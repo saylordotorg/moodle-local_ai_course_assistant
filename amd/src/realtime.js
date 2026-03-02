@@ -375,9 +375,11 @@ define([], function() {
 
         setState('connecting');
 
+        // GA Realtime API: omit the 'openai-beta.realtime-v1' subprotocol —
+        // it is only valid for the beta API and causes a version mismatch with GA client secrets.
         ws = new WebSocket(
             'wss://api.openai.com/v1/realtime?model=gpt-realtime',
-            ['realtime', 'openai-insecure-api-key.' + token, 'openai-beta.realtime-v1']
+            ['realtime', 'openai-insecure-api-key.' + token]
         );
 
         ws.addEventListener('open', function() {
