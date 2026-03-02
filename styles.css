@@ -1784,6 +1784,23 @@
     line-height: 1.5;
 }
 
+.aica-settings-panel__select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1f2937;
+    background: #fff;
+    cursor: pointer;
+    appearance: auto;
+}
+.aica-settings-panel__select:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74,108,247,0.15);
+}
+
 .aica-settings-panel__footer {
     flex: 0 0 auto;
     padding: 10px 16px 14px;
@@ -2036,6 +2053,49 @@
         color: #ef4444;
     }
 }
+
+/* Compact voice status card — sits at top of messages area when voice mode is active */
+.aica-voice-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin: 8px 8px 4px;
+    background: #eef2ff;
+    border-radius: 10px;
+    border: 1px solid #dde3f5;
+    flex-shrink: 0;
+    animation: aica-fade-in 0.2s ease;
+}
+
+.aica-voice-card__status {
+    flex: 1;
+    font-size: 12px;
+    color: #4b5563;
+}
+
+/* Card waveform: reuse .aica-voice-bar__wave children, driven by card state classes */
+.aica-voice-card--connecting .aica-voice-bar__wave span,
+.aica-voice-card--disconnected .aica-voice-bar__wave span {
+    height: 3px;
+}
+.aica-voice-card--idle .aica-voice-bar__wave span,
+.aica-voice-card--listening .aica-voice-bar__wave span {
+    animation: aica-wave-pulse 1s ease-in-out infinite;
+}
+.aica-voice-card--listening .aica-voice-bar__wave span:nth-child(2),
+.aica-voice-card--idle .aica-voice-bar__wave span:nth-child(2) { animation-delay: 0.12s; }
+.aica-voice-card--listening .aica-voice-bar__wave span:nth-child(3),
+.aica-voice-card--idle .aica-voice-bar__wave span:nth-child(3) { animation-delay: 0.24s; }
+.aica-voice-card--listening .aica-voice-bar__wave span:nth-child(4),
+.aica-voice-card--idle .aica-voice-bar__wave span:nth-child(4) { animation-delay: 0.36s; }
+.aica-voice-card--listening .aica-voice-bar__wave span:nth-child(5),
+.aica-voice-card--idle .aica-voice-bar__wave span:nth-child(5) { animation-delay: 0.48s; }
+.aica-voice-card--speaking .aica-voice-bar__wave span:nth-child(1),
+.aica-voice-card--speaking .aica-voice-bar__wave span:nth-child(5) { height: 8px; }
+.aica-voice-card--speaking .aica-voice-bar__wave span:nth-child(2),
+.aica-voice-card--speaking .aica-voice-bar__wave span:nth-child(4) { height: 14px; }
+.aica-voice-card--speaking .aica-voice-bar__wave span:nth-child(3) { height: 18px; }
 
 /* Voice transcript messages in the main messages area */
 .aica-voice-msg {

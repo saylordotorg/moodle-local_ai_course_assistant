@@ -1442,9 +1442,27 @@ define([
     const showVoiceOverlay = function(avatarUrl, onEnd) {
         if (!drawer) { return null; }
 
-        // Remove any existing bar.
+        // Remove any existing bar or card.
         const existing = drawer.querySelector('.aica-voice-bar');
         if (existing) { existing.remove(); }
+        if (messagesContainer) {
+            const existingCard = messagesContainer.querySelector('.aica-voice-card');
+            if (existingCard) { existingCard.remove(); }
+
+            // Compact voice status card in messages area — replaces the empty-space problem.
+            const card = document.createElement('div');
+            card.className = 'aica-voice-card';
+            const cardWave = document.createElement('div');
+            cardWave.className = 'aica-voice-bar__wave';
+            cardWave.setAttribute('aria-hidden', 'true');
+            for (var ci = 0; ci < 5; ci++) { cardWave.appendChild(document.createElement('span')); }
+            card.appendChild(cardWave);
+            const cardStatus = document.createElement('span');
+            cardStatus.className = 'aica-voice-card__status';
+            cardStatus.textContent = 'Connecting…';
+            card.appendChild(cardStatus);
+            messagesContainer.appendChild(card);
+        }
 
         const bar = document.createElement('div');
         bar.className = 'aica-voice-bar';
@@ -1491,10 +1509,20 @@ define([
     const hideVoiceOverlay = function() {
         if (!drawer) { return; }
         const bar = drawer.querySelector('.aica-voice-bar');
-        if (!bar) { return; }
-        bar.style.transition = 'opacity 0.2s ease';
-        bar.style.opacity = '0';
-        setTimeout(function() { bar.remove(); }, 220);
+        if (bar) {
+            bar.style.transition = 'opacity 0.2s ease';
+            bar.style.opacity = '0';
+            setTimeout(function() { bar.remove(); }, 220);
+        }
+        // Remove the voice card from messages area too.
+        if (messagesContainer) {
+            const card = messagesContainer.querySelector('.aica-voice-card');
+            if (card) {
+                card.style.transition = 'opacity 0.2s ease';
+                card.style.opacity = '0';
+                setTimeout(function() { card.remove(); }, 220);
+            }
+        }
     };
 
     /**
@@ -1524,6 +1552,21 @@ define([
         };
         if (statusEl) {
             statusEl.textContent = labels[state] || state;
+        }
+
+        // Also update the compact card in messages area.
+        if (messagesContainer) {
+            const card = messagesContainer.querySelector('.aica-voice-card');
+            if (card) {
+                card.classList.remove(
+                    'aica-voice-card--connecting', 'aica-voice-card--idle',
+                    'aica-voice-card--listening',  'aica-voice-card--speaking',
+                    'aica-voice-card--disconnected'
+                );
+                card.classList.add('aica-voice-card--' + state);
+                const cardStatusEl = card.querySelector('.aica-voice-card__status');
+                if (cardStatusEl) { cardStatusEl.textContent = labels[state] || state; }
+            }
         }
     };
 
@@ -1589,6 +1632,7 @@ define([
         let pendingLangName = config.currentLang ? (config.langs[config.currentLang] || {}).name : 'English';
         let pendingAvatarId = null;
         let pendingAvatarUrl = config.currentAvatarUrl || null;
+        let pendingVoice = config.currentVoice || 'shimmer';
 
         const panel = document.createElement('div');
         panel.className = 'aica-settings-panel';
@@ -1627,44 +1671,27 @@ define([
         langHead.textContent = 'Language';
         langSection.appendChild(langHead);
 
-        const langList = document.createElement('div');
-        langList.className = 'aica-settings-panel__lang-list';
-
-        const enOpt = document.createElement('button');
-        enOpt.type = 'button';
-        enOpt.className = 'aica-settings-panel__lang-opt' +
-            (!config.currentLang ? ' aica-settings-panel__lang-opt--active' : '');
-        enOpt.textContent = 'English (default)';
-        enOpt.addEventListener('click', function() {
-            pendingLang = null;
-            pendingLangName = 'English';
-            langList.querySelectorAll('.aica-settings-panel__lang-opt').forEach(function(b) {
-                b.classList.remove('aica-settings-panel__lang-opt--active');
-            });
-            enOpt.classList.add('aica-settings-panel__lang-opt--active');
-        });
-        langList.appendChild(enOpt);
-
+        const langSelect = document.createElement('select');
+        langSelect.className = 'aica-settings-panel__select';
+        const enOption = document.createElement('option');
+        enOption.value = '';
+        enOption.textContent = 'English (default)';
+        if (!config.currentLang) { enOption.selected = true; }
+        langSelect.appendChild(enOption);
         Object.keys(config.langs).sort(function(a, b) {
             return config.langs[a].name.localeCompare(config.langs[b].name);
         }).forEach(function(code) {
-            const opt = document.createElement('button');
-            opt.type = 'button';
-            opt.className = 'aica-settings-panel__lang-opt' +
-                (config.currentLang === code ? ' aica-settings-panel__lang-opt--active' : '');
+            const opt = document.createElement('option');
+            opt.value = code;
             opt.textContent = config.langs[code].name;
-            opt.addEventListener('click', function() {
-                pendingLang = code;
-                pendingLangName = config.langs[code].name;
-                langList.querySelectorAll('.aica-settings-panel__lang-opt').forEach(function(b) {
-                    b.classList.remove('aica-settings-panel__lang-opt--active');
-                });
-                opt.classList.add('aica-settings-panel__lang-opt--active');
-            });
-            langList.appendChild(opt);
+            if (config.currentLang === code) { opt.selected = true; }
+            langSelect.appendChild(opt);
         });
-
-        langSection.appendChild(langList);
+        langSelect.addEventListener('change', function() {
+            pendingLang = langSelect.value || null;
+            pendingLangName = pendingLang ? (config.langs[pendingLang] || {}).name : 'English';
+        });
+        langSection.appendChild(langSelect);
         content.appendChild(langSection);
 
         // ── Avatar ──
@@ -1702,17 +1729,36 @@ define([
         }
 
         // ── Voice ──
-        if (config.realtimeEnabled) {
+        if (config.realtimeEnabled || config.hasTts) {
             const voiceSection = document.createElement('div');
             voiceSection.className = 'aica-settings-panel__section';
             const voiceHead = document.createElement('h3');
             voiceHead.className = 'aica-settings-panel__section-title';
-            voiceHead.textContent = 'Voice';
+            voiceHead.textContent = 'SOLA Voice';
             voiceSection.appendChild(voiceHead);
-            const voiceNote = document.createElement('p');
-            voiceNote.className = 'aica-settings-panel__note';
-            voiceNote.textContent = 'Voice settings are managed in the site admin panel.';
-            voiceSection.appendChild(voiceNote);
+            const voiceSelect = document.createElement('select');
+            voiceSelect.className = 'aica-settings-panel__select';
+            [
+                {id: 'alloy',   label: 'Alloy'},
+                {id: 'ash',     label: 'Ash'},
+                {id: 'coral',   label: 'Coral'},
+                {id: 'echo',    label: 'Echo'},
+                {id: 'fable',   label: 'Fable'},
+                {id: 'nova',    label: 'Nova'},
+                {id: 'onyx',    label: 'Onyx'},
+                {id: 'sage',    label: 'Sage'},
+                {id: 'shimmer', label: 'Shimmer'},
+            ].forEach(function(v) {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.textContent = v.label;
+                if ((config.currentVoice || 'shimmer') === v.id) { opt.selected = true; }
+                voiceSelect.appendChild(opt);
+            });
+            voiceSelect.addEventListener('change', function() {
+                pendingVoice = voiceSelect.value;
+            });
+            voiceSection.appendChild(voiceSelect);
             content.appendChild(voiceSection);
         }
 
@@ -1733,6 +1779,12 @@ define([
             // Apply avatar if changed.
             if (pendingAvatarId !== null && pendingAvatarUrl !== config.currentAvatarUrl) {
                 callbacks.onAvatarSelect(pendingAvatarId, pendingAvatarUrl);
+            }
+            // Apply voice if changed.
+            if (pendingVoice && pendingVoice !== (config.currentVoice || 'shimmer')) {
+                if (callbacks.onVoiceSelect) {
+                    callbacks.onVoiceSelect(pendingVoice);
+                }
             }
             panel.remove();
         });

@@ -493,6 +493,8 @@ define([
                 avatars: avatars,
                 currentAvatarUrl: root.dataset.avatarurl || '',
                 realtimeEnabled: root.dataset.realtimeenabled === '1' || root.dataset.realtimeenabled === 'true',
+                hasTts: !!(root.dataset.ttsurl),
+                currentVoice: localStorage.getItem('aica_tts_voice') || 'shimmer',
             },
             {
                 onLangSelect: function(code, name) {
@@ -510,6 +512,9 @@ define([
                         UI.updateAvatarImages(avatarUrl);
                         return;
                     }).catch(function() { /**/ });
+                },
+                onVoiceSelect: function(voice) {
+                    localStorage.setItem('aica_tts_voice', voice);
                 },
             }
         );
@@ -564,7 +569,8 @@ define([
 
         Repo.getRealtimeToken(courseId).then(function(result) {
             const token = result.token;
-            const voice = result.voice;
+            // Student's saved voice preference overrides the server default.
+            const voice = localStorage.getItem('aica_tts_voice') || result.voice;
 
             Realtime.connect(
                 token,
@@ -746,6 +752,8 @@ define([
         formData.append('text', text.length > 2000 ? text.substring(0, 2000) : text);
         formData.append('sesskey', sessKey);
         formData.append('courseid', String(courseId));
+        const storedVoice = localStorage.getItem('aica_tts_voice');
+        if (storedVoice) { formData.append('voice', storedVoice); }
 
         fetch(ttsUrl, {
             method: 'POST',

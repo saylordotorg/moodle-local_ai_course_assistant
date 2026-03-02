@@ -264,8 +264,14 @@ define([], function() {
                     audio: b64,
                 }));
             };
+            // Route scriptProcessor through a muted gain node — prevents mic echo through speakers.
+            // ScriptProcessor must be connected in the audio graph for onaudioprocess to fire,
+            // but connecting directly to destination causes feedback on Mac/Chrome without headphones.
+            const dummyGain = audioCtx.createGain();
+            dummyGain.gain.value = 0;
+            dummyGain.connect(audioCtx.destination);
             source.connect(scriptProcessor);
-            scriptProcessor.connect(audioCtx.destination);
+            scriptProcessor.connect(dummyGain);
         }).catch(function(err) {
             if (onErrorCb) { onErrorCb('Microphone access denied: ' + err.message); }
         });

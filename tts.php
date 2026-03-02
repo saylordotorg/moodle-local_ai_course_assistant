@@ -58,7 +58,9 @@ if (empty($apikey)) {
     exit;
 }
 
-$voice = get_config('local_ai_course_assistant', 'realtime_voice') ?: 'shimmer';
+// Student's saved voice preference takes priority over the site default.
+$voice_param = optional_param('voice', '', PARAM_ALPHA);
+$voice = $voice_param ?: (get_config('local_ai_course_assistant', 'realtime_voice') ?: 'shimmer');
 
 // Truncate text to avoid excessive API costs.
 $text = mb_substr(trim($text), 0, 4096);
