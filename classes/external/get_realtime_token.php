@@ -59,7 +59,7 @@ class get_realtime_token extends external_api {
         }
 
         if (empty($apikey)) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '', null,
+            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
                 'No OpenAI API key configured for voice mode.');
         }
 
@@ -83,7 +83,7 @@ class get_realtime_token extends external_api {
         if ($info['http_code'] !== 200) {
             $errdata = json_decode($response, true);
             $errmsg = isset($errdata['error']['message']) ? $errdata['error']['message'] : 'API error ' . $info['http_code'];
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '', null, $errmsg);
+            throw new \moodle_exception('error', 'local_ai_course_assistant', '', $errmsg);
         }
 
         $data = json_decode($response, true);
@@ -94,7 +94,7 @@ class get_realtime_token extends external_api {
             : ($data['value'] ?? '');
 
         if (empty($token)) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '', null,
+            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
                 'Unexpected response from OpenAI Realtime API: ' . substr($response, 0, 200));
         }
 
