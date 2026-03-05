@@ -1,0 +1,90 @@
+name: API Smoke Tests
+
+# Runs daily at 06:00 UTC and on every push to main.
+# If any test fails an issue is automatically opened so the team is alerted
+# before users encounter the breakage.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # daily 06:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - "tests/smoke_api.py"
+      - ".github/workflows/api-smoke-test.yml"
+  workflow_dispatch:       # allow manual trigger from the Actions tab
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install websockets
+
+      - name: Run smoke tests
+        id: smoke
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python3 tests/smoke_api.py --apikey "$OPENAI_API_KEY"
+
+      - name: Open GitHub issue on failure
+        if: failure() && steps.smoke.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `⚠️ API Smoke Test Failed — ${new Date().toISOString().slice(0,10)}`;
+            const body = [
+              '## API Smoke Test Failure',
+              '',
+              `**Run:** [${context.runId}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+              `**Triggered by:** ${context.eventName}`,
+              '',
+              'One or more external API tests failed. This likely means OpenAI changed their API',
+              'in a way that breaks SOLA. Check the run log for details.',
+              '',
+              '### Common causes',
+              '- New required fields in `session.update`',
+              '- Event names renamed (e.g. `response.audio.*` → `response.output_audio.*`)',
+              '- Token endpoint response structure changed',
+              '- Model deprecated or renamed',
+              '',
+              '### Steps to fix',
+              '1. Check the [OpenAI changelog](https://platform.openai.com/docs/changelog)',
+              '2. Run `python3 tests/smoke_api.py --apikey $KEY` locally to reproduce',
+              '3. Update `amd/src/realtime.js` and/or `classes/external/get_realtime_token.php`',
+              '4. Update the assertions in `tests/smoke_api.py` to match the new contract',
+            ].join('\n');
+
+            // Check if there's already an open issue for today to avoid duplicates
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'api-smoke-test',
+            });
+
+            const today = new Date().toISOString().slice(0, 10);
+            const exists = issues.data.some(i => i.title.includes(today));
+
+            if (!exists) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['api-smoke-test', 'bug'],
+              });
+              console.log('Issue created.');
+            } else {
+              console.log('Issue for today already exists — skipping.');
+            }
