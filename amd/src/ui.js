@@ -59,6 +59,8 @@ define([
     const AVATAR_KEY = 'aica_avatar';
     /** localStorage prefix for per-course bookmarks */
     const BOOKMARK_PREFIX = 'aica_bookmarks_';
+    /** Tracks the most-recent user message element (shows the edit button) */
+    let lastUserMsgEl = null;
     /** Minimum pixel movement to count as a drag (suppresses subsequent click) */
     const DRAG_THRESHOLD = 8;
 
@@ -985,6 +987,51 @@ define([
             el.appendChild(createMsgActions(content, el, onSpeak, text));
         }
 
+        // Edit button on user messages — only visible on the most-recent one.
+        if (role === 'user') {
+            const editActions = document.createElement('div');
+            editActions.className = 'local-ai-course-assistant__msg-actions--user';
+            const editBtn = document.createElement('button');
+            editBtn.className = 'local-ai-course-assistant__btn-edit';
+            editBtn.setAttribute('aria-label', 'Edit message');
+            editBtn.setAttribute('title', 'Edit message');
+            editBtn.innerHTML = EDIT_SVG;
+            editBtn.addEventListener('click', function() {
+                const text = content.textContent || '';
+                // Remove this message and everything that came after it.
+                let node = el;
+                while (node) {
+                    const next = node.nextSibling;
+                    node.remove();
+                    node = next;
+                }
+                // Update lastUserMsgEl to the new last user message (if any).
+                const remaining = messagesContainer.querySelectorAll(
+                    '.local-ai-course-assistant__message--user');
+                if (lastUserMsgEl) {
+                    lastUserMsgEl.classList.remove('local-ai-course-assistant__message--last-user');
+                }
+                lastUserMsgEl = remaining.length ? remaining[remaining.length - 1] : null;
+                if (lastUserMsgEl) {
+                    lastUserMsgEl.classList.add('local-ai-course-assistant__message--last-user');
+                }
+                // Populate the input.
+                input.value = text;
+                autoResizeInput();
+                updateSendButton();
+                input.focus();
+            });
+            editActions.appendChild(editBtn);
+            el.appendChild(editActions);
+
+            // Shift the "last user" marker to this new message.
+            if (lastUserMsgEl) {
+                lastUserMsgEl.classList.remove('local-ai-course-assistant__message--last-user');
+            }
+            lastUserMsgEl = el;
+            el.classList.add('local-ai-course-assistant__message--last-user');
+        }
+
         // Timestamp label (shown on hover).
         if (msgTs) {
             const timeEl = document.createElement('div');
@@ -1223,6 +1270,13 @@ define([
         ' width="14" height="14" fill="currentColor" aria-hidden="true">' +
         '<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>';
 
+    const EDIT_SVG =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"' +
+        ' width="14" height="14" fill="currentColor" aria-hidden="true">' +
+        '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>' +
+        '<path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>' +
+        '</svg>';
+
     const SPEAK_SVG =
         '<svg class="aica-icon-speak" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"' +
         ' width="14" height="14" fill="currentColor" aria-hidden="true">' +
@@ -1312,6 +1366,7 @@ define([
     const clearMessages = function() {
         messagesContainer.innerHTML = '';
         streamingEl = null;
+        lastUserMsgEl = null;
     };
 
     /**

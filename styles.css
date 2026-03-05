@@ -1185,6 +1185,53 @@
 .local-ai-course-assistant__btn-speak--active .aica-icon-stop  { display: inline; }
 
 /* =========================================================
+   Edit button — last user message
+   Mirrors assistant msg-actions but anchored bottom-left
+   ========================================================= */
+
+.local-ai-course-assistant__message--user {
+    position: relative;
+}
+
+.local-ai-course-assistant__msg-actions--user {
+    position: absolute;
+    bottom: 5px;
+    left: 6px;
+    display: flex;
+    gap: 3px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+@media (hover: hover) {
+    .local-ai-course-assistant__message--last-user:hover .local-ai-course-assistant__msg-actions--user {
+        opacity: 1;
+    }
+}
+
+.local-ai-course-assistant__btn-edit {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+}
+
+@media (hover: hover) {
+    .local-ai-course-assistant__btn-edit:hover {
+        color: #4a6cf7;
+        background: rgba(255, 255, 255, 0.98);
+        border-color: #c7d2fe;
+    }
+}
+
+/* =========================================================
    Language detection banner
    ========================================================= */
 
@@ -2707,15 +2754,21 @@
         opacity: 0.85 !important;
     }
 
+    .local-ai-course-assistant__message--last-user .local-ai-course-assistant__msg-actions--user {
+        opacity: 0.85;
+    }
+
     .local-ai-course-assistant__btn-copy,
     .local-ai-course-assistant__btn-bookmark,
-    .local-ai-course-assistant__btn-speak {
+    .local-ai-course-assistant__btn-speak,
+    .local-ai-course-assistant__btn-edit {
         padding: 6px !important;
     }
 
     .local-ai-course-assistant__btn-copy svg,
     .local-ai-course-assistant__btn-bookmark svg,
-    .local-ai-course-assistant__btn-speak svg {
+    .local-ai-course-assistant__btn-speak svg,
+    .local-ai-course-assistant__btn-edit svg {
         width: 16px !important;
         height: 16px !important;
     }
