@@ -195,5 +195,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026030701, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026030800) {
+        // v1.0.17: Enhanced Quick Study (objectives/modules sub-select, recent sessions),
+        // personalised welcome-back message, progress panel, Settings progress section.
+        // No schema changes needed.
+        upgrade_plugin_savepoint(true, 2026030800, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

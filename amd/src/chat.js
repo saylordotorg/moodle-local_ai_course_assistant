@@ -512,6 +512,10 @@ define([
             if (raw) { avatars = JSON.parse(raw); }
         } catch (e) { avatars = []; }
 
+        let studySessions = [];
+        let quizHistory = [];
+        try { studySessions = JSON.parse(localStorage.getItem('aica_study_sessions_' + courseId) || '[]'); } catch (e) { /**/ }
+        try { quizHistory = JSON.parse(localStorage.getItem('aica_quiz_history_' + courseId) || '[]'); } catch (e) { /**/ }
         UI.showSettingsPanel(
             {
                 langs: Speech.SUPPORTED_LANGS,
@@ -521,6 +525,8 @@ define([
                 realtimeEnabled: root.dataset.realtimeenabled === '1' || root.dataset.realtimeenabled === 'true',
                 hasTts: !!(root.dataset.ttsurl),
                 currentVoice: localStorage.getItem('aica_tts_voice') || 'shimmer',
+                studySessions: studySessions,
+                quizHistory: quizHistory,
             },
             {
                 onLangSelect: function(code, name) {
@@ -542,6 +548,13 @@ define([
                 onVoiceSelect: function(voice) {
                     localStorage.setItem('aica_tts_voice', voice);
                 },
+                onClearProgress: function() {
+                    try {
+                        localStorage.removeItem('aica_study_sessions_' + courseId);
+                        localStorage.removeItem('aica_quiz_history_' + courseId);
+                        localStorage.removeItem('aica_last_session_' + courseId);
+                    } catch (e) { /**/ }
+                },
             }
         );
     };
@@ -552,6 +565,30 @@ define([
      * @param {string} text The suggestion text to send
      */
     const handleSuggestionClick = function(text) {
+        // Special chip: "Continue: <topic>" — build a resume prompt.
+        if (text.startsWith('Continue: ')) {
+            const rawTopic = text.slice('Continue: '.length).replace(/ \(last quiz: \d+%\)$/, '');
+            UI.clearSuggestions();
+            const prompt = 'Let\'s continue studying "' + rawTopic + '" from where I left off. ' +
+                'Briefly remind me what we covered and what I should learn next.';
+            UI.getElements().input.value = prompt;
+            UI.autoResizeInput();
+            UI.updateSendButton();
+            handleSend();
+            return;
+        }
+        // Special chip: open progress panel.
+        if (text === 'Show my progress') {
+            UI.clearSuggestions();
+            handleShowProgress();
+            return;
+        }
+        // Special chip: show starters overlay.
+        if (text === 'Start something new' || text === 'Start fresh') {
+            UI.clearSuggestions();
+            UI.showStarters();
+            return;
+        }
         UI.clearSuggestions();
         UI.getElements().input.value = text;
         UI.autoResizeInput();
@@ -1240,8 +1277,8 @@ define([
     };
 
     /**
-     * Show a "welcome back" suggestion chip if there is a recent session to continue.
-     * Called on widget open (after history loads).
+     * Show a personalised welcome-back assistant message + action chips if there
+     * is a recent session to continue.  Called on widget open (after history loads).
      */
     const checkWelcomeBack = function() {
         try {
@@ -1251,36 +1288,62 @@ define([
                 return;
             }
             const daysSince = (Date.now() - stored.ts) / 86400000;
-            if (daysSince > 7) {
-                return; // Too long ago — don't bother
+            if (daysSince > 14) {
+                return; // Too long ago
             }
             const topic = stored.topic;
+            const name = firstName || 'there';
 
-            // Also surface the last quiz score for the same topic if available.
+            // Study stats line.
+            let studyNote = '';
+            try {
+                const sessions = JSON.parse(localStorage.getItem('aica_study_sessions_' + courseId) || '[]');
+                if (sessions.length >= 2) {
+                    const totalMins = sessions.reduce(function(sum, s) { return sum + (s.minutes || 0); }, 0);
+                    studyNote = '\n\nYou\'ve completed **' + sessions.length + ' study sessions** (' + totalMins + ' min total) in this course.';
+                }
+            } catch (e) { /**/ }
+
+            // Quiz note for the same topic.
             let quizNote = '';
+            let chipSuffix = '';
             try {
                 const hist = JSON.parse(localStorage.getItem('aica_quiz_history_' + courseId) || '[]');
-                // Find most recent quiz result for the same or similar topic.
                 for (var i = hist.length - 1; i >= 0; i--) {
                     if (hist[i].topic && hist[i].topic.toLowerCase().indexOf(topic.toLowerCase().slice(0, 8)) >= 0) {
                         const pct = Math.round((hist[i].score / hist[i].total) * 100);
-                        quizNote = ' (last quiz: ' + pct + '%)';
+                        quizNote = '\n\nYour last quiz on **' + hist[i].topic + '** scored **' + pct + '%**.';
+                        chipSuffix = ' (last quiz: ' + pct + '%)';
                         break;
                     }
                 }
             } catch (e) { /**/ }
 
-            const chip = 'Continue: ' + topic + quizNote;
+            const daysAgo = Math.max(1, Math.round(daysSince));
+            const timeStr = daysAgo === 1 ? 'yesterday' : daysAgo + ' days ago';
+            const msg = 'Welcome back, **' + name + '**! \ud83d\udc4b\n\n' +
+                'Last time you were studying **' + topic + '** (' + timeStr + ').' +
+                studyNote + quizNote +
+                '\n\nWould you like to pick up where you left off?';
+
             // Show after a brief delay so history messages render first.
             setTimeout(function() {
-                UI.showSuggestions([chip, 'Start fresh'], handleSuggestionClick);
+                addAssistantMsg(msg);
+                setTimeout(function() {
+                    UI.showSuggestions([
+                        'Continue: ' + topic + chipSuffix,
+                        'Show my progress',
+                        'Start something new'
+                    ], handleSuggestionClick);
+                }, 150);
             }, 600);
         } catch (e) { /**/ }
     };
 
     /**
      * Handle the Quick Study chip.
-     * Shows a time picker + topic selector, then sends a focused study prompt.
+     * Shows a time picker + topic selector (with objectives/modules sub-select),
+     * recent sessions with Resume buttons, then sends a focused study prompt.
      */
     const handleQuickStudy = function() {
         const root = document.getElementById('local-ai-course-assistant');
@@ -1289,7 +1352,7 @@ define([
             return;
         }
 
-        // Remove any existing panel.
+        // Toggle: if already open, close it.
         const existing = drawer.querySelector('.aica-study-setup');
         if (existing) {
             existing.remove();
@@ -1309,13 +1372,55 @@ define([
         title.textContent = 'Quick Study';
         panel.appendChild(title);
 
-        // Time label.
+        // --- Recent sessions ---
+        try {
+            const sessions = JSON.parse(localStorage.getItem('aica_study_sessions_' + courseId) || '[]');
+            const recent = sessions.slice(-3).reverse();
+            if (recent.length > 0) {
+                const recentLabel = document.createElement('p');
+                recentLabel.className = 'aica-quiz-setup__label';
+                recentLabel.textContent = 'Recent sessions';
+                panel.appendChild(recentLabel);
+
+                const recentList = document.createElement('div');
+                recentList.className = 'aica-study-setup__recent-list';
+                recent.forEach(function(sess) {
+                    const item = document.createElement('div');
+                    item.className = 'aica-study-setup__recent-item';
+
+                    const info = document.createElement('span');
+                    info.className = 'aica-study-setup__recent-info';
+                    const dateStr = new Date(sess.ts).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+                    info.textContent = sess.topic + ' \u00b7 ' + sess.minutes + ' min \u00b7 ' + dateStr;
+                    item.appendChild(info);
+
+                    const resumeBtn = document.createElement('button');
+                    resumeBtn.type = 'button';
+                    resumeBtn.className = 'aica-study-setup__resume-btn';
+                    resumeBtn.textContent = 'Resume';
+                    resumeBtn.addEventListener('click', function() {
+                        panel.remove();
+                        drawer.classList.remove('local-ai-course-assistant__drawer--quiz-setup');
+                        const prompt = 'Let\'s continue studying "' + sess.topic + '" from where I left off. ' +
+                            'Briefly remind me what we covered and what I should learn next.';
+                        UI.getElements().input.value = prompt;
+                        UI.autoResizeInput();
+                        UI.updateSendButton();
+                        handleSend();
+                    });
+                    item.appendChild(resumeBtn);
+                    recentList.appendChild(item);
+                });
+                panel.appendChild(recentList);
+            }
+        } catch (e) { /**/ }
+
+        // --- Time picker ---
         const timeLabel = document.createElement('p');
         timeLabel.className = 'aica-quiz-setup__label';
         timeLabel.textContent = 'How much time do you have?';
         panel.appendChild(timeLabel);
 
-        // Time buttons.
         const timeRow = document.createElement('div');
         timeRow.className = 'aica-quiz-setup__count-row';
         const times = [5, 10, 15, 30];
@@ -1338,13 +1443,12 @@ define([
         });
         panel.appendChild(timeRow);
 
-        // Topic label.
+        // --- Topic selector ---
         const topicLabel = document.createElement('p');
         topicLabel.className = 'aica-quiz-setup__label';
         topicLabel.textContent = 'What would you like to study?';
         panel.appendChild(topicLabel);
 
-        // Topic select.
         const select = document.createElement('select');
         select.className = 'aica-quiz-setup__topic-select';
 
@@ -1359,13 +1463,26 @@ define([
         if (currentPageTitle) {
             addOption('', currentPageTitle + ' (current page)');
         }
-        if (Array.isArray(quizTopics)) {
-            quizTopics.forEach(function(t) {
-                addOption(t.name, t.name);
-            });
+
+        const hasObjectives = Array.isArray(learningObjectives) && learningObjectives.length > 0;
+        const hasModules = Array.isArray(moduleTitles) && moduleTitles.length > 0;
+        if (hasObjectives) {
+            addOption('__objectives__', 'Learning objectives\u2026');
         }
-        addOption('__custom__', 'Custom topic...');
+        if (hasModules) {
+            addOption('__modules__', 'Module topics\u2026');
+        }
+        if (Array.isArray(quizTopics) && quizTopics.length > 0) {
+            quizTopics.forEach(function(t) { addOption(t.name, t.name); });
+        }
+        addOption('__custom__', 'Custom topic\u2026');
         panel.appendChild(select);
+
+        // Sub-selector for objectives/modules (hidden until parent chosen).
+        const subSelect = document.createElement('select');
+        subSelect.className = 'aica-quiz-setup__topic-select aica-quiz-setup__sub-select';
+        subSelect.style.display = 'none';
+        panel.appendChild(subSelect);
 
         // Custom input.
         const customInput = document.createElement('input');
@@ -1378,6 +1495,24 @@ define([
         select.addEventListener('change', function() {
             customInput.style.display = select.value === '__custom__' ? '' : 'none';
             if (select.value === '__custom__') { customInput.focus(); }
+
+            const isObj = select.value === '__objectives__';
+            const isMod = select.value === '__modules__';
+            subSelect.style.display = (isObj || isMod) ? '' : 'none';
+            if (isObj || isMod) {
+                subSelect.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = '\u2014 select a sub-topic \u2014';
+                subSelect.appendChild(placeholder);
+                const items = isObj ? learningObjectives : moduleTitles;
+                items.forEach(function(item) {
+                    const opt = document.createElement('option');
+                    opt.value = item.name;
+                    opt.textContent = item.name;
+                    subSelect.appendChild(opt);
+                });
+            }
         });
 
         // Start button.
@@ -1389,17 +1524,18 @@ define([
             let topic;
             if (select.value === '__custom__') {
                 topic = customInput.value.trim() || 'this topic';
+            } else if (select.value === '__objectives__' || select.value === '__modules__') {
+                topic = subSelect.value || null;
+                if (!topic) { subSelect.focus(); return; }
             } else if (select.value === '__guided__') {
                 topic = null;
             } else {
                 topic = select.value || currentPageTitle;
             }
 
-            // Remove panel and restore drawer.
             panel.remove();
             drawer.classList.remove('local-ai-course-assistant__drawer--quiz-setup');
 
-            // Build the study prompt.
             let prompt;
             if (topic) {
                 prompt = 'I have ' + selectedMinutes + ' minutes. Please give me a focused ' +
@@ -1409,7 +1545,7 @@ define([
             } else {
                 prompt = 'I have ' + selectedMinutes + ' minutes to study. Based on my recent ' +
                     'activity and this course, what should I focus on? Give me a focused ' +
-                    selectedMinutes + '-minute study session — start immediately with the most ' +
+                    selectedMinutes + '-minute study session \u2014 start immediately with the most ' +
                     'important topic and keep responses concise.';
             }
 
@@ -1442,6 +1578,130 @@ define([
         });
         panel.appendChild(cancelBtn);
 
+        drawer.appendChild(panel);
+    };
+
+    /**
+     * Show a dedicated progress panel in the drawer listing study sessions and quiz history.
+     */
+    const handleShowProgress = function() {
+        const root = document.getElementById('local-ai-course-assistant');
+        const drawer = root ? root.querySelector('.local-ai-course-assistant__drawer') : null;
+        if (!drawer) { return; }
+
+        // Toggle.
+        const existing = drawer.querySelector('.aica-progress-panel');
+        if (existing) { existing.remove(); return; }
+
+        const panel = document.createElement('div');
+        panel.className = 'aica-progress-panel aica-settings-panel';
+
+        // Header.
+        const header = document.createElement('div');
+        header.className = 'aica-settings-panel__header';
+        const titleEl = document.createElement('span');
+        titleEl.className = 'aica-settings-panel__title';
+        titleEl.textContent = 'My Progress';
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'aica-settings-panel__close';
+        closeBtn.setAttribute('aria-label', 'Close');
+        closeBtn.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"' +
+            ' fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5' +
+            ' 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+        closeBtn.addEventListener('click', function() { panel.remove(); });
+        header.appendChild(titleEl);
+        header.appendChild(closeBtn);
+        panel.appendChild(header);
+
+        const content = document.createElement('div');
+        content.className = 'aica-settings-panel__content';
+
+        // Study sessions section.
+        const sessSection = document.createElement('div');
+        sessSection.className = 'aica-settings-panel__section';
+        const sessHead = document.createElement('h3');
+        sessHead.className = 'aica-settings-panel__section-title';
+        let sessions = [];
+        try { sessions = JSON.parse(localStorage.getItem('aica_study_sessions_' + courseId) || '[]'); } catch (e) { /**/ }
+        sessHead.textContent = 'Study sessions (' + sessions.length + ')';
+        sessSection.appendChild(sessHead);
+        if (sessions.length === 0) {
+            const p = document.createElement('p');
+            p.className = 'aica-settings-panel__empty-note';
+            p.textContent = 'No study sessions yet. Start a Quick Study!';
+            sessSection.appendChild(p);
+        } else {
+            const totalMins = sessions.reduce(function(s, x) { return s + (x.minutes || 0); }, 0);
+            const totalPara = document.createElement('p');
+            totalPara.className = 'aica-settings-panel__empty-note';
+            totalPara.style.marginBottom = '6px';
+            totalPara.textContent = sessions.length + ' sessions \u00b7 ' + totalMins + ' minutes total';
+            sessSection.appendChild(totalPara);
+            sessions.slice().reverse().slice(0, 10).forEach(function(sess) {
+                const item = document.createElement('div');
+                item.className = 'aica-settings-panel__bookmark-item';
+                const txt = document.createElement('p');
+                txt.className = 'aica-settings-panel__bookmark-text';
+                const dateStr = new Date(sess.ts).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+                txt.textContent = sess.topic + ' \u00b7 ' + sess.minutes + ' min \u00b7 ' + dateStr;
+                item.appendChild(txt);
+                sessSection.appendChild(item);
+            });
+        }
+        content.appendChild(sessSection);
+
+        // Quiz history section.
+        const quizSection = document.createElement('div');
+        quizSection.className = 'aica-settings-panel__section';
+        const quizHead = document.createElement('h3');
+        quizHead.className = 'aica-settings-panel__section-title';
+        let quizHist = [];
+        try { quizHist = JSON.parse(localStorage.getItem('aica_quiz_history_' + courseId) || '[]'); } catch (e) { /**/ }
+        quizHead.textContent = 'Quiz history (' + quizHist.length + ')';
+        quizSection.appendChild(quizHead);
+        if (quizHist.length === 0) {
+            const p = document.createElement('p');
+            p.className = 'aica-settings-panel__empty-note';
+            p.textContent = 'No quizzes taken yet.';
+            quizSection.appendChild(p);
+        } else {
+            quizHist.slice().reverse().slice(0, 10).forEach(function(q) {
+                const item = document.createElement('div');
+                item.className = 'aica-settings-panel__bookmark-item';
+                const txt = document.createElement('p');
+                txt.className = 'aica-settings-panel__bookmark-text';
+                const pct = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
+                const dateStr = q.date ? new Date(q.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
+                txt.textContent = q.topic + ' \u00b7 ' + pct + '% \u00b7 ' + dateStr;
+                item.appendChild(txt);
+                quizSection.appendChild(item);
+            });
+        }
+        content.appendChild(quizSection);
+
+        // Clear progress button.
+        const clearSection = document.createElement('div');
+        clearSection.className = 'aica-settings-panel__section';
+        const clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'aica-quiz-setup__cancel';
+        clearBtn.style.cssText = 'display:block;width:100%;padding:10px;font-size:0.85em;';
+        clearBtn.textContent = 'Clear all progress data';
+        clearBtn.addEventListener('click', function() {
+            if (!window.confirm('Clear all study sessions and quiz history for this course?')) { return; }
+            try {
+                localStorage.removeItem('aica_study_sessions_' + courseId);
+                localStorage.removeItem('aica_quiz_history_' + courseId);
+                localStorage.removeItem('aica_last_session_' + courseId);
+            } catch (e) { /**/ }
+            panel.remove();
+        });
+        clearSection.appendChild(clearBtn);
+        content.appendChild(clearSection);
+
+        panel.appendChild(content);
         drawer.appendChild(panel);
     };
 

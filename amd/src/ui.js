@@ -2308,6 +2308,77 @@ define([
         }
         content.appendChild(savedSection);
 
+        // ── My Progress ──
+        if (config.studySessions !== undefined || config.quizHistory !== undefined) {
+            const progSection = document.createElement('div');
+            progSection.className = 'aica-settings-panel__section';
+            const progHead = document.createElement('h3');
+            progHead.className = 'aica-settings-panel__section-title';
+            progHead.textContent = 'My Progress';
+            progSection.appendChild(progHead);
+
+            const studySessions = config.studySessions || [];
+            const quizHistory = config.quizHistory || [];
+
+            if (studySessions.length === 0 && quizHistory.length === 0) {
+                const p = document.createElement('p');
+                p.className = 'aica-settings-panel__empty-note';
+                p.textContent = 'No study activity yet for this course.';
+                progSection.appendChild(p);
+            } else {
+                if (studySessions.length > 0) {
+                    const totalMins = studySessions.reduce(function(s, x) { return s + (x.minutes || 0); }, 0);
+                    const studyPara = document.createElement('p');
+                    studyPara.className = 'aica-settings-panel__empty-note';
+                    studyPara.textContent = studySessions.length + ' study session' +
+                        (studySessions.length !== 1 ? 's' : '') + ' \u00b7 ' + totalMins + ' min total';
+                    progSection.appendChild(studyPara);
+                    studySessions.slice().reverse().slice(0, 5).forEach(function(sess) {
+                        const item = document.createElement('div');
+                        item.className = 'aica-settings-panel__bookmark-item';
+                        const txt = document.createElement('p');
+                        txt.className = 'aica-settings-panel__bookmark-text';
+                        const dateStr = new Date(sess.ts).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+                        txt.textContent = sess.topic + ' \u00b7 ' + sess.minutes + ' min \u00b7 ' + dateStr;
+                        item.appendChild(txt);
+                        progSection.appendChild(item);
+                    });
+                }
+                if (quizHistory.length > 0) {
+                    const quizLabel = document.createElement('p');
+                    quizLabel.className = 'aica-settings-panel__empty-note';
+                    quizLabel.style.marginTop = '8px';
+                    quizLabel.textContent = quizHistory.length + ' quiz' + (quizHistory.length !== 1 ? 'zes' : '') + ' taken';
+                    progSection.appendChild(quizLabel);
+                    quizHistory.slice().reverse().slice(0, 5).forEach(function(q) {
+                        const item = document.createElement('div');
+                        item.className = 'aica-settings-panel__bookmark-item';
+                        const txt = document.createElement('p');
+                        txt.className = 'aica-settings-panel__bookmark-text';
+                        const pct = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
+                        const dateStr = q.date ? new Date(q.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
+                        txt.textContent = q.topic + ' \u00b7 ' + pct + '% \u00b7 ' + dateStr;
+                        item.appendChild(txt);
+                        progSection.appendChild(item);
+                    });
+                }
+                if (callbacks.onClearProgress) {
+                    const clearBtn = document.createElement('button');
+                    clearBtn.type = 'button';
+                    clearBtn.className = 'aica-quiz-setup__cancel';
+                    clearBtn.style.cssText = 'display:block;width:100%;padding:8px;font-size:0.8em;margin-top:6px;';
+                    clearBtn.textContent = 'Clear progress data';
+                    clearBtn.addEventListener('click', function() {
+                        if (!window.confirm('Clear all study sessions and quiz history for this course?')) { return; }
+                        callbacks.onClearProgress();
+                        panel.remove();
+                    });
+                    progSection.appendChild(clearBtn);
+                }
+            }
+            content.appendChild(progSection);
+        }
+
         // Avatar section appended last so it appears at the bottom of settings.
         if (avatarSection) {
             content.appendChild(avatarSection);
