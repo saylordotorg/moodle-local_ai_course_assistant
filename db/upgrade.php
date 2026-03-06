@@ -223,5 +223,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026030803, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026030804) {
+        // v1.0.20: Update welcome screen — personalised subtitle, new feature list
+        // including Practice Speaking and Pronunciation Practice (conditionally),
+        // adaptive quizzes, focused sessions; updated CTA text.
+        // No schema changes needed.
+        upgrade_plugin_savepoint(true, 2026030804, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

@@ -1630,6 +1630,8 @@ define([
         const avatarUrl = root.dataset.avatarurl || '';
         const firstName = root.dataset.firstname || '';
         const welcomeName = firstName ? ', ' + firstName : '';
+        const hasTts = !!(root.dataset.ttsurl);
+        const hasPronunciation = !!(root.querySelector('[data-starter="ell-pronunciation"]'));
 
         const panel = document.createElement('div');
         panel.className = 'local-ai-course-assistant__welcome';
@@ -1641,26 +1643,38 @@ define([
                 ? '<img src="' + avatarUrl + '" alt="" class="local-ai-course-assistant__welcome-avatar" aria-hidden="true" />'
                 : '') +
             '<h2 class="local-ai-course-assistant__welcome-title">Hi' + welcomeName + ', I\'m SOLA!</h2>' +
-            '<p class="local-ai-course-assistant__welcome-subtitle">Your Saylor Online Learning Assistant, here to help you succeed.</p>' +
+            '<p class="local-ai-course-assistant__welcome-subtitle">Your personal study coach \u2014 not just another chatbot.</p>' +
             '<ul class="local-ai-course-assistant__welcome-features">' +
             '<li>' +
-            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">💬</span>' +
-            '<span><strong>Ask questions</strong> about course content anytime</span>' +
+            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\ud83c\udfaf</span>' +
+            '<span><strong>Focused study sessions</strong> \u2014 pick a topic &amp; time limit, I\'ll guide you step by step</span>' +
             '</li>' +
             '<li>' +
-            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">📅</span>' +
-            '<span><strong>Build a study plan</strong> tailored to your schedule</span>' +
+            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\u26a1</span>' +
+            '<span><strong>Adaptive quizzes</strong> \u2014 I track your scores and focus practice where you need it most</span>' +
+            '</li>' +
+            (hasTts
+                ? '<li>' +
+                  '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\ud83c\udfa4</span>' +
+                  '<span><strong>Practice Speaking</strong> \u2014 real voice conversations about what you\'re learning</span>' +
+                  '</li>'
+                : '') +
+            (hasPronunciation
+                ? '<li>' +
+                  '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\ud83d\udd0a</span>' +
+                  '<span><strong>Pronunciation Practice</strong> \u2014 say a word or phrase and get instant coaching</span>' +
+                  '</li>'
+                : '') +
+            '<li>' +
+            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\ud83d\udcc5</span>' +
+            '<span><strong>Personalised study plan</strong> \u2014 share your schedule and I\'ll map out a realistic path</span>' +
             '</li>' +
             '<li>' +
-            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">📝</span>' +
-            '<span><strong>Practice quizzes</strong> to test your understanding</span>' +
-            '</li>' +
-            '<li>' +
-            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">🕐</span>' +
-            '<span><strong>Available 24/7</strong> — always here when you need help</span>' +
+            '<span class="local-ai-course-assistant__welcome-feature-icon" aria-hidden="true">\ud83d\udcac</span>' +
+            '<span><strong>Ask me anything</strong> \u2014 explanations, examples, and guidance 24/7</span>' +
             '</li>' +
             '</ul>' +
-            '<button class="local-ai-course-assistant__welcome-cta">Start Chatting</button>';
+            '<button class="local-ai-course-assistant__welcome-cta">Let\'s get started \u2192</button>';
 
         // Insert as a flex child immediately after the header so it naturally
         // starts below it — no absolute positioning or height measurement needed.
