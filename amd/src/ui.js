@@ -509,9 +509,18 @@ define([
         if (toggleAvatarEl) {
             toggleAvatarEl.style.backgroundColor = avatarFill;
         }
-        // Apply drawer display mode if configured.
+        // Apply drawer display mode if configured — auto-open, hide toggle.
         if (root.dataset.displaymode === 'drawer') {
             root.classList.add('local-ai-course-assistant--drawer-mode');
+            // Auto-open the drawer since there's no toggle button.
+            if (drawer) {
+                drawer.setAttribute('aria-hidden', 'false');
+                drawer.classList.add('local-ai-course-assistant__drawer--open');
+                root.classList.add('local-ai-course-assistant--open');
+            }
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'true');
+            }
         }
         restoreExpandState();
         applyPositionOffset();
