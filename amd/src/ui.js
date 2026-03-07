@@ -1204,25 +1204,6 @@ define([
     };
 
     /**
-     * Scroll just enough to keep the bottom of the streaming content visible.
-     * Unlike scrollToBottom, this doesn't snap to the very end of the messages container.
-     */
-    const scrollToKeepStreamingVisible = function() {
-        if (!messagesContainer || !streamingEl) {
-            return;
-        }
-        const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
-        if (!content) {
-            return;
-        }
-        const cRect = messagesContainer.getBoundingClientRect();
-        const eRect = content.getBoundingClientRect();
-        if (eRect.bottom > cRect.bottom - 4) {
-            messagesContainer.scrollTop += (eRect.bottom - cRect.bottom) + 6;
-        }
-    };
-
-    /**
      * Internal: advance the typewriter by TYPEWRITER_SPEED characters and re-render.
      */
     const tickTypewriter = function() {
@@ -1239,10 +1220,10 @@ define([
         const content = streamingEl.querySelector('.local-ai-course-assistant__message-content');
         if (content) {
             content.innerHTML = Markdown.render(partial);
+            // Only auto-scroll if user explicitly clicked the down arrow.
+            // Otherwise the message top stays fixed so students read from the beginning.
             if (scrollFollowMode) {
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            } else {
-                scrollToKeepStreamingVisible();
             }
         }
     };
