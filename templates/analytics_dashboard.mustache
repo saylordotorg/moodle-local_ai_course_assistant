@@ -227,6 +227,73 @@
     </table>
     {{/has_students}}
 
+    {{! User Feedback }}
+    <h3 class="mt-4">User Feedback</h3>
+    {{#has_feedback}}
+    <div class="card-deck mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Total Responses</h5>
+                <p class="display-4">{{feedback_total}}</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Average Rating</h5>
+                <p class="display-4">{{feedback_avg}} <small style="font-size:0.4em">/ 5</small></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Rating Distribution</h5>
+                <div style="text-align:left;max-width:200px;margin:0 auto">
+                    {{#feedback_ratings}}
+                    <div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:2px">
+                        <span style="width:14px;text-align:right">{{stars}}</span>
+                        <span style="color:#f59e0b">&#9733;</span>
+                        <div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;overflow:hidden">
+                            <div style="background:#f59e0b;height:100%;width:{{count}}px;min-width:{{#count}}2px{{/count}};max-width:100%"></div>
+                        </div>
+                        <span style="width:24px;text-align:right;color:#6c757d">{{count}}</span>
+                    </div>
+                    {{/feedback_ratings}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Browser / OS</th>
+                        <th>Device</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#feedback_entries}}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td style="color:#f59e0b;white-space:nowrap">{{{stars}}}</td>
+                        <td>{{#has_comment}}{{comment}}{{/has_comment}}{{^has_comment}}<span class="text-muted">—</span>{{/has_comment}}</td>
+                        <td><small>{{browser}}<br>{{os}}</small></td>
+                        <td><small>{{device}} {{screen}}</small></td>
+                        <td><small>{{date}}</small></td>
+                    </tr>
+                    {{/feedback_entries}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{/has_feedback}}
+    {{^has_feedback}}
+    <p class="text-muted">No feedback received yet. Students can submit feedback via the chat bubble icon in the SOLA header.</p>
+    {{/has_feedback}}
+
     {{/has_data}}
 </div>
 

@@ -2538,6 +2538,172 @@ define([
     };
 
     /**
+     * Show the feedback panel overlay inside the drawer.
+     *
+     * @param {Function} onSubmit Called with (rating, comment, deviceInfo)
+     */
+    const showFeedbackPanel = function(onSubmit) {
+        if (!drawer) { return; }
+
+        const existing = drawer.querySelector('.aica-feedback-panel');
+        if (existing) { existing.remove(); }
+
+        const panel = document.createElement('div');
+        panel.className = 'aica-feedback-panel aica-settings-panel';
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'aica-settings-panel__header';
+        const titleEl = document.createElement('span');
+        titleEl.className = 'aica-settings-panel__title';
+        titleEl.textContent = 'Send Feedback';
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'aica-settings-panel__close';
+        closeBtn.type = 'button';
+        closeBtn.setAttribute('aria-label', 'Close');
+        closeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">' +
+            '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+        closeBtn.addEventListener('click', function() { panel.remove(); });
+        header.appendChild(titleEl);
+        header.appendChild(closeBtn);
+        panel.appendChild(header);
+
+        // Content
+        const content = document.createElement('div');
+        content.className = 'aica-settings-panel__content';
+
+        // Rating stars
+        const ratingSection = document.createElement('div');
+        ratingSection.className = 'aica-settings-panel__section';
+        const ratingLabel = document.createElement('div');
+        ratingLabel.className = 'aica-settings-panel__section-title';
+        ratingLabel.textContent = 'How would you rate SOLA?';
+        ratingSection.appendChild(ratingLabel);
+
+        const starsRow = document.createElement('div');
+        starsRow.className = 'aica-feedback-stars';
+        var selectedRating = 0;
+        for (var i = 1; i <= 5; i++) {
+            (function(val) {
+                var star = document.createElement('button');
+                star.type = 'button';
+                star.className = 'aica-feedback-star';
+                star.setAttribute('aria-label', val + ' star' + (val > 1 ? 's' : ''));
+                star.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">' +
+                    '<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+                star.addEventListener('click', function() {
+                    selectedRating = val;
+                    starsRow.querySelectorAll('.aica-feedback-star').forEach(function(s, idx) {
+                        s.classList.toggle('aica-feedback-star--active', idx < val);
+                    });
+                });
+                starsRow.appendChild(star);
+            })(i);
+        }
+        ratingSection.appendChild(starsRow);
+        content.appendChild(ratingSection);
+
+        // Comment textarea
+        const commentSection = document.createElement('div');
+        commentSection.className = 'aica-settings-panel__section';
+        const commentLabel = document.createElement('div');
+        commentLabel.className = 'aica-settings-panel__section-title';
+        commentLabel.textContent = 'Tell us more (optional)';
+        commentSection.appendChild(commentLabel);
+
+        const textarea = document.createElement('textarea');
+        textarea.className = 'aica-feedback-textarea';
+        textarea.placeholder = 'What do you like? What could be better?';
+        textarea.rows = 4;
+        textarea.maxLength = 2000;
+        commentSection.appendChild(textarea);
+        content.appendChild(commentSection);
+
+        panel.appendChild(content);
+
+        // Footer with submit
+        const footer = document.createElement('div');
+        footer.className = 'aica-settings-panel__footer';
+        const submitBtn = document.createElement('button');
+        submitBtn.type = 'button';
+        submitBtn.className = 'aica-settings-panel__save';
+        submitBtn.textContent = 'Submit Feedback';
+        submitBtn.addEventListener('click', function() {
+            if (selectedRating === 0) {
+                ratingLabel.textContent = 'Please select a rating';
+                ratingLabel.style.color = '#dc3545';
+                return;
+            }
+            // Collect device info.
+            var ua = navigator.userAgent || '';
+            var deviceInfo = {
+                browser: getBrowserName(ua),
+                os: getOSName(ua),
+                device: getDeviceType(),
+                screen_size: window.screen.width + 'x' + window.screen.height,
+                user_agent: ua.substring(0, 500),
+                page_url: window.location.href.substring(0, 500),
+            };
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            onSubmit(selectedRating, textarea.value.trim(), deviceInfo);
+            // Show thank you message.
+            setTimeout(function() {
+                content.innerHTML = '<div style="text-align:center;padding:2rem 1rem">' +
+                    '<div style="font-size:2rem;margin-bottom:0.5rem">Thank you!</div>' +
+                    '<p style="color:#6c757d">Your feedback helps us improve SOLA.</p></div>';
+                footer.style.display = 'none';
+                setTimeout(function() { panel.remove(); }, 2000);
+            }, 500);
+        });
+        footer.appendChild(submitBtn);
+        panel.appendChild(footer);
+
+        drawer.appendChild(panel);
+    };
+
+    /**
+     * Parse browser name from user agent string.
+     * @param {string} ua
+     * @returns {string}
+     */
+    const getBrowserName = function(ua) {
+        if (/Edg\//i.test(ua)) { return 'Edge ' + (ua.match(/Edg\/([\d.]+)/) || [])[1]; }
+        if (/OPR\//i.test(ua)) { return 'Opera ' + (ua.match(/OPR\/([\d.]+)/) || [])[1]; }
+        if (/Chrome\//i.test(ua) && !/Chromium/i.test(ua)) { return 'Chrome ' + (ua.match(/Chrome\/([\d.]+)/) || [])[1]; }
+        if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) { return 'Safari ' + (ua.match(/Version\/([\d.]+)/) || [])[1]; }
+        if (/Firefox\//i.test(ua)) { return 'Firefox ' + (ua.match(/Firefox\/([\d.]+)/) || [])[1]; }
+        return 'Unknown';
+    };
+
+    /**
+     * Parse OS name from user agent string.
+     * @param {string} ua
+     * @returns {string}
+     */
+    const getOSName = function(ua) {
+        if (/Windows NT 10/i.test(ua)) { return 'Windows 10/11'; }
+        if (/Windows/i.test(ua)) { return 'Windows'; }
+        if (/Mac OS X ([\d_]+)/i.test(ua)) { return 'macOS ' + (ua.match(/Mac OS X ([\d_]+)/) || [])[1].replace(/_/g, '.'); }
+        if (/iPhone|iPad/i.test(ua)) { return 'iOS ' + ((ua.match(/OS ([\d_]+)/) || [])[1] || '').replace(/_/g, '.'); }
+        if (/Android ([\d.]+)/i.test(ua)) { return 'Android ' + (ua.match(/Android ([\d.]+)/) || [])[1]; }
+        if (/Linux/i.test(ua)) { return 'Linux'; }
+        if (/CrOS/i.test(ua)) { return 'ChromeOS'; }
+        return 'Unknown';
+    };
+
+    /**
+     * Detect device type.
+     * @returns {string}
+     */
+    const getDeviceType = function() {
+        var w = window.innerWidth;
+        if (/Mobi|Android/i.test(navigator.userAgent) || w < 768) { return 'mobile'; }
+        if (/iPad|Tablet/i.test(navigator.userAgent) || (w >= 768 && w < 1024)) { return 'tablet'; }
+        return 'desktop';
+    };
+
+    /**
      * Show a compact language picker popover above the hint bar.
      * Toggle behaviour: calling while open closes it.
      *
@@ -2971,6 +3137,7 @@ define([
         appendVoiceTranscript: appendVoiceTranscript,
         showLangPicker: showLangPicker,
         showSettingsPanel: showSettingsPanel,
+        showFeedbackPanel: showFeedbackPanel,
         startWordHighlight: startWordHighlight,
         highlightWordAt: highlightWordAt,
         stopWordHighlight: stopWordHighlight,

@@ -2252,6 +2252,40 @@
     }
 }
 
+/* Feedback panel */
+.aica-feedback-stars {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+.aica-feedback-star {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: #d1d5db;
+    transition: color .15s;
+}
+.aica-feedback-star--active,
+.aica-feedback-star:hover {
+    color: #f59e0b;
+}
+.aica-feedback-textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    resize: vertical;
+    font-family: inherit;
+    margin-top: 4px;
+}
+.aica-feedback-textarea:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.15);
+}
+
 /* Settings panel: saved responses section */
 .aica-settings-panel__empty-note {
     font-size: 11px;

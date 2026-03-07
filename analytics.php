@@ -53,6 +53,78 @@ $commonprompts = analytics::get_common_prompts($courseid, $since);
 $studentusage = analytics::get_student_usage($courseid, $since);
 $providercomparison = analytics::get_provider_comparison($courseid, $since);
 
+// Gather feedback data.
+$feedbackparams = ['courseid' => $courseid];
+$feedbacktimewhere = '';
+if ($since > 0) {
+    $feedbacktimewhere = ' AND f.timecreated >= :since';
+    $feedbackparams['since'] = $since;
+}
+
+// Feedback summary.
+$feedbacksummary = $DB->get_record_sql(
+    "SELECT COUNT(f.id) AS total_count,
+            AVG(f.rating) AS avg_rating
+       FROM {local_ai_course_assistant_feedback} f
+      WHERE f.courseid = :courseid{$feedbacktimewhere}",
+    $feedbackparams
+);
+
+// Rating distribution.
+$ratingdist = $DB->get_records_sql(
+    "SELECT f.rating AS id, f.rating, COUNT(f.id) AS cnt
+       FROM {local_ai_course_assistant_feedback} f
+      WHERE f.courseid = :courseid{$feedbacktimewhere}
+      GROUP BY f.rating
+      ORDER BY f.rating DESC",
+    $feedbackparams
+);
+$ratingrows = [];
+for ($r = 5; $r >= 1; $r--) {
+    $cnt = 0;
+    foreach ($ratingdist as $row) {
+        if ((int) $row->rating === $r) {
+            $cnt = (int) $row->cnt;
+            break;
+        }
+    }
+    $ratingrows[] = ['stars' => $r, 'count' => $cnt];
+}
+
+// Recent feedback entries (last 50).
+$recentfeedback = $DB->get_records_sql(
+    "SELECT f.id, f.rating, f.comment, f.browser, f.os, f.device,
+            f.screen_size, f.timecreated, u.firstname, u.lastname
+       FROM {local_ai_course_assistant_feedback} f
+       JOIN {user} u ON u.id = f.userid
+      WHERE f.courseid = :courseid{$feedbacktimewhere}
+      ORDER BY f.timecreated DESC",
+    $feedbackparams, 0, 50
+);
+$feedbackentries = [];
+foreach ($recentfeedback as $fb) {
+    $stars = '';
+    for ($s = 0; $s < 5; $s++) {
+        $stars .= $s < (int) $fb->rating ? '&#9733;' : '&#9734;';
+    }
+    $feedbackentries[] = [
+        'name'    => htmlspecialchars($fb->firstname . ' ' . $fb->lastname),
+        'stars'   => $stars,
+        'rating'  => (int) $fb->rating,
+        'comment' => htmlspecialchars($fb->comment ?: ''),
+        'has_comment' => !empty($fb->comment),
+        'browser' => htmlspecialchars($fb->browser ?: ''),
+        'os'      => htmlspecialchars($fb->os ?: ''),
+        'device'  => htmlspecialchars($fb->device ?: ''),
+        'screen'  => htmlspecialchars($fb->screen_size ?: ''),
+        'date'    => userdate($fb->timecreated),
+    ];
+}
+
+$feedbacktotal = $feedbacksummary ? (int) $feedbacksummary->total_count : 0;
+$feedbackavg = $feedbacksummary && $feedbacksummary->avg_rating
+    ? round((float) $feedbacksummary->avg_rating, 1) : 0;
+
 // Build template data.
 $templatedata = [
     'courseid' => $courseid,
@@ -82,6 +154,11 @@ $templatedata = [
     'url_all' => (new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid, 'range' => 0]))->out(false),
     'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
         ['courseid' => $courseid, 'range' => $range]))->out(false),
+    'feedback_total'    => $feedbacktotal,
+    'feedback_avg'      => $feedbackavg,
+    'feedback_ratings'  => $ratingrows,
+    'feedback_entries'  => $feedbackentries,
+    'has_feedback'      => $feedbacktotal > 0,
 ];
 
 echo $OUTPUT->header();

@@ -261,5 +261,31 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026030900, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026030905) {
+        // Create feedback table.
+        $table = new xmldb_table('local_ai_course_assistant_feedback');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('rating', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('comment', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('browser', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('os', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('device', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('screen_size', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('user_agent', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+        $table->add_field('page_url', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('courseid_fk', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_index('courseid_time', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'timecreated']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026030905, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

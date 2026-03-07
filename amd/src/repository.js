@@ -209,6 +209,32 @@ define(['core/ajax'], function(Ajax) {
         }])[0];
     };
 
+    /**
+     * Submit user feedback.
+     *
+     * @param {number} courseid
+     * @param {number} rating      1-5
+     * @param {string} comment     Free-text feedback
+     * @param {Object} deviceInfo  {browser, os, device, screen_size, user_agent, page_url}
+     * @returns {Promise}
+     */
+    const submitFeedback = function(courseid, rating, comment, deviceInfo) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_submit_feedback',
+            args: {
+                courseid: courseid,
+                rating: rating,
+                comment: comment || '',
+                browser: (deviceInfo && deviceInfo.browser) || '',
+                os: (deviceInfo && deviceInfo.os) || '',
+                device: (deviceInfo && deviceInfo.device) || '',
+                screen_size: (deviceInfo && deviceInfo.screen_size) || '',
+                user_agent: (deviceInfo && deviceInfo.user_agent) || '',
+                page_url: (deviceInfo && deviceInfo.page_url) || '',
+            },
+        }])[0];
+    };
+
     return {
         sendMessage: sendMessage,
         getHistory: getHistory,
@@ -222,5 +248,6 @@ define(['core/ajax'], function(Ajax) {
         generateQuiz: generateQuiz,
         saveAvatarPreference: saveAvatarPreference,
         getRealtimeToken: getRealtimeToken,
+        submitFeedback: submitFeedback,
     };
 });

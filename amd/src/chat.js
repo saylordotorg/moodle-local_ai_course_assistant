@@ -279,6 +279,18 @@ define([
             });
         }
 
+        // Feedback button.
+        const feedbackBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-feedback') : null;
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', function() {
+                UI.showFeedbackPanel(function(rating, comment, deviceInfo) {
+                    Repo.submitFeedback(courseId, rating, comment, deviceInfo).catch(function() {
+                        // Silently ignore — feedback is best-effort.
+                    });
+                });
+            });
+        }
+
         // Reset/home button.
         const resetBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-reset') : null;
         if (resetBtn) {
