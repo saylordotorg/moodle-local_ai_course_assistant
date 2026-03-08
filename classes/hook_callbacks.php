@@ -62,6 +62,12 @@ class hook_callbacks {
             return;
         }
 
+        // Per-course SOLA disable check (default: enabled).
+        $courseEnabled = get_config('local_ai_course_assistant', 'sola_enabled_course_' . $courseid);
+        if ($courseEnabled === '0') {
+            return;
+        }
+
         // Detect role: administrator > academic_support > student.
         if (has_capability('local/ai_course_assistant:manage', $coursecontext)) {
             $userrole = 'administrator';
@@ -95,8 +101,8 @@ class hook_callbacks {
         // Build SSE URL.
         $sseurl = new \moodle_url('/local/ai_course_assistant/sse.php');
 
-        // Check if user can view analytics.
-        $canviewanalytics = has_capability('local/ai_course_assistant:viewanalytics', $coursecontext);
+        // Analytics: site admins only.
+        $canviewanalytics = has_capability('moodle/site:config', \context_system::instance());
         $analyticsurl = new \moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid]);
 
         // Check if user can access course-level AI settings (editing teachers, managers, admins).

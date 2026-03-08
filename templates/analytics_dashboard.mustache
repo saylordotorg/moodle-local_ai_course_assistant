@@ -17,196 +17,285 @@
 {{!
     @template local_ai_course_assistant/analytics_dashboard
 
-    Analytics dashboard for AI tutor usage.
+    SOLA Analytics — admin-only dashboard with cross-course summary,
+    per-course enable/disable toggles, and per-course drill-down.
 }}
 <div class="local-ai-tutor-analytics">
 
-    {{! Time range selector }}
-    <div class="mb-3">
-        <span class="mr-2"><strong>{{#str}}analytics:timerange, local_ai_course_assistant{{/str}}:</strong></span>
-        <div class="btn-group" role="group">
-            <a href="{{url_7}}" class="btn btn-sm {{#range_7_selected}}btn-primary{{/range_7_selected}}{{^range_7_selected}}btn-outline-secondary{{/range_7_selected}}">
-                {{#str}}analytics:last_7_days, local_ai_course_assistant{{/str}}
-            </a>
-            <a href="{{url_30}}" class="btn btn-sm {{#range_30_selected}}btn-primary{{/range_30_selected}}{{^range_30_selected}}btn-outline-secondary{{/range_30_selected}}">
-                {{#str}}analytics:last_30_days, local_ai_course_assistant{{/str}}
-            </a>
-            <a href="{{url_all}}" class="btn btn-sm {{#range_all_selected}}btn-primary{{/range_all_selected}}{{^range_all_selected}}btn-outline-secondary{{/range_all_selected}}">
-                {{#str}}analytics:all_time, local_ai_course_assistant{{/str}}
-            </a>
+    {{! Navigation }}
+    <div class="mb-3 d-flex flex-wrap gap-2" style="gap:8px">
+        <a href="{{settings_url}}" class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
+        <a href="{{token_analytics_url}}" class="btn btn-sm btn-outline-secondary">&#36; Token Usage &amp; Cost</a>
+    </div>
+
+    {{! ═══ Cross-Course Summary ═══ }}
+    <h3>SOLA Overview</h3>
+    <div class="card-deck mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Courses with SOLA</h5>
+                <p class="display-4">{{enabled_courses}}<small style="font-size:0.4em"> / {{total_courses}}</small></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Active Courses</h5>
+                <p class="display-4">{{active_courses}}</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Total Messages</h5>
+                <p class="display-4">{{total_messages_all}}</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Active Students</h5>
+                <p class="display-4">{{active_students_all}}</p>
+            </div>
         </div>
     </div>
 
-    {{#token_analytics_url}}
+    {{! ═══ Course List with Enable/Disable Toggles ═══ }}
+    <h3>Courses</h3>
+    <p class="text-muted">Enable or disable SOLA per course. Click a course name to view detailed analytics.</p>
+
+    {{#has_courses}}
+    <div class="card mb-4">
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th class="text-center" style="width:120px">SOLA Status</th>
+                        <th class="text-center" style="width:100px">Has Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#courses}}
+                    <tr>
+                        <td>
+                            {{#has_data}}
+                            <a href="{{form_action}}?courseid={{id}}&amp;range={{range}}">
+                                <strong>{{fullname}}</strong>
+                            </a>
+                            {{/has_data}}
+                            {{^has_data}}
+                            {{fullname}}
+                            {{/has_data}}
+                            <small class="text-muted ml-1">({{shortname}})</small>
+                        </td>
+                        <td class="text-center">
+                            <form method="post" action="{{form_action}}" style="display:inline">
+                                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                <input type="hidden" name="action" value="toggle">
+                                <input type="hidden" name="togglecourseid" value="{{id}}">
+                                <input type="hidden" name="courseid" value="{{courseid_param}}">
+                                <input type="hidden" name="range" value="{{range}}">
+                                {{#enabled}}
+                                <input type="hidden" name="enabled" value="0">
+                                <button type="submit" class="btn btn-sm btn-success" title="Click to disable">
+                                    Enabled
+                                </button>
+                                {{/enabled}}
+                                {{^enabled}}
+                                <input type="hidden" name="enabled" value="1">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Click to enable">
+                                    Disabled
+                                </button>
+                                {{/enabled}}
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            {{#has_data}}<span class="badge badge-info">Yes</span>{{/has_data}}
+                            {{^has_data}}<span class="text-muted">&mdash;</span>{{/has_data}}
+                        </td>
+                    </tr>
+                    {{/courses}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{/has_courses}}
+
+    {{! ═══ Per-Course Analytics (if selected) ═══ }}
+    {{#has_course_selected}}
+    <hr>
+    <h2>{{course.coursename}}</h2>
+
+    {{! Time range selector }}
     <div class="mb-3">
-        <a href="{{token_analytics_url}}" class="btn btn-sm btn-outline-secondary">
+        <span class="mr-2"><strong>Time Range:</strong></span>
+        <div class="btn-group" role="group">
+            <a href="{{url_7}}" class="btn btn-sm {{#range_7_selected}}btn-primary{{/range_7_selected}}{{^range_7_selected}}btn-outline-secondary{{/range_7_selected}}">
+                Last 7 days
+            </a>
+            <a href="{{url_30}}" class="btn btn-sm {{#range_30_selected}}btn-primary{{/range_30_selected}}{{^range_30_selected}}btn-outline-secondary{{/range_30_selected}}">
+                Last 30 days
+            </a>
+            <a href="{{url_all}}" class="btn btn-sm {{#range_all_selected}}btn-primary{{/range_all_selected}}{{^range_all_selected}}btn-outline-secondary{{/range_all_selected}}">
+                All time
+            </a>
+        </div>
+        <a href="{{course.token_analytics_url}}" class="btn btn-sm btn-outline-secondary ml-2">
             &#36; Token Usage &amp; Cost &rarr;
         </a>
     </div>
-    {{/token_analytics_url}}
 
-    {{^has_data}}
-    <div class="alert alert-info">
-        {{#str}}analytics:no_data, local_ai_course_assistant{{/str}}
-    </div>
-    {{/has_data}}
+    {{^course.has_data}}
+    <div class="alert alert-info">No SOLA usage data for this course yet.</div>
+    {{/course.has_data}}
 
-    {{#has_data}}
+    {{#course.has_data}}
 
     {{! Overview cards }}
-    <h3>{{#str}}analytics:overview, local_ai_course_assistant{{/str}}</h3>
+    <h3>Overview</h3>
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:total_conversations, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.total_conversations}}</p>
+                <h5 class="card-title text-muted">Conversations</h5>
+                <p class="display-4">{{course.overview.total_conversations}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:total_messages, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.total_messages}}</p>
+                <h5 class="card-title text-muted">Messages</h5>
+                <p class="display-4">{{course.overview.total_messages}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:active_students, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.active_students}}</p>
+                <h5 class="card-title text-muted">Active Students</h5>
+                <p class="display-4">{{course.overview.active_students}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:avg_messages_per_student, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.avg_messages_per_student}}</p>
+                <h5 class="card-title text-muted">Avg Msgs/Student</h5>
+                <p class="display-4">{{course.overview.avg_messages_per_student}}</p>
             </div>
         </div>
     </div>
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:offtopic_rate, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.offtopic_rate}}%</p>
+                <h5 class="card-title text-muted">Off-topic Rate</h5>
+                <p class="display-4">{{course.overview.offtopic_rate}}%</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:escalation_count, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.escalation_count}}</p>
+                <h5 class="card-title text-muted">Escalations</h5>
+                <p class="display-4">{{course.overview.escalation_count}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">{{#str}}analytics:studyplan_adoption, local_ai_course_assistant{{/str}}</h5>
-                <p class="display-4">{{overview.studyplan_adoption}}</p>
+                <h5 class="card-title text-muted">Study Plans</h5>
+                <p class="display-4">{{course.overview.studyplan_adoption}}</p>
             </div>
         </div>
     </div>
 
     {{! Usage trend chart }}
-    <h3>{{#str}}analytics:usage_trends, local_ai_course_assistant{{/str}}</h3>
+    <h3>Usage Trends</h3>
     <div class="card mb-4">
         <div class="card-body">
-            <canvas id="aitc-usage-chart" height="80" data-daily-usage="{{daily_usage_json}}"></canvas>
+            <canvas id="aitc-usage-chart" height="80" data-daily-usage="{{course.daily_usage_json}}"></canvas>
         </div>
     </div>
 
     <div class="row">
         {{! Hotspots }}
         <div class="col-md-6">
-            <h3>{{#str}}analytics:hotspots, local_ai_course_assistant{{/str}}</h3>
-            <p class="text-muted">{{#str}}analytics:hotspots_desc, local_ai_course_assistant{{/str}}</p>
-            {{#has_hotspots}}
+            <h3>Hotspots</h3>
+            <p class="text-muted">Course sections most frequently referenced in student messages.</p>
+            {{#course.has_hotspots}}
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>{{#str}}analytics:section, local_ai_course_assistant{{/str}}</th>
-                        <th class="text-right">{{#str}}analytics:mention_count, local_ai_course_assistant{{/str}}</th>
+                        <th>Section</th>
+                        <th class="text-right">Mentions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{#hotspots}}
+                    {{#course.hotspots}}
                     <tr>
                         <td>{{section}}</td>
-                        <td class="text-right">
-                            <span class="badge badge-warning">{{count}}</span>
-                        </td>
+                        <td class="text-right"><span class="badge badge-warning">{{count}}</span></td>
                     </tr>
-                    {{/hotspots}}
+                    {{/course.hotspots}}
                 </tbody>
             </table>
-            {{/has_hotspots}}
-            {{^has_hotspots}}
+            {{/course.has_hotspots}}
+            {{^course.has_hotspots}}
             <p class="text-muted">No hotspot data available yet.</p>
-            {{/has_hotspots}}
+            {{/course.has_hotspots}}
         </div>
 
         {{! Common prompts }}
         <div class="col-md-6">
-            <h3>{{#str}}analytics:common_prompts, local_ai_course_assistant{{/str}}</h3>
-            <p class="text-muted">{{#str}}analytics:common_prompts_desc, local_ai_course_assistant{{/str}}</p>
-            {{#has_common_prompts}}
+            <h3>Common Prompts</h3>
+            <p class="text-muted">Recurring question patterns from students.</p>
+            {{#course.has_common_prompts}}
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>{{#str}}analytics:prompt_pattern, local_ai_course_assistant{{/str}}</th>
-                        <th class="text-right">{{#str}}analytics:frequency, local_ai_course_assistant{{/str}}</th>
+                        <th>Pattern</th>
+                        <th class="text-right">Frequency</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{#common_prompts}}
+                    {{#course.common_prompts}}
                     <tr>
                         <td><code>{{pattern}}</code></td>
-                        <td class="text-right">
-                            <span class="badge badge-info">{{frequency}}</span>
-                        </td>
+                        <td class="text-right"><span class="badge badge-info">{{frequency}}</span></td>
                     </tr>
-                    {{/common_prompts}}
+                    {{/course.common_prompts}}
                 </tbody>
             </table>
-            {{/has_common_prompts}}
-            {{^has_common_prompts}}
+            {{/course.has_common_prompts}}
+            {{^course.has_common_prompts}}
             <p class="text-muted">No recurring prompt patterns detected yet.</p>
-            {{/has_common_prompts}}
+            {{/course.has_common_prompts}}
         </div>
     </div>
 
-    {{! Provider comparison table }}
-    {{#has_provider_comparison}}
-    <h3 class="mt-4">{{#str}}analytics:provider_comparison, local_ai_course_assistant{{/str}}</h3>
-    <p class="text-muted">{{#str}}analytics:provider_comparison_desc, local_ai_course_assistant{{/str}}</p>
+    {{! Provider comparison }}
+    {{#course.has_provider_comparison}}
+    <h3 class="mt-4">Provider Comparison</h3>
     <div class="card mb-4">
         <div class="card-body p-0">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>{{#str}}analytics:provider, local_ai_course_assistant{{/str}}</th>
-                        <th class="text-right">{{#str}}analytics:response_count, local_ai_course_assistant{{/str}}</th>
-                        <th class="text-right">{{#str}}analytics:avg_response_length, local_ai_course_assistant{{/str}}</th>
-                        <th class="text-right">{{#str}}analytics:total_tokens, local_ai_course_assistant{{/str}}</th>
-                        <th class="text-right">{{#str}}analytics:avg_tokens, local_ai_course_assistant{{/str}}</th>
+                        <th>Provider</th>
+                        <th class="text-right">Responses</th>
+                        <th class="text-right">Avg Length</th>
+                        <th class="text-right">Total Tokens</th>
+                        <th class="text-right">Avg Tokens</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{#provider_comparison}}
+                    {{#course.provider_comparison}}
                     <tr>
                         <td><strong>{{provider}}</strong></td>
-                        <td class="text-right">
-                            <span class="badge badge-primary">{{response_count}}</span>
-                        </td>
+                        <td class="text-right"><span class="badge badge-primary">{{response_count}}</span></td>
                         <td class="text-right">{{avg_response_length}} chars</td>
                         <td class="text-right">{{total_tokens}}</td>
                         <td class="text-right">{{avg_tokens}}</td>
                     </tr>
-                    {{/provider_comparison}}
+                    {{/course.provider_comparison}}
                 </tbody>
             </table>
         </div>
     </div>
-    {{/has_provider_comparison}}
+    {{/course.has_provider_comparison}}
 
-    {{! Student activity table }}
-    {{#has_students}}
-    <h3 class="mt-4">{{#str}}analytics:recent_activity, local_ai_course_assistant{{/str}}</h3>
+    {{! Student activity }}
+    {{#course.has_students}}
+    <h3 class="mt-4">Student Activity</h3>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -216,38 +305,38 @@
             </tr>
         </thead>
         <tbody>
-            {{#students}}
+            {{#course.students}}
             <tr>
                 <td>{{name}}</td>
                 <td class="text-right">{{message_count}}</td>
                 <td>{{last_active}}</td>
             </tr>
-            {{/students}}
+            {{/course.students}}
         </tbody>
     </table>
-    {{/has_students}}
+    {{/course.has_students}}
 
-    {{! User Feedback }}
+    {{! User feedback }}
     <h3 class="mt-4">User Feedback</h3>
-    {{#has_feedback}}
+    {{#course.has_feedback}}
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
                 <h5 class="card-title text-muted">Total Responses</h5>
-                <p class="display-4">{{feedback_total}}</p>
+                <p class="display-4">{{course.feedback_total}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
                 <h5 class="card-title text-muted">Average Rating</h5>
-                <p class="display-4">{{feedback_avg}} <small style="font-size:0.4em">/ 5</small></p>
+                <p class="display-4">{{course.feedback_avg}} <small style="font-size:0.4em">/ 5</small></p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
                 <h5 class="card-title text-muted">Rating Distribution</h5>
                 <div style="text-align:left;max-width:200px;margin:0 auto">
-                    {{#feedback_ratings}}
+                    {{#course.feedback_ratings}}
                     <div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:2px">
                         <span style="width:14px;text-align:right">{{stars}}</span>
                         <span style="color:#f59e0b">&#9733;</span>
@@ -256,7 +345,7 @@
                         </div>
                         <span style="width:24px;text-align:right;color:#6c757d">{{count}}</span>
                     </div>
-                    {{/feedback_ratings}}
+                    {{/course.feedback_ratings}}
                 </div>
             </div>
         </div>
@@ -275,31 +364,37 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{#feedback_entries}}
+                    {{#course.feedback_entries}}
                     <tr>
                         <td>{{name}}</td>
                         <td style="color:#f59e0b;white-space:nowrap">{{{stars}}}</td>
-                        <td>{{#has_comment}}{{comment}}{{/has_comment}}{{^has_comment}}<span class="text-muted">—</span>{{/has_comment}}</td>
+                        <td>{{#has_comment}}{{comment}}{{/has_comment}}{{^has_comment}}<span class="text-muted">&mdash;</span>{{/has_comment}}</td>
                         <td><small>{{browser}}<br>{{os}}</small></td>
                         <td><small>{{device}} {{screen}}</small></td>
                         <td><small>{{date}}</small></td>
                     </tr>
-                    {{/feedback_entries}}
+                    {{/course.feedback_entries}}
                 </tbody>
             </table>
         </div>
     </div>
-    {{/has_feedback}}
-    {{^has_feedback}}
-    <p class="text-muted">No feedback received yet. Students can submit feedback via the chat bubble icon in the SOLA header.</p>
-    {{/has_feedback}}
+    {{/course.has_feedback}}
+    {{^course.has_feedback}}
+    <p class="text-muted">No feedback received yet.</p>
+    {{/course.has_feedback}}
 
-    {{/has_data}}
+    {{/course.has_data}}
+    {{/has_course_selected}}
+
+    {{^has_course_selected}}
+    <div class="alert alert-info mt-3">Select a course above to view detailed analytics.</div>
+    {{/has_course_selected}}
 </div>
 
+{{#has_course_selected}}
+{{#course.has_data}}
 {{#js}}
 (function() {
-    // Simple bar chart using canvas (no external dependencies).
     var canvas = document.getElementById('aitc-usage-chart');
     if (!canvas) return;
 
@@ -318,7 +413,6 @@
     var originX = 40;
     var originY = height - 25;
 
-    // Draw axes.
     ctx.strokeStyle = '#ddd';
     ctx.beginPath();
     ctx.moveTo(originX, 10);
@@ -326,7 +420,6 @@
     ctx.lineTo(width - 10, originY);
     ctx.stroke();
 
-    // Y-axis labels.
     ctx.fillStyle = '#666';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'right';
@@ -341,7 +434,6 @@
         ctx.stroke();
     }
 
-    // Draw bars.
     ctx.fillStyle = '#4a6cf7';
     data.forEach(function(d, idx) {
         var barH = (d.count / maxCount) * chartHeight;
@@ -349,7 +441,6 @@
         ctx.fillRect(x, originY - barH, barWidth, barH);
     });
 
-    // X-axis labels (show every Nth date).
     ctx.fillStyle = '#666';
     ctx.textAlign = 'center';
     ctx.font = '10px sans-serif';
@@ -357,9 +448,11 @@
     data.forEach(function(d, idx) {
         if (idx % labelInterval === 0 || idx === data.length - 1) {
             var x = originX + 5 + idx * (barWidth + 1) + barWidth / 2;
-            var label = d.date.substring(5); // MM-DD
+            var label = d.date.substring(5);
             ctx.fillText(label, x, originY + 15);
         }
     });
 })();
 {{/js}}
+{{/course.has_data}}
+{{/has_course_selected}}

@@ -34,19 +34,9 @@ $courseid = optional_param('courseid',  0, PARAM_INT);  // 0 = all courses.
 $syscontext = context_system::instance();
 $hassiteconfig = has_capability('moodle/site:config', $syscontext);
 
-if ($hassiteconfig) {
-    // Site admins can see all courses.
-    $pagecontext = $syscontext;
-} elseif ($courseid > 0) {
-    // Course-level: require viewanalytics on that course; lock to that course only.
-    $coursecontext = context_course::instance($courseid);
-    require_capability('local/ai_course_assistant:viewanalytics', $coursecontext);
-    $pagecontext = $coursecontext;
-} else {
-    // No courseid and not a site admin — deny.
-    require_capability('moodle/site:config', $syscontext);
-    $pagecontext = $syscontext; // unreachable, satisfies static analysis.
-}
+// Site-admin only.
+require_capability('moodle/site:config', $syscontext);
+$pagecontext = $syscontext;
 
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/token_analytics.php',
     ['range' => $range, 'courseid' => $courseid]));
