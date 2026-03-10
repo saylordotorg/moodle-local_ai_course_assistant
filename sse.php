@@ -58,6 +58,12 @@ $timelimit  = optional_param('timelimit', 0, PARAM_INT);      // Time constraint
 $firstgen   = optional_param('firstgen', 0, PARAM_BOOL);      // First-generation student mode.
 $completion = optional_param('completion', 0, PARAM_INT);      // Course completion percentage (0-100).
 
+// English lock: force English for ELL courses regardless of student language preference.
+$englishlock = get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
+if ($englishlock) {
+    $lang = 'en';
+}
+
 // Validate context and capability.
 $context = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:use', $context);

@@ -88,6 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ragcourse = optional_param('rag_course_enabled', 0, PARAM_INT);
     set_config('rag_enabled_course_' . $courseid, $ragcourse, 'local_ai_course_assistant');
 
+    // English lock — force English responses for ELL courses.
+    $englishlock = optional_param('english_lock', 0, PARAM_INT);
+    set_config('english_lock_course_' . $courseid, $englishlock, 'local_ai_course_assistant');
+
     // Starter overrides — per-course enable/disable for each starter.
     $starteroverrides = [];
     $allstarters = \local_ai_course_assistant\starter_manager::get_global_starters();
@@ -108,6 +112,9 @@ $current = course_config_manager::get($courseid);
 $ragenabled = (bool)get_config('local_ai_course_assistant', 'rag_enabled');
 $ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
 $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw;
+
+// English lock setting.
+$englishlockenabled = (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
 
 // Build provider options.
 $providers = [
@@ -304,6 +311,33 @@ echo html_writer::div(
         </div>
     </div>
     <?php } ?>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">English Lock (ELL Courses)</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Force SOLA to always respond in English for this course, regardless of the student's language preference. Ideal for English language learning courses where students should practice reading and writing in English.</p>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="english_lock">
+                    English Lock
+                </label>
+                <div class="col-sm-9">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="english_lock"
+                               name="english_lock" value="1"
+                               <?php if ($englishlockenabled) { echo 'checked'; } ?>>
+                        <label class="custom-control-label" for="english_lock">
+                            Always respond in English
+                        </label>
+                    </div>
+                    <small class="form-text text-muted">
+                        When enabled, SOLA will respond in English even if the student writes in another language. The student's language preference in their settings panel will be overridden.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php
     // Starter overrides section.
