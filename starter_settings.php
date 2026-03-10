@@ -128,6 +128,29 @@ echo $OUTPUT->header();
 <div class="aica-starters-admin">
     <p><?php echo get_string('starters:admin_desc', 'local_ai_course_assistant'); ?></p>
 
+    <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
+        <div class="card-body">
+            <h6 style="cursor:pointer;margin:0;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'; this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'▶':'▼';">
+                <span>▶</span> How to use this page
+            </h6>
+            <div style="display:none;margin-top:12px;font-size:14px;line-height:1.6;">
+                <p><strong>Built-in starters</strong> are system managed. You can enable or disable them, change their icon, and reorder them, but you cannot delete them.</p>
+                <p><strong>Custom starters</strong> are ones you create. Click "Add New Starter" below to create one. You can edit everything: the name, prompt, icon, and visibility conditions.</p>
+                <p><strong>Starter types:</strong></p>
+                <ul style="margin-bottom:8px;">
+                    <li><strong>Prompt</strong>: when clicked, sends a custom message to the AI on behalf of the student</li>
+                    <li><span class="aica-starter-type-badge type-quiz" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#fff3cd;color:#856404;">QUIZ</span> starts an interactive practice quiz</li>
+                    <li><span class="aica-starter-type-badge type-voice" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">VOICE</span> starts a spoken conversation (requires TTS)</li>
+                    <li><span class="aica-starter-type-badge type-pronunciation" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">PRONUNCIATION</span> starts pronunciation practice (requires Realtime Voice Mode)</li>
+                </ul>
+                <p><strong>Conditional visibility:</strong> choose "Only when TTS enabled" for audio starters, or "Only when Realtime enabled" for pronunciation starters. If the required feature is off, the starter will be hidden from students.</p>
+                <p><strong>Prompt placeholders:</strong> use <code>{page}</code> to insert the current page title. Example: <em>"Explain the key concepts on the {page} page."</em></p>
+                <p><strong>Drag to reorder</strong> using the ≡ handle on the left. The order here is the order students see.</p>
+                <p><strong>Per-course overrides:</strong> after configuring starters here, go to each course's settings page to enable or disable specific starters for that course.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="aica-admin-actions mb-3">
         <form method="post" style="display: inline;">
             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
@@ -232,8 +255,14 @@ echo $OUTPUT->header();
                     '<label>Icon</label>' +
                     '<div class="aica-icon-picker">' +
                         Object.keys(ICONS).map(function(k) {
+                            var labels = {chat:'Chat',lightbulb:'Idea',book:'Book',pencil:'Write',question:'Question',
+                                flask:'Experiment',target:'Goal',chart:'Analytics',globe:'Languages',mic:'Microphone',
+                                speaker:'Speaker',puzzle:'Puzzle',star:'Star',heart:'Wellbeing',clock:'Timer',
+                                brain:'Brain',rocket:'Quick Start',compass:'Explore',list:'List',search:'Search',
+                                graduation:'Academic',handshake:'Support',users:'Group',trophy:'Achievement'};
+                            var label = labels[k] || k;
                             return '<span class="aica-icon-option' + (k === s.icon ? ' selected' : '') +
-                                '" data-icon="' + k + '" title="' + k + '">' + ICONS[k] + '</span>';
+                                '" data-icon="' + k + '" title="' + label + '">' + ICONS[k] + '</span>';
                         }).join('') +
                     '</div>' +
                 '</div>' +

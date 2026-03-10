@@ -156,7 +156,10 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rag_heading',
         get_string('settings:rag_heading', 'local_ai_course_assistant'),
-        get_string('settings:rag_heading_desc', 'local_ai_course_assistant')
+        get_string('settings:rag_heading_desc', 'local_ai_course_assistant') .
+        '<br><small class="text-muted">RAG (Retrieval-Augmented Generation) indexes your course content and retrieves ' .
+        'relevant passages when students ask questions, so the AI can give answers grounded in your materials. ' .
+        'Requires an embedding API key (OpenAI recommended). After enabling, use the RAG Admin page to index courses.</small>'
     ));
 
     // RAG master toggle.
@@ -540,7 +543,10 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/realtime_heading',
         get_string('settings:realtime_heading', 'local_ai_course_assistant'),
-        ''
+        '<small class="text-muted">Realtime Voice Mode enables live, two-way spoken conversations between students ' .
+        'and the AI using OpenAI\'s Realtime API. This is different from standard text-to-speech (TTS), which reads ' .
+        'AI responses aloud. Realtime Voice requires a separate API key and is billed per minute of audio. ' .
+        'Once enabled globally, you can toggle it per course in each course\'s settings page.</small>'
     ));
 
     // Realtime enable.

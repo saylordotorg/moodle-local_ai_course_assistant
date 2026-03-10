@@ -153,6 +153,13 @@ echo html_writer::div(
         </a>
     </div>
 
+    <div class="alert alert-info" style="font-size:14px;">
+        <strong>How course settings work:</strong>
+        Settings configured here override the global defaults for this course only.
+        Leave a field blank to use the global setting.
+        Changes here do not affect other courses.
+    </div>
+
     <div class="card mb-3">
         <div class="card-header">
             <h5 class="mb-0"><?php echo get_string('coursesettings:title', 'local_ai_course_assistant'); ?></h5>
