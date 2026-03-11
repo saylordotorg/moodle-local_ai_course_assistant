@@ -62,12 +62,18 @@ define([
     let currentPageId = 0;
     /** @type {string} Title of the current resource page (empty if on course-level page) */
     let currentPageTitle = '';
+    /** @type {Object|null} Source attribution metadata from SSE meta event */
+    let streamMeta = null;
     /** @type {boolean} Whether SOLA is locked due to a Moodle quiz attempt/view page */
     let quizLocked = false;
     /** @type {HTMLAudioElement|{pause:Function}|null} Currently playing OpenAI TTS audio (or AudioContext proxy) */
     let currentAudio = null;
     /** @type {AudioContext|null} Shared AudioContext unlocked by user gesture (iOS TTS fix) */
     let sharedAudioCtx = null;
+    /** @type {Map} Cache of TTS audio responses keyed by text hash */
+    const ttsCache = new Map();
+    /** @type {number} Max TTS cache entries */
+    const TTS_CACHE_MAX = 20;
     /** @type {number} Count of messages sent in this session (for study break nudge) */
     let sessionMessageCount = 0;
     /** @type {boolean} Whether we've already shown a study break nudge this session */
@@ -466,9 +472,27 @@ define([
             return;
         }
 
-        // Fallback: use buildStarterPrompt for known keys.
-        const prompt = buildStarterPrompt(starterKey, '');
+        // Fallback: use buildStarterPrompt for known keys (translate if non-English).
+        var prompt = buildStarterPrompt(starterKey, '');
         if (prompt) {
+            const currentLang = Speech.getLang ? Speech.getLang() : '';
+            if (currentLang && currentLang !== 'en') {
+                // Map kebab-case data-starter keys to camelCase STARTER_PROMPTS keys.
+                const camelKeyMap = {
+                    'help-page': 'helpPage',
+                    'quiz': 'quiz',
+                    'study-plan': 'studyPlan',
+                    'ask-anything': 'askAnything',
+                    'review-practice': 'reviewPractice',
+                };
+                const promptKey = camelKeyMap[starterKey];
+                if (promptKey) {
+                    const translatedPrompt = Speech.getStarterPrompt(currentLang, promptKey);
+                    if (translatedPrompt) {
+                        prompt = translatedPrompt;
+                    }
+                }
+            }
             UI.getElements().input.value = prompt;
             UI.autoResizeInput();
             UI.updateSendButton();
@@ -1125,6 +1149,123 @@ define([
     };
 
     /**
+     * Play TTS audio from a data object (base64 audio + type).
+     * Extracted so both fresh fetches and cache hits share the same playback path.
+     *
+     * @param {Object}        data       {audio: base64String, type: mimeType}
+     * @param {string}        text       Plain text (fallback for browser TTS)
+     * @param {Function}      callback   Called when speech ends or fails
+     * @param {Array|null}    wordSpans  From UI.startWordHighlight — for word highlighting
+     * @param {string|null}   cleanText  Clean plain text matching the wordSpans
+     */
+    const playTtsData = function(data, text, callback, wordSpans, cleanText) {
+        try {
+            const byteChars = atob(data.audio);
+            const byteArr = new Uint8Array(byteChars.length);
+            for (var i = 0; i < byteChars.length; i++) {
+                byteArr[i] = byteChars.charCodeAt(i);
+            }
+
+            // ── AudioContext path (iOS-compatible) ────────────────────────────
+            // sharedAudioCtx was unlocked synchronously in handleSpeak() within
+            // the user gesture; decoding + playing here (in a Promise chain) is
+            // safe because the context is already running.
+            const ctx = sharedAudioCtx;
+            if (ctx && ctx.decodeAudioData) {
+                ctx.decodeAudioData(byteArr.buffer.slice(0), function(audioBuffer) {
+                    const source = ctx.createBufferSource();
+                    source.buffer = audioBuffer;
+
+                    // Route through analyser for SVG mouth sync.
+                    const analyser = ctx.createAnalyser();
+                    source.connect(analyser);
+                    analyser.connect(ctx.destination);
+
+                    // Duck-typed proxy so stopAllTts() can call .pause().
+                    var startedAt = ctx.currentTime;
+                    currentAudio = {
+                        pause: function() {
+                            try { source.stop(); } catch (e) { /**/ }
+                        },
+                        _duration: audioBuffer.duration,
+                        _startedAt: startedAt
+                    };
+
+                    UI.startMouthSyncFromAnalyser(analyser);
+
+                    if (wordSpans && cleanText) {
+                        var rafId;
+                        var onFrame = function() {
+                            if (!currentAudio) { return; }
+                            var elapsed = ctx.currentTime - startedAt;
+                            var charIndex = Math.floor(
+                                (elapsed / audioBuffer.duration) * cleanText.length
+                            );
+                            UI.highlightWordAt(wordSpans, charIndex);
+                            rafId = requestAnimationFrame(onFrame);
+                        };
+                        rafId = requestAnimationFrame(onFrame);
+                        source.onended = function() {
+                            cancelAnimationFrame(rafId);
+                            currentAudio = null;
+                            UI.stopMouthSync();
+                            if (callback) { callback(); }
+                        };
+                    } else {
+                        source.onended = function() {
+                            currentAudio = null;
+                            UI.stopMouthSync();
+                            if (callback) { callback(); }
+                        };
+                    }
+                    source.start(0);
+                }, function() {
+                    // decodeAudioData failed — fall back to browser TTS.
+                    currentAudio = null;
+                    Speech.speak(text, callback);
+                });
+                return;
+            }
+
+            // ── HTMLAudioElement fallback (non-iOS / no AudioContext) ──────────
+            const blob = new Blob([byteArr], {type: data.type || 'audio/mpeg'});
+            const objUrl = URL.createObjectURL(blob);
+            const audio = new Audio(objUrl);
+            currentAudio = audio;
+            UI.startMouthSync(audio);
+            if (wordSpans && cleanText) {
+                audio.addEventListener('timeupdate', function() {
+                    if (!audio.duration) { return; }
+                    const charIndex = Math.floor(
+                        (audio.currentTime / audio.duration) * cleanText.length
+                    );
+                    UI.highlightWordAt(wordSpans, charIndex);
+                });
+            }
+            audio.addEventListener('ended', function() {
+                URL.revokeObjectURL(objUrl);
+                currentAudio = null;
+                UI.stopMouthSync();
+                if (callback) { callback(); }
+            });
+            audio.addEventListener('error', function() {
+                URL.revokeObjectURL(objUrl);
+                currentAudio = null;
+                UI.stopMouthSync();
+                Speech.speak(text, callback);
+            });
+            audio.play().catch(function() {
+                URL.revokeObjectURL(objUrl);
+                currentAudio = null;
+                UI.stopMouthSync();
+                Speech.speak(text, callback);
+            });
+        } catch (e) {
+            Speech.speak(text, callback);
+        }
+    };
+
+    /**
      * Speak text using OpenAI TTS proxy (tts.php), falling back to browser TTS on error.
      *
      * @param {string}        text       Plain text to read aloud
@@ -1134,6 +1275,14 @@ define([
      * @param {string|null}   cleanText  Clean plain text matching the wordSpans
      */
     const speakWithOpenAI = function(text, ttsUrl, callback, wordSpans, cleanText) {
+        // TTS cache: reuse previously fetched audio.
+        const cacheKey = (localStorage.getItem('aica_tts_voice') || 'shimmer') + ':' + text.substring(0, 300);
+        const cached = ttsCache.get(cacheKey);
+        if (cached) {
+            playTtsData(cached, text, callback, wordSpans, cleanText);
+            return;
+        }
+
         const formData = new URLSearchParams();
         formData.append('text', text.length > 2000 ? text.substring(0, 2000) : text);
         formData.append('sesskey', sessKey);
@@ -1152,110 +1301,12 @@ define([
                 Speech.speak(text, callback);
                 return;
             }
-            try {
-                const byteChars = atob(data.audio);
-                const byteArr = new Uint8Array(byteChars.length);
-                for (var i = 0; i < byteChars.length; i++) {
-                    byteArr[i] = byteChars.charCodeAt(i);
-                }
-
-                // ── AudioContext path (iOS-compatible) ────────────────────────────
-                // sharedAudioCtx was unlocked synchronously in handleSpeak() within
-                // the user gesture; decoding + playing here (in a Promise chain) is
-                // safe because the context is already running.
-                const ctx = sharedAudioCtx;
-                if (ctx && ctx.decodeAudioData) {
-                    ctx.decodeAudioData(byteArr.buffer, function(audioBuffer) {
-                        const source = ctx.createBufferSource();
-                        source.buffer = audioBuffer;
-
-                        // Route through analyser for SVG mouth sync.
-                        const analyser = ctx.createAnalyser();
-                        source.connect(analyser);
-                        analyser.connect(ctx.destination);
-
-                        // Duck-typed proxy so stopAllTts() can call .pause().
-                        var startedAt = ctx.currentTime;
-                        currentAudio = {
-                            pause: function() {
-                                try { source.stop(); } catch (e) { /**/ }
-                            },
-                            _duration: audioBuffer.duration,
-                            _startedAt: startedAt
-                        };
-
-                        UI.startMouthSyncFromAnalyser(analyser);
-
-                        if (wordSpans && cleanText) {
-                            var rafId;
-                            var onFrame = function() {
-                                if (!currentAudio) { return; }
-                                var elapsed = ctx.currentTime - startedAt;
-                                var charIndex = Math.floor(
-                                    (elapsed / audioBuffer.duration) * cleanText.length
-                                );
-                                UI.highlightWordAt(wordSpans, charIndex);
-                                rafId = requestAnimationFrame(onFrame);
-                            };
-                            rafId = requestAnimationFrame(onFrame);
-                            source.onended = function() {
-                                cancelAnimationFrame(rafId);
-                                currentAudio = null;
-                                UI.stopMouthSync();
-                                if (callback) { callback(); }
-                            };
-                        } else {
-                            source.onended = function() {
-                                currentAudio = null;
-                                UI.stopMouthSync();
-                                if (callback) { callback(); }
-                            };
-                        }
-                        source.start(0);
-                    }, function() {
-                        // decodeAudioData failed — fall back to browser TTS.
-                        currentAudio = null;
-                        Speech.speak(text, callback);
-                    });
-                    return;
-                }
-
-                // ── HTMLAudioElement fallback (non-iOS / no AudioContext) ──────────
-                const blob = new Blob([byteArr], {type: data.type || 'audio/mpeg'});
-                const objUrl = URL.createObjectURL(blob);
-                const audio = new Audio(objUrl);
-                currentAudio = audio;
-                UI.startMouthSync(audio);
-                if (wordSpans && cleanText) {
-                    audio.addEventListener('timeupdate', function() {
-                        if (!audio.duration) { return; }
-                        const charIndex = Math.floor(
-                            (audio.currentTime / audio.duration) * cleanText.length
-                        );
-                        UI.highlightWordAt(wordSpans, charIndex);
-                    });
-                }
-                audio.addEventListener('ended', function() {
-                    URL.revokeObjectURL(objUrl);
-                    currentAudio = null;
-                    UI.stopMouthSync();
-                    if (callback) { callback(); }
-                });
-                audio.addEventListener('error', function() {
-                    URL.revokeObjectURL(objUrl);
-                    currentAudio = null;
-                    UI.stopMouthSync();
-                    Speech.speak(text, callback);
-                });
-                audio.play().catch(function() {
-                    URL.revokeObjectURL(objUrl);
-                    currentAudio = null;
-                    UI.stopMouthSync();
-                    Speech.speak(text, callback);
-                });
-            } catch (e) {
-                Speech.speak(text, callback);
+            // Store in TTS cache before playback.
+            ttsCache.set(cacheKey, {audio: data.audio, type: data.type});
+            if (ttsCache.size > TTS_CACHE_MAX) {
+                ttsCache.delete(ttsCache.keys().next().value);
             }
+            playTtsData(data, text, callback, wordSpans, cleanText);
         })
         .catch(function() {
             Speech.speak(text, callback);
@@ -1317,6 +1368,52 @@ define([
      * @param {number|null} ts    Optional Unix timestamp (ms)
      * @returns {HTMLElement}
      */
+    /**
+     * Create a source attribution pill element (clickable link or plain span).
+     *
+     * @param {string} sourceType 'page', 'course', or 'general'
+     * @param {Object|null} meta SSE metadata with pageurl, courseurl, pagetitle
+     * @returns {HTMLElement}
+     */
+    const createSourcePill = function(sourceType, meta) {
+        const SOURCE_LABELS = {
+            page: 'From: Current Page',
+            course: 'From: Course Materials',
+            general: 'General Knowledge'
+        };
+        var href = '';
+        var title = '';
+        if (sourceType === 'page' && meta && meta.pageurl) {
+            href = meta.pageurl;
+            title = meta.pagetitle || '';
+        } else if (sourceType === 'course' && meta && meta.courseurl) {
+            href = meta.courseurl;
+            title = '';
+        }
+        var pill;
+        if (href) {
+            pill = document.createElement('a');
+            pill.href = href;
+            pill.target = '_blank';
+            pill.rel = 'noopener';
+            if (title) {
+                pill.title = title;
+            }
+            // Small external link icon after label.
+            pill.innerHTML = (SOURCE_LABELS[sourceType] || sourceType)
+                + ' <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24"'
+                + ' fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"'
+                + ' stroke-linejoin="round" style="vertical-align:-1px;margin-left:2px">'
+                + '<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>'
+                + '<polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+        } else {
+            pill = document.createElement('span');
+            pill.textContent = SOURCE_LABELS[sourceType] || sourceType;
+        }
+        pill.className = 'aica-source-pill aica-source-pill--' + sourceType;
+        return pill;
+    };
+
     const addAssistantMsg = function(text, ts) {
         const fn = (getTtsUrl() || Speech.isTTSSupported()) ? handleSpeak : null;
         return UI.addMessage('assistant', text, fn, ts || null);
@@ -2183,7 +2280,7 @@ define([
         Repo.getHistory(courseId).then(function(result) {
             if (result.messages && result.messages.length > 0) {
                 const NEXT_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
-                const SOURCE_RE = /\n*\[SOURCE:(page|course|general)\]/;
+                const SOURCE_RE = /[\s]*\[SOURCE:\s*(page|course|general)\s*\]/;
                 let lastSuggestions = [];
                 let prevDateKey = null;
                 const today = new Date();
@@ -2234,19 +2331,18 @@ define([
                         addAssistantMsg(text, msg.timecreated ? msg.timecreated * 1000 : null);
                         // Append source pill for history messages.
                         if (histSourceType) {
-                            const SOURCE_LABELS = {
-                                page: 'From: Current Page',
-                                course: 'From: Course Materials',
-                                general: 'General Knowledge'
-                            };
                             const allMsgs = document.querySelectorAll(
                                 '.local-ai-course-assistant__message--assistant');
                             const lastEl = allMsgs.length ? allMsgs[allMsgs.length - 1] : null;
                             if (lastEl) {
-                                const pill = document.createElement('span');
-                                pill.className = 'aica-source-pill aica-source-pill--' + histSourceType;
-                                pill.textContent = SOURCE_LABELS[histSourceType] || histSourceType;
-                                lastEl.appendChild(pill);
+                                // History pills: use current page meta if available, otherwise course-level only.
+                                var histMeta = {
+                                    courseurl: (new URL('/course/view.php?id=' + courseId,
+                                        window.location.origin)).href,
+                                    pageurl: '',
+                                    pagetitle: ''
+                                };
+                                lastEl.appendChild(createSourcePill(histSourceType, histMeta));
                             }
                         }
                     } else {
@@ -2382,7 +2478,11 @@ define([
             postData.completion = completionPct;
         }
 
+        streamMeta = null;
         streamController = SSE.startStream(sseUrl, postData, {
+            onMeta: function(meta) {
+                streamMeta = meta;
+            },
             onToken: function(token) {
                 if (!fullText) {
                     // First token — create the streaming message element.
@@ -2395,7 +2495,7 @@ define([
                 UI.showTyping(false);
                 if (fullText) {
                     const NEXT_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
-                    const SOURCE_RE = /\n*\[SOURCE:(page|course|general)\]/;
+                    const SOURCE_RE = /[\s]*\[SOURCE:\s*(page|course|general)\s*\]/;
                     const match = fullText.match(NEXT_RE);
                     let suggestions = [];
                     let displayText = fullText;
@@ -2414,19 +2514,11 @@ define([
                     UI.finishStreaming(displayText, (getTtsUrl() || Speech.isTTSSupported()) ? handleSpeak : null);
                     // Append source pill to the last assistant message.
                     if (sourceType) {
-                        const SOURCE_LABELS = {
-                            page: 'From: Current Page',
-                            course: 'From: Course Materials',
-                            general: 'General Knowledge'
-                        };
                         const msgs = document.querySelectorAll(
                             '.local-ai-course-assistant__message--assistant');
                         const lastMsg = msgs.length ? msgs[msgs.length - 1] : null;
                         if (lastMsg) {
-                            const pill = document.createElement('span');
-                            pill.className = 'aica-source-pill aica-source-pill--' + sourceType;
-                            pill.textContent = SOURCE_LABELS[sourceType] || sourceType;
-                            lastMsg.appendChild(pill);
+                            lastMsg.appendChild(createSourcePill(sourceType, streamMeta));
                         }
                     }
                     if (suggestions.length) {

@@ -605,6 +605,20 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // --- Analytics Export (Redash) ---
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/redash_heading',
+        get_string('redash_heading', 'local_ai_course_assistant'),
+        get_string('redash_heading_desc', 'local_ai_course_assistant')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/redash_api_key',
+        get_string('redash_api_key', 'local_ai_course_assistant'),
+        get_string('redash_api_key_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // --- Integrity Monitoring ---
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/integrity_heading',

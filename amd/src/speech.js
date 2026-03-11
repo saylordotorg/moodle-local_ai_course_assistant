@@ -484,6 +484,210 @@ define([], function() {
         'yo': {helpPage: 'Ìrànlọ́wọ́ ojú-ìwé yìí', quiz: 'Dánwò mi', studyPlan: 'Ètò Ẹkọ', askAnything: 'Béèrè ohunkóhun', reviewPractice: 'Àtúnyẹ̀wò àti ìdánrawò', ellPractice: 'Ìdánwò Ọ̀rọ̀', ellPronunciation: 'Ìdánwò Pronunciation', helpLesson: 'Ṣe àlàyé èyí', helpMe: 'Ìrànlọ́wọ́ AI', keyConcepts: 'Àwọn Èrò Pàtàkì', aiCoach: 'Olùkọ́ AI'},
     };
 
+    // -----------------------------------------------------------------------
+    // Conversation starter PROMPT translations (26 languages)
+    // These are the actual prompts sent to the AI, not the button labels.
+    // -----------------------------------------------------------------------
+
+    /** @type {Object} Starter prompt translations keyed by ISO 639-1 code */
+    const STARTER_PROMPTS = {
+        'en': {
+            helpPage: 'Help me understand this page',
+            quiz: 'Give me a practice quiz',
+            studyPlan: 'Help me create a study plan',
+            askAnything: 'I have a question',
+            reviewPractice: 'Review and practice key concepts'
+        },
+        'ar': {
+            helpPage: 'ساعدني في فهم هذه الصفحة',
+            quiz: 'أعطني اختباراً تدريبياً',
+            studyPlan: 'ساعدني في إنشاء خطة دراسية',
+            askAnything: 'لدي سؤال',
+            reviewPractice: 'مراجعة وممارسة المفاهيم الرئيسية'
+        },
+        'am': {
+            helpPage: 'ይህን ገጽ እንድረዳ እርዳኝ',
+            quiz: 'የልምምድ ፈተና ስጠኝ',
+            studyPlan: 'የጥናት እቅድ እንድፈጥር እርዳኝ',
+            askAnything: 'ጥያቄ አለኝ',
+            reviewPractice: 'ቁልፍ ፅንሰ-ሀሳቦችን ክለሳ እና ልምምድ'
+        },
+        'bm': {
+            helpPage: 'N dɛmɛ ka nin ɲɛ faamu',
+            quiz: 'Sɛgɛsɛgɛli kɛ n ye',
+            studyPlan: 'N dɛmɛ ka kalanso jɛtigi dilan',
+            askAnything: 'Ɲininkali bɛ n bolo',
+            reviewPractice: 'Kunnafoni hakɛw sɛgɛsɛgɛ ani lakodɔn'
+        },
+        'bn': {
+            helpPage: 'এই পৃষ্ঠাটি বুঝতে আমাকে সাহায্য করুন',
+            quiz: 'আমাকে একটি অনুশীলন কুইজ দিন',
+            studyPlan: 'একটি অধ্যয়ন পরিকল্পনা তৈরি করতে আমাকে সাহায্য করুন',
+            askAnything: 'আমার একটি প্রশ্ন আছে',
+            reviewPractice: 'মূল ধারণাগুলি পর্যালোচনা ও অনুশীলন করুন'
+        },
+        'es': {
+            helpPage: 'Ayúdame a entender esta página',
+            quiz: 'Dame un cuestionario de práctica',
+            studyPlan: 'Ayúdame a crear un plan de estudio',
+            askAnything: 'Tengo una pregunta',
+            reviewPractice: 'Revisar y practicar conceptos clave'
+        },
+        'fr': {
+            helpPage: 'Aide-moi à comprendre cette page',
+            quiz: 'Donne-moi un quiz de pratique',
+            studyPlan: 'Aide-moi à créer un plan d\'étude',
+            askAnything: 'J\'ai une question',
+            reviewPractice: 'Réviser et pratiquer les concepts clés'
+        },
+        'ha': {
+            helpPage: 'Taimaka mini in fahimci wannan shafin',
+            quiz: 'Ba ni jarabawar aiki',
+            studyPlan: 'Taimaka mini in kirkiri shirin karatu',
+            askAnything: 'Ina da tambaya',
+            reviewPractice: 'Bita da aikata muhimman ra\'ayoyi'
+        },
+        'hi': {
+            helpPage: 'इस पेज को समझने में मेरी मदद करें',
+            quiz: 'मुझे एक अभ्यास प्रश्नोत्तरी दें',
+            studyPlan: 'एक अध्ययन योजना बनाने में मेरी मदद करें',
+            askAnything: 'मेरा एक सवाल है',
+            reviewPractice: 'मुख्य अवधारणाओं की समीक्षा और अभ्यास करें'
+        },
+        'id': {
+            helpPage: 'Bantu saya memahami halaman ini',
+            quiz: 'Berikan saya kuis latihan',
+            studyPlan: 'Bantu saya membuat rencana belajar',
+            askAnything: 'Saya punya pertanyaan',
+            reviewPractice: 'Tinjau dan latih konsep utama'
+        },
+        'ig': {
+            helpPage: 'Nyere m aka ịghọta peeji a',
+            quiz: 'Nye m ajụjụ ule mmụta',
+            studyPlan: 'Nyere m aka ịmepụta atụmatụ mmụta',
+            askAnything: 'Enwere m ajụjụ',
+            reviewPractice: 'Nyochaa ma mụọ echiche ndị bụ isi'
+        },
+        'ms': {
+            helpPage: 'Bantu saya memahami halaman ini',
+            quiz: 'Berikan saya kuiz latihan',
+            studyPlan: 'Bantu saya membuat rancangan belajar',
+            askAnything: 'Saya ada soalan',
+            reviewPractice: 'Ulangkaji dan berlatih konsep utama'
+        },
+        'ne': {
+            helpPage: 'यो पृष्ठ बुझ्न मलाई मद्दत गर्नुहोस्',
+            quiz: 'मलाई अभ्यास प्रश्नोत्तरी दिनुहोस्',
+            studyPlan: 'अध्ययन योजना बनाउन मलाई मद्दत गर्नुहोस्',
+            askAnything: 'मेरो एउटा प्रश्न छ',
+            reviewPractice: 'मुख्य अवधारणाहरू समीक्षा र अभ्यास गर्नुहोस्'
+        },
+        'om': {
+            helpPage: 'Fuula kana akkan hubachuu na gargaari',
+            quiz: 'Qormaata shaakalaaf naaf kenni',
+            studyPlan: 'Karoora barumsaa uumuu na gargaari',
+            askAnything: 'Gaaffii qaba',
+            reviewPractice: 'Yaadota ijoo irra deebi\'ii shaakali'
+        },
+        'pa': {
+            helpPage: 'ਇਸ ਪੰਨੇ ਨੂੰ ਸਮਝਣ ਵਿੱਚ ਮੇਰੀ ਮਦਦ ਕਰੋ',
+            quiz: 'ਮੈਨੂੰ ਇੱਕ ਅਭਿਆਸ ਕੁਇਜ਼ ਦਿਓ',
+            studyPlan: 'ਅਧਿਐਨ ਯੋਜਨਾ ਬਣਾਉਣ ਵਿੱਚ ਮੇਰੀ ਮਦਦ ਕਰੋ',
+            askAnything: 'ਮੇਰਾ ਇੱਕ ਸਵਾਲ ਹੈ',
+            reviewPractice: 'ਮੁੱਖ ਧਾਰਣਾਵਾਂ ਦੀ ਸਮੀਖਿਆ ਅਤੇ ਅਭਿਆਸ ਕਰੋ'
+        },
+        'pt': {
+            helpPage: 'Me ajude a entender esta página',
+            quiz: 'Me dê um quiz de prática',
+            studyPlan: 'Me ajude a criar um plano de estudo',
+            askAnything: 'Eu tenho uma pergunta',
+            reviewPractice: 'Revisar e praticar conceitos-chave'
+        },
+        'ru': {
+            helpPage: 'Помоги мне понять эту страницу',
+            quiz: 'Дай мне тренировочный тест',
+            studyPlan: 'Помоги мне составить план учёбы',
+            askAnything: 'У меня есть вопрос',
+            reviewPractice: 'Повторить и попрактиковать ключевые понятия'
+        },
+        'so': {
+            helpPage: 'I caawin in aan fahmo boggan',
+            quiz: 'I sii imtixaan tababar ah',
+            studyPlan: 'I caawin in aan abuuro qorshe waxbarashada',
+            askAnything: 'Su\'aal baan qabaa',
+            reviewPractice: 'Dib u eeg oo ku celceli fikradaha muhiimka ah'
+        },
+        'sw': {
+            helpPage: 'Nisaidie kuelewa ukurasa huu',
+            quiz: 'Nipe jaribio la mazoezi',
+            studyPlan: 'Nisaidie kutengeneza mpango wa masomo',
+            askAnything: 'Nina swali',
+            reviewPractice: 'Kagua na fanya mazoezi ya dhana kuu'
+        },
+        'ta': {
+            helpPage: 'இந்தப் பக்கத்தைப் புரிந்துகொள்ள எனக்கு உதவுங்கள்',
+            quiz: 'எனக்கு ஒரு பயிற்சி வினாடி வினா கொடுங்கள்',
+            studyPlan: 'ஒரு படிப்பு திட்டம் உருவாக்க எனக்கு உதவுங்கள்',
+            askAnything: 'எனக்கு ஒரு கேள்வி உள்ளது',
+            reviewPractice: 'முக்கிய கருத்துகளை மீளாய்வு செய்து பயிற்சி செய்யுங்கள்'
+        },
+        'tl': {
+            helpPage: 'Tulungan mo akong maunawaan ang pahinang ito',
+            quiz: 'Bigyan mo ako ng practice quiz',
+            studyPlan: 'Tulungan mo akong gumawa ng plano sa pag-aaral',
+            askAnything: 'May tanong ako',
+            reviewPractice: 'Repasuhin at isanay ang mga pangunahing konsepto'
+        },
+        'vi': {
+            helpPage: 'Giúp tôi hiểu trang này',
+            quiz: 'Cho tôi một bài kiểm tra thực hành',
+            studyPlan: 'Giúp tôi tạo kế hoạch học tập',
+            askAnything: 'Tôi có một câu hỏi',
+            reviewPractice: 'Ôn tập và thực hành các khái niệm chính'
+        },
+        'wo': {
+            helpPage: 'Ndimbal ma xam bii xët',
+            quiz: 'Jox ma seetlu bi jëfandikoo',
+            studyPlan: 'Ndimbal ma sos ab xëy ci jàng',
+            askAnything: 'Am naa laaj',
+            reviewPractice: 'Seet ak jëfandikoo xam-xam yu am solo'
+        },
+        'yo': {
+            helpPage: 'Ràn mí lọ́wọ́ láti lóye ojú-ìwé yìí',
+            quiz: 'Fún mi ní ìdánwò àdánrawò',
+            studyPlan: 'Ràn mí lọ́wọ́ láti ṣẹ̀dá ètò ẹ̀kọ́',
+            askAnything: 'Mo ní ìbéèrè kan',
+            reviewPractice: 'Àtúnyẹ̀wò àti ìdánrawò àwọn èrò pàtàkì'
+        },
+        'zh': {
+            helpPage: '帮我理解这个页面',
+            quiz: '给我一个练习测验',
+            studyPlan: '帮我制定一个学习计划',
+            askAnything: '我有一个问题',
+            reviewPractice: '复习和练习关键概念'
+        },
+        'zu': {
+            helpPage: 'Ngisize ngiqonde leli khasi',
+            quiz: 'Nginike isivivinyo sokuzejwayeza',
+            studyPlan: 'Ngisize ngakhe uhlelo lwezifundo',
+            askAnything: 'Nginombuzo',
+            reviewPractice: 'Buyekeza futhi uzipratize imiqondo esemqoka'
+        },
+    };
+
+    /**
+     * Get a translated starter prompt for a given language code and starter key.
+     * Falls back to English if the language or key is not found.
+     *
+     * @param {string} langCode ISO 639-1 code, e.g. 'fr'
+     * @param {string} key      Starter key, e.g. 'helpPage'
+     * @returns {string}
+     */
+    const getStarterPrompt = function(langCode, key) {
+        const lang = STARTER_PROMPTS[langCode] || STARTER_PROMPTS['en'];
+        return lang[key] || STARTER_PROMPTS['en'][key] || '';
+    };
+
     /**
      * Get starter label translations for a given language code.
      * Returns null for English (default), meaning callers should use the original server-rendered text.
@@ -521,5 +725,6 @@ define([], function() {
         stopSpeaking:      stopSpeaking,
         isSpeaking:        isSpeaking,
         getStarterLabels:  getStarterLabels,
+        getStarterPrompt:  getStarterPrompt,
     };
 });

@@ -303,6 +303,12 @@ $string['update:download_failed'] = 'Failed to download the update. Please try a
 $string['update:github_token'] = 'GitHub Token (optional)';
 $string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
 
+// Analytics Export (Redash).
+$string['redash_heading'] = 'Analytics Export';
+$string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
+$string['redash_api_key'] = 'Redash API Key';
+$string['redash_api_key_desc'] = 'API key for external analytics platforms like Redash. Provides read-only access to usage data, feedback, and cost analytics. Leave blank to disable the export endpoint.';
+
 // Integrity Checks.
 $string['integrity:title'] = 'Integrity Checks';
 $string['integrity:desc'] = 'Automated daily health checks that verify PHP syntax, JS builds, lang files, database tables, and more. Email alerts are sent only when issues are found.';

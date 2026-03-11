@@ -284,6 +284,17 @@ try {
         $streamoptions['max_tokens'] = $maxtokens;
     }
 
+    // Emit source attribution metadata before streaming begins.
+    $pageurl = '';
+    $courseurl = (new \moodle_url('/course/view.php', ['id' => $courseid]))->out(false);
+    if (!empty($pageid)) {
+        $cm = get_coursemodule_from_id('', $pageid, 0, false, IGNORE_MISSING);
+        if ($cm) {
+            $pageurl = (new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $pageid]))->out(false);
+        }
+    }
+    sse_send(['type' => 'meta', 'pageurl' => $pageurl, 'courseurl' => $courseurl, 'pagetitle' => $pagetitle ?? '']);
+
     $provider->chat_completion_stream($systemprompt, $history, function (string $chunk) use (&$fullresponse) {
         $fullresponse .= $chunk;
         sse_send(['token' => $chunk]);

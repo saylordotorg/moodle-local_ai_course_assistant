@@ -1481,6 +1481,20 @@
     background: #fff3e0;
     color: #e65100;
 }
+a.aica-source-pill {
+    text-decoration: none;
+    cursor: pointer;
+}
+a.aica-source-pill:hover {
+    opacity: 0.85;
+    text-decoration: underline;
+}
+a.aica-source-pill svg {
+    opacity: 0.6;
+}
+a.aica-source-pill:hover svg {
+    opacity: 1;
+}
 
 /* =========================================================
    Edit button — last user message
@@ -3157,4 +3171,33 @@
         width: 16px !important;
         height: 16px !important;
     }
+}
+
+/* Bookmark header button and badge */
+.local-ai-course-assistant__btn-bookmarks {
+    position: relative;
+}
+
+.aica-bookmark-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 10px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+/* Bookmarks panel date label */
+.aica-bookmarks-panel__date {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+    display: block;
 }

@@ -35,6 +35,7 @@ define([], function() {
      * @param {Function} callbacks.onToken Called with each token string
      * @param {Function} callbacks.onDone Called when stream completes
      * @param {Function} callbacks.onError Called on error with error message string
+     * @param {Function} [callbacks.onMeta] Called with metadata object (type, pageurl, courseurl, pagetitle)
      * @returns {AbortController} Controller to cancel the stream
      */
     const startStream = function(url, body, callbacks) {
@@ -108,6 +109,13 @@ define([], function() {
                             if (data.error) {
                                 callbacks.onError(data.error);
                                 return;
+                            }
+
+                            if (data.type === 'meta') {
+                                if (callbacks.onMeta) {
+                                    callbacks.onMeta(data);
+                                }
+                                continue;
                             }
 
                             if (data.done) {
