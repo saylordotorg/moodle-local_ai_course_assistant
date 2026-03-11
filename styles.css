@@ -3234,3 +3234,81 @@ a.aica-source-pill:hover svg {
     color: #ef4444;
     border-color: #fca5a5;
 }
+
+/* Context Debug Inspector */
+.local-ai-course-assistant__btn-debug {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+.local-ai-course-assistant__btn-debug:hover,
+.local-ai-course-assistant__btn-debug.active {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.aica-debug-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #1e293b;
+    color: #e2e8f0;
+    z-index: 100;
+    overflow-y: auto;
+    padding: 12px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.aica-debug-panel[hidden] { display: none; }
+
+.aica-debug-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #334155;
+}
+.aica-debug-panel__header strong {
+    font-size: 13px;
+    color: #f59e0b;
+}
+.aica-debug-panel__copy {
+    background: none;
+    border: 1px solid #475569;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.aica-debug-panel__copy:hover {
+    color: #e2e8f0;
+    border-color: #64748b;
+}
+.aica-debug-panel__label {
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+.aica-debug-panel__pre {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 0 0 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 11px;
+    max-height: 200px;
+    overflow-y: auto;
+    color: #a5f3fc;
+}

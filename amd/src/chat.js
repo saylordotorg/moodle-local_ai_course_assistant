@@ -79,6 +79,128 @@ define([
     /** @type {boolean} Whether we've already shown a study break nudge this session */
     let breakNudgeShown = false;
 
+    /** @type {boolean} Whether the admin context debug inspector is enabled */
+    let contextDebugEnabled = false;
+    /** @type {Object} Debug state: browser snapshot, last request, and server response */
+    let contextDebugState = {
+        browser: null,
+        lastRequest: null,
+        lastServer: null,
+    };
+
+    // ── Context Debug Inspector (admin only) ──────────────────────────
+
+    /**
+     * Get the main heading text from the page.
+     */
+    const getContextDebugHeading = function() {
+        var h1 = document.querySelector('h1');
+        return h1 ? h1.textContent.trim() : '';
+    };
+
+    /**
+     * Build a snapshot of the browser-side page context.
+     */
+    const buildContextDebugBrowserSnapshot = function(rootEl) {
+        return {
+            browserUrl: window.location.href,
+            browserTitle: document.title || '',
+            browserHeading: getContextDebugHeading(),
+            bodyClasses: document.body ? document.body.className : '',
+            widgetCapture: {
+                currentPageId: rootEl ? rootEl.dataset.currentPageId : '',
+                currentPageTitle: rootEl ? rootEl.dataset.currentPageTitle : '',
+                modName: rootEl ? rootEl.dataset.modname : '',
+                pageType: rootEl ? rootEl.dataset.pagetype : '',
+            },
+        };
+    };
+
+    /**
+     * Write a JSON payload into a debug panel <pre> element.
+     */
+    const setContextDebugBlock = function(el, payload, emptyText) {
+        if (!el) { return; }
+        el.textContent = payload ? JSON.stringify(payload, null, 2) : (emptyText || '(empty)');
+    };
+
+    /**
+     * Refresh the debug panel with current state.
+     */
+    const refreshContextDebug = function() {
+        var rootEl = document.getElementById('local-ai-course-assistant');
+        contextDebugState.browser = buildContextDebugBrowserSnapshot(rootEl);
+        var panel = rootEl ? rootEl.querySelector('.aica-debug-panel') : null;
+        if (!panel) { return; }
+        setContextDebugBlock(panel.querySelector('.aica-debug-panel__pre--browser'), contextDebugState.browser, 'No browser context');
+        setContextDebugBlock(panel.querySelector('.aica-debug-panel__pre--request'), contextDebugState.lastRequest, 'No request sent yet');
+        setContextDebugBlock(panel.querySelector('.aica-debug-panel__pre--prompt'), contextDebugState.lastServer, 'No server response yet');
+    };
+
+    /**
+     * Initialize the context debug feature if the admin flag is set.
+     */
+    const initContextDebug = function(rootEl) {
+        if (!rootEl || rootEl.dataset.contextDebug !== '1') { return; }
+        contextDebugEnabled = true;
+        contextDebugState.browser = buildContextDebugBrowserSnapshot(rootEl);
+    };
+
+    /**
+     * Toggle the debug panel visibility.
+     */
+    const handleContextDebugToggle = function() {
+        var rootEl = document.getElementById('local-ai-course-assistant');
+        var panel = rootEl ? rootEl.querySelector('.aica-debug-panel') : null;
+        if (!panel) { return; }
+        var hidden = panel.hasAttribute('hidden');
+        if (hidden) {
+            panel.removeAttribute('hidden');
+            refreshContextDebug();
+        } else {
+            panel.setAttribute('hidden', '');
+        }
+        var btn = rootEl.querySelector('.local-ai-course-assistant__btn-debug');
+        if (btn) {
+            btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+            btn.classList.toggle('active', hidden);
+        }
+    };
+
+    /**
+     * Copy all debug panels to clipboard.
+     */
+    const handleContextDebugCopy = function() {
+        var lines = [
+            '=== Browser Snapshot ===',
+            JSON.stringify(contextDebugState.browser, null, 2),
+            '',
+            '=== Last Request ===',
+            JSON.stringify(contextDebugState.lastRequest, null, 2),
+            '',
+            '=== Server Response ===',
+            JSON.stringify(contextDebugState.lastServer, null, 2),
+        ];
+        navigator.clipboard.writeText(lines.join('\n')).catch(function() { /* ignore */ });
+    };
+
+    /**
+     * Store the outbound SSE request for the debug panel.
+     */
+    const updateContextDebugRequest = function(postData) {
+        contextDebugState.lastRequest = Object.assign({sentAt: new Date().toISOString()}, postData);
+        contextDebugState.lastServer = null;
+        refreshContextDebug();
+    };
+
+    /**
+     * Store the server debug payload.
+     */
+    const updateContextDebugServer = function(payload) {
+        contextDebugState.lastServer = payload;
+        refreshContextDebug();
+    };
+
     /**
      * Initialize the chat module.
      */
@@ -115,6 +237,7 @@ define([
         } catch (e) { moduleTitles = []; }
 
         UI.initUI(root);
+        initContextDebug(root);
         bindEvents();
         initSpeech();
         // Cache English starter labels before any language update overwrites them.
@@ -309,6 +432,16 @@ define([
             voiceBtn.addEventListener('click', function() {
                 handlePracticeSpeaking();
             });
+        }
+
+        // Context debug toggle (admin only).
+        const debugBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-debug') : null;
+        if (debugBtn) {
+            debugBtn.addEventListener('click', handleContextDebugToggle);
+        }
+        const debugCopyBtn = els.root ? els.root.querySelector('.aica-debug-panel__copy') : null;
+        if (debugCopyBtn) {
+            debugCopyBtn.addEventListener('click', handleContextDebugCopy);
         }
 
         // Feedback button.
@@ -2485,10 +2618,30 @@ define([
             postData.completion = completionPct;
         }
 
+        // Append browser context for admin debug inspector.
+        if (contextDebugEnabled) {
+            postData.clienturl = window.location.href;
+            postData.clienttitle = document.title || '';
+            postData.pageheading = getContextDebugHeading();
+            postData.bodyclasses = document.body ? document.body.className : '';
+            if (rootEl && rootEl.dataset.pagetype) {
+                postData.clientpagetype = rootEl.dataset.pagetype;
+            }
+            if (rootEl && rootEl.dataset.modname) {
+                postData.clientmodname = rootEl.dataset.modname;
+            }
+            updateContextDebugRequest(postData);
+        }
+
         streamMeta = null;
         streamController = SSE.startStream(sseUrl, postData, {
             onMeta: function(meta) {
                 streamMeta = meta;
+            },
+            onDebug: function(payload) {
+                if (contextDebugEnabled) {
+                    updateContextDebugServer(payload);
+                }
             },
             onToken: function(token) {
                 if (!fullText) {

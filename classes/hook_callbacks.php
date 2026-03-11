@@ -252,6 +252,7 @@ class hook_callbacks {
             'coursename'         => $course->fullname,
             'emailreminders'     => (bool)get_config('local_ai_course_assistant', 'reminders_email_enabled'),
             'completionpct'      => $completionpct,
+            'contextdebug'       => $cansiteconfig ? 1 : 0,
             'starters'           => $starters,
             'startersjson'       => json_encode($starters),
         ];
