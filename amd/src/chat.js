@@ -443,6 +443,14 @@ define([
         if (debugCopyBtn) {
             debugCopyBtn.addEventListener('click', handleContextDebugCopy);
         }
+        const debugCloseBtn = els.root ? els.root.querySelector('.aica-debug-panel__close') : null;
+        if (debugCloseBtn) {
+            debugCloseBtn.addEventListener('click', handleContextDebugToggle);
+        }
+        const debugRefreshBtn = els.root ? els.root.querySelector('.aica-debug-panel__refresh') : null;
+        if (debugRefreshBtn) {
+            debugRefreshBtn.addEventListener('click', refreshContextDebug);
+        }
 
         // Feedback button.
         const feedbackBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-feedback') : null;

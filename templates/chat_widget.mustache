@@ -220,6 +220,34 @@
              aria-label="{{#str}}chat:title, local_ai_course_assistant{{/str}}">
         </div>
 
+        {{! Context Debug Inspector (admin only) }}
+        {{#cansiteconfig}}
+        <div class="aica-debug-panel" hidden>
+            <div class="aica-debug-panel__header">
+                <span class="aica-debug-panel__title">Context Debug</span>
+            </div>
+            <div class="aica-debug-panel__content">
+                <div class="aica-debug-panel__section">
+                    <div class="aica-debug-panel__label">Browser Snapshot</div>
+                    <pre class="aica-debug-panel__pre aica-debug-panel__pre--browser"></pre>
+                </div>
+                <div class="aica-debug-panel__section">
+                    <div class="aica-debug-panel__label">Last SSE Request</div>
+                    <pre class="aica-debug-panel__pre aica-debug-panel__pre--request"></pre>
+                </div>
+                <div class="aica-debug-panel__section">
+                    <div class="aica-debug-panel__label">Server Response</div>
+                    <pre class="aica-debug-panel__pre aica-debug-panel__pre--prompt"></pre>
+                </div>
+            </div>
+            <div class="aica-debug-panel__actions">
+                <button type="button" class="aica-debug-panel__btn aica-debug-panel__refresh">Refresh</button>
+                <button type="button" class="aica-debug-panel__btn aica-debug-panel__copy">Copy All</button>
+                <button type="button" class="aica-debug-panel__btn aica-debug-panel__btn--close aica-debug-panel__close">Close</button>
+            </div>
+        </div>
+        {{/cansiteconfig}}
+
         {{! Conversation starters — dynamically rendered from admin config }}
         <div class="local-ai-course-assistant__starters"
              aria-label="{{#str}}chat:starters_label, local_ai_course_assistant{{/str}}"
@@ -291,30 +319,5 @@
             </span>
         </div>
 
-        {{! Context Debug Inspector (admin only) }}
-        {{#cansiteconfig}}
-        <div class="aica-debug-panel" hidden>
-            <div class="aica-debug-panel__header">
-                <strong>Context Debug Inspector</strong>
-                <button type="button" class="aica-debug-panel__copy" title="Copy all to clipboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="aica-debug-panel__section">
-                <div class="aica-debug-panel__label">Browser Snapshot</div>
-                <pre class="aica-debug-panel__pre aica-debug-panel__pre--browser">(open drawer to capture)</pre>
-            </div>
-            <div class="aica-debug-panel__section">
-                <div class="aica-debug-panel__label">Last SSE Request</div>
-                <pre class="aica-debug-panel__pre aica-debug-panel__pre--request">No request sent yet</pre>
-            </div>
-            <div class="aica-debug-panel__section">
-                <div class="aica-debug-panel__label">Server Response</div>
-                <pre class="aica-debug-panel__pre aica-debug-panel__pre--prompt">No server response yet</pre>
-            </div>
-        </div>
-        {{/cansiteconfig}}
     </div>
 </div>

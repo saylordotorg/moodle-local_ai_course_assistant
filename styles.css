@@ -3248,23 +3248,14 @@ a.aica-source-pill:hover svg {
 }
 .local-ai-course-assistant__btn-debug:hover,
 .local-ai-course-assistant__btn-debug.active {
-    color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.18);
 }
 
 .aica-debug-panel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #1e293b;
-    color: #e2e8f0;
-    z-index: 100;
-    overflow-y: auto;
-    padding: 12px;
-    font-size: 12px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
+    flex: 0 0 auto;
+    border-top: 1px solid #e5e7eb;
+    background: #f8fafc;
 }
 .aica-debug-panel[hidden] { display: none; }
 
@@ -3272,43 +3263,73 @@ a.aica-source-pill:hover svg {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #334155;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #eef2ff;
+    border-bottom: 1px solid #dbeafe;
 }
-.aica-debug-panel__header strong {
-    font-size: 13px;
-    color: #f59e0b;
+.aica-debug-panel__title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e3a8a;
 }
-.aica-debug-panel__copy {
-    background: none;
-    border: 1px solid #475569;
-    color: #94a3b8;
-    cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 4px;
-}
-.aica-debug-panel__copy:hover {
-    color: #e2e8f0;
-    border-color: #64748b;
+.aica-debug-panel__content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 8px 10px 10px;
 }
 .aica-debug-panel__label {
-    color: #94a3b8;
-    font-size: 11px;
+    margin: 0 0 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    color: #64748b;
 }
 .aica-debug-panel__pre {
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 4px;
-    padding: 8px;
-    margin: 0 0 12px;
-    white-space: pre-wrap;
-    word-break: break-all;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #111827;
+    color: #e5e7eb;
     font-size: 11px;
-    max-height: 200px;
-    overflow-y: auto;
-    color: #a5f3fc;
+    line-height: 1.45;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.aica-debug-panel__actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px 10px;
+    border-top: 1px solid #e5e7eb;
+}
+.aica-debug-panel__btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #c7d2fe;
+    background: #fff;
+    color: #3730a3;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .aica-debug-panel__btn:hover {
+        background: #eef2ff;
+    }
+}
+.aica-debug-panel__btn--close {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+@media (hover: hover) {
+    .aica-debug-panel__btn--close:hover {
+        background: #fecaca;
+    }
 }
