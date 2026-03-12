@@ -984,6 +984,7 @@ define([
             status: status,
             buttonText: getVoicePanelButtonLabel(sessionActive),
             disabled: sessionActive ? false : !available,
+            active: sessionActive,
         });
     };
 

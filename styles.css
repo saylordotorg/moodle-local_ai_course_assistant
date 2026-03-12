@@ -712,6 +712,13 @@ a.aica-source-pill:hover svg {
     color: #7c8a96;
 }
 
+.local-ai-course-assistant__voice-panel--active .aica-mode-card__icon,
+.local-ai-course-assistant__voice-panel--active .aica-mode-card__eyebrow,
+.local-ai-course-assistant__voice-panel--active .aica-mode-card__title,
+.local-ai-course-assistant__voice-panel--active .aica-mode-card__text {
+    display: none;
+}
+
 .aica-history-panel {
     display: flex;
     flex-direction: column;
@@ -897,11 +904,11 @@ a.aica-source-pill:hover svg {
     width: 100%;
     min-width: 0;
     border: none;
-    padding: 10px 12px 6px;
+    padding: 4px 12px 4px;
     font-size: 14px;
     resize: none;
     max-height: 160px;
-    min-height: 44px;
+    min-height: 22px;
     line-height: 1.5;
     outline: none;
     font-family: inherit;

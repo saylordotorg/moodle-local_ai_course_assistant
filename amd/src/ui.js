@@ -2298,6 +2298,9 @@ define([
                 startBtn.disabled = !!config.disabled;
             }
         }
+        if (config.active !== undefined) {
+            panel.classList.toggle('local-ai-course-assistant__voice-panel--active', !!config.active);
+        }
     };
 
     /**
