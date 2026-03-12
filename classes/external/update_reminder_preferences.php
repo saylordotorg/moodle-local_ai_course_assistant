@@ -79,6 +79,12 @@ class update_reminder_preferences extends external_api {
                 $params['country_code'],
                 $params['frequency']
             );
+
+            // Save contact info to Moodle user profile.
+            if ($params['channel'] === 'whatsapp' && !empty($destination)) {
+                $DB->set_field('user', 'phone1', $destination, ['id' => $USER->id]);
+                $USER->phone1 = $destination;
+            }
         } else {
             // Disable existing reminder.
             global $DB;

@@ -1731,8 +1731,11 @@ define([
         try { quizHistory = JSON.parse(localStorage.getItem('aica_quiz_history_' + courseId) || '[]'); } catch (e) { /**/ }
 
         // Fetch reminder preferences, then show panel.
-        var reminderEnabled = false;
+        var emailReminderEnabled = false;
+        var whatsappReminderEnabled = false;
+        var whatsappDestination = '';
         var reminderFrequency = 'daily';
+        var hasAnyReminders = root.dataset.emailreminders === '1' || root.dataset.whatsappreminders === '1';
         var showPanel = function() {
             UI.showSettingsPanel(
                 {
@@ -1746,8 +1749,13 @@ define([
                     studySessions: studySessions,
                     quizHistory: quizHistory,
                     emailRemindersEnabled: root.dataset.emailreminders === '1',
-                    reminderEnabled: reminderEnabled,
+                    whatsappRemindersEnabled: root.dataset.whatsappreminders === '1',
+                    emailReminderEnabled: emailReminderEnabled,
+                    whatsappReminderEnabled: whatsappReminderEnabled,
+                    whatsappDestination: whatsappDestination,
                     reminderFrequency: reminderFrequency,
+                    userEmail: root.dataset.useremail || '',
+                    userPhone: root.dataset.userphone || '',
                 },
                 {
                     onLangSelect: function(code, name) {
@@ -1776,8 +1784,8 @@ define([
                             localStorage.removeItem('aica_last_session_' + courseId);
                         } catch (e) { /**/ }
                     },
-                    onReminderUpdate: function(enabled, frequency) {
-                        Repo.updateReminderPreferences(courseId, 'email', '', '', frequency, enabled)
+                    onReminderUpdate: function(channel, enabled, destination, countryCode, frequency) {
+                        Repo.updateReminderPreferences(courseId, channel, destination || '', countryCode || '', frequency, enabled)
                             .catch(function() { /**/ });
                     },
                 }
@@ -1785,14 +1793,21 @@ define([
         };
 
         // Try to load current reminder state before opening panel.
-        if (root.dataset.emailreminders === '1') {
+        if (hasAnyReminders) {
             Repo.getReminderPreferences(courseId).then(function(prefs) {
                 if (prefs && prefs.reminders) {
                     for (var i = 0; i < prefs.reminders.length; i++) {
-                        if (prefs.reminders[i].channel === 'email') {
-                            reminderEnabled = true;
-                            reminderFrequency = prefs.reminders[i].frequency || 'daily';
-                            break;
+                        var r = prefs.reminders[i];
+                        if (r.channel === 'email' && r.enabled) {
+                            emailReminderEnabled = true;
+                            reminderFrequency = r.frequency || 'daily';
+                        }
+                        if (r.channel === 'whatsapp') {
+                            whatsappReminderEnabled = !!r.enabled;
+                            whatsappDestination = r.destination || '';
+                            if (!reminderFrequency || reminderFrequency === 'daily') {
+                                reminderFrequency = r.frequency || 'daily';
+                            }
                         }
                     }
                 }

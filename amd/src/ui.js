@@ -3292,7 +3292,7 @@ define([
         }
 
         // ── Study Reminders ──
-        if (config.emailRemindersEnabled) {
+        if (config.emailRemindersEnabled || config.whatsappRemindersEnabled) {
             const remSection = document.createElement('div');
             remSection.className = 'aica-settings-panel__section';
             const remHead = document.createElement('h3');
@@ -3302,27 +3302,92 @@ define([
 
             const remDesc = document.createElement('p');
             remDesc.className = 'aica-settings-panel__empty-note';
-            remDesc.textContent = 'Get email nudges to keep your study streak going.';
+            remDesc.textContent = 'Get nudges to keep your study streak going.';
             remSection.appendChild(remDesc);
 
-            // Toggle row.
-            const remRow = document.createElement('div');
-            remRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:4px';
-            const remToggle = document.createElement('input');
-            remToggle.type = 'checkbox';
-            remToggle.id = 'aica-reminder-toggle';
-            remToggle.checked = !!(config.reminderEnabled);
-            const remLabel = document.createElement('label');
-            remLabel.htmlFor = 'aica-reminder-toggle';
-            remLabel.textContent = 'Email me study reminders';
-            remLabel.style.cssText = 'font-size:13px;cursor:pointer';
-            remRow.appendChild(remToggle);
-            remRow.appendChild(remLabel);
-            remSection.appendChild(remRow);
+            // --- Email reminders ---
+            if (config.emailRemindersEnabled) {
+                const emailBlock = document.createElement('div');
+                emailBlock.style.cssText = 'margin-top:6px';
 
-            // Frequency select.
+                const emailRow = document.createElement('div');
+                emailRow.style.cssText = 'display:flex;align-items:center;gap:8px';
+                const emailToggle = document.createElement('input');
+                emailToggle.type = 'checkbox';
+                emailToggle.id = 'aica-reminder-email-toggle';
+                emailToggle.checked = !!(config.emailReminderEnabled);
+                const emailLabel = document.createElement('label');
+                emailLabel.htmlFor = 'aica-reminder-email-toggle';
+                emailLabel.textContent = 'Email me study reminders';
+                emailLabel.style.cssText = 'font-size:13px;cursor:pointer';
+                emailRow.appendChild(emailToggle);
+                emailRow.appendChild(emailLabel);
+                emailBlock.appendChild(emailRow);
+
+                // Show user's email (read-only display).
+                const emailAddrRow = document.createElement('div');
+                emailAddrRow.style.cssText = 'margin-top:4px;font-size:12px;color:#6c757d';
+                emailAddrRow.textContent = 'Sends to: ' + (config.userEmail || 'your Moodle email');
+                emailBlock.appendChild(emailAddrRow);
+
+                remSection.appendChild(emailBlock);
+                remSection._emailToggle = emailToggle;
+            }
+
+            // --- WhatsApp reminders ---
+            if (config.whatsappRemindersEnabled) {
+                const waBlock = document.createElement('div');
+                waBlock.style.cssText = 'margin-top:10px';
+
+                const waRow = document.createElement('div');
+                waRow.style.cssText = 'display:flex;align-items:center;gap:8px';
+                const waToggle = document.createElement('input');
+                waToggle.type = 'checkbox';
+                waToggle.id = 'aica-reminder-wa-toggle';
+                waToggle.checked = !!(config.whatsappReminderEnabled);
+                const waLabel = document.createElement('label');
+                waLabel.htmlFor = 'aica-reminder-wa-toggle';
+                waLabel.textContent = 'WhatsApp reminders';
+                waLabel.style.cssText = 'font-size:13px;cursor:pointer';
+                waRow.appendChild(waToggle);
+                waRow.appendChild(waLabel);
+                waBlock.appendChild(waRow);
+
+                // Phone number input.
+                const phoneRow = document.createElement('div');
+                phoneRow.style.cssText = 'margin-top:4px;display:flex;gap:6px;align-items:center';
+                const phoneInput = document.createElement('input');
+                phoneInput.type = 'tel';
+                phoneInput.id = 'aica-reminder-phone';
+                phoneInput.placeholder = '+1 555 123 4567';
+                phoneInput.value = config.whatsappDestination || config.userPhone || '';
+                phoneInput.style.cssText = 'flex:1;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;' +
+                    'font-size:13px;background:#f8fafc;color:#334155';
+                phoneRow.appendChild(phoneInput);
+                waBlock.appendChild(phoneRow);
+
+                const phoneHint = document.createElement('div');
+                phoneHint.style.cssText = 'font-size:11px;color:#94a3b8;margin-top:2px';
+                phoneHint.textContent = 'Include country code (e.g. +1 for US, +44 for UK)';
+                waBlock.appendChild(phoneHint);
+
+                const ratesNote = document.createElement('div');
+                ratesNote.style.cssText = 'font-size:10px;color:#94a3b8;margin-top:4px;font-style:italic';
+                ratesNote.textContent = 'Standard messaging and data rates may apply.';
+                waBlock.appendChild(ratesNote);
+
+                remSection.appendChild(waBlock);
+                remSection._waToggle = waToggle;
+                remSection._phoneInput = phoneInput;
+            }
+
+            // Shared frequency select.
             const freqRow = document.createElement('div');
-            freqRow.style.cssText = 'margin-top:6px';
+            freqRow.style.cssText = 'margin-top:8px';
+            const freqLabel = document.createElement('label');
+            freqLabel.textContent = 'Frequency';
+            freqLabel.style.cssText = 'font-size:12px;color:#6c757d;display:block;margin-bottom:2px';
+            freqRow.appendChild(freqLabel);
             const freqSelect = document.createElement('select');
             freqSelect.className = 'aica-settings-panel__select';
             [
@@ -3340,22 +3405,23 @@ define([
             remSection.appendChild(freqRow);
 
             // Email study notes toggle.
-            var notesRow = document.createElement('div');
-            notesRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px';
-            var notesToggle = document.createElement('input');
-            notesToggle.type = 'checkbox';
-            notesToggle.id = 'aica-email-notes-toggle';
-            try { notesToggle.checked = localStorage.getItem('aica_email_notes') === '1'; } catch (e) { /**/ }
-            var notesLabel = document.createElement('label');
-            notesLabel.htmlFor = 'aica-email-notes-toggle';
-            notesLabel.textContent = 'Email me study session notes';
-            notesLabel.style.cssText = 'font-size:12px;cursor:pointer;color:#6c757d';
-            notesRow.appendChild(notesToggle);
-            notesRow.appendChild(notesLabel);
-            remSection.appendChild(notesRow);
+            if (config.emailRemindersEnabled) {
+                var notesRow = document.createElement('div');
+                notesRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px';
+                var notesToggle = document.createElement('input');
+                notesToggle.type = 'checkbox';
+                notesToggle.id = 'aica-email-notes-toggle';
+                try { notesToggle.checked = localStorage.getItem('aica_email_notes') === '1'; } catch (e) { /**/ }
+                var notesLabel = document.createElement('label');
+                notesLabel.htmlFor = 'aica-email-notes-toggle';
+                notesLabel.textContent = 'Email me study session notes';
+                notesLabel.style.cssText = 'font-size:12px;cursor:pointer;color:#6c757d';
+                notesRow.appendChild(notesToggle);
+                notesRow.appendChild(notesLabel);
+                remSection.appendChild(notesRow);
+            }
 
             // Store references for save handler.
-            remSection._toggle = remToggle;
             remSection._freqSelect = freqSelect;
             remSection.dataset.hasReminders = '1';
 
@@ -3424,8 +3490,15 @@ define([
             }
             // Save reminder preferences if section exists.
             const remSec = content.querySelector('[data-has-reminders="1"]');
-            if (remSec && remSec._toggle && callbacks.onReminderUpdate) {
-                callbacks.onReminderUpdate(remSec._toggle.checked, remSec._freqSelect.value);
+            if (remSec && callbacks.onReminderUpdate) {
+                var freq = remSec._freqSelect ? remSec._freqSelect.value : 'daily';
+                if (remSec._emailToggle) {
+                    callbacks.onReminderUpdate('email', remSec._emailToggle.checked, '', '', freq);
+                }
+                if (remSec._waToggle) {
+                    var phone = remSec._phoneInput ? remSec._phoneInput.value.trim() : '';
+                    callbacks.onReminderUpdate('whatsapp', remSec._waToggle.checked, phone, '', freq);
+                }
             }
             // Save email study notes preference.
             var notesCheck = content.querySelector('#aica-email-notes-toggle');
