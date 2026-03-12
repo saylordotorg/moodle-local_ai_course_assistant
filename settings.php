@@ -660,7 +660,7 @@ if ($hassiteconfig) {
         get_string('integrity:email', 'local_ai_course_assistant'),
         get_string('integrity:email_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_EMAIL
+        PARAM_TEXT
     ));
 
     $integrityurl = new moodle_url('/local/ai_course_assistant/integrity_admin.php');

@@ -315,8 +315,8 @@ $string['integrity:title'] = 'Integrity Checks';
 $string['integrity:desc'] = 'Automated daily health checks that verify PHP syntax, JS builds, lang files, database tables, and more. Email alerts are sent only when issues are found.';
 $string['integrity:enabled'] = 'Enable Daily Integrity Checks';
 $string['integrity:enabled_desc'] = 'Run automated plugin health checks daily at 3 AM server time.';
-$string['integrity:email'] = 'Report Email Address';
-$string['integrity:email_desc'] = 'Email address for failure reports. Leave blank to notify the primary site admin.';
+$string['integrity:email'] = 'Report Email Address(es)';
+$string['integrity:email_desc'] = 'Email address(es) for failure reports. Separate multiple addresses with commas. Leave blank to notify the primary site admin.';
 $string['integrity:view_results'] = 'View Integrity Results';
 $string['integrity:run_now'] = 'Run Checks Now';
 

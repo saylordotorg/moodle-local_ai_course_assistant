@@ -108,25 +108,32 @@ class run_integrity_checks extends \core\task\scheduled_task {
 
         // Send using Moodle messaging.
         if (!empty($email)) {
-            // Send to configured email address using a dummy user object.
-            $touser = \core_user::get_noreply_user();
-            $touser->email = $email;
-            $touser->id = -1;
-            $touser->firstaccess = 0;
-            $touser->username = 'integrity_report';
-            $touser->firstname = 'SOLA';
-            $touser->lastname = 'Admin';
-            $touser->maildisplay = 1;
-            $touser->mailformat = 1;
-            $touser->deleted = 0;
-            $touser->suspended = 0;
-            $touser->auth = 'manual';
-            $touser->confirmed = 1;
-
+            // Support comma-separated email addresses.
+            $emails = array_map('trim', explode(',', $email));
             $fromuser = \core_user::get_noreply_user();
 
-            email_to_user($touser, $fromuser, $subject, $body, nl2br(s($body)));
-            mtrace("Integrity report sent to {$email}.");
+            foreach ($emails as $addr) {
+                if (!validate_email($addr)) {
+                    mtrace("Skipping invalid email: {$addr}");
+                    continue;
+                }
+                $touser = \core_user::get_noreply_user();
+                $touser->email = $addr;
+                $touser->id = -1;
+                $touser->firstaccess = 0;
+                $touser->username = 'integrity_report';
+                $touser->firstname = 'SOLA';
+                $touser->lastname = 'Admin';
+                $touser->maildisplay = 1;
+                $touser->mailformat = 1;
+                $touser->deleted = 0;
+                $touser->suspended = 0;
+                $touser->auth = 'manual';
+                $touser->confirmed = 1;
+
+                email_to_user($touser, $fromuser, $subject, $body, nl2br(s($body)));
+                mtrace("Integrity report sent to {$addr}.");
+            }
         } else {
             // Send via Moodle message to admin.
             $message = new \core\message\message();
