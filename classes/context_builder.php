@@ -139,6 +139,9 @@ class context_builder {
                 . "This marker will be detected by the system and a support ticket will be created automatically.";
         }
 
+        // Append widget feature awareness so the AI can guide students to existing UI features.
+        $prompt .= self::get_widget_feature_instructions();
+
         // Append off-topic detection instructions.
         if (get_config('local_ai_course_assistant', 'offtopic_enabled')) {
             $prompt .= "\n\n## Off-topic Detection\n"
@@ -572,6 +575,49 @@ class context_builder {
             . "5. Celebrate any partial understanding: \"You've actually got the first part right — let's build from there.\"\n"
             . "6. Never say \"it's easy\" or \"it's simple\" — this invalidates their struggle.\n"
             . "7. If they seem overwhelmed, suggest focusing on just one small piece rather than everything at once.";
+    }
+
+    /**
+     * Get instructions about widget features so the AI can guide students.
+     *
+     * Tells the AI what's available in the settings panel and other UI features,
+     * so it can direct students rather than trying to handle requests itself.
+     *
+     * @return string
+     */
+    private static function get_widget_feature_instructions(): string {
+        $features = [];
+
+        // Settings panel features.
+        $features[] = "Language preference (the student can choose their preferred language)";
+        $features[] = "Avatar customization (the student can choose a different avatar)";
+        $features[] = "Coaching style preference (Motivational Coach, Study Buddy, or Direct Tutor)";
+
+        if ((bool) get_config('local_ai_course_assistant', 'reminders_email_enabled')) {
+            $features[] = "Email study reminders (toggle on/off, uses their Moodle email)";
+        }
+        if ((bool) get_config('local_ai_course_assistant', 'reminders_whatsapp_enabled')) {
+            $features[] = "WhatsApp study reminders (toggle on/off, enter phone number with country code)";
+        }
+
+        $features[] = "First-generation student support toggle";
+        $features[] = "Bookmarked/saved responses";
+
+        $text = "\n\n## Widget Features\n"
+            . "The chat widget has a settings panel (gear icon in the header) where students can configure:\n";
+        foreach ($features as $f) {
+            $text .= "- {$f}\n";
+        }
+        $text .= "\nIMPORTANT: If a student asks to set up reminders, change their phone number or email, "
+            . "switch language, change coaching style, or customize their avatar, "
+            . "direct them to click the gear/settings icon in the chat header. "
+            . "Do NOT attempt to collect personal information like phone numbers or email addresses yourself. "
+            . "The settings panel handles all of this securely.\n"
+            . "Example response: \"You can set up WhatsApp reminders in the settings panel. "
+            . "Just tap the gear icon at the top of this chat, scroll to Study Reminders, "
+            . "and enter your phone number there.\"";
+
+        return $text;
     }
 
     /**
