@@ -299,5 +299,31 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026031200, 'local', 'ai_course_assistant');
     }
 
+    // v3.0.2: Update default survey rating question to include scale labels.
+    if ($oldversion < 2026031202) {
+        $surveys = $DB->get_records('local_ai_course_assistant_surveys');
+        foreach ($surveys as $survey) {
+            $questions = json_decode($survey->questions, true);
+            if (!is_array($questions)) {
+                continue;
+            }
+            $changed = false;
+            foreach ($questions as &$q) {
+                if (($q['type'] ?? '') === 'rating' && strpos($q['text'], '1 = ') === false) {
+                    $q['text'] = $q['text'] . ' (1 = not at all, 5 = very happy)';
+                    $q['min_label'] = 'Not at all';
+                    $q['max_label'] = 'Very happy';
+                    $changed = true;
+                }
+            }
+            unset($q);
+            if ($changed) {
+                $DB->set_field('local_ai_course_assistant_surveys', 'questions',
+                    json_encode($questions), ['id' => $survey->id]);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2026031202, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

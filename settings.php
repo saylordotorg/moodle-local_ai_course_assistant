@@ -675,7 +675,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/survey_heading',
         'Student Survey',
-        'Configure the in-chat student experience survey. Surveys can be customized per course via the analytics dashboard.'
+        'Configure the in-chat student experience survey. '
+        . '<a href="' . (new moodle_url('/local/ai_course_assistant/survey_admin.php'))->out() . '" class="btn btn-sm btn-outline-primary ml-2">Edit Survey Questions &rarr;</a>'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -713,6 +714,14 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_starters',
         get_string('starters:admin_title', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/starter_settings.php'),
+        'moodle/site:config'
+    ));
+
+    // Register the Survey Editor admin page.
+    $ADMIN->add('localplugins', new admin_externalpage(
+        'local_ai_course_assistant_survey',
+        'SOLA Survey Editor',
+        new moodle_url('/local/ai_course_assistant/survey_admin.php'),
         'moodle/site:config'
     ));
 

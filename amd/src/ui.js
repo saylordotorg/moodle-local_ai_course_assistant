@@ -4160,10 +4160,17 @@ define([
                 inputs.push({type: 'multiple_choice', index: idx, container: optContainer});
 
             } else if (q.type === 'rating') {
+                var ratingWrap = document.createElement('div');
                 var ratingRow = document.createElement('div');
                 ratingRow.style.cssText = 'display:flex;gap:8px;align-items:center';
                 var min = q.min || 1;
                 var max = q.max || 5;
+                if (q.min_label) {
+                    var minLbl = document.createElement('span');
+                    minLbl.style.cssText = 'font-size:11px;color:#94a3b8;white-space:nowrap';
+                    minLbl.textContent = q.min_label;
+                    ratingRow.appendChild(minLbl);
+                }
                 for (var r = min; r <= max; r++) {
                     (function(val) {
                         var btn = document.createElement('button');
@@ -4185,7 +4192,14 @@ define([
                         ratingRow.appendChild(btn);
                     })(r);
                 }
-                qDiv.appendChild(ratingRow);
+                if (q.max_label) {
+                    var maxLbl = document.createElement('span');
+                    maxLbl.style.cssText = 'font-size:11px;color:#94a3b8;white-space:nowrap';
+                    maxLbl.textContent = q.max_label;
+                    ratingRow.appendChild(maxLbl);
+                }
+                ratingWrap.appendChild(ratingRow);
+                qDiv.appendChild(ratingWrap);
                 inputs.push({type: 'rating', index: idx, container: ratingRow});
 
             } else {

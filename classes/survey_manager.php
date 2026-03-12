@@ -52,9 +52,11 @@ class survey_manager {
         ],
         [
             'type' => 'rating',
-            'text' => 'Overall, how happy were you with the AI tutor?',
+            'text' => 'Overall, how happy were you with the AI tutor? (1 = not at all, 5 = very happy)',
             'min' => 1,
             'max' => 5,
+            'min_label' => 'Not at all',
+            'max_label' => 'Very happy',
         ],
     ];
 
