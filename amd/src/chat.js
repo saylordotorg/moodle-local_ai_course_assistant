@@ -1416,16 +1416,21 @@ define([
             });
         }
 
-        // Feedback button.
-        const feedbackBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-feedback') : null;
-        if (feedbackBtn) {
-            feedbackBtn.addEventListener('click', function() {
-                UI.showFeedbackPanel(function(rating, comment, deviceInfo) {
-                    Repo.submitFeedback(courseId, rating, comment, deviceInfo).catch(function() {
-                        // Silently ignore â€” feedback is best-effort.
-                    });
+        // Feedback buttons (header + footer).
+        const feedbackHandler = function() {
+            UI.showFeedbackPanel(function(rating, comment, deviceInfo) {
+                Repo.submitFeedback(courseId, rating, comment, deviceInfo).catch(function() {
+                    // Silently ignore — feedback is best-effort.
                 });
             });
+        };
+        const feedbackBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-feedback') : null;
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', feedbackHandler);
+        }
+        const footerFeedbackBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__footer-feedback-link') : null;
+        if (footerFeedbackBtn) {
+            footerFeedbackBtn.addEventListener('click', feedbackHandler);
         }
 
         // Reset/home button.

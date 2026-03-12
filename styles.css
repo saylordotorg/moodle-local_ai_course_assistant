@@ -873,6 +873,30 @@ a.aica-source-pill:hover svg {
     text-align: center;
 }
 
+/* Footer feedback link */
+.local-ai-course-assistant__footer-feedback {
+    text-align: center;
+    padding: 2px 0;
+    flex-shrink: 0;
+}
+
+.local-ai-course-assistant__footer-feedback-link {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s ease;
+}
+
+.local-ai-course-assistant__footer-feedback-link:hover {
+    color: var(--aica-brand-color);
+}
+
 /* Input area */
 .local-ai-course-assistant__input-area {
     padding: 10px 12px 8px;
