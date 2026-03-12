@@ -241,5 +241,63 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026030905, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026031200) {
+        // Create surveys table.
+        $table = new xmldb_table('local_ai_course_assistant_surveys');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('questions', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('courseid_active', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'active']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Create survey responses table.
+        $table = new xmldb_table('local_ai_course_assistant_survey_resp');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('surveyid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('question_index', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('answer', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('surveyid_fk', XMLDB_KEY_FOREIGN, ['surveyid'], 'local_ai_course_assistant_surveys', ['id']);
+        $table->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('courseid_fk', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_index('surveyid_userid_courseid', XMLDB_INDEX_NOTUNIQUE, ['surveyid', 'userid', 'courseid']);
+        $table->add_index('courseid_time', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'timecreated']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Seed the default global survey.
+        if (!$DB->record_exists('local_ai_course_assistant_surveys', ['courseid' => 0])) {
+            $now = time();
+            $DB->insert_record('local_ai_course_assistant_surveys', (object) [
+                'courseid' => 0,
+                'title' => 'AI Tutor Experience Survey',
+                'questions' => json_encode([
+                    ['type' => 'multiple_choice', 'text' => 'How often did you use the AI tutor in this course?',
+                     'options' => ['Daily', 'Several times per week', 'Once per week', 'Less than once per week', 'Never']],
+                    ['type' => 'long_text', 'text' => 'How did interacting with the AI tutor impact your motivation or confidence in completing the course?'],
+                    ['type' => 'long_text', 'text' => 'How did the AI tutor help you understand difficult ideas or lessons better?'],
+                    ['type' => 'long_text', 'text' => 'Was the AI tutor a helpful part of your learning? Do you have any ideas to make it more useful or more trustworthy?'],
+                    ['type' => 'rating', 'text' => 'Overall, how happy were you with the AI tutor?', 'min' => 1, 'max' => 5],
+                ]),
+                'active' => 1,
+                'timecreated' => $now,
+                'timemodified' => $now,
+            ]);
+        }
+
+        upgrade_plugin_savepoint(true, 2026031200, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

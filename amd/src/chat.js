@@ -1712,7 +1712,70 @@ define([
     };
 
     /**
-     * Handle the settings panel gear button â€” show language, avatar, and voice settings.
+     * Show and handle the survey panel.
+     * Checks if a survey is available and if the user hasn't already responded.
+     */
+    const showSurvey = function() {
+        Repo.getSurvey(courseId).then(function(data) {
+            if (!data.has_survey || data.already_responded) {
+                if (data.already_responded) {
+                    UI.showNotification('You have already completed this survey. Thank you!', 'info');
+                }
+                return;
+            }
+            var questions = [];
+            try { questions = JSON.parse(data.questions); } catch (e) { return; }
+
+            UI.showSurveyPanel(
+                {id: data.survey_id, title: data.title, questions: questions},
+                function(surveyId, answers) {
+                    Repo.submitSurveyResponse(surveyId, courseId, JSON.stringify(answers))
+                        .catch(function() { /**/ });
+                }
+            );
+            return;
+        }).catch(function() { /**/ });
+    };
+
+    /**
+     * Check if a survey should be shown automatically.
+     * Respects admin settings for trigger conditions.
+     */
+    const checkSurveyTrigger = function() {
+        var root = UI.getElements().root;
+        if (!root) { return; }
+        var surveyEnabled = root.dataset.surveyenabled;
+        if (surveyEnabled === '0') { return; }
+        // Check localStorage to avoid re-prompting within a session.
+        var dismissKey = 'aica_survey_dismissed_' + courseId;
+        try {
+            if (localStorage.getItem(dismissKey)) { return; }
+        } catch (e) { /**/ }
+
+        Repo.getSurvey(courseId).then(function(data) {
+            if (!data.has_survey || data.already_responded) { return; }
+            // Check trigger: after N messages (default 10).
+            var triggerAfter = parseInt(root.dataset.surveytrigger || '10', 10);
+            var msgCount = 0;
+            try {
+                var msgs = document.querySelectorAll('.local-ai-course-assistant__message--user');
+                msgCount = msgs ? msgs.length : 0;
+            } catch (e) { /**/ }
+            if (msgCount >= triggerAfter) {
+                // Show a non-intrusive suggestion chip.
+                UI.showSuggestions(['\uD83D\uDCCB Take a quick survey'], function(text) {
+                    if (text.indexOf('survey') !== -1) {
+                        showSurvey();
+                        try { localStorage.setItem(dismissKey, '1'); } catch (e) { /**/ }
+                    }
+                });
+            }
+            return;
+        }).catch(function() { /**/ });
+    };
+
+    /**
+     * Handle the settings panel gear button — show language, avatar, and voice settings.
      */
     const handleSettingsPanel = function() {
         const root = UI.getElements().root;
@@ -3880,6 +3943,8 @@ define([
                         );
                     }, 1500);
                 }
+                // Check if survey should be triggered after enough messages.
+                checkSurveyTrigger();
                 sending = false;
                 streamController = null;
                 UI.setInputEnabled(true);

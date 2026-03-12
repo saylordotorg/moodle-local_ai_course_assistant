@@ -383,6 +383,75 @@
     <p class="text-muted">No feedback received yet.</p>
     {{/course.has_feedback}}
 
+    {{! Survey Results }}
+    {{#course.has_survey_data}}
+    <h3 class="mt-4">Survey Results</h3>
+    <div class="alert alert-info">
+        <strong>{{course.survey_data.total_responses}}</strong> survey response(s) collected.
+    </div>
+
+    {{#course.survey_data.questions}}
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>{{text}}</strong>
+            <span class="badge badge-secondary ml-2">{{response_count}} responses</span>
+        </div>
+        <div class="card-body">
+            {{#is_multiple_choice}}
+            <table class="table table-sm table-striped mb-0">
+                <thead><tr><th>Option</th><th class="text-right" style="width:80px">Count</th></tr></thead>
+                <tbody>
+                    {{#options}}
+                    <tr>
+                        <td>{{label}}</td>
+                        <td class="text-right"><span class="badge badge-primary">{{count}}</span></td>
+                    </tr>
+                    {{/options}}
+                </tbody>
+            </table>
+            {{/is_multiple_choice}}
+
+            {{#is_rating}}
+            <div class="d-flex align-items-center mb-2">
+                <span class="mr-2"><strong>Average:</strong></span>
+                <span class="display-4" style="font-size:2rem;color:#f59e0b">{{average}}</span>
+                <span class="ml-1 text-muted">/ 5</span>
+            </div>
+            <div style="max-width:300px">
+                {{#distribution}}
+                <div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:2px">
+                    <span style="width:14px;text-align:right">{{value}}</span>
+                    <span style="color:#f59e0b">&#9733;</span>
+                    <div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;overflow:hidden">
+                        <div style="background:#f59e0b;height:100%;width:{{count}}0px;min-width:{{#count}}2px{{/count}};max-width:100%"></div>
+                    </div>
+                    <span style="width:24px;text-align:right;color:#6c757d">{{count}}</span>
+                </div>
+                {{/distribution}}
+            </div>
+            {{/is_rating}}
+
+            {{#is_long_text}}
+            {{#has_answers}}
+            <ul class="list-group list-group-flush" style="max-height:300px;overflow-y:auto">
+                {{#answers}}
+                <li class="list-group-item" style="font-size:0.9em">{{text}}</li>
+                {{/answers}}
+            </ul>
+            {{/has_answers}}
+            {{^has_answers}}
+            <p class="text-muted mb-0">No text responses yet.</p>
+            {{/has_answers}}
+            {{/is_long_text}}
+        </div>
+    </div>
+    {{/course.survey_data.questions}}
+    {{/course.has_survey_data}}
+    {{^course.has_survey_data}}
+    <h3 class="mt-4">Survey Results</h3>
+    <p class="text-muted">No survey responses collected yet.</p>
+    {{/course.has_survey_data}}
+
     {{/course.has_data}}
     {{/has_course_selected}}
 

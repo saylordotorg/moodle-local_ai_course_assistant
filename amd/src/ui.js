@@ -4084,6 +4084,204 @@ define([
         // No-op: badge element no longer exists in the current template.
     };
 
+    /**
+     * Show a survey panel inside the drawer.
+     *
+     * @param {Object} survey  {id, title, questions (array)}
+     * @param {Function} onSubmit  Called with (surveyId, answersArray)
+     */
+    const showSurveyPanel = function(survey, onSubmit) {
+        if (!drawer) { return; }
+        // Remove any existing survey panel.
+        var existing = drawer.querySelector('.aica-survey-panel');
+        if (existing) { existing.remove(); }
+
+        var panel = document.createElement('div');
+        panel.className = 'aica-survey-panel';
+        panel.style.cssText = 'position:absolute;inset:0;z-index:210;background:#fff;display:flex;flex-direction:column;' +
+            'overflow:hidden;border-radius:inherit';
+
+        // Header.
+        var header = document.createElement('div');
+        header.style.cssText = 'padding:14px 16px;border-bottom:1px solid #e2e8f0;flex-shrink:0;display:flex;' +
+            'align-items:center;justify-content:space-between';
+        var title = document.createElement('h3');
+        title.style.cssText = 'margin:0;font-size:15px;font-weight:600;color:#1e293b';
+        title.textContent = survey.title || 'Survey';
+        header.appendChild(title);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.style.cssText = 'background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:0 4px';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', function() { panel.remove(); });
+        header.appendChild(closeBtn);
+        panel.appendChild(header);
+
+        // Scrollable content.
+        var content = document.createElement('div');
+        content.style.cssText = 'flex:1;overflow-y:auto;padding:16px';
+
+        var questions = survey.questions || [];
+        var inputs = [];
+
+        questions.forEach(function(q, idx) {
+            var qDiv = document.createElement('div');
+            qDiv.style.cssText = 'margin-bottom:20px';
+
+            var label = document.createElement('div');
+            label.style.cssText = 'font-size:13px;font-weight:600;color:#334155;margin-bottom:8px';
+            label.textContent = (idx + 1) + '. ' + q.text;
+            qDiv.appendChild(label);
+
+            if (q.type === 'multiple_choice') {
+                var optContainer = document.createElement('div');
+                optContainer.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+                (q.options || []).forEach(function(opt) {
+                    var optRow = document.createElement('label');
+                    optRow.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:13px;color:#475569;cursor:pointer;' +
+                        'padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;transition:border-color 0.15s';
+                    var radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'aica-survey-q' + idx;
+                    radio.value = opt;
+                    optRow.appendChild(radio);
+                    optRow.appendChild(document.createTextNode(opt));
+                    optRow.addEventListener('click', function() {
+                        optContainer.querySelectorAll('label').forEach(function(l) {
+                            l.style.borderColor = '#e2e8f0';
+                            l.style.background = '';
+                        });
+                        optRow.style.borderColor = 'var(--aica-brand-color, #173140)';
+                        optRow.style.background = '#f0f9ff';
+                    });
+                    optContainer.appendChild(optRow);
+                });
+                qDiv.appendChild(optContainer);
+                inputs.push({type: 'multiple_choice', index: idx, container: optContainer});
+
+            } else if (q.type === 'rating') {
+                var ratingRow = document.createElement('div');
+                ratingRow.style.cssText = 'display:flex;gap:8px;align-items:center';
+                var min = q.min || 1;
+                var max = q.max || 5;
+                for (var r = min; r <= max; r++) {
+                    (function(val) {
+                        var btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.dataset.val = val;
+                        btn.style.cssText = 'width:40px;height:40px;border-radius:50%;border:2px solid #d1d5db;background:#fff;' +
+                            'font-size:16px;font-weight:600;cursor:pointer;color:#475569;transition:all 0.15s';
+                        btn.textContent = val;
+                        btn.addEventListener('click', function() {
+                            ratingRow.querySelectorAll('button').forEach(function(b) {
+                                b.style.borderColor = '#d1d5db';
+                                b.style.background = '#fff';
+                                b.style.color = '#475569';
+                            });
+                            btn.style.borderColor = 'var(--aica-brand-color, #173140)';
+                            btn.style.background = 'var(--aica-brand-color, #173140)';
+                            btn.style.color = '#fff';
+                        });
+                        ratingRow.appendChild(btn);
+                    })(r);
+                }
+                qDiv.appendChild(ratingRow);
+                inputs.push({type: 'rating', index: idx, container: ratingRow});
+
+            } else {
+                // long_text
+                var textarea = document.createElement('textarea');
+                textarea.style.cssText = 'width:100%;min-height:80px;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;' +
+                    'font-size:13px;resize:vertical;font-family:inherit;color:#334155;background:#f8fafc';
+                textarea.placeholder = 'Type your answer here...';
+                qDiv.appendChild(textarea);
+                inputs.push({type: 'long_text', index: idx, textarea: textarea});
+            }
+
+            content.appendChild(qDiv);
+        });
+
+        panel.appendChild(content);
+
+        // Footer with submit.
+        var footer = document.createElement('div');
+        footer.style.cssText = 'padding:12px 16px;border-top:1px solid #e2e8f0;flex-shrink:0';
+        var submitBtn = document.createElement('button');
+        submitBtn.type = 'button';
+        submitBtn.style.cssText = 'width:100%;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;' +
+            'cursor:pointer;color:#fff;background:var(--aica-brand-color, #173140);transition:opacity 0.15s';
+        submitBtn.textContent = 'Submit Survey';
+        submitBtn.addEventListener('click', function() {
+            var answers = [];
+            var complete = true;
+            inputs.forEach(function(inp) {
+                if (inp.type === 'multiple_choice') {
+                    var checked = inp.container.querySelector('input:checked');
+                    if (checked) {
+                        answers.push({question_index: inp.index, answer: checked.value});
+                    } else {
+                        complete = false;
+                    }
+                } else if (inp.type === 'rating') {
+                    var selected = inp.container.querySelector('button[style*="color: rgb(255"]') ||
+                        inp.container.querySelector('button[style*="color:#fff"]');
+                    if (selected) {
+                        answers.push({question_index: inp.index, answer: selected.dataset.val});
+                    } else {
+                        complete = false;
+                    }
+                } else {
+                    var val = inp.textarea.value.trim();
+                    answers.push({question_index: inp.index, answer: val});
+                }
+            });
+
+            if (!complete) {
+                showNotification('Please answer all required questions.', 'warning');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.style.opacity = '0.6';
+
+            if (onSubmit) {
+                onSubmit(survey.id, answers);
+            }
+
+            // Show thank you message.
+            content.innerHTML = '';
+            var thanks = document.createElement('div');
+            thanks.style.cssText = 'text-align:center;padding:40px 20px';
+            var checkmark = document.createElement('div');
+            checkmark.style.cssText = 'font-size:48px;margin-bottom:12px';
+            checkmark.textContent = '\u2705';
+            thanks.appendChild(checkmark);
+            var thanksTitle = document.createElement('h3');
+            thanksTitle.style.cssText = 'font-size:18px;font-weight:600;color:#1e293b;margin:0 0 8px';
+            thanksTitle.textContent = 'Thank you!';
+            thanks.appendChild(thanksTitle);
+            var thanksText = document.createElement('p');
+            thanksText.style.cssText = 'font-size:13px;color:#64748b;margin:0';
+            thanksText.textContent = 'Your feedback helps us improve the AI tutor experience.';
+            thanks.appendChild(thanksText);
+            content.appendChild(thanks);
+
+            footer.innerHTML = '';
+            var doneBtn = document.createElement('button');
+            doneBtn.type = 'button';
+            doneBtn.style.cssText = submitBtn.style.cssText;
+            doneBtn.style.opacity = '1';
+            doneBtn.textContent = 'Done';
+            doneBtn.addEventListener('click', function() { panel.remove(); });
+            footer.appendChild(doneBtn);
+        });
+        footer.appendChild(submitBtn);
+        panel.appendChild(footer);
+
+        drawer.appendChild(panel);
+    };
+
     return {
         initUI: initUI,
         isOpen: isOpen,
@@ -4141,6 +4339,7 @@ define([
         showBookmarksPanel: showBookmarksPanel,
         updateBookmarkBadge: updateBookmarkBadge,
         showFeedbackPanel: showFeedbackPanel,
+        showSurveyPanel: showSurveyPanel,
         setComposerLlmOptions: setComposerLlmOptions,
         startWordHighlight: startWordHighlight,
         highlightWordAt: highlightWordAt,

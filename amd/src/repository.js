@@ -249,6 +249,34 @@ define(['core/ajax'], function(Ajax) {
         }])[0];
     };
 
+    /**
+     * Get the active survey for a course.
+     *
+     * @param {number} courseid
+     * @returns {Promise}
+     */
+    const getSurvey = function(courseid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_survey',
+            args: {courseid: courseid},
+        }])[0];
+    };
+
+    /**
+     * Submit survey responses.
+     *
+     * @param {number} surveyid
+     * @param {number} courseid
+     * @param {string} answersJson JSON array of {question_index, answer}
+     * @returns {Promise}
+     */
+    const submitSurveyResponse = function(surveyid, courseid, answersJson) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_submit_survey_response',
+            args: {surveyid: surveyid, courseid: courseid, answers: answersJson},
+        }])[0];
+    };
+
     return {
         sendMessage: sendMessage,
         getHistory: getHistory,
@@ -264,5 +292,7 @@ define(['core/ajax'], function(Ajax) {
         getRealtimeToken: getRealtimeToken,
         submitFeedback: submitFeedback,
         emailStudyNotes: emailStudyNotes,
+        getSurvey: getSurvey,
+        submitSurveyResponse: submitSurveyResponse,
     };
 });

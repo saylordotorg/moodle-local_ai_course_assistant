@@ -671,6 +671,41 @@ if ($hassiteconfig) {
             get_string('integrity:view_results', 'local_ai_course_assistant') . ' &rarr;</a>'
     ));
 
+    // ── Student Survey ──────────────────────────────────────────────────
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/survey_heading',
+        'Student Survey',
+        'Configure the in-chat student experience survey. Surveys can be customized per course via the analytics dashboard.'
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/survey_enabled',
+        'Enable surveys',
+        'When enabled, students will be offered a survey about their AI tutor experience.',
+        1
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/survey_trigger_messages',
+        'Trigger after N messages',
+        'Show the survey prompt after the student has sent this many messages in a course. Set to 0 to only show via manual trigger.',
+        '10',
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/survey_frequency',
+        'Survey frequency per user',
+        'How often a student can be prompted to take the survey in each course.',
+        'once',
+        [
+            'once' => 'Once per course (default)',
+            'monthly' => 'Once per month',
+            'quarterly' => 'Once per quarter',
+            'unlimited' => 'Every time (no limit)',
+        ]
+    ));
+
     $ADMIN->add('localplugins', $settings);
 
     // Register the Starter Settings admin page.

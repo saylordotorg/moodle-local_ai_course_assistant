@@ -215,6 +215,47 @@ foreach ($tokenrecords as $record) {
     ];
 }
 
+// Survey response data.
+$surveydata = [];
+try {
+    $surveywhere = '';
+    $surveyparams = [];
+    if ($courseid > 0) {
+        $surveywhere .= ' WHERE r.courseid = :courseid';
+        $surveyparams['courseid'] = $courseid;
+    }
+    if ($since > 0) {
+        $surveywhere .= ($surveywhere ? ' AND' : ' WHERE') . ' r.timecreated >= :since';
+        $surveyparams['since'] = $since;
+    }
+
+    $surveyrecords = $DB->get_records_sql(
+        "SELECT r.id, r.surveyid, r.userid, r.courseid, r.question_index, r.answer, r.timecreated,
+                s.title AS survey_title
+           FROM {local_ai_course_assistant_survey_resp} r
+           JOIN {local_ai_course_assistant_surveys} s ON s.id = r.surveyid" .
+        $surveywhere . " ORDER BY r.timecreated DESC",
+        $surveyparams
+    );
+
+    foreach ($surveyrecords as $record) {
+        // Decode the survey questions to get the question text.
+        $surveydata[] = [
+            'id' => (int) $record->id,
+            'surveyid' => (int) $record->surveyid,
+            'survey_title' => $record->survey_title,
+            'userid' => (int) $record->userid,
+            'courseid' => (int) $record->courseid,
+            'question_index' => (int) $record->question_index,
+            'answer' => $record->answer,
+            'timecreated' => (int) $record->timecreated,
+        ];
+    }
+} catch (\Throwable $e) {
+    // Table may not exist yet on older installs.
+    $surveydata = [];
+}
+
 // Build response.
 $response = [
     'generated_at' => date('c'),
@@ -222,6 +263,7 @@ $response = [
     'courses' => $courses,
     'feedback' => $feedback,
     'token_costs' => $tokencosts,
+    'survey_responses' => $surveydata,
 ];
 
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

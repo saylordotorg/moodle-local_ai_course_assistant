@@ -189,6 +189,57 @@ if ($courseid > 0) {
         $feedbackavg = $feedbacksummary && $feedbacksummary->avg_rating
             ? round((float) $feedbacksummary->avg_rating, 1) : 0;
 
+        // Survey results.
+        $surveyData = null;
+        try {
+            $surveyResults = \local_ai_course_assistant\survey_manager::get_survey_results($courseid, $since);
+            if ($surveyResults['total_responses'] > 0) {
+                $surveyQuestions = [];
+                foreach ($surveyResults['questions'] as $q) {
+                    $sq = [
+                        'text' => $q['text'],
+                        'type' => $q['type'],
+                        'response_count' => $q['response_count'],
+                        'is_multiple_choice' => $q['type'] === 'multiple_choice',
+                        'is_rating' => $q['type'] === 'rating',
+                        'is_long_text' => $q['type'] === 'long_text',
+                    ];
+                    if ($q['type'] === 'multiple_choice' && !empty($q['option_counts'])) {
+                        $opts = [];
+                        foreach ($q['option_counts'] as $label => $cnt) {
+                            $opts[] = ['label' => $label, 'count' => $cnt];
+                        }
+                        $sq['options'] = $opts;
+                    }
+                    if ($q['type'] === 'rating') {
+                        $sq['average'] = $q['average'] ?? 0;
+                        $dist = [];
+                        if (!empty($q['distribution'])) {
+                            foreach ($q['distribution'] as $val => $cnt) {
+                                $dist[] = ['value' => $val, 'count' => $cnt];
+                            }
+                        }
+                        $sq['distribution'] = $dist;
+                    }
+                    if ($q['type'] === 'long_text' && !empty($q['answers'])) {
+                        $textAnswers = [];
+                        foreach (array_slice($q['answers'], 0, 20) as $a) {
+                            $textAnswers[] = ['text' => htmlspecialchars($a)];
+                        }
+                        $sq['answers'] = $textAnswers;
+                        $sq['has_answers'] = true;
+                    }
+                    $surveyQuestions[] = $sq;
+                }
+                $surveyData = [
+                    'total_responses' => $surveyResults['total_responses'],
+                    'questions' => $surveyQuestions,
+                ];
+            }
+        } catch (\Throwable $e) {
+            // Survey tables may not exist yet on older installs.
+        }
+
         $courseData = [
             'courseid'   => $courseid,
             'coursename' => $courseName,
@@ -214,6 +265,8 @@ if ($courseid > 0) {
             'feedback_ratings' => $ratingrows,
             'feedback_entries' => $feedbackentries,
             'has_feedback'    => $feedbacktotal > 0,
+            'survey_data'     => $surveyData,
+            'has_survey_data' => ($surveyData !== null),
             'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
                 ['courseid' => $courseid, 'range' => $range]))->out(false),
         ];

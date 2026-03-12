@@ -127,4 +127,18 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_get_survey' => [
+        'classname'    => \local_ai_course_assistant\external\get_survey::class,
+        'description'  => 'Get the active survey for a course.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
+    'local_ai_course_assistant_submit_survey_response' => [
+        'classname'    => \local_ai_course_assistant\external\submit_survey_response::class,
+        'description'  => 'Submit survey answers.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
 ];

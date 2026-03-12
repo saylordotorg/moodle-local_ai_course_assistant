@@ -291,6 +291,8 @@ class hook_callbacks {
             'whatsappreminders'  => (bool)get_config('local_ai_course_assistant', 'reminders_whatsapp_enabled'),
             'useremail'          => $USER->email,
             'userphone'          => $USER->phone1 ?: '',
+            'surveyenabled'      => get_config('local_ai_course_assistant', 'survey_enabled') !== '0' ? '1' : '0',
+            'surveytrigger'      => (int)(get_config('local_ai_course_assistant', 'survey_trigger_messages') ?: 10),
             'completionpct'      => $completionpct,
             'contextdebugvisible' => $cansiteconfig,
             'starters'           => $starters,
