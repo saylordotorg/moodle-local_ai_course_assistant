@@ -186,6 +186,8 @@ class generate_insights extends external_api {
         ];
 
         try {
+            global $CFG;
+            require_once($CFG->dirroot . '/lib/filelib.php');
             $provider = base_provider::create_from_config($courseid);
             $response = $provider->chat_completion($systemprompt, $messages);
 
