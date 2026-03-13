@@ -4293,3 +4293,33 @@ a.aica-source-pill:hover svg {
     color: #ef4444;
     border-color: #fca5a5;
 }
+
+/* Stop streaming button */
+.aica-stop-stream-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px auto;
+    padding: 6px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 16px;
+    background: #fff;
+    color: #374151;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.aica-stop-stream-btn:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+[data-theme="dark"] .aica-stop-stream-btn,
+.local-ai-course-assistant__drawer--dark .aica-stop-stream-btn {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+[data-theme="dark"] .aica-stop-stream-btn:hover,
+.local-ai-course-assistant__drawer--dark .aica-stop-stream-btn:hover {
+    background: #4b5563;
+}

@@ -1552,16 +1552,47 @@ define([
         }
     };
 
+    /** @type {HTMLElement|null} Stop button shown during streaming */
+    let stopStreamBtn = null;
+
     /**
      * Start streaming a new assistant message.
      *
+     * @param {Function|null} onStop  Optional callback invoked when the user clicks "Stop"
      * @returns {HTMLElement} The streaming message element
      */
-    const startStreaming = function() {
+    const startStreaming = function(onStop) {
         showTyping(false);
         scrollFollowMode = false;
         streamingEl = addMessage('assistant', '');
+
+        // Show a stop button below the streaming message so the user can interrupt.
+        if (onStop && messagesContainer) {
+            stopStreamBtn = document.createElement('button');
+            stopStreamBtn.className = 'aica-stop-stream-btn';
+            stopStreamBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">'
+                + '<rect x="4" y="4" width="16" height="16" rx="2"/></svg> Stop';
+            stopStreamBtn.addEventListener('click', function() {
+                onStop();
+                removeStopButton();
+            });
+            messagesContainer.appendChild(stopStreamBtn);
+            programmaticScroll = true;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            programmaticScroll = false;
+        }
+
         return streamingEl;
+    };
+
+    /**
+     * Remove the stop-stream button if present.
+     */
+    const removeStopButton = function() {
+        if (stopStreamBtn && stopStreamBtn.parentNode) {
+            stopStreamBtn.parentNode.removeChild(stopStreamBtn);
+        }
+        stopStreamBtn = null;
     };
 
     /**
@@ -1646,7 +1677,8 @@ define([
      * @param {Function|null} onSpeak   Optional TTS callback; if provided, adds speak button
      */
     const finishStreaming = function(fullText, onSpeak) {
-        // Stop typewriter animation — final render below replaces it.
+        // Remove stop button and stop typewriter animation.
+        removeStopButton();
         clearTypewriterTimer();
         if (streamingEl) {
             const completedEl = streamingEl;

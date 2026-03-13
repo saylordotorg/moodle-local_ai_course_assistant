@@ -3577,9 +3577,15 @@ define([
     /**
      * Handle toggle button click.
      * Suppressed if the toggle was just used to drag-reposition the widget.
+     * If the drawer is already open, acts like the Home button (shows starters).
      */
     const handleToggle = function() {
         if (UI.wasToggleDragged()) {
+            return;
+        }
+        // If drawer is already open, act like the Home/Reset button.
+        if (UI.isOpen()) {
+            handleReset();
             return;
         }
         // Remove first-visit pulse on first click and mark course as visited.
@@ -3590,7 +3596,7 @@ define([
         }
         // Pre-apply welcome class before opening so the drawer doesn't flash
         // empty content on mobile before the welcome panel is injected.
-        if (isFirstVisit && !UI.isOpen()) {
+        if (isFirstVisit) {
             UI.preWelcome();
         }
         const opened = UI.toggleDrawer();
@@ -4001,8 +4007,21 @@ define([
             },
             onToken: function(token) {
                 if (!fullText) {
-                    // First token â€” create the streaming message element.
-                    UI.startStreaming();
+                    // First token — create the streaming message element with stop button.
+                    UI.startStreaming(function() {
+                        // User clicked Stop — abort the SSE stream.
+                        if (streamController) {
+                            streamController.abort();
+                            streamController = null;
+                        }
+                        if (fullText) {
+                            const parsed = parseAssistantDecorators(fullText);
+                            UI.finishStreaming(parsed.text, (getTtsUrl() || Speech.isTTSSupported()) ? handleSpeak : null);
+                            recordConversationMessage('assistant', parsed.text, Date.now());
+                        }
+                        sending = false;
+                        UI.setInputEnabled(true);
+                    });
                 }
                 fullText += token;
                 UI.updateStreamContent(fullText);

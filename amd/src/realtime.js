@@ -298,8 +298,8 @@ define([], function() {
                 audioCtx.resume().catch(function() {/**/});
             }
 
-            var SPEECH_THRESHOLD = 0.012;  // RMS energy threshold (0–1 normalised)
-            var SILENCE_FRAMES   = 20;     // ~1.7 s of silence before committing turn
+            var SPEECH_THRESHOLD = 0.02;   // RMS energy threshold (0–1 normalised); raised from 0.012 to reduce false triggers from ambient noise
+            var SILENCE_FRAMES   = 25;     // ~2.1 s of silence before committing turn (was 20 / ~1.7 s)
             var PREFILL_FRAMES   = 3;      // frames of pre-speech to prepend (avoids clipping)
 
             var silenceCount  = 0;
