@@ -1087,6 +1087,10 @@ define([
             if (normalized === 'history' && options.refreshHistory) {
                 refreshConversationHistory(false);
             }
+            // Re-clicking Chat tab shows conversation starters.
+            if (normalized === 'chat') {
+                UI.showStarters();
+            }
             return;
         }
 
@@ -2683,6 +2687,19 @@ define([
         return root ? (root.dataset.ttsurl || '') : '';
     };
 
+    /** @type {HTMLElement|null} Stop button shown during TTS playback */
+    var ttsStopBtn = null;
+
+    /**
+     * Remove the TTS stop button if present.
+     */
+    const removeTtsStopButton = function() {
+        if (ttsStopBtn && ttsStopBtn.parentNode) {
+            ttsStopBtn.parentNode.removeChild(ttsStopBtn);
+        }
+        ttsStopBtn = null;
+    };
+
     /**
      * Stop all TTS (both OpenAI audio and browser speech synthesis).
      */
@@ -2693,6 +2710,7 @@ define([
         }
         Speech.stopSpeaking();
         UI.stopWordHighlight();
+        removeTtsStopButton();
     };
 
     /**
@@ -2907,27 +2925,41 @@ define([
 
         UI.setSpeakingState(msgEl, true);
 
+        // Show a stop button below the speaking message.
+        var messagesContainer = UI.getElements().messages;
+        if (messagesContainer) {
+            ttsStopBtn = document.createElement('button');
+            ttsStopBtn.className = 'aica-stop-stream-btn aica-tts-stop-btn';
+            ttsStopBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">'
+                + '<rect x="4" y="4" width="16" height="16" rx="2"/></svg> Stop reading';
+            ttsStopBtn.addEventListener('click', function() {
+                stopAllTts();
+                UI.setSpeakingState(msgEl, false);
+            });
+            messagesContainer.appendChild(ttsStopBtn);
+        }
+
         // Unlock AudioContext synchronously within the user gesture (required for iOS Chrome).
         // This must happen before any async operation; decoding/playing in the
         // fetch callback is then safe because the context is already running.
         getOrCreateAudioCtx();
 
+        const onDone = function() {
+            UI.setSpeakingState(msgEl, false);
+            UI.stopWordHighlight();
+            removeTtsStopButton();
+        };
+
         const ttsUrl = getTtsUrl();
         if (ttsUrl) {
             const cleanText = Speech.cleanTextForSpeech(text);
             const wordSpans = UI.startWordHighlight(msgEl, cleanText);
-            speakWithOpenAI(text, ttsUrl, function() {
-                UI.setSpeakingState(msgEl, false);
-                UI.stopWordHighlight();
-            }, wordSpans, cleanText);
+            speakWithOpenAI(text, ttsUrl, onDone, wordSpans, cleanText);
         } else {
             // Browser TTS: enable word-by-word highlighting via onboundary events.
             const cleanText = Speech.cleanTextForSpeech(text);
             const wordSpans = UI.startWordHighlight(msgEl, cleanText);
-            Speech.speak(text, function() {
-                UI.setSpeakingState(msgEl, false);
-                UI.stopWordHighlight();
-            }, wordSpans ? function(charIndex) {
+            Speech.speak(text, onDone, wordSpans ? function(charIndex) {
                 UI.highlightWordAt(wordSpans, charIndex);
             } : null);
         }
@@ -3697,6 +3729,7 @@ define([
         }
         UI.showIntroModal(function() {
             markIntroDismissed(root);
+            UI.hideStarters();
         });
     };
 
