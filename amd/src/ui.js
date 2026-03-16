@@ -1594,6 +1594,12 @@ define([
         scrollFollowMode = false;
         streamingEl = addMessage('assistant', '');
 
+        // If a stop button was already shown (e.g. during typing indicator),
+        // move it below the new streaming message so it stays at the bottom.
+        if (stopStreamBtn && stopStreamBtn.parentNode && messagesContainer) {
+            messagesContainer.appendChild(stopStreamBtn);
+        }
+
         // Show a stop button below the streaming message so the user can interrupt.
         if (onStop && messagesContainer) {
             stopStreamBtn = document.createElement('button');
