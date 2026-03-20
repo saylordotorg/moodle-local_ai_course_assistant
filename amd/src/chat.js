@@ -1369,11 +1369,6 @@ define([
             els.clearBtn.addEventListener('click', handleClear);
         }
 
-        // Expand/collapse button.
-        if (els.expandBtn) {
-            els.expandBtn.addEventListener('click', handleExpand);
-        }
-
         // Mic button (STT).
         if (els.micBtn) {
             els.micBtn.addEventListener('click', handleMic);
@@ -3187,37 +3182,6 @@ define([
             el.appendChild(createSourcePill(sourceType, histMeta, sourceCmid));
         }
         return el;
-    };
-
-    /**
-     * Handle expand/collapse button click.
-     * On mobile (â‰¤600px): toggles half-screen minimized state.
-     * On desktop: toggles the wider expanded state.
-     */
-    const handleExpand = function() {
-        const isMobile = window.innerWidth <= 600;
-        const els = UI.getElements();
-        if (isMobile) {
-            const minimized = UI.toggleMinimize();
-            if (els.expandBtn) {
-                Str.get_string(minimized ? 'chat:expand' : 'chat:collapse', 'local_ai_course_assistant')
-                .then(function(label) {
-                    els.expandBtn.title = label;
-                    els.expandBtn.setAttribute('aria-label', label);
-                    return;
-                }).catch(function() { /**/ });
-            }
-        } else {
-            const expanded = UI.toggleExpand();
-            if (els.expandBtn) {
-                Str.get_string(expanded ? 'chat:collapse' : 'chat:expand', 'local_ai_course_assistant')
-                .then(function(label) {
-                    els.expandBtn.title = label;
-                    els.expandBtn.setAttribute('aria-label', label);
-                    return;
-                }).catch(function() { /**/ });
-            }
-        }
     };
 
     /**

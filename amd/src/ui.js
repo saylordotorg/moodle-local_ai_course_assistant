@@ -43,8 +43,6 @@ define([
     /** @type {HTMLElement} */
     let typingIndicator = null;
     /** @type {HTMLElement} */
-    let expandBtn = null;
-    /** @type {HTMLElement} */
     let micBtn = null;
     /** @type {HTMLElement} */
     let langBtn = null;
@@ -73,8 +71,6 @@ define([
     /** Current History panel subview. */
     let historyPanelView = 'recent';
 
-    /** localStorage key for persisting expanded state */
-    const EXPAND_KEY = 'aica_expand_state';
     /** localStorage key for persisting drag position */
     const DRAG_KEY = 'aica_drag_pos';
     /** localStorage key for persisting custom resize dimensions */
@@ -518,7 +514,6 @@ define([
         input = root.querySelector('.local-ai-course-assistant__input');
         sendBtn = root.querySelector('.local-ai-course-assistant__btn-send');
         typingIndicator = root.querySelector('.local-ai-course-assistant__typing');
-        expandBtn = root.querySelector('.local-ai-course-assistant__btn-expand');
         micBtn = root.querySelector('.local-ai-course-assistant__btn-mic');
         langBtn = root.querySelector('.local-ai-course-assistant__btn-lang');
         langBanner = root.querySelector('.local-ai-course-assistant__lang-banner');
@@ -864,9 +859,6 @@ define([
                 e.stopPropagation();
                 // Remove expanded class so inline styles take over.
                 drawer.classList.remove('local-ai-course-assistant__drawer--expanded');
-                try {
-                    localStorage.setItem(EXPAND_KEY, '');
-                } catch (ex) { /**/ }
             });
         });
 
@@ -1038,24 +1030,19 @@ define([
     };
 
     /**
-     * Restore the expanded state and custom size from localStorage on init.
+     * Restore custom drawer size from localStorage on init.
      */
     const restoreExpandState = function() {
         try {
-            if (localStorage.getItem(EXPAND_KEY) === 'expanded' && drawer) {
-                drawer.classList.add('local-ai-course-assistant__drawer--expanded');
-                // Don't restore custom size when expanded — CSS class defines the size.
-            } else {
-                // Restore custom size if user previously resized the drawer.
-                const saved = localStorage.getItem(SIZE_KEY);
-                if (saved && drawer) {
-                    const size = JSON.parse(saved);
-                    if (size.width) {
-                        drawer.style.width = size.width;
-                    }
-                    if (size.height) {
-                        drawer.style.height = size.height;
-                    }
+            // Restore custom size if user previously resized the drawer.
+            const saved = localStorage.getItem(SIZE_KEY);
+            if (saved && drawer) {
+                const size = JSON.parse(saved);
+                if (size.width) {
+                    drawer.style.width = size.width;
+                }
+                if (size.height) {
+                    drawer.style.height = size.height;
                 }
             }
         } catch (e) {
@@ -1086,48 +1073,6 @@ define([
             return false;
         }
         return drawer.classList.toggle('local-ai-course-assistant__drawer--minimized');
-    };
-
-    /**
-     * Toggle between normal and expanded states.
-     * Expanding clears inline dimensions so the CSS class defines size.
-     * Collapsing restores the user's custom size if previously set.
-     *
-     * @returns {boolean} True if now expanded
-     */
-    const toggleExpand = function() {
-        if (!drawer) {
-            return false;
-        }
-        const expanded = drawer.classList.toggle('local-ai-course-assistant__drawer--expanded');
-        try {
-            if (expanded) {
-                // Remove inline size so the --expanded CSS class takes effect.
-                drawer.style.width = '';
-                drawer.style.height = '';
-                localStorage.setItem(EXPAND_KEY, 'expanded');
-            } else {
-                // Restore custom size if user previously resized.
-                const saved = localStorage.getItem(SIZE_KEY);
-                if (saved) {
-                    const size = JSON.parse(saved);
-                    if (size.width) {
-                        drawer.style.width = size.width;
-                    }
-                    if (size.height) {
-                        drawer.style.height = size.height;
-                    }
-                }
-                localStorage.setItem(EXPAND_KEY, '');
-            }
-        } catch (e) {
-            // localStorage may be unavailable.
-        }
-        // Re-sync page push margin since drawer width changed.
-        if (isOpen()) {
-            requestAnimationFrame(function() { updatePagePush(true); });
-        }
-        return expanded;
     };
 
     /**
@@ -2110,7 +2055,6 @@ define([
             closeBtn: root.querySelector('.local-ai-course-assistant__btn-close'),
             clearBtn: root.querySelector('.local-ai-course-assistant__btn-clear'),
             copyBtn: root.querySelector('.local-ai-course-assistant__btn-copy'),
-            expandBtn: expandBtn,
             micBtn: micBtn,
             langBtn: langBtn,
             llmProviderSelect: llmProviderSelect,
@@ -4980,7 +4924,6 @@ define([
         showNotification: showNotification,
         showIntroModal: showIntroModal,
         preWelcome: preWelcome,
-        toggleExpand: toggleExpand,
         toggleMinimize: toggleMinimize,
         setMicRecording: setMicRecording,
         setMicVisible: setMicVisible,

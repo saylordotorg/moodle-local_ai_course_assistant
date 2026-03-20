@@ -1706,34 +1706,15 @@ a.aica-history-panel__source:hover {
     }
 }
 
-/* =========================================================
-   Expanded chat window state (vertical fill)
-   ========================================================= */
-
-/* Drawer transition for smooth expand/collapse */
+/* Drawer transition */
 .local-ai-course-assistant__drawer {
     transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.3s ease;
-}
-
-/* Expanded: grows to fill most of the viewport height.
-   clamp(min, preferred, max) + dvh handles mobile chrome correctly. */
-.local-ai-course-assistant__drawer--expanded {
-    height: clamp(420px, 70dvh, 760px);
-    max-height: calc(100dvh - 90px);
 }
 
 /* Quiz mode: auto-expand so quiz content never clips at the bottom */
 .local-ai-course-assistant__drawer--quiz {
     max-height: calc(100vh - 100px);
 }
-
-/* Expand icon toggle: collapse icon hidden by default, shown when expanded */
-.aica-icon-collapse { display: none; }
-
-.local-ai-course-assistant__drawer--expanded .aica-icon-expand   { display: none; }
-.local-ai-course-assistant__drawer--expanded .aica-icon-collapse { display: inline-flex; }
-
-/* On mobile, expand button acts as minimize/restore — keep it visible */
 
 /* =========================================================
    Side-drawer display mode
@@ -1989,14 +1970,6 @@ a.aica-history-panel__source:hover {
         visibility 0s linear 0s,
         width 0.2s ease,
         box-shadow 0.2s ease;
-}
-
-/* Expanded state in drawer mode — wider panel */
-.local-ai-course-assistant--drawer-mode .local-ai-course-assistant__drawer--expanded {
-    width: clamp(400px, 35vw, 600px);
-    height: 100vh;
-    height: 100dvh;
-    max-height: none;
 }
 
 /* Push Moodle page content aside when drawer is open (desktop only).
@@ -3125,11 +3098,6 @@ a.aica-history-panel__source:hover {
     border-radius: 3px 0 3px 0;
 }
 
-/* Hide resize handles when expand is active (CSS-defined size) */
-.local-ai-course-assistant__drawer--expanded .aica-resize-handle {
-    display: none;
-}
-
 /* Hide left/corner handles on bottom-left positioned widgets */
 .local-ai-course-assistant--bottom-left .aica-resize-handle--w,
 .local-ai-course-assistant--bottom-left .aica-resize-handle--nw,
@@ -4182,14 +4150,6 @@ a.aica-history-panel__source:hover {
         transform: translateY(0) !important;
         pointer-events: auto !important;
     }
-
-    /* Expand/minimize icon state on mobile:
-       Full-screen (open, not minimized) → show collapse icon (tap to minimize)
-       Minimized → show expand icon (tap to restore, which is the default) */
-    .local-ai-course-assistant__drawer--open:not(.local-ai-course-assistant__drawer--minimized)
-        .aica-icon-expand { display: none; }
-    .local-ai-course-assistant__drawer--open:not(.local-ai-course-assistant__drawer--minimized)
-        .aica-icon-collapse { display: inline-flex; }
 
     /* Resize handles unnecessary on mobile */
     .aica-resize-handle {

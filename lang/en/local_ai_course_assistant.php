@@ -177,8 +177,6 @@ $string['chat:error_auth'] = 'Authentication error. Please contact your administ
 $string['chat:error_ratelimit'] = 'Too many requests. Please wait a moment and try again.';
 $string['chat:error_unavailable'] = 'The AI service is temporarily unavailable. Please try again later.';
 $string['chat:error_notconfigured'] = 'SOLA has not been configured yet. Please contact your administrator.';
-$string['chat:expand'] = 'Expand chat';
-$string['chat:collapse'] = 'Collapse chat';
 $string['chat:mic'] = 'Speak your question';
 $string['chat:mic_error'] = 'Microphone error. Please check your browser permissions.';
 $string['chat:mic_unsupported'] = 'Speech input is not supported in this browser.';
@@ -560,8 +558,6 @@ $string['chat:topic_picker_title_explain']= 'What would you like me to explain?'
 $string['chat:topic_picker_title_study']  = 'What area would you like to focus on?';
 $string['chat:topic_start']               = 'Continue';
 
-// Expand states.
-$string['chat:expand']                  = 'Expand chat';
 $string['chat:fullscreen']              = 'Full screen';
 $string['chat:exitfullscreen']          = 'Exit full screen';
 
