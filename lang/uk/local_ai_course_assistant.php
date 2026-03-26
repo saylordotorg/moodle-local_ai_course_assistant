@@ -302,3 +302,11 @@ $string['mobile_disabled'] = 'SOLA недоступний для цього ку
 $string['mobile_chip_concepts'] = 'Ключові поняття';
 $string['mobile_chip_studyplan'] = 'Навчальний план';
 $string['mobile_chip_quiz'] = 'Перевір мене';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Доставка фронтенду';
+$string['settings:cdn_heading_desc'] = 'Обслуговуйте фронтенд-ресурси SOLA (JS/CSS) із зовнішнього CDN замість файлової системи Moodle. Це дозволяє оновлювати фронтенд без оновлення плагіна. Залиште URL CDN порожнім для використання локальних файлів плагіна.';
+$string['settings:cdn_url'] = 'Базова URL CDN';
+$string['settings:cdn_url_desc'] = 'Базова URL-адреса, де розміщено sola.min.js та sola.min.css. Приклад: https://your-org.github.io/sola-cdn. Залиште порожнім для використання локальних файлів плагіна.';
+$string['settings:cdn_version'] = 'Версія ресурсів CDN';
+$string['settings:cdn_version_desc'] = 'Рядок версії, що додається до URL CDN для скидання кешу (cache busting). Оновлюйте після кожного розгортання CDN (напр. 3.2.4 або commit hash).';

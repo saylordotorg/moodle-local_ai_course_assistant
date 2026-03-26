@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Muistiinpanot';
 $string['chat:history_title'] = 'Muistiinpanot ja keskusteluhistoria';
 $string['task:send_inactivity_reminders'] = 'Lähetä viikoittaiset muistutussähköpostit toimettomuudesta';
 $string['messageprovider:study_notes'] = 'Opiskeluistunnon muistiinpanot';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Käyttöliittymän jakelu';
+$string['settings:cdn_heading_desc'] = 'Tarjoa SOLA:n käyttöliittymäresurssit (JS/CSS) ulkoisesta CDN:stä Moodlen tiedostojärjestelmän sijaan. Tämä mahdollistaa käyttöliittymäpäivitykset ilman lisäosan päivittämistä. Jätä CDN-URL tyhjäksi käyttääksesi paikallisia lisäosatiedostoja.';
+$string['settings:cdn_url'] = 'CDN:n perus-URL';
+$string['settings:cdn_url_desc'] = 'Perus-URL, jossa sola.min.js ja sola.min.css isännöidään. Esimerkki: https://your-org.github.io/sola-cdn. Jätä tyhjäksi käyttääksesi paikallisia lisäosatiedostoja.';
+$string['settings:cdn_version'] = 'CDN-resurssien versio';
+$string['settings:cdn_version_desc'] = 'CDN-URLeihin liitettävä versiomerkkijono välimuistin tyhjennystä varten (cache busting). Päivitä jokaisen CDN-julkaisun jälkeen (esim. 3.2.4 tai commit hash).';

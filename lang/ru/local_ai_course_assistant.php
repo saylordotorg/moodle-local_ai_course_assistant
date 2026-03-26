@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = 'Отправлять еженеде
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания о неактивности';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Доставка фронтенда';
+$string['settings:cdn_heading_desc'] = 'Раздавайте фронтенд-ресурсы SOLA (JS/CSS) с внешнего CDN вместо файловой системы Moodle. Это позволяет обновлять фронтенд без обновления плагина. Оставьте URL CDN пустым для использования локальных файлов плагина.';
+$string['settings:cdn_url'] = 'Базовый URL CDN';
+$string['settings:cdn_url_desc'] = 'Базовый URL, на котором размещены sola.min.js и sola.min.css. Пример: https://your-org.github.io/sola-cdn. Оставьте пустым для использования локальных файлов плагина.';
+$string['settings:cdn_version'] = 'Версия ресурсов CDN';
+$string['settings:cdn_version_desc'] = 'Строка версии, добавляемая к URL CDN для сброса кеша (cache busting). Обновляйте после каждого развёртывания CDN (напр. 3.2.4 или commit hash).';

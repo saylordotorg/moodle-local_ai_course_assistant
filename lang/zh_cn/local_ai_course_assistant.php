@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = '发送每周不活跃提醒邮件';
 $string['messageprovider:study_notes'] = '学习会话笔记';
 $string['task:send_inactivity_reminders'] = '发送每周不活跃提醒邮件';
 $string['messageprovider:study_notes'] = '学习课程笔记';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / 前端分发';
+$string['settings:cdn_heading_desc'] = '从外部 CDN 提供 SOLA 前端资源（JS/CSS），而不是从 Moodle 文件系统提供。这允许在不升级插件的情况下更新前端。将 CDN URL 留空以使用本地插件文件。';
+$string['settings:cdn_url'] = 'CDN 基础 URL';
+$string['settings:cdn_url_desc'] = '托管 sola.min.js 和 sola.min.css 的基础 URL。示例：https://your-org.github.io/sola-cdn。留空以使用本地插件文件。';
+$string['settings:cdn_version'] = 'CDN 资源版本';
+$string['settings:cdn_version_desc'] = '附加到 CDN URL 的版本字符串，用于 cache busting。每次 CDN 部署后更新（例如 3.2.4 或 commit hash）。';

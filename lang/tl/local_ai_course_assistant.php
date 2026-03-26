@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa 
 $string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa kawalan ng aktibidad';
 $string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Frontend Delivery';
+$string['settings:cdn_heading_desc'] = 'Maghatid ng SOLA frontend assets (JS/CSS) mula sa isang panlabas na CDN sa halip na mula sa Moodle filesystem. Pinapayagan nito ang mga frontend update nang hindi ina-upgrade ang plugin. Iwanan ang CDN URL na walang laman upang gamitin ang mga lokal na plugin file.';
+$string['settings:cdn_url'] = 'CDN Base URL';
+$string['settings:cdn_url_desc'] = 'Base URL kung saan naka-host ang sola.min.js at sola.min.css. Halimbawa: https://your-org.github.io/sola-cdn. Iwanang walang laman upang gamitin ang mga lokal na plugin file.';
+$string['settings:cdn_version'] = 'CDN Asset Version';
+$string['settings:cdn_version_desc'] = 'Version string na idinadagdag sa CDN URLs para sa cache busting. I-update pagkatapos ng bawat CDN deploy (hal. 3.2.4 o commit hash).';

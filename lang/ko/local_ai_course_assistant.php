@@ -338,3 +338,11 @@ $string['chat:mode_history'] = '메모';
 $string['chat:history_title'] = '메모 및 대화 기록';
 $string['task:send_inactivity_reminders'] = '주간 비활동 알림 이메일 보내기';
 $string['messageprovider:study_notes'] = '학습 세션 노트';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / 프론트엔드 전송';
+$string['settings:cdn_heading_desc'] = 'Moodle 파일 시스템 대신 외부 CDN에서 SOLA 프론트엔드 자산(JS/CSS)을 제공합니다. 이를 통해 플러그인 업그레이드 없이 프론트엔드 업데이트가 가능합니다. 로컬 플러그인 파일을 사용하려면 CDN URL을 비워 두세요.';
+$string['settings:cdn_url'] = 'CDN 기본 URL';
+$string['settings:cdn_url_desc'] = 'sola.min.js와 sola.min.css가 호스팅되는 기본 URL. 예: https://your-org.github.io/sola-cdn. 로컬 플러그인 파일을 사용하려면 비워 두세요.';
+$string['settings:cdn_version'] = 'CDN 자산 버전';
+$string['settings:cdn_version_desc'] = 'cache busting을 위해 CDN URL에 추가되는 버전 문자열. 각 CDN 배포 후 업데이트하세요 (예: 3.2.4 또는 commit hash).';

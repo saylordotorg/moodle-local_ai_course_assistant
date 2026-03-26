@@ -17,6 +17,10 @@
 *.bak
 *.orig
 
+# CDN build output
+cdn/dist/
+cdn/node_modules/
+
 # Local dev overrides
 *.local.php
 config.local.php

@@ -652,6 +652,30 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // --- CDN / Frontend Delivery ---
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/cdn_heading',
+        get_string('settings:cdn_heading', 'local_ai_course_assistant'),
+        get_string('settings:cdn_heading_desc', 'local_ai_course_assistant')
+    ));
+
+    // CDN base URL (empty = use local AMD files).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/cdn_url',
+        get_string('settings:cdn_url', 'local_ai_course_assistant'),
+        get_string('settings:cdn_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+
+    // CDN asset version (cache busting).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/cdn_version',
+        get_string('settings:cdn_version', 'local_ai_course_assistant'),
+        get_string('settings:cdn_version_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // --- Analytics Export (Redash) ---
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/redash_heading',

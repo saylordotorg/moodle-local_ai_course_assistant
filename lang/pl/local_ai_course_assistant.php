@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Notatki';
 $string['chat:history_title'] = 'Notatki i historia rozmowy';
 $string['task:send_inactivity_reminders'] = 'Wyślij tygodniowe e-maile z przypomnieniem o nieaktywności';
 $string['messageprovider:study_notes'] = 'Notatki z sesji nauki';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Dostarczanie frontendu';
+$string['settings:cdn_heading_desc'] = 'Serwuj zasoby frontendowe SOLA (JS/CSS) z zewnętrznego CDN zamiast z systemu plików Moodle. Umożliwia to aktualizacje frontendu bez aktualizacji wtyczki. Pozostaw URL CDN pusty, aby używać lokalnych plików wtyczki.';
+$string['settings:cdn_url'] = 'Bazowy URL CDN';
+$string['settings:cdn_url_desc'] = 'Bazowy URL, pod którym hostowane są sola.min.js i sola.min.css. Przykład: https://your-org.github.io/sola-cdn. Pozostaw pusty, aby używać lokalnych plików wtyczki.';
+$string['settings:cdn_version'] = 'Wersja zasobów CDN';
+$string['settings:cdn_version_desc'] = 'Ciąg wersji dołączany do URL-i CDN w celu cache busting. Zaktualizuj po każdym wdrożeniu CDN (np. 3.2.4 lub commit hash).';

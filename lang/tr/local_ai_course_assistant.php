@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Notlar';
 $string['chat:history_title'] = 'Notlar ve Konuşma Geçmişi';
 $string['task:send_inactivity_reminders'] = 'Haftalık hareketsizlik hatırlatma e-postaları gönder';
 $string['messageprovider:study_notes'] = 'Çalışma oturumu notları';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Ön Uç Dağıtımı';
+$string['settings:cdn_heading_desc'] = 'SOLA ön uç varlıklarını (JS/CSS) Moodle dosya sistemi yerine harici bir CDN\'den sunun. Bu, eklenti yükseltmesi olmadan ön uç güncellemelerini sağlar. Yerel eklenti dosyalarını kullanmak için CDN URL\'sini boş bırakın.';
+$string['settings:cdn_url'] = 'CDN Temel URL';
+$string['settings:cdn_url_desc'] = 'sola.min.js ve sola.min.css\'nin barındırıldığı temel URL. Örnek: https://your-org.github.io/sola-cdn. Yerel eklenti dosyalarını kullanmak için boş bırakın.';
+$string['settings:cdn_version'] = 'CDN Varlık Sürümü';
+$string['settings:cdn_version_desc'] = 'Cache busting için CDN URL\'lerine eklenen sürüm dizesi. Her CDN dağıtımından sonra güncelleyin (ör. 3.2.4 veya commit hash).';

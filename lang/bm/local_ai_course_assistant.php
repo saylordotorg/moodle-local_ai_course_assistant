@@ -368,3 +368,11 @@ $string['task:send_inactivity_reminders'] = 'Dɔgɔkun kelen kelen na hakili-jig
 $string['messageprovider:study_notes'] = 'Kalanko waati sɛbɛnniw';
 $string['task:send_inactivity_reminders'] = 'Ci dɔgɔkun dɔgɔkun ladilikan bataki walasa ka baarakɛbaliya kɔfɔ';
 $string['messageprovider:study_notes'] = 'Kalanko waati kunnafoni sɛbɛnw';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Ɲɛfɛla yiriwali';
+$string['settings:cdn_heading_desc'] = 'SOLA ɲɛfɛla nafaw (JS/CSS) bɔ CDN kɛnɛ kan Moodle dosiyew nɔ na. Nin bɛ se ka ɲɛfɛla ladoni kɛ plugin yɛlɛma kɔfɛ. CDN URL to lankolon walasa ka plugin dosiyew kɛ.';
+$string['settings:cdn_url'] = 'CDN URL daminɛ';
+$string['settings:cdn_url_desc'] = 'URL daminɛ min na sola.min.js ni sola.min.css bɛ jɛnsɛn. Misali: https://your-org.github.io/sola-cdn. A to lankolon walasa ka plugin dosiyew kɛ.';
+$string['settings:cdn_version'] = 'CDN nafolo version';
+$string['settings:cdn_version_desc'] = 'Version sɛbɛn min bɛ fara CDN URL kan cache busting kama. A ladoni kɛ CDN deploy kelen-kelen kɔfɛ (misali 3.2.4 walima commit hash).';

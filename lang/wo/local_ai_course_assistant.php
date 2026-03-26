@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = 'Yónne bataaxal ci ayu-bis yu ngën
 $string['messageprovider:study_notes'] = 'Téere yi ci diggante jàng bi';
 $string['task:send_inactivity_reminders'] = 'Yónnal bataaxal xalaat ci at ci biir ayu-bés';
 $string['messageprovider:study_notes'] = 'Bindu ci jàng yi';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Yónnee ci kanam';
+$string['settings:cdn_heading_desc'] = 'Joxe njëlbéen kanam yi SOLA (JS/CSS) ci CDN bu biti ba, du ci Moodle files yi. Lii mën na may yeesal kanam bi te yeesal-atul plugin bi. Bayyi CDN URL bi neen ngir jëfandikoo plugin files yi ci biir.';
+$string['settings:cdn_url'] = 'CDN URL bu njëkk';
+$string['settings:cdn_url_desc'] = 'URL bu njëkk fu sola.min.js ak sola.min.css di dëkkee. Misaal: https://your-org.github.io/sola-cdn. Bayyi ko neen ngir jëfandikoo plugin files yi ci biir.';
+$string['settings:cdn_version'] = 'Version njëlbéen CDN';
+$string['settings:cdn_version_desc'] = 'Baat bu version bii ñu dugg ci CDN URLs yi ngir cache busting. Yeesal ko gannaaw CDN deploy bu nekk (misaal 3.2.4 walla commit hash).';

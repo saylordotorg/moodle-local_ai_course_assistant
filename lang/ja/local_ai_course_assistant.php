@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'メモ';
 $string['chat:history_title'] = 'メモと会話履歴';
 $string['task:send_inactivity_reminders'] = '週次の非アクティビティリマインダーメールを送信する';
 $string['messageprovider:study_notes'] = '学習セッションノート';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / フロントエンド配信';
+$string['settings:cdn_heading_desc'] = 'Moodleファイルシステムの代わりに外部CDNからSOLAフロントエンドアセット（JS/CSS）を配信します。これにより、プラグインのアップグレードなしでフロントエンドの更新が可能になります。ローカルプラグインファイルを使用するにはCDN URLを空のままにしてください。';
+$string['settings:cdn_url'] = 'CDNベースURL';
+$string['settings:cdn_url_desc'] = 'sola.min.jsとsola.min.cssがホストされているベースURL。例：https://your-org.github.io/sola-cdn。ローカルプラグインファイルを使用するには空のままにしてください。';
+$string['settings:cdn_version'] = 'CDNアセットバージョン';
+$string['settings:cdn_version_desc'] = 'cache bustingのためにCDN URLに付加されるバージョン文字列。CDNデプロイごとに更新してください（例：3.2.4またはcommit hash）。';

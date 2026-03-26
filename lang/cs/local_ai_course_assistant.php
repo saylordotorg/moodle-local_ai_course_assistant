@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Poznámky';
 $string['chat:history_title'] = 'Poznámky a historie konverzace';
 $string['task:send_inactivity_reminders'] = 'Odeslat týdenní e-maily s připomínkou při nečinnosti';
 $string['messageprovider:study_notes'] = 'Poznámky ze studijní relace';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Doručování frontendu';
+$string['settings:cdn_heading_desc'] = 'Servírujte frontendové soubory SOLA (JS/CSS) z externího CDN místo ze souborového systému Moodle. To umožňuje aktualizace frontendu bez upgradu pluginu. Ponechte CDN URL prázdné pro použití lokálních souborů pluginu.';
+$string['settings:cdn_url'] = 'Základní CDN URL';
+$string['settings:cdn_url_desc'] = 'Základní URL, kde jsou hostovány sola.min.js a sola.min.css. Příklad: https://your-org.github.io/sola-cdn. Ponechte prázdné pro použití lokálních souborů pluginu.';
+$string['settings:cdn_version'] = 'Verze CDN souborů';
+$string['settings:cdn_version_desc'] = 'Řetězec verze připojovaný k CDN URL pro cache busting. Aktualizujte po každém CDN nasazení (např. 3.2.4 nebo commit hash).';

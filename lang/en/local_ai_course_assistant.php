@@ -308,6 +308,14 @@ $string['update:download_failed'] = 'Failed to download the update. Please try a
 $string['update:github_token'] = 'GitHub Token (optional)';
 $string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
 
+// CDN / Frontend Delivery settings.
+$string['settings:cdn_heading'] = 'CDN / Frontend Delivery';
+$string['settings:cdn_heading_desc'] = 'Serve SOLA frontend assets (JS/CSS) from an external CDN instead of the Moodle filesystem. This allows frontend updates without a plugin upgrade. Leave the CDN URL empty to use the local plugin files.';
+$string['settings:cdn_url'] = 'CDN Base URL';
+$string['settings:cdn_url_desc'] = 'Base URL where sola.min.js and sola.min.css are hosted. Example: https://your-org.github.io/sola-cdn. Leave empty to use local plugin files.';
+$string['settings:cdn_version'] = 'CDN Asset Version';
+$string['settings:cdn_version_desc'] = 'Version string appended to CDN URLs for cache busting. Update this after each CDN deploy (e.g. 3.2.4 or a commit hash).';
+
 // Practice Scoring.
 $string['rubric:score_title_conversation'] = 'Conversation Practice Score';
 $string['rubric:score_title_pronunciation'] = 'Pronunciation Practice Score';

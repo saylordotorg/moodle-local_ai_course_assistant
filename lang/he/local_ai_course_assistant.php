@@ -302,3 +302,11 @@ $string['mobile_disabled'] = 'SOLA אינו זמין לקורס זה.';
 $string['mobile_chip_concepts'] = 'מושגי מפתח';
 $string['mobile_chip_studyplan'] = 'תוכנית לימודים';
 $string['mobile_chip_quiz'] = 'בחן אותי';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / הפצת ממשק קצה';
+$string['settings:cdn_heading_desc'] = 'הגשת נכסי ממשק SOLA (JS/CSS) מ-CDN חיצוני במקום ממערכת הקבצים של Moodle. זה מאפשר עדכוני ממשק ללא שדרוג התוסף. השאירו את כתובת ה-CDN ריקה כדי להשתמש בקבצי התוסף המקומיים.';
+$string['settings:cdn_url'] = 'כתובת CDN בסיסית';
+$string['settings:cdn_url_desc'] = 'כתובת בסיסית שבה מתארחים sola.min.js ו-sola.min.css. דוגמה: https://your-org.github.io/sola-cdn. השאירו ריק כדי להשתמש בקבצי התוסף המקומיים.';
+$string['settings:cdn_version'] = 'גרסת נכסי CDN';
+$string['settings:cdn_version_desc'] = 'מחרוזת גרסה המתווספת לכתובות CDN עבור cache busting. עדכנו לאחר כל פריסת CDN (למשל 3.2.4 או commit hash).';

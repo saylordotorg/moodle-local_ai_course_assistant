@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Notater';
 $string['chat:history_title'] = 'Notater og samtalehistorikk';
 $string['task:send_inactivity_reminders'] = 'Send ukentlige inaktivitetspåminnelser via e-post';
 $string['messageprovider:study_notes'] = 'Studieøktnotater';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Frontend-levering';
+$string['settings:cdn_heading_desc'] = 'Server SOLA frontend-ressurser (JS/CSS) fra en ekstern CDN i stedet for Moodles filsystem. Dette muliggjør frontend-oppdateringer uten plugin-oppgradering. La CDN URL stå tom for å bruke lokale plugin-filer.';
+$string['settings:cdn_url'] = 'CDN-basis-URL';
+$string['settings:cdn_url_desc'] = 'Basis-URL der sola.min.js og sola.min.css er vert. Eksempel: https://your-org.github.io/sola-cdn. La feltet stå tomt for å bruke lokale plugin-filer.';
+$string['settings:cdn_version'] = 'CDN-ressursversjon';
+$string['settings:cdn_version_desc'] = 'Versjonsstreng som legges til CDN-URLer for cache busting. Oppdater etter hver CDN-utrulling (f.eks. 3.2.4 eller et commit hash).';

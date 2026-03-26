@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Notities';
 $string['chat:history_title'] = 'Notities en gespreksgeschiedenis';
 $string['task:send_inactivity_reminders'] = 'Wekelijkse herinneringse-mails bij inactiviteit verzenden';
 $string['messageprovider:study_notes'] = 'Notities van studiesessie';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Frontend-levering';
+$string['settings:cdn_heading_desc'] = 'Serveer SOLA frontend-assets (JS/CSS) vanaf een extern CDN in plaats van het Moodle-bestandssysteem. Dit maakt frontend-updates mogelijk zonder plugin-upgrade. Laat de CDN-URL leeg om de lokale pluginbestanden te gebruiken.';
+$string['settings:cdn_url'] = 'CDN-basis-URL';
+$string['settings:cdn_url_desc'] = 'Basis-URL waar sola.min.js en sola.min.css worden gehost. Voorbeeld: https://your-org.github.io/sola-cdn. Laat leeg om de lokale pluginbestanden te gebruiken.';
+$string['settings:cdn_version'] = 'CDN-assetversie';
+$string['settings:cdn_version_desc'] = 'Versiereeks die wordt toegevoegd aan CDN-URLs voor cache busting. Werk bij na elke CDN-deploy (bijv. 3.2.4 of een commit hash).';

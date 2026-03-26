@@ -313,12 +313,87 @@ class hook_callbacks {
             'hasstarterdata'     => $hasstarterdata,
         ];
 
+        // CDN mode: serve JS/CSS from external CDN instead of Moodle's AMD loader.
+        $cdnurl = get_config('local_ai_course_assistant', 'cdn_url');
+        if (!empty($cdnurl)) {
+            $cdnversion = get_config('local_ai_course_assistant', 'cdn_version') ?: '';
+            $qs = $cdnversion ? '?v=' . urlencode($cdnversion) : '';
+            $templatedata['use_cdn'] = true;
+            $templatedata['cdn_js_url'] = rtrim($cdnurl, '/') . '/sola.min.js' . $qs;
+            $templatedata['cdn_css_url'] = rtrim($cdnurl, '/') . '/sola.min.css' . $qs;
+            $templatedata['i18n_json'] = json_encode(self::get_js_strings());
+        }
+
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);
 
-        // Load AMD module.
-        $PAGE->requires->js_call_amd('local_ai_course_assistant/chat', 'init');
+        // Load JS: CDN mode uses <script> tags in the template; local mode uses AMD loader.
+        if (empty($cdnurl)) {
+            $PAGE->requires->js_call_amd('local_ai_course_assistant/chat', 'init');
+        }
 
         $hook->add_html($html);
+    }
+
+    /**
+     * Get all i18n string keys used by JS at runtime (for CDN mode pre-loading).
+     *
+     * These are the strings fetched via Str.get_string() / Str.get_strings()
+     * in chat.js and quiz.js. Template-level {{#str}} strings are resolved
+     * server-side by Moodle and do not need to be included here.
+     *
+     * @return array Associative array of string key => translated value.
+     */
+    private static function get_js_strings(): array {
+        $keys = [
+            // chat.js strings.
+            'chat:greeting',
+            'chat:error',
+            'chat:error_auth',
+            'chat:error_ratelimit',
+            'chat:error_unavailable',
+            'chat:clear_confirm',
+            'chat:copied',
+            'chat:copy_failed',
+            'chat:mic_error',
+            'chat:mic_unsupported',
+            'chat:quiz_error',
+            'chat:quiz_locked',
+            'chat:topic_picker_title',
+            'chat:topic_picker_title_explain',
+            'chat:topic_start',
+            // quiz.js strings.
+            'chat:quiz_setup_title',
+            'chat:quiz_questions',
+            'chat:quiz_topic',
+            'chat:quiz_topic_guided',
+            'chat:quiz_topic_default',
+            'chat:quiz_topic_custom',
+            'chat:quiz_custom_placeholder',
+            'chat:quiz_start',
+            'chat:quiz_cancel',
+            'chat:quiz_topic_objectives',
+            'chat:quiz_topic_modules',
+            'chat:quiz_subtopic_select',
+            'chat:quiz_correct',
+            'chat:quiz_wrong',
+            'chat:quiz_next',
+            'chat:quiz_finish',
+            'chat:quiz_score',
+            'chat:quiz_review_heading',
+            'chat:quiz_retake',
+            'chat:quiz_your_answer',
+            'chat:quiz_correct_answer',
+            'chat:quiz_exit',
+            'chat:quiz_score_great',
+            'chat:quiz_score_good',
+            'chat:quiz_score_practice',
+        ];
+
+        $strings = [];
+        foreach ($keys as $key) {
+            $strings[$key] = get_string($key, 'local_ai_course_assistant');
+        }
+        return $strings;
     }
 
     /**

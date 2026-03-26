@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Бележки';
 $string['chat:history_title'] = 'Бележки и история на разговора';
 $string['task:send_inactivity_reminders'] = 'Изпращане на седмични имейли за напомняне при неактивност';
 $string['messageprovider:study_notes'] = 'Бележки от учебна сесия';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Доставка на интерфейса';
+$string['settings:cdn_heading_desc'] = 'Обслужвайте ресурсите на SOLA (JS/CSS) от външен CDN вместо от файловата система на Moodle. Това позволява обновяване на интерфейса без надграждане на плъгина. Оставете CDN URL празно, за да използвате локалните файлове на плъгина.';
+$string['settings:cdn_url'] = 'Основен CDN URL адрес';
+$string['settings:cdn_url_desc'] = 'Основен URL адрес, където са хоствани sola.min.js и sola.min.css. Пример: https://your-org.github.io/sola-cdn. Оставете празно, за да използвате локалните файлове на плъгина.';
+$string['settings:cdn_version'] = 'Версия на CDN ресурсите';
+$string['settings:cdn_version_desc'] = 'Версионен низ, добавян към CDN URL адресите за cache busting. Обновете го след всяко CDN разгръщане (напр. 3.2.4 или commit hash).';

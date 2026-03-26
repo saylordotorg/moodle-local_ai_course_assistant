@@ -1,0 +1,15 @@
+{
+  "name": "sola-cdn",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CDN build for SOLA Moodle plugin frontend",
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs",
+    "watch": "rollup -c rollup.config.mjs --watch"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.28.0",
+    "rollup-plugin-postcss": "^4.0.2"
+  }
+}

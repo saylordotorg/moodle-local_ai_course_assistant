@@ -338,3 +338,11 @@ $string['task:send_inactivity_reminders'] = 'إرسال رسائل تذكير أ
 $string['messageprovider:study_notes'] = 'ملاحظات جلسة الدراسة';
 $string['task:send_inactivity_reminders'] = 'إرسال رسائل تذكير أسبوعية بعدم النشاط';
 $string['messageprovider:study_notes'] = 'ملاحظات جلسة الدراسة';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / توصيل الواجهة الأمامية';
+$string['settings:cdn_heading_desc'] = 'تقديم أصول الواجهة الأمامية لـ SOLA (JS/CSS) من CDN خارجي بدلاً من نظام ملفات Moodle. يتيح هذا تحديثات الواجهة الأمامية دون ترقية الإضافة. اترك عنوان CDN URL فارغاً لاستخدام ملفات الإضافة المحلية.';
+$string['settings:cdn_url'] = 'عنوان CDN الأساسي';
+$string['settings:cdn_url_desc'] = 'العنوان الأساسي حيث يتم استضافة sola.min.js و sola.min.css. مثال: https://your-org.github.io/sola-cdn. اتركه فارغاً لاستخدام ملفات الإضافة المحلية.';
+$string['settings:cdn_version'] = 'إصدار أصول CDN';
+$string['settings:cdn_version_desc'] = 'سلسلة الإصدار المُلحقة بعناوين CDN لـ cache busting. قم بتحديثها بعد كل نشر CDN (مثلاً 3.2.4 أو commit hash).';

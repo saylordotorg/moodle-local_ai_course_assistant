@@ -302,3 +302,11 @@ $string['mobile_disabled'] = 'SOLA non è disponibile per questo corso.';
 $string['mobile_chip_concepts'] = 'Concetti chiave';
 $string['mobile_chip_studyplan'] = 'Piano di studio';
 $string['mobile_chip_quiz'] = 'Mettimi alla prova';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Distribuzione frontend';
+$string['settings:cdn_heading_desc'] = 'Servire le risorse frontend di SOLA (JS/CSS) da un CDN esterno anziché dal filesystem di Moodle. Ciò consente aggiornamenti frontend senza aggiornare il plugin. Lasciare vuoto l\'URL CDN per utilizzare i file locali del plugin.';
+$string['settings:cdn_url'] = 'URL base CDN';
+$string['settings:cdn_url_desc'] = 'URL base dove sono ospitati sola.min.js e sola.min.css. Esempio: https://your-org.github.io/sola-cdn. Lasciare vuoto per utilizzare i file locali del plugin.';
+$string['settings:cdn_version'] = 'Versione risorse CDN';
+$string['settings:cdn_version_desc'] = 'Stringa di versione aggiunta agli URL CDN per il cache busting. Aggiornare dopo ogni deploy CDN (es. 3.2.4 o un commit hash).';

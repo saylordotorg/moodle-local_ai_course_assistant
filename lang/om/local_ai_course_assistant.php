@@ -342,3 +342,11 @@ $string['chat:mode_history'] = 'Yaadannoo';
 $string['chat:history_title'] = 'Yaadannoo fi Seenaa Dubbii';
 $string['task:send_inactivity_reminders'] = 'Ergaa yaadannoo torban torbaniin socho\'ummaa dhabuu erguu';
 $string['messageprovider:study_notes'] = 'Yaadannoo yeroo qo\'annoo';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Dhiyeessuu Fuula Duraa';
+$string['settings:cdn_heading_desc'] = 'Qabeenya fuula duraa SOLA (JS/CSS) CDN alaa irraa dhiyeessuu siistama faayilii Moodle irra. Kun sirrna fuula duraa akka fooyya plugin malee ta\'u dandeessisa. Faayilii plugin naannoo fayyadamuuf CDN URL duwwaa dhiisaa.';
+$string['settings:cdn_url'] = 'CDN URL Bu\'uuraa';
+$string['settings:cdn_url_desc'] = 'URL bu\'uuraa bakka sola.min.js fi sola.min.css itti keessummeeffaman. Fakkeenya: https://your-org.github.io/sola-cdn. Faayilii plugin naannoo fayyadamuuf duwwaa dhiisaa.';
+$string['settings:cdn_version'] = 'Gosa Qabeenya CDN';
+$string['settings:cdn_version_desc'] = 'Tarree gosa CDN URLs irratti dabalamu cache busting tiif. CDN deploy hundaa booda haaromsi (fkn. 3.2.4 ykn commit hash).';

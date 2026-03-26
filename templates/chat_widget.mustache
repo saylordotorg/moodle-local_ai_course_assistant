@@ -523,3 +523,8 @@
         </div>
     </div>
 </div>
+{{#use_cdn}}
+<link rel="stylesheet" href="{{cdn_css_url}}" />
+<script>window.SOLA_I18N = {{{i18n_json}}};</script>
+<script src="{{cdn_js_url}}" defer></script>
+{{/use_cdn}}

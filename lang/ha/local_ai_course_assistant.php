@@ -369,3 +369,11 @@ $string['task:send_inactivity_reminders'] = 'Aika saƙonnin tunatarwa na mako-ma
 $string['messageprovider:study_notes'] = 'Bayanan zaman karatu';
 $string['task:send_inactivity_reminders'] = 'Aika saƙonnin tunatarwa na mako-mako saboda rashin aiki';
 $string['messageprovider:study_notes'] = 'Bayanan zaman karatu';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Isar da Gaban';
+$string['settings:cdn_heading_desc'] = 'Bayar kadarorin gaban SOLA (JS/CSS) daga CDN na waje maimakon tsarin fayilolin Moodle. Wannan yana ba da damar sabunta gaban ba tare da haɓaka plugin ba. Bar CDN URL fanko don amfani da fayilolin plugin na gida.';
+$string['settings:cdn_url'] = 'Tushen CDN URL';
+$string['settings:cdn_url_desc'] = 'Tushen URL inda aka shirya sola.min.js da sola.min.css. Misali: https://your-org.github.io/sola-cdn. Bar fanko don amfani da fayilolin plugin na gida.';
+$string['settings:cdn_version'] = 'Sigar kadarorin CDN';
+$string['settings:cdn_version_desc'] = 'Kalmar sigar da aka ƙara zuwa CDN URLs don cache busting. Sabunta bayan kowace CDN deploy (misali 3.2.4 ko commit hash).';

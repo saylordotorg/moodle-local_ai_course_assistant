@@ -356,3 +356,11 @@ $string['chat:mode_history'] = 'Xusuusin';
 $string['chat:history_title'] = 'Xusuusin iyo Taariikhdii Wada-hadalka';
 $string['task:send_inactivity_reminders'] = 'Dir iimaylasha xusuusinta toddobaadlaha ee aan firfircoonayn';
 $string['messageprovider:study_notes'] = 'Qoraallada fadhiga daraasadda';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Gudbin Hore';
+$string['settings:cdn_heading_desc'] = 'U adeeg hantida hore ee SOLA (JS/CSS) CDN dibadda ah halkii nidaamka faylalka Moodle. Tani waxay u oggolaataa cusboonaysiinta hore iyada oo aan la hagaajin plugin-ka. CDN URL ka banaan u dhaaf si aad u isticmaasho faylalka plugin-ka maxalliga ah.';
+$string['settings:cdn_url'] = 'CDN URL Saldhigga';
+$string['settings:cdn_url_desc'] = 'URL-ka saldhigga halka sola.min.js iyo sola.min.css lagu martigeliyey. Tusaale: https://your-org.github.io/sola-cdn. U dhaaf banaan si aad u isticmaasho faylalka plugin-ka maxalliga ah.';
+$string['settings:cdn_version'] = 'Nooca Hantida CDN';
+$string['settings:cdn_version_desc'] = 'Xargaha nooca ee lagu daro CDN URLs cache busting. Cusbooneysii CDN deploy kasta ka dib (tusaale 3.2.4 ama commit hash).';

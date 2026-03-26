@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = 'Hantar e-mel peringatan ketidakakti
 $string['messageprovider:study_notes'] = 'Nota sesi pengajian';
 $string['task:send_inactivity_reminders'] = 'Hantar e-mel peringatan ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Nota sesi pengajian';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Penghantaran Frontend';
+$string['settings:cdn_heading_desc'] = 'Sajikan aset frontend SOLA (JS/CSS) daripada CDN luaran dan bukannya sistem fail Moodle. Ini membolehkan kemas kini frontend tanpa naik taraf plugin. Biarkan URL CDN kosong untuk menggunakan fail plugin tempatan.';
+$string['settings:cdn_url'] = 'URL Asas CDN';
+$string['settings:cdn_url_desc'] = 'URL asas tempat sola.min.js dan sola.min.css dihoskan. Contoh: https://your-org.github.io/sola-cdn. Biarkan kosong untuk menggunakan fail plugin tempatan.';
+$string['settings:cdn_version'] = 'Versi Aset CDN';
+$string['settings:cdn_version_desc'] = 'Rentetan versi yang ditambahkan pada URL CDN untuk cache busting. Kemas kini selepas setiap penerapan CDN (cth. 3.2.4 atau commit hash).';

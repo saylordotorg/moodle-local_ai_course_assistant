@@ -338,3 +338,11 @@ $string['chat:mode_history'] = 'Note';
 $string['chat:history_title'] = 'Note și istoricul conversației';
 $string['task:send_inactivity_reminders'] = 'Trimiteți e-mailuri săptămânale de memento privind inactivitatea';
 $string['messageprovider:study_notes'] = 'Note ale sesiunii de studiu';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Livrarea frontend-ului';
+$string['settings:cdn_heading_desc'] = 'Serviți resursele frontend SOLA (JS/CSS) de la un CDN extern în loc de sistemul de fișiere Moodle. Aceasta permite actualizări frontend fără actualizarea pluginului. Lăsați URL-ul CDN gol pentru a utiliza fișierele locale ale pluginului.';
+$string['settings:cdn_url'] = 'URL de bază CDN';
+$string['settings:cdn_url_desc'] = 'URL-ul de bază unde sunt găzduite sola.min.js și sola.min.css. Exemplu: https://your-org.github.io/sola-cdn. Lăsați gol pentru a utiliza fișierele locale ale pluginului.';
+$string['settings:cdn_version'] = 'Versiunea resurselor CDN';
+$string['settings:cdn_version_desc'] = 'Șir de versiune adăugat la URL-urile CDN pentru cache busting. Actualizați după fiecare implementare CDN (ex. 3.2.4 sau un commit hash).';

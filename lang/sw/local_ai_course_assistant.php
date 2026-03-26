@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kil
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kutofanya kazi kila wiki';
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Utoaji wa Frontend';
+$string['settings:cdn_heading_desc'] = 'Toa mali za frontend za SOLA (JS/CSS) kutoka CDN ya nje badala ya mfumo wa faili wa Moodle. Hii inaruhusu masasisho ya frontend bila kuboresha programu-jalizi. Acha CDN URL tupu kutumia faili za programu-jalizi za ndani.';
+$string['settings:cdn_url'] = 'URL ya Msingi wa CDN';
+$string['settings:cdn_url_desc'] = 'URL ya msingi ambapo sola.min.js na sola.min.css zinahifadhiwa. Mfano: https://your-org.github.io/sola-cdn. Acha tupu kutumia faili za programu-jalizi za ndani.';
+$string['settings:cdn_version'] = 'Toleo la Mali za CDN';
+$string['settings:cdn_version_desc'] = 'Mfuatano wa toleo unaoongezwa kwa CDN URLs kwa cache busting. Sasisha baada ya kila CDN deploy (mfano 3.2.4 au commit hash).';

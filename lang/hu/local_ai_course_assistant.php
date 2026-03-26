@@ -302,3 +302,11 @@ $string['mobile_disabled'] = 'A SOLA nem elérhető ehhez a kurzushoz.';
 $string['mobile_chip_concepts'] = 'Főfogalmak';
 $string['mobile_chip_studyplan'] = 'Tanulmányi terv';
 $string['mobile_chip_quiz'] = 'Tesztelj engem';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Frontend kiszolgálás';
+$string['settings:cdn_heading_desc'] = 'A SOLA frontend erőforrásainak (JS/CSS) kiszolgálása külső CDN-ről a Moodle fájlrendszer helyett. Ez lehetővé teszi a frontend frissítéseket bővítmény-frissítés nélkül. Hagyja üresen a CDN URL-t a helyi bővítményfájlok használatához.';
+$string['settings:cdn_url'] = 'CDN alap URL';
+$string['settings:cdn_url_desc'] = 'Alap URL, ahol a sola.min.js és sola.min.css fájlok tárolva vannak. Példa: https://your-org.github.io/sola-cdn. Hagyja üresen a helyi bővítményfájlok használatához.';
+$string['settings:cdn_version'] = 'CDN erőforrás verzió';
+$string['settings:cdn_version_desc'] = 'A CDN URL-ekhez hozzáfűzött verziósztring a cache busting érdekében. Frissítse minden CDN telepítés után (pl. 3.2.4 vagy commit hash).';

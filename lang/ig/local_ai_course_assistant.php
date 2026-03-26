@@ -355,3 +355,11 @@ $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu nke i
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
 $string['task:send_inactivity_reminders'] = 'Ziga ozi email ncheta nke izu maka enweghị ọrụ';
 $string['messageprovider:study_notes'] = 'Ndetu oge ọmụmụ ihe';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Nnyefe Ihu';
+$string['settings:cdn_heading_desc'] = 'Nye akụkụ ihu SOLA (JS/CSS) site na CDN mpụga kama usoro faịlụ Moodle. Nke a na-enye ohere mmelite ihu na-enweghị nkwalite plugin. Hapụ CDN URL ka ọ tọgbọrọ n\'efu iji jiri faịlụ plugin mpaghara.';
+$string['settings:cdn_url'] = 'URL Ntọala CDN';
+$string['settings:cdn_url_desc'] = 'URL ntọala ebe a na-akwado sola.min.js na sola.min.css. Ọmụmaatụ: https://your-org.github.io/sola-cdn. Hapụ ya ka ọ tọgbọrọ n\'efu iji jiri faịlụ plugin mpaghara.';
+$string['settings:cdn_version'] = 'Ụdị akụkụ CDN';
+$string['settings:cdn_version_desc'] = 'Eriri ụdị agbakwunyere na CDN URLs maka cache busting. Melite ya mgbe ọ bụla emechara CDN deploy (dịka 3.2.4 ma ọ bụ commit hash).';

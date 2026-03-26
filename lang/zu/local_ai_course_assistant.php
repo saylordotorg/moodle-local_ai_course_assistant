@@ -361,3 +361,11 @@ $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo sam
 $string['messageprovider:study_notes'] = 'Amanothi esikhathi sokufunda';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo sokungasebenzi njalo ngesonto';
 $string['messageprovider:study_notes'] = 'Amanothi eseshini yokufunda';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Ukulethwa kwe-Frontend';
+$string['settings:cdn_heading_desc'] = 'Nikeza ama-asset e-frontend e-SOLA (JS/CSS) kusuka ku-CDN yangaphandle esikhundleni sohlelo lwamafayela lwe-Moodle. Lokhu kuvumela izibuyekezo ze-frontend ngaphandle kokuthuthukisa i-plugin. Shiya i-CDN URL ingenalutho ukusebenzisa amafayela e-plugin wendawo.';
+$string['settings:cdn_url'] = 'I-CDN URL Eyisisekelo';
+$string['settings:cdn_url_desc'] = 'I-URL eyisisekelo lapho kuphethwe khona i-sola.min.js ne-sola.min.css. Isibonelo: https://your-org.github.io/sola-cdn. Shiya ingenalutho ukusebenzisa amafayela e-plugin wendawo.';
+$string['settings:cdn_version'] = 'Inguqulo Yempahla ye-CDN';
+$string['settings:cdn_version_desc'] = 'Uchungechunge lwenguqulo olwengezwa kuma-CDN URLs ngenxa ye-cache busting. Buyekeza ngemva kwe-CDN deploy ngayinye (isib. 3.2.4 noma i-commit hash).';

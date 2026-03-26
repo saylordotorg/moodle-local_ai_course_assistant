@@ -369,3 +369,11 @@ $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifa
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
+
+// CDN settings.
+$string['settings:cdn_heading'] = 'CDN / Pengiriman Frontend';
+$string['settings:cdn_heading_desc'] = 'Sajikan aset frontend SOLA (JS/CSS) dari CDN eksternal alih-alih sistem file Moodle. Ini memungkinkan pembaruan frontend tanpa peningkatan plugin. Biarkan URL CDN kosong untuk menggunakan file plugin lokal.';
+$string['settings:cdn_url'] = 'URL Dasar CDN';
+$string['settings:cdn_url_desc'] = 'URL dasar tempat sola.min.js dan sola.min.css dihosting. Contoh: https://your-org.github.io/sola-cdn. Biarkan kosong untuk menggunakan file plugin lokal.';
+$string['settings:cdn_version'] = 'Versi Aset CDN';
+$string['settings:cdn_version_desc'] = 'String versi yang ditambahkan ke URL CDN untuk cache busting. Perbarui setelah setiap deploy CDN (misalnya 3.2.4 atau commit hash).';
