@@ -321,10 +321,34 @@ try {
         'modules' => $modulesmap,
     ]);
 
-    $provider->chat_completion_stream($systemprompt, $history, function (string $chunk) use (&$fullresponse) {
-        $fullresponse .= $chunk;
-        sse_send(['token' => $chunk]);
-    }, $streamoptions);
+    try {
+        $provider->chat_completion_stream($systemprompt, $history, function (string $chunk) use (&$fullresponse) {
+            $fullresponse .= $chunk;
+            sse_send(['token' => $chunk]);
+        }, $streamoptions);
+    } catch (\moodle_exception $e) {
+        // On 404 (model not found), retry once with the provider's default model.
+        if (strpos($e->debuginfo ?? '', 'HTTP 404') !== false
+            || strpos($e->debuginfo ?? '', 'was not found') !== false) {
+            if ($provider->can_retry_with_default_model()) {
+                $provider->use_default_model();
+                $fullresponse = '';
+                $provider->chat_completion_stream($systemprompt, $history, function (string $chunk) use (&$fullresponse) {
+                    $fullresponse .= $chunk;
+                    sse_send(['token' => $chunk]);
+                }, $streamoptions);
+                // Log the fallback so admins know.
+                audit_logger::log('model_fallback', $userid, $courseid, [
+                    'original_model' => get_config('local_ai_course_assistant', 'model'),
+                    'reason' => 'HTTP 404 — model not found, retried with provider default',
+                ]);
+            } else {
+                throw $e;
+            }
+        } else {
+            throw $e;
+        }
+    }
 
     // Capture token usage immediately after streaming — before any other operations.
     $tokenusage = $provider->get_last_token_usage();

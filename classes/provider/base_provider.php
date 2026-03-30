@@ -181,11 +181,36 @@ abstract class base_provider implements provider_interface {
             throw new \moodle_exception('chat:error_ratelimit', 'local_ai_course_assistant');
         }
 
+        if ($httpcode === 404) {
+            // Model not found — likely misspelled or deprecated.
+            $defaultmodel = $this->get_default_model();
+            $detail = "The model \"{$this->model}\" was not found (HTTP 404). "
+                . "Check the model name in Site Admin > Plugins > AI Course Assistant. "
+                . "The default for this provider is \"{$defaultmodel}\".";
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $detail);
+        }
+
         if ($httpcode >= 500) {
             throw new \moodle_exception('chat:error_unavailable', 'local_ai_course_assistant');
         }
 
         throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, "HTTP {$httpcode}: {$response}");
+    }
+
+    /**
+     * Whether this provider can retry with its default model after a 404 error.
+     *
+     * @return bool True if the configured model differs from the default.
+     */
+    public function can_retry_with_default_model(): bool {
+        return !empty($this->model) && $this->model !== $this->get_default_model();
+    }
+
+    /**
+     * Reset the model to the provider's default for a retry attempt.
+     */
+    public function use_default_model(): void {
+        $this->model = $this->get_default_model();
     }
 
     /**

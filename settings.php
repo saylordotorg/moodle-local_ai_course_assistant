@@ -101,7 +101,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/model',
         get_string('settings:model', 'local_ai_course_assistant'),
         get_string('settings:model_desc', 'local_ai_course_assistant'),
-        ''
+        'gpt-4o'
     ));
 
     // API Base URL.
