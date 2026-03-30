@@ -55,8 +55,9 @@ $pageid     = optional_param('pageid', 0, PARAM_INT);       // Course-module ID 
 $pagetitle  = optional_param('pagetitle', '', PARAM_TEXT);  // Title of the current resource/activity.
 $coachstyle = optional_param('coachingstyle', '', PARAM_ALPHA); // Coaching style: coach, buddy, tutor.
 $timelimit  = optional_param('timelimit', 0, PARAM_INT);      // Time constraint in minutes (0 = none).
-$firstgen   = optional_param('firstgen', 0, PARAM_BOOL);      // First-generation student mode.
-$completion = optional_param('completion', 0, PARAM_INT);      // Course completion percentage (0-100).
+$firstgen        = optional_param('firstgen', 0, PARAM_BOOL);      // First-generation student mode.
+$completion      = optional_param('completion', 0, PARAM_INT);      // Course completion percentage (0-100).
+$interactiontype = optional_param('interaction_type', 'chat', PARAM_ALPHA); // Interaction mode: chat, voice, quiz, etc.
 
 // English lock: force English for ELL courses regardless of student language preference.
 $englishlock = get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
@@ -158,8 +159,12 @@ try {
         $conv->offtopic_locked_until = null;
     }
 
-    // Save user message.
-    conversation_manager::add_message($conv->id, $userid, $courseid, 'user', $message);
+    // Save user message with interaction context.
+    conversation_manager::add_message(
+        $conv->id, $userid, $courseid, 'user', $message,
+        0, '', null, null, null,
+        $interactiontype, $pageid ?: null
+    );
 
     // Audit log the message.
     audit_logger::log('message_sent', $userid, $courseid, [
@@ -346,7 +351,7 @@ try {
     // Save the clean assistant response (without markers), recording which provider was used.
     $effectivecfg = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
     $providername = $effectivecfg['provider'] ?? get_config('local_ai_course_assistant', 'provider');
-    conversation_manager::add_message(
+    $assistantmsgid = conversation_manager::add_message(
         $conv->id,
         $userid,
         $courseid,
@@ -356,7 +361,9 @@ try {
         $providername,
         $tokenusage['prompt_tokens'] ?? null,
         $tokenusage['completion_tokens'] ?? null,
-        $tokenusage['model'] ?? null
+        $tokenusage['model'] ?? null,
+        $interactiontype,
+        $pageid ?: null
     );
 
     // Handle off-topic tracking.
@@ -395,12 +402,15 @@ try {
         if ($ticketref) {
             $escalationmsg = get_string('chat:escalated_to_support', 'local_ai_course_assistant', $ticketref);
             sse_send(['token' => "\n\n" . $escalationmsg]);
-            conversation_manager::add_message($conv->id, $userid, $courseid, 'assistant', $escalationmsg);
+            conversation_manager::add_message(
+                $conv->id, $userid, $courseid, 'assistant', $escalationmsg,
+                0, '', null, null, null, $interactiontype, $pageid ?: null
+            );
         }
     }
 
-    // Signal completion.
-    sse_send(['done' => true]);
+    // Signal completion (include message ID for client-side thumbs up/down).
+    sse_send(['done' => true, 'messageid' => $assistantmsgid]);
 
 } catch (\moodle_exception $e) {
     // Include debuginfo (curl errors, HTTP details) alongside the user message.

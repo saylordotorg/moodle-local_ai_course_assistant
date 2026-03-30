@@ -310,3 +310,27 @@ $string['settings:cdn_url'] = 'Базова URL CDN';
 $string['settings:cdn_url_desc'] = 'Базова URL-адреса, де розміщено sola.min.js та sola.min.css. Приклад: https://your-org.github.io/sola-cdn. Залиште порожнім для використання локальних файлів плагіна.';
 $string['settings:cdn_version'] = 'Версія ресурсів CDN';
 $string['settings:cdn_version_desc'] = 'Рядок версії, що додається до URL CDN для скидання кешу (cache busting). Оновлюйте після кожного розгортання CDN (напр. 3.2.4 або commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Загальне використання';
+$string['analytics:tab_bycourse'] = 'За курсом';
+$string['analytics:tab_comparison'] = 'AI проти тих, хто не використовує';
+$string['analytics:tab_byunit'] = 'За розділом';
+$string['analytics:tab_usagetypes'] = 'Типи використання';
+$string['analytics:tab_themes'] = 'Теми';
+$string['analytics:tab_feedback'] = 'Відгуки про AI';
+$string['analytics:total_students'] = 'Усього студентів';
+$string['analytics:active_users'] = 'Активні користувачі AI';
+$string['analytics:msgs_per_student'] = 'Повідомлень на студента';
+$string['analytics:avg_session'] = 'Середня тривалість сеансу';
+$string['analytics:return_rate'] = 'Показник повернення';
+$string['analytics:total_sessions'] = 'Усього сеансів';
+$string['analytics:thumbs_up'] = 'Подобається';
+$string['analytics:thumbs_down'] = 'Не подобається';
+$string['analytics:hallucination_flags'] = 'Позначки неточності';
+$string['analytics:msgs_to_resolution'] = 'Повідомлень до вирішення';
+$string['analytics:helpful'] = 'Корисно';
+$string['analytics:not_helpful'] = 'Не корисно';
+$string['analytics:flag_hallucination'] = 'Ця відповідь містить неточну інформацію';
+$string['analytics:submit_rating'] = 'Надіслати';
+$string['analytics:thanks_feedback'] = 'Дякуємо за ваш відгук';

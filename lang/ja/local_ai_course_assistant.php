@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'CDNベースURL';
 $string['settings:cdn_url_desc'] = 'sola.min.jsとsola.min.cssがホストされているベースURL。例：https://your-org.github.io/sola-cdn。ローカルプラグインファイルを使用するには空のままにしてください。';
 $string['settings:cdn_version'] = 'CDNアセットバージョン';
 $string['settings:cdn_version_desc'] = 'cache bustingのためにCDN URLに付加されるバージョン文字列。CDNデプロイごとに更新してください（例：3.2.4またはcommit hash）。';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = '全体の利用状況';
+$string['analytics:tab_bycourse'] = 'コース別';
+$string['analytics:tab_comparison'] = 'AI利用者 vs 非利用者';
+$string['analytics:tab_byunit'] = 'ユニット別';
+$string['analytics:tab_usagetypes'] = '利用タイプ';
+$string['analytics:tab_themes'] = 'テーマ';
+$string['analytics:tab_feedback'] = 'AIフィードバック';
+$string['analytics:total_students'] = '学生総数';
+$string['analytics:active_users'] = 'アクティブAIユーザー';
+$string['analytics:msgs_per_student'] = '学生あたりのメッセージ数';
+$string['analytics:avg_session'] = '平均セッション時間';
+$string['analytics:return_rate'] = 'リピート率';
+$string['analytics:total_sessions'] = 'セッション総数';
+$string['analytics:thumbs_up'] = '高評価';
+$string['analytics:thumbs_down'] = '低評価';
+$string['analytics:hallucination_flags'] = '不正確な情報の報告';
+$string['analytics:msgs_to_resolution'] = '解決までのメッセージ数';
+$string['analytics:helpful'] = '役に立った';
+$string['analytics:not_helpful'] = '役に立たなかった';
+$string['analytics:flag_hallucination'] = 'この回答には不正確な情報が含まれています';
+$string['analytics:submit_rating'] = '送信';
+$string['analytics:thanks_feedback'] = 'フィードバックありがとうございます';

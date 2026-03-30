@@ -364,3 +364,27 @@ $string['settings:cdn_url'] = 'CDN URL Saldhigga';
 $string['settings:cdn_url_desc'] = 'URL-ka saldhigga halka sola.min.js iyo sola.min.css lagu martigeliyey. Tusaale: https://your-org.github.io/sola-cdn. U dhaaf banaan si aad u isticmaasho faylalka plugin-ka maxalliga ah.';
 $string['settings:cdn_version'] = 'Nooca Hantida CDN';
 $string['settings:cdn_version_desc'] = 'Xargaha nooca ee lagu daro CDN URLs cache busting. Cusbooneysii CDN deploy kasta ka dib (tusaale 3.2.4 ama commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Isticmaalka guud';
+$string['analytics:tab_bycourse'] = 'Koorsiga';
+$string['analytics:tab_comparison'] = 'AI iyo kuwa aan isticmaalin';
+$string['analytics:tab_byunit'] = 'Cutubka';
+$string['analytics:tab_usagetypes'] = 'Noocyada isticmaalka';
+$string['analytics:tab_themes'] = 'Mawduucyo';
+$string['analytics:tab_feedback'] = 'Jawaab celinta AI';
+$string['analytics:total_students'] = 'Wadarta ardayda';
+$string['analytics:active_users'] = 'Isticmaalayaasha firfircoon ee AI';
+$string['analytics:msgs_per_student'] = 'Fariimaha arday kasta';
+$string['analytics:avg_session'] = 'Celcelis muddada fadhiga';
+$string['analytics:return_rate'] = 'Heerka soo noqoshada';
+$string['analytics:total_sessions'] = 'Wadarta fadhiyada';
+$string['analytics:thumbs_up'] = 'Suul kor';
+$string['analytics:thumbs_down'] = 'Suul hoos';
+$string['analytics:hallucination_flags'] = 'Calaamadaha khaladka';
+$string['analytics:msgs_to_resolution'] = 'Fariimaha ilaa xalinta';
+$string['analytics:helpful'] = 'Wax tar leh';
+$string['analytics:not_helpful'] = 'Aan waxtar lahayn';
+$string['analytics:flag_hallucination'] = 'Jawaabtan waxay ka kooban tahay macluumaad aan sax ahayn';
+$string['analytics:submit_rating'] = 'Dir';
+$string['analytics:thanks_feedback'] = 'Waad ku mahadsantahay jawaab celintaada';

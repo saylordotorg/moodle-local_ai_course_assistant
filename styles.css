@@ -4498,3 +4498,35 @@ a.aica-history-panel__source:hover {
     color: #e2e8f0;
     border-color: #475569;
 }
+
+/* ── Analytics Dashboard ──────────────────────────────────── */
+.sola-analytics-dashboard { max-width: 1200px; }
+.sola-analytics-tabs .nav-link { font-size: .85rem; padding: .5rem .75rem; }
+.sola-analytics-tabs .nav-link.active { font-weight: 600; }
+.sola-stat-cards { display: flex; flex-wrap: wrap; gap: .75rem; }
+.sola-stat-card {
+    flex: 1 1 140px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    text-align: center;
+    min-width: 120px;
+}
+.sola-stat-value { font-size: 1.5rem; font-weight: 700; color: #173140; line-height: 1.2; }
+.sola-stat-label { font-size: .75rem; color: #868e96; margin-top: .2rem; text-transform: uppercase; letter-spacing: .03em; }
+.sola-analytics-table th { font-size: .8rem; text-transform: uppercase; color: #868e96; letter-spacing: .03em; }
+.sola-analytics-panes canvas { max-width: 100%; }
+
+/* Thumbs up/down on assistant messages */
+.aica-msg-actions { display: flex; gap: .25rem; margin-top: .25rem; }
+.aica-msg-actions button {
+    background: none; border: none; cursor: pointer; padding: 2px 4px;
+    color: #adb5bd; font-size: .8rem; border-radius: 4px; transition: color .15s;
+}
+.aica-msg-actions button:hover { color: #495057; background: #f1f3f5; }
+.aica-msg-actions button.active-up { color: #2f9e44; }
+.aica-msg-actions button.active-down { color: #e03131; }
+.aica-hallucination-check { font-size: .75rem; color: #868e96; margin-top: .25rem; }
+.aica-rating-comment { font-size: .8rem; margin-top: .25rem; }
+.aica-rating-comment textarea { font-size: .8rem; width: 100%; max-width: 300px; resize: vertical; }

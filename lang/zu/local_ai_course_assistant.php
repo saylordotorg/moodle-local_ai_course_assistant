@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'I-CDN URL Eyisisekelo';
 $string['settings:cdn_url_desc'] = 'I-URL eyisisekelo lapho kuphethwe khona i-sola.min.js ne-sola.min.css. Isibonelo: https://your-org.github.io/sola-cdn. Shiya ingenalutho ukusebenzisa amafayela e-plugin wendawo.';
 $string['settings:cdn_version'] = 'Inguqulo Yempahla ye-CDN';
 $string['settings:cdn_version_desc'] = 'Uchungechunge lwenguqulo olwengezwa kuma-CDN URLs ngenxa ye-cache busting. Buyekeza ngemva kwe-CDN deploy ngayinye (isib. 3.2.4 noma i-commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Ukusetshenziswa kwangempela';
+$string['analytics:tab_bycourse'] = 'Ngekosi';
+$string['analytics:tab_comparison'] = 'AI nabangazisebenzisi';
+$string['analytics:tab_byunit'] = 'Ngeyunithi';
+$string['analytics:tab_usagetypes'] = 'Izinhlobo zokusetshenziswa';
+$string['analytics:tab_themes'] = 'Izihloko';
+$string['analytics:tab_feedback'] = 'Impendulo ye-AI';
+$string['analytics:total_students'] = 'Isibalo sabafundi';
+$string['analytics:active_users'] = 'Abasebenzisi be-AI abasebenzayo';
+$string['analytics:msgs_per_student'] = 'Imilayezo ngomfundi';
+$string['analytics:avg_session'] = 'Isikhathi esilinganiselwa sesikhathi';
+$string['analytics:return_rate'] = 'Izinga lokubuya';
+$string['analytics:total_sessions'] = 'Isibalo sezikhathi';
+$string['analytics:thumbs_up'] = 'Isithupha phezulu';
+$string['analytics:thumbs_down'] = 'Isithupha phansi';
+$string['analytics:hallucination_flags'] = 'Izimpawu zokunganembi';
+$string['analytics:msgs_to_resolution'] = 'Imilayezo kuze kuxazululwe';
+$string['analytics:helpful'] = 'Kusiza';
+$string['analytics:not_helpful'] = 'Akusizi';
+$string['analytics:flag_hallucination'] = 'Le mpendulo inemininingwane enganembi';
+$string['analytics:submit_rating'] = 'Thumela';
+$string['analytics:thanks_feedback'] = 'Siyabonga ngempendulo yakho';

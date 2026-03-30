@@ -91,7 +91,9 @@ class conversation_manager {
         string $provider = '',
         ?int $prompttokens = null,
         ?int $completiontokens = null,
-        ?string $modelname = null
+        ?string $modelname = null,
+        string $interactiontype = 'chat',
+        ?int $cmid = null
     ): int {
         global $DB;
 
@@ -109,6 +111,8 @@ class conversation_manager {
         $record->completion_tokens = $completiontokens;
         $record->model_name        = ($role === 'assistant' && $modelname !== null) ? $modelname : null;
         $record->provider = ($role === 'assistant' && $provider !== '') ? $provider : null;
+        $record->interaction_type  = $interactiontype ?: 'chat';
+        $record->cmid              = $cmid ?: null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);

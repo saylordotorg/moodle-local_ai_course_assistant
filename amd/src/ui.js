@@ -1965,6 +1965,49 @@ define([
         });
         actions.appendChild(bookmarkBtn);
 
+        // Thumbs up button.
+        const thumbUpBtn = document.createElement('button');
+        thumbUpBtn.className = 'aica-btn-thumb';
+        thumbUpBtn.setAttribute('aria-label', 'Thumbs up');
+        thumbUpBtn.setAttribute('title', 'Helpful');
+        thumbUpBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>';
+        actions.appendChild(thumbUpBtn);
+
+        // Thumbs down button.
+        const thumbDownBtn = document.createElement('button');
+        thumbDownBtn.className = 'aica-btn-thumb';
+        thumbDownBtn.setAttribute('aria-label', 'Thumbs down');
+        thumbDownBtn.setAttribute('title', 'Not helpful');
+        thumbDownBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>';
+        actions.appendChild(thumbDownBtn);
+
+        // Wire up thumb rating handlers.
+        var ratingState = {rating: 0};
+        thumbUpBtn.addEventListener('click', function() {
+            var newRating = ratingState.rating === 1 ? 0 : 1;
+            ratingState.rating = newRating;
+            thumbUpBtn.classList.toggle('active-up', newRating === 1);
+            thumbDownBtn.classList.remove('active-down');
+            // Remove any open feedback form.
+            var form = actions.parentElement.querySelector('.aica-rating-feedback');
+            if (form) { form.remove(); }
+            if (newRating !== 0 && el && el.dataset.messageid) {
+                submitRating(el.dataset.messageid, newRating, 0, '');
+            }
+        });
+        thumbDownBtn.addEventListener('click', function() {
+            var newRating = ratingState.rating === -1 ? 0 : -1;
+            ratingState.rating = newRating;
+            thumbDownBtn.classList.toggle('active-down', newRating === -1);
+            thumbUpBtn.classList.remove('active-up');
+            if (newRating === -1) {
+                showRatingFeedback(actions.parentElement, el, ratingState);
+            } else {
+                var form = actions.parentElement.querySelector('.aica-rating-feedback');
+                if (form) { form.remove(); }
+            }
+        });
+
         // Speak button (optional).
         if (onSpeak) {
             const speakBtn = document.createElement('button');
@@ -4896,6 +4939,60 @@ define([
 
         appendMessageNode(card);
         scrollToBottom();
+    };
+
+    // ── Message rating helpers (thumbs up/down + hallucination flag) ──
+
+    /**
+     * Submit a message rating via the rate_message web service.
+     */
+    const submitRating = function(messageid, rating, isHallucination, comment) {
+        if (!messageid) { return; }
+        try {
+            require(['core/ajax'], function(Ajax) {
+                Ajax.call([{
+                    methodname: 'local_ai_course_assistant_rate_message',
+                    args: {
+                        messageid: parseInt(messageid, 10),
+                        rating: rating,
+                        is_hallucination: isHallucination ? 1 : 0,
+                        comment: comment || '',
+                    },
+                }])[0].catch(function() { /* silent */ });
+            });
+        } catch (e) { /* silent */ }
+    };
+
+    /**
+     * Show the feedback form below a thumbs-down rating.
+     */
+    const showRatingFeedback = function(container, msgEl, ratingState) {
+        // Remove existing form if any.
+        var existing = container.querySelector('.aica-rating-feedback');
+        if (existing) { existing.remove(); }
+
+        var form = document.createElement('div');
+        form.className = 'aica-rating-feedback';
+        form.innerHTML =
+            '<div class="aica-hallucination-check">' +
+            '<label><input type="checkbox" class="aica-hallucination-cb"> This response contains inaccurate information</label>' +
+            '</div>' +
+            '<div class="aica-rating-comment">' +
+            '<textarea rows="2" placeholder="What was wrong? (optional)"></textarea>' +
+            '<button class="btn btn-sm btn-outline-secondary mt-1 aica-submit-rating">Submit</button>' +
+            '</div>';
+
+        container.appendChild(form);
+
+        form.querySelector('.aica-submit-rating').addEventListener('click', function() {
+            var isHallucination = form.querySelector('.aica-hallucination-cb').checked ? 1 : 0;
+            var comment = form.querySelector('textarea').value.trim();
+            if (msgEl && msgEl.dataset.messageid) {
+                submitRating(msgEl.dataset.messageid, -1, isHallucination, comment);
+            }
+            form.innerHTML = '<span class="text-muted" style="font-size:.75rem;">Thanks for your feedback</span>';
+            setTimeout(function() { form.remove(); }, 2000);
+        });
     };
 
     return {

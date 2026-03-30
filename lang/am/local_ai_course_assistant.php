@@ -375,3 +375,27 @@ $string['settings:cdn_url'] = 'CDN መሠረታዊ URL';
 $string['settings:cdn_url_desc'] = 'sola.min.js እና sola.min.css የሚስተናገዱበት መሠረታዊ URL። ምሳሌ: https://your-org.github.io/sola-cdn። የአካባቢ ተሰኪ ፋይሎችን ለመጠቀም ባዶ ይተዉት።';
 $string['settings:cdn_version'] = 'CDN ንብረት ስሪት';
 $string['settings:cdn_version_desc'] = 'ለ cache busting ወደ CDN URLs የሚጨመር የስሪት ሕብረቁምፊ። ከእያንዳንዱ CDN ማሰማራት በኋላ ያዘምኑ (ለምሳሌ 3.2.4 ወይም የ commit hash)።';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'አጠቃላይ አጠቃቀም';
+$string['analytics:tab_bycourse'] = 'በኮርስ';
+$string['analytics:tab_comparison'] = 'AI vs ያልተጠቃሚዎች';
+$string['analytics:tab_byunit'] = 'በክፍል';
+$string['analytics:tab_usagetypes'] = 'የአጠቃቀም ዓይነቶች';
+$string['analytics:tab_themes'] = 'ርዕሰ ጉዳዮች';
+$string['analytics:tab_feedback'] = 'AI ግብረመልስ';
+$string['analytics:total_students'] = 'ጠቅላላ ተማሪዎች';
+$string['analytics:active_users'] = 'ንቁ AI ተጠቃሚዎች';
+$string['analytics:msgs_per_student'] = 'በተማሪ መልዕክቶች';
+$string['analytics:avg_session'] = 'አማካይ የክፍለ ጊዜ ርዝመት';
+$string['analytics:return_rate'] = 'የመመለሻ መጠን';
+$string['analytics:total_sessions'] = 'ጠቅላላ ክፍለ ጊዜዎች';
+$string['analytics:thumbs_up'] = 'አውራ ጣት ወደ ላይ';
+$string['analytics:thumbs_down'] = 'አውራ ጣት ወደ ታች';
+$string['analytics:hallucination_flags'] = 'የስህተት ምልክቶች';
+$string['analytics:msgs_to_resolution'] = 'ለመፍትሄ የሚያስፈልጉ መልዕክቶች';
+$string['analytics:helpful'] = 'ጠቃሚ';
+$string['analytics:not_helpful'] = 'ጠቃሚ አይደለም';
+$string['analytics:flag_hallucination'] = 'ይህ ምላሽ ትክክል ያልሆነ መረጃ ይዟል';
+$string['analytics:submit_rating'] = 'አስገባ';
+$string['analytics:thanks_feedback'] = 'ስለ ግብረመልስዎ እናመሰግናለን';

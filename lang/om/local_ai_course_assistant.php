@@ -350,3 +350,27 @@ $string['settings:cdn_url'] = 'CDN URL Bu\'uuraa';
 $string['settings:cdn_url_desc'] = 'URL bu\'uuraa bakka sola.min.js fi sola.min.css itti keessummeeffaman. Fakkeenya: https://your-org.github.io/sola-cdn. Faayilii plugin naannoo fayyadamuuf duwwaa dhiisaa.';
 $string['settings:cdn_version'] = 'Gosa Qabeenya CDN';
 $string['settings:cdn_version_desc'] = 'Tarree gosa CDN URLs irratti dabalamu cache busting tiif. CDN deploy hundaa booda haaromsi (fkn. 3.2.4 ykn commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Itti fayyadama waliigalaa';
+$string['analytics:tab_bycourse'] = 'Koorsii koorsiin';
+$string['analytics:tab_comparison'] = 'AI fi hin fayyadamne';
+$string['analytics:tab_byunit'] = 'Kutaa kutaan';
+$string['analytics:tab_usagetypes'] = 'Gosa itti fayyadama';
+$string['analytics:tab_themes'] = 'Mata duree';
+$string['analytics:tab_feedback'] = 'Yaada AI';
+$string['analytics:total_students'] = 'Barattoota waliigalaa';
+$string['analytics:active_users'] = 'Fayyadamtoota AI hojiirra';
+$string['analytics:msgs_per_student'] = 'Ergaa barataa tokkotti';
+$string['analytics:avg_session'] = 'Turtii waltajjii giddugaleessa';
+$string['analytics:return_rate'] = 'Hamma deebi\'uu';
+$string['analytics:total_sessions'] = 'Waltajjii waliigalaa';
+$string['analytics:thumbs_up'] = 'Quba ol';
+$string['analytics:thumbs_down'] = 'Quba gad';
+$string['analytics:hallucination_flags'] = 'Mallattoo dogoggora';
+$string['analytics:msgs_to_resolution'] = 'Ergaa hanga furmaataatti';
+$string['analytics:helpful'] = 'Gargaarsa qaba';
+$string['analytics:not_helpful'] = 'Gargaarsa hin qabu';
+$string['analytics:flag_hallucination'] = 'Deebiin kun odeeffannoo sirrii hin taane qaba';
+$string['analytics:submit_rating'] = 'Ergi';
+$string['analytics:thanks_feedback'] = 'Yaada keessaniif galatoomaa';

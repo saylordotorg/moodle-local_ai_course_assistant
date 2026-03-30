@@ -310,3 +310,27 @@ $string['settings:cdn_url'] = 'כתובת CDN בסיסית';
 $string['settings:cdn_url_desc'] = 'כתובת בסיסית שבה מתארחים sola.min.js ו-sola.min.css. דוגמה: https://your-org.github.io/sola-cdn. השאירו ריק כדי להשתמש בקבצי התוסף המקומיים.';
 $string['settings:cdn_version'] = 'גרסת נכסי CDN';
 $string['settings:cdn_version_desc'] = 'מחרוזת גרסה המתווספת לכתובות CDN עבור cache busting. עדכנו לאחר כל פריסת CDN (למשל 3.2.4 או commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'שימוש כללי';
+$string['analytics:tab_bycourse'] = 'לפי קורס';
+$string['analytics:tab_comparison'] = 'AI מול לא-משתמשים';
+$string['analytics:tab_byunit'] = 'לפי יחידה';
+$string['analytics:tab_usagetypes'] = 'סוגי שימוש';
+$string['analytics:tab_themes'] = 'נושאים';
+$string['analytics:tab_feedback'] = 'משוב AI';
+$string['analytics:total_students'] = 'סה"כ סטודנטים';
+$string['analytics:active_users'] = 'משתמשי AI פעילים';
+$string['analytics:msgs_per_student'] = 'הודעות לסטודנט';
+$string['analytics:avg_session'] = 'משך הפעלה ממוצע';
+$string['analytics:return_rate'] = 'שיעור חזרה';
+$string['analytics:total_sessions'] = 'סה"כ הפעלות';
+$string['analytics:thumbs_up'] = 'אגודל למעלה';
+$string['analytics:thumbs_down'] = 'אגודל למטה';
+$string['analytics:hallucination_flags'] = 'סימוני אי-דיוק';
+$string['analytics:msgs_to_resolution'] = 'הודעות עד לפתרון';
+$string['analytics:helpful'] = 'מועיל';
+$string['analytics:not_helpful'] = 'לא מועיל';
+$string['analytics:flag_hallucination'] = 'תשובה זו מכילה מידע לא מדויק';
+$string['analytics:submit_rating'] = 'שלח';
+$string['analytics:thanks_feedback'] = 'תודה על המשוב';

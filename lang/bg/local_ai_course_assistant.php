@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'Основен CDN URL адрес';
 $string['settings:cdn_url_desc'] = 'Основен URL адрес, където са хоствани sola.min.js и sola.min.css. Пример: https://your-org.github.io/sola-cdn. Оставете празно, за да използвате локалните файлове на плъгина.';
 $string['settings:cdn_version'] = 'Версия на CDN ресурсите';
 $string['settings:cdn_version_desc'] = 'Версионен низ, добавян към CDN URL адресите за cache busting. Обновете го след всяко CDN разгръщане (напр. 3.2.4 или commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Обща употреба';
+$string['analytics:tab_bycourse'] = 'По курс';
+$string['analytics:tab_comparison'] = 'AI срещу неизползващи';
+$string['analytics:tab_byunit'] = 'По раздел';
+$string['analytics:tab_usagetypes'] = 'Видове употреба';
+$string['analytics:tab_themes'] = 'Теми';
+$string['analytics:tab_feedback'] = 'AI обратна връзка';
+$string['analytics:total_students'] = 'Общо студенти';
+$string['analytics:active_users'] = 'Активни AI потребители';
+$string['analytics:msgs_per_student'] = 'Съобщения на студент';
+$string['analytics:avg_session'] = 'Средна продължителност на сесията';
+$string['analytics:return_rate'] = 'Процент на връщане';
+$string['analytics:total_sessions'] = 'Общо сесии';
+$string['analytics:thumbs_up'] = 'Харесвам';
+$string['analytics:thumbs_down'] = 'Не харесвам';
+$string['analytics:hallucination_flags'] = 'Маркирани неточности';
+$string['analytics:msgs_to_resolution'] = 'Съобщения до решение';
+$string['analytics:helpful'] = 'Полезно';
+$string['analytics:not_helpful'] = 'Не е полезно';
+$string['analytics:flag_hallucination'] = 'Този отговор съдържа неточна информация';
+$string['analytics:submit_rating'] = 'Изпращане';
+$string['analytics:thanks_feedback'] = 'Благодарим за обратната връзка';

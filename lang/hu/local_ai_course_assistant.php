@@ -310,3 +310,27 @@ $string['settings:cdn_url'] = 'CDN alap URL';
 $string['settings:cdn_url_desc'] = 'Alap URL, ahol a sola.min.js és sola.min.css fájlok tárolva vannak. Példa: https://your-org.github.io/sola-cdn. Hagyja üresen a helyi bővítményfájlok használatához.';
 $string['settings:cdn_version'] = 'CDN erőforrás verzió';
 $string['settings:cdn_version_desc'] = 'A CDN URL-ekhez hozzáfűzött verziósztring a cache busting érdekében. Frissítse minden CDN telepítés után (pl. 3.2.4 vagy commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Összesített használat';
+$string['analytics:tab_bycourse'] = 'Kurzusonként';
+$string['analytics:tab_comparison'] = 'AI vs nem használók';
+$string['analytics:tab_byunit'] = 'Egységenként';
+$string['analytics:tab_usagetypes'] = 'Használattípusok';
+$string['analytics:tab_themes'] = 'Témák';
+$string['analytics:tab_feedback'] = 'AI visszajelzés';
+$string['analytics:total_students'] = 'Összes hallgató';
+$string['analytics:active_users'] = 'Aktív AI felhasználók';
+$string['analytics:msgs_per_student'] = 'Üzenetek hallgatónként';
+$string['analytics:avg_session'] = 'Átlagos munkamenet időtartama';
+$string['analytics:return_rate'] = 'Visszatérési arány';
+$string['analytics:total_sessions'] = 'Összes munkamenet';
+$string['analytics:thumbs_up'] = 'Tetszik';
+$string['analytics:thumbs_down'] = 'Nem tetszik';
+$string['analytics:hallucination_flags'] = 'Pontatlanság jelölések';
+$string['analytics:msgs_to_resolution'] = 'Üzenetek a megoldásig';
+$string['analytics:helpful'] = 'Hasznos';
+$string['analytics:not_helpful'] = 'Nem hasznos';
+$string['analytics:flag_hallucination'] = 'Ez a válasz pontatlan információt tartalmaz';
+$string['analytics:submit_rating'] = 'Küldés';
+$string['analytics:thanks_feedback'] = 'Köszönjük a visszajelzését';

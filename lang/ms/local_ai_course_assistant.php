@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'URL Asas CDN';
 $string['settings:cdn_url_desc'] = 'URL asas tempat sola.min.js dan sola.min.css dihoskan. Contoh: https://your-org.github.io/sola-cdn. Biarkan kosong untuk menggunakan fail plugin tempatan.';
 $string['settings:cdn_version'] = 'Versi Aset CDN';
 $string['settings:cdn_version_desc'] = 'Rentetan versi yang ditambahkan pada URL CDN untuk cache busting. Kemas kini selepas setiap penerapan CDN (cth. 3.2.4 atau commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Penggunaan keseluruhan';
+$string['analytics:tab_bycourse'] = 'Mengikut kursus';
+$string['analytics:tab_comparison'] = 'AI vs bukan pengguna';
+$string['analytics:tab_byunit'] = 'Mengikut unit';
+$string['analytics:tab_usagetypes'] = 'Jenis penggunaan';
+$string['analytics:tab_themes'] = 'Tema';
+$string['analytics:tab_feedback'] = 'Maklum balas AI';
+$string['analytics:total_students'] = 'Jumlah pelajar';
+$string['analytics:active_users'] = 'Pengguna AI aktif';
+$string['analytics:msgs_per_student'] = 'Mesej per pelajar';
+$string['analytics:avg_session'] = 'Purata tempoh sesi';
+$string['analytics:return_rate'] = 'Kadar kembali';
+$string['analytics:total_sessions'] = 'Jumlah sesi';
+$string['analytics:thumbs_up'] = 'Suka';
+$string['analytics:thumbs_down'] = 'Tidak suka';
+$string['analytics:hallucination_flags'] = 'Tanda ketidaktepatan';
+$string['analytics:msgs_to_resolution'] = 'Mesej sehingga penyelesaian';
+$string['analytics:helpful'] = 'Membantu';
+$string['analytics:not_helpful'] = 'Tidak membantu';
+$string['analytics:flag_hallucination'] = 'Respons ini mengandungi maklumat yang tidak tepat';
+$string['analytics:submit_rating'] = 'Hantar';
+$string['analytics:thanks_feedback'] = 'Terima kasih atas maklum balas anda';

@@ -377,3 +377,27 @@ $string['settings:cdn_url'] = 'CDN बेस URL';
 $string['settings:cdn_url_desc'] = 'बेस URL जहाँ sola.min.js और sola.min.css होस्ट किए गए हैं। उदाहरण: https://your-org.github.io/sola-cdn। स्थानीय प्लगइन फाइलों का उपयोग करने के लिए खाली छोड़ें।';
 $string['settings:cdn_version'] = 'CDN संसाधन संस्करण';
 $string['settings:cdn_version_desc'] = 'Cache busting के लिए CDN URLs में जोड़ी जाने वाली संस्करण स्ट्रिंग। प्रत्येक CDN डिप्लॉय के बाद अपडेट करें (जैसे 3.2.4 या commit hash)।';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'समग्र उपयोग';
+$string['analytics:tab_bycourse'] = 'कोर्स अनुसार';
+$string['analytics:tab_comparison'] = 'AI बनाम गैर-उपयोगकर्ता';
+$string['analytics:tab_byunit'] = 'इकाई अनुसार';
+$string['analytics:tab_usagetypes'] = 'उपयोग के प्रकार';
+$string['analytics:tab_themes'] = 'विषय';
+$string['analytics:tab_feedback'] = 'AI प्रतिक्रिया';
+$string['analytics:total_students'] = 'कुल छात्र';
+$string['analytics:active_users'] = 'सक्रिय AI उपयोगकर्ता';
+$string['analytics:msgs_per_student'] = 'प्रति छात्र संदेश';
+$string['analytics:avg_session'] = 'औसत सत्र अवधि';
+$string['analytics:return_rate'] = 'वापसी दर';
+$string['analytics:total_sessions'] = 'कुल सत्र';
+$string['analytics:thumbs_up'] = 'पसंद';
+$string['analytics:thumbs_down'] = 'नापसंद';
+$string['analytics:hallucination_flags'] = 'गलत जानकारी के चिह्न';
+$string['analytics:msgs_to_resolution'] = 'समाधान तक संदेश';
+$string['analytics:helpful'] = 'सहायक';
+$string['analytics:not_helpful'] = 'सहायक नहीं';
+$string['analytics:flag_hallucination'] = 'इस उत्तर में गलत जानकारी है';
+$string['analytics:submit_rating'] = 'भेजें';
+$string['analytics:thanks_feedback'] = 'आपकी प्रतिक्रिया के लिए धन्यवाद';

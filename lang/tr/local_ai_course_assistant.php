@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'CDN Temel URL';
 $string['settings:cdn_url_desc'] = 'sola.min.js ve sola.min.css\'nin barındırıldığı temel URL. Örnek: https://your-org.github.io/sola-cdn. Yerel eklenti dosyalarını kullanmak için boş bırakın.';
 $string['settings:cdn_version'] = 'CDN Varlık Sürümü';
 $string['settings:cdn_version_desc'] = 'Cache busting için CDN URL\'lerine eklenen sürüm dizesi. Her CDN dağıtımından sonra güncelleyin (ör. 3.2.4 veya commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Genel kullanım';
+$string['analytics:tab_bycourse'] = 'Kursa göre';
+$string['analytics:tab_comparison'] = 'AI vs kullanmayanlar';
+$string['analytics:tab_byunit'] = 'Üniteye göre';
+$string['analytics:tab_usagetypes'] = 'Kullanım türleri';
+$string['analytics:tab_themes'] = 'Temalar';
+$string['analytics:tab_feedback'] = 'AI geri bildirimi';
+$string['analytics:total_students'] = 'Toplam öğrenci';
+$string['analytics:active_users'] = 'Aktif AI kullanıcıları';
+$string['analytics:msgs_per_student'] = 'Öğrenci başına mesaj';
+$string['analytics:avg_session'] = 'Ortalama oturum süresi';
+$string['analytics:return_rate'] = 'Geri dönüş oranı';
+$string['analytics:total_sessions'] = 'Toplam oturum';
+$string['analytics:thumbs_up'] = 'Beğen';
+$string['analytics:thumbs_down'] = 'Beğenme';
+$string['analytics:hallucination_flags'] = 'Yanlışlık işaretleri';
+$string['analytics:msgs_to_resolution'] = 'Çözüme kadar mesaj';
+$string['analytics:helpful'] = 'Faydalı';
+$string['analytics:not_helpful'] = 'Faydalı değil';
+$string['analytics:flag_hallucination'] = 'Bu yanıt yanlış bilgi içeriyor';
+$string['analytics:submit_rating'] = 'Gönder';
+$string['analytics:thanks_feedback'] = 'Geri bildiriminiz için teşekkürler';

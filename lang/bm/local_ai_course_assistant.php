@@ -376,3 +376,27 @@ $string['settings:cdn_url'] = 'CDN URL daminɛ';
 $string['settings:cdn_url_desc'] = 'URL daminɛ min na sola.min.js ni sola.min.css bɛ jɛnsɛn. Misali: https://your-org.github.io/sola-cdn. A to lankolon walasa ka plugin dosiyew kɛ.';
 $string['settings:cdn_version'] = 'CDN nafolo version';
 $string['settings:cdn_version_desc'] = 'Version sɛbɛn min bɛ fara CDN URL kan cache busting kama. A ladoni kɛ CDN deploy kelen-kelen kɔfɛ (misali 3.2.4 walima commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Bɛɛ lajɛli';
+$string['analytics:tab_bycourse'] = 'Kalan fɛ';
+$string['analytics:tab_comparison'] = 'AI ni tɛ baara la';
+$string['analytics:tab_byunit'] = 'Yɔrɔ fɛ';
+$string['analytics:tab_usagetypes'] = 'Baarakɛcogo suguya';
+$string['analytics:tab_themes'] = 'Kuncɛla';
+$string['analytics:tab_feedback'] = 'AI jaabi';
+$string['analytics:total_students'] = 'Kalandenw bɛɛ';
+$string['analytics:active_users'] = 'AI baarakɛlaw';
+$string['analytics:msgs_per_student'] = 'Ci kalanden kelen ma';
+$string['analytics:avg_session'] = 'Waati caman hakɛ';
+$string['analytics:return_rate'] = 'Seginni hakɛ';
+$string['analytics:total_sessions'] = 'Waati bɛɛ';
+$string['analytics:thumbs_up'] = 'Bolokunnafin sanfɛ';
+$string['analytics:thumbs_down'] = 'Bolokunnafin duguma';
+$string['analytics:hallucination_flags'] = 'Fɔcogo jugu taamasiɲɛ';
+$string['analytics:msgs_to_resolution'] = 'Ci fura sɔrɔli kama';
+$string['analytics:helpful'] = 'Dɛmɛ bɛ a la';
+$string['analytics:not_helpful'] = 'Dɛmɛ tɛ a la';
+$string['analytics:flag_hallucination'] = 'Jaabi in kɔnɔ kunnafoni tiɲɛnen bɛ yen';
+$string['analytics:submit_rating'] = 'A ci';
+$string['analytics:thanks_feedback'] = 'Aw ni ce aw ka jaabi la';

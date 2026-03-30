@@ -377,3 +377,27 @@ $string['settings:cdn_url'] = 'Tushen CDN URL';
 $string['settings:cdn_url_desc'] = 'Tushen URL inda aka shirya sola.min.js da sola.min.css. Misali: https://your-org.github.io/sola-cdn. Bar fanko don amfani da fayilolin plugin na gida.';
 $string['settings:cdn_version'] = 'Sigar kadarorin CDN';
 $string['settings:cdn_version_desc'] = 'Kalmar sigar da aka ƙara zuwa CDN URLs don cache busting. Sabunta bayan kowace CDN deploy (misali 3.2.4 ko commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Jimlar amfani';
+$string['analytics:tab_bycourse'] = 'Ta darasi';
+$string['analytics:tab_comparison'] = 'AI da waɗanda ba su yi amfani ba';
+$string['analytics:tab_byunit'] = 'Ta sashe';
+$string['analytics:tab_usagetypes'] = 'Nau\'ikan amfani';
+$string['analytics:tab_themes'] = 'Jigogi';
+$string['analytics:tab_feedback'] = 'Ra\'ayin AI';
+$string['analytics:total_students'] = 'Jimlar ɗalibai';
+$string['analytics:active_users'] = 'Masu amfani da AI';
+$string['analytics:msgs_per_student'] = 'Saƙonni ga kowane ɗalibi';
+$string['analytics:avg_session'] = 'Matsakaicin lokacin zama';
+$string['analytics:return_rate'] = 'Adadin dawowa';
+$string['analytics:total_sessions'] = 'Jimlar zama';
+$string['analytics:thumbs_up'] = 'Yabo';
+$string['analytics:thumbs_down'] = 'Rashin yabo';
+$string['analytics:hallucination_flags'] = 'Alamun kuskure';
+$string['analytics:msgs_to_resolution'] = 'Saƙonni zuwa warwarewa';
+$string['analytics:helpful'] = 'Mai taimako';
+$string['analytics:not_helpful'] = 'Ba mai taimako ba';
+$string['analytics:flag_hallucination'] = 'Wannan amsar tana ɗauke da bayanan da ba daidai ba';
+$string['analytics:submit_rating'] = 'Aika';
+$string['analytics:thanks_feedback'] = 'Na gode da ra\'ayinku';

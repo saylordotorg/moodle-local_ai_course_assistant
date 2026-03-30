@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'CDN URL bu njëkk';
 $string['settings:cdn_url_desc'] = 'URL bu njëkk fu sola.min.js ak sola.min.css di dëkkee. Misaal: https://your-org.github.io/sola-cdn. Bayyi ko neen ngir jëfandikoo plugin files yi ci biir.';
 $string['settings:cdn_version'] = 'Version njëlbéen CDN';
 $string['settings:cdn_version_desc'] = 'Baat bu version bii ñu dugg ci CDN URLs yi ngir cache busting. Yeesal ko gannaaw CDN deploy bu nekk (misaal 3.2.4 walla commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Jëfandikoo bu mat';
+$string['analytics:tab_bycourse'] = 'Bu kuur bi';
+$string['analytics:tab_comparison'] = 'AI ak ñi jëfandikuul';
+$string['analytics:tab_byunit'] = 'Bu xët bi';
+$string['analytics:tab_usagetypes'] = 'Yeneeni jëfandikoo';
+$string['analytics:tab_themes'] = 'Njëkk';
+$string['analytics:tab_feedback'] = 'Tekki AI';
+$string['analytics:total_students'] = 'Ñépp ndongo yi';
+$string['analytics:active_users'] = 'Ñi jëfandikoo AI';
+$string['analytics:msgs_per_student'] = 'Bataaxal bu ndongo bi';
+$string['analytics:avg_session'] = 'Diir bu njël bi';
+$string['analytics:return_rate'] = 'Tolluwaay delloo';
+$string['analytics:total_sessions'] = 'Ñépp njël yi';
+$string['analytics:thumbs_up'] = 'Baaraam bu kow';
+$string['analytics:thumbs_down'] = 'Baaraam bu suuf';
+$string['analytics:hallucination_flags'] = 'Xàmme njuumte';
+$string['analytics:msgs_to_resolution'] = 'Bataaxal ba faj';
+$string['analytics:helpful'] = 'Dimbali na';
+$string['analytics:not_helpful'] = 'Dimbaliwul';
+$string['analytics:flag_hallucination'] = 'Tontu bii am na xibaar yu baaxul';
+$string['analytics:submit_rating'] = 'Yónne';
+$string['analytics:thanks_feedback'] = 'Jërëjëf ci sa tekki';

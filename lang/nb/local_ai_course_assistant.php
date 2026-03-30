@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'CDN-basis-URL';
 $string['settings:cdn_url_desc'] = 'Basis-URL der sola.min.js og sola.min.css er vert. Eksempel: https://your-org.github.io/sola-cdn. La feltet stå tomt for å bruke lokale plugin-filer.';
 $string['settings:cdn_version'] = 'CDN-ressursversjon';
 $string['settings:cdn_version_desc'] = 'Versjonsstreng som legges til CDN-URLer for cache busting. Oppdater etter hver CDN-utrulling (f.eks. 3.2.4 eller et commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Samlet bruk';
+$string['analytics:tab_bycourse'] = 'Per kurs';
+$string['analytics:tab_comparison'] = 'AI vs ikke-brukere';
+$string['analytics:tab_byunit'] = 'Per enhet';
+$string['analytics:tab_usagetypes'] = 'Brukstyper';
+$string['analytics:tab_themes'] = 'Temaer';
+$string['analytics:tab_feedback'] = 'AI-tilbakemelding';
+$string['analytics:total_students'] = 'Totalt antall studenter';
+$string['analytics:active_users'] = 'Aktive AI-brukere';
+$string['analytics:msgs_per_student'] = 'Meldinger per student';
+$string['analytics:avg_session'] = 'Gjennomsnittlig øktvarighet';
+$string['analytics:return_rate'] = 'Returrate';
+$string['analytics:total_sessions'] = 'Totalt antall økter';
+$string['analytics:thumbs_up'] = 'Tommel opp';
+$string['analytics:thumbs_down'] = 'Tommel ned';
+$string['analytics:hallucination_flags'] = 'Markeringer for unøyaktighet';
+$string['analytics:msgs_to_resolution'] = 'Meldinger til løsning';
+$string['analytics:helpful'] = 'Nyttig';
+$string['analytics:not_helpful'] = 'Ikke nyttig';
+$string['analytics:flag_hallucination'] = 'Dette svaret inneholder unøyaktig informasjon';
+$string['analytics:submit_rating'] = 'Send inn';
+$string['analytics:thanks_feedback'] = 'Takk for tilbakemeldingen';

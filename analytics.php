@@ -433,6 +433,20 @@ $templatedata = [
         ['range' => $range]))->out(false),
 ];
 
+// Load Chart.js and analytics dashboard AMD module.
+$PAGE->requires->js(new moodle_url('/local/ai_course_assistant/cdn/chartjs/chart.umd.min.js'));
+$PAGE->requires->js_call_amd('local_ai_course_assistant/analytics_dashboard', 'init', [[
+    'courseid' => $courseid,
+    'since' => $since,
+]]);
+
+// Build course list for tabs filter dropdown.
+$tabscourses = [];
+foreach ($all_courses as $c) {
+    $tabscourses[] = ['id' => $c->id, 'shortname' => $c->shortname];
+}
+
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_ai_course_assistant/analytics_dashboard', $templatedata);
+echo $OUTPUT->render_from_template('local_ai_course_assistant/analytics_tabs', ['courses' => $tabscourses]);
 echo $OUTPUT->footer();

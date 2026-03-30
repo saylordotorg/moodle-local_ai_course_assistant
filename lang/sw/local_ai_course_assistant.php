@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'URL ya Msingi wa CDN';
 $string['settings:cdn_url_desc'] = 'URL ya msingi ambapo sola.min.js na sola.min.css zinahifadhiwa. Mfano: https://your-org.github.io/sola-cdn. Acha tupu kutumia faili za programu-jalizi za ndani.';
 $string['settings:cdn_version'] = 'Toleo la Mali za CDN';
 $string['settings:cdn_version_desc'] = 'Mfuatano wa toleo unaoongezwa kwa CDN URLs kwa cache busting. Sasisha baada ya kila CDN deploy (mfano 3.2.4 au commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Matumizi yote';
+$string['analytics:tab_bycourse'] = 'Kwa kozi';
+$string['analytics:tab_comparison'] = 'AI dhidi ya wasiotumia';
+$string['analytics:tab_byunit'] = 'Kwa sehemu';
+$string['analytics:tab_usagetypes'] = 'Aina za matumizi';
+$string['analytics:tab_themes'] = 'Mada';
+$string['analytics:tab_feedback'] = 'Maoni ya AI';
+$string['analytics:total_students'] = 'Jumla ya wanafunzi';
+$string['analytics:active_users'] = 'Watumiaji hai wa AI';
+$string['analytics:msgs_per_student'] = 'Ujumbe kwa mwanafunzi';
+$string['analytics:avg_session'] = 'Muda wa wastani wa kipindi';
+$string['analytics:return_rate'] = 'Kiwango cha kurudi';
+$string['analytics:total_sessions'] = 'Jumla ya vipindi';
+$string['analytics:thumbs_up'] = 'Kidole gumba juu';
+$string['analytics:thumbs_down'] = 'Kidole gumba chini';
+$string['analytics:hallucination_flags'] = 'Alama za makosa';
+$string['analytics:msgs_to_resolution'] = 'Ujumbe hadi suluhisho';
+$string['analytics:helpful'] = 'Yenye msaada';
+$string['analytics:not_helpful'] = 'Haina msaada';
+$string['analytics:flag_hallucination'] = 'Jibu hili lina taarifa zisizo sahihi';
+$string['analytics:submit_rating'] = 'Tuma';
+$string['analytics:thanks_feedback'] = 'Asante kwa maoni yako';

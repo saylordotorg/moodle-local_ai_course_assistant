@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'CDN URL Ipilẹ';
 $string['settings:cdn_url_desc'] = 'URL ipilẹ nibiti sola.min.js ati sola.min.css ti wa. Apẹẹrẹ: https://your-org.github.io/sola-cdn. Fi silẹ ni ofo lati lo awọn faili plugin ti agbegbe.';
 $string['settings:cdn_version'] = 'Ẹya Ohun-ini CDN';
 $string['settings:cdn_version_desc'] = 'Okun ẹya ti a fi kun si awọn CDN URLs fun cache busting. Ṣe imudojuiwọn lẹhin CDN deploy kọọkan (apẹẹrẹ 3.2.4 tabi commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Lilo gbogbogbo';
+$string['analytics:tab_bycourse'] = 'Gẹgẹ bi ẹkọ';
+$string['analytics:tab_comparison'] = 'AI pẹlu awọn ti ko lo';
+$string['analytics:tab_byunit'] = 'Gẹgẹ bi apakan';
+$string['analytics:tab_usagetypes'] = 'Awọn iru lilo';
+$string['analytics:tab_themes'] = 'Awọn akọle';
+$string['analytics:tab_feedback'] = 'Esi AI';
+$string['analytics:total_students'] = 'Apapọ awọn akẹkọ';
+$string['analytics:active_users'] = 'Awọn olumulo AI ti nṣiṣẹ';
+$string['analytics:msgs_per_student'] = 'Awọn ifiranṣẹ fun akẹkọ kọọkan';
+$string['analytics:avg_session'] = 'Aropin igba akoko';
+$string['analytics:return_rate'] = 'Oṣuwọn ipadabọ';
+$string['analytics:total_sessions'] = 'Apapọ awọn igba';
+$string['analytics:thumbs_up'] = 'Atanpako soke';
+$string['analytics:thumbs_down'] = 'Atanpako sile';
+$string['analytics:hallucination_flags'] = 'Awọn ami aṣiṣe';
+$string['analytics:msgs_to_resolution'] = 'Awọn ifiranṣẹ si ipinnu';
+$string['analytics:helpful'] = 'Iranlọwọ';
+$string['analytics:not_helpful'] = 'Ko ṣe iranlọwọ';
+$string['analytics:flag_hallucination'] = 'Idahun yii ni alaye ti ko tọ';
+$string['analytics:submit_rating'] = 'Firanṣẹ';
+$string['analytics:thanks_feedback'] = 'O ṣeun fun esi rẹ';

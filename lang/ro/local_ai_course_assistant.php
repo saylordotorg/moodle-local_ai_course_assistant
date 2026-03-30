@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'URL de bază CDN';
 $string['settings:cdn_url_desc'] = 'URL-ul de bază unde sunt găzduite sola.min.js și sola.min.css. Exemplu: https://your-org.github.io/sola-cdn. Lăsați gol pentru a utiliza fișierele locale ale pluginului.';
 $string['settings:cdn_version'] = 'Versiunea resurselor CDN';
 $string['settings:cdn_version_desc'] = 'Șir de versiune adăugat la URL-urile CDN pentru cache busting. Actualizați după fiecare implementare CDN (ex. 3.2.4 sau un commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Utilizare totală';
+$string['analytics:tab_bycourse'] = 'Pe curs';
+$string['analytics:tab_comparison'] = 'AI vs neutilizatori';
+$string['analytics:tab_byunit'] = 'Pe unitate';
+$string['analytics:tab_usagetypes'] = 'Tipuri de utilizare';
+$string['analytics:tab_themes'] = 'Teme';
+$string['analytics:tab_feedback'] = 'Feedback AI';
+$string['analytics:total_students'] = 'Total studenți';
+$string['analytics:active_users'] = 'Utilizatori AI activi';
+$string['analytics:msgs_per_student'] = 'Mesaje per student';
+$string['analytics:avg_session'] = 'Durata medie a sesiunii';
+$string['analytics:return_rate'] = 'Rata de revenire';
+$string['analytics:total_sessions'] = 'Total sesiuni';
+$string['analytics:thumbs_up'] = 'Apreciere';
+$string['analytics:thumbs_down'] = 'Dezaprobare';
+$string['analytics:hallucination_flags'] = 'Marcaje de inexactitate';
+$string['analytics:msgs_to_resolution'] = 'Mesaje până la rezolvare';
+$string['analytics:helpful'] = 'Util';
+$string['analytics:not_helpful'] = 'Nu este util';
+$string['analytics:flag_hallucination'] = 'Acest răspuns conține informații inexacte';
+$string['analytics:submit_rating'] = 'Trimite';
+$string['analytics:thanks_feedback'] = 'Mulțumim pentru feedback';

@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'CDN 기본 URL';
 $string['settings:cdn_url_desc'] = 'sola.min.js와 sola.min.css가 호스팅되는 기본 URL. 예: https://your-org.github.io/sola-cdn. 로컬 플러그인 파일을 사용하려면 비워 두세요.';
 $string['settings:cdn_version'] = 'CDN 자산 버전';
 $string['settings:cdn_version_desc'] = 'cache busting을 위해 CDN URL에 추가되는 버전 문자열. 각 CDN 배포 후 업데이트하세요 (예: 3.2.4 또는 commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = '전체 사용량';
+$string['analytics:tab_bycourse'] = '코스별';
+$string['analytics:tab_comparison'] = 'AI 사용자 vs 비사용자';
+$string['analytics:tab_byunit'] = '단원별';
+$string['analytics:tab_usagetypes'] = '사용 유형';
+$string['analytics:tab_themes'] = '테마';
+$string['analytics:tab_feedback'] = 'AI 피드백';
+$string['analytics:total_students'] = '전체 학생 수';
+$string['analytics:active_users'] = '활성 AI 사용자';
+$string['analytics:msgs_per_student'] = '학생당 메시지';
+$string['analytics:avg_session'] = '평균 세션 시간';
+$string['analytics:return_rate'] = '재방문율';
+$string['analytics:total_sessions'] = '전체 세션';
+$string['analytics:thumbs_up'] = '좋아요';
+$string['analytics:thumbs_down'] = '싫어요';
+$string['analytics:hallucination_flags'] = '부정확한 정보 표시';
+$string['analytics:msgs_to_resolution'] = '해결까지 메시지 수';
+$string['analytics:helpful'] = '도움됨';
+$string['analytics:not_helpful'] = '도움 안됨';
+$string['analytics:flag_hallucination'] = '이 응답에는 부정확한 정보가 포함되어 있습니다';
+$string['analytics:submit_rating'] = '제출';
+$string['analytics:thanks_feedback'] = '피드백 감사합니다';

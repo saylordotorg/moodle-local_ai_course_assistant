@@ -2125,6 +2125,7 @@ define([
             courseid: courseId,
             message: prompt,
             sesskey: sessKey,
+            interaction_type: type === 'pronunciation' ? 'practice_pronunciation' : 'practice_conversation',
         };
         // Add provider/model.
         var llm = getResolvedLlmSelection(rootEl);
@@ -4199,6 +4200,18 @@ define([
         if (completionPct > 0) {
             postData.completion = completionPct;
         }
+        // Interaction type for analytics tracking.
+        if (quizModeActive) {
+            postData.interaction_type = 'quiz';
+        } else if (practiceSessionType === 'conversation') {
+            postData.interaction_type = 'practice_conversation';
+        } else if (practiceSessionType === 'pronunciation') {
+            postData.interaction_type = 'practice_pronunciation';
+        } else if (typeof activeBottomMode !== 'undefined' && activeBottomMode === 'voice') {
+            postData.interaction_type = 'voice';
+        } else {
+            postData.interaction_type = 'chat';
+        }
         var llmSelection = getResolvedLlmSelection(rootEl);
         if (llmSelection.enabled && llmSelection.provider && llmSelection.model) {
             postData.provider = llmSelection.provider;
@@ -4262,11 +4275,18 @@ define([
                 displayText = displayText.replace(/\n*\[SOLA_SCORE\][^\[]*$/, '');
                 UI.updateStreamContent(displayText);
             },
-            onDone: function() {
+            onDone: function(doneData) {
                 UI.showTyping(false);
                 if (fullText) {
                     const parsed = parseAssistantDecorators(fullText);
                     UI.finishStreaming(parsed.text, (getTtsUrl() || Speech.isTTSSupported()) ? handleSpeak : null);
+                    // Set message ID on the element for thumbs up/down rating.
+                    if (doneData && doneData.messageid) {
+                        var msgEl = getLastAssistantMessageEl();
+                        if (msgEl) {
+                            msgEl.dataset.messageid = doneData.messageid;
+                        }
+                    }
                     // Append clickable source pill using SSE metadata (page/course URLs + modules map).
                     if (parsed.sourceType) {
                         var lastMsgEl = getLastAssistantMessageEl();

@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'CDN-basis-URL';
 $string['settings:cdn_url_desc'] = 'Basis-URL waar sola.min.js en sola.min.css worden gehost. Voorbeeld: https://your-org.github.io/sola-cdn. Laat leeg om de lokale pluginbestanden te gebruiken.';
 $string['settings:cdn_version'] = 'CDN-assetversie';
 $string['settings:cdn_version_desc'] = 'Versiereeks die wordt toegevoegd aan CDN-URLs voor cache busting. Werk bij na elke CDN-deploy (bijv. 3.2.4 of een commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Totaal gebruik';
+$string['analytics:tab_bycourse'] = 'Per cursus';
+$string['analytics:tab_comparison'] = 'AI vs niet-gebruikers';
+$string['analytics:tab_byunit'] = 'Per eenheid';
+$string['analytics:tab_usagetypes'] = 'Gebruikstypen';
+$string['analytics:tab_themes'] = 'Thema\'s';
+$string['analytics:tab_feedback'] = 'AI-feedback';
+$string['analytics:total_students'] = 'Totaal studenten';
+$string['analytics:active_users'] = 'Actieve AI-gebruikers';
+$string['analytics:msgs_per_student'] = 'Berichten per student';
+$string['analytics:avg_session'] = 'Gemiddelde sessieduur';
+$string['analytics:return_rate'] = 'Terugkeerpercentage';
+$string['analytics:total_sessions'] = 'Totaal sessies';
+$string['analytics:thumbs_up'] = 'Duim omhoog';
+$string['analytics:thumbs_down'] = 'Duim omlaag';
+$string['analytics:hallucination_flags'] = 'Onnauwkeurigheidsmarkeringen';
+$string['analytics:msgs_to_resolution'] = 'Berichten tot oplossing';
+$string['analytics:helpful'] = 'Nuttig';
+$string['analytics:not_helpful'] = 'Niet nuttig';
+$string['analytics:flag_hallucination'] = 'Dit antwoord bevat onnauwkeurige informatie';
+$string['analytics:submit_rating'] = 'Verzenden';
+$string['analytics:thanks_feedback'] = 'Bedankt voor uw feedback';

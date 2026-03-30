@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'CDN:n perus-URL';
 $string['settings:cdn_url_desc'] = 'Perus-URL, jossa sola.min.js ja sola.min.css isännöidään. Esimerkki: https://your-org.github.io/sola-cdn. Jätä tyhjäksi käyttääksesi paikallisia lisäosatiedostoja.';
 $string['settings:cdn_version'] = 'CDN-resurssien versio';
 $string['settings:cdn_version_desc'] = 'CDN-URLeihin liitettävä versiomerkkijono välimuistin tyhjennystä varten (cache busting). Päivitä jokaisen CDN-julkaisun jälkeen (esim. 3.2.4 tai commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Kokonaiskäyttö';
+$string['analytics:tab_bycourse'] = 'Kursseittain';
+$string['analytics:tab_comparison'] = 'AI vs ei-käyttäjät';
+$string['analytics:tab_byunit'] = 'Yksiköittäin';
+$string['analytics:tab_usagetypes'] = 'Käyttötyypit';
+$string['analytics:tab_themes'] = 'Teemat';
+$string['analytics:tab_feedback'] = 'AI-palaute';
+$string['analytics:total_students'] = 'Opiskelijoita yhteensä';
+$string['analytics:active_users'] = 'Aktiiviset AI-käyttäjät';
+$string['analytics:msgs_per_student'] = 'Viestejä per opiskelija';
+$string['analytics:avg_session'] = 'Keskimääräinen istunnon kesto';
+$string['analytics:return_rate'] = 'Palautusaste';
+$string['analytics:total_sessions'] = 'Istuntoja yhteensä';
+$string['analytics:thumbs_up'] = 'Peukku ylös';
+$string['analytics:thumbs_down'] = 'Peukku alas';
+$string['analytics:hallucination_flags'] = 'Epätarkkuusmerkinnät';
+$string['analytics:msgs_to_resolution'] = 'Viestejä ratkaisuun';
+$string['analytics:helpful'] = 'Hyödyllinen';
+$string['analytics:not_helpful'] = 'Ei hyödyllinen';
+$string['analytics:flag_hallucination'] = 'Tämä vastaus sisältää epätarkkaa tietoa';
+$string['analytics:submit_rating'] = 'Lähetä';
+$string['analytics:thanks_feedback'] = 'Kiitos palautteestasi';

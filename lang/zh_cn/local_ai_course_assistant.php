@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'CDN 基础 URL';
 $string['settings:cdn_url_desc'] = '托管 sola.min.js 和 sola.min.css 的基础 URL。示例：https://your-org.github.io/sola-cdn。留空以使用本地插件文件。';
 $string['settings:cdn_version'] = 'CDN 资源版本';
 $string['settings:cdn_version_desc'] = '附加到 CDN URL 的版本字符串，用于 cache busting。每次 CDN 部署后更新（例如 3.2.4 或 commit hash）。';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = '总体使用情况';
+$string['analytics:tab_bycourse'] = '按课程';
+$string['analytics:tab_comparison'] = 'AI用户与非用户';
+$string['analytics:tab_byunit'] = '按单元';
+$string['analytics:tab_usagetypes'] = '使用类型';
+$string['analytics:tab_themes'] = '主题';
+$string['analytics:tab_feedback'] = 'AI反馈';
+$string['analytics:total_students'] = '学生总数';
+$string['analytics:active_users'] = '活跃AI用户';
+$string['analytics:msgs_per_student'] = '每位学生的消息数';
+$string['analytics:avg_session'] = '平均会话时长';
+$string['analytics:return_rate'] = '回访率';
+$string['analytics:total_sessions'] = '总会话数';
+$string['analytics:thumbs_up'] = '点赞';
+$string['analytics:thumbs_down'] = '踩';
+$string['analytics:hallucination_flags'] = '不准确信息标记';
+$string['analytics:msgs_to_resolution'] = '解决问题所需消息数';
+$string['analytics:helpful'] = '有帮助';
+$string['analytics:not_helpful'] = '没有帮助';
+$string['analytics:flag_hallucination'] = '此回答包含不准确的信息';
+$string['analytics:submit_rating'] = '提交';
+$string['analytics:thanks_feedback'] = '感谢您的反馈';

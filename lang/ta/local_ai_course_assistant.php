@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'CDN அடிப்படை URL';
 $string['settings:cdn_url_desc'] = 'sola.min.js மற்றும் sola.min.css ஹோஸ்ட் செய்யப்படும் அடிப்படை URL. எடுத்துக்காட்டு: https://your-org.github.io/sola-cdn. உள்ளூர் செருகுநிரல் கோப்புகளைப் பயன்படுத்த காலியாக விடவும்.';
 $string['settings:cdn_version'] = 'CDN சொத்து பதிப்பு';
 $string['settings:cdn_version_desc'] = 'Cache busting க்கான CDN URLs இல் சேர்க்கப்படும் பதிப்பு சரம். ஒவ்வொரு CDN deploy க்குப் பிறகும் புதுப்பிக்கவும் (எ.கா. 3.2.4 அல்லது commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'ஒட்டுமொத்த பயன்பாடு';
+$string['analytics:tab_bycourse'] = 'பாடத்தின்படி';
+$string['analytics:tab_comparison'] = 'AI எதிர் பயனர் அல்லாதவர்';
+$string['analytics:tab_byunit'] = 'அலகின்படி';
+$string['analytics:tab_usagetypes'] = 'பயன்பாட்டு வகைகள்';
+$string['analytics:tab_themes'] = 'கருப்பொருள்கள்';
+$string['analytics:tab_feedback'] = 'AI கருத்து';
+$string['analytics:total_students'] = 'மொத்த மாணவர்கள்';
+$string['analytics:active_users'] = 'செயலில் உள்ள AI பயனர்கள்';
+$string['analytics:msgs_per_student'] = 'மாணவர் ஒருவருக்கான செய்திகள்';
+$string['analytics:avg_session'] = 'சராசரி அமர்வு நேரம்';
+$string['analytics:return_rate'] = 'திரும்புதல் விகிதம்';
+$string['analytics:total_sessions'] = 'மொத்த அமர்வுகள்';
+$string['analytics:thumbs_up'] = 'நல்லது';
+$string['analytics:thumbs_down'] = 'நல்லதல்ல';
+$string['analytics:hallucination_flags'] = 'தவறான தகவல் குறிகள்';
+$string['analytics:msgs_to_resolution'] = 'தீர்வு வரை செய்திகள்';
+$string['analytics:helpful'] = 'பயனுள்ளது';
+$string['analytics:not_helpful'] = 'பயனற்றது';
+$string['analytics:flag_hallucination'] = 'இந்த பதிலில் தவறான தகவல் உள்ளது';
+$string['analytics:submit_rating'] = 'சமர்ப்பிக்கவும்';
+$string['analytics:thanks_feedback'] = 'உங்கள் கருத்துக்கு நன்றி';

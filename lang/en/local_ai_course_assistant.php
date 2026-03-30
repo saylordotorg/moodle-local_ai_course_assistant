@@ -316,6 +316,30 @@ $string['settings:cdn_url_desc'] = 'Base URL where sola.min.js and sola.min.css 
 $string['settings:cdn_version'] = 'CDN Asset Version';
 $string['settings:cdn_version_desc'] = 'Version string appended to CDN URLs for cache busting. Update this after each CDN deploy (e.g. 3.2.4 or a commit hash).';
 
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Overall Usage';
+$string['analytics:tab_bycourse'] = 'By Course';
+$string['analytics:tab_comparison'] = 'AI vs Non-Users';
+$string['analytics:tab_byunit'] = 'By Unit';
+$string['analytics:tab_usagetypes'] = 'Usage Types';
+$string['analytics:tab_themes'] = 'Themes';
+$string['analytics:tab_feedback'] = 'AI Feedback';
+$string['analytics:total_students'] = 'Total Students';
+$string['analytics:active_users'] = 'Active AI Users';
+$string['analytics:msgs_per_student'] = 'Messages per Student';
+$string['analytics:avg_session'] = 'Average Session Duration';
+$string['analytics:return_rate'] = 'Return Rate';
+$string['analytics:total_sessions'] = 'Total Sessions';
+$string['analytics:thumbs_up'] = 'Thumbs Up';
+$string['analytics:thumbs_down'] = 'Thumbs Down';
+$string['analytics:hallucination_flags'] = 'Hallucination Flags';
+$string['analytics:msgs_to_resolution'] = 'Messages to Resolution';
+$string['analytics:helpful'] = 'Helpful';
+$string['analytics:not_helpful'] = 'Not helpful';
+$string['analytics:flag_hallucination'] = 'This response contains inaccurate information';
+$string['analytics:submit_rating'] = 'Submit';
+$string['analytics:thanks_feedback'] = 'Thanks for your feedback';
+
 // Practice Scoring.
 $string['rubric:score_title_conversation'] = 'Conversation Practice Score';
 $string['rubric:score_title_pronunciation'] = 'Pronunciation Practice Score';

@@ -363,3 +363,27 @@ $string['settings:cdn_url'] = 'URL Ntọala CDN';
 $string['settings:cdn_url_desc'] = 'URL ntọala ebe a na-akwado sola.min.js na sola.min.css. Ọmụmaatụ: https://your-org.github.io/sola-cdn. Hapụ ya ka ọ tọgbọrọ n\'efu iji jiri faịlụ plugin mpaghara.';
 $string['settings:cdn_version'] = 'Ụdị akụkụ CDN';
 $string['settings:cdn_version_desc'] = 'Eriri ụdị agbakwunyere na CDN URLs maka cache busting. Melite ya mgbe ọ bụla emechara CDN deploy (dịka 3.2.4 ma ọ bụ commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Ojiri niile';
+$string['analytics:tab_bycourse'] = 'Site kọọsu';
+$string['analytics:tab_comparison'] = 'AI na ndị anaghị eji ya';
+$string['analytics:tab_byunit'] = 'Site nkeji';
+$string['analytics:tab_usagetypes'] = 'Ụdị ojiri';
+$string['analytics:tab_themes'] = 'Isiokwu';
+$string['analytics:tab_feedback'] = 'Nzaghachi AI';
+$string['analytics:total_students'] = 'Ndi nkuzi niile';
+$string['analytics:active_users'] = 'Ndị na-eji AI eme ihe';
+$string['analytics:msgs_per_student'] = 'Ozi kwa onye nkuzi';
+$string['analytics:avg_session'] = 'Oge nnọkọ nkezi';
+$string['analytics:return_rate'] = 'Ọnụego nlọghachi';
+$string['analytics:total_sessions'] = 'Nnọkọ niile';
+$string['analytics:thumbs_up'] = 'Mkpịsị aka elu';
+$string['analytics:thumbs_down'] = 'Mkpịsị aka ala';
+$string['analytics:hallucination_flags'] = 'Akara nghọ';
+$string['analytics:msgs_to_resolution'] = 'Ozi ruo mgbazi';
+$string['analytics:helpful'] = 'Na-enyere aka';
+$string['analytics:not_helpful'] = 'Anaghị enyere aka';
+$string['analytics:flag_hallucination'] = 'Azịza a nwere ozi na-ezighi ezi';
+$string['analytics:submit_rating'] = 'Ziga';
+$string['analytics:thanks_feedback'] = 'Daalụ maka nzaghachi gị';

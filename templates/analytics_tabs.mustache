@@ -1,0 +1,46 @@
+{{!
+    Analytics dashboard tabs — 7 tabbed sections with Chart.js visualizations.
+    Data is loaded via AJAX when each tab is activated.
+}}
+<div class="sola-analytics-dashboard mt-4">
+    <div class="sola-analytics-filters d-flex align-items-center gap-3 mb-3 flex-wrap">
+        <div>
+            <label for="sola-analytics-range" class="form-label mb-0 small text-muted">Time Range</label>
+            <select id="sola-analytics-range" class="form-select form-select-sm" style="width:auto;">
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="0">All time</option>
+            </select>
+        </div>
+        <div>
+            <label for="sola-analytics-course" class="form-label mb-0 small text-muted">Course</label>
+            <select id="sola-analytics-course" class="form-select form-select-sm" style="width:auto;">
+                <option value="0">All courses</option>
+                {{#courses}}
+                <option value="{{id}}">{{shortname}}</option>
+                {{/courses}}
+            </select>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs sola-analytics-tabs mb-0">
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab active" data-tab="overall">Overall Usage</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="bycourse">By Course</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="comparison">AI vs Non-Users</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="byunit">By Unit</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="usagetypes">Usage Types</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="themes">Themes</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="feedback">AI Feedback</a></li>
+    </ul>
+
+    <div class="sola-analytics-panes border border-top-0 rounded-bottom p-4 bg-white">
+        <div id="sola-pane-overall" class="sola-analytics-pane"><div class="sola-analytics-content"></div></div>
+        <div id="sola-pane-bycourse" class="sola-analytics-pane" style="display:none;"><div class="sola-analytics-content"></div></div>
+        <div id="sola-pane-comparison" class="sola-analytics-pane" style="display:none;"><div class="sola-analytics-content"></div></div>
+        <div id="sola-pane-byunit" class="sola-analytics-pane" style="display:none;"><div class="sola-analytics-content"></div></div>
+        <div id="sola-pane-usagetypes" class="sola-analytics-pane" style="display:none;"><div class="sola-analytics-content"></div></div>
+        <div id="sola-pane-themes" class="sola-analytics-pane" style="display:none;"><div class="sola-analytics-content"></div></div>
+        <div id="sola-pane-feedback" class="sola-analytics-pane" style="display:none;"><div class="sola-analytics-content"></div></div>
+    </div>
+</div>

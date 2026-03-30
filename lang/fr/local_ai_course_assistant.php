@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'URL de base CDN';
 $string['settings:cdn_url_desc'] = 'URL de base où sont hébergés sola.min.js et sola.min.css. Exemple : https://your-org.github.io/sola-cdn. Laissez vide pour utiliser les fichiers locaux du plugin.';
 $string['settings:cdn_version'] = 'Version des ressources CDN';
 $string['settings:cdn_version_desc'] = 'Chaîne de version ajoutée aux URLs CDN pour le cache busting. Mettez à jour après chaque déploiement CDN (ex. 3.2.4 ou un commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Utilisation globale';
+$string['analytics:tab_bycourse'] = 'Par cours';
+$string['analytics:tab_comparison'] = 'AI vs non-utilisateurs';
+$string['analytics:tab_byunit'] = 'Par unité';
+$string['analytics:tab_usagetypes'] = 'Types d\'utilisation';
+$string['analytics:tab_themes'] = 'Thèmes';
+$string['analytics:tab_feedback'] = 'Retours AI';
+$string['analytics:total_students'] = 'Total étudiants';
+$string['analytics:active_users'] = 'Utilisateurs AI actifs';
+$string['analytics:msgs_per_student'] = 'Messages par étudiant';
+$string['analytics:avg_session'] = 'Durée moyenne de session';
+$string['analytics:return_rate'] = 'Taux de retour';
+$string['analytics:total_sessions'] = 'Total des sessions';
+$string['analytics:thumbs_up'] = 'Pouce en haut';
+$string['analytics:thumbs_down'] = 'Pouce en bas';
+$string['analytics:hallucination_flags'] = 'Signalements d\'inexactitude';
+$string['analytics:msgs_to_resolution'] = 'Messages jusqu\'à résolution';
+$string['analytics:helpful'] = 'Utile';
+$string['analytics:not_helpful'] = 'Pas utile';
+$string['analytics:flag_hallucination'] = 'Cette réponse contient des informations inexactes';
+$string['analytics:submit_rating'] = 'Envoyer';
+$string['analytics:thanks_feedback'] = 'Merci pour votre retour';

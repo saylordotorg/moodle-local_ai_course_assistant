@@ -346,3 +346,27 @@ $string['settings:cdn_url'] = 'Základná CDN URL';
 $string['settings:cdn_url_desc'] = 'Základná URL, kde sú hostované sola.min.js a sola.min.css. Príklad: https://your-org.github.io/sola-cdn. Ponechajte prázdne na použitie lokálnych súborov pluginu.';
 $string['settings:cdn_version'] = 'Verzia CDN súborov';
 $string['settings:cdn_version_desc'] = 'Reťazec verzie pridávaný k CDN URL pre cache busting. Aktualizujte po každom CDN nasadení (napr. 3.2.4 alebo commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Celkové využitie';
+$string['analytics:tab_bycourse'] = 'Podľa kurzu';
+$string['analytics:tab_comparison'] = 'AI vs nepoužívatelia';
+$string['analytics:tab_byunit'] = 'Podľa jednotky';
+$string['analytics:tab_usagetypes'] = 'Typy využitia';
+$string['analytics:tab_themes'] = 'Témy';
+$string['analytics:tab_feedback'] = 'Spätná väzba AI';
+$string['analytics:total_students'] = 'Celkom študentov';
+$string['analytics:active_users'] = 'Aktívni používatelia AI';
+$string['analytics:msgs_per_student'] = 'Správ na študenta';
+$string['analytics:avg_session'] = 'Priemerná dĺžka relácie';
+$string['analytics:return_rate'] = 'Miera návratu';
+$string['analytics:total_sessions'] = 'Celkom relácií';
+$string['analytics:thumbs_up'] = 'Palec hore';
+$string['analytics:thumbs_down'] = 'Palec dole';
+$string['analytics:hallucination_flags'] = 'Označenia nepresností';
+$string['analytics:msgs_to_resolution'] = 'Správ do vyriešenia';
+$string['analytics:helpful'] = 'Užitočné';
+$string['analytics:not_helpful'] = 'Neužitočné';
+$string['analytics:flag_hallucination'] = 'Táto odpoveď obsahuje nepresné informácie';
+$string['analytics:submit_rating'] = 'Odoslať';
+$string['analytics:thanks_feedback'] = 'Ďakujeme za spätnú väzbu';

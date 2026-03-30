@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'URL cơ sở CDN';
 $string['settings:cdn_url_desc'] = 'URL cơ sở nơi sola.min.js và sola.min.css được lưu trữ. Ví dụ: https://your-org.github.io/sola-cdn. Để trống để sử dụng tệp plugin cục bộ.';
 $string['settings:cdn_version'] = 'Phiên bản tài nguyên CDN';
 $string['settings:cdn_version_desc'] = 'Chuỗi phiên bản được thêm vào URL CDN cho cache busting. Cập nhật sau mỗi lần triển khai CDN (ví dụ: 3.2.4 hoặc commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Sử dụng tổng thể';
+$string['analytics:tab_bycourse'] = 'Theo khóa học';
+$string['analytics:tab_comparison'] = 'AI so với người không dùng';
+$string['analytics:tab_byunit'] = 'Theo đơn vị';
+$string['analytics:tab_usagetypes'] = 'Loại sử dụng';
+$string['analytics:tab_themes'] = 'Chủ đề';
+$string['analytics:tab_feedback'] = 'Phản hồi AI';
+$string['analytics:total_students'] = 'Tổng số sinh viên';
+$string['analytics:active_users'] = 'Người dùng AI hoạt động';
+$string['analytics:msgs_per_student'] = 'Tin nhắn mỗi sinh viên';
+$string['analytics:avg_session'] = 'Thời lượng phiên trung bình';
+$string['analytics:return_rate'] = 'Tỷ lệ quay lại';
+$string['analytics:total_sessions'] = 'Tổng số phiên';
+$string['analytics:thumbs_up'] = 'Thích';
+$string['analytics:thumbs_down'] = 'Không thích';
+$string['analytics:hallucination_flags'] = 'Đánh dấu thông tin sai';
+$string['analytics:msgs_to_resolution'] = 'Tin nhắn đến khi giải quyết';
+$string['analytics:helpful'] = 'Hữu ích';
+$string['analytics:not_helpful'] = 'Không hữu ích';
+$string['analytics:flag_hallucination'] = 'Câu trả lời này chứa thông tin không chính xác';
+$string['analytics:submit_rating'] = 'Gửi';
+$string['analytics:thanks_feedback'] = 'Cảm ơn phản hồi của bạn';

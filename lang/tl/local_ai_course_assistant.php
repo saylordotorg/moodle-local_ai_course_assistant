@@ -369,3 +369,27 @@ $string['settings:cdn_url'] = 'CDN Base URL';
 $string['settings:cdn_url_desc'] = 'Base URL kung saan naka-host ang sola.min.js at sola.min.css. Halimbawa: https://your-org.github.io/sola-cdn. Iwanang walang laman upang gamitin ang mga lokal na plugin file.';
 $string['settings:cdn_version'] = 'CDN Asset Version';
 $string['settings:cdn_version_desc'] = 'Version string na idinadagdag sa CDN URLs para sa cache busting. I-update pagkatapos ng bawat CDN deploy (hal. 3.2.4 o commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Kabuuang paggamit';
+$string['analytics:tab_bycourse'] = 'Ayon sa kurso';
+$string['analytics:tab_comparison'] = 'AI vs hindi gumagamit';
+$string['analytics:tab_byunit'] = 'Ayon sa yunit';
+$string['analytics:tab_usagetypes'] = 'Mga uri ng paggamit';
+$string['analytics:tab_themes'] = 'Mga tema';
+$string['analytics:tab_feedback'] = 'Feedback sa AI';
+$string['analytics:total_students'] = 'Kabuuang mga mag-aaral';
+$string['analytics:active_users'] = 'Aktibong gumagamit ng AI';
+$string['analytics:msgs_per_student'] = 'Mga mensahe bawat mag-aaral';
+$string['analytics:avg_session'] = 'Average na tagal ng sesyon';
+$string['analytics:return_rate'] = 'Rate ng pagbabalik';
+$string['analytics:total_sessions'] = 'Kabuuang mga sesyon';
+$string['analytics:thumbs_up'] = 'Thumbs up';
+$string['analytics:thumbs_down'] = 'Thumbs down';
+$string['analytics:hallucination_flags'] = 'Mga marka ng kamalian';
+$string['analytics:msgs_to_resolution'] = 'Mga mensahe hanggang malutas';
+$string['analytics:helpful'] = 'Nakatutulong';
+$string['analytics:not_helpful'] = 'Hindi nakatutulong';
+$string['analytics:flag_hallucination'] = 'Ang sagot na ito ay may maling impormasyon';
+$string['analytics:submit_rating'] = 'Isumite';
+$string['analytics:thanks_feedback'] = 'Salamat sa iyong feedback';

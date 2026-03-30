@@ -310,3 +310,27 @@ $string['settings:cdn_url'] = 'Βασικό CDN URL';
 $string['settings:cdn_url_desc'] = 'Βασικό URL όπου φιλοξενούνται τα sola.min.js και sola.min.css. Παράδειγμα: https://your-org.github.io/sola-cdn. Αφήστε κενό για χρήση τοπικών αρχείων πρόσθετου.';
 $string['settings:cdn_version'] = 'Έκδοση CDN στοιχείων';
 $string['settings:cdn_version_desc'] = 'Συμβολοσειρά έκδοσης που προστίθεται στα CDN URLs για cache busting. Ενημερώστε μετά από κάθε CDN ανάπτυξη (π.χ. 3.2.4 ή commit hash).';
+
+// Analytics dashboard.
+$string['analytics:tab_overall'] = 'Συνολική χρήση';
+$string['analytics:tab_bycourse'] = 'Ανά μάθημα';
+$string['analytics:tab_comparison'] = 'AI έναντι μη χρηστών';
+$string['analytics:tab_byunit'] = 'Ανά ενότητα';
+$string['analytics:tab_usagetypes'] = 'Τύποι χρήσης';
+$string['analytics:tab_themes'] = 'Θέματα';
+$string['analytics:tab_feedback'] = 'Αξιολόγηση AI';
+$string['analytics:total_students'] = 'Σύνολο φοιτητών';
+$string['analytics:active_users'] = 'Ενεργοί χρήστες AI';
+$string['analytics:msgs_per_student'] = 'Μηνύματα ανά φοιτητή';
+$string['analytics:avg_session'] = 'Μέση διάρκεια συνεδρίας';
+$string['analytics:return_rate'] = 'Ποσοστό επιστροφής';
+$string['analytics:total_sessions'] = 'Σύνολο συνεδριών';
+$string['analytics:thumbs_up'] = 'Θετικό';
+$string['analytics:thumbs_down'] = 'Αρνητικό';
+$string['analytics:hallucination_flags'] = 'Σημάνσεις ανακρίβειας';
+$string['analytics:msgs_to_resolution'] = 'Μηνύματα μέχρι επίλυση';
+$string['analytics:helpful'] = 'Χρήσιμο';
+$string['analytics:not_helpful'] = 'Μη χρήσιμο';
+$string['analytics:flag_hallucination'] = 'Αυτή η απάντηση περιέχει ανακριβείς πληροφορίες';
+$string['analytics:submit_rating'] = 'Υποβολή';
+$string['analytics:thanks_feedback'] = 'Ευχαριστούμε για την αξιολόγησή σας';
