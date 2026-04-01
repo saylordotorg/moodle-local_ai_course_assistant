@@ -393,3 +393,9 @@ $string['analytics:not_helpful'] = 'Akusizi';
 $string['analytics:flag_hallucination'] = 'Le mpendulo inemininingwane enganembi';
 $string['analytics:submit_rating'] = 'Thumela';
 $string['analytics:thanks_feedback'] = 'Siyabonga ngempendulo yakho';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

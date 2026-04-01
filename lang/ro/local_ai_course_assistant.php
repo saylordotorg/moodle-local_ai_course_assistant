@@ -370,3 +370,9 @@ $string['analytics:not_helpful'] = 'Nu este util';
 $string['analytics:flag_hallucination'] = 'Acest răspuns conține informații inexacte';
 $string['analytics:submit_rating'] = 'Trimite';
 $string['analytics:thanks_feedback'] = 'Mulțumim pentru feedback';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

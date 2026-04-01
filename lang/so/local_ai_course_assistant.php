@@ -388,3 +388,9 @@ $string['analytics:not_helpful'] = 'Aan waxtar lahayn';
 $string['analytics:flag_hallucination'] = 'Jawaabtan waxay ka kooban tahay macluumaad aan sax ahayn';
 $string['analytics:submit_rating'] = 'Dir';
 $string['analytics:thanks_feedback'] = 'Waad ku mahadsantahay jawaab celintaada';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

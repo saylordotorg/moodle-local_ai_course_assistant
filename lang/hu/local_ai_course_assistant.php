@@ -334,3 +334,9 @@ $string['analytics:not_helpful'] = 'Nem hasznos';
 $string['analytics:flag_hallucination'] = 'Ez a válasz pontatlan információt tartalmaz';
 $string['analytics:submit_rating'] = 'Küldés';
 $string['analytics:thanks_feedback'] = 'Köszönjük a visszajelzését';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

@@ -370,3 +370,9 @@ $string['analytics:not_helpful'] = '役に立たなかった';
 $string['analytics:flag_hallucination'] = 'この回答には不正確な情報が含まれています';
 $string['analytics:submit_rating'] = '送信';
 $string['analytics:thanks_feedback'] = 'フィードバックありがとうございます';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

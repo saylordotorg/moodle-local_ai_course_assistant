@@ -374,3 +374,9 @@ $string['analytics:not_helpful'] = 'Gargaarsa hin qabu';
 $string['analytics:flag_hallucination'] = 'Deebiin kun odeeffannoo sirrii hin taane qaba';
 $string['analytics:submit_rating'] = 'Ergi';
 $string['analytics:thanks_feedback'] = 'Yaada keessaniif galatoomaa';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

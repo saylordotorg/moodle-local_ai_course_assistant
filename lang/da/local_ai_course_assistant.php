@@ -370,3 +370,9 @@ $string['analytics:not_helpful'] = 'Ikke nyttig';
 $string['analytics:flag_hallucination'] = 'Dette svar indeholder unøjagtige oplysninger';
 $string['analytics:submit_rating'] = 'Indsend';
 $string['analytics:thanks_feedback'] = 'Tak for din feedback';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

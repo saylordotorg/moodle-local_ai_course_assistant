@@ -334,3 +334,9 @@ $string['analytics:not_helpful'] = 'Не корисно';
 $string['analytics:flag_hallucination'] = 'Ця відповідь містить неточну інформацію';
 $string['analytics:submit_rating'] = 'Надіслати';
 $string['analytics:thanks_feedback'] = 'Дякуємо за ваш відгук';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

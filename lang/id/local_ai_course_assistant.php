@@ -401,3 +401,9 @@ $string['analytics:not_helpful'] = 'Tidak membantu';
 $string['analytics:flag_hallucination'] = 'Respons ini mengandung informasi yang tidak akurat';
 $string['analytics:submit_rating'] = 'Kirim';
 $string['analytics:thanks_feedback'] = 'Terima kasih atas umpan balik Anda';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

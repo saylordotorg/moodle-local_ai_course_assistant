@@ -370,3 +370,9 @@ $string['analytics:not_helpful'] = 'Faydalı değil';
 $string['analytics:flag_hallucination'] = 'Bu yanıt yanlış bilgi içeriyor';
 $string['analytics:submit_rating'] = 'Gönder';
 $string['analytics:thanks_feedback'] = 'Geri bildiriminiz için teşekkürler';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

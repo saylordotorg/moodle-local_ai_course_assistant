@@ -401,3 +401,9 @@ $string['analytics:not_helpful'] = 'Ba mai taimako ba';
 $string['analytics:flag_hallucination'] = 'Wannan amsar tana ɗauke da bayanan da ba daidai ba';
 $string['analytics:submit_rating'] = 'Aika';
 $string['analytics:thanks_feedback'] = 'Na gode da ra\'ayinku';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

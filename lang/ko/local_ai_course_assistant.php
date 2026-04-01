@@ -370,3 +370,9 @@ $string['analytics:not_helpful'] = '도움 안됨';
 $string['analytics:flag_hallucination'] = '이 응답에는 부정확한 정보가 포함되어 있습니다';
 $string['analytics:submit_rating'] = '제출';
 $string['analytics:thanks_feedback'] = '피드백 감사합니다';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

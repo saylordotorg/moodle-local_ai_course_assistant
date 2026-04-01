@@ -78,6 +78,10 @@ if ($hassiteconfig) {
         'gemini' => get_string('settings:provider_gemini', 'local_ai_course_assistant'),
         'ollama' => get_string('settings:provider_ollama', 'local_ai_course_assistant'),
         'minimax' => get_string('settings:provider_minimax', 'local_ai_course_assistant'),
+        'mistral' => get_string('settings:provider_mistral', 'local_ai_course_assistant'),
+        'groq' => get_string('settings:provider_groq', 'local_ai_course_assistant'),
+        'openrouter' => get_string('settings:provider_openrouter', 'local_ai_course_assistant'),
+        'xai' => get_string('settings:provider_xai', 'local_ai_course_assistant'),
         'custom' => get_string('settings:provider_custom', 'local_ai_course_assistant'),
     ];
     $settings->add(new admin_setting_configselect(

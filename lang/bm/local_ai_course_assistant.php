@@ -400,3 +400,9 @@ $string['analytics:not_helpful'] = 'Dɛmɛ tɛ a la';
 $string['analytics:flag_hallucination'] = 'Jaabi in kɔnɔ kunnafoni tiɲɛnen bɛ yen';
 $string['analytics:submit_rating'] = 'A ci';
 $string['analytics:thanks_feedback'] = 'Aw ni ce aw ka jaabi la';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

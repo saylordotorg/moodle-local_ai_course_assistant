@@ -401,3 +401,9 @@ $string['analytics:not_helpful'] = 'सहायक नहीं';
 $string['analytics:flag_hallucination'] = 'इस उत्तर में गलत जानकारी है';
 $string['analytics:submit_rating'] = 'भेजें';
 $string['analytics:thanks_feedback'] = 'आपकी प्रतिक्रिया के लिए धन्यवाद';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

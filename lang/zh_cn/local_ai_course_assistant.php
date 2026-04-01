@@ -393,3 +393,9 @@ $string['analytics:not_helpful'] = '没有帮助';
 $string['analytics:flag_hallucination'] = '此回答包含不准确的信息';
 $string['analytics:submit_rating'] = '提交';
 $string['analytics:thanks_feedback'] = '感谢您的反馈';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

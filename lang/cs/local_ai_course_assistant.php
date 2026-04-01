@@ -370,3 +370,9 @@ $string['analytics:not_helpful'] = 'Neužitečné';
 $string['analytics:flag_hallucination'] = 'Tato odpověď obsahuje nepřesné informace';
 $string['analytics:submit_rating'] = 'Odeslat';
 $string['analytics:thanks_feedback'] = 'Děkujeme za zpětnou vazbu';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

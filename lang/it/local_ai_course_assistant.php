@@ -334,3 +334,9 @@ $string['analytics:not_helpful'] = 'Non utile';
 $string['analytics:flag_hallucination'] = 'Questa risposta contiene informazioni imprecise';
 $string['analytics:submit_rating'] = 'Invia';
 $string['analytics:thanks_feedback'] = 'Grazie per il tuo feedback';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

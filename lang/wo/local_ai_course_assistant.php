@@ -393,3 +393,9 @@ $string['analytics:not_helpful'] = 'Dimbaliwul';
 $string['analytics:flag_hallucination'] = 'Tontu bii am na xibaar yu baaxul';
 $string['analytics:submit_rating'] = 'Yónne';
 $string['analytics:thanks_feedback'] = 'Jërëjëf ci sa tekki';
+
+// LLM provider names.
+$string['settings:provider_mistral'] = 'Mistral AI';
+$string['settings:provider_groq'] = 'Groq';
+$string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_xai'] = 'xAI (Grok)';

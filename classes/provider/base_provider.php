@@ -251,6 +251,14 @@ abstract class base_provider implements provider_interface {
                 return new deepseek_provider($overrides);
             case 'gemini':
                 return new gemini_provider($overrides);
+            case 'mistral':
+                return new mistral_provider($overrides);
+            case 'groq':
+                return new groq_provider($overrides);
+            case 'openrouter':
+                return new openrouter_provider($overrides);
+            case 'xai':
+                return new xai_provider($overrides);
             case 'custom':
                 return new custom_provider($overrides);
             default:
