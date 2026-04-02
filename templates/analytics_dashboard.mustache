@@ -29,11 +29,11 @@
     </div>
 
     {{! ═══ Cross-Course Summary ═══ }}
-    <h3>SOLA Overview</h3>
+    <h3>AI Course Assistant Overview</h3>
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Courses with SOLA</h5>
+                <h5 class="card-title text-muted">Courses with AI Assistant</h5>
                 <p class="display-4">{{enabled_courses}}<small style="font-size:0.4em"> / {{total_courses}}</small></p>
             </div>
         </div>
@@ -59,17 +59,17 @@
 
     {{! ═══ Course List with Enable/Disable Toggles ═══ }}
     <h3>Courses</h3>
-    <p class="text-muted">Enable or disable SOLA per course. Click a course name to view detailed analytics.</p>
+    <p class="text-muted">Enable or disable AI Assistant per course. Click a course name to view detailed analytics.</p>
 
     {{#has_courses}}
     {{! Search + filter bar }}
     <div class="d-flex align-items-center mb-2 flex-wrap" style="gap:8px">
         <input type="text" id="sola-course-search" class="form-control form-control-sm" style="max-width:260px"
                placeholder="Search courses..." aria-label="Filter course list">
-        <select id="sola-filter-status" class="form-control form-control-sm" style="max-width:160px" aria-label="Filter by SOLA status">
-            <option value="">All SOLA Status</option>
-            <option value="enabled">SOLA Enabled</option>
-            <option value="disabled">SOLA Disabled</option>
+        <select id="sola-filter-status" class="form-control form-control-sm" style="max-width:160px" aria-label="Filter by AI Assistant status">
+            <option value="">All AI Assistant Status</option>
+            <option value="enabled">AI Assistant Enabled</option>
+            <option value="disabled">AI Assistant Disabled</option>
         </select>
         <select id="sola-filter-ut" class="form-control form-control-sm" style="max-width:180px" aria-label="Filter by user testing">
             <option value="">All Usability Testing</option>
@@ -88,7 +88,7 @@
             <span id="sola-selected-count" class="text-muted" style="font-size:13px">(0 selected)</span>
             <span class="mx-1" style="border-left:1px solid #ccc;height:20px"></span>
 
-            <span style="font-size:13px;font-weight:600">SOLA:</span>
+            <span style="font-size:13px;font-weight:600">AI Assistant:</span>
             <button type="button" class="btn btn-sm btn-outline-success sola-bulk-action" data-action="bulktoggle" data-enabled="1">
                 Enable
             </button>
@@ -133,7 +133,7 @@
                             Course <span class="sola-sort-icon">&#8597;</span>
                         </th>
                         <th class="text-center sola-sortable" data-sort="sola" style="width:120px;cursor:pointer">
-                            SOLA Status <span class="sola-sort-icon">&#8597;</span>
+                            AI Assistant <span class="sola-sort-icon">&#8597;</span>
                         </th>
                         <th class="text-center sola-sortable" data-sort="ut" style="width:140px;cursor:pointer">
                             Usability Testing <span class="sola-sort-icon">&#8597;</span>
@@ -252,7 +252,7 @@
     </div>
 
     {{^course.has_data}}
-    <div class="alert alert-info">No SOLA usage data for this course yet.</div>
+    <div class="alert alert-info">No AI Assistant usage data for this course yet.</div>
     {{/course.has_data}}
 
     {{#course.has_data}}
@@ -733,7 +733,7 @@
         bulkBtns[b].addEventListener('click', function() {
             var ids = getSelectedIds();
             var action = this.getAttribute('data-action');
-            var label = action === 'bulktoggle' ? 'SOLA' : 'Usability Testing';
+            var label = action === 'bulktoggle' ? 'AI Assistant' : 'Usability Testing';
 
             if (ids.length === 0) {
                 if (!confirm('No courses selected. Apply to ALL courses?')) return;
@@ -845,7 +845,7 @@
         ctx.stroke();
     }
 
-    ctx.fillStyle = '#4a6cf7';
+    ctx.fillStyle = '#023e8a';
     data.forEach(function(d, idx) {
         var barH = (d.count / maxCount) * chartHeight;
         var x = originX + 5 + idx * (barWidth + 1);

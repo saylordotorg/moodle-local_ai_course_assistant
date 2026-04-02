@@ -39,7 +39,7 @@ if ($hassiteconfig) {
         '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' .
         '<path d="M13 2.05V4.07C16.94 4.56 20 7.92 20 12C20 16.08 16.94 19.44 13 19.93V21.95C18.05 21.44 22 17.18 22 12C22 6.82 18.05 2.56 13 2.05M11 2.05C9.04 2.27 7.2 3.04 5.67 4.22L7.1 5.67C8.23 4.84 9.57 4.26 11 4.07V2.05M4.26 5.67C3.07 7.2 2.29 9.05 2.06 11H4.08C4.26 9.57 4.84 8.23 5.67 7.1L4.26 5.67M2.06 13C2.3 14.95 3.08 16.8 4.27 18.33L5.69 16.9C4.86 15.77 4.28 14.43 4.09 13H2.06M7.1 18.37L5.67 19.74C7.18 20.95 9.04 21.73 11 21.95V19.93C9.58 19.75 8.23 19.17 7.1 18.37M12 8L9 11H11V16H13V11H15L12 8Z"/>' .
         '</svg>' .
-        '<strong>SOLA</strong>&nbsp;v' . $release . '&nbsp;<span style="color:#868e96;">(' . $versionnum . ')</span>' .
+        '<strong>' . htmlspecialchars(get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA') . '</strong>&nbsp;v' . $release . '&nbsp;<span style="color:#868e96;">(' . $versionnum . ')</span>' .
         '</div>'
     ));
 
@@ -442,27 +442,35 @@ if ($hassiteconfig) {
         'Customize the assistant name and appearance.'
     ));
 
-    // Institution name (used in system prompt, avatar label, etc.).
+    // Institution full name.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_name',
-        get_string('settings:institution_name', 'local_ai_course_assistant'),
-        get_string('settings:institution_name_desc', 'local_ai_course_assistant'),
+        'Institution Name',
+        'Full institution name used in the system prompt, avatar labels, and AI insights (e.g. "Saylor University").',
         'Saylor University'
     ));
 
-    // Display name.
+    // Institution short name.
     $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/display_name',
-        'Display Name',
-        'The full name shown in greetings and the welcome screen (e.g. "SOLA").',
-        'SOLA'
+        'local_ai_course_assistant/institution_short_name',
+        'Institution Short Name',
+        'Abbreviated institution name for compact UI elements (e.g. "Saylor U").',
+        'Saylor U'
     ));
 
-    // Short name.
+    // AI Assistant display name (long).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/display_name',
+        'Assistant Display Name',
+        'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Saylor Online Learning Assistant").',
+        'Saylor Online Learning Assistant'
+    ));
+
+    // AI Assistant short name.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/short_name',
-        'Short Name',
-        'Short name shown in the header bar and compact UI elements.',
+        'Assistant Short Name',
+        'Short name shown in the header bar and compact UI elements (e.g. "SOLA").',
         'SOLA'
     ));
 
@@ -532,7 +540,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/avatar_color',
         get_string('settings:avatar_color', 'local_ai_course_assistant'),
         get_string('settings:avatar_color_desc', 'local_ai_course_assistant'),
-        '#4a6cf7'
+        '#023e8a'
     ));
 
     // Avatar fill/background color.
@@ -820,7 +828,7 @@ if ($hassiteconfig) {
     // Register the Usability Testing Editor admin page.
     $ADMIN->add('localplugins', new admin_externalpage(
         'local_ai_course_assistant_usertesting',
-        'SOLA Usability Testing Editor',
+        'AI Course Assistant — Usability Testing',
         new moodle_url('/local/ai_course_assistant/usertesting_admin.php'),
         'moodle/site:config'
     ));
@@ -828,7 +836,7 @@ if ($hassiteconfig) {
     // Register the Rubric Editor admin page.
     $ADMIN->add('localplugins', new admin_externalpage(
         'local_ai_course_assistant_rubric',
-        'SOLA Rubric Editor',
+        'AI Course Assistant — Rubric Editor',
         new moodle_url('/local/ai_course_assistant/rubric_admin.php'),
         'moodle/site:config'
     ));
@@ -836,7 +844,7 @@ if ($hassiteconfig) {
     // Register the Survey Editor admin page.
     $ADMIN->add('localplugins', new admin_externalpage(
         'local_ai_course_assistant_survey',
-        'SOLA Survey Editor',
+        'AI Course Assistant — Survey Editor',
         new moodle_url('/local/ai_course_assistant/survey_admin.php'),
         'moodle/site:config'
     ));

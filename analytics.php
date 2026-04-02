@@ -103,8 +103,8 @@ if ($action === 'bulktoggleut' && confirm_sesskey()) {
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/analytics.php',
     ['courseid' => $courseid, 'range' => $range]));
 $PAGE->set_context($syscontext);
-$PAGE->set_title('SOLA Analytics');
-$PAGE->set_heading('SOLA Analytics');
+$PAGE->set_title('AI Course Assistant Analytics');
+$PAGE->set_heading('AI Course Assistant Analytics');
 $PAGE->set_pagelayout('admin');
 
 $since = $range > 0 ? time() - ($range * 86400) : 0;

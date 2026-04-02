@@ -216,7 +216,7 @@ class hook_callbacks {
         );
 
         // Starter icon color (CSS custom property).
-        $startericoncolor = get_config('local_ai_course_assistant', 'starter_icon_color') ?: '#173140';
+        $startericoncolor = get_config('local_ai_course_assistant', 'starter_icon_color') ?: '#023e8a';
 
         // Whether user has dismissed the intro overlay.
         $introdismissed = (bool)\get_user_preferences('local_ai_course_assistant_intro_dismissed', false);
@@ -283,8 +283,9 @@ class hook_callbacks {
             'avatarcolor'        => get_config('local_ai_course_assistant', 'avatar_color') ?: '#023e8a',
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',
             'displaymode'        => $displaymode,
-            'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA',
+            'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'Saylor Online Learning Assistant',
             'institution'        => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
+            'institutionshort'   => get_config('local_ai_course_assistant', 'institution_short_name') ?: 'Saylor U',
             'practicescoring'    => (bool)get_config('local_ai_course_assistant', 'practice_scoring_enabled'),
             'shortname_label'    => get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA',
             'welcomemessage'     => get_config('local_ai_course_assistant', 'welcome_message') ?: '',

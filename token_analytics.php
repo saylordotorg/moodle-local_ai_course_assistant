@@ -41,8 +41,8 @@ $pagecontext = $syscontext;
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/token_analytics.php',
     ['range' => $range, 'courseid' => $courseid]));
 $PAGE->set_context($pagecontext);
-$PAGE->set_title('SOLA — Token Usage & Cost');
-$PAGE->set_heading('SOLA — Token Usage & Cost');
+$PAGE->set_title('AI Course Assistant — Token Usage & Cost');
+$PAGE->set_heading('AI Course Assistant — Token Usage & Cost');
 $PAGE->set_pagelayout($hassiteconfig ? 'admin' : 'report');
 
 // ── Query helpers ──────────────────────────────────────────────────────────────

@@ -435,7 +435,7 @@
 }
 
 .local-ai-course-assistant__message--user .local-ai-course-assistant__message-content {
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     border-bottom-right-radius: 4px;
 }
@@ -498,7 +498,7 @@
 }
 
 .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content a {
-    color: #4a6cf7;
+    color: #023e8a;
     text-decoration: underline;
 }
 
@@ -1413,7 +1413,7 @@ a.aica-history-panel__source:hover {
 .local-ai-course-assistant__welcome-cta {
     width: 100%;
     padding: 12px;
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -1432,7 +1432,7 @@ a.aica-history-panel__source:hover {
 }
 
 .local-ai-course-assistant__welcome-cta:focus-visible {
-    outline: 3px solid #4a6cf7;
+    outline: 3px solid #023e8a;
     outline-offset: 2px;
 }
 
@@ -2116,14 +2116,14 @@ a.aica-history-panel__source:hover {
 
 @media (hover: hover) {
     .aica-quiz-setup__count-btn:hover {
-        border-color: #4a6cf7;
-        color: #4a6cf7;
+        border-color: #023e8a;
+        color: #023e8a;
     }
 }
 
 .aica-quiz-setup__count-btn--selected {
-    background: #4a6cf7;
-    border-color: #4a6cf7;
+    background: #023e8a;
+    border-color: #023e8a;
     color: #fff;
 }
 
@@ -2155,7 +2155,7 @@ a.aica-history-panel__source:hover {
 .aica-quiz-setup__start {
     width: 100%;
     min-height: 48px;
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -2222,7 +2222,7 @@ a.aica-history-panel__source:hover {
 
 .aica-study-setup__resume-btn {
     flex-shrink: 0;
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -2289,7 +2289,7 @@ a.aica-history-panel__source:hover {
 
 @media (hover: hover) {
     .aica-quiz__choice:hover:not(:disabled) {
-        border-color: #4a6cf7;
+        border-color: #023e8a;
         background: #f0f3ff;
     }
 }
@@ -2339,7 +2339,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__next {
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -2501,7 +2501,7 @@ a.aica-history-panel__source:hover {
     .local-ai-course-assistant__btn-copy:hover,
     .local-ai-course-assistant__btn-bookmark:hover,
     .local-ai-course-assistant__btn-speak:hover {
-        color: #4a6cf7;
+        color: #023e8a;
         background: rgba(255, 255, 255, 0.98);
     }
 }
@@ -2576,7 +2576,7 @@ a.aica-history-panel__source:hover {
 
 @media (hover: hover) {
     .local-ai-course-assistant__btn-edit:hover {
-        color: #4a6cf7;
+        color: #023e8a;
         background: rgba(255, 255, 255, 0.98);
         border-color: #c7d2fe;
     }
@@ -2667,7 +2667,7 @@ a.aica-history-panel__source:hover {
 
 @media (hover: hover) {
     .local-ai-course-assistant__btn-lang:hover {
-        color: #4a6cf7;
+        color: #023e8a;
     }
 }
 
@@ -2709,7 +2709,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-lang-picker__search:focus {
-    border-color: #4a6cf7;
+    border-color: #023e8a;
 }
 
 .aica-lang-picker__list {
@@ -2738,7 +2738,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-lang-picker__option--active {
-    color: #4a6cf7;
+    color: #023e8a;
     font-weight: 600;
 }
 
@@ -2886,13 +2886,13 @@ a.aica-history-panel__source:hover {
 
 .aica-quiz__retake {
     background: none;
-    border: 1.5px solid #4a6cf7;
-    color: #4a6cf7;
+    border: 1.5px solid #023e8a;
+    color: #023e8a;
 }
 
 @media (hover: hover) {
     .aica-quiz__retake:hover {
-        background: #4a6cf7;
+        background: #023e8a;
         color: #fff;
     }
 }
@@ -3252,7 +3252,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__lang-opt--active {
-    color: #4a6cf7;
+    color: #023e8a;
     font-weight: 600;
     background: #eef2ff;
 }
@@ -3280,7 +3280,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__avatar-opt--selected {
-    border-color: #4a6cf7;
+    border-color: #023e8a;
     background: #eef2ff;
 }
 
@@ -3313,7 +3313,7 @@ a.aica-history-panel__source:hover {
 }
 .aica-settings-panel__select:focus {
     outline: none;
-    border-color: #4a6cf7;
+    border-color: #023e8a;
     box-shadow: 0 0 0 2px rgba(74,108,247,0.15);
 }
 
@@ -3332,7 +3332,7 @@ a.aica-history-panel__source:hover {
 
 .aica-settings-panel__speed-slider {
     width: 90px;
-    accent-color: #4a6cf7;
+    accent-color: #023e8a;
     cursor: pointer;
 }
 
@@ -3352,7 +3352,7 @@ a.aica-history-panel__source:hover {
 .aica-settings-panel__save {
     width: 100%;
     padding: 9px 16px;
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -3398,7 +3398,7 @@ a.aica-history-panel__source:hover {
 }
 .aica-feedback-textarea:focus {
     outline: none;
-    border-color: #4a6cf7;
+    border-color: #023e8a;
     box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.15);
 }
 
@@ -3508,7 +3508,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-avatar-option--selected {
-    border-color: #4a6cf7;
+    border-color: #023e8a;
 }
 
 .aica-avatar-option img {
@@ -3609,7 +3609,7 @@ a.aica-history-panel__source:hover {
     display: block;
     width: 3px;
     border-radius: 2px;
-    background: #4a6cf7;
+    background: #023e8a;
     height: 3px;
     transition: height 0.08s ease;
 }
@@ -3807,7 +3807,7 @@ a.aica-history-panel__source:hover {
 
 .aica-word--active {
     background: rgba(74, 108, 247, 0.18);
-    color: #4a6cf7;
+    color: #023e8a;
 }
 
 /* =========================================================
@@ -3974,8 +3974,8 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-av-trio__btn--active {
-    background: #4a6cf7;
-    border-color: #4a6cf7;
+    background: #023e8a;
+    border-color: #023e8a;
     color: #fff;
 }
 
@@ -4003,8 +4003,8 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-av-swatch--active {
-    border-color: #4a6cf7;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4a6cf7;
+    border-color: #023e8a;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #023e8a;
 }
 
 /* Style swatches (mini face thumbnails) */
@@ -4028,7 +4028,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-av-style-swatch--active {
-    border-color: #4a6cf7;
+    border-color: #023e8a;
     background: #eef2ff;
 }
 
@@ -4043,7 +4043,7 @@ a.aica-history-panel__source:hover {
     padding: 9px 0;
     border: none;
     border-radius: 10px;
-    background: #4a6cf7;
+    background: #023e8a;
     color: #fff;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -4083,17 +4083,17 @@ a.aica-history-panel__source:hover {
 
 .aica-starter-voice__btn--recording {
     background: #eef2ff;
-    border-color: #4a6cf7;
+    border-color: #023e8a;
     border-style: solid;
-    color: #4a6cf7;
+    color: #023e8a;
 }
 
 @media (hover: hover) {
     .aica-starter-voice__btn:hover {
         background: #eef2ff;
-        border-color: #4a6cf7;
+        border-color: #023e8a;
         border-style: solid;
-        color: #4a6cf7;
+        color: #023e8a;
     }
 }
 

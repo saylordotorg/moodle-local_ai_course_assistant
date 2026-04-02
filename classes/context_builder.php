@@ -106,7 +106,8 @@ class context_builder {
         }
 
         // Dynamic display name from admin settings.
-        $display_name = get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA';
+        $display_name = get_config('local_ai_course_assistant', 'display_name') ?: 'Saylor Online Learning Assistant';
+        $short_name = get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA';
 
         // Institution name from settings.
         $institution = get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University';
@@ -118,8 +119,12 @@ class context_builder {
             $template
         );
 
-        // Replace hardcoded "SOLA" identity with configurable display name.
-        $prompt = str_replace('You are SOLA', 'You are ' . $display_name, $prompt);
+        // Replace hardcoded identity with configurable display name.
+        $prompt = str_replace(
+            ['You are SOLA', 'SOLA (Online Learning Assistant)'],
+            ['You are ' . $short_name . ' (' . $display_name . ')', $short_name . ' (' . $display_name . ')'],
+            $prompt
+        );
 
         // If the template doesn't include {{coursecontent}} but we have content, append it.
         if (!empty($coursecontent) && strpos($template, '{{coursecontent}}') === false) {

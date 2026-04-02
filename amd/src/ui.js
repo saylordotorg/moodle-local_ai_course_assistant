@@ -4401,7 +4401,7 @@ define([
                             l.style.borderColor = '#e2e8f0';
                             l.style.background = '';
                         });
-                        optRow.style.borderColor = 'var(--aica-brand-color, #173140)';
+                        optRow.style.borderColor = 'var(--aica-brand-color, #023e8a)';
                         optRow.style.background = '#f0f9ff';
                     });
                     optContainer.appendChild(optRow);
@@ -4435,8 +4435,8 @@ define([
                                 b.style.background = '#fff';
                                 b.style.color = '#475569';
                             });
-                            btn.style.borderColor = 'var(--aica-brand-color, #173140)';
-                            btn.style.background = 'var(--aica-brand-color, #173140)';
+                            btn.style.borderColor = 'var(--aica-brand-color, #023e8a)';
+                            btn.style.background = 'var(--aica-brand-color, #023e8a)';
                             btn.style.color = '#fff';
                         });
                         ratingRow.appendChild(btn);
@@ -4473,7 +4473,7 @@ define([
         var submitBtn = document.createElement('button');
         submitBtn.type = 'button';
         submitBtn.style.cssText = 'width:100%;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;' +
-            'cursor:pointer;color:#fff;background:var(--aica-brand-color, #173140);transition:opacity 0.15s';
+            'cursor:pointer;color:#fff;background:var(--aica-brand-color, #023e8a);transition:opacity 0.15s';
         submitBtn.textContent = 'Submit Survey';
         submitBtn.addEventListener('click', function() {
             var answers = [];
@@ -4601,7 +4601,7 @@ define([
             progressBar.style.cssText = 'height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden';
             var progressFill = document.createElement('div');
             var pct = ((idx) / tasks.length * 100);
-            progressFill.style.cssText = 'height:100%;background:var(--aica-brand-color, #173140);border-radius:2px;' +
+            progressFill.style.cssText = 'height:100%;background:var(--aica-brand-color, #023e8a);border-radius:2px;' +
                 'transition:width 0.3s;width:' + pct + '%';
             progressBar.appendChild(progressFill);
             progressWrap.appendChild(progressBar);
@@ -4667,8 +4667,8 @@ define([
                                 b.style.background = '#fff';
                                 b.style.color = '#475569';
                             });
-                            btn.style.borderColor = 'var(--aica-brand-color, #173140)';
-                            btn.style.background = 'var(--aica-brand-color, #173140)';
+                            btn.style.borderColor = 'var(--aica-brand-color, #023e8a)';
+                            btn.style.background = 'var(--aica-brand-color, #023e8a)';
                             btn.style.color = '#fff';
                         });
                         ratingRow.appendChild(btn);
@@ -4703,7 +4703,7 @@ define([
                         mcContainer.querySelectorAll('label').forEach(function(l) {
                             l.style.borderColor = '#e2e8f0'; l.style.background = '';
                         });
-                        optRow.style.borderColor = 'var(--aica-brand-color, #173140)';
+                        optRow.style.borderColor = 'var(--aica-brand-color, #023e8a)';
                         optRow.style.background = '#f0f9ff';
                     });
                     mcContainer.appendChild(optRow);
@@ -4753,7 +4753,7 @@ define([
             var nextBtn = document.createElement('button');
             nextBtn.type = 'button';
             nextBtn.style.cssText = 'flex:1;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;' +
-                'cursor:pointer;color:#fff;background:var(--aica-brand-color, #173140);transition:opacity 0.15s';
+                'cursor:pointer;color:#fff;background:var(--aica-brand-color, #023e8a);transition:opacity 0.15s';
             nextBtn.textContent = isLast ? 'Finish' : 'Next Task';
             nextBtn.addEventListener('click', function() {
                 // Validate.
@@ -4820,7 +4820,7 @@ define([
                     var doneBtn = document.createElement('button');
                     doneBtn.type = 'button';
                     doneBtn.style.cssText = 'padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;' +
-                        'cursor:pointer;color:#fff;background:var(--aica-brand-color, #173140)';
+                        'cursor:pointer;color:#fff;background:var(--aica-brand-color, #023e8a)';
                     doneBtn.textContent = 'Done';
                     doneBtn.addEventListener('click', function() { panel.remove(); });
                     doneContent.appendChild(doneBtn);

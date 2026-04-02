@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 // General.
-$string['pluginname'] = 'Online Learning Assistant (SOLA)';
+$string['pluginname'] = 'AI Course Assistant';
 $string['error'] = '{$a}';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Stores AI tutor chat conversations per user and course.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'The ID of the user who owns the conversation.';
