@@ -12,7 +12,7 @@ import urllib.request
 
 BASE_URL = "https://dev.sylr.org"
 USERNAME = "tom.caswell@saylor.org"
-PASSWORD = "Hi11crestD!!"
+PASSWORD = "Hi11crest!!"
 
 ZIP_PATH = pathlib.Path.home() / "Library" / "CloudStorage" / "Dropbox" / "!Saylor" / "ai-projects" / "ai_course_assistant.zip"
 
