@@ -280,7 +280,7 @@ class hook_callbacks {
             'realtimeenabled'         => $realtimeenabled,
             'ellpronunciationenabled' => $realtimeenabled,
             'ttsurl'             => $ttsurl,
-            'avatarcolor'        => get_config('local_ai_course_assistant', 'avatar_color') ?: '#173140',
+            'avatarcolor'        => get_config('local_ai_course_assistant', 'avatar_color') ?: '#023e8a',
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',
             'displaymode'        => $displaymode,
             'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'SOLA',

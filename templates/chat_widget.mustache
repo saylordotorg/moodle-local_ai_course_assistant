@@ -101,7 +101,6 @@
         <button id="local-ai-course-assistant-close-toggle"
                 class="local-ai-course-assistant__toggle local-ai-course-assistant__toggle--close"
                 type="button"
-                aria-hidden="true"
                 aria-expanded="false"
                 aria-controls="local-ai-course-assistant-drawer"
                 title="{{#str}}chat:close, local_ai_course_assistant{{/str}}"
@@ -208,10 +207,12 @@
         <div class="local-ai-course-assistant__lang-banner" aria-hidden="true">
             <span class="local-ai-course-assistant__lang-banner-text"></span>
             <div class="local-ai-course-assistant__lang-banner-actions">
-                <button class="local-ai-course-assistant__lang-accept">
+                <button class="local-ai-course-assistant__lang-accept"
+                        aria-label="Switch language">
                     {{#str}}lang:switch, local_ai_course_assistant{{/str}}
                 </button>
-                <button class="local-ai-course-assistant__lang-dismiss">
+                <button class="local-ai-course-assistant__lang-dismiss"
+                        aria-label="Dismiss language suggestion">
                     {{#str}}lang:dismiss, local_ai_course_assistant{{/str}}
                 </button>
             </div>
@@ -396,7 +397,7 @@
         <div class="local-ai-course-assistant__stop-slot" hidden></div>
 
         {{! Typing indicator }}
-        <div class="local-ai-course-assistant__typing" aria-hidden="true">
+        <div class="local-ai-course-assistant__typing" aria-hidden="true" role="status">
             <span class="local-ai-course-assistant__typing-dot"></span>
             <span class="local-ai-course-assistant__typing-dot"></span>
             <span class="local-ai-course-assistant__typing-dot"></span>

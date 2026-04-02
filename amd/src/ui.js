@@ -1157,6 +1157,26 @@ define([
             if (root) { root.classList.add('local-ai-course-assistant--open'); }
             // Show conversation starters when reopening.
             showStarters();
+            // Focus trap: keep Tab cycling within the drawer.
+            if (!drawer._aicaFocusTrap) {
+                drawer._aicaFocusTrap = function(e) {
+                    if (e.key !== 'Tab') { return; }
+                    var focusable = drawer.querySelectorAll(
+                        'button:not([disabled]):not([aria-hidden="true"]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                    );
+                    if (!focusable.length) { return; }
+                    var first = focusable[0];
+                    var last = focusable[focusable.length - 1];
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                };
+                drawer.addEventListener('keydown', drawer._aicaFocusTrap);
+            }
             // Push page content aside on desktop so drawer doesn't overlap.
             // Use requestAnimationFrame so the drawer has its final width before we read it.
             requestAnimationFrame(function() {
@@ -2503,6 +2523,8 @@ define([
                 // Double-click or edit button to make editable.
                 var makeEditable = function() {
                     text.contentEditable = 'true';
+                    text.setAttribute('role', 'textbox');
+                    text.setAttribute('aria-label', 'Edit saved message');
                     text.classList.add('aica-history-panel__message--editing');
                     text.focus();
                     // Select all text.
@@ -2514,6 +2536,8 @@ define([
                 };
                 var commitEdit = function() {
                     text.contentEditable = 'false';
+                    text.removeAttribute('role');
+                    text.removeAttribute('aria-label');
                     text.classList.remove('aica-history-panel__message--editing');
                     var newText = text.textContent.trim();
                     if (newText && newText !== item.text) {
@@ -2536,6 +2560,8 @@ define([
                     if (e.key === 'Escape') {
                         text.textContent = (item.text || '').replace(/\s+/g, ' ').trim();
                         text.contentEditable = 'false';
+                        text.removeAttribute('role');
+                        text.removeAttribute('aria-label');
                         text.classList.remove('aica-history-panel__message--editing');
                     }
                 });

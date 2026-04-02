@@ -5,8 +5,8 @@
     position: fixed;
     z-index: 100000;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --aica-brand-color: var(--aica-avatar-color, #173140);
-    --aica-brand-rgb: 23, 49, 64;
+    --aica-brand-color: var(--aica-avatar-color, #023e8a);
+    --aica-brand-rgb: 2, 62, 138;
 }
 
 .local-ai-course-assistant--bottom-right {
@@ -235,7 +235,7 @@
     align-items: center;
     gap: 8px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .local-ai-course-assistant__header-avatar {
@@ -321,7 +321,7 @@
 }
 
 .aica-debug-panel__title {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #1e3a8a;
 }
@@ -332,7 +332,7 @@
     color: #3730a3;
     border-radius: 6px;
     padding: 4px 8px;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
 }
@@ -354,7 +354,7 @@
 
 .aica-debug-panel__label {
     margin: 0 0 4px;
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -367,7 +367,7 @@
     border-radius: 8px;
     background: #111827;
     color: #e5e7eb;
-    font-size: 11px;
+    font-size: 0.8125rem;
     line-height: 1.45;
     overflow: auto;
     white-space: pre-wrap;
@@ -387,7 +387,7 @@
     background: #fff;
     color: #3730a3;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
 }
@@ -428,7 +428,7 @@
 .local-ai-course-assistant__message-content {
     padding: 8px 12px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.5;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -456,7 +456,7 @@
 .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content h2,
 .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content h3 {
     margin: 8px 0 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 700;
 }
 
@@ -472,7 +472,7 @@
     background: rgba(0, 0, 0, 0.06);
     padding: 1px 4px;
     border-radius: 3px;
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 
 .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content pre {
@@ -482,7 +482,7 @@
     border-radius: 6px;
     overflow-x: auto;
     margin: 8px 0;
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 
 .local-ai-course-assistant__message--assistant .local-ai-course-assistant__message-content pre code {
@@ -506,7 +506,7 @@
 .aica-source-pill {
     display: inline-flex;
     align-self: flex-start;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 600;
     line-height: 1.2;
     padding: 3px 8px;
@@ -662,7 +662,7 @@ a.aica-source-pill:hover svg {
 .aica-mode-card__eyebrow,
 .aica-history-panel__eyebrow {
     margin: 0 0 4px;
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -672,7 +672,7 @@ a.aica-source-pill:hover svg {
 .aica-mode-card__title,
 .aica-history-panel__title {
     margin: 0;
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.2;
     color: #12222c;
 }
@@ -683,7 +683,7 @@ a.aica-source-pill:hover svg {
 .aica-history-panel__message,
 .aica-history-panel__empty {
     margin: 0;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.5;
     color: #52616c;
     cursor: default;
@@ -693,7 +693,7 @@ a.aica-source-pill:hover svg {
 }
 .aica-history-panel__message--editing {
     background: #f8fafc;
-    outline: 1.5px solid var(--aica-brand-color, #173140);
+    outline: 1.5px solid var(--aica-brand-color, #023e8a);
     cursor: text;
     white-space: pre-wrap;
 }
@@ -714,7 +714,7 @@ a.aica-source-pill:hover svg {
 .aica-history-panel__refresh {
     border: none;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
@@ -792,7 +792,7 @@ a.aica-source-pill:hover svg {
     color: #52616c;
     border-radius: 999px;
     padding: 6px 10px;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -856,7 +856,7 @@ a.aica-source-pill:hover svg {
     min-width: 44px;
     padding: 3px 8px;
     border-radius: 999px;
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -878,7 +878,7 @@ a.aica-source-pill:hover svg {
 }
 
 .aica-history-panel__time {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #8a97a5;
 }
 
@@ -893,7 +893,7 @@ a.aica-source-pill:hover svg {
     border: none;
     background: transparent;
     padding: 0;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 700;
     cursor: pointer;
     color: var(--aica-brand-color);
@@ -919,7 +919,7 @@ a.aica-source-pill:hover svg {
 }
 .aica-history-panel__source {
     display: inline-block;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 500;
     padding: 2px 6px;
     border-radius: 3px;
@@ -943,7 +943,7 @@ a.aica-history-panel__source:hover {
     background: none;
     border: none;
     color: #94a3b8;
-    font-size: 11px;
+    font-size: 0.8125rem;
     cursor: pointer;
     padding: 2px 8px;
     display: inline-flex;
@@ -960,7 +960,7 @@ a.aica-history-panel__source:hover {
     background: none;
     border: none;
     color: #94a3b8;
-    font-size: 11px;
+    font-size: 0.8125rem;
     cursor: pointer;
     padding: 2px 8px;
     display: inline-flex;
@@ -1005,7 +1005,7 @@ a.aica-history-panel__source:hover {
     min-width: 0;
     border: none;
     padding: 2px 12px 2px;
-    font-size: 14px;
+    font-size: 0.875rem;
     resize: none;
     max-height: 160px;
     min-height: 22px;
@@ -1074,7 +1074,7 @@ a.aica-history-panel__source:hover {
 
 .local-ai-course-assistant__composer-select-label {
     flex: 0 0 auto;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.01em;
     color: #64748b;
@@ -1108,7 +1108,7 @@ a.aica-history-panel__source:hover {
     min-width: 0;
     max-width: 100%;
     padding: 0 14px 0 0;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #334155;
     cursor: pointer;
@@ -1159,7 +1159,7 @@ a.aica-history-panel__source:hover {
 
 .local-ai-course-assistant__hint {
     padding: 0 16px 8px;
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #9ca3af;
     flex-shrink: 0;
     display: flex;
@@ -1177,7 +1177,7 @@ a.aica-history-panel__source:hover {
     background: none;
     border: none;
     padding: 0;
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #9ca3af;
     cursor: pointer;
     text-decoration: underline;
@@ -1210,7 +1210,7 @@ a.aica-history-panel__source:hover {
     justify-content: center;
     gap: 6px;
     padding: 8px 6px 10px;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 600;
     line-height: 1.2;
     transition: background 0.15s ease, color 0.15s ease;
@@ -1278,7 +1278,7 @@ a.aica-history-panel__source:hover {
 
 /* Timestamp label on messages (shown on hover) */
 .local-ai-course-assistant__message-time {
-    font-size: 10px;
+    font-size: 0.75rem;
     color: #9ca3af;
     opacity: 0;
     transition: opacity 0.15s;
@@ -1301,7 +1301,7 @@ a.aica-history-panel__source:hover {
     align-items: center;
     margin: 12px 0 8px;
     color: #9ca3af;
-    font-size: 11px;
+    font-size: 0.8125rem;
 }
 
 .local-ai-course-assistant__date-separator::before,
@@ -1351,14 +1351,14 @@ a.aica-history-panel__source:hover {
 }
 
 .local-ai-course-assistant__welcome-title {
-    font-size: 17px;
+    font-size: 1.0625rem;
     font-weight: 700;
     color: #1a1a1a;
     margin: 0 0 8px;
 }
 
 .local-ai-course-assistant__welcome-subtitle {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #6b7280;
     margin: 0 0 12px;
     line-height: 1.5;
@@ -1376,7 +1376,7 @@ a.aica-history-panel__source:hover {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #374151;
     padding: 5px 0;
     border-bottom: 1px solid #f3f4f6;
@@ -1388,7 +1388,7 @@ a.aica-history-panel__source:hover {
 }
 
 .local-ai-course-assistant__welcome-feature-icon {
-    font-size: 18px;
+    font-size: 1.125rem;
     flex-shrink: 0;
     line-height: 1;
 }
@@ -1401,7 +1401,7 @@ a.aica-history-panel__source:hover {
     background: #fff7ed;
     border: 1px solid #fed7aa;
     color: #9a3412;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.5;
     text-align: left;
 }
@@ -1417,7 +1417,7 @@ a.aica-history-panel__source:hover {
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
@@ -1564,7 +1564,7 @@ a.aica-history-panel__source:hover {
     .local-ai-course-assistant__mode-btn {
         border-radius: 14px;
         padding: 8px 4px 9px;
-        font-size: 10px;
+        font-size: 0.75rem;
     }
 
     .local-ai-course-assistant__mode-icon svg {
@@ -1605,12 +1605,12 @@ a.aica-history-panel__source:hover {
     }
 
     .local-ai-course-assistant__welcome-title {
-        font-size: 14px;
+        font-size: 0.875rem;
         margin-bottom: 3px;
     }
 
     .local-ai-course-assistant__welcome-subtitle {
-        font-size: 11px;
+        font-size: 0.8125rem;
         margin-bottom: 8px;
     }
 
@@ -1620,23 +1620,23 @@ a.aica-history-panel__source:hover {
 
     .local-ai-course-assistant__welcome-features li {
         padding: 3px 0;
-        font-size: 11px;
+        font-size: 0.8125rem;
         gap: 7px;
     }
 
     .local-ai-course-assistant__welcome-feature-icon {
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 
     .local-ai-course-assistant__welcome-disclaimer {
         margin: 2px 0 8px;
         padding: 8px 10px;
-        font-size: 11px;
+        font-size: 0.8125rem;
     }
 
     .local-ai-course-assistant__welcome-cta {
         padding: 8px;
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 
     /* Conversation starters — even more compact on mobile */
@@ -1648,7 +1648,7 @@ a.aica-history-panel__source:hover {
     .local-ai-course-assistant__starter {
         padding: 6px 8px;
         gap: 5px;
-        font-size: 11px;
+        font-size: 0.8125rem;
         border-radius: 20px;
     }
 
@@ -1670,7 +1670,7 @@ a.aica-history-panel__source:hover {
     right: 20px;
     padding: 12px 24px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 10000;
@@ -1857,7 +1857,7 @@ a.aica-history-panel__source:hover {
     }
 
     .local-ai-course-assistant__starter:hover .aica-starter-icon {
-        color: var(--aica-starter-icon-color, #173140);
+        color: var(--aica-starter-icon-color, #023e8a);
     }
 
     .aica-quiz__retake:hover {
@@ -2082,14 +2082,14 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz-setup__title {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: #111827;
     margin: 0 0 12px;
 }
 
 .aica-quiz-setup__label {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #6b7280;
     margin: 0 0 6px;
 }
@@ -2109,7 +2109,7 @@ a.aica-history-panel__source:hover {
     background: #fff;
     color: #374151;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
@@ -2135,7 +2135,7 @@ a.aica-history-panel__source:hover {
     border-radius: 8px;
     background: #fff;
     color: #374151;
-    font-size: 14px;
+    font-size: 0.875rem;
     margin-bottom: 10px;
     box-sizing: border-box;
 }
@@ -2146,7 +2146,7 @@ a.aica-history-panel__source:hover {
     padding: 8px 12px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: #374151;
     margin-bottom: 10px;
     box-sizing: border-box;
@@ -2160,7 +2160,7 @@ a.aica-history-panel__source:hover {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 600;
     margin-bottom: 8px;
     transition: background 0.15s;
@@ -2179,7 +2179,7 @@ a.aica-history-panel__source:hover {
     border: none;
     color: #9ca3af;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.8125rem;
     text-decoration: underline;
     text-align: center;
     padding: 4px;
@@ -2208,7 +2208,7 @@ a.aica-history-panel__source:hover {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 0.75rem;
 }
 
 .aica-study-setup__recent-info {
@@ -2227,7 +2227,7 @@ a.aica-history-panel__source:hover {
     border: none;
     border-radius: 6px;
     padding: 4px 10px;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
     line-height: 1.4;
@@ -2253,13 +2253,13 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__progress {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #9ca3af;
     margin: 0 0 8px;
 }
 
 .aica-quiz__question {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: #111827;
     margin: 0 0 12px;
@@ -2281,7 +2281,7 @@ a.aica-history-panel__source:hover {
     background: #fff;
     color: #374151;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.875rem;
     text-align: left;
     line-height: 1.3;
     transition: border-color 0.15s, background 0.15s;
@@ -2312,7 +2312,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__feedback {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     margin: 10px 0 4px;
 }
@@ -2326,7 +2326,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__explanation {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-style: italic;
     color: #6b7280;
     margin: 0 0 8px;
@@ -2344,7 +2344,7 @@ a.aica-history-panel__source:hover {
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 500;
     padding: 8px 16px;
     transition: background 0.15s;
@@ -2363,7 +2363,7 @@ a.aica-history-panel__source:hover {
 
 .aica-quiz__score {
     text-align: center;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     color: #111827;
     padding: 20px;
@@ -2594,7 +2594,7 @@ a.aica-history-panel__source:hover {
     padding: 0 14px;
     background: #eff6ff;
     border-bottom: 1px solid #bfdbfe;
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #1e40af;
     max-height: 0;
     overflow: hidden;
@@ -2624,7 +2624,7 @@ a.aica-history-panel__source:hover {
     border-radius: 4px;
     color: #1e40af;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 3px 10px;
     transition: background 0.15s;
 }
@@ -2657,7 +2657,7 @@ a.aica-history-panel__source:hover {
     border: none;
     color: #9ca3af;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 0.8125rem;
     padding: 0 2px;
     text-decoration: underline dotted;
     transition: color 0.15s;
@@ -2701,7 +2701,7 @@ a.aica-history-panel__source:hover {
     width: 100%;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 5px 8px;
     outline: none;
     box-sizing: border-box;
@@ -2724,7 +2724,7 @@ a.aica-history-panel__source:hover {
     border: none;
     color: #374151;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 8px 16px;
     text-align: left;
     transition: background 0.1s;
@@ -2759,7 +2759,7 @@ a.aica-history-panel__source:hover {
 .aica-quiz__choice-icon {
     flex-shrink: 0;
     margin-left: 10px;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 700;
     line-height: 1;
     display: none;
@@ -2784,7 +2784,7 @@ a.aica-history-panel__source:hover {
 
 .aica-quiz__encourage {
     text-align: center;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     color: #374151;
     margin: 12px 0 16px;
@@ -2811,7 +2811,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__review-heading {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #6b7280;
     text-transform: uppercase;
@@ -2831,7 +2831,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__review-question {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #111827;
     margin: 0 0 6px;
@@ -2839,7 +2839,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__review-answer {
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 4px 10px;
     border-radius: 4px;
     margin-bottom: 4px;
@@ -2857,7 +2857,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-quiz__review-explanation {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-style: italic;
     color: #6b7280;
     margin: 4px 0 0;
@@ -2877,7 +2877,7 @@ a.aica-history-panel__source:hover {
     width: 100%;
     padding: 10px 16px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
@@ -3009,7 +3009,7 @@ a.aica-history-panel__source:hover {
     border-radius: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     color: #374151;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 500;
     text-align: left;
     cursor: pointer;
@@ -3031,7 +3031,7 @@ a.aica-history-panel__source:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--aica-starter-icon-color, #173140);
+    color: var(--aica-starter-icon-color, #023e8a);
     flex-shrink: 0;
 }
 
@@ -3042,7 +3042,7 @@ a.aica-history-panel__source:hover {
 
 @media (hover: hover) {
     .local-ai-course-assistant__starter:hover .aica-starter-icon {
-        color: var(--aica-starter-icon-color, #173140);
+        color: var(--aica-starter-icon-color, #023e8a);
     }
 }
 
@@ -3171,7 +3171,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__title {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: #1a1a2e;
 }
@@ -3212,7 +3212,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__section-title {
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -3238,7 +3238,7 @@ a.aica-history-panel__source:hover {
     border-radius: 6px;
     color: #374151;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 6px 10px;
     text-align: left;
     transition: background 0.1s;
@@ -3294,7 +3294,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__note {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #6b7280;
     margin: 0;
     line-height: 1.5;
@@ -3305,7 +3305,7 @@ a.aica-history-panel__source:hover {
     padding: 8px 10px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #1f2937;
     background: #fff;
     cursor: pointer;
@@ -3326,7 +3326,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__speed-label {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #374151;
 }
 
@@ -3337,7 +3337,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-settings-panel__speed-val {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #6b7280;
     min-width: 28px;
     text-align: right;
@@ -3356,7 +3356,7 @@ a.aica-history-panel__source:hover {
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
     transition: background .15s;
@@ -3391,7 +3391,7 @@ a.aica-history-panel__source:hover {
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 8px 10px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     resize: vertical;
     font-family: inherit;
     margin-top: 4px;
@@ -3404,7 +3404,7 @@ a.aica-history-panel__source:hover {
 
 /* Settings panel: saved responses section */
 .aica-settings-panel__empty-note {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #9ca3af;
     margin: 0;
     line-height: 1.4;
@@ -3424,7 +3424,7 @@ a.aica-history-panel__source:hover {
 
 .aica-settings-panel__bookmark-text {
     flex: 1;
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #374151;
     line-height: 1.4;
     margin: 0;
@@ -3437,7 +3437,7 @@ a.aica-history-panel__source:hover {
     border: none;
     color: #9ca3af;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1;
     padding: 0 2px;
     transition: color .15s;
@@ -3477,7 +3477,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-avatar-picker__title {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #1a1a2e;
     margin: 0 0 12px;
@@ -3525,7 +3525,7 @@ a.aica-history-panel__source:hover {
     background: #f3f4f6;
     border: none;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #6b7280;
     cursor: pointer;
     transition: background 0.15s;
@@ -3553,7 +3553,7 @@ a.aica-history-panel__source:hover {
     background: #f0f3ff;
     border: 1px solid #c7d0f8;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #3a5ce4;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
@@ -3660,14 +3660,14 @@ a.aica-history-panel__source:hover {
 
 /* Status text */
 .aica-voice-status {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #4b5563;
     letter-spacing: 0.02em;
 }
 
 /* Optional instruction hint */
 .aica-voice-instruction {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #6b7280;
     margin: 0;
     line-height: 1.3;
@@ -3681,7 +3681,7 @@ a.aica-history-panel__source:hover {
     padding: 3px 10px;
     border-radius: 12px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 500;
     transition: border-color 0.15s, color 0.15s;
     flex-shrink: 0;
@@ -3710,7 +3710,7 @@ a.aica-history-panel__source:hover {
 
 .aica-voice-card__status {
     flex: 1;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #4b5563;
 }
 
@@ -3751,14 +3751,14 @@ a.aica-history-panel__source:hover {
     justify-content: flex-end;
 }
 .aica-voice-msg__text {
-    font-size: 13.5px;
+    font-size: 0.84375rem;
     line-height: 1.5;
     color: #1f2937;
     max-width: 85%;
 }
 .aica-voice-msg--user .aica-voice-msg__text {
     color: #6b7280;
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     font-style: italic;
 }
 
@@ -3940,7 +3940,7 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-svg-picker__label {
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #6b7280;
     text-transform: uppercase;
@@ -3959,7 +3959,7 @@ a.aica-history-panel__source:hover {
     border: 1px solid #d1d5db;
     border-radius: 8px;
     background: #f9fafb;
-    font-size: 11px;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: #374151;
     cursor: pointer;
@@ -4045,7 +4045,7 @@ a.aica-history-panel__source:hover {
     border-radius: 10px;
     background: #4a6cf7;
     color: #fff;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
@@ -4075,7 +4075,7 @@ a.aica-history-panel__source:hover {
     border: 1px dashed #c9d0e8;
     border-radius: 20px;
     color: #6b7280;
-    font-size: 11.5px;
+    font-size: 0.71875rem;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -4250,17 +4250,17 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-bookmarks-panel__date {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #9ca3af;
 }
 
 .aica-bookmarks-panel__sep {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #d1d5db;
 }
 
 .aica-bookmarks-panel__source-link {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #2563eb;
     text-decoration: none;
 }
@@ -4270,13 +4270,13 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-bookmarks-panel__source-label {
-    font-size: 11px;
+    font-size: 0.8125rem;
     color: #9ca3af;
     font-style: italic;
 }
 
 .aica-bookmarks-panel__text {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #374151;
     line-height: 1.5;
     margin: 0 0 6px 0;
@@ -4327,7 +4327,7 @@ a.aica-history-panel__source:hover {
     border-radius: 16px;
     background: #fff;
     color: #374151;
-    font-size: 13px;
+    font-size: 0.8125rem;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
 }
@@ -4356,7 +4356,7 @@ a.aica-history-panel__source:hover {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .aica-score-card__title {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     color: #1e293b;
     margin-bottom: 12px;
@@ -4367,13 +4367,13 @@ a.aica-history-panel__source:hover {
     margin-bottom: 16px;
 }
 .aica-score-card__overall-num {
-    font-size: 36px;
+    font-size: 2.25rem;
     font-weight: 800;
-    color: var(--aica-brand-color, #173140);
+    color: var(--aica-brand-color, #023e8a);
     line-height: 1;
 }
 .aica-score-card__overall-max {
-    font-size: 16px;
+    font-size: 1rem;
     color: #94a3b8;
     font-weight: 600;
 }
@@ -4392,14 +4392,14 @@ a.aica-history-panel__source:hover {
 }
 .aica-score-card__criterion-name {
     grid-column: 1;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #334155;
 }
 .aica-score-card__criterion-score {
     grid-column: 2;
     grid-row: 1;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 700;
     color: #475569;
     white-space: nowrap;
@@ -4421,12 +4421,12 @@ a.aica-history-panel__source:hover {
 .aica-score-card__bar--low  { background: #ef4444; }
 .aica-score-card__criterion-feedback {
     grid-column: 1 / -1;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #64748b;
     line-height: 1.4;
 }
 .aica-score-card__summary {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #475569;
     line-height: 1.5;
     padding: 10px 12px;
@@ -4435,9 +4435,9 @@ a.aica-history-panel__source:hover {
     margin-bottom: 12px;
 }
 .aica-score-card__encourage {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--aica-brand-color, #173140);
+    color: var(--aica-brand-color, #023e8a);
     text-align: center;
     margin-bottom: 12px;
 }
@@ -4449,7 +4449,7 @@ a.aica-history-panel__source:hover {
 .aica-score-card__btn {
     padding: 8px 18px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
     border: none;
@@ -4459,7 +4459,7 @@ a.aica-history-panel__source:hover {
     transform: scale(0.97);
 }
 .aica-score-card__btn--retry {
-    background: var(--aica-brand-color, #173140);
+    background: var(--aica-brand-color, #023e8a);
     color: #fff;
 }
 .aica-score-card__btn--retry:hover {
@@ -4534,3 +4534,40 @@ a.aica-history-panel__source:hover {
 .aica-hallucination-check { font-size: .75rem; color: #868e96; margin-top: .25rem; }
 .aica-rating-comment { font-size: .8rem; margin-top: .25rem; }
 .aica-rating-comment textarea { font-size: .8rem; width: 100%; max-width: 300px; resize: vertical; }
+
+/* ── Accessibility: focus indicators ──────────────────────── */
+.local-ai-course-assistant button:focus-visible,
+.local-ai-course-assistant a:focus-visible,
+.local-ai-course-assistant [tabindex]:focus-visible,
+.local-ai-course-assistant input:focus-visible,
+.local-ai-course-assistant textarea:focus-visible,
+.local-ai-course-assistant select:focus-visible {
+    outline: 3px solid #3b5bdb;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .local-ai-course-assistant *,
+    .local-ai-course-assistant *::before,
+    .local-ai-course-assistant *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@media (prefers-contrast: more) {
+    .local-ai-course-assistant__drawer {
+        border: 2px solid #000;
+    }
+    .local-ai-course-assistant__toggle {
+        border-width: 4px;
+    }
+    .local-ai-course-assistant__message-content {
+        border: 1px solid #333;
+    }
+    .local-ai-course-assistant__input {
+        border: 2px solid #333;
+    }
+}

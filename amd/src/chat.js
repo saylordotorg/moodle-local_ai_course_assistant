@@ -4151,6 +4151,8 @@ define([
         UI.hideStarters();
         UI.setInputEnabled(false);
         UI.clearInput();
+        var inputEl = UI.getElements().input;
+        if (inputEl) { inputEl.removeAttribute('aria-invalid'); }
 
         // Track last session topic for personalized welcome-back.
         updateLastSession();
@@ -4346,6 +4348,8 @@ define([
                     recordConversationMessage('assistant', parsed.text, Date.now());
                 }
                 window.console && console.error('[SOLA]', errorMsg); // eslint-disable-line no-console
+                var inputEl = UI.getElements().input;
+                if (inputEl) { inputEl.setAttribute('aria-invalid', 'true'); }
                 // Show error as assistant message.
                 // Detect specific HTTP error patterns for categorised responses.
                 if (errorMsg.includes('401') || errorMsg.includes('auth')) {
