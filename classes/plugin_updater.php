@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 class plugin_updater {
 
     /** GitHub API endpoint for latest release. */
-    const GITHUB_API = 'https://api.github.com/repos/saylordotorg/sola-moodle-plugin/releases/latest';
+    const GITHUB_API = 'https://api.github.com/repos/saylordotorg/moodle-local_ai_course_assistant/releases/latest';
 
     /**
      * Get the current installed version info.
