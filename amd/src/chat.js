@@ -1328,7 +1328,8 @@ define([
             if (!span) {
                 return;
             }
-            if (btn.dataset.translatable !== '1') {
+            if (btn.dataset.builtin !== '1') {
+                // Custom (non-built-in) starters keep their admin-configured label.
                 span.textContent = btn.dataset.labelEn || span.textContent;
                 return;
             }
@@ -2655,23 +2656,17 @@ define([
             UI.showNotification('Please wait for the current response to finish before starting voice chat.', 'error');
             return;
         }
-        setBottomMode('voice', {force: true});
-        syncVoicePanel();
         const root = document.getElementById('local-ai-course-assistant');
         if (!root || !isVoiceFeatureEnabled(root)) {
             UI.showNotification('Voice chat is not enabled for this course yet.', 'error');
-            syncVoicePanel();
             return;
         }
-
         if (!hasVoiceInputEnvironment()) {
-            addAssistantMsg(
-                'Voice chat requires a secure connection (HTTPS). ' +
-                'Please use the HTTPS version of this site to access voice features.'
-            );
-            syncVoicePanel();
+            UI.showNotification('Voice chat needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.', 'error');
             return;
         }
+        setBottomMode('voice', {force: true});
+        syncVoicePanel();
 
         if (isRealtimeVoicePreferred(root)) {
             var assistantName = (root && root.dataset.shortname) || (root && root.dataset.displayname) || 'SOLA';
@@ -2713,24 +2708,17 @@ define([
             UI.showNotification('Please wait for the current response to finish before starting voice chat.', 'error');
             return;
         }
-        setBottomMode('voice', {force: true});
-        syncVoicePanel();
-
-        if (!hasVoiceInputEnvironment()) {
-            addAssistantMsg(
-                'ELL Pronunciation requires a secure connection (HTTPS). ' +
-                'Please use the HTTPS version of this site to access voice features.'
-            );
-            syncVoicePanel();
-            return;
-        }
-
         const root = document.getElementById('local-ai-course-assistant');
         if (!root || !isRealtimeVoicePreferred(root)) {
-            addAssistantMsg('ELL Pronunciation is not enabled for this course yet.');
-            syncVoicePanel();
+            UI.showNotification('Pronunciation Practice is not enabled for this course yet.', 'error');
             return;
         }
+        if (!hasVoiceInputEnvironment()) {
+            UI.showNotification('Pronunciation Practice needs a secure context (HTTPS or localhost) and microphone access. This page is served over plain HTTP from a LAN address, so the browser blocks the microphone.', 'error');
+            return;
+        }
+        setBottomMode('voice', {force: true});
+        syncVoicePanel();
 
         var assistantName = (root && root.dataset.shortname) || (root && root.dataset.displayname) || 'SOLA';
         startRealtimeVoiceSession({

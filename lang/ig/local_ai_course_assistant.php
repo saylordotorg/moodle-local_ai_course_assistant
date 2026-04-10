@@ -393,3 +393,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Kọwaa peeji a';
+$string['chat:starter_ask_anything'] = 'Jụọ ihe ọ bụla';
+$string['chat:starter_review_practice'] = 'Nyochaa ma mụọ';
+$string['chat:history_saved_subtitle'] = 'Azịza echekwara na-anọ na ngwaọrụ a maka nkuzi a.';
+$string['chat:history_saved_empty'] = 'Chekwaa azịza AI ka ịhụ ya ebe a.';
+$string['chat:history_views_label'] = 'Nlele akụkọ ihe mere eme';
+$string['chat:history_view_saved'] = 'Echekwara';
+$string['chat:history_view_recent'] = 'Akụkọ ihe mere eme';
+$string['chat:debug_refresh'] = 'Megharịa';
+$string['chat:debug_copy_all'] = 'Detuo niile';
+$string['chat:debug_close'] = 'Mechie';
+$string['chat:language_switch'] = 'Gbanwee asụsụ';
+$string['chat:language_dismiss'] = 'Wepụ aro asụsụ';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Họrọ onye na-enye LLM';
+$string['chat:llm_model_label'] = 'Ụdị';
+$string['chat:llm_model_select'] = 'Họrọ ụdị LLM';
+$string['chat:footer_usertesting'] = 'Nyocha nke ojiji';
+$string['chat:footer_feedback'] = 'Nzaghachi';
+$string['chat:voice_panel_title'] = 'Kpaa {$a} okwu (Nnwale)';

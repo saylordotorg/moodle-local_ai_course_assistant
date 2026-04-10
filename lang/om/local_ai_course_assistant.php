@@ -380,3 +380,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Fuula kana ibsi';
+$string['chat:starter_ask_anything'] = 'Waan tokko gaafadhu';
+$string['chat:starter_review_practice'] = 'Irra deebi\'ii shaakali';
+$string['chat:history_saved_subtitle'] = 'Deebiiwwan kuufaman koorsii kana keessatti meeshaa kana irra turu.';
+$string['chat:history_saved_empty'] = 'Deebii AI asitti argu kuufadhu.';
+$string['chat:history_views_label'] = 'Ilaalcha seenaa';
+$string['chat:history_view_saved'] = 'Kuufame';
+$string['chat:history_view_recent'] = 'Seenaa';
+$string['chat:debug_refresh'] = 'Haaromsi';
+$string['chat:debug_copy_all'] = 'Hunda garagalchi';
+$string['chat:debug_close'] = 'Cufi';
+$string['chat:language_switch'] = 'Afaan jijjiiri';
+$string['chat:language_dismiss'] = 'Yaada afaanii hambisi';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Dhiyeessaa LLM filadhu';
+$string['chat:llm_model_label'] = 'Moodela';
+$string['chat:llm_model_select'] = 'Moodela LLM filadhu';
+$string['chat:footer_usertesting'] = 'Qorannoo ittifayyadamummaa';
+$string['chat:footer_feedback'] = 'Yaada';
+$string['chat:voice_panel_title'] = '{$a} waliin dubbadhu (Yaaliif)';

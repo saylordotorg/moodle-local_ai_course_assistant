@@ -399,3 +399,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Eleza ukurasa huu';
+$string['chat:starter_ask_anything'] = 'Uliza chochote';
+$string['chat:starter_review_practice'] = 'Kagua na fanya mazoezi';
+$string['chat:history_saved_subtitle'] = 'Majibu yaliyohifadhiwa yanabaki kwenye kifaa hiki kwa kozi hii.';
+$string['chat:history_saved_empty'] = 'Hifadhi jibu la AI ili kuliona hapa.';
+$string['chat:history_views_label'] = 'Mionekano ya historia';
+$string['chat:history_view_saved'] = 'Yaliyohifadhiwa';
+$string['chat:history_view_recent'] = 'Historia';
+$string['chat:debug_refresh'] = 'Onyesha upya';
+$string['chat:debug_copy_all'] = 'Nakili zote';
+$string['chat:debug_close'] = 'Funga';
+$string['chat:language_switch'] = 'Badilisha lugha';
+$string['chat:language_dismiss'] = 'Puuza pendekezo la lugha';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Chagua mtoa huduma wa LLM';
+$string['chat:llm_model_label'] = 'Mfano';
+$string['chat:llm_model_select'] = 'Chagua mfano wa LLM';
+$string['chat:footer_usertesting'] = 'Jaribio la utumiaji';
+$string['chat:footer_feedback'] = 'Maoni';
+$string['chat:voice_panel_title'] = 'Zungumza na {$a} (Jaribio)';

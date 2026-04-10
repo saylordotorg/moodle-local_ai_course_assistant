@@ -399,3 +399,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Ipaliwanag ang pahinang ito';
+$string['chat:starter_ask_anything'] = 'Magtanong ng kahit ano';
+$string['chat:starter_review_practice'] = 'Repasuhin at magsanay';
+$string['chat:history_saved_subtitle'] = 'Ang mga nai-save na sagot ay nananatili sa device na ito para sa kursong ito.';
+$string['chat:history_saved_empty'] = 'Mag-save ng sagot ng AI upang makita ito dito.';
+$string['chat:history_views_label'] = 'Mga view ng kasaysayan';
+$string['chat:history_view_saved'] = 'Naka-save';
+$string['chat:history_view_recent'] = 'Kasaysayan';
+$string['chat:debug_refresh'] = 'I-refresh';
+$string['chat:debug_copy_all'] = 'Kopyahin lahat';
+$string['chat:debug_close'] = 'Isara';
+$string['chat:language_switch'] = 'Magpalit ng wika';
+$string['chat:language_dismiss'] = 'I-dismiss ang mungkahi ng wika';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Piliin ang provider ng LLM';
+$string['chat:llm_model_label'] = 'Modelo';
+$string['chat:llm_model_select'] = 'Piliin ang modelo ng LLM';
+$string['chat:footer_usertesting'] = 'Pagsubok sa kagamitan';
+$string['chat:footer_feedback'] = 'Feedback';
+$string['chat:voice_panel_title'] = 'Makipag-usap kay {$a} (Eksperimental)';

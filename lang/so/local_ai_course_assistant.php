@@ -394,3 +394,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Sharax boggan';
+$string['chat:starter_ask_anything'] = 'Weydii wax kasta';
+$string['chat:starter_review_practice'] = 'Dib u eeg oo ku celceli';
+$string['chat:history_saved_subtitle'] = 'Jawaabaha la keydiyay way ku sii jiraan qalabkan koorsadan.';
+$string['chat:history_saved_empty'] = 'Keydi jawaabta AI si aad halkan ugu aragto.';
+$string['chat:history_views_label'] = 'Aragtiyada taariikhda';
+$string['chat:history_view_saved'] = 'La keydiyay';
+$string['chat:history_view_recent'] = 'Taariikhda';
+$string['chat:debug_refresh'] = 'Cusboonaysii';
+$string['chat:debug_copy_all'] = 'Koobbi dhamaan';
+$string['chat:debug_close'] = 'Xir';
+$string['chat:language_switch'] = 'Beddel luqadda';
+$string['chat:language_dismiss'] = 'Diid soo jeedinta luqadda';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Dooro bixiyaha LLM';
+$string['chat:llm_model_label'] = 'Qaabka';
+$string['chat:llm_model_select'] = 'Dooro qaabka LLM';
+$string['chat:footer_usertesting'] = 'Imtixaanka isticmaalka';
+$string['chat:footer_feedback'] = 'Jawaab celin';
+$string['chat:voice_panel_title'] = 'La hadal {$a} (Tijaabo)';

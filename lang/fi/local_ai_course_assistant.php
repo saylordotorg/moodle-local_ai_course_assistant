@@ -376,3 +376,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Selitä tämä sivu';
+$string['chat:starter_ask_anything'] = 'Kysy mitä vain';
+$string['chat:starter_review_practice'] = 'Kertaa ja harjoittele';
+$string['chat:history_saved_subtitle'] = 'Tallennetut vastaukset säilyvät tällä laitteella tätä kurssia varten.';
+$string['chat:history_saved_empty'] = 'Tallenna AI-vastaus nähdäksesi sen täällä.';
+$string['chat:history_views_label'] = 'Historianäkymät';
+$string['chat:history_view_saved'] = 'Tallennetut';
+$string['chat:history_view_recent'] = 'Historia';
+$string['chat:debug_refresh'] = 'Päivitä';
+$string['chat:debug_copy_all'] = 'Kopioi kaikki';
+$string['chat:debug_close'] = 'Sulje';
+$string['chat:language_switch'] = 'Vaihda kieli';
+$string['chat:language_dismiss'] = 'Hylkää kieliehdotus';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Valitse LLM-palveluntarjoaja';
+$string['chat:llm_model_label'] = 'Malli';
+$string['chat:llm_model_select'] = 'Valitse LLM-malli';
+$string['chat:footer_usertesting'] = 'Käytettävyystestaus';
+$string['chat:footer_feedback'] = 'Palaute';
+$string['chat:voice_panel_title'] = 'Keskustele {$a} kanssa (Kokeellinen)';

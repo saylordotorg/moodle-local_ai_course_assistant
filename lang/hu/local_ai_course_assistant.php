@@ -340,3 +340,22 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:history_saved_subtitle'] = 'A mentett válaszok ezen az eszközön maradnak ehhez a kurzushoz.';
+$string['chat:history_saved_empty'] = 'Ments el egy AI-választ, hogy itt láthasd.';
+$string['chat:history_views_label'] = 'Előzménynézetek';
+$string['chat:history_view_saved'] = 'Mentett';
+$string['chat:history_view_recent'] = 'Előzmények';
+$string['chat:debug_refresh'] = 'Frissítés';
+$string['chat:debug_copy_all'] = 'Összes másolása';
+$string['chat:debug_close'] = 'Bezárás';
+$string['chat:language_switch'] = 'Nyelv váltása';
+$string['chat:language_dismiss'] = 'Nyelvjavaslat elvetése';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'LLM-szolgáltató kiválasztása';
+$string['chat:llm_model_label'] = 'Modell';
+$string['chat:llm_model_select'] = 'LLM-modell kiválasztása';
+$string['chat:footer_usertesting'] = 'Használhatósági tesztelés';
+$string['chat:footer_feedback'] = 'Visszajelzés';
+$string['chat:voice_panel_title'] = 'Beszélgetés {$a} partnerrel (Kísérleti)';

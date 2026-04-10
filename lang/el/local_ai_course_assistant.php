@@ -340,3 +340,22 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:history_saved_subtitle'] = 'Οι αποθηκευμένες απαντήσεις παραμένουν σε αυτή τη συσκευή για αυτό το μάθημα.';
+$string['chat:history_saved_empty'] = 'Αποθηκεύστε μια απάντηση AI για να τη δείτε εδώ.';
+$string['chat:history_views_label'] = 'Προβολές ιστορικού';
+$string['chat:history_view_saved'] = 'Αποθηκευμένες';
+$string['chat:history_view_recent'] = 'Ιστορικό';
+$string['chat:debug_refresh'] = 'Ανανέωση';
+$string['chat:debug_copy_all'] = 'Αντιγραφή όλων';
+$string['chat:debug_close'] = 'Κλείσιμο';
+$string['chat:language_switch'] = 'Αλλαγή γλώσσας';
+$string['chat:language_dismiss'] = 'Απόρριψη πρότασης γλώσσας';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Επιλογή παρόχου LLM';
+$string['chat:llm_model_label'] = 'Μοντέλο';
+$string['chat:llm_model_select'] = 'Επιλογή μοντέλου LLM';
+$string['chat:footer_usertesting'] = 'Δοκιμή ευχρηστίας';
+$string['chat:footer_feedback'] = 'Σχόλια';
+$string['chat:voice_panel_title'] = 'Μίλα με {$a} (Πειραματικό)';

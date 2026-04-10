@@ -399,3 +399,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Ṣàlàyé ojú-ìwé yìí';
+$string['chat:starter_ask_anything'] = 'Béèrè ohunkóhun';
+$string['chat:starter_review_practice'] = 'Àtúnyẹ̀wò àti ìdánrawò';
+$string['chat:history_saved_subtitle'] = 'Àwọn ìdáhùn tí a ti fi pamọ́ wà lórí ẹ̀rọ yìí fún iṣẹ́-ẹ̀kọ́ yìí.';
+$string['chat:history_saved_empty'] = 'Fi ìdáhùn AI pamọ́ láti rí i níhìn-ín.';
+$string['chat:history_views_label'] = 'Àwọn ìwòye ìtàn';
+$string['chat:history_view_saved'] = 'Tí a fi pamọ́';
+$string['chat:history_view_recent'] = 'Ìtàn';
+$string['chat:debug_refresh'] = 'Mú tuntun';
+$string['chat:debug_copy_all'] = 'Ṣe àdàkọ gbogbo';
+$string['chat:debug_close'] = 'Tì';
+$string['chat:language_switch'] = 'Yí èdè padà';
+$string['chat:language_dismiss'] = 'Kọ̀ àbá èdè';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Yan olùpèsè LLM';
+$string['chat:llm_model_label'] = 'Àwòkọ́ṣe';
+$string['chat:llm_model_select'] = 'Yan àwòkọ́ṣe LLM';
+$string['chat:footer_usertesting'] = 'Ìdánwò ìlò';
+$string['chat:footer_feedback'] = 'Èsì';
+$string['chat:voice_panel_title'] = 'Bá {$a} sọ̀rọ̀ (Àdánwò)';

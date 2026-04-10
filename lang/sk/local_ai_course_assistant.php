@@ -376,3 +376,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Vysvetli túto stránku';
+$string['chat:starter_ask_anything'] = 'Opýtajte sa čokoľvek';
+$string['chat:starter_review_practice'] = 'Opakovanie a precvičovanie';
+$string['chat:history_saved_subtitle'] = 'Uložené odpovede zostávajú na tomto zariadení pre tento kurz.';
+$string['chat:history_saved_empty'] = 'Uložte odpoveď AI, aby ste ju videli tu.';
+$string['chat:history_views_label'] = 'Zobrazenia histórie';
+$string['chat:history_view_saved'] = 'Uložené';
+$string['chat:history_view_recent'] = 'História';
+$string['chat:debug_refresh'] = 'Obnoviť';
+$string['chat:debug_copy_all'] = 'Kopírovať všetko';
+$string['chat:debug_close'] = 'Zavrieť';
+$string['chat:language_switch'] = 'Zmeniť jazyk';
+$string['chat:language_dismiss'] = 'Zamietnuť návrh jazyka';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Vyberte poskytovateľa LLM';
+$string['chat:llm_model_label'] = 'Model';
+$string['chat:llm_model_select'] = 'Vyberte model LLM';
+$string['chat:footer_usertesting'] = 'Testovanie použiteľnosti';
+$string['chat:footer_feedback'] = 'Spätná väzba';
+$string['chat:voice_panel_title'] = 'Hovorte s {$a} (Experimentálne)';

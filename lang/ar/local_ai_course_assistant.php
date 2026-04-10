@@ -376,3 +376,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'اشرح هذه الصفحة';
+$string['chat:starter_ask_anything'] = 'اسأل أي شيء';
+$string['chat:starter_review_practice'] = 'مراجعة وتمرين';
+$string['chat:history_saved_subtitle'] = 'تبقى الردود المحفوظة على هذا الجهاز لهذه الدورة.';
+$string['chat:history_saved_empty'] = 'احفظ رد الذكاء الاصطناعي لرؤيته هنا.';
+$string['chat:history_views_label'] = 'عروض السجل';
+$string['chat:history_view_saved'] = 'المحفوظة';
+$string['chat:history_view_recent'] = 'السجل';
+$string['chat:debug_refresh'] = 'تحديث';
+$string['chat:debug_copy_all'] = 'نسخ الكل';
+$string['chat:debug_close'] = 'إغلاق';
+$string['chat:language_switch'] = 'تبديل اللغة';
+$string['chat:language_dismiss'] = 'تجاهل اقتراح اللغة';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'اختر مزود LLM';
+$string['chat:llm_model_label'] = 'النموذج';
+$string['chat:llm_model_select'] = 'اختر نموذج LLM';
+$string['chat:footer_usertesting'] = 'اختبار قابلية الاستخدام';
+$string['chat:footer_feedback'] = 'ملاحظات';
+$string['chat:voice_panel_title'] = 'تحدث مع {$a} (تجريبي)';

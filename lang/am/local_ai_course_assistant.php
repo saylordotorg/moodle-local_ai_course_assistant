@@ -405,3 +405,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'ይህን ገጽ አብራራ';
+$string['chat:starter_ask_anything'] = 'ማንኛውንም ጠይቅ';
+$string['chat:starter_review_practice'] = 'ክለሳ እና ልምምድ';
+$string['chat:history_saved_subtitle'] = 'የተቀመጡ ምላሾች ለዚህ ኮርስ በዚህ መሣሪያ ላይ ይቆያሉ።';
+$string['chat:history_saved_empty'] = 'የAI ምላሽን እዚህ ለማየት ያስቀምጡ።';
+$string['chat:history_views_label'] = 'የታሪክ እይታዎች';
+$string['chat:history_view_saved'] = 'የተቀመጡ';
+$string['chat:history_view_recent'] = 'ታሪክ';
+$string['chat:debug_refresh'] = 'አድስ';
+$string['chat:debug_copy_all'] = 'ሁሉንም ቅዳ';
+$string['chat:debug_close'] = 'ዝጋ';
+$string['chat:language_switch'] = 'ቋንቋ ቀይር';
+$string['chat:language_dismiss'] = 'የቋንቋ ጥቆማን አሰናብት';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'የLLM አቅራቢ ይምረጡ';
+$string['chat:llm_model_label'] = 'ሞዴል';
+$string['chat:llm_model_select'] = 'የLLM ሞዴል ይምረጡ';
+$string['chat:footer_usertesting'] = 'የተጠቃሚ ሙከራ';
+$string['chat:footer_feedback'] = 'አስተያየት';
+$string['chat:voice_panel_title'] = 'ከ{$a} ጋር ተነጋገር (ሙከራ)';

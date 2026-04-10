@@ -340,3 +340,22 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:history_saved_subtitle'] = 'תגובות שמורות נשארות במכשיר זה עבור קורס זה.';
+$string['chat:history_saved_empty'] = 'שמור תגובת AI כדי לראותה כאן.';
+$string['chat:history_views_label'] = 'תצוגות היסטוריה';
+$string['chat:history_view_saved'] = 'שמורות';
+$string['chat:history_view_recent'] = 'היסטוריה';
+$string['chat:debug_refresh'] = 'רענן';
+$string['chat:debug_copy_all'] = 'העתק הכל';
+$string['chat:debug_close'] = 'סגור';
+$string['chat:language_switch'] = 'החלף שפה';
+$string['chat:language_dismiss'] = 'דחה הצעת שפה';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'בחר ספק LLM';
+$string['chat:llm_model_label'] = 'מודל';
+$string['chat:llm_model_select'] = 'בחר מודל LLM';
+$string['chat:footer_usertesting'] = 'בדיקת שמישות';
+$string['chat:footer_feedback'] = 'משוב';
+$string['chat:voice_panel_title'] = 'דבר עם {$a} (ניסיוני)';

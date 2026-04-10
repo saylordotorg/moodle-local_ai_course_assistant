@@ -399,3 +399,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Chaza leli khasi';
+$string['chat:starter_ask_anything'] = 'Buza noma yini';
+$string['chat:starter_review_practice'] = 'Buyekeza futhi uzipratize';
+$string['chat:history_saved_subtitle'] = 'Izimpendulo ezilondoloziwe zihlala kule divayisi yalesi sifundo.';
+$string['chat:history_saved_empty'] = 'Londoloza impendulo ye-AI ukuze uyibone lapha.';
+$string['chat:history_views_label'] = 'Imibono yomlando';
+$string['chat:history_view_saved'] = 'Okulondoloziwe';
+$string['chat:history_view_recent'] = 'Umlando';
+$string['chat:debug_refresh'] = 'Vuselela';
+$string['chat:debug_copy_all'] = 'Kopisha konke';
+$string['chat:debug_close'] = 'Vala';
+$string['chat:language_switch'] = 'Shintsha ulimi';
+$string['chat:language_dismiss'] = 'Cashisa isiphakamiso solimi';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Khetha umhlinzeki we-LLM';
+$string['chat:llm_model_label'] = 'Imodeli';
+$string['chat:llm_model_select'] = 'Khetha imodeli ye-LLM';
+$string['chat:footer_usertesting'] = 'Ukuhlolwa kokusebenziseka';
+$string['chat:footer_feedback'] = 'Impendulo';
+$string['chat:voice_panel_title'] = 'Khuluma no-{$a} (Okulingwayo)';

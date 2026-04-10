@@ -406,3 +406,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Nin ɲɛ ɲɛfɔ';
+$string['chat:starter_ask_anything'] = 'Fɛn o fɛn ɲininka';
+$string['chat:starter_review_practice'] = 'Sɛgɛsɛgɛli ni lakodɔnni';
+$string['chat:history_saved_subtitle'] = 'Jaabi marалenw bɛ to masin in na kalanso in kama.';
+$string['chat:history_saved_empty'] = 'AI jaabi mara walisa k\'a ye yan.';
+$string['chat:history_views_label'] = 'Kɔfɛkow jirali';
+$string['chat:history_view_saved'] = 'Maralenw';
+$string['chat:history_view_recent'] = 'Kɔfɛkow';
+$string['chat:debug_refresh'] = 'A kura';
+$string['chat:debug_copy_all'] = 'Bɛɛ ladege';
+$string['chat:debug_close'] = 'A datugu';
+$string['chat:language_switch'] = 'Kan falen';
+$string['chat:language_dismiss'] = 'Kan laadilikan ban';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'LLM dilannikɛla sugandi';
+$string['chat:llm_model_label'] = 'Cogoya';
+$string['chat:llm_model_select'] = 'LLM cogoya sugandi';
+$string['chat:footer_usertesting'] = 'Baarakɛcogo sɛgɛsɛgɛli';
+$string['chat:footer_feedback'] = 'Hakililajigin';
+$string['chat:voice_panel_title'] = 'Kuma {$a} fɛ (Ka sɛgɛsɛgɛ)';

@@ -376,3 +376,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Forklar denne siden';
+$string['chat:starter_ask_anything'] = 'Spør om hva som helst';
+$string['chat:starter_review_practice'] = 'Gjennomgå og øv';
+$string['chat:history_saved_subtitle'] = 'Lagrede svar blir værende på denne enheten for dette kurset.';
+$string['chat:history_saved_empty'] = 'Lagre et AI-svar for å se det her.';
+$string['chat:history_views_label'] = 'Historikkvisninger';
+$string['chat:history_view_saved'] = 'Lagrede';
+$string['chat:history_view_recent'] = 'Historikk';
+$string['chat:debug_refresh'] = 'Oppdater';
+$string['chat:debug_copy_all'] = 'Kopier alt';
+$string['chat:debug_close'] = 'Lukk';
+$string['chat:language_switch'] = 'Bytt språk';
+$string['chat:language_dismiss'] = 'Avvis språkforslag';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Velg LLM-leverandør';
+$string['chat:llm_model_label'] = 'Modell';
+$string['chat:llm_model_select'] = 'Velg LLM-modell';
+$string['chat:footer_usertesting'] = 'Brukervennlighetstesting';
+$string['chat:footer_feedback'] = 'Tilbakemelding';
+$string['chat:voice_panel_title'] = 'Snakk med {$a} (Eksperimentell)';

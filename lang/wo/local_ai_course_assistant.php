@@ -399,3 +399,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Xamal bii xët';
+$string['chat:starter_ask_anything'] = 'Laaj lu la neexe';
+$string['chat:starter_review_practice'] = 'Seet ak jëfandikoo';
+$string['chat:history_saved_subtitle'] = 'Tontu yi ñu denc ñoo féete ci masiin bi ngir kurs bi.';
+$string['chat:history_saved_empty'] = 'Dencal benn tontu AI ngir gis ko fi.';
+$string['chat:history_views_label'] = 'Xoolu taariix';
+$string['chat:history_view_saved'] = 'Dencu';
+$string['chat:history_view_recent'] = 'Taariix';
+$string['chat:debug_refresh'] = 'Yeesalaat';
+$string['chat:debug_copy_all'] = 'Duppee yépp';
+$string['chat:debug_close'] = 'Tëj';
+$string['chat:language_switch'] = 'Soppi làkk';
+$string['chat:language_dismiss'] = 'Bañ xalaat làkk';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Tànn jotkatu LLM';
+$string['chat:llm_model_label'] = 'Modél';
+$string['chat:llm_model_select'] = 'Tànn modél LLM';
+$string['chat:footer_usertesting'] = 'Testu jëfandikoo';
+$string['chat:footer_feedback'] = 'Xalaat';
+$string['chat:voice_panel_title'] = 'Wax ak {$a} (Natal)';

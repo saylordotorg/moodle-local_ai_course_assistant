@@ -631,6 +631,11 @@ $string['chat:history_title']           = 'Notes and Conversation History';
 $string['chat:history_subtitle']        = 'Your recent messages in this course.';
 $string['chat:history_empty']           = 'No conversations yet.';
 $string['chat:history_refresh']         = 'Refresh';
+$string['chat:history_saved_subtitle']  = 'Saved responses stay on this device for this course.';
+$string['chat:history_saved_empty']     = 'Save an AI response to see it here.';
+$string['chat:history_views_label']     = 'History views';
+$string['chat:history_view_saved']      = 'Saved';
+$string['chat:history_view_recent']     = 'History';
 
 // Debug panel.
 $string['chat:debug_context']           = 'Context Debug';
@@ -639,6 +644,26 @@ $string['chat:debug_context_copy']      = 'Copy';
 $string['chat:debug_context_browser']   = 'Browser Snapshot';
 $string['chat:debug_context_request']   = 'Last SSE Request';
 $string['chat:debug_context_prompt']    = 'Server Response';
+$string['chat:debug_refresh']           = 'Refresh';
+$string['chat:debug_copy_all']          = 'Copy all';
+$string['chat:debug_close']             = 'Close';
+
+// Language suggestion banner.
+$string['chat:language_switch']         = 'Switch language';
+$string['chat:language_dismiss']        = 'Dismiss language suggestion';
+
+// Composer LLM picker (admin/debug).
+$string['chat:llm_label']               = 'LLM';
+$string['chat:llm_provider_select']     = 'Select LLM provider';
+$string['chat:llm_model_label']         = 'Model';
+$string['chat:llm_model_select']        = 'Select LLM model';
+
+// Footer links.
+$string['chat:footer_usertesting']      = 'Usability Testing';
+$string['chat:footer_feedback']         = 'Feedback';
+
+// Voice panel title (uses {$a} for assistant display name).
+$string['chat:voice_panel_title']       = 'Talk with {$a} (Experimental)';
 
 // Quiz hide settings.
 $string['settings:quiz_hide_heading'] = 'Quiz Page Visibility';

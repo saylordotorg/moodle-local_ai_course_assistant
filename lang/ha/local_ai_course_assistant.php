@@ -407,3 +407,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'Bayyana wannan shafi';
+$string['chat:starter_ask_anything'] = 'Tambayi komai';
+$string['chat:starter_review_practice'] = 'Bita da aiki';
+$string['chat:history_saved_subtitle'] = 'Amsoshin da aka ajiye suna kasancewa akan wannan na\'urar don wannan kwas.';
+$string['chat:history_saved_empty'] = 'Ajiye amsar AI don ganinta a nan.';
+$string['chat:history_views_label'] = 'Ra\'ayoyin tarihi';
+$string['chat:history_view_saved'] = 'An ajiye';
+$string['chat:history_view_recent'] = 'Tarihi';
+$string['chat:debug_refresh'] = 'Sabunta';
+$string['chat:debug_copy_all'] = 'Kwafi duka';
+$string['chat:debug_close'] = 'Rufe';
+$string['chat:language_switch'] = 'Canza harshe';
+$string['chat:language_dismiss'] = 'Yar da shawarar harshe';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Zaɓi mai samar da LLM';
+$string['chat:llm_model_label'] = 'Samfuri';
+$string['chat:llm_model_select'] = 'Zaɓi samfurin LLM';
+$string['chat:footer_usertesting'] = 'Gwajin yiwuwar amfani';
+$string['chat:footer_feedback'] = 'Ra\'ayi';
+$string['chat:voice_panel_title'] = 'Yi magana da {$a} (Gwaji)';

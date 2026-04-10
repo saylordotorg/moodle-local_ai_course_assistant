@@ -340,3 +340,22 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:history_saved_subtitle'] = 'Збережені відповіді залишаються на цьому пристрої для цього курсу.';
+$string['chat:history_saved_empty'] = 'Збережіть відповідь ШІ, щоб побачити її тут.';
+$string['chat:history_views_label'] = 'Перегляди історії';
+$string['chat:history_view_saved'] = 'Збережені';
+$string['chat:history_view_recent'] = 'Історія';
+$string['chat:debug_refresh'] = 'Оновити';
+$string['chat:debug_copy_all'] = 'Копіювати все';
+$string['chat:debug_close'] = 'Закрити';
+$string['chat:language_switch'] = 'Змінити мову';
+$string['chat:language_dismiss'] = 'Відхилити пропозицію мови';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'Вибрати постачальника LLM';
+$string['chat:llm_model_label'] = 'Модель';
+$string['chat:llm_model_select'] = 'Вибрати модель LLM';
+$string['chat:footer_usertesting'] = 'Тестування зручності';
+$string['chat:footer_feedback'] = 'Відгук';
+$string['chat:voice_panel_title'] = 'Говоріть з {$a} (Експериментально)';

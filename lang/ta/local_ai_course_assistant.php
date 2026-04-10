@@ -399,3 +399,25 @@ $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_groq'] = 'Groq';
 $string['settings:provider_openrouter'] = 'OpenRouter';
 $string['settings:provider_xai'] = 'xAI (Grok)';
+
+// Strings added by update_langs.py.
+$string['chat:starter_help_page'] = 'இந்தப் பக்கத்தை விளக்கு';
+$string['chat:starter_ask_anything'] = 'எதையும் கேளுங்கள்';
+$string['chat:starter_review_practice'] = 'மீளாய்வு மற்றும் பயிற்சி';
+$string['chat:history_saved_subtitle'] = 'சேமிக்கப்பட்ட பதில்கள் இந்த படிப்புக்காக இந்த சாதனத்தில் இருக்கும்.';
+$string['chat:history_saved_empty'] = 'இங்கே காண AI பதிலைச் சேமிக்கவும்.';
+$string['chat:history_views_label'] = 'வரலாற்று காட்சிகள்';
+$string['chat:history_view_saved'] = 'சேமிக்கப்பட்டவை';
+$string['chat:history_view_recent'] = 'வரலாறு';
+$string['chat:debug_refresh'] = 'புதுப்பிக்க';
+$string['chat:debug_copy_all'] = 'அனைத்தையும் நகலெடு';
+$string['chat:debug_close'] = 'மூடு';
+$string['chat:language_switch'] = 'மொழி மாற்று';
+$string['chat:language_dismiss'] = 'மொழி பரிந்துரையை நிராகரி';
+$string['chat:llm_label'] = 'LLM';
+$string['chat:llm_provider_select'] = 'LLM வழங்குநரைத் தேர்ந்தெடு';
+$string['chat:llm_model_label'] = 'மாதிரி';
+$string['chat:llm_model_select'] = 'LLM மாதிரியைத் தேர்ந்தெடு';
+$string['chat:footer_usertesting'] = 'பயன்பாட்டுத் திறன் சோதனை';
+$string['chat:footer_feedback'] = 'கருத்து';
+$string['chat:voice_panel_title'] = '{$a} உடன் பேசு (சோதனை)';
