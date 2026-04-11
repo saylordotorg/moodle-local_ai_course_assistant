@@ -68,14 +68,7 @@ class hook_callbacks {
             return;
         }
 
-        // Detect role: administrator > academic_support > student.
-        if (has_capability('local/ai_course_assistant:manage', $coursecontext)) {
-            $userrole = 'administrator';
-        } else if (has_capability('moodle/course:update', $coursecontext)) {
-            $userrole = 'academic_support';
-        } else {
-            $userrole = 'student';
-        }
+        $userrole = context_builder::detect_role($courseid, $USER->id);
 
         // Quiz hide: optionally suppress widget on all quiz pages (stricter than quizLocked).
         $hideonquizforstudents = (bool)get_config('local_ai_course_assistant', 'hide_on_quiz_for_students');

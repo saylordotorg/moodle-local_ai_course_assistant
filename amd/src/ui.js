@@ -1132,6 +1132,7 @@ define([
             isOpen() &&
             window.innerWidth > 600);
 
+        closeToggle.hidden = !showCloseToggle;
         closeToggle.setAttribute('aria-hidden', showCloseToggle ? 'false' : 'true');
         closeToggle.setAttribute('aria-expanded', showCloseToggle ? 'true' : 'false');
         closeToggle.disabled = !showCloseToggle;
@@ -1144,60 +1145,70 @@ define([
      * @returns {boolean} True if drawer is now open
      */
     const toggleDrawer = function() {
+        if (!drawer || !toggle) {
+            return false;
+        }
+
         // On mobile, if the drawer is minimized, clicking the toggle restores to full-screen.
-        if (drawer && drawer.classList.contains('local-ai-course-assistant__drawer--minimized')) {
+        if (drawer.classList.contains('local-ai-course-assistant__drawer--minimized')) {
             drawer.classList.remove('local-ai-course-assistant__drawer--minimized');
             return true; // still open
         }
+
         const opening = !isOpen();
-        drawer.setAttribute('aria-hidden', opening ? 'false' : 'true');
-        toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
-        if (opening) {
-            drawer.classList.add('local-ai-course-assistant__drawer--open');
-            if (root) { root.classList.add('local-ai-course-assistant--open'); }
-            // Show conversation starters when reopening.
-            showStarters();
-            // Focus trap: keep Tab cycling within the drawer.
-            if (!drawer._aicaFocusTrap) {
-                drawer._aicaFocusTrap = function(e) {
-                    if (e.key !== 'Tab') { return; }
-                    var focusable = drawer.querySelectorAll(
-                        'button:not([disabled]):not([aria-hidden="true"]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                    );
-                    if (!focusable.length) { return; }
-                    var first = focusable[0];
-                    var last = focusable[focusable.length - 1];
-                    if (e.shiftKey && document.activeElement === first) {
-                        e.preventDefault();
-                        last.focus();
-                    } else if (!e.shiftKey && document.activeElement === last) {
-                        e.preventDefault();
-                        first.focus();
-                    }
-                };
-                drawer.addEventListener('keydown', drawer._aicaFocusTrap);
-            }
-            // Push page content aside on desktop so drawer doesn't overlap.
-            // Use requestAnimationFrame so the drawer has its final width before we read it.
-            requestAnimationFrame(function() {
-                updatePagePush(true);
-                syncCloseTogglePosition();
-            });
-        } else {
-            drawer.classList.remove('local-ai-course-assistant__drawer--open');
-            if (root) { root.classList.remove('local-ai-course-assistant--open'); }
-            updatePagePush(false);
-            syncCloseTogglePosition();
+
+        if (!opening) {
+            closeDrawer();
+            return false;
         }
 
-        return opening;
+        drawer.hidden = false;
+        drawer.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+        drawer.classList.add('local-ai-course-assistant__drawer--open');
+        if (root) { root.classList.add('local-ai-course-assistant--open'); }
+        // Show conversation starters when reopening.
+        showStarters();
+        // Focus trap: keep Tab cycling within the drawer.
+        if (!drawer._aicaFocusTrap) {
+            drawer._aicaFocusTrap = function(e) {
+                if (e.key !== 'Tab') { return; }
+                var focusable = drawer.querySelectorAll(
+                    'button:not([disabled]):not([aria-hidden="true"]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                );
+                if (!focusable.length) { return; }
+                var first = focusable[0];
+                var last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            };
+            drawer.addEventListener('keydown', drawer._aicaFocusTrap);
+        }
+        // Push page content aside on desktop so drawer doesn't overlap.
+        // Use requestAnimationFrame so the drawer has its final width before we read it.
+        requestAnimationFrame(function() {
+            updatePagePush(true);
+            syncCloseTogglePosition();
+        });
+
+        return true;
     };
 
     /**
      * Close the drawer.
      */
     const closeDrawer = function() {
+        if (!drawer || !toggle) {
+            return;
+        }
+
         drawer.setAttribute('aria-hidden', 'true');
+        drawer.hidden = true;
         toggle.setAttribute('aria-expanded', 'false');
         drawer.classList.remove('local-ai-course-assistant__drawer--open');
         drawer.classList.remove('local-ai-course-assistant__drawer--minimized');

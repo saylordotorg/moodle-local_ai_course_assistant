@@ -74,16 +74,7 @@ class context_builder {
         $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
         $userrecord = $DB->get_record('user', ['id' => $userid], 'firstname', MUST_EXIST);
         $firstname = $userrecord->firstname;
-        $coursecontext = \context_course::instance($courseid);
-
-        // Detect role: administrator > academic_support > student.
-        if (has_capability('local/ai_course_assistant:manage', $coursecontext, $userid)) {
-            $userrole = 'administrator';
-        } else if (has_capability('moodle/course:update', $coursecontext, $userid)) {
-            $userrole = 'academic_support';
-        } else {
-            $userrole = 'student';
-        }
+        $userrole = self::detect_role($courseid, $userid);
 
         // Build course structure (section names + activity list).
         $coursetopics = self::build_course_topics($courseid);
@@ -97,12 +88,14 @@ class context_builder {
         }
 
         // Get template: local admin setting → remote config → lang string default.
-        $template = get_config('local_ai_course_assistant', 'systemprompt');
-        if (empty($template)) {
-            $template = remote_config_manager::get_value(
-                'system_prompt',
-                get_string('settings:systemprompt_default', 'local_ai_course_assistant')
-            );
+        $template = trim((string)(get_config('local_ai_course_assistant', 'systemprompt') ?? ''));
+        if ($template === '') {
+            $remoteconfigtemplate = remote_config_manager::get_value('system_prompt');
+            if (is_string($remoteconfigtemplate) && trim($remoteconfigtemplate) !== '') {
+                $template = trim($remoteconfigtemplate);
+            } else {
+                $template = get_string('settings:systemprompt_default', 'local_ai_course_assistant');
+            }
         }
 
         // Dynamic display name from admin settings.
@@ -433,10 +426,13 @@ class context_builder {
      */
     public static function detect_role(int $courseid, int $userid): string {
         $coursecontext = \context_course::instance($courseid);
-        if (has_capability('local/ai_course_assistant:manage', $coursecontext, $userid)) {
+        $systemcontext = \context_system::instance();
+
+        if (has_capability('moodle/site:config', $systemcontext, $userid)) {
             return 'administrator';
         }
-        if (has_capability('moodle/course:update', $coursecontext, $userid)) {
+        if (has_capability('local/ai_course_assistant:manage', $coursecontext, $userid)
+                || has_capability('moodle/course:update', $coursecontext, $userid)) {
             return 'academic_support';
         }
         return 'student';
@@ -480,7 +476,7 @@ class context_builder {
 
         if ($role === 'academic_support') {
             return 'The user is an Academic Support team member. They do not teach students live — '
-                . 'instead they monitor student trends, improve course assets, and ensure content quality. '
+                . 'instead they focus on monitoring trends, improving course assets, and ensuring content quality. '
                 . 'Provide direct, comprehensive answers. Help them analyze student engagement patterns, '
                 . 'identify confusing course sections, suggest content improvements, and discuss '
                 . 'assessment strategies and course design. Be a collaborative partner in '
