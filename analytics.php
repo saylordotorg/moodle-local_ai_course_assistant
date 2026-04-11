@@ -427,8 +427,8 @@ $templatedata = [
     // Links.
     'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
         ['range' => $range]))->out(false),
-    'settings_url' => (new moodle_url('/admin/settings.php',
-        ['section' => 'local_ai_course_assistant']))->out(false),
+    'settings_url' => (new moodle_url('/admin/category.php',
+        ['category' => 'local_ai_course_assistant']))->out(false),
     'analytics_base_url' => (new moodle_url('/local/ai_course_assistant/analytics.php',
         ['range' => $range]))->out(false),
 ];

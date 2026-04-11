@@ -46,7 +46,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_context($context);
 
 // Global admin settings URL for the "back to global" link.
-$globalsettingsurl = new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']);
+$globalsettingsurl = new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']);
 
 // Current global defaults (shown as placeholder hints).
 $globalcfg = [

@@ -121,7 +121,7 @@ $sql = "SELECT DISTINCT c.id, c.fullname
 $activecourses = $DB->get_records_sql($sql);
 
 $ragenabled  = (bool) get_config('local_ai_course_assistant', 'rag_enabled');
-$settingsurl = new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']);
+$settingsurl = new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('ragadmin:title', 'local_ai_course_assistant'));

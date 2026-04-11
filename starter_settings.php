@@ -167,7 +167,7 @@ echo $OUTPUT->header();
                 <?php echo get_string('starters:reset_defaults', 'local_ai_course_assistant'); ?>
             </button>
         </form>
-        <a href="<?php echo (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']))->out(); ?>"
+        <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
            class="btn btn-outline-secondary">
             <?php echo get_string('starters:back_settings', 'local_ai_course_assistant'); ?>
         </a>
@@ -196,7 +196,7 @@ echo $OUTPUT->header();
                 <?php echo get_string('starters:reset_defaults', 'local_ai_course_assistant'); ?>
             </button>
         </form>
-        <a href="<?php echo (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']))->out(); ?>"
+        <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
            class="btn btn-outline-secondary">
             <?php echo get_string('starters:back_settings', 'local_ai_course_assistant'); ?>
         </a>

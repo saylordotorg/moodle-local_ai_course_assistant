@@ -199,7 +199,7 @@ echo $OUTPUT->header();
 <div class="aica-rubric-admin">
 
     <div class="mb-3 d-flex flex-wrap" style="gap:8px">
-        <a href="<?php echo (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']))->out(); ?>"
+        <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
            class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(); ?>"
            class="btn btn-sm btn-outline-secondary">Analytics Dashboard</a>
