@@ -43,20 +43,61 @@ if ($hassiteconfig) {
         . '</div>';
 
     // ── Create the plugin admin category ────────────────────────────────────
-    // All settings pages and admin tools live under this category,
-    // reachable at: Site admin > Plugins > Local plugins > AI Course Assistant
+    // Admin tools live under this category as external pages; all settings
+    // live on a single "Settings" page with TOC navigation.
+    // Reachable at: Site admin > Plugins > Local plugins > AI Course Assistant
     $ADMIN->add('localplugins', new admin_category(
         'local_ai_course_assistant',
         get_string('pluginname', 'local_ai_course_assistant')
     ));
 
-    // ── Page 1: General ─────────────────────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_general', 'General');
+    // ── Single settings page with TOC ───────────────────────────────────────
+    $settings = new admin_settingpage('local_ai_course_assistant_general', 'Settings');
+
+    // Scoped smooth scrolling + TOC styling.
+    $tocstyle = '<style>'
+        . 'html{scroll-behavior:smooth;}'
+        . '.sola-toc{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:14px 18px;margin:0 0 18px;}'
+        . '.sola-toc strong{display:block;font-size:13px;color:#495057;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}'
+        . '.sola-toc ul{display:flex;flex-wrap:wrap;gap:6px 10px;list-style:none;padding:0;margin:0;}'
+        . '.sola-toc li{margin:0;}'
+        . '.sola-toc a{display:inline-block;padding:4px 10px;background:#fff;border:1px solid #ced4da;border-radius:4px;font-size:13px;color:#3b5bdb;text-decoration:none;}'
+        . '.sola-toc a:hover{background:#e7f0ff;border-color:#3b5bdb;text-decoration:none;}'
+        . '.sola-section-anchor{display:block;position:relative;top:-60px;visibility:hidden;}'
+        . '.sola-section-heading{margin-top:24px;padding-top:8px;border-top:2px solid #e5e7eb;}'
+        . '</style>';
+
+    $toc = $tocstyle
+        . '<div class="sola-toc">'
+        . '<strong>Jump to section</strong>'
+        . '<ul>'
+        . '<li><a href="#sec-general">General</a></li>'
+        . '<li><a href="#sec-ai">AI Provider &amp; Models</a></li>'
+        . '<li><a href="#sec-content">Content &amp; RAG</a></li>'
+        . '<li><a href="#sec-safety">Safety &amp; Moderation</a></li>'
+        . '<li><a href="#sec-engagement">Engagement</a></li>'
+        . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
+        . '<li><a href="#sec-integrations">Integrations &amp; Delivery</a></li>'
+        . '</ul>'
+        . '</div>';
 
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/version_banner',
         '',
-        $versionbanner
+        $versionbanner . $toc
+    ));
+
+    // Helper to render a section anchor + heading.
+    $sectionanchor = function(string $id, string $title): string {
+        return '<span id="' . $id . '" class="sola-section-anchor"></span>'
+            . '<h2 class="sola-section-heading">' . $title . '</h2>';
+    };
+
+    // ── Section: General ────────────────────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_general_anchor',
+        '',
+        $sectionanchor('sec-general', 'General')
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -74,10 +115,12 @@ if ($hassiteconfig) {
         PARAM_URL
     ));
 
-    $ADMIN->add('local_ai_course_assistant', $settings);
-
-    // ── Page 2: AI Provider & Models ────────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_ai', 'AI Provider & Models');
+    // ── Section: AI Provider & Models ───────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_ai_anchor',
+        '',
+        $sectionanchor('sec-ai', 'AI Provider &amp; Models')
+    ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/provider_heading',
@@ -190,10 +233,12 @@ if ($hassiteconfig) {
         . '<p class="text-muted mt-1" style="font-size:13px;">Monitor token usage and costs across courses and providers.</p>'
     ));
 
-    $ADMIN->add('local_ai_course_assistant', $settings);
-
-    // ── Page 3: Content & RAG ───────────────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_content', 'Content & RAG');
+    // ── Section: Content & RAG ──────────────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_content_anchor',
+        '',
+        $sectionanchor('sec-content', 'Content &amp; RAG')
+    ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rag_heading',
@@ -300,10 +345,12 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    $ADMIN->add('local_ai_course_assistant', $settings);
-
-    // ── Page 4: Safety & Moderation ─────────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_safety', 'Safety & Moderation');
+    // ── Section: Safety & Moderation ────────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_safety_anchor',
+        '',
+        $sectionanchor('sec-safety', 'Safety &amp; Moderation')
+    ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/quiz_hide_heading',
@@ -408,10 +455,12 @@ if ($hassiteconfig) {
         . get_string('integrity:view_results', 'local_ai_course_assistant') . ' &rarr;</a>'
     ));
 
-    $ADMIN->add('local_ai_course_assistant', $settings);
-
-    // ── Page 5: Engagement ──────────────────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_engagement', 'Engagement');
+    // ── Section: Engagement ─────────────────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_engagement_anchor',
+        '',
+        $sectionanchor('sec-engagement', 'Engagement')
+    ));
 
     // Study plans and reminders.
     $settings->add(new admin_setting_heading(
@@ -614,10 +663,12 @@ if ($hassiteconfig) {
         . '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
     ));
 
-    $ADMIN->add('local_ai_course_assistant', $settings);
-
-    // ── Page 6: Branding & UI ───────────────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_branding', 'Branding & UI');
+    // ── Section: Branding & UI ──────────────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_branding_anchor',
+        '',
+        $sectionanchor('sec-branding', 'Branding &amp; UI')
+    ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/branding_heading',
@@ -723,10 +774,12 @@ if ($hassiteconfig) {
         '#ffffff'
     ));
 
-    $ADMIN->add('local_ai_course_assistant', $settings);
-
-    // ── Page 7: Integrations & Delivery ─────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_integrations', 'Integrations & Delivery');
+    // ── Section: Integrations & Delivery ────────────────────────────────────
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_integrations_anchor',
+        '',
+        $sectionanchor('sec-integrations', 'Integrations &amp; Delivery')
+    ));
 
     // FAQ & Zendesk.
     $settings->add(new admin_setting_heading(
