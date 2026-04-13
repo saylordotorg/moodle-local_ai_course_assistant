@@ -18,7 +18,8 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/cdn/node_modules/*" \
   -x "*/cdn/dist/*" \
   -x "*/cdn/package-lock.json" \
-  -x "*/.wiki/*"
+  -x "*/.wiki/*" \
+  -x "*/.drafts/*"
 
 echo "✅ Created: ${SCRIPT_DIR}/ai_course_assistant.zip"
 echo ""
