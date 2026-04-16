@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Kukhutshaziwe ngokuzenzaka
 $string['settings:default_course_mode_all'] = 'Inikwe amandla kuzo zonke izifundo';
 $string['settings:auto_open'] = 'Vula ngokuzenzakalelayo ekuvakasheleni kokuqala';
 $string['settings:auto_open_desc'] = 'Uma kunikwe amandla, ishalofu le-SOLA livuleka ngokuzenzakalelayo okokuqala uma umfundi efika kuyo yonke isifundo. Ukulayisha kwamakhasi okulandelayo kuso lesi sifundo akuvuli ishalofu futhi — isimo silandelelwa ngesifundo ngasinye kusiphequluli somfundi nge-localStorage. Kusebenza kwi-desktop nakwi-mobile. Kungashintshwa ngesifundo ngasinye ekhasini le-Course AI Settings.';
+$string['settings:comparison_providers'] = 'Abahlinzeki bokuqhathanisa (isikhethi se-LLM)';
+$string['settings:comparison_providers_desc'] = 'Engeza abahlinzeki be-AI abangezelelwe kusikhethi se-LLM esikuwidgethi ukuze abaphathi bakwazi ukuqhathanisa izimpendulo phakathi kwabahlinzeki. Umugqa owodwa ngomhlinzeki ngamunye ngohlelo: provider_id|api_key|model1,model2. Umhlinzeki oyinhloko olungiselelwe ngenhla uhlala efakiwe ngokuzenzakalela. Abaphathi abanekwazi lokuphatha kuphela abayibona isikhethi; abafundi abasiboni nanini. Isibonelo:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Ama-provider IDs asebenzayo: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Umhlinzeki we-AI';
 $string['settings:provider_desc'] = 'Khetha umhlinzeki we-AI ozosetshenziswa ekuqedeleni ingxoxo. Khetha i-"Moodle AI (core_ai subsystem)" ukuze udlulisele izicelo ngokusethwa kwe-AI okwakhelwe ngaphakathi kwe-Moodle ku-Site admin > AI; ikhii ye-API, imodeli, kanye namafildi e-URL eyisisekelo angezansi anganakwa kulesiyo mode. I-Streaming, ukusetshenziswa kwethuluzi, kanye ne-prompt caching ayitholakali nge-core_ai — izimpendulo zilethwa njengesiqephu esisodwa. Sebenzisa umhlinzeki oqondile ukuze uthole ulwazi lomfundi oluhle kakhulu.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Amanothi nomlando wengxoxo';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo samasonto ngokungasebenzi';
 $string['messageprovider:study_notes'] = 'Amanothi esikhathi sokufunda';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo sokungasebenzi njalo ngesonto';
+$string['task:run_meta_ai_query'] = 'Sebenzisa umbuzo wokuhlaziya we-Meta-AI ohleliwe';
 $string['messageprovider:study_notes'] = 'Amanothi eseshini yokufunda';
 
 // CDN settings.

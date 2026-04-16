@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Imezimwa kwa chaguo-msingi
 $string['settings:default_course_mode_all'] = 'Imewashwa kwenye kozi zote';
 $string['settings:auto_open'] = 'Fungua kiotomatiki kwenye ziara ya kwanza';
 $string['settings:auto_open_desc'] = 'Inapowezeshwa, droo ya SOLA inafunguliwa kiotomatiki mara ya kwanza mwanafunzi anapofika kwenye kila kozi. Upakiaji wa kurasa zinazofuata katika kozi hiyo hiyo haufungui droo tena — hali inafuatiliwa kwa kila kozi kwenye kivinjari cha mwanafunzi kupitia localStorage. Inatumika kwenye kompyuta ya mezani na simu. Inaweza kubatilishwa kwa kila kozi kutoka ukurasa wa Course AI Settings.';
+$string['settings:comparison_providers'] = 'Watoa huduma wa kulinganisha (kichaguzi cha LLM)';
+$string['settings:comparison_providers_desc'] = 'Ongeza watoa huduma wa AI wa ziada kwenye kichaguzi cha LLM kilichojengwa ndani ya widget ili wasimamizi waweze kulinganisha majibu kati ya watoa huduma. Mstari mmoja kwa kila mtoa huduma katika muundo: provider_id|api_key|model1,model2. Mtoa huduma mkuu aliyewekwa hapo juu hujumuishwa kiotomatiki kila wakati. Wasimamizi wenye uwezo wa kusimamia pekee ndio wanaoona kichaguzi; wanafunzi hawakioni kamwe. Mfano:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs halali: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Mtoa Huduma wa AI';
 $string['settings:provider_desc'] = 'Chagua mtoa huduma wa AI wa kutumia kwa ukamilishaji wa gumzo. Chagua "Moodle AI (core_ai subsystem)" kuelekeza maombi kupitia usanidi wa AI uliojengwa ndani ya Moodle katika Site admin > AI; sehemu za ufunguo wa API, mfano na URL ya msingi hapa chini hupuuzwa katika hali hiyo. Streaming, matumizi ya zana, na prompt caching hazipatikani kupitia core_ai — majibu hutolewa kama kipande kimoja. Tumia mtoa huduma wa moja kwa moja kwa uzoefu bora wa mwanafunzi.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Maelezo na Historia ya Mazungumzo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kila wiki kwa kutokuwa na shughuli';
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
 $string['task:send_inactivity_reminders'] = 'Tuma barua pepe za ukumbusho wa kutofanya kazi kila wiki';
+$string['task:run_meta_ai_query'] = 'Endesha swali la uchambuzi wa Meta-AI lililopangwa';
 $string['messageprovider:study_notes'] = 'Maelezo ya kipindi cha masomo';
 
 // CDN settings.

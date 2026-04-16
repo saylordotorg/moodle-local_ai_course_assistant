@@ -51,6 +51,8 @@ $string['settings:default_course_mode_per_course'] = 'Изключено по п
 $string['settings:default_course_mode_all'] = 'Включено за всички курсове';
 $string['settings:auto_open'] = 'Автоматично отваряне при първото посещение';
 $string['settings:auto_open_desc'] = 'Когато е активирано, чекмеджето на SOLA се отваря автоматично първия път, когато студент влезе във всеки курс. Последващите зареждания на страници в същия курс не отварят отново чекмеджето — състоянието се проследява за всеки курс в браузъра на студента чрез localStorage. Прилага се на десктоп и мобилни устройства. Може да бъде заменено за всеки курс от страницата Course AI Settings.';
+$string['settings:comparison_providers'] = 'Доставчици за сравнение (LLM избор)';
+$string['settings:comparison_providers_desc'] = 'Добавете допълнителни AI доставчици към вградения LLM избор, за да могат администраторите да сравняват отговорите между доставчиците. Един ред на доставчик във формат: provider_id|api_key|model1,model2. Основният доставчик, конфигуриран по-горе, винаги се включва автоматично. Само администратори с право за управление виждат избора; студентите никога не го виждат. Пример:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Валидни provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI доставчик';
 $string['settings:provider_desc'] = 'Изберете доставчика на ИИ за завършвания на чата. Изберете "Moodle AI (core_ai subsystem)", за да насочите заявките през вградената AI конфигурация на Moodle в Site admin > AI; полетата за API ключ, модел и основен URL по-долу се игнорират в този режим. Стрийминг, използване на инструменти и prompt caching не са налични чрез core_ai — отговорите се доставят като единичен блок. Използвайте директен доставчик за най-добро студентско изживяване.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -346,6 +348,7 @@ $string['chat:mode_history'] = 'Бележки';
 // History panel.
 $string['chat:history_title'] = 'Бележки и история на разговора';
 $string['task:send_inactivity_reminders'] = 'Изпращане на седмични имейли за напомняне при неактивност';
+$string['task:run_meta_ai_query'] = 'Изпълнение на планирана заявка за Meta-AI анализ';
 $string['messageprovider:study_notes'] = 'Бележки от учебна сесия';
 
 // CDN settings.

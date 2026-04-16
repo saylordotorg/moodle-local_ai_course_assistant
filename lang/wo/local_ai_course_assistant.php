@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Tëjoon ci fàww (ubbil ci
 $string['settings:default_course_mode_all'] = 'Ubbi ci njàng yépp';
 $string['settings:auto_open'] = 'Ubbi ko ci sa njëkk a dem';
 $string['settings:auto_open_desc'] = 'Bu ko ñu tàmbalee, drawer bu SOLA dafay ubbiku boppam bu njëkk bi jàngkat bi dikkee ci kër kursu kër. Yokk yu topp ci page yi ci kursu bi dañu ubbiku drawer bi dara — anam wi ñu koy toppal ci kursu ku nekk ci browser bu jàngkat bi jaar ci localStorage. Mu ngi jëf ci desktop ak telefon. Mën nañu ko soppi ci kursu ku nekk ci page Course AI Settings.';
+$string['settings:comparison_providers'] = 'Yónent yi ñu mën a faral (tànn LLM)';
+$string['settings:comparison_providers_desc'] = 'Yokk yónent yi AI yu sàkk ci tànn LLM bi ci widget bi ngir administrater yi mën a faral tontu yi diggante yónent yi. Benn kuur bu am benn yónent ci format bii: provider_id|api_key|model1,model2. Yónent bu njëk bi ñu teg ci kaw moo ngi ci ci kàttan lu bees. Administrater yi am manage capability rekk moo gën a gis tànn bi; jàngalekat yi du ko gis mukk. Misaal:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs yu baax: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Fournisseur AI';
 $string['settings:provider_desc'] = 'Tànn jukki AI bi ngay jëfandikoo ngir mat-waxtaan yi. Tànn "Moodle AI (core_ai subsystem)" ngir yóbbu ñaan yi ci ndefaru AI bu nekk ci biir Moodle ci Site admin > AI; tolof-tolof yu caabiu API, mudel ak URL bu njëkk dañu leen di dugal ci jëfi yooyu. Streaming, jëfandikoo nu jumtukaay yi, ak prompt caching amul ci core_ai — tontu yi ñoo leen di jox ci benn boor. Jëfandikoo jukkikat bu jub ngir jafandu jàngkat bu gën a baax.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Xam-xam ak Waxtaan bi';
 $string['task:send_inactivity_reminders'] = 'Yónne bataaxal ci ayu-bis yu ngën-ngën yi ngir bañ liggéey';
 $string['messageprovider:study_notes'] = 'Téere yi ci diggante jàng bi';
 $string['task:send_inactivity_reminders'] = 'Yónnal bataaxal xalaat ci at ci biir ayu-bés';
+$string['task:run_meta_ai_query'] = 'Doxal laaj bu Meta-AI ci waxtu bu ñu tànn';
 $string['messageprovider:study_notes'] = 'Bindu ci jàng yi';
 
 // CDN settings.

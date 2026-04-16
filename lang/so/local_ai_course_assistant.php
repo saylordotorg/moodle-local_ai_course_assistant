@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Caadi ahaan la damiyay (ka
 $string['settings:default_course_mode_all'] = 'Waxa la kala daray dhammaan koorsooyinka';
 $string['settings:auto_open'] = 'Si toos ah u fur booqashada koowaad';
 $string['settings:auto_open_desc'] = 'Marka la awood-geliyo, drawer-ka SOLA waxa uu si toos ah u furmaa markii ugu horreysay ee arday uu galo koorso kasta. Soo-rarista bogagga ee xiga ee koorso isku mid ah ma furayaan drawer-ka mar kale — xaaladda waxa la raacaa koorso kasta browser-ka ardayga iyada oo loo marayo localStorage. Wuxuu khuseeyaa desktop iyo mobile. Waa la dhaafi karaa koorso kasta laga bilaabo bogga Course AI Settings.';
+$string['settings:comparison_providers'] = 'Bixiyeyaasha isbarbardhigga (doorashada LLM)';
+$string['settings:comparison_providers_desc'] = 'Ku dar bixiyeyaal AI dheeraad ah xulashada LLM ee widget-ka si maamulayaasha ay ugu wada barbar dhigi karaan jawaabaha bixiyeyaasha. Hal saf bixiye kasta oo qaabkan ah: provider_id|api_key|model1,model2. Bixiyaha aasaasiga ah ee kor lagu habeeyey weligiis si toos ah ayaa loo daraa. Maamulayaasha leh awoodda maaraynta keliya ayaa arka xulashada; ardaydu marnaba ma arkaan. Tusaale:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs sax ah: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Bixiyaha AI';
 $string['settings:provider_desc'] = 'Dooro bixiyaha AI si loo isticmaalo dhammaystirka sheekada. Dooro "Moodle AI (core_ai subsystem)" si codsiyada loogu marsiiyo dejinta AI-ga ku dhex jira Moodle ee Site admin > AI; furaha API, nooca iyo goobaha URL-ka saldhiga ah ee hoose waa laga gudbaa qaabkaas. Streaming, isticmaalka qalabka, iyo prompt caching lama heli karo iyada oo loo marayo core_ai — jawaabaha waxaa la siiyaa sidii hal qaybood. Isticmaal bixiye toos ah si loo helo waayo-aragnimada ardayga ugu fiican.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -364,6 +366,7 @@ $string['chat:mode_history'] = 'Xusuusin';
 // History panel.
 $string['chat:history_title'] = 'Xusuusin iyo Taariikhdii Wada-hadalka';
 $string['task:send_inactivity_reminders'] = 'Dir iimaylasha xusuusinta toddobaadlaha ee aan firfircoonayn';
+$string['task:run_meta_ai_query'] = 'Orod su\'aasha falanqaynta Meta-AI ee la qorsheeyay';
 $string['messageprovider:study_notes'] = 'Qoraallada fadhiga daraasadda';
 
 // CDN settings.

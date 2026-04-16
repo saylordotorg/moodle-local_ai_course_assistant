@@ -45,6 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'הזמ
 $string['ai_course_assistant:use'] = 'שימוש בצ\'אט מורה AI';
 $string['ai_course_assistant:viewanalytics'] = 'צפייה בניתוח נתוני מורה AI';
 $string['ai_course_assistant:manage'] = 'ניהול הגדרות מורה AI (תפקיד מנהל)';
+$string['task:run_meta_ai_query'] = 'הפעל שאילתת ניתוח Meta-AI מתוזמנת';
 
 // Settings.
 $string['settings:enabled'] = 'הפעלת עוזר קורס AI';
@@ -55,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'מושבת כברירת מ
 $string['settings:default_course_mode_all'] = 'מופעל בכל הקורסים';
 $string['settings:auto_open'] = 'פתיחה אוטומטית בביקור הראשון';
 $string['settings:auto_open_desc'] = 'כאשר מופעל, מגירת SOLA נפתחת אוטומטית בפעם הראשונה שתלמיד נכנס לכל קורס. טעינות דפים נוספות באותו קורס לא פותחות מחדש את המגירה — המצב נמעקב לכל קורס בדפדפן של התלמיד באמצעות localStorage. חל בשולחן עבודה ובמובייל. ניתן לעקוף לכל קורס מעמוד Course AI Settings.';
+$string['settings:comparison_providers'] = 'ספקי השוואה (בורר LLM)';
+$string['settings:comparison_providers_desc'] = 'הוסף ספקי AI נוספים לבורר ה-LLM המובנה בווידג\'ט כדי שמנהלים יוכלו להשוות תגובות בין ספקים. שורה אחת לכל ספק בפורמט: provider_id|api_key|model1,model2. הספק הראשי שהוגדר למעלה נכלל תמיד באופן אוטומטי. רק מנהלים עם הרשאת ניהול רואים את הבורר; תלמידים לעולם לא רואים אותו. דוגמה:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs חוקיים: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'ספק AI';
 $string['settings:provider_desc'] = 'בחר את ספק ה-AI לשימוש בהשלמות צ\'אט. בחר "Moodle AI (core_ai subsystem)" כדי לנתב בקשות דרך תצורת ה-AI המובנית של Moodle ב-Site admin > AI; שדות מפתח API, מודל ו-URL בסיסי למטה מתעלמים במצב זה. Streaming, שימוש בכלים ו-prompt caching אינם זמינים דרך core_ai — התגובות נמסרות כחלק יחיד. השתמש בספק ישיר לחוויית הסטודנט הטובה ביותר.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';

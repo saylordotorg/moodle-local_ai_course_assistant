@@ -45,6 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'Az üz
 $string['ai_course_assistant:use'] = 'AI tutor csevegés használata';
 $string['ai_course_assistant:viewanalytics'] = 'AI tutor csevegés analitika megtekintése';
 $string['ai_course_assistant:manage'] = 'AI tutor csevegés beállítások kezelése (Adminisztrátor szerep)';
+$string['task:run_meta_ai_query'] = 'Ütemezett Meta-AI elemzési lekérdezés futtatása';
 
 // Settings.
 $string['settings:enabled'] = 'AI Kurzus Asszisztens engedélyezése';
@@ -55,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Alapértelmezetten letiltv
 $string['settings:default_course_mode_all'] = 'Minden kurzuson engedélyezve';
 $string['settings:auto_open'] = 'Automatikus megnyitás az első látogatáskor';
 $string['settings:auto_open_desc'] = 'Engedélyezés esetén a SOLA fiók automatikusan megnyílik, amikor egy hallgató először jut el az egyes kurzusokra. A későbbi oldalbetöltések ugyanabban a kurzusban nem nyitják meg újra a fiókot — az állapot kurzusonként követhető a hallgató böngészőjében a localStorage segítségével. Asztali számítógépen és mobilon is alkalmazható. Kurzusonként felülbírálható a Course AI Settings oldalon.';
+$string['settings:comparison_providers'] = 'Összehasonlító szolgáltatók (LLM választó)';
+$string['settings:comparison_providers_desc'] = 'Adjon hozzá további AI szolgáltatókat a widgetbe épített LLM választóhoz, hogy az adminisztrátorok összehasonlíthassák a válaszokat a szolgáltatók között. Soronként egy szolgáltató a következő formátumban: provider_id|api_key|model1,model2. A fent beállított elsődleges szolgáltató mindig automatikusan szerepel. Csak a kezelési jogosultsággal rendelkező adminisztrátorok látják a választót; a diákok soha nem látják. Példa:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Érvényes provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI Szolgáltató';
 $string['settings:provider_desc'] = 'Válassza ki a csevegés-kiegészítésekhez használandó AI-szolgáltatót. Válassza a "Moodle AI (core_ai subsystem)" lehetőséget, hogy a kéréseket a Moodle beépített AI-konfigurációján keresztül irányítsa a Site admin > AI oldalon; az alábbi API-kulcs, modell és alap URL mezőket figyelmen kívül hagyja ebben az üzemmódban. A streaming, az eszközhasználat és a prompt caching nem érhető el a core_ai-n keresztül — a válaszok egyetlen darabban érkeznek. A legjobb tanulói élményért használjon közvetlen szolgáltatót.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';

@@ -51,6 +51,8 @@ $string['settings:default_course_mode_per_course'] = 'Deaktiveret som standard (
 $string['settings:default_course_mode_all'] = 'Aktiveret på alle kurser';
 $string['settings:auto_open'] = 'Åbn automatisk ved første besøg';
 $string['settings:auto_open_desc'] = 'Når aktiveret åbnes SOLA-skuffen automatisk, første gang en studerende lander på hvert kursus. Efterfølgende sideindlæsninger i samme kursus genåbner ikke skuffen — tilstanden spores pr. kursus i den studerendes browser via localStorage. Gælder på desktop og mobil. Kan tilsidesættes pr. kursus fra Course AI Settings-siden.';
+$string['settings:comparison_providers'] = 'Sammenligningsudbydere (LLM-vælger)';
+$string['settings:comparison_providers_desc'] = 'Tilføj ekstra AI-udbydere til den indbyggede LLM-vælger, så administratorer kan sammenligne svar på tværs af udbydere. Én linje per udbyder i formatet: provider_id|api_key|model1,model2. Den primære udbyder konfigureret ovenfor er altid inkluderet automatisk. Kun administratorer med administrationstilladelse ser vælgeren; studerende ser den aldrig. Eksempel:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Gyldige provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI-udbyder';
 $string['settings:provider_desc'] = 'Vælg den AI-udbyder, der skal bruges til chatfuldførelser. Vælg "Moodle AI (core_ai subsystem)" for at dirigere anmodninger gennem Moodles indbyggede AI-konfiguration på Site admin > AI; API-nøglen, modellen og basis-URL-felterne nedenfor ignoreres i den tilstand. Streaming, værktøjsbrug og prompt caching er ikke tilgængelige via core_ai — svar leveres som en enkelt del. Brug en direkte udbyder for den bedste studenteroplevelse.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -346,6 +348,7 @@ $string['chat:mode_history'] = 'Noter';
 // History panel.
 $string['chat:history_title'] = 'Noter og samtalehistorik';
 $string['task:send_inactivity_reminders'] = 'Send ugentlige påmindelses-e-mails ved inaktivitet';
+$string['task:run_meta_ai_query'] = 'Kør planlagt Meta-AI analyseforespørgsel';
 $string['messageprovider:study_notes'] = 'Studiesessionsnotater';
 
 // CDN settings.

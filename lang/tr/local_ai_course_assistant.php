@@ -51,6 +51,8 @@ $string['settings:default_course_mode_per_course'] = 'Varsayılan olarak devre d
 $string['settings:default_course_mode_all'] = 'Tüm kurslarda etkin';
 $string['settings:auto_open'] = 'İlk ziyarette otomatik aç';
 $string['settings:auto_open_desc'] = 'Etkinleştirildiğinde, bir öğrenci her derse ilk kez geldiğinde SOLA çekmecesi otomatik olarak açılır. Aynı derste sonraki sayfa yüklemeleri çekmeceyi tekrar açmaz — durum, öğrencinin tarayıcısında localStorage aracılığıyla ders bazında izlenir. Masaüstü ve mobilde geçerlidir. Course AI Settings sayfasından ders bazında geçersiz kılınabilir.';
+$string['settings:comparison_providers'] = 'Karşılaştırma sağlayıcıları (LLM seçici)';
+$string['settings:comparison_providers_desc'] = 'Yöneticilerin sağlayıcılar arasında yanıtları karşılaştırabilmesi için widget içi LLM seçiciye ek AI sağlayıcıları ekleyin. Her satıra bir sağlayıcı şu formatta: provider_id|api_key|model1,model2. Yukarıda yapılandırılan birincil sağlayıcı her zaman otomatik olarak dahil edilir. Yalnızca yönetim yetkisine sahip yöneticiler seçiciyi görür; öğrenciler asla görmez. Örnek:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Geçerli provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI sağlayıcı';
 $string['settings:provider_desc'] = 'Sohbet tamamlamaları için kullanılacak AI sağlayıcısını seçin. İsteklerin Moodle\'ın Site admin > AI konumundaki yerleşik AI yapılandırması üzerinden yönlendirilmesi için "Moodle AI (core_ai subsystem)" seçeneğini seçin; bu modda aşağıdaki API anahtarı, model ve temel URL alanları yok sayılır. Streaming, araç kullanımı ve prompt caching core_ai üzerinden kullanılamaz — yanıtlar tek bir parça olarak iletilir. En iyi öğrenci deneyimi için doğrudan bir sağlayıcı kullanın.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -346,6 +348,7 @@ $string['chat:mode_history'] = 'Notlar';
 // History panel.
 $string['chat:history_title'] = 'Notlar ve Konuşma Geçmişi';
 $string['task:send_inactivity_reminders'] = 'Haftalık hareketsizlik hatırlatma e-postaları gönder';
+$string['task:run_meta_ai_query'] = 'Zamanlanmış Meta-AI analiz sorgusunu çalıştır';
 $string['messageprovider:study_notes'] = 'Çalışma oturumu notları';
 
 // CDN settings.

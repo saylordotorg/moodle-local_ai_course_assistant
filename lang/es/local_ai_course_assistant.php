@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Deshabilitado por defecto 
 $string['settings:default_course_mode_all'] = 'Habilitado en todos los cursos';
 $string['settings:auto_open'] = 'Abrir automáticamente en la primera visita';
 $string['settings:auto_open_desc'] = 'Cuando está habilitado, el panel de SOLA se abre automáticamente la primera vez que un estudiante entra en cada curso. Las cargas de página posteriores en el mismo curso no vuelven a abrir el panel — el estado se rastrea por curso en el navegador del estudiante mediante localStorage. Se aplica en computadora y móvil. Puede anularse por curso desde la página Course AI Settings.';
+$string['settings:comparison_providers'] = 'Proveedores de comparación (selector de LLM)';
+$string['settings:comparison_providers_desc'] = 'Agregue proveedores de IA adicionales al selector de LLM integrado en el widget para que los administradores puedan comparar respuestas entre proveedores. Una línea por proveedor en el formato: provider_id|api_key|model1,model2. El proveedor principal configurado arriba siempre se incluye automáticamente. Solo los administradores con el permiso de gestión ven el selector; los estudiantes nunca lo ven. Ejemplo:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>IDs de proveedor válidos: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Proveedor de IA';
 $string['settings:provider_desc'] = 'Seleccione el proveedor de IA que se utilizará para las conversaciones de chat. Elija "Moodle AI (core_ai subsystem)" para enrutar las solicitudes a través de la configuración de IA integrada de Moodle en Site admin > AI; los campos de clave de API, modelo y URL base a continuación se ignoran en ese modo. Streaming, uso de herramientas y prompt caching no están disponibles vía core_ai — las respuestas se entregan como un solo bloque. Use un proveedor directo para la mejor experiencia del estudiante.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -373,6 +375,7 @@ $string['chat:mode_history'] = 'Notas';
 // History panel.
 $string['chat:history_title'] = 'Notas e historial de conversación';
 $string['task:send_inactivity_reminders'] = 'Enviar correos electrónicos semanales de recordatorio por inactividad';
+$string['task:run_meta_ai_query'] = 'Ejecutar consulta programada de analíticas Meta-AI';
 $string['messageprovider:study_notes'] = 'Notas de sesión de estudio';
 
 // CDN settings.

@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Kí a jẹ́ kú ní àbá
 $string['settings:default_course_mode_all'] = 'A ti mú ṣiṣẹ́ lórí gbogbo kọ́ọ̀sì';
 $string['settings:auto_open'] = 'Ṣii adáṣiṣẹ́ ní ìbẹ̀wò àkọ́kọ́';
 $string['settings:auto_open_desc'] = 'Nígbà tí ó bá wà ní iṣẹ́, drawer ti SOLA yóò ṣii ní adáṣiṣẹ́ nígbà àkọ́kọ́ tí akẹ́kọ̀ọ́ bá dé sí ẹ̀kọ́ kọ̀ọ̀kan. Àwọn ìṣàfilọ́lẹ̀ ojú-ìwé tí ó tẹ̀lé ní ẹ̀kọ́ kan náà kò ní tún ṣii drawer náà — a máa ń tọpa ipò náà fún ẹ̀kọ́ kọ̀ọ̀kan ní ẹ̀rọ aṣàwákiri akẹ́kọ̀ọ́ nípasẹ̀ localStorage. Ó wúlò lórí desktop àti móbáìlì. A lè fagilé fún ẹ̀kọ́ kọ̀ọ̀kan láti ojú-ìwé Course AI Settings.';
+$string['settings:comparison_providers'] = 'Awọn olupese afiwe (oluyẹn LLM)';
+$string['settings:comparison_providers_desc'] = 'Ṣe afikun awọn olupese AI afikun si oluyẹn LLM ti o wa ninu widget ki awọn alákòóso le ṣe afiwe awọn idahun laarin awọn olupese. Ila kan fun olupese kọọkan ni ọna: provider_id|api_key|model1,model2. Olupese akọkọ ti a ṣeto loke nigbagbogbo wa ninu laifọwọyi. Awọn alákòóso ti o ni agbara iṣakoso nikan ni o rii oluyẹn naa; awọn akẹkọ ko rii rẹ rara. Apẹẹrẹ:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Awọn provider IDs to wulo: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Olùpèsè AI';
 $string['settings:provider_desc'] = 'Yan olùpèsè AI láti lò fún àwọn ìparí ìbáraẹnisọ̀rọ̀. Yan "Moodle AI (core_ai subsystem)" láti darí àwọn ìbéèrè nípasẹ̀ ìṣètò AI tí a kọ́ sínú Moodle ní Site admin > AI; àwọn apá kókó API, àwòṣe, àti URL ìpìlẹ̀ nísàlẹ̀ ni a kò gbé yẹ̀wò ní ọ̀nà ìṣiṣẹ́ yìí. Streaming, lílo irinṣẹ́, àti prompt caching kò sí nípasẹ̀ core_ai — a ó ránṣẹ́ àwọn ìdáhùn gẹ́gẹ́ bí apá kan. Lo olùpèsè tààrà fún ìrírí akẹ́kọ̀ọ́ tí ó dára jùlọ.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Àkọsílẹ̀ àti Ìtàn Ìfọ̀rọ̀wáni
 $string['task:send_inactivity_reminders'] = 'Fi àwọn ìmẹ́lì ìránlọ́wọ́ ọ̀ṣọ̀ọ̀ṣẹ̀ ránṣẹ́ nítorí àìṣiṣẹ́';
 $string['messageprovider:study_notes'] = 'Àwọn àkọsílẹ̀ àkókò ìkẹ́kọ̀ọ́';
 $string['task:send_inactivity_reminders'] = 'Fi imeeli iranti aiṣiṣẹ ni ọsẹ-ọsẹ ranṣẹ';
+$string['task:run_meta_ai_query'] = 'Ṣe ibeere itupalẹ Meta-AI ti a ṣeto';
 $string['messageprovider:study_notes'] = 'Awọn akọsilẹ akoko ikẹkọ';
 
 // CDN settings.

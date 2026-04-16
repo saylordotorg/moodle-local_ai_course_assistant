@@ -45,6 +45,7 @@ $string['privacy:metadata:local_ai_course_assistant_msgs:timecreated'] = 'L\'ora
 $string['ai_course_assistant:use'] = 'Utilizzare la chat del tutor AI';
 $string['ai_course_assistant:viewanalytics'] = 'Visualizzare le analisi del tutor AI';
 $string['ai_course_assistant:manage'] = 'Gestire le impostazioni del tutor AI (Ruolo Amministratore)';
+$string['task:run_meta_ai_query'] = 'Esegui la query di analisi Meta-AI pianificata';
 
 // Settings.
 $string['settings:enabled'] = 'Abilita Assistente AI per il Corso';
@@ -55,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Disabilitato per impostazi
 $string['settings:default_course_mode_all'] = 'Abilitato su tutti i corsi';
 $string['settings:auto_open'] = 'Apertura automatica alla prima visita';
 $string['settings:auto_open_desc'] = 'Quando è abilitato, il cassetto SOLA si apre automaticamente la prima volta che uno studente arriva su ciascun corso. I caricamenti di pagina successivi nello stesso corso non riaprono il cassetto — lo stato viene tracciato per corso nel browser dello studente tramite localStorage. Si applica su desktop e mobile. Può essere sostituito per corso dalla pagina Course AI Settings.';
+$string['settings:comparison_providers'] = 'Fornitori di confronto (selettore LLM)';
+$string['settings:comparison_providers_desc'] = 'Aggiungi fornitori di AI aggiuntivi al selettore LLM integrato nel widget in modo che gli amministratori possano confrontare le risposte tra i fornitori. Una riga per fornitore nel formato: provider_id|api_key|model1,model2. Il fornitore principale configurato sopra è sempre incluso automaticamente. Solo gli amministratori con la capacità di gestione vedono il selettore; gli studenti non lo vedono mai. Esempio:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs validi: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Provider AI';
 $string['settings:provider_desc'] = 'Seleziona il provider di IA da utilizzare per i completamenti della chat. Scegli "Moodle AI (core_ai subsystem)" per instradare le richieste attraverso la configurazione AI integrata di Moodle in Site admin > AI; i campi chiave API, modello e URL di base sottostanti vengono ignorati in quella modalità. Streaming, uso di strumenti e prompt caching non sono disponibili tramite core_ai — le risposte vengono fornite come un unico blocco. Usa un provider diretto per la migliore esperienza studentesca.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';

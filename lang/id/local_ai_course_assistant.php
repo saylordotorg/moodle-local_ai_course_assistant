@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Dinonaktifkan secara defau
 $string['settings:default_course_mode_all'] = 'Diaktifkan di semua kursus';
 $string['settings:auto_open'] = 'Buka otomatis pada kunjungan pertama';
 $string['settings:auto_open_desc'] = 'Saat diaktifkan, laci SOLA terbuka secara otomatis pertama kali siswa masuk ke setiap kursus. Pemuatan halaman berikutnya di kursus yang sama tidak membuka kembali laci — status dilacak per kursus di browser siswa melalui localStorage. Berlaku di desktop dan ponsel. Dapat ditimpa per kursus dari halaman Course AI Settings.';
+$string['settings:comparison_providers'] = 'Penyedia perbandingan (pemilih LLM)';
+$string['settings:comparison_providers_desc'] = 'Tambahkan penyedia AI tambahan ke pemilih LLM bawaan widget agar administrator dapat membandingkan respons antar penyedia. Satu baris per penyedia dalam format: provider_id|api_key|model1,model2. Penyedia utama yang dikonfigurasi di atas selalu disertakan secara otomatis. Hanya administrator dengan kemampuan pengelolaan yang melihat pemilih; mahasiswa tidak pernah melihatnya. Contoh:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs yang valid: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Penyedia AI';
 $string['settings:provider_desc'] = 'Pilih penyedia AI yang akan digunakan untuk penyelesaian chat. Pilih "Moodle AI (core_ai subsystem)" untuk merutekan permintaan melalui konfigurasi AI bawaan Moodle di Site admin > AI; bidang kunci API, model, dan URL dasar di bawah ini diabaikan dalam mode tersebut. Streaming, penggunaan tool, dan prompt caching tidak tersedia melalui core_ai — respons dikirim sebagai satu bagian. Gunakan penyedia langsung untuk pengalaman siswa terbaik.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -377,6 +379,7 @@ $string['chat:history_title'] = 'Catatan dan Riwayat Percakapan';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 $string['task:send_inactivity_reminders'] = 'Kirim email pengingat ketidakaktifan mingguan';
+$string['task:run_meta_ai_query'] = 'Jalankan kueri analitik Meta-AI terjadwal';
 $string['messageprovider:study_notes'] = 'Catatan sesi belajar';
 
 // CDN settings.

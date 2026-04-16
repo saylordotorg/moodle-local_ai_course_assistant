@@ -51,6 +51,8 @@ $string['settings:default_course_mode_per_course'] = 'Predvolene zakázané (pov
 $string['settings:default_course_mode_all'] = 'Povolené na všetkých kurzoch';
 $string['settings:auto_open'] = 'Automatické otvorenie pri prvej návšteve';
 $string['settings:auto_open_desc'] = 'Ak je povolené, panel SOLA sa automaticky otvorí, keď študent prvýkrát príde do každého kurzu. Následné načítania stránok v tom istom kurze panel znova neotvoria — stav sa sleduje pre každý kurz v prehliadači študenta cez localStorage. Platí na počítači aj mobile. Možno prepísať pre jednotlivé kurzy na stránke Course AI Settings.';
+$string['settings:comparison_providers'] = 'Poskytovatelia na porovnanie (výber LLM)';
+$string['settings:comparison_providers_desc'] = 'Pridajte ďalších poskytovateľov AI do vstavaného výberu LLM vo widgete, aby administrátori mohli porovnávať odpovede medzi poskytovateľmi. Jeden riadok na poskytovateľa vo formáte: provider_id|api_key|model1,model2. Primárny poskytovateľ nakonfigurovaný vyššie je vždy zahrnutý automaticky. Výber vidia iba administrátori s oprávnením na správu; študenti ho nikdy nevidia. Príklad:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Platné provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Poskytovateľ AI';
 $string['settings:provider_desc'] = 'Vyberte poskytovateľa AI pre dokončenia chatu. Zvoľte "Moodle AI (core_ai subsystem)" na smerovanie požiadaviek cez vstavanú konfiguráciu AI v Moodle v Site admin > AI; polia API kľúča, modelu a základnej URL nižšie sú v tomto režime ignorované. Streaming, používanie nástrojov a prompt caching nie sú dostupné cez core_ai — odpovede sú doručované ako jeden celok. Pre najlepší študentský zážitok použite priameho poskytovateľa.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -346,6 +348,7 @@ $string['chat:mode_history'] = 'Poznámky';
 // History panel.
 $string['chat:history_title'] = 'Poznámky a história konverzácie';
 $string['task:send_inactivity_reminders'] = 'Odoslať týždenné e-maily o neaktivite';
+$string['task:run_meta_ai_query'] = 'Spustiť naplánovaný dotaz Meta-AI analytiky';
 $string['messageprovider:study_notes'] = 'Poznámky zo študijnej relácie';
 
 // CDN settings.

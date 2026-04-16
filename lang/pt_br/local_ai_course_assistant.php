@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Desativado por padrão (at
 $string['settings:default_course_mode_all'] = 'Ativado em todos os cursos';
 $string['settings:auto_open'] = 'Abrir automaticamente na primeira visita';
 $string['settings:auto_open_desc'] = 'Quando habilitado, a gaveta do SOLA abre automaticamente na primeira vez que um aluno entra em cada curso. Carregamentos de página subsequentes no mesmo curso não reabrem a gaveta — o estado é rastreado por curso no navegador do aluno via localStorage. Aplica-se em desktop e celular. Pode ser substituído por curso na página Course AI Settings.';
+$string['settings:comparison_providers'] = 'Provedores de comparação (seletor de LLM)';
+$string['settings:comparison_providers_desc'] = 'Adicione provedores de IA extras ao seletor de LLM integrado ao widget para que administradores possam comparar respostas entre provedores. Uma linha por provedor no formato: provider_id|api_key|model1,model2. O provedor principal configurado acima é sempre incluído automaticamente. Apenas administradores com a capacidade de gerenciamento veem o seletor; estudantes nunca o veem. Exemplo:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs válidos: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Provedor de IA';
 $string['settings:provider_desc'] = 'Selecione o provedor de IA a ser usado para as conclusões de chat. Escolha "Moodle AI (core_ai subsystem)" para rotear as solicitações pela configuração de IA integrada do Moodle em Site admin > AI; os campos de chave de API, modelo e URL base abaixo são ignorados nesse modo. Streaming, uso de ferramentas e prompt caching não estão disponíveis via core_ai — as respostas são entregues como um único bloco. Use um provedor direto para a melhor experiência do estudante.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Notas e histórico de conversa';
 $string['task:send_inactivity_reminders'] = 'Enviar e-mails semanais de lembrete de inatividade';
 $string['messageprovider:study_notes'] = 'Notas da sessão de estudo';
 $string['task:send_inactivity_reminders'] = 'Enviar e-mails de lembrete semanal de inatividade';
+$string['task:run_meta_ai_query'] = 'Executar consulta de análise Meta-AI agendada';
 $string['messageprovider:study_notes'] = 'Notas da sessão de estudo';
 
 // CDN settings.

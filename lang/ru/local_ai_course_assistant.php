@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Отключено по у
 $string['settings:default_course_mode_all'] = 'Включено на всех курсах';
 $string['settings:auto_open'] = 'Автоматическое открытие при первом посещении';
 $string['settings:auto_open_desc'] = 'Когда включено, панель SOLA открывается автоматически при первом посещении студентом каждого курса. Последующие загрузки страниц в том же курсе не открывают панель повторно — состояние отслеживается для каждого курса в браузере студента через localStorage. Применяется на компьютере и мобильном устройстве. Может быть переопределено для каждого курса на странице Course AI Settings.';
+$string['settings:comparison_providers'] = 'Провайдеры сравнения (выбор LLM)';
+$string['settings:comparison_providers_desc'] = 'Добавьте дополнительных провайдеров AI в встроенный переключатель LLM виджета, чтобы администраторы могли сравнивать ответы разных провайдеров. Одна строка на провайдера в формате: provider_id|api_key|model1,model2. Основной провайдер, настроенный выше, всегда включается автоматически. Только администраторы с правами управления видят переключатель; студенты его никогда не видят. Пример:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Допустимые provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Провайдер ИИ';
 $string['settings:provider_desc'] = 'Выберите поставщика ИИ для завершений чата. Выберите "Moodle AI (core_ai subsystem)", чтобы направлять запросы через встроенную конфигурацию ИИ Moodle в Site admin > AI; поля API-ключа, модели и базового URL ниже игнорируются в этом режиме. Стриминг, использование инструментов и prompt caching недоступны через core_ai — ответы доставляются одним фрагментом. Используйте прямого поставщика для лучшего пользовательского опыта студента.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Заметки и история разгово
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания по электронной почте о неактивности';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания о неактивности';
+$string['task:run_meta_ai_query'] = 'Запустить запланированный запрос аналитики Meta-AI';
 $string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 
 // CDN settings.

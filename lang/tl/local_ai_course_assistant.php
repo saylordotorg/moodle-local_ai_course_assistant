@@ -56,6 +56,8 @@ $string['settings:default_course_mode_per_course'] = 'Naka-disable bilang defaul
 $string['settings:default_course_mode_all'] = 'Pinagana sa lahat ng kurso';
 $string['settings:auto_open'] = 'Awtomatikong magbukas sa unang pagbisita';
 $string['settings:auto_open_desc'] = 'Kapag pinagana, awtomatikong nagbubukas ang drawer ng SOLA sa unang pagkakataon na pumasok ang isang estudyante sa bawat kurso. Hindi muling binubuksan ng mga sumunod na pag-load ng pahina sa parehong kurso ang drawer — sinusubaybayan ang estado sa bawat kurso sa browser ng estudyante sa pamamagitan ng localStorage. Naaangkop sa desktop at mobile. Maaaring i-override sa bawat kurso mula sa pahinang Course AI Settings.';
+$string['settings:comparison_providers'] = 'Mga provider ng paghahambing (LLM picker)';
+$string['settings:comparison_providers_desc'] = 'Magdagdag ng karagdagang AI provider sa in-widget LLM picker para makapaghambing ang mga admin ng mga tugon mula sa iba\'t ibang provider. Isang linya bawat provider sa format na: provider_id|api_key|model1,model2. Ang pangunahing provider na naka-configure sa itaas ay palaging awtomatikong kasama. Tanging mga admin na may manage capability lang ang makakakita ng picker; hindi ito makikita ng mga estudyante. Halimbawa:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Mga valid na provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Provider ng AI';
 $string['settings:provider_desc'] = 'Piliin ang AI provider na gagamitin para sa mga chat completion. Piliin ang "Moodle AI (core_ai subsystem)" para i-route ang mga kahilingan sa pamamagitan ng built-in na AI configuration ng Moodle sa Site admin > AI; binabalewala ang API key, model at base URL na mga field sa ibaba sa mode na iyon. Ang streaming, paggamit ng tool, at prompt caching ay hindi available sa pamamagitan ng core_ai — ang mga tugon ay inihahatid bilang isang chunk. Gumamit ng direktang provider para sa pinakamahusay na karanasan ng mag-aaral.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -369,6 +371,7 @@ $string['chat:history_title'] = 'Mga Tala at Kasaysayan ng Pag-uusap';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa email dahil sa kawalan ng aktibidad';
 $string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa kawalan ng aktibidad';
+$string['task:run_meta_ai_query'] = 'Patakbuhin ang nakaiskedyul na Meta-AI analytics query';
 $string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 
 // CDN settings.

@@ -51,6 +51,8 @@ $string['settings:default_course_mode_per_course'] = 'Dezactivat implicit (activ
 $string['settings:default_course_mode_all'] = 'Activat pe toate cursurile';
 $string['settings:auto_open'] = 'Deschidere automată la prima vizită';
 $string['settings:auto_open_desc'] = 'Când este activată, sertarul SOLA se deschide automat prima dată când un student ajunge la fiecare curs. Încărcările ulterioare ale paginii în același curs nu redeschid sertarul — starea este urmărită pe curs în browserul studentului prin localStorage. Se aplică pe desktop și mobil. Poate fi suprascrisă pe curs din pagina Course AI Settings.';
+$string['settings:comparison_providers'] = 'Furnizori de comparare (selector LLM)';
+$string['settings:comparison_providers_desc'] = 'Adăugați furnizori AI suplimentari la selectorul LLM integrat în widget pentru ca administratorii să poată compara răspunsurile între furnizori. O linie per furnizor în formatul: provider_id|api_key|model1,model2. Furnizorul principal configurat mai sus este întotdeauna inclus automat. Doar administratorii cu capacitatea de gestionare văd selectorul; studenții nu îl văd niciodată. Exemplu:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs valide: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Furnizor AI';
 $string['settings:provider_desc'] = 'Selectați furnizorul AI pentru completările de chat. Alegeți "Moodle AI (core_ai subsystem)" pentru a direcționa cererile prin configurația AI încorporată a Moodle de la Site admin > AI; câmpurile cheii API, modelului și URL-ului de bază de mai jos sunt ignorate în acel mod. Streaming, folosirea uneltelor și prompt caching nu sunt disponibile prin core_ai — răspunsurile sunt livrate ca o singură bucată. Folosiți un furnizor direct pentru cea mai bună experiență a studentului.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -346,6 +348,7 @@ $string['chat:mode_history'] = 'Note';
 // History panel.
 $string['chat:history_title'] = 'Note și istoricul conversației';
 $string['task:send_inactivity_reminders'] = 'Trimiteți e-mailuri săptămânale de memento privind inactivitatea';
+$string['task:run_meta_ai_query'] = 'Rulează interogarea programată de analiză Meta-AI';
 $string['messageprovider:study_notes'] = 'Note ale sesiunii de studiu';
 
 // CDN settings.

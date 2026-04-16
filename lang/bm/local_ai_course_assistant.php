@@ -57,6 +57,8 @@ $string['settings:default_course_mode_per_course'] = 'Dabɔlen ye i sababu ye (a
 $string['settings:default_course_mode_all'] = 'A bɛ baara la kalanw bɛɛ la';
 $string['settings:auto_open'] = 'A yɛrɛ kɛ ka wuli taama fɔlɔ la';
 $string['settings:auto_open_desc'] = 'Ni a bɛ baara la, SOLA papier bɛ a yɛrɛ wuli kalanden mana don kalansow kelen-kelen na siɲɛ fɔlɔ. Ni kalanden tora kalanso kelen kɔnɔ, page weleli wɛrɛw tɛna papier wuli tugun — cogo bɛ kɛ kalanso kelen-kelen na kalanden ka navigateur kɔnɔ ni localStorage ye. A bɛ baara kɛ desktop ni telefonin kan. A bɛ se ka yɛlɛma kalanso kelen-kelen kama Course AI Settings page la.';
+$string['settings:comparison_providers'] = 'Baarakɛlaw danfaraw (LLM sugandili)';
+$string['settings:comparison_providers_desc'] = 'Fàra AI baarakɛlaw wɛrɛw fara kan LLM sugandili kan walasa administrators bɛ se ka jaabi danfaraw lajɛ baarakɛla caman na. Sɛbɛn kelen kɛ baarakɛla kelen ye nin fasari in na: provider_id|api_key|model1,model2. Baarakɛla kunba min bɛ sanfɛ, o bɛ don a yɛrɛma tuma bɛɛ. Administrators minnu bɛ ni manage se ye, olu dɔrɔn de bɛ sugandili ye; kalandenw tɛ a ye abada. Misali:<br><code>claude|sk-ant-api03-...|claude-sonnet-4-5-20250929,claude-3-5-haiku-20241022<br>gemini|AIzaSy...|gemini-2.0-flash<br>deepseek|sk-...|deepseek-chat</code><br>Provider IDs tilennenw: openai, claude, deepseek, gemini, ollama, minimax, mistral, groq, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'AI Bɛɛlɛ Dɔnbaga';
 $string['settings:provider_desc'] = 'IA dilanbaga sugandi baro dafali kama. "Moodle AI (core_ai subsystem)" sugandi walasa ka deliliw ci Moodle ka AI labɛnni kɔnɔna la Site admin > AI la; API kilé, ko dilanbaga ani URL jɔyɔrɔ fɛɛrɛw tɛ jatɛ o cogoya la. Streaming, tool use ani prompt caching tɛ sɔrɔ core_ai fɛ — jaabiw bɛ di i ko fɛn kelen. Dilanbaga tilennen kɛ kalandenw ka kɛcogo ɲumanba kama.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
@@ -376,6 +378,7 @@ $string['chat:history_title'] = 'Dɔgɔkunw ni kuma taarixi';
 $string['task:send_inactivity_reminders'] = 'Dɔgɔkun kelen kelen na hakili-jigin-bataki ci baara-bali kama';
 $string['messageprovider:study_notes'] = 'Kalanko waati sɛbɛnniw';
 $string['task:send_inactivity_reminders'] = 'Ci dɔgɔkun dɔgɔkun ladilikan bataki walasa ka baarakɛbaliya kɔfɔ';
+$string['task:run_meta_ai_query'] = 'Ka Meta-AI jateminɛ ɲininkali latilennin boli';
 $string['messageprovider:study_notes'] = 'Kalanko waati kunnafoni sɛbɛnw';
 
 // CDN settings.
