@@ -605,6 +605,33 @@ define([
                 }
             });
         }
+
+        // Auto-open on first visit per course. Admin setting (global or
+        // per-course override) surfaces as data-autoopen="1" on the root.
+        // localStorage key marks the course as "already auto-opened once"
+        // so it does not re-open on every subsequent page load in the same
+        // course. Applies on desktop and mobile.
+        //
+        // Legacy CDN compatibility: on plugin versions prior to v3.4.8 the
+        // template did not emit the data-autoopen attribute at all, so the
+        // dataset value is undefined. Treat that case as "on" so sites
+        // running v3.4.7 with Saylor's CDN bundle still pick up the auto
+        // open behavior without a plugin deploy. v3.5.2+ always emits the
+        // attribute (either "1", "0", or "") and the explicit value wins.
+        var autoopenAttr = root.dataset.autoopen;
+        var shouldAutoopen = (autoopenAttr === '1') || (autoopenAttr === undefined);
+        if (shouldAutoopen) {
+            var courseId = root.dataset.courseid || '';
+            var firstVisitKey = 'aica_autoopened_course_' + courseId;
+            var alreadyOpened = false;
+            try { alreadyOpened = localStorage.getItem(firstVisitKey) === '1'; } catch (e) { /**/ }
+            if (courseId && !alreadyOpened) {
+                try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
+                // Defer one frame so layout, drag offsets, and focus traps
+                // are fully wired before we open.
+                requestAnimationFrame(function() { toggleDrawer(); });
+            }
+        }
     };
 
     /**

@@ -388,6 +388,7 @@ class hook_callbacks {
             'avatarfill'         => get_config('local_ai_course_assistant', 'avatar_fill') ?: '#ffffff',
             'displaymode'        => $displaymode,
             'drawermode'         => ($displaymode === 'drawer'),
+            'autoopen'           => self::is_autoopen_for_course($courseid),
             'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'Saylor Online Learning Assistant',
             'institution'        => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
             'institutionshort'   => get_config('local_ai_course_assistant', 'institution_short_name') ?: 'Saylor U',
@@ -544,5 +545,25 @@ class hook_callbacks {
         }
         // Inherit global setting.
         return (bool) get_config('local_ai_course_assistant', 'usertesting_enabled');
+    }
+
+    /**
+     * Check if auto-open (drawer opens on first course visit) is enabled for a given course.
+     *
+     * Per-course override takes precedence over the global setting.
+     * Values: '' (not set) = inherit global, '1' = force on, '0' = force off.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    private static function is_autoopen_for_course(int $courseid): bool {
+        $per_course = get_config('local_ai_course_assistant', 'sola_autoopen_course_' . $courseid);
+        if ($per_course === '1') {
+            return true;
+        }
+        if ($per_course === '0') {
+            return false;
+        }
+        return (bool) get_config('local_ai_course_assistant', 'auto_open');
     }
 }

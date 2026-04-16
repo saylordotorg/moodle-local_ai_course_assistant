@@ -106,6 +106,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset_config('sola_voicetab_course_' . $courseid, 'local_ai_course_assistant');
     }
 
+    // Auto-open — per-course override (inherit / force on / force off).
+    $autoopen = optional_param('auto_open', '', PARAM_RAW_TRIMMED);
+    if ($autoopen === '1' || $autoopen === '0') {
+        set_config('sola_autoopen_course_' . $courseid, $autoopen, 'local_ai_course_assistant');
+    } else {
+        unset_config('sola_autoopen_course_' . $courseid, 'local_ai_course_assistant');
+    }
+
     // Starter overrides — per-course enable/disable for each starter.
     $starteroverrides = [];
     $allstarters = \local_ai_course_assistant\starter_manager::get_global_starters();
@@ -136,6 +144,10 @@ $englishlockenabled = (bool)get_config('local_ai_course_assistant', 'english_loc
 // Voice Tab per-course override ('', '1', or '0').
 $voicetabcourseraw = get_config('local_ai_course_assistant', 'sola_voicetab_course_' . $courseid);
 $voicetabglobal = (bool)get_config('local_ai_course_assistant', 'voice_tab_enabled');
+
+// Auto-open per-course override ('', '1', or '0').
+$autoopencourseraw = get_config('local_ai_course_assistant', 'sola_autoopen_course_' . $courseid);
+$autoopenglobal = (bool)get_config('local_ai_course_assistant', 'auto_open');
 
 // Build provider options.
 $providers = [
@@ -413,6 +425,34 @@ echo html_writer::div(
                     </select>
                     <small class="form-text text-muted">
                         Override the global Voice Tab setting for this course only.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">Auto-open on first visit</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Control whether the SOLA drawer opens automatically the first time a student lands on this course. First-visit state is tracked per course in the student's browser via localStorage. By default this course inherits the global setting (currently <strong><?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Auto-open</label>
+                <div class="col-sm-9">
+                    <select class="form-control" name="auto_open" id="auto_open">
+                        <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') { echo 'selected'; } ?>>
+                            Inherit global (<?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?>)
+                        </option>
+                        <option value="1" <?php if ($autoopencourseraw === '1') { echo 'selected'; } ?>>
+                            Force on
+                        </option>
+                        <option value="0" <?php if ($autoopencourseraw === '0') { echo 'selected'; } ?>>
+                            Force off
+                        </option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Override the global Auto-open setting for this course only.
                     </small>
                 </div>
             </div>

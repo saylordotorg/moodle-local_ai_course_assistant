@@ -119,6 +119,13 @@ if ($hassiteconfig) {
         $coursemodes
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/auto_open',
+        get_string('settings:auto_open', 'local_ai_course_assistant'),
+        get_string('settings:auto_open_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/remoteconfigurl',
         get_string('remoteconfigurl', 'local_ai_course_assistant'),
