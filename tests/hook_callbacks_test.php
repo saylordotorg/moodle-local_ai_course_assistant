@@ -35,6 +35,11 @@ final class hook_callbacks_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course([
             'fullname' => 'Course With Learning Outcomes',
         ]);
+
+        // v3.5.0: per_course is the default course mode, so tests that expect
+        // the widget to render on a specific course must opt it in explicitly.
+        set_config('sola_enabled_course_' . $course->id, '1', 'local_ai_course_assistant');
+
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $this->getDataGenerator()->create_module('page', [
             'course' => $course->id,

@@ -17,8 +17,9 @@ Feature: AI Course Assistant widget
       | student1 | TC1    | student        |
       | teacher1 | TC1    | editingteacher |
     And the following config values are set as admin:
-      | enabled  | 1      | local_ai_course_assistant |
-      | provider | claude | local_ai_course_assistant |
+      | enabled             | 1      | local_ai_course_assistant |
+      | provider            | claude | local_ai_course_assistant |
+      | default_course_mode | all    | local_ai_course_assistant |
 
   Scenario: Student sees chat widget on course page
     Given I log in as "student1"

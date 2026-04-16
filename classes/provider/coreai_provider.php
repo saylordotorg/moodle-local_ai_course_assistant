@@ -49,6 +49,10 @@ class coreai_provider extends base_provider {
      * apikey/model/baseurl parsing the parent does. Temperature is still read
      * for consistency even though core_ai does not expose it through
      * generate_text today.
+     *
+     * @param array $overrides Optional per-course config overrides. Only
+     *                         'temperature' is consulted here; apikey/model/
+     *                         baseurl are ignored because core_ai owns them.
      */
     public function __construct(array $overrides = []) {
         $this->apikey = '';
