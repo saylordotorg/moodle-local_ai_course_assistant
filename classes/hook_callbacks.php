@@ -64,6 +64,12 @@ class hook_callbacks {
             return;
         }
 
+        // Skip admin layout pages (e.g. Course AI Settings, Analytics, RAG Admin).
+        // The widget is for student-facing course pages, not administration.
+        if (($PAGE->pagelayout ?? '') === 'admin') {
+            return;
+        }
+
         // Get the course context (may need to go up from module context).
         if ($context->contextlevel === CONTEXT_MODULE) {
             $coursecontext = $context->get_course_context();
