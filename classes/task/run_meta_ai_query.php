@@ -63,8 +63,18 @@ class run_meta_ai_query extends \core\task\scheduled_task {
         $rangedays = $this->frequency_to_days($frequency);
         $since = time() - ($rangedays * 86400);
 
-        mtrace("  AI Analysis cron: building transcript (last {$rangedays} days)...");
-        $systemprompt = meta_ai_data_builder::build_system_prompt(0, $since);
+        // Scope filters from admin settings.
+        $scopecourses = get_config('local_ai_course_assistant', 'metaai_cron_courseids') ?: '';
+        $scopeprovider = get_config('local_ai_course_assistant', 'metaai_cron_filterprovider') ?: '';
+        $courseids = [];
+        if (!empty($scopecourses)) {
+            $courseids = array_filter(array_map('intval', explode(',', $scopecourses)));
+        }
+
+        mtrace("  AI Analysis cron: building context (last {$rangedays} days, "
+            . (empty($courseids) ? "all courses" : "courses " . implode(',', $courseids))
+            . ($scopeprovider ? ", provider={$scopeprovider}" : "") . ")...");
+        $systemprompt = meta_ai_data_builder::build_system_prompt($courseids, $since, $scopeprovider);
 
         $messages = [['role' => 'user', 'content' => $query]];
 

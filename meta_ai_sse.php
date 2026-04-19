@@ -58,12 +58,22 @@ $query    = required_param('query', PARAM_RAW);
 $provider = optional_param('provider', '', PARAM_ALPHA);
 $model    = optional_param('model', '', PARAM_RAW_TRIMMED);
 $courseid = optional_param('courseid', 0, PARAM_INT);
+$courseids_raw = optional_param('courseids', '', PARAM_RAW_TRIMMED);
 $range    = optional_param('range', 30, PARAM_INT);
+$filterprovider = optional_param('filterprovider', '', PARAM_ALPHA);
 $history  = optional_param('history', '[]', PARAM_RAW);
 
 $since = $range > 0 ? time() - ($range * 86400) : 0;
 
-$systemprompt = meta_ai_data_builder::build_system_prompt($courseid, $since);
+// Build course ID list: explicit list > single courseid > all courses.
+$courseids = [];
+if (!empty($courseids_raw)) {
+    $courseids = array_filter(array_map('intval', explode(',', $courseids_raw)));
+} else if ($courseid > 0) {
+    $courseids = [$courseid];
+}
+
+$systemprompt = meta_ai_data_builder::build_system_prompt($courseids, $since, $filterprovider);
 
 $messages = [];
 $historyarr = json_decode($history, true);

@@ -120,7 +120,7 @@
             <div class="card-body">
                 <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px">
                     <div>
-                        <label for="ai-analysis-provider" class="small text-muted mb-0">Provider</label>
+                        <label for="ai-analysis-provider" class="small text-muted mb-0">LLM to query with</label>
                         <select id="ai-analysis-provider" class="form-control form-control-sm" style="width:180px">
                             {{#meta_ai_providers}}
                             <option value="{{id}}" data-models="{{models_json}}">{{label}}</option>
@@ -129,16 +129,30 @@
                     </div>
                     <div>
                         <label for="ai-analysis-model" class="small text-muted mb-0">Model</label>
-                        <select id="ai-analysis-model" class="form-control form-control-sm" style="width:220px"></select>
+                        <select id="ai-analysis-model" class="form-control form-control-sm" style="width:200px"></select>
+                    </div>
+                    <div>
+                        <label for="ai-analysis-scope" class="small text-muted mb-0">Data scope</label>
+                        <select id="ai-analysis-scope" class="form-control form-control-sm" style="width:200px">
+                            <option value="all">All courses</option>
+                            <option value="current" {{#courseid_param}}selected{{/courseid_param}}>Current course only</option>
+                            <option value="custom">Specific course IDs...</option>
+                            <option value="byprovider">By LLM provider used...</option>
+                        </select>
+                    </div>
+                    <div id="ai-analysis-scope-detail" style="display:none">
+                        <label for="ai-analysis-scope-value" class="small text-muted mb-0">Course IDs or provider</label>
+                        <input type="text" id="ai-analysis-scope-value" class="form-control form-control-sm" style="width:200px" placeholder="e.g. 2,5,12 or openai">
                     </div>
                 </div>
                 <div id="ai-analysis-messages" style="max-height:400px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;margin-bottom:12px;background:#f8f9fa;font-size:14px">
-                    <p class="text-muted mb-0" style="font-size:13px">Ask a question about student conversations. All data sent to the AI is anonymized. Examples: "What are the most common topics students ask about?" or "Summarize feedback themes from the last 30 days."</p>
+                    <p class="text-muted mb-0" style="font-size:13px">Ask about student conversations, feedback, provider performance, token costs, or learning trends. All data is anonymized. Try: "Which provider gives the best student satisfaction?" or "What topics do students struggle with most?"</p>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="ai-analysis-input" class="form-control" placeholder="Ask about student conversations...">
+                    <input type="text" id="ai-analysis-input" class="form-control" placeholder="Ask about student data, trends, costs, feedback...">
                     <div class="input-group-append">
                         <button class="btn btn-primary" id="ai-analysis-send" type="button">Send</button>
+                        <button class="btn btn-outline-secondary" id="ai-analysis-download" type="button" title="Download last response as CSV">&#8615; CSV</button>
                     </div>
                 </div>
                 <input type="hidden" id="ai-analysis-sse-url" value="{{meta_ai_sse_url}}">
@@ -1059,14 +1073,45 @@
     var messagesDiv = document.getElementById('ai-analysis-messages');
     var inputField = document.getElementById('ai-analysis-input');
     var sendBtn = document.getElementById('ai-analysis-send');
+    var downloadBtn = document.getElementById('ai-analysis-download');
     var sseUrl = document.getElementById('ai-analysis-sse-url');
     var sesskey = document.getElementById('ai-analysis-sesskey');
     var courseidEl = document.getElementById('ai-analysis-courseid');
     var rangeEl = document.getElementById('ai-analysis-range');
+    var scopeSelect = document.getElementById('ai-analysis-scope');
+    var scopeDetail = document.getElementById('ai-analysis-scope-detail');
+    var scopeValue = document.getElementById('ai-analysis-scope-value');
 
     if (!providerSelect || !modelSelect || !messagesDiv || !inputField || !sendBtn) return;
 
     var chatHistory = [];
+    var lastResponse = '';
+
+    // Scope selector: show/hide detail input.
+    if (scopeSelect) {
+        scopeSelect.addEventListener('change', function() {
+            var v = scopeSelect.value;
+            if (v === 'custom' || v === 'byprovider') {
+                scopeDetail.style.display = '';
+                scopeValue.placeholder = v === 'custom' ? 'Course IDs (e.g. 2,5,12)' : 'Provider (e.g. openai, claude)';
+            } else {
+                scopeDetail.style.display = 'none';
+            }
+        });
+    }
+
+    // CSV download of last response.
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            if (!lastResponse) { alert('No response to download yet.'); return; }
+            var csv = 'Field,Value\nQuery,"' + (inputField.value || '').replace(/"/g, '""') + '"\nResponse,"' + lastResponse.replace(/"/g, '""') + '"\nDate,"' + new Date().toISOString() + '"\nNote,"All student data is anonymized."\n';
+            var blob = new Blob([csv], {type: 'text/csv'});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sola_ai_analysis_' + Date.now() + '.csv';
+            a.click();
+        });
+    }
 
     function populateModels() {
         var opt = providerSelect.options[providerSelect.selectedIndex];
@@ -1124,9 +1169,19 @@
         params.append('query', query);
         params.append('provider', providerSelect.value);
         params.append('model', modelSelect.value);
-        params.append('courseid', courseidEl ? courseidEl.value : '0');
         params.append('range', rangeEl ? rangeEl.value : '30');
         params.append('history', JSON.stringify(chatHistory.slice(0, -1)));
+
+        // Scope filters.
+        var scope = scopeSelect ? scopeSelect.value : 'all';
+        if (scope === 'current') {
+            params.append('courseid', courseidEl ? courseidEl.value : '0');
+        } else if (scope === 'custom') {
+            params.append('courseids', scopeValue ? scopeValue.value : '');
+        } else if (scope === 'byprovider') {
+            params.append('filterprovider', scopeValue ? scopeValue.value : '');
+        }
+        // scope === 'all' sends no filter (all courses).
 
         var url = sseUrl ? sseUrl.value : '';
         fetch(url, {
@@ -1141,6 +1196,7 @@
                 return reader.read().then(function(result) {
                     if (result.done) {
                         chatHistory.push({ role: 'assistant', content: fullText });
+                        lastResponse = fullText;
                         sendBtn.disabled = false;
                         inputField.disabled = false;
                         inputField.focus();

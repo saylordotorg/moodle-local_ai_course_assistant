@@ -931,9 +931,23 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/metaai_cron_format',
         'Report format',
-        'How the report is delivered. "Text in email body" sends the AI response as plain text in the email. "CSV attachment" sends a CSV file with the query, response, and metadata as an email attachment (subject to Gmail attachment size limits).',
+        'How the report is delivered. "Text in email body" sends the AI response as plain text. "CSV attachment" sends a CSV file. All student data is anonymized in both formats.',
         'text',
         ['text' => 'Text in email body', 'csv' => 'CSV attachment']
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/metaai_cron_courseids',
+        'Report course scope',
+        'Comma-separated list of course IDs to include in the scheduled report. Leave blank for all courses. Example: "2,5,12".',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/metaai_cron_filterprovider',
+        'Report provider filter',
+        'Only include conversations handled by this LLM provider. Leave blank for all providers. Example: "openai" or "claude".',
+        ''
     ));
 
     // Analytics export (Redash).
