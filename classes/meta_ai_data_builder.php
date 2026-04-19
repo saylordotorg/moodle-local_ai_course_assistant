@@ -89,6 +89,11 @@ PROMPT;
 
     /**
      * Build aggregate statistics.
+     *
+     * @param array $courseids Array of course IDs (empty = all courses).
+     * @param int $since Unix timestamp (0 = all time).
+     * @param string $filterprovider Filter messages by this LLM provider (empty = all).
+     * @return string Formatted stats block.
      */
     public static function build_aggregate_stats(array $courseids = [], int $since = 0, string $filterprovider = ''): string {
         global $DB;
@@ -146,6 +151,10 @@ PROMPT;
 
     /**
      * Build provider comparison stats.
+     *
+     * @param array $courseids Array of course IDs (empty = all courses).
+     * @param int $since Unix timestamp (0 = all time).
+     * @return string Formatted provider comparison block.
      */
     public static function build_provider_stats(array $courseids = [], int $since = 0): string {
         global $DB;
@@ -183,6 +192,10 @@ PROMPT;
 
     /**
      * Build feedback summary.
+     *
+     * @param array $courseids Array of course IDs (empty = all courses).
+     * @param int $since Unix timestamp (0 = all time).
+     * @return string Formatted feedback summary block.
      */
     public static function build_feedback_stats(array $courseids = [], int $since = 0): string {
         global $DB;
@@ -242,6 +255,9 @@ PROMPT;
 
     /**
      * Build anonymized student profiles summary.
+     *
+     * @param array $courseids Array of course IDs (empty = all courses).
+     * @return string Formatted student profiles block.
      */
     public static function build_student_profiles(array $courseids = []): string {
         global $DB;
@@ -283,6 +299,12 @@ PROMPT;
 
     /**
      * Build anonymized transcript with provider/model metadata.
+     *
+     * @param array|int $courseids Array of course IDs, or a single int for legacy callers (0 = all).
+     * @param int $since Unix timestamp (0 = all time).
+     * @param string $filterprovider Filter messages by this LLM provider (empty = all).
+     * @param int $maxchars Maximum characters to include in the transcript.
+     * @return string Formatted transcript block.
      */
     public static function build_transcript(
         $courseids = [],
@@ -364,6 +386,10 @@ PROMPT;
 
     /**
      * Build a summary stats block (lightweight, for backward compat).
+     *
+     * @param array|int $courseids Array of course IDs, or legacy single-course int (0 = all).
+     * @param int $since Unix timestamp (0 = all time).
+     * @return string Formatted stats summary block.
      */
     public static function build_stats_summary($courseids = 0, int $since = 0): string {
         if (is_int($courseids)) {
@@ -374,6 +400,11 @@ PROMPT;
 
     /**
      * Build WHERE clause + params from filter criteria.
+     *
+     * @param array $courseids Array of course IDs (empty = all courses).
+     * @param int $since Unix timestamp (0 = all time).
+     * @param string $filterprovider Filter messages by this LLM provider (empty = all).
+     * @return array Two-element array: [sql WHERE fragment, named-params array].
      */
     private static function build_where(array $courseids = [], int $since = 0, string $filterprovider = ''): array {
         global $DB;
