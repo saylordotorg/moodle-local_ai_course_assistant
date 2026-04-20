@@ -72,6 +72,27 @@ if ($hassiteconfig) {
 
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
+    $demoadminurl = new moodle_url('/local/ai_course_assistant/demo_admin.php');
+
+    $quicklinks = '<a href="' . $analyticsurl->out() . '">Analytics Dashboard &rarr;</a>'
+        . '<a href="' . $tokenanalyticsurl->out() . '">Token Cost &amp; Analytics &rarr;</a>'
+        . '<a href="' . $demoadminurl->out() . '">Testing Environment &rarr;</a>';
+
+    // "Back to last course" shortcut: when the admin previously visited a course
+    // page with the widget active, this pref was saved via hook_callbacks. Show
+    // a button here so admins can pivot back to that course without hunting.
+    global $DB, $USER;
+    $lastcourseid = (int) get_user_preferences('local_ai_course_assistant_last_courseid', 0);
+    if ($lastcourseid > 0 && $lastcourseid !== (int) SITEID) {
+        $lastcourse = $DB->get_record('course', ['id' => $lastcourseid], 'id,shortname,fullname,visible');
+        if ($lastcourse) {
+            $lastlabel = $lastcourse->shortname !== '' ? $lastcourse->shortname : $lastcourse->fullname;
+            $lasturl = new moodle_url('/course/view.php', ['id' => $lastcourseid]);
+            $quicklinks = '<a href="' . $lasturl->out() . '" title="'
+                . s($lastcourse->fullname) . '" style="background:#6c757d;border-color:#6c757d;">'
+                . '&larr; Back to ' . s($lastlabel) . '</a>' . $quicklinks;
+        }
+    }
 
     $toc = $tocstyle
         . '<div class="sola-toc">'
@@ -85,10 +106,7 @@ if ($hassiteconfig) {
         . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
         . '<li><a href="#sec-integrations">Integrations &amp; Delivery</a></li>'
         . '</ul>'
-        . '<div class="sola-quicklinks">'
-        . '<a href="' . $analyticsurl->out() . '">Analytics Dashboard &rarr;</a>'
-        . '<a href="' . $tokenanalyticsurl->out() . '">Token Cost &amp; Analytics &rarr;</a>'
-        . '</div>'
+        . '<div class="sola-quicklinks">' . $quicklinks . '</div>'
         . '</div>';
 
     $settings->add(new admin_setting_description(
@@ -1068,6 +1086,13 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_integrity',
         get_string('integrity:title', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/integrity_admin.php'),
+        'moodle/site:config'
+    ));
+
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_demoadmin',
+        'Testing Environment',
+        new moodle_url('/local/ai_course_assistant/demo_admin.php'),
         'moodle/site:config'
     ));
 

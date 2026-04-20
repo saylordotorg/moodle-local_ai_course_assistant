@@ -83,6 +83,16 @@ class hook_callbacks {
             return;
         }
 
+        // Remember the last course visited for admins, so the global settings
+        // page can offer a "back to last course" shortcut. Non-admins skip this
+        // to avoid pointless user_preferences writes.
+        if (is_siteadmin() || has_capability('moodle/site:config', \context_system::instance())) {
+            $lastpref = (int) get_user_preferences('local_ai_course_assistant_last_courseid', 0);
+            if ($lastpref !== (int) $courseid) {
+                set_user_preference('local_ai_course_assistant_last_courseid', (int) $courseid);
+            }
+        }
+
         // Check capability.
         if (!has_capability('local/ai_course_assistant:use', $coursecontext)) {
             return;
