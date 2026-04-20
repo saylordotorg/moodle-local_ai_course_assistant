@@ -35,13 +35,17 @@ S3_KEY = "ai_course_assistant_deploy.tar.gz"
 FIXTURE_S3_KEY = "dev-fixtures/bus101.mbz"
 FIXTURE_SHORTNAME = "BUS101"
 
-# Deploy targets: name -> (hostname, remote moodle dir).
-# Plugin dir is always <moodle_dir>/local/ai_course_assistant.
+# Deploy targets: name -> (hostname, moodle_dir, plugin_subdir).
+# moodle_dir is the top-level Moodle repo (where admin/cli/* lives).
+# plugin_subdir is where local plugins are served from relative to moodle_dir.
+# Moodle 5.1+ moved the web root into a public/ subdirectory, so its local
+# plugins live at <moodle_dir>/public/local/*. Older Moodle (4.5, 5.0) keeps
+# them at <moodle_dir>/local/*.
 TARGETS = {
-    "dev": ("dev.sylr.org",    "/var/www/html/moodle"),
-    "405": ("dev405.sylr.org", "/var/www/html/moodle405"),
-    "500": ("dev500.sylr.org", "/var/www/html/moodle500"),
-    "501": ("dev501.sylr.org", "/var/www/html/moodle501"),
+    "dev": ("dev.sylr.org",    "/var/www/html/moodle",    "local"),
+    "405": ("dev405.sylr.org", "/var/www/html/moodle405", "local"),
+    "500": ("dev500.sylr.org", "/var/www/html/moodle500", "local"),
+    "501": ("dev501.sylr.org", "/var/www/html/moodle501", "public/local"),
 }
 
 # Local paths.
@@ -96,9 +100,9 @@ def ssm_send(commands, wait=True, timeout=120):
     return {"status": "Timeout", "stdout": "", "stderr": "Command polling timed out"}
 
 
-def deploy_to_target(name, hostname, moodle_dir):
+def deploy_to_target(name, hostname, moodle_dir, plugin_subdir):
     """Rsync, upgrade, purge, verify on a single Moodle install."""
-    plugin_dir = f"{moodle_dir}/local/ai_course_assistant"
+    plugin_dir = f"{moodle_dir}/{plugin_subdir}/ai_course_assistant"
     print(f"\n--- Deploying to {hostname} ({moodle_dir}) ---")
 
     print("  Syncing files via SSM...")
@@ -278,7 +282,7 @@ def main():
     if args.seed_bus101:
         failures = []
         for name in selected:
-            hostname, moodle_dir = TARGETS[name]
+            hostname, moodle_dir, _plugin_subdir = TARGETS[name]
             if not seed_bus101(name, hostname, moodle_dir):
                 failures.append(hostname)
         print("\n" + "=" * 60)
@@ -320,8 +324,8 @@ def main():
     # Step 4: Deploy to every selected target in sequence.
     failures = []
     for name in selected:
-        hostname, moodle_dir = TARGETS[name]
-        if not deploy_to_target(name, hostname, moodle_dir):
+        hostname, moodle_dir, plugin_subdir = TARGETS[name]
+        if not deploy_to_target(name, hostname, moodle_dir, plugin_subdir):
             failures.append(hostname)
 
     # Clean up local tarball.

@@ -74,9 +74,12 @@ if ($hassiteconfig) {
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
     $demoadminurl = new moodle_url('/local/ai_course_assistant/demo_admin.php');
 
-    $quicklinks = '<a href="' . $analyticsurl->out() . '">Analytics Dashboard &rarr;</a>'
-        . '<a href="' . $tokenanalyticsurl->out() . '">Token Cost &amp; Analytics &rarr;</a>'
-        . '<a href="' . $demoadminurl->out() . '">Testing Environment &rarr;</a>';
+    $quicklinks = '<a href="' . $analyticsurl->out() . '">'
+            . get_string('toc:analytics', 'local_ai_course_assistant') . '</a>'
+        . '<a href="' . $tokenanalyticsurl->out() . '">'
+            . get_string('toc:tokenanalytics', 'local_ai_course_assistant') . '</a>'
+        . '<a href="' . $demoadminurl->out() . '">'
+            . get_string('toc:testing', 'local_ai_course_assistant') . '</a>';
 
     // "Back to last course" shortcut: when the admin previously visited a course
     // page with the widget active, this pref was saved via hook_callbacks. Show
@@ -88,9 +91,11 @@ if ($hassiteconfig) {
         if ($lastcourse) {
             $lastlabel = $lastcourse->shortname !== '' ? $lastcourse->shortname : $lastcourse->fullname;
             $lasturl = new moodle_url('/course/view.php', ['id' => $lastcourseid]);
+            $backlabel = str_replace('{$a}', s($lastlabel),
+                get_string('toc:back_to_course', 'local_ai_course_assistant'));
             $quicklinks = '<a href="' . $lasturl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#6c757d;border-color:#6c757d;">'
-                . '&larr; Back to ' . s($lastlabel) . '</a>' . $quicklinks;
+                . $backlabel . '</a>' . $quicklinks;
         }
     }
 
@@ -1091,7 +1096,7 @@ if ($hassiteconfig) {
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_demoadmin',
-        'Testing Environment',
+        get_string('demo:title', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/demo_admin.php'),
         'moodle/site:config'
     ));
