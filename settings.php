@@ -63,9 +63,15 @@ if ($hassiteconfig) {
         . '.sola-toc li{margin:0;}'
         . '.sola-toc a{display:inline-block;padding:4px 10px;background:#fff;border:1px solid #ced4da;border-radius:4px;font-size:13px;color:#3b5bdb;text-decoration:none;}'
         . '.sola-toc a:hover{background:#e7f0ff;border-color:#3b5bdb;text-decoration:none;}'
+        . '.sola-quicklinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #ced4da;}'
+        . '.sola-quicklinks a{display:inline-block;padding:5px 12px;background:#3b5bdb;border:1px solid #3b5bdb;border-radius:4px;font-size:13px;color:#fff;text-decoration:none;font-weight:500;}'
+        . '.sola-quicklinks a:hover{background:#2d47b5;border-color:#2d47b5;color:#fff;text-decoration:none;}'
         . '.sola-section-anchor{display:block;position:relative;top:-60px;visibility:hidden;}'
         . '.sola-section-heading{margin-top:24px;padding-top:8px;border-top:2px solid #e5e7eb;}'
         . '</style>';
+
+    $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
+    $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
 
     $toc = $tocstyle
         . '<div class="sola-toc">'
@@ -79,6 +85,10 @@ if ($hassiteconfig) {
         . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
         . '<li><a href="#sec-integrations">Integrations &amp; Delivery</a></li>'
         . '</ul>'
+        . '<div class="sola-quicklinks">'
+        . '<a href="' . $analyticsurl->out() . '">Analytics Dashboard &rarr;</a>'
+        . '<a href="' . $tokenanalyticsurl->out() . '">Token Cost &amp; Analytics &rarr;</a>'
+        . '</div>'
         . '</div>';
 
     $settings->add(new admin_setting_description(

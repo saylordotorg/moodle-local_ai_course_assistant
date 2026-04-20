@@ -260,21 +260,26 @@ abstract class base_provider implements provider_interface {
             $overrides['model'] = $model;
         }
 
-        $apikey = self::lookup_comparison_key($providerid);
-        if (!empty($apikey)) {
-            $overrides['apikey'] = $apikey;
+        $row = self::lookup_comparison_row($providerid);
+        if ($row !== null) {
+            if (!empty($row['apikey'])) {
+                $overrides['apikey'] = $row['apikey'];
+            }
+            if ($row['temperature'] !== '') {
+                $overrides['temperature'] = $row['temperature'];
+            }
         }
 
         return self::instantiate($providerid, $overrides);
     }
 
     /**
-     * Look up an API key for a comparison provider from the admin textarea.
+     * Look up a comparison provider row from the admin textarea.
      *
      * @param string $providerid
-     * @return string API key if found, empty string otherwise.
+     * @return array|null Row with apikey, models, temperature keys, or null if not found.
      */
-    private static function lookup_comparison_key(string $providerid): string {
+    private static function lookup_comparison_row(string $providerid): ?array {
         $raw = get_config('local_ai_course_assistant', 'comparison_providers') ?: '';
         foreach (explode("\n", $raw) as $line) {
             $line = trim($line);
@@ -283,10 +288,14 @@ abstract class base_provider implements provider_interface {
             }
             $parts = array_map('trim', explode('|', $line));
             if (count($parts) >= 2 && strtolower($parts[0]) === $providerid) {
-                return $parts[1];
+                return [
+                    'apikey'      => $parts[1] ?? '',
+                    'models'      => $parts[2] ?? '',
+                    'temperature' => $parts[3] ?? '',
+                ];
             }
         }
-        return '';
+        return null;
     }
 
     /**

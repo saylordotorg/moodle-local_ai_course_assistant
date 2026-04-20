@@ -29,61 +29,6 @@
     left: 20px;
 }
 
-/* Admin settings: keep long password/unmask values from forcing horizontal overflow. */
-.path-admin .form-item .form-setting .form-password {
-    max-width: 100%;
-}
-
-.path-admin .form-item .form-setting .form-password > input.form-control,
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="editor"] .form-control {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-}
-
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="wrapper"] {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.35rem 0.5rem;
-    max-width: 100%;
-    min-width: 0;
-}
-
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="editor"] {
-    flex: 1 1 20rem;
-    min-width: 0;
-    max-width: 100%;
-}
-
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="edit"] {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: 0.35rem;
-    flex: 1 1 20rem;
-    min-width: 0;
-    max-width: 100%;
-}
-
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="displayvalue"] {
-    display: inline-block;
-    min-width: 0;
-    max-width: 100%;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="displayvalue"] > span {
-    display: inline;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-.path-admin .form-item .form-setting .form-password [data-passwordunmask="unmask"] {
-    flex: 0 0 auto;
-}
-
 /* Toggle button */
 .local-ai-course-assistant__toggle {
     width: 62px;

@@ -64,7 +64,7 @@ class admin_setting_comparison_providers extends \admin_setting {
     /**
      * Parse the stored pipe-delimited config into structured rows.
      *
-     * @return array Array of ['provider' => string, 'apikey' => string, 'models' => string]
+     * @return array Array of ['provider' => string, 'apikey' => string, 'models' => string, 'temperature' => string]
      */
     private function parse_rows(): array {
         $raw = $this->get_setting() ?: '';
@@ -76,9 +76,10 @@ class admin_setting_comparison_providers extends \admin_setting {
             }
             $parts = array_map('trim', explode('|', $line));
             $rows[] = [
-                'provider' => strtolower($parts[0] ?? ''),
-                'apikey'   => $parts[1] ?? '',
-                'models'   => $parts[2] ?? '',
+                'provider'    => strtolower($parts[0] ?? ''),
+                'apikey'      => $parts[1] ?? '',
+                'models'      => $parts[2] ?? '',
+                'temperature' => $parts[3] ?? '',
             ];
         }
         return $rows;
@@ -95,12 +96,13 @@ class admin_setting_comparison_providers extends \admin_setting {
         }
 
         $html = '<div id="' . $id . '-wrap">';
-        $html .= '<table class="table table-sm table-bordered" id="' . $id . '-table" style="max-width:800px">';
+        $html .= '<table class="table table-sm table-bordered" id="' . $id . '-table" style="max-width:900px">';
         $html .= '<thead><tr>'
-            . '<th style="width:180px">Provider</th>'
-            . '<th style="width:240px">API Key</th>'
+            . '<th style="width:160px">Provider</th>'
+            . '<th style="width:220px">API Key</th>'
             . '<th>Models (comma-separated)</th>'
-            . '<th style="width:60px"></th>'
+            . '<th style="width:90px" title="Leave blank to use global default">Temp.</th>'
+            . '<th style="width:50px"></th>'
             . '</tr></thead>';
         $html .= '<tbody>';
 
@@ -136,6 +138,8 @@ class admin_setting_comparison_providers extends \admin_setting {
             . '</td>'
             . '<td><input type="text" class="form-control form-control-sm sola-cp-models" '
             . 'value="' . s($row['models']) . '" placeholder="model-name-1, model-name-2"></td>'
+            . '<td><input type="number" step="0.1" min="0" max="2" class="form-control form-control-sm sola-cp-temp" '
+            . 'value="' . s($row['temperature']) . '" placeholder="0.7"></td>'
             . '<td><button type="button" class="btn btn-sm btn-outline-danger sola-cp-remove" title="Remove">&times;</button></td>'
             . '</tr>';
     }
@@ -157,8 +161,13 @@ class admin_setting_comparison_providers extends \admin_setting {
             var p = tr.querySelector('.sola-cp-provider').value;
             var k = tr.querySelector('.sola-cp-key').value;
             var m = tr.querySelector('.sola-cp-models').value;
+            var t = tr.querySelector('.sola-cp-temp').value.trim();
             if (p && k) {
-                lines.push(p + '|' + k + '|' + m);
+                var line = p + '|' + k + '|' + m;
+                if (t !== '') {
+                    line += '|' + t;
+                }
+                lines.push(line);
             }
         });
         hiddenInput.value = lines.join('\\n');
@@ -170,6 +179,7 @@ class admin_setting_comparison_providers extends \admin_setting {
             + '<td><input type="password" class="form-control form-control-sm sola-cp-key" placeholder="Paste API key" autocomplete="off">'
             + '<small class="text-muted sola-cp-key-hint" style="font-size:11px"></small></td>'
             + '<td><input type="text" class="form-control form-control-sm sola-cp-models" placeholder="model-name-1, model-name-2"></td>'
+            + '<td><input type="number" step="0.1" min="0" max="2" class="form-control form-control-sm sola-cp-temp" placeholder="0.7"></td>'
             + '<td><button type="button" class="btn btn-sm btn-outline-danger sola-cp-remove" title="Remove">&times;</button></td>';
         tbody.appendChild(tr);
         bindRow(tr);
@@ -184,6 +194,7 @@ class admin_setting_comparison_providers extends \admin_setting {
         tr.querySelector('.sola-cp-provider').addEventListener('change', serialize);
         tr.querySelector('.sola-cp-key').addEventListener('input', serialize);
         tr.querySelector('.sola-cp-models').addEventListener('input', serialize);
+        tr.querySelector('.sola-cp-temp').addEventListener('input', serialize);
     }
 
     tbody.querySelectorAll('tr').forEach(bindRow);
