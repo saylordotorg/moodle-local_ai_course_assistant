@@ -174,10 +174,22 @@ def smoke_test_bus101(hostname, moodle_dir):
     if not course_exists(moodle_dir, FIXTURE_SHORTNAME):
         return
     url = f"https://{hostname}/course/view.php?name={FIXTURE_SHORTNAME}"
+    # Match only genuine error markers. Avoid bare words like "exception" (hits
+    # YUI module names like moodle-core-notification-exception) or "debug info"
+    # (hits the static lang-string label M.str.debug.debuginfo embedded on every page).
+    pattern = (
+        r'dml_missing_record'
+        r'|PHP Fatal error'
+        r'|PHP Parse error'
+        r'|class="[^"]*\berrorbox\b'
+        r'|class="[^"]*\bnotifyproblem\b'
+        r'|class="[^"]*\balert-danger\b'
+        r'|<title>Error</title>'
+    )
     check = (
         f"code=$(curl -sk -o /tmp/bus101_smoke.html -w '%{{http_code}}' '{url}'); "
         "if [ \"$code\" != \"200\" ]; then echo \"BAD HTTP $code\"; exit 1; fi; "
-        "if grep -qiE 'dml_missing_record|exception|error/|debug info' /tmp/bus101_smoke.html; then "
+        f"if grep -qE '{pattern}' /tmp/bus101_smoke.html; then "
         "echo 'BAD error markers in response'; exit 1; fi; "
         "echo OK"
     )
