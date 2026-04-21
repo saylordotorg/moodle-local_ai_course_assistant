@@ -48,4 +48,13 @@ $definitions = [
         'simplekeys' => true,
         'ttl'        => 3600, // 1 hour.
     ],
+    // Spend-guard per-period spend totals. Short TTL: the cached value is only
+    // consulted on the hot path (every LLM call). 60s is a reasonable
+    // accuracy-vs-performance trade, and our thresholds are coarse (80/95/100%).
+    'spend' => [
+        'mode'       => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'ttl'        => 60,
+    ],
 ];

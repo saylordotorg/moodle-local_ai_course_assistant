@@ -85,6 +85,31 @@ class voice_registry {
      * @return array|null ['provider', 'apikey', 'voice', 'endpoint']
      */
     public static function resolve(string $capability): ?array {
+        // Spend guard: if voice is over cap, swap in the failover chain voice
+        // provider (if any) before resolving. Failover returns null when none
+        // is configured — in that case we still try the normal resolution so
+        // the caller sees a nullable config and can surface "voice paused".
+        try {
+            $guardlevel = spend_guard::check(0, 'voice');
+            if ($guardlevel === spend_guard::CAP_BLOCKED) {
+                $failover = spend_guard::resolve_failover('voice');
+                if ($failover !== null) {
+                    return [
+                        'provider' => $failover['provider'],
+                        'apikey'   => $failover['apikey'],
+                        'voice'    => self::default_voice_for($failover['provider']),
+                        'endpoint' => self::endpoint_for($failover['provider'], $capability),
+                        'label'    => $failover['label'] . ' (failover)',
+                    ];
+                }
+                // No failover — block voice for this period.
+                debugging('SOLA voice spend cap reached; no failover configured. Voice paused.', DEBUG_DEVELOPER);
+                return null;
+            }
+        } catch (\Throwable $ignore) {
+            // Guard errors never block the primary path.
+        }
+
         $rows = self::parse_rows();
         $activelabel = get_config('local_ai_course_assistant', 'voice_active_' . $capability);
 

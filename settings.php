@@ -81,9 +81,9 @@ if ($hassiteconfig) {
         . '<a href="' . $demoadminurl->out() . '">'
             . get_string('toc:testing', 'local_ai_course_assistant') . '</a>';
 
-    // "Back to last course" shortcut: when the admin previously visited a course
-    // page with the widget active, this pref was saved via hook_callbacks. Show
-    // a button here so admins can pivot back to that course without hunting.
+    // "Back to last course" + "Course AI Settings" shortcuts. Pref set on course visits
+    // by hook_callbacks. Two buttons so admins can pivot to the course OR to its
+    // per-course AI settings page without hunting. v3.9.9+.
     global $DB, $USER;
     $lastcourseid = (int) get_user_preferences('local_ai_course_assistant_last_courseid', 0);
     if ($lastcourseid > 0 && $lastcourseid !== (int) SITEID) {
@@ -91,11 +91,17 @@ if ($hassiteconfig) {
         if ($lastcourse) {
             $lastlabel = $lastcourse->shortname !== '' ? $lastcourse->shortname : $lastcourse->fullname;
             $lasturl = new moodle_url('/course/view.php', ['id' => $lastcourseid]);
+            $coursesettingsurl = new moodle_url('/local/ai_course_assistant/course_settings.php',
+                ['id' => $lastcourseid]);
             $backlabel = str_replace('{$a}', s($lastlabel),
                 get_string('toc:back_to_course', 'local_ai_course_assistant'));
-            $quicklinks = '<a href="' . $lasturl->out() . '" title="'
+            $courseaiurl = '<a href="' . $coursesettingsurl->out() . '" title="'
+                . s($lastcourse->fullname) . '" style="background:#495057;border-color:#495057;">'
+                . '&#9881; ' . s($lastlabel) . ' AI settings</a>';
+            $backbtn = '<a href="' . $lasturl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#6c757d;border-color:#6c757d;">'
-                . $backlabel . '</a>' . $quicklinks;
+                . $backlabel . '</a>';
+            $quicklinks = $backbtn . $courseaiurl . $quicklinks;
         }
     }
 
@@ -514,6 +520,86 @@ if ($hassiteconfig) {
         'Maximum total characters of course content included in the system prompt. Lower values reduce prompt size and speed up responses.',
         '15000',
         PARAM_INT
+    ));
+
+    // Spend guard + optimizer (v3.9.9+).
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/spend_guard_heading',
+        'Spend guard and optimizer',
+        'Set LLM spend caps per period. SOLA pauses requests when a cap is hit or falls back to a cheaper provider from your failover chain. '
+        . 'See the <a href="' . (new moodle_url('/local/ai_course_assistant/token_analytics.php'))->out() . '">Token Cost page</a> '
+        . 'for the current spend status and optimizer recommendations.'
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/spend_cap_period',
+        'Spend cap period',
+        'How often the spend cap resets. Calendar-aligned: monthly starts on the 1st of the month, weekly on Monday, daily at midnight.',
+        'monthly',
+        ['daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly']
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_cap_site',
+        'Site-wide spend cap (USD)',
+        'Total USD cap across all courses and capabilities for the current period. <code>0</code> = unlimited. Per-capability caps below override this when set.',
+        '0',
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_cap_chat',
+        'Chat cap (USD)',
+        'Cap just for student chat + quiz workload. <code>0</code> = use site-wide cap.',
+        '0', PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_cap_voice',
+        'Voice cap (USD)',
+        'Cap for Voice (Realtime + TTS + STT). Voice is usually the biggest line item — cap it first.',
+        '0', PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_cap_rag',
+        'RAG cap (USD)',
+        'Cap for embedding calls made during course indexing.',
+        '0', PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_cap_analytics',
+        'Analytics cap (USD)',
+        'Cap for Learning Radar admin queries.',
+        '0', PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/spend_failover_chain',
+        'Failover chain',
+        'When a cap is hit, SOLA tries these providers in order. One entry per line, format <code>capability:label</code>. '
+        . 'Labels refer to entries in Comparison providers (for <code>chat</code> / <code>analytics</code>) or Voice providers (for <code>voice</code>). '
+        . 'Lines starting with <code>#</code> are comments. Example:<br>'
+        . '<code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_notify_emails',
+        'Spend alert recipients',
+        'Comma-separated email addresses to notify at 80%, 95%, and 100% of the cap. Leave blank to notify all site admins.',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/opt_cost_weight',
+        'Optimizer: cost weight',
+        'How much the optimizer prioritizes cost when ranking providers. 0.0 ignores cost, 1.0 optimizes purely for cost. Must sum with quality weight.',
+        '0.7', PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/opt_quality_weight',
+        'Optimizer: quality weight',
+        'How much the optimizer prioritizes student satisfaction (thumbs-up rate) when ranking providers. 0.0 ignores quality.',
+        '0.3', PARAM_FLOAT
     ));
 
     // ── Section: Safety & Moderation ────────────────────────────────────────

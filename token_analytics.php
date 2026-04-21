@@ -227,6 +227,64 @@ $makeurl = function(int $r, int $c) {
         ['range' => $r, 'courseid' => $c]))->out(false);
 };
 
+// ── Spend guard status + Optimizer recommendations (v3.9.9+) ─────────────────
+
+$spendstatus = [];
+foreach (\local_ai_course_assistant\spend_guard::status_rows() as $row) {
+    $cap = (float) $row['cap'];
+    $spent = (float) $row['spent'];
+    $pctnum = $cap > 0 ? min(100, (int) round($spent / $cap * 100)) : 0;
+    $color = '#6c757d';
+    if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_BLOCKED) { $color = '#dc3545'; }
+    else if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_WARN_95) { $color = '#fd7e14'; }
+    else if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_WARN_80) { $color = '#ffc107'; }
+    else if ($cap > 0) { $color = '#198754'; }
+    $spendstatus[] = [
+        'label'        => $row['label'],
+        'spent_fmt'    => \local_ai_course_assistant\token_cost_manager::format_cost($spent),
+        'cap_fmt'      => $cap > 0 ? \local_ai_course_assistant\token_cost_manager::format_cost($cap) : 'unlimited',
+        'pct'          => $pctnum,
+        'color'        => $color,
+        'cap_is_set'   => $cap > 0,
+        'level_label'  => ucfirst(str_replace(['warn80', 'warn95'], ['80%+', '95%+'], $row['level'])),
+    ];
+}
+
+$optimizerdata = \local_ai_course_assistant\llm_optimizer::recommend();
+$optrows = [];
+foreach ($optimizerdata['capabilities'] as $cap) {
+    $toprecs = array_slice($cap['rankings'], 0, 3);
+    $ranklines = [];
+    foreach ($toprecs as $i => $r) {
+        $satstr = $r['satisfaction'] !== null
+            ? sprintf('%d%%', (int) round($r['satisfaction'] * 100))
+            : 'n/a';
+        $ranklines[] = sprintf('%d. %s (%s) — %s/req, satisfaction %s, %d samples (%s confidence)',
+            $i + 1,
+            htmlspecialchars($r['provider']),
+            htmlspecialchars($r['model']),
+            \local_ai_course_assistant\token_cost_manager::format_cost($r['cost_per_request']),
+            $satstr,
+            $r['sample'],
+            $r['confidence']
+        );
+    }
+    $optrows[] = [
+        'capability' => ucfirst($cap['capability']),
+        'active'     => htmlspecialchars($cap['active']),
+        'rankings_html' => $ranklines ? implode('<br>', $ranklines) : '<em>Not enough data yet — need at least 30 messages of this capability in the last 30 days.</em>',
+        'has_data'   => !empty($ranklines),
+    ];
+}
+
+$projection = [
+    'amount'     => $optimizerdata['projected_monthly'] > 0
+        ? \local_ai_course_assistant\token_cost_manager::format_cost($optimizerdata['projected_monthly'])
+        : 'Not enough data yet',
+    'confidence' => $optimizerdata['projection_confidence'],
+    'days'       => $optimizerdata['projection_days'],
+];
+
 // ── Template data ─────────────────────────────────────────────────────────────
 
 $grandtotal = $grandprompt + $grandcompl;
@@ -238,6 +296,14 @@ $templatedata = [
     'grand_cost'         => $grandcost > 0
                                 ? token_cost_manager::format_cost($grandcost)
                                 : ($grandtotal > 0 ? 'Unknown model' : '—'),
+    'spend_status'       => $spendstatus,
+    'has_spend_status'   => !empty($spendstatus),
+    'spend_period_label' => \local_ai_course_assistant\spend_guard::period_label(),
+    'spend_period_start' => userdate(\local_ai_course_assistant\spend_guard::period_start(), '%e %B %Y'),
+    'opt_rows'           => $optrows,
+    'opt_projection_amount'     => $projection['amount'],
+    'opt_projection_confidence' => $projection['confidence'],
+    'opt_projection_days'       => $projection['days'],
     'by_category'        => $bycategoryrows,
     'has_by_category'    => !empty($bycategoryrows),
     'by_model'           => $bymodelrows,

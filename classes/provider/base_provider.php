@@ -240,7 +240,47 @@ abstract class base_provider implements provider_interface {
             ? $overrides['provider']
             : (get_config('local_ai_course_assistant', 'provider') ?: '');
 
+        // Spend guard: consult the cap before instantiation. If the site is
+        // over the cap for chat/analytics workload, try the failover chain.
+        // If no failover is configured, throw — the SSE handler catches this
+        // and shows a friendly "budget paused" message to the student.
+        // Read defensively; a fresh install has no caps and this is a no-op.
+        try {
+            $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
+            if ($level === spend_guard::CAP_BLOCKED) {
+                $failover = spend_guard::resolve_failover('chat');
+                if ($failover !== null) {
+                    $overrides['provider'] = $failover['provider'];
+                    $overrides['apikey']   = $failover['apikey'];
+                    $provider = $failover['provider'];
+                } else {
+                    throw new \moodle_exception('error', 'local_ai_course_assistant', '',
+                        'SOLA spend cap reached for this period; no failover provider configured.');
+                }
+            }
+        } catch (\moodle_exception $budgeterr) {
+            throw $budgeterr;
+        } catch (\Throwable $ignore) {
+            // Never let the guard break core flow on a fresh install.
+        }
+
         return self::instantiate($provider, $overrides);
+    }
+
+    /**
+     * For the primary factory (used by both student chat and Learning Radar
+     * via `create_from_config`), we can't always tell chat vs analytics from
+     * the call site. Default to 'chat' — Learning Radar also respects the
+     * chat cap since analytics workload is tiny in comparison. If an admin
+     * specifically caps analytics, meta_ai_sse can pass a capability hint
+     * directly via `spend_guard::check` before calling this factory.
+     *
+     * @param int $courseid
+     * @return string
+     */
+    private static function infer_capability_for_primary(int $courseid): string {
+        // No cheap way to distinguish from here; use 'chat' as the common case.
+        return 'chat';
     }
 
     /**

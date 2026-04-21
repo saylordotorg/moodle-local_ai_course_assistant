@@ -112,6 +112,72 @@
         </div>
     </div>
 
+    {{! ── Spend guard status (v3.9.9+) ─────────────────────────────────── }}
+    {{#has_spend_status}}
+    <div class="aica-cost-section">
+        <div class="aica-cost-section__header">
+            <p class="aica-cost-section__title">Spend status</p>
+            <p class="aica-cost-section__sub">{{spend_period_label}} period, since {{spend_period_start}}. Configure caps in Settings &rarr; Spend guard and optimizer.</p>
+        </div>
+        <table class="aica-cost-table">
+            <thead><tr>
+                <th>Scope</th>
+                <th style="text-align:right">Spent</th>
+                <th style="text-align:right">Cap</th>
+                <th>Status</th>
+            </tr></thead>
+            <tbody>
+                {{#spend_status}}
+                <tr>
+                    <td><strong>{{label}}</strong></td>
+                    <td class="num">{{spent_fmt}}</td>
+                    <td class="num">{{cap_fmt}}</td>
+                    <td>
+                        {{#cap_is_set}}
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <div style="flex:1;background:#e9ecef;border-radius:6px;height:8px;overflow:hidden;max-width:240px">
+                                <div style="width:{{pct}}%;background:{{color}};height:100%"></div>
+                            </div>
+                            <span style="font-size:12px;color:{{color}};font-weight:600;white-space:nowrap">{{pct}}%</span>
+                        </div>
+                        {{/cap_is_set}}
+                        {{^cap_is_set}}
+                        <span class="text-muted" style="font-size:12px">no cap</span>
+                        {{/cap_is_set}}
+                    </td>
+                </tr>
+                {{/spend_status}}
+            </tbody>
+        </table>
+    </div>
+    {{/has_spend_status}}
+
+    {{! ── Optimizer recommendations (v3.9.9+) ──────────────────────────── }}
+    <div class="aica-cost-section">
+        <div class="aica-cost-section__header">
+            <p class="aica-cost-section__title">LLM Optimizer</p>
+            <p class="aica-cost-section__sub">Projected monthly spend at current mix: <strong>{{opt_projection_amount}}</strong>
+                ({{opt_projection_days}} days of data, {{opt_projection_confidence}} confidence).
+                Recommendations rank each capability's providers by composite cost + quality score.</p>
+        </div>
+        <table class="aica-cost-table">
+            <thead><tr>
+                <th>Capability</th>
+                <th>Active</th>
+                <th>Top recommendations</th>
+            </tr></thead>
+            <tbody>
+                {{#opt_rows}}
+                <tr>
+                    <td><strong>{{capability}}</strong></td>
+                    <td><code>{{active}}</code></td>
+                    <td style="font-size:13px;line-height:1.6">{{{rankings_html}}}</td>
+                </tr>
+                {{/opt_rows}}
+            </tbody>
+        </table>
+    </div>
+
     {{! ── By category (Chat / Voice / RAG / Analytics) ───────────────────── }}
     {{#has_by_category}}
     <div class="aica-cost-section">
