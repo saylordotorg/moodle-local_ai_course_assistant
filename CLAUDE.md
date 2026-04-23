@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a floating chat widget.
+SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
 - **Current version:** `2026041601`, release `3.5.1`
