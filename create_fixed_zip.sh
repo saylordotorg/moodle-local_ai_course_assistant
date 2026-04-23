@@ -10,6 +10,9 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*.git*" \
   -x "*/.DS_Store" \
   -x "*/Thumbs.db" \
+  -x "*/._*" \
+  -x "*/__MACOSX/*" \
+  -x "__MACOSX/*" \
   -x "*/create_fixed_zip.sh" \
   -x "*/TROUBLESHOOTING.md" \
   -x "*/ENHANCEMENT_ESTIMATE.md" \

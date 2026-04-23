@@ -128,7 +128,12 @@ def deploy_to_target(name, hostname, moodle_dir, plugin_subdir, instance_id=None
         f"aws s3 cp s3://{S3_BUCKET}/{S3_KEY} ./ai_course_assistant_deploy.tar.gz",
         f"rm -rf /tmp/sola_extract_{name} && mkdir -p /tmp/sola_extract_{name}",
         f"tar -xzf /tmp/ai_course_assistant_deploy.tar.gz -C /tmp/sola_extract_{name} 2>&1 | grep -v 'LIBARCHIVE' || true",
-        f"sudo rsync -a --delete /tmp/sola_extract_{name}/ai_course_assistant/ {plugin_dir}/",
+        f"sudo rsync -a --delete --exclude='._*' --exclude='__MACOSX' /tmp/sola_extract_{name}/ai_course_assistant/ {plugin_dir}/",
+        # Belt-and-suspenders: strip any AppleDouble/__MACOSX that pre-existed on
+        # the target from a prior install (e.g. a ZIP uploaded via Moodle admin
+        # UI). A single ._chat.min.js in amd/build/ breaks Moodle's AMD bundle
+        # with a SyntaxError and takes out the nav drawer + admin menu.
+        f"sudo find {plugin_dir} \\( -name '._*' -o -name '__MACOSX' \\) -exec rm -rf {{}} + 2>/dev/null || true",
         f"sudo chown -R www-data:www-data {plugin_dir}",
         f"sudo find {plugin_dir} -type f -exec chmod 644 {{}} \\;",
         f"sudo find {plugin_dir} -type d -exec chmod 755 {{}} \\;",
