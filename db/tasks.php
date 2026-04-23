@@ -70,4 +70,22 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        'classname' => \local_ai_course_assistant\task\audit_cleanup::class,
+        'blocking' => 0,
+        'minute' => '30',
+        'hour' => '4',       // Daily at 4:30 AM server time.
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
+        'classname' => \local_ai_course_assistant\task\conversation_retention::class,
+        'blocking' => 0,
+        'minute' => '45',
+        'hour' => '4',       // Daily at 4:45 AM server time.
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

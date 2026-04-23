@@ -90,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_login();
 require_sesskey();
 
+\local_ai_course_assistant\security::send_security_headers();
+
 $courseid   = required_param('courseid', PARAM_INT);
 $message    = required_param('message', PARAM_RAW);
 $lang       = optional_param('lang', '', PARAM_ALPHA);      // ISO 639-1 language preference.

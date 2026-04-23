@@ -548,6 +548,14 @@ $string['chat:consent_body'] = 'SOLA is an AI powered learning assistant. Your m
 $string['chat:consent_accept'] = 'I understand, start SOLA';
 $string['chat:consent_privacy_link'] = 'Read the full privacy notice';
 
+// Scheduled tasks (v3.9.12).
+$string['task:audit_cleanup'] = 'SOLA audit table cleanup';
+$string['task:conversation_retention'] = 'SOLA conversation retention sweeper';
+$string['settings:audit_retention_days'] = 'Audit log retention (days)';
+$string['settings:audit_retention_days_desc'] = 'Daily scheduled task purges audit rows older than this. 0 disables. Default 365.';
+$string['settings:conversation_retention_days'] = 'Conversation retention (days)';
+$string['settings:conversation_retention_days_desc'] = 'Daily scheduled task purges conversation rows whose last modified timestamp is older than this. 0 disables. Default 730.';
+
 // Quiz.
 $string['chat:quiz']                    = 'Take a practice quiz';
 $string['chat:quiz_setup_title']        = 'Practice Quiz';

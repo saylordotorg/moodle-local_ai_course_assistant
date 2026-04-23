@@ -29,6 +29,7 @@ require_once('../../config.php');
 require_login();
 require_sesskey();
 
+\local_ai_course_assistant\security::send_security_headers();
 header('Content-Type: application/json');
 
 $text = required_param('text', PARAM_TEXT);

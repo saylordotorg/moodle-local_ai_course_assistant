@@ -1351,6 +1351,22 @@ if ($hassiteconfig) {
         'moodle/site:config'
     ));
 
+    // v3.9.12: data retention controls.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/audit_retention_days',
+        get_string('settings:audit_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:audit_retention_days_desc', 'local_ai_course_assistant'),
+        '365',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/conversation_retention_days',
+        get_string('settings:conversation_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:conversation_retention_days_desc', 'local_ai_course_assistant'),
+        '730',
+        PARAM_INT
+    ));
+
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls
     // admin_externalpage_setup('local_ai_course_assistant_whatsapptest').
     // Register it defensively only when the file is present so upstream
