@@ -29,4 +29,11 @@ $callbacks = [
         'hook' => \core\hook\output\before_footer_html_generation::class,
         'callback' => \local_ai_course_assistant\hook_callbacks::class . '::inject_chat_widget',
     ],
+    [
+        // GDPR cascade: when a Moodle user is hard-deleted, remove their SOLA
+        // conversations, plans, reminders, ratings, profiles, and audit rows
+        // so we do not leave orphan rows behind.
+        'hook' => \core\hook\user\deleted::class,
+        'callback' => \local_ai_course_assistant\hook_callbacks::class . '::on_user_deleted',
+    ],
 ];

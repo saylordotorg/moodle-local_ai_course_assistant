@@ -1344,6 +1344,13 @@ if ($hassiteconfig) {
         'moodle/site:config'
     ));
 
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_userdata',
+        get_string('admin:user_data:title', 'local_ai_course_assistant'),
+        new moodle_url('/local/ai_course_assistant/admin_user_data.php'),
+        'moodle/site:config'
+    ));
+
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls
     // admin_externalpage_setup('local_ai_course_assistant_whatsapptest').
     // Register it defensively only when the file is present so upstream

@@ -35,6 +35,55 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('usersettings:title', 'local_ai_course_assistant'));
 $PAGE->set_heading(get_string('usersettings:title', 'local_ai_course_assistant'));
 
+// Handle "Download my SOLA data" action — GDPR Article 15 right of access,
+// FERPA student right to inspect. Produces a JSON bundle of every SOLA record
+// tied to the authenticated user across all courses.
+if ($action === 'download' && confirm_sesskey()) {
+    global $DB;
+    $uid = (int)$USER->id;
+    $bundle = [
+        'generated_at' => date('c'),
+        'userid' => $uid,
+        'plugin' => 'local_ai_course_assistant',
+        'release' => get_config('local_ai_course_assistant', 'release') ?: '3.9.11',
+    ];
+    $tables = [
+        'conversations'   => 'local_ai_course_assistant_convs',
+        'messages'        => 'local_ai_course_assistant_msgs',
+        'ratings'         => 'local_ai_course_assistant_msg_ratings',
+        'study_plans'     => 'local_ai_course_assistant_plans',
+        'reminders'       => 'local_ai_course_assistant_reminders',
+        'feedback'        => 'local_ai_course_assistant_feedback',
+        'survey_responses'=> 'local_ai_course_assistant_survey_resp',
+        'ut_responses'    => 'local_ai_course_assistant_ut_resp',
+        'audit'           => 'local_ai_course_assistant_audit',
+        'practice_scores' => 'local_ai_course_assistant_practice_scores',
+        'profiles'        => 'local_ai_course_assistant_profiles',
+    ];
+    foreach ($tables as $label => $table) {
+        try {
+            if ($label === 'messages') {
+                // messages live under conversations (joined via conversationid).
+                $sql = "SELECT m.* FROM {local_ai_course_assistant_msgs} m
+                        JOIN {local_ai_course_assistant_convs} c ON c.id = m.conversationid
+                        WHERE c.userid = :uid ORDER BY m.timecreated ASC";
+                $bundle[$label] = array_values($DB->get_records_sql($sql, ['uid' => $uid]));
+            } else {
+                $bundle[$label] = array_values($DB->get_records($table, ['userid' => $uid]));
+            }
+        } catch (\Throwable $e) {
+            $bundle[$label] = ['error' => 'table unavailable'];
+        }
+    }
+    \local_ai_course_assistant\audit_logger::log('data_download_self', $uid, 0, ['bundle_keys' => array_keys($bundle)]);
+    $filename = 'sola-data-' . $uid . '-' . date('Ymd') . '.json';
+    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: no-store');
+    echo json_encode($bundle, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
 // Handle delete actions.
 if ($action === 'delete_course' && $courseid && confirm_sesskey()) {
     if ($confirm) {
@@ -99,6 +148,8 @@ $templatedata = [
     'totalconversations' => $stats['total_conversations'],
     'coursedata' => $coursedata,
     'deleteallurl' => new moodle_url($PAGE->url, ['action' => 'delete_all', 'sesskey' => sesskey()]),
+    'downloadurl' => new moodle_url($PAGE->url, ['action' => 'download', 'sesskey' => sesskey()]),
+    'privacyurl' => new moodle_url('/local/ai_course_assistant/privacy.php'),
 ];
 
 echo $OUTPUT->header();

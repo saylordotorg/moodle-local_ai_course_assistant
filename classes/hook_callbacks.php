@@ -45,6 +45,52 @@ class hook_callbacks {
     }
 
     /**
+     * Cascade SOLA data deletion when a Moodle user is hard-deleted.
+     *
+     * Invokes the plugin's conversation manager and the Privacy API manager so
+     * every table SOLA owns is cleaned up in one operation. Wrapped in a
+     * try/catch so a delete-cascade error cannot block the user-deleted hook
+     * chain; any failure is logged for the site admin to investigate.
+     *
+     * @param \core\hook\user\deleted $hook
+     */
+    public static function on_user_deleted(\core\hook\user\deleted $hook): void {
+        try {
+            $user = $hook->user;
+            if (empty($user) || empty($user->id)) {
+                return;
+            }
+            // Primary path: the conversation manager owns message and conversation rows.
+            \local_ai_course_assistant\conversation_manager::delete_user_data((int)$user->id);
+            // Secondary path: route through the Privacy API so every other
+            // plugin table (plans, reminders, feedback, surveys, UT, profiles,
+            // practice scores, ratings, audit) is cleaned up by the same code
+            // that services a formal data subject request.
+            $contextlist = \core_privacy\manager::get_contexts_for_userid(
+                (int)$user->id,
+                'local_ai_course_assistant'
+            );
+            if ($contextlist && $contextlist->count() > 0) {
+                $approved = new \core_privacy\local\request\approved_contextlist(
+                    \core\user::get_user((int)$user->id) ?: (object)['id' => (int)$user->id],
+                    'local_ai_course_assistant',
+                    $contextlist->get_contextids()
+                );
+                \local_ai_course_assistant\privacy\provider::delete_data_for_user($approved);
+            }
+            \local_ai_course_assistant\audit_logger::log(
+                'user_deleted_cascade',
+                (int)$user->id,
+                0,
+                ['trigger' => 'core_user_deleted_hook']
+            );
+        } catch (\Throwable $e) {
+            debugging('SOLA user_deleted cascade failed: ' . $e->getMessage(),
+                DEBUG_DEVELOPER, $e->getTrace());
+        }
+    }
+
+    /**
      * Internal implementation of the widget injection. Wrapped by inject_chat_widget()
      * so any throwable is caught and logged rather than breaking page rendering.
      *
@@ -540,6 +586,9 @@ class hook_callbacks {
             'hasstarterdata'     => $hasstarterdata,
             'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),
+            'consentgiven'       => (bool) get_user_preferences('aica_sola_consent_given', 0),
+            'consenturl'         => (new \moodle_url('/local/ai_course_assistant/consent.php'))->out(false),
+            'privacynoticeurl'   => (new \moodle_url('/local/ai_course_assistant/privacy.php'))->out(false),
             'englishlock'        => (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid),
         ];
 

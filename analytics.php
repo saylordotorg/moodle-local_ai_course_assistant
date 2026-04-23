@@ -55,6 +55,14 @@ if ($action === 'togglenames' && confirm_sesskey()) {
         unset($_SESSION['sola_show_real_names']);
     } else {
         $_SESSION['sola_show_real_names'] = true;
+        // FERPA/GDPR: log the moment an admin reveals learner identities
+        // so we have an audit trail of who viewed learner data and when.
+        \local_ai_course_assistant\audit_logger::log(
+            'admin_reveal_learner_identities',
+            (int)$USER->id,
+            (int)$courseid,
+            ['range_days' => (int)$range]
+        );
     }
     redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
         ['courseid' => $courseid, 'range' => $range]));

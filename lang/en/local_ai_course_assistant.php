@@ -524,6 +524,29 @@ $string['usersettings:delete_all_button'] = 'Delete All My Data';
 $string['usersettings:confirm_delete_course'] = 'Are you sure you want to permanently delete all your AI tutor data for the course "{$a}"? This action cannot be undone.';
 $string['usersettings:confirm_delete_all'] = 'Are you sure you want to permanently delete ALL your AI tutor data across all courses? This action cannot be undone.';
 $string['usersettings:data_deleted'] = 'Your data has been deleted.';
+$string['usersettings:download'] = 'Download my SOLA data';
+$string['usersettings:download_help'] = 'Download a complete JSON copy of every SOLA record tied to your account: conversations, messages, ratings, study plans, reminders, practice scores, survey responses, profile, and audit entries.';
+$string['usersettings:privacy_notice_link'] = 'Read the SOLA privacy notice';
+
+// Privacy notice page.
+$string['privacy:title'] = 'SOLA Privacy Notice';
+
+// Admin: Find user → export + purge.
+$string['admin:user_data:title'] = 'SOLA — Learner data export and purge';
+$string['admin:user_data:intro'] = 'Operational path for a GDPR Article 15 (access) or Article 17 (erasure) request. Look up a learner by Moodle user id, review the rows SOLA holds for them, and export or purge.';
+$string['admin:user_data:search_label'] = 'Moodle user id';
+$string['admin:user_data:lookup'] = 'Look up';
+$string['admin:user_data:not_found'] = 'No user found with that id.';
+$string['admin:user_data:download'] = 'Download all SOLA data as JSON';
+$string['admin:user_data:purge'] = 'Purge all SOLA data for this user';
+$string['admin:user_data:confirm_purge'] = 'Permanently delete every SOLA record for {$a}? This cascades through conversations, messages, ratings, study plans, reminders, profiles, practice scores, surveys, audit entries, and feedback. The action cannot be undone.';
+$string['admin:user_data:purged'] = 'All SOLA data for the selected user has been purged.';
+
+// First-run consent banner.
+$string['chat:consent_heading'] = 'Before you chat with SOLA';
+$string['chat:consent_body'] = 'SOLA is an AI powered learning assistant. Your messages and SOLA\'s replies are stored in Saylor\'s Moodle database and the most recent ten turns are sent to an approved AI model provider to answer your questions. Your first name is shared for personalization; no other identifying information is sent to the AI provider. You can download, delete, or stop using SOLA at any time.';
+$string['chat:consent_accept'] = 'I understand, start SOLA';
+$string['chat:consent_privacy_link'] = 'Read the full privacy notice';
 
 // Quiz.
 $string['chat:quiz']                    = 'Take a practice quiz';
