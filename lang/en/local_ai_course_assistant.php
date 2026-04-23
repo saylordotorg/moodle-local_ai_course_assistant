@@ -573,6 +573,10 @@ $string['settings:dpo_email_desc'] = 'Contact email shown on the learner facing 
 $string['settings:privacy_external_url'] = 'Institution privacy page URL';
 $string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to hide the line.';
 
+// Privacy notice admin override (v3.9.16).
+$string['settings:privacy_notice_override'] = 'Privacy notice override (HTML)';
+$string['settings:privacy_notice_override_desc'] = 'If set, this HTML replaces the default branded privacy notice rendered at /local/ai_course_assistant/privacy.php. Use this to drop in the Legal-reviewed text for your institution without editing code. Leave empty to use the default notice, which derives its text from the seven branding config keys.';
+
 // Quiz.
 $string['chat:quiz']                    = 'Take a practice quiz';
 $string['chat:quiz_setup_title']        = 'Practice Quiz';

@@ -1376,6 +1376,17 @@ if ($hassiteconfig) {
         PARAM_URL
     ));
 
+    // v3.9.16: admin-editable privacy notice override. If populated, this HTML
+    // replaces the default branded notice rendered by privacy.php. Lets
+    // Saylor (or any rebranded install) finalize the legal-reviewed notice
+    // text in the admin UI without touching code.
+    $settings->add(new admin_setting_confightmleditor(
+        'local_ai_course_assistant/privacy_notice_override',
+        get_string('settings:privacy_notice_override', 'local_ai_course_assistant'),
+        get_string('settings:privacy_notice_override_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // v3.9.12: data retention controls.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/audit_retention_days',

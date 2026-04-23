@@ -169,8 +169,8 @@ rsync -a --exclude=.git \
 ## i18n
 
 - **46 language files:** en + ar, am, bg, bm, bn, cs, da, de, el, es, fi, fr, ha, he, hi, hu, id, ig, it, ja, ko, ms, nb, ne, nl, om, pa, pl, pt_br, ro, ru, sk, so, sv, sw, ta, th, tl, tr, uk, vi, wo, yo, zh_cn, zu
-- Lang codes for STT/TTS: `amd/src/speech.js` → `SUPPORTED_LANGS` (43 total)
-- Starter button translations: `STARTER_LABELS` in `amd/src/speech.js` (43 languages × 5 starters)
+- Lang codes for STT/TTS: `amd/src/speech.js` → `SUPPORTED_LANGS` (46 total, including `en`)
+- Starter button translations: `STARTER_LABELS` in `amd/src/speech.js` (46 languages × 5 starters)
 - ISO 639-1 → language name mapping: `classes/context_builder.php::get_multilingual_instructions()`
 - **JS string substitution:** Moodle's string cache returns raw `{$a}` — always do `.replace('{$a}', value)` in JS rather than relying on `Str.get_string()` third-argument substitution
 

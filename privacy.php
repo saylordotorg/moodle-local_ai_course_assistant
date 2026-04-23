@@ -48,6 +48,19 @@ $privacyurl  = s(branding::privacy_external_url());
 $today       = date('j F Y');
 
 echo $OUTPUT->header();
+
+// Admin override: if `privacy_notice_override` is set in admin settings, we
+// render that HTML (passed through format_text with FORMAT_HTML for
+// sanitization and filter support) in place of the default branded notice.
+// Empty override falls through to the default notice below.
+$override = get_config('local_ai_course_assistant', 'privacy_notice_override');
+if (is_string($override) && trim($override) !== '') {
+    echo '<div class="sola-privacy-notice" style="max-width:820px;margin:0 auto;line-height:1.6;padding:0 12px">';
+    echo format_text($override, FORMAT_HTML, ['context' => $PAGE->context, 'noclean' => false]);
+    echo '</div>';
+    echo $OUTPUT->footer();
+    return;
+}
 ?>
 <div class="sola-privacy-notice" style="max-width:820px;margin:0 auto;line-height:1.6;padding:0 12px">
 

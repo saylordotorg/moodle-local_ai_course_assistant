@@ -441,18 +441,6 @@
                 </span>
                 <span>{{#str}}chat:starter_quiz, local_ai_course_assistant{{/str}}</span>
             </button>
-            <button class="local-ai-course-assistant__starter" type="button" data-builtin="1" data-starter="ask-anything">
-                <span class="aica-starter-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-                </span>
-                <span>{{#str}}chat:starter_ask_anything, local_ai_course_assistant{{/str}}</span>
-            </button>
-            <button class="local-ai-course-assistant__starter" type="button" data-builtin="1" data-starter="review-practice">
-                <span class="aica-starter-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-                </span>
-                <span>{{#str}}chat:starter_review_practice, local_ai_course_assistant{{/str}}</span>
-            </button>
             <button class="local-ai-course-assistant__starter" type="button" data-builtin="1" data-starter="study-plan">
                 <span class="aica-starter-icon" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20 3h-1V1h-2v2H7V1H5v2H4C2.9 5 2 5.9 2 7v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H4V10h16v11zm0-13H4V7h16v1z"/></svg>
@@ -465,22 +453,12 @@
                 </span>
                 <span>{{#str}}chat:starter_ai_project_coach, local_ai_course_assistant{{/str}}</span>
             </button>
-            {{#ttsurl}}
-            <button class="local-ai-course-assistant__starter" type="button" data-builtin="1" data-starter="ell-practice">
-                <span class="aica-starter-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h2v-3.07A7 7 0 0 0 19 11h-2z"/></svg>
-                </span>
-                <span>{{#str}}chat:starter_ell_practice, local_ai_course_assistant{{/str}}</span>
-            </button>
-            {{/ttsurl}}
-            {{#ellpronunciationenabled}}
-            <button class="local-ai-course-assistant__starter" type="button" data-builtin="1" data-starter="ell-pronunciation">
-                <span class="aica-starter-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                </span>
-                <span>{{#str}}chat:starter_ell_pronunciation, local_ai_course_assistant{{/str}}</span>
-            </button>
-            {{/ellpronunciationenabled}}
+            {{! v3.9.16: Default starters intentionally limited to four —
+                Help with this page, Take a practice quiz, Build a study plan,
+                and AI project coach. "Ask anything", "Review what I've
+                practiced", "ELL practice", and "ELL pronunciation" were
+                removed from the default set. Admins who want any of them on
+                a specific course can add them back via the Starter Editor. }}
             {{/hasstarterdata}}
         </div>
 

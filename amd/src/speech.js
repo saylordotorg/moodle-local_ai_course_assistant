@@ -34,6 +34,8 @@ define([], function() {
      * Keys are ISO 639-1 codes; locale is the BCP-47 tag for Web Speech API.
      */
     const SUPPORTED_LANGS = {
+        // English (default)
+        'en': {name: 'English',     locale: 'en-US'},
         // Tier A — excellent browser STT/TTS support
         'ar': {name: 'Arabic',      locale: 'ar-SA'},
         'zh': {name: 'Chinese',     locale: 'zh-CN'},
@@ -434,7 +436,7 @@ define([], function() {
     };
 
     // -----------------------------------------------------------------------
-    // Conversation starter label translations (43 languages)
+    // Conversation starter label translations (46 languages)
     // New keys (v1.7): helpPage, askAnything, reviewPractice
     // Legacy keys kept: helpLesson, keyConcepts, helpMe, aiCoach
     // -----------------------------------------------------------------------
