@@ -92,7 +92,7 @@ if ($hassiteconfig) {
             $lastlabel = $lastcourse->shortname !== '' ? $lastcourse->shortname : $lastcourse->fullname;
             $lasturl = new moodle_url('/course/view.php', ['id' => $lastcourseid]);
             $coursesettingsurl = new moodle_url('/local/ai_course_assistant/course_settings.php',
-                ['id' => $lastcourseid]);
+                ['courseid' => $lastcourseid]);
             $backlabel = str_replace('{$a}', s($lastlabel),
                 get_string('toc:back_to_course', 'local_ai_course_assistant'));
             $courseaiurl = '<a href="' . $coursesettingsurl->out() . '" title="'
