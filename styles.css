@@ -4998,3 +4998,96 @@ a.aica-history-panel__source:hover {
     color: #6b7280;
     white-space: nowrap;
 }
+
+/* Progress dashboard panel (v3.9.18 — Mastery dashboard tab). */
+.local-ai-course-assistant__progress-panel {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0;
+    background: #fff;
+}
+.aica-progress-panel { padding: 16px 18px 24px; }
+.aica-progress-panel__header {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+}
+.aica-progress-panel__eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6b7280;
+}
+.aica-progress-panel__title {
+    margin: 4px 0 0; font-size: 16px; font-weight: 600; color: #111827;
+}
+.aica-progress-panel__refresh {
+    background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; color: #374151; cursor: pointer;
+}
+.aica-progress-panel__refresh:hover { background: #e5e7eb; }
+.aica-progress-panel__subtitle {
+    margin: 8px 0 14px; font-size: 13px; color: #4b5563;
+}
+.aica-progress-panel__summary {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px; border: 1px solid #e5e7eb; border-radius: 10px;
+    background: #f9fafb; margin-bottom: 14px;
+}
+.aica-progress-ring__track { stroke: #e5e7eb; stroke-width: 8; }
+.aica-progress-ring__progress {
+    stroke: #0a7d2c; stroke-width: 8; stroke-linecap: round;
+    transition: stroke-dashoffset 600ms cubic-bezier(.4,0,.2,1);
+}
+.aica-progress-ring__count { font-size: 22px; font-weight: 700; fill: #111827; }
+.aica-progress-ring__total { font-size: 11px; fill: #6b7280; }
+.aica-progress-panel__counts {
+    display: flex; flex-direction: column; gap: 6px; flex: 1 1 auto;
+}
+.aica-progress-panel__counts-row {
+    display: grid; grid-template-columns: 12px 1fr auto;
+    align-items: center; gap: 8px; font-size: 13px; color: #1f2937;
+}
+.aica-progress-panel__counts-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #d1d5db;
+}
+.aica-progress-panel__counts-row--mastered .aica-progress-panel__counts-dot { background: #0a7d2c; }
+.aica-progress-panel__counts-row--learning .aica-progress-panel__counts-dot { background: #d97706; }
+.aica-progress-panel__counts-row--not-started .aica-progress-panel__counts-dot { background: #9ca3af; }
+.aica-progress-panel__counts-value {
+    font-variant-numeric: tabular-nums; font-weight: 600; color: #111827;
+}
+.aica-progress-panel__celebrate {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; margin-bottom: 12px; border-radius: 10px;
+    background: linear-gradient(90deg, #fef9c3, #fef3c7);
+    border: 1px solid #fde68a; font-size: 13px; color: #78350f; font-weight: 500;
+}
+.aica-progress-panel__celebrate-icon { font-size: 20px; line-height: 1; }
+.aica-progress-panel__sections { display: flex; flex-direction: column; gap: 14px; }
+.aica-progress-panel__section-heading {
+    margin: 0 0 8px; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280;
+}
+.aica-progress-panel__section--mastered .aica-progress-panel__section-heading { color: #166534; }
+.aica-progress-panel__section--learning .aica-progress-panel__section-heading { color: #92400e; }
+.aica-progress-panel__list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 6px;
+}
+.aica-progress-panel__item {
+    display: grid; grid-template-columns: 12px 1fr auto;
+    align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: #fff; border: 1px solid #e5e7eb; font-size: 13px;
+}
+.aica-progress-panel__dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; }
+.aica-progress-panel__item.aica-mastery-status--mastered .aica-progress-panel__dot { background: #0a7d2c; }
+.aica-progress-panel__item.aica-mastery-status--learning .aica-progress-panel__dot { background: #d97706; }
+.aica-progress-panel__item.aica-mastery-status--not_started .aica-progress-panel__dot { background: #9ca3af; }
+.aica-progress-panel__item-title { color: #111827; }
+.aica-progress-panel__ask {
+    background: transparent; border: 1px solid #d1d5db; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; color: #374151; cursor: pointer;
+}
+.aica-progress-panel__ask:hover { background: #f3f4f6; border-color: #9ca3af; }
+.aica-progress-panel__empty {
+    margin: 6px 0; padding: 18px;
+    border: 1px dashed #d1d5db; border-radius: 8px;
+    text-align: center; color: #6b7280; font-size: 13px;
+}

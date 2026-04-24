@@ -1112,10 +1112,13 @@ define([
      */
     const setBottomMode = function(mode, options) {
         options = options || {};
-        const normalized = ['chat', 'voice', 'history'].indexOf(mode) !== -1 ? mode : 'chat';
+        const normalized = ['chat', 'voice', 'history', 'progress'].indexOf(mode) !== -1 ? mode : 'chat';
         if (normalized === activeBottomMode && !options.force) {
             if (normalized === 'history' && options.refreshHistory) {
                 refreshConversationHistory(false);
+            }
+            if (normalized === 'progress') {
+                hydrateMasteryDashboard();
             }
             // Re-clicking Chat tab shows conversation starters.
             if (normalized === 'chat') {
@@ -1159,6 +1162,8 @@ define([
             if (options.refreshHistory) {
                 refreshConversationHistory(false);
             }
+        } else if (normalized === 'progress') {
+            hydrateMasteryDashboard();
         }
     };
 
@@ -1501,6 +1506,7 @@ define([
         setText($('.local-ai-course-assistant__mode-btn[data-mode="chat"] .local-ai-course-assistant__mode-label'), 'mode_chat');
         setText($('.local-ai-course-assistant__mode-btn[data-mode="voice"] .local-ai-course-assistant__mode-label'), 'mode_voice');
         setText($('.local-ai-course-assistant__mode-btn[data-mode="history"] .local-ai-course-assistant__mode-label'), 'mode_history');
+        setText($('.local-ai-course-assistant__mode-btn[data-mode="progress"] .local-ai-course-assistant__mode-label'), 'mode_progress');
     };
 
     /**
@@ -4686,6 +4692,43 @@ define([
             return;
         }).catch(function() {
             UI.hideMasteryChip();
+        });
+    };
+
+    /**
+     * Hydrate the Progress dashboard tab. Fetches the mastery summary and
+     * the per-objective list, then hands them to UI.renderMasteryDashboard
+     * along with an Ask-about callback that prefills the composer with a
+     * templated study prompt and switches back to Chat mode.
+     *
+     * Safe to call repeatedly; UI side is idempotent.
+     */
+    const hydrateMasteryDashboard = function() {
+        var root = document.getElementById('local-ai-course-assistant');
+        if (!root) { return; }
+        if (!root.querySelector('.local-ai-course-assistant__progress-panel')) { return; }
+        Promise.all([
+            Repo.getMasterySummary(courseId),
+            Str.get_strings([
+                {key: 'mastery:ask_about', component: 'local_ai_course_assistant'},
+                {key: 'mastery:ask_template', component: 'local_ai_course_assistant'},
+            ]),
+        ]).then(function(results) {
+            var summary = results[0];
+            var askLabel = results[1][0];
+            var askTemplate = results[1][1];
+            UI.renderMasteryDashboard(summary, function(obj) {
+                // Switch to chat, prefill composer, focus.
+                UI.setMode('chat');
+                var prompt = (askTemplate || 'Help me practice {$a}.').replace('{$a}', obj.title);
+                UI.setInputValue(prompt);
+                UI.focusInput();
+            }, function() {
+                hydrateMasteryDashboard();
+            }, askLabel);
+            return;
+        }).catch(function() {
+            // Fail quiet: dashboard tab simply renders empty.
         });
     };
 

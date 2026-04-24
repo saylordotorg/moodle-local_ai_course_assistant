@@ -64,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect($pageurl, get_string('objectives:toggled', 'local_ai_course_assistant'),
             null, \core\output\notification::NOTIFY_SUCCESS);
 
+    } else if ($action === 'toggle_dashboard') {
+        $enabled = (bool) optional_param('enabled', 0, PARAM_BOOL);
+        objective_manager::set_dashboard_enabled_for_course($courseid, $enabled);
+        redirect($pageurl, get_string('objectives:toggled', 'local_ai_course_assistant'),
+            null, \core\output\notification::NOTIFY_SUCCESS);
+
     } else if ($action === 'import_detected') {
         $source = required_param('source', PARAM_ALPHA);
         $payload = required_param('payload', PARAM_RAW);
@@ -203,6 +209,25 @@ echo html_writer::tag('label',
     ]) . ' ' . get_string('objectives:toggle_chip', 'local_ai_course_assistant'),
     ['class' => 'mb-0']);
 echo html_writer::tag('small', ' ' . get_string('objectives:toggle_chip_help', 'local_ai_course_assistant'),
+    ['class' => 'text-muted']);
+echo html_writer::end_tag('form');
+
+// Dashboard tab toggle form (v3.9.18). Gated on the master switch.
+echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(), 'class' => 'd-inline-block ml-3']);
+echo html_writer::input_hidden_params(new moodle_url('', ['sesskey' => sesskey(), 'action' => 'toggle_dashboard']));
+echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'enabled',
+    'value' => objective_manager::is_dashboard_enabled_for_course($courseid) ? 0 : 1]);
+$dashboardchecked = (bool) get_config('local_ai_course_assistant',
+    'mastery_dashboard_enabled_course_' . $courseid);
+echo html_writer::tag('label',
+    html_writer::empty_tag('input', [
+        'type' => 'checkbox',
+        'checked' => $dashboardchecked ? 'checked' : null,
+        'disabled' => $masterenabled ? null : 'disabled',
+        'onchange' => 'this.form.submit()',
+    ]) . ' ' . get_string('objectives:toggle_dashboard', 'local_ai_course_assistant'),
+    ['class' => 'mb-0']);
+echo html_writer::tag('small', ' ' . get_string('objectives:toggle_dashboard_help', 'local_ai_course_assistant'),
     ['class' => 'text-muted']);
 echo html_writer::end_tag('form');
 echo html_writer::end_div();

@@ -98,6 +98,29 @@ class objective_manager {
         set_config('mastery_chip_enabled_course_' . $courseid, $enabled ? 1 : 0, 'local_ai_course_assistant');
     }
 
+    /**
+     * Whether the per-course Progress dashboard tab should render. Always
+     * gated on the master switch so the tab cannot appear without mastery
+     * tracking actively running.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    public static function is_dashboard_enabled_for_course(int $courseid): bool {
+        if (!self::is_enabled_for_course($courseid)) {
+            return false;
+        }
+        return (bool) get_config('local_ai_course_assistant', 'mastery_dashboard_enabled_course_' . $courseid);
+    }
+
+    /**
+     * @param int  $courseid
+     * @param bool $enabled
+     */
+    public static function set_dashboard_enabled_for_course(int $courseid, bool $enabled): void {
+        set_config('mastery_dashboard_enabled_course_' . $courseid, $enabled ? 1 : 0, 'local_ai_course_assistant');
+    }
+
     // ------------------------------------------------------------------
     //  CRUD
     // ------------------------------------------------------------------

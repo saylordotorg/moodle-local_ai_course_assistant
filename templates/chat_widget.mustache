@@ -539,6 +539,76 @@
             </div>
         </div>
 
+        {{! Progress (mastery dashboard) panel — shown only when the course
+            owner has enabled both the mastery master switch and the
+            dashboard tab toggle. Populated by ui.js -> renderMasteryDashboard
+            from the get_mastery_summary external function. }}
+        {{#masterydashboardenabled}}
+        <div class="local-ai-course-assistant__progress-panel"
+             data-status-mastered="{{#str}}mastery:status_mastered, local_ai_course_assistant{{/str}}"
+             data-status-learning="{{#str}}mastery:status_learning, local_ai_course_assistant{{/str}}"
+             data-status-not-started="{{#str}}mastery:status_not_started, local_ai_course_assistant{{/str}}"
+             data-empty-label="{{#str}}mastery:popover_empty, local_ai_course_assistant{{/str}}"
+             data-section-mastered="{{#str}}mastery:section_mastered, local_ai_course_assistant{{/str}}"
+             data-section-learning="{{#str}}mastery:section_learning, local_ai_course_assistant{{/str}}"
+             data-section-not-started="{{#str}}mastery:section_not_started, local_ai_course_assistant{{/str}}"
+             data-ask-label="{{#str}}mastery:ask_about, local_ai_course_assistant{{/str}}"
+             data-celebrate-label="{{#str}}mastery:celebrate, local_ai_course_assistant{{/str}}"
+             data-summary-label="{{#str}}mastery:summary_label, local_ai_course_assistant{{/str}}"
+             hidden>
+            <div class="aica-progress-panel">
+                <div class="aica-progress-panel__header">
+                    <div>
+                        <div class="aica-progress-panel__eyebrow">{{#str}}chat:mode_progress, local_ai_course_assistant{{/str}}</div>
+                        <h3 class="aica-progress-panel__title">{{#str}}mastery:dashboard_title, local_ai_course_assistant{{/str}}</h3>
+                    </div>
+                    <button type="button" class="aica-progress-panel__refresh">
+                        {{#str}}mastery:dashboard_refresh, local_ai_course_assistant{{/str}}
+                    </button>
+                </div>
+                <p class="aica-progress-panel__subtitle">{{#str}}mastery:dashboard_subtitle, local_ai_course_assistant{{/str}}</p>
+
+                {{! Donut + counts summary. JS swaps the inline path's stroke-dashoffset to reflect mastered/total. }}
+                <div class="aica-progress-panel__summary" role="status" aria-live="polite">
+                    <svg class="aica-progress-ring" viewBox="0 0 80 80" width="84" height="84" aria-hidden="true">
+                        <circle class="aica-progress-ring__track" cx="40" cy="40" r="34" fill="none"></circle>
+                        <circle class="aica-progress-ring__progress" cx="40" cy="40" r="34" fill="none"
+                                stroke-dasharray="213.62" stroke-dashoffset="213.62"
+                                transform="rotate(-90 40 40)"></circle>
+                        <text class="aica-progress-ring__count" x="40" y="38" text-anchor="middle" dominant-baseline="middle"></text>
+                        <text class="aica-progress-ring__total" x="40" y="52" text-anchor="middle" dominant-baseline="middle"></text>
+                    </svg>
+                    <div class="aica-progress-panel__counts">
+                        <div class="aica-progress-panel__counts-row aica-progress-panel__counts-row--mastered">
+                            <span class="aica-progress-panel__counts-dot" aria-hidden="true"></span>
+                            <span class="aica-progress-panel__counts-label"></span>
+                            <span class="aica-progress-panel__counts-value"></span>
+                        </div>
+                        <div class="aica-progress-panel__counts-row aica-progress-panel__counts-row--learning">
+                            <span class="aica-progress-panel__counts-dot" aria-hidden="true"></span>
+                            <span class="aica-progress-panel__counts-label"></span>
+                            <span class="aica-progress-panel__counts-value"></span>
+                        </div>
+                        <div class="aica-progress-panel__counts-row aica-progress-panel__counts-row--not-started">
+                            <span class="aica-progress-panel__counts-dot" aria-hidden="true"></span>
+                            <span class="aica-progress-panel__counts-label"></span>
+                            <span class="aica-progress-panel__counts-value"></span>
+                        </div>
+                    </div>
+                </div>
+
+                {{! Celebrate banner — only rendered when total > 0 and all mastered. JS toggles hidden. }}
+                <div class="aica-progress-panel__celebrate" hidden role="status">
+                    <span class="aica-progress-panel__celebrate-icon" aria-hidden="true">★</span>
+                    <span class="aica-progress-panel__celebrate-text"></span>
+                </div>
+
+                {{! Three sectioned objective lists. JS populates each. }}
+                <div class="aica-progress-panel__sections" aria-live="polite"></div>
+            </div>
+        </div>
+        {{/masterydashboardenabled}}
+
         {{! Stop button slot — always visible outside the scrollable messages area }}
         <div class="local-ai-course-assistant__stop-slot" hidden></div>
 
@@ -684,6 +754,22 @@
                 <span class="local-ai-course-assistant__mode-label">{{#str}}chat:mode_voice, local_ai_course_assistant{{/str}}</span>
             </button>
             {{/voicetabenabled}}
+            {{#masterydashboardenabled}}
+            <button type="button"
+                    class="local-ai-course-assistant__mode-btn"
+                    data-mode="progress"
+                    aria-pressed="false">
+                <span class="local-ai-course-assistant__mode-icon" aria-hidden="true">
+                    {{! Target/bullseye icon for the Progress tab. }}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"/>
+                        <circle cx="12" cy="12" r="5"/>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                    </svg>
+                </span>
+                <span class="local-ai-course-assistant__mode-label">{{#str}}chat:mode_progress, local_ai_course_assistant{{/str}}</span>
+            </button>
+            {{/masterydashboardenabled}}
             <button type="button"
                     class="local-ai-course-assistant__mode-btn"
                     data-mode="history"

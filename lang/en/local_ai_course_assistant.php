@@ -856,6 +856,21 @@ $string['mastery:status_learning']      = 'in progress';
 $string['mastery:status_not_started']   = 'not started';
 $string['mastery:popover_empty']        = 'No learning objectives configured for this course.';
 
+// Progress dashboard tab (v3.9.18).
+$string['chat:mode_progress']           = 'Progress';
+$string['objectives:toggle_dashboard']  = 'Show the Progress dashboard tab to students';
+$string['objectives:toggle_dashboard_help'] = 'Optional. Adds a Progress tab next to Chat / Voice / History inside the widget. The tab shows learners which objectives they have mastered, which are in progress, and which they have not started.';
+$string['mastery:dashboard_title']      = 'Your learning progress';
+$string['mastery:dashboard_subtitle']   = 'Mastery is measured from your quiz answers and chat practice. Keep going — depth beats coverage.';
+$string['mastery:dashboard_refresh']    = 'Refresh';
+$string['mastery:section_mastered']     = 'Mastered';
+$string['mastery:section_learning']     = 'In progress';
+$string['mastery:section_not_started']  = 'Not yet started';
+$string['mastery:summary_label']        = '{$a->mastered} of {$a->total} objectives mastered';
+$string['mastery:ask_about']            = 'Ask about this';
+$string['mastery:celebrate']            = 'You have mastered every objective for this course. Excellent work.';
+$string['mastery:ask_template']         = 'Help me practice and deepen my understanding of this objective: {$a}.';
+
 // Mastery admin settings (v3.9.17).
 $string['settings:mastery_heading']              = 'Mastery tracking';
 $string['settings:mastery_heading_desc']         = 'Opt-in per-course feature that tags quiz answers and assistant conversation turns against the course\'s learning objectives, then feeds a compact mastery snapshot back into the system prompt to steer questioning. Subtle by default: learners see nothing unless the per-course chip toggle is on.';

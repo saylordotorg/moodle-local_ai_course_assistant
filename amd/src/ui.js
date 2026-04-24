@@ -748,6 +748,149 @@ define([
         }
     };
 
+    /**
+     * Render the Progress dashboard tab from a mastery summary payload. Populates
+     * the donut ring, the three count rows, the per-objective sectioned lists,
+     * and the celebrate banner when every objective is mastered. Each objective
+     * row gets an "Ask about this" button that the caller (chat.js) wires to
+     * prefill the composer with a templated study prompt.
+     *
+     * Idempotent — safe to call repeatedly with a fresh summary on each tab open.
+     *
+     * @param {Object}   summary           Payload from get_mastery_summary external.
+     * @param {Function} onAskAbout        Called with the objective object when the learner clicks Ask about this.
+     * @param {Function} onRefresh         Called when the Refresh button is clicked.
+     * @param {string}   askTemplateLabel  Localised "Ask about this" button label (mastery:ask_about).
+     */
+    const renderMasteryDashboard = function(summary, onAskAbout, onRefresh, askTemplateLabel) {
+        if (!root) { return; }
+        const panel = root.querySelector('.local-ai-course-assistant__progress-panel');
+        if (!panel) { return; }
+        if (!summary || !summary.enabled) {
+            // Mastery off for this course — render nothing visible. The tab
+            // itself will not have rendered in the template either.
+            panel.hidden = true;
+            return;
+        }
+
+        const total = parseInt(summary.total, 10) || 0;
+        const mastered = parseInt(summary.mastered, 10) || 0;
+        const learning = parseInt(summary.learning, 10) || 0;
+        const notStarted = parseInt(summary.not_started, 10) || 0;
+        const objectives = Array.isArray(summary.objectives) ? summary.objectives : [];
+
+        // Donut ring: stroke-dasharray is the full circumference (213.62 for r=34);
+        // dashoffset = circumference * (1 - ratio) so 0 mastered = full ring empty.
+        const circumference = 213.62;
+        const ratio = total > 0 ? Math.min(1, Math.max(0, mastered / total)) : 0;
+        const ring = panel.querySelector('.aica-progress-ring__progress');
+        if (ring) {
+            ring.setAttribute('stroke-dashoffset', String(circumference * (1 - ratio)));
+        }
+        const countText = panel.querySelector('.aica-progress-ring__count');
+        const totalText = panel.querySelector('.aica-progress-ring__total');
+        if (countText) { countText.textContent = String(mastered); }
+        if (totalText) { totalText.textContent = '/ ' + String(total); }
+
+        // Count rows.
+        const countRows = {
+            mastered: panel.querySelector('.aica-progress-panel__counts-row--mastered'),
+            learning: panel.querySelector('.aica-progress-panel__counts-row--learning'),
+            'not-started': panel.querySelector('.aica-progress-panel__counts-row--not-started'),
+        };
+        const countLabels = {
+            mastered: panel.dataset.statusMastered || 'mastered',
+            learning: panel.dataset.statusLearning || 'in progress',
+            'not-started': panel.dataset.statusNotStarted || 'not started',
+        };
+        const countValues = { mastered: mastered, learning: learning, 'not-started': notStarted };
+        Object.keys(countRows).forEach(function(key) {
+            const row = countRows[key];
+            if (!row) { return; }
+            const label = row.querySelector('.aica-progress-panel__counts-label');
+            const value = row.querySelector('.aica-progress-panel__counts-value');
+            if (label) { label.textContent = countLabels[key]; }
+            if (value) { value.textContent = String(countValues[key]); }
+        });
+
+        // Celebrate banner: only when total > 0 and everything is mastered.
+        const celebrate = panel.querySelector('.aica-progress-panel__celebrate');
+        if (celebrate) {
+            if (total > 0 && mastered === total) {
+                celebrate.hidden = false;
+                const text = celebrate.querySelector('.aica-progress-panel__celebrate-text');
+                if (text) { text.textContent = panel.dataset.celebrateLabel || ''; }
+            } else {
+                celebrate.hidden = true;
+            }
+        }
+
+        // Sectioned objective lists.
+        const sectionsHost = panel.querySelector('.aica-progress-panel__sections');
+        if (sectionsHost) {
+            sectionsHost.innerHTML = '';
+            if (objectives.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'aica-progress-panel__empty';
+                empty.textContent = panel.dataset.emptyLabel || '';
+                sectionsHost.appendChild(empty);
+            } else {
+                const sectionMeta = [
+                    {key: 'mastered',    label: panel.dataset.sectionMastered    || 'Mastered'},
+                    {key: 'learning',    label: panel.dataset.sectionLearning    || 'In progress'},
+                    {key: 'not_started', label: panel.dataset.sectionNotStarted  || 'Not yet started'},
+                ];
+                sectionMeta.forEach(function(meta) {
+                    const items = objectives.filter(function(o) { return o.status === meta.key; });
+                    if (items.length === 0) { return; }
+                    const section = document.createElement('section');
+                    section.className = 'aica-progress-panel__section aica-progress-panel__section--' + meta.key;
+                    const heading = document.createElement('h4');
+                    heading.className = 'aica-progress-panel__section-heading';
+                    heading.textContent = meta.label + ' (' + items.length + ')';
+                    section.appendChild(heading);
+                    const ul = document.createElement('ul');
+                    ul.className = 'aica-progress-panel__list';
+                    items.forEach(function(obj) {
+                        const li = document.createElement('li');
+                        li.className = 'aica-progress-panel__item aica-mastery-status--' + obj.status;
+                        const dot = document.createElement('span');
+                        dot.className = 'aica-progress-panel__dot';
+                        dot.setAttribute('aria-hidden', 'true');
+                        li.appendChild(dot);
+                        const titleSpan = document.createElement('span');
+                        titleSpan.className = 'aica-progress-panel__item-title';
+                        titleSpan.textContent = (obj.code ? '[' + obj.code + '] ' : '') + obj.title;
+                        li.appendChild(titleSpan);
+                        // "Ask about this" button — only useful on not-yet-mastered items.
+                        if (obj.status !== 'mastered' && typeof onAskAbout === 'function') {
+                            const ask = document.createElement('button');
+                            ask.type = 'button';
+                            ask.className = 'aica-progress-panel__ask';
+                            ask.textContent = askTemplateLabel || 'Ask about this';
+                            ask.addEventListener('click', function() {
+                                onAskAbout(obj);
+                            });
+                            li.appendChild(ask);
+                        }
+                        ul.appendChild(li);
+                    });
+                    section.appendChild(ul);
+                    sectionsHost.appendChild(section);
+                });
+            }
+        }
+
+        // Refresh button — wire once.
+        const refreshBtn = panel.querySelector('.aica-progress-panel__refresh');
+        if (refreshBtn && !refreshBtn._aicaProgressBound) {
+            refreshBtn.addEventListener('click', function() {
+                if (typeof onRefresh === 'function') { onRefresh(); }
+            });
+            refreshBtn._aicaProgressBound = true;
+        }
+    };
+
     /** @type {HTMLElement|null} Currently playing TTS message element */
     let speakingEl = null;
     /** @type {Function|null} Cleanup for Web Audio mouth sync */
@@ -2463,6 +2606,27 @@ define([
     };
 
     /**
+     * Set the input field text and update height/send-button state. Used by
+     * features like the Progress dashboard "Ask about this" button to
+     * prefill the composer with a templated study prompt.
+     *
+     * @param {string} value
+     */
+    const setInputValue = function(value) {
+        if (!input) { return; }
+        input.value = value || '';
+        autoResizeInput();
+        updateSendButton();
+    };
+
+    /**
+     * Focus the composer textarea. No-ops if the input element is missing.
+     */
+    const focusInput = function() {
+        if (input) { input.focus(); }
+    };
+
+    /**
      * Clear the input field and reset height.
      */
     const clearInput = function() {
@@ -2733,8 +2897,9 @@ define([
         if (!root || !drawer) {
             return;
         }
-        const normalized = ['chat', 'voice', 'history'].indexOf(mode) !== -1 ? mode : 'chat';
-        ['chat', 'voice', 'history'].forEach(function(name) {
+        const allowed = ['chat', 'voice', 'history', 'progress'];
+        const normalized = allowed.indexOf(mode) !== -1 ? mode : 'chat';
+        allowed.forEach(function(name) {
             drawer.classList.toggle('local-ai-course-assistant__drawer--mode-' + name, name === normalized);
         });
         root.querySelectorAll('.local-ai-course-assistant__mode-btn').forEach(function(btn) {
@@ -2744,11 +2909,15 @@ define([
         });
         const voicePanel = root.querySelector('.local-ai-course-assistant__voice-panel');
         const historyPanel = root.querySelector('.local-ai-course-assistant__history-panel');
+        const progressPanel = root.querySelector('.local-ai-course-assistant__progress-panel');
         if (voicePanel) {
             voicePanel.hidden = normalized !== 'voice';
         }
         if (historyPanel) {
             historyPanel.hidden = normalized !== 'history';
+        }
+        if (progressPanel) {
+            progressPanel.hidden = normalized !== 'progress';
         }
     };
 
@@ -5447,6 +5616,7 @@ define([
         hideAttachmentPreview: hideAttachmentPreview,
         renderMasteryChip: renderMasteryChip,
         hideMasteryChip: hideMasteryChip,
+        renderMasteryDashboard: renderMasteryDashboard,
         showStopButton: showStopButton,
         removeStopButton: removeStopButton,
         scrollToBottom: scrollToBottom,
@@ -5456,6 +5626,8 @@ define([
         getBookmarks: getBookmarks,
         clearMessages: clearMessages,
         getInputValue: getInputValue,
+        setInputValue: setInputValue,
+        focusInput: focusInput,
         clearInput: clearInput,
         autoResizeInput: autoResizeInput,
         updateSendButton: updateSendButton,
