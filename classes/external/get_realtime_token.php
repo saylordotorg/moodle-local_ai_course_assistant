@@ -62,15 +62,40 @@ class get_realtime_token extends external_api {
                 'No voice provider configured for Realtime.');
         }
 
-        // xAI Realtime: authenticate the WebSocket directly with the API key
-        // (no ephemeral token flow is exposed yet). We still return a "token"
-        // for the client to use with Bearer auth on the WebSocket subprotocol.
+        // xAI Realtime: the master API key must never leave the server, so
+        // we mint a short-lived HS256 JWT scoped to this learner + course +
+        // voice + a fresh nonce and return the proxy URL with the token
+        // embedded. The standalone `services/xai_rt_proxy/` daemon validates
+        // the token and opens the upstream WebSocket to api.x.ai itself.
         if ($cfg['provider'] === 'xai') {
+            $proxyurl = get_config('local_ai_course_assistant', 'xai_proxy_url');
+            $jwtsecret = get_config('local_ai_course_assistant', 'xai_proxy_jwt_secret');
+            if (empty($proxyurl) || empty($jwtsecret)) {
+                throw new \moodle_exception('error', 'local_ai_course_assistant', '',
+                    'xAI Realtime proxy is not configured. Set xai_proxy_url and xai_proxy_jwt_secret in SOLA admin settings, or switch voice to OpenAI.');
+            }
+            $now = time();
+            $header = self::b64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+            $payload = self::b64url(json_encode([
+                'sub'      => (int)$USER->id,
+                'courseid' => (int)$params['courseid'],
+                'provider' => 'xai',
+                'voice'    => $cfg['voice'],
+                'iat'      => $now,
+                'nbf'      => $now,
+                'exp'      => $now + 60,
+                'nonce'    => bin2hex(random_bytes(12)),
+            ]));
+            $sig = self::b64url(hash_hmac('sha256', $header . '.' . $payload, $jwtsecret, true));
+            $jwt = $header . '.' . $payload . '.' . $sig;
+            $sep = (strpos($proxyurl, '?') === false) ? '?' : '&';
             return [
-                'token'    => $cfg['apikey'],
+                // Empty token: the proxy URL carries the auth. The client must
+                // not pass a subprotocol bearer for the xAI-via-proxy path.
+                'token'    => '',
                 'voice'    => $cfg['voice'],
                 'provider' => 'xai',
-                'endpoint' => $cfg['endpoint'],
+                'endpoint' => $proxyurl . $sep . 'token=' . rawurlencode($jwt),
             ];
         }
 
@@ -113,6 +138,16 @@ class get_realtime_token extends external_api {
             'provider' => 'openai',
             'endpoint' => $cfg['endpoint'],
         ];
+    }
+
+    /**
+     * base64url encoder used for the JWT header/payload/signature.
+     *
+     * @param string $data
+     * @return string
+     */
+    private static function b64url(string $data): string {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     /**

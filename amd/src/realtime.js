@@ -520,8 +520,16 @@ define([], function() {
         var provider = callbacks.provider || 'openai';
         var endpoint = callbacks.endpoint ||
             'wss://api.openai.com/v1/realtime?model=gpt-realtime-mini';
-        // Both providers share the OpenAI Realtime WebSocket subprotocol pattern.
-        ws = new WebSocket(endpoint, ['realtime', 'openai-insecure-api-key.' + token]);
+        // xAI now routes through the SOLA WebSocket proxy (services/xai_rt_proxy);
+        // the proxy authenticates with a short-lived JWT embedded in the URL
+        // and does the Bearer auth to xAI itself, so we must NOT pass the
+        // subprotocol bearer for the xAI-via-proxy path. OpenAI still uses
+        // the ephemeral client_secret flow over the subprotocol bearer.
+        if (provider === 'xai') {
+            ws = new WebSocket(endpoint);
+        } else {
+            ws = new WebSocket(endpoint, ['realtime', 'openai-insecure-api-key.' + token]);
+        }
 
         ws.addEventListener('open', function() {
             // Use caller-provided AudioContext if available (iOS/WKWebView user-gesture requirement).

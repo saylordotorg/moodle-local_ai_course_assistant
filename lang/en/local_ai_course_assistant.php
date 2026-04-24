@@ -524,6 +524,58 @@ $string['usersettings:delete_all_button'] = 'Delete All My Data';
 $string['usersettings:confirm_delete_course'] = 'Are you sure you want to permanently delete all your AI tutor data for the course "{$a}"? This action cannot be undone.';
 $string['usersettings:confirm_delete_all'] = 'Are you sure you want to permanently delete ALL your AI tutor data across all courses? This action cannot be undone.';
 $string['usersettings:data_deleted'] = 'Your data has been deleted.';
+$string['usersettings:download'] = 'Download my {$a} data';
+$string['usersettings:download_help'] = 'Download a complete JSON copy of every {$a} record tied to your account: conversations, messages, ratings, study plans, reminders, practice scores, survey responses, profile, and audit entries.';
+$string['usersettings:privacy_notice_link'] = 'Read the {$a} privacy notice';
+
+// Privacy notice page.
+$string['privacy:title'] = '{$a} Privacy Notice';
+
+// Admin: Find user → export + purge.
+$string['admin:user_data:title'] = '{$a} — Learner data export and purge';
+$string['admin:user_data:intro'] = 'Operational path for a GDPR Article 15 (access) or Article 17 (erasure) request. Look up a learner by Moodle user id, review the rows this plugin holds for them, and export or purge.';
+$string['admin:user_data:search_label'] = 'Moodle user id';
+$string['admin:user_data:lookup'] = 'Look up';
+$string['admin:user_data:not_found'] = 'No user found with that id.';
+$string['admin:user_data:download'] = 'Download all learner data as JSON';
+$string['admin:user_data:purge'] = 'Purge all learner data for this user';
+$string['admin:user_data:confirm_purge'] = 'Permanently delete every record for {$a}? This cascades through conversations, messages, ratings, study plans, reminders, profiles, practice scores, surveys, audit entries, and feedback. The action cannot be undone.';
+$string['admin:user_data:purged'] = 'All data for the selected user has been purged.';
+
+// First-run consent banner. {$a->product} = short product name, {$a->institution} = institution name.
+$string['chat:consent_heading'] = 'Before you chat with {$a->product}';
+$string['chat:consent_body'] = '{$a->product} is an AI powered learning assistant. Your messages and {$a->product}\'s replies are stored in {$a->institution}\'s Moodle database and the most recent ten turns are sent to an approved AI model provider to answer your questions. Your first name is shared for personalization; no other identifying information is sent to the AI provider. You can download, delete, or stop using {$a->product} at any time.';
+$string['chat:consent_accept'] = 'I understand, start {$a}';
+$string['chat:consent_privacy_link'] = 'Read the full privacy notice';
+
+// Scheduled tasks (v3.9.12).
+$string['task:audit_cleanup'] = 'AI Course Assistant audit table cleanup';
+$string['task:conversation_retention'] = 'AI Course Assistant conversation retention sweeper';
+$string['settings:audit_retention_days'] = 'Audit log retention (days)';
+$string['settings:audit_retention_days_desc'] = 'Daily scheduled task purges audit rows older than this. 0 disables. Default 365.';
+$string['settings:conversation_retention_days'] = 'Conversation retention (days)';
+$string['settings:conversation_retention_days_desc'] = 'Daily scheduled task purges conversation rows whose last modified timestamp is older than this. 0 disables. Default 730.';
+
+// xAI Realtime proxy (v3.9.13).
+$string['settings:xai_proxy_url'] = 'xAI Realtime proxy URL';
+$string['settings:xai_proxy_url_desc'] = 'Public wss URL of the SOLA xAI Realtime proxy service (for example wss://voice.example.com/xai-rt/rt). When this is set together with the JWT secret, xAI voice routes through the proxy and the master xAI API key never reaches the browser. Leave empty to fall back to the direct connection (not recommended for production).';
+$string['settings:xai_proxy_jwt_secret'] = 'xAI Realtime proxy JWT secret';
+$string['settings:xai_proxy_jwt_secret_desc'] = 'HS256 shared secret used to sign short-lived session tokens for the xAI Realtime proxy. Must match the MOODLE_JWT_SECRET secret on the Cloudflare Worker. Rotate periodically.';
+
+// Vendor DPA admin view (v3.9.14).
+$string['admin:vendor_dpa:title'] = '{$a} — Vendor DPA status';
+$string['admin:vendor_dpa:intro'] = 'Training opt-out, DPA, and retention posture for every AI provider driver. Use this to decide which drivers to enable on your site. Tier 2 and higher routing requires a signed DPA and a contractual training opt-out.';
+$string['admin:vendor_dpa:maintenance_note'] = 'This table is maintained in classes/vendor_registry.php. Update it when a vendor ToS change lands.';
+
+// White-label contact points (v3.9.15).
+$string['settings:dpo_email'] = 'Data Protection Officer email';
+$string['settings:dpo_email_desc'] = 'Contact email shown on the learner facing privacy notice under "Contact". Leave empty to hide the line. Rebranded installs should point this at their own DPO.';
+$string['settings:privacy_external_url'] = 'Institution privacy page URL';
+$string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to hide the line.';
+
+// Privacy notice admin override (v3.9.16).
+$string['settings:privacy_notice_override'] = 'Privacy notice override (HTML)';
+$string['settings:privacy_notice_override_desc'] = 'If set, this HTML replaces the default branded privacy notice rendered at /local/ai_course_assistant/privacy.php. Use this to drop in the Legal-reviewed text for your institution without editing code. Leave empty to use the default notice, which derives its text from the seven branding config keys.';
 
 // Quiz.
 $string['chat:quiz']                    = 'Take a practice quiz';

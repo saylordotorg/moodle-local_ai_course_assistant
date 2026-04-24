@@ -1344,6 +1344,82 @@ if ($hassiteconfig) {
         'moodle/site:config'
     ));
 
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_userdata',
+        get_string('admin:user_data:title', 'local_ai_course_assistant',
+            \local_ai_course_assistant\branding::short_name()),
+        new moodle_url('/local/ai_course_assistant/admin_user_data.php'),
+        'moodle/site:config'
+    ));
+
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_vendordpa',
+        get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
+            \local_ai_course_assistant\branding::short_name()),
+        new moodle_url('/local/ai_course_assistant/vendor_dpa.php'),
+        'moodle/site:config'
+    ));
+
+    // v3.9.15: white-label contact points surfaced on the privacy notice.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/dpo_email',
+        get_string('settings:dpo_email', 'local_ai_course_assistant'),
+        get_string('settings:dpo_email_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_EMAIL
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/privacy_external_url',
+        get_string('settings:privacy_external_url', 'local_ai_course_assistant'),
+        get_string('settings:privacy_external_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+
+    // v3.9.16: admin-editable privacy notice override. If populated, this HTML
+    // replaces the default branded notice rendered by privacy.php. Lets
+    // Saylor (or any rebranded install) finalize the legal-reviewed notice
+    // text in the admin UI without touching code.
+    $settings->add(new admin_setting_confightmleditor(
+        'local_ai_course_assistant/privacy_notice_override',
+        get_string('settings:privacy_notice_override', 'local_ai_course_assistant'),
+        get_string('settings:privacy_notice_override_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    // v3.9.12: data retention controls.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/audit_retention_days',
+        get_string('settings:audit_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:audit_retention_days_desc', 'local_ai_course_assistant'),
+        '365',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/conversation_retention_days',
+        get_string('settings:conversation_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:conversation_retention_days_desc', 'local_ai_course_assistant'),
+        '730',
+        PARAM_INT
+    ));
+
+    // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
+    // xAI voice routes through services/xai_rt_proxy instead of opening a
+    // direct browser connection to api.x.ai with the master key.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/xai_proxy_url',
+        get_string('settings:xai_proxy_url', 'local_ai_course_assistant'),
+        get_string('settings:xai_proxy_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/xai_proxy_jwt_secret',
+        get_string('settings:xai_proxy_jwt_secret', 'local_ai_course_assistant'),
+        get_string('settings:xai_proxy_jwt_secret_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls
     // admin_externalpage_setup('local_ai_course_assistant_whatsapptest').
     // Register it defensively only when the file is present so upstream

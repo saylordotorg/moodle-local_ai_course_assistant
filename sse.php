@@ -90,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_login();
 require_sesskey();
 
+\local_ai_course_assistant\security::send_security_headers();
+
 $courseid   = required_param('courseid', PARAM_INT);
 $message    = required_param('message', PARAM_RAW);
 $lang       = optional_param('lang', '', PARAM_ALPHA);      // ISO 639-1 language preference.
@@ -538,9 +540,11 @@ try {
     }
 
 } catch (\moodle_exception $e) {
-    // Include debuginfo (curl errors, HTTP details) alongside the user message.
+    // Include debuginfo (curl errors, HTTP details) only for site admins on
+    // developer-debug environments; never expose internal details to learners.
+    global $CFG, $USER;
     $errmsg = $e->getMessage();
-    if (!empty($e->debuginfo)) {
+    if (!empty($e->debuginfo) && !empty($CFG->debugdeveloper) && is_siteadmin($USER->id)) {
         $errmsg .= ' [' . $e->debuginfo . ']';
     }
     sse_send(['error' => $errmsg]);

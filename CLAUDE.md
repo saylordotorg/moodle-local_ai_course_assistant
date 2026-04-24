@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a floating chat widget.
+SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
 - **Current version:** `2026041601`, release `3.5.1`
@@ -169,8 +169,8 @@ rsync -a --exclude=.git \
 ## i18n
 
 - **46 language files:** en + ar, am, bg, bm, bn, cs, da, de, el, es, fi, fr, ha, he, hi, hu, id, ig, it, ja, ko, ms, nb, ne, nl, om, pa, pl, pt_br, ro, ru, sk, so, sv, sw, ta, th, tl, tr, uk, vi, wo, yo, zh_cn, zu
-- Lang codes for STT/TTS: `amd/src/speech.js` → `SUPPORTED_LANGS` (43 total)
-- Starter button translations: `STARTER_LABELS` in `amd/src/speech.js` (43 languages × 5 starters)
+- Lang codes for STT/TTS: `amd/src/speech.js` → `SUPPORTED_LANGS` (46 total, including `en`)
+- Starter button translations: `STARTER_LABELS` in `amd/src/speech.js` (46 languages × 5 starters)
 - ISO 639-1 → language name mapping: `classes/context_builder.php::get_multilingual_instructions()`
 - **JS string substitution:** Moodle's string cache returns raw `{$a}` — always do `.replace('{$a}', value)` in JS rather than relying on `Str.get_string()` third-argument substitution
 

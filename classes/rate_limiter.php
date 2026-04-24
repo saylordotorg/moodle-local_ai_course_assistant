@@ -101,7 +101,10 @@ class rate_limiter {
     ): bool {
         $cache = self::get_cache();
         $now = time();
-        $ip = getremoteaddr();
+        // Use the hardened client IP helper: only honors X-Forwarded-For when
+        // $CFG->reverseproxy is true. Without this tightening a caller could
+        // bypass IP rate limits by spoofing XFF on a non-proxied deployment.
+        $ip = \local_ai_course_assistant\security::client_ip();
 
         // Key based on IP + endpoint.
         $key = "ip_" . md5($ip) . "_{$endpoint}";

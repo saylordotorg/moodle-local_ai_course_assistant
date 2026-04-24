@@ -32,6 +32,7 @@ require_once('../../config.php');
 require_login();
 require_sesskey();
 
+\local_ai_course_assistant\security::send_security_headers();
 header('Content-Type: application/json');
 
 $courseid = optional_param('courseid', 0, PARAM_INT);
@@ -42,10 +43,39 @@ if ($courseid > 0) {
 }
 require_capability('local/ai_course_assistant:use', $context);
 
+// Rate limit: 20 STT requests per 60 seconds per user. Whisper is a per-minute
+// spend vector; without this cap an authenticated learner can upload clips in a
+// tight loop and rack up cost.
+if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'stt', 20, 60)) {
+    http_response_code(429);
+    header('Retry-After: 60');
+    echo json_encode(['error' => get_string('chat:error_ratelimit', 'local_ai_course_assistant')]);
+    exit;
+}
+
 // Require the uploaded audio file.
 if (empty($_FILES['audio']['tmp_name']) || !is_uploaded_file($_FILES['audio']['tmp_name'])) {
     http_response_code(400);
     echo json_encode(['error' => 'No audio file provided.']);
+    exit;
+}
+
+// Enforce a 25 MB max size and an audio MIME allowlist before the file ever
+// hits the upstream transcription API. Uses finfo so a spoofed Content-Type
+// header cannot smuggle a non-audio payload through.
+$tmp = $_FILES['audio']['tmp_name'];
+$size = filesize($tmp) ?: 0;
+if ($size <= 0 || $size > \local_ai_course_assistant\security::MAX_AUDIO_BYTES) {
+    http_response_code(413);
+    echo json_encode(['error' => 'Audio file too large.']);
+    exit;
+}
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$sniffed = $finfo ? finfo_file($finfo, $tmp) : '';
+if ($finfo) { finfo_close($finfo); }
+if (!in_array($sniffed, \local_ai_course_assistant\security::AUDIO_MIME_ALLOWLIST, true)) {
+    http_response_code(415);
+    echo json_encode(['error' => 'Unsupported audio format.']);
     exit;
 }
 
