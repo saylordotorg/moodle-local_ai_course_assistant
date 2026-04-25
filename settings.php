@@ -448,6 +448,13 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rag_extract_pptx',
+        'Index PPTX files (mod_resource)',
+        'Extract text from modern PowerPoint uploads via PHP ZipArchive. Walks slide and speaker-note XML in deck order; no external dependency required. Legacy binary <code>.ppt</code> files are not supported — re-save those decks as <code>.pptx</code>.',
+        1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_h5p',
         'Index H5P content (mod_h5p)',
         'Walk H5P content JSON and index every text-bearing field (questions, answers, feedback, descriptions). H5P content type metadata is broad; expect some false positives in edge cases.',

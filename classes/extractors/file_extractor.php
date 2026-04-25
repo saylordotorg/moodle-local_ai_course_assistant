@@ -98,6 +98,17 @@ class file_extractor {
                 return self::extract_docx($file);
             }
 
+            // PPTX (modern PowerPoint, OOXML format). Legacy binary .ppt
+            // requires libreoffice / catdoc and is intentionally not handled
+            // here; instructors should re-save legacy decks as .pptx.
+            $pptxmime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+            if ($mime === $pptxmime || str_ends_with($filename, '.pptx')) {
+                if (!self::is_enabled('rag_extract_pptx', true)) {
+                    return '';
+                }
+                return self::extract_pptx($file);
+            }
+
             return '';
         } catch (\Throwable $e) {
             debugging('file_extractor failed for instance ' . $instance . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
@@ -284,6 +295,127 @@ class file_extractor {
                 @unlink($tmppath);
             }
         }
+    }
+
+    /**
+     * Extract text from a PPTX stored_file by walking ppt/slides/slide*.xml
+     * inside the OOXML zip and concatenating each slide's text runs.
+     *
+     * Slide order is preserved by sorting on the numeric suffix of the
+     * filename (slide1.xml, slide2.xml, …) so the extracted text reads
+     * deck-top-to-bottom. Each slide is prefixed with "Slide N:" so chunks
+     * downstream retain a sense of structure.
+     *
+     * Speaker notes (ppt/notesSlides/notesSlide*.xml) are also picked up
+     * when present — useful because slide bullets are often terse but
+     * speaker notes carry the actual explanation.
+     *
+     * Legacy binary .ppt files are NOT handled here; that format requires
+     * an external converter (libreoffice headless, catdoc) and we do not
+     * shell out for it. Instructors should re-save those decks as .pptx.
+     *
+     * @param \stored_file $file
+     * @return string Extracted plain text, or empty string on failure.
+     */
+    private static function extract_pptx(\stored_file $file): string {
+        global $CFG;
+
+        if (!class_exists('ZipArchive')) {
+            debugging('ZipArchive not available; PPTX extraction disabled.', DEBUG_DEVELOPER);
+            return '';
+        }
+
+        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
+        if (!is_dir($tempdir)) {
+            @mkdir($tempdir, 0777, true);
+        }
+        $tmppath = tempnam($tempdir, 'sola_pptx_');
+        if ($tmppath === false) {
+            return '';
+        }
+
+        try {
+            $file->copy_content_to($tmppath);
+
+            $zip = new \ZipArchive();
+            if ($zip->open($tmppath) !== true) {
+                return '';
+            }
+
+            $slides = [];
+            $notes  = [];
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $name = (string) $zip->getNameIndex($i);
+                if (preg_match('#^ppt/slides/slide(\d+)\.xml$#i', $name, $m)) {
+                    $slides[(int) $m[1]] = $zip->getFromIndex($i);
+                } else if (preg_match('#^ppt/notesSlides/notesSlide(\d+)\.xml$#i', $name, $m)) {
+                    $notes[(int) $m[1]] = $zip->getFromIndex($i);
+                }
+            }
+            $zip->close();
+            if (empty($slides)) {
+                return '';
+            }
+            ksort($slides, SORT_NUMERIC);
+
+            $parts = [];
+            foreach ($slides as $n => $xml) {
+                $slidetext = self::extract_pptx_runs((string) $xml);
+                if ($slidetext === '') {
+                    continue;
+                }
+                $block = "Slide {$n}: " . $slidetext;
+                if (isset($notes[$n])) {
+                    $notetext = self::extract_pptx_runs((string) $notes[$n]);
+                    if ($notetext !== '') {
+                        $block .= "\n  (Speaker notes: " . $notetext . ')';
+                    }
+                }
+                $parts[] = $block;
+            }
+            if (empty($parts)) {
+                return '';
+            }
+            return self::normalize_whitespace(implode("\n\n", $parts));
+        } catch (\Throwable $e) {
+            debugging('PPTX extraction failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return '';
+        } finally {
+            if (is_file($tmppath)) {
+                @unlink($tmppath);
+            }
+        }
+    }
+
+    /**
+     * Pull all <a:t>…</a:t> text runs out of a slide or notes-slide XML
+     * payload, separated by spaces, with paragraph-level <a:p> breaks
+     * collapsed to a single space (slide bullets read as a flat list).
+     *
+     * @param string $xml
+     * @return string
+     */
+    private static function extract_pptx_runs(string $xml): string {
+        if ($xml === '') {
+            return '';
+        }
+        // Convert paragraph and break tags to spaces before stripping XML.
+        $xml = preg_replace('#<a:br\b[^/]*/>#i', ' ', $xml);
+        $xml = preg_replace('#</a:p>#i', ' ', $xml);
+
+        $parts = [];
+        if (preg_match_all('#<a:t[^>]*>(.*?)</a:t>#s', $xml, $matches)) {
+            foreach ($matches[1] as $piece) {
+                $piece = html_entity_decode($piece, ENT_QUOTES | ENT_XML1, 'UTF-8');
+                $piece = trim($piece);
+                if ($piece !== '') {
+                    $parts[] = $piece;
+                }
+            }
+        }
+        $text = implode(' ', $parts);
+        $text = preg_replace('/\s+/', ' ', $text);
+        return trim($text);
     }
 
     /**
