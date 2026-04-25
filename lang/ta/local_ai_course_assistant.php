@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI பாட உதவியாளர்';
+$string['attachment:attach'] = 'இணைக்கவும்';
+$string['attachment:attach_image_or_pdf'] = 'படம் அல்லது PDF ஐ இணைக்கவும்';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'ஒவ்வொரு பயனர் மற்றும் பாடத்திற்கான AI ஆசிரியர் உரையாடல்களை சேமிக்கிறது.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'உரையாடலை வைத்திருக்கும் பயனரின் ID.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'உரையாடல் சார்ந்த பாடத்தின் ID.';

@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'የAI ኮርስ ረዳት';
+$string['attachment:attach'] = 'አያይዝ';
+$string['attachment:attach_image_or_pdf'] = 'ምስል ወይም PDF አያይዝ';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'የAI አስተማሪ ውይይቶችን በተጠቃሚ እና በኮርስ ያከማቻል።';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ውይይቱን የሚያቀርበው ተጠቃሚ መለያ።';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ውይይቱ የሚነካው ኮርስ መለያ።';

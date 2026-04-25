@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI Ders Asistanı';
+$string['attachment:attach'] = 'Ekle';
+$string['attachment:attach_image_or_pdf'] = 'Resim veya PDF ekle';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AI eğitmen konuşmalarını kullanıcı ve ders bazında saklar.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Konuşmanın sahibi olan kullanıcının kimliği.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Konuşmanın ait olduğu dersin kimliği.';

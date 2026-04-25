@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Pembantu Kursus AI';
+$string['attachment:attach'] = 'Lampirkan';
+$string['attachment:attach_image_or_pdf'] = 'Lampirkan imej atau PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Menyimpan perbualan chat tutor AI bagi setiap pengguna dan kursus.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID pengguna yang memiliki perbualan.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID kursus yang dimiliki oleh perbualan.';

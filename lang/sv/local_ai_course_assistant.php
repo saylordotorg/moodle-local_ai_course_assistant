@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI-kursassistent';
+$string['attachment:attach'] = 'Bifoga';
+$string['attachment:attach_image_or_pdf'] = 'Bifoga bild eller PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Lagrar AI-handledarens konversationer per användare och kurs.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID:t för användaren som äger konversationen.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID:t för kursen som konversationen tillhör.';

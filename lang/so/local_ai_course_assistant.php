@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Kaaliyaha Koorsada AI';
+$string['attachment:attach'] = 'Lifaaq';
+$string['attachment:attach_image_or_pdf'] = 'Lifaaq sawir ama PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Kaydiya wada-hadalada barida AI ee isticmaalaha iyo koorsada kasta.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID-ga isticmaalaha leh wada-hadalkii.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID-ga koorsada ay wada-hadalku u dhigan tahay.';

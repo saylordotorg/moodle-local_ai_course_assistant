@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'مساعد الذكاء الاصطناعي للمقررات';
+$string['attachment:attach'] = 'إرفاق';
+$string['attachment:attach_image_or_pdf'] = 'إرفاق صورة أو PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'يخزّن محادثات المدرّس الافتراضي بالذكاء الاصطناعي لكل مستخدم ومقرر.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'معرّف المستخدم الذي يمتلك المحادثة.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'معرّف المقرر الذي تنتمي إليه المحادثة.';

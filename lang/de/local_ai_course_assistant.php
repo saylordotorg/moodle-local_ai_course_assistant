@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'KI-Kursassistent';
+$string['attachment:attach'] = 'Anhängen';
+$string['attachment:attach_image_or_pdf'] = 'Bild oder PDF anhängen';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Speichert die Unterhaltungen des KI-Tutors pro Benutzer und Kurs.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Die ID des Benutzers, dem die Unterhaltung gehört.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Die ID des Kurses, zu dem die Unterhaltung gehört.';

@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Umsizi Wesifundo AI';
+$string['attachment:attach'] = 'Faka';
+$string['attachment:attach_image_or_pdf'] = 'Faka isithombe noma i-PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Igcina izingxoxo zomfundisi we-AI ngomuntu ngamunye nezifundo.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'I-ID yomsebenzisi owengamele ingxoxo.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'I-ID yesifundo elingxoxo lize kulo.';

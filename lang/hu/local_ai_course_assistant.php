@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI Kurzus Asszisztens';
+$string['attachment:attach'] = 'Csatolás';
+$string['attachment:attach_image_or_pdf'] = 'Kép vagy PDF csatolása';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Az AI tutor csevegési beszélgetéseit tárolja felhasználónként és kurzusonként.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'A beszélgetés tulajdonosának azonosítója.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'A kurzus azonosítója, amelyhez a beszélgetés tartozik.';

@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'ผู้ช่วยรายวิชา AI';
+$string['attachment:attach'] = 'แนบไฟล์';
+$string['attachment:attach_image_or_pdf'] = 'แนบรูปภาพหรือ PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'จัดเก็บการสนทนากับผู้สอน AI ตามผู้ใช้และรายวิชา';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'รหัสผู้ใช้ที่เป็นเจ้าของการสนทนา';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'รหัสรายวิชาที่การสนทนาสังกัดอยู่';

@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AIコースアシスタント';
+$string['attachment:attach'] = '添付';
+$string['attachment:attach_image_or_pdf'] = '画像またはPDFを添付';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AIチューターの会話をユーザーおよびコースごとに保存します。';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = '会話を所有するユーザーのID。';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = '会話が属するコースのID。';

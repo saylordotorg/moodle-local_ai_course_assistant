@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI асистент за курсове';
+$string['attachment:attach'] = 'Прикачи';
+$string['attachment:attach_image_or_pdf'] = 'Прикачи изображение или PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Съхранява разговорите с AI тутора по потребител и курс.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Идентификаторът на потребителя, притежаващ разговора.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Идентификаторът на курса, към който принадлежи разговорът.';

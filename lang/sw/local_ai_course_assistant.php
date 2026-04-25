@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Msaidizi wa Kozi wa AI';
+$string['attachment:attach'] = 'Ambatisha';
+$string['attachment:attach_image_or_pdf'] = 'Ambatisha picha au PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Huhifadhi mazungumzo ya mshauri wa AI kwa kila mtumiaji na kozi.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Kitambulisho cha mtumiaji anayemiliki mazungumzo.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Kitambulisho cha kozi ambayo mazungumzo yanahusiana nazo.';

@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI কোর্স সহকারী';
+$string['attachment:attach'] = 'সংযুক্ত করুন';
+$string['attachment:attach_image_or_pdf'] = 'ছবি বা PDF সংযুক্ত করুন';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'প্রতিটি ব্যবহারকারী ও কোর্সের জন্য AI টিউটর চ্যাটের কথোপকথন সংরক্ষণ করে।';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'কথোপকথনের মালিক ব্যবহারকারীর আইডি।';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'যে কোর্সের সাথে কথোপকথনটি সম্পর্কিত তার আইডি।';

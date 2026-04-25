@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI पाठ्यक्रम सहायक';
+$string['attachment:attach'] = 'संलग्न गर्नुहोस्';
+$string['attachment:attach_image_or_pdf'] = 'छवि वा PDF संलग्न गर्नुहोस्';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'प्रत्येक प्रयोगकर्ता र पाठ्यक्रमका लागि AI ट्युटर च्याट वार्तालापहरू भण्डारण गर्छ।';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'वार्तालापको स्वामी प्रयोगकर्ताको ID।';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'वार्तालाप सम्बन्धित पाठ्यक्रमको ID।';

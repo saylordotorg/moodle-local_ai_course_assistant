@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Jëkkër AI bi ci Cours bi';
+$string['attachment:attach'] = 'Boole';
+$string['attachment:attach_image_or_pdf'] = 'Boole nataal walla PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Dëkk ay wax-ak-wax yu AI jàng ak ay jëkkëram ak cours yépp.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID bi bu nekkee nit ki am wax-ak-wax bi.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID bi bu nekkee cours bi moo moom wax-ak-wax bi.';

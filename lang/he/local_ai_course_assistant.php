@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'עוזר קורס מבוסס בינה מלאכותית';
+$string['attachment:attach'] = 'צרף';
+$string['attachment:attach_image_or_pdf'] = 'צרף תמונה או PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'מאחסן שיחות של מורה AI לפי משתמש וקורס.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'מזהה המשתמש שבבעלותו השיחה.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'מזהה הקורס שאליו שייכת השיחה.';

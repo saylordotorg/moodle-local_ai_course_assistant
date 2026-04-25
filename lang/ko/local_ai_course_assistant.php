@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI 코스 어시스턴트';
+$string['attachment:attach'] = '첨부';
+$string['attachment:attach_image_or_pdf'] = '이미지 또는 PDF 첨부';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AI 튜터 대화를 사용자 및 코스별로 저장합니다.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = '대화를 소유한 사용자의 ID.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = '대화가 속한 코스의 ID.';

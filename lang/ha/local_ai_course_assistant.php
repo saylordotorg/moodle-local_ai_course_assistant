@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Mataimakin Horo na AI';
+$string['attachment:attach'] = 'Haɗawa';
+$string['attachment:attach_image_or_pdf'] = 'Haɗa hoto ko PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Yana adana tattaunawar mai koyarwa na AI ga kowane mai amfani da kozi.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID na mai amfani wanda yake da tattaunawar.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID na kozi da tattaunawar ta shafi.';

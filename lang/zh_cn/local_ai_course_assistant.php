@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI 课程助手';
+$string['attachment:attach'] = '附加';
+$string['attachment:attach_image_or_pdf'] = '附加图片或PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = '存储每位用户和课程的 AI 辅导聊天会话。';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = '拥有该会话的用户 ID。';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = '该会话所属课程的 ID。';

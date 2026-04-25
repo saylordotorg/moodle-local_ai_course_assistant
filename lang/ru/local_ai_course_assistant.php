@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'ИИ-ассистент курса';
+$string['attachment:attach'] = 'Прикрепить';
+$string['attachment:attach_image_or_pdf'] = 'Прикрепить изображение или PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Хранит чат-беседы ИИ-репетитора для каждого пользователя и курса.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Идентификатор пользователя, которому принадлежит беседа.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Идентификатор курса, которому принадлежит беседа.';

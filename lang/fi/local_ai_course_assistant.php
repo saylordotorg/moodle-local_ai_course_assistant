@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI-kurssiavustaja';
+$string['attachment:attach'] = 'Liitä';
+$string['attachment:attach_image_or_pdf'] = 'Liitä kuva tai PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Tallentaa AI-tutorin keskustelut käyttäjä- ja kurssikohtaisesti.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Keskustelun omistavan käyttäjän tunniste.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Kurssin tunniste, johon keskustelu kuuluu.';

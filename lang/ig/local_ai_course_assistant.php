@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Onye Enyemaka AI Nkuzi';
+$string['attachment:attach'] = 'Ntinye';
+$string['attachment:attach_image_or_pdf'] = 'Tinye foto ma ọ bụ PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Echekwa mkparịta ụka AI nkuzi maka onye ọ bụla na kọọsị.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID nke onye nwe mkparịta ụka.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID nke kọọsị nke mkparịta ụka dị na ya.';

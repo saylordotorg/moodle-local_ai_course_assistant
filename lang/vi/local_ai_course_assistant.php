@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Trợ Lý AI Khóa Học';
+$string['attachment:attach'] = 'Đính kèm';
+$string['attachment:attach_image_or_pdf'] = 'Đính kèm hình ảnh hoặc PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Lưu trữ các cuộc trò chuyện với gia sư AI theo người dùng và khóa học.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID của người dùng sở hữu cuộc trò chuyện.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID của khóa học mà cuộc trò chuyện thuộc về.';

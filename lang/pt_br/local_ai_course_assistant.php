@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Assistente de Curso com IA';
+$string['attachment:attach'] = 'Anexar';
+$string['attachment:attach_image_or_pdf'] = 'Anexar imagem ou PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Armazena as conversas do chat do tutor de IA por usuário e curso.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'O ID do usuário proprietário da conversa.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'O ID do curso ao qual a conversa pertence.';

@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Gargaaraa Barnoota AI';
+$string['attachment:attach'] = 'Maxxansi';
+$string['attachment:attach_image_or_pdf'] = 'Suuraa ykn PDF maxxansi';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Haasawa barsiisaa AI kan fayyadamaa fi koorsii hunda ol kaa\'a.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID fayyadamaa haasawa qabu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID koorsii haasawni itti dhihaatu.';

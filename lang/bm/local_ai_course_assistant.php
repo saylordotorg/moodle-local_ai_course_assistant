@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI Kalanso Dɛmɛbaga';
+$string['attachment:attach'] = 'A masala';
+$string['attachment:attach_image_or_pdf'] = 'Ja walima PDF masala';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AI karamɔgɔ ka kumakanbali mara jɔyɔrɔ kelen-kelen dɔ ani kalanso bɛɛ la.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Jɔyɔrɔ mɔgɔ ka ID.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Kalanso ID min na kumakanbali kɛra.';

@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI-cursusassistent';
+$string['attachment:attach'] = 'Bijvoegen';
+$string['attachment:attach_image_or_pdf'] = 'Afbeelding of PDF bijvoegen';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Slaat AI-tutorgesprekken op per gebruiker en cursus.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'De ID van de gebruiker die eigenaar is van het gesprek.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'De ID van de cursus waartoe het gesprek behoort.';

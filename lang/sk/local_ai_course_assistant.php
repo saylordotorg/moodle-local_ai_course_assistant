@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI asistent kurzu';
+$string['attachment:attach'] = 'Priložiť';
+$string['attachment:attach_image_or_pdf'] = 'Priložiť obrázok alebo PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Ukladá konverzácie AI tútora podľa používateľa a kurzu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID používateľa, ktorý vlastní konverzáciu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID kurzu, ku ktorému konverzácia patrí.';

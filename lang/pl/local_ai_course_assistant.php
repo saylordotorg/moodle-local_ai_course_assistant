@@ -27,6 +27,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Asystent kursu AI';
+$string['attachment:attach'] = 'Załącz';
+$string['attachment:attach_image_or_pdf'] = 'Załącz obraz lub PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Przechowuje rozmowy z korepetytorem AI według użytkownika i kursu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Identyfikator użytkownika będącego właścicielem rozmowy.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Identyfikator kursu, do którego należy rozmowa.';
