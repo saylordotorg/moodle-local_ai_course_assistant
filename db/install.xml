@@ -383,6 +383,7 @@
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="manual" SEQUENCE="false" COMMENT="How this objective was seeded: manual, competency, summary, section, llm"/>
         <FIELD NAME="external_ref" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="Optional reference back to the source (e.g. core_competency id)"/>
+        <FIELD NAME="prereq_ids" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated upstream objective ids (v3.9.24 prerequisite gap detection)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>

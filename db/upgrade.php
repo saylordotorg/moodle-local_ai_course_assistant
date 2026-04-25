@@ -670,5 +670,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026042406, 'local', 'ai_course_assistant');
     }
 
+    // v3.9.24: prereq_ids column on objs table (prerequisite gap detection).
+    if ($oldversion < 2026042408) {
+        $table = new xmldb_table('local_ai_course_assistant_objs');
+        $field = new xmldb_field('prereq_ids', XMLDB_TYPE_CHAR, '255', null, null, null, null,
+            'external_ref');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026042408, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

@@ -121,6 +121,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect($pageurl, get_string('objectives:saved', 'local_ai_course_assistant'),
             null, \core\output\notification::NOTIFY_SUCCESS);
 
+    } else if ($action === 'set_prereqs') {
+        $id = required_param('id', PARAM_INT);
+        $obj = objective_manager::get($id);
+        if (!$obj || (int) $obj->courseid !== $courseid) {
+            redirect($pageurl, 'Unknown objective.', null, \core\output\notification::NOTIFY_ERROR);
+        }
+        $raw = optional_param_array('prereqs', [], PARAM_INT);
+        objective_manager::set_prereq_ids($id, $raw);
+        redirect($pageurl, get_string('objectives:saved', 'local_ai_course_assistant'),
+            null, \core\output\notification::NOTIFY_SUCCESS);
+
     } else if ($action === 'delete') {
         $id = required_param('id', PARAM_INT);
         $obj = objective_manager::get($id);
@@ -364,6 +375,44 @@ if (!empty($objectives)) {
                 ['class' => 'text-muted small']);
         }
         $titlecell .= $editform;
+
+        // v3.9.24: per-objective prerequisite editor. Multi-select of
+        // sibling objectives; saving writes the comma-separated ids to the
+        // objective row.
+        $currentprereqs = objective_manager::get_prereq_ids($obj);
+        $preqsummary = [];
+        foreach ($currentprereqs as $pid) {
+            if (isset($objectives[$pid])) {
+                $p = $objectives[$pid];
+                $preqsummary[] = $p->code ? "[{$p->code}] " . shorten_text($p->title, 40)
+                    : shorten_text($p->title, 40);
+            }
+        }
+        $prereqform = html_writer::start_tag('details', ['style' => 'margin-top:6px']);
+        $prereqform .= html_writer::tag('summary',
+            get_string('objectives:prereqs_summary', 'local_ai_course_assistant',
+                empty($preqsummary) ? get_string('objectives:prereqs_none', 'local_ai_course_assistant')
+                    : implode('; ', $preqsummary)));
+        $prereqform .= html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(false),
+            'style' => 'margin-top:6px']);
+        $prereqform .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
+        $prereqform .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'action', 'value' => 'set_prereqs']);
+        $prereqform .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'id', 'value' => (int) $obj->id]);
+        $prereqform .= '<select name="prereqs[]" multiple size="5" style="min-width:260px">';
+        foreach ($objectives as $sibid => $sibobj) {
+            if ((int) $sibid === (int) $obj->id) { continue; }
+            $sel = in_array((int) $sibid, $currentprereqs, true) ? ' selected' : '';
+            $lbl = ($sibobj->code ? "[{$sibobj->code}] " : '') . shorten_text($sibobj->title, 60);
+            $prereqform .= '<option value="' . (int) $sibid . '"' . $sel . '>' . s($lbl) . '</option>';
+        }
+        $prereqform .= '</select><br />';
+        $prereqform .= html_writer::tag('button',
+            get_string('save', 'core') . ' ' . get_string('objectives:prereqs_label',
+                'local_ai_course_assistant'),
+            ['type' => 'submit', 'class' => 'btn btn-sm btn-primary mt-1']);
+        $prereqform .= html_writer::end_tag('form');
+        $prereqform .= html_writer::end_tag('details');
+        $titlecell .= $prereqform;
 
         $table->data[] = [
             $i++,

@@ -296,4 +296,13 @@ $functions = [
         'capabilities' => 'local/ai_course_assistant:use',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    // Essay feedback (v3.9.25).
+    'local_ai_course_assistant_score_essay' => [
+        'classname'    => \local_ai_course_assistant\external\score_essay::class,
+        'description'  => 'Score a learner essay against an optional rubric via the configured AI provider.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

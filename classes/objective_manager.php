@@ -445,6 +445,11 @@ class objective_manager {
         if ($summary['total'] === 0) {
             return '';
         }
+        // Index by id for prereq lookup.
+        $byid = [];
+        foreach ($summary['objectives'] as $row) {
+            $byid[(int) $row['objective']->id] = $row;
+        }
         $lines = [];
         foreach ($summary['objectives'] as $row) {
             $obj = $row['objective'];
@@ -452,6 +457,38 @@ class objective_manager {
             $label = $obj->code ? "[{$obj->code}] {$obj->title}" : $obj->title;
             $lines[] = "- {$label} — {$m['status']}";
         }
+
+        // v3.9.24: Prerequisite gap detection. For each weak objective
+        // (learning or not_started) that has declared prereqs also in a
+        // weak state, name the upstream so the assistant can route the
+        // learner back to the prereq in natural language.
+        $gaplines = [];
+        foreach ($summary['objectives'] as $row) {
+            $obj = $row['objective'];
+            $m = $row['mastery'];
+            if ($m['status'] === 'mastered') {
+                continue;
+            }
+            $preqs = self::get_prereq_ids($obj);
+            if (empty($preqs)) {
+                continue;
+            }
+            $weakprereqs = [];
+            foreach ($preqs as $pid) {
+                if (isset($byid[$pid])) {
+                    $pmat = $byid[$pid]['mastery'];
+                    if ($pmat['status'] !== 'mastered') {
+                        $pobj = $byid[$pid]['objective'];
+                        $weakprereqs[] = $pobj->code ? "[{$pobj->code}] {$pobj->title}" : $pobj->title;
+                    }
+                }
+            }
+            if (!empty($weakprereqs)) {
+                $label = $obj->code ? "[{$obj->code}] {$obj->title}" : $obj->title;
+                $gaplines[] = "- {$label} is gated by: " . implode('; ', $weakprereqs);
+            }
+        }
+
         $block = "\n\n## Learning Objectives (mastery state)\n"
             . "This course has the following objectives. The student's status per objective is shown. "
             . "Use this to subtly steer the conversation — offer to practice underpracticed objectives, "
@@ -461,7 +498,69 @@ class objective_manager {
             . "how they're doing, summarise in warm prose ('you're solid on X and Y, still working "
             . "on Z') — never a table, never numbers.\n\n"
             . implode("\n", $lines);
+
+        if (!empty($gaplines)) {
+            $block .= "\n\n### Prerequisite gaps detected\n"
+                . "The student is struggling with objectives whose upstream prerequisites are also weak. "
+                . "When a topic the student is working on appears below, first offer to shore up the "
+                . "upstream prerequisite before pushing deeper. Use natural phrasing ('this builds on X — "
+                . "want to review that quickly before we continue?'), never technical prereq language.\n\n"
+                . implode("\n", $gaplines);
+        }
         return $block;
+    }
+
+    /**
+     * Read the stored comma-separated prereq ids for an objective row and
+     * return them as an int[]. v3.9.24.
+     *
+     * @param \stdClass $obj Objective row as returned by list_for_course / get.
+     * @return int[]
+     */
+    public static function get_prereq_ids($obj): array {
+        $raw = isset($obj->prereq_ids) ? trim((string) $obj->prereq_ids) : '';
+        if ($raw === '') {
+            return [];
+        }
+        $ids = [];
+        foreach (explode(',', $raw) as $part) {
+            $n = (int) trim($part);
+            if ($n > 0) {
+                $ids[] = $n;
+            }
+        }
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * Persist the upstream prereqs for an objective. Accepts an array of
+     * ids and silently drops any that don't belong to the same course.
+     *
+     * @param int   $objectiveid
+     * @param int[] $prereq_ids
+     * @return bool True on success.
+     */
+    public static function set_prereq_ids(int $objectiveid, array $prereq_ids): bool {
+        global $DB;
+        $obj = $DB->get_record('local_ai_course_assistant_objs', ['id' => $objectiveid]);
+        if (!$obj) {
+            return false;
+        }
+        $clean = [];
+        foreach ($prereq_ids as $pid) {
+            $pid = (int) $pid;
+            if ($pid <= 0 || $pid === $objectiveid) {
+                continue;
+            }
+            $prow = $DB->get_record('local_ai_course_assistant_objs', ['id' => $pid]);
+            if ($prow && (int) $prow->courseid === (int) $obj->courseid) {
+                $clean[] = $pid;
+            }
+        }
+        $clean = array_values(array_unique($clean));
+        $DB->set_field('local_ai_course_assistant_objs', 'prereq_ids',
+            implode(',', $clean), ['id' => $objectiveid]);
+        return true;
     }
 
     // ------------------------------------------------------------------

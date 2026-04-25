@@ -477,6 +477,45 @@ echo html_writer::div(
                 </div>
             </div>
 
+            <?php // v3.9.25: Essay feedback toggle (per-course). ?>
+            <div class="form-group row mt-2">
+                <label class="col-sm-3 col-form-label">
+                    <?php echo get_string('essay_feedback:title', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <?php
+                    $esson = (bool) get_config('local_ai_course_assistant', 'essay_feedback_enabled_course_' . $courseid);
+                    if (data_submitted() && optional_param('save_essay', 0, PARAM_INT) && confirm_sesskey()) {
+                        $esson = (bool) optional_param('essay_on', 0, PARAM_BOOL);
+                        set_config('essay_feedback_enabled_course_' . $courseid,
+                            $esson ? 1 : 0, 'local_ai_course_assistant');
+                    }
+                    ?>
+                    <form method="post" action="" style="display:inline">
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
+                        <input type="hidden" name="save_essay" value="1" />
+                        <label class="mb-0">
+                            <input type="checkbox" name="essay_on" value="1"
+                                <?php echo $esson ? 'checked' : ''; ?>
+                                onchange="this.form.submit()" />
+                            <?php echo get_string('essay_feedback:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </form>
+                    <small class="form-text text-muted">
+                        <?php echo get_string('essay_feedback:toggle_help', 'local_ai_course_assistant'); ?>
+                    </small>
+                    <?php if ($esson) { ?>
+                    <div class="mt-1">
+                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/essay_feedback.php',
+                                ['courseid' => $courseid]))->out(false); ?>"
+                           class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <?php echo get_string('essay_feedback:link', 'local_ai_course_assistant'); ?> &rarr;
+                        </a>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+
             <?php // v3.9.23: Worked examples starter toggle (per-course). ?>
             <div class="form-group row mt-2">
                 <label class="col-sm-3 col-form-label">

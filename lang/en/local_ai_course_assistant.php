@@ -941,6 +941,32 @@ $string['worked_examples:toggle']     = 'Enable Worked Examples starter for this
 $string['worked_examples:toggle_help']= 'Adds a "Show me a worked example" starter that asks the assistant to walk through a fully solved example, then guide the learner through similar problems with progressively less scaffolding (worked → partial → blank).';
 $string['worked_examples:starter']    = 'Show me a worked example';
 
+// Prerequisite gap detection (v3.9.24).
+$string['objectives:prereqs_label']   = 'prerequisites';
+$string['objectives:prereqs_summary'] = 'Prerequisites: {$a}';
+$string['objectives:prereqs_none']    = 'none yet — click to edit';
+
+// Essay feedback (v3.9.25).
+$string['essay_feedback:title']        = 'Essay feedback';
+$string['essay_feedback:link']         = 'Essay feedback';
+$string['essay_feedback:disabled']     = 'Essay feedback is not enabled for this course.';
+$string['essay_feedback:intro']        = 'Paste your draft below and the assistant will score it against a rubric and suggest three concrete revisions. Aim for at least 80 words. Your essay text is only used for this feedback run — it is not saved.';
+$string['essay_feedback:rubric_label'] = 'Rubric (optional)';
+$string['essay_feedback:rubric_help']  = 'Paste a rubric as a bulleted list of criteria, or leave blank to use a default four-criterion rubric (thesis, evidence, organisation, mechanics).';
+$string['essay_feedback:essay_label']  = 'Your essay draft';
+$string['essay_feedback:submit']       = 'Get feedback';
+$string['essay_feedback:scoring']      = 'Scoring your draft…';
+$string['essay_feedback:too_short']    = 'Please paste at least 80 words so the assistant has something to score.';
+$string['essay_feedback:error']        = 'Could not score this draft right now. Try again in a moment.';
+$string['essay_feedback:result_heading'] = 'Rubric scores';
+$string['essay_feedback:overall_heading']= 'Overall';
+$string['essay_feedback:revisions_heading'] = 'Top 3 revision suggestions';
+$string['essay_feedback:col_criterion']= 'Criterion';
+$string['essay_feedback:col_score']    = 'Score';
+$string['essay_feedback:col_feedback'] = 'Feedback';
+$string['essay_feedback:toggle']       = 'Enable Essay feedback for this course';
+$string['essay_feedback:toggle_help']  = 'Learners get a dedicated page to paste a draft and receive rubric-scored feedback with revision suggestions. Off by default.';
+
 // Mastery admin settings (v3.9.17).
 $string['settings:mastery_heading']              = 'Mastery tracking';
 $string['settings:mastery_heading_desc']         = 'Opt-in per-course feature that tags quiz answers and assistant conversation turns against the course\'s learning objectives, then feeds a compact mastery snapshot back into the system prompt to steer questioning. Subtle by default: learners see nothing unless the per-course chip toggle is on.';
