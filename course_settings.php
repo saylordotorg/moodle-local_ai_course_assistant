@@ -477,6 +477,45 @@ echo html_writer::div(
                 </div>
             </div>
 
+            <?php // v3.9.26: Python code sandbox toggle (per-course). ?>
+            <div class="form-group row mt-2">
+                <label class="col-sm-3 col-form-label">
+                    <?php echo get_string('sandbox:title', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <?php
+                    $sbon = (bool) get_config('local_ai_course_assistant', 'code_sandbox_enabled_course_' . $courseid);
+                    if (data_submitted() && optional_param('save_sandbox', 0, PARAM_INT) && confirm_sesskey()) {
+                        $sbon = (bool) optional_param('sandbox_on', 0, PARAM_BOOL);
+                        set_config('code_sandbox_enabled_course_' . $courseid,
+                            $sbon ? 1 : 0, 'local_ai_course_assistant');
+                    }
+                    ?>
+                    <form method="post" action="" style="display:inline">
+                        <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>" />
+                        <input type="hidden" name="save_sandbox" value="1" />
+                        <label class="mb-0">
+                            <input type="checkbox" name="sandbox_on" value="1"
+                                <?php echo $sbon ? 'checked' : ''; ?>
+                                onchange="this.form.submit()" />
+                            <?php echo get_string('sandbox:toggle', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </form>
+                    <small class="form-text text-muted">
+                        <?php echo get_string('sandbox:toggle_help', 'local_ai_course_assistant'); ?>
+                    </small>
+                    <?php if ($sbon) { ?>
+                    <div class="mt-1">
+                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/sandbox.php',
+                                ['courseid' => $courseid]))->out(false); ?>"
+                           class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <?php echo get_string('sandbox:link', 'local_ai_course_assistant'); ?> &rarr;
+                        </a>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+
             <?php // v3.9.25: Essay feedback toggle (per-course). ?>
             <div class="form-group row mt-2">
                 <label class="col-sm-3 col-form-label">

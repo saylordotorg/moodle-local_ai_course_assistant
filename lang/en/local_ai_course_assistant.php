@@ -967,6 +967,23 @@ $string['essay_feedback:col_feedback'] = 'Feedback';
 $string['essay_feedback:toggle']       = 'Enable Essay feedback for this course';
 $string['essay_feedback:toggle_help']  = 'Learners get a dedicated page to paste a draft and receive rubric-scored feedback with revision suggestions. Off by default.';
 
+// Code sandbox (v3.9.26).
+$string['sandbox:title']           = 'Python sandbox';
+$string['sandbox:link']            = 'Python sandbox';
+$string['sandbox:disabled']        = 'The Python sandbox is not enabled for this course.';
+$string['sandbox:intro']           = 'Write and run Python entirely in your browser. The runtime is Pyodide (Python compiled to WebAssembly); your code never leaves this device. Use it to try ideas, work through course exercises, or check small scripts before submitting them.';
+$string['sandbox:loading']         = 'Loading the Python runtime — this is a one-time download of about 10 MB. Future runs will be instant.';
+$string['sandbox:ready']           = 'Ready. Write some code and click Run.';
+$string['sandbox:load_error']      = 'Could not load the Python runtime. Check your network connection and refresh.';
+$string['sandbox:code_label']      = 'Code';
+$string['sandbox:run']             = 'Run';
+$string['sandbox:running']         = 'Running…';
+$string['sandbox:clear']           = 'Clear output';
+$string['sandbox:output_heading']  = 'Output';
+$string['sandbox:privacy_note']    = 'Code and output stay in your browser. Nothing is sent to any server. The runtime is loaded from a public CDN the first time only and is cached for subsequent visits.';
+$string['sandbox:toggle']          = 'Enable the Python sandbox for this course';
+$string['sandbox:toggle_help']     = 'Adds a learner-facing page where students can write and run Python entirely in their browser via Pyodide. Off by default. Enable for courses with code work; leave off for courses without.';
+
 // Mastery admin settings (v3.9.17).
 $string['settings:mastery_heading']              = 'Mastery tracking';
 $string['settings:mastery_heading_desc']         = 'Opt-in per-course feature that tags quiz answers and assistant conversation turns against the course\'s learning objectives, then feeds a compact mastery snapshot back into the system prompt to steer questioning. Subtle by default: learners see nothing unless the per-course chip toggle is on.';
