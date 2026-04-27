@@ -39,6 +39,8 @@ class guard {
     /**
      * Run every registered validator and return all results.
      *
+     * @param string $output AI-generated text to validate.
+     * @param array $context Optional context (input, userid, courseid, rag_chunks).
      * @return result[]
      */
     public function check(string $output, array $context = []): array {
@@ -52,6 +54,10 @@ class guard {
     /**
      * Run validators in order, returning the first hard fail. Returns
      * null when every validator passes (warns are not blocking).
+     *
+     * @param string $output AI-generated text to validate.
+     * @param array $context Optional context (input, userid, courseid, rag_chunks).
+     * @return result|null
      */
     public function check_strict(string $output, array $context = []): ?result {
         foreach ($this->validators as $validator) {
