@@ -573,9 +573,11 @@ $string['admin:vendor_dpa:title'] = '{$a} — Vendor DPA status';
 $string['admin:vendor_dpa:intro'] = 'Training opt-out, DPA, and retention posture for every AI provider driver. Use this to decide which drivers to enable on your site. Tier 2 and higher routing requires a signed DPA and a contractual training opt-out.';
 $string['admin:vendor_dpa:maintenance_note'] = 'This table is maintained in classes/vendor_registry.php. Update it when a vendor ToS change lands.';
 
-// White-label contact points (v3.9.15).
+// White-label contact points (v3.9.15, contact_email added v4.1.9).
+$string['settings:contact_email'] = 'Contact email';
+$string['settings:contact_email_desc'] = 'General contact email shown on the learner facing privacy notice under "Contact". Defaults to contact@saylor.org. Leave empty to hide the line. Rebranded installs should point this at their own support address.';
 $string['settings:dpo_email'] = 'Data Protection Officer email';
-$string['settings:dpo_email_desc'] = 'Contact email shown on the learner facing privacy notice under "Contact". Leave empty to hide the line. Rebranded installs should point this at their own DPO.';
+$string['settings:dpo_email_desc'] = 'Optional Data Protection Officer email. Retained for installs that want a dedicated DPO line in addition to the general contact email; the bundled privacy notice surfaces the contact email by default.';
 $string['settings:privacy_external_url'] = 'Institution privacy page URL';
 $string['settings:privacy_external_url_desc'] = 'Link to the institution level privacy page, shown on the learner facing privacy notice under "Contact". Leave empty to hide the line.';
 

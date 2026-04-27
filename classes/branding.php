@@ -78,8 +78,21 @@ class branding {
     }
 
     /**
-     * Data Protection Officer contact email surfaced in the privacy notice.
-     * Operators who do not set this see a neutral placeholder.
+     * General contact email for the institution, surfaced on the privacy
+     * notice's Contact section. Replaces the dedicated DPO email line for
+     * institutions that route privacy questions through general support.
+     */
+    public static function contact_email(): string {
+        $v = get_config('local_ai_course_assistant', 'contact_email');
+        return $v !== false && $v !== '' ? $v : 'contact@saylor.org';
+    }
+
+    /**
+     * Data Protection Officer contact email. Retained for backward
+     * compatibility (was the canonical contact in v3.9.15-v4.1.8). The
+     * default privacy notice now uses {@see contact_email()} instead;
+     * this remains available for installations that want to surface a
+     * separate DPO line via a custom override.
      */
     public static function dpo_email(): string {
         $v = get_config('local_ai_course_assistant', 'dpo_email');
@@ -91,7 +104,7 @@ class branding {
      */
     public static function privacy_external_url(): string {
         $v = get_config('local_ai_course_assistant', 'privacy_external_url');
-        return $v !== false && $v !== '' ? $v : 'https://www.saylor.org/privacy';
+        return $v !== false && $v !== '' ? $v : 'https://www.saylor.org/privacy-policy/';
     }
 
     /**

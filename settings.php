@@ -1439,6 +1439,13 @@ if ($hassiteconfig) {
 
     // v3.9.15: white-label contact points surfaced on the privacy notice.
     $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/contact_email',
+        get_string('settings:contact_email', 'local_ai_course_assistant'),
+        get_string('settings:contact_email_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_EMAIL
+    ));
+    $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/dpo_email',
         get_string('settings:dpo_email', 'local_ai_course_assistant'),
         get_string('settings:dpo_email_desc', 'local_ai_course_assistant'),
