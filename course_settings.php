@@ -445,20 +445,25 @@ echo html_writer::div(
             $digeston   = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
             ?>
 
-            <?php // v3.9.20: Socratic mode toggle. ?>
+            <?php // v3.9.20: Socratic mode toggle. v4.1.3: bare-checkbox markup
+            // (no form-check form-switch wrapper) — Tomi's known-working "no
+            // CSS" version. The form-switch wrapper triggers a double-toggle on
+            // installs without smartedu: our pointerdown handler flips the
+            // input, then the form-check-label's natural click action dispatches
+            // a synthetic click on the input which flips it back. Removing the
+            // wrapper drops the pill UI but restores reliable click-to-toggle.
+            // Keep the aica-toggle class so the smartedu-bypass JS still binds. ?>
             <div class="form-group row mt-3">
-                <label class="col-sm-3 col-form-label">
+                <label class="col-sm-3 col-form-label" for="aica-socratic-mode">
                     <?php echo get_string('socratic:title', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input aica-toggle" type="checkbox" role="switch"
-                               id="aica-socratic-mode" name="socratic_mode" value="1"
-                               <?php echo $socraticon ? 'checked' : ''; ?>>
-                        <label class="form-check-label" for="aica-socratic-mode">
-                            <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
-                        </label>
-                    </div>
+                    <input class="aica-toggle" type="checkbox"
+                           id="aica-socratic-mode" name="socratic_mode" value="1"
+                           <?php echo $socraticon ? 'checked' : ''; ?>>
+                    <label for="aica-socratic-mode" class="ml-2">
+                        <?php echo get_string('socratic:toggle', 'local_ai_course_assistant'); ?>
+                    </label>
                     <small class="form-text text-muted">
                         <?php echo get_string('socratic:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
