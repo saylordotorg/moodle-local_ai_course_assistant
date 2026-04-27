@@ -99,6 +99,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_get_next_best_action' => [
+        'classname' => \local_ai_course_assistant\external\get_next_best_action::class,
+        'description' => 'Structured next-best-action recommendations for a learner on a course (v4.1 / F1).',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
+    'local_ai_course_assistant_get_active_learners' => [
+        'classname' => \local_ai_course_assistant\external\get_active_learners::class,
+        'description' => 'Aggregate count of other learners active on the course in the last 15 minutes (v4.1 / F3).',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
     'local_ai_course_assistant_generate_quiz' => [
         'classname'    => \local_ai_course_assistant\external\generate_quiz::class,
         'description'  => 'Generate a practice quiz for a course.',

@@ -452,6 +452,16 @@
         </div>
         {{/showdigestoptin}}
 
+        {{! v4.1/F3 — Active-learners-online indicator. Empty by default;
+            chat.js polls get_active_learners and writes the count line
+            when ≥2 other learners are active, otherwise leaves it empty. }}
+        <div class="aica-active-learners" aria-live="polite" hidden
+             style="margin:0 0 10px;padding:6px 10px;background:#f0fdf4;border:1px solid #bbf7d0;
+                    border-radius:6px;font-size:12px;color:#166534;display:flex;align-items:center;gap:8px">
+            <span aria-hidden="true">●</span>
+            <span class="aica-active-learners__text"></span>
+        </div>
+
         {{! Conversation starters — hidden once a message is sent }}
         <div class="local-ai-course-assistant__starters"
              role="group"

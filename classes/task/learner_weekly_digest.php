@@ -17,6 +17,8 @@
 namespace local_ai_course_assistant\task;
 
 use local_ai_course_assistant\objective_manager;
+use local_ai_course_assistant\next_best_action;
+use local_ai_course_assistant\digest_unsubscribe_token;
 use local_ai_course_assistant\branding;
 
 /**
@@ -93,8 +95,12 @@ class learner_weekly_digest extends \core\task\scheduled_task {
                     $skipped++;
                     continue;
                 }
-                $weak = objective_manager::get_weak_objectives($userid, $courseid, 3);
-                if (empty($weak)) {
+                // v4.1 / F1 — single-source-of-truth recommendations. The
+                // chat focus-next starter and any third-party integration
+                // consume the same shape, so what learners see in the email
+                // matches what they see in chat.
+                $recs = next_best_action::recommend($userid, $courseid, 3);
+                if (empty($recs)) {
                     // Nothing to nudge about this week — silent skip is the
                     // right call for a "weekly recap" tone. Sending an empty
                     // email teaches the learner to ignore the channel.
@@ -110,8 +116,23 @@ class learner_weekly_digest extends \core\task\scheduled_task {
                         'course'  => $course->fullname,
                     ]
                 );
-                $text = $this->render_text($course, $user, $weak);
-                $html = $this->render_html($course, $user, $weak);
+                $text = $this->render_text($course, $user, $recs);
+                $html = $this->render_html($course, $user, $recs);
+
+                // v4.1 / F2 — one-click unsubscribe.
+                // Email body link is set up in render_text/render_html below.
+                // Mail-client-native button comes from the List-Unsubscribe and
+                // List-Unsubscribe-Post headers. Gmail and Outlook show a
+                // single "Unsubscribe" button next to the sender when these
+                // are present, and POST `List-Unsubscribe=One-Click` to our
+                // public endpoint. RFC 8058.
+                $unsuburl = digest_unsubscribe_token::url($userid, $courseid);
+                $extraheaders = [
+                    'List-Unsubscribe: <' . $unsuburl . '>',
+                    'List-Unsubscribe-Post: List-Unsubscribe=One-Click',
+                ];
+                // email_to_user accepts custom headers via $user->customheaders.
+                $user->customheaders = $extraheaders;
 
                 email_to_user($user, $supportuser, $subject, $text, $html);
                 $sent++;
@@ -123,17 +144,19 @@ class learner_weekly_digest extends \core\task\scheduled_task {
     }
 
     /**
-     * Plain-text email body.
+     * Plain-text email body. v4.1 / F1 — consumes structured recommendations
+     * from next_best_action so the email and the chat focus-next starter
+     * share one data shape.
      *
      * @param \stdClass $course
      * @param \stdClass $user
-     * @param array $weak Weakest-objectives rows from objective_manager::get_weak_objectives.
+     * @param array $recs Recommendations from next_best_action::recommend().
      * @return string
      */
-    protected function render_text(\stdClass $course, \stdClass $user, array $weak): string {
+    protected function render_text(\stdClass $course, \stdClass $user, array $recs): string {
         $product = branding::short_name();
         $courseurl = (new \moodle_url('/course/view.php', ['id' => $course->id]))->out(false);
-        $prefurl   = (new \moodle_url('/local/ai_course_assistant/settings_user.php'))->out(false);
+        $unsuburl  = digest_unsubscribe_token::url((int) $user->id, (int) $course->id);
 
         $lines = [];
         $lines[] = 'Hi ' . trim($user->firstname) . ',';
@@ -142,51 +165,53 @@ class learner_weekly_digest extends \core\task\scheduled_task {
         $lines[] = '';
         $lines[] = 'Based on your progress so far, here is what I would focus on this week:';
         $lines[] = '';
-        foreach ($weak as $row) {
-            $obj = $row['objective'];
-            $st = $row['mastery']['status'];
-            $label = $obj->code ? "[{$obj->code}] {$obj->title}" : $obj->title;
-            $verb = ($st === 'not_started') ? 'Get started on' : 'Build on what you have';
-            $lines[] = '  - ' . $label;
-            $lines[] = '    ' . $verb . '. Open ' . $product . ' on the course and ask "help me with ' . $obj->title . '".';
+        foreach ($recs as $r) {
+            $lines[] = '  - ' . $r['title'];
+            $lines[] = '    ' . $r['suggestion'];
+            if (!empty($r['moduleurl'])) {
+                $lines[] = '    Module: ' . $r['moduleurl'];
+            }
         }
         $lines[] = '';
         $lines[] = 'Open the course: ' . $courseurl;
         $lines[] = '';
-        $lines[] = 'Manage these emails (or unsubscribe): ' . $prefurl;
+        $lines[] = 'Unsubscribe (one click): ' . $unsuburl;
         $lines[] = '';
         $lines[] = '— ' . $product;
         return implode("\n", $lines);
     }
 
     /**
-     * HTML email body.
+     * HTML email body. Consumes the same structured recommendations as the
+     * text version.
      *
      * @param \stdClass $course
      * @param \stdClass $user
-     * @param array $weak
+     * @param array $recs
      * @return string
      */
-    protected function render_html(\stdClass $course, \stdClass $user, array $weak): string {
+    protected function render_html(\stdClass $course, \stdClass $user, array $recs): string {
         $product = s(branding::short_name());
         $coursename = s($course->fullname);
         $firstname = s(trim($user->firstname));
         $courseurl = (new \moodle_url('/course/view.php', ['id' => $course->id]))->out(false);
-        $prefurl   = (new \moodle_url('/local/ai_course_assistant/settings_user.php'))->out(false);
+        $unsuburl  = digest_unsubscribe_token::url((int) $user->id, (int) $course->id);
 
         $html  = '<div style="font-family:Helvetica,Arial,sans-serif;line-height:1.5;color:#1f2937;max-width:560px">';
         $html .= '<p style="margin:0 0 12px">Hi ' . $firstname . ',</p>';
         $html .= '<p style="margin:0 0 12px">Quick weekly check-in for <strong>' . $coursename . '</strong>.</p>';
         $html .= '<p style="margin:0 0 6px">Based on your progress so far, here is what I would focus on this week:</p>';
         $html .= '<ul style="padding-left:20px;margin:0 0 18px">';
-        foreach ($weak as $row) {
-            $obj = $row['objective'];
-            $st = $row['mastery']['status'];
-            $label = $obj->code ? '[' . s($obj->code) . '] ' . s($obj->title) : s($obj->title);
-            $verb = ($st === 'not_started') ? 'Get started on this' : 'Build on what you have';
-            $hint = 'Open ' . $product . ' on the course and ask &ldquo;help me with ' . s($obj->title) . '&rdquo;.';
-            $html .= '<li style="margin-bottom:10px"><strong>' . $label . '</strong><br>'
-                . '<span style="color:#4b5563">' . $verb . '. ' . $hint . '</span></li>';
+        foreach ($recs as $r) {
+            $title = s((string) $r['title']);
+            $suggestion = s((string) $r['suggestion']);
+            $extra = '';
+            if (!empty($r['moduleurl']) && !empty($r['modulename'])) {
+                $extra = '<br><a href="' . s($r['moduleurl']) . '" style="color:#1f2937">'
+                    . s((string) $r['modulename']) . '</a>';
+            }
+            $html .= '<li style="margin-bottom:10px"><strong>' . $title . '</strong><br>'
+                . '<span style="color:#4b5563">' . $suggestion . '</span>' . $extra . '</li>';
         }
         $html .= '</ul>';
         $html .= '<p style="margin:0 0 14px">'
@@ -194,7 +219,7 @@ class learner_weekly_digest extends \core\task\scheduled_task {
             . '</p>';
         $html .= '<p style="margin:18px 0 0;color:#9ca3af;font-size:12px">'
             . 'You are receiving this because you opted in to weekly progress emails for this course. '
-            . '<a href="' . $prefurl . '" style="color:#9ca3af">Manage these emails</a>.'
+            . '<a href="' . $unsuburl . '" style="color:#9ca3af">Unsubscribe with one click</a>.'
             . '</p>';
         $html .= '<p style="margin:8px 0 0;color:#9ca3af;font-size:12px">— ' . $product . '</p>';
         $html .= '</div>';

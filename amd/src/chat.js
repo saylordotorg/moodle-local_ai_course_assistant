@@ -1799,6 +1799,60 @@ define([
             });
         }
 
+        // v4.1 / F3 — Active-learners-online indicator. Polls every 60s while
+        // the tab is visible. Renders "N others studying right now" only
+        // when N >= 2. Below that it stays hidden — a "0 others" badge would
+        // make a learner feel more alone, not less.
+        if (els.root) {
+            const poller = (function() {
+                const box = els.root.querySelector('.aica-active-learners');
+                const text = box ? box.querySelector('.aica-active-learners__text') : null;
+                if (!box || !text) {
+                    return null;
+                }
+                let timer = null;
+                const refresh = function() {
+                    Repo.getActiveLearners(courseId)
+                        .then(function(res) {
+                            const n = res && res.count ? parseInt(res.count, 10) : 0;
+                            if (n >= 2) {
+                                Str.get_string('active_learners:line',
+                                    'local_ai_course_assistant', n).then(function(line) {
+                                    text.textContent = line;
+                                    box.hidden = false;
+                                });
+                            } else {
+                                box.hidden = true;
+                            }
+                        })
+                        .catch(function() { /* silent — indicator stays hidden */ });
+                };
+                const start = function() {
+                    if (timer) { return; }
+                    refresh();
+                    timer = setInterval(refresh, 60000);
+                };
+                const stop = function() {
+                    if (timer) { clearInterval(timer); timer = null; }
+                };
+                document.addEventListener('visibilitychange', function() {
+                    if (document.visibilityState === 'hidden') { stop(); }
+                    else { start(); }
+                });
+                start();
+                return {refresh: refresh};
+            })();
+            // Keep reference so refresh fires when drawer reopens — feels more
+            // alive than waiting for the next poll tick.
+            if (poller) {
+                if (els.toggle) {
+                    els.toggle.addEventListener('click', function() {
+                        setTimeout(poller.refresh, 100);
+                    });
+                }
+            }
+        }
+
         // v4.0 / M3 — Soft opt-in for the weekly mastery digest.
         // Two chips ("Yes, send me" / "No thanks") record the choice via
         // Repo.setDigestOptin and hide the banner. Once dismissed, the
@@ -2015,6 +2069,49 @@ define([
 
         if (starterKey === 'quick-study') {
             handleQuickStudy();
+            return;
+        }
+
+        // v4.1 / F1 — focus-next starter renders structured recommendations
+        // straight from the get_next_best_action external. No LLM round-trip.
+        // The same data drives the weekly digest email so chat and email
+        // surfaces stay in lockstep.
+        if (starterKey === 'focus-next') {
+            UI.appendMessage('user', 'What should I focus on?');
+            UI.showTypingIndicator();
+            Repo.getNextBestAction(courseId, 3)
+                .then(function(res) {
+                    UI.hideTypingIndicator();
+                    if (!res || !res.recommendations || !res.recommendations.length) {
+                        Str.get_string('next_best_action:empty_state',
+                            'local_ai_course_assistant').then(function(empty) {
+                            UI.appendMessage('assistant', empty);
+                        });
+                        return;
+                    }
+                    var lines = [];
+                    Str.get_string('next_best_action:header',
+                        'local_ai_course_assistant',
+                        res.recommendations.length).then(function(header) {
+                        lines.push(header);
+                        lines.push('');
+                        res.recommendations.forEach(function(r) {
+                            lines.push('**' + r.title + '**');
+                            var line = r.suggestion;
+                            if (r.moduleurl && r.modulename) {
+                                line += ' [' + r.modulename + '](' + r.moduleurl + ')';
+                            }
+                            lines.push(line);
+                            lines.push('');
+                        });
+                        UI.appendMessage('assistant', lines.join('\n'));
+                    });
+                })
+                .catch(function() {
+                    UI.hideTypingIndicator();
+                    UI.appendMessage('assistant',
+                        'I could not pull your progress data right now. Try again later, or just type a question.');
+                });
             return;
         }
 

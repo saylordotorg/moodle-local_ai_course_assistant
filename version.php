@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026042701;
+$plugin->version = 2026042702;
 $plugin->requires = 2024100700; // Moodle 4.5+.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.0.0';
+$plugin->release = '4.1.0';

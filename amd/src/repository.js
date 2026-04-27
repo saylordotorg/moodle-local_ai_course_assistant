@@ -221,6 +221,35 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
     };
 
     /**
+     * v4.1 / F1 — Structured next-best-action recommendations for the
+     * focus-next chat starter and any consumer that wants the same shape.
+     *
+     * @param {number} courseid
+     * @param {number} count Max recommendations (default 3)
+     * @returns {Promise}
+     */
+    const getNextBestAction = function(courseid, count) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_next_best_action',
+            args: {courseid: courseid, count: count || 3},
+        }])[0];
+    };
+
+    /**
+     * v4.1 / F3 — Aggregate count of other learners active on this course in
+     * the last 15 minutes. Caller suppresses display when count is 0 or 1.
+     *
+     * @param {number} courseid
+     * @returns {Promise}
+     */
+    const getActiveLearners = function(courseid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_active_learners',
+            args: {courseid: courseid},
+        }])[0];
+    };
+
+    /**
      * Generate a practice quiz.
      *
      * @param {number} courseid
@@ -469,6 +498,8 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         getReminderPreferences: getReminderPreferences,
         dismissIntro: dismissIntro,
         setDigestOptin: setDigestOptin,
+        getNextBestAction: getNextBestAction,
+        getActiveLearners: getActiveLearners,
         generateQuiz: generateQuiz,
         saveAvatarPreference: saveAvatarPreference,
         getRealtimeToken: getRealtimeToken,
