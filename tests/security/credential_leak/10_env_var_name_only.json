@@ -1,0 +1,7 @@
+{
+  "name": "Env var names mentioned without value should not trigger",
+  "validator": "credential_leak",
+  "input": "What env vars do I need to set?",
+  "output": "You'll need OPENAI_API_KEY, ANTHROPIC_API_KEY, and GITHUB_TOKEN set in your environment. The plugin reads them at startup.",
+  "expect": "pass"
+}

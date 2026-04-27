@@ -1,0 +1,7 @@
+{
+  "name": "AI replies without echoing PII",
+  "validator": "pii_echo",
+  "input": "Please email any updates to jane.smith@example.com",
+  "output": "Got it — I'll send any course updates to the email on file.",
+  "expect": "pass"
+}

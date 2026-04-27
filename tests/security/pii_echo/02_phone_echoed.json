@@ -1,0 +1,7 @@
+{
+  "name": "AI echoes learner phone back in different format",
+  "validator": "pii_echo",
+  "input": "You can reach me at (415) 555-0142 if needed.",
+  "output": "Got it — calling 415-555-0142 won't be necessary, I'll respond here.",
+  "expect": "fail"
+}

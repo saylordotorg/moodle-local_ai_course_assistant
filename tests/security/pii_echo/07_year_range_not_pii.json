@@ -1,0 +1,7 @@
+{
+  "name": "Calendar years and ordinary numerics must not trigger detectors",
+  "validator": "pii_echo",
+  "input": "When did the industrial revolution end?",
+  "output": "Most historians put the British industrial revolution as winding down between 1840 and 1860, with effects rippling into the 1900s.",
+  "expect": "pass"
+}

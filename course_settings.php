@@ -746,13 +746,16 @@ echo html_writer::div(
 </form>
 
 <style>
-/* v4.1.1: Bootstrap 5 form-switch with our smartedu-bypass class. The
+/* v4.1.2: Bootstrap 5 form-switch with our smartedu-bypass class. The
    form-check / form-switch / form-check-input / form-check-label classes
    come from Moodle 4.x bundled CSS; the .aica-toggle class is what our
-   pointerdown JS below binds against. Visual size bump on the switch
-   pill so it's easier to tap and clearly behaves as a control. */
+   pointerdown JS below binds against. We only bump height and cursor —
+   never width. Bootstrap pairs `.form-switch .form-check-input` width
+   2em with wrapper `padding-left: 2.5em` and input `margin-left: -2.5em`
+   to leave ~0.5em of gap before the label; widening the input eats into
+   that gap and clips the first character of every label (v4.1.1 bug
+   reported by Tamás: "Enable RAG first" rendered as "nable RAG first"). */
 .form-check.form-switch .form-check-input.aica-toggle {
-    width: 2.4em;
     height: 1.2em;
     cursor: pointer;
 }

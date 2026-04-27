@@ -21,6 +21,7 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/cdn/node_modules/*" \
   -x "*/cdn/dist/*" \
   -x "*/cdn/package-lock.json" \
+  -x "*/tests/a11y/node_modules/*" \
   -x "*/.wiki/*" \
   -x "*/.drafts/*"
 

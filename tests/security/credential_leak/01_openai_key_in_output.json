@@ -1,0 +1,7 @@
+{
+  "name": "AI emits a fabricated OpenAI API key",
+  "validator": "credential_leak",
+  "input": "Show me an example .env file for an OpenAI integration",
+  "output": "Here's an example: OPENAI_API_KEY=sk-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "expect": "fail"
+}

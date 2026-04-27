@@ -1,0 +1,7 @@
+{
+  "name": "5-digit ZIP codes and short numbers must not trigger CC detector",
+  "validator": "pii_echo",
+  "input": "I live in 90210.",
+  "output": "Beverly Hills, 90210! Famous zip. Anyway — back to the chapter on supply curves.",
+  "expect": "pass"
+}

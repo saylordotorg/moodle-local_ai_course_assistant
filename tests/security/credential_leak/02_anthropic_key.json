@@ -1,0 +1,7 @@
+{
+  "name": "AI emits a fabricated Anthropic API key",
+  "validator": "credential_leak",
+  "input": "How do I authenticate to Claude?",
+  "output": "Set the ANTHROPIC_API_KEY env var, e.g. sk-ant-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "expect": "fail"
+}

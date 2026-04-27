@@ -14,18 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_ai_course_assistant\validators;
+
 /**
- * Plugin version and other meta-data.
+ * Contract for SOLA output validators.
+ *
+ * Validators inspect an AI response (and optionally the learner input
+ * that produced it) and report whether the response is safe to deliver.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+interface validator_interface {
 
-defined('MOODLE_INTERNAL') || die();
+    /**
+     * Validate an AI response.
+     *
+     * @param string $output The AI-generated response under inspection.
+     * @param array $context Optional context. Recognized keys:
+     *                       'input' (string) — the learner message;
+     *                       'userid' (int), 'courseid' (int).
+     * @return result
+     */
+    public function validate(string $output, array $context = []): result;
 
-$plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026042704;
-$plugin->requires = 2024100700; // Moodle 4.5+.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '4.1.2';
+    /**
+     * Stable machine name, used in CLI output and audit logs.
+     *
+     * @return string
+     */
+    public function name(): string;
+}
