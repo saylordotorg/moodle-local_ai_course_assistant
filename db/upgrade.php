@@ -681,5 +681,20 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026042408, 'local', 'ai_course_assistant');
     }
 
+    // v4.0 / M5: optional objectiveid column on flashcards. When the card
+    // generator can match a card to a course objective, the SM-2 scheduler
+    // halves the next interval for cards whose objective is currently weak,
+    // surfacing them earlier than vanilla SM-2 would. Untagged cards (NULL)
+    // fall back to vanilla SM-2 — backwards-compatible.
+    if ($oldversion < 2026042700) {
+        $table = new xmldb_table('local_ai_course_assistant_flashcards');
+        $field = new xmldb_field('objectiveid', XMLDB_TYPE_INTEGER, '10', null, null, null, null,
+            'cmid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026042700, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

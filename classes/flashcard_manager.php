@@ -48,23 +48,39 @@ class flashcard_manager {
      * @param int    $userid
      * @param int    $courseid
      * @param int|null $cmid
-     * @param array  $cards Each: ['question' => str, 'answer' => str]
+     * @param array  $cards Each: ['question' => str, 'answer' => str, optional 'objectiveid' => int]
      * @return int[] Inserted ids.
      */
     public static function save_batch(int $userid, int $courseid, ?int $cmid, array $cards): array {
         global $DB;
         $now = time();
         $ids = [];
+
+        // v4.0 / M5: hallucinated objective ids from the LLM are dropped at
+        // the boundary so flashcard rows never reference stale objectives.
+        // Build the set of valid ids for this course once.
+        $validobjids = [];
+        if (objective_manager::is_enabled_for_course($courseid)) {
+            foreach (objective_manager::list_for_course($courseid) as $obj) {
+                $validobjids[(int) $obj->id] = true;
+            }
+        }
+
         foreach ($cards as $card) {
             $q = trim((string) ($card['question'] ?? ''));
             $a = trim((string) ($card['answer'] ?? ''));
             if ($q === '' || $a === '') {
                 continue;
             }
+            $oid = isset($card['objectiveid']) ? (int) $card['objectiveid'] : 0;
+            if ($oid > 0 && !isset($validobjids[$oid])) {
+                $oid = 0;
+            }
             $row = (object) [
                 'userid'        => $userid,
                 'courseid'      => $courseid,
                 'cmid'          => $cmid,
+                'objectiveid'   => $oid > 0 ? $oid : null,
                 'question'      => $q,
                 'answer'        => $a,
                 'ease'          => 2.50,
@@ -142,7 +158,22 @@ class flashcard_manager {
                 else { $iv = (int) ceil($prev * ($newease + 0.15)); }
             }
             $card->repetitions = $newrep;
-            $card->interval_days = max(1, $iv);
+
+            // v4.0 / M5: mastery-aware scheduling. When the card is tagged to
+            // a course objective AND the learner's current mastery on that
+            // objective is weak (learning or not_started) AND mastery is
+            // enabled for the course, halve the next interval so the card
+            // re-surfaces sooner than vanilla SM-2 would schedule it.
+            // Untagged cards (objectiveid IS NULL) keep vanilla SM-2.
+            $boost = false;
+            if (!empty($card->objectiveid)
+                && objective_manager::is_enabled_for_course((int) $card->courseid)) {
+                $m = objective_manager::compute_mastery((int) $userid, (int) $card->objectiveid);
+                if ($m['status'] !== 'mastered') {
+                    $boost = true;
+                }
+            }
+            $card->interval_days = max(1, $boost ? (int) ceil($iv / 2) : $iv);
             $card->ease = $newease;
             $card->next_review = $now + ($card->interval_days * 86400);
         }

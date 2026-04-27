@@ -425,6 +425,7 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Optional: course module the card was generated from"/>
+        <FIELD NAME="objectiveid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v4.0/M5: optional best-fit learning objective for adaptive scheduling"/>
         <FIELD NAME="question" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="answer" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="ease" TYPE="number" LENGTH="5" DECIMALS="2" NOTNULL="true" DEFAULT="2.50" SEQUENCE="false" COMMENT="SM-2 ease factor"/>

@@ -65,11 +65,41 @@ class generate_flashcards extends external_api {
             return ['success' => false, 'message' => 'no_page_content', 'cards' => []];
         }
 
+        // v4.0 / M5: when mastery is enabled and objectives exist on the
+        // course, ask the LLM to tag every card with the best-fit objective
+        // id. Hallucinated ids are dropped at the boundary inside
+        // flashcard_manager::save_batch. Falls back to untagged behaviour
+        // (NULL objectiveid → vanilla SM-2) when mastery is off or the
+        // course has no objectives — fully backwards-compatible.
+        $objectiveslist = '';
+        $tagobjectives = false;
+        if (\local_ai_course_assistant\objective_manager::is_enabled_for_course((int) $params['courseid'])) {
+            $objectives = \local_ai_course_assistant\objective_manager::list_for_course((int) $params['courseid']);
+            if (!empty($objectives)) {
+                $tagobjectives = true;
+                $lines = [];
+                foreach ($objectives as $obj) {
+                    $label = $obj->code ? "[{$obj->code}] " : '';
+                    $lines[] = (int) $obj->id . ': ' . $label . $obj->title;
+                }
+                $objectiveslist = "\n\n## Learning objectives (for tagging)\n"
+                    . "Each card MUST be tagged with the id of the single best-fit objective from this list. "
+                    . "Use exactly the numeric id shown (left of the colon), not the title:\n"
+                    . implode("\n", $lines);
+            }
+        }
+
         $sysprompt = "You generate study flashcards for a learner. "
             . "Read the source content and produce exactly {$count} concise question-and-answer pairs that capture the most important takeaways. "
             . "Question and answer must each be one or two sentences. Avoid trivia, dates, and direct quotes. "
+            . ($tagobjectives
+                ? "Each card MUST also include an `objectiveid` numeric tag from the list below. "
+                : '')
             . "Respond with raw JSON only, in this shape:\n"
-            . '{"cards":[{"question":"...","answer":"..."}, ...]}'
+            . ($tagobjectives
+                ? '{"cards":[{"question":"...","answer":"...","objectiveid":N}, ...]}'
+                : '{"cards":[{"question":"...","answer":"..."}, ...]}')
+            . $objectiveslist
             . "\n\nSOURCE:\n" . $content;
 
         try {
@@ -78,23 +108,7 @@ class generate_flashcards extends external_api {
                 $sysprompt,
                 [['role' => 'user', 'content' => "Generate the {$count} flashcards now."]],
                 [
-                    'response_schema' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'cards' => [
-                                'type' => 'array',
-                                'items' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'question' => ['type' => 'string'],
-                                        'answer'   => ['type' => 'string'],
-                                    ],
-                                    'required' => ['question', 'answer'],
-                                ],
-                            ],
-                        ],
-                        'required' => ['cards'],
-                    ],
+                    'response_schema' => self::build_response_schema($tagobjectives),
                 ]
             );
         } catch (\Throwable $e) {
@@ -127,6 +141,44 @@ class generate_flashcards extends external_api {
             ];
         }
         return ['success' => true, 'message' => 'ok', 'cards' => $cards];
+    }
+
+    /**
+     * Build the JSON response schema. When the course has objectives, every
+     * card is required to come back with an `objectiveid` so SM-2 scheduling
+     * can use the mastery-state nudge. Hallucinated ids drop at the boundary
+     * in flashcard_manager::save_batch.
+     *
+     * @param bool $tagobjectives True if objectives should be required on each card.
+     * @return array
+     */
+    private static function build_response_schema(bool $tagobjectives): array {
+        $cardprops = [
+            'question' => ['type' => 'string'],
+            'answer'   => ['type' => 'string'],
+        ];
+        $required = ['question', 'answer'];
+        if ($tagobjectives) {
+            $cardprops['objectiveid'] = [
+                'type' => 'integer',
+                'description' => 'id of the best-fit learning objective for this card',
+            ];
+            $required[] = 'objectiveid';
+        }
+        return [
+            'type' => 'object',
+            'properties' => [
+                'cards' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => $cardprops,
+                        'required' => $required,
+                    ],
+                ],
+            ],
+            'required' => ['cards'],
+        ];
     }
 
     public static function execute_returns(): external_single_structure {
