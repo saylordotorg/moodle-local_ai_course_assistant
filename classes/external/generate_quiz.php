@@ -41,12 +41,15 @@ class generate_quiz extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID'),
-            'count'    => new external_value(PARAM_INT, 'Number of questions (3-10)', VALUE_DEFAULT, 3),
-            'topic'    => new external_value(PARAM_TEXT,
+            'courseid'   => new external_value(PARAM_INT, 'Course ID'),
+            'count'      => new external_value(PARAM_INT, 'Number of questions (3-10)', VALUE_DEFAULT, 3),
+            'topic'      => new external_value(PARAM_TEXT,
                 'Topic, __guided__ for AI-guided, __adaptive__ for mastery-targeted, or empty for current page.',
                 VALUE_DEFAULT, '__guided__'),
-            'cmid'     => new external_value(PARAM_INT, 'Current module/page ID (0 if not on a resource page)', VALUE_DEFAULT, 0),
+            'cmid'       => new external_value(PARAM_INT, 'Current module/page ID (0 if not on a resource page)', VALUE_DEFAULT, 0),
+            'difficulty' => new external_value(PARAM_ALPHA,
+                'Difficulty target: easy, medium, hard, or auto (mastery-aware) — defaults to medium',
+                VALUE_DEFAULT, 'medium'),
         ]);
     }
 
@@ -60,24 +63,29 @@ class generate_quiz extends external_api {
      * @param int $cmid Course module ID for current-page mode (0 if not applicable).
      * @return array Quiz data with success flag, error message, topic, and questions.
      */
-    public static function execute(int $courseid, int $count = 3, string $topic = '__guided__', int $cmid = 0): array {
+    public static function execute(int $courseid, int $count = 3, string $topic = '__guided__', int $cmid = 0, string $difficulty = 'medium'): array {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [
-            'courseid' => $courseid,
-            'count'    => $count,
-            'topic'    => $topic,
-            'cmid'     => $cmid,
+            'courseid'   => $courseid,
+            'count'      => $count,
+            'topic'      => $topic,
+            'cmid'       => $cmid,
+            'difficulty' => $difficulty,
         ]);
 
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
-        $courseid = (int) $params['courseid'];
-        $count    = max(1, min(10, (int) $params['count']));
-        $topic    = trim($params['topic']);
-        $cmid     = (int) $params['cmid'];
+        $courseid   = (int) $params['courseid'];
+        $count      = max(1, min(10, (int) $params['count']));
+        $topic      = trim($params['topic']);
+        $cmid       = (int) $params['cmid'];
+        $difficulty = strtolower(trim((string) $params['difficulty']));
+        if (!in_array($difficulty, ['easy', 'medium', 'hard', 'auto'], true)) {
+            $difficulty = 'medium';
+        }
         $userid   = (int) $USER->id;
 
         $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
@@ -133,7 +141,7 @@ class generate_quiz extends external_api {
                     "(weakest first). Make at least one question genuinely beginner-friendly so the learner " .
                     "can re-anchor on the basics; the rest can stretch toward applied scenarios. Do not include " .
                     "questions on objectives outside this list.\n\n" .
-                    self::get_quiz_format_instructions($count);
+                    self::get_quiz_format_instructions($count, $difficulty);
             } else {
                 // No mastery data — fall through to guided mode silently so
                 // the learner still gets a useful quiz instead of an error.
@@ -152,7 +160,7 @@ class generate_quiz extends external_api {
                 "## Recent student questions\n{$chatcontext}\n\n" .
                 "Analyse the grade data and chat history to identify areas where this student needs the most practice. " .
                 "Select the most beneficial topic(s) for a {$count}-question quiz focused on weak or under-explored areas.\n\n" .
-                self::get_quiz_format_instructions($count);
+                self::get_quiz_format_instructions($count, $difficulty);
         } else if ($topic !== '__adaptive__') {
             if (empty($topic) && $cmid > 0) {
                 // "Current page" mode: generate from the specific module's content.
@@ -163,14 +171,14 @@ class generate_quiz extends external_api {
                         "## Current Page Content\n{$pagecontent}\n\n" .
                         "Generate a {$count}-question multiple-choice quiz based on this specific page's content. " .
                         "Focus only on the key concepts presented on this page.\n\n" .
-                        self::get_quiz_format_instructions($count);
+                        self::get_quiz_format_instructions($count, $difficulty);
                 } else {
                     // Fallback: page content unavailable, use course topics.
                     $systemprompt =
                         "You are an expert educational quiz generator for the course \"{$course->fullname}\".\n\n" .
                         "Course topics:\n{$coursetopics}\n\n" .
                         "Generate a {$count}-question multiple-choice quiz on the current course content.\n\n" .
-                        self::get_quiz_format_instructions($count);
+                        self::get_quiz_format_instructions($count, $difficulty);
                 }
             } else {
                 $topictext = !empty($topic) ? $topic : 'the current course content';
@@ -178,7 +186,7 @@ class generate_quiz extends external_api {
                     "You are an expert educational quiz generator for the course \"{$course->fullname}\".\n\n" .
                     "Course topics:\n{$coursetopics}\n\n" .
                     "Generate a {$count}-question multiple-choice quiz on the topic: {$topictext}.\n\n" .
-                    self::get_quiz_format_instructions($count);
+                    self::get_quiz_format_instructions($count, $difficulty);
             }
         }
 
@@ -337,7 +345,8 @@ class generate_quiz extends external_api {
      * @param int $count Number of quiz questions to request.
      * @return string Prompt instructions for quiz generation.
      */
-    private static function get_quiz_format_instructions(int $count): string {
+    private static function get_quiz_format_instructions(int $count, string $difficulty = 'medium'): string {
+        $diffline = self::difficulty_instruction($difficulty);
         return <<<INSTRUCTIONS
 IMPORTANT: Return ONLY valid JSON wrapped in <quiz> tags. No other text before or after.
 Schema:
@@ -360,7 +369,37 @@ Requirements:
 - Each question has exactly 4 choices labelled A) B) C) D).
 - "correct" is one of: A, B, C, D.
 - "explanation" is 1–2 sentences explaining the correct answer.
+
+Quality rules (strict — apply to every question):
+- Every question MUST reference at least one specific concept, term, formula, or named entity drawn from the course material above. Generic textbook questions are not acceptable.
+- The four choices MUST be similar in length (within 25% of each other) and grammatical form. Do not let the correct answer stand out by being noticeably longer or more specific than the distractors.
+- Each distractor MUST reflect a plausible misconception, common mistake, or a near-miss restatement of the correct answer. Random or absurd distractors are not acceptable.
+- Do NOT include the choices "All of the above", "None of the above", or "Both A and B" as either correct answers or distractors.
+- Do NOT use absolute clue words ("always", "never", "exclusively", "obviously", "certainly", "the only") in either the question stem or the answer choices, since these telegraph correctness or wrongness.
+- Do NOT include the correct answer's exact phrasing inside the question stem.
+
+{$diffline}
 INSTRUCTIONS;
+    }
+
+    /**
+     * Return a one-line difficulty instruction for the quiz prompt.
+     *
+     * @param string $difficulty easy, medium, hard, or auto
+     * @return string
+     */
+    private static function difficulty_instruction(string $difficulty): string {
+        switch ($difficulty) {
+            case 'easy':
+                return "Difficulty target: EASY. Test recognition and definition recall. Question stems should be one or two sentences. Distractors should reflect close-but-incorrect definitions, not deep misconceptions.";
+            case 'hard':
+                return "Difficulty target: HARD. Test application, analysis, and edge cases (Bloom's apply/analyze level). Use multi-sentence scenarios that require selecting the best response among genuinely competing answers. Distractors should reflect sophisticated misconceptions an attentive learner might hold.";
+            case 'auto':
+                return "Difficulty target: AUTO. Calibrate per question to the learner's grade history and chat context above — easier on objectives the learner has not seen, harder on objectives the learner has already shown competence in.";
+            case 'medium':
+            default:
+                return "Difficulty target: MEDIUM. Test understanding and direct application (Bloom's understand/apply level). Question stems should be one or two sentences and ground in a specific course concept. Distractors should reflect common misunderstandings.";
+        }
     }
 
     /**

@@ -599,19 +599,32 @@ class context_builder {
      * @return string
      */
     private static function get_personalization_instructions(string $firstname): string {
-        $name = !empty($firstname) ? $firstname : 'the student';
+        $name = !empty($firstname) ? $firstname : 'the learner';
         return "\n\n## Personalization\n"
-            . "The student's first name is {$name}. Address them by name occasionally to make the "
-            . "interaction feel personal and warm — but don't overdo it.\n"
-            . "- If the student shares a preferred nickname, adopt it immediately and use it consistently "
+            . "The learner's first name is {$name}. **Always address the learner directly in the second person ("
+            . "\"you\", \"your\")**. Never refer to the learner in the third person (e.g., do not say \"the "
+            . "student\", \"the user\", \"learners\", or anything else that talks ABOUT the person you are "
+            . "talking TO). Mention their name occasionally to make the interaction feel personal and warm, but "
+            . "do not overdo it.\n\n"
+            . "Examples of WRONG language in this conversation:\n"
+            . "- \"The student should review chapter 3.\" -> WRONG. Say: \"You should review chapter 3.\"\n"
+            . "- \"Learners often confuse X and Y.\" -> WRONG when you mean THIS learner. Say: \"You may be "
+            . "confusing X and Y here.\"\n"
+            . "- \"It is recommended that {$name} try…\" -> WRONG. Say: \"I would suggest you try…\"\n\n"
+            . "Examples of CORRECT language:\n"
+            . "- \"You said earlier you found this confusing — let's go back to that.\"\n"
+            . "- \"Nice work, {$name}. Want to try a harder version?\"\n"
+            . "- \"What part of the prompt do you want to start with?\"\n\n"
+            . "Other personalization rules:\n"
+            . "- If the learner shares a preferred nickname, adopt it immediately and use it consistently "
             . "throughout the conversation. Politely decline nicknames that are offensive or inappropriate.\n"
-            . "- If the student uses inappropriate language or asks for off-topic, offensive, or harmful content, "
+            . "- If the learner uses inappropriate language or asks for off-topic, offensive, or harmful content, "
             . "gently redirect them back to course-related learning without lecturing or moralizing.\n"
             . "- Offer genuine encouragement and motivation: celebrate effort and progress, acknowledge when "
-            . "something is genuinely challenging, and remind students that persistence leads to mastery.\n"
-            . "- Look for natural opportunities to coach students on effective AI usage aligned with course "
+            . "something is genuinely challenging, and remind the learner that persistence leads to mastery.\n"
+            . "- Look for natural opportunities to coach the learner on effective AI usage aligned with course "
             . "and unit outcomes — for example, suggesting how they might use AI tools in assignments, "
-            . "projects, presentations, or to generate their own practice questions on topics they're studying.";
+            . "projects, presentations, or to generate their own practice questions on topics they are studying.";
     }
 
     /**

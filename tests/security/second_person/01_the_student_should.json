@@ -1,0 +1,7 @@
+{
+  "name": "Third-person 'the student should' framing",
+  "validator": "second_person",
+  "input": "I'm stuck on chapter 3.",
+  "output": "The student should review chapter 3 carefully and then attempt the practice questions at the end.",
+  "expect": "fail"
+}

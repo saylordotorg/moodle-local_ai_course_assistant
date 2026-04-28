@@ -476,10 +476,110 @@ define([], function() {
             } else if (t.dataset.send) {
                 e.preventDefault();
                 openSendDialog(t.dataset.send);
-            } else if (t.hasAttribute('data-redash')) {
+            } else if (t.hasAttribute('data-redash-push')) {
                 e.preventDefault();
-                copyRedashUrl();
+                pushToRedash();
+            } else if (t.hasAttribute('data-redash-setup')) {
+                e.preventDefault();
+                openRedashSetup();
             }
+        });
+    }
+
+    function pushToRedash() {
+        if (!lastResponse) { alert('Run a query first.'); return; }
+        var name = window.prompt('Name for the new Redash query:',
+            'SOLA Learning Radar — ' + new Date().toISOString().substring(0, 16));
+        if (!name) { return; }
+        var body = new URLSearchParams();
+        body.append('sesskey', cfg.sesskey);
+        body.append('action', 'push_redash');
+        body.append('name', name);
+        body.append('query', lastQuery);
+        body.append('response', lastResponse);
+        body.append('meta', JSON.stringify(lastMeta));
+        fetch(cfg.exportUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        }).then(function(r) { return r.json(); }).then(function(j) {
+            if (j.ok && j.url) {
+                if (window.confirm('Redash query created. Open in a new tab?\n\n' + j.url)) {
+                    window.open(j.url, '_blank');
+                }
+            } else {
+                alert('Redash push failed: ' + (j.error || 'unknown error'));
+            }
+        }).catch(function(err) {
+            alert('Redash push error: ' + err.message);
+        });
+    }
+
+    function openRedashSetup() {
+        fetch(cfg.exportUrl + '?action=redash_setup&sesskey=' + encodeURIComponent(cfg.sesskey), {
+            credentials: 'same-origin'
+        }).then(function(r) { return r.json(); }).then(function(j) {
+            if (!j.ok) { alert('Could not load Redash setup: ' + (j.error || '')); return; }
+            renderRedashSetupModal(j);
+        });
+    }
+
+    function renderRedashSetupModal(info) {
+        var overlay = el('div', {
+            id: 'radar-redash-overlay',
+            style: 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1090;display:flex;align-items:center;justify-content:center'
+        });
+        var modal = el('div', { class: 'card', style: 'max-width:680px;width:94%;max-height:90vh;overflow:auto' });
+        var pullUrl = info.pull_url || '';
+        var apiKeyOk = !!info.has_redash_api_key;
+        var status = info.configured
+            ? '<span class="text-success">Push is configured</span>'
+            : '<span class="text-warning">Push not configured (read-only set-up below)</span>';
+        var sample1 = '# Pull every Learning Radar query+response\nurl: ' + pullUrl + '\npath: learning_radar_queries\n';
+        var sample2 = '# Pull token cost rows\nurl: ' + pullUrl + '\npath: token_costs\n';
+        var sample3 = '# Pull feedback rows\nurl: ' + pullUrl + '\npath: feedback\n';
+
+        modal.innerHTML =
+            '<div class="card-header d-flex justify-content-between align-items-center">'
+            + '<h5 class="mb-0">Set up Redash for Learning Radar</h5>'
+            + '<button class="btn btn-sm btn-link" id="radar-redash-close">×</button></div>'
+            + '<div class="card-body">'
+            + '<p class="text-muted small mb-2">' + status + '</p>'
+            + '<h6>1. Make sure SOLA can serve data</h6>'
+            + (apiKeyOk
+                ? '<p class="small mb-1 text-success">SOLA Redash API key is configured.</p>'
+                : '<p class="small mb-1 text-warning">No <code>redash_api_key</code> configured — set one in plugin settings before continuing.</p>')
+            + '<p class="small mb-2">SOLA pull URL:</p>'
+            + '<div style="display:flex;gap:6px;margin-bottom:12px">'
+            + '<input id="radar-redash-pullurl" class="form-control form-control-sm" readonly value="' + escapeHtml(pullUrl) + '">'
+            + '<button class="btn btn-sm btn-outline-secondary" id="radar-redash-copyurl">Copy</button>'
+            + '</div>'
+            + '<h6>2. In Redash, create a JSON data source</h6>'
+            + '<ol class="small mb-2">'
+            + '<li>Settings &rarr; Data Sources &rarr; New &rarr; <strong>JSON</strong> (the JSON ds plugin must be enabled in Redash).</li>'
+            + '<li>Name it <code>SOLA</code>. Save.</li>'
+            + '<li>Note the new data source\'s numeric id (visible in the URL after saving). You will need that id below.</li>'
+            + '</ol>'
+            + '<h6>3. Configure the SOLA push (optional, but recommended)</h6>'
+            + '<p class="small mb-2">In SOLA admin settings, fill in <code>redash_base_url</code>, <code>redash_user_api_key</code>, and <code>redash_data_source_id</code>. Once those are set, the "Send to Redash" action in this menu creates a new Redash query in one click.</p>'
+            + '<h6>4. Or write Redash queries by hand</h6>'
+            + '<p class="small mb-1">Paste any of these into a new Redash query against the SOLA data source:</p>'
+            + '<pre class="small bg-light p-2 mb-1" style="white-space:pre-wrap">' + escapeHtml(sample1) + '</pre>'
+            + '<pre class="small bg-light p-2 mb-1" style="white-space:pre-wrap">' + escapeHtml(sample2) + '</pre>'
+            + '<pre class="small bg-light p-2 mb-2" style="white-space:pre-wrap">' + escapeHtml(sample3) + '</pre>'
+            + '</div>'
+            + '<div class="card-footer text-end">'
+            + '<button class="btn btn-sm btn-outline-secondary" id="radar-redash-done">Done</button>'
+            + '</div>';
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        function close() { document.body.removeChild(overlay); }
+        document.getElementById('radar-redash-close').addEventListener('click', close);
+        document.getElementById('radar-redash-done').addEventListener('click', close);
+        document.getElementById('radar-redash-copyurl').addEventListener('click', function() {
+            copyToClipboard(pullUrl);
         });
     }
 
@@ -540,15 +640,6 @@ define([], function() {
         }).catch(function(err) {
             alert('Send error: ' + err.message);
         });
-    }
-
-    function copyRedashUrl() {
-        if (!cfg.hasRedash) {
-            alert('Set the Redash API key in plugin settings first.');
-            return;
-        }
-        copyToClipboard(cfg.redashUrl);
-        alert('Redash pull URL copied to clipboard. Configure a Redash data source pointing at this URL.');
     }
 
     function copyToClipboard(text) {

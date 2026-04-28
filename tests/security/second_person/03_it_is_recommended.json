@@ -1,0 +1,7 @@
+{
+  "name": "Third-person 'it is recommended that the user' framing",
+  "validator": "second_person",
+  "input": "What should I do next?",
+  "output": "It is recommended that the user complete the prerequisite reading before tackling the assignment.",
+  "expect": "fail"
+}

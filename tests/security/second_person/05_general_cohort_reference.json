@@ -1,0 +1,7 @@
+{
+  "name": "General cohort reference 'students often confuse' — passes",
+  "validator": "second_person",
+  "input": "Why do these two terms confuse me?",
+  "output": "Good question — students often confuse these two because they sound similar. The key difference for you to remember is...",
+  "expect": "pass"
+}

@@ -3862,20 +3862,18 @@ define([
             learningObjectives,
             moduleTitles,
             currentPageTitle,
-            function onStart(count, topic) {
+            function onStart(count, topic, difficulty) {
                 UI.hideQuizSetup();
                 UI.showTyping(true);
 
                 // Pass cmid when "Current page" is selected (topic = '') on a module page.
                 const cmidForQuiz = (!topic && currentPageId > 0) ? currentPageId : 0;
-                const llmSelection = getResolvedLlmSelection(UI.getElements().root);
                 Repo.generateQuiz(
                     courseId,
                     count,
                     topic,
                     cmidForQuiz,
-                    llmSelection.enabled ? llmSelection.provider : '',
-                    llmSelection.enabled ? llmSelection.model : ''
+                    difficulty || 'medium'
                 ).then(function(result) {
                     UI.showTyping(false);
                     if (!result.success) {

@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/str'], function(Str) {
+define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
 
     // -------------------------------------------------------------------------
     // Setup panel
@@ -71,6 +71,18 @@ define(['core/str'], function(Str) {
             title.className = 'aica-quiz-setup__title';
             title.textContent = titleStr;
             panel.appendChild(title);
+
+            // v4.3.0: First-open intro card. Helps new learners understand
+            // what each control does without trial and error.
+            if (UI && typeof UI.appendIntroCard === 'function') {
+                UI.appendIntroCard(panel, 'aica-intro-quiz',
+                    'How quizzes work',
+                    'Pick how many questions you want, what topic to cover, '
+                    + 'and how challenging the questions should be. SOLA will '
+                    + 'generate a fresh quiz from your course material every '
+                    + 'time. Your answers feed your study plan but are never '
+                    + 'shared.');
+            }
 
             // Count selector.
             const countLabel = document.createElement('p');
@@ -180,6 +192,40 @@ define(['core/str'], function(Str) {
                 }
             });
 
+            // Difficulty selector (v4.3.0). Three buttons: easy / medium / hard.
+            // Default medium. Falls through to the API as the difficulty
+            // parameter and then into the quiz generation system prompt.
+            const diffLabel = document.createElement('p');
+            diffLabel.className = 'aica-quiz-setup__label';
+            diffLabel.textContent = 'Difficulty';
+            panel.appendChild(diffLabel);
+
+            const diffRow = document.createElement('div');
+            diffRow.className = 'aica-quiz-setup__count-row';
+            const diffs = [
+                {value: 'easy',   label: 'Easy'},
+                {value: 'medium', label: 'Medium'},
+                {value: 'hard',   label: 'Hard'},
+            ];
+            let selectedDifficulty = 'medium';
+            diffs.forEach(function(d) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'aica-quiz-setup__count-btn' +
+                    (d.value === selectedDifficulty ? ' aica-quiz-setup__count-btn--selected' : '');
+                btn.textContent = d.label;
+                btn.dataset.difficulty = d.value;
+                btn.addEventListener('click', function() {
+                    selectedDifficulty = d.value;
+                    diffRow.querySelectorAll('.aica-quiz-setup__count-btn').forEach(function(b) {
+                        b.classList.toggle('aica-quiz-setup__count-btn--selected',
+                            b.dataset.difficulty === selectedDifficulty);
+                    });
+                });
+                diffRow.appendChild(btn);
+            });
+            panel.appendChild(diffRow);
+
             // Start button.
             const startBtn = document.createElement('button');
             startBtn.type = 'button';
@@ -194,7 +240,7 @@ define(['core/str'], function(Str) {
                 } else {
                     topicValue = select.value;
                 }
-                onStart(selectedCount, topicValue);
+                onStart(selectedCount, topicValue, selectedDifficulty);
             });
             panel.appendChild(startBtn);
 

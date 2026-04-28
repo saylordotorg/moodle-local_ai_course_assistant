@@ -131,5 +131,41 @@ if ($action === 'teams') {
     return;
 }
 
+// v4.3.0: push the query/response to Redash as a saved Redash query, using
+// the admin-configured base URL + user API key + data source id. Returns the
+// new Redash query URL so the caller can open it in a new tab.
+if ($action === 'push_redash') {
+    $name = optional_param('name', '', PARAM_TEXT);
+    if ($name === '') {
+        $name = 'SOLA Learning Radar — ' . userdate(time(), '%Y-%m-%d %H:%M');
+    }
+    $result = \local_ai_course_assistant\redash_client::push_query($name, $query, $response);
+    if (!$result['ok']) {
+        http_response_code(400);
+        echo json_encode($result);
+        return;
+    }
+    echo json_encode($result);
+    return;
+}
+
+// v4.3.0: return the configured Redash setup details so the AMD module can
+// render the Setup Redash helper without re-fetching settings via webservice.
+if ($action === 'redash_setup') {
+    $configured = \local_ai_course_assistant\redash_client::is_configured();
+    $pullurl = (new moodle_url('/local/ai_course_assistant/redash_export.php', [
+        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
+    ]))->out(false);
+    echo json_encode([
+        'ok' => true,
+        'configured' => $configured,
+        'base_url' => (string) (get_config('local_ai_course_assistant', 'redash_base_url') ?: ''),
+        'data_source_id' => (int) (get_config('local_ai_course_assistant', 'redash_data_source_id') ?: 0),
+        'pull_url' => $pullurl,
+        'has_redash_api_key' => !empty(get_config('local_ai_course_assistant', 'redash_api_key')),
+    ]);
+    return;
+}
+
 http_response_code(400);
 echo json_encode(['ok' => false, 'error' => 'Unknown action']);

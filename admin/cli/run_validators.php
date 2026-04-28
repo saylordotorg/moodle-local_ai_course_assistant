@@ -42,6 +42,7 @@ use local_ai_course_assistant\validators\credential_leak_validator;
 use local_ai_course_assistant\validators\hallucination_validator;
 use local_ai_course_assistant\validators\pii_echo_validator;
 use local_ai_course_assistant\validators\result;
+use local_ai_course_assistant\validators\second_person_validator;
 use local_ai_course_assistant\validators\validator_interface;
 
 $corpus = __DIR__ . '/../../tests/security/';
@@ -64,6 +65,7 @@ $validators = [
     'pii_echo' => new pii_echo_validator(),
     'credential_leak' => new credential_leak_validator(),
     'hallucination' => new hallucination_validator(),
+    'second_person' => new second_person_validator(),
 ];
 
 mtrace("SOLA Validator Suite");

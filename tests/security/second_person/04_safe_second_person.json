@@ -1,0 +1,7 @@
+{
+  "name": "Direct second-person address — passes",
+  "validator": "second_person",
+  "input": "I'm stuck on chapter 3.",
+  "output": "Sure — let's go back to chapter 3 together. What part of it lost you first? Tell me where the explanation stopped making sense and we'll work from there.",
+  "expect": "pass"
+}

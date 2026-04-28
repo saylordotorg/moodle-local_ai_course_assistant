@@ -1325,6 +1325,32 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // v4.3.0: Real Redash integration. Three settings together let SOLA
+    // push a Learning Radar query/response to Redash as a new saved query
+    // via Redash's /api/queries endpoint. All three must be set for the
+    // push action to work; the existing pull path (redash_export.php +
+    // redash_api_key) keeps working unchanged.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/redash_base_url',
+        get_string('settings:redash_base_url', 'local_ai_course_assistant'),
+        get_string('settings:redash_base_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_URL
+    ));
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/redash_user_api_key',
+        get_string('settings:redash_user_api_key', 'local_ai_course_assistant'),
+        get_string('settings:redash_user_api_key_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/redash_data_source_id',
+        get_string('settings:redash_data_source_id', 'local_ai_course_assistant'),
+        get_string('settings:redash_data_source_id_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_INT
+    ));
+
     // CDN / frontend delivery.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/cdn_heading',

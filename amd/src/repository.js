@@ -253,12 +253,13 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
      * Generate a practice quiz.
      *
      * @param {number} courseid
-     * @param {number} count   Number of questions (3–10)
-     * @param {string} topic   Topic string, '__guided__', or ''
-     * @param {number} cmid    Current module/page ID (0 if not on a resource page)
+     * @param {number} count       Number of questions (3–10)
+     * @param {string} topic       Topic string, '__guided__', or ''
+     * @param {number} cmid        Current module/page ID (0 if not on a resource page)
+     * @param {string} difficulty  easy | medium | hard | auto (default medium)
      * @returns {Promise}
      */
-    const generateQuiz = function(courseid, count, topic, cmid) {
+    const generateQuiz = function(courseid, count, topic, cmid, difficulty) {
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_generate_quiz',
             args: {
@@ -266,6 +267,7 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
                 count: count || 3,
                 topic: topic !== undefined ? topic : '__guided__',
                 cmid: cmid || 0,
+                difficulty: difficulty || 'medium',
             },
         }])[0];
     };

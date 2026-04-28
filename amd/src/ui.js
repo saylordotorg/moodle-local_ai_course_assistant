@@ -3760,6 +3760,16 @@ define([
         const content = document.createElement('div');
         content.className = 'aica-settings-panel__content';
 
+        // v4.3.0: First-open intro card. Shown once per session per browser
+        // until the learner dismisses it. Helps with the "I don't know what
+        // these settings do" feedback from v3.4.7 production UT.
+        appendIntroCard(content, 'aica-intro-settings',
+            'Settings tour',
+            'Pick a language, choose an avatar, and set your voice preference. '
+            + 'Changes here only affect how SOLA appears for you. The "AI helper" '
+            + 'section near the bottom is optional — leave it on the default if '
+            + 'you are not sure.');
+
         // ── Language (top of settings) ──
         const langSection = document.createElement('div');
         langSection.className = 'aica-settings-panel__section';
@@ -5738,8 +5748,63 @@ define([
         });
     };
 
+    /**
+     * v4.3.0: Per-feature intro cards. Surfaced by v3.4.7 UT feedback that
+     * users don't know what each panel does on first open. Renders a
+     * dismissible one-paragraph card at the top of the panel; once
+     * dismissed, the storageKey lives in localStorage and the card stays
+     * hidden for that browser.
+     *
+     * @param {HTMLElement} parent  Container to append the card to.
+     * @param {string} storageKey   localStorage key for "dismissed" state.
+     * @param {string} title        Card heading.
+     * @param {string} body         Single-paragraph body text.
+     */
+    const appendIntroCard = function(parent, storageKey, title, body) {
+        if (!parent || !storageKey) {
+            return;
+        }
+        try {
+            if (window.localStorage.getItem(storageKey) === '1') {
+                return;
+            }
+        } catch (e) { /* storage may be disabled — show the card anyway */ }
+
+        const card = document.createElement('div');
+        card.className = 'aica-intro-card';
+        card.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;'
+            + 'border-radius:8px;padding:10px 12px;margin:0 0 12px;'
+            + 'font-size:13px;line-height:1.45;position:relative;';
+
+        const h = document.createElement('div');
+        h.style.cssText = 'font-weight:600;margin-bottom:4px;color:#1e40af;';
+        h.textContent = title;
+        card.appendChild(h);
+
+        const p = document.createElement('div');
+        p.style.cssText = 'color:#1e3a8a;';
+        p.textContent = body;
+        card.appendChild(p);
+
+        const close = document.createElement('button');
+        close.type = 'button';
+        close.setAttribute('aria-label', 'Dismiss intro');
+        close.style.cssText = 'position:absolute;top:6px;right:8px;'
+            + 'background:transparent;border:0;color:#1e40af;cursor:pointer;'
+            + 'font-size:16px;line-height:1;padding:2px 6px;';
+        close.textContent = '×';
+        close.addEventListener('click', function() {
+            try { window.localStorage.setItem(storageKey, '1'); } catch (e) { /* ignore */ }
+            card.remove();
+        });
+        card.appendChild(close);
+
+        parent.appendChild(card);
+    };
+
     return {
         initUI: initUI,
+        appendIntroCard: appendIntroCard,
         isOpen: isOpen,
         toggleDrawer: toggleDrawer,
         closeDrawer: closeDrawer,

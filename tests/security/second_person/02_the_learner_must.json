@@ -1,0 +1,7 @@
+{
+  "name": "Third-person 'the learner must' framing",
+  "validator": "second_person",
+  "input": "How do I solve this problem?",
+  "output": "To approach this problem, the learner must first identify the variables and then choose a method.",
+  "expect": "fail"
+}
