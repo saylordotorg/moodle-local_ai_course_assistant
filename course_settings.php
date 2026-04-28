@@ -141,6 +141,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_config('digest_email_enabled_course_' . $courseid,
         (int) optional_param('digest_email', 0, PARAM_BOOL), 'local_ai_course_assistant');
 
+    // v4.2.3: external resources opt-in. Inherit / force on / force off.
+    $extres = optional_param('external_resources', '', PARAM_RAW_TRIMMED);
+    if ($extres === '1' || $extres === '0') {
+        set_config('external_resources_enabled_course_' . $courseid, $extres, 'local_ai_course_assistant');
+    } else {
+        unset_config('external_resources_enabled_course_' . $courseid, 'local_ai_course_assistant');
+    }
+
     redirect($pageurl, get_string('coursesettings:saved', 'local_ai_course_assistant'),
         null, \core\output\notification::NOTIFY_SUCCESS);
 }
@@ -442,6 +450,8 @@ echo html_writer::div(
             $esson      = (bool) get_config('local_ai_course_assistant', 'essay_feedback_enabled_course_' . $courseid);
             $weon       = (bool) get_config('local_ai_course_assistant', 'worked_examples_enabled_course_' . $courseid);
             $digeston   = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
+            $extresraw  = get_config('local_ai_course_assistant', 'external_resources_enabled_course_' . $courseid);
+            $extresglobal = (bool) get_config('local_ai_course_assistant', 'external_resources_enabled');
             ?>
 
             <?php // v3.9.20: Socratic mode toggle. v4.1.5: bare-checkbox markup
@@ -595,6 +605,33 @@ echo html_writer::div(
                     </div>
                     <small class="form-text text-muted">
                         <?php echo get_string('digest:toggle_help', 'local_ai_course_assistant'); ?>
+                    </small>
+                </div>
+            </div>
+
+            <?php // v4.2.3: External resources opt-in (per-course override).
+            // Three-way: inherit global / force on / force off. Default 'inherit'.
+            $extreseffective = ($extresraw === '1') || ($extresraw !== '0' && $extresglobal); ?>
+            <div class="form-group row mt-2">
+                <label class="col-sm-3 col-form-label" for="aica-extres">
+                    <?php echo get_string('external_resources:title', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <select id="aica-extres" name="external_resources" class="form-control form-control-sm" style="max-width:240px">
+                        <option value="" <?php echo ($extresraw === false || $extresraw === '') ? 'selected' : ''; ?>>
+                            <?php echo get_string('external_resources:inherit', 'local_ai_course_assistant',
+                                $extresglobal ? get_string('external_resources:on', 'local_ai_course_assistant')
+                                              : get_string('external_resources:off', 'local_ai_course_assistant')); ?>
+                        </option>
+                        <option value="1" <?php echo $extresraw === '1' ? 'selected' : ''; ?>>
+                            <?php echo get_string('external_resources:force_on', 'local_ai_course_assistant'); ?>
+                        </option>
+                        <option value="0" <?php echo $extresraw === '0' ? 'selected' : ''; ?>>
+                            <?php echo get_string('external_resources:force_off', 'local_ai_course_assistant'); ?>
+                        </option>
+                    </select>
+                    <small class="form-text text-muted">
+                        <?php echo get_string('external_resources:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
                 </div>
             </div>

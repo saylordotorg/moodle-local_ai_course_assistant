@@ -969,3 +969,18 @@ $string['courses_admin:no_courses']        = 'No visible courses on this site ye
 
 // v4.2: anomaly digest scheduled task.
 $string['task:run_anomaly_digest'] = 'Run SOLA anomaly digest';
+
+// v4.2.3: external resources (admin + per-course).
+$string['settings:external_resources_heading']      = 'External resources';
+$string['settings:external_resources_heading_desc'] = 'Optional opt-in: when on, SOLA may include one or two links to reputable open educational resources alongside its course-grounded answer. Restricted to the allowlist below to keep recommendations defensible. Per-course override available on the course settings page. Default off.';
+$string['settings:external_resources_enabled']      = 'Enable external resources (site-wide default)';
+$string['settings:external_resources_enabled_desc'] = 'When on, SOLA may suggest links to the allowlisted external resources. Per-course "force on" / "force off" overrides this. Default off.';
+$string['settings:external_resources_allowlist']    = 'External resources allowlist';
+$string['settings:external_resources_allowlist_desc'] = 'One resource per line, in the format "Display Name (domain)". SOLA will only suggest links to these sites. Defaults to a small set of widely respected open-resource hosts; replace or extend as needed.';
+$string['external_resources:title']      = 'External resources';
+$string['external_resources:inherit']    = 'Inherit site default ({$a})';
+$string['external_resources:force_on']   = 'Force on for this course';
+$string['external_resources:force_off']  = 'Force off for this course';
+$string['external_resources:on']         = 'on';
+$string['external_resources:off']        = 'off';
+$string['external_resources:toggle_help']= 'When on, SOLA may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';

@@ -267,6 +267,24 @@ class context_builder {
                 . "- Learner: \"just tell me the answer please\" → Give the direct answer plainly, then optionally offer to walk through the reasoning afterwards.\n";
         }
 
+        // v4.2.3: External resources opt-in. When enabled (per-course wins
+        // over admin global), instruct the model to optionally suggest one or
+        // two reputable open-resource links alongside its course-grounded
+        // answer. Default OFF so courses ship as closed-corpus by default.
+        if (self::external_resources_enabled_for_course($courseid)) {
+            $allowlist = (string) (get_config('local_ai_course_assistant', 'external_resources_allowlist') ?: '');
+            $sites = trim($allowlist) !== '' ? trim($allowlist)
+                : "Wikipedia (en.wikipedia.org), Khan Academy (khanacademy.org), OER Commons (oercommons.org), OpenStax (openstax.org), MIT OpenCourseWare (ocw.mit.edu)";
+            $prompt .= "\n\n## External Resources\n"
+                . "When it would genuinely help the learner, you MAY include one or two links to reputable open educational resources alongside your course-grounded answer. Restrict yourself to the following allowlist of sites (do not invent or fabricate URLs; only suggest a site if you are confident the resource exists there):\n\n"
+                . $sites . "\n\n"
+                . "Rules:\n"
+                . "- Lead with course material first. Only add an external link when the course material does not cover the question, or when the learner explicitly asks for further reading.\n"
+                . "- Cap external links to a maximum of two per response.\n"
+                . "- Phrase the suggestion as optional further reading (\"If you want to dig deeper, try…\"), never as the primary answer.\n"
+                . "- Do not paste long quotations from the external source; summarise and link.";
+        }
+
         // Anti-injection and security hardening. Placed at the end of
         // the prompt (closest to user messages) for strongest enforcement.
         $prompt .= self::get_security_instructions();
@@ -380,12 +398,37 @@ class context_builder {
             'essay_feedback_enabled',
             'flashcards_enabled',
             'code_sandbox_enabled',
+            'external_resources_enabled',
         ];
         $bits = '';
         foreach ($keys as $key) {
             $bits .= ((int) (bool) get_config('local_ai_course_assistant', $key . '_course_' . $courseid));
         }
+        // External resources toggle reads as three-way (inherit/on/off), so
+        // also include the global setting in the fingerprint — flipping the
+        // global must invalidate cached prompts on every "inherit" course.
+        $bits .= ((int) (bool) get_config('local_ai_course_assistant', 'external_resources_enabled'));
         return substr(md5($bits), 0, 12);
+    }
+
+    /**
+     * Resolve the effective external-resources flag for a course.
+     *
+     * Per-course override ('1' or '0') always wins; otherwise inherits the
+     * site-wide `external_resources_enabled` setting.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    private static function external_resources_enabled_for_course(int $courseid): bool {
+        $raw = get_config('local_ai_course_assistant', 'external_resources_enabled_course_' . $courseid);
+        if ($raw === '1') {
+            return true;
+        }
+        if ($raw === '0') {
+            return false;
+        }
+        return (bool) get_config('local_ai_course_assistant', 'external_resources_enabled');
     }
 
     /**

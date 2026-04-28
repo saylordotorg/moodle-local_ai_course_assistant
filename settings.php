@@ -350,6 +350,34 @@ if ($hassiteconfig) {
         1
     ));
 
+    // v4.2.3: external resources (opt-in). When on, SOLA may suggest links to
+    // reputable open educational resources (Wikipedia, Khan Academy, OER
+    // Commons, OpenStax, MIT OpenCourseWare) alongside its course-grounded
+    // answer. Default OFF for legal/quality control. Per-course override
+    // available on course_settings.php.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/external_resources_heading',
+        get_string('settings:external_resources_heading', 'local_ai_course_assistant'),
+        get_string('settings:external_resources_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/external_resources_enabled',
+        get_string('settings:external_resources_enabled', 'local_ai_course_assistant'),
+        get_string('settings:external_resources_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/external_resources_allowlist',
+        get_string('settings:external_resources_allowlist', 'local_ai_course_assistant'),
+        get_string('settings:external_resources_allowlist_desc', 'local_ai_course_assistant'),
+        "Wikipedia (en.wikipedia.org)\n"
+        . "Khan Academy (khanacademy.org)\n"
+        . "OER Commons (oercommons.org)\n"
+        . "OpenStax (openstax.org)\n"
+        . "MIT OpenCourseWare (ocw.mit.edu)\n"
+        . "Saylor Academy (learn.saylor.org)"
+    ));
+
     $embeddingproviders = [
         'openai' => get_string('settings:embed_provider_openai', 'local_ai_course_assistant'),
         'ollama' => get_string('settings:embed_provider_ollama', 'local_ai_course_assistant'),
