@@ -35,6 +35,7 @@ require_once($CFG->dirroot . '/lib/filelib.php');
 use local_ai_course_assistant\feature_flags;
 use local_ai_course_assistant\security;
 use local_ai_course_assistant\talking_avatar\provider_factory;
+use local_ai_course_assistant\talking_avatar_session_manager;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -73,7 +74,14 @@ try {
         'lang'     => $lang ?: 'en',
         'greeting' => $greeting,
     ]);
-    echo json_encode(array_merge(['ok' => true], $session));
+    $rowid = talking_avatar_session_manager::start(
+        $USER->id,
+        $courseid,
+        (string) ($session['provider'] ?? $driver->get_key()),
+        (string) (get_config('local_ai_course_assistant', $driver->get_key() . '_persona_id') ?: ''),
+        (string) ($session['session_token'] ?? '')
+    );
+    echo json_encode(array_merge(['ok' => true, 'session_rowid' => $rowid], $session));
 } catch (\Throwable $e) {
     debugging('SOLA talking-avatar session error: ' . $e->getMessage(), DEBUG_DEVELOPER);
     echo json_encode([

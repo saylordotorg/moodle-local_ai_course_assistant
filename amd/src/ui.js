@@ -1755,6 +1755,12 @@ define([
         if (!drawer || !toggle) {
             return;
         }
+        // v4.10.0: ensure any open avatar session is closed and counted.
+        if (avatarSessionRowId) {
+            endAvatarSession();
+            const panel = drawer.querySelector('.aica-talking-avatar-panel');
+            if (panel) { panel.remove(); }
+        }
 
         drawer.setAttribute('aria-hidden', 'true');
         drawer.hidden = true;
@@ -5802,10 +5808,43 @@ define([
         parent.appendChild(card);
     };
 
+    /** Active avatar session row id, used for the heartbeat close. */
+    let avatarSessionRowId = 0;
+
+    /**
+     * Post a heartbeat to the session-end endpoint. Idempotent server-side
+     * so duplicate fires (close button + beforeunload) are safe.
+     */
+    function endAvatarSession() {
+        if (!avatarSessionRowId) {
+            return;
+        }
+        const sesskey = (root && root.dataset.sesskey) || (M && M.cfg && M.cfg.sesskey) || '';
+        const url = M.cfg.wwwroot + '/local/ai_course_assistant/talking_avatar_session_end.php';
+        const params = new URLSearchParams();
+        params.set('sesskey', sesskey);
+        params.set('rowid', String(avatarSessionRowId));
+        // sendBeacon is preferred for unload — fetch can be cancelled mid-flight.
+        if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+            const blob = new Blob([params.toString()], {type: 'application/x-www-form-urlencoded'});
+            navigator.sendBeacon(url, blob);
+        } else {
+            fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: params.toString(),
+                credentials: 'same-origin',
+                keepalive: true,
+            }).catch(function() { /* best effort */ });
+        }
+        avatarSessionRowId = 0;
+    }
+
     /**
      * Open or close a talking-avatar iframe surface inside the drawer.
      * Calls talking_avatar_session.php for the embed_url; on failure shows
-     * a non-blocking notification.
+     * a non-blocking notification. Records the session row id so the
+     * heartbeat can close it on dismissal or page unload.
      *
      * @param {number} courseId
      * @param {string} lang Two-letter ISO 639-1 language hint.
@@ -5816,6 +5855,7 @@ define([
         }
         let panel = drawer.querySelector('.aica-talking-avatar-panel');
         if (panel) {
+            endAvatarSession();
             panel.remove();
             return;
         }
@@ -5828,7 +5868,10 @@ define([
             '<div class="aica-talking-avatar-panel__loading">Loading avatar...</div>';
         drawer.appendChild(panel);
         const closeBtn = panel.querySelector('.aica-talking-avatar-panel__close');
-        closeBtn.addEventListener('click', function() { panel.remove(); });
+        closeBtn.addEventListener('click', function() {
+            endAvatarSession();
+            panel.remove();
+        });
 
         const sesskey = (root && root.dataset.sesskey) || (M && M.cfg && M.cfg.sesskey) || '';
         const params = new URLSearchParams();
@@ -5853,6 +5896,7 @@ define([
                 panel.appendChild(msg);
                 return;
             }
+            avatarSessionRowId = parseInt(json.session_rowid, 10) || 0;
             const frame = document.createElement('iframe');
             frame.className = 'aica-talking-avatar-panel__frame';
             frame.src = json.embed_url;
@@ -5865,6 +5909,10 @@ define([
                 loading.textContent = 'Talking avatar failed to start.';
             }
         });
+    }
+    // Tab-close safety net — sendBeacon survives page unload.
+    if (typeof window !== 'undefined') {
+        window.addEventListener('beforeunload', endAvatarSession);
     }
 
     return {

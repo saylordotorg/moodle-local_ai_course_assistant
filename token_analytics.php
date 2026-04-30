@@ -25,6 +25,8 @@
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\token_cost_manager;
+use local_ai_course_assistant\talking_avatar_cost_manager;
+use local_ai_course_assistant\talking_avatar_session_manager;
 
 require_login();
 
@@ -332,6 +334,39 @@ $templatedata = [
     'rate_cards'         => token_cost_manager::get_all_rates(),
     'analytics_url'      => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
 ];
+
+// v4.10.0: talking-avatar cost rollup. Same range + courseid filters as
+// the LLM rollup; uses the dedicated avatar session log + per-minute rate
+// card. Empty when no sessions in the period.
+$avatarfrom = $range > 0 ? (time() - ($range * 86400)) : 0;
+$avatarto = time();
+$avatartotals = talking_avatar_session_manager::totals_by_provider(
+    $avatarfrom,
+    $avatarto,
+    $courseid > 0 ? $courseid : null
+);
+$avatarrows = [];
+$avatargrandcost = 0.0;
+$avatargrandminutes = 0.0;
+$avatargrandsessions = 0;
+foreach ($avatartotals as $provider => $t) {
+    $rate = talking_avatar_cost_manager::rate_for($provider);
+    $avatarrows[] = [
+        'provider' => ucfirst($provider),
+        'sessions' => $t['sessions'],
+        'minutes'  => number_format($t['minutes'], 1),
+        'rate'     => $rate !== null ? '$' . number_format($rate, 2) : '—',
+        'cost'     => talking_avatar_cost_manager::format_cost($t['cost']),
+    ];
+    $avatargrandcost += $t['cost'];
+    $avatargrandminutes += $t['minutes'];
+    $avatargrandsessions += $t['sessions'];
+}
+$templatedata['avatar_rows'] = $avatarrows;
+$templatedata['avatar_has_rows'] = !empty($avatarrows);
+$templatedata['avatar_grand_cost'] = talking_avatar_cost_manager::format_cost($avatargrandcost);
+$templatedata['avatar_grand_minutes'] = number_format($avatargrandminutes, 1);
+$templatedata['avatar_grand_sessions'] = $avatargrandsessions;
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_ai_course_assistant/token_analytics', $templatedata);

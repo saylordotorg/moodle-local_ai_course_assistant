@@ -29,7 +29,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class base_provider implements provider_interface {
 
-    /** Read a per-provider config value, with a global fallback for v4.8.1 keys. */
+    /**
+     * Read a per-provider config value, with a global fallback for the
+     * v4.8.1 placeholder keys. Looks up `<provider_key>_<key>` first, then
+     * `talking_avatar_<key>`, then returns the supplied default.
+     *
+     * @param string $key Config suffix (e.g. 'api_key', 'persona_id', 'base_url').
+     * @param string $default Fallback when neither config row is set.
+     * @return string
+     */
     protected function cfg(string $key, string $default = ''): string {
         $value = (string) (get_config('local_ai_course_assistant', $this->get_key() . '_' . $key) ?: '');
         if ($value !== '') {

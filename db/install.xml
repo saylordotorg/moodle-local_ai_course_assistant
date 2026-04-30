@@ -493,5 +493,29 @@
         <INDEX NAME="enabled_frequency" UNIQUE="false" FIELDS="enabled, frequency"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_avatar_sess" COMMENT="v4.10.0: talking-avatar streaming sessions and per-minute cost (D-ID, HeyGen, Tavus, Synthesia)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="did|heygen|tavus|synthesia"/>
+        <FIELD NAME="persona_id" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="upstream_session_id" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Provider-side session id, used to correlate webhooks"/>
+        <FIELD NAME="started_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="ended_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="duration_sec" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="est_cost_usd" TYPE="number" LENGTH="10" DECIMALS="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="open" SEQUENCE="false" COMMENT="open|heartbeat|webhook|sweeper"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course_started" UNIQUE="false" FIELDS="courseid, started_at"/>
+        <INDEX NAME="upstream_session" UNIQUE="false" FIELDS="provider, upstream_session_id"/>
+        <INDEX NAME="open_sessions" UNIQUE="false" FIELDS="ended_at, started_at"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

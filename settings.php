@@ -396,6 +396,30 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // v4.10.0: avatar rate-card overrides. Mirrors the LLM rate-card
+    // overrides editor; takes a JSON object keyed by provider with a
+    // single per-minute USD rate as the value. Empty = bundled defaults
+    // (D-ID $0.30/min, HeyGen $0.50/min, Tavus $0.30/min, Synthesia $0.40/min).
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/avatar_rate_card_overrides',
+        get_string('settings:avatar_rate_card_overrides', 'local_ai_course_assistant'),
+        get_string('settings:avatar_rate_card_overrides_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+    // v4.10.0: optional per-provider webhook signing secrets. When set, the
+    // talking_avatar_webhook.php endpoint accepts and verifies session-end
+    // payloads from that vendor; webhook rows take precedence over
+    // heartbeat rows. Empty = webhook handler off for that provider.
+    foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
+        $settings->add(new admin_setting_configpasswordunmask(
+            'local_ai_course_assistant/' . $tap . '_webhook_secret',
+            get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant'),
+            get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant'),
+            ''
+        ));
+    }
+
     // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
     // xAI voice routes through services/xai_rt_proxy instead of opening a
     // direct browser connection to api.x.ai with the master key.

@@ -257,6 +257,48 @@
         {{/has_missing}}
     </div>
 
+    {{! ── Talking-avatar cost (v4.10.0) ─────────────────────────────────── }}
+    <div class="aica-cost-section">
+        <div class="aica-cost-section__header">
+            <p class="aica-cost-section__title">{{#str}}analytics:avatar_cost_heading, local_ai_course_assistant{{/str}}</p>
+            <p class="aica-cost-section__sub">Per-minute streaming cost across the four configured talking-avatar providers. Heartbeat-based — webhook-confirmed sessions are exact, others are estimated from session open/close.</p>
+        </div>
+        {{#avatar_has_rows}}
+        <table class="aica-cost-table">
+            <thead>
+                <tr>
+                    <th>{{#str}}analytics:avatar_cost_provider, local_ai_course_assistant{{/str}}</th>
+                    <th class="num">{{#str}}analytics:avatar_cost_sessions, local_ai_course_assistant{{/str}}</th>
+                    <th class="num">{{#str}}analytics:avatar_cost_minutes, local_ai_course_assistant{{/str}}</th>
+                    <th class="num">{{#str}}analytics:avatar_cost_rate, local_ai_course_assistant{{/str}}</th>
+                    <th class="num">{{#str}}analytics:avatar_cost_total, local_ai_course_assistant{{/str}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#avatar_rows}}
+                <tr>
+                    <td>{{provider}}</td>
+                    <td class="num">{{sessions}}</td>
+                    <td class="num">{{minutes}}</td>
+                    <td class="num">{{rate}}</td>
+                    <td class="num cost">{{cost}}</td>
+                </tr>
+                {{/avatar_rows}}
+                <tr class="aica-cost-table__total">
+                    <td>Total</td>
+                    <td class="num">{{avatar_grand_sessions}}</td>
+                    <td class="num">{{avatar_grand_minutes}}</td>
+                    <td></td>
+                    <td class="num cost">{{avatar_grand_cost}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {{/avatar_has_rows}}
+        {{^avatar_has_rows}}
+        <p class="aica-cost-empty">{{#str}}analytics:avatar_cost_empty, local_ai_course_assistant{{/str}}</p>
+        {{/avatar_has_rows}}
+    </div>
+
     {{! ── Per student ─────────────────────────────────────────────────────── }}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">

@@ -809,5 +809,30 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026043010, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026043030) {
+        // v4.10.0: talking-avatar streaming session log + per-minute cost.
+        $table = new xmldb_table('local_ai_course_assistant_avatar_sess');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('provider', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL);
+            $table->add_field('persona_id', XMLDB_TYPE_CHAR, '255', null, null);
+            $table->add_field('upstream_session_id', XMLDB_TYPE_CHAR, '255', null, null);
+            $table->add_field('started_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('ended_at', XMLDB_TYPE_INTEGER, '10', null, null);
+            $table->add_field('duration_sec', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('est_cost_usd', XMLDB_TYPE_NUMBER, '10, 4', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('source', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'open');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+            $table->add_index('course_started', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'started_at']);
+            $table->add_index('upstream_session', XMLDB_INDEX_NOTUNIQUE, ['provider', 'upstream_session_id']);
+            $table->add_index('open_sessions', XMLDB_INDEX_NOTUNIQUE, ['ended_at', 'started_at']);
+            $dbman->create_table($table);
+        }
+        upgrade_plugin_savepoint(true, 2026043030, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

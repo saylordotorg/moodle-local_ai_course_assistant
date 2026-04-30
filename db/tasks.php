@@ -149,4 +149,16 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v4.10.0 — Hourly sweep that closes avatar sessions left open
+        // past MAX_OPEN_SECONDS (default 1h). Without this, a tab-close
+        // mid-session would leave the row open and skew the analytics.
+        'classname' => \local_ai_course_assistant\task\sweep_avatar_sessions::class,
+        'blocking' => 0,
+        'minute' => '15',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];
