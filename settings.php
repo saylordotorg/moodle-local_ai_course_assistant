@@ -1532,6 +1532,37 @@ if ($hassiteconfig) {
     ));
 
     // Plugin updates (self-update from GitHub releases).
+    // v4.6.0: Vendor & cost data overrides. Three settings let admins
+    // (a) hide the Vendor DPA admin page if they do not use it, and
+    // (b) edit the vendor DPA table and LLM rate card without a code edit.
+    // Both override fields are JSON, merged on top of the hardcoded
+    // defaults at runtime — empty string means "use defaults".
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/vendor_data_heading',
+        get_string('settings:vendor_data_heading', 'local_ai_course_assistant'),
+        get_string('settings:vendor_data_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/vendor_dpa_admin_page_enabled',
+        get_string('settings:vendor_dpa_admin_page_enabled', 'local_ai_course_assistant'),
+        get_string('settings:vendor_dpa_admin_page_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/vendor_dpa_overrides',
+        get_string('settings:vendor_dpa_overrides', 'local_ai_course_assistant'),
+        get_string('settings:vendor_dpa_overrides_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/rate_card_overrides',
+        get_string('settings:rate_card_overrides', 'local_ai_course_assistant'),
+        get_string('settings:rate_card_overrides_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/updates_heading',
         get_string('update:title', 'local_ai_course_assistant'),
@@ -1628,13 +1659,20 @@ if ($hassiteconfig) {
         'moodle/site:config'
     ));
 
-    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
-        'local_ai_course_assistant_vendordpa',
-        get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
-            \local_ai_course_assistant\branding::short_name()),
-        new moodle_url('/local/ai_course_assistant/vendor_dpa.php'),
-        'moodle/site:config'
-    ));
+    // v4.6.0: Vendor DPA admin page is now gated on
+    // `vendor_dpa_admin_page_enabled`, default off. Admins who do not need
+    // the DPA dashboard get a smaller admin tree; those who do flip the
+    // setting in Site administration → Plugins → Local plugins →
+    // AI Course Assistant.
+    if ((bool) get_config('local_ai_course_assistant', 'vendor_dpa_admin_page_enabled')) {
+        $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+            'local_ai_course_assistant_vendordpa',
+            get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
+                \local_ai_course_assistant\branding::short_name()),
+            new moodle_url('/local/ai_course_assistant/vendor_dpa.php'),
+            'moodle/site:config'
+        ));
+    }
 
     // Catalyst's fork carries a whatsapp_test.php admin tool that calls
     // admin_externalpage_setup('local_ai_course_assistant_whatsapptest').

@@ -142,7 +142,7 @@ class token_cost_manager {
         $modelname = strtolower(trim($modelname));
         $best    = null;
         $bestlen = 0;
-        foreach (self::$rate_cards as $prefix => $rates) {
+        foreach (self::get_effective_rate_cards() as $prefix => $rates) {
             if (str_starts_with($modelname, $prefix) && strlen($prefix) > $bestlen) {
                 $best    = $rates;
                 $bestlen = strlen($prefix);
@@ -182,7 +182,7 @@ class token_cost_manager {
      */
     public static function get_all_rates(): array {
         $result = [];
-        foreach (self::$rate_cards as $prefix => $rates) {
+        foreach (self::get_effective_rate_cards() as $prefix => $rates) {
             $result[] = [
                 'model'         => $prefix . '…',
                 'input_per_1m'  => '$' . number_format($rates['input'],  2),
@@ -190,5 +190,44 @@ class token_cost_manager {
             ];
         }
         return $result;
+    }
+
+    /**
+     * v4.6.0: merge the hardcoded {@see $rate_cards} table with any admin-
+     * supplied JSON overrides from the `rate_card_overrides` setting. The
+     * override format is `{"model_prefix": {"input": float, "output":
+     * float}}` — overriding a prefix replaces both rates. New prefixes
+     * present only in the override are added to the table.
+     *
+     * Lets admins follow vendor pricing changes without a code edit.
+     * Errors in the JSON are silently ignored at runtime so a malformed
+     * paste does not break cost estimation; admins see the parse error
+     * when they save the setting.
+     *
+     * @return array<string, array{input: float, output: float}>
+     */
+    private static function get_effective_rate_cards(): array {
+        $base = self::$rate_cards;
+        $rawjson = (string) (get_config('local_ai_course_assistant', 'rate_card_overrides') ?: '');
+        if (trim($rawjson) === '') {
+            return $base;
+        }
+        $decoded = json_decode($rawjson, true);
+        if (!is_array($decoded)) {
+            return $base;
+        }
+        foreach ($decoded as $prefix => $rates) {
+            if (!is_string($prefix) || !is_array($rates)) {
+                continue;
+            }
+            if (!isset($rates['input']) || !isset($rates['output'])) {
+                continue;
+            }
+            $base[strtolower(trim($prefix))] = [
+                'input'  => (float) $rates['input'],
+                'output' => (float) $rates['output'],
+            ];
+        }
+        return $base;
     }
 }

@@ -169,8 +169,9 @@ class vendor_registry {
      */
     public static function for_provider(string $providerid): array {
         $key = strtolower(trim($providerid));
-        if (isset(self::DPA_STATUS[$key])) {
-            return self::DPA_STATUS[$key];
+        $effective = self::get_effective_table();
+        if (isset($effective[$key])) {
+            return $effective[$key];
         }
         return [
             'label'            => $providerid,
@@ -189,9 +190,45 @@ class vendor_registry {
      */
     public static function all(): array {
         $out = [];
-        foreach (self::DPA_STATUS as $key => $row) {
+        foreach (self::get_effective_table() as $key => $row) {
             $out[$key] = $row + ['provider' => $key];
         }
         return $out;
+    }
+
+    /**
+     * v4.6.0: merge the hardcoded {@see DPA_STATUS} table with any admin-
+     * supplied JSON overrides from the `vendor_dpa_overrides` setting. The
+     * override format is `{"vendor_key": {"field": "value", ...}}` — fields
+     * are applied per-vendor with the override winning per field; missing
+     * fields fall through to the default. New vendor keys present only in
+     * the override are added to the table.
+     *
+     * Lets admins fix stale entries (e.g. `dpa_status: signed` after a DPA
+     * gets re-negotiated) without a code edit. Errors in the JSON are
+     * silently ignored at runtime so a malformed paste does not break the
+     * provider gate; admins see the parse error in the admin UI when they
+     * save.
+     *
+     * @return array[] vendor key => row
+     */
+    private static function get_effective_table(): array {
+        $base = self::DPA_STATUS;
+        $rawjson = (string) (get_config('local_ai_course_assistant', 'vendor_dpa_overrides') ?: '');
+        if (trim($rawjson) === '') {
+            return $base;
+        }
+        $decoded = json_decode($rawjson, true);
+        if (!is_array($decoded)) {
+            return $base;
+        }
+        foreach ($decoded as $vendorkey => $fields) {
+            if (!is_string($vendorkey) || !is_array($fields)) {
+                continue;
+            }
+            $key = strtolower(trim($vendorkey));
+            $base[$key] = isset($base[$key]) ? array_merge($base[$key], $fields) : $fields;
+        }
+        return $base;
     }
 }

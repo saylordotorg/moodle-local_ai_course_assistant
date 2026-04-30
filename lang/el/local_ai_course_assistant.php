@@ -1050,3 +1050,13 @@ $string['pedagogy:per_course_force_on']    = 'Force on for this course';
 $string['pedagogy:per_course_force_off']   = 'Force off for this course';
 $string['pedagogy:on']                     = 'on';
 $string['pedagogy:off']                    = 'off';
+
+// v4.6.0: vendor DPA gating + override editors.
+$string['settings:vendor_data_heading']      = 'Vendor & cost data';
+$string['settings:vendor_data_heading_desc'] = 'Controls for the optional Vendor DPA admin page and the override editors that let admins keep the bundled vendor table and LLM rate card current without a code edit. Both override editors are JSON; an empty value falls back to the hardcoded defaults shipped with the plugin.';
+$string['settings:vendor_dpa_admin_page_enabled']      = 'Show Vendor DPA admin page';
+$string['settings:vendor_dpa_admin_page_enabled_desc'] = 'When on, "Vendor DPA Status" appears under Site administration → Plugins → Local plugins → AI Course Assistant. The page renders the vendor table merged with the override below. Default off — most admins do not need this surface.';
+$string['settings:vendor_dpa_overrides']      = 'Vendor DPA overrides (JSON)';
+$string['settings:vendor_dpa_overrides_desc'] = 'JSON object keyed by vendor id. Each value is an object whose fields override the hardcoded vendor row. Fields you do not specify fall through to the default. A new vendor key in the override is added to the table; edits apply per field. Malformed JSON is ignored at runtime — fix the parse error here when the saved value does not appear in the Vendor DPA page.';
+$string['settings:rate_card_overrides']      = 'LLM rate card overrides (JSON)';
+$string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name prefix. Each value is {"input": float, "output": float} in USD per 1,000,000 tokens. Replaces the bundled rate card entry for that prefix. A community-maintained source of vendor pricing JSON lives at github.com/BerriAI/litellm — multiply the input_cost_per_token / output_cost_per_token values by 1,000,000 to match this format. Auto-fetch from a configurable upstream URL is on the v4.7 roadmap.';
