@@ -123,4 +123,17 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v4.7.0 — Weekly rate-card auto-refresh from upstream pricing JSON
+        // (default LiteLLM). Default ON. Admins disable in plugin settings.
+        // Runs Mondays at 02:30 server time, before the rest of the cron
+        // tasks compete for the LLM scheduler window.
+        'classname' => \local_ai_course_assistant\task\refresh_rate_card::class,
+        'blocking' => 0,
+        'minute' => '30',
+        'hour' => '2',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '1',
+    ],
 ];

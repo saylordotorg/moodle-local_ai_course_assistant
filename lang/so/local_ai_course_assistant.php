@@ -1034,3 +1034,17 @@ $string['settings:vendor_dpa_overrides']      = 'Vendor DPA overrides (JSON)';
 $string['settings:vendor_dpa_overrides_desc'] = 'JSON object keyed by vendor id. Each value is an object whose fields override the hardcoded vendor row. Fields you do not specify fall through to the default. A new vendor key in the override is added to the table; edits apply per field. Malformed JSON is ignored at runtime — fix the parse error here when the saved value does not appear in the Vendor DPA page.';
 $string['settings:rate_card_overrides']      = 'LLM rate card overrides (JSON)';
 $string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name prefix. Each value is {"input": float, "output": float} in USD per 1,000,000 tokens. Replaces the bundled rate card entry for that prefix. A community-maintained source of vendor pricing JSON lives at github.com/BerriAI/litellm — multiply the input_cost_per_token / output_cost_per_token values by 1,000,000 to match this format. Auto-fetch from a configurable upstream URL is on the v4.7 roadmap.';
+
+// v4.7.0: rate-card auto-refresh.
+$string['settings:rate_card_auto_refresh']      = 'Auto-refresh from upstream';
+$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task fetches the upstream pricing JSON, transforms it to SOLA\'s rate-card schema, and writes it to the override field above. Default on. Failures keep the previous override in place.';
+$string['settings:rate_card_upstream_url']      = 'Upstream pricing URL';
+$string['settings:rate_card_upstream_url_desc'] = 'URL of a JSON manifest in LiteLLM\'s schema. Default points at the community-maintained file in the LiteLLM GitHub repo. URL is checked against the SSRF allowlist before fetch.';
+$string['settings:rate_card_refresh_now']        = 'Refresh now';
+$string['settings:rate_card_refresh_now_label']  = 'Refresh rate card from upstream';
+$string['settings:rate_card_refresh_success']    = 'Rate card refreshed: {$a} entries written.';
+$string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$a}';
+$string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
+$string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
+$string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
+$string['task:refresh_rate_card']                = 'Refresh SOLA LLM rate card from upstream';

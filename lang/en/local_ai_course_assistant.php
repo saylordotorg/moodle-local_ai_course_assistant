@@ -943,7 +943,21 @@ $string['settings:vendor_dpa_admin_page_enabled_desc'] = 'When on, "Vendor DPA S
 $string['settings:vendor_dpa_overrides']      = 'Vendor DPA overrides (JSON)';
 $string['settings:vendor_dpa_overrides_desc'] = 'JSON object keyed by vendor id. Each value is an object whose fields override the hardcoded vendor row. Fields you do not specify fall through to the default. Example: <pre>{ "openai": { "dpa_status": "renegotiating" }, "newvendor": { "label": "New Vendor", "training_opt_out": "contractual", "dpa_status": "signed", "retention": "30 days", "dpa_link": "", "tier_ok": 2 } }</pre> A new vendor key in the override is added to the table; edits apply per field. Malformed JSON is ignored at runtime — fix the parse error here when the saved value does not appear in the Vendor DPA page.';
 $string['settings:rate_card_overrides']      = 'LLM rate card overrides (JSON)';
-$string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name prefix. Each value is <code>{"input": float, "output": float}</code> in USD per 1,000,000 tokens. Replaces the bundled rate card entry for that prefix. Example: <pre>{ "gpt-4o-mini": { "input": 0.15, "output": 0.60 }, "claude-sonnet-4.6": { "input": 3.00, "output": 15.00 } }</pre> A community-maintained source of vendor pricing JSON lives at <a href="https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json" target="_blank" rel="noopener">github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json</a> — multiply the <code>input_cost_per_token</code> / <code>output_cost_per_token</code> values by 1,000,000 to match this format. Auto-fetch from a configurable upstream URL is on the v4.7 roadmap.';
+$string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name prefix. Each value is <code>{"input": float, "output": float}</code> in USD per 1,000,000 tokens. Replaces the bundled rate card entry for that prefix. Example: <pre>{ "gpt-4o-mini": { "input": 0.15, "output": 0.60 }, "claude-sonnet-4.6": { "input": 3.00, "output": 15.00 } }</pre> Auto-refresh below populates this field from an upstream pricing manifest (default LiteLLM) on a weekly cron schedule. Manual edits here are preserved until the next refresh overwrites them.';
+
+// v4.7.0: rate-card auto-refresh.
+$string['settings:rate_card_auto_refresh']      = 'Auto-refresh from upstream';
+$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task (Mondays 02:30 server time) fetches the upstream pricing JSON below, transforms it to SOLA\'s rate-card schema, and writes it to the override field above. Default on — flip off to pin the rate card to whatever was last fetched / manually pasted. Failures keep the previous override in place; the last-refresh status appears under the Refresh now button.';
+$string['settings:rate_card_upstream_url']      = 'Upstream pricing URL';
+$string['settings:rate_card_upstream_url_desc'] = 'URL of a JSON manifest in LiteLLM\'s schema (each entry has <code>input_cost_per_token</code>, <code>output_cost_per_token</code>, and <code>mode</code>). Default points at the community-maintained file in the LiteLLM GitHub repo. Override only if you mirror the manifest internally or maintain your own pricing source. URL is checked against the SSRF allowlist before fetch.';
+$string['settings:rate_card_refresh_now']        = 'Refresh now';
+$string['settings:rate_card_refresh_now_label']  = 'Refresh rate card from upstream';
+$string['settings:rate_card_refresh_success']    = 'Rate card refreshed: {$a} entries written.';
+$string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$a}';
+$string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
+$string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
+$string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
+$string['task:refresh_rate_card']                = 'Refresh SOLA LLM rate card from upstream';
 
 // v4.4.0: course-page CSP setting.
 $string['settings:csp_course_pages_mode']      = 'Course-page Content-Security-Policy';

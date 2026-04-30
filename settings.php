@@ -1563,6 +1563,52 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
+    // v4.7.0: rate-card auto-refresh. On by default. Weekly cron task pulls
+    // an upstream pricing JSON (LiteLLM by default) and writes it into
+    // rate_card_overrides above so cost estimation stays current without
+    // admin intervention. Manual trigger button below for one-shot pulls.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rate_card_auto_refresh',
+        get_string('settings:rate_card_auto_refresh', 'local_ai_course_assistant'),
+        get_string('settings:rate_card_auto_refresh_desc', 'local_ai_course_assistant'),
+        1
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rate_card_upstream_url',
+        get_string('settings:rate_card_upstream_url', 'local_ai_course_assistant'),
+        get_string('settings:rate_card_upstream_url_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\rate_card_refresher::DEFAULT_UPSTREAM_URL,
+        PARAM_URL
+    ));
+
+    // Manual "Refresh now" button + last-refresh status display.
+    $lastrefreshat = (int) (get_config('local_ai_course_assistant', 'rate_card_last_refresh_at') ?: 0);
+    $lastrefreshstatus = (string) (get_config('local_ai_course_assistant', 'rate_card_last_refresh_status') ?: '');
+    $lastrefresherror = (string) (get_config('local_ai_course_assistant', 'rate_card_last_refresh_error') ?: '');
+    $statusparts = [];
+    if ($lastrefreshat > 0) {
+        $statusparts[] = get_string('settings:rate_card_last_refresh_at', 'local_ai_course_assistant',
+            userdate($lastrefreshat));
+    } else {
+        $statusparts[] = get_string('settings:rate_card_never_refreshed', 'local_ai_course_assistant');
+    }
+    if ($lastrefreshstatus === 'error' && $lastrefresherror !== '') {
+        $statusparts[] = '<span class="text-danger">' . s($lastrefresherror) . '</span>';
+    } else if ($lastrefreshstatus === 'success') {
+        $statusparts[] = '<span class="text-success">'
+            . get_string('settings:rate_card_last_refresh_success', 'local_ai_course_assistant') . '</span>';
+    }
+    $refreshurl = new moodle_url('/local/ai_course_assistant/rate_card_refresh.php',
+        ['sesskey' => sesskey()]);
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/rate_card_refresh_button',
+        get_string('settings:rate_card_refresh_now', 'local_ai_course_assistant'),
+        '<a href="' . $refreshurl->out(false) . '" class="btn btn-sm btn-outline-primary">'
+        . get_string('settings:rate_card_refresh_now_label', 'local_ai_course_assistant') . '</a>'
+        . '<p class="text-muted mt-2 mb-0" style="font-size:13px">'
+        . implode(' &middot; ', $statusparts) . '</p>'
+    ));
+
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/updates_heading',
         get_string('update:title', 'local_ai_course_assistant'),
