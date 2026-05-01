@@ -265,7 +265,11 @@ class context_builder {
             );
         }
         $sections[] = new section('practice_scoring', section::CAT_BEHAVIOR, 50, self::get_scoring_instructions(), 0);
-        $sections[] = new section('multilingual', section::CAT_BEHAVIOR, 40, self::get_multilingual_instructions($lang), 0);
+        // v5.0.0: multilingual priority bumped from 40 → 70 so non-English
+        // learner courses do not lose this section under default budget
+        // pressure. Section is small (~600 chars) and matters for the ESL
+        // population SOLA serves heavily.
+        $sections[] = new section('multilingual', section::CAT_BEHAVIOR, 70, self::get_multilingual_instructions($lang), 0);
         $sections[] = new section('widget_features', section::CAT_BEHAVIOR, 30, self::get_widget_feature_instructions(), 0);
         if (self::external_resources_enabled_for_course($courseid)) {
             $sections[] = new section(
@@ -305,7 +309,10 @@ class context_builder {
         // Assemble within budget. The legacy MAX_PROMPT_LENGTH sets the upper
         // bound; an admin-configurable budget below it lets operators trade
         // detail for tokens.
-        $budget = (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 8000);
+        // v5.0.0: code-level fallback raised 8000 → 10000 to match the new
+        // settings.php default. Applies when the admin has never saved the
+        // setting explicitly (get_config returns false).
+        $budget = (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 10000);
         $assembled = prompt_builder::assemble($sections, $budget);
         $prompt = $assembled['prompt'];
 
