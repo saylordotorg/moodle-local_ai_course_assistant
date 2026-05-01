@@ -269,6 +269,26 @@ if ($hassiteconfig) {
         '0'
     ));
 
+    // v4.12.0: structured prompt budget + verbosity controls.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/prompt_budget_chars',
+        get_string('settings:prompt_budget_chars', 'local_ai_course_assistant'),
+        get_string('settings:prompt_budget_chars_desc', 'local_ai_course_assistant'),
+        '8000',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/prompt_verbosity',
+        get_string('settings:prompt_verbosity', 'local_ai_course_assistant'),
+        get_string('settings:prompt_verbosity_desc', 'local_ai_course_assistant'),
+        'concise',
+        [
+            'concise'  => get_string('settings:prompt_verbosity_concise', 'local_ai_course_assistant'),
+            'standard' => get_string('settings:prompt_verbosity_standard', 'local_ai_course_assistant'),
+            'verbose'  => get_string('settings:prompt_verbosity_verbose', 'local_ai_course_assistant'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/max_tokens',
         'Max Response Length (tokens)',

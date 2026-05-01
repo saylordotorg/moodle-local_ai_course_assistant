@@ -520,27 +520,36 @@ try {
     }
     sse_send($metaevent);
 
-    // v4.11.0: optional prompt debug log. When the admin flag is on, write
-    // the assembled system prompt + per-section character counts to a
-    // rolling file so we can keep measuring prompt size objectively.
+    // v4.11.0+v4.12.0: optional prompt debug log. When the admin flag is
+    // on, write the assembled system prompt + per-section character counts
+    // (including v4.12.0 category-level breakdown) to a rolling file.
     // Default off; never logs PII (system prompt only — no user input).
     if ((bool) get_config('local_ai_course_assistant', 'prompt_debug_enabled')) {
         try {
             $logpath = $CFG->dataroot . '/temp/sola_prompt_debug.log';
-            // Rolling cap at ~1 MB: truncate if larger before appending.
             if (file_exists($logpath) && filesize($logpath) > 1024 * 1024) {
                 file_put_contents($logpath, '');
-            }
-            $sections = [];
-            foreach (preg_split('/\n## /', $systemprompt) as $i => $section) {
-                $heading = $i === 0 ? 'PREAMBLE' : trim(substr($section, 0, strpos("\n", $section) ?: 60), "# \n");
-                $sections[] = sprintf("%6d chars  %s", strlen($section), $heading);
             }
             $entry = "=== " . date('Y-m-d H:i:s') . " courseid={$courseid} userid={$USER->id} provider="
                 . ($clientprovider ?: get_config('local_ai_course_assistant', 'provider')) . " ===\n"
                 . "Total: " . strlen($systemprompt) . " chars (~" . (int) (strlen($systemprompt) / 4) . " tokens)\n"
-                . "Sections:\n" . implode("\n", $sections) . "\n"
-                . "--- ASSEMBLED SYSTEM PROMPT ---\n" . $systemprompt . "\n"
+                . "Budget: " . (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 8000) . " chars\n";
+            // v4.12.0: structured breakdown when available.
+            if (!empty(\local_ai_course_assistant\context_builder::$last_breakdown)) {
+                $entry .= "Sections (by category):\n"
+                    . \local_ai_course_assistant\prompt\builder::format_breakdown(
+                        \local_ai_course_assistant\context_builder::$last_breakdown
+                    ) . "\n";
+            } else {
+                // Fallback: heading-based split for legacy paths.
+                $rows = [];
+                foreach (preg_split('/\n## /', $systemprompt) as $i => $section) {
+                    $heading = $i === 0 ? 'PREAMBLE' : trim(substr($section, 0, strpos("\n", $section) ?: 60), "# \n");
+                    $rows[] = sprintf("%6d chars  %s", strlen($section), $heading);
+                }
+                $entry .= "Sections:\n" . implode("\n", $rows) . "\n";
+            }
+            $entry .= "--- ASSEMBLED SYSTEM PROMPT ---\n" . $systemprompt . "\n"
                 . "================================================================\n\n";
             file_put_contents($logpath, $entry, FILE_APPEND | LOCK_EX);
         } catch (\Throwable $e) {

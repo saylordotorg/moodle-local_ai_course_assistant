@@ -16,8 +16,18 @@
 
 namespace local_ai_course_assistant;
 
+use local_ai_course_assistant\prompt\builder as prompt_builder;
+use local_ai_course_assistant\prompt\section;
+
 /**
  * Context builder — constructs AI system prompts from course data.
+ *
+ * v4.12.0 — system prompts are now built as a list of {@see section}
+ * objects (identity / context / learner / behavior / markers / safety),
+ * then assembled by {@see prompt_builder} within an admin-configurable
+ * character budget. This addresses Tomi Molnár's "context homogeneity"
+ * critique: each category is internally consistent, the order is stable,
+ * and per-section sizes are surfaced via the prompt-debug log.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant
@@ -31,6 +41,36 @@ class context_builder {
      * leaves ample room for conversation history while allowing full course content.
      */
     private const MAX_PROMPT_LENGTH = 60000;
+
+    /**
+     * v4.12.0: stash the last assembled section breakdown so the prompt-debug
+     * log in sse.php can render per-section sizes without re-running the
+     * builder. Keyed by section name; values from {@see prompt_builder::assemble}.
+     *
+     * @var array<string, array{category: string, priority: int, chars: int, used: bool, truncated: bool}>
+     */
+    public static array $last_breakdown = [];
+
+    /**
+     * Resolve per-course prompt verbosity.
+     *
+     * Returns one of 'concise' (default), 'standard', 'verbose'. Per-course
+     * override wins; falls back to the site-wide default. Verbose mode
+     * lengthens Socratic guidance and external-resources framing for weaker
+     * self-hosted models that need explicit scaffolding.
+     *
+     * @param int $courseid
+     * @return string One of 'concise', 'standard', 'verbose'.
+     */
+    private static function resolve_verbosity(int $courseid): string {
+        $valid = ['concise', 'standard', 'verbose'];
+        $override = (string) (get_config('local_ai_course_assistant', 'prompt_verbosity_course_' . $courseid) ?: '');
+        if (in_array($override, $valid, true)) {
+            return $override;
+        }
+        $global = (string) (get_config('local_ai_course_assistant', 'prompt_verbosity') ?: 'concise');
+        return in_array($global, $valid, true) ? $global : 'concise';
+    }
 
     /**
      * Build the system prompt for a course and user.
@@ -129,131 +169,149 @@ class context_builder {
         // Institution name from settings.
         $institution = get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University';
 
-        // Replace placeholders.
-        $prompt = str_replace(
+        // v4.12.0: build a structured list of homogeneous sections, then let
+        // the prompt builder emit them in canonical category order within an
+        // admin-configurable budget. The base template (which carries the
+        // identity + course-name placeholders) is the highest-priority
+        // identity section; everything else slots into context / learner /
+        // behaviour / markers / safety. Within a category, sections sort by
+        // descending priority so the assembler drops the lowest-priority
+        // first when the budget is tight.
+
+        // Per-course verbosity controls Socratic and external-resource depth.
+        $verbosity = self::resolve_verbosity($courseid);
+
+        // Render the base template (identity + base course placeholders).
+        $base = str_replace(
             ['{{coursename}}', '{{userrole}}', '{{coursetopics}}', '{{coursecontent}}', '{{institution}}'],
             [$course->fullname, $userrole, $coursetopics, $coursecontent, $institution],
             $template
         );
-
-        // Replace hardcoded identity with configurable display name.
-        $prompt = str_replace(
+        $base = str_replace(
             ['You are SOLA', 'SOLA (Online Learning Assistant)'],
             ['You are ' . $short_name . ' (' . $display_name . ')', $short_name . ' (' . $display_name . ')'],
-            $prompt
+            $base
         );
 
-        // If the template doesn't include {{coursecontent}} but we have content, append it.
+        $sections = [];
+        $sections[] = new section('base_template', section::CAT_IDENTITY, 100, $base, 200);
+
+        // If the template did not slot {{coursecontent}}, course content is
+        // a separate context section so the budget can truncate it.
         if (!empty($coursecontent) && strpos($template, '{{coursecontent}}') === false) {
-            $prompt .= "\n\n## Course Content\n" . $coursecontent;
+            $sections[] = new section(
+                'course_content',
+                section::CAT_CONTEXT,
+                90,
+                "\n\n## Course Content\n" . $coursecontent,
+                400
+            );
         }
 
-        // Append personalization instructions (uses student's first name).
-        $prompt .= self::get_personalization_instructions($firstname);
-
-        // Append student learning profile if one exists. This gives SOLA
-        // memory of the student's strengths, weaknesses, learning style,
-        // and interests across sessions without inflating the history.
+        // Learner-state sections.
+        $sections[] = new section(
+            'personalization',
+            section::CAT_LEARNER,
+            80,
+            self::get_personalization_instructions($firstname),
+            0
+        );
         if ($userid > 0 && $userrole === 'student') {
             $profile = student_profile_manager::get_profile($userid, $courseid);
             if (!empty($profile)) {
-                $prompt .= "\n\n## Student Learning Profile\n"
-                    . "The following profile was generated from this student's previous conversations. "
-                    . "Use it to personalize your responses: match their depth preference, reference "
-                    . "their strengths encouragingly, focus extra attention on their weak areas, and "
-                    . "use their preferred explanation style.\n\n" . $profile;
+                $sections[] = new section(
+                    'student_profile',
+                    section::CAT_LEARNER,
+                    60,
+                    "\n\n## Student Learning Profile\n"
+                        . "Profile generated from this learner's previous conversations. Personalise your responses: match their depth preference, reference strengths encouragingly, focus on weak areas, use their preferred explanation style.\n\n"
+                        . $profile,
+                    150
+                );
             }
-        }
-
-        // Append role-specific instructions.
-        $prompt .= "\n\n" . self::get_role_instructions($userrole);
-
-        // v4.11.0: One consolidated "Output markers" block — replaces five
-        // scattered marker-explanation paragraphs (saves ~500 tokens).
-        $offtopicon = (bool) get_config('local_ai_course_assistant', 'offtopic_enabled');
-        $faq = faq_manager::get_faq_for_prompt();
-        $hasfaq = !empty($faq);
-        $prompt .= self::get_marker_instructions($ragmode, $offtopicon, $hasfaq);
-
-        // Append FAQ content (if any) without the now-consolidated marker explanation.
-        if ($hasfaq) {
-            $prompt .= "\n\n## Support FAQ\n" . $faq;
-        }
-
-        // Append widget feature awareness so the AI can guide students to existing UI features.
-        $prompt .= self::get_widget_feature_instructions();
-
-        // Append study planning context.
-        $prompt .= study_planner::get_plan_context($userid, $courseid);
-
-        // v4.11.0: One consolidated "House style" block — replaces brevity,
-        // AI literacy, wellbeing, and struggle-detection blocks (saves ~600
-        // tokens). Wellbeing line is included only when the admin flag is on.
-        $wellbeingon = (bool) get_config('local_ai_course_assistant', 'wellbeing_enabled');
-        $prompt .= self::get_house_style_instructions($wellbeingon);
-
-        // Append mastery state (silent steering). No-op when the feature is
-        // off for the course or the course has no objectives.
-        if ($userid > 0 && $userrole === 'student') {
             $masteryblock = objective_manager::build_prompt_injection($userid, $courseid);
             if ($masteryblock !== '') {
-                $prompt .= $masteryblock;
+                $sections[] = new section('mastery_state', section::CAT_LEARNER, 50, $masteryblock, 0);
             }
         }
+        $studyblock = study_planner::get_plan_context($userid, $courseid);
+        if (!empty(trim($studyblock))) {
+            $sections[] = new section('study_plan', section::CAT_LEARNER, 40, $studyblock, 0);
+        }
 
-        // Append practice scoring instructions.
-        $prompt .= self::get_scoring_instructions();
-
-        // Append multilingual instructions (with explicit language if set).
-        $prompt .= self::get_multilingual_instructions($lang);
-
-        // Socratic mode (v3.9.20). Per-course toggle. v4.11.0: default to a
-        // 1-line directive (~30 tokens) which modern models follow reliably.
-        // The 600-token explicit do/don't version is retained behind the
-        // socratic_verbose admin flag for early-pilot courses on weaker
-        // self-hosted models that need the extra scaffolding.
+        // Behaviour sections.
+        $sections[] = new section(
+            'role',
+            section::CAT_BEHAVIOR,
+            90,
+            "\n\n" . self::get_role_instructions($userrole),
+            0
+        );
+        $wellbeingon = (bool) get_config('local_ai_course_assistant', 'wellbeing_enabled');
+        $sections[] = new section(
+            'house_style',
+            section::CAT_BEHAVIOR,
+            85,
+            self::get_house_style_instructions($wellbeingon),
+            0
+        );
         if (feature_flags::resolve('socratic_mode', $courseid)) {
-            if ((bool) get_config('local_ai_course_assistant', 'socratic_verbose')) {
-                $prompt .= "\n\n## SOCRATIC MODE — ACTIVE FOR THIS COURSE\n"
-                    . "This is a HARD REQUIREMENT for this course, not a suggestion. It overrides the brevity guidance above whenever the two conflict.\n\n"
-                    . "**You must NOT give direct answers to subject-matter questions.** Instead, lead the learner with one focused guiding question at a time. Wait for their reply before asking the next one.\n\n"
-                    . "Format every reply as:\n"
-                    . "- One short framing sentence acknowledging where they are (optional, no more than one sentence).\n"
-                    . "- Exactly **one** guiding question that helps them take the next step in their own reasoning.\n\n"
-                    . "When they answer:\n"
-                    . "- If correct: affirm specifically what they got right, then ask the next guiding question.\n"
-                    . "- If partly correct: acknowledge the right part, point out the gap with another question.\n"
-                    . "- If wrong: do NOT correct them outright. Ask a question that exposes the contradiction.\n\n"
-                    . "Only give the direct answer when the learner explicitly asks (\"just tell me\", \"I give up\"), when they've already reasoned through it and need confirmation, or when the question is purely procedural (not subject-matter).";
-            } else {
-                $prompt .= "\n\n## Socratic mode\nLead with one guiding question at a time; do NOT give direct answers to subject-matter questions. Exception: if the learner explicitly asks (\"just tell me\", \"I give up\"), gives a procedural question, or has already reasoned through and only needs confirmation, answer plainly.";
-            }
+            $sections[] = new section(
+                'socratic_mode',
+                section::CAT_BEHAVIOR,
+                75,
+                self::get_socratic_instructions($verbosity),
+                0
+            );
         }
-
-        // v4.2.3: External resources opt-in. When enabled (per-course wins
-        // over admin global), instruct the model to optionally suggest one or
-        // two reputable open-resource links alongside its course-grounded
-        // answer. Default OFF so courses ship as closed-corpus by default.
+        $sections[] = new section('practice_scoring', section::CAT_BEHAVIOR, 50, self::get_scoring_instructions(), 0);
+        $sections[] = new section('multilingual', section::CAT_BEHAVIOR, 40, self::get_multilingual_instructions($lang), 0);
+        $sections[] = new section('widget_features', section::CAT_BEHAVIOR, 30, self::get_widget_feature_instructions(), 0);
         if (self::external_resources_enabled_for_course($courseid)) {
-            $allowlist = (string) (get_config('local_ai_course_assistant', 'external_resources_allowlist') ?: '');
-            $sites = trim($allowlist) !== '' ? trim($allowlist)
-                : "Wikipedia (en.wikipedia.org), Khan Academy (khanacademy.org), OER Commons (oercommons.org), OpenStax (openstax.org), MIT OpenCourseWare (ocw.mit.edu)";
-            $prompt .= "\n\n## External Resources\n"
-                . "When it would genuinely help the learner, you MAY include one or two links to reputable open educational resources alongside your course-grounded answer. Restrict yourself to the following allowlist of sites (do not invent or fabricate URLs; only suggest a site if you are confident the resource exists there):\n\n"
-                . $sites . "\n\n"
-                . "Rules:\n"
-                . "- Lead with course material first. Only add an external link when the course material does not cover the question, or when the learner explicitly asks for further reading.\n"
-                . "- Cap external links to a maximum of two per response.\n"
-                . "- Phrase the suggestion as optional further reading (\"If you want to dig deeper, try…\"), never as the primary answer.\n"
-                . "- Do not paste long quotations from the external source; summarise and link.";
+            $sections[] = new section(
+                'external_resources',
+                section::CAT_BEHAVIOR,
+                25,
+                self::get_external_resources_instructions(),
+                0
+            );
         }
 
-        // Anti-injection and security hardening. Placed at the end of
-        // the prompt (closest to user messages) for strongest enforcement.
-        $prompt .= self::get_security_instructions();
+        // Context: FAQ (reference data, not behaviour).
+        $faq = faq_manager::get_faq_for_prompt();
+        if (!empty($faq)) {
+            $sections[] = new section(
+                'faq',
+                section::CAT_CONTEXT,
+                30,
+                "\n\n## Support FAQ\n" . $faq,
+                100
+            );
+        }
 
-        // Truncate if needed.
-        $prompt = self::truncate_prompt($prompt, $courseid);
+        // Markers — single consolidated block.
+        $offtopicon = (bool) get_config('local_ai_course_assistant', 'offtopic_enabled');
+        $sections[] = new section(
+            'output_markers',
+            section::CAT_MARKERS,
+            90,
+            self::get_marker_instructions($ragmode, $offtopicon, !empty($faq)),
+            0
+        );
+
+        // Safety — security guidance always lands in full (never truncated).
+        $sections[] = new section('security', section::CAT_SAFETY, 100, self::get_security_instructions(), 0);
+
+        // Assemble within budget. The legacy MAX_PROMPT_LENGTH sets the upper
+        // bound; an admin-configurable budget below it lets operators trade
+        // detail for tokens.
+        $budget = (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 8000);
+        $assembled = prompt_builder::assemble($sections, $budget);
+        $prompt = $assembled['prompt'];
+
+        // Stash the breakdown so the optional debug log can render it
+        // without re-running assembly.
+        self::$last_breakdown = $assembled['breakdown'];
 
         // Cache only for non-RAG mode (RAG prompts are query-specific).
         if (!$ragmode) {
@@ -393,8 +451,10 @@ class context_builder {
             'code_sandbox_enabled',
             'external_resources_enabled',
             'socratic_verbose',     // v4.11.0
-            'wellbeing_enabled',    // v4.11.0 (now drives a House-style line)
-            'offtopic_enabled',     // v4.11.0 (now drives a marker entry)
+            'wellbeing_enabled',    // v4.11.0 (drives a House-style line)
+            'offtopic_enabled',     // v4.11.0 (drives a marker entry)
+            'prompt_verbosity',     // v4.12.0 (concise/standard/verbose Socratic)
+            'prompt_budget_chars',  // v4.12.0 (assembly budget changes section drops)
         ];
         foreach ($globals as $g) {
             $bits .= ((int) (bool) get_config('local_ai_course_assistant', $g));
@@ -656,6 +716,52 @@ class context_builder {
      *
      * @return string
      */
+    /**
+     * v4.12.0: Socratic-mode directive, scaled by verbosity. The 1-line
+     * concise form is what hosted models follow reliably; verbose mode
+     * keeps the explicit do/don't scaffolding for weaker self-hosted
+     * models. The original v3.9.30 heavyweight form is preserved when
+     * verbosity is 'verbose' and the legacy `socratic_verbose` admin
+     * flag is set.
+     *
+     * @param string $verbosity One of 'concise', 'standard', 'verbose'.
+     * @return string
+     */
+    private static function get_socratic_instructions(string $verbosity): string {
+        if ($verbosity === 'verbose' || (bool) get_config('local_ai_course_assistant', 'socratic_verbose')) {
+            return "\n\n## SOCRATIC MODE — ACTIVE FOR THIS COURSE\n"
+                . "This is a HARD REQUIREMENT for this course, not a suggestion. It overrides the brevity guidance whenever the two conflict.\n\n"
+                . "**You must NOT give direct answers to subject-matter questions.** Instead, lead the learner with one focused guiding question at a time. Wait for their reply before asking the next one.\n\n"
+                . "Format every reply as:\n"
+                . "- One short framing sentence acknowledging where they are (optional, no more than one sentence).\n"
+                . "- Exactly **one** guiding question that helps them take the next step in their own reasoning.\n\n"
+                . "When they answer:\n"
+                . "- If correct: affirm specifically what they got right, then ask the next guiding question.\n"
+                . "- If partly correct: acknowledge the right part, point out the gap with another question.\n"
+                . "- If wrong: do NOT correct them outright. Ask a question that exposes the contradiction.\n\n"
+                . "Only give the direct answer when the learner explicitly asks (\"just tell me\", \"I give up\"), when they've already reasoned through it and need confirmation, or when the question is purely procedural (not subject-matter).";
+        }
+        if ($verbosity === 'standard') {
+            return "\n\n## Socratic mode\nLead with one guiding question at a time; do NOT give direct answers to subject-matter questions. Wait for the learner's reply before asking the next question. Exception: if they explicitly ask (\"just tell me\", \"I give up\"), give a procedural question, or have already reasoned through and only need confirmation, answer plainly.";
+        }
+        return "\n\n## Socratic mode\nLead with one guiding question at a time; do NOT give direct answers to subject-matter questions. Exception: if the learner explicitly asks (\"just tell me\", \"I give up\"), gives a procedural question, or has already reasoned through and only needs confirmation, answer plainly.";
+    }
+
+    /**
+     * v4.12.0: External-resources block extracted from the inline assembly
+     * so it can flow through the section/budget pipeline like everything
+     * else. Behaviour unchanged from v4.2.3.
+     *
+     * @return string
+     */
+    private static function get_external_resources_instructions(): string {
+        $allowlist = (string) (get_config('local_ai_course_assistant', 'external_resources_allowlist') ?: '');
+        $sites = trim($allowlist) !== '' ? trim($allowlist)
+            : "Wikipedia (en.wikipedia.org), Khan Academy (khanacademy.org), OER Commons (oercommons.org), OpenStax (openstax.org), MIT OpenCourseWare (ocw.mit.edu)";
+        return "\n\n## External Resources\n"
+            . "When it would genuinely help the learner, you MAY include one or two links to reputable open educational resources alongside your course-grounded answer. Restrict yourself to: " . $sites . ". Do not invent URLs. Lead with course material; cap external links at two; phrase as optional further reading; summarise rather than quote at length.";
+    }
+
     /**
      * v4.11.0: One consolidated "Output markers" block. Replaces five
      * scattered marker explanation paragraphs that previously bloated
