@@ -277,6 +277,19 @@ if ($hassiteconfig) {
         '12000',
         PARAM_INT
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/prompt_metrics_enabled',
+        get_string('settings:prompt_metrics_enabled', 'local_ai_course_assistant'),
+        get_string('settings:prompt_metrics_enabled_desc', 'local_ai_course_assistant'),
+        '1'
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/prompt_budget_auto_tune',
+        get_string('settings:prompt_budget_auto_tune', 'local_ai_course_assistant'),
+        get_string('settings:prompt_budget_auto_tune_desc', 'local_ai_course_assistant'),
+        '0'
+    ));
+
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/prompt_verbosity',
         get_string('settings:prompt_verbosity', 'local_ai_course_assistant'),
@@ -1817,6 +1830,14 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_ragadmin',
         get_string('ragadmin:title', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/rag_admin.php'),
+        'moodle/site:config'
+    ));
+
+    // v5.0.0 patch 3: prompt-metrics + budget-recommendation surface.
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_prompt_metrics',
+        get_string('prompt_metrics:title', 'local_ai_course_assistant'),
+        new moodle_url('/local/ai_course_assistant/prompt_metrics.php'),
         'moodle/site:config'
     ));
 

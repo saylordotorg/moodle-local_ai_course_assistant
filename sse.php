@@ -508,6 +508,21 @@ try {
     }
     sse_send($metaevent);
 
+    // v5.0.0 patch 3: lightweight per-turn metrics for the admin analytics
+    // surface. Always-on (no PII written, just per-section sizes) unless
+    // the admin disables prompt_metrics_enabled. Separate from the heavy
+    // prompt_debug_enabled file which writes the full prompt body.
+    if ((bool) (get_config('local_ai_course_assistant', 'prompt_metrics_enabled') ?? '1')
+            && !empty(\local_ai_course_assistant\context_builder::$last_breakdown)) {
+        \local_ai_course_assistant\prompt_metrics_logger::record(
+            $courseid,
+            $USER->id,
+            strlen($systemprompt),
+            (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 12000),
+            \local_ai_course_assistant\context_builder::$last_breakdown
+        );
+    }
+
     // v4.11.0+v4.12.0: optional prompt debug log. When the admin flag is
     // on, write the assembled system prompt + per-section character counts
     // (including v4.12.0 category-level breakdown) to a rolling file.

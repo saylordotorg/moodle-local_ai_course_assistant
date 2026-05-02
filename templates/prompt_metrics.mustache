@@ -1,0 +1,110 @@
+{{!
+    @template local_ai_course_assistant/prompt_metrics
+
+    Per-section prompt metrics + budget recommendation admin page.
+
+    Context:
+    {
+        "samples": "1234",
+        "has_data": true,
+        "enough_for_rec": true,
+        "avg_total": "10500",
+        "max_total": "11800",
+        "avg_budget": "12000",
+        "pct_truncated": 0.5,
+        "pct_dropped": 12.3,
+        "last_seen": "2026-05-02 14:30",
+        "by_cat": [{"cat": "Identity", "chars": "3,181"}],
+        "current_budget": "12000",
+        "has_rec": true,
+        "rec_budget": "11000",
+        "rec_rationale": "Trim to save tokens",
+        "rec_diff": true,
+        "apply_url": "https://...",
+        "auto_tune_on": false,
+        "settings_url": "https://..."
+    }
+}}
+<div class="container-fluid sola-prompt-metrics" role="region" aria-labelledby="sola-pm-h1">
+    <h2 id="sola-pm-h1">{{#str}}prompt_metrics:title, local_ai_course_assistant{{/str}}</h2>
+    <p class="text-muted">{{#str}}prompt_metrics:subtitle, local_ai_course_assistant{{/str}}</p>
+
+    {{^has_data}}
+    <div class="alert alert-info" role="alert">
+        {{#str}}prompt_metrics:no_data, local_ai_course_assistant{{/str}}
+    </div>
+    {{/has_data}}
+
+    {{#has_data}}
+    <h3>{{#str}}prompt_metrics:headline, local_ai_course_assistant{{/str}}</h3>
+    <dl class="row">
+        <dt class="col-sm-4">{{#str}}prompt_metrics:samples, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{samples}}</dd>
+        <dt class="col-sm-4">{{#str}}prompt_metrics:avg_total, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{avg_total}} chars</dd>
+        <dt class="col-sm-4">{{#str}}prompt_metrics:max_total, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{max_total}} chars</dd>
+        <dt class="col-sm-4">{{#str}}prompt_metrics:avg_budget, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{avg_budget}} chars</dd>
+        <dt class="col-sm-4">{{#str}}prompt_metrics:pct_truncated, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{pct_truncated}}%</dd>
+        <dt class="col-sm-4">{{#str}}prompt_metrics:pct_dropped, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{pct_dropped}}%</dd>
+        <dt class="col-sm-4">{{#str}}prompt_metrics:last_seen, local_ai_course_assistant{{/str}}</dt>
+        <dd class="col-sm-8">{{last_seen}}</dd>
+    </dl>
+
+    <h3>{{#str}}prompt_metrics:by_category, local_ai_course_assistant{{/str}}</h3>
+    <table class="generaltable" aria-describedby="sola-pm-h1">
+        <thead>
+            <tr>
+                <th scope="col">{{#str}}prompt_metrics:category, local_ai_course_assistant{{/str}}</th>
+                <th scope="col" class="text-right">{{#str}}prompt_metrics:avg_chars, local_ai_course_assistant{{/str}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#by_cat}}
+            <tr>
+                <th scope="row">{{cat}}</th>
+                <td class="text-right">{{chars}}</td>
+            </tr>
+            {{/by_cat}}
+        </tbody>
+    </table>
+
+    <h3>{{#str}}prompt_metrics:recommendation, local_ai_course_assistant{{/str}}</h3>
+    {{^enough_for_rec}}
+    <div class="alert alert-info" role="alert">
+        {{#str}}prompt_metrics:rec_insufficient_data, local_ai_course_assistant{{/str}}
+    </div>
+    {{/enough_for_rec}}
+    {{#enough_for_rec}}
+        {{#has_rec}}
+        <p><strong>{{#str}}prompt_metrics:current_budget, local_ai_course_assistant{{/str}}:</strong> {{current_budget}} chars</p>
+        <p><strong>{{#str}}prompt_metrics:recommended, local_ai_course_assistant{{/str}}:</strong> {{rec_budget}} chars</p>
+        <p>{{rec_rationale}}</p>
+        {{#rec_diff}}
+        <p>
+            <a class="btn btn-primary" href="{{apply_url}}" role="button">
+                {{#str}}prompt_metrics:apply, local_ai_course_assistant{{/str}}
+            </a>
+        </p>
+        {{/rec_diff}}
+        {{/has_rec}}
+        {{^has_rec}}
+        <div class="alert alert-success" role="alert">
+            {{#str}}prompt_metrics:rec_optimal, local_ai_course_assistant{{/str}}
+        </div>
+        {{/has_rec}}
+    {{/enough_for_rec}}
+
+    <h3>{{#str}}prompt_metrics:auto_tune_heading, local_ai_course_assistant{{/str}}</h3>
+    {{#auto_tune_on}}
+    <p>{{#str}}prompt_metrics:auto_tune_on, local_ai_course_assistant{{/str}}</p>
+    {{/auto_tune_on}}
+    {{^auto_tune_on}}
+    <p>{{#str}}prompt_metrics:auto_tune_off, local_ai_course_assistant{{/str}}</p>
+    {{/auto_tune_on}}
+    <p><a href="{{settings_url}}">{{#str}}prompt_metrics:settings_link, local_ai_course_assistant{{/str}}</a></p>
+    {{/has_data}}
+</div>

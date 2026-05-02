@@ -92,6 +92,15 @@ class token_cost_manager {
         'open-mixtral'      => ['input' =>  0.65, 'output' =>  0.65],
         'codestral'         => ['input' =>  0.30, 'output' =>  0.90],
 
+        // ── Together AI (open-weight models, OpenAI-compatible API) ──────────
+        // Together's Serverless Inference tier. Llama 3.1 8B Instruct Turbo
+        // is the FP8-quantized speed-optimized variant Saylor runs in prod.
+        // Keys are lowercased because get_rates() lowercases the model name
+        // before doing the str_starts_with match (longer prefixes win).
+        'meta-llama/llama-3.1-8b-instruct-turbo'   => ['input' => 0.18, 'output' => 0.18],
+        'meta-llama/llama-3.1-70b-instruct-turbo'  => ['input' => 0.88, 'output' => 0.88],
+        'meta-llama/llama-3.1-405b-instruct-turbo' => ['input' => 3.50, 'output' => 3.50],
+
         // ── Groq (open-source models) ─────────────────────────────────────────
         // Groq charges vary by model; these are approximate hosted rates.
         'llama-3.3-70b'     => ['input' =>  0.59, 'output' =>  0.79],
