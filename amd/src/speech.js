@@ -101,14 +101,35 @@ define([], function() {
     /**
      * Get the stored language code (ISO 639-1), or null if none set.
      *
+     * v5.0.0: when no explicit user preference exists, fall back to the
+     * Moodle session language (`M.cfg.language`) before the browser
+     * language. Addresses the Thelma v3.4.7 UT finding where a learner
+     * with their Moodle UI in English saw SOLA respond in Spanish because
+     * navigator.language was es-* on their device.
+     *
      * @returns {string|null}
      */
     const getLang = function() {
         try {
-            return localStorage.getItem(LANG_KEY) || null;
+            const stored = localStorage.getItem(LANG_KEY);
+            if (stored) {
+                return stored;
+            }
         } catch (e) {
-            return null;
+            // localStorage unavailable — fall through.
         }
+        // Prefer Moodle session language over browser language.
+        try {
+            if (typeof M !== 'undefined' && M.cfg && M.cfg.language) {
+                const moodleLang = String(M.cfg.language).split('_')[0].split('-')[0].toLowerCase();
+                if (SUPPORTED_LANGS[moodleLang]) {
+                    return moodleLang;
+                }
+            }
+        } catch (e) {
+            // M not available — fall through.
+        }
+        return null;
     };
 
     /**

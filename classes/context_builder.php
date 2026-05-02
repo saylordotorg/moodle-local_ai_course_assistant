@@ -1116,9 +1116,17 @@ class context_builder {
                 'tl' => 'Filipino', 'wo' => 'Wolof', 'yo' => 'Yoruba', 'zu' => 'Zulu',
             ];
             $langname = $langnames[$lang] ?? strtoupper($lang);
+            // v5.0.0 patch (Thelma UT re-audit): explicit override beats history.
+            // The earlier directive said "regardless of what the student writes
+            // in" but the model still reverted to a prior conversation-history
+            // language when the user asked an off-topic question. Adding the
+            // "history-override" sentence so the current preference wins even
+            // when prior turns were in a different language.
             $base .= "\n\n**IMPORTANT: The student has set their preferred language to {$langname} ({$lang}). "
-                . "You MUST respond in {$langname} for all messages in this conversation, "
-                . "regardless of what language the student writes in.**";
+                . "You MUST respond in {$langname} for every message in this conversation. "
+                . "This applies regardless of what language the student writes in, AND regardless of what language any earlier turn in the conversation history was answered in. "
+                . "If the conversation history shows responses in a different language (because the preference changed mid-session), ignore that — the current preference is {$langname}. "
+                . "Translate course-specific technical terms as needed; do not switch back.**";
         } else {
             $base .= "\nIf a student writes in a language other than English, detect their language and respond in that same language.";
         }
