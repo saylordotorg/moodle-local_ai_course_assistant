@@ -5239,23 +5239,35 @@ define([
      * Handle clear history.
      */
     const handleClear = function() {
-        // "Clear screen" wipes the visible drawer only — stored chat history
-        // in the DB is preserved so instructors retain the full transcript for
-        // analytics and student learning profiles.
+        // v5.0.0 patch (Tomi UT round 2): Clear now wipes server-side history
+        // too. Previously this only cleared the visible drawer + local JS
+        // array, but the conversation_manager kept the prior turns in the DB
+        // and re-included them on the next chat call — so a customised
+        // persona or accumulated context kept leaking into "fresh" chats.
+        // Per the audit, the ownership-checked external function exists at
+        // local_ai_course_assistant_clear_history; we just have to call it.
+        const wipe = function() {
+            UI.clearMessages();
+            setConversationHistory([]);
+            // Server-side clear; failure is non-fatal (visible drawer still
+            // wipes), but log to console so we notice in dev.
+            Repo.clearHistory(courseId).catch(function(err) {
+                if (typeof console !== 'undefined' && console.warn) {
+                    console.warn('SOLA clearHistory failed:', err);
+                }
+            });
+            showGreeting();
+        };
         Str.get_string('chat:clear_confirm', 'local_ai_course_assistant').then(function(confirmMsg) {
             if (!window.confirm(confirmMsg)) { // eslint-disable-line no-alert
                 return;
             }
-            UI.clearMessages();
-            setConversationHistory([]);
-            showGreeting();
+            wipe();
         }).catch(function() {
             if (!window.confirm('Clear the visible messages?')) { // eslint-disable-line no-alert
                 return;
             }
-            UI.clearMessages();
-            setConversationHistory([]);
-            showGreeting();
+            wipe();
         });
     };
 

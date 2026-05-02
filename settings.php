@@ -274,7 +274,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/prompt_budget_chars',
         get_string('settings:prompt_budget_chars', 'local_ai_course_assistant'),
         get_string('settings:prompt_budget_chars_desc', 'local_ai_course_assistant'),
-        '10000',
+        '12000',
         PARAM_INT
     ));
     $settings->add(new admin_setting_configselect(
