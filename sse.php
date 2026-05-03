@@ -523,10 +523,18 @@ try {
         );
     }
 
-    // v4.11.0+v4.12.0: optional prompt debug log. When the admin flag is
-    // on, write the assembled system prompt + per-section character counts
-    // (including v4.12.0 category-level breakdown) to a rolling file.
-    // Default off; never logs PII (system prompt only — no user input).
+    // v4.11.0+v4.12.0+v5.0.0p6: optional FULL-payload debug log. When the
+    // admin flag is on, write what the model actually receives this turn:
+    // assembled system prompt + per-section breakdown + conversation history
+    // array + the current user message + attachment metadata. Per Tomi UT
+    // round 3, the system-prompt-only dump was misleading because it did not
+    // show the history that the LLM is also seeing — and conversation drift
+    // (Garfield leakage etc.) is invisible without it.
+    //
+    // Default off. When on, the file lives at
+    // moodledata/temp/sola_prompt_debug.log and rotates at 1 MiB. The file
+    // contains learner messages, so treat it as PII once enabled and gate
+    // on the same site:config capability that controls the admin toggle.
     if ((bool) get_config('local_ai_course_assistant', 'prompt_debug_enabled')) {
         try {
             $logpath = $CFG->dataroot . '/temp/sola_prompt_debug.log';
@@ -552,8 +560,29 @@ try {
                 }
                 $entry .= "Sections:\n" . implode("\n", $rows) . "\n";
             }
-            $entry .= "--- ASSEMBLED SYSTEM PROMPT ---\n" . $systemprompt . "\n"
-                . "================================================================\n\n";
+            $entry .= "--- ASSEMBLED SYSTEM PROMPT ---\n" . $systemprompt . "\n\n";
+
+            // v5.0.0 patch 6: history + current user message — i.e. the
+            // ACTUAL final payload going to the model. This is what Tomi
+            // asked for: dumping just the system prompt does not reveal
+            // history-driven drift.
+            $entry .= "--- HISTORY (" . count($history) . " messages) ---\n";
+            foreach ($history as $i => $h) {
+                $role = (string) ($h['role'] ?? '?');
+                $content = (string) ($h['content'] ?? '');
+                $entry .= "[{$i}] {$role} (" . strlen($content) . " chars): {$content}\n";
+            }
+            $entry .= "\n--- CURRENT USER MESSAGE (" . strlen($message) . " chars) ---\n"
+                . $message . "\n";
+            if ($attachmentmeta !== null) {
+                $entry .= "\n--- ATTACHMENT ---\n"
+                    . "filename={$attachmentmeta['filename']} mime={$attachmentmeta['mime']} "
+                    . "size={$attachmentmeta['size']}\n";
+                if ($attachedpdftext !== '') {
+                    $entry .= "pdf_extracted_chars=" . mb_strlen($attachedpdftext) . "\n";
+                }
+            }
+            $entry .= "================================================================\n\n";
             file_put_contents($logpath, $entry, FILE_APPEND | LOCK_EX);
         } catch (\Throwable $e) {
             // Debug logging is best-effort — never break a chat turn.

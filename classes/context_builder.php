@@ -256,6 +256,7 @@ class context_builder {
         // post-cache injection that used to live in sse.php — now flows
         // through the structured assembly + budget pipeline so it can't
         // be silently dropped and shows up properly in the debug log.
+        $hascurrentpage = false;
         if ($pageid > 0) {
             $pagecontent = self::get_module_content($pageid, 12000);
             if (!empty($pagecontent)) {
@@ -265,6 +266,7 @@ class context_builder {
                     . $pagecontent . "\n\n"
                     . "**Page-grounded answer required.** If the learner's question is about this page and the answer is in the passage above, quote or paraphrase from the passage directly. The page content takes precedence over your prior conversation turns and over any persona styling. Do not deflect a question this passage answers.";
                 $sections[] = new section('current_page_content', section::CAT_CONTEXT, 95, $pageblock, 500);
+                $hascurrentpage = true;
             }
         }
 
@@ -336,6 +338,30 @@ class context_builder {
 
         // Safety — security guidance always lands in full (never truncated).
         $sections[] = new section('security', section::CAT_SAFETY, 100, self::get_security_instructions(), 0);
+
+        // v5.0.0 patch 6 (Tomi UT round 3): page-grounding directive re-emit
+        // at SAFETY tail. The full page text + first directive sit at
+        // CONTEXT priority 95, but chat-tuned LLMs over-weight the FIRST
+        // instruction (the admin systemprompt persona at IDENTITY 100). On
+        // dev with a heavy persona, the model continued the persona thread
+        // instead of citing the page. Re-emitting just the directive (no
+        // content body, ~400 chars) at SAFETY priority 50 makes it the
+        // LAST thing the model reads, where recency bias works in our
+        // favour. Only fires when there is page content to ground on.
+        if ($hascurrentpage) {
+            $sections[] = new section(
+                'page_grounding_reminder',
+                section::CAT_SAFETY,
+                50,
+                "\n\n## Page-grounded answer required\n"
+                    . "If the learner's question is about the current page and the answer is in the "
+                    . "\"## Current Page Content\" section above, quote or paraphrase from that passage "
+                    . "directly. The page content takes precedence over conversation history and persona "
+                    . "styling. Do not deflect a question this passage answers, and do not stay in "
+                    . "character at the cost of correctness.",
+                0
+            );
+        }
 
         // Assemble within budget. The legacy MAX_PROMPT_LENGTH sets the upper
         // bound; an admin-configurable budget below it lets operators trade
