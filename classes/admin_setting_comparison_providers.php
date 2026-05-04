@@ -40,6 +40,7 @@ class admin_setting_comparison_providers extends \admin_setting {
         'minimax'   => 'MiniMax',
         'mistral'   => 'Mistral AI',
         'openrouter' => 'OpenRouter',
+        'together'  => 'Together AI',
         'xai'       => 'xAI (Grok)',
         'coreai'    => 'Moodle AI (core_ai)',
         'custom'    => 'Custom (OpenAI-compatible)',

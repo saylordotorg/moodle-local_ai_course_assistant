@@ -373,6 +373,8 @@ abstract class base_provider implements provider_interface {
                 return new mistral_provider($overrides);
             case 'openrouter':
                 return new openrouter_provider($overrides);
+            case 'together':
+                return new together_provider($overrides);
             case 'xai':
                 return new xai_provider($overrides);
             case 'coreai':

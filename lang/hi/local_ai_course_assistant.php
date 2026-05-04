@@ -420,6 +420,7 @@ $string['analytics:thanks_feedback'] = 'आपकी प्रतिक्रि
 // LLM provider names.
 $string['settings:provider_mistral'] = 'Mistral AI';
 $string['settings:provider_openrouter'] = 'OpenRouter';
+$string['settings:provider_together'] = 'Together AI (Llama 3.1 8B/70B/405B Turbo, Mistral, Qwen)';
 $string['settings:provider_xai'] = 'xAI (Grok)';
 
 $string['settings:provider_coreai'] = 'Moodle AI (core_ai subsystem)';

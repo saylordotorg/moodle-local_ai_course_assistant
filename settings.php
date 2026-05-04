@@ -203,6 +203,7 @@ if ($hassiteconfig) {
         'minimax' => get_string('settings:provider_minimax', 'local_ai_course_assistant'),
         'mistral' => get_string('settings:provider_mistral', 'local_ai_course_assistant'),
         'openrouter' => get_string('settings:provider_openrouter', 'local_ai_course_assistant'),
+        'together' => get_string('settings:provider_together', 'local_ai_course_assistant'),
         'xai' => get_string('settings:provider_xai', 'local_ai_course_assistant'),
         'coreai' => get_string('settings:provider_coreai', 'local_ai_course_assistant'),
         'custom' => get_string('settings:provider_custom', 'local_ai_course_assistant'),
@@ -1125,14 +1126,14 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/voice_providers_heading',
         'Voice providers (Realtime, TTS, STT)',
-        'Configure one or more voice API providers. Use the dropdowns below to choose which registered provider drives each capability. '
-        . 'If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used.'
+        'Configure one or more voice API providers. These settings are independent of the chat provider above and the RAG embedding provider — voice has its own provider list because only OpenAI and xAI currently expose WebSocket Realtime, TTS, and STT endpoints. Use the dropdowns below to choose which registered provider drives each capability. '
+        . 'If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used. Saylor sites running Together AI / Anthropic / DeepSeek / Gemini / Mistral for chat must configure at least one row here for voice to work.'
     ));
 
     $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
         'local_ai_course_assistant/voice_providers',
         'Voice providers',
-        'Add one row per voice API. Provider IDs: openai, xai. The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).'
+        'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).'
     ));
 
     $activechoices = ['' => '(use first configured or legacy fallback)'];
