@@ -1842,6 +1842,14 @@ if ($hassiteconfig) {
         'moodle/site:config'
     ));
 
+    // v5.0.0 patch 10: prompt-debug-log viewer (per-turn assembled prompt + history).
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_prompt_debug_view',
+        get_string('prompt_debug_view:title', 'local_ai_course_assistant'),
+        new moodle_url('/local/ai_course_assistant/prompt_debug_view.php'),
+        'moodle/site:config'
+    ));
+
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_updates',
         get_string('update:title', 'local_ai_course_assistant'),

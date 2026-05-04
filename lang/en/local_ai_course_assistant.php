@@ -1013,6 +1013,23 @@ $string['prompt_metrics:auto_tune_heading']      = 'Daily auto-tune';
 $string['prompt_metrics:auto_tune_on']           = 'Daily auto-tune is ON. The recommendation will be applied automatically every night at 03:20 server time.';
 $string['prompt_metrics:auto_tune_off']          = 'Daily auto-tune is OFF. The recommendation is shown here for review; nothing is applied automatically. Toggle on in plugin settings if you want unattended daily tuning.';
 $string['prompt_metrics:settings_link']          = 'Open plugin settings to toggle auto-tune.';
+// v5.0.0 patch 10: prompt debug log viewer.
+$string['prompt_debug_view:title']            = 'Prompt debug log viewer';
+$string['prompt_debug_view:subtitle']         = 'Per-turn assembled system prompt + per-section breakdown + conversation history + current user message + attachment metadata, exactly as the model received them. Use this to verify whether a section like Current Page Content actually landed in the prompt and to debug answer-quality issues without SSHing into the server.';
+$string['prompt_debug_view:disabled']         = 'Prompt debug logging is currently OFF. No new entries will be written until it is enabled.';
+$string['prompt_debug_view:enable_link']      = 'Open plugin settings to enable "Log assembled system prompt to file".';
+$string['prompt_debug_view:no_log_yet']       = 'No log file yet. Send at least one chat turn after enabling the debug log; the file is created on first write.';
+$string['prompt_debug_view:empty']            = 'Log file exists but is empty. Send a chat turn and refresh.';
+$string['prompt_debug_view:file_status']      = 'Log file size';
+$string['prompt_debug_view:showing']          = 'Showing most recent entries (newest first), limit';
+$string['prompt_debug_view:total']            = 'Total prompt';
+$string['prompt_debug_view:budget']           = 'Budget at capture';
+$string['prompt_debug_view:sections']         = 'Sections (by category)';
+$string['prompt_debug_view:assembled_prompt'] = 'Assembled system prompt';
+$string['prompt_debug_view:history']          = 'Conversation history sent to the model';
+$string['prompt_debug_view:current_message']  = 'Current user message';
+$string['prompt_debug_view:attachment']       = 'Attachment metadata';
+$string['prompt_debug_view:show_more']        = 'Show more entries';
 // v4.10.0: avatar session cost tracking.
 $string['settings:avatar_rate_card_overrides']      = 'Avatar rate card overrides (JSON)';
 $string['settings:avatar_rate_card_overrides_desc'] = 'JSON object keyed by avatar provider with a single per-minute USD rate. Replaces the bundled rate for that provider. Example: <pre>{ "did": 0.18, "heygen": 0.40, "tavus": 0.25 }</pre> Empty = use the v4.10.0 bundled defaults: D-ID $0.30/min, HeyGen $0.50/min, Tavus $0.30/min, Synthesia $0.40/min. Set this to your contracted rate so the analytics dashboard reflects the institution\'s actual cost.';

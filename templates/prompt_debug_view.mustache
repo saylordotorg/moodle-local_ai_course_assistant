@@ -1,0 +1,134 @@
+{{!
+    @template local_ai_course_assistant/prompt_debug_view
+
+    Admin viewer for the per-turn prompt debug log written by sse.php
+    when prompt_debug_enabled is on. Saves admins from SSHing into the
+    server to read moodledata/temp/sola_prompt_debug.log by hand.
+
+    Example context (json):
+    {
+        "enabled": true,
+        "log_exists": true,
+        "log_size_kb": "12.4",
+        "has_entries": true,
+        "limit": 10,
+        "next_limit": 20,
+        "can_show_more": true,
+        "settings_url": "https://example.com/admin/category.php?category=local_ai_course_assistant",
+        "entries": [
+            {
+                "timestamp": "2026-05-04 12:30:00",
+                "courseid": 5,
+                "userid": 3,
+                "provider": "together",
+                "total": "11969 chars (~2992 tokens)",
+                "budget": "12000 chars",
+                "sections": "  identity   base_template            100  3,181 chars",
+                "system_prompt": "You are SOLA ...",
+                "history": "[0] user (12 chars): good morning",
+                "message": "What does this page say about quantum computing?",
+                "attachment": "",
+                "has_attachment": false,
+                "has_page_content": true,
+                "has_topic_focus": true
+            }
+        ]
+    }
+}}
+<div class="container-fluid sola-prompt-debug-view" role="region" aria-labelledby="sola-pdv-h1">
+    <h2 id="sola-pdv-h1">{{#str}}prompt_debug_view:title, local_ai_course_assistant{{/str}}</h2>
+    <p class="text-muted">{{#str}}prompt_debug_view:subtitle, local_ai_course_assistant{{/str}}</p>
+
+    {{^enabled}}
+    <div class="alert alert-warning" role="alert">
+        <strong>{{#str}}prompt_debug_view:disabled, local_ai_course_assistant{{/str}}</strong>
+        <p class="mb-0 mt-1">
+            <a href="{{settings_url}}">{{#str}}prompt_debug_view:enable_link, local_ai_course_assistant{{/str}}</a>
+        </p>
+    </div>
+    {{/enabled}}
+
+    {{#enabled}}
+        {{^log_exists}}
+        <div class="alert alert-info" role="alert">
+            {{#str}}prompt_debug_view:no_log_yet, local_ai_course_assistant{{/str}}
+        </div>
+        {{/log_exists}}
+
+        {{#log_exists}}
+        <p class="text-muted small">
+            {{#str}}prompt_debug_view:file_status, local_ai_course_assistant{{/str}}: {{log_size_kb}} KB
+        </p>
+        {{/log_exists}}
+    {{/enabled}}
+
+    {{^has_entries}}
+        {{#enabled}}{{#log_exists}}
+        <div class="alert alert-info" role="alert">
+            {{#str}}prompt_debug_view:empty, local_ai_course_assistant{{/str}}
+        </div>
+        {{/log_exists}}{{/enabled}}
+    {{/has_entries}}
+
+    {{#has_entries}}
+    <p class="text-muted">
+        {{#str}}prompt_debug_view:showing, local_ai_course_assistant{{/str}}: {{limit}}
+    </p>
+
+    {{#entries}}
+    <details class="card mb-3 sola-pdv-entry">
+        <summary class="card-header" style="cursor:pointer;">
+            <strong>{{timestamp}}</strong>
+            <span class="badge badge-secondary ml-2">course {{courseid}}</span>
+            <span class="badge badge-secondary ml-1">user {{userid}}</span>
+            <span class="badge badge-info ml-1">{{provider}}</span>
+            {{#has_page_content}}<span class="badge badge-success ml-1">page content</span>{{/has_page_content}}
+            {{^has_page_content}}<span class="badge badge-light ml-1" title="No current_page_content section assembled this turn">no page content</span>{{/has_page_content}}
+            {{#has_topic_focus}}<span class="badge badge-success ml-1">topic focus</span>{{/has_topic_focus}}
+            {{#has_attachment}}<span class="badge badge-warning ml-1">attachment</span>{{/has_attachment}}
+        </summary>
+        <div class="card-body">
+            <dl class="row mb-2">
+                <dt class="col-sm-2">{{#str}}prompt_debug_view:total, local_ai_course_assistant{{/str}}</dt>
+                <dd class="col-sm-10">{{total}}</dd>
+                <dt class="col-sm-2">{{#str}}prompt_debug_view:budget, local_ai_course_assistant{{/str}}</dt>
+                <dd class="col-sm-10">{{budget}}</dd>
+            </dl>
+
+            <h4>{{#str}}prompt_debug_view:sections, local_ai_course_assistant{{/str}}</h4>
+            <pre class="bg-light p-2 small" style="max-height:240px;overflow:auto;">{{sections}}</pre>
+
+            <details class="mt-2">
+                <summary><strong>{{#str}}prompt_debug_view:assembled_prompt, local_ai_course_assistant{{/str}}</strong></summary>
+                <pre class="bg-light p-2 small" style="max-height:520px;overflow:auto;">{{system_prompt}}</pre>
+            </details>
+
+            <details class="mt-2">
+                <summary><strong>{{#str}}prompt_debug_view:history, local_ai_course_assistant{{/str}}</strong></summary>
+                <pre class="bg-light p-2 small" style="max-height:520px;overflow:auto;">{{history}}</pre>
+            </details>
+
+            <details class="mt-2" open>
+                <summary><strong>{{#str}}prompt_debug_view:current_message, local_ai_course_assistant{{/str}}</strong></summary>
+                <pre class="bg-light p-2 small" style="max-height:240px;overflow:auto;">{{message}}</pre>
+            </details>
+
+            {{#has_attachment}}
+            <details class="mt-2">
+                <summary><strong>{{#str}}prompt_debug_view:attachment, local_ai_course_assistant{{/str}}</strong></summary>
+                <pre class="bg-light p-2 small">{{attachment}}</pre>
+            </details>
+            {{/has_attachment}}
+        </div>
+    </details>
+    {{/entries}}
+
+    {{#can_show_more}}
+    <p>
+        <a class="btn btn-outline-secondary btn-sm" href="?limit={{next_limit}}" role="button">
+            {{#str}}prompt_debug_view:show_more, local_ai_course_assistant{{/str}}
+        </a>
+    </p>
+    {{/can_show_more}}
+    {{/has_entries}}
+</div>
