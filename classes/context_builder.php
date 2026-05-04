@@ -258,7 +258,16 @@ class context_builder {
         // be silently dropped and shows up properly in the debug log.
         $hascurrentpage = false;
         if ($pageid > 0) {
-            $pagecontent = self::get_module_content($pageid, 12000);
+            // v5.1.0: cap exposed as an admin setting. Default 12000 matches
+            // the prior hardcoded behaviour. Cost-conscious admins running
+            // paid hosted providers can clamp this (down to 500, which is
+            // the section's truncation floor anyway) without disabling page
+            // grounding. The clamp here is a sanity floor so a misconfigured
+            // 0 or negative value cannot suppress the section silently.
+            $maxchars = (int) (get_config('local_ai_course_assistant',
+                'current_page_content_maxchars') ?: 12000);
+            $maxchars = max(500, min(12000, $maxchars));
+            $pagecontent = self::get_module_content($pageid, $maxchars);
             if (!empty($pagecontent)) {
                 $title = $pagetitle !== '' ? $pagetitle : 'this page';
                 $pageblock = "\n\n## Current Page Content\n"

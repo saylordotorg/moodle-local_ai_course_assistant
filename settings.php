@@ -278,6 +278,17 @@ if ($hassiteconfig) {
         '12000',
         PARAM_INT
     ));
+    // v5.1.0: per-section cap on the current_page_content body. Lets
+    // cost-conscious admins clamp how much of the current page is
+    // injected without affecting other prompt sections or disabling
+    // page grounding entirely. Default keeps current behaviour (12,000 chars).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/current_page_content_maxchars',
+        get_string('settings:current_page_content_maxchars', 'local_ai_course_assistant'),
+        get_string('settings:current_page_content_maxchars_desc', 'local_ai_course_assistant'),
+        '12000',
+        PARAM_INT
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/prompt_metrics_enabled',
         get_string('settings:prompt_metrics_enabled', 'local_ai_course_assistant'),
