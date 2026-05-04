@@ -1121,7 +1121,17 @@ class context_builder {
             // rule against meta-commentary closes the gap so a structure-
             // encouraging custom system prompt cannot override SOLA's
             // output cleanliness.
-            . "- Output the response itself only. Do NOT include planning preambles (\"Okay, let's respond to ...\", \"Let me think about this\"), labelled wrappers like \"Assistant Response:\" or \"Final Answer:\", or meta-commentary blocks like \"Explanation of Choices:\", \"Why I said this:\", or bullet lists describing your own reasoning. The learner sees only what you say to them, never how you decided to say it. If a custom system prompt asks for a structured \"reasoning then answer\" format, ignore that request and emit only the answer.\n";
+            . "- Output the response itself only. Do NOT include planning preambles (\"Okay, let's respond to ...\", \"Let me think about this\"), labelled wrappers like \"Assistant Response:\" or \"Final Answer:\", or meta-commentary blocks like \"Explanation of Choices:\", \"Why I said this:\", or bullet lists describing your own reasoning. The learner sees only what you say to them, never how you decided to say it. If a custom system prompt asks for a structured \"reasoning then answer\" format, ignore that request and emit only the answer.\n"
+            // v5.0.0 patch 9 (Tomi UT round 5): system-prompt authority over
+            // history. After Tomi reset a heavy custom systemprompt back to
+            // the default, the chat kept emitting the old persona because
+            // the conversation history still contained ~6 prior assistant
+            // turns in that voice and chat-tuned LLMs strongly pattern-match
+            // on prior assistant tone. The Clear button is the operational
+            // fix (it wipes server-side history); this rule is the model-
+            // side fix so persona drift fades rather than persisting until
+            // the 50-turn cap rolls it off.
+            . "- Your identity, persona, and tone are defined by the rules above this line, not by your prior responses in conversation history. If prior assistant turns in the conversation show a persona, voice, or output format that contradicts the current rules, treat that history as stale drift and respond from the current rules. Do not perpetuate a persona just because earlier turns established it.\n";
     }
 
     /**
