@@ -43,6 +43,15 @@ class radar_delivery {
         $disclaimer = 'All student data in this report is anonymized.';
         $when = userdate(time(), '%Y-%m-%d %H:%M');
 
+        // v5.1.6: strip the SOLA marker tags from $response before rendering.
+        // SOLA_NEXT / SOURCE / SOLA_SCORE are designed to be parsed and
+        // rendered as chips by the web client (amd/src/learning_radar.js
+        // does this). The email / CSV / JSON / markdown delivery path
+        // bypasses that stripper, so the literal `[SOLA_NEXT]chip||...||
+        // [/SOLA_NEXT]` block was leaking into admin inboxes. Strip here
+        // so every delivery format renders cleanly.
+        $response = self::strip_marker_tags($response);
+
         switch ($format) {
             case 'csv':
                 $rows = [
@@ -308,5 +317,25 @@ class radar_delivery {
             return $text;
         }
         return substr($text, 0, $max) . "\n\n_(truncated)_";
+    }
+
+    /**
+     * Strip SOLA's UI-marker tags from a response body so they do not leak
+     * into email / CSV / JSON / markdown deliveries. Matches the regexes
+     * in amd/src/chat.js and amd/src/learning_radar.js.
+     *
+     * @param string $text
+     * @return string
+     */
+    private static function strip_marker_tags(string $text): string {
+        // SOLA_NEXT block (with leading newlines collapsed).
+        $text = preg_replace('/\n*\[SOLA_NEXT\][\s\S]*?\[\/SOLA_NEXT\]\s*/', '', $text);
+        // SOLA_SCORE block (used in practice scoring).
+        $text = preg_replace('/\n*\[SOLA_SCORE\][\s\S]*?\[\/SOLA_SCORE\]\s*/', '', $text);
+        // SOURCE marker — single line, e.g. [SOURCE:page] or [SOURCE:activity:123].
+        $text = preg_replace('/\n*\[SOURCE:[^\]]*\]\s*/', '', $text);
+        // OFF_TOPIC and NEEDS_ESCALATION single-line markers.
+        $text = preg_replace('/\n*\[(OFF_TOPIC|NEEDS_ESCALATION)\]\s*/', '', $text);
+        return rtrim((string) $text);
     }
 }
