@@ -89,6 +89,7 @@ class context_builder {
      * @param array  $retrieved_chunks Optional RAG chunks: [['content'=>string, 'score'=>float], ...]
      * @param int    $pageid          Current Moodle page id when available.
      * @param string $pagetitle       Current Moodle page title when available.
+     * @param string $quizmode        v5.2.0: 'coach' to inject coach-mode SAFETY block; '' otherwise.
      * @return string The complete system prompt.
      */
     public static function build_system_prompt(

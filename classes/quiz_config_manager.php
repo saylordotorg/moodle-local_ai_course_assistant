@@ -41,6 +41,9 @@ class quiz_config_manager {
 
     /**
      * Fetch the raw config row for a quiz cmid (or null).
+     *
+     * @param int $cmid course_modules.id of the quiz
+     * @return \stdClass|null
      */
     public static function get(int $cmid): ?\stdClass {
         global $DB;
@@ -93,6 +96,10 @@ class quiz_config_manager {
      *
      * Saving 'default' deletes the row so the row absence == fall back to
      * the grade-based heuristic.
+     *
+     * @param int $cmid     course_modules.id of the quiz
+     * @param int $courseid course id (denormalised for fast list_for_course)
+     * @param string $level one of self::LEVELS
      */
     public static function save(int $cmid, int $courseid, string $level): void {
         global $DB;
@@ -133,6 +140,7 @@ class quiz_config_manager {
      * stored_level (raw db value or 'default'), effective_level
      * (full|coach|hidden after fallback).
      *
+     * @param int $courseid course id to list quizzes for
      * @return array<int, \stdClass>
      */
     public static function list_for_course(int $courseid): array {
