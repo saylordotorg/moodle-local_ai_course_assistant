@@ -1179,14 +1179,18 @@ class context_builder {
             return "\n\n## Suggested Follow-up Actions\n" . $blocks['next_steps'];
         }
         return "\n\n## Suggested Follow-up Actions\n"
-            . "After EVERY response, append exactly this marker on its own line at the very end:\n"
-            . "[SOLA_NEXT]suggestion 1||suggestion 2||suggestion 3||suggestion 4[/SOLA_NEXT]\n\n"
-            . "Each suggestion should be a short (3–8 word) actionable prompt that naturally continues "
-            . "the conversation. Examples: \"Quiz me on this\", \"Give me an example\", "
-            . "\"Explain it more simply\", \"What should I study next?\". "
-            . "Vary suggestions based on context. Always include exactly 4, separated by ||. "
-            . "The [SOLA_NEXT]...[/SOLA_NEXT] block is hidden from the student and must appear "
-            . "at the very end of your response with no text after it.";
+            . "After EVERY response, append exactly this marker on its own line at the very end. "
+            . "The four chips MUST be specific to what was just discussed in this turn — never echo "
+            . "placeholder text.\n\n"
+            . "Marker shape:\n"
+            . "[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]\n\n"
+            . "Worked example (note that real chip text replaces every angle-bracketed placeholder):\n"
+            . "[SOLA_NEXT]Quiz me on this||Give me an example||Explain it more simply||What should I study next?[/SOLA_NEXT]\n\n"
+            . "Each chip is a short (3–8 word) actionable prompt that naturally continues the "
+            . "conversation. Vary the chips to fit this specific turn — do not reuse the worked "
+            . "example verbatim and never emit the literal words \"suggestion 1\", \"chip 1\", or "
+            . "\"<chip 1>\". Always include exactly 4 chips, separated by ||. The whole "
+            . "[SOLA_NEXT]...[/SOLA_NEXT] block is stripped before the learner sees it.";
     }
 
     /**
@@ -1249,7 +1253,7 @@ class context_builder {
             // position at the very end of the prompt where chat-tuned models pay
             // the most attention. The marker bullet stays in get_marker_instructions
             // for redundancy, but this is the enforcement copy.
-            . "- ALWAYS finish your response with this exact marker on its own final line, with no text after it: `[SOLA_NEXT]suggestion 1||suggestion 2||suggestion 3||suggestion 4[/SOLA_NEXT]`. Each suggestion is a short (3-8 word) actionable follow-up the learner could click next, varied to fit this turn's content. The block is stripped before display — the learner never sees the brackets, just four clickable chips. This is required output format on every turn.\n";
+            . "- ALWAYS finish your response with this exact marker on its own final line, with no text after it: `[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]`. Replace each `<chip N>` placeholder with a real, short (3-8 word), actionable follow-up prompt specific to this turn. Worked example of correctly-filled output: `[SOLA_NEXT]Quiz me on this||Give me an example||Explain it more simply||What should I study next?[/SOLA_NEXT]`. NEVER emit the literal words \"suggestion 1\", \"chip 1\", or \"<chip 1>\" — those are placeholder shapes to be replaced. The block is stripped before display — the learner never sees the brackets, just four clickable chips. This is required output format on every turn.\n";
     }
 
     /**

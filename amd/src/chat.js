@@ -141,9 +141,16 @@ define([
 
         const nextMatch = cleanText.match(NEXT_BLOCK_RE);
         if (nextMatch) {
+            // v5.3.2: drop placeholder-looking chips so a weaker model that
+            // echoes the prompt template (e.g. "suggestion 1", "<chip 1>")
+            // never leaks to the UI. If the filter wipes everything, the
+            // caller falls back to its own defaults.
+            const placeholderRe = /^(suggestion\s*\d+|<?\s*chip\s*\d+\s*>?|\d+\s*:\s*\.?\.?\.?|placeholder.*|chip.*|<chip\s*\d+>)$/i;
             suggestions = nextMatch[1].split('||').map(function(s) {
                 return s.trim();
-            }).filter(Boolean).slice(0, 4);
+            }).filter(function(s) {
+                return s.length > 0 && !placeholderRe.test(s);
+            }).slice(0, 4);
             cleanText = cleanText.replace(NEXT_BLOCK_RE, '').trimEnd();
         }
 
