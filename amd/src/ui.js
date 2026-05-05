@@ -4397,6 +4397,35 @@ define([
             content.appendChild(panel._a11ySection);
         }
 
+        // v5.3.4: My SOLA data section. Surfaces the existing
+        // settings_user.php GDPR self-service page (download bundle,
+        // per-course delete, full delete) which previously lived only at
+        // a direct URL with no link from the drawer.
+        const dataSection = document.createElement('div');
+        dataSection.className = 'aica-settings-panel__section';
+        const dataHead = document.createElement('h3');
+        dataHead.className = 'aica-settings-panel__section-title';
+        dataHead.textContent = 'My SOLA data';
+        dataSection.appendChild(dataHead);
+
+        const dataDesc = document.createElement('p');
+        dataDesc.className = 'aica-settings-panel__empty-note';
+        dataDesc.textContent = 'Download a copy of everything SOLA has stored about you, '
+            + 'or delete it from this course or across every course. Opens in a new tab.';
+        dataSection.appendChild(dataDesc);
+
+        const dataLink = document.createElement('a');
+        dataLink.href = (window.M && M.cfg && M.cfg.wwwroot ? M.cfg.wwwroot : '')
+            + '/local/ai_course_assistant/settings_user.php';
+        dataLink.target = '_blank';
+        dataLink.rel = 'noopener';
+        dataLink.textContent = 'Open my data settings →';
+        dataLink.style.cssText = 'display:inline-block;margin-top:6px;font-size:13px;'
+            + 'color:#152233;text-decoration:underline';
+        dataSection.appendChild(dataLink);
+
+        content.appendChild(dataSection);
+
         panel.appendChild(content);
 
         // --- Save button ---
