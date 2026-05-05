@@ -237,6 +237,10 @@ class struggle_classifier {
 
     /**
      * Trim a string to fit a CHAR column.
+     *
+     * @param string $s
+     * @param int $max
+     * @return string
      */
     private static function cap(string $s, int $max): string {
         if (function_exists('mb_substr')) {

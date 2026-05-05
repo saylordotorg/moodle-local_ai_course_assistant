@@ -58,6 +58,10 @@ class learner_memory_manager {
 
     /**
      * Read the raw row (or null).
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return \stdClass|null
      */
     public static function get(int $userid, int $courseid): ?\stdClass {
         global $DB;
@@ -128,6 +132,10 @@ class learner_memory_manager {
     /**
      * Clear a single sticking-point entry by topic (case-insensitive).
      * No-op if the entry is absent.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param string $topic
      */
     public static function forget_sticking_point(int $userid, int $courseid, string $topic): void {
         $topic = self::trim_field($topic);
@@ -145,6 +153,11 @@ class learner_memory_manager {
     /**
      * Set or clear a style preference key (e.g. 'coaching_style' = 'tutor').
      * Pass empty string to unset.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param string $key
+     * @param string $value
      */
     public static function set_style_pref(int $userid, int $courseid, string $key, string $value): void {
         $key = self::trim_field($key);
@@ -164,6 +177,9 @@ class learner_memory_manager {
     /**
      * Wipe all notes for this learner+course. Learner can call this from
      * the Communications settings panel.
+     *
+     * @param int $userid
+     * @param int $courseid
      */
     public static function clear(int $userid, int $courseid): void {
         global $DB;
@@ -233,6 +249,10 @@ class learner_memory_manager {
 
     /**
      * Persist the notes back to the row, normalising and bounding first.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param array $notes
      */
     private static function write_notes(int $userid, int $courseid, array $notes): void {
         global $DB;
@@ -258,6 +278,9 @@ class learner_memory_manager {
 
     /**
      * Apply size and TTL bounds.
+     *
+     * @param array $notes
+     * @return array
      */
     private static function prune_notes(array $notes): array {
         $cutoff = time() - self::STICKING_TTL_SEC;
@@ -280,6 +303,9 @@ class learner_memory_manager {
     /**
      * Force every input into the canonical shape so the rest of the
      * class can assume keys exist.
+     *
+     * @param array $notes
+     * @return array
      */
     private static function normalise_notes(array $notes): array {
         $out = self::empty_notes();
@@ -323,6 +349,9 @@ class learner_memory_manager {
 
     /**
      * Trim and cap a free-text field.
+     *
+     * @param string $s
+     * @return string
      */
     private static function trim_field(string $s): string {
         $s = trim($s);
