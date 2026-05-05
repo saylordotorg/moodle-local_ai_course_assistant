@@ -172,6 +172,19 @@ $string['coursesettings:global_settings_link'] = 'Global AI settings';
 $string['coursesettings:token_usage'] = 'Token Usage & Cost';
 $string['coursesettings:token_usage_desc'] = 'View token usage, cost estimates, and per-student breakdowns for this course.';
 
+// v5.2.0: per-quiz SOLA assistance level controls.
+$string['quizsettings:title'] = 'Quiz Assistance Levels';
+$string['quizsettings:desc'] = 'Choose how much help SOLA gives on each quiz. "Default" uses the legacy rule: ungraded quizzes get full help, graded quizzes hide the widget. Use "Coach" to keep SOLA available on a graded quiz but block direct answers.';
+$string['quizsettings:colquiz'] = 'Quiz';
+$string['quizsettings:colgrade'] = 'Max grade';
+$string['quizsettings:collevel'] = 'Assistance level';
+$string['quizsettings:coleffective'] = 'Effective';
+$string['quizsettings:level_default'] = 'Default (by grade)';
+$string['quizsettings:level_full'] = 'Full help';
+$string['quizsettings:level_coach'] = 'Coach (Socratic only)';
+$string['quizsettings:level_hidden'] = 'Hidden';
+$string['quizsettings:ungraded'] = 'Ungraded';
+
 // Language detection and preference.
 $string['lang:switch'] = 'Yes, switch';
 $string['lang:dismiss'] = 'No thanks';

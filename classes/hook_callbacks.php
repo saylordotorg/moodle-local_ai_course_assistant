@@ -522,17 +522,25 @@ class hook_callbacks {
             $modname          = (string)($PAGE->cm->modname ?? '');
         }
 
-        // Lock SOLA during summative quiz view/attempt pages.
-        // Practice and formative quizzes (grade = 0 in gradebook) are excluded.
-        // Quiz review pages are always allowed — student is learning from completed feedback.
+        // Per-quiz assistance level (v5.2.0). The teacher chooses, per quiz, whether
+        // SOLA is full-help, coach-mode (Socratic only), or hidden. The 'default'
+        // setting falls back to the legacy grade-based heuristic: graded quizzes
+        // (grade > 0) hide the widget; ungraded formative quizzes get full help.
+        // Quiz review pages are always allowed (review === post-attempt feedback).
         $quizlocked = false;
+        $quizcoachmode = false;
+        $quizcmid = 0;
         if ($modname === 'quiz' && !empty($PAGE->cm) && (
             strpos($pagetype, 'attempt') !== false ||
-            strpos($pagetype, 'view') !== false
+            (strpos($pagetype, 'view') !== false && strpos($pagetype, 'review') === false)
         )) {
-            $quizrecord = $DB->get_record('quiz', ['id' => $PAGE->cm->instance], 'grade', IGNORE_MISSING);
-            $issummative = !empty($quizrecord) && (float)$quizrecord->grade > 0;
-            $quizlocked = $issummative;
+            $quizcmid = (int)$PAGE->cm->id;
+            $level = \local_ai_course_assistant\quiz_config_manager::get_assistance_level($quizcmid);
+            if ($level === 'hidden') {
+                $quizlocked = true;
+            } else if ($level === 'coach') {
+                $quizcoachmode = true;
+            }
         }
 
         // Position offsets for fine-grained widget placement.
@@ -675,6 +683,8 @@ class hook_callbacks {
             'modname'            => $modname,
             'pagetype'           => $pagetype,
             'quizlocked'         => $quizlocked,
+            'quizcoachmode'      => $quizcoachmode,
+            'quizcmid'           => $quizcmid,
             'realtimeenabled'         => $realtimeenabled,
             'ellpronunciationenabled' => $realtimeenabled,
             'talkingavatarenabled'    => $talkingavatarenabled,

@@ -296,9 +296,28 @@ try {
         }
     }
 
+    // v5.2.0: detect per-quiz coach mode. If the current $pageid is a quiz
+    // course-module and its assistance level is 'coach', flag it on the prompt
+    // so context_builder injects the SAFETY-priority coach-mode block. The
+    // 'hidden' level is enforced widget-side at injection time, so by the
+    // time we get here we only need to distinguish coach from full.
+    $quizmode = '';
+    if ($pageid > 0) {
+        $cm = $DB->get_record('course_modules', ['id' => $pageid], 'id, instance, module', IGNORE_MISSING);
+        if ($cm) {
+            $modname = $DB->get_field('modules', 'name', ['id' => $cm->module]);
+            if ($modname === 'quiz') {
+                $level = \local_ai_course_assistant\quiz_config_manager::get_assistance_level((int)$cm->id);
+                if ($level === 'coach') {
+                    $quizmode = 'coach';
+                }
+            }
+        }
+    }
+
     // Build system prompt and get history.
     $systemprompt = context_builder::build_system_prompt(
-        $courseid, $userid, $lang, $retrievedchunks, $pageid, $pagetitle
+        $courseid, $userid, $lang, $retrievedchunks, $pageid, $pagetitle, $quizmode
     );
 
     // Accessibility: reading-level adjustment (v3.9.21). Appended after the

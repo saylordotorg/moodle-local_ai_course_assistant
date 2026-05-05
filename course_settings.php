@@ -158,6 +158,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset_config('external_resources_enabled_course_' . $courseid, 'local_ai_course_assistant');
     }
 
+    // v5.2.0: per-quiz SOLA assistance level. The form posts one
+    // quiz_level[<cmid>] entry per quiz in the course.
+    $quizlevels = optional_param_array('quiz_level', [], PARAM_ALPHA);
+    foreach ($quizlevels as $cmid => $level) {
+        $cmid = (int)$cmid;
+        if ($cmid <= 0) {
+            continue;
+        }
+        // Confirm the cmid actually belongs to this course before writing.
+        $owns = $DB->record_exists('course_modules', ['id' => $cmid, 'course' => $courseid]);
+        if ($owns) {
+            \local_ai_course_assistant\quiz_config_manager::save($cmid, $courseid, (string)$level);
+        }
+    }
+
     redirect($pageurl, get_string('coursesettings:saved', 'local_ai_course_assistant'),
         null, \core\output\notification::NOTIFY_SUCCESS);
 }
@@ -774,6 +789,61 @@ echo html_writer::div(
             </div>
         </div>
     </div>
+
+    <?php
+    // v5.2.0: per-quiz SOLA assistance-level controls.
+    $quizrows = \local_ai_course_assistant\quiz_config_manager::list_for_course($courseid);
+    if (!empty($quizrows)) {
+        $levellabels = [
+            'default' => get_string('quizsettings:level_default', 'local_ai_course_assistant'),
+            'full'    => get_string('quizsettings:level_full', 'local_ai_course_assistant'),
+            'coach'   => get_string('quizsettings:level_coach', 'local_ai_course_assistant'),
+            'hidden'  => get_string('quizsettings:level_hidden', 'local_ai_course_assistant'),
+        ];
+        ?>
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0"><?php echo get_string('quizsettings:title', 'local_ai_course_assistant'); ?></h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted"><?php echo get_string('quizsettings:desc', 'local_ai_course_assistant'); ?></p>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th><?php echo get_string('quizsettings:colquiz', 'local_ai_course_assistant'); ?></th>
+                            <th><?php echo get_string('quizsettings:colgrade', 'local_ai_course_assistant'); ?></th>
+                            <th><?php echo get_string('quizsettings:collevel', 'local_ai_course_assistant'); ?></th>
+                            <th><?php echo get_string('quizsettings:coleffective', 'local_ai_course_assistant'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($quizrows as $q) {
+                            $field = 'quiz_level[' . (int)$q->cmid . ']';
+                            $stored = $q->stored_level;
+                            $eff = $q->effective_level;
+                        ?>
+                        <tr>
+                            <td><?php echo s($q->name); ?></td>
+                            <td><?php echo (float)$q->grade > 0
+                                    ? format_float((float)$q->grade, 2)
+                                    : '<span class="text-muted">' . get_string('quizsettings:ungraded', 'local_ai_course_assistant') . '</span>'; ?></td>
+                            <td>
+                                <select name="<?php echo $field; ?>" class="form-control form-control-sm">
+                                    <?php foreach ($levellabels as $key => $label) { ?>
+                                        <option value="<?php echo $key; ?>" <?php if ($stored === $key) { echo 'selected'; } ?>>
+                                            <?php echo s($label); ?>
+                                        </option>
+                                    <?php } ?>
+                                </select>
+                            </td>
+                            <td><span class="badge bg-secondary"><?php echo s($levellabels[$eff] ?? $eff); ?></span></td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php } ?>
 
     <div class="card mb-3">
         <div class="card-header">
