@@ -61,6 +61,10 @@ define([], function() {
     var onErrorCb = null;
     /** @type {Function|null} Suggestions callback — receives array of chip strings */
     var onSuggestionsCb = null;
+    /** @type {Array<string>|null} Caller-supplied chip fallback used when the
+     * model does not emit a usable [SOLA_NEXT] marker. Set per-session by
+     * connect(); reset on disconnect. v5.3.5. */
+    var fallbackChips = null;
     /** @type {string} Accumulated assistant transcript for SOLA_NEXT parsing */
     var assistantTranscript = '';
     /** @type {number} How many chars of assistantTranscript have been emitted to display */
@@ -456,14 +460,42 @@ define([], function() {
 
             case 'response.done':
                 responseActive = false;
-                // Show hardcoded ELL practice chips (SOLA_NEXT is unreliable in audio mode).
+                // v5.3.5: parse SOLA_NEXT chips out of the assistant transcript.
+                // The audio output naturally skips the brackets/pipes (the
+                // model knows not to speak them), so the marker can ride
+                // along inside the text channel. The voice-mode tail in the
+                // server-built instructions explicitly asks for the marker.
                 if (onSuggestionsCb) {
-                    onSuggestionsCb([
-                        'Try another phrase',
-                        'Correct my grammar',
-                        'Speak more slowly',
-                        'End practice'
-                    ]);
+                    var parsed = null;
+                    var nextRe = /\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
+                    var m = assistantTranscript.match(nextRe);
+                    if (m && m[1]) {
+                        // Reuse the same placeholder filter chat.js uses so a
+                        // weaker model that emits "<chip 1>" or "suggestion 1"
+                        // never leaks to the UI.
+                        var placeholderRe = /^(suggestion\s*\d+|<?\s*chip\s*\d+\s*>?|placeholder.*|<chip\s*\d+>)$/i;
+                        parsed = m[1].split('||').map(function(s) {
+                            return s.trim();
+                        }).filter(function(s) {
+                            return s.length > 0 && !placeholderRe.test(s);
+                        }).slice(0, 4);
+                        if (parsed.length === 0) {
+                            parsed = null;
+                        }
+                    }
+                    if (parsed && parsed.length > 0) {
+                        onSuggestionsCb(parsed);
+                    } else {
+                        // Fallback when the model did not emit a usable marker
+                        // (older instructions cached, or LLM dropped the
+                        // marker). The caller can override via callbacks.fallbackChips.
+                        onSuggestionsCb(fallbackChips || [
+                            'Tell me more',
+                            'Give me an example',
+                            'Quiz me on this',
+                            'End conversation'
+                        ]);
+                    }
                 }
                 assistantTranscript = '';
                 transcriptEmitted = 0;
@@ -508,6 +540,8 @@ define([], function() {
         onStateChangeCb = callbacks.onStateChange  || null;
         onErrorCb       = callbacks.onError        || null;
         onSuggestionsCb = callbacks.onSuggestions  || null;
+        fallbackChips = (callbacks.fallbackChips && callbacks.fallbackChips.length)
+            ? callbacks.fallbackChips.slice() : null;
         assistantTranscript = '';
         transcriptEmitted = 0;
         overlayRoot     = overlayEl               || null;
@@ -560,7 +594,23 @@ define([], function() {
                         input: {
                             format: {type: 'audio/pcm', rate: 24000},
                             transcription: {model: 'whisper-1'},
-                            turn_detection: null,  // client-side VAD — only transmit when speaking
+                            // v5.3.5: server VAD on. The server segments user
+                            // speech (using prefix_padding/silence_duration as
+                            // sensitivity knobs) AND interrupt_response=true so
+                            // the model stops talking the moment the learner
+                            // starts. This fixes the "transcripts mingle" UX
+                            // where SOLA kept finishing its sentence after the
+                            // learner had already begun a new question. Client-
+                            // side mic gating still trims pure-silence packets;
+                            // server VAD layers on top to handle interruption.
+                            turn_detection: {
+                                type: 'server_vad',
+                                threshold: 0.5,
+                                prefix_padding_ms: 300,
+                                silence_duration_ms: 500,
+                                create_response: true,
+                                interrupt_response: true,
+                            },
                         },
                         output: {
                             format: {type: 'audio/pcm', rate: 24000},
@@ -648,6 +698,7 @@ define([], function() {
         // (e.g. code 1005 / 1000) for intentional disconnects.
         onErrorCb = null;
         responseActive = false;
+        fallbackChips = null;
 
         // Stop any playing audio — silence master gain first.
         if (masterGain && audioCtx) {

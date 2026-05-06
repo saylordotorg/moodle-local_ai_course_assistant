@@ -38,6 +38,12 @@ class get_realtime_token extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
+            // v5.3.5: pageid + pagetitle so the realtime session is grounded
+            // in the same page-content / course-content context the chat
+            // endpoint already uses. Optional for backward compatibility.
+            'pageid' => new external_value(PARAM_INT, 'Course module id of the current page', VALUE_DEFAULT, 0),
+            'pagetitle' => new external_value(PARAM_TEXT, 'Title of the current page or activity', VALUE_DEFAULT, ''),
+            'lang' => new external_value(PARAM_ALPHA, 'Learner language preference (ISO 639-1)', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -45,14 +51,76 @@ class get_realtime_token extends external_api {
      * Get an ephemeral OpenAI Realtime session token.
      *
      * @param int $courseid
+     * @param int $pageid Course module id of the current page (optional).
+     * @param string $pagetitle Title of the current page (optional).
+     * @param string $lang Learner language preference (optional).
      * @return array
      */
-    public static function execute(int $courseid): array {
-        $params = self::validate_parameters(self::execute_parameters(), ['courseid' => $courseid]);
+    public static function execute(int $courseid, int $pageid = 0, string $pagetitle = '', string $lang = ''): array {
+        global $USER;
+        $params = self::validate_parameters(self::execute_parameters(), [
+            'courseid' => $courseid,
+            'pageid' => $pageid,
+            'pagetitle' => $pagetitle,
+            'lang' => $lang,
+        ]);
 
         $coursecontext = \context_course::instance($params['courseid']);
         self::validate_context($coursecontext);
         require_capability('local/ai_course_assistant:use', $coursecontext);
+
+        // v5.3.5: build the same system prompt the chat endpoint uses, then
+        // append a small voice-mode tail (no SOLA_NEXT markers, prefer
+        // shorter spoken responses, no markdown). The realtime session will
+        // pick this up on the first session.update from the client.
+        try {
+            $systemprompt = \local_ai_course_assistant\context_builder::build_system_prompt(
+                (int)$params['courseid'],
+                (int)$USER->id,
+                (string)$params['lang'],
+                [],
+                (int)$params['pageid'],
+                (string)$params['pagetitle'],
+                ''
+            );
+            $hascurrentpage = ((int)$params['pageid'] > 0 && (string)$params['pagetitle'] !== '');
+            $pagetitleq = (string)$params['pagetitle'];
+            $voicetail = "\n\n## Voice mode (overrides any conflicting style above)\n"
+                . "You are speaking, not writing. Keep replies short — usually one or two "
+                . "sentences. Plain spoken language only: no markdown, no bracketed tags "
+                . "or markers in the SPOKEN portion of your reply. Pause naturally between "
+                . "ideas so the learner can interject. When the learner starts speaking, "
+                . "stop your current sentence and listen.\n\n"
+                . "Chip suggestions in voice mode: at the very END of each reply, after the "
+                . "spoken portion, append the SOLA_NEXT block exactly as in chat: "
+                . "[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]. The audio "
+                . "stream skips the brackets and pipes naturally — they exist only so the "
+                . "on-screen UI can render four clickable follow-up chips below the "
+                . "transcript. Each chip is a short (3-8 word) actionable prompt specific "
+                . "to what was just discussed (e.g. \"Quiz me on this\", \"Give me an "
+                . "example\", \"Show me a real case\", \"What's next?\"). NEVER emit literal "
+                . "placeholder text like \"chip 1\" or \"suggestion 1\" — those are shapes "
+                . "to be replaced.\n\n"
+                . "Anchor the conversation in the course content. If the \"## Current Page "
+                . "Content\" section is present, treat that page as the default topic from "
+                . "the very first turn. Do NOT open with generic icebreakers like asking "
+                . "about the learner's favourite hobby, weekend, or unrelated personal "
+                . "topics. The learner is here to study, not chat.\n\n"
+                . "Begin every reply with substance, not affirmation filler. Do NOT start "
+                . "replies with \"Great!\", \"Absolutely!\", \"Sure!\", \"Of course!\", \"Wonderful!\", "
+                . "\"Awesome!\", \"Perfect!\", or any other one-word affirmation. Open directly "
+                . "with the answer or with a short relevant question.";
+            if ($hascurrentpage) {
+                $voicetail .= "\n\nThe learner is currently on the page titled \"" . $pagetitleq
+                    . "\". If they have not chosen a different topic, your first spoken turn "
+                    . "should briefly summarise that page (one sentence) and ask which part "
+                    . "they want to discuss.";
+            }
+            $instructions = $systemprompt . $voicetail;
+        } catch (\Throwable $e) {
+            debugging('realtime instructions build failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            $instructions = '';
+        }
 
         // Resolve active Realtime provider via the voice_providers registry.
         $cfg = \local_ai_course_assistant\voice_registry::resolve(
@@ -103,6 +171,7 @@ class get_realtime_token extends external_api {
                 'voice'    => $cfg['voice'],
                 'provider' => 'xai',
                 'endpoint' => $proxyurl . $sep . 'token=' . rawurlencode($jwt),
+                'instructions' => $instructions,
             ];
         }
 
@@ -144,6 +213,7 @@ class get_realtime_token extends external_api {
             'voice'    => $cfg['voice'],
             'provider' => 'openai',
             'endpoint' => $cfg['endpoint'],
+            'instructions' => $instructions,
         ];
     }
 
@@ -175,6 +245,10 @@ class get_realtime_token extends external_api {
             // moment voice mode was opened. Server-generated value, not
             // user input, so PARAM_RAW is the right type here.
             'endpoint' => new external_value(PARAM_RAW, 'WebSocket endpoint URL (wss://)'),
+            // v5.3.5: full system prompt for the realtime session, including
+            // course content, current page text, and a voice-mode tail. The
+            // client passes this to the WebSocket via the first session.update.
+            'instructions' => new external_value(PARAM_RAW, 'System instructions for the realtime session', VALUE_DEFAULT, ''),
         ]);
     }
 }

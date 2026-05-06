@@ -275,13 +275,28 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
     /**
      * Get an ephemeral token for OpenAI Realtime voice mode.
      *
+     * v5.3.5: ctx is an optional {pageid, pagetitle, lang} so the realtime
+     * session is grounded in the same page-content + course-content prompt
+     * the chat endpoint uses. Older callers can omit ctx; the server treats
+     * the missing fields as 0/'' (course-only context, no page).
+     *
      * @param {number} courseid
+     * @param {Object} [ctx]
      * @returns {Promise}
      */
-    const getRealtimeToken = function(courseid) {
+    const getRealtimeToken = function(courseid, ctx) {
+        ctx = ctx || {};
+        // Accept either camelCase (chat.js getRealtimeVoiceRequestContext)
+        // or lowercase keys.
+        const args = {
+            courseid: courseid,
+            pageid: parseInt(ctx.pageId || ctx.pageid, 10) || 0,
+            pagetitle: ctx.pageTitle || ctx.pagetitle || '',
+            lang: ctx.lang || '',
+        };
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_get_realtime_token',
-            args: {courseid: courseid},
+            args: args,
         }])[0];
     };
 

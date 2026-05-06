@@ -2770,10 +2770,16 @@ define([
      */
     const buildPracticeSpeakingInitialText = function(selection) {
         var topic = extractPracticeSpeakingTopic(selection);
-        if (topic) {
-            return 'Let\'s practice speaking about ' + topic + '.';
+        // v5.3.5: when the user picked Free conversation but a page is open,
+        // anchor the kickoff to the page so the model does not improvise an
+        // unrelated icebreaker (favourite hobby, weekend plans, etc.).
+        if (!topic && currentPageTitle) {
+            topic = currentPageTitle;
         }
-        return 'Let\'s practice speaking.';
+        if (topic) {
+            return 'Let\'s talk about ' + topic + '. Can you give me a quick overview to start?';
+        }
+        return 'Let\'s use the current course page as our starting point. Give me a brief overview.';
     };
 
     /**
@@ -2946,13 +2952,18 @@ define([
                             }
                             UI.showSuggestions(nextChips, function(text) {
                                 UI.clearSuggestions();
-                                if (text === 'End practice') {
+                                if (text === 'End practice' || text === 'End conversation') {
                                     endSession();
                                     return;
                                 }
                                 Realtime.sendText(text);
                             });
                         },
+                        // v5.3.5: forward caller-supplied fallback chips so the
+                        // regular Voice tab gets course-style chips and the
+                        // ELL pronunciation path keeps practice ones, instead
+                        // of the hardcoded ELL list realtime.js used to emit.
+                        fallbackChips: config.fallbackChips || null,
                     },
                     overlay,
                     audioCtx,
@@ -3105,23 +3116,44 @@ define([
                 overlayInstruction: 'Start speaking \u2014 ' + assistantName +
                     ' will listen and respond.',
                 chips: buildPracticeSpeakingChips(),
-                autoStartSelection: 'Free conversation',
+                // v5.3.5: prefer the current-page chip as the auto-start so
+                // the opening turn anchors in what the learner is reading.
+                // Falls back to Free conversation only if no page is loaded.
+                autoStartSelection: currentPageTitle
+                    ? ('Discuss ' + currentPageTitle)
+                    : 'Free conversation',
                 getInitialText: function(selection) {
                     return buildPracticeSpeakingInitialText(selection);
                 },
                 getInstructions: function(baseInstructions, selection) {
                     var instructions = baseInstructions || '';
                     var topic = extractPracticeSpeakingTopic(selection);
+                    // v5.3.5: if no chip topic was selected but the learner is
+                    // on a course page, use that page title as the topic so
+                    // the model does not improvise an unrelated icebreaker.
+                    if (!topic && currentPageTitle) {
+                        topic = currentPageTitle;
+                    }
                     instructions += '\n\n## Voice Conversation\n'
-                        + 'Keep the conversation grounded in the current page when relevant. '
-                        + 'Respond naturally to follow-up questions and let the student interrupt or redirect the topic. '
-                        + 'Begin the session with a warm spoken welcome, briefly explain how the speaking practice works, '
-                        + 'and ask one simple opening question.';
+                        + 'Keep every turn grounded in the course content above. '
+                        + 'Respond naturally to follow-up questions and let the learner interrupt or redirect. '
+                        + 'For your first spoken turn, give a one-sentence welcome and one specific question '
+                        + 'about the topic below. Do NOT explain how the speaking practice works, do NOT ask '
+                        + 'about hobbies or unrelated personal topics, and do NOT begin with affirmation '
+                        + 'fillers like "Great!" or "Absolutely!".';
                     if (topic) {
-                        instructions += ' Use "' + topic + '" as the opening topic.';
+                        instructions += ' Topic for this session: "' + topic + '".';
+                    } else {
+                        instructions += ' If no specific topic is set, ask the learner which course '
+                            + 'topic they want to talk through.';
                     }
                     return instructions;
                 },
+                // v5.3.5: course-relevant chip fallback for the regular Voice
+                // tab. Used only when the model does not emit a SOLA_NEXT
+                // block; otherwise the parsed chips win.
+                fallbackChips: ['Tell me more', 'Give me an example',
+                    'Quiz me on this', 'End conversation'],
             });
             return;
         }
@@ -3172,6 +3204,9 @@ define([
                 instructions += ' Base your pronunciation feedback and examples on the current page and nearby course content when possible.';
                 return instructions;
             },
+            // v5.3.5: ELL pronunciation keeps its practice-style chip fallback.
+            fallbackChips: ['Try another phrase', 'Correct my grammar',
+                'Speak more slowly', 'End practice'],
         });
     };
 
