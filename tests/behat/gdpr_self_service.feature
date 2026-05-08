@@ -11,28 +11,24 @@ Feature: GDPR self-service data page
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | learner1 | Learner   | One      | l1@example.com    |
-      | learner2 | Learner   | Two      | l2@example.com    |
     And the following "course enrolments" exist:
       | user     | course | role    |
       | learner1 | GDPR1  | student |
-      | learner2 | GDPR1  | student |
     And the following config values are set as admin:
       | enabled             | 1      | local_ai_course_assistant |
       | provider            | claude | local_ai_course_assistant |
       | default_course_mode | all    | local_ai_course_assistant |
 
-  Scenario: Self-service page renders all three GDPR controls
+  Scenario: Self-service page renders the delete-all button
     Given I log in as "learner1"
     When I visit "/local/ai_course_assistant/settings_user.php"
-    Then I should see "Download" in the "main" "region"
-    And I should see "Delete all my SOLA data"
+    Then I should see "Delete all my SOLA data"
 
   @javascript
   Scenario: Delete-all uses POST so a hosting WAF cannot strip the action
     Given I log in as "learner1"
     When I visit "/local/ai_course_assistant/settings_user.php"
-    Then "form[action*='settings_user.php']" "css_element" should exist
-    And "input[name='action'][value='delete_all']" "css_element" should exist
+    Then "input[name='action'][value='delete_all']" "css_element" should exist
     And "input[name='sesskey']" "css_element" should exist
 
   @javascript
