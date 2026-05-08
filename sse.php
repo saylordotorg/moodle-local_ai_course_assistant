@@ -802,12 +802,38 @@ try {
     if (!empty($e->debuginfo) && !empty($CFG->debugdeveloper) && is_siteadmin($USER->id)) {
         $errmsg .= ' [' . $e->debuginfo . ']';
     }
+    // v5.3.7: always write the underlying error to debugging() and the
+    // audit log so an admin can diagnose mid-chat failures from the
+    // server-side logs even when the learner-facing message is generic.
+    debugging('SOLA SSE moodle_exception: ' . get_class($e) . ': ' . $errmsg
+        . ' (courseid=' . (int)($courseid ?? 0)
+        . ', userid=' . (int)($USER->id ?? 0)
+        . ', pageid=' . (int)($pageid ?? 0) . ')',
+        DEBUG_DEVELOPER);
+    try {
+        \local_ai_course_assistant\audit_logger::log('sse_error',
+            (int)($USER->id ?? 0),
+            (int)($courseid ?? 0),
+            ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]);
+    } catch (\Throwable $ignore) { /* never let audit logging mask the real error */ }
     sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
     // Send actual message in debug mode, generic otherwise.
-    global $CFG;
+    global $CFG, $USER;
+    $errmsg = get_class($e) . ': ' . $e->getMessage();
+    debugging('SOLA SSE Throwable: ' . $errmsg
+        . ' (courseid=' . (int)($courseid ?? 0)
+        . ', userid=' . (int)($USER->id ?? 0)
+        . ', pageid=' . (int)($pageid ?? 0) . ')',
+        DEBUG_DEVELOPER);
+    try {
+        \local_ai_course_assistant\audit_logger::log('sse_error',
+            (int)($USER->id ?? 0),
+            (int)($courseid ?? 0),
+            ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)]);
+    } catch (\Throwable $ignore) { /* same */ }
     $msg = (!empty($CFG->debugdeveloper) || !empty($CFG->debug))
-        ? get_class($e) . ': ' . $e->getMessage()
+        ? $errmsg
         : get_string('chat:error', 'local_ai_course_assistant');
     sse_send(['error' => $msg]);
 }

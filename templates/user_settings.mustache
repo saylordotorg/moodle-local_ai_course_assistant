@@ -77,9 +77,19 @@
                     <p><strong>{{#str}}usersettings:last_activity, local_ai_course_assistant{{/str}}:</strong> {{lastactivity}}</p>
                 </div>
                 <div class="col-md-6 text-right">
-                    <a href="{{deleteurl}}" class="btn btn-danger">
-                        {{#str}}usersettings:delete_course_data, local_ai_course_assistant{{/str}}
-                    </a>
+                    {{!
+                        v5.3.7: POST form rather than a GET <a> link, so a
+                        hosting WAF (e.g. Catalyst staging) cannot strip the
+                        action= query param and silently no-op the click.
+                    }}
+                    <form method="post" action="{{posturl}}" class="d-inline">
+                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                        <input type="hidden" name="action" value="delete_course">
+                        <input type="hidden" name="courseid" value="{{courseid}}">
+                        <button type="submit" class="btn btn-danger">
+                            {{#str}}usersettings:delete_course_data, local_ai_course_assistant{{/str}}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -96,9 +106,14 @@
         <div class="card-body">
             <h3>{{#str}}usersettings:download, local_ai_course_assistant{{/str}}</h3>
             <p>{{#str}}usersettings:download_help, local_ai_course_assistant{{/str}}</p>
-            <a href="{{downloadurl}}" class="btn btn-primary">
-                {{#str}}usersettings:download, local_ai_course_assistant{{/str}}
-            </a>
+            {{! v5.3.7: POST form, not GET link. }}
+            <form method="post" action="{{posturl}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="download">
+                <button type="submit" class="btn btn-primary">
+                    {{#str}}usersettings:download, local_ai_course_assistant{{/str}}
+                </button>
+            </form>
             <p class="mt-3 mb-0">
                 <a href="{{privacyurl}}" target="_blank" rel="noopener">
                     {{#str}}usersettings:privacy_notice_link, local_ai_course_assistant{{/str}}
@@ -111,9 +126,14 @@
         <div class="card-body">
             <h3 class="text-danger">{{#str}}usersettings:delete_all_title, local_ai_course_assistant{{/str}}</h3>
             <p>{{#str}}usersettings:delete_all_warning, local_ai_course_assistant{{/str}}</p>
-            <a href="{{deleteallurl}}" class="btn btn-danger btn-lg">
-                {{#str}}usersettings:delete_all_button, local_ai_course_assistant{{/str}}
-            </a>
+            {{! v5.3.7: POST form, not GET link. }}
+            <form method="post" action="{{posturl}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="delete_all">
+                <button type="submit" class="btn btn-danger btn-lg">
+                    {{#str}}usersettings:delete_all_button, local_ai_course_assistant{{/str}}
+                </button>
+            </form>
         </div>
     </div>
 </div>

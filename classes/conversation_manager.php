@@ -279,43 +279,138 @@ class conversation_manager {
     }
 
     /**
-     * Delete all data for a user (GDPR).
+     * Delete every SOLA record tied to a single user across all courses.
+     *
+     * v5.3.7: previously only purged convs + msgs; now sweeps every table
+     * in the plugin that stores per-user state, so a learner who clicks
+     * "Delete all my SOLA data" actually gets a clean slate. Returns a
+     * per-table count of deleted rows for the audit log and for tests.
+     *
+     * Tables purged (in dependency order):
+     *   - msgs (FK to convs)
+     *   - convs
+     *   - msg_ratings, plans, reminders, feedback, survey_resp, ut_resp,
+     *     practice_scores, profiles
+     *   - learner_goals, learner_memory, streak (v5.2.0/v5.3.0)
+     *   - struggle_signal (v5.3.0)
+     *   - outreach_log (v5.3.0)
+     *   - audit (every audit row authored by this user)
+     *
+     * Quiz_cfg is per-quiz not per-user; not touched here.
      *
      * @param int $userid
+     * @return array<string, int> table => rows deleted
      */
-    public static function delete_user_data(int $userid): void {
+    public static function delete_user_data(int $userid): array {
         global $DB;
+        $counts = [];
 
+        // 1. Messages (FK to conversations).
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', 'userid = ?', [$userid]);
         if (!empty($convids)) {
             list($insql, $params) = $DB->get_in_or_equal($convids);
+            $counts['messages'] = $DB->count_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $params);
             $DB->delete_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $params);
+        } else {
+            $counts['messages'] = 0;
         }
-        $DB->delete_records('local_ai_course_assistant_convs', ['userid' => $userid]);
+
+        // 2. Per-user records keyed directly on userid.
+        $simple = [
+            'conversations'   => 'local_ai_course_assistant_convs',
+            'msg_ratings'     => 'local_ai_course_assistant_msg_ratings',
+            'plans'           => 'local_ai_course_assistant_plans',
+            'reminders'       => 'local_ai_course_assistant_reminders',
+            'feedback'        => 'local_ai_course_assistant_feedback',
+            'survey_resp'     => 'local_ai_course_assistant_survey_resp',
+            'ut_resp'         => 'local_ai_course_assistant_ut_resp',
+            'practice_scores' => 'local_ai_course_assistant_practice_scores',
+            'profiles'        => 'local_ai_course_assistant_profiles',
+            'learner_goals'   => 'local_ai_course_assistant_learner_goals',
+            'learner_memory'  => 'local_ai_course_assistant_learner_memory',
+            'streak'          => 'local_ai_course_assistant_streak',
+            'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
+            'outreach_log'    => 'local_ai_course_assistant_outreach_log',
+            'audit'           => 'local_ai_course_assistant_audit',
+        ];
+        foreach ($simple as $label => $table) {
+            try {
+                $counts[$label] = $DB->count_records($table, ['userid' => $userid]);
+                $DB->delete_records($table, ['userid' => $userid]);
+            } catch (\Throwable $e) {
+                // Table may not exist on older installs; skip gracefully.
+                $counts[$label] = 0;
+            }
+        }
+
+        return $counts;
     }
 
     /**
-     * Delete all data for a course context (GDPR).
+     * Delete every SOLA record tied to a (userid, courseid) pair, or to a
+     * whole courseid if $userid is omitted.
+     *
+     * v5.3.7: same coverage expansion as delete_user_data — sweeps every
+     * SOLA table that holds per-(course, user) state, not just convs+msgs.
      *
      * @param int $courseid
-     * @param int|null $userid Optional user ID to delete only specific user's data in course
+     * @param int|null $userid Optional. When set, only the (courseid, userid) pair is deleted.
+     * @return array<string, int> table => rows deleted
      */
-    public static function delete_course_data(int $courseid, ?int $userid = null): void {
+    public static function delete_course_data(int $courseid, ?int $userid = null): array {
         global $DB;
+        $counts = [];
 
-        $params = ['courseid' => $courseid];
-        $where = 'courseid = :courseid';
+        // Conversation messages first (FK to convs).
+        $convparams = ['courseid' => $courseid];
+        $convwhere = 'courseid = :courseid';
         if ($userid) {
-            $where .= ' AND userid = :userid';
-            $params['userid'] = $userid;
+            $convwhere .= ' AND userid = :userid';
+            $convparams['userid'] = $userid;
         }
-
-        $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', $where, $params);
+        $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', $convwhere, $convparams);
         if (!empty($convids)) {
             list($insql, $inparams) = $DB->get_in_or_equal($convids);
+            $counts['messages'] = $DB->count_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $inparams);
             $DB->delete_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $inparams);
+        } else {
+            $counts['messages'] = 0;
         }
-        $DB->delete_records_select('local_ai_course_assistant_convs', $where, $params);
+
+        // Tables keyed on (courseid[, userid]).
+        $tables = [
+            'conversations'   => 'local_ai_course_assistant_convs',
+            'msg_ratings'     => 'local_ai_course_assistant_msg_ratings',
+            'plans'           => 'local_ai_course_assistant_plans',
+            'reminders'       => 'local_ai_course_assistant_reminders',
+            'feedback'        => 'local_ai_course_assistant_feedback',
+            'survey_resp'     => 'local_ai_course_assistant_survey_resp',
+            'ut_resp'         => 'local_ai_course_assistant_ut_resp',
+            'practice_scores' => 'local_ai_course_assistant_practice_scores',
+            'profiles'        => 'local_ai_course_assistant_profiles',
+            'learner_goals'   => 'local_ai_course_assistant_learner_goals',
+            'learner_memory'  => 'local_ai_course_assistant_learner_memory',
+            'streak'          => 'local_ai_course_assistant_streak',
+            'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
+            'outreach_log'    => 'local_ai_course_assistant_outreach_log',
+            'audit'           => 'local_ai_course_assistant_audit',
+        ];
+        foreach ($tables as $label => $table) {
+            try {
+                $params = ['courseid' => $courseid];
+                $where = 'courseid = :courseid';
+                if ($userid) {
+                    $where .= ' AND userid = :userid';
+                    $params['userid'] = $userid;
+                }
+                $counts[$label] = $DB->count_records_select($table, $where, $params);
+                $DB->delete_records_select($table, $where, $params);
+            } catch (\Throwable $e) {
+                $counts[$label] = 0;
+            }
+        }
+
+        return $counts;
     }
 
     /**

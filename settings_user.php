@@ -26,8 +26,12 @@ require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
+// v5.3.7: optional_param handles both GET and POST sources, so the action
+// handlers below run identically for the new POST forms and any older link
+// pointing at the legacy GET URL. PARAM_ALPHANUMEXT covers 'delete_course',
+// 'delete_all', 'download'.
 $courseid = optional_param('courseid', 0, PARAM_INT);
-$action = optional_param('action', '', PARAM_ALPHA);
+$action = optional_param('action', '', PARAM_ALPHANUMEXT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 
 $PAGE->set_url('/local/ai_course_assistant/settings_user.php', ['courseid' => $courseid]);
@@ -135,6 +139,8 @@ foreach ($stats['courses'] as $cid => $coursestat) {
         'coursename' => $course->fullname,
         'messagecount' => $coursestat['messages'],
         'lastactivity' => $coursestat['lastactivity'] ? userdate($coursestat['lastactivity']) : get_string('never'),
+        // v5.3.7: deleteurl kept for backward-compat with any external
+        // link; the template uses a POST form referencing posturl above.
         'deleteurl' => new moodle_url($PAGE->url, [
             'action' => 'delete_course',
             'courseid' => $cid,
@@ -147,6 +153,15 @@ $templatedata = [
     'totalmessages' => $stats['total_messages'],
     'totalconversations' => $stats['total_conversations'],
     'coursedata' => $coursedata,
+    // v5.3.7: POST forms instead of GET links. The buttons render as
+    // <form method="post" action="{{posturl}}"> and the action /
+    // courseid / sesskey ride in hidden inputs. This survives a hosting
+    // WAF that strips action= from GET query params (e.g. Catalyst staging),
+    // and renders downloads more reliably across browsers.
+    'posturl' => $PAGE->url->out(false),
+    'sesskey' => sesskey(),
+    // Legacy GET URLs kept for any external bookmark; harmless when nothing
+    // links to them.
     'deleteallurl' => new moodle_url($PAGE->url, ['action' => 'delete_all', 'sesskey' => sesskey()]),
     'downloadurl' => new moodle_url($PAGE->url, ['action' => 'download', 'sesskey' => sesskey()]),
     'privacyurl' => new moodle_url('/local/ai_course_assistant/privacy.php'),
