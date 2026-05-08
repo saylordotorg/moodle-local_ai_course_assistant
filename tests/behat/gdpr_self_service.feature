@@ -22,7 +22,7 @@ Feature: GDPR self-service data page
   Scenario: Self-service page renders the delete-all button
     Given I log in as "learner1"
     When I visit "/local/ai_course_assistant/settings_user.php"
-    Then I should see "Delete all my SOLA data"
+    Then I should see "Delete All My Data"
 
   @javascript
   Scenario: Delete-all uses POST so a hosting WAF cannot strip the action
