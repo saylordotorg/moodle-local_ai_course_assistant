@@ -23,14 +23,14 @@ Feature: GDPR self-service data page
 
   Scenario: Self-service page renders all three GDPR controls
     Given I log in as "learner1"
-    When I am on the page "/local/ai_course_assistant/settings_user.php"
+    When I visit "/local/ai_course_assistant/settings_user.php"
     Then I should see "Download" in the "main" "region"
     And I should see "Delete all my SOLA data"
 
   @javascript
   Scenario: Delete-all uses POST so a hosting WAF cannot strip the action
     Given I log in as "learner1"
-    When I am on the page "/local/ai_course_assistant/settings_user.php"
+    When I visit "/local/ai_course_assistant/settings_user.php"
     Then "form[action*='settings_user.php']" "css_element" should exist
     And "input[name='action'][value='delete_all']" "css_element" should exist
     And "input[name='sesskey']" "css_element" should exist
@@ -38,5 +38,5 @@ Feature: GDPR self-service data page
   @javascript
   Scenario: Download button is a POST form
     Given I log in as "learner1"
-    When I am on the page "/local/ai_course_assistant/settings_user.php"
+    When I visit "/local/ai_course_assistant/settings_user.php"
     Then "input[name='action'][value='download']" "css_element" should exist

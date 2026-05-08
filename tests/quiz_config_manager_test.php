@@ -28,6 +28,10 @@ final class quiz_config_manager_test extends \advanced_testcase {
 
     /**
      * Helper to create a quiz with a specific grade. Returns the cmid.
+     *
+     * @param int $courseid
+     * @param float $grade
+     * @return int
      */
     private function make_quiz(int $courseid, float $grade): int {
         $generator = $this->getDataGenerator();

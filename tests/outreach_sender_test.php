@@ -34,6 +34,8 @@ final class outreach_sender_test extends \advanced_testcase {
     /**
      * Common helper: enable everything that needs to be on, except the
      * specific gate under test.
+     *
+     * @param int $userid
      */
     private function enable_everything(int $userid): void {
         set_config('outreach_master_enabled', '1', 'local_ai_course_assistant');

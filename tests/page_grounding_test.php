@@ -40,6 +40,11 @@ final class page_grounding_test extends \advanced_testcase {
     /**
      * Helper: plant a Page activity with the given body text and return
      * its course_modules id.
+     *
+     * @param int $courseid
+     * @param string $name
+     * @param string $body
+     * @return int
      */
     private function make_page(int $courseid, string $name, string $body): int {
         $generator = $this->getDataGenerator();
@@ -57,6 +62,12 @@ final class page_grounding_test extends \advanced_testcase {
     /**
      * Build a system prompt for the given user/course/page and return it.
      * Helper isolates the call so the assertions read clearly.
+     *
+     * @param int $courseid
+     * @param int $userid
+     * @param int $pageid
+     * @param string $pagetitle
+     * @return string
      */
     private function build_prompt(int $courseid, int $userid, int $pageid, string $pagetitle = ''): string {
         return context_builder::build_system_prompt($courseid, $userid, '', [], $pageid, $pagetitle, '');
@@ -73,6 +84,7 @@ final class page_grounding_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
 
         $fingerprint = 'XYZ123-FINGERPRINT-' . uniqid()
             . ' Professor Dobb book personetics Eino Kaikki cruellest science.';
@@ -106,6 +118,7 @@ final class page_grounding_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
 
         // 35 chars after stripping tags — well above the 30 floor.
         $fingerprint = 'tinyfp-' . uniqid() . '-page';
@@ -128,6 +141,10 @@ final class page_grounding_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
+        // v5.3.11: enrol the user so build_course_content's $cm->uservisible
+        // returns true. Without enrolment the wide dump iterates zero
+        // modules even though the rows exist in the DB.
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
 
         // Add several other pages first so the cmid we test against is
         // NOT first in modinfo natural order.
@@ -160,6 +177,7 @@ final class page_grounding_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
 
         // Plant a few other pages we DO NOT want to see in the prompt.
         $unwanted1 = 'UNWANTED-' . uniqid();
@@ -199,6 +217,8 @@ final class page_grounding_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
+        // v5.3.11: enrol so wide dump iterates uservisible cms.
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
 
         $fp = 'COURSE-CONTENT-' . uniqid();
         $this->make_page((int)$course->id, 'Page 1', '<p>' . $fp
