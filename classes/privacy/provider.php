@@ -603,6 +603,45 @@ class provider implements
                 'userid' => $userid,
                 'courseid' => $context->instanceid,
             ]);
+
+            // v5.3.18: cover the tables added in v3.x–v5.3 that were
+            // declared in the metadata above but were never purged here.
+            // Without these, a learner who exercises Moodle's Article 17
+            // erasure right via Site administration → Users → Privacy
+            // would keep their carryover-memory and outreach state.
+            $courseidkeyed = [
+                'local_ai_course_assistant_msg_ratings',
+                'local_ai_course_assistant_profiles',
+                'local_ai_course_assistant_obj_att',
+                'local_ai_course_assistant_flashcards',
+                'local_ai_course_assistant_avatar_sess',
+                'local_ai_course_assistant_learner_goals',
+                'local_ai_course_assistant_learner_memory',
+                'local_ai_course_assistant_streak',
+                'local_ai_course_assistant_struggle_signal',
+                'local_ai_course_assistant_outreach_log',
+            ];
+            foreach ($courseidkeyed as $table) {
+                try {
+                    $DB->delete_records($table, [
+                        'userid' => $userid,
+                        'courseid' => $context->instanceid,
+                    ]);
+                } catch (\Throwable $e) { /* table absent on older installs */ }
+            }
+            // Tables keyed on a different user-field name.
+            try {
+                $DB->delete_records('local_ai_course_assistant_review_res', [
+                    'resolved_by' => $userid,
+                    'courseid' => $context->instanceid,
+                ]);
+            } catch (\Throwable $e) { /* ignore */ }
+            try {
+                $DB->delete_records('local_ai_course_assistant_radar_sched', [
+                    'creator' => $userid,
+                    'courseid' => $context->instanceid,
+                ]);
+            } catch (\Throwable $e) { /* ignore */ }
         }
     }
 
@@ -658,6 +697,40 @@ class provider implements
                 'userid' => $userid,
                 'courseid' => $context->instanceid,
             ]);
+
+            // v5.3.18: same coverage extension as delete_data_for_user.
+            $courseidkeyed = [
+                'local_ai_course_assistant_msg_ratings',
+                'local_ai_course_assistant_profiles',
+                'local_ai_course_assistant_obj_att',
+                'local_ai_course_assistant_flashcards',
+                'local_ai_course_assistant_avatar_sess',
+                'local_ai_course_assistant_learner_goals',
+                'local_ai_course_assistant_learner_memory',
+                'local_ai_course_assistant_streak',
+                'local_ai_course_assistant_struggle_signal',
+                'local_ai_course_assistant_outreach_log',
+            ];
+            foreach ($courseidkeyed as $table) {
+                try {
+                    $DB->delete_records($table, [
+                        'userid' => $userid,
+                        'courseid' => $context->instanceid,
+                    ]);
+                } catch (\Throwable $e) { /* ignore */ }
+            }
+            try {
+                $DB->delete_records('local_ai_course_assistant_review_res', [
+                    'resolved_by' => $userid,
+                    'courseid' => $context->instanceid,
+                ]);
+            } catch (\Throwable $e) { /* ignore */ }
+            try {
+                $DB->delete_records('local_ai_course_assistant_radar_sched', [
+                    'creator' => $userid,
+                    'courseid' => $context->instanceid,
+                ]);
+            } catch (\Throwable $e) { /* ignore */ }
         }
     }
 }
