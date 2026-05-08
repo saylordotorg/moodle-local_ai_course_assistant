@@ -64,8 +64,8 @@ final class lang_completeness_test extends \basic_testcase {
      * Walk a directory and return every file matching the extension list.
      *
      * @param string $dir
-     * @param array<int, string> $exts
-     * @return array<int, string>
+     * @param array $exts list of file extensions to include (e.g. ['.php', '.mustache'])
+     * @return array list of absolute file paths matching one of $exts
      */
     private function walk(string $dir, array $exts): array {
         $out = [];
