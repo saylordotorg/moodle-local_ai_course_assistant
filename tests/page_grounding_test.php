@@ -85,6 +85,10 @@ final class page_grounding_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        // v5.3.12: setUser so get_fast_modinfo uses the enrolled student,
+        // not the default test guest. Without this, modinfo iteration
+        // shows zero uservisible modules and the wide dump is empty.
+        $this->setUser($user);
 
         $fingerprint = 'XYZ123-FINGERPRINT-' . uniqid()
             . ' Professor Dobb book personetics Eino Kaikki cruellest science.';
@@ -119,6 +123,10 @@ final class page_grounding_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        // v5.3.12: setUser so get_fast_modinfo uses the enrolled student,
+        // not the default test guest. Without this, modinfo iteration
+        // shows zero uservisible modules and the wide dump is empty.
+        $this->setUser($user);
 
         // 35 chars after stripping tags — well above the 30 floor.
         $fingerprint = 'tinyfp-' . uniqid() . '-page';
@@ -145,6 +153,10 @@ final class page_grounding_test extends \advanced_testcase {
         // returns true. Without enrolment the wide dump iterates zero
         // modules even though the rows exist in the DB.
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        // v5.3.12: setUser so get_fast_modinfo uses the enrolled student,
+        // not the default test guest. Without this, modinfo iteration
+        // shows zero uservisible modules and the wide dump is empty.
+        $this->setUser($user);
 
         // Add several other pages first so the cmid we test against is
         // NOT first in modinfo natural order.
@@ -178,6 +190,10 @@ final class page_grounding_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        // v5.3.12: setUser so get_fast_modinfo uses the enrolled student,
+        // not the default test guest. Without this, modinfo iteration
+        // shows zero uservisible modules and the wide dump is empty.
+        $this->setUser($user);
 
         // Plant a few other pages we DO NOT want to see in the prompt.
         $unwanted1 = 'UNWANTED-' . uniqid();
@@ -219,6 +235,10 @@ final class page_grounding_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         // v5.3.11: enrol so wide dump iterates uservisible cms.
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        // v5.3.12: setUser so get_fast_modinfo uses the enrolled student,
+        // not the default test guest. Without this, modinfo iteration
+        // shows zero uservisible modules and the wide dump is empty.
+        $this->setUser($user);
 
         $fp = 'COURSE-CONTENT-' . uniqid();
         $this->make_page((int)$course->id, 'Page 1', '<p>' . $fp
