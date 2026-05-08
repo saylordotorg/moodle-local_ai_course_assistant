@@ -1309,3 +1309,11 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
+// v5.3.19: error strings caught missing by lang_completeness_test.
+$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
+$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
+$string['attachment:error_no_file'] = 'No file was attached to your message.';
+$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
+$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
+$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
+$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
