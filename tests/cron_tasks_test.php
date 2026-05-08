@@ -21,6 +21,15 @@ use local_ai_course_assistant\task\conversation_retention;
 use local_ai_course_assistant\task\sweep_avatar_sessions;
 use local_ai_course_assistant\task\send_reminders;
 use local_ai_course_assistant\task\send_inactivity_reminders;
+use local_ai_course_assistant\task\classify_conversation_turn;
+use local_ai_course_assistant\task\struggle_signal_review;
+use local_ai_course_assistant\task\run_anomaly_digest;
+use local_ai_course_assistant\task\run_integrity_checks;
+use local_ai_course_assistant\task\run_meta_ai_query;
+use local_ai_course_assistant\task\milestone_check;
+use local_ai_course_assistant\task\learner_weekly_digest;
+use local_ai_course_assistant\task\instructor_weekly_digest;
+use local_ai_course_assistant\provider\stub_provider;
 
 /**
  * Cron task PHPUnit coverage — batch 1 (v5.3.31).
@@ -423,5 +432,269 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->assertCount(0, $messages,
             'A learner who got an inactivity email 2 days ago must not get another one this week.');
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // Batch 2 (v5.3.32) — LLM-using + digest + anomaly tasks.
+    // ───────────────────────────────────────────────────────────
+
+    // ───────────────────────────────────────────────────────────
+    // classify_conversation_turn (adhoc)
+    // ───────────────────────────────────────────────────────────
+
+    public function test_classify_conversation_turn_returns_silently_on_invalid_data(): void {
+        $this->resetAfterTest();
+        // No custom_data set => $data is null (not an object). Task must
+        // bail without throwing — anything else means a queued adhoc task
+        // could break cron processing.
+        $task = new classify_conversation_turn();
+        ob_start();
+        try {
+            $task->execute();
+            $this->assertTrue(true, 'execute() with no custom data must not throw.');
+        } finally {
+            ob_end_clean();
+        }
+    }
+
+    public function test_classify_conversation_turn_returns_silently_on_zero_ids(): void {
+        $this->resetAfterTest();
+        $task = new classify_conversation_turn();
+        $task->set_custom_data((object)[
+            'userid' => 0, 'courseid' => 0, 'usermsgid' => 0, 'assistantmsgid' => 0,
+        ]);
+        ob_start();
+        try {
+            $task->execute();
+            $this->assertTrue(true, 'execute() with all-zero IDs must not call the classifier.');
+        } finally {
+            ob_end_clean();
+        }
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // struggle_signal_review
+    // ───────────────────────────────────────────────────────────
+
+    public function test_struggle_signal_review_skips_when_classifier_disabled(): void {
+        $this->resetAfterTest();
+        global $DB;
+        set_config('struggle_classifier_enabled', 0, 'local_ai_course_assistant');
+        $beforecount = $DB->count_records('local_ai_course_assistant_struggle_signal');
+
+        $this->run_task_silently(new struggle_signal_review());
+
+        $this->assertEquals($beforecount,
+            $DB->count_records('local_ai_course_assistant_struggle_signal'),
+            'Disabled classifier must not touch the signals table.');
+    }
+
+    public function test_struggle_signal_review_runs_when_enabled(): void {
+        $this->resetAfterTest();
+        set_config('struggle_classifier_enabled', 1, 'local_ai_course_assistant');
+        // Empty input => 0 notes, 0 purged. Must not throw.
+        $this->run_task_silently(new struggle_signal_review());
+        $this->assertTrue(true, 'Enabled classifier on empty input is a no-op, not an error.');
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // run_anomaly_digest
+    // ───────────────────────────────────────────────────────────
+
+    public function test_run_anomaly_digest_skips_when_disabled(): void {
+        $this->resetAfterTest();
+        set_config('anomaly_digest_enabled', 0, 'local_ai_course_assistant');
+
+        $sink = $this->redirectEmails();
+        $this->run_task_silently(new run_anomaly_digest());
+        $this->assertEquals(0, $sink->count(),
+            'Disabled anomaly digest must not send anything.');
+        $sink->close();
+    }
+
+    public function test_run_anomaly_digest_no_alert_when_metrics_within_threshold(): void {
+        $this->resetAfterTest();
+        set_config('anomaly_digest_enabled', 1, 'local_ai_course_assistant');
+        set_config('anomaly_digest_threshold_pct', 50, 'local_ai_course_assistant');
+        // Empty DB => no metric exceeds threshold => no alert.
+        $sink = $this->redirectEmails();
+        $this->run_task_silently(new run_anomaly_digest());
+        $this->assertEquals(0, $sink->count(),
+            'No metric over threshold => no email.');
+        $sink->close();
+    }
+
+    public function test_run_anomaly_digest_threshold_zero_is_respected_after_fix(): void {
+        $this->resetAfterTest();
+        set_config('anomaly_digest_enabled', 1, 'local_ai_course_assistant');
+        // Regression test for the v5.3.32 ?:-fall-through fix. Setting the
+        // threshold to literal 0 is "alert on any change"; before the fix,
+        // ?: 50 silently applied 50% instead. We assert the task uses 0
+        // (not 50) by feeding it data that only exceeds 0% but not 50%.
+        set_config('anomaly_digest_threshold_pct', 0, 'local_ai_course_assistant');
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $u1 = $this->getDataGenerator()->create_user();
+        $u2 = $this->getDataGenerator()->create_user();
+        // Seed 6 negative ratings in the recent 7-day window vs 5 in the prior.
+        // 20% increase — over 0% threshold, under 50%.
+        $now = time();
+        $msgseq = 1;
+        for ($i = 0; $i < 5; $i++) {
+            // Prior window: 7-14 days ago. messageid is unique per rating.
+            $DB->insert_record('local_ai_course_assistant_msg_ratings', (object)[
+                'messageid' => $msgseq++, 'userid' => $u1->id,
+                'courseid' => $course->id, 'rating' => -1,
+                'timecreated' => $now - (10 * 86400),
+            ]);
+        }
+        for ($i = 0; $i < 6; $i++) {
+            // Recent window: last 7 days.
+            $DB->insert_record('local_ai_course_assistant_msg_ratings', (object)[
+                'messageid' => $msgseq++, 'userid' => $u2->id,
+                'courseid' => $course->id, 'rating' => -1,
+                'timecreated' => $now - (3 * 86400),
+            ]);
+        }
+        // Provide an admin email destination so radar_delivery has somewhere to go.
+        set_config('anomaly_digest_recipient_email', 'admin@example.com',
+            'local_ai_course_assistant');
+
+        $sink = $this->redirectEmails();
+        $this->run_task_silently(new run_anomaly_digest());
+        $count = $sink->count();
+        $sink->close();
+
+        $this->assertGreaterThan(0, $count,
+            'threshold=0 must mean alert on any positive change. '
+            . 'Pre-fix this would silently apply 50% and skip the alert.');
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // run_integrity_checks
+    // ───────────────────────────────────────────────────────────
+
+    public function test_run_integrity_checks_skips_when_disabled(): void {
+        $this->resetAfterTest();
+        set_config('integrity_enabled', '0', 'local_ai_course_assistant');
+        unset_config('integrity_last_run', 'local_ai_course_assistant');
+
+        $this->run_task_silently(new run_integrity_checks());
+
+        $this->assertFalse(
+            get_config('local_ai_course_assistant', 'integrity_last_run'),
+            'Disabled integrity checks must not record a last_run timestamp.');
+    }
+
+    public function test_run_integrity_checks_runs_and_stores_last_results(): void {
+        $this->resetAfterTest();
+        // No integrity_enabled set => default is on.
+        unset_config('integrity_enabled', 'local_ai_course_assistant');
+
+        $sink = $this->redirectMessages();
+        $this->run_task_silently(new run_integrity_checks());
+        $sink->close();
+
+        $stored = get_config('local_ai_course_assistant', 'integrity_last_run');
+        $this->assertNotEmpty($stored,
+            'Enabled run must persist integrity_last_run timestamp.');
+        $this->assertNotEmpty(
+            get_config('local_ai_course_assistant', 'integrity_last_results'),
+            'Enabled run must persist integrity_last_results JSON.');
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // run_meta_ai_query
+    // ───────────────────────────────────────────────────────────
+
+    public function test_run_meta_ai_query_no_schedules_returns_early(): void {
+        $this->resetAfterTest();
+        // No radar_sched rows. Task must return without calling LLM.
+        stub_provider::reset();
+        set_config('provider', 'stub', 'local_ai_course_assistant');
+
+        $this->run_task_silently(new run_meta_ai_query());
+
+        $this->assertCount(0, stub_provider::$calls,
+            'No schedules => no LLM call.');
+    }
+
+    public function test_run_meta_ai_query_invokes_stub_provider_for_due_schedule(): void {
+        $this->resetAfterTest();
+        global $DB;
+        stub_provider::reset();
+        set_config('provider', 'stub', 'local_ai_course_assistant');
+
+        // Seed one daily schedule. should_run_today returns true for daily.
+        $DB->insert_record('local_ai_course_assistant_radar_sched', (object)[
+            'name' => 'test', 'query' => 'How many sessions yesterday?',
+            'frequency' => 'daily', 'range_days' => 1,
+            'courseids' => '', 'filterprovider' => '',
+            'provider' => '', 'model' => '', 'format' => 'text',
+            'recipient_email' => '', 'slack_webhook' => '',
+            'teams_webhook' => '', 'enabled' => 1,
+            'last_run' => 0, 'last_status' => '',
+            'last_error' => '', 'creator' => 2,
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        $this->run_task_silently(new run_meta_ai_query());
+
+        $this->assertCount(1, stub_provider::$calls,
+            'A due schedule must trigger exactly one LLM call.');
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // milestone_check
+    // ───────────────────────────────────────────────────────────
+
+    public function test_milestone_check_skips_when_feature_disabled(): void {
+        $this->resetAfterTest();
+        set_config('milestones_feature_enabled', 0, 'local_ai_course_assistant');
+
+        $sink = $this->redirectMessages();
+        $this->run_task_silently(new milestone_check());
+        $this->assertCount(0, $sink->get_messages(),
+            'Feature disabled => no milestone emails dispatched.');
+        $sink->close();
+    }
+
+    public function test_milestone_check_no_op_when_no_streak_rows(): void {
+        $this->resetAfterTest();
+        set_config('milestones_feature_enabled', 1, 'local_ai_course_assistant');
+        // No streak rows. Task must complete without sending.
+        $sink = $this->redirectMessages();
+        $this->run_task_silently(new milestone_check());
+        $this->assertCount(0, $sink->get_messages(),
+            'No streak rows => no milestone emails.');
+        $sink->close();
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // learner_weekly_digest
+    // ───────────────────────────────────────────────────────────
+
+    public function test_learner_weekly_digest_no_optins_returns_early(): void {
+        $this->resetAfterTest();
+        // No user_preferences with the optin name => empty rowset.
+        $sink = $this->redirectEmails();
+        $this->run_task_silently(new learner_weekly_digest());
+        $this->assertEquals(0, $sink->count(),
+            'No opt-ins => no emails. Opt-in is the only way a learner gets digested.');
+        $sink->close();
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // instructor_weekly_digest
+    // ───────────────────────────────────────────────────────────
+
+    public function test_instructor_weekly_digest_no_courses_optin_returns_early(): void {
+        $this->resetAfterTest();
+        // No digest_email_enabled_course_<id>=1 config rows => empty rowset.
+        $sink = $this->redirectEmails();
+        $this->run_task_silently(new instructor_weekly_digest());
+        $this->assertEquals(0, $sink->count(),
+            'No course opt-ins => no instructor digests.');
+        $sink->close();
     }
 }

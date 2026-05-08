@@ -40,7 +40,11 @@ class run_anomaly_digest extends \core\task\scheduled_task {
             return;
         }
 
-        $threshold = (int) (get_config('local_ai_course_assistant', 'anomaly_digest_threshold_pct') ?: 50);
+        // Use explicit default-when-unset; ?: would fall through on the
+        // string "0" and silently apply the 50% default to an admin who
+        // explicitly set the threshold to 0 (alert on any change).
+        $rawthresh = get_config('local_ai_course_assistant', 'anomaly_digest_threshold_pct');
+        $threshold = ($rawthresh === false || $rawthresh === '') ? 50 : (int) $rawthresh;
         $alerts = [];
 
         // Negative ratings: 7-day window vs prior 7-day window.
