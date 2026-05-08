@@ -5,6 +5,7 @@ namespace local_ai_course_assistant\external;
 
 use core_external\external_api;
 use core_external\external_function_parameters;
+use core_external\external_single_structure;
 use core_external\external_value;
 
 /**
@@ -42,7 +43,13 @@ class save_avatar_preference extends external_api {
         return ['success' => true];
     }
 
-    public static function execute_returns(): external_value {
-        return new external_value(PARAM_BOOL, 'Success status');
+    public static function execute_returns(): external_single_structure {
+        // v5.3.20: matches the actual return shape of execute() which is
+        // ['success' => bool]. Previously declared as a scalar PARAM_BOOL,
+        // which clean_returnvalue would reject ("Scalar type expected,
+        // array or object received."). Caught by external_services_test.
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'Success flag'),
+        ]);
     }
 }
