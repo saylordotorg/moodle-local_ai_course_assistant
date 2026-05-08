@@ -20,15 +20,22 @@ Feature: AI Course Assistant widget
       | enabled             | 1      | local_ai_course_assistant |
       | provider            | claude | local_ai_course_assistant |
       | default_course_mode | all    | local_ai_course_assistant |
-    # Pre-grant SOLA consent so the first-run consent banner does not
-    # overlay the drawer interior and intercept clicks. The banner is
-    # required for production GDPR/FERPA compliance but obstructs Behat
-    # interactions; the existing escape-key scenario only worked because
-    # escape is a keyboard event, not a click.
+    # Pre-grant the two first-run UX gates so the drawer interior is
+    # actually reachable in Behat:
+    # 1. aica_sola_consent_given — bypasses the GDPR/FERPA consent banner
+    #    (position:absolute, inset:0, z-index:20) that intercepts clicks.
+    # 2. local_ai_course_assistant_intro_dismissed — bypasses the welcome
+    #    panel that adds drawer--welcome and hides starters/messages/input
+    #    until the user clicks Continue.
+    # Both gates exist for production UX; they're only skipped in the
+    # test environment so DOM-level scenarios can interact with the
+    # drawer's normal post-onboarding state.
     And the following "user preferences" exist:
-      | user     | preference              | value |
-      | student1 | aica_sola_consent_given | 1     |
-      | teacher1 | aica_sola_consent_given | 1     |
+      | user     | preference                                  | value |
+      | student1 | aica_sola_consent_given                     | 1     |
+      | teacher1 | aica_sola_consent_given                     | 1     |
+      | student1 | local_ai_course_assistant_intro_dismissed   | 1     |
+      | teacher1 | local_ai_course_assistant_intro_dismissed   | 1     |
 
   Scenario: Student sees chat widget on course page
     Given I log in as "student1"
