@@ -359,6 +359,7 @@ $string['task:run_integrity_checks'] = 'Run daily AI Course Assistant plugin int
 $string['task:milestone_check'] = 'Send daily milestone reflection emails (v5.3.0)';
 $string['task:struggle_signal_review'] = 'Review struggle signals into private learner memory (v5.3.0)';
 $string['messageprovider:study_notes'] = 'Study session notes';
+$string['messageprovider:study_reminder'] = 'Study reminders';
 $string['messageprovider:integrity_report'] = 'AI Course Assistant integrity check failure report';
 
 // v5.3.0: Empathetic communications + carryover memory.
@@ -564,6 +565,35 @@ $string['privacy:metadata:local_ai_course_assistant_practice_scores:overall_scor
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:scores'] = 'Per-criterion scores in JSON format.';
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:ai_feedback'] = 'AI-generated feedback on the practice session.';
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:timecreated'] = 'The time the score was recorded.';
+
+// v5.3.17: privacy metadata strings for tables added in v5.0–v5.3 that
+// had not been declared in the privacy provider. Each table requires
+// at least one summary string and one per-userid-field string so the
+// core_privacy table-coverage test passes.
+$string['privacy:metadata:msg_ratings'] = 'Stores per-message thumbs-up/down ratings.';
+$string['privacy:metadata:msg_ratings:userid'] = 'The user who rated the message.';
+$string['privacy:metadata:profiles'] = 'Generated learner profiles used to personalise replies.';
+$string['privacy:metadata:profiles:userid'] = 'The user the profile describes.';
+$string['privacy:metadata:obj_att'] = 'Per-learner mastery attempts on course objectives.';
+$string['privacy:metadata:obj_att:userid'] = 'The learner whose attempt is recorded.';
+$string['privacy:metadata:flashcards'] = 'Per-learner flashcard state.';
+$string['privacy:metadata:flashcards:userid'] = 'The learner the flashcards belong to.';
+$string['privacy:metadata:review_res'] = 'Audit resolution log for needs-review queue items.';
+$string['privacy:metadata:review_res:resolved_by'] = 'The reviewer who resolved the entry.';
+$string['privacy:metadata:radar_sched'] = 'Scheduled Learning Radar deliveries.';
+$string['privacy:metadata:radar_sched:creator'] = 'The user who created the schedule.';
+$string['privacy:metadata:avatar_sess'] = 'Talking-avatar streaming session log.';
+$string['privacy:metadata:avatar_sess:userid'] = 'The learner whose session was logged.';
+$string['privacy:metadata:learner_goals'] = 'Volunteered learner goals (why-here, what-becoming).';
+$string['privacy:metadata:learner_goals:userid'] = 'The learner who provided the goals.';
+$string['privacy:metadata:learner_memory'] = 'Bounded carryover personalisation notes.';
+$string['privacy:metadata:learner_memory:userid'] = 'The learner the memory describes.';
+$string['privacy:metadata:streak'] = 'Per-learner activity streak counter.';
+$string['privacy:metadata:streak:userid'] = 'The learner whose streak is tracked.';
+$string['privacy:metadata:struggle_signal'] = 'Auto-purged struggle classifier signals (private to chat).';
+$string['privacy:metadata:struggle_signal:userid'] = 'The learner whose chat session was scored.';
+$string['privacy:metadata:outreach_log'] = 'Audit log of empathetic outreach emails.';
+$string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was sent to.';
 
 // AI Insights.
 $string['insights:title'] = 'AI Insights';

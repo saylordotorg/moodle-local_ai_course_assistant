@@ -168,6 +168,48 @@ class provider implements
             'privacy:metadata:local_ai_course_assistant_practice_scores'
         );
 
+        // v5.3.17: privacy metadata for tables added in v5.0–v5.3 that had
+        // not yet been declared. Without these the core_privacy
+        // table-coverage test fails because every table with a userid
+        // field must be either declared here or explicitly excluded.
+        $collection->add_database_table('local_ai_course_assistant_msg_ratings',
+            ['userid' => 'privacy:metadata:msg_ratings:userid'],
+            'privacy:metadata:msg_ratings');
+        $collection->add_database_table('local_ai_course_assistant_profiles',
+            ['userid' => 'privacy:metadata:profiles:userid'],
+            'privacy:metadata:profiles');
+        $collection->add_database_table('local_ai_course_assistant_obj_att',
+            ['userid' => 'privacy:metadata:obj_att:userid'],
+            'privacy:metadata:obj_att');
+        $collection->add_database_table('local_ai_course_assistant_flashcards',
+            ['userid' => 'privacy:metadata:flashcards:userid'],
+            'privacy:metadata:flashcards');
+        $collection->add_database_table('local_ai_course_assistant_review_res',
+            ['resolved_by' => 'privacy:metadata:review_res:resolved_by'],
+            'privacy:metadata:review_res');
+        $collection->add_database_table('local_ai_course_assistant_radar_sched',
+            ['creator' => 'privacy:metadata:radar_sched:creator'],
+            'privacy:metadata:radar_sched');
+        $collection->add_database_table('local_ai_course_assistant_avatar_sess',
+            ['userid' => 'privacy:metadata:avatar_sess:userid'],
+            'privacy:metadata:avatar_sess');
+        // v5.3.0 carryover-personalisation tables.
+        $collection->add_database_table('local_ai_course_assistant_learner_goals',
+            ['userid' => 'privacy:metadata:learner_goals:userid'],
+            'privacy:metadata:learner_goals');
+        $collection->add_database_table('local_ai_course_assistant_learner_memory',
+            ['userid' => 'privacy:metadata:learner_memory:userid'],
+            'privacy:metadata:learner_memory');
+        $collection->add_database_table('local_ai_course_assistant_streak',
+            ['userid' => 'privacy:metadata:streak:userid'],
+            'privacy:metadata:streak');
+        $collection->add_database_table('local_ai_course_assistant_struggle_signal',
+            ['userid' => 'privacy:metadata:struggle_signal:userid'],
+            'privacy:metadata:struggle_signal');
+        $collection->add_database_table('local_ai_course_assistant_outreach_log',
+            ['userid' => 'privacy:metadata:outreach_log:userid'],
+            'privacy:metadata:outreach_log');
+
         return $collection;
     }
 
