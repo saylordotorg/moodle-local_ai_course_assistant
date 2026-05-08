@@ -20,6 +20,15 @@ Feature: AI Course Assistant widget
       | enabled             | 1      | local_ai_course_assistant |
       | provider            | claude | local_ai_course_assistant |
       | default_course_mode | all    | local_ai_course_assistant |
+    # Pre-grant SOLA consent so the first-run consent banner does not
+    # overlay the drawer interior and intercept clicks. The banner is
+    # required for production GDPR/FERPA compliance but obstructs Behat
+    # interactions; the existing escape-key scenario only worked because
+    # escape is a keyboard event, not a click.
+    And the following "user preferences" exist:
+      | user     | preference              | value |
+      | student1 | aica_sola_consent_given | 1     |
+      | teacher1 | aica_sola_consent_given | 1     |
 
   Scenario: Student sees chat widget on course page
     Given I log in as "student1"
