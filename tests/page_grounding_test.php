@@ -56,6 +56,11 @@ final class page_grounding_test extends \advanced_testcase {
             'contentformat' => FORMAT_HTML,
         ]);
         $cm = get_coursemodule_from_instance('page', $page->id);
+        // v5.3.13: rebuild modinfo cache so subsequent get_fast_modinfo()
+        // calls see the just-created module. Without this, the wide-dump
+        // iteration runs against a cache populated before any pages
+        // existed and returns zero modules.
+        rebuild_course_cache((int)$courseid, true);
         return (int)$cm->id;
     }
 
