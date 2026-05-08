@@ -381,6 +381,13 @@ abstract class base_provider implements provider_interface {
                 return new coreai_provider($overrides);
             case 'custom':
                 return new custom_provider($overrides);
+            case 'stub':
+                // Test-only canned-response provider. Production callers never
+                // configure provider='stub'; PHPUnit suites (v5.3.26+) flip
+                // it via set_config() to exercise generate_quiz, generate_
+                // flashcards, score_essay, and generate_insights without
+                // touching upstream APIs.
+                return new stub_provider($overrides);
             default:
                 throw new \moodle_exception('chat:error_notconfigured', 'local_ai_course_assistant');
         }
