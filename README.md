@@ -2,11 +2,14 @@
 
 A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-aware tutoring, support, and study planning for students.
 
-## Version 4.4.5
+## Version 5.4.5
 
-**Release Date:** January 2025
+**Release Date:** May 2026
 **Requires:** Moodle 4.5+ (2024100700)
 **License:** GPL v3+
+**Maturity:** Stable. In production at saylor.org for a 30-course pilot.
+
+See the [Changelog](https://github.com/saylordotorg/moodle-local_ai_course_assistant/wiki/Changelog) for what's new and the [GitHub Releases](https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases) page for the canonical version list.
 
 ## Credits
 
