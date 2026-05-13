@@ -39,6 +39,7 @@
         <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="AI provider used for this response (assistant messages only)"/>
         <FIELD NAME="interaction_type" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" DEFAULT="chat" COMMENT="Interaction mode: chat, voice, quiz, practice_conversation, practice_pronunciation"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course module ID the student was viewing when sending this message"/>
+        <FIELD NAME="rag_latency_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v5.4.6: wall-clock time the rag_retriever::retrieve call took for this turn (null when RAG was off or not used)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>

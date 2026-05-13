@@ -303,7 +303,10 @@ try {
     }
 
     // RAG retrieval: embed user query and fetch relevant chunks.
+    // v5.4.6: wall-clock time the retrieve call so we can attribute it to the
+    // assistant message row. Stays null when RAG is off or the call short-circuits.
     $retrievedchunks = [];
+    $raglatencyms = null;
     $ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
     $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw; // default enabled
     if (get_config('local_ai_course_assistant', 'rag_enabled') && $ragcourseenabled) {
@@ -312,11 +315,14 @@ try {
                 content_indexer::index_course($courseid);
             }
             $topk = (int) (get_config('local_ai_course_assistant', 'rag_topk') ?: 5);
+            $ragstart = microtime(true);
             $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk);
+            $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
         } catch (\Throwable $e) {
             // Fallback to content stuffing — log but don't fail the request.
             debugging('RAG retrieval failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             $retrievedchunks = [];
+            $raglatencyms = null;
         }
     }
 
@@ -712,7 +718,8 @@ try {
         $tokenusage['completion_tokens'] ?? null,
         $tokenusage['model'] ?? null,
         $interactiontype,
-        $pageid ?: null
+        $pageid ?: null,
+        $raglatencyms
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs

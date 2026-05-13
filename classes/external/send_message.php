@@ -73,7 +73,9 @@ class send_message extends external_api {
         conversation_manager::add_message($conv->id, $userid, $params['courseid'], 'user', $params['message']);
 
         // RAG retrieval.
+        // v5.4.6: time the retrieve call so we can attribute it to the assistant row.
         $retrievedchunks = [];
+        $raglatencyms = null;
         if (get_config('local_ai_course_assistant', 'rag_enabled')) {
             try {
                 if (!content_indexer::is_course_indexed($params['courseid'])) {
@@ -81,10 +83,13 @@ class send_message extends external_api {
                 }
                 $rawtopk = get_config('local_ai_course_assistant', 'rag_topk');
                 $topk = ($rawtopk === false || $rawtopk === '') ? 5 : (int) $rawtopk;
+                $ragstart = microtime(true);
                 $retrievedchunks = rag_retriever::retrieve($params['courseid'], $params['message'], $topk);
+                $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
             } catch (\Exception $e) {
                 debugging('RAG retrieval failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
                 $retrievedchunks = [];
+                $raglatencyms = null;
             }
         }
 
@@ -97,7 +102,10 @@ class send_message extends external_api {
         $response = $provider->chat_completion($systemprompt, $history);
 
         // Save assistant response.
-        conversation_manager::add_message($conv->id, $userid, $params['courseid'], 'assistant', $response);
+        conversation_manager::add_message(
+            $conv->id, $userid, $params['courseid'], 'assistant', $response,
+            0, '', null, null, null, null, null, $raglatencyms
+        );
 
         return [
             'response' => $response,

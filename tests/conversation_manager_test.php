@@ -270,4 +270,43 @@ final class conversation_manager_test extends \advanced_testcase {
         $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_streak',
             ['userid' => $user2->id, 'courseid' => $course->id]));
     }
+
+    /**
+     * v5.4.6: rag_latency_ms is stored on assistant rows only.
+     * User rows must keep it null even when a value is passed in — attributing
+     * retrieve-call time to the user message would be misleading because the
+     * user row is written before the retrieve call runs.
+     */
+    public function test_rag_latency_ms_stored_on_assistant_only(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $conv = conversation_manager::get_or_create_conversation($user->id, $course->id);
+
+        // User row: even when a latency is passed, it must be discarded.
+        $usermsgid = conversation_manager::add_message(
+            $conv->id, $user->id, $course->id, 'user', 'Hello',
+            0, '', null, null, null, 'chat', null, 42
+        );
+        $userrow = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $usermsgid], '*', MUST_EXIST);
+        $this->assertNull($userrow->rag_latency_ms);
+
+        // Assistant row with a latency value: stored as-is.
+        $assistantmsgid = conversation_manager::add_message(
+            $conv->id, $user->id, $course->id, 'assistant', 'Hi',
+            0, 'openai', null, null, null, 'chat', null, 137
+        );
+        $assistantrow = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $assistantmsgid], '*', MUST_EXIST);
+        $this->assertEquals(137, (int) $assistantrow->rag_latency_ms);
+
+        // Assistant row without a latency value: stays null (RAG was off this turn).
+        $assistantnoragid = conversation_manager::add_message(
+            $conv->id, $user->id, $course->id, 'assistant', 'No RAG here',
+            0, 'openai'
+        );
+        $noragrow = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $assistantnoragid], '*', MUST_EXIST);
+        $this->assertNull($noragrow->rag_latency_ms);
+    }
 }

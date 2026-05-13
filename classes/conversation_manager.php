@@ -84,6 +84,7 @@ class conversation_manager {
      * @param string|null $modelname Model name used to generate the response.
      * @param string $interactiontype Interaction type for analytics.
      * @param int|null $cmid Course module ID when available.
+     * @param int|null $rag_latency_ms Wall-clock ms spent in rag_retriever::retrieve for this turn; only stored on assistant rows.
      * @return int The message ID.
      */
     public static function add_message(
@@ -98,7 +99,8 @@ class conversation_manager {
         ?int $completiontokens = null,
         ?string $modelname = null,
         string $interactiontype = 'chat',
-        ?int $cmid = null
+        ?int $cmid = null,
+        ?int $rag_latency_ms = null
     ): int {
         global $DB;
 
@@ -118,6 +120,9 @@ class conversation_manager {
         $record->provider = ($role === 'assistant' && $provider !== '') ? $provider : null;
         $record->interaction_type  = $interactiontype ?: 'chat';
         $record->cmid              = $cmid ?: null;
+        // v5.4.6: only attach RAG latency to assistant messages — user messages
+        // pre-date the retrieve call, so attributing it there would be misleading.
+        $record->rag_latency_ms    = ($role === 'assistant') ? $rag_latency_ms : null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);

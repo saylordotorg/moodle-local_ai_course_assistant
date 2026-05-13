@@ -997,5 +997,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026050843, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026051246) {
+        // v5.4.6: instrument rag_retriever latency.
+        // Add a nullable rag_latency_ms column to the messages table so we
+        // can spot courses approaching the chunk-count threshold where the
+        // in-PHP cosine-similarity loop starts to degrade (~3,000 chunks).
+        // Null means RAG didn't run for this turn (off, not used, or pre-v5.4.6 row).
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $field = new xmldb_field('rag_latency_ms', XMLDB_TYPE_INTEGER, '10', null,
+            null, null, null, 'cmid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026051246, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }
