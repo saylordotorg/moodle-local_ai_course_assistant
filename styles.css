@@ -5010,8 +5010,9 @@ a.aica-history-panel__source:hover {
 }
 
 .aica-rate-item__model {
-    color: #374151;
-    font-family: monospace;
+    /* v5.5.3: muted blue identifies code-like model strings without monospace. */
+    color: #1e40af;
+    font-weight: 500;
 }
 
 .aica-rate-item__price {
