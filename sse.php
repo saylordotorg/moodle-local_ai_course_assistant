@@ -145,7 +145,15 @@ require_capability('local/ai_course_assistant:use', $context);
 // v5.5.4: derive caller role for downstream branches (e.g., post-response
 // student-profile auto-update). Anyone without the manage capability is a
 // student-grade caller; admins/teachers skip the profile refresh path.
-$userrole = has_capability('local/ai_course_assistant:manage', $context, $USER->id, false)
+//
+// v5.5.5: explicit is_siteadmin() OR clause + default $doanything=true so
+// site admins resolve to 'staff' via the siteadmin short-circuit. v5.5.4
+// passed $doanything=false which bypassed the short-circuit and caused
+// admins to be evaluated as student-grade callers, triggering an
+// unnecessary student_profile_manager::generate_profile call on every
+// admin chat.
+$userrole = (is_siteadmin($USER->id)
+    || has_capability('local/ai_course_assistant:manage', $context, $USER->id))
     ? 'staff' : 'student';
 
 // Rate limiting checks.
