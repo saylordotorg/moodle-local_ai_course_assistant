@@ -97,7 +97,7 @@ $string['settings:position_br'] = 'Jobb alsó';
 $string['settings:position_bl'] = 'Bal alsó';
 $string['settings:position_tr'] = 'Jobb felső';
 $string['settings:position_tl'] = 'Bal felső';
-$string['chat:settings'] = 'Bővítmény beállítások';
+$string['chat:settings'] = 'Kurzus beállítások';
 $string['analytics:viewdashboard'] = 'Analitikai irányítópult megtekintése';
 
 // Course settings.

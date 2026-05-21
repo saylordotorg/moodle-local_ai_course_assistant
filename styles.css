@@ -2658,6 +2658,22 @@ a.aica-history-panel__source:hover {
     }
 }
 
+/* v5.5.6: always show the action icons on the most-recent assistant
+   message, and on keyboard focus, and on touch. Hover-only was
+   undiscoverable on mobile and inaccessible to keyboard-only users
+   (Tomi feedback 2026-05-20). Older messages keep the hover-reveal
+   behavior so the chat history stays visually quiet. */
+.local-ai-course-assistant__message--assistant:not(:has(~ .local-ai-course-assistant__message--assistant)) .local-ai-course-assistant__msg-actions,
+.local-ai-course-assistant__message--assistant:focus-within .local-ai-course-assistant__msg-actions {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .local-ai-course-assistant__message--assistant .local-ai-course-assistant__msg-actions {
+        opacity: 1;
+    }
+}
+
 .local-ai-course-assistant__message--speaking .local-ai-course-assistant__msg-actions {
     opacity: 1;
 }

@@ -155,7 +155,7 @@ $string['settings:position_br'] = 'Bottom right';
 $string['settings:position_bl'] = 'Bottom left';
 $string['settings:position_tr'] = 'Top right';
 $string['settings:position_tl'] = 'Top left';
-$string['chat:settings'] = 'Plugin settings';
+$string['chat:settings'] = 'Course settings';
 $string['analytics:viewdashboard'] = 'View analytics dashboard';
 
 // Course settings (per-course AI provider override).

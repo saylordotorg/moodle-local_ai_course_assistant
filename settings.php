@@ -105,17 +105,24 @@ if ($hassiteconfig) {
         }
     }
 
+    // v5.5.6: TOC entries ordered by admin frequency-of-use (highest first)
+    // rather than by section-block order in this file. Branding & UI sits
+    // ahead of Content & RAG and Safety because first-install rebranding is
+    // a higher-frequency task than RAG tuning or off-topic-cap edits. The
+    // section blocks themselves stay where they are in the file; clicking a
+    // TOC link still jumps to the right anchor.
     $toc = $tocstyle
         . '<div class="sola-toc">'
         . '<strong>Jump to section</strong>'
         . '<ul>'
         . '<li><a href="#sec-general">General</a></li>'
         . '<li><a href="#sec-ai">AI Provider &amp; Models</a></li>'
+        . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
         . '<li><a href="#sec-content">Content &amp; RAG</a></li>'
         . '<li><a href="#sec-safety">Safety &amp; Moderation</a></li>'
         . '<li><a href="#sec-engagement">Engagement</a></li>'
-        . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
         . '<li><a href="#sec-integrations">Integrations &amp; Delivery</a></li>'
+        . '<li><a href="#sec-save" style="background:#16a34a;border-color:#16a34a;color:#fff;font-weight:500">&#8595; Save</a></li>'
         . '</ul>'
         . '<div class="sola-quicklinks">' . $quicklinks . '</div>'
         . '</div>';
@@ -1888,6 +1895,17 @@ if ($hassiteconfig) {
         get_string('update:github_token', 'local_ai_course_assistant'),
         get_string('update:github_token_desc', 'local_ai_course_assistant'),
         ''
+    ));
+
+    // v5.5.6: invisible anchor at the bottom of the registered settings so
+    // the TOC can offer a "jump to Save" shortcut without forcing admins to
+    // scroll through 2,000 lines of settings to commit a single change.
+    // Moodle's framework renders the actual Save button just below this
+    // anchor as part of the form template.
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/sec_save_anchor',
+        '',
+        '<span id="sec-save" class="sola-section-anchor"></span>'
     ));
 
     $ADMIN->add('local_ai_course_assistant', $settings);
