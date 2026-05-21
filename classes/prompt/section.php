@@ -72,18 +72,32 @@ class section {
     public int $min_chars;
 
     /**
+     * @var int v5.6.0: upper bound enforced BEFORE the drop-on-overflow
+     *           algorithm runs. 0 = no per-section cap (legacy behavior).
+     *           Used by the proportional-budget model: section_budgets()
+     *           in context_builder computes each section's share of the
+     *           total budget and writes it here; the assembler honors
+     *           those caps first, then falls through to drop-on-priority
+     *           as the safety net if the prompt still does not fit.
+     */
+    public int $max_chars;
+
+    /**
      * @param string $name
      * @param string $category
      * @param int $priority
      * @param string $content
      * @param int $min_chars
+     * @param int $max_chars v5.6.0 proportional cap; 0 = unlimited (legacy)
      */
-    public function __construct(string $name, string $category, int $priority, string $content, int $min_chars = 0) {
+    public function __construct(string $name, string $category, int $priority, string $content,
+                                int $min_chars = 0, int $max_chars = 0) {
         $this->name = $name;
         $this->category = $category;
         $this->priority = $priority;
         $this->content = $content;
         $this->min_chars = $min_chars;
+        $this->max_chars = $max_chars;
     }
 
     /**

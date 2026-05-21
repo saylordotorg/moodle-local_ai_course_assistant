@@ -65,6 +65,27 @@ class builder {
         }
         unset($bucket);
 
+        // v5.6.0: enforce per-section max_chars BEFORE the drop-on-priority
+        // fallback. The proportional-budget model in context_builder writes
+        // each section's share into max_chars. Sections that exceed their
+        // cap get truncated to that cap (preserving min_chars when set);
+        // legacy callers that pass max_chars=0 keep the prior unlimited
+        // behavior. CAT_SAFETY sections are exempt and never get clipped.
+        foreach ($sections as $sec) {
+            if ($sec->category === section::CAT_SAFETY || $sec->max_chars <= 0) {
+                continue;
+            }
+            if ($sec->length() <= $sec->max_chars) {
+                continue;
+            }
+            $newlen = max($sec->min_chars, $sec->max_chars);
+            if ($newlen >= $sec->length()) {
+                continue;
+            }
+            $sec->content = substr($sec->content, 0, $newlen) . "\n[…truncated by prompt budget…]";
+            $truncated[$sec->name] = true;
+        }
+
         // Compute current total. If it fits, emit unchanged.
         $total = 0;
         foreach ($sections as $sec) {

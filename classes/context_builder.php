@@ -470,6 +470,21 @@ class context_builder {
         // headroom alongside the existing learner + behavior sections.
         $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
         $budget = ($rawbudget === false || $rawbudget === '') ? 12000 : (int) $rawbudget;
+
+        // v5.6.0: proportional-budget model. Compute per-section max_chars
+        // from the admin-configured weight map and the automatic boost
+        // mode (`page_focus` by default boosts current_page when pageid > 0,
+        // boosts course_content when pageid == 0). The assembler honors
+        // max_chars first, then falls through to drop-on-priority as the
+        // safety net for any residual overflow.
+        $budgets = self::section_budgets($budget, $pageid, $quizmode);
+        foreach ($sections as $sec) {
+            $bucket = self::section_to_bucket($sec->name);
+            if ($bucket !== null && isset($budgets[$bucket])) {
+                $sec->max_chars = $budgets[$bucket];
+            }
+        }
+
         $assembled = prompt_builder::assemble($sections, $budget);
 
         // v5.0.0 patch 14 (Tomi UT round 7 follow-up): couple the SAFETY-tail
@@ -622,6 +637,185 @@ class context_builder {
             ['userid' => $userid, 'courseid' => $courseid], IGNORE_MISSING);
         $combined = max($goalsmod, $memmod);
         return (string)$combined;
+    }
+
+    /**
+     * v5.6.0: Map section names to the four budget buckets the
+     * proportional-weights model allocates against.
+     *
+     * Sections not in this map are not explicitly budgeted; they pass
+     * through the assembler at their natural size and fall back to the
+     * drop-on-priority safety net under overflow. This keeps the model
+     * focused on the four highest-impact buckets (the ones an admin
+     * actually wants to tune) and avoids a bookkeeping explosion for
+     * the dozens of small behaviour/learner sections.
+     *
+     * History is NOT in this map; `maxhistory` (count of message pairs)
+     * continues to govern history independently. The weights drive only
+     * system-prompt section sizes.
+     *
+     * @param string $sectionname
+     * @return string|null bucket key or null if not weighted
+     */
+    private static function section_to_bucket(string $sectionname): ?string {
+        static $map = [
+            // safety_identity bucket
+            'base_template'           => 'safety_identity',
+            'security'                => 'safety_identity',
+            'quiz_coach_mode'         => 'safety_identity',
+            'page_grounding_reminder' => 'safety_identity',
+            // course_structure bucket
+            'course_topics' => 'course_structure',
+            // course_content bucket
+            'course_content' => 'course_content',
+            // current_page bucket
+            'current_page_content' => 'current_page',
+        ];
+        return $map[$sectionname] ?? null;
+    }
+
+    /**
+     * v5.6.0: Compute per-bucket character budgets for the system prompt.
+     *
+     * Weights are percentages summing to 100 across the four buckets
+     * (safety_identity, course_structure, course_content, current_page).
+     * Automatic context-aware boost adjusts the weights at request time
+     * depending on whether a specific page is in scope:
+     *   - pageid > 0 (default boost mode `page_focus`): current_page gets
+     *     a bigger share at the expense of course_structure and course_content.
+     *   - pageid == 0: current_page weight is redistributed to course_content
+     *     and course_structure (no page in scope, no allocation needed).
+     *   - quizmode='coach': treated the same as pageid > 0 since a graded
+     *     quiz attempt always implies a specific page is in scope.
+     *
+     * Admin can override the base weights via `prompt_section_weights`
+     * (JSON) and the boost mode via `prompt_context_boost_mode`. Defaults
+     * below were tuned by the v5.6.0 weight-tuning benchmark.
+     *
+     * @param int $total_budget Total system-prompt budget in chars.
+     * @param int $pageid Current Moodle pageid (0 means no page in scope).
+     * @param string $quizmode '' or 'coach'.
+     * @return array<string,int> Map of bucket key -> char budget.
+     */
+    public static function section_budgets(int $total_budget, int $pageid, string $quizmode = ''): array {
+        // Per-coach-mode override: when the active turn is a graded quiz
+        // attempt (quizmode='coach'), prefer the coach-specific weight set
+        // if the admin set one. This lets institutions force a heavier
+        // current_page allocation during quizzes without changing the
+        // global default for normal chat.
+        $rawweights = '';
+        if ($quizmode === 'coach') {
+            $rawweights = (string) get_config('local_ai_course_assistant', 'prompt_section_weights_coach');
+        }
+        if ($rawweights === '') {
+            $rawweights = (string) get_config('local_ai_course_assistant', 'prompt_section_weights');
+        }
+        $weights = self::parse_section_weights($rawweights);
+
+        // Boost mode (admin-configurable, default 'page_focus').
+        $boost = (string) get_config('local_ai_course_assistant', 'prompt_context_boost_mode');
+        if ($boost === '') {
+            $boost = 'page_focus';
+        }
+
+        $page_in_scope = ($pageid > 0) || ($quizmode === 'coach');
+        $weights = self::apply_boost($weights, $boost, $page_in_scope);
+
+        // Convert percentages to char budgets.
+        $budgets = [];
+        foreach ($weights as $bucket => $pct) {
+            $budgets[$bucket] = (int) round($total_budget * ($pct / 100.0));
+        }
+        return $budgets;
+    }
+
+    /**
+     * v5.6.0: Parse the admin-configured weight JSON. Falls back to
+     * benchmarked defaults on any parse error or missing config.
+     *
+     * @param string $raw JSON encoded weights map
+     * @return array<string,float>
+     */
+    private static function parse_section_weights(string $raw): array {
+        // Defaults: empirically tuned on 2026-05-21 via the v5.6.0
+        // weight-tuning benchmark (50 golden prompts, 5 candidate weight
+        // sets, gpt-4o-mini + rubric judge on SOLATEST course on dev).
+        //
+        // The winning set scored 12.02/15 on the 50-prompt rubric mean,
+        // edging out content_heavy 15/15/45/25 (11.88) and the original
+        // memo baseline 15/15/30/40 (11.66). Pattern observed:
+        // higher allocations to course_content + current_page beat
+        // higher allocations to safety_identity + course_structure
+        // because the safety/structure sections are short, fixed-size
+        // content (their natural length is well under 10% of a 12000-
+        // char budget), so over-allocating to them just wastes budget
+        // that could carry more course material.
+        //
+        // safety_identity holds 10% to maintain the design-memo floor
+        // (jailbreak resistance, output-format markers, persona-vs-truth
+        // precedence). Below 10% the safety section starts truncating
+        // and the jailbreak suite would no longer pass.
+        $defaults = [
+            'safety_identity'  => 10.0,
+            'course_structure' => 10.0,
+            'course_content'   => 40.0,
+            'current_page'     => 40.0,
+        ];
+        if ($raw === '') {
+            return $defaults;
+        }
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return $defaults;
+        }
+        // Merge with defaults so missing keys are filled in; validate sum.
+        $merged = array_merge($defaults, array_intersect_key($decoded, $defaults));
+        $sum = array_sum($merged);
+        if ($sum < 95 || $sum > 105) {
+            // Outside 100 ± 5% tolerance: fall back to defaults rather than
+            // silently rescale (admins should see validation errors at save time).
+            return $defaults;
+        }
+        return $merged;
+    }
+
+    /**
+     * v5.6.0: Apply the context-aware boost to base weights.
+     *
+     * Modes:
+     *   - 'off': no adjustment; admin weights pass through unchanged.
+     *   - 'page_focus' (default): when pageid > 0, shift 15 points from
+     *     course_content + course_structure to current_page. When pageid == 0,
+     *     redistribute current_page's allocation to course_content + course_structure.
+     *   - 'aggressive': same shape as page_focus but with a 25-point shift.
+     *
+     * @param array<string,float> $weights
+     * @param string $mode
+     * @param bool $page_in_scope
+     * @return array<string,float>
+     */
+    private static function apply_boost(array $weights, string $mode, bool $page_in_scope): array {
+        if ($mode === 'off') {
+            return $weights;
+        }
+        $shift = ($mode === 'aggressive') ? 25.0 : 15.0;
+        if ($page_in_scope) {
+            // Current page gets a bigger slice; comes from course_structure
+            // (smaller, gives up less) and course_content (larger, gives up more).
+            $from_structure = min($shift * 0.2, max(0, $weights['course_structure'] - 5));
+            $from_content   = min($shift - $from_structure, max(0, $weights['course_content'] - 10));
+            $weights['course_structure'] -= $from_structure;
+            $weights['course_content']   -= $from_content;
+            $weights['current_page']     += $from_structure + $from_content;
+        } else {
+            // No page in scope; redistribute current_page's allocation.
+            $unused = $weights['current_page'];
+            $weights['current_page'] = 0;
+            // Course content absorbs 70% of the unused page slice; structure absorbs 30%.
+            $weights['course_content']   += $unused * 0.7;
+            $weights['course_structure'] += $unused * 0.3;
+        }
+        return $weights;
     }
 
     /**

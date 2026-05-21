@@ -296,6 +296,43 @@ if ($hassiteconfig) {
         '12000',
         PARAM_INT
     ));
+    // v5.6.0: prompt section proportions. Admin-configurable per-section
+    // weights that allocate the total budget across the four high-impact
+    // buckets (safety_identity, course_structure, course_content,
+    // current_page). Empirically tuned defaults from the v5.6.0 benchmark
+    // are baked into context_builder::parse_section_weights(); leaving the
+    // textarea blank uses those defaults. Boost mode auto-shifts allocation
+    // toward the current page when one is in scope, and toward course
+    // content when the learner is on the course main view.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/prompt_proportions_heading',
+        get_string('settings:prompt_proportions_heading', 'local_ai_course_assistant'),
+        get_string('settings:prompt_proportions_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/prompt_section_weights',
+        get_string('settings:prompt_section_weights', 'local_ai_course_assistant'),
+        get_string('settings:prompt_section_weights_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/prompt_context_boost_mode',
+        get_string('settings:prompt_context_boost_mode', 'local_ai_course_assistant'),
+        get_string('settings:prompt_context_boost_mode_desc', 'local_ai_course_assistant'),
+        'page_focus',
+        [
+            'off'         => get_string('settings:prompt_context_boost_off', 'local_ai_course_assistant'),
+            'page_focus'  => get_string('settings:prompt_context_boost_page_focus', 'local_ai_course_assistant'),
+            'aggressive'  => get_string('settings:prompt_context_boost_aggressive', 'local_ai_course_assistant'),
+        ]
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/prompt_section_weights_coach',
+        get_string('settings:prompt_section_weights_coach', 'local_ai_course_assistant'),
+        get_string('settings:prompt_section_weights_coach_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/prompt_metrics_enabled',
         get_string('settings:prompt_metrics_enabled', 'local_ai_course_assistant'),
