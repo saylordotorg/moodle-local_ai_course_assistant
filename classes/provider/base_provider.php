@@ -311,7 +311,8 @@ abstract class base_provider implements provider_interface {
                     }
                     global $USER;
                     $primarylabel = self::label_for_active_provider($provider, $overrides);
-                    $timeoutseconds = (int) (get_config('local_ai_course_assistant', 'failover_timeout_chat') ?: 8);
+                    $rawtimeout = get_config('local_ai_course_assistant', 'failover_timeout_chat');
+                    $timeoutseconds = ($rawtimeout === false || $rawtimeout === '') ? 8 : (int) $rawtimeout;
                     $primary = new failover_chain($primary, $primarylabel, $fallbacks, [
                         'timeout_seconds' => $timeoutseconds,
                         'audit'           => true,

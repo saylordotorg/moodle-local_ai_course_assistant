@@ -65,6 +65,10 @@ class builder {
         }
         unset($bucket);
 
+        $breakdown = [];
+        $dropped = [];
+        $truncated = [];
+
         // v5.6.0: enforce per-section max_chars BEFORE the drop-on-priority
         // fallback. The proportional-budget model in context_builder writes
         // each section's share into max_chars. Sections that exceed their
@@ -91,10 +95,6 @@ class builder {
         foreach ($sections as $sec) {
             $total += $sec->length();
         }
-
-        $breakdown = [];
-        $dropped = [];
-        $truncated = [];
 
         if ($budget_chars > 0 && $total > $budget_chars) {
             // Build a flat list of (category, section) sorted by priority asc,

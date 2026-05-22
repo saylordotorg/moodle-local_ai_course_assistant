@@ -207,10 +207,10 @@ function mode_run(string $providersfilter, string $outdir, string $datetag, int 
  * Measures TTFT and total latency by using streaming. Captures token
  * usage and computes cost via token_cost_manager.
  *
- * @param array{label: string, provider: string, models: string, apikey: string, temperature: string} $row
+ * @param array $row Provider row: ['label', 'provider', 'models', 'apikey', 'temperature'].
  * @param string $systemprompt
  * @param string $userprompt
- * @return array{response: string, prompt_tokens: ?int, completion_tokens: ?int, ttft_ms: ?int, total_latency_ms: ?int, cost_cents: ?float, error: string}
+ * @return array Result row: ['response', 'prompt_tokens', 'completion_tokens', 'ttft_ms', 'total_latency_ms', 'cost_cents', 'error'].
  */
 function run_one_call(array $row, string $systemprompt, string $userprompt): array {
     try {
@@ -642,9 +642,9 @@ function read_csv(string $path): array {
 /**
  * Nearest-rank percentile.
  *
- * @param array<int, int|float> $values
+ * @param array $values Numeric values (int or float).
  * @param int $p 0..100
- * @return int|float|null
+ * @return mixed The element at the nearest-rank percentile, or null if $values is empty.
  */
 function percentile(array $values, int $p) {
     if (empty($values)) return null;

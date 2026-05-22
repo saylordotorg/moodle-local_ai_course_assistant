@@ -77,7 +77,7 @@ class failover_chain implements provider_interface {
     /**
      * @param provider_interface $primary
      * @param string $primarylabel Label of the primary, used for circuit-state lookups.
-     * @param array<int, array{provider: provider_interface, label: string}> $fallbacks Ordered fallback list.
+     * @param array $fallbacks Ordered fallback list. Each entry: ['provider' => provider_interface, 'label' => string].
      * @param array $options Optional: ['timeout_seconds' => int, 'audit' => bool, 'courseid' => int, 'userid' => int].
      */
     public function __construct(provider_interface $primary, string $primarylabel, array $fallbacks, array $options = []) {
@@ -263,7 +263,7 @@ class failover_chain implements provider_interface {
     /**
      * Emit the audit row for a fall-through event.
      *
-     * @param array{provider: provider_interface, label: string} $failed
+     * @param array $failed The failed chain entry: ['provider' => provider_interface, 'label' => string].
      * @param string $reason
      * @param float $elapsedseconds
      */

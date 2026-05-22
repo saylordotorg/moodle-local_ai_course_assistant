@@ -789,10 +789,10 @@ class context_builder {
      *     redistribute current_page's allocation to course_content + course_structure.
      *   - 'aggressive': same shape as page_focus but with a 25-point shift.
      *
-     * @param array<string,float> $weights
-     * @param string $mode
-     * @param bool $page_in_scope
-     * @return array<string,float>
+     * @param array $weights Map of bucket name to weight (floats, sum to 100).
+     * @param string $mode One of 'off', 'page_focus', 'aggressive'.
+     * @param bool $page_in_scope True when learner is on a page (or in coach mode).
+     * @return array Adjusted weight map in the same shape as $weights.
      */
     private static function apply_boost(array $weights, string $mode, bool $page_in_scope): array {
         if ($mode === 'off') {

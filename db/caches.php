@@ -65,7 +65,10 @@ $definitions = [
     // multiple groups shares circuit state.
     'failover_circuit' => [
         'mode'       => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
+        // simplekeys is false because failover labels routinely contain hyphens
+        // (e.g. "fireworks-llama8b"). Moodle's simple-key validator only allows
+        // [a-zA-Z0-9_], so labels with hyphens would trigger a coding exception.
+        'simplekeys' => false,
         'simpledata' => false,
         'ttl'        => 900,
     ],
