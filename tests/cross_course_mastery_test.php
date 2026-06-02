@@ -238,4 +238,42 @@ final class cross_course_mastery_test extends \advanced_testcase {
         $this->assertCount(0, cross_course_mastery::get_transfer_evidence((int)$user->id, (int)$c1->id),
             'No need to surface transfer for an objective the learner already mastered here.');
     }
+
+    // ───────────────────────────────────────────────────────────
+    // Prompt-injection integration (objective_manager)
+    // ───────────────────────────────────────────────────────────
+
+    public function test_prompt_injection_includes_transfer_block_when_enabled(): void {
+        $this->resetAfterTest();
+        $c1 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course(['fullname' => 'Accounting 201']);
+        $user = $this->getDataGenerator()->create_user();
+        $this->enable_crossmastery((int)$c1->id);
+
+        $a = objective_manager::create((int)$c2->id, 'Interpret a balance sheet');
+        objective_manager::create((int)$c1->id, 'Interpret a balance sheet');
+        cross_course_mastery::rebuild_links();
+        $this->master((int)$user->id, (int)$c2->id, $a);
+
+        $block = objective_manager::build_prompt_injection((int)$user->id, (int)$c1->id);
+        $this->assertStringContainsStringIgnoringCase('demonstrated elsewhere', $block);
+        $this->assertStringContainsString('Accounting 201', $block);
+    }
+
+    public function test_prompt_injection_omits_transfer_block_when_crossmastery_off(): void {
+        $this->resetAfterTest();
+        $c1 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course(['fullname' => 'Accounting 201']);
+        $user = $this->getDataGenerator()->create_user();
+        // Mastery on (so the base block renders) but crossmastery OFF.
+        objective_manager::set_enabled_for_course((int)$c1->id, true);
+
+        $a = objective_manager::create((int)$c2->id, 'Interpret a balance sheet');
+        objective_manager::create((int)$c1->id, 'Interpret a balance sheet');
+        cross_course_mastery::rebuild_links();
+        $this->master((int)$user->id, (int)$c2->id, $a);
+
+        $block = objective_manager::build_prompt_injection((int)$user->id, (int)$c1->id);
+        $this->assertStringNotContainsStringIgnoringCase('demonstrated elsewhere', $block);
+    }
 }
