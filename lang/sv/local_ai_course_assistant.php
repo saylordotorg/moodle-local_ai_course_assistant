@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Sammanställning av kursövergripande färdighetsnivå på som standard';
+$string['pedagogy:crossmastery_desc'] = 'När detta är på känner SOLA igen när en deltagare redan har bemästrat ett mål i en annan kurs (matchat via kompetensreferens eller titel) och bekräftar den tidigare färdigheten i stället för att drilla den på nytt. Kräver färdighetsspårning; kurser utan mål faller tillbaka utan problem. Endast rådgivande – det ändrar aldrig en deltagares lagrade färdighetspoäng i någon kurs.';
+$string['pedagogy:mastery_starter'] = 'Färdighetsmedveten samtalsstartare på som standard';
+$string['pedagogy:mastery_starter_desc'] = 'När detta är på personaliseras samtalsstartaren "Vad bör jag fokusera på?" så att den namnger deltagarens svagaste mål (och eventuell kompetens som redan bemästrats någon annanstans). Kräver färdighetsspårning; faller tillbaka till den generiska startaren när det ännu inte finns några färdighetsdata.';
+$string['task:rebuild_objective_links'] = 'Bygg om kursövergripande mållänkar för sammanställning av färdighetsnivå (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Öva: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Kursövergripande färdighetslänkar';
+$string['objectives:rebuild_links_help'] = 'SOLA länkar mål som matchar mellan kurser (via kompetensreferens eller titel) så att en deltagare som har bemästrat ett ämne någon annanstans inte drillas på nytt. Länkar byggs om automatiskt varje natt; använd den här knappen för att bygga om nu efter att du har redigerat mål.';
+$string['objectives:rebuild_links_button'] = 'Bygg om länkar nu';
+$string['objectives:rebuild_links_done'] = 'Kursövergripande färdighetslänkar ombyggda: {$a->total} totalt ({$a->ref} via referens, {$a->exact} exakt titel, {$a->fuzzy} ungefärlig titel).';

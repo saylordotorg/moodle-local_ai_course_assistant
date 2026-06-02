@@ -1317,3 +1317,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'क्रॉस-कोर्स महारत रोलअप डिफ़ॉल्ट रूप से चालू';
+$string['pedagogy:crossmastery_desc'] = 'जब चालू हो, तो SOLA यह पहचानता है कि किसी शिक्षार्थी ने किसी अन्य कोर्स में किसी उद्देश्य पर पहले से ही महारत हासिल कर ली है (दक्षता संदर्भ या शीर्षक से मिलान किया गया) और उसे दोबारा अभ्यास कराने के बजाय उस पूर्व दक्षता को स्वीकार करता है। इसके लिए महारत ट्रैकिंग आवश्यक है; जिन कोर्स में उद्देश्य नहीं हैं वे सहजता से सामान्य व्यवहार पर लौट आते हैं। यह केवल सलाहकारी है — यह किसी भी कोर्स में किसी शिक्षार्थी के संग्रहीत महारत स्कोर को कभी नहीं बदलता।';
+$string['pedagogy:mastery_starter'] = 'महारत-संवेदी स्टार्टर डिफ़ॉल्ट रूप से चालू';
+$string['pedagogy:mastery_starter_desc'] = 'जब चालू हो, तो "मुझे किस पर ध्यान केंद्रित करना चाहिए?" वार्तालाप स्टार्टर को शिक्षार्थी के सबसे कमज़ोर उद्देश्य (और कहीं और पहले से महारत हासिल की गई किसी दक्षता) का नाम लेने के लिए वैयक्तिकृत किया जाता है। इसके लिए महारत ट्रैकिंग आवश्यक है; जब तक कोई महारत डेटा उपलब्ध न हो, यह सामान्य स्टार्टर पर लौट आता है।';
+$string['task:rebuild_objective_links'] = 'महारत रोलअप के लिए क्रॉस-कोर्स उद्देश्य लिंक पुनर्निर्मित करें (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'अभ्यास: {$a}';
+$string['objectives:rebuild_links_heading'] = 'क्रॉस-कोर्स महारत लिंक';
+$string['objectives:rebuild_links_help'] = 'SOLA उन उद्देश्यों को लिंक करता है जो कोर्स के बीच मेल खाते हैं (दक्षता संदर्भ या शीर्षक से) ताकि जिस शिक्षार्थी ने किसी विषय पर कहीं और महारत हासिल कर ली है उसे दोबारा अभ्यास न कराया जाए। लिंक हर रात स्वचालित रूप से पुनर्निर्मित होते हैं; उद्देश्यों को संपादित करने के बाद अभी पुनर्निर्माण करने के लिए इस बटन का उपयोग करें।';
+$string['objectives:rebuild_links_button'] = 'अभी लिंक पुनर्निर्मित करें';
+$string['objectives:rebuild_links_done'] = 'क्रॉस-कोर्स महारत लिंक पुनर्निर्मित किए गए: कुल {$a->total} ({$a->ref} संदर्भ द्वारा, {$a->exact} सटीक शीर्षक, {$a->fuzzy} अस्पष्ट शीर्षक)।';

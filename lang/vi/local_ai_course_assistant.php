@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Mặc định bật tổng hợp mức độ thành thạo liên khóa học';
+$string['pedagogy:crossmastery_desc'] = 'Khi bật, SOLA nhận biết khi học viên đã thành thạo một mục tiêu trong khóa học khác (đối chiếu theo mã tham chiếu năng lực hoặc tiêu đề) và ghi nhận năng lực đã có đó thay vì luyện lại. Yêu cầu phải theo dõi mức độ thành thạo; các khóa học không có mục tiêu sẽ tự động chuyển về chế độ dự phòng một cách nhẹ nhàng. Chỉ mang tính tư vấn — tính năng này không bao giờ thay đổi điểm thành thạo đã lưu của học viên trong bất kỳ khóa học nào.';
+$string['pedagogy:mastery_starter'] = 'Mặc định bật câu mở đầu nhận biết mức độ thành thạo';
+$string['pedagogy:mastery_starter_desc'] = 'Khi bật, câu mở đầu cuộc trò chuyện "Tôi nên tập trung vào điều gì?" sẽ được cá nhân hóa để nêu rõ mục tiêu yếu nhất của học viên (và bất kỳ năng lực nào đã được thành thạo ở nơi khác). Yêu cầu phải theo dõi mức độ thành thạo; sẽ chuyển về câu mở đầu chung khi chưa có dữ liệu thành thạo.';
+$string['task:rebuild_objective_links'] = 'Tạo lại liên kết mục tiêu liên khóa học cho tổng hợp mức độ thành thạo (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Luyện tập: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Liên kết mức độ thành thạo liên khóa học';
+$string['objectives:rebuild_links_help'] = 'SOLA liên kết các mục tiêu khớp với nhau giữa các khóa học (theo mã tham chiếu năng lực hoặc tiêu đề) để học viên đã thành thạo một chủ đề ở nơi khác không phải luyện lại. Các liên kết được tạo lại tự động vào mỗi đêm; dùng nút này để tạo lại ngay sau khi chỉnh sửa mục tiêu.';
+$string['objectives:rebuild_links_button'] = 'Tạo lại liên kết ngay';
+$string['objectives:rebuild_links_done'] = 'Đã tạo lại liên kết mức độ thành thạo liên khóa học: tổng cộng {$a->total} ({$a->ref} theo tham chiếu, {$a->exact} khớp tiêu đề chính xác, {$a->fuzzy} khớp tiêu đề gần đúng).';

@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Kurslar arası yetkinlik birleştirme varsayılan olarak açık';
+$string['pedagogy:crossmastery_desc'] = 'Açık olduğunda SOLA, bir öğrencinin bir hedefi başka bir kursta zaten kazandığını (yetkinlik referansı veya başlık eşleşmesiyle) algılar ve bunu yeniden çalıştırmak yerine önceden kazanılmış bu yetkinliği dikkate alır. Yetkinlik takibi gerektirir; hedefi olmayan kurslar sorunsuz biçimde geri çekilir. Yalnızca bilgilendirme amaçlıdır; hiçbir kursta öğrencinin kayıtlı yetkinlik puanını asla değiştirmez.';
+$string['pedagogy:mastery_starter'] = 'Yetkinlik duyarlı başlangıç istemi varsayılan olarak açık';
+$string['pedagogy:mastery_starter_desc'] = 'Açık olduğunda "Neye odaklanmalıyım?" sohbet başlangıç istemi, öğrencinin en zayıf hedefini (ve başka bir yerde zaten kazanılmış yetkinlikleri) belirtecek şekilde kişiselleştirilir. Yetkinlik takibi gerektirir; henüz yetkinlik verisi yokken genel başlangıç istemine geri döner.';
+$string['task:rebuild_objective_links'] = 'Yetkinlik birleştirme için kurslar arası hedef bağlantılarını yeniden oluştur (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Alıştırma: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Kurslar arası yetkinlik bağlantıları';
+$string['objectives:rebuild_links_help'] = 'SOLA, kurslar arasında eşleşen hedefleri (yetkinlik referansı veya başlığa göre) bağlar; böylece bir konuyu başka bir yerde kazanmış öğrenci konuyu yeniden çalışmak zorunda kalmaz. Bağlantılar her gece otomatik olarak yeniden oluşturulur; hedefleri düzenledikten sonra şimdi yeniden oluşturmak için bu düğmeyi kullanın.';
+$string['objectives:rebuild_links_button'] = 'Bağlantıları şimdi yeniden oluştur';
+$string['objectives:rebuild_links_done'] = 'Kurslar arası yetkinlik bağlantıları yeniden oluşturuldu: toplam {$a->total} ({$a->ref} referansa göre, {$a->exact} tam başlık, {$a->fuzzy} bulanık başlık).';

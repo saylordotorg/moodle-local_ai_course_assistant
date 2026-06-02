@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'تجميع الإتقان عبر المقررات مُفعَّل افتراضيًا';
+$string['pedagogy:crossmastery_desc'] = 'عند التفعيل، يتعرّف SOLA على ما إذا كان المتعلّم قد أتقن بالفعل هدفًا تعليميًا في مقرر آخر (بالمطابقة عبر مرجع الكفاءة أو العنوان) ويقرّ بهذه الكفاءة السابقة بدلًا من إعادة التدريب عليها. يتطلّب ذلك تتبّع الإتقان؛ والمقررات التي لا تتضمّن أهدافًا تعليمية تعود إلى السلوك الافتراضي بسلاسة. استشاري فقط — فهو لا يغيّر أبدًا درجة الإتقان المخزّنة للمتعلّم في أي مقرر.';
+$string['pedagogy:mastery_starter'] = 'مُحفِّز المحادثة المراعي للإتقان مُفعَّل افتراضيًا';
+$string['pedagogy:mastery_starter_desc'] = 'عند التفعيل، يُخصَّص محفّز المحادثة "على ماذا ينبغي أن أركّز؟" ليُسمّي أضعف هدف تعليمي لدى المتعلّم (وأي كفاءة سبق إتقانها في مكان آخر). يتطلّب ذلك تتبّع الإتقان؛ ويعود إلى المحفّز العام عندما لا تتوفّر بعدُ أي بيانات إتقان.';
+$string['task:rebuild_objective_links'] = 'إعادة بناء روابط الأهداف التعليمية عبر المقررات لتجميع الإتقان (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'تدرّب: {$a}';
+$string['objectives:rebuild_links_heading'] = 'روابط الإتقان عبر المقررات';
+$string['objectives:rebuild_links_help'] = 'يربط SOLA الأهداف التعليمية المتطابقة عبر المقررات (بمرجع الكفاءة أو العنوان) حتى لا يُعاد تدريب المتعلّم الذي أتقن موضوعًا في مكان آخر. تُعاد بناء الروابط تلقائيًا كل ليلة؛ استخدم هذا الزر لإعادة البناء الآن بعد تعديل الأهداف التعليمية.';
+$string['objectives:rebuild_links_button'] = 'إعادة بناء الروابط الآن';
+$string['objectives:rebuild_links_done'] = 'أُعيد بناء روابط الإتقان عبر المقررات: {$a->total} إجمالًا ({$a->ref} بالمرجع، {$a->exact} بمطابقة العنوان التامة، {$a->fuzzy} بمطابقة العنوان التقريبية).';

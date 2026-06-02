@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Vakoverstijgende beheersingsoverzicht standaard ingeschakeld';
+$string['pedagogy:crossmastery_desc'] = 'Indien ingeschakeld herkent SOLA wanneer een cursist een doelstelling al in een andere cursus heeft beheerst (gematcht op competentiereferentie of titel) en erkent die eerder verworven competentie in plaats van die opnieuw te oefenen. Vereist beheersingsregistratie; cursussen zonder doelstellingen vallen netjes terug. Alleen adviserend: het wijzigt nooit de opgeslagen beheersingsscore van een cursist in welke cursus dan ook.';
+$string['pedagogy:mastery_starter'] = 'Beheersingsbewuste gespreksstarter standaard ingeschakeld';
+$string['pedagogy:mastery_starter_desc'] = 'Indien ingeschakeld wordt de gespreksstarter "Waar moet ik me op richten?" gepersonaliseerd om de zwakste doelstelling van de cursist te benoemen (en eventuele competenties die elders al beheerst zijn). Vereist beheersingsregistratie; valt terug op de algemene starter wanneer er nog geen beheersingsgegevens zijn.';
+$string['task:rebuild_objective_links'] = 'Vakoverstijgende doelstellingskoppelingen voor beheersingsoverzicht opnieuw opbouwen (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Oefenen: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Vakoverstijgende beheersingskoppelingen';
+$string['objectives:rebuild_links_help'] = 'SOLA koppelt doelstellingen die overeenkomen tussen cursussen (op competentiereferentie of titel), zodat een cursist die een onderwerp elders heeft beheerst dit niet opnieuw hoeft te oefenen. De koppelingen worden elke nacht automatisch opnieuw opgebouwd; gebruik deze knop om ze nu opnieuw op te bouwen na het bewerken van doelstellingen.';
+$string['objectives:rebuild_links_button'] = 'Koppelingen nu opnieuw opbouwen';
+$string['objectives:rebuild_links_done'] = 'Vakoverstijgende beheersingskoppelingen opnieuw opgebouwd: {$a->total} in totaal ({$a->ref} op referentie, {$a->exact} exacte titel, {$a->fuzzy} benaderende titel).';

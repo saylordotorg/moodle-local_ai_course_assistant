@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Учет освоения целей в разных курсах включен по умолчанию';
+$string['pedagogy:crossmastery_desc'] = 'Когда эта опция включена, SOLA распознает, что учащийся уже освоил цель в другом курсе (по совпадению ссылки на компетенцию или названия), и учитывает эту ранее освоенную компетенцию вместо повторной отработки. Требуется отслеживание освоения; курсы без целей корректно используют запасной вариант. Носит только рекомендательный характер — это никогда не изменяет сохраненный балл освоения учащегося ни в одном курсе.';
+$string['pedagogy:mastery_starter'] = 'Начальная подсказка с учетом освоения включена по умолчанию';
+$string['pedagogy:mastery_starter_desc'] = 'Когда эта опция включена, начальная реплика разговора «На чем мне стоит сосредоточиться?» персонализируется так, чтобы назвать самую слабую цель учащегося (и любую компетенцию, уже освоенную в другом месте). Требуется отслеживание освоения; при отсутствии данных об освоении используется обычная начальная подсказка.';
+$string['task:rebuild_objective_links'] = 'Перестроить межкурсовые связи целей для учета освоения (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Практика: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Межкурсовые связи освоения';
+$string['objectives:rebuild_links_help'] = 'SOLA связывает цели, которые совпадают в разных курсах (по ссылке на компетенцию или названию), чтобы учащийся, освоивший тему в другом месте, не отрабатывал ее повторно. Связи перестраиваются автоматически каждую ночь; используйте эту кнопку, чтобы перестроить их сейчас после редактирования целей.';
+$string['objectives:rebuild_links_button'] = 'Перестроить связи сейчас';
+$string['objectives:rebuild_links_done'] = 'Межкурсовые связи освоения перестроены: всего {$a->total} ({$a->ref} по ссылке, {$a->exact} по точному названию, {$a->fuzzy} по приблизительному названию).';

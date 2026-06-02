@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Beherskelsesoversigt på tværs af kurser slået til som standard';
+$string['pedagogy:crossmastery_desc'] = 'Når dette er slået til, genkender SOLA, når en deltager allerede har behersket et læringsmål i et andet kursus (matchet via kompetencereference eller titel), og anerkender denne tidligere kompetence i stedet for at gennemgå den igen. Kræver beherskelsessporing; kurser uden læringsmål falder elegant tilbage. Kun vejledende — det ændrer aldrig en deltagers gemte beherskelsesscore i noget kursus.';
+$string['pedagogy:mastery_starter'] = 'Beherskelsesbevidst samtalestarter slået til som standard';
+$string['pedagogy:mastery_starter_desc'] = 'Når dette er slået til, personaliseres samtalestarteren “Hvad skal jeg fokusere på?”, så den nævner deltagerens svageste læringsmål (og enhver kompetence, der allerede er behersket andetsteds). Kræver beherskelsessporing; falder tilbage til den generiske samtalestarter, når der endnu ikke findes beherskelsesdata.';
+$string['task:rebuild_objective_links'] = 'Genopbyg læringsmålslinks på tværs af kurser til beherskelsesoversigt (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Øv: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Beherskelseslinks på tværs af kurser';
+$string['objectives:rebuild_links_help'] = 'SOLA linker læringsmål, der matcher på tværs af kurser (via kompetencereference eller titel), så en deltager, der har behersket et emne andetsteds, ikke skal gennemgå det igen. Links genopbygges automatisk hver nat; brug denne knap til at genopbygge nu efter redigering af læringsmål.';
+$string['objectives:rebuild_links_button'] = 'Genopbyg links nu';
+$string['objectives:rebuild_links_done'] = 'Beherskelseslinks på tværs af kurser genopbygget: {$a->total} i alt ({$a->ref} via reference, {$a->exact} nøjagtig titel, {$a->fuzzy} omtrentlig titel).';

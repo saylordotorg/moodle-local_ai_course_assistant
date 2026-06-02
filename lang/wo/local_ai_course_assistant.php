@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Ycoon ëmbu ci diggante kurs yi nafter ci ñu-am';
+$string['pedagogy:crossmastery_desc'] = 'Bu nekkee dox, SOLA dafay xam su nekkee ne jàngkat bi mën na ba pare benn pàcc ci beneen kurs (jàppante ci wàllu ndëgg mbaa ci tur) te dafay nangu xam-xam boobu jëkk ci lu dul ko delloo jàngat. Dafa soxla toppantéeg ëmbu; kurs yu amul pàcc yi dañuy delloo ci anam yu jaadu. Tegtal rekk la — du tax mukk ñu soppi nattukaayu ëmbu bu jàngkat bi ci benn kurs.';
+$string['pedagogy:mastery_starter'] = 'Tàmbalikat bu xam ëmbu ci nekk dox ci ñu-am';
+$string['pedagogy:mastery_starter_desc'] = 'Bu nekkee dox, tàmbalikatu waxtaan bi di "Lan laa war a sàmm sama xel?" dañu koy jagleel jàngkat bi ngir tudd pàcc bi gënal néew dooley (ak pàcc bu mu ba pare am ci beneen bërëb). Dafa soxla toppantéeg ëmbu; dafay dellu ci tàmbalikat bu yemale bi su amul benn xibaar ci ëmbu ba léegi.';
+$string['task:rebuild_objective_links'] = 'Tabaxaat ay liggéeyu pàcc ci diggante kurs yi ngir ëmbu (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Jàngat: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Liggéeyu ëmbu ci diggante kurs yi';
+$string['objectives:rebuild_links_help'] = 'SOLA dafay liggéeyloo pàcc yi mengoo ci diggante kurs yi (ci wàllu ndëgg mbaa ci tur) ngir jàngkat bi ba pare am benn taar ci beneen bërëb bañ koo delloo jàngat. Liggéey yi dañuy tabaxaat boppam guddi gu nekk; jëfandikoo bii butoŋ ngir tabaxaat léegi su nga sopppee pàcc yi.';
+$string['objectives:rebuild_links_button'] = 'Tabaxaat liggéey yi léegi';
+$string['objectives:rebuild_links_done'] = 'Liggéeyu ëmbu ci diggante kurs yi tabaxaat nañu ko: {$a->total} ñoom ñépp ({$a->ref} ci wàllu ndëgg, {$a->exact} tur bu wóor, {$a->fuzzy} tur bu jege).';

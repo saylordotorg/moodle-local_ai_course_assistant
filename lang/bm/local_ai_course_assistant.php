@@ -1316,3 +1316,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Kalansow ni ɲɔgɔn cɛ se sɔrɔli sigili sirakan ka kɛ a yɛrɛ ma';
+$string['pedagogy:crossmastery_desc'] = 'Ni a sigilen don, SOLA bɛ a dɔn ni kalanden ye sebaaya sɔrɔ kaban kalanso wɛrɛ kɔnɔ (a bɛnnen sebaaya hakili ɲɛsinni walima tɔgɔ fɛ), o tuma a bɛ o sebaaya kɔrɔ minɛ sani ka segin a kan tugun. A mago bɛ se sɔrɔli kɔlɔsili la; kalansow minnu tɛ ni se sɔrɔli sirakanw ye, olu bɛ jigin ka ɲɛ. Laadilikan dɔrɔn — a tɛ kalanden ka se sɔrɔli hakɛ marolen Changé kalanso si kɔnɔ abada.';
+$string['pedagogy:mastery_starter'] = 'Daminɛkuma min bɛ se sɔrɔli dɔn ka kɛ a yɛrɛ ma';
+$string['pedagogy:mastery_starter_desc'] = 'Ni a sigilen don, baro daminɛkuma "Ne ka kan ka ne ɲɛsin mun ma?" bɛ kɛ kalanden yɛrɛ ta ye walisa ka kalanden ka sirakan barika dɔgɔn tɔgɔ fɔ (ani sebaaya o sebaaya min sɔrɔla yɔrɔ wɛrɛ la kaban). A mago bɛ se sɔrɔli kɔlɔsili la; ni se sɔrɔli kunnafoni si tɛ yen fɔlɔ, a bɛ segin daminɛkuma jamana ma.';
+$string['task:rebuild_objective_links'] = 'Kalansow ni ɲɔgɔn cɛ sirakan jɛsiraw labɛnkura se sɔrɔli sigili kama (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Degeli: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Kalansow ni ɲɔgɔn cɛ se sɔrɔli jɛsiraw';
+$string['objectives:rebuild_links_help'] = 'SOLA bɛ sirakanw jɛsira minnu bɛ bɛn kalansow ni ɲɔgɔn cɛ (sebaaya hakili ɲɛsinni walima tɔgɔ fɛ) walisa kalanden min ye barokun dɔ se sɔrɔ yɔrɔ wɛrɛ la, o kana segin a kan tugun. Jɛsiraw bɛ labɛnkura a yɛrɛ ma su o su; o butɔn in baara kɛ ka labɛnkura kɛ sisan kɔfɛ ni i ye sirakanw yɛlɛma.';
+$string['objectives:rebuild_links_button'] = 'Jɛsiraw labɛnkura sisan';
+$string['objectives:rebuild_links_done'] = 'Kalansow ni ɲɔgɔn cɛ se sɔrɔli jɛsiraw labɛnkura ra: {$a->total} bɛɛ lajɛlen ({$a->ref} hakili ɲɛsinni fɛ, {$a->exact} tɔgɔ ɲumalen, {$a->fuzzy} tɔgɔ surunyalen).';

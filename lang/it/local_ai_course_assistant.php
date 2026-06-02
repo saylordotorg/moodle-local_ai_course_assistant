@@ -1330,3 +1330,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Riepilogo delle competenze acquisite tra corsi attivo per impostazione predefinita';
+$string['pedagogy:crossmastery_desc'] = 'Se attivo, SOLA riconosce quando uno studente ha già acquisito un obiettivo in un altro corso (abbinato tramite riferimento di competenza o titolo) e ne tiene conto invece di farlo esercitare nuovamente. Richiede il monitoraggio delle competenze; i corsi privi di obiettivi vengono gestiti senza problemi. Funzione puramente consultiva: non modifica mai il punteggio di competenza memorizzato di uno studente in alcun corso.';
+$string['pedagogy:mastery_starter'] = 'Spunto iniziale basato sulle competenze attivo per impostazione predefinita';
+$string['pedagogy:mastery_starter_desc'] = 'Se attivo, lo spunto di conversazione "Su cosa dovrei concentrarmi?" viene personalizzato per indicare l\'obiettivo più debole dello studente (e qualsiasi competenza già acquisita altrove). Richiede il monitoraggio delle competenze; in assenza di dati sulle competenze, viene utilizzato lo spunto generico.';
+$string['task:rebuild_objective_links'] = 'Ricostruisci i collegamenti tra obiettivi di corsi diversi per il riepilogo delle competenze (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Esercitati: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Collegamenti delle competenze tra corsi';
+$string['objectives:rebuild_links_help'] = 'SOLA collega gli obiettivi che corrispondono tra i corsi (tramite riferimento di competenza o titolo), in modo che uno studente che ha già acquisito un argomento altrove non debba esercitarsi di nuovo. I collegamenti vengono ricostruiti automaticamente ogni notte; usa questo pulsante per ricostruirli subito dopo aver modificato gli obiettivi.';
+$string['objectives:rebuild_links_button'] = 'Ricostruisci i collegamenti ora';
+$string['objectives:rebuild_links_done'] = 'Collegamenti delle competenze tra corsi ricostruiti: {$a->total} in totale ({$a->ref} per riferimento, {$a->exact} per titolo esatto, {$a->fuzzy} per titolo approssimativo).';

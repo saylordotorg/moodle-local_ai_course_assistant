@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Àkójọpọ̀ ìmọ̀ jíjinlẹ̀ káàkiri ẹ̀kọ́ ti ṣiṣẹ́ látinwá';
+$string['pedagogy:crossmastery_desc'] = 'Nígbà tí ó bá ti ṣiṣẹ́, SOLA á mọ̀ nígbà tí akẹ́kọ̀ọ́ kan ti ní ìmọ̀ jíjinlẹ̀ lórí ète kan nínú ẹ̀kọ́ mìíràn (tí a fi ìtọ́kasí ìmọ̀-ìṣẹ́ tàbí àkòlé bára), yóò sì jẹ́wọ́ ìmọ̀-ìṣẹ́ tẹ́lẹ̀tẹ́lẹ̀ yẹn dípò kí ó tún ọ kọ́ láti ìbẹ̀rẹ̀. Ó nílò ìtọpinpin ìmọ̀ jíjinlẹ̀; àwọn ẹ̀kọ́ tí kò ní ète á padà sẹ́yìn láìséwu. Ìmọ̀ràn nìkan ni — kò ní yí ìdíwọ̀n ìmọ̀ jíjinlẹ̀ akẹ́kọ̀ọ́ tí a kó pamọ́ padà nínú ẹ̀kọ́ kankan.';
+$string['pedagogy:mastery_starter'] = 'Olùbẹ̀rẹ̀ tí ó mọ ìmọ̀ jíjinlẹ̀ ti ṣiṣẹ́ látinwá';
+$string['pedagogy:mastery_starter_desc'] = 'Nígbà tí ó bá ti ṣiṣẹ́, olùbẹ̀rẹ̀ ìfọ̀rọ̀wérọ̀ "Kí ni mo gbọ́dọ̀ dojú kọ?" ni a ṣe ní ìbámu fún akẹ́kọ̀ọ́ láti dárúkọ ète tí ó lẹ jùlọ fún akẹ́kọ̀ọ́ náà (àti ìmọ̀-ìṣẹ́ èyíkéyìí tí ó ti ní ìmọ̀ jíjinlẹ̀ rẹ̀ ní ibòmíràn). Ó nílò ìtọpinpin ìmọ̀ jíjinlẹ̀; ó á padà sí olùbẹ̀rẹ̀ gbogbo-gbòò nígbà tí kò bá tí ì sí dátà ìmọ̀ jíjinlẹ̀.';
+$string['task:rebuild_objective_links'] = 'Tún àwọn ìjápọ̀ ète káàkiri ẹ̀kọ́ kọ́ fún àkójọpọ̀ ìmọ̀ jíjinlẹ̀ (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Àdánwò: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Àwọn ìjápọ̀ ìmọ̀ jíjinlẹ̀ káàkiri ẹ̀kọ́';
+$string['objectives:rebuild_links_help'] = 'SOLA á so àwọn ète tí ó bára pọ̀ káàkiri àwọn ẹ̀kọ́ (nípa ìtọ́kasí ìmọ̀-ìṣẹ́ tàbí àkòlé) kí akẹ́kọ̀ọ́ tí ó ti ní ìmọ̀ jíjinlẹ̀ lórí kókó kan ní ibòmíràn má bàa tún un kọ́ láti ìbẹ̀rẹ̀. Àwọn ìjápọ̀ á tún ara wọn kọ́ ní aṣálẹ́-ọ̀sán; lo bọ́tìnnì yìí láti tún wọn kọ́ nísinsìnyí lẹ́yìn títúnṣe àwọn ète.';
+$string['objectives:rebuild_links_button'] = 'Tún àwọn ìjápọ̀ kọ́ nísinsìnyí';
+$string['objectives:rebuild_links_done'] = 'A ti tún àwọn ìjápọ̀ ìmọ̀ jíjinlẹ̀ káàkiri ẹ̀kọ́ kọ́: {$a->total} lápapọ̀ ({$a->ref} nípa ìtọ́kasí, {$a->exact} àkòlé pípé, {$a->fuzzy} àkòlé tí kò gún régé).';

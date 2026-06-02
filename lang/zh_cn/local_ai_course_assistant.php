@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = '默认开启跨课程掌握度汇总';
+$string['pedagogy:crossmastery_desc'] = '开启后，SOLA 会识别学习者是否已在其他课程中掌握某个目标（通过能力点引用或标题匹配），并认可其先前已具备的能力，而不再重复训练该目标。需启用掌握度追踪；未设置目标的课程将自动平稳回退。仅作为参考提示，不会更改学习者在任何课程中已存储的掌握度分数。';
+$string['pedagogy:mastery_starter'] = '默认开启掌握度感知对话开场';
+$string['pedagogy:mastery_starter_desc'] = '开启后，"我应该重点学习什么？"这一对话开场会进行个性化处理，指出学习者最薄弱的目标（以及任何已在别处掌握的能力点）。需启用掌握度追踪；当尚无掌握度数据时，将回退到通用对话开场。';
+$string['task:rebuild_objective_links'] = '为掌握度汇总重建跨课程目标关联 (v5.7.0)';
+$string['mastery_starter:practice_label'] = '练习：{$a}';
+$string['objectives:rebuild_links_heading'] = '跨课程掌握度关联';
+$string['objectives:rebuild_links_help'] = 'SOLA 会关联跨课程相互匹配的目标（通过能力点引用或标题），使已在别处掌握某主题的学习者无需重复训练。关联每晚自动重建；编辑目标后，可使用此按钮立即重建。';
+$string['objectives:rebuild_links_button'] = '立即重建关联';
+$string['objectives:rebuild_links_done'] = '已重建跨课程掌握度关联：共 {$a->total} 个（按引用 {$a->ref} 个，标题完全匹配 {$a->exact} 个，标题模糊匹配 {$a->fuzzy} 个）。';

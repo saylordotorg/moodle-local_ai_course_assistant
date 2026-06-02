@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Activer par défaut le récapitulatif de maîtrise inter-cours';
+$string['pedagogy:crossmastery_desc'] = 'Lorsque cette option est activée, SOLA reconnaît qu\'un apprenant a déjà maîtrisé un objectif dans un autre cours (mis en correspondance par référence de compétence ou par titre) et prend acte de cette compétence acquise au lieu de la faire travailler à nouveau. Nécessite le suivi de la maîtrise ; les cours sans objectifs reviennent à un comportement de repli sans incident. À titre indicatif uniquement : cette option ne modifie jamais le score de maîtrise enregistré d\'un apprenant dans aucun cours.';
+$string['pedagogy:mastery_starter'] = 'Activer par défaut l\'amorce tenant compte de la maîtrise';
+$string['pedagogy:mastery_starter_desc'] = 'Lorsque cette option est activée, l\'amorce de conversation « Sur quoi devrais-je me concentrer ? » est personnalisée afin de nommer l\'objectif le plus faible de l\'apprenant (ainsi que toute compétence déjà maîtrisée ailleurs). Nécessite le suivi de la maîtrise ; revient à l\'amorce générique lorsqu\'aucune donnée de maîtrise n\'est encore disponible.';
+$string['task:rebuild_objective_links'] = 'Reconstruire les liens d\'objectifs inter-cours pour le récapitulatif de maîtrise (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'S\'exercer : {$a}';
+$string['objectives:rebuild_links_heading'] = 'Liens de maîtrise inter-cours';
+$string['objectives:rebuild_links_help'] = 'SOLA relie les objectifs qui correspondent d\'un cours à l\'autre (par référence de compétence ou par titre) afin qu\'un apprenant ayant maîtrisé un sujet ailleurs ne le retravaille pas. Les liens sont reconstruits automatiquement chaque nuit ; utilisez ce bouton pour les reconstruire immédiatement après avoir modifié des objectifs.';
+$string['objectives:rebuild_links_button'] = 'Reconstruire les liens maintenant';
+$string['objectives:rebuild_links_done'] = 'Liens de maîtrise inter-cours reconstruits : {$a->total} au total ({$a->ref} par référence, {$a->exact} par titre exact, {$a->fuzzy} par titre approximatif).';

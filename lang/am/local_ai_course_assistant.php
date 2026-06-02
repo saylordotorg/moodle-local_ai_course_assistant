@@ -1315,3 +1315,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'የተደጋጋሚ ኮርስ ብቃት ማጠቃለያ በነባሪ ይብራ';
+$string['pedagogy:crossmastery_desc'] = 'ሲበራ፣ SOLA አንድ ተማሪ በሌላ ኮርስ ውስጥ አንድን ዓላማ ቀደም ሲል ሲያሳካ (በብቃት ማጣቀሻ ወይም በርዕስ ተዛምዶ) ይለያል እና እንደገና ከመለማመድ ይልቅ ያንን ቀደም ያለ ብቃት ይቀበላል። የብቃት ክትትል ይጠይቃል፤ ዓላማ የሌላቸው ኮርሶች በተገቢው ሁኔታ ይመለሳሉ። አማካሪ ብቻ ነው — በማንኛውም ኮርስ ውስጥ የተማሪውን የተቀመጠ የብቃት ውጤት ፈጽሞ አይለውጥም።';
+$string['pedagogy:mastery_starter'] = 'ብቃትን የሚያውቅ ማስጀመሪያ በነባሪ ይብራ';
+$string['pedagogy:mastery_starter_desc'] = 'ሲበራ፣ "በምን ላይ ላተኩር?" የውይይት ማስጀመሪያው የተማሪውን ደካማ ዓላማ (እና በሌላ ቦታ ቀደም ሲል የተካነውን ማንኛውንም ብቃት) ለመጥቀስ ይብጅባጃል። የብቃት ክትትል ይጠይቃል፤ እስካሁን የብቃት መረጃ በሌለበት ጊዜ ወደ አጠቃላይ ማስጀመሪያ ይመለሳል።';
+$string['task:rebuild_objective_links'] = 'ለብቃት ማጠቃለያ የተደጋጋሚ ኮርስ ዓላማ አገናኞችን እንደገና ይገንቡ (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'ልምምድ: {$a}';
+$string['objectives:rebuild_links_heading'] = 'የተደጋጋሚ ኮርስ ብቃት አገናኞች';
+$string['objectives:rebuild_links_help'] = 'SOLA በኮርሶች መካከል የሚዛመዱ ዓላማዎችን (በብቃት ማጣቀሻ ወይም በርዕስ) ያገናኛል፤ ስለዚህ በሌላ ቦታ አንድን ርዕስ የተካነ ተማሪ እንደገና አይለማመድም። አገናኞቹ በየሌሊቱ በራስ-ሰር እንደገና ይገነባሉ፤ ዓላማዎችን ካስተካከሉ በኋላ አሁን እንደገና ለመገንባት ይህንን አዝራር ይጠቀሙ።';
+$string['objectives:rebuild_links_button'] = 'አገናኞችን አሁን እንደገና ይገንቡ';
+$string['objectives:rebuild_links_done'] = 'የተደጋጋሚ ኮርስ ብቃት አገናኞች እንደገና ተገንብተዋል: {$a->total} ጠቅላላ ({$a->ref} በማጣቀሻ፣ {$a->exact} ትክክለኛ ርዕስ፣ {$a->fuzzy} ግምታዊ ርዕስ)።';

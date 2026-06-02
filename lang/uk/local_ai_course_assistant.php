@@ -1330,3 +1330,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Зведення засвоєння між курсами увімкнено за замовчуванням';
+$string['pedagogy:crossmastery_desc'] = 'Коли увімкнено, SOLA розпізнає, що слухач уже опанував певну ціль навчання в іншому курсі (за збігом посилання на компетентність або назви), і визнає цю попередню компетентність замість повторного відпрацювання. Потребує відстеження засвоєння; курси без цілей навчання коректно повертаються до стандартної поведінки. Має лише рекомендаційний характер — ніколи не змінює збережений бал засвоєння слухача в жодному курсі.';
+$string['pedagogy:mastery_starter'] = 'Початковий запит з урахуванням засвоєння увімкнено за замовчуванням';
+$string['pedagogy:mastery_starter_desc'] = 'Коли увімкнено, початковий запит для бесіди «На чому мені варто зосередитися?» персоналізується так, щоб назвати найслабшу ціль навчання слухача (а також будь-яку компетентність, уже опановану деінде). Потребує відстеження засвоєння; повертається до загального початкового запиту, якщо даних про засвоєння ще немає.';
+$string['task:rebuild_objective_links'] = 'Перебудувати міжкурсові зв’язки цілей навчання для зведення засвоєння (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Практика: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Міжкурсові зв’язки засвоєння';
+$string['objectives:rebuild_links_help'] = 'SOLA пов’язує цілі навчання, які збігаються між курсами (за посиланням на компетентність або назвою), щоб слухач, який опанував тему деінде, не відпрацьовував її повторно. Зв’язки перебудовуються автоматично щоночі; скористайтеся цією кнопкою, щоб перебудувати їх зараз після редагування цілей навчання.';
+$string['objectives:rebuild_links_button'] = 'Перебудувати зв’язки зараз';
+$string['objectives:rebuild_links_done'] = 'Міжкурсові зв’язки засвоєння перебудовано: {$a->total} усього ({$a->ref} за посиланням, {$a->exact} за точною назвою, {$a->fuzzy} за приблизною назвою).';

@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'เปิดใช้การรวมความเชี่ยวชาญข้ามรายวิชาเป็นค่าเริ่มต้น';
+$string['pedagogy:crossmastery_desc'] = 'เมื่อเปิดใช้งาน SOLA จะรับรู้ว่าผู้เรียนได้เชี่ยวชาญวัตถุประสงค์การเรียนรู้หนึ่งในอีกรายวิชาแล้ว (จับคู่ด้วยรหัสอ้างอิงสมรรถนะหรือชื่อ) และยอมรับสมรรถนะที่มีอยู่ก่อนนั้นแทนที่จะให้ฝึกซ้ำ จำเป็นต้องมีการติดตามความเชี่ยวชาญ รายวิชาที่ไม่มีวัตถุประสงค์การเรียนรู้จะถอยกลับอย่างราบรื่น เป็นเพียงคำแนะนำเท่านั้น โดยจะไม่เปลี่ยนคะแนนความเชี่ยวชาญที่จัดเก็บไว้ของผู้เรียนในรายวิชาใด ๆ';
+$string['pedagogy:mastery_starter'] = 'เปิดใช้ตัวเริ่มต้นบทสนทนาที่รับรู้ความเชี่ยวชาญเป็นค่าเริ่มต้น';
+$string['pedagogy:mastery_starter_desc'] = 'เมื่อเปิดใช้งาน ตัวเริ่มต้นบทสนทนา "ฉันควรมุ่งเน้นที่อะไร?" จะถูกปรับให้เป็นส่วนตัวโดยระบุวัตถุประสงค์การเรียนรู้ที่ผู้เรียนอ่อนที่สุด (และสมรรถนะใด ๆ ที่เชี่ยวชาญแล้วจากที่อื่น) จำเป็นต้องมีการติดตามความเชี่ยวชาญ และจะถอยกลับไปใช้ตัวเริ่มต้นทั่วไปเมื่อยังไม่มีข้อมูลความเชี่ยวชาญ';
+$string['task:rebuild_objective_links'] = 'สร้างลิงก์วัตถุประสงค์การเรียนรู้ข้ามรายวิชาใหม่สำหรับการรวมความเชี่ยวชาญ (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'ฝึกฝน: {$a}';
+$string['objectives:rebuild_links_heading'] = 'ลิงก์ความเชี่ยวชาญข้ามรายวิชา';
+$string['objectives:rebuild_links_help'] = 'SOLA เชื่อมโยงวัตถุประสงค์การเรียนรู้ที่ตรงกันข้ามรายวิชา (ด้วยรหัสอ้างอิงสมรรถนะหรือชื่อ) เพื่อให้ผู้เรียนที่เชี่ยวชาญหัวข้อหนึ่งจากที่อื่นแล้วไม่ต้องฝึกซ้ำ ลิงก์จะถูกสร้างใหม่โดยอัตโนมัติทุกคืน ใช้ปุ่มนี้เพื่อสร้างใหม่ทันทีหลังจากแก้ไขวัตถุประสงค์การเรียนรู้';
+$string['objectives:rebuild_links_button'] = 'สร้างลิงก์ใหม่ทันที';
+$string['objectives:rebuild_links_done'] = 'สร้างลิงก์ความเชี่ยวชาญข้ามรายวิชาใหม่แล้ว: ทั้งหมด {$a->total} รายการ ({$a->ref} จากรหัสอ้างอิง, {$a->exact} จากชื่อที่ตรงกันพอดี, {$a->fuzzy} จากชื่อที่ใกล้เคียง)';

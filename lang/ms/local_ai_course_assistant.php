@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Hidupkan rumusan penguasaan merentas kursus secara lalai';
+$string['pedagogy:crossmastery_desc'] = 'Apabila dihidupkan, SOLA mengenali apabila seseorang pelajar telah pun menguasai sesuatu objektif dalam kursus lain (dipadankan melalui rujukan kompetensi atau tajuk) dan mengiktiraf kompetensi terdahulu itu, bukannya melatihnya semula. Memerlukan penjejakan penguasaan; kursus tanpa objektif akan beralih dengan lancar. Bersifat nasihat sahaja — ia tidak sekali-kali mengubah skor penguasaan pelajar yang tersimpan dalam mana-mana kursus.';
+$string['pedagogy:mastery_starter'] = 'Hidupkan pembuka perbualan peka penguasaan secara lalai';
+$string['pedagogy:mastery_starter_desc'] = 'Apabila dihidupkan, pembuka perbualan "Apakah yang patut saya fokuskan?" diperibadikan untuk menamakan objektif paling lemah pelajar (dan mana-mana kompetensi yang telah dikuasai di tempat lain). Memerlukan penjejakan penguasaan; akan beralih kepada pembuka perbualan umum apabila belum ada data penguasaan lagi.';
+$string['task:rebuild_objective_links'] = 'Bina semula pautan objektif merentas kursus untuk rumusan penguasaan (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Latihan: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Pautan penguasaan merentas kursus';
+$string['objectives:rebuild_links_help'] = 'SOLA memautkan objektif yang sepadan merentas kursus (melalui rujukan kompetensi atau tajuk) supaya pelajar yang telah menguasai sesuatu topik di tempat lain tidak dilatih semula. Pautan dibina semula secara automatik setiap malam; gunakan butang ini untuk membina semula sekarang selepas menyunting objektif.';
+$string['objectives:rebuild_links_button'] = 'Bina semula pautan sekarang';
+$string['objectives:rebuild_links_done'] = 'Pautan penguasaan merentas kursus telah dibina semula: {$a->total} jumlah keseluruhan ({$a->ref} melalui rujukan, {$a->exact} tajuk tepat, {$a->fuzzy} tajuk kabur).';

@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Mkusanyiko wa umahiri wa kozi mtambuka umewashwa kwa chaguo-msingi';
+$string['pedagogy:crossmastery_desc'] = 'Ikiwashwa, SOLA inatambua wakati mwanafunzi tayari amebobea lengo katika kozi nyingine (likilinganishwa kwa kumbukumbu ya umahiri au kichwa) na kutambua umahiri huo wa awali badala ya kulirudia tena. Inahitaji ufuatiliaji wa umahiri; kozi zisizo na malengo zinarejea bila tatizo. Ni ushauri tu — kamwe haibadilishi alama ya umahiri iliyohifadhiwa ya mwanafunzi katika kozi yoyote.';
+$string['pedagogy:mastery_starter'] = 'Kianzishi kinachozingatia umahiri kimewashwa kwa chaguo-msingi';
+$string['pedagogy:mastery_starter_desc'] = 'Ikiwashwa, kianzishi cha mazungumzo cha "Niangazie nini?" kinabinafsishwa ili kutaja lengo dhaifu zaidi la mwanafunzi (na umahiri wowote ambao tayari umebobewa mahali pengine). Inahitaji ufuatiliaji wa umahiri; inarejea kwa kianzishi cha kawaida ikiwa bado hakuna data ya umahiri.';
+$string['task:rebuild_objective_links'] = 'Jenga upya viungo vya malengo ya kozi mtambuka kwa mkusanyiko wa umahiri (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Fanya mazoezi: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Viungo vya umahiri wa kozi mtambuka';
+$string['objectives:rebuild_links_help'] = 'SOLA inaunganisha malengo yanayolingana katika kozi tofauti (kwa kumbukumbu ya umahiri au kichwa) ili mwanafunzi aliyebobea mada mahali pengine asilirudie tena. Viungo hujengwa upya kiotomatiki kila usiku; tumia kitufe hiki kujenga upya sasa baada ya kuhariri malengo.';
+$string['objectives:rebuild_links_button'] = 'Jenga upya viungo sasa';
+$string['objectives:rebuild_links_done'] = 'Viungo vya umahiri wa kozi mtambuka vimejengwa upya: {$a->total} jumla ({$a->ref} kwa kumbukumbu, {$a->exact} kichwa kamili, {$a->fuzzy} kichwa cha makadirio).';

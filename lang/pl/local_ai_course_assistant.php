@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Domyślnie włączone zbiorcze opanowanie celów między kursami';
+$string['pedagogy:crossmastery_desc'] = 'Gdy ta opcja jest włączona, SOLA rozpoznaje, że uczący się opanował już dany cel w innym kursie (dopasowany na podstawie odniesienia do kompetencji lub tytułu), i uwzględnia tę wcześniej zdobytą kompetencję zamiast ponownie jej ćwiczyć. Wymaga śledzenia opanowania; kursy bez celów są obsługiwane bez błędów. Funkcja wyłącznie doradcza — nigdy nie zmienia zapisanego wyniku opanowania uczącego się w żadnym kursie.';
+$string['pedagogy:mastery_starter'] = 'Domyślnie włączony starter uwzględniający opanowanie';
+$string['pedagogy:mastery_starter_desc'] = 'Gdy ta opcja jest włączona, starter rozmowy "Na czym powinienem się skupić?" jest spersonalizowany tak, aby wskazać najsłabszy cel uczącego się (oraz wszelkie kompetencje już opanowane gdzie indziej). Wymaga śledzenia opanowania; gdy nie ma jeszcze danych o opanowaniu, używany jest ogólny starter.';
+$string['task:rebuild_objective_links'] = 'Przebuduj powiązania celów między kursami dla zbiorczego opanowania (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Ćwiczenie: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Powiązania opanowania między kursami';
+$string['objectives:rebuild_links_help'] = 'SOLA łączy cele, które pasują do siebie w różnych kursach (na podstawie odniesienia do kompetencji lub tytułu), aby uczący się, który opanował dany temat gdzie indziej, nie musiał go ponownie ćwiczyć. Powiązania są przebudowywane automatycznie co noc; użyj tego przycisku, aby przebudować je teraz po edycji celów.';
+$string['objectives:rebuild_links_button'] = 'Przebuduj powiązania teraz';
+$string['objectives:rebuild_links_done'] = 'Przebudowano powiązania opanowania między kursami: {$a->total} łącznie ({$a->ref} według odniesienia, {$a->exact} dokładny tytuł, {$a->fuzzy} przybliżony tytuł).';

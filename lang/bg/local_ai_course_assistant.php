@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Обобщаване на овладяното между курсове, включено по подразбиране';
+$string['pedagogy:crossmastery_desc'] = 'Когато е включено, SOLA разпознава, когато обучаемият вече е овладял дадена цел в друг курс (съпоставена по референция на компетентност или по заглавие) и отчита тази предходна компетентност, вместо да я упражнява отново. Изисква проследяване на овладяването; курсовете без цели преминават плавно към резервно поведение. Само с информативен характер — никога не променя съхранения резултат за овладяване на обучаемия в който и да е курс.';
+$string['pedagogy:mastery_starter'] = 'Начален въпрос, отчитащ овладяването, включен по подразбиране';
+$string['pedagogy:mastery_starter_desc'] = 'Когато е включено, началният въпрос за разговор „Върху какво да се съсредоточа?“ се персонализира, така че да назове най-слабата цел на обучаемия (както и всяка компетентност, вече овладяна другаде). Изисква проследяване на овладяването; преминава към общия начален въпрос, когато все още няма данни за овладяване.';
+$string['task:rebuild_objective_links'] = 'Възстановяване на връзките между целите от различни курсове за обобщаване на овладяното (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Упражнение: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Връзки за овладяване между курсове';
+$string['objectives:rebuild_links_help'] = 'SOLA свързва цели, които съвпадат между курсове (по референция на компетентност или по заглавие), така че обучаем, овладял дадена тема другаде, да не я упражнява отново. Връзките се възстановяват автоматично всяка нощ; използвайте този бутон, за да ги възстановите сега след редактиране на целите.';
+$string['objectives:rebuild_links_button'] = 'Възстановяване на връзките сега';
+$string['objectives:rebuild_links_done'] = 'Връзките за овладяване между курсове са възстановени: общо {$a->total} ({$a->ref} по референция, {$a->exact} с точно заглавие, {$a->fuzzy} с приблизително заглавие).';

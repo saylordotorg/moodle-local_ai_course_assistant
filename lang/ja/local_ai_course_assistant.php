@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'コース横断の習得状況の集約をデフォルトで有効にする';
+$string['pedagogy:crossmastery_desc'] = '有効にすると、学習者が別のコースで既に目標を習得している場合（コンピテンシー参照またはタイトルで照合）、SOLA がそれを認識し、再度繰り返し学習させるのではなく、これまでに習得したコンピテンシーを評価します。習得状況の追跡が必要です。目標が設定されていないコースでは、適切にフォールバックします。これはあくまで参考情報であり、いずれのコースにおいても学習者の保存された習得スコアを変更することはありません。';
+$string['pedagogy:mastery_starter'] = '習得状況に応じたスターターをデフォルトで有効にする';
+$string['pedagogy:mastery_starter_desc'] = '有効にすると、「何に重点を置いて学習すべきですか？」という会話スターターが、学習者の最も弱い目標（および他で既に習得済みのコンピテンシー）を示すようにパーソナライズされます。習得状況の追跡が必要です。習得データがまだ存在しない場合は、汎用のスターターにフォールバックします。';
+$string['task:rebuild_objective_links'] = '習得状況の集約のためのコース横断目標リンクを再構築する (v5.7.0)';
+$string['mastery_starter:practice_label'] = '練習: {$a}';
+$string['objectives:rebuild_links_heading'] = 'コース横断の習得状況リンク';
+$string['objectives:rebuild_links_help'] = 'SOLA は、コース間で一致する目標（コンピテンシー参照またはタイトルによる）をリンクし、別の場所でトピックを習得した学習者が再度繰り返し学習させられないようにします。リンクは毎晩自動的に再構築されます。目標を編集した後にすぐ再構築するには、このボタンを使用してください。';
+$string['objectives:rebuild_links_button'] = '今すぐリンクを再構築';
+$string['objectives:rebuild_links_done'] = 'コース横断の習得状況リンクを再構築しました: 合計 {$a->total} 件（参照による一致 {$a->ref} 件、タイトル完全一致 {$a->exact} 件、タイトル曖昧一致 {$a->fuzzy} 件）。';

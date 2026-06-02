@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Souhrn zvládnutí napříč kurzy ve výchozím nastavení zapnut';
+$string['pedagogy:crossmastery_desc'] = 'Když je zapnuto, SOLA rozpozná, že student už zvládl daný cíl v jiném kurzu (na základě shody odkazu na kompetenci nebo názvu), a tuto dříve získanou kompetenci uzná místo toho, aby ji znovu procvičoval. Vyžaduje sledování zvládnutí; kurzy bez cílů se elegantně vrátí k výchozímu chování. Pouze poradní funkce — nikdy nemění uložené skóre zvládnutí studenta v žádném kurzu.';
+$string['pedagogy:mastery_starter'] = 'Úvodní výzva zohledňující zvládnutí ve výchozím nastavení zapnuta';
+$string['pedagogy:mastery_starter_desc'] = 'Když je zapnuto, úvodní výzva ke konverzaci „Na co se mám zaměřit?" je personalizována tak, aby pojmenovala nejslabší cíl studenta (a případnou kompetenci již zvládnutou jinde). Vyžaduje sledování zvládnutí; pokud zatím nejsou k dispozici žádná data o zvládnutí, vrátí se k obecné úvodní výzvě.';
+$string['task:rebuild_objective_links'] = 'Znovu sestavit odkazy mezi cíli napříč kurzy pro souhrn zvládnutí (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Procvičit: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Odkazy zvládnutí napříč kurzy';
+$string['objectives:rebuild_links_help'] = 'SOLA propojuje cíle, které si odpovídají napříč kurzy (na základě odkazu na kompetenci nebo názvu), aby student, který dané téma zvládl jinde, nemusel znovu procvičovat. Odkazy se přestavují automaticky každou noc; toto tlačítko použijte k okamžitému přestavění po úpravě cílů.';
+$string['objectives:rebuild_links_button'] = 'Přestavět odkazy nyní';
+$string['objectives:rebuild_links_done'] = 'Odkazy zvládnutí napříč kurzy přestavěny: celkem {$a->total} ({$a->ref} podle odkazu, {$a->exact} přesná shoda názvu, {$a->fuzzy} přibližná shoda názvu).';

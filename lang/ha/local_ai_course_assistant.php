@@ -1317,3 +1317,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Tara cancantar koyo a tsakanin darussa a kunne ta tsohuwa';
+$string['pedagogy:crossmastery_desc'] = 'Idan a kunne, SOLA na gane lokacin da mai koyo ya riga ya kware a wani manufa a wani darasi (an daidaita ta hanyar nuni ko taken cancanta) sannan ya yarda da wannan cancantar da ta gabata maimakon sake jarrabtar da ita. Yana bukatar bin diddigin cancanta; darussa marasa manufofi suna komawa cikin sauki. Shawara kawai ce — ba ya taba canza makin cancantar mai koyo da aka adana a kowane darasi.';
+$string['pedagogy:mastery_starter'] = 'Mai farawa mai sanin cancanta a kunne ta tsohuwa';
+$string['pedagogy:mastery_starter_desc'] = 'Idan a kunne, mai farawa tattaunawa na "Me ya kamata in mai da hankali a kai?" an keɓance shi don ambaton manufa mafi rauni na mai koyo (da kuma duk wata cancantar da ya riga ya kware a wani waje). Yana bukatar bin diddigin cancanta; yana komawa ga mai farawa na gama-gari idan babu wani bayanan cancanta tukuna.';
+$string['task:rebuild_objective_links'] = 'Sake gina mahaɗan manufofi a tsakanin darussa don tara cancanta (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Aiki: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Mahaɗan cancanta a tsakanin darussa';
+$string['objectives:rebuild_links_help'] = 'SOLA na haɗa manufofin da suka yi daidai a tsakanin darussa (ta hanyar nuni ko taken cancanta) saboda kada a sake jarrabtar mai koyon da ya kware a wani batu a wani waje. Mahaɗan suna sake ginawa kai tsaye kowane dare; yi amfani da wannan maɓallin don sake ginawa yanzu bayan gyara manufofi.';
+$string['objectives:rebuild_links_button'] = 'Sake gina mahaɗa yanzu';
+$string['objectives:rebuild_links_done'] = 'An sake gina mahaɗan cancanta a tsakanin darussa: {$a->total} gaba ɗaya ({$a->ref} ta nuni, {$a->exact} cikakken taken, {$a->fuzzy} taken kusa-kusa).';

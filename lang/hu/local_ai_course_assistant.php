@@ -1330,3 +1330,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Tantárgyak közötti tudásösszesítés alapértelmezetten bekapcsolva';
+$string['pedagogy:crossmastery_desc'] = 'Ha be van kapcsolva, a SOLA felismeri, ha a tanuló egy tanulási célt már elsajátított egy másik tantárgyban (kompetenciahivatkozás vagy cím alapján egyeztetve), és elismeri ezt a korábbi kompetenciát ahelyett, hogy újra gyakoroltatná. Tudáskövetést igényel; a tanulási célokkal nem rendelkező tantárgyak esetén zökkenőmentesen visszaáll az alapviselkedésre. Csak tájékoztató jellegű – soha nem módosítja a tanuló tárolt tudásszintjét egyetlen tantárgyban sem.';
+$string['pedagogy:mastery_starter'] = 'Tudásszint-érzékeny beszélgetésindító alapértelmezetten bekapcsolva';
+$string['pedagogy:mastery_starter_desc'] = 'Ha be van kapcsolva, a „Mire érdemes összpontosítanom?” beszélgetésindító személyre szabottan megnevezi a tanuló leggyengébb tanulási célját (és minden olyan kompetenciát, amelyet máshol már elsajátított). Tudáskövetést igényel; ha még nincs tudásadat, visszaáll az általános beszélgetésindítóra.';
+$string['task:rebuild_objective_links'] = 'Tantárgyak közötti tanulási cél kapcsolatok újraépítése a tudásösszesítéshez (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Gyakorlás: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Tantárgyak közötti tudáskapcsolatok';
+$string['objectives:rebuild_links_help'] = 'A SOLA összekapcsolja a tantárgyak között egyező tanulási célokat (kompetenciahivatkozás vagy cím alapján), így annak a tanulónak, aki egy témát máshol már elsajátított, nem kell újra gyakorolnia. A kapcsolatok minden éjjel automatikusan újraépülnek; ezzel a gombbal a tanulási célok szerkesztése után most azonnal újraépítheti őket.';
+$string['objectives:rebuild_links_button'] = 'Kapcsolatok újraépítése most';
+$string['objectives:rebuild_links_done'] = 'Tantárgyak közötti tudáskapcsolatok újraépítve: összesen {$a->total} ({$a->ref} hivatkozás alapján, {$a->exact} pontos cím alapján, {$a->fuzzy} hasonló cím alapján).';

@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Ukuhlanganisa ukukhona kuyo yonke izifundo kuvuliwe ngokuzenzakalelayo';
+$string['pedagogy:crossmastery_desc'] = 'Uma kuvuliwe, i-SOLA iyaqaphela uma umfundi esevele ekhona kahle enhlosweni kwesinye isifundo (efaniswa ngenkomba yobukhono noma ngesihloko) futhi iyamukela lobo bukhono bangaphambili esikhundleni sokuphinda ibuqeqeshe. Idinga ukulandelela ukukhona; izifundo ezingenazinhloso ziwela kahle ngendlela enokuhleleka. Yiseluleko kuphela — ayilokothi iguqule isikolo somfundi sokukhona esigciniwe kunoma yisiphi isifundo.';
+$string['pedagogy:mastery_starter'] = 'Isiqalisi esiqaphela ukukhona sivuliwe ngokuzenzakalelayo';
+$string['pedagogy:mastery_starter_desc'] = 'Uma kuvuliwe, isiqalisi sengxoxo esithi "Yikuphi okufanele ngikugxile?" senziwa saba ngokoqobo ukuze siqambe inhloso ebuthakathaka kunazo zonke zomfundi (kanye nanoma yibuphi ubukhono asebuke bukhona kahle kwenye indawo). Idinga ukulandelela ukukhona; iwela kusiqalisi esivamile uma kungekho idatha yokukhona okwamanje.';
+$string['task:rebuild_objective_links'] = 'Yakha kabusha izixhumanisi zezinhloso eziphakathi kwezifundo zokuhlanganisa ukukhona (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Ukuzilolonga: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Izixhumanisi zokukhona eziphakathi kwezifundo';
+$string['objectives:rebuild_links_help'] = 'I-SOLA ixhuma izinhloso ezifanayo kuyo yonke izifundo (ngenkomba yobukhono noma ngesihloko) ukuze umfundi osekhona kahle esihlokweni kwenye indawo angaphinde aqeqeshwe. Izixhumanisi ziyazakhela kabusha ngokuzenzakalelayo njalo ebusuku; sebenzisa le nkinobho ukuze wakhe kabusha manje ngemva kokuhlela izinhloso.';
+$string['objectives:rebuild_links_button'] = 'Yakha kabusha izixhumanisi manje';
+$string['objectives:rebuild_links_done'] = 'Izixhumanisi zokukhona eziphakathi kwezifundo zakhiwe kabusha: {$a->total} sezizonke ({$a->ref} ngenkomba, {$a->exact} isihloko esiqondile, {$a->fuzzy} isihloko esicishe safana).';
