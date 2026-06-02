@@ -663,9 +663,6 @@
         <KEY NAME="objectiveidb_fk" TYPE="foreign" FIELDS="objectiveidb" REFTABLE="local_ai_course_assistant_objs" REFFIELDS="id"/>
         <KEY NAME="pair_uniq" TYPE="unique" FIELDS="objectiveida, objectiveidb"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="objectiveidb_idx" UNIQUE="false" FIELDS="objectiveidb"/>
-      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

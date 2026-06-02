@@ -1376,6 +1376,8 @@ if ($hassiteconfig) {
         'code_sandbox_enabled'    => 'pedagogy:code_sandbox',
         'essay_feedback_enabled'  => 'pedagogy:essay_feedback',
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
+        'crossmastery_enabled'    => 'pedagogy:crossmastery',
+        'mastery_starter_enabled' => 'pedagogy:mastery_starter',
     ] as $key => $stringkey) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,

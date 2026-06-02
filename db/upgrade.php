@@ -1030,7 +1030,7 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_key('objectiveidb_fk', XMLDB_KEY_FOREIGN, ['objectiveidb'],
                 'local_ai_course_assistant_objs', ['id']);
             $table->add_key('pair_uniq', XMLDB_KEY_UNIQUE, ['objectiveida', 'objectiveidb']);
-            $table->add_index('objectiveidb_idx', XMLDB_INDEX_NOTUNIQUE, ['objectiveidb']);
+            // objectiveidb is already indexed by its foreign key; no extra index.
             $dbman->create_table($table);
         }
 
