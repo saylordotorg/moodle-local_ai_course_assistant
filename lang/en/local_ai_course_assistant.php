@@ -1026,6 +1026,12 @@ $string['objectives:delete_all']        = 'Delete all objectives for this course
 $string['objectives:delete_all_confirm']= 'Delete every objective and all attempt history for this course? Cannot be undone.';
 $string['objectives:deleted_all']       = 'All objectives for this course deleted.';
 
+// Cross-course mastery rebuild (v5.7.0).
+$string['objectives:rebuild_links_heading'] = 'Cross-course mastery links';
+$string['objectives:rebuild_links_help']    = 'SOLA links objectives that match across courses (by competency reference or title) so a learner who mastered a topic elsewhere is not re-drilled. Links rebuild automatically every night; use this button to rebuild now after editing objectives.';
+$string['objectives:rebuild_links_button']  = 'Rebuild links now';
+$string['objectives:rebuild_links_done']    = 'Cross-course mastery links rebuilt: {$a->total} total ({$a->ref} by reference, {$a->exact} exact title, {$a->fuzzy} fuzzy title).';
+
 // Mastery chip (v3.9.17) — shown in the widget when the per-course chip toggle is on.
 $string['mastery:chip_aria']            = 'Learning mastery status';
 $string['mastery:popover_aria']         = 'Learning mastery details';
