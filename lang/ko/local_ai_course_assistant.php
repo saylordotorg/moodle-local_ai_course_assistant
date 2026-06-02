@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = '과정 간 숙달도 통합 기본 활성화';
+$string['pedagogy:crossmastery_desc'] = '활성화하면 SOLA는 학습자가 다른 과정에서 이미 숙달한 학습 목표(역량 참조 또는 제목으로 매칭)를 인식하여, 해당 내용을 다시 반복 학습시키는 대신 이전에 갖춘 역량을 인정합니다. 숙달도 추적이 필요하며, 학습 목표가 없는 과정에서는 자연스럽게 기본 동작으로 전환됩니다. 권고용으로만 사용되며, 어떤 과정에서도 학습자의 저장된 숙달도 점수를 변경하지 않습니다.';
+$string['pedagogy:mastery_starter'] = '숙달도 인식 대화 시작 문구 기본 활성화';
+$string['pedagogy:mastery_starter_desc'] = '활성화하면 "무엇에 집중해야 할까요?" 대화 시작 문구가 학습자의 가장 취약한 학습 목표(및 다른 곳에서 이미 숙달한 역량)를 지목하도록 개인화됩니다. 숙달도 추적이 필요하며, 아직 숙달도 데이터가 없는 경우 일반 시작 문구로 전환됩니다.';
+$string['task:rebuild_objective_links'] = '숙달도 통합을 위한 과정 간 학습 목표 링크 재구축 (v5.7.0)';
+$string['mastery_starter:practice_label'] = '연습: {$a}';
+$string['objectives:rebuild_links_heading'] = '과정 간 숙달도 링크';
+$string['objectives:rebuild_links_help'] = 'SOLA는 과정 간에 일치하는 학습 목표(역량 참조 또는 제목 기준)를 연결하여, 다른 곳에서 주제를 숙달한 학습자가 다시 반복 학습하지 않도록 합니다. 링크는 매일 밤 자동으로 재구축됩니다. 학습 목표를 편집한 후 지금 바로 재구축하려면 이 버튼을 사용하세요.';
+$string['objectives:rebuild_links_button'] = '지금 링크 재구축';
+$string['objectives:rebuild_links_done'] = '과정 간 숙달도 링크가 재구축되었습니다: 총 {$a->total}개 (참조 기준 {$a->ref}개, 제목 정확 일치 {$a->exact}개, 제목 유사 일치 {$a->fuzzy}개).';

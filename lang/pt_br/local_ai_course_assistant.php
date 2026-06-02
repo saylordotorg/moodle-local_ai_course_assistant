@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Consolidação de domínio entre cursos ativada por padrão';
+$string['pedagogy:crossmastery_desc'] = 'Quando ativado, o SOLA reconhece quando um aluno já dominou um objetivo em outro curso (correspondido por referência de competência ou por título) e reconhece essa competência prévia em vez de exercitá-la novamente. Requer o acompanhamento de domínio; cursos sem objetivos têm um comportamento alternativo seguro. Apenas consultivo: nunca altera a pontuação de domínio armazenada do aluno em nenhum curso.';
+$string['pedagogy:mastery_starter'] = 'Sugestão inicial baseada no domínio ativada por padrão';
+$string['pedagogy:mastery_starter_desc'] = 'Quando ativado, a sugestão inicial de conversa "Em que devo focar?" é personalizada para nomear o objetivo mais fraco do aluno (e qualquer competência já dominada em outro lugar). Requer o acompanhamento de domínio; recorre à sugestão inicial genérica quando ainda não há dados de domínio.';
+$string['task:rebuild_objective_links'] = 'Reconstruir os vínculos de objetivos entre cursos para a consolidação de domínio (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Praticar: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Vínculos de domínio entre cursos';
+$string['objectives:rebuild_links_help'] = 'O SOLA vincula objetivos que correspondem entre cursos (por referência de competência ou por título) para que um aluno que dominou um tópico em outro lugar não precise exercitá-lo novamente. Os vínculos são reconstruídos automaticamente todas as noites; use este botão para reconstruí-los agora após editar os objetivos.';
+$string['objectives:rebuild_links_button'] = 'Reconstruir vínculos agora';
+$string['objectives:rebuild_links_done'] = 'Vínculos de domínio entre cursos reconstruídos: {$a->total} no total ({$a->ref} por referência, {$a->exact} por título exato, {$a->fuzzy} por título aproximado).';

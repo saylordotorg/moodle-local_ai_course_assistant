@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Súhrn ovládania naprieč kurzami predvolene zapnutý';
+$string['pedagogy:crossmastery_desc'] = 'Keď je zapnuté, SOLA rozpozná, že študent už zvládol cieľ v inom kurze (na základe zhody odkazu na kompetenciu alebo názvu), a túto predchádzajúcu kompetenciu uzná namiesto opakovaného precvičovania. Vyžaduje sledovanie ovládania; kurzy bez cieľov sa korektne vrátia k bežnému správaniu. Iba poradné — nikdy nemení uložené skóre ovládania študenta v žiadnom kurze.';
+$string['pedagogy:mastery_starter'] = 'Úvodný podnet zohľadňujúci ovládanie predvolene zapnutý';
+$string['pedagogy:mastery_starter_desc'] = 'Keď je zapnuté, úvodný konverzačný podnet „Na čo by som sa mal zamerať?“ je personalizovaný tak, aby pomenoval najslabší cieľ študenta (a každú kompetenciu, ktorú už zvládol inde). Vyžaduje sledovanie ovládania; ak zatiaľ nie sú k dispozícii žiadne údaje o ovládaní, vráti sa k všeobecnému podnetu.';
+$string['task:rebuild_objective_links'] = 'Znovu vytvoriť prepojenia cieľov naprieč kurzami pre súhrn ovládania (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Precvičovanie: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Prepojenia ovládania naprieč kurzami';
+$string['objectives:rebuild_links_help'] = 'SOLA prepája ciele, ktoré sa zhodujú naprieč kurzami (na základe odkazu na kompetenciu alebo názvu), aby študent, ktorý tému zvládol inde, nemusel znova precvičovať. Prepojenia sa automaticky obnovujú každú noc; toto tlačidlo použite na okamžité obnovenie po úprave cieľov.';
+$string['objectives:rebuild_links_button'] = 'Obnoviť prepojenia teraz';
+$string['objectives:rebuild_links_done'] = 'Prepojenia ovládania naprieč kurzami obnovené: {$a->total} celkovo ({$a->ref} podľa odkazu, {$a->exact} podľa presného názvu, {$a->fuzzy} podľa približného názvu).';

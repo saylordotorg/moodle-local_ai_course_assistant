@@ -1317,3 +1317,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Rangkuman penguasaan lintas kursus aktif secara default';
+$string['pedagogy:crossmastery_desc'] = 'Saat aktif, SOLA mengenali ketika seorang pelajar telah menguasai suatu tujuan di kursus lain (dicocokkan berdasarkan referensi kompetensi atau judul) dan mengakui kompetensi sebelumnya itu alih-alih melatihnya kembali. Memerlukan pelacakan penguasaan; kursus tanpa tujuan akan tetap berjalan dengan baik sebagai cadangan. Bersifat saran saja — tidak pernah mengubah skor penguasaan tersimpan milik pelajar di kursus mana pun.';
+$string['pedagogy:mastery_starter'] = 'Pembuka percakapan berbasis penguasaan aktif secara default';
+$string['pedagogy:mastery_starter_desc'] = 'Saat aktif, pembuka percakapan "Apa yang sebaiknya saya fokuskan?" dipersonalisasi untuk menyebut tujuan terlemah pelajar (serta kompetensi apa pun yang sudah dikuasai di tempat lain). Memerlukan pelacakan penguasaan; akan beralih ke pembuka percakapan umum jika belum ada data penguasaan.';
+$string['task:rebuild_objective_links'] = 'Bangun ulang tautan tujuan lintas kursus untuk rangkuman penguasaan (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Latihan: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Tautan penguasaan lintas kursus';
+$string['objectives:rebuild_links_help'] = 'SOLA menautkan tujuan yang cocok antar kursus (berdasarkan referensi kompetensi atau judul) sehingga pelajar yang telah menguasai suatu topik di tempat lain tidak dilatih kembali. Tautan dibangun ulang secara otomatis setiap malam; gunakan tombol ini untuk membangun ulang sekarang setelah menyunting tujuan.';
+$string['objectives:rebuild_links_button'] = 'Bangun ulang tautan sekarang';
+$string['objectives:rebuild_links_done'] = 'Tautan penguasaan lintas kursus dibangun ulang: {$a->total} total ({$a->ref} berdasarkan referensi, {$a->exact} judul persis, {$a->fuzzy} judul mirip).';

@@ -29,6 +29,7 @@
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\objective_manager;
+use local_ai_course_assistant\cross_course_mastery;
 
 // v5.1.7: was required_param + 404. Now optional_param with a friendly
 // course picker landing when accessed bare. Direct links unchanged.
@@ -180,6 +181,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         redirect($pageurl, get_string('objectives:deleted_all', 'local_ai_course_assistant'),
             null, \core\output\notification::NOTIFY_SUCCESS);
+
+    } else if ($action === 'rebuild_links') {
+        // v5.7.0: rebuild cross-course mastery links on demand instead of
+        // waiting for the daily scheduled task. The rebuild is global (all
+        // courses) but triggered contextually from this course's page.
+        $counts = cross_course_mastery::rebuild_links();
+        redirect($pageurl,
+            get_string('objectives:rebuild_links_done', 'local_ai_course_assistant',
+                (object) [
+                    'total' => (int) $counts['total'],
+                    'ref' => (int) $counts['ref'],
+                    'exact' => (int) $counts['title_exact'],
+                    'fuzzy' => (int) $counts['title_fuzzy'],
+                ]),
+            null, \core\output\notification::NOTIFY_SUCCESS);
     }
 }
 
@@ -255,6 +271,30 @@ echo html_writer::tag('small', ' ' . get_string('objectives:toggle_dashboard_hel
 echo html_writer::end_tag('form');
 echo html_writer::end_div();
 echo html_writer::end_div();
+
+// Cross-course mastery rebuild (v5.7.0). Shown only when cross-course
+// mastery is enabled for this course. The daily task keeps links fresh;
+// this button forces an immediate rebuild after editing objectives.
+if (cross_course_mastery::is_enabled_for_course($courseid)) {
+    echo html_writer::start_div('card mb-3');
+    echo html_writer::start_div('card-body');
+    echo html_writer::tag('h3',
+        get_string('objectives:rebuild_links_heading', 'local_ai_course_assistant'),
+        ['class' => 'h5 mb-2']);
+    echo html_writer::tag('p',
+        get_string('objectives:rebuild_links_help', 'local_ai_course_assistant'),
+        ['class' => 'text-muted small mb-2']);
+    echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(), 'class' => 'd-inline']);
+    echo html_writer::input_hidden_params(new moodle_url('', [
+        'sesskey' => sesskey(), 'action' => 'rebuild_links',
+    ]));
+    echo html_writer::tag('button',
+        get_string('objectives:rebuild_links_button', 'local_ai_course_assistant'),
+        ['type' => 'submit', 'class' => 'btn btn-outline-primary']);
+    echo html_writer::end_tag('form');
+    echo html_writer::end_div();
+    echo html_writer::end_div();
+}
 
 // Look-first banner (empty course only).
 if ($detected !== null && $detected['source'] !== 'none') {

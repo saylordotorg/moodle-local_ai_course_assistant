@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'ਮੂਲ ਰੂਪ ਵਿੱਚ ਕ੍ਰਾਸ-ਕੋਰਸ ਮੁਹਾਰਤ ਰੋਲਅੱਪ ਚਾਲੂ';
+$string['pedagogy:crossmastery_desc'] = 'ਜਦੋਂ ਚਾਲੂ ਹੋਵੇ, ਤਾਂ SOLA ਪਛਾਣ ਲੈਂਦਾ ਹੈ ਕਿ ਕਿਸੇ ਸਿਖਿਆਰਥੀ ਨੇ ਕੋਈ ਉਦੇਸ਼ ਪਹਿਲਾਂ ਹੀ ਕਿਸੇ ਹੋਰ ਕੋਰਸ ਵਿੱਚ ਮੁਹਾਰਤ ਨਾਲ ਪੂਰਾ ਕਰ ਲਿਆ ਹੈ (ਯੋਗਤਾ ਹਵਾਲੇ ਜਾਂ ਸਿਰਲੇਖ ਨਾਲ ਮਿਲਾਨ ਕਰਕੇ) ਅਤੇ ਉਸ ਪਿਛਲੀ ਯੋਗਤਾ ਨੂੰ ਮੁੜ-ਅਭਿਆਸ ਕਰਾਉਣ ਦੀ ਬਜਾਏ ਉਸ ਨੂੰ ਮਾਨਤਾ ਦਿੰਦਾ ਹੈ। ਇਸ ਲਈ ਮੁਹਾਰਤ ਟਰੈਕਿੰਗ ਜ਼ਰੂਰੀ ਹੈ; ਉਦੇਸ਼ਾਂ ਤੋਂ ਬਿਨਾਂ ਕੋਰਸ ਸੁਚਾਰੂ ਢੰਗ ਨਾਲ ਵਾਪਸ ਪਰਤ ਜਾਂਦੇ ਹਨ। ਸਿਰਫ਼ ਸਲਾਹਕਾਰੀ — ਇਹ ਕਿਸੇ ਵੀ ਕੋਰਸ ਵਿੱਚ ਸਿਖਿਆਰਥੀ ਦੇ ਸਟੋਰ ਕੀਤੇ ਮੁਹਾਰਤ ਸਕੋਰ ਨੂੰ ਕਦੇ ਨਹੀਂ ਬਦਲਦਾ।';
+$string['pedagogy:mastery_starter'] = 'ਮੂਲ ਰੂਪ ਵਿੱਚ ਮੁਹਾਰਤ-ਜਾਣੂ ਸਟਾਰਟਰ ਚਾਲੂ';
+$string['pedagogy:mastery_starter_desc'] = 'ਜਦੋਂ ਚਾਲੂ ਹੋਵੇ, ਤਾਂ "ਮੈਨੂੰ ਕਿਸ ਉੱਤੇ ਧਿਆਨ ਦੇਣਾ ਚਾਹੀਦਾ ਹੈ?" ਗੱਲਬਾਤ ਸਟਾਰਟਰ ਨੂੰ ਨਿੱਜੀ ਬਣਾਇਆ ਜਾਂਦਾ ਹੈ ਤਾਂ ਜੋ ਸਿਖਿਆਰਥੀ ਦੇ ਸਭ ਤੋਂ ਕਮਜ਼ੋਰ ਉਦੇਸ਼ (ਅਤੇ ਕੋਈ ਵੀ ਯੋਗਤਾ ਜੋ ਪਹਿਲਾਂ ਹੀ ਕਿਤੇ ਹੋਰ ਮੁਹਾਰਤ ਨਾਲ ਪੂਰੀ ਕੀਤੀ ਜਾ ਚੁੱਕੀ ਹੈ) ਦਾ ਨਾਮ ਲਿਆ ਜਾ ਸਕੇ। ਇਸ ਲਈ ਮੁਹਾਰਤ ਟਰੈਕਿੰਗ ਜ਼ਰੂਰੀ ਹੈ; ਜਦੋਂ ਅਜੇ ਕੋਈ ਮੁਹਾਰਤ ਡਾਟਾ ਨਾ ਹੋਵੇ, ਤਾਂ ਇਹ ਆਮ ਸਟਾਰਟਰ ਉੱਤੇ ਵਾਪਸ ਪਰਤ ਜਾਂਦਾ ਹੈ।';
+$string['task:rebuild_objective_links'] = 'ਮੁਹਾਰਤ ਰੋਲਅੱਪ ਲਈ ਕ੍ਰਾਸ-ਕੋਰਸ ਉਦੇਸ਼ ਲਿੰਕ ਮੁੜ-ਬਣਾਓ (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'ਅਭਿਆਸ: {$a}';
+$string['objectives:rebuild_links_heading'] = 'ਕ੍ਰਾਸ-ਕੋਰਸ ਮੁਹਾਰਤ ਲਿੰਕ';
+$string['objectives:rebuild_links_help'] = 'SOLA ਉਹਨਾਂ ਉਦੇਸ਼ਾਂ ਨੂੰ ਲਿੰਕ ਕਰਦਾ ਹੈ ਜੋ ਕੋਰਸਾਂ ਵਿਚਕਾਰ ਮਿਲਦੇ ਹਨ (ਯੋਗਤਾ ਹਵਾਲੇ ਜਾਂ ਸਿਰਲੇਖ ਨਾਲ) ਤਾਂ ਜੋ ਕਿਸੇ ਅਜਿਹੇ ਸਿਖਿਆਰਥੀ ਨੂੰ, ਜਿਸ ਨੇ ਕੋਈ ਵਿਸ਼ਾ ਕਿਤੇ ਹੋਰ ਮੁਹਾਰਤ ਨਾਲ ਪੂਰਾ ਕੀਤਾ ਹੈ, ਮੁੜ-ਅਭਿਆਸ ਨਾ ਕਰਾਇਆ ਜਾਵੇ। ਲਿੰਕ ਹਰ ਰਾਤ ਆਪਣੇ-ਆਪ ਮੁੜ-ਬਣਦੇ ਹਨ; ਉਦੇਸ਼ਾਂ ਨੂੰ ਸੋਧਣ ਤੋਂ ਬਾਅਦ ਹੁਣੇ ਮੁੜ-ਬਣਾਉਣ ਲਈ ਇਸ ਬਟਨ ਦੀ ਵਰਤੋਂ ਕਰੋ।';
+$string['objectives:rebuild_links_button'] = 'ਲਿੰਕ ਹੁਣੇ ਮੁੜ-ਬਣਾਓ';
+$string['objectives:rebuild_links_done'] = 'ਕ੍ਰਾਸ-ਕੋਰਸ ਮੁਹਾਰਤ ਲਿੰਕ ਮੁੜ-ਬਣਾਏ ਗਏ: ਕੁੱਲ {$a->total} (ਹਵਾਲੇ ਨਾਲ {$a->ref}, ਸਹੀ ਸਿਰਲੇਖ {$a->exact}, ਅਨੁਮਾਨਿਤ ਸਿਰਲੇਖ {$a->fuzzy})।';

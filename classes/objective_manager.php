@@ -547,6 +547,32 @@ class objective_manager {
                 . "want to review that quickly before we continue?'), never technical prereq language.\n\n"
                 . implode("\n", $gaplines);
         }
+
+        // v5.7.0: Cross-course mastery rollup. When the learner has already
+        // mastered a linked objective in another course, tell the assistant to
+        // acknowledge that prior competency and not re-drill from scratch.
+        // Advisory only — stored mastery numbers are never changed by another
+        // course.
+        if (cross_course_mastery::is_enabled_for_course($courseid)) {
+            $evidence = cross_course_mastery::get_transfer_evidence($userid, $courseid);
+            if (!empty($evidence)) {
+                $tlines = [];
+                foreach ($evidence as $e) {
+                    $obj = $e['objective'];
+                    $label = $obj->code ? "[{$obj->code}] {$obj->title}" : $obj->title;
+                    $cname = $e['source_coursename'] !== '' ? $e['source_coursename'] : 'another course';
+                    $tlines[] = "- {$label} — mastered in {$cname}";
+                }
+                $block .= "\n\n### Already demonstrated elsewhere\n"
+                    . "The learner has shown mastery of these objectives (or close equivalents) in other "
+                    . "courses. Acknowledge this prior competency, build on it, and do NOT re-drill from "
+                    . "scratch unless the learner actually struggles. Phrase it naturally ('you've worked "
+                    . "with this before in another course — let's build on that'); never mention course "
+                    . "databases, mastery scores, or how you know.\n\n"
+                    . implode("\n", $tlines);
+            }
+        }
+
         return $block;
     }
 

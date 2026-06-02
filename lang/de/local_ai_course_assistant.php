@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Kursübergreifende Kompetenzübersicht standardmäßig aktiviert';
+$string['pedagogy:crossmastery_desc'] = 'Wenn aktiviert, erkennt SOLA, wenn ein Lernender ein Lernziel bereits in einem anderen Kurs gemeistert hat (abgeglichen über Kompetenzreferenz oder Titel), und würdigt diese bereits vorhandene Kompetenz, anstatt sie erneut abzufragen. Erfordert die Kompetenzverfolgung; Kurse ohne Lernziele greifen problemlos auf das Standardverhalten zurück. Nur beratend – der gespeicherte Kompetenzwert eines Lernenden wird in keinem Kurs verändert.';
+$string['pedagogy:mastery_starter'] = 'Kompetenzbewusster Gesprächseinstieg standardmäßig aktiviert';
+$string['pedagogy:mastery_starter_desc'] = 'Wenn aktiviert, wird der Gesprächseinstieg "Worauf sollte ich mich konzentrieren?" so personalisiert, dass das schwächste Lernziel des Lernenden benannt wird (sowie jede bereits anderweitig gemeisterte Kompetenz). Erfordert die Kompetenzverfolgung; greift auf den allgemeinen Gesprächseinstieg zurück, solange noch keine Kompetenzdaten vorliegen.';
+$string['task:rebuild_objective_links'] = 'Kursübergreifende Lernzielverknüpfungen für die Kompetenzübersicht neu aufbauen (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Üben: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Kursübergreifende Kompetenzverknüpfungen';
+$string['objectives:rebuild_links_help'] = 'SOLA verknüpft Lernziele, die kursübergreifend übereinstimmen (über Kompetenzreferenz oder Titel), sodass ein Lernender, der ein Thema anderweitig gemeistert hat, es nicht erneut abfragen muss. Die Verknüpfungen werden jede Nacht automatisch neu aufgebaut; verwenden Sie diese Schaltfläche, um sie nach dem Bearbeiten von Lernzielen sofort neu aufzubauen.';
+$string['objectives:rebuild_links_button'] = 'Verknüpfungen jetzt neu aufbauen';
+$string['objectives:rebuild_links_done'] = 'Kursübergreifende Kompetenzverknüpfungen neu aufgebaut: {$a->total} insgesamt ({$a->ref} per Referenz, {$a->exact} exakter Titel, {$a->fuzzy} unscharfer Titel).';

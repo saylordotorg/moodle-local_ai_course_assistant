@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Cumulare a competențelor dobândite în alte cursuri, activată implicit';
+$string['pedagogy:crossmastery_desc'] = 'Când este activată, SOLA recunoaște situația în care un cursant a dobândit deja un obiectiv într-un alt curs (corelat prin referința competenței sau prin titlu) și confirmă competența anterioară în loc să o reia. Necesită urmărirea competențelor; cursurile fără obiective revin elegant la comportamentul implicit. Are doar rol orientativ — nu modifică niciodată scorul de competență stocat al cursantului în niciun curs.';
+$string['pedagogy:mastery_starter'] = 'Inițiator de conversație conștient de competențe, activat implicit';
+$string['pedagogy:mastery_starter_desc'] = 'Când este activat, inițiatorul de conversație „Pe ce ar trebui să mă concentrez?” este personalizat pentru a numi cel mai slab obiectiv al cursantului (și orice competență deja dobândită în altă parte). Necesită urmărirea competențelor; revine la inițiatorul generic atunci când nu există încă date despre competențe.';
+$string['task:rebuild_objective_links'] = 'Reconstruirea legăturilor dintre obiectivele din mai multe cursuri pentru cumularea competențelor (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Exersează: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Legături între competențele din mai multe cursuri';
+$string['objectives:rebuild_links_help'] = 'SOLA leagă obiectivele care se potrivesc între cursuri (prin referința competenței sau prin titlu), astfel încât un cursant care a dobândit un subiect în altă parte să nu îl reia. Legăturile se reconstruiesc automat în fiecare noapte; folosiți acest buton pentru a le reconstrui acum, după ce ați editat obiectivele.';
+$string['objectives:rebuild_links_button'] = 'Reconstruiește legăturile acum';
+$string['objectives:rebuild_links_done'] = 'Legăturile între competențele din mai multe cursuri au fost reconstruite: {$a->total} în total ({$a->ref} prin referință, {$a->exact} prin titlu exact, {$a->fuzzy} prin titlu aproximativ).';

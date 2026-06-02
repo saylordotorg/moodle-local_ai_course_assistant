@@ -1330,3 +1330,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'סיכום שליטה חוצה-קורסים מופעל כברירת מחדל';
+$string['pedagogy:crossmastery_desc'] = 'כאשר האפשרות מופעלת, SOLA מזהה מתי לומד כבר השיג שליטה ביעד בקורס אחר (בהתאמה לפי מזהה כשירות או כותרת) ומכיר בכשירות הקודמת הזו במקום לתרגל אותה מחדש. דורש מעקב שליטה; קורסים ללא יעדים יחזרו להתנהגות ברירת המחדל באופן חלק. למטרות ייעוץ בלבד — לעולם אינו משנה את ציון השליטה השמור של הלומד באף קורס.';
+$string['pedagogy:mastery_starter'] = 'פתיח מודע-שליטה מופעל כברירת מחדל';
+$string['pedagogy:mastery_starter_desc'] = 'כאשר האפשרות מופעלת, פתיח השיחה "על מה כדאי לי להתמקד?" מותאם אישית כדי לציין את היעד החלש ביותר של הלומד (וכל כשירות שכבר הושגה במקום אחר). דורש מעקב שליטה; חוזר לפתיח הכללי כאשר עדיין אין נתוני שליטה.';
+$string['task:rebuild_objective_links'] = 'בנייה מחדש של קישורי יעדים חוצי-קורסים לסיכום שליטה (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'תרגול: {$a}';
+$string['objectives:rebuild_links_heading'] = 'קישורי שליטה חוצי-קורסים';
+$string['objectives:rebuild_links_help'] = 'SOLA מקשר יעדים התואמים בין קורסים (לפי מזהה כשירות או כותרת) כך שלומד שהשיג שליטה בנושא במקום אחר לא יתרגל אותו מחדש. הקישורים נבנים מחדש אוטומטית מדי לילה; השתמשו בכפתור זה כדי לבנות מחדש כעת לאחר עריכת יעדים.';
+$string['objectives:rebuild_links_button'] = 'בנה קישורים מחדש כעת';
+$string['objectives:rebuild_links_done'] = 'קישורי השליטה חוצי-הקורסים נבנו מחדש: {$a->total} בסך הכול ({$a->ref} לפי מזהה, {$a->exact} כותרת מדויקת, {$a->fuzzy} כותרת מקורבת).';

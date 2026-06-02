@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'पूर्वनिर्धारित रूपमा अन्तर-पाठ्यक्रम दक्षता रोलअप सक्रिय';
+$string['pedagogy:crossmastery_desc'] = 'सक्रिय हुँदा, SOLA ले विद्यार्थीले अर्को पाठ्यक्रममा कुनै उद्देश्य पहिल्यै आत्मसात गरिसकेको (दक्षता सन्दर्भ वा शीर्षकद्वारा मिलान गरिएको) पहिचान गर्छ र त्यसलाई पुनः अभ्यास गराउनुको सट्टा सो पूर्व दक्षतालाई स्वीकार गर्छ। यसका लागि दक्षता ट्र्याकिङ आवश्यक छ; उद्देश्यविहीन पाठ्यक्रमहरू सहजै सामान्य व्यवहारमा फर्कन्छन्। यो केवल सल्लाहकारी हो — यसले कुनै पनि पाठ्यक्रममा विद्यार्थीको भण्डारण गरिएको दक्षता अंक कहिल्यै परिवर्तन गर्दैन।';
+$string['pedagogy:mastery_starter'] = 'पूर्वनिर्धारित रूपमा दक्षता-सचेत प्रारम्भकर्ता सक्रिय';
+$string['pedagogy:mastery_starter_desc'] = 'सक्रिय हुँदा, "मैले केमा ध्यान केन्द्रित गर्नुपर्छ?" भन्ने वार्तालाप प्रारम्भकर्ता विद्यार्थीको सबैभन्दा कमजोर उद्देश्य (र अन्यत्र पहिल्यै आत्मसात गरिएको कुनै दक्षता) उल्लेख गर्न व्यक्तिगत बनाइन्छ। यसका लागि दक्षता ट्र्याकिङ आवश्यक छ; अहिलेसम्म कुनै दक्षता डेटा नभएको अवस्थामा यो सामान्य प्रारम्भकर्तामा फर्कन्छ।';
+$string['task:rebuild_objective_links'] = 'दक्षता रोलअपका लागि अन्तर-पाठ्यक्रम उद्देश्य लिङ्कहरू पुनर्निर्माण गर्नुहोस् (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'अभ्यास: {$a}';
+$string['objectives:rebuild_links_heading'] = 'अन्तर-पाठ्यक्रम दक्षता लिङ्कहरू';
+$string['objectives:rebuild_links_help'] = 'SOLA ले पाठ्यक्रमहरूमा मिल्ने उद्देश्यहरूलाई (दक्षता सन्दर्भ वा शीर्षकद्वारा) लिङ्क गर्छ ताकि अन्यत्र कुनै विषय आत्मसात गरिसकेको विद्यार्थीलाई पुनः अभ्यास गराइँदैन। लिङ्कहरू हरेक रात स्वतः पुनर्निर्माण हुन्छन्; उद्देश्यहरू सम्पादन गरेपछि अहिले नै पुनर्निर्माण गर्न यो बटन प्रयोग गर्नुहोस्।';
+$string['objectives:rebuild_links_button'] = 'अहिले लिङ्कहरू पुनर्निर्माण गर्नुहोस्';
+$string['objectives:rebuild_links_done'] = 'अन्तर-पाठ्यक्रम दक्षता लिङ्कहरू पुनर्निर्माण गरियो: कुल {$a->total} ({$a->ref} सन्दर्भद्वारा, {$a->exact} ठ्याक्कै शीर्षक, {$a->fuzzy} अस्पष्ट शीर्षक)।';

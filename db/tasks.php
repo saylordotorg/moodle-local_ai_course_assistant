@@ -198,4 +198,16 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v5.7.0 — Daily rebuild of the cross-course objective link table
+        // for the mastery rollup. Runs at 03:10 server time, after objective
+        // seeding and before the morning digest tasks.
+        'classname' => \local_ai_course_assistant\task\rebuild_objective_links::class,
+        'blocking' => 0,
+        'minute' => '10',
+        'hour' => '3',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

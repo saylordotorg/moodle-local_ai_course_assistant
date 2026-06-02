@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Kurssien välinen osaamiskooste oletuksena käytössä';
+$string['pedagogy:crossmastery_desc'] = 'Kun tämä on käytössä, SOLA tunnistaa, kun oppija on jo saavuttanut osaamistavoitteen toisella kurssilla (tunnistus osaamisviitteen tai otsikon perusteella), ja huomioi tämän aiemman osaamisen sen sijaan, että harjoituttaisi sitä uudelleen. Edellyttää osaamisen seurantaa; kurssit, joilla ei ole osaamistavoitteita, käyttävät hallitusti varatoimintoa. Ohjeellinen vain — se ei koskaan muuta oppijan tallennettua osaamispistemäärää millään kurssilla.';
+$string['pedagogy:mastery_starter'] = 'Osaamistietoinen aloitusvihje oletuksena käytössä';
+$string['pedagogy:mastery_starter_desc'] = 'Kun tämä on käytössä, keskustelun aloitusvihje "Mihin minun kannattaisi keskittyä?" personoidaan nimeämään oppijan heikoin osaamistavoite (ja mahdollinen muualla jo saavutettu osaaminen). Edellyttää osaamisen seurantaa; käyttää yleistä aloitusvihjettä, kun osaamistietoja ei vielä ole.';
+$string['task:rebuild_objective_links'] = 'Rakenna kurssien väliset osaamistavoitteiden linkit uudelleen osaamiskoostetta varten (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Harjoittele: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Kurssien väliset osaamislinkit';
+$string['objectives:rebuild_links_help'] = 'SOLA linkittää eri kurssien osaamistavoitteet, jotka vastaavat toisiaan (osaamisviitteen tai otsikon perusteella), jotta oppijaa, joka on saavuttanut aiheen osaamisen muualla, ei harjoituteta uudelleen. Linkit rakennetaan uudelleen automaattisesti joka yö; rakenna ne tällä painikkeella heti uudelleen osaamistavoitteiden muokkaamisen jälkeen.';
+$string['objectives:rebuild_links_button'] = 'Rakenna linkit uudelleen nyt';
+$string['objectives:rebuild_links_done'] = 'Kurssien väliset osaamislinkit rakennettu uudelleen: {$a->total} yhteensä ({$a->ref} viitteen perusteella, {$a->exact} tarkka otsikko, {$a->fuzzy} sumea otsikko).';

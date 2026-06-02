@@ -1290,3 +1290,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Walitti qabama gahumsa koorsiiwwan gidduu durtiidhaan banaa';
+$string['pedagogy:crossmastery_desc'] = 'Yeroo banaa ta\'u, SOLA yeroo barataan tokko galma koorsii biraa keessatti duraan gahumsa argate (wabii dandeettii ykn mata-dureedhaan walsimsiifame) ni beeka; deebisee shaakalsiisuu mannaa gahumsa duraanii sana ni dhugoomsa. Hordoffii gahumsaa barbaada; koorsiiwwan galmoota hin qabne sirnaan ni deebi\'u. Gorsa qofa — galmee gahumsa barataa koorsii kamiyyuu keessatti kuufame gonkumaa hin jijjiiru.';
+$string['pedagogy:mastery_starter'] = 'Jalqabaa gahumsa beeku durtiidhaan banaa';
+$string['pedagogy:mastery_starter_desc'] = 'Yeroo banaa ta\'u, jalqabaan haasawaa "Maal irratti xiyyeeffachuun qaba?" jedhu galma barataa irra dadhabaa (akkasumas dandeettii kamiyyuu iddoo biraatti duraan gahumsa irratti argame) maqaa dhahuuf dhuunfeeffama. Hordoffii gahumsaa barbaada; yeroo deetaan gahumsaa hin jirre jalqabaa waliigalaatti deebi\'a.';
+$string['task:rebuild_objective_links'] = 'Walitti qabama gahumsaaf hidhaalee galmoota koorsiiwwan gidduu irra deebi\'anii ijaaruu (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Shaakala: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Hidhaalee gahumsa koorsiiwwan gidduu';
+$string['objectives:rebuild_links_help'] = 'SOLA galmoota koorsiiwwan gidduutti walsiman (wabii dandeettii ykn mata-dureedhaan) ni walqabsiisa; kanaaf barataan mata-duree iddoo biraatti gahumsa irratti argate deebi\'ee hin shaakalsiifamu. Hidhaaleen halkan halkan ofumaan irra deebi\'anii ijaaramu; erga galmoota gulaaltee booda amma irra deebitee ijaaruuf qabduu kana fayyadami.';
+$string['objectives:rebuild_links_button'] = 'Amma hidhaalee irra deebi\'ii ijaari';
+$string['objectives:rebuild_links_done'] = 'Hidhaaleen gahumsa koorsiiwwan gidduu irra deebi\'anii ijaaraman: {$a->total} waliigala ({$a->ref} wabiidhaan, {$a->exact} mata-duree sirrii, {$a->fuzzy} mata-duree dhiheenyaan).';

@@ -1309,3 +1309,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'I-on bilang default ang cross-course mastery rollup';
+$string['pedagogy:crossmastery_desc'] = 'Kapag naka-on, kinikilala ng SOLA kapag namaster na ng isang mag-aaral ang isang layunin sa ibang kurso (itinugma sa pamamagitan ng competency reference o pamagat) at kinikilala ang naunang kakayahang iyon sa halip na ulitin itong pag-drill. Kailangan ng mastery tracking; ang mga kursong walang layunin ay maayos na babalik sa default. Pang-payo lamang ito — hindi kailanman binabago ang nakaimbak na mastery score ng mag-aaral sa anumang kurso.';
+$string['pedagogy:mastery_starter'] = 'I-on bilang default ang mastery-aware na starter';
+$string['pedagogy:mastery_starter_desc'] = 'Kapag naka-on, ang "Saan ako dapat mag-focus?" na conversation starter ay ipinapersonalize upang banggitin ang pinakamahinang layunin ng mag-aaral (at anumang kakayahang namaster na sa ibang lugar). Kailangan ng mastery tracking; babalik sa generic na starter kapag wala pang mastery data.';
+$string['task:rebuild_objective_links'] = 'Muling itayo ang cross-course na mga link ng layunin para sa mastery rollup (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Pagsasanay: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Mga cross-course na link ng mastery';
+$string['objectives:rebuild_links_help'] = 'Iniuugnay ng SOLA ang mga layuning magkatugma sa iba\'t ibang kurso (sa pamamagitan ng competency reference o pamagat) upang ang mag-aaral na namaster na ang isang paksa sa ibang lugar ay hindi na muling i-drill. Awtomatikong muling itinatayo ang mga link tuwing gabi; gamitin ang button na ito upang muling itayo ngayon pagkatapos i-edit ang mga layunin.';
+$string['objectives:rebuild_links_button'] = 'Muling itayo ang mga link ngayon';
+$string['objectives:rebuild_links_done'] = 'Muling naitayo ang cross-course na mga link ng mastery: {$a->total} sa kabuuan ({$a->ref} sa pamamagitan ng reference, {$a->exact} eksaktong pamagat, {$a->fuzzy} fuzzy na pamagat).';

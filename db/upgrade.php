@@ -1013,5 +1013,29 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026051246, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026060100) {
+        // v5.7.0: cross-course mastery rollup. Precomputed link table pairing
+        // objectives in different courses judged to be the same competency.
+        $table = new xmldb_table('local_ai_course_assistant_obj_links');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('objectiveida', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('objectiveidb', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('method', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('score', XMLDB_TYPE_NUMBER, '5, 4', null, XMLDB_NOTNULL, null, '1.0000');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('objectiveida_fk', XMLDB_KEY_FOREIGN, ['objectiveida'],
+                'local_ai_course_assistant_objs', ['id']);
+            $table->add_key('objectiveidb_fk', XMLDB_KEY_FOREIGN, ['objectiveidb'],
+                'local_ai_course_assistant_objs', ['id']);
+            $table->add_key('pair_uniq', XMLDB_KEY_UNIQUE, ['objectiveida', 'objectiveidb']);
+            // objectiveidb is already indexed by its foreign key; no extra index.
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026060100, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

@@ -366,6 +366,7 @@ $string['task:send_inactivity_reminders'] = 'Send weekly inactivity reminder ema
 $string['task:run_integrity_checks'] = 'Run daily AI Course Assistant plugin integrity checks';
 $string['task:milestone_check'] = 'Send daily milestone reflection emails (v5.3.0)';
 $string['task:struggle_signal_review'] = 'Review struggle signals into private learner memory (v5.3.0)';
+$string['task:rebuild_objective_links'] = 'Rebuild cross-course objective links for mastery rollup (v5.7.0)';
 $string['messageprovider:study_notes'] = 'Study session notes';
 $string['messageprovider:study_reminder'] = 'Study reminders';
 $string['messageprovider:integrity_report'] = 'AI Course Assistant integrity check failure report';
@@ -742,6 +743,7 @@ $string['next_best_action:quiz']                  = 'Lock in {$a->title} with a 
 $string['next_best_action:quiz_with_module']      = 'Lock in {$a->title} with a quick quiz. The module "{$a->module}" is where it lives.';
 $string['next_best_action:empty_state']           = 'You are looking great on every objective right now — nothing to nudge on. Keep going.';
 $string['next_best_action:header']                = 'Here are {$a} things to focus on next:';
+$string['mastery_starter:practice_label']         = 'Practice: {$a}';
 $string['active_learners:line']                    = '{$a} others are studying this course right now.';
 $string['active_learners:line_global']             = '{$a} others are studying right now.';
 $string['settings:active_learners_scope']          = 'Active-learners indicator scope';
@@ -1024,6 +1026,12 @@ $string['objectives:delete_all']        = 'Delete all objectives for this course
 $string['objectives:delete_all_confirm']= 'Delete every objective and all attempt history for this course? Cannot be undone.';
 $string['objectives:deleted_all']       = 'All objectives for this course deleted.';
 
+// Cross-course mastery rebuild (v5.7.0).
+$string['objectives:rebuild_links_heading'] = 'Cross-course mastery links';
+$string['objectives:rebuild_links_help']    = 'SOLA links objectives that match across courses (by competency reference or title) so a learner who mastered a topic elsewhere is not re-drilled. Links rebuild automatically every night; use this button to rebuild now after editing objectives.';
+$string['objectives:rebuild_links_button']  = 'Rebuild links now';
+$string['objectives:rebuild_links_done']    = 'Cross-course mastery links rebuilt: {$a->total} total ({$a->ref} by reference, {$a->exact} exact title, {$a->fuzzy} fuzzy title).';
+
 // Mastery chip (v3.9.17) — shown in the widget when the per-course chip toggle is on.
 $string['mastery:chip_aria']            = 'Learning mastery status';
 $string['mastery:popover_aria']         = 'Learning mastery details';
@@ -1077,6 +1085,10 @@ $string['pedagogy:essay_feedback']         = 'Essay feedback on by default';
 $string['pedagogy:essay_feedback_desc']    = 'When on, AI essay feedback is available in every course unless the course has its own override.';
 $string['pedagogy:talking_avatar']         = 'Talking avatar on by default';
 $string['pedagogy:talking_avatar_desc']    = 'When on, the talking-avatar surface is enabled in every course unless the course has its own override. Requires a configured provider (D-ID, HeyGen, Tavus, or Synthesia Agents) below; otherwise the widget shows a "configure a provider" notice and the avatar does not animate.';
+$string['pedagogy:crossmastery']           = 'Cross-course mastery rollup on by default';
+$string['pedagogy:crossmastery_desc']      = 'When on, SOLA recognizes when a learner has already mastered an objective in another course (matched by competency reference or title) and acknowledges that prior competency instead of re-drilling it. Requires mastery tracking; courses without objectives fall back gracefully. Advisory only — it never changes a learner\'s stored mastery score in any course.';
+$string['pedagogy:mastery_starter']        = 'Mastery-aware starter on by default';
+$string['pedagogy:mastery_starter_desc']   = 'When on, the "What should I focus on?" conversation starter is personalized to name the learner\'s weakest objective (and any competency already mastered elsewhere). Requires mastery tracking; falls back to the generic starter when there is no mastery data yet.';
 $string['settings:talking_avatar_heading']      = 'Talking avatar';
 $string['settings:talking_avatar_heading_desc'] = 'Pick which talking-avatar vendor SOLA opens for students when the avatar surface is enabled. SOLA ships drivers for D-ID (cheapest WebRTC streaming), HeyGen (LiveKit-backed interactive avatars), Tavus (drop-in iframable Conversational Video Interface), and Synthesia Agents (real-time agent product, configured in the Synthesia dashboard). Per-provider key + persona id appear below; only the chosen provider needs to be filled in. Every outbound call is SSRF-checked.';
 $string['settings:talking_avatar_provider']      = 'Talking avatar provider';

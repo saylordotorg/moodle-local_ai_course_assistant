@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Sammenstilling av mestring på tvers av kurs på som standard';
+$string['pedagogy:crossmastery_desc'] = 'Når dette er på, gjenkjenner SOLA når en deltaker allerede har mestret et læringsmål i et annet kurs (matchet på kompetansereferanse eller tittel), og anerkjenner den tidligere kompetansen i stedet for å øve den inn på nytt. Krever mestringssporing; kurs uten læringsmål håndteres på en smidig måte. Kun veiledende – det endrer aldri en deltakers lagrede mestringsscore i noe kurs.';
+$string['pedagogy:mastery_starter'] = 'Mestringsbevisst samtalestarter på som standard';
+$string['pedagogy:mastery_starter_desc'] = 'Når dette er på, blir samtalestarteren «Hva bør jeg fokusere på?» personlig tilpasset slik at den navngir deltakerens svakeste læringsmål (og eventuell kompetanse som allerede er mestret andre steder). Krever mestringssporing; faller tilbake til den generiske starteren når det ennå ikke finnes mestringsdata.';
+$string['task:rebuild_objective_links'] = 'Bygg om læringsmålkoblinger på tvers av kurs for mestringssammenstilling (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Øv: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Mestringskoblinger på tvers av kurs';
+$string['objectives:rebuild_links_help'] = 'SOLA kobler sammen læringsmål som samsvarer på tvers av kurs (etter kompetansereferanse eller tittel), slik at en deltaker som har mestret et tema andre steder, ikke øver det inn på nytt. Koblingene bygges om automatisk hver natt; bruk denne knappen for å bygge om nå etter at du har redigert læringsmål.';
+$string['objectives:rebuild_links_button'] = 'Bygg om koblinger nå';
+$string['objectives:rebuild_links_done'] = 'Mestringskoblinger på tvers av kurs ble bygd om: {$a->total} totalt ({$a->ref} etter referanse, {$a->exact} nøyaktig tittel, {$a->fuzzy} omtrentlig tittel).';

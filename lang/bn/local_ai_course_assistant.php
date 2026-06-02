@@ -1286,3 +1286,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'ডিফল্টভাবে ক্রস-কোর্স দক্ষতা রোলআপ চালু';
+$string['pedagogy:crossmastery_desc'] = 'চালু থাকলে, SOLA শনাক্ত করে যখন কোনো শিক্ষার্থী ইতিমধ্যে অন্য একটি কোর্সে কোনো লক্ষ্য আয়ত্ত করেছেন (দক্ষতা রেফারেন্স বা শিরোনাম মিলিয়ে) এবং সেই পূর্ববর্তী দক্ষতা পুনরায় অনুশীলন করানোর পরিবর্তে স্বীকৃতি দেয়। এর জন্য দক্ষতা ট্র্যাকিং প্রয়োজন; লক্ষ্যবিহীন কোর্সগুলো সুন্দরভাবে ফলব্যাক করে। কেবল পরামর্শমূলক — এটি কখনো কোনো কোর্সে শিক্ষার্থীর সংরক্ষিত দক্ষতা স্কোর পরিবর্তন করে না।';
+$string['pedagogy:mastery_starter'] = 'ডিফল্টভাবে দক্ষতা-সচেতন স্টার্টার চালু';
+$string['pedagogy:mastery_starter_desc'] = 'চালু থাকলে, "আমার কোন বিষয়ে মনোযোগ দেওয়া উচিত?" কথোপকথন স্টার্টারটি ব্যক্তিগতকৃত করা হয় শিক্ষার্থীর সবচেয়ে দুর্বল লক্ষ্যটির নাম উল্লেখ করার জন্য (এবং অন্য কোথাও ইতিমধ্যে আয়ত্ত করা যেকোনো দক্ষতা)। এর জন্য দক্ষতা ট্র্যাকিং প্রয়োজন; এখনো কোনো দক্ষতা ডেটা না থাকলে সাধারণ স্টার্টারে ফলব্যাক করে।';
+$string['task:rebuild_objective_links'] = 'দক্ষতা রোলআপের জন্য ক্রস-কোর্স লক্ষ্য লিঙ্ক পুনর্নির্মাণ করুন (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'অনুশীলন: {$a}';
+$string['objectives:rebuild_links_heading'] = 'ক্রস-কোর্স দক্ষতা লিঙ্ক';
+$string['objectives:rebuild_links_help'] = 'SOLA এমন লক্ষ্যগুলো লিঙ্ক করে যা কোর্সগুলোর মধ্যে মিলে যায় (দক্ষতা রেফারেন্স বা শিরোনাম অনুসারে), যাতে অন্য কোথাও কোনো বিষয় আয়ত্ত করা শিক্ষার্থীকে পুনরায় অনুশীলন করানো না হয়। লিঙ্কগুলো প্রতি রাতে স্বয়ংক্রিয়ভাবে পুনর্নির্মিত হয়; লক্ষ্য সম্পাদনার পর এখনই পুনর্নির্মাণ করতে এই বোতামটি ব্যবহার করুন।';
+$string['objectives:rebuild_links_button'] = 'এখনই লিঙ্ক পুনর্নির্মাণ করুন';
+$string['objectives:rebuild_links_done'] = 'ক্রস-কোর্স দক্ষতা লিঙ্ক পুনর্নির্মিত হয়েছে: মোট {$a->total} ({$a->ref}টি রেফারেন্স অনুসারে, {$a->exact}টি সঠিক শিরোনাম, {$a->fuzzy}টি আনুমানিক শিরোনাম)।';

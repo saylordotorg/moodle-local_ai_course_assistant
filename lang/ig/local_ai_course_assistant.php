@@ -1303,3 +1303,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Ntinye nke ọmụma n\'agbata usoro ọmụmụ dị iche iche site na ndabara';
+$string['pedagogy:crossmastery_desc'] = 'Mgbe ọ na-arụ ọrụ, SOLA na-aghọta mgbe onye mmụta amaralarị otu ihe mgbaru ọsọ n\'usoro ọmụmụ ọzọ (dabere na ntụaka inwe ike ma ọ bụ aha) ma na-akwado inwe ike ahụ buru ụzọ kama ịmụgharị ya ọzọ. Ọ chọrọ nsochi nke ọmụma; usoro ọmụmụ na-enweghị ihe mgbaru ọsọ na-adaba nke ọma. Naanị maka ndụmọdụ — ọ naghị agbanwe akara ọmụma echekwara nke onye mmụta n\'usoro ọmụmụ ọ bụla.';
+$string['pedagogy:mastery_starter'] = 'Ihe mmalite maara ọmụma site na ndabara';
+$string['pedagogy:mastery_starter_desc'] = 'Mgbe ọ na-arụ ọrụ, a na-eme ka ihe mmalite mkparịta ụka "Gịnị ka m kwesịrị ilekwasị anya na ya?" bụrụ nke ahaziri iche iji kpọọ aha ihe mgbaru ọsọ kacha sie ike nye onye mmụta (na inwe ike ọ bụla ọ maralarị n\'ebe ọzọ). Ọ chọrọ nsochi nke ọmụma; ọ na-adaba na ihe mmalite izugbe mgbe enweghị data ọmụma ugbu a.';
+$string['task:rebuild_objective_links'] = 'Wughachi njikọ ihe mgbaru ọsọ n\'agbata usoro ọmụmụ maka mkpokọta ọmụma (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Omume: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Njikọ ọmụma n\'agbata usoro ọmụmụ';
+$string['objectives:rebuild_links_help'] = 'SOLA na-ejikọ ihe mgbaru ọsọ ndị dabara n\'agbata usoro ọmụmụ (site na ntụaka inwe ike ma ọ bụ aha) ka onye mmụta nke maralarị isiokwu n\'ebe ọzọ ghara ịmụgharị ya ọzọ. A na-ewughachi njikọ ndị a na-akpaghị aka kwa abalị; jiri bọtịnụ a wughachi ugbu a mgbe ị dezigharịchara ihe mgbaru ọsọ.';
+$string['objectives:rebuild_links_button'] = 'Wughachi njikọ ugbu a';
+$string['objectives:rebuild_links_done'] = 'E wughachiri njikọ ọmụma n\'agbata usoro ọmụmụ: {$a->total} nchịkọta ({$a->ref} site na ntụaka, {$a->exact} aha kpọmkwem, {$a->fuzzy} aha yiri ya).';

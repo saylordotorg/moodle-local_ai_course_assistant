@@ -1304,3 +1304,15 @@ $string['attachment:error_upload_failed'] = 'The file could not be uploaded. Ple
 $string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
 $string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
 $string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
+
+// Cross-course mastery rollup (v5.7.0).
+$string['pedagogy:crossmastery'] = 'Isku-darka aqoonta koorsooyinka dhexdooda waxaa daacad ahaan loo hawlgeliyaa';
+$string['pedagogy:crossmastery_desc'] = 'Markii la hawlgeliyo, SOLA waxay aqoonsanaysaa marka uu ardaygu hore u qaatay yool koorso kale (oo lagu kala saaray tixraaca kartida ama cinwaanka) waxayna qiraysaa kartidaas hore ee la helay halkii dib loogu celin lahaa. Waxay u baahan tahay raadraaca aqoonta; koorsooyinka aan lahayn yoolal si nabad ah ayay dib ugu noqonayaan. Talo keliya ayay tahay — marnaba ma beddesho dhibcaha aqoonta ee ardayga ee la keydiyay koorso kasta.';
+$string['pedagogy:mastery_starter'] = 'Bilaabaha aqoonta-garka ah waxaa daacad ahaan loo hawlgeliyaa';
+$string['pedagogy:mastery_starter_desc'] = 'Markii la hawlgeliyo, bilaabaha wada sheekaysiga ee ah "Maxaan diiradda saaraa?" waxaa loo gaar yeelaa si uu u magacaabo yoolka ugu daciifsan ee ardayga (iyo karti kasta oo horeba meel kale loogu helay). Waxay u baahan tahay raadraaca aqoonta; waxay dib ugu noqonaysaa bilaabaha guud marka aan weli jirin xog aqooneed.';
+$string['task:rebuild_objective_links'] = 'Dib u dhis xiriirinta yoolasha koorsooyinka dhexdooda ee isku-darka aqoonta (v5.7.0)';
+$string['mastery_starter:practice_label'] = 'Tababar: {$a}';
+$string['objectives:rebuild_links_heading'] = 'Xiriirinta aqoonta koorsooyinka dhexdooda';
+$string['objectives:rebuild_links_help'] = 'SOLA waxay isku xirtaa yoolasha isku mid ah koorsooyinka dhexdooda (iyadoo loo eegayo tixraaca kartida ama cinwaanka) si ardayga horeba mawduuc meel kale ugu bartay aan dib loogu celin. Xiriirinta waxay dib isu dhisaysaa si toos ah habeen kasta; isticmaal badhankan si aad hadda dib u dhisto kadib markaad wax ka beddesho yoolasha.';
+$string['objectives:rebuild_links_button'] = 'Hadda dib u dhis xiriirinta';
+$string['objectives:rebuild_links_done'] = 'Xiriirinta aqoonta koorsooyinka dhexdooda waa la dib u dhisay: {$a->total} wadarta guud ({$a->ref} tixraac ahaan, {$a->exact} cinwaan sax ah, {$a->fuzzy} cinwaan u dhow).';
