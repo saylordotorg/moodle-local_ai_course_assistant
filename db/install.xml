@@ -648,5 +648,24 @@
         <INDEX NAME="optout_type_idx" UNIQUE="false" FIELDS="optout_type"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_obj_links" COMMENT="v5.7.0: precomputed cross-course objective links for mastery rollup. Each row pairs two objectives in DIFFERENT courses judged to be the same competency. Stored once per pair with objectiveida &lt; objectiveidb. Rebuilt by the rebuild_objective_links scheduled task.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="objectiveida" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Lower objective id of the pair"/>
+        <FIELD NAME="objectiveidb" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Higher objective id of the pair"/>
+        <FIELD NAME="method" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="How the pair was matched: ref, title_exact, title_fuzzy, title_embed"/>
+        <FIELD NAME="score" TYPE="number" LENGTH="5" DECIMALS="4" NOTNULL="true" DEFAULT="1.0000" SEQUENCE="false" COMMENT="Match confidence 0-1"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="objectiveida_fk" TYPE="foreign" FIELDS="objectiveida" REFTABLE="local_ai_course_assistant_objs" REFFIELDS="id"/>
+        <KEY NAME="objectiveidb_fk" TYPE="foreign" FIELDS="objectiveidb" REFTABLE="local_ai_course_assistant_objs" REFFIELDS="id"/>
+        <KEY NAME="pair_uniq" TYPE="unique" FIELDS="objectiveida, objectiveidb"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="objectiveidb_idx" UNIQUE="false" FIELDS="objectiveidb"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
