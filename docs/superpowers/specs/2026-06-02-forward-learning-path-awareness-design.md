@@ -1,33 +1,50 @@
 # Forward Learning-Path Awareness — Design Spec
 
 **Date:** 2026-06-02
-**Status:** Approved (approach C, hybrid phased)
+**Status:** Approved (design); pending implementation plan
 **Component:** `local_ai_course_assistant` (SOLA)
-**Target release:** v5.8.0
+**Target release:** likely v5.8.0
+**Relationship:** Forward-direction complement to v5.7.0 cross-course mastery rollup.
+
+> **Provenance note.** An earlier auto-generated draft of this file asserted
+> production-specific details (an `enrol_programs_*` table prefix on prod,
+> named programs, a plugin version) that were **never verified**. This version
+> keeps only what was actually confirmed on dev.sylr.org and marks every
+> remaining assumption as something to verify before release. See §3.
 
 ---
 
 ## 1. Problem
 
-SOLA already looks *backward* across courses: within-course prerequisite-gap detection ("this builds on X — want to review first?") and v5.7.0 cross-course mastery ("you've demonstrated this elsewhere"). It has no concept of what comes *next*. Students can't see, in conversation, how the course they're in fits into a larger learning path — what they'll learn next, or how today's concepts feed forward into later courses.
-
-This feature gives SOLA *forward* awareness: when a course belongs to a Saylor program (specialization or degree), SOLA can naturally tell the learner where this course leads and how the concepts connect forward.
+SOLA already looks *backward* across courses: within-course prerequisite-gap detection ("this builds on X — want to review first?") and v5.7.0 cross-course mastery ("you've demonstrated this elsewhere"). It has no concept of what comes *next* — students can't see, in conversation, how the course they're in fits into a larger learning path, what they'll study next, or how today's concepts feed forward.
 
 ## 2. Goal & non-goals
 
-**Goal:** A conversational, advisory prompt block — mirroring cross-course mastery — that lets SOLA reference the learner's forward path: the program this course belongs to, the learner's position in it, the next course(s), and (when data allows) the specific objective that bridges to the next course.
+**Goal:** a conversational, advisory prompt block — mirroring cross-course mastery — that lets SOLA reference the learner's forward path: the program this course belongs to, the learner's position in it, the next course(s), and (when data allows) the specific objective that bridges to the next course.
 
-**Non-goals (v5.8.0):**
-- No visual "path map" UI, no dashboard tab, no new student-facing surface beyond the chat conversation.
+**Non-goals (v1):**
+- No visual "path map" UI, no dashboard tab, no new student-facing surface beyond chat.
 - No new database table, no scheduled task, no schema change.
 - No enrolment changes, no mastery changes — strictly advisory.
 - No proactive "you're ready to advance" nudges/emails (possible later).
+- No authoring of curriculum — we read Saylor's existing program structure.
 
 ## 3. Data source
 
-Saylor uses the Open LMS "Programs" plugin. **Production (learn.saylor.org, degrees.saylor.org) runs it under the public `enrol_programs` naming; the dev box (dev.sylr.org) runs the same codebase under the older `muprog` naming (`enrol_muprog` / `tool_muprog` / `block_muprog_my`, version `2026041945`).** The schemas are identical; only the table prefix differs (`enrol_programs_*` vs `tool_muprog_*`). The feature MUST detect and support both, and no-op gracefully where neither is installed (e.g. the local dev Moodle, or any non-program install).
+Saylor's "Degrees" are represented in Moodle by the **Programs plugin**.
 
-Relevant tables (shown with the `muprog` prefix; `programs` prefix is identical in shape):
+**Verified (dev.sylr.org, 2026-06-02, read-only SSM probe):**
+- The plugin is installed under the `tool_muprog_*` table prefix.
+- `tool_muprog_program` had 1 row: "Administrative or Virtual Assistant Specialization".
+- `tool_muprog_item` modeled it as a `top` item with `sequencejson` `{"children":["2"],"type":"allinanyorder"}` and a `course` item (`courseid=2`, "PRDV225: Managing Employees").
+- `tool_muprog_prerequisite` and `tool_muprog_allocation` exist with the schemas below and held data (1 row each).
+- Core competency tables are empty (0 rows) — competencies are **not** the path source.
+
+**Assumptions to verify before release (NOT yet confirmed):**
+- **Production table prefix.** The upstream Open LMS Programs plugin uses `enrol_programs_*`; the dev box uses `tool_muprog_*`. Production (learn/degrees) may use either. The adapter (§4.2) detects whichever is present, but the actual prod prefix MUST be confirmed on a prod or prod-like box before release. Do not hard-code one prefix.
+- **Whether any ordered programs exist in real data.** The only dev program is `allinanyorder`. Forward "next course" claims depend on either explicit prerequisites or `allinorder` sets; if real Saylor programs are predominantly any-order with no prerequisites, course-level "next" coverage will be thin and the feature will mostly surface program membership + position. Confirm with real program data during the dev verification step.
+
+Relevant tables (shown with the verified `tool_muprog_` prefix; any `enrol_programs_` equivalent is expected to be schema-identical and MUST be confirmed):
 
 | Table | Key columns | Use |
 |---|---|---|
@@ -35,15 +52,16 @@ Relevant tables (shown with the `muprog` prefix; `programs` prefix is identical 
 | `tool_muprog_item` | `id`, `programid`, `type` (`top`/`set`/`course`), `topitem`, `courseid`, `previtemid`, `sequencejson`, `fullname` | the ordered tree of courses/sets |
 | `tool_muprog_prerequisite` | `id`, `itemid`, `prerequisiteitemid` | explicit "item builds on item" edges |
 | `tool_muprog_allocation` | `id`, `programid`, `userid`, `archived` | which programs a learner is in |
+| `tool_muprog_completion` | `itemid`, `allocationid`, `timecompleted` | filter already-completed forward courses |
 
-**Ordering nuances discovered in live data:**
-- A program's top/set item carries `sequencejson` like `{"children":["2","3"],"type":"allinanyorder"}`. The `type` distinguishes ordered (`allinorder`) from unordered (`allinanyorder`) sets.
+**Ordering nuances (verified in dev data + schema):**
+- A `top`/`set` item carries `sequencejson` like `{"children":["2","3"],"type":"allinanyorder"}`. `type` distinguishes ordered (`allinorder`) from unordered (`allinanyorder`).
 - `previtemid` forms a linked list giving item order within a set.
-- Real programs are **mixed**: some are strictly ordered (e.g. "ESL for Healthcare" — "complete each course in order"), most are "progressive but any-order." So forward sequence is reliable only from explicit prerequisites or from sets explicitly marked ordered. Any-order programs yield membership + position but no specific "next."
+- Forward sequence is asserted **only** from explicit prerequisites or from sets explicitly marked `allinorder`. Any-order programs with no prerequisites yield membership + position but no specific "next."
 
 ## 4. Architecture
 
-Separate **logic** from **data access** so the logic is unit-testable without the third-party program tables, and so both table namings are handled in one place. This mirrors the existing `provider_interface` / `stub_provider` pattern.
+Separate **logic** from **data access** so the logic is unit-testable without the third-party program tables, and so the table-prefix variance is handled in one place. Mirrors the existing `provider_interface` / `stub_provider` pattern.
 
 ### 4.1 `program_source_interface` (`classes/program/program_source_interface.php`)
 
@@ -55,14 +73,15 @@ interface program_source_interface {
     public function is_available(): bool;
 
     /**
-     * Programs (not archived) the user is allocated to.
+     * Non-archived programs the user is allocated to.
      * @return array<int, array{programid:int, name:string}>
      */
     public function get_user_programs(int $userid): array;
 
     /**
-     * Programs (not archived) that contain the given course, regardless of
-     * allocation — used as a fallback when the learner has no allocation.
+     * Non-archived programs that contain the given course, regardless of
+     * allocation — used only as a fallback when the learner has no allocation
+     * (see §4.4 step 2; off by default per the honesty rule).
      * @return array<int, array{programid:int, name:string}>
      */
     public function get_programs_for_course(int $courseid): array;
@@ -79,27 +98,30 @@ interface program_source_interface {
      * @return array<int, int[]>
      */
     public function get_prerequisites(int $programid): array;
+
+    /** Has the user completed the given program item? */
+    public function is_item_completed(int $userid, int $programid, int $itemid): bool;
 }
 ```
 
 ### 4.2 `db_program_source` (`classes/program/db_program_source.php`)
 
 The real adapter. Responsibilities:
-- Detect the active prefix once: `tool_muprog_` if `tool_muprog_program` exists, else `enrol_programs_` if `enrol_programs_program` exists, else "unavailable."
+- Detect the active prefix once: `tool_muprog_` if `tool_muprog_program` exists, else `enrol_programs_` if `enrol_programs_program` exists, else "unavailable." (Prefix set confirmed against prod before release — §3.)
 - Implement each interface method against that prefix using `$DB`.
-- Resolve item order from `sequencejson` children + `previtemid`, and mark each set ordered/unordered from `sequencejson.type`: treat `type === 'allinorder'` as ordered; any other value (`allinanyorder`, `atleast`, `all`, etc.) as unordered for v1.
-- Return only **visible** courses' names truthfully; include hidden ones flagged `visible=false` so the logic can exclude them (never leak a hidden course title).
-- Every public method wrapped so any DB/schema error returns the empty/`false` result (the feature degrades to silence). `\Throwable`, not `\Exception`.
+- Resolve item order from `sequencejson` children + `previtemid`; mark each set ordered/unordered from `sequencejson.type` (`allinorder` → ordered; anything else → unordered for v1).
+- Return **visible** courses truthfully; include hidden ones flagged `visible=false` so the logic excludes them (never leak a hidden course title).
+- Every public method wrapped so any DB/schema error returns the empty/`false` result (degrade to silence). Catch `\Throwable`, not `\Exception`.
 
-This adapter is intentionally thin and contains no business logic. It is verified on dev (where the real tables live), not in PHPUnit.
+Thin, no business logic. Verified on dev against the live tables (§9), not in PHPUnit.
 
 ### 4.3 `stub_program_source` (`classes/program/stub_program_source.php`)
 
-Array-backed implementation constructed from fixtures, for unit tests. Lets tests express "a 5-course ordered program where the learner is on course 2, course 3 lists course 2 as a prerequisite" without any database.
+Array-backed implementation built from fixtures, for unit tests. Lets tests express "a 5-course ordered program where the learner is on course 2, and course 3 lists course 2 as a prerequisite" with no database.
 
 ### 4.4 `program_path` (`classes/program_path.php`)
 
-Pure logic over a `program_source_interface`. The single place that decides what to say.
+Pure logic over a `program_source_interface` — the single place that decides what to say.
 
 ```php
 class program_path {
@@ -109,10 +131,10 @@ class program_path {
     public function is_enabled_for_course(int $courseid): bool;
 
     /**
-     * The forward-path context for this learner+course, or null if none.
+     * Forward-path context for this learner+course, or null if none.
      * @return null|array{
      *   program: array{programid:int, name:string},
-     *   position: array{index:int, total:int},        // 1-based; index/total
+     *   position: array{index:int, total:int},          // 1-based
      *   next_courses: array<int, array{courseid:int, name:string,
      *                                  reason:'prerequisite'|'sequence'}>,
      *   concept_links: array<int, array{objective:string,
@@ -129,27 +151,25 @@ class program_path {
 
 **`forward_context` algorithm:**
 1. If not available / flag off → null.
-2. Programs = `get_user_programs(userid)`; if empty, fall back to `get_programs_for_course(courseid)`.
-3. For each candidate program (stop at the first that yields a usable result):
-   a. `courses = get_program_courses(programid)`; find the item whose `courseid == courseid`. Skip program if not found.
+2. Programs = `get_user_programs(userid)` (allocation = "your path"). Course-membership fallback (`get_programs_for_course`) is **off by default** per the honesty rule (§7); it exists in the interface for a possible opt-in later, not v1's default path.
+3. For the first candidate program that yields a usable result:
+   a. `courses = get_program_courses(programid)`; find the item with `courseid == courseid`. Skip program if absent.
    b. `position` = that course's 1-based index among **visible** course items, and the visible total.
-   c. `next_courses` (cap 2), in priority order:
+   c. `next_courses` (cap 2), priority order:
       - **prerequisite:** items J where this course's item ∈ `get_prerequisites(programid)[J]`; reason `prerequisite`.
-      - **sequence:** if none, and this course's set is `ordered`, the next visible course item after it; reason `sequence`.
-      - exclude hidden courses and the current course.
-   d. `concept_links` (cap 2, optional): only if `next_courses` non-empty AND objectives are enabled for the current course. The only cross-course objective signal in the data model is **equivalency** (the v5.7.0 `obj_links` table), not a forward prerequisite chain (objective prereqs are within-course only). So a concept link is: an objective in the *current* course whose cross-course equivalent (`cross_course_mastery::linked_objectives()`) lands in one of the `next_courses`. `next_objective` is that linked objective's title (usually identical; may differ slightly under fuzzy match). The forward framing is truthful because the linked course is later in the path: "the work you're doing on X here is the foundation for X in {next course}." Empty when no current-course objective links into a next course.
-   e. If the program yields neither a `next_course` nor a meaningful `position` (total < 2), skip it.
+      - **sequence:** else, if this course's set is `ordered`, the next visible course item; reason `sequence`.
+      - exclude hidden courses, the current course, and items the learner has already completed (`is_item_completed`).
+   d. `concept_links` (cap 2, optional): only if `next_courses` non-empty AND objectives are enabled for the current course. The only cross-course objective signal in the data model is **equivalency** (the v5.7.0 `obj_links` table via `cross_course_mastery::linked_objectives()`), not a forward objective-prerequisite chain (objective prereqs are within-course only). So a concept link = a current-course objective whose cross-course equivalent lands in one of the `next_courses`. Forward framing stays truthful because that course is later in the path: "the work you're doing on X here is the foundation for X in {next course}." Empty when nothing links forward.
+   e. If a program yields neither a `next_course` nor a meaningful `position` (total < 2), skip it.
 4. Return the first usable program's context, else null.
 
-**Multiple programs:** take the first candidate that yields a usable result (allocations before course-membership fallback). Do not stack multiple programs into one block — keep the message focused.
+**Multiple programs:** first usable candidate wins; do not stack programs into one block.
 
 ### 4.5 Prompt injection wiring
 
-`context_builder` already calls `objective_manager::build_prompt_injection(...)` (around `context_builder.php:309`). Add an independent call to `program_path::build_prompt_injection(...)` immediately after the objective/cross-course block, so the program block:
-- appends after "Already demonstrated elsewhere," and
-- does **not** depend on objectives/mastery being enabled (course-level path awareness works without them).
+`context_builder` already calls `objective_manager::build_prompt_injection(...)` (~`context_builder.php:309`). Add an independent call to `program_path::build_prompt_injection(...)` immediately after the objective/cross-course block, so the program block appends after "Already demonstrated elsewhere" and does **not** depend on objectives/mastery being enabled (course-level path awareness works without them).
 
-The block text:
+Block text:
 
 ```
 ### Where this course leads
@@ -161,53 +181,65 @@ today's work connects forward; motivate with the path, but never sound like
 you're reading a database, and never push them ahead before they're ready.
 ```
 
-When there is no `next_courses` (any-order program), the block degrades to a single membership+position sentence and drops the "leads into" clause.
+With no `next_courses` (any-order program), the block degrades to a single membership+position sentence and drops the "leads into" clause.
 
-## 5. Configuration
+## 5. Configuration & off switches
 
-- New pedagogy-default flag **`program_path`**, **default off**, resolvable per-course via the existing `feature_flags::resolve('program_path', $courseid)` order (per-course override → site default → false).
+- New pedagogy-default flag **`program_path`**, **default off**, resolved via `feature_flags::resolve('program_path', $courseid)` (per-course override → site default → false).
 - `settings.php`: add `'program_path_enabled' => 'pedagogy:program_path'` to the pedagogy-defaults `foreach` block.
-- **Not** gated on mastery. The concept-enrichment layer simply checks objective availability at runtime and is a no-op when off.
+- Respects the existing **`emergency_control`** global kill switch alongside the other pedagogy features.
+- **Three independent off switches** plus auto-suppression: per-course override, site default, emergency kill; and the feature self-disables silently when the program plugin is absent, the learner has no allocation, or no valid forward context exists.
+- **Not** gated on mastery; the concept layer checks objective availability at runtime and no-ops when unavailable.
 
-## 6. Lang strings (English; 45-language translation at release like v5.7.0)
+## 6. Lang strings (English; 45-language translation at release, like v5.7.0)
 
-- `pedagogy:program_path` — "Forward learning-path awareness on by default"
+- `pedagogy:program_path` — e.g. "Forward learning-path awareness on by default"
 - `pedagogy:program_path_desc` — describes the advisory forward block, the program-plugin dependency, default-off, advisory-only.
+- Any block scaffolding strings used by `build_prompt_injection` (English source; translated at release).
 
 ## 7. Privacy & safety
 
-- Reads only the **current learner's own** allocations and the program's public structure. No other user's data → memory-leak/jailbreak safe (covered by existing suite).
-- Emits only **visible** course titles; hidden/restricted courses are excluded by the `visible` flag.
+- Reads only the **current learner's own** allocations and the program's public structure. No other user's data → memory-leak/jailbreak safe (covered by the existing suite; re-confirm 32/32).
+- Emits only **visible** course titles; hidden/restricted courses excluded via the `visible` flag.
 - Advisory only: never enrols, never changes mastery, never reveals scores or "how it knows."
-- Whole feature is `\Throwable`-guarded at the adapter boundary: any program-plugin schema difference degrades to no block rather than an error.
+- `\Throwable`-guarded at the adapter boundary: any program-plugin schema difference degrades to no block rather than an error.
+- **Honesty rule:** "your path" claims come from the learner's own allocation. The course-membership fallback is off by default so SOLA never calls a generic program "your path."
 
 ## 8. Performance
 
-- Program tables are small; the feature issues a handful of indexed reads per request only when the flag is on and a program is found.
-- Per-request static memoization in `db_program_source` (cache the detected prefix and per-program reads within a request). No persistent cache table and no scheduled rebuild — the source plugin is authoritative and read live, so data is always fresh.
+- Program tables are small; a handful of indexed reads per request, only when the flag is on and a program is found.
+- Per-request static memoization in `db_program_source` (detected prefix + per-program reads). No persistent cache table, no scheduled rebuild — the source plugin is authoritative and read live, so data is always fresh.
 
 ## 9. Testing (TDD)
 
 `tests/program_path_test.php`, driving `program_path` with `stub_program_source` fixtures:
-- **Position math:** course 2 of 5; visible-only counting (a hidden course doesn't shift the visible index/total).
-- **Next-course priority:** prerequisite beats sequence; ordered-set sequence used when no prereq; any-order with no prereq yields no next course (membership/position only).
-- **Concept bridge:** when objectives link current→next, a concept_link is produced; when they don't, concept_links is empty and the block omits the clause.
+- **Position math:** course 2 of 5; visible-only counting (a hidden course doesn't shift visible index/total).
+- **Next-course priority:** prerequisite beats sequence; ordered-set sequence used when no prereq; any-order with no prereq → no next course (membership/position only).
+- **Completed-course filtering:** a completed forward item is excluded.
+- **Concept bridge:** objectives linking current→next produce a concept_link; otherwise concept_links empty and the block omits the clause.
 - **Gating:** flag off → null; source unavailable → null.
-- **Fallback:** no allocation but course is in a public program → uses course-membership fallback.
-- **Multiple programs:** first usable candidate wins; allocation preferred over fallback.
-- **Block formatting:** exact strings for next-course present, next-course absent, and concept-link present.
+- **Fallback flag:** with the (default-off) course-membership fallback disabled, no allocation → null; behavior of the fallback path covered separately.
+- **Multiple programs:** first usable candidate wins; allocation preferred.
+- **Block formatting:** exact strings for next-course-present, next-course-absent, and concept-link-present.
 - **Graceful no-op:** empty source → null, '' block.
 
-The `db_program_source` adapter is verified manually on dev.sylr.org against the live `tool_muprog_*` tables (and is structurally identical for `enrol_programs_*`).
+The `db_program_source` adapter is **verified manually on dev.sylr.org** against the live `tool_muprog_*` tables, and the **prod table prefix is confirmed** there (§3) before release. Not run in CI (no program tables in the CI/test DB).
 
-## 10. Out of scope / future
+## 10. Pre-release checklist additions (beyond the standard release flow)
 
-- Visual learning-path map (the "Visual path map" option from brainstorming).
-- Proactive milestone nudges ("you're ready for the next course") via starter/digest.
-- Configurable number of next courses surfaced; configurable fuzzy concept-bridge threshold.
-- Degrees-site enumeration was gated behind login during design; structure is identical to Learn, so no design impact.
+- Confirm the **production** Programs table prefix (`tool_muprog_*` vs `enrol_programs_*`) and that `db_program_source` detects it.
+- Spot-check at least one **ordered** real program (or confirm none exist and accept thinner "next" coverage).
+- Standard gates: full plugin suite, validators 36/0, jailbreak 32/32, lang-completeness; version bump; 45-language strings; `.wiki/Changelog.md`; `.drafts/` release notes + walkthrough; tag; GH release; `deploy_dev --target all` + smoke.
 
-## 11. Files
+## 11. Out of scope / future
+
+- Visual learning-path map (the "Visual path map" brainstorming option).
+- Proactive milestone nudges via starter/digest.
+- Opt-in course-membership fallback as a configurable mode.
+- Configurable next-course count; configurable fuzzy concept-bridge threshold.
+- Precomputed concept-bridge table (only if live concept coverage proves valuable but too sparse).
+
+## 12. Files
 
 **New:**
 - `classes/program/program_source_interface.php`
@@ -219,6 +251,6 @@ The `db_program_source` adapter is verified manually on dev.sylr.org against the
 **Modified:**
 - `classes/context_builder.php` — call `program_path::build_prompt_injection()` after the objective block.
 - `settings.php` — register `program_path_enabled` pedagogy default.
-- `lang/en/local_ai_course_assistant.php` — two new strings.
-- `version.php` — bump to v5.8.0.
-- `.wiki/Changelog.md` — v5.8.0 entry.
+- `lang/en/local_ai_course_assistant.php` — new strings.
+- `version.php` — bump (likely v5.8.0).
+- `.wiki/Changelog.md` — new entry.
