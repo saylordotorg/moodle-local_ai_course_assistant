@@ -276,4 +276,44 @@ final class cross_course_mastery_test extends \advanced_testcase {
         $block = objective_manager::build_prompt_injection((int)$user->id, (int)$c1->id);
         $this->assertStringNotContainsStringIgnoringCase('demonstrated elsewhere', $block);
     }
+
+    // ───────────────────────────────────────────────────────────
+    // Mastery-aware starter (next_best_action::starter_label) — Feature C
+    // ───────────────────────────────────────────────────────────
+
+    public function test_starter_label_names_weakest_objective(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        objective_manager::set_enabled_for_course((int)$course->id, true);
+        objective_manager::create((int)$course->id, 'Interpret a balance sheet');
+
+        $r = next_best_action::starter_label((int)$user->id, (int)$course->id);
+        $this->assertEquals('weak', $r['kind']);
+        $this->assertNotNull($r['objectiveid']);
+        $this->assertStringContainsString('Interpret a balance sheet', $r['label']);
+    }
+
+    public function test_starter_label_generic_when_mastery_off(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        objective_manager::create((int)$course->id, 'Interpret a balance sheet'); // mastery OFF.
+
+        $r = next_best_action::starter_label((int)$user->id, (int)$course->id);
+        $this->assertEquals('generic', $r['kind']);
+        $this->assertEquals('', $r['label']);
+    }
+
+    public function test_starter_label_generic_when_all_mastered(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        objective_manager::set_enabled_for_course((int)$course->id, true);
+        $o = objective_manager::create((int)$course->id, 'Interpret a balance sheet');
+        $this->master((int)$user->id, (int)$course->id, $o);
+
+        $r = next_best_action::starter_label((int)$user->id, (int)$course->id);
+        $this->assertEquals('generic', $r['kind']);
+    }
 }

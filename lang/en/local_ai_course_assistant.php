@@ -743,6 +743,7 @@ $string['next_best_action:quiz']                  = 'Lock in {$a->title} with a 
 $string['next_best_action:quiz_with_module']      = 'Lock in {$a->title} with a quick quiz. The module "{$a->module}" is where it lives.';
 $string['next_best_action:empty_state']           = 'You are looking great on every objective right now — nothing to nudge on. Keep going.';
 $string['next_best_action:header']                = 'Here are {$a} things to focus on next:';
+$string['mastery_starter:practice_label']         = 'Practice: {$a}';
 $string['active_learners:line']                    = '{$a} others are studying this course right now.';
 $string['active_learners:line_global']             = '{$a} others are studying right now.';
 $string['settings:active_learners_scope']          = 'Active-learners indicator scope';

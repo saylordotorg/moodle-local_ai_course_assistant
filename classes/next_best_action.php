@@ -93,6 +93,29 @@ class next_best_action {
     }
 
     /**
+     * v5.7.0 / Feature C — Personalized label for the "focus-next" chat
+     * starter. Names the learner's weakest objective so the opening surface
+     * reflects mastery state instead of a generic prompt.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array{label:string, objectiveid:?int, kind:string}
+     *               kind: 'weak' when personalized, 'generic' when the caller
+     *               should fall back to the default starter text.
+     */
+    public static function starter_label(int $userid, int $courseid): array {
+        $recs = self::recommend($userid, $courseid, 1);
+        if (empty($recs)) {
+            return ['label' => '', 'objectiveid' => null, 'kind' => 'generic'];
+        }
+        $top = $recs[0];
+        // Strip any leading "[CODE] " prefix for a cleaner chip.
+        $title = preg_replace('/^\[[^\]]*\]\s*/', '', (string) $top['title']);
+        $label = get_string('mastery_starter:practice_label', 'local_ai_course_assistant', $title);
+        return ['label' => $label, 'objectiveid' => (int) $top['objectiveid'], 'kind' => 'weak'];
+    }
+
+    /**
      * Pick a recommended action for a (status, score) pair.
      *
      * Logic — kept simple and tweakable:

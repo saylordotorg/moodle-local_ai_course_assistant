@@ -602,6 +602,26 @@ class hook_callbacks {
             $courseid, !empty($ttsurl), $realtimeenabled
         );
 
+        // v5.7.0 / Feature C — personalize the focus-next starter chip with the
+        // learner's weakest objective when the mastery-aware starter flag is on.
+        // Only the display name changes; the chip's prompt and behavior are
+        // unchanged. focus-next has no STARTER_LABELS entry so it is never
+        // re-localized client-side — the server-rendered name persists across
+        // language switches. starter_label() returns kind 'generic' whenever
+        // mastery is off or there is no weak objective, so this is self-gating.
+        if (\local_ai_course_assistant\feature_flags::resolve('mastery_starter', $courseid)) {
+            $starterlabel = \local_ai_course_assistant\next_best_action::starter_label($USER->id, $courseid);
+            if ($starterlabel['kind'] === 'weak' && $starterlabel['label'] !== '') {
+                foreach ($starters as &$starter) {
+                    if (($starter['key'] ?? '') === 'focus-next') {
+                        $starter['name'] = $starterlabel['label'];
+                        break;
+                    }
+                }
+                unset($starter);
+            }
+        }
+
         // Starter icon color (CSS custom property).
         $startericoncolor = get_config('local_ai_course_assistant', 'starter_icon_color') ?: '#023e8a';
 
