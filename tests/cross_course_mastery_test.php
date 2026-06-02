@@ -175,13 +175,26 @@ final class cross_course_mastery_test extends \advanced_testcase {
     // get_transfer_evidence — read-side resolver
     // ───────────────────────────────────────────────────────────
 
-    /** Master an objective for a user with enough correct attempts. */
+    /**
+     * Master an objective for a user with enough correct attempts.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param int $objid
+     * @return void
+     */
     private function master(int $userid, int $courseid, int $objid): void {
         for ($i = 0; $i < 6; $i++) {
             objective_manager::record_attempt($userid, $courseid, $objid, true, 'quiz', 1.0, null, null);
         }
     }
 
+    /**
+     * Enable cross-course mastery (and objectives) for a course.
+     *
+     * @param int $courseid
+     * @return void
+     */
     private function enable_crossmastery(int $courseid): void {
         objective_manager::set_enabled_for_course($courseid, true);
         set_config('crossmastery_enabled_course_' . $courseid, 1, 'local_ai_course_assistant');
