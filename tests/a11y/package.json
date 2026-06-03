@@ -2,11 +2,14 @@
   "name": "sola-a11y",
   "version": "1.0.0",
   "private": true,
-  "description": "Pa11y CI accessibility tests for SOLA Moodle plugin pages",
+  "description": "Accessibility tests for SOLA Moodle plugin pages (axe-core + pa11y-ci)",
   "scripts": {
-    "test": "pa11y-ci --config .pa11yci.json"
+    "test": "node axe-run.js",
+    "test:pa11y": "pa11y-ci --config .pa11yci.json"
   },
   "devDependencies": {
-    "pa11y-ci": "^3.1.0"
+    "axe-core": "^4.2.4",
+    "pa11y-ci": "^3.1.0",
+    "puppeteer": "^9.1.1"
   }
 }
