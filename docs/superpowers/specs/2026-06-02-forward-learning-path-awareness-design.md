@@ -40,9 +40,13 @@ Saylor's "Degrees" are represented in Moodle by the **Programs plugin**.
 - `tool_muprog_prerequisite` and `tool_muprog_allocation` exist with the schemas below and held data (1 row each).
 - Core competency tables are empty (0 rows) — competencies are **not** the path source.
 
-**Assumptions to verify before release (NOT yet confirmed):**
-- **Production table prefix.** The upstream Open LMS Programs plugin uses `enrol_programs_*`; the dev box uses `tool_muprog_*`. Production (learn/degrees) may use either. The adapter (§4.2) detects whichever is present, but the actual prod prefix MUST be confirmed on a prod or prod-like box before release. Do not hard-code one prefix.
-- **Whether any ordered programs exist in real data.** The only dev program is `allinanyorder`. Forward "next course" claims depend on either explicit prerequisites or `allinorder` sets; if real Saylor programs are predominantly any-order with no prerequisites, course-level "next" coverage will be thin and the feature will mostly surface program membership + position. Confirm with real program data during the dev verification step.
+**Production naming (confirmed by route evidence):**
+- Both `learn.saylor.org` and `degrees.saylor.org` serve a live `/enrol/programs/catalogue/index.php` catalog. That route is owned by the upstream **`enrol_programs`** plugin, so **production uses the `enrol_programs_*` table prefix** while dev uses `tool_muprog_*`. The schemas are otherwise identical; the adapter (§4.2) detects whichever prefix is present. (The catalogs require login, so program rows could not be read anonymously; prod row-level confirmation happens during the dev/prod verification step, but the prefix is settled.)
+
+**Two real use cases this must serve (per product owner):**
+- **Degrees (`degrees.saylor.org`)** — more degree sequences *with prerequisites and required order*. Here forward "next course" fires reliably from prerequisite edges and `allinorder` sets.
+- **Learn (`learn.saylor.org`)** — most of the course catalog plus small certificates, *often with little or no required sequence*. Here many programs are any-order with no prerequisites, so the feature surfaces program membership + position (and concept equivalencies when present) but asserts no specific "next course."
+- The design meets both because it only claims "next" where prerequisites or `allinorder` encode it, and otherwise degrades to membership + position. The any-order degradation is a feature, not a gap.
 
 Relevant tables (shown with the verified `tool_muprog_` prefix; any `enrol_programs_` equivalent is expected to be schema-identical and MUST be confirmed):
 
@@ -227,8 +231,8 @@ The `db_program_source` adapter is **verified manually on dev.sylr.org** against
 
 ## 10. Pre-release checklist additions (beyond the standard release flow)
 
-- Confirm the **production** Programs table prefix (`tool_muprog_*` vs `enrol_programs_*`) and that `db_program_source` detects it.
-- Spot-check at least one **ordered** real program (or confirm none exist and accept thinner "next" coverage).
+- Production prefix is `enrol_programs_*` (route-confirmed); verify `db_program_source` detects it and reads `enrol_programs_program/_item/_prerequisite/_allocation/_completion` correctly. Dev remains `tool_muprog_*`.
+- Confirm behavior against both shapes: an **ordered/prereq** degree program (degrees) and an **any-order** Learn program/cert (membership + position only).
 - Standard gates: full plugin suite, validators 36/0, jailbreak 32/32, lang-completeness; version bump; 45-language strings; `.wiki/Changelog.md`; `.drafts/` release notes + walkthrough; tag; GH release; `deploy_dev --target all` + smoke.
 
 ## 11. Out of scope / future
