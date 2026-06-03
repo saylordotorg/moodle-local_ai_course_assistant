@@ -311,6 +311,14 @@ class context_builder {
                 $sections[] = new section('mastery_state', section::CAT_LEARNER, 50, $masteryblock, 0);
             }
         }
+        // v5.8.0 — Forward learning-path awareness (program_path). Independent of
+        // objectives/mastery being enabled; default-off feature flag; silent
+        // no-op where no Moodle Programs plugin or allocation applies.
+        $pathblock = (new \local_ai_course_assistant\program\program_path())
+            ->build_prompt_injection($userid, $courseid);
+        if ($pathblock !== '') {
+            $sections[] = new section('program_path', section::CAT_LEARNER, 45, $pathblock, 0);
+        }
         $studyblock = study_planner::get_plan_context($userid, $courseid);
         if (!empty(trim($studyblock))) {
             $sections[] = new section('study_plan', section::CAT_LEARNER, 40, $studyblock, 0);
