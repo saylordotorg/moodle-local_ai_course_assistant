@@ -100,6 +100,14 @@ class token_cost_manager {
         'meta-llama/llama-3.1-8b-instruct-turbo'   => ['input' => 0.18, 'output' => 0.18],
         'meta-llama/llama-3.1-70b-instruct-turbo'  => ['input' => 0.88, 'output' => 0.88],
         'meta-llama/llama-3.1-405b-instruct-turbo' => ['input' => 3.50, 'output' => 3.50],
+        // Together Serverless "Lite" tier — Llama 3 8B Instruct Lite (flat $0.10/M).
+        // Matches the Together free-account serverless model used in benchmarking.
+        'meta-llama/meta-llama-3-8b-instruct'      => ['input' => 0.10, 'output' => 0.10],
+
+        // ── OpenRouter (routed open-weight) ───────────────────────────────────
+        // Non-turbo llama-3.1-8b-instruct as served via OpenRouter's default
+        // routing. Representative public rate; varies by upstream host.
+        'meta-llama/llama-3.1-8b-instruct'         => ['input' => 0.02, 'output' => 0.03],
 
         // ── Groq (open-source models) ─────────────────────────────────────────
         // Groq charges vary by model; these are approximate hosted rates.
@@ -112,6 +120,8 @@ class token_cost_manager {
         'gemma2-9b'         => ['input' =>  0.20, 'output' =>  0.20],
 
         // ── xAI (Grok) ───────────────────────────────────────────────────────
+        'grok-4-1-fast'     => ['input' =>  0.20, 'output' =>  0.50],
+        'grok-4-fast'       => ['input' =>  0.20, 'output' =>  0.50],
         'grok-3'            => ['input' =>  3.00, 'output' => 15.00],
         'grok-3-mini'       => ['input' =>  0.30, 'output' =>  0.50],
         'grok-2'            => ['input' =>  2.00, 'output' => 10.00],
