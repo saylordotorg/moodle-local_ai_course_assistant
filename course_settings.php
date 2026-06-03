@@ -696,7 +696,7 @@ echo html_writer::div(
         <div class="card-body">
             <p class="text-muted">Control the Voice Tab (settings panel voice options) for this course. By default it inherits the global setting (currently <strong><?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
             <div class="form-group row">
-                <label class="col-sm-3 col-form-label">Voice Tab</label>
+                <label class="col-sm-3 col-form-label" for="voice_tab">Voice Tab</label>
                 <div class="col-sm-9">
                     <select class="form-control" name="voice_tab" id="voice_tab">
                         <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') { echo 'selected'; } ?>>
@@ -724,7 +724,7 @@ echo html_writer::div(
         <div class="card-body">
             <p class="text-muted">Control whether the SOLA drawer opens automatically the first time a student lands on this course. First-visit state is tracked per course in the student's browser via localStorage. By default this course inherits the global setting (currently <strong><?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
             <div class="form-group row">
-                <label class="col-sm-3 col-form-label">Auto-open</label>
+                <label class="col-sm-3 col-form-label" for="auto_open">Auto-open</label>
                 <div class="col-sm-9">
                     <select class="form-control" name="auto_open" id="auto_open">
                         <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') { echo 'selected'; } ?>>
