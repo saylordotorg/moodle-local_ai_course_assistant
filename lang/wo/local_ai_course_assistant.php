@@ -1321,3 +1321,7 @@ $string['objectives:rebuild_links_heading'] = 'Liggéeyu ëmbu ci diggante kurs 
 $string['objectives:rebuild_links_help'] = 'SOLA dafay liggéeyloo pàcc yi mengoo ci diggante kurs yi (ci wàllu ndëgg mbaa ci tur) ngir jàngkat bi ba pare am benn taar ci beneen bërëb bañ koo delloo jàngat. Liggéey yi dañuy tabaxaat boppam guddi gu nekk; jëfandikoo bii butoŋ ngir tabaxaat léegi su nga sopppee pàcc yi.';
 $string['objectives:rebuild_links_button'] = 'Tabaxaat liggéey yi léegi';
 $string['objectives:rebuild_links_done'] = 'Liggéeyu ëmbu ci diggante kurs yi tabaxaat nañu ko: {$a->total} ñoom ñépp ({$a->ref} ci wàllu ndëgg, {$a->exact} tur bu wóor, {$a->fuzzy} tur bu jege).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Xam yoonu jàng bu jëm kanam ci nekk dox ci ñu-am';
+$string['pedagogy:program_path_desc'] = 'Bu nekkee dox, SOLA mën na wax jàngkat bi fan la kurs bii mu ci nekk di jëm ci porогraам bi (degree mbaa sertifika) ak ni xam-xam yu tey di jokkale ak kurs yu ñëw. Dafay jàng plugin Programs bu Moodle (Degrees ak Learn) te day tudd benn kurs bu ñëw bu jaar bu porogaraам bi wax benn lu nuy laaj bu jiitu mbaa benn tegtal bu war; bu ko deful, dafay tegtal fan la jàngkat bi nekk ci yoon wi. Tegtal rekk la — du soppi mukk mbooleem mbaa ëmbu, te day jëfandikoo rekk allocation bu porogaraам bu jàngkat bi ci boppam. Bu amul benn porogaraам bu jaar, dafay noppi te du def dara.';

@@ -1321,3 +1321,7 @@ $string['objectives:rebuild_links_heading'] = '跨课程掌握度关联';
 $string['objectives:rebuild_links_help'] = 'SOLA 会关联跨课程相互匹配的目标（通过能力点引用或标题），使已在别处掌握某主题的学习者无需重复训练。关联每晚自动重建；编辑目标后，可使用此按钮立即重建。';
 $string['objectives:rebuild_links_button'] = '立即重建关联';
 $string['objectives:rebuild_links_done'] = '已重建跨课程掌握度关联：共 {$a->total} 个（按引用 {$a->ref} 个，标题完全匹配 {$a->exact} 个，标题模糊匹配 {$a->fuzzy} 个）。';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = '默认开启前向学习路径感知';
+$string['pedagogy:program_path_desc'] = '开启后，SOLA 可以告诉学习者当前课程在其项目（学位或证书）中接下来通向何处，以及今天的概念如何衔接到后续课程。该功能读取 Moodle Programs 插件（Degrees 和 Learn），仅在项目定义了先修要求或必修顺序时才指明具体的下一门课程；否则只说明学习者在路径中的位置。仅供参考——它绝不会更改注册或掌握度，且始终只使用当前学习者本人的项目分配。在不适用任何项目的情况下，它会静默地不执行任何操作。';

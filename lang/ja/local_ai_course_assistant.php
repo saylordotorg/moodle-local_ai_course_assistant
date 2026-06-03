@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'コース横断の習得状況リ
 $string['objectives:rebuild_links_help'] = 'SOLA は、コース間で一致する目標（コンピテンシー参照またはタイトルによる）をリンクし、別の場所でトピックを習得した学習者が再度繰り返し学習させられないようにします。リンクは毎晩自動的に再構築されます。目標を編集した後にすぐ再構築するには、このボタンを使用してください。';
 $string['objectives:rebuild_links_button'] = '今すぐリンクを再構築';
 $string['objectives:rebuild_links_done'] = 'コース横断の習得状況リンクを再構築しました: 合計 {$a->total} 件（参照による一致 {$a->ref} 件、タイトル完全一致 {$a->exact} 件、タイトル曖昧一致 {$a->fuzzy} 件）。';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = '学習パスの先読み認識をデフォルトで有効にする';
+$string['pedagogy:program_path_desc'] = '有効にすると、SOLAは現在のコースが学習者のプログラム（学位または修了証）の中で次にどこへ続くか、また本日の概念が後続コースへどのようにつながるかを学習者に伝えられます。MoodleのPrograms（プログラム）プラグイン（DegreesおよびLearn）を読み取り、プログラムが前提条件または必須の順序を定義している場合にのみ具体的な次のコースを示し、それ以外の場合は学習パス内での学習者の位置を示します。これは助言のみを目的としており — 履修登録や習熟度を変更することは一切なく、常に現在の学習者自身のプログラム割り当てのみを使用します。該当するプログラムがない場合は、何もせずに静かに処理を終えます。';

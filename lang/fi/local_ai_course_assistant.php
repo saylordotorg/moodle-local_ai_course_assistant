@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Kurssien väliset osaamislinkit';
 $string['objectives:rebuild_links_help'] = 'SOLA linkittää eri kurssien osaamistavoitteet, jotka vastaavat toisiaan (osaamisviitteen tai otsikon perusteella), jotta oppijaa, joka on saavuttanut aiheen osaamisen muualla, ei harjoituteta uudelleen. Linkit rakennetaan uudelleen automaattisesti joka yö; rakenna ne tällä painikkeella heti uudelleen osaamistavoitteiden muokkaamisen jälkeen.';
 $string['objectives:rebuild_links_button'] = 'Rakenna linkit uudelleen nyt';
 $string['objectives:rebuild_links_done'] = 'Kurssien väliset osaamislinkit rakennettu uudelleen: {$a->total} yhteensä ({$a->ref} viitteen perusteella, {$a->exact} tarkka otsikko, {$a->fuzzy} sumea otsikko).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Tulevan oppimispolun tunnistus oletusarvoisesti käytössä';
+$string['pedagogy:program_path_desc'] = 'Kun tämä on käytössä, SOLA voi kertoa opiskelijalle, mihin nykyinen kurssi johtaa seuraavaksi hänen ohjelmassaan (tutkinto tai todistus) ja miten päivän käsitteet linkittyvät myöhempiin kursseihin. Se lukee Moodlen Programs-lisäosaa (Degrees ja Learn) ja nimeää tietyn seuraavan kurssin vain silloin, kun ohjelma määrittää esitietovaatimuksen tai pakollisen järjestyksen; muutoin se ilmoittaa opiskelijan sijainnin polulla. Vain ohjaava — se ei koskaan muuta ilmoittautumista tai osaamista, ja se käyttää aina vain nykyisen opiskelijan omaa ohjelmasijoitusta. Ei tee mitään äänettömästi silloin, kun mikään ohjelma ei sovellu.';

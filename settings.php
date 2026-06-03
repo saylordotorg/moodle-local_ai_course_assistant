@@ -1378,6 +1378,7 @@ if ($hassiteconfig) {
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
         'crossmastery_enabled'    => 'pedagogy:crossmastery',
         'mastery_starter_enabled' => 'pedagogy:mastery_starter',
+        'program_path_enabled'    => 'pedagogy:program_path',
     ] as $key => $stringkey) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,

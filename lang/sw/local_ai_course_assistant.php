@@ -1321,3 +1321,7 @@ $string['objectives:rebuild_links_heading'] = 'Viungo vya umahiri wa kozi mtambu
 $string['objectives:rebuild_links_help'] = 'SOLA inaunganisha malengo yanayolingana katika kozi tofauti (kwa kumbukumbu ya umahiri au kichwa) ili mwanafunzi aliyebobea mada mahali pengine asilirudie tena. Viungo hujengwa upya kiotomatiki kila usiku; tumia kitufe hiki kujenga upya sasa baada ya kuhariri malengo.';
 $string['objectives:rebuild_links_button'] = 'Jenga upya viungo sasa';
 $string['objectives:rebuild_links_done'] = 'Viungo vya umahiri wa kozi mtambuka vimejengwa upya: {$a->total} jumla ({$a->ref} kwa kumbukumbu, {$a->exact} kichwa kamili, {$a->fuzzy} kichwa cha makadirio).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Utambuzi wa njia ya mbele ya kujifunza umewashwa kwa chaguo-msingi';
+$string['pedagogy:program_path_desc'] = 'Inapowashwa, SOLA inaweza kumweleza mwanafunzi mahali kozi ya sasa inakoelekea katika programu yake (shahada au cheti) na jinsi dhana za leo zinavyounganisha na kozi za baadaye. Inasoma programu-jalizi ya Moodle Programs (Degrees na Learn) na inataja kozi mahususi inayofuata pale tu ambapo programu inafafanua sharti la awali au mpangilio unaohitajika; vinginevyo inaonyesha nafasi ya mwanafunzi katika njia hiyo. Ni ushauri pekee — kamwe haibadilishi udahili au umahiri, na hutumia tu mgao wa programu wa mwanafunzi wa sasa mwenyewe. Haifanyi chochote kimyakimya pale ambapo hakuna programu inayohusika.';

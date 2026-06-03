@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Kurslar arası yetkinlik bağlant
 $string['objectives:rebuild_links_help'] = 'SOLA, kurslar arasında eşleşen hedefleri (yetkinlik referansı veya başlığa göre) bağlar; böylece bir konuyu başka bir yerde kazanmış öğrenci konuyu yeniden çalışmak zorunda kalmaz. Bağlantılar her gece otomatik olarak yeniden oluşturulur; hedefleri düzenledikten sonra şimdi yeniden oluşturmak için bu düğmeyi kullanın.';
 $string['objectives:rebuild_links_button'] = 'Bağlantıları şimdi yeniden oluştur';
 $string['objectives:rebuild_links_done'] = 'Kurslar arası yetkinlik bağlantıları yeniden oluşturuldu: toplam {$a->total} ({$a->ref} referansa göre, {$a->exact} tam başlık, {$a->fuzzy} bulanık başlık).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'İleri öğrenme yolu farkındalığı varsayılan olarak açık';
+$string['pedagogy:program_path_desc'] = 'Açık olduğunda SOLA, mevcut dersin öğrencinin programında (derece veya sertifika) bir sonraki adımda nereye götürdüğünü ve bugünkü kavramların sonraki derslere nasıl köprü oluşturduğunu öğrenciye anlatabilir. Moodle Programs eklentisini (Degrees ve Learn) okur ve yalnızca programın bir ön koşul veya zorunlu sıralama tanımladığı yerlerde belirli bir sonraki dersin adını verir; aksi takdirde öğrencinin yoldaki konumunu belirtir. Yalnızca bilgilendirme amaçlıdır — kayıt veya ustalık durumunu asla değiştirmez ve yalnızca mevcut öğrencinin kendi program tahsisini kullanır. Hiçbir programın geçerli olmadığı durumlarda sessizce hiçbir şey yapmaz.';

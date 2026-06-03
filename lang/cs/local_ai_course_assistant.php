@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Odkazy zvládnutí napříč kurz
 $string['objectives:rebuild_links_help'] = 'SOLA propojuje cíle, které si odpovídají napříč kurzy (na základě odkazu na kompetenci nebo názvu), aby student, který dané téma zvládl jinde, nemusel znovu procvičovat. Odkazy se přestavují automaticky každou noc; toto tlačítko použijte k okamžitému přestavění po úpravě cílů.';
 $string['objectives:rebuild_links_button'] = 'Přestavět odkazy nyní';
 $string['objectives:rebuild_links_done'] = 'Odkazy zvládnutí napříč kurzy přestavěny: celkem {$a->total} ({$a->ref} podle odkazu, {$a->exact} přesná shoda názvu, {$a->fuzzy} přibližná shoda názvu).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Povědomí o budoucí studijní cestě ve výchozím nastavení zapnuto';
+$string['pedagogy:program_path_desc'] = 'Když je zapnuto, SOLA může studujícímu sdělit, kam aktuální kurz vede dál v rámci jeho programu (titulu nebo certifikátu) a jak dnešní pojmy navazují na pozdější kurzy. Načítá data z pluginu Moodle Programs (Degrees a Learn) a konkrétní následující kurz pojmenuje pouze tam, kde program definuje předpoklad nebo požadované pořadí; jinak uvede pozici studujícího v této cestě. Pouze poradní funkce — nikdy nemění zápis ani zvládnutí učiva a vždy používá výhradně přiřazení k programu daného studujícího. Tam, kde se žádný program neuplatní, tiše nedělá nic.';

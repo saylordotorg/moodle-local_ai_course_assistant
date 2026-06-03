@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Prepojenia ovládania naprieč ku
 $string['objectives:rebuild_links_help'] = 'SOLA prepája ciele, ktoré sa zhodujú naprieč kurzami (na základe odkazu na kompetenciu alebo názvu), aby študent, ktorý tému zvládol inde, nemusel znova precvičovať. Prepojenia sa automaticky obnovujú každú noc; toto tlačidlo použite na okamžité obnovenie po úprave cieľov.';
 $string['objectives:rebuild_links_button'] = 'Obnoviť prepojenia teraz';
 $string['objectives:rebuild_links_done'] = 'Prepojenia ovládania naprieč kurzami obnovené: {$a->total} celkovo ({$a->ref} podľa odkazu, {$a->exact} podľa presného názvu, {$a->fuzzy} podľa približného názvu).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Predvolene zapnuté povedomie o ďalšom postupe vo vzdelávacej ceste';
+$string['pedagogy:program_path_desc'] = 'Keď je táto možnosť zapnutá, SOLA dokáže študentovi povedať, kam aktuálny kurz vedie ďalej v jeho programe (titul alebo certifikát) a ako dnešné koncepty nadväzujú na neskoršie kurzy. Číta z pluginu Moodle Programs (Degrees a Learn) a konkrétny ďalší kurz pomenuje len tam, kde program definuje prerekvizitu alebo požadované poradie; inak uvedie pozíciu študenta vo vzdelávacej ceste. Má len poradný charakter — nikdy nemení zápis ani úroveň zvládnutia a vždy používa iba zaradenie aktuálneho študenta do jeho vlastného programu. Tam, kde sa žiadny program neuplatňuje, ticho nevykoná nič.';

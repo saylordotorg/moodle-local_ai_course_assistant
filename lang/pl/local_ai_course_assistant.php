@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Powiązania opanowania między ku
 $string['objectives:rebuild_links_help'] = 'SOLA łączy cele, które pasują do siebie w różnych kursach (na podstawie odniesienia do kompetencji lub tytułu), aby uczący się, który opanował dany temat gdzie indziej, nie musiał go ponownie ćwiczyć. Powiązania są przebudowywane automatycznie co noc; użyj tego przycisku, aby przebudować je teraz po edycji celów.';
 $string['objectives:rebuild_links_button'] = 'Przebuduj powiązania teraz';
 $string['objectives:rebuild_links_done'] = 'Przebudowano powiązania opanowania między kursami: {$a->total} łącznie ({$a->ref} według odniesienia, {$a->exact} dokładny tytuł, {$a->fuzzy} przybliżony tytuł).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Świadomość dalszej ścieżki nauki domyślnie włączona';
+$string['pedagogy:program_path_desc'] = 'Po włączeniu SOLA może wskazać uczącemu się, dokąd prowadzi bieżący kurs w jego programie (studiach lub certyfikacie) i jak dzisiejsze pojęcia łączą się z późniejszymi kursami. Odczytuje dane z wtyczki Programs w Moodle (Degrees i Learn) i nazywa konkretny następny kurs tylko tam, gdzie program definiuje warunek wstępny lub wymaganą kolejność; w pozostałych przypadkach wskazuje pozycję uczącego się na ścieżce. Funkcja wyłącznie doradcza — nigdy nie zmienia zapisów na kursy ani biegłości i zawsze korzysta jedynie z przydziału programu danego uczącego się. Po cichu nie podejmuje żadnych działań tam, gdzie żaden program nie ma zastosowania.';

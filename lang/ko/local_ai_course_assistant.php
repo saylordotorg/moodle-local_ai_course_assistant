@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = '과정 간 숙달도 링크';
 $string['objectives:rebuild_links_help'] = 'SOLA는 과정 간에 일치하는 학습 목표(역량 참조 또는 제목 기준)를 연결하여, 다른 곳에서 주제를 숙달한 학습자가 다시 반복 학습하지 않도록 합니다. 링크는 매일 밤 자동으로 재구축됩니다. 학습 목표를 편집한 후 지금 바로 재구축하려면 이 버튼을 사용하세요.';
 $string['objectives:rebuild_links_button'] = '지금 링크 재구축';
 $string['objectives:rebuild_links_done'] = '과정 간 숙달도 링크가 재구축되었습니다: 총 {$a->total}개 (참조 기준 {$a->ref}개, 제목 정확 일치 {$a->exact}개, 제목 유사 일치 {$a->fuzzy}개).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = '기본적으로 향후 학습 경로 인식 사용';
+$string['pedagogy:program_path_desc'] = '이 기능을 사용하면 SOLA가 학습자에게 현재 강좌가 자신의 프로그램(학위 또는 수료증) 내에서 다음에 어디로 이어지는지, 그리고 오늘 배운 개념이 이후 강좌와 어떻게 연결되는지 알려줄 수 있습니다. Moodle Programs 플러그인(Degrees 및 Learn)을 읽어와, 프로그램이 선수 요건이나 필수 이수 순서를 정의한 경우에만 특정 다음 강좌를 명시하며, 그렇지 않은 경우에는 학습자가 경로에서 차지하는 위치를 안내합니다. 안내 전용 기능입니다 — 수강 등록이나 숙달도를 절대 변경하지 않으며, 항상 현재 학습자 본인의 프로그램 배정만 사용합니다. 적용되는 프로그램이 없는 경우에는 아무 동작도 하지 않습니다.';

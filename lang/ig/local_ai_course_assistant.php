@@ -1315,3 +1315,7 @@ $string['objectives:rebuild_links_heading'] = 'Njikọ ọmụma n\'agbata usoro
 $string['objectives:rebuild_links_help'] = 'SOLA na-ejikọ ihe mgbaru ọsọ ndị dabara n\'agbata usoro ọmụmụ (site na ntụaka inwe ike ma ọ bụ aha) ka onye mmụta nke maralarị isiokwu n\'ebe ọzọ ghara ịmụgharị ya ọzọ. A na-ewughachi njikọ ndị a na-akpaghị aka kwa abalị; jiri bọtịnụ a wughachi ugbu a mgbe ị dezigharịchara ihe mgbaru ọsọ.';
 $string['objectives:rebuild_links_button'] = 'Wughachi njikọ ugbu a';
 $string['objectives:rebuild_links_done'] = 'E wughachiri njikọ ọmụma n\'agbata usoro ọmụmụ: {$a->total} nchịkọta ({$a->ref} site na ntụaka, {$a->exact} aha kpọmkwem, {$a->fuzzy} aha yiri ya).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Mmata ụzọ mmụta n\'ihu na-arụ ọrụ site na ndabara';
+$string['pedagogy:program_path_desc'] = 'Mgbe ọ na-arụ ọrụ, SOLA nwere ike ịgwa onye na-amụ ihe ebe usoro ọmụmụ a na-eduga na-aga ọzọ na mmemme ha (akara mmụta ma ọ bụ asambodo) na otú echiche nke taa si jikọta na nkuzi ndị na-abịa n\'ihu. Ọ na-agụ ngwa Moodle Programs (Degrees na Learn) ma na-akpọ aha otu nkuzi ọzọ kpọmkwem naanị ebe mmemme na-akọwa ihe achọrọ tupu mmalite ma ọ bụ usoro achọrọ; ma ọ bụghị ya, ọ na-akọwa ọnọdụ onye na-amụ ihe n\'ụzọ ahụ. Naanị ndụmọdụ — ọ naghị agbanwe ndenye aha ma ọ bụ mmụta zuru oke, ọ na-eji naanị nkesa mmemme nke onye na-amụ ihe ugbu a. Ọ na-eme ihe ọ bụla na nzuzo ebe ọ dịghị mmemme metụtara ya.';

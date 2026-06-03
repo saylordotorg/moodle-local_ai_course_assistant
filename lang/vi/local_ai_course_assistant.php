@@ -1321,3 +1321,7 @@ $string['objectives:rebuild_links_heading'] = 'Liên kết mức độ thành th
 $string['objectives:rebuild_links_help'] = 'SOLA liên kết các mục tiêu khớp với nhau giữa các khóa học (theo mã tham chiếu năng lực hoặc tiêu đề) để học viên đã thành thạo một chủ đề ở nơi khác không phải luyện lại. Các liên kết được tạo lại tự động vào mỗi đêm; dùng nút này để tạo lại ngay sau khi chỉnh sửa mục tiêu.';
 $string['objectives:rebuild_links_button'] = 'Tạo lại liên kết ngay';
 $string['objectives:rebuild_links_done'] = 'Đã tạo lại liên kết mức độ thành thạo liên khóa học: tổng cộng {$a->total} ({$a->ref} theo tham chiếu, {$a->exact} khớp tiêu đề chính xác, {$a->fuzzy} khớp tiêu đề gần đúng).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Bật nhận biết lộ trình học tập phía trước theo mặc định';
+$string['pedagogy:program_path_desc'] = 'Khi được bật, SOLA có thể cho người học biết khóa học hiện tại dẫn đến đâu tiếp theo trong chương trình của họ (bằng cấp hoặc chứng chỉ) và các khái niệm hôm nay kết nối thế nào với những khóa học sau. Nó đọc plugin Programs của Moodle (Degrees và Learn) và chỉ nêu tên một khóa học tiếp theo cụ thể khi chương trình xác định điều kiện tiên quyết hoặc thứ tự bắt buộc; nếu không, nó ghi nhận vị trí của người học trong lộ trình. Chỉ mang tính tư vấn — nó không bao giờ thay đổi việc ghi danh hay mức độ thành thạo, và chỉ luôn sử dụng phân bổ chương trình của chính người học hiện tại. Tự động không làm gì khi không có chương trình nào áp dụng.';
