@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Mestringskoblinger på tvers av k
 $string['objectives:rebuild_links_help'] = 'SOLA kobler sammen læringsmål som samsvarer på tvers av kurs (etter kompetansereferanse eller tittel), slik at en deltaker som har mestret et tema andre steder, ikke øver det inn på nytt. Koblingene bygges om automatisk hver natt; bruk denne knappen for å bygge om nå etter at du har redigert læringsmål.';
 $string['objectives:rebuild_links_button'] = 'Bygg om koblinger nå';
 $string['objectives:rebuild_links_done'] = 'Mestringskoblinger på tvers av kurs ble bygd om: {$a->total} totalt ({$a->ref} etter referanse, {$a->exact} nøyaktig tittel, {$a->fuzzy} omtrentlig tittel).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Bevissthet om videre læringssti på som standard';
+$string['pedagogy:program_path_desc'] = 'Når dette er på, kan SOLA fortelle en student hvor det gjeldende kurset leder videre i programmet (grad eller sertifikat) og hvordan dagens begreper bygger bro til senere kurs. Leser Moodle Programs-tillegget (Degrees og Learn) og navngir et bestemt neste kurs bare der programmet definerer en forkunnskap eller en påkrevd rekkefølge; ellers angir det studentens plassering i stien. Kun veiledende — det endrer aldri påmelding eller mestring, og bruker alltid bare den gjeldende studentens egen programtildeling. Gjør stille ingenting der ingen program gjelder.';

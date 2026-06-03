@@ -1329,3 +1329,7 @@ $string['objectives:rebuild_links_heading'] = 'Tautan penguasaan lintas kursus';
 $string['objectives:rebuild_links_help'] = 'SOLA menautkan tujuan yang cocok antar kursus (berdasarkan referensi kompetensi atau judul) sehingga pelajar yang telah menguasai suatu topik di tempat lain tidak dilatih kembali. Tautan dibangun ulang secara otomatis setiap malam; gunakan tombol ini untuk membangun ulang sekarang setelah menyunting tujuan.';
 $string['objectives:rebuild_links_button'] = 'Bangun ulang tautan sekarang';
 $string['objectives:rebuild_links_done'] = 'Tautan penguasaan lintas kursus dibangun ulang: {$a->total} total ({$a->ref} berdasarkan referensi, {$a->exact} judul persis, {$a->fuzzy} judul mirip).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Kesadaran jalur belajar ke depan aktif secara default';
+$string['pedagogy:program_path_desc'] = 'Saat aktif, SOLA dapat memberi tahu pelajar ke mana kursus saat ini akan mengarah berikutnya dalam program mereka (gelar atau sertifikat) dan bagaimana konsep hari ini menjembatani ke kursus-kursus selanjutnya. Membaca plugin Moodle Programs (Degrees dan Learn) dan menyebutkan kursus berikutnya yang spesifik hanya jika program tersebut menetapkan prasyarat atau urutan yang diwajibkan; jika tidak, ia mencatat posisi pelajar dalam jalur tersebut. Bersifat saran saja — tidak pernah mengubah pendaftaran atau penguasaan, dan hanya menggunakan alokasi program milik pelajar saat ini. Secara diam-diam tidak melakukan apa pun jika tidak ada program yang berlaku.';

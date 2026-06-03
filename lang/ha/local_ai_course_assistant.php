@@ -1329,3 +1329,7 @@ $string['objectives:rebuild_links_heading'] = 'Mahaɗan cancanta a tsakanin daru
 $string['objectives:rebuild_links_help'] = 'SOLA na haɗa manufofin da suka yi daidai a tsakanin darussa (ta hanyar nuni ko taken cancanta) saboda kada a sake jarrabtar mai koyon da ya kware a wani batu a wani waje. Mahaɗan suna sake ginawa kai tsaye kowane dare; yi amfani da wannan maɓallin don sake ginawa yanzu bayan gyara manufofi.';
 $string['objectives:rebuild_links_button'] = 'Sake gina mahaɗa yanzu';
 $string['objectives:rebuild_links_done'] = 'An sake gina mahaɗan cancanta a tsakanin darussa: {$a->total} gaba ɗaya ({$a->ref} ta nuni, {$a->exact} cikakken taken, {$a->fuzzy} taken kusa-kusa).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Sanin hanyar koyo ta gaba a buɗe ta tsohuwar saiti';
+$string['pedagogy:program_path_desc'] = 'Lokacin da yake a buɗe, SOLA na iya gaya wa mai koyo inda darasin yanzu ke kaiwa na gaba a cikin shirinsa (digiri ko takardar shaida) da yadda dabarun yau suke haɗawa zuwa darussan baya. Yana karanta plugin ɗin Moodle Programs (Degrees da Learn) kuma yana ambaton wani takamaiman darasi na gaba kawai inda shirin ya bayyana sharaɗin gaba ko tsari da ake buƙata; in ba haka ba sai ya lura da matsayin mai koyo a cikin hanyar. Don shawara kawai — ba ya taɓa canza rajista ko ƙwarewa, kuma yana amfani da rabon shirin mai koyo na yanzu kawai. Yana yin shiru ba tare da yin komai ba inda babu shirin da ya dace.';

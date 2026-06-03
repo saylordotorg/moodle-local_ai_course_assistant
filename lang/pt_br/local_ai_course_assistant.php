@@ -1321,3 +1321,7 @@ $string['objectives:rebuild_links_heading'] = 'Vínculos de domínio entre curso
 $string['objectives:rebuild_links_help'] = 'O SOLA vincula objetivos que correspondem entre cursos (por referência de competência ou por título) para que um aluno que dominou um tópico em outro lugar não precise exercitá-lo novamente. Os vínculos são reconstruídos automaticamente todas as noites; use este botão para reconstruí-los agora após editar os objetivos.';
 $string['objectives:rebuild_links_button'] = 'Reconstruir vínculos agora';
 $string['objectives:rebuild_links_done'] = 'Vínculos de domínio entre cursos reconstruídos: {$a->total} no total ({$a->ref} por referência, {$a->exact} por título exato, {$a->fuzzy} por título aproximado).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Reconhecimento do caminho de aprendizagem futuro ativado por padrão';
+$string['pedagogy:program_path_desc'] = 'Quando ativado, o SOLA pode dizer ao aluno para onde o curso atual leva em seguida em seu programa (diploma ou certificado) e como os conceitos de hoje se conectam aos cursos posteriores. Lê o plugin Programs do Moodle (Degrees e Learn) e nomeia um curso seguinte específico apenas quando o programa define um pré-requisito ou uma ordem obrigatória; caso contrário, indica a posição do aluno no caminho. Apenas consultivo — nunca altera matrículas ou domínio, e usa somente a alocação de programa do próprio aluno atual. Não faz nada de forma silenciosa quando nenhum programa se aplica.';

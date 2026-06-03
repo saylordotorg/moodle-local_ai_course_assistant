@@ -1298,3 +1298,7 @@ $string['objectives:rebuild_links_heading'] = 'Beherskelseslinks på tværs af k
 $string['objectives:rebuild_links_help'] = 'SOLA linker læringsmål, der matcher på tværs af kurser (via kompetencereference eller titel), så en deltager, der har behersket et emne andetsteds, ikke skal gennemgå det igen. Links genopbygges automatisk hver nat; brug denne knap til at genopbygge nu efter redigering af læringsmål.';
 $string['objectives:rebuild_links_button'] = 'Genopbyg links nu';
 $string['objectives:rebuild_links_done'] = 'Beherskelseslinks på tværs af kurser genopbygget: {$a->total} i alt ({$a->ref} via reference, {$a->exact} nøjagtig titel, {$a->fuzzy} omtrentlig titel).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Bevidsthed om fremadrettet læringsforløb slået til som standard';
+$string['pedagogy:program_path_desc'] = 'Når denne er slået til, kan SOLA fortælle en studerende, hvor det aktuelle kursus fører hen derefter i deres program (grad eller certifikat), og hvordan dagens begreber bygger bro til senere kurser. Den læser fra Moodle Programs-pluginet (Degrees og Learn) og navngiver kun et bestemt næste kursus, hvor programmet definerer en forudsætning eller en obligatorisk rækkefølge; ellers angiver den den studerendes placering i forløbet. Kun vejledende — den ændrer aldrig tilmelding eller mestring og anvender kun den aktuelle studerendes egen programtildeling. Gør i det stille ingenting, hvor intet program er relevant.';

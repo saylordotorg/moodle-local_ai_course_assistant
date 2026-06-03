@@ -1321,3 +1321,7 @@ $string['objectives:rebuild_links_heading'] = 'Àwọn ìjápọ̀ ìmọ̀ jíj
 $string['objectives:rebuild_links_help'] = 'SOLA á so àwọn ète tí ó bára pọ̀ káàkiri àwọn ẹ̀kọ́ (nípa ìtọ́kasí ìmọ̀-ìṣẹ́ tàbí àkòlé) kí akẹ́kọ̀ọ́ tí ó ti ní ìmọ̀ jíjinlẹ̀ lórí kókó kan ní ibòmíràn má bàa tún un kọ́ láti ìbẹ̀rẹ̀. Àwọn ìjápọ̀ á tún ara wọn kọ́ ní aṣálẹ́-ọ̀sán; lo bọ́tìnnì yìí láti tún wọn kọ́ nísinsìnyí lẹ́yìn títúnṣe àwọn ète.';
 $string['objectives:rebuild_links_button'] = 'Tún àwọn ìjápọ̀ kọ́ nísinsìnyí';
 $string['objectives:rebuild_links_done'] = 'A ti tún àwọn ìjápọ̀ ìmọ̀ jíjinlẹ̀ káàkiri ẹ̀kọ́ kọ́: {$a->total} lápapọ̀ ({$a->ref} nípa ìtọ́kasí, {$a->exact} àkòlé pípé, {$a->fuzzy} àkòlé tí kò gún régé).';
+
+// Forward learning-path awareness (v5.8.0).
+$string['pedagogy:program_path'] = 'Mọ̀ ọ̀nà ìkẹ́kọ̀ọ́ síwájú ní ìpilẹ̀ṣẹ̀';
+$string['pedagogy:program_path_desc'] = 'Nígbà tó bá ṣiṣẹ́, SOLA lè sọ fún akẹ́kọ̀ọ́ ibi tí ẹ̀kọ́ tó wà lọ́wọ́lọ́wọ́ ń darí sí nínú ìtòlẹ́sẹẹsẹ rẹ̀ (oyè tàbí ìwé ẹ̀rí) àti bí àwọn èròjà òní ṣe ń so pọ̀ mọ́ àwọn ẹ̀kọ́ tó ń tẹ̀lé. Ó ń ka àfikún Moodle Programs (Degrees àti Learn) ó sì ń dárúkọ ẹ̀kọ́ tó ń tẹ̀lé pàtó kìkì níbi tí ìtòlẹ́sẹẹsẹ náà bá ti ṣàlàyé ohun tó gbọ́dọ̀ wà ṣáájú tàbí ètò tó pọn dandan; bí bẹ́ẹ̀ kọ́, ó máa ṣàkíyèsí ipò akẹ́kọ̀ọ́ nínú ọ̀nà náà. Fún ìmọ̀ràn nìkan — kò yí ìforúkọsílẹ̀ tàbí ìmọ̀ràn ìkẹ́kọ̀ọ́ padà rárá, ó sì ń lo ìpín ìtòlẹ́sẹẹsẹ ti akẹ́kọ̀ọ́ tó wà lọ́wọ́lọ́wọ́ fúnra rẹ̀ nìkan. Ó ń dákẹ́ jẹ́ẹ́ láìṣe ohunkóhun níbi tí kò sí ìtòlẹ́sẹẹsẹ tó bá a mu.';
