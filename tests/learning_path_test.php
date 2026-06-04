@@ -137,4 +137,34 @@ final class learning_path_test extends \advanced_testcase {
         $this->assertSame(202, $model['courses'][1]['courseid']);
         $this->assertSame(2, $model['courses'][1]['position']);
     }
+
+    public function test_external_get_learning_path_empty_without_program(): void {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user((int) $user->id, (int) $course->id, 'student');
+        set_config('learning_path_enabled', '1', 'local_ai_course_assistant');
+        $this->setUser($user);
+
+        $raw = \local_ai_course_assistant\external\get_learning_path::execute((int) $course->id);
+        // clean_returnvalue enforces the declared external structure.
+        $result = \core_external\external_api::clean_returnvalue(
+            \local_ai_course_assistant\external\get_learning_path::execute_returns(),
+            $raw
+        );
+        // No Programs plugin tables in the test DB -> live source unavailable -> empty path.
+        $this->assertFalse($result['has_path']);
+        $this->assertSame('', $result['program_name']);
+        $this->assertSame([], $result['courses']);
+    }
+
+    public function test_external_get_learning_path_requires_enrolment(): void {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        // Not enrolled: no local/ai_course_assistant:use in the course context.
+        $this->setUser($user);
+        $this->expectException(\moodle_exception::class);
+        \local_ai_course_assistant\external\get_learning_path::execute((int) $course->id);
+    }
 }
