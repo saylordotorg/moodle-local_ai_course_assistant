@@ -10,9 +10,11 @@
 #      every page to the upgrade screen:
 #        /opt/homebrew/opt/php@8.3/bin/php ~/Sites/moodle/admin/cli/upgrade.php --non-interactive
 #
-# Default engine is the puppeteer + axe-core runner (axe-run.js), which logs in
-# reliably where pa11y's action DSL cannot. Pass --pa11y to use the legacy
-# pa11y-ci engine instead.
+# The runner is the puppeteer + axe-core engine (axe-run.js): it logs in once via
+# the real login form and reuses the session. The former pa11y-ci fallback was
+# removed in v5.8.1 — its action-DSL login never drove Moodle's login form
+# locally (verified again against pa11y-ci 4.1.1), so it only ever reported
+# false timeouts and exercised nothing in CI.
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -20,11 +22,6 @@ cd "$(dirname "$0")"
 if [ ! -d node_modules ]; then
   echo "Installing dependencies..."
   npm install --no-audit --no-fund
-fi
-
-if [ "${1:-}" = "--pa11y" ]; then
-  shift
-  exec npx pa11y-ci --config .pa11yci.json "$@"
 fi
 
 exec node axe-run.js "$@"

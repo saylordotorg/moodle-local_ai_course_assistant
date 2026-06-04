@@ -5,8 +5,8 @@
 # we DO depend on:
 #
 # 1. npm (devDependencies) — cdn/ build chain (rollup) and tests/a11y/
-#    (pa11y-ci). These are dev-only; a vulnerable transitive package
-#    in either folder cannot reach a learner. Updated weekly.
+#    (axe-core + puppeteer). These are dev-only; a vulnerable transitive
+#    package in either folder cannot reach a learner. Updated weekly.
 #
 # 2. github-actions — the workflows in .github/workflows/ pin
 #    moodlehq/moodle-plugin-ci, shivammathur/setup-php, etc. Updated
