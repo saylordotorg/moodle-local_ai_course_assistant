@@ -80,9 +80,36 @@ class program_path {
         }
         // The learner's own allocations drive "your path". The course-membership
         // fallback is intentionally OFF by default (honesty rule).
-        $candidates = $this->source->get_user_programs($userid);
+        foreach ($this->program_memberships($userid, $courseid) as $m) {
+            $programid = (int) $m['programid'];
+            $next = $this->compute_next_courses($userid, $programid, $courseid, $m['courses']);
+            if ($m['total'] < 2 && empty($next)) {
+                continue;
+            }
+            return [
+                'program' => ['programid' => $programid, 'name' => (string) $m['name']],
+                'position' => ['index' => $m['index'], 'total' => $m['total']],
+                'next_courses' => $next,
+                'concept_links' => $this->compute_concept_links($courseid, $next),
+            ];
+        }
+        return null;
+    }
 
-        foreach ($candidates as $prog) {
+    /**
+     * Every program (in allocation order) in which this course is a visible
+     * member, with the course list and the learner's 1-based position. Shared
+     * by {@see forward_context()} and the v5.9.0 learning_path aggregator so the
+     * program-resolution walk lives in one place. Honesty rule preserved: driven
+     * by the learner's own allocations via {@see program_source_interface::get_user_programs()}.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array<int, array{programid:int, name:string, courses:array, visible:array, index:int, total:int}>
+     */
+    public function program_memberships(int $userid, int $courseid): array {
+        $out = [];
+        foreach ($this->source->get_user_programs($userid) as $prog) {
             $programid = (int) $prog['programid'];
             $courses = $this->source->get_program_courses($programid);
             $visible = array_values(array_filter($courses, static fn($c) => !empty($c['visible'])));
@@ -97,19 +124,16 @@ class program_path {
             if ($index === null) {
                 continue;
             }
-            $total = count($visible);
-            $next = $this->compute_next_courses($userid, $programid, $courseid, $courses);
-            if ($total < 2 && empty($next)) {
-                continue;
-            }
-            return [
-                'program' => ['programid' => $programid, 'name' => (string) $prog['name']],
-                'position' => ['index' => $index, 'total' => $total],
-                'next_courses' => $next,
-                'concept_links' => $this->compute_concept_links($courseid, $next),
+            $out[] = [
+                'programid' => $programid,
+                'name' => (string) $prog['name'],
+                'courses' => $courses,
+                'visible' => $visible,
+                'index' => $index,
+                'total' => count($visible),
             ];
         }
-        return null;
+        return $out;
     }
 
     /**
