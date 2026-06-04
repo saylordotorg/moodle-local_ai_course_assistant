@@ -55,7 +55,14 @@ final class learning_path_test extends \advanced_testcase {
         return new stub_program_source(['available' => true]);
     }
 
-    /** Master the first $count objectives in $courseid for $userid (enough attempts to cross the bar). */
+    /**
+     * Master the leading objectives for the learner (enough attempts to cross the bar).
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param array $objids Objective ids, in order.
+     * @param int $count How many of the leading objectives to master.
+     */
     private function master(int $userid, int $courseid, array $objids, int $count): void {
         for ($i = 0; $i < $count; $i++) {
             for ($a = 0; $a < 8; $a++) {
@@ -64,7 +71,13 @@ final class learning_path_test extends \advanced_testcase {
         }
     }
 
-    /** Create $n objectives in $courseid, return their ids. */
+    /**
+     * Create $n objectives in a course.
+     *
+     * @param int $courseid
+     * @param int $n Number of objectives to create.
+     * @return array Objective ids, in creation order.
+     */
     private function objectives(int $courseid, int $n): array {
         $ids = [];
         for ($i = 0; $i < $n; $i++) {
