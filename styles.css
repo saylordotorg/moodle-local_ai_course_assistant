@@ -5236,3 +5236,17 @@ a.aica-history-panel__source:hover {
     background: rgba(0, 0, 0, 0.08);
     border-radius: 4px;
 }
+
+/*
+ * Accessibility: WCAG 2.1 SC 1.4.1 (Use of Color). Links sitting inside muted
+ * helper text (.text-muted / .form-text / .small) inherit Moodle's link colour
+ * against a low-contrast grey, which axe-core flags as `link-in-text-block`
+ * (the link is distinguishable from surrounding text by colour alone). Underline
+ * them so they carry a non-colour cue. Scoped to this plugin's own pages via the
+ * body id prefix so it never restyles links elsewhere in Moodle.
+ */
+[id^="page-local-ai_course_assistant"] .text-muted > a,
+[id^="page-local-ai_course_assistant"] .form-text > a,
+[id^="page-local-ai_course_assistant"] .small > a {
+    text-decoration: underline;
+}

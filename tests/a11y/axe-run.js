@@ -6,9 +6,9 @@
  * pa11y's action DSL ("set field" / "click element") does not reliably drive
  * Moodle's login form in a local php -S environment, so every page times out
  * waiting for /my/. This runner logs in once with a real puppeteer session,
- * reuses the cookie jar for every page, injects axe-core, and runs the same
- * WCAG2AA standard. It shares its URL list and ignore rules with .pa11yci.json
- * so the two harnesses stay in sync.
+ * reuses the cookie jar for every page, injects axe-core, and runs the WCAG2AA
+ * standard. The pa11y-ci fallback was retired in v5.8.1; this is the only engine
+ * and the audited URL list lives inline below.
  *
  * Prereqs (see run.sh): local Moodle at http://localhost:8080, admin/Admin1234!,
  * course id=2, server started with PHP_CLI_SERVER_WORKERS>=4 (puppeteer opens
@@ -19,20 +19,40 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const puppeteer = require('puppeteer');
 
 const BASE = process.env.SOLA_A11Y_BASE || 'http://localhost:8080';
 const USER = process.env.SOLA_A11Y_USER || 'admin';
 const PASS = process.env.SOLA_A11Y_PASS || 'Admin1234!';
 const AXE = require.resolve('axe-core/axe.min.js');
+const VIEWPORT = { width: 1280, height: 900 };
 
-// Reuse the URL list and contrast-ignore policy from the pa11y config so there
-// is a single source of truth for what we audit.
-const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, '.pa11yci.json'), 'utf8'));
-const URLS = cfg.urls;
-// The pa11y ignore list is HTML_CodeSniffer rule IDs; the only substantive ones
-// are the colour-contrast checks (1_4_3 G18/G145), which axe calls "color-contrast".
+// The plugin admin/report pages we audit, relative to the plugin web root.
+// Keep this list current as pages are added or removed.
+const PAGES = [
+  'course_settings.php?courseid=2',
+  'sandbox.php?courseid=2',
+  'flashcards.php?courseid=2',
+  'objectives_admin.php?courseid=2',
+  'instructor_dashboard.php?courseid=2',
+  'rag_admin.php',
+  'analytics.php?courseid=2',
+  'starter_settings.php?courseid=2',
+  'token_analytics.php?courseid=2',
+  'essay_feedback.php?courseid=2',
+  'integrity_admin.php',
+  'usertesting_admin.php',
+  'update_admin.php',
+  'vendor_dpa.php',
+  'survey_admin.php',
+  'rubric_admin.php',
+  'admin_user_data.php',
+  'privacy.php',
+  'settings_user.php',
+];
+const URLS = PAGES.map((p) => `${BASE}/local/ai_course_assistant/${p}`);
+// Colour-contrast (WCAG 1.4.3) is excluded: it depends on the active Moodle
+// theme's palette, not on plugin markup, so it is out of scope for this harness.
 const DISABLED_RULES = ['color-contrast'];
 
 function pickChrome() {
@@ -93,7 +113,7 @@ async function auditPage(page, url) {
   let pages = 0;
   try {
     const page = await browser.newPage();
-    await page.setViewport(cfg.defaults.viewport || { width: 1280, height: 900 });
+    await page.setViewport(VIEWPORT);
     await login(page);
     console.log(`Logged in as ${USER}. Auditing ${URLS.length} pages (WCAG2AA, axe-core)...\n`);
 
