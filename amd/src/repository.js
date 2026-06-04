@@ -236,6 +236,21 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
     };
 
     /**
+     * v5.9.0 — The learner's program learning path for a course (program,
+     * position, course nodes with objectives + mastery). Resolves to
+     * {has_path:false, courses:[]} when no program applies.
+     *
+     * @param {number} courseid
+     * @returns {Promise}
+     */
+    const getLearningPath = function(courseid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_learning_path',
+            args: {courseid: courseid},
+        }])[0];
+    };
+
+    /**
      * v4.1 / F3 — Aggregate count of other learners active on this course in
      * the last 15 minutes. Caller suppresses display when count is 0 or 1.
      *
@@ -531,5 +546,6 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         recordObjectiveAttempt: recordObjectiveAttempt,
         getMasterySummary: getMasterySummary,
         generateFlashcards: generateFlashcards,
+        getLearningPath: getLearningPath,
     };
 });
