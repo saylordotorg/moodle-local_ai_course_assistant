@@ -5250,3 +5250,170 @@ a.aica-history-panel__source:hover {
 [id^="page-local-ai_course_assistant"] .small > a {
     text-decoration: underline;
 }
+
+/* ============================================================
+ * v5.9.0 — Learning path map panel + next-course nudge banner
+ * ============================================================ */
+
+/* Readiness banner pinned at the top of the drawer body. */
+.local-ai-course-assistant__path-nudge {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 8px 10px 0;
+    padding: 10px 12px;
+    border: 1px solid #b9d6c2;
+    border-left: 4px solid #2e7d4f;
+    border-radius: 8px;
+    background: #f1f8f3;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.local-ai-course-assistant__path-nudge-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.local-ai-course-assistant__path-nudge-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.local-ai-course-assistant__btn-nudge-path {
+    border: 1px solid #2e7d4f;
+    background: #2e7d4f;
+    color: #fff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.local-ai-course-assistant__btn-nudge-dismiss {
+    border: none;
+    background: transparent;
+    color: #4a4a4a;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+/* The path panel slides over the drawer body. */
+.local-ai-course-assistant__path-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    overflow: hidden;
+}
+.local-ai-course-assistant__path-panel[hidden] {
+    display: none;
+}
+.local-ai-course-assistant__path-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e3e3e3;
+    font-size: 14px;
+}
+.local-ai-course-assistant__btn-path-close {
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    color: #4a4a4a;
+}
+.local-ai-course-assistant__path-panel-body {
+    overflow-y: auto;
+    padding: 8px 0;
+}
+.local-ai-course-assistant__path-empty {
+    padding: 18px 16px;
+    color: #555;
+    font-size: 13px;
+}
+
+/* Course nodes. Status carries a glyph (set in JS) plus a text label, so colour
+ * is never the only cue (WCAG 1.4.1). */
+.local-ai-course-assistant__path-node {
+    border-left: 3px solid transparent;
+}
+.local-ai-course-assistant__path-node.is-done {
+    border-left-color: #2e7d4f;
+}
+.local-ai-course-assistant__path-node.is-current {
+    border-left-color: #1b4f8a;
+    background: #f3f7fb;
+}
+.local-ai-course-assistant__path-node.is-upcoming {
+    border-left-color: #cfcfcf;
+}
+.local-ai-course-assistant__path-node-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 10px 14px;
+    font: inherit;
+    cursor: default;
+}
+button.local-ai-course-assistant__path-node-head {
+    cursor: pointer;
+}
+button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
+    background: #f6f6f6;
+}
+.local-ai-course-assistant__path-node-glyph {
+    font-size: 14px;
+    line-height: 1.4;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.local-ai-course-assistant__path-node-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.local-ai-course-assistant__path-node-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+.local-ai-course-assistant__path-node-meta {
+    font-size: 11px;
+    color: #666;
+}
+.local-ai-course-assistant__path-objectives {
+    list-style: none;
+    margin: 0;
+    padding: 0 14px 8px 40px;
+}
+.local-ai-course-assistant__path-objective {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+.local-ai-course-assistant__path-objective-state {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: #555;
+}
+.local-ai-course-assistant__path-objective.is-mastered .local-ai-course-assistant__path-objective-state {
+    color: #2e7d4f;
+}
+.local-ai-course-assistant__path-objective.is-demonstrated_elsewhere .local-ai-course-assistant__path-objective-state {
+    color: #1b4f8a;
+}

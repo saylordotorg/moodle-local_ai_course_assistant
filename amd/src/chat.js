@@ -29,8 +29,9 @@ define([
     'local_ai_course_assistant/realtime',
     'local_ai_course_assistant/voice',
     'local_ai_course_assistant/i18n_strings',
+    'local_ai_course_assistant/path_map',
     'core/str',
-], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, Str) {
+], function(UI, SSE, Repo, Speech, Realtime, Voice, I18nStrings, PathMap, Str) {
 
     /** @type {Array} Quiz topics parsed from data attribute */
     let quizTopics = [];
@@ -1739,6 +1740,48 @@ define([
         const settingsPanelBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-settings-panel') : null;
         if (settingsPanelBtn) {
             settingsPanelBtn.addEventListener('click', handleSettingsPanel);
+        }
+
+        // v5.9.0 — Learning path map panel + next-course nudge banner.
+        const pathBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-path') : null;
+        if (pathBtn) {
+            pathBtn.addEventListener('click', function() {
+                PathMap.toggle(els.root, courseId);
+            });
+        }
+        const pathCloseBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-path-close') : null;
+        if (pathCloseBtn) {
+            pathCloseBtn.addEventListener('click', function() {
+                PathMap.close(els.root);
+            });
+        }
+        const nudge = els.root ? els.root.querySelector('.local-ai-course-assistant__path-nudge') : null;
+        if (nudge) {
+            // Respect a prior dismissal for this course.
+            try {
+                if (window.localStorage.getItem('aica_path_nudge_' + courseId) === '1') {
+                    nudge.hidden = true;
+                }
+            } catch (e) {
+                // localStorage unavailable (private mode) — leave the banner visible.
+            }
+            const nudgePathBtn = nudge.querySelector('.local-ai-course-assistant__btn-nudge-path');
+            if (nudgePathBtn) {
+                nudgePathBtn.addEventListener('click', function() {
+                    PathMap.open(els.root, courseId);
+                });
+            }
+            const nudgeDismissBtn = nudge.querySelector('.local-ai-course-assistant__btn-nudge-dismiss');
+            if (nudgeDismissBtn) {
+                nudgeDismissBtn.addEventListener('click', function() {
+                    nudge.hidden = true;
+                    try {
+                        window.localStorage.setItem('aica_path_nudge_' + courseId, '1');
+                    } catch (e) {
+                        // Ignore: dismissal just will not persist across reloads.
+                    }
+                });
+            }
         }
         const debugBtn = els.root ? els.root.querySelector('.local-ai-course-assistant__btn-debug') : null;
         if (debugBtn) {

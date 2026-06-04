@@ -49,6 +49,13 @@ $functions = [
         'capabilities' => 'local/ai_course_assistant:use',
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_ai_course_assistant_get_learning_path' => [
+        'classname' => \local_ai_course_assistant\external\get_learning_path::class,
+        'description' => 'Get the learner\'s program learning path for a course.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
     'local_ai_course_assistant_get_config' => [
         'classname' => \local_ai_course_assistant\external\get_config::class,
         'description' => 'Get client-side configuration.',
