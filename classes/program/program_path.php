@@ -137,6 +137,26 @@ class program_path {
     }
 
     /**
+     * Next course(s) for the learner's first program containing this course,
+     * WITHOUT the program_path feature-flag gate. A pure computation shared with
+     * the v5.9.0 learning_path aggregator (which has its own `learning_path`
+     * flag): the path map / nudge must surface the next course even on a site
+     * that enables the map but not the conversational program_path block.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array<int, array{courseid:int, name:string, reason:string}>
+     */
+    public function next_courses_for(int $userid, int $courseid): array {
+        $memberships = $this->program_memberships($userid, $courseid);
+        $m = $memberships[0] ?? null;
+        if ($m === null) {
+            return [];
+        }
+        return $this->compute_next_courses($userid, (int) $m['programid'], $courseid, $m['courses']);
+    }
+
+    /**
      * Forward courses for the current course, prerequisite edges before ordered
      * sequence. Excludes hidden, current, and already-completed courses; cap 2.
      *
