@@ -1379,6 +1379,7 @@ if ($hassiteconfig) {
         'crossmastery_enabled'    => 'pedagogy:crossmastery',
         'mastery_starter_enabled' => 'pedagogy:mastery_starter',
         'program_path_enabled'    => 'pedagogy:program_path',
+        'learning_path_enabled'   => 'pedagogy:learning_path',
     ] as $key => $stringkey) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,
@@ -1408,6 +1409,16 @@ if ($hassiteconfig) {
         get_string('settings:mastery_window', 'local_ai_course_assistant'),
         get_string('settings:mastery_window_desc', 'local_ai_course_assistant'),
         '8',
+        PARAM_INT
+    ));
+    // v5.9.0: percent of a course's tracked objectives that must be mastered for
+    // the learning-path nudge to treat the learner as "ready" (the early path;
+    // Moodle course completion is the other trigger).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/learning_path_mastery_threshold',
+        get_string('settings:learning_path_mastery_threshold', 'local_ai_course_assistant'),
+        get_string('settings:learning_path_mastery_threshold_desc', 'local_ai_course_assistant'),
+        '80',
         PARAM_INT
     ));
 
