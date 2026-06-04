@@ -240,6 +240,11 @@ class learning_path {
      * @return bool
      */
     private function course_complete(int $userid, int $courseid): bool {
+        global $CFG;
+        // completion_info is not autoloaded; without this the constructor throws
+        // a "Class not found", which the readiness() try/catch would swallow as
+        // "not ready", silently masking the mastery trigger.
+        require_once($CFG->libdir . '/completionlib.php');
         $course = get_course($courseid);
         $info = new \completion_info($course);
         if (!$info->is_enabled()) {
