@@ -68,6 +68,7 @@ $datetag = date('Y-m-d-His');
 $judgeprovider = 'claude';
 $judgemodel = 'claude-sonnet-4-6';
 $limit = 0; // 0 = all prompts
+$promptfile = ''; // empty => default tutor_prompts.json; else a file in tests/golden/ or an absolute path
 
 foreach ($argv as $arg) {
     if (preg_match('/^--mode=(run|judge|report|all)$/', $arg, $m)) {
@@ -86,6 +87,8 @@ foreach ($argv as $arg) {
         $judgemodel = trim($m[1]);
     } else if (preg_match('/^--limit=(\d+)$/', $arg, $m)) {
         $limit = (int) $m[1];
+    } else if (preg_match('/^--prompts=(.+)$/', $arg, $m)) {
+        $promptfile = trim($m[1]);
     } else if ($arg === '--help' || $arg === '-h') {
         $help = <<<TXT
 Usage: php run_tutor_golden.php [--mode=run|judge|report|all] [options]
@@ -99,6 +102,9 @@ Modes:
 Options:
   --providers=label1,label2     Limit run to a subset of comparison_providers labels.
   --limit=N                     Limit run to the first N prompts (for smoke tests).
+  --prompts=FILE                Prompt set to use: a filename in tests/golden/ (e.g.
+                                tutor_prompts_domains.json) or an absolute path.
+                                Default: tutor_prompts.json.
   --in=run.csv[,judge.csv]      Input CSV(s) for judge/report modes.
   --out=DIR                     Output directory (default: <plugin>/runs).
   --judge-provider=ID           Provider id for the rubric judge (default: claude).
@@ -567,18 +573,30 @@ function mode_report(string $runcsv, string $judgecsv, string $outdir, string $d
 /**
  * Load the golden prompt set.
  *
+ * Honors the global $promptfile (set by --prompts=FILE): a bare filename is
+ * resolved inside tests/golden/, an absolute path is used as-is. Empty falls
+ * back to the default tutor_prompts.json.
+ *
  * @return array<int, array{id: string, category: string, text: string}>
  */
 function load_prompts(): array {
-    $path = __DIR__ . '/../../tests/golden/tutor_prompts.json';
-    $raw = file_get_contents($path);
+    global $promptfile;
+    $golden = __DIR__ . '/../../tests/golden/';
+    if ($promptfile === '' || $promptfile === null) {
+        $path = $golden . 'tutor_prompts.json';
+    } else if (is_file($promptfile)) {
+        $path = $promptfile;
+    } else {
+        $path = $golden . basename($promptfile);
+    }
+    $raw = @file_get_contents($path);
     if ($raw === false) {
-        fwrite(STDERR, "ERROR: cannot read $path\n");
+        fwrite(STDERR, "ERROR: cannot read prompt file: $path\n");
         exit(1);
     }
     $j = json_decode($raw, true);
     if (!is_array($j) || empty($j['prompts'])) {
-        fwrite(STDERR, "ERROR: tutor_prompts.json is malformed\n");
+        fwrite(STDERR, "ERROR: prompt file is malformed (expected a non-empty 'prompts' array): $path\n");
         exit(1);
     }
     return $j['prompts'];
