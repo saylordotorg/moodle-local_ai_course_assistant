@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'コース横断の習得状況リン
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = '学習パスの先読み認識をデフォルトで有効にする';
 $string['pedagogy:program_path_desc'] = '有効にすると、SOLAは現在のコースが学習者のプログラム（学位または修了証）の中で次にどこへ続くか、また本日の概念が後続コースへどのようにつながるかを学習者に伝えられます。MoodleのPrograms（プログラム）プラグイン（DegreesおよびLearn）を読み取り、プログラムが前提条件または必須の順序を定義している場合にのみ具体的な次のコースを示し、それ以外の場合は学習パス内での学習者の位置を示します。これは助言のみを目的としており — 履修登録や習熟度を変更することは一切なく、常に現在の学習者自身のプログラム割り当てのみを使用します。該当するプログラムがない場合は、何もせずに静かに処理を終えます。';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = '学習パスマップと次のコースへの案内をデフォルトで有効化';
+$string['pedagogy:learning_path_desc'] = '有効にすると、SOLAは視覚的な学習パスパネル（ウィジェットヘッダーの「マイパス」ボタン）を追加し、学習者のプログラムをコースの連続として表示します。各コースは展開して、その目標と学習者の習熟度を確認できます。学習者が現在のコースの基準（修了、または高い割合の目標を習得）を満たすと、SOLAは控えめな「次のコースの準備が整いました」バナーも表示し、会話の中でそれに言及します。あくまで助言的なものであり、学習者自身のプログラム割り当てを使用します。該当するプログラムがない場合は何も行いません。';
+$string['settings:learning_path_mastery_threshold'] = '学習パス準備完了のしきい値（％）';
+$string['settings:learning_path_mastery_threshold_desc'] = '学習パスの案内が次のコースの準備が整ったとみなす前に、学習者が習得しなければならないコースの追跡対象目標の割合。Moodleのコース修了がもう一方のトリガーであり、いずれか早い方で案内が発動します。デフォルトは80です。';
+$string['pathpanel_title'] = 'マイ学習パス';
+$string['pathpanel_open'] = 'マイ学習パス';
+$string['pathpanel_empty'] = 'このコースにはまだプログラムパスがありません。';
+$string['path_position'] = 'コース {$a->index} / {$a->total}';
+$string['path_status_done'] = '完了';
+$string['path_status_current'] = '現在地';
+$string['path_status_upcoming'] = '今後';
+$string['path_mastery_mastered'] = '習得済み';
+$string['path_mastery_in_progress'] = '進行中';
+$string['path_mastery_not_started'] = '未開始';
+$string['path_mastery_demonstrated_elsewhere'] = '別のコースで実証済み';
+$string['nudge_ready_title'] = '次へ進む準備完了';
+$string['nudge_ready_body'] = 'よくできました — {$a} の準備が整いました。';
+$string['nudge_view_path'] = 'マイパスを表示';
+$string['nudge_dismiss'] = '閉じる';

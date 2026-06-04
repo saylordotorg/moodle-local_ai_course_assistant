@@ -1306,3 +1306,24 @@ $string['objectives:rebuild_links_done'] = 'Hidhaaleen gahumsa koorsiiwwan giddu
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Hubannoo daandii barnootaa gara fuulduraa duraan dursee banaa';
 $string['pedagogy:program_path_desc'] = 'Yeroo banaa ta\'u, SOLA barataa tokkoof iddoo koorsiin ammaa sagantaa isaanii (digirii ykn ragaa) keessatti itti aanee gara isaa geessu, akkasumas yaadonni har\'aa koorsiiwwan boodaatti akkamitti akka wal qunnaman itti himuu danda\'a. Pluugii Moodle Programs (Degrees fi Learn) dubbisa, koorsii itti aanu addaa kan moggaasu yeroo sagantaan dura-barbaachisummaa ykn tartiiba barbaachisaa ibsu qofa; kanaan alatti immoo iddoo barataan daandii irratti qabu agarsiisa. Gorsa qofaaf — gonkumaa galmee ykn ga\'umsa hin jijjiiru, akkasumas yeroo hunda qoodama sagantaa barataa ammaa isaa qofa fayyadama. Iddoo sagantaan tokko iyyuu hojii irra hin oolle callisee homaa hin hojjetu.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Kaartaa daandii barnootaa fi kakaasaa gara koorsii itti aanuu durtiidhaan banaa';
+$string['pedagogy:learning_path_desc'] = 'Yommuu banaa ta\'u, SOLA paanaalii daandii barnootaa mul\'atu (qabduu "daandii koo" mataduree widget keessaa) dabala kan sagantaa barataa akka tartiiba koorsiiwwanii agarsiisu, tokkoon tokkoon isaanii gara kaayyoolee isaaniitii fi gahumsa barataatti babal\'achuu danda\'an. Yommuu barataan sadarkaa koorsii ammaa guutu (xumura yookaan hangii guddaa kaayyoolee gahumsaan), SOLA akkasumas baanara suuta jedhu "koorsii itti aanuuf qophaa\'aa" mul\'isa akkasumas marii keessatti kaasa. Gorsaaf qofa; ramaddii sagantaa barataa mataa isaa fayyadama; yommuu sagantaan tokko iyyuu hin hojjenne calluma jedhee homaa hin hojjetu.';
+$string['settings:learning_path_mastery_threshold'] = 'Daangaa qophaa\'ina daandii barnootaa (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Dhibbeentaa kaayyoolee koorsii hordofaman kan barataan tokko gahumsaan qabaachuu qabu osoo kakaasaan daandii barnootaa koorsii itti aanuuf qophaa\'aa godhee hin ilaalin dura. Xumurri koorsii Moodle kakaasaa biraa ti; kanneen keessaa kan dura ta\'u kakaasaa sana kakaasa. Durtii 80.';
+$string['pathpanel_title'] = 'Daandii barnootaa koo';
+$string['pathpanel_open'] = 'Daandii barnootaa koo';
+$string['pathpanel_empty'] = 'Koorsii kanaaf hanga ammaatti daandiin sagantaa hin jiru.';
+$string['path_position'] = 'Koorsii {$a->index} {$a->total} keessaa';
+$string['path_status_done'] = 'Xumurame';
+$string['path_status_current'] = 'Asitti jirta';
+$string['path_status_upcoming'] = 'Dhufaa jiru';
+$string['path_mastery_mastered'] = 'Gahumsa qabu';
+$string['path_mastery_in_progress'] = 'Adeemsa irra jira';
+$string['path_mastery_not_started'] = 'Hin jalqabamne';
+$string['path_mastery_demonstrated_elsewhere'] = 'Koorsii biraa keessatti agarsiifame';
+$string['nudge_ready_title'] = 'Itti fufuuf qophaa\'aa';
+$string['nudge_ready_body'] = 'Hojii gaarii — {$a}f qophaa\'aa dha.';
+$string['nudge_view_path'] = 'Daandii koo ilaali';
+$string['nudge_dismiss'] = 'Dhiisi';

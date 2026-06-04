@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Odkazy zvládnutí napříč kurzy p
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Povědomí o budoucí studijní cestě ve výchozím nastavení zapnuto';
 $string['pedagogy:program_path_desc'] = 'Když je zapnuto, SOLA může studujícímu sdělit, kam aktuální kurz vede dál v rámci jeho programu (titulu nebo certifikátu) a jak dnešní pojmy navazují na pozdější kurzy. Načítá data z pluginu Moodle Programs (Degrees a Learn) a konkrétní následující kurz pojmenuje pouze tam, kde program definuje předpoklad nebo požadované pořadí; jinak uvede pozici studujícího v této cestě. Pouze poradní funkce — nikdy nemění zápis ani zvládnutí učiva a vždy používá výhradně přiřazení k programu daného studujícího. Tam, kde se žádný program neuplatní, tiše nedělá nic.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Mapa vzdělávací cesty a pobídka k dalšímu kurzu jsou ve výchozím nastavení zapnuty';
+$string['pedagogy:learning_path_desc'] = 'Když je zapnuto, SOLA přidá vizuální panel vzdělávací cesty (tlačítko „moje cesta“ v záhlaví widgetu), který zobrazuje program studujícího jako posloupnost kurzů, z nichž každý lze rozbalit na jeho cíle a úroveň zvládnutí studujícím. Když studující splní laťku pro aktuální kurz (dokončení nebo zvládnutí vysokého podílu cílů), SOLA také zobrazí jemný banner „připraven na další kurz“ a zmíní jej v konverzaci. Pouze doporučující; používá vlastní programové přiřazení studujícího; tam, kde se žádný program neuplatní, tiše nedělá nic.';
+$string['settings:learning_path_mastery_threshold'] = 'Práh připravenosti vzdělávací cesty (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Procento sledovaných cílů kurzu, které musí studující zvládnout, než jej pobídka vzdělávací cesty bude považovat za připraveného na další kurz. Druhým spouštěčem je dokončení kurzu v Moodle; pobídku spustí to, co nastane dříve. Výchozí 80.';
+$string['pathpanel_title'] = 'Moje vzdělávací cesta';
+$string['pathpanel_open'] = 'Moje vzdělávací cesta';
+$string['pathpanel_empty'] = 'Pro tento kurz zatím není k dispozici žádná programová cesta.';
+$string['path_position'] = 'Kurz {$a->index} z {$a->total}';
+$string['path_status_done'] = 'Hotovo';
+$string['path_status_current'] = 'Jste zde';
+$string['path_status_upcoming'] = 'Nadcházející';
+$string['path_mastery_mastered'] = 'Zvládnuto';
+$string['path_mastery_in_progress'] = 'Probíhá';
+$string['path_mastery_not_started'] = 'Nezahájeno';
+$string['path_mastery_demonstrated_elsewhere'] = 'Prokázáno v jiném kurzu';
+$string['nudge_ready_title'] = 'Připraveni pokračovat';
+$string['nudge_ready_body'] = 'Skvělá práce — jste připraveni na {$a}.';
+$string['nudge_view_path'] = 'Zobrazit moji cestu';
+$string['nudge_dismiss'] = 'Zavřít';

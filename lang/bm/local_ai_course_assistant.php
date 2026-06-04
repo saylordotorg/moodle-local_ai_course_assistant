@@ -1332,3 +1332,24 @@ $string['objectives:rebuild_links_done'] = 'Kalansow ni ɲɔgɔn cɛ se sɔrɔli
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Kalan-sira ɲɛfɛla dɔnniya ka di a yɛrɛ ma';
 $string['pedagogy:program_path_desc'] = 'Ni a sigilen don, SOLA bɛ se ka kalanden ɲɛfɔ kalansen min bɛ taa yɔrɔ min na a ka kalan porogaramu kɔnɔ (jatebɔsɛbɛn walima sɛbɛnni) ani cogo min na bi ka hakililaw bɛ jɛnsɛn kalansenw na minnu bɛ taa ɲɛfɛ. A bɛ Moodle Programs plugin (Degrees ani Learn) kalan ka kalansen kelen tɔgɔ fɔ yɔrɔ dɔrɔn na min na porogaramu bɛ kɔɲɛn walima labɛnni kɛrɛn-kɛrɛnnen sigi senkan; ni o tɛ, a bɛ kalanden yɔrɔ jira sira kan. Ladilikan dɔrɔn don — a tɛ tɔgɔsɛbɛn walima dɔnniya yɛlɛma abada, ani a bɛ kalanden yɛrɛ ka porogaramu tilali dama de baara la. A bɛ ka je dɔrɔn yɔrɔ min na porogaramu si tɛ baara la.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Kalanko sira jaabi ani kalanko nata laɲini bɛ daa la ka kɛ';
+$string['pedagogy:learning_path_desc'] = 'Ni a dara, SOLA bɛ kalanko-sira ɲɛjira pano fara a kan ("ne ka sira" butɔni minɛn kunfɔla la) min bɛ kalanden ka porogaramu jira i n\'a fɔ kalanko caman tɔn, u kelen-kelen bɛ se ka da ka u kuntilennaw n\'a kalanden ka dɔnniya jira. Ni kalanden ye sariya dafa min bɛ kalanko sisan na (a labanni walima kuntilennaw caman dɔn), SOLA fana bɛ banɛri nɔgɔman jira "i labɛnnen don kalanko nata kama" ani a b\'a fɔ baro la. Laadilikan dɔrɔn de don; a bɛ baara kɛ ni kalanden yɛrɛ ka porogaramu tilali ye; a tɛ foyi kɛ ni porogaramu si tɛ se ka kɛ yɔrɔ min na.';
+$string['settings:learning_path_mastery_threshold'] = 'Kalanko-sira labɛnni hakɛ (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Kalanko kuntilenna lajɛlenw hakɛ min ka kan ka dɔn kalanden fɛ sani kalanko-sira laɲini ka a jate i labɛnnen don kalanko nata kama. Moodle kalanko labanni ye laɲini wɛrɛ ye; min kɔnna ka kɛ, o de bɛ laɲini wuli. Daa la 80.';
+$string['pathpanel_title'] = 'Ne ka kalanko sira';
+$string['pathpanel_open'] = 'Ne ka kalanko sira';
+$string['pathpanel_empty'] = 'Porogaramu sira si tɛ yen fɔlɔ nin kalanko in na.';
+$string['path_position'] = 'Kalanko {$a->index} / {$a->total}';
+$string['path_status_done'] = 'Banna';
+$string['path_status_current'] = 'I bɛ yan';
+$string['path_status_upcoming'] = 'Nata';
+$string['path_mastery_mastered'] = 'Dɔnna';
+$string['path_mastery_in_progress'] = 'A bɛ taama na';
+$string['path_mastery_not_started'] = 'A ma daminɛ';
+$string['path_mastery_demonstrated_elsewhere'] = 'A jira kalanko wɛrɛ la';
+$string['nudge_ready_title'] = 'I labɛnnen don ka taa ɲɛ';
+$string['nudge_ready_body'] = 'Baara ɲuman — i labɛnnen don {$a} kama.';
+$string['nudge_view_path'] = 'Ne ka sira lajɛ';
+$string['nudge_dismiss'] = 'A bɔ';

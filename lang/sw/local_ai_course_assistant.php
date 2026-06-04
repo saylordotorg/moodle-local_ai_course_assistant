@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'Viungo vya umahiri wa kozi mtambuka 
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Utambuzi wa njia ya mbele ya kujifunza umewashwa kwa chaguo-msingi';
 $string['pedagogy:program_path_desc'] = 'Inapowashwa, SOLA inaweza kumweleza mwanafunzi mahali kozi ya sasa inakoelekea katika programu yake (shahada au cheti) na jinsi dhana za leo zinavyounganisha na kozi za baadaye. Inasoma programu-jalizi ya Moodle Programs (Degrees na Learn) na inataja kozi mahususi inayofuata pale tu ambapo programu inafafanua sharti la awali au mpangilio unaohitajika; vinginevyo inaonyesha nafasi ya mwanafunzi katika njia hiyo. Ni ushauri pekee — kamwe haibadilishi udahili au umahiri, na hutumia tu mgao wa programu wa mwanafunzi wa sasa mwenyewe. Haifanyi chochote kimyakimya pale ambapo hakuna programu inayohusika.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Ramani ya njia ya kujifunza na kidokezo cha kozi inayofuata vimewashwa kwa chaguomsingi';
+$string['pedagogy:learning_path_desc'] = 'Inapowashwa, SOLA huongeza paneli ya kuona ya njia ya kujifunza (kitufe cha "njia yangu" kwenye kichwa cha wijeti) inayoonyesha programu ya mwanafunzi kama mfululizo wa kozi, kila moja ikiweza kupanuliwa ili kuonyesha malengo yake na umahiri wa mwanafunzi. Mwanafunzi anapofikia kiwango cha kozi ya sasa (kukamilisha au sehemu kubwa ya malengo yaliyomudu), SOLA pia huonyesha bango pole la "tayari kwa kozi inayofuata" na kulitaja kwenye mazungumzo. Ushauri tu; hutumia mgao wa programu ya mwanafunzi mwenyewe; haifanyi chochote kimya pale ambapo hakuna programu inayohusika.';
+$string['settings:learning_path_mastery_threshold'] = 'Kiwango cha utayari wa njia ya kujifunza (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Asilimia ya malengo ya kozi yanayofuatiliwa ambayo mwanafunzi lazima ayamudu kabla kidokezo cha njia ya kujifunza hakimchukulii kuwa tayari kwa kozi inayofuata. Kukamilika kwa kozi katika Moodle ni kichocheo kingine; kinachotokea kwanza ndicho huwasha kidokezo. Chaguomsingi 80.';
+$string['pathpanel_title'] = 'Njia yangu ya kujifunza';
+$string['pathpanel_open'] = 'Njia yangu ya kujifunza';
+$string['pathpanel_empty'] = 'Bado hakuna njia ya programu inayopatikana kwa kozi hii.';
+$string['path_position'] = 'Kozi ya {$a->index} kati ya {$a->total}';
+$string['path_status_done'] = 'Imekamilika';
+$string['path_status_current'] = 'Uko hapa';
+$string['path_status_upcoming'] = 'Inayokuja';
+$string['path_mastery_mastered'] = 'Imemudiwa';
+$string['path_mastery_in_progress'] = 'Inaendelea';
+$string['path_mastery_not_started'] = 'Haijaanza';
+$string['path_mastery_demonstrated_elsewhere'] = 'Imeonyeshwa katika kozi nyingine';
+$string['nudge_ready_title'] = 'Tayari kuendelea';
+$string['nudge_ready_body'] = 'Kazi nzuri — uko tayari kwa {$a}.';
+$string['nudge_view_path'] = 'Tazama njia yangu';
+$string['nudge_dismiss'] = 'Ondoa';

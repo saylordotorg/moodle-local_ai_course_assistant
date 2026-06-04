@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Kursövergripande färdighetslänkar
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Framåtblickande medvetenhet om inlärningsvägen aktiverad som standard';
 $string['pedagogy:program_path_desc'] = 'När detta är aktiverat kan SOLA berätta för en student vart den aktuella kursen leder härnäst i deras program (examen eller certifikat) och hur dagens begrepp knyter an till senare kurser. Läser från Moodle Programs-pluginet (Degrees och Learn) och namnger en specifik nästa kurs endast där programmet definierar ett förkunskapskrav eller en obligatorisk ordningsföljd; i annat fall anges studentens position i vägen. Endast vägledande — det ändrar aldrig registrering eller färdighetsnivå och använder alltid endast den aktuella studentens egen programtilldelning. Gör i tysthet ingenting där inget program är tillämpligt.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Karta över lärväg och knuff till nästa kurs på som standard';
+$string['pedagogy:learning_path_desc'] = 'När det är på lägger SOLA till en visuell lärvägspanel (en "min väg"-knapp i widgetens rubrik) som visar elevens program som en sekvens av kurser, var och en utbyggbar för att visa dess mål och elevens behärskning. När eleven har nått ribban för den aktuella kursen (slutförande eller en hög andel behärskade mål) visar SOLA även en mild "redo för nästa kurs"-banner och nämner det i konversationen. Endast rådgivande; använder elevens egen programtilldelning; gör tyst ingenting där inget program gäller.';
+$string['settings:learning_path_mastery_threshold'] = 'Tröskel för lärvägsberedskap (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Andelen av en kurs spårade mål som en elev måste behärska innan lärvägsknuffen betraktar dem som redo för nästa kurs. Kursavslut i Moodle är den andra utlösaren; det som inträffar först aktiverar knuffen. Standard 80.';
+$string['pathpanel_title'] = 'Min lärväg';
+$string['pathpanel_open'] = 'Min lärväg';
+$string['pathpanel_empty'] = 'Ingen programväg är tillgänglig för den här kursen ännu.';
+$string['path_position'] = 'Kurs {$a->index} av {$a->total}';
+$string['path_status_done'] = 'Klar';
+$string['path_status_current'] = 'Du är här';
+$string['path_status_upcoming'] = 'Kommande';
+$string['path_mastery_mastered'] = 'Behärskad';
+$string['path_mastery_in_progress'] = 'Pågår';
+$string['path_mastery_not_started'] = 'Inte påbörjad';
+$string['path_mastery_demonstrated_elsewhere'] = 'Visad i en annan kurs';
+$string['nudge_ready_title'] = 'Redo att gå vidare';
+$string['nudge_ready_body'] = 'Bra jobbat — du är redo för {$a}.';
+$string['nudge_view_path'] = 'Visa min väg';
+$string['nudge_dismiss'] = 'Avfärda';

@@ -1329,3 +1329,24 @@ $string['objectives:rebuild_links_done'] = 'Vínculos de dominio entre cursos re
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Reconocimiento de la ruta de aprendizaje activado de forma predeterminada';
 $string['pedagogy:program_path_desc'] = 'Cuando está activado, SOLA puede indicar a un estudiante hacia dónde conduce el curso actual dentro de su programa (titulación o certificado) y cómo los conceptos de hoy enlazan con cursos posteriores. Lee el plugin Programs de Moodle (Degrees y Learn) y nombra un curso siguiente específico solo cuando el programa define un prerrequisito o un orden obligatorio; de lo contrario, indica la posición del estudiante en la ruta. Es solo orientativo — nunca modifica la matriculación ni el dominio, y únicamente utiliza la asignación de programa del propio estudiante actual. No hace nada de forma silenciosa cuando no se aplica ningún programa.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Mapa de la ruta de aprendizaje y sugerencia del siguiente curso activados por defecto';
+$string['pedagogy:learning_path_desc'] = 'Cuando está activado, SOLA añade un panel visual de ruta de aprendizaje (un botón "mi ruta" en la cabecera del widget) que muestra el programa del estudiante como una secuencia de cursos, cada uno desplegable para ver sus objetivos y el dominio del estudiante. Cuando el estudiante alcanza el umbral del curso actual (finalización o un alto porcentaje de objetivos dominados), SOLA también muestra un suave aviso de "listo para el siguiente curso" y lo menciona en la conversación. Solo es orientativo; utiliza la asignación de programa propia del estudiante; no hace nada de forma silenciosa cuando no se aplica ningún programa.';
+$string['settings:learning_path_mastery_threshold'] = 'Umbral de preparación de la ruta de aprendizaje (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Porcentaje de los objetivos rastreados de un curso que un estudiante debe dominar antes de que el aviso de la ruta de aprendizaje lo considere listo para el siguiente curso. La finalización del curso en Moodle es el otro desencadenante; el aviso se activa con lo que ocurra primero. Predeterminado: 80.';
+$string['pathpanel_title'] = 'Mi ruta de aprendizaje';
+$string['pathpanel_open'] = 'Mi ruta de aprendizaje';
+$string['pathpanel_empty'] = 'Todavía no hay ninguna ruta de programa disponible para este curso.';
+$string['path_position'] = 'Curso {$a->index} de {$a->total}';
+$string['path_status_done'] = 'Hecho';
+$string['path_status_current'] = 'Estás aquí';
+$string['path_status_upcoming'] = 'Próximo';
+$string['path_mastery_mastered'] = 'Dominado';
+$string['path_mastery_in_progress'] = 'En curso';
+$string['path_mastery_not_started'] = 'Sin empezar';
+$string['path_mastery_demonstrated_elsewhere'] = 'Demostrado en otro curso';
+$string['nudge_ready_title'] = 'Listo para avanzar';
+$string['nudge_ready_body'] = 'Buen trabajo: estás listo para {$a}.';
+$string['nudge_view_path'] = 'Ver mi ruta';
+$string['nudge_dismiss'] = 'Descartar';

@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Legăturile între competențele din
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Conștientizarea traseului de învățare în avans activată implicit';
 $string['pedagogy:program_path_desc'] = 'Când este activată, SOLA îi poate spune unui cursant unde duce mai departe cursul curent în cadrul programului său (diplomă sau certificat) și cum conceptele de astăzi fac legătura cu cursurile ulterioare. Citește pluginul Programs din Moodle (Degrees și Learn) și numește un anumit curs următor doar acolo unde programul definește o cerință prealabilă sau o ordine obligatorie; în caz contrar, indică poziția cursantului în traseu. Are doar rol orientativ — nu modifică niciodată înscrierea sau nivelul de competență și folosește întotdeauna exclusiv alocarea de program a cursantului curent. Nu face nimic, în mod silențios, acolo unde niciun program nu se aplică.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Harta traseului de învățare și sugestia următorului curs activate implicit';
+$string['pedagogy:learning_path_desc'] = 'Când este activat, SOLA adaugă un panou vizual al traseului de învățare (un buton "traseul meu" în antetul widgetului) care arată programul cursantului ca o secvență de cursuri, fiecare putând fi extins pentru a vedea obiectivele sale și nivelul de stăpânire al cursantului. Când cursantul a atins pragul pentru cursul curent (finalizare sau o proporție mare de obiective stăpânite), SOLA afișează și un banner discret "pregătit pentru următorul curs" și îl menționează în conversație. Doar cu rol consultativ; folosește alocarea de program a cursantului; nu face nimic în tăcere acolo unde niciun program nu se aplică.';
+$string['settings:learning_path_mastery_threshold'] = 'Pragul de pregătire pentru traseul de învățare (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Procentul obiectivelor monitorizate ale unui curs pe care un cursant trebuie să le stăpânească înainte ca sugestia traseului de învățare să îl considere pregătit pentru următorul curs. Finalizarea cursului în Moodle este celălalt declanșator; oricare se întâmplă primul activează sugestia. Implicit 80.';
+$string['pathpanel_title'] = 'Traseul meu de învățare';
+$string['pathpanel_open'] = 'Traseul meu de învățare';
+$string['pathpanel_empty'] = 'Niciun traseu de program nu este încă disponibil pentru acest curs.';
+$string['path_position'] = 'Cursul {$a->index} din {$a->total}';
+$string['path_status_done'] = 'Finalizat';
+$string['path_status_current'] = 'Aici te afli';
+$string['path_status_upcoming'] = 'Urmează';
+$string['path_mastery_mastered'] = 'Stăpânit';
+$string['path_mastery_in_progress'] = 'În curs';
+$string['path_mastery_not_started'] = 'Neînceput';
+$string['path_mastery_demonstrated_elsewhere'] = 'Demonstrat în alt curs';
+$string['nudge_ready_title'] = 'Pregătit să mergi mai departe';
+$string['nudge_ready_body'] = 'Bună treabă — ești pregătit pentru {$a}.';
+$string['nudge_view_path'] = 'Vezi traseul meu';
+$string['nudge_dismiss'] = 'Închide';

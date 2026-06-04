@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'Liggéeyu ëmbu ci diggante kurs yi 
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Xam yoonu jàng bu jëm kanam ci nekk dox ci ñu-am';
 $string['pedagogy:program_path_desc'] = 'Bu nekkee dox, SOLA mën na wax jàngkat bi fan la kurs bii mu ci nekk di jëm ci porогraам bi (degree mbaa sertifika) ak ni xam-xam yu tey di jokkale ak kurs yu ñëw. Dafay jàng plugin Programs bu Moodle (Degrees ak Learn) te day tudd benn kurs bu ñëw bu jaar bu porogaraам bi wax benn lu nuy laaj bu jiitu mbaa benn tegtal bu war; bu ko deful, dafay tegtal fan la jàngkat bi nekk ci yoon wi. Tegtal rekk la — du soppi mukk mbooleem mbaa ëmbu, te day jëfandikoo rekk allocation bu porogaraам bu jàngkat bi ci boppam. Bu amul benn porogaraам bu jaar, dafay noppi te du def dara.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Kaartu yoonu njàng ak xeetalu kuru bi ci topp dafa ubbi ci anam bu wér';
+$string['pedagogy:learning_path_desc'] = 'Bu ubbioon, SOLA dafay yokk benn panel bu yoonu njàng bu gis-gis (benn buton "sama yoon" ci boppu widget bi) bu wonee prograamu jàngkat bi ni ab tëralin kuru, ku nekk mënees na ko yaatal ci ay jubluwaayam ak xam-xamu jàngkat bi. Bu jàngkat bi àggee ci xaaju kuru bi mu nekk (mottali walla wàllu jubluwaay yu bare yu mu xam), SOLA dafay it wone benn baner bu woyof "foog na para kuru bi ci topp" te wax ko ci waxtaan wi. Kërtu rekk la; dafay jëfandikoo allocation prograamu jàngkat bi; ci anam bu ne tekk du def dara fu amul prograam bu jëm.';
+$string['settings:learning_path_mastery_threshold'] = 'Wàllu xam-xam bu yoonu njàng (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Wàllu jubluwaay yu kuru bi topp yu jàngkat bi war a xam balaa xeetalu yoonu njàng di ko jàppe ni mu foog na para kuru bi ci topp. Mottalig kuru ci Moodle mooy yeneen tëggkat; li jëkk a am mooy jële xeetal bi. Bu wér: 80.';
+$string['pathpanel_title'] = 'Sama yoonu njàng';
+$string['pathpanel_open'] = 'Sama yoonu njàng';
+$string['pathpanel_empty'] = 'Amul benn yoonu prograam bu jëm ci kuru bii ba tey.';
+$string['path_position'] = 'Kuru {$a->index} ci {$a->total}';
+$string['path_status_done'] = 'Mottali na';
+$string['path_status_current'] = 'Fii nga nekk';
+$string['path_status_upcoming'] = 'Di ñëw';
+$string['path_mastery_mastered'] = 'Xam na ko';
+$string['path_mastery_in_progress'] = 'Mu ngi dox';
+$string['path_mastery_not_started'] = 'Tàmbalewul';
+$string['path_mastery_demonstrated_elsewhere'] = 'Wonees na ko ci beneen kuru';
+$string['nudge_ready_title'] = 'Foog na ngir kontine';
+$string['nudge_ready_body'] = 'Liggéey bu baax — foog nga para {$a}.';
+$string['nudge_view_path'] = 'Seet sama yoon';
+$string['nudge_dismiss'] = 'Tëj';

@@ -1346,3 +1346,24 @@ $string['objectives:rebuild_links_done'] = 'Collegamenti delle competenze tra co
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Consapevolezza del percorso di apprendimento successivo attiva per impostazione predefinita';
 $string['pedagogy:program_path_desc'] = 'Quando è attiva, SOLA può indicare a uno studente dove conduce il corso attuale all\'interno del suo programma (laurea o certificato) e come i concetti di oggi fanno da ponte verso i corsi successivi. Legge il plugin Programs di Moodle (Degrees e Learn) e nomina un corso successivo specifico solo dove il programma definisce un prerequisito o un ordine obbligatorio; in caso contrario, segnala la posizione dello studente nel percorso. Ha solo funzione consultiva — non modifica mai l\'iscrizione o la padronanza e utilizza esclusivamente l\'assegnazione al programma dello studente attuale. Non fa nulla, in modo silenzioso, dove non si applica alcun programma.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Mappa del percorso di apprendimento e suggerimento al corso successivo attivi per impostazione predefinita';
+$string['pedagogy:learning_path_desc'] = 'Quando attivo, SOLA aggiunge un pannello visivo del percorso di apprendimento (un pulsante "il mio percorso" nell\'intestazione del widget) che mostra il programma dello studente come una sequenza di corsi, ciascuno espandibile per visualizzarne gli obiettivi e la padronanza dello studente. Quando lo studente ha raggiunto la soglia per il corso attuale (completamento o un\'alta percentuale di obiettivi padroneggiati), SOLA mostra anche un delicato banner "pronto per il corso successivo" e lo menziona nella conversazione. Solo a titolo informativo; usa l\'allocazione del programma propria dello studente; non fa nulla silenziosamente quando nessun programma è applicabile.';
+$string['settings:learning_path_mastery_threshold'] = 'Soglia di prontezza del percorso di apprendimento (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Percentuale degli obiettivi tracciati di un corso che uno studente deve padroneggiare prima che il suggerimento del percorso di apprendimento lo consideri pronto per il corso successivo. Il completamento del corso di Moodle è l\'altro fattore di attivazione; il suggerimento scatta a seconda di quale si verifica per primo. Predefinito 80.';
+$string['pathpanel_title'] = 'Il mio percorso di apprendimento';
+$string['pathpanel_open'] = 'Il mio percorso di apprendimento';
+$string['pathpanel_empty'] = 'Nessun percorso di programma è ancora disponibile per questo corso.';
+$string['path_position'] = 'Corso {$a->index} di {$a->total}';
+$string['path_status_done'] = 'Completato';
+$string['path_status_current'] = 'Sei qui';
+$string['path_status_upcoming'] = 'In arrivo';
+$string['path_mastery_mastered'] = 'Padroneggiato';
+$string['path_mastery_in_progress'] = 'In corso';
+$string['path_mastery_not_started'] = 'Non iniziato';
+$string['path_mastery_demonstrated_elsewhere'] = 'Dimostrato in un altro corso';
+$string['nudge_ready_title'] = 'Pronto per proseguire';
+$string['nudge_ready_body'] = 'Ottimo lavoro — sei pronto per {$a}.';
+$string['nudge_view_path'] = 'Visualizza il mio percorso';
+$string['nudge_dismiss'] = 'Ignora';

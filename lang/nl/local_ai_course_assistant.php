@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Vakoverstijgende beheersingskoppelin
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Bewustzijn van het toekomstige leerpad standaard ingeschakeld';
 $string['pedagogy:program_path_desc'] = 'Wanneer ingeschakeld, kan SOLA een lerende vertellen waar de huidige cursus naartoe leidt binnen hun programma (diploma of certificaat) en hoe de concepten van vandaag aansluiten op latere cursussen. Leest de Moodle Programs-plug-in (Degrees en Learn) en benoemt alleen een specifieke volgende cursus wanneer het programma een vereiste of verplichte volgorde definieert; anders geeft het de positie van de lerende in het pad aan. Uitsluitend adviserend — het wijzigt nooit de inschrijving of de beheersing en gebruikt altijd alleen de programmatoewijzing van de lerende zelf. Doet stilzwijgend niets wanneer er geen programma van toepassing is.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Leertrajectkaart en stimulans naar de volgende cursus standaard ingeschakeld';
+$string['pedagogy:learning_path_desc'] = 'Wanneer ingeschakeld, voegt SOLA een visueel leertrajectpaneel toe (een knop "mijn traject" in de widgetkop) dat het programma van de leerling toont als een reeks cursussen, elk uitvouwbaar naar de doelstellingen en de beheersing van de leerling. Wanneer de leerling de norm voor de huidige cursus heeft gehaald (afronding of een hoog aandeel beheerste doelstellingen), toont SOLA ook een vriendelijke banner "klaar voor de volgende cursus" en vermeldt dit in het gesprek. Alleen adviserend; gebruikt de eigen programmatoewijzing van de leerling; doet stilletjes niets wanneer er geen programma van toepassing is.';
+$string['settings:learning_path_mastery_threshold'] = 'Drempel voor gereedheid leertraject (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Percentage van de gevolgde doelstellingen van een cursus dat een leerling moet beheersen voordat de leertrajectstimulans hen als klaar voor de volgende cursus beschouwt. Moodle-cursusafronding is de andere trigger; wat het eerst gebeurt, activeert de stimulans. Standaard 80.';
+$string['pathpanel_title'] = 'Mijn leertraject';
+$string['pathpanel_open'] = 'Mijn leertraject';
+$string['pathpanel_empty'] = 'Er is nog geen programmatraject beschikbaar voor deze cursus.';
+$string['path_position'] = 'Cursus {$a->index} van {$a->total}';
+$string['path_status_done'] = 'Voltooid';
+$string['path_status_current'] = 'Je bent hier';
+$string['path_status_upcoming'] = 'Binnenkort';
+$string['path_mastery_mastered'] = 'Beheerst';
+$string['path_mastery_in_progress'] = 'Bezig';
+$string['path_mastery_not_started'] = 'Niet gestart';
+$string['path_mastery_demonstrated_elsewhere'] = 'Getoond in een andere cursus';
+$string['nudge_ready_title'] = 'Klaar om verder te gaan';
+$string['nudge_ready_body'] = 'Goed gedaan — je bent klaar voor {$a}.';
+$string['nudge_view_path'] = 'Bekijk mijn traject';
+$string['nudge_dismiss'] = 'Sluiten';

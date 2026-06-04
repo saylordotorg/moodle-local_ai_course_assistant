@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'Izixhumanisi zokukhona eziphakathi k
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Ukuqaphela indlela yokufunda eya phambili kuvuliwe ngokuzenzekelayo';
 $string['pedagogy:program_path_desc'] = 'Uma kuvuliwe, i-SOLA ingatshela umfundi ukuthi inkambo yamanje iholela kuphi okulandelayo ohlelweni lwakhe (iziqu noma isitifiketi) nokuthi imiqondo yanamuhla ixhumana kanjani nezinkambo zakamuva. Ifunda i-plugin yama-Programs ye-Moodle (Degrees ne-Learn) futhi iqambe inkambo elandelayo eqondile kuphela lapho uhlelo luchaza into edingekayo kuqala noma ukulandelana okudingekayo; ngaphandle kwalokho iphawula isikhundla somfundi endleleni. Iyiseluleko kuphela — ayilokothi iguqule ukubhalisa noma ubuchwepheshe, futhi ihlala isebenzisa kuphela isabelo sohlelo lomfundi wamanje. Ayenzi lutho ngokuthula lapho kungekho hlelo olusebenzayo.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Imephu yendlela yokufunda kanye nesikhumbuzo sesifundo esilandelayo kuvulwe ngokuzenzakalela';
+$string['pedagogy:learning_path_desc'] = 'Uma kuvuliwe, i-SOLA yengeza iphaneli yendlela yokufunda ebonakalayo (inkinobho ethi "indlela yami" esihlokweni sewijethi) ebonisa uhlelo lomfundi njengochungechunge lwezifundo, ngasinye singanwetshwa siye ezinhlosweni zaso kanye nobungcweti bomfundi. Lapho umfundi efike ezingeni lesifundo samanje (ukuqedela noma ingxenye enkulu yezinhloso aziqonde kahle), i-SOLA iphinde ibonise ibhena elithambile elithi "usukulungele isifundo esilandelayo" futhi ilisho engxoxweni. Ukweluleka kuphela; isebenzisa ukwabiwa kohlelo lomfundi uqobo; ithula ingenzi lutho lapho kungekho hlelo olusebenzayo.';
+$string['settings:learning_path_mastery_threshold'] = 'Umkhawulo wokulungela kwendlela yokufunda (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Iphesenti lezinhloso ezilandelelwayo zesifundo umfundi okumele aziqonde kahle ngaphambi kokuba isikhumbuzo sendlela yokufunda simbheke njengolungele isifundo esilandelayo. Ukuqedela isifundo se-Moodle kungesinye isiqalisi; noma yikuphi okwenzeka kuqala kuqalisa isikhumbuzo. Okuzenzakalelayo ngu-80.';
+$string['pathpanel_title'] = 'Indlela yami yokufunda';
+$string['pathpanel_open'] = 'Indlela yami yokufunda';
+$string['pathpanel_empty'] = 'Ayikho indlela yohlelo etholakalayo yalesi sifundo okwamanje.';
+$string['path_position'] = 'Isifundo {$a->index} kwangu-{$a->total}';
+$string['path_status_done'] = 'Kuqediwe';
+$string['path_status_current'] = 'Ulapha';
+$string['path_status_upcoming'] = 'Esizayo';
+$string['path_mastery_mastered'] = 'Kuqondwe kahle';
+$string['path_mastery_in_progress'] = 'Kuyaqhubeka';
+$string['path_mastery_not_started'] = 'Akuqalwanga';
+$string['path_mastery_demonstrated_elsewhere'] = 'Kuboniswe kwesinye isifundo';
+$string['nudge_ready_title'] = 'Usukulungele ukuqhubeka';
+$string['nudge_ready_body'] = 'Umsebenzi omuhle — usukulungele i-{$a}.';
+$string['nudge_view_path'] = 'Buka indlela yami';
+$string['nudge_dismiss'] = 'Susa';

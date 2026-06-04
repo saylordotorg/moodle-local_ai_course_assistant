@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Kursübergreifende Kompetenzverknüp
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Vorausschauende Lernpfad-Erkennung standardmäßig aktiviert';
 $string['pedagogy:program_path_desc'] = 'Wenn aktiviert, kann SOLA einem Lernenden mitteilen, wohin der aktuelle Kurs als Nächstes in seinem Programm (Abschluss oder Zertifikat) führt und wie die heutigen Konzepte den Übergang zu späteren Kursen schaffen. Liest das Moodle-Programs-Plugin (Degrees und Learn) aus und nennt einen konkreten nächsten Kurs nur dort, wo das Programm eine Voraussetzung oder eine verbindliche Reihenfolge festlegt; andernfalls verweist es auf die Position des Lernenden im Pfad. Nur beratend — es ändert weder die Einschreibung noch den Lernfortschritt und verwendet ausschließlich die Programmzuweisung des jeweils aktuellen Lernenden. Bleibt stillschweigend inaktiv, wenn kein Programm zutrifft.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Lernpfad-Karte und Hinweis auf den nächsten Kurs standardmäßig aktiviert';
+$string['pedagogy:learning_path_desc'] = 'Wenn aktiviert, fügt SOLA ein visuelles Lernpfad-Panel hinzu (eine Schaltfläche „Mein Pfad“ in der Widget-Kopfzeile), das das Programm der lernenden Person als Abfolge von Kursen zeigt, die jeweils zu ihren Zielen und dem Beherrschungsgrad der lernenden Person aufgeklappt werden können. Wenn die lernende Person die Schwelle für den aktuellen Kurs erreicht hat (Abschluss oder ein hoher Anteil beherrschter Ziele), zeigt SOLA zudem ein dezentes Banner „bereit für den nächsten Kurs“ an und erwähnt dies im Gespräch. Nur beratend; nutzt die eigene Programmzuweisung der lernenden Person; tut dort, wo kein Programm zutrifft, stillschweigend nichts.';
+$string['settings:learning_path_mastery_threshold'] = 'Lernpfad-Bereitschaftsschwelle (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Prozentsatz der erfassten Ziele eines Kurses, die eine lernende Person beherrschen muss, bevor der Lernpfad-Hinweis sie als bereit für den nächsten Kurs einstuft. Der andere Auslöser ist der Moodle-Kursabschluss; der Hinweis wird durch das ausgelöst, was zuerst eintritt. Standard 80.';
+$string['pathpanel_title'] = 'Mein Lernpfad';
+$string['pathpanel_open'] = 'Mein Lernpfad';
+$string['pathpanel_empty'] = 'Für diesen Kurs ist noch kein Programmpfad verfügbar.';
+$string['path_position'] = 'Kurs {$a->index} von {$a->total}';
+$string['path_status_done'] = 'Erledigt';
+$string['path_status_current'] = 'Sie sind hier';
+$string['path_status_upcoming'] = 'Bevorstehend';
+$string['path_mastery_mastered'] = 'Beherrscht';
+$string['path_mastery_in_progress'] = 'In Bearbeitung';
+$string['path_mastery_not_started'] = 'Nicht begonnen';
+$string['path_mastery_demonstrated_elsewhere'] = 'In einem anderen Kurs gezeigt';
+$string['nudge_ready_title'] = 'Bereit weiterzumachen';
+$string['nudge_ready_body'] = 'Gut gemacht — Sie sind bereit für {$a}.';
+$string['nudge_view_path'] = 'Meinen Pfad anzeigen';
+$string['nudge_dismiss'] = 'Schließen';

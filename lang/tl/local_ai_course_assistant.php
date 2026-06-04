@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'Muling naitayo ang cross-course na m
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Naka-on bilang default ang kamalayan sa pasulong na landas ng pagkatuto';
 $string['pedagogy:program_path_desc'] = 'Kapag naka-on, maaaring sabihin ng SOLA sa isang mag-aaral kung saan patungo ang kasalukuyang kurso sa kanilang programa (degree o sertipiko) at kung paano nag-uugnay ang mga konsepto ngayon sa mga susunod na kurso. Binabasa nito ang Moodle Programs plugin (Degrees at Learn) at pinangangalanan ang isang partikular na susunod na kurso lamang kung saan tinutukoy ng programa ang isang prerequisite o kinakailangang pagkakasunod-sunod; kung hindi, binabanggit nito ang posisyon ng mag-aaral sa landas. Pang-payo lamang — hindi nito binabago ang enrolment o mastery, at gumagamit lamang ito ng sariling program allocation ng kasalukuyang mag-aaral. Tahimik na walang ginagawa kung saan walang naaangkop na programa.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Naka-on bilang default ang mapa ng landas ng pagkatuto at paalala sa susunod na kurso';
+$string['pedagogy:learning_path_desc'] = 'Kapag naka-on, magdaragdag ang SOLA ng visual na panel ng landas ng pagkatuto (isang "aking landas" na button sa header ng widget) na nagpapakita ng programa ng mag-aaral bilang isang serye ng mga kurso, bawat isa ay maaaring palawakin sa mga layunin nito at sa kahusayan ng mag-aaral. Kapag naabot ng mag-aaral ang pamantayan para sa kasalukuyang kurso (pagkumpleto o mataas na bahagi ng mga layuning natutuhan nang husto), magpapakita rin ang SOLA ng banayad na banner na "handa na para sa susunod na kurso" at babanggitin ito sa usapan. Pang-payo lamang; ginagamit ang sariling alokasyon ng programa ng mag-aaral; tahimik na walang ginagawa kung saan walang naaangkop na programa.';
+$string['settings:learning_path_mastery_threshold'] = 'Pamantayan ng kahandaan sa landas ng pagkatuto (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Porsiyento ng mga sinusubaybayang layunin ng kurso na dapat matutuhan nang husto ng mag-aaral bago siya ituring na handa para sa susunod na kurso ng paalala sa landas ng pagkatuto. Ang pagkumpleto ng kurso sa Moodle ang isa pang trigger; alinman ang mauna ang magpapagana sa paalala. Default na 80.';
+$string['pathpanel_title'] = 'Aking landas ng pagkatuto';
+$string['pathpanel_open'] = 'Aking landas ng pagkatuto';
+$string['pathpanel_empty'] = 'Wala pang available na landas ng programa para sa kursong ito.';
+$string['path_position'] = 'Kurso {$a->index} ng {$a->total}';
+$string['path_status_done'] = 'Tapos na';
+$string['path_status_current'] = 'Narito ka';
+$string['path_status_upcoming'] = 'Paparating';
+$string['path_mastery_mastered'] = 'Nahusay na';
+$string['path_mastery_in_progress'] = 'Isinasagawa';
+$string['path_mastery_not_started'] = 'Hindi pa nasisimulan';
+$string['path_mastery_demonstrated_elsewhere'] = 'Ipinakita sa ibang kurso';
+$string['nudge_ready_title'] = 'Handa nang magpatuloy';
+$string['nudge_ready_body'] = 'Magaling — handa ka na para sa {$a}.';
+$string['nudge_view_path'] = 'Tingnan ang aking landas';
+$string['nudge_dismiss'] = 'I-dismiss';

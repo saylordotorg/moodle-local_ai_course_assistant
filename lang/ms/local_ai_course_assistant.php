@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'Pautan penguasaan merentas kursus te
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Kesedaran laluan pembelajaran ke hadapan dihidupkan secara lalai';
 $string['pedagogy:program_path_desc'] = 'Apabila dihidupkan, SOLA boleh memberitahu pelajar ke mana kursus semasa membawa mereka seterusnya dalam program mereka (ijazah atau sijil) dan bagaimana konsep hari ini menghubungkan kepada kursus kemudian. Ia membaca pemalam Moodle Programs (Degrees dan Learn) dan menamakan kursus seterusnya yang khusus hanya di tempat program menetapkan prasyarat atau susunan yang diperlukan; jika tidak, ia mencatatkan kedudukan pelajar dalam laluan tersebut. Bersifat nasihat sahaja — ia tidak pernah mengubah pendaftaran atau penguasaan, dan hanya menggunakan peruntukan program pelajar semasa itu sendiri. Secara senyap tidak melakukan apa-apa di tempat yang tiada program berkenaan.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Peta laluan pembelajaran dan dorongan kursus seterusnya dihidupkan secara lalai';
+$string['pedagogy:learning_path_desc'] = 'Apabila dihidupkan, SOLA menambah panel laluan pembelajaran visual (butang "laluan saya" pada pengepala widget) yang menunjukkan program pelajar sebagai satu urutan kursus, setiap satunya boleh dikembangkan untuk melihat objektif dan penguasaan pelajar. Apabila pelajar telah mencapai tahap untuk kursus semasa (penyiapan atau bahagian besar objektif dikuasai), SOLA turut memaparkan sepanduk lembut "sedia untuk kursus seterusnya" dan menyebutnya dalam perbualan. Hanya sebagai nasihat; menggunakan peruntukan program pelajar sendiri; tidak melakukan apa-apa secara senyap apabila tiada program berkenaan.';
+$string['settings:learning_path_mastery_threshold'] = 'Ambang kesediaan laluan pembelajaran (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Peratusan objektif kursus yang dijejaki yang mesti dikuasai oleh pelajar sebelum dorongan laluan pembelajaran menganggap mereka sedia untuk kursus seterusnya. Penyiapan kursus Moodle ialah pencetus yang satu lagi; mana-mana yang berlaku dahulu akan mencetuskan dorongan. Lalai 80.';
+$string['pathpanel_title'] = 'Laluan pembelajaran saya';
+$string['pathpanel_open'] = 'Laluan pembelajaran saya';
+$string['pathpanel_empty'] = 'Tiada laluan program tersedia untuk kursus ini lagi.';
+$string['path_position'] = 'Kursus {$a->index} daripada {$a->total}';
+$string['path_status_done'] = 'Selesai';
+$string['path_status_current'] = 'Anda di sini';
+$string['path_status_upcoming'] = 'Akan datang';
+$string['path_mastery_mastered'] = 'Dikuasai';
+$string['path_mastery_in_progress'] = 'Sedang berjalan';
+$string['path_mastery_not_started'] = 'Belum dimulakan';
+$string['path_mastery_demonstrated_elsewhere'] = 'Ditunjukkan dalam kursus lain';
+$string['nudge_ready_title'] = 'Sedia untuk teruskan';
+$string['nudge_ready_body'] = 'Syabas — anda sedia untuk {$a}.';
+$string['nudge_view_path'] = 'Lihat laluan saya';
+$string['nudge_dismiss'] = 'Tolak';
