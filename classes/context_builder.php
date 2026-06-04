@@ -316,6 +316,14 @@ class context_builder {
         // no-op where no Moodle Programs plugin or allocation applies.
         $pathblock = (new \local_ai_course_assistant\program\program_path())
             ->build_prompt_injection($userid, $courseid);
+        // v5.9.0 — Next-course readiness line. When the learning_path feature is
+        // on and the learner has met the bar (completion or mastery), affirm it
+        // and point forward. Rides on the program_path block when present; else a
+        // small standalone line so the nudge fires even with program_path off.
+        $readyline = self::get_readiness_line($userid, $courseid);
+        if ($readyline !== '') {
+            $pathblock = $pathblock === '' ? $readyline : ($pathblock . $readyline);
+        }
         if ($pathblock !== '') {
             $sections[] = new section('program_path', section::CAT_LEARNER, 45, $pathblock, 0);
         }
@@ -1183,6 +1191,30 @@ class context_builder {
      * and tells the model to redirect off-topic asks back. Lives in the
      * LEARNER category so it sits alongside personalisation and study plan.
      *
+     * Advisory readiness line for the v5.9.0 next-course nudge. Empty unless the
+     * learning_path feature is on, the learner has met the bar (completion or
+     * mastery), and there is a next course to point toward. Reuses the
+     * \Throwable-guarded learning_path::readiness().
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return string Leading-newline block, or '' when not ready.
+     */
+    private static function get_readiness_line(int $userid, int $courseid): string {
+        $r = (new \local_ai_course_assistant\program\learning_path())->readiness($userid, $courseid);
+        if (empty($r['ready']) || empty($r['next_course'])) {
+            return '';
+        }
+        $next = '"' . $r['next_course']['name'] . '"';
+        $met = $r['reason'] === 'completion'
+            ? 'has now completed this course'
+            : 'has now mastered most of this course\'s objectives';
+        return "\n\nThe learner {$met}. When it fits naturally, affirm that progress and point them "
+            . "toward {$next} as the natural next step in their path — encourage, but never pressure "
+            . 'them to move on before they feel ready.';
+    }
+
+    /**
      * @param string $pagetitle Title of the current resource/activity, or empty.
      * @return string Empty when no pagetitle is provided.
      */
