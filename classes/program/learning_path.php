@@ -99,6 +99,117 @@ class learning_path {
     }
 
     /**
+     * The complete multi-course path model for the panel: the program, the
+     * learner's position, every visible course (status + objectives + mastery),
+     * the next course(s), and readiness. `null` when no usable program applies.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array|null
+     */
+    public function full_path(int $userid, int $courseid): ?array {
+        try {
+            if (!$this->is_enabled_for_course($courseid)) {
+                return null;
+            }
+            $pp = new program_path($this->source);
+            $membership = $pp->program_memberships($userid, $courseid)[0] ?? null;
+            if ($membership === null) {
+                return null;
+            }
+            $programid = (int) $membership['programid'];
+            $courses = [];
+            foreach ($membership['visible'] as $i => $c) {
+                $cid = (int) $c['courseid'];
+                $iscurrent = $cid === $courseid;
+                $courses[] = [
+                    'courseid' => $cid,
+                    'name' => (string) $c['coursename'],
+                    'position' => $i + 1,
+                    'status' => $this->status_for($userid, $programid, $c, $iscurrent),
+                    'ordered' => !empty($c['ordered']),
+                    'is_current' => $iscurrent,
+                    'objectives' => $this->objectives_for($userid, $cid),
+                ];
+            }
+            return [
+                'program' => ['programid' => $programid, 'name' => (string) $membership['name']],
+                'position' => ['index' => (int) $membership['index'], 'total' => (int) $membership['total']],
+                'courses' => $courses,
+                'next_courses' => $pp->next_courses_for($userid, $courseid),
+                'readiness' => $this->readiness($userid, $courseid),
+            ];
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Status of a course node: 'current' for the course the learner is on,
+     * 'done' when the program item is completed, else 'upcoming'.
+     *
+     * @param int $userid
+     * @param int $programid
+     * @param array $c Program course item.
+     * @param bool $iscurrent
+     * @return string
+     */
+    private function status_for(int $userid, int $programid, array $c, bool $iscurrent): string {
+        if ($iscurrent) {
+            return 'current';
+        }
+        if (!empty($c['itemid']) && $this->source->is_item_completed($userid, $programid, (int) $c['itemid'])) {
+            return 'done';
+        }
+        return 'upcoming';
+    }
+
+    /**
+     * The course's objectives with the learner's mastery state. Empty where
+     * objectives are not enabled/defined. Mastery vocabulary:
+     * mastered | in_progress | not_started | demonstrated_elsewhere.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array<int, array{title:string, mastery:string}>
+     */
+    private function objectives_for(int $userid, int $courseid): array {
+        if (!objective_manager::is_enabled_for_course($courseid)) {
+            return [];
+        }
+        $summary = objective_manager::compute_course_summary($userid, $courseid);
+        $out = [];
+        foreach ($summary['objectives'] as $row) {
+            $status = (string) $row['mastery']['status']; // not_started | learning | mastered.
+            $mastery = $status === 'learning' ? 'in_progress' : $status;
+            if ($mastery === 'not_started'
+                    && $this->demonstrated_elsewhere($userid, (int) $row['objective']->id)) {
+                $mastery = 'demonstrated_elsewhere';
+            }
+            $out[] = ['title' => (string) $row['objective']->title, 'mastery' => $mastery];
+        }
+        return $out;
+    }
+
+    /**
+     * Whether the learner mastered a cross-course equivalent of this objective
+     * elsewhere (v5.7.0 obj_links equivalency).
+     *
+     * @param int $userid
+     * @param int $objectiveid
+     * @return bool
+     */
+    private function demonstrated_elsewhere(int $userid, int $objectiveid): bool {
+        foreach (cross_course_mastery::linked_objectives($objectiveid) as $link) {
+            $m = objective_manager::compute_mastery($userid, (int) $link['objectiveid']);
+            if (($m['status'] ?? '') === 'mastered') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * At least the configured percentage of the course's tracked objectives are
      * mastered (and objectives are enabled with at least one defined).
      *

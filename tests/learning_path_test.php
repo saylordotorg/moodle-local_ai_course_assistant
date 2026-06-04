@@ -111,4 +111,30 @@ final class learning_path_test extends \advanced_testcase {
         $r = $lp->readiness((int) $user->id, (int) $c->id);
         $this->assertFalse($r['ready']);
     }
+
+    public function test_full_path_null_when_flag_off(): void {
+        $this->resetAfterTest();
+        set_config('learning_path_enabled', '0', 'local_ai_course_assistant');
+        $lp = new learning_path(new stub_program_source($this->threecourse_cfg(100, [201, 202, 203])));
+        $this->assertNull($lp->full_path(100, 202));
+    }
+
+    public function test_full_path_structure(): void {
+        $this->resetAfterTest();
+        set_config('learning_path_enabled', '1', 'local_ai_course_assistant');
+        $lp = new learning_path(new stub_program_source($this->threecourse_cfg(100, [201, 202, 203])));
+        $model = $lp->full_path(100, 202);
+
+        $this->assertNotNull($model);
+        $this->assertSame('Business Path', $model['program']['name']);
+        $this->assertSame(2, $model['position']['index']);
+        $this->assertSame(3, $model['position']['total']);
+        $this->assertCount(3, $model['courses']);
+        // Learner is on the middle course; the others are upcoming (no completion in the stub).
+        $this->assertSame('upcoming', $model['courses'][0]['status']);
+        $this->assertSame('current', $model['courses'][1]['status']);
+        $this->assertTrue($model['courses'][1]['is_current']);
+        $this->assertSame(202, $model['courses'][1]['courseid']);
+        $this->assertSame(2, $model['courses'][1]['position']);
+    }
 }
