@@ -695,8 +695,34 @@ class hook_callbacks {
         // Whether admin-configured starters exist (controls fallback defaults in template).
         $hasstarterdata = !empty($starters);
 
+        // v5.9.0 — Learning path map + next-course nudge. pathenabled gates the
+        // header button and the lazy-loaded panel; the nudge fields drive the
+        // dismissible in-drawer banner. Current-course readiness only (cheap);
+        // the full multi-course model loads via the get_learning_path WS when the
+        // panel opens. \Throwable-guarded so any program-data issue degrades to
+        // no button / no banner.
+        $pathenabled = false;
+        $pathnudgeready = false;
+        $pathnudgename = '';
+        try {
+            $learningpath = new \local_ai_course_assistant\program\learning_path();
+            $pathenabled = $learningpath->is_enabled_for_course($courseid);
+            if ($pathenabled) {
+                $readiness = $learningpath->readiness((int) $USER->id, $courseid);
+                if (!empty($readiness['ready']) && !empty($readiness['next_course'])) {
+                    $pathnudgeready = true;
+                    $pathnudgename = (string) $readiness['next_course']['name'];
+                }
+            }
+        } catch (\Throwable $e) {
+            $pathenabled = false;
+        }
+
         // Render template.
         $templatedata = [
+            'pathenabled'        => $pathenabled,
+            'pathnudgeready'     => $pathnudgeready,
+            'pathnudgename'      => $pathnudgename,
             'courseid'           => $courseid,
             'sesskey'            => sesskey(),
             'avatarurl'          => $avatarurl,

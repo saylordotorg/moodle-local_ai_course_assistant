@@ -214,6 +214,21 @@
                     </svg>
                 </button>
                 {{/talkingavatarenabled}}
+                {{#pathenabled}}
+                <button class="local-ai-course-assistant__btn-path"
+                        title="{{#str}}pathpanel_open, local_ai_course_assistant{{/str}}"
+                        aria-label="{{#str}}pathpanel_open, local_ai_course_assistant{{/str}}"
+                        type="button">
+                    {{! Path / route icon }}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="6" cy="19" r="2"/>
+                        <circle cx="18" cy="5" r="2"/>
+                        <path d="M8 19h7a3 3 0 0 0 3-3V7"/>
+                    </svg>
+                </button>
+                {{/pathenabled}}
                 {{#canviewanalytics}}
                 <a href="{{analyticsurl}}"
                    class="local-ai-course-assistant__btn-analytics"
@@ -404,12 +419,47 @@
         </div>
         {{/masterychipenabled}}
 
+        {{! v5.9.0 — Next-course readiness banner. Rendered only when the learner
+            has met the bar; chat.js hides it if dismissed (localStorage). }}
+        {{#pathnudgeready}}
+        <div class="local-ai-course-assistant__path-nudge"
+             role="status"
+             data-next-name="{{pathnudgename}}">
+            <div class="local-ai-course-assistant__path-nudge-text">
+                <strong>{{#str}}nudge_ready_title, local_ai_course_assistant{{/str}}</strong>
+                <span>{{#str}}nudge_ready_body, local_ai_course_assistant, {{pathnudgename}}{{/str}}</span>
+            </div>
+            <div class="local-ai-course-assistant__path-nudge-actions">
+                <button type="button" class="local-ai-course-assistant__btn-nudge-path">
+                    {{#str}}nudge_view_path, local_ai_course_assistant{{/str}}
+                </button>
+                <button type="button" class="local-ai-course-assistant__btn-nudge-dismiss"
+                        aria-label="{{#str}}nudge_dismiss, local_ai_course_assistant{{/str}}"
+                        title="{{#str}}nudge_dismiss, local_ai_course_assistant{{/str}}">&times;</button>
+            </div>
+        </div>
+        {{/pathnudgeready}}
+
         {{! Messages area }}
         <div class="local-ai-course-assistant__messages"
              role="log"
              aria-live="polite"
              aria-label="{{shortname_label}}">
         </div>
+
+        {{! v5.9.0 — Learning path map panel (lazy-populated by path_map.js). }}
+        {{#pathenabled}}
+        <div class="local-ai-course-assistant__path-panel" hidden
+             role="region" aria-label="{{#str}}pathpanel_title, local_ai_course_assistant{{/str}}">
+            <div class="local-ai-course-assistant__path-panel-header">
+                <strong>{{#str}}pathpanel_title, local_ai_course_assistant{{/str}}</strong>
+                <button type="button" class="local-ai-course-assistant__btn-path-close"
+                        aria-label="{{#str}}nudge_dismiss, local_ai_course_assistant{{/str}}"
+                        title="{{#str}}nudge_dismiss, local_ai_course_assistant{{/str}}">&times;</button>
+            </div>
+            <div class="local-ai-course-assistant__path-panel-body"></div>
+        </div>
+        {{/pathenabled}}
 
         {{#contextdebugvisible}}
         <div class="aica-debug-panel" hidden>
