@@ -1333,3 +1333,24 @@ $string['objectives:rebuild_links_done'] = 'Tautan penguasaan lintas kursus diba
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Kesadaran jalur belajar ke depan aktif secara default';
 $string['pedagogy:program_path_desc'] = 'Saat aktif, SOLA dapat memberi tahu pelajar ke mana kursus saat ini akan mengarah berikutnya dalam program mereka (gelar atau sertifikat) dan bagaimana konsep hari ini menjembatani ke kursus-kursus selanjutnya. Membaca plugin Moodle Programs (Degrees dan Learn) dan menyebutkan kursus berikutnya yang spesifik hanya jika program tersebut menetapkan prasyarat atau urutan yang diwajibkan; jika tidak, ia mencatat posisi pelajar dalam jalur tersebut. Bersifat saran saja — tidak pernah mengubah pendaftaran atau penguasaan, dan hanya menggunakan alokasi program milik pelajar saat ini. Secara diam-diam tidak melakukan apa pun jika tidak ada program yang berlaku.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Peta jalur pembelajaran dan saran kursus berikutnya aktif secara bawaan';
+$string['pedagogy:learning_path_desc'] = 'Saat aktif, SOLA menambahkan panel jalur pembelajaran visual (tombol "jalur saya" di header widget) yang menampilkan program pelajar sebagai rangkaian kursus, masing-masing dapat diperluas untuk menampilkan tujuannya dan penguasaan pelajar. Ketika pelajar telah memenuhi ambang batas untuk kursus saat ini (penyelesaian atau porsi tinggi dari tujuan yang dikuasai), SOLA juga menampilkan banner halus "siap untuk kursus berikutnya" dan menyebutkannya dalam percakapan. Hanya bersifat saran; menggunakan alokasi program milik pelajar sendiri; secara diam-diam tidak melakukan apa pun jika tidak ada program yang berlaku.';
+$string['settings:learning_path_mastery_threshold'] = 'Ambang batas kesiapan jalur pembelajaran (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Persentase tujuan kursus yang dilacak yang harus dikuasai pelajar sebelum dorongan jalur pembelajaran menganggapnya siap untuk kursus berikutnya. Penyelesaian kursus Moodle adalah pemicu lainnya; mana pun yang terjadi lebih dulu akan memicu dorongan tersebut. Bawaan 80.';
+$string['pathpanel_title'] = 'Jalur pembelajaran saya';
+$string['pathpanel_open'] = 'Jalur pembelajaran saya';
+$string['pathpanel_empty'] = 'Belum ada jalur program yang tersedia untuk kursus ini.';
+$string['path_position'] = 'Kursus {$a->index} dari {$a->total}';
+$string['path_status_done'] = 'Selesai';
+$string['path_status_current'] = 'Anda di sini';
+$string['path_status_upcoming'] = 'Mendatang';
+$string['path_mastery_mastered'] = 'Dikuasai';
+$string['path_mastery_in_progress'] = 'Sedang berlangsung';
+$string['path_mastery_not_started'] = 'Belum dimulai';
+$string['path_mastery_demonstrated_elsewhere'] = 'Ditunjukkan di kursus lain';
+$string['nudge_ready_title'] = 'Siap melanjutkan';
+$string['nudge_ready_body'] = 'Kerja bagus – Anda siap untuk {$a}.';
+$string['nudge_view_path'] = 'Lihat jalur saya';
+$string['nudge_dismiss'] = 'Tutup';

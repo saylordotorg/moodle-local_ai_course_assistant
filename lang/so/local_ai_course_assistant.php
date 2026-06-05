@@ -1320,3 +1320,24 @@ $string['objectives:rebuild_links_done'] = 'Xiriirinta aqoonta koorsooyinka dhex
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Wacyigelinta jidka waxbarasho ee hore ayaa loo daaray sida caadiga ah';
 $string['pedagogy:program_path_desc'] = 'Marka la daaro, SOLA wuxuu u sheegi karaa ardayga halka koorsadan hadda jirta ay u horseedeyso barnaamijkooda (shahaado ama shahaado xirfadeed) iyo sida fikradaha maanta ay isugu xirmaan koorsooyinka soo socda. Wuxuu akhriyaa Moodle Programs plugin (Degrees iyo Learn) wuxuuna magacaabaa koorso xiga oo gaar ah oo keliya halka barnaamijku qeexo shuruud ka horreysa ama nidaam loo baahan yahay; haddii kale wuxuu xusaa booska ardaygu ku jiro jidka. Talo bixin kaliya — waligii ma beddelo isdiiwaangelinta ama heerka mahadda, oo waligii wuxuu adeegsadaa kaliya qoondada barnaamijka ardayga hadda jira. Si aamusnaan ah waxba ma qabto halka aan barnaamij khusayn.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Khariidadda dariiqa waxbarashada iyo riixitaanka koorsada xigta ayaa si caadi ah loo shidaa';
+$string['pedagogy:learning_path_desc'] = 'Marka la shido, SOLA waxay ku dartaa muraayad muuqaal ah oo dariiqa waxbarashada (badhan "dariiqayga" oo ku yaal madaxa widget-ka) oo muujinaya barnaamijka ardayga sida isku xigxiga koorsooyin, mid kasta oo la kala bixin karo si loo arko ujeeddooyinkiisa iyo heerka aqoonta ardayga. Marka ardaygu gaaro xadka koorsada hadda (dhammaystirka ama qayb sare oo ujeeddooyin la xaqiijiyay), SOLA waxay sidoo kale muujinaysaa boorar khafiif ah "diyaar u ah koorsada xigta" oo ay ku xuso sheekada. Talo kaliya; waxay isticmaashaa qoondada barnaamijka ardayga; si aamusan waxba ma qabato meesha aanu barnaamij khusayn.';
+$string['settings:learning_path_mastery_threshold'] = 'Xadka diyaarnimada dariiqa waxbarashada (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Boqolkiiba ujeeddooyinka la dabagalo ee koorsada oo ardaygu waa inuu xaqiijiyo ka hor inta uusan riixitaanka dariiqa waxbarashada u tixgelin inuu diyaar u yahay koorsada xigta. Dhammaystirka koorsada Moodle waa kicinta kale; midkii hore dhaca ayaa kiciya riixitaanka. Caadi ahaan 80.';
+$string['pathpanel_title'] = 'Dariiqayga waxbarashada';
+$string['pathpanel_open'] = 'Dariiqayga waxbarashada';
+$string['pathpanel_empty'] = 'Wali dariiq barnaamij looma heli karo koorsadan.';
+$string['path_position'] = 'Koorsada {$a->index} ee {$a->total}';
+$string['path_status_done'] = 'La dhammeeyay';
+$string['path_status_current'] = 'Halkan ayaad joogtaa';
+$string['path_status_upcoming'] = 'Soo socda';
+$string['path_mastery_mastered'] = 'La xaqiijiyay';
+$string['path_mastery_in_progress'] = 'Socota';
+$string['path_mastery_not_started'] = 'Lama bilaabin';
+$string['path_mastery_demonstrated_elsewhere'] = 'Lagu muujiyay koorso kale';
+$string['nudge_ready_title'] = 'Diyaar u ah inaad sii wadato';
+$string['nudge_ready_body'] = 'Shaqo wanaagsan — waxaad diyaar u tahay {$a}.';
+$string['nudge_view_path'] = 'Eeg dariiqayga';
+$string['nudge_dismiss'] = 'Iska tuur';

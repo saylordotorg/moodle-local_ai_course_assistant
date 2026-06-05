@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Liens de maîtrise inter-cours recon
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Conscience du parcours d\'apprentissage à venir activée par défaut';
 $string['pedagogy:program_path_desc'] = 'Lorsque cette option est activée, SOLA peut indiquer à un apprenant vers quoi mène le cours actuel dans son programme (diplôme ou certificat) et comment les concepts du jour préparent les cours ultérieurs. Elle lit le plugin Programs de Moodle (Degrees et Learn) et ne nomme un cours suivant précis que lorsque le programme définit un prérequis ou un ordre obligatoire ; sinon, elle situe simplement la position de l\'apprenant dans le parcours. À titre consultatif uniquement — elle ne modifie jamais l\'inscription ni la maîtrise, et n\'utilise que l\'attribution de programme propre à l\'apprenant actuel. Ne fait rien, de manière silencieuse, lorsqu\'aucun programme ne s\'applique.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Carte du parcours d\'apprentissage et suggestion du cours suivant activées par défaut';
+$string['pedagogy:learning_path_desc'] = 'Lorsqu\'elle est activée, SOLA ajoute un panneau visuel de parcours d\'apprentissage (un bouton "mon parcours" dans l\'en-tête du widget) montrant le programme de l\'apprenant sous forme de séquence de cours, chacun pouvant être déployé pour afficher ses objectifs et la maîtrise de l\'apprenant. Lorsque l\'apprenant a atteint le seuil du cours actuel (achèvement ou une part élevée d\'objectifs maîtrisés), SOLA affiche également une bannière discrète "prêt pour le cours suivant" et le mentionne dans la conversation. À titre indicatif uniquement ; utilise l\'affectation de programme propre à l\'apprenant ; ne fait rien silencieusement lorsqu\'aucun programme ne s\'applique.';
+$string['settings:learning_path_mastery_threshold'] = 'Seuil de préparation du parcours d\'apprentissage (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Pourcentage des objectifs suivis d\'un cours qu\'un apprenant doit maîtriser avant que la suggestion de parcours d\'apprentissage ne le considère prêt pour le cours suivant. L\'achèvement du cours dans Moodle est l\'autre déclencheur ; la suggestion se déclenche selon ce qui survient en premier. Valeur par défaut : 80.';
+$string['pathpanel_title'] = 'Mon parcours d\'apprentissage';
+$string['pathpanel_open'] = 'Mon parcours d\'apprentissage';
+$string['pathpanel_empty'] = 'Aucun parcours de programme n\'est encore disponible pour ce cours.';
+$string['path_position'] = 'Cours {$a->index} sur {$a->total}';
+$string['path_status_done'] = 'Terminé';
+$string['path_status_current'] = 'Vous êtes ici';
+$string['path_status_upcoming'] = 'À venir';
+$string['path_mastery_mastered'] = 'Maîtrisé';
+$string['path_mastery_in_progress'] = 'En cours';
+$string['path_mastery_not_started'] = 'Non commencé';
+$string['path_mastery_demonstrated_elsewhere'] = 'Démontré dans un autre cours';
+$string['nudge_ready_title'] = 'Prêt à continuer';
+$string['nudge_ready_body'] = 'Beau travail : vous êtes prêt pour {$a}.';
+$string['nudge_view_path'] = 'Voir mon parcours';
+$string['nudge_dismiss'] = 'Ignorer';

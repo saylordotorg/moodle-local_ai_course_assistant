@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Beherskelseslinks på tværs af kurs
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Bevidsthed om fremadrettet læringsforløb slået til som standard';
 $string['pedagogy:program_path_desc'] = 'Når denne er slået til, kan SOLA fortælle en studerende, hvor det aktuelle kursus fører hen derefter i deres program (grad eller certifikat), og hvordan dagens begreber bygger bro til senere kurser. Den læser fra Moodle Programs-pluginet (Degrees og Learn) og navngiver kun et bestemt næste kursus, hvor programmet definerer en forudsætning eller en obligatorisk rækkefølge; ellers angiver den den studerendes placering i forløbet. Kun vejledende — den ændrer aldrig tilmelding eller mestring og anvender kun den aktuelle studerendes egen programtildeling. Gør i det stille ingenting, hvor intet program er relevant.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Læringssti-kort og næste-kursus-puff er slået til som standard';
+$string['pedagogy:learning_path_desc'] = 'Når funktionen er slået til, tilføjer SOLA et visuelt læringssti-panel (en "min sti"-knap i widget-headeren), der viser den lærendes program som en række kurser, hvor hvert kursus kan udvides til sine mål og den lærendes mestring. Når den lærende har nået kravet for det aktuelle kursus (gennemførelse eller en høj andel af målene mestret), viser SOLA også et venligt "klar til næste kursus"-banner og nævner det i samtalen. Kun vejledende; bruger den lærendes egen programtildeling; gør stille og roligt ingenting, hvor intet program er relevant.';
+$string['settings:learning_path_mastery_threshold'] = 'Læringssti-parathedsgrænse (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Procentdel af et kursus\' sporede mål, en lærende skal mestre, før læringssti-puffet betragter vedkommende som klar til næste kursus. Moodle-kursusgennemførelse er den anden udløser; det, der sker først, udløser puffet. Standard er 80.';
+$string['pathpanel_title'] = 'Min læringssti';
+$string['pathpanel_open'] = 'Min læringssti';
+$string['pathpanel_empty'] = 'Der er endnu ingen programsti tilgængelig for dette kursus.';
+$string['path_position'] = 'Kursus {$a->index} af {$a->total}';
+$string['path_status_done'] = 'Færdig';
+$string['path_status_current'] = 'Du er her';
+$string['path_status_upcoming'] = 'Kommende';
+$string['path_mastery_mastered'] = 'Mestret';
+$string['path_mastery_in_progress'] = 'I gang';
+$string['path_mastery_not_started'] = 'Ikke påbegyndt';
+$string['path_mastery_demonstrated_elsewhere'] = 'Vist i et andet kursus';
+$string['nudge_ready_title'] = 'Klar til at gå videre';
+$string['nudge_ready_body'] = 'Godt gået — du er klar til {$a}.';
+$string['nudge_view_path'] = 'Se min sti';
+$string['nudge_dismiss'] = 'Afvis';

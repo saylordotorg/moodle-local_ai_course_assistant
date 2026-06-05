@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'Vínculos de domínio entre cursos r
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Reconhecimento do caminho de aprendizagem futuro ativado por padrão';
 $string['pedagogy:program_path_desc'] = 'Quando ativado, o SOLA pode dizer ao aluno para onde o curso atual leva em seguida em seu programa (diploma ou certificado) e como os conceitos de hoje se conectam aos cursos posteriores. Lê o plugin Programs do Moodle (Degrees e Learn) e nomeia um curso seguinte específico apenas quando o programa define um pré-requisito ou uma ordem obrigatória; caso contrário, indica a posição do aluno no caminho. Apenas consultivo — nunca altera matrículas ou domínio, e usa somente a alocação de programa do próprio aluno atual. Não faz nada de forma silenciosa quando nenhum programa se aplica.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Mapa do percurso de aprendizagem e sugestão do próximo curso ativadas por padrão';
+$string['pedagogy:learning_path_desc'] = 'Quando ativado, o SOLA adiciona um painel visual de percurso de aprendizagem (um botão "meu percurso" no cabeçalho do widget) mostrando o programa do aluno como uma sequência de cursos, cada um expansível para seus objetivos e o domínio do aluno. Quando o aluno atinge o limite do curso atual (conclusão ou uma alta proporção de objetivos dominados), o SOLA também exibe um discreto banner "pronto para o próximo curso" e o menciona na conversa. Apenas consultivo; usa a alocação de programa do próprio aluno; não faz nada silenciosamente quando nenhum programa se aplica.';
+$string['settings:learning_path_mastery_threshold'] = 'Limite de prontidão do percurso de aprendizagem (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Porcentagem dos objetivos monitorados de um curso que um aluno deve dominar antes que a sugestão de percurso de aprendizagem o considere pronto para o próximo curso. A conclusão do curso no Moodle é o outro gatilho; o que ocorrer primeiro dispara a sugestão. Padrão 80.';
+$string['pathpanel_title'] = 'Meu percurso de aprendizagem';
+$string['pathpanel_open'] = 'Meu percurso de aprendizagem';
+$string['pathpanel_empty'] = 'Ainda não há nenhum percurso de programa disponível para este curso.';
+$string['path_position'] = 'Curso {$a->index} de {$a->total}';
+$string['path_status_done'] = 'Concluído';
+$string['path_status_current'] = 'Você está aqui';
+$string['path_status_upcoming'] = 'Em breve';
+$string['path_mastery_mastered'] = 'Dominado';
+$string['path_mastery_in_progress'] = 'Em andamento';
+$string['path_mastery_not_started'] = 'Não iniciado';
+$string['path_mastery_demonstrated_elsewhere'] = 'Demonstrado em outro curso';
+$string['nudge_ready_title'] = 'Pronto para avançar';
+$string['nudge_ready_body'] = 'Bom trabalho — você está pronto para {$a}.';
+$string['nudge_view_path'] = 'Ver meu percurso';
+$string['nudge_dismiss'] = 'Dispensar';

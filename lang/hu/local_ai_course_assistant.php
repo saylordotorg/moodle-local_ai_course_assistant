@@ -1346,3 +1346,24 @@ $string['objectives:rebuild_links_done'] = 'Tantárgyak közötti tudáskapcsola
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Előretekintő tanulási úvonal felismerése alapértelmezetten bekapcsolva';
 $string['pedagogy:program_path_desc'] = 'Bekapcsolt állapotban a SOLA megmondhatja a tanulónak, hogy a jelenlegi kurzus hová vezet tovább a programjában (oklevél vagy bizonyítvány), és hogy a mai fogalmak miként kapcsolódnak a későbbi kurzusokhoz. A Moodle Programs bővítményt (Degrees és Learn) olvassa, és csak akkor nevez meg egy konkrét következő kurzust, ahol a program előfeltételt vagy kötelező sorrendet határoz meg; egyébként a tanuló útvonalon belüli helyzetét jelzi. Csak tájékoztató jellegű — soha nem módosítja a beiratkozást vagy az elsajátítást, és mindig kizárólag az adott tanuló saját programbeosztását használja. Csendben nem tesz semmit, ahol nem alkalmazható program.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Tanulási útvonal térkép és következő kurzus ajánlás alapértelmezetten bekapcsolva';
+$string['pedagogy:learning_path_desc'] = 'Bekapcsolt állapotban a SOLA egy vizuális tanulási útvonal panelt ad hozzá (egy "saját útvonalam" gomb a widget fejlécében), amely a tanuló programját kurzusok sorozataként mutatja, melyek mindegyike kibontható a céljainak és a tanuló elsajátítási szintjének megjelenítéséhez. Amikor a tanuló elérte az aktuális kurzus küszöbét (teljesítés vagy az elsajátított célok magas aránya), a SOLA egy finom "készen állsz a következő kurzusra" feliratot is megjelenít, és megemlíti a beszélgetésben. Csak tájékoztató jellegű; a tanuló saját programkiosztását használja; csendben nem tesz semmit, ha nincs alkalmazható program.';
+$string['settings:learning_path_mastery_threshold'] = 'Tanulási útvonal felkészültségi küszöb (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Egy kurzus követett céljainak azon százaléka, amelyet a tanulónak el kell sajátítania, mielőtt a tanulási útvonal ajánlás késznek tekinti a következő kurzusra. A másik kiváltó tényező a Moodle kurzusteljesítés; az ajánlást az indítja el, amelyik előbb bekövetkezik. Alapértelmezett: 80.';
+$string['pathpanel_title'] = 'A tanulási útvonalam';
+$string['pathpanel_open'] = 'A tanulási útvonalam';
+$string['pathpanel_empty'] = 'Ehhez a kurzushoz még nem érhető el programútvonal.';
+$string['path_position'] = '{$a->total} kurzusból a(z) {$a->index}.';
+$string['path_status_done'] = 'Kész';
+$string['path_status_current'] = 'Itt tartasz';
+$string['path_status_upcoming'] = 'Hamarosan';
+$string['path_mastery_mastered'] = 'Elsajátítva';
+$string['path_mastery_in_progress'] = 'Folyamatban';
+$string['path_mastery_not_started'] = 'Nincs elkezdve';
+$string['path_mastery_demonstrated_elsewhere'] = 'Másik kurzuson bemutatva';
+$string['nudge_ready_title'] = 'Készen állsz a továbblépésre';
+$string['nudge_ready_body'] = 'Szép munka – készen állsz erre: {$a}.';
+$string['nudge_view_path'] = 'Útvonalam megtekintése';
+$string['nudge_dismiss'] = 'Elvetés';

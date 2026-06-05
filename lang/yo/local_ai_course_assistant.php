@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = 'A ti tún àwọn ìjápọ̀ ìmọ
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Mọ̀ ọ̀nà ìkẹ́kọ̀ọ́ síwájú ní ìpilẹ̀ṣẹ̀';
 $string['pedagogy:program_path_desc'] = 'Nígbà tó bá ṣiṣẹ́, SOLA lè sọ fún akẹ́kọ̀ọ́ ibi tí ẹ̀kọ́ tó wà lọ́wọ́lọ́wọ́ ń darí sí nínú ìtòlẹ́sẹẹsẹ rẹ̀ (oyè tàbí ìwé ẹ̀rí) àti bí àwọn èròjà òní ṣe ń so pọ̀ mọ́ àwọn ẹ̀kọ́ tó ń tẹ̀lé. Ó ń ka àfikún Moodle Programs (Degrees àti Learn) ó sì ń dárúkọ ẹ̀kọ́ tó ń tẹ̀lé pàtó kìkì níbi tí ìtòlẹ́sẹẹsẹ náà bá ti ṣàlàyé ohun tó gbọ́dọ̀ wà ṣáájú tàbí ètò tó pọn dandan; bí bẹ́ẹ̀ kọ́, ó máa ṣàkíyèsí ipò akẹ́kọ̀ọ́ nínú ọ̀nà náà. Fún ìmọ̀ràn nìkan — kò yí ìforúkọsílẹ̀ tàbí ìmọ̀ràn ìkẹ́kọ̀ọ́ padà rárá, ó sì ń lo ìpín ìtòlẹ́sẹẹsẹ ti akẹ́kọ̀ọ́ tó wà lọ́wọ́lọ́wọ́ fúnra rẹ̀ nìkan. Ó ń dákẹ́ jẹ́ẹ́ láìṣe ohunkóhun níbi tí kò sí ìtòlẹ́sẹẹsẹ tó bá a mu.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Maapu ọ̀nà ìkẹ́kọ̀ọ́ àti ìmọ̀ràn ẹ̀kọ́ tókàn ti ṣiṣẹ́ ní àkọ́kọ́';
+$string['pedagogy:learning_path_desc'] = 'Nígbà tó bá ṣiṣẹ́, SOLA á fi pánẹ́lì ọ̀nà ìkẹ́kọ̀ọ́ tó hàn kún (bọ́tìnì "ọ̀nà mi" nínú orí widget) tó ń fi ètò akẹ́kọ̀ọ́ hàn gẹ́gẹ́ bí ọ̀wọ́ àwọn ẹ̀kọ́, tí ọ̀kọ̀ọ̀kan lè ṣí kàlàkàlà sí àwọn àfojúsùn rẹ̀ àti ìmọ̀ àkúnlẹ̀ akẹ́kọ̀ọ́. Nígbà tí akẹ́kọ̀ọ́ bá ti dé àmì ẹ̀kọ́ lọ́wọ́ (ìparí tàbí ìpín gíga àwọn àfojúsùn tí ó ti mọ̀ dáadáa), SOLA á tún fi báánà jẹ́jẹ́ "ó ti ṣetán fún ẹ̀kọ́ tókàn" hàn yóò sì mẹ́nu kàn án nínú ìjíròrò. Ìmọ̀ràn nìkan ni; ó ń lo ìpín ètò ti akẹ́kọ̀ọ́ fúnra rẹ̀; ó ń dákẹ́ láìṣe nǹkan kan níbi tí kò sí ètò tó bá a mu.';
+$string['settings:learning_path_mastery_threshold'] = 'Àlà ìmúrasílẹ̀ ọ̀nà ìkẹ́kọ̀ọ́ (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Ìpín ọgọ́rùn-ún àwọn àfojúsùn ẹ̀kọ́ tí a ń tọpa tí akẹ́kọ̀ọ́ gbọ́dọ̀ mọ̀ dáadáa kí ìmọ̀ràn ọ̀nà ìkẹ́kọ̀ọ́ tó kà á sí ẹni tó ti ṣetán fún ẹ̀kọ́ tókàn. Ìparí ẹ̀kọ́ Moodle ni okùnfà mìíràn; èyíkéyìí tó bá ṣẹlẹ̀ ní àkọ́kọ́ ló máa fa ìmọ̀ràn náà. Àfàtàn 80.';
+$string['pathpanel_title'] = 'Ọ̀nà ìkẹ́kọ̀ọ́ mi';
+$string['pathpanel_open'] = 'Ọ̀nà ìkẹ́kọ̀ọ́ mi';
+$string['pathpanel_empty'] = 'Kò sí ọ̀nà ètò kankan fún ẹ̀kọ́ yìí síbẹ̀.';
+$string['path_position'] = 'Ẹ̀kọ́ {$a->index} nínú {$a->total}';
+$string['path_status_done'] = 'Ó parí';
+$string['path_status_current'] = 'Ìbí ni o wà';
+$string['path_status_upcoming'] = 'Tó ń bọ̀';
+$string['path_mastery_mastered'] = 'Ó ti mọ̀ ọ́n';
+$string['path_mastery_in_progress'] = 'Ń lọ lọ́wọ́';
+$string['path_mastery_not_started'] = 'Kò bẹ̀rẹ̀';
+$string['path_mastery_demonstrated_elsewhere'] = 'Fi hàn nínú ẹ̀kọ́ mìíràn';
+$string['nudge_ready_title'] = 'Ó ṣetán láti tẹ̀síwájú';
+$string['nudge_ready_body'] = 'Iṣẹ́ rere — o ti ṣetán fún {$a}.';
+$string['nudge_view_path'] = 'Wo ọ̀nà mi';
+$string['nudge_dismiss'] = 'Pa á rẹ́';

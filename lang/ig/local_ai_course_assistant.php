@@ -1319,3 +1319,24 @@ $string['objectives:rebuild_links_done'] = 'E wughachiri njikọ ọmụma n\'ag
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Mmata ụzọ mmụta n\'ihu na-arụ ọrụ site na ndabara';
 $string['pedagogy:program_path_desc'] = 'Mgbe ọ na-arụ ọrụ, SOLA nwere ike ịgwa onye na-amụ ihe ebe usoro ọmụmụ a na-eduga na-aga ọzọ na mmemme ha (akara mmụta ma ọ bụ asambodo) na otú echiche nke taa si jikọta na nkuzi ndị na-abịa n\'ihu. Ọ na-agụ ngwa Moodle Programs (Degrees na Learn) ma na-akpọ aha otu nkuzi ọzọ kpọmkwem naanị ebe mmemme na-akọwa ihe achọrọ tupu mmalite ma ọ bụ usoro achọrọ; ma ọ bụghị ya, ọ na-akọwa ọnọdụ onye na-amụ ihe n\'ụzọ ahụ. Naanị ndụmọdụ — ọ naghị agbanwe ndenye aha ma ọ bụ mmụta zuru oke, ọ na-eji naanị nkesa mmemme nke onye na-amụ ihe ugbu a. Ọ na-eme ihe ọ bụla na nzuzo ebe ọ dịghị mmemme metụtara ya.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Maapụ ụzọ mmụta na ntu aka nke usoro ọmụmụ na-esote ka a gbanyere site na ndabere';
+$string['pedagogy:learning_path_desc'] = 'Mgbe agbanyere ya, SOLA na-agbakwunye ogige ụzọ mmụta a na-ahụ anya (bọtịnụ "ụzọ m" dị na isi widget) nke na-egosi mmemme nke onye mmụta dị ka usoro nke ọmụmụ, nke ọ bụla nwere ike ịgbasa iji gosi ebumnuche ya na ọkachamara nke onye mmụta. Mgbe onye mmụta ruru ókè nke usoro ọmụmụ dị ugbu a (mmecha ma ọ bụ oke pasentị nke ebumnuche e mejupụtara), SOLA na-egosikwa banner dị nro nke "dị njikere maka usoro ọmụmụ na-esote" ma kwuo ya na mkparịta ụka. Naanị maka ndụmọdụ; na-eji nkesa mmemme nke onye mmụta n\'onwe ya; anaghị eme ihe ọ bụla na nzuzo ebe ọ dịghị mmemme dabara.';
+$string['settings:learning_path_mastery_threshold'] = 'Ókè njikere ụzọ mmụta (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Pasentị nke ebumnuche usoro ọmụmụ a na-eso nke onye mmụta ga-amụta tupu ntu aka ụzọ mmụta were ya dị ka onye dị njikere maka usoro ọmụmụ na-esote. Mmecha usoro ọmụmụ Moodle bụ ihe ọzọ na-akpali ya; nke ọ bụla mere mbụ na-akpali ntu aka ahụ. Ndabere 80.';
+$string['pathpanel_title'] = 'Ụzọ mmụta m';
+$string['pathpanel_open'] = 'Ụzọ mmụta m';
+$string['pathpanel_empty'] = 'Enwebeghị ụzọ mmemme dị maka usoro ọmụmụ a.';
+$string['path_position'] = 'Usoro ọmụmụ {$a->index} nke {$a->total}';
+$string['path_status_done'] = 'Emechaala';
+$string['path_status_current'] = 'Ị nọ ebe a';
+$string['path_status_upcoming'] = 'Na-abịa';
+$string['path_mastery_mastered'] = 'Amụtala';
+$string['path_mastery_in_progress'] = 'Na-aga n\'ihu';
+$string['path_mastery_not_started'] = 'Amaliteghị';
+$string['path_mastery_demonstrated_elsewhere'] = 'Egosiri na usoro ọmụmụ ọzọ';
+$string['nudge_ready_title'] = 'Dị njikere ịga n\'ihu';
+$string['nudge_ready_body'] = 'Ọrụ ọma – ị dị njikere maka {$a}.';
+$string['nudge_view_path'] = 'Lee ụzọ m';
+$string['nudge_dismiss'] = 'Wepụ';

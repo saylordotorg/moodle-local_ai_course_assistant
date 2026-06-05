@@ -1325,3 +1325,24 @@ $string['objectives:rebuild_links_done'] = '已重建跨课程掌握度关联：
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = '默认开启前向学习路径感知';
 $string['pedagogy:program_path_desc'] = '开启后，SOLA 可以告诉学习者当前课程在其项目（学位或证书）中接下来通向何处，以及今天的概念如何衔接到后续课程。该功能读取 Moodle Programs 插件（Degrees 和 Learn），仅在项目定义了先修要求或必修顺序时才指明具体的下一门课程；否则只说明学习者在路径中的位置。仅供参考——它绝不会更改注册或掌握度，且始终只使用当前学习者本人的项目分配。在不适用任何项目的情况下，它会静默地不执行任何操作。';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = '默认开启学习路径图和下一门课程提示';
+$string['pedagogy:learning_path_desc'] = '开启后，SOLA 会添加一个可视化的学习路径面板（小组件标题栏中的"我的路径"按钮），以课程序列的形式展示学员的学习项目，每门课程都可展开查看其目标以及学员的掌握情况。当学员达到当前课程的标准时（完成课程或掌握了较高比例的目标），SOLA 还会温和地显示"已准备好学习下一门课程"的横幅，并在对话中提及。仅供建议参考；使用学员自己的学习项目分配；在不适用任何学习项目时静默不做任何操作。';
+$string['settings:learning_path_mastery_threshold'] = '学习路径就绪阈值 (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = '学习路径提示将学员视为已准备好学习下一门课程之前，学员必须掌握的课程已跟踪目标的百分比。Moodle 课程完成是另一个触发条件；以先发生者触发提示。默认为 80。';
+$string['pathpanel_title'] = '我的学习路径';
+$string['pathpanel_open'] = '我的学习路径';
+$string['pathpanel_empty'] = '此课程暂无可用的学习项目路径。';
+$string['path_position'] = '第 {$a->index} 门课程，共 {$a->total} 门';
+$string['path_status_done'] = '已完成';
+$string['path_status_current'] = '您在这里';
+$string['path_status_upcoming'] = '即将开始';
+$string['path_mastery_mastered'] = '已掌握';
+$string['path_mastery_in_progress'] = '进行中';
+$string['path_mastery_not_started'] = '未开始';
+$string['path_mastery_demonstrated_elsewhere'] = '已在其他课程中展示';
+$string['nudge_ready_title'] = '准备好继续了';
+$string['nudge_ready_body'] = '做得好——您已准备好学习 {$a}。';
+$string['nudge_view_path'] = '查看我的路径';
+$string['nudge_dismiss'] = '关闭';

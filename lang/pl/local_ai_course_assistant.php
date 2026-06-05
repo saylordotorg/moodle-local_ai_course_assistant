@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Przebudowano powiązania opanowania 
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Świadomość dalszej ścieżki nauki domyślnie włączona';
 $string['pedagogy:program_path_desc'] = 'Po włączeniu SOLA może wskazać uczącemu się, dokąd prowadzi bieżący kurs w jego programie (studiach lub certyfikacie) i jak dzisiejsze pojęcia łączą się z późniejszymi kursami. Odczytuje dane z wtyczki Programs w Moodle (Degrees i Learn) i nazywa konkretny następny kurs tylko tam, gdzie program definiuje warunek wstępny lub wymaganą kolejność; w pozostałych przypadkach wskazuje pozycję uczącego się na ścieżce. Funkcja wyłącznie doradcza — nigdy nie zmienia zapisów na kursy ani biegłości i zawsze korzysta jedynie z przydziału programu danego uczącego się. Po cichu nie podejmuje żadnych działań tam, gdzie żaden program nie ma zastosowania.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Mapa ścieżki nauki i podpowiedź następnego kursu domyślnie włączone';
+$string['pedagogy:learning_path_desc'] = 'Gdy włączone, SOLA dodaje wizualny panel ścieżki nauki (przycisk "moja ścieżka" w nagłówku widżetu), pokazujący program uczącego się jako sekwencję kursów, z których każdy można rozwinąć, aby zobaczyć jego cele i poziom opanowania przez uczącego się. Gdy uczący się osiągnie próg dla bieżącego kursu (ukończenie lub wysoki odsetek opanowanych celów), SOLA wyświetla także delikatny baner "gotowy na następny kurs" i wspomina o tym w rozmowie. Tylko doradczo; korzysta z własnego przydziału programu uczącego się; po cichu nie robi nic tam, gdzie żaden program nie ma zastosowania.';
+$string['settings:learning_path_mastery_threshold'] = 'Próg gotowości ścieżki nauki (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Odsetek śledzonych celów kursu, które uczący się musi opanować, zanim podpowiedź ścieżki nauki uzna go za gotowego na następny kurs. Ukończenie kursu w Moodle jest drugim wyzwalaczem; podpowiedź uruchamia to, co nastąpi pierwsze. Domyślnie 80.';
+$string['pathpanel_title'] = 'Moja ścieżka nauki';
+$string['pathpanel_open'] = 'Moja ścieżka nauki';
+$string['pathpanel_empty'] = 'Dla tego kursu nie jest jeszcze dostępna żadna ścieżka programu.';
+$string['path_position'] = 'Kurs {$a->index} z {$a->total}';
+$string['path_status_done'] = 'Ukończono';
+$string['path_status_current'] = 'Jesteś tutaj';
+$string['path_status_upcoming'] = 'Nadchodzące';
+$string['path_mastery_mastered'] = 'Opanowane';
+$string['path_mastery_in_progress'] = 'W toku';
+$string['path_mastery_not_started'] = 'Nierozpoczęte';
+$string['path_mastery_demonstrated_elsewhere'] = 'Pokazane w innym kursie';
+$string['nudge_ready_title'] = 'Gotowy, by przejść dalej';
+$string['nudge_ready_body'] = 'Dobra robota — jesteś gotowy na {$a}.';
+$string['nudge_view_path'] = 'Zobacz moją ścieżkę';
+$string['nudge_dismiss'] = 'Odrzuć';

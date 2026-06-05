@@ -1333,3 +1333,24 @@ $string['objectives:rebuild_links_done'] = 'An sake gina mahaɗan cancanta a tsa
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Sanin hanyar koyo ta gaba a buɗe ta tsohuwar saiti';
 $string['pedagogy:program_path_desc'] = 'Lokacin da yake a buɗe, SOLA na iya gaya wa mai koyo inda darasin yanzu ke kaiwa na gaba a cikin shirinsa (digiri ko takardar shaida) da yadda dabarun yau suke haɗawa zuwa darussan baya. Yana karanta plugin ɗin Moodle Programs (Degrees da Learn) kuma yana ambaton wani takamaiman darasi na gaba kawai inda shirin ya bayyana sharaɗin gaba ko tsari da ake buƙata; in ba haka ba sai ya lura da matsayin mai koyo a cikin hanyar. Don shawara kawai — ba ya taɓa canza rajista ko ƙwarewa, kuma yana amfani da rabon shirin mai koyo na yanzu kawai. Yana yin shiru ba tare da yin komai ba inda babu shirin da ya dace.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Taswirar hanyar koyo da shawarar kwas na gaba a kunne ta tsohuwa';
+$string['pedagogy:learning_path_desc'] = 'Idan an kunna, SOLA na ƙara faifan gani na hanyar koyo (maɓallin "hanyata" a saman widget) wanda ke nuna shirin ɗalibi a matsayin jerin kwasakwasai, kowanne ana iya buɗewa don nuna manufofinsa da ƙwarewar ɗalibi. Idan ɗalibi ya cimma matakin kwas ɗin yanzu (kammalawa ko babban kaso na manufofin da aka ƙware), SOLA na kuma nuna kintinkiri mai laushi na "a shirye yake don kwas na gaba" tare da ambata shi a cikin tattaunawa. Don shawara kawai; yana amfani da rabon shirin ɗalibi kansa; ba ya yin komai a shiru inda babu wani shiri da ya dace.';
+$string['settings:learning_path_mastery_threshold'] = 'Matakin shirye-shiryen hanyar koyo (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Kaso na manufofin kwas da ake bibiya wanda dole ne ɗalibi ya ƙware kafin shawarar hanyar koyo ta ɗauke shi a shirye don kwas na gaba. Kammala kwas a Moodle shi ne ɗayan abin da ke kunnawa; duk wanda ya fara faruwa shi ke kunna shawarar. Tsoho 80.';
+$string['pathpanel_title'] = 'Hanyar koyona';
+$string['pathpanel_open'] = 'Hanyar koyona';
+$string['pathpanel_empty'] = 'Babu hanyar shiri da ke samuwa don wannan kwas tukuna.';
+$string['path_position'] = 'Kwas {$a->index} daga {$a->total}';
+$string['path_status_done'] = 'An gama';
+$string['path_status_current'] = 'Kana nan';
+$string['path_status_upcoming'] = 'Mai zuwa';
+$string['path_mastery_mastered'] = 'An ƙware';
+$string['path_mastery_in_progress'] = 'Ana ci gaba';
+$string['path_mastery_not_started'] = 'Ba a fara ba';
+$string['path_mastery_demonstrated_elsewhere'] = 'An nuna a wani kwas';
+$string['nudge_ready_title'] = 'A shirye don ci gaba';
+$string['nudge_ready_body'] = 'Kyakkyawan aiki – kana shirye don {$a}.';
+$string['nudge_view_path'] = 'Duba hanyata';
+$string['nudge_dismiss'] = 'Yi watsi';

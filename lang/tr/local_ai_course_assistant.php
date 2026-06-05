@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Kurslar arası yetkinlik bağlantıl
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'İleri öğrenme yolu farkındalığı varsayılan olarak açık';
 $string['pedagogy:program_path_desc'] = 'Açık olduğunda SOLA, mevcut dersin öğrencinin programında (derece veya sertifika) bir sonraki adımda nereye götürdüğünü ve bugünkü kavramların sonraki derslere nasıl köprü oluşturduğunu öğrenciye anlatabilir. Moodle Programs eklentisini (Degrees ve Learn) okur ve yalnızca programın bir ön koşul veya zorunlu sıralama tanımladığı yerlerde belirli bir sonraki dersin adını verir; aksi takdirde öğrencinin yoldaki konumunu belirtir. Yalnızca bilgilendirme amaçlıdır — kayıt veya ustalık durumunu asla değiştirmez ve yalnızca mevcut öğrencinin kendi program tahsisini kullanır. Hiçbir programın geçerli olmadığı durumlarda sessizce hiçbir şey yapmaz.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Öğrenme yolu haritası ve sonraki kurs önerisi varsayılan olarak açık';
+$string['pedagogy:learning_path_desc'] = 'Açık olduğunda, SOLA görsel bir öğrenme yolu paneli ekler (widget başlığında bir "yolum" düğmesi) ve öğrencinin programını bir kurs dizisi olarak gösterir; her kurs, hedeflerine ve öğrencinin ustalığına göre genişletilebilir. Öğrenci mevcut kursun çıtasını karşıladığında (tamamlama veya hedeflerin yüksek bir oranında ustalık), SOLA ayrıca nazik bir "sonraki kursa hazır" başlığı gösterir ve bunu sohbette belirtir. Yalnızca tavsiye niteliğindedir; öğrencinin kendi program tahsisini kullanır; hiçbir programın geçerli olmadığı yerlerde sessizce hiçbir şey yapmaz.';
+$string['settings:learning_path_mastery_threshold'] = 'Öğrenme yolu hazırlık eşiği (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Öğrenme yolu önerisinin öğrenciyi sonraki kursa hazır kabul etmesi için öğrencinin ustalaşması gereken, kursun izlenen hedeflerinin yüzdesi. Moodle kurs tamamlama diğer tetikleyicidir; hangisi önce gerçekleşirse öneriyi başlatır. Varsayılan 80.';
+$string['pathpanel_title'] = 'Öğrenme yolum';
+$string['pathpanel_open'] = 'Öğrenme yolum';
+$string['pathpanel_empty'] = 'Bu kurs için henüz bir program yolu mevcut değil.';
+$string['path_position'] = '{$a->total} kurstan {$a->index}. kurs';
+$string['path_status_done'] = 'Tamamlandı';
+$string['path_status_current'] = 'Buradasınız';
+$string['path_status_upcoming'] = 'Yaklaşan';
+$string['path_mastery_mastered'] = 'Ustalaşıldı';
+$string['path_mastery_in_progress'] = 'Devam ediyor';
+$string['path_mastery_not_started'] = 'Başlanmadı';
+$string['path_mastery_demonstrated_elsewhere'] = 'Başka bir kursta gösterildi';
+$string['nudge_ready_title'] = 'Devam etmeye hazır';
+$string['nudge_ready_body'] = 'Güzel iş — {$a} için hazırsınız.';
+$string['nudge_view_path'] = 'Yolumu görüntüle';
+$string['nudge_dismiss'] = 'Kapat';

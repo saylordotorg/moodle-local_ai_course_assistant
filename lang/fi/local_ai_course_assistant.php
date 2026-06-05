@@ -1302,3 +1302,24 @@ $string['objectives:rebuild_links_done'] = 'Kurssien väliset osaamislinkit rake
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Tulevan oppimispolun tunnistus oletusarvoisesti käytössä';
 $string['pedagogy:program_path_desc'] = 'Kun tämä on käytössä, SOLA voi kertoa opiskelijalle, mihin nykyinen kurssi johtaa seuraavaksi hänen ohjelmassaan (tutkinto tai todistus) ja miten päivän käsitteet linkittyvät myöhempiin kursseihin. Se lukee Moodlen Programs-lisäosaa (Degrees ja Learn) ja nimeää tietyn seuraavan kurssin vain silloin, kun ohjelma määrittää esitietovaatimuksen tai pakollisen järjestyksen; muutoin se ilmoittaa opiskelijan sijainnin polulla. Vain ohjaava — se ei koskaan muuta ilmoittautumista tai osaamista, ja se käyttää aina vain nykyisen opiskelijan omaa ohjelmasijoitusta. Ei tee mitään äänettömästi silloin, kun mikään ohjelma ei sovellu.';
+
+// Learning path map + next-course nudge (v5.9.0).
+$string['pedagogy:learning_path'] = 'Oppimispolkukartta ja seuraavan kurssin vihje oletusarvoisesti käytössä';
+$string['pedagogy:learning_path_desc'] = 'Kun tämä on käytössä, SOLA lisää visuaalisen oppimispolkupaneelin ("oma polku" -painike widgetin yläpalkkiin), joka näyttää oppijan ohjelman kurssien sarjana, joista jokainen voidaan laajentaa näyttämään tavoitteet ja oppijan osaaminen. Kun oppija on saavuttanut nykyisen kurssin rajan (suoritus tai suuri osuus hallituista tavoitteista), SOLA näyttää myös hienovaraisen "valmis seuraavaan kurssiin" -bannerin ja mainitsee siitä keskustelussa. Vain neuvoa-antava; käyttää oppijan omaa ohjelmajakoa; ei tee mitään hiljaisesti, jos mikään ohjelma ei sovellu.';
+$string['settings:learning_path_mastery_threshold'] = 'Oppimispolun valmiuskynnys (%)';
+$string['settings:learning_path_mastery_threshold_desc'] = 'Prosenttiosuus kurssin seuratuista tavoitteista, jotka oppijan on hallittava ennen kuin oppimispolun vihje pitää häntä valmiina seuraavaan kurssiin. Moodle-kurssin suoritus on toinen laukaisin; vihje aktivoituu sen mukaan, kumpi tapahtuu ensin. Oletus 80.';
+$string['pathpanel_title'] = 'Oma oppimispolkuni';
+$string['pathpanel_open'] = 'Oma oppimispolkuni';
+$string['pathpanel_empty'] = 'Tälle kurssille ei ole vielä saatavilla ohjelmapolkua.';
+$string['path_position'] = 'Kurssi {$a->index}/{$a->total}';
+$string['path_status_done'] = 'Valmis';
+$string['path_status_current'] = 'Olet tässä';
+$string['path_status_upcoming'] = 'Tulossa';
+$string['path_mastery_mastered'] = 'Hallittu';
+$string['path_mastery_in_progress'] = 'Käynnissä';
+$string['path_mastery_not_started'] = 'Ei aloitettu';
+$string['path_mastery_demonstrated_elsewhere'] = 'Osoitettu toisella kurssilla';
+$string['nudge_ready_title'] = 'Valmis etenemään';
+$string['nudge_ready_body'] = 'Hienoa työtä – olet valmis kurssille {$a}.';
+$string['nudge_view_path'] = 'Näytä polkuni';
+$string['nudge_dismiss'] = 'Hylkää';
