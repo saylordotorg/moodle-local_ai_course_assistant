@@ -12,9 +12,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026041601`, release `3.5.1`
-- **Source folder:** `~/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor/ai_course_assistant/`
-- **Zip for upload:** `~/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor/ai_course_assistant.zip`
+- **Current version:** `2026060800`, release `5.10.0`
+- **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
+- **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
 
 ---
@@ -36,8 +36,9 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - 2-state expand (normal / expanded)
 - 50-pair conversation cap
 - Dynamic SOLA_NEXT suggestion chips after each AI response
-- RAG semantic search (embedding-based retrieval, disabled by default)
+- RAG semantic search (embedding-based retrieval, enabled by default)
 - Conversation starters overlay (shown on open / after reset / after quiz exit)
+- Self-hosted readiness (v5.10.0): token-aware prompt budgeting clamped to a backend `max_model_len` (`backend_context_tokens`), bounded pre-first-byte retry on transient 429/503, apply-once deployment presets, and an on-demand backend self-test page
 
 ---
 
@@ -60,7 +61,10 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 | File | Purpose |
 |------|---------|
 | `classes/hook_callbacks.php` | Injects widget into course pages; builds template data |
-| `classes/context_builder.php` | Builds AI system prompt; personalization; multilingual instructions; SOLA_NEXT instruction |
+| `classes/context_builder.php` | Builds AI system prompt; personalization; multilingual instructions; SOLA_NEXT instruction; v5.10.0 `effective_budget_chars` window clamp + truncation hint |
+| `classes/token_estimator.php` | v5.10.0 language-aware char/token estimation; `budget_chars_for_window` ceiling (shared by the budget clamp, metrics tuner, and self-test) |
+| `classes/backend_probe.php` | v5.10.0 on-demand live backend capability probe (chat round-trip, window detect, embedding); rendered by `backend_selftest.php` |
+| `classes/deployment_profile.php` | v5.10.0 apply-once preset definitions (self-hosted small-context / hosted large-context); applied by `deployment_profile.php` page |
 | `classes/course_config_manager.php` | Per-course AI configuration |
 | `classes/analytics.php` | Usage analytics and provider comparison |
 | `classes/external/generate_quiz.php` | Quiz generation (AI-guided + manual topic) |
