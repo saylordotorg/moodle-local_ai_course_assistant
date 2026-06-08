@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Vastaanottajakohtaiset sähköpostin
 $string['privacy:metadata:email_optout:email'] = 'Vastaanottajan sähköpostiosoite, jota kieltäytyminen koskee.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Sähköpostityyppi, josta vastaanottaja on kieltäytynyt.';
 $string['privacy:metadata:email_optout:userid'] = 'Moodle-käyttäjä, jolle kieltäytyminen kuuluu, kun tiedossa.';
+$string['chat:consent_scroll_hint'] = 'Vieritä alas lukeaksesi koko ilmoituksen ennen jatkamista.';

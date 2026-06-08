@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Préférences de désinscription par
 $string['privacy:metadata:email_optout:email'] = 'L\'adresse e-mail du destinataire à laquelle s\'applique la désinscription.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Le type d\'e-mail dont le destinataire s\'est désinscrit.';
 $string['privacy:metadata:email_optout:userid'] = 'L\'utilisateur Moodle auquel appartient la désinscription, lorsqu\'il est connu.';
+$string['chat:consent_scroll_hint'] = 'Veuillez faire défiler jusqu\'en bas pour lire l\'intégralité de l\'avis avant de continuer.';

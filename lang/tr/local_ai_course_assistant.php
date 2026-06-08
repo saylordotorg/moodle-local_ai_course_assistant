@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Alıcı bazında e-posta vazgeçme t
 $string['privacy:metadata:email_optout:email'] = 'Vazgeçmenin uygulandığı alıcı e-posta adresi.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Alıcının vazgeçtiği e-posta türü.';
 $string['privacy:metadata:email_optout:userid'] = 'Bilindiğinde, vazgeçmenin ait olduğu Moodle kullanıcısı.';
+$string['chat:consent_scroll_hint'] = 'Devam etmeden önce bildirimin tamamını okumak için lütfen en alta kaydırın.';

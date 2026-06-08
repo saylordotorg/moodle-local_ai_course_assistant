@@ -1404,3 +1404,4 @@ $string['privacy:metadata:email_optout'] = 'העדפות ביטול הסכמה �
 $string['privacy:metadata:email_optout:email'] = 'כתובת הדוא"ל של הנמען שאליה חל ביטול ההסכמה.';
 $string['privacy:metadata:email_optout:optout_type'] = 'סוג הדוא"ל שממנו הנמען ביטל את הסכמתו.';
 $string['privacy:metadata:email_optout:userid'] = 'משתמש ה-Moodle שאליו שייך ביטול ההסכמה, כאשר ידוע.';
+$string['chat:consent_scroll_hint'] = 'אנא גלול עד למטה כדי לקרוא את ההודעה המלאה לפני שתמשיך.';

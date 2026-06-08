@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Předvolby odhlášení z e-mailů p
 $string['privacy:metadata:email_optout:email'] = 'E-mailová adresa příjemce, na kterou se odhlášení vztahuje.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Typ e-mailu, ze kterého se příjemce odhlásil.';
 $string['privacy:metadata:email_optout:userid'] = 'Uživatel Moodle, kterému odhlášení patří, je-li znám.';
+$string['chat:consent_scroll_hint'] = 'Než budete pokračovat, posuňte se prosím dolů a přečtěte si celé oznámení.';

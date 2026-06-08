@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Innstillinger for e-postreservasjon 
 $string['privacy:metadata:email_optout:email'] = 'Mottakerens e-postadresse som reservasjonen gjelder for.';
 $string['privacy:metadata:email_optout:optout_type'] = 'E-posttypen mottakeren har reservert seg mot.';
 $string['privacy:metadata:email_optout:userid'] = 'Moodle-brukeren reservasjonen tilhører, når den er kjent.';
+$string['chat:consent_scroll_hint'] = 'Vennligst rull til bunnen for å lese hele meldingen før du fortsetter.';

@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Preferencje rezygnacji z e-maili dla
 $string['privacy:metadata:email_optout:email'] = 'Adres e-mail odbiorcy, którego dotyczy rezygnacja.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Typ e-maila, z którego odbiorca zrezygnował.';
 $string['privacy:metadata:email_optout:userid'] = 'Użytkownik Moodle, do którego należy rezygnacja, jeśli jest znany.';
+$string['chat:consent_scroll_hint'] = 'Przed kontynuowaniem przewiń na sam dół, aby przeczytać całe powiadomienie.';

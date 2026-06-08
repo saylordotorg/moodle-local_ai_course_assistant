@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Fravalgspræferencer for e-mail pr. 
 $string['privacy:metadata:email_optout:email'] = 'Modtagerens e-mailadresse, som fravalget gælder for.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Den e-mailtype, modtageren har fravalgt.';
 $string['privacy:metadata:email_optout:userid'] = 'Den Moodle-bruger, fravalget tilhører, når det er kendt.';
+$string['chat:consent_scroll_hint'] = 'Rul venligst ned til bunden for at læse hele meddelelsen, før du fortsætter.';

@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Voorkeuren voor e-mailafmelding per 
 $string['privacy:metadata:email_optout:email'] = 'Het e-mailadres van de ontvanger waarop de afmelding van toepassing is.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Het e-mailtype waarvoor de ontvanger zich heeft afgemeld.';
 $string['privacy:metadata:email_optout:userid'] = 'De Moodle-gebruiker aan wie de afmelding toebehoort, indien bekend.';
+$string['chat:consent_scroll_hint'] = 'Scrol naar beneden om de volledige kennisgeving te lezen voordat u doorgaat.';

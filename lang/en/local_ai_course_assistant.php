@@ -693,6 +693,7 @@ $string['admin:user_data:purged'] = 'All data for the selected user has been pur
 $string['chat:consent_heading'] = 'Before you chat with {$a->product}';
 $string['chat:consent_body'] = '{$a->product} is an AI powered learning assistant. Your messages and {$a->product}\'s replies are stored in {$a->institution}\'s Moodle database and the most recent ten turns are sent to an approved AI model provider to answer your questions. Your first name is shared for personalization; no other identifying information is sent to the AI provider. If you ask for human help and your question is escalated, this conversation (including your name and email) may be shared with our support team. You can download, delete, or stop using {$a->product} at any time.';
 $string['chat:consent_accept'] = 'I understand, start {$a}';
+$string['chat:consent_scroll_hint'] = 'Please scroll to the bottom to read the full notice before continuing.';
 $string['chat:consent_privacy_link'] = 'Read the full privacy notice';
 
 // Scheduled tasks (v3.9.12).

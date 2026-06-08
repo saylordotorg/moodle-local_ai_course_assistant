@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = '수신자별 이메일 수신 거부
 $string['privacy:metadata:email_optout:email'] = '수신 거부가 적용되는 수신자 이메일 주소.';
 $string['privacy:metadata:email_optout:optout_type'] = '수신자가 수신을 거부한 이메일 유형.';
 $string['privacy:metadata:email_optout:userid'] = '알려진 경우, 수신 거부가 속한 Moodle 사용자.';
+$string['chat:consent_scroll_hint'] = '계속하기 전에 맨 아래로 스크롤하여 전체 공지를 읽어 주세요.';

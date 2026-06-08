@@ -1387,3 +1387,4 @@ $string['privacy:metadata:email_optout'] = 'Preferencias de exclusión de correo
 $string['privacy:metadata:email_optout:email'] = 'La dirección de correo electrónico del destinatario a la que se aplica la exclusión.';
 $string['privacy:metadata:email_optout:optout_type'] = 'El tipo de correo electrónico del que el destinatario se ha dado de baja.';
 $string['privacy:metadata:email_optout:userid'] = 'El usuario de Moodle al que pertenece la exclusión, cuando se conoce.';
+$string['chat:consent_scroll_hint'] = 'Por favor, desplácese hasta el final para leer el aviso completo antes de continuar.';

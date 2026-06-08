@@ -1364,3 +1364,4 @@ $string['privacy:metadata:email_optout'] = 'Filannoowwan ala-bahuu imeelii tokko
 $string['privacy:metadata:email_optout:email'] = 'Teessoo imeelii fudhataa kan ala-bahuun irratti raawwatamu.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Gosa imeelii fudhataan ala bahe.';
 $string['privacy:metadata:email_optout:userid'] = 'Yoo beekame, fayyadamaa Moodle kan ala-bahuun kan isaa ta\'e.';
+$string['chat:consent_scroll_hint'] = 'Itti fufuun dura beeksisa guutuu dubbisuuf maaloo gara gadiitti gad deemi.';

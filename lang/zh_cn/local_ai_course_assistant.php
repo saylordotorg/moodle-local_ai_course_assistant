@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = '每位收件人的电子邮件退订
 $string['privacy:metadata:email_optout:email'] = '退订所适用的收件人电子邮件地址。';
 $string['privacy:metadata:email_optout:optout_type'] = '收件人已退订的电子邮件类型。';
 $string['privacy:metadata:email_optout:userid'] = '退订所属的 Moodle 用户（在已知的情况下）。';
+$string['chat:consent_scroll_hint'] = '请滚动到底部阅读完整通知后再继续。';

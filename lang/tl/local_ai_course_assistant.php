@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Mga kagustuhan sa pag-opt-out ng ema
 $string['privacy:metadata:email_optout:email'] = 'Ang email address ng recipient kung saan nalalapat ang opt-out.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Ang uri ng email na inopt-out ng recipient.';
 $string['privacy:metadata:email_optout:userid'] = 'Ang Moodle user na pag-aari ng opt-out, kapag alam.';
+$string['chat:consent_scroll_hint'] = 'Mangyaring mag-scroll pababa upang basahin ang buong abiso bago magpatuloy.';

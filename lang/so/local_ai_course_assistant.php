@@ -1378,3 +1378,4 @@ $string['privacy:metadata:email_optout'] = 'Doorbidyada ka-baxitaanka email ee q
 $string['privacy:metadata:email_optout:email'] = 'Cinwaanka emailka qaataaga ee ka-baxitaanku khuseeyo.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Nooca email ee qaataagu ka baxay.';
 $string['privacy:metadata:email_optout:userid'] = 'Isticmaalaha Moodle ee ka-baxitaanku leeyahay, marka la yaqaan.';
+$string['chat:consent_scroll_hint'] = 'Fadlan hoos u soo wareeg si aad u akhrido ogeysiiska oo dhan ka hor inta aadan sii wadin.';

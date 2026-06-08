@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Preferințele de renunțare la e-mai
 $string['privacy:metadata:email_optout:email'] = 'Adresa de e-mail a destinatarului căreia i se aplică renunțarea.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Tipul de e-mail de la care s-a dezabonat destinatarul.';
 $string['privacy:metadata:email_optout:userid'] = 'Utilizatorul Moodle căruia îi aparține renunțarea, când este cunoscut.';
+$string['chat:consent_scroll_hint'] = 'Vă rugăm să derulați până jos pentru a citi notificarea completă înainte de a continua.';

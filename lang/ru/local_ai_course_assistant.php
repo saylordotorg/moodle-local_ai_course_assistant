@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Настройки отказа от
 $string['privacy:metadata:email_optout:email'] = 'Адрес электронной почты получателя, к которому применяется отказ.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Тип письма, от которого отказался получатель.';
 $string['privacy:metadata:email_optout:userid'] = 'Пользователь Moodle, которому принадлежит отказ, когда известен.';
+$string['chat:consent_scroll_hint'] = 'Пожалуйста, прокрутите вниз, чтобы прочитать уведомление полностью, прежде чем продолжить.';

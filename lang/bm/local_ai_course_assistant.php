@@ -1390,3 +1390,4 @@ $string['privacy:metadata:email_optout'] = 'Imɛli-banni sugandiliw minɛbaa kel
 $string['privacy:metadata:email_optout:email'] = 'Minɛbaa imɛli adɛrɛsi min kan banni bɛ baara kɛ.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Imɛli suguya min na minɛbaa ye kuma a yɛrɛ la.';
 $string['privacy:metadata:email_optout:userid'] = 'Moodle baarakɛla min ta banni ye, ni a dɔnnen don.';
+$string['chat:consent_scroll_hint'] = 'Aw ye taga duguma ka kibaru bɛɛ kalan sani aw ka taa ɲɛ.';

@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'E-Mail-Abmeldeeinstellungen pro Empf
 $string['privacy:metadata:email_optout:email'] = 'Die E-Mail-Adresse des Empfängers, für die die Abmeldung gilt.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Der E-Mail-Typ, von dem sich der Empfänger abgemeldet hat.';
 $string['privacy:metadata:email_optout:userid'] = 'Der Moodle-Nutzer, dem die Abmeldung gehört, sofern bekannt.';
+$string['chat:consent_scroll_hint'] = 'Bitte scrollen Sie bis zum Ende, um den vollständigen Hinweis zu lesen, bevor Sie fortfahren.';

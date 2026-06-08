@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Okuncamelayo kokuphuma ku-imeyili ko
 $string['privacy:metadata:email_optout:email'] = 'Ikheli le-imeyili lomamukeli okusebenza kulo ukuphuma.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Uhlobo lwe-imeyili umamukeli aphume kulo.';
 $string['privacy:metadata:email_optout:userid'] = 'Umsebenzisi we-Moodle okuphuma okungokwakhe, uma kwaziwa.';
+$string['chat:consent_scroll_hint'] = 'Sicela uskrole uye phansi ukuze ufunde isaziso esiphelele ngaphambi kokuqhubeka.';

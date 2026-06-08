@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Keutamaan menarik diri e-mel setiap 
 $string['privacy:metadata:email_optout:email'] = 'Alamat e-mel penerima yang penarikan diri itu terpakai.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Jenis e-mel yang penerima telah menarik diri.';
 $string['privacy:metadata:email_optout:userid'] = 'Pengguna Moodle yang penarikan diri itu dimiliki, apabila diketahui.';
+$string['chat:consent_scroll_hint'] = 'Sila tatal ke bawah untuk membaca notis penuh sebelum meneruskan.';

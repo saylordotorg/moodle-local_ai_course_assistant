@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Tùy chọn từ chối email theo t
 $string['privacy:metadata:email_optout:email'] = 'Địa chỉ email của người nhận mà tùy chọn từ chối áp dụng.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Loại email mà người nhận đã từ chối.';
 $string['privacy:metadata:email_optout:userid'] = 'Người dùng Moodle mà tùy chọn từ chối thuộc về, khi biết.';
+$string['chat:consent_scroll_hint'] = 'Vui lòng cuộn xuống cuối để đọc toàn bộ thông báo trước khi tiếp tục.';

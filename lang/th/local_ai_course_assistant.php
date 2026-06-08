@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'การตั้งค่ากา
 $string['privacy:metadata:email_optout:email'] = 'ที่อยู่อีเมลของผู้รับที่การเลือกไม่รับมีผลใช้บังคับ';
 $string['privacy:metadata:email_optout:optout_type'] = 'ประเภทอีเมลที่ผู้รับได้เลือกไม่รับ';
 $string['privacy:metadata:email_optout:userid'] = 'ผู้ใช้ Moodle ที่การเลือกไม่รับเป็นของ เมื่อทราบ';
+$string['chat:consent_scroll_hint'] = 'โปรดเลื่อนลงไปด้านล่างเพื่ออ่านประกาศทั้งหมดก่อนดำเนินการต่อ';

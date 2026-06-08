@@ -1391,3 +1391,4 @@ $string['privacy:metadata:email_optout'] = 'Zaɓuɓɓukan ƙin imel na kowane ma
 $string['privacy:metadata:email_optout:email'] = 'Adireshin imel na mai karɓa wanda ƙin ya shafi.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Nau\'in imel da mai karɓa ya ƙi.';
 $string['privacy:metadata:email_optout:userid'] = 'Mai amfani da Moodle wanda ƙin yake nasa, lokacin da aka sani.';
+$string['chat:consent_scroll_hint'] = 'Da fatan a gungura zuwa ƙasa don karanta sanarwar gaba ɗaya kafin ci gaba.';

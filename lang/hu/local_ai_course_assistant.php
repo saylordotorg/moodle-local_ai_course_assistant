@@ -1404,3 +1404,4 @@ $string['privacy:metadata:email_optout'] = 'Címzettenkénti e-mail-leiratkozás
 $string['privacy:metadata:email_optout:email'] = 'A címzett e-mail-címe, amelyre a leiratkozás vonatkozik.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Az e-mail-típus, amelyről a címzett leiratkozott.';
 $string['privacy:metadata:email_optout:userid'] = 'A Moodle-felhasználó, akihez a leiratkozás tartozik, ha ismert.';
+$string['chat:consent_scroll_hint'] = 'Kérjük, görgessen le az aljáig, hogy elolvassa a teljes tájékoztatót, mielőtt folytatná.';

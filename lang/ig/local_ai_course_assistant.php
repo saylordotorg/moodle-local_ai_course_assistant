@@ -1377,3 +1377,4 @@ $string['privacy:metadata:email_optout'] = 'Mmasị ịpụ na email nke onye nn
 $string['privacy:metadata:email_optout:email'] = 'Adreesị email onye nnata nke ịpụ metụtara.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Ụdị email nke onye nnata pụrụ na ya.';
 $string['privacy:metadata:email_optout:userid'] = 'Onye ọrụ Moodle nke ịpụ bụ nke ya, mgbe amaara ya.';
+$string['chat:consent_scroll_hint'] = 'Biko pịgharịa gaa n\'okpuru iji gụọ ọkwa ahụ n\'ozuzu ya tupu ịga n\'ihu.';

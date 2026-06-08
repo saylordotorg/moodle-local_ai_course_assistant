@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Tànneef yu génn ci email ci ku ko 
 $string['privacy:metadata:email_optout:email'] = 'Adres email bu ku ko jot bi génn bi jëm.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Xeetu email bi ku ko jot génnee.';
 $string['privacy:metadata:email_optout:userid'] = 'Jëfandikukat Moodle bi génn bi am, su ñu ko xam.';
+$string['chat:consent_scroll_hint'] = 'Su la neexee, wàcceel ba ci suuf ngir jàng yégle bi yépp balaa ngay dem kanam.';

@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Preferências de cancelamento de e-m
 $string['privacy:metadata:email_optout:email'] = 'O endereço de e-mail do destinatário ao qual o cancelamento se aplica.';
 $string['privacy:metadata:email_optout:optout_type'] = 'O tipo de e-mail do qual o destinatário cancelou a inscrição.';
 $string['privacy:metadata:email_optout:userid'] = 'O usuário do Moodle a quem o cancelamento pertence, quando conhecido.';
+$string['chat:consent_scroll_hint'] = 'Por favor, role até o final para ler o aviso completo antes de continuar.';

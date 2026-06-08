@@ -1391,3 +1391,4 @@ $string['privacy:metadata:email_optout'] = 'Preferensi penolakan email per pener
 $string['privacy:metadata:email_optout:email'] = 'Alamat email penerima yang menjadi sasaran penolakan.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Jenis email yang telah ditolak oleh penerima.';
 $string['privacy:metadata:email_optout:userid'] = 'Pengguna Moodle yang menjadi pemilik penolakan, bila diketahui.';
+$string['chat:consent_scroll_hint'] = 'Silakan gulir ke bawah untuk membaca pemberitahuan lengkap sebelum melanjutkan.';

@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = '受信者ごとのメールオプト
 $string['privacy:metadata:email_optout:email'] = 'オプトアウトが適用される受信者のメールアドレス。';
 $string['privacy:metadata:email_optout:optout_type'] = '受信者がオプトアウトしたメールタイプ。';
 $string['privacy:metadata:email_optout:userid'] = '判明している場合、オプトアウトが属するMoodleユーザー。';
+$string['chat:consent_scroll_hint'] = '続行する前に、一番下までスクロールして通知全体をお読みください。';

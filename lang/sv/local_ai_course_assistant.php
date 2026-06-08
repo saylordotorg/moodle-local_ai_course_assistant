@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'Inställningar för e-postavanmälan
 $string['privacy:metadata:email_optout:email'] = 'Mottagarens e-postadress som avanmälan gäller.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Den e-posttyp som mottagaren har avanmält sig från.';
 $string['privacy:metadata:email_optout:userid'] = 'Moodle-användaren som avanmälan tillhör, när det är känt.';
+$string['chat:consent_scroll_hint'] = 'Bläddra längst ner för att läsa hela meddelandet innan du fortsätter.';

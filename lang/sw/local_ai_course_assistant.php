@@ -1383,3 +1383,4 @@ $string['privacy:metadata:email_optout'] = 'Mapendeleo ya kujiondoa kwenye barua
 $string['privacy:metadata:email_optout:email'] = 'Anwani ya barua pepe ya mpokeaji ambayo kujiondoa kunatumika.';
 $string['privacy:metadata:email_optout:optout_type'] = 'Aina ya barua pepe ambayo mpokeaji amejiondoa.';
 $string['privacy:metadata:email_optout:userid'] = 'Mtumiaji wa Moodle ambaye kujiondoa kunamhusu, inapojulikana.';
+$string['chat:consent_scroll_hint'] = 'Tafadhali teleza hadi chini ili kusoma taarifa kamili kabla ya kuendelea.';

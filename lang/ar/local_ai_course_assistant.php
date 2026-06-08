@@ -1360,3 +1360,4 @@ $string['privacy:metadata:email_optout'] = 'تفضيلات إلغاء الاشت
 $string['privacy:metadata:email_optout:email'] = 'عنوان البريد الإلكتروني للمستلم الذي ينطبق عليه إلغاء الاشتراك.';
 $string['privacy:metadata:email_optout:optout_type'] = 'نوع البريد الإلكتروني الذي ألغى المستلم الاشتراك فيه.';
 $string['privacy:metadata:email_optout:userid'] = 'مستخدم Moodle الذي ينتمي إليه إلغاء الاشتراك، عند معرفته.';
+$string['chat:consent_scroll_hint'] = 'يرجى التمرير إلى الأسفل لقراءة الإشعار كاملاً قبل المتابعة.';
