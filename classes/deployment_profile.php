@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Bundles the existing knobs into two recommended baselines: a hosted
  * large-context default, and a self-hosted small-context profile sized for a
- * single-GPU backend (the University of Debrecen A30 / vLLM scenario).
+ * single-GPU backend (for example a 24GB card running vLLM with an 8K window).
  *
  * Apply-once semantics: selecting a preset writes the recommended values into
  * the normal individual settings, which remain editable afterward. There is no

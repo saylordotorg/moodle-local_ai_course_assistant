@@ -27,7 +27,8 @@ defined('MOODLE_INTERNAL') || die();
  * This class converts between characters and an estimated token count using
  * conservative (low) chars-per-token divisors, so estimates round high and
  * the assembled prompt never overflows the window, even in token-dense
- * languages such as Hungarian.
+ * languages (agglutinative and many non-Latin scripts pack more tokens per
+ * character than English).
  *
  * The divisors are deliberately approximate: a real per-model tokenizer is
  * out of scope (self-hosted Llama-family models use a different tokenizer
