@@ -839,7 +839,17 @@ try {
     }
 
     // Handle Zendesk escalation.
-    if ($needsescalation && zendesk_client::is_enabled()) {
+    if ($needsescalation && zendesk_client::is_enabled() && !zendesk_client::should_send_now($userid)) {
+        // v5.10.x (security finding #40): escalation would ship the learner's
+        // name, email, and transcript to the support desk. Without disclosed
+        // consent, do not send; tell the learner instead.
+        $consentmsg = get_string('chat:escalation_needs_consent', 'local_ai_course_assistant');
+        sse_send(['token' => "\n\n" . $consentmsg]);
+        conversation_manager::add_message(
+            $conv->id, $userid, $courseid, 'assistant', $consentmsg,
+            0, '', null, null, null, $interactiontype, $pageid ?: null
+        );
+    } else if ($needsescalation && zendesk_client::is_enabled()) {
         $messages = conversation_manager::get_messages($conv->id);
         $summary = zendesk_client::build_conversation_summary($messages);
         $ticketref = zendesk_client::create_ticket($userid, $courseid, $message, $summary);

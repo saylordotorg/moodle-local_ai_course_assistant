@@ -40,6 +40,26 @@ class zendesk_client {
     }
 
     /**
+     * v5.10.x (security finding #40): may this learner's conversation be sent to
+     * the support desk right now? Escalation ships the learner's name, email,
+     * question, and transcript to Zendesk, so by default it requires the
+     * learner to have accepted the first-run consent banner (which discloses
+     * support sharing). Admins who do not run the consent banner can disable
+     * the requirement with the `zendesk_require_consent` setting.
+     *
+     * @param int $userid the learner whose conversation would be escalated
+     * @return bool true when escalation may proceed
+     */
+    public static function should_send_now(int $userid): bool {
+        $raw = get_config('local_ai_course_assistant', 'zendesk_require_consent');
+        $require = ($raw === false || $raw === '') ? true : (bool) $raw;
+        if (!$require) {
+            return true;
+        }
+        return (bool) get_user_preferences('aica_sola_consent_given', '', $userid);
+    }
+
+    /**
      * Create a Zendesk support ticket from a chat conversation.
      *
      * @param int $userid The Moodle user ID.
