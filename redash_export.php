@@ -77,6 +77,20 @@ if (empty($apikey) || !hash_equals($configuredkey, $apikey)) {
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $since = optional_param('since', 0, PARAM_INT);
 
+// v5.10.x (security finding #3.7): a de-anonymized export (anonymize=0) reveals
+// real learner names. This endpoint authenticates by API key, not a logged-in
+// admin, so audit the access with the requesting IP to keep it traceable.
+if (optional_param('anonymize', 1, PARAM_INT) === 0) {
+    try {
+        \local_ai_course_assistant\audit_logger::log(
+            'redash_export_deanonymized', 0, $courseid,
+            ['ip' => getremoteaddr(), 'since' => $since]);
+    } catch (\Throwable $e) {
+        // Best-effort audit; never block the export on a logging failure.
+        $unused = $e;
+    }
+}
+
 // Get plugin version from version.php.
 $plugin = new stdClass();
 require(__DIR__ . '/version.php');
