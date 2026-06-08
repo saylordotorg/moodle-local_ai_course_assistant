@@ -80,6 +80,14 @@ final class provider_delete_test extends \advanced_testcase {
             'trigger_reason' => 'r', 'message_id' => 'm',
             'timesent' => $now,
         ]);
+        // v5.10.x: email opt-out is user-global (courseid may be null), so it
+        // must be purged by userid, not by (userid, courseid).
+        $DB->insert_record('local_ai_course_assistant_email_optout', (object)[
+            'email' => 'learner-' . $user->id . '@example.com',
+            'optout_type' => 'study_reminder',
+            'userid' => $user->id, 'courseid' => null,
+            'timecreated' => $now,
+        ]);
         return [$course, $user];
     }
 
@@ -125,6 +133,25 @@ final class provider_delete_test extends \advanced_testcase {
                 $DB->count_records($table, ['userid' => $user->id, 'courseid' => $course->id]),
                 "Table {$table} still has rows for the user after provider::delete_data_for_user");
         }
+    }
+
+    public function test_delete_purges_global_email_optout(): void {
+        $this->resetAfterTest();
+        global $DB;
+
+        [$course, $user] = $this->seed_user_data();
+        $coursecontext = \context_course::instance($course->id);
+
+        $this->assertEquals(1,
+            $DB->count_records('local_ai_course_assistant_email_optout', ['userid' => $user->id]));
+
+        provider::delete_data_for_user($this->approved_list($user, $coursecontext));
+
+        // The opt-out row has a null courseid, so a course-keyed delete would
+        // miss it; the provider must purge it by userid.
+        $this->assertEquals(0,
+            $DB->count_records('local_ai_course_assistant_email_optout', ['userid' => $user->id]),
+            'Global email opt-out row was not purged on Article 17 erasure.');
     }
 
     public function test_delete_data_for_users_purges_v530_tables(): void {

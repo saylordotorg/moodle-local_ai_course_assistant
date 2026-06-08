@@ -209,6 +209,14 @@ class provider implements
         $collection->add_database_table('local_ai_course_assistant_outreach_log',
             ['userid' => 'privacy:metadata:outreach_log:userid'],
             'privacy:metadata:outreach_log');
+        // v5.10.x: per-recipient email opt-out (user-global; courseid may be null).
+        $collection->add_database_table('local_ai_course_assistant_email_optout',
+            [
+                'email' => 'privacy:metadata:email_optout:email',
+                'optout_type' => 'privacy:metadata:email_optout:optout_type',
+                'userid' => 'privacy:metadata:email_optout:userid',
+            ],
+            'privacy:metadata:email_optout');
 
         return $collection;
     }
@@ -643,6 +651,14 @@ class provider implements
                 ]);
             } catch (\Throwable $e) { /* ignore */ }
         }
+
+        // v5.10.x: email opt-out is user-global (courseid may be null), so it
+        // is purged by userid once, outside the per-course loop. Covers the
+        // case the 2026-06-08 audit flagged where a hard-deleted user would
+        // otherwise leave opt-out rows containing their email behind.
+        try {
+            $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
+        } catch (\Throwable $e) { /* table absent on older installs */ }
     }
 
     /**
@@ -730,6 +746,10 @@ class provider implements
                     'creator' => $userid,
                     'courseid' => $context->instanceid,
                 ]);
+            } catch (\Throwable $e) { /* ignore */ }
+            // v5.10.x: email opt-out is user-global; purge by userid.
+            try {
+                $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
             } catch (\Throwable $e) { /* ignore */ }
         }
     }

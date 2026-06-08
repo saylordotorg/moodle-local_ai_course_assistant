@@ -189,6 +189,15 @@ class hook_callbacks {
             }
             // Primary path: the conversation manager owns message and conversation rows.
             \local_ai_course_assistant\conversation_manager::delete_user_data((int)$user->id);
+            // v5.10.x: email opt-out is user-global and may exist for a user who
+            // never held a SOLA course context (so the Privacy API path below,
+            // gated on a non-empty contextlist, would not reach it). Purge it by
+            // userid directly so a hard-deleted user leaves no opt-out row
+            // containing their email behind.
+            global $DB;
+            try {
+                $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => (int)$user->id]);
+            } catch (\Throwable $e) { /* table absent on older installs */ }
             // Secondary path: route through the Privacy API so every other
             // plugin table (plans, reminders, feedback, surveys, UT, profiles,
             // practice scores, ratings, audit) is cleaned up by the same code

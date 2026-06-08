@@ -603,6 +603,10 @@ $string['privacy:metadata:struggle_signal'] = 'Auto-purged struggle classifier s
 $string['privacy:metadata:struggle_signal:userid'] = 'The learner whose chat session was scored.';
 $string['privacy:metadata:outreach_log'] = 'Audit log of empathetic outreach emails.';
 $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was sent to.';
+$string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferences (which email types a recipient has unsubscribed from).';
+$string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
+$string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
+$string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
 
 // AI Insights.
 $string['insights:title'] = 'AI Insights';
