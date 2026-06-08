@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026060800`, release `5.10.0`
+- **Current version:** `2026060802`, release `5.10.2`
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
@@ -39,6 +39,8 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - RAG semantic search (embedding-based retrieval, enabled by default)
 - Conversation starters overlay (shown on open / after reset / after quiz exit)
 - Self-hosted readiness (v5.10.0): token-aware prompt budgeting clamped to a backend `max_model_len` (`backend_context_tokens`), bounded pre-first-byte retry on transient 429/503, apply-once deployment presets, and an on-demand backend self-test page
+- Security/privacy (v5.10.1): `email_optout` covered by the privacy provider erasure path, avatar-viewer session-ownership check, Zendesk escalation gated on disclosed first-run consent (`zendesk_require_consent`), de-anonymized Redash export audit-logged
+- First-run consent scroll-gate (v5.10.1, fixed v5.10.2): Accept button disabled until the learner scrolls the notice to the bottom; inline JS in `templates/chat_widget.mustache`, regression harness `tests/a11y/consent-gate-check.js` (Puppeteer)
 
 ---
 
