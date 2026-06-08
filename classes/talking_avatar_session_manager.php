@@ -131,6 +131,30 @@ class talking_avatar_session_manager {
     }
 
     /**
+     * v5.10.x (security finding #39): does this avatar session belong to this
+     * user? The viewer page receives the session id as a parameter; without
+     * this check any logged-in user who learned another learner's session id
+     * and token could load their avatar stream. An empty or unknown session id
+     * is never owned.
+     *
+     * @param int $userid the current user
+     * @param string $provider did|heygen|tavus|synthesia
+     * @param string $upstreamsessionid the provider-side session id from the viewer URL
+     * @return bool true only when a matching session row is owned by $userid
+     */
+    public static function user_owns_session(int $userid, string $provider, string $upstreamsessionid): bool {
+        global $DB;
+        if ($upstreamsessionid === '') {
+            return false;
+        }
+        return $DB->record_exists(self::TABLE, [
+            'provider' => $provider,
+            'upstream_session_id' => $upstreamsessionid,
+            'userid' => $userid,
+        ]);
+    }
+
+    /**
      * Close any open sessions older than {@see MAX_OPEN_SECONDS}. Called
      * from the scheduled task; idempotent.
      *

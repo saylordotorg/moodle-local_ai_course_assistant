@@ -320,18 +320,26 @@
     {{^consentgiven}}
     <div class="aica-consent-banner" data-consent-url="{{consenturl}}" data-sesskey="{{sesskey}}"
          style="position:absolute;inset:0;z-index:20;background:rgba(255,255,255,0.98);
-                display:flex;flex-direction:column;justify-content:center;padding:28px 24px;
-                overflow-y:auto;font-size:14px;line-height:1.55">
-        <h3 style="margin:0 0 12px;font-size:17px">{{consent_heading}}</h3>
-        <p style="margin:0 0 14px;color:#333">{{consent_body}}</p>
-        <p style="margin:0 0 18px;font-size:13px">
-            <a href="{{privacynoticeurl}}" target="_blank" rel="noopener" style="color:#023e8a">
-                {{#str}}chat:consent_privacy_link, local_ai_course_assistant{{/str}}
-            </a>
-        </p>
-        <div>
-            <button type="button" class="aica-consent-accept btn btn-primary"
-                    style="padding:8px 16px;font-weight:600">
+                display:flex;flex-direction:column;padding:24px;font-size:14px;line-height:1.55">
+        {{! v5.10.x: the policy is a scrollable region; the learner must reach the
+            bottom before the Accept button enables. tabindex makes it scrollable
+            by keyboard. }}
+        <div class="aica-consent-scroll" tabindex="0"
+             style="flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:6px">
+            <h3 style="margin:0 0 12px;font-size:17px">{{consent_heading}}</h3>
+            <p style="margin:0 0 14px;color:#333">{{consent_body}}</p>
+            <p style="margin:0;font-size:13px">
+                <a href="{{privacynoticeurl}}" target="_blank" rel="noopener" style="color:#023e8a">
+                    {{#str}}chat:consent_privacy_link, local_ai_course_assistant{{/str}}
+                </a>
+            </p>
+        </div>
+        <div style="flex:0 0 auto;margin-top:12px;padding-top:12px;border-top:1px solid #eee">
+            <p class="aica-consent-scrollhint" style="margin:0 0 10px;font-size:12px;color:#666">
+                {{#str}}chat:consent_scroll_hint, local_ai_course_assistant{{/str}}
+            </p>
+            <button type="button" class="aica-consent-accept btn btn-primary" disabled aria-disabled="true"
+                    style="padding:8px 16px;font-weight:600;opacity:0.5;cursor:not-allowed">
                 {{consent_accept}}
             </button>
         </div>
@@ -340,9 +348,37 @@
     (function() {
         var banner = document.querySelector('.aica-consent-banner');
         if (!banner) { return; }
+        var scroller = banner.querySelector('.aica-consent-scroll');
         var btn = banner.querySelector('.aica-consent-accept');
-        if (!btn) { return; }
+        var hint = banner.querySelector('.aica-consent-scrollhint');
+        if (!scroller || !btn) { return; }
+        var unlocked = false;
+        function unlock() {
+            if (unlocked) { return; }
+            unlocked = true;
+            btn.disabled = false;
+            btn.setAttribute('aria-disabled', 'false');
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            if (hint) { hint.style.display = 'none'; }
+        }
+        function reevaluate() {
+            // True both when the policy fits without scrolling and when the
+            // learner has scrolled to the bottom.
+            if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4) {
+                unlock();
+            }
+        }
+        reevaluate();
+        scroller.addEventListener('scroll', reevaluate);
+        // The drawer may render hidden (clientHeight 0); re-check once it has a
+        // real size so a short policy that needs no scrolling still unlocks.
+        if (window.ResizeObserver) {
+            var ro = new window.ResizeObserver(reevaluate);
+            ro.observe(scroller);
+        }
         btn.addEventListener('click', function() {
+            if (btn.disabled) { return; }
             var url = banner.dataset.consentUrl;
             var sk = banner.dataset.sesskey;
             var body = new URLSearchParams();

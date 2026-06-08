@@ -230,6 +230,9 @@ $string['chat:offtopic_warning'] = 'It looks like your question is not related t
 $string['chat:offtopic_ended'] = 'Your AI tutor access has been temporarily suspended for {$a} minutes because the conversation went off-topic too many times. Please use this time to review your course materials, and you can try again later.';
 $string['chat:offtopic_locked'] = 'Your AI tutor access is temporarily suspended. You can try again in {$a} minutes. Please focus on course-related questions when you return.';
 $string['chat:escalated_to_support'] = 'I was unable to fully answer your question, so I\'ve created a support ticket for you. A support team member will follow up. Your ticket reference is: {$a}';
+$string['chat:escalation_needs_consent'] = 'It looks like this needs a member of our support team. To pass it to them I would have to share this conversation, including your name and email, with the support desk. You have not agreed to that yet, so I have not sent anything. If you would like human help, please accept the data-sharing notice for this assistant and ask again, or contact support directly.';
+$string['settings:zendesk_require_consent'] = 'Require consent before support escalation';
+$string['settings:zendesk_require_consent_desc'] = 'When on (recommended), SOLA escalates a conversation to the Zendesk support desk only after the learner has accepted the first-run consent notice, which discloses that requesting human help shares the conversation (including name and email) with support. Turn this off only if you obtain that consent some other way; with it off, escalations send immediately. Has no effect unless Zendesk escalation is enabled.';
 $string['chat:studyplan_intro'] = 'I can help you create a study plan for this course! Just tell me how many hours per week you can dedicate to studying, and I\'ll help you build a structured plan.';
 
 // FAQ & Support settings.
@@ -603,6 +606,10 @@ $string['privacy:metadata:struggle_signal'] = 'Auto-purged struggle classifier s
 $string['privacy:metadata:struggle_signal:userid'] = 'The learner whose chat session was scored.';
 $string['privacy:metadata:outreach_log'] = 'Audit log of empathetic outreach emails.';
 $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was sent to.';
+$string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferences (which email types a recipient has unsubscribed from).';
+$string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
+$string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
+$string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
 
 // AI Insights.
 $string['insights:title'] = 'AI Insights';
@@ -684,8 +691,9 @@ $string['admin:user_data:purged'] = 'All data for the selected user has been pur
 
 // First-run consent banner. {$a->product} = short product name, {$a->institution} = institution name.
 $string['chat:consent_heading'] = 'Before you chat with {$a->product}';
-$string['chat:consent_body'] = '{$a->product} is an AI powered learning assistant. Your messages and {$a->product}\'s replies are stored in {$a->institution}\'s Moodle database and the most recent ten turns are sent to an approved AI model provider to answer your questions. Your first name is shared for personalization; no other identifying information is sent to the AI provider. You can download, delete, or stop using {$a->product} at any time.';
+$string['chat:consent_body'] = '{$a->product} is an AI powered learning assistant. Your messages and {$a->product}\'s replies are stored in {$a->institution}\'s Moodle database and the most recent ten turns are sent to an approved AI model provider to answer your questions. Your first name is shared for personalization; no other identifying information is sent to the AI provider. If you ask for human help and your question is escalated, this conversation (including your name and email) may be shared with our support team. You can download, delete, or stop using {$a->product} at any time.';
 $string['chat:consent_accept'] = 'I understand, start {$a}';
+$string['chat:consent_scroll_hint'] = 'Please scroll to the bottom to read the full notice before continuing.';
 $string['chat:consent_privacy_link'] = 'Read the full privacy notice';
 
 // Scheduled tasks (v3.9.12).

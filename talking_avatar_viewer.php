@@ -39,6 +39,16 @@ $sid = optional_param('sid', '', PARAM_ALPHANUMEXT);
 $tok = optional_param('tok', '', PARAM_ALPHANUMEXT);
 $lang = optional_param('lang', 'en', PARAM_ALPHA);
 
+// v5.10.x (security finding #39): a session id in the URL is not enough to
+// prove the requester owns the session. Verify the avatar session belongs to
+// the current user before exposing its stream, so a leaked or guessed
+// (sid, tok) pair cannot be replayed by a different logged-in user.
+if ($sid !== '' && !\local_ai_course_assistant\talking_avatar_session_manager::user_owns_session(
+        (int) $USER->id, $provider, $sid)) {
+    throw new \moodle_exception('nopermissions', 'error', '',
+        get_string('talking_avatar:viewer_title', 'local_ai_course_assistant'));
+}
+
 \local_ai_course_assistant\security::send_security_headers();
 
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/talking_avatar_viewer.php'));
