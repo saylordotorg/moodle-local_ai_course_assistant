@@ -199,10 +199,18 @@ class prompt_metrics_logger {
         if ($agg['pct_truncated'] > 1.0) {
             // Truncations happening — raise budget to clear them.
             $rec = (int) (ceil(($max + 500) / 1000) * 1000);
+            $rationale = sprintf('Raise budget to %d chars to eliminate truncation (currently truncating %.1f%% of turns; max observed %d chars).',
+                $rec, $agg['pct_truncated'], $max);
+            // v5.10.0: never recommend above what the backend context window
+            // allows, or the prompt would overflow max_model_len at runtime.
+            $ceiling = self::window_ceiling();
+            if ($ceiling > 0 && $rec > $ceiling) {
+                $rec = $ceiling;
+                $rationale .= sprintf(' Capped at %d chars by the backend context window (raise backend_context_tokens or lower max_tokens to go higher).', $ceiling);
+            }
             return [
                 'budget'    => $rec,
-                'rationale' => sprintf('Raise budget to %d chars to eliminate truncation (currently truncating %.1f%% of turns; max observed %d chars).',
-                    $rec, $agg['pct_truncated'], $max),
+                'rationale' => $rationale,
             ];
         }
         if ($budget > 0 && $avg < $budget * 0.7) {
@@ -218,6 +226,21 @@ class prompt_metrics_logger {
             ];
         }
         return null;
+    }
+
+    /**
+     * v5.10.0: the character ceiling imposed by the backend context window,
+     * or 0 when no window is configured (hosted/unlimited). Shares the
+     * conversion logic with the runtime prompt clamp via token_estimator.
+     */
+    private static function window_ceiling(): int {
+        $windowtokens = (int) get_config('local_ai_course_assistant', 'backend_context_tokens');
+        if ($windowtokens <= 0) {
+            return 0;
+        }
+        $rawmax = get_config('local_ai_course_assistant', 'max_tokens');
+        $outputtokens = ($rawmax === false || $rawmax === '') ? 1024 : (int) $rawmax;
+        return token_estimator::budget_chars_for_window($windowtokens, $outputtokens, 0, 'en');
     }
 
     /**
