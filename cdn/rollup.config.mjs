@@ -8,6 +8,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const amdSrc = resolve(__dirname, '..', 'amd', 'src');
 
 /**
+ * The core/* modules the CDN bundle provides via shims. The dependency check
+ * (assertDependenciesResolvable) treats these as resolvable. MUST stay in sync
+ * with the shims actually registered into _resolved in buildBundle() — the
+ * dependency-check regression test asserts that, so a name listed here but not
+ * wired (a "missing shim" the check would wrongly trust) fails the test.
+ */
+export const CDN_SHIMS = ['core/ajax', 'core/str', 'core/config', 'core/notification'];
+
+/**
  * Build a single concatenated bundle that includes a mini AMD loader,
  * all shim modules, and all plugin AMD modules.
  *
@@ -48,7 +57,7 @@ export default {
     ],
 };
 
-function buildBundle() {
+export function buildBundle() {
     // Read shim files.
     const ajaxShim = readFileSync(resolve(__dirname, 'shims', 'ajax.js'), 'utf8');
     const strShim = readFileSync(resolve(__dirname, 'shims', 'str.js'), 'utf8');
@@ -211,10 +220,8 @@ import '../styles.css';
  * @param {{name: string, code: string}[]} amdSources Bundled module sources.
  * @param {string[]} modules Bundled module short names.
  */
-function assertDependenciesResolvable(amdSources, modules) {
-    // Keep in sync with the shims registered into _resolved in buildBundle().
-    const SHIMS = ['core/ajax', 'core/str', 'core/config', 'core/notification'];
-    const available = new Set([...modules, ...SHIMS]);
+export function assertDependenciesResolvable(amdSources, modules) {
+    const available = new Set([...modules, ...CDN_SHIMS]);
 
     const errors = [];
     for (const { name, code } of amdSources) {

@@ -5,7 +5,8 @@
   "description": "CDN build for SOLA Moodle plugin frontend",
   "scripts": {
     "build": "rollup -c rollup.config.mjs",
-    "watch": "rollup -c rollup.config.mjs --watch"
+    "watch": "rollup -c rollup.config.mjs --watch",
+    "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^1.0.0",
