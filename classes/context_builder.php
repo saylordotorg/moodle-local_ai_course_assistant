@@ -555,6 +555,18 @@ class context_builder {
 
         $prompt = $assembled['prompt'];
 
+        // v5.10.0: when the course_content section was dropped or truncated this
+        // turn and the learner is not on a specific page, append a short
+        // instruction so the model frames a "not found" answer as "could not
+        // search the whole course, open the specific page" rather than asserting
+        // the topic is absent. More likely now that small backends clamp the
+        // budget (see effective_budget_chars).
+        $cc = $assembled['breakdown']['course_content'] ?? null;
+        $cctruncated = $cc !== null && (empty($cc['used']) || !empty($cc['truncated']));
+        if (self::should_add_truncation_hint($cctruncated, $pageid)) {
+            $prompt .= "\n\n" . get_string('prompt:truncation_hint', 'local_ai_course_assistant');
+        }
+
         // Stash the breakdown so the optional debug log can render it
         // without re-running assembly.
         self::$last_breakdown = $assembled['breakdown'];
@@ -739,6 +751,19 @@ class context_builder {
             $windowtokens, $outputtokens > 0 ? $outputtokens : 512, $historytokens, $lang !== '' ? $lang : 'en'
         );
         return max(self::MIN_BUDGET_FLOOR, min($rawbudget, $ceiling));
+    }
+
+    /**
+     * v5.10.0: whether to append the "could not search the whole course" hint.
+     * Only when the course_content section was dropped/truncated this turn AND
+     * the learner is not on a specific page (a page-scoped turn is grounded in
+     * the page text, so the hint would be misleading).
+     *
+     * @param bool $coursecontenttruncated course_content was dropped or truncated
+     * @param int $pageid current Moodle pageid (0 means no page in scope)
+     */
+    public static function should_add_truncation_hint(bool $coursecontenttruncated, int $pageid): bool {
+        return $coursecontenttruncated && $pageid === 0;
     }
 
     /**
