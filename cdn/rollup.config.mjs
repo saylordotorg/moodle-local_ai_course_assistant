@@ -70,6 +70,19 @@ function buildBundle() {
         return { name, code };
     });
 
+    // Build-time safeguard against the 2026-06-04 CDN drawer outage: a new
+    // module (path_map) was depended on by chat without being added to
+    // `modules`, and its core/notification dep had no shim. rollup happily
+    // concatenated the sources; the only symptom was a runtime "Unknown module"
+    // throw that killed the widget on every CDN-mode install (prod), invisible
+    // to local/dev which load modules individually via Moodle AMD.
+    //
+    // Verify every bundled module's declared AMD dependencies are satisfiable
+    // here — either another bundled module or a registered shim — using the
+    // same name normalization the runtime loader applies. Any gap fails the
+    // build (and therefore cdn-deploy) loudly instead of shipping a dead widget.
+    assertDependenciesResolvable(amdSources, modules);
+
     // Build the bundle: mini AMD loader + shims + modules + init.
     let bundle = `
 // CDN bundle for SOLA - auto-generated, do not edit.
@@ -184,4 +197,52 @@ import '../styles.css';
 `;
 
     return bundle;
+}
+
+/**
+ * Fail the build if any bundled module declares an AMD dependency the CDN
+ * bundle cannot satisfy. Mirrors the runtime mini-AMD loader: a dependency
+ * resolves only if it is another bundled module or a registered shim.
+ *
+ * Guard for the 2026-06-04 outage class — a new module or a new core/*
+ * dependency slipping in without being bundled/shimmed otherwise ships silently
+ * and only throws "Unknown module" in the browser on CDN-mode installs (prod).
+ *
+ * @param {{name: string, code: string}[]} amdSources Bundled module sources.
+ * @param {string[]} modules Bundled module short names.
+ */
+function assertDependenciesResolvable(amdSources, modules) {
+    // Keep in sync with the shims registered into _resolved in buildBundle().
+    const SHIMS = ['core/ajax', 'core/str', 'core/config', 'core/notification'];
+    const available = new Set([...modules, ...SHIMS]);
+
+    const errors = [];
+    for (const { name, code } of amdSources) {
+        // Dependency array of the module's first define([...], ...) call.
+        const match = code.match(/define\(\s*\[([\s\S]*?)\]/);
+        if (!match) {
+            continue; // define(function(){...}) — no dependencies.
+        }
+        const deps = match[1]
+            .split(',')
+            .map(d => d.trim().replace(/^['"]|['"]$/g, ''))
+            .filter(Boolean);
+        for (const dep of deps) {
+            // Same normalization the runtime loader's _resolve() applies.
+            const normalized = dep.replace('local_ai_course_assistant/', '');
+            if (!available.has(normalized)) {
+                errors.push(`  "${name}" depends on "${dep}" — not a bundled module or a registered shim`);
+            }
+        }
+    }
+
+    if (errors.length) {
+        throw new Error(
+            '\nSOLA CDN bundle dependency check FAILED. These would throw '
+            + '"Unknown module" at runtime and break the widget on every '
+            + 'CDN-mode install:\n' + errors.join('\n')
+            + '\n\nFix: add the module to `modules` in cdn/rollup.config.mjs, '
+            + 'or add a shim in cdn/shims/ and register it in buildBundle().\n'
+        );
+    }
 }
