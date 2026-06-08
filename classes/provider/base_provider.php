@@ -91,6 +91,55 @@ abstract class base_provider implements provider_interface {
     abstract protected function get_default_base_url(): string;
 
     /**
+     * v5.10.0: best-effort detection of the backend context window
+     * (max_model_len) via the OpenAI-compatible /v1/models endpoint that vLLM
+     * and similar servers expose. Returns 0 when the window cannot be
+     * determined (hosted providers, older servers, network/auth failure), in
+     * which case the admin sets backend_context_tokens manually.
+     *
+     * @return int detected max_model_len, or 0 if unknown
+     */
+    public function detect_context_window(): int {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        try {
+            // Most OpenAI-compatible base URLs already include /v1.
+            $base = rtrim($this->baseurl, '/');
+            $url = (strpos($base, '/v1') !== false) ? $base . '/models' : $base . '/v1/models';
+            if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
+                return 0;
+            }
+            $curl = new \curl();
+            $headers = [];
+            if (!empty($this->apikey)) {
+                $headers[] = 'Authorization: Bearer ' . $this->apikey;
+            }
+            $curl->setopt([
+                'CURLOPT_HTTPHEADER' => $headers,
+                'CURLOPT_RETURNTRANSFER' => true,
+                'CURLOPT_TIMEOUT' => 10,
+            ]);
+            $resp = $curl->get($url);
+            $code = $curl->get_info()['http_code'] ?? 0;
+            if ($code < 200 || $code >= 300) {
+                return 0;
+            }
+            $data = json_decode($resp, true);
+            if (!is_array($data) || empty($data['data']) || !is_array($data['data'])) {
+                return 0;
+            }
+            foreach ($data['data'] as $modelinfo) {
+                if (isset($modelinfo['max_model_len'])) {
+                    return (int) $modelinfo['max_model_len'];
+                }
+            }
+            return 0;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
      * Make a non-streaming HTTP POST request using Moodle's curl class.
      *
      * @param string $url Full URL.

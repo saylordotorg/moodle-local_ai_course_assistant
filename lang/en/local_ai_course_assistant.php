@@ -1161,6 +1161,14 @@ $string['settings:backend_retry_attempts_desc'] = 'How many times to retry a tra
 $string['settings:backend_retry_max_wait']      = 'Backend retry maximum wait (seconds)';
 $string['settings:backend_retry_max_wait_desc'] = 'Upper bound, in seconds, on how long to honor a Retry-After header from the backend before retrying. When the backend sends no Retry-After, SOLA uses a short exponential backoff instead. Default 5.';
 $string['prompt:truncation_hint'] = 'NOTE: The full course content could not be searched this turn because of length limits. If the student asks about something you cannot find in the provided content, say that you could not search the entire course and suggest they open the specific page or activity where the topic is covered, rather than stating it is absent from the course.';
+$string['selftest:title']  = 'Backend self-test';
+$string['selftest:intro']  = 'Run a live check of your configured AI backend: a tiny chat round-trip, automatic detection of the context window (max_model_len) and a comparison against your Backend context window setting, the system-prompt budget floor, and (when RAG is on) an embedding round-trip. Network calls run only when you press Run.';
+$string['selftest:run']    = 'Run backend self-test';
+$string['selftest:check']  = 'Check';
+$string['selftest:status'] = 'Status';
+$string['selftest:detail'] = 'Detail';
+$string['selftest:link']   = 'Backend self-test page';
+$string['selftest:link_desc'] = 'Open the <a href="{$a}">Backend self-test</a> page to verify your AI backend works and is sized correctly. Useful right after configuring a self-hosted backend.';
 // v5.1.0: per-section cap on the current_page_content body.
 $string['settings:current_page_content_maxchars']      = 'Current page content cap (characters)';
 $string['settings:current_page_content_maxchars_desc'] = 'Maximum number of characters of the current page\'s text injected into the system prompt as the "Current Page Content" section. Default 12,000 keeps the prior behaviour where the full page (up to that cap) is sent — best for accuracy on page-specific questions, since the model can quote directly from the passage. Cost-conscious sites running paid hosted providers can clamp this lower (e.g. 3,000-4,000) to reduce per-turn token spend, at the risk that a question whose answer is in the truncated tail of a long page will not be answered as accurately. Clamped to the range 500-12,000. Independent of <code>prompt_budget_chars</code>: this caps just the page section; the budget caps the whole prompt.';

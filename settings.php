@@ -295,6 +295,13 @@ if ($hassiteconfig) {
         '0',
         PARAM_INT
     ));
+    // v5.10.0: link to the on-demand backend self-test page.
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/selftest_link',
+        get_string('selftest:link', 'local_ai_course_assistant'),
+        get_string('selftest:link_desc', 'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/backend_selftest.php'))->out())
+    ));
     // v5.1.0: per-section cap on the current_page_content body. Lets
     // cost-conscious admins clamp how much of the current page is
     // injected without affecting other prompt sections or disabling
