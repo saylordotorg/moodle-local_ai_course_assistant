@@ -363,6 +363,10 @@
             if (hint) { hint.style.display = 'none'; }
         }
         function reevaluate() {
+            // While the drawer is closed the region has no layout (0 height); a
+            // 0-height region would read as "already at the bottom" and unlock
+            // before the learner has seen anything, so skip until it is shown.
+            if (scroller.scrollHeight <= 0 || scroller.clientHeight <= 0) { return; }
             // True both when the policy fits without scrolling and when the
             // learner has scrolled to the bottom.
             if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4) {
