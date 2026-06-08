@@ -53,11 +53,16 @@ function buildBundle() {
     const ajaxShim = readFileSync(resolve(__dirname, 'shims', 'ajax.js'), 'utf8');
     const strShim = readFileSync(resolve(__dirname, 'shims', 'str.js'), 'utf8');
     const configShim = readFileSync(resolve(__dirname, 'shims', 'config.js'), 'utf8');
+    const notificationShim = readFileSync(resolve(__dirname, 'shims', 'notification.js'), 'utf8');
 
     // Read all AMD source modules. Dependency order: deps first.
+    // IMPORTANT: every module that any other bundled module `define()`s a
+    // dependency on MUST appear here, or the mini-AMD loader throws
+    // "Unknown module" at runtime and the whole widget fails to init. path_map
+    // (v5.9.0) is depended on by chat; omitting it broke the CDN drawer on prod.
     const modules = [
         'markdown', 'audio_player', 'sse_client', 'speech', 'realtime',
-        'voice', 'repository', 'quiz', 'i18n_strings', 'ui', 'chat',
+        'voice', 'repository', 'quiz', 'i18n_strings', 'ui', 'path_map', 'chat',
     ];
 
     const amdSources = modules.map(name => {
@@ -145,6 +150,13 @@ import '../styles.css';
     _resolved['core/config'] = (function() {
         ${configShim.replace(/export\s+default\s+.*/, '').replace(/export\s*\{[^}]*\}/, '')}
         return cfg;
+    })();
+
+    // core/notification shim — bundled modules (e.g. path_map) use only
+    // Notification.exception(); surface errors to the console in CDN mode.
+    _resolved['core/notification'] = (function() {
+        ${notificationShim.replace(/export\s+default\s+.*/, '').replace(/export\s*\{[^}]*\}/, '')}
+        return {exception: exception};
     })();
 
     // ---- Register AMD modules ----
