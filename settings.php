@@ -285,6 +285,16 @@ if ($hassiteconfig) {
         '12000',
         PARAM_INT
     ));
+    // v5.10.0: backend context window (max_model_len) for self-hosted/small
+    // backends. 0 = hosted/unlimited (no clamping). When set, the system-prompt
+    // character budget above is clamped so the prompt fits the token window.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/backend_context_tokens',
+        get_string('settings:backend_context_tokens', 'local_ai_course_assistant'),
+        get_string('settings:backend_context_tokens_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_INT
+    ));
     // v5.1.0: per-section cap on the current_page_content body. Lets
     // cost-conscious admins clamp how much of the current page is
     // injected without affecting other prompt sections or disabling
