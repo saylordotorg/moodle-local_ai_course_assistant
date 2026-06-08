@@ -189,6 +189,7 @@ abstract class base_provider implements provider_interface {
     /**
      * Is this exception a transient backend error, and what Retry-After (if any)?
      *
+     * @param \Throwable $e the exception thrown by the upstream call
      * @return array{0:bool,1:int|null} [transient, retry_after_seconds]
      */
     private static function is_transient(\Throwable $e): array {
