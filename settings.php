@@ -285,6 +285,30 @@ if ($hassiteconfig) {
         '12000',
         PARAM_INT
     ));
+    // v5.10.0: backend context window (max_model_len) for self-hosted/small
+    // backends. 0 = hosted/unlimited (no clamping). When set, the system-prompt
+    // character budget above is clamped so the prompt fits the token window.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/backend_context_tokens',
+        get_string('settings:backend_context_tokens', 'local_ai_course_assistant'),
+        get_string('settings:backend_context_tokens_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_INT
+    ));
+    // v5.10.0: link to the on-demand backend self-test page.
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/selftest_link',
+        get_string('selftest:link', 'local_ai_course_assistant'),
+        get_string('selftest:link_desc', 'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/backend_selftest.php'))->out())
+    ));
+    // v5.10.0: link to the deployment presets page.
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/deployment_profile_link',
+        get_string('profile:link', 'local_ai_course_assistant'),
+        get_string('profile:link_desc', 'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/deployment_profile.php'))->out())
+    ));
     // v5.1.0: per-section cap on the current_page_content body. Lets
     // cost-conscious admins clamp how much of the current page is
     // injected without affecting other prompt sections or disabling
@@ -903,6 +927,22 @@ if ($hassiteconfig) {
         . 'than chat. Only consulted when <strong>Per-call failover</strong> is on (and voice failover is '
         . 'wired through; chat-only in v5.5.0).',
         '3', PARAM_INT
+    ));
+
+    // v5.10.0: bounded retry on a transient backend rejection (429/503). Aimed
+    // at small self-hosted backends that reject under load. Retries only happen
+    // before any response text has streamed, so output is never duplicated.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/backend_retry_attempts',
+        get_string('settings:backend_retry_attempts', 'local_ai_course_assistant'),
+        get_string('settings:backend_retry_attempts_desc', 'local_ai_course_assistant'),
+        '2', PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/backend_retry_max_wait',
+        get_string('settings:backend_retry_max_wait', 'local_ai_course_assistant'),
+        get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant'),
+        '5', PARAM_INT
     ));
 
     $settings->add(new admin_setting_configtext(

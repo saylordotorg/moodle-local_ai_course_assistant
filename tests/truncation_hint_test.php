@@ -14,18 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Plugin version and other meta-data.
- *
- * @package    local_ai_course_assistant
- * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace local_ai_course_assistant;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026060800;
-$plugin->requires = 2024100700; // Moodle 4.5+.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '5.10.0';
+/**
+ * The truncation-aware "not found" hint predicate (v5.10.0).
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Saylor
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_ai_course_assistant\context_builder::should_add_truncation_hint
+ */
+final class truncation_hint_test extends \advanced_testcase {
+
+    public function test_hint_present_when_content_truncated_and_no_page(): void {
+        $this->assertTrue(context_builder::should_add_truncation_hint(true, 0));
+    }
+
+    public function test_hint_absent_when_page_in_scope(): void {
+        $this->assertFalse(context_builder::should_add_truncation_hint(true, 42));
+    }
+
+    public function test_hint_absent_when_not_truncated(): void {
+        $this->assertFalse(context_builder::should_add_truncation_hint(false, 0));
+    }
+}

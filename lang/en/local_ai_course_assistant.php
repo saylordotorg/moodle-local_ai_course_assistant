@@ -1154,6 +1154,34 @@ $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses rece
 // v4.12.0: structured prompt budget + verbosity.
 $string['settings:prompt_budget_chars']      = 'System prompt character budget';
 $string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organises sections by category (identity, course context, learner state, behaviour, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 12,000 characters (~3,000 tokens) as of v5.0.0. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';
+$string['settings:backend_context_tokens']      = 'Backend context window (tokens)';
+$string['settings:backend_context_tokens_desc'] = 'The maximum context length (max_model_len) of your AI backend, in tokens. Set to 0 for hosted models with a large window (no clamping). When set above 0 (for example 8192 on a self-hosted vLLM backend), SOLA shrinks the system-prompt character budget above so the prompt plus reserved output and conversation history fit the window, even in token-dense languages. See the Deployment Sizing wiki page for how this maps to concurrent users.';
+$string['settings:backend_retry_attempts']      = 'Backend retry attempts';
+$string['settings:backend_retry_attempts_desc'] = 'How many times to retry a transient backend error (HTTP 429 or 503) before showing the student an error. Retries only happen before any response text has streamed, so output is never duplicated. Aimed at small self-hosted backends that reject requests under load. Set to 0 to disable. Default 2.';
+$string['settings:backend_retry_max_wait']      = 'Backend retry maximum wait (seconds)';
+$string['settings:backend_retry_max_wait_desc'] = 'Upper bound, in seconds, on how long to honor a Retry-After header from the backend before retrying. When the backend sends no Retry-After, SOLA uses a short exponential backoff instead. Default 5.';
+$string['prompt:truncation_hint'] = 'NOTE: The full course content could not be searched this turn because of length limits. If the student asks about something you cannot find in the provided content, say that you could not search the entire course and suggest they open the specific page or activity where the topic is covered, rather than stating it is absent from the course.';
+$string['selftest:title']  = 'Backend self-test';
+$string['selftest:intro']  = 'Run a live check of your configured AI backend: a tiny chat round-trip, automatic detection of the context window (max_model_len) and a comparison against your Backend context window setting, the system-prompt budget floor, and (when RAG is on) an embedding round-trip. Network calls run only when you press Run.';
+$string['selftest:run']    = 'Run backend self-test';
+$string['selftest:check']  = 'Check';
+$string['selftest:status'] = 'Status';
+$string['selftest:detail'] = 'Detail';
+$string['selftest:link']   = 'Backend self-test page';
+$string['selftest:link_desc'] = 'Open the <a href="{$a}">Backend self-test</a> page to verify your AI backend works and is sized correctly. Useful right after configuring a self-hosted backend.';
+$string['profile:title']   = 'Deployment presets';
+$string['profile:intro']   = 'Apply a recommended bundle of settings for your deployment type. The values are written into the normal plugin settings and remain individually editable afterward. Applying a preset overwrites the listed settings.';
+$string['profile:current'] = 'Last applied preset: {$a}';
+$string['profile:setting'] = 'Setting';
+$string['profile:value']   = 'Value';
+$string['profile:self_hosted_small'] = 'Self-hosted small-context (single GPU, e.g. A30 24GB / vLLM at 8K)';
+$string['profile:hosted_large']      = 'Hosted large-context (default)';
+$string['profile:apply_self_hosted_small'] = 'Apply self-hosted small-context preset';
+$string['profile:apply_hosted_large']      = 'Apply hosted large-context defaults';
+$string['profile:applied'] = 'Applied the {$a} preset. The values are now in your plugin settings.';
+$string['profile:unknown'] = 'Unknown deployment preset.';
+$string['profile:link']    = 'Deployment presets page';
+$string['profile:link_desc'] = 'Open the <a href="{$a}">Deployment presets</a> page to apply a recommended bundle of settings for a hosted or self-hosted backend.';
 // v5.1.0: per-section cap on the current_page_content body.
 $string['settings:current_page_content_maxchars']      = 'Current page content cap (characters)';
 $string['settings:current_page_content_maxchars_desc'] = 'Maximum number of characters of the current page\'s text injected into the system prompt as the "Current Page Content" section. Default 12,000 keeps the prior behaviour where the full page (up to that cap) is sent — best for accuracy on page-specific questions, since the model can quote directly from the passage. Cost-conscious sites running paid hosted providers can clamp this lower (e.g. 3,000-4,000) to reduce per-turn token spend, at the risk that a question whose answer is in the truncated tail of a long page will not be answered as accurately. Clamped to the range 500-12,000. Independent of <code>prompt_budget_chars</code>: this caps just the page section; the budget caps the whole prompt.';

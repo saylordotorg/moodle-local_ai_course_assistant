@@ -37,10 +37,22 @@ class context_builder {
 
     /**
      * Maximum system prompt length in characters.
-     * Claude Sonnet 4.6 has a 200K-token context window; 60K chars (~15K tokens)
-     * leaves ample room for conversation history while allowing full course content.
+     * Hosted large-context models (e.g. Claude Sonnet 4.6, 200K tokens) leave
+     * ample room; this is now a fallback ceiling only. When backend_context_tokens
+     * is set (self-hosted small-context backends), effective_budget_chars()
+     * computes a tighter, window-aware budget below this value.
      */
     private const MAX_PROMPT_LENGTH = 60000;
+
+    /** v5.10.0: hard lower bound so safety/identity always survive the clamp. */
+    public const MIN_BUDGET_FLOOR = 1500;
+
+    /**
+     * v5.10.0: conservative tokens reserved per conversation-history pair when
+     * sizing the prompt against a backend window. History is sent as separate
+     * messages (not in the system prompt) but still consumes the window.
+     */
+    private const HISTORY_TOKENS_PER_PAIR = 250;
 
     /**
      * v4.12.0: stash the last assembled section breakdown so the prompt-debug
@@ -487,6 +499,21 @@ class context_builder {
         $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
         $budget = ($rawbudget === false || $rawbudget === '') ? 12000 : (int) $rawbudget;
 
+        // v5.10.0: clamp to the backend context window when configured, so the
+        // assembled prompt (plus reserved output and history) fits a small
+        // self-hosted max_model_len even in token-dense languages. A window of
+        // 0 leaves the budget untouched (hosted large-context behaviour).
+        $windowtokens = (int) get_config('local_ai_course_assistant', 'backend_context_tokens');
+        if ($windowtokens > 0) {
+            $rawmax = get_config('local_ai_course_assistant', 'max_tokens');
+            $outputtokens = ($rawmax === false || $rawmax === '') ? 1024 : (int) $rawmax;
+            $rawhist = get_config('local_ai_course_assistant', 'maxhistory');
+            $maxpairs = ($rawhist === false || $rawhist === '') ? 20 : (int) $rawhist;
+            $historytokens = $maxpairs * self::HISTORY_TOKENS_PER_PAIR;
+            $budget = self::effective_budget_chars(
+                $budget, $windowtokens, $outputtokens, $historytokens, $lang);
+        }
+
         // v5.6.0: proportional-budget model. Compute per-section max_chars
         // from the admin-configured weight map and the automatic boost
         // mode (`page_focus` by default boosts current_page when pageid > 0,
@@ -527,6 +554,18 @@ class context_builder {
         }
 
         $prompt = $assembled['prompt'];
+
+        // v5.10.0: when the course_content section was dropped or truncated this
+        // turn and the learner is not on a specific page, append a short
+        // instruction so the model frames a "not found" answer as "could not
+        // search the whole course, open the specific page" rather than asserting
+        // the topic is absent. More likely now that small backends clamp the
+        // budget (see effective_budget_chars).
+        $cc = $assembled['breakdown']['course_content'] ?? null;
+        $cctruncated = $cc !== null && (empty($cc['used']) || !empty($cc['truncated']));
+        if (self::should_add_truncation_hint($cctruncated, $pageid)) {
+            $prompt .= "\n\n" . get_string('prompt:truncation_hint', 'local_ai_course_assistant');
+        }
 
         // Stash the breakdown so the optional debug log can render it
         // without re-running assembly.
@@ -688,6 +727,43 @@ class context_builder {
             'current_page_content' => 'current_page',
         ];
         return $map[$sectionname] ?? null;
+    }
+
+    /**
+     * v5.10.0: Clamp the system-prompt character budget so the prompt fits a
+     * backend token window. Returns $rawbudget unchanged when $windowtokens
+     * is 0 (hosted/unlimited). Otherwise computes a token-aware ceiling and
+     * returns max(MIN_BUDGET_FLOOR, min($rawbudget, ceiling)).
+     *
+     * @param int $rawbudget admin prompt_budget_chars
+     * @param int $windowtokens backend_context_tokens (0 = unlimited)
+     * @param int $outputtokens reserved output tokens (max_tokens)
+     * @param int $historytokens estimated conversation-history tokens
+     * @param string $lang learner language code
+     */
+    public static function effective_budget_chars(
+        int $rawbudget, int $windowtokens, int $outputtokens, int $historytokens, string $lang
+    ): int {
+        if ($windowtokens <= 0) {
+            return $rawbudget;
+        }
+        $ceiling = token_estimator::budget_chars_for_window(
+            $windowtokens, $outputtokens > 0 ? $outputtokens : 512, $historytokens, $lang !== '' ? $lang : 'en'
+        );
+        return max(self::MIN_BUDGET_FLOOR, min($rawbudget, $ceiling));
+    }
+
+    /**
+     * v5.10.0: whether to append the "could not search the whole course" hint.
+     * Only when the course_content section was dropped/truncated this turn AND
+     * the learner is not on a specific page (a page-scoped turn is grounded in
+     * the page text, so the hint would be misleading).
+     *
+     * @param bool $coursecontenttruncated course_content was dropped or truncated
+     * @param int $pageid current Moodle pageid (0 means no page in scope)
+     */
+    public static function should_add_truncation_hint(bool $coursecontenttruncated, int $pageid): bool {
+        return $coursecontenttruncated && $pageid === 0;
     }
 
     /**
