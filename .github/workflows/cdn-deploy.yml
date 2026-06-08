@@ -31,6 +31,14 @@ jobs:
         working-directory: cdn
         run: npm ci
 
+      - name: Run CDN bundle dependency-check tests
+        # Regression guard for the missing-module / missing-shim outage class
+        # (chat -> path_map unbundled, path_map -> core/notification unshimmed).
+        # Fails the deploy before publishing a bundle that would throw
+        # "Unknown module" at runtime on CDN-mode installs (prod).
+        working-directory: cdn
+        run: npm test
+
       - name: Build CDN bundle
         working-directory: cdn
         run: npm run build
