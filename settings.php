@@ -915,6 +915,22 @@ if ($hassiteconfig) {
         '3', PARAM_INT
     ));
 
+    // v5.10.0: bounded retry on a transient backend rejection (429/503). Aimed
+    // at small self-hosted backends that reject under load. Retries only happen
+    // before any response text has streamed, so output is never duplicated.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/backend_retry_attempts',
+        get_string('settings:backend_retry_attempts', 'local_ai_course_assistant'),
+        get_string('settings:backend_retry_attempts_desc', 'local_ai_course_assistant'),
+        '2', PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/backend_retry_max_wait',
+        get_string('settings:backend_retry_max_wait', 'local_ai_course_assistant'),
+        get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant'),
+        '5', PARAM_INT
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_notify_emails',
         'Spend alert recipients',

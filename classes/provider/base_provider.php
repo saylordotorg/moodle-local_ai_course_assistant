@@ -102,19 +102,107 @@ abstract class base_provider implements provider_interface {
     protected function http_post(string $url, array $headers, string $body): string {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
-        $curl = new \curl();
-        $curl->setopt([
-            'CURLOPT_HTTPHEADER' => $headers,
-            'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_TIMEOUT' => 120,
-        ]);
+        // v5.10.0: a saturated backend may reject with a transient 429/503
+        // before any work is done; retry the whole (non-streaming) call.
+        return self::with_transient_retry(function () use ($url, $headers, $body) {
+            $curl = new \curl();
+            $curl->setopt([
+                'CURLOPT_HTTPHEADER' => $headers,
+                'CURLOPT_RETURNTRANSFER' => true,
+                'CURLOPT_TIMEOUT' => 120,
+            ]);
 
-        $response = $curl->post($url, $body);
-        $httpcode = $curl->get_info()['http_code'] ?? 0;
+            $response = $curl->post($url, $body);
+            $httpcode = $curl->get_info()['http_code'] ?? 0;
 
-        $this->check_http_error($httpcode, $response);
+            $this->check_http_error($httpcode, $response);
 
-        return $response;
+            return $response;
+        }, 0);
+    }
+
+    /**
+     * v5.10.0: build a moodle_exception flagged as a transient (retryable)
+     * backend error (HTTP 429 or 503). The flag rides in debuginfo so the
+     * retry wrapper can distinguish it from a permanent error without
+     * changing the user-facing string the SSE layer already handles.
+     *
+     * @param int $status the upstream HTTP status (429 or 503)
+     * @param int|null $retryafter parsed Retry-After header value in seconds, if any
+     */
+    public static function transient_http_exception(int $status, ?int $retryafter): \moodle_exception {
+        $key = $status === 429 ? 'chat:error_ratelimit' : 'chat:error_unavailable';
+        $e = new \moodle_exception($key, 'local_ai_course_assistant');
+        $e->debuginfo = json_encode(['transient' => true, 'status' => $status, 'retry_after' => $retryafter]);
+        return $e;
+    }
+
+    /**
+     * Is this exception a transient backend error, and what Retry-After (if any)?
+     *
+     * @return array{0:bool,1:int|null} [transient, retry_after_seconds]
+     */
+    private static function is_transient(\Throwable $e): array {
+        if ($e instanceof \moodle_exception && !empty($e->debuginfo) && is_string($e->debuginfo)) {
+            $d = json_decode($e->debuginfo, true);
+            if (is_array($d) && !empty($d['transient'])) {
+                $ra = isset($d['retry_after']) && $d['retry_after'] !== null ? (int) $d['retry_after'] : null;
+                return [true, $ra];
+            }
+        }
+        return [false, null];
+    }
+
+    /**
+     * Seam so unit tests do not actually sleep between retries.
+     *
+     * @param float $seconds
+     */
+    protected static function backoff_sleep(float $seconds): void {
+        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+            return;
+        }
+        if ($seconds > 0) {
+            usleep((int) round($seconds * 1000000));
+        }
+    }
+
+    /**
+     * v5.10.0: run $fn, retrying on a transient 429/503 up to
+     * backend_retry_attempts times, but only while $streamedtokens === 0 so a
+     * mid-stream failure is never retried (which would duplicate visible
+     * output). Honors a Retry-After value capped at backend_retry_max_wait;
+     * otherwise uses exponential backoff. Re-throws the last exception when
+     * retries are exhausted or the error is not transient.
+     *
+     * @param callable $fn the operation to run/retry
+     * @param int $streamedtokens count of real output tokens already streamed (0 = safe to retry)
+     * @return mixed whatever $fn returns
+     */
+    public static function with_transient_retry(callable $fn, int $streamedtokens) {
+        $attempts = (int) get_config('local_ai_course_assistant', 'backend_retry_attempts');
+        if ($attempts < 0) {
+            $attempts = 0;
+        }
+        $rawmax = get_config('local_ai_course_assistant', 'backend_retry_max_wait');
+        $maxwait = ($rawmax === false || $rawmax === '') ? 5 : (int) $rawmax;
+
+        $tries = 0;
+        $backoffs = [0.5, 1.5, 3.0];
+        while (true) {
+            try {
+                return $fn();
+            } catch (\Throwable $e) {
+                [$transient, $retryafter] = self::is_transient($e);
+                $canretry = $transient && $streamedtokens === 0 && $tries < $attempts;
+                if (!$canretry) {
+                    throw $e;
+                }
+                $wait = $retryafter !== null ? min($retryafter, $maxwait) : ($backoffs[$tries] ?? 3.0);
+                self::backoff_sleep($wait);
+                $tries++;
+            }
+        }
     }
 
     /**
@@ -136,46 +224,77 @@ abstract class base_provider implements provider_interface {
                 'Provider endpoint rejected by SSRF validator: ' . $url);
         }
 
-        $ch = curl_init();
-
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $body,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_TIMEOUT => 300,
-            CURLOPT_WRITEFUNCTION => function ($ch, $data) use ($writecallback) {
-                $writecallback($data);
-                return strlen($data);
-            },
-        ]);
-
-        // Add proxy settings from Moodle config if present.
         global $CFG;
-        if (!empty($CFG->proxyhost)) {
-            curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
-            if (!empty($CFG->proxyport)) {
-                curl_setopt($ch, CURLOPT_PROXYPORT, $CFG->proxyport);
+
+        // v5.10.0: wrap the stream in the bounded transient-retry. A header
+        // function captures the status before any body arrives; the write
+        // function swallows error-body bytes (status >= 400) so a clean 429/503
+        // rejection forwards zero real tokens and is safe to retry. A transport
+        // error (which may occur mid-stream) is thrown as non-transient and is
+        // never retried, so visible output cannot be duplicated.
+        self::with_transient_retry(function () use ($url, $headers, $body, $writecallback, $CFG) {
+            $status = 0;
+            $retryafter = null;
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $url,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => $headers,
+                CURLOPT_RETURNTRANSFER => false,
+                CURLOPT_TIMEOUT => 300,
+                CURLOPT_HEADERFUNCTION => function ($ch, $header) use (&$status, &$retryafter) {
+                    if (preg_match('#^HTTP/\S+\s+(\d{3})#', $header, $m)) {
+                        $status = (int) $m[1];
+                    } else if (stripos($header, 'Retry-After:') === 0) {
+                        $val = trim(substr($header, strlen('Retry-After:')));
+                        if (is_numeric($val)) {
+                            $retryafter = (int) $val;
+                        }
+                    }
+                    return strlen($header);
+                },
+                CURLOPT_WRITEFUNCTION => function ($ch, $data) use ($writecallback, &$status) {
+                    if ($status >= 400) {
+                        return strlen($data); // Swallow error body; keep call retry-safe.
+                    }
+                    $writecallback($data);
+                    return strlen($data);
+                },
+            ]);
+
+            // Add proxy settings from Moodle config if present.
+            if (!empty($CFG->proxyhost)) {
+                curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
+                if (!empty($CFG->proxyport)) {
+                    curl_setopt($ch, CURLOPT_PROXYPORT, $CFG->proxyport);
+                }
+                if (!empty($CFG->proxyuser)) {
+                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser . ':' . ($CFG->proxypassword ?? ''));
+                }
             }
-            if (!empty($CFG->proxyuser)) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser . ':' . ($CFG->proxypassword ?? ''));
+
+            curl_exec($ch);
+
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                // Transport error: possibly mid-stream, so non-transient.
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $error);
             }
-        }
 
-        curl_exec($ch);
-
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $error);
-        }
-
-        if ($httpcode >= 400) {
-            $this->check_http_error($httpcode, '');
-        }
+            if ($httpcode === 429) {
+                throw self::transient_http_exception(429, $retryafter);
+            }
+            if ($httpcode === 503) {
+                throw self::transient_http_exception(503, $retryafter);
+            }
+            if ($httpcode >= 400) {
+                $this->check_http_error($httpcode, '');
+            }
+        }, 0);
     }
 
     /**
@@ -195,7 +314,8 @@ abstract class base_provider implements provider_interface {
         }
 
         if ($httpcode === 429) {
-            throw new \moodle_exception('chat:error_ratelimit', 'local_ai_course_assistant');
+            // v5.10.0: transient — the retry wrapper may re-attempt before streaming.
+            throw self::transient_http_exception(429, null);
         }
 
         if ($httpcode === 404) {
@@ -205,6 +325,11 @@ abstract class base_provider implements provider_interface {
                 . "Check the model name in Site Admin > Plugins > AI Course Assistant. "
                 . "The default for this provider is \"{$defaultmodel}\".";
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $detail);
+        }
+
+        if ($httpcode === 503) {
+            // v5.10.0: transient — backend temporarily unavailable/overloaded.
+            throw self::transient_http_exception(503, null);
         }
 
         if ($httpcode >= 500) {
