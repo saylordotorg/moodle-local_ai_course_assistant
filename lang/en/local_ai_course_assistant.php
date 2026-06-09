@@ -289,6 +289,7 @@ $string['settings:rag_enabled_desc'] = 'When enabled, the AI tutor uses semantic
 $string['settings:embed_provider'] = 'RAG Embedding Provider';
 $string['settings:embed_provider_desc'] = 'API provider used to generate text embeddings for RAG indexing and retrieval. This is independent of the chat provider above and the voice providers below — RAG only uses an embedding endpoint, not a chat completion endpoint. Site-wide setting (no per-course override yet); switching providers requires a re-index of every course. Together AI does not currently expose an embedding endpoint, so RAG must use OpenAI or a local Ollama embedding model when chat is on Together.';
 $string['settings:embed_provider_openai'] = 'OpenAI (text-embedding-3-small)';
+$string['settings:embed_provider_voyage'] = 'Voyage AI (voyage-3.5 — recommended; +4 MTEB vs OpenAI 3-small, 4x context, multilingual)';
 $string['settings:embed_provider_ollama'] = 'Ollama (local, e.g. nomic-embed-text)';
 $string['settings:embed_apikey'] = 'Embedding API Key';
 $string['settings:embed_apikey_desc'] = 'API key for the embedding provider. Can be different from the chat API key. Not required for Ollama.';
@@ -302,6 +303,18 @@ $string['settings:rag_topk'] = 'Top-K Chunks';
 $string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt.';
 $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
+
+// v5.11.0: two-stage retrieval with Voyage rerank-2.5.
+$string['settings:rerank_enabled'] = 'Two-stage retrieval (Voyage rerank-2.5)';
+$string['settings:rerank_enabled_desc'] = 'When enabled, RAG retrieval becomes two-stage: cosine similarity returns the top-N candidates (default 50), then Voyage rerank-2.5 cross-encoder scores each and the top-K go into the prompt. Published lifts: +15 Recall@10 enterprise, +39% NDCG BEIR. ~$0.05/MTok billing. Requires <code>rerank_apikey</code> below; falls back gracefully to single-stage cosine if rerank fails or is unconfigured.';
+$string['settings:rerank_apikey'] = 'Rerank API key';
+$string['settings:rerank_apikey_desc'] = 'Voyage AI API key for rerank-2.5. Leave blank to reuse the Embedding API Key above (typical Voyage deployments share one key across embed + rerank).';
+$string['settings:rerank_model'] = 'Rerank model';
+$string['settings:rerank_model_desc'] = 'Default <code>rerank-2.5</code>. Newer Voyage rerank models can be specified here.';
+$string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
+$string['settings:rerank_apibaseurl_desc'] = 'Override the Voyage rerank base URL. Leave blank to use the Embedding API Base URL above, or Voyage default (<code>https://api.voyageai.com/v1</code>).';
+$string['settings:rerank_candidates'] = 'Rerank candidate window';
+$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 50. Larger windows give the reranker more material to work with at small extra cost (~10k tokens per rerank op).';
 
 // Reminder messages.
 $string['reminder:email_subject'] = 'Study Reminder: {$a}';
@@ -1460,8 +1473,10 @@ $string['settings:mastery_decay_enabled']        = 'Enable mastery decay';
 $string['settings:mastery_decay_enabled_desc']   = 'When on, mastery scores decay over time against the most recent attempt timestamp. A previously-mastered objective drops back to "learning" once enough time has passed since the learner last touched it, surfacing it for refresh in the adaptive surfaces. Never demotes past "learning" — a learner with any attempts at all stays at least there. Read-side only; no data change. <strong>Default off in v4.0.</strong> Plan is to flip default-on in v4.1 once tuning data is in.';
 $string['settings:mastery_decay_half_life_days'] = 'Mastery decay half-life (days)';
 $string['settings:mastery_decay_half_life_days_desc'] = 'Half-life in days for the mastery score time decay. Score is multiplied by 0.5 ^ (days_since_last_attempt / half_life) before the threshold check. Default 30 — a mastered objective last touched 30 days ago is at half its raw mastery score; at 60 days, a quarter. Only used when "Enable mastery decay" is on.';
+$string['settings:mastery_classifier_provider']  = 'Classifier provider';
+$string['settings:mastery_classifier_provider_desc'] = 'Provider id used for the per-turn mastery classifier. Leave empty to inherit the default AI provider. Default <code>openai</code> pairs with the <code>gpt-4o-mini</code> classifier model below — the cheapest TIER 1 option for structured-output classification (~$220/mo saving at 100k MAU vs the chat tier). When set, the row in Comparison providers with this provider id supplies the API key, base URL, and temperature.';
 $string['settings:mastery_classifier_model']     = 'Classifier model';
-$string['settings:mastery_classifier_model_desc']= 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini.';
+$string['settings:mastery_classifier_model_desc']= 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini. Default <code>gpt-4o-mini</code>.';
 $string['settings:mastery_classifier_weight']    = 'Classifier weight';
 $string['settings:mastery_classifier_weight_desc']= 'How much a conversation attempt counts relative to a quiz attempt (1.0). Default 0.3.';
 $string['settings:mastery_classifier_threshold'] = 'Classifier confidence threshold';

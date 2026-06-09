@@ -1037,5 +1037,18 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026060100, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026060900) {
+        // v5.11.0: wire the previously-orphaned mastery_classifier_model setting
+        // by adding a paired mastery_classifier_provider. Default 'openai' lets
+        // the classifier route to gpt-4o-mini (saving ~$220/mo at 100k MAU vs
+        // running on the chat tier). Only set if unset; never overwrite admin choice.
+        $existing = get_config('local_ai_course_assistant', 'mastery_classifier_provider');
+        if ($existing === false || $existing === '') {
+            set_config('mastery_classifier_provider', 'openai', 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026060900, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }
