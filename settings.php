@@ -932,6 +932,26 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    // v6.0.0: daily cost anomaly detector (in-SOLA equivalent to the Redash query).
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/cost_anomaly_heading',
+        get_string('settings:cost_anomaly_heading', 'local_ai_course_assistant'),
+        get_string('settings:cost_anomaly_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/cost_anomaly_enabled',
+        get_string('settings:cost_anomaly_enabled', 'local_ai_course_assistant'),
+        get_string('settings:cost_anomaly_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/cost_anomaly_multiplier',
+        get_string('settings:cost_anomaly_multiplier', 'local_ai_course_assistant'),
+        get_string('settings:cost_anomaly_multiplier_desc', 'local_ai_course_assistant'),
+        '2.0',
+        PARAM_FLOAT
+    ));
+
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/spend_failover_chain',
         'Failover chain',

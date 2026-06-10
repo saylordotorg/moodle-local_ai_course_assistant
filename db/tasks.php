@@ -210,4 +210,21 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v6.0.0 — Daily cost anomaly check. Compares today's site-wide
+        // SOLA spend against the rolling 7-day median. Emails the
+        // spend_notify_emails recipient list (falls back to site admins)
+        // when today > cost_anomaly_multiplier × median. Off by default;
+        // enable via cost_anomaly_enabled. Idempotent: per-day flag in
+        // config_plugins prevents duplicate emails if cron runs multiple
+        // times on the same day. Runs at 09:05 so morning admin triage
+        // can act on alerts that landed overnight.
+        'classname' => \local_ai_course_assistant\task\cost_anomaly_check::class,
+        'blocking' => 0,
+        'minute' => '5',
+        'hour' => '9',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];
