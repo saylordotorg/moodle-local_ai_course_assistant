@@ -2256,6 +2256,15 @@ if ($hassiteconfig) {
         'moodle/site:config'
     ));
 
+    // v6.2.0: prompt playground — assemble the prompt with simulated injected
+    // content and inspect the result + per-section breakdown.
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_prompt_playground',
+        'SOLA Prompt Playground',
+        new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
+        'moodle/site:config'
+    ));
+
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_updates',
         get_string('update:title', 'local_ai_course_assistant'),
