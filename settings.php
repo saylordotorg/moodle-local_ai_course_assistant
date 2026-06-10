@@ -1523,6 +1523,48 @@ if ($hassiteconfig) {
         'openai',
         PARAM_ALPHANUMEXT
     ));
+
+    // v5.12.0: premium escalation tier (A.10 follow-on).
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/premium_escalation_heading',
+        get_string('settings:premium_escalation_heading', 'local_ai_course_assistant'),
+        get_string('settings:premium_escalation_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/premium_escalation_enabled',
+        get_string('settings:premium_escalation_enabled', 'local_ai_course_assistant'),
+        get_string('settings:premium_escalation_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/premium_escalation_provider',
+        get_string('settings:premium_escalation_provider', 'local_ai_course_assistant'),
+        get_string('settings:premium_escalation_provider_desc', 'local_ai_course_assistant'),
+        'claude',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/premium_escalation_model',
+        get_string('settings:premium_escalation_model', 'local_ai_course_assistant'),
+        get_string('settings:premium_escalation_model_desc', 'local_ai_course_assistant'),
+        'claude-opus-4-8',
+        PARAM_RAW_TRIMMED
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/premium_escalation_triggers',
+        get_string('settings:premium_escalation_triggers', 'local_ai_course_assistant'),
+        get_string('settings:premium_escalation_triggers_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/premium_escalation_course_tags',
+        get_string('settings:premium_escalation_course_tags', 'local_ai_course_assistant'),
+        get_string('settings:premium_escalation_course_tags_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_model',
         get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),

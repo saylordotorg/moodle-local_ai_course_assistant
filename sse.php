@@ -488,6 +488,31 @@ try {
         $provider = base_provider::create_from_config($courseid);
         $effectiveprovidername = (\local_ai_course_assistant\course_config_manager::get_effective_config($courseid)['provider']
             ?? get_config('local_ai_course_assistant', 'provider')) ?: '';
+
+        // v5.12.0: premium escalation tier (A.10 follow-on). When enabled,
+        // per-turn routing checks the user message against admin-configured
+        // regex triggers (and any course-allowlist tags); matching turns
+        // route to the premium provider (Opus 4.8 by default) instead of
+        // the workhorse. Admin-LLM-picker overrides skip this path —
+        // explicit admin choice always wins. On any router or instantiation
+        // failure, falls back to the workhorse provider.
+        $premiumdecision = \local_ai_course_assistant\premium_router::decide($message, $courseid);
+        if (!empty($premiumdecision['escalate'])) {
+            try {
+                $provider = base_provider::create_for_comparison(
+                    $premiumdecision['provider'],
+                    $premiumdecision['model'],
+                    $courseid
+                );
+                $effectiveprovidername = $premiumdecision['provider'];
+                \local_ai_course_assistant\premium_router::log_decision(
+                    (int) $conv->id, (int) $USER->id, $courseid, $premiumdecision
+                );
+            } catch (\Throwable $e) {
+                debugging('premium_router escalation failed, staying on workhorse: '
+                    . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
     }
 
     // If the student attached an image, confirm the effective provider can

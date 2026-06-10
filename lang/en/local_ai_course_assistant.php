@@ -1482,6 +1482,20 @@ $string['settings:mastery_classifier_weight_desc']= 'How much a conversation att
 $string['settings:mastery_classifier_threshold'] = 'Classifier confidence threshold';
 $string['settings:mastery_classifier_threshold_desc'] = 'Minimum classifier confidence required to record a conversation attempt. 0.0 to 1.0. Default 0.7.';
 
+// v5.12.0: premium escalation tier (A.10 follow-on).
+$string['settings:premium_escalation_heading'] = 'Premium escalation tier (A.10)';
+$string['settings:premium_escalation_heading_desc'] = 'Optional per-turn routing to a premium model (Claude Opus 4.8 by default) for prompts where the workhorse chat tier visibly struggles — typically multi-step math, CS, and science reasoning. Resolved by the 2026-06-09 A.10 bake-off: Opus 4.8 won at 14.97/15 vs gpt-4o\'s 12.68/15 on hard prompts. Two trigger paths: regex matches on the user message, OR a course allowlist that escalates every turn. Off by default. At ~5% escalation, expect ~$700/month at 100k Saylor MAU on top of the baseline chat spend.';
+$string['settings:premium_escalation_enabled'] = 'Enable premium escalation routing';
+$string['settings:premium_escalation_enabled_desc'] = 'When on, the per-turn router checks the trigger regex list and the course allowlist for every chat call; matching turns are routed to the premium provider. Falls back to the workhorse provider if the premium row is missing or fails to instantiate. Admin-LLM-picker overrides always win regardless.';
+$string['settings:premium_escalation_provider'] = 'Premium provider';
+$string['settings:premium_escalation_provider_desc'] = 'Provider id to route premium calls through. Must match a row in Comparison providers (so the API key, base URL, and temperature come from the same place admins already manage). Default <code>claude</code>.';
+$string['settings:premium_escalation_model'] = 'Premium model';
+$string['settings:premium_escalation_model_desc'] = 'Model name passed to the premium provider. Default <code>claude-opus-4-8</code> per the A.10 bake-off verdict.';
+$string['settings:premium_escalation_triggers'] = 'Premium trigger regexes';
+$string['settings:premium_escalation_triggers_desc'] = 'One PCRE regex per line (without delimiters; case-insensitive matching is applied automatically). Lines starting with # are comments. Leave blank to use the curated default set from the A.10 bake-off (multi-step STEM markers: "derive", "prove that", "step by step", LaTeX math, fenced code blocks, big-O, integrals, optimization, etc.).';
+$string['settings:premium_escalation_course_tags'] = 'Premium course allowlist';
+$string['settings:premium_escalation_course_tags_desc'] = 'One course shortname or idnumber prefix per line. Every turn in a matching course auto-escalates regardless of the message regex (use for STEM-heavy courses where escalation should be the default). Matching is case-insensitive prefix — "MATH" matches MATH121, MATH205, etc.';
+
 // v4.2: courses_admin page.
 $string['courses_admin:title']             = 'AI Course Assistant — Courses';
 $string['courses_admin:lede']              = 'Enable or disable AI Assistant per course, manage Usability Testing, or run bulk actions across many courses.';
