@@ -1587,33 +1587,6 @@ class context_builder {
     }
 
     /**
-     * Get instructions for appending SOLA_NEXT suggestion markers.
-     *
-     * Remote config key: instruction_blocks.next_steps
-     *
-     * @return string
-     */
-    private static function get_next_steps_instructions(): string {
-        $blocks = remote_config_manager::get_value('instruction_blocks', []);
-        if (!empty($blocks['next_steps'])) {
-            return "\n\n## Suggested Follow-up Actions\n" . $blocks['next_steps'];
-        }
-        return "\n\n## Suggested Follow-up Actions\n"
-            . "After EVERY response, append exactly this marker on its own line at the very end. "
-            . "The four chips MUST be specific to what was just discussed in this turn — never echo "
-            . "placeholder text.\n\n"
-            . "Marker shape:\n"
-            . "[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]\n\n"
-            . "Worked example (note that real chip text replaces every angle-bracketed placeholder):\n"
-            . "[SOLA_NEXT]Quiz me on this||Give me an example||Explain it more simply||What should I study next?[/SOLA_NEXT]\n\n"
-            . "Each chip is a short (3–8 word) actionable prompt that naturally continues the "
-            . "conversation. Vary the chips to fit this specific turn — do not reuse the worked "
-            . "example verbatim and never emit the literal words \"suggestion 1\", \"chip 1\", or "
-            . "\"<chip 1>\". Always include exactly 4 chips, separated by ||. The whole "
-            . "[SOLA_NEXT]...[/SOLA_NEXT] block is stripped before the learner sees it.";
-    }
-
-    /**
      * Get practice session scoring instructions.
      *
      * When the frontend requests a score at the end of a practice session, it sends
