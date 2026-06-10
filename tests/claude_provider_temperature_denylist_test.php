@@ -44,6 +44,9 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
      * Invoke the private static `model_supports_temperature($model)` via
      * reflection. The method is private by design (callers go through
      * `chat_completion`); the test pins the contract.
+     *
+     * @param string $model Model identifier to test.
+     * @return bool Whether the model supports a temperature parameter.
      */
     private function supports(string $model): bool {
         $r = new \ReflectionClass(claude_provider::class);

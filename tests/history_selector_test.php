@@ -28,7 +28,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class history_selector_test extends \advanced_testcase {
 
-    /** Build a scored row whose pair is identifiable by a label. */
+    /**
+     * Build a scored row whose pair is identifiable by a label.
+     *
+     * @param string $label Identifier used for the user/assistant content.
+     * @param float $score Relevance score for the row.
+     * @return array Scored row shaped like the selector input.
+     */
     private function row(string $label, float $score): array {
         return [
             'pair' => [
@@ -39,7 +45,12 @@ final class history_selector_test extends \advanced_testcase {
         ];
     }
 
-    /** Extract the user-content labels (minus the -q suffix) from flattened output. */
+    /**
+     * Extract the user-content labels (minus the -q suffix) from flattened output.
+     *
+     * @param array $pairs Flattened API-shaped messages.
+     * @return array Labels in order.
+     */
     private function labels(array $pairs): array {
         $out = [];
         foreach ($pairs as $p) {
