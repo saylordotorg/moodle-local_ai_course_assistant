@@ -145,6 +145,9 @@ class security {
      *
      * Call from every SOLA entry point that renders learner-affecting HTML
      * or streams AI output.
+     *
+     * @param bool $fullmoodlepage True for full Moodle pages, which omit the
+     *                             strict CSP (it breaks Moodle's own YUI/JS).
      */
     public static function send_security_headers(bool $fullmoodlepage = false): void {
         if (headers_sent()) {
