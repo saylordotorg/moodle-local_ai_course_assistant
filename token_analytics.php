@@ -84,19 +84,27 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('voice')                                    THEN 'Voice (Realtime)'
     WHEN m.interaction_type IN ('openai_tts','xai_tts')                     THEN 'Voice (TTS)'
     WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt')    THEN 'Voice (STT)'
-    WHEN m.interaction_type IN ('embedding','embed')                        THEN 'RAG'
+    WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'RAG'
     WHEN m.interaction_type IN ('meta')                                     THEN 'Analytics'
+    WHEN m.interaction_type IN ('premium_route')                            THEN 'Premium routing (escalation decisions)'
     WHEN m.interaction_type IN ('chat','quiz') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'Chat'
     ELSE 'Other'
 END";
 
+// v6.1.0: this breakdown includes role='system' cost-log rows (embedding,
+// rerank) and premium_route decision rows — previously the role='assistant'
+// filter silently excluded them, so the RAG category was always empty and
+// the v5.12 premium router was unobservable here. Premium-routing rows
+// carry zero tokens (the escalated chat call itself is logged as a normal
+// assistant message under its Opus model); the response_count column is
+// the number of escalation decisions in the window.
 $bycategory = $DB->get_records_sql(
     "SELECT {$categorysql} AS category,
             COUNT(m.id) AS response_count,
             SUM(COALESCE(m.prompt_tokens,0))     AS total_prompt,
             SUM(COALESCE(m.completion_tokens,0)) AS total_completion
        FROM {local_ai_course_assistant_msgs} m
-      WHERE m.role = 'assistant' AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}
+      WHERE m.role IN ('assistant','system') AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}
       GROUP BY {$categorysql}
       ORDER BY SUM(COALESCE(m.prompt_tokens,0)) + SUM(COALESCE(m.completion_tokens,0)) DESC",
     $params
@@ -294,6 +302,26 @@ $projection = [
     'days'       => $optimizerdata['projection_days'],
 ];
 
+// ── Query: prompt-cache visibility (v6.1.0) ──────────────────────────────────
+// Sums the per-call cached-token counts persisted since v6.1.0 (OpenAI
+// prompt_tokens_details.cached_tokens / Anthropic cache_read_input_tokens,
+// normalized into the one cached_tokens column at write time). Rows from
+// before the column existed are NULL and excluded — the hit-rate denominator
+// only counts calls that reported cache data, so the percentage is honest
+// rather than diluted by pre-v6.1 history.
+$cachestats = $DB->get_record_sql(
+    "SELECT SUM(COALESCE(m.cached_tokens,0))            AS cached_total,
+            SUM(COALESCE(m.prompt_tokens,0))             AS prompt_total,
+            COUNT(m.id)                                  AS calls_reporting
+       FROM {local_ai_course_assistant_msgs} m
+      WHERE m.role = 'assistant' AND m.cached_tokens IS NOT NULL{$timewhere}{$coursewhere}",
+    $params
+);
+$cachedtotal = (int) ($cachestats->cached_total ?? 0);
+$cachepct = ($cachestats && (int) $cachestats->prompt_total > 0)
+    ? round(100 * $cachedtotal / (int) $cachestats->prompt_total)
+    : 0;
+
 // ── Template data ─────────────────────────────────────────────────────────────
 
 $grandtotal = $grandprompt + $grandcompl;
@@ -315,6 +343,9 @@ $templatedata = [
     'opt_projection_days'       => $projection['days'],
     'by_category'        => $bycategoryrows,
     'has_by_category'    => !empty($bycategoryrows),
+    'cached_tokens'      => number_format($cachedtotal),
+    'cached_pct'         => $cachepct,
+    'has_cache_data'     => $cachedtotal > 0,
     'by_model'           => $bymodelrows,
     'has_by_model'       => !empty($bymodelrows),
     'by_student'         => $bystudentrows,

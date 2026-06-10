@@ -40,6 +40,7 @@
         <FIELD NAME="interaction_type" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" DEFAULT="chat" COMMENT="Interaction mode: chat, voice, quiz, practice_conversation, practice_pronunciation"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course module ID the student was viewing when sending this message"/>
         <FIELD NAME="rag_latency_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v5.4.6: wall-clock time the rag_retriever::retrieve call took for this turn (null when RAG was off or not used)"/>
+        <FIELD NAME="cached_tokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v6.1.0: prompt tokens served from the provider's prompt cache this call (OpenAI prompt_tokens_details.cached_tokens or Anthropic cache_read_input_tokens). Null when the provider reported nothing."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
