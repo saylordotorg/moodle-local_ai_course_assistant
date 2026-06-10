@@ -1496,6 +1496,10 @@ $string['settings:premium_escalation_triggers_desc'] = 'One PCRE regex per line 
 $string['settings:premium_escalation_course_tags'] = 'Premium course allowlist';
 $string['settings:premium_escalation_course_tags_desc'] = 'One course shortname or idnumber prefix per line. Every turn in a matching course auto-escalates regardless of the message regex (use for STEM-heavy courses where escalation should be the default). Matching is case-insensitive prefix — "MATH" matches MATH121, MATH205, etc.';
 
+// v5.13.0: default per-course spend cap.
+$string['settings:spend_cap_per_course_default'] = 'Default per-course spend cap (USD)';
+$string['settings:spend_cap_per_course_default_desc'] = 'Defensive cap applied to every course that does not have its own per-course spend cap configured. Set to e.g. <code>30</code> to bound any single course\'s monthly spend at $30 without having to tune individual courses. <code>0</code> = no default (only site-wide and per-course-override caps apply). When a course crosses 80% / 95% / 100% of this cap, the existing spend-guard alert pipeline sends the admin notification (recipient list: <code>spend_notify_emails</code>, falling back to site admins). A specific course can always raise its own ceiling by setting a higher per-course override.';
+
 // v4.2: courses_admin page.
 $string['courses_admin:title']             = 'AI Course Assistant — Courses';
 $string['courses_admin:lede']              = 'Enable or disable AI Assistant per course, manage Usability Testing, or run bulk actions across many courses.';

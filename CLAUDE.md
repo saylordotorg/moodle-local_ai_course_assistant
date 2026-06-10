@@ -12,10 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026060802`, release `5.10.2`
+- **Current version:** `2026060901`, release `5.12.1`
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
+- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) run v5.12.1.
 
 ---
 
@@ -41,6 +42,24 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - Self-hosted readiness (v5.10.0): token-aware prompt budgeting clamped to a backend `max_model_len` (`backend_context_tokens`), bounded pre-first-byte retry on transient 429/503, apply-once deployment presets, and an on-demand backend self-test page
 - Security/privacy (v5.10.1): `email_optout` covered by the privacy provider erasure path, avatar-viewer session-ownership check, Zendesk escalation gated on disclosed first-run consent (`zendesk_require_consent`), de-anonymized Redash export audit-logged
 - First-run consent scroll-gate (v5.10.1, fixed v5.10.2): Accept button disabled until the learner scrolls the notice to the bottom; inline JS in `templates/chat_widget.mustache`, regression harness `tests/a11y/consent-gate-check.js` (Puppeteer)
+- Vendor-rec optimizations (v5.11.0): mastery classifier routed off chat tier via `mastery_classifier_provider` (default `openai`/`gpt-4o-mini`, saves ~$220/mo at 100k MAU); Voyage AI embeddings (voyage-3.5, asymmetric query/document `input_type`, MRL `output_dimension`); opt-in Voyage rerank-2.5 two-stage RAG (`rerank_enabled` checkbox, default off); OpenAI `prompt_tokens_details.cached_tokens` captured for auto-prefix cache-hit visibility; Claude Opus 4.7+ temperature deny-list (Anthropic deprecated `temperature` on reasoning-class Opus models, was bubbling up as the generic error string)
+- Premium escalation tier (v5.12.0): per-turn `premium_router` evaluates each chat call against admin-configured regex triggers (default ships with multi-step STEM markers from the A.10 bake-off: derive, prove that, step by step, LaTeX math, fenced code blocks, big-O, integrals, optimization, thermodynamics) plus an optional course-shortname/idnumber allowlist; matching turns route to Claude Opus 4.8 instead of the workhorse chat tier. Off by default; expected ~$700/mo at 100k MAU at 5% escalation rate.
+
+---
+
+## AI vendor stack (text-only baseline)
+
+- **Chat tutor:** Gemini 2.5 Flash on Vertex AI (primary), gpt-4o-mini failover.
+- **Quiz coach / mastery classifier / analytics / digests:** gpt-4o-mini.
+- **Anti-cheat reference (~5% of turns when integrity routing ships):** Claude Haiku 4.5.
+- **Premium escalation tier (v5.12 router):** Claude Opus 4.8 on ~5% of turns matching STEM markers + course allowlist. Off by default.
+- **Embeddings:** OpenAI `text-embedding-3-small` currently; recommended migration to Voyage-3.5 at 50K+ MAU.
+- **Re-ranker (opt-in):** Voyage rerank-2.5.
+- **Judge harness:** Claude Sonnet 4.6 (out of contestant pool).
+- **Ultimate-fallback chat for EU residency (NOT in Saylor default):** Mistral Small. Provider class stays available so non-Saylor sites can select it; not in Saylor's `spend_failover_chain` (pending Mistral training-opt-out + ZDR, and Saylor doesn't need EU residency at current scale).
+- **Audio / Voice / Avatar:** deferred (Appendix B of `.drafts/sola-vendor-recommendations-2026-06-09.md`).
+
+See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and `.drafts/sola-vendor-optimization-by-mau-2026-06-09.md` (per-MAU-tier optimization playbook) for the full vendor story.
 
 ---
 
@@ -67,7 +86,14 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 | `classes/token_estimator.php` | v5.10.0 language-aware char/token estimation; `budget_chars_for_window` ceiling (shared by the budget clamp, metrics tuner, and self-test) |
 | `classes/backend_probe.php` | v5.10.0 on-demand live backend capability probe (chat round-trip, window detect, embedding); rendered by `backend_selftest.php` |
 | `classes/deployment_profile.php` | v5.10.0 apply-once preset definitions (self-hosted small-context / hosted large-context); applied by `deployment_profile.php` page |
-| `classes/course_config_manager.php` | Per-course AI configuration |
+| `classes/course_config_manager.php` | Per-course AI configuration (including per-course `spend_cap_monthly` override) |
+| `classes/spend_guard.php` | Site-wide + per-capability + per-course spend cap enforcement; emits notification emails at 80% and 95% thresholds (v5.13 adds `spend_cap_per_course_default` fallback) |
+| `classes/emergency_control.php` | Site-wide kill switch (`emergency_disabled` flag); when on, every SOLA chat call short-circuits with a disabled-state response. Admin UI at `emergency_control.php`; CLI at `admin/cli/emergency_disable.php` |
+| `classes/premium_router.php` | v5.12.0 per-turn router for premium escalation tier (regex triggers + course allowlist → Opus 4.8) |
+| `classes/embedding_provider/voyage_embedding_provider.php` | v5.11.0 Voyage-3.5 embedding client (asymmetric query/document, MRL dims) |
+| `classes/embedding_provider/voyage_reranker.php` | v5.11.0 Voyage rerank-2.5 cross-encoder for two-stage RAG |
+| `classes/conversation_classifier.php` | v5.11.0 reads `mastery_classifier_provider` + `mastery_classifier_model`; routes per-turn classification through gpt-4o-mini by default |
+| `classes/provider/claude_provider.php` | v5.11.0 `model_supports_temperature()` per-prefix deny-list (Opus 4.7/4.8/4.9 reject temperature) |
 | `classes/analytics.php` | Usage analytics and provider comparison |
 | `classes/external/generate_quiz.php` | Quiz generation (AI-guided + manual topic) |
 | `classes/external/get_realtime_token.php` | Fetches OpenAI Realtime ephemeral token |
@@ -196,4 +222,9 @@ rsync -a --exclude=.git \
 
 ## Upcoming Work
 
-1. Talking avatars in the plugin (pricing/architecture discussion pending)
+1. Mistral training-opt-out + ZDR (external action — Saylor portal). Currently NOT in Saylor's `spend_failover_chain`; provider class stays available so non-Saylor sites can opt in.
+2. Vendor enterprise commits (Vertex Tier 3+, OpenAI Tier 4, Anthropic Tier 3, Voyage enterprise). 2-4 week procurement window; only matters past 50K MAU.
+3. lp-i18n translation batch for v5.11 (13 strings) + v5.12 (8 strings) + v5.13 (2 strings) into the 45 non-English language files.
+4. Instructor spot-check on 20 of the A.10 bake-off responses to validate the LLM judge's calls.
+5. SOLA-fixture RAG benchmark (30-50 real BUS101 / PHIL101 questions with expected-passage labels) before enabling Voyage rerank at scale.
+6. Talking avatars in the plugin (pricing / architecture discussion still pending; sit in Appendix B of `.drafts/sola-vendor-recommendations-2026-06-09.md`).

@@ -86,9 +86,9 @@ At 10K MAU you're spending pocket change. The optimization machinery has fixed o
 **DO at this level:**
 1. **Migrate embeddings to Voyage-3.5.** Four config lines + a $4.80 one-time reindex. +4 MTEB English, 4x context window, materially better multilingual. Pays for itself in ELL courses (30% of mix at this scale).
 2. **Enable Voyage rerank-2.5.** ~$31/mo for a published +15 Recall@10 / +39% NDCG lift on BEIR. ~6% of chat spend for a measurable answer-quality improvement.
-3. **Wire the failover chain.** `spend_failover_chain` = `chat:openai\nchat:mistral`; `failover_per_call_enabled=1`. At 12,500 SOLA users a Vertex AI outage during EU evening is a real incident; failover keeps it invisible.
+3. **Wire the failover chain.** `spend_failover_chain` = `chat:openai`; `failover_per_call_enabled=1`. At 12,500 SOLA users a Vertex AI outage is a real incident; failover keeps it invisible. (Mistral was originally specified as the EU-resident ultimate fallback but dropped from Saylor's defaults on 2026-06-09 pending training-opt-out + ZDR; provider class stays available so non-Saylor sites can add `chat:mistral` as a third line.)
 4. **Enable premium escalation routing (v5.12) at 5% rate.** Default trigger list is fine. Monitor escalation rate per course via the `[PremiumRouter]` telemetry table. Cost ~$350/mo; worth it for the visible quality lift on STEM courses.
-5. **Verify Mistral training-opt-out + ZDR before EU traffic.** External vendor action; flagged in `.drafts/sola-v5.11.0-external-actions.md`. Required if the failover chain is wired (above) and any non-US learners exist.
+5. **(Optional, Mistral-only sites only) Verify Mistral training-opt-out + ZDR before EU traffic.** Not required for Saylor; required for any non-Saylor site that chooses to add Mistral to its failover chain.
 6. **Set per-course soft caps at $100/mo, admin alert at $150.** Higher than 10K MAU because legitimate course usage grows; still tight enough to catch ELL spikes.
 7. **Start the Vertex AI committed-use conversation.** At ~$525/mo Gemini Flash spend, a 1-year commit saves ~$130/mo (25%). Procurement window is 2-4 weeks; start now so the commit is in place by 100K MAU.
 8. **Build a Redash dashboard for `cached_tokens` / `cache_read_tokens`.** The v5.11 infrastructure captures both Anthropic and OpenAI cache metrics; visibility is the prereq for tuning at 100K.
@@ -221,7 +221,7 @@ The 10K → 50K transition is mostly turning ON the v5.11+v5.12 machinery that's
 | Tier | Vendor | Action | Lead time |
 |---|---|---|---|
 | 50K | Google Vertex AI | Start committed-use conversation | 2-4 weeks |
-| 50K | Mistral La Plateforme | Training opt-out + ZDR (if EU failover lane in use) | 1-2 weeks |
+| 50K (non-Saylor sites only) | Mistral La Plateforme | Training opt-out + ZDR (skip on Saylor; Mistral not in Saylor default failover as of 2026-06-09) | 1-2 weeks |
 | 100K | Google Vertex AI | Sign 1-year or 3-year commit at projected volume | 2-4 weeks |
 | 100K | OpenAI | Tier 4 + enterprise volume discount | 2-3 weeks |
 | 100K | Anthropic | Tier 3 + enterprise volume discount | 2-3 weeks |

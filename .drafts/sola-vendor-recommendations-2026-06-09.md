@@ -85,15 +85,16 @@ Saving vs current text-only stack at 100k Saylor MAU: ~$730/month (~35%). Source
 Single-vendor single-region is not acceptable at 100k Saylor MAU.
 
 - **US (primary):** Vertex AI us-east1 + OpenAI default + Voyage default.
-- **EU residency:** Vertex AI eu-west1 for chat; OpenAI EU residency once shipped; Mistral La Plateforme as the EU-resident ultimate-fallback chat lane.
+- **EU residency:** Vertex AI eu-west1 for chat; OpenAI EU residency once shipped. **Mistral La Plateforme is NOT in Saylor's default failover** as of 2026-06-09 (training-opt-out + ZDR still pending in their portal, and Saylor doesn't need EU residency at current scale). Provider class stays available so non-Saylor sites can opt in; re-add to Saylor's chain once both Mistral conditions clear.
 - **APAC residency:** Vertex AI ap-southeast-1.
 
-**Failover chain** (already implemented in `spend_failover_chain`):
+**Failover chain** (Saylor default; configured in `spend_failover_chain` on dev as of 2026-06-09):
 
 1. Primary: Gemini 2.5 Flash (Vertex AI us-east1).
 2. On 429 / 5xx: OpenAI gpt-4o-mini.
-3. On secondary failure: Mistral Small (EU).
-4. On tertiary failure: serve a degraded "SOLA briefly unavailable" message rather than burn Claude Haiku at 1.9x cost.
+3. On secondary failure: serve a degraded "SOLA briefly unavailable" message rather than burn Claude Haiku at 1.9x cost.
+
+Mistral Small was originally specified as the EU-resident ultimate fallback (step 3 above). Removed from Saylor's chain on 2026-06-09 pending Mistral training-opt-out + ZDR. Non-Saylor sites that have completed Mistral procurement can add `chat:mistral` as a third line.
 
 **Capacity tiers to negotiate 2–4 weeks before promotion to 100k Saylor MAU:**
 
@@ -114,7 +115,7 @@ Single-vendor single-region is not acceptable at 100k Saylor MAU.
 - [ ] **OpenAI** — Tier 4 organization, no-training-on-API-data clause.
 - [ ] **Anthropic** — Tier 3 organization, DPA, no-training-by-default.
 - [ ] **Voyage AI** — enterprise tier, SOC 2 Type II + GDPR + no-training in writing.
-- [ ] **Mistral La Plateforme** — EU-resident ultimate-fallback chat account, DPA, no-training.
+- [ ] **~~Mistral La Plateforme~~** — DROPPED from Saylor procurement 2026-06-09. Provider class stays available; if Saylor ever needs the EU-resident ultimate-fallback lane, complete Mistral training-opt-out + ZDR in their portal and re-open this item.
 
 ### Operational (in admin settings)
 

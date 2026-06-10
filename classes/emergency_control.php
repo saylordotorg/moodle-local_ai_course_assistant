@@ -86,15 +86,25 @@ class emergency_control {
             $touched[] = 'outreach_master_enabled';
         }
         if ($set[self::FLAG_CHAT] && !$set[self::FLAG_ALL]) {
-            // Chat-only: leave widget rendering, set spend cap to 0 so the
-            // existing budget-paused path returns a friendly message.
-            // Stash the prior cap so restore() can put it back.
+            // Chat-only: leave widget rendering, but set a dedicated kill
+            // flag that spend_guard::check() consults to return CAP_BLOCKED
+            // so the friendly "SOLA paused" path runs.
+            //
+            // v5.13.0 fix: prior versions of this branch set spend_cap_site=0
+            // thinking "0 = paused", but get_cap() treats 0 as unlimited.
+            // That made --chat a silent no-op on every release from v5.4.5
+            // through v5.12.x. The dedicated flag below is unambiguous.
+            // Backward-compatible: the spend_cap_site backup-and-clear is
+            // kept for sites that may still rely on the legacy behavior
+            // alongside the new flag.
             $current = (string) get_config('local_ai_course_assistant', 'spend_cap_site');
             if ($current !== '' && $current !== '0') {
                 set_config('spend_cap_site_backup', $current, 'local_ai_course_assistant');
             }
             set_config('spend_cap_site', '0', 'local_ai_course_assistant');
-            $touched[] = 'spend_cap_site (set to 0 = paused)';
+            set_config('emergency_chat_disabled', '1', 'local_ai_course_assistant');
+            $touched[] = 'spend_cap_site (set to 0)';
+            $touched[] = 'emergency_chat_disabled (set to 1)';
         }
 
         self::write_audit('disable', $flags, $reason, $invoker, $touched);
@@ -141,7 +151,9 @@ class emergency_control {
                 set_config('spend_cap_site', $backup, 'local_ai_course_assistant');
                 unset_config('spend_cap_site_backup', 'local_ai_course_assistant');
             }
+            unset_config('emergency_chat_disabled', 'local_ai_course_assistant');
             $touched[] = 'spend_cap_site (restored from backup)';
+            $touched[] = 'emergency_chat_disabled (cleared)';
         }
 
         self::write_audit('restore', $flags, $reason, $invoker, $touched);
