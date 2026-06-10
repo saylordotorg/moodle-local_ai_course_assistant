@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $totalindexed = 0;
         $totalskipped = 0;
         $totalerrors  = 0;
+        $samplereason = '';
 
         foreach ($courses as $c) {
             try {
@@ -63,8 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $totalindexed += $stats['indexed'];
                 $totalskipped += $stats['skipped'];
                 $totalerrors  += $stats['errors'];
+                if ($samplereason === '' && !empty($stats['fatal'])) {
+                    $samplereason = $stats['fatal'];
+                }
+                if ($samplereason === '' && !empty($stats['embed_error'])) {
+                    $samplereason = $stats['embed_error'];
+                }
             } catch (\Exception $e) {
                 $totalerrors++;
+                if ($samplereason === '') {
+                    $samplereason = $e->getMessage();
+                }
             }
         }
 
@@ -74,20 +84,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'skipped' => $totalskipped,
             'errors'  => $totalerrors,
         ]);
+        // If nothing embedded across every course, the cause is almost always a
+        // single shared misconfiguration (provider/key) — surface it.
+        if ($totalindexed === 0 && $samplereason !== '') {
+            redirect($pageurl,
+                $msg . ' Nothing was embedded — first error: ' . $samplereason
+                    . ' Check the embedding provider and API key in Settings.',
+                null, \core\output\notification::NOTIFY_ERROR);
+        }
         redirect($pageurl, $msg, null, \core\output\notification::NOTIFY_SUCCESS);
 
     } else if ($action === 'reindexcourse' && $courseid > 0) {
         try {
             $stats = content_indexer::index_course($courseid);
-            $msg = get_string('ragadmin:reindexcourse_done', 'local_ai_course_assistant', (object)[
-                'indexed' => $stats['indexed'],
-                'skipped' => $stats['skipped'],
-                'errors'  => $stats['errors'],
-            ]);
-            redirect($pageurl, $msg, null, \core\output\notification::NOTIFY_SUCCESS);
         } catch (\Exception $e) {
             redirect($pageurl, $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
         }
+        $msg = get_string('ragadmin:reindexcourse_done', 'local_ai_course_assistant', (object)[
+            'indexed' => $stats['indexed'],
+            'skipped' => $stats['skipped'],
+            'errors'  => $stats['errors'],
+        ]);
+        // Explain a zero-chunk outcome instead of reporting a bare "0 indexed".
+        if (!empty($stats['fatal'])) {
+            redirect($pageurl,
+                'Indexing could not run: ' . $stats['fatal']
+                    . ' — check the embedding provider and API key in Settings.',
+                null, \core\output\notification::NOTIFY_ERROR);
+        }
+        if ($stats['indexed'] === 0 && ($stats['sources'] ?? 0) > 0 && !empty($stats['embed_error'])) {
+            redirect($pageurl,
+                $msg . ' No chunks were embedded — first error: ' . $stats['embed_error']
+                    . ' (most often the embedding API key or provider). The existing index was left untouched.',
+                null, \core\output\notification::NOTIFY_ERROR);
+        }
+        if (($stats['sources'] ?? 0) === 0) {
+            redirect($pageurl,
+                $msg . ' No extractable content was found in this course (no pages, books, or supported files).',
+                null, \core\output\notification::NOTIFY_WARNING);
+        }
+        redirect($pageurl, $msg, null, \core\output\notification::NOTIFY_SUCCESS);
 
     } else if ($action === 'deleteindex' && $courseid > 0) {
         content_indexer::delete_course_index($courseid);
@@ -147,6 +183,26 @@ if (!$ragenabled) {
 // see at a glance why content isn't being indexed. v3.9.6+.
 $statusrows = [];
 
+// Embedding provider is the hard prerequisite: without a working provider and
+// (for hosted providers) an API key, every embedding call fails and a reindex
+// produces zero chunks. Show it first so a misconfiguration is obvious.
+$embedprovider = (string) (get_config('local_ai_course_assistant', 'embed_provider') ?: 'openai');
+$embedmodel    = (string) (get_config('local_ai_course_assistant', 'embed_model') ?: '');
+$embedkey      = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
+$embedneedskey = ($embedprovider !== 'ollama'); // Local Ollama needs no key.
+$embedok       = $embedneedskey ? ($embedkey !== '') : true;
+$statusrows[] = [
+    'label' => 'Embedding provider (required for RAG)',
+    'ok'    => $embedok,
+    'detail' => $embedok
+        ? ('Provider: <code>' . s($embedprovider) . '</code>'
+            . ($embedmodel !== '' ? ', model: <code>' . s($embedmodel) . '</code>' : '')
+            . ($embedneedskey ? ', API key set.' : ', no key required (local).'))
+        : ('Provider <code>' . s($embedprovider) . '</code> needs an API key, but '
+            . '<code>embed_apikey</code> is empty. Set it in Settings — without it every '
+            . 'embedding call fails and a reindex produces zero chunks.'),
+];
+
 $pdfon = (bool) get_config('local_ai_course_assistant', 'rag_extract_pdf');
 if (class_exists('\\local_ai_course_assistant\\extractors\\file_extractor')) {
     $pdfavail = \local_ai_course_assistant\extractors\file_extractor::pdftotext_available();
@@ -167,6 +223,13 @@ $statusrows[] = [
     'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_docx'),
     'detail' => get_config('local_ai_course_assistant', 'rag_extract_docx')
         ? 'On. Uses native PHP ZipArchive, no external dependency.'
+        : 'Disabled in settings.',
+];
+$statusrows[] = [
+    'label' => 'PPTX (mod_resource)',
+    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_pptx'),
+    'detail' => get_config('local_ai_course_assistant', 'rag_extract_pptx')
+        ? 'On. Uses native PHP ZipArchive, no external dependency. Walks slide and speaker-note XML. (Legacy binary .ppt is not supported; re-save as .pptx.)'
         : 'Disabled in settings.',
 ];
 $statusrows[] = [

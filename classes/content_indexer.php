@@ -49,14 +49,25 @@ class content_indexer {
 
         $rawchunksize = get_config('local_ai_course_assistant', 'rag_chunksize');
         $chunksize = ($rawchunksize === false || $rawchunksize === '') ? 400 : (int) $rawchunksize;
-        $provider  = base_embedding_provider::create_from_config();
-        // v5.11.0: ask the provider its actual model so non-OpenAI vendors
-        // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
-        $modelname = $provider->get_model();
 
         $modules = content_extractor::extract_course_modules($courseid);
 
-        $stats = ['indexed' => 0, 'skipped' => 0, 'errors' => 0];
+        $stats = ['indexed' => 0, 'skipped' => 0, 'errors' => 0, 'sources' => count($modules)];
+
+        // Resolve the embedding provider up front. A missing/unknown provider
+        // or misconfiguration must surface as a clear fatal reason rather than
+        // a silently empty index — this is the "reindex produced zero chunks
+        // with no explanation" failure mode admins hit when embed_apikey is
+        // unset. The reason is returned to the caller (rag_admin) to display.
+        try {
+            $provider = base_embedding_provider::create_from_config();
+        } catch (\Throwable $e) {
+            $stats['fatal'] = $e->getMessage();
+            return $stats;
+        }
+        // v5.11.0: ask the provider its actual model so non-OpenAI vendors
+        // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
+        $modelname = $provider->get_model();
 
         // Track all chunk content-hashes we encounter (for cleanup later).
         $seenhashes = [];
@@ -123,6 +134,11 @@ class content_indexer {
                     $stats['indexed']++;
                 }
             } catch (\Exception $e) {
+                if (empty($stats['embed_error'])) {
+                    // Keep the first failure so rag_admin can explain a
+                    // zero-chunk outcome (bad API key, provider down, ...).
+                    $stats['embed_error'] = $e->getMessage();
+                }
                 debugging(
                     'RAG indexing error for cmid=' . $mod['cmid'] . ': ' . $e->getMessage(),
                     DEBUG_DEVELOPER
@@ -131,8 +147,11 @@ class content_indexer {
             }
         }
 
-        // Remove stale chunks: DB rows for this course whose hash is no longer in source.
-        if (!empty($seenhashes)) {
+        // Remove stale chunks: DB rows for this course whose hash is no longer
+        // in source. Only prune on a clean run (no embed errors) — otherwise a
+        // transient embedding outage, where every embed() throws and nothing is
+        // re-inserted, would silently delete a previously-good index.
+        if ($stats['errors'] === 0 && !empty($seenhashes)) {
             // Use chunked IN queries to avoid exceeding SQL placeholder limits.
             $allchunks = $DB->get_records(
                 'local_ai_course_assistant_chunks',
@@ -145,10 +164,12 @@ class content_indexer {
                     $DB->delete_records('local_ai_course_assistant_chunks', ['id' => $row->id]);
                 }
             }
-        } else {
-            // No extractable content at all — clear the course index.
+        } else if ($stats['sources'] === 0) {
+            // Genuinely no extractable content in the course — clear the index.
             $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);
         }
+        // Otherwise (sources existed but embeds errored) leave the existing
+        // index untouched rather than risk wiping good data on a flaky run.
 
         return $stats;
     }
