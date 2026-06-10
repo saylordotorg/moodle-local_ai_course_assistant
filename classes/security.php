@@ -146,35 +146,61 @@ class security {
      * Call from every SOLA entry point that renders learner-affecting HTML
      * or streams AI output.
      */
-    public static function send_security_headers(): void {
+    public static function send_security_headers(bool $fullmoodlepage = false): void {
         if (headers_sent()) {
             return;
         }
-        $connect = [
-            "'self'",
-            'https://api.openai.com',
-            'https://api.anthropic.com',
-            'https://api.x.ai',
-            'https://api.mistral.ai',
-            'https://api.deepseek.com',
-            'https://generativelanguage.googleapis.com',
-            'https://api.minimax.chat',
-            'https://openrouter.ai',
-            'wss://api.openai.com',
-            'wss://api.x.ai',
-        ];
-        $csp = "default-src 'self'; "
-             . "script-src 'self' 'unsafe-inline'; "
-             . "style-src 'self' 'unsafe-inline'; "
-             . "img-src 'self' data: blob:; "
-             . "media-src 'self' blob:; "
-             . "font-src 'self' data:; "
-             . 'connect-src ' . implode(' ', $connect) . '; '
-             . "frame-ancestors 'self';";
-        header('Content-Security-Policy: ' . $csp);
-        header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: SAMEORIGIN');
-        header('Referrer-Policy: same-origin');
+        foreach (self::build_security_headers($fullmoodlepage) as $name => $value) {
+            header($name . ': ' . $value);
+        }
+    }
+
+    /**
+     * Build the security headers as a name => value map (pure; no side effects,
+     * so it is unit-testable).
+     *
+     * The strict Content-Security-Policy is for the plugin's own raw output
+     * endpoints (SSE, TTS, transcribe, webhooks, media viewer). It omits
+     * 'unsafe-eval', which Moodle's YUI library requires: a full Moodle page
+     * rendered via $OUTPUT->header() cannot run its core JS (YUI init,
+     * requirejs string loading) under this CSP, and the MathJax CDN is blocked,
+     * so flashcard / essay-feedback / sandbox / dashboard pages render broken
+     * (clicks and math fail). Full Moodle pages therefore get only the non-CSP
+     * hardening headers — matching Moodle core, which ships no page-level CSP —
+     * while the raw endpoints keep the lock-down.
+     *
+     * @param bool $fullmoodlepage True for full Moodle pages (omit the CSP).
+     * @return array<string, string> Header name => value.
+     */
+    public static function build_security_headers(bool $fullmoodlepage = false): array {
+        $headers = [];
+        if (!$fullmoodlepage) {
+            $connect = [
+                "'self'",
+                'https://api.openai.com',
+                'https://api.anthropic.com',
+                'https://api.x.ai',
+                'https://api.mistral.ai',
+                'https://api.deepseek.com',
+                'https://generativelanguage.googleapis.com',
+                'https://api.minimax.chat',
+                'https://openrouter.ai',
+                'wss://api.openai.com',
+                'wss://api.x.ai',
+            ];
+            $headers['Content-Security-Policy'] = "default-src 'self'; "
+                 . "script-src 'self' 'unsafe-inline'; "
+                 . "style-src 'self' 'unsafe-inline'; "
+                 . "img-src 'self' data: blob:; "
+                 . "media-src 'self' blob:; "
+                 . "font-src 'self' data:; "
+                 . 'connect-src ' . implode(' ', $connect) . '; '
+                 . "frame-ancestors 'self';";
+        }
+        $headers['X-Content-Type-Options'] = 'nosniff';
+        $headers['X-Frame-Options'] = 'SAMEORIGIN';
+        $headers['Referrer-Policy'] = 'same-origin';
+        return $headers;
     }
 
     /**

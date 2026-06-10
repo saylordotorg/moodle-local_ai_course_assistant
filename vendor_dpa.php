@@ -41,7 +41,7 @@ $PAGE->set_title(get_string('admin:vendor_dpa:title', 'local_ai_course_assistant
 $PAGE->set_heading(get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
     \local_ai_course_assistant\branding::short_name()));
 
-\local_ai_course_assistant\security::send_security_headers();
+\local_ai_course_assistant\security::send_security_headers(true);
 
 echo $OUTPUT->header();
 

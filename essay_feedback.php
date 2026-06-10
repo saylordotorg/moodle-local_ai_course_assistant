@@ -48,7 +48,7 @@ $PAGE->set_course($course);
 $PAGE->set_title(get_string('essay_feedback:title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
-security::send_security_headers();
+security::send_security_headers(true);
 
 echo $OUTPUT->header();
 ?>

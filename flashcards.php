@@ -49,7 +49,7 @@ $PAGE->set_course($course);
 $PAGE->set_title(get_string('flashcards:title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
-security::send_security_headers();
+security::send_security_headers(true);
 
 $due = flashcard_manager::get_due((int) $USER->id, $courseid, 30);
 
