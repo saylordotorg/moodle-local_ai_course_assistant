@@ -323,7 +323,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/current_page_content_maxchars',
         get_string('settings:current_page_content_maxchars', 'local_ai_course_assistant'),
         get_string('settings:current_page_content_maxchars_desc', 'local_ai_course_assistant'),
-        '12000',
+        '8000',
         PARAM_INT
     ));
     // v5.6.0: prompt section proportions. Admin-configurable per-section
