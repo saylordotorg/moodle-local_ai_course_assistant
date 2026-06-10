@@ -801,6 +801,12 @@ try {
     // Save the clean assistant response (without markers), recording which provider was used.
     $effectivecfg = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
     $providername = $effectivecfg['provider'] ?? get_config('local_ai_course_assistant', 'provider');
+    // v6.1.0: normalize the two vendors' cache-read counters into one column —
+    // OpenAI reports prompt_tokens_details.cached_tokens, Anthropic reports
+    // cache_read_input_tokens (captured as cache_read_tokens). Null when the
+    // provider reported neither, so analytics can distinguish "no cache
+    // support" from "cache missed" (0).
+    $cachedtokens = $tokenusage['cached_tokens'] ?? $tokenusage['cache_read_tokens'] ?? null;
     $assistantmsgid = conversation_manager::add_message(
         $conv->id,
         $userid,
@@ -814,7 +820,8 @@ try {
         $tokenusage['model'] ?? null,
         $interactiontype,
         $pageid ?: null,
-        $raglatencyms
+        $raglatencyms,
+        $cachedtokens !== null ? (int) $cachedtokens : null
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs

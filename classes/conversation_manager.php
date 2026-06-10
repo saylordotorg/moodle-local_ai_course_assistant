@@ -100,7 +100,8 @@ class conversation_manager {
         ?string $modelname = null,
         string $interactiontype = 'chat',
         ?int $cmid = null,
-        ?int $rag_latency_ms = null
+        ?int $rag_latency_ms = null,
+        ?int $cachedtokens = null
     ): int {
         global $DB;
 
@@ -123,6 +124,11 @@ class conversation_manager {
         // v5.4.6: only attach RAG latency to assistant messages — user messages
         // pre-date the retrieve call, so attributing it there would be misleading.
         $record->rag_latency_ms    = ($role === 'assistant') ? $rag_latency_ms : null;
+        // v6.1.0: prompt tokens the provider served from its prompt cache
+        // (OpenAI auto-prefix 50% discount / Anthropic cache_read 90%
+        // discount). Assistant rows only; makes the cache hit rate visible
+        // in token analytics instead of in-memory only.
+        $record->cached_tokens     = ($role === 'assistant') ? $cachedtokens : null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);

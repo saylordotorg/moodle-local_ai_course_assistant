@@ -305,6 +305,9 @@ $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
 
 // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
+// v6.1.0: heading strings (the block was orphaned without a group boundary).
+$string['settings:rerank_heading'] = 'RAG: Two-stage retrieval (re-ranking)';
+$string['settings:rerank_heading_desc'] = 'Optional second retrieval stage: cosine similarity selects the top-N candidate chunks (default 50), then a cross-encoder re-ranker scores each (query, chunk) pair and the best top-K go into the prompt. Off by default; falls back to single-stage cosine if the re-ranker is unconfigured or fails.';
 $string['settings:rerank_enabled'] = 'Two-stage retrieval (Voyage rerank-2.5)';
 $string['settings:rerank_enabled_desc'] = 'When enabled, RAG retrieval becomes two-stage: cosine similarity returns the top-N candidates (default 50), then Voyage rerank-2.5 cross-encoder scores each and the top-K go into the prompt. Published lifts: +15 Recall@10 enterprise, +39% NDCG BEIR. ~$0.05/MTok billing. Requires <code>rerank_apikey</code> below; falls back gracefully to single-stage cosine if rerank fails or is unconfigured.';
 $string['settings:rerank_apikey'] = 'Rerank API key';
@@ -500,6 +503,33 @@ $string['redash_heading'] = 'Analytics Export';
 $string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
 $string['redash_api_key'] = 'Redash API Key';
 $string['redash_api_key_desc'] = 'API key for external analytics platforms like Redash. Provides read-only access to usage data, feedback, and cost analytics. Leave blank to disable the export endpoint.';
+
+// v6.1.0: web emergency panel.
+$string['emergency:title'] = 'SOLA Emergency Controls';
+$string['emergency:page_warning'] = 'These switches take effect immediately for every learner on the site. Each action writes an audit row. Granular switches leave the rest of SOLA running; the master kill removes the widget entirely.';
+$string['emergency:back_to_settings'] = 'SOLA Settings';
+$string['emergency:state_disabled'] = 'DISABLED';
+$string['emergency:state_active'] = 'Active';
+$string['emergency:confirm_label'] = 'I understand this affects every learner immediately';
+$string['emergency:confirm_required'] = 'Please tick the confirmation checkbox before disabling a subsystem.';
+$string['emergency:reason_placeholder'] = 'Reason (recorded in the audit log)';
+$string['emergency:disable_button'] = 'Disable';
+$string['emergency:restore_button'] = 'Restore';
+$string['emergency:disabled_notice'] = 'Subsystem "{$a->flag}" disabled. Config touched: {$a->touched}';
+$string['emergency:restored_notice'] = 'Subsystem "{$a->flag}" restored. Config touched: {$a->touched}';
+$string['emergency:cli_reference'] = 'The same controls are available from the on-call shell:';
+$string['emergency:flag_chat'] = 'Chat';
+$string['emergency:flag_chat_desc'] = 'Blocks chat traffic via the dedicated kill flag (v5.13 fix). The widget keeps rendering; learners see the friendly "SOLA paused" message. Use when an LLM provider is misbehaving or a cost spike is in progress.';
+$string['emergency:flag_voice'] = 'Voice';
+$string['emergency:flag_voice_desc'] = 'Clears the active realtime voice provider (stashed for exact restore). Text chat keeps working.';
+$string['emergency:flag_rag'] = 'RAG';
+$string['emergency:flag_rag_desc'] = 'Disables retrieval and indexing. Chat continues without course-content grounding.';
+$string['emergency:flag_outreach'] = 'Outreach';
+$string['emergency:flag_outreach_desc'] = 'Stops digest, milestone, and reminder emails. Chat is unaffected.';
+$string['emergency:flag_all'] = 'MASTER KILL';
+$string['emergency:flag_all_desc'] = 'Disables the entire plugin: widget gone from every page, scheduled tasks stop, voice cleared, RAG off, outreach off. The strongest switch — use for a security incident or when SOLA must be taken offline immediately.';
+$string['emergency:settings_link'] = 'Emergency controls';
+$string['emergency:settings_link_desc'] = 'Per-subsystem kill switches (chat / voice / RAG / outreach / master) with audit logging — the web equivalent of <code>admin/cli/emergency_disable.php</code>. Open <a href="{$a}">SOLA Emergency Controls</a>.';
 
 // Integrity Checks.
 $string['integrity:title'] = 'Integrity Checks';

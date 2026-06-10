@@ -74,12 +74,18 @@ if ($hassiteconfig) {
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
     $demoadminurl = new moodle_url('/local/ai_course_assistant/demo_admin.php');
 
+    // v6.1.0: emergency panel one click from the top of settings — the
+    // review found the kill switch was CLI-only, leaving incident response
+    // dependent on SSH access.
+    $emergencyurl = new moodle_url('/local/ai_course_assistant/emergency_admin.php');
     $quicklinks = '<a href="' . $analyticsurl->out() . '">'
             . get_string('toc:analytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $tokenanalyticsurl->out() . '">'
             . get_string('toc:tokenanalytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $demoadminurl->out() . '">'
-            . get_string('toc:testing', 'local_ai_course_assistant') . '</a>';
+            . get_string('toc:testing', 'local_ai_course_assistant') . '</a>'
+        . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
+            . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 
     // "Back to last course" + "Course AI Settings" shortcuts. Pref set on course visits
     // by hook_callbacks. Two buttons so admins can pivot to the course OR to its
@@ -684,6 +690,13 @@ if ($hassiteconfig) {
     ));
 
     // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
+    // v6.1.0: own heading — these five settings were orphaned after
+    // rag_chunksize with no visual group boundary.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/rerank_heading',
+        get_string('settings:rerank_heading', 'local_ai_course_assistant'),
+        get_string('settings:rerank_heading_desc', 'local_ai_course_assistant')
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rerank_enabled',
         get_string('settings:rerank_enabled', 'local_ai_course_assistant'),
@@ -1545,6 +1558,11 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v6.1.0: the four mastery_classifier_* settings are registered together
+    // (provider, model, weight, threshold). Before v6.1.0 the premium
+    // escalation block interrupted this group, splitting provider from its
+    // three siblings — admins tuning the classifier had to scroll past an
+    // unrelated feature.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_provider',
         get_string('settings:mastery_classifier_provider', 'local_ai_course_assistant'),
@@ -1552,8 +1570,31 @@ if ($hassiteconfig) {
         'openai',
         PARAM_ALPHANUMEXT
     ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_model',
+        get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
+        'gpt-4o-mini',
+        PARAM_RAW_TRIMMED
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_weight',
+        get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
+        '0.3',
+        PARAM_RAW
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_threshold',
+        get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
+        '0.7',
+        PARAM_RAW
+    ));
 
     // v5.12.0: premium escalation tier (A.10 follow-on).
+    // v6.1.0: moved after the complete mastery-classifier group so the
+    // heading no longer splits that section in half.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/premium_escalation_heading',
         get_string('settings:premium_escalation_heading', 'local_ai_course_assistant'),
@@ -1591,28 +1632,6 @@ if ($hassiteconfig) {
         get_string('settings:premium_escalation_course_tags', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_course_tags_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_model',
-        get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
-        get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
-        'gpt-4o-mini',
-        PARAM_RAW_TRIMMED
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_weight',
-        get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
-        get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
-        '0.3',
-        PARAM_RAW
-    ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/mastery_classifier_threshold',
-        get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
-        get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
-        '0.7',
         PARAM_RAW
     ));
 

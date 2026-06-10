@@ -1066,5 +1066,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026061000, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026061001) {
+        // v6.1.0: persist per-call cached-token counts. v5.11.0 captured
+        // OpenAI's prompt_tokens_details.cached_tokens (and Claude's
+        // cache_read_input_tokens) in the provider layer but never wrote
+        // them to the DB, so the cache-hit visibility feature was
+        // unobservable in token analytics. One nullable int column.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $field = new xmldb_field('cached_tokens', XMLDB_TYPE_INTEGER, '10',
+            null, null, null, null, 'rag_latency_ms');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026061001, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

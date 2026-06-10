@@ -110,6 +110,12 @@
             <div class="aica-cost-card__label">Estimated Cost</div>
             <div class="aica-cost-card__value">{{grand_cost}}</div>
         </div>
+        {{#has_cache_data}}
+        <div class="aica-cost-card">
+            <div class="aica-cost-card__label">Cached Tokens ({{cached_pct}}% of prompt)</div>
+            <div class="aica-cost-card__value">{{cached_tokens}}</div>
+        </div>
+        {{/has_cache_data}}
     </div>
 
     {{! ── Spend guard status (v3.9.9+) ─────────────────────────────────── }}

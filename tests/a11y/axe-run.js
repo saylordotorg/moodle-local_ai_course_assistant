@@ -49,6 +49,7 @@ const PAGES = [
   'admin_user_data.php',
   'privacy.php',
   'settings_user.php',
+  'emergency_admin.php',
 ];
 const URLS = PAGES.map((p) => `${BASE}/local/ai_course_assistant/${p}`);
 // Colour-contrast (WCAG 1.4.3) is excluded: it depends on the active Moodle
