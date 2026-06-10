@@ -231,9 +231,18 @@ class conversation_manager {
      */
     public static function get_messages(int $conversationid): array {
         global $DB;
-        return $DB->get_records('local_ai_course_assistant_msgs', [
-            'conversationid' => $conversationid,
-        ], 'timecreated ASC');
+        // v6.0.1: filter out system telemetry rows (premium_router decisions,
+        // rerank cost logs, embedding cost logs) that share the same
+        // conversationid but are never meant to be shown to the learner or
+        // sent to the LLM as context. They have role='system' AND were
+        // emitted by the routing/RAG plumbing, not by a real chat turn.
+        // Real chat exchanges only use role='user' OR role='assistant'.
+        return $DB->get_records_select(
+            'local_ai_course_assistant_msgs',
+            "conversationid = :cid AND role IN ('user', 'assistant')",
+            ['cid' => $conversationid],
+            'timecreated ASC'
+        );
     }
 
     /**

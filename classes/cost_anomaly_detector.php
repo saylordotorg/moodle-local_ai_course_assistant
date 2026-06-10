@@ -154,18 +154,26 @@ class cost_anomaly_detector {
             $bycourse[$cid] = ($bycourse[$cid] ?? 0.0) + (float) $cost;
         }
         arsort($bycourse);
-        $top = array_slice($bycourse, 0, $topn, true);
+        $top = array_slice($bycourse, 0, max(1, $topn), true);
+
+        // v6.0.1: bulk-fetch course shortnames in one query instead of N
+        // per-courseid get_record() calls. Material at scale when an
+        // anomaly day covers many courses; harmless win at small scale.
+        $shortnames = [];
+        if (!empty($top)) {
+            $rows = $DB->get_records_list(
+                'course', 'id', array_keys($top), '', 'id,shortname'
+            );
+            foreach ($rows as $r) {
+                $shortnames[(int) $r->id] = (string) $r->shortname;
+            }
+        }
 
         $out = [];
         foreach ($top as $cid => $spend) {
-            $shortname = '<unknown>';
-            $course = $DB->get_record('course', ['id' => $cid], 'shortname', IGNORE_MISSING);
-            if ($course) {
-                $shortname = $course->shortname;
-            }
             $out[] = [
                 'courseid' => $cid,
-                'shortname' => $shortname,
+                'shortname' => $shortnames[$cid] ?? '<unknown>',
                 'spend_usd' => round($spend, 4),
             ];
         }

@@ -1050,5 +1050,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026060900, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026061000) {
+        // v6.0.1: add composite (role, timecreated) index on the msgs table so
+        // the v6.0.0 cost_anomaly_check daily scan does not turn into a full
+        // table scan at scale. The detector queries WHERE m.role='assistant'
+        // AND m.timecreated >= :daystart AND m.timecreated < :dayend; without
+        // this index the planner falls back to a scan that grows linearly
+        // with corpus size.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $index = new xmldb_index('role_timecreated', XMLDB_INDEX_NOTUNIQUE, ['role', 'timecreated']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2026061000, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

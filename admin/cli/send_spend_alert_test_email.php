@@ -82,9 +82,26 @@ if ($dryrun) {
     exit(0);
 }
 
+use local_ai_course_assistant\email_optout;
+
 $sent = 0;
 $failed = [];
+$skipped = [];
 foreach ($list as $email) {
+    // v6.0.1: honour per-recipient opt-out the same way spend_guard and
+    // cost_anomaly_detector do. Without this, the test CLI would email
+    // recipients who have unsubscribed from spend alerts, breaking the
+    // unsubscribe contract.
+    try {
+        if (email_optout::is_opted_out($email, email_optout::TYPE_SPEND_ALERT)) {
+            $skipped[] = $email;
+            echo "  - skipped (opted out): $email\n";
+            continue;
+        }
+    } catch (\Throwable $e) {
+        // email_optout missing? Continue with send — better than swallowing
+        // the test silently. The production paths handle the same edge.
+    }
     $to = new \stdClass();
     $to->email = $email;
     $to->firstname = '';
@@ -110,7 +127,8 @@ foreach ($list as $email) {
     }
 }
 
-echo "\nDelivered $sent of " . count($list) . " test emails.\n";
+$attempted = count($list) - count($skipped);
+echo "\nDelivered $sent of $attempted attempted (skipped " . count($skipped) . " opted-out).\n";
 if (!empty($failed)) {
     fwrite(STDERR, "Failures: " . implode(', ', $failed) . "\n");
     exit(2);
