@@ -681,6 +681,27 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v6.2.0: relevance gate — drop chunks below this cosine similarity so an
+    // off-topic/sparse query injects fewer (or zero) passages instead of always
+    // padding to top-k. Model-dependent; default suits text-embedding-3-small.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_min_similarity',
+        get_string('settings:rag_min_similarity', 'local_ai_course_assistant'),
+        get_string('settings:rag_min_similarity_desc', 'local_ai_course_assistant'),
+        '0.25',
+        PARAM_FLOAT
+    ));
+
+    // v6.2.0: small ordering boost for chunks from the page the learner is on,
+    // so "explain this" grounds on the visible page among near-ties.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_currentpage_boost',
+        get_string('settings:rag_currentpage_boost', 'local_ai_course_assistant'),
+        get_string('settings:rag_currentpage_boost_desc', 'local_ai_course_assistant'),
+        '0.05',
+        PARAM_FLOAT
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_chunksize',
         get_string('settings:rag_chunksize', 'local_ai_course_assistant'),

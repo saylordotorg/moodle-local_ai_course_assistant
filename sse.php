@@ -330,7 +330,10 @@ try {
             }
             $topk = (int) (get_config('local_ai_course_assistant', 'rag_topk') ?: 5);
             $ragstart = microtime(true);
-            $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk);
+            // Pass the current page's cmid so retrieval prefers the page the
+            // learner is on among near-ties (and so a large page is grounded by
+            // its own relevant chunks rather than a head-truncated dump).
+            $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk, (int) $pageid);
             $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
         } catch (\Throwable $e) {
             // Fallback to content stuffing — log but don't fail the request.

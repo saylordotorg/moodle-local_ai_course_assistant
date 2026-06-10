@@ -301,6 +301,10 @@ $string['settings:embed_dimensions'] = 'Embedding Dimensions';
 $string['settings:embed_dimensions_desc'] = 'Number of dimensions in the embedding vector. Must match your model output. OpenAI text-embedding-3-small: 1536. nomic-embed-text: 768.';
 $string['settings:rag_topk'] = 'Top-K Chunks';
 $string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt.';
+$string['settings:rag_min_similarity'] = 'Minimum Relevance (cosine)';
+$string['settings:rag_min_similarity_desc'] = 'Drop retrieved chunks whose cosine similarity to the question is below this value, so an off-topic or sparse question injects fewer (or zero) passages instead of always padding to Top-K with weak matches. Range 0 to 1; 0 disables the gate. The right value depends on the embedding model: 0.25 suits text-embedding-3-small. Raise it to be stricter (less, more on-topic context), lower it to be more permissive.';
+$string['settings:rag_currentpage_boost'] = 'Current-Page Boost';
+$string['settings:rag_currentpage_boost_desc'] = 'A small bonus added to the relevance score of chunks from the page the learner is currently viewing, so questions like "explain this" prefer the visible page when scores are close. Ordering only: it does not force an irrelevant page chunk past the minimum-relevance gate. Set 0 to disable.';
 $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
 
