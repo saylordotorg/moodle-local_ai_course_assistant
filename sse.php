@@ -477,7 +477,11 @@ try {
             . $pdfsnippet . $suffix;
     }
 
-    $history = conversation_manager::get_history_for_api($conv->id);
+    // v6.2.0: history_mode-aware selection. In semantic mode this keeps only
+    // recent turns relevant to the current question (plus the latest pair),
+    // so stale off-topic history does not inflate cost or invite drift; in
+    // recency mode it is the long-standing last-N-pairs behaviour.
+    $history = \local_ai_course_assistant\history_selector::select_for_api($conv->id, $message);
 
     // Create provider. Admin LLM picker can override the provider/model for
     // side-by-side comparison. Requires the manage capability; students always

@@ -406,6 +406,37 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v6.2.0: how conversation history is trimmed before it is sent to the
+    // model. 'semantic' keeps only the recent turns relevant to the current
+    // question (plus the latest pair); 'recency' keeps the last maxhistory
+    // pairs. Semantic reduces cost/noise but does an extra embedding call.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/history_mode',
+        get_string('settings:history_mode', 'local_ai_course_assistant'),
+        get_string('settings:history_mode_desc', 'local_ai_course_assistant'),
+        'semantic',
+        [
+            'semantic' => get_string('settings:history_mode_semantic', 'local_ai_course_assistant'),
+            'recency'  => get_string('settings:history_mode_recency', 'local_ai_course_assistant'),
+        ]
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/history_semantic_minscore',
+        get_string('settings:history_semantic_minscore', 'local_ai_course_assistant'),
+        get_string('settings:history_semantic_minscore_desc', 'local_ai_course_assistant'),
+        '0.20',
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/history_candidates',
+        get_string('settings:history_candidates', 'local_ai_course_assistant'),
+        get_string('settings:history_candidates_desc', 'local_ai_course_assistant'),
+        '12',
+        PARAM_INT
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/profile_update_interval',
         'Student Profile Update Interval',
