@@ -1428,6 +1428,7 @@ $string['settings:math_render_heading_desc']    = 'Math expressions in assistant
 
 // Flashcards (v3.9.22).
 $string['flashcards:title']         = 'Flashcards';
+$string['flashcards:disabled']      = 'Flashcards are not enabled for this course.';
 $string['flashcards:link']          = 'Flashcards (review now)';
 $string['flashcards:intro']         = 'Spaced-repetition review. Reveal the answer, then self-grade with Again, Hard, or Easy. Cards you found hard come back sooner; cards you found easy spread out.';
 $string['flashcards:question']      = 'Question';

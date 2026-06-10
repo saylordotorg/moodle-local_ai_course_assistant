@@ -38,7 +38,7 @@ $context = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:use', $context);
 
 if (!flashcard_manager::is_enabled_for_course($courseid)) {
-    print_error('flashcards_disabled', 'local_ai_course_assistant');
+    throw new \moodle_exception('flashcards:disabled', 'local_ai_course_assistant');
 }
 
 $pageurl = new moodle_url('/local/ai_course_assistant/flashcards.php', ['courseid' => $courseid]);
