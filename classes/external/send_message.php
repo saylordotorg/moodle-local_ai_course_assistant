@@ -93,9 +93,10 @@ class send_message extends external_api {
             }
         }
 
-        // Build context and get history.
+        // Build context and get history (history_mode-aware: semantic keeps
+        // only recent turns relevant to the question; recency keeps last N).
         $systemprompt = context_builder::build_system_prompt($params['courseid'], $userid, '', $retrievedchunks);
-        $history = conversation_manager::get_history_for_api($conv->id);
+        $history = \local_ai_course_assistant\history_selector::select_for_api($conv->id, $params['message']);
 
         // Get AI response.
         $provider = base_provider::create_from_config();

@@ -85,6 +85,7 @@ class conversation_manager {
      * @param string $interactiontype Interaction type for analytics.
      * @param int|null $cmid Course module ID when available.
      * @param int|null $rag_latency_ms Wall-clock ms spent in rag_retriever::retrieve for this turn; only stored on assistant rows.
+     * @param int|null $cachedtokens Cached prompt-token count when the provider reports one; null otherwise.
      * @return int The message ID.
      */
     public static function add_message(

@@ -42,21 +42,37 @@ class rag_retriever {
      * @param int    $courseid
      * @param string $query    The user's message / question.
      * @param int    $topk     Number of chunks to return.
+     * @param int    $currentcmid Course-module id of the page the learner is on
+     *                            (0 if none); its chunks get a small ordering
+     *                            boost so "explain this" grounds on the page.
      * @return array Array of [
      *                  'content'    => string,
      *                  'score'      => float,
      *                  'cmid'       => int|null,
      *                  'modtype'    => string,
      *                  'chunkindex' => int,
-     *               ] sorted by score desc. Empty array if no chunks or embedding fails.
+     *               ] sorted by score desc, filtered to those at/above the
+     *               configured relevance floor. Empty array if no chunks clear
+     *               the floor, no chunks exist, or embedding fails.
      */
-    public static function retrieve(int $courseid, string $query, int $topk = 5): array {
+    public static function retrieve(int $courseid, string $query, int $topk = 5, int $currentcmid = 0): array {
         global $DB;
 
         // Static cache of decoded embeddings — avoids re-decoding JSON on
         // subsequent RAG queries within the same PHP request.
         static $embedding_cache = [];
         $cache_key = "course_{$courseid}";
+
+        // Relevance gate + current-page bias, admin-tunable. The floor drops
+        // weakly-matched chunks so an off-topic or sparse query injects fewer
+        // (or zero) passages instead of always padding to top-k. The boost
+        // prefers chunks from the page the learner is on among near-ties
+        // (ordering only). Defaults assume the text-embedding-3-small cosine
+        // scale; re-tune for other embedding models.
+        $rawfloor = get_config('local_ai_course_assistant', 'rag_min_similarity');
+        $minscore = ($rawfloor === false || $rawfloor === '') ? 0.25 : (float) $rawfloor;
+        $rawboost = get_config('local_ai_course_assistant', 'rag_currentpage_boost');
+        $boost = ($rawboost === false || $rawboost === '') ? 0.05 : (float) $rawboost;
 
         // Embed the query. When the configured embedding provider is Voyage,
         // ask for the asymmetric "query" projection so the vector pairs
@@ -122,8 +138,13 @@ class rag_retriever {
             return [];
         }
 
-        // Sort descending by score.
-        usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
+        // Relevance gate + current-page bias. Applied before reranking, so
+        // genuinely irrelevant chunks never reach the (more expensive) reranker
+        // and an off-topic query returns fewer (or zero) passages.
+        $scored = self::filter_and_rank($scored, $minscore, $currentcmid, $boost);
+        if (empty($scored)) {
+            return [];
+        }
 
         // Optional stage 2: two-stage retrieval with Voyage rerank-2.5.
         // When `rerank_enabled` is on AND a Voyage rerank API key is configured,
@@ -167,6 +188,39 @@ class rag_retriever {
         }
 
         return array_slice($scored, 0, $topk);
+    }
+
+    /**
+     * Apply the relevance floor and current-page ordering boost to scored chunks.
+     *
+     * Pure function (no DB or provider) so it is unit-testable. Chunks scoring
+     * below $minscore on raw cosine are dropped; the remainder are sorted by a
+     * rank that adds $boost to chunks from $currentcmid. The boost is ordering
+     * only — the floor compares the raw cosine score, so an irrelevant
+     * current-page chunk is never force-kept.
+     *
+     * @param array $scored Rows with at least 'score' (float) and 'cmid' (int|null).
+     * @param float $minscore Cosine floor in [0,1]; 0 disables the gate.
+     * @param int   $currentcmid Current page course-module id (0 = none).
+     * @param float $boost Ordering bonus added to current-page chunks.
+     * @return array Filtered, rank-sorted rows (same shape as input).
+     */
+    public static function filter_and_rank(array $scored, float $minscore, int $currentcmid, float $boost): array {
+        if ($minscore > 0.0) {
+            $scored = array_values(array_filter(
+                $scored,
+                fn($r) => (float) ($r['score'] ?? 0.0) >= $minscore
+            ));
+        }
+        if (empty($scored)) {
+            return [];
+        }
+        $rank = function (array $r) use ($currentcmid, $boost): float {
+            $bonus = ($currentcmid > 0 && (int) ($r['cmid'] ?? 0) === $currentcmid) ? $boost : 0.0;
+            return (float) ($r['score'] ?? 0.0) + $bonus;
+        };
+        usort($scored, fn($a, $b) => $rank($b) <=> $rank($a));
+        return $scored;
     }
 
     /**

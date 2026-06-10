@@ -50,6 +50,15 @@ final class conversation_manager_filter_system_test extends \advanced_testcase {
     /**
      * Insert a row directly into the msgs table so we can verify
      * get_messages's filter independently of conversation_manager::add_*.
+     *
+     * @param int $convid Conversation id.
+     * @param int $userid User id.
+     * @param int $courseid Course id.
+     * @param string $role Message role.
+     * @param string $message Message body.
+     * @param string $providerid Provider identifier.
+     * @param string $itype Interaction type.
+     * @return int Inserted row id.
      */
     private function insert_msg(int $convid, int $userid, int $courseid,
             string $role, string $message, string $providerid = '',

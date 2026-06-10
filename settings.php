@@ -323,7 +323,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/current_page_content_maxchars',
         get_string('settings:current_page_content_maxchars', 'local_ai_course_assistant'),
         get_string('settings:current_page_content_maxchars_desc', 'local_ai_course_assistant'),
-        '12000',
+        '8000',
         PARAM_INT
     ));
     // v5.6.0: prompt section proportions. Admin-configurable per-section
@@ -403,6 +403,39 @@ if ($hassiteconfig) {
         get_string('settings:maxhistory', 'local_ai_course_assistant'),
         get_string('settings:maxhistory_desc', 'local_ai_course_assistant'),
         '20',
+        PARAM_INT
+    ));
+
+    // v6.2.0: how conversation history is trimmed before it is sent to the
+    // model. 'semantic' keeps only the recent turns relevant to the current
+    // question (plus the latest pair); 'recency' keeps the last maxhistory
+    // pairs. Semantic reduces cost/noise but does an extra embedding call.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/history_mode',
+        get_string('settings:history_mode', 'local_ai_course_assistant'),
+        get_string('settings:history_mode_desc', 'local_ai_course_assistant'),
+        'semantic',
+        [
+            'semantic' => get_string('settings:history_mode_semantic', 'local_ai_course_assistant'),
+            'recency'  => get_string('settings:history_mode_recency', 'local_ai_course_assistant'),
+        ]
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/history_semantic_minscore',
+        get_string('settings:history_semantic_minscore', 'local_ai_course_assistant'),
+        get_string('settings:history_semantic_minscore_desc', 'local_ai_course_assistant'),
+        // Must round-trip through clean_param(PARAM_FLOAT): '0.20' cleans to
+        // 0.2 and '0.2' !== '0.20' fails default-validation at install. Use '0.2'.
+        '0.2',
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/history_candidates',
+        get_string('settings:history_candidates', 'local_ai_course_assistant'),
+        get_string('settings:history_candidates_desc', 'local_ai_course_assistant'),
+        '12',
         PARAM_INT
     ));
 
@@ -679,6 +712,27 @@ if ($hassiteconfig) {
         get_string('settings:rag_topk_desc', 'local_ai_course_assistant'),
         '5',
         PARAM_INT
+    ));
+
+    // v6.2.0: relevance gate — drop chunks below this cosine similarity so an
+    // off-topic/sparse query injects fewer (or zero) passages instead of always
+    // padding to top-k. Model-dependent; default suits text-embedding-3-small.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_min_similarity',
+        get_string('settings:rag_min_similarity', 'local_ai_course_assistant'),
+        get_string('settings:rag_min_similarity_desc', 'local_ai_course_assistant'),
+        '0.25',
+        PARAM_FLOAT
+    ));
+
+    // v6.2.0: small ordering boost for chunks from the page the learner is on,
+    // so "explain this" grounds on the visible page among near-ties.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_currentpage_boost',
+        get_string('settings:rag_currentpage_boost', 'local_ai_course_assistant'),
+        get_string('settings:rag_currentpage_boost_desc', 'local_ai_course_assistant'),
+        '0.05',
+        PARAM_FLOAT
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -961,7 +1015,10 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/cost_anomaly_multiplier',
         get_string('settings:cost_anomaly_multiplier', 'local_ai_course_assistant'),
         get_string('settings:cost_anomaly_multiplier_desc', 'local_ai_course_assistant'),
-        '2.0',
+        // Must round-trip through clean_param(PARAM_FLOAT): '2.0' cleans to 2
+        // and '2' !== '2.0' fails default-validation at install (pre-existing
+        // bug that has been failing CI since v6.0.1). Use '2'.
+        '2',
         PARAM_FLOAT
     ));
 
@@ -2201,6 +2258,15 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_prompt_debug_view',
         get_string('prompt_debug_view:title', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/prompt_debug_view.php'),
+        'moodle/site:config'
+    ));
+
+    // v6.2.0: prompt playground — assemble the prompt with simulated injected
+    // content and inspect the result + per-section breakdown.
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_prompt_playground',
+        'SOLA Prompt Playground',
+        new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
         'moodle/site:config'
     ));
 

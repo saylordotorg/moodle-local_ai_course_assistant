@@ -117,6 +117,15 @@ class context_builder {
 
         $ragmode = !empty($retrieved_chunks);
 
+        // Whether RAG is enabled for this course (independent of whether this
+        // particular query retrieved anything). When RAG is on but retrieval
+        // returned nothing above the relevance floor, we deliberately do NOT
+        // fall back to stuffing front-of-course content — that is the
+        // irrelevant-context noise RAG exists to remove. v6.2.0.
+        $ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
+        $ragcourseon = (bool) get_config('local_ai_course_assistant', 'rag_enabled')
+            && (($ragcourseraw === false) || (bool) $ragcourseraw);
+
         // Use cache only when NOT in RAG mode (RAG content is query-specific).
         // Cache key includes a fingerprint of per-course toggles that affect
         // the prompt body (Socratic mode, mastery surfaces, RAG, English lock,
@@ -169,9 +178,15 @@ class context_builder {
         // current page content + thin course-structure overview, instead.
         $resolvedpagecontent = '';
         if ($pageid > 0 && !$ragmode) {
+            // v6.2.0: lowered the default/ceiling from 12000 to 8000. A very
+            // large page was head-truncated to its first 12000 chars (losing
+            // the rest and still costing 12000); 8000 is plenty for grounding
+            // and leaves budget for structure/instructions. (With RAG on, the
+            // page is instead sliced by its own relevant chunks, current-page
+            // biased, so this path only affects RAG-off installs.)
             $maxpagechars = (int) (get_config('local_ai_course_assistant',
-                'current_page_content_maxchars') ?: 12000);
-            $maxpagechars = max(500, min(12000, $maxpagechars));
+                'current_page_content_maxchars') ?: 8000);
+            $maxpagechars = max(500, min(8000, $maxpagechars));
             $resolvedpagecontent = self::get_module_content($pageid, $maxpagechars);
         }
         $skipwidedump = (strlen($resolvedpagecontent) >= 500);
@@ -213,12 +228,23 @@ class context_builder {
             // so the model sees a consistent heading and knows where to
             // find the actual page text.
             $coursecontent = "(The full text of the page the learner is currently reading appears in the **Current Page Content** section above. Use that section as the primary source for any question about the page.)";
+        } else if ($ragcourseon) {
+            // v6.2.0: RAG is enabled for this course but retrieval returned
+            // nothing above the relevance floor (off-topic question, or a
+            // sparse/empty index). Do NOT fall back to stuffing front-of-course
+            // pages — that is exactly the irrelevant context RAG exists to
+            // avoid. Rely on the (thinned) course-structure overview plus any
+            // current-page content, with a short pointer for a consistent
+            // heading.
+            $coursecontent = $resolvedpagecontent !== ''
+                ? "(See the **Current Page Content** section above for the page the learner is reading; use it as the primary source.)"
+                : "(No specific course passage matched this question. Use the course-structure overview above and sound teaching of this subject; do not invent course-specific details that are not shown.)";
         } else {
-            // v5.3.6: pass $pageid so the wide dump preempts the learner's
-            // current cmid in modinfo order. That way, even when get_module_content
-            // returns empty (filter collapse, unsupported module type), the
-            // current page still appears at the top of the dump rather than
-            // being squeezed out by the 15000-char total cap.
+            // RAG off for this course: legacy wide course-content dump. v5.3.6:
+            // pass $pageid so the dump preempts the learner's current cmid in
+            // modinfo order, so even when get_module_content returns empty
+            // (filter collapse, unsupported module type) the current page still
+            // appears at the top rather than being squeezed out by the total cap.
             $coursecontent = self::build_course_content($courseid, $pageid);
         }
 
@@ -1005,20 +1031,23 @@ class context_builder {
                 $line .= ": {$summary}";
             }
 
-            // Add visible activities with cmid for source attribution.
+            // Add visible activities with cmid for source attribution. v6.2.0:
+            // drop the module type from the annotation (the cmid is what
+            // citations need; the type was noise) and cap at 8 per section to
+            // keep the overview compact on large courses.
             $activities = [];
             if (!empty($modinfo->sections[$section->section])) {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
                     $cm = $modinfo->get_cm($cmid);
                     if ($cm->visible && $cm->has_view()) {
-                        $activities[] = "{$cm->name} ({$cm->modname}, id:{$cmid})";
+                        $activities[] = "{$cm->name} (id:{$cmid})";
                     }
                 }
             }
 
             if (!empty($activities)) {
-                $line .= "\n  Activities: " . implode(', ', array_slice($activities, 0, 10));
-                if (count($activities) > 10) {
+                $line .= "\n  Activities: " . implode(', ', array_slice($activities, 0, 8));
+                if (count($activities) > 8) {
                     $line .= ', ...';
                 }
             }
@@ -1026,7 +1055,17 @@ class context_builder {
             $lines[] = $line;
         }
 
-        return !empty($lines) ? implode("\n", $lines) : 'No topics available.';
+        $out = !empty($lines) ? implode("\n", $lines) : 'No topics available.';
+
+        // v6.2.0: unconditional backstop cap. The caller applies a tighter
+        // 1500-char cap when a usable current page anchors the prompt, but in
+        // RAG mode (no page resolved) the overview was previously uncapped and
+        // a large course could ship multiple KB of section/activity listing.
+        $maxtopics = 2500;
+        if (strlen($out) > $maxtopics) {
+            $out = substr($out, 0, $maxtopics) . "\n[..additional sections truncated..]";
+        }
+        return $out;
     }
 
     /**
@@ -1545,33 +1584,6 @@ class context_builder {
             . "Look at the course structure above and match the topic of your answer to the most relevant activity by name. "
             . "Use [SOURCE:course] only as a last resort when no single activity is a clear match.\n\n"
             . "Always include exactly one [SOURCE:xxx] tag. Place it on its own line just before [SOLA_NEXT].";
-    }
-
-    /**
-     * Get instructions for appending SOLA_NEXT suggestion markers.
-     *
-     * Remote config key: instruction_blocks.next_steps
-     *
-     * @return string
-     */
-    private static function get_next_steps_instructions(): string {
-        $blocks = remote_config_manager::get_value('instruction_blocks', []);
-        if (!empty($blocks['next_steps'])) {
-            return "\n\n## Suggested Follow-up Actions\n" . $blocks['next_steps'];
-        }
-        return "\n\n## Suggested Follow-up Actions\n"
-            . "After EVERY response, append exactly this marker on its own line at the very end. "
-            . "The four chips MUST be specific to what was just discussed in this turn — never echo "
-            . "placeholder text.\n\n"
-            . "Marker shape:\n"
-            . "[SOLA_NEXT]<chip 1>||<chip 2>||<chip 3>||<chip 4>[/SOLA_NEXT]\n\n"
-            . "Worked example (note that real chip text replaces every angle-bracketed placeholder):\n"
-            . "[SOLA_NEXT]Quiz me on this||Give me an example||Explain it more simply||What should I study next?[/SOLA_NEXT]\n\n"
-            . "Each chip is a short (3–8 word) actionable prompt that naturally continues the "
-            . "conversation. Vary the chips to fit this specific turn — do not reuse the worked "
-            . "example verbatim and never emit the literal words \"suggestion 1\", \"chip 1\", or "
-            . "\"<chip 1>\". Always include exactly 4 chips, separated by ||. The whole "
-            . "[SOLA_NEXT]...[/SOLA_NEXT] block is stripped before the learner sees it.";
     }
 
     /**

@@ -330,7 +330,10 @@ try {
             }
             $topk = (int) (get_config('local_ai_course_assistant', 'rag_topk') ?: 5);
             $ragstart = microtime(true);
-            $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk);
+            // Pass the current page's cmid so retrieval prefers the page the
+            // learner is on among near-ties (and so a large page is grounded by
+            // its own relevant chunks rather than a head-truncated dump).
+            $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk, (int) $pageid);
             $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
         } catch (\Throwable $e) {
             // Fallback to content stuffing — log but don't fail the request.
@@ -474,7 +477,11 @@ try {
             . $pdfsnippet . $suffix;
     }
 
-    $history = conversation_manager::get_history_for_api($conv->id);
+    // v6.2.0: history_mode-aware selection. In semantic mode this keeps only
+    // recent turns relevant to the current question (plus the latest pair),
+    // so stale off-topic history does not inflate cost or invite drift; in
+    // recency mode it is the long-standing last-N-pairs behaviour.
+    $history = \local_ai_course_assistant\history_selector::select_for_api($conv->id, $message);
 
     // Create provider. Admin LLM picker can override the provider/model for
     // side-by-side comparison. Requires the manage capability; students always

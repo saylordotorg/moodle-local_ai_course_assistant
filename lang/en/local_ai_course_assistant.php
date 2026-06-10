@@ -136,6 +136,14 @@ $string['settings:temperature'] = 'Temperature';
 $string['settings:temperature_desc'] = 'Controls randomness. Lower values are more focused, higher values more creative. Range: 0.0 to 2.0.';
 $string['settings:maxhistory'] = 'Max Conversation History';
 $string['settings:maxhistory_desc'] = 'Maximum number of message pairs to include in API requests. Older messages are trimmed.';
+$string['settings:history_mode'] = 'History Selection Mode';
+$string['settings:history_mode_desc'] = 'How past conversation turns are chosen before being sent to the model. <strong>Semantic</strong> keeps only the recent turns relevant to the current question (and always the most recent exchange), so a stale, off-topic earlier turn does not inflate cost or pull the answer off course; it does one extra embedding call per message. <strong>Recency</strong> keeps the last "Max Conversation History" pairs regardless of relevance (the long-standing behaviour, no extra call). If embedding is unavailable, semantic mode falls back to recency automatically.';
+$string['settings:history_mode_semantic'] = 'Semantic (relevant recent turns)';
+$string['settings:history_mode_recency'] = 'Recency (last N pairs)';
+$string['settings:history_semantic_minscore'] = 'History Relevance Floor (cosine)';
+$string['settings:history_semantic_minscore_desc'] = 'In semantic history mode, a past turn is kept only if its similarity to the current question is at least this value (the most recent exchange is always kept). Range 0 to 1; model-dependent. Raise to be stricter (less history), lower to keep more.';
+$string['settings:history_candidates'] = 'History Candidate Window';
+$string['settings:history_candidates_desc'] = 'In semantic history mode, only the most recent this-many pairs are scored for relevance (a cost bound). Pairs older than this window are not sent. Keep this at or above "Max Conversation History".';
 $string['settings:avatar'] = 'Chat Avatar';
 $string['settings:avatar_desc'] = 'Select the avatar icon for the chat widget button.';
 $string['settings:institution_name'] = 'Institution Name';
@@ -301,6 +309,10 @@ $string['settings:embed_dimensions'] = 'Embedding Dimensions';
 $string['settings:embed_dimensions_desc'] = 'Number of dimensions in the embedding vector. Must match your model output. OpenAI text-embedding-3-small: 1536. nomic-embed-text: 768.';
 $string['settings:rag_topk'] = 'Top-K Chunks';
 $string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt.';
+$string['settings:rag_min_similarity'] = 'Minimum Relevance (cosine)';
+$string['settings:rag_min_similarity_desc'] = 'Drop retrieved chunks whose cosine similarity to the question is below this value, so an off-topic or sparse question injects fewer (or zero) passages instead of always padding to Top-K with weak matches. Range 0 to 1; 0 disables the gate. The right value depends on the embedding model: 0.25 suits text-embedding-3-small. Raise it to be stricter (less, more on-topic context), lower it to be more permissive.';
+$string['settings:rag_currentpage_boost'] = 'Current-Page Boost';
+$string['settings:rag_currentpage_boost_desc'] = 'A small bonus added to the relevance score of chunks from the page the learner is currently viewing, so questions like "explain this" prefer the visible page when scores are close. Ordering only: it does not force an irrelevant page chunk past the minimum-relevance gate. Set 0 to disable.';
 $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
 
@@ -1235,7 +1247,7 @@ $string['profile:link']    = 'Deployment presets page';
 $string['profile:link_desc'] = 'Open the <a href="{$a}">Deployment presets</a> page to apply a recommended bundle of settings for a hosted or self-hosted backend.';
 // v5.1.0: per-section cap on the current_page_content body.
 $string['settings:current_page_content_maxchars']      = 'Current page content cap (characters)';
-$string['settings:current_page_content_maxchars_desc'] = 'Maximum number of characters of the current page\'s text injected into the system prompt as the "Current Page Content" section. Default 12,000 keeps the prior behaviour where the full page (up to that cap) is sent — best for accuracy on page-specific questions, since the model can quote directly from the passage. Cost-conscious sites running paid hosted providers can clamp this lower (e.g. 3,000-4,000) to reduce per-turn token spend, at the risk that a question whose answer is in the truncated tail of a long page will not be answered as accurately. Clamped to the range 500-12,000. Independent of <code>prompt_budget_chars</code>: this caps just the page section; the budget caps the whole prompt.';
+$string['settings:current_page_content_maxchars_desc'] = 'Maximum number of characters of the current page\'s text injected into the system prompt as the "Current Page Content" section, when RAG is off. Default 8,000 grounds page-specific questions well while leaving budget for structure and instructions. (With RAG enabled the page is instead grounded by its own most-relevant chunks, current-page biased, so this cap does not apply.) A very long page is head-truncated to this many characters, so the tail of an extremely long page may not be quoted; enabling RAG avoids that. Cost-conscious sites can clamp lower (e.g. 3,000-4,000). Clamped to the range 500-8,000. Independent of <code>prompt_budget_chars</code>: this caps just the page section; the budget caps the whole prompt.';
 
 // v5.6.0: prompt section proportions (admin-tunable weights + automatic context-aware boost).
 $string['settings:prompt_proportions_heading']      = 'Prompt section proportions (v5.6.0)';
