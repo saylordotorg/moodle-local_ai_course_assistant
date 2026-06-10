@@ -149,6 +149,7 @@ exit(0);
  * @param string $outdir
  * @param string $datetag
  * @param int $limit Max prompts to send, 0 = all.
+ * @param string $promptsfile Optional alternate path to a tutor_prompts.json-shaped file.
  * @return string Path to run CSV.
  */
 function mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = ''): string {
@@ -294,6 +295,7 @@ function run_one_call(array $row, string $systemprompt, string $userprompt): arr
  * @param string $datetag
  * @param string $judgeprovider Provider id (must be in comparison_providers OR have an apikey via standard config).
  * @param string $judgemodel Model name passed to the judge.
+ * @param string $promptsfile Optional alternate path to a tutor_prompts.json-shaped file.
  * @return string Path to judge CSV.
  */
 function mode_judge(string $runcsv, string $outdir, string $datetag, string $judgeprovider, string $judgemodel, string $promptsfile = ''): string {
