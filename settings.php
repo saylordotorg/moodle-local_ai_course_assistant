@@ -425,7 +425,9 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/history_semantic_minscore',
         get_string('settings:history_semantic_minscore', 'local_ai_course_assistant'),
         get_string('settings:history_semantic_minscore_desc', 'local_ai_course_assistant'),
-        '0.20',
+        // Must round-trip through clean_param(PARAM_FLOAT): '0.20' cleans to
+        // 0.2 and '0.2' !== '0.20' fails default-validation at install. Use '0.2'.
+        '0.2',
         PARAM_FLOAT
     ));
 
@@ -1013,7 +1015,10 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/cost_anomaly_multiplier',
         get_string('settings:cost_anomaly_multiplier', 'local_ai_course_assistant'),
         get_string('settings:cost_anomaly_multiplier_desc', 'local_ai_course_assistant'),
-        '2.0',
+        // Must round-trip through clean_param(PARAM_FLOAT): '2.0' cleans to 2
+        // and '2' !== '2.0' fails default-validation at install (pre-existing
+        // bug that has been failing CI since v6.0.1). Use '2'.
+        '2',
         PARAM_FLOAT
     ));
 
