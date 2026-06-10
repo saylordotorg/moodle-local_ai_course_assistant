@@ -1500,6 +1500,15 @@ $string['settings:premium_escalation_course_tags_desc'] = 'One course shortname 
 $string['settings:spend_cap_per_course_default'] = 'Default per-course spend cap (USD)';
 $string['settings:spend_cap_per_course_default_desc'] = 'Defensive cap applied to every course that does not have its own per-course spend cap configured. Set to e.g. <code>30</code> to bound any single course\'s monthly spend at $30 without having to tune individual courses. <code>0</code> = no default (only site-wide and per-course-override caps apply). When a course crosses 80% / 95% / 100% of this cap, the existing spend-guard alert pipeline sends the admin notification (recipient list: <code>spend_notify_emails</code>, falling back to site admins). A specific course can always raise its own ceiling by setting a higher per-course override.';
 
+// v6.0.0: cost anomaly detector + scheduled task.
+$string['settings:cost_anomaly_heading'] = 'Cost anomaly detector (v6.0)';
+$string['settings:cost_anomaly_heading_desc'] = 'Daily scheduled task (<code>cost_anomaly_check</code>) that compares today\'s site-wide SOLA spend against the rolling 7-day median. Emails the <code>spend_notify_emails</code> recipient list (falling back to site admins) when today exceeds the configured multiplier × median. Catches three failure modes the existing 80% / 95% / 100% spend-cap thresholds miss: (1) runaway course where the absolute ceiling isn\'t crossed but a single course suddenly drives 10x its usual volume, (2) accidental premium-tier enable, (3) provider misroute. Off by default; the in-SOLA equivalent of the Redash query at <code>.drafts/sola-redash-cost-anomaly-2026-06-09.md</code>.';
+$string['settings:cost_anomaly_enabled'] = 'Enable cost anomaly detector';
+$string['settings:cost_anomaly_enabled_desc'] = 'When on, the daily scheduled task evaluates today\'s spend against the rolling 7-day median and emails admins on anomaly. The first 7 days after enabling produce an <code>insufficient_history</code> status (no historical baseline yet) and never emit an alert. Idempotent per day: a flag in <code>config_plugins</code> stops repeat emails if cron runs multiple times.';
+$string['settings:cost_anomaly_multiplier'] = 'Anomaly multiplier';
+$string['settings:cost_anomaly_multiplier_desc'] = 'Today\'s spend must exceed this multiplier × the 7-day median to trigger an alert. Default <code>2.0</code>. Lower to <code>1.5</code> for earlier warnings (more false positives during enrollment bursts). Raise to <code>3.0</code> if Saylor\'s usage is bursty enough that 2x spikes are routine.';
+$string['task:cost_anomaly_check'] = 'SOLA cost anomaly check (daily)';
+
 // v4.2: courses_admin page.
 $string['courses_admin:title']             = 'AI Course Assistant — Courses';
 $string['courses_admin:lede']              = 'Enable or disable AI Assistant per course, manage Usability Testing, or run bulk actions across many courses.';

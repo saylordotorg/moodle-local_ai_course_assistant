@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026060901`, release `5.12.1`
+- **Current version:** `2026060903`, release `6.0.0`
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
@@ -44,6 +44,8 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - First-run consent scroll-gate (v5.10.1, fixed v5.10.2): Accept button disabled until the learner scrolls the notice to the bottom; inline JS in `templates/chat_widget.mustache`, regression harness `tests/a11y/consent-gate-check.js` (Puppeteer)
 - Vendor-rec optimizations (v5.11.0): mastery classifier routed off chat tier via `mastery_classifier_provider` (default `openai`/`gpt-4o-mini`, saves ~$220/mo at 100k MAU); Voyage AI embeddings (voyage-3.5, asymmetric query/document `input_type`, MRL `output_dimension`); opt-in Voyage rerank-2.5 two-stage RAG (`rerank_enabled` checkbox, default off); OpenAI `prompt_tokens_details.cached_tokens` captured for auto-prefix cache-hit visibility; Claude Opus 4.7+ temperature deny-list (Anthropic deprecated `temperature` on reasoning-class Opus models, was bubbling up as the generic error string)
 - Premium escalation tier (v5.12.0): per-turn `premium_router` evaluates each chat call against admin-configured regex triggers (default ships with multi-step STEM markers from the A.10 bake-off: derive, prove that, step by step, LaTeX math, fenced code blocks, big-O, integrals, optimization, thermodynamics) plus an optional course-shortname/idnumber allowlist; matching turns route to Claude Opus 4.8 instead of the workhorse chat tier. Off by default; expected ~$700/mo at 100k MAU at 5% escalation rate.
+- Defensive defaults (v5.13.0): `spend_cap_per_course_default` fallback (every course without an explicit per-course override gets this cap; existing 80/95/100% notification email pipeline carries through). Fix: `emergency_control --chat` was a silent no-op v5.4.5 → v5.12.x; v5.13 adds a dedicated `emergency_chat_disabled` flag that spend_guard::check() consults first.
+- Operational maturity (v6.0.0): daily `cost_anomaly_check` scheduled task compares today's site-wide SOLA spend vs rolling 7-day median, emails `spend_notify_emails` recipients when today > multiplier × median (default 2.0). Catches runaway courses + accidental premium-tier enable + provider misroute that the cap thresholds miss. Off by default. Companion `admin/cli/send_spend_alert_test_email.php` lets admins verify alert delivery BEFORE relying on it.
 
 ---
 
@@ -88,7 +90,8 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 | `classes/deployment_profile.php` | v5.10.0 apply-once preset definitions (self-hosted small-context / hosted large-context); applied by `deployment_profile.php` page |
 | `classes/course_config_manager.php` | Per-course AI configuration (including per-course `spend_cap_monthly` override) |
 | `classes/spend_guard.php` | Site-wide + per-capability + per-course spend cap enforcement; emits notification emails at 80% and 95% thresholds (v5.13 adds `spend_cap_per_course_default` fallback) |
-| `classes/emergency_control.php` | Site-wide kill switch (`emergency_disabled` flag); when on, every SOLA chat call short-circuits with a disabled-state response. Admin UI at `emergency_control.php`; CLI at `admin/cli/emergency_disable.php` |
+| `classes/emergency_control.php` | Site-wide kill switch. `--chat` sets `emergency_chat_disabled` (v5.13 fix; was silent no-op pre-v5.13); other flags toggle `enabled` / `voice_active_realtime` / `rag_enabled` / `outreach_master_enabled`. Admin UI at `emergency_control.php`; CLI at `admin/cli/emergency_disable.php` |
+| `classes/cost_anomaly_detector.php` | v6.0.0 daily cost-anomaly detector (today vs rolling 7-day median × multiplier); `classes/task/cost_anomaly_check.php` is the scheduled task wrapper; `admin/cli/send_spend_alert_test_email.php` is the alert-delivery self-test |
 | `classes/premium_router.php` | v5.12.0 per-turn router for premium escalation tier (regex triggers + course allowlist → Opus 4.8) |
 | `classes/embedding_provider/voyage_embedding_provider.php` | v5.11.0 Voyage-3.5 embedding client (asymmetric query/document, MRL dims) |
 | `classes/embedding_provider/voyage_reranker.php` | v5.11.0 Voyage rerank-2.5 cross-encoder for two-stage RAG |
