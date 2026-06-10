@@ -132,7 +132,8 @@ class rag_retriever {
         // Published recall lifts: +15 Recall@10 enterprise / +39% NDCG BEIR.
         // Falls back to single-stage cosine top-k if reranker fails or is unset.
         if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')) {
-            $candidates = (int) (get_config('local_ai_course_assistant', 'rerank_candidates') ?: 50);
+            $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
+            $candidates = ($rawcand === false || $rawcand === '') ? 50 : (int) $rawcand;
             $candidates = max($topk, min($candidates, count($scored)));
             $stage1 = array_slice($scored, 0, $candidates);
             try {
