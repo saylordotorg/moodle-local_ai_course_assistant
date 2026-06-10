@@ -126,7 +126,7 @@ class conversation_classifier {
             . "Return your classification now.";
 
         try {
-            $provider = base_provider::create_from_config($courseid);
+            $provider = self::resolve_classifier_provider($courseid);
             $response = $provider->chat_completion(
                 $system,
                 [['role' => 'user', 'content' => $user]],
@@ -195,5 +195,35 @@ class conversation_classifier {
      */
     private static function nullresult(): array {
         return ['recorded' => false, 'objectiveid' => 0, 'signal' => 'unclear', 'confidence' => 0.0];
+    }
+
+    /**
+     * Resolve which provider runs the classifier turn. If both
+     * mastery_classifier_provider and mastery_classifier_model are set,
+     * route to that dedicated provider via comparison_providers (so the
+     * API key, base URL, and temperature come from the same row admins
+     * already manage). Otherwise fall back to the course's primary chat
+     * provider — preserving pre-v5.11 behavior on sites that never
+     * touched the classifier settings.
+     *
+     * v5.11.0 wires the previously-orphaned mastery_classifier_model
+     * setting. Default 'openai' + 'gpt-4o-mini' saves ~$220/month at
+     * 100k Saylor MAU vs running the classifier on the chat-tier model.
+     *
+     * @param int $courseid
+     * @return \local_ai_course_assistant\provider\provider_interface
+     */
+    private static function resolve_classifier_provider(int $courseid) {
+        $providerid = trim((string) get_config('local_ai_course_assistant', 'mastery_classifier_provider'));
+        $model = trim((string) get_config('local_ai_course_assistant', 'mastery_classifier_model'));
+        if ($providerid !== '' && $model !== '') {
+            try {
+                return base_provider::create_for_comparison($providerid, $model, $courseid);
+            } catch (\Throwable $e) {
+                debugging('mastery classifier provider unavailable, falling back to chat tier: '
+                    . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
+        return base_provider::create_from_config($courseid);
     }
 }

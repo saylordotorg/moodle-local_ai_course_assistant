@@ -60,6 +60,18 @@ abstract class base_embedding_provider {
     abstract protected function get_default_model(): string;
 
     /**
+     * Get the actual model name in use after construction-time resolution.
+     * Callers that want to record the model that produced an embedding
+     * should use this rather than reading embed_model config directly —
+     * an empty embed_model resolves to the provider's default here.
+     *
+     * @return string
+     */
+    public function get_model(): string {
+        return $this->model;
+    }
+
+    /**
      * Get the default API base URL for this provider.
      *
      * @return string
@@ -98,6 +110,8 @@ abstract class base_embedding_provider {
                 return new openai_embedding_provider();
             case 'ollama':
                 return new ollama_embedding_provider();
+            case 'voyage':
+                return new voyage_embedding_provider();
             default:
                 throw new \moodle_exception(
                     'chat:error_notconfigured',

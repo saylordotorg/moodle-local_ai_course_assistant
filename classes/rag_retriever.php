@@ -58,9 +58,17 @@ class rag_retriever {
         static $embedding_cache = [];
         $cache_key = "course_{$courseid}";
 
-        // Embed the query.
-        $provider   = base_embedding_provider::create_from_config();
-        $queryvec   = $provider->embed($query);
+        // Embed the query. When the configured embedding provider is Voyage,
+        // ask for the asymmetric "query" projection so the vector pairs
+        // properly with the "document"-typed index vectors. Other providers
+        // (OpenAI, Ollama) expose a single embed() entrypoint and project
+        // symmetrically.
+        $provider = base_embedding_provider::create_from_config();
+        if ($provider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider) {
+            $queryvec = $provider->embed_query($query);
+        } else {
+            $queryvec = $provider->embed($query);
+        }
 
         if (empty($queryvec)) {
             return [];
@@ -116,6 +124,46 @@ class rag_retriever {
 
         // Sort descending by score.
         usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        // Optional stage 2: two-stage retrieval with Voyage rerank-2.5.
+        // When `rerank_enabled` is on AND a Voyage rerank API key is configured,
+        // take the top `rerank_candidates` cosine matches (default 50) and
+        // re-score them with rerank-2.5 (cross-encoder), then keep the top-k.
+        // Published recall lifts: +15 Recall@10 enterprise / +39% NDCG BEIR.
+        // Falls back to single-stage cosine top-k if reranker fails or is unset.
+        if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')) {
+            $candidates = (int) (get_config('local_ai_course_assistant', 'rerank_candidates') ?: 50);
+            $candidates = max($topk, min($candidates, count($scored)));
+            $stage1 = array_slice($scored, 0, $candidates);
+            try {
+                $reranker = new \local_ai_course_assistant\embedding_provider\voyage_reranker();
+                if ($reranker->is_configured()) {
+                    $documents = array_map(fn($r) => $r['content'], $stage1);
+                    $reranked = $reranker->rerank($query, $documents, $topk);
+                    if (!empty($reranked)) {
+                        $out = [];
+                        foreach ($reranked as $entry) {
+                            $idx = $entry['index'];
+                            if (isset($stage1[$idx])) {
+                                $row = $stage1[$idx];
+                                // Replace the cosine score with the rerank
+                                // relevance score so downstream telemetry
+                                // reflects the actual ranking signal used.
+                                $row['score'] = $entry['score'];
+                                $row['cosine_score'] = $stage1[$idx]['score'];
+                                $out[] = $row;
+                            }
+                        }
+                        if (!empty($out)) {
+                            return $out;
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                debugging('rag_retriever rerank failed, falling back to cosine top-k: '
+                    . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
 
         return array_slice($scored, 0, $topk);
     }

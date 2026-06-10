@@ -627,6 +627,7 @@ if ($hassiteconfig) {
 
     $embeddingproviders = [
         'openai' => get_string('settings:embed_provider_openai', 'local_ai_course_assistant'),
+        'voyage' => get_string('settings:embed_provider_voyage', 'local_ai_course_assistant'),
         'ollama' => get_string('settings:embed_provider_ollama', 'local_ai_course_assistant'),
     ];
     $settings->add(new admin_setting_configselect(
@@ -679,6 +680,43 @@ if ($hassiteconfig) {
         get_string('settings:rag_chunksize', 'local_ai_course_assistant'),
         get_string('settings:rag_chunksize_desc', 'local_ai_course_assistant'),
         '400',
+        PARAM_INT
+    ));
+
+    // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/rerank_enabled',
+        get_string('settings:rerank_enabled', 'local_ai_course_assistant'),
+        get_string('settings:rerank_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/rerank_apikey',
+        get_string('settings:rerank_apikey', 'local_ai_course_assistant'),
+        get_string('settings:rerank_apikey_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rerank_model',
+        get_string('settings:rerank_model', 'local_ai_course_assistant'),
+        get_string('settings:rerank_model_desc', 'local_ai_course_assistant'),
+        'rerank-2.5'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rerank_apibaseurl',
+        get_string('settings:rerank_apibaseurl', 'local_ai_course_assistant'),
+        get_string('settings:rerank_apibaseurl_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rerank_candidates',
+        get_string('settings:rerank_candidates', 'local_ai_course_assistant'),
+        get_string('settings:rerank_candidates_desc', 'local_ai_course_assistant'),
+        '50',
         PARAM_INT
     ));
 
@@ -1478,6 +1516,13 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/mastery_classifier_provider',
+        get_string('settings:mastery_classifier_provider', 'local_ai_course_assistant'),
+        get_string('settings:mastery_classifier_provider_desc', 'local_ai_course_assistant'),
+        'openai',
+        PARAM_ALPHANUMEXT
+    ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_model',
         get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),

@@ -48,6 +48,26 @@ class claude_provider extends base_provider {
         return 'claude-sonnet-4-20250514';
     }
 
+    /**
+     * Whether the given Anthropic model accepts a `temperature` parameter.
+     * Opus 4.7 and 4.8 (reasoning-class models) reject temperature with HTTP
+     * 400; their successors will likely behave the same way. Maintain this
+     * as a per-prefix denylist so the model-specific 400 doesn't bubble up
+     * as the generic "something went wrong" error.
+     *
+     * @param string $model
+     * @return bool
+     */
+    private static function model_supports_temperature(string $model): bool {
+        $denyprefixes = ['claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-4-9'];
+        foreach ($denyprefixes as $prefix) {
+            if (str_starts_with($model, $prefix)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected function get_default_base_url(): string {
         return 'https://api.anthropic.com';
     }
@@ -132,6 +152,10 @@ class claude_provider extends base_provider {
         if (!empty($options['thinking'])) {
             $body['thinking'] = ['type' => 'adaptive'];
             $body['temperature'] = 1;
+        } else if (!self::model_supports_temperature($this->model)) {
+            // v5.11.0: Opus 4.7+ (and other reasoning-class models) reject the
+            // temperature parameter with HTTP 400 "temperature is deprecated
+            // for this model." Sending no temperature lets the model pick.
         } else {
             $body['temperature'] = $options['temperature'] ?? $this->temperature;
         }

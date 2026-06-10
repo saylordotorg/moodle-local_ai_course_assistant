@@ -50,7 +50,9 @@ class content_indexer {
         $rawchunksize = get_config('local_ai_course_assistant', 'rag_chunksize');
         $chunksize = ($rawchunksize === false || $rawchunksize === '') ? 400 : (int) $rawchunksize;
         $provider  = base_embedding_provider::create_from_config();
-        $modelname = get_config('local_ai_course_assistant', 'embed_model') ?: 'text-embedding-3-small';
+        // v5.11.0: ask the provider its actual model so non-OpenAI vendors
+        // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
+        $modelname = $provider->get_model();
 
         $modules = content_extractor::extract_course_modules($courseid);
 
@@ -185,7 +187,9 @@ class content_indexer {
         $rawchunksize = get_config('local_ai_course_assistant', 'rag_chunksize');
         $chunksize = ($rawchunksize === false || $rawchunksize === '') ? 400 : (int) $rawchunksize;
         $provider  = base_embedding_provider::create_from_config();
-        $modelname = get_config('local_ai_course_assistant', 'embed_model') ?: 'text-embedding-3-small';
+        // v5.11.0: ask the provider its actual model so non-OpenAI vendors
+        // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
+        $modelname = $provider->get_model();
 
         $chunks = content_chunker::chunk($mod['text'], $mod['title'], $section, $chunksize);
 

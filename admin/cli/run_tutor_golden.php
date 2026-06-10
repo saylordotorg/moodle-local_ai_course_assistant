@@ -68,6 +68,7 @@ $datetag = date('Y-m-d-His');
 $judgeprovider = 'claude';
 $judgemodel = 'claude-sonnet-4-6';
 $limit = 0; // 0 = all prompts
+$promptsfile = ''; // empty = use tutor_prompts.json default
 
 foreach ($argv as $arg) {
     if (preg_match('/^--mode=(run|judge|report|all)$/', $arg, $m)) {
@@ -86,6 +87,8 @@ foreach ($argv as $arg) {
         $judgemodel = trim($m[1]);
     } else if (preg_match('/^--limit=(\d+)$/', $arg, $m)) {
         $limit = (int) $m[1];
+    } else if (preg_match('/^--prompts=(.+)$/', $arg, $m)) {
+        $promptsfile = trim($m[1]);
     } else if ($arg === '--help' || $arg === '-h') {
         $help = <<<TXT
 Usage: php run_tutor_golden.php [--mode=run|judge|report|all] [options]
@@ -99,6 +102,9 @@ Modes:
 Options:
   --providers=label1,label2     Limit run to a subset of comparison_providers labels.
   --limit=N                     Limit run to the first N prompts (for smoke tests).
+  --prompts=FILE                Path to a tutor_prompts.json-shaped file (default:
+                                tests/golden/tutor_prompts.json). Use for one-off
+                                fixture sets like the A.10 premium-escalation bake-off.
   --in=run.csv[,judge.csv]      Input CSV(s) for judge/report modes.
   --out=DIR                     Output directory (default: <plugin>/runs).
   --judge-provider=ID           Provider id for the rubric judge (default: claude).
@@ -114,14 +120,14 @@ if (!is_dir($outdir)) {
 }
 
 if ($mode === 'run' || $mode === 'all') {
-    $runin = mode_run($providersfilter, $outdir, $datetag, $limit);
+    $runin = mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile);
 }
 if ($mode === 'judge' || $mode === 'all') {
     if ($runin === '') {
         fwrite(STDERR, "ERROR: --mode=judge requires --in=<run.csv>\n");
         exit(1);
     }
-    $judgein = mode_judge($runin, $outdir, $datetag, $judgeprovider, $judgemodel);
+    $judgein = mode_judge($runin, $outdir, $datetag, $judgeprovider, $judgemodel, $promptsfile);
 }
 if ($mode === 'report' || $mode === 'all') {
     if ($runin === '' || $judgein === '') {
@@ -145,15 +151,29 @@ exit(0);
  * @param int $limit Max prompts to send, 0 = all.
  * @return string Path to run CSV.
  */
-function mode_run(string $providersfilter, string $outdir, string $datetag, int $limit): string {
-    $prompts = load_prompts();
+function mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = ''): string {
+    $prompts = load_prompts($promptsfile);
     if ($limit > 0) {
         $prompts = array_slice($prompts, 0, $limit);
     }
     $rows = parse_comparison_providers();
     if ($providersfilter !== '') {
         $wanted = array_map('strtolower', array_map('trim', explode(',', $providersfilter)));
-        $rows = array_filter($rows, fn($r) => in_array(strtolower($r['label']), $wanted, true));
+        // Match by exact label or by provider-id prefix so --providers=claude
+        // still picks up disambiguated `claude:claude-haiku-4-5` and
+        // `claude:claude-sonnet-4-6` rows from the A.10 bake-off.
+        $rows = array_filter($rows, function ($r) use ($wanted) {
+            $label = strtolower($r['label']);
+            foreach ($wanted as $w) {
+                if ($label === $w) {
+                    return true;
+                }
+                if (str_starts_with($label, $w . ':')) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
     if (empty($rows)) {
         fwrite(STDERR, "ERROR: no comparison_providers rows to run against.\n");
@@ -276,7 +296,7 @@ function run_one_call(array $row, string $systemprompt, string $userprompt): arr
  * @param string $judgemodel Model name passed to the judge.
  * @return string Path to judge CSV.
  */
-function mode_judge(string $runcsv, string $outdir, string $datetag, string $judgeprovider, string $judgemodel): string {
+function mode_judge(string $runcsv, string $outdir, string $datetag, string $judgeprovider, string $judgemodel, string $promptsfile = ''): string {
     if (!is_readable($runcsv)) {
         fwrite(STDERR, "ERROR: run CSV not readable: $runcsv\n");
         exit(1);
@@ -290,7 +310,7 @@ function mode_judge(string $runcsv, string $outdir, string $datetag, string $jud
     $header = fgetcsv($in);
     $col = array_flip($header);
 
-    $prompts = load_prompts();
+    $prompts = load_prompts($promptsfile);
     $promptmap = [];
     foreach ($prompts as $p) {
         $promptmap[$p['id']] = $p['text'];
@@ -565,12 +585,20 @@ function mode_report(string $runcsv, string $judgecsv, string $outdir, string $d
 // ---------- helpers ----------
 
 /**
- * Load the golden prompt set.
+ * Load the golden prompt set. Optional $path overrides the default
+ * tests/golden/tutor_prompts.json so one-off fixture sets like the A.10
+ * premium-escalation bake-off can be driven without renaming files.
  *
+ * @param string $path Optional absolute or repo-relative path to a tutor_prompts.json-shaped file.
  * @return array<int, array{id: string, category: string, text: string}>
  */
-function load_prompts(): array {
-    $path = __DIR__ . '/../../tests/golden/tutor_prompts.json';
+function load_prompts(string $path = ''): array {
+    if ($path === '') {
+        $path = __DIR__ . '/../../tests/golden/tutor_prompts.json';
+    } else if ($path[0] !== '/') {
+        // Repo-relative path. Resolve against plugin root.
+        $path = __DIR__ . '/../../' . $path;
+    }
     $raw = file_get_contents($path);
     if ($raw === false) {
         fwrite(STDERR, "ERROR: cannot read $path\n");
@@ -578,7 +606,7 @@ function load_prompts(): array {
     }
     $j = json_decode($raw, true);
     if (!is_array($j) || empty($j['prompts'])) {
-        fwrite(STDERR, "ERROR: tutor_prompts.json is malformed\n");
+        fwrite(STDERR, "ERROR: prompts file is malformed: $path\n");
         exit(1);
     }
     return $j['prompts'];
@@ -615,6 +643,22 @@ function parse_comparison_providers(): array {
             'apibaseurl'  => $parts[4] ?? '',
         ];
     }
+
+    // Disambiguate labels when multiple rows share the same provider id —
+    // e.g. two claude rows for claude-haiku-4-5 and claude-sonnet-4-6 in the
+    // A.10 premium-escalation bake-off. Single-row providers keep the bare
+    // provider id as their label so existing 06-03/06-04 bake-off labels and
+    // their --providers=claude filters keep working unchanged.
+    $counts = [];
+    foreach ($out as $r) {
+        $counts[$r['label']] = ($counts[$r['label']] ?? 0) + 1;
+    }
+    foreach ($out as &$r) {
+        if ($counts[$r['label']] > 1) {
+            $r['label'] = $r['label'] . ':' . strtolower($r['models']);
+        }
+    }
+    unset($r);
     return $out;
 }
 

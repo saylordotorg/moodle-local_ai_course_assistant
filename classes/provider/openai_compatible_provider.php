@@ -28,7 +28,10 @@ namespace local_ai_course_assistant\provider;
  */
 abstract class openai_compatible_provider extends base_provider {
 
-    /** @var array|null Token usage from the last streaming call */
+    /** @var array|null Token usage from the last streaming call.
+     *  v5.11.0 adds `cached_tokens` so dashboards can see the OpenAI auto-prefix
+     *  discount hit rate (cached_tokens get 50% off input; auto-fires on any
+     *  prompt >=1024 tokens with a stable prefix; no opt-in needed). */
     protected ?array $last_token_usage = null;
 
     /**
@@ -206,6 +209,7 @@ abstract class openai_compatible_provider extends base_provider {
                         'prompt_tokens'     => (int) ($event['usage']['prompt_tokens'] ?? 0),
                         'completion_tokens' => (int) ($event['usage']['completion_tokens'] ?? 0),
                         'model'             => $event['model'] ?? $this->model,
+                        'cached_tokens'     => (int) ($event['usage']['prompt_tokens_details']['cached_tokens'] ?? 0),
                     ];
                 }
 
