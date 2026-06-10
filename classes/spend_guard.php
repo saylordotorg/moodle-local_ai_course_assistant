@@ -90,8 +90,8 @@ class spend_guard {
      */
     public static function get_cap(int $courseid = 0, ?string $capability = null): float {
         if ($capability !== null) {
-            $key = 'spend_cap_' . $capability;
-            $val = (float) (get_config('local_ai_course_assistant', $key) ?: 0);
+            $rawcap = get_config('local_ai_course_assistant', 'spend_cap_' . $capability);
+            $val = ($rawcap === false || $rawcap === '') ? 0.0 : (float) $rawcap;
             if ($val > 0) {
                 return $val;
             }
@@ -102,8 +102,18 @@ class spend_guard {
             if (!empty($coursecfg['spend_cap_monthly']) && (float) $coursecfg['spend_cap_monthly'] > 0) {
                 return (float) $coursecfg['spend_cap_monthly'];
             }
+            // v5.13.0: site-wide default per-course cap. Lets an admin set a
+            // defensive cap once (say $30/mo) that propagates to every course
+            // without an explicit override, so a runaway course is bounded
+            // even when no one has tuned its individual settings.
+            $rawdefault = get_config('local_ai_course_assistant', 'spend_cap_per_course_default');
+            $coursedefault = ($rawdefault === false || $rawdefault === '') ? 0.0 : (float) $rawdefault;
+            if ($coursedefault > 0) {
+                return $coursedefault;
+            }
         }
-        return (float) (get_config('local_ai_course_assistant', 'spend_cap_site') ?: 0);
+        $rawsite = get_config('local_ai_course_assistant', 'spend_cap_site');
+        return ($rawsite === false || $rawsite === '') ? 0.0 : (float) $rawsite;
     }
 
     /**
@@ -211,6 +221,15 @@ class spend_guard {
      * @return string One of the CAP_* constants
      */
     public static function check(int $courseid = 0, ?string $capability = null): string {
+        // v5.13.0: emergency_control --chat sets a dedicated flag that
+        // short-circuits every chat-shaped call (and only chat-shaped calls)
+        // to CAP_BLOCKED so the friendly "SOLA paused" path runs. Previously
+        // emergency_control wrote spend_cap_site=0 thinking 0 = paused, but
+        // get_cap() treats 0 as unlimited, so --chat was a silent no-op.
+        if (($capability === 'chat' || $capability === null)
+                && (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled')) {
+            return self::CAP_BLOCKED;
+        }
         $cap = self::get_cap($courseid, $capability);
         if ($cap <= 0) {
             return self::CAP_OK;

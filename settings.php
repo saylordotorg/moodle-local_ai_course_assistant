@@ -923,6 +923,15 @@ if ($hassiteconfig) {
         '0', PARAM_FLOAT
     ));
 
+    // v5.13.0: default per-course cap (applies to any course without an explicit override).
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/spend_cap_per_course_default',
+        get_string('settings:spend_cap_per_course_default', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_per_course_default_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
+    ));
+
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/spend_failover_chain',
         'Failover chain',
