@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Keď je zapnuté, denná naplá
 $string['settings:cost_anomaly_multiplier'] = 'Násobiteľ anomálie';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Dnešné výdavky musia prekročiť tento násobiteľ × mediánu za 7 dní, aby sa spustilo upozornenie. Predvolene <code>2.0</code>. Znížte na <code>1.5</code> pre skoršie varovania (viac falošných pozitív počas nárastu zápisov). Zvýšte na <code>3.0</code>, ak je využitie Saylor dostatočne burstové, aby 2x skoky boli bežné.';
 $string['task:cost_anomaly_check'] = 'Denná kontrola anomálií nákladov SOLA';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Podpísaný balík politík (vzdialené aktualizácie správania)';
+$string['settings:policy_bundle_heading_desc'] = 'Aplikuje nastavenia správania (výzvy, smerovanie, spúšťače eskalácie, ladenie RAG, politiku výdavkov) z kryptograficky podpísaného súboru JSON bez nasadenia kódu. Denná naplánovaná úloha stiahne URL balíka, overí jeho podpis Ed25519 voči verejnému kľúču nižšie a aplikuje nastavenia iba vtedy, ak každý kľúč je na vstavanom zozname povolených a verzia balíka je novšia ako naposledy aplikovaná. Kľúče API, URL adresy, webhooky a nastavenia zabezpečenia nemôžu byť nikdy nastavené balíkom. Vytvárajte a podpisujte balíky pomocou <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Zapnúť synchronizáciu balíka politík';
+$string['settings:policy_bundle_enabled_desc'] = 'Keď je zapnuté, denná úloha stiahne a aplikuje podpísané balíky. Predvolene vypnuté. Vypnutie okamžite zastaví všetky synchronizácie; už aplikované nastavenia si zachovajú svoje hodnoty.';
+$string['settings:policy_bundle_url'] = 'URL balíka politík';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL podpísaného JSON balíka (napríklad objekt S3 alebo GitHub raw URL). URL prechádza rovnakou validáciou SSRF ako koncové body poskytovateľov AI; hostiteľov v súkromnej sieti alebo plain-http je potrebné uviesť v zozname dôveryhodných koncových bodov SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Verejný kľúč balíka politík';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 verejný kľúč použitý na overenie podpisov balíka. Vygenerujte pár kľúčov pomocou <code>policy_bundle_tool.php --keygen</code>; súkromný kľúč zostáva u autora balíka a nesmie byť nikde nahraný.';
+$string['settings:policy_bundle_status'] = 'Posledná synchronizácia';
+$string['settings:policy_bundle_applied_version'] = 'aplikovaná verzia';
+$string['task:policy_bundle_sync'] = 'Synchronizácia podpísaného balíka politík SOLA';
+$string['policy_bundle:invalid'] = 'Balík politík odmietnutý: {$a}';

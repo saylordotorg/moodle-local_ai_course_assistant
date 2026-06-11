@@ -1498,3 +1498,30 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Nígbà tí ó bá ṣiṣẹ́
 $string['settings:cost_anomaly_multiplier'] = 'Multiplier àmì àìdára';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Ìnáwó lónìí gbọ́dọ̀ rekọjá multiplier yìí × ìgbà-àárín ọjọ́ 7 láti mú ìkìlọ̀ ṣiṣẹ́. Àpèjúwe <code>2.0</code>. Dín kù sí <code>1.5</code> fún àwọn ìkìlọ̀ títọ̀wọ́n sáaju. Gbé sí <code>3.0</code> bí ìlò Saylor bá jẹ́ pé àwọn spikes 2x jẹ́ déédéé.';
 $string['task:cost_anomaly_check'] = 'SOLA àyẹ̀wò àmì iye tí kò dára (ojoojúmọ́)';
+
+$string['settings:policy_bundle_heading'] = 'Signed policy bundle (awọn imudojuiwọn ihuwasi latọna jijin)';
+$string['settings:policy_bundle_heading_desc'] = 'Lo awọn eto ihuwasi (prompts, routing, escalation triggers, RAG tuning, spend policy) lati faili JSON ti o ti fowo si ni ọna cryptographic laisi code deploy. Iṣẹ ìgbékalẹ̀ ojoojumọ kan mu URL bundle, ṣayẹwo ibuwọlu Ed25519 rẹ lodi si bọtini gbangba ti o wa ni isalẹ, o si lo awọn eto nikan ti bọtini kọọkan ba wa ninu atokọ aṣẹ ti a ṣe sinu ati pe ẹya bundle jẹ titun ju ẹya ti o kẹhin lo. API keys, URLs, webhooks, ati awọn eto aabo ko le ṣeto nipasẹ bundle. Ṣẹda ati fowo si bundles pẹlu <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Mu policy bundle sync ṣiṣẹ';
+$string['settings:policy_bundle_enabled_desc'] = 'Nígbà tí wọ́n bá mú ṣiṣẹ, iṣẹ ojoojumọ mu ati lo awọn bundles ti o fowo si. Ti pa ni aiyipada. Pipaa mu gbogbo syncs duro lẹsẹkẹsẹ; awọn eto ti a ti lo tẹlẹ tọju awọn iye wọn.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS ti JSON bundle ti o fowo si (fun apẹẹrẹ ohun S3 kan tabi GitHub raw URL). URL naa kọja nipasẹ idanwo SSRF kanna bi awọn endpoint olupese AI; awọn ogun nẹtiwọọki aladani tabi plain-http nilo titẹsi kan ninu atokọ aṣẹ SSRF trusted endpoints.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Bọtini gbangba Base64 Ed25519 ti a lo lati ṣayẹwo awọn ibuwọlu bundle. Ṣe ipilẹṣẹ keypair pẹlu <code>policy_bundle_tool.php --keygen</code>; bọtini aladani naa wa pẹlu onkọwe bundle ko si gbọdọ gbe soke nibikibi.';
+$string['settings:policy_bundle_status'] = 'Sync ti o kẹhin';
+$string['settings:policy_bundle_applied_version'] = 'ẹya ti a lo';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'Policy bundle kọ: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Policy bundle tí a fọwọ́ sí (àwọn ìmúdójúìwọ̀n ìhùwàsí jíjìn)';
+$string['settings:policy_bundle_heading_desc'] = 'Ló àwọn ìtọ́sọ́nà ìhùwàsí (àwọn prompt, routing, àwọn okunfa escalation, ìtọ̀nà RAG, ìlànà ìnáwó) láti ọ̀dọ̀ fáìlì JSON tí a fọwọ́ sí àkọóbẹ̀rẹ̀ láì fi ìpínlẹ̀ kóòdù tì. Iṣẹ́ tí a ṣètò ojoojúmọ́ máa ń gbà URL bundle, máa ń ṣe ìmúdájú fọwọ́ Ed25519 rẹ̀ lòdì sí ìpìlẹ̀ gbangba tó wà nísàlẹ̀, ó sì máa ń lo àwọn ìtọ́sọ́nà nìkan bí gbogbo kọkọrọ bá wà nínú allowlist tí a gbé kalẹ̀ àti bí ẹ̀yà bundle bá jẹ́ tuntun ju ẹ̀yà tó gbẹ̀yìn tí a lò. Àwọn kọkọrọ API, URL, webhook, àti àwọn ìtọ́sọ́nà ààbò kò lè ṣeéṣe fún bundle láti fi ìtọ́sọ́nà wọn. Ṣẹ̀dá àti fọwọ́ sí àwọn bundle pẹ̀lú <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Mú policy bundle sync ṣiṣẹ́';
+$string['settings:policy_bundle_enabled_desc'] = 'Nígbà tí ó bá ṣiṣẹ́, iṣẹ́ ojoojúmọ́ máa ń gbà tí ó sì ń lo àwọn bundle tí a fọwọ́ sí. Kò ṣiṣẹ́ nípasẹ̀ àpẹẹrẹ. Dídáwọ̀n rẹ̀ dúró máa ń fi gbogbo àwọn sync dúró lẹ́sẹ̀kẹsẹ̀; àwọn ìtọ́sọ́nà tí a ti lo tẹ́lẹ̀ máa ń pa iye wọn mọ́.';
+$string['settings:policy_bundle_url'] = 'URL policy bundle';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS ti JSON bundle tí a fọwọ́ sí (fún àpẹẹrẹ S3 object tàbí GitHub raw URL). URL náà máa ń kọjá lọ nípasẹ̀ ìwádìí SSRF kan náà gẹ́gẹ́ bí àwọn endpoint ti olùpèsè AI; àwọn host nẹ́tíwọ̀ọ̀kì àdánidá tàbí plain-http nílò ìfi sọ́dọ̀ àdírẹ́sì sínú SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'Kọkọrọ gbangba policy bundle';
+$string['settings:policy_bundle_pubkey_desc'] = 'Kọkọrọ gbangba Base64 Ed25519 tí a lò láti ṣe ìmúdájú àwọn fọwọ́ bundle. Ṣẹ̀dá keypair pẹ̀lú <code>policy_bundle_tool.php --keygen</code>; kọkọrọ ìkọ̀kọ̀ máa ń wà pẹ̀lú olùdásílẹ̀ bundle kò sì yẹ kí a gba gbé kalẹ̀ níbikíbi.';
+$string['settings:policy_bundle_status'] = 'Sync tó gbẹ̀yìn';
+$string['settings:policy_bundle_applied_version'] = 'ẹ̀yà tí a lò';
+$string['task:policy_bundle_sync'] = 'SOLA policy bundle sync tí a fọwọ́ sí';
+$string['policy_bundle:invalid'] = 'Policy bundle kọ̀: {$a}';

@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'När det är på utvärderar de
 $string['settings:cost_anomaly_multiplier'] = 'Anomalimultiplikator';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Dagens utgifter måste överstiga denna multiplikator × 7-dagarsmedianvärdet för att utlösa en avisering. Standard <code>2.0</code>. Sänk till <code>1.5</code> för tidigare varningar (fler falska positiver under registreringsspikar). Höj till <code>3.0</code> om Saylors användning är tillräckligt burstartad att 2x-spikar är rutinmässiga.';
 $string['task:cost_anomaly_check'] = 'SOLA daglig kostnadsanomalikontroll';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signerat policypaket (fjärruppdateringar av beteende)';
+$string['settings:policy_bundle_heading_desc'] = 'Tillämpa beteendeinställningar (uppmaningar, routing, eskaleringstriggrar, RAG-justering, utgiftspolicy) från en kryptografiskt signerad JSON-fil utan koddriftsättning. En daglig schemalagd uppgift hämtar paketets URL, verifierar dess Ed25519-signatur mot den publika nyckeln nedan och tillämpar inställningarna bara om varje nyckel finns på den inbyggda tillåtelselistan och paketversionen är nyare än den senast tillämpade. API-nycklar, URL:er, webhooks och säkerhetsinställningar kan aldrig anges av ett paket. Skapa och signera paket med <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Aktivera synkronisering av policypaket';
+$string['settings:policy_bundle_enabled_desc'] = 'När aktiverat hämtar den dagliga uppgiften och tillämpar signerade paket. Inaktiverat som standard. Inaktivering stoppar alla synkroniseringar omedelbart; redan tillämpade inställningar behåller sina värden.';
+$string['settings:policy_bundle_url'] = 'URL till policypaket';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL till det signerade paketets JSON (till exempel ett S3-objekt eller GitHub raw URL). URL:en genomgår samma SSRF-validering som AI-leverantörernas slutpunkter; privata nätverksvärdar eller plain-http-värdar behöver en post i SSRF-listan med betrodda slutpunkter.';
+$string['settings:policy_bundle_pubkey'] = 'Publik nyckel för policypaket';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 publik nyckel som används för att verifiera paketsignaturer. Generera nyckelpar med <code>policy_bundle_tool.php --keygen</code>; den privata nyckeln stannar hos paketets författare och får aldrig laddas upp någonstans.';
+$string['settings:policy_bundle_status'] = 'Senaste synkronisering';
+$string['settings:policy_bundle_applied_version'] = 'tillämpad version';
+$string['task:policy_bundle_sync'] = 'SOLA synkronisering av signerat policypaket';
+$string['policy_bundle:invalid'] = 'Policypaket avvisat: {$a}';

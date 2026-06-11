@@ -1498,3 +1498,30 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Uma kuvuliwe, umsebenzi ohleliw
 $string['settings:cost_anomaly_multiplier'] = 'I-multiplier yensalela';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Izindleko zanamuhla kufanele zigqabuke le multiplier × inhlalo yezinsuku ezi-7 ukuze kuqalise isixwayiso. Okuzenzakalelayo <code>2.0</code>. Yehlisa ku-<code>1.5</code> ukuze uxwayise nangaphambili (izixwayiso ezinhle ezingekho ngaphambili ngesikhathi sokulayisha okwengeziwe). Phakamisa ku-<code>3.0</code> uma ukusetshenziswa kwe-Saylor kuvamile ukwedlula i-2x.';
 $string['task:cost_anomaly_check'] = 'Ukuhlola kwensalela yentengo ye-SOLA (nsuku zonke)';
+
+$string['settings:policy_bundle_heading'] = 'Signed policy bundle (izibuyekezo zokuziphatha ezikhishwa kude)';
+$string['settings:policy_bundle_heading_desc'] = 'Sebenzisa izilungiselelo zokuziphatha (prompts, routing, escalation triggers, RAG tuning, spend policy) kusuka kufayela le-JSON elinkenwa kwe-cryptographic ngaphandle kwe-code deploy. Umsebenzi wansuku zonke ohlelelwe uthumela i-URL ye-bundle, uqinisekisa i-Ed25519 signature yawo ngokuqhathanisa ne-public key engezansi, futhi usetshenziswa izilungiselelo kuphela uma konke okukhiye kuse-built-in allowlist futhi inguqulo ye-bundle isha kunengaphezulu yokusetshenziswa. Izinkinobho ze-API, URL, webhooks, nezilungiselelo zokuphepha azikwazi ukusethelwa i-bundle. Dala futhi usayine ama-bundle nge- <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Vumela ukuvumelanisa kwe-policy bundle';
+$string['settings:policy_bundle_enabled_desc'] = 'Uma kuvuliwe, umsebenzi wansuku zonke uthumela futhi usebenzise ama-bundle asayiniwe. Ivaliwe ngokuzenzakalelayo. Ukuvala kuyamisa konke ukuvumelanisa ngokushesha; izilungiselelo ezisetshenzisiwe ngaphambilini zigcina izindinganiso zazo.';
+$string['settings:policy_bundle_url'] = 'I-URL ye-policy bundle';
+$string['settings:policy_bundle_url_desc'] = 'I-HTTPS URL ye-JSON ye-bundle esayiniwe (isibonelo i-S3 object noma i-GitHub raw URL). I-URL idlula ukuqinisekiswa kwe-SSRF okufanayo njengezinhlelo ze-AI provider endpoints; ama-host e-private-network noma plain-http adinga ukufakwa ku-SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'I-public key ye-policy bundle';
+$string['settings:policy_bundle_pubkey_desc'] = 'I-Base64 Ed25519 public key esetshenziswa ukuqinisekisa izimpawu ze-bundle. Yenza i-keypair nge- <code>policy_bundle_tool.php --keygen</code>; i-private key ihlala nomlobi we-bundle futhi akumelwe ilayishwe noma kuphi.';
+$string['settings:policy_bundle_status'] = 'Ukuvumelanisa kwakuqala';
+$string['settings:policy_bundle_applied_version'] = 'inguqulo esetshenzisiwe';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'I-policy bundle iwile: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'I-policy bundle esiniywe (izibuyekezo zokuziphatha kude)';
+$string['settings:policy_bundle_heading_desc'] = 'Sebenzisa izilungiselelo zokuziphatha (amaprompt, i-routing, izinqikithi zokukhushulwa, ukuhlelwa kwe-RAG, inqubomgomo yezindleko) kusuka kufayela le-JSON esiniywe ngokubethelelwa kwemfihlo ngaphandle kokusabalalisa ikhodi. Umsebenzi ohleliwe wosuku uhola i-URL ye-bundle, uqinisekise umnikelo wayo we-Ed25519 ngokuphambana nokhiye womphakathi ongezansi, bese usebenzisa izilungiselelo kuphela uma yonke ikhiye isekho ku-allowlist ewakhiwe ngaphakathi kanye nekhodi ye-bundle isha kunaleyo eyayisetshenziselwe l\'okugcina. Izinhlelo zokusebenza ze-API, URL, webhook, nezilungiselelo zokuphepha azikwazi ukusetshenzwa i-bundle. Yenza futhi usayine izinsete nge-<code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Vula ukuvumelanisa kwe-policy bundle';
+$string['settings:policy_bundle_enabled_desc'] = 'Uma kuvuliwe, umsebenzi wosuku uhola futhi usebenzise izinsete ezisiniyiwe. Kuvaliwe ngokuzenzakalelayo. Ukuvala kuyamisa wonke ukuvumelanisa ngokushesha; izilungiselelo esezisetshenzisiwe zigcina amanani azo.';
+$string['settings:policy_bundle_url'] = 'I-URL ye-policy bundle';
+$string['settings:policy_bundle_url_desc'] = 'I-URL ye-HTTPS ye-JSON ye-bundle esiniywe (isibonelo into ye-S3 noma i-GitHub raw URL). I-URL idlula ngokuqinisekiswa kwe-SSRF okufanayo njenge-endpoint zabahlinzeki be-AI; abasebenzi bomkhandlu oyimfihlo noma i-plain-http badinga ukungena kwe-allowlist ye-SSRF trusted endpoints.';
+$string['settings:policy_bundle_pubkey'] = 'Ukhiye womphakathi we-policy bundle';
+$string['settings:policy_bundle_pubkey_desc'] = 'Ukhiye womphakathi we-Base64 Ed25519 osetshenziswa ukuqinisekisa iziniyiwa ze-bundle. Yakha i-keypair nge-<code>policy_bundle_tool.php --keygen</code>; ukhiye wangasese uhlala nompheki we-bundle futhi akufanele ukhokhele ndawo yonke.';
+$string['settings:policy_bundle_status'] = 'Ukuvumelanisa kwakamuva';
+$string['settings:policy_bundle_applied_version'] = 'inguqulo esetshenzisiwe';
+$string['task:policy_bundle_sync'] = 'SOLA ukuvumelanisa kwe-policy bundle esiniywe';
+$string['policy_bundle:invalid'] = 'I-policy bundle yanqatshwa: {$a}';

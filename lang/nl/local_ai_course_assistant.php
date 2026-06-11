@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Wanneer ingeschakeld evalueert 
 $string['settings:cost_anomaly_multiplier'] = 'Anomalie-vermenigvuldiger';
 $string['settings:cost_anomaly_multiplier_desc'] = 'De uitgaven van vandaag moeten deze vermenigvuldiger × de mediaan van 7 dagen overschrijden om een melding te activeren. Standaard <code>2.0</code>. Verlaag naar <code>1.5</code> voor vroegere waarschuwingen (meer fout-positieven bij inschrijvingspieken). Verhoog naar <code>3.0</code> als het gebruik van Saylor grillig genoeg is dat 2× pieken normaal zijn.';
 $string['task:cost_anomaly_check'] = 'SOLA dagelijkse kostenanomalie-controle';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Ondertekend beleidspakket (externe gedragsupdates)';
+$string['settings:policy_bundle_heading_desc'] = 'Pas gedragsinstellingen (prompts, routering, escalatietriggers, RAG-afstemming, bestedingsbeleid) toe vanuit een cryptografisch ondertekend JSON-bestand zonder code-implementatie. Een dagelijkse geplande taak haalt de pakket-URL op, verifieert de Ed25519-handtekening met de onderstaande openbare sleutel en past de instellingen alleen toe als elke sleutel op de ingebouwde acceptatielijst staat en de pakketversie nieuwer is dan de laatste toegepaste. API-sleutels, URL\'s, webhooks en beveiligingsinstellingen kunnen nooit door een pakket worden ingesteld. Maak pakketten en onderteken ze met <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Synchronisatie van beleidspakket inschakelen';
+$string['settings:policy_bundle_enabled_desc'] = 'Indien ingeschakeld haalt de dagelijkse taak ondertekende pakketten op en past ze toe. Standaard uitgeschakeld. Uitschakelen stopt onmiddellijk alle synchronisaties; reeds toegepaste instellingen behouden hun waarden.';
+$string['settings:policy_bundle_url'] = 'URL van beleidspakket';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL van de ondertekende pakket-JSON (bijvoorbeeld een S3-object of GitHub raw URL). De URL ondergaat dezelfde SSRF-validatie als AI-provider-eindpunten; hosts op een privénetwerk of plain-http hebben een vermelding nodig in de acceptatielijst voor vertrouwde SSRF-eindpunten.';
+$string['settings:policy_bundle_pubkey'] = 'Openbare sleutel van beleidspakket';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 openbare sleutel die wordt gebruikt om pakkethandtekeningen te verifiëren. Genereer het sleutelpaar met <code>policy_bundle_tool.php --keygen</code>; de privésleutel blijft bij de pakketauteur en mag nooit ergens worden geüpload.';
+$string['settings:policy_bundle_status'] = 'Laatste synchronisatie';
+$string['settings:policy_bundle_applied_version'] = 'toegepaste versie';
+$string['task:policy_bundle_sync'] = 'SOLA-synchronisatie van ondertekend beleidspakket';
+$string['policy_bundle:invalid'] = 'Beleidspakket geweigerd: {$a}';

@@ -1479,3 +1479,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Yeroo banaa ta\'u, hojiin qinda
 $string['settings:cost_anomaly_multiplier'] = 'Multiplier al-dansaa';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Baasii guyyaa har\'aa multiplier × median 7-guyyaa caalee beeksisa mul\'isu qaba. Durtii <code>2.0</code>. Gara <code>1.5</code> xiqqeessi beeksisa duraa (erga yoo baay\'atan yeroo galma\'ina). Gara <code>3.0</code> ol-guddisi Saylor fayyadamaan al-dansaa 2x dansaa ta\'e yoo ta\'e.';
 $string['task:cost_anomaly_check'] = 'Sakatta\'iinsa SOLA al-dansaa gatii (guyyaa guyyaa)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signed policy bundle (update amala fagoo irraa)';
+$string['settings:policy_bundle_heading_desc'] = 'Qindaa\'inawwan amala (prompts, routing, escalation triggers, RAG tuning, spend policy) faayila JSON signed cryptographically irraa code deploy malee fayyadami. Hojii daily scheduled bundle URL fiddi, mallatoo Ed25519 isaa public key armaan gadii waliin mirkaneessa, qindaa\'inawwannis key hunduu allowlist keessa yoo jiraate fi version bundle kan dhumaa caalaa haaraa yoo ta\'e qofa hojii irra oolcha. API keys, URLs, webhooks, fi qindaa\'inawwan nageenya bundle tiin yeroo kamiiyyuu qindeeffamuu hin danda\'an. Bundles <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync) waliin uumi fi mallattoo goodi.';
+$string['settings:policy_bundle_enabled'] = 'Policy bundle sync dandeessisi';
+$string['settings:policy_bundle_enabled_desc'] = 'Yoo dandeessifame, hojiin guyyaa guyyaa signed bundles fiddi fi hojii irra oolcha. Dura bu\'uuraatti cufaa dha. Dhaabuu sync hunda hatattamaan dhaaba; qindaa\'inawwan dursanii hojii irra oolfaman gatii isaanii eegu.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL JSON bundle signed (fakkeenyaaf S3 object yookiin GitHub raw URL). URL SSRF validation wal fakkaataa AI provider endpoints waliin darba; private-network yookiin plain-http hosts SSRF trusted endpoints allowlist keessatti galii barbaadu.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 public key bundle signatures mirkaneessuuf fayyadamu. Keypair <code>policy_bundle_tool.php --keygen</code> waliin uumi; private key qopheessaa bundle waliin taa\'a, iddoo kamiiyyuu fe\'amuu hin qabu.';
+$string['settings:policy_bundle_status'] = 'Sync dhumaa';
+$string['settings:policy_bundle_applied_version'] = 'version hojii irra oolfame';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'Policy bundle dide: {$a}';

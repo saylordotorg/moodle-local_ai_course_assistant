@@ -1506,3 +1506,16 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Lokacin da yake a kan, aikin da
 $string['settings:cost_anomaly_multiplier'] = 'Mai daidaitawa na bambanci';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Kashen yau dole ya zarce wannan mai daidaitawa × matsakaicin kwanaki 7 don kunna faɗakarwa. Tsoho <code>2.0</code>. Rage zuwa <code>1.5</code> don faɗakarwa na farko (ƙarin ƙirgar ƙarya yayin fashewar rajista). Ɗago zuwa <code>3.0</code> idan amfanin Saylor yana da yawa ƙarfin burst da ƙarfin 2x yana yau da kullum.';
 $string['task:cost_anomaly_check'] = 'Duba bambancin farashin SOLA (yau da kullun)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signed policy bundle (sabunta hali na nesa)';
+$string['settings:policy_bundle_heading_desc'] = 'Yi amfani da saitunan hali (prompts, routing, escalation triggers, RAG tuning, spend policy) daga cryptographically signed JSON file ba tare da code deploy ba. Daily scheduled task yana kawo bundle URL, yana tabbatar da Ed25519 signature akan public key da ke ƙasa, kuma yana amfani da saitunan idan kowane key yana cikin built-in allowlist kuma bundle version ya fi na ƙarshe da aka yi amfani da shi. API keys, URLs, webhooks, da security settings ba za a iya saita su da bundle ba. Ƙirƙiri kuma sanya hannu bundles da <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Kunna policy bundle sync';
+$string['settings:policy_bundle_enabled_desc'] = 'Idan an kunna, daily task yana kawo kuma yana amfani da signed bundles. An kashe ta tun farko. Kashe ta yana dakatar da duk syncs nan take; saitunan da aka riga aka yi amfani da su suna riƙe ƙimarsu.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL na signed bundle JSON (misali S3 object ko GitHub raw URL). URL yana wucewa ta SSRF validation iri ɗaya kamar AI provider endpoints; private-network ko plain-http hosts suna buƙatar shigar da su a cikin SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 public key da ake amfani da shi don tabbatar da bundle signatures. Ƙirƙiri keypair da <code>policy_bundle_tool.php --keygen</code>; private key yana zaune tare da bundle author kuma ba za a taɓa loda shi a ko\'ina ba.';
+$string['settings:policy_bundle_status'] = 'Sync na ƙarshe';
+$string['settings:policy_bundle_applied_version'] = 'version da aka yi amfani da shi';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'An ƙi policy bundle: {$a}';

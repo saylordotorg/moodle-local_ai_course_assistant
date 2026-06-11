@@ -1506,3 +1506,16 @@ $string['settings:cost_anomaly_multiplier_desc'] = 'Perbelanjaan hari ini mesti 
 $string['settings:prompt_debug_enabled'] = 'Log prompt sistem yang dirakit ke fail';
 $string['settings:prompt_debug_enabled_desc'] = 'Apabila dihidupkan, setiap giliran sembang menulis prompt sistem penuh yang dirakit dan kiraan aksara setiap bahagian ke <code>moodledata/temp/sola_prompt_debug.log</code> (bergolek pada ~1MB). Mati secara lalai. Gunakan untuk mengukur saiz prompt secara empirikal dan mengaudit bahagian mana yang menyumbang token paling banyak. Log mengandungi prompt sistem sahaja (tiada input pelajar atau PII).';
 $string['task:cost_anomaly_check'] = 'Semakan anomali kos SOLA (harian)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Bundel dasar yang ditandatangani (kemas kini gelagat jauh)';
+$string['settings:policy_bundle_heading_desc'] = 'Gunakan tetapan gelagat (gesaan, penghalaan, pencetus eskalasi, penalaan RAG, dasar perbelanjaan) daripada fail JSON yang ditandatangani secara kriptografi tanpa penggunaan kod. Tugas yang dijadualkan harian mengambil URL bundel, mengesahkan tandatangan Ed25519 berbanding kunci awam di bawah, dan menerapkan tetapan hanya jika setiap kunci berada dalam senarai benarkan terbina dan versi bundel lebih baharu daripada yang terakhir diterapkan. Kunci API, URL, webhook dan tetapan keselamatan tidak pernah boleh ditetapkan oleh bundel. Cipta dan tandatangani bundel dengan <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Dayakan penyegerakan bundel dasar';
+$string['settings:policy_bundle_enabled_desc'] = 'Apabila didayakan, tugas harian mengambil dan menerapkan bundel yang ditandatangani. Dimatikan secara lalai. Melumpuhkan menghentikan semua penyegerakan dengan serta-merta; tetapan yang sudah diterapkan mengekalkan nilainya.';
+$string['settings:policy_bundle_url'] = 'URL bundel dasar';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS bagi JSON bundel yang ditandatangani (contohnya objek S3 atau GitHub raw URL). URL melalui pengesahan SSRF yang sama seperti titik akhir pembekal AI; hos rangkaian peribadi atau plain-http memerlukan entri dalam senarai benarkan titik akhir dipercayai SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Kunci awam bundel dasar';
+$string['settings:policy_bundle_pubkey_desc'] = 'Kunci awam Base64 Ed25519 yang digunakan untuk mengesahkan tandatangan bundel. Jana pasangan kunci dengan <code>policy_bundle_tool.php --keygen</code>; kunci peribadi kekal dengan pengarang bundel dan tidak boleh dimuat naik ke mana-mana.';
+$string['settings:policy_bundle_status'] = 'Penyegerakan terakhir';
+$string['settings:policy_bundle_applied_version'] = 'versi yang diterapkan';
+$string['task:policy_bundle_sync'] = 'Penyegerakan bundel dasar bertanda tangan SOLA';
+$string['policy_bundle:invalid'] = 'Bundel dasar ditolak: {$a}';

@@ -1475,3 +1475,31 @@ $string['settings:cost_anomaly_enabled_desc'] = 'เมื่อเปิด sch
 $string['settings:cost_anomaly_multiplier'] = 'Anomaly multiplier';
 $string['settings:cost_anomaly_multiplier_desc'] = 'ค่าใช้จ่ายวันนี้ต้องเกิน multiplier นี้คูณค่ามัธยฐาน 7 วันเพื่อกระตุ้นการแจ้งเตือน ค่าเริ่มต้น <code>2.0</code> ลดเป็น <code>1.5</code> เพื่อรับคำเตือนเร็วขึ้น (false positive มากขึ้นในช่วงที่มีการลงทะเบียนพุ่งสูง) เพิ่มเป็น <code>3.0</code> หากการใช้งาน Saylor มีความผันผวนมากพอที่ spike ระดับ 2x เป็นเรื่องปกติ';
 $string['task:cost_anomaly_check'] = 'การตรวจสอบความผิดปกติของต้นทุน SOLA (รายวัน)';
+
+// v6.4.0 signed policy bundle strings
+$string['settings:policy_bundle_heading'] = 'ชุดนโยบายที่ลงนาม (การอัปเดตพฤติกรรมระยะไกล)';
+$string['settings:policy_bundle_heading_desc'] = 'ใช้การตั้งค่าพฤติกรรม (พรอมต์, การกำหนดเส้นทาง, ตัวกระตุ้นการยกระดับ, การปรับแต่ง RAG, นโยบายการใช้จ่าย) จากไฟล์ JSON ที่ลงนามด้วยการเข้ารหัสลับโดยไม่ต้องดีพลอยโค้ด งานที่กำหนดเวลารายวันจะดึง URL ของชุด ตรวจสอบลายเซ็น Ed25519 กับคีย์สาธารณะด้านล่าง และใช้การตั้งค่าเฉพาะเมื่อทุกคีย์อยู่ในรายการที่อนุญาตในตัวและเวอร์ชันชุดใหม่กว่าที่ใช้ล่าสุดเท่านั้น คีย์ API, URL, webhooks และการตั้งค่าความปลอดภัยไม่สามารถกำหนดโดยชุดได้ สร้างและลงนามชุดด้วย <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync)';
+$string['settings:policy_bundle_enabled'] = 'เปิดใช้งานการซิงก์ชุดนโยบาย';
+$string['settings:policy_bundle_enabled_desc'] = 'เมื่อเปิดใช้งาน งานรายวันจะดึงและใช้ชุดที่ลงนาม ปิดโดยค่าเริ่มต้น การปิดใช้งานจะหยุดการซิงก์ทั้งหมดทันที การตั้งค่าที่ใช้แล้วจะคงค่าของตน';
+$string['settings:policy_bundle_url'] = 'URL ชุดนโยบาย';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS ของ JSON ชุดที่ลงนาม (เช่น วัตถุ S3 หรือ GitHub raw URL) URL ผ่านการตรวจสอบ SSRF แบบเดียวกับจุดปลายทางของผู้ให้บริการ AI โฮสต์เครือข่ายส่วนตัวหรือ plain-http ต้องการรายการในรายการที่อนุญาตของจุดปลายทางที่เชื่อถือได้ของ SSRF';
+$string['settings:policy_bundle_pubkey'] = 'คีย์สาธารณะชุดนโยบาย';
+$string['settings:policy_bundle_pubkey_desc'] = 'คีย์สาธารณะ Base64 Ed25519 ที่ใช้ตรวจสอบลายเซ็นชุด สร้างคู่คีย์ด้วย <code>policy_bundle_tool.php --keygen</code> คีย์ส่วนตัวอยู่กับผู้เขียนชุดและห้ามอัปโหลดที่ใดก็ตาม';
+$string['settings:policy_bundle_status'] = 'การซิงก์ล่าสุด';
+$string['settings:policy_bundle_applied_version'] = 'เวอร์ชันที่ใช้';
+$string['task:policy_bundle_sync'] = 'SOLA การซิงก์ชุดนโยบายที่ลงนาม';
+$string['policy_bundle:invalid'] = 'ชุดนโยบายถูกปฏิเสธ: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'ชุดนโยบายที่ลงนามแล้ว (การอัปเดตพฤติกรรมระยะไกล)';
+$string['settings:policy_bundle_heading_desc'] = 'ใช้การตั้งค่าพฤติกรรม (prompts, routing, ตัวกระตุ้นการยกระดับ, การปรับแต่ง RAG, นโยบายการใช้จ่าย) จากไฟล์ JSON ที่ลงนามด้วยการเข้ารหัสโดยไม่ต้องปรับใช้โค้ด งาน scheduled รายวันจะดึง URL ของชุด ตรวจสอบลายเซ็น Ed25519 กับกุญแจสาธารณะด้านล่าง และใช้การตั้งค่าเฉพาะเมื่อทุกกุญแจอยู่ใน allowlist ที่กำหนดไว้และเวอร์ชันของชุดใหม่กว่าที่ใช้ล่าสุด คีย์ API, URL, webhooks และการตั้งค่าความปลอดภัยไม่สามารถกำหนดได้โดยชุดนโยบาย สร้างและลงนามชุดด้วย <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'เปิดใช้งานการซิงค์ชุดนโยบาย';
+$string['settings:policy_bundle_enabled_desc'] = 'เมื่อเปิดใช้งาน งานรายวันจะดึงและใช้ชุดที่ลงนามแล้ว ปิดไว้ตามค่าเริ่มต้น การปิดใช้งานจะหยุดการซิงค์ทั้งหมดทันที การตั้งค่าที่ใช้ไปแล้วจะคงค่าไว้';
+$string['settings:policy_bundle_url'] = 'URL ชุดนโยบาย';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS ของ JSON ชุดที่ลงนามแล้ว (เช่น S3 object หรือ GitHub raw URL) URL จะผ่านการตรวจสอบ SSRF เดียวกันกับ endpoint ของผู้ให้บริการ AI โฮสต์เครือข่ายส่วนตัวหรือ plain-http ต้องมีรายการใน allowlist ของ SSRF trusted endpoints';
+$string['settings:policy_bundle_pubkey'] = 'กุญแจสาธารณะชุดนโยบาย';
+$string['settings:policy_bundle_pubkey_desc'] = 'กุญแจสาธารณะ Base64 Ed25519 ที่ใช้ตรวจสอบลายเซ็นของชุด สร้างคู่กุญแจด้วย <code>policy_bundle_tool.php --keygen</code>; กุญแจส่วนตัวอยู่กับผู้สร้างชุดและต้องไม่อัปโหลดไปที่ใดเลย';
+$string['settings:policy_bundle_status'] = 'ซิงค์ล่าสุด';
+$string['settings:policy_bundle_applied_version'] = 'เวอร์ชันที่ใช้แล้ว';
+$string['task:policy_bundle_sync'] = 'SOLA ซิงค์ชุดนโยบายที่ลงนามแล้ว';
+$string['policy_bundle:invalid'] = 'ชุดนโยบายถูกปฏิเสธ: {$a}';

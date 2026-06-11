@@ -1022,6 +1022,50 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    // v6.4.0: signed policy bundle — behavior-as-data updates without a code
+    // deploy. Daily task fetches a JSON envelope, verifies the Ed25519
+    // signature, enforces the settings allowlist + monotonic version, applies
+    // with an audit row. Authoring tooling: admin/cli/policy_bundle_tool.php.
+    $policystatus = '';
+    $lastresult = get_config('local_ai_course_assistant', 'policy_bundle_last_result');
+    if ($lastresult !== false && $lastresult !== '') {
+        $lastsync = (int) get_config('local_ai_course_assistant', 'policy_bundle_last_sync');
+        $appliedver = (int) get_config('local_ai_course_assistant', 'policy_bundle_applied_version');
+        $policystatus = '<br><strong>' . get_string('settings:policy_bundle_status', 'local_ai_course_assistant')
+            . ':</strong> ' . s($lastresult)
+            . ' (' . ($lastsync ? userdate($lastsync) : '-') . ', '
+            . get_string('settings:policy_bundle_applied_version', 'local_ai_course_assistant')
+            . ' ' . $appliedver . ')';
+    }
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/policy_bundle_heading',
+        get_string('settings:policy_bundle_heading', 'local_ai_course_assistant'),
+        get_string('settings:policy_bundle_heading_desc', 'local_ai_course_assistant') . $policystatus
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/policy_bundle_enabled',
+        get_string('settings:policy_bundle_enabled', 'local_ai_course_assistant'),
+        get_string('settings:policy_bundle_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/policy_bundle_url',
+        get_string('settings:policy_bundle_url', 'local_ai_course_assistant'),
+        get_string('settings:policy_bundle_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/policy_bundle_pubkey',
+        get_string('settings:policy_bundle_pubkey', 'local_ai_course_assistant'),
+        get_string('settings:policy_bundle_pubkey_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/spend_failover_chain',
         'Failover chain',

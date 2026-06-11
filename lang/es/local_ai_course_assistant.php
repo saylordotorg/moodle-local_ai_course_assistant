@@ -1502,3 +1502,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Cuando está activado, la tarea
 $string['settings:cost_anomaly_multiplier'] = 'Multiplicador de anomalía';
 $string['settings:cost_anomaly_multiplier_desc'] = 'El gasto de hoy debe superar este multiplicador × la mediana de 7 días para activar una alerta. Por defecto <code>2.0</code>. Reducir a <code>1.5</code> para advertencias más tempranas (más falsos positivos durante ráfagas de matriculación). Aumentar a <code>3.0</code> si el uso de Saylor es suficientemente fluctuante como para que los picos de 2x sean habituales.';
 $string['task:cost_anomaly_check'] = 'Comprobación de anomalías de costes de SOLA (diaria)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Paquete de políticas firmado (actualizaciones de comportamiento remoto)';
+$string['settings:policy_bundle_heading_desc'] = 'Aplique configuraciones de comportamiento (indicaciones, enrutamiento, disparadores de escalación, ajuste de RAG, política de gastos) desde un archivo JSON firmado criptográficamente sin implementar código. Una tarea programada diaria obtiene la URL del paquete, verifica su firma Ed25519 con la clave pública a continuación y aplica la configuración solo si cada clave está en la lista de permitidos incorporada y la versión del paquete es más reciente que la última aplicada. Las claves API, las URL, los webhooks y las configuraciones de seguridad nunca pueden establecerse mediante un paquete. Cree y firme paquetes con <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Habilitar sincronización del paquete de políticas';
+$string['settings:policy_bundle_enabled_desc'] = 'Cuando está habilitado, la tarea diaria obtiene y aplica paquetes firmados. Desactivado de forma predeterminada. Al deshabilitar se detienen todas las sincronizaciones de inmediato; las configuraciones ya aplicadas conservan sus valores.';
+$string['settings:policy_bundle_url'] = 'URL del paquete de políticas';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS del JSON del paquete firmado (por ejemplo, un objeto S3 o GitHub raw URL). La URL pasa por la misma validación SSRF que los puntos de conexión del proveedor de IA; los hosts de red privada o plain-http necesitan una entrada en la lista de puntos de conexión de confianza de SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Clave pública del paquete de políticas';
+$string['settings:policy_bundle_pubkey_desc'] = 'Clave pública Base64 Ed25519 utilizada para verificar las firmas del paquete. Genere el par de claves con <code>policy_bundle_tool.php --keygen</code>; la clave privada permanece con el autor del paquete y nunca debe cargarse en ningún lugar.';
+$string['settings:policy_bundle_status'] = 'Última sincronización';
+$string['settings:policy_bundle_applied_version'] = 'versión aplicada';
+$string['task:policy_bundle_sync'] = 'Sincronización del paquete de políticas firmado de SOLA';
+$string['policy_bundle:invalid'] = 'Paquete de políticas rechazado: {$a}';

@@ -1498,3 +1498,30 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Khi bật, tác vụ được l
 $string['settings:cost_anomaly_multiplier'] = 'Số nhân bất thường';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Chi tiêu hôm nay phải vượt số nhân này × trung vị 7 ngày để kích hoạt cảnh báo. Mặc định <code>2.0</code>. Giảm xuống <code>1.5</code> để cảnh báo sớm hơn (nhiều dương tính giả hơn trong các đợt đăng ký tăng đột biến). Tăng lên <code>3.0</code> nếu việc sử dụng Saylor đủ biến động đến mức tăng đột biến 2x là bình thường.';
 $string['task:cost_anomaly_check'] = 'Kiểm tra bất thường chi phí SOLA (hàng ngày)';
+
+$string['settings:policy_bundle_heading'] = 'Gói chính sách đã ký (cập nhật hành vi từ xa)';
+$string['settings:policy_bundle_heading_desc'] = 'Áp dụng cài đặt hành vi (lời nhắc, định tuyến, bộ kích hoạt leo thang, điều chỉnh RAG, chính sách chi tiêu) từ tệp JSON được ký bằng mã hóa mà không cần triển khai mã. Nhiệm vụ được lên lịch hàng ngày tải URL của gói, xác minh chữ ký Ed25519 của nó với khóa công khai bên dưới và chỉ áp dụng cài đặt nếu mọi khóa đều có trong danh sách cho phép tích hợp sẵn và phiên bản gói mới hơn phiên bản được áp dụng gần nhất. Khóa API, URL, webhook và cài đặt bảo mật không bao giờ có thể được đặt bởi gói. Tạo và ký gói với <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Bật đồng bộ gói chính sách';
+$string['settings:policy_bundle_enabled_desc'] = 'Khi được bật, nhiệm vụ hàng ngày tải và áp dụng các gói đã ký. Tắt theo mặc định. Tắt tính năng này sẽ dừng ngay lập tức tất cả các đồng bộ; cài đặt đã áp dụng trước đó vẫn giữ nguyên giá trị.';
+$string['settings:policy_bundle_url'] = 'URL gói chính sách';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS của JSON gói đã ký (ví dụ: đối tượng S3 hoặc GitHub raw URL). URL được xác thực SSRF giống như các điểm cuối nhà cung cấp AI; máy chủ mạng riêng tư hoặc plain-http cần có mục nhập trong danh sách cho phép các điểm cuối tin cậy SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Khóa công khai gói chính sách';
+$string['settings:policy_bundle_pubkey_desc'] = 'Khóa công khai Base64 Ed25519 dùng để xác minh chữ ký gói. Tạo cặp khóa bằng <code>policy_bundle_tool.php --keygen</code>; khóa riêng tư vẫn ở với tác giả gói và không bao giờ được tải lên bất kỳ đâu.';
+$string['settings:policy_bundle_status'] = 'Lần đồng bộ cuối';
+$string['settings:policy_bundle_applied_version'] = 'phiên bản đã áp dụng';
+$string['task:policy_bundle_sync'] = 'SOLA đồng bộ gói chính sách đã ký';
+$string['policy_bundle:invalid'] = 'Gói chính sách bị từ chối: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Gói chính sách đã ký (cập nhật hành vi từ xa)';
+$string['settings:policy_bundle_heading_desc'] = 'Áp dụng các cài đặt hành vi (lời nhắc, định tuyến, trình kích hoạt leo thang, tinh chỉnh RAG, chính sách chi tiêu) từ tệp JSON được ký mã hóa mà không cần triển khai mã. Tác vụ được lên lịch hàng ngày tải URL của gói, xác minh chữ ký Ed25519 với khóa công khai bên dưới và chỉ áp dụng các cài đặt khi mỗi khóa nằm trong danh sách cho phép tích hợp sẵn và phiên bản gói mới hơn phiên bản đã áp dụng lần cuối. Khóa API, URL, webhook và cài đặt bảo mật không bao giờ có thể được đặt bởi một gói. Tạo và ký gói bằng <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Bật đồng bộ hóa gói chính sách';
+$string['settings:policy_bundle_enabled_desc'] = 'Khi được bật, tác vụ hàng ngày tải và áp dụng các gói đã ký. Tắt theo mặc định. Tắt sẽ dừng tất cả các lần đồng bộ ngay lập tức; các cài đặt đã áp dụng giữ nguyên giá trị của chúng.';
+$string['settings:policy_bundle_url'] = 'URL gói chính sách';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS của JSON gói đã ký (ví dụ: đối tượng S3 hoặc GitHub raw URL). URL trải qua cùng một xác thực SSRF như các endpoint của nhà cung cấp AI; các máy chủ mạng riêng tư hoặc plain-http cần có mục trong danh sách cho phép endpoint SSRF đáng tin cậy.';
+$string['settings:policy_bundle_pubkey'] = 'Khóa công khai gói chính sách';
+$string['settings:policy_bundle_pubkey_desc'] = 'Khóa công khai Base64 Ed25519 dùng để xác minh chữ ký của gói. Tạo cặp khóa bằng <code>policy_bundle_tool.php --keygen</code>; khóa riêng tư ở lại với tác giả gói và không bao giờ được tải lên bất kỳ đâu.';
+$string['settings:policy_bundle_status'] = 'Lần đồng bộ cuối';
+$string['settings:policy_bundle_applied_version'] = 'phiên bản đã áp dụng';
+$string['task:policy_bundle_sync'] = 'SOLA đồng bộ hóa gói chính sách đã ký';
+$string['policy_bundle:invalid'] = 'Gói chính sách bị từ chối: {$a}';

@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Når aktiveret vurderer den dag
 $string['settings:cost_anomaly_multiplier'] = 'Anomalimultiplikator';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Dagens forbrug skal overstige denne multiplikator × 7-dages medianen for at udløse en advarsel. Standard <code>2.0</code>. Sænk til <code>1.5</code> for tidligere advarsler (flere falske positive ved tilmeldingsudbrud). Hæv til <code>3.0</code>, hvis Saylors forbrug er ujævnt nok til, at 2× toppe er rutinemæssige.';
 $string['task:cost_anomaly_check'] = 'SOLA-omkostningsanomalikontrol (daglig)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signeret politikpakke (fjernbetjente adfærdsopdateringer)';
+$string['settings:policy_bundle_heading_desc'] = 'Anvend adfærdsindstillinger (prompter, routing, eskaleringstriggere, RAG-justering, forbrugspolitik) fra en kryptografisk signeret JSON-fil uden kodeinstallation. En daglig planlagt opgave henter pakkens URL, verificerer dens Ed25519-signatur mod den nedenfor angivne offentlige nøgle og anvender indstillingerne kun, hvis alle nøgler er på den indbyggede tilladelsesliste, og pakkeversionen er nyere end den sidst anvendte. API-nøgler, URL\'er, webhooks og sikkerhedsindstillinger kan aldrig indstilles af en pakke. Opret og signer pakker med <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Aktivér synkronisering af politikpakke';
+$string['settings:policy_bundle_enabled_desc'] = 'Når aktiveret henter den daglige opgave og anvender signerede pakker. Deaktiveret som standard. Deaktivering stopper alle synkroniseringer øjeblikkeligt; allerede anvendte indstillinger beholder deres værdier.';
+$string['settings:policy_bundle_url'] = 'URL til politikpakke';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL til den signerede JSON-pakke (f.eks. et S3-objekt eller GitHub raw URL). URL\'en gennemgår den samme SSRF-validering som AI-udbyderslutpunkter; private netværk eller plain-http-servere kræver en post på SSRF\'s liste over betroede slutpunkter.';
+$string['settings:policy_bundle_pubkey'] = 'Politikpakkens offentlige nøgle';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 offentlig nøgle til verificering af pakkesignaturer. Generér nøgleparret med <code>policy_bundle_tool.php --keygen</code>; den private nøgle forbliver hos pakkeforfatteren og må aldrig uploades nogen steder.';
+$string['settings:policy_bundle_status'] = 'Seneste synkronisering';
+$string['settings:policy_bundle_applied_version'] = 'anvendt version';
+$string['task:policy_bundle_sync'] = 'SOLA signeret politikpakke-synkronisering';
+$string['policy_bundle:invalid'] = 'Politikpakke afvist: {$a}';

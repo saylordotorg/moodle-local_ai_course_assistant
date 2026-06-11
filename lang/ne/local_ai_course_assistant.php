@@ -1506,3 +1506,16 @@ $string['settings:cost_anomaly_multiplier_desc'] = 'अलर्ट ट्रि
 $string['settings:prompt_debug_enabled'] = 'असेम्बल गरिएको प्रणाली प्रम्प्ट फाइलमा लग गर्नुहोस्';
 $string['settings:prompt_debug_enabled_desc'] = 'चालू हुँदा, प्रत्येक च्याट टर्नले पूर्ण रूपमा असेम्बल गरिएको प्रणाली प्रम्प्ट र प्रति-खण्ड क्यारेक्टर गणनाहरू <code>moodledata/temp/sola_prompt_debug.log</code> मा लेख्छ (~1MB मा रोलिङ)। पूर्वनिर्धारित रूपमा बन्द। प्रम्प्ट आकार अनुभवजन्य रूपमा मापन गर्न र कुन खण्डले सबैभन्दा बढी टोकन योगदान गर्छ भन्ने अडिट गर्न प्रयोग गर्नुहोस्। लगमा प्रणाली प्रम्प्ट मात्र समावेश छ (कुनै सिकारु इनपुट वा PII छैन)।';
 $string['task:cost_anomaly_check'] = 'SOLA लागत विसंगति जाँच (दैनिक)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'हस्ताक्षरित नीति बन्डल (रिमोट व्यवहार अपडेट)';
+$string['settings:policy_bundle_heading_desc'] = 'कोड डिप्लोय नगरी क्रिप्टोग्राफिक रूपमा हस्ताक्षरित JSON फाइलबाट व्यवहार सेटिङहरू (प्रम्प्टहरू, राउटिङ, इस्केलेसन ट्रिगरहरू, RAG ट्युनिङ, खर्च नीति) लागू गर्नुहोस्। दैनिक अनुसूचित कार्यले बन्डल URL ल्याउँछ, तलको सार्वजनिक कुञ्जी विरुद्ध Ed25519 हस्ताक्षर प्रमाणित गर्छ, र प्रत्येक कुञ्जी बिल्ट-इन अनुमति सूचीमा भएमा र बन्डल संस्करण अन्तिम लागू गरिएकोभन्दा नयाँ भएमा मात्र सेटिङहरू लागू गर्छ। API कुञ्जीहरू, URL हरू, webhook हरू र सुरक्षा सेटिङहरू कहिल्यै बन्डलद्वारा सेट गर्न सकिँदैन। <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync) सँग बन्डलहरू बनाउनुहोस् र हस्ताक्षर गर्नुहोस्।';
+$string['settings:policy_bundle_enabled'] = 'नीति बन्डल सिंक सक्षम गर्नुहोस्';
+$string['settings:policy_bundle_enabled_desc'] = 'सक्षम भएमा, दैनिक कार्यले हस्ताक्षरित बन्डलहरू ल्याउँछ र लागू गर्छ। पूर्वनिर्धारित रूपमा बन्द छ। अक्षम गर्दा सबै सिंकहरू तुरुन्तै रोकिन्छन्; पहिले लागू गरिएका सेटिङहरूले आफ्नो मान राख्छन्।';
+$string['settings:policy_bundle_url'] = 'नीति बन्डल URL';
+$string['settings:policy_bundle_url_desc'] = 'हस्ताक्षरित बन्डल JSON को HTTPS URL (उदाहरणका लागि S3 अब्जेक्ट वा GitHub raw URL)। URL ले AI प्रदायक इन्डपोइन्टहरू जस्तै SSRF प्रमाणीकरणबाट गुज्र्छ; निजी नेटवर्क वा plain-http होस्टहरूलाई SSRF विश्वसनीय इन्डपोइन्ट अनुमति सूचीमा प्रविष्टि चाहिन्छ।';
+$string['settings:policy_bundle_pubkey'] = 'नीति बन्डल सार्वजनिक कुञ्जी';
+$string['settings:policy_bundle_pubkey_desc'] = 'बन्डल हस्ताक्षरहरू प्रमाणित गर्न प्रयोग गरिने Base64 Ed25519 सार्वजनिक कुञ्जी। <code>policy_bundle_tool.php --keygen</code> सँग किपेयर उत्पन्न गर्नुहोस्; निजी कुञ्जी बन्डल लेखकसँग रहन्छ र कहिल्यै कतै अपलोड गर्नु हुँदैन।';
+$string['settings:policy_bundle_status'] = 'अन्तिम सिंक';
+$string['settings:policy_bundle_applied_version'] = 'लागू संस्करण';
+$string['task:policy_bundle_sync'] = 'SOLA हस्ताक्षरित नीति बन्डल सिंक';
+$string['policy_bundle:invalid'] = 'नीति बन्डल अस्वीकृत: {$a}';

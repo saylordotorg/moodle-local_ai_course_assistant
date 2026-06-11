@@ -1506,3 +1506,16 @@ $string['settings:cost_anomaly_enabled_desc'] = 'जब चालू हो, द
 $string['settings:cost_anomaly_multiplier'] = 'विसंगति गुणक';
 $string['settings:cost_anomaly_multiplier_desc'] = 'अलर्ट ट्रिगर करने के लिए आज के खर्च को इस गुणक × 7-दिन मीडियन से अधिक होना चाहिए। डिफ़ॉल्ट <code>2.0</code>। पहले चेतावनी के लिए <code>1.5</code> तक कम करें (नामांकन बर्स्ट के दौरान अधिक झूठे सकारात्मक)। <code>3.0</code> तक बढ़ाएँ यदि Saylor का उपयोग इतना अनियमित है कि 2x स्पाइक सामान्य हों।';
 $string['task:cost_anomaly_check'] = 'SOLA लागत विसंगति जाँच (दैनिक)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'हस्ताक्षरित नीति बंडल (दूरस्थ व्यवहार अपडेट)';
+$string['settings:policy_bundle_heading_desc'] = 'कोड डिप्लॉय के बिना क्रिप्टोग्राफिक रूप से हस्ताक्षरित JSON फ़ाइल से व्यवहार सेटिंग (प्रॉम्प्ट, रूटिंग, एस्केलेशन ट्रिगर, RAG ट्यूनिंग, व्यय नीति) लागू करें। एक दैनिक अनुसूचित कार्य बंडल URL लाता है, नीचे दी गई सार्वजनिक कुंजी के विरुद्ध उसके Ed25519 हस्ताक्षर की जाँच करता है, और सेटिंग तभी लागू करता है जब प्रत्येक कुंजी बिल्ट-इन अनुमति सूची में हो और बंडल संस्करण अंतिम लागू संस्करण से नया हो। API कुंजियाँ, URL, webhooks और सुरक्षा सेटिंग कभी भी बंडल द्वारा सेट नहीं की जा सकतीं। <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync) से बंडल बनाएं और हस्ताक्षर करें।';
+$string['settings:policy_bundle_enabled'] = 'नीति बंडल सिंक सक्षम करें';
+$string['settings:policy_bundle_enabled_desc'] = 'सक्षम होने पर, दैनिक कार्य हस्ताक्षरित बंडल लाता और लागू करता है। डिफ़ॉल्ट रूप से बंद। अक्षम करने से सभी सिंक तुरंत रुक जाते हैं; पहले से लागू सेटिंग अपने मान बनाए रखती हैं।';
+$string['settings:policy_bundle_url'] = 'नीति बंडल URL';
+$string['settings:policy_bundle_url_desc'] = 'हस्ताक्षरित बंडल JSON का HTTPS URL (उदाहरण के लिए S3 ऑब्जेक्ट या GitHub raw URL)। URL AI प्रदाता एंडपॉइंट के समान SSRF सत्यापन से गुजरता है; निजी नेटवर्क या plain-http होस्ट को SSRF विश्वसनीय एंडपॉइंट अनुमति सूची में एंट्री की आवश्यकता है।';
+$string['settings:policy_bundle_pubkey'] = 'नीति बंडल सार्वजनिक कुंजी';
+$string['settings:policy_bundle_pubkey_desc'] = 'बंडल हस्ताक्षर सत्यापित करने के लिए उपयोग की जाने वाली Base64 Ed25519 सार्वजनिक कुंजी। <code>policy_bundle_tool.php --keygen</code> से कीपेयर उत्पन्न करें; निजी कुंजी बंडल लेखक के पास रहती है और इसे कहीं भी अपलोड नहीं किया जाना चाहिए।';
+$string['settings:policy_bundle_status'] = 'अंतिम सिंक';
+$string['settings:policy_bundle_applied_version'] = 'लागू संस्करण';
+$string['task:policy_bundle_sync'] = 'SOLA हस्ताक्षरित नीति बंडल सिंक';
+$string['policy_bundle:invalid'] = 'नीति बंडल अस्वीकृत: {$a}';

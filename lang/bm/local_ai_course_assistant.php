@@ -1505,3 +1505,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Ni a bilalen don, tile kelen-ke
 $string['settings:cost_anomaly_multiplier'] = 'Wɛrɛya multiplier';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Tile sara ka kan ka multiplier × 7-tile median bɔ walisa ka kunnafoni bila. Sɔrɔminɛ <code>2.0</code>. <code>1.5</code> kama bɛ ɲɛna kunnafoni (false positives caaman enrollment waati). <code>3.0</code> kama bɛ yɛlɛma ni Saylor ka 2× spike bɛ kɛ sɔrɔminɛ ye.';
 $string['task:cost_anomaly_check'] = 'SOLA sara wɛrɛya sɛgɛsɛgɛli (tile kelen-kelen)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Policy bundle siningnen (ka ka kɛlɛ fɛ cogo cogo)';
+$string['settings:policy_bundle_heading_desc'] = 'Cogo jalabɔ (prompts, routing, escalation triggers, RAG tuning, spend policy) signed JSON file la, code deploy tɛ ka kan. Tile kelen kelen scheduled task b\'a donna bundle URL la, Ed25519 signature sɛgɛsɛgɛ public key la min b\'a ta kɔfɛ, ka settings to k\'a sɔrɔ key bɛɛ allowlist kɔnɔ ani bundle version kɔrɔ ka tɛmɛ tɔgɔ la min kɛra. API keys, URLs, webhooks, ani security settings tɛ se ka bɔ bundle la. Bundle daaw ani u sini <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync) baara la.';
+$string['settings:policy_bundle_enabled'] = 'Policy bundle sync daminɛ';
+$string['settings:policy_bundle_enabled_desc'] = 'A daminɛ tuma, tile kelen kelen task signed bundles sɔrɔ ka u to. A banna cogo la. A daminɛbali ka sync bɛɛ ban joona; settings min kɛra dɔrɔn, olu bɛ jɛ k\'u ka nɔgɔya mara.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'Signed bundle JSON HTTPS URL (misali S3 object walima GitHub raw URL). URL bɛ tɛmɛ SSRF validation la i n\'a fɔ AI provider endpoints; private-network walima plain-http hosts ka kan ka don SSRF trusted endpoints allowlist kɔnɔ.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 public key min bɛ baara ka bundle signatures sɛgɛsɛgɛ. Keypair kɛ <code>policy_bundle_tool.php --keygen</code> baara la; private key bɛ to bundle author fɛ, a kana tɛmɛ jɛ fɛ.';
+$string['settings:policy_bundle_status'] = 'Sync laban';
+$string['settings:policy_bundle_applied_version'] = 'version to';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'Policy bundle m\'a sɔn: {$a}';

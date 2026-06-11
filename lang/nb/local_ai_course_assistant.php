@@ -1483,3 +1483,16 @@ $string['settings:cost_anomaly_multiplier_desc'] = 'Dagens forbruk må overskrid
 $string['settings:prompt_debug_enabled'] = 'Logg sammenstilt systemprompt til fil';
 $string['settings:prompt_debug_enabled_desc'] = 'Når på skriver hver chat-tur den fullstendige sammenstilte systemprompten og per-seksjon tegntellinger til <code>moodledata/temp/sola_prompt_debug.log</code> (rullende ved ~1MB). Av som standard. Bruk til å måle promptstørrelse empirisk og revidere hvilke seksjoner som bidrar mest med tokens. Loggen inneholder kun systemprompten (ingen lærende-input eller PII).';
 $string['task:cost_anomaly_check'] = 'SOLA kostnadsavvikssjekk (daglig)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signert retningslinjepakke (fjernoppdateringer av atferd)';
+$string['settings:policy_bundle_heading_desc'] = 'Bruk atferdsinnstillinger (ledetekster, ruting, eskaleringsutløsere, RAG-justering, forbrukspolicy) fra en kryptografisk signert JSON-fil uten kodeutrulling. En daglig planlagt oppgave henter pakke-URL-en, verifiserer Ed25519-signaturen mot offentlig nøkkel nedenfor og bruker innstillingene bare hvis alle nøkler er på den innebygde tillatelseslisten og pakkeversjon er nyere enn den sist brukte. API-nøkler, URL-er, webhooks og sikkerhetsinnstillinger kan aldri angis av en pakke. Opprett og signer pakker med <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Aktiver synkronisering av retningslinjepakke';
+$string['settings:policy_bundle_enabled_desc'] = 'Når aktivert henter den daglige oppgaven og bruker signerte pakker. Deaktivert som standard. Deaktivering stopper alle synkroniseringer umiddelbart; allerede brukte innstillinger beholder verdiene sine.';
+$string['settings:policy_bundle_url'] = 'URL til retningslinjepakke';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL til den signerte pakke-JSON-en (for eksempel et S3-objekt eller GitHub raw URL). URL-en gjennomgår samme SSRF-validering som AI-leverandørenes endepunkter; private nettverks- eller plain-http-verter trenger en oppføring i SSRF-listen over klarerte endepunkter.';
+$string['settings:policy_bundle_pubkey'] = 'Offentlig nøkkel for retningslinjepakke';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 offentlig nøkkel som brukes til å verifisere pakkesignaturer. Generer nøkkelparet med <code>policy_bundle_tool.php --keygen</code>; den private nøkkelen forblir hos pakkeforfatteren og må aldri lastes opp noe sted.';
+$string['settings:policy_bundle_status'] = 'Siste synkronisering';
+$string['settings:policy_bundle_applied_version'] = 'brukt versjon';
+$string['task:policy_bundle_sync'] = 'SOLA signert retningslinjepakke-synkronisering';
+$string['policy_bundle:invalid'] = 'Retningslinjepakke avvist: {$a}';

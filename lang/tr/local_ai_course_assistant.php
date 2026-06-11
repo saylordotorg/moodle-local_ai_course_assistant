@@ -1475,3 +1475,31 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Açıkken, günlük zamanlanmı
 $string['settings:cost_anomaly_multiplier'] = 'Anomali çarpanı';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Uyarı tetiklemek için bugünün harcaması bu çarpan × 7 günlük ortalamanın üzerinde olmalıdır. Varsayılan <code>2.0</code>. Daha erken uyarılar için <code>1.5</code>\'e düşürün (kayıt artışlarında daha fazla yanlış pozitif). Saylor\'un kullanımı 2 katlık artışların rutin sayılacağı kadar değişkense <code>3.0</code>\'a yükseltin.';
 $string['task:cost_anomaly_check'] = 'SOLA maliyet anomali kontrolü (günlük)';
+
+// v6.4.0 signed policy bundle strings
+$string['settings:policy_bundle_heading'] = 'İmzalı politika paketi (uzaktan davranış güncellemeleri)';
+$string['settings:policy_bundle_heading_desc'] = 'Kod dağıtımı olmadan şifreli olarak imzalanmış JSON dosyasından davranış ayarlarını (istemler, yönlendirme, yükseltme tetikleyicileri, RAG ayarları, harcama politikası) uygulayın. Günlük zamanlanmış bir görev paket URL\'sini alır, aşağıdaki genel anahtara göre Ed25519 imzasını doğrular ve yalnızca her anahtar yerleşik izin listesinde yer alıyorsa ve paket sürümü en son uygulanan sürümden daha yeniyse ayarları uygular. API anahtarları, URL\'ler, webhook\'lar ve güvenlik ayarları hiçbir zaman bir paket tarafından ayarlanamaz. Paketleri <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync) ile oluşturun ve imzalayın.';
+$string['settings:policy_bundle_enabled'] = 'Politika paketi senkronizasyonunu etkinleştir';
+$string['settings:policy_bundle_enabled_desc'] = 'Etkinleştirildiğinde, günlük görev imzalı paketleri alır ve uygular. Varsayılan olarak kapalıdır. Devre dışı bırakma tüm senkronizasyonları hemen durdurur; zaten uygulanmış ayarlar değerlerini korur.';
+$string['settings:policy_bundle_url'] = 'Politika paketi URL\'si';
+$string['settings:policy_bundle_url_desc'] = 'İmzalı paket JSON\'ının HTTPS URL\'si (örneğin bir S3 nesnesi veya GitHub raw URL). URL, yapay zeka sağlayıcı uç noktalarıyla aynı SSRF doğrulamasından geçer; özel ağ veya plain-http ana bilgisayarlarının SSRF güvenilir uç noktaları izin listesine bir giriş eklemesi gerekir.';
+$string['settings:policy_bundle_pubkey'] = 'Politika paketi genel anahtarı';
+$string['settings:policy_bundle_pubkey_desc'] = 'Paket imzalarını doğrulamak için kullanılan Base64 Ed25519 genel anahtarı. Anahtar çiftini <code>policy_bundle_tool.php --keygen</code> ile oluşturun; özel anahtar paket yazarında kalır ve hiçbir yere yüklenmemelidir.';
+$string['settings:policy_bundle_status'] = 'Son senkronizasyon';
+$string['settings:policy_bundle_applied_version'] = 'uygulanan sürüm';
+$string['task:policy_bundle_sync'] = 'SOLA imzalı politika paketi senkronizasyonu';
+$string['policy_bundle:invalid'] = 'Politika paketi reddedildi: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'İmzalı ilke paketi (uzaktan davranış güncellemeleri)';
+$string['settings:policy_bundle_heading_desc'] = 'Kod dağıtımı olmaksızın kriptografik olarak imzalanmış bir JSON dosyasından davranış ayarlarını (istemler, yönlendirme, yükseltme tetikleyicileri, RAG ayarı, harcama politikası) uygular. Günlük zamanlanmış bir görev paket URL\'sini alır, Ed25519 imzasını aşağıdaki genel anahtara göre doğrular ve ayarları yalnızca her anahtar yerleşik izin listesindeyse ve paket sürümü en son uygulananından daha yeniyse uygular. API anahtarları, URL\'ler, web kancaları ve güvenlik ayarları asla bir paket tarafından ayarlanamaz. <code>admin/cli/policy_bundle_tool.php</code> ile paketler oluşturun ve imzalayın (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'İlke paketi senkronizasyonunu etkinleştir';
+$string['settings:policy_bundle_enabled_desc'] = 'Etkinleştirildiğinde, günlük görev imzalı paketleri alır ve uygular. Varsayılan olarak kapalıdır. Devre dışı bırakma tüm senkronizasyonları hemen durdurur; zaten uygulanmış ayarlar değerlerini korur.';
+$string['settings:policy_bundle_url'] = 'İlke paketi URL\'si';
+$string['settings:policy_bundle_url_desc'] = 'İmzalı paket JSON\'unun HTTPS URL\'si (örneğin bir S3 nesnesi veya GitHub ham URL\'si). URL, AI sağlayıcısı uç noktalarıyla aynı SSRF doğrulamasından geçer; özel ağ veya plain-http ana bilgisayarlarının SSRF güvenilir uç noktalar izin listesine bir giriş eklemesi gerekir.';
+$string['settings:policy_bundle_pubkey'] = 'İlke paketi genel anahtarı';
+$string['settings:policy_bundle_pubkey_desc'] = 'Paket imzalarını doğrulamak için kullanılan Base64 Ed25519 genel anahtarı. Anahtar çiftini <code>policy_bundle_tool.php --keygen</code> ile oluşturun; özel anahtar paket yazarında kalır ve asla hiçbir yere yüklenmemelidir.';
+$string['settings:policy_bundle_status'] = 'Son senkronizasyon';
+$string['settings:policy_bundle_applied_version'] = 'uygulanan sürüm';
+$string['task:policy_bundle_sync'] = 'SOLA imzalı ilke paketi senkronizasyonu';
+$string['policy_bundle:invalid'] = 'İlke paketi reddedildi: {$a}';

@@ -1493,3 +1493,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Marka la shido, hawsha nidaamsa
 $string['settings:cost_anomaly_multiplier'] = 'Dhaliisha khaladaadka';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Kharashyada maanta waa inay dhaafaan dhaliishahan × mediana 7-maalmoodka si ogeysiis loogu kicin. Caadiga <code>2.0</code>. Hoos u dhig <code>1.5</code> digniinadii hore (khaladaadka been-abuurka badan inta lagu jiro kululeynta qorista). Sare u qaad <code>3.0</code> haddii isticmaalka Saylor uu si ku filan u xoogaan yahay in 2x-ka duffanka ay caadi yihiin.';
 $string['task:cost_anomaly_check'] = 'Hubinta maalinlaha ah ee khaladaadka kharashka SOLA';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Xidhmada siyaasadda saxiixan (cusboonaysiinta dhaqanka fog)';
+$string['settings:policy_bundle_heading_desc'] = 'Ku dabaq goobaha dhaqanka (tilmaamaha, waddooyinka, sababaha koritaanka, dejinta RAG, siyaasadda kharashka) faylka JSON ee saxiixan cryptographically iyada oo aan la gelin kood. Hawsha maalinlaha ah ee la qorsheeyay waxay soo jiidataa URL-ka xidhmada, xaqiijisaa saxiixiisa Ed25519 iyadoo la barbar dhigayo furaha guud ee hoose, waxayna ku dabaqaysaa goobaha kaliya haddii furaha kasta uu ku jiro liiska la ogolaaday ee la dhisay iyo nooca xidhmada oo ka cusub kan ugu dambeeyay ee la dabaqay. Furaha API, URL-yada, webhooks-ka, iyo goobaha amniga marar dambe lama awoodi karo in xidhmad ay dejiso. Ku soo abuur oo saxiix xidhmadaha <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Furi isku-dubbaridka xidhmada siyaasadda';
+$string['settings:policy_bundle_enabled_desc'] = 'Markay furan tahay, hawsha maalinlaha ah waxay soo jiidataa oo ku dabaqaysaa xidhmadaha saxiixan. Si caadi ah waa xidnaantahay. Xidista waxay si deg-deg ah u joojisaa dhammaan isku-dubbaridyada; goobaha hore loo dabaqay waxay hayaan qiyamkooda.';
+$string['settings:policy_bundle_url'] = 'URL-ka xidhmada siyaasadda';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL-ka JSON-ka xidhmada saxiixan (tusaale ahaan walax S3 ah ama GitHub raw URL). URL-ku wuxuu marayaa xaqiijinta SSRF isku mid ah sida dhamaadyada bixiyaha AI; martida shabakadda gaarka ah ama plain-http waxay u baahan yihiin gelitaan liiska la ogolaaday ee dhamaadyada la aaminsan SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Furaha guud ee xidhmada siyaasadda';
+$string['settings:policy_bundle_pubkey_desc'] = 'Furaha guud Base64 Ed25519 ee loo isticmaalo xaqiijinta saxiixada xidhmada. Ku soo abuuri labada fur <code>policy_bundle_tool.php --keygen</code>; furaha gaarka ah wuxuu xidhmada la joogaa qoraaha oo marna lama soo gelin karo meel kasta.';
+$string['settings:policy_bundle_status'] = 'Isku-dubbaridkii ugu dambeeyay';
+$string['settings:policy_bundle_applied_version'] = 'nooca la dabaqay';
+$string['task:policy_bundle_sync'] = 'SOLA isku-dubbaridka xidhmada siyaasadda saxiixan';
+$string['policy_bundle:invalid'] = 'Xidhmada siyaasadda waa la diiday: {$a}';

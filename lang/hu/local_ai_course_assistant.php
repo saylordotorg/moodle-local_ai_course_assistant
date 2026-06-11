@@ -1519,3 +1519,16 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Bekapcsolva a napi ütemezett f
 $string['settings:cost_anomaly_multiplier'] = 'Rendellenesség-szorzó';
 $string['settings:cost_anomaly_multiplier_desc'] = 'A mai kiadásnak meg kell haladnia ezt a szorzót × a 7 napos mediánt a riasztás aktiválásához. Alapértelmezés: <code>2.0</code>. Csökkentse <code>1.5</code>-re a korábbi figyelmeztetéshez (több téves riasztás beiratkozási csúcsok idején). Növelje <code>3.0</code>-ra, ha a Saylor használata elég hullámos ahhoz, hogy a 2-szeres kiugrások rutinszerűek legyenek.';
 $string['task:cost_anomaly_check'] = 'SOLA napi költségrendellenesség-ellenőrzés';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Aláírt irányelvcsomag (távoli viselkedésfrissítések)';
+$string['settings:policy_bundle_heading_desc'] = 'Viselkedési beállítások (promptok, útválasztás, eszkalációs triggerek, RAG-hangolás, kiadási irányelv) alkalmazása kriptográfiailag aláírt JSON-fájlból kóddeploy nélkül. Egy napi ütemezett feladat lekéri a csomag URL-jét, ellenőrzi Ed25519-aláírását az alábbi nyilvános kulccsal szemben, és csak akkor alkalmazza a beállításokat, ha minden kulcs szerepel a beépített engedélyezési listán, és a csomagverzió újabb, mint az utoljára alkalmazott. API-kulcsok, URL-ek, webhookok és biztonsági beállítások soha nem állíthatók be csomaggal. Csomagokat hozzon létre és írjon alá a <code>admin/cli/policy_bundle_tool.php</code> segítségével (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Irányelvcsomag-szinkronizálás engedélyezése';
+$string['settings:policy_bundle_enabled_desc'] = 'Ha engedélyezve van, a napi feladat lekéri és alkalmazza az aláírt csomagokat. Alapértelmezés szerint kikapcsolva. A letiltás azonnal leállít minden szinkronizálást; a már alkalmazott beállítások megőrzik értékeiket.';
+$string['settings:policy_bundle_url'] = 'Irányelvcsomag URL-je';
+$string['settings:policy_bundle_url_desc'] = 'Az aláírt csomaghoz tartozó JSON HTTPS URL-je (például S3-objektum vagy GitHub raw URL). Az URL ugyanolyan SSRF-érvényesítésen megy át, mint az AI-szolgáltatói végpontok; magánhálózati vagy plain-http gazdagépeknek szükségük van egy bejegyzésre az SSRF megbízható végpontjainak engedélyezési listáján.';
+$string['settings:policy_bundle_pubkey'] = 'Irányelvcsomag nyilvános kulcsa';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 nyilvános kulcs a csomagaláírások ellenőrzéséhez. A kulcspárt a <code>policy_bundle_tool.php --keygen</code> paranccsal generálja; a privát kulcs a csomag szerzőjénél marad, és soha nem tölthető fel sehová.';
+$string['settings:policy_bundle_status'] = 'Utolsó szinkronizálás';
+$string['settings:policy_bundle_applied_version'] = 'alkalmazott verzió';
+$string['task:policy_bundle_sync'] = 'SOLA aláírt irányelvcsomag-szinkronizálás';
+$string['policy_bundle:invalid'] = 'Az irányelvcsomag elutasítva: {$a}';

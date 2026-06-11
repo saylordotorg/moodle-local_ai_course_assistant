@@ -1498,3 +1498,30 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Su ubbeeku, tâche planifié bu
 $string['settings:cost_anomaly_multiplier'] = 'Multiplicateur anomalie';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Njëg bu tëdde war a tëmm multiplicateur bii × médiane 7 fan ngir déclencher benn alerte. Bu defawul <code>2.0</code>. Wàññi ko ci <code>1.5</code> ngir alerte yi gëna jot (faux positifs yi gëna bari ci inscription burst yi). Yokk ko ci <code>3.0</code> su Saylor di jëfandikoo ci yënenteem bi spike 2x ay routine.';
 $string['task:cost_anomaly_check'] = 'Vérification anomalie njëg SOLA (bu fan bu tëdde)';
+
+$string['settings:policy_bundle_heading'] = 'Policy bundle bi signée (yeesal jëf yi ci kanam)';
+$string['settings:policy_bundle_heading_desc'] = 'Jëfandikoo yettali jëf yi (prompts, routing, escalation triggers, RAG tuning, spend policy) ci benn fichier JSON bu signée bu cryptographique, mënula dëgg deploy bu code. Benn tâche bi programée ci benn fan rekk jeex URL ji ci bundle bi, verifie sa signature Ed25519 ak clé publique bi ci suuf bi, te apply settings yi seulement su benn key am ci allowlist bi bu defar ci biir ak version ji ci bundle bi buy moy ju bees ngir version ji postée ci kanam. API keys, URLs, webhooks, ak settings sécurité dañuy mën xammal bundle bi. Author ak signer bundles yi ak <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Sàmm policy bundle sync';
+$string['settings:policy_bundle_enabled_desc'] = 'Su sàmm na, tâche bi ci benn fan rekk jeex ak apply bundles yu signée yi. Séy na ci sëriñ. Dàkk rekk dañuy sàqq sync yépp tey; settings yi ci kanam bi apply na dañuy mëneel jëfandikoo ba kanam.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS bi ci bundle JSON bi signée (par exemple benn objet S3 walla GitHub raw URL). URL bi jëm ci validation SSRF bu mel ni ay endpoints yu bixeex AI yi; private-network walla plain-http hosts dañuy soxor benn entrée ci SSRF trusted endpoints allowlist bi.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 public key bi jëfandikoo ngir verifie signatures yi ci bundle bi. Génère keypair bi ak <code>policy_bundle_tool.php --keygen</code>; private key bi deka ak auteur bundle bi, bëgul télécharge fi ak fi.';
+$string['settings:policy_bundle_status'] = 'Sync bi ci kanam';
+$string['settings:policy_bundle_applied_version'] = 'version bi postée';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'Policy bundle bi mënul: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Policy bundle bu signée (mises à jour comportement yi bu jan)';
+$string['settings:policy_bundle_heading_desc'] = 'Appliquer paramètres comportement yi (prompts, routing, déclencheurs escalation, réglage RAG, politique dépenses) ci benn fichier JSON bu signée cryptographiquement sans déploiement code. Tâche planifiée bu fan bi day télécharger URL bundle bi, vérifier sa signature Ed25519 ba clé publique bi ci tëdd bi, te day appliquer paramètres yi seulement bu clé yépp ñu nekk ci liste autorisation bi bu bañal te version bundle bi ñu gëna yees ci ñu codsaday yi ñu dimbëleel. Clés API, URL yi, webhooks yi, ak paramètres sécurité yi dafay baaje askan wá bundle lañu set. Créer te signer bundles yi ak <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Ubbi policy bundle sync';
+$string['settings:policy_bundle_enabled_desc'] = 'Su ubbeeku, tâche bu fan bi day télécharger te appliquer bundles yu signées. Bu defawul dafa ferme. Fermeelu dafa arrêter sync yépp dëgg dëgg; paramètres yu déjà appliquées yi day garder valeurs yi.';
+$string['settings:policy_bundle_url'] = 'URL policy bundle';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS bu JSON bundle bu signée (misaal bu bari S3 object wall GitHub raw URL). URL bi day passer ci même validation SSRF yi te endpoints fournisseurs AI yi; hôtes réseau privé wall plain-http yi dañu soxor entrée ci liste autorisation endpoints SSRF yi nu jëm jaam.';
+$string['settings:policy_bundle_pubkey'] = 'Clé publique policy bundle';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 clé publique bu jëfandikoo ngir vérifier signatures bundles yi. Générer paire clés yi ak <code>policy_bundle_tool.php --keygen</code>; clé privée bi day dem ak auteur bundle bi te du wax ni ñu ko upload fenn.';
+$string['settings:policy_bundle_status'] = 'Sync bu mujj';
+$string['settings:policy_bundle_applied_version'] = 'version bu appliqué';
+$string['task:policy_bundle_sync'] = 'SOLA policy bundle bu signée sync';
+$string['policy_bundle:invalid'] = 'Policy bundle refusé: {$a}';

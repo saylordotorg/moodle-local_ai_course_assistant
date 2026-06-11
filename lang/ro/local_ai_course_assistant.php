@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Când este activat, sarcina pro
 $string['settings:cost_anomaly_multiplier'] = 'Multiplicator de anomalie';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Cheltuielile de astăzi trebuie să depășească acest multiplicator × mediana pe 7 zile pentru a declanșa o alertă. Implicit <code>2.0</code>. Reduceți la <code>1.5</code> pentru avertismente mai timpurii (mai multe fals pozitive în perioadele de înregistrare mare). Ridicați la <code>3.0</code> dacă utilizarea Saylor este suficient de în rafale încât vârfurile de 2x să fie de rutină.';
 $string['task:cost_anomaly_check'] = 'Verificare zilnică anomalii cost SOLA';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Pachet de politici semnat (actualizări de comportament la distanță)';
+$string['settings:policy_bundle_heading_desc'] = 'Aplicați setările de comportament (solicitări, rutare, declanșatori de escaladare, reglare RAG, politică de cheltuieli) dintr-un fișier JSON semnat criptografic fără implementare de cod. O sarcină planificată zilnică preia URL-ul pachetului, verifică semnătura Ed25519 față de cheia publică de mai jos și aplică setările numai dacă fiecare cheie se află în lista de permisiuni integrată și versiunea pachetului este mai nouă decât ultima aplicată. Cheile API, URL-urile, webhook-urile și setările de securitate nu pot fi niciodată setate de un pachet. Creați și semnați pachete cu <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Activați sincronizarea pachetului de politici';
+$string['settings:policy_bundle_enabled_desc'] = 'Când este activată, sarcina zilnică preia și aplică pachete semnate. Dezactivată în mod implicit. Dezactivarea oprește imediat toate sincronizările; setările deja aplicate își păstrează valorile.';
+$string['settings:policy_bundle_url'] = 'URL-ul pachetului de politici';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS al JSON-ului pachetului semnat (de exemplu, un obiect S3 sau GitHub raw URL). URL-ul trece prin aceeași validare SSRF ca și punctele finale ale furnizorilor AI; gazdele din rețeaua privată sau plain-http necesită o intrare în lista de permisiuni a punctelor finale de încredere SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Cheia publică a pachetului de politici';
+$string['settings:policy_bundle_pubkey_desc'] = 'Cheia publică Base64 Ed25519 utilizată pentru verificarea semnăturilor pachetelor. Generați perechea de chei cu <code>policy_bundle_tool.php --keygen</code>; cheia privată rămâne la autorul pachetului și nu trebuie niciodată încărcată nicăieri.';
+$string['settings:policy_bundle_status'] = 'Ultima sincronizare';
+$string['settings:policy_bundle_applied_version'] = 'versiune aplicată';
+$string['task:policy_bundle_sync'] = 'Sincronizarea pachetului de politici semnat SOLA';
+$string['policy_bundle:invalid'] = 'Pachetul de politici a fost respins: {$a}';

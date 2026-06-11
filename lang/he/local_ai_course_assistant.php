@@ -1519,3 +1519,16 @@ $string['settings:cost_anomaly_enabled_desc'] = 'כאשר מופעל, המשימ
 $string['settings:cost_anomaly_multiplier'] = 'מכפיל חריגה';
 $string['settings:cost_anomaly_multiplier_desc'] = 'הוצאות היום חייבות לעלות על מכפיל זה × החציון ל-7 ימים כדי להפעיל התראה. ברירת מחדל <code>2.0</code>. הורד ל-<code>1.5</code> לאזהרות מוקדמות יותר (יותר פוזיטיביים שגויים בזמן גלי רישום). העלה ל-<code>3.0</code> אם השימוש של Saylor מספיק לא יציב כדי שפיקים פי 2 יהיו שגרתיים.';
 $string['task:cost_anomaly_check'] = 'בדיקת חריגות עלויות SOLA (יומית)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'חבילת מדיניות חתומה (עדכוני התנהגות מרחוק)';
+$string['settings:policy_bundle_heading_desc'] = 'החל הגדרות התנהגות (הנחיות, ניתוב, טריגרים להסלמה, כיוונון RAG, מדיניות הוצאות) מקובץ JSON חתום קריפטוגרפית ללא פריסת קוד. משימה מתוזמנת יומית מאחזרת את ה-URL של החבילה, מאמתת את חתימת Ed25519 שלה מול המפתח הציבורי שלהלן, ומחילה את ההגדרות רק אם כל מפתח נמצא ברשימת ההיתרים המובנית וגרסת החבילה חדשה יותר מהאחרונה שהוחלה. מפתחות API, כתובות URL, webhooks והגדרות אבטחה לעולם אינם יכולים להיות מוגדרים על ידי חבילה. צרו וחתמו על חבילות באמצעות <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'הפעל סנכרון חבילת מדיניות';
+$string['settings:policy_bundle_enabled_desc'] = 'כאשר מופעל, המשימה היומית מאחזרת ומחילה חבילות חתומות. כבוי כברירת מחדל. השבתה מפסיקה את כל הסנכרונים מיד; הגדרות שכבר הוחלו שומרות על ערכיהן.';
+$string['settings:policy_bundle_url'] = 'URL של חבילת מדיניות';
+$string['settings:policy_bundle_url_desc'] = 'כתובת HTTPS URL של ה-JSON של החבילה החתומה (לדוגמה אובייקט S3 או GitHub raw URL). ה-URL עובר את אותו אימות SSRF כמו נקודות קצה של ספקי AI; מארחים ברשת פרטית או plain-http זקוקים לרשומה ברשימת ההיתרים של נקודות קצה מהימנות של SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'מפתח ציבורי של חבילת מדיניות';
+$string['settings:policy_bundle_pubkey_desc'] = 'מפתח ציבורי Base64 Ed25519 המשמש לאימות חתימות חבילה. צרו את זוג המפתחות באמצעות <code>policy_bundle_tool.php --keygen</code>; המפתח הפרטי נשאר אצל מחבר החבילה ואסור בהחלט להעלותו לשום מקום.';
+$string['settings:policy_bundle_status'] = 'סנכרון אחרון';
+$string['settings:policy_bundle_applied_version'] = 'גרסה מוחלת';
+$string['task:policy_bundle_sync'] = 'סנכרון חבילת מדיניות חתומה של SOLA';
+$string['policy_bundle:invalid'] = 'חבילת המדיניות נדחתה: {$a}';

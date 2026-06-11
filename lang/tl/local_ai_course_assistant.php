@@ -1498,3 +1498,31 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Kapag naka-on, sinusuri ng araw
 $string['settings:cost_anomaly_multiplier'] = 'Anomaly multiplier';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Ang gastos ngayon ay dapat lumampas sa multiplier na ito × ang 7-day median upang ma-trigger ang isang alerto. Default na <code>2.0</code>. Bawasan sa <code>1.5</code> para sa mas maagang mga babala (mas maraming false positive sa panahon ng mga enrollment burst). Itaas sa <code>3.0</code> kung ang paggamit ng Saylor ay sapat na magulo upang ang 2x spike ay karaniwan.';
 $string['task:cost_anomaly_check'] = 'SOLA cost anomaly check (araw-araw)';
+
+// v6.4.0 signed policy bundle strings
+$string['settings:policy_bundle_heading'] = 'Nilagdaang bundle ng patakaran (mga malalayong update sa gawi)';
+$string['settings:policy_bundle_heading_desc'] = 'Ilapat ang mga setting ng gawi (mga prompt, routing, mga trigger ng escalation, pag-aayos ng RAG, patakaran sa gastos) mula sa isang cryptographically na nilagdaang JSON file nang walang code deploy. Isang araw-araw na naka-iskedyul na gawain ang kumukuha ng bundle URL, bine-verify ang Ed25519 signature nito laban sa pampublikong key sa ibaba, at inilalapat ang mga setting lamang kung ang bawat key ay nasa built-in na allowlist at ang bersyon ng bundle ay mas bago kaysa sa huling inilapat. Ang mga API key, URL, webhook, at mga setting ng seguridad ay hindi maaaring itakda ng bundle. Gumawa at pumirma ng mga bundle gamit ang <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'I-enable ang pag-sync ng bundle ng patakaran';
+$string['settings:policy_bundle_enabled_desc'] = 'Kapag naka-enable, ang araw-araw na gawain ay kumukuha at naglalapat ng mga nilagdaang bundle. Naka-off bilang default. Ang pag-disable ay agad na nagtigil ng lahat ng pag-sync; ang mga setting na naaplikahan na ay pinapanatili ang kanilang mga halaga.';
+$string['settings:policy_bundle_url'] = 'URL ng bundle ng patakaran';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL ng nilagdaang bundle na JSON (halimbawa isang S3 object o GitHub raw URL). Ang URL ay dumadaan sa parehong SSRF validation gaya ng mga endpoint ng AI provider; ang mga private-network o plain-http host ay nangangailangan ng entry sa SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'Pampublikong key ng bundle ng patakaran';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 pampublikong key na ginagamit upang i-verify ang mga bundle signature. Buuin ang keypair gamit ang <code>policy_bundle_tool.php --keygen</code>; ang pribadong key ay nananatili sa may-akda ng bundle at hindi dapat ma-upload kahit saan.';
+$string['settings:policy_bundle_status'] = 'Huling pag-sync';
+$string['settings:policy_bundle_applied_version'] = 'inilapat na bersyon';
+$string['task:policy_bundle_sync'] = 'SOLA nilagdaang pag-sync ng bundle ng patakaran';
+$string['policy_bundle:invalid'] = 'Tinanggihan ang bundle ng patakaran: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Nilagdaang policy bundle (malalayong pag-update ng gawi)';
+$string['settings:policy_bundle_heading_desc'] = 'Mag-apply ng mga setting ng gawi (mga prompt, routing, mga trigger ng escalation, pag-tune ng RAG, patakaran sa gastos) mula sa isang kriptograpikong nilagdaang JSON na file nang walang pag-deploy ng code. Ang isang araw-araw na naka-iskedyul na gawain ay kumuha ng bundle URL, bine-verify ang Ed25519 signature nito laban sa pampublikong key sa ibaba, at ina-apply ang mga setting lamang kung ang bawat key ay nasa built-in na allowlist at ang bersyon ng bundle ay mas bago kaysa sa huling na-apply. Ang mga API key, URL, webhook, at setting ng seguridad ay hindi kailanman maaaring itakda ng isang bundle. Gumawa at lagdaan ng mga bundle gamit ang <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'I-enable ang policy bundle sync';
+$string['settings:policy_bundle_enabled_desc'] = 'Kapag naka-enable, ang araw-araw na gawain ay kumukuha at nag-a-apply ng mga nilagdaang bundle. Naka-off bilang default. Ang pag-disable ay agad na nagtigil ng lahat ng sync; ang mga setting na na-apply na ay pinapanatili ang kanilang mga halaga.';
+$string['settings:policy_bundle_url'] = 'URL ng policy bundle';
+$string['settings:policy_bundle_url_desc'] = 'URL ng HTTPS ng nilagdaang bundle JSON (halimbawa isang S3 object o GitHub raw URL). Ang URL ay dumadaan sa parehong SSRF validation gaya ng mga AI provider endpoint; ang mga host ng pribadong network o plain-http ay nangangailangan ng entry sa SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'Pampublikong key ng policy bundle';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 pampublikong key na ginagamit upang i-verify ang mga lagda ng bundle. Buuin ang keypair gamit ang <code>policy_bundle_tool.php --keygen</code>; ang pribadong key ay nananatili sa may-akda ng bundle at hindi kailanman dapat i-upload kahit saan.';
+$string['settings:policy_bundle_status'] = 'Huling sync';
+$string['settings:policy_bundle_applied_version'] = 'na-apply na bersyon';
+$string['task:policy_bundle_sync'] = 'SOLA nilagdaang policy bundle sync';
+$string['policy_bundle:invalid'] = 'Policy bundle tinanggihan: {$a}';

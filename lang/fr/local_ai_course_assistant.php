@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Lorsqu\'activé, la tâche plan
 $string['settings:cost_anomaly_multiplier'] = 'Multiplicateur d\'anomalie';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Les dépenses d\'aujourd\'hui doivent dépasser ce multiplicateur × la médiane sur 7 jours pour déclencher une alerte. Par défaut <code>2.0</code>. Abaissez à <code>1.5</code> pour des avertissements plus précoces (plus de faux positifs lors des pics d\'inscription). Augmentez à <code>3.0</code> si l\'utilisation de Saylor est suffisamment irrégulière pour que des pics de 2x soient habituels.';
 $string['task:cost_anomaly_check'] = 'Vérification des anomalies de coûts SOLA (quotidienne)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Pack de politiques signé (mises à jour du comportement à distance)';
+$string['settings:policy_bundle_heading_desc'] = 'Appliquez des paramètres de comportement (invites, routage, déclencheurs d\'escalade, réglage RAG, politique de dépenses) depuis un fichier JSON signé cryptographiquement sans déploiement de code. Une tâche planifiée quotidienne récupère l\'URL du pack, vérifie sa signature Ed25519 par rapport à la clé publique ci-dessous et applique les paramètres uniquement si chaque clé figure dans la liste d\'autorisation intégrée et si la version du pack est plus récente que la dernière appliquée. Les clés API, les URL, les webhooks et les paramètres de sécurité ne peuvent jamais être définis par un pack. Créez et signez des packs avec <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Activer la synchronisation du pack de politiques';
+$string['settings:policy_bundle_enabled_desc'] = 'Lorsqu\'activée, la tâche quotidienne récupère et applique les packs signés. Désactivée par défaut. La désactivation arrête immédiatement toutes les synchronisations ; les paramètres déjà appliqués conservent leurs valeurs.';
+$string['settings:policy_bundle_url'] = 'URL du pack de politiques';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS du JSON du pack signé (par exemple un objet S3 ou GitHub raw URL). L\'URL est soumise à la même validation SSRF que les points de terminaison des fournisseurs d\'IA ; les hôtes de réseau privé ou plain-http nécessitent une entrée dans la liste d\'autorisation des points de terminaison SSRF de confiance.';
+$string['settings:policy_bundle_pubkey'] = 'Clé publique du pack de politiques';
+$string['settings:policy_bundle_pubkey_desc'] = 'Clé publique Base64 Ed25519 utilisée pour vérifier les signatures du pack. Générez la paire de clés avec <code>policy_bundle_tool.php --keygen</code> ; la clé privée reste chez l\'auteur du pack et ne doit jamais être téléchargée nulle part.';
+$string['settings:policy_bundle_status'] = 'Dernière synchronisation';
+$string['settings:policy_bundle_applied_version'] = 'version appliquée';
+$string['task:policy_bundle_sync'] = 'Synchronisation du pack de politiques signé SOLA';
+$string['policy_bundle:invalid'] = 'Pack de politiques rejeté : {$a}';

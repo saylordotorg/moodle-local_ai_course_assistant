@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Gdy włączone, codzienne zapla
 $string['settings:cost_anomaly_multiplier'] = 'Mnożnik anomalii';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Dzisiejsze wydatki muszą przekroczyć ten mnożnik × medianę z 7 dni, aby wyzwolić alert. Domyślnie <code>2.0</code>. Obniż do <code>1.5</code>, aby uzyskać wcześniejsze ostrzeżenia (więcej fałszywych pozytywów podczas nagłego wzrostu zapisów). Podnieś do <code>3.0</code>, jeśli użycie Saylor jest wystarczająco burstowe, że skoki 2x są rutynowe.';
 $string['task:cost_anomaly_check'] = 'Codzienna kontrola anomalii kosztów SOLA';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Podpisany pakiet zasad (zdalne aktualizacje zachowania)';
+$string['settings:policy_bundle_heading_desc'] = 'Zastosuj ustawienia zachowania (podpowiedzi, routing, wyzwalacze eskalacji, dostrajanie RAG, zasady wydatków) z kryptograficznie podpisanego pliku JSON bez wdrażania kodu. Codzienne zaplanowane zadanie pobiera URL pakietu, weryfikuje jego podpis Ed25519 względem poniższego klucza publicznego i stosuje ustawienia tylko wtedy, gdy każdy klucz jest na wbudowanej liście dozwolonych i wersja pakietu jest nowsza niż ostatnio zastosowana. Klucze API, URL-e, webhooki i ustawienia zabezpieczeń nigdy nie mogą być ustawiane przez pakiet. Twórz i podpisuj pakiety za pomocą <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Włącz synchronizację pakietu zasad';
+$string['settings:policy_bundle_enabled_desc'] = 'Po włączeniu codzienne zadanie pobiera i stosuje podpisane pakiety. Domyślnie wyłączone. Wyłączenie natychmiast wstrzymuje wszystkie synchronizacje; już zastosowane ustawienia zachowują swoje wartości.';
+$string['settings:policy_bundle_url'] = 'URL pakietu zasad';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL podpisanego JSON pakietu (na przykład obiekt S3 lub GitHub raw URL). URL przechodzi tę samą walidację SSRF co punkty końcowe dostawców AI; hosty sieci prywatnej lub plain-http wymagają wpisu na liście dozwolonych zaufanych punktów końcowych SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Klucz publiczny pakietu zasad';
+$string['settings:policy_bundle_pubkey_desc'] = 'Klucz publiczny Base64 Ed25519 używany do weryfikacji podpisów pakietu. Wygeneruj parę kluczy za pomocą <code>policy_bundle_tool.php --keygen</code>; klucz prywatny pozostaje u autora pakietu i nigdy nie może być nigdzie przesłany.';
+$string['settings:policy_bundle_status'] = 'Ostatnia synchronizacja';
+$string['settings:policy_bundle_applied_version'] = 'zastosowana wersja';
+$string['task:policy_bundle_sync'] = 'SOLA synchronizacja podpisanego pakietu zasad';
+$string['policy_bundle:invalid'] = 'Pakiet zasad odrzucony: {$a}';

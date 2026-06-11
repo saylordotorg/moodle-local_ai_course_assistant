@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Wenn aktiviert, bewertet die t�
 $string['settings:cost_anomaly_multiplier'] = 'Anomalie-Multiplikator';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Die heutigen Ausgaben müssen diesen Multiplikator × den 7-Tage-Median überschreiten, um eine Benachrichtigung auszulösen. Standard: <code>2.0</code>. Auf <code>1.5</code> senken für frühere Warnungen (mehr Falsch-Positive bei Einschreibungsspitzen). Auf <code>3.0</code> erhöhen, wenn Saylors Nutzung so unregelmäßig ist, dass 2×-Spitzen routinemäßig sind.';
 $string['task:cost_anomaly_check'] = 'SOLA-Kostenanomalie-Prüfung (täglich)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signiertes Richtlinienpaket (Remote-Verhaltensänderungen)';
+$string['settings:policy_bundle_heading_desc'] = 'Verhaltenseinstellungen (Prompts, Routing, Eskalations-Trigger, RAG-Anpassung, Ausgabenrichtlinie) aus einer kryptografisch signierten JSON-Datei ohne Code-Deployment anwenden. Eine tägliche geplante Aufgabe ruft die Bundle-URL ab, verifiziert die Ed25519-Signatur anhand des unten angegebenen öffentlichen Schlüssels und wendet die Einstellungen nur an, wenn jeder Schlüssel auf der integrierten Zulassungsliste steht und die Bundle-Version neuer als die zuletzt angewendete ist. API-Schlüssel, URLs, Webhooks und Sicherheitseinstellungen können niemals durch ein Bundle gesetzt werden. Erstellen und signieren Sie Bundles mit <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Richtlinienpaket-Synchronisierung aktivieren';
+$string['settings:policy_bundle_enabled_desc'] = 'Wenn aktiviert, ruft die tägliche Aufgabe signierte Bundles ab und wendet sie an. Standardmäßig deaktiviert. Das Deaktivieren stoppt alle Synchronisierungen sofort; bereits angewendete Einstellungen behalten ihre Werte.';
+$string['settings:policy_bundle_url'] = 'Richtlinienpaket-URL';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS-URL der signierten Bundle-JSON-Datei (z. B. ein S3-Objekt oder GitHub-Raw-URL). Die URL durchläuft dieselbe SSRF-Validierung wie KI-Anbieter-Endpunkte; private Netzwerke oder Plain-HTTP-Hosts benötigen einen Eintrag in der Liste der vertrauenswürdigen SSRF-Endpunkte.';
+$string['settings:policy_bundle_pubkey'] = 'Öffentlicher Schlüssel des Richtlinienpakets';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 öffentlicher Schlüssel zur Verifizierung von Bundle-Signaturen. Generieren Sie das Schlüsselpaar mit <code>policy_bundle_tool.php --keygen</code>; der private Schlüssel verbleibt beim Bundle-Autor und darf niemals irgendwo hochgeladen werden.';
+$string['settings:policy_bundle_status'] = 'Letzte Synchronisierung';
+$string['settings:policy_bundle_applied_version'] = 'angewendete Version';
+$string['task:policy_bundle_sync'] = 'SOLA signierte Richtlinienpaket-Synchronisierung';
+$string['policy_bundle:invalid'] = 'Richtlinienpaket abgelehnt: {$a}';

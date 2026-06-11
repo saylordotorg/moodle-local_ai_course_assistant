@@ -1506,3 +1506,16 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Bila aktif, tugas terjadwal har
 $string['settings:cost_anomaly_multiplier'] = 'Pengganda anomali';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Pengeluaran hari ini harus melebihi pengganda ini × median 7 hari untuk memicu peringatan. Bawaan <code>2.0</code>. Turunkan ke <code>1.5</code> untuk peringatan lebih awal (lebih banyak positif palsu saat lonjakan pendaftaran). Naikkan ke <code>3.0</code> bila penggunaan Saylor cukup berlonjak sehingga lonjakan 2x sudah biasa.';
 $string['task:cost_anomaly_check'] = 'Pemeriksaan anomali biaya SOLA (harian)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Bundel kebijakan bertanda tangan (pembaruan perilaku jarak jauh)';
+$string['settings:policy_bundle_heading_desc'] = 'Terapkan pengaturan perilaku (perintah, perutean, pemicu eskalasi, penyetelan RAG, kebijakan pengeluaran) dari file JSON yang ditandatangani secara kriptografis tanpa penerapan kode. Tugas terjadwal harian mengambil URL bundel, memverifikasi tanda tangan Ed25519-nya terhadap kunci publik di bawah, dan menerapkan pengaturan hanya jika setiap kunci ada dalam daftar izin bawaan dan versi bundel lebih baru dari yang terakhir diterapkan. Kunci API, URL, webhook, dan pengaturan keamanan tidak pernah dapat ditetapkan oleh bundel. Buat dan tandatangani bundel dengan <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Aktifkan sinkronisasi bundel kebijakan';
+$string['settings:policy_bundle_enabled_desc'] = 'Saat diaktifkan, tugas harian mengambil dan menerapkan bundel bertanda tangan. Nonaktif secara default. Menonaktifkan menghentikan semua sinkronisasi segera; pengaturan yang sudah diterapkan mempertahankan nilainya.';
+$string['settings:policy_bundle_url'] = 'URL bundel kebijakan';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS dari JSON bundel bertanda tangan (misalnya objek S3 atau GitHub raw URL). URL melalui validasi SSRF yang sama dengan titik akhir penyedia AI; host jaringan privat atau plain-http memerlukan entri dalam daftar izin titik akhir tepercaya SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Kunci publik bundel kebijakan';
+$string['settings:policy_bundle_pubkey_desc'] = 'Kunci publik Base64 Ed25519 yang digunakan untuk memverifikasi tanda tangan bundel. Buat pasangan kunci dengan <code>policy_bundle_tool.php --keygen</code>; kunci privat tetap pada penulis bundel dan tidak boleh diunggah ke mana pun.';
+$string['settings:policy_bundle_status'] = 'Sinkronisasi terakhir';
+$string['settings:policy_bundle_applied_version'] = 'versi yang diterapkan';
+$string['task:policy_bundle_sync'] = 'Sinkronisasi bundel kebijakan bertanda tangan SOLA';
+$string['policy_bundle:invalid'] = 'Bundel kebijakan ditolak: {$a}';

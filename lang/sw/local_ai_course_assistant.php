@@ -1498,3 +1498,31 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Ukiwa imewashwa, kazi iliyopang
 $string['settings:cost_anomaly_multiplier'] = 'Kizidishi cha hitilafu';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Matumizi ya leo lazima yazidi kizidishi hiki × wastani wa siku 7 ili kusababisha arifa. Chaguo-msingi <code>2.0</code>. Punguza hadi <code>1.5</code> kwa maonyo ya mapema zaidi (uwongo chanya zaidi wakati wa ongezeko la usajili). Ongeza hadi <code>3.0</code> ikiwa matumizi ya Saylor ni ya mawimbi vya kutosha kwamba kilele cha 2x ni cha kawaida.';
 $string['task:cost_anomaly_check'] = 'Ukaguzi wa kila siku wa hitilafu za gharama za SOLA';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Mfuko wa sera uliosainishwa (masasisho ya tabia ya mbali)';
+$string['settings:policy_bundle_heading_desc'] = 'Tumia mipangilio ya tabia (maagizo, uelekezaji, vichochezi vya kupanda, urekebishaji wa RAG, sera ya matumizi) kutoka kwa faili la JSON lililosainiwa kwa kriptografia bila usambazaji wa msimbo. Kazi ya kila siku iliyopangwa inachukua URL ya mfuko, inathibitisha saini yake ya Ed25519 dhidi ya ufunguo wa umma hapa chini, na inatumia mipangilio tu ikiwa kila ufunguo uko kwenye orodha ya kuruhusiwa iliyojengwa ndani na toleo la mfuko ni jipya zaidi kuliko lililotumika mwisho. Funguo za API, URL, webhooks, na mipangilio ya usalama haiwezi kamwe kuwekwa na mfuko. Andika na usaini mifuko kwa <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Washa usawazishaji wa mfuko wa sera';
+$string['settings:policy_bundle_enabled_desc'] = 'Ukiwashwa, kazi ya kila siku inachukua na kutumia mifuko iliyosainiwa. Imezimwa kwa chaguo-msingi. Kuzima kunasimamisha usawazishaji wote mara moja; mipangilio iliyotumika tayari inahifadhi maadili yake.';
+$string['settings:policy_bundle_url'] = 'URL ya mfuko wa sera';
+$string['settings:policy_bundle_url_desc'] = 'URL ya HTTPS ya JSON ya mfuko uliosainishwa (kwa mfano kitu cha S3 au GitHub raw URL). URL inapita uthibitishaji sawa wa SSRF na vituo vya watoa AI; seva za mtandao binafsi au plain-http zinahitaji kuingizwa kwenye orodha ya vituo vinavyoaminika vya SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Ufunguo wa umma wa mfuko wa sera';
+$string['settings:policy_bundle_pubkey_desc'] = 'Ufunguo wa umma wa Base64 Ed25519 unaotumika kuthibitisha saini za mfuko. Tengeneza jozi ya funguo kwa <code>policy_bundle_tool.php --keygen</code>; ufunguo wa siri unabaki na mwandishi wa mfuko na haupaswi kamwe kupakiwa mahali popote.';
+$string['settings:policy_bundle_status'] = 'Usawazishaji wa mwisho';
+$string['settings:policy_bundle_applied_version'] = 'toleo lililotumika';
+$string['task:policy_bundle_sync'] = 'SOLA usawazishaji wa mfuko wa sera uliosainishwa';
+$string['policy_bundle:invalid'] = 'Mfuko wa sera umekataliwa: {$a}';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Policy bundle iliyosainiwa (masasisho ya tabia ya mbali)';
+$string['settings:policy_bundle_heading_desc'] = 'Tumia mipangilio ya tabia (prompts, routing, vichocheo vya escalation, urekebishaji wa RAG, sera ya matumizi) kutoka kwa faili la JSON lililosainiwa kwa njia ya kriptografia bila usambazaji wa msimbo. Kazi iliyopangwa ya kila siku hupata URL ya bundle, huthibitisha saini yake ya Ed25519 dhidi ya ufunguo wa umma hapa chini, na hutumia mipangilio tu ikiwa kila ufunguo upo kwenye orodha ya ruhusa iliyojengwa ndani na toleo la bundle ni jipya kuliko lile lililotumika mara ya mwisho. Funguo za API, URL, webhooks, na mipangilio ya usalama haiwezi kamwe kuwekwa na bundle. Andika na usainishe bundles kwa kutumia <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Wezesha usawazishaji wa policy bundle';
+$string['settings:policy_bundle_enabled_desc'] = 'Ukiwa imewashwa, kazi ya kila siku hupata na kutumia bundles zilizosainiwa. Imezimwa kwa chaguo-msingi. Kuzima kunasimamisha usawazishaji wote mara moja; mipangilio iliyotumika tayari inabaki na thamani zake.';
+$string['settings:policy_bundle_url'] = 'URL ya policy bundle';
+$string['settings:policy_bundle_url_desc'] = 'URL ya HTTPS ya JSON ya bundle iliyosainiwa (kwa mfano kitu cha S3 au GitHub raw URL). URL inapita kwenye uthibitishaji sawa wa SSRF kama sehemu za mwisho za watoa huduma wa AI; wapangishaji wa mtandao wa kibinafsi au plain-http wanahitaji kuingizwa kwenye orodha ya ruhusa ya sehemu za mwisho zinazoaminika za SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Ufunguo wa umma wa policy bundle';
+$string['settings:policy_bundle_pubkey_desc'] = 'Ufunguo wa umma wa Base64 Ed25519 unaotumika kuthibitisha saini za bundle. Tengeneza jozi ya ufunguo kwa kutumia <code>policy_bundle_tool.php --keygen</code>; ufunguo wa kibinafsi hubaki na mwandishi wa bundle na kamwe haupaswi kupakiwa mahali popote.';
+$string['settings:policy_bundle_status'] = 'Usawazishaji wa mwisho';
+$string['settings:policy_bundle_applied_version'] = 'toleo lililotumika';
+$string['task:policy_bundle_sync'] = 'SOLA usawazishaji wa policy bundle iliyosainiwa';
+$string['policy_bundle:invalid'] = 'Policy bundle imekataliwa: {$a}';

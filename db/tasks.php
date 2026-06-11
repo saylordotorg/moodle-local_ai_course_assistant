@@ -227,4 +227,20 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v6.4.0 — Daily signed policy bundle sync. Fetches the JSON
+        // envelope from policy_bundle_url, verifies the Ed25519 signature
+        // against policy_bundle_pubkey, enforces the settings allowlist
+        // and monotonic version, and applies the contained behavior
+        // settings with an audit row. Off by default; enable via
+        // policy_bundle_enabled. Runs at 06:20 so bundles published the
+        // previous day are live before the teaching morning.
+        'classname' => \local_ai_course_assistant\task\policy_bundle_sync::class,
+        'blocking' => 0,
+        'minute' => '20',
+        'hour' => '6',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

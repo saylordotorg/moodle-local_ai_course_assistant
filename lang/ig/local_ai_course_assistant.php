@@ -1492,3 +1492,16 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Mgbe ọ gbanye, ọrụ nhazi 
 $string['settings:cost_anomaly_multiplier'] = 'Ihe na-abawanye ihe ọjọọ';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Ihe eji taa kwesịrị igafe ihe na-abawanye a × median 7-ụbọchị iji kpalie ọkwa ọzọ. Ndabara <code>2.0</code>. Belata na <code>1.5</code> maka ọkwa ọzọ mbụ (ọtụtụ ihe odụdụ ụgha n\'oge mmụba ndebanye aha). Bulie na <code>3.0</code> ma ọ bụrụ na ojiji Saylor na-aburstị nke ọma n\'ụzọ na-emepụta spikes 2x na-abụkarị.';
 $string['task:cost_anomaly_check'] = 'Nlele ihe ọjọọ ọnụahịa SOLA (kwa ụbọchị)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Signed policy bundle (mgbanwe omume site n\'ebe ọzọ)';
+$string['settings:policy_bundle_heading_desc'] = 'Tinye ntọala omume (prompts, routing, escalation triggers, RAG tuning, spend policy) sitere na cryptographically signed JSON file n\'enweghị code deploy. Ọrụ nke amaokwa kwa ụbọchị na-eweta bundle URL, na-atụ aro Ed25519 signature ya megide public key dị n\'okpuru, ma tinye ntọala naanị ma ọ bụrụ na igodo ọ bụla dị na built-in allowlist ma ụdị bundle dịkwuo ọhụrụ karịa nke ikpeazụ etinyere. Igodo API, URL, webhooks, na ntọala nchekwa enweghị ike itoọ bundle. Mepụta ma bịanye aka na bundles site na <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Kwado policy bundle sync';
+$string['settings:policy_bundle_enabled_desc'] = 'Mgbe etinyelachara ya, ọrụ kwa ụbọchị na-eweta ma tinye bundles ndị e bịanyere aka. Agbanyụọla na ndabara. Ịgbanyụ ya na-akwụsị sync niile ozugbo; ntọala ndị etinyela dị na ha ugbu a.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS nke signed bundle JSON (dịka ihe S3 ma ọ bụ GitHub raw URL). URL na-aga site na SSRF validation otu ahụ dị ka AI provider endpoints; ụlọ ọrụ private-network ma ọ bụ plain-http chọrọ ntinye na SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 public key eji atụ aro bundle signatures. Mepụta keypair site na <code>policy_bundle_tool.php --keygen</code>; private key na-anọdị na onye dere bundle ma ọ kwesịghị ibugharị ebe ọ bụla.';
+$string['settings:policy_bundle_status'] = 'Sync ikpeazụ';
+$string['settings:policy_bundle_applied_version'] = 'ụdị etinyere';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'A jụrụ policy bundle: {$a}';

@@ -1483,3 +1483,16 @@ $string['settings:cost_anomaly_multiplier_desc'] = '경보를 트리거하려면
 $string['settings:prompt_debug_enabled'] = '조립된 시스템 프롬프트를 파일에 기록';
 $string['settings:prompt_debug_enabled_desc'] = '켜면 모든 채팅 턴이 완전히 조립된 시스템 프롬프트와 섹션별 문자 수를 <code>moodledata/temp/sola_prompt_debug.log</code>(~1MB에서 롤링)에 씁니다. 기본값은 꺼짐. 프롬프트 크기를 경험적으로 측정하고 어떤 섹션이 가장 많은 토큰에 기여하는지 감사하기 위해 사용합니다. 로그에는 시스템 프롬프트만 포함됩니다(학습자 입력 또는 PII 없음).';
 $string['task:cost_anomaly_check'] = 'SOLA 비용 이상 확인(일일)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = '서명된 정책 번들 (원격 동작 업데이트)';
+$string['settings:policy_bundle_heading_desc'] = '코드 배포 없이 암호화 서명된 JSON 파일에서 동작 설정(프롬프트, 라우팅, 에스컬레이션 트리거, RAG 튜닝, 지출 정책)을 적용합니다. 매일 예약된 작업이 번들 URL을 가져오고, 아래의 공개 키에 대해 Ed25519 서명을 확인하며, 모든 키가 기본 제공 허용 목록에 있고 번들 버전이 마지막으로 적용된 것보다 새로운 경우에만 설정을 적용합니다. API 키, URL, 웹훅 및 보안 설정은 번들로 설정할 수 없습니다. <code>admin/cli/policy_bundle_tool.php</code>(keygen, sign, verify, status, sync)로 번들을 작성하고 서명하십시오.';
+$string['settings:policy_bundle_enabled'] = '정책 번들 동기화 활성화';
+$string['settings:policy_bundle_enabled_desc'] = '활성화하면 일일 작업이 서명된 번들을 가져와 적용합니다. 기본적으로 비활성화되어 있습니다. 비활성화하면 모든 동기화가 즉시 중단됩니다. 이미 적용된 설정은 해당 값을 유지합니다.';
+$string['settings:policy_bundle_url'] = '정책 번들 URL';
+$string['settings:policy_bundle_url_desc'] = '서명된 번들 JSON의 HTTPS URL(예: S3 객체 또는 GitHub raw URL). URL은 AI 공급자 엔드포인트와 동일한 SSRF 유효성 검사를 거칩니다. 사설 네트워크 또는 plain-http 호스트는 SSRF 신뢰할 수 있는 엔드포인트 허용 목록에 항목이 필요합니다.';
+$string['settings:policy_bundle_pubkey'] = '정책 번들 공개 키';
+$string['settings:policy_bundle_pubkey_desc'] = '번들 서명을 확인하는 데 사용되는 Base64 Ed25519 공개 키입니다. <code>policy_bundle_tool.php --keygen</code>으로 키 쌍을 생성하십시오. 개인 키는 번들 작성자에게 남아 있으며 어디에도 업로드해서는 안 됩니다.';
+$string['settings:policy_bundle_status'] = '마지막 동기화';
+$string['settings:policy_bundle_applied_version'] = '적용된 버전';
+$string['task:policy_bundle_sync'] = 'SOLA 서명된 정책 번들 동기화';
+$string['policy_bundle:invalid'] = '정책 번들이 거부되었습니다: {$a}';

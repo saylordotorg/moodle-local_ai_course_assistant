@@ -341,6 +341,20 @@ $string['settings:stt_selfhosted_model_desc'] = 'Model name passed to the server
 $string['settings:stt_selfhosted_apikey'] = 'Selfhosted STT API key';
 $string['settings:stt_selfhosted_apikey_desc'] = 'Optional. Most selfhosted servers are keyless behind a trusted network; set this only if your server requires a bearer token.';
 
+// Signed policy bundle (v6.4.0).
+$string['settings:policy_bundle_heading'] = 'Signed policy bundle (remote behavior updates)';
+$string['settings:policy_bundle_heading_desc'] = 'Apply behavior settings (prompts, routing, escalation triggers, RAG tuning, spend policy) from a cryptographically signed JSON file without a code deploy. A daily scheduled task fetches the bundle URL, verifies its Ed25519 signature against the public key below, and applies the settings only if every key is on the built-in allowlist and the bundle version is newer than the last applied one. API keys, URLs, webhooks, and security settings can never be set by a bundle. Author and sign bundles with <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Enable policy bundle sync';
+$string['settings:policy_bundle_enabled_desc'] = 'When enabled, the daily task fetches and applies signed bundles. Off by default. Disabling stops all syncs immediately; already-applied settings keep their values.';
+$string['settings:policy_bundle_url'] = 'Policy bundle URL';
+$string['settings:policy_bundle_url_desc'] = 'HTTPS URL of the signed bundle JSON (for example an S3 object or GitHub raw URL). The URL goes through the same SSRF validation as AI provider endpoints; private-network or plain-http hosts need an entry in the SSRF trusted endpoints allowlist.';
+$string['settings:policy_bundle_pubkey'] = 'Policy bundle public key';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 public key used to verify bundle signatures. Generate the keypair with <code>policy_bundle_tool.php --keygen</code>; the private key stays with the bundle author and must never be uploaded anywhere.';
+$string['settings:policy_bundle_status'] = 'Last sync';
+$string['settings:policy_bundle_applied_version'] = 'applied version';
+$string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
+$string['policy_bundle:invalid'] = 'Policy bundle rejected: {$a}';
+
 // Reminder messages.
 $string['reminder:email_subject'] = 'Study Reminder: {$a}';
 $string['reminder:email_body'] = 'Hi {$a->firstname},

@@ -1527,3 +1527,16 @@ $string['settings:cost_anomaly_multiplier_desc'] = 'La spesa odierna deve supera
 $string['settings:prompt_debug_enabled'] = 'Registra il prompt di sistema assemblato su file';
 $string['settings:prompt_debug_enabled_desc'] = 'Quando attivo, ogni turno di chat scrive il prompt di sistema assemblato completo e i conteggi di caratteri per sezione in <code>moodledata/temp/sola_prompt_debug.log</code> (rotazione a ~1MB). Disattivato per impostazione predefinita. Da usare per misurare empiricamente la dimensione del prompt e verificare quali sezioni contribuiscono più token. Il log contiene solo il prompt di sistema (nessun input dell\'utente o PII).';
 $string['task:cost_anomaly_check'] = 'Controllo anomalie di costo SOLA (giornaliero)';
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Pacchetto di policy firmato (aggiornamenti del comportamento remoto)';
+$string['settings:policy_bundle_heading_desc'] = 'Applica impostazioni di comportamento (prompt, instradamento, trigger di escalation, ottimizzazione RAG, policy di spesa) da un file JSON firmato crittograficamente senza un deploy del codice. Un\'attività pianificata giornaliera recupera l\'URL del pacchetto, verifica la firma Ed25519 rispetto alla chiave pubblica sottostante e applica le impostazioni solo se ogni chiave è nell\'elenco di autorizzazioni integrato e la versione del pacchetto è più recente dell\'ultima applicata. Le chiavi API, gli URL, i webhook e le impostazioni di sicurezza non possono mai essere impostati da un pacchetto. Crea e firma i pacchetti con <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Abilita sincronizzazione pacchetto policy';
+$string['settings:policy_bundle_enabled_desc'] = 'Se abilitata, l\'attività giornaliera recupera e applica i pacchetti firmati. Disabilitata per impostazione predefinita. La disabilitazione interrompe immediatamente tutte le sincronizzazioni; le impostazioni già applicate mantengono i propri valori.';
+$string['settings:policy_bundle_url'] = 'URL pacchetto policy';
+$string['settings:policy_bundle_url_desc'] = 'URL HTTPS del JSON del pacchetto firmato (ad esempio un oggetto S3 o GitHub raw URL). L\'URL è soggetto alla stessa validazione SSRF degli endpoint dei provider AI; gli host di rete privata o plain-http necessitano di una voce nell\'elenco di autorizzazioni degli endpoint attendibili SSRF.';
+$string['settings:policy_bundle_pubkey'] = 'Chiave pubblica pacchetto policy';
+$string['settings:policy_bundle_pubkey_desc'] = 'Chiave pubblica Base64 Ed25519 utilizzata per verificare le firme del pacchetto. Genera la coppia di chiavi con <code>policy_bundle_tool.php --keygen</code>; la chiave privata rimane all\'autore del pacchetto e non deve mai essere caricata da nessuna parte.';
+$string['settings:policy_bundle_status'] = 'Ultima sincronizzazione';
+$string['settings:policy_bundle_applied_version'] = 'versione applicata';
+$string['task:policy_bundle_sync'] = 'Sincronizzazione pacchetto policy firmato SOLA';
+$string['policy_bundle:invalid'] = 'Pacchetto policy rifiutato: {$a}';

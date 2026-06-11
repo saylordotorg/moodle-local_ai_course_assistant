@@ -1498,3 +1498,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'ਚਾਲੂ ਹੋਣ \'ਤੇ
 $string['settings:cost_anomaly_multiplier'] = 'ਅਸੰਗਤਤਾ multiplier';
 $string['settings:cost_anomaly_multiplier_desc'] = 'ਚੇਤਾਵਨੀ trigger ਕਰਨ ਲਈ ਅੱਜ ਦਾ ਖਰਚ ਇਸ multiplier × 7-ਦਿਨ ਮੱਧਮਾਨ ਤੋਂ ਵੱਧ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ। ਡਿਫਾਲਟ <code>2.0</code>। ਪਹਿਲਾਂ ਚੇਤਾਵਨੀ ਲਈ <code>1.5</code> ਤੱਕ ਘਟਾਓ। ਜੇ Saylor ਦੀ ਵਰਤੋਂ 2x spikes ਨੂੰ ਆਮ ਬਣਾ ਦਿੰਦੀ ਹੈ ਤਾਂ <code>3.0</code> ਤੱਕ ਵਧਾਓ।';
 $string['task:cost_anomaly_check'] = 'SOLA ਲਾਗਤ ਅਸੰਗਤਤਾ ਜਾਂਚ (ਰੋਜ਼ਾਨਾ)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'ਦਸਤਖਤ ਕੀਤਾ ਨੀਤੀ ਬੰਡਲ (ਰਿਮੋਟ ਵਿਹਾਰ ਅਪਡੇਟ)';
+$string['settings:policy_bundle_heading_desc'] = 'ਕੋਡ ਡਿਪਲੋਏ ਕੀਤੇ ਬਿਨਾਂ ਕ੍ਰਿਪਟੋਗ੍ਰਾਫਿਕ ਤੌਰ ਤੇ ਦਸਤਖਤ ਕੀਤੇ JSON ਫਾਈਲ ਤੋਂ ਵਿਹਾਰ ਸੈਟਿੰਗਾਂ (ਪ੍ਰੌਂਪਟ, ਰਾਊਟਿੰਗ, ਐਸਕਲੇਸ਼ਨ ਟ੍ਰਿਗਰ, RAG ਟਿਊਨਿੰਗ, ਖਰਚ ਨੀਤੀ) ਲਾਗੂ ਕਰੋ। ਇੱਕ ਰੋਜ਼ਾਨਾ ਅਨੁਸੂਚਿਤ ਕੰਮ ਬੰਡਲ URL ਲਿਆਉਂਦਾ ਹੈ, ਹੇਠਾਂ ਦਿੱਤੀ ਜਨਤਕ ਕੁੰਜੀ ਦੇ ਵਿਰੁੱਧ Ed25519 ਦਸਤਖਤ ਦੀ ਤਸਦੀਕ ਕਰਦਾ ਹੈ, ਅਤੇ ਸੈਟਿੰਗਾਂ ਤਾਂ ਹੀ ਲਾਗੂ ਕਰਦਾ ਹੈ ਜੇ ਹਰ ਕੁੰਜੀ ਬਿਲਟ-ਇਨ ਅਨੁਮਤੀ ਸੂਚੀ ਵਿੱਚ ਹੋਵੇ ਅਤੇ ਬੰਡਲ ਸੰਸਕਰਣ ਆਖਰੀ ਲਾਗੂ ਕੀਤੇ ਨਾਲੋਂ ਨਵਾਂ ਹੋਵੇ। API ਕੁੰਜੀਆਂ, URL, webhooks ਅਤੇ ਸੁਰੱਖਿਆ ਸੈਟਿੰਗਾਂ ਕਦੇ ਵੀ ਬੰਡਲ ਦੁਆਰਾ ਸੈੱਟ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕਦੀਆਂ। <code>admin/cli/policy_bundle_tool.php</code> (keygen, sign, verify, status, sync) ਨਾਲ ਬੰਡਲ ਬਣਾਓ ਅਤੇ ਦਸਤਖਤ ਕਰੋ।';
+$string['settings:policy_bundle_enabled'] = 'ਨੀਤੀ ਬੰਡਲ ਸਿੰਕ ਯੋਗ ਬਣਾਓ';
+$string['settings:policy_bundle_enabled_desc'] = 'ਯੋਗ ਹੋਣ ਤੇ, ਰੋਜ਼ਾਨਾ ਕੰਮ ਦਸਤਖਤ ਕੀਤੇ ਬੰਡਲ ਲਿਆਉਂਦਾ ਅਤੇ ਲਾਗੂ ਕਰਦਾ ਹੈ। ਮੂਲ ਰੂਪ ਵਿੱਚ ਬੰਦ। ਅਯੋਗ ਕਰਨ ਨਾਲ ਸਾਰੇ ਸਿੰਕ ਤੁਰੰਤ ਰੁਕ ਜਾਂਦੇ ਹਨ; ਪਹਿਲਾਂ ਤੋਂ ਲਾਗੂ ਸੈਟਿੰਗਾਂ ਆਪਣੇ ਮੁੱਲ ਬਣਾਈ ਰੱਖਦੀਆਂ ਹਨ।';
+$string['settings:policy_bundle_url'] = 'ਨੀਤੀ ਬੰਡਲ URL';
+$string['settings:policy_bundle_url_desc'] = 'ਦਸਤਖਤ ਕੀਤੇ ਬੰਡਲ JSON ਦਾ HTTPS URL (ਉਦਾਹਰਨ ਲਈ S3 ਆਬਜੈਕਟ ਜਾਂ GitHub raw URL)। URL AI ਪ੍ਰਦਾਤਾ ਐਂਡਪੋਆਇੰਟਾਂ ਵਾਂਗੂ SSRF ਵੈਲੀਡੇਸ਼ਨ ਤੋਂ ਲੰਘਦਾ ਹੈ; ਨਿੱਜੀ ਨੈੱਟਵਰਕ ਜਾਂ plain-http ਹੋਸਟਾਂ ਨੂੰ SSRF ਭਰੋਸੇਯੋਗ ਐਂਡਪੋਆਇੰਟ ਅਨੁਮਤੀ ਸੂਚੀ ਵਿੱਚ ਐਂਟਰੀ ਦੀ ਲੋੜ ਹੈ।';
+$string['settings:policy_bundle_pubkey'] = 'ਨੀਤੀ ਬੰਡਲ ਜਨਤਕ ਕੁੰਜੀ';
+$string['settings:policy_bundle_pubkey_desc'] = 'ਬੰਡਲ ਦਸਤਖਤਾਂ ਦੀ ਤਸਦੀਕ ਕਰਨ ਲਈ ਵਰਤੀ ਜਾਂਦੀ Base64 Ed25519 ਜਨਤਕ ਕੁੰਜੀ। <code>policy_bundle_tool.php --keygen</code> ਨਾਲ ਕੀਪੇਅਰ ਬਣਾਓ; ਨਿੱਜੀ ਕੁੰਜੀ ਬੰਡਲ ਲੇਖਕ ਕੋਲ ਰਹਿੰਦੀ ਹੈ ਅਤੇ ਕਦੇ ਵੀ ਕਿਤੇ ਅਪਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾਣੀ ਚਾਹੀਦੀ।';
+$string['settings:policy_bundle_status'] = 'ਆਖਰੀ ਸਿੰਕ';
+$string['settings:policy_bundle_applied_version'] = 'ਲਾਗੂ ਸੰਸਕਰਣ';
+$string['task:policy_bundle_sync'] = 'SOLA ਦਸਤਖਤ ਕੀਤਾ ਨੀਤੀ ਬੰਡਲ ਸਿੰਕ';
+$string['policy_bundle:invalid'] = 'ਨੀਤੀ ਬੰਡਲ ਰੱਦ: {$a}';

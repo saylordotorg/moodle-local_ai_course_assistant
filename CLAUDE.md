@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026061007`, release `6.3.0`
+- **Current version:** `2026061008`, release `6.4.0`
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
@@ -50,6 +50,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - Admin UX (v6.1.0): web emergency kill-switch panel (`emergency_admin.php`, red link from settings quicklinks); `cached_tokens` persisted per call + Cached Tokens card in token analytics; token-analytics category fix (RAG rows were silently excluded); settings regrouping. v6.1.1: flashcards review page Moodle 5.x fatal fixed (`print_error` → `moodle_exception`).
 - Selfhosted Whisper STT (v6.3.0): `stt_selfhosted_url`/`stt_selfhosted_model`/`stt_selfhosted_apikey` settings; any OpenAI-compatible transcription server (whisper-server Docker, speaches/faster-whisper, whisper.cpp). Default STT path when URL configured; paid label in `voice_active_stt` overrides; bypasses voice spend guard (free); keyless auth supported; private/http servers need an `ssrf_trusted_endpoints` entry. Resolution + normalization in `classes/voice_registry.php` (`SELFHOSTED_LABEL`, `selfhosted_stt_config()`, `selfhosted_stt_endpoint()`); tests in `tests/voice_registry_selfhosted_test.php`. Realtime voice conversations remain OpenAI WebSocket only — selfhosted covers the mic STT path.
 - i18n catch-up (v6.3.0): 100 keys (v5.11→v6.2 surfaces) translated into all 45 non-English languages; 46/46 locales pass the completeness check with zero missing keys.
+- Signed policy bundles (v6.4.0): behavior-as-data updates without a code deploy. Daily `policy_bundle_sync` task fetches a JSON envelope from `policy_bundle_url`, verifies the Ed25519 signature against `policy_bundle_pubkey`, enforces a hard-coded 42-setting allowlist (`policy_bundle::ALLOWED_KEYS` — never keys/URLs/webhooks/emails/SSRF/consent/emergency) and a strictly-increasing version, applies with an audit row (old/new per key). Fail closed. Authoring CLI: `admin/cli/policy_bundle_tool.php` (--keygen/--sign/--verify/--status/--sync); --sign pre-flights the same checks. Off by default. Core: `classes/policy_bundle.php`; tests: `tests/policy_bundle_test.php`. Strategy doc: `.drafts/sola-upgrade-independence-2026-06-11.md`.
 
 ---
 
@@ -96,6 +97,7 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 | `classes/spend_guard.php` | Site-wide + per-capability + per-course spend cap enforcement; emits notification emails at 80% and 95% thresholds (v5.13 adds `spend_cap_per_course_default` fallback) |
 | `classes/emergency_control.php` | Site-wide kill switch. `--chat` sets `emergency_chat_disabled` (v5.13 fix; was silent no-op pre-v5.13); other flags toggle `enabled` / `voice_active_realtime` / `rag_enabled` / `outreach_master_enabled`. Admin UI at `emergency_control.php`; CLI at `admin/cli/emergency_disable.php` |
 | `classes/cost_anomaly_detector.php` | v6.0.0 daily cost-anomaly detector (today vs rolling 7-day median × multiplier); `classes/task/cost_anomaly_check.php` is the scheduled task wrapper; `admin/cli/send_spend_alert_test_email.php` is the alert-delivery self-test |
+| `classes/policy_bundle.php` | v6.4.0 signed policy bundle: Ed25519 verify + ALLOWED_KEYS allowlist + monotonic version + audit; `classes/task/policy_bundle_sync.php` daily task; `admin/cli/policy_bundle_tool.php` authoring CLI |
 | `classes/premium_router.php` | v5.12.0 per-turn router for premium escalation tier (regex triggers + course allowlist → Opus 4.8) |
 | `classes/embedding_provider/voyage_embedding_provider.php` | v5.11.0 Voyage-3.5 embedding client (asymmetric query/document, MRL dims) |
 | `classes/embedding_provider/voyage_reranker.php` | v5.11.0 Voyage rerank-2.5 cross-encoder for two-stage RAG |

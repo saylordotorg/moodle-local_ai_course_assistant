@@ -1475,3 +1475,17 @@ $string['settings:cost_anomaly_enabled_desc'] = 'Kun käytössä, päivittäinen
 $string['settings:cost_anomaly_multiplier'] = 'Poikkeavuuskerroin';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Tämän päivän kulujen on ylitettävä tämä kerroin × 7 päivän mediaani hälytyksen käynnistämiseksi. Oletus <code>2.0</code>. Laske arvoon <code>1.5</code> aiempia varoituksia varten (enemmän vääriä positiivisia ilmoittautumispiikkien aikana). Nosta arvoon <code>3.0</code>, jos Saylor-käyttö on niin vaihtelevaa, että 2x piikit ovat tavanomaisia.';
 $string['task:cost_anomaly_check'] = 'SOLA:n kustannuspoikkeavuuden tarkistus (päivittäinen)';
+
+// v6.4.0 signed policy bundle strings (added 2026-06-11).
+$string['settings:policy_bundle_heading'] = 'Allekirjoitettu käytäntöpaketti (etäkäyttäytymispäivitykset)';
+$string['settings:policy_bundle_heading_desc'] = 'Ota käyttöön käyttäytymisasetukset (kehotteet, reititys, eskaloinnin laukaisijat, RAG-säätö, kulutuskäytäntö) kryptografisesti allekirjoitetusta JSON-tiedostosta ilman koodin käyttöönottoa. Päivittäinen ajoitettu tehtävä hakee paketin URL-osoitteen, tarkistaa sen Ed25519-allekirjoituksen alla olevalla julkisella avaimella ja soveltaa asetuksia vain, jos jokainen avain on sisäänrakennetussa sallittujen luettelossa ja paketin versio on uudempi kuin viimeksi sovellettu. API-avaimia, URL-osoitteita, webhookeja ja suojausasetuksia ei voida koskaan määrittää paketilla. Luo ja allekirjoita paketit <code>admin/cli/policy_bundle_tool.php</code> -komennolla (keygen, sign, verify, status, sync).';
+$string['settings:policy_bundle_enabled'] = 'Ota käytäntöpaketin synkronointi käyttöön';
+$string['settings:policy_bundle_enabled_desc'] = 'Kun käytössä, päivittäinen tehtävä hakee ja soveltaa allekirjoitettuja paketteja. Oletuksena pois käytöstä. Poistaminen käytöstä pysäyttää kaikki synkronoinit välittömästi; jo sovelletut asetukset säilyttävät arvonsa.';
+$string['settings:policy_bundle_url'] = 'Käytäntöpaketin URL-osoite';
+$string['settings:policy_bundle_url_desc'] = 'Allekirjoitetun paketti-JSON:in HTTPS URL-osoite (esimerkiksi S3-objekti tai GitHub raw URL). URL-osoite läpäisee saman SSRF-validoinnin kuin tekoälypalveluntarjoajien päätepisteet; yksityisverkon tai plain-http-isäntien on oltava SSRF:n luotettujen päätepisteiden sallittujen luettelossa.';
+$string['settings:policy_bundle_pubkey'] = 'Käytäntöpaketin julkinen avain';
+$string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 -julkinen avain pakettiallekirjoitusten tarkistamiseen. Luo avainpari <code>policy_bundle_tool.php --keygen</code> -komennolla; yksityinen avain jää paketin tekijälle eikä sitä saa koskaan ladata minnekään.';
+$string['settings:policy_bundle_status'] = 'Viimeisin synkronointi';
+$string['settings:policy_bundle_applied_version'] = 'sovellettu versio';
+$string['task:policy_bundle_sync'] = 'SOLA allekirjoitetun käytäntöpaketin synkronointi';
+$string['policy_bundle:invalid'] = 'Käytäntöpaketti hylätty: {$a}';
