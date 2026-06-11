@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Senaste synkronisering';
 $string['settings:policy_bundle_applied_version'] = 'tillämpad version';
 $string['task:policy_bundle_sync'] = 'SOLA synkronisering av signerat policypaket';
 $string['policy_bundle:invalid'] = 'Policypaket avvisat: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Hämtade stycken (RAG-urval)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'De stycken som hämtaren valde för den här frågan, i rangordning med deras relevanspoäng och källa (cmid). Använd detta för att kontrollera att modellen fick det bäst matchande kursinnehållet.';

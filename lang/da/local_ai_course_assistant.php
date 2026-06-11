@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Seneste synkronisering';
 $string['settings:policy_bundle_applied_version'] = 'anvendt version';
 $string['task:policy_bundle_sync'] = 'SOLA signeret politikpakke-synkronisering';
 $string['policy_bundle:invalid'] = 'Politikpakke afvist: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Hentede uddrag (RAG-udvælgelse)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'De passager, som retrieveren valgte til dette spørgsmål, sorteret efter rangorden med deres relevansscore og kilde (cmid). Brug dette til at bekræfte, at modellen modtog det bedst matchende kursusindhold.';

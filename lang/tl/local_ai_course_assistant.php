@@ -1526,3 +1526,5 @@ $string['settings:policy_bundle_status'] = 'Huling sync';
 $string['settings:policy_bundle_applied_version'] = 'na-apply na bersyon';
 $string['task:policy_bundle_sync'] = 'SOLA nilagdaang policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle tinanggihan: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Mga nakuhang chunk (pagpili ng RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Ang mga sipi na pinili ng retriever para sa tanong na ito, naka-ayos ayon sa ranggo kasama ang kanilang marka ng kaugnayan at pinagmulan (cmid). Gamitin ito upang i-verify na natanggap ng modelo ang pinakamatugmang nilalaman ng kurso.';

@@ -1496,3 +1496,5 @@ $string['settings:policy_bundle_status'] = 'Siste synkronisering';
 $string['settings:policy_bundle_applied_version'] = 'brukt versjon';
 $string['task:policy_bundle_sync'] = 'SOLA signert retningslinjepakke-synkronisering';
 $string['policy_bundle:invalid'] = 'Retningslinjepakke avvist: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Hentede deler (RAG-utvalg)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Avsnittene som retrieveren valgte for dette spørsmålet, i rangert rekkefølge med relevansscore og kilde (cmid). Bruk dette til å bekrefte at modellen mottok det best samsvarende kursinnholdet.';

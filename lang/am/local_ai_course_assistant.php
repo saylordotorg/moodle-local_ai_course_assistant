@@ -1518,3 +1518,5 @@ $string['settings:policy_bundle_status'] = 'የመጨረሻ sync';
 $string['settings:policy_bundle_applied_version'] = 'የተተገበረ ስሪት';
 $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle ውድቅ ሆኗል: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'የተገኙ ቅንጭቦች (RAG ምርጫ)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'መልሰው የሚያወጣው ስልት ለዚህ ጥያቄ የመረጣቸው ቅንጭቦች፣ በደረጃ ቅደም ተከተል ከተዛማጅነታቸው ነጥብ እና ምንጫቸው (cmid) ጋር። ሞዴሉ ምርጡን የሚዛመድ የኮርስ ይዘት መቀበሉን ለማረጋገጥ ይህንን ይጠቀሙ።';

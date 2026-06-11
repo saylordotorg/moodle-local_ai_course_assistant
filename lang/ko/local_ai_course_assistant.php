@@ -1496,3 +1496,5 @@ $string['settings:policy_bundle_status'] = '마지막 동기화';
 $string['settings:policy_bundle_applied_version'] = '적용된 버전';
 $string['task:policy_bundle_sync'] = 'SOLA 서명된 정책 번들 동기화';
 $string['policy_bundle:invalid'] = '정책 번들이 거부되었습니다: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = '검색된 청크(RAG 선택)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = '이 질문에 대해 검색기가 선택한 구절을 관련도 점수 및 출처(cmid)와 함께 순위 순으로 표시합니다. 이를 사용해 모델이 가장 잘 일치하는 강좌 콘텐츠를 받았는지 확인하세요.';

@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Letzte Synchronisierung';
 $string['settings:policy_bundle_applied_version'] = 'angewendete Version';
 $string['task:policy_bundle_sync'] = 'SOLA signierte Richtlinienpaket-Synchronisierung';
 $string['policy_bundle:invalid'] = 'Richtlinienpaket abgelehnt: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Abgerufene Abschnitte (RAG-Auswahl)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Die Passagen, die der Retriever für diese Frage ausgewählt hat, in Rangfolge mit ihrem Relevanzwert und ihrer Quelle (cmid). Verwenden Sie dies, um zu überprüfen, ob das Modell die am besten passenden Kursinhalte erhalten hat.';

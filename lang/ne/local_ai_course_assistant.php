@@ -1519,3 +1519,5 @@ $string['settings:policy_bundle_status'] = 'अन्तिम सिंक';
 $string['settings:policy_bundle_applied_version'] = 'लागू संस्करण';
 $string['task:policy_bundle_sync'] = 'SOLA हस्ताक्षरित नीति बन्डल सिंक';
 $string['policy_bundle:invalid'] = 'नीति बन्डल अस्वीकृत: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'पुनःप्राप्त गरिएका खण्डहरू (RAG चयन)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'यस प्रश्नका लागि रिट्रिभरले चयन गरेका अनुच्छेदहरू, तिनका सान्दर्भिकता अंक र स्रोत (cmid) सहित श्रेणी क्रममा। मोडेलले सबैभन्दा मिल्दो पाठ्यक्रम सामग्री प्राप्त गर्‍यो भनी पुष्टि गर्न यसको प्रयोग गर्नुहोस्।';

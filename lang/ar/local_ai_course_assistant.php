@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'آخر مزامنة';
 $string['settings:policy_bundle_applied_version'] = 'الإصدار المُطبَّق';
 $string['task:policy_bundle_sync'] = 'مزامنة حزمة سياسة SOLA الموقَّعة';
 $string['policy_bundle:invalid'] = 'رُفضت حزمة السياسة: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'المقاطع المُستردة (اختيار RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'المقاطع التي اختارها نظام الاسترجاع لهذا السؤال، مرتبة حسب الترتيب مع درجة الصلة والمصدر (cmid). استخدم هذا للتحقق من أن النموذج تلقى أفضل محتوى مطابق للمقرر.';

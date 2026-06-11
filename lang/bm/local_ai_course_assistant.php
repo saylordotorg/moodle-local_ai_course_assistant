@@ -1519,3 +1519,5 @@ $string['settings:policy_bundle_status'] = 'Sync laban';
 $string['settings:policy_bundle_applied_version'] = 'version to';
 $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle m\'a sɔn: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Tilanw minnu sɔrɔla (RAG sugandili)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Sɛbɛnni-yɔrɔw min sɔrɔbaga ye u sugandi nin ɲininkali in na, u labɛnnen u jɔyɔrɔ kɔrɔ ni u bɛnni hakɛ ani u sɔrɔyɔrɔ (cmid) ye. Nin baara kɛ walisa ka sɛgɛsɛgɛ ko modɛli ye kalansen kɔnɔkow minnu bɛnna kosɛbɛ sɔrɔ.';

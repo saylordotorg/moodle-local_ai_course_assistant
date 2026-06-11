@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Ultima sincronizare';
 $string['settings:policy_bundle_applied_version'] = 'versiune aplicată';
 $string['task:policy_bundle_sync'] = 'Sincronizarea pachetului de politici semnat SOLA';
 $string['policy_bundle:invalid'] = 'Pachetul de politici a fost respins: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Fragmente recuperate (selecție RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Fragmentele pe care sistemul de recuperare le-a selectat pentru această întrebare, în ordinea clasamentului, împreună cu scorul lor de relevanță și sursa (cmid). Folosește acest lucru pentru a verifica dacă modelul a primit cel mai potrivit conținut al cursului.';

@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Poslední synchronizace';
 $string['settings:policy_bundle_applied_version'] = 'aplikovaná verze';
 $string['task:policy_bundle_sync'] = 'SOLA synchronizace podepsaného balíčku zásad';
 $string['policy_bundle:invalid'] = 'Balíček zásad odmítnut: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Načtené úryvky (výběr RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Pasáže, které vyhledávač pro tuto otázku vybral, seřazené podle pořadí spolu s jejich skóre relevance a zdrojem (cmid). Pomocí tohoto si ověřte, že model obdržel nejlépe odpovídající obsah kurzu.';

@@ -1507,3 +1507,5 @@ $string['settings:policy_bundle_status'] = 'Isku-dubbaridkii ugu dambeeyay';
 $string['settings:policy_bundle_applied_version'] = 'nooca la dabaqay';
 $string['task:policy_bundle_sync'] = 'SOLA isku-dubbaridka xidhmada siyaasadda saxiixan';
 $string['policy_bundle:invalid'] = 'Xidhmada siyaasadda waa la diiday: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Qaybaha la soo helay (xulashada RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Qaybaha uu soo-helaha u xushay su\'aashan, oo u kala horreeya darajada, oo leh dhibcahooda khuseeya iyo isha (cmid). U isticmaal tan si aad u xaqiijiso in moodelku helay nuxurka koorsada ee ugu wanaagsan.';

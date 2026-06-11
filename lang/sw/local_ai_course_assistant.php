@@ -1526,3 +1526,5 @@ $string['settings:policy_bundle_status'] = 'Usawazishaji wa mwisho';
 $string['settings:policy_bundle_applied_version'] = 'toleo lililotumika';
 $string['task:policy_bundle_sync'] = 'SOLA usawazishaji wa policy bundle iliyosainiwa';
 $string['policy_bundle:invalid'] = 'Policy bundle imekataliwa: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Vipande vilivyopatikana (uteuzi wa RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Vipande ambavyo mfumo wa upatikanaji uliviteua kwa swali hili, kwa mpangilio wa cheo pamoja na alama yao ya umuhimu na chanzo (cmid). Tumia hii kuthibitisha kuwa modeli ilipokea maudhui ya kozi yanayolingana zaidi.';

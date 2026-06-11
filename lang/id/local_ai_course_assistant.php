@@ -1519,3 +1519,5 @@ $string['settings:policy_bundle_status'] = 'Sinkronisasi terakhir';
 $string['settings:policy_bundle_applied_version'] = 'versi yang diterapkan';
 $string['task:policy_bundle_sync'] = 'Sinkronisasi bundel kebijakan bertanda tangan SOLA';
 $string['policy_bundle:invalid'] = 'Bundel kebijakan ditolak: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Potongan yang diambil (seleksi RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Bagian yang dipilih oleh retriever untuk pertanyaan ini, dalam urutan peringkat beserta skor relevansi dan sumbernya (cmid). Gunakan ini untuk memverifikasi bahwa model menerima konten kursus yang paling sesuai.';
