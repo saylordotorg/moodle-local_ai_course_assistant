@@ -1,6 +1,6 @@
 # SOLA RAG Fixture Benchmark 2026-06-10
 
-**Status:** Embedding arm complete. Rerank arm blocked on missing Voyage API key.
+**Status:** Embedding arm complete. Rerank arm blocked on Voyage free tier rate limits (key added 2026-06-11, authenticates; needs a payment method on the Voyage account to lift per minute limits — actual spend stays $0).
 **Verdict:** CONDITIONAL GO — see section 6.
 
 ---
@@ -195,14 +195,41 @@ topic, while later content chunks that address it more directly ranked higher.
 
 ## 4. Rerank arm: blocked
 
-The Voyage rerank-2.5 arm could not execute. The dev site's plugin config has no
-`embed_apikey` and no `rerank_apikey` set. The `apikey` field holds an OpenAI key only.
+### 4.1 First blocker (2026-06-10, resolved): no key
 
-`voyage_reranker::is_configured()` returned false for the `embed_apikey` fallback check,
-so all 40 rerank calls failed with HTTP 401 (authentication error).
+The Voyage rerank-2.5 arm could not execute on the first run. The dev site's plugin
+config had no `embed_apikey` and no `rerank_apikey` set, so all 40 rerank calls failed
+with HTTP 401.
 
-This means the rerank arm results are unavailable and the delta calculations cannot be
-measured directly. Section 5 provides a projection based on the observed embedding ranks.
+### 4.2 Second blocker (2026-06-11, open): free tier rate limits
+
+Tom added a Voyage API key to `rerank_apikey` on dev (rerank stays disabled for
+learners). The key authenticates: an isolated 2 document probe call succeeds. But the
+account has no payment method, and Voyage free tier rate limits are far below what the
+benchmark needs:
+
+- Full pool (50 documents, ~10K tokens per call) at 21s pacing with five 25s retries:
+  every call returned 429 Too many requests.
+- Reduced pool (25 documents, ~5K tokens per call) at 70s pacing: still zero successes
+  in 10 fixtures before the run was cancelled.
+- A ~30 token probe after 90s of quiet succeeds.
+
+The observable budget is on the order of a few thousand tokens per minute at most, too
+small for any pool size that would make the benchmark meaningful (shrinking the pool to
+fit the budget removes exactly the deep ranked chunks rerank is supposed to rescue).
+
+**Unblock:** add a payment method to the Voyage account (dashboard.voyageai.com,
+Billing). Actual spend stays $0 — the benchmark uses well under the free token
+allotment — but billing on file lifts the per minute limits by orders of magnitude.
+After that, the full 50 candidate run completes in about 3 minutes:
+
+    sudo -u www-data php admin/cli/run_rag_fixture_benchmark.php --embed-apikey=<openai key>
+
+The harness now supports `--rerank-delay-ms=N` pacing and retries 429s five times with
+25s backoff, so it also degrades gracefully on limited keys.
+
+Until then the rerank deltas cannot be measured directly. Section 5 provides a
+projection based on the observed embedding ranks.
 
 ---
 

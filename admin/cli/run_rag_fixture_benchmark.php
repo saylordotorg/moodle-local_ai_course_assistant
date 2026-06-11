@@ -63,6 +63,7 @@ $embedapikeyoverride = '';
 $candidates = 50;
 $topk = 10;
 $outfile = '';
+$rerankdelayms = 0;
 
 foreach ($argv as $arg) {
     if (preg_match('/^--fixtures=(.+)$/', $arg, $m)) {
@@ -75,6 +76,8 @@ foreach ($argv as $arg) {
         $topk = max(1, min(20, (int) $m[1]));
     } else if (preg_match('/^--out=(.+)$/', $arg, $m)) {
         $outfile = trim($m[1]);
+    } else if (preg_match('/^--rerank-delay-ms=(\d+)$/', $arg, $m)) {
+        $rerankdelayms = max(0, (int) $m[1]);
     } else if ($arg === '--help' || $arg === '-h') {
         echo <<<TXT
 Usage: php run_rag_fixture_benchmark.php [options]
@@ -85,6 +88,8 @@ Options:
   --candidates=N        Embedding-stage candidate pool for reranker (default 50)
   --topk=N              Final top-k retrieved (default 10; max 20)
   --out=PATH            Output JSON path (default: runs/YYYY-MM-DD-rag-bench.json)
+  --rerank-delay-ms=N   Sleep N ms before each rerank call (default 0). Use ~21000
+                        on a free-tier Voyage key (~3 requests/minute).
 
 TXT;
         exit(0);
@@ -309,9 +314,31 @@ foreach ($fixtures as $fixture) {
         $stage1 = array_slice($scored, 0, $candidates);
         $documents = array_map(fn($r) => $r['content'], $stage1);
 
+        // Pace requests for low-rate-limit keys (Voyage free tier allows ~3
+        // requests/minute until a payment method is on file).
+        if ($rerankdelayms > 0) {
+            usleep($rerankdelayms * 1000);
+        }
         $t0rerank = microtime(true);
         try {
-            $reranked = $reranker->rerank($q, $documents, $topk);
+            // Retry on 429 with a flat backoff so a transient rate-limit hit
+            // does not void the whole arm. Latency is measured per successful
+            // attempt only.
+            $attempt = 0;
+            while (true) {
+                try {
+                    $t0rerank = microtime(true);
+                    $reranked = $reranker->rerank($q, $documents, $topk);
+                    break;
+                } catch (\Throwable $re) {
+                    $attempt++;
+                    if ($attempt >= 5 || stripos($re->getMessage(), 'too many requests') === false) {
+                        throw $re;
+                    }
+                    fwrite(STDERR, "  [rerank]     429, retry {$attempt}/5 in 25s\n");
+                    sleep(25);
+                }
+            }
             $reranklatencyms = (int) round((microtime(true) - $t0rerank) * 1000);
 
             // Count approximate tokens for cost estimate.
