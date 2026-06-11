@@ -115,6 +115,16 @@ if ($httpcode !== 200) {
     exit;
 }
 
+// Some providers/proxies return HTTP 200 with a JSON error or empty body (e.g.
+// a moderation refusal). Returning that as base64 "audio" makes the client
+// decode garbage and silently fall back to the browser voice with no
+// diagnostic. Audio (mp3) never starts with '{', so reject a non-audio 200.
+if ($response === false || $response === '' || $response[0] === '{') {
+    http_response_code(502);
+    echo json_encode(['error' => 'TTS provider returned no audio']);
+    exit;
+}
+
 // Log TTS cost: approximate tokens from character count (~4 chars/token).
 $charcount = mb_strlen($text);
 $approxtokens = (int) ceil($charcount / 4);

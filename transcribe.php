@@ -73,7 +73,11 @@ if ($size <= 0 || $size > \local_ai_course_assistant\security::MAX_AUDIO_BYTES) 
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 $sniffed = $finfo ? finfo_file($finfo, $tmp) : '';
 if ($finfo) { finfo_close($finfo); }
-if (!in_array($sniffed, \local_ai_course_assistant\security::AUDIO_MIME_ALLOWLIST, true)) {
+// MediaRecorder audio containers sniff as video/* or octet-stream (not audio/*),
+// so a strict audio/*-only check 415'd every real browser recording. Accept the
+// container types real recordings produce; see security::is_allowed_audio_upload.
+$declaredtype = !empty($_FILES['audio']['type']) ? (string) $_FILES['audio']['type'] : '';
+if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $sniffed, $declaredtype)) {
     http_response_code(415);
     echo json_encode(['error' => 'Unsupported audio format.']);
     exit;

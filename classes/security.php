@@ -38,6 +38,21 @@ class security {
         'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/flac', 'audio/aac',
     ];
 
+    /**
+     * Container MIME types that finfo emits for audio-only MediaRecorder
+     * recordings. A WebM/Matroska audio container sniffs as video/webm (or, on
+     * some magic databases, application/octet-stream); an MP4 audio container
+     * sniffs as video/mp4; an Ogg container as application/ogg or video/ogg.
+     * The earlier audio/*-only allowlist rejected every real browser recording
+     * with HTTP 415, so STT never produced a transcript.
+     *
+     * @var string[]
+     */
+    public const AUDIO_CONTAINER_ALLOWLIST = [
+        'video/webm', 'video/ogg', 'video/mp4', 'video/x-matroska',
+        'application/ogg',
+    ];
+
     /** @var int Maximum audio upload size in bytes (25 MB). */
     public const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
 
@@ -130,6 +145,40 @@ class security {
             if (isset($parts['port']) && (int) $parts['port'] !== (int) $port) {
                 continue;
             }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Decide whether an uploaded audio file is acceptable for transcription.
+     *
+     * Validation is defence-in-depth (the file is forwarded only to the STT
+     * provider, never stored or executed), so it accepts what real browser
+     * recordings actually look like:
+     *  - a direct audio/* match (AUDIO_MIME_ALLOWLIST), or
+     *  - a known audio container that finfo reports as video/* or
+     *    application/ogg (AUDIO_CONTAINER_ALLOWLIST), or
+     *  - a generic sniff (octet-stream / empty / text/plain — magic-database
+     *    dependent) but only when the browser-declared type is an allowlisted
+     *    audio/* type.
+     *
+     * @param string $sniffed  MIME type from finfo on the file bytes.
+     * @param string $declared Browser-declared MIME ($_FILES['audio']['type']).
+     * @return bool
+     */
+    public static function is_allowed_audio_upload(string $sniffed, string $declared): bool {
+        $sniffed = strtolower(trim($sniffed));
+        $declared = strtolower(trim($declared));
+        if (in_array($sniffed, self::AUDIO_MIME_ALLOWLIST, true)) {
+            return true;
+        }
+        if (in_array($sniffed, self::AUDIO_CONTAINER_ALLOWLIST, true)) {
+            return true;
+        }
+        $generic = ['application/octet-stream', 'text/plain', ''];
+        if (in_array($sniffed, $generic, true)
+            && in_array($declared, self::AUDIO_MIME_ALLOWLIST, true)) {
             return true;
         }
         return false;
