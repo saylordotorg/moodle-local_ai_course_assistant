@@ -12,11 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026060903`, release `6.0.0`
+- **Current version:** `2026061007`, release `6.3.0`
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
-- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) run v5.12.1.
+- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) run v6.3.0. Prod upgrade runbook (one jump v5.4.5 → v6.3.0, path tested locally): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.3.0.md`.
 
 ---
 
@@ -46,6 +46,10 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - Premium escalation tier (v5.12.0): per-turn `premium_router` evaluates each chat call against admin-configured regex triggers (default ships with multi-step STEM markers from the A.10 bake-off: derive, prove that, step by step, LaTeX math, fenced code blocks, big-O, integrals, optimization, thermodynamics) plus an optional course-shortname/idnumber allowlist; matching turns route to Claude Opus 4.8 instead of the workhorse chat tier. Off by default; expected ~$700/mo at 100k MAU at 5% escalation rate.
 - Defensive defaults (v5.13.0): `spend_cap_per_course_default` fallback (every course without an explicit per-course override gets this cap; existing 80/95/100% notification email pipeline carries through). Fix: `emergency_control --chat` was a silent no-op v5.4.5 → v5.12.x; v5.13 adds a dedicated `emergency_chat_disabled` flag that spend_guard::check() consults first.
 - Operational maturity (v6.0.0): daily `cost_anomaly_check` scheduled task compares today's site-wide SOLA spend vs rolling 7-day median, emails `spend_notify_emails` recipients when today > multiplier × median (default 2.0). Catches runaway courses + accidental premium-tier enable + provider misroute that the cap thresholds miss. Off by default. Companion `admin/cli/send_spend_alert_test_email.php` lets admins verify alert delivery BEFORE relying on it.
+- Security + hardening hotfix (v6.0.1): conversation history filtered to user/assistant roles so internal telemetry rows ([PremiumRouter]/[Rerank]/[Embedding]) never reach learners or the LLM; email opt-out honored by the spend-alert self-test; `role_timecreated` index on msgs.
+- Admin UX (v6.1.0): web emergency kill-switch panel (`emergency_admin.php`, red link from settings quicklinks); `cached_tokens` persisted per call + Cached Tokens card in token analytics; token-analytics category fix (RAG rows were silently excluded); settings regrouping. v6.1.1: flashcards review page Moodle 5.x fatal fixed (`print_error` → `moodle_exception`).
+- Selfhosted Whisper STT (v6.3.0): `stt_selfhosted_url`/`stt_selfhosted_model`/`stt_selfhosted_apikey` settings; any OpenAI-compatible transcription server (whisper-server Docker, speaches/faster-whisper, whisper.cpp). Default STT path when URL configured; paid label in `voice_active_stt` overrides; bypasses voice spend guard (free); keyless auth supported; private/http servers need an `ssrf_trusted_endpoints` entry. Resolution + normalization in `classes/voice_registry.php` (`SELFHOSTED_LABEL`, `selfhosted_stt_config()`, `selfhosted_stt_endpoint()`); tests in `tests/voice_registry_selfhosted_test.php`. Realtime voice conversations remain OpenAI WebSocket only — selfhosted covers the mic STT path.
+- i18n catch-up (v6.3.0): 100 keys (v5.11→v6.2 surfaces) translated into all 45 non-English languages; 46/46 locales pass the completeness check with zero missing keys.
 
 ---
 
@@ -225,9 +229,10 @@ rsync -a --exclude=.git \
 
 ## Upcoming Work
 
-1. Mistral training-opt-out + ZDR (external action — Saylor portal). Currently NOT in Saylor's `spend_failover_chain`; provider class stays available so non-Saylor sites can opt in.
-2. Vendor enterprise commits (Vertex Tier 3+, OpenAI Tier 4, Anthropic Tier 3, Voyage enterprise). 2-4 week procurement window; only matters past 50K MAU.
-3. lp-i18n translation batch for v5.11 (13 strings) + v5.12 (8 strings) + v5.13 (2 strings) into the 45 non-English language files.
-4. Instructor spot-check on 20 of the A.10 bake-off responses to validate the LLM judge's calls.
-5. SOLA-fixture RAG benchmark (30-50 real BUS101 / PHIL101 questions with expected-passage labels) before enabling Voyage rerank at scale.
-6. Talking avatars in the plugin (pricing / architecture discussion still pending; sit in Appendix B of `.drafts/sola-vendor-recommendations-2026-06-09.md`).
+1. Prod upgrade decision: v5.4.5 → v6.3.0 on Learn + Degrees (Tom's call; runbook ready at `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.3.0.md`; Catalyst/Artem workflow, stagger Degrees-first recommended).
+2. Mistral training-opt-out + ZDR (external action — Saylor portal). Currently NOT in Saylor's `spend_failover_chain`; provider class stays available so non-Saylor sites can opt in.
+3. Vendor enterprise commits (Vertex Tier 3+, OpenAI Tier 4, Anthropic Tier 3, Voyage enterprise). 2-4 week procurement window; only matters past 50K MAU.
+4. RAG rerank arm rerun: 2026-06-10 fixture benchmark (`admin/cli/run_rag_fixture_benchmark.php`, 40 fixtures BUS101+POLSC101) measured embedding-only recall@3 = 55% and projected +17-25pp from rerank, but the rerank arm is BLOCKED on a Voyage API key on dev. Add key, rerun, confirm P50 added latency < 300ms before `rerank_enabled=1` anywhere. Report: `.drafts/sola-rag-fixture-benchmark-2026-06-10.md`.
+5. Talking avatars in the plugin (pricing / architecture discussion still pending; sit in Appendix B of `.drafts/sola-vendor-recommendations-2026-06-09.md`).
+
+Done recently: lp-i18n catch-up batch (100 keys × 45 languages, v6.3.0); A.10 judge spot-check (verdict CONFIRMED, `.drafts/sola-a10-spot-check-2026-06-10.md`); upgrade-path test v5.4.5 → v6.3.0.

@@ -118,14 +118,18 @@ if ($cfg['provider'] === 'xai') {
     }
     $model = 'grok-stt';
 } else {
+    // OpenAI protocol: hosted OpenAI (whisper-1) or an OpenAI compatible
+    // selfhosted server (faster-whisper / whisper-server). The model name
+    // comes from the registry so selfhosted servers can name the Whisper
+    // model they have loaded.
+    $model = !empty($cfg['model']) ? $cfg['model'] : 'whisper-1';
     $post = [
         'file'  => new CURLFile($tmpfile, $mimetype, $filename),
-        'model' => 'whisper-1',
+        'model' => $model,
     ];
     if (!empty($lang)) {
         $post['language'] = $lang;
     }
-    $model = 'whisper-1';
 }
 
 if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])) {
@@ -133,14 +137,18 @@ if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])
     echo json_encode(['error' => 'STT endpoint failed SSRF validation']);
     exit;
 }
+// Selfhosted servers are usually keyless behind a trusted network; only
+// send an Authorization header when a key is actually configured.
+$headers = [];
+if (!empty($cfg['apikey'])) {
+    $headers[] = 'Authorization: Bearer ' . $cfg['apikey'];
+}
 $ch = curl_init($cfg['endpoint']);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $post,
-    CURLOPT_HTTPHEADER     => [
-        'Authorization: Bearer ' . $cfg['apikey'],
-    ],
+    CURLOPT_HTTPHEADER     => $headers,
     CURLOPT_TIMEOUT        => 30,
 ]);
 $response = curl_exec($ch);
@@ -160,8 +168,10 @@ if (!isset($data['text'])) {
     exit;
 }
 
-// Log Whisper transcription cost: approximate tokens from audio file size.
-// Whisper charges per minute (~$0.006/min). Rough estimate: 1MB ≈ 1 min audio.
+// Log Whisper transcription usage: approximate tokens from audio file size.
+// Hosted Whisper charges per minute (~$0.006/min). Rough estimate: 1MB ≈ 1 min
+// audio. Selfhosted servers cost $0 — the rate card simply has no entry for
+// 'selfhosted_stt', so the row records usage telemetry at zero cost.
 $filesizebytes = filesize($tmpfile) ?: 0;
 $approxminutes = max(0.1, $filesizebytes / 1_000_000);
 $approxtokens = (int) ceil($approxminutes * 1000); // Arbitrary unit for rate card matching.

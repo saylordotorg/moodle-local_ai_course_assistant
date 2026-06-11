@@ -1422,12 +1422,54 @@ if ($hassiteconfig) {
         '',
         $activechoices
     ));
+    // STT additionally offers the selfhosted Whisper server (v6.2.0). When a
+    // server URL is configured below, the blank default prefers selfhosted;
+    // picking a paid label here overrides that.
+    $sttchoices = ['' => '(selfhosted if configured, else first row or legacy fallback)'];
+    $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
+        'Selfhosted Whisper server (free, uses the URL below)';
+    foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
+        $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
+        $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
+    }
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/voice_active_stt',
         'Active STT provider',
-        'Which configured voice provider handles speech-to-text transcription of student audio.',
+        'Which provider handles speech-to-text transcription of student audio. Leave blank to prefer the selfhosted Whisper server when one is configured below, falling back to the first voice provider row or the legacy key.',
         '',
-        $activechoices
+        $sttchoices
+    ));
+
+    // Selfhosted Whisper STT server (v6.2.0). Any OpenAI compatible
+    // transcription server works: whisper-server Docker, speaches
+    // (faster-whisper), or whisper.cpp server.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/stt_selfhosted_heading',
+        get_string('settings:stt_selfhosted_heading', 'local_ai_course_assistant'),
+        get_string('settings:stt_selfhosted_heading_desc', 'local_ai_course_assistant')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/stt_selfhosted_url',
+        get_string('settings:stt_selfhosted_url', 'local_ai_course_assistant'),
+        get_string('settings:stt_selfhosted_url_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/stt_selfhosted_model',
+        get_string('settings:stt_selfhosted_model', 'local_ai_course_assistant'),
+        get_string('settings:stt_selfhosted_model_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/stt_selfhosted_apikey',
+        get_string('settings:stt_selfhosted_apikey', 'local_ai_course_assistant'),
+        get_string('settings:stt_selfhosted_apikey_desc', 'local_ai_course_assistant'),
+        ''
     ));
 
     $settings->add(new admin_setting_configcheckbox(

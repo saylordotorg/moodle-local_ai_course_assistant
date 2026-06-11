@@ -331,6 +331,16 @@ $string['settings:rerank_apibaseurl_desc'] = 'Override the Voyage rerank base UR
 $string['settings:rerank_candidates'] = 'Rerank candidate window';
 $string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 50. Larger windows give the reranker more material to work with at small extra cost (~10k tokens per rerank op).';
 
+// Selfhosted Whisper STT server (v6.2.0).
+$string['settings:stt_selfhosted_heading'] = 'Selfhosted transcription (Whisper)';
+$string['settings:stt_selfhosted_heading_desc'] = 'Run speech-to-text on your own hardware at zero per-minute cost. Point SOLA at any OpenAI-compatible transcription server: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), or <code>whisper.cpp</code> server. When a server URL is set here it becomes the default STT path; pick a paid provider in Active STT provider above to override. If the server is on a private network or plain http, also add its host to the SSRF trusted endpoints allowlist in the Security section.';
+$string['settings:stt_selfhosted_url'] = 'Selfhosted STT server URL';
+$string['settings:stt_selfhosted_url_desc'] = 'Base URL of the OpenAI-compatible transcription server, for example <code>http://10.0.0.5:8000</code>. SOLA appends <code>/v1/audio/transcriptions</code> automatically; a full endpoint path is also accepted. Leave empty to disable selfhosted STT.';
+$string['settings:stt_selfhosted_model'] = 'Selfhosted STT model';
+$string['settings:stt_selfhosted_model_desc'] = 'Model name passed to the server, matching the Whisper model it has loaded — for example <code>Systran/faster-whisper-small</code> for speaches or <code>large-v3</code>. Leave empty to send <code>whisper-1</code>, which most selfhosted servers accept or ignore.';
+$string['settings:stt_selfhosted_apikey'] = 'Selfhosted STT API key';
+$string['settings:stt_selfhosted_apikey_desc'] = 'Optional. Most selfhosted servers are keyless behind a trusted network; set this only if your server requires a bearer token.';
+
 // Reminder messages.
 $string['reminder:email_subject'] = 'Study Reminder: {$a}';
 $string['reminder:email_body'] = 'Hi {$a->firstname},

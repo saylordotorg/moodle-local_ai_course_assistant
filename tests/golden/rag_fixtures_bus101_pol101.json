@@ -1,0 +1,411 @@
+{
+  "version": "1.0",
+  "created": "2026-06-10",
+  "description": "RAG fixture set for SOLA embedding-only vs. two-stage rerank benchmark. 40 learner-style questions labeled against real BUS101 and POLSC101 chunk IDs from the dev.sylr.org index. Questions are authored to sound like real students: short, sometimes vague, occasional typos, not keyword queries.",
+  "courses": {
+    "BUS101": {"id": 11, "chunks_indexed": 792},
+    "POLSC101": {"id": 7, "chunks_indexed": 191}
+  },
+  "fixtures": [
+    {
+      "id": "bus-001",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what even is a business? like why do we need them",
+      "expected_chunk_id": 16,
+      "expected_substring": "people outside of the business enterprise ought to have a say in how the business operates",
+      "difficulty": "easy",
+      "notes": "Vague opener; should match the intro 'What Is a Business?' chunk"
+    },
+    {
+      "id": "bus-002",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "does a company have to care about the environment or just make money",
+      "expected_chunk_id": 31,
+      "expected_substring": "environments that are free from sexual harassment and all types of discrimination",
+      "difficulty": "medium",
+      "notes": "CSR question; should retrieve the Corporate Social Responsibility chunk"
+    },
+    {
+      "id": "bus-003",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what happens to workers when a coal plant closes down",
+      "expected_chunk_id": 46,
+      "expected_substring": "biomass electricity generation on the sites, to take advantage of existing transmission infrastructure",
+      "difficulty": "easy",
+      "notes": "Direct topic reference; should match the 'When Coal Plants Shut Down' chunk"
+    },
+    {
+      "id": "bus-004",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "how does GDP relate to how well a country is doing",
+      "expected_chunk_id": 91,
+      "expected_substring": "GDP per capita exactly equals the gross domestic income (GDI) per capita",
+      "difficulty": "easy",
+      "notes": "Should retrieve the GDP/economic indicators chunk"
+    },
+    {
+      "id": "bus-005",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what does the Fed do exactly and how does it effect inflation",
+      "expected_chunk_id": 121,
+      "expected_substring": "monetary policy, the Fed relies on three tools: reserve requirements, the discount rate, and open market operations",
+      "difficulty": "medium",
+      "notes": "Misspelling 'effect' for 'affect'; should retrieve Federal Reserve chunk"
+    },
+    {
+      "id": "bus-006",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "why is it hard to sell products in other countries",
+      "expected_chunk_id": 136,
+      "expected_substring": "Distance is thus one of the natural barriers to international trade. Language is another natural trade barrier",
+      "difficulty": "easy",
+      "notes": "Global trade barriers; should match the competing in global marketplace chunk"
+    },
+    {
+      "id": "bus-007",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what is a contract manufacturing arrangement",
+      "expected_chunk_id": 151,
+      "expected_substring": "volume of products to specification and put the domestic firm's brand name on the goods",
+      "difficulty": "hard",
+      "notes": "Specific trade strategy; should match the global marketplace licensing/manufacturing chunk"
+    },
+    {
+      "id": "bus-008",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "is the WTO the same as the EU? whats the difference",
+      "expected_chunk_id": 181,
+      "expected_substring": "renamed as such in 1993) was an international organization created by the 1957 Treaty of Rome",
+      "difficulty": "medium",
+      "notes": "Confusion between trade organizations; should retrieve EU/global trade facilitators chunk"
+    },
+    {
+      "id": "bus-009",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what are the advantages of a sole proprietorship",
+      "expected_chunk_id": 196,
+      "expected_substring": "What is a sole proprietorship? Why is this a popular form of business organization? What are the drawbacks",
+      "difficulty": "easy",
+      "notes": "Direct business law question; should match forms of business ownership chunk"
+    },
+    {
+      "id": "bus-010",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "ben and jerry started their ice cream company together, what type of business is that",
+      "expected_chunk_id": 211,
+      "expected_substring": "cream business as a partnership was inexpensive and let them combine their limited financial resources",
+      "difficulty": "easy",
+      "notes": "Scenario-based question; should retrieve the partnerships chunk with Ben and Jerry reference"
+    },
+    {
+      "id": "bus-011",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what makes small businesses important for the economy",
+      "expected_chunk_id": 241,
+      "expected_substring": "discourages start-ups and expansions, which decreases the workforce through layoffs",
+      "difficulty": "easy",
+      "notes": "Should match the small businesses and US economy chunk"
+    },
+    {
+      "id": "bus-012",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "groupon sounds like it lost alot of money, why would daily deals sites fail",
+      "expected_chunk_id": 256,
+      "expected_substring": "daily deals website isn't just unprofitable - it's bleeding hundreds of million",
+      "difficulty": "medium",
+      "notes": "Slightly mangled question about Groupon failure case; should match starting a business chunk"
+    },
+    {
+      "id": "bus-013",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what should I think about before starting my own company",
+      "expected_chunk_id": 271,
+      "expected_substring": "first step in starting your own business is a self-assessment to determine whether you have the personal traits",
+      "difficulty": "easy",
+      "notes": "Broad entrepreneurship question; should retrieve entrepreneurship getting-started chunk"
+    },
+    {
+      "id": "bus-014",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what goes in a business plan",
+      "expected_chunk_id": 286,
+      "expected_substring": "target market, pricing, distribution, and promotion",
+      "difficulty": "easy",
+      "notes": "Basic business plan question; should retrieve the business plan components chunk"
+    },
+    {
+      "id": "bus-015",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "how does e-commerce let companies collect customer data",
+      "expected_chunk_id": 316,
+      "expected_substring": "be used to collect data from both existing and potential customers",
+      "difficulty": "medium",
+      "notes": "E-commerce data collection; should match the marketing/e-commerce chunk"
+    },
+    {
+      "id": "bus-016",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "woody allen quote about innovation I think was in the reading",
+      "expected_chunk_id": 331,
+      "expected_substring": "Woody Allen once put it",
+      "difficulty": "hard",
+      "notes": "Student remembers a specific quote; verbatim content match test"
+    },
+    {
+      "id": "bus-017",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what modes of transportation do companies use to ship goods",
+      "expected_chunk_id": 346,
+      "expected_substring": "Pipelines account for 3 percent of expenditures",
+      "difficulty": "easy",
+      "notes": "Logistics/distribution question; should retrieve placing a product chunk"
+    },
+    {
+      "id": "bus-018",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "how is SWOT analysis done with a real company",
+      "expected_chunk_id": 391,
+      "expected_substring": "SWOT analysis to various scenarios",
+      "difficulty": "medium",
+      "notes": "Applied SWOT; should retrieve marketing segmentation/SWOT chunk"
+    },
+    {
+      "id": "bus-019",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "whats the difference between managerial and financial accounting",
+      "expected_chunk_id": 406,
+      "expected_substring": "management accounting helps",
+      "difficulty": "medium",
+      "notes": "Accounting distinction; should match the role of accounting in business chunk"
+    },
+    {
+      "id": "bus-020",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what does an income statement show me",
+      "expected_chunk_id": 421,
+      "expected_substring": "shows sales, expenses, and net p",
+      "difficulty": "easy",
+      "notes": "Basic income statement question; should match income statement chunk"
+    },
+    {
+      "id": "bus-021",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "how do you figure out if a company is financially healthy using ratios",
+      "expected_chunk_id": 451,
+      "expected_substring": "ratio analysis be used to identify a firm's financial strengths and weaknesses",
+      "difficulty": "medium",
+      "notes": "Ratio analysis application; should retrieve financial ratio analysis chunk"
+    },
+    {
+      "id": "bus-022",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what tools does the federal reserve use for monetary policy",
+      "expected_chunk_id": 466,
+      "expected_substring": "three tools: reserve requirements, the discount rate, and open market operations",
+      "difficulty": "easy",
+      "notes": "Fed tools question; two chunks mention this - chunk 466 vs 121 - tests ranking"
+    },
+    {
+      "id": "bus-023",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "how does a company get a loan and what affects the interest rate",
+      "expected_chunk_id": 481,
+      "expected_substring": "quality of the collateral, and the debt-paying ability of the borrower",
+      "difficulty": "medium",
+      "notes": "Business financing question; should retrieve financing options loan chunk"
+    },
+    {
+      "id": "bus-024",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what is the 401k and should I start one",
+      "expected_chunk_id": 511,
+      "expected_substring": "defined contribution retirement plan, is a form of savings plan",
+      "difficulty": "easy",
+      "notes": "Personal finance question; should retrieve personal finances/401k chunk"
+    },
+    {
+      "id": "bus-025",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what is span of control in management",
+      "expected_chunk_id": 556,
+      "expected_substring": "frequency and type of interaction, proximity of subordinates, competence of both supervisor",
+      "difficulty": "medium",
+      "notes": "Management concept; should retrieve the organizing/span of control chunk"
+    },
+    {
+      "id": "bus-026",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "why would a company hire from outside instead of promoting internally",
+      "expected_chunk_id": 571,
+      "expected_substring": "Going outside gives you an opportunity to bring fresh ideas and skills into the company",
+      "difficulty": "medium",
+      "notes": "HR recruiting question; should retrieve HRM external hiring chunk"
+    },
+    {
+      "id": "bus-027",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "starbucks barista training how does that relate to HRM",
+      "expected_chunk_id": 586,
+      "expected_substring": "customer-service course, which trains you in making eye contact",
+      "difficulty": "hard",
+      "notes": "Scenario recall; should match the Starbucks/coffee training anecdote in HRM chunk"
+    },
+    {
+      "id": "bus-028",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what does a performance review usually measure",
+      "expected_chunk_id": 601,
+      "expected_substring": "sometimes employers lay off workers because revenues are down",
+      "difficulty": "medium",
+      "notes": "HRM appraisal question; should retrieve the appraisal/layoffs chunk"
+    },
+    {
+      "id": "bus-029",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "how does a profit sharing bonus plan work",
+      "expected_chunk_id": 616,
+      "expected_substring": "operating profit soars to 20 percent, the employee bonuses go up to 26 percent",
+      "difficulty": "medium",
+      "notes": "Employee compensation incentive; should retrieve great workplace/bonuses chunk"
+    },
+    {
+      "id": "bus-030",
+      "courseid": 11,
+      "course": "BUS101",
+      "question": "what is insider trading and is it illegal",
+      "expected_chunk_id": 691,
+      "expected_substring": "news becomes public, you sell all the stock you own in the company",
+      "difficulty": "easy",
+      "notes": "Business ethics/securities law; should retrieve ethics insider trading chunk"
+    },
+    {
+      "id": "pol-001",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "how is political science different from other social sciences",
+      "expected_chunk_id": 793,
+      "expected_substring": "Situate the academic discipline of political science within the broader field of social science",
+      "difficulty": "easy",
+      "notes": "Foundational POLSC101 question; should retrieve unit 1 learning outcomes chunk"
+    },
+    {
+      "id": "pol-002",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "is political science actually a science or just opinions",
+      "expected_chunk_id": 799,
+      "expected_substring": "whether a particular government is fully democratic or is more or less democratic when compared",
+      "difficulty": "medium",
+      "notes": "Should retrieve the research in political science chunk"
+    },
+    {
+      "id": "pol-003",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "what is the american dream and why do people believe in it",
+      "expected_chunk_id": 805,
+      "expected_substring": "belief that each American has the freedom to pursue a better life",
+      "difficulty": "easy",
+      "notes": "Political culture question; should retrieve American political culture chunk"
+    },
+    {
+      "id": "pol-004",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "can politicians just ignore what their voters want",
+      "expected_chunk_id": 811,
+      "expected_substring": "responsibility of each representative to explain to the people back home why he or she has cast a vote",
+      "difficulty": "medium",
+      "notes": "Public opinion and representation; should retrieve public opinion chunk"
+    },
+    {
+      "id": "pol-005",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "what are lobbyists and do they actually bribe politicians",
+      "expected_chunk_id": 823,
+      "expected_substring": "research on lobbying has progressed substantially",
+      "difficulty": "medium",
+      "notes": "Interest groups and lobbying; should retrieve lobbying/special interests chunk"
+    },
+    {
+      "id": "pol-006",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "why does the US only have two main parties when other countries have more",
+      "expected_chunk_id": 835,
+      "expected_substring": "parliamentary arrangement such as Britain",
+      "difficulty": "medium",
+      "notes": "Two-party vs multiparty question; should retrieve two-party system chunk"
+    },
+    {
+      "id": "pol-007",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "what is democratic socialism and how is it different from communism",
+      "expected_chunk_id": 847,
+      "expected_substring": "revolutionary vanguard party, and the achievement of a direct-democracy dictatorship of the proletariat",
+      "difficulty": "hard",
+      "notes": "Ideological distinction; should retrieve democratic socialism chunk"
+    },
+    {
+      "id": "pol-008",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "what did laissez faire actually mean in economics",
+      "expected_chunk_id": 859,
+      "expected_substring": "transactions between private parties are free from tariffs, government subsidies, and enforced monopolies",
+      "difficulty": "medium",
+      "notes": "Classical liberalism definition; should retrieve laissez-faire chunk"
+    },
+    {
+      "id": "pol-009",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "how was the united nations created and what is it supposed to do",
+      "expected_chunk_id": 889,
+      "expected_substring": "ratification of the Charter of the United Nations in October 1945",
+      "difficulty": "easy",
+      "notes": "UN origins; should retrieve the United Nations chunk"
+    },
+    {
+      "id": "pol-010",
+      "courseid": 7,
+      "course": "POLSC101",
+      "question": "what is terrorism and how is it different from regular war",
+      "expected_chunk_id": 907,
+      "expected_substring": "deliberate commission of an act of violence to create an emotional response through the suffering",
+      "difficulty": "easy",
+      "notes": "War and terrorism definition; should retrieve terrorism chunk"
+    }
+  ]
+}

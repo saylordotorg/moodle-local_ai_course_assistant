@@ -43,6 +43,9 @@ class voice_registry {
     public const CAPABILITY_TTS = 'tts';
     public const CAPABILITY_STT = 'stt';
 
+    /** @var string Reserved voice_active_stt value selecting the selfhosted Whisper server. */
+    public const SELFHOSTED_LABEL = 'selfhosted';
+
     /**
      * Parse the voice_providers config into structured rows.
      * Stored format: provider|apikey|label|realtime_voice|tts_voice
@@ -85,6 +88,20 @@ class voice_registry {
      * @return array|null ['provider', 'apikey', 'voice', 'endpoint']
      */
     public static function resolve(string $capability): ?array {
+        // Selfhosted Whisper STT (v6.2.0): free, so it bypasses the voice
+        // spend guard entirely. It is the DEFAULT STT path whenever a server
+        // URL is configured; an explicit paid label in voice_active_stt still
+        // wins so hosted STT stays selectable.
+        if ($capability === self::CAPABILITY_STT) {
+            $selfhosted = self::selfhosted_stt_config();
+            if ($selfhosted !== null) {
+                $activelabel = (string) (get_config('local_ai_course_assistant', 'voice_active_stt') ?: '');
+                if ($activelabel === '' || $activelabel === self::SELFHOSTED_LABEL) {
+                    return $selfhosted;
+                }
+            }
+        }
+
         // Spend guard: if voice is over cap, swap in the failover chain voice
         // provider (if any) before resolving. Failover returns null when none
         // is configured — in that case we still try the normal resolution so
@@ -205,6 +222,56 @@ class voice_registry {
      */
     public static function default_voice_for(string $provider): string {
         return $provider === 'xai' ? 'eve' : 'shimmer';
+    }
+
+    /**
+     * Resolve the selfhosted Whisper STT config, or null when no server URL
+     * is configured.
+     *
+     * Selfhosted servers (faster-whisper based images such as whisper-server,
+     * speaches, or whisper.cpp server) expose the OpenAI compatible
+     * POST /v1/audio/transcriptions endpoint, so transcribe.php can talk to
+     * them with the same multipart request it sends to OpenAI. The API key is
+     * optional (most selfhosted servers are keyless behind a trusted network);
+     * the model name identifies the Whisper model the server has loaded.
+     *
+     * @return array|null ['provider','apikey','voice','endpoint','label','model']
+     */
+    public static function selfhosted_stt_config(): ?array {
+        $url = trim((string) get_config('local_ai_course_assistant', 'stt_selfhosted_url'));
+        if ($url === '') {
+            return null;
+        }
+        $model = trim((string) get_config('local_ai_course_assistant', 'stt_selfhosted_model'));
+        return [
+            'provider' => 'selfhosted',
+            'apikey'   => trim((string) get_config('local_ai_course_assistant', 'stt_selfhosted_apikey')),
+            'voice'    => '',
+            'endpoint' => self::selfhosted_stt_endpoint($url),
+            'label'    => self::SELFHOSTED_LABEL,
+            'model'    => $model !== '' ? $model : 'whisper-1',
+        ];
+    }
+
+    /**
+     * Normalize an admin-entered selfhosted server URL to a full OpenAI
+     * compatible transcription endpoint.
+     *
+     * Accepts a bare base URL (http://host:8000), a base ending in /v1, or a
+     * full path that already contains /audio/transcriptions.
+     *
+     * @param string $url Admin-entered URL.
+     * @return string Full endpoint URL.
+     */
+    public static function selfhosted_stt_endpoint(string $url): string {
+        $url = rtrim(trim($url), '/');
+        if (strpos($url, '/audio/transcriptions') !== false) {
+            return $url;
+        }
+        if (preg_match('~/v\d+$~', $url)) {
+            return $url . '/audio/transcriptions';
+        }
+        return $url . '/v1/audio/transcriptions';
     }
 
     /**
