@@ -64,7 +64,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 1. Download or clone this repository
 2. Extract to `{moodle_root}/local/ai_course_assistant/`
 3. Visit Site Administration → Notifications to complete installation
-4. Configure settings at Site Administration → Plugins → Local plugins → AI Course Assistant
+4. Configure settings at Site Administration → Plugins → Local plugins → AI Course Assistant, or go directly to `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant`
 
 ## Configuration
 
