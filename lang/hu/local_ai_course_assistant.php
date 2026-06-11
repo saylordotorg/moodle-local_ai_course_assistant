@@ -1532,3 +1532,5 @@ $string['settings:policy_bundle_status'] = 'Utolsó szinkronizálás';
 $string['settings:policy_bundle_applied_version'] = 'alkalmazott verzió';
 $string['task:policy_bundle_sync'] = 'SOLA aláírt irányelvcsomag-szinkronizálás';
 $string['policy_bundle:invalid'] = 'Az irányelvcsomag elutasítva: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Lekért részletek (RAG-kiválasztás)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'A részletek, amelyeket a lekérő kiválasztott ehhez a kérdéshez, rangsor szerint, relevanciapontszámukkal és forrásukkal (cmid) együtt. Ezzel ellenőrizheti, hogy a modell a legjobban illeszkedő kurzustartalmat kapta-e meg.';

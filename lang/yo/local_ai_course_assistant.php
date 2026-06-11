@@ -1525,3 +1525,5 @@ $string['settings:policy_bundle_status'] = 'Sync tó gbẹ̀yìn';
 $string['settings:policy_bundle_applied_version'] = 'ẹ̀yà tí a lò';
 $string['task:policy_bundle_sync'] = 'SOLA policy bundle sync tí a fọwọ́ sí';
 $string['policy_bundle:invalid'] = 'Policy bundle kọ̀: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Àwọn àjákù tí a gbà jáde (àṣàyàn RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Àwọn ọ̀rọ̀ tí ohun ìgbàjáde yan fún ìbéèrè yìí, ní ọ̀nà ipò pẹ̀lú àmì ìbátan wọn àti orísun (cmid). Lo èyí láti rí i dájú pé àwòṣe náà gba àkóónú ẹ̀kọ́ tí ó bára mu jùlọ.';

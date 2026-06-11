@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Posledná synchronizácia';
 $string['settings:policy_bundle_applied_version'] = 'aplikovaná verzia';
 $string['task:policy_bundle_sync'] = 'Synchronizácia podpísaného balíka politík SOLA';
 $string['policy_bundle:invalid'] = 'Balík politík odmietnutý: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Získané fragmenty (výber RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Fragmenty, ktoré vyhľadávač vybral pre túto otázku, v poradí podľa hodnotenia spolu s ich skóre relevantnosti a zdrojom (cmid). Použite to na overenie, či model dostal najlepšie zodpovedajúci obsah kurzu.';

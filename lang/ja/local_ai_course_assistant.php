@@ -1496,3 +1496,5 @@ $string['settings:policy_bundle_status'] = '最終同期';
 $string['settings:policy_bundle_applied_version'] = '適用済みバージョン';
 $string['task:policy_bundle_sync'] = 'SOLA署名済みポリシーバンドル同期';
 $string['policy_bundle:invalid'] = 'ポリシーバンドルが拒否されました: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = '取得されたチャンク（RAG による選択）';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'リトリーバーがこの質問のために選択したパッセージを、関連度スコアとソース（cmid）とともにランク順に表示します。これを使って、モデルが最も一致するコースコンテンツを受け取ったかを確認してください。';

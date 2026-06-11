@@ -1493,3 +1493,5 @@ $string['settings:policy_bundle_status'] = 'Sync dhumaa';
 $string['settings:policy_bundle_applied_version'] = 'version hojii irra oolfame';
 $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle dide: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Kutaalee argaman (filannoo RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Caqasoota retriever gaaffii kanaaf filate, sajoo wal-simannaa isaaniitii fi madda (cmid) waliin tartiiba sadarkaatiin. Akka moodeelichi qabiyyee koorsii baayʼee wal-simu argate mirkaneeffachuuf kana fayyadami.';

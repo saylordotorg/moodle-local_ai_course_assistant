@@ -1525,3 +1525,5 @@ $string['settings:policy_bundle_status'] = '最近同步';
 $string['settings:policy_bundle_applied_version'] = '已应用版本';
 $string['task:policy_bundle_sync'] = 'SOLA 签名策略包同步';
 $string['policy_bundle:invalid'] = '策略包已拒绝：{$a}';
+$string['prompt_debug_view:retrieved_chunks'] = '检索到的文本块（RAG 选取）';
+$string['prompt_debug_view:retrieved_chunks_hint'] = '检索器为此问题选取的段落，按排名顺序列出，并附有相关性评分和来源（cmid）。可用于验证模型是否获得了最匹配的课程内容。';

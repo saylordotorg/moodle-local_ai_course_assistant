@@ -1503,3 +1503,5 @@ $string['settings:policy_bundle_status'] = 'ซิงค์ล่าสุด';
 $string['settings:policy_bundle_applied_version'] = 'เวอร์ชันที่ใช้แล้ว';
 $string['task:policy_bundle_sync'] = 'SOLA ซิงค์ชุดนโยบายที่ลงนามแล้ว';
 $string['policy_bundle:invalid'] = 'ชุดนโยบายถูกปฏิเสธ: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'ส่วนข้อความที่ดึงมา (การคัดเลือกแบบ RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'ส่วนข้อความที่ตัวดึงข้อมูลเลือกมาสำหรับคำถามนี้ เรียงตามลำดับความสำคัญพร้อมคะแนนความเกี่ยวข้องและแหล่งที่มา (cmid) ใช้ข้อมูลนี้เพื่อตรวจสอบว่าโมเดลได้รับเนื้อหารายวิชาที่ตรงกันมากที่สุด';

@@ -1503,3 +1503,5 @@ $string['settings:policy_bundle_status'] = 'Son senkronizasyon';
 $string['settings:policy_bundle_applied_version'] = 'uygulanan sürüm';
 $string['task:policy_bundle_sync'] = 'SOLA imzalı ilke paketi senkronizasyonu';
 $string['policy_bundle:invalid'] = 'İlke paketi reddedildi: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Getirilen parçalar (RAG seçimi)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Bu soru için getiricinin seçtiği pasajlar; alaka puanları ve kaynaklarıyla (cmid) birlikte sıralama düzeninde. Modelin en iyi eşleşen ders içeriğini aldığını doğrulamak için bunu kullanın.';

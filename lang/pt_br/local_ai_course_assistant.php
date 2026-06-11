@@ -1512,3 +1512,5 @@ $string['settings:policy_bundle_status'] = 'Última sincronização';
 $string['settings:policy_bundle_applied_version'] = 'versão aplicada';
 $string['task:policy_bundle_sync'] = 'Sincronização do pacote de políticas assinado do SOLA';
 $string['policy_bundle:invalid'] = 'Pacote de políticas rejeitado: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Trechos recuperados (seleção do RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Os trechos que o recuperador selecionou para esta pergunta, em ordem de classificação, com sua pontuação de relevância e a fonte (cmid). Use isto para verificar se o modelo recebeu o conteúdo do curso mais correspondente.';

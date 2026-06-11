@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Dernière synchronisation';
 $string['settings:policy_bundle_applied_version'] = 'version appliquée';
 $string['task:policy_bundle_sync'] = 'Synchronisation du pack de politiques signé SOLA';
 $string['policy_bundle:invalid'] = 'Pack de politiques rejeté : {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Segments récupérés (sélection RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Les passages que le récupérateur a sélectionnés pour cette question, classés par ordre de pertinence avec leur score de pertinence et leur source (cmid). Utilisez ceci pour vérifier que le modèle a reçu le contenu de cours le plus pertinent.';

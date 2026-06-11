@@ -1512,3 +1512,5 @@ $string['settings:policy_bundle_status'] = 'ਆਖਰੀ ਸਿੰਕ';
 $string['settings:policy_bundle_applied_version'] = 'ਲਾਗੂ ਸੰਸਕਰਣ';
 $string['task:policy_bundle_sync'] = 'SOLA ਦਸਤਖਤ ਕੀਤਾ ਨੀਤੀ ਬੰਡਲ ਸਿੰਕ';
 $string['policy_bundle:invalid'] = 'ਨੀਤੀ ਬੰਡਲ ਰੱਦ: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'ਪ੍ਰਾਪਤ ਕੀਤੇ ਟੁਕੜੇ (RAG ਚੋਣ)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'ਇਸ ਸਵਾਲ ਲਈ ਰੀਟ੍ਰੀਵਰ ਵੱਲੋਂ ਚੁਣੇ ਗਏ ਹਵਾਲੇ, ਉਨ੍ਹਾਂ ਦੇ ਸੰਬੰਧਤਾ ਸਕੋਰ ਅਤੇ ਸਰੋਤ (cmid) ਸਮੇਤ ਦਰਜਾਬੰਦੀ ਕ੍ਰਮ ਵਿੱਚ। ਇਹ ਪੁਸ਼ਟੀ ਕਰਨ ਲਈ ਇਸ ਦੀ ਵਰਤੋਂ ਕਰੋ ਕਿ ਮਾਡਲ ਨੂੰ ਸਭ ਤੋਂ ਵੱਧ ਮੇਲ ਖਾਂਦੀ ਕੋਰਸ ਸਮੱਗਰੀ ਮਿਲੀ।';

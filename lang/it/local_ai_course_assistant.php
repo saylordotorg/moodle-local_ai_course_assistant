@@ -1540,3 +1540,5 @@ $string['settings:policy_bundle_status'] = 'Ultima sincronizzazione';
 $string['settings:policy_bundle_applied_version'] = 'versione applicata';
 $string['task:policy_bundle_sync'] = 'Sincronizzazione pacchetto policy firmato SOLA';
 $string['policy_bundle:invalid'] = 'Pacchetto policy rifiutato: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Frammenti recuperati (selezione RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'I passaggi che il retriever ha selezionato per questa domanda, in ordine di pertinenza con il relativo punteggio di rilevanza e la fonte (cmid). Usalo per verificare che il modello abbia ricevuto i contenuti del corso più pertinenti.';

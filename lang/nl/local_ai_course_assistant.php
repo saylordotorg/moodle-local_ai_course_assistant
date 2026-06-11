@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Laatste synchronisatie';
 $string['settings:policy_bundle_applied_version'] = 'toegepaste versie';
 $string['task:policy_bundle_sync'] = 'SOLA-synchronisatie van ondertekend beleidspakket';
 $string['policy_bundle:invalid'] = 'Beleidspakket geweigerd: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Opgehaalde fragmenten (RAG-selectie)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'De passages die de retriever voor deze vraag heeft geselecteerd, op rangvolgorde met hun relevantiescore en bron (cmid). Gebruik dit om te verifiëren dat het model de best passende cursusinhoud heeft ontvangen.';

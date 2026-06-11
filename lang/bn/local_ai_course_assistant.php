@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'শেষ সিঙ্ক';
 $string['settings:policy_bundle_applied_version'] = 'প্রয়োগকৃত সংস্করণ';
 $string['task:policy_bundle_sync'] = 'SOLA স্বাক্ষরিত পলিসি বান্ডেল সিঙ্ক';
 $string['policy_bundle:invalid'] = 'পলিসি বান্ডেল প্রত্যাখ্যাত: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'পুনরুদ্ধার করা অংশ (RAG নির্বাচন)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'এই প্রশ্নের জন্য পুনরুদ্ধারকারী যে অনুচ্ছেদগুলো নির্বাচন করেছে, সেগুলো র‍্যাঙ্ক অনুসারে তাদের প্রাসঙ্গিকতার স্কোর ও উৎস (cmid) সহ সাজানো। মডেল সবচেয়ে ভালোভাবে মিলে যাওয়া কোর্স বিষয়বস্তু পেয়েছে কিনা তা যাচাই করতে এটি ব্যবহার করুন।';

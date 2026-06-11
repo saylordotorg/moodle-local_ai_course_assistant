@@ -1532,3 +1532,5 @@ $string['settings:policy_bundle_status'] = 'סנכרון אחרון';
 $string['settings:policy_bundle_applied_version'] = 'גרסה מוחלת';
 $string['task:policy_bundle_sync'] = 'סנכרון חבילת מדיניות חתומה של SOLA';
 $string['policy_bundle:invalid'] = 'חבילת המדיניות נדחתה: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'מקטעים שאוחזרו (בחירת RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'הקטעים שמנגנון האחזור בחר עבור שאלה זו, בסדר דירוג עם ציון הרלוונטיות והמקור שלהם (cmid). השתמשו בכך כדי לוודא שהמודל קיבל את תוכן הקורס התואם ביותר.';

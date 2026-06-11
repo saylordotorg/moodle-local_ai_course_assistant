@@ -1489,3 +1489,5 @@ $string['settings:policy_bundle_status'] = 'Ostatnia synchronizacja';
 $string['settings:policy_bundle_applied_version'] = 'zastosowana wersja';
 $string['task:policy_bundle_sync'] = 'SOLA synchronizacja podpisanego pakietu zasad';
 $string['policy_bundle:invalid'] = 'Pakiet zasad odrzucony: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Pobrane fragmenty (wybór RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Fragmenty, które wyszukiwarka wybrała dla tego pytania, w kolejności rankingu wraz z ich oceną trafności i źródłem (cmid). Użyj tego, aby sprawdzić, czy model otrzymał najlepiej dopasowaną treść kursu.';

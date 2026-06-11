@@ -1525,3 +1525,5 @@ $string['settings:policy_bundle_status'] = 'Lần đồng bộ cuối';
 $string['settings:policy_bundle_applied_version'] = 'phiên bản đã áp dụng';
 $string['task:policy_bundle_sync'] = 'SOLA đồng bộ hóa gói chính sách đã ký';
 $string['policy_bundle:invalid'] = 'Gói chính sách bị từ chối: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Các đoạn được truy xuất (lựa chọn RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Các đoạn văn mà bộ truy xuất đã chọn cho câu hỏi này, sắp xếp theo thứ hạng cùng với điểm liên quan và nguồn (cmid). Dùng thông tin này để xác minh rằng mô hình đã nhận được nội dung khóa học phù hợp nhất.';

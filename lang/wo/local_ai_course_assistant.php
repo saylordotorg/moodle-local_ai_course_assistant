@@ -1525,3 +1525,5 @@ $string['settings:policy_bundle_status'] = 'Sync bu mujj';
 $string['settings:policy_bundle_applied_version'] = 'version bu appliqué';
 $string['task:policy_bundle_sync'] = 'SOLA policy bundle bu signée sync';
 $string['policy_bundle:invalid'] = 'Policy bundle refusé: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Dégg yi ñu jële (tànneef RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Dégg yi jëfandikukat bu wut tànn ngir laaj bii, ci tëraliin gu ñu daje ak seen pwaŋ bu jëm ci laaj bi ak seen géej (cmid). Jëfandikoo ko ngir saytu ne modèl bi jot na li gën a dëppoo ci njàngale mi.';

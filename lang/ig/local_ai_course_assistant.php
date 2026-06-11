@@ -1505,3 +1505,5 @@ $string['settings:policy_bundle_status'] = 'Sync ikpeazụ';
 $string['settings:policy_bundle_applied_version'] = 'ụdị etinyere';
 $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'A jụrụ policy bundle: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Iberibe e wetara (nhọrọ RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Akụkụ ndị onye na-eweta họọrọ maka ajụjụ a, n\'usoro ọkwa ya na akara mkpa ha na isi mmalite (cmid). Jiri nke a gosi na ụdị ahụ natara ọdịnaya nkuzi kacha dabaa.';

@@ -1519,3 +1519,5 @@ $string['settings:policy_bundle_status'] = 'Penyegerakan terakhir';
 $string['settings:policy_bundle_applied_version'] = 'versi yang diterapkan';
 $string['task:policy_bundle_sync'] = 'Penyegerakan bundel dasar bertanda tangan SOLA';
 $string['policy_bundle:invalid'] = 'Bundel dasar ditolak: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Ketulan yang diambil (pemilihan RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Petikan yang dipilih oleh retriever untuk soalan ini, mengikut susunan kedudukan dengan skor keberkaitan dan sumbernya (cmid). Gunakan ini untuk mengesahkan bahawa model menerima kandungan kursus yang paling sepadan.';

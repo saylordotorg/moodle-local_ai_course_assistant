@@ -1525,3 +1525,5 @@ $string['settings:policy_bundle_status'] = 'Ukuvumelanisa kwakamuva';
 $string['settings:policy_bundle_applied_version'] = 'inguqulo esetshenzisiwe';
 $string['task:policy_bundle_sync'] = 'SOLA ukuvumelanisa kwe-policy bundle esiniywe';
 $string['policy_bundle:invalid'] = 'I-policy bundle yanqatshwa: {$a}';
+$string['prompt_debug_view:retrieved_chunks'] = 'Izingcezu ezitholiwe (ukukhetha kwe-RAG)';
+$string['prompt_debug_view:retrieved_chunks_hint'] = 'Iziqephu umtholi azikhethile zalo mbuzo, ngokulandelana kwezinga kanye namaphuzu okuhambisana nawo nomthombo (cmid). Sebenzisa lokhu ukuze uqinisekise ukuthi imodeli ithole okuqukethwe kwesifundo okuhambisana kahle kunakho konke.';
