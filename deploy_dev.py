@@ -59,6 +59,14 @@ TARGETS = {
     "503": ("dev503.sylr.org", "/var/www/moodle", "public/local", "i-01c8aaf0d2e9dcab1"),
 }
 
+# Targets running a development Moodle (dev503 currently tracks 5.3dev): the
+# CLI upgrade refuses to run without --allow-unstable, so the plugin DB
+# upgrade silently no-ops on every deploy and someone has to run it by hand.
+# The flag only bypasses the unstable-version refusal (harmless on a stable
+# Moodle), but keep this list tight so a stable site that unexpectedly
+# reports unstable still fails loudly.
+UNSTABLE_OK_TARGETS = {"503"}
+
 # Local paths.
 PLUGIN_DIR = pathlib.Path(__file__).resolve().parent
 PARENT_DIR = PLUGIN_DIR.parent
@@ -117,7 +125,7 @@ def ssm_send(commands, wait=True, timeout=120, instance_id=None):
     return {"status": "Timeout", "stdout": "", "stderr": "Command polling timed out"}
 
 
-def deploy_to_target(name, hostname, moodle_dir, plugin_subdir, instance_id=None):
+def deploy_to_target(name, hostname, moodle_dir, plugin_subdir, instance_id=None, allow_unstable=False):
     """Rsync, upgrade, purge, verify on a single Moodle install."""
     plugin_dir = f"{moodle_dir}/{plugin_subdir}/ai_course_assistant"
     print(f"\n--- Deploying to {hostname} ({moodle_dir}) ---")
@@ -148,8 +156,9 @@ def deploy_to_target(name, hostname, moodle_dir, plugin_subdir, instance_id=None
     print("  Files synced")
 
     print("  Running Moodle database upgrade...")
+    unstable_flag = " --allow-unstable" if allow_unstable else ""
     upgrade_commands = [
-        f"sudo -u www-data php {moodle_dir}/admin/cli/upgrade.php --non-interactive 2>&1 | tail -30",
+        f"sudo -u www-data php {moodle_dir}/admin/cli/upgrade.php --non-interactive{unstable_flag} 2>&1 | tail -30",
     ]
     result = ssm_send(upgrade_commands, timeout=180, instance_id=instance_id)
     if result:
@@ -356,7 +365,8 @@ def main():
     failures = []
     for name in selected:
         hostname, moodle_dir, plugin_subdir, instance_id = TARGETS[name]
-        if not deploy_to_target(name, hostname, moodle_dir, plugin_subdir, instance_id=instance_id):
+        if not deploy_to_target(name, hostname, moodle_dir, plugin_subdir, instance_id=instance_id,
+                                allow_unstable=(name in UNSTABLE_OK_TARGETS)):
             failures.append(hostname)
 
     # Clean up local tarball.
