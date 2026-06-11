@@ -221,6 +221,30 @@ class voice_registry {
     }
 
     /**
+     * Lightweight config-only check: is any voice provider configured?
+     *
+     * Unlike {@see resolve()} this does NOT run the spend guard, so it is cheap
+     * enough to call on every course-page render (e.g. to decide whether to
+     * show the speaker button). A configured voice_providers row serves any
+     * capability via resolve()'s first-row fallback, and the legacy single-key
+     * config (realtime_apikey, or the main OpenAI key) also counts. This fixes
+     * the speaker button being gated on the legacy key alone, which hid
+     * registry-configured TTS on sites running a non-OpenAI chat provider.
+     *
+     * @return bool
+     */
+    public static function is_configured(): bool {
+        if (!empty(self::parse_rows())) {
+            return true;
+        }
+        if (!empty(get_config('local_ai_course_assistant', 'realtime_apikey'))) {
+            return true;
+        }
+        return get_config('local_ai_course_assistant', 'provider') === 'openai'
+            && !empty(get_config('local_ai_course_assistant', 'apikey'));
+    }
+
+    /**
      * Return true when any voice capability (Realtime, TTS, or STT) resolves
      * to a configured provider. Used by the widget to suppress mic, speaker,
      * and voice tab affordances (and the matching help and welcome copy) on

@@ -581,11 +581,13 @@ class hook_callbacks {
 
         // Voice mode availability (global flags only; per-course control via starter toggles).
         $realtimeenabled = (bool)get_config('local_ai_course_assistant', 'realtime_enabled');
-        $realtimeapikey = get_config('local_ai_course_assistant', 'realtime_apikey');
-        $provider       = get_config('local_ai_course_assistant', 'provider');
-        $mainapikey     = get_config('local_ai_course_assistant', 'apikey');
-        $hasttskey = !empty($realtimeapikey) || ($provider === 'openai' && !empty($mainapikey));
-        $ttsurl = $hasttskey
+        // v6.2.x: gate the speaker button on whether ANY voice provider is
+        // configured (a voice_providers row, or the legacy realtime/OpenAI key),
+        // not the legacy key alone. tts.php resolves the actual provider through
+        // the registry; the old legacy-only check hid registry-configured
+        // provider TTS on sites running a non-OpenAI chat provider, silently
+        // degrading the speaker to the browser SpeechSynthesis voice.
+        $ttsurl = \local_ai_course_assistant\voice_registry::is_configured()
             ? (new \moodle_url('/local/ai_course_assistant/tts.php'))->out(false)
             : '';
 
