@@ -66,7 +66,7 @@ $PAGE->set_title(get_string('instructor_dashboard:title', 'local_ai_course_assis
     \local_ai_course_assistant\branding::short_name()));
 $PAGE->set_heading($course->fullname);
 
-security::send_security_headers();
+security::send_security_headers(true);
 
 // v4.8.0: needs-review queue resolve action.
 if ($action === 'resolvereview' && confirm_sesskey()) {
