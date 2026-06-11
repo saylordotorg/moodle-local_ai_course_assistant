@@ -671,6 +671,24 @@ try {
                 }
                 $entry .= "Sections:\n" . implode("\n", $rows) . "\n";
             }
+            // v6.4.x: log the retrieved RAG chunks distinctly — with their
+            // relevance score and source — so admins can verify on the debug
+            // page WHICH passages the retriever selected (the "5 best pieces")
+            // and how strongly they matched. Inside the assembled prompt these
+            // appear only as [c:N] labels with no scores; this block makes the
+            // selection reviewable on its own. Only present when RAG retrieved.
+            if (!empty($retrievedchunks)) {
+                $entry .= "--- RETRIEVED CHUNKS (" . count($retrievedchunks)
+                    . ", top-k by relevance) ---\n";
+                foreach (array_values($retrievedchunks) as $ci => $ch) {
+                    $cscore = isset($ch['score']) ? number_format((float) $ch['score'], 4) : 'n/a';
+                    $ccmid = isset($ch['cmid']) ? (int) $ch['cmid'] : 0;
+                    $cmod = (string) ($ch['modtype'] ?? '');
+                    $ccontent = (string) ($ch['content'] ?? '');
+                    $entry .= "[c:{$ci}] score={$cscore} cmid={$ccmid} modtype={$cmod} ("
+                        . strlen($ccontent) . " chars)\n" . $ccontent . "\n\n";
+                }
+            }
             $entry .= "--- ASSEMBLED SYSTEM PROMPT ---\n" . $systemprompt . "\n\n";
 
             // v5.0.0 patch 6: history + current user message — i.e. the

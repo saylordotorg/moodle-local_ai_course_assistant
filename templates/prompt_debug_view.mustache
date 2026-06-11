@@ -90,6 +90,7 @@
             {{#topic_truncated}}<span class="badge badge-warning ml-1">topic focus (truncated)</span>{{/topic_truncated}}
             {{#topic_dropped}}<span class="badge badge-danger ml-1" title="topic_focus section dropped by prompt budget">topic DROPPED</span>{{/topic_dropped}}
             {{#has_attachment}}<span class="badge badge-warning ml-1">attachment</span>{{/has_attachment}}
+            {{#has_chunks}}<span class="badge badge-primary ml-1" title="Number of RAG chunks the retriever selected and showed the model this turn">{{chunk_count}} chunks</span>{{/has_chunks}}
         </summary>
         <div class="card-body">
             <dl class="row mb-2">
@@ -101,6 +102,14 @@
 
             <h4>{{#str}}prompt_debug_view:sections, local_ai_course_assistant{{/str}}</h4>
             <pre class="bg-light p-2 small" style="max-height:240px;overflow:auto;">{{sections}}</pre>
+
+            {{#has_chunks}}
+            <details class="mt-2" open>
+                <summary><strong>{{#str}}prompt_debug_view:retrieved_chunks, local_ai_course_assistant{{/str}}</strong> <span class="badge badge-primary">{{chunk_count}}</span></summary>
+                <p class="text-muted small mb-1 mt-1">{{#str}}prompt_debug_view:retrieved_chunks_hint, local_ai_course_assistant{{/str}}</p>
+                <pre class="bg-light p-2 small" style="max-height:360px;overflow:auto;">{{chunks}}</pre>
+            </details>
+            {{/has_chunks}}
 
             <details class="mt-2">
                 <summary><strong>{{#str}}prompt_debug_view:assembled_prompt, local_ai_course_assistant{{/str}}</strong></summary>

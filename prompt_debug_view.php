@@ -174,6 +174,9 @@ function parse_one_entry(string $block): ?array {
     $history = extract_named_block($block, 'HISTORY');
     $message = extract_named_block($block, 'CURRENT USER MESSAGE');
     $attachment = extract_named_block($block, 'ATTACHMENT');
+    // v6.4.x: the retrieved RAG chunks block (each line "[c:N] score=.. cmid=..").
+    $chunks = extract_named_block($block, 'RETRIEVED CHUNKS');
+    $chunkcount = ($chunks !== null) ? substr_count($chunks, '[c:') : 0;
 
     // v5.0.0 patch 13: previous "did the page section land?" badges were a
     // false-positive trap. The regex matched the section name appearing
@@ -199,6 +202,11 @@ function parse_one_entry(string $block): ?array {
         'message'           => (string) $message,
         'attachment'        => (string) $attachment,
         'has_attachment'    => $attachment !== null && trim($attachment) !== '',
+        // v6.4.x: retrieved RAG chunks (the selected top-k with relevance
+        // scores + source), so admins can verify chunk selection on this page.
+        'chunks'            => (string) $chunks,
+        'has_chunks'        => $chunks !== null && trim((string) $chunks) !== '',
+        'chunk_count'       => $chunkcount,
         // 'kept' / 'truncated' / 'dropped' / 'absent' for the page-content
         // and topic-focus sections. 'absent' = the section was never even
         // added (page module not detected, get_module_content empty, or
