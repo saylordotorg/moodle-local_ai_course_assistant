@@ -140,3 +140,43 @@ function local_ai_course_assistant_get_custom_avatars(): array {
     }
     return $out;
 }
+
+/**
+ * Add AI Course Assistant links to the course navigation ("More" menu).
+ *
+ * Admin feedback: the per-course settings and analytics pages were hard to
+ * find, buried under Site administration. This surfaces them where staff
+ * already are — on the course page — gated by the same capabilities the
+ * target pages themselves enforce. Learners (capability :use only) see
+ * nothing. Note Moodle never shows a "Settings" link for local plugins on
+ * the Plugins overview page (core hardcodes get_settings_section_name() to
+ * null for the local type), so course navigation is the supported way to
+ * make these pages findable outside the Site administration tree.
+ *
+ * @param navigation_node $navigation The course navigation node to extend.
+ * @param stdClass $course The course record.
+ * @param context_course $context The course context.
+ */
+function local_ai_course_assistant_extend_navigation_course(navigation_node $navigation, stdClass $course,
+        context_course $context): void {
+    if (has_capability('local/ai_course_assistant:manage', $context)) {
+        $navigation->add(
+            get_string('coursesettings:title', 'local_ai_course_assistant'),
+            new moodle_url('/local/ai_course_assistant/course_settings.php', ['courseid' => $course->id]),
+            navigation_node::TYPE_SETTING,
+            null,
+            'aicacoursesettings',
+            new pix_icon('i/settings', '')
+        );
+    }
+    if (has_capability('local/ai_course_assistant:viewanalytics', $context)) {
+        $navigation->add(
+            get_string('analytics:title', 'local_ai_course_assistant'),
+            new moodle_url('/local/ai_course_assistant/instructor_dashboard.php', ['courseid' => $course->id]),
+            navigation_node::TYPE_SETTING,
+            null,
+            'aicaanalytics',
+            new pix_icon('i/report', '')
+        );
+    }
+}
