@@ -1495,3 +1495,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle dide: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Kutaalee argaman (filannoo RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Caqasoota retriever gaaffii kanaaf filate, sajoo wal-simannaa isaaniitii fi madda (cmid) waliin tartiiba sadarkaatiin. Akka moodeelichi qabiyyee koorsii baayʼee wal-simu argate mirkaneeffachuuf kana fayyadami.';
+$string['settings:avatar_animation_enabled'] = 'Sochii avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Avatar SVG uumame sochoosu: yeroo boqonnaa ijaan diriiruu, akkasumas sochiiwwan afaanii sagalee barreeffama-gara-sagaleetti walmakame yeroo gargaaraan dubbatu. Filannoo sochiiwwan hir\'atame meeshaa barataa kabaja. Qabiyyee tokkoo tokkoon sadarkaa A/B mirkaneessuuf: gatii qindaa\'ina avatar_animation_course_COURSEID 0 ykn 1 godhaa.';

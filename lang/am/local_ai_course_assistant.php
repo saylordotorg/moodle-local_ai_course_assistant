@@ -1520,3 +1520,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle ውድቅ ሆኗል: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'የተገኙ ቅንጭቦች (RAG ምርጫ)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'መልሰው የሚያወጣው ስልት ለዚህ ጥያቄ የመረጣቸው ቅንጭቦች፣ በደረጃ ቅደም ተከተል ከተዛማጅነታቸው ነጥብ እና ምንጫቸው (cmid) ጋር። ሞዴሉ ምርጡን የሚዛመድ የኮርስ ይዘት መቀበሉን ለማረጋገጥ ይህንን ይጠቀሙ።';
+$string['settings:avatar_animation_enabled'] = 'የአቫታር እንቅስቃሴ';
+$string['settings:avatar_animation_enabled_desc'] = 'የተፈጠረውን SVG አቫታር ያንቀሳቅሱ: በእረፍት ጊዜ ዓይን ጥቅሻ፣ ከዚህ በተጨማሪ ረዳቱ ሲናገር ከጽሑፍ-ወደ-ንግግር ኦዲዮ ጋር የተመሳሰለ የአፍ እንቅስቃሴ። የተማሪው ሃርድዌር የቀነሰ እንቅስቃሴ ምርጫን ያከብራል። ለ A/B ልኬት በኮርስ መሻገሪያ: avatar_animation_course_COURSEID የኮንፊግ እሴትን ወደ 0 ወይም 1 ያዘጋጁ።';

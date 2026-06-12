@@ -1498,3 +1498,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signert retningslinjepakke-synkronise
 $string['policy_bundle:invalid'] = 'Retningslinjepakke avvist: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Hentede deler (RAG-utvalg)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Avsnittene som retrieveren valgte for dette spørsmålet, i rangert rekkefølge med relevansscore og kilde (cmid). Bruk dette til å bekrefte at modellen mottok det best samsvarende kursinnholdet.';
+$string['settings:avatar_animation_enabled'] = 'Avatar-animasjon';
+$string['settings:avatar_animation_enabled_desc'] = 'Animer den genererte SVG-avataren: tomgangsblinking samt munnbevegelse synkronisert med tekst-til-tale-lyd mens assistenten snakker. Respekterer lærens enhets preferanse for redusert bevegelse. Kursvis overstyring for A/B-måling: sett konfigurasjonsverdien avatar_animation_course_COURSEID til 0 eller 1.';

@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'SOLA allekirjoitetun käytäntöpaketin sy
 $string['policy_bundle:invalid'] = 'Käytäntöpaketti hylätty: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Haetut osat (RAG-valinta)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Osiot, jotka hakija valitsi tähän kysymykseen, järjestettynä sijoituksen mukaan sekä niiden relevanssipisteet ja lähde (cmid). Tarkista tällä, että malli sai parhaiten vastaavan kurssisisällön.';
+$string['settings:avatar_animation_enabled'] = 'Avatar-animaatio';
+$string['settings:avatar_animation_enabled_desc'] = 'Animoi luotu SVG-avatar: silmien räpyttely valmiustilassa sekä suun liike synkronoituna puhesynteesiääneen assistentin puhuessa. Kunnioittaa oppijan laitteen vähennetyn liikkeen asetusta. Kurssikohtainen ohitus A/B-mittausta varten: aseta kokoonpanoarvo avatar_animation_course_COURSEID arvoon 0 tai 1.';

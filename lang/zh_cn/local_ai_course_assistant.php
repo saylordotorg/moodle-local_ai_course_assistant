@@ -1527,3 +1527,5 @@ $string['task:policy_bundle_sync'] = 'SOLA 签名策略包同步';
 $string['policy_bundle:invalid'] = '策略包已拒绝：{$a}';
 $string['prompt_debug_view:retrieved_chunks'] = '检索到的文本块（RAG 选取）';
 $string['prompt_debug_view:retrieved_chunks_hint'] = '检索器为此问题选取的段落，按排名顺序列出，并附有相关性评分和来源（cmid）。可用于验证模型是否获得了最匹配的课程内容。';
+$string['settings:avatar_animation_enabled'] = '头像动画';
+$string['settings:avatar_animation_enabled_desc'] = '为生成的SVG头像添加动画效果：空闲时眨眼，以及在助手说话时与文字转语音音频同步的嘴部动作。遵循学习者设备的减少动画偏好。每门课程的A/B测量覆盖：将配置值avatar_animation_course_COURSEID设为0或1。';

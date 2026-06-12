@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signeret politikpakke-synkronisering'
 $string['policy_bundle:invalid'] = 'Politikpakke afvist: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Hentede uddrag (RAG-udvælgelse)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'De passager, som retrieveren valgte til dette spørgsmål, sorteret efter rangorden med deres relevansscore og kilde (cmid). Brug dette til at bekræfte, at modellen modtog det bedst matchende kursusindhold.';
+$string['settings:avatar_animation_enabled'] = 'Avatar-animation';
+$string['settings:avatar_animation_enabled_desc'] = 'Animer den genererede SVG-avatar: tomgangs-blinkning samt mundbevægelse synkroniseret med tekst-til-tale-lyd, mens assistenten taler. Respekterer lærens enheds præference for reduceret bevægelse. Pr.-kursus-tilsidesættelse til A/B-måling: sæt konfigurationsværdien avatar_animation_course_COURSEID til 0 eller 1.';

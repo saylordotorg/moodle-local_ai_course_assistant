@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'مزامنة حزمة سياسة SOLA ال
 $string['policy_bundle:invalid'] = 'رُفضت حزمة السياسة: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'المقاطع المُستردة (اختيار RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'المقاطع التي اختارها نظام الاسترجاع لهذا السؤال، مرتبة حسب الترتيب مع درجة الصلة والمصدر (cmid). استخدم هذا للتحقق من أن النموذج تلقى أفضل محتوى مطابق للمقرر.';
+$string['settings:avatar_animation_enabled'] = 'تحريك الصورة الرمزية';
+$string['settings:avatar_animation_enabled_desc'] = 'تحريك الصورة الرمزية SVG المُنشأة: وميض أثناء الخمول، بالإضافة إلى حركة الفم متزامنة مع الصوت المُحوَّل من النص أثناء حديث المساعد. يراعي تفضيل تقليل الحركة في جهاز المتعلم. تجاوز لكل مقرر لقياس A/B: اضبط قيمة الإعداد avatar_animation_course_COURSEID على 0 أو 1.';

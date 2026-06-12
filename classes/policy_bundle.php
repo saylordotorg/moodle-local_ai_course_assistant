@@ -111,6 +111,8 @@ class policy_bundle {
         'premium_escalation_model',
         'premium_escalation_triggers',
         'premium_escalation_course_tags',
+        // Widget behavior (v6.5 avatar animation probe).
+        'avatar_animation_enabled',
         // RAG tuning (v6.2 floor/boost, v5.11 rerank).
         'rag_enabled',
         'rag_min_similarity',

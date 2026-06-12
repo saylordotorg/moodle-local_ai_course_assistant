@@ -1527,3 +1527,5 @@ $string['task:policy_bundle_sync'] = 'SOLA ukuvumelanisa kwe-policy bundle esini
 $string['policy_bundle:invalid'] = 'I-policy bundle yanqatshwa: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Izingcezu ezitholiwe (ukukhetha kwe-RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Iziqephu umtholi azikhethile zalo mbuzo, ngokulandelana kwezinga kanye namaphuzu okuhambisana nawo nomthombo (cmid). Sebenzisa lokhu ukuze uqinisekise ukuthi imodeli ithole okuqukethwe kwesifundo okuhambisana kahle kunakho konke.';
+$string['settings:avatar_animation_enabled'] = 'I-animation ye-avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Phila i-avatar ye-SVG edalwe: ukugwinya ngesikhathi singenzi lutho, kanye nokunyakaza komlomo okuhambelana ne-audio yokuguqula umbhalo ube inkulumo ngenkathi umsizi ekhuluma. Ihlonipha inkulumo encishisiwe yesitho sokufunda sokuya. Ukuguqula ngesikhwama ngasinye sokuzuza i-A/B: setha ixabiso lokulungiselela avatar_animation_course_COURSEID ku-0 noma ku-1.';

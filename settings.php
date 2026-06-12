@@ -1845,6 +1845,13 @@ if ($hassiteconfig) {
         $displaymodes
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/avatar_animation_enabled',
+        get_string('settings:avatar_animation_enabled', 'local_ai_course_assistant'),
+        get_string('settings:avatar_animation_enabled_desc', 'local_ai_course_assistant'),
+        1
+    ));
+
     $positions = [
         'bottom-right' => get_string('settings:position_br', 'local_ai_course_assistant'),
         'bottom-left' => get_string('settings:position_bl', 'local_ai_course_assistant'),

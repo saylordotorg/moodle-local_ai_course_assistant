@@ -729,8 +729,17 @@ class hook_callbacks {
             $pathenabled = false;
         }
 
+        // Avatar animation gate: per-course override (for A/B measurement) falls
+        // back to the site setting; missing config means enabled.
+        $avataranim = get_config('local_ai_course_assistant', 'avatar_animation_course_' . $courseid);
+        if ($avataranim === false || $avataranim === '') {
+            $avataranim = get_config('local_ai_course_assistant', 'avatar_animation_enabled');
+        }
+        $avataranim = ($avataranim === false || $avataranim === '') ? 1 : (int)(bool)$avataranim;
+
         // Render template.
         $templatedata = [
+            'avataranim'         => $avataranim,
             'pathenabled'        => $pathenabled,
             'pathnudgeready'     => $pathnudgeready,
             'pathnudgename'      => $pathnudgename,

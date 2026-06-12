@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'SOLA synchronizacja podpisanego pakietu za
 $string['policy_bundle:invalid'] = 'Pakiet zasad odrzucony: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Pobrane fragmenty (wybór RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Fragmenty, które wyszukiwarka wybrała dla tego pytania, w kolejności rankingu wraz z ich oceną trafności i źródłem (cmid). Użyj tego, aby sprawdzić, czy model otrzymał najlepiej dopasowaną treść kursu.';
+$string['settings:avatar_animation_enabled'] = 'Animacja awatara';
+$string['settings:avatar_animation_enabled_desc'] = 'Animuj wygenerowany awatar SVG: mruganie w trybie bezczynności oraz ruch ust zsynchronizowany z dźwiękiem zamiany tekstu na mowę, gdy asystent mówi. Uwzględnia preferencję zmniejszonego ruchu urządzenia ucznia. Zastąpienie per kurs do pomiaru A/B: ustaw wartość konfiguracyjną avatar_animation_course_COURSEID na 0 lub 1.';

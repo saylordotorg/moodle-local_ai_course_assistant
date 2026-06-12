@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'Synchronizácia podpísaného balíka poli
 $string['policy_bundle:invalid'] = 'Balík politík odmietnutý: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Získané fragmenty (výber RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Fragmenty, ktoré vyhľadávač vybral pre túto otázku, v poradí podľa hodnotenia spolu s ich skóre relevantnosti a zdrojom (cmid). Použite to na overenie, či model dostal najlepšie zodpovedajúci obsah kurzu.';
+$string['settings:avatar_animation_enabled'] = 'Animácia avatara';
+$string['settings:avatar_animation_enabled_desc'] = 'Animujte vygenerovaný SVG avatara: blikanie v nečinnom stave a pohyb úst synchronizovaný so zvukom prevodu textu na reč, keď asistent hovorí. Rešpektuje predvoľbu zníženého pohybu zariadenia študenta. Prepísanie pre každý kurz na meranie A/B: nastavte konfiguračnú hodnotu avatar_animation_course_COURSEID na 0 alebo 1.';

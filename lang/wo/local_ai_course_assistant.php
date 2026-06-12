@@ -1527,3 +1527,5 @@ $string['task:policy_bundle_sync'] = 'SOLA policy bundle bu signée sync';
 $string['policy_bundle:invalid'] = 'Policy bundle refusé: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Dégg yi ñu jële (tànneef RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Dégg yi jëfandikukat bu wut tànn ngir laaj bii, ci tëraliin gu ñu daje ak seen pwaŋ bu jëm ci laaj bi ak seen géej (cmid). Jëfandikoo ko ngir saytu ne modèl bi jot na li gën a dëppoo ci njàngale mi.';
+$string['settings:avatar_animation_enabled'] = 'Animasion avatar bi';
+$string['settings:avatar_animation_enabled_desc'] = 'Animeer avatar SVG bi ñu defar: yéegal bi dafa noppi, ak yëgël suuf bi jëm ak jàng tekst-ci-kàlam audio bi tegu ngoon gi dangay wax. Seet bëgg bi jëfandikukat am ci jumtukaay bi. Yeesal kër ak kër ci A/B jëf: seet config bi avatar_animation_course_COURSEID ci 0 walla 1.';

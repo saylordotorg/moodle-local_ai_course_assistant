@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signierte Richtlinienpaket-Synchronis
 $string['policy_bundle:invalid'] = 'Richtlinienpaket abgelehnt: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Abgerufene Abschnitte (RAG-Auswahl)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Die Passagen, die der Retriever für diese Frage ausgewählt hat, in Rangfolge mit ihrem Relevanzwert und ihrer Quelle (cmid). Verwenden Sie dies, um zu überprüfen, ob das Modell die am besten passenden Kursinhalte erhalten hat.';
+$string['settings:avatar_animation_enabled'] = 'Avatar-Animation';
+$string['settings:avatar_animation_enabled_desc'] = 'Animiert den generierten SVG-Avatar: Blinzeln im Leerlauf sowie Mundbewegung synchronisiert mit der Text-zu-Sprache-Audiowiedergabe, wenn der Assistent spricht. Berücksichtigt die Einstellung für reduzierte Bewegung des Geräts des Lernenden. Kursweise Überschreibung für A/B-Messungen: Konfigurationswert avatar_animation_course_COURSEID auf 0 oder 1 setzen.';

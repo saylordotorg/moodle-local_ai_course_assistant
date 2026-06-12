@@ -1521,3 +1521,5 @@ $string['task:policy_bundle_sync'] = 'Penyegerakan bundel dasar bertanda tangan 
 $string['policy_bundle:invalid'] = 'Bundel dasar ditolak: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Ketulan yang diambil (pemilihan RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Petikan yang dipilih oleh retriever untuk soalan ini, mengikut susunan kedudukan dengan skor keberkaitan dan sumbernya (cmid). Gunakan ini untuk mengesahkan bahawa model menerima kandungan kursus yang paling sepadan.';
+$string['settings:avatar_animation_enabled'] = 'Animasi avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Animasikan avatar SVG yang dijana: berkelip semasa melahu, ditambah pergerakan mulut yang disegerakkan dengan audio teks-ke-ucapan semasa pembantu bercakap. Menghormati pilihan pergerakan dikurangkan pada peranti pelajar. Penggantian setiap kursus untuk pengukuran A/B: tetapkan nilai konfigurasi avatar_animation_course_COURSEID kepada 0 atau 1.';

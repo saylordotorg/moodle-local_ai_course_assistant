@@ -1534,3 +1534,5 @@ $string['task:policy_bundle_sync'] = 'SOLA aláírt irányelvcsomag-szinkronizá
 $string['policy_bundle:invalid'] = 'Az irányelvcsomag elutasítva: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Lekért részletek (RAG-kiválasztás)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'A részletek, amelyeket a lekérő kiválasztott ehhez a kérdéshez, rangsor szerint, relevanciapontszámukkal és forrásukkal (cmid) együtt. Ezzel ellenőrizheti, hogy a modell a legjobban illeszkedő kurzustartalmat kapta-e meg.';
+$string['settings:avatar_animation_enabled'] = 'Avatár animáció';
+$string['settings:avatar_animation_enabled_desc'] = 'Animálja a generált SVG avatárt: üresjárati villogás, valamint szájmozgás szinkronizálva a szövegfelolvasó hanggal, miközben a asszisztens beszél. Tiszteletben tartja a tanuló eszközének csökkentett mozgásra vonatkozó beállítását. Tanfolyamonkénti felülbírálás A/B méréshez: állítsa az avatar_animation_course_COURSEID konfigurációs értéket 0-ra vagy 1-re.';

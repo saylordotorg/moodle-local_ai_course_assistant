@@ -1527,3 +1527,5 @@ $string['task:policy_bundle_sync'] = 'SOLA policy bundle sync tí a fọwọ́ s
 $string['policy_bundle:invalid'] = 'Policy bundle kọ̀: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Àwọn àjákù tí a gbà jáde (àṣàyàn RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Àwọn ọ̀rọ̀ tí ohun ìgbàjáde yan fún ìbéèrè yìí, ní ọ̀nà ipò pẹ̀lú àmì ìbátan wọn àti orísun (cmid). Lo èyí láti rí i dájú pé àwòṣe náà gba àkóónú ẹ̀kọ́ tí ó bára mu jùlọ.';
+$string['settings:avatar_animation_enabled'] = 'Ere idaraya avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Ṣe agbeka fun avatar SVG ti a ṣẹda: fifọ oju nigba isinmi, pẹlú gbigbe ẹnu ti a ṣọkan pẹlu ohun ìsọ ọ̀rọ̀-sí-ọ̀rọ̀ bí olùrànlọ́wọ́ bá n sọrọ. Bọwọ fun ayanfẹ gbigbe ti o dinku ti ẹrọ akẹkọ. Atokọ-kọọkan fun wiwọn A/B: ṣeto iye iṣeto avatar_animation_course_COURSEID si 0 tabi 1.';

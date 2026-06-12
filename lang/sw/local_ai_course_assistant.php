@@ -1528,3 +1528,5 @@ $string['task:policy_bundle_sync'] = 'SOLA usawazishaji wa policy bundle iliyosa
 $string['policy_bundle:invalid'] = 'Policy bundle imekataliwa: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Vipande vilivyopatikana (uteuzi wa RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Vipande ambavyo mfumo wa upatikanaji uliviteua kwa swali hili, kwa mpangilio wa cheo pamoja na alama yao ya umuhimu na chanzo (cmid). Tumia hii kuthibitisha kuwa modeli ilipokea maudhui ya kozi yanayolingana zaidi.';
+$string['settings:avatar_animation_enabled'] = 'Uhuishaji wa avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Huisha avatar ya SVG iliyoundwa: kupepesa macho wakati wa utulivu, pamoja na mwendo wa mdomo uliolandanishwa na sauti ya maandishi-kuwa-usemi wakati msaidizi anaposema. Inazingatia mapendeleo ya mwendo uliopunguzwa wa kifaa cha mwanafunzi. Kubatilisha kwa kila kozi kwa kipimo cha A/B: weka thamani ya usanidi avatar_animation_course_COURSEID kuwa 0 au 1.';

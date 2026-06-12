@@ -1505,3 +1505,5 @@ $string['task:policy_bundle_sync'] = 'SOLA imzalı ilke paketi senkronizasyonu';
 $string['policy_bundle:invalid'] = 'İlke paketi reddedildi: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Getirilen parçalar (RAG seçimi)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Bu soru için getiricinin seçtiği pasajlar; alaka puanları ve kaynaklarıyla (cmid) birlikte sıralama düzeninde. Modelin en iyi eşleşen ders içeriğini aldığını doğrulamak için bunu kullanın.';
+$string['settings:avatar_animation_enabled'] = 'Avatar animasyonu';
+$string['settings:avatar_animation_enabled_desc'] = 'Oluşturulan SVG avatarını canlandırın: boşta göz kırpma ve asistan konuşurken metinden sese dönüştürme sesiyle senkronize ağız hareketi. Öğrencinin cihazının azaltılmış hareket tercihine saygı duyar. A/B ölçümü için ders başına geçersiz kılma: yapılandırma değeri avatar_animation_course_COURSEID değerini 0 veya 1 olarak ayarlayın.';

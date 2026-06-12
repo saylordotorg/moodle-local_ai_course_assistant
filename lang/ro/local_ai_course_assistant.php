@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'Sincronizarea pachetului de politici semna
 $string['policy_bundle:invalid'] = 'Pachetul de politici a fost respins: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Fragmente recuperate (selecție RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Fragmentele pe care sistemul de recuperare le-a selectat pentru această întrebare, în ordinea clasamentului, împreună cu scorul lor de relevanță și sursa (cmid). Folosește acest lucru pentru a verifica dacă modelul a primit cel mai potrivit conținut al cursului.';
+$string['settings:avatar_animation_enabled'] = 'Animație avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Animează avatarul SVG generat: clipire în stare inactivă, plus mișcare a buzelor sincronizată cu redarea audio text-în-vorbire în timp ce asistentul vorbește. Respectă preferința de mișcare redusă a dispozitivului cursantului. Suprascriere per curs pentru măsurarea A/B: setați valoarea de configurare avatar_animation_course_COURSEID la 0 sau 1.';

@@ -1498,3 +1498,5 @@ $string['task:policy_bundle_sync'] = 'SOLA 서명된 정책 번들 동기화';
 $string['policy_bundle:invalid'] = '정책 번들이 거부되었습니다: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = '검색된 청크(RAG 선택)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = '이 질문에 대해 검색기가 선택한 구절을 관련도 점수 및 출처(cmid)와 함께 순위 순으로 표시합니다. 이를 사용해 모델이 가장 잘 일치하는 강좌 콘텐츠를 받았는지 확인하세요.';
+$string['settings:avatar_animation_enabled'] = '아바타 애니메이션';
+$string['settings:avatar_animation_enabled_desc'] = '생성된 SVG 아바타를 애니메이션화합니다: 유휴 시 눈 깜빡임과 함께 어시스턴트가 말하는 동안 텍스트 음성 변환 오디오에 동기화된 입 움직임. 학습자 기기의 움직임 감소 설정을 존중합니다. A/B 측정을 위한 강좌별 재정의: 구성 값 avatar_animation_course_COURSEID를 0 또는 1로 설정하세요.';

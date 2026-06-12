@@ -1521,3 +1521,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle m\'a sɔn: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Tilanw minnu sɔrɔla (RAG sugandili)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Sɛbɛnni-yɔrɔw min sɔrɔbaga ye u sugandi nin ɲininkali in na, u labɛnnen u jɔyɔrɔ kɔrɔ ni u bɛnni hakɛ ani u sɔrɔyɔrɔ (cmid) ye. Nin baara kɛ walisa ka sɛgɛsɛgɛ ko modɛli ye kalansen kɔnɔkow minnu bɛnna kosɛbɛ sɔrɔ.';
+$string['settings:avatar_animation_enabled'] = 'Avatar ka jɛlɛnni';
+$string['settings:avatar_animation_enabled_desc'] = 'SVG avatar minɛnen nin jɛlɛ: nɔɔrɔ waati la ɲɛgɛn, ani da ka cɛɲɔgɔn kɛ ni jira-kan jaabi audio ye assistant ka kuma waati la. Kalandenw ka fɛɛrɛ-kɔrɔtalen ɲɛmɔgɔya hakɛ lajɛlen don. Kalo kelen kelen bɛ A/B jatebɔli kama: config baara avatar_animation_course_COURSEID di 0 walima 1 ma.';

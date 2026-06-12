@@ -161,8 +161,8 @@ define([
             + '<circle cx="32" cy="60" r="22" fill="#94a3b8"/>'   // shirt (clipped)
             + hairSVG                                               // hair (behind head)
             + '<circle cx="32" cy="32" r="22" fill="' + skin + '"/>'  // head
-            + '<circle cx="25" cy="30" r="2" fill="#2d1b0e"/>'    // left eye
-            + '<circle cx="39" cy="30" r="2" fill="#2d1b0e"/>'    // right eye
+            + '<circle class="aica-eye" cx="25" cy="30" r="2" fill="#2d1b0e" style="transform-origin:25px 30px;"/>'  // left eye
+            + '<circle class="aica-eye" cx="39" cy="30" r="2" fill="#2d1b0e" style="transform-origin:39px 30px;"/>'  // right eye
             + '<path class="aica-mouth-smile" d="M27 38 Q32 42 37 38" stroke="#2d1b0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>'
             + '<ellipse class="aica-mouth-open" cx="32" cy="39.5" rx="4" ry="3.5" fill="#3d1a08" opacity="0" style="transform-origin:32px 39.5px;transform:scaleY(0);"/>'
             + '</svg>';
@@ -937,6 +937,27 @@ define([
     let speakingEl = null;
     /** @type {Function|null} Cleanup for Web Audio mouth sync */
     let mouthSyncCleanup = null;
+    /** @type {boolean} Admin gate for avatar animation (blink + mouth sync) */
+    let avatarAnimEnabled = true;
+
+    /**
+     * Whether avatar animation may run: admin setting on AND the user has not
+     * asked the OS for reduced motion (CSS animations are already neutralised
+     * by the prefers-reduced-motion block in styles.css; this covers the
+     * requestAnimationFrame-driven mouth sync, which CSS cannot stop).
+     *
+     * @returns {boolean}
+     */
+    const avatarAnimAllowed = function() {
+        if (!avatarAnimEnabled) {
+            return false;
+        }
+        try {
+            return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        } catch (e) {
+            return true;
+        }
+    };
     /** @type {HTMLElement|null} Message element whose content has been replaced with word spans */
     let highlightingEl = null;
     /** @type {{el: HTMLElement, start: number, end: number}|null} Currently highlighted word span */
@@ -949,6 +970,7 @@ define([
      */
     const initUI = function(rootEl) {
         root = rootEl;
+        avatarAnimEnabled = root.dataset.avataranim !== '0';
         drawer = root.querySelector('.local-ai-course-assistant__drawer');
         toggle = root.querySelector('#local-ai-course-assistant-toggle');
         closeToggle = root.querySelector('#local-ai-course-assistant-close-toggle');
@@ -2117,14 +2139,17 @@ define([
         }
 
         // Animate the toggle-button and header avatars while TTS is active.
+        // Gated on the avatar animation admin setting (functional speaking
+        // state on the message/button above is not animation and stays on).
+        var animate = !!on && avatarAnimEnabled;
         if (root) {
             root.querySelectorAll('.aica-avatar-svg--toggle, .aica-avatar-svg--header').forEach(function(av) {
-                av.classList.toggle('aica-avatar-svg--speaking', !!on);
+                av.classList.toggle('aica-avatar-svg--speaking', animate);
             });
         }
         // Pulse-glow the toggle button itself (drives the CSS @keyframes aica-speaking-glow).
         if (toggle) {
-            toggle.classList.toggle('aica-speaking', !!on);
+            toggle.classList.toggle('aica-speaking', animate);
         }
     };
 
@@ -4927,7 +4952,7 @@ define([
      */
     const startMouthSync = function(audioEl) {
         stopMouthSync();
-        if (!root || !audioEl) {
+        if (!root || !audioEl || !avatarAnimAllowed()) {
             return;
         }
         var AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -5011,7 +5036,7 @@ define([
      */
     const startMouthSyncFromAnalyser = function(analyser) {
         stopMouthSync();
-        if (!root || !analyser) {
+        if (!root || !analyser || !avatarAnimAllowed()) {
             return;
         }
         analyser.fftSize = 256;

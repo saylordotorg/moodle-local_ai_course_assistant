@@ -1521,3 +1521,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'An ƙi policy bundle: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Sassan da aka dawo da su (zaɓin RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Sassan da mai dawowa ya zaɓa don wannan tambaya, cikin tsari bisa matsayi tare da makin dacewarsu da tushe (cmid). Yi amfani da wannan don tabbatar da cewa samfurin ya karɓi abun cikin kwas da ya fi dacewa.';
+$string['settings:avatar_animation_enabled'] = 'Motsin avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Motsa SVG avatar da aka ƙirƙira: yin ido lokacin hutawa, da kuma motsin baki da aka haɗa da sauti na rubutu zuwa magana yayinda mataimaki yana magana. Yana mutunta zaɓin ƙarancin motsi na na\'urar mai koyo. Keta kowace hanya don auna A/B: saita darajar tsarin avatar_animation_course_COURSEID zuwa 0 ko 1.';

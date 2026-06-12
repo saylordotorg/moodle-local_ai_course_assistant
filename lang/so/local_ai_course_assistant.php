@@ -1509,3 +1509,5 @@ $string['task:policy_bundle_sync'] = 'SOLA isku-dubbaridka xidhmada siyaasadda s
 $string['policy_bundle:invalid'] = 'Xidhmada siyaasadda waa la diiday: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Qaybaha la soo helay (xulashada RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Qaybaha uu soo-helaha u xushay su\'aashan, oo u kala horreeya darajada, oo leh dhibcahooda khuseeya iyo isha (cmid). U isticmaal tan si aad u xaqiijiso in moodelku helay nuxurka koorsada ee ugu wanaagsan.';
+$string['settings:avatar_animation_enabled'] = 'Dhaqdhaqaaqa avatar-ka';
+$string['settings:avatar_animation_enabled_desc'] = 'Dhaqdhaqaajinta avatar-ka SVG ee la sameeyay: indho-laacista marka nasasho, iyo dhaqdhaqaaqa afka oo la xidid ah codka qoraalka-u-hadlaya markii kaaliyuhu hadlayo. Waxa ay xushmaysaa doorbidaanka dhaqdhaqaaqa yar ee qalab-baraha. Beddelida korsoodheer kors walba loogu qiyaasayo A/B: dejinta qiimaha hageynta avatar_animation_course_COURSEID ilaa 0 ama 1.';

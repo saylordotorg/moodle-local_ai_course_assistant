@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'Synchronisation du pack de politiques sign
 $string['policy_bundle:invalid'] = 'Pack de politiques rejeté : {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Segments récupérés (sélection RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Les passages que le récupérateur a sélectionnés pour cette question, classés par ordre de pertinence avec leur score de pertinence et leur source (cmid). Utilisez ceci pour vérifier que le modèle a reçu le contenu de cours le plus pertinent.';
+$string['settings:avatar_animation_enabled'] = 'Animation de l\'avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Anime l\'avatar SVG généré : clignement en veille, plus mouvement de la bouche synchronisé avec l\'audio de synthèse vocale pendant que l\'assistant parle. Respecte la préférence de mouvement réduit de l\'appareil de l\'apprenant. Remplacement par cours pour la mesure A/B : définissez la valeur de configuration avatar_animation_course_COURSEID sur 0 ou 1.';

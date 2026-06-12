@@ -1528,3 +1528,5 @@ $string['task:policy_bundle_sync'] = 'SOLA nilagdaang policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle tinanggihan: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Mga nakuhang chunk (pagpili ng RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Ang mga sipi na pinili ng retriever para sa tanong na ito, naka-ayos ayon sa ranggo kasama ang kanilang marka ng kaugnayan at pinagmulan (cmid). Gamitin ito upang i-verify na natanggap ng modelo ang pinakamatugmang nilalaman ng kurso.';
+$string['settings:avatar_animation_enabled'] = 'Animasyon ng avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'I-animate ang nabuong SVG avatar: kumikislap habang walang ginagawa, kasama ang galaw ng bibig na naka-sync sa audio ng text-to-speech habang nagsasalita ang assistant. Iginagalang ang kagustuhan ng nabawasang galaw ng device ng mag-aaral. Bawas-bawas na override bawat kurso para sa pagsukat ng A/B: itakda ang config value na avatar_animation_course_COURSEID sa 0 o 1.';

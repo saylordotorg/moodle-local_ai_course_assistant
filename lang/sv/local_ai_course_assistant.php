@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'SOLA synkronisering av signerat policypake
 $string['policy_bundle:invalid'] = 'Policypaket avvisat: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Hämtade stycken (RAG-urval)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'De stycken som hämtaren valde för den här frågan, i rangordning med deras relevanspoäng och källa (cmid). Använd detta för att kontrollera att modellen fick det bäst matchande kursinnehållet.';
+$string['settings:avatar_animation_enabled'] = 'Avataranimation';
+$string['settings:avatar_animation_enabled_desc'] = 'Animera den genererade SVG-avataren: blinkning i viloläge samt munrörelse synkroniserad med text-till-tal-ljud medan assistenten talar. Respekterar inlärares enhets inställning för reducerad rörelse. Kursvis åsidosättning för A/B-mätning: ange konfigurationsvärdet avatar_animation_course_COURSEID till 0 eller 1.';

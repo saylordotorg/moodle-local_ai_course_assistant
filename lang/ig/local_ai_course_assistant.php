@@ -1507,3 +1507,5 @@ $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'A jụrụ policy bundle: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Iberibe e wetara (nhọrọ RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Akụkụ ndị onye na-eweta họọrọ maka ajụjụ a, n\'usoro ọkwa ya na akara mkpa ha na isi mmalite (cmid). Jiri nke a gosi na ụdị ahụ natara ọdịnaya nkuzi kacha dabaa.';
+$string['settings:avatar_animation_enabled'] = 'Mmegharị avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Megharịa avatar SVG emepụtara: ìchèkwu n\'oge nwayọọ, tinyere mmegharị ọnụ na-emekọrịta ihe na audio okwu site n\'ederede mgbe onye inyeaka na-asụ okwu. Na-asọpụrụ nhọrọ mmetụta obere nke ngwaọrụ onye na-amụ. Nnọchianya kwa ihe omuma maka iwepụ ogo A/B: tọọ uru nhazi avatar_animation_course_COURSEID na 0 ma ọ bụ 1.';

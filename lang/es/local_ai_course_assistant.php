@@ -1518,3 +1518,5 @@ $string['task:policy_bundle_sync'] = 'Sincronización del paquete de políticas 
 $string['policy_bundle:invalid'] = 'Paquete de políticas rechazado: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Fragmentos recuperados (selección RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Los pasajes que el recuperador seleccionó para esta pregunta, ordenados por rango con su puntuación de relevancia y su origen (cmid). Utilice esto para verificar que el modelo recibió el contenido del curso que mejor coincide.';
+$string['settings:avatar_animation_enabled'] = 'Animación de avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Anima el avatar SVG generado: parpadeo en reposo, más movimiento de boca sincronizado con el audio de texto a voz mientras el asistente habla. Respeta la preferencia de movimiento reducido del dispositivo del estudiante. Anulación por curso para medición A/B: establezca el valor de configuración avatar_animation_course_COURSEID en 0 o 1.';

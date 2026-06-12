@@ -1491,3 +1491,5 @@ $string['task:policy_bundle_sync'] = 'SOLA-synchronisatie van ondertekend beleid
 $string['policy_bundle:invalid'] = 'Beleidspakket geweigerd: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Opgehaalde fragmenten (RAG-selectie)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'De passages die de retriever voor deze vraag heeft geselecteerd, op rangvolgorde met hun relevantiescore en bron (cmid). Gebruik dit om te verifiëren dat het model de best passende cursusinhoud heeft ontvangen.';
+$string['settings:avatar_animation_enabled'] = 'Avatar-animatie';
+$string['settings:avatar_animation_enabled_desc'] = 'Animeer de gegenereerde SVG-avatar: knipperen in ruststand, plus mondbeweging gesynchroniseerd met tekst-naar-spraak-audio terwijl de assistent spreekt. Respecteert de voorkeur voor verminderde beweging van het apparaat van de leerling. Overschrijving per cursus voor A/B-meting: stel de configuratiewaarde avatar_animation_course_COURSEID in op 0 of 1.';

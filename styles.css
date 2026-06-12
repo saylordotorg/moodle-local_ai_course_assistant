@@ -4104,6 +4104,18 @@ a.aica-history-panel__source:hover {
     to   { transform: scaleY(1); opacity: 1; }
 }
 
+/* Idle blink for generated SVG avatars — only when the avatar animation
+   admin setting is on (data-avataranim on the widget root). The global
+   prefers-reduced-motion block neutralizes it for motion-sensitive users. */
+.local-ai-course-assistant[data-avataranim="1"] .aica-eye {
+    animation: aica-blink 5.2s ease-in-out infinite;
+}
+
+@keyframes aica-blink {
+    0%, 94%, 100% { transform: scaleY(1); }
+    96.5% { transform: scaleY(0.08); }
+}
+
 /* Focus sentinel — absorbs initial focus from ARIA dialog, zero visual footprint */
 .aica-focus-sentinel {
     position: absolute;

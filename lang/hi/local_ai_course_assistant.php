@@ -1521,3 +1521,5 @@ $string['task:policy_bundle_sync'] = 'SOLA हस्ताक्षरित न
 $string['policy_bundle:invalid'] = 'नीति बंडल अस्वीकृत: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'प्राप्त किए गए अंश (RAG चयन)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'इस प्रश्न के लिए रिट्रीवर द्वारा चुने गए अंश, उनकी प्रासंगिकता स्कोर और स्रोत (cmid) के साथ रैंक क्रम में। इसका उपयोग यह सत्यापित करने के लिए करें कि मॉडल को सबसे अच्छी तरह मेल खाने वाली कोर्स सामग्री प्राप्त हुई।';
+$string['settings:avatar_animation_enabled'] = 'अवतार एनिमेशन';
+$string['settings:avatar_animation_enabled_desc'] = 'उत्पन्न SVG अवतार को एनिमेट करें: निष्क्रिय अवस्था में पलक झपकाना, साथ ही सहायक के बोलते समय टेक्स्ट-टू-स्पीच ऑडियो के साथ समन्वित मुँह की गति। शिक्षार्थी के डिवाइस की कम गति की प्राथमिकता का सम्मान करता है। A/B माप के लिए प्रति-पाठ्यक्रम ओवरराइड: config मान avatar_animation_course_COURSEID को 0 या 1 पर सेट करें।';

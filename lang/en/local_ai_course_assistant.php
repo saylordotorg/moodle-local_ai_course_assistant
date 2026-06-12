@@ -354,6 +354,8 @@ $string['settings:policy_bundle_status'] = 'Last sync';
 $string['settings:policy_bundle_applied_version'] = 'applied version';
 $string['task:policy_bundle_sync'] = 'SOLA signed policy bundle sync';
 $string['policy_bundle:invalid'] = 'Policy bundle rejected: {$a}';
+$string['settings:avatar_animation_enabled'] = 'Avatar animation';
+$string['settings:avatar_animation_enabled_desc'] = 'Animate the generated SVG avatar: idle blinking, plus mouth movement synced to text-to-speech audio while the assistant speaks. Respects the reduced motion preference of the learner\'s device. Per-course override for A/B measurement: set the config value avatar_animation_course_COURSEID to 0 or 1.';
 
 // Reminder messages.
 $string['reminder:email_subject'] = 'Study Reminder: {$a}';

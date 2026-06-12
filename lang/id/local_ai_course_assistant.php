@@ -1521,3 +1521,5 @@ $string['task:policy_bundle_sync'] = 'Sinkronisasi bundel kebijakan bertanda tan
 $string['policy_bundle:invalid'] = 'Bundel kebijakan ditolak: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Potongan yang diambil (seleksi RAG)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'Bagian yang dipilih oleh retriever untuk pertanyaan ini, dalam urutan peringkat beserta skor relevansi dan sumbernya (cmid). Gunakan ini untuk memverifikasi bahwa model menerima konten kursus yang paling sesuai.';
+$string['settings:avatar_animation_enabled'] = 'Animasi avatar';
+$string['settings:avatar_animation_enabled_desc'] = 'Animasikan avatar SVG yang dihasilkan: kedipan saat tidak aktif, ditambah gerakan mulut yang disinkronkan dengan audio teks-ke-ucapan saat asisten berbicara. Menghormati preferensi gerak berkurang pada perangkat peserta didik. Penggantian per-kursus untuk pengukuran A/B: atur nilai konfigurasi avatar_animation_course_COURSEID ke 0 atau 1.';
