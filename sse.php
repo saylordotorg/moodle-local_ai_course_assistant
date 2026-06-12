@@ -648,71 +648,30 @@ try {
     // on the same site:config capability that controls the admin toggle.
     if ((bool) get_config('local_ai_course_assistant', 'prompt_debug_enabled')) {
         try {
-            $logpath = $CFG->dataroot . '/temp/sola_prompt_debug.log';
-            if (file_exists($logpath) && filesize($logpath) > 1024 * 1024) {
-                file_put_contents($logpath, '');
-            }
-            $entry = "=== " . date('Y-m-d H:i:s') . " courseid={$courseid} userid={$USER->id} provider="
-                . ($clientprovider ?: get_config('local_ai_course_assistant', 'provider')) . " ===\n"
-                . "Total: " . strlen($systemprompt) . " chars (~" . (int) (strlen($systemprompt) / 4) . " tokens)\n"
-                . "Budget: " . (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 8000) . " chars\n";
-            // v4.12.0: structured breakdown when available.
+            // Formatting + rotation live in prompt_debug (v6.6.0 extraction)
+            // so the viewer's parser and this writer share one pinned format.
+            $breakdowntext = null;
             if (!empty(\local_ai_course_assistant\context_builder::$last_breakdown)) {
-                $entry .= "Sections (by category):\n"
-                    . \local_ai_course_assistant\prompt\builder::format_breakdown(
-                        \local_ai_course_assistant\context_builder::$last_breakdown
-                    ) . "\n";
-            } else {
-                // Fallback: heading-based split for legacy paths.
-                $rows = [];
-                foreach (preg_split('/\n## /', $systemprompt) as $i => $section) {
-                    $heading = $i === 0 ? 'PREAMBLE' : trim(substr($section, 0, strpos("\n", $section) ?: 60), "# \n");
-                    $rows[] = sprintf("%6d chars  %s", strlen($section), $heading);
-                }
-                $entry .= "Sections:\n" . implode("\n", $rows) . "\n";
+                $breakdowntext = \local_ai_course_assistant\prompt\builder::format_breakdown(
+                    \local_ai_course_assistant\context_builder::$last_breakdown
+                );
             }
-            // v6.4.x: log the retrieved RAG chunks distinctly — with their
-            // relevance score and source — so admins can verify on the debug
-            // page WHICH passages the retriever selected (the "5 best pieces")
-            // and how strongly they matched. Inside the assembled prompt these
-            // appear only as [c:N] labels with no scores; this block makes the
-            // selection reviewable on its own. Only present when RAG retrieved.
-            if (!empty($retrievedchunks)) {
-                $entry .= "--- RETRIEVED CHUNKS (" . count($retrievedchunks)
-                    . ", top-k by relevance) ---\n";
-                foreach (array_values($retrievedchunks) as $ci => $ch) {
-                    $cscore = isset($ch['score']) ? number_format((float) $ch['score'], 4) : 'n/a';
-                    $ccmid = isset($ch['cmid']) ? (int) $ch['cmid'] : 0;
-                    $cmod = (string) ($ch['modtype'] ?? '');
-                    $ccontent = (string) ($ch['content'] ?? '');
-                    $entry .= "[c:{$ci}] score={$cscore} cmid={$ccmid} modtype={$cmod} ("
-                        . strlen($ccontent) . " chars)\n" . $ccontent . "\n\n";
-                }
-            }
-            $entry .= "--- ASSEMBLED SYSTEM PROMPT ---\n" . $systemprompt . "\n\n";
-
-            // v5.0.0 patch 6: history + current user message — i.e. the
-            // ACTUAL final payload going to the model. This is what Tomi
-            // asked for: dumping just the system prompt does not reveal
-            // history-driven drift.
-            $entry .= "--- HISTORY (" . count($history) . " messages) ---\n";
-            foreach ($history as $i => $h) {
-                $role = (string) ($h['role'] ?? '?');
-                $content = (string) ($h['content'] ?? '');
-                $entry .= "[{$i}] {$role} (" . strlen($content) . " chars): {$content}\n";
-            }
-            $entry .= "\n--- CURRENT USER MESSAGE (" . strlen($message) . " chars) ---\n"
-                . $message . "\n";
-            if ($attachmentmeta !== null) {
-                $entry .= "\n--- ATTACHMENT ---\n"
-                    . "filename={$attachmentmeta['filename']} mime={$attachmentmeta['mime']} "
-                    . "size={$attachmentmeta['size']}\n";
-                if ($attachedpdftext !== '') {
-                    $entry .= "pdf_extracted_chars=" . mb_strlen($attachedpdftext) . "\n";
-                }
-            }
-            $entry .= "================================================================\n\n";
-            file_put_contents($logpath, $entry, FILE_APPEND | LOCK_EX);
+            \local_ai_course_assistant\prompt_debug::write_entry(
+                \local_ai_course_assistant\prompt_debug::format_entry([
+                    'timestamp'         => date('Y-m-d H:i:s'),
+                    'courseid'          => $courseid,
+                    'userid'            => $USER->id,
+                    'provider'          => ($clientprovider ?: get_config('local_ai_course_assistant', 'provider')),
+                    'systemprompt'      => $systemprompt,
+                    'budgetchars'       => (int) (get_config('local_ai_course_assistant', 'prompt_budget_chars') ?: 8000),
+                    'breakdowntext'     => $breakdowntext,
+                    'retrievedchunks'   => $retrievedchunks,
+                    'history'           => $history,
+                    'message'           => $message,
+                    'attachmentmeta'    => $attachmentmeta,
+                    'pdfextractedchars' => ($attachedpdftext !== '') ? mb_strlen($attachedpdftext) : 0,
+                ])
+            );
         } catch (\Throwable $e) {
             // Debug logging is best-effort — never break a chat turn.
         }

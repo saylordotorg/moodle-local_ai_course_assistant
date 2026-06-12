@@ -37,6 +37,8 @@ require_capability('moodle/site:config', $syscontext);
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $range    = optional_param('range', 30, PARAM_INT); // 7, 30, 0 = all.
 $action   = optional_param('action', '', PARAM_ALPHA);
+$expa     = optional_param('expa', 0, PARAM_INT); // Experiment comparison course A.
+$expb     = optional_param('expb', 0, PARAM_INT); // Experiment comparison course B.
 
 // ── Student mode toggle (session-scoped) ───────────────────────────────────
 if ($action === 'togglestudentmode' && confirm_sesskey()) {
@@ -646,6 +648,58 @@ $PAGE->requires->js_call_amd('local_ai_course_assistant/analytics_dashboard', 'i
 $tabscourses = [];
 foreach ($all_courses as $c) {
     $tabscourses[] = ['id' => $c->id, 'shortname' => $c->shortname];
+}
+
+// ── A/B experiment comparison (server-rendered, GET-driven) ────────────────
+$templatedata['experiment_form_action'] = (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false);
+$templatedata['experiment_range'] = $range;
+$templatedata['experiment_courses_a'] = [];
+$templatedata['experiment_courses_b'] = [];
+foreach ($all_courses as $c) {
+    $templatedata['experiment_courses_a'][] = ['id' => $c->id, 'shortname' => $c->shortname, 'sel' => ((int) $c->id === $expa)];
+    $templatedata['experiment_courses_b'][] = ['id' => $c->id, 'shortname' => $c->shortname, 'sel' => ((int) $c->id === $expb)];
+}
+if ($expa > 0 && $expb > 0 && $expa !== $expb) {
+    $ma = analytics::get_experiment_metrics($expa, $since);
+    $mb = analytics::get_experiment_metrics($expb, $since);
+    $metriclabels = [
+        'enrolled' => get_string('analytics:exp_enrolled', 'local_ai_course_assistant'),
+        'active_users' => get_string('analytics:exp_active_users', 'local_ai_course_assistant'),
+        'usage_rate_pct' => get_string('analytics:exp_usage_rate', 'local_ai_course_assistant'),
+        'sessions' => get_string('analytics:exp_sessions', 'local_ai_course_assistant'),
+        'messages' => get_string('analytics:exp_messages', 'local_ai_course_assistant'),
+        'avg_messages_per_session' => get_string('analytics:exp_avg_msgs_session', 'local_ai_course_assistant'),
+        'avg_session_minutes' => get_string('analytics:exp_avg_session_minutes', 'local_ai_course_assistant'),
+        'return_rate_pct' => get_string('analytics:exp_return_rate', 'local_ai_course_assistant'),
+        'tts_plays' => get_string('analytics:exp_tts_plays', 'local_ai_course_assistant'),
+        'tts_per_active_user' => get_string('analytics:exp_tts_per_active', 'local_ai_course_assistant'),
+    ];
+    $exprows = [];
+    foreach ($metriclabels as $key => $label) {
+        $a = $ma[$key];
+        $b = $mb[$key];
+        $delta = '–';
+        if (is_numeric($a) && (float) $a != 0.0) {
+            $pct = ((float) $b - (float) $a) / (float) $a * 100;
+            $delta = ($pct >= 0 ? '+' : '') . round($pct, 1) . '%';
+        }
+        $exprows[] = ['label' => $label, 'a' => $a, 'b' => $b, 'delta' => $delta];
+    }
+    $expnamea = '';
+    $expnameb = '';
+    foreach ($all_courses as $c) {
+        if ((int) $c->id === $expa) {
+            $expnamea = $c->shortname;
+        }
+        if ((int) $c->id === $expb) {
+            $expnameb = $c->shortname;
+        }
+    }
+    $templatedata['experiment'] = [
+        'course_a_name' => $expnamea,
+        'course_b_name' => $expnameb,
+        'rows' => $exprows,
+    ];
 }
 
 echo $OUTPUT->header();

@@ -770,6 +770,54 @@
         enable SOLA on more courses.
     </div>
     {{/has_course_selected}}
+
+    {{! ═══ A/B experiment comparison (server-rendered) ═══ }}
+    <div class="card mt-4" id="sola-experiment-compare">
+        <div class="card-body">
+            <h4 class="card-title">{{#str}}analytics:exp_heading, local_ai_course_assistant{{/str}}</h4>
+            <p class="text-muted">{{#str}}analytics:exp_desc, local_ai_course_assistant{{/str}}</p>
+            <form method="get" action="{{experiment_form_action}}" class="form-inline mb-3">
+                <input type="hidden" name="range" value="{{experiment_range}}">
+                <label class="mr-2" for="sola-exp-a">{{#str}}analytics:exp_course_a, local_ai_course_assistant{{/str}}</label>
+                <select class="custom-select mr-3" id="sola-exp-a" name="expa">
+                    <option value="0">…</option>
+                    {{#experiment_courses_a}}
+                    <option value="{{id}}" {{#sel}}selected{{/sel}}>{{shortname}}</option>
+                    {{/experiment_courses_a}}
+                </select>
+                <label class="mr-2" for="sola-exp-b">{{#str}}analytics:exp_course_b, local_ai_course_assistant{{/str}}</label>
+                <select class="custom-select mr-3" id="sola-exp-b" name="expb">
+                    <option value="0">…</option>
+                    {{#experiment_courses_b}}
+                    <option value="{{id}}" {{#sel}}selected{{/sel}}>{{shortname}}</option>
+                    {{/experiment_courses_b}}
+                </select>
+                <button type="submit" class="btn btn-primary">{{#str}}analytics:exp_compare, local_ai_course_assistant{{/str}}</button>
+            </form>
+            {{#experiment}}
+            <table class="table table-sm table-striped" id="sola-experiment-table">
+                <thead>
+                    <tr>
+                        <th>{{#str}}analytics:exp_metric, local_ai_course_assistant{{/str}}</th>
+                        <th>{{course_a_name}}</th>
+                        <th>{{course_b_name}}</th>
+                        <th>{{#str}}analytics:exp_delta, local_ai_course_assistant{{/str}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#rows}}
+                    <tr>
+                        <td>{{label}}</td>
+                        <td>{{a}}</td>
+                        <td>{{b}}</td>
+                        <td>{{delta}}</td>
+                    </tr>
+                    {{/rows}}
+                </tbody>
+            </table>
+            {{/experiment}}
+        </div>
+    </div>
 </div>
 
 {{#has_course_selected}}

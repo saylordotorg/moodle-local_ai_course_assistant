@@ -425,7 +425,10 @@ class analytics {
             $params['since'] = $since;
         }
 
-        $sql = "SELECT m.userid, m.timecreated
+        // m.id leads the select: get_records_sql keys rows by the first column
+        // and silently collapses duplicates, so keying by userid dropped every
+        // message after a user's first and undercounted sessions.
+        $sql = "SELECT m.id, m.userid, m.timecreated
                   FROM {local_ai_course_assistant_msgs} m
                  WHERE {$where}
                  ORDER BY m.userid ASC, m.timecreated ASC";
@@ -1177,5 +1180,52 @@ class analytics {
         } catch (\Throwable $e) {
             return $default;
         }
+    }
+
+    /**
+     * Per-course metric snapshot for A/B experiment comparison.
+     *
+     * Generic by design: any two courses (one with a per-course override on,
+     * one without) can be compared on engagement, not just the avatar probe.
+     * All values are computed within the given time window.
+     *
+     * @param int $courseid Course ID.
+     * @param int $since Timestamp for time range filter (0 = all time).
+     * @return array Metric name => numeric value.
+     */
+    public static function get_experiment_metrics(int $courseid, int $since = 0): array {
+        global $DB;
+
+        $overview = self::get_overview($courseid, $since);
+        $sessions = self::get_session_stats($courseid, $since);
+        $returns = self::get_return_rate($courseid, $since);
+        $enrolled = self::get_enrollment_counts($courseid)['total_enrolled'];
+
+        // TTS plays: synthesis calls logged against the course in the window.
+        $params = ['courseid' => $courseid];
+        $timewhere = '';
+        if ($since > 0) {
+            $timewhere = ' AND m.timecreated >= :since';
+            $params['since'] = $since;
+        }
+        $sql = "SELECT COUNT(m.id)
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE m.courseid = :courseid
+                   AND m.interaction_type IN ('openai_tts', 'xai_tts'){$timewhere}";
+        $ttsplays = (int) $DB->count_records_sql($sql, $params);
+
+        $active = (int) $overview['active_students'];
+        return [
+            'enrolled' => $enrolled,
+            'active_users' => $active,
+            'usage_rate_pct' => $enrolled > 0 ? round($active / $enrolled * 100, 1) : 0,
+            'sessions' => (int) $sessions['total_sessions'],
+            'messages' => (int) $overview['total_messages'],
+            'avg_messages_per_session' => (float) $sessions['avg_messages_per_session'],
+            'avg_session_minutes' => (float) $sessions['avg_duration_minutes'],
+            'return_rate_pct' => (float) $returns['return_rate_pct'],
+            'tts_plays' => $ttsplays,
+            'tts_per_active_user' => $active > 0 ? round($ttsplays / $active, 2) : 0,
+        ];
     }
 }

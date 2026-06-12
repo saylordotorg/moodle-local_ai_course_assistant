@@ -104,19 +104,7 @@ if ($go && $courseid > 0) {
             $ragerror = $e->getMessage();
         }
     } else if (trim($simchunks) !== '') {
-        $parts = preg_split('/^\s*---\s*$/m', $simchunks);
-        foreach ($parts as $i => $part) {
-            $part = trim($part);
-            if ($part !== '') {
-                $chunks[] = [
-                    'content'    => $part,
-                    'score'      => 1.0,
-                    'cmid'       => 0,
-                    'modtype'    => 'sim',
-                    'chunkindex' => $i,
-                ];
-            }
-        }
+        $chunks = \local_ai_course_assistant\prompt_debug::sim_chunks_from_text($simchunks);
     }
 
     // Show what the live retriever selected, so the admin can verify the
