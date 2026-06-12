@@ -80,7 +80,7 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 - Exiting a quiz (exit button or cancel) returns to the conversation starters view
 - `data-firstname` is passed from PHP → mustache → JS for personalized greetings
 - `bindEvents` has null guards on all optional buttons (clearBtn, expandBtn, micBtn, etc.) — if a button is removed from the mustache, it won't crash init
-- Admin settings link removed from header (was duplicate gear); admins use Moodle admin UI for course settings
+- Admin course settings link in the header is a WRENCH icon gated on `{{#cansiteconfig}}` (re-introduced after an earlier duplicate-gear removal); the gear is the all-users preferences panel. Admins also reach settings via the course More menu (v6.6.1) and Site administration
 - SOLA_NEXT: system prompt emits `[SOLA_NEXT]chip1||chip2||chip3||chip4[/SOLA_NEXT]`; `chat.js` strips tag and calls `UI.showSuggestions()`; tags are never shown to students
 - Starter translations live in `STARTER_LABELS` in `amd/src/speech.js` (46 languages)
 - SVG avatar: `buildFaceSVG()` + `renderAvatar()` in `ui.js`; prefs in localStorage `aica_avatar`; legacy img hidden when SVG active
@@ -126,18 +126,25 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 
 ---
 
-## Header Buttons (current layout)
+## Header Buttons (current layout, verified against the template 2026-06-12)
 
-From left to right in `.local-ai-course-assistant__header-actions`:
-1. Voice button (`.btn-voice`) — headphone icon; conditional on `{{#realtimeenabled}}`
-2. Analytics link (`.btn-analytics`) — stats icon; conditional on `{{#canviewanalytics}}`
-3. Settings panel (`.btn-settings-panel`) — gear icon; opens in-drawer language/avatar/voice panel
-4. Clear history (`.btn-clear`) — trash icon; confirms then clears conversation
-5. Reset/Home (`.btn-reset`) — home icon; shows starters overlay without clearing history
-6. Expand (`.btn-expand`) — arrows icon; toggles expanded state
-7. Close (`.btn-close`) — X icon; closes drawer
+From left to right in `.local-ai-course-assistant__header-actions` (template order):
+1. Avatar picker (`.btn-avatar`) — opens the avatar chooser; all users
+2. Talking avatar (`.btn-talking-avatar`) — person icon; conditional on `{{#talkingavatarenabled}}`
+3. Learning path (`.btn-path`) — conditional on `{{#pathenabled}}`; opens the "my path" panel
+4. Analytics link (`.btn-analytics`) — stats icon; conditional on `{{#canviewanalytics}}`
+5. Admin course settings (`.btn-settings`) — **wrench icon**; conditional on `{{#cansiteconfig}}`; `<a href="{{coursesettingsurl}}" target="_blank">`, tooltip "Course settings"
+6. Settings panel (`.btn-settings-panel`) — **gear icon**; opens in-drawer language/avatar/voice panel; all users
+7. Context debug (`.btn-debug`) — conditional on `{{#contextdebugvisible}}`
+8. Help (`.btn-help`) — opens the in-drawer help panel; all users
+9. Clear screen (`.btn-clear`) — trash icon; tooltip "Clear screen"
+10. Reset/Home (`.btn-reset`) — home icon; tooltip "Start over"; shows starters overlay WITHOUT clearing history
+11. Close (`.btn-close`) — X icon; closes drawer
 
-> **Note:** The admin course settings link (`btn-settings`) was removed to eliminate a duplicate gear icon. Admins access course settings via the Moodle admin interface.
+> **History note:** the admin settings link was removed at one point as a duplicate gear, then re-introduced as a **wrench** icon gated on `{{#cansiteconfig}}` — so admins see wrench (course settings page) + gear (preferences panel); learners see only the gear. There is no `.btn-voice`/`.btn-expand` in the header anymore: voice moved to the bottom mode nav (`{{#voicetabenabled}}`), and drawer sizing is via the drag/resize handles.
+
+### Bottom mode nav (`.local-ai-course-assistant__bottom-nav`)
+Tabs: Chat, Voice (`{{#voicetabenabled}}`), History, Progress. **Re-clicking the active Chat tab calls `UI.showStarters()`** (chat.js `setBottomMode`) — a secondary way back to the conversation starters; the primary affordance is the home/reset header button.
 
 ---
 
