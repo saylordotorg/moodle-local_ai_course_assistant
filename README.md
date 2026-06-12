@@ -66,6 +66,10 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 3. Visit Site Administration → Notifications to complete installation
 4. Configure settings at Site Administration → Plugins → Local plugins → AI Course Assistant, or go directly to `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant`
 
+### Finding the admin pages
+
+All admin pages live under one hub: **Site administration → Plugins → Local plugins → AI Course Assistant**. Bookmark the hub directly: `{moodle_root_url}/admin/category.php?category=local_ai_course_assistant` — it lists every settings page and tool (Analytics, RAG Index, Prompt Debug Log, Emergency Controls, the editors). The Site administration search box also finds every page by name (try "AI Course"). Course staff additionally get **Course AI Settings** and **AI Tutor Analytics** links in each course's "More" menu (v6.6.1+). Note: Moodle does not show a "Settings" link for local plugins on the Plugins overview page (admin/plugins.php) — that column only exists for other plugin types, so use the hub bookmark instead.
+
 ## Configuration
 
 ### Required Settings

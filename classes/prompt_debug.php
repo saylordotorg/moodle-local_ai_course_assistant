@@ -135,6 +135,10 @@ class prompt_debug {
      */
     public static function write_entry(string $entry): void {
         $logpath = self::log_path();
+        // PHP caches stat results per path within a process, so filesize()
+        // can return a stale value after the file was written earlier in the
+        // same request — the rotation check then silently never fires.
+        clearstatcache(true, $logpath);
         if (file_exists($logpath) && filesize($logpath) > self::MAX_LOG_BYTES) {
             file_put_contents($logpath, '');
         }
