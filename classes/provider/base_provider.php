@@ -114,11 +114,11 @@ abstract class base_provider implements provider_interface {
             if (!empty($this->apikey)) {
                 $headers[] = 'Authorization: Bearer ' . $this->apikey;
             }
-            $curl->setopt([
+            $curl->setopt(array_merge([
                 'CURLOPT_HTTPHEADER' => $headers,
                 'CURLOPT_RETURNTRANSFER' => true,
                 'CURLOPT_TIMEOUT' => 10,
-            ]);
+            ], \local_ai_course_assistant\security::resolve_pin_options($url)));
             $resp = $curl->get($url);
             $code = $curl->get_info()['http_code'] ?? 0;
             if ($code < 200 || $code >= 300) {
@@ -323,6 +323,10 @@ abstract class base_provider implements provider_interface {
                     curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser . ':' . ($CFG->proxypassword ?? ''));
                 }
             }
+
+            // Pin the connection to the IP validated above, closing the
+            // DNS-rebinding window (no-op under a proxy / literal IP / trusted host).
+            \local_ai_course_assistant\security::pin_curl_handle($ch, $url);
 
             curl_exec($ch);
 

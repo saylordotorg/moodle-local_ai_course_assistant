@@ -65,8 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-// Validate API key.
-$apikey = optional_param('apikey', '', PARAM_RAW);
+// Validate API key. Prefer an Authorization: Bearer header (which web servers
+// do not log by default) over the ?apikey query parameter; the query parameter
+// is still accepted for backward compatibility with existing Redash data sources.
+$bearer = '';
+$authheader = $_SERVER['HTTP_AUTHORIZATION'] ?? ($_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
+if ($authheader !== '' && preg_match('/^Bearer\s+(.+)$/i', trim($authheader), $bm)) {
+    $bearer = trim($bm[1]);
+}
+$apikey = $bearer !== '' ? $bearer : optional_param('apikey', '', PARAM_RAW);
 $configuredkey = get_config('local_ai_course_assistant', 'redash_api_key');
 
 if (empty($configuredkey)) {

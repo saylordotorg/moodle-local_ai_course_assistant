@@ -254,6 +254,8 @@ class get_realtime_token extends external_api {
             ],
             CURLOPT_TIMEOUT        => 5,
         ]);
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        \local_ai_course_assistant\security::pin_curl_handle($ch, 'https://api.openai.com/v1/realtime/client_secrets');
         $response = (string) curl_exec($ch);
         $httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

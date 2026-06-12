@@ -298,7 +298,8 @@ class radar_delivery {
         require_once($CFG->dirroot . '/lib/filelib.php');
         $curl = new \curl();
         $curl->setHeader(['Content-Type: ' . $contenttype]);
-        $result = $curl->post($url, $body);
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        $result = $curl->post($url, $body, security::resolve_pin_options($url));
         $code = (int) $curl->get_info()['http_code'];
         if ($code < 200 || $code >= 300) {
             debugging('Learning Radar webhook delivery failed (' . $code . '): ' . $result, DEBUG_DEVELOPER);

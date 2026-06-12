@@ -105,6 +105,8 @@ curl_setopt_array($ch, [
     ],
     CURLOPT_TIMEOUT        => 30,
 ]);
+// Pin to the validated IP, closing the DNS-rebinding window.
+\local_ai_course_assistant\security::pin_curl_handle($ch, $cfg['endpoint']);
 $response = curl_exec($ch);
 $httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);

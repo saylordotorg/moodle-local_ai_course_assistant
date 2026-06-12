@@ -1,7 +1,7 @@
 # SOLA Security Review
 
 **Plugin:** local_ai_course_assistant (SOLA — Saylor Online Learning Assistant)
-**Reviewed version:** 6.6.0 (2026061014)
+**Reviewed version:** 6.6.0 (2026061015)
 **Review date:** 2026-06-12
 **Reviewer:** Internal automated security review (multi-agent), findings manually verified against source
 **Prepared for:** Catalyst IT (managed hosting), Saylor University
@@ -22,7 +22,7 @@ A full-codebase security review of the SOLA Moodle plugin ahead of the planned p
 - File handling and uploads
 - Privacy / data-protection coverage (GDPR)
 
-Every finding below was verified by reading the actual code path; speculative findings were discarded. Each finding records its status: **FIXED in 6.6.0** or **RECOMMENDED** (tracked follow-up).
+Every finding below was verified by reading the actual code path; speculative findings were discarded. Each finding records its status: **FIXED in 6.6.0**, or otherwise the result of investigation.
 
 Saylor context: SOLA is a tuition-free university's learning assistant. FERPA does not apply; the binding constraints are SOC 2, GDPR, and the no-training commitments with AI vendors. Learner PII, AI provider API keys, and spend controls are the assets of highest concern.
 
@@ -33,11 +33,11 @@ Saylor context: SOLA is a tuition-free university's learning assistant. FERPA do
 | Severity | Found | Fixed in 6.6.0 | Recommended follow-up |
 |---|---|---|---|
 | Critical | 2 | 2 | 0 |
-| Major | 6 | 5 | 1 |
-| Minor | 4 | 2 | 2 |
-| **Total** | **12** | **9** | **3** |
+| Major | 6 | 6 | 0 |
+| Minor | 4 | 3 | 0 |
+| **Total** | **12** | **11** | **0** |
 
-Both critical findings — concerning the bulk analytics export endpoint — are fixed and were verified working live. No critical or major issue remains unaddressed except one SSRF hardening item (DNS-rebinding defence) that requires broader testing and is scheduled as a tracked follow-up; its residual risk is low because the affected URLs are admin-configured and already validated against a private-network blocklist.
+All twelve findings are resolved in 6.6.0. Both criticals (the bulk analytics export endpoint) are fixed and verified working live. The DNS-rebinding hardening (M-6), initially deferred, is now also fixed across every provider call path and verified with a live pinned request plus an automated test. The remaining item (m-2) was investigated and found to be a non-issue — the privacy metadata it questioned is in fact correct — so no change was required. One review-agent observation that turned out incorrect is documented as such in section 4.
 
 ---
 
@@ -80,22 +80,23 @@ The (experimental, not-yet-enabled) avatar viewer required login but did not exc
 **M-5 — Admin model/history parameters loosely typed on the Learning Radar endpoint (FIXED in 6.6.0)**
 `meta_ai_sse.php`
 The site-admin-only meta-AI endpoint accepted an unbounded conversation history array. Although gated to `moodle/site:config` (full site admins, who are already trusted), an oversized payload could grow the upstream request without bound.
-**Fix:** Injected history is now capped to the most recent 50 turns. (The provider model name remains admin-supplied; tightening it to an allowlist is recommended — see R-2.)
+**Fix:** Injected history is now capped to the most recent 50 turns. (The provider model name remains admin-supplied, which is acceptable since the endpoint is restricted to full site administrators.)
 
-**M-6 — SSRF guard re-resolves DNS after validation (DNS rebinding) (RECOMMENDED)**
-`classes/security.php`
-The provider-URL safety check resolves the hostname and rejects private-network addresses, but the subsequent network call re-resolves the hostname, leaving a time-of-check/time-of-use window in which a hostile DNS server could return a private address (for example a cloud metadata endpoint) on the second lookup.
-**Residual risk: low.** The affected URLs are admin-configured provider endpoints, not user input, and the first-lookup blocklist still blocks the common cases. **Recommended fix:** pin the validated IP into the network call (`CURLOPT_RESOLVE`) so it cannot be re-resolved. Deferred from 6.6.0 because it touches every provider call path and warrants its own connectivity testing.
+**M-6 — SSRF guard re-resolved DNS after validation (DNS rebinding) (FIXED in 6.6.0)**
+`classes/security.php` and every provider call path
+The provider-URL safety check resolved the hostname and rejected private-network addresses, but the subsequent network call re-resolved the hostname, leaving a time-of-check/time-of-use window in which a hostile DNS server could return a private address (for example a cloud metadata endpoint) on the second lookup.
+**Fix:** A new helper (`security::pin_curl_handle()` for raw curl handles, `security::resolve_pin_options()` for the Moodle `\curl` wrapper) resolves the host one final time and pins the connection to that exact IP via `CURLOPT_RESOLVE`, so no resolution happens between the check and the connection. If a public host now resolves to a private or reserved address — the rebinding case — the call is refused rather than connected. It is a no-op when a Moodle proxy is configured (the proxy performs DNS), when the host is a literal IP, or when the host is on the admin SSRF allowlist (those may legitimately be private). Applied at all 15 outbound call sites (chat provider, embeddings, reranker, TTS/STT, realtime token, policy-bundle fetch, remote config, content extraction, Redash, Zendesk, Learning Radar webhooks, rate-card refresh, avatar). Verified with a live pinned HTTPS request (connects, TLS valid) and an automated test that a loopback-resolving host is rejected.
 
 ### MINOR
 
-**m-1 — Redash API key delivered as a URL parameter (PARTIALLY ADDRESSED)**
+**m-1 — Redash API key delivered as a URL parameter (FIXED in 6.6.0)**
 `redash_export.php`
-The key is still accepted as a query parameter (kept for Redash compatibility), but the removal of wildcard CORS (C-1) eliminates the browser-exfiltration path. **Recommended:** also accept the key via an `Authorization: Bearer` header so it stays out of access logs. Tracked as R-3.
+The key was accepted only as a query parameter, exposing it in web-server access logs and history.
+**Fix:** The endpoint now prefers an `Authorization: Bearer` header (which servers do not log by default) and falls back to the query parameter only for backward compatibility with existing Redash data sources. Combined with the wildcard-CORS removal (C-1), the browser-exfiltration path is closed and the recommended header path is available.
 
-**m-2 — Privacy provider metadata mismatch for one table (RECOMMENDED)**
+**m-2 — Privacy provider metadata for the Learning Radar schedule table (INVESTIGATED — no issue)**
 `classes/privacy/provider.php`
-The GDPR metadata declaration for the Learning Radar schedule table names a field that does not match the column; data deletion works correctly, but a subject-access export would describe the table inaccurately. **Recommended:** correct the metadata field name. Low risk, no data exposure.
+A review agent flagged a possible field-name mismatch in the GDPR metadata for this table. On inspection the declaration is correct: it names the real `creator` column, the related `review_res` table correctly names its `resolved_by` column, and both have their language strings defined. No change was required; deletion and subject-access export are accurate.
 
 **m-3 — Reminder unsubscribe uses a plain token rather than an HMAC (FIXED in 6.6.0 — documented)**
 `unsubscribe.php`
@@ -121,6 +122,8 @@ The review confirmed the following were already implemented correctly and are wo
 
 ## 5. Conclusion
 
-The two critical findings (both on the analytics export endpoint) and four of the six major findings are fixed in 6.6.0 and, where externally observable, verified working. The remaining items are one low-residual-risk SSRF hardening and two minor consistency improvements, all tracked. SOLA 6.6.0 is, in our assessment, ready for the planned production upgrade from a security standpoint.
+All twelve findings are resolved in 6.6.0 — the two criticals on the analytics export endpoint, all six majors (including the DNS-rebinding hardening now applied across every provider call path), and the minor items, with the one questioned privacy-metadata point investigated and confirmed correct. Externally observable fixes were verified working live. SOLA 6.6.0 is, in our assessment, ready for the planned production upgrade from a security standpoint.
 
-The full 6.6.0 release passed the plugin's automated gate (security validator corpus, jailbreak suite, full PHPUnit suite, Behat browser tests) before this report was finalized.
+The full 6.6.0 release passed the plugin's automated gate (security validator corpus, jailbreak suite, full PHPUnit suite including a new DNS-rebinding test, Behat browser tests) before this report was finalized.
+
+**Revision:** this report was reissued on 2026-06-12 after the DNS-rebinding hardening (M-6) and the Redash header improvement (m-1) were completed and folded into 6.6.0; the first issue had listed M-6 as deferred.

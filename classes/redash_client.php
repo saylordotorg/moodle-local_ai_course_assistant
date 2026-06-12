@@ -101,7 +101,9 @@ class redash_client {
             'Content-Type: application/json',
         ]);
         $endpoint = $baseurl . '/api/queries';
-        $resp = $curl->post($endpoint, json_encode($payload));
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        $resp = $curl->post($endpoint, json_encode($payload),
+            security::resolve_pin_options($endpoint));
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code < 200 || $code >= 300) {
             return ['ok' => false, 'error' => 'Redash API returned HTTP ' . $code . ': ' . substr((string) $resp, 0, 400)];

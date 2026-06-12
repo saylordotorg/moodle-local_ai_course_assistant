@@ -178,7 +178,9 @@ abstract class base_embedding_provider {
             'CURLOPT_TIMEOUT'       => 120,
         ]);
 
-        $response = $curl->post($url, $body);
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        $response = $curl->post($url, $body,
+            \local_ai_course_assistant\security::resolve_pin_options($url));
         $httpcode = $curl->get_info()['http_code'] ?? 0;
 
         if ($httpcode < 200 || $httpcode >= 300) {

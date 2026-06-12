@@ -59,7 +59,10 @@ class rate_card_refresher {
         global $CFG;
         require_once($CFG->dirroot . '/lib/filelib.php');
         $curl = new \curl();
-        $body = $curl->get($url, [], ['CURLOPT_TIMEOUT' => 30, 'CURLOPT_CONNECTTIMEOUT' => 10]);
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        $body = $curl->get($url, [], array_merge(
+            ['CURLOPT_TIMEOUT' => 30, 'CURLOPT_CONNECTTIMEOUT' => 10],
+            security::resolve_pin_options($url)));
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code < 200 || $code >= 300 || $body === false || $body === '') {
             return self::record_failure('Upstream HTTP ' . $code . ' (empty or error response)');

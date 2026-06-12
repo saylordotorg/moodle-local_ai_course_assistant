@@ -67,7 +67,8 @@ abstract class base_provider implements provider_interface {
         require_once($CFG->dirroot . '/lib/filelib.php');
         $curl = new \curl();
         $curl->setHeader(array_merge(['Content-Type: application/json', 'Accept: application/json'], $headers));
-        $resp = $curl->post($url, json_encode($payload));
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        $resp = $curl->post($url, json_encode($payload), security::resolve_pin_options($url));
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code < 200 || $code >= 300) {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,

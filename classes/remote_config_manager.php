@@ -64,6 +64,8 @@ class remote_config_manager {
             CURLOPT_TIMEOUT        => 10,
             CURLOPT_USERAGENT      => 'SOLA-Moodle-Plugin/1.0',
         ]);
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        security::pin_curl_handle($ch, $url);
         $body = curl_exec($ch);
         $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

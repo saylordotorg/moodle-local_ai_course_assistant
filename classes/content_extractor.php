@@ -512,6 +512,8 @@ TXT;
                 CURLOPT_ENCODING       => '',
                 CURLOPT_HEADER         => true,
             ]);
+            // Pin each hop to the validated IP, closing the DNS-rebinding window.
+            \local_ai_course_assistant\security::pin_curl_handle($ch, $currenturl);
             $response = curl_exec($ch);
             if ($response === false) {
                 curl_close($ch);

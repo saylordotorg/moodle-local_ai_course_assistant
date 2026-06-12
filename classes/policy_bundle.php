@@ -167,6 +167,8 @@ class policy_bundle {
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_MAXFILESIZE    => self::MAX_BUNDLE_BYTES,
         ]);
+        // Pin to the validated IP, closing the DNS-rebinding window.
+        security::pin_curl_handle($ch, $url);
         $json = curl_exec($ch);
         $httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

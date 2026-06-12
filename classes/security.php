@@ -151,6 +151,97 @@ class security {
     }
 
     /**
+     * Pin a curl handle's connection to the exact IP that passes the SSRF
+     * check, closing the DNS-rebinding (TOCTOU) window between
+     * is_safe_provider_url() and the connection: without this, a hostile DNS
+     * server could answer with a public IP at validation time and a private
+     * one (e.g. 169.254.169.254) when curl re-resolves at connect time.
+     *
+     * Call once, right after the curl handle is configured, on every provider
+     * call. It re-resolves the host a final time and forces curl to that IP via
+     * CURLOPT_RESOLVE, so no resolution happens between this check and connect.
+     *
+     * No-op when: a Moodle proxy is configured (the proxy performs DNS, so a
+     * direct pin does not apply); the host is a literal IP (nothing to rebind);
+     * or the host is on the admin SSRF allowlist (those may legitimately point
+     * at private self-hosted endpoints). For a public DNS host that now
+     * resolves to a private/reserved address — the rebind case — it throws
+     * rather than connect.
+     *
+     * @param \CurlHandle|resource $ch Configured curl handle.
+     * @param string $url The provider URL already passed to is_safe_provider_url().
+     * @throws \moodle_exception When the host now resolves to a forbidden address.
+     */
+    public static function pin_curl_handle($ch, string $url): void {
+        $entry = self::resolve_for_pin($url);
+        if ($entry !== null) {
+            curl_setopt($ch, CURLOPT_RESOLVE, [$entry]);
+        }
+    }
+
+    /**
+     * Same DNS-rebinding pin as pin_curl_handle(), but returned as a Moodle
+     * \curl options fragment for call sites that use the \curl wrapper instead
+     * of a raw handle. Merge the result into the options array passed to
+     * \curl::post()/get(). Empty array when no pin applies.
+     *
+     * @param string $url The provider URL already passed to is_safe_provider_url().
+     * @return array CURLOPT_RESOLVE option fragment, or [].
+     * @throws \moodle_exception When the host now resolves to a forbidden address.
+     */
+    public static function resolve_pin_options(string $url): array {
+        $entry = self::resolve_for_pin($url);
+        return $entry !== null ? ['CURLOPT_RESOLVE' => [$entry]] : [];
+    }
+
+    /**
+     * Resolve a provider host one final time and return a `host:port:ip`
+     * CURLOPT_RESOLVE entry pinning the connection to the validated IP, or
+     * null when no pin applies (proxy in use, literal IP, or admin-trusted
+     * self-hosted endpoint). Throws when a public DNS host now resolves to a
+     * private/reserved address — the DNS-rebinding case.
+     *
+     * @param string $url
+     * @return string|null
+     * @throws \moodle_exception
+     */
+    private static function resolve_for_pin(string $url): ?string {
+        global $CFG;
+        // With a proxy, curl connects to the proxy and the proxy resolves the
+        // host; a client-side IP pin neither applies nor helps.
+        if (!empty($CFG->proxyhost)) {
+            return null;
+        }
+        $parts = parse_url($url);
+        if (!$parts || empty($parts['host'])) {
+            return null;
+        }
+        $host = $parts['host'];
+        $scheme = $parts['scheme'] ?? 'https';
+        $port = isset($parts['port']) ? (int) $parts['port'] : ($scheme === 'https' ? 443 : 80);
+
+        // A literal IP cannot be rebound; the gate already validated it.
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return null;
+        }
+        // Admin-trusted self-hosted endpoint: the allowlist is the trust
+        // decision and the host may legitimately resolve to a private address,
+        // so neither pin nor reject.
+        if (self::host_is_trusted($scheme, $host, $port)) {
+            return null;
+        }
+        $ip = gethostbyname($host);
+        if ($ip === $host || !filter_var($ip, FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            // Resolution failed, or the host now resolves to a private/reserved
+            // address: treat as a rebinding attempt and refuse to connect.
+            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
+                'Provider host failed SSRF re-validation (possible DNS rebinding): ' . $host);
+        }
+        return $host . ':' . $port . ':' . $ip;
+    }
+
+    /**
      * Decide whether an uploaded audio file is acceptable for transcription.
      *
      * Validation is defence-in-depth (the file is forwarded only to the STT
