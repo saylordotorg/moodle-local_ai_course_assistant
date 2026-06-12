@@ -16,7 +16,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
-- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Prod upgrade runbook (one jump v5.4.5 → v6.4.1, path retested locally 2026-06-11): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.4.1.md`; ready-to-send Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`.
+- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Prod upgrade runbook (one jump v5.4.5 → v6.5.0, path retested locally 2026-06-12): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.5.0.md`; ready-to-send Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`.
 
 ---
 

@@ -1,12 +1,12 @@
-# SOLA Production Upgrade Runbook: v5.4.5 to v6.4.1
+# SOLA Production Upgrade Runbook: v5.4.5 to v6.5.0
 
-Date prepared: 2026-06-10, retested against v6.4.1 on 2026-06-11
+Date prepared: 2026-06-10, retested against v6.5.0 on 2026-06-12
 Scope: Learn (learn.saylor.org) and Degrees, both currently on v5.4.5 (2026050945).
-Target: v6.4.1 (2026061003), one jump, no intermediate versions needed.
+Target: v6.5.0 (2026061003), one jump, no intermediate versions needed.
 
 ## Upgrade path verification (done)
 
-The exact jump was tested today on local Moodle 4.5.10 + MySQL: clean install of v5.4.5, seeded config and conversation data, then a single upgrade run to v6.4.1.
+The exact jump was tested today on local Moodle 4.5.10 + MySQL: clean install of v5.4.5, seeded config and conversation data, then a single upgrade run to v6.5.0.
 
 | Check | Result |
 |---|---|
@@ -26,7 +26,7 @@ All upgrade steps between 2026050945 and 2026061003 are guarded (`index_exists` 
 2. **Kill switch fix (v5.13.0):** `emergency_control --chat` is a silent no op on v5.4.5. If you ever need to stop chat spend in an incident today, the CLI will not actually do it.
 3. Spend protections: per course default cap, cost anomaly detector, web emergency panel.
 4. Cost optimizations: mastery classifier routed to gpt-4o-mini, prompt cache visibility.
-5. 46 language coverage for every admin surface added since v5.10, and selfhosted Whisper STT support (v6.4.1).
+5. 46 language coverage for every admin surface added since v5.10, and selfhosted Whisper STT support (v6.5.0).
 
 ## Behavior changes to be aware of
 
@@ -50,13 +50,14 @@ All upgrade steps between 2026050945 and 2026061003 are guarded (`index_exists` 
 | `mastery_classifier_provider` | openai | Keep |
 | `policy_bundle_enabled` | off | Adopt after the dev soak: lets behavior settings update via signed bundle without further Catalyst engagements (`.drafts/sola-upgrade-independence-2026-06-11.md`) |
 | `rag_min_similarity` | 0.25 | Keep (v6.2.0 relevance floor) |
+| `avatar_animation_enabled` | on | Keep (v6.5.0; preserves prior behavior, adds idle blink). Stage 0 A/B uses per-course `avatar_animation_course_<id>` overrides post-upgrade |
 
 ## Deployment steps
 
 Prod deploys are managed by Catalyst (Artem workflow, git submodule), NOT zip upload and NOT the dev AWS path.
 
-1. Confirm v6.4.1 is tagged and the GitHub release is published with green CI.
-2. Request Catalyst pin the submodule to tag `v6.4.1` for staging first.
+1. Confirm v6.5.0 is tagged and the GitHub release is published with green CI.
+2. Request Catalyst pin the submodule to tag `v6.5.0` for staging first.
 3. On staging after deploy: run `php admin/cli/upgrade.php --non-interactive`, then purge caches, then the 5 minute smoke checklist (`.wiki/Release-Checklist.md`) against BUS101.
 4. Schedule the prod window. The DB migration is small (one column, one index on the messages table). On a messages table in the low millions of rows the index build takes seconds to low minutes; no maintenance mode required, but a low traffic window is polite.
 5. Before the prod deploy: database backup plus a copy of the current plugin directory.
@@ -72,7 +73,7 @@ Prod deploys are managed by Catalyst (Artem workflow, git submodule), NOT zip up
 ## Rollback plan
 
 - Code: restore the saved v5.4.5 plugin directory, purge caches. Moodle will not complain about the higher recorded version as long as code paths exist; however the clean rollback is code restore PLUS database restore from the pre upgrade backup.
-- The v6.x schema additions are additive (nullable column, index), so v5.4.5 code runs against a v6.4.1 schema without errors if a fast code only rollback is ever needed; the recorded plugin version in config will be ahead, which blocks future upgrades until corrected. Prefer the full restore.
+- The v6.x schema additions are additive (nullable column, index), so v5.4.5 code runs against a v6.5.0 schema without errors if a fast code only rollback is ever needed; the recorded plugin version in config will be ahead, which blocks future upgrades until corrected. Prefer the full restore.
 
 ## Open question for Tom
 
