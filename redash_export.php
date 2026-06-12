@@ -37,12 +37,20 @@ require_once(__DIR__ . '/../../config.php');
 use local_ai_course_assistant\analytics;
 use local_ai_course_assistant\token_cost_manager;
 
-// CORS and content type headers.
+// Content type. This endpoint is server-to-server (Redash pulls it with the
+// API key); it is NOT meant to be read cross-origin from a browser. A wildcard
+// Access-Control-Allow-Origin would let any web page fetch bulk learner data if
+// it learned the key. Emit a CORS origin header ONLY when an admin has
+// explicitly configured one (redash_allowed_origin), and never the wildcard.
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Cache-Control: no-cache, no-store, must-revalidate');
+$allowedorigin = trim((string) get_config('local_ai_course_assistant', 'redash_allowed_origin'));
+if ($allowedorigin !== '') {
+    header('Access-Control-Allow-Origin: ' . $allowedorigin);
+    header('Vary: Origin');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+}
 
 // Handle CORS preflight.
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -177,22 +185,38 @@ $feedbackrecords = $DB->get_records_sql(
     $feedbackparams
 );
 
+// Feedback PII gate: under the default anonymized export, do not emit the
+// fields that re-identify or fingerprint a learner (real userid, user agent,
+// page URL, device/browser/OS/screen). Keep the rating, the free-text comment,
+// and a stable pseudonymous id so dashboards still work. Only a deliberate
+// anonymize=0 request (already audit-logged above) sees raw values.
 $feedback = [];
 foreach ($feedbackrecords as $record) {
-    $feedback[] = [
-        'id' => (int) $record->id,
-        'userid' => (int) $record->userid,
-        'courseid' => (int) $record->courseid,
-        'rating' => (int) $record->rating,
-        'comment' => $record->comment,
-        'browser' => $record->browser,
-        'os' => $record->os,
-        'device' => $record->device,
-        'screen_size' => $record->screen_size,
-        'user_agent' => $record->user_agent,
-        'page_url' => $record->page_url,
-        'timecreated' => (int) $record->timecreated,
-    ];
+    if ($anonymize) {
+        $feedback[] = [
+            'id' => (int) $record->id,
+            'user_ref' => \local_ai_course_assistant\anonymizer::name((int) $record->userid),
+            'courseid' => (int) $record->courseid,
+            'rating' => (int) $record->rating,
+            'comment' => $record->comment,
+            'timecreated' => (int) $record->timecreated,
+        ];
+    } else {
+        $feedback[] = [
+            'id' => (int) $record->id,
+            'userid' => (int) $record->userid,
+            'courseid' => (int) $record->courseid,
+            'rating' => (int) $record->rating,
+            'comment' => $record->comment,
+            'browser' => $record->browser,
+            'os' => $record->os,
+            'device' => $record->device,
+            'screen_size' => $record->screen_size,
+            'user_agent' => $record->user_agent,
+            'page_url' => $record->page_url,
+            'timecreated' => (int) $record->timecreated,
+        ];
+    }
 }
 
 // Token costs: aggregate by model.
@@ -259,12 +283,14 @@ try {
     );
 
     foreach ($surveyrecords as $record) {
-        // Decode the survey questions to get the question text.
+        // Same PII gate as feedback: pseudonymous learner ref under anonymize.
         $surveydata[] = [
             'id' => (int) $record->id,
             'surveyid' => (int) $record->surveyid,
             'survey_title' => $record->survey_title,
-            'userid' => (int) $record->userid,
+            'user_ref' => $anonymize
+                ? \local_ai_course_assistant\anonymizer::name((int) $record->userid)
+                : (int) $record->userid,
             'courseid' => (int) $record->courseid,
             'question_index' => (int) $record->question_index,
             'answer' => $record->answer,

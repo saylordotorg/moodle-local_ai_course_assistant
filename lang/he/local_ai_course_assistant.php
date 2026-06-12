@@ -1553,3 +1553,6 @@ $string['analytics:exp_avg_session_minutes'] = 'אורך סשן ממוצע (דק
 $string['analytics:exp_return_rate'] = 'משתמשים חוזרים (%)';
 $string['analytics:exp_tts_plays'] = 'השמעות TTS';
 $string['analytics:exp_tts_per_active'] = 'השמעות TTS למשתמש פעיל';
+
+$string['settings:redash_allowed_origin'] = 'מקור מורשה עבור Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'השאר ריק (מומלץ): הייצוא נשלף משרת לשרת על ידי Redash ואינו זקוק לכותרת CORS של הדפדפן. הגדר מקור מדויק יחיד (לדוגמה https://redash.example.org) רק אם לוח מחוונים מבוסס דפדפן חייב לקרוא את הייצוא ישירות. לעולם אל תשתמש בתו כללי.';

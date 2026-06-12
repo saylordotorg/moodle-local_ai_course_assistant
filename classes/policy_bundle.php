@@ -203,7 +203,12 @@ class policy_bundle {
         }
 
         // Apply. Keys and value types were validated in verify_envelope().
+        // Wrap the whole apply (settings + version stamp) in one transaction so
+        // a crash mid-loop cannot leave a partially-applied bundle whose version
+        // was never advanced (which would re-apply the remainder next sync).
+        global $DB;
         $changes = [];
+        $tx = $DB->start_delegated_transaction();
         foreach ($payload['settings'] as $key => $value) {
             $old = get_config('local_ai_course_assistant', $key);
             $new = self::scalar_to_config($value);
@@ -215,6 +220,7 @@ class policy_bundle {
         }
 
         set_config('policy_bundle_applied_version', (string) $version, 'local_ai_course_assistant');
+        $tx->allow_commit();
         audit_logger::log('policy_bundle_applied', 0, 0, [
             'version'   => $version,
             'issued_at' => $payload['issued_at'] ?? '',

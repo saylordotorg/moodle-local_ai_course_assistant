@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<libraries>
+  <library>
+    <location>cdn/chartjs/chart.umd.min.js</location>
+    <name>Chart.js</name>
+    <description>Charting library used by the analytics and token-analytics dashboards.</description>
+    <version>4.4.7</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+    <repository>https://github.com/chartjs/Chart.js</repository>
+  </library>
+</libraries>

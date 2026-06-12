@@ -1524,3 +1524,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Ortalama oturum süresi (dakika)
 $string['analytics:exp_return_rate'] = 'Geri dönen kullanıcılar (%)';
 $string['analytics:exp_tts_plays'] = 'TTS oynatmaları';
 $string['analytics:exp_tts_per_active'] = 'Aktif kullanıcı başına TTS oynatmaları';
+
+$string['settings:redash_allowed_origin'] = 'Redash için izin verilen kaynak (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Boş bırakın (önerilir): dışa aktarma, Redash tarafından sunucudan sunucuya alınır ve herhangi bir tarayıcı CORS başlığına gerek duymaz. Yalnızca tarayıcı tabanlı bir kontrol panelinin dışa aktarmayı doğrudan okuması gerekiyorsa tek bir tam kaynak ayarlayın (örneğin https://redash.example.org). Asla joker karakter kullanmayın.';

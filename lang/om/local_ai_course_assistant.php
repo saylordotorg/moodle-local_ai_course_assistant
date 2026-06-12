@@ -1514,3 +1514,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Dheerina walga\'ii giddu-galeess
 $string['analytics:exp_return_rate'] = 'Fayyadamtoota deebi\'an (%)';
 $string['analytics:exp_tts_plays'] = 'Taphoota TTS';
 $string['analytics:exp_tts_per_active'] = 'Taphoota TTS fayyadamaa hojii irra jiru tokkoof';
+
+$string['settings:redash_allowed_origin'] = 'Maddi hayyamame Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Duwwaa dhiisi (kan gorfame): ergaan ala baasuu Redash\'n sarvera gara sarveraatti waan fudhatamuuf, mata CORS biraawzariitiin hin barbaachisu. Daashboordiin biraawzaratti hundaa\'e erga ala baafame kallattiin dubbisuu kan qabu yoo ta\'e qofa madda sirrii tokko qofa galchi (fakkeenyaaf https://redash.example.org). Mallattoo bakka bu\'aa gonkumaa hin fayyadamiin.';

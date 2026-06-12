@@ -1546,3 +1546,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Xarit session bu noppy (simili)'
 $string['analytics:exp_return_rate'] = 'Jëfandikukat yi dellu (%)';
 $string['analytics:exp_tts_plays'] = 'TTS jël yi';
 $string['analytics:exp_tts_per_active'] = 'TTS jël yi ci jëfandikukat bu dëkk';
+
+$string['settings:redash_allowed_origin'] = 'Cosaan bu Redash mu nangu (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Bàyyil ko feem (ñu koy digal): Redash mooy yóbbu mbindum-génn mi ci diggante sarwa yi, te soxlawul benn kàddu CORS bu naróbull. Defal benn cosaan bu jub (misaal https://redash.example.org) rekk bu dashboard bu sukkandiku ci naróbull dafa war a jàng mbindum-génn mi ci taxaw. Bul jëfandikoo joker mukk.';

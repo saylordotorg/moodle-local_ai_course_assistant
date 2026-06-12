@@ -34,6 +34,12 @@ require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
+// Guests must never reach the avatar stream: the page carries a session token
+// and loads a third-party bundle. Authenticated, non-guest learners only.
+if (isguestuser()) {
+    throw new \moodle_exception('noguest');
+}
+
 $provider = required_param('provider', PARAM_ALPHA);
 $sid = optional_param('sid', '', PARAM_ALPHANUMEXT);
 $tok = optional_param('tok', '', PARAM_ALPHANUMEXT);

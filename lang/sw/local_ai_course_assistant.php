@@ -1547,3 +1547,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Muda wastani wa kikao (dakika)';
 $string['analytics:exp_return_rate'] = 'Watumiaji wanaorejea (%)';
 $string['analytics:exp_tts_plays'] = 'Uchezaji wa TTS';
 $string['analytics:exp_tts_per_active'] = 'Uchezaji wa TTS kwa kila mtumiaji anayefanya kazi';
+
+$string['settings:redash_allowed_origin'] = 'Asili inayoruhusiwa kwa Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Acha tupu (inapendekezwa): hamishaji huletwa seva-kwa-seva na Redash na hauhitaji kichwa cha CORS cha kivinjari. Weka asili moja kamili (kwa mfano https://redash.example.org) ikiwa tu dashibodi inayotegemea kivinjari lazima isome hamishaji moja kwa moja. Usitumie kamwe alama ya kibambo.';

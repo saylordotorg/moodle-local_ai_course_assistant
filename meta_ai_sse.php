@@ -78,6 +78,9 @@ $systemprompt = meta_ai_data_builder::build_system_prompt($courseids, $since, $f
 $messages = [];
 $historyarr = json_decode($history, true);
 if (is_array($historyarr)) {
+    // Cap injected history so a malformed or oversized payload cannot grow the
+    // upstream request without bound (admin-only endpoint, but cheap guard).
+    $historyarr = array_slice($historyarr, -50);
     foreach ($historyarr as $h) {
         if (!empty($h['role']) && !empty($h['content'])) {
             $messages[] = [

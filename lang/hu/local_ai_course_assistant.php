@@ -1553,3 +1553,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Átlagos munkamenet hossza (perc
 $string['analytics:exp_return_rate'] = 'Visszatérő felhasználók (%)';
 $string['analytics:exp_tts_plays'] = 'TTS lejátszások';
 $string['analytics:exp_tts_per_active'] = 'TTS lejátszások aktív felhasználónként';
+
+$string['settings:redash_allowed_origin'] = 'Engedélyezett eredet a Redash számára (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Hagyja üresen (ajánlott): az exportot a Redash kiszerverről kiszerverre kéri le, és nincs szüksége böngészős CORS-fejlécre. Csak akkor adjon meg egyetlen pontos eredetet (például https://redash.example.org), ha egy böngészőalapú irányítópultnak közvetlenül kell olvasnia az exportot. Soha ne használjon helyettesítő karaktert.';

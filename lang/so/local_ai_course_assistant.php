@@ -1528,3 +1528,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Dhererka celceliska ee fadhiga (
 $string['analytics:exp_return_rate'] = 'Isticmaalayaasha soo laabanaya (%)';
 $string['analytics:exp_tts_plays'] = 'Ciyaaryada TTS';
 $string['analytics:exp_tts_per_active'] = 'Ciyaaryada TTS ee isticmaale firfircoon kasta';
+
+$string['settings:redash_allowed_origin'] = 'Asalka la oggol yahay ee Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Ka tag faaruq (lagu taliyay): soosaarka waxaa keena Redash server-ka-server oo uma baahna madax CORS oo barawsar. Dhig hal asal oo sax ah (tusaale ahaan https://redash.example.org) kaliya haddii dashboard ku salaysan barawsar ay tahay inuu soosaarka si toos ah u akhriyo. Waligaa ha isticmaalin wildcard.';

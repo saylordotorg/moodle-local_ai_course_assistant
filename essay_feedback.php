@@ -89,6 +89,13 @@ echo $OUTPUT->header();
     var submitBtn = document.getElementById('aica-essay-submit');
     var status = document.getElementById('aica-essay-status');
     var out = document.getElementById('aica-essay-result');
+    // Escape AI-generated strings before they are concatenated into innerHTML;
+    // the model response is untrusted and could contain markup.
+    var esc = function(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    };
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         var essay = document.getElementById('aica-essay-text').value || '';
@@ -118,7 +125,7 @@ echo $OUTPUT->header();
                 out.style.display = 'block';
                 out.innerHTML = '<div class="alert alert-warning">' +
                     '<?php echo get_string('essay_feedback:error', 'local_ai_course_assistant'); ?>' +
-                    ' <code>' + (res && res.message ? res.message : 'unknown') + '</code></div>';
+                    ' <code>' + esc(res && res.message ? res.message : 'unknown') + '</code></div>';
                 return;
             }
             var html = '<h3><?php echo get_string('essay_feedback:result_heading', 'local_ai_course_assistant'); ?></h3>';
@@ -128,19 +135,19 @@ echo $OUTPUT->header();
                     '<th><?php echo get_string('essay_feedback:col_feedback', 'local_ai_course_assistant'); ?></th></tr></thead><tbody>';
             res.criteria.forEach(function(c) {
                 var stars = ''; for (var i = 0; i < 4; i++) { stars += i < c.score ? '●' : '○'; }
-                html += '<tr><td>' + (c.name || '') + '</td>' +
-                        '<td style="font-family:monospace">' + stars + ' ' + c.score + '/4</td>' +
-                        '<td>' + (c.feedback || '') + '</td></tr>';
+                html += '<tr><td>' + esc(c.name) + '</td>' +
+                        '<td style="font-family:monospace">' + stars + ' ' + esc(c.score) + '/4</td>' +
+                        '<td>' + esc(c.feedback) + '</td></tr>';
             });
             html += '</tbody></table>';
             if (res.overall) {
                 html += '<h4 style="margin-top:18px"><?php echo get_string('essay_feedback:overall_heading', 'local_ai_course_assistant'); ?></h4>';
-                html += '<p>' + res.overall + '</p>';
+                html += '<p>' + esc(res.overall) + '</p>';
             }
             if (res.revisions && res.revisions.length) {
                 html += '<h4 style="margin-top:14px"><?php echo get_string('essay_feedback:revisions_heading', 'local_ai_course_assistant'); ?></h4>';
                 html += '<ol>';
-                res.revisions.forEach(function(r) { html += '<li>' + r + '</li>'; });
+                res.revisions.forEach(function(r) { html += '<li>' + esc(r) + '</li>'; });
                 html += '</ol>';
             }
             out.style.display = 'block';

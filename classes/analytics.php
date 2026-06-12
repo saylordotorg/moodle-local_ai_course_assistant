@@ -29,6 +29,13 @@ namespace local_ai_course_assistant;
 class analytics {
 
     /**
+     * Upper bound on message rows pulled into PHP for text-sampling displays
+     * (hotspots, common prompts, keywords). Caps memory on large courses; the
+     * most recent messages are a representative sample for these features.
+     */
+    const TEXT_SAMPLE_CAP = 20000;
+
+    /**
      * Get overview statistics for a course.
      *
      * @param int $courseid
@@ -188,9 +195,14 @@ class analytics {
             $params['since'] = $since;
         }
 
+        // Bounded sample of the most recent messages: these functions do
+        // PHP-side text matching for a display, so an unbounded fetch would
+        // load every message body in a large course into memory. The most
+        // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
         $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE courseid = :courseid AND role = :role{$timewhere}";
-        $messages = $DB->get_fieldset_sql($sql, $params);
+                 WHERE courseid = :courseid AND role = :role{$timewhere}
+                 ORDER BY timecreated DESC";
+        $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
         // Count mentions of each section.
         $counts = [];
@@ -232,9 +244,14 @@ class analytics {
             $params['since'] = $since;
         }
 
+        // Bounded sample of the most recent messages: these functions do
+        // PHP-side text matching for a display, so an unbounded fetch would
+        // load every message body in a large course into memory. The most
+        // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
         $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE courseid = :courseid AND role = :role{$timewhere}";
-        $messages = $DB->get_fieldset_sql($sql, $params);
+                 WHERE courseid = :courseid AND role = :role{$timewhere}
+                 ORDER BY timecreated DESC";
+        $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
         if (empty($messages)) {
             return [];
@@ -837,10 +854,13 @@ class analytics {
             $params['since'] = $since;
         }
 
+        // Bounded sample (see self::TEXT_SAMPLE_CAP) — keyword extraction is a
+        // PHP-side text scan and must not load an entire large course's bodies.
         $sql = "SELECT m.message
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE {$where}";
-        $messages = $DB->get_fieldset_sql($sql, $params);
+                 WHERE {$where}
+                 ORDER BY m.timecreated DESC";
+        $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
         if (empty($messages)) {
             return [];

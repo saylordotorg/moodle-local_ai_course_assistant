@@ -865,7 +865,10 @@ class hook_callbacks {
             $templatedata['use_cdn'] = true;
             $templatedata['cdn_js_url'] = rtrim($cdnurl, '/') . '/sola.min.js' . $qs;
             $templatedata['cdn_css_url'] = rtrim($cdnurl, '/') . '/sola.min.css' . $qs;
-            $templatedata['i18n_json'] = json_encode(self::get_js_strings());
+            // JSON_HEX_TAG escapes < and > so a translated string containing
+            // "</script>" cannot break out of the inline script tag in the
+            // template ({{{i18n_json}}} is intentionally unescaped).
+            $templatedata['i18n_json'] = json_encode(self::get_js_strings(), JSON_HEX_TAG);
         }
 
         $html = $OUTPUT->render_from_template('local_ai_course_assistant/chat_widget', $templatedata);

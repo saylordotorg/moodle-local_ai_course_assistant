@@ -1540,3 +1540,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Rata-rata durasi sesi (menit)';
 $string['analytics:exp_return_rate'] = 'Pengguna yang kembali (%)';
 $string['analytics:exp_tts_plays'] = 'Pemutaran TTS';
 $string['analytics:exp_tts_per_active'] = 'Pemutaran TTS per pengguna aktif';
+
+$string['settings:redash_allowed_origin'] = 'Asal yang diizinkan untuk Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Biarkan kosong (disarankan): ekspor diambil dari server ke server oleh Redash dan tidak memerlukan header CORS peramban. Setel satu asal yang tepat (misalnya https://redash.example.org) hanya jika dasbor berbasis peramban harus membaca ekspor secara langsung. Jangan pernah menggunakan karakter pengganti.';

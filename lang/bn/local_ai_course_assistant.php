@@ -1510,3 +1510,6 @@ $string['analytics:exp_avg_session_minutes'] = 'গড় সেশনের দ
 $string['analytics:exp_return_rate'] = 'ফিরে আসা ব্যবহারকারী (%)';
 $string['analytics:exp_tts_plays'] = 'TTS প্লে';
 $string['analytics:exp_tts_per_active'] = 'প্রতি সক্রিয় ব্যবহারকারী TTS প্লে';
+
+$string['settings:redash_allowed_origin'] = 'Redash অনুমোদিত উৎস (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'খালি রাখুন (প্রস্তাবিত): এক্সপোর্টটি Redash দ্বারা সার্ভার-থেকে-সার্ভার আনা হয় এবং কোনো ব্রাউজার CORS হেডারের প্রয়োজন হয় না। কেবলমাত্র একটি ব্রাউজার-ভিত্তিক ড্যাশবোর্ডকে যদি সরাসরি এক্সপোর্টটি পড়তে হয় তবেই একটি একক সঠিক উৎস সেট করুন (উদাহরণস্বরূপ https://redash.example.org)। কখনও ওয়াইল্ডকার্ড ব্যবহার করবেন না।';

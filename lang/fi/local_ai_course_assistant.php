@@ -1510,3 +1510,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Istunnon keskimääräinen kesto
 $string['analytics:exp_return_rate'] = 'Palaavat käyttäjät (%)';
 $string['analytics:exp_tts_plays'] = 'TTS-toistot';
 $string['analytics:exp_tts_per_active'] = 'TTS-toistot per aktiivinen käyttäjä';
+
+$string['settings:redash_allowed_origin'] = 'Redashin sallittu alkuperä (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Jätä tyhjäksi (suositeltavaa): Redash hakee viennin palvelimelta palvelimelle eikä se tarvitse selaimen CORS-otsaketta. Aseta yksi tarkka alkuperä (esimerkiksi https://redash.example.org) vain, jos selainpohjaisen koontinäytön on luettava vienti suoraan. Älä koskaan käytä jokerimerkkiä.';

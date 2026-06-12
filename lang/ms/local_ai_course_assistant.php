@@ -1540,3 +1540,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Purata tempoh sesi (minit)';
 $string['analytics:exp_return_rate'] = 'Pengguna yang kembali (%)';
 $string['analytics:exp_tts_plays'] = 'Main semula TTS';
 $string['analytics:exp_tts_per_active'] = 'Main semula TTS setiap pengguna aktif';
+
+$string['settings:redash_allowed_origin'] = 'Asal yang dibenarkan untuk Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Biarkan kosong (disyorkan): eksport diambil dari pelayan ke pelayan oleh Redash dan tidak memerlukan pengepala CORS pelayar. Tetapkan satu asal yang tepat (contohnya https://redash.example.org) hanya jika papan pemuka berasaskan pelayar mesti membaca eksport secara terus. Jangan sesekali menggunakan kad bebas.';

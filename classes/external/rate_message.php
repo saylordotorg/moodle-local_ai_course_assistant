@@ -74,6 +74,16 @@ class rate_message extends external_api {
         self::validate_context($coursecontext);
         require_capability('local/ai_course_assistant:use', $coursecontext);
 
+        // Ownership: a learner may only rate messages in their OWN
+        // conversation. Course capability alone would let any enrolled user
+        // rate (and hallucination-flag) another learner's private messages,
+        // skewing analytics. The conversation row carries the owning userid.
+        $conv = $DB->get_record('local_ai_course_assistant_convs',
+            ['id' => $message->conversationid], 'id, userid', MUST_EXIST);
+        if ((int) $conv->userid !== (int) $USER->id) {
+            throw new \moodle_exception('nopermissions', 'error', '', 'rate this message');
+        }
+
         // Check for existing rating by this user on this message.
         $existing = $DB->get_record('local_ai_course_assistant_msg_ratings', [
             'messageid' => $messageid,

@@ -1561,3 +1561,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Durata media sessione (minuti)';
 $string['analytics:exp_return_rate'] = 'Utenti di ritorno (%)';
 $string['analytics:exp_tts_plays'] = 'Riproduzioni TTS';
 $string['analytics:exp_tts_per_active'] = 'Riproduzioni TTS per utente attivo';
+
+$string['settings:redash_allowed_origin'] = 'Origine consentita per Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Lascia vuoto (consigliato): l\'esportazione viene recuperata da server a server da Redash e non necessita di alcuna intestazione CORS del browser. Imposta una singola origine esatta (per esempio https://redash.example.org) solo se una dashboard basata su browser deve leggere l\'esportazione direttamente. Non usare mai un carattere jolly.';

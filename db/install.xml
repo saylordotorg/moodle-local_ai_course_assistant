@@ -55,6 +55,7 @@
         <INDEX NAME="courseid_interaction_type" UNIQUE="false" FIELDS="courseid, interaction_type"/>
         <INDEX NAME="courseid_cmid" UNIQUE="false" FIELDS="courseid, cmid"/>
         <INDEX NAME="role_timecreated" UNIQUE="false" FIELDS="role, timecreated"/>
+        <INDEX NAME="courseid_role_timecreated" UNIQUE="false" FIELDS="courseid, role, timecreated"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_ai_course_assistant_msg_ratings" COMMENT="Per-message thumbs up/down ratings and hallucination flags">

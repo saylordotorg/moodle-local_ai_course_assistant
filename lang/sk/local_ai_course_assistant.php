@@ -1510,3 +1510,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Priemerná dĺžka relácie (min
 $string['analytics:exp_return_rate'] = 'Vracajúci sa používatelia (%)';
 $string['analytics:exp_tts_plays'] = 'Prehrávania TTS';
 $string['analytics:exp_tts_per_active'] = 'Prehrávania TTS na aktívneho používateľa';
+
+$string['settings:redash_allowed_origin'] = 'Povolený pôvod pre Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Ponechajte prázdne (odporúčané): export je načítavaný zo servera na server nástrojom Redash a nepotrebuje žiadnu prehliadačovú hlavičku CORS. Nastavte jediný presný pôvod (napríklad https://redash.example.org) iba vtedy, ak musí export priamo čítať nástenka založená na prehliadači. Nikdy nepoužívajte zástupný znak.';

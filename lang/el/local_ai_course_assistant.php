@@ -1554,3 +1554,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Μέση διάρκεια συν
 $string['analytics:exp_return_rate'] = 'Επιστρέφοντες χρήστες (%)';
 $string['analytics:exp_tts_plays'] = 'Αναπαραγωγές TTS';
 $string['analytics:exp_tts_per_active'] = 'Αναπαραγωγές TTS ανά ενεργό χρήστη';
+
+$string['settings:redash_allowed_origin'] = 'Επιτρεπόμενη προέλευση για το Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Αφήστε το κενό (συνιστάται): η εξαγωγή ανακτάται από διακομιστή σε διακομιστή από το Redash και δεν χρειάζεται κεφαλίδα CORS στο πρόγραμμα περιήγησης. Ορίστε μία ακριβή προέλευση (για παράδειγμα https://redash.example.org) μόνο εάν ένας πίνακας ελέγχου που βασίζεται σε πρόγραμμα περιήγησης πρέπει να διαβάσει την εξαγωγή απευθείας. Μην χρησιμοποιείτε ποτέ χαρακτήρα μπαλαντέρ.';

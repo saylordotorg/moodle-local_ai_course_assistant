@@ -1533,3 +1533,6 @@ $string['analytics:exp_avg_session_minutes'] = 'ਔਸਤ ਸੈਸ਼ਨ ਮਿ
 $string['analytics:exp_return_rate'] = 'ਵਾਪਸ ਆਉਣ ਵਾਲੇ ਉਪਭੋਗਤਾ (%)';
 $string['analytics:exp_tts_plays'] = 'TTS ਪਲੇਅ';
 $string['analytics:exp_tts_per_active'] = 'ਪ੍ਰਤੀ ਸਰਗਰਮ ਉਪਭੋਗਤਾ TTS ਪਲੇਅ';
+
+$string['settings:redash_allowed_origin'] = 'Redash ਲਈ ਮਨਜ਼ੂਰ ਮੂਲ (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'ਖਾਲੀ ਛੱਡੋ (ਸਿਫਾਰਸ਼ ਕੀਤਾ): ਨਿਰਯਾਤ ਨੂੰ Redash ਦੁਆਰਾ ਸਰਵਰ-ਤੋਂ-ਸਰਵਰ ਪ੍ਰਾਪਤ ਕੀਤਾ ਜਾਂਦਾ ਹੈ ਅਤੇ ਇਸ ਨੂੰ ਕਿਸੇ ਬ੍ਰਾਊਜ਼ਰ CORS ਹੈੱਡਰ ਦੀ ਲੋੜ ਨਹੀਂ ਹੁੰਦੀ। ਸਿਰਫ਼ ਤਾਂ ਹੀ ਇੱਕ ਸਟੀਕ ਮੂਲ ਸੈੱਟ ਕਰੋ (ਉਦਾਹਰਨ ਲਈ https://redash.example.org) ਜਦੋਂ ਕਿਸੇ ਬ੍ਰਾਊਜ਼ਰ-ਅਧਾਰਿਤ ਡੈਸ਼ਬੋਰਡ ਨੂੰ ਨਿਰਯਾਤ ਸਿੱਧਾ ਪੜ੍ਹਨਾ ਪਵੇ। ਕਦੇ ਵੀ ਵਾਈਲਡਕਾਰਡ ਦੀ ਵਰਤੋਂ ਨਾ ਕਰੋ।';

@@ -133,7 +133,11 @@ class content_indexer {
                     $DB->insert_record('local_ai_course_assistant_chunks', $record);
                     $stats['indexed']++;
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                // \Throwable, not \Exception: a TypeError or OOM-class Error in
+                // an embedding provider must count as a per-module error (so the
+                // stale-chunk cleanup guard below stays correct) rather than
+                // abort the whole reindex and risk leaving a half-built index.
                 if (empty($stats['embed_error'])) {
                     // Keep the first failure so rag_admin can explain a
                     // zero-chunk outcome (bad API key, provider down, ...).
@@ -152,18 +156,22 @@ class content_indexer {
         // transient embedding outage, where every embed() throws and nothing is
         // re-inserted, would silently delete a previously-good index.
         if ($stats['errors'] === 0 && !empty($seenhashes)) {
-            // Use chunked IN queries to avoid exceeding SQL placeholder limits.
-            $allchunks = $DB->get_records(
+            // O(1) membership via a hash set, not in_array (which was O(n) per
+            // row, O(n^2) overall on large courses). Stream rows with a
+            // recordset so the whole chunk table is never held in memory.
+            $seenset = array_flip($seenhashes);
+            $rs = $DB->get_recordset(
                 'local_ai_course_assistant_chunks',
                 ['courseid' => $courseid],
                 '',
                 'id, contenthash'
             );
-            foreach ($allchunks as $row) {
-                if (!in_array($row->contenthash, $seenhashes, true)) {
+            foreach ($rs as $row) {
+                if (!isset($seenset[$row->contenthash])) {
                     $DB->delete_records('local_ai_course_assistant_chunks', ['id' => $row->id]);
                 }
             }
+            $rs->close();
         } else if ($stats['sources'] === 0) {
             // Genuinely no extractable content in the course — clear the index.
             $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);

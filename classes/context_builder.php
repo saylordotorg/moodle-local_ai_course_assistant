@@ -686,7 +686,7 @@ class context_builder {
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Fall through to empty string.
         }
 
@@ -1129,7 +1129,7 @@ class context_builder {
                             $label   = "Page: {$cm->name}";
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     // Skip unavailable resources gracefully.
                 }
 
@@ -1156,7 +1156,7 @@ class context_builder {
                             $label   = "Book: {$cm->name}";
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     // Skip.
                 }
             }

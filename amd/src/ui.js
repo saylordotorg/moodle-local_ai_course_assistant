@@ -1171,7 +1171,12 @@ define([
             var welcomeDiv = document.createElement('div');
             welcomeDiv.className = 'local-ai-course-assistant__message local-ai-course-assistant__message--assistant';
             welcomeDiv.setAttribute('data-welcome', '1');
-            welcomeDiv.innerHTML = '<div class="local-ai-course-assistant__message-content">' + greeting + '</div>';
+            // textContent, not innerHTML: the greeting is an admin free-text
+            // setting and must never inject markup into the learner's session.
+            var welcomeContent = document.createElement('div');
+            welcomeContent.className = 'local-ai-course-assistant__message-content';
+            welcomeContent.textContent = greeting;
+            welcomeDiv.appendChild(welcomeContent);
             messagesContainer.insertBefore(welcomeDiv, messagesContainer.firstChild);
         }
     };

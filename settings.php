@@ -2077,6 +2077,13 @@ if ($hassiteconfig) {
         ''
     ));
 
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/redash_allowed_origin',
+        get_string('settings:redash_allowed_origin', 'local_ai_course_assistant'),
+        get_string('settings:redash_allowed_origin_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // v4.3.0: Real Redash integration. Three settings together let SOLA
     // push a Learning Radar query/response to Redash as a new saved query
     // via Redash's /api/queries endpoint. All three must be set for the

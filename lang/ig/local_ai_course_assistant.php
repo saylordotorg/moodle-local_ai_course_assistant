@@ -1526,3 +1526,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Ogologo oge ntaramaahụ nkezi (
 $string['analytics:exp_return_rate'] = 'Ndị oji na-alaghachi (%)';
 $string['analytics:exp_tts_plays'] = 'Egwu TTS';
 $string['analytics:exp_tts_per_active'] = 'Egwu TTS kwa onye oji na-arụ ọrụ';
+
+$string['settings:redash_allowed_origin'] = 'Mmalite enyere ikike maka Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Hapụ ya efu (a tụrụ aro): Redash na-ewepụta mbupụ ahụ site na ihe nkesa gaa na ihe nkesa, ọ dịghịkwa achọ isi CORS nke ihe nchọgharị. Tọọ otu mmalite ziri ezi (dịka ọmụmaatụ https://redash.example.org) naanị ma ọ bụrụ na dashboard dabere na ihe nchọgharị ga-agụ mbupụ ahụ ozugbo. Ejila wildcard mgbe ọ bụla.';

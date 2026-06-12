@@ -371,6 +371,8 @@ $string['analytics:exp_avg_session_minutes'] = 'Avg session length (minutes)';
 $string['analytics:exp_return_rate'] = 'Returning users (%)';
 $string['analytics:exp_tts_plays'] = 'TTS plays';
 $string['analytics:exp_tts_per_active'] = 'TTS plays per active user';
+$string['settings:redash_allowed_origin'] = 'Redash allowed origin (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Leave empty (recommended): the export is fetched server-to-server by Redash and needs no browser CORS header. Set a single exact origin (for example https://redash.example.org) only if a browser-based dashboard must read the export directly. Never use a wildcard.';
 $string['settings:avatar_animation_enabled'] = 'Avatar animation';
 $string['settings:avatar_animation_enabled_desc'] = 'Animate the generated SVG avatar: idle blinking, plus mouth movement synced to text-to-speech audio while the assistant speaks. Respects the reduced motion preference of the learner\'s device. Per-course override for A/B measurement: set the config value avatar_animation_course_COURSEID to 0 or 1.';
 

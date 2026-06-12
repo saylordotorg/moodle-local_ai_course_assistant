@@ -1546,3 +1546,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Ipari igba apapọ (iṣẹju)';
 $string['analytics:exp_return_rate'] = 'Awọn olumulo ti n pada (%)';
 $string['analytics:exp_tts_plays'] = 'Awọn iṣere TTS';
 $string['analytics:exp_tts_per_active'] = 'Awọn iṣere TTS fun olumulo ti nṣiṣẹ';
+
+$string['settings:redash_allowed_origin'] = 'Orisun ti a gba laaye fun Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Fi sile ni ofo (a gba a niyanju): Redash ni o n gba ijade naa lati olupin si olupin, ko si nilo akole CORS aṣawakiri kankan. Ṣeto orisun kan to peye (fun apẹẹrẹ https://redash.example.org) nikan ti dasibodu ti o da lori aṣawakiri ba gbọdọ ka ijade naa taara. Maṣe lo wildcard rara.';

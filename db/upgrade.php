@@ -1082,5 +1082,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026061001, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026061014) {
+        // v6.6.0: composite (courseid, role, timecreated) index on msgs.
+        // Analytics, spend-guard, and the cost-anomaly task all filter on
+        // courseid + role + a timecreated range; the prior single-column
+        // courseid index forced a range scan over the whole course's rows for
+        // the time filter, which degrades badly at production scale.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $index = new xmldb_index('courseid_role_timecreated', XMLDB_INDEX_NOTUNIQUE,
+            ['courseid', 'role', 'timecreated']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2026061014, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

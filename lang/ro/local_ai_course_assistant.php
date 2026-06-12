@@ -1510,3 +1510,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Durata medie a sesiunii (minute)
 $string['analytics:exp_return_rate'] = 'Utilizatori recurenți (%)';
 $string['analytics:exp_tts_plays'] = 'Redări TTS';
 $string['analytics:exp_tts_per_active'] = 'Redări TTS per utilizator activ';
+
+$string['settings:redash_allowed_origin'] = 'Origine permisă pentru Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Lăsați gol (recomandat): exportul este preluat de la server la server de către Redash și nu necesită niciun antet CORS din browser. Setați o singură origine exactă (de exemplu https://redash.example.org) numai dacă un tablou de bord bazat pe browser trebuie să citească exportul direct. Nu folosiți niciodată un caracter generic.';

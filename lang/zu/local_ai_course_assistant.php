@@ -1546,3 +1546,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Ubude besikhathi esimvamisa (ama
 $string['analytics:exp_return_rate'] = 'Abasebenzisi abaphindayo (%)';
 $string['analytics:exp_tts_plays'] = 'Ukudlalwa kwe-TTS';
 $string['analytics:exp_tts_per_active'] = 'Ukudlalwa kwe-TTS ngomsebenzisi omusha';
+
+$string['settings:redash_allowed_origin'] = 'Umsuka ovunyelwe we-Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Shiya kungenalutho (kunconywa): ukukhipha kulandwa kusukela kuseva kuya kuseva yi-Redash futhi akudingi isihloko se-CORS sesiphequluli. Setha umsuka owodwa oqondile (isibonelo https://redash.example.org) kuphela uma ideshibhodi esekelwe kusiphequluli kumele ifunde ukukhipha ngokuqondile. Ungalokothi usebenzise i-wildcard.';

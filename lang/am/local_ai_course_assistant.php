@@ -1539,3 +1539,6 @@ $string['analytics:exp_avg_session_minutes'] = 'አማካይ የክፍለ ጊዜ
 $string['analytics:exp_return_rate'] = 'ተመላሽ ተጠቃሚዎች (%)';
 $string['analytics:exp_tts_plays'] = 'TTS ማጫወቶች';
 $string['analytics:exp_tts_per_active'] = 'TTS ማጫወቶች በንቁ ተጠቃሚ';
+
+$string['settings:redash_allowed_origin'] = 'የ Redash የተፈቀደ መነሻ (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'ባዶ ይተዉት (የሚመከር)፦ ወደ ውጭ መላኩ በ Redash ከአገልጋይ ወደ አገልጋይ ይወሰዳል እና የአሳሽ CORS ራስጌ አያስፈልገውም። በአሳሽ ላይ የተመሰረተ ዳሽቦርድ ወደ ውጭ የተላከውን በቀጥታ ማንበብ ካለበት ብቻ አንድ ትክክለኛ መነሻ ያዘጋጁ (ለምሳሌ https://redash.example.org)። ፈጽሞ የዱር ቁምፊ አይጠቀሙ።';

@@ -1546,3 +1546,6 @@ $string['analytics:exp_avg_session_minutes'] = '平均会话时长（分钟）';
 $string['analytics:exp_return_rate'] = '回访用户 (%)';
 $string['analytics:exp_tts_plays'] = 'TTS 播放次数';
 $string['analytics:exp_tts_per_active'] = '每活跃用户 TTS 播放次数';
+
+$string['settings:redash_allowed_origin'] = 'Redash 允许的来源 (CORS)';
+$string['settings:redash_allowed_origin_desc'] = '保持为空（推荐）：导出由 Redash 通过服务器到服务器的方式获取，不需要浏览器 CORS 标头。仅当基于浏览器的仪表板必须直接读取导出时，才设置单个精确来源（例如 https://redash.example.org）。切勿使用通配符。';

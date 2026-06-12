@@ -1517,3 +1517,6 @@ $string['analytics:exp_avg_session_minutes'] = '평균 세션 길이 (분)';
 $string['analytics:exp_return_rate'] = '재방문 사용자 (%)';
 $string['analytics:exp_tts_plays'] = 'TTS 재생 횟수';
 $string['analytics:exp_tts_per_active'] = '활성 사용자당 TTS 재생 횟수';
+
+$string['settings:redash_allowed_origin'] = 'Redash 허용 오리진 (CORS)';
+$string['settings:redash_allowed_origin_desc'] = '비워 두세요(권장): 내보내기는 Redash가 서버 간에 가져오므로 브라우저 CORS 헤더가 필요하지 않습니다. 브라우저 기반 대시보드가 내보내기를 직접 읽어야 하는 경우에만 단일 정확한 오리진(예: https://redash.example.org)을 설정하세요. 와일드카드는 절대 사용하지 마세요.';

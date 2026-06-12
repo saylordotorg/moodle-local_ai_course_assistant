@@ -1547,3 +1547,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Avg na haba ng sesyon (minuto)';
 $string['analytics:exp_return_rate'] = 'Mga bumabalik na gumagamit (%)';
 $string['analytics:exp_tts_plays'] = 'Mga pag-play ng TTS';
 $string['analytics:exp_tts_per_active'] = 'Mga pag-play ng TTS bawat aktibong gumagamit';
+
+$string['settings:redash_allowed_origin'] = 'Pinapayagang pinagmulan para sa Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Iwanang walang laman (inirerekomenda): ang export ay kinukuha server-to-server ng Redash at hindi nangangailangan ng CORS header ng browser. Magtakda lamang ng iisang eksaktong pinagmulan (halimbawa https://redash.example.org) kung kailangang basahin nang direkta ng isang browser-based na dashboard ang export. Huwag kailanman gumamit ng wildcard.';

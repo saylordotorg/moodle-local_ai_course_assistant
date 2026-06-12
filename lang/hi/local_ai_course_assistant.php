@@ -1540,3 +1540,6 @@ $string['analytics:exp_avg_session_minutes'] = 'औसत सत्र अवध
 $string['analytics:exp_return_rate'] = 'वापस आने वाले उपयोगकर्ता (%)';
 $string['analytics:exp_tts_plays'] = 'TTS प्लेबैक';
 $string['analytics:exp_tts_per_active'] = 'प्रति सक्रिय उपयोगकर्ता TTS प्लेबैक';
+
+$string['settings:redash_allowed_origin'] = 'Redash के लिए अनुमत मूल (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'खाली छोड़ें (अनुशंसित): निर्यात को Redash द्वारा सर्वर-से-सर्वर प्राप्त किया जाता है और इसे किसी ब्राउज़र CORS हेडर की आवश्यकता नहीं होती। केवल तभी एक एकल सटीक मूल सेट करें (उदाहरण के लिए https://redash.example.org) जब किसी ब्राउज़र-आधारित डैशबोर्ड को निर्यात को सीधे पढ़ना हो। कभी भी वाइल्डकार्ड का उपयोग न करें।';

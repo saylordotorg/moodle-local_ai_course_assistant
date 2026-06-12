@@ -1546,3 +1546,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Thời lượng phiên trung bì
 $string['analytics:exp_return_rate'] = 'Người dùng quay lại (%)';
 $string['analytics:exp_tts_plays'] = 'Lượt phát TTS';
 $string['analytics:exp_tts_per_active'] = 'Lượt phát TTS trên mỗi người dùng hoạt động';
+
+$string['settings:redash_allowed_origin'] = 'Nguồn gốc được phép cho Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Để trống (khuyến nghị): bản xuất được Redash lấy theo phương thức máy chủ tới máy chủ và không cần tiêu đề CORS của trình duyệt. Chỉ đặt một nguồn gốc chính xác duy nhất (ví dụ https://redash.example.org) nếu một bảng điều khiển dựa trên trình duyệt phải đọc trực tiếp bản xuất. Không bao giờ sử dụng ký tự đại diện.';

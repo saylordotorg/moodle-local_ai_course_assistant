@@ -1540,3 +1540,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Sɛbɛnni kelen dɔgɔkun (minit
 $string['analytics:exp_return_rate'] = 'Segin-seginnen baara kɛlaw (%)';
 $string['analytics:exp_tts_plays'] = 'TTS fɔliw';
 $string['analytics:exp_tts_per_active'] = 'TTS fɔliw baara kɛlaw kelen kelen ma';
+
+$string['settings:redash_allowed_origin'] = 'Redash ka sigida dabɔlen (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'A to lankolon na (a ɲɛnabɔlen): cikan bɔli bɛ ta ka taa serverw cɛ Redash fɛ ani a mago tɛ navigatɛri CORS kunsɛn na. Sigida kelen dɔrɔn ɲɛni (misali https://redash.example.org) ni navigatɛri tabilo dɔ ka kan ka cikan bɔli kalan k\'a tigɛ. Aw kana joker sɛbɛn kelen na abada.';

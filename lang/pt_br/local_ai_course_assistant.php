@@ -1533,3 +1533,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Duração média da sessão (min
 $string['analytics:exp_return_rate'] = 'Usuários recorrentes (%)';
 $string['analytics:exp_tts_plays'] = 'Reproduções de TTS';
 $string['analytics:exp_tts_per_active'] = 'Reproduções de TTS por usuário ativo';
+
+$string['settings:redash_allowed_origin'] = 'Origem permitida para o Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Deixe vazio (recomendado): a exportação é obtida de servidor para servidor pelo Redash e não precisa de nenhum cabeçalho CORS do navegador. Defina uma única origem exata (por exemplo https://redash.example.org) somente se um painel baseado em navegador precisar ler a exportação diretamente. Nunca use um curinga.';

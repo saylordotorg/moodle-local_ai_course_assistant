@@ -1510,3 +1510,6 @@ $string['analytics:exp_avg_session_minutes'] = 'متوسط مدة الجلسة (
 $string['analytics:exp_return_rate'] = 'المستخدمون العائدون (%)';
 $string['analytics:exp_tts_plays'] = 'تشغيلات TTS';
 $string['analytics:exp_tts_per_active'] = 'تشغيلات TTS لكل مستخدم نشط';
+
+$string['settings:redash_allowed_origin'] = 'النطاق المسموح به لـ Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'اتركه فارغًا (موصى به): يتم جلب التصدير من خادم إلى خادم بواسطة Redash ولا يحتاج إلى رأس CORS في المتصفح. عيّن نطاقًا واحدًا دقيقًا (على سبيل المثال https://redash.example.org) فقط إذا كان يجب على لوحة معلومات تعمل في المتصفح قراءة التصدير مباشرة. لا تستخدم أبدًا حرف البدل.';

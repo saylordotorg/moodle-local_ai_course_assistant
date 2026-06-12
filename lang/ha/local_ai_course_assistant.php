@@ -1540,3 +1540,6 @@ $string['analytics:exp_avg_session_minutes'] = 'Matsakaicin tsawon zama (mintuna
 $string['analytics:exp_return_rate'] = 'Masu amfani masu dawowa (%)';
 $string['analytics:exp_tts_plays'] = 'Wasannin TTS';
 $string['analytics:exp_tts_per_active'] = 'Wasannin TTS ga kowane mai amfani mai aiki';
+
+$string['settings:redash_allowed_origin'] = 'Asalin da aka yarda don Redash (CORS)';
+$string['settings:redash_allowed_origin_desc'] = 'Bar shi babu komai (an ba da shawara): Redash yana ɗauko fitarwar daga uwar garke zuwa uwar garke kuma baya buƙatar kan CORS na birawsa. Saita asali ɗaya daidai (alal misali https://redash.example.org) kawai idan dole ne dashboard ɗin da ke kan birawsa ya karanta fitarwar kai tsaye. Kada ka taɓa amfani da wildcard.';
