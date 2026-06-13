@@ -1452,8 +1452,10 @@ define([
             setAria(el, 'clear');
         });
         $$('.local-ai-course-assistant__btn-reset').forEach(function(el) {
-            setTitle(el, 'reset');
-            setAria(el, 'reset');
+            // Home button brings back the conversation-starter chips (it does
+            // not clear the chat); label it as such — "Start over" read as a wipe.
+            setTitle(el, 'starters_label');
+            setAria(el, 'starters_label');
         });
 
         // Language banner.
