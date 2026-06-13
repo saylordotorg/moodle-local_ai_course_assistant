@@ -262,12 +262,16 @@ foreach ($fixtures as $fixture) {
     $cosinelatencyms = (int) round((microtime(true) - $t0cosine) * 1000);
     $totalembedlatencyms = $embedlatencyms + $cosinelatencyms;
 
-    // Find rank of expected chunk in cosine results.
+    // Find rank of expected chunk in cosine results, and capture its raw
+    // cosine score so we can report whether the production relevance floor
+    // (rag_min_similarity) would drop it before reranking. (2026-06-13)
     $cosinerank = null;
     $cosinesubmatch = false;
+    $targetscore = null;
     foreach ($scored as $rank1 => $entry) {
         if ($entry['id'] === $expid) {
             $cosinerank = $rank1 + 1; // 1-based
+            $targetscore = $entry['score'];
             break;
         }
     }
@@ -283,8 +287,9 @@ foreach ($fixtures as $fixture) {
     }
 
     $top5cosine = array_slice(array_column($scored, 'id'), 0, 5);
-    printf("  [embed-only] rank=%s latency=%dms top5_ids=[%s]%s\n",
+    printf("  [embed-only] rank=%s target_cosine=%s latency=%dms top5_ids=[%s]%s\n",
         $cosinerank !== null ? $cosinerank : 'NOT_FOUND',
+        $targetscore !== null ? number_format($targetscore, 4) : 'n/a',
         $totalembedlatencyms,
         implode(',', $top5cosine),
         $cosinesubmatch ? ' (substring match)' : ''
@@ -297,6 +302,7 @@ foreach ($fixtures as $fixture) {
         'question'            => $q,
         'expected_chunk_id'   => $expid,
         'cosine_rank'         => $cosinerank,
+        'target_cosine_score' => $targetscore,
         'cosine_substring_match' => $cosinesubmatch,
         'embed_latency_ms'    => $embedlatencyms,
         'cosine_latency_ms'   => $cosinelatencyms,
@@ -405,6 +411,50 @@ if ($embedapikeyoverride !== '') {
     set_config('embed_apikey', ($origkey === false) ? '' : $origkey, 'local_ai_course_assistant');
     echo "embed_apikey restored to original value\n\n";
 }
+
+// ---------- Production floor sanity check (2026-06-13) ----------
+// The production retriever (rag_retriever::retrieve) drops chunks scoring below
+// rag_min_similarity BEFORE reranking. This harness ranks by raw cosine and does
+// not apply that floor, so report which fixtures' target chunks would be dropped
+// in production even though they are "recalled" here.
+$floorraw = get_config('local_ai_course_assistant', 'rag_min_similarity');
+$floor = ($floorraw === false || $floorraw === '') ? 0.25 : (float) $floorraw;
+echo str_repeat('=', 64) . "\n";
+echo 'PRODUCTION FLOOR CHECK (rag_min_similarity = ' . number_format($floor, 4) . ")\n";
+echo str_repeat('=', 64) . "\n";
+$below = [];
+$notfound = [];
+$scoredcount = 0;
+$minscore = 1.0;
+$maxscore = -1.0;
+$sumscore = 0.0;
+foreach ($results as $r) {
+    if (!array_key_exists('target_cosine_score', $r) || $r['target_cosine_score'] === null) {
+        $notfound[] = $r['fixture_id'] ?? '?';
+        continue;
+    }
+    $s = (float) $r['target_cosine_score'];
+    $scoredcount++;
+    $sumscore += $s;
+    $minscore = min($minscore, $s);
+    $maxscore = max($maxscore, $s);
+    if ($s < $floor) {
+        $below[] = sprintf('%s  cos=%.4f  course=%s', $r['fixture_id'] ?? '?', $s, $r['course'] ?? '?');
+    }
+}
+printf("Target-chunk cosine over %d located fixtures: min=%.4f  mean=%.4f  max=%.4f\n",
+    $scoredcount, $scoredcount ? $minscore : 0.0,
+    $scoredcount ? $sumscore / $scoredcount : 0.0, $scoredcount ? $maxscore : 0.0);
+printf("Target chunk BELOW the %.2f floor (would be dropped in production): %d of %d\n",
+    $floor, count($below), $scoredcount);
+foreach ($below as $b) {
+    echo "  - $b\n";
+}
+if ($notfound) {
+    printf("Target chunk not located by cosine at all (unfixable by floor change): %d (%s)\n",
+        count($notfound), implode(',', $notfound));
+}
+echo "\n";
 
 // ---------- Compute metrics ----------
 
