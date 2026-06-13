@@ -399,3 +399,18 @@ Overall  | 40  | 32.5%  | 55.0%  | 65.0%  | 77.5%  | 0.468   | 242 ms
 BUS101   | 30  | 23.3%  | 50.0%  | 56.7%  | 73.3%  | 0.389   | 247 ms
 POLSC101 | 10  | 60.0%  | 70.0%  | 90.0%  | 90.0%  | 0.704   | 176 ms
 ```
+
+---
+
+## Caveat + re-run recommendation (2026-06-13)
+
+This benchmark measures **raw cosine recall**: `run_rag_fixture_benchmark.php` embeds the question and ranks all course chunks by `cosine_sim` directly (§ harness, stage 2). It does **not** go through `rag_retriever::retrieve`, so it does not apply the production retrieval gates added in v6.2.0:
+
+- **Relevance floor** `rag_min_similarity = 0.25` (default): the production retriever drops any chunk scoring below 0.25 cosine *before* reranking. Any fixture whose target chunk scores under 0.25 would be unretrievable in production even though it counts as "recalled" here. So the recall@k figures in §6/tail are an **upper bound** on production recall.
+- **Current-page bias** `rag_currentpage_boost = 0.05`: a pure ordering nudge for the page the learner is on. The fixtures have no current page, so this does not affect these results — noted only for completeness.
+
+**What still stands:** the GO decision and the +17.5pp recall@3 rerank lift are valid for the embedding-only / cosine arm, and rerank operates on the top-N cosine candidates regardless of the floor, so the *relative* improvement carries over.
+
+**Recommended cheap follow-ups before reading these as the production numbers:**
+1. **Floor sanity check (trivial):** the harness already computes every chunk's cosine to the query, so the target chunk's score is one print statement away — emit it per fixture and compare against `0.25`. (The dev-box `/tmp/rag_bench_results.json` records the target's rank; add its score if not already present.) The low-score scenario-recall fixtures called out in §3 (e.g. the Starbucks/HRM training-theory cases; overall mean cosine ≈ 0.47 with a long left tail) are the candidates to fall under the floor. If any known-good target sits below 0.25, either lower the default floor for the Saylor corpus or accept the documented recall loss.
+2. **Production-path re-run (cheap):** add a benchmark arm that calls `rag_retriever::retrieve($courseid, $q, $topk)` (which applies the floor + bias + optional rerank) and reports recall@k, to measure true production recall rather than raw cosine. This becomes the number to quote once rerank is enabled on prod.

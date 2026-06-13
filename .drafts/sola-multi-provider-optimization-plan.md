@@ -592,3 +592,21 @@ Total remaining engineering: roughly 3 days across 4 weeks. The architectural wo
 - [ ] **Update `.wiki/Provider-DPAs.md`** to reflect the rev. 3 baseline vendor list and drop the retired pilot-only vendors. Compliance and DPO sign-off (companion doc section 6).
 - [ ] **Confirm Voice tab is disabled** in the universal-rollout build; remove TTS / STT entry points from the learner UI for the rollout cohort.
 - [ ] **Run the deferred premium-escalation-tier bake-off** (companion doc A.10, ~half day, ~$5 in API spend) — decides whether SOLA needs a premium tier.
+
+---
+
+## Addendum 2026-06-13 — deltas from v6.2 → v6.6 that touch this plan
+
+Reviewed the plan against everything merged since the rev. 3 baseline (2026-06-04). The vendor picks and compliance posture are unchanged; four cost/architecture items moved and are captured here rather than rewriting the body.
+
+1. **Semantic history is now a SECOND query-time embedding per turn (default on).** v6.2.0 added `history_mode` and v6.3 ships it defaulting to `semantic` (`settings.php`, `history_selector.php`). On every chat turn the plugin now embeds the query for RAG retrieval AND embeds the query + a batch of recent history turns to score relevance — two separate, serial, blocking embedding calls before the stream starts. Implications:
+   - **Embedding volume roughly doubles** vs the "one embed per turn" assumption. Absolute spend stays trivial (text-embedding-3-small at $0.02/MTok), but it **moves the Voyage-3.5 migration breakeven earlier** and is worth modeling explicitly when costing embeddings.
+   - **Latency/stability**: each embedding call carries the 120s curl timeout, so a slow embedding endpoint can add a second pre-stream hang surface. Two cheap fixes worth tracking as engineering follow-ups (not vendor changes): reuse the already-computed RAG query vector for history scoring (one embed, not two), and set a tight retrieval-time embedding timeout distinct from the 120s indexing timeout. Admins who don't want the extra call can set `history_mode = recency` (no embedding; the long-standing behavior).
+
+2. **Per-turn chat-tier input cost is now LOWER than the plan models.** v6.2.0 added a RAG relevance floor (`rag_min_similarity = 0.25`) + current-page bias, and capped the current-page section 12k → 8k chars. Off-topic/sparse turns now inject fewer (or zero) chunks instead of always padding to top-k, and large pages no longer dominate the prompt. Net: the per-turn input-token figures in this plan are **conservative** (real spend is lower); no action needed, but don't tighten the chat budget further on the assumption it's still top-k-always.
+
+3. **Voice now has a $0 STT path (Appendix B, deferred).** v6.3.0 added self-hosted Whisper STT (`stt_selfhosted_url`; whisper-server / faster-whisper / whisper.cpp). When voice is eventually costed for an opt-in, STT can be self-hosted at $0 (bypasses the voice spend guard); update the Appendix B voice economics accordingly. No change to the text-only baseline.
+
+4. **The rerank GO numbers are raw-cosine recall, not the production retrieval path.** The fixture benchmark that drives the Voyage rerank-2.5 decision (§10 / companion `sola-rag-fixture-benchmark-2026-06-10.md`) ranks by cosine over all chunks and does **not** apply the v6.2.0 production floor (0.25) or current-page bias. The +17.5pp recall@3 lift and the GO still stand for the embedding-only arm, but see that doc's 2026-06-13 caveat: production recall is bounded by the floor, so confirm the 0.25 default doesn't sit above any known-good chunk score before reading the benchmark recall as the production number.
+
+**Not stale:** the 8-provider chat benchmark (2026-06-03) and the Gemini 2.5 Flash primary / gpt-4o-mini specialty / Claude Opus 4.8 premium picks — no SOLA stack model changed since, so no re-run is triggered by these releases (only by elapsed time / new model launches).
