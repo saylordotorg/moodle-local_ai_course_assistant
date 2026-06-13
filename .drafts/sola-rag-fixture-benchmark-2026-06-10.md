@@ -414,3 +414,15 @@ This benchmark measures **raw cosine recall**: `run_rag_fixture_benchmark.php` e
 **Recommended cheap follow-ups before reading these as the production numbers:**
 1. **Floor sanity check (trivial):** the harness already computes every chunk's cosine to the query, so the target chunk's score is one print statement away — emit it per fixture and compare against `0.25`. (The dev-box `/tmp/rag_bench_results.json` records the target's rank; add its score if not already present.) The low-score scenario-recall fixtures called out in §3 (e.g. the Starbucks/HRM training-theory cases; overall mean cosine ≈ 0.47 with a long left tail) are the candidates to fall under the floor. If any known-good target sits below 0.25, either lower the default floor for the Saylor corpus or accept the documented recall loss.
 2. **Production-path re-run (cheap):** add a benchmark arm that calls `rag_retriever::retrieve($courseid, $q, $topk)` (which applies the floor + bias + optional rerank) and reports recall@k, to measure true production recall rather than raw cosine. This becomes the number to quote once rerank is enabled on prod.
+
+### Result — floor check measured on dev.sylr.org (2026-06-13)
+
+Ran the updated harness (now prints each target chunk's cosine + a floor summary) on dev.sylr.org against the same 40-fixture set, rerank arm active:
+
+```
+PRODUCTION FLOOR CHECK (rag_min_similarity = 0.2500)
+Target-chunk cosine over 40 located fixtures: min=0.3153  mean=0.4862  max=0.6736
+Target chunk BELOW the 0.25 floor (would be dropped in production): 0 of 40
+```
+
+**The 0.25 default floor is safe for this corpus.** The worst-case target chunk scores 0.3153 — ~0.065 above the floor — so no known-good chunk is dropped before reranking, and the §6/§7 recall numbers (Cos@3 55% → Rerank@3 72.5%, +17.5pp; re-confirmed identically in this run) hold for the production retrieval path, not just raw cosine. No floor change needed. Re-check if the corpus is re-indexed or harder fixtures are added (headroom is comfortable but not large). The remaining recommendation — a full production-path re-run via `rag_retriever::retrieve` once rerank is enabled on prod — is now lower priority since the floor is confirmed non-binding on the labeled targets.
