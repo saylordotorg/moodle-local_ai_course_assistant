@@ -1566,3 +1566,4 @@ $string['soapbox:edit_rubric'] = 'Edytuj rubrykę wystąpienia';
 $string['soapbox:sample_label'] = 'Wczytaj przykładową rubrykę';
 $string['soapbox:sample_choose'] = 'Wybierz przykład…';
 $string['soapbox:sample_hint'] = 'Wczytuje przykładowe kryteria do edytora poniżej. Przejrzyj je i zapisz, aby zastosować je w tym zakresie.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (średniozaawansowany)';

@@ -1584,3 +1584,4 @@ $string['soapbox:edit_rubric'] = 'Tafatir qiimaynta hadalka';
 $string['soapbox:sample_label'] = 'Soo rar tusaale qiimayn ah';
 $string['soapbox:sample_choose'] = 'Dooro tusaale…';
 $string['soapbox:sample_hint'] = 'Waxay shubaysaa shuruudaha tusaalaha ah tafatiraha hoose. Dib u eeg oo kaydi si aad ugu dabaqdo baaxaddan.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (dhexe)';

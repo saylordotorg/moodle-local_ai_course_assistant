@@ -37,6 +37,7 @@ class rubric_manager {
     /** @var string Soapbox course-type/level presets (drive both the default rubric and the coaching register). */
     const SPEECH_LEVEL_GENERAL = 'general';
     const SPEECH_LEVEL_ESL_BEGINNER = 'esl_beginner';
+    const SPEECH_LEVEL_ESL_INTERMEDIATE = 'esl_intermediate';
     const SPEECH_LEVEL_ESL_ADVANCED = 'esl_advanced';
 
     /** @var array Default Soapbox speech rubric criteria (general speech / presentation course). */
@@ -370,6 +371,20 @@ class rubric_manager {
                     ['name' => 'Basic Grammar', 'description' => 'Simple tenses, subject-verb agreement, and word order.', 'max_score' => 5],
                     ['name' => 'Core Vocabulary', 'description' => 'Using common, topic-relevant words and getting meaning across despite gaps.', 'max_score' => 5],
                     ['name' => 'Task Completion', 'description' => 'Staying on topic and saying enough on the prompt to be understood.', 'max_score' => 5],
+                ],
+            ],
+            self::SPEECH_LEVEL_ESL_INTERMEDIATE => [
+                'label_key' => 'soapbox:level_esl_intermediate',
+                'hint' => 'The learner is an intermediate-level English-as-a-second-language student. Balance '
+                    . 'encouragement with targeted correction: acknowledge what works, then name a couple of '
+                    . 'concrete, level-appropriate improvements (a grammar pattern, a clearer transition, a more '
+                    . 'precise word). Stretch them slightly beyond their comfort without overwhelming them.',
+                'criteria' => [
+                    ['name' => 'Pronunciation & Clarity', 'description' => 'Mostly clear sounds and stress; occasional slips that rarely block understanding.', 'max_score' => 5],
+                    ['name' => 'Fluency & Pace', 'description' => 'Reasonably smooth with some hesitation; keeps going through most ideas.', 'max_score' => 5],
+                    ['name' => 'Grammar', 'description' => 'Common tenses and structures handled with some errors in more complex forms.', 'max_score' => 5],
+                    ['name' => 'Vocabulary', 'description' => 'Adequate range for the topic, with some reach for less common or precise words.', 'max_score' => 5],
+                    ['name' => 'Organization & Coherence', 'description' => 'Clear main idea, mostly logical ordering, and basic connectors.', 'max_score' => 5],
                 ],
             ],
             self::SPEECH_LEVEL_ESL_ADVANCED => [

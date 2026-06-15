@@ -1610,3 +1610,4 @@ $string['soapbox:edit_rubric'] = 'עריכת מחוון הדיבור';
 $string['soapbox:sample_label'] = 'טעינת מחוון לדוגמה';
 $string['soapbox:sample_choose'] = 'בחר דוגמה…';
 $string['soapbox:sample_hint'] = 'טוען קריטריונים לדוגמה לעורך שלמטה. סקור ושמור כדי להחיל אותם על היקף זה.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (בינוניים)';

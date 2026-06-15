@@ -1596,3 +1596,4 @@ $string['soapbox:edit_rubric'] = 'Sunting rubrik ucapan';
 $string['soapbox:sample_label'] = 'Muatkan rubrik sampel';
 $string['soapbox:sample_choose'] = 'Pilih sampel…';
 $string['soapbox:sample_hint'] = 'Memuatkan kriteria sampel ke dalam penyunting di bawah. Semak dan Simpan untuk menerapkannya pada skop ini.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (pertengahan)';

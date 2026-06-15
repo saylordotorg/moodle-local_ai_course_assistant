@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'Rediger talerubrik';
 $string['soapbox:sample_label'] = 'Indlæs en prøverubrik';
 $string['soapbox:sample_choose'] = 'Vælg en prøve…';
 $string['soapbox:sample_hint'] = 'Indlæser prøvekriterier i editoren nedenfor. Gennemgå og gem for at anvende dem på dette område.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (mellem)';

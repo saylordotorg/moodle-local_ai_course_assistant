@@ -1624,3 +1624,4 @@ $string['soapbox:edit_rubric'] = 'Редагувати критерії мовл
 $string['soapbox:sample_label'] = 'Завантажити зразок критеріїв';
 $string['soapbox:sample_choose'] = 'Виберіть зразок…';
 $string['soapbox:sample_hint'] = 'Завантажує зразкові критерії до редактора нижче. Перегляньте та Збережіть, щоб застосувати їх до цієї області.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (середній)';

@@ -1602,3 +1602,4 @@ $string['soapbox:edit_rubric'] = 'Jubbanti rubrik wax';
 $string['soapbox:sample_label'] = 'Yebal benn misaal rubrik';
 $string['soapbox:sample_choose'] = 'Tànn benn misaal…';
 $string['soapbox:sample_hint'] = 'Day yeb misaal kriteryo yi ci editër bi ci suuf. Saytu te Denc ngir jëfandikoo leen ci wàll wii.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (digg-dóomu)';

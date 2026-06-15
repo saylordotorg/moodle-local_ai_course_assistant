@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'Redebewertung bearbeiten';
 $string['soapbox:sample_label'] = 'Beispielbewertung laden';
 $string['soapbox:sample_choose'] = 'Beispiel auswählen…';
 $string['soapbox:sample_hint'] = 'Lädt Beispielkriterien in den Editor unten. Überprüfen und speichern Sie, um sie auf diesen Bereich anzuwenden.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (Mittelstufe)';

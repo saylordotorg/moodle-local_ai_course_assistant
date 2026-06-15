@@ -1566,3 +1566,4 @@ $string['soapbox:edit_rubric'] = 'Spraakrubriek bewerken';
 $string['soapbox:sample_label'] = 'Een voorbeeldrubriek laden';
 $string['soapbox:sample_choose'] = 'Kies een voorbeeld…';
 $string['soapbox:sample_hint'] = 'Laadt voorbeeldcriteria in de editor hieronder. Controleer en sla op om ze op dit bereik toe te passen.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (gemiddeld)';

@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'تعديل نموذج تقييم الخطاب'
 $string['soapbox:sample_label'] = 'تحميل نموذج تقييم جاهز';
 $string['soapbox:sample_choose'] = 'اختر نموذجًا…';
 $string['soapbox:sample_hint'] = 'يُحمّل معايير نموذجية في المحرّر أدناه. راجِعها ثم احفظ لتطبيقها على هذا النطاق.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (متوسط)';

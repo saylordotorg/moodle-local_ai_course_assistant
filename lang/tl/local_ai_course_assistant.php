@@ -1603,3 +1603,4 @@ $string['soapbox:edit_rubric'] = 'I-edit ang rubric ng talumpati';
 $string['soapbox:sample_label'] = 'Mag-load ng sample na rubric';
 $string['soapbox:sample_choose'] = 'Pumili ng sample…';
 $string['soapbox:sample_hint'] = 'Naglo-load ng sample na pamantayan sa editor sa ibaba. Suriin at I-save upang ilapat ang mga ito sa saklaw na ito.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermedyo)';

@@ -1611,3 +1611,4 @@ $string['soapbox:edit_rubric'] = 'Επεξεργασία ρουμπρίκας ο
 $string['soapbox:sample_label'] = 'Φόρτωση δειγματικής ρουμπρίκας';
 $string['soapbox:sample_choose'] = 'Επιλέξτε ένα δείγμα…';
 $string['soapbox:sample_hint'] = 'Φορτώνει δειγματικά κριτήρια στον επεξεργαστή παρακάτω. Ελέγξτε και αποθηκεύστε για να τα εφαρμόσετε σε αυτό το εύρος.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (μέσοι)';

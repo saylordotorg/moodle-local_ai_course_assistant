@@ -1597,3 +1597,4 @@ $string['soapbox:edit_rubric'] = 'Kuma sumanikɛlan yɛlɛma';
 $string['soapbox:sample_label'] = 'Sumanikɛlan ɲɛjira dɔ ladon';
 $string['soapbox:sample_choose'] = 'Ɲɛjira dɔ sugandi…';
 $string['soapbox:sample_hint'] = 'A bɛ ɲɛjira sariyaw ladon sɛbɛnnikɛlan na duguma. I k\'u lajɛ ka Mara walisa k\'u baara kɛ nin yɔrɔ in na.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (cɛmancɛ)';

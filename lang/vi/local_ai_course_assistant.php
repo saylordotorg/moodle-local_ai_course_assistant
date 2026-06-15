@@ -1602,3 +1602,4 @@ $string['soapbox:edit_rubric'] = 'Chỉnh sửa khung tiêu chí bài nói';
 $string['soapbox:sample_label'] = 'Tải khung tiêu chí mẫu';
 $string['soapbox:sample_choose'] = 'Chọn một mẫu…';
 $string['soapbox:sample_hint'] = 'Tải các tiêu chí mẫu vào trình chỉnh sửa bên dưới. Xem lại và Lưu để áp dụng chúng cho phạm vi này.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (trung cấp)';

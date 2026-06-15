@@ -1602,3 +1602,4 @@ $string['soapbox:edit_rubric'] = '编辑演讲评分标准';
 $string['soapbox:sample_label'] = '加载示例评分标准';
 $string['soapbox:sample_choose'] = '选择一个示例…';
 $string['soapbox:sample_hint'] = '将示例标准加载到下方的编辑器中。请审阅并保存，以将其应用于此范围。';
+$string['soapbox:level_esl_intermediate'] = 'ESL（中级）';

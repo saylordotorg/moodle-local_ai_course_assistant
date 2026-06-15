@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'Muokkaa puherubriikkia';
 $string['soapbox:sample_label'] = 'Lataa mallirubriikki';
 $string['soapbox:sample_choose'] = 'Valitse malli…';
 $string['soapbox:sample_hint'] = 'Lataa mallikriteerit alla olevaan editoriin. Tarkista ja tallenna ottaaksesi ne käyttöön tässä laajuudessa.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (keskitaso)';

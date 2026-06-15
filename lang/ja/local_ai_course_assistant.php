@@ -1573,3 +1573,4 @@ $string['soapbox:edit_rubric'] = 'スピーチルーブリックを編集';
 $string['soapbox:sample_label'] = 'サンプルルーブリックを読み込む';
 $string['soapbox:sample_choose'] = 'サンプルを選択…';
 $string['soapbox:sample_hint'] = '下のエディターにサンプル基準を読み込みます。確認して保存すると、このスコープに適用されます。';
+$string['soapbox:level_esl_intermediate'] = 'ESL（中級）';

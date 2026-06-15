@@ -1566,3 +1566,4 @@ $string['soapbox:edit_rubric'] = 'Editează grila de evaluare a vorbirii';
 $string['soapbox:sample_label'] = 'Încarcă o grilă de evaluare exemplu';
 $string['soapbox:sample_choose'] = 'Alege un exemplu…';
 $string['soapbox:sample_hint'] = 'Încarcă criteriile exemplu în editorul de mai jos. Revizuiește și salvează pentru a le aplica acestui domeniu.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermediar)';

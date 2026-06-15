@@ -1603,3 +1603,4 @@ $string['soapbox:edit_rubric'] = 'Hariri rubriki ya hotuba';
 $string['soapbox:sample_label'] = 'Pakia sampuli ya rubriki';
 $string['soapbox:sample_choose'] = 'Chagua sampuli…';
 $string['soapbox:sample_hint'] = 'Hupakia vigezo vya sampuli kwenye kihariri kilicho hapa chini. Kagua na uhifadhi ili kuvitumia kwenye eneo hili.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (wa kati)';

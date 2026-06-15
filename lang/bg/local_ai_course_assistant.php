@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'Редактиране на рубриката
 $string['soapbox:sample_label'] = 'Зареждане на примерна рубрика';
 $string['soapbox:sample_choose'] = 'Изберете пример…';
 $string['soapbox:sample_hint'] = 'Зарежда примерни критерии в редактора по-долу. Прегледайте и запазете, за да ги приложите към този обхват.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (средно напреднали)';
