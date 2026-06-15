@@ -319,4 +319,12 @@ $functions = [
         'capabilities' => 'local/ai_course_assistant:use',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_ai_course_assistant_score_speech' => [
+        'classname'    => \local_ai_course_assistant\external\score_speech::class,
+        'description'  => 'Soapbox: score a transcribed speech against the per-course speech rubric and save history.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+        'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

@@ -163,6 +163,7 @@ class provider implements
                 'overall_score' => 'privacy:metadata:local_ai_course_assistant_practice_scores:overall_score',
                 'scores' => 'privacy:metadata:local_ai_course_assistant_practice_scores:scores',
                 'ai_feedback' => 'privacy:metadata:local_ai_course_assistant_practice_scores:ai_feedback',
+                'session_meta' => 'privacy:metadata:local_ai_course_assistant_practice_scores:session_meta',
                 'timecreated' => 'privacy:metadata:local_ai_course_assistant_practice_scores:timecreated',
             ],
             'privacy:metadata:local_ai_course_assistant_practice_scores'
@@ -532,6 +533,7 @@ class provider implements
                         'scores' => $score->scores,
                         'ai_feedback' => $score->ai_feedback,
                         'session_duration' => $score->session_duration,
+                        'session_meta' => $score->session_meta,
                         'timecreated' => transform::datetime($score->timecreated),
                     ]
                 );

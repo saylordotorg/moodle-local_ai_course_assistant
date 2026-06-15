@@ -179,4 +179,18 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
             new pix_icon('i/report', '')
         );
     }
+    // v6.7.0: learner-facing Soapbox link. Unlike the admin nodes above, this is
+    // shown to any enrolled learner (capability :use) when Soapbox is enabled for
+    // the course, so students in speech courses have a discoverable way in.
+    if (has_capability('local/ai_course_assistant:use', $context)
+            && \local_ai_course_assistant\feature_flags::resolve('soapbox', $course->id)) {
+        $navigation->add(
+            get_string('soapbox:link', 'local_ai_course_assistant'),
+            new moodle_url('/local/ai_course_assistant/soapbox.php', ['courseid' => $course->id]),
+            navigation_node::TYPE_SETTING,
+            null,
+            'aicasoapbox',
+            new pix_icon('i/audio', '')
+        );
+    }
 }

@@ -136,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'flashcards_on'           => 'flashcards_enabled_course_',
         'sandbox_on'              => 'code_sandbox_enabled_course_',
         'essay_on'                => 'essay_feedback_enabled_course_',
+        'soapbox_on'              => 'soapbox_enabled_course_',
         'we_on'                   => 'worked_examples_enabled_course_',
     ] as $field => $cfgprefix) {
         $v = optional_param($field, '', PARAM_RAW_TRIMMED);
@@ -476,16 +477,19 @@ echo html_writer::div(
             $fcraw        = get_config('local_ai_course_assistant', 'flashcards_enabled_course_' . $courseid);
             $sbraw        = get_config('local_ai_course_assistant', 'code_sandbox_enabled_course_' . $courseid);
             $essraw       = get_config('local_ai_course_assistant', 'essay_feedback_enabled_course_' . $courseid);
+            $sbxraw       = get_config('local_ai_course_assistant', 'soapbox_enabled_course_' . $courseid);
             $weraw        = get_config('local_ai_course_assistant', 'worked_examples_enabled_course_' . $courseid);
             $socraticgbl  = (bool) get_config('local_ai_course_assistant', 'socratic_mode_enabled');
             $fcgbl        = (bool) get_config('local_ai_course_assistant', 'flashcards_enabled');
             $sbgbl        = (bool) get_config('local_ai_course_assistant', 'code_sandbox_enabled');
             $essgbl       = (bool) get_config('local_ai_course_assistant', 'essay_feedback_enabled');
+            $sbxgbl       = (bool) get_config('local_ai_course_assistant', 'soapbox_enabled');
             $wegbl        = (bool) get_config('local_ai_course_assistant', 'worked_examples_enabled');
             // Resolved booleans for `if (X) { show secondary link }` checks.
             $fcon       = \local_ai_course_assistant\feature_flags::resolve('flashcards', $courseid);
             $sbon       = \local_ai_course_assistant\feature_flags::resolve('code_sandbox', $courseid);
             $esson      = \local_ai_course_assistant\feature_flags::resolve('essay_feedback', $courseid);
+            $sbxon      = \local_ai_course_assistant\feature_flags::resolve('soapbox', $courseid);
             $digeston   = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
             $extresraw  = get_config('local_ai_course_assistant', 'external_resources_enabled_course_' . $courseid);
             $extresglobal = (bool) get_config('local_ai_course_assistant', 'external_resources_enabled');
@@ -593,6 +597,28 @@ echo html_writer::div(
                                 ['courseid' => $courseid]))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('essay_feedback:link', 'local_ai_course_assistant'); ?> &rarr;
+                        </a>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <?php // v6.7.0: Soapbox speech-practice toggle. Three-way (inherit/force on/force off). ?>
+            <div class="form-group row mt-2">
+                <label class="col-sm-3 col-form-label" for="aica-soapbox-on">
+                    <?php echo get_string('soapbox:title', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <?php echo $renderpedagogyselect('soapbox_on', $sbxraw, $sbxgbl, 'aica-soapbox-on'); ?>
+                    <small class="form-text text-muted">
+                        <?php echo get_string('soapbox:toggle_help', 'local_ai_course_assistant'); ?>
+                    </small>
+                    <?php if ($sbxon) { ?>
+                    <div class="mt-1">
+                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/soapbox.php',
+                                ['courseid' => $courseid]))->out(false); ?>"
+                           class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <?php echo get_string('soapbox:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
                     </div>
                     <?php } ?>

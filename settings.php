@@ -1638,6 +1638,7 @@ if ($hassiteconfig) {
         'flashcards_enabled'      => 'pedagogy:flashcards',
         'code_sandbox_enabled'    => 'pedagogy:code_sandbox',
         'essay_feedback_enabled'  => 'pedagogy:essay_feedback',
+        'soapbox_enabled'         => 'pedagogy:soapbox',
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
         'crossmastery_enabled'    => 'pedagogy:crossmastery',
         'mastery_starter_enabled' => 'pedagogy:mastery_starter',
@@ -1651,6 +1652,22 @@ if ($hassiteconfig) {
             0
         ));
     }
+
+    // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
+    // transcribes through the configured Whisper provider (self-hosted free, or
+    // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
+    // Web Speech API (free, no server, Chrome/Safari only). Server is the default
+    // so transcription quality does not depend on the learner's browser.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/soapbox_stt_mode',
+        get_string('settings:soapbox_stt_mode', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_stt_mode_desc', 'local_ai_course_assistant'),
+        'server',
+        [
+            'server'  => get_string('settings:soapbox_stt_mode_server', 'local_ai_course_assistant'),
+            'browser' => get_string('settings:soapbox_stt_mode_browser', 'local_ai_course_assistant'),
+        ]
+    ));
 
     // v3.9.17: mastery tracking tunables. Per-course enable toggles live
     // on the per-course Objectives admin page; these are the site-wide

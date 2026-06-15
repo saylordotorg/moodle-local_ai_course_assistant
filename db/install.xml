@@ -453,11 +453,12 @@
         <FIELD NAME="rubricid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="session_type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="conversation or pronunciation"/>
+        <FIELD NAME="session_type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="conversation, pronunciation, or speech"/>
         <FIELD NAME="scores" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON array of per-criterion scores"/>
         <FIELD NAME="overall_score" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="ai_feedback" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="AI-generated summary feedback"/>
         <FIELD NAME="session_duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Duration in seconds"/>
+        <FIELD NAME="session_meta" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Optional JSON metadata (e.g. Soapbox name/topic/target); never audio or transcript"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
