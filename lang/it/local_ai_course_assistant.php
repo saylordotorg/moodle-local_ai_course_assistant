@@ -1607,3 +1607,13 @@ $string['soapbox:untitled'] = 'Discorso senza titolo';
 $string['soapbox:overall_badge'] = 'Complessivo {$a}';
 $string['soapbox:toggle'] = 'Abilita Soapbox per questo corso';
 $string['soapbox:toggle_help'] = 'Gli studenti ottengono una pagina dedicata per registrare un discorso e ricevere un feedback sull\'esposizione valutato in base a una rubrica, con suggerimenti. L\'audio e le trascrizioni non vengono mai memorizzati. Disattivato per impostazione predefinita.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Tipo di corso / livello di esposizione';
+$string['soapbox:level_help'] = 'Adatta il coaching dell\'IA e la rubrica di esempio predefinita al tipo di corso. I livelli ESL ricevono un feedback sull\'apprendimento linguistico; il discorso generale si concentra sulle capacità di presentazione. Puoi comunque modificare la rubrica qui sotto.';
+$string['soapbox:level_general'] = 'Discorso / presentazione generale';
+$string['soapbox:level_esl_beginner'] = 'ESL (principiante)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avanzato)';
+$string['soapbox:edit_rubric'] = 'Modifica la rubrica del discorso';
+$string['soapbox:sample_label'] = 'Carica una rubrica di esempio';
+$string['soapbox:sample_choose'] = 'Scegli un esempio…';
+$string['soapbox:sample_hint'] = 'Carica criteri di esempio nell\'editor qui sotto. Rivedi e salva per applicarli a questo ambito.';

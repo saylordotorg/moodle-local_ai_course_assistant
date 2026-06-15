@@ -1586,3 +1586,14 @@ $string['soapbox:untitled'] = 'Pidato tanpa judul';
 $string['soapbox:overall_badge'] = 'Keseluruhan {$a}';
 $string['soapbox:toggle'] = 'Aktifkan Soapbox untuk kursus ini';
 $string['soapbox:toggle_help'] = 'Pelajar mendapatkan halaman khusus untuk merekam pidato dan menerima umpan balik berbicara yang dinilai berdasarkan rubrik beserta kiat. Audio dan transkrip tidak pernah disimpan. Nonaktif secara default.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Jenis kursus / tingkat berbicara';
+$string['soapbox:level_help'] = 'Menyesuaikan pelatihan AI dan rubrik sampel default dengan jenis kursus. Tingkat ESL mendapatkan umpan balik pembelajaran bahasa; pidato umum berfokus pada keterampilan presentasi. Anda masih dapat mengedit rubrik di bawah ini.';
+$string['soapbox:level_general'] = 'Pidato umum / presentasi';
+$string['soapbox:level_esl_beginner'] = 'ESL (pemula)';
+$string['soapbox:level_esl_advanced'] = 'ESL (lanjutan)';
+$string['soapbox:edit_rubric'] = 'Edit rubrik pidato';
+$string['soapbox:sample_label'] = 'Muat rubrik sampel';
+$string['soapbox:sample_choose'] = 'Pilih sampel…';
+$string['soapbox:sample_hint'] = 'Memuat kriteria sampel ke editor di bawah ini. Tinjau dan Simpan untuk menerapkannya pada cakupan ini.';

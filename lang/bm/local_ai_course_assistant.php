@@ -1586,3 +1586,14 @@ $string['soapbox:untitled'] = 'Kuma tɔgɔntan';
 $string['soapbox:overall_badge'] = 'A bɛɛ lajɛlen {$a}';
 $string['soapbox:toggle'] = 'Soapbox dabɔ nin kalansen kama';
 $string['soapbox:toggle_help'] = 'Kalandenw bɛ ɲɛ kɛrɛnkɛrɛnnen sɔrɔ ka kuma sɛbɛn ani ka kuma fɔli jaabili sumaninen sɔrɔ sariyasun kan ni ladiliw ye. Mankan ni sɛbɛnnenw tɛ mara abada. A faga la ka kɛ a cogo la.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kalan suguya / kuma fɔli hakɛ';
+$string['soapbox:level_help'] = 'A b\'AI ladilikan ni sumanikɛlan ɲɛsin kalan suguya ma. ESL hakɛw bɛ kanko kalan ɲɛfɔli sɔrɔ; kuma gansan b\'a sinsin jiralikɛ seko kan. I bɛ se ka sumanikɛlan yɛlɛma hali bi duguma.';
+$string['soapbox:level_general'] = 'Kuma gansan / jirali';
+$string['soapbox:level_esl_beginner'] = 'ESL (daminɛbaga)';
+$string['soapbox:level_esl_advanced'] = 'ESL (ɲɛtaalen)';
+$string['soapbox:edit_rubric'] = 'Kuma sumanikɛlan yɛlɛma';
+$string['soapbox:sample_label'] = 'Sumanikɛlan ɲɛjira dɔ ladon';
+$string['soapbox:sample_choose'] = 'Ɲɛjira dɔ sugandi…';
+$string['soapbox:sample_hint'] = 'A bɛ ɲɛjira sariyaw ladon sɛbɛnnikɛlan na duguma. I k\'u lajɛ ka Mara walisa k\'u baara kɛ nin yɔrɔ in na.';

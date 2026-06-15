@@ -1592,3 +1592,13 @@ $string['soapbox:untitled'] = 'Inkulumo engenasihloko';
 $string['soapbox:overall_badge'] = 'Sezizonke {$a}';
 $string['soapbox:toggle'] = 'Vula i-Soapbox kule nkambo';
 $string['soapbox:toggle_help'] = 'Abafundi bathola ikhasi elizinikele lokuqopha inkulumo futhi bathole impendulo yenkulumo enikwe amaphuzu ngesilinganiso kanye namathiphu. Umsindo nemibhalo ayikaze igcinwe. Ivaliwe ngokuzenzakalela.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Uhlobo lwesifundo / izinga lokukhuluma';
+$string['soapbox:level_help'] = 'Ilungiselela ukuqeqeshwa kwe-AI nesibonelo serubric esizenzakalelayo ngokuhlobo lwesifundo. Amazinga e-ESL athola impendulo yokufunda ulimi; inkulumo evamile igxile emakhonweni okwethula. Usengakwazi ukuhlela irubric engezansi.';
+$string['soapbox:level_general'] = 'Inkulumo evamile / ukwethula';
+$string['soapbox:level_esl_beginner'] = 'ESL (oqalayo)';
+$string['soapbox:level_esl_advanced'] = 'ESL (othuthukile)';
+$string['soapbox:edit_rubric'] = 'Hlela irubric yenkulumo';
+$string['soapbox:sample_label'] = 'Layisha isibonelo serubric';
+$string['soapbox:sample_choose'] = 'Khetha isibonelo…';
+$string['soapbox:sample_hint'] = 'Ilayisha izinhlelo zesibonelo kuhleli ongezansi. Buyekeza bese u-Save ukuze uzisebenzise kulesi sikhala.';

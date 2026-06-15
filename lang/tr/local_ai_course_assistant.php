@@ -1570,3 +1570,13 @@ $string['soapbox:untitled'] = 'Başlıksız konuşma';
 $string['soapbox:overall_badge'] = 'Genel {$a}';
 $string['soapbox:toggle'] = 'Bu kurs için Soapbox\'ı etkinleştir';
 $string['soapbox:toggle_help'] = 'Öğrenciler, bir konuşma kaydetmek ve ipuçlarıyla birlikte ölçüte göre puanlanmış konuşma geri bildirimi almak için özel bir sayfaya kavuşur. Ses ve yazıya dökümler asla saklanmaz. Varsayılan olarak kapalı.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kurs türü / konuşma seviyesi';
+$string['soapbox:level_help'] = 'Yapay zekâ koçluğunu ve varsayılan örnek değerlendirme ölçütünü kurs türüne göre uyarlar. ESL seviyeleri dil öğrenimi geri bildirimi alır; Genel konuşma ise sunum becerilerine odaklanır. Aşağıdaki değerlendirme ölçütünü yine de düzenleyebilirsiniz.';
+$string['soapbox:level_general'] = 'Genel konuşma / sunum';
+$string['soapbox:level_esl_beginner'] = 'ESL (başlangıç)';
+$string['soapbox:level_esl_advanced'] = 'ESL (ileri)';
+$string['soapbox:edit_rubric'] = 'Konuşma değerlendirme ölçütünü düzenle';
+$string['soapbox:sample_label'] = 'Örnek değerlendirme ölçütü yükle';
+$string['soapbox:sample_choose'] = 'Bir örnek seçin…';
+$string['soapbox:sample_hint'] = 'Aşağıdaki düzenleyiciye örnek ölçütler yükler. Bu kapsama uygulamak için Gözden geçirin ve Kaydedin.';

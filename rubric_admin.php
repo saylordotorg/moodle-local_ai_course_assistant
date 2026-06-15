@@ -126,6 +126,19 @@ $rubric = rubric_manager::get_rubric($courseid, $type);
 $is_inherited = ($rubric && (int) $rubric->courseid !== $courseid && $courseid > 0);
 $criteria = $rubric ? $rubric->criteria : rubric_manager::get_default_criteria($type);
 
+// v6.7.0: Soapbox sample-rubric loader. ?preset=<level> seeds the editor with a
+// built-in sample (General Speech / ESL beginner / ESL advanced) which the admin
+// then reviews and Saves to apply to this scope. Editor-only; nothing is written
+// until Save. Only valid for the speech type.
+$loadedpreset = '';
+if ($type === rubric_manager::TYPE_SPEECH) {
+    $presetparam = optional_param('preset', '', PARAM_ALPHANUMEXT);
+    if ($presetparam !== '' && array_key_exists($presetparam, rubric_manager::speech_presets())) {
+        $criteria = rubric_manager::speech_preset($presetparam)['criteria'];
+        $loadedpreset = $presetparam;
+    }
+}
+
 // Get list of courses for the scope selector.
 $courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname FROM {course} c WHERE c.id > 1 AND c.visible = 1 ORDER BY c.fullname ASC"
@@ -233,6 +246,27 @@ echo $OUTPUT->header();
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['courseid' => $courseid, 'type' => 'speech']))->out(); ?>"
            class="<?php echo $type === 'speech' ? 'active' : ''; ?>">Soapbox Speech</a>
     </div>
+
+    <?php if ($type === 'speech'): ?>
+    <!-- Soapbox sample-rubric loader (v6.7.0) -->
+    <div class="card mb-3"><div class="card-body" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="aica-rb-sample" style="font-weight:600;margin:0;white-space:nowrap">
+            <?php echo get_string('soapbox:sample_label', 'local_ai_course_assistant'); ?>
+        </label>
+        <select id="aica-rb-sample" class="form-control form-control-sm" style="max-width:280px"
+                onchange="if(this.value){window.location=this.value;}">
+            <option value=""><?php echo get_string('soapbox:sample_choose', 'local_ai_course_assistant'); ?></option>
+            <?php foreach (rubric_manager::speech_presets() as $lvkey => $lvdef) {
+                $url = (new moodle_url('/local/ai_course_assistant/rubric_admin.php',
+                    ['courseid' => $courseid, 'type' => 'speech', 'preset' => $lvkey]))->out(false); ?>
+            <option value="<?php echo s($url); ?>"<?php echo $loadedpreset === $lvkey ? ' selected' : ''; ?>>
+                <?php echo get_string($lvdef['label_key'], 'local_ai_course_assistant'); ?>
+            </option>
+            <?php } ?>
+        </select>
+        <small class="text-muted"><?php echo get_string('soapbox:sample_hint', 'local_ai_course_assistant'); ?></small>
+    </div></div>
+    <?php endif; ?>
 
     <?php if ($is_inherited): ?>
     <div class="aica-rb-inherited-badge">

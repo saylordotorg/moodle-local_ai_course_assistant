@@ -34,7 +34,12 @@ class rubric_manager {
     /** @var string Rubric/session type for Soapbox speech practice. */
     const TYPE_SPEECH = 'speech';
 
-    /** @var array Default Soapbox speech rubric criteria (graded class speech). */
+    /** @var string Soapbox course-type/level presets (drive both the default rubric and the coaching register). */
+    const SPEECH_LEVEL_GENERAL = 'general';
+    const SPEECH_LEVEL_ESL_BEGINNER = 'esl_beginner';
+    const SPEECH_LEVEL_ESL_ADVANCED = 'esl_advanced';
+
+    /** @var array Default Soapbox speech rubric criteria (general speech / presentation course). */
     const DEFAULT_SPEECH_CRITERIA = [
         ['name' => 'Delivery & Fluency', 'description' => 'Pace, clarity, confidence, and smoothness of speaking.', 'max_score' => 5],
         ['name' => 'Structure & Organization', 'description' => 'Clear opening, logical flow of ideas, and a strong close.', 'max_score' => 5],
@@ -332,6 +337,66 @@ class rubric_manager {
             return self::DEFAULT_SPEECH_CRITERIA;
         }
         return self::DEFAULT_CONVERSATION_CRITERIA;
+    }
+
+    /**
+     * Soapbox course-type/level presets. Each preset bundles a sample rubric
+     * (criteria) with a coaching `hint` injected into the scoring prompt so the
+     * AI adapts its register: ESL levels get language-learning feedback, while
+     * General Speech focuses on presentation skills. Used as the fallback rubric
+     * when a course has no custom speech rubric, and offered as loadable samples
+     * on the rubric admin page. Criteria text is English seed data (admins edit
+     * it on rubric_admin.php); the `label` is shown in UI pickers.
+     *
+     * @return array<string, array{label_key:string, hint:string, criteria:array}>
+     */
+    public static function speech_presets(): array {
+        return [
+            self::SPEECH_LEVEL_GENERAL => [
+                'label_key' => 'soapbox:level_general',
+                'hint' => 'The learner is practising a general spoken presentation; focus your feedback on '
+                    . 'presentation and public-speaking skills.',
+                'criteria' => self::DEFAULT_SPEECH_CRITERIA,
+            ],
+            self::SPEECH_LEVEL_ESL_BEGINNER => [
+                'label_key' => 'soapbox:level_esl_beginner',
+                'hint' => 'The learner is a beginner-level English-as-a-second-language student. Prioritise '
+                    . 'intelligibility and communication over native-like accuracy. Use simple, clear language in '
+                    . 'your feedback, warmly praise successful communication, and give one small, concrete '
+                    . 'improvement per criterion. Do not penalise a noticeable accent.',
+                'criteria' => [
+                    ['name' => 'Pronunciation & Intelligibility', 'description' => 'Sounds, word stress, and being understood by a patient listener.', 'max_score' => 5],
+                    ['name' => 'Fluency & Pace', 'description' => 'Speaking in connected phrases without long pauses or heavy hesitation.', 'max_score' => 5],
+                    ['name' => 'Basic Grammar', 'description' => 'Simple tenses, subject-verb agreement, and word order.', 'max_score' => 5],
+                    ['name' => 'Core Vocabulary', 'description' => 'Using common, topic-relevant words and getting meaning across despite gaps.', 'max_score' => 5],
+                    ['name' => 'Task Completion', 'description' => 'Staying on topic and saying enough on the prompt to be understood.', 'max_score' => 5],
+                ],
+            ],
+            self::SPEECH_LEVEL_ESL_ADVANCED => [
+                'label_key' => 'soapbox:level_esl_advanced',
+                'hint' => 'The learner is an advanced English-as-a-second-language student. Hold them to a high '
+                    . 'standard of fluency, range, and accuracy while staying encouraging. Note subtle errors in '
+                    . 'idiom, register, and complex grammar, and push for more natural, native-like phrasing.',
+                'criteria' => [
+                    ['name' => 'Fluency & Naturalness', 'description' => 'Smooth pace, natural rhythm, and self-correction that does not disrupt flow.', 'max_score' => 5],
+                    ['name' => 'Pronunciation & Stress', 'description' => 'Clear sounds plus sentence stress and intonation that carry meaning.', 'max_score' => 5],
+                    ['name' => 'Grammatical Range & Accuracy', 'description' => 'Varied, complex structures used accurately.', 'max_score' => 5],
+                    ['name' => 'Vocabulary & Idiom', 'description' => 'Precise, varied, idiomatic word choice and appropriate register.', 'max_score' => 5],
+                    ['name' => 'Coherence & Development', 'description' => 'Well-organized ideas with connectors and full development.', 'max_score' => 5],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Resolve a single Soapbox preset by level key, falling back to General.
+     *
+     * @param string $level One of the SPEECH_LEVEL_* constants.
+     * @return array{label_key:string, hint:string, criteria:array}
+     */
+    public static function speech_preset(string $level): array {
+        $presets = self::speech_presets();
+        return $presets[$level] ?? $presets[self::SPEECH_LEVEL_GENERAL];
     }
 
     /**

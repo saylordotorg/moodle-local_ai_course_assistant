@@ -1583,3 +1583,14 @@ $string['soapbox:untitled'] = 'Discurso sin título';
 $string['soapbox:overall_badge'] = 'General {$a}';
 $string['soapbox:toggle'] = 'Habilitar Soapbox para este curso';
 $string['soapbox:toggle_help'] = 'Los estudiantes obtienen una página dedicada para grabar un discurso y recibir comentarios de oratoria calificados con rúbrica junto con consejos. El audio y las transcripciones nunca se almacenan. Desactivado de forma predeterminada.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Tipo de curso / nivel de oratoria';
+$string['soapbox:level_help'] = 'Adapta el asesoramiento de la IA y la rúbrica de muestra predeterminada al tipo de curso. Los niveles de ESL reciben comentarios de aprendizaje de idiomas; el discurso general se centra en las habilidades de presentación. Aún puedes editar la rúbrica a continuación.';
+$string['soapbox:level_general'] = 'Discurso general / presentación';
+$string['soapbox:level_esl_beginner'] = 'ESL (principiante)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avanzado)';
+$string['soapbox:edit_rubric'] = 'Editar rúbrica de oratoria';
+$string['soapbox:sample_label'] = 'Cargar una rúbrica de muestra';
+$string['soapbox:sample_choose'] = 'Elige una muestra…';
+$string['soapbox:sample_hint'] = 'Carga criterios de muestra en el editor de abajo. Revisa y guarda para aplicarlos a este ámbito.';

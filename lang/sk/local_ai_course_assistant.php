@@ -1556,3 +1556,13 @@ $string['soapbox:untitled'] = 'Prejav bez názvu';
 $string['soapbox:overall_badge'] = 'Celkovo {$a}';
 $string['soapbox:toggle'] = 'Povoliť Soapbox pre tento kurz';
 $string['soapbox:toggle_help'] = 'Študenti dostanú samostatnú stránku na nahranie prejavu a získanie rečníckej spätnej väzby ohodnotenej podľa kritérií s radami. Zvuk a prepisy sa nikdy neukladajú. Predvolene vypnuté.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Typ kurzu / úroveň prejavu';
+$string['soapbox:level_help'] = 'Prispôsobuje koučing AI a predvolenú vzorovú hodnotiacu schému typu kurzu. Úrovne ESL získavajú spätnú väzbu na učenie sa jazyka; všeobecný prejav sa zameriava na prezentačné zručnosti. Hodnotiacu schému nižšie môžete naďalej upravovať.';
+$string['soapbox:level_general'] = 'Všeobecný prejav / prezentácia';
+$string['soapbox:level_esl_beginner'] = 'ESL (začiatočník)';
+$string['soapbox:level_esl_advanced'] = 'ESL (pokročilý)';
+$string['soapbox:edit_rubric'] = 'Upraviť hodnotiacu schému prejavu';
+$string['soapbox:sample_label'] = 'Načítať vzorovú hodnotiacu schému';
+$string['soapbox:sample_choose'] = 'Vyberte vzor…';
+$string['soapbox:sample_hint'] = 'Načíta vzorové kritériá do editora nižšie. Skontrolujte ich a uložte, aby ste ich použili na tento rozsah.';

@@ -1586,3 +1586,14 @@ $string['soapbox:untitled'] = 'Jawabi mara suna';
 $string['soapbox:overall_badge'] = 'Gaba ɗaya {$a}';
 $string['soapbox:toggle'] = 'Kunna Soapbox don wannan darasin';
 $string['soapbox:toggle_help'] = 'Masu koyo suna samun shafi na musamman don yin rikodin jawabi da karɓar ra\'ayin magana da aka ba maki bisa ma\'auni tare da shawarwari. Ba a taɓa adana sauti da rubutattun jawabai ba. A kashe ta tsohuwa.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Nau\'in kwas / matakin magana';
+$string['soapbox:level_help'] = 'Yana daidaita koyarwar AI da ma\'aunin samfuri na asali bisa ga nau\'in kwas. Matakan ESL suna samun ra\'ayoyin koyon harshe; magana ta gama-gari tana mai da hankali kan kwarewar gabatarwa. Har yanzu kana iya gyara ma\'aunin a kasa.';
+$string['soapbox:level_general'] = 'Magana ta gama-gari / gabatarwa';
+$string['soapbox:level_esl_beginner'] = 'ESL (mafari)';
+$string['soapbox:level_esl_advanced'] = 'ESL (gwani)';
+$string['soapbox:edit_rubric'] = 'Gyara ma\'aunin magana';
+$string['soapbox:sample_label'] = 'Loda samfurin ma\'auni';
+$string['soapbox:sample_choose'] = 'Zabi samfuri…';
+$string['soapbox:sample_hint'] = 'Yana lodawa ma\'aunin samfuri cikin editan da ke kasa. Duba sannan ka Ajiye don amfani da su a wannan iyaka.';

@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'Tale uden titel';
 $string['soapbox:overall_badge'] = 'Samlet {$a}';
 $string['soapbox:toggle'] = 'Aktivér Soapbox for dette kursus';
 $string['soapbox:toggle_help'] = 'De studerende får en dedikeret side til at optage en tale og modtage rubrikvurderet talefeedback med tips. Lyd og udskrifter gemmes aldrig. Slået fra som standard.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kursustype / taleniveau';
+$string['soapbox:level_help'] = 'Tilpasser AI-coachingen og standardprøverubrikken til kursustypen. ESL-niveauer får feedback om sprogindlæring; generel tale fokuserer på præsentationsfærdigheder. Du kan stadig redigere rubrikken nedenfor.';
+$string['soapbox:level_general'] = 'Generel tale / præsentation';
+$string['soapbox:level_esl_beginner'] = 'ESL (begynder)';
+$string['soapbox:level_esl_advanced'] = 'ESL (øvet)';
+$string['soapbox:edit_rubric'] = 'Rediger talerubrik';
+$string['soapbox:sample_label'] = 'Indlæs en prøverubrik';
+$string['soapbox:sample_choose'] = 'Vælg en prøve…';
+$string['soapbox:sample_hint'] = 'Indlæser prøvekriterier i editoren nedenfor. Gennemgå og gem for at anvende dem på dette område.';

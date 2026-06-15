@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'Rede ohne Titel';
 $string['soapbox:overall_badge'] = 'Gesamt {$a}';
 $string['soapbox:toggle'] = 'Soapbox für diesen Kurs aktivieren';
 $string['soapbox:toggle_help'] = 'Lernende erhalten eine eigene Seite, um eine Rede aufzunehmen und rasterbewertetes Redefeedback mit Tipps zu erhalten. Audio und Transkripte werden niemals gespeichert. Standardmäßig deaktiviert.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kursart / Sprechniveau';
+$string['soapbox:level_help'] = 'Passt das KI-Coaching und die standardmäßige Beispielbewertung an die Art des Kurses an. ESL-Niveaus erhalten Feedback zum Sprachenlernen; allgemeine Rede konzentriert sich auf Präsentationsfähigkeiten. Sie können die Bewertung unten weiterhin bearbeiten.';
+$string['soapbox:level_general'] = 'Allgemeine Rede / Präsentation';
+$string['soapbox:level_esl_beginner'] = 'ESL (Anfänger)';
+$string['soapbox:level_esl_advanced'] = 'ESL (Fortgeschrittene)';
+$string['soapbox:edit_rubric'] = 'Redebewertung bearbeiten';
+$string['soapbox:sample_label'] = 'Beispielbewertung laden';
+$string['soapbox:sample_choose'] = 'Beispiel auswählen…';
+$string['soapbox:sample_hint'] = 'Lädt Beispielkriterien in den Editor unten. Überprüfen und speichern Sie, um sie auf diesen Bereich anzuwenden.';

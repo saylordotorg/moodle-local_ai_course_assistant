@@ -1593,3 +1593,13 @@ $string['soapbox:untitled'] = 'Hotuba isiyo na jina';
 $string['soapbox:overall_badge'] = 'Kwa ujumla {$a}';
 $string['soapbox:toggle'] = 'Washa Soapbox kwa kozi hii';
 $string['soapbox:toggle_help'] = 'Wanafunzi hupata ukurasa maalumu wa kurekodi hotuba na kupokea maoni ya kuongea yaliyopimwa kwa kigezo pamoja na vidokezo. Sauti na nakala za maandishi kamwe havihifadhiwi. Kimezimwa kwa chaguomsingi.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Aina ya kozi / kiwango cha kuzungumza';
+$string['soapbox:level_help'] = 'Hubadilisha ukocha wa AI na sampuli ya rubriki chaguo-msingi kulingana na aina ya kozi. Viwango vya ESL hupata maoni ya kujifunza lugha; hotuba ya jumla huzingatia ujuzi wa uwasilishaji. Bado unaweza kuhariri rubriki iliyo hapa chini.';
+$string['soapbox:level_general'] = 'Hotuba ya jumla / uwasilishaji';
+$string['soapbox:level_esl_beginner'] = 'ESL (anayeanza)';
+$string['soapbox:level_esl_advanced'] = 'ESL (wa hali ya juu)';
+$string['soapbox:edit_rubric'] = 'Hariri rubriki ya hotuba';
+$string['soapbox:sample_label'] = 'Pakia sampuli ya rubriki';
+$string['soapbox:sample_choose'] = 'Chagua sampuli…';
+$string['soapbox:sample_hint'] = 'Hupakia vigezo vya sampuli kwenye kihariri kilicho hapa chini. Kagua na uhifadhi ili kuvitumia kwenye eneo hili.';

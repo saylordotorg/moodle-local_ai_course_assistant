@@ -1586,3 +1586,13 @@ $string['soapbox:untitled'] = 'शीर्षकविहीन भाषण';
 $string['soapbox:overall_badge'] = 'समग्र {$a}';
 $string['soapbox:toggle'] = 'यो कोर्सका लागि Soapbox सक्रिय गर्नुहोस्';
 $string['soapbox:toggle_help'] = 'सिकारुहरूले भाषण रेकर्ड गर्न र सुझावसहित रुब्रिक-अंकित बोल्ने प्रतिक्रिया प्राप्त गर्न एउटा समर्पित पृष्ठ पाउँछन्। अडियो र ट्रान्सक्रिप्ट कहिल्यै भण्डारण गरिँदैन। पूर्वनिर्धारित रूपमा निष्क्रिय।';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'कोर्सको प्रकार / बोल्ने स्तर';
+$string['soapbox:level_help'] = 'AI कोचिङ र पूर्वनिर्धारित नमुना रुब्रिकलाई कोर्सको प्रकारअनुसार मिलाउँछ। ESL स्तरहरूले भाषा-सिकाइ प्रतिक्रिया पाउँछन्; सामान्य भाषणले प्रस्तुतीकरण सीपमा केन्द्रित हुन्छ। तपाईं तल रुब्रिक सम्पादन गर्न सक्नुहुन्छ।';
+$string['soapbox:level_general'] = 'सामान्य भाषण / प्रस्तुतीकरण';
+$string['soapbox:level_esl_beginner'] = 'ESL (सुरुवाती)';
+$string['soapbox:level_esl_advanced'] = 'ESL (उन्नत)';
+$string['soapbox:edit_rubric'] = 'भाषण रुब्रिक सम्पादन गर्नुहोस्';
+$string['soapbox:sample_label'] = 'नमुना रुब्रिक लोड गर्नुहोस्';
+$string['soapbox:sample_choose'] = 'एउटा नमुना छान्नुहोस्…';
+$string['soapbox:sample_hint'] = 'तलको सम्पादकमा नमुना मापदण्ड लोड गर्छ। यो दायरामा लागू गर्न समीक्षा गर्नुहोस् र सेभ गर्नुहोस्।';

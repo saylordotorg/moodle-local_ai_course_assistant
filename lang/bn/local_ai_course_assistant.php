@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'শিরোনামহীন বক্তৃত
 $string['soapbox:overall_badge'] = 'সামগ্রিক {$a}';
 $string['soapbox:toggle'] = 'এই কোর্সের জন্য Soapbox সক্রিয় করুন';
 $string['soapbox:toggle_help'] = 'শিক্ষার্থীরা একটি বক্তৃতা রেকর্ড করতে এবং পরামর্শসহ রুব্রিক-স্কোর করা বক্তৃতা প্রতিক্রিয়া পেতে একটি নিবেদিত পৃষ্ঠা পায়। অডিও এবং প্রতিলিপি কখনও সংরক্ষণ করা হয় না। ডিফল্টরূপে বন্ধ।';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'কোর্সের ধরন / বলার স্তর';
+$string['soapbox:level_help'] = 'কোর্সের ধরন অনুযায়ী AI কোচিং এবং ডিফল্ট নমুনা রুব্রিক সাজিয়ে দেয়। ESL স্তরগুলো ভাষা-শেখার ফিডব্যাক পায়; সাধারণ বক্তৃতা উপস্থাপন দক্ষতার উপর মনোযোগ দেয়। আপনি এখনও নিচের রুব্রিক সম্পাদনা করতে পারেন।';
+$string['soapbox:level_general'] = 'সাধারণ বক্তৃতা / উপস্থাপন';
+$string['soapbox:level_esl_beginner'] = 'ESL (প্রাথমিক)';
+$string['soapbox:level_esl_advanced'] = 'ESL (উন্নত)';
+$string['soapbox:edit_rubric'] = 'বক্তৃতা রুব্রিক সম্পাদনা করুন';
+$string['soapbox:sample_label'] = 'একটি নমুনা রুব্রিক লোড করুন';
+$string['soapbox:sample_choose'] = 'একটি নমুনা বেছে নিন…';
+$string['soapbox:sample_hint'] = 'নিচের সম্পাদকে নমুনা মানদণ্ড লোড করে। এই পরিসরে প্রয়োগ করতে পর্যালোচনা করে সংরক্ষণ করুন।';

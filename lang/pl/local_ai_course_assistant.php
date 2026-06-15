@@ -1556,3 +1556,13 @@ $string['soapbox:untitled'] = 'Przemówienie bez tytułu';
 $string['soapbox:overall_badge'] = 'Ogółem {$a}';
 $string['soapbox:toggle'] = 'Włącz Soapbox dla tego kursu';
 $string['soapbox:toggle_help'] = 'Uczący się otrzymują dedykowaną stronę do nagrania przemówienia i uzyskania ocenianej według rubryki informacji zwrotnej dotyczącej wystąpienia wraz ze wskazówkami. Nagrania i transkrypcje nigdy nie są przechowywane. Domyślnie wyłączone.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Typ kursu / poziom wystąpień';
+$string['soapbox:level_help'] = 'Dostosowuje coaching AI oraz domyślną przykładową rubrykę do rodzaju kursu. Poziomy ESL otrzymują informacje zwrotne dotyczące nauki języka; wystąpienia ogólne skupiają się na umiejętnościach prezentacji. Rubrykę poniżej nadal możesz edytować.';
+$string['soapbox:level_general'] = 'Wystąpienie ogólne / prezentacja';
+$string['soapbox:level_esl_beginner'] = 'ESL (początkujący)';
+$string['soapbox:level_esl_advanced'] = 'ESL (zaawansowany)';
+$string['soapbox:edit_rubric'] = 'Edytuj rubrykę wystąpienia';
+$string['soapbox:sample_label'] = 'Wczytaj przykładową rubrykę';
+$string['soapbox:sample_choose'] = 'Wybierz przykład…';
+$string['soapbox:sample_hint'] = 'Wczytuje przykładowe kryteria do edytora poniżej. Przejrzyj je i zapisz, aby zastosować je w tym zakresie.';

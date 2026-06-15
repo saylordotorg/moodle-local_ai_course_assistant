@@ -1592,3 +1592,13 @@ $string['soapbox:untitled'] = '未命名演讲';
 $string['soapbox:overall_badge'] = '总体 {$a}';
 $string['soapbox:toggle'] = '为本课程启用 Soapbox';
 $string['soapbox:toggle_help'] = '学习者将获得一个专属页面来录制演讲，并获得按评分标准打分的演讲反馈和建议。音频和文字记录绝不会被存储。默认关闭。';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = '课程类型 / 口语水平';
+$string['soapbox:level_help'] = '根据课程类型调整 AI 辅导和默认示例评分标准。ESL 等级会获得语言学习反馈；通用演讲则侧重于演示技巧。您仍可编辑下方的评分标准。';
+$string['soapbox:level_general'] = '通用演讲 / 演示';
+$string['soapbox:level_esl_beginner'] = 'ESL（初级）';
+$string['soapbox:level_esl_advanced'] = 'ESL（高级）';
+$string['soapbox:edit_rubric'] = '编辑演讲评分标准';
+$string['soapbox:sample_label'] = '加载示例评分标准';
+$string['soapbox:sample_choose'] = '选择一个示例…';
+$string['soapbox:sample_hint'] = '将示例标准加载到下方的编辑器中。请审阅并保存，以将其应用于此范围。';

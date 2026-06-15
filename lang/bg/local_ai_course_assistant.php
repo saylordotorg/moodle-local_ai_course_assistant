@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'Реч без заглавие';
 $string['soapbox:overall_badge'] = 'Общо {$a}';
 $string['soapbox:toggle'] = 'Активиране на Soapbox за този курс';
 $string['soapbox:toggle_help'] = 'Учащите получават специална страница, за да запишат реч и да получат оценена по критерии обратна връзка за изказването със съвети. Аудиото и транскрипциите никога не се съхраняват. Изключено по подразбиране.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Тип на курса / ниво на говорене';
+$string['soapbox:level_help'] = 'Адаптира AI обучението и стандартната примерна рубрика спрямо вида на курса. Нивата ESL получават обратна връзка за изучаване на език; общата реч се фокусира върху презентационни умения. Все още можете да редактирате рубриката по-долу.';
+$string['soapbox:level_general'] = 'Обща реч / презентация';
+$string['soapbox:level_esl_beginner'] = 'ESL (начинаещи)';
+$string['soapbox:level_esl_advanced'] = 'ESL (напреднали)';
+$string['soapbox:edit_rubric'] = 'Редактиране на рубриката за реч';
+$string['soapbox:sample_label'] = 'Зареждане на примерна рубрика';
+$string['soapbox:sample_choose'] = 'Изберете пример…';
+$string['soapbox:sample_hint'] = 'Зарежда примерни критерии в редактора по-долу. Прегледайте и запазете, за да ги приложите към този обхват.';

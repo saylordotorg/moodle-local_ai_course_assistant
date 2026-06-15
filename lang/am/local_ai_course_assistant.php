@@ -1585,3 +1585,14 @@ $string['soapbox:untitled'] = 'ርዕስ የሌለው ንግግር';
 $string['soapbox:overall_badge'] = 'አጠቃላይ {$a}';
 $string['soapbox:toggle'] = 'Soapbox ን ለዚህ ኮርስ ያንቁ';
 $string['soapbox:toggle_help'] = 'ተማሪዎች ንግግር ለመቅዳት እና በመለኪያ የተመዘነ የንግግር ግብረመልስ ከምክሮች ጋር ለመቀበል የተወሰነ ገጽ ያገኛሉ። ድምጽ እና ግልባጮች ፈጽሞ አይቀመጡም። በነባሪ ጠፍቷል።';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'የኮርስ ዓይነት / የንግግር ደረጃ';
+$string['soapbox:level_help'] = 'የ AI አሰልጣኝነትን እና ነባሪውን የናሙና መመዘኛ ለኮርሱ ዓይነት ያስማማል። የ ESL ደረጃዎች የቋንቋ ትምህርት ግብረመልስ ያገኛሉ፤ አጠቃላይ ንግግር ግን በአቀራረብ ክህሎቶች ላይ ያተኩራል። አሁንም ከታች ያለውን መመዘኛ ማስተካከል ይችላሉ።';
+$string['soapbox:level_general'] = 'አጠቃላይ ንግግር / አቀራረብ';
+$string['soapbox:level_esl_beginner'] = 'ESL (ጀማሪ)';
+$string['soapbox:level_esl_advanced'] = 'ESL (የተራቀቀ)';
+$string['soapbox:edit_rubric'] = 'የንግግር መመዘኛ አርትዕ';
+$string['soapbox:sample_label'] = 'የናሙና መመዘኛ ጫን';
+$string['soapbox:sample_choose'] = 'ናሙና ይምረጡ…';
+$string['soapbox:sample_hint'] = 'የናሙና መስፈርቶችን ከታች ወዳለው አርታዒ ይጭናል። ይገምግሙ እና በዚህ ወሰን ላይ ለመተግበር ያስቀምጡ።';

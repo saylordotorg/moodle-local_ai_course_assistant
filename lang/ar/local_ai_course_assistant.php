@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'خطاب بلا عنوان';
 $string['soapbox:overall_badge'] = 'الإجمالي {$a}';
 $string['soapbox:toggle'] = 'تفعيل Soapbox لهذا المقرّر';
 $string['soapbox:toggle_help'] = 'يحصل المتعلّمون على صفحة مخصّصة لتسجيل خطاب وتلقّي تعليقات على الخطابة مقيّمة وفق معيار مع نصائح. لا يتم حفظ الصوت ولا النصوص المكتوبة أبدًا. معطّل افتراضيًا.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'نوع الدورة / مستوى التحدث';
+$string['soapbox:level_help'] = 'يُكيّف التوجيه بالذكاء الاصطناعي ونموذج التقييم الافتراضي بحسب نوع الدورة. تحصل مستويات ESL على ملاحظات خاصة بتعلّم اللغة؛ بينما يركّز الخطاب العام على مهارات العرض. لا يزال بإمكانك تعديل نموذج التقييم أدناه.';
+$string['soapbox:level_general'] = 'خطاب عام / عرض تقديمي';
+$string['soapbox:level_esl_beginner'] = 'ESL (مبتدئ)';
+$string['soapbox:level_esl_advanced'] = 'ESL (متقدّم)';
+$string['soapbox:edit_rubric'] = 'تعديل نموذج تقييم الخطاب';
+$string['soapbox:sample_label'] = 'تحميل نموذج تقييم جاهز';
+$string['soapbox:sample_choose'] = 'اختر نموذجًا…';
+$string['soapbox:sample_hint'] = 'يُحمّل معايير نموذجية في المحرّر أدناه. راجِعها ثم احفظ لتطبيقها على هذا النطاق.';

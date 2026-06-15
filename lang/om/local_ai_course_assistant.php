@@ -1560,3 +1560,13 @@ $string['soapbox:untitled'] = 'Haasawaa mata duree hin qabne';
 $string['soapbox:overall_badge'] = 'Waliigala {$a}';
 $string['soapbox:toggle'] = 'Soapbox koorsii kanaaf banuu';
 $string['soapbox:toggle_help'] = 'Barattoonni fuula addaa haasawaa waraabuu fi yaada haasawaa ulaagaadhaan madaalame qajeelfama waliin argachuuf ni argatu. Sagaleen fi barreeffamni gonkumaa hin kuufamu. Durtiidhaan cufaa.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Gosa koorsii / sadarkaa haasawaa';
+$string['soapbox:level_help'] = 'Qajeelfama AI fi ruubrikii fakkeenyaa durtii gosa koorsiitiif sirreessa. Sadarkaaleen ESL yaada barnoota afaanii argatu; haasawni waliigalaa dandeettii dhiyeessii irratti xiyyeeffata. Ammas ruubrikii gadii gulaaluu dandeessa.';
+$string['soapbox:level_general'] = 'Haasawaa / dhiyeessii waliigalaa';
+$string['soapbox:level_esl_beginner'] = 'ESL (jalqabaa)';
+$string['soapbox:level_esl_advanced'] = 'ESL (olaanaa)';
+$string['soapbox:edit_rubric'] = 'Ruubrikii haasawaa gulaali';
+$string['soapbox:sample_label'] = 'Ruubrikii fakkeenyaa fe\'i';
+$string['soapbox:sample_choose'] = 'Fakkeenya filadhu…';
+$string['soapbox:sample_hint'] = 'Ulaagaa fakkeenyaa gulaalaa gadiitti fe\'a. Hammata kanatti hojiirra oolchuuf ilaali fi olkaa\'i.';

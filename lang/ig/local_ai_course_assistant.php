@@ -1572,3 +1572,14 @@ $string['soapbox:untitled'] = 'Okwu na-enweghị aha';
 $string['soapbox:overall_badge'] = 'N\'ozuzu {$a}';
 $string['soapbox:toggle'] = 'Kwe ka Soapbox rụọ ọrụ maka usoro a';
 $string['soapbox:toggle_help'] = 'Ndị mmụta na-enweta ibe akwadoro iji dekọọ okwu ma nweta nzaghachi okwu enyere akara site na usoro nyocha tinyere ndụmọdụ. A naghị echekwa ọdịyo na ihe ederede mbubata mgbe ọ bụla. Gbanyụrụ site na ndabara.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Ụdị ọmụmụ / ọkwa okwu';
+$string['soapbox:level_help'] = 'Na-emepụta nkuzi AI na rubric ihe nlereanya ndabara dabere n\'ụdị ọmụmụ. Ọkwa ESL na-enweta nzaghachi mmụta asụsụ; okwu izugbe na-elekwasị anya na nkà ngosi. Ị ka nwere ike idezi rubric n\'okpuru.';
+$string['soapbox:level_general'] = 'Okwu izugbe / ngosi';
+$string['soapbox:level_esl_beginner'] = 'ESL (mbido)';
+$string['soapbox:level_esl_advanced'] = 'ESL (ọkachamara)';
+$string['soapbox:edit_rubric'] = 'Dezie rubric okwu';
+$string['soapbox:sample_label'] = 'Bulite rubric ihe nlereanya';
+$string['soapbox:sample_choose'] = 'Họrọ ihe nlereanya…';
+$string['soapbox:sample_hint'] = 'Na-ebulite ụkpụrụ ihe nlereanya n\'ime onye nchịkọta n\'okpuru. Lelee ma Chekwaa iji tinye ha na oghere a.';

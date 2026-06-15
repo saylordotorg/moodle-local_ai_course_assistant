@@ -1574,3 +1574,13 @@ $string['soapbox:untitled'] = 'Khudbad aan magac lahayn';
 $string['soapbox:overall_badge'] = 'Guud ahaan {$a}';
 $string['soapbox:toggle'] = 'U fur Soapbox koorsadan';
 $string['soapbox:toggle_help'] = 'Ardaydu waxay helaan bog gaar ah oo ay ku duubaan khudbad oo ay ku helaan jawaab-celin hadal oo lagu qiimeeyay qiyaas-hage oo talooyin leh. Codka iyo qoraal-rogista waligood lama keydiyo. Si caadi ah waa damin.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Nooca koorsada / heerka hadalka';
+$string['soapbox:level_help'] = 'Waxay u habaysaa tababarka AI iyo tusaalaha qiimaynta caadiga ah nooca koorsada. Heerarka ESL waxay helaan jawaab-celin barashada luqadda; hadalka guud wuxuu diiradda saaraa xirfadaha soo bandhigida. Weli waad tafatiri kartaa qiimaynta hoose.';
+$string['soapbox:level_general'] = 'Hadal guud / soo bandhig';
+$string['soapbox:level_esl_beginner'] = 'ESL (bilow)';
+$string['soapbox:level_esl_advanced'] = 'ESL (heersare)';
+$string['soapbox:edit_rubric'] = 'Tafatir qiimaynta hadalka';
+$string['soapbox:sample_label'] = 'Soo rar tusaale qiimayn ah';
+$string['soapbox:sample_choose'] = 'Dooro tusaale…';
+$string['soapbox:sample_hint'] = 'Waxay shubaysaa shuruudaha tusaalaha ah tafatiraha hoose. Dib u eeg oo kaydi si aad ugu dabaqdo baaxaddan.';

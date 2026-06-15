@@ -1556,3 +1556,13 @@ $string['soapbox:untitled'] = 'Naamloze toespraak';
 $string['soapbox:overall_badge'] = 'Totaal {$a}';
 $string['soapbox:toggle'] = 'Soapbox inschakelen voor deze cursus';
 $string['soapbox:toggle_help'] = 'Cursisten krijgen een eigen pagina om een toespraak op te nemen en rubriekbeoordeelde spreekfeedback met tips te ontvangen. Audio en transcripten worden nooit opgeslagen. Standaard uit.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Cursustype / spreekniveau';
+$string['soapbox:level_help'] = 'Stemt de AI-coaching en de standaard voorbeeldrubriek af op het type cursus. ESL-niveaus krijgen feedback op taalverwerving; algemene spraak richt zich op presentatievaardigheden. Je kunt de rubriek hieronder nog steeds bewerken.';
+$string['soapbox:level_general'] = 'Algemene spraak / presentatie';
+$string['soapbox:level_esl_beginner'] = 'ESL (beginner)';
+$string['soapbox:level_esl_advanced'] = 'ESL (gevorderd)';
+$string['soapbox:edit_rubric'] = 'Spraakrubriek bewerken';
+$string['soapbox:sample_label'] = 'Een voorbeeldrubriek laden';
+$string['soapbox:sample_choose'] = 'Kies een voorbeeld…';
+$string['soapbox:sample_hint'] = 'Laadt voorbeeldcriteria in de editor hieronder. Controleer en sla op om ze op dit bereik toe te passen.';

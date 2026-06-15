@@ -1563,3 +1563,13 @@ $string['soapbox:untitled'] = '無題のスピーチ';
 $string['soapbox:overall_badge'] = '総合 {$a}';
 $string['soapbox:toggle'] = 'このコースで Soapbox を有効にする';
 $string['soapbox:toggle_help'] = '学習者はスピーチを録音し、ヒント付きでルーブリック採点されたスピーチのフィードバックを受け取る専用ページを利用できます。音声と文字起こしは一切保存されません。デフォルトではオフです。';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'コースの種類 / スピーチレベル';
+$string['soapbox:level_help'] = 'AI コーチングとデフォルトのサンプルルーブリックをコースの種類に合わせて調整します。ESL レベルでは言語学習のフィードバックが得られ、一般スピーチではプレゼンテーションスキルに焦点を当てます。下のルーブリックは引き続き編集できます。';
+$string['soapbox:level_general'] = '一般スピーチ / プレゼンテーション';
+$string['soapbox:level_esl_beginner'] = 'ESL（初級）';
+$string['soapbox:level_esl_advanced'] = 'ESL（上級）';
+$string['soapbox:edit_rubric'] = 'スピーチルーブリックを編集';
+$string['soapbox:sample_label'] = 'サンプルルーブリックを読み込む';
+$string['soapbox:sample_choose'] = 'サンプルを選択…';
+$string['soapbox:sample_hint'] = '下のエディターにサンプル基準を読み込みます。確認して保存すると、このスコープに適用されます。';

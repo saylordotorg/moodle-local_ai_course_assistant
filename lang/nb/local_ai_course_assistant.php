@@ -1563,3 +1563,13 @@ $string['soapbox:untitled'] = 'Tale uten tittel';
 $string['soapbox:overall_badge'] = 'Totalt {$a}';
 $string['soapbox:toggle'] = 'Aktiver Soapbox for dette emnet';
 $string['soapbox:toggle_help'] = 'Lærende får en egen side for å spille inn en tale og motta rubrikkvurdert taletilbakemelding med tips. Lyd og transkripsjoner lagres aldri. Av som standard.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Emnetype / talenivå';
+$string['soapbox:level_help'] = 'Tilpasser AI-veiledningen og standard eksempelrubrikk til typen emne. ESL-nivåer får tilbakemelding på språklæring; generell tale fokuserer på presentasjonsferdigheter. Du kan fortsatt redigere rubrikken nedenfor.';
+$string['soapbox:level_general'] = 'Generell tale / presentasjon';
+$string['soapbox:level_esl_beginner'] = 'ESL (nybegynner)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avansert)';
+$string['soapbox:edit_rubric'] = 'Rediger talerubrikk';
+$string['soapbox:sample_label'] = 'Last inn en eksempelrubrikk';
+$string['soapbox:sample_choose'] = 'Velg et eksempel…';
+$string['soapbox:sample_hint'] = 'Laster inn eksempelkriterier i redigeringsprogrammet nedenfor. Gå gjennom og lagre for å bruke dem på dette omfanget.';

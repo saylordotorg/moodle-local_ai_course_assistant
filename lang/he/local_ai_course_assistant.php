@@ -1599,3 +1599,14 @@ $string['soapbox:untitled'] = 'נאום ללא כותרת';
 $string['soapbox:overall_badge'] = 'כולל {$a}';
 $string['soapbox:toggle'] = 'הפעל את Soapbox עבור קורס זה';
 $string['soapbox:toggle_help'] = 'הלומדים מקבלים עמוד ייעודי להקלטת נאום ולקבלת משוב על הנאום, מנוקד לפי מחוון ומלווה בטיפים. אודיו ותמלולים לעולם אינם נשמרים. כבוי כברירת מחדל.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'סוג הקורס / רמת דיבור';
+$string['soapbox:level_help'] = 'מתאים את אימון ה-AI ואת מחוון הדוגמה המוגדר כברירת מחדל לסוג הקורס. רמות ESL מקבלות משוב ללימוד שפה; דיבור כללי מתמקד בכישורי הצגה. עדיין ניתן לערוך את המחוון למטה.';
+$string['soapbox:level_general'] = 'דיבור כללי / הצגה';
+$string['soapbox:level_esl_beginner'] = 'ESL (מתחילים)';
+$string['soapbox:level_esl_advanced'] = 'ESL (מתקדמים)';
+$string['soapbox:edit_rubric'] = 'עריכת מחוון הדיבור';
+$string['soapbox:sample_label'] = 'טעינת מחוון לדוגמה';
+$string['soapbox:sample_choose'] = 'בחר דוגמה…';
+$string['soapbox:sample_hint'] = 'טוען קריטריונים לדוגמה לעורך שלמטה. סקור ושמור כדי להחיל אותם על היקף זה.';

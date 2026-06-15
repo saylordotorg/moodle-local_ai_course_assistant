@@ -1599,3 +1599,14 @@ $string['soapbox:untitled'] = 'Cím nélküli beszéd';
 $string['soapbox:overall_badge'] = 'Összesített {$a}';
 $string['soapbox:toggle'] = 'A Soapbox engedélyezése ehhez a kurzushoz';
 $string['soapbox:toggle_help'] = 'A tanulók egy dedikált oldalt kapnak, ahol felvehetnek egy beszédet, és szempontrendszer alapján pontozott beszédvisszajelzést kapnak tippekkel. A hangfelvételeket és az átiratokat soha nem tároljuk. Alapértelmezetten kikapcsolva.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kurzustípus / beszédszint';
+$string['soapbox:level_help'] = 'A kurzus típusához igazítja az AI-coachingot és az alapértelmezett mintaértékelőt. Az ESL-szintek nyelvtanulási visszajelzést kapnak; az általános beszéd a prezentációs készségekre összpontosít. Az alábbi értékelőt továbbra is szerkesztheti.';
+$string['soapbox:level_general'] = 'Általános beszéd / prezentáció';
+$string['soapbox:level_esl_beginner'] = 'ESL (kezdő)';
+$string['soapbox:level_esl_advanced'] = 'ESL (haladó)';
+$string['soapbox:edit_rubric'] = 'Beszédértékelő szerkesztése';
+$string['soapbox:sample_label'] = 'Mintaértékelő betöltése';
+$string['soapbox:sample_choose'] = 'Válasszon mintát…';
+$string['soapbox:sample_hint'] = 'Mintakritériumokat tölt be az alábbi szerkesztőbe. Tekintse át és mentse el, hogy alkalmazza őket erre a hatókörre.';

@@ -1592,3 +1592,13 @@ $string['soapbox:untitled'] = 'Bài nói chưa đặt tên';
 $string['soapbox:overall_badge'] = 'Tổng thể {$a}';
 $string['soapbox:toggle'] = 'Bật Soapbox cho khóa học này';
 $string['soapbox:toggle_help'] = 'Người học có một trang riêng để ghi âm một bài nói và nhận phản hồi kỹ năng nói được chấm điểm theo thang đánh giá kèm lời khuyên. Âm thanh và bản ghi không bao giờ được lưu trữ. Tắt theo mặc định.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Loại khóa học / trình độ nói';
+$string['soapbox:level_help'] = 'Điều chỉnh phần huấn luyện AI và khung tiêu chí mẫu mặc định cho phù hợp với loại khóa học. Các cấp độ ESL nhận phản hồi học ngôn ngữ; phần nói tổng quát tập trung vào kỹ năng thuyết trình. Bạn vẫn có thể chỉnh sửa khung tiêu chí bên dưới.';
+$string['soapbox:level_general'] = 'Nói tổng quát / thuyết trình';
+$string['soapbox:level_esl_beginner'] = 'ESL (sơ cấp)';
+$string['soapbox:level_esl_advanced'] = 'ESL (nâng cao)';
+$string['soapbox:edit_rubric'] = 'Chỉnh sửa khung tiêu chí bài nói';
+$string['soapbox:sample_label'] = 'Tải khung tiêu chí mẫu';
+$string['soapbox:sample_choose'] = 'Chọn một mẫu…';
+$string['soapbox:sample_hint'] = 'Tải các tiêu chí mẫu vào trình chỉnh sửa bên dưới. Xem lại và Lưu để áp dụng chúng cho phạm vi này.';

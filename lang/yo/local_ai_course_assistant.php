@@ -1592,3 +1592,13 @@ $string['soapbox:untitled'] = 'Ọrọ ti ko ni akọle';
 $string['soapbox:overall_badge'] = 'Lapapọ {$a}';
 $string['soapbox:toggle'] = 'Tan Soapbox fun ẹkọ yii';
 $string['soapbox:toggle_help'] = 'Awọn akẹkọọ gba oju-iwe iyasọtọ lati gbasilẹ ọrọ kan ki wọn si gba esi ọrọ sisọ ti a fun ni ami rubric pẹlu awọn imọran. A ko fipamọ ohun afetigbọ ati iwe afọwọkọ rara. O paa nipasẹ aiyipada.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Iru iṣẹ́ ẹ̀kọ́ / ipele ọ̀rọ̀ sísọ';
+$string['soapbox:level_help'] = 'Ó ń ṣàtúnṣe ìtọ́sọ́nà AI àti àpẹẹrẹ rubric àkọ́kọ́ sí iru iṣẹ́ ẹ̀kọ́ náà. Àwọn ipele ESL máa ń gba èsì ẹ̀kọ́ èdè; ọ̀rọ̀ gbogbogbòò ń pọkàn sí ọgbọ́n ìgbéjáde. O ṣì lè ṣàtúnṣe rubric tó wà nísàlẹ̀.';
+$string['soapbox:level_general'] = 'Ọ̀rọ̀ gbogbogbòò / ìgbéjáde';
+$string['soapbox:level_esl_beginner'] = 'ESL (olùbẹ̀rẹ̀)';
+$string['soapbox:level_esl_advanced'] = 'ESL (gíga)';
+$string['soapbox:edit_rubric'] = 'Ṣàtúnṣe rubric ọ̀rọ̀ sísọ';
+$string['soapbox:sample_label'] = 'Gbé àpẹẹrẹ rubric wọlé';
+$string['soapbox:sample_choose'] = 'Yan àpẹẹrẹ kan…';
+$string['soapbox:sample_hint'] = 'Ó ń gbé àwọn àpẹẹrẹ ìlànà wọ inú olóòtú tó wà nísàlẹ̀. Ṣàyẹ̀wò kí o sì Fipamọ́ láti lò wọ́n sí ààyè yìí.';

@@ -1586,3 +1586,13 @@ $string['soapbox:untitled'] = 'Ucapan tanpa tajuk';
 $string['soapbox:overall_badge'] = 'Keseluruhan {$a}';
 $string['soapbox:toggle'] = 'Aktifkan Soapbox untuk kursus ini';
 $string['soapbox:toggle_help'] = 'Pelajar mendapat halaman khusus untuk merakam ucapan dan menerima maklum balas pertuturan yang diberi markah rubrik berserta petua. Audio dan transkrip tidak sekali-kali disimpan. Dimatikan secara lalai.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Jenis kursus / tahap pertuturan';
+$string['soapbox:level_help'] = 'Menyesuaikan bimbingan AI dan rubrik sampel lalai dengan jenis kursus. Tahap ESL menerima maklum balas pembelajaran bahasa; ucapan umum memberi tumpuan kepada kemahiran persembahan. Anda masih boleh menyunting rubrik di bawah.';
+$string['soapbox:level_general'] = 'Ucapan / persembahan umum';
+$string['soapbox:level_esl_beginner'] = 'ESL (permulaan)';
+$string['soapbox:level_esl_advanced'] = 'ESL (lanjutan)';
+$string['soapbox:edit_rubric'] = 'Sunting rubrik ucapan';
+$string['soapbox:sample_label'] = 'Muatkan rubrik sampel';
+$string['soapbox:sample_choose'] = 'Pilih sampel…';
+$string['soapbox:sample_hint'] = 'Memuatkan kriteria sampel ke dalam penyunting di bawah. Semak dan Simpan untuk menerapkannya pada skop ini.';

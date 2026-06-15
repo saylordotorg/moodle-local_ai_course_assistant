@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'Discours sans titre';
 $string['soapbox:overall_badge'] = 'Global {$a}';
 $string['soapbox:toggle'] = 'Activer Soapbox pour ce cours';
 $string['soapbox:toggle_help'] = 'Les apprenants disposent d\'une page dédiée pour enregistrer un discours et recevoir des retours sur leur prise de parole, notés selon une grille et accompagnés de conseils. L\'audio et les transcriptions ne sont jamais conservés. Désactivé par défaut.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Type de cours / niveau d\'expression orale';
+$string['soapbox:level_help'] = 'Adapte le coaching de l\'IA et la grille d\'évaluation par défaut au type de cours. Les niveaux ESL reçoivent des retours d\'apprentissage des langues ; l\'expression générale se concentre sur les compétences de présentation. Vous pouvez toujours modifier la grille ci-dessous.';
+$string['soapbox:level_general'] = 'Expression générale / présentation';
+$string['soapbox:level_esl_beginner'] = 'ESL (débutant)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avancé)';
+$string['soapbox:edit_rubric'] = 'Modifier la grille d\'évaluation';
+$string['soapbox:sample_label'] = 'Charger un exemple de grille';
+$string['soapbox:sample_choose'] = 'Choisir un exemple…';
+$string['soapbox:sample_hint'] = 'Charge des critères d\'exemple dans l\'éditeur ci-dessous. Vérifiez et enregistrez pour les appliquer à cette portée.';

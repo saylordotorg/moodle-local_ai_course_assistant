@@ -1556,3 +1556,14 @@ $string['soapbox:untitled'] = 'Nimetön puhe';
 $string['soapbox:overall_badge'] = 'Kokonaisuus {$a}';
 $string['soapbox:toggle'] = 'Ota Soapbox käyttöön tällä kurssilla';
 $string['soapbox:toggle_help'] = 'Oppijat saavat oman sivun, jolla he voivat äänittää puheen ja saada rubriikilla pisteytettyä puhepalautetta vinkkeineen. Äänitteitä ja litterointeja ei koskaan tallenneta. Pois käytöstä oletuksena.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kurssin tyyppi / puhetaso';
+$string['soapbox:level_help'] = 'Mukauttaa tekoälyn valmennuksen ja oletusarvoisen mallirubriikin kurssin tyypin mukaan. ESL-tasot saavat kielenoppimispalautetta; yleinen puhe keskittyy esitystaitoihin. Voit silti muokata alla olevaa rubriikkia.';
+$string['soapbox:level_general'] = 'Yleinen puhe / esitys';
+$string['soapbox:level_esl_beginner'] = 'ESL (alkeistaso)';
+$string['soapbox:level_esl_advanced'] = 'ESL (edistynyt)';
+$string['soapbox:edit_rubric'] = 'Muokkaa puherubriikkia';
+$string['soapbox:sample_label'] = 'Lataa mallirubriikki';
+$string['soapbox:sample_choose'] = 'Valitse malli…';
+$string['soapbox:sample_hint'] = 'Lataa mallikriteerit alla olevaan editoriin. Tarkista ja tallenna ottaaksesi ne käyttöön tässä laajuudessa.';

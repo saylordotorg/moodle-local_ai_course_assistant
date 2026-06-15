@@ -1556,3 +1556,13 @@ $string['soapbox:untitled'] = 'Namnlöst tal';
 $string['soapbox:overall_badge'] = 'Totalt {$a}';
 $string['soapbox:toggle'] = 'Aktivera Soapbox för den här kursen';
 $string['soapbox:toggle_help'] = 'Inlärningsdeltagare får en egen sida för att spela in ett tal och få rubrikbetygsatt talåterkoppling med tips. Ljud och transkriptioner lagras aldrig. Avstängt som standard.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kurstyp / talnivå';
+$string['soapbox:level_help'] = 'Anpassar AI-coachningen och standardmallen för bedömningsmatrisen efter typen av kurs. ESL-nivåer får återkoppling för språkinlärning; allmänt tal fokuserar på presentationsfärdigheter. Du kan fortfarande redigera matrisen nedan.';
+$string['soapbox:level_general'] = 'Allmänt tal / presentation';
+$string['soapbox:level_esl_beginner'] = 'ESL (nybörjare)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avancerad)';
+$string['soapbox:edit_rubric'] = 'Redigera bedömningsmatris för tal';
+$string['soapbox:sample_label'] = 'Ladda en exempelmatris';
+$string['soapbox:sample_choose'] = 'Välj ett exempel…';
+$string['soapbox:sample_hint'] = 'Laddar exempelkriterier i redigeraren nedan. Granska och spara för att tillämpa dem på detta omfång.';

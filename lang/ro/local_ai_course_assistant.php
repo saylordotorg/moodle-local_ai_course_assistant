@@ -1556,3 +1556,13 @@ $string['soapbox:untitled'] = 'Discurs fără titlu';
 $string['soapbox:overall_badge'] = 'În ansamblu {$a}';
 $string['soapbox:toggle'] = 'Activați Soapbox pentru acest curs';
 $string['soapbox:toggle_help'] = 'Cursanții primesc o pagină dedicată pentru a înregistra un discurs și a primi feedback de vorbire punctat după rubrică, cu sfaturi. Audio și transcrierile nu sunt niciodată stocate. Dezactivat implicit.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Tip de curs / nivel de vorbire';
+$string['soapbox:level_help'] = 'Adaptează coaching-ul AI și grila de evaluare implicită la tipul cursului. Nivelurile ESL primesc feedback pentru învățarea limbii; vorbirea generală se concentrează pe abilitățile de prezentare. Poți edita în continuare grila de mai jos.';
+$string['soapbox:level_general'] = 'Vorbire generală / prezentare';
+$string['soapbox:level_esl_beginner'] = 'ESL (începător)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avansat)';
+$string['soapbox:edit_rubric'] = 'Editează grila de evaluare a vorbirii';
+$string['soapbox:sample_label'] = 'Încarcă o grilă de evaluare exemplu';
+$string['soapbox:sample_choose'] = 'Alege un exemplu…';
+$string['soapbox:sample_hint'] = 'Încarcă criteriile exemplu în editorul de mai jos. Revizuiește și salvează pentru a le aplica acestui domeniu.';

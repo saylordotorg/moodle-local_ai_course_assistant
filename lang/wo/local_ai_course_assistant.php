@@ -1592,3 +1592,13 @@ $string['soapbox:untitled'] = 'Waxtaan bu amul tur';
 $string['soapbox:overall_badge'] = 'Mbooloo {$a}';
 $string['soapbox:toggle'] = 'Yóbbu Soapbox ci sàrt bii';
 $string['soapbox:toggle_help'] = 'Jàngalekat yi am nañu benn xët bu jagleel ngir enregistre benn waxtaan te jot feedback waxtaan bu am points ci rubrique ak cosaan. Xewuy waxtu ak mbind du ñu ko denc mukk. Dafa fëɓ ci kanam.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Xeeti njàng / nivoo wax';
+$string['soapbox:level_help'] = 'Dafay jëmale njàngalem AI ak misaal rubrik bi ëpp ci xeeti njàng bi. Nivoo yi ESL dañuy jot feedback ci njàngum làkk; wax gu yaatu day fokk ci xarala yu prezantasyon. Mën nga ko jubbanti rubrik bi ci suuf.';
+$string['soapbox:level_general'] = 'Wax gu yaatu / prezantasyon';
+$string['soapbox:level_esl_beginner'] = 'ESL (tàmbali)';
+$string['soapbox:level_esl_advanced'] = 'ESL (gën a yokku)';
+$string['soapbox:edit_rubric'] = 'Jubbanti rubrik wax';
+$string['soapbox:sample_label'] = 'Yebal benn misaal rubrik';
+$string['soapbox:sample_choose'] = 'Tànn benn misaal…';
+$string['soapbox:sample_hint'] = 'Day yeb misaal kriteryo yi ci editër bi ci suuf. Saytu te Denc ngir jëfandikoo leen ci wàll wii.';

@@ -1593,3 +1593,13 @@ $string['soapbox:untitled'] = 'Walang pamagat na talumpati';
 $string['soapbox:overall_badge'] = 'Pangkalahatan {$a}';
 $string['soapbox:toggle'] = 'I-enable ang Soapbox para sa kursong ito';
 $string['soapbox:toggle_help'] = 'Nakakakuha ang mga mag-aaral ng nakalaang pahina upang mag-record ng talumpati at tumanggap ng feedback sa pagsasalita na may iskor batay sa rubric kasama ang mga tip. Hindi kailanman iniimbak ang audio at mga transcript. Naka-off bilang default.';
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Uri ng kurso / antas ng pagsasalita';
+$string['soapbox:level_help'] = 'Iniaangkop ang AI coaching at ang default na sample rubric sa uri ng kurso. Ang mga antas ng ESL ay nakakatanggap ng feedback sa pag-aaral ng wika; ang General speech ay nakatuon sa mga kasanayan sa presentasyon. Maaari mo pa ring i-edit ang rubric sa ibaba.';
+$string['soapbox:level_general'] = 'Pangkalahatang talumpati / presentasyon';
+$string['soapbox:level_esl_beginner'] = 'ESL (baguhan)';
+$string['soapbox:level_esl_advanced'] = 'ESL (advanced)';
+$string['soapbox:edit_rubric'] = 'I-edit ang rubric ng talumpati';
+$string['soapbox:sample_label'] = 'Mag-load ng sample na rubric';
+$string['soapbox:sample_choose'] = 'Pumili ng sample…';
+$string['soapbox:sample_hint'] = 'Naglo-load ng sample na pamantayan sa editor sa ibaba. Suriin at I-save upang ilapat ang mga ito sa saklaw na ito.';
