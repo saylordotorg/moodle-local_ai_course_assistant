@@ -1597,3 +1597,4 @@ $string['soapbox:edit_rubric'] = 'Edit rubrik pidato';
 $string['soapbox:sample_label'] = 'Muat rubrik sampel';
 $string['soapbox:sample_choose'] = 'Pilih sampel…';
 $string['soapbox:sample_hint'] = 'Memuat kriteria sampel ke editor di bawah ini. Tinjau dan Simpan untuk menerapkannya pada cakupan ini.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (menengah)';

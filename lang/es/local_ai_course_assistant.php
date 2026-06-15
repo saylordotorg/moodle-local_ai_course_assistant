@@ -1594,3 +1594,4 @@ $string['soapbox:edit_rubric'] = 'Editar rúbrica de oratoria';
 $string['soapbox:sample_label'] = 'Cargar una rúbrica de muestra';
 $string['soapbox:sample_choose'] = 'Elige una muestra…';
 $string['soapbox:sample_hint'] = 'Carga criterios de muestra en el editor de abajo. Revisa y guarda para aplicarlos a este ámbito.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermedio)';

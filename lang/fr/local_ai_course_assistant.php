@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'Modifier la grille d\'évaluation';
 $string['soapbox:sample_label'] = 'Charger un exemple de grille';
 $string['soapbox:sample_choose'] = 'Choisir un exemple…';
 $string['soapbox:sample_hint'] = 'Charge des critères d\'exemple dans l\'éditeur ci-dessous. Vérifiez et enregistrez pour les appliquer à cette portée.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermédiaire)';

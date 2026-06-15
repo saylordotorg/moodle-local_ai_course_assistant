@@ -1589,3 +1589,4 @@ $string['soapbox:edit_rubric'] = 'Editar rubrica de fala';
 $string['soapbox:sample_label'] = 'Carregar uma rubrica de exemplo';
 $string['soapbox:sample_choose'] = 'Escolha um exemplo…';
 $string['soapbox:sample_hint'] = 'Carrega os critérios de exemplo no editor abaixo. Revise e salve para aplicá-los a este escopo.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermediário)';

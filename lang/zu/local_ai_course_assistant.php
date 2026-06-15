@@ -1602,3 +1602,4 @@ $string['soapbox:edit_rubric'] = 'Hlela irubric yenkulumo';
 $string['soapbox:sample_label'] = 'Layisha isibonelo serubric';
 $string['soapbox:sample_choose'] = 'Khetha isibonelo…';
 $string['soapbox:sample_hint'] = 'Ilayisha izinhlelo zesibonelo kuhleli ongezansi. Buyekeza bese u-Save ukuze uzisebenzise kulesi sikhala.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (maphakathi)';

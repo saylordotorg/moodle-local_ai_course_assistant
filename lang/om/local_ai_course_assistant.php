@@ -1570,3 +1570,4 @@ $string['soapbox:edit_rubric'] = 'Ruubrikii haasawaa gulaali';
 $string['soapbox:sample_label'] = 'Ruubrikii fakkeenyaa fe\'i';
 $string['soapbox:sample_choose'] = 'Fakkeenya filadhu…';
 $string['soapbox:sample_hint'] = 'Ulaagaa fakkeenyaa gulaalaa gadiitti fe\'a. Hammata kanatti hojiirra oolchuuf ilaali fi olkaa\'i.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (giddu-galeessa)';

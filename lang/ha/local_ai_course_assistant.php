@@ -1597,3 +1597,4 @@ $string['soapbox:edit_rubric'] = 'Gyara ma\'aunin magana';
 $string['soapbox:sample_label'] = 'Loda samfurin ma\'auni';
 $string['soapbox:sample_choose'] = 'Zabi samfuri…';
 $string['soapbox:sample_hint'] = 'Yana lodawa ma\'aunin samfuri cikin editan da ke kasa. Duba sannan ka Ajiye don amfani da su a wannan iyaka.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (matsakaici)';

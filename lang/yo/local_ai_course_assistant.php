@@ -1602,3 +1602,4 @@ $string['soapbox:edit_rubric'] = 'Ṣàtúnṣe rubric ọ̀rọ̀ sísọ';
 $string['soapbox:sample_label'] = 'Gbé àpẹẹrẹ rubric wọlé';
 $string['soapbox:sample_choose'] = 'Yan àpẹẹrẹ kan…';
 $string['soapbox:sample_hint'] = 'Ó ń gbé àwọn àpẹẹrẹ ìlànà wọ inú olóòtú tó wà nísàlẹ̀. Ṣàyẹ̀wò kí o sì Fipamọ́ láti lò wọ́n sí ààyè yìí.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (àárín)';

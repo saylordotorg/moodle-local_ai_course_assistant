@@ -1580,3 +1580,4 @@ $string['soapbox:edit_rubric'] = 'Konuşma değerlendirme ölçütünü düzenle
 $string['soapbox:sample_label'] = 'Örnek değerlendirme ölçütü yükle';
 $string['soapbox:sample_choose'] = 'Bir örnek seçin…';
 $string['soapbox:sample_hint'] = 'Aşağıdaki düzenleyiciye örnek ölçütler yükler. Bu kapsama uygulamak için Gözden geçirin ve Kaydedin.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (orta)';

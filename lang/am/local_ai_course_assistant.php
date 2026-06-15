@@ -1596,3 +1596,4 @@ $string['soapbox:edit_rubric'] = 'የንግግር መመዘኛ አርትዕ';
 $string['soapbox:sample_label'] = 'የናሙና መመዘኛ ጫን';
 $string['soapbox:sample_choose'] = 'ናሙና ይምረጡ…';
 $string['soapbox:sample_hint'] = 'የናሙና መስፈርቶችን ከታች ወዳለው አርታዒ ይጭናል። ይገምግሙ እና በዚህ ወሰን ላይ ለመተግበር ያስቀምጡ።';
+$string['soapbox:level_esl_intermediate'] = 'ESL (መካከለኛ)';

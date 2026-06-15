@@ -1581,6 +1581,7 @@ $string['soapbox:level_label']      = 'Course type / speaking level';
 $string['soapbox:level_help']       = 'Tailors the AI coaching and the default sample rubric to the kind of course. ESL levels get language-learning feedback; General speech focuses on presentation skills. You can still edit the rubric below.';
 $string['soapbox:level_general']    = 'General speech / presentation';
 $string['soapbox:level_esl_beginner'] = 'ESL (beginner)';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermediate)';
 $string['soapbox:level_esl_advanced'] = 'ESL (advanced)';
 $string['soapbox:edit_rubric']      = 'Edit speech rubric';
 $string['soapbox:sample_label']     = 'Load a sample rubric';

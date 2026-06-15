@@ -1617,3 +1617,4 @@ $string['soapbox:edit_rubric'] = 'Modifica la rubrica del discorso';
 $string['soapbox:sample_label'] = 'Carica una rubrica di esempio';
 $string['soapbox:sample_choose'] = 'Scegli un esempio…';
 $string['soapbox:sample_hint'] = 'Carica criteri di esempio nell\'editor qui sotto. Rivedi e salva per applicarli a questo ambito.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (intermedio)';

@@ -1567,3 +1567,4 @@ $string['soapbox:edit_rubric'] = 'Upravit hodnoticí tabulku projevu';
 $string['soapbox:sample_label'] = 'Načíst vzorovou hodnoticí tabulku';
 $string['soapbox:sample_choose'] = 'Vyberte vzor…';
 $string['soapbox:sample_hint'] = 'Načte vzorová kritéria do editoru níže. Zkontrolujte a uložte, abyste je použili na tento rozsah.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (středně pokročilý)';

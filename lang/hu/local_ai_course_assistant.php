@@ -1610,3 +1610,4 @@ $string['soapbox:edit_rubric'] = 'Beszédértékelő szerkesztése';
 $string['soapbox:sample_label'] = 'Mintaértékelő betöltése';
 $string['soapbox:sample_choose'] = 'Válasszon mintát…';
 $string['soapbox:sample_hint'] = 'Mintakritériumokat tölt be az alábbi szerkesztőbe. Tekintse át és mentse el, hogy alkalmazza őket erre a hatókörre.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (középhaladó)';

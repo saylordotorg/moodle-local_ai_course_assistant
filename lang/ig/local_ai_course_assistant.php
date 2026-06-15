@@ -1583,3 +1583,4 @@ $string['soapbox:edit_rubric'] = 'Dezie rubric okwu';
 $string['soapbox:sample_label'] = 'Bulite rubric ihe nlereanya';
 $string['soapbox:sample_choose'] = 'Họrọ ihe nlereanya…';
 $string['soapbox:sample_hint'] = 'Na-ebulite ụkpụrụ ihe nlereanya n\'ime onye nchịkọta n\'okpuru. Lelee ma Chekwaa iji tinye ha na oghere a.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (ọkara)';

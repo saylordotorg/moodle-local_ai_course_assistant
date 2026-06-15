@@ -1573,3 +1573,4 @@ $string['soapbox:edit_rubric'] = 'Rediger talerubrikk';
 $string['soapbox:sample_label'] = 'Last inn en eksempelrubrikk';
 $string['soapbox:sample_choose'] = 'Velg et eksempel…';
 $string['soapbox:sample_hint'] = 'Laster inn eksempelkriterier i redigeringsprogrammet nedenfor. Gå gjennom og lagre for å bruke dem på dette omfanget.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (mellomnivå)';

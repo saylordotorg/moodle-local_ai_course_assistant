@@ -1603,3 +1603,4 @@ $string['soapbox:edit_rubric'] = 'பேச்சு மதிப்பீட்
 $string['soapbox:sample_label'] = 'மாதிரி மதிப்பீட்டு அட்டவணையை ஏற்று';
 $string['soapbox:sample_choose'] = 'ஒரு மாதிரியைத் தேர்வுசெய்க…';
 $string['soapbox:sample_hint'] = 'கீழே உள்ள தொகுப்பானில் மாதிரி அளவுகோல்களை ஏற்றுகிறது. இந்த எல்லைக்குப் பயன்படுத்த அவற்றை மதிப்பாய்வு செய்து சேமிக்கவும்.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (இடைநிலை)';

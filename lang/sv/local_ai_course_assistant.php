@@ -1566,3 +1566,4 @@ $string['soapbox:edit_rubric'] = 'Redigera bedömningsmatris för tal';
 $string['soapbox:sample_label'] = 'Ladda en exempelmatris';
 $string['soapbox:sample_choose'] = 'Välj ett exempel…';
 $string['soapbox:sample_hint'] = 'Laddar exempelkriterier i redigeraren nedan. Granska och spara för att tillämpa dem på detta omfång.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (medel)';

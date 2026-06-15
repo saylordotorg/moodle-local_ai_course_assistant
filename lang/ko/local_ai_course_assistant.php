@@ -1573,3 +1573,4 @@ $string['soapbox:edit_rubric'] = '스피치 루브릭 편집';
 $string['soapbox:sample_label'] = '샘플 루브릭 불러오기';
 $string['soapbox:sample_choose'] = '샘플 선택…';
 $string['soapbox:sample_hint'] = '아래 편집기에 샘플 기준을 불러옵니다. 검토하고 저장하면 이 범위에 적용됩니다.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (중급)';

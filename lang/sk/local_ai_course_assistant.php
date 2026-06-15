@@ -1566,3 +1566,4 @@ $string['soapbox:edit_rubric'] = 'Upraviť hodnotiacu schému prejavu';
 $string['soapbox:sample_label'] = 'Načítať vzorovú hodnotiacu schému';
 $string['soapbox:sample_choose'] = 'Vyberte vzor…';
 $string['soapbox:sample_hint'] = 'Načíta vzorové kritériá do editora nižšie. Skontrolujte ich a uložte, aby ste ich použili na tento rozsah.';
+$string['soapbox:level_esl_intermediate'] = 'ESL (stredne pokročilý)';
