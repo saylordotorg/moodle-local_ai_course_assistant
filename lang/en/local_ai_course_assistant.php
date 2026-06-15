@@ -676,6 +676,7 @@ $string['privacy:metadata:local_ai_course_assistant_practice_scores:session_type
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:overall_score'] = 'The overall score achieved.';
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:scores'] = 'Per-criterion scores in JSON format.';
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:ai_feedback'] = 'AI-generated feedback on the practice session.';
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Optional metadata you supplied for the session, such as the name, topic, and target length of a Soapbox speech. Never includes audio or a transcript.';
 $string['privacy:metadata:local_ai_course_assistant_practice_scores:timecreated'] = 'The time the score was recorded.';
 
 // v5.3.17: privacy metadata strings for tables added in v5.0–v5.3 that
@@ -1191,6 +1192,8 @@ $string['pedagogy:code_sandbox']           = 'Python code sandbox on by default'
 $string['pedagogy:code_sandbox_desc']      = 'When on, the in-browser Python sandbox is available in every course unless the course has its own override.';
 $string['pedagogy:essay_feedback']         = 'Essay feedback on by default';
 $string['pedagogy:essay_feedback_desc']    = 'When on, AI essay feedback is available in every course unless the course has its own override.';
+$string['pedagogy:soapbox']                = 'Soapbox speech feedback on by default';
+$string['pedagogy:soapbox_desc']           = 'When on, the Soapbox speech-practice tool is available in every course unless the course has its own override. Leave off and enable it only in the courses that need it (typically speech and communication courses).';
 $string['pedagogy:talking_avatar']         = 'Talking avatar on by default';
 $string['pedagogy:talking_avatar_desc']    = 'When on, the talking-avatar surface is enabled in every course unless the course has its own override. Requires a configured provider (D-ID, HeyGen, Tavus, or Synthesia Agents) below; otherwise the widget shows a "configure a provider" notice and the avatar does not animate.';
 $string['pedagogy:crossmastery']           = 'Cross-course mastery rollup on by default';
@@ -1534,6 +1537,46 @@ $string['essay_feedback:col_score']    = 'Score';
 $string['essay_feedback:col_feedback'] = 'Feedback';
 $string['essay_feedback:toggle']       = 'Enable Essay feedback for this course';
 $string['essay_feedback:toggle_help']  = 'Learners get a dedicated page to paste a draft and receive rubric-scored feedback with revision suggestions. Off by default.';
+
+// Soapbox speech practice (v6.7.0).
+$string['settings:soapbox_stt_mode']        = 'Soapbox transcription mode';
+$string['settings:soapbox_stt_mode_desc']   = 'How Soapbox turns a recorded speech into text. Server uses the configured Whisper provider (self-hosted is free; hosted OpenAI is about USD 0.006 per minute). Browser uses the learner\'s built-in speech recognition (free, no server, works in Chrome and Safari only). Server is recommended so transcription quality does not depend on the learner\'s browser.';
+$string['settings:soapbox_stt_mode_server'] = 'Server (Whisper provider)';
+$string['settings:soapbox_stt_mode_browser']= 'Browser (free, no server)';
+$string['soapbox:title']            = 'Soapbox';
+$string['soapbox:link']             = 'Soapbox speech practice';
+$string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
+$string['soapbox:intro']            = 'Give a speech and get coaching. Optionally set a name, topic, and target length, then record yourself speaking. Soapbox transcribes your speech, scores it against a speaking rubric, and gives you concrete tips. Your audio and the transcript are never stored, only your scores and feedback.';
+$string['soapbox:optional']         = 'optional';
+$string['soapbox:name_label']       = 'Name this speech';
+$string['soapbox:topic_label']      = 'Topic';
+$string['soapbox:time_label']       = 'Target length';
+$string['soapbox:no_target']        = 'No target';
+$string['soapbox:record']           = 'Record speech';
+$string['soapbox:stop']             = 'Stop and get feedback';
+$string['soapbox:recording']        = 'Recording. Speak naturally; click stop when you finish.';
+$string['soapbox:transcribing']     = 'Transcribing your speech…';
+$string['soapbox:scoring']          = 'Scoring your speech…';
+$string['soapbox:too_short']        = 'That recording was too short to score. Aim for at least a sentence or two and try again.';
+$string['soapbox:mic_denied']       = 'Microphone access is needed to record. Allow microphone access and try again.';
+$string['soapbox:no_browser_stt']   = 'This browser does not support in-browser speech recognition. Try Chrome or Safari, or ask your administrator to switch Soapbox to server transcription.';
+$string['soapbox:browser_note']     = 'This speech is transcribed in your browser. Nothing is uploaded. Works best in Chrome and Safari.';
+$string['soapbox:server_note']      = 'Your recording is uploaded for transcription only and is not stored.';
+$string['soapbox:error']            = 'Could not score this speech right now. Try again in a moment.';
+$string['soapbox:audio_too_large']  = 'That recording is too large. Keep speeches under about 25 MB (roughly 20 minutes).';
+$string['soapbox:no_stt']           = 'No transcription provider is configured. Ask your administrator to set up Whisper or enable browser transcription.';
+$string['soapbox:result_heading']   = 'Rubric scores';
+$string['soapbox:overall_heading']  = 'Overall';
+$string['soapbox:tips_heading']     = 'Tips for next time';
+$string['soapbox:col_criterion']    = 'Criterion';
+$string['soapbox:col_score']        = 'Score';
+$string['soapbox:col_feedback']     = 'Feedback';
+$string['soapbox:history_heading']  = 'My speeches';
+$string['soapbox:history_empty']    = 'You have not recorded a speech yet. Record one above to start building your history.';
+$string['soapbox:untitled']         = 'Untitled speech';
+$string['soapbox:overall_badge']    = 'Overall {$a}';
+$string['soapbox:toggle']           = 'Enable Soapbox for this course';
+$string['soapbox:toggle_help']      = 'Learners get a dedicated page to record a speech and receive rubric-scored speaking feedback with tips. Audio and transcripts are never stored. Off by default.';
 
 // Code sandbox (v3.9.26).
 $string['sandbox:title']           = 'Python sandbox';

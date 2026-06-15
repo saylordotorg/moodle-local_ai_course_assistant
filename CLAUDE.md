@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026061015`, release `6.6.0`
+- **Current version:** `2026061500`, release `6.7.0`
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
@@ -54,6 +54,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - RAG chunk-selection debug (v6.4.1): `prompt_debug_enabled` log gains a RETRIEVED CHUNKS block (score/cmid/module/content per chunk); debug viewer renders a chunks card; `prompt_playground.php` gains a live-retrieval test against the real retriever.
 - Avatar animation probe (v6.5.0, Stage 0 of the talking-avatar evaluation): SVG avatar idle blink (pure CSS, keyed off `data-avataranim` on the widget root) + `avatar_animation_enabled` setting (default on) gating blink, Web Audio mouth-sync, CSS mouth fallback, and the speaking pulse as one unit; per-course A/B override `avatar_animation_course_<id>`; on the policy bundle allowlist; `prefers-reduced-motion` respected in the rAF path. Decision doc: `.drafts/sola-talking-avatars-decision-2026-06-11.md`.
 - A/B experiment readout (v6.6.0): analytics dashboard comparison card (two course pickers, 10 engagement metrics with B vs A deltas) powered by `analytics::get_experiment_metrics()`; generic for any per-course experiment. Fix: `get_session_stats()` undercounted sessions (userid-keyed rows collapsed by get_records_sql; now id-keyed). Prompt debug formatter/parser/rotation extracted to `classes/prompt_debug.php` (shared by sse.php, prompt_debug_view.php, prompt_playground.php) with 12 tests pinning the log format (`tests/prompt_debug_test.php`).
+- Soapbox speech practice (v6.7.0): learner records a longer spoken presentation (optional name/topic/target-length), it is transcribed, scored against a per-course `speech` rubric, and saved to a personal score history. Off by default; per-course gated via `feature_flags::resolve('soapbox', $courseid)` (site `soapbox_enabled` default + `soapbox_enabled_course_<id>` three-way override). Learner page `soapbox.php` (course-nav link for `:use` when enabled); long-form STT endpoint `soapbox_transcribe.php` (300s timeout, 25MB cap, `soapbox_stt` rate bucket 12/600); scoring external function `score_speech`. Three STT tiers chosen by `soapbox_stt_mode` (server default / browser): self-hosted Whisper (free, via voice_registry), hosted OpenAI Whisper, or in-browser Web Speech API (free, no server). New `speech` rubric type in `rubric_manager` (5 default criteria; authorable on `rubric_admin.php`). Nullable `session_meta` column on `_practice_scores` holds the name/topic/target blob; audio and transcript text are NEVER stored. Privacy provider covers `session_meta` (metadata + export).
 
 ---
 
@@ -108,6 +109,10 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 | `classes/provider/claude_provider.php` | v5.11.0 `model_supports_temperature()` per-prefix deny-list (Opus 4.7/4.8/4.9 reject temperature) |
 | `classes/analytics.php` | Usage analytics and provider comparison |
 | `classes/external/generate_quiz.php` | Quiz generation (AI-guided + manual topic) |
+| `soapbox.php` | v6.7.0 Soapbox learner page (setup panel, record/transcribe, rubric feedback, My Speeches history); inline vanilla JS, server + browser STT modes |
+| `soapbox_transcribe.php` | v6.7.0 long-form STT endpoint (300s timeout, 25MB cap, `soapbox_stt` rate bucket); voice_registry-resolved Whisper |
+| `classes/external/score_speech.php` | v6.7.0 score a transcribed speech vs the `speech` rubric; persists score + meta (no audio/transcript) via `rubric_manager::save_score` |
+| `classes/rubric_manager.php` | Practice rubrics + `_practice_scores`; v6.7.0 adds `TYPE_SPEECH`, `DEFAULT_SPEECH_CRITERIA`, and `save_score` `$meta` (→ `session_meta`) |
 | `classes/external/get_realtime_token.php` | Fetches OpenAI Realtime ephemeral token |
 | `classes/external/save_avatar_preference.php` | Saves avatar selection to user preferences |
 | `rag_admin.php` | RAG index admin page (stat cards, per-course reindex/clear) |

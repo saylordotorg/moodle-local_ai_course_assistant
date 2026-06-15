@@ -31,6 +31,18 @@ class rubric_manager {
     /** @var string Table name for practice scores. */
     private const TABLE_SCORES = 'local_ai_course_assistant_practice_scores';
 
+    /** @var string Rubric/session type for Soapbox speech practice. */
+    const TYPE_SPEECH = 'speech';
+
+    /** @var array Default Soapbox speech rubric criteria (graded class speech). */
+    const DEFAULT_SPEECH_CRITERIA = [
+        ['name' => 'Delivery & Fluency', 'description' => 'Pace, clarity, confidence, and smoothness of speaking.', 'max_score' => 5],
+        ['name' => 'Structure & Organization', 'description' => 'Clear opening, logical flow of ideas, and a strong close.', 'max_score' => 5],
+        ['name' => 'Content & Relevance', 'description' => 'Ideas stay on topic and are well supported and developed.', 'max_score' => 5],
+        ['name' => 'Language & Vocabulary', 'description' => 'Word choice, grammar, and varied, precise language.', 'max_score' => 5],
+        ['name' => 'Time Management', 'description' => 'Fits the target length without rushing or running long.', 'max_score' => 5],
+    ];
+
     /** @var array Default conversation practice rubric criteria. */
     const DEFAULT_CONVERSATION_CRITERIA = [
         [
@@ -213,6 +225,16 @@ class rubric_manager {
         if (!$pronunciationexists) {
             self::create_rubric(0, 'pronunciation', 'Pronunciation Practice Rubric', self::DEFAULT_PRONUNCIATION_CRITERIA);
         }
+
+        $speechexists = $DB->record_exists(self::TABLE_RUBRICS, [
+            'courseid' => 0,
+            'type' => self::TYPE_SPEECH,
+            'active' => 1,
+        ]);
+
+        if (!$speechexists) {
+            self::create_rubric(0, self::TYPE_SPEECH, 'Soapbox Speech Rubric', self::DEFAULT_SPEECH_CRITERIA);
+        }
     }
 
     /**
@@ -221,15 +243,16 @@ class rubric_manager {
      * @param int $rubricid
      * @param int $userid
      * @param int $courseid
-     * @param string $sessiontype 'conversation' or 'pronunciation'
+     * @param string $sessiontype 'conversation', 'pronunciation', or 'speech'
      * @param array $scores Array of per-criterion scores [{name, score, feedback}, ...]
      * @param int $overallscore Overall score for the session.
      * @param string $aifeedback AI-generated feedback text.
      * @param int $duration Session duration in seconds.
+     * @param array|null $meta Optional metadata blob (e.g. Soapbox name/topic/target); JSON-encoded. Never audio/transcript.
      * @return int The new score record ID.
      */
     public static function save_score(int $rubricid, int $userid, int $courseid, string $sessiontype,
-            array $scores, int $overallscore, string $aifeedback, int $duration): int {
+            array $scores, int $overallscore, string $aifeedback, int $duration, ?array $meta = null): int {
         global $DB;
 
         $record = new \stdClass();
@@ -241,6 +264,7 @@ class rubric_manager {
         $record->overall_score = $overallscore;
         $record->ai_feedback = $aifeedback;
         $record->session_duration = $duration;
+        $record->session_meta = ($meta !== null) ? json_encode($meta) : null;
         $record->timecreated = time();
 
         return $DB->insert_record(self::TABLE_SCORES, $record);
@@ -285,7 +309,11 @@ class rubric_manager {
         ]);
         if (!$exists) {
             $criteria = self::get_default_criteria($type);
-            $title = $type === 'pronunciation' ? 'Pronunciation Practice Rubric' : 'Conversation Practice Rubric';
+            $titles = [
+                'pronunciation' => 'Pronunciation Practice Rubric',
+                self::TYPE_SPEECH => 'Soapbox Speech Rubric',
+            ];
+            $title = $titles[$type] ?? 'Conversation Practice Rubric';
             self::create_rubric(0, $type, $title, $criteria);
         }
     }
@@ -297,7 +325,13 @@ class rubric_manager {
      * @return array
      */
     public static function get_default_criteria(string $type): array {
-        return $type === 'pronunciation' ? self::DEFAULT_PRONUNCIATION_CRITERIA : self::DEFAULT_CONVERSATION_CRITERIA;
+        if ($type === 'pronunciation') {
+            return self::DEFAULT_PRONUNCIATION_CRITERIA;
+        }
+        if ($type === self::TYPE_SPEECH) {
+            return self::DEFAULT_SPEECH_CRITERIA;
+        }
+        return self::DEFAULT_CONVERSATION_CRITERIA;
     }
 
     /**

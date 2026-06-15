@@ -1098,5 +1098,20 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026061014, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026061500) {
+        // v6.7.0 (Soapbox): optional JSON metadata column on practice scores.
+        // Soapbox stores the learner-chosen name/topic/target-time blob here
+        // (never audio or transcript text) so the speech-history list can label
+        // and filter past attempts. Nullable text; pre-existing rows stay NULL.
+        $table = new xmldb_table('local_ai_course_assistant_practice_scores');
+        $field = new xmldb_field('session_meta', XMLDB_TYPE_TEXT, null,
+            null, null, null, null, 'session_duration');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026061500, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

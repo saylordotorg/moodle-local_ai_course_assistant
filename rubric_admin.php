@@ -35,7 +35,7 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 $type = optional_param('type', 'conversation', PARAM_ALPHA);
 
 // Validate type.
-if (!in_array($type, ['conversation', 'pronunciation'])) {
+if (!in_array($type, ['conversation', 'pronunciation', 'speech'])) {
     $type = 'conversation';
 }
 
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $action = required_param('action', PARAM_ALPHA);
     $posttype = required_param('rubric_type', PARAM_ALPHA);
-    if (!in_array($posttype, ['conversation', 'pronunciation'])) {
+    if (!in_array($posttype, ['conversation', 'pronunciation', 'speech'])) {
         $posttype = 'conversation';
     }
 
@@ -230,6 +230,8 @@ echo $OUTPUT->header();
            class="<?php echo $type === 'conversation' ? 'active' : ''; ?>">Conversation Practice</a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['courseid' => $courseid, 'type' => 'pronunciation']))->out(); ?>"
            class="<?php echo $type === 'pronunciation' ? 'active' : ''; ?>">Pronunciation Practice</a>
+        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['courseid' => $courseid, 'type' => 'speech']))->out(); ?>"
+           class="<?php echo $type === 'speech' ? 'active' : ''; ?>">Soapbox Speech</a>
     </div>
 
     <?php if ($is_inherited): ?>
