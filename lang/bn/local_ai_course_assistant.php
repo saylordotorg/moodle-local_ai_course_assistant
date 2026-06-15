@@ -1513,3 +1513,57 @@ $string['analytics:exp_tts_per_active'] = 'প্রতি সক্রিয়
 
 $string['settings:redash_allowed_origin'] = 'Redash অনুমোদিত উৎস (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'খালি রাখুন (প্রস্তাবিত): এক্সপোর্টটি Redash দ্বারা সার্ভার-থেকে-সার্ভার আনা হয় এবং কোনো ব্রাউজার CORS হেডারের প্রয়োজন হয় না। কেবলমাত্র একটি ব্রাউজার-ভিত্তিক ড্যাশবোর্ডকে যদি সরাসরি এক্সপোর্টটি পড়তে হয় তবেই একটি একক সঠিক উৎস সেট করুন (উদাহরণস্বরূপ https://redash.example.org)। কখনও ওয়াইল্ডকার্ড ব্যবহার করবেন না।';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'সেশনের জন্য আপনার সরবরাহ করা ঐচ্ছিক মেটাডেটা, যেমন একটি Soapbox বক্তৃতার নাম, বিষয় এবং লক্ষ্য দৈর্ঘ্য। এতে কখনও অডিও বা প্রতিলিপি অন্তর্ভুক্ত থাকে না।';
+$string['pedagogy:soapbox'] = 'Soapbox বক্তৃতা প্রতিক্রিয়া ডিফল্টরূপে চালু';
+$string['pedagogy:soapbox_desc'] = 'চালু থাকলে, কোর্সের নিজস্ব ওভাররাইড না থাকলে Soapbox বক্তৃতা-অনুশীলন সরঞ্জামটি প্রতিটি কোর্সে উপলব্ধ থাকে। এটি বন্ধ রাখুন এবং কেবল সেই কোর্সগুলিতে চালু করুন যেগুলির এটি প্রয়োজন (সাধারণত বক্তৃতা ও যোগাযোগ কোর্স)।';
+$string['settings:soapbox_stt_mode'] = 'Soapbox প্রতিলিপি মোড';
+$string['settings:soapbox_stt_mode_desc'] = 'Soapbox কীভাবে একটি রেকর্ড করা বক্তৃতাকে টেক্সটে রূপান্তরিত করে। সার্ভার কনফিগার করা Whisper প্রদানকারী ব্যবহার করে (স্ব-হোস্ট করা বিনামূল্যে; হোস্ট করা OpenAI প্রতি মিনিটে প্রায় 0.006 USD খরচ করে)। ব্রাউজার শিক্ষার্থীর অন্তর্নির্মিত স্পিচ রিকগনিশন ব্যবহার করে (বিনামূল্যে, কোনো সার্ভার নেই, কেবল Chrome ও Safari-তে কাজ করে)। সার্ভার সুপারিশ করা হয় যাতে প্রতিলিপির মান শিক্ষার্থীর ব্রাউজারের উপর নির্ভর না করে।';
+$string['settings:soapbox_stt_mode_server'] = 'সার্ভার (Whisper প্রদানকারী)';
+$string['settings:soapbox_stt_mode_browser'] = 'ব্রাউজার (বিনামূল্যে, কোনো সার্ভার নেই)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Soapbox বক্তৃতা অনুশীলন';
+$string['soapbox:disabled'] = 'এই কোর্সের জন্য Soapbox সক্রিয় করা নেই।';
+$string['soapbox:intro'] = 'একটি বক্তৃতা দিন এবং কোচিং পান। ঐচ্ছিকভাবে একটি নাম, বিষয় এবং লক্ষ্য দৈর্ঘ্য সেট করুন, তারপর কথা বলার সময় নিজেকে রেকর্ড করুন। Soapbox আপনার বক্তৃতা প্রতিলিপি করে, একটি বক্তৃতা রুব্রিকের বিপরীতে এটি স্কোর করে এবং আপনাকে সুনির্দিষ্ট পরামর্শ দেয়। আপনার অডিও এবং প্রতিলিপি কখনও সংরক্ষণ করা হয় না, কেবল আপনার স্কোর এবং প্রতিক্রিয়া।';
+$string['soapbox:optional'] = 'ঐচ্ছিক';
+$string['soapbox:name_label'] = 'এই বক্তৃতার নাম দিন';
+$string['soapbox:topic_label'] = 'বিষয়';
+$string['soapbox:time_label'] = 'লক্ষ্য দৈর্ঘ্য';
+$string['soapbox:no_target'] = 'কোনো লক্ষ্য নেই';
+$string['soapbox:record'] = 'বক্তৃতা রেকর্ড করুন';
+$string['soapbox:stop'] = 'থামুন এবং প্রতিক্রিয়া পান';
+$string['soapbox:recording'] = 'রেকর্ড করা হচ্ছে। স্বাভাবিকভাবে কথা বলুন; শেষ হলে থামুন ক্লিক করুন।';
+$string['soapbox:transcribing'] = 'আপনার বক্তৃতা প্রতিলিপি করা হচ্ছে…';
+$string['soapbox:scoring'] = 'আপনার বক্তৃতা স্কোর করা হচ্ছে…';
+$string['soapbox:too_short'] = 'সেই রেকর্ডিংটি স্কোর করার জন্য খুব ছোট ছিল। অন্তত একটি বা দুটি বাক্যের লক্ষ্য রাখুন এবং আবার চেষ্টা করুন।';
+$string['soapbox:mic_denied'] = 'রেকর্ড করার জন্য মাইক্রোফোন অ্যাক্সেস প্রয়োজন। মাইক্রোফোন অ্যাক্সেসের অনুমতি দিন এবং আবার চেষ্টা করুন।';
+$string['soapbox:no_browser_stt'] = 'এই ব্রাউজার ইন-ব্রাউজার স্পিচ রিকগনিশন সমর্থন করে না। Chrome বা Safari চেষ্টা করুন, অথবা আপনার প্রশাসককে Soapbox-কে সার্ভার প্রতিলিপিতে পরিবর্তন করতে বলুন।';
+$string['soapbox:browser_note'] = 'এই বক্তৃতা আপনার ব্রাউজারে প্রতিলিপি করা হয়। কিছুই আপলোড করা হয় না। Chrome ও Safari-তে সবচেয়ে ভালো কাজ করে।';
+$string['soapbox:server_note'] = 'আপনার রেকর্ডিং কেবল প্রতিলিপির জন্য আপলোড করা হয় এবং সংরক্ষণ করা হয় না।';
+$string['soapbox:error'] = 'এই বক্তৃতা এখন স্কোর করা যায়নি। একটু পরে আবার চেষ্টা করুন।';
+$string['soapbox:audio_too_large'] = 'সেই রেকর্ডিংটি খুব বড়। বক্তৃতা প্রায় 25 MB-এর নিচে রাখুন (মোটামুটি 20 মিনিট)।';
+$string['soapbox:no_stt'] = 'কোনো প্রতিলিপি প্রদানকারী কনফিগার করা নেই। আপনার প্রশাসককে Whisper সেট আপ করতে বা ব্রাউজার প্রতিলিপি সক্রিয় করতে বলুন।';
+$string['soapbox:result_heading'] = 'রুব্রিক স্কোর';
+$string['soapbox:overall_heading'] = 'সামগ্রিক';
+$string['soapbox:tips_heading'] = 'পরের বারের জন্য পরামর্শ';
+$string['soapbox:col_criterion'] = 'মানদণ্ড';
+$string['soapbox:col_score'] = 'স্কোর';
+$string['soapbox:col_feedback'] = 'প্রতিক্রিয়া';
+$string['soapbox:history_heading'] = 'আমার বক্তৃতা';
+$string['soapbox:history_empty'] = 'আপনি এখনও কোনো বক্তৃতা রেকর্ড করেননি। আপনার ইতিহাস তৈরি শুরু করতে উপরে একটি রেকর্ড করুন।';
+$string['soapbox:untitled'] = 'শিরোনামহীন বক্তৃতা';
+$string['soapbox:overall_badge'] = 'সামগ্রিক {$a}';
+$string['soapbox:toggle'] = 'এই কোর্সের জন্য Soapbox সক্রিয় করুন';
+$string['soapbox:toggle_help'] = 'শিক্ষার্থীরা একটি বক্তৃতা রেকর্ড করতে এবং পরামর্শসহ রুব্রিক-স্কোর করা বক্তৃতা প্রতিক্রিয়া পেতে একটি নিবেদিত পৃষ্ঠা পায়। অডিও এবং প্রতিলিপি কখনও সংরক্ষণ করা হয় না। ডিফল্টরূপে বন্ধ।';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'কোর্সের ধরন / বলার স্তর';
+$string['soapbox:level_help'] = 'কোর্সের ধরন অনুযায়ী AI কোচিং এবং ডিফল্ট নমুনা রুব্রিক সাজিয়ে দেয়। ESL স্তরগুলো ভাষা-শেখার ফিডব্যাক পায়; সাধারণ বক্তৃতা উপস্থাপন দক্ষতার উপর মনোযোগ দেয়। আপনি এখনও নিচের রুব্রিক সম্পাদনা করতে পারেন।';
+$string['soapbox:level_general'] = 'সাধারণ বক্তৃতা / উপস্থাপন';
+$string['soapbox:level_esl_beginner'] = 'ESL (প্রাথমিক)';
+$string['soapbox:level_esl_advanced'] = 'ESL (উন্নত)';
+$string['soapbox:edit_rubric'] = 'বক্তৃতা রুব্রিক সম্পাদনা করুন';
+$string['soapbox:sample_label'] = 'একটি নমুনা রুব্রিক লোড করুন';
+$string['soapbox:sample_choose'] = 'একটি নমুনা বেছে নিন…';
+$string['soapbox:sample_hint'] = 'নিচের সম্পাদকে নমুনা মানদণ্ড লোড করে। এই পরিসরে প্রয়োগ করতে পর্যালোচনা করে সংরক্ষণ করুন।';

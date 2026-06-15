@@ -1543,3 +1543,57 @@ $string['analytics:exp_tts_per_active'] = 'Wasannin TTS ga kowane mai amfani mai
 
 $string['settings:redash_allowed_origin'] = 'Asalin da aka yarda don Redash (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'Bar shi babu komai (an ba da shawara): Redash yana ɗauko fitarwar daga uwar garke zuwa uwar garke kuma baya buƙatar kan CORS na birawsa. Saita asali ɗaya daidai (alal misali https://redash.example.org) kawai idan dole ne dashboard ɗin da ke kan birawsa ya karanta fitarwar kai tsaye. Kada ka taɓa amfani da wildcard.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Bayanan zaɓi da ka bayar don zaman, kamar suna, jigo, da tsawon da ake nufi na jawabin Soapbox. Ba ya taɓa haɗawa da sauti ko rubutaccen jawabi.';
+$string['pedagogy:soapbox'] = 'An kunna ra\'ayin jawabin Soapbox ta tsohuwa';
+$string['pedagogy:soapbox_desc'] = 'Idan an kunna, kayan aikin koyon jawabi na Soapbox yana samuwa a kowane darasi sai dai idan darasin yana da nasa saitin musamman. Bar shi a kashe kuma ka kunna shi kawai a darussan da ke buƙatarsa (galibi darussan jawabi da sadarwa).';
+$string['settings:soapbox_stt_mode'] = 'Yanayin rubuta jawabi na Soapbox';
+$string['settings:soapbox_stt_mode_desc'] = 'Yadda Soapbox ke mai da jawabin da aka yi rikodi zuwa rubutu. Uwar garke tana amfani da mai bayar da Whisper da aka saita (na kanka kyauta ne; OpenAI da aka karɓi bakuncinsa yana kusan USD 0.006 a minti ɗaya). Birawsa tana amfani da gane magana da aka gina cikin na mai koyo (kyauta, babu uwar garke, yana aiki a Chrome da Safari kawai). Ana ba da shawarar Uwar garke don ingancin rubutawa ya kasance bai dogara da birawsa na mai koyo ba.';
+$string['settings:soapbox_stt_mode_server'] = 'Uwar garke (mai bayar da Whisper)';
+$string['settings:soapbox_stt_mode_browser'] = 'Birawsa (kyauta, babu uwar garke)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Koyon jawabi na Soapbox';
+$string['soapbox:disabled'] = 'Ba a kunna Soapbox don wannan darasin ba.';
+$string['soapbox:intro'] = 'Yi jawabi kuma ka samu jagora. A zaɓe, ka saita suna, jigo, da tsawon da ake nufi, sannan ka yi rikodin kanka kana magana. Soapbox yana rubuta jawabinka, yana ba shi maki bisa ma\'aunin magana, kuma yana ba ka shawarwari na zahiri. Ba a taɓa adana sautinka da rubutaccen jawabin ba, sai makinka da ra\'ayoyi kawai.';
+$string['soapbox:optional'] = 'na zaɓi';
+$string['soapbox:name_label'] = 'Ba wannan jawabin suna';
+$string['soapbox:topic_label'] = 'Jigo';
+$string['soapbox:time_label'] = 'Tsawon da ake nufi';
+$string['soapbox:no_target'] = 'Babu manufa';
+$string['soapbox:record'] = 'Yi rikodin jawabi';
+$string['soapbox:stop'] = 'Tsaya kuma ka samu ra\'ayi';
+$string['soapbox:recording'] = 'Ana yin rikodi. Ka yi magana a dabi\'a; danna tsaya idan ka gama.';
+$string['soapbox:transcribing'] = 'Ana rubuta jawabinka…';
+$string['soapbox:scoring'] = 'Ana ba jawabinka maki…';
+$string['soapbox:too_short'] = 'Wannan rikodin ya yi gajarta sosai don a ba shi maki. Ka yi nufin aƙalla jimla ɗaya ko biyu kuma ka sake gwadawa.';
+$string['soapbox:mic_denied'] = 'Ana buƙatar damar makirufo don yin rikodi. Ka ba da damar makirufo kuma ka sake gwadawa.';
+$string['soapbox:no_browser_stt'] = 'Wannan birawsa ba ta tallafawa gane magana cikin birawsa ba. Ka gwada Chrome ko Safari, ko ka nemi mai gudanarwa ya canza Soapbox zuwa rubutawa ta uwar garke.';
+$string['soapbox:browser_note'] = 'Ana rubuta wannan jawabin cikin birawsa naka. Ba a ɗora komai ba. Yana aiki mafi kyau a Chrome da Safari.';
+$string['soapbox:server_note'] = 'Ana ɗora rikodinka don rubutawa kawai kuma ba a adana shi ba.';
+$string['soapbox:error'] = 'Ba a iya ba wannan jawabin maki yanzu ba. Ka sake gwadawa cikin ɗan lokaci.';
+$string['soapbox:audio_too_large'] = 'Wannan rikodin ya yi girma sosai. Ka kiyaye jawabai a ƙasa da kusan 25 MB (kusan minti 20).';
+$string['soapbox:no_stt'] = 'Ba a saita mai bayar da rubutawa ba. Ka nemi mai gudanarwa ya saita Whisper ko ya kunna rubutawa ta birawsa.';
+$string['soapbox:result_heading'] = 'Makin ma\'auni';
+$string['soapbox:overall_heading'] = 'Gaba ɗaya';
+$string['soapbox:tips_heading'] = 'Shawarwari don gaba';
+$string['soapbox:col_criterion'] = 'Ma\'auni';
+$string['soapbox:col_score'] = 'Maki';
+$string['soapbox:col_feedback'] = 'Ra\'ayi';
+$string['soapbox:history_heading'] = 'Jawabaina';
+$string['soapbox:history_empty'] = 'Ba ka riga ka yi rikodin jawabi ba. Ka yi rikodin ɗaya a sama don fara gina tarihinka.';
+$string['soapbox:untitled'] = 'Jawabi mara suna';
+$string['soapbox:overall_badge'] = 'Gaba ɗaya {$a}';
+$string['soapbox:toggle'] = 'Kunna Soapbox don wannan darasin';
+$string['soapbox:toggle_help'] = 'Masu koyo suna samun shafi na musamman don yin rikodin jawabi da karɓar ra\'ayin magana da aka ba maki bisa ma\'auni tare da shawarwari. Ba a taɓa adana sauti da rubutattun jawabai ba. A kashe ta tsohuwa.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Nau\'in kwas / matakin magana';
+$string['soapbox:level_help'] = 'Yana daidaita koyarwar AI da ma\'aunin samfuri na asali bisa ga nau\'in kwas. Matakan ESL suna samun ra\'ayoyin koyon harshe; magana ta gama-gari tana mai da hankali kan kwarewar gabatarwa. Har yanzu kana iya gyara ma\'aunin a kasa.';
+$string['soapbox:level_general'] = 'Magana ta gama-gari / gabatarwa';
+$string['soapbox:level_esl_beginner'] = 'ESL (mafari)';
+$string['soapbox:level_esl_advanced'] = 'ESL (gwani)';
+$string['soapbox:edit_rubric'] = 'Gyara ma\'aunin magana';
+$string['soapbox:sample_label'] = 'Loda samfurin ma\'auni';
+$string['soapbox:sample_choose'] = 'Zabi samfuri…';
+$string['soapbox:sample_hint'] = 'Yana lodawa ma\'aunin samfuri cikin editan da ke kasa. Duba sannan ka Ajiye don amfani da su a wannan iyaka.';

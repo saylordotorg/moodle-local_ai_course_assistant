@@ -1543,3 +1543,57 @@ $string['analytics:exp_tts_per_active'] = 'Pemutaran TTS per pengguna aktif';
 
 $string['settings:redash_allowed_origin'] = 'Asal yang diizinkan untuk Redash (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'Biarkan kosong (disarankan): ekspor diambil dari server ke server oleh Redash dan tidak memerlukan header CORS peramban. Setel satu asal yang tepat (misalnya https://redash.example.org) hanya jika dasbor berbasis peramban harus membaca ekspor secara langsung. Jangan pernah menggunakan karakter pengganti.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Metadata opsional yang Anda berikan untuk sesi ini, seperti nama, topik, dan target durasi pidato Soapbox. Tidak pernah menyertakan audio atau transkrip.';
+$string['pedagogy:soapbox'] = 'Umpan balik pidato Soapbox aktif secara default';
+$string['pedagogy:soapbox_desc'] = 'Jika aktif, alat latihan pidato Soapbox tersedia di setiap kursus kecuali kursus tersebut memiliki penggantinya sendiri. Biarkan nonaktif dan aktifkan hanya pada kursus yang membutuhkannya (biasanya kursus pidato dan komunikasi).';
+$string['settings:soapbox_stt_mode'] = 'Mode transkripsi Soapbox';
+$string['settings:soapbox_stt_mode_desc'] = 'Bagaimana Soapbox mengubah pidato yang direkam menjadi teks. Server menggunakan penyedia Whisper yang dikonfigurasi (yang dihos sendiri gratis; OpenAI yang dihos berbiaya sekitar USD 0,006 per menit). Peramban menggunakan pengenalan suara bawaan pelajar (gratis, tanpa server, hanya berfungsi di Chrome dan Safari). Server disarankan agar kualitas transkripsi tidak bergantung pada peramban pelajar.';
+$string['settings:soapbox_stt_mode_server'] = 'Server (penyedia Whisper)';
+$string['settings:soapbox_stt_mode_browser'] = 'Peramban (gratis, tanpa server)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Latihan pidato Soapbox';
+$string['soapbox:disabled'] = 'Soapbox tidak diaktifkan untuk kursus ini.';
+$string['soapbox:intro'] = 'Sampaikan pidato dan dapatkan pembinaan. Secara opsional tetapkan nama, topik, dan target durasi, lalu rekam diri Anda saat berbicara. Soapbox mentranskripsikan pidato Anda, menilainya berdasarkan rubrik berbicara, dan memberi Anda kiat konkret. Audio dan transkrip Anda tidak pernah disimpan, hanya skor dan umpan balik Anda.';
+$string['soapbox:optional'] = 'opsional';
+$string['soapbox:name_label'] = 'Beri nama pidato ini';
+$string['soapbox:topic_label'] = 'Topik';
+$string['soapbox:time_label'] = 'Target durasi';
+$string['soapbox:no_target'] = 'Tanpa target';
+$string['soapbox:record'] = 'Rekam pidato';
+$string['soapbox:stop'] = 'Hentikan dan dapatkan umpan balik';
+$string['soapbox:recording'] = 'Merekam. Bicaralah dengan wajar; klik hentikan saat Anda selesai.';
+$string['soapbox:transcribing'] = 'Mentranskripsikan pidato Anda…';
+$string['soapbox:scoring'] = 'Menilai pidato Anda…';
+$string['soapbox:too_short'] = 'Rekaman itu terlalu pendek untuk dinilai. Usahakan setidaknya satu atau dua kalimat dan coba lagi.';
+$string['soapbox:mic_denied'] = 'Akses mikrofon diperlukan untuk merekam. Izinkan akses mikrofon dan coba lagi.';
+$string['soapbox:no_browser_stt'] = 'Peramban ini tidak mendukung pengenalan suara dalam peramban. Coba Chrome atau Safari, atau minta administrator Anda untuk mengalihkan Soapbox ke transkripsi server.';
+$string['soapbox:browser_note'] = 'Pidato ini ditranskripsikan di peramban Anda. Tidak ada yang diunggah. Berfungsi paling baik di Chrome dan Safari.';
+$string['soapbox:server_note'] = 'Rekaman Anda diunggah hanya untuk transkripsi dan tidak disimpan.';
+$string['soapbox:error'] = 'Tidak dapat menilai pidato ini saat ini. Coba lagi sebentar.';
+$string['soapbox:audio_too_large'] = 'Rekaman itu terlalu besar. Jaga pidato di bawah sekitar 25 MB (kira-kira 20 menit).';
+$string['soapbox:no_stt'] = 'Tidak ada penyedia transkripsi yang dikonfigurasi. Minta administrator Anda untuk menyiapkan Whisper atau mengaktifkan transkripsi peramban.';
+$string['soapbox:result_heading'] = 'Skor rubrik';
+$string['soapbox:overall_heading'] = 'Keseluruhan';
+$string['soapbox:tips_heading'] = 'Kiat untuk lain kali';
+$string['soapbox:col_criterion'] = 'Kriteria';
+$string['soapbox:col_score'] = 'Skor';
+$string['soapbox:col_feedback'] = 'Umpan balik';
+$string['soapbox:history_heading'] = 'Pidato saya';
+$string['soapbox:history_empty'] = 'Anda belum merekam pidato. Rekam satu di atas untuk mulai membangun riwayat Anda.';
+$string['soapbox:untitled'] = 'Pidato tanpa judul';
+$string['soapbox:overall_badge'] = 'Keseluruhan {$a}';
+$string['soapbox:toggle'] = 'Aktifkan Soapbox untuk kursus ini';
+$string['soapbox:toggle_help'] = 'Pelajar mendapatkan halaman khusus untuk merekam pidato dan menerima umpan balik berbicara yang dinilai berdasarkan rubrik beserta kiat. Audio dan transkrip tidak pernah disimpan. Nonaktif secara default.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Jenis kursus / tingkat berbicara';
+$string['soapbox:level_help'] = 'Menyesuaikan pelatihan AI dan rubrik sampel default dengan jenis kursus. Tingkat ESL mendapatkan umpan balik pembelajaran bahasa; pidato umum berfokus pada keterampilan presentasi. Anda masih dapat mengedit rubrik di bawah ini.';
+$string['soapbox:level_general'] = 'Pidato umum / presentasi';
+$string['soapbox:level_esl_beginner'] = 'ESL (pemula)';
+$string['soapbox:level_esl_advanced'] = 'ESL (lanjutan)';
+$string['soapbox:edit_rubric'] = 'Edit rubrik pidato';
+$string['soapbox:sample_label'] = 'Muat rubrik sampel';
+$string['soapbox:sample_choose'] = 'Pilih sampel…';
+$string['soapbox:sample_hint'] = 'Memuat kriteria sampel ke editor di bawah ini. Tinjau dan Simpan untuk menerapkannya pada cakupan ini.';

@@ -1513,3 +1513,57 @@ $string['analytics:exp_tts_per_active'] = 'TTS-afspilninger pr. aktiv bruger';
 
 $string['settings:redash_allowed_origin'] = 'Tilladt oprindelse for Redash (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'Lad feltet stå tomt (anbefales): eksporten hentes server-til-server af Redash og kræver ingen CORS-header i browseren. Angiv kun én præcis oprindelse (for eksempel https://redash.example.org), hvis et browserbaseret dashboard skal læse eksporten direkte. Brug aldrig et jokertegn.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Valgfrie metadata, som du angav til sessionen, såsom navn, emne og mållængde for en Soapbox-tale. Indeholder aldrig lyd eller en udskrift.';
+$string['pedagogy:soapbox'] = 'Feedback på Soapbox-tale slået til som standard';
+$string['pedagogy:soapbox_desc'] = 'Når dette er slået til, er taleøvelsesværktøjet Soapbox tilgængeligt i alle kurser, medmindre kurset har sin egen tilsidesættelse. Lad det være slået fra, og aktivér det kun i de kurser, der har brug for det (typisk tale- og kommunikationskurser).';
+$string['settings:soapbox_stt_mode'] = 'Soapbox-transskriptionstilstand';
+$string['settings:soapbox_stt_mode_desc'] = 'Hvordan Soapbox omdanner en optaget tale til tekst. Server bruger den konfigurerede Whisper-udbyder (selvhostet er gratis; hostet OpenAI koster cirka USD 0,006 pr. minut). Browser bruger den indbyggede talegenkendelse hos den studerende (gratis, ingen server, fungerer kun i Chrome og Safari). Server anbefales, så transskriptionskvaliteten ikke afhænger af den studerendes browser.';
+$string['settings:soapbox_stt_mode_server'] = 'Server (Whisper-udbyder)';
+$string['settings:soapbox_stt_mode_browser'] = 'Browser (gratis, ingen server)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Soapbox-taleøvelse';
+$string['soapbox:disabled'] = 'Soapbox er ikke aktiveret for dette kursus.';
+$string['soapbox:intro'] = 'Hold en tale og få coaching. Du kan eventuelt angive et navn, et emne og en mållængde og derefter optage dig selv, mens du taler. Soapbox transskriberer din tale, vurderer den ud fra en talerubrik og giver dig konkrete tips. Din lyd og udskriften gemmes aldrig, kun dine scorer og din feedback.';
+$string['soapbox:optional'] = 'valgfrit';
+$string['soapbox:name_label'] = 'Giv denne tale et navn';
+$string['soapbox:topic_label'] = 'Emne';
+$string['soapbox:time_label'] = 'Mållængde';
+$string['soapbox:no_target'] = 'Intet mål';
+$string['soapbox:record'] = 'Optag tale';
+$string['soapbox:stop'] = 'Stop og få feedback';
+$string['soapbox:recording'] = 'Optager. Tal naturligt; klik på stop, når du er færdig.';
+$string['soapbox:transcribing'] = 'Transskriberer din tale…';
+$string['soapbox:scoring'] = 'Vurderer din tale…';
+$string['soapbox:too_short'] = 'Den optagelse var for kort til at blive vurderet. Sigt efter mindst en sætning eller to, og prøv igen.';
+$string['soapbox:mic_denied'] = 'Der kræves adgang til mikrofonen for at optage. Tillad adgang til mikrofonen, og prøv igen.';
+$string['soapbox:no_browser_stt'] = 'Denne browser understøtter ikke talegenkendelse i browseren. Prøv Chrome eller Safari, eller bed din administrator om at skifte Soapbox til servertransskription.';
+$string['soapbox:browser_note'] = 'Denne tale transskriberes i din browser. Intet uploades. Fungerer bedst i Chrome og Safari.';
+$string['soapbox:server_note'] = 'Din optagelse uploades udelukkende til transskription og gemmes ikke.';
+$string['soapbox:error'] = 'Denne tale kunne ikke vurderes lige nu. Prøv igen om et øjeblik.';
+$string['soapbox:audio_too_large'] = 'Den optagelse er for stor. Hold taler under cirka 25 MB (omtrent 20 minutter).';
+$string['soapbox:no_stt'] = 'Der er ikke konfigureret nogen transskriptionsudbyder. Bed din administrator om at opsætte Whisper eller aktivere transskription i browseren.';
+$string['soapbox:result_heading'] = 'Rubrikscorer';
+$string['soapbox:overall_heading'] = 'Samlet';
+$string['soapbox:tips_heading'] = 'Tips til næste gang';
+$string['soapbox:col_criterion'] = 'Kriterium';
+$string['soapbox:col_score'] = 'Score';
+$string['soapbox:col_feedback'] = 'Feedback';
+$string['soapbox:history_heading'] = 'Mine taler';
+$string['soapbox:history_empty'] = 'Du har endnu ikke optaget en tale. Optag en ovenfor for at begynde at opbygge din historik.';
+$string['soapbox:untitled'] = 'Tale uden titel';
+$string['soapbox:overall_badge'] = 'Samlet {$a}';
+$string['soapbox:toggle'] = 'Aktivér Soapbox for dette kursus';
+$string['soapbox:toggle_help'] = 'De studerende får en dedikeret side til at optage en tale og modtage rubrikvurderet talefeedback med tips. Lyd og udskrifter gemmes aldrig. Slået fra som standard.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kursustype / taleniveau';
+$string['soapbox:level_help'] = 'Tilpasser AI-coachingen og standardprøverubrikken til kursustypen. ESL-niveauer får feedback om sprogindlæring; generel tale fokuserer på præsentationsfærdigheder. Du kan stadig redigere rubrikken nedenfor.';
+$string['soapbox:level_general'] = 'Generel tale / præsentation';
+$string['soapbox:level_esl_beginner'] = 'ESL (begynder)';
+$string['soapbox:level_esl_advanced'] = 'ESL (øvet)';
+$string['soapbox:edit_rubric'] = 'Rediger talerubrik';
+$string['soapbox:sample_label'] = 'Indlæs en prøverubrik';
+$string['soapbox:sample_choose'] = 'Vælg en prøve…';
+$string['soapbox:sample_hint'] = 'Indlæser prøvekriterier i editoren nedenfor. Gennemgå og gem for at anvende dem på dette område.';

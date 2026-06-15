@@ -1543,3 +1543,57 @@ $string['analytics:exp_tts_per_active'] = 'TTS fɔliw baara kɛlaw kelen kelen m
 
 $string['settings:redash_allowed_origin'] = 'Redash ka sigida dabɔlen (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'A to lankolon na (a ɲɛnabɔlen): cikan bɔli bɛ ta ka taa serverw cɛ Redash fɛ ani a mago tɛ navigatɛri CORS kunsɛn na. Sigida kelen dɔrɔn ɲɛni (misali https://redash.example.org) ni navigatɛri tabilo dɔ ka kan ka cikan bɔli kalan k\'a tigɛ. Aw kana joker sɛbɛn kelen na abada.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Kunnafoni dɔw i ye minnu di sigi kama, i n\'a fɔ Soapbox kuma tɔgɔ, barokun ani a janya laɲini. A tɛ kuma fɔlenw walima sɛbɛnnen don abada.';
+$string['pedagogy:soapbox'] = 'Soapbox kuma fɔli jaabili dabɔlen don ka kɛ a cogo la';
+$string['pedagogy:soapbox_desc'] = 'Ni a dabɔra, Soapbox kuma fɔli degeli minɛn bɛ sɔrɔ kalansen bɛɛ la fo ni kalansen yɛrɛ ka labɛn dɔ b\'a falen. A to faga la ani k\'a dabɔ kalansenw dɔrɔn na minnu mago b\'a la (a ka teli ka kɛ kuma fɔli ni ɲɔgɔn faamuya kalansenw ye).';
+$string['settings:soapbox_stt_mode'] = 'Soapbox sɛbɛnni cogo';
+$string['settings:soapbox_stt_mode_desc'] = 'Soapbox bɛ kuma fɔlen mara cogo min na ka kɛ sɛbɛn ye. Server bɛ Whisper dibaga labɛnnen baara (i yɛrɛ ka mara ye fu ye; OpenAI maralen bɛ se 0.006 USD ɲɔgɔn ma miniti kelen na). Navigatɛri bɛ kalanden ka kuma faamuyali minɛn dabɔlen baara (fu, server tɛ, a bɛ baara kɛ Chrome ni Safari dɔrɔn na). Server ye laɲini ye walasa sɛbɛnni ɲumanya kana sɔrɔ kalanden ka navigatɛri kan.';
+$string['settings:soapbox_stt_mode_server'] = 'Server (Whisper dibaga)';
+$string['settings:soapbox_stt_mode_browser'] = 'Navigatɛri (fu, server tɛ)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Soapbox kuma fɔli degeli';
+$string['soapbox:disabled'] = 'Soapbox ma dabɔ nin kalansen kama.';
+$string['soapbox:intro'] = 'Kuma dɔ fɔ ka ladili sɔrɔ. Ni a diyara i ye, tɔgɔ, barokun ani janya laɲini sigi, o kɔ i yɛrɛ sɛbɛn k\'i bɛ kuma fɔli kɛ. Soapbox bɛ i ka kuma sɛbɛn, k\'a sumani kuma fɔli sariyasun kan, ani ka ladili gɛlɛnw di i ma. I ka mankan ni sɛbɛnnen tɛ mara abada, i ka hakɛw ni jaabiliw dɔrɔn.';
+$string['soapbox:optional'] = 'a man wajibi';
+$string['soapbox:name_label'] = 'Tɔgɔ da nin kuma la';
+$string['soapbox:topic_label'] = 'Barokun';
+$string['soapbox:time_label'] = 'Janya laɲini';
+$string['soapbox:no_target'] = 'Laɲini tɛ';
+$string['soapbox:record'] = 'Kuma sɛbɛn';
+$string['soapbox:stop'] = 'A jɔ ka jaabili sɔrɔ';
+$string['soapbox:recording'] = 'A bɛ sɛbɛnni na. Kuma cogo ɲuman na; ni i banna, jɔli digi.';
+$string['soapbox:transcribing'] = 'I ka kuma bɛ sɛbɛn…';
+$string['soapbox:scoring'] = 'I ka kuma bɛ sumani…';
+$string['soapbox:too_short'] = 'O sɛbɛnni surun kojugu walasa k\'a sumani. A ɲini ka kumasen kelen walima fila fɔ ka segin k\'a lajɛ tugun.';
+$string['soapbox:mic_denied'] = 'Mikoro sɔrɔli wajibiyalen don sɛbɛnni kama. Mikoro sɔrɔli sɔn ka segin k\'a lajɛ tugun.';
+$string['soapbox:no_browser_stt'] = 'Nin navigatɛri tɛ se ka kuma faamuyali kɛ navigatɛri kɔnɔ. Chrome walima Safari lajɛ, walima a ɲini i ka mara ɲɛmɔgɔ fɛ ka Soapbox falen ka kɛ server sɛbɛnni ye.';
+$string['soapbox:browser_note'] = 'Nin kuma bɛ sɛbɛn i ka navigatɛri kɔnɔ. Foyi tɛ tila. A bɛ baara kɛ ka ɲɛ Chrome ni Safari kɔnɔ.';
+$string['soapbox:server_note'] = 'I ka sɛbɛnni bɛ tila sɛbɛnni dɔrɔn kama ani a tɛ mara.';
+$string['soapbox:error'] = 'Nin kuma sumani ma se ka kɛ sisan. A lajɛ tugun waati dɔɔni kɔ.';
+$string['soapbox:audio_too_large'] = 'O sɛbɛnni ka bon kojugu. Kumaw to 25 MB ɲɔgɔn duguma (a bɛ se miniti 20 ɲɔgɔn ma).';
+$string['soapbox:no_stt'] = 'Sɛbɛnni dibaga si ma labɛn. A ɲini i ka mara ɲɛmɔgɔ fɛ ka Whisper labɛn walima ka navigatɛri sɛbɛnni dabɔ.';
+$string['soapbox:result_heading'] = 'Sariyasun hakɛw';
+$string['soapbox:overall_heading'] = 'A bɛɛ lajɛlen';
+$string['soapbox:tips_heading'] = 'Ladiliw siɲɛ nata kama';
+$string['soapbox:col_criterion'] = 'Sariyasun';
+$string['soapbox:col_score'] = 'Hakɛ';
+$string['soapbox:col_feedback'] = 'Jaabili';
+$string['soapbox:history_heading'] = 'Ne ka kumaw';
+$string['soapbox:history_empty'] = 'I ma kuma si sɛbɛn fɔlɔ. Kelen sɛbɛn sanfɛ walasa k\'i ka tariku damina.';
+$string['soapbox:untitled'] = 'Kuma tɔgɔntan';
+$string['soapbox:overall_badge'] = 'A bɛɛ lajɛlen {$a}';
+$string['soapbox:toggle'] = 'Soapbox dabɔ nin kalansen kama';
+$string['soapbox:toggle_help'] = 'Kalandenw bɛ ɲɛ kɛrɛnkɛrɛnnen sɔrɔ ka kuma sɛbɛn ani ka kuma fɔli jaabili sumaninen sɔrɔ sariyasun kan ni ladiliw ye. Mankan ni sɛbɛnnenw tɛ mara abada. A faga la ka kɛ a cogo la.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kalan suguya / kuma fɔli hakɛ';
+$string['soapbox:level_help'] = 'A b\'AI ladilikan ni sumanikɛlan ɲɛsin kalan suguya ma. ESL hakɛw bɛ kanko kalan ɲɛfɔli sɔrɔ; kuma gansan b\'a sinsin jiralikɛ seko kan. I bɛ se ka sumanikɛlan yɛlɛma hali bi duguma.';
+$string['soapbox:level_general'] = 'Kuma gansan / jirali';
+$string['soapbox:level_esl_beginner'] = 'ESL (daminɛbaga)';
+$string['soapbox:level_esl_advanced'] = 'ESL (ɲɛtaalen)';
+$string['soapbox:edit_rubric'] = 'Kuma sumanikɛlan yɛlɛma';
+$string['soapbox:sample_label'] = 'Sumanikɛlan ɲɛjira dɔ ladon';
+$string['soapbox:sample_choose'] = 'Ɲɛjira dɔ sugandi…';
+$string['soapbox:sample_hint'] = 'A bɛ ɲɛjira sariyaw ladon sɛbɛnnikɛlan na duguma. I k\'u lajɛ ka Mara walisa k\'u baara kɛ nin yɔrɔ in na.';

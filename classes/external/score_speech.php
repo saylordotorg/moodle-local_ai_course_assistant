@@ -92,12 +92,19 @@ class score_speech extends external_api {
         $targetsec = max(0, (int) $params['targetsec']);
         $durationsec = max(0, (int) $params['durationsec']);
 
-        // Resolve the per-course speech rubric (falls back to the global default).
+        // Per-course course-type/level (general speech vs ESL beginner/advanced).
+        // Drives both the fallback rubric and the coaching register in the prompt.
+        $level = (string) (get_config('local_ai_course_assistant', 'soapbox_level_course_' . $courseid)
+            ?: rubric_manager::SPEECH_LEVEL_GENERAL);
+        $preset = rubric_manager::speech_preset($level);
+
+        // Resolve the per-course speech rubric. An explicit course/global rubric
+        // wins; otherwise fall back to the level preset's sample criteria.
         // get_active_rubric() returns the criteria already decoded to an array.
         $rubric = rubric_manager::get_active_rubric($courseid, rubric_manager::TYPE_SPEECH);
-        $criteriadefs = ($rubric && is_array($rubric->criteria)) ? $rubric->criteria : rubric_manager::DEFAULT_SPEECH_CRITERIA;
+        $criteriadefs = ($rubric && is_array($rubric->criteria)) ? $rubric->criteria : $preset['criteria'];
         if (!is_array($criteriadefs) || empty($criteriadefs)) {
-            $criteriadefs = rubric_manager::DEFAULT_SPEECH_CRITERIA;
+            $criteriadefs = $preset['criteria'];
         }
         $maxscore = 5;
         $rubriclines = [];
@@ -112,7 +119,7 @@ class score_speech extends external_api {
         }
         $rubrictext = implode("\n", $rubriclines);
 
-        $contextline = 'The learner is practising a spoken presentation.';
+        $contextline = (string) ($preset['hint'] ?? 'The learner is practising a spoken presentation.');
         if ($topic !== '') {
             $contextline .= ' Their stated topic is: "' . mb_substr($topic, 0, 300) . '".';
         }

@@ -1540,3 +1540,57 @@ $string['analytics:exp_tts_per_active'] = 'Reproducciones de TTS por usuario act
 
 $string['settings:redash_allowed_origin'] = 'Origen permitido para Redash (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'Deje el campo vacío (recomendado): Redash obtiene la exportación de servidor a servidor y no necesita ninguna cabecera CORS del navegador. Establezca un único origen exacto (por ejemplo https://redash.example.org) solo si un panel basado en navegador debe leer la exportación directamente. Nunca use un comodín.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Metadatos opcionales que proporcionó para la sesión, como el nombre, el tema y la duración objetivo de un discurso de Soapbox. Nunca incluye audio ni una transcripción.';
+$string['pedagogy:soapbox'] = 'Comentarios sobre el discurso de Soapbox activados de forma predeterminada';
+$string['pedagogy:soapbox_desc'] = 'Cuando está activado, la herramienta de práctica de discursos Soapbox está disponible en todos los cursos, a menos que el curso tenga su propia anulación. Déjelo desactivado y actívelo solo en los cursos que lo necesiten (normalmente cursos de oratoria y comunicación).';
+$string['settings:soapbox_stt_mode'] = 'Modo de transcripción de Soapbox';
+$string['settings:soapbox_stt_mode_desc'] = 'Cómo convierte Soapbox un discurso grabado en texto. La opción Servidor usa el proveedor de Whisper configurado (el autoalojamiento es gratuito; el OpenAI alojado cuesta unos USD 0,006 por minuto). La opción Navegador usa el reconocimiento de voz integrado del estudiante (gratuito, sin servidor, solo funciona en Chrome y Safari). Se recomienda Servidor para que la calidad de la transcripción no dependa del navegador del estudiante.';
+$string['settings:soapbox_stt_mode_server'] = 'Servidor (proveedor de Whisper)';
+$string['settings:soapbox_stt_mode_browser'] = 'Navegador (gratuito, sin servidor)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Práctica de discurso de Soapbox';
+$string['soapbox:disabled'] = 'Soapbox no está habilitado para este curso.';
+$string['soapbox:intro'] = 'Pronuncie un discurso y reciba orientación. Si lo desea, establezca un nombre, un tema y una duración objetivo, y luego grábese mientras habla. Soapbox transcribe su discurso, lo califica según una rúbrica de oratoria y le ofrece consejos concretos. Su audio y la transcripción nunca se almacenan, solo sus puntuaciones y comentarios.';
+$string['soapbox:optional'] = 'opcional';
+$string['soapbox:name_label'] = 'Asigne un nombre a este discurso';
+$string['soapbox:topic_label'] = 'Tema';
+$string['soapbox:time_label'] = 'Duración objetivo';
+$string['soapbox:no_target'] = 'Sin objetivo';
+$string['soapbox:record'] = 'Grabar discurso';
+$string['soapbox:stop'] = 'Detener y recibir comentarios';
+$string['soapbox:recording'] = 'Grabando. Hable con naturalidad; haga clic en detener cuando termine.';
+$string['soapbox:transcribing'] = 'Transcribiendo su discurso…';
+$string['soapbox:scoring'] = 'Calificando su discurso…';
+$string['soapbox:too_short'] = 'Esa grabación fue demasiado corta para calificarla. Procure al menos una o dos oraciones e inténtelo de nuevo.';
+$string['soapbox:mic_denied'] = 'Se necesita acceso al micrófono para grabar. Permita el acceso al micrófono e inténtelo de nuevo.';
+$string['soapbox:no_browser_stt'] = 'Este navegador no admite el reconocimiento de voz en el navegador. Pruebe con Chrome o Safari, o pida a su administrador que cambie Soapbox a la transcripción de servidor.';
+$string['soapbox:browser_note'] = 'Este discurso se transcribe en su navegador. No se sube nada. Funciona mejor en Chrome y Safari.';
+$string['soapbox:server_note'] = 'Su grabación se sube únicamente para la transcripción y no se almacena.';
+$string['soapbox:error'] = 'No se pudo calificar este discurso en este momento. Inténtelo de nuevo en un momento.';
+$string['soapbox:audio_too_large'] = 'Esa grabación es demasiado grande. Mantenga los discursos por debajo de unos 25 MB (aproximadamente 20 minutos).';
+$string['soapbox:no_stt'] = 'No hay ningún proveedor de transcripción configurado. Pida a su administrador que configure Whisper o que habilite la transcripción en el navegador.';
+$string['soapbox:result_heading'] = 'Puntuaciones de la rúbrica';
+$string['soapbox:overall_heading'] = 'General';
+$string['soapbox:tips_heading'] = 'Consejos para la próxima vez';
+$string['soapbox:col_criterion'] = 'Criterio';
+$string['soapbox:col_score'] = 'Puntuación';
+$string['soapbox:col_feedback'] = 'Comentarios';
+$string['soapbox:history_heading'] = 'Mis discursos';
+$string['soapbox:history_empty'] = 'Aún no ha grabado ningún discurso. Grabe uno arriba para empezar a crear su historial.';
+$string['soapbox:untitled'] = 'Discurso sin título';
+$string['soapbox:overall_badge'] = 'General {$a}';
+$string['soapbox:toggle'] = 'Habilitar Soapbox para este curso';
+$string['soapbox:toggle_help'] = 'Los estudiantes obtienen una página dedicada para grabar un discurso y recibir comentarios de oratoria calificados con rúbrica junto con consejos. El audio y las transcripciones nunca se almacenan. Desactivado de forma predeterminada.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Tipo de curso / nivel de oratoria';
+$string['soapbox:level_help'] = 'Adapta el asesoramiento de la IA y la rúbrica de muestra predeterminada al tipo de curso. Los niveles de ESL reciben comentarios de aprendizaje de idiomas; el discurso general se centra en las habilidades de presentación. Aún puedes editar la rúbrica a continuación.';
+$string['soapbox:level_general'] = 'Discurso general / presentación';
+$string['soapbox:level_esl_beginner'] = 'ESL (principiante)';
+$string['soapbox:level_esl_advanced'] = 'ESL (avanzado)';
+$string['soapbox:edit_rubric'] = 'Editar rúbrica de oratoria';
+$string['soapbox:sample_label'] = 'Cargar una rúbrica de muestra';
+$string['soapbox:sample_choose'] = 'Elige una muestra…';
+$string['soapbox:sample_hint'] = 'Carga criterios de muestra en el editor de abajo. Revisa y guarda para aplicarlos a este ámbito.';

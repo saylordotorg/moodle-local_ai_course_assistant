@@ -1529,3 +1529,57 @@ $string['analytics:exp_tts_per_active'] = 'Egwu TTS kwa onye oji na-arụ ọr�
 
 $string['settings:redash_allowed_origin'] = 'Mmalite enyere ikike maka Redash (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'Hapụ ya efu (a tụrụ aro): Redash na-ewepụta mbupụ ahụ site na ihe nkesa gaa na ihe nkesa, ọ dịghịkwa achọ isi CORS nke ihe nchọgharị. Tọọ otu mmalite ziri ezi (dịka ọmụmaatụ https://redash.example.org) naanị ma ọ bụrụ na dashboard dabere na ihe nchọgharị ga-agụ mbupụ ahụ ozugbo. Ejila wildcard mgbe ọ bụla.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Metadata nhọrọ ị nyere maka nnọkọ ahụ, dị ka aha, isiokwu, na ogologo ebumnobi nke okwu Soapbox. Ọ naghị agụnye ọdịyo ma ọ bụ ihe ederede mbubata.';
+$string['pedagogy:soapbox'] = 'Nzaghachi okwu Soapbox gbanyere site na ndabara';
+$string['pedagogy:soapbox_desc'] = 'Mgbe agbanyere ya, ngwa npractice okwu Soapbox dị na usoro ọ bụla ọ gwụla ma usoro ahụ nwere mmegharị nke ya. Hapụ ya gbanyụọ ma gbanye ya naanị na usoro ndị chọrọ ya (na-abụkarị usoro okwu na nkwukọrịta).';
+$string['settings:soapbox_stt_mode'] = 'Ụdị ntụgharị okwu Soapbox';
+$string['settings:soapbox_stt_mode_desc'] = 'Otú Soapbox si atụgharị okwu e dekọrọ ka ọ bụrụ ederede. Sava na-eji onye na-enye Whisper a haziri (nke onwe gị nwebata enweghị ụgwọ; OpenAI a kwadoro dị ihe dịka USD 0.006 kwa nkeji). Ihe nchọgharị na-eji nghọta okwu nke onye mmụta (n\'efu, enweghị sava, na-arụ ọrụ na Chrome na Safari naanị). A na-akwado Sava ka mma ntụgharị okwu ghara ịdabere na ihe nchọgharị nke onye mmụta.';
+$string['settings:soapbox_stt_mode_server'] = 'Sava (onye na-enye Whisper)';
+$string['settings:soapbox_stt_mode_browser'] = 'Ihe nchọgharị (n\'efu, enweghị sava)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Npractice okwu Soapbox';
+$string['soapbox:disabled'] = 'A naghị enyere Soapbox ikike maka usoro a.';
+$string['soapbox:intro'] = 'Kwuo okwu wee nweta nduzi. Ọ bụrụ nhọrọ, tinye aha, isiokwu, na ogologo ebumnobi, wee dekọọ onwe gị ka ị na-ekwu okwu. Soapbox na-atụgharị okwu gị, na-enye ya akara megide usoro nyocha okwu, ma na-enye gị ndụmọdụ doro anya. A naghị echekwa ọdịyo gị na ihe ederede mbubata mgbe ọ bụla, naanị akara na nzaghachi gị.';
+$string['soapbox:optional'] = 'nhọrọ';
+$string['soapbox:name_label'] = 'Nye okwu a aha';
+$string['soapbox:topic_label'] = 'Isiokwu';
+$string['soapbox:time_label'] = 'Ogologo ebumnobi';
+$string['soapbox:no_target'] = 'Enweghị ebumnobi';
+$string['soapbox:record'] = 'Dekọọ okwu';
+$string['soapbox:stop'] = 'Kwụsị wee nweta nzaghachi';
+$string['soapbox:recording'] = 'Na-edekọ. Kwuo okwu nke ọma; pịa kwụsị mgbe ị mechara.';
+$string['soapbox:transcribing'] = 'Na-atụgharị okwu gị…';
+$string['soapbox:scoring'] = 'Na-enye okwu gị akara…';
+$string['soapbox:too_short'] = 'Ndekọ ahụ dị mkpụmkpụ nke ukwuu inye akara. Gbalịa opekata mpe otu ahịrịokwu ma ọ bụ abụọ wee nwaa ọzọ.';
+$string['soapbox:mic_denied'] = 'Achọrọ ohere igweokwu iji dekọọ. Kwe ka e nweta ohere igweokwu wee nwaa ọzọ.';
+$string['soapbox:no_browser_stt'] = 'Ihe nchọgharị a anaghị akwado nghọta okwu n\'ime ihe nchọgharị. Nwaa Chrome ma ọ bụ Safari, ma ọ bụ rịọ onye nchịkwa gị ka ọ gbanwee Soapbox ka ọ bụrụ ntụgharị okwu sava.';
+$string['soapbox:browser_note'] = 'A na-atụgharị okwu a n\'ime ihe nchọgharị gị. Ọ dịghị ihe a na-ebugo. Ọ na-arụ ọrụ nke ọma na Chrome na Safari.';
+$string['soapbox:server_note'] = 'A na-ebugo ndekọ gị maka ntụgharị okwu naanị, a naghịkwa echekwa ya.';
+$string['soapbox:error'] = 'Enweghị ike inye okwu a akara ugbu a. Nwaa ọzọ n\'oge na-adịghị anya.';
+$string['soapbox:audio_too_large'] = 'Ndekọ ahụ buru ibu nke ukwuu. Mee ka okwu dịrị n\'okpuru ihe dịka 25 MB (ihe dịka nkeji 20).';
+$string['soapbox:no_stt'] = 'A hazighị onye na-enye ntụgharị okwu ọ bụla. Rịọ onye nchịkwa gị ka ọ hazie Whisper ma ọ bụ kwe ka ntụgharị okwu ihe nchọgharị rụọ ọrụ.';
+$string['soapbox:result_heading'] = 'Akara usoro nyocha';
+$string['soapbox:overall_heading'] = 'N\'ozuzu';
+$string['soapbox:tips_heading'] = 'Ndụmọdụ maka oge ọzọ';
+$string['soapbox:col_criterion'] = 'Ụkpụrụ';
+$string['soapbox:col_score'] = 'Akara';
+$string['soapbox:col_feedback'] = 'Nzaghachi';
+$string['soapbox:history_heading'] = 'Okwu m';
+$string['soapbox:history_empty'] = 'Ị dekọbeghị okwu. Dekọọ otu n\'elu iji malite iwu akụkọ ihe mere eme gị.';
+$string['soapbox:untitled'] = 'Okwu na-enweghị aha';
+$string['soapbox:overall_badge'] = 'N\'ozuzu {$a}';
+$string['soapbox:toggle'] = 'Kwe ka Soapbox rụọ ọrụ maka usoro a';
+$string['soapbox:toggle_help'] = 'Ndị mmụta na-enweta ibe akwadoro iji dekọọ okwu ma nweta nzaghachi okwu enyere akara site na usoro nyocha tinyere ndụmọdụ. A naghị echekwa ọdịyo na ihe ederede mbubata mgbe ọ bụla. Gbanyụrụ site na ndabara.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Ụdị ọmụmụ / ọkwa okwu';
+$string['soapbox:level_help'] = 'Na-emepụta nkuzi AI na rubric ihe nlereanya ndabara dabere n\'ụdị ọmụmụ. Ọkwa ESL na-enweta nzaghachi mmụta asụsụ; okwu izugbe na-elekwasị anya na nkà ngosi. Ị ka nwere ike idezi rubric n\'okpuru.';
+$string['soapbox:level_general'] = 'Okwu izugbe / ngosi';
+$string['soapbox:level_esl_beginner'] = 'ESL (mbido)';
+$string['soapbox:level_esl_advanced'] = 'ESL (ọkachamara)';
+$string['soapbox:edit_rubric'] = 'Dezie rubric okwu';
+$string['soapbox:sample_label'] = 'Bulite rubric ihe nlereanya';
+$string['soapbox:sample_choose'] = 'Họrọ ihe nlereanya…';
+$string['soapbox:sample_hint'] = 'Na-ebulite ụkpụrụ ihe nlereanya n\'ime onye nchịkọta n\'okpuru. Lelee ma Chekwaa iji tinye ha na oghere a.';

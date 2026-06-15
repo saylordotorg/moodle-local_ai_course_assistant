@@ -146,6 +146,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset_config($cfgprefix . $courseid, 'local_ai_course_assistant');
         }
     }
+    // v6.7.0: Soapbox course-type/level (general speech vs ESL beginner/advanced).
+    // Tailors the AI coaching register and the default sample rubric.
+    $soapboxlevel = optional_param('soapbox_level', '', PARAM_ALPHANUMEXT);
+    $validlevels = array_keys(\local_ai_course_assistant\rubric_manager::speech_presets());
+    if (in_array($soapboxlevel, $validlevels, true) && $soapboxlevel !== \local_ai_course_assistant\rubric_manager::SPEECH_LEVEL_GENERAL) {
+        set_config('soapbox_level_course_' . $courseid, $soapboxlevel, 'local_ai_course_assistant');
+    } else {
+        unset_config('soapbox_level_course_' . $courseid, 'local_ai_course_assistant');
+    }
     // Digest email keeps its checkbox semantics — it's a per-course delivery
     // toggle, not a feature on/off.
     set_config('digest_email_enabled_course_' . $courseid,
@@ -490,6 +499,8 @@ echo html_writer::div(
             $sbon       = \local_ai_course_assistant\feature_flags::resolve('code_sandbox', $courseid);
             $esson      = \local_ai_course_assistant\feature_flags::resolve('essay_feedback', $courseid);
             $sbxon      = \local_ai_course_assistant\feature_flags::resolve('soapbox', $courseid);
+            $sbxlevel   = (string) (get_config('local_ai_course_assistant', 'soapbox_level_course_' . $courseid)
+                ?: \local_ai_course_assistant\rubric_manager::SPEECH_LEVEL_GENERAL);
             $digeston   = (bool) get_config('local_ai_course_assistant', 'digest_email_enabled_course_' . $courseid);
             $extresraw  = get_config('local_ai_course_assistant', 'external_resources_enabled_course_' . $courseid);
             $extresglobal = (bool) get_config('local_ai_course_assistant', 'external_resources_enabled');
@@ -614,11 +625,31 @@ echo html_writer::div(
                         <?php echo get_string('soapbox:toggle_help', 'local_ai_course_assistant'); ?>
                     </small>
                     <?php if ($sbxon) { ?>
-                    <div class="mt-1">
+                    <div class="mt-2">
+                        <label for="aica-soapbox-level" style="font-weight:600;font-size:13px">
+                            <?php echo get_string('soapbox:level_label', 'local_ai_course_assistant'); ?>
+                        </label>
+                        <select id="aica-soapbox-level" name="soapbox_level" class="form-control form-control-sm" style="max-width:320px">
+                            <?php foreach (\local_ai_course_assistant\rubric_manager::speech_presets() as $lvkey => $lvdef) { ?>
+                            <option value="<?php echo s($lvkey); ?>"<?php echo $sbxlevel === $lvkey ? ' selected' : ''; ?>>
+                                <?php echo get_string($lvdef['label_key'], 'local_ai_course_assistant'); ?>
+                            </option>
+                            <?php } ?>
+                        </select>
+                        <small class="form-text text-muted">
+                            <?php echo get_string('soapbox:level_help', 'local_ai_course_assistant'); ?>
+                        </small>
+                    </div>
+                    <div class="mt-2 d-flex flex-wrap" style="gap:8px">
                         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/soapbox.php',
                                 ['courseid' => $courseid]))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('soapbox:link', 'local_ai_course_assistant'); ?> &rarr;
+                        </a>
+                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php',
+                                ['courseid' => $courseid, 'type' => 'speech']))->out(false); ?>"
+                           class="btn btn-sm btn-outline-secondary" target="_blank">
+                            <?php echo get_string('soapbox:edit_rubric', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
                     </div>
                     <?php } ?>

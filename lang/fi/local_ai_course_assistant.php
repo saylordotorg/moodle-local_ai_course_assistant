@@ -1513,3 +1513,57 @@ $string['analytics:exp_tts_per_active'] = 'TTS-toistot per aktiivinen käyttäj�
 
 $string['settings:redash_allowed_origin'] = 'Redashin sallittu alkuperä (CORS)';
 $string['settings:redash_allowed_origin_desc'] = 'Jätä tyhjäksi (suositeltavaa): Redash hakee viennin palvelimelta palvelimelle eikä se tarvitse selaimen CORS-otsaketta. Aseta yksi tarkka alkuperä (esimerkiksi https://redash.example.org) vain, jos selainpohjaisen koontinäytön on luettava vienti suoraan. Älä koskaan käytä jokerimerkkiä.';
+
+// Soapbox speech practice (v6.7.0).
+$string['privacy:metadata:local_ai_course_assistant_practice_scores:session_meta'] = 'Valinnaiset metatiedot, jotka annoit istuntoa varten, kuten Soapbox-puheen nimi, aihe ja tavoitepituus. Ei koskaan sisällä äänitettä tai litterointia.';
+$string['pedagogy:soapbox'] = 'Soapbox-puhepalaute oletuksena käytössä';
+$string['pedagogy:soapbox_desc'] = 'Kun tämä on käytössä, Soapbox-puheharjoittelutyökalu on saatavilla jokaisella kurssilla, ellei kurssilla ole omaa ohitusasetusta. Jätä pois käytöstä ja ota se käyttöön vain niillä kursseilla, jotka sitä tarvitsevat (yleensä puhe- ja viestintäkurssit).';
+$string['settings:soapbox_stt_mode'] = 'Soapbox-litterointitila';
+$string['settings:soapbox_stt_mode_desc'] = 'Miten Soapbox muuntaa äänitetyn puheen tekstiksi. Palvelin käyttää määritettyä Whisper-tarjoajaa (itse isännöity on ilmainen; isännöity OpenAI maksaa noin USD 0,006 minuutilta). Selain käyttää oppijan sisäänrakennettua puheentunnistusta (ilmainen, ei palvelinta, toimii vain Chromessa ja Safarissa). Palvelinta suositellaan, jotta litteroinnin laatu ei riipu oppijan selaimesta.';
+$string['settings:soapbox_stt_mode_server'] = 'Palvelin (Whisper-tarjoaja)';
+$string['settings:soapbox_stt_mode_browser'] = 'Selain (ilmainen, ei palvelinta)';
+$string['soapbox:title'] = 'Soapbox';
+$string['soapbox:link'] = 'Soapbox-puheharjoittelu';
+$string['soapbox:disabled'] = 'Soapbox ei ole käytössä tällä kurssilla.';
+$string['soapbox:intro'] = 'Pidä puhe ja saa valmennusta. Voit halutessasi asettaa nimen, aiheen ja tavoitepituuden ja äänittää sitten itsesi puhumassa. Soapbox litteroi puheesi, pisteyttää sen puherubriikin mukaan ja antaa konkreettisia vinkkejä. Äänitettäsi ja litterointia ei koskaan tallenneta, vain pisteesi ja palaute.';
+$string['soapbox:optional'] = 'valinnainen';
+$string['soapbox:name_label'] = 'Nimeä tämä puhe';
+$string['soapbox:topic_label'] = 'Aihe';
+$string['soapbox:time_label'] = 'Tavoitepituus';
+$string['soapbox:no_target'] = 'Ei tavoitetta';
+$string['soapbox:record'] = 'Äänitä puhe';
+$string['soapbox:stop'] = 'Lopeta ja saa palautetta';
+$string['soapbox:recording'] = 'Äänitetään. Puhu luonnollisesti; napsauta lopeta, kun olet valmis.';
+$string['soapbox:transcribing'] = 'Litteroidaan puhettasi…';
+$string['soapbox:scoring'] = 'Pisteytetään puhettasi…';
+$string['soapbox:too_short'] = 'Äänite oli liian lyhyt pisteytettäväksi. Tavoittele vähintään lausetta tai kahta ja yritä uudelleen.';
+$string['soapbox:mic_denied'] = 'Äänittäminen vaatii pääsyn mikrofoniin. Salli mikrofonin käyttö ja yritä uudelleen.';
+$string['soapbox:no_browser_stt'] = 'Tämä selain ei tue selaimensisäistä puheentunnistusta. Kokeile Chromea tai Safaria tai pyydä järjestelmänvalvojaa vaihtamaan Soapbox palvelinlitterointiin.';
+$string['soapbox:browser_note'] = 'Tämä puhe litteroidaan selaimessasi. Mitään ei ladata palvelimelle. Toimii parhaiten Chromessa ja Safarissa.';
+$string['soapbox:server_note'] = 'Äänitteesi ladataan vain litterointia varten, eikä sitä tallenneta.';
+$string['soapbox:error'] = 'Tätä puhetta ei voitu pisteyttää juuri nyt. Yritä hetken kuluttua uudelleen.';
+$string['soapbox:audio_too_large'] = 'Äänite on liian suuri. Pidä puheet alle noin 25 MB:n kokoisina (noin 20 minuuttia).';
+$string['soapbox:no_stt'] = 'Litterointitarjoajaa ei ole määritetty. Pyydä järjestelmänvalvojaa määrittämään Whisper tai ottamaan selainlitterointi käyttöön.';
+$string['soapbox:result_heading'] = 'Rubriikkipisteet';
+$string['soapbox:overall_heading'] = 'Kokonaisuus';
+$string['soapbox:tips_heading'] = 'Vinkkejä seuraavaa kertaa varten';
+$string['soapbox:col_criterion'] = 'Kriteeri';
+$string['soapbox:col_score'] = 'Pisteet';
+$string['soapbox:col_feedback'] = 'Palaute';
+$string['soapbox:history_heading'] = 'Omat puheeni';
+$string['soapbox:history_empty'] = 'Et ole vielä äänittänyt puhetta. Äänitä yksi yllä aloittaaksesi historiasi kartuttamisen.';
+$string['soapbox:untitled'] = 'Nimetön puhe';
+$string['soapbox:overall_badge'] = 'Kokonaisuus {$a}';
+$string['soapbox:toggle'] = 'Ota Soapbox käyttöön tällä kurssilla';
+$string['soapbox:toggle_help'] = 'Oppijat saavat oman sivun, jolla he voivat äänittää puheen ja saada rubriikilla pisteytettyä puhepalautetta vinkkeineen. Äänitteitä ja litterointeja ei koskaan tallenneta. Pois käytöstä oletuksena.';
+
+// Soapbox course-type/level + sample loader (v6.7.0).
+$string['soapbox:level_label'] = 'Kurssin tyyppi / puhetaso';
+$string['soapbox:level_help'] = 'Mukauttaa tekoälyn valmennuksen ja oletusarvoisen mallirubriikin kurssin tyypin mukaan. ESL-tasot saavat kielenoppimispalautetta; yleinen puhe keskittyy esitystaitoihin. Voit silti muokata alla olevaa rubriikkia.';
+$string['soapbox:level_general'] = 'Yleinen puhe / esitys';
+$string['soapbox:level_esl_beginner'] = 'ESL (alkeistaso)';
+$string['soapbox:level_esl_advanced'] = 'ESL (edistynyt)';
+$string['soapbox:edit_rubric'] = 'Muokkaa puherubriikkia';
+$string['soapbox:sample_label'] = 'Lataa mallirubriikki';
+$string['soapbox:sample_choose'] = 'Valitse malli…';
+$string['soapbox:sample_hint'] = 'Lataa mallikriteerit alla olevaan editoriin. Tarkista ja tallenna ottaaksesi ne käyttöön tässä laajuudessa.';
