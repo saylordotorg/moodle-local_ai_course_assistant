@@ -69,6 +69,7 @@ $judgeprovider = 'claude';
 $judgemodel = 'claude-sonnet-4-6';
 $limit = 0; // 0 = all prompts
 $promptsfile = ''; // empty = use tutor_prompts.json default
+$delay = 0.0; // seconds to sleep between calls (throttle for rate-limited free tiers)
 
 foreach ($argv as $arg) {
     if (preg_match('/^--mode=(run|judge|report|all)$/', $arg, $m)) {
@@ -89,6 +90,8 @@ foreach ($argv as $arg) {
         $limit = (int) $m[1];
     } else if (preg_match('/^--prompts=(.+)$/', $arg, $m)) {
         $promptsfile = trim($m[1]);
+    } else if (preg_match('/^--delay=([\d.]+)$/', $arg, $m)) {
+        $delay = (float) $m[1];
     } else if ($arg === '--help' || $arg === '-h') {
         $help = <<<TXT
 Usage: php run_tutor_golden.php [--mode=run|judge|report|all] [options]
@@ -104,7 +107,10 @@ Options:
   --limit=N                     Limit run to the first N prompts (for smoke tests).
   --prompts=FILE                Path to a tutor_prompts.json-shaped file (default:
                                 tests/golden/tutor_prompts.json). Use for one-off
-                                fixture sets like the A.10 premium-escalation bake-off.
+                                fixture sets like the A.10 premium-escalation bake-off
+                                or the domain-tagged set (tutor_prompts_domains.json).
+  --delay=N                     Sleep N seconds between calls in run mode (throttle
+                                rate-limited free tiers, e.g. --delay=5 for ~15 RPM).
   --in=run.csv[,judge.csv]      Input CSV(s) for judge/report modes.
   --out=DIR                     Output directory (default: <plugin>/runs).
   --judge-provider=ID           Provider id for the rubric judge (default: claude).
@@ -120,7 +126,7 @@ if (!is_dir($outdir)) {
 }
 
 if ($mode === 'run' || $mode === 'all') {
-    $runin = mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile);
+    $runin = mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile, $delay);
 }
 if ($mode === 'judge' || $mode === 'all') {
     if ($runin === '') {
@@ -150,9 +156,10 @@ exit(0);
  * @param string $datetag
  * @param int $limit Max prompts to send, 0 = all.
  * @param string $promptsfile Optional alternate path to a tutor_prompts.json-shaped file.
+ * @param float $delay Seconds to sleep between calls (0 = no throttle).
  * @return string Path to run CSV.
  */
-function mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = ''): string {
+function mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = '', float $delay = 0.0): string {
     $prompts = load_prompts($promptsfile);
     if ($limit > 0) {
         $prompts = array_slice($prompts, 0, $limit);
@@ -216,6 +223,9 @@ function mode_run(string $providersfilter, string $outdir, string $datetag, int 
             printf("  %s [%s] %s\n", $p['id'],
                 ($result['error'] ?? '') === '' ? 'ok' : 'err',
                 $result['error'] ?? sprintf('%dms', $result['total_latency_ms'] ?? 0));
+            if ($delay > 0) {
+                usleep((int) round($delay * 1_000_000));
+            }
         }
     }
     fclose($fh);

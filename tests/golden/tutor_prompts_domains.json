@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "purpose": "Domain-tagged golden prompt set for SOLA provider benchmarking by subject area.",
+    "design": "5 subject domains x 8 prompts. Each domain holds a balanced mix of 4 tutoring sub-functions (2 each): concept (Socratic explanation of a core idea), worked (step-by-step problem the learner asks to be guided through, not handed), misconception (learner states a wrong belief; model must correct accurately and kindly), apply (transfer a concept to a scenario). Sub-function is encoded in the id so cross-domain differences reflect domain handling at a constant function mix. category = domain, so the existing report groups by subject.",
+    "domains": ["business", "science", "cs_tech", "math", "humanities"],
+    "created": "2026-06-03"
+  },
+  "prompts": [
+    { "id": "bus_concept_01", "category": "business", "function": "concept", "text": "I keep mixing up fixed costs and variable costs in my accounting course. Can you help me really understand the difference without just handing me the definitions?" },
+    { "id": "bus_concept_02", "category": "business", "function": "concept", "text": "My economics professor keeps saying every choice has an opportunity cost. I can repeat the phrase but I don't think I actually get it. Can you help it click?" },
+    { "id": "bus_worked_01", "category": "business", "function": "worked", "text": "A company has 50,000 dollars in fixed costs, sells its product for 20 dollars a unit, and each unit costs 12 dollars to make. I need to find the break-even point in units. Please walk me through the reasoning instead of just giving the number." },
+    { "id": "bus_worked_02", "category": "business", "function": "worked", "text": "I need to find the present value of 1,000 dollars I will receive in 3 years if the discount rate is 5 percent. Can you guide me through how to set this up rather than just stating the answer?" },
+    { "id": "bus_misconception_01", "category": "business", "function": "misconception", "text": "Profit and cash flow are basically the same thing, right? If a company reports a profit it must have plenty of cash on hand." },
+    { "id": "bus_misconception_02", "category": "business", "function": "misconception", "text": "Raising the price of a product always increases total revenue, because you earn more on every sale. That's correct, isn't it?" },
+    { "id": "bus_apply_01", "category": "business", "function": "apply", "text": "I'm planning a small coffee cart business for a class project. How would I actually use a SWOT analysis to think it through?" },
+    { "id": "bus_apply_02", "category": "business", "function": "apply", "text": "My study group is arguing about whether a hypothetical startup should lease or buy its equipment. What factors should drive that decision?" },
+
+    { "id": "sci_concept_01", "category": "science", "function": "concept", "text": "I don't really understand why entropy always increases. Can you help me build some intuition for the second law of thermodynamics rather than just stating it?" },
+    { "id": "sci_concept_02", "category": "science", "function": "concept", "text": "I get the basic idea of natural selection, but how it leads to entirely new species over time still feels hand-wavy to me. Can you help me reason through it?" },
+    { "id": "sci_worked_01", "category": "science", "function": "worked", "text": "How many grams of sodium chloride are in 0.5 liters of a 2 molar solution? Please walk me through the steps instead of just giving the final mass." },
+    { "id": "sci_worked_02", "category": "science", "function": "worked", "text": "A ball is dropped from a height of 20 meters. Ignoring air resistance, how long until it hits the ground? Guide me through setting up the problem rather than just stating the time." },
+    { "id": "sci_misconception_01", "category": "science", "function": "misconception", "text": "Plants get most of their mass from the soil they grow in, right? That's where the material to build the plant comes from." },
+    { "id": "sci_misconception_02", "category": "science", "function": "misconception", "text": "Heavier objects fall faster than lighter ones because they weigh more. In a vacuum that's still true, isn't it?" },
+    { "id": "sci_apply_01", "category": "science", "function": "apply", "text": "If average global temperatures are rising, why do some regions still get more extreme cold snaps? Help me reason through how that can happen." },
+    { "id": "sci_apply_02", "category": "science", "function": "apply", "text": "I want to design a simple experiment to test whether caffeine affects how fast a plant grows. How should I think about controls and variables?" },
+
+    { "id": "cs_concept_01", "category": "cs_tech", "function": "concept", "text": "I understand loops, but I don't see why recursion is useful if a loop can do the same job. Can you help make recursion click for me?" },
+    { "id": "cs_concept_02", "category": "cs_tech", "function": "concept", "text": "What is the actual difference between a stack and a queue, and how would I know which one to reach for in a given situation?" },
+    { "id": "cs_worked_01", "category": "cs_tech", "function": "worked", "text": "I need to write a function that checks whether a string is a palindrome. Please don't give me the code, but walk me through how to approach the problem." },
+    { "id": "cs_worked_02", "category": "cs_tech", "function": "worked", "text": "How do I work out the Big O time complexity of a loop nested inside another loop, where both run over the same array? Guide me through the reasoning." },
+    { "id": "cs_misconception_01", "category": "cs_tech", "function": "misconception", "text": "More lines of code means a more powerful program, so I should write everything out the long way instead of leaning on built-in functions, right?" },
+    { "id": "cs_misconception_02", "category": "cs_tech", "function": "misconception", "text": "If my code runs and produces the right answer once, then it's correct and I don't really need to write tests for it. Do you agree?" },
+    { "id": "cs_apply_01", "category": "cs_tech", "function": "apply", "text": "I'm building a simple to-do list web app. How should I think about what belongs on the front end versus the back end?" },
+    { "id": "cs_apply_02", "category": "cs_tech", "function": "apply", "text": "My login form stores passwords as plain text in the database. A classmate said that's a serious problem. Why is it bad, and what should I do instead?" },
+
+    { "id": "math_concept_01", "category": "math", "function": "concept", "text": "I can compute derivatives mechanically, but I don't understand what a derivative is actually telling me. Can you help me grasp the meaning?" },
+    { "id": "math_concept_02", "category": "math", "function": "concept", "text": "My statistics class keeps repeating that correlation does not imply causation. I want to genuinely understand why, not just memorize the slogan." },
+    { "id": "math_worked_01", "category": "math", "function": "worked", "text": "How do I find the derivative of f of x equals 3 x squared plus 2 x? Please walk me through the rules you're using rather than just giving the answer." },
+    { "id": "math_worked_02", "category": "math", "function": "worked", "text": "For the data set 4, 8, 8, 10, 10, 12, how do I find the mean and the standard deviation step by step?" },
+    { "id": "math_misconception_01", "category": "math", "function": "misconception", "text": "A p-value of 0.05 means there is a 95 percent chance that my hypothesis is true, correct?" },
+    { "id": "math_misconception_02", "category": "math", "function": "misconception", "text": "If I flip a fair coin and get five heads in a row, then tails is now more likely on the next flip to balance things out, right?" },
+    { "id": "math_apply_01", "category": "math", "function": "apply", "text": "How would I use a derivative to find the point that maximizes profit in a business problem? Help me see the connection." },
+    { "id": "math_apply_02", "category": "math", "function": "apply", "text": "I rolled a die 60 times and want to decide whether it's fair. How should I think about testing that?" },
+
+    { "id": "hum_concept_01", "category": "humanities", "function": "concept", "text": "In my history course, what does it actually mean for a source to be primary versus secondary, and why does the distinction matter so much?" },
+    { "id": "hum_concept_02", "category": "humanities", "function": "concept", "text": "My philosophy class distinguishes between a valid argument and a sound one. Aren't those just two words for the same thing?" },
+    { "id": "hum_worked_01", "category": "humanities", "function": "worked", "text": "I have to write a thesis statement for an essay about why a character in a novel changes. Please don't write it for me, but walk me through how to build a strong one." },
+    { "id": "hum_worked_02", "category": "humanities", "function": "worked", "text": "How do I structure a body paragraph so it actually supports my argument, instead of just retelling what happened in the plot? Guide me through it." },
+    { "id": "hum_misconception_01", "category": "humanities", "function": "misconception", "text": "A primary source is always more reliable than a secondary source, because it's a firsthand account. That's right, isn't it?" },
+    { "id": "hum_misconception_02", "category": "humanities", "function": "misconception", "text": "If a famous and respected philosopher made the claim, then it must be a strong argument. Citing a great thinker basically settles the question, doesn't it?" },
+    { "id": "hum_apply_01", "category": "humanities", "function": "apply", "text": "I'm analyzing a political speech for a communications assignment. How do I identify the rhetorical techniques being used to persuade the audience?" },
+    { "id": "hum_apply_02", "category": "humanities", "function": "apply", "text": "I have to compare two historical accounts of the same event that contradict each other. How should I approach deciding what likely happened?" }
+  ]
+}
