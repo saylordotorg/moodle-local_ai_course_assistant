@@ -47,8 +47,8 @@ use local_ai_course_assistant\emergency_control;
 
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/emergency_admin.php'));
-$PAGE->set_title(get_string('emergency:title', 'local_ai_course_assistant'));
-$PAGE->set_heading(get_string('emergency:title', 'local_ai_course_assistant'));
+$PAGE->set_title(\local_ai_course_assistant\branding::apply(get_string('emergency:title', 'local_ai_course_assistant')));
+$PAGE->set_heading(\local_ai_course_assistant\branding::apply(get_string('emergency:title', 'local_ai_course_assistant')));
 $PAGE->set_pagelayout('admin');
 
 $validflags = [

@@ -4786,10 +4786,19 @@ define([
             identity = shortName + ' (' + displayName + ')';
         }
         Str.get_string('chat:greeting', 'local_ai_course_assistant').then(function(greeting) {
-            // Replace placeholders with configured values.
-            var msg = greeting.replace('{$a}', firstName || 'there');
+            // Resolve brand tokens from the configured names. [[tutorshort]] keeps
+            // the old identity expansion ("Short (Full Name)"); the other three map
+            // to their configured values via the brand-token map on the widget root.
+            var brand = {};
+            try { brand = JSON.parse((rootEl && rootEl.dataset.brandtokens) || '{}'); } catch (e) { brand = {}; }
+            var msg = greeting
+                .replace(/\[\[tutorshort\]\]/g, identity)
+                .replace(/\[\[tutorname\]\]/g, brand.tutorname || displayName)
+                .replace(/\[\[uniname\]\]/g, brand.uniname || institutionName)
+                .replace(/\[\[unishort\]\]/g, brand.unishort || institutionName);
+            // Replace the remaining placeholders with configured values.
+            msg = msg.replace('{$a}', firstName || 'there');
             msg = msg.replace('{INSTITUTION}', institutionName);
-            msg = msg.replace(/SOLA/g, identity);
             addAssistantMsg(msg, null, {skipHistory: true});
             return;
         }).catch(function() {

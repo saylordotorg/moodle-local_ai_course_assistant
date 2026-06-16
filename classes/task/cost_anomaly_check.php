@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 class cost_anomaly_check extends \core\task\scheduled_task {
 
     public function get_name(): string {
-        return get_string('task:cost_anomaly_check', 'local_ai_course_assistant');
+        return \local_ai_course_assistant\branding::apply(get_string('task:cost_anomaly_check', 'local_ai_course_assistant'));
     }
 
     public function execute(): void {

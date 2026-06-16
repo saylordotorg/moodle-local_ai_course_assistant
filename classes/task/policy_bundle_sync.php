@@ -43,7 +43,7 @@ class policy_bundle_sync extends \core\task\scheduled_task {
      * @return string
      */
     public function get_name(): string {
-        return get_string('task:policy_bundle_sync', 'local_ai_course_assistant');
+        return \local_ai_course_assistant\branding::apply(get_string('task:policy_bundle_sync', 'local_ai_course_assistant'));
     }
 
     /**

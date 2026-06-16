@@ -52,7 +52,7 @@ $lang = optional_param('lang', 'en', PARAM_ALPHA);
 if ($sid !== '' && !\local_ai_course_assistant\talking_avatar_session_manager::user_owns_session(
         (int) $USER->id, $provider, $sid)) {
     throw new \moodle_exception('nopermissions', 'error', '',
-        get_string('talking_avatar:viewer_title', 'local_ai_course_assistant'));
+        \local_ai_course_assistant\branding::apply(get_string('talking_avatar:viewer_title', 'local_ai_course_assistant')));
 }
 
 \local_ai_course_assistant\security::send_security_headers();
@@ -60,7 +60,7 @@ if ($sid !== '' && !\local_ai_course_assistant\talking_avatar_session_manager::u
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/talking_avatar_viewer.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('embedded');
-$PAGE->set_title(get_string('talking_avatar:viewer_title', 'local_ai_course_assistant'));
+$PAGE->set_title(\local_ai_course_assistant\branding::apply(get_string('talking_avatar:viewer_title', 'local_ai_course_assistant')));
 
 $bundleurl = (string) (get_config('local_ai_course_assistant', 'cdn_bundle_url') ?: '');
 $config = [
@@ -76,7 +76,7 @@ echo $OUTPUT->header();
 <div id="sola-avatar-stage" class="sola-avatar-stage" data-provider="<?php echo s($provider); ?>">
   <video id="sola-avatar-video" autoplay playsinline></video>
   <div id="sola-avatar-fallback" class="sola-avatar-fallback" hidden>
-    <p><?php echo get_string('talking_avatar:bundle_required', 'local_ai_course_assistant'); ?></p>
+    <p><?php echo \local_ai_course_assistant\branding::apply(get_string('talking_avatar:bundle_required', 'local_ai_course_assistant')); ?></p>
   </div>
 </div>
 <script>

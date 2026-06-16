@@ -31,7 +31,7 @@ use local_ai_course_assistant\radar_delivery;
 class run_anomaly_digest extends \core\task\scheduled_task {
 
     public function get_name(): string {
-        return get_string('task:run_anomaly_digest', 'local_ai_course_assistant');
+        return \local_ai_course_assistant\branding::apply(get_string('task:run_anomaly_digest', 'local_ai_course_assistant'));
     }
 
     public function execute(): void {

@@ -53,11 +53,11 @@ $string['task:run_meta_ai_query'] = 'Ütemezett Tanulási radar elemzési lekér
 $string['settings:enabled'] = 'AI Kurzus Asszisztens engedélyezése';
 $string['settings:enabled_desc'] = 'Az AI Kurzus Asszisztens widget engedélyezése vagy letiltása a kurzusoldalon.';
 $string['settings:default_course_mode'] = 'Új kurzusok alapértelmezése';
-$string['settings:default_course_mode_desc'] = 'Szabályozza, hogy a SOLA megjelenik-e egy kurzuson, ha nincs kurzus-specifikus választás. Az új telepítések alapértelmezés szerint "Alapértelmezetten letiltva" állapotban vannak, így a rendszergazdák kurzusonként engedélyezhetik az Analytics oldalról vagy a Course AI Settings oldalról.';
+$string['settings:default_course_mode_desc'] = 'Szabályozza, hogy a [[tutorshort]] megjelenik-e egy kurzuson, ha nincs kurzus-specifikus választás. Az új telepítések alapértelmezés szerint "Alapértelmezetten letiltva" állapotban vannak, így a rendszergazdák kurzusonként engedélyezhetik az Analytics oldalról vagy a Course AI Settings oldalról.';
 $string['settings:default_course_mode_per_course'] = 'Alapértelmezetten letiltva (kurzusonként engedélyezés)';
 $string['settings:default_course_mode_all'] = 'Minden kurzuson engedélyezve';
 $string['settings:auto_open'] = 'Automatikus megnyitás az első látogatáskor';
-$string['settings:auto_open_desc'] = 'Engedélyezés esetén a SOLA fiók automatikusan megnyílik, amikor egy hallgató először jut el az egyes kurzusokra. A későbbi oldalbetöltések ugyanabban a kurzusban nem nyitják meg újra a fiókot — az állapot kurzusonként követhető a hallgató böngészőjében a localStorage segítségével. Asztali számítógépen és mobilon is alkalmazható. Kurzusonként felülbírálható a Course AI Settings oldalon.';
+$string['settings:auto_open_desc'] = 'Engedélyezés esetén a [[tutorshort]] fiók automatikusan megnyílik, amikor egy hallgató először jut el az egyes kurzusokra. A későbbi oldalbetöltések ugyanabban a kurzusban nem nyitják meg újra a fiókot — az állapot kurzusonként követhető a hallgató böngészőjében a localStorage segítségével. Asztali számítógépen és mobilon is alkalmazható. Kurzusonként felülbírálható a Course AI Settings oldalon.';
 $string['settings:comparison_providers'] = 'Összehasonlító szolgáltatók (LLM választó)';
 $string['settings:comparison_providers_desc'] = 'Adjon hozzá további AI szolgáltatókat a widgetbe épített LLM választóhoz, hogy az adminisztrátorok összehasonlíthassák a válaszokat a szolgáltatók között. Sorok hozzáadásához használja az alábbi táblázatot. A hőmérséklet oszlop opcionális (hagyja üresen a globális hőmérséklet használatához). Tárolt formátum: provider_id|api_key|model1,model2|temperature. A fent beállított elsődleges szolgáltató mindig automatikusan szerepel. Csak a kezelési jogosultsággal rendelkező adminisztrátorok látják a választót; a diákok soha nem látják. Érvényes provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:provider'] = 'Alapértelmezett AI szolgáltató';
@@ -88,7 +88,7 @@ $string['settings:avatar_color_desc'] = 'Az avatar gomb keretszíne. Használjon
 $string['settings:avatar_fill'] = 'Avatar háttér szín';
 $string['settings:avatar_fill_desc'] = 'Kitöltőszín az avatar gombon belül. Használjon hex értéket.';
 $string['settings:display_mode'] = 'Megjelenítési mód';
-$string['settings:display_mode_desc'] = 'Hogyan jelenik meg a SOLA az oldalon.';
+$string['settings:display_mode_desc'] = 'Hogyan jelenik meg a [[tutorshort]] az oldalon.';
 $string['settings:display_mode_widget'] = 'Widget (lebegő gomb)';
 $string['settings:display_mode_drawer'] = 'Oldalsó fiók (jobb szél)';
 $string['settings:position'] = 'Widget pozíció';
@@ -104,9 +104,9 @@ $string['analytics:viewdashboard'] = 'Analitikai irányítópult megtekintése';
 $string['coursesettings:title'] = 'Kurzus AI beállítások';
 $string['coursesettings:enabled'] = 'Kurzus felülírások engedélyezése';
 $string['coursesettings:enabled_desc'] = 'Ha engedélyezve van, az alábbi beállítások felülírják a globális AI konfigurációt.';
-$string['coursesettings:sola_enabled'] = 'SOLA ezen a kurzuson';
-$string['coursesettings:sola_enabled_toggle'] = 'A SOLA widget megjelenítése ezen a kurzuson';
-$string['coursesettings:sola_enabled_desc'] = 'Szabályozza, hogy a SOLA chat widget megjelenik-e ezen a kurzuson. A webhelyszintű alapértelmezés a bővítmény beállításaiban a General > Default for new courses alatt állítható be.';
+$string['coursesettings:sola_enabled'] = '[[tutorshort]] ezen a kurzuson';
+$string['coursesettings:sola_enabled_toggle'] = 'A [[tutorshort]] widget megjelenítése ezen a kurzuson';
+$string['coursesettings:sola_enabled_desc'] = 'Szabályozza, hogy a [[tutorshort]] chat widget megjelenik-e ezen a kurzuson. A webhelyszintű alapértelmezés a bővítmény beállításaiban a General > Default for new courses alatt állítható be.';
 $string['coursesettings:using_global'] = 'Globális beállítás használata';
 $string['coursesettings:saved'] = 'Kurzus AI beállítások mentve.';
 $string['coursesettings:ell_pronunciation'] = 'Kiejtésgyakorlási mód';
@@ -122,9 +122,9 @@ $string['coursesettings:global_settings_link'] = 'Globális AI beállítások';
 $string['coursesettings:token_usage'] = 'Token használat és költség';
 $string['coursesettings:token_usage_desc'] = 'Token használat, költségbecslések és hallgatónkénti bontás megtekintése.';
 
-// v5.2.0: per-quiz SOLA assistance level controls.
+// v5.2.0: per-quiz [[tutorshort]] assistance level controls.
 $string['quizsettings:title'] = 'Quiz Assistance Levels';
-$string['quizsettings:desc'] = 'Choose how much help SOLA gives on each quiz. "Default" uses the legacy rule: ungraded quizzes get full help, graded quizzes hide the widget. Use "Coach" to keep SOLA available on a graded quiz but block direct answers.';
+$string['quizsettings:desc'] = 'Choose how much help [[tutorshort]] gives on each quiz. "Default" uses the legacy rule: ungraded quizzes get full help, graded quizzes hide the widget. Use "Coach" to keep [[tutorshort]] available on a graded quiz but block direct answers.';
 $string['quizsettings:colquiz'] = 'Quiz';
 $string['quizsettings:colgrade'] = 'Max grade';
 $string['quizsettings:collevel'] = 'Assistance level';
@@ -142,30 +142,30 @@ $string['lang:change'] = 'Nyelv váltása';
 $string['lang:english'] = 'Angol';
 
 // Chat widget.
-$string['chat:title'] = 'SOLA';
+$string['chat:title'] = '[[tutorshort]]';
 $string['chat:placeholder'] = 'Tegyen fel egy kérdést...';
 $string['chat:send'] = 'Küldés';
 $string['chat:close'] = 'Csevegés bezárása';
-$string['chat:open'] = 'SOLA megnyitása';
+$string['chat:open'] = '[[tutorshort]] megnyitása';
 $string['chat:change_avatar'] = 'Avatar módosítása';
 $string['chat:clear'] = 'Képernyő törlése';
 $string['chat:clear_confirm'] = 'Törli a látható üzeneteket? A teljes csevegési előzmény mentve marad, és a widget újbóli megnyitásával újratölthető.';
 $string['chat:copy'] = 'Beszélgetés másolása';
 $string['chat:copied'] = 'Beszélgetés vágólapra másolva';
 $string['chat:copy_failed'] = 'Másolás sikertelen';
-$string['chat:greeting'] = 'Szia, {$a}! A SOLA vagyok. Miben segíthetek ma?';
+$string['chat:greeting'] = 'Szia, {$a}! A [[tutorshort]] vagyok. Miben segíthetek ma?';
 $string['chat:thinking'] = 'Gondolkodom...';
 $string['chat:error'] = 'Sajnálom, valami hiba történt. Kérjük, próbálja újra.';
 $string['chat:error_auth'] = 'Hitelesítési hiba. Kérjük, lépjen kapcsolatba a rendszergazdával.';
 $string['chat:error_ratelimit'] = 'Túl sok kérés. Kérjük, várjon egy pillanatot és próbálja újra.';
 $string['chat:error_unavailable'] = 'Az AI szolgáltatás átmenetileg nem érhető el.';
-$string['chat:error_notconfigured'] = 'A SOLA még nincs konfigurálva. Kérjük, lépjen kapcsolatba a rendszergazdával.';
+$string['chat:error_notconfigured'] = 'A [[tutorshort]] még nincs konfigurálva. Kérjük, lépjen kapcsolatba a rendszergazdával.';
 $string['chat:mic'] = 'Mondja el a kérdését';
 $string['chat:mic_error'] = 'Mikrofonhiba. Kérjük, ellenőrizze a böngésző engedélyeit.';
 $string['chat:mic_unsupported'] = 'A hangbemenet nem támogatott ebben a böngészőben.';
 $string['chat:newline_hint'] = 'Shift+Enter új sorhoz';
 $string['chat:you'] = 'Ön';
-$string['chat:assistant'] = 'SOLA';
+$string['chat:assistant'] = '[[tutorshort]]';
 $string['chat:history_loaded'] = 'Korábbi beszélgetés betöltve.';
 $string['chat:history_cleared'] = 'Csevegési előzmények törölve.';
 $string['chat:offtopic_warning'] = 'Úgy tűnik, a kérdése nem kapcsolódik ehhez a kurzushoz. Kérjük, maradjon a témánál!';
@@ -266,17 +266,17 @@ $string['chat:settings_voice_admin'] = 'A hangbeállításokat az adminisztráci
 
 // Voice mode.
 $string['chat:voice_mode'] = 'Hang mód';
-$string['chat:voice_title'] = 'Beszéljen a SOLA-val';
+$string['chat:voice_title'] = 'Beszéljen a [[tutorshort]]-val';
 $string['chat:voice_copy'] = 'Folytasson természetes hangbeszélgetést a tanulási asszisztenssel.';
 $string['chat:voice_ready'] = 'Indulásra kész';
 $string['chat:voice_start'] = 'Beszélgetés indítása';
 $string['chat:voice_end'] = 'Hang munkamenet befejezése';
 $string['chat:voice_connecting'] = 'Csatlakozás...';
 $string['chat:voice_listening'] = 'Hallgatás...';
-$string['chat:voice_speaking'] = 'SOLA beszél...';
+$string['chat:voice_speaking'] = '[[tutorshort]] beszél...';
 $string['chat:voice_idle'] = 'Kész';
 $string['chat:voice_error'] = 'A hangkapcsolat sikertelen. Ellenőrizze a beállításait.';
-$string['chat:quiz_locked'] = 'A SOLA szünetel a tesztek alatt az akadémiai tisztesség támogatása érdekében. Sok sikert!';
+$string['chat:quiz_locked'] = 'A [[tutorshort]] szünetel a tesztek alatt az akadémiai tisztesség támogatása érdekében. Sok sikert!';
 
 // Bottom nav.
 $string['chat:mode_nav'] = 'Mód navigáció';
@@ -300,17 +300,17 @@ $string['chat:debug_context_prompt'] = 'Szerver válasz';
 
 // Quiz hide settings.
 $string['settings:quiz_hide_heading'] = 'Tesztoldal láthatóság';
-$string['settings:quiz_hide_heading_desc'] = 'Szabályozza, hogy a SOLA widget megjelenjen-e a Moodle tesztoldalakon.';
-$string['settings:hide_on_quiz_for_students'] = 'SOLA elrejtése tesztoldalakon hallgatóknak';
-$string['settings:hide_on_quiz_for_students_desc'] = 'A SOLA widget teljes elrejtése minden tesztoldalon hallgatóknak.';
-$string['settings:hide_on_quiz_for_staff'] = 'SOLA elrejtése tesztoldalakon személyzetnek';
-$string['settings:hide_on_quiz_for_staff_desc'] = 'A SOLA widget teljes elrejtése minden tesztoldalon tanároknak és rendszergazdáknak.';
+$string['settings:quiz_hide_heading_desc'] = 'Szabályozza, hogy a [[tutorshort]] widget megjelenjen-e a Moodle tesztoldalakon.';
+$string['settings:hide_on_quiz_for_students'] = '[[tutorshort]] elrejtése tesztoldalakon hallgatóknak';
+$string['settings:hide_on_quiz_for_students_desc'] = 'A [[tutorshort]] widget teljes elrejtése minden tesztoldalon hallgatóknak.';
+$string['settings:hide_on_quiz_for_staff'] = '[[tutorshort]] elrejtése tesztoldalakon személyzetnek';
+$string['settings:hide_on_quiz_for_staff_desc'] = 'A [[tutorshort]] widget teljes elrejtése minden tesztoldalon tanároknak és rendszergazdáknak.';
 
 // Wellbeing.
 $string['settings:wellbeing_heading'] = 'Jóllét és biztonság';
-$string['settings:wellbeing_heading_desc'] = 'A SOLA felismeri a szorongás jeleit és empátiával és támogatási erőforrásokkal válaszol.';
+$string['settings:wellbeing_heading_desc'] = 'A [[tutorshort]] felismeri a szorongás jeleit és empátiával és támogatási erőforrásokkal válaszol.';
 $string['settings:wellbeing_enabled'] = 'Jólléti támogatás engedélyezése';
-$string['settings:wellbeing_enabled_desc'] = 'A SOLA felismeri az érzelmi szorongás jeleit és krízis erőforrásokat biztosít.';
+$string['settings:wellbeing_enabled_desc'] = 'A [[tutorshort]] felismeri az érzelmi szorongás jeleit és krízis erőforrásokat biztosít.';
 
 // Voice mode settings.
 $string['settings:realtime_heading'] = 'Hang mód (OpenAI Realtime)';
@@ -318,22 +318,22 @@ $string['settings:realtime_enabled'] = 'Hang mód engedélyezése';
 $string['settings:realtime_enabled_desc'] = 'Lehetővé teszi a hallgatók számára a valós idejű hangbeszélgetéseket.';
 $string['settings:realtime_apikey'] = 'OpenAI API Kulcs (Hang & TTS)';
 $string['settings:realtime_apikey_desc'] = 'Hang módhoz és az üzenetek TTS gombjához használva.';
-$string['settings:realtime_voice'] = 'SOLA hang';
+$string['settings:realtime_voice'] = '[[tutorshort]] hang';
 $string['settings:realtime_voice_desc'] = 'Hang a Hang módhoz és a TTS gombhoz.';
 
 // Mobile.
 $string['mobile_welcome'] = 'Szia, {$a}!';
-$string['mobile_welcome_sub'] = 'A SOLA vagyok, a tanulási asszisztensed. Hogyan segíthetek ma?';
+$string['mobile_welcome_sub'] = 'A [[tutorshort]] vagyok, a tanulási asszisztensed. Hogyan segíthetek ma?';
 $string['mobile_placeholder'] = 'Tegyen fel egy kérdést...';
 $string['mobile_clear'] = 'Előzmények törlése';
-$string['mobile_disabled'] = 'A SOLA nem elérhető ehhez a kurzushoz.';
+$string['mobile_disabled'] = 'A [[tutorshort]] nem elérhető ehhez a kurzushoz.';
 $string['mobile_chip_concepts'] = 'Főfogalmak';
 $string['mobile_chip_studyplan'] = 'Tanulmányi terv';
 $string['mobile_chip_quiz'] = 'Tesztelj engem';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend kiszolgálás';
-$string['settings:cdn_heading_desc'] = 'A SOLA frontend erőforrásainak (JS/CSS) kiszolgálása külső CDN-ről a Moodle fájlrendszer helyett. Ez lehetővé teszi a frontend frissítéseket bővítmény-frissítés nélkül. Hagyja üresen a CDN URL-t a helyi bővítményfájlok használatához.';
+$string['settings:cdn_heading_desc'] = 'A [[tutorshort]] frontend erőforrásainak (JS/CSS) kiszolgálása külső CDN-ről a Moodle fájlrendszer helyett. Ez lehetővé teszi a frontend frissítéseket bővítmény-frissítés nélkül. Hagyja üresen a CDN URL-t a helyi bővítményfájlok használatához.';
 $string['settings:cdn_url'] = 'CDN alap URL';
 $string['settings:cdn_url_desc'] = 'Alap URL, ahol a sola.min.js és sola.min.css fájlok tárolva vannak. Példa: https://your-org.github.io/sola-cdn. Hagyja üresen a helyi bővítményfájlok használatához.';
 $string['settings:cdn_version'] = 'CDN erőforrás verzió';
@@ -444,7 +444,7 @@ $string['integrity:enabled_desc'] = 'Run automated plugin health checks daily at
 $string['integrity:run_now'] = 'Run Checks Now';
 $string['integrity:title'] = 'Integrity Checks';
 $string['integrity:view_results'] = 'View Integrity Results';
-$string['messageprovider:integrity_report'] = 'SOLA integrity check failure report';
+$string['messageprovider:integrity_report'] = '[[tutorshort]] integrity check failure report';
 $string['messageprovider:study_notes'] = 'Study session notes';
 $string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking.';
 $string['privacy:metadata:local_ai_course_assistant_audit:action'] = 'The action that was performed.';
@@ -572,12 +572,12 @@ $string['studytip:mix_modes']           = 'Mix different types of study: reading
 $string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
 $string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
 $string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell SOLA a different number and it will save your plan.';
+$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
 $string['reminder:email_subject'] = 'Study Reminder: {$a}';
 $string['reminder:study_tip_prefix'] = 'Today\'s study focus: ';
 $string['reminder:whatsapp_body'] = 'Study Reminder for {$a->coursename}: {$a->message} (Opt out: {$a->unsubscribe_url})';
 $string['remoteconfigurl'] = 'Remote config URL';
-$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed SOLA configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
+$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed [[tutorshort]] configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
 $string['rubric:done'] = 'Kész';
 $string['rubric:encourage_high'] = 'Kiváló! Így tovább!';
 $string['rubric:encourage_low'] = 'Jó kezdet! A rendszeres gyakorlás segít.';
@@ -606,7 +606,7 @@ $string['settings:faq_heading'] = 'FAQ & Support';
 $string['settings:faq_heading_desc'] = 'Configure the centralized FAQ and Zendesk support ticket integration.';
 $string['settings:institution_name'] = 'Institution Name';
 $string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
-$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, SOLA will automatically fall back to the provider\'s default.';
+$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, [[tutorshort]] will automatically fall back to the provider\'s default.';
 $string['settings:offtopic_action'] = 'Off-topic Action';
 $string['settings:offtopic_action_desc'] = 'What to do when the off-topic limit is reached.';
 $string['settings:offtopic_action_end'] = 'Temporarily lock access';
@@ -635,7 +635,7 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are SOLA (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
 
 ## Role
 Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
@@ -654,13 +654,13 @@ The following is the actual text of the course pages and materials. This is your
 
 {{coursecontent}}
 
-## What SOLA Can Help With
+## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
 - Give examples and practice questions
 - Suggest study strategies
 - Encourage persistence and progress
 
-## What SOLA Will Not Do
+## What [[tutorshort]] Will Not Do
 - Make academic or policy decisions
 - Provide medical, legal, or mental health counseling
 - Assist with academic dishonesty or bypassing learning
@@ -687,7 +687,7 @@ $string['settings:zendesk_subdomain_desc'] = 'Your Zendesk subdomain (e.g. "myco
 $string['settings:zendesk_token'] = 'Zendesk API Token';
 $string['settings:zendesk_token_desc'] = 'API token for Zendesk authentication.';
 $string['task:index_course_content'] = 'Index course content for RAG semantic search';
-$string['task:run_integrity_checks'] = 'Run daily SOLA plugin integrity checks';
+$string['task:run_integrity_checks'] = 'Run daily [[tutorshort]] plugin integrity checks';
 $string['task:send_inactivity_reminders'] = 'Send weekly inactivity reminder emails';
 $string['task:send_reminders'] = 'Send AI tutor study reminders';
 $string['unsubscribe:already'] = 'You have already been unsubscribed from these reminders.';
@@ -701,7 +701,7 @@ $string['update:changelog'] = 'Release Notes';
 $string['update:check'] = 'Check for Updates';
 $string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
 $string['update:current_version'] = 'Installed Version';
-$string['update:desc'] = 'Check for and install SOLA plugin updates directly from GitHub releases.';
+$string['update:desc'] = 'Check for and install [[tutorshort]] plugin updates directly from GitHub releases.';
 $string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
 $string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
 $string['update:github_token'] = 'GitHub Token (optional)';
@@ -746,7 +746,7 @@ $string['demo:clear_label'] = 'Először törölje a meglévő demo_* felhaszná
 $string['demo:seed_btn'] = 'Hallgatók és beszélgetések hozzáadása';
 $string['demo:view_analytics'] = 'Analitika megtekintése ehhez a kurzushoz &rarr;';
 $string['demo:footer'] = 'Az itt létrehozott adatok a szabványos Moodle felhasználó / beiratkozás táblákban és a bővítmény saját beszélgetéstábláiban találhatók. Minden kitalált felhasználónév <code>demo_student_</code> előtaggal kezdődik, így könnyen szűrhetők vagy eltávolíthatók. Eltávolításukhoz futtassa újra a feltöltési lépést a „Először törölje a meglévő demo_* felhasználókat“ opcióval bejelölve.';
-$string['demo:course_fullname'] = 'SOLA tesztkurzus (rejtett)';
+$string['demo:course_fullname'] = '[[tutorshort]] tesztkurzus (rejtett)';
 $string['demo:notify_created'] = 'A tesztkurzus készen áll: {$a->fullname} (id {$a->id}).';
 $string['demo:notify_create_fail'] = 'Nem sikerült létrehozni a kurzust: {$a}';
 $string['demo:notify_seeded'] = 'Hozzáadva: {$a->users} felhasználó, {$a->conversations} beszélgetés, {$a->messages} üzenet, {$a->ratings} értékelés, {$a->feedback} visszajelzés.';
@@ -793,7 +793,7 @@ $string['settings:audit_retention_days_desc'] = 'A napi ütemezett feladat törl
 $string['settings:conversation_retention_days'] = 'Beszélgetés megőrzése (napok)';
 $string['settings:conversation_retention_days_desc'] = 'A napi ütemezett feladat törli azokat a beszélgetéssorokat, amelyek utolsó módosítási időbélyege ennél régebbi. 0 érték kikapcsolja. Alapértelmezett: 730.';
 $string['settings:ssrf_trusted_endpoints'] = 'Megbízható SSRF végpontok';
-$string['settings:ssrf_trusted_endpoints_desc'] = 'Soronként egy URL. A felsorolt gazdagépek megkerülik a loopback / privát-IP / csak-https ellenőrzéseket a SOLA SSRF validátorában. Csak saját üzemeltetésű LLM-ekhez használja egy Ön által irányított hálózaton — például <code>http://localhost:11434</code> a helyi Ollamához, <code>http://10.0.0.5:8000</code> egy vLLM podhoz ugyanazon VPC-ben. Az összehasonlítás scheme + host + port szerint történik; minden útvonalat figyelmen kívül hagy. Alapértelmezett üres (mindent belsőt blokkol). A <code>#</code> jellel kezdődő sorok megjegyzések.';
+$string['settings:ssrf_trusted_endpoints_desc'] = 'Soronként egy URL. A felsorolt gazdagépek megkerülik a loopback / privát-IP / csak-https ellenőrzéseket a [[tutorshort]] SSRF validátorában. Csak saját üzemeltetésű LLM-ekhez használja egy Ön által irányított hálózaton — például <code>http://localhost:11434</code> a helyi Ollamához, <code>http://10.0.0.5:8000</code> egy vLLM podhoz ugyanazon VPC-ben. Az összehasonlítás scheme + host + port szerint történik; minden útvonalat figyelmen kívül hagy. Alapértelmezett üres (mindent belsőt blokkol). A <code>#</code> jellel kezdődő sorok megjegyzések.';
 $string['task:learner_weekly_digest']    = 'AI tanfolyam asszisztens - Tanulói heti összefoglaló';
 $string['learner_digest:subject']        = 'A heted a {$a->course} kurzussal - {$a->product}';
 $string['learner_digest:optin_offer']    = 'Szeretnél rövid heti e-mailt arról, mire koncentrálj legközelebb?';
@@ -822,7 +822,7 @@ $string['learner_digest:optin_no']       = 'Nem, köszönöm';
 $string['learner_digest:optin_thanks']   = 'Rendben. Minden hétfőn kapsz heti összefoglalót.';
 $string['learner_digest:optin_declined'] = 'Rendben. Nincsenek e-mailek - csak nyiss meg, amikor szeretnél áttekintést.';
 $string['settings:xai_proxy_url'] = 'xAI Realtime proxy URL';
-$string['settings:xai_proxy_url_desc'] = 'A SOLA xAI Realtime proxy szolgáltatás nyilvános wss URL-je (például wss://voice.example.com/xai-rt/rt). Ha ez a JWT titokkal együtt be van állítva, az xAI hangfolyam a proxyn keresztül halad, és a fő xAI API kulcs sosem jut el a böngészőbe. Hagyd üresen a közvetlen kapcsolat használatához (éles környezetben nem ajánlott).';
+$string['settings:xai_proxy_url_desc'] = 'A [[tutorshort]] xAI Realtime proxy szolgáltatás nyilvános wss URL-je (például wss://voice.example.com/xai-rt/rt). Ha ez a JWT titokkal együtt be van állítva, az xAI hangfolyam a proxyn keresztül halad, és a fő xAI API kulcs sosem jut el a böngészőbe. Hagyd üresen a közvetlen kapcsolat használatához (éles környezetben nem ajánlott).';
 $string['settings:xai_proxy_jwt_secret'] = 'xAI Realtime proxy JWT titok';
 $string['settings:xai_proxy_jwt_secret_desc'] = 'HS256 megosztott titok, amellyel rövid élettartamú munkamenet-tokeneket írunk alá az xAI Realtime proxyhoz. Meg kell egyeznie a Cloudflare Worker MOODLE_JWT_SECRET értékével. Időnként cseréld le.';
 $string['admin:vendor_dpa:title'] = '{$a} — Szállítói DPA állapot';
@@ -1043,30 +1043,30 @@ $string['courses_admin:yes']               = 'Yes';
 $string['courses_admin:no_courses']        = 'No visible courses on this site yet.';
 
 // v4.2: anomaly digest scheduled task.
-$string['task:run_anomaly_digest'] = 'Run SOLA anomaly digest';
+$string['task:run_anomaly_digest'] = 'Run [[tutorshort]] anomaly digest';
 
 // v4.2.3: external resources (admin + per-course).
 $string['settings:external_resources_heading']      = 'External resources';
-$string['settings:external_resources_heading_desc'] = 'Optional opt-in: when on, SOLA may include one or two links to reputable open educational resources alongside its course-grounded answer. Restricted to the allowlist below to keep recommendations defensible. Per-course override available on the course settings page. Default off.';
+$string['settings:external_resources_heading_desc'] = 'Optional opt-in: when on, [[tutorshort]] may include one or two links to reputable open educational resources alongside its course-grounded answer. Restricted to the allowlist below to keep recommendations defensible. Per-course override available on the course settings page. Default off.';
 $string['settings:external_resources_enabled']      = 'Enable external resources (site-wide default)';
-$string['settings:external_resources_enabled_desc'] = 'When on, SOLA may suggest links to the allowlisted external resources. Per-course "force on" / "force off" overrides this. Default off.';
+$string['settings:external_resources_enabled_desc'] = 'When on, [[tutorshort]] may suggest links to the allowlisted external resources. Per-course "force on" / "force off" overrides this. Default off.';
 $string['settings:external_resources_allowlist']    = 'External resources allowlist';
-$string['settings:external_resources_allowlist_desc'] = 'One resource per line, in the format "Display Name (domain)". SOLA will only suggest links to these sites. Defaults to a small set of widely respected open-resource hosts; replace or extend as needed.';
+$string['settings:external_resources_allowlist_desc'] = 'One resource per line, in the format "Display Name (domain)". [[tutorshort]] will only suggest links to these sites. Defaults to a small set of widely respected open-resource hosts; replace or extend as needed.';
 $string['external_resources:title']      = 'External resources';
 $string['external_resources:inherit']    = 'Inherit site default ({$a})';
 $string['external_resources:force_on']   = 'Force on for this course';
 $string['external_resources:force_off']  = 'Force off for this course';
 $string['external_resources:on']         = 'on';
 $string['external_resources:off']        = 'off';
-$string['external_resources:toggle_help']= 'When on, SOLA may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
+$string['external_resources:toggle_help']= 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
 
 // v4.3.0: real Redash push integration.
 $string['settings:redash_base_url']           = 'Redash base URL';
 $string['settings:redash_base_url_desc']      = 'Base URL of your Redash instance, e.g. https://redash.example.com. Required for the "Send to Redash" action in Learning Radar.';
 $string['settings:redash_user_api_key']       = 'Redash user API key';
-$string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the SOLA Redash API key (which controls inbound auth on redash_export.php).';
+$string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the [[tutorshort]] Redash API key (which controls inbound auth on redash_export.php).';
 $string['settings:redash_data_source_id']     = 'Redash data source ID';
-$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at SOLA\'s redash_export.php. Visible in the Redash data source URL after saving.';
+$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
 
 $string['instructor_dashboard:nav_back_course']  = '← Back to course';
 $string['instructor_dashboard:nav_settings']     = 'AI Course Assistant settings';
@@ -1074,18 +1074,18 @@ $string['instructor_dashboard:nav_analytics']    = 'AI Course Assistant analytic
 
 // v4.4.0: course-page CSP setting.
 $string['settings:csp_course_pages_mode']      = 'Course-page Content-Security-Policy';
-$string['settings:csp_course_pages_mode_desc'] = 'Optional CSP header on course pages where the AI Course Assistant widget is active. <strong>Off</strong>: no header (default). <strong>Report-only</strong>: send <code>Content-Security-Policy-Report-Only</code> — browsers log violations but do not block. Useful for a one-week observation pass. <strong>Enforce</strong>: send <code>Content-Security-Policy</code> — browsers block off-allowlist iframe sources, fetches, and other risky loads. Helps contain the impact of arbitrary scripts pasted into Additional HTML site config (the IBL AI / Raison incident on 2026-04-29). Does not affect SOLA endpoints, which always send a stricter CSP.';
+$string['settings:csp_course_pages_mode_desc'] = 'Optional CSP header on course pages where the AI Course Assistant widget is active. <strong>Off</strong>: no header (default). <strong>Report-only</strong>: send <code>Content-Security-Policy-Report-Only</code> — browsers log violations but do not block. Useful for a one-week observation pass. <strong>Enforce</strong>: send <code>Content-Security-Policy</code> — browsers block off-allowlist iframe sources, fetches, and other risky loads. Helps contain the impact of arbitrary scripts pasted into Additional HTML site config (the IBL AI / Raison incident on 2026-04-29). Does not affect [[tutorshort]] endpoints, which always send a stricter CSP.';
 $string['settings:csp_mode_off']               = 'Off (no header on course pages)';
 $string['settings:csp_mode_report_only']       = 'Report-only (log violations, do not block)';
 $string['settings:csp_mode_enforce']           = 'Enforce (block off-allowlist loads)';
 
 // v4.5.0: site-wide pedagogy defaults.
 $string['settings:pedagogy_defaults_heading']      = 'Pedagogy defaults';
-$string['settings:pedagogy_defaults_heading_desc'] = 'Site-wide default state for each pedagogy feature. Flip a feature on here and every course inherits it unless that course has an explicit override on its SOLA course settings page (force on / force off). On upgrade to v4.5.0, every per-course "force off" override that was set to the legacy default-off value of <code>0</code> is cleared so the new global defaults take effect cleanly. Default off — upgrades from v4.4.x are a no-op until an admin flips a feature on.';
+$string['settings:pedagogy_defaults_heading_desc'] = 'Site-wide default state for each pedagogy feature. Flip a feature on here and every course inherits it unless that course has an explicit override on its [[tutorshort]] course settings page (force on / force off). On upgrade to v4.5.0, every per-course "force off" override that was set to the legacy default-off value of <code>0</code> is cleared so the new global defaults take effect cleanly. Default off — upgrades from v4.4.x are a no-op until an admin flips a feature on.';
 $string['pedagogy:mastery']                = 'Mastery tracking on by default';
 $string['pedagogy:mastery_desc']           = 'When on, every course inherits mastery tracking unless the course has its own override. Mastery requires curated learning objectives — courses without objectives fall back gracefully, no error.';
 $string['pedagogy:socratic_mode']          = 'Socratic mode on by default';
-$string['pedagogy:socratic_mode_desc']     = 'When on, SOLA leads with questions instead of direct answers in every course unless the course has its own override.';
+$string['pedagogy:socratic_mode_desc']     = 'When on, [[tutorshort]] leads with questions instead of direct answers in every course unless the course has its own override.';
 $string['pedagogy:worked_examples']        = 'Worked examples starter on by default';
 $string['pedagogy:worked_examples_desc']   = 'When on, the "Show me a worked example" conversation starter appears in every course unless the course has its own override.';
 $string['pedagogy:flashcards']             = 'Flashcards on by default';
@@ -1112,7 +1112,7 @@ $string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name 
 
 // v4.7.0: rate-card auto-refresh.
 $string['settings:rate_card_auto_refresh']      = 'Auto-refresh from upstream';
-$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task fetches the upstream pricing JSON, transforms it to SOLA\'s rate-card schema, and writes it to the override field above. Default on. Failures keep the previous override in place.';
+$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task fetches the upstream pricing JSON, transforms it to [[tutorshort]]\'s rate-card schema, and writes it to the override field above. Default on. Failures keep the previous override in place.';
 $string['settings:rate_card_upstream_url']      = 'Upstream pricing URL';
 $string['settings:rate_card_upstream_url_desc'] = 'URL of a JSON manifest in LiteLLM\'s schema. Default points at the community-maintained file in the LiteLLM GitHub repo. URL is checked against the SSRF allowlist before fetch.';
 $string['settings:rate_card_refresh_now']        = 'Refresh now';
@@ -1122,7 +1122,7 @@ $string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$
 $string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
 $string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
 $string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
-$string['task:refresh_rate_card']                = 'Refresh SOLA LLM rate card from upstream';
+$string['task:refresh_rate_card']                = 'Refresh [[tutorshort]] LLM rate card from upstream';
 
 // v4.8.0: runtime validators + RAG drift + needs-review queue.
 $string['settings:validators_runtime_mode']      = 'Runtime validators';
@@ -1150,7 +1150,7 @@ $string['instructor_dashboard:review_source_integrity'] = 'Integrity';
 $string['pedagogy:talking_avatar']         = 'Talking avatar on by default';
 $string['pedagogy:talking_avatar_desc']    = 'When on, the talking-avatar surface is enabled in every course unless the course has its own override. Requires a configured provider (D-ID, HeyGen, Tavus, or Synthesia Agents) below; otherwise the widget shows a "configure a provider" notice and the avatar does not animate.';
 $string['settings:talking_avatar_heading']      = 'Talking avatar';
-$string['settings:talking_avatar_heading_desc'] = 'Pick which talking-avatar vendor SOLA opens for students when the avatar surface is enabled. SOLA ships drivers for D-ID (cheapest WebRTC streaming), HeyGen (LiveKit-backed interactive avatars), Tavus (drop-in iframable Conversational Video Interface), and Synthesia Agents (real-time agent product, configured in the Synthesia dashboard). Per-provider key + persona id appear below; only the chosen provider needs to be filled in. Every outbound call is SSRF-checked.';
+$string['settings:talking_avatar_heading_desc'] = 'Pick which talking-avatar vendor [[tutorshort]] opens for students when the avatar surface is enabled. [[tutorshort]] ships drivers for D-ID (cheapest WebRTC streaming), HeyGen (LiveKit-backed interactive avatars), Tavus (drop-in iframable Conversational Video Interface), and Synthesia Agents (real-time agent product, configured in the Synthesia dashboard). Per-provider key + persona id appear below; only the chosen provider needs to be filled in. Every outbound call is SSRF-checked.';
 $string['settings:talking_avatar_provider_url']      = 'Provider API base URL (legacy)';
 $string['settings:talking_avatar_provider_url_desc'] = 'v4.8.1 placeholder, kept for upgrade safety. The active drivers in v4.9.0 read their own per-provider settings; this field is only used as a fallback when an admin upgraded mid-release.';
 $string['settings:talking_avatar_provider_api_key']      = 'Provider API key (legacy)';
@@ -1173,16 +1173,16 @@ $string['settings:talking_avatar_heygen_persona_id_desc'] = 'Avatar id from the 
 $string['settings:talking_avatar_tavus_api_key']         = 'Tavus API key';
 $string['settings:talking_avatar_tavus_api_key_desc']    = 'API key from <a href="https://platform.tavus.io/api-keys" target="_blank" rel="noopener">Tavus platform → API keys</a>. Sent as <code>x-api-key</code>.';
 $string['settings:talking_avatar_tavus_persona_id']      = 'Tavus replica id';
-$string['settings:talking_avatar_tavus_persona_id_desc'] = 'Replica id (the trained likeness) you want SOLA to converse as. Combine with a persona id by appending it to the API key field if needed; SOLA will pass <code>persona_id</code> through.';
+$string['settings:talking_avatar_tavus_persona_id_desc'] = 'Replica id (the trained likeness) you want [[tutorshort]] to converse as. Combine with a persona id by appending it to the API key field if needed; [[tutorshort]] will pass <code>persona_id</code> through.';
 $string['settings:talking_avatar_synthesia_api_key']         = 'Synthesia API key';
 $string['settings:talking_avatar_synthesia_api_key_desc']    = 'API key from <a href="https://app.synthesia.io/#/account/api" target="_blank" rel="noopener">Synthesia → Account → API</a>. Sent as <code>Authorization</code> header (Synthesia accepts the raw key).';
 $string['settings:talking_avatar_synthesia_persona_id']      = 'Synthesia agent id';
-$string['settings:talking_avatar_synthesia_persona_id_desc'] = 'Agent id created in the Synthesia Agents dashboard. Knowledge, persona, and allowed origins are configured agent-side; SOLA only opens a session against this id.';
+$string['settings:talking_avatar_synthesia_persona_id_desc'] = 'Agent id created in the Synthesia Agents dashboard. Knowledge, persona, and allowed origins are configured agent-side; [[tutorshort]] only opens a session against this id.';
 $string['talking_avatar:disabled']        = 'Talking avatar is not enabled for this course.';
 $string['talking_avatar:unconfigured']    = 'Talking avatar is enabled but no provider has been configured. An administrator must pick a provider and supply credentials in plugin settings.';
 $string['talking_avatar:session_failed']  = 'The talking-avatar provider declined the session request. Check the provider configuration or try again in a moment.';
-$string['talking_avatar:viewer_title']    = 'SOLA talking avatar';
-$string['talking_avatar:bundle_required'] = 'The talking-avatar viewer requires the SOLA CDN bundle to be configured. Ask an administrator to set the CDN bundle URL in plugin settings.';
+$string['talking_avatar:viewer_title']    = '[[tutorshort]] talking avatar';
+$string['talking_avatar:bundle_required'] = 'The talking-avatar viewer requires the [[tutorshort]] CDN bundle to be configured. Ask an administrator to set the CDN bundle URL in plugin settings.';
 $string['talking_avatar:open']            = 'Open avatar';
 $string['talking_avatar:close']           = 'Close avatar';
 $string['settings:avatar_rate_card_overrides']      = 'Avatar rate card overrides (JSON)';
@@ -1220,7 +1220,7 @@ $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt me
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
 $string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
 $string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
-$string['task:auto_tune_prompt_budget']          = 'Auto-tune SOLA prompt budget from observed metrics';
+$string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
 $string['prompt_metrics:no_data']                = 'No prompt metrics recorded yet. Send a few chat turns from a learner account, then refresh this page. (If the metrics capture flag is off in plugin settings, no data will accumulate.)';
@@ -1252,7 +1252,7 @@ $string['prompt_metrics:settings_link']          = 'Open plugin settings to togg
 $string['task:milestone_check'] = 'Send daily milestone reflection emails (v5.3.0)';
 $string['task:struggle_signal_review'] = 'Review struggle signals into private learner memory (v5.3.0)';
 $string['empathy:title'] = 'Empathetic communications and carryover memory (v5.3.0)';
-$string['empathy:desc'] = 'Three coordinated features that make SOLA feel more like a coach who listens. Goals capture why the learner is here. Carryover memory remembers what has been hard before so SOLA can offer a different angle. Milestones celebrate streaks and completions by email. Each feature has an independent kill switch and learner opt-in. Struggle signals never leave the chat — no email is ever sent about a difficult session.';
+$string['empathy:desc'] = 'Three coordinated features that make [[tutorshort]] feel more like a coach who listens. Goals capture why the learner is here. Carryover memory remembers what has been hard before so [[tutorshort]] can offer a different angle. Milestones celebrate streaks and completions by email. Each feature has an independent kill switch and learner opt-in. Struggle signals never leave the chat — no email is ever sent about a difficult session.';
 $string['empathy:outreach_master_enabled'] = 'Master outreach kill switch';
 $string['empathy:outreach_master_enabled_desc'] = 'Off by default on a fresh install. When off, NO empathetic email of any kind ever fires, regardless of the per-feature switches below. Turn this on once you have reviewed the per-feature defaults and per-learner consent flow.';
 $string['empathy:goals_enabled'] = 'Enable career goal conversations';
@@ -1260,9 +1260,9 @@ $string['empathy:goals_enabled_desc'] = 'Lets learners volunteer two short answe
 $string['empathy:milestones_enabled'] = 'Enable milestone reflection emails';
 $string['empathy:milestones_enabled_desc'] = 'Sends a short warm email when a learner reaches a 7-day streak, 30-day streak, or course completion. Requires the master switch above plus per-learner consent. Hard cap of one email per learner per 7 days across all channels.';
 $string['empathy:memory_enabled'] = 'Enable carryover personalisation memory';
-$string['empathy:memory_enabled_desc'] = 'Lets SOLA carry small private notes about what has been hard for a learner across sessions, so the next reply can offer a different angle. Bounded (max 5 notes per learner per course, 90-day TTL). Learner-editable. Never visible to instructors.';
+$string['empathy:memory_enabled_desc'] = 'Lets [[tutorshort]] carry small private notes about what has been hard for a learner across sessions, so the next reply can offer a different angle. Bounded (max 5 notes per learner per course, 90-day TTL). Learner-editable. Never visible to instructors.';
 $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
-$string['empathy:struggle_enabled_desc'] = 'Off by default. Lets SOLA detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
+$string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
 $string['goals:starter_title'] = 'Set my learning goals';
@@ -1277,17 +1277,17 @@ $string['goals:clear'] = 'Clear my goals';
 $string['goals:cleared'] = 'Your goals have been cleared.';
 $string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'My communications';
-$string['comms:desc'] = 'Choose which automated emails SOLA may send you. Off by default. You can change this any time.';
+$string['comms:desc'] = 'Choose which automated emails [[tutorshort]] may send you. Off by default. You can change this any time.';
 $string['comms:milestones_label'] = 'Email me when I reach a milestone (7-day streak, 30-day streak, course completion).';
-$string['comms:audit_log_title'] = 'What SOLA has sent me';
-$string['comms:audit_log_empty'] = 'SOLA has not sent you any emails.';
-$string['comms:memory_title'] = "What SOLA has remembered about how I learn";
-$string['comms:memory_desc'] = 'These notes are private to your chat with SOLA. They help SOLA pick a different angle when a topic is hard. Clear any time.';
+$string['comms:audit_log_title'] = 'What [[tutorshort]] has sent me';
+$string['comms:audit_log_empty'] = '[[tutorshort]] has not sent you any emails.';
+$string['comms:memory_title'] = "What [[tutorshort]] has remembered about how I learn";
+$string['comms:memory_desc'] = 'These notes are private to your chat with [[tutorshort]]. They help [[tutorshort]] pick a different angle when a topic is hard. Clear any time.';
 $string['comms:memory_clear'] = 'Clear all memory notes';
 $string['milestone:streak_subject'] = '{$a->days}-day streak in {$a->coursename}';
-$string['milestone:streak_body_text'] = "Hi {\$a->firstname},\n\nYou have shown up {\$a->days} days in a row in {\$a->coursename}. That kind of consistency is the part of learning that is hardest to fake.\n\nWhenever you are ready, SOLA is here.\n\n— {\$a->institution}";
+$string['milestone:streak_body_text'] = "Hi {\$a->firstname},\n\nYou have shown up {\$a->days} days in a row in {\$a->coursename}. That kind of consistency is the part of learning that is hardest to fake.\n\nWhenever you are ready, [[tutorshort]] is here.\n\n— {\$a->institution}";
 $string['milestone:completion_subject'] = 'You finished {$a->coursename}';
-$string['milestone:completion_body_text'] = "Hi {\$a->firstname},\n\nYou finished {\$a->coursename}. That is a real thing you did.\n\nIf you want to keep going, SOLA can help you pick a related next course or revisit a topic you found interesting.\n\n— {\$a->institution}";
+$string['milestone:completion_body_text'] = "Hi {\$a->firstname},\n\nYou finished {\$a->coursename}. That is a real thing you did.\n\nIf you want to keep going, [[tutorshort]] can help you pick a related next course or revisit a topic you found interesting.\n\n— {\$a->institution}";
 $string['milestone:trigger_streak7'] = '7-day activity streak reached';
 $string['milestone:trigger_streak30'] = '30-day activity streak reached';
 $string['milestone:trigger_completion'] = 'Course completion recorded';
@@ -1333,23 +1333,23 @@ $string['attachment:error_save_failed'] = 'The file was uploaded but could not b
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Tantárgyak közötti tudásösszesítés alapértelmezetten bekapcsolva';
-$string['pedagogy:crossmastery_desc'] = 'Ha be van kapcsolva, a SOLA felismeri, ha a tanuló egy tanulási célt már elsajátított egy másik tantárgyban (kompetenciahivatkozás vagy cím alapján egyeztetve), és elismeri ezt a korábbi kompetenciát ahelyett, hogy újra gyakoroltatná. Tudáskövetést igényel; a tanulási célokkal nem rendelkező tantárgyak esetén zökkenőmentesen visszaáll az alapviselkedésre. Csak tájékoztató jellegű – soha nem módosítja a tanuló tárolt tudásszintjét egyetlen tantárgyban sem.';
+$string['pedagogy:crossmastery_desc'] = 'Ha be van kapcsolva, a [[tutorshort]] felismeri, ha a tanuló egy tanulási célt már elsajátított egy másik tantárgyban (kompetenciahivatkozás vagy cím alapján egyeztetve), és elismeri ezt a korábbi kompetenciát ahelyett, hogy újra gyakoroltatná. Tudáskövetést igényel; a tanulási célokkal nem rendelkező tantárgyak esetén zökkenőmentesen visszaáll az alapviselkedésre. Csak tájékoztató jellegű – soha nem módosítja a tanuló tárolt tudásszintjét egyetlen tantárgyban sem.';
 $string['pedagogy:mastery_starter'] = 'Tudásszint-érzékeny beszélgetésindító alapértelmezetten bekapcsolva';
 $string['pedagogy:mastery_starter_desc'] = 'Ha be van kapcsolva, a „Mire érdemes összpontosítanom?” beszélgetésindító személyre szabottan megnevezi a tanuló leggyengébb tanulási célját (és minden olyan kompetenciát, amelyet máshol már elsajátított). Tudáskövetést igényel; ha még nincs tudásadat, visszaáll az általános beszélgetésindítóra.';
 $string['task:rebuild_objective_links'] = 'Tantárgyak közötti tanulási cél kapcsolatok újraépítése a tudásösszesítéshez (v5.7.0)';
 $string['mastery_starter:practice_label'] = 'Gyakorlás: {$a}';
 $string['objectives:rebuild_links_heading'] = 'Tantárgyak közötti tudáskapcsolatok';
-$string['objectives:rebuild_links_help'] = 'A SOLA összekapcsolja a tantárgyak között egyező tanulási célokat (kompetenciahivatkozás vagy cím alapján), így annak a tanulónak, aki egy témát máshol már elsajátított, nem kell újra gyakorolnia. A kapcsolatok minden éjjel automatikusan újraépülnek; ezzel a gombbal a tanulási célok szerkesztése után most azonnal újraépítheti őket.';
+$string['objectives:rebuild_links_help'] = 'A [[tutorshort]] összekapcsolja a tantárgyak között egyező tanulási célokat (kompetenciahivatkozás vagy cím alapján), így annak a tanulónak, aki egy témát máshol már elsajátított, nem kell újra gyakorolnia. A kapcsolatok minden éjjel automatikusan újraépülnek; ezzel a gombbal a tanulási célok szerkesztése után most azonnal újraépítheti őket.';
 $string['objectives:rebuild_links_button'] = 'Kapcsolatok újraépítése most';
 $string['objectives:rebuild_links_done'] = 'Tantárgyak közötti tudáskapcsolatok újraépítve: összesen {$a->total} ({$a->ref} hivatkozás alapján, {$a->exact} pontos cím alapján, {$a->fuzzy} hasonló cím alapján).';
 
 // Forward learning-path awareness (v5.8.0).
 $string['pedagogy:program_path'] = 'Előretekintő tanulási úvonal felismerése alapértelmezetten bekapcsolva';
-$string['pedagogy:program_path_desc'] = 'Bekapcsolt állapotban a SOLA megmondhatja a tanulónak, hogy a jelenlegi kurzus hová vezet tovább a programjában (oklevél vagy bizonyítvány), és hogy a mai fogalmak miként kapcsolódnak a későbbi kurzusokhoz. A Moodle Programs bővítményt (Degrees és Learn) olvassa, és csak akkor nevez meg egy konkrét következő kurzust, ahol a program előfeltételt vagy kötelező sorrendet határoz meg; egyébként a tanuló útvonalon belüli helyzetét jelzi. Csak tájékoztató jellegű — soha nem módosítja a beiratkozást vagy az elsajátítást, és mindig kizárólag az adott tanuló saját programbeosztását használja. Csendben nem tesz semmit, ahol nem alkalmazható program.';
+$string['pedagogy:program_path_desc'] = 'Bekapcsolt állapotban a [[tutorshort]] megmondhatja a tanulónak, hogy a jelenlegi kurzus hová vezet tovább a programjában (oklevél vagy bizonyítvány), és hogy a mai fogalmak miként kapcsolódnak a későbbi kurzusokhoz. A Moodle Programs bővítményt (Degrees és Learn) olvassa, és csak akkor nevez meg egy konkrét következő kurzust, ahol a program előfeltételt vagy kötelező sorrendet határoz meg; egyébként a tanuló útvonalon belüli helyzetét jelzi. Csak tájékoztató jellegű — soha nem módosítja a beiratkozást vagy az elsajátítást, és mindig kizárólag az adott tanuló saját programbeosztását használja. Csendben nem tesz semmit, ahol nem alkalmazható program.';
 
 // Learning path map + next-course nudge (v5.9.0).
 $string['pedagogy:learning_path'] = 'Tanulási útvonal térkép és következő kurzus ajánlás alapértelmezetten bekapcsolva';
-$string['pedagogy:learning_path_desc'] = 'Bekapcsolt állapotban a SOLA egy vizuális tanulási útvonal panelt ad hozzá (egy "saját útvonalam" gomb a widget fejlécében), amely a tanuló programját kurzusok sorozataként mutatja, melyek mindegyike kibontható a céljainak és a tanuló elsajátítási szintjének megjelenítéséhez. Amikor a tanuló elérte az aktuális kurzus küszöbét (teljesítés vagy az elsajátított célok magas aránya), a SOLA egy finom "készen állsz a következő kurzusra" feliratot is megjelenít, és megemlíti a beszélgetésben. Csak tájékoztató jellegű; a tanuló saját programkiosztását használja; csendben nem tesz semmit, ha nincs alkalmazható program.';
+$string['pedagogy:learning_path_desc'] = 'Bekapcsolt állapotban a [[tutorshort]] egy vizuális tanulási útvonal panelt ad hozzá (egy "saját útvonalam" gomb a widget fejlécében), amely a tanuló programját kurzusok sorozataként mutatja, melyek mindegyike kibontható a céljainak és a tanuló elsajátítási szintjének megjelenítéséhez. Amikor a tanuló elérte az aktuális kurzus küszöbét (teljesítés vagy az elsajátított célok magas aránya), a [[tutorshort]] egy finom "készen állsz a következő kurzusra" feliratot is megjelenít, és megemlíti a beszélgetésben. Csak tájékoztató jellegű; a tanuló saját programkiosztását használja; csendben nem tesz semmit, ha nincs alkalmazható program.';
 $string['settings:learning_path_mastery_threshold'] = 'Tanulási útvonal felkészültségi küszöb (%)';
 $string['settings:learning_path_mastery_threshold_desc'] = 'Egy kurzus követett céljainak azon százaléka, amelyet a tanulónak el kell sajátítania, mielőtt a tanulási útvonal ajánlás késznek tekinti a következő kurzusra. A másik kiváltó tényező a Moodle kurzusteljesítés; az ajánlást az indítja el, amelyik előbb bekövetkezik. Alapértelmezett: 80.';
 $string['pathpanel_title'] = 'A tanulási útvonalam';
@@ -1370,11 +1370,11 @@ $string['nudge_dismiss'] = 'Elvetés';
 
 // v5.10.x strings (token-aware budgeting, backend retry, self-test, deployment presets, escalation consent, privacy).
 $string['settings:backend_context_tokens'] = 'Háttérrendszer kontextusablaka (tokenek)';
-$string['settings:backend_context_tokens_desc'] = 'Az AI-háttérrendszered maximális kontextushossza (max_model_len) tokenekben. Állítsd 0-ra a nagy ablakkal rendelkező, üzemeltetett modellekhez (nincs korlátozás). Ha 0 fölé van állítva (például 8192 egy saját üzemeltetésű vLLM háttérrendszeren), a SOLA csökkenti a fenti rendszerprompt karakter-keretét, hogy a prompt a fenntartott kimenettel és a beszélgetési előzményekkel együtt beférjen az ablakba, még token-sűrű nyelvek esetén is. A Deployment Sizing wikioldalon megnézheted, hogyan kapcsolódik ez az egyidejű felhasználókhoz.';
+$string['settings:backend_context_tokens_desc'] = 'Az AI-háttérrendszered maximális kontextushossza (max_model_len) tokenekben. Állítsd 0-ra a nagy ablakkal rendelkező, üzemeltetett modellekhez (nincs korlátozás). Ha 0 fölé van állítva (például 8192 egy saját üzemeltetésű vLLM háttérrendszeren), a [[tutorshort]] csökkenti a fenti rendszerprompt karakter-keretét, hogy a prompt a fenntartott kimenettel és a beszélgetési előzményekkel együtt beférjen az ablakba, még token-sűrű nyelvek esetén is. A Deployment Sizing wikioldalon megnézheted, hogyan kapcsolódik ez az egyidejű felhasználókhoz.';
 $string['settings:backend_retry_attempts'] = 'Háttérrendszer újrapróbálkozásai';
 $string['settings:backend_retry_attempts_desc'] = 'Hányszor próbálkozzon újra egy átmeneti háttérrendszer-hibával (HTTP 429 vagy 503), mielőtt hibát mutatna a tanulónak. Az újrapróbálkozások csak azelőtt történnek, hogy bármilyen válaszszöveg streamelve lett volna, így a kimenet sosem duplikálódik. Kis, saját üzemeltetésű háttérrendszerekhez készült, amelyek terhelés alatt elutasítják a kéréseket. A letiltáshoz állítsd 0-ra. Alapértelmezett: 2.';
 $string['settings:backend_retry_max_wait'] = 'Háttérrendszer újrapróbálkozásának maximális várakozása (másodperc)';
-$string['settings:backend_retry_max_wait_desc'] = 'Felső korlát másodpercben arra, hogy meddig vegye figyelembe a háttérrendszer Retry-After fejlécét újrapróbálkozás előtt. Ha a háttérrendszer nem küld Retry-After fejlécet, a SOLA helyette rövid exponenciális visszalépést használ. Alapértelmezett: 5.';
+$string['settings:backend_retry_max_wait_desc'] = 'Felső korlát másodpercben arra, hogy meddig vegye figyelembe a háttérrendszer Retry-After fejlécét újrapróbálkozás előtt. Ha a háttérrendszer nem küld Retry-After fejlécet, a [[tutorshort]] helyette rövid exponenciális visszalépést használ. Alapértelmezett: 5.';
 $string['prompt:truncation_hint'] = 'MEGJEGYZÉS: A teljes kurzustartalmat ebben a körben nem lehetett átkeresni a hosszkorlátok miatt. Ha a tanuló olyasmiről kérdez, amit nem találsz a megadott tartalomban, mondd el, hogy nem tudtad átkeresni a teljes kurzust, és javasold, hogy nyissa meg azt a konkrét oldalt vagy tevékenységet, ahol a téma szerepel, ahelyett hogy kijelentenéd, hogy az hiányzik a kurzusból.';
 $string['selftest:title'] = 'Háttérrendszer önellenőrzése';
 $string['selftest:intro'] = 'Futtass élő ellenőrzést a beállított AI-háttérrendszereden: egy apró csevegés oda-vissza, a kontextusablak (max_model_len) automatikus felismerése és összehasonlítása a Háttérrendszer kontextusablaka beállításoddal, a rendszerprompt-keret alsó határa, és (ha a RAG be van kapcsolva) egy beágyazás oda-vissza. A hálózati hívások csak akkor futnak, amikor megnyomod a Futtatás gombot.';
@@ -1398,7 +1398,7 @@ $string['profile:unknown'] = 'Ismeretlen telepítési előbeállítás.';
 $string['profile:link'] = 'Telepítési előbeállítások oldala';
 $string['profile:link_desc'] = 'Nyisd meg a <a href="{$a}">Telepítési előbeállítások</a> oldalt, hogy alkalmazz egy ajánlott beállításcsomagot üzemeltetett vagy saját üzemeltetésű háttérrendszerhez.';
 $string['settings:zendesk_require_consent'] = 'Hozzájárulás megkövetelése a támogatáshoz továbbítás előtt';
-$string['settings:zendesk_require_consent_desc'] = 'Bekapcsolt állapotban (ajánlott) a SOLA csak azután továbbítja a beszélgetést a Zendesk támogatási ügyfélszolgálathoz, hogy a tanuló elfogadta az első indításkor megjelenő hozzájárulási értesítést, amely közli, hogy az emberi segítség kérése megosztja a beszélgetést (beleértve a nevet és az e-mail-címet) a támogatással. Csak akkor kapcsold ki ezt, ha ezt a hozzájárulást más módon szerzed be; kikapcsolt állapotban a továbbítások azonnal elküldésre kerülnek. Nincs hatása, hacsak a Zendesk-továbbítás nincs engedélyezve.';
+$string['settings:zendesk_require_consent_desc'] = 'Bekapcsolt állapotban (ajánlott) a [[tutorshort]] csak azután továbbítja a beszélgetést a Zendesk támogatási ügyfélszolgálathoz, hogy a tanuló elfogadta az első indításkor megjelenő hozzájárulási értesítést, amely közli, hogy az emberi segítség kérése megosztja a beszélgetést (beleértve a nevet és az e-mail-címet) a támogatással. Csak akkor kapcsold ki ezt, ha ezt a hozzájárulást más módon szerzed be; kikapcsolt állapotban a továbbítások azonnal elküldésre kerülnek. Nincs hatása, hacsak a Zendesk-továbbítás nincs engedélyezve.';
 $string['chat:escalation_needs_consent'] = 'Úgy tűnik, ehhez a támogatási csapatunk egy tagjára van szükség. Ahhoz, hogy továbbítsam nekik, meg kellene osztanom ezt a beszélgetést, beleértve a nevedet és az e-mail-címedet, a támogatási ügyfélszolgálattal. Ehhez még nem járultál hozzá, ezért semmit sem küldtem el. Ha emberi segítséget szeretnél, kérlek fogadd el ennek az asszisztensnek az adatmegosztási értesítését, és kérdezz újra, vagy lépj kapcsolatba közvetlenül a támogatással.';
 $string['privacy:metadata:email_optout'] = 'Címzettenkénti e-mail-leiratkozási beállítások (mely e-mail-típusokról iratkozott le egy címzett).';
 $string['privacy:metadata:email_optout:email'] = 'A címzett e-mail-címe, amelyre a leiratkozás vonatkozik.';
@@ -1433,16 +1433,16 @@ $string['settings:rerank_apibaseurl_desc'] = 'Felülbírálja a Voyage rerank al
 $string['settings:rerank_candidates'] = 'Rerank jelöltablak';
 $string['settings:rerank_candidates_desc'] = 'Hány koszinusz-alapú legjobb N jelölt kerül az újrarangsorolási lépésbe. Alapértelmezés: 50. A nagyobb ablak több anyagot ad az újrarangsorolónak, kis extra költség mellett (~10 000 token újrarangsorolási műveleteként).';
 $string['settings:stt_selfhosted_heading'] = 'Saját üzemeltetésű átírás (Whisper)';
-$string['settings:stt_selfhosted_heading_desc'] = 'Futtasson beszédfelismerést saját hardveren, percenkénti díj nélkül. Irányítsa a SOLA-t bármely OpenAI-kompatibilis átírókiszolgálóra: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) vagy <code>whisper.cpp</code> kiszolgáló. Ha itt beállít egy kiszolgáló URL-t, az lesz az alapértelmezett STT-útvonal; a feletti Aktív STT-szolgáltató beállításban fizetős szolgáltatót kiválasztva felülbírálható. Ha a kiszolgáló magánhálózaton vagy egyszerű HTTP-n van, a gazdagép nevét adja hozzá az SSRF megbízható végpontok engedélylistájához a Biztonság szakaszban.';
+$string['settings:stt_selfhosted_heading_desc'] = 'Futtasson beszédfelismerést saját hardveren, percenkénti díj nélkül. Irányítsa a [[tutorshort]]-t bármely OpenAI-kompatibilis átírókiszolgálóra: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) vagy <code>whisper.cpp</code> kiszolgáló. Ha itt beállít egy kiszolgáló URL-t, az lesz az alapértelmezett STT-útvonal; a feletti Aktív STT-szolgáltató beállításban fizetős szolgáltatót kiválasztva felülbírálható. Ha a kiszolgáló magánhálózaton vagy egyszerű HTTP-n van, a gazdagép nevét adja hozzá az SSRF megbízható végpontok engedélylistájához a Biztonság szakaszban.';
 $string['settings:stt_selfhosted_url'] = 'Saját üzemeltetésű STT-kiszolgáló URL-je';
-$string['settings:stt_selfhosted_url_desc'] = 'Az OpenAI-kompatibilis átírókiszolgáló alap-URL-je, például <code>http://10.0.0.5:8000</code>. A SOLA automatikusan hozzáfűzi a <code>/v1/audio/transcriptions</code> végpontot; teljes végponti útvonal is elfogadott. Hagyja üresen a saját üzemeltetésű STT letiltásához.';
+$string['settings:stt_selfhosted_url_desc'] = 'Az OpenAI-kompatibilis átírókiszolgáló alap-URL-je, például <code>http://10.0.0.5:8000</code>. A [[tutorshort]] automatikusan hozzáfűzi a <code>/v1/audio/transcriptions</code> végpontot; teljes végponti útvonal is elfogadott. Hagyja üresen a saját üzemeltetésű STT letiltásához.';
 $string['settings:stt_selfhosted_model'] = 'Saját üzemeltetésű STT-modell';
 $string['settings:stt_selfhosted_model_desc'] = 'A kiszolgálónak átadott modellnév, amelynek meg kell egyeznie a betöltött Whisper-modellel — például <code>Systran/faster-whisper-small</code> speaches esetén vagy <code>large-v3</code>. Hagyja üresen a <code>whisper-1</code> küldéséhez, amelyet a legtöbb saját üzemeltetésű kiszolgáló elfogad vagy figyelmen kívül hagy.';
 $string['settings:stt_selfhosted_apikey'] = 'Saját üzemeltetésű STT API-kulcs';
 $string['settings:stt_selfhosted_apikey_desc'] = 'Opcionális. A legtöbb saját üzemeltetésű kiszolgáló megbízható hálózat mögött kulcs nélkül működik; csak akkor adja meg, ha a kiszolgáló bearer tokent igényel.';
-$string['emergency:title'] = 'SOLA vészhelyzeti vezérlők';
-$string['emergency:page_warning'] = 'Ezek a kapcsolók azonnal hatályba lépnek a webhely minden tanulójára. Minden művelet naplóbejegyzést ír. A részletes kapcsolók a SOLA többi részét futva hagyják; a főkapcsoló teljesen eltávolítja a widgetet.';
-$string['emergency:back_to_settings'] = 'SOLA beállításai';
+$string['emergency:title'] = '[[tutorshort]] vészhelyzeti vezérlők';
+$string['emergency:page_warning'] = 'Ezek a kapcsolók azonnal hatályba lépnek a webhely minden tanulójára. Minden művelet naplóbejegyzést ír. A részletes kapcsolók a [[tutorshort]] többi részét futva hagyják; a főkapcsoló teljesen eltávolítja a widgetet.';
+$string['emergency:back_to_settings'] = '[[tutorshort]] beállításai';
 $string['emergency:state_disabled'] = 'LETILTVA';
 $string['emergency:state_active'] = 'Aktív';
 $string['emergency:confirm_label'] = 'Megértem, hogy ez azonnal minden tanulót érint';
@@ -1454,7 +1454,7 @@ $string['emergency:disabled_notice'] = 'A(z) „{$a->flag}" alrendszer letiltva.
 $string['emergency:restored_notice'] = 'A(z) „{$a->flag}" alrendszer visszaállítva. Érintett beállítások: {$a->touched}';
 $string['emergency:cli_reference'] = 'Ugyanezek a vezérlők elérhetők az ügyeletesi parancssorból:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blokkolja a chat-forgalmat a dedikált leállítási jellel (v5.13-as javítás). A widget tovább jelenik meg; a tanulók a barátságos „SOLA szünetel" üzenetet látják. Használja, ha egy LLM-szolgáltató hibásan működik vagy költségnövekedés van folyamatban.';
+$string['emergency:flag_chat_desc'] = 'Blokkolja a chat-forgalmat a dedikált leállítási jellel (v5.13-as javítás). A widget tovább jelenik meg; a tanulók a barátságos „[[tutorshort]] szünetel" üzenetet látják. Használja, ha egy LLM-szolgáltató hibásan működik vagy költségnövekedés van folyamatban.';
 $string['emergency:flag_voice'] = 'Hang';
 $string['emergency:flag_voice_desc'] = 'Törli az aktív valós idejű hangszolgáltatót (pontos visszaállításhoz eltárolva). A szöveges chat továbbra is működik.';
 $string['emergency:flag_rag'] = 'RAG';
@@ -1462,11 +1462,11 @@ $string['emergency:flag_rag_desc'] = 'Letiltja a visszakeresést és az indexel�
 $string['emergency:flag_outreach'] = 'Elérés';
 $string['emergency:flag_outreach_desc'] = 'Leállítja az összefoglaló, mérföldkő- és emlékeztető e-maileket. A chatra nincs hatása.';
 $string['emergency:flag_all'] = 'FŐKAPCSOLÓ';
-$string['emergency:flag_all_desc'] = 'Letiltja a teljes bővítményt: a widget eltűnik minden oldalról, az ütemezett feladatok leállnak, a hang törlődik, a RAG ki van kapcsolva, az elérés ki van kapcsolva. A legerősebb kapcsoló — biztonsági eseménynél vagy ha a SOLA-t azonnal offline kell venni.';
+$string['emergency:flag_all_desc'] = 'Letiltja a teljes bővítményt: a widget eltűnik minden oldalról, az ütemezett feladatok leállnak, a hang törlődik, a RAG ki van kapcsolva, az elérés ki van kapcsolva. A legerősebb kapcsoló — biztonsági eseménynél vagy ha a [[tutorshort]]-t azonnal offline kell venni.';
 $string['emergency:settings_link'] = 'Vészhelyzeti vezérlők';
-$string['emergency:settings_link_desc'] = 'Alrendszerenkénti leállítási kapcsolók (chat / hang / RAG / elérés / fő) naplózással — a <code>admin/cli/emergency_disable.php</code> webes megfelelője. Nyissa meg a <a href="{$a}">SOLA vészhelyzeti vezérlők</a> oldalt.';
+$string['emergency:settings_link_desc'] = 'Alrendszerenkénti leállítási kapcsolók (chat / hang / RAG / elérés / fő) naplózással — a <code>admin/cli/emergency_disable.php</code> webes megfelelője. Nyissa meg a <a href="{$a}">[[tutorshort]] vészhelyzeti vezérlők</a> oldalt.';
 $string['email_unsubscribe:done_title'] = 'Leiratkozva';
-$string['email_unsubscribe:done_body'] = 'Kész — {$a->email} a továbbiakban nem kap ilyen típusú e-mailt a(z) {$a->product} rendszertől. Ha meggondolja magát, kérje meg a(z) {$a->product} rendszergazdáját az előfizetés újraengedélyezésére, vagy küldjön új feliratkozási kérelmet a SOLA Címzett adminisztrációs oldalán.';
+$string['email_unsubscribe:done_body'] = 'Kész — {$a->email} a továbbiakban nem kap ilyen típusú e-mailt a(z) {$a->product} rendszertől. Ha meggondolja magát, kérje meg a(z) {$a->product} rendszergazdáját az előfizetés újraengedélyezésére, vagy küldjön új feliratkozási kérelmet a [[tutorshort]] Címzett adminisztrációs oldalán.';
 $string['email_unsubscribe:invalid_title'] = 'A leiratkozási link már nem érvényes';
 $string['email_unsubscribe:invalid_body'] = 'Ez a leiratkozási link lejárt vagy hibás formátumú. Keressen egy újabb e-mailt tőlünk, vagy lépjen kapcsolatba egy webhely-rendszergazdával a manuális eltávolításhoz.';
 $string['settings:prompt_proportions_heading'] = 'Prompt-szakasz arányok (v5.6.0)';
@@ -1499,7 +1499,7 @@ $string['prompt_debug_view:show_more'] = 'További bejegyzések megjelenítése'
 $string['settings:mastery_classifier_provider'] = 'Osztályozó szolgáltató';
 $string['settings:mastery_classifier_provider_desc'] = 'A fordulatonkénti elsajátítás-osztályozóhoz használt szolgáltatói azonosító. Hagyja üresen az alapértelmezett AI-szolgáltató öröklésére. Az alapértelmezett <code>openai</code> az alábbi <code>gpt-4o-mini</code> osztályozómodellel párosul — ez a legolcsóbb 1. SZINTŰ opció a strukturált kimenetű osztályozáshoz (~$220/hó megtakarítás 100 000 MAU esetén a chat szinthez képest). Ha be van állítva, az összehasonlító szolgáltatók listájának az adott szolgáltatói azonosítójú sora adja meg az API-kulcsot, az alap-URL-t és a hőmérsékletet.';
 $string['settings:premium_escalation_heading'] = 'Prémium eszkalációs szint (A.10)';
-$string['settings:premium_escalation_heading_desc'] = 'Opcionális fordulatonkénti útválasztás prémium modellre (alapértelmezés: Claude Opus 4.8) olyan promptoknál, ahol a fő chat szint láthatóan küzd — jellemzően többlépéses matematikánál, informatikánál és természettudományos következtetésnél. A 2026-06-09-i A.10 bake-off dönteménye: az Opus 4.8 nyert 14,97/15 vs a gpt-4o 12,68/15 arányával nehéz promptokon. Két aktiválási útvonal: regex-egyezés a felhasználói üzenetben VAGY tanfolyamengedélyezési lista, amely minden fordulaton eszkalál. Alapértelmezés szerint kikapcsolt. ~5%-os eszkaláció esetén a Saylor alap chat-kiadás felett kb. 100 000 MAU-nként $700/hó várható.';
+$string['settings:premium_escalation_heading_desc'] = 'Opcionális fordulatonkénti útválasztás prémium modellre (alapértelmezés: Claude Opus 4.8) olyan promptoknál, ahol a fő chat szint láthatóan küzd — jellemzően többlépéses matematikánál, informatikánál és természettudományos következtetésnél. A 2026-06-09-i A.10 bake-off dönteménye: az Opus 4.8 nyert 14,97/15 vs a gpt-4o 12,68/15 arányával nehéz promptokon. Két aktiválási útvonal: regex-egyezés a felhasználói üzenetben VAGY tanfolyamengedélyezési lista, amely minden fordulaton eszkalál. Alapértelmezés szerint kikapcsolt. ~5%-os eszkaláció esetén a [[unishort]] alap chat-kiadás felett kb. 100 000 MAU-nként $700/hó várható.';
 $string['settings:premium_escalation_enabled'] = 'Prémium eszkalációs útválasztás engedélyezése';
 $string['settings:premium_escalation_enabled_desc'] = 'Bekapcsolva az fordulatonkénti router minden chat-hívásnál ellenőrzi az aktiválási regex-listát és a tanfolyamengedélyezési listát; az egyező fordulatok a prémium szolgáltatóhoz kerülnek. Ha a prémium sor hiányzik vagy nem sikerül példányosítani, visszaesik a fő szolgáltatóra. A rendszergazdai LLM-választó felülbírálatok mindig győznek, kivétel nélkül.';
 $string['settings:premium_escalation_provider'] = 'Prémium szolgáltató';
@@ -1513,12 +1513,12 @@ $string['settings:premium_escalation_course_tags_desc'] = 'Soronként egy tanfol
 $string['settings:spend_cap_per_course_default'] = 'Alapértelmezett tanfolyamszintű kiadási korlát (USD)';
 $string['settings:spend_cap_per_course_default_desc'] = 'Védelmi korlát, amelyet minden olyan tanfolyamra alkalmazunk, amelyhez nincs saját tanfolyamszintű kiadási korlát beállítva. Állítsa például <code>30</code>-ra, hogy egyetlen tanfolyam havi kiadása legfeljebb $30 legyen az egyes tanfolyamok finomhangolása nélkül. <code>0</code> = nincs alapértelmezés (csak az egész webhelyre vonatkozó és az egyéni tanfolyamszintű korlátok érvényesek). Ha egy tanfolyam eléri ennek a korlátnak a 80% / 95% / 100%-át, a meglévő spend-guard értesítési folyamat elküldi a rendszergazdai értesítést (a <code>spend_notify_emails</code> listára, vagy ha az üres, a webhely rendszergazdáinak). Egy adott tanfolyam mindig megemelheti saját határát magasabb egyéni korlát beállításával.';
 $string['settings:cost_anomaly_heading'] = 'Költségrendellenesség-érzékelő (v6.0)';
-$string['settings:cost_anomaly_heading_desc'] = 'Napi ütemezett feladat (<code>cost_anomaly_check</code>), amely összehasonlítja a mai nap webhely-szintű SOLA-kiadásait a 7 napos mozgó mediánnal. E-mailt küld a <code>spend_notify_emails</code> listára (vagy a webhely rendszergazdáinak), ha a mai kiadás meghaladja a beállított szorzó × medián értékét. Három meghibásodási módot fog el, amelyeket a meglévő 80% / 95% / 100% kiadási küszöbök nem észlelnek: (1) elszabaduló tanfolyam, ahol az abszolút felső határ nem lép át, de egyetlen tanfolyam hirtelen 10-szeres forgalmat generál, (2) véletlenszerű prémium szint engedélyezése, (3) szolgáltatói hibás útválasztás. Alapértelmezés szerint kikapcsolt; a <code>.drafts/sola-redash-cost-anomaly-2026-06-09.md</code> Redash-lekérdezés SOLA-n belüli megfelelője.';
+$string['settings:cost_anomaly_heading_desc'] = 'Napi ütemezett feladat (<code>cost_anomaly_check</code>), amely összehasonlítja a mai nap webhely-szintű [[tutorshort]]-kiadásait a 7 napos mozgó mediánnal. E-mailt küld a <code>spend_notify_emails</code> listára (vagy a webhely rendszergazdáinak), ha a mai kiadás meghaladja a beállított szorzó × medián értékét. Három meghibásodási módot fog el, amelyeket a meglévő 80% / 95% / 100% kiadási küszöbök nem észlelnek: (1) elszabaduló tanfolyam, ahol az abszolút felső határ nem lép át, de egyetlen tanfolyam hirtelen 10-szeres forgalmat generál, (2) véletlenszerű prémium szint engedélyezése, (3) szolgáltatói hibás útválasztás. Alapértelmezés szerint kikapcsolt; a <code>.drafts/sola-redash-cost-anomaly-2026-06-09.md</code> Redash-lekérdezés [[tutorshort]]-n belüli megfelelője.';
 $string['settings:cost_anomaly_enabled'] = 'Költségrendellenesség-érzékelő engedélyezése';
 $string['settings:cost_anomaly_enabled_desc'] = 'Bekapcsolva a napi ütemezett feladat kiértékeli a mai kiadásokat a 7 napos mozgó mediánhoz képest, és rendellenesség esetén e-mailt küld a rendszergazdáknak. Az első 7 nap az engedélyezés után <code>insufficient_history</code> (nincs még historikus alapvonal) állapotot jelez, és nem bocsát ki riasztást. Naponként idempotens: egy <code>config_plugins</code>-beli jelző megakadályozza az ismételt e-maileket, ha a cron naponta többször fut.';
 $string['settings:cost_anomaly_multiplier'] = 'Rendellenesség-szorzó';
-$string['settings:cost_anomaly_multiplier_desc'] = 'A mai kiadásnak meg kell haladnia ezt a szorzót × a 7 napos mediánt a riasztás aktiválásához. Alapértelmezés: <code>2.0</code>. Csökkentse <code>1.5</code>-re a korábbi figyelmeztetéshez (több téves riasztás beiratkozási csúcsok idején). Növelje <code>3.0</code>-ra, ha a Saylor használata elég hullámos ahhoz, hogy a 2-szeres kiugrások rutinszerűek legyenek.';
-$string['task:cost_anomaly_check'] = 'SOLA napi költségrendellenesség-ellenőrzés';
+$string['settings:cost_anomaly_multiplier_desc'] = 'A mai kiadásnak meg kell haladnia ezt a szorzót × a 7 napos mediánt a riasztás aktiválásához. Alapértelmezés: <code>2.0</code>. Csökkentse <code>1.5</code>-re a korábbi figyelmeztetéshez (több téves riasztás beiratkozási csúcsok idején). Növelje <code>3.0</code>-ra, ha a [[unishort]] használata elég hullámos ahhoz, hogy a 2-szeres kiugrások rutinszerűek legyenek.';
+$string['task:cost_anomaly_check'] = '[[tutorshort]] napi költségrendellenesség-ellenőrzés';
 // v6.4.0 signed policy bundle strings (added 2026-06-11).
 $string['settings:policy_bundle_heading'] = 'Aláírt irányelvcsomag (távoli viselkedésfrissítések)';
 $string['settings:policy_bundle_heading_desc'] = 'Viselkedési beállítások (promptok, útválasztás, eszkalációs triggerek, RAG-hangolás, kiadási irányelv) alkalmazása kriptográfiailag aláírt JSON-fájlból kóddeploy nélkül. Egy napi ütemezett feladat lekéri a csomag URL-jét, ellenőrzi Ed25519-aláírását az alábbi nyilvános kulccsal szemben, és csak akkor alkalmazza a beállításokat, ha minden kulcs szerepel a beépített engedélyezési listán, és a csomagverzió újabb, mint az utoljára alkalmazott. API-kulcsok, URL-ek, webhookok és biztonsági beállítások soha nem állíthatók be csomaggal. Csomagokat hozzon létre és írjon alá a <code>admin/cli/policy_bundle_tool.php</code> segítségével (keygen, sign, verify, status, sync).';
@@ -1530,7 +1530,7 @@ $string['settings:policy_bundle_pubkey'] = 'Irányelvcsomag nyilvános kulcsa';
 $string['settings:policy_bundle_pubkey_desc'] = 'Base64 Ed25519 nyilvános kulcs a csomagaláírások ellenőrzéséhez. A kulcspárt a <code>policy_bundle_tool.php --keygen</code> paranccsal generálja; a privát kulcs a csomag szerzőjénél marad, és soha nem tölthető fel sehová.';
 $string['settings:policy_bundle_status'] = 'Utolsó szinkronizálás';
 $string['settings:policy_bundle_applied_version'] = 'alkalmazott verzió';
-$string['task:policy_bundle_sync'] = 'SOLA aláírt irányelvcsomag-szinkronizálás';
+$string['task:policy_bundle_sync'] = '[[tutorshort]] aláírt irányelvcsomag-szinkronizálás';
 $string['policy_bundle:invalid'] = 'Az irányelvcsomag elutasítva: {$a}';
 $string['prompt_debug_view:retrieved_chunks'] = 'Lekért részletek (RAG-kiválasztás)';
 $string['prompt_debug_view:retrieved_chunks_hint'] = 'A részletek, amelyeket a lekérő kiválasztott ehhez a kérdéshez, rangsor szerint, relevanciapontszámukkal és forrásukkal (cmid) együtt. Ezzel ellenőrizheti, hogy a modell a legjobban illeszkedő kurzustartalmat kapta-e meg.';
@@ -1544,7 +1544,7 @@ $string['analytics:exp_compare'] = 'Összehasonlítás';
 $string['analytics:exp_metric'] = 'Mérőszám';
 $string['analytics:exp_delta'] = 'B vs A';
 $string['analytics:exp_enrolled'] = 'Beiratkozott tanulók';
-$string['analytics:exp_active_users'] = 'Aktív SOLA felhasználók';
+$string['analytics:exp_active_users'] = 'Aktív [[tutorshort]] felhasználók';
 $string['analytics:exp_usage_rate'] = 'Használati arány (%)';
 $string['analytics:exp_sessions'] = 'Munkamenetek';
 $string['analytics:exp_messages'] = 'Üzenetek';
