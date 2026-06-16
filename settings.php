@@ -1812,28 +1812,28 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/institution_name',
         'Institution Name',
         'Full institution name used in the system prompt, avatar labels, and AI insights (e.g. "State University").',
-        'Your Institution'
+        'Saylor University'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_short_name',
         'Institution Short Name',
         'Abbreviated institution name for compact UI elements (e.g. "State U").',
-        'Your Institution'
+        'Saylor'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/display_name',
         'Assistant Display Name',
         'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").',
-        'Online Learning Assistant'
+        'Saylor Online Learning Assistant'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/short_name',
         'Assistant Short Name',
         'Short name shown in the header bar and compact UI elements (e.g. "Assistant").',
-        'Assistant'
+        'SOLA'
     ));
 
     $settings->add(new admin_setting_configtextarea(
