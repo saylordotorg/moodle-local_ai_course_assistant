@@ -163,8 +163,16 @@ final class branding_test extends \advanced_testcase {
         $this->assertStringNotContainsString('[[', $out);
     }
 
-    public function test_apply_uses_defaults_when_unconfigured(): void {
+    public function test_apply_uses_fallback_when_config_empty(): void {
+        // With config blank, apply() resolves to branding.php's built-in
+        // fallback chain (the Saylor/SOLA values). NOTE: a fresh install
+        // actually writes the generic settings.php defaults ("Assistant" etc.)
+        // to config, so this asserts the fallback in isolation by clearing the
+        // four keys first.
         $this->resetAfterTest();
+        foreach (['short_name', 'display_name', 'institution_name', 'institution_short_name'] as $k) {
+            set_config($k, '', 'local_ai_course_assistant');
+        }
         $this->assertEquals('SOLA', branding::apply('[[tutorshort]]'));
         $this->assertEquals('Saylor Online Learning Assistant', branding::apply('[[tutorname]]'));
         $this->assertEquals('Saylor University', branding::apply('[[uniname]]'));
