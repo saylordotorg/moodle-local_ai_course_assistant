@@ -129,6 +129,14 @@ class get_realtime_token extends external_api {
                     . "they want to discuss.";
             }
             $instructions = $systemprompt . $voicetail;
+            // OpenAI Realtime rejects session.instructions that contain a
+            // reserved special token and fails the whole session with
+            // "instructions contain a reserved special token". The chat
+            // jailbreak-defense line cites one such token (<|im_start|>) as an
+            // example of text to ignore; the chat APIs tolerate it, but Realtime
+            // validates strictly. Neutralize any <|...|> token so voice mode can
+            // start. The surrounding instruction keeps its meaning.
+            $instructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $instructions);
         } catch (\Throwable $e) {
             debugging('realtime instructions build failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             $instructions = '';
