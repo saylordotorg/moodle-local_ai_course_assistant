@@ -297,7 +297,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/backend_context_tokens',
         get_string('settings:backend_context_tokens', 'local_ai_course_assistant'),
-        get_string('settings:backend_context_tokens_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:backend_context_tokens_desc', 'local_ai_course_assistant')),
         '0',
         PARAM_INT
     ));
@@ -500,7 +500,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/ssrf_trusted_endpoints',
         get_string('settings:ssrf_trusted_endpoints', 'local_ai_course_assistant'),
-        get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant')),
         '',
         PARAM_RAW
     ));
@@ -516,7 +516,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/talking_avatar_heading',
         get_string('settings:talking_avatar_heading', 'local_ai_course_assistant'),
-        get_string('settings:talking_avatar_heading_desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_heading_desc', 'local_ai_course_assistant'))
     ));
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/talking_avatar_provider',
@@ -534,14 +534,14 @@ if ($hassiteconfig) {
     foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
         $settings->add(new admin_setting_configpasswordunmask(
             'local_ai_course_assistant/' . $tap . '_api_key',
-            get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant'),
-            get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant')),
+            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant')),
             ''
         ));
         $settings->add(new admin_setting_configtext(
             'local_ai_course_assistant/' . $tap . '_persona_id',
-            get_string('settings:talking_avatar_' . $tap . '_persona_id', 'local_ai_course_assistant'),
-            get_string('settings:talking_avatar_' . $tap . '_persona_id_desc', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_persona_id', 'local_ai_course_assistant')),
+            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_persona_id_desc', 'local_ai_course_assistant')),
             '',
             PARAM_TEXT
         ));
@@ -580,8 +580,8 @@ if ($hassiteconfig) {
     foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
         $settings->add(new admin_setting_configpasswordunmask(
             'local_ai_course_assistant/' . $tap . '_webhook_secret',
-            get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant'),
-            get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant')),
+            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant')),
             ''
         ));
     }
@@ -592,7 +592,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/xai_proxy_url',
         get_string('settings:xai_proxy_url', 'local_ai_course_assistant'),
-        get_string('settings:xai_proxy_url_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:xai_proxy_url_desc', 'local_ai_course_assistant')),
         '',
         PARAM_URL
     ));
@@ -644,18 +644,18 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/external_resources_heading',
         get_string('settings:external_resources_heading', 'local_ai_course_assistant'),
-        get_string('settings:external_resources_heading_desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('settings:external_resources_heading_desc', 'local_ai_course_assistant'))
     ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/external_resources_enabled',
         get_string('settings:external_resources_enabled', 'local_ai_course_assistant'),
-        get_string('settings:external_resources_enabled_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:external_resources_enabled_desc', 'local_ai_course_assistant')),
         0
     ));
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/external_resources_allowlist',
         get_string('settings:external_resources_allowlist', 'local_ai_course_assistant'),
-        get_string('settings:external_resources_allowlist_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:external_resources_allowlist_desc', 'local_ai_course_assistant')),
         "Wikipedia (en.wikipedia.org)\n"
         . "Khan Academy (khanacademy.org)\n"
         . "OER Commons (oercommons.org)\n"
@@ -1003,7 +1003,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/cost_anomaly_heading',
         get_string('settings:cost_anomaly_heading', 'local_ai_course_assistant'),
-        get_string('settings:cost_anomaly_heading_desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('settings:cost_anomaly_heading_desc', 'local_ai_course_assistant'))
     ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/cost_anomaly_enabled',
@@ -1014,7 +1014,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/cost_anomaly_multiplier',
         get_string('settings:cost_anomaly_multiplier', 'local_ai_course_assistant'),
-        get_string('settings:cost_anomaly_multiplier_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:cost_anomaly_multiplier_desc', 'local_ai_course_assistant')),
         // Must round-trip through clean_param(PARAM_FLOAT): '2.0' cleans to 2
         // and '2' !== '2.0' fails default-validation at install (pre-existing
         // bug that has been failing CI since v6.0.1). Use '2'.
@@ -1122,7 +1122,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/backend_retry_max_wait',
         get_string('settings:backend_retry_max_wait', 'local_ai_course_assistant'),
-        get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant')),
         '5', PARAM_INT
     ));
 
@@ -1297,7 +1297,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/csp_course_pages_mode',
         get_string('settings:csp_course_pages_mode', 'local_ai_course_assistant'),
-        get_string('settings:csp_course_pages_mode_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:csp_course_pages_mode_desc', 'local_ai_course_assistant')),
         'off',
         [
             'off'         => get_string('settings:csp_mode_off', 'local_ai_course_assistant'),
@@ -1490,13 +1490,13 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/stt_selfhosted_heading',
         get_string('settings:stt_selfhosted_heading', 'local_ai_course_assistant'),
-        get_string('settings:stt_selfhosted_heading_desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('settings:stt_selfhosted_heading_desc', 'local_ai_course_assistant'))
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/stt_selfhosted_url',
         get_string('settings:stt_selfhosted_url', 'local_ai_course_assistant'),
-        get_string('settings:stt_selfhosted_url_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:stt_selfhosted_url_desc', 'local_ai_course_assistant')),
         '',
         PARAM_RAW_TRIMMED
     ));
@@ -1629,7 +1629,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/pedagogy_defaults_heading',
         get_string('settings:pedagogy_defaults_heading', 'local_ai_course_assistant'),
-        get_string('settings:pedagogy_defaults_heading_desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('settings:pedagogy_defaults_heading_desc', 'local_ai_course_assistant'))
     ));
     foreach ([
         'mastery_enabled'         => 'pedagogy:mastery',
@@ -1647,8 +1647,8 @@ if ($hassiteconfig) {
     ] as $key => $stringkey) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,
-            get_string($stringkey, 'local_ai_course_assistant'),
-            get_string($stringkey . '_desc', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\branding::apply(get_string($stringkey, 'local_ai_course_assistant')),
+            \local_ai_course_assistant\branding::apply(get_string($stringkey . '_desc', 'local_ai_course_assistant')),
             0
         ));
     }
@@ -1758,7 +1758,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/premium_escalation_heading',
         get_string('settings:premium_escalation_heading', 'local_ai_course_assistant'),
-        get_string('settings:premium_escalation_heading_desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('settings:premium_escalation_heading_desc', 'local_ai_course_assistant'))
     ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/premium_escalation_enabled',
@@ -1812,28 +1812,28 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/institution_name',
         'Institution Name',
         'Full institution name used in the system prompt, avatar labels, and AI insights (e.g. "State University").',
-        'Your Institution'
+        'Saylor University'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_short_name',
         'Institution Short Name',
         'Abbreviated institution name for compact UI elements (e.g. "State U").',
-        'Your Institution'
+        'Saylor'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/display_name',
         'Assistant Display Name',
         'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").',
-        'Online Learning Assistant'
+        'Saylor Online Learning Assistant'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/short_name',
         'Assistant Short Name',
         'Short name shown in the header bar and compact UI elements (e.g. "Assistant").',
-        'Assistant'
+        'SOLA'
     ));
 
     $settings->add(new admin_setting_configtextarea(
@@ -2003,7 +2003,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/zendesk_require_consent',
         get_string('settings:zendesk_require_consent', 'local_ai_course_assistant'),
-        get_string('settings:zendesk_require_consent_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:zendesk_require_consent_desc', 'local_ai_course_assistant')),
         1
     ));
 
@@ -2116,13 +2116,13 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/redash_user_api_key',
         get_string('settings:redash_user_api_key', 'local_ai_course_assistant'),
-        get_string('settings:redash_user_api_key_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:redash_user_api_key_desc', 'local_ai_course_assistant')),
         ''
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/redash_data_source_id',
         get_string('settings:redash_data_source_id', 'local_ai_course_assistant'),
-        get_string('settings:redash_data_source_id_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:redash_data_source_id_desc', 'local_ai_course_assistant')),
         '',
         PARAM_INT
     ));
@@ -2188,7 +2188,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rate_card_auto_refresh',
         get_string('settings:rate_card_auto_refresh', 'local_ai_course_assistant'),
-        get_string('settings:rate_card_auto_refresh_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('settings:rate_card_auto_refresh_desc', 'local_ai_course_assistant')),
         1
     ));
     $settings->add(new admin_setting_configtext(
@@ -2231,7 +2231,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/empathy_heading',
         get_string('empathy:title', 'local_ai_course_assistant'),
-        get_string('empathy:desc', 'local_ai_course_assistant')
+        \local_ai_course_assistant\branding::apply(get_string('empathy:desc', 'local_ai_course_assistant'))
     ));
 
     // Master kill switch for ALL outreach emails. Default OFF on fresh install.
@@ -2262,7 +2262,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/memory_feature_enabled',
         get_string('empathy:memory_enabled', 'local_ai_course_assistant'),
-        get_string('empathy:memory_enabled_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('empathy:memory_enabled_desc', 'local_ai_course_assistant')),
         '1'
     ));
 
@@ -2270,7 +2270,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/struggle_classifier_enabled',
         get_string('empathy:struggle_enabled', 'local_ai_course_assistant'),
-        get_string('empathy:struggle_enabled_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('empathy:struggle_enabled_desc', 'local_ai_course_assistant')),
         '0'
     ));
 

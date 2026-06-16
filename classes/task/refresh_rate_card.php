@@ -32,7 +32,7 @@ use local_ai_course_assistant\rate_card_refresher;
 class refresh_rate_card extends \core\task\scheduled_task {
 
     public function get_name(): string {
-        return get_string('task:refresh_rate_card', 'local_ai_course_assistant');
+        return \local_ai_course_assistant\branding::apply(get_string('task:refresh_rate_card', 'local_ai_course_assistant'));
     }
 
     public function execute(): void {

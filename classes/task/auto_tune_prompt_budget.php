@@ -34,7 +34,7 @@ use local_ai_course_assistant\prompt_metrics_logger;
 class auto_tune_prompt_budget extends \core\task\scheduled_task {
 
     public function get_name(): string {
-        return get_string('task:auto_tune_prompt_budget', 'local_ai_course_assistant');
+        return \local_ai_course_assistant\branding::apply(get_string('task:auto_tune_prompt_budget', 'local_ai_course_assistant'));
     }
 
     public function execute(): void {

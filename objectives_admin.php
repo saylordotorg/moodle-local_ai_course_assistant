@@ -282,7 +282,7 @@ if (cross_course_mastery::is_enabled_for_course($courseid)) {
         get_string('objectives:rebuild_links_heading', 'local_ai_course_assistant'),
         ['class' => 'h5 mb-2']);
     echo html_writer::tag('p',
-        get_string('objectives:rebuild_links_help', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(get_string('objectives:rebuild_links_help', 'local_ai_course_assistant')),
         ['class' => 'text-muted small mb-2']);
     echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(), 'class' => 'd-inline']);
     echo html_writer::input_hidden_params(new moodle_url('', [

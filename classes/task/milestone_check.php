@@ -170,7 +170,7 @@ class milestone_check extends \core\task\scheduled_task {
             'institution' => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
         ];
         $subject = get_string('milestone:streak_subject', 'local_ai_course_assistant', $a);
-        $text = get_string('milestone:streak_body_text', 'local_ai_course_assistant', $a);
+        $text = \local_ai_course_assistant\branding::apply(get_string('milestone:streak_body_text', 'local_ai_course_assistant', $a));
         $html = format_text($text, FORMAT_MARKDOWN);
         return [$subject, $text, $html];
     }
@@ -195,7 +195,7 @@ class milestone_check extends \core\task\scheduled_task {
             'institution' => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
         ];
         $subject = get_string('milestone:completion_subject', 'local_ai_course_assistant', $a);
-        $text = get_string('milestone:completion_body_text', 'local_ai_course_assistant', $a);
+        $text = \local_ai_course_assistant\branding::apply(get_string('milestone:completion_body_text', 'local_ai_course_assistant', $a));
         $html = format_text($text, FORMAT_MARKDOWN);
         return [$subject, $text, $html];
     }

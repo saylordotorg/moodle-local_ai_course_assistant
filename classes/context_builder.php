@@ -259,12 +259,10 @@ class context_builder {
             }
         }
 
-        // Dynamic display name from admin settings.
-        $display_name = get_config('local_ai_course_assistant', 'display_name') ?: 'Saylor Online Learning Assistant';
-        $short_name = get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA';
-
-        // Institution name from settings.
-        $institution = get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University';
+        // Institution name from branding (single source of truth; the product
+        // name tokens [[tutorshort]]/[[tutorname]] in the template are resolved
+        // by branding::apply() below).
+        $institution = branding::institution_name();
 
         // v4.12.0: build a structured list of homogeneous sections, then let
         // the prompt builder emit them in canonical category order within an
@@ -284,11 +282,11 @@ class context_builder {
             [$course->fullname, $userrole, $coursetopics, $coursecontent, $institution],
             $template
         );
-        $base = str_replace(
-            ['You are SOLA', 'SOLA (Online Learning Assistant)'],
-            ['You are ' . $short_name . ' (' . $display_name . ')', $short_name . ' (' . $display_name . ')'],
-            $base
-        );
+        // Resolve the product/institution brand tokens ([[tutorshort]],
+        // [[tutorname]], [[uniname]], [[unishort]]) from the configured names.
+        // This covers every occurrence in the template, not just the first
+        // identity line, so a rebrand is complete throughout the prompt.
+        $base = branding::apply($base);
 
         $sections = [];
         $sections[] = new section('base_template', section::CAT_IDENTITY, 100, $base, 200);

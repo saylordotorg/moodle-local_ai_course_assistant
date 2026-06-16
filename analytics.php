@@ -664,7 +664,7 @@ if ($expa > 0 && $expb > 0 && $expa !== $expb) {
     $mb = analytics::get_experiment_metrics($expb, $since);
     $metriclabels = [
         'enrolled' => get_string('analytics:exp_enrolled', 'local_ai_course_assistant'),
-        'active_users' => get_string('analytics:exp_active_users', 'local_ai_course_assistant'),
+        'active_users' => \local_ai_course_assistant\branding::apply(get_string('analytics:exp_active_users', 'local_ai_course_assistant')),
         'usage_rate_pct' => get_string('analytics:exp_usage_rate', 'local_ai_course_assistant'),
         'sessions' => get_string('analytics:exp_sessions', 'local_ai_course_assistant'),
         'messages' => get_string('analytics:exp_messages', 'local_ai_course_assistant'),

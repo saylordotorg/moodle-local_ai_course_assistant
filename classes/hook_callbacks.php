@@ -778,11 +778,18 @@ class hook_callbacks {
             'drawermode'         => ($displaymode === 'drawer'),
             'autoopen'           => self::is_autoopen_for_course($courseid),
             'studentmode'        => $studentmode,
-            'displayname'        => get_config('local_ai_course_assistant', 'display_name') ?: 'Saylor Online Learning Assistant',
-            'institution'        => get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University',
-            'institutionshort'   => get_config('local_ai_course_assistant', 'institution_short_name') ?: 'Saylor U',
+            'displayname'        => branding::display_name(),
+            'institution'        => branding::institution_name(),
+            'institutionshort'   => branding::institution_short_name(),
             'practicescoring'    => (bool)get_config('local_ai_course_assistant', 'practice_scoring_enabled'),
-            'shortname_label'    => get_config('local_ai_course_assistant', 'short_name') ?: 'SOLA',
+            'shortname_label'    => branding::short_name(),
+            // Pre-resolved brand label for the open button (the only brand-bearing
+            // string the mustache renders directly via {{#str}}).
+            'chat_open_label'    => branding::str('chat:open'),
+            // Brand token map for the browser: lets JS resolve [[tutorshort]] etc.
+            // in strings fetched at runtime via the Moodle string API (e.g. the
+            // personalized greeting). Consumed in chat.js init.
+            'brandtokens_json'   => branding::token_map_json(),
             'welcomemessage'     => get_config('local_ai_course_assistant', 'welcome_message') ?: '',
             'chatgreeting'       => get_config('local_ai_course_assistant', 'chat_greeting') ?: '',
             'coursename'         => $course->fullname,
@@ -938,7 +945,10 @@ class hook_callbacks {
 
         $strings = [];
         foreach ($keys as $key) {
-            $strings[$key] = get_string($key, 'local_ai_course_assistant');
+            // Resolve brand tokens so the CDN-bundled i18n map carries final
+            // names. (In non-CDN mode these strings are fetched via the Moodle
+            // string API and brand-resolved in JS via the token map instead.)
+            $strings[$key] = branding::apply(get_string($key, 'local_ai_course_assistant'));
         }
         return $strings;
     }

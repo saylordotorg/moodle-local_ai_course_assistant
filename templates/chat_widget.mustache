@@ -57,6 +57,8 @@
         "displaymode": "drawer",
         "displayname": "SOLA",
         "shortname_label": "SOLA",
+        "chat_open_label": "Open SOLA",
+        "brandtokens_json": "{\"tutorshort\":\"SOLA\"}",
         "institution": "Saylor Academy",
         "welcomemessage": "Welcome back.",
         "chatgreeting": "How can I help you today?",
@@ -122,6 +124,7 @@
      data-autoopen="{{#autoopen}}1{{/autoopen}}"
      data-displayname="{{displayname}}"
      data-shortname="{{shortname_label}}"
+     data-brandtokens="{{brandtokens_json}}"
      data-institution="{{institution}}"
      data-practice-scoring="{{#practicescoring}}1{{/practicescoring}}"
      data-welcome-message="{{welcomemessage}}"
@@ -151,8 +154,8 @@
             type="button"
             aria-expanded="false"
             aria-controls="local-ai-course-assistant-drawer"
-            title="{{#str}}chat:open, local_ai_course_assistant{{/str}}"
-            aria-label="{{#str}}chat:open, local_ai_course_assistant{{/str}}">
+            title="{{chat_open_label}}"
+            aria-label="{{chat_open_label}}">
         <span class="aica-avatar-svg aica-avatar-svg--toggle" aria-hidden="true"
               data-fallback-avatar="{{avatarurl}}">
             <img src="{{avatarurl}}" alt="" class="local-ai-course-assistant__avatar-img" aria-hidden="true" />

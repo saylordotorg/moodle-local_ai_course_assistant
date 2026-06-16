@@ -74,7 +74,7 @@ class branding {
      */
     public static function institution_short_name(): string {
         $v = get_config('local_ai_course_assistant', 'institution_short_name');
-        return $v !== false && $v !== '' ? $v : 'Saylor U';
+        return $v !== false && $v !== '' ? $v : 'Saylor';
     }
 
     /**
@@ -118,5 +118,91 @@ class branding {
         $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $short));
         $slug = trim($slug, '-');
         return $slug !== '' ? $slug : 'ai-course-assistant';
+    }
+
+    // ------------------------------------------------------------------
+    // Brand-token substitution.
+    //
+    // Lang strings, the default system prompt, emails, and any other
+    // brand-bearing copy embed four tokens instead of literal names, so the
+    // whole product (and the operator-facing copy) rebrands from the four
+    // admin settings with no code or string-file edits:
+    //
+    //   [[tutorname]]  → display_name()            (e.g. "Saylor Online Learning Assistant")
+    //   [[tutorshort]] → short_name()              (e.g. "SOLA")
+    //   [[uniname]]    → institution_name()        (e.g. "Saylor University")
+    //   [[unishort]]   → institution_short_name()  (e.g. "Saylor")
+    //
+    // Substitution happens at output boundaries (the JS string bundle, the
+    // mustache template data, the system prompt builder, admin settings copy,
+    // and the standalone learner/admin pages) via apply() / str(), and in the
+    // browser via the token map exposed to JS. The double-square-bracket
+    // delimiter is deliberately distinct from Moodle's `{$a}` and mustache's
+    // `{{ }}` so a token can never be misread by either engine.
+    // ------------------------------------------------------------------
+
+    /** @var string Regex matching a single brand token, e.g. [[tutorshort]]. */
+    private const TOKEN_RE = '/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/';
+
+    /**
+     * Map of brand token name → its configured value. Single place that binds
+     * the token vocabulary to the four accessors; consumed by apply() and by
+     * the browser via token_map_json().
+     *
+     * @return array<string, string>
+     */
+    public static function token_map(): array {
+        return [
+            'tutorname'  => self::display_name(),
+            'tutorshort' => self::short_name(),
+            'uniname'    => self::institution_name(),
+            'unishort'   => self::institution_short_name(),
+        ];
+    }
+
+    /**
+     * Substitute every brand token in a piece of text with its configured
+     * value. Null-safe (returns '' for null) and a no-op for text that holds
+     * no tokens, so it is cheap to apply broadly at output boundaries.
+     *
+     * @param string|null $text Text that may contain [[token]] placeholders.
+     * @return string The text with all brand tokens resolved.
+     */
+    public static function apply(?string $text): string {
+        if ($text === null || $text === '') {
+            return (string) $text;
+        }
+        if (strpos($text, '[[') === false) {
+            return $text;
+        }
+        $map = self::token_map();
+        return preg_replace_callback(self::TOKEN_RE, static function ($m) use ($map) {
+            return $map[$m[1]] ?? $m[0];
+        }, $text);
+    }
+
+    /**
+     * Fetch a Moodle lang string and resolve its brand tokens in one call.
+     * Drop-in replacement for get_string() at brand-bearing call sites.
+     *
+     * @param string $identifier Lang string key.
+     * @param array|object|string|null $a Standard get_string $a substitution.
+     * @param string $component Lang component (defaults to this plugin).
+     * @return string The fully-resolved, brand-substituted string.
+     */
+    public static function str(string $identifier, $a = null, string $component = 'local_ai_course_assistant'): string {
+        return self::apply(get_string($identifier, $component, $a));
+    }
+
+    /**
+     * The token map as a JSON object for embedding in an inline script, so the
+     * browser can resolve brand tokens in strings fetched at runtime via the
+     * Moodle string API. JSON_HEX_TAG guards against a value containing
+     * "</script>" breaking out of the inline tag.
+     *
+     * @return string JSON object, e.g. {"tutorshort":"SOLA", ...}.
+     */
+    public static function token_map_json(): string {
+        return json_encode(self::token_map(), JSON_HEX_TAG | JSON_UNESCAPED_UNICODE);
     }
 }

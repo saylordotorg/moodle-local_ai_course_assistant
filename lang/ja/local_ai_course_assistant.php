@@ -217,7 +217,7 @@ $string['studytip:mix_modes']           = 'Mix different types of study: reading
 $string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
 $string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
 $string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell SOLA a different number and it will save your plan.';
+$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
 $string['reminder:whatsapp_body'] = '{$a->coursename}の学習リマインダー：{$a->message}（配信停止：{$a->unsubscribe_url}）';
 $string['reminder:study_tip_prefix'] = '今日の学習目標：';
 $string['unsubscribe:title'] = '学習リマインダーの配信停止';
@@ -286,12 +286,12 @@ $string['usersettings:confirm_delete_course'] = 'コース「{$a}」のAIチュ�
 $string['usersettings:confirm_delete_all'] = 'すべてのコースのAIチューターデータをすべて永久に削除してもよろしいですか？この操作は元に戻せません。';
 $string['usersettings:data_deleted'] = 'データが削除されました。';
 
-// === SOLA v1.0.12 — updated/new strings ===
+// === [[tutorshort]] v1.0.12 — updated/new strings ===
 
 // Updated strings (override earlier values):
 $string['chat:greeting'] = 'こんにちは、{$a}さん！SOLAです。今日はどのようにお手伝いしましょうか？';
-$string['chat:title'] = 'SOLA';
-$string['chat:assistant'] = 'SOLA';
+$string['chat:title'] = '[[tutorshort]]';
+$string['chat:assistant'] = '[[tutorshort]]';
 $string['chat:open'] = 'SOLAを開く';
 $string['chat:change_avatar'] = 'アバターを変更';
 
@@ -470,7 +470,7 @@ $string['coursesettings:ell_pronunciation'] = 'Pronunciation Practice Mode';
 $string['coursesettings:ell_pronunciation_desc'] = 'Show the "Pronunciation Practice" chip for students in this course. Uses OpenAI Realtime API for phoneme-level pronunciation feedback. Requires Voice Mode to be enabled in global plugin settings.';
 $string['coursesettings:ell_pronunciation_enable'] = 'Enable Pronunciation Practice chip for this course';
 $string['coursesettings:rag'] = 'Semantic Search (RAG)';
-$string['coursesettings:rag_desc'] = 'Enable retrieval-augmented generation for this course. When enabled, SOLA embeds and searches course content to ground its answers. Requires RAG to be enabled globally in plugin settings.';
+$string['coursesettings:rag_desc'] = 'Enable retrieval-augmented generation for this course. When enabled, [[tutorshort]] embeds and searches course content to ground its answers. Requires RAG to be enabled globally in plugin settings.';
 $string['coursesettings:rag_enable'] = 'Enable RAG for this course';
 $string['coursesettings:speaking_practice'] = 'Speaking Practice';
 $string['coursesettings:speaking_practice_desc'] = 'Show the "Practice Speaking" chip for students in this course. Uses OpenAI TTS for voice responses. Requires an OpenAI API key in global plugin settings.';
@@ -478,9 +478,9 @@ $string['coursesettings:speaking_practice_enable'] = 'Enable Speaking Practice c
 $string['coursesettings:token_usage'] = 'Token Usage & Cost';
 $string['coursesettings:token_usage_desc'] = 'View token usage, cost estimates, and per-student breakdowns for this course.';
 
-// v5.2.0: per-quiz SOLA assistance level controls.
+// v5.2.0: per-quiz [[tutorshort]] assistance level controls.
 $string['quizsettings:title'] = 'Quiz Assistance Levels';
-$string['quizsettings:desc'] = 'Choose how much help SOLA gives on each quiz. "Default" uses the legacy rule: ungraded quizzes get full help, graded quizzes hide the widget. Use "Coach" to keep SOLA available on a graded quiz but block direct answers.';
+$string['quizsettings:desc'] = 'Choose how much help [[tutorshort]] gives on each quiz. "Default" uses the legacy rule: ungraded quizzes get full help, graded quizzes hide the widget. Use "Coach" to keep [[tutorshort]] available on a graded quiz but block direct answers.';
 $string['quizsettings:colquiz'] = 'Quiz';
 $string['quizsettings:colgrade'] = 'Max grade';
 $string['quizsettings:collevel'] = 'Assistance level';
@@ -511,7 +511,7 @@ $string['integrity:enabled_desc'] = 'Run automated plugin health checks daily at
 $string['integrity:run_now'] = 'Run Checks Now';
 $string['integrity:title'] = 'Integrity Checks';
 $string['integrity:view_results'] = 'View Integrity Results';
-$string['messageprovider:integrity_report'] = 'SOLA integrity check failure report';
+$string['messageprovider:integrity_report'] = '[[tutorshort]] integrity check failure report';
 $string['mobile_chip_concepts'] = '主要概念';
 $string['mobile_chip_quiz'] = 'クイズ';
 $string['mobile_chip_studyplan'] = '学習計画';
@@ -595,7 +595,7 @@ $string['redash_api_key_desc'] = 'API key for external analytics platforms like 
 $string['redash_heading'] = 'Analytics Export';
 $string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
 $string['remoteconfigurl'] = 'Remote config URL';
-$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed SOLA configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
+$string['remoteconfigurl_desc'] = 'URL to a JSON file containing remotely-managed [[tutorshort]] configuration (system prompt, instruction blocks, model default). Must be HTTPS. Leave blank to use the default GitHub URL. Local admin settings always take priority over remote config values.';
 $string['rubric:done'] = '完了';
 $string['rubric:encourage_high'] = '素晴らしい！その調子で！';
 $string['rubric:encourage_low'] = '良いスタートです！定期的な練習が上達につながります。';
@@ -610,7 +610,7 @@ $string['settings:avatar_color_desc'] = 'Border color of the floating avatar but
 $string['settings:avatar_fill'] = 'Avatar Background Color';
 $string['settings:avatar_fill_desc'] = 'Fill color inside the floating avatar button (shown behind transparent avatar areas). Use a hex value, e.g. #ffffff.';
 $string['settings:display_mode'] = 'Display Mode';
-$string['settings:display_mode_desc'] = 'How SOLA appears on the page. "Widget" shows a floating avatar button with a popup chat panel. "Side drawer" shows a full-height panel that slides in from the right edge of the screen.';
+$string['settings:display_mode_desc'] = 'How [[tutorshort]] appears on the page. "Widget" shows a floating avatar button with a popup chat panel. "Side drawer" shows a full-height panel that slides in from the right edge of the screen.';
 $string['settings:display_mode_drawer'] = 'Side drawer (right edge)';
 $string['settings:display_mode_widget'] = 'Widget (floating button)';
 $string['settings:embed_apibaseurl'] = 'Embedding API Base URL';
@@ -625,16 +625,16 @@ $string['settings:embed_provider'] = 'Embedding Provider';
 $string['settings:embed_provider_desc'] = 'The API provider used to generate text embeddings for RAG indexing and retrieval.';
 $string['settings:embed_provider_ollama'] = 'Ollama (local, e.g. nomic-embed-text)';
 $string['settings:embed_provider_openai'] = 'OpenAI (text-embedding-3-small)';
-$string['settings:hide_on_quiz_for_staff'] = 'Hide SOLA on quiz pages for staff';
-$string['settings:hide_on_quiz_for_staff_desc'] = 'Completely hide the SOLA widget on all quiz pages for teachers and administrators.';
-$string['settings:hide_on_quiz_for_students'] = 'Hide SOLA on quiz pages for students';
-$string['settings:hide_on_quiz_for_students_desc'] = 'Completely hide the SOLA widget on all quiz pages (view, attempt, review) for students.';
+$string['settings:hide_on_quiz_for_staff'] = 'Hide [[tutorshort]] on quiz pages for staff';
+$string['settings:hide_on_quiz_for_staff_desc'] = 'Completely hide the [[tutorshort]] widget on all quiz pages for teachers and administrators.';
+$string['settings:hide_on_quiz_for_students'] = 'Hide [[tutorshort]] on quiz pages for students';
+$string['settings:hide_on_quiz_for_students_desc'] = 'Completely hide the [[tutorshort]] widget on all quiz pages (view, attempt, review) for students.';
 $string['settings:institution_name'] = 'Institution Name';
 $string['settings:institution_name_desc'] = 'The name of the institution displayed in the system prompt, avatar labels, and demo content. Change this when rebranding.';
-$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, SOLA will automatically fall back to the provider\'s default.';
+$string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s default model automatically. Each provider has a built-in default that stays current (e.g. gpt-4o for OpenAI, claude-sonnet-4 for Claude, mistral-large-latest for Mistral). Only enter a model name if you want to override the default. If a model is misspelled or deprecated, [[tutorshort]] will automatically fall back to the provider\'s default.';
 $string['settings:provider_gemini'] = 'Google Gemini';
 $string['settings:quiz_hide_heading'] = 'Quiz Page Visibility';
-$string['settings:quiz_hide_heading_desc'] = 'Control whether the SOLA widget appears on Moodle quiz pages. This is stricter than the built-in summative quiz lock, which only disables chat during graded quizzes. These settings completely hide the widget on all quiz pages.';
+$string['settings:quiz_hide_heading_desc'] = 'Control whether the [[tutorshort]] widget appears on Moodle quiz pages. This is stricter than the built-in summative quiz lock, which only disables chat during graded quizzes. These settings completely hide the widget on all quiz pages.';
 $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
 $string['settings:rag_enabled'] = 'Enable RAG (Semantic Search)';
@@ -646,16 +646,16 @@ $string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve 
 $string['settings:realtime_apikey'] = 'OpenAI API Key (Voice & TTS)';
 $string['settings:realtime_apikey_desc'] = 'Used for Voice Mode and the TTS speak button on messages. Leave blank to fall back to the main API key when provider is set to OpenAI.';
 $string['settings:realtime_enabled'] = 'Enable Voice Mode';
-$string['settings:realtime_enabled_desc'] = 'Allows students to have real-time voice conversations with SOLA. Requires an OpenAI API key.';
+$string['settings:realtime_enabled_desc'] = 'Allows students to have real-time voice conversations with [[tutorshort]]. Requires an OpenAI API key.';
 $string['settings:realtime_heading'] = 'Voice Mode (OpenAI Realtime)';
-$string['settings:realtime_voice'] = 'SOLA Voice';
+$string['settings:realtime_voice'] = '[[tutorshort]] Voice';
 $string['settings:realtime_voice_desc'] = 'Voice used for both Voice Mode and the TTS speak button (OpenAI voices: Shimmer, Alloy, Echo, Fable, Onyx, Nova).';
 $string['settings:wellbeing_enabled'] = 'Enable Wellbeing Support';
-$string['settings:wellbeing_enabled_desc'] = 'When enabled, SOLA will detect signs of emotional distress and provide empathetic responses with links to global crisis resources. Disable this if your institution provides its own crisis response and does not want SOLA to surface external resources.';
+$string['settings:wellbeing_enabled_desc'] = 'When enabled, [[tutorshort]] will detect signs of emotional distress and provide empathetic responses with links to global crisis resources. Disable this if your institution provides its own crisis response and does not want [[tutorshort]] to surface external resources.';
 $string['settings:wellbeing_heading'] = 'Wellbeing & Safety';
-$string['settings:wellbeing_heading_desc'] = 'When enabled, SOLA detects expressions of distress or crisis and responds with empathy and globally-applicable support resources (findahelpline.com, Crisis Text Line, Befrienders Worldwide). SOLA is NOT a counselor — it acknowledges feelings, directs students to human support, and never attempts diagnosis or therapy.';
+$string['settings:wellbeing_heading_desc'] = 'When enabled, [[tutorshort]] detects expressions of distress or crisis and responds with empathy and globally-applicable support resources (findahelpline.com, Crisis Text Line, Befrienders Worldwide). [[tutorshort]] is NOT a counselor — it acknowledges feelings, directs students to human support, and never attempts diagnosis or therapy.';
 $string['starters:add_new'] = 'Add new starter';
-$string['starters:admin_desc'] = 'Configure the conversation starter chips shown to students when they open the SOLA chat. Drag to reorder, toggle to enable/disable, or add custom starters with your own AI prompts.';
+$string['starters:admin_desc'] = 'Configure the conversation starter chips shown to students when they open the [[tutorshort]] chat. Drag to reorder, toggle to enable/disable, or add custom starters with your own AI prompts.';
 $string['starters:admin_title'] = 'Conversation Starter Settings';
 $string['starters:back_settings'] = 'Back to settings';
 $string['starters:course_desc'] = 'Enable or disable individual starters for this course.';
@@ -666,14 +666,14 @@ $string['starters:reset_done'] = 'Starters reset to defaults.';
 $string['starters:save'] = 'Save changes';
 $string['starters:saved'] = 'Starter configuration saved.';
 $string['task:index_course_content'] = 'Index course content for RAG semantic search';
-$string['task:run_integrity_checks'] = 'Run daily SOLA plugin integrity checks';
+$string['task:run_integrity_checks'] = 'Run daily [[tutorshort]] plugin integrity checks';
 $string['update:available'] = 'Update Available';
 $string['update:back_to_settings'] = 'Back to Settings';
 $string['update:changelog'] = 'Release Notes';
 $string['update:check'] = 'Check for Updates';
 $string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
 $string['update:current_version'] = 'Installed Version';
-$string['update:desc'] = 'Check for and install SOLA plugin updates directly from GitHub releases.';
+$string['update:desc'] = 'Check for and install [[tutorshort]] plugin updates directly from GitHub releases.';
 $string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
 $string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
 $string['update:github_token'] = 'GitHub Token (optional)';
@@ -702,7 +702,7 @@ $string['demo:clear_label'] = '既存の demo_* ユーザーを先にクリア';
 $string['demo:seed_btn'] = '学生とチャットを投入';
 $string['demo:view_analytics'] = 'このコースの Analytics を表示 &rarr;';
 $string['demo:footer'] = 'ここで作成されたデータは、標準の Moodle ユーザー / 受講登録テーブルと、プラグイン独自の会話テーブルに存在します。すべての架空ユーザーのユーザー名は <code>demo_student_</code> で始まるため、フィルタリングや削除が簡単です。削除するには、「既存の demo_* ユーザーを先にクリア」をチェックした状態で seed ステップを再度実行してください。';
-$string['demo:course_fullname'] = 'SOLA テストコース（非表示）';
+$string['demo:course_fullname'] = '[[tutorshort]] テストコース（非表示）';
 $string['demo:notify_created'] = 'テストコースの準備完了: {$a->fullname} (id {$a->id}).';
 $string['demo:notify_create_fail'] = 'コースの作成に失敗しました: {$a}';
 $string['demo:notify_seeded'] = '投入しました: {$a->users} ユーザー, {$a->conversations} 会話, {$a->messages} メッセージ, {$a->ratings} 評価, {$a->feedback} フィードバック。';
@@ -778,7 +778,7 @@ $string['learner_digest:optin_no']       = 'いいえ、結構です';
 $string['learner_digest:optin_thanks']   = '了解しました。毎週月曜日に週次サマリーが届きます。';
 $string['learner_digest:optin_declined'] = '了解しました。メールなし — 確認したいときだけ開いてください。';
 $string['settings:xai_proxy_url'] = 'xAI Realtime プロキシ URL';
-$string['settings:xai_proxy_url_desc'] = 'SOLA xAI Realtime プロキシサービスの公開 wss URL(例: wss://voice.example.com/xai-rt/rt)。これと JWT シークレットの両方を設定すると、xAI 音声はプロキシ経由でルーティングされ、マスター xAI API キーがブラウザに到達することはありません。空のままにすると直接接続にフォールバックします(本番では推奨されません)。';
+$string['settings:xai_proxy_url_desc'] = '[[tutorshort]] xAI Realtime プロキシサービスの公開 wss URL(例: wss://voice.example.com/xai-rt/rt)。これと JWT シークレットの両方を設定すると、xAI 音声はプロキシ経由でルーティングされ、マスター xAI API キーがブラウザに到達することはありません。空のままにすると直接接続にフォールバックします(本番では推奨されません)。';
 $string['settings:xai_proxy_jwt_secret'] = 'xAI Realtime プロキシ JWT シークレット';
 $string['settings:xai_proxy_jwt_secret_desc'] = 'xAI Realtime プロキシ用に短命のセッショントークンを署名するために使用する HS256 共有シークレット。Cloudflare Worker の MOODLE_JWT_SECRET と一致している必要があります。定期的にローテーションしてください。';
 $string['admin:vendor_dpa:title'] = '{$a} — ベンダー DPA ステータス';
@@ -999,30 +999,30 @@ $string['courses_admin:yes']               = 'Yes';
 $string['courses_admin:no_courses']        = 'No visible courses on this site yet.';
 
 // v4.2: anomaly digest scheduled task.
-$string['task:run_anomaly_digest'] = 'Run SOLA anomaly digest';
+$string['task:run_anomaly_digest'] = 'Run [[tutorshort]] anomaly digest';
 
 // v4.2.3: external resources (admin + per-course).
 $string['settings:external_resources_heading']      = 'External resources';
-$string['settings:external_resources_heading_desc'] = 'Optional opt-in: when on, SOLA may include one or two links to reputable open educational resources alongside its course-grounded answer. Restricted to the allowlist below to keep recommendations defensible. Per-course override available on the course settings page. Default off.';
+$string['settings:external_resources_heading_desc'] = 'Optional opt-in: when on, [[tutorshort]] may include one or two links to reputable open educational resources alongside its course-grounded answer. Restricted to the allowlist below to keep recommendations defensible. Per-course override available on the course settings page. Default off.';
 $string['settings:external_resources_enabled']      = 'Enable external resources (site-wide default)';
-$string['settings:external_resources_enabled_desc'] = 'When on, SOLA may suggest links to the allowlisted external resources. Per-course "force on" / "force off" overrides this. Default off.';
+$string['settings:external_resources_enabled_desc'] = 'When on, [[tutorshort]] may suggest links to the allowlisted external resources. Per-course "force on" / "force off" overrides this. Default off.';
 $string['settings:external_resources_allowlist']    = 'External resources allowlist';
-$string['settings:external_resources_allowlist_desc'] = 'One resource per line, in the format "Display Name (domain)". SOLA will only suggest links to these sites. Defaults to a small set of widely respected open-resource hosts; replace or extend as needed.';
+$string['settings:external_resources_allowlist_desc'] = 'One resource per line, in the format "Display Name (domain)". [[tutorshort]] will only suggest links to these sites. Defaults to a small set of widely respected open-resource hosts; replace or extend as needed.';
 $string['external_resources:title']      = 'External resources';
 $string['external_resources:inherit']    = 'Inherit site default ({$a})';
 $string['external_resources:force_on']   = 'Force on for this course';
 $string['external_resources:force_off']  = 'Force off for this course';
 $string['external_resources:on']         = 'on';
 $string['external_resources:off']        = 'off';
-$string['external_resources:toggle_help']= 'When on, SOLA may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
+$string['external_resources:toggle_help']= 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
 
 // v4.3.0: real Redash push integration.
 $string['settings:redash_base_url']           = 'Redash base URL';
 $string['settings:redash_base_url_desc']      = 'Base URL of your Redash instance, e.g. https://redash.example.com. Required for the "Send to Redash" action in Learning Radar.';
 $string['settings:redash_user_api_key']       = 'Redash user API key';
-$string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the SOLA Redash API key (which controls inbound auth on redash_export.php).';
+$string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the [[tutorshort]] Redash API key (which controls inbound auth on redash_export.php).';
 $string['settings:redash_data_source_id']     = 'Redash data source ID';
-$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at SOLA\'s redash_export.php. Visible in the Redash data source URL after saving.';
+$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
 
 $string['instructor_dashboard:nav_back_course']  = '← Back to course';
 $string['instructor_dashboard:nav_settings']     = 'AI Course Assistant settings';
@@ -1030,18 +1030,18 @@ $string['instructor_dashboard:nav_analytics']    = 'AI Course Assistant analytic
 
 // v4.4.0: course-page CSP setting.
 $string['settings:csp_course_pages_mode']      = 'Course-page Content-Security-Policy';
-$string['settings:csp_course_pages_mode_desc'] = 'Optional CSP header on course pages where the AI Course Assistant widget is active. <strong>Off</strong>: no header (default). <strong>Report-only</strong>: send <code>Content-Security-Policy-Report-Only</code> — browsers log violations but do not block. Useful for a one-week observation pass. <strong>Enforce</strong>: send <code>Content-Security-Policy</code> — browsers block off-allowlist iframe sources, fetches, and other risky loads. Helps contain the impact of arbitrary scripts pasted into Additional HTML site config (the IBL AI / Raison incident on 2026-04-29). Does not affect SOLA endpoints, which always send a stricter CSP.';
+$string['settings:csp_course_pages_mode_desc'] = 'Optional CSP header on course pages where the AI Course Assistant widget is active. <strong>Off</strong>: no header (default). <strong>Report-only</strong>: send <code>Content-Security-Policy-Report-Only</code> — browsers log violations but do not block. Useful for a one-week observation pass. <strong>Enforce</strong>: send <code>Content-Security-Policy</code> — browsers block off-allowlist iframe sources, fetches, and other risky loads. Helps contain the impact of arbitrary scripts pasted into Additional HTML site config (the IBL AI / Raison incident on 2026-04-29). Does not affect [[tutorshort]] endpoints, which always send a stricter CSP.';
 $string['settings:csp_mode_off']               = 'Off (no header on course pages)';
 $string['settings:csp_mode_report_only']       = 'Report-only (log violations, do not block)';
 $string['settings:csp_mode_enforce']           = 'Enforce (block off-allowlist loads)';
 
 // v4.5.0: site-wide pedagogy defaults.
 $string['settings:pedagogy_defaults_heading']      = 'Pedagogy defaults';
-$string['settings:pedagogy_defaults_heading_desc'] = 'Site-wide default state for each pedagogy feature. Flip a feature on here and every course inherits it unless that course has an explicit override on its SOLA course settings page (force on / force off). On upgrade to v4.5.0, every per-course "force off" override that was set to the legacy default-off value of <code>0</code> is cleared so the new global defaults take effect cleanly. Default off — upgrades from v4.4.x are a no-op until an admin flips a feature on.';
+$string['settings:pedagogy_defaults_heading_desc'] = 'Site-wide default state for each pedagogy feature. Flip a feature on here and every course inherits it unless that course has an explicit override on its [[tutorshort]] course settings page (force on / force off). On upgrade to v4.5.0, every per-course "force off" override that was set to the legacy default-off value of <code>0</code> is cleared so the new global defaults take effect cleanly. Default off — upgrades from v4.4.x are a no-op until an admin flips a feature on.';
 $string['pedagogy:mastery']                = 'Mastery tracking on by default';
 $string['pedagogy:mastery_desc']           = 'When on, every course inherits mastery tracking unless the course has its own override. Mastery requires curated learning objectives — courses without objectives fall back gracefully, no error.';
 $string['pedagogy:socratic_mode']          = 'Socratic mode on by default';
-$string['pedagogy:socratic_mode_desc']     = 'When on, SOLA leads with questions instead of direct answers in every course unless the course has its own override.';
+$string['pedagogy:socratic_mode_desc']     = 'When on, [[tutorshort]] leads with questions instead of direct answers in every course unless the course has its own override.';
 $string['pedagogy:worked_examples']        = 'Worked examples starter on by default';
 $string['pedagogy:worked_examples_desc']   = 'When on, the "Show me a worked example" conversation starter appears in every course unless the course has its own override.';
 $string['pedagogy:flashcards']             = 'Flashcards on by default';
@@ -1068,7 +1068,7 @@ $string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name 
 
 // v4.7.0: rate-card auto-refresh.
 $string['settings:rate_card_auto_refresh']      = 'Auto-refresh from upstream';
-$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task fetches the upstream pricing JSON, transforms it to SOLA\'s rate-card schema, and writes it to the override field above. Default on. Failures keep the previous override in place.';
+$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task fetches the upstream pricing JSON, transforms it to [[tutorshort]]\'s rate-card schema, and writes it to the override field above. Default on. Failures keep the previous override in place.';
 $string['settings:rate_card_upstream_url']      = 'Upstream pricing URL';
 $string['settings:rate_card_upstream_url_desc'] = 'URL of a JSON manifest in LiteLLM\'s schema. Default points at the community-maintained file in the LiteLLM GitHub repo. URL is checked against the SSRF allowlist before fetch.';
 $string['settings:rate_card_refresh_now']        = 'Refresh now';
@@ -1078,7 +1078,7 @@ $string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$
 $string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
 $string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
 $string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
-$string['task:refresh_rate_card']                = 'Refresh SOLA LLM rate card from upstream';
+$string['task:refresh_rate_card']                = 'Refresh [[tutorshort]] LLM rate card from upstream';
 
 // v4.8.0: runtime validators + RAG drift + needs-review queue.
 $string['settings:validators_runtime_mode']      = 'Runtime validators';
@@ -1106,7 +1106,7 @@ $string['instructor_dashboard:review_source_integrity'] = 'Integrity';
 $string['pedagogy:talking_avatar']         = 'Talking avatar on by default';
 $string['pedagogy:talking_avatar_desc']    = 'When on, the talking-avatar surface is enabled in every course unless the course has its own override. Requires a configured provider (D-ID, HeyGen, Tavus, or Synthesia Agents) below; otherwise the widget shows a "configure a provider" notice and the avatar does not animate.';
 $string['settings:talking_avatar_heading']      = 'Talking avatar';
-$string['settings:talking_avatar_heading_desc'] = 'Pick which talking-avatar vendor SOLA opens for students when the avatar surface is enabled. SOLA ships drivers for D-ID (cheapest WebRTC streaming), HeyGen (LiveKit-backed interactive avatars), Tavus (drop-in iframable Conversational Video Interface), and Synthesia Agents (real-time agent product, configured in the Synthesia dashboard). Per-provider key + persona id appear below; only the chosen provider needs to be filled in. Every outbound call is SSRF-checked.';
+$string['settings:talking_avatar_heading_desc'] = 'Pick which talking-avatar vendor [[tutorshort]] opens for students when the avatar surface is enabled. [[tutorshort]] ships drivers for D-ID (cheapest WebRTC streaming), HeyGen (LiveKit-backed interactive avatars), Tavus (drop-in iframable Conversational Video Interface), and Synthesia Agents (real-time agent product, configured in the Synthesia dashboard). Per-provider key + persona id appear below; only the chosen provider needs to be filled in. Every outbound call is SSRF-checked.';
 $string['settings:talking_avatar_provider_url']      = 'Provider API base URL (legacy)';
 $string['settings:talking_avatar_provider_url_desc'] = 'v4.8.1 placeholder, kept for upgrade safety. The active drivers in v4.9.0 read their own per-provider settings; this field is only used as a fallback when an admin upgraded mid-release.';
 $string['settings:talking_avatar_provider_api_key']      = 'Provider API key (legacy)';
@@ -1129,16 +1129,16 @@ $string['settings:talking_avatar_heygen_persona_id_desc'] = 'Avatar id from the 
 $string['settings:talking_avatar_tavus_api_key']         = 'Tavus API key';
 $string['settings:talking_avatar_tavus_api_key_desc']    = 'API key from <a href="https://platform.tavus.io/api-keys" target="_blank" rel="noopener">Tavus platform → API keys</a>. Sent as <code>x-api-key</code>.';
 $string['settings:talking_avatar_tavus_persona_id']      = 'Tavus replica id';
-$string['settings:talking_avatar_tavus_persona_id_desc'] = 'Replica id (the trained likeness) you want SOLA to converse as. Combine with a persona id by appending it to the API key field if needed; SOLA will pass <code>persona_id</code> through.';
+$string['settings:talking_avatar_tavus_persona_id_desc'] = 'Replica id (the trained likeness) you want [[tutorshort]] to converse as. Combine with a persona id by appending it to the API key field if needed; [[tutorshort]] will pass <code>persona_id</code> through.';
 $string['settings:talking_avatar_synthesia_api_key']         = 'Synthesia API key';
 $string['settings:talking_avatar_synthesia_api_key_desc']    = 'API key from <a href="https://app.synthesia.io/#/account/api" target="_blank" rel="noopener">Synthesia → Account → API</a>. Sent as <code>Authorization</code> header (Synthesia accepts the raw key).';
 $string['settings:talking_avatar_synthesia_persona_id']      = 'Synthesia agent id';
-$string['settings:talking_avatar_synthesia_persona_id_desc'] = 'Agent id created in the Synthesia Agents dashboard. Knowledge, persona, and allowed origins are configured agent-side; SOLA only opens a session against this id.';
+$string['settings:talking_avatar_synthesia_persona_id_desc'] = 'Agent id created in the Synthesia Agents dashboard. Knowledge, persona, and allowed origins are configured agent-side; [[tutorshort]] only opens a session against this id.';
 $string['talking_avatar:disabled']        = 'Talking avatar is not enabled for this course.';
 $string['talking_avatar:unconfigured']    = 'Talking avatar is enabled but no provider has been configured. An administrator must pick a provider and supply credentials in plugin settings.';
 $string['talking_avatar:session_failed']  = 'The talking-avatar provider declined the session request. Check the provider configuration or try again in a moment.';
-$string['talking_avatar:viewer_title']    = 'SOLA talking avatar';
-$string['talking_avatar:bundle_required'] = 'The talking-avatar viewer requires the SOLA CDN bundle to be configured. Ask an administrator to set the CDN bundle URL in plugin settings.';
+$string['talking_avatar:viewer_title']    = '[[tutorshort]] talking avatar';
+$string['talking_avatar:bundle_required'] = 'The talking-avatar viewer requires the [[tutorshort]] CDN bundle to be configured. Ask an administrator to set the CDN bundle URL in plugin settings.';
 $string['talking_avatar:open']            = 'Open avatar';
 $string['talking_avatar:close']           = 'Close avatar';
 $string['settings:avatar_rate_card_overrides']      = 'Avatar rate card overrides (JSON)';
@@ -1176,7 +1176,7 @@ $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt me
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
 $string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
 $string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
-$string['task:auto_tune_prompt_budget']          = 'Auto-tune SOLA prompt budget from observed metrics';
+$string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
 $string['prompt_metrics:no_data']                = 'No prompt metrics recorded yet. Send a few chat turns from a learner account, then refresh this page. (If the metrics capture flag is off in plugin settings, no data will accumulate.)';
@@ -1208,7 +1208,7 @@ $string['prompt_metrics:settings_link']          = 'Open plugin settings to togg
 $string['task:milestone_check'] = 'Send daily milestone reflection emails (v5.3.0)';
 $string['task:struggle_signal_review'] = 'Review struggle signals into private learner memory (v5.3.0)';
 $string['empathy:title'] = 'Empathetic communications and carryover memory (v5.3.0)';
-$string['empathy:desc'] = 'Three coordinated features that make SOLA feel more like a coach who listens. Goals capture why the learner is here. Carryover memory remembers what has been hard before so SOLA can offer a different angle. Milestones celebrate streaks and completions by email. Each feature has an independent kill switch and learner opt-in. Struggle signals never leave the chat — no email is ever sent about a difficult session.';
+$string['empathy:desc'] = 'Three coordinated features that make [[tutorshort]] feel more like a coach who listens. Goals capture why the learner is here. Carryover memory remembers what has been hard before so [[tutorshort]] can offer a different angle. Milestones celebrate streaks and completions by email. Each feature has an independent kill switch and learner opt-in. Struggle signals never leave the chat — no email is ever sent about a difficult session.';
 $string['empathy:outreach_master_enabled'] = 'Master outreach kill switch';
 $string['empathy:outreach_master_enabled_desc'] = 'Off by default on a fresh install. When off, NO empathetic email of any kind ever fires, regardless of the per-feature switches below. Turn this on once you have reviewed the per-feature defaults and per-learner consent flow.';
 $string['empathy:goals_enabled'] = 'Enable career goal conversations';
@@ -1216,9 +1216,9 @@ $string['empathy:goals_enabled_desc'] = 'Lets learners volunteer two short answe
 $string['empathy:milestones_enabled'] = 'Enable milestone reflection emails';
 $string['empathy:milestones_enabled_desc'] = 'Sends a short warm email when a learner reaches a 7-day streak, 30-day streak, or course completion. Requires the master switch above plus per-learner consent. Hard cap of one email per learner per 7 days across all channels.';
 $string['empathy:memory_enabled'] = 'Enable carryover personalisation memory';
-$string['empathy:memory_enabled_desc'] = 'Lets SOLA carry small private notes about what has been hard for a learner across sessions, so the next reply can offer a different angle. Bounded (max 5 notes per learner per course, 90-day TTL). Learner-editable. Never visible to instructors.';
+$string['empathy:memory_enabled_desc'] = 'Lets [[tutorshort]] carry small private notes about what has been hard for a learner across sessions, so the next reply can offer a different angle. Bounded (max 5 notes per learner per course, 90-day TTL). Learner-editable. Never visible to instructors.';
 $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
-$string['empathy:struggle_enabled_desc'] = 'Off by default. Lets SOLA detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
+$string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
 $string['goals:starter_title'] = 'Set my learning goals';
@@ -1233,17 +1233,17 @@ $string['goals:clear'] = 'Clear my goals';
 $string['goals:cleared'] = 'Your goals have been cleared.';
 $string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'My communications';
-$string['comms:desc'] = 'Choose which automated emails SOLA may send you. Off by default. You can change this any time.';
+$string['comms:desc'] = 'Choose which automated emails [[tutorshort]] may send you. Off by default. You can change this any time.';
 $string['comms:milestones_label'] = 'Email me when I reach a milestone (7-day streak, 30-day streak, course completion).';
-$string['comms:audit_log_title'] = 'What SOLA has sent me';
-$string['comms:audit_log_empty'] = 'SOLA has not sent you any emails.';
-$string['comms:memory_title'] = "What SOLA has remembered about how I learn";
-$string['comms:memory_desc'] = 'These notes are private to your chat with SOLA. They help SOLA pick a different angle when a topic is hard. Clear any time.';
+$string['comms:audit_log_title'] = 'What [[tutorshort]] has sent me';
+$string['comms:audit_log_empty'] = '[[tutorshort]] has not sent you any emails.';
+$string['comms:memory_title'] = "What [[tutorshort]] has remembered about how I learn";
+$string['comms:memory_desc'] = 'These notes are private to your chat with [[tutorshort]]. They help [[tutorshort]] pick a different angle when a topic is hard. Clear any time.';
 $string['comms:memory_clear'] = 'Clear all memory notes';
 $string['milestone:streak_subject'] = '{$a->days}-day streak in {$a->coursename}';
-$string['milestone:streak_body_text'] = "Hi {\$a->firstname},\n\nYou have shown up {\$a->days} days in a row in {\$a->coursename}. That kind of consistency is the part of learning that is hardest to fake.\n\nWhenever you are ready, SOLA is here.\n\n— {\$a->institution}";
+$string['milestone:streak_body_text'] = "Hi {\$a->firstname},\n\nYou have shown up {\$a->days} days in a row in {\$a->coursename}. That kind of consistency is the part of learning that is hardest to fake.\n\nWhenever you are ready, [[tutorshort]] is here.\n\n— {\$a->institution}";
 $string['milestone:completion_subject'] = 'You finished {$a->coursename}';
-$string['milestone:completion_body_text'] = "Hi {\$a->firstname},\n\nYou finished {\$a->coursename}. That is a real thing you did.\n\nIf you want to keep going, SOLA can help you pick a related next course or revisit a topic you found interesting.\n\n— {\$a->institution}";
+$string['milestone:completion_body_text'] = "Hi {\$a->firstname},\n\nYou finished {\$a->coursename}. That is a real thing you did.\n\nIf you want to keep going, [[tutorshort]] can help you pick a related next course or revisit a topic you found interesting.\n\n— {\$a->institution}";
 $string['milestone:trigger_streak7'] = '7-day activity streak reached';
 $string['milestone:trigger_streak30'] = '30-day activity streak reached';
 $string['milestone:trigger_completion'] = 'Course completion recorded';
@@ -1289,13 +1289,13 @@ $string['attachment:error_save_failed'] = 'The file was uploaded but could not b
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'コース横断の習得状況の集約をデフォルトで有効にする';
-$string['pedagogy:crossmastery_desc'] = '有効にすると、学習者が別のコースで既に目標を習得している場合（コンピテンシー参照またはタイトルで照合）、SOLA がそれを認識し、再度繰り返し学習させるのではなく、これまでに習得したコンピテンシーを評価します。習得状況の追跡が必要です。目標が設定されていないコースでは、適切にフォールバックします。これはあくまで参考情報であり、いずれのコースにおいても学習者の保存された習得スコアを変更することはありません。';
+$string['pedagogy:crossmastery_desc'] = '有効にすると、学習者が別のコースで既に目標を習得している場合（コンピテンシー参照またはタイトルで照合）、[[tutorshort]] がそれを認識し、再度繰り返し学習させるのではなく、これまでに習得したコンピテンシーを評価します。習得状況の追跡が必要です。目標が設定されていないコースでは、適切にフォールバックします。これはあくまで参考情報であり、いずれのコースにおいても学習者の保存された習得スコアを変更することはありません。';
 $string['pedagogy:mastery_starter'] = '習得状況に応じたスターターをデフォルトで有効にする';
 $string['pedagogy:mastery_starter_desc'] = '有効にすると、「何に重点を置いて学習すべきですか？」という会話スターターが、学習者の最も弱い目標（および他で既に習得済みのコンピテンシー）を示すようにパーソナライズされます。習得状況の追跡が必要です。習得データがまだ存在しない場合は、汎用のスターターにフォールバックします。';
 $string['task:rebuild_objective_links'] = '習得状況の集約のためのコース横断目標リンクを再構築する (v5.7.0)';
 $string['mastery_starter:practice_label'] = '練習: {$a}';
 $string['objectives:rebuild_links_heading'] = 'コース横断の習得状況リンク';
-$string['objectives:rebuild_links_help'] = 'SOLA は、コース間で一致する目標（コンピテンシー参照またはタイトルによる）をリンクし、別の場所でトピックを習得した学習者が再度繰り返し学習させられないようにします。リンクは毎晩自動的に再構築されます。目標を編集した後にすぐ再構築するには、このボタンを使用してください。';
+$string['objectives:rebuild_links_help'] = '[[tutorshort]] は、コース間で一致する目標（コンピテンシー参照またはタイトルによる）をリンクし、別の場所でトピックを習得した学習者が再度繰り返し学習させられないようにします。リンクは毎晩自動的に再構築されます。目標を編集した後にすぐ再構築するには、このボタンを使用してください。';
 $string['objectives:rebuild_links_button'] = '今すぐリンクを再構築';
 $string['objectives:rebuild_links_done'] = 'コース横断の習得状況リンクを再構築しました: 合計 {$a->total} 件（参照による一致 {$a->ref} 件、タイトル完全一致 {$a->exact} 件、タイトル曖昧一致 {$a->fuzzy} 件）。';
 
@@ -1463,7 +1463,7 @@ $string['settings:mastery_classifier_threshold_desc'] = '会話試行を記録�
 $string['settings:spend_cap_per_course_default'] = 'コースごとのデフォルト支出上限（USD）';
 $string['settings:spend_cap_per_course_default_desc'] = '独自のコースごとの支出上限が設定されていないすべてのコースに適用される防御的な上限。例えば<code>30</code>に設定すると、個別のコースを調整せずにどの単一コースの月次支出も$30に制限します。<code>0</code> = デフォルトなし（サイト全体とコース別のオーバーライド上限のみが適用されます）。コースがこの上限の80% / 95% / 100%を超えると、既存のスペンドガードアラートパイプラインが管理者通知を送信します（受信者リスト: <code>spend_notify_emails</code>、サイト管理者にフォールバック）。特定のコースは常により高いコース別オーバーライドを設定して独自の上限を引き上げることができます。';
 $string['settings:premium_escalation_heading'] = 'プレミアムエスカレーション層（A.10）';
-$string['settings:premium_escalation_heading_desc'] = 'ワークホースチャット層が明らかに苦労するプロンプト（通常、複数ステップの数学、CS、科学的推論）に対してプレミアムモデル（デフォルトでClaude Opus 4.8）へのターンごとのオプションルーティング。2026-06-09のA.10ベイクオフで決定: Opus 4.8は難しいプロンプトでgpt-4oの12.68/15に対して14.97/15で勝利。2つのトリガーパス: ユーザーメッセージへのregex一致、またはすべてのターンをエスカレートするコース許可リスト。デフォルトはオフ。~5%のエスカレーションで、ベースラインのチャット支出に加えて100k Saylor MAUで月額~$700を見込む。';
+$string['settings:premium_escalation_heading_desc'] = 'ワークホースチャット層が明らかに苦労するプロンプト（通常、複数ステップの数学、CS、科学的推論）に対してプレミアムモデル（デフォルトでClaude Opus 4.8）へのターンごとのオプションルーティング。2026-06-09のA.10ベイクオフで決定: Opus 4.8は難しいプロンプトでgpt-4oの12.68/15に対して14.97/15で勝利。2つのトリガーパス: ユーザーメッセージへのregex一致、またはすべてのターンをエスカレートするコース許可リスト。デフォルトはオフ。~5%のエスカレーションで、ベースラインのチャット支出に加えて100k [[unishort]] MAUで月額~$700を見込む。';
 $string['settings:premium_escalation_enabled'] = 'プレミアムエスカレーションルーティングを有効にする';
 $string['settings:premium_escalation_enabled_desc'] = 'オンにすると、ターンごとのルーターがすべてのチャット呼び出しのトリガーregexリストとコース許可リストをチェックします。一致するターンはプレミアムプロバイダーにルーティングされます。プレミアム行が見つからないかインスタンス化に失敗した場合はワークホースプロバイダーにフォールバックします。管理者のLLMピッカーオーバーライドは常に優先されます。';
 $string['settings:premium_escalation_provider'] = 'プレミアムプロバイダー';

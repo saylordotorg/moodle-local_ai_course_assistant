@@ -87,8 +87,8 @@ $PAGE->set_pagelayout('login');
 
 echo $OUTPUT->header();
 echo $OUTPUT->box(
-    get_string('email_unsubscribe:done_body', 'local_ai_course_assistant',
-        (object)['product' => branding::short_name(), 'email' => s($verified['email'])]),
+    branding::apply(get_string('email_unsubscribe:done_body', 'local_ai_course_assistant',
+        (object)['product' => branding::short_name(), 'email' => s($verified['email'])])),
     'generalbox'
 );
 echo $OUTPUT->footer();

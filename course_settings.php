@@ -711,7 +711,7 @@ echo html_writer::div(
                         </option>
                     </select>
                     <small class="form-text text-muted">
-                        <?php echo get_string('external_resources:toggle_help', 'local_ai_course_assistant'); ?>
+                        <?php echo \local_ai_course_assistant\branding::apply(get_string('external_resources:toggle_help', 'local_ai_course_assistant')); ?>
                     </small>
                 </div>
             </div>
@@ -863,7 +863,7 @@ echo html_writer::div(
                 <h5 class="mb-0"><?php echo get_string('quizsettings:title', 'local_ai_course_assistant'); ?></h5>
             </div>
             <div class="card-body">
-                <p class="text-muted"><?php echo get_string('quizsettings:desc', 'local_ai_course_assistant'); ?></p>
+                <p class="text-muted"><?php echo \local_ai_course_assistant\branding::apply(get_string('quizsettings:desc', 'local_ai_course_assistant')); ?></p>
                 <table class="table table-sm">
                     <thead>
                         <tr>

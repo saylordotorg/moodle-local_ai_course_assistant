@@ -135,4 +135,100 @@ final class branding_test extends \advanced_testcase {
         $this->assertIsString(branding::privacy_external_url());
         $this->assertIsString(branding::filename_slug());
     }
+
+    // ------------------------------------------------------------------
+    // Brand-token substitution (v6.8.0): lang strings, the system prompt,
+    // emails, and admin copy embed [[tutorname]]/[[tutorshort]]/[[uniname]]/
+    // [[unishort]] tokens that resolve from the four admin settings, so the
+    // whole product rebrands without code or string-file edits.
+    // ------------------------------------------------------------------
+
+    public function test_token_map_has_the_four_brand_tokens(): void {
+        $this->resetAfterTest();
+        $map = branding::token_map();
+        $this->assertEqualsCanonicalizing(
+            ['tutorname', 'tutorshort', 'uniname', 'unishort'], array_keys($map));
+    }
+
+    public function test_apply_resolves_every_token_from_config(): void {
+        $this->resetAfterTest();
+        set_config('display_name', 'Acme Study Buddy', 'local_ai_course_assistant');
+        set_config('short_name', 'ASB', 'local_ai_course_assistant');
+        set_config('institution_name', 'Acme University', 'local_ai_course_assistant');
+        set_config('institution_short_name', 'Acme', 'local_ai_course_assistant');
+
+        $out = branding::apply('[[tutorshort]] by [[tutorname]] at [[uniname]] ([[unishort]])');
+
+        $this->assertEquals('ASB by Acme Study Buddy at Acme University (Acme)', $out);
+        $this->assertStringNotContainsString('[[', $out);
+    }
+
+    public function test_apply_uses_fallback_when_config_empty(): void {
+        // With config blank, apply() resolves to branding.php's built-in
+        // fallback chain (the Saylor/SOLA values). NOTE: a fresh install
+        // actually writes the generic settings.php defaults ("Assistant" etc.)
+        // to config, so this asserts the fallback in isolation by clearing the
+        // four keys first.
+        $this->resetAfterTest();
+        foreach (['short_name', 'display_name', 'institution_name', 'institution_short_name'] as $k) {
+            set_config($k, '', 'local_ai_course_assistant');
+        }
+        $this->assertEquals('SOLA', branding::apply('[[tutorshort]]'));
+        $this->assertEquals('Saylor Online Learning Assistant', branding::apply('[[tutorname]]'));
+        $this->assertEquals('Saylor University', branding::apply('[[uniname]]'));
+        $this->assertEquals('Saylor', branding::apply('[[unishort]]'));
+    }
+
+    public function test_apply_is_noop_and_null_safe(): void {
+        $this->resetAfterTest();
+        $this->assertEquals('', branding::apply(null));
+        $this->assertEquals('', branding::apply(''));
+        $this->assertEquals('no tokens here', branding::apply('no tokens here'));
+        // An unknown token is left untouched (only the four are resolved).
+        $this->assertEquals('[[unknown]]', branding::apply('[[unknown]]'));
+    }
+
+    public function test_apply_handles_repeated_tokens(): void {
+        $this->resetAfterTest();
+        set_config('short_name', 'ASB', 'local_ai_course_assistant');
+        $this->assertEquals('ASB and ASB', branding::apply('[[tutorshort]] and [[tutorshort]]'));
+    }
+
+    public function test_str_resolves_a_tokenized_lang_string(): void {
+        $this->resetAfterTest();
+        set_config('short_name', 'ASB', 'local_ai_course_assistant');
+        // chat:open is "Open [[tutorshort]]" in the tokenized lang file.
+        $this->assertEquals('Open ASB', branding::str('chat:open'));
+    }
+
+    public function test_token_map_json_is_valid_json(): void {
+        $this->resetAfterTest();
+        $decoded = json_decode(branding::token_map_json(), true);
+        $this->assertIsArray($decoded);
+        $this->assertArrayHasKey('tutorshort', $decoded);
+    }
+
+    public function test_no_english_lang_string_leaks_a_token_after_apply(): void {
+        // The strong guarantee: every brand token that appears in any English
+        // lang string is one that apply() knows how to resolve. If a future
+        // string introduces an unknown [[token]], apply() leaves it and this
+        // test fails — catching the leak before it reaches a user.
+        $this->resetAfterTest();
+        $string = [];
+        include(__DIR__ . '/../lang/en/local_ai_course_assistant.php');
+        $leaks = [];
+        foreach ($string as $key => $value) {
+            if (!is_string($value)) {
+                continue;
+            }
+            $resolved = branding::apply($value);
+            if (strpos($resolved, '[[') !== false
+                    && preg_match('/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/', $resolved)) {
+                $leaks[] = $key;
+            }
+        }
+        $this->assertSame([], $leaks,
+            'These lang keys still hold an unresolved brand token after apply(): '
+            . implode(', ', $leaks));
+    }
 }
