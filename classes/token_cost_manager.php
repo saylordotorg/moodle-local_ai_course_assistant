@@ -100,6 +100,14 @@ class token_cost_manager {
         'meta-llama/llama-3.1-8b-instruct-turbo'   => ['input' => 0.18, 'output' => 0.18],
         'meta-llama/llama-3.1-70b-instruct-turbo'  => ['input' => 0.88, 'output' => 0.88],
         'meta-llama/llama-3.1-405b-instruct-turbo' => ['input' => 3.50, 'output' => 3.50],
+        // Together Serverless "Lite" tier — Llama 3 8B Instruct Lite. Live rate
+        // from Together /v1/models pricing endpoint (2026-06-03): $0.14/M flat.
+        'meta-llama/meta-llama-3-8b-instruct'      => ['input' => 0.14, 'output' => 0.14],
+
+        // ── OpenRouter (routed open-weight) ───────────────────────────────────
+        // Non-turbo llama-3.1-8b-instruct via OpenRouter default routing. Live
+        // rate from OpenRouter /api/v1/models (2026-06-03): $0.02 in / $0.05 out.
+        'meta-llama/llama-3.1-8b-instruct'         => ['input' => 0.02, 'output' => 0.05],
 
         // ── Groq (open-source models) ─────────────────────────────────────────
         // Groq charges vary by model; these are approximate hosted rates.
@@ -112,6 +120,14 @@ class token_cost_manager {
         'gemma2-9b'         => ['input' =>  0.20, 'output' =>  0.20],
 
         // ── xAI (Grok) ───────────────────────────────────────────────────────
+        // Live rates from xAI /v1/language-models + docs.x.ai (2026-06-03).
+        // NOTE: the API silently aliases the (now-retired) name `grok-4-1-fast`
+        // to grok-4.3, so it bills at grok-4.3 rates ($1.25/$2.50), NOT a cheap
+        // "fast" tier. Benchmark "xai" rows actually ran grok-4.3.
+        'grok-4.3'          => ['input' =>  1.25, 'output' =>  2.50],
+        'grok-4.20'         => ['input' =>  1.25, 'output' =>  2.50],
+        'grok-4-1-fast'     => ['input' =>  1.25, 'output' =>  2.50],
+        'grok-4'            => ['input' =>  1.25, 'output' =>  2.50],
         'grok-3'            => ['input' =>  3.00, 'output' => 15.00],
         'grok-3-mini'       => ['input' =>  0.30, 'output' =>  0.50],
         'grok-2'            => ['input' =>  2.00, 'output' => 10.00],
