@@ -642,9 +642,23 @@ $templatedata = [
 
 // Load Chart.js and analytics dashboard AMD module.
 $PAGE->requires->js(new moodle_url('/local/ai_course_assistant/cdn/chartjs/chart.umd.min.js'));
+// Resolve the dashboard's JS-rendered labels server-side so they are translatable
+// (CONTRIB-10574 #79); the JS reads config.strings.<key>.
+$jsstringkeys = [
+    'total_students', 'active_ai_users', 'msgs_per_student', 'avg_session', 'return_rate',
+    'total_sessions', 'ai_users', 'non_users', 'thumbs_up', 'thumbs_down', 'hallucination_flags',
+    'avg_star_rating', 'avg_msgs_resolution', 'survey_respondents', 'messages', 'students',
+    'frequency', 'responses', 'error_loading', 'loading', 'no_course_data', 'no_unit_data',
+    'no_keyword_data',
+];
+$jsstrings = [];
+foreach ($jsstringkeys as $jsk) {
+    $jsstrings[$jsk] = get_string('analytics_js:' . $jsk, 'local_ai_course_assistant');
+}
 $PAGE->requires->js_call_amd('local_ai_course_assistant/analytics_dashboard', 'init', [[
     'courseid' => $courseid,
     'since' => $since,
+    'strings' => $jsstrings,
 ]]);
 
 // Build course list for tabs filter dropdown.
