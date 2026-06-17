@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/templates'], function(Templates) {
+define([], function() {
 
     /** @type {SpeechSynthesisUtterance|null} Current utterance */
     let currentUtterance = null;
@@ -43,18 +43,52 @@ define(['core/templates'], function(Templates) {
      * @param {HTMLElement} button
      * @param {string} state 'play' or 'pause'
      */
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    /**
+     * Build an SVG element via the DOM (no innerHTML string, no template engine).
+     * audio_player ships in the standalone CDN widget bundle, which has no
+     * core/templates, so the glyph is constructed from constants here
+     * (CONTRIB-10574 #94).
+     *
+     * @param {string} tag
+     * @param {Object} attrs
+     * @return {SVGElement}
+     */
+    const svgEl = function(tag, attrs) {
+        const el = document.createElementNS(SVG_NS, tag);
+        Object.keys(attrs).forEach(function(k) {
+            el.setAttribute(k, attrs[k]);
+        });
+        return el;
+    };
+
+    /**
+     * Update button icon based on state.
+     *
+     * @param {HTMLElement} button
+     * @param {string} state 'play' or 'pause'
+     */
     const updateButtonIcon = function(button, state) {
         const playing = (state === 'pause');
-        // Render the glyph from the Mustache template instead of assigning an
-        // innerHTML string (CONTRIB-10574 #94).
-        Templates.render('local_ai_course_assistant/audio_button_icon', {playing: playing})
-            .then(function(html, js) {
-                Templates.replaceNodeContents(button, html, js);
-                button.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
-                return null;
-            }).catch(function() {
-                return null;
-            });
+        const svg = svgEl('svg', {
+            'class': 'local-ai-course-assistant__audio-icon',
+            width: '16', height: '16', viewBox: '0 0 16 16',
+            fill: 'currentColor', 'aria-hidden': 'true',
+        });
+        if (playing) {
+            svg.appendChild(svgEl('rect', {x: '4', y: '2', width: '3', height: '12', fill: 'currentColor'}));
+            svg.appendChild(svgEl('rect', {x: '9', y: '2', width: '3', height: '12', fill: 'currentColor'}));
+        } else {
+            svg.appendChild(svgEl('path', {d: 'M8 2l-4 4H1v4h3l4 4V2z'}));
+            svg.appendChild(svgEl('path', {d: 'M11.5 8c0-1.1-.9-2-2-2v4c1.1 0 2-.9 2-2z'}));
+            svg.appendChild(svgEl('path', {d: 'M13 8c0-2.2-1.8-4-4-4v2c1.1 0 2 .9 2 2s-.9 2-2 2v2c2.2 0 4-1.8 4-4z'}));
+        }
+        while (button.firstChild) {
+            button.removeChild(button.firstChild);
+        }
+        button.appendChild(svg);
+        button.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
     };
 
     /**
