@@ -745,6 +745,7 @@ $string['insights:error'] = 'Could not generate insights.';
 
 // Analytics dashboard.
 $string['analytics:title'] = 'AI Tutor Analytics';
+$string['instructor_dashboard:navlink'] = 'AI Tutor Dashboard';
 $string['analytics:overview'] = 'Overview';
 $string['analytics:total_conversations'] = 'Total conversations';
 $string['analytics:total_messages'] = 'Total messages';
