@@ -68,13 +68,13 @@ if ($export !== '') {
     $filename = "sola-provider-benchmark-{$stamp}";
     switch ($export) {
         case 'json':
-            send_file_handler(provider_benchmark::export_json($payload),
+            local_ai_course_assistant_send_file(provider_benchmark::export_json($payload),
                 $filename . '.json', 'application/json; charset=utf-8');
         case 'csv':
-            send_file_handler(provider_benchmark::export_csv($payload),
+            local_ai_course_assistant_send_file(provider_benchmark::export_csv($payload),
                 $filename . '.csv', 'text/csv; charset=utf-8');
         case 'markdown':
-            send_file_handler(provider_benchmark::export_markdown($payload),
+            local_ai_course_assistant_send_file(provider_benchmark::export_markdown($payload),
                 $filename . '.md', 'text/markdown; charset=utf-8');
         default:
             throw new \moodle_exception('error', 'local_ai_course_assistant', '',
@@ -91,7 +91,7 @@ if ($export !== '') {
  * @param string $contenttype MIME type for the Content-Type header.
  * @return void
  */
-function send_file_handler(string $body, string $filename, string $contenttype): void {
+function local_ai_course_assistant_send_file(string $body, string $filename, string $contenttype): void {
     header('Content-Type: ' . $contenttype);
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . strlen($body));

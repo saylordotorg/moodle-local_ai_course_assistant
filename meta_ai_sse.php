@@ -40,7 +40,7 @@ if (ob_get_level()) {
     ob_end_clean();
 }
 
-function sse_send(string $event, string $data): void {
+function local_ai_course_assistant_meta_sse_send(string $event, string $data): void {
     echo "event: {$event}\ndata: {$data}\n\n";
     if (ob_get_level()) {
         ob_flush();
@@ -122,7 +122,7 @@ try {
                     ?? '';
                 if ($token !== '') {
                     $fullresponse .= $token;
-                    sse_send('token', json_encode(['token' => $token]));
+                    local_ai_course_assistant_meta_sse_send('token', json_encode(['token' => $token]));
                 }
             } else {
                 $decoded = json_decode($line, true);
@@ -133,7 +133,7 @@ try {
                         ?? '';
                     if ($token !== '') {
                         $fullresponse .= $token;
-                        sse_send('token', json_encode(['token' => $token]));
+                        local_ai_course_assistant_meta_sse_send('token', json_encode(['token' => $token]));
                     }
                 }
             }
@@ -142,7 +142,7 @@ try {
 
     if ($fullresponse === '') {
         $fullresponse = $llm->chat_completion($systemprompt, $messages);
-        sse_send('token', json_encode(['token' => $fullresponse]));
+        local_ai_course_assistant_meta_sse_send('token', json_encode(['token' => $fullresponse]));
     }
 
     // v4.8.0: runtime validator pipeline applies to Learning Radar
@@ -192,8 +192,8 @@ try {
         debugging('Learning Radar meta-log failed: ' . $logerr->getMessage(), DEBUG_DEVELOPER);
     }
 
-    sse_send('done', json_encode(['full' => $fullresponse]));
+    local_ai_course_assistant_meta_sse_send('done', json_encode(['full' => $fullresponse]));
 
 } catch (\Throwable $e) {
-    sse_send('error', json_encode(['message' => $e->getMessage()]));
+    local_ai_course_assistant_meta_sse_send('error', json_encode(['message' => $e->getMessage()]));
 }

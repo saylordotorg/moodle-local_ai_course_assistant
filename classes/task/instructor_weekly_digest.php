@@ -45,21 +45,21 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
     public function execute(): void {
         global $DB;
 
-        // Find every course with the digest flag on. The flag lives in
-        // `mdl_config_plugins` under `local_ai_course_assistant` with a
-        // course-id-suffixed name, so a single LIKE query is the cheapest
-        // way to enumerate enabled courses without scanning every course.
-        $rows = $DB->get_records_sql(
-            "SELECT name, value FROM {config_plugins}
-              WHERE plugin = :plugin
-                AND " . $DB->sql_like('name', ':pattern') . "
-                AND value = '1'",
-            [
-                'plugin' => 'local_ai_course_assistant',
-                'pattern' => 'digest_email_enabled_course_%',
-            ]
-        );
-        if (empty($rows)) {
+        // Find every course with the digest flag on. The flags live under
+        // local_ai_course_assistant as course-id-suffixed keys; read them via
+        // the configuration API (not a direct config_plugins query) and filter
+        // in PHP.
+        $enabledcourseids = [];
+        $prefix = 'digest_email_enabled_course_';
+        foreach ((array) get_config('local_ai_course_assistant') as $name => $value) {
+            if (strpos($name, $prefix) === 0 && (string) $value === '1') {
+                $cid = (int) substr($name, strlen($prefix));
+                if ($cid > 0) {
+                    $enabledcourseids[] = $cid;
+                }
+            }
+        }
+        if (empty($enabledcourseids)) {
             mtrace('instructor_weekly_digest: no courses opted in.');
             return;
         }
@@ -67,11 +67,7 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
         $since = time() - (7 * 86400);
         $sent = 0;
         $skipped = 0;
-        foreach ($rows as $row) {
-            $cid = (int) substr($row->name, strlen('digest_email_enabled_course_'));
-            if ($cid <= 0) {
-                continue;
-            }
+        foreach ($enabledcourseids as $cid) {
             try {
                 $course = $DB->get_record('course', ['id' => $cid]);
                 if (!$course) {

@@ -775,15 +775,17 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             'code_sandbox_enabled',
             'essay_feedback_enabled',
         ];
+        // Use the configuration API rather than touching the config_plugins
+        // table directly: read all plugin settings once, then unset each
+        // matching "force off" per-course key via unset_config().
+        $settings = (array) get_config('local_ai_course_assistant');
         foreach ($features as $feature) {
-            $like = $DB->sql_like('name', ':namepattern');
-            $DB->delete_records_select('config_plugins',
-                "plugin = :plugin AND {$like} AND value = :zero",
-                [
-                    'plugin' => 'local_ai_course_assistant',
-                    'namepattern' => $feature . '_course_%',
-                    'zero' => '0',
-                ]);
+            $prefix = $feature . '_course_';
+            foreach ($settings as $name => $value) {
+                if (strpos($name, $prefix) === 0 && (string) $value === '0') {
+                    unset_config($name, 'local_ai_course_assistant');
+                }
+            }
         }
         upgrade_plugin_savepoint(true, 2026042920, 'local', 'ai_course_assistant');
     }
