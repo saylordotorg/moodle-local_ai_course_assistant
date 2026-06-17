@@ -219,6 +219,30 @@ class provider implements
             ],
             'privacy:metadata:email_optout');
 
+        // External systems that personal data may be transmitted to. The plugin
+        // forwards learner-authored content to the admin-configured AI provider
+        // to generate tutoring responses; voice content to the configured speech
+        // provider; and, when escalation is enabled, contact details to Zendesk.
+        $collection->add_external_location_link('ai_provider', [
+            'message' => 'privacy:metadata:ai_provider:message',
+            'coursecontext' => 'privacy:metadata:ai_provider:coursecontext',
+        ], 'privacy:metadata:ai_provider');
+
+        $collection->add_external_location_link('voice_provider', [
+            'audio' => 'privacy:metadata:voice_provider:audio',
+            'text' => 'privacy:metadata:voice_provider:text',
+        ], 'privacy:metadata:voice_provider');
+
+        $collection->add_external_location_link('zendesk', [
+            'name' => 'privacy:metadata:zendesk:name',
+            'email' => 'privacy:metadata:zendesk:email',
+            'message' => 'privacy:metadata:zendesk:message',
+        ], 'privacy:metadata:zendesk');
+
+        $collection->add_external_location_link('radar_webhook', [
+            'report' => 'privacy:metadata:radar_webhook:report',
+        ], 'privacy:metadata:radar_webhook');
+
         return $collection;
     }
 

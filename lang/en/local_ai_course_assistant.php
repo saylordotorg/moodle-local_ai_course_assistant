@@ -717,6 +717,19 @@ $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferen
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
 $string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
+// External locations that personal data may be transmitted to.
+$string['privacy:metadata:ai_provider'] = 'To generate tutoring responses, learner-authored content is sent to the AI provider configured by the site or course administrator.';
+$string['privacy:metadata:ai_provider:message'] = 'The message text and attachments the learner sends to the AI tutor.';
+$string['privacy:metadata:ai_provider:coursecontext'] = 'Course and activity context (such as the course name and current page) included to ground the response.';
+$string['privacy:metadata:voice_provider'] = 'When voice input or output is used, audio and text are sent to the configured speech-to-text / text-to-speech provider.';
+$string['privacy:metadata:voice_provider:audio'] = 'Recorded audio of the learner speaking, sent for transcription.';
+$string['privacy:metadata:voice_provider:text'] = 'Text sent to the provider to be synthesised into speech.';
+$string['privacy:metadata:zendesk'] = 'When human-support escalation is enabled and the learner consents, their contact details and message are sent to Zendesk to open a support ticket.';
+$string['privacy:metadata:zendesk:name'] = 'The learner full name, used to identify the support requester.';
+$string['privacy:metadata:zendesk:email'] = 'The learner email address, used to reply to the support request.';
+$string['privacy:metadata:zendesk:message'] = 'The message or conversation content the learner chose to escalate.';
+$string['privacy:metadata:radar_webhook'] = 'When Learning Radar delivery to a Slack or Microsoft Teams webhook is configured, the generated report is posted to that external endpoint.';
+$string['privacy:metadata:radar_webhook:report'] = 'The Learning Radar report content, which may reference learner activity in the course.';
 
 // AI Insights.
 $string['insights:title'] = 'AI Insights';
