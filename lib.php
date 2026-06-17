@@ -170,14 +170,21 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
         );
     }
     if (has_capability('local/ai_course_assistant:viewanalytics', $context)) {
-        $navigation->add(
-            get_string('analytics:title', 'local_ai_course_assistant'),
+        // Clear, dedicated label (was "AI Tutor Analytics", which read like the
+        // separate cross-course analytics page and was easy to miss in "More").
+        $dashboardnode = $navigation->add(
+            get_string('instructor_dashboard:navlink', 'local_ai_course_assistant'),
             new moodle_url('/local/ai_course_assistant/instructor_dashboard.php', ['courseid' => $course->id]),
             navigation_node::TYPE_SETTING,
             null,
             'aicaanalytics',
             new pix_icon('i/report', '')
         );
+        // Also surface it in the flat (left) navigation so teachers and admins
+        // have a prominent, persistent entry point, not only the More overflow.
+        if ($dashboardnode) {
+            $dashboardnode->showinflatnavigation = true;
+        }
     }
     // v6.7.0: learner-facing Soapbox link. Unlike the admin nodes above, this is
     // shown to any enrolled learner (capability :use) when Soapbox is enabled for
