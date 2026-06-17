@@ -187,7 +187,7 @@ define([], function() {
         const button = document.createElement('button');
         button.className = 'local-ai-course-assistant__audio-btn';
         button.setAttribute('aria-label', 'Play audio');
-        // Render the initial play glyph from the template (CONTRIB-10574 #94).
+        // Build the initial play glyph via the DOM (CONTRIB-10574 #94).
         updateButtonIcon(button, 'play');
 
         button.addEventListener('click', function(e) {
