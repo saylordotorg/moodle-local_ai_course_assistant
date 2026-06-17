@@ -5695,3 +5695,16 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 /* Learning Radar citation popover (moved from inline styles in learning_radar.js, CONTRIB-10574 #94/#87). */
 .local-ai-course-assistant__cite-head { margin-bottom: 4px; }
 .local-ai-course-assistant__cite-body { white-space: pre-wrap; }
+
+/* Vendor DPA status table (moved from inline styles in vendor_dpa.php, CONTRIB-10574 #78/#87). */
+.sola-dpa-intro { max-width: 820px; }
+.sola-dpa-note { max-width: 820px; margin-top: 16px; color: #666; font-size: 13px; }
+.sola-dpa-table { margin-top: 12px; }
+.sola-dpa-code { font-size: 11px; color: #666; }
+.sola-dpa-good { color: #0a7d2c; font-weight: 600; }
+.sola-dpa-warn { color: #92400e; font-weight: 600; }
+.sola-dpa-bad { color: #b91c1c; font-weight: 600; }
+.sola-dpa-neutral { color: #6b7280; }
+
+/* Privacy notice wrapper (moved from inline style in privacy.php, CONTRIB-10574 #78/#87). */
+.sola-privacy-notice { max-width: 820px; margin: 0 auto; line-height: 1.6; padding: 0 12px; }

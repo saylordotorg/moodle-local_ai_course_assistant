@@ -842,6 +842,25 @@ $string['settings:xai_proxy_jwt_secret_desc'] = 'HS256 shared secret used to sig
 $string['admin:vendor_dpa:title'] = '{$a} — Vendor DPA status';
 $string['admin:vendor_dpa:intro'] = 'Training opt-out, DPA, and retention posture for every AI provider driver. Use this to decide which drivers to enable on your site. Tier 2 and higher routing requires a signed DPA and a contractual training opt-out.';
 $string['admin:vendor_dpa:maintenance_note'] = 'This table is maintained in classes/vendor_registry.php. Update it when a vendor ToS change lands.';
+$string['admin:vendor_dpa:col_provider'] = 'Provider';
+$string['admin:vendor_dpa:col_optout'] = 'Training opt-out';
+$string['admin:vendor_dpa:col_dpa'] = 'DPA';
+$string['admin:vendor_dpa:col_retention'] = 'Retention';
+$string['admin:vendor_dpa:col_tier'] = 'Tier ceiling';
+$string['admin:vendor_dpa:col_link'] = 'Link';
+$string['admin:vendor_dpa:vendor_terms'] = 'Vendor terms';
+$string['admin:vendor_dpa:tier'] = 'Tier {$a}';
+$string['admin:vendor_dpa:too_contractual'] = 'Contractual (opted out)';
+$string['admin:vendor_dpa:too_default_on'] = 'On by default';
+$string['admin:vendor_dpa:too_none'] = 'No opt out';
+$string['admin:vendor_dpa:too_local'] = 'Local (no vendor)';
+$string['admin:vendor_dpa:too_unknown'] = 'Not yet reviewed';
+$string['admin:vendor_dpa:dpa_signed'] = 'Signed';
+$string['admin:vendor_dpa:dpa_available'] = 'Available';
+$string['admin:vendor_dpa:dpa_negotiating'] = 'Negotiating';
+$string['admin:vendor_dpa:dpa_not_offered'] = 'Not offered';
+$string['admin:vendor_dpa:dpa_not_applicable'] = 'N/A';
+$string['admin:vendor_dpa:dpa_unknown'] = 'Unknown';
 
 // White-label contact points (v3.9.15, contact_email added v4.1.9).
 $string['settings:contact_email'] = 'Contact email';

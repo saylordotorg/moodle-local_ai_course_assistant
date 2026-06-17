@@ -1,0 +1,69 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/vendor_dpa
+
+    Vendor DPA status table. Replaces the echo/print HTML in vendor_dpa.php with
+    a template rendered through the Output API (CONTRIB-10574 #78); status colours
+    are CSS tone classes rather than data-driven inline styles.
+
+    Context variables required for this template:
+    * intro - intro paragraph text
+    * maintenance_note - footer note text
+    * rows - array of provider rows, each with: label, provider, too_text,
+             too_class, dpa_text, dpa_class, retention, tier, link
+
+    Example context (json):
+    {
+        "intro": "Training opt-out, DPA and retention posture.",
+        "maintenance_note": "Maintained in vendor_registry.php.",
+        "rows": [
+            {"label": "OpenAI", "provider": "openai", "too_text": "Contractual (opted out)",
+             "too_class": "sola-dpa-good", "dpa_text": "Signed", "dpa_class": "sola-dpa-good",
+             "retention": "0 days", "tier": "Tier 3", "link": "https://example.com/terms"}
+        ]
+    }
+}}
+<p class="sola-dpa-intro">{{intro}}</p>
+<table class="generaltable sola-dpa-table">
+    <thead>
+        <tr>
+            <th>{{#str}}admin:vendor_dpa:col_provider, local_ai_course_assistant{{/str}}</th>
+            <th>{{#str}}admin:vendor_dpa:col_optout, local_ai_course_assistant{{/str}}</th>
+            <th>{{#str}}admin:vendor_dpa:col_dpa, local_ai_course_assistant{{/str}}</th>
+            <th>{{#str}}admin:vendor_dpa:col_retention, local_ai_course_assistant{{/str}}</th>
+            <th>{{#str}}admin:vendor_dpa:col_tier, local_ai_course_assistant{{/str}}</th>
+            <th>{{#str}}admin:vendor_dpa:col_link, local_ai_course_assistant{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#rows}}
+        <tr>
+            <td><strong>{{label}}</strong><br><code class="sola-dpa-code">{{provider}}</code></td>
+            <td class="{{too_class}}">{{too_text}}</td>
+            <td class="{{dpa_class}}">{{dpa_text}}</td>
+            <td>{{retention}}</td>
+            <td>{{tier}}</td>
+            <td>
+                {{#link}}<a href="{{link}}" target="_blank" rel="noopener">{{#str}}admin:vendor_dpa:vendor_terms, local_ai_course_assistant{{/str}}</a>{{/link}}
+                {{^link}}<span class="sola-dpa-neutral">&mdash;</span>{{/link}}
+            </td>
+        </tr>
+    {{/rows}}
+    </tbody>
+</table>
+<p class="sola-dpa-note">{{maintenance_note}}</p>
