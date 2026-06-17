@@ -404,14 +404,9 @@ class file_extractor {
             return '';
         }
 
-        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-        if (!is_dir($tempdir)) {
-            @mkdir($tempdir, 0777, true);
-        }
-        $tmppath = tempnam($tempdir, 'sola_docx_');
-        if ($tmppath === false) {
-            return '';
-        }
+        // Request-scoped temp file via the Moodle File API (unique, not
+        // world-writable, auto-removed at end of request).
+        $tmppath = make_request_directory() . '/source.docx';
 
         try {
             $file->copy_content_to($tmppath);
@@ -478,14 +473,9 @@ class file_extractor {
             return '';
         }
 
-        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-        if (!is_dir($tempdir)) {
-            @mkdir($tempdir, 0777, true);
-        }
-        $tmppath = tempnam($tempdir, 'sola_pptx_');
-        if ($tmppath === false) {
-            return '';
-        }
+        // Request-scoped temp file via the Moodle File API (unique, not
+        // world-writable, auto-removed at end of request).
+        $tmppath = make_request_directory() . '/source.pptx';
 
         try {
             $file->copy_content_to($tmppath);
