@@ -29,6 +29,7 @@ $string['pluginname'] = 'AI Course Assistant';
 $string['error'] = '{$a}';
 // Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
 $string['cachedef_ratelimit'] = 'Per-user request rate limiting';
+$string['cachedef_uistate'] = 'Per-session UI toggles (view-as-student, reveal real names)';
 $string['cachedef_systemprompt'] = 'Assembled AI system prompt (per course)';
 $string['cachedef_remoteconfig'] = 'Remote configuration fetched from the update channel';
 $string['cachedef_spend'] = 'Per-period AI spend totals for the spend guard';

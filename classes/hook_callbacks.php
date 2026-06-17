@@ -332,15 +332,17 @@ class hook_callbacks {
         // testing. URL param ?sola_student_mode=1 enters, Ctrl+Shift+A or
         // ?sola_student_mode=0 exits. Session-scoped.
         $isadmin = has_capability('local/ai_course_assistant:manage', $coursecontext);
+        // Session-scoped toggle stored in a MODE_SESSION cache, not $_SESSION.
+        $uistate = \cache::make('local_ai_course_assistant', 'uistate');
         if ($isadmin) {
             $modeparam = optional_param('sola_student_mode', -1, PARAM_INT);
             if ($modeparam === 1) {
-                $_SESSION['sola_student_mode'] = true;
+                $uistate->set('student_mode', 1);
             } else if ($modeparam === 0) {
-                unset($_SESSION['sola_student_mode']);
+                $uistate->delete('student_mode');
             }
         }
-        $studentmode = $isadmin && !empty($_SESSION['sola_student_mode']);
+        $studentmode = $isadmin && (bool) $uistate->get('student_mode');
 
         // Quiz hide: optionally suppress widget on all quiz pages (stricter than quizLocked).
         $hideonquizforstudents = (bool)get_config('local_ai_course_assistant', 'hide_on_quiz_for_students');

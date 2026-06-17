@@ -80,13 +80,15 @@ if ($action === 'resolvereview' && confirm_sesskey()) {
         null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
-// Reveal-real-names toggle (session-scoped + audit logged).
+// Reveal-real-names toggle (session-scoped + audit logged). Stored in a
+// MODE_SESSION cache rather than the raw $_SESSION superglobal.
+$uistate = \cache::make('local_ai_course_assistant', 'uistate');
+$realnameskey = 'show_real_names_' . $courseid;
 if ($action === 'togglenames' && confirm_sesskey()) {
-    $key = 'sola_id_show_real_names_' . $courseid;
-    if (!empty($_SESSION[$key])) {
-        unset($_SESSION[$key]);
+    if ($uistate->get($realnameskey)) {
+        $uistate->delete($realnameskey);
     } else {
-        $_SESSION[$key] = true;
+        $uistate->set($realnameskey, 1);
         audit_logger::log(
             'instructor_reveal_learner_identities',
             (int) $USER->id,
@@ -96,7 +98,7 @@ if ($action === 'togglenames' && confirm_sesskey()) {
     }
     redirect($pageurl);
 }
-$showrealnames = !empty($_SESSION['sola_id_show_real_names_' . $courseid]);
+$showrealnames = (bool) $uistate->get($realnameskey);
 
 $since = $range > 0 ? (time() - ($range * 86400)) : 0;
 
