@@ -1,0 +1,201 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/instructor_dashboard
+
+    Per-course instructor & designer dashboard. Replaces the procedural
+    echo/html_writer rendering in instructor_dashboard.php with the Output API
+    (CONTRIB-10574 #78). All label strings are resolved in PHP and passed in;
+    inline styles moved to styles.css.
+
+    Context variables required for this template:
+    * nav, title, intro, formaction, courseid, range, gapdays, sesskey
+    * period_label, periodoptions, gap_label, toggle_label, toggle_class
+    * tiles
+    * has_mastery, mastery_heading, mastery_empty, mastery_cols, mastery_rows
+    * has_topics, topics_heading, topics_empty, topics
+    * has_confusion, confusion_heading, confusion_empty, confusion_cols, confusion_rows
+    * ratings_heading, ratings_summary, has_low_rated, ratings_low_label, ratings_low_module, ratings_low_count, ratings_low_rows
+    * gap_heading, gap_summary, has_gap_sample, gap_sample_label, gap_sample
+    * has_review, review_heading, review_intro, review_empty, review_cols, review_rows
+
+    Example context (json):
+    {
+        "nav": [{"url": "#", "label": "Back to course"}],
+        "title": "AI Tutor Dashboard", "intro": "Aggregate insights for this course.",
+        "formaction": "#", "courseid": 2, "range": 30, "gapdays": 7, "sesskey": "x",
+        "period_label": "Period", "periodoptions": [{"value": 30, "label": "30d", "selected": true}],
+        "gap_label": "Inactivity (days)", "toggle_label": "Reveal names", "toggle_class": "btn-secondary",
+        "tiles": [{"label": "Active learners", "value": "12"}],
+        "has_mastery": true, "mastery_heading": "Mastery", "mastery_empty": "Mastery is off.",
+        "mastery_cols": {"objective": "Objective", "mastered": "Mastered", "learning": "Learning", "notstarted": "Not started", "attempts": "Attempts"},
+        "mastery_rows": [{"code": "LO1", "title": "Cells", "mastered": 5, "mastered_pct": 50, "learning": 3, "learning_pct": 30, "notstarted": 2, "notstarted_pct": 20, "attempts": "40"}],
+        "has_topics": true, "topics_heading": "Most-asked topics", "topics_empty": "No topics yet.",
+        "topics": [{"keyword": "osmosis", "frequency": 9, "category": "biology"}],
+        "has_confusion": true, "confusion_heading": "Confusion", "confusion_empty": "No data.",
+        "confusion_cols": {"module": "Module", "questions": "Questions", "learners": "Learners"},
+        "confusion_rows": [{"linkurl": "", "label": "Unit 1", "questions": "12", "learners": "4"}],
+        "ratings_heading": "Ratings", "ratings_summary": "20 helpful, 2 not (90%).",
+        "has_low_rated": true, "ratings_low_label": "Low-rated by module", "ratings_low_module": "Module", "ratings_low_count": "Low-rated",
+        "ratings_low_rows": [{"name": "Unit 2", "count": 3}],
+        "gap_heading": "Engagement gap", "gap_summary": "3 of 12 not seen in 7 days.",
+        "has_gap_sample": true, "gap_sample_label": "Show sample", "gap_sample": [{"name": "Learner 7"}],
+        "has_review": true, "review_heading": "Needs review", "review_intro": "Flagged exchanges.", "review_empty": "Nothing to review.",
+        "review_cols": {"when": "When", "source": "Source", "who": "Who", "summary": "Summary"},
+        "review_rows": [{"when": "2026-06-17 09:00", "sourcelabel": "Hallucination", "who": "Learner 7", "summary": "...", "resolveurl": "#", "resolve_label": "Resolve"}]
+    }
+}}
+<div class="aica-id-dashboard">
+
+    <div class="aica-id-nav mb-3 d-flex flex-wrap">
+        {{#nav}}<a href="{{url}}" class="btn btn-sm btn-outline-secondary">{{label}}</a>{{/nav}}
+    </div>
+
+    <h2>{{title}}</h2>
+    <p class="text-muted">{{intro}}</p>
+
+    <div class="aica-id-controls">
+        <form method="get" action="{{formaction}}" class="d-inline">
+            <input type="hidden" name="courseid" value="{{courseid}}">
+            <input type="hidden" name="gapdays" value="{{gapdays}}">
+            <label class="aica-id-inline-label">{{period_label}}
+                <select name="range" class="custom-select custom-select-sm" onchange="this.form.submit()">
+                    {{#periodoptions}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>{{/periodoptions}}
+                </select>
+            </label>
+        </form>
+        <form method="get" action="{{formaction}}" class="d-inline">
+            <input type="hidden" name="courseid" value="{{courseid}}">
+            <input type="hidden" name="range" value="{{range}}">
+            <label class="aica-id-inline-label">{{gap_label}}
+                <input type="number" name="gapdays" value="{{gapdays}}" min="1" max="365"
+                       class="aica-id-gapinput" onchange="this.form.submit()">
+            </label>
+        </form>
+        <form method="get" action="{{formaction}}" class="d-inline">
+            <input type="hidden" name="courseid" value="{{courseid}}">
+            <input type="hidden" name="range" value="{{range}}">
+            <input type="hidden" name="gapdays" value="{{gapdays}}">
+            <input type="hidden" name="action" value="togglenames">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <button type="submit" class="btn btn-sm {{toggle_class}}">{{toggle_label}}</button>
+        </form>
+    </div>
+
+    <div class="aica-id-tiles">
+        {{#tiles}}
+        <div class="aica-id-tile">
+            <div class="aica-id-tile-label">{{label}}</div>
+            <div class="aica-id-tile-value">{{value}}</div>
+        </div>
+        {{/tiles}}
+    </div>
+
+    <h3>{{mastery_heading}}</h3>
+    {{^has_mastery}}<p class="text-muted">{{mastery_empty}}</p>{{/has_mastery}}
+    {{#has_mastery}}
+    <table class="generaltable aica-id-table">
+        <thead><tr>
+            <th>{{mastery_cols.objective}}</th><th>{{mastery_cols.mastered}}</th>
+            <th>{{mastery_cols.learning}}</th><th>{{mastery_cols.notstarted}}</th>
+            <th>{{mastery_cols.attempts}}</th>
+        </tr></thead>
+        <tbody>
+        {{#mastery_rows}}
+            <tr>
+                <td>{{#code}}<code>{{code}}</code> {{/code}}{{title}}</td>
+                <td><span class="aica-id-pos">{{mastered}}</span> ({{mastered_pct}}%)</td>
+                <td><span class="aica-id-mid">{{learning}}</span> ({{learning_pct}}%)</td>
+                <td><span class="aica-id-muted">{{notstarted}}</span> ({{notstarted_pct}}%)</td>
+                <td>{{attempts}}</td>
+            </tr>
+        {{/mastery_rows}}
+        </tbody>
+    </table>
+    {{/has_mastery}}
+
+    <h3 class="aica-id-h3">{{topics_heading}}</h3>
+    {{^has_topics}}<p class="text-muted">{{topics_empty}}</p>{{/has_topics}}
+    {{#has_topics}}
+    <ol class="aica-id-topics">
+        {{#topics}}<li>{{keyword}} <span class="aica-id-muted">({{frequency}})</span>{{#category}} <span class="aica-id-cat">[{{category}}]</span>{{/category}}</li>{{/topics}}
+    </ol>
+    {{/has_topics}}
+
+    <h3 class="aica-id-h3">{{confusion_heading}}</h3>
+    {{^has_confusion}}<p class="text-muted">{{confusion_empty}}</p>{{/has_confusion}}
+    {{#has_confusion}}
+    <table class="generaltable aica-id-table">
+        <thead><tr>
+            <th>{{confusion_cols.module}}</th><th>{{confusion_cols.questions}}</th><th>{{confusion_cols.learners}}</th>
+        </tr></thead>
+        <tbody>
+        {{#confusion_rows}}
+            <tr>
+                <td>{{#linkurl}}<a href="{{linkurl}}" target="_blank" rel="noopener">{{label}}</a>{{/linkurl}}{{^linkurl}}{{label}}{{/linkurl}}</td>
+                <td>{{questions}}</td><td>{{learners}}</td>
+            </tr>
+        {{/confusion_rows}}
+        </tbody>
+    </table>
+    {{/has_confusion}}
+
+    <h3 class="aica-id-h3">{{ratings_heading}}</h3>
+    <p>{{ratings_summary}}</p>
+    {{#has_low_rated}}
+    <details class="aica-id-details">
+        <summary class="aica-id-summary">{{ratings_low_label}}</summary>
+        <table class="generaltable aica-id-table aica-id-mt8">
+            <thead><tr><th>{{ratings_low_module}}</th><th>{{ratings_low_count}}</th></tr></thead>
+            <tbody>{{#ratings_low_rows}}<tr><td>{{name}}</td><td>{{count}}</td></tr>{{/ratings_low_rows}}</tbody>
+        </table>
+    </details>
+    {{/has_low_rated}}
+
+    <h3 class="aica-id-h3">{{gap_heading}}</h3>
+    <p>{{gap_summary}}</p>
+    {{#has_gap_sample}}
+    <details>
+        <summary class="aica-id-summary">{{gap_sample_label}}</summary>
+        <ul>{{#gap_sample}}<li>{{name}}</li>{{/gap_sample}}</ul>
+    </details>
+    {{/has_gap_sample}}
+
+    <h3 class="aica-id-h3-lg">{{review_heading}}</h3>
+    <p class="text-muted aica-id-narrow">{{review_intro}}</p>
+    {{^has_review}}<p class="text-success">{{review_empty}}</p>{{/has_review}}
+    {{#has_review}}
+    <table class="generaltable">
+        <thead><tr>
+            <th>{{review_cols.when}}</th><th>{{review_cols.source}}</th>
+            <th>{{review_cols.who}}</th><th>{{review_cols.summary}}</th><th></th>
+        </tr></thead>
+        <tbody>
+        {{#review_rows}}
+            <tr>
+                <td><small>{{when}}</small></td>
+                <td><span class="badge badge-secondary">{{sourcelabel}}</span></td>
+                <td>{{who}}</td>
+                <td><small>{{summary}}</small></td>
+                <td><a href="{{resolveurl}}" class="btn btn-sm btn-outline-success">{{resolve_label}}</a></td>
+            </tr>
+        {{/review_rows}}
+        </tbody>
+    </table>
+    {{/has_review}}
+
+</div>

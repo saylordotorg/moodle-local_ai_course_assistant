@@ -39,6 +39,12 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     var charts = {};
     var activeTab = 'overall';
 
+    // Resolve a UI string from the PHP-supplied config (CONTRIB-10574 #79);
+    // falls back to the key so a missing string is visible, not blank.
+    function s(key) {
+        return (config.strings && config.strings[key]) || key;
+    }
+
     // Chart.js color palette.
     var COLORS = [
         '#3b5bdb', '#1098ad', '#37b24d', '#f59f00', '#e8590c',
@@ -153,12 +159,12 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             // rather than an innerHTML string (CONTRIB-10574 #94).
             Templates.render('local_ai_course_assistant/analytics_message', {
                 danger: true,
-                message: 'Error loading data: ' + (err.message || err)
+                message: s('error_loading') + ': ' + (err.message || err)
             }).then(function(html, js) {
                 Templates.replaceNodeContents(content, html, js);
                 return null;
             }).catch(function() {
-                content.textContent = 'Error loading data.';
+                content.textContent = s('error_loading') + '.';
             });
         });
     }
@@ -166,7 +172,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function showLoading(pane) {
         var content = pane.querySelector('.sola-analytics-content');
         if (content) {
-            content.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Loading analytics...</p></div>';
+            content.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">' + s('loading') + '</p></div>';
         }
     }
 
@@ -200,12 +206,12 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         var pane = document.getElementById('sola-pane-overall');
         if (!pane) { return; }
         var html = '<div class="sola-stat-cards">' +
-            statCard('Total Students', data.total_enrolled || 0, 'users') +
-            statCard('Active AI Users', data.active_students || 0, 'chat') +
-            statCard('Msgs / Student', data.avg_messages_per_student || 0, 'message') +
-            statCard('Avg Session', formatMinutes(data.avg_session_minutes || 0), 'clock') +
-            statCard('Return Rate', (data.return_rate_pct || 0) + '%', 'return') +
-            statCard('Total Sessions', data.total_sessions || 0, 'sessions') +
+            statCard(s('total_students'), data.total_enrolled || 0, 'users') +
+            statCard(s('active_ai_users'), data.active_students || 0, 'chat') +
+            statCard(s('msgs_per_student'), data.avg_messages_per_student || 0, 'message') +
+            statCard(s('avg_session'), formatMinutes(data.avg_session_minutes || 0), 'clock') +
+            statCard(s('return_rate'), (data.return_rate_pct || 0) + '%', 'return') +
+            statCard(s('total_sessions'), data.total_sessions || 0, 'sessions') +
             '</div>';
         html += '<div class="row mt-4">';
         html += '<div class="col-md-12 mb-4"><h5>Daily Usage Trend</h5><canvas id="sola-chart-daily" height="80"></canvas></div>';
@@ -221,7 +227,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             charts['daily'] = createChart('sola-chart-daily', 'line', {
                 labels: data.daily_usage.map(function(d) { return d.date; }),
                 datasets: [{
-                    label: 'Messages',
+                    label: s('messages'),
                     data: data.daily_usage.map(function(d) { return d.count; }),
                     borderColor: COLORS[0],
                     backgroundColor: COLORS_ALPHA[0],
@@ -239,7 +245,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             }
             charts['hourly'] = createChart('sola-chart-hourly', 'bar', {
                 labels: hours,
-                datasets: [{label: 'Messages', data: hcounts, backgroundColor: COLORS[1]}],
+                datasets: [{label: s('messages'), data: hcounts, backgroundColor: COLORS[1]}],
             });
         }
         if (data.daily) {
@@ -247,7 +253,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             var dcounts = days.map(function(d) { return data.daily[d] || 0; });
             charts['dow'] = createChart('sola-chart-dow', 'bar', {
                 labels: days,
-                datasets: [{label: 'Messages', data: dcounts, backgroundColor: COLORS[2]}],
+                datasets: [{label: s('messages'), data: dcounts, backgroundColor: COLORS[2]}],
             });
         }
     }
@@ -259,7 +265,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         if (!pane) { return; }
         var courses = Array.isArray(data) ? data : (data.courses || []);
         if (!courses.length) {
-            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">No course data available.</p>';
+            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">' + s('no_course_data') + '</p>';
             return;
         }
         var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-bycourse" height="' + Math.max(80, courses.length * 25) + '"></canvas></div></div>';
@@ -279,7 +285,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
 
         charts['bycourse'] = createChart('sola-chart-bycourse', 'bar', {
             labels: courses.map(function(c) { return c.coursename || c.shortname || ''; }),
-            datasets: [{label: 'Messages', data: courses.map(function(c) { return c.total_messages || 0; }), backgroundColor: COLORS[0]}],
+            datasets: [{label: s('messages'), data: courses.map(function(c) { return c.total_messages || 0; }), backgroundColor: COLORS[0]}],
         }, {indexAxis: 'y'});
     }
 
@@ -291,8 +297,8 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         var ai = data.ai_users || {};
         var non = data.non_users || {};
         var html = '<div class="sola-stat-cards">' +
-            statCard('AI Users', ai.count || 0, 'users') +
-            statCard('Non-Users', non.count || 0, 'users') +
+            statCard(s('ai_users'), ai.count || 0, 'users') +
+            statCard(s('non_users'), non.count || 0, 'users') +
             '</div>';
         html += '<div class="row mt-4"><div class="col-md-8"><canvas id="sola-chart-comparison" height="120"></canvas></div></div>';
         html += '<table class="table table-sm mt-4"><thead><tr><th>Metric</th><th>AI Users</th><th>Non-Users</th></tr></thead><tbody>';
@@ -305,8 +311,8 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         charts['comparison'] = createChart('sola-chart-comparison', 'bar', {
             labels: ['Avg Grade (%)', 'Completion Rate (%)', 'Days to Complete'],
             datasets: [
-                {label: 'AI Users', data: [ai.avg_grade || 0, ai.completion_rate || 0, ai.avg_days_to_completion || 0], backgroundColor: COLORS[0]},
-                {label: 'Non-Users', data: [non.avg_grade || 0, non.completion_rate || 0, non.avg_days_to_completion || 0], backgroundColor: COLORS[4]},
+                {label: s('ai_users'), data: [ai.avg_grade || 0, ai.completion_rate || 0, ai.avg_days_to_completion || 0], backgroundColor: COLORS[0]},
+                {label: s('non_users'), data: [non.avg_grade || 0, non.completion_rate || 0, non.avg_days_to_completion || 0], backgroundColor: COLORS[4]},
             ],
         });
     }
@@ -318,7 +324,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         if (!pane) { return; }
         var units = Array.isArray(data) ? data : (data.units || []);
         if (!units.length) {
-            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">No unit data yet. Unit tracking began when v3.4.0 was installed — data will accumulate as students use SOLA.</p>';
+            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">' + s('no_unit_data') + '</p>';
             return;
         }
         var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-byunit" height="' + Math.max(80, units.length * 30) + '"></canvas></div></div>';
@@ -333,8 +339,8 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         charts['byunit'] = createChart('sola-chart-byunit', 'bar', {
             labels: units.map(function(u) { return u.section_name; }),
             datasets: [
-                {label: 'Students', data: units.map(function(u) { return u.student_count; }), backgroundColor: COLORS[0]},
-                {label: 'Messages', data: units.map(function(u) { return u.message_count; }), backgroundColor: COLORS[2]},
+                {label: s('students'), data: units.map(function(u) { return u.student_count; }), backgroundColor: COLORS[0]},
+                {label: s('messages'), data: units.map(function(u) { return u.message_count; }), backgroundColor: COLORS[2]},
             ],
         }, {indexAxis: 'y'});
     }
@@ -368,7 +374,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         if (!pane) { return; }
         var keywords = Array.isArray(data) ? data : (data.keywords || []);
         if (!keywords.length) {
-            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">No keyword data available for this period.</p>';
+            pane.querySelector('.sola-analytics-content').innerHTML = '<p class="text-muted">' + s('no_keyword_data') + '</p>';
             return;
         }
         var top20 = keywords.slice(0, 20);
@@ -383,7 +389,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
 
         charts['themes'] = createChart('sola-chart-themes', 'bar', {
             labels: top20.map(function(k) { return k.keyword; }),
-            datasets: [{label: 'Frequency', data: top20.map(function(k) { return k.frequency; }), backgroundColor: COLORS[0]}],
+            datasets: [{label: s('frequency'), data: top20.map(function(k) { return k.frequency; }), backgroundColor: COLORS[0]}],
         }, {indexAxis: 'y'});
     }
 
@@ -398,12 +404,12 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         var negatives = data.negatives || [];
 
         var html = '<div class="sola-stat-cards">' +
-            statCard('Thumbs Up', ratings.thumbs_up || 0, 'up') +
-            statCard('Thumbs Down', ratings.thumbs_down || 0, 'down') +
-            statCard('Hallucination Flags', ratings.hallucination_flags || 0, 'flag') +
-            statCard('Avg Star Rating', fmt(survey.avg_star_rating || 0) + '/5', 'star') +
-            statCard('Avg Msgs to Resolution', fmt(resolution.avg_messages || 0), 'resolve') +
-            statCard('Survey Respondents', survey.survey_respondents || 0, 'survey') +
+            statCard(s('thumbs_up'), ratings.thumbs_up || 0, 'up') +
+            statCard(s('thumbs_down'), ratings.thumbs_down || 0, 'down') +
+            statCard(s('hallucination_flags'), ratings.hallucination_flags || 0, 'flag') +
+            statCard(s('avg_star_rating'), fmt(survey.avg_star_rating || 0) + '/5', 'star') +
+            statCard(s('avg_msgs_resolution'), fmt(resolution.avg_messages || 0), 'resolve') +
+            statCard(s('survey_respondents'), survey.survey_respondents || 0, 'survey') +
             '</div>';
 
         html += '<div class="row mt-4">';
@@ -438,7 +444,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             var dist = survey.rating_distribution;
             charts['stars'] = createChart('sola-chart-stars', 'bar', {
                 labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
-                datasets: [{label: 'Responses', data: [dist['1'] || 0, dist['2'] || 0, dist['3'] || 0, dist['4'] || 0, dist['5'] || 0], backgroundColor: COLORS[0]}],
+                datasets: [{label: s('responses'), data: [dist['1'] || 0, dist['2'] || 0, dist['3'] || 0, dist['4'] || 0, dist['5'] || 0], backgroundColor: COLORS[0]}],
             });
         }
     }
