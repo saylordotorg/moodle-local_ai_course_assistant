@@ -151,68 +151,6 @@ $courses = $DB->get_records_sql(
 echo $OUTPUT->header();
 ?>
 
-<style>
-.aica-survey-admin { max-width: 800px; margin: 0 auto; }
-.aica-sq-card {
-    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
-    background: #fff; padding: 16px;
-}
-.aica-sq-card.dragging { opacity: 0.4; }
-.aica-sq-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-}
-.aica-sq-header .aica-sq-num {
-    width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 13px; color: #475569; flex-shrink: 0;
-}
-.aica-sq-header .aica-sq-type {
-    font-size: 12px; color: #94a3b8; background: #f1f5f9; padding: 2px 8px;
-    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.aica-sq-actions {
-    margin-left: auto; display: flex; gap: 6px;
-}
-.aica-sq-actions button {
-    border: none; background: none; cursor: pointer; padding: 4px 6px;
-    color: #94a3b8; font-size: 16px; border-radius: 4px;
-}
-.aica-sq-actions button:hover { background: #f1f5f9; color: #475569; }
-.aica-sq-actions button.aica-sq-delete:hover { color: #dc3545; }
-.aica-sq-field { margin-bottom: 10px; }
-.aica-sq-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-.aica-sq-field input, .aica-sq-field textarea, .aica-sq-field select {
-    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
-    font-size: 14px; font-family: inherit;
-}
-.aica-sq-field textarea { min-height: 60px; resize: vertical; }
-.aica-sq-options-list { margin-top: 6px; }
-.aica-sq-opt-row {
-    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
-}
-.aica-sq-opt-row input { flex: 1; }
-.aica-sq-opt-row button {
-    border: none; background: none; cursor: pointer; color: #dc3545; font-size: 18px; padding: 2px 6px;
-}
-.aica-sq-add-opt {
-    border: 1px dashed #d1d5db; background: #f8fafc; padding: 6px 12px;
-    border-radius: 6px; cursor: pointer; font-size: 13px; color: #64748b;
-    margin-top: 4px;
-}
-.aica-sq-add-opt:hover { background: #e2e8f0; }
-.aica-sq-add-question {
-    border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px;
-    text-align: center; cursor: pointer; color: #64748b; font-size: 14px;
-    margin-bottom: 16px; transition: all 0.15s;
-}
-.aica-sq-add-question:hover { border-color: #94a3b8; background: #f8fafc; }
-.aica-sq-inherited-badge {
-    display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
-    border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
-}
-.aica-sq-rating-fields { display: flex; gap: 10px; flex-wrap: wrap; }
-.aica-sq-rating-fields .aica-sq-field { flex: 1; min-width: 120px; }
-</style>
 
 <div class="aica-survey-admin">
 

@@ -68,15 +68,6 @@ $latest = plugin_updater::check_for_update();
 echo $OUTPUT->header();
 ?>
 
-<style>
-.sola-update-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.sola-update-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; background: #fff; }
-.sola-update-card h6 { color: #6c757d; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
-.sola-update-card .value { font-size: 24px; font-weight: 700; }
-.sola-update-card .value.up-to-date { color: #28a745; }
-.sola-update-card .value.update-available { color: #fd7e14; }
-.sola-changelog { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 24px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
-</style>
 
 <div style="max-width: 800px;">
     <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"

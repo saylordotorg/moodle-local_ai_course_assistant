@@ -30,6 +30,9 @@ $string['error'] = '{$a}';
 // Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
 $string['cachedef_ratelimit'] = 'Per-user request rate limiting';
 $string['cachedef_uistate'] = 'Per-session UI toggles (view-as-student, reveal real names)';
+// Provider benchmark admin page.
+$string['benchmark:pagetitle'] = 'Provider benchmark';
+$string['benchmark:intro'] = 'Sends a fixed set of typical prompts to every configured AI provider, records token usage, cost and latency, and recommends one provider per capability. Each run makes real API calls, so a run costs roughly 5 to 20 cents depending on how many providers are configured.';
 $string['cachedef_systemprompt'] = 'Assembled AI system prompt (per course)';
 $string['cachedef_remoteconfig'] = 'Remote configuration fetched from the update channel';
 $string['cachedef_spend'] = 'Per-period AI spend totals for the spend guard';

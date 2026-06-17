@@ -5429,3 +5429,265 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 .local-ai-course-assistant__path-objective.is-demonstrated_elsewhere .local-ai-course-assistant__path-objective-state {
     color: #1b4f8a;
 }
+
+
+/* ===================================================================
+ * Admin-page styles moved out of inline <style> blocks (CONTRIB-10574 #87).
+ * =================================================================== */
+
+/* Conversation-starters admin page (was inline in starter_settings.php). */
+.aica-starters-admin { max-width: 900px; margin: 0 auto; }
+.aica-starter-card {
+    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
+    background: #fff; transition: box-shadow 0.2s;
+}
+.aica-starter-card.dragging { opacity: 0.5; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.aica-starter-card-header {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer;
+    user-select: none;
+}
+.aica-starter-card-header:hover { background: #f8f9fa; border-radius: 8px; }
+.aica-drag-handle { cursor: grab; color: #adb5bd; font-size: 18px; }
+.aica-drag-handle:active { cursor: grabbing; }
+.aica-starter-icon-preview { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #495057; }
+.aica-starter-icon-preview svg { width: 18px; height: 18px; }
+.aica-starter-name { font-weight: 600; flex: 1; }
+.aica-starter-type-badge {
+    font-size: 11px; padding: 2px 8px; border-radius: 12px;
+    background: #e9ecef; color: #495057; text-transform: uppercase;
+}
+.aica-starter-type-badge.type-quiz { background: #fff3cd; color: #856404; }
+.aica-starter-type-badge.type-voice,
+.aica-starter-type-badge.type-pronunciation { background: #d4edda; color: #155724; }
+.aica-starter-toggle { transform: scale(1.2); }
+.aica-starter-expand-arrow { font-size: 14px; color: #adb5bd; transition: transform 0.2s; }
+.aica-starter-card.expanded .aica-starter-expand-arrow { transform: rotate(180deg); }
+.aica-starter-card-body { display: none; padding: 0 16px 16px 52px; }
+.aica-starter-card.expanded .aica-starter-card-body { display: block; }
+.aica-field { margin-bottom: 12px; }
+.aica-field label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; color: #495057; }
+.aica-field input[type="text"], .aica-field textarea, .aica-field select {
+    width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+}
+.aica-field textarea { min-height: 60px; resize: vertical; }
+.aica-field .aica-help { font-size: 12px; color: #6c757d; margin-top: 2px; }
+.aica-icon-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+.aica-icon-option {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; color: #495057;
+    background: #fff; transition: all 0.15s;
+}
+.aica-icon-option:hover { border-color: #0d6efd; background: #e7f1ff; }
+.aica-icon-option.selected { border-color: #0d6efd; background: #0d6efd; color: #fff; }
+.aica-icon-option svg { width: 18px; height: 18px; }
+.aica-starter-actions { display: flex; gap: 8px; margin-top: 8px; }
+.aica-btn-delete { color: #dc3545; background: none; border: 1px solid #dc3545; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 13px; }
+.aica-btn-delete:hover { background: #dc3545; color: #fff; }
+.aica-btn-add {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 12px; border: 2px dashed #dee2e6; border-radius: 8px;
+    background: #fff; cursor: pointer; color: #6c757d; font-size: 14px; margin-bottom: 16px;
+}
+.aica-btn-add:hover { border-color: #0d6efd; color: #0d6efd; background: #f8f9ff; }
+.aica-admin-actions { display: flex; gap: 12px; margin-top: 16px; }
+.aica-admin-actions .btn { min-width: 140px; }
+
+/* Practice-rubric admin page (was inline in rubric_admin.php). */
+.aica-rubric-admin { max-width: 800px; margin: 0 auto; }
+.aica-rb-card {
+    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
+    background: #fff; padding: 16px;
+}
+.aica-rb-card.dragging { opacity: 0.4; }
+.aica-rb-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.aica-rb-header .aica-rb-num {
+    width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #475569; flex-shrink: 0;
+}
+.aica-rb-header .aica-rb-type {
+    font-size: 12px; color: #94a3b8; background: #f1f5f9; padding: 2px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.aica-rb-actions {
+    margin-left: auto; display: flex; gap: 6px;
+}
+.aica-rb-actions button {
+    border: none; background: none; cursor: pointer; padding: 4px 6px;
+    color: #94a3b8; font-size: 16px; border-radius: 4px;
+}
+.aica-rb-actions button:hover { background: #f1f5f9; color: #475569; }
+.aica-rb-actions button.aica-rb-delete:hover { color: #dc3545; }
+.aica-rb-field { margin-bottom: 10px; }
+.aica-rb-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+.aica-rb-field input, .aica-rb-field textarea, .aica-rb-field select {
+    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+}
+.aica-rb-field textarea { min-height: 60px; resize: vertical; }
+.aica-rb-score-field input { width: 80px; }
+.aica-rb-add-criterion {
+    border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px;
+    text-align: center; cursor: pointer; color: #64748b; font-size: 14px;
+    margin-bottom: 16px; transition: all 0.15s;
+}
+.aica-rb-add-criterion:hover { border-color: #94a3b8; background: #f8fafc; }
+.aica-rb-inherited-badge {
+    display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
+    border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
+}
+.aica-rb-type-selector {
+    display: flex; gap: 0; margin-bottom: 16px; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
+}
+.aica-rb-type-selector a {
+    flex: 1; padding: 10px 16px; text-align: center; text-decoration: none;
+    font-weight: 600; font-size: 14px; color: #64748b; background: #f8fafc;
+    border-right: 1px solid #d1d5db; transition: all 0.15s;
+}
+.aica-rb-type-selector a:last-child { border-right: none; }
+.aica-rb-type-selector a:hover { background: #e2e8f0; color: #334155; }
+.aica-rb-type-selector a.active { background: #3b82f6; color: #fff; }
+.aica-rb-inline-fields { display: flex; gap: 10px; flex-wrap: wrap; }
+.aica-rb-inline-fields .aica-rb-field:first-child { flex: 1; min-width: 200px; }
+.aica-rb-inline-fields .aica-rb-score-field { flex: 0 0 auto; }
+
+/* Plugin self-update admin page (was inline in update_admin.php). */
+.sola-update-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.sola-update-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; background: #fff; }
+.sola-update-card h6 { color: #6c757d; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+.sola-update-card .value { font-size: 24px; font-weight: 700; }
+.sola-update-card .value.up-to-date { color: #28a745; }
+.sola-update-card .value.update-available { color: #fd7e14; }
+.sola-changelog { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 24px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
+
+/* Integrity-check admin page (was inline in integrity_admin.php). */
+.sola-integrity-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.sola-integrity-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; background: #fff; text-align: center; }
+.sola-integrity-card h6 { color: #6c757d; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; }
+.sola-integrity-card .value { font-size: 28px; font-weight: 700; }
+.sola-result-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.sola-result-table th, .sola-result-table td { padding: 10px 14px; border-bottom: 1px solid #dee2e6; text-align: left; }
+.sola-result-table th { background: #f8f9fa; font-size: 13px; text-transform: uppercase; color: #6c757d; }
+.sola-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.sola-badge.pass { background: #d4edda; color: #155724; }
+.sola-badge.fail { background: #f8d7da; color: #721c24; }
+.sola-badge.warn { background: #fff3cd; color: #856404; }
+
+/* Survey admin page (was inline in survey_admin.php). */
+.aica-survey-admin { max-width: 800px; margin: 0 auto; }
+.aica-sq-card {
+    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
+    background: #fff; padding: 16px;
+}
+.aica-sq-card.dragging { opacity: 0.4; }
+.aica-sq-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.aica-sq-header .aica-sq-num {
+    width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #475569; flex-shrink: 0;
+}
+.aica-sq-header .aica-sq-type {
+    font-size: 12px; color: #94a3b8; background: #f1f5f9; padding: 2px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.aica-sq-actions {
+    margin-left: auto; display: flex; gap: 6px;
+}
+.aica-sq-actions button {
+    border: none; background: none; cursor: pointer; padding: 4px 6px;
+    color: #94a3b8; font-size: 16px; border-radius: 4px;
+}
+.aica-sq-actions button:hover { background: #f1f5f9; color: #475569; }
+.aica-sq-actions button.aica-sq-delete:hover { color: #dc3545; }
+.aica-sq-field { margin-bottom: 10px; }
+.aica-sq-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+.aica-sq-field input, .aica-sq-field textarea, .aica-sq-field select {
+    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+}
+.aica-sq-field textarea { min-height: 60px; resize: vertical; }
+.aica-sq-options-list { margin-top: 6px; }
+.aica-sq-opt-row {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+.aica-sq-opt-row input { flex: 1; }
+.aica-sq-opt-row button {
+    border: none; background: none; cursor: pointer; color: #dc3545; font-size: 18px; padding: 2px 6px;
+}
+.aica-sq-add-opt {
+    border: 1px dashed #d1d5db; background: #f8fafc; padding: 6px 12px;
+    border-radius: 6px; cursor: pointer; font-size: 13px; color: #64748b;
+    margin-top: 4px;
+}
+.aica-sq-add-opt:hover { background: #e2e8f0; }
+.aica-sq-add-question {
+    border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px;
+    text-align: center; cursor: pointer; color: #64748b; font-size: 14px;
+    margin-bottom: 16px; transition: all 0.15s;
+}
+.aica-sq-add-question:hover { border-color: #94a3b8; background: #f8fafc; }
+.aica-sq-inherited-badge {
+    display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
+    border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
+}
+.aica-sq-rating-fields { display: flex; gap: 10px; flex-wrap: wrap; }
+.aica-sq-rating-fields .aica-sq-field { flex: 1; min-width: 120px; }
+
+/* User-testing admin page (was inline in usertesting_admin.php). */
+.aica-ut-admin { max-width: 800px; margin: 0 auto; }
+.aica-ut-card {
+    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
+    background: #fff; padding: 16px;
+}
+.aica-ut-card.dragging { opacity: 0.4; }
+.aica-ut-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.aica-ut-header .aica-ut-num {
+    width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #475569; flex-shrink: 0;
+}
+.aica-ut-header .aica-ut-type {
+    font-size: 12px; color: #94a3b8; background: #f1f5f9; padding: 2px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.aica-ut-actions { margin-left: auto; display: flex; gap: 6px; }
+.aica-ut-actions button {
+    border: none; background: none; cursor: pointer; padding: 4px 6px;
+    color: #94a3b8; font-size: 16px; border-radius: 4px;
+}
+.aica-ut-actions button:hover { background: #f1f5f9; color: #475569; }
+.aica-ut-actions button.aica-ut-delete:hover { color: #dc3545; }
+.aica-ut-field { margin-bottom: 10px; }
+.aica-ut-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
+.aica-ut-field input, .aica-ut-field textarea, .aica-ut-field select {
+    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+}
+.aica-ut-field textarea { min-height: 60px; resize: vertical; }
+.aica-ut-rating-fields { display: flex; gap: 10px; flex-wrap: wrap; }
+.aica-ut-rating-fields .aica-ut-field { flex: 1; min-width: 120px; }
+.aica-ut-opt-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.aica-ut-opt-row input { flex: 1; }
+.aica-ut-opt-row button { border: none; background: none; cursor: pointer; color: #dc3545; font-size: 18px; padding: 2px 6px; }
+.aica-ut-add-opt {
+    border: 1px dashed #d1d5db; background: #f8fafc; padding: 6px 12px;
+    border-radius: 6px; cursor: pointer; font-size: 13px; color: #64748b; margin-top: 4px;
+}
+.aica-ut-add-opt:hover { background: #e2e8f0; }
+.aica-ut-add-task {
+    border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px;
+    text-align: center; cursor: pointer; color: #64748b; font-size: 14px;
+    margin-bottom: 16px; transition: all 0.15s;
+}
+.aica-ut-add-task:hover { border-color: #94a3b8; background: #f8fafc; }
+.aica-ut-inherited-badge {
+    display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
+    border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
+}

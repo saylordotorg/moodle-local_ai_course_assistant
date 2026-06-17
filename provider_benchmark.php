@@ -102,17 +102,15 @@ function local_ai_course_assistant_send_file(string $body, string $filename, str
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/provider_benchmark.php'));
 $PAGE->set_title('SOLA Provider Benchmark');
-$PAGE->set_heading('SOLA Provider Benchmark');
+$benchmarkheading = \local_ai_course_assistant\branding::short_name() . ' '
+    . get_string('benchmark:pagetitle', 'local_ai_course_assistant');
+$PAGE->set_heading($benchmarkheading);
 $PAGE->set_pagelayout('admin');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('SOLA Provider Benchmark');
+echo $OUTPUT->heading($benchmarkheading);
 
-echo \html_writer::tag('p',
-    'Sends a fixed set of typical SOLA prompts to every configured AI provider, '
-    . 'records token usage / cost / latency, and recommends one provider per capability. '
-    . 'Each run makes real API calls — runs cost roughly &cent;5–&cent;20 depending on how many '
-    . 'providers are configured.');
+echo \html_writer::tag('p', get_string('benchmark:intro', 'local_ai_course_assistant'));
 
 $payload = $cache->get($cachekey);
 

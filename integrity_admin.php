@@ -61,19 +61,6 @@ $results = $lastjson ? json_decode($lastjson, true) : null;
 echo $OUTPUT->header();
 ?>
 
-<style>
-.sola-integrity-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.sola-integrity-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; background: #fff; text-align: center; }
-.sola-integrity-card h6 { color: #6c757d; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; }
-.sola-integrity-card .value { font-size: 28px; font-weight: 700; }
-.sola-result-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-.sola-result-table th, .sola-result-table td { padding: 10px 14px; border-bottom: 1px solid #dee2e6; text-align: left; }
-.sola-result-table th { background: #f8f9fa; font-size: 13px; text-transform: uppercase; color: #6c757d; }
-.sola-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-.sola-badge.pass { background: #d4edda; color: #155724; }
-.sola-badge.fail { background: #f8d7da; color: #721c24; }
-.sola-badge.warn { background: #fff3cd; color: #856404; }
-</style>
 
 <div style="max-width: 800px;">
     <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
