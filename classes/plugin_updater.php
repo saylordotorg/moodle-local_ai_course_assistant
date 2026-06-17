@@ -170,7 +170,8 @@ class plugin_updater {
         global $CFG;
 
         $plugindir = $CFG->dirroot . '/local/ai_course_assistant';
-        $tempdir = $CFG->tempdir . '/sola_update';
+        // Same location download_release() wrote to, via the File API helper.
+        $tempdir = make_temp_directory('sola_update');
 
         // Pre-flight: check write permissions.
         if (!is_writable($plugindir)) {

@@ -50,10 +50,9 @@ class prompt_metrics_logger {
     public static function record(int $courseid, int $userid, int $totalchars, int $budgetchars, array $breakdown): void {
         global $CFG;
         try {
-            $dir = $CFG->dataroot . '/sola_prompt_metrics';
-            if (!is_dir($dir)) {
-                mkdir($dir, 0700, true);
-            }
+            // make_writable_directory() creates the dir with Moodle's configured
+            // directory permissions instead of a hard-coded mode.
+            $dir = make_writable_directory($CFG->dataroot . '/sola_prompt_metrics');
             // Aggregate by category.
             $by_cat = ['identity' => 0, 'context' => 0, 'learner' => 0, 'behavior' => 0, 'markers' => 0, 'safety' => 0];
             $dropped = 0;
