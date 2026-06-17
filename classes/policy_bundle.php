@@ -159,19 +159,19 @@ class policy_bundle {
         // allowlist) is the security layer, consistent across all SOLA
         // outbound calls. Redirects are refused so the verified URL is the
         // fetched URL.
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 20,
-            CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_FOLLOWLOCATION => false,
-            CURLOPT_MAXFILESIZE    => self::MAX_BUNDLE_BYTES,
-        ]);
-        // Pin to the validated IP, closing the DNS-rebinding window.
-        security::pin_curl_handle($ch, $url);
-        $json = curl_exec($ch);
-        $httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
+        $curl = new \curl();
+        $curl->setopt(array_merge([
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_TIMEOUT'        => 20,
+            'CURLOPT_CONNECTTIMEOUT' => 10,
+            'CURLOPT_FOLLOWLOCATION' => false,
+            'CURLOPT_MAXFILESIZE'    => self::MAX_BUNDLE_BYTES,
+            // Pin to the validated IP, closing the DNS-rebinding window.
+        ], security::resolve_pin_options($url)));
+        $json = $curl->get($url);
+        $httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($httpcode !== 200 || !is_string($json) || $json === '') {
             return self::record('error', 'bundle fetch failed (HTTP ' . $httpcode . ')');
         }

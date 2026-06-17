@@ -477,6 +477,8 @@ TXT;
         if (!function_exists('curl_init')) {
             return null;
         }
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
 
         // SSRF: reject internal and loopback URLs before any request fires.
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
@@ -497,35 +499,30 @@ TXT;
         $body = '';
         $httpcode = 0;
         while ($hops <= $maxhops) {
-            $ch = curl_init($currenturl);
-            if ($ch === false) {
-                return null;
-            }
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => false,
-                CURLOPT_MAXREDIRS      => 0,
-                CURLOPT_TIMEOUT        => self::TRANSCRIPT_FETCH_TIMEOUT,
-                CURLOPT_CONNECTTIMEOUT => 10,
-                CURLOPT_USERAGENT      => self::TRANSCRIPT_UA,
-                CURLOPT_HTTPHEADER     => self::TRANSCRIPT_HEADERS,
-                CURLOPT_ENCODING       => '',
-                CURLOPT_HEADER         => true,
-            ]);
-            // Pin each hop to the validated IP, closing the DNS-rebinding window.
-            \local_ai_course_assistant\security::pin_curl_handle($ch, $currenturl);
-            $response = curl_exec($ch);
-            if ($response === false) {
-                curl_close($ch);
+            $curl = new \curl();
+            $curl->setopt(array_merge([
+                'CURLOPT_RETURNTRANSFER' => true,
+                'CURLOPT_FOLLOWLOCATION' => false,
+                'CURLOPT_MAXREDIRS'      => 0,
+                'CURLOPT_TIMEOUT'        => self::TRANSCRIPT_FETCH_TIMEOUT,
+                'CURLOPT_CONNECTTIMEOUT' => 10,
+                'CURLOPT_USERAGENT'      => self::TRANSCRIPT_UA,
+                'CURLOPT_HTTPHEADER'     => self::TRANSCRIPT_HEADERS,
+                'CURLOPT_ENCODING'       => '',
+                // Pin each hop to the validated IP, closing the DNS-rebinding window.
+            ], \local_ai_course_assistant\security::resolve_pin_options($currenturl)));
+            // The body is the return value; response headers are parsed into
+            // $curl->rawresponse. Redirects stay disabled so we can re-validate
+            // each Location by hand below.
+            $body = $curl->get($currenturl);
+            if ($body === false || $curl->errno) {
                 debugging('SOLA transcript fetch failed: ' . $currenturl, DEBUG_DEVELOPER);
                 return null;
             }
-            $headersize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-            $httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            $rawheaders = substr($response, 0, $headersize);
-            $body = substr($response, $headersize);
+            $info = $curl->get_info();
+            $httpcode = (int) ($info['http_code'] ?? 0);
+            $rawheaders = is_array($curl->rawresponse)
+                ? implode("\n", $curl->rawresponse) : (string) $curl->rawresponse;
 
             // Handle redirects manually so we can re-validate each Location.
             if (in_array($httpcode, [301, 302, 303, 307, 308], true)) {

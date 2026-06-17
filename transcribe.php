@@ -143,19 +143,17 @@ $headers = [];
 if (!empty($cfg['apikey'])) {
     $headers[] = 'Authorization: Bearer ' . $cfg['apikey'];
 }
-$ch = curl_init($cfg['endpoint']);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => $post,
-    CURLOPT_HTTPHEADER     => $headers,
-    CURLOPT_TIMEOUT        => 30,
-]);
-// Pin to the validated IP, closing the DNS-rebinding window.
-\local_ai_course_assistant\security::pin_curl_handle($ch, $cfg['endpoint']);
-$response = curl_exec($ch);
-$httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+require_once($CFG->libdir . '/filelib.php'); // For \curl.
+$curl = new \curl();
+$curl->setopt(array_merge([
+    'CURLOPT_RETURNTRANSFER' => true,
+    'CURLOPT_TIMEOUT'        => 30,
+    'CURLOPT_HTTPHEADER'     => $headers,
+    // Pin to the validated IP, closing the DNS-rebinding window.
+], \local_ai_course_assistant\security::resolve_pin_options($cfg['endpoint'])));
+// Multipart upload: $post carries a CURLFile plus the model/language fields.
+$response = $curl->post($cfg['endpoint'], $post);
+$httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
 
 if ($httpcode !== 200) {
     http_response_code(502);

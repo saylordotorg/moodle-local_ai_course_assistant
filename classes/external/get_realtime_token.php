@@ -250,23 +250,21 @@ class get_realtime_token extends external_api {
             ];
         }
         $body = '{}';
-        $ch = curl_init('https://api.openai.com/v1/realtime/client_secrets');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $body,
-            CURLOPT_HTTPHEADER     => [
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
+        $endpoint = 'https://api.openai.com/v1/realtime/client_secrets';
+        $curl = new \curl();
+        $curl->setopt(array_merge([
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_TIMEOUT'        => 5,
+            'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Bearer ' . $apikey,
                 'Content-Type: application/json',
-                'Content-Length: ' . strlen($body),
             ],
-            CURLOPT_TIMEOUT        => 5,
-        ]);
-        // Pin to the validated IP, closing the DNS-rebinding window.
-        \local_ai_course_assistant\security::pin_curl_handle($ch, 'https://api.openai.com/v1/realtime/client_secrets');
-        $response = (string) curl_exec($ch);
-        $httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+            // Pin to the validated IP, closing the DNS-rebinding window.
+        ], \local_ai_course_assistant\security::resolve_pin_options($endpoint)));
+        $response = (string) $curl->post($endpoint, $body);
+        $httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
         return [$response, $httpcode];
     }
 

@@ -274,26 +274,28 @@ abstract class base_provider implements provider_interface {
                 'Provider endpoint rejected by SSRF validator: ' . $url);
         }
 
-        global $CFG;
-
         // v5.10.0: wrap the stream in the bounded transient-retry. A header
         // function captures the status before any body arrives; the write
         // function swallows error-body bytes (status >= 400) so a clean 429/503
         // rejection forwards zero real tokens and is safe to retry. A transport
         // error (which may occur mid-stream) is thrown as non-transient and is
         // never retried, so visible output cannot be duplicated.
-        self::with_transient_retry(function () use ($url, $headers, $body, $writecallback, $CFG) {
+        self::with_transient_retry(function () use ($url, $headers, $body, $writecallback) {
+            global $CFG;
+            require_once($CFG->libdir . '/filelib.php'); // For \curl.
             $status = 0;
             $retryafter = null;
-            $ch = curl_init();
-            curl_setopt_array($ch, [
-                CURLOPT_URL => $url,
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => $body,
-                CURLOPT_HTTPHEADER => $headers,
-                CURLOPT_RETURNTRANSFER => false,
-                CURLOPT_TIMEOUT => 300,
-                CURLOPT_HEADERFUNCTION => function ($ch, $header) use (&$status, &$retryafter) {
+            // Moodle's \curl wrapper reads proxy settings from $CFG and routes
+            // through the organisation curl-security layer automatically, so the
+            // previous manual CURLOPT_PROXY* wiring is gone. Streaming still works
+            // because CURLOPT_WRITEFUNCTION takes precedence over buffering.
+            $curl = new \curl();
+            $curl->setopt(array_merge([
+                'CURLOPT_POST' => true,
+                'CURLOPT_HTTPHEADER' => $headers,
+                'CURLOPT_RETURNTRANSFER' => false,
+                'CURLOPT_TIMEOUT' => 300,
+                'CURLOPT_HEADERFUNCTION' => function ($ch, $header) use (&$status, &$retryafter) {
                     if (preg_match('#^HTTP/\S+\s+(\d{3})#', $header, $m)) {
                         $status = (int) $m[1];
                     } else if (stripos($header, 'Retry-After:') === 0) {
@@ -304,35 +306,21 @@ abstract class base_provider implements provider_interface {
                     }
                     return strlen($header);
                 },
-                CURLOPT_WRITEFUNCTION => function ($ch, $data) use ($writecallback, &$status) {
+                'CURLOPT_WRITEFUNCTION' => function ($ch, $data) use ($writecallback, &$status) {
                     if ($status >= 400) {
                         return strlen($data); // Swallow error body; keep call retry-safe.
                     }
                     $writecallback($data);
                     return strlen($data);
                 },
-            ]);
+                // Pin the connection to the IP validated above, closing the
+                // DNS-rebinding window (no-op under a proxy / literal IP / trusted host).
+            ], \local_ai_course_assistant\security::resolve_pin_options($url)));
 
-            // Add proxy settings from Moodle config if present.
-            if (!empty($CFG->proxyhost)) {
-                curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
-                if (!empty($CFG->proxyport)) {
-                    curl_setopt($ch, CURLOPT_PROXYPORT, $CFG->proxyport);
-                }
-                if (!empty($CFG->proxyuser)) {
-                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser . ':' . ($CFG->proxypassword ?? ''));
-                }
-            }
+            $curl->post($url, $body);
 
-            // Pin the connection to the IP validated above, closing the
-            // DNS-rebinding window (no-op under a proxy / literal IP / trusted host).
-            \local_ai_course_assistant\security::pin_curl_handle($ch, $url);
-
-            curl_exec($ch);
-
-            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
-            curl_close($ch);
+            $httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
+            $error = $curl->error;
 
             if ($error) {
                 // Transport error: possibly mid-stream, so non-transient.
