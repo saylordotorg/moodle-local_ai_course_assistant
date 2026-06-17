@@ -322,7 +322,7 @@
     {{! First-run consent banner (GDPR Article 13, FERPA). Shown once per learner
         until `aica_sola_consent_given` user preference is set. }}
     {{^consentgiven}}
-    <div class="aica-consent-banner" data-consent-url="{{consenturl}}" data-sesskey="{{sesskey}}"
+    <div class="aica-consent-banner"
          style="position:absolute;inset:0;z-index:20;background:rgba(255,255,255,0.98);
                 display:flex;flex-direction:column;padding:24px;font-size:14px;line-height:1.55">
         {{! v5.10.x: the policy is a scrollable region; the learner must reach the
@@ -387,17 +387,15 @@
         }
         btn.addEventListener('click', function() {
             if (btn.disabled) { return; }
-            var url = banner.dataset.consentUrl;
-            var sk = banner.dataset.sesskey;
-            var body = new URLSearchParams();
-            body.append('sesskey', sk);
-            fetch(url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: body.toString(),
-                credentials: 'same-origin'
-            }).finally(function() {
-                banner.style.display = 'none';
+            // Record consent through the external service (core/ajax adds the
+            // sesskey); hide the banner regardless of the call outcome.
+            require(['core/ajax'], function(Ajax) {
+                Ajax.call([{
+                    methodname: 'local_ai_course_assistant_record_consent',
+                    args: {}
+                }])[0].always(function() {
+                    banner.style.display = 'none';
+                });
             });
         });
     })();

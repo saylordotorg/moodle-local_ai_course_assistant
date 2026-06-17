@@ -427,7 +427,6 @@ $templatedata = [
     'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
     'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
     'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
-    'radar_cite_url' => (new moodle_url('/local/ai_course_assistant/radar_cite.php'))->out(false),
     'redash_pull_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
         'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
     ]))->out(false),

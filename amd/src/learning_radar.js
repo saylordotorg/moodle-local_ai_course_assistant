@@ -26,7 +26,7 @@
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define([], function() {
+define(['core/ajax'], function(Ajax) {
 
     var root, cfg;
     var providers = [];
@@ -60,7 +60,6 @@ define([], function() {
             sseUrl: root.dataset.sseUrl,
             exportUrl: root.dataset.exportUrl,
             scheduleUrl: root.dataset.scheduleUrl,
-            citeUrl: root.dataset.citeUrl,
             redashUrl: root.dataset.redashUrl,
             hasRedash: root.dataset.hasRedash === '1',
             sesskey: root.dataset.sesskey,
@@ -425,8 +424,10 @@ define([], function() {
         pop.style.top = (window.scrollY + rect.bottom + 4) + 'px';
         pop.style.display = 'block';
 
-        var url = cfg.citeUrl + '?id=' + encodeURIComponent(id) + '&sesskey=' + encodeURIComponent(cfg.sesskey);
-        fetch(url, { credentials: 'same-origin' }).then(function(r) { return r.json(); }).then(function(j) {
+        Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_radar_citation',
+            args: { id: parseInt(id, 10) }
+        }])[0].then(function(j) {
             if (!j.ok) {
                 pop.innerHTML = '<div class="text-muted">Citation not found.</div>';
                 return;
