@@ -29,15 +29,15 @@ was verified against current code before acting.
 | 75 | print_error | HIGH | ALREADY FIXED on main |
 | 76 | Direct config_plugins access | HIGH | DONE — config API in upgrade.php + digest task |
 | 77 | Privacy email_optout table | HIGH | ALREADY FIXED on main (v5.10.1) |
-| 78 | Templates / Output API | MEDIUM | **DEFERRED — needs browser testing (see below)** |
-| 79 | Hard-coded strings | MEDIUM | PARTIAL — benchmark done; admin-page strings ride #78 |
+| 78 | Templates / Output API | MEDIUM | DONE for vendor_dpa + privacy (instructor_dashboard left: interactive, needs visual QA) |
+| 79 | Hard-coded strings | MEDIUM | DONE — benchmark + vendor_dpa headers/labels (19 keys) |
 | 80 | N+1 DB in loops | MEDIUM | DONE — demo_seeder preload; export loops annotated bounded |
 | 81 | snake_case naming | MEDIUM | DONE for flagged vars (full phpcs sweep optional) |
 | 82 | File API temp dirs | MEDIUM | DONE — all temp dirs via make_*_directory |
 | 83 | curl_init -> \curl | MEDIUM | DONE — **streaming SSE path needs a dev smoke test** |
 | 84 | $_SESSION -> Cache API | MEDIUM | DONE — MODE_SESSION 'uistate' cache |
 | 85 | Legacy JS (cdn/services) | MEDIUM | DONE — external build-sources excluded from zip |
-| 86 | AJAX -> external services | MEDIUM | **DEFERRED — needs browser testing (see below)** |
+| 86 | AJAX -> external services | MEDIUM | DONE — consent + radar_cite are external services (transcribe stays AJAX) |
 | 87 | Inline CSS -> styles.css | MEDIUM | DONE — 6 admin pages; export doc justified inline |
 | 88 | Boilerplate headers | MEDIUM | DONE — 6 JS files (all PHP already had them) |
 | 89 | Comprehensive i18n | MEDIUM | DONE — provider_benchmark strings |
@@ -45,10 +45,25 @@ was verified against current code before acting.
 | 91 | Autoloading vs require_once | MEDIUM | DONE — removed redundant class requires |
 | 92 | $USER mutation | MEDIUM | DONE |
 | 93 | $DB->execute -> set_field | MEDIUM | DONE — set_field_select |
-| 94 | innerHTML -> templates in JS | LOW | **DEFERRED — needs browser testing (see below)** |
+| 94 | innerHTML -> templates in JS | LOW | DONE for the 3 flagged modules (audio_player/learning_radar/analytics_dashboard) |
 | 95 | Course picker recordset | LOW | DONE — capped get_recordset |
 | 96 | Missing lang strings | - | DONE — cachedef_* strings |
 
+## UPDATE 2026-06-17: the 3 deferred refactors are now done in this PR
+
+- **#86 done.** consent.php + radar_cite.php are gone; replaced by external\record_consent
+  and external\get_radar_citation (db/services.php), called via core/ajax / Ajax.call.
+  4 new PHPUnit tests. transcribe.php stays AJAX (binary upload).
+- **#94 done** for the three cited modules via core/templates + new mustache templates
+  (audio_button_icon, radar_citation, analytics_message). AMD rebuilt; templates render-verified.
+- **#78 done** for vendor_dpa.php and privacy.php (templates + Output API + 19 lang strings
+  + CSS tone classes). instructor_dashboard.php (interactive, 5 sections) is the one
+  remaining echo-HTML page — left for a pass with visual QA.
+- **#83 streaming smoke PASSED on dev** (openai_provider, 9-10 chunks, coherent reply).
+
+Full regression after all of the above: PHPUnit 553/0 (1 skip), validators 36/0.
+
+## Original deferral notes (kept for reference)
 ## Deferred items — why, and the plan
 
 These three are MEDIUM/LOW UI refactors that change the learner-facing widget /
