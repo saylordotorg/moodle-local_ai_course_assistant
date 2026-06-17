@@ -16,7 +16,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
-- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Prod upgrade runbook (one jump v5.4.5 → v6.7.1, path retested locally 2026-06-16): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.7.1.md`; ready-to-send Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`.
+- **Saylor production:** v5.4.5 on Learn + Degrees (as of 2026-05-12). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Prod upgrade runbook (one jump v5.4.5 → v6.8.2; v6.7.1 schema path retested locally 2026-06-16, v6.8.x adds no new migrations): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.8.2.md`; ready-to-send Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`.
 
 ---
 
@@ -249,7 +249,7 @@ rsync -a --exclude=.git \
 
 ## Upcoming Work
 
-1. Prod upgrade decision: v5.4.5 → v6.3.0 on Learn + Degrees (Tom's call; runbook ready at `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.3.0.md`; Catalyst/Artem workflow, stagger Degrees-first recommended).
+1. Prod upgrade decision: v5.4.5 → v6.8.2 on Learn + Degrees (Tom's call; runbook ready at `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.8.2.md`; Catalyst/Artem workflow, stagger Degrees-first recommended). v6.8.2 is merged to main (4326003) and on the full dev fleet; the v6.8.2 git tag + GitHub release still need to be cut before the Catalyst engagement.
 2. Mistral training-opt-out + ZDR (external action — Saylor portal). Currently NOT in Saylor's `spend_failover_chain`; provider class stays available so non-Saylor sites can opt in.
 3. Vendor enterprise commits (Vertex Tier 3+, OpenAI Tier 4, Anthropic Tier 3, Voyage enterprise). 2-4 week procurement window; only matters past 50K MAU.
 4. RAG rerank: MEASURED GO (2026-06-11). Both arms run on dev with Tom's Voyage key (payment method on file lifts free-tier rate limits; spend stays in free tokens). Recall@3 55% → 72.5% (+17.5pp, identical at candidate pool 50 and 30); P50 added latency 306ms at pool 30. Recommended: `rerank_candidates=30` + `rerank_enabled=1` on dev (Tom's call), revisit cost model before prod scale (measured ~$0.97/1k queries, 4x projection — ~$485/mo at 100k MAU usage model). Report: `.drafts/sola-rag-fixture-benchmark-2026-06-10.md` section 6-7.
