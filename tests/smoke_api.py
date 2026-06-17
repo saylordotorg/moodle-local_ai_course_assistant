@@ -68,6 +68,29 @@ def _is_quota_error(msg: str) -> bool:
     return any(marker in msg for marker in QUOTA_MARKERS)
 
 
+# Markers for a transient network/server blip (a slow REST read, a 5xx, a reset
+# connection) rather than an API-contract regression. Recorded as SKIP so a
+# single flaky run does not file a false-positive "OpenAI changed their API"
+# issue. Deliberately NARROW: only socket read-timeouts on the REST endpoints
+# and explicit 5xx/connection errors. It must NOT match the realtime
+# asyncio.wait_for() timeouts (empty-message TimeoutError) — those legitimately
+# fail when an expected event is renamed, which is exactly what this suite
+# exists to catch.
+TRANSIENT_MARKERS = (
+    "read operation timed out",
+    "HTTP 503", "got 503", " 503:", "Service Unavailable",
+    "HTTP 502", "got 502", " 502:", "Bad Gateway",
+    "Connection reset", "Connection aborted",
+    "Remote end closed connection",
+    "Temporary failure in name resolution",
+)
+
+
+def _is_transient_error(msg: str) -> bool:
+    low = msg.lower()
+    return any(marker.lower() in low for marker in TRANSIENT_MARKERS)
+
+
 results = []
 
 def run(name, fn, *args, **kwargs):
@@ -88,6 +111,10 @@ def run(name, fn, *args, **kwargs):
     if _is_quota_error(msg):
         print(f"  {yellow('SKIP')}  {name}  ({elapsed:.1f}s)")
         print(f"         {yellow('OpenAI quota exceeded — skipping (not a real API regression)')}")
+        results.append((name, "skip", msg))
+    elif _is_transient_error(msg):
+        print(f"  {yellow('SKIP')}  {name}  ({elapsed:.1f}s)")
+        print(f"         {yellow('Transient network/server error — skipping (not a real API regression)')}")
         results.append((name, "skip", msg))
     else:
         print(f"  {red('FAIL')}  {name}  ({elapsed:.1f}s)")
