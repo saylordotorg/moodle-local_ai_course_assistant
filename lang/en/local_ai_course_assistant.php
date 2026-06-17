@@ -27,6 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 // General.
 $string['pluginname'] = 'AI Course Assistant';
 $string['error'] = '{$a}';
+// Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
+$string['cachedef_ratelimit'] = 'Per-user request rate limiting';
+$string['cachedef_systemprompt'] = 'Assembled AI system prompt (per course)';
+$string['cachedef_remoteconfig'] = 'Remote configuration fetched from the update channel';
+$string['cachedef_spend'] = 'Per-period AI spend totals for the spend guard';
+$string['cachedef_failover_circuit'] = 'Provider failover circuit-breaker state';
 $string['attachment:attach'] = 'Attach';
 $string['attachment:attach_image_or_pdf'] = 'Attach image or PDF';
 // v5.3.19: error strings caught missing by lang_completeness_test.

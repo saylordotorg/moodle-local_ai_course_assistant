@@ -96,10 +96,11 @@ class update_reminder_preferences extends external_api {
                 $params['frequency']
             );
 
-            // Save contact info to Moodle user profile.
+            // Save contact info to the Moodle user profile. We deliberately do
+            // NOT mutate the global $USER object in-session: the database row is
+            // the source of truth and is re-read on the next request.
             if ($params['channel'] === 'whatsapp' && !empty($destination)) {
                 $DB->set_field('user', 'phone1', $destination, ['id' => $USER->id]);
-                $USER->phone1 = $destination;
             }
         } else {
             // Disable existing reminder.

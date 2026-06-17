@@ -138,17 +138,13 @@ class h5p_extractor {
      * @return string|null JSON string, or null if not readable.
      */
     private static function read_content_json_from_h5p(\stored_file $file): ?string {
-        global $CFG;
-
         if (!class_exists('ZipArchive')) {
             return null;
         }
 
-        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-        if (!is_dir($tempdir)) {
-            @mkdir($tempdir, 0777, true);
-        }
-        $tmppath = tempnam($tempdir, 'sola_h5p_');
+        // Request-scoped temp file via the Moodle File API (unique, not
+        // world-writable, auto-removed at end of request).
+        $tmppath = make_request_directory() . '/package.h5p';
         if ($tmppath === false) {
             return null;
         }
