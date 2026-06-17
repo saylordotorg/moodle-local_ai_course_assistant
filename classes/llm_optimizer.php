@@ -95,7 +95,6 @@ class llm_optimizer {
      */
     private static function rank_providers(string $capability): array {
         global $DB, $CFG;
-        require_once($CFG->dirroot . '/local/ai_course_assistant/classes/token_cost_manager.php');
 
         $since = time() - 30 * 86400;
         $capclause = self::capability_clause($capability);
@@ -223,7 +222,6 @@ class llm_optimizer {
      */
     private static function project_monthly_spend(): array {
         global $DB, $CFG;
-        require_once($CFG->dirroot . '/local/ai_course_assistant/classes/token_cost_manager.php');
 
         $since = time() - 30 * 86400;
         $earliest = (int) ($DB->get_field_sql(
