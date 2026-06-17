@@ -32,7 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax'], function(Ajax) {
+define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
 
     var config = {};
     var cache = {};
@@ -148,8 +148,18 @@ define(['core/ajax'], function(Ajax) {
             renderTab(tabId, data);
         }).catch(function(err) {
             hideLoading(pane);
-            pane.querySelector('.sola-analytics-content').innerHTML =
-                '<div class="alert alert-danger">Error loading data: ' + (err.message || err) + '</div>';
+            var content = pane.querySelector('.sola-analytics-content');
+            // Render the error state from a Mustache template (auto-escaped)
+            // rather than an innerHTML string (CONTRIB-10574 #94).
+            Templates.render('local_ai_course_assistant/analytics_message', {
+                danger: true,
+                message: 'Error loading data: ' + (err.message || err)
+            }).then(function(html, js) {
+                Templates.replaceNodeContents(content, html, js);
+                return null;
+            }).catch(function() {
+                content.textContent = 'Error loading data.';
+            });
         });
     }
 

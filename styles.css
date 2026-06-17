@@ -5691,3 +5691,7 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
     display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
     border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
 }
+
+/* Learning Radar citation popover (moved from inline styles in learning_radar.js, CONTRIB-10574 #94/#87). */
+.local-ai-course-assistant__cite-head { margin-bottom: 4px; }
+.local-ai-course-assistant__cite-body { white-space: pre-wrap; }

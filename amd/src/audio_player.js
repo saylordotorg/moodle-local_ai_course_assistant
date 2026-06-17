@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([], function() {
+define(['core/templates'], function(Templates) {
 
     /** @type {SpeechSynthesisUtterance|null} Current utterance */
     let currentUtterance = null;
@@ -44,21 +44,17 @@ define([], function() {
      * @param {string} state 'play' or 'pause'
      */
     const updateButtonIcon = function(button, state) {
-        const icon = button.querySelector('.local-ai-course-assistant__audio-icon');
-        if (!icon) {
-            return;
-        }
-
-        if (state === 'pause') {
-            icon.innerHTML = '<rect x="4" y="2" width="3" height="12" fill="currentColor"/>' +
-                '<rect x="9" y="2" width="3" height="12" fill="currentColor"/>';
-            button.setAttribute('aria-label', 'Pause audio');
-        } else {
-            icon.innerHTML = '<path d="M8 2l-4 4H1v4h3l4 4V2z"/>' +
-                '<path d="M11.5 8c0-1.1-.9-2-2-2v4c1.1 0 2-.9 2-2z"/>' +
-                '<path d="M13 8c0-2.2-1.8-4-4-4v2c1.1 0 2 .9 2 2s-.9 2-2 2v2c2.2 0 4-1.8 4-4z"/>';
-            button.setAttribute('aria-label', 'Play audio');
-        }
+        const playing = (state === 'pause');
+        // Render the glyph from the Mustache template instead of assigning an
+        // innerHTML string (CONTRIB-10574 #94).
+        Templates.render('local_ai_course_assistant/audio_button_icon', {playing: playing})
+            .then(function(html, js) {
+                Templates.replaceNodeContents(button, html, js);
+                button.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
+                return null;
+            }).catch(function() {
+                return null;
+            });
     };
 
     /**
@@ -157,11 +153,8 @@ define([], function() {
         const button = document.createElement('button');
         button.className = 'local-ai-course-assistant__audio-btn';
         button.setAttribute('aria-label', 'Play audio');
-        button.innerHTML = '<svg class="local-ai-course-assistant__audio-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">' +
-            '<path d="M8 2l-4 4H1v4h3l4 4V2z"/>' +
-            '<path d="M11.5 8c0-1.1-.9-2-2-2v4c1.1 0 2-.9 2-2z"/>' +
-            '<path d="M13 8c0-2.2-1.8-4-4-4v2c1.1 0 2 .9 2 2s-.9 2-2 2v2c2.2 0 4-1.8 4-4z"/>' +
-            '</svg>';
+        // Render the initial play glyph from the template (CONTRIB-10574 #94).
+        updateButtonIcon(button, 'play');
 
         button.addEventListener('click', function(e) {
             e.stopPropagation();
