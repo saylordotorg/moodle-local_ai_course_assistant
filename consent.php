@@ -32,6 +32,12 @@ require_once(__DIR__ . '/../../config.php');
 require_login();
 require_sesskey();
 
+// Consent is a per-user state change; guests have no durable account to record
+// it against, so block them explicitly (authenticated, non-guest users only).
+if (isguestuser()) {
+    throw new \moodle_exception('noguest');
+}
+
 set_user_preference('aica_sola_consent_given', time());
 
 \local_ai_course_assistant\audit_logger::log('consent_given', (int)$USER->id, 0, []);

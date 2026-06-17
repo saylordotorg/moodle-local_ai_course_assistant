@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = required_param('action', PARAM_ALPHA);
 
     if ($action === 'save') {
+        // PARAM_RAW is required to receive the JSON envelope intact; every
+        // decoded field is then strictly cleaned (clean_param per key, icon and
+        // type allowlisted) inside starter_manager::save_global_starters().
         $raw = required_param('starters_json', PARAM_RAW);
         $starters = json_decode($raw, true);
         if (is_array($starters)) {

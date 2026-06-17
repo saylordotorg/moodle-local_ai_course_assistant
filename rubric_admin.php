@@ -65,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'save') {
+        // PARAM_RAW is required to receive the JSON envelope intact; each decoded
+        // field is strictly cleaned below (clean_param + integer cast) before use.
         $criteriaraw = required_param('criteria_json', PARAM_RAW);
         $criteria = json_decode($criteriaraw, true);
 
@@ -80,8 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 continue;
             }
             $clean[] = [
-                'name' => trim($c['name']),
-                'description' => trim($c['description'] ?? ''),
+                'name' => clean_param(trim($c['name']), PARAM_TEXT),
+                'description' => clean_param(trim($c['description'] ?? ''), PARAM_TEXT),
                 'max_score' => max(1, (int) ($c['max_score'] ?? 5)),
             ];
         }
