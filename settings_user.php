@@ -64,6 +64,8 @@ if ($action === 'download' && confirm_sesskey()) {
         'practice_scores' => 'local_ai_course_assistant_practice_scores',
         'profiles'        => 'local_ai_course_assistant_profiles',
     ];
+    // One query per plugin table for this user's export. The list is a fixed,
+    // small constant (not row-driven), so this is bounded, not an N+1.
     foreach ($tables as $label => $table) {
         try {
             if ($label === 'messages') {

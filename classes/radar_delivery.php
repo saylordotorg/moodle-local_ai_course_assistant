@@ -190,12 +190,9 @@ class radar_delivery {
         // Non-text formats: attach as a file with a brief plain-text body.
         // The unsubscribe footer goes on the human-readable body, not the
         // attached CSV/JSON/markdown payload.
-        global $CFG;
         list($filename, ) = self::format_meta($format);
-        $tmpdir = $CFG->tempdir . '/sola_radar';
-        if (!is_dir($tmpdir)) {
-            @mkdir($tmpdir, 0700, true);
-        }
+        // Moodle File API: creates $CFG->tempdir/sola_radar with safe perms.
+        $tmpdir = make_temp_directory('sola_radar');
         $tmpfile = $tmpdir . '/' . uniqid('radar_', true) . '_' . $filename;
         file_put_contents($tmpfile, $payload);
         $body = "Your SOLA Learning Radar report is attached.\n\n"

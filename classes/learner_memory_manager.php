@@ -212,9 +212,9 @@ class learner_memory_manager {
         $notes = self::get_notes($userid, $courseid);
         $notes = self::prune_notes($notes);
 
-        $haveSticking = !empty($notes['sticking']);
-        $haveStyle = !empty($notes['style_prefs']);
-        if (!$haveSticking && !$haveStyle) {
+        $havesticking = !empty($notes['sticking']);
+        $havestyle = !empty($notes['style_prefs']);
+        if (!$havesticking && !$havestyle) {
             return '';
         }
 
@@ -222,7 +222,7 @@ class learner_memory_manager {
         $lines[] = "Use the notes below to adjust depth, examples, and tone — never quote them back, and never bring them up uninvited. If the learner asks again about a topic flagged below, offer a different angle (analogy, simpler example, real-world application) before repeating yourself.";
         $lines[] = '';
 
-        if ($haveSticking) {
+        if ($havesticking) {
             $lines[] = "Topics that have been hard for this learner before:";
             foreach ($notes['sticking'] as $entry) {
                 $topic = (string)($entry['topic'] ?? '');
@@ -235,7 +235,7 @@ class learner_memory_manager {
             $lines[] = '';
         }
 
-        if ($haveStyle) {
+        if ($havestyle) {
             $lines[] = "Style preferences the learner has confirmed:";
             foreach ($notes['style_prefs'] as $k => $v) {
                 $lines[] = "- " . $k . ': ' . (string)$v;

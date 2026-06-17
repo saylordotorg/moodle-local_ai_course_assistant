@@ -21,6 +21,13 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/cdn/node_modules/*" \
   -x "*/cdn/dist/*" \
   -x "*/cdn/package-lock.json" \
+  -x "*/cdn/package.json" \
+  -x "*/cdn/rollup.config.mjs" \
+  -x "*/cdn/bundle-allowlist.txt" \
+  -x "*/cdn/entry-bundle.js" \
+  -x "*/cdn/shims/*" \
+  -x "*/cdn/test/*" \
+  -x "*/services/*" \
   -x "*/tests/a11y/node_modules/*" \
   -x "*/.wiki/*" \
   -x "*/.drafts/*"

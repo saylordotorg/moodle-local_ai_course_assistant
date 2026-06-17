@@ -25,6 +25,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
+    // Per-session UI toggles (admin "view as student", reveal-real-names).
+    // MODE_SESSION replaces ad-hoc $_SESSION superglobal use.
+    'uistate' => [
+        'mode' => cache_store::MODE_SESSION,
+        'simplekeys' => true,
+        'simpledata' => true,
+    ],
     // Rate limiting cache.
     'ratelimit' => [
         'mode' => cache_store::MODE_APPLICATION,

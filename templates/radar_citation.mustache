@@ -1,0 +1,35 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/radar_citation
+
+    Learning Radar citation popover. Replaces innerHTML string-building in
+    amd/src/learning_radar.js (CONTRIB-10574 #94); Mustache auto-escapes every
+    field, so no manual escaping is needed.
+
+    Context variables required for this template:
+    * who - pseudonymized author label
+    * course - course full name
+    * date - formatted timestamp
+    * message - message text (already truncated by the caller)
+
+    Example context (json):
+    { "who": "Learner 7", "course": "BUS101", "date": "2026-06-17 09:00", "message": "What is osmosis?" }
+}}
+<div class="local-ai-course-assistant__cite-head"><strong>{{who}}</strong> <span class="text-muted">{{course}} &middot; {{date}}</span></div>
+<div class="local-ai-course-assistant__cite-body">{{message}}</div>
+<div class="text-end mt-2"><button type="button" class="btn btn-sm btn-link p-0" data-action="radar-cite-close">{{#str}}closebuttontitle, moodle{{/str}}</button></div>

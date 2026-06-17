@@ -66,6 +66,8 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
         'userid' => $targetuserid,
         'exported_by' => (int)$USER->id,
     ];
+    // One query per plugin table for this user's export. The list is a fixed,
+    // small constant (not row-driven), so this is bounded, not an N+1.
     foreach ($tables as $label => $table) {
         try {
             $bundle[$label] = array_values($DB->get_records($table, ['userid' => $targetuserid]));

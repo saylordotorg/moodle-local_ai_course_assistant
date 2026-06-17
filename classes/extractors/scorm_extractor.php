@@ -50,7 +50,7 @@ class scorm_extractor {
      * @return string Extracted text, or empty string on any failure / when disabled.
      */
     public static function extract(int $instance, int $courseid): string {
-        global $CFG, $DB;
+        global $DB;
 
         if (!self::is_enabled('rag_extract_scorm', false)) {
             return '';
@@ -107,20 +107,16 @@ class scorm_extractor {
                 return '';
             }
 
-            $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-            if (!is_dir($tempdir)) {
-                @mkdir($tempdir, 0777, true);
-            }
-            $extractdir = $tempdir . DIRECTORY_SEPARATOR . 'sola_scorm_' . uniqid('', true);
-            if (!@mkdir($extractdir, 0777, true)) {
+            // Request-scoped working directory via the Moodle File API (unique,
+            // not world-writable, auto-removed at end of request).
+            $workdir = make_request_directory();
+            $extractdir = $workdir . DIRECTORY_SEPARATOR . 'extract';
+            if (!@mkdir($extractdir)) {
                 return '';
             }
             self::register_tempdir($extractdir);
 
-            $tmppath = tempnam($tempdir, 'sola_scorm_pkg_');
-            if ($tmppath === false) {
-                return '';
-            }
+            $tmppath = $workdir . DIRECTORY_SEPARATOR . 'package.zip';
 
             try {
                 $packagefile->copy_content_to($tmppath);

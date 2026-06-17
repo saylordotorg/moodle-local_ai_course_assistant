@@ -99,6 +99,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_record_consent' => [
+        'classname' => \local_ai_course_assistant\external\record_consent::class,
+        'description' => 'Record that the learner accepted the first-run privacy notice.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'moodle/user:editownprofile',
+    ],
+    'local_ai_course_assistant_get_radar_citation' => [
+        'classname' => \local_ai_course_assistant\external\get_radar_citation::class,
+        'description' => 'Resolve a Learning Radar citation token to a pseudonymized message (site admin).',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'moodle/site:config',
+    ],
     'local_ai_course_assistant_set_digest_optin' => [
         'classname' => \local_ai_course_assistant\external\set_digest_optin::class,
         'description' => 'Record learner opt-in / opt-out for the per-course weekly mastery digest email (v4.0 / M3).',

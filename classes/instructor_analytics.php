@@ -256,9 +256,9 @@ class instructor_analytics {
                    AND m.cmid IS NOT NULL
                  GROUP BY m.cmid
                  ORDER BY neg DESC";
-        $perModule = $DB->get_records_sql($sql, $params, 0, 10);
+        $permodule = $DB->get_records_sql($sql, $params, 0, 10);
         $bymodule = [];
-        foreach ($perModule as $row) {
+        foreach ($permodule as $row) {
             $cmid = (int) $row->cmid;
             $name = '';
             try {

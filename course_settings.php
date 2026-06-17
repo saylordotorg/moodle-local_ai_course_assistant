@@ -65,10 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'enabled'     => optional_param('enabled', 0, PARAM_INT),
         'provider'    => optional_param('provider', '', PARAM_ALPHA),
+        // API keys legitimately contain arbitrary characters, so PARAM_RAW_TRIMMED
+        // is the correct (and Moodle-conventional) type for a secret credential.
         'apikey'      => optional_param('apikey', '', PARAM_RAW_TRIMMED),
-        'model'       => optional_param('model', '', PARAM_RAW_TRIMMED),
+        'model'       => optional_param('model', '', PARAM_TEXT),
         'apibaseurl'  => optional_param('apibaseurl', '', PARAM_URL),
+        // The system prompt is free-form text sent verbatim to the model (never
+        // rendered as HTML); PARAM_RAW preserves characters PARAM_TEXT would strip.
         'systemprompt' => optional_param('systemprompt', '', PARAM_RAW),
+        // Received raw, then range-validated and cast to float just below.
         'temperature'  => optional_param('temperature', '', PARAM_RAW_TRIMMED),
     ];
 

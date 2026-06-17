@@ -152,7 +152,6 @@ class spend_guard {
      */
     private static function compute_spend(int $courseid, ?string $capability): float {
         global $DB, $CFG;
-        require_once($CFG->dirroot . '/local/ai_course_assistant/classes/token_cost_manager.php');
 
         $since = self::period_start();
         $params = ['since' => $since];

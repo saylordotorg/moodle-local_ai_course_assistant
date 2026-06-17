@@ -68,13 +68,13 @@ if ($export !== '') {
     $filename = "sola-provider-benchmark-{$stamp}";
     switch ($export) {
         case 'json':
-            send_file_handler(provider_benchmark::export_json($payload),
+            local_ai_course_assistant_send_file(provider_benchmark::export_json($payload),
                 $filename . '.json', 'application/json; charset=utf-8');
         case 'csv':
-            send_file_handler(provider_benchmark::export_csv($payload),
+            local_ai_course_assistant_send_file(provider_benchmark::export_csv($payload),
                 $filename . '.csv', 'text/csv; charset=utf-8');
         case 'markdown':
-            send_file_handler(provider_benchmark::export_markdown($payload),
+            local_ai_course_assistant_send_file(provider_benchmark::export_markdown($payload),
                 $filename . '.md', 'text/markdown; charset=utf-8');
         default:
             throw new \moodle_exception('error', 'local_ai_course_assistant', '',
@@ -91,7 +91,7 @@ if ($export !== '') {
  * @param string $contenttype MIME type for the Content-Type header.
  * @return void
  */
-function send_file_handler(string $body, string $filename, string $contenttype): void {
+function local_ai_course_assistant_send_file(string $body, string $filename, string $contenttype): void {
     header('Content-Type: ' . $contenttype);
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . strlen($body));
@@ -102,17 +102,15 @@ function send_file_handler(string $body, string $filename, string $contenttype):
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/provider_benchmark.php'));
 $PAGE->set_title('SOLA Provider Benchmark');
-$PAGE->set_heading('SOLA Provider Benchmark');
+$benchmarkheading = \local_ai_course_assistant\branding::short_name() . ' '
+    . get_string('benchmark:pagetitle', 'local_ai_course_assistant');
+$PAGE->set_heading($benchmarkheading);
 $PAGE->set_pagelayout('admin');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('SOLA Provider Benchmark');
+echo $OUTPUT->heading($benchmarkheading);
 
-echo \html_writer::tag('p',
-    'Sends a fixed set of typical SOLA prompts to every configured AI provider, '
-    . 'records token usage / cost / latency, and recommends one provider per capability. '
-    . 'Each run makes real API calls — runs cost roughly &cent;5–&cent;20 depending on how many '
-    . 'providers are configured.');
+echo \html_writer::tag('p', get_string('benchmark:intro', 'local_ai_course_assistant'));
 
 $payload = $cache->get($cachekey);
 

@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = required_param('action', PARAM_ALPHA);
 
     if ($action === 'save') {
+        // PARAM_RAW is required to receive the JSON envelope intact; every
+        // decoded field is then strictly cleaned (clean_param per key, icon and
+        // type allowlisted) inside starter_manager::save_global_starters().
         $raw = required_param('starters_json', PARAM_RAW);
         $starters = json_decode($raw, true);
         if (is_array($starters)) {
@@ -66,64 +69,6 @@ foreach ($iconkeys as $k) {
 echo $OUTPUT->header();
 ?>
 
-<style>
-.aica-starters-admin { max-width: 900px; margin: 0 auto; }
-.aica-starter-card {
-    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
-    background: #fff; transition: box-shadow 0.2s;
-}
-.aica-starter-card.dragging { opacity: 0.5; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.aica-starter-card-header {
-    display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer;
-    user-select: none;
-}
-.aica-starter-card-header:hover { background: #f8f9fa; border-radius: 8px; }
-.aica-drag-handle { cursor: grab; color: #adb5bd; font-size: 18px; }
-.aica-drag-handle:active { cursor: grabbing; }
-.aica-starter-icon-preview { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #495057; }
-.aica-starter-icon-preview svg { width: 18px; height: 18px; }
-.aica-starter-name { font-weight: 600; flex: 1; }
-.aica-starter-type-badge {
-    font-size: 11px; padding: 2px 8px; border-radius: 12px;
-    background: #e9ecef; color: #495057; text-transform: uppercase;
-}
-.aica-starter-type-badge.type-quiz { background: #fff3cd; color: #856404; }
-.aica-starter-type-badge.type-voice,
-.aica-starter-type-badge.type-pronunciation { background: #d4edda; color: #155724; }
-.aica-starter-toggle { transform: scale(1.2); }
-.aica-starter-expand-arrow { font-size: 14px; color: #adb5bd; transition: transform 0.2s; }
-.aica-starter-card.expanded .aica-starter-expand-arrow { transform: rotate(180deg); }
-.aica-starter-card-body { display: none; padding: 0 16px 16px 52px; }
-.aica-starter-card.expanded .aica-starter-card-body { display: block; }
-.aica-field { margin-bottom: 12px; }
-.aica-field label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; color: #495057; }
-.aica-field input[type="text"], .aica-field textarea, .aica-field select {
-    width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px;
-    font-size: 14px; font-family: inherit;
-}
-.aica-field textarea { min-height: 60px; resize: vertical; }
-.aica-field .aica-help { font-size: 12px; color: #6c757d; margin-top: 2px; }
-.aica-icon-picker { display: flex; flex-wrap: wrap; gap: 6px; }
-.aica-icon-option {
-    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-    border: 2px solid #dee2e6; border-radius: 6px; cursor: pointer; color: #495057;
-    background: #fff; transition: all 0.15s;
-}
-.aica-icon-option:hover { border-color: #0d6efd; background: #e7f1ff; }
-.aica-icon-option.selected { border-color: #0d6efd; background: #0d6efd; color: #fff; }
-.aica-icon-option svg { width: 18px; height: 18px; }
-.aica-starter-actions { display: flex; gap: 8px; margin-top: 8px; }
-.aica-btn-delete { color: #dc3545; background: none; border: 1px solid #dc3545; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 13px; }
-.aica-btn-delete:hover { background: #dc3545; color: #fff; }
-.aica-btn-add {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; padding: 12px; border: 2px dashed #dee2e6; border-radius: 8px;
-    background: #fff; cursor: pointer; color: #6c757d; font-size: 14px; margin-bottom: 16px;
-}
-.aica-btn-add:hover { border-color: #0d6efd; color: #0d6efd; background: #f8f9ff; }
-.aica-admin-actions { display: flex; gap: 12px; margin-top: 16px; }
-.aica-admin-actions .btn { min-width: 140px; }
-</style>
 
 <div class="aica-starters-admin">
     <p><?php echo get_string('starters:admin_desc', 'local_ai_course_assistant'); ?></p>

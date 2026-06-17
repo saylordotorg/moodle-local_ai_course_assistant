@@ -56,19 +56,19 @@ class remote_config_manager {
             return [];
         }
 
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS      => 3,
-            CURLOPT_TIMEOUT        => 10,
-            CURLOPT_USERAGENT      => 'SOLA-Moodle-Plugin/1.0',
-        ]);
-        // Pin to the validated IP, closing the DNS-rebinding window.
-        security::pin_curl_handle($ch, $url);
-        $body = curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php'); // For \curl.
+        $curl = new \curl();
+        $curl->setopt(array_merge([
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_FOLLOWLOCATION' => true,
+            'CURLOPT_MAXREDIRS'      => 3,
+            'CURLOPT_TIMEOUT'        => 10,
+            'CURLOPT_USERAGENT'      => 'SOLA-Moodle-Plugin/1.0',
+            // Pin to the validated IP, closing the DNS-rebinding window.
+        ], security::resolve_pin_options($url)));
+        $body = $curl->get($url);
+        $code = (int) ($curl->get_info()['http_code'] ?? 0);
 
         if ($code !== 200 || !$body) {
             $cache->set('config', []);

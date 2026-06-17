@@ -51,6 +51,9 @@ class rate_card_refresher {
      * @return array{ok:bool, count:int, error:string}
      */
     public static function refresh(): array {
+        // Privacy: this is an outbound GET for provider pricing data only. No
+        // personal data is transmitted, so no privacy external-location link is
+        // declared for it (see classes/privacy/provider.php::get_metadata()).
         $url = (string) (get_config('local_ai_course_assistant', 'rate_card_upstream_url') ?: self::DEFAULT_UPSTREAM_URL);
         if (!security::is_safe_provider_url($url)) {
             return self::record_failure('Upstream URL rejected by SSRF allowlist: ' . $url);

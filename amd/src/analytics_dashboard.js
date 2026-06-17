@@ -1,3 +1,26 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Analytics dashboard tab loader and chart rendering.
+ *
+ * @module     local_ai_course_assistant/analytics_dashboard
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 /**
  * Analytics dashboard controller with Chart.js visualization.
  *
@@ -9,7 +32,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax'], function(Ajax) {
+define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
 
     var config = {};
     var cache = {};
@@ -125,8 +148,18 @@ define(['core/ajax'], function(Ajax) {
             renderTab(tabId, data);
         }).catch(function(err) {
             hideLoading(pane);
-            pane.querySelector('.sola-analytics-content').innerHTML =
-                '<div class="alert alert-danger">Error loading data: ' + (err.message || err) + '</div>';
+            var content = pane.querySelector('.sola-analytics-content');
+            // Render the error state from a Mustache template (auto-escaped)
+            // rather than an innerHTML string (CONTRIB-10574 #94).
+            Templates.render('local_ai_course_assistant/analytics_message', {
+                danger: true,
+                message: 'Error loading data: ' + (err.message || err)
+            }).then(function(html, js) {
+                Templates.replaceNodeContents(content, html, js);
+                return null;
+            }).catch(function() {
+                content.textContent = 'Error loading data.';
+            });
         });
     }
 

@@ -95,13 +95,13 @@ PROMPT;
             return true;
         }
 
-        $msgsSinceProfile = $DB->count_records_select(
+        $msgssinceprofile = $DB->count_records_select(
             'local_ai_course_assistant_msgs',
             "userid = :userid AND courseid = :courseid AND role = 'user' AND timecreated > :since",
             ['userid' => $userid, 'courseid' => $courseid, 'since' => $profile->timemodified]
         );
 
-        return $msgsSinceProfile >= $interval;
+        return $msgssinceprofile >= $interval;
     }
 
     /**

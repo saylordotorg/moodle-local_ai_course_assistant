@@ -189,13 +189,14 @@ class struggle_classifier {
         }
 
         // Mark singleton candidates as 'fine' so they don't sit in the
-        // table forever waiting for stage-2.
-        $DB->execute(
-            "UPDATE {" . self::TABLE_SIGNAL . "}
-                SET stage2_label = ?
-              WHERE stage2_label = ?
-                AND timecreated < ?",
-            ['fine', 'unprocessed', time() - 86400]
+        // table forever waiting for stage-2. Uses the specialised DML helper
+        // rather than a raw $DB->execute() UPDATE.
+        $DB->set_field_select(
+            self::TABLE_SIGNAL,
+            'stage2_label',
+            'fine',
+            'stage2_label = ? AND timecreated < ?',
+            ['unprocessed', time() - 86400]
         );
 
         return $notesrecorded;

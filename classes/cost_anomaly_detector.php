@@ -81,7 +81,6 @@ class cost_anomaly_detector {
      */
     public static function compute_daily_spend(int $daystart): float {
         global $DB, $CFG;
-        require_once($CFG->dirroot . '/local/ai_course_assistant/classes/token_cost_manager.php');
 
         $dayend = $daystart + 86400;
         $rows = $DB->get_records_sql(
@@ -121,7 +120,6 @@ class cost_anomaly_detector {
      */
     public static function per_course_spend_for_day(int $daystart, int $topn = self::TOP_COURSES_IN_EMAIL): array {
         global $DB, $CFG;
-        require_once($CFG->dirroot . '/local/ai_course_assistant/classes/token_cost_manager.php');
 
         $dayend = $daystart + 86400;
         $rows = $DB->get_records_sql(

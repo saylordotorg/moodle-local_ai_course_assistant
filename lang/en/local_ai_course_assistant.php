@@ -27,6 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 // General.
 $string['pluginname'] = 'AI Course Assistant';
 $string['error'] = '{$a}';
+// Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
+$string['cachedef_ratelimit'] = 'Per-user request rate limiting';
+$string['cachedef_uistate'] = 'Per-session UI toggles (view-as-student, reveal real names)';
+// Provider benchmark admin page.
+$string['benchmark:pagetitle'] = 'Provider benchmark';
+$string['benchmark:intro'] = 'Sends a fixed set of typical prompts to every configured AI provider, records token usage, cost and latency, and recommends one provider per capability. Each run makes real API calls, so a run costs roughly 5 to 20 cents depending on how many providers are configured.';
+$string['cachedef_systemprompt'] = 'Assembled AI system prompt (per course)';
+$string['cachedef_remoteconfig'] = 'Remote configuration fetched from the update channel';
+$string['cachedef_spend'] = 'Per-period AI spend totals for the spend guard';
+$string['cachedef_failover_circuit'] = 'Provider failover circuit-breaker state';
 $string['attachment:attach'] = 'Attach';
 $string['attachment:attach_image_or_pdf'] = 'Attach image or PDF';
 // v5.3.19: error strings caught missing by lang_completeness_test.
@@ -711,6 +721,19 @@ $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferen
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
 $string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
+// External locations that personal data may be transmitted to.
+$string['privacy:metadata:ai_provider'] = 'To generate tutoring responses, learner-authored content is sent to the AI provider configured by the site or course administrator.';
+$string['privacy:metadata:ai_provider:message'] = 'The message text and attachments the learner sends to the AI tutor.';
+$string['privacy:metadata:ai_provider:coursecontext'] = 'Course and activity context (such as the course name and current page) included to ground the response.';
+$string['privacy:metadata:voice_provider'] = 'When voice input or output is used, audio and text are sent to the configured speech-to-text / text-to-speech provider.';
+$string['privacy:metadata:voice_provider:audio'] = 'Recorded audio of the learner speaking, sent for transcription.';
+$string['privacy:metadata:voice_provider:text'] = 'Text sent to the provider to be synthesised into speech.';
+$string['privacy:metadata:zendesk'] = 'When human-support escalation is enabled and the learner consents, their contact details and message are sent to Zendesk to open a support ticket.';
+$string['privacy:metadata:zendesk:name'] = 'The learner full name, used to identify the support requester.';
+$string['privacy:metadata:zendesk:email'] = 'The learner email address, used to reply to the support request.';
+$string['privacy:metadata:zendesk:message'] = 'The message or conversation content the learner chose to escalate.';
+$string['privacy:metadata:radar_webhook'] = 'When Learning Radar delivery to a Slack or Microsoft Teams webhook is configured, the generated report is posted to that external endpoint.';
+$string['privacy:metadata:radar_webhook:report'] = 'The Learning Radar report content, which may reference learner activity in the course.';
 
 // AI Insights.
 $string['insights:title'] = 'AI Insights';
@@ -819,6 +842,25 @@ $string['settings:xai_proxy_jwt_secret_desc'] = 'HS256 shared secret used to sig
 $string['admin:vendor_dpa:title'] = '{$a} — Vendor DPA status';
 $string['admin:vendor_dpa:intro'] = 'Training opt-out, DPA, and retention posture for every AI provider driver. Use this to decide which drivers to enable on your site. Tier 2 and higher routing requires a signed DPA and a contractual training opt-out.';
 $string['admin:vendor_dpa:maintenance_note'] = 'This table is maintained in classes/vendor_registry.php. Update it when a vendor ToS change lands.';
+$string['admin:vendor_dpa:col_provider'] = 'Provider';
+$string['admin:vendor_dpa:col_optout'] = 'Training opt-out';
+$string['admin:vendor_dpa:col_dpa'] = 'DPA';
+$string['admin:vendor_dpa:col_retention'] = 'Retention';
+$string['admin:vendor_dpa:col_tier'] = 'Tier ceiling';
+$string['admin:vendor_dpa:col_link'] = 'Link';
+$string['admin:vendor_dpa:vendor_terms'] = 'Vendor terms';
+$string['admin:vendor_dpa:tier'] = 'Tier {$a}';
+$string['admin:vendor_dpa:too_contractual'] = 'Contractual (opted out)';
+$string['admin:vendor_dpa:too_default_on'] = 'On by default';
+$string['admin:vendor_dpa:too_none'] = 'No opt out';
+$string['admin:vendor_dpa:too_local'] = 'Local (no vendor)';
+$string['admin:vendor_dpa:too_unknown'] = 'Not yet reviewed';
+$string['admin:vendor_dpa:dpa_signed'] = 'Signed';
+$string['admin:vendor_dpa:dpa_available'] = 'Available';
+$string['admin:vendor_dpa:dpa_negotiating'] = 'Negotiating';
+$string['admin:vendor_dpa:dpa_not_offered'] = 'Not offered';
+$string['admin:vendor_dpa:dpa_not_applicable'] = 'N/A';
+$string['admin:vendor_dpa:dpa_unknown'] = 'Unknown';
 
 // White-label contact points (v3.9.15, contact_email added v4.1.9).
 $string['settings:contact_email'] = 'Contact email';

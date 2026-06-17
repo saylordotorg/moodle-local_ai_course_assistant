@@ -65,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'save') {
+        // PARAM_RAW is required to receive the JSON envelope intact; each decoded
+        // field is strictly cleaned below (clean_param + integer cast) before use.
         $criteriaraw = required_param('criteria_json', PARAM_RAW);
         $criteria = json_decode($criteriaraw, true);
 
@@ -80,8 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 continue;
             }
             $clean[] = [
-                'name' => trim($c['name']),
-                'description' => trim($c['description'] ?? ''),
+                'name' => clean_param(trim($c['name']), PARAM_TEXT),
+                'description' => clean_param(trim($c['description'] ?? ''), PARAM_TEXT),
                 'max_score' => max(1, (int) ($c['max_score'] ?? 5)),
             ];
         }
@@ -147,67 +149,6 @@ $courses = $DB->get_records_sql(
 echo $OUTPUT->header();
 ?>
 
-<style>
-.aica-rubric-admin { max-width: 800px; margin: 0 auto; }
-.aica-rb-card {
-    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
-    background: #fff; padding: 16px;
-}
-.aica-rb-card.dragging { opacity: 0.4; }
-.aica-rb-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-}
-.aica-rb-header .aica-rb-num {
-    width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 13px; color: #475569; flex-shrink: 0;
-}
-.aica-rb-header .aica-rb-type {
-    font-size: 12px; color: #94a3b8; background: #f1f5f9; padding: 2px 8px;
-    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.aica-rb-actions {
-    margin-left: auto; display: flex; gap: 6px;
-}
-.aica-rb-actions button {
-    border: none; background: none; cursor: pointer; padding: 4px 6px;
-    color: #94a3b8; font-size: 16px; border-radius: 4px;
-}
-.aica-rb-actions button:hover { background: #f1f5f9; color: #475569; }
-.aica-rb-actions button.aica-rb-delete:hover { color: #dc3545; }
-.aica-rb-field { margin-bottom: 10px; }
-.aica-rb-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-.aica-rb-field input, .aica-rb-field textarea, .aica-rb-field select {
-    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
-    font-size: 14px; font-family: inherit;
-}
-.aica-rb-field textarea { min-height: 60px; resize: vertical; }
-.aica-rb-score-field input { width: 80px; }
-.aica-rb-add-criterion {
-    border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px;
-    text-align: center; cursor: pointer; color: #64748b; font-size: 14px;
-    margin-bottom: 16px; transition: all 0.15s;
-}
-.aica-rb-add-criterion:hover { border-color: #94a3b8; background: #f8fafc; }
-.aica-rb-inherited-badge {
-    display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
-    border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
-}
-.aica-rb-type-selector {
-    display: flex; gap: 0; margin-bottom: 16px; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden;
-}
-.aica-rb-type-selector a {
-    flex: 1; padding: 10px 16px; text-align: center; text-decoration: none;
-    font-weight: 600; font-size: 14px; color: #64748b; background: #f8fafc;
-    border-right: 1px solid #d1d5db; transition: all 0.15s;
-}
-.aica-rb-type-selector a:last-child { border-right: none; }
-.aica-rb-type-selector a:hover { background: #e2e8f0; color: #334155; }
-.aica-rb-type-selector a.active { background: #3b82f6; color: #fff; }
-.aica-rb-inline-fields { display: flex; gap: 10px; flex-wrap: wrap; }
-.aica-rb-inline-fields .aica-rb-field:first-child { flex: 1; min-width: 200px; }
-.aica-rb-inline-fields .aica-rb-score-field { flex: 0 0 auto; }
-</style>
 
 <div class="aica-rubric-admin">
 

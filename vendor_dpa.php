@@ -43,53 +43,45 @@ $PAGE->set_heading(get_string('admin:vendor_dpa:title', 'local_ai_course_assista
 
 \local_ai_course_assistant\security::send_security_headers(true);
 
-echo $OUTPUT->header();
-
-echo \html_writer::tag('p',
-    get_string('admin:vendor_dpa:intro', 'local_ai_course_assistant'),
-    ['style' => 'max-width:820px']);
-
+// Map each registry status to a language-string key and a CSS tone class, so
+// the template carries no hard-coded English or data-driven inline colours.
 $labels = [
-    'contractual'    => ['text' => 'Contractual (opted out)',  'color' => '#0a7d2c'],
-    'default_on'     => ['text' => 'On by default',            'color' => '#b91c1c'],
-    'none'           => ['text' => 'No opt out',               'color' => '#b91c1c'],
-    'local'          => ['text' => 'Local (no vendor)',        'color' => '#0a7d2c'],
-    'unknown'        => ['text' => 'Not yet reviewed',         'color' => '#92400e'],
+    'contractual' => ['key' => 'admin:vendor_dpa:too_contractual', 'class' => 'sola-dpa-good'],
+    'default_on'  => ['key' => 'admin:vendor_dpa:too_default_on',  'class' => 'sola-dpa-bad'],
+    'none'        => ['key' => 'admin:vendor_dpa:too_none',        'class' => 'sola-dpa-bad'],
+    'local'       => ['key' => 'admin:vendor_dpa:too_local',       'class' => 'sola-dpa-good'],
+    'unknown'     => ['key' => 'admin:vendor_dpa:too_unknown',     'class' => 'sola-dpa-warn'],
 ];
 $dpalabels = [
-    'signed'         => ['text' => 'Signed',        'color' => '#0a7d2c'],
-    'available'      => ['text' => 'Available',     'color' => '#0a7d2c'],
-    'negotiating'    => ['text' => 'Negotiating',   'color' => '#92400e'],
-    'not_offered'    => ['text' => 'Not offered',   'color' => '#b91c1c'],
-    'not_applicable' => ['text' => 'N/A',           'color' => '#6b7280'],
-    'unknown'        => ['text' => 'Unknown',       'color' => '#6b7280'],
+    'signed'         => ['key' => 'admin:vendor_dpa:dpa_signed',         'class' => 'sola-dpa-good'],
+    'available'      => ['key' => 'admin:vendor_dpa:dpa_available',      'class' => 'sola-dpa-good'],
+    'negotiating'    => ['key' => 'admin:vendor_dpa:dpa_negotiating',    'class' => 'sola-dpa-warn'],
+    'not_offered'    => ['key' => 'admin:vendor_dpa:dpa_not_offered',    'class' => 'sola-dpa-bad'],
+    'not_applicable' => ['key' => 'admin:vendor_dpa:dpa_not_applicable', 'class' => 'sola-dpa-neutral'],
+    'unknown'        => ['key' => 'admin:vendor_dpa:dpa_unknown',        'class' => 'sola-dpa-neutral'],
 ];
 
-echo '<table class="generaltable" style="margin-top:12px">';
-echo '<thead><tr>';
-echo '<th>Provider</th><th>Training opt-out</th><th>DPA</th><th>Retention</th><th>Tier ceiling</th><th>Link</th>';
-echo '</tr></thead><tbody>';
+$rows = [];
 foreach (\local_ai_course_assistant\vendor_registry::all() as $row) {
     $too = $labels[$row['training_opt_out']] ?? $labels['unknown'];
     $dpa = $dpalabels[$row['dpa_status']] ?? $dpalabels['unknown'];
-    echo '<tr>';
-    echo '<td><strong>' . s($row['label']) . '</strong><br><code style="font-size:11px;color:#666">'
-        . s($row['provider']) . '</code></td>';
-    echo '<td style="color:' . $too['color'] . ';font-weight:600">' . s($too['text']) . '</td>';
-    echo '<td style="color:' . $dpa['color'] . ';font-weight:600">' . s($dpa['text']) . '</td>';
-    echo '<td>' . s($row['retention']) . '</td>';
-    echo '<td>Tier ' . (int)$row['tier_ok'] . '</td>';
-    if (!empty($row['dpa_link'])) {
-        echo '<td><a href="' . s($row['dpa_link']) . '" target="_blank" rel="noopener">Vendor terms</a></td>';
-    } else {
-        echo '<td style="color:#999">—</td>';
-    }
-    echo '</tr>';
+    $rows[] = [
+        'label'     => $row['label'],
+        'provider'  => $row['provider'],
+        'too_text'  => get_string($too['key'], 'local_ai_course_assistant'),
+        'too_class' => $too['class'],
+        'dpa_text'  => get_string($dpa['key'], 'local_ai_course_assistant'),
+        'dpa_class' => $dpa['class'],
+        'retention' => $row['retention'],
+        'tier'      => get_string('admin:vendor_dpa:tier', 'local_ai_course_assistant', (int) $row['tier_ok']),
+        'link'      => !empty($row['dpa_link']) ? $row['dpa_link'] : '',
+    ];
 }
-echo '</tbody></table>';
 
-echo \html_writer::tag('p',
-    get_string('admin:vendor_dpa:maintenance_note', 'local_ai_course_assistant'),
-    ['style' => 'max-width:820px;margin-top:16px;color:#666;font-size:13px']);
-
+echo $OUTPUT->header();
+echo $OUTPUT->render_from_template('local_ai_course_assistant/vendor_dpa', [
+    'intro'            => get_string('admin:vendor_dpa:intro', 'local_ai_course_assistant'),
+    'maintenance_note' => get_string('admin:vendor_dpa:maintenance_note', 'local_ai_course_assistant'),
+    'rows'             => $rows,
+]);
 echo $OUTPUT->footer();

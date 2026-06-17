@@ -40,12 +40,16 @@ $action   = optional_param('action', '', PARAM_ALPHA);
 $expa     = optional_param('expa', 0, PARAM_INT); // Experiment comparison course A.
 $expb     = optional_param('expb', 0, PARAM_INT); // Experiment comparison course B.
 
+// Per-session UI toggles live in a MODE_SESSION cache rather than the raw
+// $_SESSION superglobal.
+$uistate = \cache::make('local_ai_course_assistant', 'uistate');
+
 // ── Student mode toggle (session-scoped) ───────────────────────────────────
 if ($action === 'togglestudentmode' && confirm_sesskey()) {
-    if (!empty($_SESSION['sola_student_mode'])) {
-        unset($_SESSION['sola_student_mode']);
+    if ($uistate->get('student_mode')) {
+        $uistate->delete('student_mode');
     } else {
-        $_SESSION['sola_student_mode'] = true;
+        $uistate->set('student_mode', 1);
     }
     redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
         ['courseid' => $courseid, 'range' => $range]));
@@ -53,10 +57,10 @@ if ($action === 'togglestudentmode' && confirm_sesskey()) {
 
 // ── Anonymization toggle (session-scoped) ──────────────────────────────────
 if ($action === 'togglenames' && confirm_sesskey()) {
-    if (!empty($_SESSION['sola_show_real_names'])) {
-        unset($_SESSION['sola_show_real_names']);
+    if ($uistate->get('show_real_names')) {
+        $uistate->delete('show_real_names');
     } else {
-        $_SESSION['sola_show_real_names'] = true;
+        $uistate->set('show_real_names', 1);
         // FERPA/GDPR: log the moment an admin reveals learner identities
         // so we have an audit trail of who viewed learner data and when.
         \local_ai_course_assistant\audit_logger::log(
@@ -69,7 +73,7 @@ if ($action === 'togglenames' && confirm_sesskey()) {
     redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
         ['courseid' => $courseid, 'range' => $range]));
 }
-$show_real_names = !empty($_SESSION['sola_show_real_names']);
+$show_real_names = (bool) $uistate->get('show_real_names');
 
 // Per-course enable/disable + UT toggles moved to courses_admin.php in v4.2.
 // Any legacy POST that lands here is redirected so old bookmarks still work.
@@ -423,7 +427,6 @@ $templatedata = [
     'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
     'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
     'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
-    'radar_cite_url' => (new moodle_url('/local/ai_course_assistant/radar_cite.php'))->out(false),
     'redash_pull_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
         'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
     ]))->out(false),
@@ -449,7 +452,7 @@ $templatedata = [
     'show_real_names' => $show_real_names,
 
     // Student mode.
-    'student_mode' => !empty($_SESSION['sola_student_mode']),
+    'student_mode' => (bool) $uistate->get('student_mode'),
 
     // Learning Radar.
     'meta_ai_sse_url' => (new moodle_url('/local/ai_course_assistant/meta_ai_sse.php'))->out(false),

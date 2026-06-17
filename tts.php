@@ -93,23 +93,19 @@ if (!\local_ai_course_assistant\security::is_safe_provider_url($cfg['endpoint'])
     echo json_encode(['error' => 'TTS endpoint failed SSRF validation']);
     exit;
 }
-$ch = curl_init($cfg['endpoint']);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => $body,
-    CURLOPT_HTTPHEADER     => [
+require_once($CFG->libdir . '/filelib.php'); // For \curl.
+$curl = new \curl();
+$curl->setopt(array_merge([
+    'CURLOPT_RETURNTRANSFER' => true,
+    'CURLOPT_TIMEOUT'        => 30,
+    'CURLOPT_HTTPHEADER'     => [
         'Authorization: Bearer ' . $cfg['apikey'],
         'Content-Type: application/json',
-        'Content-Length: ' . strlen($body),
     ],
-    CURLOPT_TIMEOUT        => 30,
-]);
-// Pin to the validated IP, closing the DNS-rebinding window.
-\local_ai_course_assistant\security::pin_curl_handle($ch, $cfg['endpoint']);
-$response = curl_exec($ch);
-$httpcode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+    // Pin to the validated IP, closing the DNS-rebinding window.
+], \local_ai_course_assistant\security::resolve_pin_options($cfg['endpoint'])));
+$response = $curl->post($cfg['endpoint'], $body);
+$httpcode = (int) ($curl->get_info()['http_code'] ?? 0);
 
 if ($httpcode !== 200) {
     http_response_code(502);

@@ -142,60 +142,6 @@ $courses = $DB->get_records_sql(
 echo $OUTPUT->header();
 ?>
 
-<style>
-.aica-ut-admin { max-width: 800px; margin: 0 auto; }
-.aica-ut-card {
-    border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px;
-    background: #fff; padding: 16px;
-}
-.aica-ut-card.dragging { opacity: 0.4; }
-.aica-ut-header {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-}
-.aica-ut-header .aica-ut-num {
-    width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 13px; color: #475569; flex-shrink: 0;
-}
-.aica-ut-header .aica-ut-type {
-    font-size: 12px; color: #94a3b8; background: #f1f5f9; padding: 2px 8px;
-    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.aica-ut-actions { margin-left: auto; display: flex; gap: 6px; }
-.aica-ut-actions button {
-    border: none; background: none; cursor: pointer; padding: 4px 6px;
-    color: #94a3b8; font-size: 16px; border-radius: 4px;
-}
-.aica-ut-actions button:hover { background: #f1f5f9; color: #475569; }
-.aica-ut-actions button.aica-ut-delete:hover { color: #dc3545; }
-.aica-ut-field { margin-bottom: 10px; }
-.aica-ut-field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-.aica-ut-field input, .aica-ut-field textarea, .aica-ut-field select {
-    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
-    font-size: 14px; font-family: inherit;
-}
-.aica-ut-field textarea { min-height: 60px; resize: vertical; }
-.aica-ut-rating-fields { display: flex; gap: 10px; flex-wrap: wrap; }
-.aica-ut-rating-fields .aica-ut-field { flex: 1; min-width: 120px; }
-.aica-ut-opt-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-.aica-ut-opt-row input { flex: 1; }
-.aica-ut-opt-row button { border: none; background: none; cursor: pointer; color: #dc3545; font-size: 18px; padding: 2px 6px; }
-.aica-ut-add-opt {
-    border: 1px dashed #d1d5db; background: #f8fafc; padding: 6px 12px;
-    border-radius: 6px; cursor: pointer; font-size: 13px; color: #64748b; margin-top: 4px;
-}
-.aica-ut-add-opt:hover { background: #e2e8f0; }
-.aica-ut-add-task {
-    border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px;
-    text-align: center; cursor: pointer; color: #64748b; font-size: 14px;
-    margin-bottom: 16px; transition: all 0.15s;
-}
-.aica-ut-add-task:hover { border-color: #94a3b8; background: #f8fafc; }
-.aica-ut-inherited-badge {
-    display: inline-block; background: #fef3c7; color: #92400e; padding: 4px 10px;
-    border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px;
-}
-</style>
 
 <div class="aica-ut-admin">
 

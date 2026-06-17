@@ -189,10 +189,21 @@ class demo_seeder {
         [$firstnames, $lastnames, $topics, $assistantreplies, $providers, $interactiontypes] =
             self::seeder_pools();
 
+        // Preload any already-seeded demo users in a single query instead of
+        // one get_record() per iteration (avoids an N+1 in the create loop).
+        $wantedusernames = [];
+        for ($i = 1; $i <= $numusers; $i++) {
+            $wantedusernames[] = 'demo_student_' . str_pad((string) $i, 3, '0', STR_PAD_LEFT);
+        }
+        $existingusers = [];
+        foreach ($DB->get_records_list('user', 'username', $wantedusernames, '', 'id, username') as $rec) {
+            $existingusers[$rec->username] = $rec;
+        }
+
         $userids = [];
         for ($i = 1; $i <= $numusers; $i++) {
             $username = 'demo_student_' . str_pad((string) $i, 3, '0', STR_PAD_LEFT);
-            $existing = $DB->get_record('user', ['username' => $username]);
+            $existing = $existingusers[$username] ?? null;
             if ($existing) {
                 $userids[] = (int) $existing->id;
                 continue;

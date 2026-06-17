@@ -26,7 +26,7 @@
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define([], function() {
+define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
 
     var root, cfg;
     var providers = [];
@@ -60,7 +60,6 @@ define([], function() {
             sseUrl: root.dataset.sseUrl,
             exportUrl: root.dataset.exportUrl,
             scheduleUrl: root.dataset.scheduleUrl,
-            citeUrl: root.dataset.citeUrl,
             redashUrl: root.dataset.redashUrl,
             hasRedash: root.dataset.hasRedash === '1',
             sesskey: root.dataset.sesskey,
@@ -425,20 +424,29 @@ define([], function() {
         pop.style.top = (window.scrollY + rect.bottom + 4) + 'px';
         pop.style.display = 'block';
 
-        var url = cfg.citeUrl + '?id=' + encodeURIComponent(id) + '&sesskey=' + encodeURIComponent(cfg.sesskey);
-        fetch(url, { credentials: 'same-origin' }).then(function(r) { return r.json(); }).then(function(j) {
+        Ajax.call([{
+            methodname: 'local_ai_course_assistant_get_radar_citation',
+            args: { id: parseInt(id, 10) }
+        }])[0].then(function(j) {
             if (!j.ok) {
                 pop.innerHTML = '<div class="text-muted">Citation not found.</div>';
                 return;
             }
             var msg = j.message;
             if (msg && msg.length > 800) { msg = msg.substring(0, 800) + '… (truncated)'; }
-            pop.innerHTML = '<div style="margin-bottom:4px"><strong>' + escapeHtml(j.who) + '</strong> '
-                + '<span class="text-muted">— ' + escapeHtml(j.course) + ' · ' + escapeHtml(j.date) + '</span></div>'
-                + '<div style="white-space:pre-wrap">' + escapeHtml(msg) + '</div>'
-                + '<div class="text-end mt-2"><button type="button" class="btn btn-sm btn-link p-0" id="radar-cite-close">Close</button></div>';
-            document.getElementById('radar-cite-close').addEventListener('click', function() {
-                pop.style.display = 'none';
+            // Render the popover from a Mustache template (auto-escaped) instead
+            // of building an innerHTML string (CONTRIB-10574 #94).
+            Templates.render('local_ai_course_assistant/radar_citation', {
+                who: j.who, course: j.course, date: j.date, message: msg
+            }).then(function(html, jsout) {
+                Templates.replaceNodeContents(pop, html, jsout);
+                var closeBtn = pop.querySelector('[data-action="radar-cite-close"]');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() { pop.style.display = 'none'; });
+                }
+                return null;
+            }).catch(function() {
+                pop.innerHTML = '<div class="text-muted">Could not load citation.</div>';
             });
         }).catch(function() {
             pop.innerHTML = '<div class="text-muted">Could not load citation.</div>';

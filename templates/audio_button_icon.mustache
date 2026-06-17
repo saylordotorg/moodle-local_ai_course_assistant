@@ -1,0 +1,39 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/audio_button_icon
+
+    SVG glyph for the inline message audio button. Replaces innerHTML
+    string-building in amd/src/audio_player.js (CONTRIB-10574 #94).
+
+    Context variables required for this template:
+    * playing - boolean, true to show the pause glyph, false for the play glyph
+
+    Example context (json):
+    { "playing": false }
+}}
+<svg class="local-ai-course-assistant__audio-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+{{#playing}}
+    <rect x="4" y="2" width="3" height="12" fill="currentColor"/>
+    <rect x="9" y="2" width="3" height="12" fill="currentColor"/>
+{{/playing}}
+{{^playing}}
+    <path d="M8 2l-4 4H1v4h3l4 4V2z"/>
+    <path d="M11.5 8c0-1.1-.9-2-2-2v4c1.1 0 2-.9 2-2z"/>
+    <path d="M13 8c0-2.2-1.8-4-4-4v2c1.1 0 2 .9 2 2s-.9 2-2 2v2c2.2 0 4-1.8 4-4z"/>
+{{/playing}}
+</svg>

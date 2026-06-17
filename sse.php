@@ -48,7 +48,7 @@ use local_ai_course_assistant\attachment_manager;
  * @param string $response
  * @return string Cleaned response.
  */
-function filter_response_safety(string $response): string {
+function local_ai_course_assistant_filter_response_safety(string $response): string {
     // Phrases that indicate the LLM is leaking its system prompt.
     $leakpatterns = [
         '/## Security Rules \(non-negotiable\)/i',
@@ -201,7 +201,7 @@ ob_implicit_flush(true);
  *
  * @param array $data Data to encode as JSON.
  */
-function sse_send(array $data): void {
+function local_ai_course_assistant_sse_send(array $data): void {
     echo 'data: ' . json_encode($data) . "\n\n";
     if (ob_get_level() > 0) {
         ob_flush();
@@ -214,7 +214,7 @@ try {
 
     // Check plugin is enabled.
     if (!get_config('local_ai_course_assistant', 'enabled')) {
-        sse_send(['error' => get_string('chat:error_notconfigured', 'local_ai_course_assistant')]);
+        local_ai_course_assistant_sse_send(['error' => get_string('chat:error_notconfigured', 'local_ai_course_assistant')]);
         die();
     }
 
@@ -232,8 +232,8 @@ try {
         $remaining = (int) $conv->offtopic_locked_until - time();
         $remainingmins = ceil($remaining / 60);
         $lockoutmsg = get_string('chat:offtopic_locked', 'local_ai_course_assistant', $remainingmins);
-        sse_send(['token' => $lockoutmsg]);
-        sse_send(['done' => true, 'locked' => true, 'locked_until' => (int) $conv->offtopic_locked_until]);
+        local_ai_course_assistant_sse_send(['token' => $lockoutmsg]);
+        local_ai_course_assistant_sse_send(['done' => true, 'locked' => true, 'locked_until' => (int) $conv->offtopic_locked_until]);
         die();
     }
 
@@ -527,7 +527,7 @@ try {
     // than a silent drop or a provider-side 400.
     if ($attachmentpayload !== null
         && !attachment_manager::provider_supports_images((string) $effectiveprovidername)) {
-        sse_send(['error' => get_string('attachment:error_provider_no_images', 'local_ai_course_assistant')]);
+        local_ai_course_assistant_sse_send(['error' => get_string('attachment:error_provider_no_images', 'local_ai_course_assistant')]);
         die();
     }
 
@@ -617,7 +617,7 @@ try {
     if ($attachmentmeta !== null) {
         $metaevent['attachment'] = $attachmentmeta;
     }
-    sse_send($metaevent);
+    local_ai_course_assistant_sse_send($metaevent);
 
     // v5.0.0 patch 3: lightweight per-turn metrics for the admin analytics
     // surface. Always-on (no PII written, just per-section sizes) unless
@@ -707,7 +707,7 @@ try {
         // separately; the live stream should never show them as raw text.
         $emit = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $emit) ?? $emit;
         if ($emit !== '') {
-            sse_send(['token' => $emit]);
+            local_ai_course_assistant_sse_send(['token' => $emit]);
         }
     };
     $streamflush = function () use (&$carry) {
@@ -715,7 +715,7 @@ try {
         $tail = str_replace(['[OFF_TOPIC]', '[NEEDS_ESCALATION]'], '', $carry);
         $tail = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $tail) ?? $tail;
         if ($tail !== '') {
-            sse_send(['token' => $tail]);
+            local_ai_course_assistant_sse_send(['token' => $tail]);
         }
         $carry = '';
     };
@@ -770,7 +770,7 @@ try {
 
     // Output safety filter: scrub leaked system prompt fragments, PII
     // patterns, and credentials from the response before saving/sending.
-    $cleanresponse = filter_response_safety($cleanresponse);
+    $cleanresponse = local_ai_course_assistant_filter_response_safety($cleanresponse);
 
     // v4.8.0: runtime validator pipeline. Off by default; admin opts in
     // via `validators_runtime_mode` (annotate / block). On fail, either
@@ -842,8 +842,8 @@ try {
                 $DB->set_field('local_ai_course_assistant_convs', 'offtopic_locked_until', $lockeduntil, ['id' => $conv->id]);
 
                 $lockoutmsg = get_string('chat:offtopic_ended', 'local_ai_course_assistant', $lockoutminutes);
-                sse_send(['token' => "\n\n" . $lockoutmsg]);
-                sse_send(['done' => true, 'locked' => true, 'locked_until' => $lockeduntil]);
+                local_ai_course_assistant_sse_send(['token' => "\n\n" . $lockoutmsg]);
+                local_ai_course_assistant_sse_send(['done' => true, 'locked' => true, 'locked_until' => $lockeduntil]);
                 die();
             }
         } else {
@@ -860,7 +860,7 @@ try {
         // name, email, and transcript to the support desk. Without disclosed
         // consent, do not send; tell the learner instead.
         $consentmsg = get_string('chat:escalation_needs_consent', 'local_ai_course_assistant');
-        sse_send(['token' => "\n\n" . $consentmsg]);
+        local_ai_course_assistant_sse_send(['token' => "\n\n" . $consentmsg]);
         conversation_manager::add_message(
             $conv->id, $userid, $courseid, 'assistant', $consentmsg,
             0, '', null, null, null, $interactiontype, $pageid ?: null
@@ -872,7 +872,7 @@ try {
 
         if ($ticketref) {
             $escalationmsg = get_string('chat:escalated_to_support', 'local_ai_course_assistant', $ticketref);
-            sse_send(['token' => "\n\n" . $escalationmsg]);
+            local_ai_course_assistant_sse_send(['token' => "\n\n" . $escalationmsg]);
             conversation_manager::add_message(
                 $conv->id, $userid, $courseid, 'assistant', $escalationmsg,
                 0, '', null, null, null, $interactiontype, $pageid ?: null
@@ -881,7 +881,7 @@ try {
     }
 
     // Signal completion (include message ID for client-side thumbs up/down).
-    sse_send(['done' => true, 'messageid' => $assistantmsgid]);
+    local_ai_course_assistant_sse_send(['done' => true, 'messageid' => $assistantmsgid]);
 
     // Check if the student's learning profile needs updating. Runs
     // after the response is sent so it does not add latency. The
@@ -919,7 +919,7 @@ try {
             (int)($courseid ?? 0),
             ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]);
     } catch (\Throwable $ignore) { /* never let audit logging mask the real error */ }
-    sse_send(['error' => $errmsg]);
+    local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
     // Send actual message in debug mode, generic otherwise.
     global $CFG, $USER;
@@ -938,5 +938,5 @@ try {
     $msg = (!empty($CFG->debugdeveloper) || !empty($CFG->debug))
         ? $errmsg
         : get_string('chat:error', 'local_ai_course_assistant');
-    sse_send(['error' => $msg]);
+    local_ai_course_assistant_sse_send(['error' => $msg]);
 }

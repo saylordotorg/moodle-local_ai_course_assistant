@@ -33,7 +33,12 @@ class dismiss_intro extends external_api {
     public static function execute(): array {
         global $USER;
 
-        self::validate_context(\context_system::instance());
+        // This only ever writes the calling user's own preference, so validate
+        // and authorise against that user's context. moodle/user:editownprofile
+        // is held by authenticated users on their own context but not by guests.
+        $context = \context_user::instance($USER->id);
+        self::validate_context($context);
+        require_capability('moodle/user:editownprofile', $context);
 
         set_user_preference('local_ai_course_assistant_intro_dismissed', 1);
 

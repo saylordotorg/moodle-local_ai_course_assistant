@@ -142,16 +142,10 @@ class file_extractor {
             return $configured;
         }
 
-        // `which` lookup.
-        $which = @shell_exec('command -v pdftotext 2>/dev/null');
-        if (is_string($which)) {
-            $which = trim($which);
-            if ($which !== '' && is_executable($which)) {
-                return $which;
-            }
-        }
-
-        // Common install paths.
+        // Allowlist of common absolute install paths. We deliberately do NOT
+        // shell out (e.g. `command -v`) to discover the binary: resolving only
+        // against a fixed list of absolute paths avoids any reliance on the
+        // shell PATH and keeps the executable location predictable.
         $candidates = [
             '/usr/bin/pdftotext',
             '/usr/local/bin/pdftotext',
@@ -185,8 +179,6 @@ class file_extractor {
      * @return string Extracted plain text, or empty string on failure.
      */
     private static function extract_pdf(\stored_file $file): string {
-        global $CFG;
-
         $binary = self::resolve_pdftotext_path();
 
         // v4.8.0: pure-PHP fallback when pdftotext is unavailable. Handles
@@ -211,19 +203,18 @@ class file_extractor {
             return '';
         }
 
-        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-        if (!is_dir($tempdir)) {
-            @mkdir($tempdir, 0777, true);
-        }
-        $tmppath = tempnam($tempdir, 'sola_pdf_');
-        if ($tmppath === false) {
-            return '';
-        }
+        // Request-scoped temp file via the Moodle File API. make_request_directory()
+        // returns a unique, non-world-writable directory that Moodle removes at the
+        // end of the request, replacing the manual mkdir(0777)/tempnam dance.
+        $tmppath = make_request_directory() . '/source.pdf';
 
         try {
             $file->copy_content_to($tmppath);
 
-            $cmd = escapeshellcmd($binary) . ' -layout -q ' . escapeshellarg($tmppath) . ' -';
+            // Array-form proc_open passes each argument straight to the binary
+            // without invoking a shell, so no shell-metacharacter escaping is
+            // needed and the executable path cannot be reinterpreted.
+            $cmd = [$binary, '-layout', '-q', $tmppath, '-'];
             $descriptor = [
                 0 => ['pipe', 'r'],
                 1 => ['pipe', 'w'],
@@ -413,14 +404,9 @@ class file_extractor {
             return '';
         }
 
-        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-        if (!is_dir($tempdir)) {
-            @mkdir($tempdir, 0777, true);
-        }
-        $tmppath = tempnam($tempdir, 'sola_docx_');
-        if ($tmppath === false) {
-            return '';
-        }
+        // Request-scoped temp file via the Moodle File API (unique, not
+        // world-writable, auto-removed at end of request).
+        $tmppath = make_request_directory() . '/source.docx';
 
         try {
             $file->copy_content_to($tmppath);
@@ -487,14 +473,9 @@ class file_extractor {
             return '';
         }
 
-        $tempdir = isset($CFG->tempdir) ? $CFG->tempdir : sys_get_temp_dir();
-        if (!is_dir($tempdir)) {
-            @mkdir($tempdir, 0777, true);
-        }
-        $tmppath = tempnam($tempdir, 'sola_pptx_');
-        if ($tmppath === false) {
-            return '';
-        }
+        // Request-scoped temp file via the Moodle File API (unique, not
+        // world-writable, auto-removed at end of request).
+        $tmppath = make_request_directory() . '/source.pptx';
 
         try {
             $file->copy_content_to($tmppath);
