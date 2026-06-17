@@ -72,15 +72,19 @@ class page_helpers {
         // Site admins see every course (enrol_get_users_courses excludes
         // courses the user is not enrolled in, but admins should see all).
         if (is_siteadmin($USER) && empty($eligible)) {
-            $allcourses = $DB->get_records('course',
+            // Avoid loading the entire course table into memory on very large
+            // sites: stream with a recordset and cap the picker list.
+            $maxcourses = 500;
+            $rs = $DB->get_recordset('course',
                 ['visible' => 1], 'fullname',
-                'id, fullname, shortname, visible');
-            foreach ($allcourses as $c) {
+                'id, fullname, shortname, visible', 0, $maxcourses);
+            foreach ($rs as $c) {
                 if ((int) $c->id === SITEID) {
                     continue;
                 }
                 $eligible[] = $c;
             }
+            $rs->close();
         }
 
         echo $OUTPUT->header();

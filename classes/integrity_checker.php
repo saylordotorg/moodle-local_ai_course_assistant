@@ -175,7 +175,7 @@ class integrity_checker {
         foreach ($files as $file) {
             $output = [];
             $retval = 0;
-            exec($phpbin . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
+            exec(escapeshellarg($phpbin) . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
             if ($retval !== 0) {
                 $relpath = str_replace($dir . '/', '', $file);
                 $errors[] = $relpath . ': ' . implode(' ', $output);
@@ -256,7 +256,7 @@ class integrity_checker {
             // Use php -l to check syntax without actually including the file.
             $output = [];
             $retval = 0;
-            exec($phpbin . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
+            exec(escapeshellarg($phpbin) . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $retval);
             if ($retval !== 0) {
                 $errors[] = $langdir;
             }

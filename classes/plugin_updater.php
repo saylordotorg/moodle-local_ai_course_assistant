@@ -127,10 +127,8 @@ class plugin_updater {
             return '';
         }
 
-        $tempdir = $CFG->tempdir . '/sola_update';
-        if (!is_dir($tempdir)) {
-            mkdir($tempdir, 0755, true);
-        }
+        // Moodle File API: creates $CFG->tempdir/sola_update with safe perms.
+        $tempdir = make_temp_directory('sola_update');
         $zippath = $tempdir . '/sola_release.zip';
 
         $token = get_config('local_ai_course_assistant', 'github_token');
