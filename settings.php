@@ -1724,6 +1724,17 @@ if ($hassiteconfig) {
         ]
     ));
 
+    // Direct link to the speech rubric editor (Soapbox scores against the
+    // speech rubric; the editor also loads the General / ESL level presets).
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/soapbox_rubric_link',
+        'Soapbox speech rubric',
+        'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, '
+        . 'ESL intermediate, ESL advanced). '
+        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
+        . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
+    ));
+
     // v3.9.17: mastery tracking tunables. Per-course enable toggles live
     // on the per-course Objectives admin page; these are the site-wide
     // knobs that govern mastery math and the classifier behavior.
