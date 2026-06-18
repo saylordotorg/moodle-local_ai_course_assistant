@@ -71,7 +71,7 @@ define([], function() {
         mic:                    'Speak your question',
         send:                   'Send',
         footer_usertesting:     'Usability Testing',
-        footer_feedback:        'Feedback',
+        footer_feedback:        'Send feedback',
     };
 
     // Per-language overrides. Missing keys fall back to EN.

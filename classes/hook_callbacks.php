@@ -754,10 +754,14 @@ class hook_callbacks {
         if ($footercoursesurl === '') {
             $footercoursestext = '';
         }
-        // Feedback label/intro default to empty (the translated "Feedback" label
-        // and the intro-less panel) until an admin sets them.
+        // Feedback label defaults to empty, so the translated "Send feedback"
+        // label applies; an admin value overrides it. The panel intro ships with
+        // a default (false = never saved); '' means an admin cleared it.
         $feedbacklabel = trim((string) get_config('local_ai_course_assistant', 'feedback_link_label'));
-        $feedbackpanelintro = trim((string) get_config('local_ai_course_assistant', 'feedback_panel_intro'));
+        $introcfg = get_config('local_ai_course_assistant', 'feedback_panel_intro');
+        $feedbackpanelintro = $introcfg === false
+            ? 'Your feedback helps us improve the assistant and goes to your site administrators.'
+            : trim((string) $introcfg);
 
         // Render template.
         $templatedata = [

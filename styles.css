@@ -1125,7 +1125,8 @@ a.aica-history-panel__source:hover {
     background: none;
     border: none;
     color: #94a3b8;
-    font-size: 0.8125rem;
+    /* Matches the courses link below it (.footer-courses-link). */
+    font-size: 0.75rem;
     cursor: pointer;
     padding: 2px 8px;
     display: inline-flex;

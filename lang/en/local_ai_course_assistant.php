@@ -1079,7 +1079,7 @@ $string['chat:llm_model_select']        = 'Select LLM model';
 
 // Footer links.
 $string['chat:footer_usertesting']      = 'Usability Testing';
-$string['chat:footer_feedback']         = 'Feedback';
+$string['chat:footer_feedback']         = 'Send feedback';
 
 // Voice panel title (uses {$a} for assistant display name).
 $string['chat:voice_panel_title']       = 'Talk with {$a}';

@@ -1643,9 +1643,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/feedback_panel_intro',
         'Feedback panel intro',
-        'Optional intro line shown at the top of the feedback panel, e.g. clarifying that feedback goes '
-        . 'to your site administrators. Leave blank for no intro line.',
-        '',
+        'Intro line shown at the top of the feedback panel. Clarifies where feedback goes. '
+        . 'Leave blank for no intro line.',
+        'Your feedback helps us improve the assistant and goes to your site administrators.',
         PARAM_TEXT
     ));
 
