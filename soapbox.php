@@ -159,6 +159,10 @@ echo $OUTPUT->header();
         browser_note: <?php echo json_encode(get_string('soapbox:browser_note', 'local_ai_course_assistant')); ?>,
         server_note: <?php echo json_encode(get_string('soapbox:server_note', 'local_ai_course_assistant')); ?>,
         error: <?php echo json_encode(get_string('soapbox:error', 'local_ai_course_assistant')); ?>,
+        err_provider: <?php echo json_encode(get_string('soapbox:err_provider', 'local_ai_course_assistant')); ?>,
+        err_parse: <?php echo json_encode(get_string('soapbox:err_parse', 'local_ai_course_assistant')); ?>,
+        err_disabled: <?php echo json_encode(get_string('soapbox:err_disabled', 'local_ai_course_assistant')); ?>,
+        err_transcribe: <?php echo json_encode(get_string('soapbox:err_transcribe', 'local_ai_course_assistant')); ?>,
         result_heading: <?php echo json_encode(get_string('soapbox:result_heading', 'local_ai_course_assistant')); ?>,
         col_criterion: <?php echo json_encode(get_string('soapbox:col_criterion', 'local_ai_course_assistant')); ?>,
         col_score: <?php echo json_encode(get_string('soapbox:col_score', 'local_ai_course_assistant')); ?>,
@@ -169,6 +173,15 @@ echo $OUTPUT->header();
     var esc = function(s) {
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    };
+    // Map a server status code to a friendly learner-facing message. Unknown
+    // codes fall back to the generic error with the raw code kept for diagnosis.
+    var errMsg = function(code) {
+        var map = {
+            too_short: STR.too_short, provider_error: STR.err_provider,
+            parse_error: STR.err_parse, disabled: STR.err_disabled
+        };
+        return map[code] || (STR.error + ' (' + code + ')');
     };
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (mode === 'browser') { modeNote.textContent = STR.browser_note; } else { modeNote.textContent = STR.server_note; }
@@ -205,8 +218,8 @@ echo $OUTPUT->header();
             var res = resp && resp[0] && resp[0].data;
             resultEl.style.display = 'block';
             if (!res || !res.success) {
-                resultEl.innerHTML = '<div class="alert alert-warning">' + esc(STR.error) +
-                    ' <code>' + esc(res && res.message ? res.message : 'unknown') + '</code></div>';
+                resultEl.innerHTML = '<div class="alert alert-warning">' +
+                    esc(errMsg(res && res.message ? res.message : 'unknown')) + '</div>';
                 return;
             }
             var html = '<div class="card"><div class="card-body"><h3>' + esc(STR.result_heading) + '</h3>';
@@ -260,8 +273,9 @@ echo $OUTPUT->header();
                         if (!o.ok || !o.j || !o.j.text) {
                             recordBtn.disabled = false; setBusy('');
                             resultEl.style.display = 'block';
-                            resultEl.innerHTML = '<div class="alert alert-warning">' + esc(STR.error) +
-                                ' <code>' + esc(o.j && o.j.error ? o.j.error : 'transcription') + '</code></div>';
+                            var raw = o.j && o.j.error ? o.j.error : 'transcription';
+                            resultEl.innerHTML = '<div class="alert alert-warning">' + esc(STR.err_transcribe) +
+                                ' <code>' + esc(raw) + '</code></div>';
                             return;
                         }
                         finishWithTranscript(o.j.text, durationSec);
