@@ -69,6 +69,16 @@ define([], function() {
     var assistantTranscript = '';
     /** @type {number} How many chars of assistantTranscript have been emitted to display */
     var transcriptEmitted = 0;
+    /** @type {boolean} True between session start and the opening greeting's
+     * response.done. While true the mic is gated (micHot=false) so ambient noise
+     * or speaker echo cannot trigger an unprompted response. */
+    var awaitingGreeting = false;
+    /** @type {boolean} Whether captured mic audio is streamed to the server yet.
+     * Held false until the opening greeting completes. */
+    var micHot = false;
+    /** @type {number|null} Safety timer that force-opens the mic if the greeting
+     * response.done never arrives. */
+    var greetingFallbackTimer = null;
     /** @type {HTMLElement|null} Overlay root for CSS custom property */
     var overlayRoot = null;
     /** @type {number|null} Animation frame ID */
@@ -91,6 +101,36 @@ define([], function() {
     var SESSION_CAP_MS = 15 * 60 * 1000;
     /** Warning fires 1 minute before cap */
     var SESSION_WARN_MS = SESSION_CAP_MS - 60 * 1000;
+
+    /** Control tags that may ride along the text channel but must never display. */
+    var TRANSCRIPT_TAGS = ['[SOLA_NEXT]', '[SOURCE'];
+
+    /**
+     * Index up to which an assistant transcript is safe to show: everything
+     * before a SOLA_NEXT / SOURCE control tag, while also holding back a trailing
+     * partial that could be the start of one. Without the holdback a bare "["
+     * flashes into the transcript in the delta before "[SOLA_NEXT]" completes.
+     * @param {string} text Accumulated transcript
+     * @returns {number} Safe end index for slicing
+     */
+    var safeTranscriptEnd = function(text) {
+        var end = text.length;
+        // Cut at a tag that has clearly started.
+        ['[SOLA_', '[SOURCE'].forEach(function(t) {
+            var i = text.indexOf(t);
+            if (i !== -1 && i < end) { end = i; }
+        });
+        // Hold back a trailing "[" that could be the beginning of a control tag.
+        var lastBracket = text.lastIndexOf('[', end - 1);
+        if (lastBracket !== -1 && lastBracket < end) {
+            var tail = text.slice(lastBracket, end).toUpperCase();
+            var couldBeTag = TRANSCRIPT_TAGS.some(function(tag) {
+                return tag.length > tail.length && tag.slice(0, tail.length) === tail;
+            });
+            if (couldBeTag) { end = lastBracket; }
+        }
+        return end;
+    };
 
     /**
      * Set state and notify callback.
@@ -318,6 +358,9 @@ define([], function() {
 
             scriptProcessor.onaudioprocess = function(e) {
                 if (!ws || ws.readyState !== WebSocket.OPEN) { return; }
+                // Gate: stay silent until the opening greeting completes so the
+                // greeting is not interrupted and no startup noise is streamed.
+                if (!micHot) { return; }
 
                 var raw    = e.inputBuffer.getChannelData(0);
                 var float32 = resampleTo24k(raw, nativeRate);
@@ -363,15 +406,18 @@ define([], function() {
 
                     if (speechActive) {
                         silenceCount++;
-                        // Send silence frames during the tail of the utterance.
+                        // Send silence frames during the tail of the utterance so the
+                        // server VAD sees the pause and closes the turn.
                         ws.send(JSON.stringify({type: 'input_audio_buffer.append', audio: b64}));
                         if (silenceCount >= SILENCE_FRAMES) {
                             speechActive = false;
                             silenceCount = 0;
-                            // Commit the buffered audio and ask the model to respond.
-                            ws.send(JSON.stringify({type: 'input_audio_buffer.commit'}));
-                            responseActive = true;
-                            ws.send(JSON.stringify({type: 'response.create'}));
+                            // Turn-taking is owned by server VAD (turn_detection:
+                            // server_vad, create_response:true): it auto-commits the
+                            // buffer and creates the response on end-of-speech. The
+                            // client must NOT also commit/create here — a second commit
+                            // races the server's and fails with "buffer too small"
+                            // (0.00ms) once the server has already drained the buffer.
                         }
                     }
                 }
@@ -402,7 +448,10 @@ define([], function() {
 
         switch (msg.type) {
             case 'session.created':
-                // Session is live — clear connection timeout and start mic.
+                // Session is live — clear connection timeout and bring the mic
+                // online. Capture starts but stays gated (micHot=false) until the
+                // opening greeting finishes, so the greeting plays into silence
+                // and no ambient noise triggers an unprompted response.
                 if (connectionTimeout) { clearTimeout(connectionTimeout); connectionTimeout = null; }
                 sessionStartMs = Date.now();
                 setState('idle');
@@ -410,10 +459,30 @@ define([], function() {
                 break;
 
             case 'session.updated':
-                // Session config confirmed. response.create was already queued in the open
-                // handler (immediately after session.update), so no action needed here —
-                // sending it again would trigger a second greeting.
+                // Session config is confirmed. Send the one controlled greeting:
+                // a short opener that asks how we can help, then stops. The mic
+                // stays gated until this greeting's response.done so turn-taking
+                // (server VAD) only kicks in after the learner has been greeted.
                 setState('idle');
+                if (!awaitingGreeting && !micHot) {
+                    awaitingGreeting = true;
+                    responseActive = true;
+                    ws.send(JSON.stringify({
+                        type: 'response.create',
+                        response: {
+                            instructions: 'Greet the learner in one short, friendly sentence and ask ' +
+                                'how you can help today. Then stop and wait for their reply. Do not ' +
+                                'explain the course, list topics, or volunteer information until asked. ' +
+                                'Do not include any brackets, tags, or markers.',
+                        },
+                    }));
+                    // Safety net: if response.done never arrives, open the mic anyway.
+                    greetingFallbackTimer = setTimeout(function() {
+                        greetingFallbackTimer = null;
+                        awaitingGreeting = false;
+                        micHot = true;
+                    }, 8000);
+                }
                 break;
 
             case 'response.output_audio.delta':
@@ -429,18 +498,10 @@ define([], function() {
             case 'response.output_audio_transcript.delta':
                 if (msg.delta) {
                     assistantTranscript += msg.delta;
-                    // Emit new transcript text to the UI.
-                    // Safety: strip any stray [SOLA_NEXT or [SOURCE tags that
-                    // might appear if older instructions are cached.
-                    var cleanEnd = assistantTranscript.length;
-                    var bracketIdx = assistantTranscript.indexOf('[SOLA_');
-                    if (bracketIdx !== -1) {
-                        cleanEnd = bracketIdx;
-                    }
-                    var sourceIdx = assistantTranscript.indexOf('[SOURCE');
-                    if (sourceIdx !== -1 && sourceIdx < cleanEnd) {
-                        cleanEnd = sourceIdx;
-                    }
+                    // Emit new transcript text to the UI, stripping SOLA_NEXT /
+                    // SOURCE control tags and holding back a trailing partial tag so
+                    // a bare "[" never flashes before the full marker arrives.
+                    var cleanEnd = safeTranscriptEnd(assistantTranscript);
                     if (cleanEnd > transcriptEmitted && onTranscriptCb) {
                         onTranscriptCb('assistant', assistantTranscript.slice(transcriptEmitted, cleanEnd));
                     }
@@ -460,6 +521,16 @@ define([], function() {
 
             case 'response.done':
                 responseActive = false;
+                // Opening greeting finished: open the mic for real turn-taking and
+                // skip suggestion chips (there is no conversation to suggest from yet).
+                if (awaitingGreeting) {
+                    awaitingGreeting = false;
+                    micHot = true;
+                    if (greetingFallbackTimer) { clearTimeout(greetingFallbackTimer); greetingFallbackTimer = null; }
+                    assistantTranscript = '';
+                    transcriptEmitted = 0;
+                    break;
+                }
                 // v5.3.5: parse SOLA_NEXT chips out of the assistant transcript.
                 // The audio output naturally skips the brackets/pipes (the
                 // model knows not to speak them), so the marker can ride
@@ -544,6 +615,9 @@ define([], function() {
             ? callbacks.fallbackChips.slice() : null;
         assistantTranscript = '';
         transcriptEmitted = 0;
+        awaitingGreeting = false;
+        micHot = false;
+        if (greetingFallbackTimer) { clearTimeout(greetingFallbackTimer); greetingFallbackTimer = null; }
         overlayRoot     = overlayEl               || null;
         micStreamIn     = micStreamParam          || null;
 
@@ -699,6 +773,9 @@ define([], function() {
         onErrorCb = null;
         responseActive = false;
         fallbackChips = null;
+        awaitingGreeting = false;
+        micHot = false;
+        if (greetingFallbackTimer) { clearTimeout(greetingFallbackTimer); greetingFallbackTimer = null; }
 
         // Stop any playing audio — silence master gain first.
         if (masterGain && audioCtx) {
