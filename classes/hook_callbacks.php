@@ -739,6 +739,26 @@ class hook_callbacks {
         }
         $avataranim = ($avataranim === false || $avataranim === '') ? 1 : (int)(bool)$avataranim;
 
+        // Footer "explore courses" link + customizable feedback text. The courses
+        // link ships with a default; get_config() === false means "never saved"
+        // (use default), while '' means an admin cleared it (hide the link).
+        $coursestextcfg = get_config('local_ai_course_assistant', 'footer_courses_text');
+        $footercoursestext = $coursestextcfg === false
+            ? 'Explore open online courses at saylor.org'
+            : trim((string) $coursestextcfg);
+        $coursesurlcfg = get_config('local_ai_course_assistant', 'footer_courses_url');
+        $footercoursesurl = $coursesurlcfg === false
+            ? 'https://www.saylor.org'
+            : trim((string) $coursesurlcfg);
+        // Hide the link if either piece is missing.
+        if ($footercoursesurl === '') {
+            $footercoursestext = '';
+        }
+        // Feedback label/intro default to empty (the translated "Feedback" label
+        // and the intro-less panel) until an admin sets them.
+        $feedbacklabel = trim((string) get_config('local_ai_course_assistant', 'feedback_link_label'));
+        $feedbackpanelintro = trim((string) get_config('local_ai_course_assistant', 'feedback_panel_intro'));
+
         // Render template.
         $templatedata = [
             'avataranim'         => $avataranim,
@@ -801,6 +821,16 @@ class hook_callbacks {
             'userphone'          => $USER->phone1 ?: '',
             'usertestingenabled'  => self::is_usertesting_enabled($courseid),
             'usertestingexternalurl' => get_config('local_ai_course_assistant', 'usertesting_external_url') ?: '',
+            // Footer links (v6.9.0): customizable "explore courses" link + feedback
+            // label/intro. A config value of false means the setting has never been
+            // saved, so the shipped default applies; an empty string means an admin
+            // deliberately cleared it (hide the courses link).
+            'showfootercourses'  => $footercoursestext !== '',
+            'footercoursestext'  => $footercoursestext,
+            'footercoursesurl'   => $footercoursesurl,
+            'feedbacklabelcustom' => $feedbacklabel !== '',
+            'feedbacklabel'      => $feedbacklabel,
+            'feedbackpanelintro' => $feedbackpanelintro,
             'surveyenabled'      => get_config('local_ai_course_assistant', 'survey_enabled') !== '0' ? '1' : '0',
             'surveytrigger'      => self::config_int_with_default('survey_trigger_messages', 10),
             'completionpct'      => $completionpct,

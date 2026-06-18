@@ -1155,6 +1155,41 @@ a.aica-history-panel__source:hover {
     color: var(--aica-brand-color);
 }
 
+/* Footer "explore courses" link (Variant B: hairline divider above). */
+.local-ai-course-assistant__footer-courses {
+    text-align: center;
+    border-top: 1px solid #f1f5f9;
+    margin: 2px 10px 0;
+    padding: 5px 0 2px;
+}
+
+.local-ai-course-assistant__footer-courses-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.local-ai-course-assistant__footer-courses-link:hover {
+    color: var(--aica-brand-color);
+    text-decoration: underline;
+}
+
+.local-ai-course-assistant__footer-courses-link svg {
+    opacity: 0.85;
+}
+
+/* Optional intro line at the top of the feedback panel. */
+.aica-feedback-intro {
+    margin: 0 0 12px;
+    color: #6b7280;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
 /* Input area */
 .local-ai-course-assistant__input-area {
     padding: 10px 12px 8px;

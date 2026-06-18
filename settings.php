@@ -1606,6 +1606,49 @@ if ($hassiteconfig) {
         . '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
     ));
 
+    // Footer links: an "explore courses" link below the Feedback link, plus
+    // customizable feedback wording.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/footer_links_heading',
+        'Footer Links',
+        'Customize the links shown at the bottom of the assistant: an optional "explore courses" link '
+        . 'below the Feedback link, and the wording of the Feedback link and its panel.'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/footer_courses_text',
+        'Courses link text',
+        'Text for a link shown below the Feedback link. Leave blank to hide the link entirely.',
+        'Explore open online courses at saylor.org',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/footer_courses_url',
+        'Courses link URL',
+        'Destination for the courses link (opens in a new tab). The link is hidden if this is blank.',
+        'https://www.saylor.org',
+        PARAM_URL
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/feedback_link_label',
+        'Feedback link label',
+        'Override the footer Feedback link text, e.g. "Send feedback about SOLA to the IT team". '
+        . 'Leave blank to use the default translated "Feedback" label.',
+        '',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/feedback_panel_intro',
+        'Feedback panel intro',
+        'Optional intro line shown at the top of the feedback panel, e.g. clarifying that feedback goes '
+        . 'to your site administrators. Leave blank for no intro line.',
+        '',
+        PARAM_TEXT
+    ));
+
     // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
     // anti-loneliness default — a global count rarely hits zero, so the
     // indicator actually appears on small courses). Set to 'course' to
