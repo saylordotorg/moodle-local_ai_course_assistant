@@ -1611,10 +1611,8 @@ if ($hassiteconfig) {
         'essay_feedback_enabled'  => 'pedagogy:essay_feedback',
         'soapbox_enabled'         => 'pedagogy:soapbox',
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
-        'crossmastery_enabled'    => 'pedagogy:crossmastery',
-        'mastery_starter_enabled' => 'pedagogy:mastery_starter',
-        'program_path_enabled'    => 'pedagogy:program_path',
-        'learning_path_enabled'   => 'pedagogy:learning_path',
+        // crossmastery / mastery_starter / program_path / learning_path render
+        // in the Mastery tracking section below (they all require mastery).
     ] as $key => $stringkey) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,
@@ -1743,6 +1741,22 @@ if ($hassiteconfig) {
         get_string('settings:mastery_heading', 'local_ai_course_assistant'),
         get_string('settings:mastery_heading_desc', 'local_ai_course_assistant')
     ));
+    // Mastery-dependent feature defaults (moved here from the pedagogy list so the
+    // toggles sit with the mastery knobs they depend on). Each is a site-wide
+    // default; per-course overrides remain authoritative. Default off.
+    foreach ([
+        'crossmastery_enabled'    => 'pedagogy:crossmastery',
+        'mastery_starter_enabled' => 'pedagogy:mastery_starter',
+        'program_path_enabled'    => 'pedagogy:program_path',
+        'learning_path_enabled'   => 'pedagogy:learning_path',
+    ] as $mkey => $mstringkey) {
+        $settings->add(new admin_setting_configcheckbox(
+            'local_ai_course_assistant/' . $mkey,
+            \local_ai_course_assistant\branding::apply(get_string($mstringkey, 'local_ai_course_assistant')),
+            \local_ai_course_assistant\branding::apply(get_string($mstringkey . '_desc', 'local_ai_course_assistant')),
+            0
+        ));
+    }
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_threshold',
         get_string('settings:mastery_threshold', 'local_ai_course_assistant'),
