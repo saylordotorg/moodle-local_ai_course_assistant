@@ -1706,6 +1706,15 @@ if ($hassiteconfig) {
         }
     }
 
+    // Soapbox: spoken-presentation practice. Its own section so the transcription
+    // mode and rubric editor sit together, separate from the pedagogy toggles.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/soapbox_heading',
+        'Soapbox',
+        'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. '
+        . 'Turn Soapbox on per course with the Soapbox pedagogy toggle above.'
+    ));
+
     // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
     // transcribes through the configured Whisper provider (self-hosted free, or
     // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
