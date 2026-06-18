@@ -825,7 +825,7 @@ class hook_callbacks {
             'userphone'          => $USER->phone1 ?: '',
             'usertestingenabled'  => self::is_usertesting_enabled($courseid),
             'usertestingexternalurl' => get_config('local_ai_course_assistant', 'usertesting_external_url') ?: '',
-            // Footer links (v6.9.0): customizable "explore courses" link + feedback
+            // Footer links (v6.8.5): customizable "explore courses" link + feedback
             // label/intro. A config value of false means the setting has never been
             // saved, so the shipped default applies; an empty string means an admin
             // deliberately cleared it (hide the courses link).
