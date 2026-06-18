@@ -1451,6 +1451,42 @@ if ($hassiteconfig) {
         0
     ));
 
+    // Soapbox: spoken-presentation practice. Its own section so the transcription
+    // mode and rubric editor sit together, separate from the pedagogy toggles.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/soapbox_heading',
+        'Soapbox',
+        'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. '
+        . 'Turn Soapbox on per course with the Soapbox pedagogy toggle in the Pedagogy section.'
+    ));
+
+    // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
+    // transcribes through the configured Whisper provider (self-hosted free, or
+    // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
+    // Web Speech API (free, no server, Chrome/Safari only). Server is the default
+    // so transcription quality does not depend on the learner's browser.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/soapbox_stt_mode',
+        get_string('settings:soapbox_stt_mode', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_stt_mode_desc', 'local_ai_course_assistant'),
+        'server',
+        [
+            'server'  => get_string('settings:soapbox_stt_mode_server', 'local_ai_course_assistant'),
+            'browser' => get_string('settings:soapbox_stt_mode_browser', 'local_ai_course_assistant'),
+        ]
+    ));
+
+    // Direct link to the speech rubric editor (Soapbox scores against the
+    // speech rubric; the editor also loads the General / ESL level presets).
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/soapbox_rubric_link',
+        'Soapbox speech rubric',
+        'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, '
+        . 'ESL intermediate, ESL advanced). '
+        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
+        . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
+    ));
+
     // Student Survey.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/survey_heading',
@@ -1705,42 +1741,6 @@ if ($hassiteconfig) {
             }
         }
     }
-
-    // Soapbox: spoken-presentation practice. Its own section so the transcription
-    // mode and rubric editor sit together, separate from the pedagogy toggles.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/soapbox_heading',
-        'Soapbox',
-        'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. '
-        . 'Turn Soapbox on per course with the Soapbox pedagogy toggle above.'
-    ));
-
-    // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
-    // transcribes through the configured Whisper provider (self-hosted free, or
-    // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
-    // Web Speech API (free, no server, Chrome/Safari only). Server is the default
-    // so transcription quality does not depend on the learner's browser.
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/soapbox_stt_mode',
-        get_string('settings:soapbox_stt_mode', 'local_ai_course_assistant'),
-        get_string('settings:soapbox_stt_mode_desc', 'local_ai_course_assistant'),
-        'server',
-        [
-            'server'  => get_string('settings:soapbox_stt_mode_server', 'local_ai_course_assistant'),
-            'browser' => get_string('settings:soapbox_stt_mode_browser', 'local_ai_course_assistant'),
-        ]
-    ));
-
-    // Direct link to the speech rubric editor (Soapbox scores against the
-    // speech rubric; the editor also loads the General / ESL level presets).
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/soapbox_rubric_link',
-        'Soapbox speech rubric',
-        'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, '
-        . 'ESL intermediate, ESL advanced). '
-        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
-        . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
-    ));
 
     // v3.9.17: mastery tracking tunables. Per-course enable toggles live
     // on the per-course Objectives admin page; these are the site-wide
