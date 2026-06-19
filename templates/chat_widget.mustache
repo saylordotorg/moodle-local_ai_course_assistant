@@ -54,6 +54,12 @@
         "avatarfill": "#ffffff",
         "coursesettingsurl": "https://example.invalid/course/settings.php?id=2",
         "analyticsurl": "https://example.invalid/local/ai_course_assistant/analytics.php",
+        "showfootercourses": true,
+        "footercoursestext": "Explore open online courses at saylor.org",
+        "footercoursesurl": "https://www.saylor.org",
+        "feedbacklabelcustom": true,
+        "feedbacklabel": "Send feedback about SOLA to the IT team",
+        "feedbackpanelintro": "Your feedback goes to our team and helps us improve SOLA.",
         "displaymode": "drawer",
         "displayname": "SOLA",
         "shortname_label": "SOLA",
@@ -116,6 +122,8 @@
      data-ttsurl="{{ttsurl}}"
      data-avatar-color="{{avatarcolor}}"
      data-avatar-fill="{{avatarfill}}"
+     data-feedbackintro="{{feedbackpanelintro}}"
+     data-feedbacklabel="{{feedbacklabel}}"
      data-settingsurl="{{coursesettingsurl}}"
      data-analyticsurl="{{analyticsurl}}"
      data-cansiteconfig="{{#cansiteconfig}}1{{/cansiteconfig}}"
@@ -888,8 +896,18 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
                     <path d="M2 20h2c.55 0 1-.45 1-1v-9c0-.55-.45-1-1-1H2v11zm19.83-7.12c.11-.25.17-.52.17-.8V11c0-1.1-.9-2-2-2h-5.5l.92-4.65c.05-.22.02-.46-.08-.66a4.8 4.8 0 0 0-.88-1.22L14 2 7.59 8.41C7.21 8.79 7 9.3 7 9.83v7.84A2.34 2.34 0 0 0 9.34 20h8.11c.7 0 1.36-.37 1.72-.97l2.66-6.15z"/>
                 </svg>
-                {{#str}}chat:footer_feedback, local_ai_course_assistant{{/str}}
+                {{#feedbacklabelcustom}}{{feedbacklabel}}{{/feedbacklabelcustom}}{{^feedbacklabelcustom}}{{#str}}chat:footer_feedback, local_ai_course_assistant{{/str}}{{/feedbacklabelcustom}}
             </button>
+            {{#showfootercourses}}
+            <div class="local-ai-course-assistant__footer-courses">
+                <a class="local-ai-course-assistant__footer-courses-link" href="{{footercoursesurl}}" target="_blank" rel="noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true">
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 13L5 12.27v3.46l7 3.82 7-3.82v-3.46L12 16z"/>
+                    </svg>
+                    {{footercoursestext}}
+                </a>
+            </div>
+            {{/showfootercourses}}
         </div>
 
         <div class="local-ai-course-assistant__bottom-nav"

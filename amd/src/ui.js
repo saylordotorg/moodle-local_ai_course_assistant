@@ -4592,6 +4592,17 @@ define([
         const content = document.createElement('div');
         content.className = 'aica-settings-panel__content';
 
+        // Optional admin-configured intro line (e.g. clarifying where feedback
+        // goes). Sourced from data-feedbackintro on the widget root; omitted when
+        // unset so the panel is unchanged by default.
+        const introText = (root && root.dataset.feedbackintro) ? root.dataset.feedbackintro : '';
+        if (introText) {
+            const introEl = document.createElement('p');
+            introEl.className = 'aica-feedback-intro';
+            introEl.textContent = introText;
+            content.appendChild(introEl);
+        }
+
         // Rating stars
         const ratingSection = document.createElement('div');
         ratingSection.className = 'aica-settings-panel__section';

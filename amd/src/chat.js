@@ -1520,7 +1520,11 @@ define([
 
         // Footer feedback buttons (SVG + text siblings; use text-node to preserve SVG).
         setTextNode($('.local-ai-course-assistant__footer-usertesting-link'), 'footer_usertesting');
-        setTextNode($('.local-ai-course-assistant__footer-feedback-link'), 'footer_feedback');
+        // Only retranslate the feedback label when no admin override is set; a
+        // custom label is rendered server-side and must survive language switches.
+        if (!(root.dataset && root.dataset.feedbacklabel)) {
+            setTextNode($('.local-ai-course-assistant__footer-feedback-link'), 'footer_feedback');
+        }
 
         // Bottom nav tabs.
         setAria($('.local-ai-course-assistant__bottom-nav'), 'mode_nav');

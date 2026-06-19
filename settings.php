@@ -505,87 +505,6 @@ if ($hassiteconfig) {
         PARAM_RAW
     ));
 
-    // v4.9.0: Talking Avatar driver selection + per-provider config.
-    // SOLA ships drivers for D-ID, HeyGen, Tavus (the three most cost-
-    // effective real-time avatar vendors as of 2026-04) and Synthesia
-    // Agents (newest entrant; iframable embed_url). Operators pick one in
-    // the dropdown and fill in just that provider's API key + persona id;
-    // the v4.8.1 placeholder fields below remain readable so an admin
-    // mid-upgrade does not have to re-enter the key. SSRF-checked on
-    // every outbound call.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/talking_avatar_heading',
-        get_string('settings:talking_avatar_heading', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_heading_desc', 'local_ai_course_assistant'))
-    ));
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/talking_avatar_provider',
-        get_string('settings:talking_avatar_provider', 'local_ai_course_assistant'),
-        get_string('settings:talking_avatar_provider_desc', 'local_ai_course_assistant'),
-        '',
-        [
-            ''          => get_string('settings:talking_avatar_provider_none', 'local_ai_course_assistant'),
-            'did'       => get_string('settings:talking_avatar_provider_did', 'local_ai_course_assistant'),
-            'heygen'    => get_string('settings:talking_avatar_provider_heygen', 'local_ai_course_assistant'),
-            'tavus'     => get_string('settings:talking_avatar_provider_tavus', 'local_ai_course_assistant'),
-            'synthesia' => get_string('settings:talking_avatar_provider_synthesia', 'local_ai_course_assistant'),
-        ]
-    ));
-    foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
-        $settings->add(new admin_setting_configpasswordunmask(
-            'local_ai_course_assistant/' . $tap . '_api_key',
-            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant')),
-            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant')),
-            ''
-        ));
-        $settings->add(new admin_setting_configtext(
-            'local_ai_course_assistant/' . $tap . '_persona_id',
-            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_persona_id', 'local_ai_course_assistant')),
-            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_persona_id_desc', 'local_ai_course_assistant')),
-            '',
-            PARAM_TEXT
-        ));
-    }
-    // v4.8.1 fields kept readable as a fallback for upgrades; hidden in
-    // settings UI is unnecessary because the new driver fields are above.
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/talking_avatar_provider_url',
-        get_string('settings:talking_avatar_provider_url', 'local_ai_course_assistant'),
-        get_string('settings:talking_avatar_provider_url_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_URL
-    ));
-    $settings->add(new admin_setting_configpasswordunmask(
-        'local_ai_course_assistant/talking_avatar_provider_api_key',
-        get_string('settings:talking_avatar_provider_api_key', 'local_ai_course_assistant'),
-        get_string('settings:talking_avatar_provider_api_key_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
-    // v4.10.0: avatar rate-card overrides. Mirrors the LLM rate-card
-    // overrides editor; takes a JSON object keyed by provider with a
-    // single per-minute USD rate as the value. Empty = bundled defaults
-    // (D-ID $0.30/min, HeyGen $0.50/min, Tavus $0.30/min, Synthesia $0.40/min).
-    $settings->add(new admin_setting_configtextarea(
-        'local_ai_course_assistant/avatar_rate_card_overrides',
-        get_string('settings:avatar_rate_card_overrides', 'local_ai_course_assistant'),
-        get_string('settings:avatar_rate_card_overrides_desc', 'local_ai_course_assistant'),
-        '',
-        PARAM_RAW
-    ));
-    // v4.10.0: optional per-provider webhook signing secrets. When set, the
-    // talking_avatar_webhook.php endpoint accepts and verifies session-end
-    // payloads from that vendor; webhook rows take precedence over
-    // heartbeat rows. Empty = webhook handler off for that provider.
-    foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
-        $settings->add(new admin_setting_configpasswordunmask(
-            'local_ai_course_assistant/' . $tap . '_webhook_secret',
-            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant')),
-            \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant')),
-            ''
-        ));
-    }
-
     // v3.9.13: xAI Realtime WebSocket proxy settings. When configured,
     // xAI voice routes through services/xai_rt_proxy instead of opening a
     // direct browser connection to api.x.ai with the master key.
@@ -1493,6 +1412,15 @@ if ($hassiteconfig) {
         \local_ai_course_assistant\branding::apply(get_string('settings:stt_selfhosted_heading_desc', 'local_ai_course_assistant'))
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/stt_selfhosted_enabled',
+        'Enable self-hosted transcription',
+        'Use the self-hosted Whisper server below as the speech-to-text path for voice input and Soapbox. '
+        . 'Requires a server URL below. When off, transcription falls back to the hosted (OpenAI Whisper) or '
+        . 'in-browser path even if a URL is set.',
+        1
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/stt_selfhosted_url',
         get_string('settings:stt_selfhosted_url', 'local_ai_course_assistant'),
@@ -1521,6 +1449,42 @@ if ($hassiteconfig) {
         'Enable Voice Tab',
         'Show the Voice tab in the bottom navigation bar. When disabled, students only see Chat and Notes tabs. Voice features (Conversation Practice, Pronunciation Practice) can still be accessed via conversation starters if enabled separately.',
         0
+    ));
+
+    // Soapbox: spoken-presentation practice. Its own section so the transcription
+    // mode and rubric editor sit together, separate from the pedagogy toggles.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/soapbox_heading',
+        'Soapbox',
+        'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. '
+        . 'Turn Soapbox on per course with the Soapbox pedagogy toggle in the Pedagogy section.'
+    ));
+
+    // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
+    // transcribes through the configured Whisper provider (self-hosted free, or
+    // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
+    // Web Speech API (free, no server, Chrome/Safari only). Server is the default
+    // so transcription quality does not depend on the learner's browser.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/soapbox_stt_mode',
+        get_string('settings:soapbox_stt_mode', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_stt_mode_desc', 'local_ai_course_assistant'),
+        'server',
+        [
+            'server'  => get_string('settings:soapbox_stt_mode_server', 'local_ai_course_assistant'),
+            'browser' => get_string('settings:soapbox_stt_mode_browser', 'local_ai_course_assistant'),
+        ]
+    ));
+
+    // Direct link to the speech rubric editor (Soapbox scores against the
+    // speech rubric; the editor also loads the General / ESL level presets).
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/soapbox_rubric_link',
+        'Soapbox speech rubric',
+        'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, '
+        . 'ESL intermediate, ESL advanced). '
+        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
+        . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
     ));
 
     // Student Survey.
@@ -1606,6 +1570,49 @@ if ($hassiteconfig) {
         . '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
     ));
 
+    // Footer links: an "explore courses" link below the Feedback link, plus
+    // customizable feedback wording.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/footer_links_heading',
+        'Footer Links',
+        'Customize the links shown at the bottom of the assistant: an optional "explore courses" link '
+        . 'below the Feedback link, and the wording of the Feedback link and its panel.'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/footer_courses_text',
+        'Courses link text',
+        'Text for a link shown below the Feedback link. Leave blank to hide the link entirely.',
+        'Explore open online courses at saylor.org',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/footer_courses_url',
+        'Courses link URL',
+        'Destination for the courses link (opens in a new tab). The link is hidden if this is blank.',
+        'https://www.saylor.org',
+        PARAM_URL
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/feedback_link_label',
+        'Feedback link label',
+        'Override the footer Feedback link text, e.g. "Send feedback about SOLA to the IT team". '
+        . 'Leave blank to use the default translated "Feedback" label.',
+        '',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/feedback_panel_intro',
+        'Feedback panel intro',
+        'Intro line shown at the top of the feedback panel. Clarifies where feedback goes. '
+        . 'Leave blank for no intro line.',
+        'Your feedback helps us improve the assistant and goes to your site administrators.',
+        PARAM_TEXT
+    ));
+
     // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
     // anti-loneliness default — a global count rarely hits zero, so the
     // indicator actually appears on small courses). Set to 'course' to
@@ -1640,10 +1647,8 @@ if ($hassiteconfig) {
         'essay_feedback_enabled'  => 'pedagogy:essay_feedback',
         'soapbox_enabled'         => 'pedagogy:soapbox',
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
-        'crossmastery_enabled'    => 'pedagogy:crossmastery',
-        'mastery_starter_enabled' => 'pedagogy:mastery_starter',
-        'program_path_enabled'    => 'pedagogy:program_path',
-        'learning_path_enabled'   => 'pedagogy:learning_path',
+        // crossmastery / mastery_starter / program_path / learning_path render
+        // in the Mastery tracking section below (they all require mastery).
     ] as $key => $stringkey) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,
@@ -1651,23 +1656,91 @@ if ($hassiteconfig) {
             \local_ai_course_assistant\branding::apply(get_string($stringkey . '_desc', 'local_ai_course_assistant')),
             0
         ));
-    }
+        // Talking-avatar provider config sits directly under its toggle so the
+        // "configure a provider below" notice points at the fields beneath it.
+        if ($key === 'talking_avatar_enabled') {
+            // v4.9.0: Talking Avatar driver selection + per-provider config.
+            // SOLA ships drivers for D-ID, HeyGen, Tavus (the three most cost-
+            // effective real-time avatar vendors as of 2026-04) and Synthesia
+            // Agents (newest entrant; iframable embed_url). Operators pick one in
+            // the dropdown and fill in just that provider's API key + persona id;
+            // the v4.8.1 placeholder fields below remain readable so an admin
+            // mid-upgrade does not have to re-enter the key. SSRF-checked on
+            // every outbound call.
+            $settings->add(new admin_setting_heading(
+                'local_ai_course_assistant/talking_avatar_heading',
+                get_string('settings:talking_avatar_heading', 'local_ai_course_assistant'),
+                \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_heading_desc', 'local_ai_course_assistant'))
+            ));
+            $settings->add(new admin_setting_configselect(
+                'local_ai_course_assistant/talking_avatar_provider',
+                get_string('settings:talking_avatar_provider', 'local_ai_course_assistant'),
+                get_string('settings:talking_avatar_provider_desc', 'local_ai_course_assistant'),
+                '',
+                [
+                    ''          => get_string('settings:talking_avatar_provider_none', 'local_ai_course_assistant'),
+                    'did'       => get_string('settings:talking_avatar_provider_did', 'local_ai_course_assistant'),
+                    'heygen'    => get_string('settings:talking_avatar_provider_heygen', 'local_ai_course_assistant'),
+                    'tavus'     => get_string('settings:talking_avatar_provider_tavus', 'local_ai_course_assistant'),
+                    'synthesia' => get_string('settings:talking_avatar_provider_synthesia', 'local_ai_course_assistant'),
+                ]
+            ));
+            foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
+                $settings->add(new admin_setting_configpasswordunmask(
+                    'local_ai_course_assistant/' . $tap . '_api_key',
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key', 'local_ai_course_assistant')),
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_api_key_desc', 'local_ai_course_assistant')),
+                    ''
+                ));
+                $settings->add(new admin_setting_configtext(
+                    'local_ai_course_assistant/' . $tap . '_persona_id',
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_persona_id', 'local_ai_course_assistant')),
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_persona_id_desc', 'local_ai_course_assistant')),
+                    '',
+                    PARAM_TEXT
+                ));
+            }
+            // v4.8.1 fields kept readable as a fallback for upgrades; hidden in
+            // settings UI is unnecessary because the new driver fields are above.
+            $settings->add(new admin_setting_configtext(
+                'local_ai_course_assistant/talking_avatar_provider_url',
+                get_string('settings:talking_avatar_provider_url', 'local_ai_course_assistant'),
+                get_string('settings:talking_avatar_provider_url_desc', 'local_ai_course_assistant'),
+                '',
+                PARAM_URL
+            ));
+            $settings->add(new admin_setting_configpasswordunmask(
+                'local_ai_course_assistant/talking_avatar_provider_api_key',
+                get_string('settings:talking_avatar_provider_api_key', 'local_ai_course_assistant'),
+                get_string('settings:talking_avatar_provider_api_key_desc', 'local_ai_course_assistant'),
+                ''
+            ));
 
-    // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
-    // transcribes through the configured Whisper provider (self-hosted free, or
-    // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
-    // Web Speech API (free, no server, Chrome/Safari only). Server is the default
-    // so transcription quality does not depend on the learner's browser.
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/soapbox_stt_mode',
-        get_string('settings:soapbox_stt_mode', 'local_ai_course_assistant'),
-        get_string('settings:soapbox_stt_mode_desc', 'local_ai_course_assistant'),
-        'server',
-        [
-            'server'  => get_string('settings:soapbox_stt_mode_server', 'local_ai_course_assistant'),
-            'browser' => get_string('settings:soapbox_stt_mode_browser', 'local_ai_course_assistant'),
-        ]
-    ));
+            // v4.10.0: avatar rate-card overrides. Mirrors the LLM rate-card
+            // overrides editor; takes a JSON object keyed by provider with a
+            // single per-minute USD rate as the value. Empty = bundled defaults
+            // (D-ID $0.30/min, HeyGen $0.50/min, Tavus $0.30/min, Synthesia $0.40/min).
+            $settings->add(new admin_setting_configtextarea(
+                'local_ai_course_assistant/avatar_rate_card_overrides',
+                get_string('settings:avatar_rate_card_overrides', 'local_ai_course_assistant'),
+                get_string('settings:avatar_rate_card_overrides_desc', 'local_ai_course_assistant'),
+                '',
+                PARAM_RAW
+            ));
+            // v4.10.0: optional per-provider webhook signing secrets. When set, the
+            // talking_avatar_webhook.php endpoint accepts and verifies session-end
+            // payloads from that vendor; webhook rows take precedence over
+            // heartbeat rows. Empty = webhook handler off for that provider.
+            foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
+                $settings->add(new admin_setting_configpasswordunmask(
+                    'local_ai_course_assistant/' . $tap . '_webhook_secret',
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret', 'local_ai_course_assistant')),
+                    \local_ai_course_assistant\branding::apply(get_string('settings:talking_avatar_' . $tap . '_webhook_secret_desc', 'local_ai_course_assistant')),
+                    ''
+                ));
+            }
+        }
+    }
 
     // v3.9.17: mastery tracking tunables. Per-course enable toggles live
     // on the per-course Objectives admin page; these are the site-wide
@@ -1677,6 +1750,22 @@ if ($hassiteconfig) {
         get_string('settings:mastery_heading', 'local_ai_course_assistant'),
         get_string('settings:mastery_heading_desc', 'local_ai_course_assistant')
     ));
+    // Mastery-dependent feature defaults (moved here from the pedagogy list so the
+    // toggles sit with the mastery knobs they depend on). Each is a site-wide
+    // default; per-course overrides remain authoritative. Default off.
+    foreach ([
+        'crossmastery_enabled'    => 'pedagogy:crossmastery',
+        'mastery_starter_enabled' => 'pedagogy:mastery_starter',
+        'program_path_enabled'    => 'pedagogy:program_path',
+        'learning_path_enabled'   => 'pedagogy:learning_path',
+    ] as $mkey => $mstringkey) {
+        $settings->add(new admin_setting_configcheckbox(
+            'local_ai_course_assistant/' . $mkey,
+            \local_ai_course_assistant\branding::apply(get_string($mstringkey, 'local_ai_course_assistant')),
+            \local_ai_course_assistant\branding::apply(get_string($mstringkey . '_desc', 'local_ai_course_assistant')),
+            0
+        ));
+    }
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_threshold',
         get_string('settings:mastery_threshold', 'local_ai_course_assistant'),

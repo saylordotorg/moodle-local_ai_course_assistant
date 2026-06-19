@@ -238,6 +238,12 @@ class voice_registry {
      * @return array|null ['provider','apikey','voice','endpoint','label','model']
      */
     public static function selfhosted_stt_config(): ?array {
+        // Explicit master switch (v6.8.5). Unset is treated as on so existing
+        // URL-configured installs keep working after upgrade; only an explicit
+        // '0' disables the self-hosted path.
+        if ((string) get_config('local_ai_course_assistant', 'stt_selfhosted_enabled') === '0') {
+            return null;
+        }
         $url = trim((string) get_config('local_ai_course_assistant', 'stt_selfhosted_url'));
         if ($url === '') {
             return null;
