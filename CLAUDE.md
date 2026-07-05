@@ -203,6 +203,13 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
 
 ---
 
+## CI and GitHub automation
+
+- **Claude code review triggers on pull requests, not releases.** `.github/workflows/claude-code-review.yml` runs `/code-review` automatically on every PR (opened / synchronize / reopened / ready_for_review); `.github/workflows/claude.yml` runs Claude whenever a comment or issue body contains `@claude`. No tag or release is involved — to get a review, open a PR (or comment `@claude`).
+- **Both workflows need write scope to post their output.** They originally shipped with a read-only `GITHUB_TOKEN` (`pull-requests: read`), so the review job ran and reported success but posted nothing — the job log showed `permission_denials_count` and `No buffered inline comments`. Fixed in **PR #108 (2026-07-03)** by granting `pull-requests: write` + `issues: write` in both files; verified by PR #109. If Claude reviews or `@claude` replies ever stop appearing, check these workflow permissions first.
+
+---
+
 ## Local Development
 
 - **Moodle 4.5** at `~/Sites/moodle/`, moodledata at `~/Sites/moodledata/`
