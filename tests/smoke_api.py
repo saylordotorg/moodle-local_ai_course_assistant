@@ -164,8 +164,16 @@ async def _ws_session_update(apikey):
     subprotocols = ["realtime", f"openai-insecure-api-key.{token}"]
 
     async with websockets.connect(uri, subprotocols=subprotocols, open_timeout=20) as ws:
-        # Expect session.created
+        # Expect session.created. If the very first event is an error (e.g. the
+        # key is out of quota), surface the error body so _is_quota_error() can
+        # classify quota/429 outages as SKIP rather than a hard FAIL — matching
+        # every other test in this suite.
         msg = json.loads(await asyncio.wait_for(ws.recv(), timeout=10))
+        if msg.get("type") == "error":
+            err = msg.get("error", {}) or {}
+            raise AssertionError(
+                "Realtime session failed to open: "
+                f"{err.get('type', '')} {err.get('message') or msg}".strip())
         assert msg.get("type") == "session.created", \
             f"Expected session.created, got: {msg.get('type')}"
 
