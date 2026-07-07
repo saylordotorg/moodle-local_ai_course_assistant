@@ -96,6 +96,24 @@ TXT;
      *                         'section'=>string, 'text'=>string]
      */
     public static function extract_course_modules(int $courseid): array {
+        return self::extract_course_modules_with_skips($courseid)['modules'];
+    }
+
+    /**
+     * Extract text from all supported modules, and also report the ones that
+     * were skipped because they yielded no indexable text.
+     *
+     * The skip list makes the otherwise-silent "no chunk was produced for this
+     * page" outcome visible: a page that is mostly an embedded interactive (text
+     * lives inside an iframe) or that strips to under MIN_CHARS is dropped here
+     * with no chunk and, previously, no trace.
+     *
+     * @param int $courseid
+     * @return array{modules: array[], skipped: array[]} Each skipped entry is
+     *               ['cmid'=>int, 'modtype'=>string, 'title'=>string,
+     *                'chars'=>int, 'reason'=>string ('empty'|'too_short'|'error')].
+     */
+    public static function extract_course_modules_with_skips(int $courseid): array {
         global $DB;
 
         $modinfo = get_fast_modinfo($courseid);
@@ -112,28 +130,37 @@ TXT;
             }
         }
 
+        $supported = [
+            'page', 'book', 'assign', 'forum', 'label', 'glossary', 'quiz',
+            'resource', 'h5p', 'scorm',
+        ];
+
         $results = [];
+        $skipped = [];
 
         foreach ($modinfo->get_cms() as $cm) {
-            if (!$cm->uservisible) {
-                continue;
-            }
-
-            $supported = [
-                'page', 'book', 'assign', 'forum', 'label', 'glossary', 'quiz',
-                'resource', 'h5p', 'scorm',
-            ];
-            if (!in_array($cm->modname, $supported, true)) {
+            if (!$cm->uservisible || !in_array($cm->modname, $supported, true)) {
                 continue;
             }
 
             try {
                 $text = self::extract_module_text($cm->modname, $cm->instance, $courseid, $DB);
             } catch (\Exception $e) {
+                $skipped[] = [
+                    'cmid' => (int) $cm->id, 'modtype' => $cm->modname,
+                    'title' => $cm->name, 'chars' => 0, 'reason' => 'error',
+                ];
                 continue;
             }
 
-            if (empty($text) || strlen($text) < self::MIN_CHARS) {
+            if (!self::is_indexable_text($text)) {
+                $skipped[] = [
+                    'cmid'    => (int) $cm->id,
+                    'modtype' => $cm->modname,
+                    'title'   => $cm->name,
+                    'chars'   => strlen((string) $text),
+                    'reason'  => (trim((string) $text) === '') ? 'empty' : 'too_short',
+                ];
                 continue;
             }
 
@@ -146,7 +173,20 @@ TXT;
             ];
         }
 
-        return $results;
+        return ['modules' => $results, 'skipped' => $skipped];
+    }
+
+    /**
+     * Whether extracted text is substantial enough to index.
+     *
+     * Pure so the too-short / empty skip decision (the reason a page can silently
+     * produce no chunk) is unit-testable in isolation.
+     *
+     * @param string|null $text
+     * @return bool True when the text has at least MIN_CHARS characters.
+     */
+    public static function is_indexable_text(?string $text): bool {
+        return $text !== null && strlen($text) >= self::MIN_CHARS;
     }
 
     /**
@@ -175,7 +215,7 @@ TXT;
             return null;
         }
 
-        if (empty($text) || strlen($text) < self::MIN_CHARS) {
+        if (!self::is_indexable_text($text)) {
             return null;
         }
 

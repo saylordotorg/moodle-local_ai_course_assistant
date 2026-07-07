@@ -58,12 +58,13 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
      *
      * @param {number} courseid
      * @param {string} message
+     * @param {number} [pageid] Current document course-module ID (0 if none); scopes RAG retrieval.
      * @returns {Promise}
      */
-    const sendMessage = function(courseid, message) {
+    const sendMessage = function(courseid, message, pageid) {
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_send_message',
-            args: {courseid: courseid, message: message},
+            args: {courseid: courseid, message: message, pageid: pageid || 0},
         }])[0];
     };
 

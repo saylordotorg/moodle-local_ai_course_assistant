@@ -44,6 +44,12 @@ class send_message extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
             'message' => new external_value(PARAM_RAW, 'User message'),
+            'pageid' => new external_value(
+                PARAM_INT,
+                'Course-module id of the document the learner is on (0 if none); scopes RAG retrieval',
+                VALUE_DEFAULT,
+                0
+            ),
         ]);
     }
 
@@ -52,14 +58,16 @@ class send_message extends external_api {
      *
      * @param int $courseid
      * @param string $message
+     * @param int $pageid Course-module id of the current document (0 if none).
      * @return array
      */
-    public static function execute(int $courseid, string $message): array {
+    public static function execute(int $courseid, string $message, int $pageid = 0): array {
         global $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'message' => $message,
+            'pageid' => $pageid,
         ]);
 
         $context = \context_course::instance($params['courseid']);
@@ -84,7 +92,8 @@ class send_message extends external_api {
                 $rawtopk = get_config('local_ai_course_assistant', 'rag_topk');
                 $topk = ($rawtopk === false || $rawtopk === '') ? 5 : (int) $rawtopk;
                 $ragstart = microtime(true);
-                $retrievedchunks = rag_retriever::retrieve($params['courseid'], $params['message'], $topk);
+                $retrievedchunks = rag_retriever::retrieve(
+                    $params['courseid'], $params['message'], $topk, (int) $params['pageid']);
                 $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
             } catch (\Exception $e) {
                 debugging('RAG retrieval failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
