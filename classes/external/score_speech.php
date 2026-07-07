@@ -50,6 +50,7 @@ class score_speech extends external_api {
             'topic'      => new external_value(PARAM_TEXT, 'Learner-chosen topic', VALUE_DEFAULT, ''),
             'targetsec'  => new external_value(PARAM_INT, 'Target speech length in seconds (0 = none)', VALUE_DEFAULT, 0),
             'durationsec' => new external_value(PARAM_INT, 'Actual recorded duration in seconds', VALUE_DEFAULT, 0),
+            'mode'       => new external_value(PARAM_ALPHA, 'Presentation type: informative | persuasive', VALUE_DEFAULT, 'informative'),
         ]);
     }
 
@@ -63,11 +64,11 @@ class score_speech extends external_api {
      * @return array
      */
     public static function execute(int $courseid, string $transcript, string $name = '',
-            string $topic = '', int $targetsec = 0, int $durationsec = 0): array {
+            string $topic = '', int $targetsec = 0, int $durationsec = 0, string $mode = 'informative'): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid, 'transcript' => $transcript, 'name' => $name,
-            'topic' => $topic, 'targetsec' => $targetsec, 'durationsec' => $durationsec,
+            'topic' => $topic, 'targetsec' => $targetsec, 'durationsec' => $durationsec, 'mode' => $mode,
         ]);
         $courseid = (int) $params['courseid'];
         $context = \context_course::instance($courseid);
@@ -130,6 +131,13 @@ class score_speech extends external_api {
             }
             $contextline .= '.';
         }
+
+        // Informative vs persuasive changes what "good" looks like; the mode hint
+        // tells the coach which skills to weight (clear explanation and accuracy
+        // vs a claim backed by evidence, appeals, and a call to action). Orthogonal
+        // to the ESL level and the rubric criteria.
+        $mode = strtolower((string) $params['mode']);
+        $contextline .= self::mode_hint($mode);
 
         $sysprompt = "You are a supportive public-speaking coach giving formative feedback on a learner's spoken "
             . "presentation. You are reading a speech-to-text transcript, so ignore transcription artefacts "
@@ -203,7 +211,7 @@ class score_speech extends external_api {
         $scoreid = 0;
         try {
             $rubricid = $rubric ? (int) $rubric->id : 0;
-            $meta = ['name' => $name, 'topic' => $topic, 'target' => $targetsec, 'tips' => $tips];
+            $meta = ['name' => $name, 'topic' => $topic, 'target' => $targetsec, 'mode' => $mode, 'tips' => $tips];
             $scoreid = rubric_manager::save_score(
                 $rubricid, (int) $USER->id, $courseid, rubric_manager::TYPE_SPEECH,
                 $criteria, (int) round($sum / max(1, count($criteria))), $overall, $durationsec, $meta
@@ -221,6 +229,33 @@ class score_speech extends external_api {
             'tips'     => $tips,
             'scoreid'  => $scoreid,
         ];
+    }
+
+    /**
+     * Coaching-register overlay for the learner-chosen presentation type.
+     *
+     * Pure so the informative/persuasive prompt shaping is unit-testable. Returns
+     * a leading-space sentence appended to the coach context, or '' for an
+     * unknown mode (falls back to the neutral, level-only coaching).
+     *
+     * @param string $mode 'informative' | 'persuasive' (case-insensitive).
+     * @return string
+     */
+    public static function mode_hint(string $mode): string {
+        switch (strtolower(trim($mode))) {
+            case 'persuasive':
+                return ' This is a PERSUASIVE presentation: the learner is trying to convince the audience. '
+                    . 'Weight your feedback toward a clear position or claim, the strength of evidence and reasoning, '
+                    . 'use of rhetorical appeals (credibility, logic, and emotion), acknowledging counter-arguments, '
+                    . 'and a clear call to action. Reward a well-supported argument over neutral description.';
+            case 'informative':
+                return ' This is an INFORMATIVE presentation: the learner is explaining or teaching. '
+                    . 'Weight your feedback toward clarity of explanation, accuracy, logical organization, coverage '
+                    . 'of the topic, and helping the audience understand. Do not expect a persuasive thesis or a '
+                    . 'call to action.';
+            default:
+                return '';
+        }
     }
 
     /**

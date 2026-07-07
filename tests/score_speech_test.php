@@ -75,4 +75,22 @@ final class score_speech_test extends \advanced_testcase {
             $this->assertArrayHasKey($key, $result);
         }
     }
+
+    public function test_mode_hint_informative_and_persuasive_differ(): void {
+        $inf = score_speech::mode_hint('informative');
+        $per = score_speech::mode_hint('persuasive');
+        $this->assertStringContainsStringIgnoringCase('informative', $inf);
+        $this->assertStringContainsStringIgnoringCase('persuasive', $per);
+        $this->assertStringContainsStringIgnoringCase('call to action', $per);
+        $this->assertNotSame($inf, $per);
+    }
+
+    public function test_mode_hint_is_case_insensitive(): void {
+        $this->assertSame(score_speech::mode_hint('persuasive'), score_speech::mode_hint('Persuasive'));
+    }
+
+    public function test_mode_hint_unknown_returns_empty(): void {
+        $this->assertSame('', score_speech::mode_hint('interpretive-dance'));
+        $this->assertSame('', score_speech::mode_hint(''));
+    }
 }

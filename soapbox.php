@@ -90,6 +90,13 @@ echo $OUTPUT->header();
                 <option value="600">10 min</option>
             </select>
         </div>
+        <div class="form-group mt-2">
+            <label for="sb-mode"><strong><?php echo get_string('soapbox:mode_label', 'local_ai_course_assistant'); ?></strong></label>
+            <select id="sb-mode" class="form-control" style="max-width:280px">
+                <option value="informative"><?php echo get_string('soapbox:mode_informative', 'local_ai_course_assistant'); ?></option>
+                <option value="persuasive"><?php echo get_string('soapbox:mode_persuasive', 'local_ai_course_assistant'); ?></option>
+            </select>
+        </div>
 
         <div class="mt-3 d-flex align-items-center" style="gap:12px;flex-wrap:wrap">
             <button type="button" id="sb-record" class="btn btn-primary">
@@ -207,7 +214,8 @@ echo $OUTPUT->header();
                 name: (document.getElementById('sb-name').value || ''),
                 topic: (document.getElementById('sb-topic').value || ''),
                 targetsec: parseInt(document.getElementById('sb-target').value, 10) || 0,
-                durationsec: durationSec || 0
+                durationsec: durationSec || 0,
+                mode: (document.getElementById('sb-mode').value || 'informative')
             }
         }]);
         fetch(AJAX_URL, { method: 'POST', credentials: 'same-origin',
