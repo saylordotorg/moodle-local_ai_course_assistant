@@ -323,6 +323,11 @@ $string['settings:rag_min_similarity'] = 'Minimum Relevance (cosine)';
 $string['settings:rag_min_similarity_desc'] = 'Drop retrieved chunks whose cosine similarity to the question is below this value, so an off-topic or sparse question injects fewer (or zero) passages instead of always padding to Top-K with weak matches. Range 0 to 1; 0 disables the gate. The right value depends on the embedding model: 0.25 suits text-embedding-3-small. Raise it to be stricter (less, more on-topic context), lower it to be more permissive.';
 $string['settings:rag_currentpage_boost'] = 'Current-Page Boost';
 $string['settings:rag_currentpage_boost_desc'] = 'A small bonus added to the relevance score of chunks from the page the learner is currently viewing, so questions like "explain this" prefer the visible page when scores are close. Ordering only: it does not force an irrelevant page chunk past the minimum-relevance gate. Set 0 to disable.';
+$string['settings:rag_scope'] = 'Retrieval scope';
+$string['settings:rag_scope_desc'] = 'When a learner is viewing a specific document (a page, book, or PDF), whether to constrain retrieval to that document. <b>Document-first</b> grounds the answer on the current document when it has relevant chunks and falls back to the whole course otherwise. <b>Document-only</b> never falls back: if the current document has no relevant chunk it retrieves nothing, so the tutor answers from general knowledge rather than citing unrelated pages. <b>Course-wide</b> searches all course content (the current page still gets the ordering boost above). Document-first is recommended, so an answer about the page a learner is reading is grounded on that page.';
+$string['settings:rag_scope_document_first'] = 'Document-first (prefer the current document, fall back to the course)';
+$string['settings:rag_scope_document_only'] = 'Document-only (restrict to the current document)';
+$string['settings:rag_scope_course'] = 'Course-wide (search all course content)';
 $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
 

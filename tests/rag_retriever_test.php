@@ -19,15 +19,18 @@ namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Unit tests for rag_retriever relevance gate + current-page bias (v6.2.0).
+ * Unit tests for rag_retriever relevance gate, current-page bias (v6.2.0), and
+ * document scoping (v6.8.7).
  *
- * Exercises the pure filter_and_rank() seam (no DB/provider) that retrieve()
- * delegates the floor and ordering boost to.
+ * Exercises the pure filter_and_rank() and scope_to_document() seams (no
+ * DB/provider) that retrieve() delegates the floor, ordering boost, and
+ * document constraint to.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_ai_course_assistant\rag_retriever::filter_and_rank
+ * @covers     \local_ai_course_assistant\rag_retriever::scope_to_document
  */
 final class rag_retriever_test extends \advanced_testcase {
 
@@ -80,5 +83,51 @@ final class rag_retriever_test extends \advanced_testcase {
         $out = rag_retriever::filter_and_rank($scored, 0.25, 31, 0.05);
         $this->assertCount(1, $out);
         $this->assertSame('good', $out[0]['content']);
+    }
+
+    public function test_scope_document_first_restricts_to_current_document(): void {
+        // Current document (cmid 11) contributed a chunk -> return only it.
+        $ranked = [
+            ['content' => 'other', 'score' => 0.62, 'cmid' => 10, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'page',  'score' => 0.30, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
+        ];
+        $out = rag_retriever::scope_to_document($ranked, 11, 'document_first');
+        $this->assertCount(1, $out);
+        $this->assertSame('page', $out[0]['content']);
+    }
+
+    public function test_scope_document_first_falls_back_when_document_absent(): void {
+        // Current document (cmid 99) contributed nothing -> full course-wide set.
+        $ranked = [
+            ['content' => 'a', 'score' => 0.62, 'cmid' => 10, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'b', 'score' => 0.30, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
+        ];
+        $out = rag_retriever::scope_to_document($ranked, 99, 'document_first');
+        $this->assertCount(2, $out);
+    }
+
+    public function test_scope_document_only_returns_empty_when_document_absent(): void {
+        // document_only never falls back: no page chunk -> retrieve nothing.
+        $ranked = [
+            ['content' => 'a', 'score' => 0.62, 'cmid' => 10, 'modtype' => 'page', 'chunkindex' => 0],
+        ];
+        $out = rag_retriever::scope_to_document($ranked, 99, 'document_only');
+        $this->assertSame([], $out);
+    }
+
+    public function test_scope_document_only_restricts_and_preserves_order(): void {
+        $ranked = [
+            ['content' => 'other', 'score' => 0.62, 'cmid' => 10, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'p1',    'score' => 0.40, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'p2',    'score' => 0.35, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 1],
+        ];
+        $out = rag_retriever::scope_to_document($ranked, 11, 'document_only');
+        $this->assertSame(['p1', 'p2'], array_column($out, 'content'));
+    }
+
+    public function test_scope_course_and_no_cmid_leave_set_unchanged(): void {
+        $ranked = $this->sample();
+        $this->assertCount(3, rag_retriever::scope_to_document($ranked, 10, 'course'));
+        $this->assertCount(3, rag_retriever::scope_to_document($ranked, 0, 'document_first'));
     }
 }

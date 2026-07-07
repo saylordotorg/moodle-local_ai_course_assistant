@@ -654,6 +654,19 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    // v6.8.7: retrieval scope when the learner is viewing a specific document.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/rag_scope',
+        get_string('settings:rag_scope', 'local_ai_course_assistant'),
+        get_string('settings:rag_scope_desc', 'local_ai_course_assistant'),
+        'document_first',
+        [
+            'document_first' => get_string('settings:rag_scope_document_first', 'local_ai_course_assistant'),
+            'document_only'  => get_string('settings:rag_scope_document_only', 'local_ai_course_assistant'),
+            'course'         => get_string('settings:rag_scope_course', 'local_ai_course_assistant'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_chunksize',
         get_string('settings:rag_chunksize', 'local_ai_course_assistant'),

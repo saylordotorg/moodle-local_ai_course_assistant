@@ -42,9 +42,10 @@ class rag_retriever {
      * @param int    $courseid
      * @param string $query    The user's message / question.
      * @param int    $topk     Number of chunks to return.
-     * @param int    $currentcmid Course-module id of the page the learner is on
-     *                            (0 if none); its chunks get a small ordering
-     *                            boost so "explain this" grounds on the page.
+     * @param int    $currentcmid Course-module id of the document the learner is
+     *                            on (0 if none). Drives the current-page ordering
+     *                            boost and, when `rag_scope` constrains to the
+     *                            document, filters retrieval to that document.
      * @return array Array of [
      *                  'content'    => string,
      *                  'score'      => float,
@@ -73,6 +74,17 @@ class rag_retriever {
         $minscore = ($rawfloor === false || $rawfloor === '') ? 0.25 : (float) $rawfloor;
         $rawboost = get_config('local_ai_course_assistant', 'rag_currentpage_boost');
         $boost = ($rawboost === false || $rawboost === '') ? 0.05 : (float) $rawboost;
+
+        // v6.8.7: retrieval scope. When the learner is viewing a specific
+        // document ($currentcmid > 0), 'document_first' grounds the answer on
+        // that document's chunks when it has any that clear the floor, and falls
+        // back to the whole course otherwise; 'document_only' never falls back
+        // (no relevant chunk on the page means retrieve nothing, so the tutor
+        // answers from general knowledge rather than citing unrelated pages);
+        // 'course' keeps the legacy course-wide search (the current page still
+        // gets the ordering boost). Default document_first.
+        $rawscope = get_config('local_ai_course_assistant', 'rag_scope');
+        $scope = ($rawscope === false || $rawscope === '') ? 'document_first' : (string) $rawscope;
 
         // Embed the query. When the configured embedding provider is Voyage,
         // ask for the asymmetric "query" projection so the vector pairs
@@ -142,6 +154,13 @@ class rag_retriever {
         // genuinely irrelevant chunks never reach the (more expensive) reranker
         // and an off-topic query returns fewer (or zero) passages.
         $scored = self::filter_and_rank($scored, $minscore, $currentcmid, $boost);
+        if (empty($scored)) {
+            return [];
+        }
+
+        // Constrain to the current document when the learner is viewing one.
+        // Applied before reranking, so the reranker only sees the scoped set.
+        $scored = self::scope_to_document($scored, $currentcmid, $scope);
         if (empty($scored)) {
             return [];
         }
@@ -221,6 +240,41 @@ class rag_retriever {
         };
         usort($scored, fn($a, $b) => $rank($b) <=> $rank($a));
         return $scored;
+    }
+
+    /**
+     * Constrain floor-passed, rank-sorted chunks to the current document.
+     *
+     * Pure function (no DB or provider) so it is unit-testable. When the learner
+     * is viewing a specific document ($currentcmid > 0):
+     *  - 'document_first': if that document contributed any chunks to the set,
+     *    return only those; otherwise return the full set (course-wide fallback).
+     *  - 'document_only': return only that document's chunks, or an empty array if
+     *    it contributed none (no fallback — the caller then grounds on general
+     *    knowledge rather than citing unrelated pages).
+     *  - 'course' (or $currentcmid <= 0): return the set unchanged.
+     *
+     * Input is assumed already sorted by descending rank; the returned subset
+     * preserves that order.
+     *
+     * @param array  $ranked      Rows with at least 'cmid' (int|null), rank-sorted.
+     * @param int    $currentcmid Current document course-module id (0 = none).
+     * @param string $scope       'document_first' | 'document_only' | 'course'.
+     * @return array The scoped rows (same shape as input).
+     */
+    public static function scope_to_document(array $ranked, int $currentcmid, string $scope): array {
+        if ($currentcmid <= 0 || $scope === 'course') {
+            return $ranked;
+        }
+        $docchunks = array_values(array_filter(
+            $ranked,
+            fn($r) => (int) ($r['cmid'] ?? 0) === $currentcmid
+        ));
+        if (!empty($docchunks)) {
+            return $docchunks;
+        }
+        // The current document contributed no chunks to the set.
+        return $scope === 'document_only' ? [] : $ranked;
     }
 
     /**
