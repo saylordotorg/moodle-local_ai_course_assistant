@@ -123,6 +123,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $msg . ' No extractable content was found in this course (no pages, books, or supported files).',
                 null, \core\output\notification::NOTIFY_WARNING);
         }
+        // Surface documents that produced no indexable text, so a page that
+        // silently generated no chunk (e.g. mostly an embedded interactive, or
+        // shorter than the minimum) is visible instead of missed.
+        if (!empty($stats['no_content'])) {
+            $titles = array_map(
+                fn($d) => format_string($d['title']),
+                array_slice($stats['no_content'], 0, 8)
+            );
+            if (count($stats['no_content']) > 8) {
+                $titles[] = '…';
+            }
+            redirect($pageurl,
+                $msg . ' ' . get_string('ragadmin:no_content_documents', 'local_ai_course_assistant', (object) [
+                    'count'  => count($stats['no_content']),
+                    'titles' => implode('; ', $titles),
+                ]),
+                null, \core\output\notification::NOTIFY_WARNING);
+        }
         redirect($pageurl, $msg, null, \core\output\notification::NOTIFY_SUCCESS);
 
     } else if ($action === 'deleteindex' && $courseid > 0) {

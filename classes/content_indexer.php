@@ -50,9 +50,20 @@ class content_indexer {
         $rawchunksize = get_config('local_ai_course_assistant', 'rag_chunksize');
         $chunksize = ($rawchunksize === false || $rawchunksize === '') ? 400 : (int) $rawchunksize;
 
-        $modules = content_extractor::extract_course_modules($courseid);
+        $extract = content_extractor::extract_course_modules_with_skips($courseid);
+        $modules = $extract['modules'];
 
-        $stats = ['indexed' => 0, 'skipped' => 0, 'errors' => 0, 'sources' => count($modules)];
+        // 'no_content' lists supported documents that produced no indexable text
+        // (empty or shorter than MIN_CHARS) and were therefore never chunked —
+        // surfaced by rag_admin so a page that silently produced no chunk is
+        // visible instead of being missed.
+        $stats = [
+            'indexed'    => 0,
+            'skipped'    => 0,
+            'errors'     => 0,
+            'sources'    => count($modules),
+            'no_content' => $extract['skipped'],
+        ];
 
         // Resolve the embedding provider up front. A missing/unknown provider
         // or misconfiguration must surface as a clear fatal reason rather than

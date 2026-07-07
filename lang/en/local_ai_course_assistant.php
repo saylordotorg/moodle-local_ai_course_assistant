@@ -623,6 +623,7 @@ $string['ragadmin:reindexall_desc'] = 'Runs incremental indexing on all courses 
 $string['ragadmin:reindexall_confirm'] = 'This will call the embedding API for all new/changed content across all active courses. Continue?';
 $string['ragadmin:reindexall_done'] = 'Reindexing complete: {$a->courses} course(s) processed — {$a->indexed} chunks indexed, {$a->skipped} skipped, {$a->errors} error(s).';
 $string['ragadmin:reindexcourse_done'] = 'Course reindexed: {$a->indexed} chunks indexed, {$a->skipped} skipped, {$a->errors} error(s).';
+$string['ragadmin:no_content_documents'] = '{$a->count} document(s) produced no indexable text and were not chunked (usually mostly-embedded or very short pages): {$a->titles}. If any of these should be searchable, add on-page text or a transcript, then reindex.';
 $string['ragadmin:deleteindex'] = 'Clear index';
 $string['ragadmin:deleteindex_confirm'] = 'Delete all indexed chunks for this course? The AI tutor will fall back to full content stuffing until the course is re-indexed.';
 $string['ragadmin:deleteindex_done'] = 'Course index cleared.';
