@@ -61,6 +61,7 @@ class score_speech extends external_api {
      * @param string $topic
      * @param int $targetsec
      * @param int $durationsec
+     * @param string $mode
      * @return array
      */
     public static function execute(int $courseid, string $transcript, string $name = '',
