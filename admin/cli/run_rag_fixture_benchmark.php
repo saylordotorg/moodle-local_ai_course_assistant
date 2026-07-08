@@ -65,6 +65,15 @@ $topk = 10;
 $outfile = '';
 $rerankdelayms = 0;
 
+// Embedding A/B mode (2026-07-08): each --embed-provider adds an arm to a
+// head-to-head embedding-only recall comparison. Repeatable. When any arm is
+// supplied the script re-embeds the fixture courses' chunk contents with each
+// provider and ignores the legacy single-arm / rerank path.
+$abproviders = [];
+$openaiapikey = '';
+$voyageapikey = '';
+$abbatch = 96; // Chunk re-embed slice size; bounds per-call token usage for both providers.
+
 foreach ($argv as $arg) {
     if (preg_match('/^--fixtures=(.+)$/', $arg, $m)) {
         $fixturespath = trim($m[1]);
@@ -78,6 +87,12 @@ foreach ($argv as $arg) {
         $outfile = trim($m[1]);
     } else if (preg_match('/^--rerank-delay-ms=(\d+)$/', $arg, $m)) {
         $rerankdelayms = max(0, (int) $m[1]);
+    } else if (preg_match('/^--embed-provider=(.+)$/', $arg, $m)) {
+        $abproviders[] = trim($m[1]);
+    } else if (preg_match('/^--openai-apikey=(.+)$/', $arg, $m)) {
+        $openaiapikey = trim($m[1]);
+    } else if (preg_match('/^--voyage-apikey=(.+)$/', $arg, $m)) {
+        $voyageapikey = trim($m[1]);
     } else if ($arg === '--help' || $arg === '-h') {
         echo <<<TXT
 Usage: php run_rag_fixture_benchmark.php [options]
@@ -90,6 +105,24 @@ Options:
   --out=PATH            Output JSON path (default: runs/YYYY-MM-DD-rag-bench.json)
   --rerank-delay-ms=N   Sleep N ms before each rerank call (default 0). Use ~21000
                         on a free-tier Voyage key (~3 requests/minute).
+
+Embedding A/B mode (repeatable --embed-provider switches on a head-to-head
+embedding-only recall comparison; the rerank arm is skipped in this mode):
+  --embed-provider=SPEC provider[:model], e.g. openai:text-embedding-3-small,
+                        voyage:voyage-3.5, voyage:voyage-4. Repeat to add arms.
+                        Each arm RE-EMBEDS the fixture courses' chunk contents
+                        with that provider, so arms compare like against like;
+                        the stored vectors are ignored. Site config is set per
+                        arm and restored at exit.
+  --openai-apikey=KEY   API key used for openai:* arms (in memory only).
+  --voyage-apikey=KEY   API key used for voyage:* arms (in memory only).
+
+  Example three-way A/B:
+    php run_rag_fixture_benchmark.php \
+      --embed-provider=openai:text-embedding-3-small \
+      --embed-provider=voyage:voyage-3.5 \
+      --embed-provider=voyage:voyage-4 \
+      --openai-apikey=sk-... --voyage-apikey=pa-...
 
 TXT;
         exit(0);
@@ -126,6 +159,269 @@ if (!is_array($fixturedoc) || empty($fixturedoc['fixtures'])) {
 }
 $fixtures = $fixturedoc['fixtures'];
 echo "Loaded " . count($fixtures) . " fixtures from " . basename($fixturespath) . "\n";
+
+// ---------- Embedding provider A/B mode (2026-07-08) ----------
+// When one or more --embed-provider arms are supplied, run a head-to-head
+// embedding-only recall comparison. Each arm RE-EMBEDS the fixture courses'
+// chunk CONTENTS with that provider (document vectors) and each query (query
+// vectors for Voyage), so every arm compares like against like -- the stored
+// OpenAI vectors are ignored. Site embedding config is set per arm and always
+// restored (a shutdown hook restores even on a fatal), so the plugin's stored
+// configuration is unchanged once the CLI exits.
+if (!empty($abproviders)) {
+    echo "\n" . str_repeat('=', 64) . "\n";
+    echo "EMBEDDING A/B MODE: " . count($abproviders) . " arm(s): " . implode(', ', $abproviders) . "\n";
+    echo str_repeat('=', 64) . "\n\n";
+
+    // Preload chunk CONTENTS (not stored vectors) for the fixture courses.
+    $abcontents = []; // courseid -> [chunkid => content]
+    $abcourseids = array_unique(array_column($fixtures, 'courseid'));
+    foreach ($abcourseids as $courseid) {
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_chunks',
+            'courseid = :cid',
+            ['cid' => $courseid],
+            '',
+            'id, content'
+        );
+        $abcontents[$courseid] = [];
+        foreach ($rows as $row) {
+            if (trim((string) $row->content) !== '') {
+                $abcontents[$courseid][(int) $row->id] = (string) $row->content;
+            }
+        }
+        echo "Loaded " . count($abcontents[$courseid]) . " chunk contents for courseid={$courseid}\n";
+    }
+    echo "\n";
+
+    // Capture original embedding config and guarantee restoration.
+    $aborigcfg = [
+        'embed_provider'   => get_config('local_ai_course_assistant', 'embed_provider'),
+        'embed_model'      => get_config('local_ai_course_assistant', 'embed_model'),
+        'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'),
+        'embed_dimensions' => get_config('local_ai_course_assistant', 'embed_dimensions'),
+    ];
+    $abrestore = function () use ($aborigcfg) {
+        foreach ($aborigcfg as $k => $v) {
+            set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant');
+        }
+    };
+    // Restore even if a fatal aborts mid-arm; idempotent with the per-arm restore.
+    register_shutdown_function($abrestore);
+
+    $absummaries = [];
+    $abperfixture = [];
+
+    foreach ($abproviders as $spec) {
+        [$prov, $model] = array_pad(explode(':', $spec, 2), 2, '');
+        $prov = strtolower(trim($prov));
+        $model = trim($model);
+        $armkey = ($prov === 'voyage') ? $voyageapikey : $openaiapikey;
+
+        echo str_repeat('-', 64) . "\n";
+        echo "ARM: {$spec}  (provider={$prov}, model=" . ($model !== '' ? $model : '(default)') . ")\n";
+        echo str_repeat('-', 64) . "\n";
+
+        // Apply this arm's config (restored after the arm). Set embed_dimensions
+        // to the arm provider's NATIVE default width: OpenAI 1536, Voyage 1024.
+        // The base provider hard-defaults an unset width to 1536, which Voyage
+        // rejects (its MRL widths are only 256/512/1024/2048), so the width must
+        // be pinned per provider rather than left unset.
+        $armdim = ($prov === 'voyage') ? 1024 : 1536;
+        set_config('embed_provider', $prov, 'local_ai_course_assistant');
+        set_config('embed_model', ($model !== '') ? $model : null, 'local_ai_course_assistant');
+        set_config('embed_dimensions', $armdim, 'local_ai_course_assistant');
+        if ($armkey !== '') {
+            set_config('embed_apikey', $armkey, 'local_ai_course_assistant');
+        }
+
+        try {
+            $armprovider = base_embedding_provider::create_from_config();
+        } catch (\Throwable $e) {
+            echo "  ERROR building provider: " . $e->getMessage() . "\n\n";
+            $abrestore();
+            continue;
+        }
+        $armmodel = $armprovider->get_model();
+        $isvoyage = $armprovider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider;
+        echo "  class=" . get_class($armprovider) . "  model={$armmodel}\n";
+
+        // Re-embed all chunk contents for each course (document vectors), sliced
+        // to bound per-call token usage regardless of the provider batch size.
+        $armvecs = []; // courseid -> [chunkid => vec]
+        $embedfail = false;
+        $t0embed = microtime(true);
+        foreach ($abcontents as $courseid => $contents) {
+            $ids = array_keys($contents);
+            $texts = array_values($contents);
+            $armvecs[$courseid] = [];
+            for ($off = 0; $off < count($texts); $off += $abbatch) {
+                $sliceids = array_slice($ids, $off, $abbatch);
+                $slicetexts = array_slice($texts, $off, $abbatch);
+                try {
+                    $vecs = $armprovider->embed_batch($slicetexts);
+                } catch (\Throwable $e) {
+                    echo "  ERROR embedding chunks (course {$courseid}, offset {$off}): "
+                        . mb_substr($e->getMessage(), 0, 160) . "\n";
+                    $embedfail = true;
+                    break 2;
+                }
+                if (count($vecs) !== count($slicetexts)) {
+                    echo "  ERROR: returned " . count($vecs) . " vectors for " . count($slicetexts) . " texts\n";
+                    $embedfail = true;
+                    break 2;
+                }
+                foreach ($sliceids as $i => $chunkid) {
+                    $armvecs[$courseid][$chunkid] = $vecs[$i];
+                }
+            }
+            echo "  embedded " . count($armvecs[$courseid]) . " chunks for course {$courseid}\n";
+        }
+        if ($embedfail) {
+            $abrestore();
+            echo "\n";
+            continue;
+        }
+        $embedsec = round(microtime(true) - $t0embed, 1);
+        echo "  chunk re-embed took {$embedsec}s\n";
+
+        // Rank each fixture's query against this arm's re-embedded chunks.
+        $ranks = [];
+        $perfix = [];
+        $qlatencies = [];
+        foreach ($fixtures as $fx) {
+            $cid = (int) $fx['courseid'];
+            $q = (string) $fx['question'];
+            $expid = (int) $fx['expected_chunk_id'];
+            $expsub = (string) ($fx['expected_substring'] ?? '');
+            if (empty($armvecs[$cid])) {
+                $ranks[] = null;
+                continue;
+            }
+            $tq = microtime(true);
+            try {
+                $qvec = $isvoyage ? $armprovider->embed_query($q) : $armprovider->embed($q);
+            } catch (\Throwable $e) {
+                echo "  query embed error ({$fx['id']}): " . mb_substr($e->getMessage(), 0, 120) . "\n";
+                $ranks[] = null;
+                continue;
+            }
+            $qlatencies[] = (int) round((microtime(true) - $tq) * 1000);
+            if (empty($qvec)) {
+                $ranks[] = null;
+                continue;
+            }
+            $scored = [];
+            foreach ($armvecs[$cid] as $chunkid => $vec) {
+                $scored[] = ['id' => $chunkid, 'score' => cosine_sim($qvec, $vec)];
+            }
+            usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
+            $rank = null;
+            $submatch = false;
+            foreach ($scored as $i => $e) {
+                if ($e['id'] === $expid) {
+                    $rank = $i + 1;
+                    break;
+                }
+            }
+            if ($rank === null && $expsub !== '') {
+                foreach ($scored as $i => $e) {
+                    $content = $abcontents[$cid][$e['id']] ?? '';
+                    if ($content !== '' && str_contains($content, substr($expsub, 0, 50))) {
+                        $rank = $i + 1;
+                        $submatch = true;
+                        break;
+                    }
+                }
+            }
+            $ranks[] = $rank;
+            $perfix[] = [
+                'fixture_id' => $fx['id'],
+                'course'     => $fx['course'],
+                'difficulty' => $fx['difficulty'] ?? '',
+                'rank'       => $rank,
+                'substring_match' => $submatch,
+            ];
+        }
+
+        $absummaries[] = [
+            'arm'             => $spec,
+            'provider'        => $prov,
+            'model'           => $armmodel,
+            'n'               => count($ranks),
+            'recall_at_1'     => compute_metrics($ranks, 1)['recall_at_k'],
+            'recall_at_3'     => compute_metrics($ranks, 3)['recall_at_k'],
+            'recall_at_5'     => compute_metrics($ranks, 5)['recall_at_k'],
+            'mrr'             => compute_metrics($ranks, 999)['mrr'],
+            'p50_query_ms'    => pct($qlatencies, 50),
+            'p95_query_ms'    => pct($qlatencies, 95),
+            'chunk_embed_sec' => $embedsec,
+        ];
+        $abperfixture[$spec] = $perfix;
+
+        $armsum = $absummaries[count($absummaries) - 1];
+        printf("  recall@1=%.1f%%  recall@3=%.1f%%  recall@5=%.1f%%  mrr=%.3f\n\n",
+            $armsum['recall_at_1'] * 100,
+            $armsum['recall_at_3'] * 100,
+            $armsum['recall_at_5'] * 100,
+            $armsum['mrr']);
+
+        $abrestore();
+    }
+
+    // ---------- A/B comparison table ----------
+    echo str_repeat('=', 64) . "\n";
+    echo "EMBEDDING A/B RESULTS (embedding-only recall, " . count($fixtures) . " fixtures)\n";
+    echo str_repeat('=', 64) . "\n\n";
+    $hdr = ['Arm', 'Model', 'N', 'R@1', 'R@3', 'R@5', 'MRR', 'P50q'];
+    $widths = [26, 22, 4, 7, 7, 7, 7, 7];
+    $line = '';
+    foreach ($hdr as $i => $h) {
+        $line .= str_pad($h, $widths[$i]) . ' ';
+    }
+    echo $line . "\n" . str_repeat('-', array_sum($widths) + count($widths)) . "\n";
+    foreach ($absummaries as $s) {
+        $cells = [
+            str_pad(substr($s['arm'], 0, 25), $widths[0]),
+            str_pad(substr($s['model'], 0, 21), $widths[1]),
+            str_pad((string) $s['n'], $widths[2]),
+            str_pad(sprintf('%.1f%%', $s['recall_at_1'] * 100), $widths[3]),
+            str_pad(sprintf('%.1f%%', $s['recall_at_3'] * 100), $widths[4]),
+            str_pad(sprintf('%.1f%%', $s['recall_at_5'] * 100), $widths[5]),
+            str_pad(sprintf('%.3f', $s['mrr']), $widths[6]),
+            str_pad($s['p50_query_ms'] !== null ? $s['p50_query_ms'] . 'ms' : 'n/a', $widths[7]),
+        ];
+        echo implode(' ', $cells) . "\n";
+    }
+    echo "\n";
+
+    // Deltas vs the first arm (treated as the baseline).
+    if (count($absummaries) > 1) {
+        $base = $absummaries[0];
+        echo "Deltas vs baseline (" . $base['arm'] . "):\n";
+        foreach (array_slice($absummaries, 1) as $s) {
+            printf("  %-26s  R@1 %+.1fpp  R@3 %+.1fpp  R@5 %+.1fpp  MRR %+.3f\n",
+                $s['arm'],
+                ($s['recall_at_1'] - $base['recall_at_1']) * 100,
+                ($s['recall_at_3'] - $base['recall_at_3']) * 100,
+                ($s['recall_at_5'] - $base['recall_at_5']) * 100,
+                $s['mrr'] - $base['mrr']);
+        }
+        echo "\n";
+    }
+
+    // ---------- Write JSON ----------
+    $about = [
+        'run_at'       => date('c'),
+        'mode'         => 'embedding_ab',
+        'fixture_file' => basename($fixturespath),
+        'arms'         => $absummaries,
+        'per_fixture'  => $abperfixture,
+    ];
+    file_put_contents($outfile, json_encode($about, JSON_PRETTY_PRINT));
+    echo "Results written to: {$outfile}\n";
+    exit(0);
+}
 
 // ---------- Build embedding provider ----------
 
