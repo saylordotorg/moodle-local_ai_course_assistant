@@ -42,6 +42,32 @@ class voyage_embedding_provider extends base_embedding_provider {
     /** Default input_type when caller doesn't specify (indexing uses "document"). */
     private const DEFAULT_INPUT_TYPE = 'document';
 
+    /** Native default output width; sending it explicitly is redundant. */
+    private const NATIVE_DIMENSION = 1024;
+
+    /** Valid Matryoshka (MRL) output widths for the voyage-3.x / voyage-4 line. */
+    private const VALID_DIMENSIONS = [256, 512, 1024, 2048];
+
+    /**
+     * Resolve the output_dimension to send, or null to omit it (native default).
+     *
+     * Pure and testable. Only a valid non-native MRL width is sent; anything
+     * else (0/unset, the native 1024, or an OpenAI-shaped width such as 1536
+     * left over from a provider switch) omits the parameter so Voyage applies
+     * its own default instead of rejecting the call.
+     *
+     * @param int $configured Configured embed_dimensions (0 = unset).
+     * @return int|null Width to send, or null to omit.
+     */
+    public static function mrl_output_dimension(int $configured): ?int {
+        if ($configured > 0
+                && $configured !== self::NATIVE_DIMENSION
+                && in_array($configured, self::VALID_DIMENSIONS, true)) {
+            return $configured;
+        }
+        return null;
+    }
+
     protected function get_default_model(): string {
         return 'voyage-3.5';
     }
@@ -96,11 +122,13 @@ class voyage_embedding_provider extends base_embedding_provider {
                 'input_type' => $inputtype,
             ];
 
-            // voyage-3.5 defaults to 1024 dimensions; valid MRL widths are
-            // 256/512/1024/2048. Pass output_dimension only when admin asked
-            // for a non-default width.
-            if ($this->dimensions > 0 && $this->dimensions !== 1024) {
-                $payload['output_dimension'] = $this->dimensions;
+            // Pass output_dimension only when the configured width is a valid
+            // non-default MRL width (256/512/2048); 0/unset, 1024, or an invalid
+            // width (e.g. an OpenAI-shaped 1536 left after a provider switch)
+            // omit it so Voyage applies its native 1024 rather than erroring.
+            $outputdim = self::mrl_output_dimension($this->dimensions);
+            if ($outputdim !== null) {
+                $payload['output_dimension'] = $outputdim;
             }
 
             $headers = [

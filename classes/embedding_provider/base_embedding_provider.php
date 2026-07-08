@@ -45,8 +45,13 @@ abstract class base_embedding_provider {
     public function __construct() {
         $this->apikey     = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
         $this->model      = (string) (get_config('local_ai_course_assistant', 'embed_model') ?: $this->get_default_model());
+        // 0 means "use the provider's native default width". An unset config
+        // must NOT fall back to a hard 1536: that is only valid for OpenAI, and
+        // forcing it on Voyage (whose MRL widths are 256/512/1024/2048) makes
+        // every embedding call fail. Each provider skips sending an explicit
+        // width when this is 0 and lets its own model default apply.
         $rawdim = get_config('local_ai_course_assistant', 'embed_dimensions');
-        $this->dimensions = ($rawdim === false || $rawdim === '') ? 1536 : (int) $rawdim;
+        $this->dimensions = ($rawdim === false || $rawdim === '') ? 0 : (int) $rawdim;
 
         $configurl = get_config('local_ai_course_assistant', 'embed_apibaseurl');
         $this->baseurl = !empty($configurl) ? rtrim($configurl, '/') : $this->get_default_base_url();
@@ -69,6 +74,15 @@ abstract class base_embedding_provider {
      */
     public function get_model(): string {
         return $this->model;
+    }
+
+    /**
+     * Configured output width, or 0 to use the provider's native default.
+     *
+     * @return int
+     */
+    public function get_dimensions(): int {
+        return $this->dimensions;
     }
 
     /**
