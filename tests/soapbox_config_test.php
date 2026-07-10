@@ -102,4 +102,45 @@ final class soapbox_config_test extends \advanced_testcase {
         $this->assertSame(2, soapbox_config::effective_recording_cap(2));  // below cap -> honored
         $this->assertSame(3, soapbox_config::effective_recording_cap(10)); // above cap -> clamped
     }
+
+    public function test_clamp_assignment_slides_flag(): void {
+        $this->resetAfterTest();
+        $this->assertSame(1, soapbox_config::clamp_assignment(['slides_enabled' => 1])['slides_enabled']);
+        $this->assertSame(1, soapbox_config::clamp_assignment(['slides_enabled' => '1'])['slides_enabled']);
+        $this->assertSame(0, soapbox_config::clamp_assignment(['slides_enabled' => 0])['slides_enabled']);
+        $this->assertSame(0, soapbox_config::clamp_assignment([])['slides_enabled']); // default off
+    }
+
+    public function test_normalize_slide_timeline(): void {
+        // Sorts by time, drops malformed, clamps negatives, and clamps index to slidecount.
+        $raw = [
+            ['t' => 30, 'i' => 2],
+            ['t' => 0, 'i' => 0],
+            ['t' => -5, 'i' => -1],        // negatives clamped to 0
+            ['t' => 10, 'i' => 99],        // index clamped to slidecount-1
+            ['nope' => 1],                 // malformed, dropped
+            'garbage',                     // malformed, dropped
+        ];
+        $out = soapbox_config::normalize_slide_timeline($raw, 5);
+        $this->assertCount(4, $out);
+        $this->assertSame(['t' => 0, 'i' => 0], $out[0]);   // the -5 entry, clamped and sorted first
+        $this->assertSame(0, $out[1]['t']);                 // original t=0
+        $this->assertSame(10, $out[2]['t']);
+        $this->assertSame(4, $out[2]['i']);                 // 99 clamped to slidecount-1 = 4
+        $this->assertSame(30, $out[3]['t']);
+    }
+
+    public function test_normalize_slide_timeline_accepts_json_string_and_caps(): void {
+        $this->assertSame([], soapbox_config::normalize_slide_timeline('not json'));
+        $this->assertSame([], soapbox_config::normalize_slide_timeline(null));
+        $json = json_encode([['t' => 1, 'i' => 0], ['t' => 2, 'i' => 1]]);
+        $this->assertCount(2, soapbox_config::normalize_slide_timeline($json));
+        // Cap enforced.
+        $big = [];
+        for ($k = 0; $k < 600; $k++) {
+            $big[] = ['t' => $k, 'i' => 0];
+        }
+        $this->assertCount(soapbox_config::MAX_TIMELINE_EVENTS,
+            soapbox_config::normalize_slide_timeline($big));
+    }
 }

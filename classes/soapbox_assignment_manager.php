@@ -110,6 +110,7 @@ class soapbox_assignment_manager {
             'stored_attempts' => $clamped['stored_attempts'],
             'rubricid'        => !empty($data['rubricid']) ? (int) $data['rubricid'] : null,
             'speaking_level'  => isset($data['speaking_level']) ? (string) $data['speaking_level'] : null,
+            'slides_enabled'  => $clamped['slides_enabled'],
             'visible'         => isset($data['visible']) ? (int) (bool) $data['visible'] : 1,
             'usermodified'    => (int) $USER->id,
             'timecreated'     => $now,
@@ -154,6 +155,7 @@ class soapbox_assignment_manager {
                 ? (!empty($data['rubricid']) ? (int) $data['rubricid'] : null) : $existing->rubricid,
             'speaking_level'  => array_key_exists('speaking_level', $data)
                 ? (string) $data['speaking_level'] : $existing->speaking_level,
+            'slides_enabled'  => $clamped['slides_enabled'],
             'visible'         => array_key_exists('visible', $data)
                 ? (int) (bool) $data['visible'] : $existing->visible,
             'usermodified'    => (int) $USER->id,

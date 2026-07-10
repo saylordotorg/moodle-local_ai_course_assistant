@@ -1199,5 +1199,30 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026071001, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026071010) {
+        // v6.8.21 (Soapbox slides, Phase 2): a slides flag on the assignment and
+        // the deck key + slide-advance timeline on the recording.
+        $table = new xmldb_table('local_ai_course_assistant_sbx_assign');
+        $field = new xmldb_field('slides_enabled', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'speaking_level');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('local_ai_course_assistant_sbx_rec');
+        $field = new xmldb_field('deck_key', XMLDB_TYPE_CHAR, '255', null,
+            null, null, null, 'transcript');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('slide_timeline', XMLDB_TYPE_TEXT, null, null,
+            null, null, null, 'deck_key');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026071010, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

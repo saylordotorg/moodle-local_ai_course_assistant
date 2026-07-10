@@ -86,6 +86,10 @@ class soapbox_assignment_form extends \moodleform {
         $mform->addElement('static', 'reccap', '',
             'Site maximum recordings kept per student: ' . $maxrec . '.');
 
+        $mform->addElement('advcheckbox', 'slides_enabled',
+            'Slides', 'Let students upload a PDF deck and advance slides while recording');
+        $mform->setDefault('slides_enabled', 0);
+
         $mform->addElement('advcheckbox', 'visible', 'Visible to students');
         $mform->setDefault('visible', 1);
 
