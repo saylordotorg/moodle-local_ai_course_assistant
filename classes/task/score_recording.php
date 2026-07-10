@@ -14,19 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_ai_course_assistant\task;
+
 /**
- * Plugin version and other meta-data.
+ * Ad-hoc task: transcribe and score one Soapbox recording (v6.8.16). Queued by
+ * finalize_recording so scoring happens off the request, and retried by the
+ * task runner if transcription or scoring is transiently unavailable.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
+ * @copyright  2026 Saylor
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class score_recording extends \core\task\adhoc_task {
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026071006;
-$plugin->requires = 2024100700; // Moodle 4.5+.
-$plugin->supported = [405, 503]; // Tested on Moodle 4.5 through 5.3dev.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '6.8.17';
+    /**
+     * Score the recording named in the custom data.
+     */
+    public function execute() {
+        $data = $this->get_custom_data();
+        $recid = (int) ($data->recid ?? 0);
+        if ($recid > 0) {
+            \local_ai_course_assistant\soapbox_scorer::score_recording($recid);
+        }
+    }
+}
