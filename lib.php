@@ -199,5 +199,31 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
             'aicasoapbox',
             new pix_icon('i/audio', '')
         );
+
+        // v6.8.19: Soapbox video/audio presentation assignments. Instructors get
+        // a link to the assignment manager; learners get a direct link to each
+        // visible assignment so individual assignments are reachable in-course.
+        if (has_capability('local/ai_course_assistant:manage', $context)) {
+            $navigation->add(
+                get_string('soapbox:assign_manage', 'local_ai_course_assistant'),
+                new moodle_url('/local/ai_course_assistant/soapbox_assign.php', ['courseid' => $course->id]),
+                navigation_node::TYPE_SETTING,
+                null,
+                'aicasoapboxassign',
+                new pix_icon('i/settings', '')
+            );
+        }
+        $assignments = \local_ai_course_assistant\soapbox_assignment_manager::get_course_assignments(
+            $course->id, false);
+        foreach ($assignments as $assign) {
+            $navigation->add(
+                format_string($assign->name),
+                new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $assign->id]),
+                navigation_node::TYPE_SETTING,
+                null,
+                'aicasoapboxassign_' . $assign->id,
+                new pix_icon('i/video', '')
+            );
+        }
     }
 }
