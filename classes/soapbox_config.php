@@ -157,8 +157,8 @@ class soapbox_config {
         $maxrec = self::max_recordings();
         $out = $in;
 
-        $out['mode'] = in_array($in['mode'] ?? 'video', self::MODES, true)
-            ? $in['mode'] : 'video';
+        $mode = $in['mode'] ?? 'video';
+        $out['mode'] = in_array($mode, self::MODES, true) ? $mode : 'video';
 
         $ptype = strtolower(trim((string) ($in['ptype'] ?? 'informative')));
         $out['ptype'] = ($ptype !== '') ? $ptype : 'informative';
