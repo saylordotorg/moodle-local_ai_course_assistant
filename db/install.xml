@@ -668,5 +668,81 @@
         <KEY NAME="pair_uniq" TYPE="unique" FIELDS="objectiveida, objectiveidb"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_sbx_assign" COMMENT="Soapbox video/audio presentation assignments (v6.8.12). Per-course, instructor-configured.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="ptype" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="informative" SEQUENCE="false" COMMENT="Presentation type, e.g. informative or persuasive"/>
+        <FIELD NAME="mode" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="video" SEQUENCE="false" COMMENT="video | audio"/>
+        <FIELD NAME="min_seconds" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="300" SEQUENCE="false"/>
+        <FIELD NAME="max_seconds" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="420" SEQUENCE="false"/>
+        <FIELD NAME="max_attempts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 = unlimited (still bounded by the admin max recordings)"/>
+        <FIELD NAME="stored_attempts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="2" SEQUENCE="false"/>
+        <FIELD NAME="rubricid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Custom rubric; null uses the level preset"/>
+        <FIELD NAME="speaking_level" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="courseid_fk_sbxa" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="rubricid_fk_sbxa" TYPE="foreign" FIELDS="rubricid" REFTABLE="local_ai_course_assistant_rubrics" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course_visible" UNIQUE="false" FIELDS="courseid, visible"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_sbx_topic" COMMENT="Student-selectable topics per Soapbox assignment (v6.8.12).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="instructions" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="instructionsformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="pdf_itemid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="File API itemid of the uploaded PDF case; 0 = none"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="assignid_fk_sbxt" TYPE="foreign" FIELDS="assignid" REFTABLE="local_ai_course_assistant_sbx_assign" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="assign_sort" UNIQUE="false" FIELDS="assignid, sortorder"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_sbx_rec" COMMENT="Soapbox recording attempts (v6.8.12). Video auto-deleted after retention; transcript and score retained.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="topicid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="mode" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="video" SEQUENCE="false"/>
+        <FIELD NAME="storage_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Object-storage key for the recording; null once deleted"/>
+        <FIELD NAME="duration_seconds" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="size_bytes" TYPE="int" LENGTH="19" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="uploading" SEQUENCE="false" COMMENT="uploading | uploaded | scored | deleted | failed"/>
+        <FIELD NAME="transcript" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="scoreid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="expires_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="assignid_fk_sbxr" TYPE="foreign" FIELDS="assignid" REFTABLE="local_ai_course_assistant_sbx_assign" REFFIELDS="id"/>
+        <KEY NAME="userid_fk_sbxr" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="scoreid_fk_sbxr" TYPE="foreign" FIELDS="scoreid" REFTABLE="local_ai_course_assistant_practice_scores" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="assign_user" UNIQUE="false" FIELDS="assignid, userid"/>
+        <INDEX NAME="status_expires" UNIQUE="false" FIELDS="status, expires_at"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

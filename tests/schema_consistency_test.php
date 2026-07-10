@@ -107,10 +107,16 @@ final class schema_consistency_test extends \basic_testcase {
             "/new\s+xmldb_table\(['\"](local_ai_course_assistant[^'\"]+)['\"]\)/",
             $body, $m)) {
             foreach ($m[1] as $candidate) {
-                // Find the surrounding block (1500-char window) and check
-                // for create_table on the same table object.
+                // Window = from this table-name occurrence up to the NEXT
+                // `new xmldb_table(` (or end of file), i.e. this table's own
+                // block. A fixed char cap truncates large tables (a 16-field
+                // table's create_table sits well past 1500 chars) and could
+                // also leak a later block's create_table in; the block
+                // boundary avoids both.
                 $idx = strpos($body, $candidate);
-                $window = substr($body, $idx, 1500);
+                $after = substr($body, $idx);
+                $next = strpos($after, 'new xmldb_table(');
+                $window = ($next !== false) ? substr($after, 0, $next) : $after;
                 if (strpos($window, 'create_table') !== false) {
                     $tables[] = $candidate;
                 }
