@@ -5773,3 +5773,19 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 .sbx-recorder .sbx-timer { font-variant-numeric: tabular-nums; }
 .sbx-recorder.sbx-near-max .sbx-timer { color: #b4791f; }
 .sbx-recorder.sbx-recording .sbx-preview { outline: 3px solid #d64550; }
+
+/* Soapbox audio-only recorder indicator (v6.8.20) */
+.sbx-audio-indicator .sbx-mic-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #94a0ac; display: inline-block; flex: 0 0 auto;
+}
+.sbx-recorder.sbx-recording .sbx-audio-indicator .sbx-mic-dot {
+    background: #d64550; animation: sbx-pulse 1s ease-in-out infinite;
+}
+@keyframes sbx-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.3); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sbx-recorder.sbx-recording .sbx-audio-indicator .sbx-mic-dot { animation: none; }
+}

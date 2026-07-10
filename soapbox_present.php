@@ -101,12 +101,21 @@ if (!$storageready) {
     echo $OUTPUT->notification(
         get_string('soapbox:storage_unconfigured', 'local_ai_course_assistant'), 'warning');
 } else {
-    echo html_writer::start_div('sbx-recorder card p-3 mb-4', ['id' => 'sbx-recorder']);
+    $modeclass = 'sbx-recorder card p-3 mb-4 sbx-mode-' . ($assign->mode === 'audio' ? 'audio' : 'video');
+    echo html_writer::start_div($modeclass, ['id' => 'sbx-recorder']);
     if ($assign->mode !== 'audio') {
         echo html_writer::empty_tag('video', [
             'class' => 'sbx-preview w-100 mb-2', 'playsinline' => 'playsinline',
             'style' => 'max-height:360px;background:#000;border-radius:6px',
         ]);
+    } else {
+        // Audio-only: no camera. A mic indicator that pulses while recording
+        // gives the learner clear feedback that audio is being captured.
+        echo html_writer::div(
+            html_writer::tag('span', '', ['class' => 'sbx-mic-dot'])
+            . html_writer::tag('span', get_string('soapbox:audio_ready', 'local_ai_course_assistant'),
+                ['class' => 'sbx-mic-label']),
+            'sbx-audio-indicator d-flex align-items-center mb-2', ['style' => 'gap:10px']);
     }
     echo html_writer::start_div('sbx-controls d-flex align-items-center mb-2', ['style' => 'gap:12px']);
     echo html_writer::tag('button', 'Record', ['type' => 'button', 'class' => 'sbx-record btn btn-primary']);
