@@ -1500,6 +1500,42 @@ if ($hassiteconfig) {
         . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
     ));
 
+    // v6.8.12 Soapbox video: site-wide caps and defaults for the video/audio
+    // presentation assignments. Instructors set per-assignment values within
+    // these caps; the caps are clamped server-side in soapbox_config.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_max_seconds',
+        'Soapbox max recording length (seconds)',
+        'Hard ceiling on any assignment\'s recording length. Instructors may set a shorter range. Default 720 (12 minutes).',
+        720,
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_max_recordings',
+        'Soapbox max recordings per student per assignment',
+        'Hard ceiling on how many recordings a student may make for one assignment, regardless of the per-assignment attempts setting. Default 3.',
+        3,
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_retention_days',
+        'Soapbox recording retention (days)',
+        'How long a recording is stored before automatic deletion; the transcript, score, and feedback are kept. Clamped to 1 to 28 days. Shorter is better data minimization. Default 7.',
+        7,
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/soapbox_video_quality',
+        'Soapbox video quality',
+        'Recording resolution and bitrate. This is the main cost and bandwidth lever; a talking-head presenter is legible at Standard. Low suits weak connections; High only when visual detail matters.',
+        'standard_480p',
+        [
+            'low_360p'      => 'Low (360p, ~3 MB/min)',
+            'standard_480p' => 'Standard (480p, ~4 MB/min)',
+            'high_720p'     => 'High (720p, ~9 MB/min)',
+        ]
+    ));
+
     // Student Survey.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/survey_heading',

@@ -1115,5 +1115,89 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026061500, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026071001) {
+        // v6.8.12 (Soapbox video): the per-assignment framework tables. Video/
+        // audio presentation assignments, their student-selectable topics, and
+        // the per-attempt recording rows (video auto-deleted after retention;
+        // transcript and score kept). Created only when absent so a fresh
+        // install (which gets them from install.xml) is untouched.
+
+        // Assignments.
+        $table = new xmldb_table('local_ai_course_assistant_sbx_assign');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('intro', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('introformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('ptype', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'informative');
+        $table->add_field('mode', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'video');
+        $table->add_field('min_seconds', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '300');
+        $table->add_field('max_seconds', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '420');
+        $table->add_field('max_attempts', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('stored_attempts', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
+        $table->add_field('rubricid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('speaking_level', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('courseid_fk_sbxa', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_key('rubricid_fk_sbxa', XMLDB_KEY_FOREIGN, ['rubricid'],
+            'local_ai_course_assistant_rubrics', ['id']);
+        $table->add_index('course_visible', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'visible']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Topics.
+        $table = new xmldb_table('local_ai_course_assistant_sbx_topic');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('assignid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('instructions', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('instructionsformat', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('pdf_itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('assignid_fk_sbxt', XMLDB_KEY_FOREIGN, ['assignid'],
+            'local_ai_course_assistant_sbx_assign', ['id']);
+        $table->add_index('assign_sort', XMLDB_INDEX_NOTUNIQUE, ['assignid', 'sortorder']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Recordings.
+        $table = new xmldb_table('local_ai_course_assistant_sbx_rec');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('assignid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('topicid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('mode', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'video');
+        $table->add_field('storage_key', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('duration_seconds', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('size_bytes', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'uploading');
+        $table->add_field('transcript', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('scoreid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('expires_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('assignid_fk_sbxr', XMLDB_KEY_FOREIGN, ['assignid'],
+            'local_ai_course_assistant_sbx_assign', ['id']);
+        $table->add_key('userid_fk_sbxr', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_key('scoreid_fk_sbxr', XMLDB_KEY_FOREIGN, ['scoreid'],
+            'local_ai_course_assistant_practice_scores', ['id']);
+        $table->add_index('assign_user', XMLDB_INDEX_NOTUNIQUE, ['assignid', 'userid']);
+        $table->add_index('status_expires', XMLDB_INDEX_NOTUNIQUE, ['status', 'expires_at']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026071001, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }
