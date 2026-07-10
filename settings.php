@@ -1536,6 +1536,45 @@ if ($hassiteconfig) {
         ]
     ));
 
+    // v6.8.13 Soapbox video: object storage for recordings. The browser uploads
+    // straight to S3 with a presigned URL (bytes never touch this server). By
+    // default recordings live in the shared archive bucket under a soapbox/
+    // prefix; a bucket lifecycle rule on that prefix is the deletion backstop.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_storage_bucket',
+        'Soapbox storage bucket',
+        'S3 bucket for recordings. Default: the shared archive bucket.',
+        'archive-course',
+        PARAM_TEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_storage_region',
+        'Soapbox storage region',
+        'AWS region of the bucket, e.g. us-east-1.',
+        'us-east-1',
+        PARAM_TEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_storage_prefix',
+        'Soapbox storage key prefix',
+        'Key prefix within the bucket. Recordings are stored under this path so a lifecycle rule can target them.',
+        'soapbox/',
+        PARAM_TEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_storage_key',
+        'Soapbox storage access key ID',
+        'Access key ID for an IAM principal limited to PutObject/GetObject/DeleteObject on the prefix above.',
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/soapbox_storage_secret',
+        'Soapbox storage secret access key',
+        'Secret access key for the access key ID above.',
+        ''
+    ));
+
     // Student Survey.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/survey_heading',
