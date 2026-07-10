@@ -425,7 +425,7 @@ class provider implements
         global $DB;
         try {
             $recs = $DB->get_records_sql(
-                "SELECT r.id, r.storage_key
+                "SELECT r.id, r.storage_key, r.deck_key
                    FROM {local_ai_course_assistant_sbx_rec} r
                    JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
                   WHERE r.userid = :userid AND a.courseid = :courseid",
@@ -439,10 +439,14 @@ class provider implements
         $storage = \local_ai_course_assistant\soapbox_storage::is_configured()
             ? new \local_ai_course_assistant\soapbox_storage() : null;
         foreach ($recs as $rec) {
-            if ($storage && !empty($rec->storage_key)) {
-                try {
-                    $storage->delete_object($rec->storage_key);
-                } catch (\Throwable $e) { /* backstop: bucket lifecycle rule */ }
+            if ($storage) {
+                foreach ([$rec->storage_key, $rec->deck_key] as $objkey) {
+                    if (!empty($objkey)) {
+                        try {
+                            $storage->delete_object($objkey);
+                        } catch (\Throwable $e) { /* backstop: bucket lifecycle rule */ }
+                    }
+                }
             }
             $DB->delete_records('local_ai_course_assistant_sbx_rec', ['id' => $rec->id]);
         }

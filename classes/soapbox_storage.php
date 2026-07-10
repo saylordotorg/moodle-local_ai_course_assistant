@@ -115,6 +115,20 @@ class soapbox_storage {
     }
 
     /**
+     * Build a unique object key for a slide deck (PDF), under the learner's own
+     * path so the finalize ownership check (prefix + courseid/userid/) still
+     * holds. The extra deck/ segment keeps decks distinguishable from recordings.
+     *
+     * @param int $courseid
+     * @param int $userid
+     * @return string
+     */
+    public static function make_deck_key(int $courseid, int $userid): string {
+        $token = random_string(24);
+        return self::prefix() . $courseid . '/' . $userid . '/deck/' . $token . '.pdf';
+    }
+
+    /**
      * Presigned PUT URL for uploading an object (browser -> S3 directly).
      *
      * @param string $key Object key (no leading slash).

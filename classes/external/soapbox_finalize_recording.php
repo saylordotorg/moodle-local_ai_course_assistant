@@ -48,6 +48,8 @@ class soapbox_finalize_recording extends external_api {
             'objectkey' => new external_value(PARAM_RAW, 'Object key returned by get_upload_url'),
             'topicid' => new external_value(PARAM_INT, 'Chosen topic id (0 = none)', VALUE_DEFAULT, 0),
             'durationseconds' => new external_value(PARAM_INT, 'Recorded duration in seconds', VALUE_DEFAULT, 0),
+            'deckkey' => new external_value(PARAM_RAW, 'Object key of the uploaded PDF deck (slides mode)', VALUE_DEFAULT, ''),
+            'slidetimeline' => new external_value(PARAM_RAW, 'JSON slide-advance timeline', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -56,15 +58,18 @@ class soapbox_finalize_recording extends external_api {
      * @param string $objectkey
      * @param int $topicid
      * @param int $durationseconds
+     * @param string $deckkey
+     * @param string $slidetimeline
      * @return array
      */
     public static function execute(int $assignid, string $objectkey, int $topicid = 0,
-            int $durationseconds = 0): array {
+            int $durationseconds = 0, string $deckkey = '', string $slidetimeline = ''): array {
         global $USER, $DB;
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'assignid' => $assignid, 'objectkey' => $objectkey,
             'topicid' => $topicid, 'durationseconds' => $durationseconds,
+            'deckkey' => $deckkey, 'slidetimeline' => $slidetimeline,
         ]);
 
         $assign = soapbox_assignment_manager::get_assignment((int) $params['assignid']);
@@ -97,6 +102,24 @@ class soapbox_finalize_recording extends external_api {
             $topicid = 0;
         }
 
+        // Slides (only for slides-enabled assignments): validate the deck key is
+        // under this learner's own path and the object landed; normalize the
+        // slide-advance timeline. A missing/foreign deck is dropped rather than
+        // failing the whole recording.
+        $deckkeystored = null;
+        $timelinejson = null;
+        if (!empty($assign->slides_enabled)) {
+            $deckkey = (string) $params['deckkey'];
+            if ($deckkey !== '' && strpos($deckkey, $expectedprefix) === 0
+                    && $storage->object_size($deckkey) !== null) {
+                $deckkeystored = $deckkey;
+            }
+            $timeline = soapbox_config::normalize_slide_timeline((string) $params['slidetimeline']);
+            if (!empty($timeline)) {
+                $timelinejson = json_encode($timeline);
+            }
+        }
+
         $now = time();
         $rec = (object) [
             'assignid'         => (int) $assign->id,
@@ -104,6 +127,8 @@ class soapbox_finalize_recording extends external_api {
             'topicid'          => $topicid ?: null,
             'mode'             => $assign->mode,
             'storage_key'      => $key,
+            'deck_key'         => $deckkeystored,
+            'slide_timeline'   => $timelinejson,
             'duration_seconds' => max(0, (int) $params['durationseconds']),
             'size_bytes'       => $size,
             'status'           => 'uploaded',

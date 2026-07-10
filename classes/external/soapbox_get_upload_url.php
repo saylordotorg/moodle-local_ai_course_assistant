@@ -50,19 +50,21 @@ class soapbox_get_upload_url extends external_api {
         return new external_function_parameters([
             'assignid' => new external_value(PARAM_INT, 'Soapbox assignment id'),
             'ext' => new external_value(PARAM_ALPHANUM, 'Recording file extension', VALUE_DEFAULT, 'mp4'),
+            'kind' => new external_value(PARAM_ALPHA, 'recording | deck', VALUE_DEFAULT, 'recording'),
         ]);
     }
 
     /**
      * @param int $assignid
      * @param string $ext
+     * @param string $kind
      * @return array
      */
-    public static function execute(int $assignid, string $ext = 'mp4'): array {
+    public static function execute(int $assignid, string $ext = 'mp4', string $kind = 'recording'): array {
         global $USER, $DB;
 
         $params = self::validate_parameters(self::execute_parameters(),
-            ['assignid' => $assignid, 'ext' => $ext]);
+            ['assignid' => $assignid, 'ext' => $ext, 'kind' => $kind]);
 
         $assign = soapbox_assignment_manager::get_assignment((int) $params['assignid']);
         if (!$assign || !$assign->visible) {
@@ -79,7 +81,26 @@ class soapbox_get_upload_url extends external_api {
             throw new \moodle_exception('soapbox:storage_unconfigured', 'local_ai_course_assistant');
         }
 
-        // Enforce the recording cap (per-assignment attempts, bounded by the admin max).
+        $storage = new soapbox_storage();
+
+        // Deck upload: only for slides-enabled assignments; a PDF under the
+        // learner's own deck/ path. No recording-cap check (a deck is not an
+        // attempt), and decks are pruned with their recording / on erasure.
+        if (($params['kind'] ?? 'recording') === 'deck') {
+            if (empty($assign->slides_enabled)) {
+                throw new \moodle_exception('soapbox:slides_disabled', 'local_ai_course_assistant');
+            }
+            $key = soapbox_storage::make_deck_key((int) $assign->courseid, (int) $USER->id);
+            return [
+                'uploadurl' => $storage->presign_put($key),
+                'objectkey' => $key,
+                'method'    => 'PUT',
+                'expiresin' => soapbox_storage::DEFAULT_EXPIRY,
+            ];
+        }
+
+        // Recording upload: enforce the recording cap (per-assignment attempts,
+        // bounded by the admin max).
         $made = $DB->count_records_select(
             'local_ai_course_assistant_sbx_rec',
             'assignid = :a AND userid = :u AND status <> :d',
@@ -93,7 +114,6 @@ class soapbox_get_upload_url extends external_api {
             $ext = ($assign->mode === 'audio') ? 'm4a' : 'mp4';
         }
         $key = soapbox_storage::make_object_key((int) $assign->courseid, (int) $USER->id, $ext);
-        $storage = new soapbox_storage();
 
         return [
             'uploadurl' => $storage->presign_put($key),
