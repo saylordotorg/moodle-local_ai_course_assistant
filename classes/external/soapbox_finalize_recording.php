@@ -114,6 +114,11 @@ class soapbox_finalize_recording extends external_api {
         ];
         $recid = (int) $DB->insert_record('local_ai_course_assistant_sbx_rec', $rec);
 
+        // Transcribe + score off the request.
+        $task = new \local_ai_course_assistant\task\score_recording();
+        $task->set_custom_data(['recid' => $recid]);
+        \core\task\manager::queue_adhoc_task($task);
+
         return [
             'recordingid' => $recid,
             'status'      => 'uploaded',
