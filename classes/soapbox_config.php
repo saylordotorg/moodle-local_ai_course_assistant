@@ -183,6 +183,55 @@ class soapbox_config {
         }
         $out['stored_attempts'] = $stored;
 
+        // v6.8.21: slides on/off (student uploads a PDF deck and advances it).
+        $out['slides_enabled'] = !empty($in['slides_enabled']) ? 1 : 0;
+
+        return $out;
+    }
+
+    /** @var int Max slide-advance events kept in a timeline (guards absurd input). */
+    const MAX_TIMELINE_EVENTS = 500;
+
+    /**
+     * Normalize a slide-advance timeline to a clean, bounded, sorted list of
+     * {t, i} entries (t = seconds into the recording, i = 0-based slide index).
+     * Pure so the recorder's captured timeline can be sanitized identically on
+     * the way in. Drops malformed entries, clamps negatives, sorts by time, and
+     * caps the count.
+     *
+     * @param mixed $raw Decoded JSON (array) or a JSON string.
+     * @param int $slidecount Number of slides in the deck (0 = unknown, no upper clamp on index).
+     * @return array List of ['t' => int, 'i' => int].
+     */
+    public static function normalize_slide_timeline($raw, int $slidecount = 0): array {
+        if (is_string($raw)) {
+            $raw = json_decode($raw, true);
+        }
+        if (!is_array($raw)) {
+            return [];
+        }
+        $out = [];
+        foreach ($raw as $entry) {
+            if (!is_array($entry) || !array_key_exists('t', $entry) || !array_key_exists('i', $entry)) {
+                continue;
+            }
+            $t = (int) round((float) $entry['t']);
+            $i = (int) $entry['i'];
+            if ($t < 0) {
+                $t = 0;
+            }
+            if ($i < 0) {
+                $i = 0;
+            }
+            if ($slidecount > 0 && $i > $slidecount - 1) {
+                $i = $slidecount - 1;
+            }
+            $out[] = ['t' => $t, 'i' => $i];
+        }
+        usort($out, fn($a, $b) => $a['t'] <=> $b['t']);
+        if (count($out) > self::MAX_TIMELINE_EVENTS) {
+            $out = array_slice($out, 0, self::MAX_TIMELINE_EVENTS);
+        }
         return $out;
     }
 }

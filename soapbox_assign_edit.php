@@ -71,6 +71,7 @@ if ($data = $form->get_data()) {
         'max_seconds'     => $data->max_seconds,
         'max_attempts'    => $data->max_attempts,
         'stored_attempts' => $data->stored_attempts,
+        'slides_enabled'  => $data->slides_enabled,
         'visible'         => $data->visible,
     ];
     if ($id) {
@@ -96,6 +97,7 @@ if ($existing) {
         'max_seconds'     => $existing->max_seconds,
         'max_attempts'    => $existing->max_attempts,
         'stored_attempts' => $existing->stored_attempts,
+        'slides_enabled'  => $existing->slides_enabled,
         'visible'         => $existing->visible,
     ]);
 } else {

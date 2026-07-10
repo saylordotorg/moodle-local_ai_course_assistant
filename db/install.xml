@@ -683,6 +683,7 @@
         <FIELD NAME="stored_attempts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="2" SEQUENCE="false"/>
         <FIELD NAME="rubricid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Custom rubric; null uses the level preset"/>
         <FIELD NAME="speaking_level" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="slides_enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="v6.8.21: student uploads a PDF deck and advances slides while recording"/>
         <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -729,6 +730,8 @@
         <FIELD NAME="size_bytes" TYPE="int" LENGTH="19" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="uploading" SEQUENCE="false" COMMENT="uploading | uploaded | scored | deleted | failed"/>
         <FIELD NAME="transcript" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="deck_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="v6.8.21: object-storage key for the uploaded PDF slide deck; null if none / deleted"/>
+        <FIELD NAME="slide_timeline" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="v6.8.21: JSON [{t:seconds, i:slideindex}] of slide advances during the recording"/>
         <FIELD NAME="scoreid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="expires_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
