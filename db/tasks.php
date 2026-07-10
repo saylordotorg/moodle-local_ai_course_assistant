@@ -89,6 +89,18 @@ $tasks = [
         'dayofweek' => '*',
     ],
     [
+        // v6.8.18 Soapbox: delete recording objects past their retention window
+        // and prune to the per-assignment stored-attempts cap. Transcript and
+        // score are retained; only the heavy video/audio object is removed.
+        'classname' => \local_ai_course_assistant\task\soapbox_cleanup::class,
+        'blocking' => 0,
+        'minute' => '50',
+        'hour' => '4',       // Daily at 4:50 AM server time.
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
         // Weekly digest email to course authors / instructional designers
         // for every course with the per-course digest toggle on.
         'classname' => \local_ai_course_assistant\task\instructor_weekly_digest::class,

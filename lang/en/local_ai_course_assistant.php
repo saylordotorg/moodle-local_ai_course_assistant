@@ -854,6 +854,7 @@ $string['chat:consent_privacy_link'] = 'Read the full privacy notice';
 // Scheduled tasks (v3.9.12).
 $string['task:audit_cleanup'] = 'AI Course Assistant audit table cleanup';
 $string['task:conversation_retention'] = 'AI Course Assistant conversation retention sweeper';
+$string['task:soapbox_cleanup'] = 'Soapbox recording retention and cleanup';
 $string['settings:audit_retention_days'] = 'Audit log retention (days)';
 $string['settings:audit_retention_days_desc'] = 'Daily scheduled task purges audit rows older than this. 0 disables. Default 365.';
 $string['settings:conversation_retention_days'] = 'Conversation retention (days)';

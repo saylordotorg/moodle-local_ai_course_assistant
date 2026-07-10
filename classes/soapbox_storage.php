@@ -190,6 +190,34 @@ class soapbox_storage {
     }
 
     /**
+     * Delete an object from storage. Returns true on a 2xx/404 (already gone),
+     * false on any other failure so the caller can leave the row for retry.
+     * A bucket lifecycle rule on the prefix is the backstop for anything missed.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function delete_object(string $key): bool {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        $url = self::presign_url([
+            'host'      => self::host(),
+            'region'    => self::region(),
+            'service'   => 's3',
+            'accesskey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
+            'secretkey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'method'    => 'DELETE',
+            'uri'       => self::encode_key_path($key),
+            'expires'   => 300,
+            'timestamp' => time(),
+        ]);
+        $curl = new \curl();
+        $curl->delete($url);
+        $code = (int) ($curl->get_info()['http_code'] ?? 0);
+        return ($code >= 200 && $code < 300) || $code === 404;
+    }
+
+    /**
      * URI-encode an object key path, preserving slashes between segments.
      *
      * @param string $key
