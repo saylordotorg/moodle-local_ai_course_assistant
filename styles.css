@@ -5767,3 +5767,9 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 .aica-id-mt8 { margin-top: 8px; }
 .aica-id-narrow { max-width: 820px; }
 @media (max-width: 700px) { .aica-id-tiles { grid-template-columns: repeat(2, 1fr); } }
+
+/* Soapbox video recorder (v6.8.16) */
+.sbx-recorder.sbx-recording .sbx-record { display: none; }
+.sbx-recorder .sbx-timer { font-variant-numeric: tabular-nums; }
+.sbx-recorder.sbx-near-max .sbx-timer { color: #b4791f; }
+.sbx-recorder.sbx-recording .sbx-preview { outline: 3px solid #d64550; }

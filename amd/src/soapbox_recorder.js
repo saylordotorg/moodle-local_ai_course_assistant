@@ -148,10 +148,18 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str'], function(Uplo
                     return;
                 }
                 var blob = new Blob(chunks, {type: mime || 'application/octet-stream'});
+                // Read the currently-chosen topic, if a picker is wired.
+                var topicid = config.topicid || 0;
+                if (config.topicSelector) {
+                    var tsel = document.querySelector(config.topicSelector);
+                    if (tsel && tsel.value) {
+                        topicid = parseInt(tsel.value, 10) || 0;
+                    }
+                }
                 setStatus('Uploading...');
                 Uploader.uploadRecording({
                     assignid: config.assignid,
-                    topicid: config.topicid || 0,
+                    topicid: topicid,
                     blob: blob,
                     ext: extFor(mime || (config.mode === 'audio' ? 'audio/webm' : 'video/webm')),
                     contentType: mime || 'application/octet-stream',
