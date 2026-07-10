@@ -562,6 +562,48 @@ class provider implements
                     ]
                 );
             }
+
+            // Export mastery attempts (per-objective mastery signal, including the
+            // conversation-derived signal written with source = conversation).
+            $attempts = $DB->get_records('local_ai_course_assistant_obj_att', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($attempts as $attempt) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'mastery_attempts', $attempt->id],
+                    (object) [
+                        'objectiveid' => $attempt->objectiveid,
+                        'source' => $attempt->source,
+                        'msgid' => $attempt->msgid,
+                        'iscorrect' => $attempt->iscorrect,
+                        'weight' => $attempt->weight,
+                        'confidence' => $attempt->confidence,
+                        'timecreated' => transform::datetime($attempt->timecreated),
+                    ]
+                );
+            }
+
+            // Export struggle signals (short-lived engagement signal used only to
+            // adjust tutor tone; 7-day TTL, never surfaced to instructors).
+            $struggles = $DB->get_records('local_ai_course_assistant_struggle_signal', [
+                'userid' => $userid,
+                'courseid' => $context->instanceid,
+            ]);
+            foreach ($struggles as $signal) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'struggle_signals', $signal->id],
+                    (object) [
+                        'session_id' => $signal->session_id,
+                        'topic_hint' => $signal->topic_hint,
+                        'stage1_score' => $signal->stage1_score,
+                        'stage2_label' => $signal->stage2_label,
+                        'followup_sent_at' => empty($signal->followup_sent_at)
+                            ? null : transform::datetime($signal->followup_sent_at),
+                        'timecreated' => transform::datetime($signal->timecreated),
+                    ]
+                );
+            }
         }
     }
 
