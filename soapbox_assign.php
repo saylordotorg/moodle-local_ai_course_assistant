@@ -78,7 +78,7 @@ if (empty($assignments)) {
     echo $OUTPUT->notification('No Soapbox assignments yet.', 'info');
 } else {
     $table = new html_table();
-    $table->head = ['Name', 'Type', 'Recording', 'Length', 'Kept', 'Visible', 'Actions'];
+    $table->head = ['Name', 'Type', 'Recording', 'Length', 'Kept', 'Visible', 'Student link', 'Actions'];
     $table->attributes['class'] = 'generaltable';
     foreach ($assignments as $a) {
         $editurl = new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php',
@@ -88,13 +88,25 @@ if (empty($assignments)) {
             . ' &middot; '
             . html_writer::link($delurl, 'Delete');
         $length = ((int) $a->min_seconds) . '-' . ((int) $a->max_seconds) . 's';
+        // Copyable student URL so an instructor can paste a link to this
+        // assignment anywhere in the course (a Label, Page, or section summary).
+        $studenturl = (new moodle_url('/local/ai_course_assistant/soapbox_present.php',
+            ['id' => $a->id]))->out(false);
+        $linkcell = html_writer::empty_tag('input', [
+            'type' => 'text', 'readonly' => 'readonly', 'value' => $studenturl,
+            'class' => 'form-control form-control-sm', 'style' => 'width:15em',
+            'onclick' => 'this.select();', 'aria-label' => get_string('soapbox:copy_link', 'local_ai_course_assistant'),
+        ]);
         $table->data[] = [
-            format_string($a->name),
+            html_writer::link(
+                new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $a->id]),
+                format_string($a->name)),
             s($a->ptype),
             $a->mode === 'audio' ? 'Audio' : 'Video',
             $length,
             (int) $a->stored_attempts,
             $a->visible ? 'Yes' : 'No',
+            $linkcell,
             $actions,
         ];
     }
