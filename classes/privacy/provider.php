@@ -218,6 +218,17 @@ class provider implements
                 'userid' => 'privacy:metadata:email_optout:userid',
             ],
             'privacy:metadata:email_optout');
+        // v6.8.20 Soapbox video: per-attempt recording rows. The recording
+        // object itself is retention-deleted; the transcript is stored here for
+        // feedback and subject-access, so it is declared.
+        $collection->add_database_table('local_ai_course_assistant_sbx_rec',
+            [
+                'userid' => 'privacy:metadata:sbx_rec:userid',
+                'transcript' => 'privacy:metadata:sbx_rec:transcript',
+                'duration_seconds' => 'privacy:metadata:sbx_rec:duration_seconds',
+                'timecreated' => 'privacy:metadata:sbx_rec:timecreated',
+            ],
+            'privacy:metadata:sbx_rec');
 
         // External systems that personal data may be transmitted to. The plugin
         // forwards learner-authored content to the admin-configured AI provider
@@ -329,6 +340,17 @@ class provider implements
             'userid' => $userid,
         ]);
 
+        // v6.8.20 Soapbox recordings (keyed on the assignment; join to course).
+        $sql = "SELECT DISTINCT ctx.id
+                  FROM {local_ai_course_assistant_sbx_rec} r
+                  JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
+                  JOIN {context} ctx ON ctx.instanceid = a.courseid AND ctx.contextlevel = :contextlevel
+                 WHERE r.userid = :userid";
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid' => $userid,
+        ]);
+
         return $contextlist;
     }
 
@@ -382,6 +404,48 @@ class provider implements
                   FROM {local_ai_course_assistant_practice_scores}
                  WHERE courseid = :courseid";
         $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+
+        // v6.8.20 Soapbox recordings (keyed on the assignment; join to course).
+        $sql = "SELECT DISTINCT r.userid
+                  FROM {local_ai_course_assistant_sbx_rec} r
+                  JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
+                 WHERE a.courseid = :courseid";
+        $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
+    }
+
+    /**
+     * Purge a user's Soapbox recordings in a course: delete the stored media
+     * object (best-effort, so erasure removes the media not just the row) then
+     * the rows. sbx_rec is keyed on the assignment, so scope via a join.
+     *
+     * @param int $userid
+     * @param int $courseid
+     */
+    private static function purge_soapbox_recordings(int $userid, int $courseid): void {
+        global $DB;
+        try {
+            $recs = $DB->get_records_sql(
+                "SELECT r.id, r.storage_key
+                   FROM {local_ai_course_assistant_sbx_rec} r
+                   JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
+                  WHERE r.userid = :userid AND a.courseid = :courseid",
+                ['userid' => $userid, 'courseid' => $courseid]);
+        } catch (\Throwable $e) {
+            return; // Tables absent on older installs.
+        }
+        if (empty($recs)) {
+            return;
+        }
+        $storage = \local_ai_course_assistant\soapbox_storage::is_configured()
+            ? new \local_ai_course_assistant\soapbox_storage() : null;
+        foreach ($recs as $rec) {
+            if ($storage && !empty($rec->storage_key)) {
+                try {
+                    $storage->delete_object($rec->storage_key);
+                } catch (\Throwable $e) { /* backstop: bucket lifecycle rule */ }
+            }
+            $DB->delete_records('local_ai_course_assistant_sbx_rec', ['id' => $rec->id]);
+        }
     }
 
     /**
@@ -604,6 +668,30 @@ class provider implements
                     ]
                 );
             }
+
+            // Export Soapbox presentation recordings (metadata + transcript;
+            // the media object itself is retention-deleted). sbx_rec keys on the
+            // assignment, so join to scope by course.
+            $recs = $DB->get_records_sql(
+                "SELECT r.*
+                   FROM {local_ai_course_assistant_sbx_rec} r
+                   JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
+                  WHERE r.userid = :userid AND a.courseid = :courseid",
+                ['userid' => $userid, 'courseid' => $context->instanceid]);
+            foreach ($recs as $rec) {
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_ai_course_assistant'), 'soapbox_recordings', $rec->id],
+                    (object) [
+                        'mode' => $rec->mode,
+                        'status' => $rec->status,
+                        'duration_seconds' => $rec->duration_seconds,
+                        'transcript' => $rec->transcript,
+                        'timecreated' => transform::datetime($rec->timecreated),
+                        'expires_at' => empty($rec->expires_at)
+                            ? null : transform::datetime($rec->expires_at),
+                    ]
+                );
+            }
         }
     }
 
@@ -718,6 +806,9 @@ class provider implements
                     'courseid' => $context->instanceid,
                 ]);
             } catch (\Throwable $e) { /* ignore */ }
+            // v6.8.20 Soapbox recordings (assignid-keyed; delete the storage
+            // object too so erasure removes the media, not just the row).
+            self::purge_soapbox_recordings($userid, (int) $context->instanceid);
         }
 
         // v5.10.x: email opt-out is user-global (courseid may be null), so it
@@ -815,6 +906,8 @@ class provider implements
                     'courseid' => $context->instanceid,
                 ]);
             } catch (\Throwable $e) { /* ignore */ }
+            // v6.8.20 Soapbox recordings (assignid-keyed; also drop the object).
+            self::purge_soapbox_recordings($userid, (int) $context->instanceid);
             // v5.10.x: email opt-out is user-global; purge by userid.
             try {
                 $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
