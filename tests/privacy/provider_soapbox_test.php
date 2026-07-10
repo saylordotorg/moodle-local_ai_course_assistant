@@ -63,9 +63,9 @@ final class provider_soapbox_test extends \advanced_testcase {
     public function test_context_discovery_finds_recording_only_user(): void {
         $this->resetAfterTest();
         [$course, $user] = $this->seed();
-        $contexts = provider::get_contexts_for_userid((int) $user->id)->get_contextids();
+        $contexts = array_map('intval', provider::get_contexts_for_userid((int) $user->id)->get_contextids());
         $coursectx = \context_course::instance($course->id);
-        $this->assertContains($coursectx->id, $contexts);
+        $this->assertContains((int) $coursectx->id, $contexts);
     }
 
     public function test_export_includes_recording_transcript(): void {
