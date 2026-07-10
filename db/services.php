@@ -341,4 +341,18 @@ $functions = [
         'capabilities' => 'local/ai_course_assistant:use',
         'services'     => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_ai_course_assistant_soapbox_get_upload_url' => [
+        'classname'    => \local_ai_course_assistant\external\soapbox_get_upload_url::class,
+        'description'  => 'Soapbox video: issue a presigned URL for a direct browser upload of a recording.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
+    'local_ai_course_assistant_soapbox_finalize_recording' => [
+        'classname'    => \local_ai_course_assistant\external\soapbox_finalize_recording::class,
+        'description'  => 'Soapbox video: register an uploaded recording after the browser finishes the upload.',
+        'type'         => 'write',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
 ];

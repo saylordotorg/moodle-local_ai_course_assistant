@@ -157,6 +157,39 @@ class soapbox_storage {
     }
 
     /**
+     * Size of an object in bytes, or null if it does not exist / cannot be read.
+     * Used by finalize to confirm the browser actually uploaded before a row is
+     * recorded. Signs a HEAD request (method is part of the SigV4 canonical
+     * request, so a GET-signed URL cannot be reused for HEAD).
+     *
+     * @param string $key
+     * @return int|null
+     */
+    public function object_size(string $key): ?int {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        $url = self::presign_url([
+            'host'      => self::host(),
+            'region'    => self::region(),
+            'service'   => 's3',
+            'accesskey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
+            'secretkey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'method'    => 'HEAD',
+            'uri'       => self::encode_key_path($key),
+            'expires'   => 300,
+            'timestamp' => time(),
+        ]);
+        $curl = new \curl();
+        $curl->head($url);
+        $info = $curl->get_info();
+        if ((int) ($info['http_code'] ?? 0) !== 200) {
+            return null;
+        }
+        $size = $info['download_content_length'] ?? null;
+        return ($size !== null && $size >= 0) ? (int) $size : null;
+    }
+
+    /**
      * URI-encode an object key path, preserving slashes between segments.
      *
      * @param string $key
