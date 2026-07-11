@@ -1861,6 +1861,16 @@ if ($hassiteconfig) {
         '0.75',
         PARAM_RAW
     ));
+    // v6.8.28 Outcomes-based assessment (WSCUC): the institution-set benchmark,
+    // as a percentage, for the per-outcome achievement report. Distinct from the
+    // coaching mastery threshold above: this is the reporting standard.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/outcomes_benchmark_default',
+        get_string('settings:outcomes_benchmark_default', 'local_ai_course_assistant'),
+        get_string('settings:outcomes_benchmark_default_desc', 'local_ai_course_assistant'),
+        '70',
+        PARAM_INT
+    ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_window',
         get_string('settings:mastery_window', 'local_ai_course_assistant'),
