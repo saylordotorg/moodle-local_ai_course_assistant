@@ -99,10 +99,16 @@ class soapbox_cleanup extends \core\task\scheduled_task {
                 return;
             }
         }
+        // Also drop the slide deck, if any (best-effort; the bucket lifecycle
+        // rule on the prefix is the backstop for a failed delete).
+        if (!empty($rec->deck_key)) {
+            $storage->delete_object($rec->deck_key);
+        }
         $DB->update_record('local_ai_course_assistant_sbx_rec', (object) [
             'id' => $rec->id,
             'status' => 'deleted',
             'storage_key' => null,
+            'deck_key' => null,
         ]);
     }
 }

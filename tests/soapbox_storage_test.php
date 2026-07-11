@@ -90,4 +90,15 @@ final class soapbox_storage_test extends \advanced_testcase {
         $this->assertStringStartsWith('soapbox/7/42/', $key);
         $this->assertStringEndsWith('.mp4', $key);
     }
+
+    public function test_make_deck_key_under_learner_path(): void {
+        $this->resetAfterTest();
+        set_config('soapbox_storage_prefix', 'soapbox/', 'local_ai_course_assistant');
+        $key = soapbox_storage::make_deck_key(7, 42);
+        // Starts with the learner's own path (so the finalize ownership check
+        // passes) and is a PDF under a deck/ segment.
+        $this->assertStringStartsWith('soapbox/7/42/', $key);
+        $this->assertStringContainsString('/deck/', $key);
+        $this->assertStringEndsWith('.pdf', $key);
+    }
 }

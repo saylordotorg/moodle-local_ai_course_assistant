@@ -1632,6 +1632,7 @@ $string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
 $string['soapbox:cap_reached']      = 'You have reached the maximum number of recordings for this assignment.';
 $string['soapbox:storage_unconfigured'] = 'Recording storage is not set up yet. Please contact your administrator.';
 $string['soapbox:bad_key']          = 'That upload does not belong to you.';
+$string['soapbox:slides_disabled']  = 'Slides are not enabled for this assignment.';
 $string['soapbox:upload_missing']   = 'The upload could not be found. Please try recording again.';
 $string['soapbox:intro']            = 'Give a speech and get coaching. Optionally set a name, topic, and target length, then record yourself speaking. Soapbox transcribes your speech, scores it against a speaking rubric, and gives you concrete tips. Your audio and the transcript are never stored, only your scores and feedback.';
 $string['soapbox:optional']         = 'optional';
