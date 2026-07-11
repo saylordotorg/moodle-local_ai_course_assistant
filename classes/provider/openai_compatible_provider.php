@@ -110,20 +110,33 @@ abstract class openai_compatible_provider extends base_provider {
             ];
         }
 
-        // Multimodal: attach the image to the latest user message as a
-        // content-block array, matching the OpenAI chat/completions schema
-        // that Gemini, xAI, and other compatible endpoints also accept.
+        // Multimodal: attach one or more images to the latest user message as a
+        // content-block array, matching the OpenAI chat/completions schema that
+        // Gemini, xAI, and other compatible endpoints also accept.
+        //   options['attachment']     => single {base64, mime} image
+        //   options['image_datauris'] => list of full data: URI strings (slide vision)
+        $imageurls = [];
         if (!empty($options['attachment']['base64']) && !empty($options['attachment']['mime'])) {
+            $imageurls[] = 'data:' . $options['attachment']['mime']
+                . ';base64,' . $options['attachment']['base64'];
+        }
+        if (!empty($options['image_datauris']) && is_array($options['image_datauris'])) {
+            foreach ($options['image_datauris'] as $uri) {
+                $uri = (string) $uri;
+                if (str_starts_with($uri, 'data:image/')) {
+                    $imageurls[] = $uri;
+                }
+            }
+        }
+        if (!empty($imageurls)) {
             for ($i = count($apimessages) - 1; $i >= 0; $i--) {
                 if (($apimessages[$i]['role'] ?? '') === 'user') {
                     $text = is_string($apimessages[$i]['content']) ? $apimessages[$i]['content'] : '';
-                    $apimessages[$i]['content'] = [
-                        ['type' => 'text', 'text' => $text],
-                        ['type' => 'image_url', 'image_url' => [
-                            'url' => 'data:' . $options['attachment']['mime']
-                                . ';base64,' . $options['attachment']['base64'],
-                        ]],
-                    ];
+                    $content = [['type' => 'text', 'text' => $text]];
+                    foreach ($imageurls as $url) {
+                        $content[] = ['type' => 'image_url', 'image_url' => ['url' => $url]];
+                    }
+                    $apimessages[$i]['content'] = $content;
                     break;
                 }
             }

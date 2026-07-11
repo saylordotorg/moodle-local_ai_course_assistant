@@ -1536,6 +1536,31 @@ if ($hassiteconfig) {
         ]
     ));
 
+    // v6.8.31 Soapbox slide vision (Phase 2, issue 15): master toggle for the
+    // optional gpt-4o-mini vision pass over slide images. Off by default; even
+    // when on, each assignment must also opt in via its own Slide visual-design
+    // feedback checkbox. The pass adds a short visual-design note to the score.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/soapbox_slide_vision',
+        get_string('settings:soapbox_slide_vision', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_slide_vision_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_vision_provider',
+        get_string('settings:soapbox_vision_provider', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_vision_provider_desc', 'local_ai_course_assistant'),
+        'openai',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/soapbox_vision_model',
+        get_string('settings:soapbox_vision_model', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_vision_model_desc', 'local_ai_course_assistant'),
+        'gpt-4o-mini',
+        PARAM_RAW_TRIMMED
+    ));
+
     // v6.8.13 Soapbox video: object storage for recordings. The browser uploads
     // straight to S3 with a presigned URL (bytes never touch this server). By
     // default recordings live in the shared archive bucket under a soapbox/

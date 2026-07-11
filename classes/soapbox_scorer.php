@@ -121,13 +121,24 @@ class soapbox_scorer {
         // and time spent per slide.
         $slidecontext = '';
         $slidecount = 0;
+        $visionnote = '';
         if (!empty($assign->slides_enabled) && !empty($rec->deck_key)
                 && soapbox_deck_renderer::is_available()) {
-            $texts = self::deck_text($rec->deck_key);
-            if (!empty($texts)) {
-                $timeline = soapbox_config::normalize_slide_timeline((string) ($rec->slide_timeline ?? ''));
-                $slidecontext = self::build_slide_context($texts, $timeline, (int) $rec->duration_seconds);
-                $slidecount = count($texts);
+            $deckpdf = self::download_deck($rec->deck_key);
+            if ($deckpdf !== null) {
+                $texts = soapbox_deck_renderer::extract_text($deckpdf);
+                if (!empty($texts)) {
+                    $timeline = soapbox_config::normalize_slide_timeline((string) ($rec->slide_timeline ?? ''));
+                    $slidecontext = self::build_slide_context($texts, $timeline, (int) $rec->duration_seconds);
+                    $slidecount = count($texts);
+                }
+                // v6.8.31: optional single vision pass over the rendered slide
+                // images for visual-design feedback (best-effort, off by default).
+                if (soapbox_slide_vision::is_enabled($assign)) {
+                    $datauris = soapbox_deck_renderer::render_to_datauris($deckpdf);
+                    $visionnote = soapbox_slide_vision::design_note(
+                        $datauris, (string) $assign->ptype, (int) $assign->courseid);
+                }
             }
         }
 
@@ -142,7 +153,7 @@ class soapbox_scorer {
         $result = score_speech::execute(
             (int) $assign->courseid, $transcript, '', $topictitle,
             (int) $assign->max_seconds, (int) $rec->duration_seconds, (string) $assign->ptype,
-            $slidecontext, $slidecount);
+            $slidecontext, $slidecount, $visionnote);
 
         $update = (object) [
             'id'         => $recid,
@@ -154,12 +165,15 @@ class soapbox_scorer {
     }
 
     /**
-     * Download a stored deck and extract its per-page text.
+     * Download a stored deck to a per-request temp PDF. Returns the local path,
+     * or null if the object is missing / empty. Downloading once lets a single
+     * caller both extract text and rasterize pages (slide vision) without a
+     * second fetch.
      *
      * @param string $deckkey
-     * @return string[] Per-page text (empty on failure).
+     * @return string|null Local PDF path, or null on failure.
      */
-    public static function deck_text(string $deckkey): array {
+    public static function download_deck(string $deckkey): ?string {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         $storage = new soapbox_storage();
@@ -168,9 +182,20 @@ class soapbox_scorer {
         $curl->download_one($storage->presign_get($deckkey, 900), null,
             ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]);
         if (!is_file($tmp) || filesize($tmp) === 0) {
-            return [];
+            return null;
         }
-        return soapbox_deck_renderer::extract_text($tmp);
+        return $tmp;
+    }
+
+    /**
+     * Download a stored deck and extract its per-page text.
+     *
+     * @param string $deckkey
+     * @return string[] Per-page text (empty on failure).
+     */
+    public static function deck_text(string $deckkey): array {
+        $tmp = self::download_deck($deckkey);
+        return ($tmp !== null) ? soapbox_deck_renderer::extract_text($tmp) : [];
     }
 
     /**

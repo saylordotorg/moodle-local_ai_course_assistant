@@ -90,6 +90,14 @@ class soapbox_assignment_form extends \moodleform {
             'Slides', 'Let students upload a PDF deck and advance slides while recording');
         $mform->setDefault('slides_enabled', 0);
 
+        // v6.8.31: optional slide-vision pass. Only meaningful with slides on, and
+        // additionally gated on the site soapbox_slide_vision toggle at run time.
+        $mform->addElement('advcheckbox', 'slide_vision',
+            'Slide visual-design feedback',
+            'Also run a vision pass over the slide images for visual-design notes (requires Slides, and the site Soapbox slide-vision setting)');
+        $mform->setDefault('slide_vision', 0);
+        $mform->disabledIf('slide_vision', 'slides_enabled', 'notchecked');
+
         $mform->addElement('advcheckbox', 'visible', 'Visible to students');
         $mform->setDefault('visible', 1);
 
