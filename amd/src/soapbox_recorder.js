@@ -156,6 +156,14 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str'], function(Uplo
                         topicid = parseInt(tsel.value, 10) || 0;
                     }
                 }
+                // Slides: stop capture and collect the deck key + timeline.
+                var deckKey = '';
+                var slideTimeline = '';
+                if (config.slides) {
+                    config.slides.stopCapture();
+                    deckKey = config.deckKey || '';
+                    slideTimeline = JSON.stringify(config.slides.getTimeline());
+                }
                 setStatus('Uploading...');
                 Uploader.uploadRecording({
                     assignid: config.assignid,
@@ -163,7 +171,9 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str'], function(Uplo
                     blob: blob,
                     ext: extFor(mime || (config.mode === 'audio' ? 'audio/webm' : 'video/webm')),
                     contentType: mime || 'application/octet-stream',
-                    durationSeconds: elapsed
+                    durationSeconds: elapsed,
+                    deckKey: deckKey,
+                    slideTimeline: slideTimeline
                 }).then(function(res) {
                     setStatus('Uploaded.');
                     if (resultEl) {
@@ -238,6 +248,12 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str'], function(Uplo
                     recorder.onstop = handleStop;
                     recorder.start();
                     startedAt = Date.now();
+                    // Slides: begin capturing advances against this recording's clock.
+                    if (config.slides) {
+                        config.slides.startCapture(function() {
+                            return (Date.now() - startedAt) / 1000;
+                        });
+                    }
                     root.classList.remove('sbx-near-max');
                     root.classList.add('sbx-recording');
                     if (recBtn) {

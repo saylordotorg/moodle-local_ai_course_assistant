@@ -77,6 +77,33 @@ define(['core/ajax'], function(Ajax) {
 
     return {
         /**
+         * Upload a slide deck (PDF) ahead of recording. Returns the object key
+         * to pass back to uploadRecording as deckKey.
+         *
+         * @param {object} opts
+         * @param {number} opts.assignid
+         * @param {Blob} opts.blob PDF deck data
+         * @param {function} [opts.fetchFn]
+         * @param {object} [opts.ajax]
+         * @param {number} [opts.retries]
+         * @return {Promise<string>} the deck object key
+         */
+        uploadDeck: function(opts) {
+            var ajax = opts.ajax || Ajax;
+            var fetchFn = opts.fetchFn || window.fetch.bind(window);
+            var retries = opts.retries || 3;
+            return ajax.call([{
+                methodname: 'local_ai_course_assistant_soapbox_get_upload_url',
+                args: {assignid: opts.assignid, ext: 'pdf', kind: 'deck'}
+            }])[0].then(function(urlinfo) {
+                return putWithRetry(fetchFn, urlinfo.uploadurl, opts.blob, 'application/pdf', retries)
+                    .then(function() {
+                        return urlinfo.objectkey;
+                    });
+            });
+        },
+
+        /**
          * Upload a finished recording end to end.
          *
          * @param {object} opts
@@ -86,6 +113,8 @@ define(['core/ajax'], function(Ajax) {
          * @param {string} opts.ext file extension (mp4/webm/...)
          * @param {string} opts.contentType MIME type for the PUT
          * @param {number} opts.durationSeconds
+         * @param {string} [opts.deckKey] slide deck object key (slides mode)
+         * @param {string} [opts.slideTimeline] JSON slide-advance timeline
          * @param {function} [opts.fetchFn] fetch (defaults to window.fetch)
          * @param {object} [opts.ajax] core/ajax (defaults to the module)
          * @param {number} [opts.retries] PUT attempts (default 3)
@@ -108,7 +137,9 @@ define(['core/ajax'], function(Ajax) {
                                 assignid: opts.assignid,
                                 objectkey: urlinfo.objectkey,
                                 topicid: opts.topicid || 0,
-                                durationseconds: opts.durationSeconds || 0
+                                durationseconds: opts.durationSeconds || 0,
+                                deckkey: opts.deckKey || '',
+                                slidetimeline: opts.slideTimeline || ''
                             }
                         }])[0];
                     });
