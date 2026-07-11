@@ -271,6 +271,7 @@ class objective_manager {
      * @param float      $weight      Quiz attempts 1.0; classifier signals 0.3.
      * @param int|null   $msgid       Optional pointer to the originating message.
      * @param float|null $confidence  Classifier confidence (0..1) when source=conversation.
+     * @param float|null $score       Partial-credit observation (0..1); blends fractionally when set.
      * @return int Attempt row id.
      */
     public static function record_attempt(
@@ -281,9 +282,17 @@ class objective_manager {
         string $source = 'quiz',
         float $weight = 1.0,
         ?int $msgid = null,
-        ?float $confidence = null
+        ?float $confidence = null,
+        ?float $score = null
     ): int {
         global $DB;
+        // A partial-credit score (0-1), when supplied, is stored so mastery can
+        // blend it fractionally; iscorrect is still set (rounded) so any code
+        // reading the binary column stays sensible.
+        if ($score !== null) {
+            $score = max(0.0, min(1.0, $score));
+            $iscorrect = $score >= 0.5;
+        }
         return (int) $DB->insert_record(self::TABLE_ATTS, (object) [
             'userid' => $userid,
             'courseid' => $courseid,
@@ -293,6 +302,7 @@ class objective_manager {
             'iscorrect' => $iscorrect ? 1 : 0,
             'weight' => $weight,
             'confidence' => $confidence,
+            'score' => $score,
             'timecreated' => time(),
         ]);
     }
@@ -361,9 +371,14 @@ class objective_manager {
             $decay = self::DEFAULT_DECAY ** $i;
             $w = (float) $att->weight * $decay;
             $denominator += $w;
-            if ((int) $att->iscorrect === 1) {
-                $numerator += $w;
+            // Partial-credit: when a continuous score (0-1) is present it
+            // contributes fractionally; otherwise the binary iscorrect (0/1).
+            if (isset($att->score) && $att->score !== null) {
+                $correctness = max(0.0, min(1.0, (float) $att->score));
+            } else {
+                $correctness = ((int) $att->iscorrect === 1) ? 1.0 : 0.0;
             }
+            $numerator += $w * $correctness;
             if ($i === 0) {
                 $last = (int) $att->timecreated;
             }

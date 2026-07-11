@@ -1224,5 +1224,19 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026071010, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026071100) {
+        // v6.8.29: partial-credit (continuous) mastery observations. A nullable
+        // score column on obj_att; when set (0-1) it contributes fractionally to
+        // the mastery estimate instead of the binary iscorrect.
+        $table = new xmldb_table('local_ai_course_assistant_obj_att');
+        $field = new xmldb_field('score', XMLDB_TYPE_NUMBER, '4, 3', null,
+            null, null, null, 'confidence');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026071100, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }
