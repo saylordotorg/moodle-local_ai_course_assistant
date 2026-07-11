@@ -191,6 +191,14 @@ if (empty($recs)) {
         if ($storage && $r->storage_key && $r->status !== 'deleted') {
             $url = $storage->presign_get($r->storage_key, 3600);
             $view = html_writer::link($url, 'View / download', ['target' => '_blank', 'rel' => 'noopener']);
+            // Slides playback: recordings that carry a deck can be played back
+            // with the slides advancing in sync.
+            if (!empty($r->deck_key) && !empty($r->slide_timeline)) {
+                $view .= ' &middot; ' . html_writer::tag('button',
+                    get_string('soapbox:play_slides', 'local_ai_course_assistant'),
+                    ['type' => 'button', 'class' => 'sbx-play-btn btn btn-link btn-sm p-0',
+                     'data-recid' => (int) $r->id]);
+            }
         } else if ($r->status === 'deleted') {
             $view = html_writer::span('Expired', 'text-muted');
         }
@@ -202,9 +210,13 @@ if (empty($recs)) {
         ];
     }
     echo html_writer::table($table);
+    // Container the player renders into when a "Play with slides" button is used.
+    echo html_writer::div('', 'sbx-playback mt-3', ['id' => 'sbx-playback']);
     echo html_writer::div(
         'Recordings are available to view and download for ' . soapbox_config::retention_days()
         . ' days, then automatically deleted.', 'small text-muted mt-1');
+    $PAGE->requires->js_call_amd('local_ai_course_assistant/soapbox_player', 'init',
+        ['#sbx-playback', '.sbx-play-btn']);
 }
 
 echo $OUTPUT->footer();

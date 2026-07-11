@@ -362,4 +362,11 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_soapbox_get_playback' => [
+        'classname'    => \local_ai_course_assistant\external\soapbox_get_playback::class,
+        'description'  => 'Soapbox slides: video URL, rendered deck pages, and slide timeline for synced playback.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
 ];
