@@ -54,6 +54,7 @@ class score_speech extends external_api {
             'mode'       => new external_value(PARAM_ALPHA, 'Presentation type: informative | persuasive', VALUE_DEFAULT, 'informative'),
             'slidecontext' => new external_value(PARAM_RAW, 'Slide-by-slide text + pacing context (slides mode)', VALUE_DEFAULT, ''),
             'slidecount' => new external_value(PARAM_INT, 'Number of slides (0 = no slides)', VALUE_DEFAULT, 0),
+            'visionnote' => new external_value(PARAM_RAW, 'Optional slide visual-design note from the vision pass', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -67,16 +68,17 @@ class score_speech extends external_api {
      * @param string $mode
      * @param string $slidecontext
      * @param int $slidecount
+     * @param string $visionnote
      * @return array
      */
     public static function execute(int $courseid, string $transcript, string $name = '',
             string $topic = '', int $targetsec = 0, int $durationsec = 0, string $mode = 'informative',
-            string $slidecontext = '', int $slidecount = 0): array {
+            string $slidecontext = '', int $slidecount = 0, string $visionnote = ''): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid, 'transcript' => $transcript, 'name' => $name,
             'topic' => $topic, 'targetsec' => $targetsec, 'durationsec' => $durationsec, 'mode' => $mode,
-            'slidecontext' => $slidecontext, 'slidecount' => $slidecount,
+            'slidecontext' => $slidecontext, 'slidecount' => $slidecount, 'visionnote' => $visionnote,
         ]);
         $courseid = (int) $params['courseid'];
         $context = \context_course::instance($courseid);
@@ -223,6 +225,15 @@ class score_speech extends external_api {
         $overall = (string) ($decoded['overall'] ?? '');
         $tips = array_map('strval', (array) ($decoded['tips'] ?? []));
 
+        // v6.8.31: a slide visual-design note from the vision pass (when enabled)
+        // is appended to the overall comment and kept in meta, so it surfaces on
+        // the existing score display and history without a schema change.
+        $visionnote = trim((string) ($params['visionnote'] ?? ''));
+        if ($visionnote !== '') {
+            $label = get_string('soapbox:slide_design_note', 'local_ai_course_assistant');
+            $overall = trim($overall . "\n\n" . $label . ' ' . $visionnote);
+        }
+
         // Persist to the learner's speech history. We store the scores, feedback,
         // duration, and a meta blob with the name/topic/target — never the audio
         // or the transcript text.
@@ -230,6 +241,9 @@ class score_speech extends external_api {
         try {
             $rubricid = $rubric ? (int) $rubric->id : 0;
             $meta = ['name' => $name, 'topic' => $topic, 'target' => $targetsec, 'mode' => $mode, 'tips' => $tips];
+            if ($visionnote !== '') {
+                $meta['slide_design_note'] = $visionnote;
+            }
             $scoreid = rubric_manager::save_score(
                 $rubricid, (int) $USER->id, $courseid, rubric_manager::TYPE_SPEECH,
                 $criteria, (int) round($sum / max(1, count($criteria))), $overall, $durationsec, $meta

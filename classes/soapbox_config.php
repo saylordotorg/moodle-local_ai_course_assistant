@@ -186,6 +186,11 @@ class soapbox_config {
         // v6.8.21: slides on/off (student uploads a PDF deck and advances it).
         $out['slides_enabled'] = !empty($in['slides_enabled']) ? 1 : 0;
 
+        // v6.8.31: optional slide-vision pass. Only meaningful when slides are on;
+        // the actual run is additionally gated on the site soapbox_slide_vision
+        // toggle in soapbox_slide_vision::is_enabled().
+        $out['slide_vision'] = (!empty($in['slide_vision']) && $out['slides_enabled']) ? 1 : 0;
+
         return $out;
     }
 
