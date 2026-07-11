@@ -1629,6 +1629,7 @@ $string['soapbox:copy_link']        = 'Student link';
 $string['soapbox:deck_label']       = 'Slides (PDF). Upload your deck, then advance the slides as you record.';
 $string['soapbox:slide_prev']       = 'Previous slide';
 $string['soapbox:slide_next']       = 'Next slide';
+$string['soapbox:play_slides']      = 'Play with slides';
 $string['soapbox:audio_ready']      = 'Audio only. Your microphone will be recorded; your camera is not used.';
 $string['soapbox:audio_recording']  = 'Recording audio...';
 $string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
