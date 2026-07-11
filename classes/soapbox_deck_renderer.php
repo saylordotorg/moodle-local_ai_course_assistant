@@ -89,6 +89,48 @@ class soapbox_deck_renderer {
     }
 
     /**
+     * Extract the text of each page with Ghostscript's txtwrite device (same
+     * binary as the raster render, so no extra dependency). Returns one string
+     * per page, index 0 = page 1. Empty pages yield an empty string. Used to
+     * give the AI the slide content for slide-aware scoring.
+     *
+     * @param string $pdfpath
+     * @param int $maxpages
+     * @return string[] Per-page text (page 1..N).
+     */
+    public static function extract_text(string $pdfpath, int $maxpages = self::MAX_PAGES): array {
+        global $CFG;
+        if (!self::is_available() || !is_readable($pdfpath)) {
+            return [];
+        }
+        $maxpages = max(1, min($maxpages, self::MAX_PAGES));
+        // Render one page range in a single call to a per-page text pattern.
+        $outdir = make_request_directory();
+        $pattern = $outdir . '/text-%d.txt';
+        $cmd = escapeshellarg($CFG->pathtogs)
+            . ' -q -dNOPAUSE -dBATCH -dSAFER'
+            . ' -sDEVICE=txtwrite'
+            . ' -dFirstPage=1 -dLastPage=' . $maxpages
+            . ' -sOutputFile=' . escapeshellarg($pattern)
+            . ' ' . escapeshellarg($pdfpath)
+            . ' 2>&1';
+        exec($cmd, $output, $status);
+
+        $texts = [];
+        for ($i = 1; $i <= $maxpages; $i++) {
+            $file = $outdir . '/text-' . $i . '.txt';
+            if (!is_file($file)) {
+                break;
+            }
+            $t = (string) file_get_contents($file);
+            // Collapse whitespace runs to keep the prompt compact.
+            $t = trim(preg_replace('/\s+/u', ' ', $t));
+            $texts[] = $t;
+        }
+        return $texts;
+    }
+
+    /**
      * Render a PDF to page images encoded as data URIs, ready to hand to the
      * browser slide viewer without persisting page images to storage.
      *
