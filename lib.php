@@ -185,6 +185,15 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
         if ($dashboardnode) {
             $dashboardnode->showinflatnavigation = true;
         }
+        // v6.8.28: WSCUC-aligned per-outcome achievement report.
+        $navigation->add(
+            get_string('outcomes:navlink', 'local_ai_course_assistant'),
+            new moodle_url('/local/ai_course_assistant/outcomes_report.php', ['courseid' => $course->id]),
+            navigation_node::TYPE_SETTING,
+            null,
+            'aicaoutcomes',
+            new pix_icon('i/completion-manual-enabled', '')
+        );
     }
     // v6.7.0: learner-facing Soapbox link. Unlike the admin nodes above, this is
     // shown to any enrolled learner (capability :use) when Soapbox is enabled for
