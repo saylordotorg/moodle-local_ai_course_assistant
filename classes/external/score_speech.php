@@ -26,6 +26,7 @@ use core_external\external_multiple_structure;
 use local_ai_course_assistant\provider\base_provider;
 use local_ai_course_assistant\rubric_manager;
 use local_ai_course_assistant\feature_flags;
+use local_ai_course_assistant\objective_manager;
 
 /**
  * Soapbox: score a transcribed speech against the per-course speech rubric and
@@ -236,6 +237,33 @@ class score_speech extends external_api {
         } catch (\Throwable $e) {
             // History persistence is best-effort; still return the feedback.
             $scoreid = 0;
+        }
+
+        // v6.8.30: outcome mapping. A criterion mapped to a course outcome
+        // records a partial-credit mastery attempt (its normalized score), so
+        // the presentation feeds the WSCUC outcomes report. Best-effort.
+        try {
+            $defbyname = [];
+            foreach ($criteriadefs as $d) {
+                $dname = (string) ($d['name'] ?? '');
+                if ($dname !== '') {
+                    $defbyname[$dname] = $d;
+                }
+            }
+            foreach ($criteria as $scored) {
+                $def = $defbyname[$scored['name']] ?? null;
+                $oid = (int) ($def['objectiveid'] ?? 0);
+                if (!$def || $oid <= 0) {
+                    continue;
+                }
+                $max = max(1, (int) ($def['max_score'] ?? 5));
+                $norm = max(0.0, min(1.0, $scored['score'] / $max));
+                objective_manager::record_attempt(
+                    (int) $USER->id, $courseid, $oid, $norm >= 0.5, 'rubric', 1.0, null, null, $norm);
+            }
+        } catch (\Throwable $e) {
+            // Outcome recording is best-effort; feedback is unaffected.
+            null;
         }
 
         return [

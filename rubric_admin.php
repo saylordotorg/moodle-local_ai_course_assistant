@@ -81,11 +81,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty(trim($c['name'] ?? ''))) {
                 continue;
             }
-            $clean[] = [
+            $entry = [
                 'name' => clean_param(trim($c['name']), PARAM_TEXT),
                 'description' => clean_param(trim($c['description'] ?? ''), PARAM_TEXT),
                 'max_score' => max(1, (int) ($c['max_score'] ?? 5)),
             ];
+            // v6.8.30: optional outcome mapping. Only meaningful for a per-course
+            // rubric (objectives are per-course); kept only if the objective
+            // belongs to this course.
+            $oid = (int) ($c['objectiveid'] ?? 0);
+            if ($oid > 0 && $courseid > 0
+                    && \local_ai_course_assistant\objective_manager::get($oid)
+                    && (int) \local_ai_course_assistant\objective_manager::get($oid)->courseid === $courseid) {
+                $entry['objectiveid'] = $oid;
+            }
+            $clean[] = $entry;
         }
 
         if (empty($clean)) {
@@ -127,6 +137,16 @@ rubric_manager::ensure_default_rubric($type);
 $rubric = rubric_manager::get_rubric($courseid, $type);
 $is_inherited = ($rubric && (int) $rubric->courseid !== $courseid && $courseid > 0);
 $criteria = $rubric ? $rubric->criteria : rubric_manager::get_default_criteria($type);
+
+// v6.8.30: course outcomes offered for per-criterion mapping (per-course rubrics
+// only; objectives are per-course). Empty for the global rubric, which hides the
+// picker in the editor JS.
+$outcomesforjs = [];
+if ($courseid > 0) {
+    foreach (\local_ai_course_assistant\objective_manager::list_for_course($courseid) as $o) {
+        $outcomesforjs[] = ['id' => (int) $o->id, 'title' => (string) $o->title, 'code' => (string) ($o->code ?? '')];
+    }
+}
 
 // v6.7.0: Soapbox sample-rubric loader. ?preset=<level> seeds the editor with a
 // built-in sample (General Speech / ESL beginner / ESL advanced) which the admin
@@ -247,6 +267,8 @@ echo $OUTPUT->header();
 <script>
 (function() {
     var criteria = <?php echo json_encode($criteria); ?>;
+    // Course outcomes available to map criteria to (per-course rubrics only).
+    var sbxObjectives = <?php echo json_encode($outcomesforjs); ?>;
     var container = document.getElementById('aica-criteria-container');
     var addBtn = document.getElementById('aica-add-criterion-btn');
     var resetBtn = document.getElementById('aica-reset-btn');
@@ -382,6 +404,34 @@ echo $OUTPUT->header();
         descInp.addEventListener('input', function() { c.description = descInp.value; });
         descField.appendChild(descInp);
         card.appendChild(descField);
+
+        // Outcome mapping (per-course rubrics only): map this criterion to a
+        // course learning outcome so scoring it feeds the outcomes report.
+        if (sbxObjectives.length) {
+            var outField = document.createElement('div');
+            outField.className = 'aica-rb-field';
+            var outLbl = document.createElement('label');
+            outLbl.textContent = 'Maps to outcome (optional)';
+            outField.appendChild(outLbl);
+            var outSel = document.createElement('select');
+            outSel.setAttribute('aria-label', 'Course outcome this criterion maps to');
+            var none = document.createElement('option');
+            none.value = '0';
+            none.textContent = '- None -';
+            outSel.appendChild(none);
+            sbxObjectives.forEach(function(o) {
+                var opt = document.createElement('option');
+                opt.value = String(o.id);
+                opt.textContent = (o.code ? o.code + ' ' : '') + o.title;
+                if (parseInt(c.objectiveid, 10) === o.id) { opt.selected = true; }
+                outSel.appendChild(opt);
+            });
+            outSel.addEventListener('change', function() {
+                c.objectiveid = parseInt(outSel.value, 10) || 0;
+            });
+            outField.appendChild(outSel);
+            card.appendChild(outField);
+        }
 
         return card;
     }
