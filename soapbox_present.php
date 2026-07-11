@@ -103,6 +103,24 @@ if (!$storageready) {
 } else {
     $modeclass = 'sbx-recorder card p-3 mb-4 sbx-mode-' . ($assign->mode === 'audio' ? 'audio' : 'video');
     echo html_writer::start_div($modeclass, ['id' => 'sbx-recorder']);
+
+    // Slides: deck upload + viewer. The learner uploads a PDF deck, which is
+    // rendered to page images they advance while recording (the advance timeline
+    // is captured with the recording).
+    if (!empty($assign->slides_enabled)) {
+        echo html_writer::start_div('sbx-deck mb-3');
+        echo html_writer::tag('label', get_string('soapbox:deck_label', 'local_ai_course_assistant'),
+            ['for' => 'sbx-deck-input', 'class' => 'font-weight-bold d-block']);
+        echo html_writer::empty_tag('input', [
+            'type' => 'file', 'accept' => 'application/pdf,.pdf',
+            'id' => 'sbx-deck-input', 'class' => 'sbx-deck-input form-control-file',
+        ]);
+        echo html_writer::div('', 'sbx-deck-status small text-muted mt-1');
+        echo html_writer::div('', 'sbx-slide-viewer mt-2',
+            ['style' => 'max-width:640px']);
+        echo html_writer::end_div();
+    }
+
     if ($assign->mode !== 'audio') {
         echo html_writer::empty_tag('video', [
             'class' => 'sbx-preview w-100 mb-2', 'playsinline' => 'playsinline',
@@ -126,7 +144,7 @@ if (!$storageready) {
     echo html_writer::div('', 'sbx-result mt-2');
     echo html_writer::end_div();
 
-    $PAGE->requires->js_call_amd('local_ai_course_assistant/soapbox_recorder', 'init', [
+    $PAGE->requires->js_call_amd('local_ai_course_assistant/soapbox_present', 'init', [
         [
             'assignid'      => (int) $assign->id,
             'mode'          => $assign->mode,
@@ -140,10 +158,14 @@ if (!$storageready) {
             ],
             'topicid'       => 0,
             'topicSelector' => $hastopics ? '#sbx-topic' : null,
+            'slidesEnabled' => !empty($assign->slides_enabled),
+            'prevLabel'     => get_string('soapbox:slide_prev', 'local_ai_course_assistant'),
+            'nextLabel'     => get_string('soapbox:slide_next', 'local_ai_course_assistant'),
         ],
         [
             'root' => '#sbx-recorder', 'preview' => '.sbx-preview', 'record' => '.sbx-record',
             'stop' => '.sbx-stop', 'timer' => '.sbx-timer', 'status' => '.sbx-status', 'result' => '.sbx-result',
+            'deckInput' => '.sbx-deck-input', 'deckStatus' => '.sbx-deck-status', 'slideViewer' => '.sbx-slide-viewer',
         ],
     ]);
 }
