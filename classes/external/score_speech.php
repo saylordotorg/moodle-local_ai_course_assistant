@@ -51,6 +51,8 @@ class score_speech extends external_api {
             'targetsec'  => new external_value(PARAM_INT, 'Target speech length in seconds (0 = none)', VALUE_DEFAULT, 0),
             'durationsec' => new external_value(PARAM_INT, 'Actual recorded duration in seconds', VALUE_DEFAULT, 0),
             'mode'       => new external_value(PARAM_ALPHA, 'Presentation type: informative | persuasive', VALUE_DEFAULT, 'informative'),
+            'slidecontext' => new external_value(PARAM_RAW, 'Slide-by-slide text + pacing context (slides mode)', VALUE_DEFAULT, ''),
+            'slidecount' => new external_value(PARAM_INT, 'Number of slides (0 = no slides)', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -62,14 +64,18 @@ class score_speech extends external_api {
      * @param int $targetsec
      * @param int $durationsec
      * @param string $mode
+     * @param string $slidecontext
+     * @param int $slidecount
      * @return array
      */
     public static function execute(int $courseid, string $transcript, string $name = '',
-            string $topic = '', int $targetsec = 0, int $durationsec = 0, string $mode = 'informative'): array {
+            string $topic = '', int $targetsec = 0, int $durationsec = 0, string $mode = 'informative',
+            string $slidecontext = '', int $slidecount = 0): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid, 'transcript' => $transcript, 'name' => $name,
             'topic' => $topic, 'targetsec' => $targetsec, 'durationsec' => $durationsec, 'mode' => $mode,
+            'slidecontext' => $slidecontext, 'slidecount' => $slidecount,
         ]);
         $courseid = (int) $params['courseid'];
         $context = \context_course::instance($courseid);
@@ -140,6 +146,16 @@ class score_speech extends external_api {
         $mode = strtolower((string) $params['mode']);
         $contextline .= self::mode_hint($mode);
 
+        // Slides: when the presentation had a deck, give the coach the slide
+        // text and pacing so feedback can address slide design, slide-to-speech
+        // alignment, and time per slide (in addition to the spoken rubric).
+        $slidecount = (int) ($params['slidecount'] ?? 0);
+        $slideblock = '';
+        if ($slidecount > 0 && trim((string) ($params['slidecontext'] ?? '')) !== '') {
+            $slideblock = "\n\nSLIDES:\n" . mb_substr((string) $params['slidecontext'], 0, 8000);
+            $contextline .= ' This was a slide presentation, so also weigh how well the delivery uses the slides.';
+        }
+
         $sysprompt = "You are a supportive public-speaking coach giving formative feedback on a learner's spoken "
             . "presentation. You are reading a speech-to-text transcript, so ignore transcription artefacts "
             . "(missing punctuation, homophone errors, '[inaudible]') and do not penalise them. {$contextline} "
@@ -148,7 +164,7 @@ class score_speech extends external_api {
             . "highest-leverage improvement. Then give a short overall comment and three concrete next-time tips ordered "
             . "by impact. Be encouraging; this is practice. Respond with JSON only, in this shape:\n"
             . '{"criteria":[{"name":"...","score":3,"feedback":"..."}], "overall":"...", "tips":["...","...","..."]}'
-            . "\n\nRUBRIC:\n{$rubrictext}\n\nTRANSCRIPT:\n{$speech}";
+            . "\n\nRUBRIC:\n{$rubrictext}{$slideblock}\n\nTRANSCRIPT:\n{$speech}";
 
         try {
             $provider = base_provider::create_from_config($courseid);

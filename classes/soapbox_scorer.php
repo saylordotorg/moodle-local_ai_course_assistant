@@ -116,6 +116,21 @@ class soapbox_scorer {
                 ['id' => $rec->topicid]);
         }
 
+        // Slides: extract the deck text and build a slide-by-slide context with
+        // pacing, so the AI can judge slide design, slide-to-speech alignment,
+        // and time spent per slide.
+        $slidecontext = '';
+        $slidecount = 0;
+        if (!empty($assign->slides_enabled) && !empty($rec->deck_key)
+                && soapbox_deck_renderer::is_available()) {
+            $texts = self::deck_text($rec->deck_key);
+            if (!empty($texts)) {
+                $timeline = soapbox_config::normalize_slide_timeline((string) ($rec->slide_timeline ?? ''));
+                $slidecontext = self::build_slide_context($texts, $timeline, (int) $rec->duration_seconds);
+                $slidecount = count($texts);
+            }
+        }
+
         // Score as the recording owner (score_speech saves to $USER's history and
         // checks the course :use capability, which the learner holds).
         $user = $DB->get_record('user', ['id' => (int) $rec->userid]);
@@ -126,7 +141,8 @@ class soapbox_scorer {
 
         $result = score_speech::execute(
             (int) $assign->courseid, $transcript, '', $topictitle,
-            (int) $assign->max_seconds, (int) $rec->duration_seconds, (string) $assign->ptype);
+            (int) $assign->max_seconds, (int) $rec->duration_seconds, (string) $assign->ptype,
+            $slidecontext, $slidecount);
 
         $update = (object) [
             'id'         => $recid,
@@ -135,5 +151,65 @@ class soapbox_scorer {
             'status'     => !empty($result['success']) ? 'scored' : 'failed',
         ];
         $DB->update_record('local_ai_course_assistant_sbx_rec', $update);
+    }
+
+    /**
+     * Download a stored deck and extract its per-page text.
+     *
+     * @param string $deckkey
+     * @return string[] Per-page text (empty on failure).
+     */
+    public static function deck_text(string $deckkey): array {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        $storage = new soapbox_storage();
+        $tmp = make_request_directory() . '/deck.pdf';
+        $curl = new \curl();
+        $curl->download_one($storage->presign_get($deckkey, 900), null,
+            ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]);
+        if (!is_file($tmp) || filesize($tmp) === 0) {
+            return [];
+        }
+        return soapbox_deck_renderer::extract_text($tmp);
+    }
+
+    /**
+     * Build a compact slide-by-slide context string with per-slide text and the
+     * time the speaker spent on each slide, for the scoring prompt. Pure so it is
+     * unit-testable. Time on a slide = the gap to the next advance (or to the end
+     * of the recording for the last slide).
+     *
+     * @param string[] $texts Per-slide text (index 0 = slide 1).
+     * @param array $timeline Normalized [{t, i}] advances.
+     * @param int $duration Total recording length in seconds.
+     * @return string
+     */
+    public static function build_slide_context(array $texts, array $timeline, int $duration): string {
+        $count = count($texts);
+        if ($count === 0) {
+            return '';
+        }
+        // Seconds spent on each slide index from the advance timeline.
+        $spent = array_fill(0, $count, 0);
+        if (!empty($timeline)) {
+            for ($k = 0; $k < count($timeline); $k++) {
+                $i = max(0, min($count - 1, (int) $timeline[$k]['i']));
+                $start = (int) $timeline[$k]['t'];
+                $end = ($k + 1 < count($timeline)) ? (int) $timeline[$k + 1]['t'] : max($start, $duration);
+                $spent[$i] += max(0, $end - $start);
+            }
+        }
+        $lines = ["The presentation used {$count} slide(s). Slide text and time spent per slide:"];
+        for ($i = 0; $i < $count; $i++) {
+            $txt = trim($texts[$i]);
+            if ($txt === '') {
+                $txt = '(no text on this slide)';
+            }
+            $txt = mb_substr($txt, 0, 600);
+            $lines[] = 'Slide ' . ($i + 1) . ' (~' . $spent[$i] . 's): ' . $txt;
+        }
+        $lines[] = 'Consider slide design and clarity, whether the spoken content matches the slide it is on, '
+            . 'and pacing (roughly even time per slide, not rushing the last slides).';
+        return implode("\n", $lines);
     }
 }
