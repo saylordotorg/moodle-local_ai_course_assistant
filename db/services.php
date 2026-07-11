@@ -355,4 +355,11 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_soapbox_render_deck' => [
+        'classname'    => \local_ai_course_assistant\external\soapbox_render_deck::class,
+        'description'  => 'Soapbox slides: render an uploaded PDF deck to page images for the recorder.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
 ];
