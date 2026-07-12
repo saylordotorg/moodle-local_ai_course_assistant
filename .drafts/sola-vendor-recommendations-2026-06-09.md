@@ -2,6 +2,8 @@
 
 **Author:** Tom Caswell. **Date:** 2026-06-09. **Status:** Ready for finance, procurement, ops, and DPO review.
 
+**Revised 2026-07-12:** added **Appendix C (Soapbox spoken-presentation activity)** for the cost of the video/audio feature shipped in v6.8.32 (previously only sketched in Appendix B's deferred audio tier). Soapbox has a different cost shape from the text baseline — per-assignment, not monthly-per-user — so it is scoped separately and does not change the baseline monthly figures below. Standalone cost guide: `.drafts/sola-soapbox-cost-estimate-2026-07-12.md`.
+
 Concise rev of `.drafts/sola-pilot-to-scale-vendor-recommendations-2026-06-01.md` (which stays as the long-form historical record). All conclusions, benchmark evidence, and rate-card sources are unchanged; this version drops repetition between the front-page summary blocks, condenses Appendix A from 10 verbose subsections to bullet form, and trims Appendix B (audio, voice, avatars) to one table per feature.
 
 **Scope.** Text-only universal-rollout baseline. Voice tab, TTS, STT, and talking avatars are out of baseline (Appendix B keeps the analysis for a future opt-in). Every cost assumes **25% of Saylor MAU actively uses SOLA in a given month**.
@@ -20,7 +22,7 @@ Concise rev of `.drafts/sola-pilot-to-scale-vendor-recommendations-2026-06-01.md
 | ESL / multilingual chat | Gemini 2.5 Flash | gpt-4o-mini | Decisive multilingual lead (14.50/15). |
 | Mastery classifier | gpt-4o-mini | Mistral Small | Structured-output adhoc task at ~1/40 of chat-tier per-token. |
 | Analytics + digests | gpt-4o-mini (keep) | Gemini 2.5 Flash | Batch summarization. Unchanged. |
-| Embeddings (RAG) | **Voyage-3.5** | OpenAI text-embedding-3-small | +4 MTEB, 4x context, materially better multilingual. |
+| Embeddings (RAG) | ~~Voyage-3.5~~ **OpenAI text-embedding-3-small** (kept) | Voyage-3.5 | Superseded by measured A/B 2026-07-08 (addendum after A.7): on our corpus OpenAI matches/beats Voyage, is cheaper, and is incumbent. |
 | RAG re-ranker | **Voyage rerank-2.5** | Cohere Rerank 3.5 | 40x cheaper than Cohere for near-equivalent quality. |
 | Judge harness | Claude Sonnet 4.6 (keep) | Gemini 2.5 Pro | Independent of contestant pool. |
 
@@ -65,7 +67,7 @@ A "100k MAU" scale point = 100k Saylor MAU with ~25k active SOLA users. **Chat i
 | Anti-cheat reference (Haiku 4.5, ~5% turns) | $8 | $16 | $33 |
 | Mastery classifier (gpt-4o-mini) | $25 | $53 | $105 |
 | Analytics + digests + Radar | $4 | $15 | $30 |
-| Embeddings (Voyage-3.5) | <$1 | <$1 | <$1 |
+| Embeddings (OpenAI 3-small; kept per 2026-07-08 A/B, was Voyage-3.5) | <$1 | <$1 | <$1 |
 | Re-ranker (Voyage rerank-2.5) | $15 | $31 | $63 |
 | Judge harness | $4 | $4 | $4 |
 | **Baseline total** | **~$330** | **~$690** | **~$1,370** |
@@ -77,6 +79,8 @@ Saving vs current text-only stack at 100k Saylor MAU: ~$730/month (~35%). Source
 **Note on ESL.** ESL learners are ~30% of the SOLA mix and run 3.5x typical chat volume. The blended $0.042/SOLA-learner/mo rate already reflects this mix; do not double-count when projecting per-course economics for ELL-heavy cohorts.
 
 **Future Directions add-ons (Appendix B, not in baseline).** At 100k Saylor MAU under 25% adoption: TTS ~$500/mo, STT ~$160/mo, realtime voice ~$175/mo, avatar at 5% SOLA adoption ~$1,200/mo. Add-on subtotal if all enabled: ~$2,035/mo (about 1.5x the baseline).
+
+**Soapbox (Appendix C, shipped v6.8.32, per-assignment not monthly).** The spoken-presentation activity is priced per assignment, not per active user per month, so it is not added to the monthly baseline above. On the lean default stack (self-hosted Whisper, no managed transcoding, 480p), one 5-7 minute video assignment with two attempts per student costs about **$1.2k-1.8k at a 100k-student cohort** — a one-time spend comparable to a single month of the entire text baseline. Full model in Appendix C.
 
 ---
 
@@ -211,6 +215,20 @@ Batch summarization, structured output, no latency requirement. SOLA's existing 
 
 Multilingual escalation lever if Voyage proves weak on non-English course materials: self-host Qwen3-Embedding-8B (MMTEB multilingual leader at 70.58, Apache 2.0) on a g5.xlarge (~$735/mo all-in). Cost-justifies above ~12M tokens/mo of embedding work; SOLA is well below that today.
 
+**Addendum 2026-07-08 (measured — SUPERSEDES the migrate-to-Voyage pick above): keep OpenAI text-embedding-3-small.** A three-way embedding A/B was run on dev against our own corpus (BUS101 191 chunks + POLSC101 793 chunks, 40 golden fixtures, each arm re-embedding both chunks and queries). On Saylor content the MTEB paper gap did not reproduce — OpenAI 3-small matched or beat every Voyage model:
+
+| Embedding model | R@1 | R@3 | R@5 | MRR |
+|---|---|---|---|---|
+| **OpenAI text-embedding-3-small (1536d)** | **32.5%** | **55.0%** | 65.0% | **0.468** |
+| voyage-3.5 (1024d) | 30.0% | 52.5% | 67.5% | 0.451 |
+| voyage-4 (1024d) | 22.5% | 50.0% | 65.0% | 0.408 |
+| voyage-4-large (1024d) | 22.5% | 52.5% | 67.5% | 0.417 |
+| voyage-4-lite (1024d) | 20.0% | 47.5% | 62.5% | 0.386 |
+
+OpenAI leads R@1 and MRR; Voyage-3.5 only edges R@5 by a single fixture (a tie at this sample size). OpenAI is also cheaper ($0.02 vs $0.06 per 1M), is the incumbent (no re-index, no migration, no new privacy path), and the whole Voyage-4 series is a few fixtures *worse* at R@1. **Decision: embeddings stay on OpenAI text-embedding-3-small.** The TL;DR row and section-2 line that name Voyage-3.5 are superseded by this; cost impact is nil (both are <$1/mo at 100k MAU). This is exactly why we measured locally rather than trusting the public leaderboard.
+
+**The reranker recommendation (A.8) is unaffected and remains the real, measured win.** Rerank runs on top of OpenAI embeddings; enable it once the Voyage privacy/DPA clears (see A.8). The A/B harness gained a repeatable `--embed-provider` mode for future re-tests (`admin/cli/run_rag_fixture_benchmark.php`). Caveat: 40 fixtures is small and Voyage was tested at 1024d vs OpenAI 1536d; revisit if the corpus or models change materially. Source: measured A/B 2026-07-08 (GDoc "SOLA - Voyage / OpenAI embedding decision (measured)" in the SOLA Documentation Drive).
+
 ### A.8 RAG re-ranker: add Voyage rerank-2.5
 
 | Re-ranker | $/1M tokens |
@@ -290,6 +308,43 @@ If enabled, pilot **Tavus CVI** ($0.32/min live, custom replica with 2-min train
 At 100k Saylor MAU with 5% SOLA-user adoption: ~$1,200/mo — about 85% of the baseline text-stack spend. **Single-course A/B on BUS101 before any wider enable.** Measure 90-day completion vs an avatar-off control; decide from data.
 
 **African language gap is structural.** No major vendor lip-syncs Yoruba, Hausa, Igbo, Wolof, Bambara, or Oromo. Synthesia / HeyGen cover Afrikaans, Amharic, Somali, Swahili, Zulu: useful but not complete. Avoid Soul Machines (receivership), D-ID Streaming (18x cost, transparency complaints), Argil (no realtime API).
+
+---
+
+# Appendix C: Soapbox (spoken-presentation activity — shipped v6.8.32)
+
+Added 2026-07-12. Soapbox lets an instructor set a video or audio-only presentation assignment; the learner records in the browser, optionally advances an uploaded slide deck, and the recording is transcribed and scored against a speech rubric. Unlike everything in the baseline, this bills **per assignment** (per student x attempts), not per active user per month, so it is scoped here rather than folded into the section 2 monthly total. Full plain-language guide: `.drafts/sola-soapbox-cost-estimate-2026-07-12.md`. Engineering derivation: `.drafts/soapbox-video-design-2026-07-10.md`.
+
+**What sets the cost.** Three defaults, all lean out of the box:
+1. **Transcription** — self-hosted Whisper (already shipped since v6.3.0) is free at the margin; hosted OpenAI Whisper is $0.006/min and becomes the largest line if selected. Default is server/self-hosted.
+2. **Video bitrate** (`soapbox_video_quality`, default 480p ~4 MB/min) — the dominant lever because bandwidth (egress) dominates cost. Low 360p ~0.7x, High 720p ~2.2x.
+3. **What the AI sees** — transcript + slide text + slide-change timings, never video frames. The optional slide-vision pass (v6.8.31, off by default, dual-gated) is one gpt-4o-mini call over up to 12 sampled slide images; it adds ~$0.002/recording and stores no images.
+
+**Cost per single recording (lean stack, self-hosted Whisper):**
+
+| Duration | Size | STT | Scoring | Storage (7d) | Egress (~3x) | Total |
+|---|---|---|---|---|---|---|
+| 3 min | 12 MB | ~$0 | ~$0.001 | ~$0.0001 | ~$0.003 | ~$0.004 |
+| 5 min | 20 MB | ~$0 | ~$0.001 | ~$0.0001 | ~$0.005 | ~$0.006 |
+| 7 min | 28 MB | ~$0 | ~$0.0015 | ~$0.0002 | ~$0.007 | ~$0.009 |
+| 10 min | 40 MB | ~$0 | ~$0.0015 | ~$0.0002 | ~$0.010 | ~$0.012 |
+
+Hosted OpenAI Whisper instead of self-hosted adds $0.018 / $0.030 / $0.042 / $0.060 respectively. Audio-only recordings are ~$0.001-0.002 each (5-10x cheaper than video).
+
+**Cohort total for one assignment (2 attempts/student, lean self-hosted):**
+
+| Duration | 5k | 20k | 50k | 100k |
+|---|---|---|---|---|
+| 3 min | $40 | $160 | $400 | $800 |
+| 5 min | $60 | $240 | $600 | $1,200 |
+| 7 min | $90 | $360 | $900 | $1,800 |
+| 10 min | $120 | $480 | $1,200 | $2,400 |
+
+Same 5 min / 100k figure on hosted OpenAI Whisper: ~$7,200 (about 6x). Slide vision on: add ~$400 at 100k. A managed transcoder (e.g. AWS MediaConvert): **avoid** — ~$15,000 at 100k x 2 x 5 min for one assignment; SOLA records MP4-first and transcodes on self-hosted ffmpeg only on demand.
+
+**Reading it.** Cost is dominated by download egress; transcription matters only if hosted; AI scoring, slide vision, and storage are rounding error. A lean 5-7 minute video assignment is roughly 1-2 cents per student. The levers, in order: hosted vs self-hosted Whisper, managed vs no transcoding, bitrate, views (egress), attempts, video vs audio-only.
+
+**Procurement/ops notes.** No new vendor: transcription reuses the self-hosted Whisper path, scoring reuses gpt-4o-mini (already in the OpenAI Tier 4 line), storage/egress is the existing S3 + CloudFront archive bucket. The only spend that needs a cap is per-assignment egress on very large cohorts; the existing per-course spend cap covers it. DPIA: `.drafts/sola-soapbox-dpia-2026-07-11.md`.
 
 ---
 

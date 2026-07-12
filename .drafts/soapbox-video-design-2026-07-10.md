@@ -1,6 +1,6 @@
 # Soapbox video + slides: design and cost model (2026-07-10)
 
-**Author:** Tom Caswell. **Status:** design draft for review. **Scope:** expand Soapbox from audio-only speech practice to video and audio presentations with student-advanced slides, per-assignment instructor configuration, and course links, at low cost / low bandwidth / mobile-and-desktop.
+**Author:** Tom Caswell. **Status:** BUILT and shipped in SOLA v6.8.32 (both phases complete). This doc is retained as the design and cost derivation; the cost model in section 3 was reconfirmed 2026-07-12 against the shipped feature and extended to cover the optional slide-vision pass (v6.8.31). Plain-language cost guide derived from this: `.drafts/sola-soapbox-cost-estimate-2026-07-12.md`. **Scope:** expand Soapbox from audio-only speech practice to video and audio presentations with student-advanced slides, per-assignment instructor configuration, and course links, at low cost / low bandwidth / mobile-and-desktop.
 
 ---
 
@@ -81,6 +81,8 @@ A new per-assignment model (not just the current per-course flag):
 If hosted OpenAI Whisper is used instead of self-hosted, add $0.018 / $0.030 / $0.042 / $0.060 respectively; STT then becomes the largest line.
 
 Audio-only recordings: ~$0.001 to $0.002 each all-in (STT self-hosted, tiny egress). Roughly 5 to 10x cheaper than video.
+
+**Slide vision (as shipped, v6.8.31, off by default).** When both the site toggle (`soapbox_slide_vision`) and the per-assignment opt-in are on, scoring runs one extra gpt-4o-mini vision pass over a bounded sample of the rendered slide images (up to 12, evenly spread) for a single visual-design note. It runs once per scored recording, adds **~$0.002 per recording** (roughly doubling the AI line, still a rounding error next to egress), and stores no images. At 100k students x 2 attempts that is ~$400 added to the one-assignment cohort total. Leave off unless slide-design feedback is a stated goal.
 
 ### 3.3 Cost per student (2 scored attempts, lean stack)
 | Duration | Self-hosted Whisper | With OpenAI Whisper |
