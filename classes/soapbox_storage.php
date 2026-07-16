@@ -226,7 +226,12 @@ class soapbox_storage {
             'timestamp' => time(),
         ]);
         $curl = new \curl();
-        $curl->delete($url);
+        // Moodle's curl::delete() injects CURLOPT_USERPWD ('anonymous: ...'),
+        // which makes curl add an Authorization: Basic header. On a presigned
+        // S3 URL (SigV4 auth in the query string) that second mechanism triggers
+        // 400 InvalidArgument "Only one auth mechanism allowed". Blank the
+        // Authorization header so only the query-string signature is used.
+        $curl->delete($url, [], ['CURLOPT_HTTPHEADER' => ['Authorization:']]);
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         return ($code >= 200 && $code < 300) || $code === 404;
     }
