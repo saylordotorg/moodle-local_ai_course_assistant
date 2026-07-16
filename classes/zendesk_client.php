@@ -111,6 +111,7 @@ class zendesk_client {
      * @param int $courseid The course ID.
      * @param string $question The student's original question.
      * @param string $conversationsummary A summary of the chat conversation so far.
+     * @param int $pageid Course-module id of the page the learner was on (0 = none).
      * @return string|null The ticket ID/URL if created, or null on failure.
      */
     public static function create_ticket(
