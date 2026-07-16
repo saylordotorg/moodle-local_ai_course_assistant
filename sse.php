@@ -868,7 +868,7 @@ try {
     } else if ($needsescalation && zendesk_client::is_enabled()) {
         $messages = conversation_manager::get_messages($conv->id);
         $summary = zendesk_client::build_conversation_summary($messages);
-        $ticketref = zendesk_client::create_ticket($userid, $courseid, $message, $summary);
+        $ticketref = zendesk_client::create_ticket($userid, $courseid, $message, $summary, $pageid);
 
         if ($ticketref) {
             $escalationmsg = get_string('chat:escalated_to_support', 'local_ai_course_assistant', $ticketref);

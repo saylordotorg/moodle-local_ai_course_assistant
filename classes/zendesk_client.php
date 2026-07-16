@@ -60,6 +60,51 @@ class zendesk_client {
     }
 
     /**
+     * Build the Zendesk ticket body. Pure (no IO) so the exact format is pinned
+     * by tests. The learner's current page URL is included as context for the
+     * support agent, on its own "Page:" line after the course.
+     *
+     * @param \stdClass $user firstname, lastname, email
+     * @param \stdClass $course fullname
+     * @param string $pageurl absolute page URL ('' to omit the line)
+     * @param string $question the learner's original question
+     * @param string $summary the conversation summary
+     * @return string
+     */
+    public static function format_ticket_body(\stdClass $user, \stdClass $course,
+            string $pageurl, string $question, string $summary): string {
+        $body = "Student: {$user->firstname} {$user->lastname} ({$user->email})\n"
+            . "Course: {$course->fullname}\n";
+        if (trim($pageurl) !== '') {
+            $body .= "Page: {$pageurl}\n";
+        }
+        $body .= "Original Question: {$question}\n\n"
+            . "--- Conversation Summary ---\n{$summary}\n\n"
+            . "--- End of AI Tutor Conversation ---\n"
+            . "The AI tutor was unable to resolve this question. Please follow up with the student.";
+        return $body;
+    }
+
+    /**
+     * Resolve the learner's current page URL for ticket context: the module view
+     * URL when a course-module id is known, else the course page. The cmid is
+     * pinned to the course so a foreign id cannot resolve to another course.
+     *
+     * @param int $courseid
+     * @param int $pageid course-module id (0 = none)
+     * @return string absolute URL
+     */
+    public static function resolve_page_url(int $courseid, int $pageid): string {
+        if ($pageid > 0) {
+            $cm = get_coursemodule_from_id('', $pageid, $courseid, false, IGNORE_MISSING);
+            if ($cm) {
+                return (new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $pageid]))->out(false);
+            }
+        }
+        return (new \moodle_url('/course/view.php', ['id' => $courseid]))->out(false);
+    }
+
+    /**
      * Create a Zendesk support ticket from a chat conversation.
      *
      * @param int $userid The Moodle user ID.
@@ -72,7 +117,8 @@ class zendesk_client {
         int $userid,
         int $courseid,
         string $question,
-        string $conversationsummary
+        string $conversationsummary,
+        int $pageid = 0
     ): ?string {
         global $DB, $CFG;
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
@@ -89,12 +135,8 @@ class zendesk_client {
         $course = $DB->get_record('course', ['id' => $courseid], 'id, fullname', MUST_EXIST);
 
         $subject = "AI Tutor Support: {$course->fullname} - " . shorten_text($question, 80);
-        $body = "Student: {$user->firstname} {$user->lastname} ({$user->email})\n"
-            . "Course: {$course->fullname}\n"
-            . "Original Question: {$question}\n\n"
-            . "--- Conversation Summary ---\n{$conversationsummary}\n\n"
-            . "--- End of AI Tutor Conversation ---\n"
-            . "The AI tutor was unable to resolve this question. Please follow up with the student.";
+        $pageurl = self::resolve_page_url($courseid, $pageid);
+        $body = self::format_ticket_body($user, $course, $pageurl, $question, $conversationsummary);
 
         $url = "https://{$subdomain}.zendesk.com/api/v2/tickets.json";
 
