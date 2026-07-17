@@ -34,6 +34,7 @@ const PAGES = [
   'sandbox.php?courseid=2',
   'flashcards.php?courseid=2',
   'objectives_admin.php?courseid=2',
+  'outcomes_report.php?courseid=2',
   'instructor_dashboard.php?courseid=2',
   'rag_admin.php',
   'analytics.php?courseid=2',
