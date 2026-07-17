@@ -59,6 +59,8 @@ class rag_retriever {
     public static function retrieve(int $courseid, string $query, int $topk = 5, int $currentcmid = 0): array {
         global $DB;
 
+        $final = null;
+
         // Static cache of decoded embeddings — avoids re-decoding JSON on
         // subsequent RAG queries within the same PHP request.
         static $embedding_cache = [];
@@ -196,7 +198,7 @@ class rag_retriever {
                             }
                         }
                         if (!empty($out)) {
-                            return $out;
+                            $final = $out;
                         }
                     }
                 }
@@ -206,7 +208,40 @@ class rag_retriever {
             }
         }
 
-        return array_slice($scored, 0, $topk);
+        $final = $final ?? array_slice($scored, 0, $topk);
+
+        // Parent-document expansion (opt-in). Selection above is unchanged;
+        // here we optionally widen each hit to a neighbour window or full page.
+        $rawreturn = get_config('local_ai_course_assistant', 'rag_return_scope');
+        $returnscope = ($rawreturn === false || $rawreturn === '') ? 'chunk' : (string) $rawreturn;
+        if ($returnscope === 'chunk') {
+            return $final;
+        }
+        $rawwin = get_config('local_ai_course_assistant', 'rag_window_size');
+        $windowsize = ($rawwin === false || $rawwin === '') ? 1 : max(0, (int) $rawwin);
+        $rawcap = get_config('local_ai_course_assistant', 'rag_parent_max_chars');
+        $maxchars = ($rawcap === false || $rawcap === '') ? 6000 : max(500, (int) $rawcap);
+
+        $cmids = array_values(array_unique(array_filter(
+            array_map(fn($r) => (int) ($r['cmid'] ?? 0), $final))));
+        $siblingsbycmid = [];
+        if (!empty($cmids)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+            $rows = $DB->get_records_select(
+                'local_ai_course_assistant_chunks',
+                "courseid = :cid AND cmid {$insql}",
+                array_merge(['cid' => $courseid], $inparams),
+                'cmid, chunkindex',
+                'id, cmid, chunkindex, content'
+            );
+            foreach ($rows as $r) {
+                $siblingsbycmid[(int) $r->cmid][] = [
+                    'content'    => (string) $r->content,
+                    'chunkindex' => (int) $r->chunkindex,
+                ];
+            }
+        }
+        return self::merge_parents($final, $siblingsbycmid, $returnscope, $windowsize, $maxchars);
     }
 
     /**
