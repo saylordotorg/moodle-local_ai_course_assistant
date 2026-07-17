@@ -278,6 +278,63 @@ class rag_retriever {
     }
 
     /**
+     * Expand selected chunks into parent units (neighbor window or whole page),
+     * deduplicated by cmid, size-capped with fallback. Pure (no DB/provider).
+     *
+     * @param array  $topkrows       Final selected rows (post-rerank), rank-sorted.
+     * @param array  $siblingsbycmid [cmid => [ ['content'=>string,'chunkindex'=>int], ... ]]
+     * @param string $mode           'window' | 'page'.
+     * @param int    $windowsize     Neighbors each side for 'window' mode.
+     * @param int    $maxchars       Per-passage cap; over-cap pages fall back.
+     * @return array Expanded rows (same shape + 'expand_mode', 'expanded_from').
+     */
+    public static function merge_parents(array $topkrows, array $siblingsbycmid,
+            string $mode, int $windowsize, int $maxchars): array {
+        $out = [];
+        $seen = [];
+        foreach ($topkrows as $row) {
+            $cmid = (int) ($row['cmid'] ?? 0);
+            if ($cmid <= 0 || empty($siblingsbycmid[$cmid])) {
+                $out[] = $row;
+                continue;
+            }
+            if (isset($seen[$cmid])) {
+                continue; // page already emitted from a higher-ranked hit
+            }
+            $seen[$cmid] = true;
+
+            $siblings = $siblingsbycmid[$cmid];
+            usort($siblings, fn($a, $b) => ((int) $a['chunkindex']) <=> ((int) $b['chunkindex']));
+            $center = (int) ($row['chunkindex'] ?? 0);
+
+            $pick = function (int $win) use ($siblings, $center) {
+                return array_values(array_filter($siblings,
+                    fn($s) => abs(((int) $s['chunkindex']) - $center) <= $win));
+            };
+
+            $selected = ($mode === 'window') ? $pick($windowsize) : $siblings;
+            $merged = content_chunker::reconstruct(array_map(fn($s) => (string) $s['content'], $selected));
+
+            // Size cap: page -> window -> single matched chunk.
+            if (strlen($merged) > $maxchars) {
+                $selected = $pick(max(1, $windowsize));
+                $merged = content_chunker::reconstruct(array_map(fn($s) => (string) $s['content'], $selected));
+                if (strlen($merged) > $maxchars) {
+                    $selected = [['content' => (string) $row['content'], 'chunkindex' => $center]];
+                    $merged = (string) $row['content'];
+                }
+            }
+
+            $newrow = $row;
+            $newrow['content']       = $merged;
+            $newrow['expand_mode']   = $mode;
+            $newrow['expanded_from'] = count($selected);
+            $out[] = $newrow;
+        }
+        return $out;
+    }
+
+    /**
      * Compute cosine similarity between two equal-length float vectors.
      *
      * @param float[] $a
