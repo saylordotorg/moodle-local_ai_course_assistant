@@ -12,6 +12,12 @@ on:
 
 jobs:
   claude-review:
+    # Skip Dependabot PRs: GitHub runs Dependabot-triggered pull_request
+    # workflows with a restricted token that reads from Dependabot secrets, not
+    # Actions secrets, so ANTHROPIC_API_KEY is empty and the review fails with
+    # is_error. Guard here so these runs are skipped cleanly, not marked failed.
+    if: github.actor != 'dependabot[bot]'
+
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
@@ -36,9 +42,6 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Allow Dependabot-authored PRs to be auto-reviewed (bot-initiated
-          # runs are blocked by default). Use '*' to allow all bots.
-          allowed_bots: 'dependabot'
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
