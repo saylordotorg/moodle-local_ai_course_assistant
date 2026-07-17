@@ -114,4 +114,67 @@ class content_chunker {
 
         return $chunks;
     }
+
+    /**
+     * Reconstruct a module's chunks into one passage: keep the shared
+     * "[Section] Title:" prefix once, and remove the word overlap between
+     * consecutive chunks. Pure (no DB/provider) so it is unit-testable.
+     *
+     * @param string[] $contents Ordered chunk `content` strings for one module.
+     * @return string
+     */
+    public static function reconstruct(array $contents): string {
+        $contents = array_values($contents);
+        $n = count($contents);
+        if ($n === 0) {
+            return '';
+        }
+        if ($n === 1) {
+            return $contents[0];
+        }
+
+        // Longest common prefix across all chunks, cut at the last ": " so we
+        // only strip the "[Section] Title: " header, never shared body text.
+        $prefix = $contents[0];
+        foreach ($contents as $c) {
+            $max = min(strlen($prefix), strlen($c));
+            $i = 0;
+            while ($i < $max && $prefix[$i] === $c[$i]) {
+                $i++;
+            }
+            $prefix = substr($prefix, 0, $i);
+            if ($prefix === '') {
+                break;
+            }
+        }
+        $cut = strrpos($prefix, ': ');
+        $prefix = ($cut !== false) ? substr($prefix, 0, $cut + 2) : '';
+        $plen = strlen($prefix);
+
+        $result    = $contents[0];
+        $prevwords = preg_split('/\s+/', trim(substr($contents[0], $plen)), -1, PREG_SPLIT_NO_EMPTY);
+
+        for ($k = 1; $k < $n; $k++) {
+            $body     = trim(substr($contents[$k], $plen));
+            $curwords = preg_split('/\s+/', $body, -1, PREG_SPLIT_NO_EMPTY);
+            if (empty($curwords)) {
+                continue;
+            }
+            // Largest o such that the last o words of prev equal the first o of cur.
+            $cap = min(count($prevwords), count($curwords), 100);
+            $ov  = 0;
+            for ($o = $cap; $o >= 1; $o--) {
+                if (array_slice($prevwords, -$o) === array_slice($curwords, 0, $o)) {
+                    $ov = $o;
+                    break;
+                }
+            }
+            $newwords = array_slice($curwords, $ov);
+            if (!empty($newwords)) {
+                $result .= ' ' . implode(' ', $newwords);
+            }
+            $prevwords = $curwords;
+        }
+        return $result;
+    }
 }
