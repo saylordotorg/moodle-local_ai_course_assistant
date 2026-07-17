@@ -48,4 +48,29 @@ class content_chunker_test extends \basic_testcase {
     public function test_reconstruct_empty() {
         $this->assertSame('', content_chunker::reconstruct([]));
     }
+
+    public function test_reconstruct_no_common_prefix() {
+        // No shared prefix and no ": " boundary -> prefix resolves to empty;
+        // chunks are simply de-overlapped and joined.
+        $out = content_chunker::reconstruct(["alpha beta", "gamma delta"]);
+        $this->assertSame("alpha beta gamma delta", $out);
+    }
+
+    public function test_reconstruct_three_chunks_ordering_and_deoverlap() {
+        $prefix = "[S] T: ";
+        // Each chunk overlaps the previous by exactly 2 words.
+        $c0 = $prefix . "one two three four";
+        $c1 = $prefix . "three four five six";
+        $c2 = $prefix . "five six seven eight";
+        $out = content_chunker::reconstruct([$c0, $c1, $c2]);
+        $this->assertSame(
+            $prefix . "one two three four five six seven eight",
+            $out
+        );
+        // Prefix header appears exactly once.
+        $this->assertSame(1, substr_count($out, "[S] T:"));
+        // Overlap words are not duplicated.
+        $this->assertSame(1, substr_count($out, "three four"));
+        $this->assertSame(1, substr_count($out, "five six"));
+    }
 }

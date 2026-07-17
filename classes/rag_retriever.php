@@ -351,10 +351,10 @@ class rag_retriever {
             $merged = content_chunker::reconstruct(array_map(fn($s) => (string) $s['content'], $selected));
 
             // Size cap: page -> window -> single matched chunk.
-            if (strlen($merged) > $maxchars) {
+            if (mb_strlen($merged) > $maxchars) {
                 $selected = $pick(max(1, $windowsize));
                 $merged = content_chunker::reconstruct(array_map(fn($s) => (string) $s['content'], $selected));
-                if (strlen($merged) > $maxchars) {
+                if (mb_strlen($merged) > $maxchars) {
                     $selected = [['content' => (string) $row['content'], 'chunkindex' => $center]];
                     $merged = (string) $row['content'];
                 }
