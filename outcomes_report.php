@@ -85,13 +85,20 @@ if (empty($rows)) {
         get_string('outcomes:col_pct', 'local_ai_course_assistant'),
     ];
     $table->attributes['class'] = 'generaltable';
+    // Screen-reader caption (visually hidden; the visible <h2> already names the table).
+    $table->caption = get_string('outcomes:title', 'local_ai_course_assistant');
+    $table->captionhide = true;
     foreach ($rows as $r) {
         $label = format_string($r['title']);
         if ($r['code'] !== '') {
             $label = html_writer::span(s($r['code']) . ' ', 'text-muted') . $label;
         }
+        // Outcome name is the row header so screen readers associate each data cell with it.
+        $labelcell = new html_table_cell($label);
+        $labelcell->header = true;
+        $labelcell->scope = 'row';
         $table->data[] = [
-            $label,
+            $labelcell,
             $r['benchmark_pct'] . '%',
             $r['n'],
             $r['met'],
