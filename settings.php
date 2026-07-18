@@ -73,6 +73,7 @@ if ($hassiteconfig) {
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
     $demoadminurl = new moodle_url('/local/ai_course_assistant/demo_admin.php');
+    $playgroundurl = new moodle_url('/local/ai_course_assistant/prompt_playground.php');
 
     // v6.1.0: emergency panel one click from the top of settings — the
     // review found the kill switch was CLI-only, leaving incident response
@@ -84,6 +85,7 @@ if ($hassiteconfig) {
             . get_string('toc:tokenanalytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $demoadminurl->out() . '">'
             . get_string('toc:testing', 'local_ai_course_assistant') . '</a>'
+        . '<a href="' . $playgroundurl->out() . '">Prompt Playground</a>'
         . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
             . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 
