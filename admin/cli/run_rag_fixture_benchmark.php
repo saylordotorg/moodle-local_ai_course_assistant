@@ -724,6 +724,10 @@ function cosine_sim(array $a, array $b): float {
  * LLM-grade each passage 0-3 for relevance to the question (one batched call).
  * Returns exactly count($passages) grades, or null on judge/parse failure.
  *
+ * @param string $question The learner question.
+ * @param string[] $passages Retrieved passage texts in rank order.
+ * @param string $model Judge model id.
+ * @param string $apikey OpenAI API key.
  * @return int[]|null
  */
 function judge_passages(string $question, array $passages, string $model, string $apikey): ?array {
@@ -777,6 +781,12 @@ function judge_passages(string $question, array $passages, string $model, string
 /**
  * Run the live retriever over the questions under the current config and judge
  * the returned passages. Returns aggregate metrics for one arm.
+ *
+ * @param array $qitems Question rows, each ['courseid' => int, 'question' => string].
+ * @param int $topk Passages to retrieve and judge per question.
+ * @param string $model Judge model id.
+ * @param string $key OpenAI API key for the judge.
+ * @return array
  */
 function judge_arm(array $qitems, int $topk, string $model, string $key): array {
     $ndcg = $prec = $hit = $mean = 0.0;
