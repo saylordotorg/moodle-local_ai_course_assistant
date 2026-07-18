@@ -258,6 +258,111 @@ if ($judgemode) {
     }
     echo "\n";
 
+    // Family B: embedding-provider arms via in-memory re-embed (bare cosine,
+    // no rerank/scope/parent-doc). Comparable to the embedding A/B, judged.
+    $famB = [
+        ['label' => 'openai:3-small', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey)],
+        ['label' => 'voyage:3.5',     'prov' => 'voyage', 'model' => 'voyage-3.5',            'dim' => 1024, 'key' => $voyageapikey],
+    ];
+    $origB = [
+        'embed_provider'   => get_config('local_ai_course_assistant', 'embed_provider'),
+        'embed_model'      => get_config('local_ai_course_assistant', 'embed_model'),
+        'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'),
+        'embed_dimensions' => get_config('local_ai_course_assistant', 'embed_dimensions'),
+    ];
+    $restoreB = function () use ($origB) {
+        foreach ($origB as $k => $v) {
+            set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant');
+        }
+    };
+    register_shutdown_function($restoreB);
+
+    // Preload chunk contents for the courses referenced by the sampled questions.
+    $courseids = array_values(array_unique(array_map(fn($q) => $q['courseid'], $qitems)));
+    $bcontents = [];
+    foreach ($courseids as $cid) {
+        $rows = $DB->get_records_select('local_ai_course_assistant_chunks',
+            'courseid = :cid', ['cid' => $cid], '', 'id, content');
+        foreach ($rows as $row) {
+            if (trim((string) $row->content) !== '') {
+                $bcontents[$cid][(int) $row->id] = (string) $row->content;
+            }
+        }
+    }
+
+    $resultsB = [];
+    foreach ($famB as $arm) {
+        if (empty($arm['key'])) {
+            echo "  (skip {$arm['label']}: no API key)\n";
+            continue;
+        }
+        $restoreB();
+        set_config('embed_provider', $arm['prov'], 'local_ai_course_assistant');
+        set_config('embed_model', $arm['model'], 'local_ai_course_assistant');
+        set_config('embed_dimensions', $arm['dim'], 'local_ai_course_assistant');
+        set_config('embed_apikey', $arm['key'], 'local_ai_course_assistant');
+        try {
+            $prov = base_embedding_provider::create_from_config();
+        } catch (\Throwable $e) {
+            echo "  (skip {$arm['label']}: provider error: " . mb_substr($e->getMessage(), 0, 100) . ")\n";
+            $restoreB();
+            continue;
+        }
+        $isvoyage = $prov instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider;
+
+        // Re-embed each course's chunk contents (document vectors), sliced.
+        $vecs = [];
+        foreach ($bcontents as $cid => $contents) {
+            $ids = array_keys($contents);
+            $texts = array_values($contents);
+            for ($off = 0; $off < count($texts); $off += $abbatch) {
+                $embs = $prov->embed_batch(array_slice($texts, $off, $abbatch));
+                foreach (array_slice($ids, $off, $abbatch) as $j => $chunkid) {
+                    $vecs[$cid][$chunkid] = $embs[$j];
+                }
+            }
+        }
+
+        $ndcg = $prec = $hit = $mean = 0.0; $scored = 0; $errors = 0;
+        foreach ($qitems as $q) {
+            $cid = $q['courseid'];
+            $qvec = $isvoyage ? $prov->embed_query($q['question']) : $prov->embed($q['question']);
+            if (empty($qvec) || empty($vecs[$cid])) { $scored++; continue; }
+            $scoredchunks = [];
+            foreach ($vecs[$cid] as $chunkid => $vec) {
+                $scoredchunks[] = ['id' => $chunkid, 's' => cosine_sim($qvec, $vec)];
+            }
+            usort($scoredchunks, fn($a, $b) => $b['s'] <=> $a['s']);
+            $passages = [];
+            foreach (array_slice($scoredchunks, 0, $topk) as $sc) {
+                $passages[] = $bcontents[$cid][$sc['id']];
+            }
+            $grades = judge_passages($q['question'], $passages, $judgemodel, $judgekey);
+            if ($grades === null) { $errors++; continue; }
+            $ndcg += \local_ai_course_assistant\rag_judge::ndcg_at_k($grades, $topk);
+            $prec += \local_ai_course_assistant\rag_judge::precision_at_k($grades, $topk);
+            $hit  += \local_ai_course_assistant\rag_judge::hit_at_k($grades, $topk);
+            $mean += \local_ai_course_assistant\rag_judge::mean_relevance($grades, $topk);
+            $scored++;
+        }
+        $n = max(1, $scored);
+        $resultsB[] = ['arm' => $arm['label'], 'ndcg' => $ndcg / $n, 'precision' => $prec / $n,
+                       'hit' => $hit / $n, 'mean_rel' => $mean / $n, 'scored' => $scored, 'errors' => $errors];
+        printf("  %-15s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
+            $arm['label'], $topk, $ndcg / $n, $topk, $prec / $n, $topk, $hit / $n, $mean / $n, $scored, $errors);
+        $restoreB();
+    }
+    $restoreB();
+
+    echo "\n" . str_repeat('=', 64) . "\n";
+    echo "FAMILY B (embedding provider, in-memory re-embed, bare cosine)\n";
+    echo str_repeat('=', 64) . "\n";
+    foreach ($resultsB as $r) {
+        printf("  %-15s nDCG=%.3f  P@k=%.3f  hit@k=%.3f  mean=%.2f\n",
+            $r['arm'], $r['ndcg'], $r['precision'], $r['hit'], $r['mean_rel']);
+    }
+    echo "\n";
+
     $out = [
         'run_at'     => date('c'),
         'mode'       => 'judge',
@@ -265,6 +370,7 @@ if ($judgemode) {
         'topk'       => $topk,
         'n'          => count($qitems),
         'family_a'   => $resultsA,
+        'family_b'   => $resultsB,
     ];
     file_put_contents($outfile, json_encode($out, JSON_PRETTY_PRINT));
     echo "Results written to: {$outfile}\n";
