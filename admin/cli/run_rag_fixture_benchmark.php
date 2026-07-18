@@ -74,6 +74,11 @@ $openaiapikey = '';
 $voyageapikey = '';
 $abbatch = 96; // Chunk re-embed slice size; bounds per-call token usage for both providers.
 
+$judgemode     = false;
+$questionspath = '';
+$samplesize    = 100;
+$judgemodel    = 'gpt-4o-mini';
+
 foreach ($argv as $arg) {
     if (preg_match('/^--fixtures=(.+)$/', $arg, $m)) {
         $fixturespath = trim($m[1]);
@@ -93,6 +98,14 @@ foreach ($argv as $arg) {
         $openaiapikey = trim($m[1]);
     } else if (preg_match('/^--voyage-apikey=(.+)$/', $arg, $m)) {
         $voyageapikey = trim($m[1]);
+    } else if ($arg === '--judge') {
+        $judgemode = true;
+    } else if (preg_match('/^--questions=(.+)$/', $arg, $m)) {
+        $questionspath = trim($m[1]);
+    } else if (preg_match('/^--sample=(\d+)$/', $arg, $m)) {
+        $samplesize = max(1, (int) $m[1]);
+    } else if (preg_match('/^--judge-model=(.+)$/', $arg, $m)) {
+        $judgemodel = trim($m[1]);
     } else if ($arg === '--help' || $arg === '-h') {
         echo <<<TXT
 Usage: php run_rag_fixture_benchmark.php [options]
@@ -159,6 +172,104 @@ if (!is_array($fixturedoc) || empty($fixturedoc['fixtures'])) {
 }
 $fixtures = $fixturedoc['fixtures'];
 echo "Loaded " . count($fixtures) . " fixtures from " . basename($fixturespath) . "\n";
+
+// ---------- Judge mode (2026-07-18): label-free LLM relevance grading ----------
+if ($judgemode) {
+    // ---------- Judge mode: label-free relevance grading ----------
+    $qpath = $questionspath !== ''
+        ? (($questionspath[0] === '/') ? $questionspath : __DIR__ . '/../../' . $questionspath)
+        : __DIR__ . '/../../tests/golden/rag_fixtures_synthetic_1000.json';
+    $qdoc = json_decode((string) file_get_contents($qpath), true);
+    $qsrc = $qdoc['questions'] ?? $qdoc['fixtures'] ?? [];
+    $qitems = [];
+    foreach ($qsrc as $i => $row) {
+        if (!empty($row['question']) && !empty($row['courseid'])) {
+            $qitems[] = [
+                'id'       => (string) ($row['id'] ?? $i),
+                'courseid' => (int) $row['courseid'],
+                'question' => (string) $row['question'],
+            ];
+        }
+    }
+    usort($qitems, fn($a, $b) => strcmp($a['id'], $b['id']));
+    $qitems = array_slice($qitems, 0, $samplesize);
+
+    $judgekey = get_config('local_ai_course_assistant', 'embed_apikey');
+    if ($judgekey === false || $judgekey === '') {
+        $judgekey = (string) get_config('local_ai_course_assistant', 'apikey');
+    }
+    if ($openaiapikey !== '') {
+        $judgekey = $openaiapikey;
+    }
+    if ($judgekey === '') {
+        fwrite(STDERR, "ERROR: no OpenAI key for the judge (set embed_apikey/apikey or --openai-apikey)\n");
+        exit(1);
+    }
+
+    echo "JUDGE MODE: " . count($qitems) . " questions, judge={$judgemodel}, top-k={$topk}\n";
+    echo str_repeat('=', 64) . "\n\n";
+
+    // Family A: pipeline-config arms via the real retriever.
+    $famA = [
+        ['label' => 'return=chunk', 'cfg' => ['rag_return_scope' => 'chunk']],
+        ['label' => 'return=page',  'cfg' => ['rag_return_scope' => 'page']],
+        ['label' => 'rerank=off',   'cfg' => ['rerank_enabled' => '0']],
+        ['label' => 'rerank=on',    'cfg' => ['rerank_enabled' => '1']],
+    ];
+    $touched = ['rag_return_scope', 'rerank_enabled'];
+    $origA = [];
+    foreach ($touched as $key) {
+        $origA[$key] = get_config('local_ai_course_assistant', $key);
+    }
+    $restoreA = function () use ($origA) {
+        foreach ($origA as $k => $v) {
+            set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant');
+        }
+    };
+    register_shutdown_function($restoreA);
+
+    $resultsA = [];
+    foreach ($famA as $arm) {
+        $restoreA();
+        foreach ($arm['cfg'] as $k => $v) {
+            set_config($k, $v, 'local_ai_course_assistant');
+        }
+        $per = judge_arm($qitems, $topk, $judgemodel, $judgekey);
+        $resultsA[] = ['arm' => $arm['label']] + $per;
+        printf("  %-13s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
+            $arm['label'], $topk, $per['ndcg'], $topk, $per['precision'], $topk, $per['hit'],
+            $per['mean_rel'], $per['scored'], $per['errors']);
+    }
+    $restoreA();
+
+    echo "\n" . str_repeat('=', 64) . "\n";
+    echo "FAMILY A (pipeline config, via live retriever)\n";
+    echo str_repeat('=', 64) . "\n";
+    $hdr = ['Arm', 'nDCG', 'P@k', 'hit@k', 'mean'];
+    echo implode(' | ', array_map(fn($h) => str_pad($h, 13), $hdr)) . "\n";
+    foreach ($resultsA as $r) {
+        echo implode(' | ', [
+            str_pad($r['arm'], 13),
+            str_pad(sprintf('%.3f', $r['ndcg']), 13),
+            str_pad(sprintf('%.3f', $r['precision']), 13),
+            str_pad(sprintf('%.3f', $r['hit']), 13),
+            str_pad(sprintf('%.2f', $r['mean_rel']), 13),
+        ]) . "\n";
+    }
+    echo "\n";
+
+    $out = [
+        'run_at'     => date('c'),
+        'mode'       => 'judge',
+        'judge'      => $judgemodel,
+        'topk'       => $topk,
+        'n'          => count($qitems),
+        'family_a'   => $resultsA,
+    ];
+    file_put_contents($outfile, json_encode($out, JSON_PRETTY_PRINT));
+    echo "Results written to: {$outfile}\n";
+    exit(0);
+}
 
 // ---------- Embedding provider A/B mode (2026-07-08) ----------
 // When one or more --embed-provider arms are supplied, run a head-to-head
@@ -499,6 +610,94 @@ function cosine_sim(array $a, array $b): float {
         return 0.0;
     }
     return $dot / (sqrt($norma) * sqrt($normb));
+}
+
+// ---------- Judge-mode helpers (2026-07-18) ----------
+
+/**
+ * LLM-grade each passage 0-3 for relevance to the question (one batched call).
+ * Returns exactly count($passages) grades, or null on judge/parse failure.
+ *
+ * @return int[]|null
+ */
+function judge_passages(string $question, array $passages, string $model, string $apikey): ?array {
+    $k = count($passages);
+    if ($k === 0) {
+        return [];
+    }
+    $lines = [];
+    foreach ($passages as $i => $p) {
+        $lines[] = 'PASSAGE ' . ($i + 1) . ":\n" . mb_substr((string) $p, 0, 1500);
+    }
+    $sys = "You grade how well each passage answers a student's question, for a retrieval-quality eval. "
+        . "Grade each passage 0-3: 0 = irrelevant, 1 = tangentially related, 2 = relevant / partially answers, "
+        . "3 = directly answers. Return ONLY a JSON array of {$k} integers, one grade per passage in order, "
+        . "e.g. [3,1,0,2,0].";
+    $user = 'QUESTION: ' . $question . "\n\n" . implode("\n\n", $lines);
+    $payload = json_encode([
+        'model' => $model,
+        'messages' => [
+            ['role' => 'system', 'content' => $sys],
+            ['role' => 'user', 'content' => $user],
+        ],
+        'temperature' => 0,
+    ]);
+    for ($attempt = 0; $attempt < 4; $attempt++) {
+        $c = curl_init('https://api.openai.com/v1/chat/completions');
+        curl_setopt_array($c, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $apikey],
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 60,
+        ]);
+        $resp = curl_exec($c);
+        $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+        curl_close($c);
+        if ($code === 429 || $code >= 500) {
+            sleep(3);
+            continue;
+        }
+        if ($code !== 200 || !$resp) {
+            return null;
+        }
+        $body = json_decode($resp, true);
+        $content = $body['choices'][0]['message']['content'] ?? '';
+        return \local_ai_course_assistant\rag_judge::parse_grades($content, $k);
+    }
+    return null;
+}
+
+/**
+ * Run the live retriever over the questions under the current config and judge
+ * the returned passages. Returns aggregate metrics for one arm.
+ */
+function judge_arm(array $qitems, int $topk, string $model, string $key): array {
+    $ndcg = $prec = $hit = $mean = 0.0;
+    $scored = 0;
+    $errors = 0;
+    foreach ($qitems as $q) {
+        $res = \local_ai_course_assistant\rag_retriever::retrieve($q['courseid'], $q['question'], $topk, 0);
+        $passages = array_map(fn($r) => (string) $r['content'], $res);
+        if (empty($passages)) {
+            // Retrieval returned nothing -> zero relevance for this question.
+            $scored++;
+            continue;
+        }
+        $grades = judge_passages($q['question'], $passages, $model, $key);
+        if ($grades === null) {
+            $errors++;
+            continue;
+        }
+        $ndcg += \local_ai_course_assistant\rag_judge::ndcg_at_k($grades, $topk);
+        $prec += \local_ai_course_assistant\rag_judge::precision_at_k($grades, $topk);
+        $hit  += \local_ai_course_assistant\rag_judge::hit_at_k($grades, $topk);
+        $mean += \local_ai_course_assistant\rag_judge::mean_relevance($grades, $topk);
+        $scored++;
+    }
+    $n = max(1, $scored);
+    return ['ndcg' => $ndcg / $n, 'precision' => $prec / $n, 'hit' => $hit / $n,
+            'mean_rel' => $mean / $n, 'scored' => $scored, 'errors' => $errors];
 }
 
 // ---------- Run each fixture ----------
