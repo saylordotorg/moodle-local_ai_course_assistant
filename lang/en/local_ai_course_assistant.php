@@ -330,6 +330,12 @@ $string['settings:rag_scope_document_only'] = 'Document-only (restrict to the cu
 $string['settings:rag_scope_course'] = 'Course-wide (search all course content)';
 $string['settings:rag_chunksize'] = 'Chunk Size (words)';
 $string['settings:rag_chunksize_desc'] = 'Target number of words per content chunk when indexing course material. Smaller chunks are more precise; larger chunks provide more context.';
+$string['settings:rag_return_scope'] = 'Retrieval return scope';
+$string['settings:rag_return_scope_desc'] = 'What to inject for each retrieved hit. "chunk" (default) injects the matched ~400-word chunk. "window" injects the matched chunk plus neighbouring chunks from the same page. "page" injects the whole module page the match belongs to. window/page help when an answer spans a page, at the cost of a larger prompt.';
+$string['settings:rag_window_size'] = 'Retrieval window size';
+$string['settings:rag_window_size_desc'] = 'For "window" return scope: number of neighbouring chunks to include on each side of a matched chunk. Default 1.';
+$string['settings:rag_parent_max_chars'] = 'Parent passage cap (characters)';
+$string['settings:rag_parent_max_chars_desc'] = 'Maximum characters for an expanded window/page passage. Over-cap pages fall back to a window, then to the single chunk. Default 6000.';
 
 // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
 // v6.1.0: heading strings (the block was orphaned without a group boundary).

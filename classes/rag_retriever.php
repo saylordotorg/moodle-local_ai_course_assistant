@@ -59,6 +59,8 @@ class rag_retriever {
     public static function retrieve(int $courseid, string $query, int $topk = 5, int $currentcmid = 0): array {
         global $DB;
 
+        $final = null;
+
         // Static cache of decoded embeddings — avoids re-decoding JSON on
         // subsequent RAG queries within the same PHP request.
         static $embedding_cache = [];
@@ -196,7 +198,7 @@ class rag_retriever {
                             }
                         }
                         if (!empty($out)) {
-                            return $out;
+                            $final = $out;
                         }
                     }
                 }
@@ -206,7 +208,40 @@ class rag_retriever {
             }
         }
 
-        return array_slice($scored, 0, $topk);
+        $final = $final ?? array_slice($scored, 0, $topk);
+
+        // Parent-document expansion (opt-in). Selection above is unchanged;
+        // here we optionally widen each hit to a neighbour window or full page.
+        $rawreturn = get_config('local_ai_course_assistant', 'rag_return_scope');
+        $returnscope = ($rawreturn === false || $rawreturn === '') ? 'chunk' : (string) $rawreturn;
+        if ($returnscope === 'chunk') {
+            return $final;
+        }
+        $rawwin = get_config('local_ai_course_assistant', 'rag_window_size');
+        $windowsize = ($rawwin === false || $rawwin === '') ? 1 : max(0, (int) $rawwin);
+        $rawcap = get_config('local_ai_course_assistant', 'rag_parent_max_chars');
+        $maxchars = ($rawcap === false || $rawcap === '') ? 6000 : max(500, (int) $rawcap);
+
+        $cmids = array_values(array_unique(array_filter(
+            array_map(fn($r) => (int) ($r['cmid'] ?? 0), $final))));
+        $siblingsbycmid = [];
+        if (!empty($cmids)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+            $rows = $DB->get_records_select(
+                'local_ai_course_assistant_chunks',
+                "courseid = :cid AND cmid {$insql}",
+                array_merge(['cid' => $courseid], $inparams),
+                'cmid, chunkindex',
+                'id, cmid, chunkindex, content'
+            );
+            foreach ($rows as $r) {
+                $siblingsbycmid[(int) $r->cmid][] = [
+                    'content'    => (string) $r->content,
+                    'chunkindex' => (int) $r->chunkindex,
+                ];
+            }
+        }
+        return self::merge_parents($final, $siblingsbycmid, $returnscope, $windowsize, $maxchars);
     }
 
     /**
@@ -275,6 +310,63 @@ class rag_retriever {
         }
         // The current document contributed no chunks to the set.
         return $scope === 'document_only' ? [] : $ranked;
+    }
+
+    /**
+     * Expand selected chunks into parent units (neighbor window or whole page),
+     * deduplicated by cmid, size-capped with fallback. Pure (no DB/provider).
+     *
+     * @param array  $topkrows       Final selected rows (post-rerank), rank-sorted.
+     * @param array  $siblingsbycmid [cmid => [ ['content'=>string,'chunkindex'=>int], ... ]]
+     * @param string $mode           'window' | 'page'.
+     * @param int    $windowsize     Neighbors each side for 'window' mode.
+     * @param int    $maxchars       Per-passage cap; over-cap pages fall back.
+     * @return array Expanded rows (same shape + 'expand_mode', 'expanded_from').
+     */
+    public static function merge_parents(array $topkrows, array $siblingsbycmid,
+            string $mode, int $windowsize, int $maxchars): array {
+        $out = [];
+        $seen = [];
+        foreach ($topkrows as $row) {
+            $cmid = (int) ($row['cmid'] ?? 0);
+            if ($cmid <= 0 || empty($siblingsbycmid[$cmid])) {
+                $out[] = $row;
+                continue;
+            }
+            if (isset($seen[$cmid])) {
+                continue; // page already emitted from a higher-ranked hit
+            }
+            $seen[$cmid] = true;
+
+            $siblings = $siblingsbycmid[$cmid];
+            usort($siblings, fn($a, $b) => ((int) $a['chunkindex']) <=> ((int) $b['chunkindex']));
+            $center = (int) ($row['chunkindex'] ?? 0);
+
+            $pick = function (int $win) use ($siblings, $center) {
+                return array_values(array_filter($siblings,
+                    fn($s) => abs(((int) $s['chunkindex']) - $center) <= $win));
+            };
+
+            $selected = ($mode === 'window') ? $pick($windowsize) : $siblings;
+            $merged = content_chunker::reconstruct(array_map(fn($s) => (string) $s['content'], $selected));
+
+            // Size cap: page -> window -> single matched chunk.
+            if (mb_strlen($merged) > $maxchars) {
+                $selected = $pick(max(1, $windowsize));
+                $merged = content_chunker::reconstruct(array_map(fn($s) => (string) $s['content'], $selected));
+                if (mb_strlen($merged) > $maxchars) {
+                    $selected = [['content' => (string) $row['content'], 'chunkindex' => $center]];
+                    $merged = (string) $row['content'];
+                }
+            }
+
+            $newrow = $row;
+            $newrow['content']       = $merged;
+            $newrow['expand_mode']   = $mode;
+            $newrow['expanded_from'] = count($selected);
+            $out[] = $newrow;
+        }
+        return $out;
     }
 
     /**

@@ -130,4 +130,92 @@ final class rag_retriever_test extends \advanced_testcase {
         $this->assertCount(3, rag_retriever::scope_to_document($ranked, 10, 'course'));
         $this->assertCount(3, rag_retriever::scope_to_document($ranked, 0, 'document_first'));
     }
+
+    public function test_merge_parents_page_dedupes_and_reconstructs() {
+        $prefix = "[U1] Intro: ";
+        $siblings = [510 => [
+            ['content' => $prefix . "alpha beta gamma", 'chunkindex' => 0],
+            ['content' => $prefix . "beta gamma delta epsilon", 'chunkindex' => 1],
+        ]];
+        // Two top-k hits from the same cmid -> collapse to one expanded page.
+        $topk = [
+            ['content' => $prefix . "beta gamma delta epsilon", 'score' => 0.9, 'cmid' => 510, 'chunkindex' => 1],
+            ['content' => $prefix . "alpha beta gamma", 'score' => 0.8, 'cmid' => 510, 'chunkindex' => 0],
+        ];
+        $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, $siblings, 'page', 1, 6000);
+        $this->assertCount(1, $out);
+        $this->assertSame($prefix . "alpha beta gamma delta epsilon", $out[0]['content']);
+        $this->assertSame('page', $out[0]['expand_mode']);
+        $this->assertSame(2, $out[0]['expanded_from']);
+        $this->assertSame(0.9, $out[0]['score']); // best score preserved
+    }
+
+    public function test_merge_parents_passthrough_without_cmid() {
+        $topk = [['content' => 'x', 'score' => 0.7, 'cmid' => null, 'chunkindex' => 0]];
+        $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, [], 'page', 1, 6000);
+        $this->assertSame($topk, $out);
+    }
+
+    public function test_merge_parents_cap_falls_back_to_chunk() {
+        $big = str_repeat('word ', 50);
+        $siblings = [7 => [
+            ['content' => $big . 'a', 'chunkindex' => 0],
+            ['content' => $big . 'b', 'chunkindex' => 1],
+            ['content' => $big . 'c', 'chunkindex' => 2],
+        ]];
+        $matched = $big . 'b';
+        $topk = [['content' => $matched, 'score' => 0.9, 'cmid' => 7, 'chunkindex' => 1]];
+        // maxchars smaller than any multi-chunk merge -> fall back to matched chunk.
+        $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, $siblings, 'page', 1, strlen($matched) + 5);
+        $this->assertSame($matched, $out[0]['content']);
+    }
+
+    public function test_merge_parents_window_mode_selects_correct_neighbors() {
+        $prefix = "[U] T: ";
+        $siblings = [42 => [
+            ['content' => $prefix . "one", 'chunkindex' => 0],
+            ['content' => $prefix . "two", 'chunkindex' => 1],
+            ['content' => $prefix . "three", 'chunkindex' => 2],
+            ['content' => $prefix . "four", 'chunkindex' => 3],
+            ['content' => $prefix . "five", 'chunkindex' => 4],
+        ]];
+        $topk = [['content' => $prefix . "three", 'score' => 0.9, 'cmid' => 42, 'chunkindex' => 2]];
+        $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, $siblings, 'window', 1, 6000);
+        $this->assertCount(1, $out);
+        // Window is chunkindex 1,2,3 only ("two three four") -- 0 and 4 excluded.
+        $this->assertSame($prefix . "two three four", $out[0]['content']);
+        $this->assertSame('window', $out[0]['expand_mode']);
+        $this->assertSame(3, $out[0]['expanded_from']);
+    }
+
+    public function test_merge_parents_page_over_cap_falls_back_to_window() {
+        $prefix = "[P] X: ";
+        // Distinct 100-char bodies per chunk (no shared words -> no de-overlap
+        // collapsing), so reconstructed lengths are exactly predictable:
+        //   full page (5 chunks): 7 + 5*100 + 4 spaces = 511 chars
+        //   ±1 window (3 chunks): 7 + 3*100 + 2 spaces = 309 chars
+        $words = [];
+        for ($i = 0; $i < 5; $i++) {
+            $words[$i] = str_repeat(chr(97 + $i), 100); // 'a'*100 .. 'e'*100
+        }
+        $siblings = [99 => [
+            ['content' => $prefix . $words[0], 'chunkindex' => 0],
+            ['content' => $prefix . $words[1], 'chunkindex' => 1],
+            ['content' => $prefix . $words[2], 'chunkindex' => 2],
+            ['content' => $prefix . $words[3], 'chunkindex' => 3],
+            ['content' => $prefix . $words[4], 'chunkindex' => 4],
+        ]];
+        $topk = [['content' => $prefix . $words[2], 'score' => 0.9, 'cmid' => 99, 'chunkindex' => 2]];
+        // maxchars=400: page (511) > cap >= window (309) -> falls back to window,
+        // not all the way to the single matched chunk.
+        $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, $siblings, 'page', 1, 400);
+        $this->assertCount(1, $out);
+        $content = $out[0]['content'];
+        $this->assertStringContainsString($words[1], $content);
+        $this->assertStringContainsString($words[2], $content);
+        $this->assertStringContainsString($words[3], $content);
+        $this->assertStringNotContainsString($words[0], $content);
+        $this->assertStringNotContainsString($words[4], $content);
+        $this->assertSame(3, $out[0]['expanded_from']);
+    }
 }

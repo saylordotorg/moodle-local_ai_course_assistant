@@ -677,6 +677,28 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // Parent-document retrieval: what to inject for a retrieved hit (single
+    // chunk, a window of neighbouring chunks, or the whole page).
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/rag_return_scope',
+        get_string('settings:rag_return_scope', 'local_ai_course_assistant'),
+        get_string('settings:rag_return_scope_desc', 'local_ai_course_assistant'),
+        'chunk',
+        ['chunk' => 'chunk', 'window' => 'window', 'page' => 'page']
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_window_size',
+        get_string('settings:rag_window_size', 'local_ai_course_assistant'),
+        get_string('settings:rag_window_size_desc', 'local_ai_course_assistant'),
+        '1', PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rag_parent_max_chars',
+        get_string('settings:rag_parent_max_chars', 'local_ai_course_assistant'),
+        get_string('settings:rag_parent_max_chars_desc', 'local_ai_course_assistant'),
+        '6000', PARAM_INT
+    ));
+
     // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
     // v6.1.0: own heading — these five settings were orphaned after
     // rag_chunksize with no visual group boundary.
