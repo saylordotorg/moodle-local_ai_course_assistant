@@ -1460,6 +1460,16 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/stt_selfhosted_warm',
+        'Pre-warm on Soapbox record start',
+        'When on, starting a Soapbox recording sends a lightweight, best-effort "warm-up" ping to the '
+        . 'self-hosted transcription server so a scale-to-zero host (e.g. Cloud Run) boots while the student '
+        . 'is still recording — hiding the cold-start delay from the transcription that runs on submit. '
+        . 'No effect unless a self-hosted server URL is set above. Off by default.',
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/voice_tab_enabled',
         'Enable Voice Tab',
         'Show the Voice tab in the bottom navigation bar. When disabled, students only see Chat and Notes tabs. Voice features (Conversation Practice, Pronunciation Practice) can still be accessed via conversation starters if enabled separately.',
