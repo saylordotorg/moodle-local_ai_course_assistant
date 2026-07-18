@@ -15,6 +15,14 @@ class rag_judge_test extends \basic_testcase {
         $this->assertSame(1, rag_judge::hit_at_k([1, 2, 0], 3));
         $this->assertEqualsWithDelta(2.0, rag_judge::mean_relevance([3, 0, 3], 3), 1e-9);
     }
+    public function test_precision_mean_divide_by_k_when_fewer_grades_returned() {
+        // Count < k: missing slots count as not-relevant / grade 0, so divide by k not count(grades).
+        $this->assertEqualsWithDelta(0.4, rag_judge::precision_at_k([3, 3], 5), 1e-9);
+        $this->assertEqualsWithDelta(1.2, rag_judge::mean_relevance([3, 3], 5), 1e-9);
+        // Empty grades.
+        $this->assertEqualsWithDelta(0.0, rag_judge::precision_at_k([], 5), 1e-9);
+        $this->assertEqualsWithDelta(0.0, rag_judge::mean_relevance([], 5), 1e-9);
+    }
     public function test_parse_grades() {
         $this->assertSame([3, 2, 0, 1, 0], rag_judge::parse_grades('[3, 2, 0, 1, 0]', 5));
         // extra prose around the array is tolerated

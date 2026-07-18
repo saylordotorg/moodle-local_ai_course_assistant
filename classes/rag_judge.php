@@ -41,14 +41,20 @@ class rag_judge {
         return $idcg > 0 ? $dcg / $idcg : 0.0;
     }
 
-    /** Fraction of the top-k passages graded >= threshold. */
+    /**
+     * Fraction of the top-k passages graded >= threshold.
+     *
+     * Divides by $k (not count($grades)) so arms that return fewer than k
+     * passages (e.g. page-mode dedups) are comparable: missing slots count
+     * as not-relevant / grade 0, per standard precision@k semantics.
+     */
     public static function precision_at_k(array $grades, int $k, int $threshold = 2): float {
-        $g = array_slice(array_map('intval', $grades), 0, $k);
-        if (empty($g)) {
+        if ($k <= 0) {
             return 0.0;
         }
+        $g = array_slice(array_map('intval', $grades), 0, $k);
         $rel = count(array_filter($g, fn($x) => $x >= $threshold));
-        return $rel / count($g);
+        return $rel / $k;
     }
 
     /** 1 if any top-k passage is graded >= threshold, else 0. */
@@ -61,13 +67,18 @@ class rag_judge {
         return 0;
     }
 
-    /** Mean grade over the top-k passages. */
+    /**
+     * Mean grade over the top-k passages.
+     *
+     * Divides by $k (not count($grades)) so arms that return fewer than k
+     * passages are comparable: missing slots count as grade 0.
+     */
     public static function mean_relevance(array $grades, int $k): float {
-        $g = array_slice(array_map('intval', $grades), 0, $k);
-        if (empty($g)) {
+        if ($k <= 0) {
             return 0.0;
         }
-        return array_sum($g) / count($g);
+        $g = array_slice(array_map('intval', $grades), 0, $k);
+        return array_sum($g) / $k;
     }
 
     /**
