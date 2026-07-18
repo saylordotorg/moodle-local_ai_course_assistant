@@ -24,7 +24,25 @@
  * @copyright  2026 Saylor
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['local_ai_course_assistant/soapbox_uploader', 'core/str'], function(Uploader, Str) {
+define(['local_ai_course_assistant/soapbox_uploader', 'core/str', 'core/ajax'], function(Uploader, Str, Ajax) {
+
+    /**
+     * Fire-and-forget ping so a scale-to-zero self-hosted STT server starts
+     * booting the moment recording starts, hiding the cold start from the
+     * transcription request that runs on submit. Best-effort; ignores failures.
+     */
+    var warmStt = function() {
+        try {
+            var calls = Ajax.call([{methodname: 'local_ai_course_assistant_warm_stt', args: {}}]);
+            if (calls && calls[0] && typeof calls[0].catch === 'function') {
+                calls[0].catch(function() {
+                    return;
+                });
+            }
+        } catch (e) {
+            return;
+        }
+    };
 
     /**
      * Pick a MediaRecorder mime type the browser supports, MP4 first.
@@ -222,6 +240,8 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str'], function(Uplo
             };
 
             var start = function() {
+                // Warm the self-hosted STT server now so it's ready by submit time.
+                warmStt();
                 navigator.mediaDevices.getUserMedia(getConstraints()).then(function(s) {
                     stream = s;
                     if (preview && config.mode !== 'audio') {

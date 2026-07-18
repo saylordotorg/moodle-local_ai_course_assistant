@@ -33,6 +33,13 @@ $functions = [
         'capabilities' => 'local/ai_course_assistant:use',
         'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'local_ai_course_assistant_warm_stt' => [
+        'classname' => \local_ai_course_assistant\external\warm_stt::class,
+        'description' => 'Best-effort ping to spin up the self-hosted transcription server when a Soapbox recording starts.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
     'local_ai_course_assistant_get_history' => [
         'classname' => \local_ai_course_assistant\external\get_history::class,
         'description' => 'Get conversation history for a course.',
