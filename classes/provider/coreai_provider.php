@@ -45,6 +45,39 @@ class coreai_provider extends base_provider {
     private ?array $lasttokenusage = null;
 
     /**
+     * Whether the Moodle core_ai subsystem is present AND has a configured,
+     * enabled AI provider. Used by the 'auto' chat-provider default so a fresh
+     * install on a site with central AI setup routes chat through core_ai with
+     * no SOLA key, and by the backend self-test. Version-defensive: the way
+     * providers are stored changed between Moodle 4.5 (config-based aiprovider
+     * plugins) and 5.0+ (the {ai_providers} instance table).
+     *
+     * @return bool
+     */
+    public static function is_available(): bool {
+        if (!class_exists('\\core_ai\\manager') || !class_exists('\\core_ai\\aiactions\\generate_text')) {
+            return false;
+        }
+        global $DB;
+        try {
+            // Moodle 5.0+: provider instances live in the {ai_providers} table.
+            if ($DB->get_manager()->table_exists('ai_providers')) {
+                return $DB->record_exists('ai_providers', ['enabled' => 1]);
+            }
+            // Moodle 4.5: enabled aiprovider plugins (config-based).
+            if (class_exists('\\core\\plugininfo\\aiprovider')) {
+                return !empty(\core\plugininfo\aiprovider::get_enabled_plugins());
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+        // Classes exist but we cannot confirm a configured provider: be
+        // conservative so 'auto' falls back to a direct provider rather than
+        // routing chat into a core_ai that has nothing behind it.
+        return false;
+    }
+
+    /**
      * Override: core_ai has its own provider config surface, so skip the
      * apikey/model/baseurl parsing the parent does. Temperature is still read
      * for consistency even though core_ai does not expose it through
@@ -99,20 +132,26 @@ class coreai_provider extends base_provider {
         $manager = new \core_ai\manager();
         $response = $manager->process_action($action);
 
-        if (!$response->get_success()) {
-            $msg = $response->get_errormessage() ?: 'core_ai returned an error.';
-            $code = $response->get_errorcode();
+        // Version-defensive response handling. core_ai's response object and
+        // its get_response_data() key names shifted across Moodle 4.5 -> 5.3,
+        // so guard method existence and try the known key variants.
+        $ok = method_exists($response, 'get_success') ? (bool) $response->get_success() : true;
+        if (!$ok) {
+            $msg = method_exists($response, 'get_errormessage') ? ($response->get_errormessage() ?: '') : '';
+            $code = method_exists($response, 'get_errorcode') ? $response->get_errorcode() : 0;
             throw new \moodle_exception(
                 'chat:error', 'local_ai_course_assistant', '', null,
-                "Moodle core_ai error ({$code}): {$msg}"
+                "Moodle core_ai error ({$code}): " . ($msg ?: 'core_ai returned an error.')
             );
         }
 
-        $data = $response->get_response_data();
-        $text = (string) ($data['generatedcontent'] ?? '');
+        $data = method_exists($response, 'get_response_data') ? (array) $response->get_response_data() : [];
+        $text = self::extract_text($data);
 
-        $prompttokens = isset($data['prompttokens']) ? (int) $data['prompttokens'] : 0;
-        $completiontokens = isset($data['completiontokens']) ? (int) $data['completiontokens'] : 0;
+        $prompttokens = (int) ($data['prompttokens'] ?? $data['prompt_tokens']
+            ?? ($data['usage']['prompt_tokens'] ?? 0));
+        $completiontokens = (int) ($data['completiontokens'] ?? $data['completion_tokens']
+            ?? ($data['usage']['completion_tokens'] ?? 0));
         if ($prompttokens > 0 || $completiontokens > 0) {
             $this->lasttokenusage = [
                 'prompt_tokens' => $prompttokens,
@@ -140,6 +179,23 @@ class coreai_provider extends base_provider {
 
     public function get_last_token_usage(): ?array {
         return $this->lasttokenusage;
+    }
+
+    /**
+     * Pull the generated text out of a core_ai response-data array, trying the
+     * key names used across Moodle versions (generatedcontent is current;
+     * content/response/completion/text cover older and adjacent variants).
+     *
+     * @param array $data Response data from get_response_data().
+     * @return string The generated text, or '' if no known key held a string.
+     */
+    private static function extract_text(array $data): string {
+        foreach (['generatedcontent', 'content', 'response', 'completion', 'text'] as $key) {
+            if (!empty($data[$key]) && is_string($data[$key])) {
+                return (string) $data[$key];
+            }
+        }
+        return '';
     }
 
     /**

@@ -105,6 +105,29 @@ final class backend_probe {
     }
 
     /**
+     * Structural: report Moodle core_ai availability and how the 'auto' chat
+     * provider default would resolve. Network-free.
+     */
+    public static function probe_coreai(): array {
+        $available = \local_ai_course_assistant\provider\coreai_provider::is_available();
+        $configured = get_config('local_ai_course_assistant', 'provider') ?: 'auto';
+        if ($available) {
+            $note = ($configured === 'auto')
+                ? 'Auto routes chat through it when no SOLA key is set.'
+                : "Chat provider is set to '{$configured}', so core_ai is available but not in use.";
+            return self::row(self::STATUS_PASS,
+                "Moodle core_ai is available with a configured provider. {$note}");
+        }
+        if (!class_exists('\\core_ai\\manager')) {
+            return self::row(self::STATUS_PASS,
+                'Moodle core_ai subsystem not present (needs Moodle 4.5+); SOLA uses its own providers.');
+        }
+        return self::row(self::STATUS_PASS,
+            'Moodle core_ai is present but has no configured AI provider; SOLA uses its own providers. '
+            . 'Configure one under Site admin > AI to route chat through it.');
+    }
+
+    /**
      * Live: best-effort detection of the backend context window. 0 if unknown.
      */
     public static function detect_window(): int {
@@ -145,6 +168,8 @@ final class backend_probe {
      */
     public static function run_all(): array {
         $rows = [];
+
+        $rows[] = ['label' => 'Moodle core_ai'] + self::probe_coreai();
 
         $chat = self::probe_chat();
         $rows[] = ['label' => 'Chat round-trip'] + $chat;

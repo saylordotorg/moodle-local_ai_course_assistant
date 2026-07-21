@@ -422,6 +422,15 @@ abstract class base_provider implements provider_interface {
             ? $overrides['provider']
             : (get_config('local_ai_course_assistant', 'provider') ?: '');
 
+        // 'auto' (the shipped default) resolves to a concrete provider here so
+        // the rest of the pipeline (spend guard, failover, instantiate) sees a
+        // real id. Prefers Moodle core_ai when it is configured, so a fresh
+        // install on a site with central AI setup works with no SOLA key.
+        if ($provider === 'auto' || $provider === '') {
+            $provider = self::resolve_auto_provider($overrides);
+            $overrides['provider'] = $provider;
+        }
+
         // Spend guard: consult the cap before instantiation. If the site is
         // over the cap for chat/analytics workload, try the failover chain.
         // If no failover is configured, throw; the SSE handler catches this
@@ -600,6 +609,34 @@ abstract class base_provider implements provider_interface {
             }
         }
         return null;
+    }
+
+    /**
+     * Resolve the 'auto' chat provider (the shipped default) to a concrete id.
+     *
+     * An explicit provider choice never reaches here. Rules:
+     *  - A configured SOLA chat API key means the admin wants a direct
+     *    provider, so 'auto' resolves to the historical default (openai) with
+     *    that key.
+     *  - Otherwise, if Moodle core_ai is available AND has a configured
+     *    provider, resolve to 'coreai' (zero-config on centrally-managed sites).
+     *  - Otherwise fall back to openai, which surfaces the usual
+     *    "configure a key" error, exactly as before 'auto' existed.
+     *
+     * @param array $overrides Effective config (may carry a per-course apikey).
+     * @return string Concrete provider id.
+     */
+    private static function resolve_auto_provider(array $overrides): string {
+        $apikey = !empty($overrides['apikey'])
+            ? $overrides['apikey']
+            : (get_config('local_ai_course_assistant', 'apikey') ?: '');
+        if (!empty($apikey)) {
+            return 'openai';
+        }
+        if (coreai_provider::is_available()) {
+            return 'coreai';
+        }
+        return 'openai';
     }
 
     /**
