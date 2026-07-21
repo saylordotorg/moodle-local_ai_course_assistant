@@ -113,10 +113,13 @@ class policy_bundle {
         'premium_escalation_course_tags',
         // Widget behavior (v6.5 avatar animation probe).
         'avatar_animation_enabled',
-        // RAG tuning (v6.2 floor/boost, v5.11 rerank).
+        // RAG tuning (v6.2 floor/boost, v5.11 rerank, parent-document expansion).
         'rag_enabled',
         'rag_min_similarity',
         'rag_currentpage_boost',
+        'rag_return_scope',
+        'rag_window_size',
+        'rag_parent_max_chars',
         'rerank_enabled',
         'rerank_model',
         'rerank_candidates',
