@@ -210,6 +210,7 @@ if ($hassiteconfig) {
     ));
 
     $providers = [
+        'auto' => get_string('settings:provider_auto', 'local_ai_course_assistant'),
         'claude' => get_string('settings:provider_claude', 'local_ai_course_assistant'),
         'openai' => get_string('settings:provider_openai', 'local_ai_course_assistant'),
         'deepseek' => get_string('settings:provider_deepseek', 'local_ai_course_assistant'),
@@ -227,7 +228,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/provider',
         get_string('settings:provider', 'local_ai_course_assistant'),
         get_string('settings:provider_desc', 'local_ai_course_assistant'),
-        'openai',
+        'auto',
         $providers
     ));
 
