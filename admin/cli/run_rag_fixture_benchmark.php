@@ -137,6 +137,16 @@ embedding-only recall comparison; the rerank arm is skipped in this mode):
       --embed-provider=voyage:voyage-4 \
       --openai-apikey=sk-... --voyage-apikey=pa-...
 
+Judge mode (--judge): LLM-judged relevance across pipeline configs.
+  Family A (before/after via the live retriever, embeddings held constant):
+    baseline (prod default) | rerank-only | parent-only | full:window | full:page.
+    The 'full:*' arms turn on Voyage rerank-2.5 + parent-document expansion
+    together; pass --voyage-apikey so the rerank arms actually exercise Voyage.
+  Family B: OpenAI vs Voyage embeddings (bare cosine, in-memory re-embed).
+  Example:
+    php run_rag_fixture_benchmark.php --judge --sample=40 \
+      --openai-apikey=sk-... --voyage-apikey=pa-...
+
 TXT;
         exit(0);
     }
@@ -209,14 +219,21 @@ if ($judgemode) {
     echo "JUDGE MODE: " . count($qitems) . " questions, judge={$judgemodel}, top-k={$topk}\n";
     echo str_repeat('=', 64) . "\n\n";
 
-    // Family A: pipeline-config arms via the real retriever.
+    // Family A: pipeline-config arms via the real retriever (embeddings held
+    // constant at whatever is indexed — OpenAI in prod). This is the full-stack
+    // BEFORE/AFTER: 'baseline' is today's production default (no rerank, single
+    // chunk); the 'full:*' arms turn on Voyage rerank-2.5 + parent-document
+    // expansion together. 'rerank-only' and 'parent-only' isolate each factor
+    // so the combined lift can be attributed. Window vs page compares the two
+    // parent-document return scopes under rerank.
     $famA = [
-        ['label' => 'return=chunk', 'cfg' => ['rag_return_scope' => 'chunk']],
-        ['label' => 'return=page',  'cfg' => ['rag_return_scope' => 'page']],
-        ['label' => 'rerank=off',   'cfg' => ['rerank_enabled' => '0']],
-        ['label' => 'rerank=on',    'cfg' => ['rerank_enabled' => '1']],
+        ['label' => 'baseline',    'cfg' => ['rerank_enabled' => '0', 'rag_return_scope' => 'chunk']],
+        ['label' => 'rerank-only', 'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'chunk']],
+        ['label' => 'parent-only', 'cfg' => ['rerank_enabled' => '0', 'rag_return_scope' => 'window', 'rag_window_size' => '1']],
+        ['label' => 'full:window', 'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'window', 'rag_window_size' => '1']],
+        ['label' => 'full:page',   'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'page']],
     ];
-    $touched = ['rag_return_scope', 'rerank_enabled'];
+    $touched = ['rag_return_scope', 'rerank_enabled', 'rag_window_size', 'rerank_apikey'];
     $origA = [];
     foreach ($touched as $key) {
         $origA[$key] = get_config('local_ai_course_assistant', $key);
@@ -233,6 +250,12 @@ if ($judgemode) {
         $restoreA();
         foreach ($arm['cfg'] as $k => $v) {
             set_config($k, $v, 'local_ai_course_assistant');
+        }
+        // Ensure rerank arms actually exercise Voyage rerank-2.5 even when the
+        // site's live rerank key is unset, by using --voyage-apikey when given.
+        // Without a key the reranker no-ops and the arm silently equals cosine.
+        if (($arm['cfg']['rerank_enabled'] ?? '0') === '1' && $voyageapikey !== '') {
+            set_config('rerank_apikey', $voyageapikey, 'local_ai_course_assistant');
         }
         $per = judge_arm($qitems, $topk, $judgemodel, $judgekey);
         $resultsA[] = ['arm' => $arm['label']] + $per;
@@ -363,6 +386,151 @@ if ($judgemode) {
     }
     echo "\n";
 
+    // Family C: full-stack before/after (in-memory re-embed + REAL Voyage
+    // rerank-2.5 + REAL parent-document expansion via rag_retriever::merge_parents).
+    // Isolates the embedding provider's contribution to the whole pipeline:
+    //   before(oa,bare) = OpenAI 3-small, no rerank, single chunk (prod default)
+    //   full(oa)        = OpenAI 3-small + rerank + parent-doc(window)
+    //   full(voyage)    = Voyage 3.5     + rerank + parent-doc(window)
+    // No DB writes: vectors are in-memory; the reranker and merge_parents are the
+    // real production components. Rerank arms need a Voyage key (--voyage-apikey).
+    $famC = [
+        ['label' => 'before(oa,bare)', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => false, 'scope' => 'chunk'],
+        ['label' => 'full(oa)',        'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => true,  'scope' => 'window'],
+        ['label' => 'full(voyage)',    'prov' => 'voyage', 'model' => 'voyage-3.5',             'dim' => 1024, 'key' => $voyageapikey,               'rerank' => true,  'scope' => 'window'],
+    ];
+    $ckeys = ['embed_provider', 'embed_model', 'embed_dimensions', 'embed_apikey',
+              'rerank_enabled', 'rag_return_scope', 'rag_window_size', 'rerank_apikey'];
+    $origC = [];
+    foreach ($ckeys as $k) { $origC[$k] = get_config('local_ai_course_assistant', $k); }
+    $restoreC = function () use ($origC) {
+        foreach ($origC as $k => $v) { set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant'); }
+    };
+    register_shutdown_function($restoreC);
+
+    // Rich chunk metadata (content + cmid + chunkindex) for parent-doc expansion.
+    $richchunks = []; // cid -> [chunkid => ['content','cmid','chunkindex']]
+    foreach ($courseids as $cid) {
+        $rows = $DB->get_records_select('local_ai_course_assistant_chunks',
+            'courseid = :cid', ['cid' => $cid], 'cmid, chunkindex',
+            'id, content, cmid, chunkindex');
+        foreach ($rows as $row) {
+            if (trim((string) $row->content) === '') { continue; }
+            $richchunks[$cid][(int) $row->id] = [
+                'content'    => (string) $row->content,
+                'cmid'       => (int) ($row->cmid ?? 0),
+                'chunkindex' => (int) ($row->chunkindex ?? 0),
+            ];
+        }
+    }
+
+    $resultsC = [];
+    foreach ($famC as $arm) {
+        if (empty($arm['key'])) { echo "  (skip {$arm['label']}: no embedding key)\n"; continue; }
+        if ($arm['rerank'] && $voyageapikey === '') { echo "  (skip {$arm['label']}: rerank needs --voyage-apikey)\n"; continue; }
+        $restoreC();
+        set_config('embed_provider', $arm['prov'], 'local_ai_course_assistant');
+        set_config('embed_model', $arm['model'], 'local_ai_course_assistant');
+        set_config('embed_dimensions', $arm['dim'], 'local_ai_course_assistant');
+        set_config('embed_apikey', $arm['key'], 'local_ai_course_assistant');
+        set_config('rerank_enabled', $arm['rerank'] ? '1' : '0', 'local_ai_course_assistant');
+        set_config('rag_return_scope', $arm['scope'], 'local_ai_course_assistant');
+        set_config('rag_window_size', '1', 'local_ai_course_assistant');
+        if ($arm['rerank']) { set_config('rerank_apikey', $voyageapikey, 'local_ai_course_assistant'); }
+        try {
+            $prov = base_embedding_provider::create_from_config();
+        } catch (\Throwable $e) {
+            echo "  (skip {$arm['label']}: provider error: " . mb_substr($e->getMessage(), 0, 100) . ")\n";
+            $restoreC(); continue;
+        }
+        $isvoyage = $prov instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider;
+        $reranker = $arm['rerank'] ? new \local_ai_course_assistant\embedding_provider\voyage_reranker() : null;
+
+        // Re-embed each course's chunk contents (document vectors), in-memory.
+        $vecs = [];
+        foreach ($richchunks as $cid => $chunks) {
+            $ids = array_keys($chunks);
+            $texts = array_map(fn($c) => $c['content'], $chunks);
+            for ($off = 0; $off < count($texts); $off += $abbatch) {
+                $embs = $prov->embed_batch(array_slice($texts, $off, $abbatch));
+                foreach (array_slice($ids, $off, $abbatch) as $j => $chunkid) {
+                    $vecs[$cid][$chunkid] = $embs[$j];
+                }
+            }
+        }
+
+        $ndcg = $prec = $hit = $mean = 0.0; $scored = 0; $errors = 0;
+        foreach ($qitems as $q) {
+            $cid = $q['courseid'];
+            if (empty($vecs[$cid])) { $scored++; continue; }
+            $qvec = $isvoyage ? $prov->embed_query($q['question']) : $prov->embed($q['question']);
+            if (empty($qvec)) { $scored++; continue; }
+            $sc = [];
+            foreach ($vecs[$cid] as $chunkid => $vec) {
+                $sc[] = ['id' => $chunkid, 's' => cosine_sim($qvec, $vec)];
+            }
+            usort($sc, fn($a, $b) => $b['s'] <=> $a['s']);
+
+            if ($arm['rerank']) {
+                $candn = max($topk, min($candidates, count($sc)));
+                $cand = array_slice($sc, 0, $candn);
+                $docs = array_map(fn($x) => $richchunks[$cid][$x['id']]['content'], $cand);
+                if ($rerankdelayms > 0) { usleep($rerankdelayms * 1000); }
+                try {
+                    $rr = $reranker->rerank($q['question'], $docs, $topk);
+                } catch (\Throwable $e) {
+                    echo "  ({$arm['label']} rerank error: " . mb_substr($e->getMessage(), 0, 80) . ")\n";
+                    $errors++; continue;
+                }
+                $winners = [];
+                foreach ($rr as $e) { if (isset($cand[$e['index']])) { $winners[] = $cand[$e['index']]; } }
+            } else {
+                $winners = array_slice($sc, 0, $topk);
+            }
+
+            $rows = [];
+            foreach ($winners as $w) {
+                $c = $richchunks[$cid][$w['id']];
+                $rows[] = ['content' => $c['content'], 'cmid' => $c['cmid'], 'chunkindex' => $c['chunkindex']];
+            }
+            if ($arm['scope'] !== 'chunk' && !empty($rows)) {
+                $cmids = array_unique(array_map(fn($r) => $r['cmid'], $rows));
+                $siblings = [];
+                foreach ($richchunks[$cid] as $c) {
+                    if (in_array($c['cmid'], $cmids, true)) {
+                        $siblings[$c['cmid']][] = ['content' => $c['content'], 'chunkindex' => $c['chunkindex']];
+                    }
+                }
+                $rows = \local_ai_course_assistant\rag_retriever::merge_parents($rows, $siblings, $arm['scope'], 1, 6000);
+            }
+            $passages = array_map(fn($r) => (string) $r['content'], $rows);
+            if (empty($passages)) { $scored++; continue; }
+            $grades = judge_passages($q['question'], $passages, $judgemodel, $judgekey);
+            if ($grades === null) { $errors++; continue; }
+            $ndcg += \local_ai_course_assistant\rag_judge::ndcg_at_k($grades, $topk);
+            $prec += \local_ai_course_assistant\rag_judge::precision_at_k($grades, $topk);
+            $hit  += \local_ai_course_assistant\rag_judge::hit_at_k($grades, $topk);
+            $mean += \local_ai_course_assistant\rag_judge::mean_relevance($grades, $topk);
+            $scored++;
+        }
+        $n = max(1, $scored);
+        $resultsC[] = ['arm' => $arm['label'], 'ndcg' => $ndcg / $n, 'precision' => $prec / $n,
+                       'hit' => $hit / $n, 'mean_rel' => $mean / $n, 'scored' => $scored, 'errors' => $errors];
+        printf("  %-16s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
+            $arm['label'], $topk, $ndcg / $n, $topk, $prec / $n, $topk, $hit / $n, $mean / $n, $scored, $errors);
+        $restoreC();
+    }
+    $restoreC();
+
+    echo "\n" . str_repeat('=', 64) . "\n";
+    echo "FAMILY C (full-stack: embeddings + Voyage rerank + parent-doc, in-memory)\n";
+    echo str_repeat('=', 64) . "\n";
+    foreach ($resultsC as $r) {
+        printf("  %-16s nDCG=%.3f  P@k=%.3f  hit@k=%.3f  mean=%.2f\n",
+            $r['arm'], $r['ndcg'], $r['precision'], $r['hit'], $r['mean_rel']);
+    }
+    echo "\n";
+
     $out = [
         'run_at'     => date('c'),
         'mode'       => 'judge',
@@ -371,6 +539,7 @@ if ($judgemode) {
         'n'          => count($qitems),
         'family_a'   => $resultsA,
         'family_b'   => $resultsB,
+        'family_c'   => $resultsC,
     ];
     file_put_contents($outfile, json_encode($out, JSON_PRETTY_PRINT));
     echo "Results written to: {$outfile}\n";
