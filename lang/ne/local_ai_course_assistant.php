@@ -447,6 +447,7 @@ $string['settings:provider_together'] = 'Together AI (Llama 3.1 8B/70B/405B Turb
 $string['settings:provider_xai'] = 'xAI (Grok)';
 
 $string['settings:provider_coreai'] = 'Moodle AI (core_ai subsystem)';
+$string['settings:provider_auto'] = 'स्वचालित (कन्फिगर गरिएको भए Moodle AI प्रयोग गर्नुहोस्, अन्यथा प्रत्यक्ष प्रदायक)';
 // Strings added by update_langs.py.
 $string['chat:starter_help_page'] = 'यो पृष्ठ व्याख्या गर्नुहोस्';
 $string['chat:starter_ask_anything'] = 'जे पनि सोध्नुहोस्';
