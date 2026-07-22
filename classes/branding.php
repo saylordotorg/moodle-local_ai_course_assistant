@@ -104,7 +104,7 @@ class branding {
      */
     public static function privacy_external_url(): string {
         $v = get_config('local_ai_course_assistant', 'privacy_external_url');
-        return $v !== false && $v !== '' ? $v : 'https://www.saylor.org/privacy-policy/';
+        return $v !== false && $v !== '' ? $v : 'https://www.saylor.org/privacypolicy/';
     }
 
     /**
