@@ -454,6 +454,7 @@ $string['settings:provider_together'] = 'Together AI (Llama 3.1 8B/70B/405B Turb
 $string['settings:provider_xai'] = 'xAI (Grok)';
 
 $string['settings:provider_coreai'] = 'Moodle AI (core_ai subsystem)';
+$string['settings:provider_auto'] = 'A yɛrɛ (Moodle AI baara ni a labɛnnen don, n’o tɛ dilannikɛla tilennen)';
 // Strings added by update_langs.py.
 $string['chat:starter_help_page'] = 'Nin ɲɛ ɲɛfɔ';
 $string['chat:starter_ask_anything'] = 'Fɛn o fɛn ɲininka';

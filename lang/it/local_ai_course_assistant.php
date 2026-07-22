@@ -370,6 +370,7 @@ $string['settings:provider_together'] = 'Together AI (Llama 3.1 8B/70B/405B Turb
 $string['settings:provider_xai'] = 'xAI (Grok)';
 
 $string['settings:provider_coreai'] = 'Moodle AI (core_ai subsystem)';
+$string['settings:provider_auto'] = 'Automatico (usa Moodle AI se configurato, altrimenti un provider diretto)';
 // Strings added by update_langs.py.
 $string['chat:history_saved_subtitle'] = 'Le risposte salvate rimangono su questo dispositivo per questo corso.';
 $string['chat:history_saved_empty'] = 'Salva una risposta dell\'IA per vederla qui.';
