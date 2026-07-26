@@ -63,7 +63,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 
 ## AI vendor stack (text-only baseline)
 
-- **Chat tutor:** Gemini 2.5 Flash on Vertex AI (primary), gpt-4o-mini failover.
+- **Chat tutor:** Gemini 2.5 Flash on Vertex AI (primary), gpt-4o-mini failover. **Reconfirmed 2026-07-24** by a thorough bake-off vs the newer Gemini Flash models: 2.5-flash is the most compliant Gemini (86% jailbreak, 3-run mean, vs 79% for 3.5-flash-lite and 62% for 3.6-flash) and the cheapest (0.056¢/call vs 0.117 for lite; 3.6-flash ~10x list price), with tutor-quality effectively tied across the three; gpt-4o-mini is the most compliant overall (98%) but the quality laggard, so it stays failover only. Newer Flash models rejected on safety + cost. Now live on the whole dev fleet. Report: `.drafts/sola-chat-model-benchmark-2026-07-24.md`.
 - **Quiz coach / mastery classifier / analytics / digests:** gpt-4o-mini.
 - **Anti-cheat reference (~5% of turns when integrity routing ships):** Claude Haiku 4.5.
 - **Premium escalation tier (v5.12 router):** Claude Opus 4.8 on ~5% of turns matching STEM markers + course allowlist. Off by default.
