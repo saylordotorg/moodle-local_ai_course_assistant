@@ -8,6 +8,9 @@ cd "$SCRIPT_DIR"
 rm -f ai_course_assistant.zip
 zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*.git*" \
+  -x "*/.claude/*" \
+  -x "*/CLAUDE.md" \
+  -x "*/deploy_dev.py" \
   -x "*/.DS_Store" \
   -x "*/Thumbs.db" \
   -x "*/._*" \
