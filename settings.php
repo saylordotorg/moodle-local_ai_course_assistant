@@ -246,6 +246,21 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // v6.9.5: which Anthropic models accept `temperature`. An ALLOW-list —
+    // an unlisted model has temperature omitted, which is safe, rather than
+    // sent and rejected with a 400. Editable here (and pushable via policy
+    // bundle) so a newly released model never needs a plugin release.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/claude_temperature_allow_prefixes',
+        'Claude models accepting temperature',
+        'One model-name prefix per line. Anthropic models whose name starts with one of '
+        . 'these still accept the <code>temperature</code> sampling parameter. Any Claude '
+        . 'model NOT matching a prefix has temperature omitted (reasoning-class models '
+        . 'since Opus 4.7 reject it with an HTTP 400). Leave blank to use the shipped default.',
+        implode("\n", \local_ai_course_assistant\provider\claude_provider::DEFAULT_TEMPERATURE_ALLOW_PREFIXES),
+        PARAM_RAW
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/apibaseurl',
         get_string('settings:apibaseurl', 'local_ai_course_assistant'),

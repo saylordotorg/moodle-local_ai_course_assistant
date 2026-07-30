@@ -49,23 +49,86 @@ class claude_provider extends base_provider {
     }
 
     /**
+     * Prefixes of Anthropic models known to ACCEPT sampling parameters.
+     *
+     * Used as the default when the `claude_temperature_allow_prefixes` setting
+     * is empty. Deliberately an allow-list, not a deny-list: see
+     * {@see model_supports_temperature()} for why.
+     *
+     * @var string[]
+     */
+    public const DEFAULT_TEMPERATURE_ALLOW_PREFIXES = [
+        // Aliases.
+        'claude-opus-4-6', 'claude-opus-4-5', 'claude-opus-4-1', 'claude-opus-4-0',
+        'claude-sonnet-4-6', 'claude-sonnet-4-5', 'claude-sonnet-4-0',
+        'claude-haiku-4-5', 'claude-haiku-3-5', 'claude-haiku-3',
+        // Dated full IDs for the 4.0 generation, whose alias form does not
+        // prefix-match them: e.g. claude-sonnet-4-20250514 (this provider's
+        // own get_default_model()) and claude-opus-4-20250514. We cannot use a
+        // bare 'claude-opus-4' prefix here because it would also match the
+        // denied claude-opus-4-7 / 4-8.
+        'claude-opus-4-2025', 'claude-sonnet-4-2025',
+        // Claude 3.x and 2.x, all of which accept sampling parameters.
+        'claude-3', 'claude-2',
+    ];
+
+    /**
      * Whether the given Anthropic model accepts a `temperature` parameter.
-     * Opus 4.7 and 4.8 (reasoning-class models) reject temperature with HTTP
-     * 400; their successors will likely behave the same way. Maintain this
-     * as a per-prefix denylist so the model-specific 400 doesn't bubble up
-     * as the generic "something went wrong" error.
+     *
+     * This is an ALLOW-list: a model we do not recognise is assumed NOT to
+     * accept sampling parameters, and temperature is omitted.
+     *
+     * The reason is that the two failure modes are asymmetric:
+     *   - Omitting temperature from a model that accepts it: the model uses
+     *     its own default. Harmless.
+     *   - Sending temperature to a model that rejects it: HTTP 400 on EVERY
+     *     call, surfacing as the generic "something went wrong" error.
+     *
+     * Anthropic has removed sampling parameters from every reasoning-class
+     * model since Opus 4.7 (Opus 4.7/4.8, and the whole Claude 5 family), so
+     * an unrecognised model is now more likely to reject them than accept
+     * them. Defaulting to "omit" means a newly released model works on day
+     * one instead of failing every request until the plugin is updated.
+     *
+     * The list is read from the `claude_temperature_allow_prefixes` setting so
+     * it can be corrected without a plugin release — by an admin, or pushed
+     * fleet-wide via a signed policy bundle (the key is on
+     * {@see \local_ai_course_assistant\policy_bundle::ALLOWED_KEYS}). This
+     * mirrors how `rate_card_overrides` keeps per-model pricing current
+     * without a redeploy.
      *
      * @param string $model
      * @return bool
      */
     private static function model_supports_temperature(string $model): bool {
-        $denyprefixes = ['claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-4-9'];
-        foreach ($denyprefixes as $prefix) {
+        $model = strtolower(trim($model));
+        if ($model === '') {
+            return false;
+        }
+        foreach (self::temperature_allow_prefixes() as $prefix) {
             if (str_starts_with($model, $prefix)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * The effective allow-list: the admin/policy-bundle setting when set and
+     * parseable, otherwise the shipped default.
+     *
+     * @return string[]
+     */
+    private static function temperature_allow_prefixes(): array {
+        $raw = (string) get_config('local_ai_course_assistant', 'claude_temperature_allow_prefixes');
+        $out = [];
+        foreach (preg_split('/[\r\n,]+/', $raw) as $line) {
+            $line = strtolower(trim($line));
+            if ($line !== '' && $line[0] !== '#') {
+                $out[] = $line;
+            }
+        }
+        return $out ?: self::DEFAULT_TEMPERATURE_ALLOW_PREFIXES;
     }
 
     protected function get_default_base_url(): string {
