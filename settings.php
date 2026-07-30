@@ -1970,7 +1970,28 @@ if ($hassiteconfig) {
     // escalation block interrupted this group, splitting provider from its
     // three siblings — admins tuning the classifier had to scroll past an
     // unrelated feature.
+        // Quiz coach: optional dedicated provider/model. Empty (the default)
+    // keeps quiz generation on the course's chat provider, which is the
+    // pre-v6.9.5 behaviour. Set both to route quiz turns to a cheaper or
+    // better-suited model without touching the chat tier.
     $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/quiz_provider',
+        'Quiz coach provider',
+        'Provider id (e.g. <code>claude</code>, <code>openai</code>) for quiz generation. '
+        . 'Must match a row in Comparison providers. Leave blank to use the chat provider.',
+        '',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/quiz_model',
+        'Quiz coach model',
+        'Model name for quiz generation, e.g. <code>claude-haiku-4-5</code>. '
+        . 'Both this and the provider must be set for the override to apply.',
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
+$settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_provider',
         get_string('settings:mastery_classifier_provider', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_provider_desc', 'local_ai_course_assistant'),
