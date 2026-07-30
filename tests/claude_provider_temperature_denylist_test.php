@@ -91,6 +91,31 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
         $this->assertTrue($this->supports('claude-sonnet-4-5'));
     }
 
+    /**
+     * The Claude 5 family removed sampling parameters entirely — temperature,
+     * top_p and top_k all return HTTP 400.
+     *
+     * @covers ::model_supports_temperature
+     */
+    public function test_claude_5_family_rejects_temperature(): void {
+        $this->assertFalse($this->supports('claude-opus-5'));
+        $this->assertFalse($this->supports('claude-sonnet-5'));
+        $this->assertFalse($this->supports('claude-fable-5'));
+        $this->assertFalse($this->supports('claude-mythos-5'));
+    }
+
+    /**
+     * Sonnet 5 is denied but Sonnet 4.6 and 4.5 are not — the denylist must
+     * not be widened to a bare `claude-sonnet` prefix.
+     *
+     * @covers ::model_supports_temperature
+     */
+    public function test_sonnet_5_denied_without_catching_earlier_sonnets(): void {
+        $this->assertFalse($this->supports('claude-sonnet-5'));
+        $this->assertTrue($this->supports('claude-sonnet-4-6'));
+        $this->assertTrue($this->supports('claude-sonnet-4-5'));
+    }
+
     public function test_haiku_models_accept_temperature(): void {
         $this->assertTrue($this->supports('claude-haiku-4-5'));
         $this->assertTrue($this->supports('claude-haiku-3-5'));

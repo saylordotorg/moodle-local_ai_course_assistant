@@ -50,16 +50,24 @@ class claude_provider extends base_provider {
 
     /**
      * Whether the given Anthropic model accepts a `temperature` parameter.
-     * Opus 4.7 and 4.8 (reasoning-class models) reject temperature with HTTP
-     * 400; their successors will likely behave the same way. Maintain this
-     * as a per-prefix denylist so the model-specific 400 doesn't bubble up
-     * as the generic "something went wrong" error.
+     * Reasoning-class models reject sampling parameters (temperature, top_p,
+     * top_k) with HTTP 400: Opus 4.7 and 4.8, and the entire Claude 5 family
+     * (Opus 5, Sonnet 5, Fable 5, Mythos 5). Maintain this as a per-prefix
+     * denylist so the model-specific 400 doesn't bubble up as the generic
+     * "something went wrong" error.
+     *
+     * Note the prefixes are deliberately specific: `claude-sonnet-4-6` and
+     * earlier Sonnets DO accept temperature, so a bare `claude-sonnet` prefix
+     * would wrongly strip it from models that support it.
      *
      * @param string $model
      * @return bool
      */
     private static function model_supports_temperature(string $model): bool {
-        $denyprefixes = ['claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-4-9'];
+        $denyprefixes = [
+            'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-4-9',
+            'claude-opus-5', 'claude-sonnet-5', 'claude-fable-5', 'claude-mythos-5',
+        ];
         foreach ($denyprefixes as $prefix) {
             if (str_starts_with($model, $prefix)) {
                 return false;
