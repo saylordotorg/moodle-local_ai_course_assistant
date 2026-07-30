@@ -83,6 +83,7 @@ class policy_bundle {
         // Chat routing and prompt shape.
         'provider',
         'model',
+        'claude_temperature_allow_prefixes',
         'temperature',
         'maxhistory',
         'prompt_verbosity',

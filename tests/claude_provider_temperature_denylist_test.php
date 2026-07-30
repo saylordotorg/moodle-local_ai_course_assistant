@@ -116,6 +116,51 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
         $this->assertTrue($this->supports('claude-sonnet-4-5'));
     }
 
+    /**
+     * An unrecognised / brand-new model defaults to OMITTING temperature.
+     * This is the point of the allow-list: a model released after this
+     * version of the plugin must not break every call.
+     *
+     * @covers ::model_supports_temperature
+     */
+    public function test_unknown_future_model_omits_temperature(): void {
+        $this->resetAfterTest();
+        $this->assertFalse($this->supports('claude-opus-7'));
+        $this->assertFalse($this->supports('claude-someting-entirely-new'));
+        $this->assertFalse($this->supports(''));
+    }
+
+    /**
+     * The allow-list is config-backed so a correction needs no plugin release.
+     *
+     * @covers ::model_supports_temperature
+     */
+    public function test_allowlist_is_overridable_by_config(): void {
+        $this->resetAfterTest();
+        // A future model can be enabled without a code change...
+        set_config('claude_temperature_allow_prefixes', "claude-opus-7\nclaude-haiku-4-5",
+            'local_ai_course_assistant');
+        $this->assertTrue($this->supports('claude-opus-7'));
+        $this->assertTrue($this->supports('claude-haiku-4-5'));
+        // ...and anything not on the override is omitted, including models
+        // that are on the shipped default.
+        $this->assertFalse($this->supports('claude-sonnet-4-6'));
+    }
+
+    /**
+     * An empty or comment-only setting falls back to the shipped default
+     * rather than denying everything.
+     *
+     * @covers ::model_supports_temperature
+     */
+    public function test_empty_config_falls_back_to_default(): void {
+        $this->resetAfterTest();
+        set_config('claude_temperature_allow_prefixes', "\n  \n# just a comment\n",
+            'local_ai_course_assistant');
+        $this->assertTrue($this->supports('claude-sonnet-4-6'));
+        $this->assertFalse($this->supports('claude-opus-5'));
+    }
+
     public function test_haiku_models_accept_temperature(): void {
         $this->assertTrue($this->supports('claude-haiku-4-5'));
         $this->assertTrue($this->supports('claude-haiku-3-5'));
@@ -126,9 +171,28 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
         $this->assertTrue($this->supports('claude-3-5-sonnet-20241022'));
     }
 
-    public function test_empty_model_defaults_to_supports_temperature(): void {
-        // Defensive: a misconfigured row with empty model should not
-        // accidentally trip the deny-list. Default to supporting temp.
-        $this->assertTrue($this->supports(''));
+    public function test_empty_model_omits_temperature(): void {
+        // BEHAVIOUR CHANGE (allow-list migration). Previously an empty model
+        // defaulted to SENDING temperature, on the reasoning that a
+        // misconfigured row should not trip the deny-list. Under the
+        // allow-list the safe default inverts: an unrecognised model omits
+        // temperature, which costs nothing (the model uses its own default)
+        // whereas sending it to a model that rejects it fails every call.
+        $this->assertFalse($this->supports(''));
+    }
+
+    /**
+     * Dated full model IDs must resolve the same way as their aliases —
+     * including claude-sonnet-4-20250514, which is this provider's own
+     * get_default_model() and therefore what an empty config resolves to.
+     *
+     * @covers ::model_supports_temperature
+     */
+    public function test_dated_full_ids_match_their_alias_behaviour(): void {
+        $this->assertTrue($this->supports('claude-sonnet-4-20250514'));
+        $this->assertTrue($this->supports('claude-opus-4-20250514'));
+        $this->assertTrue($this->supports('claude-opus-4-5-20251101'));
+        // Denied models keep being denied in dated form.
+        $this->assertFalse($this->supports('claude-opus-4-8-20260101'));
     }
 }
