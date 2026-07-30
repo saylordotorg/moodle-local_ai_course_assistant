@@ -101,14 +101,14 @@ This is the finding that holds up. Two-stage retrieval (embed a pool of 30, rera
 | | R@5 | 77.5% | 95.0% | +17.5 pp |
 | | MRR | 0.646 | 0.745 | +0.099 |
 
-The +17.5 pp headline from the 2026-06-11 benchmark **reproduces exactly**, and the lift survives the switch to realistic multi-sentence questions. Added latency is modest: P50 238 ms on curated, 273 ms on conversational. Measured cost is roughly **$0.001 per query** ($0.00097 curated, $0.00109 conversational), which is the ~$485/mo figure at the 100k MAU usage model.
+The +17.5 pp headline from the 2026-06-11 benchmark **reproduces exactly**, and the lift survives the switch to realistic multi-sentence questions. Added latency is modest: P50 238 ms on curated, 273 ms on conversational. Measured cost is roughly **$0.001 per query** ($0.00097 curated, $0.00109 conversational). See the scale projection below for what that means in monthly terms against real usage — it is far less than earlier planning docs assumed.
 
 **Where it is weaker than the headline suggests.** The gain is not uniform, and two results argue for keeping it opt-in:
 
 - **It can hurt the top slot.** On POLSC101 (curated), reranking moved R@1 *down* 60.0% to 50.0% and MRR down 0.704 to 0.654, while still improving R@3. The reranker reorders a good pool well but is not strictly better at rank 1.
 - **Independent judging shows far less lift.** Scored by an LLM judge on relevance rather than against a ground-truth chunk, baseline and rerank are nearly tied — nDCG@5 0.952 vs 0.969 — and precision@5 slightly *declines* (0.695 to 0.660). Recall@k rewards surfacing one specific chunk; the judge asks whether the whole returned set is useful. Rerank clearly wins the first framing and roughly ties on the second.
 
-**Recommendation: enable on dev at `rerank_candidates=30`, keep it off by default for prod** until the cost model is revisited at scale. Unchanged from 2026-06-11, now with a second query style and an independent judge behind it.
+**These 40-fixture results are superseded by the 1,008-query sweep below**, which covers 16 courses instead of two and lands on a different recommendation (per-course enablement at pool 20). They are kept here because they reproduce the 2026-06-11 benchmark exactly, which is what establishes that the harness and index are stable.
 
 ### Full pipeline comparison (judged)
 
