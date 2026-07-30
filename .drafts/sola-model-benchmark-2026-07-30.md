@@ -272,7 +272,7 @@ Retrieval is not where the money goes. Chat generation is.
 
 **Index build time.** Measured throughput is 984 chunks in 7.6 seconds, i.e. **~129 chunks/second**. A full cold index of all 162 courses is therefore about **14 minutes** of wall clock, and a single course re-index is roughly 5 seconds. Reindexing is cheap in both time and money; there is no reason to avoid it after a content update.
 
-**Rate limits at peak.** At ~193 queries/minute peak, both the embedding and rerank calls sit far inside normal paid-tier limits (OpenAI Tier 2+ allows thousands of RPM for embeddings; Voyage pay-as-you-go is comfortable at this rate). The vendor doc's advice to negotiate capacity tiers applies to the **chat** tier, not retrieval — retrieval is not where the rate-limit risk lives.
+**Rate limits at peak.** At the projected ~7 queries/minute peak, both the embedding and rerank calls sit far inside normal paid-tier limits (OpenAI Tier 2+ allows thousands of RPM for embeddings; Voyage pay-as-you-go is comfortable at this rate). The vendor doc's advice to negotiate capacity tiers applies to the **chat** tier, not retrieval — retrieval is not where the rate-limit risk lives.
 
 **Latency budget.** Embedding query P50 is 207 ms (P95 428 ms); reranking adds a further 238-273 ms P50. A rerank-enabled turn therefore spends roughly **0.5 seconds in retrieval before the model starts generating**. Against Gemini 2.5 Flash's 2,272 ms P50 time-to-first-token, that is a ~20% increase in perceived wait — noticeable but not disqualifying. It matters more if a faster chat model is ever adopted.
 
