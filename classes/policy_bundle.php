@@ -102,6 +102,8 @@ class policy_bundle {
         'history_candidates',
         'history_semantic_minscore',
         // Mastery classifier (v5.11).
+        'quiz_provider',
+        'quiz_model',
         'mastery_classifier_provider',
         'mastery_classifier_model',
         'mastery_classifier_threshold',

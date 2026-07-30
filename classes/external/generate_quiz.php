@@ -198,7 +198,7 @@ class generate_quiz extends external_api {
 
         $quizschema = self::get_quiz_json_schema($count, $objectivesblock !== '');
         try {
-            $provider = base_provider::create_from_config($courseid);
+            $provider = self::resolve_quiz_provider($courseid);
             $response = $provider->chat_completion(
                 $systemprompt,
                 [['role' => 'user', 'content' => 'Generate the quiz now.']],
@@ -459,5 +459,36 @@ INSTRUCTIONS;
         } catch (\Throwable $e) {
             return 'Chat history unavailable.';
         }
+    }
+
+    /**
+     * Resolve which provider runs the quiz-coach turn.
+     *
+     * Mirrors conversation_classifier::resolve_classifier_provider(): if both
+     * quiz_provider and quiz_model are set, route through
+     * comparison_providers so the API key, base URL and temperature come from
+     * the row admins already manage. Otherwise fall back to the course's
+     * primary chat provider — preserving the previous behaviour on every site
+     * that never touches these settings.
+     *
+     * Before this, quiz generation always ran on the chat tier, so the vendor
+     * recommendation of a cheaper dedicated quiz model was unimplementable
+     * without changing the chat model too.
+     *
+     * @param int $courseid
+     * @return \local_ai_course_assistant\provider\provider_interface
+     */
+    private static function resolve_quiz_provider(int $courseid) {
+        $providerid = trim((string) get_config('local_ai_course_assistant', 'quiz_provider'));
+        $model = trim((string) get_config('local_ai_course_assistant', 'quiz_model'));
+        if ($providerid !== '' && $model !== '') {
+            try {
+                return base_provider::create_for_comparison($providerid, $model, $courseid);
+            } catch (\Throwable $e) {
+                debugging('quiz provider unavailable, falling back to chat tier: '
+                    . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
+        return base_provider::create_from_config($courseid);
     }
 }
