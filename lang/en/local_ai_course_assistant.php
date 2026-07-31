@@ -233,6 +233,7 @@ $string['chat:copy_failed'] = 'Failed to copy conversation';
 $string['chat:greeting'] = 'Hi, {$a}! I\'m [[tutorshort]]. How can I help you today?';
 $string['chat:thinking'] = 'Thinking...';
 $string['chat:error'] = 'Sorry, something went wrong. Please try again.';
+$string['chat:refused'] = 'I am not able to help with that request. Let us get back to your coursework -- what would you like to work on next?';
 $string['chat:error_auth'] = 'Authentication error. Please contact your administrator.';
 $string['chat:error_ratelimit'] = 'Too many requests. Please wait a moment and try again.';
 $string['chat:error_unavailable'] = 'The AI service is temporarily unavailable. Please try again later.';
