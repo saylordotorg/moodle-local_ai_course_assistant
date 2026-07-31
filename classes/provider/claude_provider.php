@@ -31,6 +31,13 @@ class claude_provider extends base_provider {
     /** @var string Anthropic API version */
     private const API_VERSION = '2023-06-01';
 
+    /**
+     * @var string stop_reason returned when the model's own safety layer
+     * declines the request. The response carries NO content blocks at all,
+     * so it must be handled explicitly or it looks like a malformed reply.
+     */
+    public const STOP_REASON_REFUSAL = 'refusal';
+
     /** @var array|null Token usage from the last streaming call */
     private ?array $last_token_usage = null;
 
@@ -250,6 +257,15 @@ class claude_provider extends base_provider {
         $response = $this->http_post($url, $this->get_headers($options), $body);
 
         $data = json_decode($response, true);
+
+        // A model-level safety refusal is a WELL-FORMED response that carries
+        // no content blocks, so it must be checked before the empty-content
+        // guard below -- otherwise it is misreported as a transport failure
+        // and the learner sees the generic "something went wrong" string.
+        if (is_array($data) && ($data['stop_reason'] ?? '') === self::STOP_REASON_REFUSAL) {
+            return get_string('chat:refused', 'local_ai_course_assistant');
+        }
+
         if (!$data || empty($data['content'])) {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
         }
@@ -290,8 +306,12 @@ class claude_provider extends base_provider {
 
         $buffer = '';
         $this->last_token_usage = null;
+        // Tracks whether any text reached the learner, so a refusal notice is
+        // only emitted when the stream produced nothing.
+        $sentanytext = false;
 
-        $this->http_post_stream($url, $this->get_headers($options), $body, function ($data) use ($callback, &$buffer) {
+        $this->http_post_stream($url, $this->get_headers($options), $body,
+            function ($data) use ($callback, &$buffer, &$sentanytext) {
             $buffer .= $data;
 
             while (($pos = strpos($buffer, "\n")) !== false) {
@@ -332,12 +352,23 @@ class claude_provider extends base_provider {
                     }
                 }
 
+                // A safety refusal streams as a message_delta carrying
+                // stop_reason "refusal" with no content_block_delta events at
+                // all, so without this the learner would see an empty reply.
+                if ($eventtype === 'message_delta'
+                        && ($event['delta']['stop_reason'] ?? '') === self::STOP_REASON_REFUSAL
+                        && !$sentanytext) {
+                    $callback(get_string('chat:refused', 'local_ai_course_assistant'));
+                    $sentanytext = true;
+                }
+
                 // Only forward text deltas; skip thinking deltas and tool input deltas.
                 if ($eventtype === 'content_block_delta') {
                     $deltatype = $event['delta']['type'] ?? '';
                     if ($deltatype === 'text_delta') {
                         $text = $event['delta']['text'] ?? '';
                         if ($text !== '') {
+                            $sentanytext = true;
                             $callback($text);
                         }
                     }
