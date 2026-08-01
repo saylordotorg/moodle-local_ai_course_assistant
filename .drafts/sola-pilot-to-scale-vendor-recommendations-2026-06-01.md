@@ -1,5 +1,13 @@
 # SOLA Vendor and Tier Recommendations: Pilot → 50k → 100k Saylor MAU
 
+> **CORRECTION (2026-08-01) — the rerank cost and per-user volume figures below are superseded.**
+>
+> Two errors compound in the original model. Measured production usage is **5.07 chat turns per SOLA user per month**, not the ~70 implied by the capacity table here (**13.7x overstated**). And the measured rerank cost is **$0.00187/query at pool 50** against real ~700-token Saylor chunks, not the snippet-sized assumption behind the $63/mo figure (**52x understated**).
+>
+> They partly cancel, so the net error in absolute cost is **3.8x understated**: at 25,000 SOLA users, reranking at pool 50 is **~$237/month**, not $63. The bigger correction is proportional — reranking is **~101% of chat spend at pool 50** and **~41% at pool 20**, not the "~6% of chat spend" claimed here. Enabling it at pool 50 would roughly double the AI bill.
+>
+> Canonical figures: `sola-retrieval-cost-projections-2026-07-31.md`. Measurement: `sola-model-benchmark-2026-07-30.md`.
+
 **Author:** Tom Caswell. **Date:** 2026-06-01. **Last revised:** 2026-06-04 (scope cut to text-only baseline; audio, voice, and avatars moved to Appendix B; projections re-baselined to 25% SOLA adoption; per-component analysis moved to Appendix A). **Status:** Ready for finance, procurement, and ops review.
 
 Concrete vendor and tier recommendations for every SOLA component in scope for a universal Saylor rollout: chat tutor, quiz coach, integrity reference, mastery classifier, analytics, embeddings + re-ranker, judge harness. TTS, STT, the Voice tab, and talking avatars are out of the baseline; their pricing is in Appendix B (Future Directions). Per-component rationale, benchmark scores, and failover details are in Appendix A.
@@ -82,7 +90,7 @@ The 2-month pilot has 2,866 active SOLA learners (observed). All forward project
 | Mastery classifier (gpt-4o-mini) | $25 | $53 | $105 |
 | Analytics + digests + Radar (gpt-4o-mini) | $4 | $15 | $30 |
 | Embeddings (Voyage-3.5) | <$1 | <$1 | <$1 |
-| Re-ranker (Voyage rerank-2.5) | $15 | $31 | $63 |
+| Re-ranker (Voyage rerank-2.5) | $15 | $31 | $63 <br>**[corrected: ~$237 at pool 50, ~$95 at pool 20]** |
 | Judge / benchmark harness ($1/week) | $4 | $4 | $4 |
 | **Baseline total (text only)** | **~$330** | **~$690** | **~$1,370** |
 
@@ -176,7 +184,7 @@ A future audio or avatar opt-in (Appendix B) would re-open vendor selection and 
 >
 > **Specialty routing:** Claude Haiku 4.5 for anti-cheat refusal (~5% of turns), gpt-4o-mini for quiz coach + mastery classifier + analytics. Wired through existing `comparison_providers` + `spend_failover_chain` admin settings.
 >
-> **RAG:** Voyage-3.5 embeddings ($0.06/MTok, 32k context, multilingual) + Voyage rerank-2.5 (~$63/month at 100k Saylor MAU).
+> **RAG:** Voyage-3.5 embeddings ($0.06/MTok, 32k context, multilingual) + Voyage rerank-2.5 (~$63/month at 100k Saylor MAU). **[CORRECTED 2026-08-01: ~$237/month at pool 50, ~$95 at pool 20. Also, keep OpenAI embeddings -- Voyage-3.5 measured no better on our corpus across three independent tests.]**
 >
 > **Judge:** Claude Sonnet 4.6 in the weekly benchmark harness (~$1/week).
 >
@@ -385,9 +393,10 @@ SOLA currently does single-stage retrieval (embedding cosine top-k=5). The domin
 |---|---|---|---|
 | 30 course pilot at full enrollment | ~24,000 | ~6,000 | $15 |
 | 50k MAU | 50,000 | 12,500 | $31 |
-| 100k MAU | 100,000 | 25,000 | $63 |
+| 100k MAU | 100,000 | 25,000 | $63 **[corrected: ~$237 at pool 50]** |
 
 Even at $63/month, the recall lift materially improves answer quality, and the spend is ~6% of the chat spend it accompanies. Net positive.
+> **[CORRECTED 2026-08-01: the conclusion does not survive the corrected numbers. Reranking is ~101% of chat spend at pool 50 and ~41% at pool 20, not ~6%. The recall lift is real (+9.8 pp R@3 at pool 20), but 'net positive' is no longer automatic -- it is negative on courses whose embedding recall is already strong, where reranking breaks 12% of correct top-1 results. See sola-per-course-rerank-gating-scope-2026-07-31.md.]**
 
 ---
 
