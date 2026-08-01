@@ -1088,6 +1088,18 @@ foreach ($fixtures as $fixture) {
         'cosine_latency_ms'   => $cosinelatencyms,
         'total_embed_ms'      => $totalembedlatencyms,
         'top10_cosine_ids'    => array_column(array_slice($scored, 0, 10), 'id'),
+        // Ground-truth-free confidence signals, available at query time in
+        // production. Used to test whether the embedding stage's own
+        // confidence predicts when reranking helps, which would allow gating
+        // rerank per query without needing labelled fixtures.
+        'top1_cosine_score'   => isset($scored[0]) ? (float) $scored[0]['score'] : null,
+        'top2_cosine_score'   => isset($scored[1]) ? (float) $scored[1]['score'] : null,
+        'top3_cosine_score'   => isset($scored[2]) ? (float) $scored[2]['score'] : null,
+        'top5_cosine_score'   => isset($scored[4]) ? (float) $scored[4]['score'] : null,
+        'margin_1_2'          => (isset($scored[0], $scored[1]))
+            ? (float) $scored[0]['score'] - (float) $scored[1]['score'] : null,
+        'margin_1_3'          => (isset($scored[0], $scored[2]))
+            ? (float) $scored[0]['score'] - (float) $scored[2]['score'] : null,
         'rerank_rank'         => null,
         'rerank_latency_ms'   => null,
         'rerank_total_tokens' => null,
