@@ -126,6 +126,7 @@ class policy_bundle {
         'rerank_enabled',
         'rerank_model',
         'rerank_candidates',
+        'rerank_margin_threshold',
         // Spend policy (v5.13/v6.0).
         'spend_cap_site',
         'spend_cap_chat',
