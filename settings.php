@@ -759,6 +759,14 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rerank_margin_threshold',
+        get_string('settings:rerank_margin_threshold', 'local_ai_course_assistant'),
+        get_string('settings:rerank_margin_threshold_desc', 'local_ai_course_assistant'),
+        '0.086',
+        PARAM_FLOAT
+    ));
+
     $ragadminurl = new moodle_url('/local/ai_course_assistant/rag_admin.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/rag_admin_link',
