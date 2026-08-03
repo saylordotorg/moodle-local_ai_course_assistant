@@ -195,6 +195,11 @@ class content_indexer {
         // Otherwise (sources existed but embeds errored) leave the existing
         // index untouched rather than risk wiping good data on a flaky run.
 
+        // The retriever caches decoded vectors for the life of the process.
+        // Reindexing inside a long-running CLI would otherwise keep scoring
+        // against the vectors this run just replaced.
+        rag_retriever::flush_cache($courseid);
+
         return $stats;
     }
 
@@ -212,6 +217,7 @@ class content_indexer {
         if ($mod === null) {
             // Nothing extractable — delete any stale chunks.
             $DB->delete_records('local_ai_course_assistant_chunks', ['cmid' => $cmid]);
+            rag_retriever::flush_cache();
             return true;
         }
 
@@ -276,6 +282,7 @@ class content_indexer {
             $DB->insert_record('local_ai_course_assistant_chunks', $record);
         }
 
+        rag_retriever::flush_cache();
         return true;
     }
 
@@ -302,5 +309,6 @@ class content_indexer {
     public static function delete_course_index(int $courseid): void {
         global $DB;
         $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);
+        rag_retriever::flush_cache($courseid);
     }
 }

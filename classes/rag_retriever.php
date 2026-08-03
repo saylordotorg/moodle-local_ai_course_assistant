@@ -37,6 +37,34 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
 class rag_retriever {
 
     /**
+     * @var array Decoded chunk vectors, keyed "course_<id>".
+     *
+     * Avoids re-decoding every vector on repeated retrievals. Lives for the
+     * life of the PHP process, so it MUST be flushed whenever the index
+     * changes -- see flush_cache(). For a web request that window is a single
+     * page load, but CLI processes (reindex tools, benchmark harnesses,
+     * scheduled tasks) can hold it across an entire run and would otherwise
+     * score against vectors that no longer exist.
+     */
+    private static array $vectorcache = [];
+
+    /**
+     * Discard cached vectors after the index changes.
+     *
+     * Called by content_indexer on every path that inserts or deletes chunks.
+     * Cheap: the cache is per-process and rebuilt on the next retrieval.
+     *
+     * @param int|null $courseid Course to flush, or null for every course.
+     */
+    public static function flush_cache(?int $courseid = null): void {
+        if ($courseid === null) {
+            self::$vectorcache = [];
+            return;
+        }
+        unset(self::$vectorcache["course_{$courseid}"]);
+    }
+
+    /**
      * Retrieve the top-k most relevant chunks for a user query.
      *
      * @param int    $courseid
@@ -61,9 +89,6 @@ class rag_retriever {
 
         $final = null;
 
-        // Static cache of decoded embeddings — avoids re-decoding JSON on
-        // subsequent RAG queries within the same PHP request.
-        static $embedding_cache = [];
         $cache_key = "course_{$courseid}";
 
         // Relevance gate + current-page bias, admin-tunable. The floor drops
@@ -105,7 +130,7 @@ class rag_retriever {
         }
 
         // Load and decode embeddings (cached per-course within the request).
-        if (!isset($embedding_cache[$cache_key])) {
+        if (!isset(self::$vectorcache[$cache_key])) {
             $rows = $DB->get_records_select(
                 'local_ai_course_assistant_chunks',
                 'courseid = :courseid AND embedding IS NOT NULL',
@@ -121,12 +146,12 @@ class rag_retriever {
                 'id, embedding, embedding_bin, cmid, modtype, chunkindex'
             );
 
-            $embedding_cache[$cache_key] = [];
+            self::$vectorcache[$cache_key] = [];
             if (!empty($rows)) {
                 foreach ($rows as $row) {
                     $vec = self::decode_vector($row->embedding_bin ?? null, $row->embedding ?? null);
                     if (is_array($vec) && !empty($vec)) {
-                        $embedding_cache[$cache_key][$row->id] = [
+                        self::$vectorcache[$cache_key][$row->id] = [
                             'vec'        => $vec,
                             'cmid'       => isset($row->cmid) ? (int) $row->cmid : null,
                             'modtype'    => (string) ($row->modtype ?? ''),
@@ -137,7 +162,7 @@ class rag_retriever {
             }
         }
 
-        if (empty($embedding_cache[$cache_key])) {
+        if (empty(self::$vectorcache[$cache_key])) {
             return [];
         }
 
@@ -152,7 +177,7 @@ class rag_retriever {
         $qnorm = sqrt($qnorm);
 
         $scored = [];
-        foreach ($embedding_cache[$cache_key] as $chunkid => $entry) {
+        foreach (self::$vectorcache[$cache_key] as $chunkid => $entry) {
             $score    = self::cosine_against_query($queryvec, $qnorm, $entry['vec']);
             $scored[] = [
                 'id'         => $chunkid,
