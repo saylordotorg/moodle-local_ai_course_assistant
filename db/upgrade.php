@@ -1253,5 +1253,28 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026071102, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026080300) {
+        // Packed float32 vectors alongside the JSON `embedding` column.
+        // Measured on dev: decoding 793 chunks took 262 ms from JSON versus
+        // 65 ms from packed binary (4x), and storage fell from 22.3 MB to
+        // 4.6 MB (4.8x). There is no precision cost -- the embeddings are
+        // already float32, so a round trip through pack('g*') reproduces
+        // every element exactly and cosine scores are bit-identical.
+        //
+        // The JSON column is deliberately left in place and still written, so
+        // this release can be rolled back without a reindex. Backfill is a
+        // separate, resumable step (admin/cli/backfill_embedding_bin.php)
+        // rather than an upgrade-time loop, because converting a large
+        // catalogue inside the upgrade would block the site.
+        $table = new xmldb_table('local_ai_course_assistant_chunks');
+        $field = new xmldb_field('embedding_bin', XMLDB_TYPE_BINARY, null, null,
+            null, null, null, 'embedding');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026080300, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

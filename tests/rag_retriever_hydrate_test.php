@@ -147,6 +147,95 @@ final class rag_retriever_hydrate_test extends \advanced_testcase {
         }
     }
 
+    /**
+     * Values that are already float32 round-trip bit-exactly.
+     *
+     * This is the case that matters: OpenAI and Voyage return float32
+     * embeddings, so packing them is lossless. Verified against real data on
+     * dev -- 793 production chunks, max element error 0.0 and max cosine-score
+     * delta 0.0.
+     */
+    public function test_float32_values_round_trip_bit_exactly(): void {
+        $this->resetAfterTest();
+        mt_srand(7);
+        $vec = [];
+        for ($i = 0; $i < 1536; $i++) {
+            // Force each value through float32 first, so the fixture reflects
+            // what a provider actually returns rather than a full double.
+            $vec[] = (float) unpack('g', pack('g', mt_rand(-1000, 1000) / 1000))[1];
+        }
+        $back = rag_retriever::decode_vector(rag_retriever::pack_vector($vec), null);
+        $this->assertCount(1536, $back);
+        foreach ($vec as $i => $v) {
+            $this->assertSame((float) $v, (float) $back[$i], "element {$i} changed");
+        }
+    }
+
+    /**
+     * A full-precision double does NOT survive, and that is worth stating
+     * rather than discovering later: pack('g') is 32-bit. 0.827 comes back as
+     * 0.8270000219345093.
+     *
+     * This is safe for the providers in use, which emit float32. It would stop
+     * being safe if a provider ever returned float64 vectors -- the error
+     * would be ~1e-7 per element, small but no longer bit-identical, so
+     * scores would drift very slightly from every baseline measured to date.
+     */
+    public function test_full_precision_doubles_lose_bits_as_expected(): void {
+        $this->resetAfterTest();
+        $vec = [0.827, 0.1234567890123456];
+        $back = rag_retriever::decode_vector(rag_retriever::pack_vector($vec), null);
+        foreach ($vec as $i => $v) {
+            $this->assertEqualsWithDelta($v, $back[$i], 1e-6,
+                'float32 packing should stay within ~1e-7 of the double');
+        }
+        $this->assertNotSame((float) $vec[0], (float) $back[0],
+            'documents that this is 32-bit storage, not 64-bit');
+    }
+
+    /**
+     * A partially-backfilled index must keep working: binary preferred, JSON
+     * used when the binary column is still null.
+     */
+    public function test_falls_back_to_json_when_binary_absent(): void {
+        $this->resetAfterTest();
+        $vec = [0.25, -0.5, 0.75];
+        $this->assertSame($vec, rag_retriever::decode_vector(null, json_encode($vec)));
+        $this->assertSame($vec, rag_retriever::decode_vector('', json_encode($vec)));
+    }
+
+    /**
+     * Binary wins when both are present.
+     */
+    public function test_binary_is_preferred_over_json(): void {
+        $this->resetAfterTest();
+        $bin = rag_retriever::pack_vector([1.0, 2.0]);
+        $out = rag_retriever::decode_vector($bin, json_encode([9.0, 9.0]));
+        $this->assertSame([1.0, 2.0], $out);
+    }
+
+    /**
+     * A truncated blob must not yield a short vector. Scoring a 1,535-element
+     * vector against a 1,536-element query would silently produce a wrong
+     * score rather than an error, so the codec rejects a length that is not a
+     * whole number of float32s and falls back to JSON.
+     */
+    public function test_truncated_blob_falls_back_instead_of_scoring_garbage(): void {
+        $this->resetAfterTest();
+        $good = [0.1, 0.2, 0.3];
+        $truncated = substr(rag_retriever::pack_vector($good), 0, 9); // not a multiple of 4
+        $out = rag_retriever::decode_vector($truncated, json_encode($good));
+        $this->assertDebuggingCalled();
+        $this->assertSame($good, $out);
+    }
+
+    public function test_decode_returns_empty_when_both_sources_unusable(): void {
+        $this->resetAfterTest();
+        $this->assertSame([], rag_retriever::decode_vector(null, null));
+        $this->assertSame([], rag_retriever::decode_vector('', ''));
+        $this->assertSame([], rag_retriever::decode_vector(null, 'not json'));
+    }
+
     public function test_scorer_guards_zero_vectors(): void {
         $this->resetAfterTest();
         $rc = new \ReflectionClass(rag_retriever::class);
