@@ -219,6 +219,10 @@ final class rag_retriever_hydrate_test extends \advanced_testcase {
      * vector against a 1,536-element query would silently produce a wrong
      * score rather than an error, so the codec rejects a length that is not a
      * whole number of float32s and falls back to JSON.
+     *
+     * NOTE: the warning is bounded to once per request via a static, so this
+     * must remain the only test that triggers it. A second such test would
+     * see no debugging call and fail confusingly.
      */
     public function test_truncated_blob_falls_back_instead_of_scoring_garbage(): void {
         $this->resetAfterTest();

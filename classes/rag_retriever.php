@@ -277,21 +277,6 @@ class rag_retriever {
     }
 
     /**
-     * Apply the relevance floor and current-page ordering boost to scored chunks.
-     *
-     * Pure function (no DB or provider) so it is unit-testable. Chunks scoring
-     * below $minscore on raw cosine are dropped; the remainder are sorted by a
-     * rank that adds $boost to chunks from $currentcmid. The boost is ordering
-     * only — the floor compares the raw cosine score, so an irrelevant
-     * current-page chunk is never force-kept.
-     *
-     * @param array $scored Rows with at least 'score' (float) and 'cmid' (int|null).
-     * @param float $minscore Cosine floor in [0,1]; 0 disables the gate.
-     * @param int   $currentcmid Current page course-module id (0 = none).
-     * @param float $boost Ordering bonus added to current-page chunks.
-     * @return array Filtered, rank-sorted rows (same shape as input).
-     */
-    /**
      * Fill in the `content` of already-selected chunks.
      *
      * Selection above runs on vectors alone, so chunk text is fetched once the
@@ -371,6 +356,21 @@ class rag_retriever {
         return $margin < $threshold;
     }
 
+    /**
+     * Apply the relevance floor and current-page ordering boost to scored chunks.
+     *
+     * Pure function (no DB or provider) so it is unit-testable. Chunks scoring
+     * below $minscore on raw cosine are dropped; the remainder are sorted by a
+     * rank that adds $boost to chunks from $currentcmid. The boost is ordering
+     * only — the floor compares the raw cosine score, so an irrelevant
+     * current-page chunk is never force-kept.
+     *
+     * @param array $scored Rows with at least 'score' (float) and 'cmid' (int|null).
+     * @param float $minscore Cosine floor in [0,1]; 0 disables the gate.
+     * @param int   $currentcmid Current page course-module id (0 = none).
+     * @param float $boost Ordering bonus added to current-page chunks.
+     * @return array Filtered, rank-sorted rows (same shape as input).
+     */
     public static function filter_and_rank(array $scored, float $minscore, int $currentcmid, float $boost): array {
         if ($minscore > 0.0) {
             $scored = array_values(array_filter(
@@ -524,8 +524,16 @@ class rag_retriever {
                     return array_values($vec);
                 }
             }
-            debugging('rag_retriever: unreadable embedding_bin, falling back to JSON',
-                DEBUG_DEVELOPER);
+            // Warn once per request. A corrupt column would otherwise emit
+            // this for every chunk in the course -- thousands of identical
+            // lines that bury the signal they are meant to raise.
+            static $warned = false;
+            if (!$warned) {
+                $warned = true;
+                debugging('rag_retriever: unreadable embedding_bin, falling back to JSON. '
+                    . 'Re-run admin/cli/backfill_embedding_bin.php --verify',
+                    DEBUG_DEVELOPER);
+            }
         }
         if ($json !== null && $json !== '') {
             $vec = json_decode($json, true);
