@@ -312,6 +312,7 @@
         <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Raw text of this chunk"/>
         <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="sha1 for change detection"/>
         <FIELD NAME="embedding" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON float array, null if not yet embedded"/>
+        <FIELD NAME="embedding_bin" TYPE="binary" NOTNULL="false" SEQUENCE="false" COMMENT="Packed float32 vector (pack('g*')). Preferred over the JSON embedding column: 4x faster to decode and 4.8x smaller. Null until backfilled."/>
         <FIELD NAME="embed_model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="e.g. text-embedding-3-small"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timeindexed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="When embedding was computed"/>

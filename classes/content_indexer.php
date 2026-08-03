@@ -136,8 +136,13 @@ class content_indexer {
                     $record->chunkindex  = $idx;
                     $record->content     = $sanitized['text'];
                     $record->contenthash = $hash;
-                    $record->embedding   = json_encode($vector);
-                    $record->embed_model = $modelname;
+                    // Both forms are written during the transition: the packed
+                    // vector is what retrieval reads, and the JSON copy keeps
+                    // a rollback to the previous release possible without a
+                    // reindex. A later release drops the JSON column.
+                    $record->embedding     = json_encode($vector);
+                    $record->embedding_bin = rag_retriever::pack_vector($vector);
+                    $record->embed_model   = $modelname;
                     $record->timecreated = time();
                     $record->timeindexed = time();
 
