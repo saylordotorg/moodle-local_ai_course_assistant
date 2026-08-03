@@ -21,9 +21,23 @@
  * for external analytics platforms like Redash. Authenticated via API key.
  *
  * GET parameters:
- *   apikey   (required) - must match the configured redash_api_key setting
- *   courseid (optional) - specific course ID, or 0 for all courses (default: 0)
- *   since    (optional) - Unix timestamp to filter data from (default: 0 = all time)
+ *   apikey    (required) - must match the configured redash_api_key setting
+ *                          (an Authorization: Bearer header is preferred)
+ *   courseid  (optional) - specific course ID, or 0 for all courses (default: 0)
+ *   since     (optional) - Unix timestamp to filter data from. Absent means the
+ *                          configured lookback window (redash_export_window_days,
+ *                          default 90 days); an explicit since=0 means all time.
+ *   sections  (optional) - comma-separated allow-list of sections to build, e.g.
+ *                          sections=courses,feedback,token_costs. Absent (or
+ *                          "all") emits everything, which includes raw chat
+ *                          transcript text; name the sections you need instead.
+ *                          Valid: courses, student_usage, hotspots, feedback,
+ *                          token_costs, survey_responses, meta_ai,
+ *                          learning_radar_queries.
+ *   anonymize (optional) - 1 (default) pseudonymizes learners. anonymize=0 is
+ *                          refused with 403 unless an admin has enabled the
+ *                          redash_allow_deanonymized setting, and is always
+ *                          audit-logged with the requesting IP.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
@@ -35,6 +49,7 @@ define('NO_MOODLE_COOKIES', true);
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\analytics;
+use local_ai_course_assistant\redash_export_request;
 use local_ai_course_assistant\token_cost_manager;
 
 // Content type. This endpoint is server-to-server (Redash pulls it with the
@@ -90,12 +105,46 @@ if (empty($apikey) || !hash_equals($configuredkey, $apikey)) {
 
 // Parse parameters.
 $courseid = optional_param('courseid', 0, PARAM_INT);
-$since = optional_param('since', 0, PARAM_INT);
+
+// -1 is the "parameter absent" sentinel: absent means the configured lookback
+// window, while an explicit since=0 still means an all-time export.
+$since = redash_export_request::resolve_since(
+    optional_param('since', -1, PARAM_INT), time());
+
+// Section allow-list. Building only what the caller asked for keeps the heavy
+// blocks (raw transcript excerpt, Learning Radar query/response bodies) out of
+// a payload that only wants usage, feedback and cost.
+$rawsections = optional_param('sections', '', PARAM_RAW_TRIMMED);
+$sections = redash_export_request::parse_sections($rawsections);
+if (empty($sections)) {
+    // Every name supplied was unrecognised. Fail loudly rather than falling
+    // back to the full export, so a typo cannot quietly widen the payload.
+    http_response_code(400);
+    echo json_encode([
+        'error' => 'No valid sections requested',
+        'unknown_sections' => redash_export_request::unknown_sections($rawsections),
+        'valid_sections' => redash_export_request::SECTIONS,
+    ]);
+    exit;
+}
+$wants = function(string $section) use ($sections): bool {
+    return in_array($section, $sections, true);
+};
 
 // v5.10.x (security finding #3.7): a de-anonymized export (anonymize=0) reveals
 // real learner names. This endpoint authenticates by API key, not a logged-in
-// admin, so audit the access with the requesting IP to keep it traceable.
-if (optional_param('anonymize', 1, PARAM_INT) === 0) {
+// admin, so the key alone must not be enough to de-anonymize: require an admin
+// to have enabled it, and audit the access with the requesting IP either way.
+$anonymize = optional_param('anonymize', 1, PARAM_INT) !== 0;
+if (!$anonymize) {
+    if (!redash_export_request::deanonymize_allowed()) {
+        http_response_code(403);
+        echo json_encode([
+            'error' => 'De-anonymized export is disabled. Enable the '
+                . '"Allow de-anonymized export" plugin setting to permit anonymize=0.',
+        ]);
+        exit;
+    }
     try {
         \local_ai_course_assistant\audit_logger::log(
             'redash_export_deanonymized', 0, $courseid,
@@ -111,15 +160,19 @@ $plugin = new stdClass();
 require(__DIR__ . '/version.php');
 $pluginversion = $plugin->release ?? 'unknown';
 
-// Determine which courses to export.
+// Determine which courses to export. Skipped entirely when the caller did not
+// ask for the courses section (the per-course analytics are the bulk of a
+// full-site export).
 $courseids = [];
-if ($courseid > 0) {
-    $courseids = [$courseid];
-} else {
-    // Get all courses that have at least one message.
-    $courseids = $DB->get_fieldset_sql(
-        "SELECT DISTINCT courseid FROM {local_ai_course_assistant_msgs}"
-    );
+if ($wants('courses')) {
+    if ($courseid > 0) {
+        $courseids = [$courseid];
+    } else {
+        // Get all courses that have at least one message.
+        $courseids = $DB->get_fieldset_sql(
+            "SELECT DISTINCT courseid FROM {local_ai_course_assistant_msgs}"
+        );
+    }
 }
 
 // Build course data.
@@ -143,31 +196,35 @@ foreach ($courseids as $cid) {
     ];
 
     // Hotspots require course modinfo, which may fail for deleted/broken courses.
-    try {
-        $coursedata['hotspots'] = analytics::get_hotspots($cid, $since);
-    } catch (\Throwable $e) {
-        $coursedata['hotspots'] = [];
+    if ($wants('hotspots')) {
+        try {
+            $coursedata['hotspots'] = analytics::get_hotspots($cid, $since);
+        } catch (\Throwable $e) {
+            $coursedata['hotspots'] = [];
+        }
     }
 
-    // Student usage: anonymize by default; pass ?anonymize=0 to reveal real names.
-    $anonymize = optional_param('anonymize', 1, PARAM_INT);
-    $studentrecords = analytics::get_student_usage($cid, $since);
-    $studentusage = [];
-    foreach ($studentrecords as $record) {
-        $entry = [
-            'userid' => (int) $record->userid,
-            'message_count' => (int) $record->message_count,
-            'last_active' => (int) $record->last_active,
-        ];
-        if ($anonymize) {
-            $entry['name'] = \local_ai_course_assistant\anonymizer::name((int) $record->userid);
-        } else {
-            $entry['firstname'] = $record->firstname;
-            $entry['lastname'] = $record->lastname;
+    // Student usage: one row per learner, so it is opt-in. Anonymized unless an
+    // admin has enabled de-anonymized exports and the caller asked for one.
+    if ($wants('student_usage')) {
+        $studentrecords = analytics::get_student_usage($cid, $since);
+        $studentusage = [];
+        foreach ($studentrecords as $record) {
+            $entry = [
+                'userid' => (int) $record->userid,
+                'message_count' => (int) $record->message_count,
+                'last_active' => (int) $record->last_active,
+            ];
+            if ($anonymize) {
+                $entry['name'] = \local_ai_course_assistant\anonymizer::name((int) $record->userid);
+            } else {
+                $entry['firstname'] = $record->firstname;
+                $entry['lastname'] = $record->lastname;
+            }
+            $studentusage[] = $entry;
         }
-        $studentusage[] = $entry;
+        $coursedata['student_usage'] = $studentusage;
     }
-    $coursedata['student_usage'] = $studentusage;
 
     $courses[] = $coursedata;
 }
@@ -184,13 +241,13 @@ if ($since > 0) {
     $feedbackparams['since'] = $since;
 }
 
-$feedbackrecords = $DB->get_records_sql(
+$feedbackrecords = $wants('feedback') ? $DB->get_records_sql(
     "SELECT id, userid, courseid, rating, comment, browser, os, device,
             screen_size, user_agent, page_url, timecreated
        FROM {local_ai_course_assistant_feedback}" . $feedbackwhere .
     " ORDER BY timecreated DESC",
     $feedbackparams
-);
+) : [];
 
 // Feedback PII gate: under the default anonymized export, do not emit the
 // fields that re-identify or fingerprint a learner (real userid, user agent,
@@ -238,7 +295,7 @@ if ($since > 0) {
     $tokenparams['since'] = $since;
 }
 
-$tokenrecords = $DB->get_records_sql(
+$tokenrecords = $wants('token_costs') ? $DB->get_records_sql(
     "SELECT model_name,
             COUNT(id) AS response_count,
             SUM(COALESCE(prompt_tokens, 0)) AS total_prompt_tokens,
@@ -248,7 +305,7 @@ $tokenrecords = $DB->get_records_sql(
     " GROUP BY model_name
       ORDER BY total_tokens DESC",
     $tokenparams
-);
+) : [];
 
 $tokencosts = [];
 foreach ($tokenrecords as $record) {
@@ -280,14 +337,14 @@ try {
         $surveyparams['since'] = $since;
     }
 
-    $surveyrecords = $DB->get_records_sql(
+    $surveyrecords = $wants('survey_responses') ? $DB->get_records_sql(
         "SELECT r.id, r.surveyid, r.userid, r.courseid, r.question_index, r.answer, r.timecreated,
                 s.title AS survey_title
            FROM {local_ai_course_assistant_survey_resp} r
            JOIN {local_ai_course_assistant_surveys} s ON s.id = r.surveyid" .
         $surveywhere . " ORDER BY r.timecreated DESC",
         $surveyparams
-    );
+    ) : [];
 
     foreach ($surveyrecords as $record) {
         // Same PII gate as feedback: pseudonymous learner ref under anonymize.
@@ -309,11 +366,16 @@ try {
     $surveydata = [];
 }
 
-// Learning Radar analytics: anonymized stats and transcript excerpt for Redash dashboards.
-$metaai = [
-    'summary' => \local_ai_course_assistant\meta_ai_data_builder::build_stats_summary($courseid, $since),
-    'transcript_excerpt' => \local_ai_course_assistant\meta_ai_data_builder::build_transcript($courseid, $since, 50000),
-];
+// Learning Radar analytics: anonymized stats and transcript excerpt for Redash
+// dashboards. The transcript excerpt is up to 50,000 characters of raw learner
+// conversation, so this section is only built when explicitly requested.
+$metaai = [];
+if ($wants('meta_ai')) {
+    $metaai = [
+        'summary' => \local_ai_course_assistant\meta_ai_data_builder::build_stats_summary($courseid, $since),
+        'transcript_excerpt' => \local_ai_course_assistant\meta_ai_data_builder::build_transcript($courseid, $since, 50000),
+    ];
+}
 
 // Learning Radar query log: every admin query (ad-hoc + scheduled) and its
 // response, paired by (conversationid, sequential timecreated). Each record
@@ -331,14 +393,14 @@ if ($since > 0) {
 // timestamp), and the pairing walk below would cross-pair them. `id` is
 // monotonic at insertion and preserves insertion order regardless of
 // timestamp ties.
-$radarrecords = $DB->get_records_sql(
+$radarrecords = $wants('learning_radar_queries') ? $DB->get_records_sql(
     "SELECT id, conversationid, userid, role, message, prompt_tokens, completion_tokens,
             model_name, provider, interaction_type, timecreated
        FROM {local_ai_course_assistant_msgs}
       WHERE {$radarwhere}
       ORDER BY conversationid ASC, id ASC",
     $radarparams
-);
+) : [];
 
 $radarpairs = [];
 $pendinguser = null;
@@ -366,11 +428,21 @@ foreach ($radarrecords as $row) {
     }
 }
 
-// Build response.
+// Build response. `sections` and `since` are echoed back so a consumer can
+// assert that the endpoint actually honoured its allow-list: a site still
+// running a pre-sections version of the plugin ignores the parameter and
+// returns everything, and the echoed values are how that is detected.
 $response = [
     'generated_at' => date('c'),
     'plugin_version' => $pluginversion,
-    'anonymized' => !empty($anonymize),
+    'anonymized' => $anonymize,
+    'sections' => $sections,
+    'since' => $since,
+];
+
+// Only emit the sections that were requested. `student_usage` and `hotspots`
+// are nested inside each course row, so they have no top-level key here.
+$payload = [
     'courses' => $courses,
     'feedback' => $feedback,
     'token_costs' => $tokencosts,
@@ -378,5 +450,10 @@ $response = [
     'meta_ai' => $metaai,
     'learning_radar_queries' => $radarpairs,
 ];
+foreach ($payload as $key => $value) {
+    if ($wants($key)) {
+        $response[$key] = $value;
+    }
+}
 
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

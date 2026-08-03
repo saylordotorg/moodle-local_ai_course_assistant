@@ -2392,6 +2392,25 @@ $settings->add(new admin_setting_configtext(
         ''
     ));
 
+    // Default lookback window applied when a caller omits `since`, so a data
+    // source that forgets the parameter cannot pull every row ever recorded.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/redash_export_window_days',
+        get_string('settings:redash_export_window_days', 'local_ai_course_assistant'),
+        get_string('settings:redash_export_window_days_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\redash_export_request::DEFAULT_WINDOW_DAYS,
+        PARAM_INT
+    ));
+
+    // Gate on anonymize=0. Without it the shared API key alone is enough to
+    // pull real learner names out of the export.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/redash_allow_deanonymized',
+        get_string('settings:redash_allow_deanonymized', 'local_ai_course_assistant'),
+        get_string('settings:redash_allow_deanonymized_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
     // v4.3.0: Real Redash integration. Three settings together let SOLA
     // push a Learning Radar query/response to Redash as a new saved query
     // via Redash's /api/queries endpoint. All three must be set for the

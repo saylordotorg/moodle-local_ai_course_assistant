@@ -585,6 +585,10 @@ $string['redash_heading'] = 'Analytics Export';
 $string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
 $string['redash_api_key'] = 'Redash API Key';
 $string['redash_api_key_desc'] = 'API key for external analytics platforms like Redash. Provides read-only access to usage data, feedback, and cost analytics. Leave blank to disable the export endpoint.';
+$string['settings:redash_export_window_days'] = 'Export lookback window (days)';
+$string['settings:redash_export_window_days_desc'] = 'How far back the export reaches when the caller does not pass a "since" timestamp. The default of 90 days keeps a data source that omits the parameter from pulling every row ever recorded; a caller can still request a specific window, or pass since=0 for an all-time backfill. Set to 0 to make all-time the default again.';
+$string['settings:redash_allow_deanonymized'] = 'Allow de-anonymized export';
+$string['settings:redash_allow_deanonymized_desc'] = 'Off by default. When off, a request for anonymize=0 is refused and learners always appear as pseudonyms. Turn this on only if an external report genuinely needs real learner names, and remember that the export authenticates with a shared API key rather than a signed-in administrator, so anyone holding the key can then retrieve those names. De-anonymized requests are audit-logged with the requesting IP either way.';
 
 // v6.1.0: web emergency panel.
 $string['emergency:title'] = '[[tutorshort]] Emergency Controls';
