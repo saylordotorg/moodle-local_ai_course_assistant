@@ -159,6 +159,48 @@ final class redash_export_request_test extends \advanced_testcase {
         $this->assertSame($now - (7 * DAYSECS), redash_export_request::resolve_since(-1, $now));
     }
 
+    public function test_anonymized_identity_never_includes_a_real_id(): void {
+        // The leak this replaced: student_usage emitted the real userid next to
+        // the pseudonym, and learning_radar_queries emitted it unconditionally.
+        $identity = redash_export_request::learner_identity(4217, true, 'Ada', 'Lovelace');
+
+        $this->assertSame(['user_ref'], array_keys($identity));
+        $this->assertArrayNotHasKey('userid', $identity);
+        $this->assertArrayNotHasKey('firstname', $identity);
+        $this->assertArrayNotHasKey('lastname', $identity);
+        $this->assertStringNotContainsString('4217', json_encode($identity));
+        $this->assertStringNotContainsString('Ada', json_encode($identity));
+    }
+
+    public function test_anonymized_identity_is_stable_for_the_same_user(): void {
+        // Dashboards group by this value, so it has to be deterministic.
+        $one = redash_export_request::learner_identity(4217, true);
+        $two = redash_export_request::learner_identity(4217, true);
+        $other = redash_export_request::learner_identity(4218, true);
+
+        $this->assertSame($one, $two);
+        $this->assertNotSame($one, $other);
+    }
+
+    public function test_deanonymized_identity_uses_userid_not_user_ref(): void {
+        // `user_ref` must always mean pseudonym: survey_responses used to put a
+        // raw id under that key, so a consumer could not tell them apart.
+        $identity = redash_export_request::learner_identity(4217, false, 'Ada', 'Lovelace');
+
+        $this->assertArrayHasKey('userid', $identity);
+        $this->assertArrayNotHasKey('user_ref', $identity);
+        $this->assertSame(4217, $identity['userid']);
+        $this->assertSame('Ada', $identity['firstname']);
+        $this->assertSame('Lovelace', $identity['lastname']);
+    }
+
+    public function test_deanonymized_identity_omits_names_when_not_supplied(): void {
+        // feedback and survey rows have no name columns to emit.
+        $identity = redash_export_request::learner_identity(4217, false);
+
+        $this->assertSame(['userid'], array_keys($identity));
+    }
+
     public function test_deanonymize_is_denied_by_default(): void {
         $this->resetAfterTest();
         $this->assertFalse(redash_export_request::deanonymize_allowed());

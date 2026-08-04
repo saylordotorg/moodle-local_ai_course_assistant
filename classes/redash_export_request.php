@@ -167,6 +167,40 @@ final class redash_export_request {
     }
 
     /**
+     * How a person is represented in the export payload.
+     *
+     * One definition for every section, because the four sections each rolled
+     * their own and two of them leaked: `student_usage` emitted the real
+     * `userid` alongside the pseudonym even under anonymize=1, and
+     * `learning_radar_queries` emitted a raw `userid` unconditionally. A
+     * pseudonym next to the id it is derived from is not a pseudonym.
+     *
+     * `survey_responses` was a naming bug rather than a leak: it put the raw
+     * userid under the key `user_ref` when not anonymizing, so a consumer
+     * reading `user_ref` could not tell whether it held a reference or an id.
+     * Under this helper `user_ref` always means pseudonym and `userid` always
+     * means a real id, so the key alone tells you which you have.
+     *
+     * @param int $userid Moodle user id.
+     * @param bool $anonymize Whether the export is anonymized.
+     * @param string|null $firstname Real first name, when the caller has it.
+     * @param string|null $lastname Real last name, when the caller has it.
+     * @return array Identity fields to merge into the row.
+     */
+    public static function learner_identity(int $userid, bool $anonymize,
+            ?string $firstname = null, ?string $lastname = null): array {
+        if ($anonymize) {
+            return ['user_ref' => anonymizer::name($userid)];
+        }
+        $out = ['userid' => $userid];
+        if ($firstname !== null || $lastname !== null) {
+            $out['firstname'] = $firstname;
+            $out['lastname'] = $lastname;
+        }
+        return $out;
+    }
+
+    /**
      * Whether `anonymize=0` (real learner names) is permitted at all.
      *
      * The export authenticates by shared API key, not by a logged-in admin, so

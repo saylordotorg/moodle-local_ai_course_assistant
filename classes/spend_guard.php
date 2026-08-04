@@ -205,7 +205,7 @@ class spend_guard {
      * @param string $capability
      * @return string SQL clause
      */
-    private static function capability_sql(string $capability): string {
+    public static function capability_sql(string $capability): string {
         switch ($capability) {
             case 'chat':
                 return "(m.interaction_type IS NULL OR m.interaction_type IN ('chat','quiz',''))";

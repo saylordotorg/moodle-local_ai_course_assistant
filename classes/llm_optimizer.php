@@ -97,7 +97,13 @@ class llm_optimizer {
         global $DB, $CFG;
 
         $since = time() - 30 * 86400;
-        $capclause = self::capability_clause($capability);
+        // Shared with spend_guard rather than mirrored. The local copy of this
+        // mapping had drifted: it was missing 'rerank', so reranker spend fell
+        // outside every capability bucket, and combined with the old
+        // role='assistant' clause above the 'rag' branch could never match a row
+        // (embedding/rerank rows are always role='system'), which made a RAG
+        // provider recommendation impossible to produce.
+        $capclause = spend_guard::capability_sql($capability);
 
         $rows = $DB->get_records_sql(
             "SELECT " . $DB->sql_concat('m.provider', "'|'", 'm.model_name') . " AS id,
@@ -107,7 +113,8 @@ class llm_optimizer {
                     SUM(COALESCE(m.prompt_tokens, 0)) AS prompt,
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion
                FROM {local_ai_course_assistant_msgs} m
-              WHERE m.role = 'assistant' AND m.model_name IS NOT NULL
+              WHERE " . analytics::spend_rows_predicate('m') . "
+                AND m.model_name IS NOT NULL
                 AND m.timecreated >= :since
                 AND {$capclause}
               GROUP BY m.provider, m.model_name
@@ -240,7 +247,8 @@ class llm_optimizer {
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion
                FROM {local_ai_course_assistant_msgs} m
-              WHERE m.role = 'assistant' AND m.model_name IS NOT NULL AND m.timecreated >= :since
+              WHERE " . analytics::spend_rows_predicate('m') . "
+                AND m.model_name IS NOT NULL AND m.timecreated >= :since
               GROUP BY m.model_name",
             ['since' => $since]
         );
@@ -283,24 +291,4 @@ class llm_optimizer {
         return (string) (get_config('local_ai_course_assistant', 'provider') ?: 'openai');
     }
 
-    /**
-     * Capability → SQL fragment over interaction_type. Mirrors spend_guard::capability_sql.
-     *
-     * @param string $capability
-     * @return string
-     */
-    private static function capability_clause(string $capability): string {
-        switch ($capability) {
-            case 'chat':
-                return "(m.interaction_type IS NULL OR m.interaction_type IN ('chat','quiz',''))";
-            case 'voice':
-                return "m.interaction_type IN ('voice','openai_tts','xai_tts','openai_whisper','openai_stt','xai_stt')";
-            case 'rag':
-                return "m.interaction_type IN ('embedding','embed')";
-            case 'analytics':
-                return "m.interaction_type = 'meta'";
-            default:
-                return '1=1';
-        }
-    }
 }

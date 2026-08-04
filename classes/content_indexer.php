@@ -80,10 +80,26 @@ class content_indexer {
         // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
         $modelname = $provider->get_model();
 
+        // Budget gate. Indexing is the bulk of RAG spend, so refuse to start a
+        // run that is already over a configured 'rag' cap. Unreachable unless an
+        // admin set a cap: an unset cap is 0, which check() treats as unlimited.
+        // Returning here also means the stale-chunk prune below never runs, which
+        // matters: pruning on a run that indexed nothing would delete the whole
+        // existing index.
+        if (spend_guard::check(0, 'rag') === spend_guard::CAP_BLOCKED) {
+            $stats['cap_blocked'] = true;
+            $stats['fatal'] = get_string('rag_cap_blocked', 'local_ai_course_assistant');
+            return $stats;
+        }
+
         // Track all chunk content-hashes we encounter (for cleanup later).
         $seenhashes = [];
+        $capblocked = false;
 
         foreach ($modules as $mod) {
+            if ($capblocked) {
+                break;
+            }
             try {
                 $chunks = content_chunker::chunk(
                     $mod['text'],
@@ -107,6 +123,18 @@ class content_indexer {
                             $stats['skipped']++;
                             continue;
                         }
+                    }
+
+                    // Re-check the cap as the run proceeds, so a long reindex stops
+                    // when it crosses the cap rather than only being refused at
+                    // the start. check() caches for 60s, so this is not a query
+                    // per chunk. Stopping partway deliberately sets cap_blocked,
+                    // which suppresses the stale-chunk prune below: the hashes we
+                    // never reached would otherwise look stale and be deleted.
+                    if (spend_guard::check(0, 'rag') === spend_guard::CAP_BLOCKED) {
+                        $capblocked = true;
+                        $stats['cap_blocked'] = true;
+                        break;
                     }
 
                     // Embed this chunk.
@@ -171,7 +199,10 @@ class content_indexer {
         // in source. Only prune on a clean run (no embed errors) — otherwise a
         // transient embedding outage, where every embed() throws and nothing is
         // re-inserted, would silently delete a previously-good index.
-        if ($stats['errors'] === 0 && !empty($seenhashes)) {
+        // `cap_blocked` joins `errors` as a reason not to prune: a run cut short by
+        // the budget cap never reached the remaining chunks, so their hashes are
+        // absent from $seenhashes and would be misread as stale and deleted.
+        if ($stats['errors'] === 0 && empty($stats['cap_blocked']) && !empty($seenhashes)) {
             // O(1) membership via a hash set, not in_array (which was O(n) per
             // row, O(n^2) overall on large courses). Stream rows with a
             // recordset so the whole chunk table is never held in memory.

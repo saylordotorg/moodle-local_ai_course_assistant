@@ -1311,10 +1311,29 @@ foreach ($groups as $label => $group) {
     $rerankms = array_filter(array_map(fn($r) => $r['rerank_latency_ms'] ?? null, $group));
 
     $totaltokens = array_sum(array_filter(array_map(fn($r) => $r['rerank_total_tokens'] ?? 0, $group)));
-    $costusd = $totaltokens > 0 ? ($totaltokens / 1000000) * 0.05 : 0.0;
-    $costperquery = count($group) > 0 && $totaltokens > 0
-        ? ($totaltokens / count($group) / 1000000) * 0.05
-        : 0.0;
+    // Priced through the shared rate card rather than a hardcoded rate. This was
+    // `* 0.05` inline, which matched Voyage's rerank-2.5 price but would have kept
+    // billing at it silently after any price change, and ignored the fact that
+    // `rerank_model` is configurable, so a run on a different reranker was costed
+    // at rerank-2.5's rate. estimate_cost() returns null for a model absent from
+    // the card, which the $usd formatter already renders as "n/a" -- an honest
+    // unknown rather than a guessed figure.
+    $rerankmodel = (string) (get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5');
+    $costusd = null;
+    $costperquery = null;
+    if ($totaltokens > 0) {
+        $costusd = \local_ai_course_assistant\token_cost_manager::estimate_cost(
+            $rerankmodel, $totaltokens, 0);
+        if ($costusd === null) {
+            fwrite(STDERR, "WARNING: rerank model '{$rerankmodel}' is not in the rate card, "
+                . "so rerank cost is reported as n/a rather than estimated.\n");
+        } else if (count($group) > 0) {
+            $costperquery = $costusd / count($group);
+        }
+    } else {
+        $costusd = 0.0;
+        $costperquery = 0.0;
+    }
 
     $entry = [
         'group'                => $label,

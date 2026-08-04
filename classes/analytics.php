@@ -70,7 +70,7 @@ class analytics {
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
                  WHERE m.courseid = :courseid
-                   AND m.role IN ('user', 'assistant'){$timewhere}";
+                   AND " . self::conversation_rows_predicate('m') . "{$timewhere}";
         $totalmessages = $DB->count_records_sql($sql, $params);
 
         // Active students (users who sent at least one message).
@@ -362,6 +362,25 @@ class analytics {
             ];
         }
         return $result;
+    }
+
+    /**
+     * SQL predicate matching learner-facing conversation rows.
+     *
+     * The counterpart to spend_rows_predicate(): those are the rows an API bill
+     * is computed from, these are the rows a human actually saw. Everything else
+     * in the msgs table is telemetry (role='system' embedding, rerank and
+     * premium_router rows) and must not be counted as activity.
+     *
+     * Shared so the definition of "a real message" cannot drift between the
+     * overview counters and the export's course list, which is the drift that
+     * produced a phantom course row consisting entirely of indexing telemetry.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression.
+     */
+    public static function conversation_rows_predicate(string $alias = 'm'): string {
+        return "{$alias}.role IN ('user', 'assistant')";
     }
 
     /**

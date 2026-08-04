@@ -167,9 +167,31 @@ if ($wants('courses')) {
     if ($courseid > 0) {
         $courseids = [$courseid];
     } else {
-        // Get all courses that have at least one message.
+        // Courses with at least one real conversation row in the window.
+        //
+        // This used to be an unfiltered SELECT DISTINCT courseid, which had two
+        // consequences, both showing up as course rows whose every metric is
+        // zero. First, embedding telemetry is written against SITEID, so the site
+        // course appeared as a "course" whose entire content was the RAG indexing
+        // ledger. Filtering on the conversation roles rather than excluding
+        // SITEID outright is deliberate: the widget does appear on non-course
+        // pages, and that chat legitimately carries courseid = SITEID, so a
+        // blanket SITEID exclusion would discard real usage.
+        //
+        // Second, the list ignored `since` while every metric in the row honours
+        // it, so a course last used years ago still appeared, empty. The window
+        // now applies to both.
+        $listparams = [];
+        $listwhere = analytics::conversation_rows_predicate('m');
+        if ($since > 0) {
+            $listwhere .= ' AND m.timecreated >= :since';
+            $listparams['since'] = $since;
+        }
         $courseids = $DB->get_fieldset_sql(
-            "SELECT DISTINCT courseid FROM {local_ai_course_assistant_msgs}"
+            "SELECT DISTINCT m.courseid
+               FROM {local_ai_course_assistant_msgs} m
+              WHERE {$listwhere}",
+            $listparams
         );
     }
 }
@@ -209,18 +231,14 @@ foreach ($courseids as $cid) {
         $studentrecords = analytics::get_student_usage($cid, $since);
         $studentusage = [];
         foreach ($studentrecords as $record) {
-            $entry = [
-                'userid' => (int) $record->userid,
+            // Identity via the shared helper: this block used to emit the real
+            // userid next to the pseudonym, which defeated the pseudonym.
+            $studentusage[] = redash_export_request::learner_identity(
+                (int) $record->userid, $anonymize, $record->firstname, $record->lastname
+            ) + [
                 'message_count' => (int) $record->message_count,
                 'last_active' => (int) $record->last_active,
             ];
-            if ($anonymize) {
-                $entry['name'] = \local_ai_course_assistant\anonymizer::name((int) $record->userid);
-            } else {
-                $entry['firstname'] = $record->firstname;
-                $entry['lastname'] = $record->lastname;
-            }
-            $studentusage[] = $entry;
         }
         $coursedata['student_usage'] = $studentusage;
     }
@@ -255,31 +273,26 @@ $feedbackrecords = $wants('feedback') ? $DB->get_records_sql(
 // anonymize=0 request (already audit-logged above) sees raw values.
 $feedback = [];
 foreach ($feedbackrecords as $record) {
-    if ($anonymize) {
-        $feedback[] = [
-            'id' => (int) $record->id,
-            'user_ref' => \local_ai_course_assistant\anonymizer::name((int) $record->userid),
+    $row = ['id' => (int) $record->id]
+        + redash_export_request::learner_identity((int) $record->userid, $anonymize)
+        + [
             'courseid' => (int) $record->courseid,
             'rating' => (int) $record->rating,
             'comment' => $record->comment,
-            'timecreated' => (int) $record->timecreated,
         ];
-    } else {
-        $feedback[] = [
-            'id' => (int) $record->id,
-            'userid' => (int) $record->userid,
-            'courseid' => (int) $record->courseid,
-            'rating' => (int) $record->rating,
-            'comment' => $record->comment,
+    if (!$anonymize) {
+        // Fingerprinting fields, only on a deliberate de-anonymized export.
+        $row += [
             'browser' => $record->browser,
             'os' => $record->os,
             'device' => $record->device,
             'screen_size' => $record->screen_size,
             'user_agent' => $record->user_agent,
             'page_url' => $record->page_url,
-            'timecreated' => (int) $record->timecreated,
         ];
     }
+    $row['timecreated'] = (int) $record->timecreated;
+    $feedback[] = $row;
 }
 
 // Token costs: aggregate by model, chat plus the background RAG spend ledger.
@@ -312,14 +325,14 @@ try {
     ) : [];
 
     foreach ($surveyrecords as $record) {
-        // Same PII gate as feedback: pseudonymous learner ref under anonymize.
+        // Same PII gate as feedback, via the shared helper. This block used to
+        // put the raw userid under the `user_ref` key when not anonymizing, so
+        // `user_ref` did not reliably mean "pseudonym".
         $surveydata[] = [
             'id' => (int) $record->id,
             'surveyid' => (int) $record->surveyid,
             'survey_title' => $record->survey_title,
-            'user_ref' => $anonymize
-                ? \local_ai_course_assistant\anonymizer::name((int) $record->userid)
-                : (int) $record->userid,
+        ] + redash_export_request::learner_identity((int) $record->userid, $anonymize) + [
             'courseid' => (int) $record->courseid,
             'question_index' => (int) $record->question_index,
             'answer' => $record->answer,
@@ -376,9 +389,12 @@ foreach ($radarrecords as $row) {
     }
     if ($row->role === 'assistant' && $pendinguser !== null
             && (int) $pendinguser->conversationid === (int) $row->conversationid) {
-        $radarpairs[] = [
-            'id'                => (int) $row->id,
-            'userid'            => (int) $row->userid,
+        // The person here is the admin who ran the Learning Radar query rather
+        // than a learner, but it is still a real user id and was emitted raw
+        // regardless of the anonymize flag. Same helper, same gate.
+        $radarpairs[] = ['id' => (int) $row->id]
+            + redash_export_request::learner_identity((int) $row->userid, $anonymize)
+            + [
             'query'             => (string) $pendinguser->message,
             'response'          => (string) $row->message,
             'provider'          => $row->provider,

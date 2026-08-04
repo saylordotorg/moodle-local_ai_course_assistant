@@ -113,6 +113,20 @@ class rag_retriever {
         $rawscope = get_config('local_ai_course_assistant', 'rag_scope');
         $scope = ($rawscope === false || $rawscope === '') ? 'document_first' : (string) $rawscope;
 
+        // Budget gate. Every RAG API call downstream of here is billable: the
+        // query embedding, and the rerank pass if it runs. A 'rag' cap that has
+        // been exceeded therefore stops at this one point rather than being
+        // checked twice.
+        //
+        // Returning [] degrades to no retrieved context, which is the identical
+        // path taken when the index is empty or the embedding call fails, so chat
+        // continues to work and only loses its citations. Unreachable unless an
+        // admin has actually set a cap: get_cap() returns 0 when unset and
+        // check() treats 0 as unlimited.
+        if (spend_guard::check(0, 'rag') === spend_guard::CAP_BLOCKED) {
+            return [];
+        }
+
         // Embed the query. When the configured embedding provider is Voyage,
         // ask for the asymmetric "query" projection so the vector pairs
         // properly with the "document"-typed index vectors. Other providers
