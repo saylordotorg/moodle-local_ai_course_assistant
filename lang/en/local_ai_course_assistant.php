@@ -352,7 +352,7 @@ $string['settings:rerank_model_desc'] = 'Default <code>rerank-2.5</code>. Newer 
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Override the Voyage rerank base URL. Leave blank to use the Embedding API Base URL above, or Voyage default (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank candidate window';
-$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 50. Larger windows give the reranker more material to work with at small extra cost (~10k tokens per rerank op).';
+$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 20. Measured over 1,008 queries: 20 matches 30 on recall (R@3 89.0% vs 89.3%) for a third less cost, and 50 costs 2.5x with no measurable gain. Below 10 recall degrades. Cost scales linearly with this value.';
 $string['settings:rerank_margin_threshold'] = 'Rerank ambiguity threshold';
 $string['settings:rerank_margin_threshold_desc'] = 'Only rerank when the cosine margin between the top-1 and top-3 candidates is below this value, i.e. when retrieval is ambiguous. Measured over 1,008 queries: at the default 0.086 this skips about 30% of queries with no measurable recall loss, and avoids cases where reranking displaces an already-correct top result. Set to 0 to rerank every query.';
 
@@ -585,6 +585,10 @@ $string['redash_heading'] = 'Analytics Export';
 $string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
 $string['redash_api_key'] = 'Redash API Key';
 $string['redash_api_key_desc'] = 'API key for external analytics platforms like Redash. Provides read-only access to usage data, feedback, and cost analytics. Leave blank to disable the export endpoint.';
+$string['settings:redash_export_window_days'] = 'Export lookback window (days)';
+$string['settings:redash_export_window_days_desc'] = 'How far back the export reaches when the caller does not pass a "since" timestamp. The default of 90 days keeps a data source that omits the parameter from pulling every row ever recorded; a caller can still request a specific window, or pass since=0 for an all-time backfill. Set to 0 to make all-time the default again.';
+$string['settings:redash_allow_deanonymized'] = 'Allow de-anonymized export';
+$string['settings:redash_allow_deanonymized_desc'] = 'Off by default. When off, a request for anonymize=0 is refused and learners always appear as pseudonyms. Turn this on only if an external report genuinely needs real learner names, and remember that the export authenticates with a shared API key rather than a signed-in administrator, so anyone holding the key can then retrieve those names. De-anonymized requests are audit-logged with the requesting IP either way.';
 
 // v6.1.0: web emergency panel.
 $string['emergency:title'] = '[[tutorshort]] Emergency Controls';

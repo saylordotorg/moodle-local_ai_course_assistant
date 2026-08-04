@@ -216,7 +216,7 @@ class rag_retriever {
         if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')) {
             $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
             $hydratelimit = max($topk,
-                ($rawcand === false || $rawcand === '') ? 50 : (int) $rawcand);
+                ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand);
         }
         $scored = self::hydrate_content(array_slice($scored, 0, $hydratelimit));
         if (empty($scored)) {
@@ -225,14 +225,14 @@ class rag_retriever {
 
         // Optional stage 2: two-stage retrieval with Voyage rerank-2.5.
         // When `rerank_enabled` is on AND a Voyage rerank API key is configured,
-        // take the top `rerank_candidates` cosine matches (default 50) and
+        // take the top `rerank_candidates` cosine matches (default 20) and
         // re-score them with rerank-2.5 (cross-encoder), then keep the top-k.
         // Published recall lifts: +15 Recall@10 enterprise / +39% NDCG BEIR.
         // Falls back to single-stage cosine top-k if reranker fails or is unset.
         if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')
                 && self::should_rerank($scored)) {
             $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
-            $candidates = ($rawcand === false || $rawcand === '') ? 50 : (int) $rawcand;
+            $candidates = ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand;
             $candidates = max($topk, min($candidates, count($scored)));
             $stage1 = array_slice($scored, 0, $candidates);
             try {
