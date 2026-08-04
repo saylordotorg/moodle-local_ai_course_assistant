@@ -755,7 +755,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/rerank_candidates',
         get_string('settings:rerank_candidates', 'local_ai_course_assistant'),
         get_string('settings:rerank_candidates_desc', 'local_ai_course_assistant'),
-        '50',
+        '20',
         PARAM_INT
     ));
 
@@ -2378,7 +2378,14 @@ $settings->add(new admin_setting_configtext(
         get_string('redash_heading_desc', 'local_ai_course_assistant')
     ));
 
-    $settings->add(new admin_setting_configtext(
+    // Password type, not configtext: Moodle only writes '********' into
+    // config_log for password settings. A plain configtext credential has
+    // every historical value recorded in the clear in mdl_config_log, which is
+    // never purged and is readable by anything with DB or reporting access.
+    // Confirmed on production 2026-08-03 -- a retired key was recoverable in
+    // full from the log. Its siblings redash_user_api_key and github_token
+    // were already declared correctly; this one was missed.
+    $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/redash_api_key',
         get_string('redash_api_key', 'local_ai_course_assistant'),
         get_string('redash_api_key_desc', 'local_ai_course_assistant'),

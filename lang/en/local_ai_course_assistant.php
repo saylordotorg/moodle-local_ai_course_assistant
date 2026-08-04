@@ -352,7 +352,7 @@ $string['settings:rerank_model_desc'] = 'Default <code>rerank-2.5</code>. Newer 
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Override the Voyage rerank base URL. Leave blank to use the Embedding API Base URL above, or Voyage default (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank candidate window';
-$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 50. Larger windows give the reranker more material to work with at small extra cost (~10k tokens per rerank op).';
+$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 20. Measured over 1,008 queries: 20 matches 30 on recall (R@3 89.0% vs 89.3%) for a third less cost, and 50 costs 2.5x with no measurable gain. Below 10 recall degrades. Cost scales linearly with this value.';
 $string['settings:rerank_margin_threshold'] = 'Rerank ambiguity threshold';
 $string['settings:rerank_margin_threshold_desc'] = 'Only rerank when the cosine margin between the top-1 and top-3 candidates is below this value, i.e. when retrieval is ambiguous. Measured over 1,008 queries: at the default 0.086 this skips about 30% of queries with no measurable recall loss, and avoids cases where reranking displaces an already-correct top result. Set to 0 to rerank every query.';
 
