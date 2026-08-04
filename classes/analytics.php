@@ -365,6 +365,67 @@ class analytics {
     }
 
     /**
+     * SQL predicate matching rows that represent a real billable API call.
+     *
+     * Single definition on purpose. This predicate was previously written inline
+     * in each place that summed spend, and they drifted: every one of them said
+     * role='assistant', which silently omitted the embedding and rerank cost
+     * ledger (written with role='system' by base_embedding_provider and
+     * voyage_reranker). Any new spend total must use this rather than hand-roll
+     * the condition again.
+     *
+     * Matches on interaction_type rather than role for the background rows,
+     * because premium_router also writes role='system' -- with zero tokens and
+     * the escalation target's model name, while the escalated call itself is
+     * logged separately as an assistant row. Including it would double-count.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression, already parenthesised.
+     */
+    private static function spend_rows_predicate(string $alias = 'm'): string {
+        return "({$alias}.role = 'assistant'
+                 OR {$alias}.interaction_type IN ('embedding', 'rerank'))";
+    }
+
+    /**
+     * Total tokens (prompt + completion) across all billable rows.
+     *
+     * Powers the site-wide "Tokens (30d)" figure. Unlike get_token_costs() this
+     * does not require a model_name, so it keeps counting rows whose model was
+     * never recorded; the two therefore need not agree exactly, and this one is
+     * the more complete total.
+     *
+     * Background embedding/rerank spend is written against SITEID, so a
+     * whole-site call ($courseid = 0) includes it and a per-course call does not.
+     * That means this total legitimately exceeds the sum of per-course totals.
+     *
+     * @param int $courseid 0 for the whole site, or a specific course.
+     * @param int $since Unix timestamp lower bound; 0 for no bound.
+     * @return int Total tokens.
+     */
+    public static function get_total_tokens(int $courseid = 0, int $since = 0): int {
+        global $DB;
+
+        $where = self::spend_rows_predicate('m');
+        $params = [];
+        if ($courseid > 0) {
+            $where .= ' AND m.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
+        if ($since > 0) {
+            $where .= ' AND m.timecreated >= :since';
+            $params['since'] = $since;
+        }
+
+        $sql = "SELECT COALESCE(SUM(COALESCE(m.prompt_tokens, 0)
+                               + COALESCE(m.completion_tokens, 0)), 0)
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE {$where}";
+
+        return (int) $DB->get_field_sql($sql, $params);
+    }
+
+    /**
      * Aggregate token spend per model, including background RAG spend.
      *
      * Chat spend is the role='assistant' rows. Background spend is the ledger
@@ -404,8 +465,7 @@ class analytics {
 
         // Rows that represent a real billable API call.
         $where = "m.model_name IS NOT NULL AND m.model_name != ''
-                  AND (m.role = 'assistant'
-                       OR m.interaction_type IN ('embedding', 'rerank'))";
+                  AND " . self::spend_rows_predicate('m');
         $params = [];
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';

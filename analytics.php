@@ -505,19 +505,22 @@ $templatedata = [
         $since30 = $now - 30 * 86400;
         $since7 = $now - 7 * 86400;
 
-        // Tokens this month.
-        $toktotal = (int) $DB->get_field_sql(
-            "SELECT COALESCE(SUM(COALESCE(prompt_tokens, 0) + COALESCE(completion_tokens, 0)), 0)
-               FROM {local_ai_course_assistant_msgs}
-              WHERE role = 'assistant' AND timecreated > ?",
-            [$since30]) ?: 0;
+        // Tokens this month. Site-wide, so it includes the background RAG spend
+        // ledger (embedding + rerank) as well as chat. This used to filter
+        // role='assistant' inline and therefore undercounted by the whole of RAG.
+        $toktotal = \local_ai_course_assistant\analytics::get_total_tokens(0, $since30);
         $chips[] = [
             'value' => number_format($toktotal),
             'label' => 'Tokens (30d)',
             'query' => 'Break down token spend by provider and course for the last 30 days.',
         ];
 
-        // Top-cost course (30d).
+        // Top-cost course (30d). Deliberately still role='assistant': this chip
+        // attributes spend to a course, and the embedding/rerank ledger is written
+        // against SITEID rather than the course whose content was indexed, so
+        // including it would crown the site course as top consumer. Consequence
+        // to expect, not a bug: "Tokens (30d)" above is larger than the sum of
+        // per-course token totals, by the amount of background RAG spend.
         $topcourse = $DB->get_record_sql(
             "SELECT c.id, c.shortname, c.fullname,
                     SUM(COALESCE(m.prompt_tokens, 0) + COALESCE(m.completion_tokens, 0)) AS tokens
