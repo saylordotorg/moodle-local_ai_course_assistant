@@ -155,7 +155,16 @@ class spend_guard {
 
         $since = self::period_start();
         $params = ['since' => $since];
-        $where = "m.role = 'assistant' AND m.model_name IS NOT NULL AND m.timecreated >= :since";
+        // Billable-row predicate is shared with analytics rather than inlined.
+        // This clause used to read role='assistant', which made the 'rag'
+        // capability impossible to satisfy: capability_sql('rag') requires an
+        // embedding/rerank interaction_type, and those rows are always
+        // role='system', so the intersection was empty for every row in the
+        // table. RAG spend therefore computed as $0.00 no matter how much
+        // indexing had run, and the "RAG" line in the admin spend panel was
+        // permanently zero.
+        $where = analytics::spend_rows_predicate('m')
+            . " AND m.model_name IS NOT NULL AND m.timecreated >= :since";
 
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
@@ -203,7 +212,11 @@ class spend_guard {
             case 'voice':
                 return "m.interaction_type IN ('voice','openai_tts','xai_tts','openai_whisper','openai_stt','xai_stt')";
             case 'rag':
-                return "m.interaction_type IN ('embedding','embed')";
+                // 'rerank' belongs to RAG spend too: voyage_reranker is the second
+                // half of the retrieval pipeline and was in no capability bucket at
+                // all, so its cost fell outside every per-capability total.
+                // 'embed' is kept for any legacy rows written under that type.
+                return "m.interaction_type IN ('embedding','embed','rerank')";
             case 'analytics':
                 return "m.interaction_type = 'meta'";
             default:

@@ -379,10 +379,15 @@ class analytics {
      * the escalation target's model name, while the escalated call itself is
      * logged separately as an assistant row. Including it would double-count.
      *
+     * Public because spend_guard shares it: its cap accounting had the same
+     * role='assistant' clause inline, which made the RAG capability unmatchable
+     * (see spend_guard::compute_spend). Two copies of this condition is how the
+     * drift happened, so there is exactly one.
+     *
      * @param string $alias table alias used in the calling query.
      * @return string SQL boolean expression, already parenthesised.
      */
-    private static function spend_rows_predicate(string $alias = 'm'): string {
+    public static function spend_rows_predicate(string $alias = 'm'): string {
         return "({$alias}.role = 'assistant'
                  OR {$alias}.interaction_type IN ('embedding', 'rerank'))";
     }
