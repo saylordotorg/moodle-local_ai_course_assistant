@@ -112,7 +112,7 @@ final class analytics_token_costs_test extends \advanced_testcase {
         $this->assertEqualsWithDelta(1500 / 1_000_000 * 0.02, $row['estimated_cost_usd'], 1e-12);
     }
 
-    public function test_rerank_spend_is_reported_with_unknown_cost_not_zero(): void {
+    public function test_rerank_spend_is_reported_and_priced(): void {
         $this->resetAfterTest();
         $this->rerank_row(800);
 
@@ -120,7 +120,20 @@ final class analytics_token_costs_test extends \advanced_testcase {
         $this->assertNotNull($row);
         $this->assertSame('rerank', $row['category']);
         $this->assertSame(800, $row['total_tokens']);
-        // rerank-2.5 is absent from the rate card: null means unknown, not free.
+        // rerank-2.5 is in the rate card at $0.05 per million input tokens.
+        $this->assertEqualsWithDelta(800 / 1_000_000 * 0.05, $row['estimated_cost_usd'], 1e-12);
+    }
+
+    public function test_unpriced_model_reports_null_cost_not_zero(): void {
+        $this->resetAfterTest();
+        // A model absent from the rate card must read as unknown, not as free.
+        $this->msg(['role' => 'system', 'message' => '[Embedding]',
+            'model_name' => 'some-unlisted-embedder', 'provider' => 'embedding',
+            'interaction_type' => 'embedding', 'prompt_tokens' => 1000, 'tokens_used' => 1000]);
+
+        $row = $this->row(analytics::get_token_costs(0, 0), 'some-unlisted-embedder');
+        $this->assertNotNull($row);
+        $this->assertSame(1000, $row['total_tokens']);
         $this->assertNull($row['estimated_cost_usd']);
     }
 

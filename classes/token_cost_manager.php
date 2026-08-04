@@ -65,6 +65,38 @@ class token_cost_manager {
         'text-embedding-3-large' => ['input' => 0.13, 'output' => 0.00],
         'text-embedding-ada'     => ['input' => 0.10, 'output' => 0.00],
 
+        // ── Voyage AI embeddings + rerankers ────────────────────────────────
+        // Rates from docs.voyageai.com/docs/pricing (2026-08-04), USD per 1M
+        // tokens. Embeddings and rerankers are input-only; output stays 0.00.
+        // Without these, RAG spend reported estimated_cost_usd = null while the
+        // token counts were right, so indexing and rerank cost was invisible.
+        // Rerank billing counts query + document tokens, which is exactly what
+        // voyage_reranker::log_rerank_cost() records, so the input rate applies
+        // to the logged total.
+        // Prefix matching is longest-wins, so the -lite and -large variants must
+        // stay as their own keys; they are cheaper/dearer than the base model and
+        // would otherwise inherit the shorter prefix's rate.
+        // Deliberately NO bare 'voyage' or 'rerank' catch-all: an unrecognised
+        // future model should return null (unknown) rather than be priced at a
+        // guessed rate. Admins can still add one via the rate_card_overrides
+        // setting without a code change.
+        'voyage-4-large'         => ['input' => 0.12, 'output' => 0.00],
+        'voyage-4-lite'          => ['input' => 0.02, 'output' => 0.00],
+        'voyage-4'               => ['input' => 0.06, 'output' => 0.00],
+        'voyage-context-4'       => ['input' => 0.12, 'output' => 0.00],
+        'voyage-3.5-lite'        => ['input' => 0.02, 'output' => 0.00],
+        'voyage-3.5'             => ['input' => 0.06, 'output' => 0.00],
+        'voyage-3-large'         => ['input' => 0.18, 'output' => 0.00],
+        'voyage-code-3'          => ['input' => 0.18, 'output' => 0.00],
+        'voyage-multimodal-3.5'  => ['input' => 0.12, 'output' => 0.00],
+        'voyage-multimodal-3'    => ['input' => 0.12, 'output' => 0.00],
+        'voyage-finance-2'       => ['input' => 0.12, 'output' => 0.00],
+        'voyage-law-2'           => ['input' => 0.12, 'output' => 0.00],
+        'rerank-2.5-lite'        => ['input' => 0.02, 'output' => 0.00],
+        'rerank-2.5'             => ['input' => 0.05, 'output' => 0.00],
+        'rerank-2-lite'          => ['input' => 0.02, 'output' => 0.00],
+        'rerank-2'               => ['input' => 0.05, 'output' => 0.00],
+
         // ── OpenAI Whisper (transcription) ──────────────────────────────────
         // Whisper charges ~$0.006/min. Approximated per token for the rate card.
         'whisper'           => ['input' =>  0.36, 'output' =>  0.00],
