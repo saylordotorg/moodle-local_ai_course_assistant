@@ -50,7 +50,6 @@ require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\analytics;
 use local_ai_course_assistant\redash_export_request;
-use local_ai_course_assistant\token_cost_manager;
 
 // Content type. This endpoint is server-to-server (Redash pulls it with the
 // API key); it is NOT meant to be read cross-origin from a browser. A wildcard
@@ -283,45 +282,11 @@ foreach ($feedbackrecords as $record) {
     }
 }
 
-// Token costs: aggregate by model.
-$tokenwhere = " WHERE role = 'assistant' AND model_name IS NOT NULL AND model_name != ''";
-$tokenparams = [];
-if ($courseid > 0) {
-    $tokenwhere .= ' AND courseid = :courseid';
-    $tokenparams['courseid'] = $courseid;
-}
-if ($since > 0) {
-    $tokenwhere .= ' AND timecreated >= :since';
-    $tokenparams['since'] = $since;
-}
-
-$tokenrecords = $wants('token_costs') ? $DB->get_records_sql(
-    "SELECT model_name,
-            COUNT(id) AS response_count,
-            SUM(COALESCE(prompt_tokens, 0)) AS total_prompt_tokens,
-            SUM(COALESCE(completion_tokens, 0)) AS total_completion_tokens,
-            SUM(COALESCE(tokens_used, 0)) AS total_tokens
-       FROM {local_ai_course_assistant_msgs}" . $tokenwhere .
-    " GROUP BY model_name
-      ORDER BY total_tokens DESC",
-    $tokenparams
-) : [];
-
-$tokencosts = [];
-foreach ($tokenrecords as $record) {
-    $prompttokens = (int) $record->total_prompt_tokens;
-    $completiontokens = (int) $record->total_completion_tokens;
-    $cost = token_cost_manager::estimate_cost($record->model_name, $prompttokens, $completiontokens);
-
-    $tokencosts[] = [
-        'model' => $record->model_name,
-        'response_count' => (int) $record->response_count,
-        'total_prompt_tokens' => $prompttokens,
-        'total_completion_tokens' => $completiontokens,
-        'total_tokens' => (int) $record->total_tokens,
-        'estimated_cost_usd' => $cost,
-    ];
-}
+// Token costs: aggregate by model, chat plus the background RAG spend ledger.
+// The aggregation lives in analytics::get_token_costs() so it is unit-testable;
+// see that method for why embedding/rerank rows are included and premium_router
+// rows are not, and for the SITEID scoping of background spend.
+$tokencosts = $wants('token_costs') ? analytics::get_token_costs($courseid, $since) : [];
 
 // Survey response data.
 $surveydata = [];

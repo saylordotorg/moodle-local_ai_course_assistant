@@ -365,6 +365,96 @@ class analytics {
     }
 
     /**
+     * Aggregate token spend per model, including background RAG spend.
+     *
+     * Chat spend is the role='assistant' rows. Background spend is the ledger
+     * that base_embedding_provider::log_embedding_cost() and
+     * voyage_reranker::log_rerank_cost() write with role='system' -- those exist
+     * specifically to make indexing and rerank cost visible, so a filter of
+     * role='assistant' alone silently hid real API spend.
+     *
+     * premium_router also writes role='system' rows, but with zero tokens and
+     * the escalation target's model_name. Those are metadata, not spend: the
+     * escalated call itself is logged separately as an assistant row, so
+     * counting them would double-count each escalated turn against that model.
+     * They are excluded by matching on interaction_type rather than on role.
+     *
+     * `category` ('chat' / 'embedding' / 'rerank') is part of the grouping so
+     * background spend can never merge into a chat bucket, and so a consumer can
+     * split RAG cost from chat cost. `response_count` means assistant responses
+     * for chat rows and API calls for embedding/rerank rows.
+     *
+     * NOTE on scope: embedding and rerank rows are written against SITEID rather
+     * than the course whose content was indexed, so they appear only in a
+     * whole-site aggregate ($courseid = 0). A per-course call legitimately
+     * returns chat spend only.
+     *
+     * estimated_cost_usd is null when the model is absent from the rate card,
+     * which is currently the case for Voyage embedding and rerank models. Null
+     * means unknown, not free.
+     *
+     * @param int $courseid 0 for the whole site, or a specific course.
+     * @param int $since Unix timestamp lower bound; 0 for no bound.
+     * @return array List of ['model', 'category', 'response_count',
+     *               'total_prompt_tokens', 'total_completion_tokens',
+     *               'total_tokens', 'estimated_cost_usd'].
+     */
+    public static function get_token_costs(int $courseid = 0, int $since = 0): array {
+        global $DB;
+
+        // Rows that represent a real billable API call.
+        $where = "m.model_name IS NOT NULL AND m.model_name != ''
+                  AND (m.role = 'assistant'
+                       OR m.interaction_type IN ('embedding', 'rerank'))";
+        $params = [];
+        if ($courseid > 0) {
+            $where .= ' AND m.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
+        if ($since > 0) {
+            $where .= ' AND m.timecreated >= :since';
+            $params['since'] = $since;
+        }
+
+        $category = "CASE WHEN m.interaction_type IN ('embedding', 'rerank')
+                          THEN m.interaction_type ELSE 'chat' END";
+
+        // Recordset, not get_records_sql: the grouping key is (model, category),
+        // so model_name is not unique across rows and would silently collapse
+        // two groups into one if it were used as the array key.
+        $sql = "SELECT m.model_name,
+                       {$category} AS category,
+                       COUNT(m.id) AS response_count,
+                       SUM(COALESCE(m.prompt_tokens, 0)) AS total_prompt_tokens,
+                       SUM(COALESCE(m.completion_tokens, 0)) AS total_completion_tokens,
+                       SUM(COALESCE(m.tokens_used, 0)) AS total_tokens
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE {$where}
+              GROUP BY m.model_name, {$category}
+              ORDER BY total_tokens DESC";
+
+        $result = [];
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $row) {
+            $prompttokens = (int) $row->total_prompt_tokens;
+            $completiontokens = (int) $row->total_completion_tokens;
+            $result[] = [
+                'model' => $row->model_name,
+                'category' => $row->category,
+                'response_count' => (int) $row->response_count,
+                'total_prompt_tokens' => $prompttokens,
+                'total_completion_tokens' => $completiontokens,
+                'total_tokens' => (int) $row->total_tokens,
+                'estimated_cost_usd' => token_cost_manager::estimate_cost(
+                    $row->model_name, $prompttokens, $completiontokens),
+            ];
+        }
+        $rs->close();
+
+        return $result;
+    }
+
+    /**
      * Get per-student usage summary for a course.
      *
      * @param int $courseid
