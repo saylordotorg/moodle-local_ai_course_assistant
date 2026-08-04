@@ -55,10 +55,22 @@ class analytics {
         // Total conversations.
         $totalconvs = $DB->count_records('local_ai_course_assistant_convs', ['courseid' => $courseid]);
 
-        // Total messages.
+        // Total messages. Restricted to conversation roles: the msgs table also
+        // carries role='system' telemetry rows that are not learner messages at
+        // all (embedding cost rows from base_embedding_provider, which are
+        // written against SITEID, plus premium_router and reranker rows written
+        // against the real course id). Counting those overstated the metric --
+        // a site course with no learner activity reported tens of thousands of
+        // "messages" that were really background indexing ledger entries, and it
+        // inflated avg_messages_per_student and the has_data flag with it. An
+        // allowlist rather than a telemetry denylist, so any future role='system'
+        // writer is excluded without needing to update this query. The sibling
+        // counters (get_daily_usage, get_student_usage, instructor_analytics)
+        // already filter by role; this one was the outlier.
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid{$timewhere}";
+                 WHERE m.courseid = :courseid
+                   AND m.role IN ('user', 'assistant'){$timewhere}";
         $totalmessages = $DB->count_records_sql($sql, $params);
 
         // Active students (users who sent at least one message).
