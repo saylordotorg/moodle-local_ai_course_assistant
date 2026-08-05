@@ -25,6 +25,11 @@ cdn/node_modules/
 *.local.php
 config.local.php
 
+# Python bytecode. deploy_dev.py is imported by local tooling, which leaves
+# __pycache__ in the repo root on every run.
+__pycache__/
+*.py[cod]
+
 # Secrets — never commit (v5.4.5). GitHub's built-in secret scanning catches
 # live tokens in pushes, but excluding these patterns from the index in the
 # first place is cheaper than revoking a leaked key.

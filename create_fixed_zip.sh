@@ -33,7 +33,9 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/services/*" \
   -x "*/tests/a11y/node_modules/*" \
   -x "*/.wiki/*" \
-  -x "*/.drafts/*"
+  -x "*/.drafts/*" \
+  -x "*/__pycache__/*" \
+  -x "*.pyc"
 
 echo "✅ Created: ${SCRIPT_DIR}/ai_course_assistant.zip"
 echo ""
