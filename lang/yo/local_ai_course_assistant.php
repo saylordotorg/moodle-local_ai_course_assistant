@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Àpèjúwe <code>rerank-2.5</code>. Àw
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Bori Voyage rerank base URL. Fi sílẹ̀ ní ofo láti lo Embedding API Base URL ní ìsàlẹ̀, tàbí Voyage àpèjúwe (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank candidate window';
-$string['settings:rerank_candidates_desc'] = 'Mélòó ni cosine top-N olùdíje tí wọ́n jẹ ìpele rerank. Àpèjúwe 50. Àwọn window tó gbòòrò fún reranker ohun èlò díẹ̀ síi ní iye àfikún kékeré (~10k tokens fún rerank op kọ̀ọ̀kan).';
+$string['settings:rerank_candidates_desc'] = 'Iye olùdíje cosine top-N tí ó ń wọ ìpele ìtúnṣe ipò. Àsàyàn 20. A díwọ̀n rẹ̀ lórí ìbéèrè 1,008: 20 bá 30 mu ní recall (R@3 89.0% sí 89.3%) pẹ̀lú ìdíyelé tí ó dínkù ní ìdá kan nínú mẹ́ta, nígbà tí 50 ná ìlọ́po 2.5 láìsí èrè tí a lè díwọ̀n. Ní ìsàlẹ̀ 10, recall ń dínkù. Ìdíyelé ń pọ̀ sí i ní ìlà tààrà pẹ̀lú iye yìí.';
 $string['settings:stt_selfhosted_heading'] = 'Ìgbasilẹ̀ ohùn tí a gbàlejò fúnra ẹni (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Ṣe speech-to-text lórí ohun èlò tìẹ ní iye ọ̀fọ̀ ọ̀fẹ́ fún ìdákẹjẹ́. Tọ [[tutorshort]] sí sọ́fítiwéàrì ìgbasilẹ̀ eyíkéyìí tó bá mu OpenAI: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), tàbí <code>whisper.cpp</code> server. Nígbà tí a bá ṣètò server URL níbí ó di ọ̀nà STT àpèjúwe; yan olùpèsè tó san owó nínú Olùpèsè STT tí ó ṣiṣẹ́ ní ìsàlẹ̀ láti bori. Bí server bá wà lórí nẹ́tíwọ́kì àdáni tàbí plain http, tún fi host rẹ̀ kun sínú atẹ̀jẹ́ SSRF trusted endpoints nínú apá Ààbò.';
 $string['settings:stt_selfhosted_url'] = 'Selfhosted STT server URL';
@@ -1728,3 +1728,13 @@ $string['outcomes:col_met'] = 'Dé ìdíwọ̀n';
 $string['outcomes:col_pct'] = 'Ìdá-ọgọ́rùn-ún tí ó dé';
 $string['outcomes:footnote'] = 'Àwọn akẹ́kọ̀ọ́ tí a ṣàyẹ̀wò ni àwọn tí ó ní ìdánwò kan ó kéré tán lórí àbájáde náà. A ń ròyìn àṣeyọrí ní àpapọ̀; a kì í dí ìtẹ̀síwájú ẹnìkọ̀ọ̀kan lórí àbájáde kan ṣoṣo.';
 $string['outcomes:navlink'] = 'Ìjábọ̀ àbájáde';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Mi ò lè ṣèrànwọ́ pẹ̀lú ìbéèrè yẹn. Ẹ jẹ́ ká padà sí ẹ̀kọ́ rẹ: kí ni o fẹ́ ṣiṣẹ́ lé lórí nísinsìnyí?';
+$string['settings:rerank_margin_threshold'] = 'Ààlà àìdánilójú ti ìtúnṣe ipò';
+$string['settings:rerank_margin_threshold_desc'] = 'Tún ipò ṣe kìkì nígbà tí ìyàtọ̀ cosine láàrin olùdíje kìíní àti ẹ̀kẹta wà ní ìsàlẹ̀ iye yìí, ìyẹn nígbà tí ìwádìí kò dánilójú. A díwọ̀n rẹ̀ lórí ìbéèrè 1,008: ní iye àsàyàn 0.086, ó fi nǹkan bí ìdá 30 nínú ọgọ́rùn-ún ìbéèrè sílẹ̀ láìsí àdánù recall tí a lè díwọ̀n, ó sì yẹra fún ìgbà tí ìtúnṣe ipò ń tì àbájáde kìíní tí ó ti tọ̀nà sẹ́yìn. Fi 0 sí i láti tún gbogbo ìbéèrè ṣe.';
+$string['rag_cap_blocked'] = 'Ìṣe àtọ́ka kò ṣiṣẹ́: ààlà ìnáwó RAG fún àkókò yìí ti dé. Gbé ààlà náà sókè, tàbí dúró de àkókò tó ń bọ̀. Àtọ́ka tí ó wà kò ní yí padà.';
+$string['settings:redash_export_window_days'] = 'Ìwọ̀n ìwòyìn ti ìtàjàsíta (ọjọ́)';
+$string['settings:redash_export_window_days_desc'] = 'Bí ìtàjàsíta ṣe ń padà sẹ́yìn tó nígbà tí olùpè kò rán àmì àkókò "since". Àsàyàn ọjọ́ 90 ń dènà kí orísun dátà tí ó fi paramita yìí sílẹ̀ máa fa gbogbo ìlà tí a ti kọ sílẹ̀ rí; olùpè lè ṣì béèrè ìwọ̀n pàtó tàbí rán since=0 fún gbogbo ìtàn. Fi 0 sí i kí gbogbo ìtàn tún jẹ́ àsàyàn.';
+$string['settings:redash_allow_deanonymized'] = 'Fàyè gba ìtàjàsíta tí kò bo orúkọ';
+$string['settings:redash_allow_deanonymized_desc'] = 'Ó wà ní pipa ní àsàyàn. Nígbà tí ó pa, a kọ ìbéèrè tí ó ní anonymize=0, àwọn akẹ́kọ̀ọ́ sì máa fi orúkọ ìbòmọlẹ̀ hàn nígbà gbogbo. Tan án kìkì bí ìròyìn òde bá nílò orúkọ gidi ní ti gidi, kí o sì rí i dájú pé ìtàjàsíta ń fi kọ́kọ́rọ́ API tí a ń pín ṣàfihàn ara rẹ̀, kì í ṣe alábòójútó tí ó wọlé, nítorí náà ẹnikẹ́ni tí ó ní kọ́kọ́rọ́ náà lè gba àwọn orúkọ wọ̀nyẹn. Ní ọ̀nà méjèèjì, a ń kọ ìbéèrè tí kò bo orúkọ sínú àyẹ̀wò pẹ̀lú àdírẹ́sì IP olùbéèrè.';

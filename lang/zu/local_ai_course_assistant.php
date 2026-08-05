@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Okuzenzakalelayo <code>rerank-2.5</code
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Vimba i-Voyage rerank base URL. Shiya ingenalutho ukuze usebenzise i-Embedding API Base URL engenhla, noma okuzenzakalelayo kwe-Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Ifasitela labalingani be-rerank';
-$string['settings:rerank_candidates_desc'] = 'Balingani be-cosine top-N abangaki abaya esigabeni se-rerank. Okuzenzakalelayo 50. Amafasitela amakhulu anika i-reranker izinto eziningana ngezindleko ezincane ezengeziwe (~10k amathokheni ngomsebenzi we-rerank ngamunye).';
+$string['settings:rerank_candidates_desc'] = 'Bangaki abaqokwe be-cosine top-N abangena esigabeni sokuhlela kabusha. Okuzenzakalelayo 20. Kulinganiswe kumibuzo engu-1,008: u-20 uyalingana no-30 kwi-recall (R@3 89.0% ku-89.3%) ngezindleko eziphansi ngokwesithathu, kanti u-50 ubiza izikhathi ezi-2.5 ngaphandle kwenzuzo ekalekayo. Ngaphansi kuka-10 i-recall iyehla. Izindleko zikhula ngokulinganayo naleli nani.';
 $string['settings:stt_selfhosted_heading'] = 'Ukubhaliwe kwedlule ozibambele wona (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Sebenzisa speech-to-text kwe-hardware yakho ngenkokhelo efika ku-zero ngekheli ngeminute. Khomba i-[[tutorshort]] ku-server yokubhala noma iyiphi efana ne-OpenAI: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), noma iseva ye-<code>whisper.cpp</code>. Uma i-server URL isetshenzisiwe lapha iba yindlela ye-STT yesimiso; khetha umhlinzeki oshadelayo ku-Umhlinzeki we-STT oshisayo ngenhla ukuze uvimbe. Uma i-server ise-network yangasese noma plain http, yengeza i-host yayo nasekilistini lamaendpoints athenjwe i-SSRF esigabeni Sokuphepha.';
 $string['settings:stt_selfhosted_url'] = 'I-URL ye-server ye-STT ozibambele yona';
@@ -1728,3 +1728,13 @@ $string['outcomes:col_met'] = 'Bafeze isikali';
 $string['outcomes:col_pct'] = 'Iphesenti elifeziwe';
 $string['outcomes:footnote'] = 'Abafundi abahloliwe yilabo abanomzamo okungenani owodwa emphumeleni. Impumelelo ibikwa ngokuhlanganisiwe; inqubekelaphambili yomuntu ngamunye ayilokothi ivinjelwe kunoma yimuphi umphumela owodwa.';
 $string['outcomes:navlink'] = 'Umbiko wemiphumela';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Angikwazi ukusiza ngalesi sicelo. Asibuyele esifundweni sakho: yini ofuna ukuyisebenza manje?';
+$string['settings:rerank_margin_threshold'] = 'Umkhawulo wokungacaci kokuhlela kabusha';
+$string['settings:rerank_margin_threshold_desc'] = 'Hlela kabusha kuphela lapho umehluko we-cosine phakathi komuntu wokuqala nowesithathu ungaphansi kwaleli nani, okusho lapho ukuthola kungacacile. Kulinganiswe kumibuzo engu-1,008: kunani elizenzakalelayo 0.086 cishe u-30% wemibuzo weqiwa ngaphandle kokulahleka kwe-recall okukalekayo, futhi kugwenywa izimo lapho ukuhlela kabusha kususa umphumela wokuqala osuvele ulungile. Beka u-0 ukuze uhlele kabusha wonke umbuzo.';
+$string['rag_cap_blocked'] = 'Ukwenza inkomba akusebenzanga: umkhawulo wokusetshenziswa kwemali kwe-RAG wale nkathi sewufinyelelwe. Khuphula umkhawulo, noma linda inkathi elandelayo. Inkomba ekhona ishiywa ingashintshwa.';
+$string['settings:redash_export_window_days'] = 'Ithuba lokubuyekeza lokuthekelisa (izinsuku)';
+$string['settings:redash_export_window_days_desc'] = 'Ukuthi ukuthekelisa kubuyela emuva kangakanani lapho ocelayo engathumeli isitembu sesikhathi "since". Okuzenzakalelayo kwezinsuku ezingu-90 kuvimbela umthombo wedatha oshiya leli pharamitha ukuthi udonse wonke umugqa oke uqoshwe; ocelayo usengakwazi ukucela ithuba elithile noma athumele since=0 ukuthola wonke umlando. Beka u-0 ukuze okuzenzakalelayo kube umlando wonke futhi.';
+$string['settings:redash_allow_deanonymized'] = 'Vumela ukuthekelisa okungafihli amagama';
+$string['settings:redash_allow_deanonymized_desc'] = 'Kuvalwe ngokuzenzakalelayo. Lapho kuvalwe, isicelo esine-anonymize=0 siyanqatshwa futhi abafundi bavela njalo ngamagama mbumbulu. Kuvule kuphela uma umbiko wangaphandle udinga ngempela amagama angempela, futhi khumbula ukuthi ukuthekelisa kuqinisekiswa ngokhiye we-API oyabelanwa, hhayi umlawuli ongenile, ngakho noma ubani onalo khiye angathola lawo magama. Kuzo zombili izimo, izicelo ezingafihli amagama ziqoshwa kucwaningo mabhuku kanye nekheli le-IP lomceli.';

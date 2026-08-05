@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Oletus <code>rerank-2.5</code>. Uudempi
 $string['settings:rerank_apibaseurl'] = 'Uudelleenjärjestyksen API:n perus-URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Ohittaa Voyagen uudelleenjärjestyksen perus-URL:n. Jätä tyhjäksi käyttääksesi yllä olevaa Embedding API:n perus-URL:a tai Voyagen oletusta (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Uudelleenjärjestyksen ehdokasikkuna';
-$string['settings:rerank_candidates_desc'] = 'Kuinka monta kosinipohjaista N parasta ehdokasta syötetään uudelleenjärjestysvaiheeseen. Oletus 50. Suuremmat ikkunat antavat uudelleenjärjestäjälle enemmän materiaalia työskentelyyn pienellä lisäkustannuksella (~10k tokenia per uudelleenjärjestysoperaatio).';
+$string['settings:rerank_candidates_desc'] = 'Kuinka monta kosinin top-N-ehdokasta siirtyy uudelleenjärjestysvaiheeseen. Oletus 20. Mitattu 1 008 kyselyllä: 20 vastaa 30:tä saantitarkkuudessa (R@3 89,0 % vs. 89,3 %) kolmanneksen pienemmillä kustannuksilla, ja 50 kustantaa 2,5-kertaisesti ilman mitattavaa hyötyä. Alle 10:n saantitarkkuus heikkenee. Kustannus kasvaa lineaarisesti tämän arvon mukana.';
 $string['settings:stt_selfhosted_heading'] = 'Itse isännöity litterointi (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Suorita puheesta tekstiksi omalla laitteistollasi ilman minuuttikohtaisia kustannuksia. Osoita [[tutorshort]] mihin tahansa OpenAI-yhteensopivaan litterointipalvelimeen: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) tai <code>whisper.cpp</code> -palvelin. Kun palvelimen URL asetetaan tässä, siitä tulee oletusarvoinen STT-polku; valitse maksullinen palveluntarjoaja Aktiivinen STT-palveluntarjoaja -kohdasta yllä sen ohittamiseksi. Jos palvelin on yksityisessä verkossa tai tavallisella http:llä, lisää myös sen isäntä SSRF:n luotettujen päätepisteiden sallittuun luetteloon Tietoturva-osiossa.';
 $string['settings:stt_selfhosted_url'] = 'Itse isännöidyn STT-palvelimen URL';
@@ -1693,3 +1693,13 @@ $string['outcomes:col_met'] = 'Vertailuarvon saavuttaneet';
 $string['outcomes:col_pct'] = 'Saavuttaneiden prosentti';
 $string['outcomes:footnote'] = 'Arvioidut opiskelijat ovat niitä, joilla on vähintään yksi suoritusyritys oppimistuloksesta. Saavutus raportoidaan kootusti; yksilön eteneminen ei koskaan ole minkään yksittäisen oppimistuloksen varassa.';
 $string['outcomes:navlink'] = 'Oppimistulosraportti';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'En voi auttaa tässä pyynnössä. Palataan kurssiisi: mitä haluat tehdä seuraavaksi?';
+$string['settings:rerank_margin_threshold'] = 'Uudelleenjärjestyksen monitulkintaisuuden raja';
+$string['settings:rerank_margin_threshold_desc'] = 'Järjestä uudelleen vain, kun ensimmäisen ja kolmannen ehdokkaan kosinietäisyys on tätä arvoa pienempi, eli kun haku on monitulkintainen. Mitattu 1 008 kyselyllä: oletusarvolla 0,086 noin 30 % kyselyistä ohitetaan ilman mitattavaa saantitarkkuuden menetystä, ja vältetään tapaukset, joissa uudelleenjärjestys syrjäyttää jo oikean ykköstuloksen. Aseta 0, jos haluat järjestää jokaisen kyselyn uudelleen.';
+$string['rag_cap_blocked'] = 'Indeksointia ei suoritettu: tämän jakson RAG-kustannuskatto on saavutettu. Nosta kattoa tai odota seuraavaa jaksoa. Nykyinen indeksi jää koskemattomaksi.';
+$string['settings:redash_export_window_days'] = 'Viennin tarkasteluikkuna (päivää)';
+$string['settings:redash_export_window_days_desc'] = 'Kuinka kauas taaksepäin vienti ulottuu, kun kutsuja ei anna "since"-aikaleimaa. Oletus 90 päivää estää sen, että parametrin jättävä tietolähde noutaisi kaikki koskaan tallennetut rivit; kutsuja voi silti pyytää tiettyä ikkunaa tai antaa since=0 koko historian noutamiseksi. Aseta 0, jos haluat oletukseksi jälleen koko historian.';
+$string['settings:redash_allow_deanonymized'] = 'Salli anonymisoimaton vienti';
+$string['settings:redash_allow_deanonymized_desc'] = 'Pois käytöstä oletuksena. Kun asetus on pois, pyyntö anonymize=0 hylätään ja oppijat näkyvät aina peitenimillä. Ota käyttöön vain, jos ulkoinen raportti todella tarvitsee oikeat nimet, ja muista, että vienti tunnistautuu yhteisellä API-avaimella eikä kirjautuneella ylläpitäjällä, joten kukin avaimen haltija voi noutaa nimet. Anonymisoimattomat pyynnöt kirjataan kummassakin tapauksessa auditointilokiin pyytävän IP-osoitteen kanssa.';

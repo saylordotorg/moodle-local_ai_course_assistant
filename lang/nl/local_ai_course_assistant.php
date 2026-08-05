@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Standaard <code>rerank-2.5</code>. Nieu
 $string['settings:rerank_apibaseurl'] = 'Rerank API basis-URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Overschrijf de Voyage rerank basis-URL. Leeg laten om de bovenstaande Embedding API basis-URL of de Voyage-standaard te gebruiken (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank kandidatenvenster';
-$string['settings:rerank_candidates_desc'] = 'Hoeveel cosinus-gebaseerde beste N kandidaten de herrangschikkingsfase voeden. Standaard 50. Grotere vensters geven de herrangschikker meer materiaal om mee te werken voor geringe extra kosten (~10.000 tokens per herrangschikkingsoperatie).';
+$string['settings:rerank_candidates_desc'] = 'Hoeveel cosinus-top-N-kandidaten de herordeningsfase ingaan. Standaard 20. Gemeten over 1.008 zoekopdrachten: 20 evenaart 30 op recall (R@3 89,0 % tegen 89,3 %) voor een derde minder kosten, en 50 kost 2,5 keer zoveel zonder meetbare winst. Onder 10 verslechtert de recall. De kosten stijgen lineair met deze waarde.';
 $string['settings:stt_selfhosted_heading'] = 'Zelfgehoste transcriptie (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Voer spraak-naar-tekst uit op uw eigen hardware zonder kosten per minuut. Wijs [[tutorshort]] naar een OpenAI-compatibele transcriptieserver: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) of <code>whisper.cpp</code>-server. Wanneer hier een server-URL is ingesteld, wordt dit het standaard STT-pad; kies een betaalde aanbieder bij de bovenstaande instelling Actieve STT-aanbieder om dit te overschrijven. Als de server zich op een privénetwerk of gewoon http bevindt, voeg dan ook de host toe aan de SSRF-vertrouwde eindpunten-allowlist in het gedeelte Beveiliging.';
 $string['settings:stt_selfhosted_url'] = 'Zelfgehoste STT-server URL';
@@ -1692,3 +1692,13 @@ $string['outcomes:col_met'] = 'Benchmark behaald';
 $string['outcomes:col_pct'] = 'Percentage behaald';
 $string['outcomes:footnote'] = 'Beoordeelde studenten zijn degenen met minstens één poging op het leerdoel. Prestaties worden geaggregeerd gerapporteerd; individuele voortgang wordt nooit beperkt op basis van één enkel leerdoel.';
 $string['outcomes:navlink'] = 'Leerdoelenrapport';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Ik kan niet helpen met dat verzoek. Laten we terugkeren naar je cursus: waaraan wil je nu werken?';
+$string['settings:rerank_margin_threshold'] = 'Drempel voor herordeningsambiguïteit';
+$string['settings:rerank_margin_threshold_desc'] = 'Alleen herordenen wanneer de cosinusmarge tussen de eerste en de derde kandidaat onder deze waarde ligt, dus wanneer het ophalen onduidelijk is. Gemeten over 1.008 zoekopdrachten: bij de standaardwaarde 0,086 wordt ongeveer 30 % van de zoekopdrachten overgeslagen zonder meetbaar verlies aan recall, en worden gevallen vermeden waarin herordening een al correct topresultaat verdringt. Zet op 0 om elke zoekopdracht te herordenen.';
+$string['rag_cap_blocked'] = 'Indexeren is niet uitgevoerd: het RAG-bestedingsplafond voor deze periode is bereikt. Verhoog het plafond of wacht op de volgende periode. De bestaande index blijft ongewijzigd.';
+$string['settings:redash_export_window_days'] = 'Terugkijkvenster van de export (dagen)';
+$string['settings:redash_export_window_days_desc'] = 'Hoe ver de export teruggaat wanneer de aanroeper geen "since"-tijdstempel meegeeft. De standaard van 90 dagen voorkomt dat een gegevensbron die de parameter weglaat elke ooit vastgelegde rij ophaalt; een aanroeper kan nog steeds een specifiek venster vragen of since=0 meegeven voor een volledige herlaadactie. Zet op 0 om de volledige historie weer de standaard te maken.';
+$string['settings:redash_allow_deanonymized'] = 'Niet-geanonimiseerde export toestaan';
+$string['settings:redash_allow_deanonymized_desc'] = 'Standaard uit. Wanneer dit uit staat, wordt een verzoek met anonymize=0 geweigerd en verschijnen deelnemers altijd als pseudoniem. Zet dit alleen aan als een externe rapportage echt de werkelijke namen nodig heeft, en bedenk dat de export zich authenticeert met een gedeelde API-sleutel en niet met een ingelogde beheerder: wie de sleutel heeft, kan die namen dus opvragen. Niet-geanonimiseerde verzoeken worden in beide gevallen met het aanvragende IP-adres vastgelegd.';

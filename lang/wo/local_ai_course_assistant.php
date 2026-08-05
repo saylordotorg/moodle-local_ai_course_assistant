@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Bu defawul <code>rerank-2.5</code>. Më
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Sàmmal Voyage rerank base URL bi. Baaral te jëfandikoo Embedding API Base URL bi ci kaw, walla bu defawu Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Palanteer candidat yu rerank';
-$string['settings:rerank_candidates_desc'] = 'Ñaata cosine top-N candidat ñu yónniy ci étape rerank bi. 50 bu defawul. Palanteer bu mag dafa jox re-ranker bi lii mu laaj ak njëg bu ndaw (~10k token ci rerank op wern).';
+$string['settings:rerank_candidates_desc'] = 'Ñaata ndaw ci cosine top-N ñu yóbbu ci wàll bu defaraat teraanga. Ndoorte 20. Ñu ko natt ci 1,008 laaj: ci recall, 20 ak 30 a yem (R@3 89.0% ak 89.3%) te njëg gi gën a tuuti ci benn ci ñett, fekk 50 dafa jariñ 2.5 yoon te amul njariñ bu ñu mën a natt. Bu wàcc 10, recall bi dafa wàcc. Njëg gi dafa yokk ci yoon bu jubadi ak sax bii.';
 $string['settings:stt_selfhosted_heading'] = 'Transkripsiyon bu nga host sa bopp (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Doxal speech-to-text ci sa hardware sa bopp ak zéro ñaar ci minit. Saam [[tutorshort]] ci benn serveur transkripsiyon compatible OpenAI: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), walla serveur <code>whisper.cpp</code>. Su ñu defee benn URL serveur ci bii, dinaa ko jël ngir yoon STT bu defawu; tann benn prestataire bi ñu nëkk di ko jàpp ci kaw ngir sàmmal. Su serveur bi nekk ci réseau privé walla http simpel, yëgle host wii ci SSRF trusted endpoints allowlist ci seksion sécurité bi.';
 $string['settings:stt_selfhosted_url'] = 'Selfhosted STT server URL';
@@ -1728,3 +1728,13 @@ $string['outcomes:col_met'] = 'Àgg na benchmark';
 $string['outcomes:col_pct'] = 'Pursaŋ bu àgg';
 $string['outcomes:footnote'] = 'Njàngkat yu ñu assess ñooy ñi am lu mu néew benn jéego ci résultat bi. Jariñu bi ci mbooloo lañu koy bind; progression bu kenn du kenn tegoo ci benn résultat rekk.';
 $string['outcomes:navlink'] = 'Rapoor bu résultat';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Mënuma la dimbali ci ñaan boobu. Nu dellu ci sa kurs: lan nga bëgg a liggéey ci léegi?';
+$string['settings:rerank_margin_threshold'] = 'Dayo bu ñu tegtal ci teraanga bu ñu defaraat';
+$string['settings:rerank_margin_threshold_desc'] = 'Defaraat teraanga rekk bu wuute gu cosine ci diggante ki jëkk ak ki ñetteel gën a tuuti ci sax bii, maanaam bu gis-gis bi leerul. Ñu ko natt ci 1,008 laaj: ci sax bu ndoorte 0.086, lu tollu ci 30% ci laaj yi ñu ko tëj te recall bi jotewul benn ñàkk bu ñu mën a natt, te mu moytu jamono yi defaraat teraanga di génne njariñ bu jëkk bu doon dëgg. Def 0 ngir defaraat teraanga ci laaj bu nekk.';
+$string['rag_cap_blocked'] = 'Tëraliin bi doxul: dayo bu njëg RAG ci jamono jii ñu ko agsi. Yékkati dayo bi, walla xaar jamono ju topp. Tëralin bi am ñu bàyyi ko ni mu ne.';
+$string['settings:redash_export_window_days'] = 'Palanteer bu dellu ginnaaw ci génne (fan)';
+$string['settings:redash_export_window_days_desc'] = 'Ba fu génne bi dellu ginnaaw bu ki woote yónneewul màndargaa jamono "since". Ndoorte fan 90 dafa tere ab sourse bu bàyyi paramet bii mu tegtal lépp ci rëdd yi ñu bind; ki woote man na na laaj palanteer bu wóor walla yónnee since=0 ngir jot lépp ci taariix. Def 0 ngir taariix bépp doon ndoorte.';
+$string['settings:redash_allow_deanonymized'] = 'May génne bu ñu jubbanti tur';
+$string['settings:redash_allow_deanonymized_desc'] = 'Tëj la ci ndoorte. Bu ñu ko tëj, ñaan bu am anonymize=0 ñu koy nànk te jàngalekat yi dañu feeñ ci tur wu ñu tekki. Yiwal ko rekk su ab rapport bu biti soxla dëgg-dëgg tur yu wóor, te fàttaliku ne génne bi dafa gëstu boppam ak kaye API bu ñu bokk, du admin bu dugg, kon ku am kaye googu man na jot tur yooyu. Ci ñaari anam yi, ñaan yi ñu jubbanti tur ñu koy bind ci kontrol ak adaraas IP bu ki ñaan.';

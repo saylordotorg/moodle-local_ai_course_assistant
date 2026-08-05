@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Chaguo-msingi <code>rerank-2.5</code>. 
 $string['settings:rerank_apibaseurl'] = 'URL ya msingi ya API ya re-ranker';
 $string['settings:rerank_apibaseurl_desc'] = 'Inabatilisha URL ya msingi ya Voyage rerank. Acha tupu ili kutumia URL ya msingi ya API ya Kuingizwa hapo juu, au chaguo-msingi la Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Dirisha la wagombea wa re-ranker';
-$string['settings:rerank_candidates_desc'] = 'Ni wagombea wangapi wa cosine top-N wanaolisha hatua ya re-ranking. Chaguo-msingi 50. Madirisha makubwa zaidi humpa re-ranker nyenzo zaidi za kufanyia kazi kwa gharama ndogo ya ziada (~tokens 10k kwa kila operesheni ya rerank).';
+$string['settings:rerank_candidates_desc'] = 'Wagombea wangapi wa cosine top-N wanaingia hatua ya kupanga upya. Chaguo-msingi 20. Ilipimwa kwa maswali 1,008: 20 inalingana na 30 kwa recall (R@3 89.0% dhidi ya 89.3%) kwa gharama ndogo kwa theluthi moja, na 50 inagharimu mara 2.5 bila faida inayopimika. Chini ya 10 recall inashuka. Gharama huongezeka kwa mstari sawia na thamani hii.';
 $string['settings:stt_selfhosted_heading'] = 'Unukuzi uliojipangisha mwenyewe (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Endesha speech-to-text kwenye vifaa vyako mwenyewe bila gharama ya kwa dakika. Elekeza [[tutorshort]] kwa seva yoyote ya unukuzi inayooana na OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper), au seva ya <code>whisper.cpp</code>. URL ya seva ikiwekwa hapa, inakuwa njia ya STT ya chaguo-msingi; chagua mtoa huduma anayolipwa katika Mtoa huduma wa STT wa sasa hapo juu kubatilisha. Ikiwa seva iko kwenye mtandao wa kibinafsi au plain http, pia ongeza mwenyeji wake kwenye orodha ya vituo vya kuaminika vya SSRF katika sehemu ya Usalama.';
 $string['settings:stt_selfhosted_url'] = 'URL ya seva ya STT iliyojipangisha mwenyewe';
@@ -1729,3 +1729,13 @@ $string['outcomes:col_met'] = 'Walifikia kigezo';
 $string['outcomes:col_pct'] = 'Asilimia iliyofikia';
 $string['outcomes:footnote'] = 'Wanafunzi waliotathminiwa ni wale wenye angalau jaribio moja kwenye matokeo. Ufaulu unaripotiwa kwa jumla; maendeleo ya mtu binafsi kamwe hayazuiwi kwa matokeo yoyote moja.';
 $string['outcomes:navlink'] = 'Ripoti ya matokeo';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Siwezi kusaidia na ombi hilo. Turudi kwenye kozi yako: ungependa kufanyia kazi nini sasa?';
+$string['settings:rerank_margin_threshold'] = 'Kizingiti cha utata wa kupanga upya';
+$string['settings:rerank_margin_threshold_desc'] = 'Panga upya tu wakati tofauti ya cosine kati ya mgombea wa kwanza na wa tatu iko chini ya thamani hii, yaani wakati upataji ni wa utata. Ilipimwa kwa maswali 1,008: kwa thamani chaguo-msingi 0.086, takriban 30% ya maswali huachwa bila hasara inayopimika ya recall, na hali ambapo kupanga upya kunaondoa jibu bora ambalo lilikuwa sahihi huepukwa. Weka 0 ili kupanga upya kila swali.';
+$string['rag_cap_blocked'] = 'Uwekaji faharasa haukuendeshwa: kikomo cha matumizi ya RAG kwa kipindi hiki kimefikiwa. Ongeza kikomo, au subiri kipindi kijacho. Faharasa iliyopo haibadilishwi.';
+$string['settings:redash_export_window_days'] = 'Dirisha la kurudi nyuma la usafirishaji (siku)';
+$string['settings:redash_export_window_days_desc'] = 'Usafirishaji unafika nyuma kiasi gani wakati mwombaji hatumii lakiri ya muda "since". Chaguo-msingi la siku 90 huzuia chanzo cha data kinachoacha kigezo hiki kuvuta kila safu iliyorekodiwa; mwombaji anaweza bado kuomba dirisha maalum au kutuma since=0 kwa historia yote. Weka 0 ili chaguo-msingi kiwe historia yote tena.';
+$string['settings:redash_allow_deanonymized'] = 'Ruhusu usafirishaji usiofichwa';
+$string['settings:redash_allow_deanonymized_desc'] = 'Imezimwa kwa chaguo-msingi. Ikiwa imezimwa, ombi lenye anonymize=0 linakataliwa na wanafunzi huonekana kwa majina ya siri kila wakati. Iwashe tu ikiwa ripoti ya nje inahitaji kweli majina halisi, na kumbuka kuwa usafirishaji unathibitishwa kwa ufunguo wa API unaoshirikiwa, si msimamizi aliyeingia, hivyo yeyote aliye na ufunguo anaweza kupata majina hayo. Katika hali zote mbili, maombi yasiyofichwa yanaandikwa katika ukaguzi pamoja na anwani ya IP ya mwombaji.';

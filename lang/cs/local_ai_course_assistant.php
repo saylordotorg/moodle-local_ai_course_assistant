@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Výchozí <code>rerank-2.5</code>. Zde 
 $string['settings:rerank_apibaseurl'] = 'Základní URL API pro přeřazování';
 $string['settings:rerank_apibaseurl_desc'] = 'Přepište základní URL pro Voyage rerank. Ponechte prázdné pro použití základní URL Embedding API výše nebo výchozí adresy Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Okno kandidátů pro přeřazování';
-$string['settings:rerank_candidates_desc'] = 'Kolik kosinusových top-N kandidátů vstoupí do fáze přeřazování. Výchozí hodnota je 50. Větší okna dávají přeřazovači více materiálu za mírně vyšší cenu (~10 000 tokenů na operaci přeřazení).';
+$string['settings:rerank_candidates_desc'] = 'Kolik kosinových kandidátů top-N vstupuje do fáze přeřazení. Výchozí hodnota 20. Měřeno na 1 008 dotazech: 20 se vyrovná 30 v úplnosti (R@3 89,0 % proti 89,3 %) při o třetinu nižších nákladech, zatímco 50 stojí 2,5krát více bez měřitelného přínosu. Pod 10 se úplnost zhoršuje. Náklady rostou s touto hodnotou lineárně.';
 $string['settings:stt_selfhosted_heading'] = 'Vlastní přepis (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Spusťte převod řeči na text na vlastním hardwaru bez poplatku za minutu. Nasměrujte [[tutorshort]] na libovolný přepisovací server kompatibilní s OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper) nebo server <code>whisper.cpp</code>. Při zadání URL serveru se tento stane výchozí cestou STT; chcete-li jej přepsat, vyberte placeného poskytovatele v položce Aktivní poskytovatel STT výše. Pokud je server v privátní síti nebo na prostém http, přidejte jeho hostitele do seznamu důvěryhodných koncových bodů SSRF v sekci Zabezpečení.';
 $string['settings:stt_selfhosted_url'] = 'URL serveru STT s vlastním hostováním';
@@ -1693,3 +1693,13 @@ $string['outcomes:col_met'] = 'Splnili referenční hodnotu';
 $string['outcomes:col_pct'] = 'Procento splnění';
 $string['outcomes:footnote'] = 'Hodnocení studenti jsou ti, kteří mají alespoň jeden pokus na daném výstupu. Dosažení je reportováno souhrnně; individuální postup nikdy není podmíněn žádným jediným výstupem.';
 $string['outcomes:navlink'] = 'Zpráva o výstupech';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'S tímto požadavkem nemohu pomoci. Vraťme se k vašemu kurzu: na čem chcete pracovat teď?';
+$string['settings:rerank_margin_threshold'] = 'Prah nejednoznačnosti přeřazení';
+$string['settings:rerank_margin_threshold_desc'] = 'Přeřazovat pouze tehdy, když je kosinový rozdíl mezi prvním a třetím kandidátem menší než tato hodnota, tedy když je vyhledávání nejednoznačné. Měřeno na 1 008 dotazech: při výchozí hodnotě 0,086 se přeskočí přibližně 30 % dotazů bez měřitelné ztráty úplnosti a předejde se případům, kdy přeřazení odsune již správný první výsledek. Nastavte 0, chcete-li přeřazovat každý dotaz.';
+$string['rag_cap_blocked'] = 'Indexování neproběhlo: byl vyčerpán limit výdajů RAG pro toto období. Zvyšte limit, nebo vyčkejte na další období. Existující index zůstává nedotčen.';
+$string['settings:redash_export_window_days'] = 'Okno historie exportu (dny)';
+$string['settings:redash_export_window_days_desc'] = 'Jak daleko do minulosti export sahá, když volající nepředá časovou značku „since“. Výchozích 90 dní zabrání tomu, aby zdroj dat, který parametr vynechá, stáhl všechny kdy zaznamenané řádky; volající si stále může vyžádat konkrétní okno nebo předat since=0 pro úplné dohrání historie. Nastavte 0, chcete-li se vrátit k výchozímu exportu celé historie.';
+$string['settings:redash_allow_deanonymized'] = 'Povolit neanonymizovaný export';
+$string['settings:redash_allow_deanonymized_desc'] = 'Ve výchozím nastavení vypnuto. Když je vypnuto, požadavek s anonymize=0 je odmítnut a studující vždy vystupují pod pseudonymem. Zapněte to jen tehdy, pokud externí report skutečně potřebuje skutečná jména, a mějte na paměti, že export se autentizuje společným API klíčem, nikoli přihlášeným správcem, takže kdokoli s tímto klíčem si jména může vyžádat. Neanonymizované požadavky se v obou případech zaznamenávají do auditu včetně IP adresy žadatele.';

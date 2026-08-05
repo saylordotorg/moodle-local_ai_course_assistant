@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'デフォルト <code>rerank-2.5</code>
 $string['settings:rerank_apibaseurl'] = 'リランクAPIベースURL';
 $string['settings:rerank_apibaseurl_desc'] = 'VoyageリランクベースURLを上書きします。空白にすると上記の埋め込みAPIベースURL、またはVoyageのデフォルト（<code>https://api.voyageai.com/v1</code>）を使用します。';
 $string['settings:rerank_candidates'] = 'リランク候補ウィンドウ';
-$string['settings:rerank_candidates_desc'] = 'リランクステージに供給するコサイン上位N候補の数。デフォルト50。ウィンドウを大きくするとリランカーに多くの材料を提供できますが、わずかなコスト増加があります（リランク操作あたり約10kトークン）。';
+$string['settings:rerank_candidates_desc'] = '再ランク付け段階に渡すコサイン上位N候補の件数です。既定値20。1,008件のクエリで測定: 20は再現率で30と同等 (R@3 89.0%対89.3%) でコストは3分の1少なく、50は2.5倍のコストで測定可能な向上はありません。10を下回ると再現率が低下します。コストはこの値に比例して増加します。';
 $string['settings:stt_selfhosted_heading'] = 'セルフホスト音声認識（Whisper）';
 $string['settings:stt_selfhosted_heading_desc'] = '自前のハードウェアでゼロコストの音声テキスト変換を実行します。OpenAI互換の文字起こしサーバー（<code>whisper-server</code> Docker、<code>speaches</code>（faster-whisper）、<code>whisper.cpp</code>サーバー）をSOLAに向けます。ここでサーバーURLを設定するとデフォルトのSTTパスになります。上の「アクティブSTTプロバイダー」で有料プロバイダーを選択するとオーバーライドされます。サーバーがプライベートネットワーク上またはプレーンhttpの場合は、セキュリティセクションのSSRF信頼済みエンドポイント許可リストにそのホストを追加してください。';
 $string['settings:stt_selfhosted_url'] = 'セルフホストSTTサーバーURL';
@@ -1699,3 +1699,13 @@ $string['outcomes:col_met'] = 'ベンチマーク達成';
 $string['outcomes:col_pct'] = '達成率';
 $string['outcomes:footnote'] = '評価対象の学生とは、そのアウトカムに対して少なくとも1回試行した学生を指します。達成状況は集計値で報告されます。個々の進行が単一のアウトカムによって制限されることは決してありません。';
 $string['outcomes:navlink'] = 'アウトカムレポート';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'そのご依頼にはお応えできません。コースに戻りましょう。次は何に取り組みますか。';
+$string['settings:rerank_margin_threshold'] = '再ランク付けの曖昧さしきい値';
+$string['settings:rerank_margin_threshold_desc'] = '1位と3位の候補のコサイン差がこの値を下回るとき、つまり検索結果が曖昧なときにのみ再ランク付けします。1,008件のクエリで測定: 既定値0.086では約30%のクエリを省略しても再現率の測定可能な低下はなく、すでに正しい1位の結果が再ランク付けによって押し下げられる事態も避けられます。すべてのクエリを再ランク付けするには0を設定します。';
+$string['rag_cap_blocked'] = 'インデックス作成は実行されませんでした。この期間のRAG支出上限に達しています。上限を引き上げるか、次の期間までお待ちください。既存のインデックスはそのまま保持されます。';
+$string['settings:redash_export_window_days'] = 'エクスポートの遡及期間 (日)';
+$string['settings:redash_export_window_days_desc'] = '呼び出し側が「since」タイムスタンプを渡さない場合に、エクスポートがどこまで遡るかを指定します。既定の90日は、このパラメータを省略したデータソースが記録済みの全行を取得してしまうのを防ぎます。呼び出し側は特定の期間を指定することも、全期間の再取得のために since=0 を渡すこともできます。既定を再び全期間に戻すには0を設定します。';
+$string['settings:redash_allow_deanonymized'] = '匿名化しないエクスポートを許可';
+$string['settings:redash_allow_deanonymized_desc'] = '既定では無効です。無効の場合、anonymize=0 のリクエストは拒否され、学習者は常に仮名で表示されます。外部レポートに実名が本当に必要な場合にのみ有効にしてください。エクスポートはログイン中の管理者ではなく共有APIキーで認証されるため、キーを持つ人は誰でもその実名を取得できます。いずれの場合も、匿名化しないリクエストはリクエスト元のIPアドレスとともに監査ログに記録されます。';

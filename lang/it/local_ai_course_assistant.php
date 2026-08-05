@@ -1438,7 +1438,7 @@ $string['settings:rerank_model_desc'] = 'Predefinito <code>rerank-2.5</code>. Qu
 $string['settings:rerank_apibaseurl'] = 'URL base dell\'API di rerank';
 $string['settings:rerank_apibaseurl_desc'] = 'Sovrascrive l\'URL base del rerank Voyage. Lasciare vuoto per utilizzare l\'URL base dell\'API di embedding sopra, oppure il valore predefinito Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Finestra candidati per il rerank';
-$string['settings:rerank_candidates_desc'] = 'Quanti candidati coseno top-N alimentano la fase di rerank. Predefinito 50. Finestre più ampie offrono al re-ranker più materiale con cui lavorare, a un costo leggermente maggiore (~10k token per operazione di rerank).';
+$string['settings:rerank_candidates_desc'] = 'Quanti candidati cosinusoidali top-N alimentano la fase di riordinamento. Predefinito 20. Misurato su 1.008 query: 20 equivale a 30 come richiamo (R@3 89,0 % contro 89,3 %) con un terzo di costo in meno, mentre 50 costa 2,5 volte tanto senza guadagni misurabili. Sotto 10 il richiamo peggiora. Il costo cresce linearmente con questo valore.';
 $string['settings:stt_selfhosted_heading'] = 'Trascrizione self-hosted (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Esegui il riconoscimento vocale sul tuo hardware senza costi al minuto. Punta [[tutorshort]] su qualsiasi server di trascrizione compatibile con OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper) o server <code>whisper.cpp</code>. Quando qui è impostato un URL del server, diventa il percorso STT predefinito; scegli un provider a pagamento in "Provider STT attivo" sopra per ignorarlo. Se il server si trova su una rete privata o in http semplice, aggiungi anche il suo host all\'allowlist degli endpoint attendibili SSRF nella sezione Sicurezza.';
 $string['settings:stt_selfhosted_url'] = 'URL del server STT self-hosted';
@@ -1743,3 +1743,13 @@ $string['outcomes:col_met'] = 'Benchmark raggiunto';
 $string['outcomes:col_pct'] = 'Percentuale raggiunta';
 $string['outcomes:footnote'] = 'Gli studenti valutati sono quelli con almeno un tentativo sul risultato. Il conseguimento è riportato in forma aggregata; la progressione individuale non è mai vincolata a un singolo risultato.';
 $string['outcomes:navlink'] = 'Report dei risultati';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Non posso aiutarti con questa richiesta. Torniamo al tuo corso: su cosa vuoi lavorare adesso?';
+$string['settings:rerank_margin_threshold'] = 'Soglia di ambiguità del riordinamento';
+$string['settings:rerank_margin_threshold_desc'] = 'Riordina solo quando il margine cosinusoidale tra il primo e il terzo candidato è inferiore a questo valore, ossia quando il recupero è ambiguo. Misurato su 1.008 query: con il valore predefinito 0,086 viene saltato circa il 30 % delle query senza perdita misurabile di richiamo, evitando i casi in cui il riordinamento sposta un primo risultato già corretto. Imposta 0 per riordinare ogni query.';
+$string['rag_cap_blocked'] = 'L\'indicizzazione non è stata eseguita: il limite di spesa RAG per questo periodo è stato raggiunto. Aumenta il limite oppure attendi il periodo successivo. L\'indice esistente resta invariato.';
+$string['settings:redash_export_window_days'] = 'Finestra temporale dell\'esportazione (giorni)';
+$string['settings:redash_export_window_days_desc'] = 'Fino a quando risale l\'esportazione se il chiamante non passa un timestamp «since». Il valore predefinito di 90 giorni evita che una fonte dati che omette il parametro scarichi tutti i record mai registrati; il chiamante può comunque richiedere una finestra specifica oppure passare since=0 per un recupero completo. Imposta 0 per tornare a esportare tutto lo storico per impostazione predefinita.';
+$string['settings:redash_allow_deanonymized'] = 'Consenti esportazione non anonimizzata';
+$string['settings:redash_allow_deanonymized_desc'] = 'Disattivata per impostazione predefinita. Quando è disattivata, una richiesta con anonymize=0 viene rifiutata e gli studenti compaiono sempre con uno pseudonimo. Attivala solo se un report esterno ha davvero bisogno dei nomi reali e ricorda che l\'esportazione si autentica con una chiave API condivisa e non con un amministratore autenticato: chiunque possieda la chiave potrà quindi ottenere quei nomi. In ogni caso le richieste non anonimizzate vengono registrate nel log di audit insieme all\'indirizzo IP richiedente.';

@@ -1438,7 +1438,7 @@ $string['settings:rerank_model_desc'] = 'ברירת מחדל <code>rerank-2.5</c
 $string['settings:rerank_apibaseurl'] = 'URL בסיס API לדירוג מחדש';
 $string['settings:rerank_apibaseurl_desc'] = 'עוקף את ה-URL בסיס של דירוג מחדש של Voyage. השאר ריק לשימוש ב-URL בסיס API של embedding למעלה, או ברירת המחדל של Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'חלון מועמדים לדירוג מחדש';
-$string['settings:rerank_candidates_desc'] = 'כמה מועמדי N-מובילים מקוסינוס מזינים את שלב הדירוג מחדש. ברירת מחדל 50. חלונות גדולים יותר נותנים למדרג יותר חומר לעבוד איתו בעלות נוספת קטנה (~10k tokens לכל פעולת דירוג מחדש).';
+$string['settings:rerank_candidates_desc'] = 'כמה מועמדי קוסינוס top-N נכנסים לשלב הדירוג מחדש. ברירת המחדל 20. נמדד על 1,008 שאילתות: 20 שווה ל-30 בהיזכרות (R@3 89.0% מול 89.3%) בעלות נמוכה בשליש, ו-50 עולה פי 2.5 בלי רווח מדיד. מתחת ל-10 ההיזכרות נפגמת. העלות גדלה באופן קווי עם ערך זה.';
 $string['settings:stt_selfhosted_heading'] = 'תמלול באירוח עצמי (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'הרץ המרת דיבור לטקסט על החומרה שלך בעלות אפס לדקה. כוון את [[tutorshort]] לכל שרת תמלול תואם OpenAI: Docker של <code>whisper-server</code>, <code>speaches</code> (faster-whisper) או שרת <code>whisper.cpp</code>. כאשר מוגדרת URL שרת כאן היא הופכת לנתיב STT ברירת המחדל; בחר ספק בתשלום ב-ספק STT פעיל למעלה כדי לעקוף. אם השרת נמצא ברשת פרטית או בhttp רגיל, הוסף גם את המארח שלו לרשימת endpoint אמינים של SSRF בסעיף האבטחה.';
 $string['settings:stt_selfhosted_url'] = 'URL שרת STT באירוח עצמי';
@@ -1736,3 +1736,13 @@ $string['outcomes:col_met'] = 'עמדו ברף';
 $string['outcomes:col_pct'] = 'אחוז שעמדו';
 $string['outcomes:footnote'] = 'תלמידים שהוערכו הם אלה עם ניסיון אחד לפחות בתוצאת הלמידה. ההישגים מדווחים במצטבר; התקדמות אישית לעולם אינה מותנית בתוצאת למידה בודדת כלשהי.';
 $string['outcomes:navlink'] = 'דוח תוצאות למידה';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'אין באפשרותי לסייע בבקשה הזו. נחזור לקורס שלך: במה תרצה לעבוד כעת?';
+$string['settings:rerank_margin_threshold'] = 'סף העמימות של הדירוג מחדש';
+$string['settings:rerank_margin_threshold_desc'] = 'בצע דירוג מחדש רק כאשר מרווח הקוסינוס בין המועמד הראשון והשלישי נמוך מערך זה, כלומר כאשר האחזור עמום. נמדד על 1,008 שאילתות: בערך ברירת המחדל 0.086 מדלגים על כ-30% מהשאילתות בלי אובדן מדיד של היזכרות, ונמנעים מקרים שבהם הדירוג מחדש דוחק תוצאה ראשונה שכבר נכונה. הגדר 0 כדי לדרג מחדש כל שאילתה.';
+$string['rag_cap_blocked'] = 'האינדוקס לא הורץ: תקרת ההוצאות של RAG לתקופה זו הושגה. הגדל את התקרה או המתן לתקופה הבאה. האינדקס הקיים נשאר ללא שינוי.';
+$string['settings:redash_export_window_days'] = 'חלון המבט לאחור של הייצוא (ימים)';
+$string['settings:redash_export_window_days_desc'] = 'עד כמה אחורה מגיע הייצוא כאשר הקורא אינו מעביר חתימת זמן "since". ברירת המחדל של 90 יום מונעת ממקור נתונים שמשמיט את הפרמטר לשלוף כל שורה שנרשמה מעולם; הקורא עדיין יכול לבקש חלון מסוים או להעביר since=0 לשליפה מלאה. הגדר 0 כדי שברירת המחדל תחזור להיות כל ההיסטוריה.';
+$string['settings:redash_allow_deanonymized'] = 'אפשר ייצוא ללא אנונימיזציה';
+$string['settings:redash_allow_deanonymized_desc'] = 'כבוי כברירת מחדל. כאשר ההגדרה כבויה, בקשה עם anonymize=0 נדחית והלומדים מופיעים תמיד בשמות חלופיים. הפעל זאת רק אם דוח חיצוני זקוק באמת לשמות האמיתיים, וזכור שהייצוא מאמת באמצעות מפתח API משותף ולא באמצעות מנהל מחובר, ולכן כל מי שמחזיק במפתח יוכל לאחזר את השמות. בכל מקרה, בקשות ללא אנונימיזציה נרשמות ביומן הביקורת יחד עם כתובת ה-IP המבקשת.';

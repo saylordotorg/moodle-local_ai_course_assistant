@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Lalai <code>rerank-2.5</code>. Model pe
 $string['settings:rerank_apibaseurl'] = 'URL asas API pemeringkat semula';
 $string['settings:rerank_apibaseurl_desc'] = 'Gantikan URL asas pemeringkat semula Voyage. Biarkan kosong untuk menggunakan URL Asas API Penyematan di atas, atau lalai Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Tetingkap calon pemeringkat semula';
-$string['settings:rerank_candidates_desc'] = 'Berapa banyak calon N teratas kosinus yang menyuap peringkat pemeringkat semula. Lalai 50. Tetingkap yang lebih besar memberi pemeringkat semula lebih banyak bahan untuk dikerjakan pada kos tambahan yang kecil (~10k token setiap operasi pemeringkat semula).';
+$string['settings:rerank_candidates_desc'] = 'Berapa banyak calon kosinus top-N yang masuk ke peringkat penyusunan semula. Lalai 20. Diukur pada 1,008 pertanyaan: 20 menyamai 30 pada recall (R@3 89.0% berbanding 89.3%) dengan kos sepertiga lebih rendah, manakala 50 berkos 2.5 kali lebih tinggi tanpa keuntungan yang boleh diukur. Di bawah 10 recall merosot. Kos meningkat secara linear dengan nilai ini.';
 $string['settings:stt_selfhosted_heading'] = 'Transkripsi hos sendiri (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Jalankan ucapan-ke-teks pada perkakasan anda sendiri tanpa kos seminit. Arahkan [[tutorshort]] ke mana-mana pelayan transkripsi serasi OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper), atau pelayan <code>whisper.cpp</code>. Apabila URL pelayan ditetapkan di sini ia menjadi laluan STT lalai; pilih penyedia berbayar dalam Penyedia STT Aktif di atas untuk mengatasi. Jika pelayan berada pada rangkaian peribadi atau http biasa, tambah juga hosnya ke senarai benar titik akhir dipercayai SSRF dalam bahagian Keselamatan.';
 $string['settings:stt_selfhosted_url'] = 'URL pelayan STT hos sendiri';
@@ -1722,3 +1722,13 @@ $string['outcomes:col_met'] = 'Memenuhi penanda aras';
 $string['outcomes:col_pct'] = 'Peratus memenuhi';
 $string['outcomes:footnote'] = 'Pelajar yang dinilai ialah mereka yang mempunyai sekurang-kurangnya satu percubaan pada hasil tersebut. Pencapaian dilaporkan secara agregat; kemajuan individu tidak pernah dihadkan pada mana-mana hasil tunggal.';
 $string['outcomes:navlink'] = 'Laporan hasil';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Saya tidak dapat membantu permintaan itu. Mari kembali kepada kursus anda: apakah yang anda mahu usahakan sekarang?';
+$string['settings:rerank_margin_threshold'] = 'Ambang kesamaran penyusunan semula';
+$string['settings:rerank_margin_threshold_desc'] = 'Susun semula hanya apabila jurang kosinus antara calon pertama dan ketiga berada di bawah nilai ini, iaitu apabila perolehan bersifat samar. Diukur pada 1,008 pertanyaan: pada nilai lalai 0.086 kira-kira 30% pertanyaan dilangkau tanpa kehilangan recall yang boleh diukur, dan mengelakkan keadaan di mana penyusunan semula menolak keputusan teratas yang sudah betul. Tetapkan 0 untuk menyusun semula setiap pertanyaan.';
+$string['rag_cap_blocked'] = 'Pengindeksan tidak dijalankan: had perbelanjaan RAG bagi tempoh ini telah dicapai. Naikkan had itu, atau tunggu tempoh berikutnya. Indeks yang ada dibiarkan tidak berubah.';
+$string['settings:redash_export_window_days'] = 'Tingkap rujukan lampau eksport (hari)';
+$string['settings:redash_export_window_days_desc'] = 'Sejauh mana ke belakang eksport menjangkau apabila pemanggil tidak menghantar cap masa "since". Nilai lalai 90 hari menghalang sumber data yang meninggalkan parameter ini daripada menarik setiap baris yang pernah direkodkan; pemanggil masih boleh meminta tingkap tertentu atau menghantar since=0 untuk mengambil keseluruhan sejarah. Tetapkan 0 supaya lalainya kembali menjadi keseluruhan sejarah.';
+$string['settings:redash_allow_deanonymized'] = 'Benarkan eksport tanpa anonimisasi';
+$string['settings:redash_allow_deanonymized_desc'] = 'Dimatikan secara lalai. Apabila dimatikan, permintaan dengan anonymize=0 ditolak dan pelajar sentiasa muncul dengan nama samaran. Hidupkan hanya jika laporan luaran benar-benar memerlukan nama sebenar, dan ingat bahawa eksport disahkan dengan kunci API yang dikongsi, bukan oleh pentadbir yang telah masuk, jadi sesiapa yang memegang kunci itu boleh memperoleh nama tersebut. Dalam kedua-dua keadaan, permintaan tanpa anonimisasi direkodkan dalam audit bersama alamat IP pemohon.';

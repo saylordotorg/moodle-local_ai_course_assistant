@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Padrão <code>rerank-2.5</code>. Modelo
 $string['settings:rerank_apibaseurl'] = 'URL base da API do re-ranker';
 $string['settings:rerank_apibaseurl_desc'] = 'Substitui a URL base do Voyage rerank. Deixe em branco para usar a URL Base da API de Incorporação acima ou o padrão do Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Janela de candidatos do re-ranker';
-$string['settings:rerank_candidates_desc'] = 'Quantos candidatos cosseno top-N alimentam o estágio de re-ranking. Padrão 50. Janelas maiores dão ao re-ranker mais material com pequeno custo extra (~10k tokens por operação de rerank).';
+$string['settings:rerank_candidates_desc'] = 'Quantos candidatos de cosseno top-N alimentam a etapa de reordenação. Padrão 20. Medido em 1.008 consultas: 20 iguala 30 em abrangência (R@3 89,0 % contra 89,3 %) por um terço menos de custo, e 50 custa 2,5 vezes mais sem ganho mensurável. Abaixo de 10 a abrangência piora. O custo cresce linearmente com este valor.';
 $string['settings:stt_selfhosted_heading'] = 'Transcrição auto-hospedada (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Execute speech-to-text em seu próprio hardware sem custo por minuto. Aponte o [[tutorshort]] para qualquer servidor de transcrição compatível com OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper) ou servidor <code>whisper.cpp</code>. Quando uma URL de servidor é definida aqui, ela se torna o caminho STT padrão; escolha um provedor pago em Provedor STT ativo acima para substituir. Se o servidor estiver em uma rede privada ou plain http, adicione também seu host à lista de permissões de endpoints confiáveis SSRF na seção Segurança.';
 $string['settings:stt_selfhosted_url'] = 'URL do servidor STT auto-hospedado';
@@ -1715,3 +1715,13 @@ $string['outcomes:col_met'] = 'Atingiram o benchmark';
 $string['outcomes:col_pct'] = 'Porcentagem atingida';
 $string['outcomes:footnote'] = 'Estudantes avaliados são aqueles com pelo menos uma tentativa no resultado. O desempenho é reportado de forma agregada; a progressão individual nunca é condicionada a nenhum resultado isolado.';
 $string['outcomes:navlink'] = 'Relatório de resultados';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Não posso ajudar com esse pedido. Vamos voltar ao seu curso: no que você quer trabalhar agora?';
+$string['settings:rerank_margin_threshold'] = 'Limite de ambiguidade da reordenação';
+$string['settings:rerank_margin_threshold_desc'] = 'Reordenar apenas quando a margem de cosseno entre o primeiro e o terceiro candidatos estiver abaixo deste valor, ou seja, quando a recuperação for ambígua. Medido em 1.008 consultas: com o padrão 0,086 cerca de 30 % das consultas são ignoradas sem perda mensurável de abrangência, evitando os casos em que a reordenação desloca um primeiro resultado já correto. Defina 0 para reordenar todas as consultas.';
+$string['rag_cap_blocked'] = 'A indexação não foi executada: o limite de gastos de RAG deste período foi atingido. Aumente o limite ou aguarde o próximo período. O índice existente permanece intacto.';
+$string['settings:redash_export_window_days'] = 'Janela de histórico da exportação (dias)';
+$string['settings:redash_export_window_days_desc'] = 'Até quando a exportação recua quando quem chama não envia um timestamp "since". O padrão de 90 dias evita que uma fonte de dados que omite o parâmetro baixe todos os registros já gravados; quem chama ainda pode pedir uma janela específica ou enviar since=0 para uma recarga completa. Defina 0 para que o padrão volte a ser todo o histórico.';
+$string['settings:redash_allow_deanonymized'] = 'Permitir exportação não anonimizada';
+$string['settings:redash_allow_deanonymized_desc'] = 'Desativado por padrão. Quando desativado, uma solicitação com anonymize=0 é recusada e os estudantes sempre aparecem como pseudônimos. Ative apenas se um relatório externo realmente precisar dos nomes reais e lembre-se de que a exportação se autentica com uma chave de API compartilhada, e não com um administrador conectado, portanto qualquer pessoa com a chave poderá obter esses nomes. De todo modo, as solicitações não anonimizadas são registradas na auditoria com o IP solicitante.';

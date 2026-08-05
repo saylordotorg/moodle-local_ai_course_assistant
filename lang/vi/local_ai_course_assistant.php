@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = 'Mặc định <code>rerank-2.5</code>. 
 $string['settings:rerank_apibaseurl'] = 'URL cơ sở API Rerank';
 $string['settings:rerank_apibaseurl_desc'] = 'Ghi đè URL cơ sở Voyage rerank. Để trống để dùng URL cơ sở API nhúng ở trên, hoặc mặc định của Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Cửa sổ ứng viên Rerank';
-$string['settings:rerank_candidates_desc'] = 'Số lượng ứng viên cosine top-N đưa vào giai đoạn rerank. Mặc định 50. Cửa sổ lớn hơn cung cấp cho bộ xếp hạng lại nhiều tài liệu hơn để làm việc với chi phí bổ sung nhỏ (~10k token mỗi lần rerank).';
+$string['settings:rerank_candidates_desc'] = 'Số ứng viên cosine top-N được đưa vào bước xếp hạng lại. Mặc định 20. Đo trên 1.008 truy vấn: 20 tương đương 30 về độ bao phủ (R@3 89,0% so với 89,3%) với chi phí thấp hơn một phần ba, còn 50 tốn gấp 2,5 lần mà không có lợi ích đo được. Dưới 10 thì độ bao phủ giảm. Chi phí tăng tuyến tính theo giá trị này.';
 $string['settings:stt_selfhosted_heading'] = 'Phiên âm tự lưu trữ (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Chạy chuyển giọng nói thành văn bản trên phần cứng của bạn với chi phí bằng không mỗi phút. Trỏ [[tutorshort]] đến bất kỳ máy chủ phiên âm tương thích OpenAI nào: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) hoặc máy chủ <code>whisper.cpp</code>. Khi URL máy chủ được thiết lập tại đây, nó trở thành đường dẫn STT mặc định; chọn nhà cung cấp trả phí trong Nhà cung cấp STT đang hoạt động ở trên để ghi đè. Nếu máy chủ nằm trong mạng riêng hoặc dùng http thuần, hãy thêm máy chủ đó vào danh sách được phép của SSRF trusted endpoints trong phần Bảo mật.';
 $string['settings:stt_selfhosted_url'] = 'URL máy chủ Selfhosted STT';
@@ -1728,3 +1728,13 @@ $string['outcomes:col_met'] = 'Đạt chuẩn';
 $string['outcomes:col_pct'] = 'Phần trăm đạt';
 $string['outcomes:footnote'] = 'Học viên được đánh giá là những người có ít nhất một lần thử với kết quả đầu ra đó. Thành tích được báo cáo theo tổng hợp; tiến độ cá nhân không bao giờ bị chặn bởi bất kỳ một kết quả đầu ra đơn lẻ nào.';
 $string['outcomes:navlink'] = 'Báo cáo kết quả đầu ra';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Tôi không thể giúp với yêu cầu đó. Hãy trở lại khóa học của bạn: bây giờ bạn muốn làm gì?';
+$string['settings:rerank_margin_threshold'] = 'Ngưỡng nhập nhằng của việc xếp hạng lại';
+$string['settings:rerank_margin_threshold_desc'] = 'Chỉ xếp hạng lại khi khoảng cách cosine giữa ứng viên thứ nhất và thứ ba nhỏ hơn giá trị này, tức là khi việc truy hồi còn nhập nhằng. Đo trên 1.008 truy vấn: ở giá trị mặc định 0,086, khoảng 30% truy vấn được bỏ qua mà không mất độ bao phủ có thể đo được, đồng thời tránh những trường hợp việc xếp hạng lại đẩy một kết quả đầu vốn đã đúng xuống dưới. Đặt 0 để xếp hạng lại mọi truy vấn.';
+$string['rag_cap_blocked'] = 'Việc lập chỉ mục không chạy: đã đạt hạn mức chi tiêu RAG cho kỳ này. Hãy nâng hạn mức hoặc chờ kỳ tiếp theo. Chỉ mục hiện có được giữ nguyên.';
+$string['settings:redash_export_window_days'] = 'Khoảng thời gian truy xuất của bản xuất (ngày)';
+$string['settings:redash_export_window_days_desc'] = 'Bản xuất lùi về quá khứ bao xa khi bên gọi không truyền dấu thời gian "since". Giá trị mặc định 90 ngày ngăn một nguồn dữ liệu bỏ qua tham số này kéo về mọi bản ghi từng được lưu; bên gọi vẫn có thể yêu cầu một khoảng cụ thể hoặc truyền since=0 để lấy toàn bộ lịch sử. Đặt 0 để mặc định trở lại là toàn bộ lịch sử.';
+$string['settings:redash_allow_deanonymized'] = 'Cho phép xuất dữ liệu không ẩn danh';
+$string['settings:redash_allow_deanonymized_desc'] = 'Mặc định tắt. Khi tắt, yêu cầu có anonymize=0 sẽ bị từ chối và người học luôn hiện dưới bút danh. Chỉ bật khi một báo cáo bên ngoài thực sự cần tên thật, và hãy nhớ rằng bản xuất xác thực bằng một khóa API dùng chung chứ không phải bằng quản trị viên đã đăng nhập, nên bất kỳ ai giữ khóa đều có thể lấy được những tên đó. Trong cả hai trường hợp, các yêu cầu không ẩn danh đều được ghi vào sổ kiểm toán kèm địa chỉ IP của bên yêu cầu.';

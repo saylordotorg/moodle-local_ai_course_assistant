@@ -1417,7 +1417,7 @@ $string['settings:rerank_model_desc'] = '默认 <code>rerank-2.5</code>。可在
 $string['settings:rerank_apibaseurl'] = '重排序 API 基础 URL';
 $string['settings:rerank_apibaseurl_desc'] = '覆盖 Voyage 重排序基础 URL。留空则使用上方的嵌入 API 基础 URL 或 Voyage 默认值（<code>https://api.voyageai.com/v1</code>）。';
 $string['settings:rerank_candidates'] = '重排序候选窗口';
-$string['settings:rerank_candidates_desc'] = '送入重排序阶段的 cosine 前 N 个候选数量。默认 50。窗口越大，重排序器可用素材越多，额外成本很小（每次重排序操作约 10k token）。';
+$string['settings:rerank_candidates_desc'] = '进入重排序阶段的余弦 top-N 候选数量。默认 20。基于 1,008 条查询测得：20 与 30 的召回率相当（R@3 89.0% 对 89.3%），成本低三分之一；50 的成本高 2.5 倍却没有可测量的提升。低于 10 时召回率下降。成本随此值线性增长。';
 $string['settings:stt_selfhosted_heading'] = '自托管转录（Whisper）';
 $string['settings:stt_selfhosted_heading_desc'] = '在自己的硬件上以零分钟成本运行语音转文字。将 [[tutorshort]] 指向任何兼容 OpenAI 的转录服务器：<code>whisper-server</code> Docker、<code>speaches</code>（faster-whisper）或 <code>whisper.cpp</code> 服务器。在此设置服务器 URL 后，它将成为默认 STT 路径；如需覆盖，请在上方"当前 STT 提供商"中选择付费提供商。如果服务器位于私有网络或使用 plain http，还需在安全部分的 SSRF 可信端点白名单中添加其主机。';
 $string['settings:stt_selfhosted_url'] = '自托管 STT 服务器 URL';
@@ -1728,3 +1728,13 @@ $string['outcomes:col_met'] = '达到基准';
 $string['outcomes:col_pct'] = '达标百分比';
 $string['outcomes:footnote'] = '受评学生是指在该成果上至少有一次尝试的学生。达成情况以汇总方式报告；个人进度从不因任何单项成果而受限。';
 $string['outcomes:navlink'] = '成果报告';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = '这个请求我无法协助。我们回到课程吧：接下来你想学习什么？';
+$string['settings:rerank_margin_threshold'] = '重排序歧义阈值';
+$string['settings:rerank_margin_threshold_desc'] = '仅当第一名与第三名候选之间的余弦差值低于此值时才进行重排序，也就是检索结果存在歧义时。基于 1,008 条查询测得：使用默认值 0.086 时约有 30% 的查询被跳过，召回率没有可测量的下降，同时避免了重排序把本已正确的首位结果挤下去的情况。设为 0 可对每条查询都重排序。';
+$string['rag_cap_blocked'] = '索引未执行：本周期的 RAG 支出上限已达到。请提高上限或等待下一个周期。现有索引保持不变。';
+$string['settings:redash_export_window_days'] = '导出回溯窗口（天）';
+$string['settings:redash_export_window_days_desc'] = '当调用方未传入 "since" 时间戳时，导出可回溯多久。默认 90 天可防止省略该参数的数据源拉取所有历史记录；调用方仍可请求特定窗口，或传入 since=0 以回补全部历史。设为 0 可让默认值重新变为全部历史。';
+$string['settings:redash_allow_deanonymized'] = '允许非匿名导出';
+$string['settings:redash_allow_deanonymized_desc'] = '默认关闭。关闭时，带 anonymize=0 的请求会被拒绝，学习者始终以假名显示。只有当外部报表确实需要真实姓名时才开启，并请记住导出是用共享 API 密钥而非已登录的管理员进行身份验证，因此任何持有该密钥的人都能取得这些姓名。无论开启与否，非匿名请求都会连同请求方 IP 记入审计日志。';

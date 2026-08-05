@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Implicit <code>rerank-2.5</code>. Model
 $string['settings:rerank_apibaseurl'] = 'URL de bază API re-ranker';
 $string['settings:rerank_apibaseurl_desc'] = 'Suprascrie URL-ul de bază Voyage rerank. Lăsați necompletat pentru a utiliza URL-ul de bază API de Incorporare de mai sus sau implicit-ul Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Fereastra de candidați re-ranker';
-$string['settings:rerank_candidates_desc'] = 'Câți candidați cosinus top-N alimentează etapa de re-ranking. Implicit 50. Ferestre mai mari oferă re-ranker-ului mai mult material cu un cost suplimentar mic (~10k tokens per operație de rerank).';
+$string['settings:rerank_candidates_desc'] = 'Câți candidați cosinus top-N intră în etapa de reordonare. Implicit 20. Măsurat pe 1.008 interogări: 20 egalează 30 la acoperire (R@3 89,0 % față de 89,3 %) cu o treime mai puțin cost, iar 50 costă de 2,5 ori mai mult fără câștig măsurabil. Sub 10 acoperirea se degradează. Costul crește liniar cu această valoare.';
 $string['settings:stt_selfhosted_heading'] = 'Transcriere auto-găzduită (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Rulați speech-to-text pe propriul hardware la zero cost pe minut. Îndreptați [[tutorshort]] spre orice server de transcriere compatibil cu OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper) sau server <code>whisper.cpp</code>. Când o adresă URL de server este setată aici, aceasta devine calea STT implicită; alegeți un furnizor plătit în Furnizor STT activ de mai sus pentru a suprascrie. Dacă serverul se află într-o rețea privată sau plain http, adăugați și gazda sa în lista de permisiuni a punctelor finale de încredere SSRF din secțiunea Securitate.';
 $string['settings:stt_selfhosted_url'] = 'URL server STT auto-găzduit';
@@ -1692,3 +1692,13 @@ $string['outcomes:col_met'] = 'Reper atins';
 $string['outcomes:col_pct'] = 'Procent atins';
 $string['outcomes:footnote'] = 'Studenții evaluați sunt cei cu cel puțin o încercare la rezultat. Realizarea este raportată în ansamblu; progresul individual nu este niciodată condiționat de vreun rezultat unic.';
 $string['outcomes:navlink'] = 'Raport de rezultate';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Nu pot ajuta cu această solicitare. Să revenim la cursul tău: la ce vrei să lucrezi acum?';
+$string['settings:rerank_margin_threshold'] = 'Prag de ambiguitate pentru reordonare';
+$string['settings:rerank_margin_threshold_desc'] = 'Reordonează doar când marja cosinus dintre primul și al treilea candidat este sub această valoare, adică atunci când regăsirea este ambiguă. Măsurat pe 1.008 interogări: la valoarea implicită 0,086 se omit aproximativ 30 % dintre interogări fără pierdere măsurabilă de acoperire și se evită cazurile în care reordonarea deplasează un prim rezultat deja corect. Setează 0 pentru a reordona fiecare interogare.';
+$string['rag_cap_blocked'] = 'Indexarea nu a rulat: plafonul de cheltuieli RAG pentru această perioadă a fost atins. Mărește plafonul sau așteaptă perioada următoare. Indexul existent rămâne neatins.';
+$string['settings:redash_export_window_days'] = 'Fereastra de istoric a exportului (zile)';
+$string['settings:redash_export_window_days_desc'] = 'Cât de departe în trecut ajunge exportul atunci când apelantul nu trimite un moment de timp „since”. Valoarea implicită de 90 de zile împiedică o sursă de date care omite parametrul să descarce toate înregistrările existente; apelantul poate cere în continuare o fereastră anume sau poate trimite since=0 pentru o preluare completă. Setează 0 pentru a reveni la exportul întregului istoric în mod implicit.';
+$string['settings:redash_allow_deanonymized'] = 'Permite exportul neanonimizat';
+$string['settings:redash_allow_deanonymized_desc'] = 'Dezactivat implicit. Când este dezactivat, o cerere cu anonymize=0 este refuzată, iar cursanții apar întotdeauna sub pseudonim. Activează-l doar dacă un raport extern are nevoie cu adevărat de numele reale și ține minte că exportul se autentifică cu o cheie API partajată, nu cu un administrator autentificat, deci oricine deține cheia poate obține acele nume. În ambele cazuri, cererile neanonimizate sunt înregistrate în audit împreună cu adresa IP solicitantă.';

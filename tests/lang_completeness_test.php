@@ -171,14 +171,9 @@ final class lang_completeness_test extends \basic_testcase {
      * English without translations, which is the drift that went unnoticed.
      */
     private const KNOWN_UNTRANSLATED = [
-        'chat:refused',
-        'settings:rerank_margin_threshold',
-        'settings:rerank_margin_threshold_desc',
-        'rag_cap_blocked',
-        'settings:redash_export_window_days',
-        'settings:redash_export_window_days_desc',
-        'settings:redash_allow_deanonymized',
-        'settings:redash_allow_deanonymized_desc',
+        // Empty as of 6.9.5: the eight keys that were listed here were translated
+        // into all 45 locales. Keep it empty. An entry appearing here should be a
+        // conscious, temporary decision, not the default way new strings land.
     ];
 
     /**

@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Standard <code>rerank-2.5</code>. Nyere
 $string['settings:rerank_apibaseurl'] = 'Rerank API-basis-URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Overstyr Voyage rerank-basis-URL. La stå tomt for å bruke Embedding API-basis-URL ovenfor, eller Voyage-standard (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank-kandidatvindu';
-$string['settings:rerank_candidates_desc'] = 'Hvor mange cosinus topp-N-kandidater som mater re-ranktrinnet. Standard 50. Større vinduer gir re-rankeren mer materiale å jobbe med til liten ekstra kostnad (~10k tokens per rerank-operasjon).';
+$string['settings:rerank_candidates_desc'] = 'Hvor mange cosinus-topp-N-kandidater som går inn i omrangeringstrinnet. Standard 20. Målt over 1 008 spørringer: 20 tilsvarer 30 på gjenfinning (R@3 89,0 % mot 89,3 %) til en tredjedel lavere kostnad, og 50 koster 2,5 ganger mer uten målbar gevinst. Under 10 forringes gjenfinningen. Kostnaden øker lineært med denne verdien.';
 $string['settings:stt_selfhosted_heading'] = 'Selvhostet transkripsjon (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Kjør tale-til-tekst på din egen maskinvare til null kostnad per minutt. Pek [[tutorshort]] mot en hvilken som helst OpenAI-kompatibel transkripsjonserver: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), eller <code>whisper.cpp</code> server. Når en server-URL er satt her, blir det standard STT-sti; velg en betalt leverandør i Aktiv STT-leverandør ovenfor for å overstyre. Hvis serveren er på et privat nettverk eller vanlig http, legg også til verten i SSRF-tillatte endepunkter i Sikkerhet-seksjonen.';
 $string['settings:stt_selfhosted_url'] = 'Selvhostet STT-server-URL';
@@ -1699,3 +1699,13 @@ $string['outcomes:col_met'] = 'Oppnådde referanseverdi';
 $string['outcomes:col_pct'] = 'Prosent oppnådd';
 $string['outcomes:footnote'] = 'Vurderte studenter er de med minst ett forsøk på læringsutbyttet. Oppnåelse rapporteres samlet; individuell progresjon avhenger aldri av ett enkelt læringsutbytte.';
 $string['outcomes:navlink'] = 'Læringsutbytterapport';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Det kan jeg ikke hjelpe med. La oss gå tilbake til kurset ditt: hva vil du jobbe med nå?';
+$string['settings:rerank_margin_threshold'] = 'Terskel for omrangeringens tvetydighet';
+$string['settings:rerank_margin_threshold_desc'] = 'Omranger bare når cosinusmarginen mellom den første og den tredje kandidaten er under denne verdien, altså når søket er tvetydig. Målt over 1 008 spørringer: med standardverdien 0,086 hoppes rundt 30 % av spørringene over uten målbart tap av gjenfinning, og tilfeller unngås der omrangering fortrenger et allerede korrekt toppresultat. Sett til 0 for å omrangere alle spørringer.';
+$string['rag_cap_blocked'] = 'Indekseringen ble ikke kjørt: RAG-utgiftstaket for denne perioden er nådd. Hev taket, eller vent til neste periode. Den eksisterende indeksen blir ikke berørt.';
+$string['settings:redash_export_window_days'] = 'Eksportens tilbakeblikkvindu (dager)';
+$string['settings:redash_export_window_days_desc'] = 'Hvor langt tilbake eksporten rekker når den som kaller ikke sender et "since"-tidsstempel. Standarden på 90 dager hindrer en datakilde som utelater parameteren fra å hente hver rad som noen gang er registrert; den som kaller kan fortsatt be om et bestemt vindu eller sende since=0 for å hente hele historikken. Sett til 0 for å gjøre hele historikken til standard igjen.';
+$string['settings:redash_allow_deanonymized'] = 'Tillat ikke-anonymisert eksport';
+$string['settings:redash_allow_deanonymized_desc'] = 'Av som standard. Når den er av, avvises en forespørsel med anonymize=0, og deltakere vises alltid som pseudonymer. Slå den bare på hvis en ekstern rapport virkelig trenger de virkelige navnene, og husk at eksporten autentiseres med en delt API-nøkkel og ikke med en innlogget administrator, så alle som har nøkkelen kan hente disse navnene. Ikke-anonymiserte forespørsler logges i begge tilfeller sammen med IP-adressen som ber om dem.';

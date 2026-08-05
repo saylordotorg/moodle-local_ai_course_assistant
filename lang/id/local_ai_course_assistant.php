@@ -1425,7 +1425,7 @@ $string['settings:rerank_model_desc'] = 'Bawaan <code>rerank-2.5</code>. Model V
 $string['settings:rerank_apibaseurl'] = 'URL Dasar API Rerank';
 $string['settings:rerank_apibaseurl_desc'] = 'Ganti URL dasar Voyage rerank. Biarkan kosong untuk menggunakan URL Dasar API Penyematan di atas, atau bawaan Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Jendela kandidat Rerank';
-$string['settings:rerank_candidates_desc'] = 'Berapa banyak kandidat N teratas berbasis kosinus yang masuk ke tahap rerank. Bawaan 50. Jendela yang lebih besar memberikan lebih banyak bahan kepada pemeringkat ulang dengan biaya tambahan kecil (~10 ribu token per operasi rerank).';
+$string['settings:rerank_candidates_desc'] = 'Berapa banyak kandidat kosinus top-N yang masuk ke tahap pemeringkatan ulang. Bawaan 20. Diukur pada 1.008 kueri: 20 setara dengan 30 pada recall (R@3 89,0% versus 89,3%) dengan biaya sepertiga lebih murah, sedangkan 50 berbiaya 2,5 kali lipat tanpa keuntungan yang terukur. Di bawah 10 recall menurun. Biaya tumbuh linear terhadap nilai ini.';
 $string['settings:stt_selfhosted_heading'] = 'Transkripsi yang dihosting sendiri (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Jalankan pengenalan suara ke teks di perangkat keras Anda sendiri tanpa biaya per menit. Arahkan [[tutorshort]] ke server transkripsi yang kompatibel dengan OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper), atau server <code>whisper.cpp</code>. Bila URL server diatur di sini, ini menjadi jalur STT bawaan; pilih penyedia berbayar di pengaturan Penyedia STT aktif di atas untuk menimpanya. Bila server berada di jaringan pribadi atau HTTP biasa, tambahkan juga hostnya ke daftar izin titik akhir tepercaya SSRF di bagian Keamanan.';
 $string['settings:stt_selfhosted_url'] = 'URL Server STT yang Dihosting Sendiri';
@@ -1723,3 +1723,13 @@ $string['outcomes:col_met'] = 'Memenuhi tolok ukur';
 $string['outcomes:col_pct'] = 'Persen memenuhi';
 $string['outcomes:footnote'] = 'Siswa yang dinilai adalah mereka yang memiliki setidaknya satu upaya pada capaian tersebut. Pencapaian dilaporkan secara agregat; kemajuan individu tidak pernah dibatasi oleh capaian tunggal mana pun.';
 $string['outcomes:navlink'] = 'Laporan capaian';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Saya tidak dapat membantu permintaan itu. Mari kembali ke kursus Anda: apa yang ingin Anda kerjakan sekarang?';
+$string['settings:rerank_margin_threshold'] = 'Ambang ambiguitas pemeringkatan ulang';
+$string['settings:rerank_margin_threshold_desc'] = 'Lakukan pemeringkatan ulang hanya jika selisih kosinus antara kandidat pertama dan ketiga berada di bawah nilai ini, yaitu ketika pengambilan bersifat ambigu. Diukur pada 1.008 kueri: pada nilai bawaan 0,086 sekitar 30% kueri dilewati tanpa kehilangan recall yang terukur, dan menghindari kasus di mana pemeringkatan ulang menggeser hasil teratas yang sudah benar. Setel 0 untuk memeringkat ulang setiap kueri.';
+$string['rag_cap_blocked'] = 'Pengindeksan tidak dijalankan: batas belanja RAG untuk periode ini telah tercapai. Naikkan batasnya, atau tunggu periode berikutnya. Indeks yang ada dibiarkan utuh.';
+$string['settings:redash_export_window_days'] = 'Jendela penelusuran ekspor (hari)';
+$string['settings:redash_export_window_days_desc'] = 'Seberapa jauh ke belakang ekspor menjangkau ketika pemanggil tidak mengirim tanda waktu "since". Nilai bawaan 90 hari mencegah sumber data yang menghilangkan parameter ini menarik setiap baris yang pernah dicatat; pemanggil tetap dapat meminta jendela tertentu atau mengirim since=0 untuk pengambilan seluruh riwayat. Setel 0 agar bawaannya kembali menjadi seluruh riwayat.';
+$string['settings:redash_allow_deanonymized'] = 'Izinkan ekspor tanpa anonimisasi';
+$string['settings:redash_allow_deanonymized_desc'] = 'Nonaktif secara bawaan. Ketika nonaktif, permintaan dengan anonymize=0 ditolak dan pembelajar selalu tampil dengan nama samaran. Aktifkan hanya jika sebuah laporan eksternal benar-benar membutuhkan nama asli, dan ingat bahwa ekspor diautentikasi dengan kunci API bersama, bukan oleh administrator yang sedang masuk, sehingga siapa pun yang memegang kunci itu dapat memperoleh nama-nama tersebut. Dalam kedua kasus, permintaan tanpa anonimisasi dicatat dalam audit beserta alamat IP peminta.';

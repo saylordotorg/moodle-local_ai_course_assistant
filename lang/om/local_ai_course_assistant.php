@@ -1398,7 +1398,7 @@ $string['settings:rerank_model_desc'] = 'Durtii <code>rerank-2.5</code>. Modeeli
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Voyage rerank base URL overrideedi. Duwwaa dhiisi Embedding API Base URL olii ykn Voyage durtii (<code>https://api.voyageai.com/v1</code>) fayyadamuuf.';
 $string['settings:rerank_candidates'] = 'Rerank candidate window';
-$string['settings:rerank_candidates_desc'] = 'Meeqa cosine top-N candidate sadarkaa rerank keessatti seenan. Durtii 50. Fageeyyii guddaan rerankeritti meeshaa guddaa kenna, kaffaltii xiqqaa dabaluun (~10k tokens rerank op tokkoof).';
+$string['settings:rerank_candidates_desc'] = 'Kaadhimamtoota cosine top-N meeqni sadarkaa sirreeffamaatti galan. Duraan 20. Gaaffiiwwan 1,008 irratti safarame: 20 recall irratti 30 wal qixa (R@3 89.0% fi 89.3%) baasii harka sadaffaa gadi ta\'een, 50 immoo si\'a 2.5 baasii fudhata bu\'aa safaramu malee. 10 gadi recall ni hir\'ata. Baasiin gatii kanaan sarara qajeelaan dabala.';
 $string['settings:stt_selfhosted_heading'] = 'Transcription ofiin-qabame (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Sagalee gara barreeffamaatti jijjiiruun meeshaa keetii irra daqiiqaadhaan kaffaltii tokko malee hojjedhu. [[tutorshort]] gara server transcription OpenAI-waliin-wal-simatu kamiiyyuu qajeelchi: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), ykn <code>whisper.cpp</code> server. Server URL as qindaa\'ee yeroo karaa STT durtii ta\'a; Fornidarii kaffalaa Fornidarii STT banaa olitti filadhu overrideef. Server neetwoorkii dhuunfaa ykn plain http irra yoo ta\'e, host isaa SSRF trusted endpoints allowlistitti Kutaa Nageenyaa keessatti dabaluu yaadadhu.';
 $string['settings:stt_selfhosted_url'] = 'Selfhosted STT server URL';
@@ -1696,3 +1696,13 @@ $string['outcomes:col_met'] = 'Madaallii guutan';
 $string['outcomes:col_pct'] = 'Dhibbeentaa guutan';
 $string['outcomes:footnote'] = 'Barattoonni madaalaman warra bu\'aa irratti yoo xiqqaate yaalii tokko qaban. Milkaa\'inni waliigalaan gabaafama; guddina dhuunfaa gonkumaa bu\'aa tokko irratti hin daangeffamu.';
 $string['outcomes:navlink'] = 'Gabaasa bu\'aa';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Gaaffii kanaan gargaaruu hin danda\'u. Gara barnoota keessanitti haa deebi\'nu: amma maal irratti hojjachuu barbaadduu?';
+$string['settings:rerank_margin_threshold'] = 'Daangaa wal-dhabbii sirreeffama sadarkaa';
+$string['settings:rerank_margin_threshold_desc'] = 'Sadarkaa irra deebi\'ii kennii yeroo garaagarummaan cosine kaadhimamaa tokkoffaa fi sadaffaa gidduu jiru gatii kana gadi ta\'e qofa, kunis yeroo argannoon ifa hin taane. Gaaffiiwwan 1,008 irratti safarame: gatii duraa 0.086 irratti dhibbeentaa 30 ol gaaffiiwwan darbatamu, kasaaraa recall safaramu malee, akkasumas haala keessatti sirreeffamni sadarkaa bu\'aa tokkoffaa duraan sirrii ture dhiibu ni hafa. Gaaffii hunda irra deebi\'anii kennuuf 0 kaa\'i.';
+$string['rag_cap_blocked'] = 'Tarreeffamni hin hojjatamne: daangaa baasii RAG yeroo kanaaf jiru gahameera. Daangaa ol kaasi, yookaan yeroo itti aanu eegi. Tarreeffamni jiru akkuma jirutti hafa.';
+$string['settings:redash_export_window_days'] = 'Yeroo duubatti ilaalu ergaa (guyyoota)';
+$string['settings:redash_export_window_days_desc'] = 'Yeroo waamichi mallattoo yeroo "since" hin ergine, ergaan hamma kam duubatti deema. Duraan guyyoota 90 madda daataa paaraamiitara kana dhiisu sararoota hunda hanga ammaa galmeeffaman harkisuu irraa ittisa; waamichi ammas yeroo murtaa\'e gaafachuu yookaan seenaa guutuuf since=0 erguu danda\'a. Seenaan guutuun deebi\'ee duraa ta\'uuf 0 kaa\'i.';
+$string['settings:redash_allow_deanonymized'] = 'Ergaa maqaa hin dhoksine hayyami';
+$string['settings:redash_allow_deanonymized_desc'] = 'Duraan cufameera. Yeroo cufame, gaaffiin anonymize=0 qabu ni didama, barattoonnis yeroo hunda maqaa sobaan mul\'atu. Kana banii kan gabaasni alaa dhugumaan maqaa dhugaa barbaachisu qofa, akkasumas ergaan bulchaa seene irratti hin hundaa\'u, furtuu API waliin qoodamuun mirkaneeffama; kanaafuu namni furtuu qabu kamiyyuu maqoota sana argachuu danda\'a. Haala lamaan keessattis, gaaffiiwwan maqaa hin dhoksine teessoo IP gaafataa waliin qorannoo keessatti galmeeffamu.';

@@ -1438,7 +1438,7 @@ $string['settings:rerank_model_desc'] = 'Alapértelmezés: <code>rerank-2.5</cod
 $string['settings:rerank_apibaseurl'] = 'Rerank API alap-URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Felülbírálja a Voyage rerank alap-URL-jét. Hagyja üresen a fenti Beágyazási API alap-URL vagy a Voyage alapértelmezett értékének használatához (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank jelöltablak';
-$string['settings:rerank_candidates_desc'] = 'Hány koszinusz-alapú legjobb N jelölt kerül az újrarangsorolási lépésbe. Alapértelmezés: 50. A nagyobb ablak több anyagot ad az újrarangsorolónak, kis extra költség mellett (~10 000 token újrarangsorolási műveleteként).';
+$string['settings:rerank_candidates_desc'] = 'Hány koszinusz top-N találat kerül az újrarangsorolási szakaszba. Alapérték 20. 1008 lekérdezésen mérve: a 20 felidézésben megegyezik a 30-cal (R@3 89,0 % a 89,3 % ellenében) egyharmaddal kisebb költséggel, az 50 pedig 2,5-szer annyiba kerül mérhető haszon nélkül. 10 alatt a felidézés romlik. A költség ezzel az értékkel lineárisan növekszik.';
 $string['settings:stt_selfhosted_heading'] = 'Saját üzemeltetésű átírás (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Futtasson beszédfelismerést saját hardveren, percenkénti díj nélkül. Irányítsa a [[tutorshort]]-t bármely OpenAI-kompatibilis átírókiszolgálóra: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) vagy <code>whisper.cpp</code> kiszolgáló. Ha itt beállít egy kiszolgáló URL-t, az lesz az alapértelmezett STT-útvonal; a feletti Aktív STT-szolgáltató beállításban fizetős szolgáltatót kiválasztva felülbírálható. Ha a kiszolgáló magánhálózaton vagy egyszerű HTTP-n van, a gazdagép nevét adja hozzá az SSRF megbízható végpontok engedélylistájához a Biztonság szakaszban.';
 $string['settings:stt_selfhosted_url'] = 'Saját üzemeltetésű STT-kiszolgáló URL-je';
@@ -1736,3 +1736,13 @@ $string['outcomes:col_met'] = 'Referenciaértéket elérte';
 $string['outcomes:col_pct'] = 'Teljesített százalék';
 $string['outcomes:footnote'] = 'Az értékelt diákok azok, akiknek legalább egy kísérletük van az adott tanulási eredményen. A teljesítés összesítve kerül jelentésre; az egyéni előrehaladás soha nincs egyetlen tanulási eredményhez kötve.';
 $string['outcomes:navlink'] = 'Tanulási eredmények jelentése';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Ebben a kérésben nem tudok segíteni. Térjünk vissza a tananyaghoz: mivel szeretnél most foglalkozni?';
+$string['settings:rerank_margin_threshold'] = 'Az újrarangsorolás kétértelműségi küszöbe';
+$string['settings:rerank_margin_threshold_desc'] = 'Csak akkor rangsoroljon újra, ha az első és a harmadik találat közötti koszinuszkülönbség ez alatt az érték alatt van, vagyis amikor a visszakeresés kétértelmű. 1008 lekérdezésen mérve: a 0,086 alapértéknél a lekérdezések körülbelül 30 %-a kimarad mérhető felidézésveszteség nélkül, és elkerülhetők azok az esetek, amikor az újrarangsorolás egy már helyes első találatot szorít ki. Állítsa 0-ra minden lekérdezés újrarangsorolásához.';
+$string['rag_cap_blocked'] = 'Az indexelés nem futott le: az adott időszakra vonatkozó RAG-költségkeret elfogyott. Növelje a keretet, vagy várja meg a következő időszakot. A meglévő index változatlan marad.';
+$string['settings:redash_export_window_days'] = 'Az exportálás visszatekintési ablaka (nap)';
+$string['settings:redash_export_window_days_desc'] = 'Meddig nyúlik vissza az exportálás, ha a hívó nem ad meg „since” időbélyeget. A 90 napos alapérték megakadályozza, hogy egy paramétert kihagyó adatforrás minden eddig rögzített sort letöltsön; a hívó továbbra is kérhet adott ablakot, vagy megadhatja a since=0 értéket a teljes előzmény letöltéséhez. Állítsa 0-ra, ha ismét a teljes előzmény legyen az alapérték.';
+$string['settings:redash_allow_deanonymized'] = 'Nem anonimizált exportálás engedélyezése';
+$string['settings:redash_allow_deanonymized_desc'] = 'Alapértelmezés szerint kikapcsolva. Kikapcsolt állapotban az anonymize=0 kérés elutasításra kerül, és a tanulók mindig fedőnévvel jelennek meg. Csak akkor kapcsolja be, ha egy külső jelentésnek valóban valódi nevekre van szüksége, és tartsa szem előtt, hogy az exportálás megosztott API-kulccsal, nem bejelentkezett rendszergazdával azonosít, tehát bárki, akinél a kulcs van, megszerezheti ezeket a neveket. A nem anonimizált kéréseket mindkét esetben naplózzuk a kérő IP-címével együtt.';

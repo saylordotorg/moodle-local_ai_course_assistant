@@ -1423,7 +1423,7 @@ $string['settings:rerank_model_desc'] = 'ነባሪ <code>rerank-2.5</code>። �
 $string['settings:rerank_apibaseurl'] = 'Rerank API መሠረት URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Voyage rerank መሠረት URL ን ያሻሻሉ። ከላይ ያለውን Embedding API Base URL ለመጠቀም ወይም Voyage ነባሪ (<code>https://api.voyageai.com/v1</code>) ለመጠቀም ባዶ ይተው።';
 $string['settings:rerank_candidates'] = 'Rerank ዕጩ መስኮት';
-$string['settings:rerank_candidates_desc'] = 'ወደ rerank ደረጃ ስንት ኮሳይን ምርጥ-N ዕጩዎች እንደሚሄዱ። ነባሪ 50። ትላልቅ መስኮቶች ዳግም-አሰላሪውን በትንሽ ተጨማሪ ዋጋ የበለጠ ቁሳቁስ ይሰጣሉ (~10k tokens ለ rerank ኦፕ)።';
+$string['settings:rerank_candidates_desc'] = 'ወደ ዳግም ደረጃ አሰጣጥ ደረጃ የሚገቡ የኮሳይን top-N እጩዎች ብዛት። ነባር 20። በ1,008 ጥያቄዎች ተለክቷል፦ 20 በማስታወስ ከ30 ጋር እኩል ነው (R@3 89.0% ከ89.3% ጋር) ወጪው በአንድ ሦስተኛ ያነሰ ሲሆን፣ 50 ደግሞ 2.5 እጥፍ ያስከፍላል ግን የሚለካ ጥቅም አያመጣም። ከ10 በታች ማስታወሱ ይቀንሳል። ወጪው ከዚህ ዋጋ ጋር በቀጥተኛ መስመር ይጨምራል።';
 $string['settings:stt_selfhosted_heading'] = 'ራስ-የተስተናገደ ፍቺ (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'ንግግርን ወደ ጽሑፍ በተናጠል ሃርድዌርዎ ላይ ሂደት ያካሂዱ ያለ ሰዓት ዋጋ። ማንኛውም OpenAI-ተኳሃኝ ፍቺ አገልጋይ ጋር [[tutorshort]] ን ያሳዩ፦ <code>whisper-server</code> Docker፣ <code>speaches</code> (faster-whisper)፣ ወይም <code>whisper.cpp</code> አገልጋይ። አገልጋይ URL እዚህ ሲቀናበር ነባሪ STT ዱካ ይሆናል፤ ላዩን ለማለፍ ከላይ ባለ Active STT provider ውስጥ ክፍያ-ሰጪ አቅራቢ ይምረጡ። አገልጋዩ በግል ኔትወርክ ወይም ቀጥተኛ http ላይ ከሆነ፣ ሆስቱን ወደ Security ክፍሉ ውስጥ ያለ SSRF trusted endpoints allowlist ያክሉ።';
 $string['settings:stt_selfhosted_url'] = 'ራስ-የተስተናገደ STT አገልጋይ URL';
@@ -1722,3 +1722,13 @@ $string['outcomes:col_met'] = 'መለኪያ ያሟሉ';
 $string['outcomes:col_pct'] = 'ያሟሉ መቶኛ';
 $string['outcomes:footnote'] = 'የተገመገሙ ተማሪዎች በውጤቱ ላይ ቢያንስ አንድ ሙከራ ያደረጉ ናቸው። ስኬት በአጠቃላይ ይዘገባል፤ የግለሰብ ግስጋሴ በየትኛውም ነጠላ ውጤት ላይ ፈጽሞ አይገደብም።';
 $string['outcomes:navlink'] = 'የውጤቶች ሪፖርት';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'በዚህ ጥያቄ ላይ ማገዝ አልችልም። ወደ ኮርስዎ እንመለስ፦ አሁን በምን ላይ መስራት ይፈልጋሉ?';
+$string['settings:rerank_margin_threshold'] = 'የዳግም ደረጃ አሰጣጥ ግልጽነት ገደብ';
+$string['settings:rerank_margin_threshold_desc'] = 'ዳግም ደረጃ አሰጣጥ የሚከናወነው በአንደኛውና በሦስተኛው እጩ መካከል ያለው የኮሳይን ልዩነት ከዚህ ዋጋ በታች ሲሆን ብቻ ነው፣ ማለትም ማግኘቱ ግልጽ ባልሆነ ጊዜ። በ1,008 ጥያቄዎች ተለክቷል፦ በነባሩ 0.086 ላይ ወደ 30% የሚሆኑ ጥያቄዎች ይዘለላሉ፣ የሚለካ የማስታወስ ኪሳራም አይኖርም፣ እንዲሁም ዳግም ደረጃ አሰጣጥ ቀድሞ ትክክል የነበረውን የመጀመሪያ ውጤት የሚያፈናቅልባቸው ሁኔታዎች ይወገዳሉ። ሁሉንም ጥያቄዎች ዳግም ለመደልደል 0 ያድርጉ።';
+$string['rag_cap_blocked'] = 'ኢንዴክስ ማድረግ አልተሰራም፦ ለዚህ ጊዜ የተመደበው የRAG ወጪ ገደብ ተሟጧል። ገደቡን ያሳድጉ ወይም ቀጣዩን ጊዜ ይጠብቁ። ያለው ኢንዴክስ አልተነካም።';
+$string['settings:redash_export_window_days'] = 'የወጪ መረጃ የኋሊት መስኮት (ቀናት)';
+$string['settings:redash_export_window_days_desc'] = 'ጠያቂው "since" የሰዓት ማህተም ካልላከ ወጪው ወደ ኋላ ምን ያህል ይደርሳል። ነባሩ 90 ቀናት መለኪያውን የሚተው የውሂብ ምንጭ እስካሁን የተመዘገበውን ሁሉንም መስመር እንዳይጎትት ይከላከላል፤ ጠያቂው አሁንም የተወሰነ መስኮት መጠየቅ ወይም ሙሉ ታሪክ ለማግኘት since=0 መላክ ይችላል። ሙሉ ታሪኩ ዳግም ነባር እንዲሆን 0 ያድርጉ።';
+$string['settings:redash_allow_deanonymized'] = 'ስም የሚገለጽ ወጪን ፍቀድ';
+$string['settings:redash_allow_deanonymized_desc'] = 'በነባር ተዘግቷል። ሲዘጋ anonymize=0 ያለው ጥያቄ ይከለከላል፣ ተማሪዎችም ሁልጊዜ በተለዋጭ ስም ይታያሉ። የውጭ ሪፖርት በእውነት እውነተኛ ስሞችን ሲፈልግ ብቻ ያብሩት፣ እንዲሁም ወጪው በገባ አስተዳዳሪ ሳይሆን በሚጋራ የAPI ቁልፍ እንደሚረጋገጥ ያስታውሱ፤ ስለዚህ ቁልፉ ያለው ማንኛውም ሰው እነዚያን ስሞች ማግኘት ይችላል። በሁለቱም ሁኔታዎች ስም የሚገለጹ ጥያቄዎች ከጠያቂው IP አድራሻ ጋር በኦዲት ይመዘገባሉ።';

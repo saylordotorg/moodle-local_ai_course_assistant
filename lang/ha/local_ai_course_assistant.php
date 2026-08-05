@@ -1425,7 +1425,7 @@ $string['settings:rerank_model_desc'] = 'Tsoho <code>rerank-2.5</code>. Ana iya 
 $string['settings:rerank_apibaseurl'] = 'URL na tushen API na Rerank';
 $string['settings:rerank_apibaseurl_desc'] = 'Canza URL na tushen Voyage rerank. Bar fanko don amfani da URL na tushen API na Embedding da ke sama, ko tsoho na Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Tagar ɗan takara na Rerank';
-$string['settings:rerank_candidates_desc'] = 'Nawa cosine manyan-N ɗan takara suke ciyar da matakin rerank. Tsoho 50. Tagogi mafi girma suna ba wa re-ranker kayan aiki ƙarin da ƙaramin ƙarin farashin (~10k alamomi kowane aikin rerank).';
+$string['settings:rerank_candidates_desc'] = 'Yawan \'yan takara na cosine top-N da za a shigar da su matakin sake tsara matsayi. Asali 20. An auna a kan tambayoyi 1,008: 20 ya kai 30 a recall (R@3 89.0% da 89.3%) da kuɗi kashi ɗaya bisa uku ƙasa, yayin da 50 ke ci sau 2.5 ba tare da riba da za a iya aunawa ba. Ƙasa da 10 recall na raguwa. Kuɗin yana ƙaruwa kai tsaye da wannan darajar.';
 $string['settings:stt_selfhosted_heading'] = 'Fassarar da kai kanka kake karɓar bakuncinsa (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Gudanar da maganar zuwa rubutu akan kayan aikin ka da sifirin farashin kowane minti. Nuna [[tutorshort]] zuwa kowane sabar da ta dace da OpenAI: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper), ko sabar <code>whisper.cpp</code>. Lokacin da aka saita URL na sabar a nan yana zama hanyar STT ta tsoho; zaɓi mai bayarwa mai biyan kuɗi a cikin mai bayarwa na aiki na STT da ke sama don canzawa. Idan sabar yana akan hanyar sadarwa ta sirri ko http mai sauƙi, kuma ƙara mai masaukin baƙin zuwa jerin adiresoshin da aka amince da su na SSRF a ɓangaren Tsaro.';
 $string['settings:stt_selfhosted_url'] = 'URL na sabar STT da kai kanka kake karɓar bakuncinsa';
@@ -1723,3 +1723,13 @@ $string['outcomes:col_met'] = 'Cika ma\'auni';
 $string['outcomes:col_pct'] = 'Kason cikawa';
 $string['outcomes:footnote'] = 'Xalibai da aka tantance su ne waxanda suka yi aqalla gwaji xaya akan sakamakon. Ana bayar da rahoton nasara gaba xaya; ba a taxa hana ci gaban mutum akan wani sakamako guda xaya ba.';
 $string['outcomes:navlink'] = 'Rahoton sakamako';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Ba zan iya taimakawa da wannan buƙata ba. Mu koma ga darasinka: me kake son yin aiki a kansa yanzu?';
+$string['settings:rerank_margin_threshold'] = 'Iyakar rashin tabbas na sake tsara matsayi';
+$string['settings:rerank_margin_threshold_desc'] = 'Ka sake tsara matsayi kawai idan bambancin cosine tsakanin ɗan takara na farko da na uku ya gaza wannan darajar, wato lokacin da neman bayanin ba shi da tabbas. An auna a kan tambayoyi 1,008: a darajar asali 0.086 ana tsallake kusan kashi 30% na tambayoyi ba tare da asarar recall da za a iya aunawa ba, kuma ana guje wa yanayin da sake tsara matsayi ke turo sakamako na farko wanda ya riga ya zama daidai. Sanya 0 don sake tsara kowace tambaya.';
+$string['rag_cap_blocked'] = 'Ba a gudanar da ƙirƙirar ƙididdiga ba: an kai iyakar kashe kuɗin RAG na wannan lokacin. Ka ɗaga iyakar, ko ka jira lokaci na gaba. Ƙididdigar da take akwai ba a taɓa ta ba.';
+$string['settings:redash_export_window_days'] = 'Tazarar dubawar baya ta fitarwa (kwanaki)';
+$string['settings:redash_export_window_days_desc'] = 'Har zuwa yaushe fitarwar ke komawa baya idan mai kira bai aika alamar lokaci "since" ba. Asalin kwanaki 90 na hana tushen bayanai da ya bar wannan siga jan kowane layin da aka taɓa rubutawa; mai kira zai iya har yanzu neman wata tazara ta musamman ko aika since=0 don duk tarihin. Sanya 0 don sake mayar da duk tarihin a matsayin asali.';
+$string['settings:redash_allow_deanonymized'] = 'Ba da damar fitarwa ba tare da sirri ba';
+$string['settings:redash_allow_deanonymized_desc'] = 'An kashe shi a asali. Idan an kashe, ana ƙin buƙata mai anonymize=0 kuma masu koyo suna bayyana da sunan ɓoye kullum. Ka kunna shi kawai idan wani rahoto na waje yana buƙatar sunayen gaskiya da gaske, kuma ka tuna cewa fitarwar tana tabbatarwa da maɓallin API da ake raba shi, ba da mai gudanarwa da ya shiga ba, don haka duk wanda ke da maɓallin zai iya samun waɗannan sunayen. A kowane hali, ana rubuta buƙatun da ba a ɓoye sirri ba a cikin binciken tare da adireshin IP na mai buƙata.';

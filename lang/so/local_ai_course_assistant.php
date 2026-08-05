@@ -1412,7 +1412,7 @@ $string['settings:rerank_model_desc'] = 'Caadiga ahaan <code>rerank-2.5</code>. 
 $string['settings:rerank_apibaseurl'] = 'URL-ka aasaasiga ah ee API re-ranker';
 $string['settings:rerank_apibaseurl_desc'] = 'Beddelaa URL-ka aasaasiga ah ee Voyage rerank. Ka tag madhan si aad u isticmaasho URL-ka aasaasiga ah ee API Embedding ee sare, ama Voyage default (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Daaqadda candidates-ka re-ranker';
-$string['settings:rerank_candidates_desc'] = 'Intee in le\'eg oo cosine top-N candidates ah ayaa galeysa marxaladda re-ranking. Caadiga ahaan 50. Daaqado weyn waxay siinayaan re-ranker-ka xog badan oo qiimaha dheeraadka ah yar (~10k tokens hawlgal kasta oo re-ranking).';
+$string['settings:rerank_candidates_desc'] = 'Immisa musharax cosine top-N ah oo gala marxaladda dib-u-kala-saarista. Caadi 20. Waxaa lagu qiyaasay 1,008 su\'aalood: 20 waa la mid 30 recall-ka (R@3 89.0% iyo 89.3%) qiimo saddex meelood meel ka hooseeya, halka 50 ku kacayo 2.5 jibbaar iyada oo aan faa\'iido la cabbiri karo lahayn. Ka hooseeya 10 recall-ku hoos u dhacaa. Qiimaha wuxuu kordhaa si toosan la qiimahan.';
 $string['settings:stt_selfhosted_heading'] = 'Turjumaadda is-martigeliya (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Ku socodsii speech-to-text hardware-kaaga gaar ah iyada oo aan qiime daqiiqad ah la bixin. [[tutorshort]] u tilmaan server kasta oo turjumaad ah oo la mid ah OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper), ama server <code>whisper.cpp</code>. Marka URL server halkan la dejiyay, waxay noqotaa wadada STT ee caadiga ah; dooro bixiye lacag-bixinta ah Bixiyaha STT Firfircoon ee sare si aad u beddesho. Haddii server-ku ku yihiin shabakad gaar ah ama plain http, sidoo kale ku dar host-kiisa liiska la-aaminaanta ee SSRF ee qaybta Ammaanka.';
 $string['settings:stt_selfhosted_url'] = 'URL-ka server-ka STT ee is-martigeliya';
@@ -1710,3 +1710,13 @@ $string['outcomes:col_met'] = 'Buuxiyay cabbiraadda';
 $string['outcomes:col_pct'] = 'Boqolkiiba la buuxiyay';
 $string['outcomes:footnote'] = 'Ardayda la qiimeeyay waa kuwa ugu yaraan hal isku-day ku sameeyay natiijada. Guusha waxaa lagu soo warbixiyaa guud ahaan; horumarka shaqsiyeed weligeed lagama xannibo natiijo kasta oo keliya.';
 $string['outcomes:navlink'] = 'Warbixinta natiijooyinka';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Ma awoodo inaan ka caawiyo codsigaas. Aan ku noqonno koorsadaada: maxaad rabtaa inaad hadda ka shaqeyso?';
+$string['settings:rerank_margin_threshold'] = 'Xadka madmadowga dib-u-kala-saarista';
+$string['settings:rerank_margin_threshold_desc'] = 'Dib u kala saar oo keliya marka farqiga cosine ee u dhexeeya musharaxa koowaad iyo kan saddexaad ka hooseeyo qiimahan, taas oo ah marka soo-helitaanku madmadow yahay. Waxaa lagu qiyaasay 1,008 su\'aalood: qiimaha caadiga ah 0.086 wuxuu ka boodaa qiyaastii 30% su\'aalaha iyada oo aan lumin recall la cabbiri karo, waxaanna laga hortagaa xaaladaha uu dib-u-kala-saarintu ka riixdo natiijada koowaad oo horeyba u saxnayd. U dhig 0 si aad dib u kala saarto su\'aal kasta.';
+$string['rag_cap_blocked'] = 'Dejinta tusmada ma socon: xadka kharashka RAG ee muddadan waa la gaadhay. Kor u qaad xadka, ama sug muddada xigta. Tusmada jirta lama taabtin.';
+$string['settings:redash_export_window_days'] = 'Muddada dib-u-eegista dhoofinta (maalmo)';
+$string['settings:redash_export_window_days_desc'] = 'Ilaa intee dib u tegaa dhoofintu marka codsaduhu aanu soo dirin calaamadda waqtiga "since". Caadiga ah oo 90 maalmood ah wuxuu ka hor istaagaa il xogeed oo halkaas cabbirka ka tagay inay soo jiiddo saf kasta oo weligii duuban; codsaduhu wali wuxuu codsan karaa muddo gaar ah ama soo dirin karaa since=0 taariikhda oo dhan. U dhig 0 si taariikhda oo dhan mar kale caadi u noqoto.';
+$string['settings:redash_allow_deanonymized'] = 'U ogolow dhoofin aan qarsoonayn';
+$string['settings:redash_allow_deanonymized_desc'] = 'Waa la damiyay caadi ahaan. Marka la damiyo, codsi leh anonymize=0 waa la diidayaa, ardaydana waxay had iyo jeer u muuqdaan magacyo been abuur. Kaliya shid haddii warbixin dibadda ah runtii u baahan tahay magacyada dhabta ah, oo xusuuso in dhoofintu ay xaqiijiso furaha API la wadaagayo ee ma ahan maamule gal ah, sidaas darteed qof kasta oo furaha haysta wuxuu heli karaa magacyadaas. Labada xaaladdood, codsiyada aan qarsoonayn waxaa lagu diiwaan geliyaa hubinta oo ay weheliso cinwaanka IP ee codsaduhu.';

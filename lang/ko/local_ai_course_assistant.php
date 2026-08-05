@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = '기본값 <code>rerank-2.5</code>. 더 
 $string['settings:rerank_apibaseurl'] = '리랭크 API 기본 URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Voyage 리랭크 기본 URL을 재정의합니다. 비워 두면 위의 임베딩 API 기본 URL 또는 Voyage 기본값(<code>https://api.voyageai.com/v1</code>)을 사용합니다.';
 $string['settings:rerank_candidates'] = '리랭크 후보 창';
-$string['settings:rerank_candidates_desc'] = '리랭크 단계에 공급되는 코사인 상위 N 후보 수. 기본값 50. 창을 크게 하면 리랭커에게 더 많은 재료를 제공하지만 약간의 추가 비용이 발생합니다(리랭크 작업당 약 10k 토큰).';
+$string['settings:rerank_candidates_desc'] = '재순위 지정 단계로 전달되는 코사인 상위 N 후보 수입니다. 기본값 20. 1,008개 질의로 측정: 20은 재현율에서 30과 동등하며 (R@3 89.0% 대 89.3%) 비용은 3분의 1 낮고, 50은 2.5배 비용에도 측정 가능한 이득이 없습니다. 10 미만에서는 재현율이 떨어집니다. 비용은 이 값에 비례하여 증가합니다.';
 $string['settings:stt_selfhosted_heading'] = '자체 호스팅 음성 인식(Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = '분당 비용 없이 자체 하드웨어에서 음성 텍스트 변환을 실행합니다. OpenAI 호환 음성 인식 서버(<code>whisper-server</code> Docker, <code>speaches</code>(faster-whisper), 또는 <code>whisper.cpp</code> 서버)에 SOLA를 지정합니다. 여기에 서버 URL이 설정되면 기본 STT 경로가 됩니다. 위의 활성 STT 제공자에서 유료 제공자를 선택하면 재정의됩니다. 서버가 사설 네트워크 또는 일반 http에 있는 경우, 보안 섹션의 SSRF 신뢰할 수 있는 엔드포인트 허용 목록에 해당 호스트를 추가하십시오.';
 $string['settings:stt_selfhosted_url'] = '자체 호스팅 STT 서버 URL';
@@ -1699,3 +1699,13 @@ $string['outcomes:col_met'] = '기준 충족';
 $string['outcomes:col_pct'] = '충족 비율';
 $string['outcomes:footnote'] = '평가 대상 학생은 해당 성취목표에서 최소 한 번 이상 시도한 학생입니다. 성취도는 집계로 보고되며, 개인의 진도는 어떤 단일 성취목표에도 결코 좌우되지 않습니다.';
 $string['outcomes:navlink'] = '성취목표 보고서';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = '그 요청은 도와드릴 수 없습니다. 강좌로 돌아가 볼까요? 이제 어떤 것을 해보고 싶으신가요?';
+$string['settings:rerank_margin_threshold'] = '재순위 지정 모호성 임계값';
+$string['settings:rerank_margin_threshold_desc'] = '1위와 3위 후보 간 코사인 차이가 이 값보다 작을 때, 즉 검색 결과가 모호할 때만 재순위를 지정합니다. 1,008개 질의로 측정: 기본값 0.086에서는 약 30%의 질의를 건너뛰어도 재현율 손실이 측정되지 않으며, 이미 정확한 1위 결과가 재순위 지정으로 밀려나는 경우를 피할 수 있습니다. 모든 질의에 재순위를 지정하려면 0으로 설정하세요.';
+$string['rag_cap_blocked'] = '색인 작업이 실행되지 않았습니다. 이 기간의 RAG 지출 한도에 도달했습니다. 한도를 높이거나 다음 기간을 기다려 주세요. 기존 색인은 그대로 유지됩니다.';
+$string['settings:redash_export_window_days'] = '내보내기 조회 기간 (일)';
+$string['settings:redash_export_window_days_desc'] = '호출자가 "since" 타임스탬프를 전달하지 않을 때 내보내기가 거슬러 올라가는 범위입니다. 기본값 90일은 이 매개변수를 생략한 데이터 소스가 기록된 모든 행을 가져오는 것을 방지합니다. 호출자는 특정 기간을 요청하거나 전체 기간을 다시 가져오기 위해 since=0을 전달할 수 있습니다. 기본값을 다시 전체 기간으로 되돌리려면 0으로 설정하세요.';
+$string['settings:redash_allow_deanonymized'] = '비익명 내보내기 허용';
+$string['settings:redash_allow_deanonymized_desc'] = '기본적으로 꺼져 있습니다. 꺼져 있으면 anonymize=0 요청은 거부되고 학습자는 항상 가명으로 표시됩니다. 외부 보고서에 실제 이름이 정말 필요한 경우에만 켜 주세요. 내보내기는 로그인한 관리자가 아니라 공유 API 키로 인증하므로, 키를 가진 사람은 누구나 그 이름을 가져올 수 있습니다. 어느 경우든 비익명 요청은 요청한 IP 주소와 함께 감사 로그에 기록됩니다.';

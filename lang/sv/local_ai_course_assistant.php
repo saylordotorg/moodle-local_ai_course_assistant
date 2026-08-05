@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Standard <code>rerank-2.5</code>. Nyare
 $string['settings:rerank_apibaseurl'] = 'Re-ranker API-bas-URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Åsidosätter Voyage rerank-bas-URL. Lämna tomt för att använda Embedding API-bas-URL ovan eller Voyage-standard (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Re-ranker kandidatfönster';
-$string['settings:rerank_candidates_desc'] = 'Hur många kosinus top-N kandidater som matas in i re-rankningssteget. Standard 50. Större fönster ger re-rankern mer material att arbeta med till liten extra kostnad (~10k tokens per re-rankningsoperation).';
+$string['settings:rerank_candidates_desc'] = 'Hur många cosinus-topp-N-kandidater som går in i omrankningssteget. Standard 20. Mätt över 1 008 frågor: 20 motsvarar 30 i träffsäkerhet (R@3 89,0 % mot 89,3 %) till en tredjedel lägre kostnad, och 50 kostar 2,5 gånger mer utan mätbar vinst. Under 10 försämras träffsäkerheten. Kostnaden ökar linjärt med detta värde.';
 $string['settings:stt_selfhosted_heading'] = 'Självhostad transkription (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Kör speech-to-text på din egen hårdvara till noll kostnad per minut. Peka [[tutorshort]] mot valfri OpenAI-kompatibel transkriptionsserver: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper) eller <code>whisper.cpp</code>-server. När en server-URL anges här blir den den standard-STT-sökvägen; välj en betald leverantör i Aktiv STT-leverantör ovan för att åsidosätta. Om servern befinner sig i ett privat nätverk eller använder plain http, lägg även till dess värd i SSRF-listan för betrodda slutpunkter i avsnittet Säkerhet.';
 $string['settings:stt_selfhosted_url'] = 'Självhostad STT-server-URL';
@@ -1692,3 +1692,13 @@ $string['outcomes:col_met'] = 'Uppfyllde riktvärdet';
 $string['outcomes:col_pct'] = 'Procent som uppfyllde';
 $string['outcomes:footnote'] = 'Bedömda studenter är de med minst ett försök på lärandemålet. Uppnående rapporteras aggregerat; individuell progression begränsas aldrig av något enskilt lärandemål.';
 $string['outcomes:navlink'] = 'Lärandemålsrapport';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Jag kan inte hjälpa till med den förfrågan. Låt oss återgå till din kurs: vad vill du arbeta med nu?';
+$string['settings:rerank_margin_threshold'] = 'Tröskel för omrankningens tvetydighet';
+$string['settings:rerank_margin_threshold_desc'] = 'Omranka endast när cosinusmarginalen mellan den första och den tredje kandidaten ligger under detta värde, alltså när sökningen är tvetydig. Mätt över 1 008 frågor: vid standardvärdet 0,086 hoppas cirka 30 % av frågorna över utan mätbar förlust av träffsäkerhet, och fall undviks där omrankning tränger undan ett redan korrekt toppresultat. Ange 0 för att omranka varje fråga.';
+$string['rag_cap_blocked'] = 'Indexeringen kördes inte: RAG-utgiftstaket för den här perioden har nåtts. Höj taket eller vänta till nästa period. Det befintliga indexet lämnas orört.';
+$string['settings:redash_export_window_days'] = 'Exportens tillbakablicksfönster (dagar)';
+$string['settings:redash_export_window_days_desc'] = 'Hur långt tillbaka exporten sträcker sig när anroparen inte skickar någon tidsstämpel "since". Standardvärdet 90 dagar hindrar en datakälla som utelämnar parametern från att hämta varje rad som någonsin registrerats; anroparen kan fortfarande begära ett specifikt fönster eller skicka since=0 för en fullständig hämtning. Ange 0 för att göra hela historiken till standard igen.';
+$string['settings:redash_allow_deanonymized'] = 'Tillåt icke-anonymiserad export';
+$string['settings:redash_allow_deanonymized_desc'] = 'Av som standard. När den är av avvisas en förfrågan med anonymize=0 och deltagare visas alltid som pseudonymer. Slå bara på detta om en extern rapport verkligen behöver riktiga namn, och kom ihåg att exporten autentiseras med en delad API-nyckel och inte med en inloggad administratör, så den som har nyckeln kan hämta dessa namn. Icke-anonymiserade förfrågningar loggas i båda fallen tillsammans med den begärande IP-adressen.';

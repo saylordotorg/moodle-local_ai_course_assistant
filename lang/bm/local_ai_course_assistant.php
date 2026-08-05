@@ -1424,7 +1424,7 @@ $string['settings:rerank_model_desc'] = 'Sɔrɔminɛ <code>rerank-2.5</code>. Vo
 $string['settings:rerank_apibaseurl'] = 'Rerank API gɛrɛfɛ URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Voyage rerank gɛrɛfɛ URL lajɛ. Aw ye a to nɛgɛso ye walisa ka Embedding API Base URL min bɛ kɔrɔ ta, walima Voyage sɔrɔminɛ (<code>https://api.voyageai.com/v1</code>) ta.';
 $string['settings:rerank_candidates'] = 'Rerank kandida janfɛ';
-$string['settings:rerank_candidates_desc'] = 'Cosine top-N kandida joli bɛ taa rerank yɔrɔ ma. Sɔrɔminɛ 50. Janfɛ gɛlɛya bɛ reranker di ko nafolo caaman ka waati dɔ fara a kana (~10k tokens rerank kɛwale kelen na).';
+$string['settings:rerank_candidates_desc'] = 'Cosine top-N cɛbaga joli bɛ don sɛgɛsɛgɛli kokura yɔrɔ la. Fɔlɔ 20. A sumanna ɲininkali 1,008 kan: recall la, 20 ni 30 ye kelen ye (R@3 89.0% ni 89.3%), nka a musaka ka dɔgɔ ni tila saba la kelen ye; 50 musaka ka bon siɲɛ 2.5 nka nafa si tɛ min bɛ se ka sumanna. Ni a ka dɔgɔ ni 10 ye, recall bɛ jigin. Musaka bɛ bonya cɛsiri la ni nin hakɛ ye.';
 $string['settings:stt_selfhosted_heading'] = 'Kuma jɛfɛnni (Whisper) i yɛrɛ bolo sigilen';
 $string['settings:stt_selfhosted_heading_desc'] = 'Ka kuma-ka-sɛbɛn kɛwale i ka hardware yɛrɛ kan, miniti kɔnɔ sara foyi tɛ. [[tutorshort]] lajɛ OpenAI-jɛkulu sɛbɛnni server o o ma: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper), walima <code>whisper.cpp</code> server. Ni server URL setilen don yan, a bɛ kɛ STT yɔrɔ sɔrɔminɛ ye; ka mara don Active STT fɔbaa kɔrɔ walisa ka a lɔn. Ni server ka ɲɛ kan mara-bolo network walima http yɔrɔ la, a host fara SSRF trusted endpoints allowlist kan Security yɔrɔ la.';
 $string['settings:stt_selfhosted_url'] = 'I yɛrɛ bolo STT server URL';
@@ -1723,3 +1723,13 @@ $string['outcomes:col_met'] = 'Hakɛdama sɔrɔla';
 $string['outcomes:col_pct'] = 'Kɛmɛ min sɔrɔla';
 $string['outcomes:footnote'] = 'Kalanden jatelenw ye olu ye minnu ye ɲininkali kelen kɛ ɲɛtaa kan a dɔgɔyalenba. Ɲɛtaa sɔrɔ bɛ jira a lajɛlen na; mɔgɔ kelen-kelen ka taama tɛ sigi ɲɛtaa kelen si kan abada.';
 $string['outcomes:navlink'] = 'Ɲɛtaa rapɔɔri';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'N tɛ se ka dɛmɛ don o ɲininkali la. An ka segin i ka kalan kan: i b\'a fɛ ka baara kɛ min kan sisan?';
+$string['settings:rerank_margin_threshold'] = 'Sɛgɛsɛgɛli kokura ka jɛnɲɔgɔnya dan';
+$string['settings:rerank_margin_threshold_desc'] = 'Sɛgɛsɛgɛli kokura ka kɛ dɔrɔn ni cosine danfara min bɛ cɛ fɔlɔ ni sabanan cɛ ka dɔgɔ ni nin hakɛ ye, o kɔrɔ ye ko ɲininkali jaabi tɛ jɛlen. A sumanna ɲininkali 1,008 kan: hakɛ fɔlɔ 0.086 la, ɲininkali kɛmɛsarada 30 ɲɔgɔn tɛmɛ, recall bɔnɛ si tɛ min bɛ se ka sumanna, ani a bɛ kisi cogo minnu na sɛgɛsɛgɛli kokura bɛ jaabi fɔlɔ ɲuman bɔ a nɔ na. Segin ɲininkali bɛɛ kan, aw ka 0 sigi.';
+$string['rag_cap_blocked'] = 'Tɔgɔsɛbɛnni ma kɛ: RAG musaka dan min tun bɛ waati in na, o dafara. Aw ka dan in kɔrɔta, walima aw ka waati nata makɔnɔ. Tɔgɔsɛbɛn min bɛ yen, o tɛ yɛlɛma.';
+$string['settings:redash_export_window_days'] = 'Bɔli kɔsegin waati (tile)';
+$string['settings:redash_export_window_days_desc'] = 'Ni weleli baga ma waati taamasiyɛn "since" ci, bɔli bɛ segin kɔ fo yɔrɔ jumɛn. Fɔlɔ tile 90 bɛ kɛlɛ kɛ walisa kunnafoni sɔrɔyɔrɔ min bɛ nin paramɛtɛri to yen, o kana sɛbɛn bɛɛ sama min sɛbɛnna kabini fɔlɔ; weleli baga bɛ se ka waati kerenkerennen ɲini walima ka since=0 ci walisa ka tariku bɛɛ sɔrɔ. Ka tariku bɛɛ kɛ fɔlɔ ye kokura, aw ka 0 sigi.';
+$string['settings:redash_allow_deanonymized'] = 'Sɔn bɔli ma min tɛ tɔgɔ dogo';
+$string['settings:redash_allow_deanonymized_desc'] = 'A datugulen don fɔlɔ. Ni a datugulen don, weleli min bɛ ni anonymize=0 ye, o bɛ ban, ani kalandenw bɛ jira tɔgɔ wɛrɛ la tuma bɛɛ. Aw ka a daminɛ dɔrɔn ni kɛnɛma sɛbɛn dɔ mago bɛ tɔgɔ yɛrɛyɛrɛw la, ani aw ka miiri ko bɔli bɛ a yɛrɛ jira ni API kɔnnɛgɛ ye min bɛ tila, a tɛ kuntigi min donna, o de kosɔn mɔgɔ o mɔgɔ min bɛ ni kɔnnɛgɛ ye, o bɛ se ka o tɔgɔw sɔrɔ. Cogo fila bɛɛ la, weleli minnu tɛ tɔgɔ dogo, olu bɛ sɛbɛn kɔlɔsili la ni weleli baga ka IP ye.';

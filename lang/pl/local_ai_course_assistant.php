@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Domyślnie <code>rerank-2.5</code>. Now
 $string['settings:rerank_apibaseurl'] = 'Bazowy URL API re-rankera';
 $string['settings:rerank_apibaseurl_desc'] = 'Nadpisuje bazowy URL Voyage rerank. Zostaw puste, aby użyć bazowego URL API osadzania powyżej lub domyślnego Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Okno kandydatów re-rankera';
-$string['settings:rerank_candidates_desc'] = 'Ile kandydatów cosinusowych top-N trafia do etapu re-rankera. Domyślnie 50. Większe okna dają re-rankerowi więcej materiału przy niewielkim dodatkowym koszcie (~10k tokenów na operację re-rankingu).';
+$string['settings:rerank_candidates_desc'] = 'Ilu kandydatów cosinusowych top-N trafia do etapu ponownego rankingu. Domyślnie 20. Zmierzone na 1008 zapytaniach: 20 dorównuje 30 pod względem czułości (R@3 89,0 % wobec 89,3 %) przy koszcie mniejszym o jedną trzecią, a 50 kosztuje 2,5 raza więcej bez mierzalnego zysku. Poniżej 10 czułość spada. Koszt rośnie liniowo wraz z tą wartością.';
 $string['settings:stt_selfhosted_heading'] = 'Własna transkrypcja (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Uruchom speech-to-text na własnym sprzęcie bez kosztu za minutę. Wskaż [[tutorshort]] na dowolny serwer transkrypcji zgodny z OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper) lub serwer <code>whisper.cpp</code>. Gdy tu ustawiony jest URL serwera, staje się domyślną ścieżką STT; wybierz płatnego dostawcę w ustawieniu Aktywny dostawca STT powyżej, aby nadpisać. Jeśli serwer jest w sieci prywatnej lub plain http, dodaj jego host do listy zaufanych punktów końcowych SSRF w sekcji Bezpieczeństwo.';
 $string['settings:stt_selfhosted_url'] = 'URL serwera własnego STT';
@@ -1692,3 +1692,13 @@ $string['outcomes:col_met'] = 'Osiągnięto wartość odniesienia';
 $string['outcomes:col_pct'] = 'Procent osiągniętych';
 $string['outcomes:footnote'] = 'Ocenieni studenci to ci, którzy mają co najmniej jedną próbę dotyczącą danego efektu kształcenia. Osiągnięcia są raportowane zbiorczo; indywidualny postęp nigdy nie jest uzależniony od żadnego pojedynczego efektu kształcenia.';
 $string['outcomes:navlink'] = 'Raport efektów kształcenia';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Nie mogę pomóc w tej sprawie. Wróćmy do Twojego kursu: nad czym chcesz teraz pracować?';
+$string['settings:rerank_margin_threshold'] = 'Próg niejednoznaczności ponownego rankingu';
+$string['settings:rerank_margin_threshold_desc'] = 'Ponowny ranking tylko wtedy, gdy różnica cosinusowa między pierwszym i trzecim kandydatem jest mniejsza od tej wartości, czyli gdy wyszukiwanie jest niejednoznaczne. Zmierzone na 1008 zapytaniach: przy domyślnej wartości 0,086 pomijanych jest około 30 % zapytań bez mierzalnej utraty czułości, co pozwala uniknąć sytuacji, w których ponowny ranking usuwa już poprawny pierwszy wynik. Ustaw 0, aby przetwarzać każde zapytanie.';
+$string['rag_cap_blocked'] = 'Indeksowanie nie zostało wykonane: osiągnięto limit wydatków RAG na ten okres. Zwiększ limit lub poczekaj na następny okres. Istniejący indeks pozostaje bez zmian.';
+$string['settings:redash_export_window_days'] = 'Okno historyczne eksportu (dni)';
+$string['settings:redash_export_window_days_desc'] = 'Jak daleko wstecz sięga eksport, gdy wywołujący nie przekaże znacznika czasu „since”. Domyślne 90 dni zapobiega sytuacji, w której źródło danych pomijające ten parametr pobiera wszystkie kiedykolwiek zapisane wiersze; wywołujący nadal może wskazać konkretne okno lub przekazać since=0, aby pobrać całą historię. Ustaw 0, aby domyślnie ponownie eksportować całą historię.';
+$string['settings:redash_allow_deanonymized'] = 'Zezwól na eksport bez anonimizacji';
+$string['settings:redash_allow_deanonymized_desc'] = 'Domyślnie wyłączone. Gdy jest wyłączone, żądanie z anonymize=0 zostaje odrzucone, a uczący się zawsze występują pod pseudonimami. Włącz tę opcję tylko wtedy, gdy zewnętrzny raport rzeczywiście wymaga prawdziwych nazwisk, i pamiętaj, że eksport uwierzytelnia się wspólnym kluczem API, a nie zalogowanym administratorem, więc każdy, kto ma ten klucz, może pobrać te nazwiska. W obu przypadkach żądania bez anonimizacji są zapisywane w dzienniku audytu wraz z adresem IP.';

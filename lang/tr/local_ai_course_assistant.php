@@ -1394,7 +1394,7 @@ $string['settings:rerank_model_desc'] = 'Varsayılan <code>rerank-2.5</code>. Da
 $string['settings:rerank_apibaseurl'] = 'Rerank API temel URL\'si';
 $string['settings:rerank_apibaseurl_desc'] = 'Voyage yeniden sıralama temel URL\'sini geçersiz kılın. Yukarıdaki Gömme API Temel URL\'sini veya Voyage varsayılanını (<code>https://api.voyageai.com/v1</code>) kullanmak için boş bırakın.';
 $string['settings:rerank_candidates'] = 'Yeniden sıralama aday penceresi';
-$string['settings:rerank_candidates_desc'] = 'Yeniden sıralama aşamasına kaç kosinüs top-N adayının besleneceği. Varsayılan 50. Daha büyük pencereler, yeniden sıralayıcıya küçük bir ek maliyetle (yeniden sıralama işlemi başına yaklaşık 10k token) daha fazla çalışma materyali sağlar.';
+$string['settings:rerank_candidates_desc'] = 'Yeniden sıralama aşamasına kaç kosinüs top-N adayının gireceği. Varsayılan 20. 1.008 sorgu üzerinde ölçüldü: 20, anma açısından 30\'a denk (R@3 %89,0 ile %89,3) ve üçte bir daha az maliyetli; 50 ise ölçülebilir bir kazanç sağlamadan 2,5 kat pahalı. 10\'un altında anma bozulur. Maliyet bu değerle doğrusal olarak artar.';
 $string['settings:stt_selfhosted_heading'] = 'Kendi barındırılan transkripsiyon (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Kendi donanımınızda dakika başına sıfır maliyetle metne dönüştürme çalıştırın. [[tutorshort]]\'yı herhangi bir OpenAI uyumlu transkripsiyon sunucusuna yönlendirin: <code>whisper-server</code> Docker, <code>speaches</code> (faster-whisper) veya <code>whisper.cpp</code> sunucusu. Burada bir sunucu URL\'si ayarlandığında varsayılan STT yolu olur; geçersiz kılmak için yukarıdaki Aktif STT sağlayıcısında ücretli bir sağlayıcı seçin. Sunucu özel bir ağda veya düz http üzerindeyse, Güvenlik bölümündeki SSRF güvenilir uç nokta allowlist\'ine host\'unu da ekleyin.';
 $string['settings:stt_selfhosted_url'] = 'Selfhosted STT sunucu URL\'si';
@@ -1706,3 +1706,13 @@ $string['outcomes:col_met'] = 'Kıyas ölçütünü karşılayan';
 $string['outcomes:col_pct'] = 'Karşılama yüzdesi';
 $string['outcomes:footnote'] = 'Değerlendirilen öğrenciler, kazanımda en az bir denemesi olanlardır. Başarı, toplu olarak raporlanır; bireysel ilerleme hiçbir zaman tek bir kazanıma bağlı tutulmaz.';
 $string['outcomes:navlink'] = 'Kazanımlar raporu';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Bu istekte yardımcı olamam. Dersinize dönelim: şimdi ne üzerinde çalışmak istersiniz?';
+$string['settings:rerank_margin_threshold'] = 'Yeniden sıralama belirsizlik eşiği';
+$string['settings:rerank_margin_threshold_desc'] = 'Yalnızca birinci ve üçüncü aday arasındaki kosinüs farkı bu değerin altındayken, yani getirme belirsizken yeniden sırala. 1.008 sorgu üzerinde ölçüldü: varsayılan 0,086 değerinde sorguların yaklaşık %30\'u ölçülebilir bir anma kaybı olmadan atlanır ve yeniden sıralamanın hâlihazırda doğru olan ilk sonucu geri ittiği durumlar önlenir. Her sorguyu yeniden sıralamak için 0 girin.';
+$string['rag_cap_blocked'] = 'Dizin oluşturma çalışmadı: bu dönem için RAG harcama sınırına ulaşıldı. Sınırı yükseltin veya bir sonraki dönemi bekleyin. Mevcut dizin olduğu gibi bırakılır.';
+$string['settings:redash_export_window_days'] = 'Dışa aktarma geriye dönük penceresi (gün)';
+$string['settings:redash_export_window_days_desc'] = 'Çağıran taraf bir "since" zaman damgası göndermediğinde dışa aktarmanın ne kadar geriye gideceği. Varsayılan 90 gün, parametreyi atlayan bir veri kaynağının kaydedilmiş her satırı çekmesini engeller; çağıran taraf yine belirli bir pencere isteyebilir veya tüm geçmişi almak için since=0 gönderebilir. Varsayılanı yeniden tüm geçmiş yapmak için 0 girin.';
+$string['settings:redash_allow_deanonymized'] = 'Anonimleştirilmemiş dışa aktarmaya izin ver';
+$string['settings:redash_allow_deanonymized_desc'] = 'Varsayılan olarak kapalı. Kapalıyken anonymize=0 isteği reddedilir ve öğrenenler her zaman takma adla görünür. Bunu yalnızca harici bir raporun gerçekten gerçek adlara ihtiyacı varsa açın ve dışa aktarmanın oturum açmış bir yönetici yerine paylaşılan bir API anahtarıyla kimlik doğruladığını unutmayın: anahtara sahip olan herkes bu adları alabilir. Her durumda anonimleştirilmemiş istekler, isteği yapan IP adresiyle birlikte denetim günlüğüne kaydedilir.';

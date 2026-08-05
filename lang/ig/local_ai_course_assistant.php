@@ -1411,7 +1411,7 @@ $string['settings:rerank_model_desc'] = 'Ndabara <code>rerank-2.5</code>. Enwere
 $string['settings:rerank_apibaseurl'] = 'URL Ntọala API Rerank';
 $string['settings:rerank_apibaseurl_desc'] = 'Gbanwee URL ntọala Voyage rerank. Hapụ ọcha iji URL Ntọala API Embedding dị n\'elu, ma ọ bụ ndabara Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Windo kandideti Rerank';
-$string['settings:rerank_candidates_desc'] = 'Ọtụtụ kandideti N kacha mma cosine na-agọzi ọkwa rerank. Ndabara 50. Windo ndị na-abawanye na-enye reranker ihe ọzọ iji rụọ ọrụ na obere ọnụahịa ọzọ (tokens 10k kwa ọrụ rerank).';
+$string['settings:rerank_candidates_desc'] = 'Ole ndị a na-atụ aro cosine top-N na-abanye n\'ọkwa ịhazigharị. Ndabara 20. E tụrụ ya na ajụjụ 1,008: 20 hà 30 na recall (R@3 89.0% na 89.3%) na ọnụahịa dị ala otu ụzọ n\'ụzọ atọ, ebe 50 na-efu ugboro 2.5 na-enweghị uru a pụrụ ịtụ. N\'okpuru 10, recall na-adalata. Ọnụahịa na-abawanye kwụ ọtọ na uru a.';
 $string['settings:stt_selfhosted_heading'] = 'Ntranscription nke onwe na-akwado (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'Gbaa olu-na-ederede na ngwaọrụ nke gị n\'enweghị ọnụahịa kwa nkeji. Tụọ [[tutorshort]] n\'ọnọdụ ọ bụla nke transcription nke kwekọrọ na OpenAI: Docker <code>whisper-server</code>, <code>speaches</code> (faster-whisper), ma ọ bụ ọnọdụ <code>whisper.cpp</code>. Mgbe URL ọnọdụ atọrọ ebe a ọ bụrụ ụzọ STT ndabara; họọ onye na-enye ụgwọ na ntọala Onye na-enye STT dị n\'elu iji gbanwee ya. Ọ bụrụ na ọnọdụ ahụ dị n\'achịcha naanị ma ọ bụ http dị mfe, tinye yana ọkpụkpọ ya na ndepụta onye atọ n\'obi SSRF na ngalaba Nchedo.';
 $string['settings:stt_selfhosted_url'] = 'URL Ọnọdụ STT nke Onwe Na-akwado';
@@ -1709,3 +1709,13 @@ $string['outcomes:col_met'] = 'Ruru nhọ';
 $string['outcomes:col_pct'] = 'Pasent ruru';
 $string['outcomes:footnote'] = 'Ụmụ akwụkwọ a nyochara bụ ndị nwere opekata mpe otu mgbalị na nsonaazụ ahụ. A na-akọ mmezu n\'ọnụọgụgụ; a naghị egbochi ọganihu onye ọ bụ na otu nsonaazụ ọ bụla.';
 $string['outcomes:navlink'] = 'Akụkọ nsonaazụ';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'Enweghị m ike inye aka na arịrịọ ahụ. Ka anyị laghachi na kọọsụ gị: gịnị ka ị chọrọ ịrụ ugbu a?';
+$string['settings:rerank_margin_threshold'] = 'Oke enweghị nkọwa doro anya maka ịhazigharị';
+$string['settings:rerank_margin_threshold_desc'] = 'Hazigharịa naanị mgbe ọdịiche cosine dị n\'etiti onye mbụ na onye nke atọ dị n\'okpuru uru a, ya bụ mgbe nchọta enweghị nkọwa doro anya. E tụrụ ya na ajụjụ 1,008: na uru ndabara 0.086, a na-agafe ihe dịka pasent 30 nke ajụjụ na-enweghị mfu recall a pụrụ ịtụ, ma na-ezere ọnọdụ ebe ịhazigharị na-ewepụ nsonaazụ mbụ nke dịzi mma. Tinye 0 iji hazigharịa ajụjụ ọ bụla.';
+$string['rag_cap_blocked'] = 'Emeghị ndeksi: eruola oke mmefu RAG maka oge a. Bulie oke ahụ, ma ọ bụ chere oge ọzọ. A na-ahapụ ndeksi dị ugbu a ka ọ dị.';
+$string['settings:redash_export_window_days'] = 'Oge azụ nke mbupụ (ụbọchị)';
+$string['settings:redash_export_window_days_desc'] = 'Ruo ebe mbupụ na-alaghachi azụ mgbe onye na-akpọ ozi ezighị akara oge "since". Ndabara ụbọchị 90 na-egbochi ebe data nke hapụrụ paramita a ịdọrọ ahịrị ọ bụla e dekọtara; onye na-akpọ ka nwere ike ịrịọ oge ụfọdụ ma ọ bụ zipu since=0 maka akụkọ ntolite dum. Tinye 0 ka akụkọ ntolite dum bụrụ ndabara ọzọ.';
+$string['settings:redash_allow_deanonymized'] = 'Kwe ka mbupụ na-egosi aha';
+$string['settings:redash_allow_deanonymized_desc'] = 'Agbanyụrụ ya na ndabara. Mgbe agbanyụrụ ya, a na-ajụ arịrịọ nwere anonymize=0 ma ndị na-amụ ihe na-apụta mgbe niile n\'aha nzuzo. Gbanye ya naanị ma ọ bụrụ na akụkọ mpụga chọrọ aha ezi uche n\'ezie, ma cheta na mbupụ na-eji igodo API a na-ekekọrịta gosipụta onwe ya, ọ bụghị onye nchịkwa banyere, ya mere onye ọ bụla ji igodo ahụ nwere ike inweta aha ndị ahụ. N\'ọnọdụ abụọ ahụ, a na-edekọ arịrịọ na-egosi aha na nyocha tinyere adreesị IP nke onye rịọrọ.';
