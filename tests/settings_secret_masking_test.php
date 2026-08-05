@@ -44,7 +44,12 @@ final class settings_secret_masking_test extends \advanced_testcase {
     /**
      * Setting-name fragments that indicate a stored credential.
      */
-    private const SECRET_HINTS = ['apikey', 'api_key', 'secret', 'token', 'password'];
+    // 'key' is deliberately broader than 'apikey'/'api_key': soapbox_storage_key
+    // is an IAM access key ID and was a plain configtext, and none of the narrower
+    // hints matched it, so the first version of this guard walked straight past a
+    // credential it existed to catch. The bare hint flags exactly one non-secret,
+    // policy_bundle_pubkey, which is already exempted below.
+    private const SECRET_HINTS = ['apikey', 'api_key', 'key', 'secret', 'token', 'password'];
 
     /**
      * Names that match a hint but are NOT credentials, with the reason.

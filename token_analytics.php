@@ -62,7 +62,12 @@ if ($courseid > 0) {
     $params['courseid'] = $courseid;
 }
 
-$msgwhere = "m.role = 'assistant' AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}";
+// Billable rows, not just chat replies. The category breakdown below was fixed in
+// v6.1.0 to include the role='system' cost-log rows, but this clause (which drives
+// the per-model table and the totals) still said role='assistant', so two figures
+// on the same screen counted different populations and could not be reconciled.
+$msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
+    . " AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}";
 
 // ── Query 0: Per-category breakdown (Chat / Voice / RAG / Analytics) ──────────
 // Maps the per-message `interaction_type` field into a single admin-facing
@@ -213,7 +218,10 @@ foreach ($bystudent as $row) {
 
 // ── Query 3: Missing-data audit ───────────────────────────────────────────────
 
-$missingwhere = "m.role = 'assistant' AND m.model_name IS NULL{$timewhere}{$coursewhere}";
+// Same population as the spend tables above, so "calls we could not price" counts
+// every billable row missing a model rather than only chat replies.
+$missingwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
+    . " AND m.model_name IS NULL{$timewhere}{$coursewhere}";
 $missingcount = (int) $DB->count_records_sql(
     "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m WHERE {$missingwhere}",
     $params

@@ -57,8 +57,13 @@ class run_anomaly_digest extends \core\task\scheduled_task {
 
         // Token spend: 24h vs prior 24h.
         $tok = $this->compare_metric_change(
-            "SELECT COALESCE(SUM(COALESCE(prompt_tokens,0)+COALESCE(completion_tokens,0)),0) "
-            . "FROM {local_ai_course_assistant_msgs} WHERE role='assistant' AND timecreated >= ? AND timecreated < ?",
+            // Billable rows via the shared predicate, so background RAG spend is
+            // counted. Both windows of the comparison use this same SQL, so the
+            // day-over-day baseline moves with it.
+            "SELECT COALESCE(SUM(COALESCE(m.prompt_tokens,0)+COALESCE(m.completion_tokens,0)),0) "
+            . "FROM {local_ai_course_assistant_msgs} m WHERE "
+            . \local_ai_course_assistant\analytics::spend_rows_predicate('m')
+            . " AND m.timecreated >= ? AND m.timecreated < ?",
             86400, $threshold);
         if ($tok !== null) {
             $alerts[] = "Token spend up {$tok['pct']}% day-over-day ({$tok['recent']} vs {$tok['prior']} prior).";

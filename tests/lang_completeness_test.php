@@ -157,4 +157,71 @@ final class lang_completeness_test extends \basic_testcase {
                 . implode("\n  - ", $report));
         }
     }
+
+    /**
+     * English keys that are knowingly not translated yet.
+     *
+     * The pre-7.0.0 audit found the plugin was 8 keys short of the 46/46 parity
+     * the docs claim, and nothing detected it: the test above only proves a
+     * referenced key exists in English, so a new English-only string was invisible.
+     *
+     * This list is the debt, not an exemption. Removing an entry is what a
+     * translation batch does. Adding one should be a deliberate, reviewed act,
+     * because the parity test below fails the moment an unlisted key appears in
+     * English without translations, which is the drift that went unnoticed.
+     */
+    private const KNOWN_UNTRANSLATED = [
+        'chat:refused',
+        'settings:rerank_margin_threshold',
+        'settings:rerank_margin_threshold_desc',
+        'rag_cap_blocked',
+        'settings:redash_export_window_days',
+        'settings:redash_export_window_days_desc',
+        'settings:redash_allow_deanonymized',
+        'settings:redash_allow_deanonymized_desc',
+    ];
+
+    /**
+     * Keys defined in a locale file.
+     *
+     * @param string $lang locale directory name.
+     * @return array<string, true>
+     */
+    private function locale_keys(string $lang): array {
+        $path = $this->plugin_root() . '/lang/' . $lang . '/local_ai_course_assistant.php';
+        if (!file_exists($path)) {
+            return [];
+        }
+        $string = [];
+        include($path);
+        return $string;
+    }
+
+    public function test_translation_parity_has_not_regressed(): void {
+        $en = array_keys($this->load_en_strings());
+        $locales = array_filter(scandir($this->plugin_root() . '/lang'),
+            fn($d) => $d !== '.' && $d !== '..' && $d !== 'en');
+        $this->assertGreaterThan(40, count($locales), 'expected the full locale set');
+
+        $unexpected = [];
+        foreach ($locales as $lang) {
+            $keys = $this->locale_keys($lang);
+            foreach ($en as $key) {
+                if (!array_key_exists($key, $keys)
+                        && !in_array($key, self::KNOWN_UNTRANSLATED, true)) {
+                    $unexpected[$key][] = $lang;
+                }
+            }
+        }
+
+        if (!empty($unexpected)) {
+            $report = [];
+            foreach ($unexpected as $key => $langs) {
+                $report[] = $key . ' (missing from ' . count($langs) . ' locales)';
+            }
+            $this->fail("English strings with no translations, and not listed in "
+                . "KNOWN_UNTRANSLATED. Either translate them or add them to that "
+                . "list deliberately:\n  - " . implode("\n  - ", $report));
+        }
+    }
 }

@@ -40,6 +40,15 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Algorithm: compute today's site-wide SOLA spend in USD by aggregating
  * tokens from `local_ai_course_assistant_msgs` × `token_cost_manager`
+ * Counts every billable row via analytics::spend_rows_predicate(), so background
+ * RAG spend (embedding + rerank, written with role='system') is included. It used
+ * to filter role='assistant' inline, which meant a runaway reindex -- precisely
+ * the runaway this detector exists to catch -- was invisible to it.
+ *
+ * Changing that population does not produce a spurious first alert: today's
+ * figure and each of the prior 7 days come from this same method, so the median
+ * moves with the numerator rather than being a stored baseline.
+ *
  * rates. Compute the same for each of the prior 7 days. Take the median
  * of the prior 7 days. If today exceeds MULTIPLIER × median, emit an
  * alert email to the `spend_notify_emails` recipient list (falling back
@@ -89,7 +98,7 @@ class cost_anomaly_detector {
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion
                FROM {local_ai_course_assistant_msgs} m
-              WHERE m.role = 'assistant'
+              WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :daystart
                 AND m.timecreated <  :dayend
@@ -129,7 +138,7 @@ class cost_anomaly_detector {
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion
                FROM {local_ai_course_assistant_msgs} m
-              WHERE m.role = 'assistant'
+              WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :daystart
                 AND m.timecreated <  :dayend

@@ -19,6 +19,40 @@ Nothing found here argues against shipping the code; the issues are that one
 shipped artifact does not match its source, and that the release checklist has
 not been run.
 
+## Status as of the follow-up pass (same day)
+
+| Item | Status |
+|---|---|
+| B1 stale `sse_client` bundle | **fixed**, rebuilt and caps verified present |
+| B2 release checklist | **open**, needs the version decision and the manual smoke |
+| M1 anomaly detector blind to RAG | **fixed** |
+| M2 `soapbox_storage_key` cleartext | **fixed**, plus the guard gap that hid it |
+| M3 i18n 8 keys short | **guarded, not translated** (360 strings, see below) |
+| M4 auto-refresh outranks curated rates | **no change**, informational by design |
+| L1 token analytics panels disagree | **fixed** |
+| L2 untested risk classes | **partly fixed**, `anonymizer` + `digest_unsubscribe_token` now tested |
+| L3 projection window bound | **fixed** |
+
+Correction to M1 as originally written below: it said changing the population
+needed a decision because the first comparison after upgrade might fire a spurious
+alert. That was wrong. `spend_for_day()` is called for today and for each of the
+prior 7 days, and there is no persisted baseline, so the median moves with the
+numerator. The fix is safe to apply directly, and was.
+
+M3 is guarded rather than fixed. The 8 keys are 1,436 characters of English, so
+translating them into the 45 non-English locales is 360 strings and roughly 65,000
+characters. Rather than do that at low quality inside an unrelated pass,
+`lang_completeness_test` gained a `KNOWN_UNTRANSLATED` list and a parity test: the
+existing 8 are enumerated as debt, and any *new* English-only string now fails the
+suite. Verified by adding a probe key, which failed with "missing from 45 locales".
+The translation batch remains outstanding and matches the repo's existing pattern
+of doing i18n catch-up as its own release item (v6.3.0 did 100 keys that way).
+
+L2 is partly addressed: `anonymizer` (39 lines, load-bearing for every PII gate)
+and `digest_unsubscribe_token` (the only control on unauthenticated unsubscribe
+links) now have tests, 15 between them. `integrity_checker` (538 lines),
+`rate_limiter` and `rate_card_refresher` remain untested.
+
 ---
 
 ## Blockers

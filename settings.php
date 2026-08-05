@@ -1644,12 +1644,17 @@ if ($hassiteconfig) {
         'soapbox/',
         PARAM_TEXT
     ));
-    $settings->add(new admin_setting_configtext(
+    // Password type, not configtext: this is half of an IAM credential pair, and
+    // Moodle only writes '********' into config_log for password settings. As
+    // configtext, every access key ID ever saved stayed readable in mdl_config_log,
+    // which is never purged. Its sibling soapbox_storage_secret was already
+    // declared correctly; this one was missed, the same way redash_api_key was.
+    // (configpasswordunmask takes no paramtype argument; it forces PARAM_RAW.)
+    $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/soapbox_storage_key',
         'Soapbox storage access key ID',
         'Access key ID for an IAM principal limited to PutObject/GetObject/DeleteObject on the prefix above.',
-        '',
-        PARAM_RAW_TRIMMED
+        ''
     ));
     $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/soapbox_storage_secret',

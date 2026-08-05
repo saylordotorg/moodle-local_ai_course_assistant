@@ -231,10 +231,14 @@ class llm_optimizer {
         global $DB, $CFG;
 
         $since = time() - 30 * 86400;
+        // Same population as the spend this projects from. With role='assistant'
+        // here, a site whose RAG spend predates its first chat message got a
+        // window shorter than the data it was extrapolating.
         $earliest = (int) ($DB->get_field_sql(
-            "SELECT MIN(timecreated)
-               FROM {local_ai_course_assistant_msgs}
-              WHERE role = 'assistant' AND timecreated >= :since",
+            "SELECT MIN(m.timecreated)
+               FROM {local_ai_course_assistant_msgs} m
+              WHERE " . analytics::spend_rows_predicate('m') . "
+                AND m.timecreated >= :since",
             ['since' => $since]) ?: time());
         $days = max(1, (int) floor((time() - $earliest) / 86400));
 
