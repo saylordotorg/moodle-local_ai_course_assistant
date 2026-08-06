@@ -14,6 +14,12 @@ test and not a load test.
 
 ## Verdict
 
+> **Shipped as 6.9.5, not 7.0.0.** Tom's call, 5 August 2026. The filename is left
+> as written. The breaking export changes that motivated the major-bump
+> recommendation are instead called out at the top of the v6.9.5 release notes and
+> changelog entry, since a patch number does not signal them.
+
+
 **Not ready to tag.** Two blockers, both mechanical rather than architectural.
 Nothing found here argues against shipping the code; the issues are that one
 shipped artifact does not match its source, and that the release checklist has

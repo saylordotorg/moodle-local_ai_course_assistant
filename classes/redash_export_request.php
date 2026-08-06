@@ -17,7 +17,7 @@
 namespace local_ai_course_assistant;
 
 /**
- * Request shaping for the Redash analytics export endpoint (v6.8.6).
+ * Request shaping for the Redash analytics export endpoint (v6.9.5).
  *
  * `redash_export.php` used to emit every section on every call, over all of
  * time, and let any holder of the API key de-anonymize the payload. All three
