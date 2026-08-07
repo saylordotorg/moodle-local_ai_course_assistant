@@ -159,6 +159,53 @@ final class redash_export_request_test extends \advanced_testcase {
         $this->assertSame($now - (7 * DAYSECS), redash_export_request::resolve_since(-1, $now));
     }
 
+    public function test_nested_sections_without_their_parent_are_reported(): void {
+        // student_usage and hotspots are built inside the per-course walk, which
+        // only runs when `courses` is selected. Asking for one alone used to
+        // return 200 with no learner rows: a silent empty payload, which is the
+        // failure mode the unknown-section 400 exists to prevent.
+        $this->assertSame(['student_usage' => 'courses'],
+            redash_export_request::missing_parents(['student_usage']));
+        $this->assertSame(['hotspots' => 'courses'],
+            redash_export_request::missing_parents(['hotspots']));
+        $this->assertSame(['student_usage' => 'courses', 'hotspots' => 'courses'],
+            redash_export_request::missing_parents(['student_usage', 'hotspots']));
+    }
+
+    public function test_nested_sections_with_their_parent_are_fine(): void {
+        $this->assertSame([], redash_export_request::missing_parents(['courses', 'student_usage']));
+        $this->assertSame([], redash_export_request::missing_parents(['courses', 'hotspots']));
+        $this->assertSame([],
+            redash_export_request::missing_parents(['courses', 'student_usage', 'hotspots']));
+    }
+
+    public function test_top_level_sections_need_no_parent(): void {
+        // Only the two nested blocks have a parent requirement; nothing else
+        // should be caught by it.
+        $this->assertSame([], redash_export_request::missing_parents(['feedback']));
+        $this->assertSame([], redash_export_request::missing_parents(['token_costs', 'meta_ai']));
+        $this->assertSame([], redash_export_request::missing_parents([]));
+    }
+
+    public function test_the_default_full_section_list_has_no_missing_parents(): void {
+        // The backward-compatible "everything" case must never trip the 400.
+        $this->assertSame([],
+            redash_export_request::missing_parents(redash_export_request::SECTIONS));
+        $this->assertSame([],
+            redash_export_request::missing_parents(redash_export_request::parse_sections('')));
+        $this->assertSame([],
+            redash_export_request::missing_parents(redash_export_request::parse_sections('all')));
+    }
+
+    public function test_every_nested_section_names_a_real_parent(): void {
+        // Guards the constant itself: a typo in either side would make the check
+        // either unreachable or permanently failing.
+        foreach (redash_export_request::NESTED_SECTIONS as $child => $parent) {
+            $this->assertContains($child, redash_export_request::SECTIONS);
+            $this->assertContains($parent, redash_export_request::SECTIONS);
+        }
+    }
+
     public function test_anonymized_identity_never_includes_a_real_id(): void {
         // The leak this replaced: student_usage emitted the real userid next to
         // the pseudonym, and learning_radar_queries emitted it unconditionally.

@@ -126,6 +126,24 @@ if (empty($sections)) {
     ]);
     exit;
 }
+// `student_usage` and `hotspots` live inside a course row, so they are only built
+// during the per-course walk. Requested without `courses`, they used to return a
+// 200 carrying no learner rows at all, which is exactly the quiet-wrong-answer
+// this endpoint refuses to give for an unknown section name. Same treatment: say
+// what is missing rather than hand back an empty payload.
+$missingparents = redash_export_request::missing_parents($sections);
+if (!empty($missingparents)) {
+    http_response_code(400);
+    echo json_encode([
+        'error' => 'Nested sections require their parent section',
+        'requires' => $missingparents,
+        'hint' => 'Add the parent, for example sections='
+            . implode(',', array_unique(array_merge(
+                array_values($missingparents), array_keys($missingparents)))),
+    ]);
+    exit;
+}
+
 $wants = function(string $section) use ($sections): bool {
     return in_array($section, $sections, true);
 };

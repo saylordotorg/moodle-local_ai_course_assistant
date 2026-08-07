@@ -161,9 +161,11 @@ Tabs: Chat, Voice (`{{#voicetabenabled}}`), History, Progress. **Re-clicking the
 **CRITICAL: Always rebuild AMD build files after any JS change.**
 Moodle serves `amd/build/*.min.js`, NOT the source files in `amd/src/`. Changes to source files have no effect until rebuilt.
 
+The paths below point at the canonical `ai-projects/` repo. Until 6.9.5 they pointed at the stale `aicoursetutor/` tree that the Project Overview above tells you never to deploy from, which is the most plausible reason `amd/build/sse_client.min.js` sat two months behind its source and shipped without the v5.5.4 SSE hardening: following this block rebuilt an abandoned copy, so the canonical bundle never changed. Verify a rebuild by grepping the built file for a distinctive string from your change, and compare src/build staleness with `git log -1 --format=%ct --` on each file rather than with mtimes, which are meaningless in a fresh checkout.
+
 ### Rebuild JS (terser required):
 ```bash
-BASE="/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor/ai_course_assistant"
+BASE="/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant"
 for f in chat ui quiz speech repository sse_client markdown audio_player realtime; do
   terser "$BASE/amd/src/${f}.js" --compress --mangle \
     --source-map "url=${f}.min.js.map" \
@@ -174,7 +176,7 @@ Only rebuild the files you actually changed to save time.
 
 ### Build zip (must use Python subprocess — `!` in path causes zsh history expansion):
 ```python
-python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/create_fixed_zip.sh'], cwd=os.path.expanduser('~/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor'), capture_output=True)"
+python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/create_fixed_zip.sh'], cwd=os.path.expanduser('~/Library/CloudStorage/Dropbox/!Saylor/ai-projects'), capture_output=True)"
 ```
 
 ---
@@ -194,7 +196,7 @@ Then carry forward Part 2 (Key Features) and Part 3 (Admin Walkthrough) from the
 1. `python3 scripts/new_release_notes.py --version <N>` and fill the TODOs.
 2. Bump `version.php` (`$plugin->version` and `$plugin->release`).
 3. Update `.wiki/Changelog.md`.
-4. Run i18n sync, PHP lint, jailbreak test (32/32), validator suite: `php admin/cli/run_validators.php` (must be 0 failures).
+4. Run i18n sync, PHP lint, the jailbreak suite (gate on **0 FAIL and 0 ERROR**, not on a pass-rate: 32/32 is reproducible on `openai`/`gpt-4o-mini` but the production `gemini-2.5-flash` scores in the 24-27 PASS range with the remainder as REVIEW, which only means no pass-indicator regex matched), validator suite: `php admin/cli/run_validators.php` (must be 0 failures).
 5. Run the manual smoke checklist (`.wiki/Release-Checklist.md`) on local Moodle. Critical path takes ~5 minutes and catches the runtime UI bugs static checks can't.
 6. Commit plugin + wiki, tag `v<N>`, push, `gh release create` using the `.drafts/` file as the body source.
 7. `python3 deploy_dev.py --target all` and verify BUS101 smoke on all 5 dev sites.
@@ -224,7 +226,7 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
 ### Deploy to local Moodle:
 ```bash
 rsync -a --exclude=.git \
-  "/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor/ai_course_assistant/" \
+  "/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/" \
   ~/Sites/moodle/local/ai_course_assistant/
 ```
 

@@ -58,6 +58,36 @@ final class redash_export_request {
     public const DEFAULT_WINDOW_DAYS = 90;
 
     /**
+     * Sections that are nested inside a `courses` row, mapped to their parent.
+     *
+     * These are not top-level keys in the response: they are built during the
+     * per-course walk, which only runs when `courses` is selected. Asking for one
+     * without its parent therefore produced a 200 with no learner rows at all,
+     * which is the silent-empty-payload failure this endpoint otherwise goes out
+     * of its way to avoid. `missing_parents()` turns it into a 400.
+     */
+    public const NESTED_SECTIONS = [
+        'student_usage' => 'courses',
+        'hotspots' => 'courses',
+    ];
+
+    /**
+     * Nested sections requested without the parent that carries them.
+     *
+     * @param array $sections Already-parsed section list.
+     * @return array Map of requested nested section => required parent section.
+     */
+    public static function missing_parents(array $sections): array {
+        $missing = [];
+        foreach (self::NESTED_SECTIONS as $child => $parent) {
+            if (in_array($child, $sections, true) && !in_array($parent, $sections, true)) {
+                $missing[$child] = $parent;
+            }
+        }
+        return $missing;
+    }
+
+    /**
      * Resolve the `sections` parameter into an ordered allow-list.
      *
      * An absent or empty parameter keeps the historical behaviour and returns

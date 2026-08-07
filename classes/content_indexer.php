@@ -288,7 +288,15 @@ class content_indexer {
                     'contenthash' => $chunk['contenthash'],
                 ], 'id, embedding');
                 if ($existing && !empty($existing->embedding)) {
-                    // Re-insert with same data.
+                    // WARNING, do not enable this path without rewriting it. It is
+                    // currently unreachable: the only caller of index_module() is
+                    // the auto_reindex_rag_drifted task, which passes $force=true.
+                    // As written it would fail or insert a broken row, because the
+                    // record was selected as 'id, embedding' only, so courseid,
+                    // modtype, content, contenthash and timecreated (all NOT NULL)
+                    // are absent, and embedding_bin would be dropped as well. Left
+                    // as-is rather than half-fixed, since deciding what a reuse
+                    // path should copy is a real change, not a tidy-up.
                     $existing->cmid       = $cmid;
                     $existing->chunkindex = $idx;
                     $DB->insert_record('local_ai_course_assistant_chunks', $existing);
@@ -305,8 +313,17 @@ class content_indexer {
             $record->chunkindex  = $idx;
             $record->content     = $chunk['content'];
             $record->contenthash = $chunk['contenthash'];
-            $record->embedding   = json_encode($vector);
-            $record->embed_model = $modelname;
+            // Write BOTH forms, exactly as index_course() does. Omitting the
+            // packed vector here silently un-converted rows: this is the path the
+            // auto_reindex_rag_drifted scheduled task uses, so a site that had
+            // been backfilled drifted back toward the slow JSON decode every time
+            // a module's content changed, with nothing to show it had happened
+            // (retrieval falls back to JSON per row, so it stays correct, just
+            // slower). Any future writer of this table must set both columns
+            // until the JSON column is dropped.
+            $record->embedding     = json_encode($vector);
+            $record->embedding_bin = rag_retriever::pack_vector($vector);
+            $record->embed_model   = $modelname;
             $record->timecreated = time();
             $record->timeindexed = time();
 
