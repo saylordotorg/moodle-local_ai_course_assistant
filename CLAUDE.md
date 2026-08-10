@@ -13,7 +13,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 
 - **Plugin component:** `local_ai_course_assistant`
 - **Current version:** `2026061801`, release `6.8.5`
-- **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
+- **Source folder (canonical):** the git repo at `~/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
 - **Saylor production:** **v6.8.2 on Learn + Degrees as of 2026-06-24** (the Catalyst upgrade from v5.4.5 landed; the v5.4.5 → v6.8.2 jump is complete). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Upgrade runbook (now historical): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.8.2.md`; Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`. NOTE: the Moodle plugin **directory** track is a separate version (v6.8.3, the CONTRIB-10574 29/29 resubmission); the directory listing and the prod pin need not match. Resubmission email: `.drafts/moodle-directory-resubmission-email-v6.8.3.md`.
@@ -165,7 +165,7 @@ The paths below point at the canonical `ai-projects/` repo. Until 6.9.5 they poi
 
 ### Rebuild JS (terser required):
 ```bash
-BASE="/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant"
+BASE="$HOME/ai-projects/ai_course_assistant"
 for f in chat ui quiz speech repository sse_client markdown audio_player realtime; do
   terser "$BASE/amd/src/${f}.js" --compress --mangle \
     --source-map "url=${f}.min.js.map" \
@@ -176,7 +176,7 @@ Only rebuild the files you actually changed to save time.
 
 ### Build zip (must use Python subprocess — `!` in path causes zsh history expansion):
 ```python
-python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/create_fixed_zip.sh'], cwd=os.path.expanduser('~/Library/CloudStorage/Dropbox/!Saylor/ai-projects'), capture_output=True)"
+python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/create_fixed_zip.sh'], cwd=os.path.expanduser('~/ai-projects'), capture_output=True)"
 ```
 
 ---
@@ -226,7 +226,7 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
 ### Deploy to local Moodle:
 ```bash
 rsync -a --exclude=.git \
-  "/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/" \
+  "$HOME/ai-projects/ai_course_assistant/" \
   ~/Sites/moodle/local/ai_course_assistant/
 ```
 
