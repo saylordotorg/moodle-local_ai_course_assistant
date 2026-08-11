@@ -72,9 +72,15 @@ if (!empty($assign->intro)) {
 $mins = ceil((int) $assign->min_seconds / 60);
 $maxs = ceil((int) $assign->max_seconds / 60);
 echo html_writer::div(
-    ($assign->mode === 'audio' ? 'Audio presentation' : 'Video presentation')
+    ($assign->mode === 'audio'
+        ? get_string('soapbox:present_audio', 'local_ai_course_assistant')
+        : get_string('soapbox:present_video', 'local_ai_course_assistant'))
     . ' &middot; ' . s(ucfirst($assign->ptype))
-    . ' &middot; target ' . $mins . '-' . $maxs . ' min',
+    . ' &middot; ' . get_string(
+        'soapbox:present_target',
+        'local_ai_course_assistant',
+        (object) ['min' => $mins, 'max' => $maxs]
+    ),
     'sbx-meta text-muted mb-3'
 );
 
@@ -85,7 +91,8 @@ if ($hastopics) {
         $options[$t->id] = format_string($t->title);
     }
     echo html_writer::start_div('sbx-topics mb-3');
-    echo html_writer::tag('label', 'Choose a topic', ['for' => 'sbx-topic', 'class' => 'font-weight-bold d-block']);
+    echo html_writer::tag('label', get_string('soapbox:choose_topic', 'local_ai_course_assistant'),
+        ['for' => 'sbx-topic', 'class' => 'font-weight-bold d-block']);
     echo html_writer::select($options, 'sbx-topic', '', false, ['id' => 'sbx-topic']);
     foreach ($topics as $t) {
         if (!empty($t->instructions)) {
@@ -152,8 +159,10 @@ if (!$storageready) {
         );
     }
     echo html_writer::start_div('sbx-controls d-flex align-items-center mb-2', ['style' => 'gap:12px']);
-    echo html_writer::tag('button', 'Record', ['type' => 'button', 'class' => 'sbx-record btn btn-primary']);
-    echo html_writer::tag('button', 'Stop', ['type' => 'button', 'class' => 'sbx-stop btn btn-outline-secondary']);
+    echo html_writer::tag('button', get_string('soapbox:record_short', 'local_ai_course_assistant'),
+        ['type' => 'button', 'class' => 'sbx-record btn btn-primary']);
+    echo html_writer::tag('button', get_string('soapbox:stop', 'local_ai_course_assistant'),
+        ['type' => 'button', 'class' => 'sbx-stop btn btn-outline-secondary']);
     echo html_writer::tag('span', '0:00', ['class' => 'sbx-timer font-weight-bold']);
     echo html_writer::end_div();
     echo html_writer::div('', 'sbx-status text-muted');
@@ -194,20 +203,26 @@ $recs = $DB->get_records_select(
     'timecreated DESC'
 );
 
-echo $OUTPUT->heading('My recordings', 4);
+echo $OUTPUT->heading(get_string('soapbox:my_recordings', 'local_ai_course_assistant'), 4);
 if (empty($recs)) {
-    echo html_writer::div('No recordings yet.', 'text-muted');
+    echo html_writer::div(get_string('soapbox:no_recordings', 'local_ai_course_assistant'), 'text-muted');
 } else {
     $storage = $storageready ? new soapbox_storage() : null;
     $table = new html_table();
-    $table->head = ['Recorded', 'Length', 'Status', ''];
+    $table->head = [
+        get_string('soapbox:col_recorded', 'local_ai_course_assistant'),
+        get_string('soapbox:col_length', 'local_ai_course_assistant'),
+        get_string('status'),
+        '',
+    ];
     $table->attributes['class'] = 'generaltable';
     foreach ($recs as $r) {
         $len = gmdate('i:s', (int) $r->duration_seconds);
         $view = '';
         if ($storage && $r->storage_key && $r->status !== 'deleted') {
             $url = $storage->presign_get($r->storage_key, 3600);
-            $view = html_writer::link($url, 'View / download', ['target' => '_blank', 'rel' => 'noopener']);
+            $view = html_writer::link($url, get_string('soapbox:view_download', 'local_ai_course_assistant'),
+                ['target' => '_blank', 'rel' => 'noopener']);
             // Slides playback: recordings that carry a deck can be played back
             // with the slides advancing in sync.
             if (!empty($r->deck_key) && !empty($r->slide_timeline)) {
@@ -219,7 +234,7 @@ if (empty($recs)) {
                 );
             }
         } else if ($r->status === 'deleted') {
-            $view = html_writer::span('Expired', 'text-muted');
+            $view = html_writer::span(get_string('soapbox:expired', 'local_ai_course_assistant'), 'text-muted');
         }
         $table->data[] = [
             userdate((int) $r->timecreated, get_string('strftimedatetimeshort')),
@@ -232,8 +247,11 @@ if (empty($recs)) {
     // Container the player renders into when a "Play with slides" button is used.
     echo html_writer::div('', 'sbx-playback mt-3', ['id' => 'sbx-playback']);
     echo html_writer::div(
-        'Recordings are available to view and download for ' . soapbox_config::retention_days()
-        . ' days, then automatically deleted.',
+        get_string(
+            'soapbox:retention_note',
+            'local_ai_course_assistant',
+            soapbox_config::retention_days()
+        ),
         'small text-muted mt-1'
     );
     $PAGE->requires->js_call_amd(
