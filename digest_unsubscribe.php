@@ -94,8 +94,11 @@ $PAGE->set_pagelayout('login');
 
 echo $OUTPUT->header();
 echo $OUTPUT->box(
-    get_string('learner_digest:unsubscribe_done_body', 'local_ai_course_assistant',
-        (object)['product' => branding::short_name()]),
+    get_string(
+        'learner_digest:unsubscribe_done_body',
+        'local_ai_course_assistant',
+        (object)['product' => branding::short_name()]
+    ),
     'generalbox'
 );
 echo $OUTPUT->footer();

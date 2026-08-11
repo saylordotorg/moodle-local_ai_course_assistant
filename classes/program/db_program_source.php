@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class db_program_source implements program_source_interface {
-
     /** @var string|null Detected prefix without trailing underscore, e.g. 'enrol_programs'. */
     private $prefix = null;
 

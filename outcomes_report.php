@@ -66,15 +66,20 @@ echo $OUTPUT->heading(get_string('outcomes:title', 'local_ai_course_assistant'))
 
 echo html_writer::div(
     get_string('outcomes:intro', 'local_ai_course_assistant', outcomes_report::default_benchmark_pct()),
-    'outcomes-intro text-muted mb-3');
+    'outcomes-intro text-muted mb-3'
+);
 
 if (empty($rows)) {
     echo $OUTPUT->notification(get_string('outcomes:none', 'local_ai_course_assistant'), 'info');
 } else {
     echo html_writer::div(
-        $OUTPUT->single_button(new moodle_url($pageurl, ['export' => 'csv']),
-            get_string('outcomes:export', 'local_ai_course_assistant'), 'get'),
-        'mb-3');
+        $OUTPUT->single_button(
+            new moodle_url($pageurl, ['export' => 'csv']),
+            get_string('outcomes:export', 'local_ai_course_assistant'),
+            'get'
+        ),
+        'mb-3'
+    );
 
     $table = new html_table();
     $table->head = [
@@ -107,7 +112,9 @@ if (empty($rows)) {
     }
     echo html_writer::table($table);
     echo html_writer::div(
-        get_string('outcomes:footnote', 'local_ai_course_assistant'), 'small text-muted mt-1');
+        get_string('outcomes:footnote', 'local_ai_course_assistant'),
+        'small text-muted mt-1'
+    );
 }
 
 echo $OUTPUT->footer();

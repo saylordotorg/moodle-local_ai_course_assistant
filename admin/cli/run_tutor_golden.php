@@ -220,9 +220,12 @@ function mode_run(string $providersfilter, string $outdir, string $datetag, int 
                 $result['error'] ?? '',
                 date('c'),
             ]);
-            printf("  %s [%s] %s\n", $p['id'],
+            printf(
+                "  %s [%s] %s\n",
+                $p['id'],
                 ($result['error'] ?? '') === '' ? 'ok' : 'err',
-                $result['error'] ?? sprintf('%dms', $result['total_latency_ms'] ?? 0));
+                $result['error'] ?? sprintf('%dms', $result['total_latency_ms'] ?? 0)
+            );
             if ($delay > 0) {
                 usleep((int) round($delay * 1_000_000));
             }
@@ -344,13 +347,15 @@ function mode_judge(string $runcsv, string $outdir, string $datetag, string $jud
             $label, $promptid, $category,
             $rubric['socratic'] ?? '',
             $rubric['accuracy'] ?? '',
-            $rubric['tone']     ?? '',
+            $rubric['tone'] ?? '',
             $total > 0 ? $total : '',
-            $rubric['notes']    ?? '',
-            $rubric['error']    ?? '',
+            $rubric['notes'] ?? '',
+            $rubric['error'] ?? '',
         ]);
-        printf("  judged %s/%s: socratic=%s accuracy=%s tone=%s\n",
-            $label, $promptid,
+        printf(
+            "  judged %s/%s: socratic=%s accuracy=%s tone=%s\n",
+            $label,
+            $promptid,
             $rubric['socratic'] ?? 'x',
             $rubric['accuracy'] ?? 'x',
             $rubric['tone'] ?? 'x'
@@ -506,7 +511,9 @@ function mode_report(string $runcsv, string $judgecsv, string $outdir, string $d
     foreach ($summary as $a) {
         $dominated = false;
         foreach ($summary as $b) {
-            if ($a === $b) continue;
+            if ($a === $b) {
+                continue;
+            }
             $bcost = $b['avg_cost_cents'] ?? PHP_INT_MAX;
             $brub = $b['avg_rubric'] ?? -1;
             $acost = $a['avg_cost_cents'] ?? PHP_INT_MAX;
@@ -560,13 +567,17 @@ function mode_report(string $runcsv, string $judgecsv, string $outdir, string $d
     $md .= "|----------|-------|------:|------:|---:|---:|---:|---:|---:|:-:|\n";
     foreach ($summary as $s) {
         $onpareto = in_array($s['label'], $pareto, true) ? 'yes' : '';
-        $md .= sprintf("| %s | %s | %d | %d | %s | %s | %s | %s | %s | %s |\n",
-            $s['label'], $s['model'], $s['calls'], $s['errors'],
+        $md .= sprintf(
+            "| %s | %s | %d | %d | %s | %s | %s | %s | %s | %s |\n",
+            $s['label'],
+            $s['model'],
+            $s['calls'],
+            $s['errors'],
             $s['avg_cost_cents'] !== null ? number_format($s['avg_cost_cents'], 3) : 'n/a',
-            $s['p50_ttft_ms']  !== null ? $s['p50_ttft_ms']  : 'n/a',
-            $s['p95_ttft_ms']  !== null ? $s['p95_ttft_ms']  : 'n/a',
+            $s['p50_ttft_ms'] !== null ? $s['p50_ttft_ms'] : 'n/a',
+            $s['p95_ttft_ms'] !== null ? $s['p95_ttft_ms'] : 'n/a',
             $s['p50_total_ms'] !== null ? $s['p50_total_ms'] : 'n/a',
-            $s['avg_rubric']   !== null ? number_format($s['avg_rubric'], 2) : 'n/a',
+            $s['avg_rubric'] !== null ? number_format($s['avg_rubric'], 2) : 'n/a',
             $onpareto
         );
     }
@@ -703,7 +714,9 @@ function read_csv(string $path): array {
  * @return mixed The element at the nearest-rank percentile, or null if $values is empty.
  */
 function percentile(array $values, int $p) {
-    if (empty($values)) return null;
+    if (empty($values)) {
+        return null;
+    }
     sort($values);
     $idx = (int) ceil(($p / 100) * count($values)) - 1;
     return $values[max(0, min(count($values) - 1, $idx))];

@@ -34,7 +34,6 @@ require_once($GLOBALS['CFG']->libdir . '/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_assignment_form extends \moodleform {
-
     /**
      * Form definition.
      */
@@ -72,8 +71,12 @@ class soapbox_assignment_form extends \moodleform {
         $mform->addElement('text', 'max_seconds', 'Maximum length (seconds)', ['size' => 8]);
         $mform->setType('max_seconds', PARAM_INT);
         $mform->setDefault('max_seconds', min(420, $maxsec));
-        $mform->addElement('static', 'seccap', '',
-            'Site maximum length: ' . $maxsec . ' seconds.');
+        $mform->addElement(
+            'static',
+            'seccap',
+            '',
+            'Site maximum length: ' . $maxsec . ' seconds.'
+        );
 
         $mform->addElement('text', 'max_attempts', 'Attempts allowed (0 = unlimited)', ['size' => 6]);
         $mform->setType('max_attempts', PARAM_INT);
@@ -83,18 +86,29 @@ class soapbox_assignment_form extends \moodleform {
         $mform->addElement('text', 'stored_attempts', 'Recordings kept per student', ['size' => 6]);
         $mform->setType('stored_attempts', PARAM_INT);
         $mform->setDefault('stored_attempts', 2);
-        $mform->addElement('static', 'reccap', '',
-            'Site maximum recordings kept per student: ' . $maxrec . '.');
+        $mform->addElement(
+            'static',
+            'reccap',
+            '',
+            'Site maximum recordings kept per student: ' . $maxrec . '.'
+        );
 
-        $mform->addElement('advcheckbox', 'slides_enabled',
-            'Slides', 'Let students upload a PDF deck and advance slides while recording');
+        $mform->addElement(
+            'advcheckbox',
+            'slides_enabled',
+            'Slides',
+            'Let students upload a PDF deck and advance slides while recording'
+        );
         $mform->setDefault('slides_enabled', 0);
 
         // v6.8.31: optional slide-vision pass. Only meaningful with slides on, and
         // additionally gated on the site soapbox_slide_vision toggle at run time.
-        $mform->addElement('advcheckbox', 'slide_vision',
+        $mform->addElement(
+            'advcheckbox',
+            'slide_vision',
             'Slide visual-design feedback',
-            'Also run a vision pass over the slide images for visual-design notes (requires Slides, and the site Soapbox slide-vision setting)');
+            'Also run a vision pass over the slide images for visual-design notes (requires Slides, and the site Soapbox slide-vision setting)'
+        );
         $mform->setDefault('slide_vision', 0);
         $mform->disabledIf('slide_vision', 'slides_enabled', 'notchecked');
 

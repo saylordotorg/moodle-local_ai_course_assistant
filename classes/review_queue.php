@@ -38,7 +38,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class review_queue {
-
     /**
      * Pending (unresolved) queue rows for a course, newest first.
      *
@@ -49,8 +48,12 @@ class review_queue {
     public static function pending_for_course(int $courseid, int $limit = 50): array {
         global $DB;
 
-        $resolved = $DB->get_records('local_ai_course_assistant_review_res',
-            ['courseid' => $courseid], '', 'id, source, sourceid');
+        $resolved = $DB->get_records(
+            'local_ai_course_assistant_review_res',
+            ['courseid' => $courseid],
+            '',
+            'id, source, sourceid'
+        );
         $resolvedkeys = [];
         foreach ($resolved as $r) {
             $resolvedkeys[$r->source . ':' . $r->sourceid] = true;
@@ -78,7 +81,9 @@ class review_queue {
                     'who'      => anonymizer::name((int) $r->userid),
                 ];
             }
-        } catch (\Throwable $e) { /* tables may not exist on stripped installs */ }
+        } catch (\Throwable $e) {
+            /* tables may not exist on stripped installs */
+        }
 
         // 2. Conversations that hit the off-topic threshold.
         $rawofftopic = get_config('local_ai_course_assistant', 'offtopic_max_per_session');
@@ -89,7 +94,10 @@ class review_queue {
                    FROM {local_ai_course_assistant_convs}
                   WHERE courseid = :courseid AND offtopic_count >= :minct
                   ORDER BY timemodified DESC",
-                ['courseid' => $courseid, 'minct' => $offtopicmin], 0, $limit);
+                ['courseid' => $courseid, 'minct' => $offtopicmin],
+                0,
+                $limit
+            );
             foreach ($convs as $c) {
                 if (isset($resolvedkeys['offtopic:' . $c->sourceid])) {
                     continue;
@@ -102,7 +110,9 @@ class review_queue {
                     'who'      => anonymizer::name((int) $c->userid),
                 ];
             }
-        } catch (\Throwable $e) { /* ignored */ }
+        } catch (\Throwable $e) {
+            /* ignored */
+        }
 
         // 3. Integrity audit flags for this course.
         try {
@@ -111,7 +121,10 @@ class review_queue {
                    FROM {local_ai_course_assistant_audit}
                   WHERE event = :event AND courseid = :courseid
                   ORDER BY timecreated DESC",
-                ['event' => 'integrity_flagged', 'courseid' => $courseid], 0, $limit);
+                ['event' => 'integrity_flagged', 'courseid' => $courseid],
+                0,
+                $limit
+            );
             foreach ($audit as $a) {
                 if (isset($resolvedkeys['integrity:' . $a->sourceid])) {
                     continue;
@@ -126,7 +139,9 @@ class review_queue {
                     'who'      => anonymizer::name((int) $a->userid),
                 ];
             }
-        } catch (\Throwable $e) { /* ignored */ }
+        } catch (\Throwable $e) {
+            /* ignored */
+        }
 
         // Sort newest-first across all sources, then cap.
         usort($rows, static function ($a, $b) {
@@ -151,8 +166,12 @@ class review_queue {
         if (!in_array($source, ['rating', 'offtopic', 'integrity'], true)) {
             return;
         }
-        if ($DB->record_exists('local_ai_course_assistant_review_res',
-                ['source' => $source, 'sourceid' => $sourceid])) {
+        if (
+            $DB->record_exists(
+                'local_ai_course_assistant_review_res',
+                ['source' => $source, 'sourceid' => $sourceid]
+            )
+        ) {
             return;
         }
         $row = new \stdClass();

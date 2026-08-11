@@ -29,7 +29,6 @@ use local_ai_course_assistant\program\stub_program_source;
  * @covers     \local_ai_course_assistant\program\learning_path
  */
 final class learning_path_test extends \advanced_testcase {
-
     /**
      * A 3-course ordered program; learner allocated; sitting on the middle course.
      *

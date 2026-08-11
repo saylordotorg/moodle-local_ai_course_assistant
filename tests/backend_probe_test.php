@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\backend_probe
  */
 final class backend_probe_test extends \advanced_testcase {
-
     public function test_window_mismatch_warns(): void {
         $r = backend_probe::compare_window(8192, 4096);
         $this->assertSame(backend_probe::STATUS_WARN, $r['status']);

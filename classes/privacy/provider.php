@@ -34,11 +34,7 @@ use local_ai_course_assistant\reminder_manager;
  * @copyright  2025 AI Course Assistant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-    \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider {
-
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
     /**
      * Describe the type of data stored.
      *
@@ -173,62 +169,90 @@ class provider implements
         // not yet been declared. Without these the core_privacy
         // table-coverage test fails because every table with a userid
         // field must be either declared here or explicitly excluded.
-        $collection->add_database_table('local_ai_course_assistant_msg_ratings',
+        $collection->add_database_table(
+            'local_ai_course_assistant_msg_ratings',
             ['userid' => 'privacy:metadata:msg_ratings:userid'],
-            'privacy:metadata:msg_ratings');
-        $collection->add_database_table('local_ai_course_assistant_profiles',
+            'privacy:metadata:msg_ratings'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_profiles',
             ['userid' => 'privacy:metadata:profiles:userid'],
-            'privacy:metadata:profiles');
-        $collection->add_database_table('local_ai_course_assistant_obj_att',
+            'privacy:metadata:profiles'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_obj_att',
             ['userid' => 'privacy:metadata:obj_att:userid'],
-            'privacy:metadata:obj_att');
-        $collection->add_database_table('local_ai_course_assistant_flashcards',
+            'privacy:metadata:obj_att'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_flashcards',
             ['userid' => 'privacy:metadata:flashcards:userid'],
-            'privacy:metadata:flashcards');
-        $collection->add_database_table('local_ai_course_assistant_review_res',
+            'privacy:metadata:flashcards'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_review_res',
             ['resolved_by' => 'privacy:metadata:review_res:resolved_by'],
-            'privacy:metadata:review_res');
-        $collection->add_database_table('local_ai_course_assistant_radar_sched',
+            'privacy:metadata:review_res'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_radar_sched',
             ['creator' => 'privacy:metadata:radar_sched:creator'],
-            'privacy:metadata:radar_sched');
-        $collection->add_database_table('local_ai_course_assistant_avatar_sess',
+            'privacy:metadata:radar_sched'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_avatar_sess',
             ['userid' => 'privacy:metadata:avatar_sess:userid'],
-            'privacy:metadata:avatar_sess');
+            'privacy:metadata:avatar_sess'
+        );
         // v5.3.0 carryover-personalisation tables.
-        $collection->add_database_table('local_ai_course_assistant_learner_goals',
+        $collection->add_database_table(
+            'local_ai_course_assistant_learner_goals',
             ['userid' => 'privacy:metadata:learner_goals:userid'],
-            'privacy:metadata:learner_goals');
-        $collection->add_database_table('local_ai_course_assistant_learner_memory',
+            'privacy:metadata:learner_goals'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_learner_memory',
             ['userid' => 'privacy:metadata:learner_memory:userid'],
-            'privacy:metadata:learner_memory');
-        $collection->add_database_table('local_ai_course_assistant_streak',
+            'privacy:metadata:learner_memory'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_streak',
             ['userid' => 'privacy:metadata:streak:userid'],
-            'privacy:metadata:streak');
-        $collection->add_database_table('local_ai_course_assistant_struggle_signal',
+            'privacy:metadata:streak'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_struggle_signal',
             ['userid' => 'privacy:metadata:struggle_signal:userid'],
-            'privacy:metadata:struggle_signal');
-        $collection->add_database_table('local_ai_course_assistant_outreach_log',
+            'privacy:metadata:struggle_signal'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_outreach_log',
             ['userid' => 'privacy:metadata:outreach_log:userid'],
-            'privacy:metadata:outreach_log');
+            'privacy:metadata:outreach_log'
+        );
         // v5.10.x: per-recipient email opt-out (user-global; courseid may be null).
-        $collection->add_database_table('local_ai_course_assistant_email_optout',
+        $collection->add_database_table(
+            'local_ai_course_assistant_email_optout',
             [
                 'email' => 'privacy:metadata:email_optout:email',
                 'optout_type' => 'privacy:metadata:email_optout:optout_type',
                 'userid' => 'privacy:metadata:email_optout:userid',
             ],
-            'privacy:metadata:email_optout');
+            'privacy:metadata:email_optout'
+        );
         // v6.8.20 Soapbox video: per-attempt recording rows. The recording
         // object itself is retention-deleted; the transcript is stored here for
         // feedback and subject-access, so it is declared.
-        $collection->add_database_table('local_ai_course_assistant_sbx_rec',
+        $collection->add_database_table(
+            'local_ai_course_assistant_sbx_rec',
             [
                 'userid' => 'privacy:metadata:sbx_rec:userid',
                 'transcript' => 'privacy:metadata:sbx_rec:transcript',
                 'duration_seconds' => 'privacy:metadata:sbx_rec:duration_seconds',
                 'timecreated' => 'privacy:metadata:sbx_rec:timecreated',
             ],
-            'privacy:metadata:sbx_rec');
+            'privacy:metadata:sbx_rec'
+        );
 
         // External systems that personal data may be transmitted to. The plugin
         // forwards learner-authored content to the admin-configured AI provider
@@ -429,7 +453,8 @@ class provider implements
                    FROM {local_ai_course_assistant_sbx_rec} r
                    JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
                   WHERE r.userid = :userid AND a.courseid = :courseid",
-                ['userid' => $userid, 'courseid' => $courseid]);
+                ['userid' => $userid, 'courseid' => $courseid]
+            );
         } catch (\Throwable $e) {
             return; // Tables absent on older installs.
         }
@@ -444,7 +469,9 @@ class provider implements
                     if (!empty($objkey)) {
                         try {
                             $storage->delete_object($objkey);
-                        } catch (\Throwable $e) { /* backstop: bucket lifecycle rule */ }
+                        } catch (\Throwable $e) {
+                            /* backstop: bucket lifecycle rule */
+                        }
                     }
                 }
             }
@@ -681,7 +708,8 @@ class provider implements
                    FROM {local_ai_course_assistant_sbx_rec} r
                    JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
                   WHERE r.userid = :userid AND a.courseid = :courseid",
-                ['userid' => $userid, 'courseid' => $context->instanceid]);
+                ['userid' => $userid, 'courseid' => $context->instanceid]
+            );
             foreach ($recs as $rec) {
                 writer::with_context($context)->export_data(
                     [get_string('pluginname', 'local_ai_course_assistant'), 'soapbox_recordings', $rec->id],
@@ -795,7 +823,9 @@ class provider implements
                         'userid' => $userid,
                         'courseid' => $context->instanceid,
                     ]);
-                } catch (\Throwable $e) { /* table absent on older installs */ }
+                } catch (\Throwable $e) {
+                    /* table absent on older installs */
+                }
             }
             // Tables keyed on a different user-field name.
             try {
@@ -803,13 +833,17 @@ class provider implements
                     'resolved_by' => $userid,
                     'courseid' => $context->instanceid,
                 ]);
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) {
+                /* ignore */
+            }
             try {
                 $DB->delete_records('local_ai_course_assistant_radar_sched', [
                     'creator' => $userid,
                     'courseid' => $context->instanceid,
                 ]);
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) {
+                /* ignore */
+            }
             // v6.8.20 Soapbox recordings (assignid-keyed; delete the storage
             // object too so erasure removes the media, not just the row).
             self::purge_soapbox_recordings($userid, (int) $context->instanceid);
@@ -821,7 +855,9 @@ class provider implements
         // otherwise leave opt-out rows containing their email behind.
         try {
             $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
-        } catch (\Throwable $e) { /* table absent on older installs */ }
+        } catch (\Throwable $e) {
+            /* table absent on older installs */
+        }
     }
 
     /**
@@ -896,26 +932,34 @@ class provider implements
                         'userid' => $userid,
                         'courseid' => $context->instanceid,
                     ]);
-                } catch (\Throwable $e) { /* ignore */ }
+                } catch (\Throwable $e) {
+                    /* ignore */
+                }
             }
             try {
                 $DB->delete_records('local_ai_course_assistant_review_res', [
                     'resolved_by' => $userid,
                     'courseid' => $context->instanceid,
                 ]);
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) {
+                /* ignore */
+            }
             try {
                 $DB->delete_records('local_ai_course_assistant_radar_sched', [
                     'creator' => $userid,
                     'courseid' => $context->instanceid,
                 ]);
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) {
+                /* ignore */
+            }
             // v6.8.20 Soapbox recordings (assignid-keyed; also drop the object).
             self::purge_soapbox_recordings($userid, (int) $context->instanceid);
             // v5.10.x: email opt-out is user-global; purge by userid.
             try {
                 $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => $userid]);
-            } catch (\Throwable $e) { /* ignore */ }
+            } catch (\Throwable $e) {
+                /* ignore */
+            }
         }
     }
 }

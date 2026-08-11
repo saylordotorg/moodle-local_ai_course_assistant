@@ -83,16 +83,21 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
             try {
                 $user = $DB->get_record('user', ['id' => $rec->userid], '*', MUST_EXIST);
                 // v5.4.3: per-recipient opt-out check + footer.
-                if (\local_ai_course_assistant\email_optout::is_opted_out(
+                if (
+                    \local_ai_course_assistant\email_optout::is_opted_out(
                         (string) $user->email,
-                        \local_ai_course_assistant\email_optout::TYPE_INACTIVITY_REMINDER)) {
+                        \local_ai_course_assistant\email_optout::TYPE_INACTIVITY_REMINDER
+                    )
+                ) {
                     continue;
                 }
                 $bodywithfooter = \local_ai_course_assistant\email_footer::append_text(
-                    $body, (string) $user->email,
+                    $body,
+                    (string) $user->email,
                     \local_ai_course_assistant\email_optout::TYPE_INACTIVITY_REMINDER,
                     'You receive these because you signed up for course-activity '
-                    . 'reminders for ' . $rec->coursename . '.');
+                    . 'reminders for ' . $rec->coursename . '.'
+                );
                 $message = new \core\message\message();
                 $message->component = 'local_ai_course_assistant';
                 $message->name = 'study_reminder';

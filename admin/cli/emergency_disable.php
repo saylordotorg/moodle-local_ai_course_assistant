@@ -58,9 +58,11 @@ $flags = [];
 $restore = false;
 $reason = '';
 foreach ($argv as $arg) {
-    foreach ([emergency_control::FLAG_ALL, emergency_control::FLAG_VOICE,
+    foreach (
+        [emergency_control::FLAG_ALL, emergency_control::FLAG_VOICE,
               emergency_control::FLAG_RAG, emergency_control::FLAG_OUTREACH,
-              emergency_control::FLAG_CHAT] as $f) {
+              emergency_control::FLAG_CHAT] as $f
+    ) {
         if ($arg === '--' . $f) {
             $flags[] = $f;
         }

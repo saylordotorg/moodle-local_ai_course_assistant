@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_config_manager {
-
     /**
      * Fetch the raw course config record (or null if none exists).
      *
@@ -113,10 +112,10 @@ class course_config_manager {
         }
 
         return [
-            'provider'    => !empty($course->provider)    ? $course->provider    : $global['provider'],
-            'apikey'      => !empty($course->apikey)      ? $course->apikey      : $global['apikey'],
-            'model'       => !empty($course->model)       ? $course->model       : $global['model'],
-            'apibaseurl'  => !empty($course->apibaseurl)  ? $course->apibaseurl  : $global['apibaseurl'],
+            'provider'    => !empty($course->provider) ? $course->provider : $global['provider'],
+            'apikey'      => !empty($course->apikey) ? $course->apikey : $global['apikey'],
+            'model'       => !empty($course->model) ? $course->model : $global['model'],
+            'apibaseurl'  => !empty($course->apibaseurl) ? $course->apibaseurl : $global['apibaseurl'],
             'systemprompt' => !empty($course->systemprompt) ? $course->systemprompt : $global['systemprompt'],
             'temperature'  => isset($course->temperature) && $course->temperature !== null
                 ? (string) $course->temperature

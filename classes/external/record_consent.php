@@ -36,7 +36,6 @@ use local_ai_course_assistant\audit_logger;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class record_consent extends external_api {
-
     /**
      * @return external_function_parameters
      */

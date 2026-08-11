@@ -32,7 +32,6 @@ use core_external\external_value;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rate_message extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'messageid' => new external_value(PARAM_INT, 'Message ID to rate'),
@@ -78,8 +77,12 @@ class rate_message extends external_api {
         // conversation. Course capability alone would let any enrolled user
         // rate (and hallucination-flag) another learner's private messages,
         // skewing analytics. The conversation row carries the owning userid.
-        $conv = $DB->get_record('local_ai_course_assistant_convs',
-            ['id' => $message->conversationid], 'id, userid', MUST_EXIST);
+        $conv = $DB->get_record(
+            'local_ai_course_assistant_convs',
+            ['id' => $message->conversationid],
+            'id, userid',
+            MUST_EXIST
+        );
         if ((int) $conv->userid !== (int) $USER->id) {
             throw new \moodle_exception('nopermissions', 'error', '', 'rate this message');
         }

@@ -26,7 +26,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\rubric_manager
  */
 final class rubric_manager_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -48,22 +47,31 @@ final class rubric_manager_test extends \advanced_testcase {
     }
 
     public function test_get_default_criteria_by_type(): void {
-        $this->assertSame(rubric_manager::DEFAULT_SPEECH_CRITERIA,
-            rubric_manager::get_default_criteria('speech'));
-        $this->assertSame(rubric_manager::DEFAULT_PRONUNCIATION_CRITERIA,
-            rubric_manager::get_default_criteria('pronunciation'));
-        $this->assertSame(rubric_manager::DEFAULT_CONVERSATION_CRITERIA,
-            rubric_manager::get_default_criteria('conversation'));
+        $this->assertSame(
+            rubric_manager::DEFAULT_SPEECH_CRITERIA,
+            rubric_manager::get_default_criteria('speech')
+        );
+        $this->assertSame(
+            rubric_manager::DEFAULT_PRONUNCIATION_CRITERIA,
+            rubric_manager::get_default_criteria('pronunciation')
+        );
+        $this->assertSame(
+            rubric_manager::DEFAULT_CONVERSATION_CRITERIA,
+            rubric_manager::get_default_criteria('conversation')
+        );
         // Unknown type falls back to conversation.
-        $this->assertSame(rubric_manager::DEFAULT_CONVERSATION_CRITERIA,
-            rubric_manager::get_default_criteria('nonsense'));
+        $this->assertSame(
+            rubric_manager::DEFAULT_CONVERSATION_CRITERIA,
+            rubric_manager::get_default_criteria('nonsense')
+        );
     }
 
     public function test_speech_presets_has_four_levels(): void {
         $presets = rubric_manager::speech_presets();
         $this->assertEqualsCanonicalizing(
             ['general', 'esl_beginner', 'esl_intermediate', 'esl_advanced'],
-            array_keys($presets));
+            array_keys($presets)
+        );
         foreach ($presets as $level => $preset) {
             $this->assertArrayHasKey('label_key', $preset, "$level needs a label_key");
             $this->assertArrayHasKey('hint', $preset, "$level needs a coaching hint");
@@ -73,8 +81,10 @@ final class rubric_manager_test extends \advanced_testcase {
     }
 
     public function test_speech_preset_general_matches_default_criteria(): void {
-        $this->assertSame(rubric_manager::DEFAULT_SPEECH_CRITERIA,
-            rubric_manager::speech_preset('general')['criteria']);
+        $this->assertSame(
+            rubric_manager::DEFAULT_SPEECH_CRITERIA,
+            rubric_manager::speech_preset('general')['criteria']
+        );
     }
 
     public function test_speech_preset_resolves_levels_and_falls_back(): void {
@@ -83,8 +93,10 @@ final class rubric_manager_test extends \advanced_testcase {
         $advanced = rubric_manager::speech_preset('esl_advanced');
         $this->assertStringContainsStringIgnoringCase('advanced', $advanced['hint']);
         // Unknown level falls back to the General preset.
-        $this->assertSame(rubric_manager::speech_preset('general'),
-            rubric_manager::speech_preset('does-not-exist'));
+        $this->assertSame(
+            rubric_manager::speech_preset('general'),
+            rubric_manager::speech_preset('does-not-exist')
+        );
     }
 
     public function test_ensure_default_rubrics_seeds_a_global_speech_rubric(): void {
@@ -111,13 +123,26 @@ final class rubric_manager_test extends \advanced_testcase {
         global $DB;
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
-        $rid = rubric_manager::create_rubric(0, rubric_manager::TYPE_SPEECH, 'Speech',
-            rubric_manager::DEFAULT_SPEECH_CRITERIA);
+        $rid = rubric_manager::create_rubric(
+            0,
+            rubric_manager::TYPE_SPEECH,
+            'Speech',
+            rubric_manager::DEFAULT_SPEECH_CRITERIA
+        );
 
         $scores = [['name' => 'Delivery & Fluency', 'score' => 4, 'feedback' => 'Clear pace.']];
         $meta = ['name' => 'My speech', 'topic' => 'Climate', 'target' => 180, 'tips' => ['Slow down']];
-        $sid = rubric_manager::save_score($rid, (int) $user->id, (int) $course->id,
-            rubric_manager::TYPE_SPEECH, $scores, 4, 'Nice work.', 95, $meta);
+        $sid = rubric_manager::save_score(
+            $rid,
+            (int) $user->id,
+            (int) $course->id,
+            rubric_manager::TYPE_SPEECH,
+            $scores,
+            4,
+            'Nice work.',
+            95,
+            $meta
+        );
 
         $this->assertGreaterThan(0, $sid);
         $row = $DB->get_record('local_ai_course_assistant_practice_scores', ['id' => $sid]);
@@ -130,11 +155,23 @@ final class rubric_manager_test extends \advanced_testcase {
         global $DB;
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
-        $rid = rubric_manager::create_rubric(0, 'conversation', 'Conv',
-            rubric_manager::DEFAULT_CONVERSATION_CRITERIA);
+        $rid = rubric_manager::create_rubric(
+            0,
+            'conversation',
+            'Conv',
+            rubric_manager::DEFAULT_CONVERSATION_CRITERIA
+        );
 
-        $sid = rubric_manager::save_score($rid, (int) $user->id, (int) $course->id,
-            'conversation', [], 3, 'ok', 10);
+        $sid = rubric_manager::save_score(
+            $rid,
+            (int) $user->id,
+            (int) $course->id,
+            'conversation',
+            [],
+            3,
+            'ok',
+            10
+        );
 
         $row = $DB->get_record('local_ai_course_assistant_practice_scores', ['id' => $sid]);
         $this->assertNull($row->session_meta);
@@ -143,15 +180,31 @@ final class rubric_manager_test extends \advanced_testcase {
     public function test_get_user_scores_returns_decoded_scores_for_speech(): void {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
-        $rid = rubric_manager::create_rubric(0, rubric_manager::TYPE_SPEECH, 'Speech',
-            rubric_manager::DEFAULT_SPEECH_CRITERIA);
+        $rid = rubric_manager::create_rubric(
+            0,
+            rubric_manager::TYPE_SPEECH,
+            'Speech',
+            rubric_manager::DEFAULT_SPEECH_CRITERIA
+        );
         $scores = [['name' => 'Delivery & Fluency', 'score' => 5, 'feedback' => 'Great.']];
-        rubric_manager::save_score($rid, (int) $user->id, (int) $course->id,
-            rubric_manager::TYPE_SPEECH, $scores, 5, 'Excellent.', 120,
-            ['name' => 'Speech 1']);
+        rubric_manager::save_score(
+            $rid,
+            (int) $user->id,
+            (int) $course->id,
+            rubric_manager::TYPE_SPEECH,
+            $scores,
+            5,
+            'Excellent.',
+            120,
+            ['name' => 'Speech 1']
+        );
 
-        $rows = rubric_manager::get_user_scores((int) $user->id, (int) $course->id,
-            rubric_manager::TYPE_SPEECH, 5);
+        $rows = rubric_manager::get_user_scores(
+            (int) $user->id,
+            (int) $course->id,
+            rubric_manager::TYPE_SPEECH,
+            5
+        );
 
         $this->assertCount(1, $rows);
         $row = reset($rows);

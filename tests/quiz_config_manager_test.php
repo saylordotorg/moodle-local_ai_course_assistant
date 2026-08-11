@@ -25,7 +25,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\quiz_config_manager
  */
 final class quiz_config_manager_test extends \advanced_testcase {
-
     /**
      * Helper to create a quiz with a specific grade. Returns the cmid.
      *
@@ -82,10 +81,14 @@ final class quiz_config_manager_test extends \advanced_testcase {
 
         quiz_config_manager::save($cmid, (int)$course->id, 'default');
 
-        $this->assertNull(quiz_config_manager::get($cmid),
-            'Saving "default" must delete the row so absence == fall back to grade-based heuristic.');
-        $this->assertEquals(0, $DB->count_records('local_ai_course_assistant_quiz_cfg',
-            ['cmid' => $cmid]));
+        $this->assertNull(
+            quiz_config_manager::get($cmid),
+            'Saving "default" must delete the row so absence == fall back to grade-based heuristic.'
+        );
+        $this->assertEquals(0, $DB->count_records(
+            'local_ai_course_assistant_quiz_cfg',
+            ['cmid' => $cmid]
+        ));
     }
 
     public function test_save_invalid_level_falls_back_to_default(): void {

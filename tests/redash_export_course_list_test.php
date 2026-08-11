@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\analytics::conversation_rows_predicate
  */
 final class redash_export_course_list_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -80,7 +79,8 @@ final class redash_export_course_list_test extends \advanced_testcase {
         }
         $ids = $DB->get_fieldset_sql(
             "SELECT DISTINCT m.courseid FROM {local_ai_course_assistant_msgs} m WHERE {$where}",
-            $params);
+            $params
+        );
         $ids = array_map('intval', $ids);
         sort($ids);
         return $ids;

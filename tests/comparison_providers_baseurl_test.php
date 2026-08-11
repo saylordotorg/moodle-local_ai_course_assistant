@@ -32,7 +32,6 @@ use local_ai_course_assistant\provider\openai_compatible_provider;
  * @covers     \local_ai_course_assistant\spend_guard
  */
 final class comparison_providers_baseurl_test extends \advanced_testcase {
-
     /**
      * 4-field row (no base URL) still parses correctly into create_for_comparison.
      * The instantiated provider should use its class's default base URL.

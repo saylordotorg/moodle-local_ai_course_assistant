@@ -193,7 +193,6 @@ try {
     }
 
     local_ai_course_assistant_meta_sse_send('done', json_encode(['full' => $fullresponse]));
-
 } catch (\Throwable $e) {
     local_ai_course_assistant_meta_sse_send('error', json_encode(['message' => $e->getMessage()]));
 }

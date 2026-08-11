@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\rag_retriever::hydrate_content
  */
 final class rag_retriever_hydrate_test extends \advanced_testcase {
-
     /**
      * Insert a chunk and return its id.
      *
@@ -84,7 +83,7 @@ final class rag_retriever_hydrate_test extends \advanced_testcase {
 
         $out = rag_retriever::hydrate_content([
             ['id' => $gone, 'content' => '', 'score' => 0.99],
-            ['id' => $a,    'content' => '', 'score' => 0.10],
+            ['id' => $a, 'content' => '', 'score' => 0.10],
         ]);
 
         $this->assertCount(1, $out);
@@ -101,7 +100,7 @@ final class rag_retriever_hydrate_test extends \advanced_testcase {
 
         $out = rag_retriever::hydrate_content([
             ['id' => $blank, 'content' => '', 'score' => 0.9],
-            ['id' => $ok,    'content' => '', 'score' => 0.1],
+            ['id' => $ok, 'content' => '', 'score' => 0.1],
         ]);
 
         $this->assertCount(1, $out);
@@ -186,11 +185,18 @@ final class rag_retriever_hydrate_test extends \advanced_testcase {
         $vec = [0.827, 0.1234567890123456];
         $back = rag_retriever::decode_vector(rag_retriever::pack_vector($vec), null);
         foreach ($vec as $i => $v) {
-            $this->assertEqualsWithDelta($v, $back[$i], 1e-6,
-                'float32 packing should stay within ~1e-7 of the double');
+            $this->assertEqualsWithDelta(
+                $v,
+                $back[$i],
+                1e-6,
+                'float32 packing should stay within ~1e-7 of the double'
+            );
         }
-        $this->assertNotSame((float) $vec[0], (float) $back[0],
-            'documents that this is 32-bit storage, not 64-bit');
+        $this->assertNotSame(
+            (float) $vec[0],
+            (float) $back[0],
+            'documents that this is 32-bit storage, not 64-bit'
+        );
     }
 
     /**

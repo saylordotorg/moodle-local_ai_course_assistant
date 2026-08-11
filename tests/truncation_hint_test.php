@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\context_builder::should_add_truncation_hint
  */
 final class truncation_hint_test extends \advanced_testcase {
-
     public function test_hint_present_when_content_truncated_and_no_page(): void {
         $this->assertTrue(context_builder::should_add_truncation_hint(true, 0));
     }

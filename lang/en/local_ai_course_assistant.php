@@ -1037,7 +1037,7 @@ $string['starters:course_desc']     = 'Enable or disable individual starters for
 // Topic picker (used by conversation starters).
 $string['chat:topic_picker_title']        = 'What would you like to focus on?';
 $string['chat:topic_picker_title_help']   = 'What would you like help with?';
-$string['chat:topic_picker_title_explain']= 'What would you like me to explain?';
+$string['chat:topic_picker_title_explain'] = 'What would you like me to explain?';
 $string['chat:topic_picker_title_study']  = 'What area would you like to focus on?';
 $string['chat:topic_start']               = 'Continue';
 
@@ -1226,7 +1226,7 @@ $string['objectives:saved']             = 'Objective saved.';
 $string['objectives:deleted']           = 'Objective deleted.';
 $string['objectives:delete_confirm']    = 'Delete this objective and all attempt history for it?';
 $string['objectives:delete_all']        = 'Delete all objectives for this course';
-$string['objectives:delete_all_confirm']= 'Delete every objective and all attempt history for this course? Cannot be undone.';
+$string['objectives:delete_all_confirm'] = 'Delete every objective and all attempt history for this course? Cannot be undone.';
 $string['objectives:deleted_all']       = 'All objectives for this course deleted.';
 
 // Cross-course mastery rebuild (v5.7.0).
@@ -1504,7 +1504,7 @@ $string['settings:rate_card_refresh_now_label']  = 'Refresh rate card from upstr
 $string['settings:rate_card_refresh_success']    = 'Rate card refreshed: {$a} entries written.';
 $string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$a}';
 $string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
-$string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
+$string['settings:rate_card_last_refresh_success'] = 'Last fetch succeeded.';
 $string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
 $string['task:refresh_rate_card']                = 'Refresh [[tutorshort]] LLM rate card from upstream';
 
@@ -1603,7 +1603,7 @@ $string['flashcards:generated']     = 'Saved {$a} flashcards. Open the review pa
 
 // Worked examples (v3.9.23).
 $string['worked_examples:toggle']     = 'Enable Worked Examples starter for this course';
-$string['worked_examples:toggle_help']= 'Adds a "Show me a worked example" starter that asks the assistant to walk through a fully solved example, then guide the learner through similar problems with progressively less scaffolding (worked → partial → blank).';
+$string['worked_examples:toggle_help'] = 'Adds a "Show me a worked example" starter that asks the assistant to walk through a fully solved example, then guide the learner through similar problems with progressively less scaffolding (worked → partial → blank).';
 $string['worked_examples:starter']    = 'Show me a worked example';
 
 // Prerequisite gap detection (v3.9.24).
@@ -1624,9 +1624,9 @@ $string['essay_feedback:scoring']      = 'Scoring your draft…';
 $string['essay_feedback:too_short']    = 'Please paste at least 80 words so the assistant has something to score.';
 $string['essay_feedback:error']        = 'Could not score this draft right now. Try again in a moment.';
 $string['essay_feedback:result_heading'] = 'Rubric scores';
-$string['essay_feedback:overall_heading']= 'Overall';
+$string['essay_feedback:overall_heading'] = 'Overall';
 $string['essay_feedback:revisions_heading'] = 'Top 3 revision suggestions';
-$string['essay_feedback:col_criterion']= 'Criterion';
+$string['essay_feedback:col_criterion'] = 'Criterion';
 $string['essay_feedback:col_score']    = 'Score';
 $string['essay_feedback:col_feedback'] = 'Feedback';
 $string['essay_feedback:toggle']       = 'Enable Essay feedback for this course';
@@ -1636,7 +1636,7 @@ $string['essay_feedback:toggle_help']  = 'Learners get a dedicated page to paste
 $string['settings:soapbox_stt_mode']        = 'Soapbox transcription mode';
 $string['settings:soapbox_stt_mode_desc']   = 'How Soapbox turns a recorded speech into text. Server uses the configured Whisper provider (self-hosted is free; hosted OpenAI is about USD 0.006 per minute). Browser uses the learner\'s built-in speech recognition (free, no server, works in Chrome and Safari only). Server is recommended so transcription quality does not depend on the learner\'s browser.';
 $string['settings:soapbox_stt_mode_server'] = 'Server (Whisper provider)';
-$string['settings:soapbox_stt_mode_browser']= 'Browser (free, no server)';
+$string['settings:soapbox_stt_mode_browser'] = 'Browser (free, no server)';
 $string['settings:soapbox_slide_vision']      = 'Soapbox slide visual-design feedback';
 $string['settings:soapbox_slide_vision_desc'] = 'Allow a single vision pass over the rendered slide images to add a short visual-design note to a scored presentation. Off by default and privacy-conscious: no images are stored, and each assignment must also opt in with its own Slide visual-design feedback checkbox. Only slide presentations with an uploaded deck are affected.';
 $string['settings:soapbox_vision_provider']      = 'Soapbox slide-vision provider';
@@ -1753,9 +1753,9 @@ $string['settings:mastery_decay_half_life_days_desc'] = 'Half-life in days for t
 $string['settings:mastery_classifier_provider']  = 'Classifier provider';
 $string['settings:mastery_classifier_provider_desc'] = 'Provider id used for the per-turn mastery classifier. Leave empty to inherit the default AI provider. Default <code>openai</code> pairs with the <code>gpt-4o-mini</code> classifier model below — the cheapest TIER 1 option for structured-output classification (~$220/mo saving at 100k MAU vs the chat tier). When set, the row in Comparison providers with this provider id supplies the API key, base URL, and temperature.';
 $string['settings:mastery_classifier_model']     = 'Classifier model';
-$string['settings:mastery_classifier_model_desc']= 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini. Default <code>gpt-4o-mini</code>.';
+$string['settings:mastery_classifier_model_desc'] = 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini. Default <code>gpt-4o-mini</code>.';
 $string['settings:mastery_classifier_weight']    = 'Classifier weight';
-$string['settings:mastery_classifier_weight_desc']= 'How much a conversation attempt counts relative to a quiz attempt (1.0). Default 0.3.';
+$string['settings:mastery_classifier_weight_desc'] = 'How much a conversation attempt counts relative to a quiz attempt (1.0). Default 0.3.';
 $string['settings:mastery_classifier_threshold'] = 'Classifier confidence threshold';
 $string['settings:mastery_classifier_threshold_desc'] = 'Minimum classifier confidence required to record a conversation attempt. 0.0 to 1.0. Default 0.7.';
 
@@ -1792,7 +1792,7 @@ $string['courses_admin:lede']              = 'Enable or disable AI Assistant per
 $string['courses_admin:back_to_analytics'] = '← Back to Analytics';
 $string['courses_admin:plugin_settings']   = 'Plugin Settings';
 $string['courses_admin:enabled_count']     = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
-$string['courses_admin:search_placeholder']= 'Search courses…';
+$string['courses_admin:search_placeholder'] = 'Search courses…';
 $string['courses_admin:filter_status']     = 'AI Assistant status';
 $string['courses_admin:filter_enabled']    = 'Enabled';
 $string['courses_admin:filter_disabled']   = 'Disabled';
@@ -1836,7 +1836,7 @@ $string['external_resources:force_on']   = 'Force on for this course';
 $string['external_resources:force_off']  = 'Force off for this course';
 $string['external_resources:on']         = 'on';
 $string['external_resources:off']        = 'off';
-$string['external_resources:toggle_help']= 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
+$string['external_resources:toggle_help'] = 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
 
 // v4.3.0: real Redash push integration.
 $string['settings:redash_base_url']           = 'Redash base URL';
@@ -1844,6 +1844,4 @@ $string['settings:redash_base_url_desc']      = 'Base URL of your Redash instanc
 $string['settings:redash_user_api_key']       = 'Redash user API key';
 $string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the [[tutorshort]] Redash API key (which controls inbound auth on redash_export.php).';
 $string['settings:redash_data_source_id']     = 'Redash data source ID';
-$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
-
-
+$string['settings:redash_data_source_id_desc'] = 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';

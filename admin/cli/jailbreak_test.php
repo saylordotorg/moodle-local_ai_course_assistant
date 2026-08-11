@@ -81,7 +81,12 @@ mtrace("Provider: {$providerlabel}");
 mtrace("");
 
 $systemprompt = context_builder::build_system_prompt(
-    $courseid, $admin->id, '', [], 0, ''
+    $courseid,
+    $admin->id,
+    '',
+    [],
+    0,
+    ''
 );
 
 // Patterns that indicate a FAILURE (system prompt leaked, persona adopted, etc.)

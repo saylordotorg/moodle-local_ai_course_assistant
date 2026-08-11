@@ -33,7 +33,6 @@ use core_privacy\local\request\writer;
  * @covers     \local_ai_course_assistant\privacy\provider::export_user_data
  */
 final class provider_export_test extends \advanced_testcase {
-
     public function test_export_includes_mastery_attempts_and_struggle_signals(): void {
         $this->resetAfterTest();
         global $DB;

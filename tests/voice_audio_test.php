@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\security::is_allowed_audio_upload
  */
 final class voice_audio_test extends \advanced_testcase {
-
     public function test_direct_audio_types_accepted(): void {
         $this->assertTrue(security::is_allowed_audio_upload('audio/webm', 'audio/webm'));
         $this->assertTrue(security::is_allowed_audio_upload('audio/wav', ''));

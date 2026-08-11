@@ -34,7 +34,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cross_course_mastery {
-
     /** Precomputed cross-course objective-pair link table. */
     public const TABLE_LINKS = 'local_ai_course_assistant_obj_links';
 
@@ -76,7 +75,11 @@ class cross_course_mastery {
         $counts = ['ref' => 0, 'title_exact' => 0, 'title_fuzzy' => 0, 'total' => 0];
 
         $list = array_values($DB->get_records(
-            objective_manager::TABLE_OBJS, null, 'id ASC', 'id, courseid, title, external_ref'));
+            objective_manager::TABLE_OBJS,
+            null,
+            'id ASC',
+            'id, courseid, title, external_ref'
+        ));
         $n = count($list);
         $norm = [];
         foreach ($list as $o) {
@@ -143,8 +146,11 @@ class cross_course_mastery {
      */
     public static function linked_objectives(int $objectiveid): array {
         global $DB;
-        $rows = $DB->get_records_select(self::TABLE_LINKS,
-            'objectiveida = ? OR objectiveidb = ?', [$objectiveid, $objectiveid]);
+        $rows = $DB->get_records_select(
+            self::TABLE_LINKS,
+            'objectiveida = ? OR objectiveidb = ?',
+            [$objectiveid, $objectiveid]
+        );
         $out = [];
         foreach ($rows as $r) {
             $otherid = ((int) $r->objectiveida === $objectiveid)

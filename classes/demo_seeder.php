@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class demo_seeder {
-
     /**
      * Create a testing course with sections, pages, and a book.
      *
@@ -75,8 +74,12 @@ class demo_seeder {
 
         $sections = self::testing_sections();
         foreach ($sections as $sectionnum => $section) {
-            $DB->set_field('course_sections', 'name', $section['name'],
-                ['course' => $course->id, 'section' => $sectionnum]);
+            $DB->set_field(
+                'course_sections',
+                'name',
+                $section['name'],
+                ['course' => $course->id, 'section' => $sectionnum]
+            );
             foreach ($section['pages'] as $page) {
                 $module = new \stdClass();
                 $module->course = $course->id;
@@ -169,11 +172,19 @@ class demo_seeder {
         $numweeks = max(1, $numweeks);
 
         if ($clear) {
-            $existing = $DB->get_records_select('user', $DB->sql_like('username', ':pattern'),
-                ['pattern' => 'demo_student_%'], '', 'id,username');
+            $existing = $DB->get_records_select(
+                'user',
+                $DB->sql_like('username', ':pattern'),
+                ['pattern' => 'demo_student_%'],
+                '',
+                'id,username'
+            );
             foreach ($existing as $u) {
-                $DB->delete_records_select('local_ai_course_assistant_msg_ratings',
-                    'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)', [$u->id]);
+                $DB->delete_records_select(
+                    'local_ai_course_assistant_msg_ratings',
+                    'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)',
+                    [$u->id]
+                );
                 $DB->delete_records('local_ai_course_assistant_msgs', ['userid' => $u->id]);
                 $DB->delete_records('local_ai_course_assistant_convs', ['userid' => $u->id]);
                 $DB->delete_records('local_ai_course_assistant_feedback', ['userid' => $u->id]);
@@ -183,8 +194,12 @@ class demo_seeder {
 
         $studentrole = $DB->get_record('role', ['shortname' => 'student'], '*', MUST_EXIST);
         $enrolplugin = enrol_get_plugin('manual');
-        $enrolinstance = $DB->get_record('enrol',
-            ['courseid' => $courseid, 'enrol' => 'manual'], '*', MUST_EXIST);
+        $enrolinstance = $DB->get_record(
+            'enrol',
+            ['courseid' => $courseid, 'enrol' => 'manual'],
+            '*',
+            MUST_EXIST
+        );
 
         [$firstnames, $lastnames, $topics, $assistantreplies, $providers, $interactiontypes] =
             self::seeder_pools();
@@ -233,8 +248,12 @@ class demo_seeder {
         foreach ($userids as $userid) {
             // Skip if this user already has a conversation in this course
             // (the convs table has a unique index on userid+courseid).
-            if ($DB->record_exists('local_ai_course_assistant_convs',
-                    ['userid' => $userid, 'courseid' => $courseid])) {
+            if (
+                $DB->record_exists(
+                    'local_ai_course_assistant_convs',
+                    ['userid' => $userid, 'courseid' => $courseid]
+                )
+            ) {
                 continue;
             }
 
@@ -468,9 +487,9 @@ class demo_seeder {
             'I can help with that. Let us start with a quick recap, then I will walk through a worked example.',
         ];
         $providers = [
-            ['provider' => 'claude',  'model' => 'claude-opus-4-6',   'promptbase' => 1500, 'completionbase' => 800],
-            ['provider' => 'openai',  'model' => 'gpt-4o-mini',       'promptbase' => 1500, 'completionbase' => 700],
-            ['provider' => 'gemini',  'model' => 'gemini-2.5-flash',  'promptbase' => 1500, 'completionbase' => 750],
+            ['provider' => 'claude', 'model' => 'claude-opus-4-6', 'promptbase' => 1500, 'completionbase' => 800],
+            ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'promptbase' => 1500, 'completionbase' => 700],
+            ['provider' => 'gemini', 'model' => 'gemini-2.5-flash', 'promptbase' => 1500, 'completionbase' => 750],
         ];
         $interactiontypes = ['chat', 'chat', 'chat', 'chat', 'voice', 'quiz'];
 

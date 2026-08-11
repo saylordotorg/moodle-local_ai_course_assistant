@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\digest_unsubscribe_token
  */
 final class digest_unsubscribe_token_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -45,8 +44,10 @@ final class digest_unsubscribe_token_test extends \advanced_testcase {
 
     public function test_garbage_is_rejected(): void {
         foreach (['', 'x', 'a.b.c', 'not-a-token', '....', 'YWJj'] as $bad) {
-            $this->assertNull(digest_unsubscribe_token::verify($bad),
-                "unexpectedly accepted: {$bad}");
+            $this->assertNull(
+                digest_unsubscribe_token::verify($bad),
+                "unexpectedly accepted: {$bad}"
+            );
         }
     }
 

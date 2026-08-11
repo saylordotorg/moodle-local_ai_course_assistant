@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\zendesk_client::should_send_now
  */
 final class zendesk_consent_test extends \advanced_testcase {
-
     public function test_blocked_by_default_without_consent(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();

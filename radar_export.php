@@ -83,7 +83,7 @@ if ($action === 'download') {
     }
 
     $payload = radar_delivery::format($format, $query, $response, $meta);
-    list($filename, $contenttype) = radar_delivery::format_meta($format);
+    [$filename, $contenttype] = radar_delivery::format_meta($format);
     header('Content-Type: ' . $contenttype);
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . strlen($payload));

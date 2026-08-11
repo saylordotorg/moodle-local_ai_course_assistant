@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\spend_guard::get_spend
  */
 final class spend_guard_rag_capability_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);

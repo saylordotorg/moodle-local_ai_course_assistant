@@ -40,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class builder {
-
     /**
      * Assemble the final prompt and per-section breakdown.
      *
@@ -196,10 +195,12 @@ class builder {
                 if ($row['info']['truncated']) {
                     $flags[] = 'TRUNCATED';
                 }
-                $lines[] = sprintf("    %5d  %s%s",
+                $lines[] = sprintf(
+                    "    %5d  %s%s",
                     $row['info']['chars'],
                     $row['name'],
-                    $flags ? ' ['.implode(',', $flags).']' : '');
+                    $flags ? ' [' . implode(',', $flags) . ']' : ''
+                );
             }
         }
         return implode("\n", $lines);

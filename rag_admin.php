@@ -87,13 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // If nothing embedded across every course, the cause is almost always a
         // single shared misconfiguration (provider/key) — surface it.
         if ($totalindexed === 0 && $samplereason !== '') {
-            redirect($pageurl,
+            redirect(
+                $pageurl,
                 $msg . ' Nothing was embedded — first error: ' . $samplereason
                     . ' Check the embedding provider and API key in Settings.',
-                null, \core\output\notification::NOTIFY_ERROR);
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
         }
         redirect($pageurl, $msg, null, \core\output\notification::NOTIFY_SUCCESS);
-
     } else if ($action === 'reindexcourse' && $courseid > 0) {
         try {
             $stats = content_indexer::index_course($courseid);
@@ -107,21 +109,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         // Explain a zero-chunk outcome instead of reporting a bare "0 indexed".
         if (!empty($stats['fatal'])) {
-            redirect($pageurl,
+            redirect(
+                $pageurl,
                 'Indexing could not run: ' . $stats['fatal']
                     . ' — check the embedding provider and API key in Settings.',
-                null, \core\output\notification::NOTIFY_ERROR);
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
         }
         if ($stats['indexed'] === 0 && ($stats['sources'] ?? 0) > 0 && !empty($stats['embed_error'])) {
-            redirect($pageurl,
+            redirect(
+                $pageurl,
                 $msg . ' No chunks were embedded — first error: ' . $stats['embed_error']
                     . ' (most often the embedding API key or provider). The existing index was left untouched.',
-                null, \core\output\notification::NOTIFY_ERROR);
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
         }
         if (($stats['sources'] ?? 0) === 0) {
-            redirect($pageurl,
+            redirect(
+                $pageurl,
                 $msg . ' No extractable content was found in this course (no pages, books, or supported files).',
-                null, \core\output\notification::NOTIFY_WARNING);
+                null,
+                \core\output\notification::NOTIFY_WARNING
+            );
         }
         // Surface documents that produced no indexable text, so a page that
         // silently generated no chunk (e.g. mostly an embedded interactive, or
@@ -134,20 +145,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (count($stats['no_content']) > 8) {
                 $titles[] = '…';
             }
-            redirect($pageurl,
+            redirect(
+                $pageurl,
                 $msg . ' ' . get_string('ragadmin:no_content_documents', 'local_ai_course_assistant', (object) [
                     'count'  => count($stats['no_content']),
                     'titles' => implode('; ', $titles),
                 ]),
-                null, \core\output\notification::NOTIFY_WARNING);
+                null,
+                \core\output\notification::NOTIFY_WARNING
+            );
         }
         redirect($pageurl, $msg, null, \core\output\notification::NOTIFY_SUCCESS);
-
     } else if ($action === 'deleteindex' && $courseid > 0) {
         content_indexer::delete_course_index($courseid);
-        redirect($pageurl,
+        redirect(
+            $pageurl,
             get_string('ragadmin:deleteindex_done', 'local_ai_course_assistant'),
-            null, \core\output\notification::NOTIFY_SUCCESS);
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
     }
 }
 
@@ -182,9 +198,11 @@ echo $OUTPUT->heading(get_string('ragadmin:title', 'local_ai_course_assistant'))
 
 // Back link.
 echo html_writer::div(
-    html_writer::link($settingsurl,
+    html_writer::link(
+        $settingsurl,
         '&larr; ' . get_string('ragadmin:back_to_settings', 'local_ai_course_assistant'),
-        ['class' => 'btn btn-sm btn-outline-secondary mb-3']),
+        ['class' => 'btn btn-sm btn-outline-secondary mb-3']
+    ),
     'mb-2'
 );
 
@@ -343,9 +361,9 @@ $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
 <!-- Status table -->
 <h4><?php echo get_string('ragadmin:index_status', 'local_ai_course_assistant'); ?></h4>
 
-<?php if (empty($indexedcourses) && empty($activecourses)): ?>
+<?php if (empty($indexedcourses) && empty($activecourses)) : ?>
     <p class="text-muted"><?php echo get_string('ragadmin:no_courses', 'local_ai_course_assistant'); ?></p>
-<?php else: ?>
+<?php else : ?>
 <table class="table table-sm generaltable">
     <thead>
         <tr>
@@ -370,7 +388,7 @@ $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
         }
         uasort($allcourses, fn($a, $b) => strcmp($a->fullname, $b->fullname));
 
-        foreach ($allcourses as $course): ?>
+        foreach ($allcourses as $course) : ?>
         <tr>
             <td>
                 <?php echo html_writer::link(
@@ -390,9 +408,9 @@ $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
                     : html_writer::span('0', 'badge badge-secondary'); ?>
             </td>
             <td>
-                <?php if (!empty($course->lastindexed)): ?>
+                <?php if (!empty($course->lastindexed)) : ?>
                     <?php echo userdate((int)$course->lastindexed, get_string('strftimedatetimeshort', 'langconfig')); ?>
-                <?php else: ?>
+                <?php else : ?>
                     <span class="text-muted"><?php echo get_string('ragadmin:never', 'local_ai_course_assistant'); ?></span>
                 <?php endif; ?>
             </td>
@@ -405,7 +423,7 @@ $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
                         <?php echo get_string('ragadmin:reindex', 'local_ai_course_assistant'); ?>
                     </button>
                 </form>
-                <?php if ($course->chunks > 0): ?>
+                <?php if ($course->chunks > 0) : ?>
                 <form method="post" action="<?php echo $pageurl->out(false); ?>" class="d-inline ml-1">
                     <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
                     <input type="hidden" name="action" value="deleteindex">

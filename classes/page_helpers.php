@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class page_helpers {
-
     /**
      * Render a friendly "Select a course" landing for per-course admin pages
      * that previously required a `courseid` query param. Lists every course
@@ -75,9 +74,14 @@ class page_helpers {
             // Avoid loading the entire course table into memory on very large
             // sites: stream with a recordset and cap the picker list.
             $maxcourses = 500;
-            $rs = $DB->get_recordset('course',
-                ['visible' => 1], 'fullname',
-                'id, fullname, shortname, visible', 0, $maxcourses);
+            $rs = $DB->get_recordset(
+                'course',
+                ['visible' => 1],
+                'fullname',
+                'id, fullname, shortname, visible',
+                0,
+                $maxcourses
+            );
             foreach ($rs as $c) {
                 if ((int) $c->id === SITEID) {
                     continue;
@@ -89,23 +93,28 @@ class page_helpers {
 
         echo $OUTPUT->header();
         echo $OUTPUT->heading($pagetitle, 2);
-        echo \html_writer::tag('p',
+        echo \html_writer::tag(
+            'p',
             get_string('coursepicker:intro', 'local_ai_course_assistant'),
-            ['class' => 'text-muted']);
+            ['class' => 'text-muted']
+        );
 
         if (empty($eligible)) {
             echo $OUTPUT->notification(
                 get_string('coursepicker:nocourses', 'local_ai_course_assistant'),
-                \core\output\notification::NOTIFY_INFO);
+                \core\output\notification::NOTIFY_INFO
+            );
         } else {
             $items = [];
             foreach ($eligible as $c) {
                 $url = new \moodle_url($pagepath, ['courseid' => (int) $c->id]);
                 $label = format_string($c->fullname);
                 if (!empty($c->shortname)) {
-                    $label .= ' ' . \html_writer::tag('span',
+                    $label .= ' ' . \html_writer::tag(
+                        'span',
                         '(' . format_string($c->shortname) . ')',
-                        ['class' => 'text-muted small']);
+                        ['class' => 'text-muted small']
+                    );
                 }
                 $items[] = \html_writer::link($url, $label);
             }

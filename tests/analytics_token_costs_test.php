@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\analytics::get_token_costs
  */
 final class analytics_token_costs_test extends \advanced_testcase {
-
     /**
      * Insert one msgs row.
      *
@@ -177,8 +176,10 @@ final class analytics_token_costs_test extends \advanced_testcase {
             'completion_tokens' => 5, 'tokens_used' => 15]);
         $this->embedding_row(70, 'shared-model');
 
-        $rows = array_values(array_filter(analytics::get_token_costs(0, 0),
-            fn($r) => $r['model'] === 'shared-model'));
+        $rows = array_values(array_filter(
+            analytics::get_token_costs(0, 0),
+            fn($r) => $r['model'] === 'shared-model'
+        ));
         $this->assertCount(2, $rows);
         $categories = array_column($rows, 'category');
         sort($categories);
@@ -195,8 +196,10 @@ final class analytics_token_costs_test extends \advanced_testcase {
 
         $rows = analytics::get_token_costs($course->id, 0);
         $this->assertNotNull($this->row($rows, 'gpt-4o-mini'));
-        $this->assertNull($this->row($rows, 'text-embedding-3-small'),
-            'site-level indexing spend must not be attributed to one course');
+        $this->assertNull(
+            $this->row($rows, 'text-embedding-3-small'),
+            'site-level indexing spend must not be attributed to one course'
+        );
 
         // The whole-site aggregate sees both.
         $all = analytics::get_token_costs(0, 0);

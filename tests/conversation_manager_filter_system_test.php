@@ -41,7 +41,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\conversation_manager::get_messages
  */
 final class conversation_manager_filter_system_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -60,9 +59,15 @@ final class conversation_manager_filter_system_test extends \advanced_testcase {
      * @param string $itype Interaction type.
      * @return int Inserted row id.
      */
-    private function insert_msg(int $convid, int $userid, int $courseid,
-            string $role, string $message, string $providerid = '',
-            string $itype = 'chat'): int {
+    private function insert_msg(
+        int $convid,
+        int $userid,
+        int $courseid,
+        string $role,
+        string $message,
+        string $providerid = '',
+        string $itype = 'chat'
+    ): int {
         global $DB;
         return (int) $DB->insert_record('local_ai_course_assistant_msgs', (object) [
             'conversationid' => $convid,
@@ -85,11 +90,11 @@ final class conversation_manager_filter_system_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $convid = 999;
         // Plant a realistic conversation plus three telemetry rows.
-        $this->insert_msg($convid, $user->id, $course->id, 'user',      'derive the integral of x*ln(x)');
+        $this->insert_msg($convid, $user->id, $course->id, 'user', 'derive the integral of x*ln(x)');
         $this->insert_msg($convid, $user->id, $course->id, 'assistant', "Let's set u = ln(x)...");
-        $this->insert_msg($convid, $user->id, $course->id, 'system',    '[PremiumRouter] trigger:\\bderive\\b', 'premium_router', 'premium_route');
-        $this->insert_msg($convid, 0,         SITEID,       'system',    '[Rerank]', 'rerank', 'rerank');
-        $this->insert_msg($convid, 0,         SITEID,       'system',    '[Embedding]', 'embedding', 'embedding');
+        $this->insert_msg($convid, $user->id, $course->id, 'system', '[PremiumRouter] trigger:\\bderive\\b', 'premium_router', 'premium_route');
+        $this->insert_msg($convid, 0, SITEID, 'system', '[Rerank]', 'rerank', 'rerank');
+        $this->insert_msg($convid, 0, SITEID, 'system', '[Embedding]', 'embedding', 'embedding');
 
         $rows = conversation_manager::get_messages($convid);
         $this->assertCount(2, $rows, 'Expected only user + assistant rows (system telemetry should be filtered).');
@@ -102,8 +107,8 @@ final class conversation_manager_filter_system_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $convid = 1001;
-        $this->insert_msg($convid, $user->id, $course->id, 'user',      'help with this');
-        $this->insert_msg($convid, $user->id, $course->id, 'system',    '[PremiumRouter] trigger:\\bprove\\s+that\\b', 'premium_router', 'premium_route');
+        $this->insert_msg($convid, $user->id, $course->id, 'user', 'help with this');
+        $this->insert_msg($convid, $user->id, $course->id, 'system', '[PremiumRouter] trigger:\\bprove\\s+that\\b', 'premium_router', 'premium_route');
         $this->insert_msg($convid, $user->id, $course->id, 'assistant', 'Sure, let\'s walk through it.');
 
         $rows = conversation_manager::get_messages($convid);
@@ -120,10 +125,10 @@ final class conversation_manager_filter_system_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $convid = 1002;
-        $this->insert_msg($convid, $user->id, $course->id, 'user',      'q1');
+        $this->insert_msg($convid, $user->id, $course->id, 'user', 'q1');
         $this->insert_msg($convid, $user->id, $course->id, 'assistant', 'a1');
-        $this->insert_msg($convid, $user->id, $course->id, 'system',    '[PremiumRouter] course_tag', 'premium_router', 'premium_route');
-        $this->insert_msg($convid, $user->id, $course->id, 'user',      'q2');
+        $this->insert_msg($convid, $user->id, $course->id, 'system', '[PremiumRouter] course_tag', 'premium_router', 'premium_route');
+        $this->insert_msg($convid, $user->id, $course->id, 'user', 'q2');
         $this->insert_msg($convid, $user->id, $course->id, 'assistant', 'a2');
 
         $api = conversation_manager::get_history_for_api($convid);

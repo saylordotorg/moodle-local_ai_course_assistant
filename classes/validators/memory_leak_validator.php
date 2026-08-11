@@ -45,7 +45,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class memory_leak_validator implements validator_interface {
-
     /**
      * False-memory-narration patterns. These reference state the model
      * does not have (prior sessions, durable history, recall of prior

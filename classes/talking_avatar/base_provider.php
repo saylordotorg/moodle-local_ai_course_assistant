@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base_provider implements provider_interface {
-
     /**
      * Read a per-provider config value, with a global fallback for the
      * v4.8.1 placeholder keys. Looks up `<provider_key>_<key>` first, then
@@ -60,8 +59,13 @@ abstract class base_provider implements provider_interface {
      */
     protected function http_post_json(string $url, array $headers, array $payload): array {
         if (!security::is_safe_provider_url($url)) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                $this->get_key() . ': provider URL rejected by SSRF allowlist (' . $url . ')');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                $this->get_key() . ': provider URL rejected by SSRF allowlist (' . $url . ')'
+            );
         }
         global $CFG;
         require_once($CFG->dirroot . '/lib/filelib.php');
@@ -71,13 +75,23 @@ abstract class base_provider implements provider_interface {
         $resp = $curl->post($url, json_encode($payload), security::resolve_pin_options($url));
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code < 200 || $code >= 300) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                $this->get_key() . ': HTTP ' . $code . ' from ' . $url . ' — ' . substr((string) $resp, 0, 400));
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                $this->get_key() . ': HTTP ' . $code . ' from ' . $url . ' — ' . substr((string) $resp, 0, 400)
+            );
         }
         $decoded = json_decode((string) $resp, true);
         if (!is_array($decoded)) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                $this->get_key() . ': non-JSON response from ' . $url);
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                $this->get_key() . ': non-JSON response from ' . $url
+            );
         }
         return $decoded;
     }

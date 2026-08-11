@@ -28,28 +28,32 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\redash_export_request
  */
 final class redash_export_request_test extends \advanced_testcase {
-
     public function test_absent_sections_keeps_the_full_export(): void {
         // Backward compatibility: an existing data source that passes no
         // sections parameter must keep receiving every section.
         $this->assertSame(
             redash_export_request::SECTIONS,
-            redash_export_request::parse_sections(''));
+            redash_export_request::parse_sections('')
+        );
         $this->assertSame(
             redash_export_request::SECTIONS,
-            redash_export_request::parse_sections('   '));
+            redash_export_request::parse_sections('   ')
+        );
         $this->assertSame(
             redash_export_request::SECTIONS,
-            redash_export_request::parse_sections('all'));
+            redash_export_request::parse_sections('all')
+        );
         $this->assertSame(
             redash_export_request::SECTIONS,
-            redash_export_request::parse_sections('ALL'));
+            redash_export_request::parse_sections('ALL')
+        );
     }
 
     public function test_named_sections_are_the_only_ones_returned(): void {
         $this->assertSame(
             ['courses', 'feedback', 'token_costs'],
-            redash_export_request::parse_sections('courses,feedback,token_costs'));
+            redash_export_request::parse_sections('courses,feedback,token_costs')
+        );
 
         // The heavy sections stay out unless asked for by name.
         $selected = redash_export_request::parse_sections('token_costs');
@@ -62,7 +66,8 @@ final class redash_export_request_test extends \advanced_testcase {
         // Whitespace, case, and duplicates are all tolerated.
         $this->assertSame(
             ['courses', 'feedback'],
-            redash_export_request::parse_sections(' Feedback , courses ,feedback, '));
+            redash_export_request::parse_sections(' Feedback , courses ,feedback, ')
+        );
     }
 
     public function test_response_order_is_canonical_not_caller_order(): void {
@@ -70,17 +75,20 @@ final class redash_export_request_test extends \advanced_testcase {
         // response shape does not depend on how the URL was typed.
         $this->assertSame(
             ['courses', 'feedback', 'meta_ai'],
-            redash_export_request::parse_sections('meta_ai,feedback,courses'));
+            redash_export_request::parse_sections('meta_ai,feedback,courses')
+        );
     }
 
     public function test_unknown_sections_are_dropped_but_reported(): void {
         // A typo alongside a valid name: the valid name still works.
         $this->assertSame(
             ['token_costs'],
-            redash_export_request::parse_sections('token_costs,tokencosts'));
+            redash_export_request::parse_sections('token_costs,tokencosts')
+        );
         $this->assertSame(
             ['tokencosts'],
-            redash_export_request::unknown_sections('token_costs,tokencosts'));
+            redash_export_request::unknown_sections('token_costs,tokencosts')
+        );
     }
 
     public function test_all_unknown_sections_yields_empty_so_caller_can_reject(): void {
@@ -89,7 +97,8 @@ final class redash_export_request_test extends \advanced_testcase {
         $this->assertSame([], redash_export_request::parse_sections('tokencosts,feedbck'));
         $this->assertSame(
             ['tokencosts', 'feedbck'],
-            redash_export_request::unknown_sections('tokencosts,feedbck'));
+            redash_export_request::unknown_sections('tokencosts,feedbck')
+        );
     }
 
     public function test_unknown_sections_empty_for_valid_input(): void {
@@ -103,10 +112,12 @@ final class redash_export_request_test extends \advanced_testcase {
         // -1 is the endpoint's "parameter absent" sentinel.
         $this->assertSame(
             $now - (90 * DAYSECS),
-            redash_export_request::resolve_since(-1, $now, 90));
+            redash_export_request::resolve_since(-1, $now, 90)
+        );
         $this->assertSame(
             $now - (30 * DAYSECS),
-            redash_export_request::resolve_since(-1, $now, 30));
+            redash_export_request::resolve_since(-1, $now, 30)
+        );
     }
 
     public function test_explicit_since_is_honoured(): void {
@@ -135,12 +146,14 @@ final class redash_export_request_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->assertSame(
             redash_export_request::DEFAULT_WINDOW_DAYS,
-            redash_export_request::window_days());
+            redash_export_request::window_days()
+        );
 
         set_config('redash_export_window_days', '', 'local_ai_course_assistant');
         $this->assertSame(
             redash_export_request::DEFAULT_WINDOW_DAYS,
-            redash_export_request::window_days());
+            redash_export_request::window_days()
+        );
     }
 
     public function test_window_days_reads_the_admin_setting(): void {
@@ -164,19 +177,27 @@ final class redash_export_request_test extends \advanced_testcase {
         // only runs when `courses` is selected. Asking for one alone used to
         // return 200 with no learner rows: a silent empty payload, which is the
         // failure mode the unknown-section 400 exists to prevent.
-        $this->assertSame(['student_usage' => 'courses'],
-            redash_export_request::missing_parents(['student_usage']));
-        $this->assertSame(['hotspots' => 'courses'],
-            redash_export_request::missing_parents(['hotspots']));
-        $this->assertSame(['student_usage' => 'courses', 'hotspots' => 'courses'],
-            redash_export_request::missing_parents(['student_usage', 'hotspots']));
+        $this->assertSame(
+            ['student_usage' => 'courses'],
+            redash_export_request::missing_parents(['student_usage'])
+        );
+        $this->assertSame(
+            ['hotspots' => 'courses'],
+            redash_export_request::missing_parents(['hotspots'])
+        );
+        $this->assertSame(
+            ['student_usage' => 'courses', 'hotspots' => 'courses'],
+            redash_export_request::missing_parents(['student_usage', 'hotspots'])
+        );
     }
 
     public function test_nested_sections_with_their_parent_are_fine(): void {
         $this->assertSame([], redash_export_request::missing_parents(['courses', 'student_usage']));
         $this->assertSame([], redash_export_request::missing_parents(['courses', 'hotspots']));
-        $this->assertSame([],
-            redash_export_request::missing_parents(['courses', 'student_usage', 'hotspots']));
+        $this->assertSame(
+            [],
+            redash_export_request::missing_parents(['courses', 'student_usage', 'hotspots'])
+        );
     }
 
     public function test_top_level_sections_need_no_parent(): void {
@@ -189,12 +210,18 @@ final class redash_export_request_test extends \advanced_testcase {
 
     public function test_the_default_full_section_list_has_no_missing_parents(): void {
         // The backward-compatible "everything" case must never trip the 400.
-        $this->assertSame([],
-            redash_export_request::missing_parents(redash_export_request::SECTIONS));
-        $this->assertSame([],
-            redash_export_request::missing_parents(redash_export_request::parse_sections('')));
-        $this->assertSame([],
-            redash_export_request::missing_parents(redash_export_request::parse_sections('all')));
+        $this->assertSame(
+            [],
+            redash_export_request::missing_parents(redash_export_request::SECTIONS)
+        );
+        $this->assertSame(
+            [],
+            redash_export_request::missing_parents(redash_export_request::parse_sections(''))
+        );
+        $this->assertSame(
+            [],
+            redash_export_request::missing_parents(redash_export_request::parse_sections('all'))
+        );
     }
 
     public function test_every_nested_section_names_a_real_parent(): void {

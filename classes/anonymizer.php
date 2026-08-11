@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class anonymizer {
-
     /**
      * Return a consistent pseudonym for a student. Same user ID always
      * produces the same label so cross-references within a single analytics

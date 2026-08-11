@@ -40,7 +40,7 @@ require_once($CFG->libdir . '/clilib.php');
 
 use local_ai_course_assistant\rag_retriever;
 
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'help'     => false,
     'dry-run'  => false,
     'verify'   => false,
@@ -75,8 +75,11 @@ if ($courseid > 0) {
 }
 
 $total = $DB->count_records_select('local_ai_course_assistant_chunks', $where, $params);
-$done = $DB->count_records_select('local_ai_course_assistant_chunks',
-    $where . ' AND embedding_bin IS NOT NULL', $params);
+$done = $DB->count_records_select(
+    'local_ai_course_assistant_chunks',
+    $where . ' AND embedding_bin IS NOT NULL',
+    $params
+);
 $todo = $total - $done;
 
 cli_writeln("chunks with a JSON embedding : {$total}");
@@ -86,8 +89,13 @@ cli_writeln("outstanding                  : {$todo}");
 if ($options['verify']) {
     cli_writeln('');
     cli_writeln('Verifying converted rows...');
-    $rs = $DB->get_recordset_select('local_ai_course_assistant_chunks',
-        $where . ' AND embedding_bin IS NOT NULL', $params, 'id', 'id, embedding, embedding_bin');
+    $rs = $DB->get_recordset_select(
+        'local_ai_course_assistant_chunks',
+        $where . ' AND embedding_bin IS NOT NULL',
+        $params,
+        'id',
+        'id, embedding, embedding_bin'
+    );
     $checked = 0;
     $bad = 0;
     foreach ($rs as $row) {
@@ -134,8 +142,15 @@ $start = microtime(true);
 // Re-query each batch rather than paging by offset: rows leave the candidate
 // set as they are converted, so a moving offset would skip rows.
 while (true) {
-    $rows = $DB->get_records_select('local_ai_course_assistant_chunks',
-        $where . ' AND embedding_bin IS NULL', $params, 'id', 'id, embedding', 0, $batch);
+    $rows = $DB->get_records_select(
+        'local_ai_course_assistant_chunks',
+        $where . ' AND embedding_bin IS NULL',
+        $params,
+        'id',
+        'id, embedding',
+        0,
+        $batch
+    );
     if (empty($rows)) {
         break;
     }
@@ -148,8 +163,12 @@ while (true) {
             $DB->set_field('local_ai_course_assistant_chunks', 'embedding_bin', '', ['id' => $row->id]);
             continue;
         }
-        $DB->set_field('local_ai_course_assistant_chunks', 'embedding_bin',
-            rag_retriever::pack_vector($vec), ['id' => $row->id]);
+        $DB->set_field(
+            'local_ai_course_assistant_chunks',
+            'embedding_bin',
+            rag_retriever::pack_vector($vec),
+            ['id' => $row->id]
+        );
         $converted++;
     }
     $pct = $todo > 0 ? round(($converted + $skipped) / $todo * 100) : 100;

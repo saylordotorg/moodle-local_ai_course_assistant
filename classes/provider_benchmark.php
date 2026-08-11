@@ -40,25 +40,24 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider_benchmark {
-
     /**
      * Typical learner prompts. Short and zero-context — this is a cost /
      * latency / contract benchmark, not a tutoring-quality benchmark.
      */
     public const CHAT_PROMPTS = [
         ['label' => 'concept_definition', 'prompt' => 'What is photosynthesis? Answer in two sentences.'],
-        ['label' => 'one_sentence',       'prompt' => 'Explain Newton\'s second law in one sentence.'],
-        ['label' => 'example',            'prompt' => 'Give a concrete example of supply and demand.'],
-        ['label' => 'next_step',          'prompt' => 'I finished the unit on cell biology. What\'s a good next concept to study?'],
-        ['label' => 'summarize',          'prompt' => 'Summarize what a quadratic equation is, in 2 sentences.'],
+        ['label' => 'one_sentence', 'prompt' => 'Explain Newton\'s second law in one sentence.'],
+        ['label' => 'example', 'prompt' => 'Give a concrete example of supply and demand.'],
+        ['label' => 'next_step', 'prompt' => 'I finished the unit on cell biology. What\'s a good next concept to study?'],
+        ['label' => 'summarize', 'prompt' => 'Summarize what a quadratic equation is, in 2 sentences.'],
     ];
 
     /**
      * Analyst-shaped prompts that mirror what Learning Radar sends.
      */
     public const ANALYTICS_PROMPTS = [
-        ['label' => 'count',     'prompt' => 'How would you measure active-learner engagement on a Moodle site?'],
-        ['label' => 'cluster',   'prompt' => 'What are common sticking points first-year STEM students hit?'],
+        ['label' => 'count', 'prompt' => 'How would you measure active-learner engagement on a Moodle site?'],
+        ['label' => 'cluster', 'prompt' => 'What are common sticking points first-year STEM students hit?'],
         ['label' => 'cost_qual', 'prompt' => 'Briefly: how do you balance LLM cost against response quality at scale?'],
     ];
 
@@ -310,10 +309,17 @@ class provider_benchmark {
         });
         $winner = $eligible[0];
         $reason = $winner['cost_known']
-            ? sprintf('Lowest total cost ($%.6f) across %d prompts; latency %dms.',
-                $winner['total_cost'], $promptcount, $winner['total_latency'])
-            : sprintf('Cost data unavailable; lowest total latency (%dms) across %d prompts.',
-                $winner['total_latency'], $promptcount);
+            ? sprintf(
+                'Lowest total cost ($%.6f) across %d prompts; latency %dms.',
+                $winner['total_cost'],
+                $promptcount,
+                $winner['total_latency']
+            )
+            : sprintf(
+                'Cost data unavailable; lowest total latency (%dms) across %d prompts.',
+                $winner['total_latency'],
+                $promptcount
+            );
         return [
             'provider' => $winner['provider'],
             'model' => $winner['model'],
@@ -452,7 +458,10 @@ class provider_benchmark {
                     }
                     if ($p['model'] !== '' && ($row['prompt_tokens'] > 0 || $row['completion_tokens'] > 0)) {
                         $row['cost_usd'] = token_cost_manager::estimate_cost(
-                            $p['model'], $row['prompt_tokens'], $row['completion_tokens']);
+                            $p['model'],
+                            $row['prompt_tokens'],
+                            $row['completion_tokens']
+                        );
                     }
                 } catch (\Throwable $e) {
                     $row['latency_ms'] = (int) round((microtime(true) - $start) * 1000);
@@ -618,11 +627,13 @@ class provider_benchmark {
         $when = userdate((int) ($payload['generated_at'] ?? time()), '%Y-%m-%d %H:%M %Z');
         $out = "# {$brand} Provider Benchmark\n\n_Generated {$when}_\n\n";
 
-        foreach ([
+        foreach (
+            [
             'chat' => 'Chat',
             'analytics' => 'Analytics (Learning Radar)',
             'rag' => 'RAG (embeddings)',
-        ] as $cap => $title) {
+            ] as $cap => $title
+        ) {
             $section = $payload[$cap] ?? [];
             $out .= "## {$title}\n\n";
             if (!empty($section['note'])) {
@@ -646,7 +657,8 @@ class provider_benchmark {
                     // Pipe-escape for table-safe output.
                     $excerpt = str_replace('|', '\\|', (string) $excerpt);
                     $excerpt = str_replace("\n", ' ', $excerpt);
-                    $out .= sprintf("| %s | %s | %s | %s | %d | %d | %s | %d | %s |\n",
+                    $out .= sprintf(
+                        "| %s | %s | %s | %s | %d | %d | %s | %d | %s |\n",
                         (string) ($r['provider'] ?? ''),
                         (string) ($r['model'] ?? ''),
                         (string) ($r['prompt_label'] ?? ''),
@@ -655,7 +667,8 @@ class provider_benchmark {
                         (int) ($r['completion_tokens'] ?? 0),
                         $cost,
                         (int) ($r['latency_ms'] ?? 0),
-                        $excerpt);
+                        $excerpt
+                    );
                 }
                 $out .= "\n";
             }
@@ -679,12 +692,14 @@ class provider_benchmark {
             $out .= "| Provider | Label | Realtime voice | TTS voice | Configured |\n";
             $out .= "|---|---|---|---|---|\n";
             foreach ($voice['providers'] as $p) {
-                $out .= sprintf("| %s | %s | %s | %s | %s |\n",
+                $out .= sprintf(
+                    "| %s | %s | %s | %s | %s |\n",
                     (string) ($p['id'] ?? ''),
                     (string) ($p['label'] ?? ''),
                     (string) ($p['realtime_voice'] ?? ''),
                     (string) ($p['tts_voice'] ?? ''),
-                    !empty($p['configured']) ? '✓' : '✗');
+                    !empty($p['configured']) ? '✓' : '✗'
+                );
             }
             $out .= "\n";
         }

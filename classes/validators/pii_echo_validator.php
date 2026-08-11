@@ -34,7 +34,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pii_echo_validator implements validator_interface {
-
     private const RE_EMAIL = '/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i';
     private const RE_PHONE = '/(?<!\d)(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}(?!\d)/';
     private const RE_SSN   = '/(?<!\d)\d{3}-\d{2}-\d{4}(?!\d)/';

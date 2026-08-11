@@ -51,8 +51,10 @@ if ($action === 'togglestudentmode' && confirm_sesskey()) {
     } else {
         $uistate->set('student_mode', 1);
     }
-    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => $range]));
+    redirect(new moodle_url(
+        '/local/ai_course_assistant/analytics.php',
+        ['courseid' => $courseid, 'range' => $range]
+    ));
 }
 
 // ── Anonymization toggle (session-scoped) ──────────────────────────────────
@@ -70,8 +72,10 @@ if ($action === 'togglenames' && confirm_sesskey()) {
             ['range_days' => (int)$range]
         );
     }
-    redirect(new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => $range]));
+    redirect(new moodle_url(
+        '/local/ai_course_assistant/analytics.php',
+        ['courseid' => $courseid, 'range' => $range]
+    ));
 }
 $show_real_names = (bool) $uistate->get('show_real_names');
 
@@ -81,8 +85,10 @@ if (in_array($action, ['toggle', 'toggleut', 'bulktoggle', 'bulktoggleut'], true
     redirect(new moodle_url('/local/ai_course_assistant/courses_admin.php'));
 }
 
-$PAGE->set_url(new moodle_url('/local/ai_course_assistant/analytics.php',
-    ['courseid' => $courseid, 'range' => $range]));
+$PAGE->set_url(new moodle_url(
+    '/local/ai_course_assistant/analytics.php',
+    ['courseid' => $courseid, 'range' => $range]
+));
 $PAGE->set_context($syscontext);
 $PAGE->set_title('AI Course Assistant Analytics');
 $PAGE->set_heading('AI Course Assistant Analytics');
@@ -159,7 +165,9 @@ if ($courseid > 0) {
                JOIN {user} u ON u.id = f.userid
               WHERE f.courseid = :courseid{$feedbacktimewhere}
               ORDER BY f.timecreated DESC",
-            $feedbackparams, 0, 50
+            $feedbackparams,
+            0,
+            50
         );
         $feedbackentries = [];
         foreach ($recentfeedback as $fb) {
@@ -302,7 +310,7 @@ if ($courseid > 0) {
             'has_common_prompts' => !empty($commonprompts),
             'provider_comparison' => $providercomparison,
             'has_provider_comparison' => !empty($providercomparison),
-            'students' => array_values(array_map(function($s) use ($show_real_names) {
+            'students' => array_values(array_map(function ($s) use ($show_real_names) {
                 $realname = $s->firstname . ' ' . $s->lastname;
                 $anonname = \local_ai_course_assistant\anonymizer::name((int) $s->userid);
                 return [
@@ -322,8 +330,10 @@ if ($courseid > 0) {
             'usertesting_data' => $ut_data,
             'has_usertesting_data' => ($ut_data !== null),
             'has_any_feedback_data' => ($feedbacktotal > 0 || $survey_data !== null || $ut_data !== null),
-            'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
-                ['courseid' => $courseid, 'range' => $range]))->out(false),
+            'token_analytics_url' => (new moodle_url(
+                '/local/ai_course_assistant/token_analytics.php',
+                ['courseid' => $courseid, 'range' => $range]
+            ))->out(false),
         ];
     }
 }
@@ -343,8 +353,10 @@ foreach ($radarpastraw as $row) {
         $pendinguser = $row;
         continue;
     }
-    if ($row->role === 'assistant' && $pendinguser !== null
-            && (int) $pendinguser->conversationid === (int) $row->conversationid) {
+    if (
+        $row->role === 'assistant' && $pendinguser !== null
+            && (int) $pendinguser->conversationid === (int) $row->conversationid
+    ) {
         $radar_past[] = [
             'id'        => (int) $row->id,
             'query'     => mb_substr((string) $pendinguser->message, 0, 200),
@@ -406,24 +418,36 @@ $templatedata = [
     'range_7_selected'   => $range == 7,
     'range_30_selected'  => $range == 30,
     'range_all_selected' => $range == 0,
-    'url_7'  => (new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => 7]))->out(false),
-    'url_30' => (new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => 30]))->out(false),
-    'url_all' => (new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['courseid' => $courseid, 'range' => 0]))->out(false),
+    'url_7'  => (new moodle_url(
+        '/local/ai_course_assistant/analytics.php',
+        ['courseid' => $courseid, 'range' => 7]
+    ))->out(false),
+    'url_30' => (new moodle_url(
+        '/local/ai_course_assistant/analytics.php',
+        ['courseid' => $courseid, 'range' => 30]
+    ))->out(false),
+    'url_all' => (new moodle_url(
+        '/local/ai_course_assistant/analytics.php',
+        ['courseid' => $courseid, 'range' => 0]
+    ))->out(false),
 
     'sesskey'        => sesskey(),
     'form_action'    => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
     'courseid_param' => $courseid,
 
     // Links.
-    'token_analytics_url' => (new moodle_url('/local/ai_course_assistant/token_analytics.php',
-        ['range' => $range]))->out(false),
-    'settings_url' => (new moodle_url('/admin/category.php',
-        ['category' => 'local_ai_course_assistant']))->out(false),
-    'analytics_base_url' => (new moodle_url('/local/ai_course_assistant/analytics.php',
-        ['range' => $range]))->out(false),
+    'token_analytics_url' => (new moodle_url(
+        '/local/ai_course_assistant/token_analytics.php',
+        ['range' => $range]
+    ))->out(false),
+    'settings_url' => (new moodle_url(
+        '/admin/category.php',
+        ['category' => 'local_ai_course_assistant']
+    ))->out(false),
+    'analytics_base_url' => (new moodle_url(
+        '/local/ai_course_assistant/analytics.php',
+        ['range' => $range]
+    ))->out(false),
     'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
     'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
     'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
@@ -529,7 +553,8 @@ $templatedata = [
               WHERE m.role = 'assistant' AND m.timecreated > ?
               GROUP BY c.id, c.shortname, c.fullname
               ORDER BY tokens DESC LIMIT 1",
-            [$since30]);
+            [$since30]
+        );
         $chips[] = [
             'value' => $topcourse ? format_string($topcourse->shortname) : '—',
             'label' => 'Top-cost course (30d)',
@@ -543,7 +568,8 @@ $templatedata = [
             "SELECT COUNT(DISTINCT userid)
                FROM {local_ai_course_assistant_msgs}
               WHERE role = 'user' AND timecreated > ?",
-            [$since7]) ?: 0;
+            [$since7]
+        ) ?: 0;
         $chips[] = [
             'value' => number_format($activeusers),
             'label' => 'Active students (7d)',
@@ -555,7 +581,8 @@ $templatedata = [
         $voicemsgs = (int) $DB->get_field_sql(
             "SELECT COUNT(id) FROM {local_ai_course_assistant_msgs}
               WHERE interaction_type = 'voice' AND timecreated > ?",
-            [$since30]) ?: 0;
+            [$since30]
+        ) ?: 0;
         $chips[] = [
             'value' => number_format((int) ceil($voicemsgs * 0.5)),
             'label' => 'Voice minutes (30d)',
@@ -566,7 +593,8 @@ $templatedata = [
         $neg = (int) $DB->get_field_sql(
             "SELECT COUNT(id) FROM {local_ai_course_assistant_msg_ratings}
               WHERE rating = -1 AND timecreated > ?",
-            [$since7]) ?: 0;
+            [$since7]
+        ) ?: 0;
         $chips[] = [
             'value' => number_format($neg),
             'label' => 'Negative ratings (7d)',
@@ -578,7 +606,9 @@ $templatedata = [
         try {
             $flags = (int) $DB->count_records_select(
                 'local_ai_course_assistant_audit',
-                'event = ?', ['integrity_flagged']);
+                'event = ?',
+                ['integrity_flagged']
+            );
         } catch (\Throwable $e) {
             $flags = 0;
         }

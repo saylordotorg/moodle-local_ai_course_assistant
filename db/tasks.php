@@ -29,7 +29,7 @@ $tasks = [
         'classname' => \local_ai_course_assistant\task\send_reminders::class,
         'blocking' => 0,
         'minute' => '0',
-        'hour' => '8',       // Run at 8 AM server time.
+        'hour' => '8', // Run at 8 AM server time.
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
@@ -38,7 +38,7 @@ $tasks = [
         'classname' => \local_ai_course_assistant\task\index_course_content::class,
         'blocking' => 0,
         'minute' => '0',
-        'hour' => '2',       // Run at 2 AM server time.
+        'hour' => '2', // Run at 2 AM server time.
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
@@ -74,7 +74,7 @@ $tasks = [
         'classname' => \local_ai_course_assistant\task\audit_cleanup::class,
         'blocking' => 0,
         'minute' => '30',
-        'hour' => '4',       // Daily at 4:30 AM server time.
+        'hour' => '4', // Daily at 4:30 AM server time.
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
@@ -83,7 +83,7 @@ $tasks = [
         'classname' => \local_ai_course_assistant\task\conversation_retention::class,
         'blocking' => 0,
         'minute' => '45',
-        'hour' => '4',       // Daily at 4:45 AM server time.
+        'hour' => '4', // Daily at 4:45 AM server time.
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
@@ -95,7 +95,7 @@ $tasks = [
         'classname' => \local_ai_course_assistant\task\soapbox_cleanup::class,
         'blocking' => 0,
         'minute' => '50',
-        'hour' => '4',       // Daily at 4:50 AM server time.
+        'hour' => '4', // Daily at 4:50 AM server time.
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
@@ -109,7 +109,7 @@ $tasks = [
         'hour' => '9',
         'day' => '*',
         'month' => '*',
-        'dayofweek' => '1',  // Mondays at 09:00 server time.
+        'dayofweek' => '1', // Mondays at 09:00 server time.
     ],
     [
         // v4.0 / M3 — Per-learner weekly digest. Opt-in only; only fires for
@@ -121,7 +121,7 @@ $tasks = [
         'hour' => '9',
         'day' => '*',
         'month' => '*',
-        'dayofweek' => '1',  // Mondays at 09:15 server time.
+        'dayofweek' => '1', // Mondays at 09:15 server time.
     ],
     [
         // v4.2 — Daily anomaly digest. Quiet by default; only fires when the

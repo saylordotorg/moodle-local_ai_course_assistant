@@ -38,7 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_finalize_recording extends external_api {
-
     /**
      * @return external_function_parameters
      */
@@ -62,8 +61,14 @@ class soapbox_finalize_recording extends external_api {
      * @param string $slidetimeline
      * @return array
      */
-    public static function execute(int $assignid, string $objectkey, int $topicid = 0,
-            int $durationseconds = 0, string $deckkey = '', string $slidetimeline = ''): array {
+    public static function execute(
+        int $assignid,
+        string $objectkey,
+        int $topicid = 0,
+        int $durationseconds = 0,
+        string $deckkey = '',
+        string $slidetimeline = ''
+    ): array {
         global $USER, $DB;
 
         $params = self::validate_parameters(self::execute_parameters(), [
@@ -97,8 +102,12 @@ class soapbox_finalize_recording extends external_api {
 
         // Validate the topic belongs to this assignment (if any).
         $topicid = (int) $params['topicid'];
-        if ($topicid > 0 && !$DB->record_exists('local_ai_course_assistant_sbx_topic',
-                ['id' => $topicid, 'assignid' => $assign->id])) {
+        if (
+            $topicid > 0 && !$DB->record_exists(
+                'local_ai_course_assistant_sbx_topic',
+                ['id' => $topicid, 'assignid' => $assign->id]
+            )
+        ) {
             $topicid = 0;
         }
 
@@ -110,8 +119,10 @@ class soapbox_finalize_recording extends external_api {
         $timelinejson = null;
         if (!empty($assign->slides_enabled)) {
             $deckkey = (string) $params['deckkey'];
-            if ($deckkey !== '' && strpos($deckkey, $expectedprefix) === 0
-                    && $storage->object_size($deckkey) !== null) {
+            if (
+                $deckkey !== '' && strpos($deckkey, $expectedprefix) === 0
+                    && $storage->object_size($deckkey) !== null
+            ) {
                 $deckkeystored = $deckkey;
             }
             $timeline = soapbox_config::normalize_slide_timeline((string) $params['slidetimeline']);

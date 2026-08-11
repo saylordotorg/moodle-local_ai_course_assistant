@@ -34,7 +34,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class together_provider extends openai_compatible_provider {
-
     protected function get_default_model(): string {
         return 'meta-llama/Llama-3.1-8B-Instruct-Turbo';
     }

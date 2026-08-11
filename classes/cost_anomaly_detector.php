@@ -68,7 +68,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cost_anomaly_detector {
-
     /** @var int Minimum days of history required before evaluating an anomaly. */
     public const MIN_HISTORY_DAYS = 7;
 
@@ -169,7 +168,11 @@ class cost_anomaly_detector {
         $shortnames = [];
         if (!empty($top)) {
             $rows = $DB->get_records_list(
-                'course', 'id', array_keys($top), '', 'id,shortname'
+                'course',
+                'id',
+                array_keys($top),
+                '',
+                'id,shortname'
             );
             foreach ($rows as $r) {
                 $shortnames[(int) $r->id] = (string) $r->shortname;
@@ -341,7 +344,8 @@ class cost_anomaly_detector {
         if (!empty($eval['top_courses'])) {
             $body .= "Top courses by spend today:\n";
             foreach ($eval['top_courses'] as $c) {
-                $body .= sprintf("  %-40s \$%.4f  (courseid=%d)\n",
+                $body .= sprintf(
+                    "  %-40s \$%.4f  (courseid=%d)\n",
                     substr($c['shortname'] ?? '<unknown>', 0, 40),
                     $c['spend_usd'],
                     $c['courseid']

@@ -61,8 +61,12 @@ use local_ai_course_assistant\provider\base_provider;
 $courseid = 0;
 $limit = 0;
 foreach ($argv as $a) {
-    if (preg_match('/^--courseid=(\d+)$/', $a, $m)) { $courseid = (int) $m[1]; }
-    if (preg_match('/^--limit=(\d+)$/', $a, $m))    { $limit = (int) $m[1]; }
+    if (preg_match('/^--courseid=(\d+)$/', $a, $m)) {
+        $courseid = (int) $m[1];
+    }
+    if (preg_match('/^--limit=(\d+)$/', $a, $m)) {
+        $limit = (int) $m[1];
+    }
 }
 if ($courseid <= 0) {
     fwrite(STDERR, "Usage: run_weight_benchmark.php --courseid=<id> [--limit=N]\n");
@@ -134,14 +138,22 @@ foreach ($candidates as $label => $weights) {
             // pageid=1 exercises the page_focus boost path. We are not
             // actually on a Moodle page; the boost only checks pageid > 0.
             $systemprompt = context_builder::build_system_prompt(
-                $courseid, $admin->id, '', [], 1, 'Practice page', ''
+                $courseid,
+                $admin->id,
+                '',
+                [],
+                1,
+                'Practice page',
+                ''
             );
             $provider = base_provider::create_from_config($courseid);
             $response = '';
             $provider->chat_completion_stream(
                 $systemprompt,
                 [['role' => 'user', 'content' => $p['text']]],
-                function (string $chunk) use (&$response) { $response .= $chunk; },
+                function (string $chunk) use (&$response) {
+                    $response .= $chunk;
+                },
                 ['temperature' => 0.4, 'max_tokens' => 256]
             );
             $usage = $provider->get_last_token_usage();
@@ -156,7 +168,9 @@ foreach ($candidates as $label => $weights) {
                 $rubric_systemprompt,
                 [['role' => 'user', 'content' => "Student prompt:\n" . $p['text']
                     . "\n\nTutor response:\n" . mb_substr($response, 0, 1500)]],
-                function (string $chunk) use (&$judge_response) { $judge_response .= $chunk; },
+                function (string $chunk) use (&$judge_response) {
+                    $judge_response .= $chunk;
+                },
                 ['temperature' => 0.0, 'max_tokens' => 200]
             );
             $jusage = $judge->get_last_token_usage();
@@ -202,8 +216,13 @@ if ($origboost === '') {
 uasort($summary, fn($a, $b) => $b['rubric_avg'] <=> $a['rubric_avg']);
 echo "\n=== summary (sorted by avg rubric desc) ===\n";
 foreach ($summary as $label => $s) {
-    printf("  %-32s avg=%.2f/15 n=%-3d cost=%.3f cents\n",
-        $label, $s['rubric_avg'], $s['n'], $s['cost_cents']);
+    printf(
+        "  %-32s avg=%.2f/15 n=%-3d cost=%.3f cents\n",
+        $label,
+        $s['rubric_avg'],
+        $s['n'],
+        $s['cost_cents']
+    );
 }
 printf("\nTotal spend: %.3f cents\n", $totalcost * 100);
 echo "Original config restored.\n";

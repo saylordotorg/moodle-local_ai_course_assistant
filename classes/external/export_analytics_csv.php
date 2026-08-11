@@ -33,7 +33,6 @@ use local_ai_course_assistant\analytics;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class export_analytics_csv extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'tab' => new external_value(PARAM_ALPHA, 'Analytics tab to export (overall, courses, comparison, units, usage_types, themes, feedback)'),

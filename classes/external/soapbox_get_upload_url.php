@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_get_upload_url extends external_api {
-
     /** @var string[] Extensions we accept for a recording. */
     const ALLOWED_EXT = ['mp4', 'webm', 'ogg', 'm4a', 'oga', 'mov'];
 
@@ -63,8 +62,10 @@ class soapbox_get_upload_url extends external_api {
     public static function execute(int $assignid, string $ext = 'mp4', string $kind = 'recording'): array {
         global $USER, $DB;
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['assignid' => $assignid, 'ext' => $ext, 'kind' => $kind]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['assignid' => $assignid, 'ext' => $ext, 'kind' => $kind]
+        );
 
         $assign = soapbox_assignment_manager::get_assignment((int) $params['assignid']);
         if (!$assign || !$assign->visible) {
@@ -104,7 +105,8 @@ class soapbox_get_upload_url extends external_api {
         $made = $DB->count_records_select(
             'local_ai_course_assistant_sbx_rec',
             'assignid = :a AND userid = :u AND status <> :d',
-            ['a' => $assign->id, 'u' => $USER->id, 'd' => 'deleted']);
+            ['a' => $assign->id, 'u' => $USER->id, 'd' => 'deleted']
+        );
         if ($made >= soapbox_config::effective_recording_cap((int) $assign->max_attempts)) {
             throw new \moodle_exception('soapbox:cap_reached', 'local_ai_course_assistant');
         }

@@ -29,7 +29,6 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content_indexer {
-
     /**
      * Index all content in a course.
      *

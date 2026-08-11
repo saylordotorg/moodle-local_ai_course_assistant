@@ -26,7 +26,6 @@ namespace local_ai_course_assistant\embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base_embedding_provider {
-
     /** @var string API key (may be empty for local providers). */
     protected string $apikey;
 
@@ -181,8 +180,13 @@ abstract class base_embedding_provider {
     protected function http_post(string $url, array $headers, string $body): string {
         global $CFG;
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
-            throw new \moodle_exception('chat:error_generic', 'local_ai_course_assistant',
-                '', null, "embedding endpoint failed SSRF validation: {$url}");
+            throw new \moodle_exception(
+                'chat:error_generic',
+                'local_ai_course_assistant',
+                '',
+                null,
+                "embedding endpoint failed SSRF validation: {$url}"
+            );
         }
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
         $curl = new \curl();
@@ -193,8 +197,11 @@ abstract class base_embedding_provider {
         ]);
 
         // Pin to the validated IP, closing the DNS-rebinding window.
-        $response = $curl->post($url, $body,
-            \local_ai_course_assistant\security::resolve_pin_options($url));
+        $response = $curl->post(
+            $url,
+            $body,
+            \local_ai_course_assistant\security::resolve_pin_options($url)
+        );
         $httpcode = $curl->get_info()['http_code'] ?? 0;
 
         if ($httpcode < 200 || $httpcode >= 300) {

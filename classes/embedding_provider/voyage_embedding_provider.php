@@ -35,7 +35,6 @@ namespace local_ai_course_assistant\embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class voyage_embedding_provider extends base_embedding_provider {
-
     /** Voyage batch limit per call (per docs.voyageai.com). */
     private const BATCH_SIZE = 1000;
 
@@ -60,9 +59,11 @@ class voyage_embedding_provider extends base_embedding_provider {
      * @return int|null Width to send, or null to omit.
      */
     public static function mrl_output_dimension(int $configured): ?int {
-        if ($configured > 0
+        if (
+            $configured > 0
                 && $configured !== self::NATIVE_DIMENSION
-                && in_array($configured, self::VALID_DIMENSIONS, true)) {
+                && in_array($configured, self::VALID_DIMENSIONS, true)
+        ) {
             return $configured;
         }
         return null;

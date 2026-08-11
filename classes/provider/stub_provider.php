@@ -34,7 +34,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stub_provider extends base_provider {
-
     /** @var array<string,string> Programmed responses keyed by detected prompt kind. */
     public static array $programmed = [];
 

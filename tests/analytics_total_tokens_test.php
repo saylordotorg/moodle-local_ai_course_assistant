@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\analytics::get_total_tokens
  */
 final class analytics_total_tokens_test extends \advanced_testcase {
-
     /**
      * Insert one msgs row; overrides win over the defaults.
      *

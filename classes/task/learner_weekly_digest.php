@@ -38,7 +38,6 @@ use local_ai_course_assistant\branding;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learner_weekly_digest extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:learner_weekly_digest', 'local_ai_course_assistant');
     }

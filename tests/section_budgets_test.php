@@ -30,7 +30,6 @@ use local_ai_course_assistant\prompt\builder;
  * @covers     \local_ai_course_assistant\prompt\builder
  */
 final class section_budgets_test extends \advanced_testcase {
-
     /**
      * Default weights at the benchmarked 10/10/40/40 split, with the
      * page_focus boost applied because pageid > 0. The boost shifts
@@ -49,11 +48,18 @@ final class section_budgets_test extends \advanced_testcase {
         $b = context_builder::section_budgets(12000, /*pageid*/ 42, /*quizmode*/ '');
 
         // Total should be ~12000 (rounding tolerance).
-        $this->assertEqualsWithDelta(12000, array_sum($b), 5,
-            'Per-bucket budgets must sum to the total within rounding tolerance.');
+        $this->assertEqualsWithDelta(
+            12000,
+            array_sum($b),
+            5,
+            'Per-bucket budgets must sum to the total within rounding tolerance.'
+        );
         // Current page should have the largest slice after the boost.
-        $this->assertGreaterThan($b['course_content'], $b['current_page'],
-            'page_focus boost should make current_page the largest bucket.');
+        $this->assertGreaterThan(
+            $b['course_content'],
+            $b['current_page'],
+            'page_focus boost should make current_page the largest bucket.'
+        );
         $this->assertGreaterThan($b['course_structure'], $b['course_content']);
         // Safety floor preserved.
         $this->assertGreaterThanOrEqual(1100, $b['safety_identity']);
@@ -93,8 +99,11 @@ final class section_budgets_test extends \advanced_testcase {
         $without_either = context_builder::section_budgets(12000, /*pageid*/ 0, '');
 
         // Coach mode + no pageid should still allocate to current_page (boost fires).
-        $this->assertGreaterThan(0, $with_coach['current_page'],
-            'Coach mode must allocate to current_page even when pageid==0.');
+        $this->assertGreaterThan(
+            0,
+            $with_coach['current_page'],
+            'Coach mode must allocate to current_page even when pageid==0.'
+        );
         // Coach budgets should mirror the with-page budgets reasonably closely.
         $this->assertEquals($with_page['current_page'], $with_coach['current_page']);
         // Without either, current_page is 0.
@@ -136,7 +145,7 @@ final class section_budgets_test extends \advanced_testcase {
         $this->resetAfterTest();
         set_config('prompt_context_boost_mode', 'off', 'local_ai_course_assistant');
         set_config('prompt_section_weights', json_encode([
-            'safety_identity'  => 5,  // sums to 25; way out of tolerance
+            'safety_identity'  => 5, // sums to 25; way out of tolerance
             'course_structure' => 5,
             'course_content'   => 10,
             'current_page'     => 5,
@@ -144,8 +153,12 @@ final class section_budgets_test extends \advanced_testcase {
 
         $b = context_builder::section_budgets(12000, 42, '');
 
-        $this->assertEqualsWithDelta(12000, array_sum($b), 5,
-            'Fall-back defaults must still produce a budget summing to the total.');
+        $this->assertEqualsWithDelta(
+            12000,
+            array_sum($b),
+            5,
+            'Fall-back defaults must still produce a budget summing to the total.'
+        );
         // Defaults are 10/10/40/40, so current_page should be 4800.
         $this->assertEqualsWithDelta(4800, $b['current_page'], 5);
     }
@@ -163,16 +176,24 @@ final class section_budgets_test extends \advanced_testcase {
         ]), 'local_ai_course_assistant');
 
         $with_page    = context_builder::section_budgets(12000, 42, '');
-        $without_page = context_builder::section_budgets(12000, 0,  '');
+        $without_page = context_builder::section_budgets(12000, 0, '');
 
         // With boost off, every bucket gets exactly 25% regardless of pageid.
         foreach ($with_page as $bucket => $alloc) {
-            $this->assertEqualsWithDelta(3000, $alloc, 5,
-                "bucket=$bucket should be 25% under boost=off, got $alloc");
+            $this->assertEqualsWithDelta(
+                3000,
+                $alloc,
+                5,
+                "bucket=$bucket should be 25% under boost=off, got $alloc"
+            );
         }
         foreach ($without_page as $bucket => $alloc) {
-            $this->assertEqualsWithDelta(3000, $alloc, 5,
-                "bucket=$bucket should be 25% under boost=off, got $alloc");
+            $this->assertEqualsWithDelta(
+                3000,
+                $alloc,
+                5,
+                "bucket=$bucket should be 25% under boost=off, got $alloc"
+            );
         }
     }
 
@@ -189,10 +210,16 @@ final class section_budgets_test extends \advanced_testcase {
         $assembled = builder::assemble([$sec], /*budget*/ 100000);
 
         // The section should be truncated to ~500 chars + the truncation marker.
-        $this->assertLessThan(700, $assembled['breakdown']['test']['chars'],
-            'Section with max_chars=500 should be truncated at the cap.');
-        $this->assertGreaterThan(450, $assembled['breakdown']['test']['chars'],
-            'Section truncated should still carry at least max_chars-ish content.');
+        $this->assertLessThan(
+            700,
+            $assembled['breakdown']['test']['chars'],
+            'Section with max_chars=500 should be truncated at the cap.'
+        );
+        $this->assertGreaterThan(
+            450,
+            $assembled['breakdown']['test']['chars'],
+            'Section truncated should still carry at least max_chars-ish content.'
+        );
         $this->assertTrue($assembled['breakdown']['test']['truncated']);
     }
 
@@ -208,8 +235,11 @@ final class section_budgets_test extends \advanced_testcase {
         $assembled = builder::assemble([$sec], /*budget*/ 100000);
 
         // max_chars should be ignored on safety sections.
-        $this->assertEquals(strlen($long), $assembled['breakdown']['safety_test']['chars'],
-            'Safety sections must be exempt from max_chars truncation.');
+        $this->assertEquals(
+            strlen($long),
+            $assembled['breakdown']['safety_test']['chars'],
+            'Safety sections must be exempt from max_chars truncation.'
+        );
         $this->assertFalse($assembled['breakdown']['safety_test']['truncated']);
     }
 }

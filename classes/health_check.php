@@ -34,7 +34,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class health_check {
-
     public const STATUS_PASS = 'pass';
     public const STATUS_FAIL = 'fail';
     public const STATUS_WARN = 'warn';
@@ -60,9 +59,15 @@ class health_check {
         $passed = $failed = $warned = 0;
         foreach ($checks as $c) {
             switch ($c['status']) {
-                case self::STATUS_PASS: $passed++; break;
-                case self::STATUS_FAIL: $failed++; break;
-                case self::STATUS_WARN: $warned++; break;
+                case self::STATUS_PASS:
+                    $passed++;
+                    break;
+                case self::STATUS_FAIL:
+                    $failed++;
+                    break;
+                case self::STATUS_WARN:
+                    $warned++;
+                    break;
             }
         }
 
@@ -124,8 +129,10 @@ class health_check {
             // Adhoc tasks (queued from request) are not in mdl_task_scheduled.
             // Identify them by the parent class. Cheap: read first 80 lines.
             $head = file_get_contents($f, false, null, 0, 4096);
-            if (strpos($head, 'extends \\core\\task\\adhoc_task') !== false
-                || strpos($head, 'extends adhoc_task') !== false) {
+            if (
+                strpos($head, 'extends \\core\\task\\adhoc_task') !== false
+                || strpos($head, 'extends adhoc_task') !== false
+            ) {
                 continue;
             }
             $expected[] = '\\local_ai_course_assistant\\task\\' . $base;
@@ -223,9 +230,11 @@ class health_check {
     public static function check_no_cron_tasks_stuck(): array {
         $name = 'no_cron_tasks_stuck';
         global $DB;
-        $rows = $DB->get_records_select('task_scheduled',
+        $rows = $DB->get_records_select(
+            'task_scheduled',
             $DB->sql_like('classname', ':pattern'),
-            ['pattern' => '%local_ai_course_assistant\\\\task\\\\%']);
+            ['pattern' => '%local_ai_course_assistant\\\\task\\\\%']
+        );
         $stuck = [];
         foreach ($rows as $row) {
             if ((int) $row->faildelay > 3600) {
@@ -334,8 +343,10 @@ class health_check {
             }
             return self::pass($name, "provider={$providerid} resolves cleanly.");
         } catch (\Throwable $e) {
-            return self::fail($name,
-                "provider={$providerid} factory threw: " . $e->getMessage());
+            return self::fail(
+                $name,
+                "provider={$providerid} factory threw: " . $e->getMessage()
+            );
         }
     }
 

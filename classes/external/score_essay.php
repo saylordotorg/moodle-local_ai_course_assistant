@@ -35,7 +35,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class score_essay extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -46,8 +45,10 @@ class score_essay extends external_api {
 
     public static function execute(int $courseid, string $essay, string $rubric = ''): array {
         global $USER;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['courseid' => $courseid, 'essay' => $essay, 'rubric' => $rubric]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['courseid' => $courseid, 'essay' => $essay, 'rubric' => $rubric]
+        );
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
@@ -156,8 +157,8 @@ class score_essay extends external_api {
             'criteria' => new external_multiple_structure(
                 new external_single_structure([
                     'name'     => new external_value(PARAM_RAW, 'Criterion name'),
-                    'score'    => new external_value(PARAM_INT,  'Score 0-4'),
-                    'feedback' => new external_value(PARAM_RAW,  'Feedback text'),
+                    'score'    => new external_value(PARAM_INT, 'Score 0-4'),
+                    'feedback' => new external_value(PARAM_RAW, 'Feedback text'),
                 ])
             ),
             'overall'   => new external_value(PARAM_RAW, 'Overall comment'),

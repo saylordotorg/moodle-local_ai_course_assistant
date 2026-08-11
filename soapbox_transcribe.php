@@ -77,7 +77,9 @@ if ($size <= 0 || $size > \local_ai_course_assistant\security::MAX_AUDIO_BYTES) 
 }
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 $sniffed = $finfo ? finfo_file($finfo, $tmp) : '';
-if ($finfo) { finfo_close($finfo); }
+if ($finfo) {
+    finfo_close($finfo);
+}
 $declaredtype = !empty($_FILES['audio']['type']) ? (string) $_FILES['audio']['type'] : '';
 if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $sniffed, $declaredtype)) {
     http_response_code(415);
@@ -88,7 +90,8 @@ if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $snif
 // Resolve active STT provider via the voice_providers registry (self-hosted
 // Whisper first when configured, else hosted OpenAI/xAI).
 $cfg = \local_ai_course_assistant\voice_registry::resolve(
-    \local_ai_course_assistant\voice_registry::CAPABILITY_STT);
+    \local_ai_course_assistant\voice_registry::CAPABILITY_STT
+);
 if ($cfg === null) {
     http_response_code(503);
     echo json_encode(['error' => get_string('soapbox:no_stt', 'local_ai_course_assistant')]);
@@ -172,9 +175,16 @@ try {
     ]);
     if ($conv) {
         \local_ai_course_assistant\conversation_manager::add_message(
-            $conv->id, $USER->id, $courseid > 0 ? $courseid : SITEID,
-            'system', '[Soapbox STT]',
-            0, $cfg['provider'] . '_stt', $approxtokens, 0, $model
+            $conv->id,
+            $USER->id,
+            $courseid > 0 ? $courseid : SITEID,
+            'system',
+            '[Soapbox STT]',
+            0,
+            $cfg['provider'] . '_stt',
+            $approxtokens,
+            0,
+            $model
         );
     }
 } catch (\Throwable $e) {

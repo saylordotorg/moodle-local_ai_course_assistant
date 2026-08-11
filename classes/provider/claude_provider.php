@@ -27,7 +27,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class claude_provider extends base_provider {
-
     /** @var string Anthropic API version */
     private const API_VERSION = '2023-06-01';
 
@@ -310,70 +309,76 @@ class claude_provider extends base_provider {
         // only emitted when the stream produced nothing.
         $sentanytext = false;
 
-        $this->http_post_stream($url, $this->get_headers($options), $body,
+        $this->http_post_stream(
+            $url,
+            $this->get_headers($options),
+            $body,
             function ($data) use ($callback, &$buffer, &$sentanytext) {
-            $buffer .= $data;
+                $buffer .= $data;
 
-            while (($pos = strpos($buffer, "\n")) !== false) {
-                $line = substr($buffer, 0, $pos);
-                $buffer = substr($buffer, $pos + 1);
-                $line = trim($line);
+                while (($pos = strpos($buffer, "\n")) !== false) {
+                    $line = substr($buffer, 0, $pos);
+                    $buffer = substr($buffer, $pos + 1);
+                    $line = trim($line);
 
-                if (empty($line) || !str_starts_with($line, 'data: ')) {
-                    continue;
-                }
+                    if (empty($line) || !str_starts_with($line, 'data: ')) {
+                        continue;
+                    }
 
-                $json = substr($line, 6);
-                if ($json === '[DONE]') {
-                    return;
-                }
+                    $json = substr($line, 6);
+                    if ($json === '[DONE]') {
+                        return;
+                    }
 
-                $event = json_decode($json, true);
-                if (!$event) {
-                    continue;
-                }
+                    $event = json_decode($json, true);
+                    if (!$event) {
+                        continue;
+                    }
 
-                $eventtype = $event['type'] ?? '';
+                    $eventtype = $event['type'] ?? '';
 
-                if ($eventtype === 'message_start') {
-                    $usage = $event['message']['usage'] ?? [];
-                    $this->last_token_usage = [
+                    if ($eventtype === 'message_start') {
+                        $usage = $event['message']['usage'] ?? [];
+                        $this->last_token_usage = [
                         'prompt_tokens'          => (int) ($usage['input_tokens'] ?? 0),
                         'completion_tokens'      => 0,
                         'model'                  => $event['message']['model'] ?? $this->model,
                         'cache_creation_tokens'  => (int) ($usage['cache_creation_input_tokens'] ?? 0),
                         'cache_read_tokens'      => (int) ($usage['cache_read_input_tokens'] ?? 0),
-                    ];
-                }
-
-                if ($eventtype === 'message_delta' && isset($event['usage']['output_tokens'])) {
-                    if ($this->last_token_usage !== null) {
-                        $this->last_token_usage['completion_tokens'] = (int) $event['usage']['output_tokens'];
+                        ];
                     }
-                }
 
-                // A safety refusal streams as a message_delta carrying
-                // stop_reason "refusal" with no content_block_delta events at
-                // all, so without this the learner would see an empty reply.
-                if ($eventtype === 'message_delta'
+                    if ($eventtype === 'message_delta' && isset($event['usage']['output_tokens'])) {
+                        if ($this->last_token_usage !== null) {
+                            $this->last_token_usage['completion_tokens'] = (int) $event['usage']['output_tokens'];
+                        }
+                    }
+
+                    // A safety refusal streams as a message_delta carrying
+                    // stop_reason "refusal" with no content_block_delta events at
+                    // all, so without this the learner would see an empty reply.
+                    if (
+                        $eventtype === 'message_delta'
                         && ($event['delta']['stop_reason'] ?? '') === self::STOP_REASON_REFUSAL
-                        && !$sentanytext) {
-                    $callback(get_string('chat:refused', 'local_ai_course_assistant'));
-                    $sentanytext = true;
-                }
+                        && !$sentanytext
+                    ) {
+                        $callback(get_string('chat:refused', 'local_ai_course_assistant'));
+                        $sentanytext = true;
+                    }
 
-                // Only forward text deltas; skip thinking deltas and tool input deltas.
-                if ($eventtype === 'content_block_delta') {
-                    $deltatype = $event['delta']['type'] ?? '';
-                    if ($deltatype === 'text_delta') {
-                        $text = $event['delta']['text'] ?? '';
-                        if ($text !== '') {
-                            $sentanytext = true;
-                            $callback($text);
+                    // Only forward text deltas; skip thinking deltas and tool input deltas.
+                    if ($eventtype === 'content_block_delta') {
+                        $deltatype = $event['delta']['type'] ?? '';
+                        if ($deltatype === 'text_delta') {
+                            $text = $event['delta']['text'] ?? '';
+                            if ($text !== '') {
+                                $sentanytext = true;
+                                $callback($text);
+                            }
                         }
                     }
                 }
             }
-        });
+        );
     }
 }

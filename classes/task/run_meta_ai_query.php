@@ -37,7 +37,6 @@ use local_ai_course_assistant\radar_schedule_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class run_meta_ai_query extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:run_meta_ai_query', 'local_ai_course_assistant');
     }

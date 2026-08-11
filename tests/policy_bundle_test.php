@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\policy_bundle
  */
 final class policy_bundle_test extends \advanced_testcase {
-
     /** @var string Base64 Ed25519 secret key for this test run. */
     private string $secret;
 
@@ -36,8 +35,11 @@ final class policy_bundle_test extends \advanced_testcase {
         $this->resetAfterTest(true);
         $keypair = sodium_crypto_sign_keypair();
         $this->secret = base64_encode(sodium_crypto_sign_secretkey($keypair));
-        set_config('policy_bundle_pubkey',
-            base64_encode(sodium_crypto_sign_publickey($keypair)), 'local_ai_course_assistant');
+        set_config(
+            'policy_bundle_pubkey',
+            base64_encode(sodium_crypto_sign_publickey($keypair)),
+            'local_ai_course_assistant'
+        );
         set_config('policy_bundle_enabled', '1', 'local_ai_course_assistant');
     }
 
@@ -71,8 +73,10 @@ final class policy_bundle_test extends \advanced_testcase {
         ]);
         $result = policy_bundle::process_envelope($json);
         $this->assertSame('applied', $result['status']);
-        $this->assertSame('derive|prove that',
-            get_config('local_ai_course_assistant', 'premium_escalation_triggers'));
+        $this->assertSame(
+            'derive|prove that',
+            get_config('local_ai_course_assistant', 'premium_escalation_triggers')
+        );
         $this->assertSame('30', get_config('local_ai_course_assistant', 'rerank_candidates'));
         $this->assertSame('1', get_config('local_ai_course_assistant', 'cost_anomaly_enabled'));
         $this->assertSame('3', get_config('local_ai_course_assistant', 'policy_bundle_applied_version'));
@@ -121,8 +125,8 @@ final class policy_bundle_test extends \advanced_testcase {
         $json = $this->envelope([
             'version' => 1,
             'settings' => [
-                'rerank_candidates' => 25,          // Allowed.
-                'apikey' => 'sk-evil',              // NOT allowed.
+                'rerank_candidates' => 25, // Allowed.
+                'apikey' => 'sk-evil', // NOT allowed.
             ],
         ]);
         $result = policy_bundle::process_envelope($json);
@@ -134,10 +138,15 @@ final class policy_bundle_test extends \advanced_testcase {
     }
 
     public function test_ssrf_and_url_settings_not_on_allowlist(): void {
-        foreach (['ssrf_trusted_endpoints', 'policy_bundle_url', 'policy_bundle_pubkey',
-                'stt_selfhosted_url', 'rerank_apikey', 'spend_notify_emails'] as $forbidden) {
-            $this->assertNotContains($forbidden, policy_bundle::ALLOWED_KEYS,
-                "{$forbidden} must never be settable by a bundle");
+        foreach (
+            ['ssrf_trusted_endpoints', 'policy_bundle_url', 'policy_bundle_pubkey',
+                'stt_selfhosted_url', 'rerank_apikey', 'spend_notify_emails'] as $forbidden
+        ) {
+            $this->assertNotContains(
+                $forbidden,
+                policy_bundle::ALLOWED_KEYS,
+                "{$forbidden} must never be settable by a bundle"
+            );
         }
     }
 
@@ -203,8 +212,10 @@ final class policy_bundle_test extends \advanced_testcase {
         set_config('policy_bundle_enabled', '0', 'local_ai_course_assistant');
         policy_bundle::sync();
         $this->assertNotEmpty(get_config('local_ai_course_assistant', 'policy_bundle_last_sync'));
-        $this->assertStringContainsString('skipped',
-            (string) get_config('local_ai_course_assistant', 'policy_bundle_last_result'));
+        $this->assertStringContainsString(
+            'skipped',
+            (string) get_config('local_ai_course_assistant', 'policy_bundle_last_result')
+        );
     }
 
     public function test_unchanged_values_do_not_count_as_changes(): void {

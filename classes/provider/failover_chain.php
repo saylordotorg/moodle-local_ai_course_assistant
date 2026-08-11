@@ -49,7 +49,6 @@ use local_ai_course_assistant\audit_logger;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class failover_chain implements provider_interface {
-
     /** @var provider_interface The primary provider (head of the chain). */
     private provider_interface $primary;
 
@@ -152,8 +151,12 @@ class failover_chain implements provider_interface {
             try {
                 $entry['provider']->chat_completion_stream($systemprompt, $messages, $wrappedcb, $options);
                 if (!$firsttokenreceived) {
-                    throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                        'No tokens received from ' . $entry['label']);
+                    throw new \moodle_exception(
+                        'error',
+                        'local_ai_course_assistant',
+                        '',
+                        'No tokens received from ' . $entry['label']
+                    );
                 }
                 $this->record_success($entry['label']);
                 $this->lastused = $entry['provider'];

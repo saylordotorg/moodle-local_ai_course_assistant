@@ -38,7 +38,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class cross_course_pageid_test extends \advanced_testcase {
-
     /**
      * Confirm that a course_modules lookup constrained to a course id
      * returns NULL when the cmid actually belongs to a different course.
@@ -55,15 +54,21 @@ final class cross_course_pageid_test extends \advanced_testcase {
         $cmid = (int) $quiz->cmid;
 
         // The constrained lookup must miss when the course doesn't match.
-        $miss = $DB->get_record('course_modules',
+        $miss = $DB->get_record(
+            'course_modules',
             ['id' => $cmid, 'course' => $coursea->id],
-            'id, instance, module', IGNORE_MISSING);
+            'id, instance, module',
+            IGNORE_MISSING
+        );
         $this->assertFalse($miss, 'Cross-course pageid lookup must return false.');
 
         // The same lookup against the correct course succeeds.
-        $hit = $DB->get_record('course_modules',
+        $hit = $DB->get_record(
+            'course_modules',
             ['id' => $cmid, 'course' => $courseb->id],
-            'id, instance, module', IGNORE_MISSING);
+            'id, instance, module',
+            IGNORE_MISSING
+        );
         $this->assertNotFalse($hit, 'Same-course pageid lookup must succeed.');
         $this->assertEquals($cmid, (int) $hit->id);
     }

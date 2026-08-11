@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\soapbox_scorer::build_slide_context
  */
 final class soapbox_scorer_test extends \basic_testcase {
-
     public function test_build_slide_context_computes_time_per_slide(): void {
         $texts = ['Intro', 'Body', 'Conclusion'];
         // Advance to slide 1 at 8s, slide 2 at 20s; recording is 30s long.

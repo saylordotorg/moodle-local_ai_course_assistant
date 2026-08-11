@@ -58,7 +58,7 @@ if ($action === 'download' && confirm_sesskey()) {
         'study_plans'     => 'local_ai_course_assistant_plans',
         'reminders'       => 'local_ai_course_assistant_reminders',
         'feedback'        => 'local_ai_course_assistant_feedback',
-        'survey_responses'=> 'local_ai_course_assistant_survey_resp',
+        'survey_responses' => 'local_ai_course_assistant_survey_resp',
         'ut_responses'    => 'local_ai_course_assistant_ut_resp',
         'audit'           => 'local_ai_course_assistant_audit',
         'practice_scores' => 'local_ai_course_assistant_practice_scores',
@@ -146,7 +146,7 @@ foreach ($stats['courses'] as $cid => $coursestat) {
         'deleteurl' => new moodle_url($PAGE->url, [
             'action' => 'delete_course',
             'courseid' => $cid,
-            'sesskey' => sesskey()
+            'sesskey' => sesskey(),
         ]),
     ];
 }

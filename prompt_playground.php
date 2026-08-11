@@ -99,7 +99,11 @@ if ($go && $courseid > 0) {
         try {
             $topk = (int) (get_config('local_ai_course_assistant', 'rag_topk') ?: 5);
             $chunks = \local_ai_course_assistant\rag_retriever::retrieve(
-                $courseid, $query, $topk, $pageid);
+                $courseid,
+                $query,
+                $topk,
+                $pageid
+            );
         } catch (\Throwable $e) {
             $ragerror = $e->getMessage();
         }
@@ -114,9 +118,11 @@ if ($go && $courseid > 0) {
         echo '<h4>Live RAG retrieval</h4>';
         echo '<p class="text-muted mb-2">Question: <em>' . s($query) . '</em></p>';
         if ($ragerror !== '') {
-            echo $OUTPUT->notification('Retrieval failed: ' . s($ragerror)
+            echo $OUTPUT->notification(
+                'Retrieval failed: ' . s($ragerror)
                 . ' (RAG must be enabled for the course and the course indexed).',
-                \core\output\notification::NOTIFY_ERROR);
+                \core\output\notification::NOTIFY_ERROR
+            );
         } else if (empty($chunks)) {
             echo '<p class="text-muted">No chunks cleared the relevance floor for this question — '
                 . 'an off-topic question, or the course is not indexed. The prompt below falls back '

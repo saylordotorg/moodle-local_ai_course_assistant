@@ -37,7 +37,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class objective_manager {
-
     public const TABLE_OBJS = 'local_ai_course_assistant_objs';
     public const TABLE_ATTS = 'local_ai_course_assistant_obj_att';
 
@@ -67,7 +66,7 @@ class objective_manager {
     private const DEFAULT_DECAY_HALF_LIFE_DAYS = 30;
 
     // ------------------------------------------------------------------
-    //  Feature gates
+    // Feature gates
     // ------------------------------------------------------------------
 
     /**
@@ -137,7 +136,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  CRUD
+    // CRUD
     // ------------------------------------------------------------------
 
     /**
@@ -257,7 +256,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  Attempts
+    // Attempts
     // ------------------------------------------------------------------
 
     /**
@@ -329,7 +328,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  Mastery math
+    // Mastery math
     // ------------------------------------------------------------------
 
     /**
@@ -639,13 +638,17 @@ class objective_manager {
             }
         }
         $clean = array_values(array_unique($clean));
-        $DB->set_field('local_ai_course_assistant_objs', 'prereq_ids',
-            implode(',', $clean), ['id' => $objectiveid]);
+        $DB->set_field(
+            'local_ai_course_assistant_objs',
+            'prereq_ids',
+            implode(',', $clean),
+            ['id' => $objectiveid]
+        );
         return true;
     }
 
     // ------------------------------------------------------------------
-    //  Source scanners (look-first authoring)
+    // Source scanners (look-first authoring)
     // ------------------------------------------------------------------
 
     /**
@@ -851,7 +854,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  Internal helpers
+    // Internal helpers
     // ------------------------------------------------------------------
 
     /**

@@ -90,9 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // rubric (objectives are per-course); kept only if the objective
             // belongs to this course.
             $oid = (int) ($c['objectiveid'] ?? 0);
-            if ($oid > 0 && $courseid > 0
+            if (
+                $oid > 0 && $courseid > 0
                     && \local_ai_course_assistant\objective_manager::get($oid)
-                    && (int) \local_ai_course_assistant\objective_manager::get($oid)->courseid === $courseid) {
+                    && (int) \local_ai_course_assistant\objective_manager::get($oid)->courseid === $courseid
+            ) {
                 $entry['objectiveid'] = $oid;
             }
             $clean[] = $entry;
@@ -188,7 +190,7 @@ echo $OUTPUT->header();
                 <select id="aica-scope-select" name="courseid" class="form-control form-control-sm" style="max-width:350px"
                         onchange="this.form.submit()">
                     <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>>Global Default (all courses)</option>
-                    <?php foreach ($courses as $c): ?>
+                    <?php foreach ($courses as $c) : ?>
                     <option value="<?php echo $c->id; ?>" <?php echo (int) $c->id === $courseid ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($c->fullname); ?> (<?php echo htmlspecialchars($c->shortname); ?>)
                     </option>
@@ -208,7 +210,7 @@ echo $OUTPUT->header();
            class="<?php echo $type === 'speech' ? 'active' : ''; ?>">Soapbox Speech</a>
     </div>
 
-    <?php if ($type === 'speech'): ?>
+    <?php if ($type === 'speech') : ?>
     <!-- Soapbox sample-rubric loader (v6.7.0) -->
     <div class="card mb-3"><div class="card-body" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <label for="aica-rb-sample" style="font-weight:600;margin:0;white-space:nowrap">
@@ -218,8 +220,10 @@ echo $OUTPUT->header();
                 onchange="if(this.value){window.location=this.value;}">
             <option value=""><?php echo get_string('soapbox:sample_choose', 'local_ai_course_assistant'); ?></option>
             <?php foreach (rubric_manager::speech_presets() as $lvkey => $lvdef) {
-                $url = (new moodle_url('/local/ai_course_assistant/rubric_admin.php',
-                    ['courseid' => $courseid, 'type' => 'speech', 'preset' => $lvkey]))->out(false); ?>
+                $url = (new moodle_url(
+                    '/local/ai_course_assistant/rubric_admin.php',
+                    ['courseid' => $courseid, 'type' => 'speech', 'preset' => $lvkey]
+                ))->out(false); ?>
             <option value="<?php echo s($url); ?>"<?php echo $loadedpreset === $lvkey ? ' selected' : ''; ?>>
                 <?php echo get_string($lvdef['label_key'], 'local_ai_course_assistant'); ?>
             </option>
@@ -229,7 +233,7 @@ echo $OUTPUT->header();
     </div></div>
     <?php endif; ?>
 
-    <?php if ($is_inherited): ?>
+    <?php if ($is_inherited) : ?>
     <div class="aica-rb-inherited-badge">
         This course has no custom rubric. Showing the global default. Edit below to create a course-specific override.
     </div>
@@ -248,7 +252,7 @@ echo $OUTPUT->header();
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
             <button type="submit" class="btn btn-primary">Save Rubric</button>
             <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">Preview</button>
-            <?php if ($courseid > 0 && !$is_inherited): ?>
+            <?php if ($courseid > 0 && !$is_inherited) : ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Remove Course Override</button>
             <?php elseif ($courseid === 0): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Reset to Defaults</button>

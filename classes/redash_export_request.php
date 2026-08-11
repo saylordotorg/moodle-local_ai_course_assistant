@@ -35,7 +35,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class redash_export_request {
-
     /**
      * Every section the export can emit, in response order.
      *
@@ -217,8 +216,12 @@ final class redash_export_request {
      * @param string|null $lastname Real last name, when the caller has it.
      * @return array Identity fields to merge into the row.
      */
-    public static function learner_identity(int $userid, bool $anonymize,
-            ?string $firstname = null, ?string $lastname = null): array {
+    public static function learner_identity(
+        int $userid,
+        bool $anonymize,
+        ?string $firstname = null,
+        ?string $lastname = null
+    ): array {
         if ($anonymize) {
             return ['user_ref' => anonymizer::name($userid)];
         }

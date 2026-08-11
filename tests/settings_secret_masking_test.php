@@ -40,7 +40,6 @@ namespace local_ai_course_assistant;
  * @coversNothing
  */
 final class settings_secret_masking_test extends \advanced_testcase {
-
     /**
      * Setting-name fragments that indicate a stored credential.
      */
@@ -75,8 +74,11 @@ final class settings_secret_masking_test extends \advanced_testcase {
 
         // Each declaration: the class name, then the setting name a few lines on.
         $pattern = '/new\s+(admin_setting_config\w+)\s*\(\s*\'local_ai_course_assistant\/([a-z0-9_]+)\'/i';
-        $this->assertMatchesRegularExpression($pattern, $src,
-            'no settings found -- the scan pattern has drifted from settings.php');
+        $this->assertMatchesRegularExpression(
+            $pattern,
+            $src,
+            'no settings found -- the scan pattern has drifted from settings.php'
+        );
         preg_match_all($pattern, $src, $m, PREG_SET_ORDER);
 
         $offenders = [];
@@ -102,12 +104,18 @@ final class settings_secret_masking_test extends \advanced_testcase {
             }
         }
 
-        $this->assertGreaterThan(0, $checked,
-            'no credential-looking settings matched -- the hint list may be stale');
-        $this->assertSame([], $offenders,
+        $this->assertGreaterThan(
+            0,
+            $checked,
+            'no credential-looking settings matched -- the hint list may be stale'
+        );
+        $this->assertSame(
+            [],
+            $offenders,
             "Credential settings must use a password type so Moodle masks them in "
             . "mdl_config_log. Plain configtext records every historical value in "
-            . "the clear. Offenders: " . implode(', ', $offenders));
+            . "the clear. Offenders: " . implode(', ', $offenders)
+        );
     }
 
     /**

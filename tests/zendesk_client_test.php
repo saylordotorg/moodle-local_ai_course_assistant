@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\zendesk_client
  */
 final class zendesk_client_test extends \basic_testcase {
-
     /**
      * The page URL appears on its own line, between Course and Original Question.
      */

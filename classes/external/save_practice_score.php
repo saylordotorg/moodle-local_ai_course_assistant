@@ -30,7 +30,6 @@ use local_ai_course_assistant\rubric_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_practice_score extends external_api {
-
     /**
      * Returns description of method parameters.
      *
@@ -60,8 +59,15 @@ class save_practice_score extends external_api {
      * @param int $sessionduration
      * @return array
      */
-    public static function execute(int $courseid, int $rubricid, string $sessiontype,
-            string $scores, int $overallscore, string $aifeedback, int $sessionduration): array {
+    public static function execute(
+        int $courseid,
+        int $rubricid,
+        string $sessiontype,
+        string $scores,
+        int $overallscore,
+        string $aifeedback,
+        int $sessionduration
+    ): array {
         global $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [

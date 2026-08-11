@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class faq_manager {
-
     /**
      * Get the FAQ content formatted for inclusion in the system prompt.
      *

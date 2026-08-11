@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class survey_manager {
-
     /** @var string Table name for surveys. */
     private const TABLE_SURVEYS = 'local_ai_course_assistant_surveys';
 

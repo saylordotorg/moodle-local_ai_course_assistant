@@ -75,7 +75,7 @@ echo $OUTPUT->header();
                 <?php echo $lastrun ? userdate($lastrun, '%Y-%m-%d %H:%M') : 'Never'; ?>
             </div>
         </div>
-        <?php if ($results): ?>
+        <?php if ($results) : ?>
         <div class="sola-integrity-card">
             <h6>Passed</h6>
             <div class="value" style="color:#28a745;"><?php echo $results['passed']; ?></div>
@@ -103,7 +103,7 @@ echo $OUTPUT->header();
         </button>
     </form>
 
-    <?php if ($results && !empty($results['results'])): ?>
+    <?php if ($results && !empty($results['results'])) : ?>
     <h5>Test Results</h5>
     <table class="sola-result-table">
         <thead>
@@ -114,7 +114,7 @@ echo $OUTPUT->header();
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($results['results'] as $r): ?>
+            <?php foreach ($results['results'] as $r) : ?>
             <tr>
                 <td><span class="sola-badge <?php echo s($r['status']); ?>"><?php echo s($r['status']); ?></span></td>
                 <td><strong><?php echo s($r['name']); ?></strong></td>

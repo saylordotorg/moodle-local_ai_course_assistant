@@ -29,7 +29,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class radar_delivery {
-
     /**
      * Build a payload string in the requested format.
      *
@@ -182,23 +181,31 @@ class radar_delivery {
         $payload = self::format($format, $query, $response, $meta);
 
         if ($format === 'text') {
-            $payload = email_footer::append_text($payload, $emailaddress,
-                email_optout::TYPE_LEARNING_RADAR, $reason);
+            $payload = email_footer::append_text(
+                $payload,
+                $emailaddress,
+                email_optout::TYPE_LEARNING_RADAR,
+                $reason
+            );
             return (bool) email_to_user($recipient, $admin, $subject, $payload);
         }
 
         // Non-text formats: attach as a file with a brief plain-text body.
         // The unsubscribe footer goes on the human-readable body, not the
         // attached CSV/JSON/markdown payload.
-        list($filename, ) = self::format_meta($format);
+        [$filename, ] = self::format_meta($format);
         // Moodle File API: creates $CFG->tempdir/sola_radar with safe perms.
         $tmpdir = make_temp_directory('sola_radar');
         $tmpfile = $tmpdir . '/' . uniqid('radar_', true) . '_' . $filename;
         file_put_contents($tmpfile, $payload);
         $body = "Your SOLA Learning Radar report is attached.\n\n"
             . "Query: {$query}\n\nAll student data is anonymized.";
-        $body = email_footer::append_text($body, $emailaddress,
-            email_optout::TYPE_LEARNING_RADAR, $reason);
+        $body = email_footer::append_text(
+            $body,
+            $emailaddress,
+            email_optout::TYPE_LEARNING_RADAR,
+            $reason
+        );
         $sent = (bool) email_to_user($recipient, $admin, $subject, $body, '', $tmpfile, $filename);
         @unlink($tmpfile);
         return $sent;

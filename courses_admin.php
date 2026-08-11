@@ -140,8 +140,10 @@ foreach ($all_courses as $c) {
         'ut_effective' => $ut_effective,
         'sesskey'      => sesskey(),
         'form_action'  => $selfurl->out(false),
-        'analytics_url' => (new moodle_url('/local/ai_course_assistant/analytics.php',
-            ['courseid' => (int) $c->id]))->out(false),
+        'analytics_url' => (new moodle_url(
+            '/local/ai_course_assistant/analytics.php',
+            ['courseid' => (int) $c->id]
+        ))->out(false),
     ];
 }
 
@@ -153,8 +155,10 @@ $templatedata = [
     'enabled_count'   => $enabled_count,
     'total_count'     => count($course_list),
     'analytics_url'   => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
-    'settings_url'    => (new moodle_url('/admin/category.php',
-        ['category' => 'local_ai_course_assistant']))->out(false),
+    'settings_url'    => (new moodle_url(
+        '/admin/category.php',
+        ['category' => 'local_ai_course_assistant']
+    ))->out(false),
 ];
 
 echo $OUTPUT->header();

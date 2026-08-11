@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\external\generate_quiz
  */
 final class quiz_provider_routing_test extends \advanced_testcase {
-
     /**
      * Invoke the private resolver.
      *

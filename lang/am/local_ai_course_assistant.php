@@ -1006,7 +1006,7 @@ $string['courses_admin:lede']              = 'Enable or disable AI Assistant per
 $string['courses_admin:back_to_analytics'] = '← Back to Analytics';
 $string['courses_admin:plugin_settings']   = 'Plugin Settings';
 $string['courses_admin:enabled_count']     = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
-$string['courses_admin:search_placeholder']= 'Search courses…';
+$string['courses_admin:search_placeholder'] = 'Search courses…';
 $string['courses_admin:filter_status']     = 'AI Assistant status';
 $string['courses_admin:filter_enabled']    = 'Enabled';
 $string['courses_admin:filter_disabled']   = 'Disabled';
@@ -1050,7 +1050,7 @@ $string['external_resources:force_on']   = 'Force on for this course';
 $string['external_resources:force_off']  = 'Force off for this course';
 $string['external_resources:on']         = 'on';
 $string['external_resources:off']        = 'off';
-$string['external_resources:toggle_help']= 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
+$string['external_resources:toggle_help'] = 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
 
 // v4.3.0: real Redash push integration.
 $string['settings:redash_base_url']           = 'Redash base URL';
@@ -1058,7 +1058,7 @@ $string['settings:redash_base_url_desc']      = 'Base URL of your Redash instanc
 $string['settings:redash_user_api_key']       = 'Redash user API key';
 $string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the [[tutorshort]] Redash API key (which controls inbound auth on redash_export.php).';
 $string['settings:redash_data_source_id']     = 'Redash data source ID';
-$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
+$string['settings:redash_data_source_id_desc'] = 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
 
 $string['instructor_dashboard:nav_back_course']  = '← Back to course';
 $string['instructor_dashboard:nav_settings']     = 'AI Course Assistant settings';
@@ -1112,7 +1112,7 @@ $string['settings:rate_card_refresh_now_label']  = 'Refresh rate card from upstr
 $string['settings:rate_card_refresh_success']    = 'Rate card refreshed: {$a} entries written.';
 $string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$a}';
 $string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
-$string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
+$string['settings:rate_card_last_refresh_success'] = 'Last fetch succeeded.';
 $string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
 $string['task:refresh_rate_card']                = 'Refresh [[tutorshort]] LLM rate card from upstream';
 

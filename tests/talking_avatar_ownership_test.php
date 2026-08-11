@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\talking_avatar_session_manager::user_owns_session
  */
 final class talking_avatar_ownership_test extends \advanced_testcase {
-
     public function test_owner_can_view_others_cannot(): void {
         $this->resetAfterTest();
         $owner = $this->getDataGenerator()->create_user();
@@ -35,22 +34,31 @@ final class talking_avatar_ownership_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
 
         talking_avatar_session_manager::start(
-            (int) $owner->id, (int) $course->id, 'did', 'persona-1', 'upstream-abc');
+            (int) $owner->id,
+            (int) $course->id,
+            'did',
+            'persona-1',
+            'upstream-abc'
+        );
 
         $this->assertTrue(
-            talking_avatar_session_manager::user_owns_session((int) $owner->id, 'did', 'upstream-abc'));
+            talking_avatar_session_manager::user_owns_session((int) $owner->id, 'did', 'upstream-abc')
+        );
         $this->assertFalse(
             talking_avatar_session_manager::user_owns_session((int) $other->id, 'did', 'upstream-abc'),
-            'A different user must not be treated as the owner of the session.');
+            'A different user must not be treated as the owner of the session.'
+        );
     }
 
     public function test_empty_or_unknown_session_is_not_owned(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->assertFalse(
-            talking_avatar_session_manager::user_owns_session((int) $user->id, 'did', ''));
+            talking_avatar_session_manager::user_owns_session((int) $user->id, 'did', '')
+        );
         $this->assertFalse(
-            talking_avatar_session_manager::user_owns_session((int) $user->id, 'did', 'does-not-exist'));
+            talking_avatar_session_manager::user_owns_session((int) $user->id, 'did', 'does-not-exist')
+        );
     }
 
     public function test_provider_must_match(): void {
@@ -58,9 +66,15 @@ final class talking_avatar_ownership_test extends \advanced_testcase {
         $owner = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
         talking_avatar_session_manager::start(
-            (int) $owner->id, (int) $course->id, 'did', 'persona-1', 'upstream-xyz');
+            (int) $owner->id,
+            (int) $course->id,
+            'did',
+            'persona-1',
+            'upstream-xyz'
+        );
         // Same session id, wrong provider -> not owned.
         $this->assertFalse(
-            talking_avatar_session_manager::user_owns_session((int) $owner->id, 'heygen', 'upstream-xyz'));
+            talking_avatar_session_manager::user_owns_session((int) $owner->id, 'heygen', 'upstream-xyz')
+        );
     }
 }

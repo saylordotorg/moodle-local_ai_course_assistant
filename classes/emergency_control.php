@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class emergency_control {
-
     /** Master kill (full chat widget + scheduled tasks + SSE). */
     public const FLAG_ALL = 'all';
     /** Voice realtime + TTS only. */
@@ -191,8 +190,13 @@ class emergency_control {
      * @param array $touched
      * @return void
      */
-    private static function write_audit(string $action, array $flags, string $reason,
-            string $invoker, array $touched): void {
+    private static function write_audit(
+        string $action,
+        array $flags,
+        string $reason,
+        string $invoker,
+        array $touched
+    ): void {
         try {
             audit_logger::log('emergency_' . $action, 0, 0, [
                 'flags' => array_values($flags),
@@ -201,8 +205,10 @@ class emergency_control {
                 'invoked_by' => $invoker,
             ]);
         } catch (\Throwable $e) {
-            debugging('emergency_control: audit logging failed: ' . $e->getMessage(),
-                DEBUG_DEVELOPER);
+            debugging(
+                'emergency_control: audit logging failed: ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
         }
     }
 }

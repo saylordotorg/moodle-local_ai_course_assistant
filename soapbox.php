@@ -124,7 +124,9 @@ echo $OUTPUT->header();
             ?>
         <details class="card mb-2"><summary class="card-header" style="cursor:pointer">
             <strong><?php echo s($hname); ?></strong>
-            <?php if ($htopic !== '') { ?><span class="text-muted"> — <?php echo s($htopic); ?></span><?php } ?>
+            <?php if ($htopic !== '') {
+?><span class="text-muted"> — <?php echo s($htopic); ?></span><?php
+            } ?>
             <span class="badge badge-info ml-2"><?php echo get_string('soapbox:overall_badge', 'local_ai_course_assistant', (int) $h->overall_score); ?></span>
             <span class="text-muted ml-2 small"><?php echo userdate((int) $h->timecreated, get_string('strftimedatetimeshort', 'langconfig')); ?> · <?php echo $durtxt; ?></span>
         </summary><div class="card-body">
@@ -135,9 +137,12 @@ echo $OUTPUT->header();
                     <td><?php echo s($c['feedback'] ?? ''); ?></td></tr>
             <?php } ?>
             </tbody></table>
-            <?php if (!empty($h->ai_feedback)) { ?><p><?php echo s($h->ai_feedback); ?></p><?php } ?>
+            <?php if (!empty($h->ai_feedback)) {
+?><p><?php echo s($h->ai_feedback); ?></p><?php
+            } ?>
         </div></details>
-    <?php } } ?>
+        <?php }
+    } ?>
     </div>
 </div>
 

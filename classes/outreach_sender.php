@@ -38,7 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class outreach_sender {
-
     /** Audit/outreach log table. */
     const TABLE_LOG = 'local_ai_course_assistant_outreach_log';
 
@@ -65,8 +64,15 @@ class outreach_sender {
      * @param string $triggerreason Plain-English reason shown in learner audit log.
      * @return bool
      */
-    public static function send(int $userid, int $courseid, string $channel,
-            string $subject, string $bodytext, string $bodyhtml, string $triggerreason): bool {
+    public static function send(
+        int $userid,
+        int $courseid,
+        string $channel,
+        string $subject,
+        string $bodytext,
+        string $bodyhtml,
+        string $triggerreason
+    ): bool {
         global $DB;
 
         // 1. Master site-wide outreach kill switch.
@@ -102,16 +108,28 @@ class outreach_sender {
                 return false;
             }
             // v5.4.3: per-recipient unsubscribe footer + opt-out check.
-            if (email_optout::is_opted_out((string) $user->email,
-                    email_optout::TYPE_OUTREACH)) {
+            if (
+                email_optout::is_opted_out(
+                    (string) $user->email,
+                    email_optout::TYPE_OUTREACH
+                )
+            ) {
                 return false;
             }
             $reason = 'You receive these from time to time when you hit a '
                 . 'milestone or finish a streak in your SOLA-supported course.';
             $bodytextf = email_footer::append_text(
-                $bodytext, (string) $user->email, email_optout::TYPE_OUTREACH, $reason);
+                $bodytext,
+                (string) $user->email,
+                email_optout::TYPE_OUTREACH,
+                $reason
+            );
             $bodyhtmlf = email_footer::append_html(
-                $bodyhtml, (string) $user->email, email_optout::TYPE_OUTREACH, $reason);
+                $bodyhtml,
+                (string) $user->email,
+                email_optout::TYPE_OUTREACH,
+                $reason
+            );
             $from = \core_user::get_noreply_user();
             $sent = email_to_user($user, $from, $subject, $bodytextf, $bodyhtmlf);
             if (!$sent) {

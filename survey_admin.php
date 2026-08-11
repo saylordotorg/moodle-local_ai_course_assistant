@@ -169,7 +169,7 @@ echo $OUTPUT->header();
                 <select id="aica-scope-select" name="courseid" class="form-control form-control-sm" style="max-width:350px"
                         onchange="this.form.submit()">
                     <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>>Global Default (all courses)</option>
-                    <?php foreach ($courses as $c): ?>
+                    <?php foreach ($courses as $c) : ?>
                     <option value="<?php echo $c->id; ?>" <?php echo (int) $c->id === $courseid ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($c->fullname); ?> (<?php echo htmlspecialchars($c->shortname); ?>)
                     </option>
@@ -179,7 +179,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
-    <?php if ($is_inherited): ?>
+    <?php if ($is_inherited) : ?>
     <div class="aica-sq-inherited-badge">
         This course has no custom survey. Showing the global default. Edit below to create a course-specific override.
     </div>
@@ -205,7 +205,7 @@ echo $OUTPUT->header();
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
             <button type="submit" class="btn btn-primary">Save Survey</button>
             <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">Preview</button>
-            <?php if ($courseid > 0 && !$is_inherited): ?>
+            <?php if ($courseid > 0 && !$is_inherited) : ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Remove Course Override</button>
             <?php elseif ($courseid === 0): ?>
             <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Reset to Defaults</button>

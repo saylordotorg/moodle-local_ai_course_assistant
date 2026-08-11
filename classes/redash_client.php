@@ -36,7 +36,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class redash_client {
-
     /**
      * Whether all three Redash push settings are configured.
      *
@@ -102,8 +101,11 @@ class redash_client {
         ]);
         $endpoint = $baseurl . '/api/queries';
         // Pin to the validated IP, closing the DNS-rebinding window.
-        $resp = $curl->post($endpoint, json_encode($payload),
-            security::resolve_pin_options($endpoint));
+        $resp = $curl->post(
+            $endpoint,
+            json_encode($payload),
+            security::resolve_pin_options($endpoint)
+        );
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code < 200 || $code >= 300) {
             return ['ok' => false, 'error' => 'Redash API returned HTTP ' . $code . ': ' . substr((string) $resp, 0, 400)];

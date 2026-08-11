@@ -36,7 +36,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class backend_probe {
-
     public const STATUS_PASS = 'pass';
     public const STATUS_WARN = 'warn';
     public const STATUS_FAIL = 'fail';
@@ -49,18 +48,24 @@ final class backend_probe {
      */
     public static function compare_window(int $configured, int $detected): array {
         if ($detected === 0) {
-            return self::row(self::STATUS_WARN,
-                'Could not detect max_model_len from the backend. Set the Backend context window setting manually.');
+            return self::row(
+                self::STATUS_WARN,
+                'Could not detect max_model_len from the backend. Set the Backend context window setting manually.'
+            );
         }
         if ($configured === 0) {
-            return self::row(self::STATUS_WARN,
+            return self::row(
+                self::STATUS_WARN,
                 "The backend reports a {$detected}-token window but SOLA clamping is off (Backend context window = 0). "
-                . "Consider setting it to {$detected} so prompts cannot overflow.");
+                . "Consider setting it to {$detected} so prompts cannot overflow."
+            );
         }
         if ($configured > $detected) {
-            return self::row(self::STATUS_WARN,
+            return self::row(
+                self::STATUS_WARN,
                 "Configured window {$configured} exceeds the backend's {$detected}; prompts may overflow. "
-                . "Lower the Backend context window setting to {$detected} or less.");
+                . "Lower the Backend context window setting to {$detected} or less."
+            );
         }
         return self::row(self::STATUS_PASS, "Window OK (configured {$configured} is within the backend's {$detected}).");
     }
@@ -75,9 +80,11 @@ final class backend_probe {
     public static function check_floor_fits(int $windowtokens, int $outputtokens, string $lang): array {
         $chars = token_estimator::budget_chars_for_window($windowtokens, $outputtokens > 0 ? $outputtokens : 512, 0, $lang);
         if ($chars < context_builder::MIN_BUDGET_FLOOR) {
-            return self::row(self::STATUS_FAIL,
+            return self::row(
+                self::STATUS_FAIL,
                 "Window too small: only {$chars} chars remain for the system prompt, below the "
-                . context_builder::MIN_BUDGET_FLOOR . '-char safety floor. Raise the window or lower Max Response Length (max_tokens).');
+                . context_builder::MIN_BUDGET_FLOOR . '-char safety floor. Raise the window or lower Max Response Length (max_tokens).'
+            );
         }
         return self::row(self::STATUS_PASS, "System-prompt budget of {$chars} chars clears the safety floor.");
     }
@@ -115,16 +122,22 @@ final class backend_probe {
             $note = ($configured === 'auto')
                 ? 'Auto routes chat through it when no SOLA key is set.'
                 : "Chat provider is set to '{$configured}', so core_ai is available but not in use.";
-            return self::row(self::STATUS_PASS,
-                "Moodle core_ai is available with a configured provider. {$note}");
+            return self::row(
+                self::STATUS_PASS,
+                "Moodle core_ai is available with a configured provider. {$note}"
+            );
         }
         if (!class_exists('\\core_ai\\manager')) {
-            return self::row(self::STATUS_PASS,
-                'Moodle core_ai subsystem not present (needs Moodle 4.5+); SOLA uses its own providers.');
+            return self::row(
+                self::STATUS_PASS,
+                'Moodle core_ai subsystem not present (needs Moodle 4.5+); SOLA uses its own providers.'
+            );
         }
-        return self::row(self::STATUS_PASS,
+        return self::row(
+            self::STATUS_PASS,
             'Moodle core_ai is present but has no configured AI provider; SOLA uses its own providers. '
-            . 'Configure one under Site admin > AI to route chat through it.');
+            . 'Configure one under Site admin > AI to route chat through it.'
+        );
     }
 
     /**

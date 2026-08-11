@@ -38,7 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class voice_registry {
-
     public const CAPABILITY_REALTIME = 'realtime';
     public const CAPABILITY_TTS = 'tts';
     public const CAPABILITY_STT = 'stt';

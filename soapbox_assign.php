@@ -58,7 +58,9 @@ if ($action === 'delete' && $id) {
     $confirmurl = new moodle_url($pageurl, ['action' => 'delete', 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()]);
     echo $OUTPUT->confirm(
         'Delete "' . format_string($assign->name) . '" and all its recordings? This cannot be undone.',
-        $confirmurl, $pageurl);
+        $confirmurl,
+        $pageurl
+    );
     echo $OUTPUT->footer();
     exit;
 }
@@ -71,8 +73,11 @@ echo $OUTPUT->heading('Soapbox assignments');
 echo html_writer::div(
     $OUTPUT->single_button(
         new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php', ['courseid' => $courseid]),
-        'Add assignment', 'get'),
-    'mb-3');
+        'Add assignment',
+        'get'
+    ),
+    'mb-3'
+);
 
 if (empty($assignments)) {
     echo $OUTPUT->notification('No Soapbox assignments yet.', 'info');
@@ -81,8 +86,10 @@ if (empty($assignments)) {
     $table->head = ['Name', 'Type', 'Recording', 'Length', 'Kept', 'Visible', 'Student link', 'Actions'];
     $table->attributes['class'] = 'generaltable';
     foreach ($assignments as $a) {
-        $editurl = new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php',
-            ['courseid' => $courseid, 'id' => $a->id]);
+        $editurl = new moodle_url(
+            '/local/ai_course_assistant/soapbox_assign_edit.php',
+            ['courseid' => $courseid, 'id' => $a->id]
+        );
         $delurl = new moodle_url($pageurl, ['action' => 'delete', 'id' => $a->id]);
         $actions = html_writer::link($editurl, 'Edit')
             . ' &middot; '
@@ -90,8 +97,10 @@ if (empty($assignments)) {
         $length = ((int) $a->min_seconds) . '-' . ((int) $a->max_seconds) . 's';
         // Copyable student URL so an instructor can paste a link to this
         // assignment anywhere in the course (a Label, Page, or section summary).
-        $studenturl = (new moodle_url('/local/ai_course_assistant/soapbox_present.php',
-            ['id' => $a->id]))->out(false);
+        $studenturl = (new moodle_url(
+            '/local/ai_course_assistant/soapbox_present.php',
+            ['id' => $a->id]
+        ))->out(false);
         $linkcell = html_writer::empty_tag('input', [
             'type' => 'text', 'readonly' => 'readonly', 'value' => $studenturl,
             'class' => 'form-control form-control-sm', 'style' => 'width:15em',
@@ -100,7 +109,8 @@ if (empty($assignments)) {
         $table->data[] = [
             html_writer::link(
                 new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $a->id]),
-                format_string($a->name)),
+                format_string($a->name)
+            ),
             s($a->ptype),
             $a->mode === 'audio' ? 'Audio' : 'Video',
             $length,

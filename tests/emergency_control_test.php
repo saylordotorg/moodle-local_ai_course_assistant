@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\emergency_control
  */
 final class emergency_control_test extends \advanced_testcase {
-
     public function test_full_kill_disables_master_switch(): void {
         $this->resetAfterTest();
         set_config('enabled', '1', 'local_ai_course_assistant');
@@ -61,8 +60,10 @@ final class emergency_control_test extends \advanced_testcase {
         emergency_control::disable([emergency_control::FLAG_VOICE], '', 'test');
 
         $this->assertEquals('', get_config('local_ai_course_assistant', 'voice_active_realtime'));
-        $this->assertEquals('MyOpenAIVoice',
-            get_config('local_ai_course_assistant', 'voice_active_realtime_backup'));
+        $this->assertEquals(
+            'MyOpenAIVoice',
+            get_config('local_ai_course_assistant', 'voice_active_realtime_backup')
+        );
     }
 
     public function test_voice_restore_round_trips_to_original_value(): void {
@@ -73,11 +74,15 @@ final class emergency_control_test extends \advanced_testcase {
         $this->assertEquals('', get_config('local_ai_course_assistant', 'voice_active_realtime'));
 
         emergency_control::restore([emergency_control::FLAG_VOICE], '', 'test');
-        $this->assertEquals('MyOpenAIVoice',
+        $this->assertEquals(
+            'MyOpenAIVoice',
             get_config('local_ai_course_assistant', 'voice_active_realtime'),
-            'restore must put the stashed voice provider back exactly.');
-        $this->assertFalse(get_config('local_ai_course_assistant', 'voice_active_realtime_backup'),
-            'backup row must be cleaned up after restore.');
+            'restore must put the stashed voice provider back exactly.'
+        );
+        $this->assertFalse(
+            get_config('local_ai_course_assistant', 'voice_active_realtime_backup'),
+            'backup row must be cleaned up after restore.'
+        );
     }
 
     public function test_chat_kill_uses_spend_cap_zero(): void {
@@ -86,10 +91,15 @@ final class emergency_control_test extends \advanced_testcase {
 
         emergency_control::disable([emergency_control::FLAG_CHAT], '', 'test');
 
-        $this->assertEquals('0', get_config('local_ai_course_assistant', 'spend_cap_site'),
-            'chat-only kill sets spend_cap_site to 0 so existing budget-paused path fires.');
-        $this->assertEquals('500',
-            get_config('local_ai_course_assistant', 'spend_cap_site_backup'));
+        $this->assertEquals(
+            '0',
+            get_config('local_ai_course_assistant', 'spend_cap_site'),
+            'chat-only kill sets spend_cap_site to 0 so existing budget-paused path fires.'
+        );
+        $this->assertEquals(
+            '500',
+            get_config('local_ai_course_assistant', 'spend_cap_site_backup')
+        );
     }
 
     public function test_chat_restore_round_trips_spend_cap(): void {
@@ -113,8 +123,11 @@ final class emergency_control_test extends \advanced_testcase {
             'test'
         );
 
-        $row = $DB->get_record_select('local_ai_course_assistant_audit',
-            "action = 'emergency_disable'", []);
+        $row = $DB->get_record_select(
+            'local_ai_course_assistant_audit',
+            "action = 'emergency_disable'",
+            []
+        );
         $this->assertNotFalse($row, 'disable() must write an emergency_disable audit row.');
         $details = json_decode($row->details, true);
         $this->assertEquals('provider returning 401', $details['reason']);
@@ -128,10 +141,15 @@ final class emergency_control_test extends \advanced_testcase {
         emergency_control::disable([emergency_control::FLAG_ALL], '', 'test');
         emergency_control::restore([emergency_control::FLAG_ALL], '', 'test');
 
-        $count = $DB->count_records_select('local_ai_course_assistant_audit',
-            "action LIKE 'emergency_%'");
-        $this->assertEquals(2, $count,
-            'disable + restore must produce exactly 2 audit rows (emergency_disable + emergency_restore).');
+        $count = $DB->count_records_select(
+            'local_ai_course_assistant_audit',
+            "action LIKE 'emergency_%'"
+        );
+        $this->assertEquals(
+            2,
+            $count,
+            'disable + restore must produce exactly 2 audit rows (emergency_disable + emergency_restore).'
+        );
     }
 
     public function test_unknown_flags_are_ignored(): void {

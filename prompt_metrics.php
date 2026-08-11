@@ -47,15 +47,19 @@ $PAGE->set_pagelayout('admin');
 if ($apply && confirm_sesskey()) {
     $result = \local_ai_course_assistant\prompt_metrics_logger::apply_recommendation();
     if ($result['applied']) {
-        redirect($pageurl,
+        redirect(
+            $pageurl,
             get_string('prompt_metrics:applied', 'local_ai_course_assistant', (object) $result),
             null,
-            \core\output\notification::NOTIFY_SUCCESS);
+            \core\output\notification::NOTIFY_SUCCESS
+        );
     } else {
-        redirect($pageurl,
+        redirect(
+            $pageurl,
             get_string('prompt_metrics:noop', 'local_ai_course_assistant', s($result['reason'])),
             null,
-            \core\output\notification::NOTIFY_INFO);
+            \core\output\notification::NOTIFY_INFO
+        );
     }
 }
 

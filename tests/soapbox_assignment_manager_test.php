@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\soapbox_assignment_manager
  */
 final class soapbox_assignment_manager_test extends \advanced_testcase {
-
     /** @var \stdClass */
     private $course;
 
@@ -94,8 +93,10 @@ final class soapbox_assignment_manager_test extends \advanced_testcase {
         $this->assertSame('Tariffs', $topics[0]->title); // sortorder 0 first
 
         soapbox_assignment_manager::save_topic($aid, ['id' => $t1, 'title' => 'Free trade (rev)', 'sortorder' => 2]);
-        $this->assertSame('Free trade (rev)',
-            soapbox_assignment_manager::get_topics($aid)[1]->title);
+        $this->assertSame(
+            'Free trade (rev)',
+            soapbox_assignment_manager::get_topics($aid)[1]->title
+        );
 
         soapbox_assignment_manager::delete_topic($t2);
         $this->assertCount(1, soapbox_assignment_manager::get_topics($aid));
@@ -109,7 +110,9 @@ final class soapbox_assignment_manager_test extends \advanced_testcase {
         soapbox_assignment_manager::delete_assignment($aid);
         $this->assertNull(soapbox_assignment_manager::get_assignment($aid));
         $this->assertEquals(0, $DB->count_records(
-            soapbox_assignment_manager::T_TOPIC, ['assignid' => $aid]));
+            soapbox_assignment_manager::T_TOPIC,
+            ['assignid' => $aid]
+        ));
     }
 
     public function test_student_cannot_create(): void {

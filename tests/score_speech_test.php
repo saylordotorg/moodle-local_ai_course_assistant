@@ -27,7 +27,6 @@ namespace local_ai_course_assistant\external;
  * @covers     \local_ai_course_assistant\external\score_speech
  */
 final class score_speech_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -37,8 +36,14 @@ final class score_speech_test extends \advanced_testcase {
     public function test_returns_disabled_when_soapbox_off_for_course(): void {
         $course = $this->getDataGenerator()->create_course();
         // Soapbox is off by default (site + course).
-        $result = score_speech::execute((int) $course->id,
-            str_repeat('word ', 30), 'Name', 'Topic', 180, 120);
+        $result = score_speech::execute(
+            (int) $course->id,
+            str_repeat('word ', 30),
+            'Name',
+            'Topic',
+            180,
+            120
+        );
 
         $this->assertFalse($result['success']);
         $this->assertSame('disabled', $result['message']);

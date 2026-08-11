@@ -1,5 +1,18 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_ai_course_assistant\external;
 
@@ -22,7 +35,6 @@ use local_ai_course_assistant\program\learning_path;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_learning_path extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course id'),
@@ -80,8 +92,10 @@ class get_learning_path extends external_api {
                 'is_current' => new external_value(PARAM_BOOL, 'Is the current course'),
                 'objectives' => new external_multiple_structure(new external_single_structure([
                     'title' => new external_value(PARAM_TEXT, 'Objective title'),
-                    'mastery' => new external_value(PARAM_ALPHAEXT,
-                        'mastered | in_progress | not_started | demonstrated_elsewhere'),
+                    'mastery' => new external_value(
+                        PARAM_ALPHAEXT,
+                        'mastered | in_progress | not_started | demonstrated_elsewhere'
+                    ),
                 ])),
             ])),
         ]);

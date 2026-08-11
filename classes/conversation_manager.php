@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class conversation_manager {
-
     /**
      * Get or create a conversation for a user in a course.
      *
@@ -150,7 +149,7 @@ class conversation_manager {
                 $excess
             );
             if (!empty($oldest)) {
-                list($insql, $inparams) = $DB->get_in_or_equal(array_keys($oldest));
+                [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
                 $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
             }
         }
@@ -330,7 +329,7 @@ class conversation_manager {
         // 1. Messages (FK to conversations).
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', 'userid = ?', [$userid]);
         if (!empty($convids)) {
-            list($insql, $params) = $DB->get_in_or_equal($convids);
+            [$insql, $params] = $DB->get_in_or_equal($convids);
             $counts['messages'] = $DB->count_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $params);
             $DB->delete_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $params);
         } else {
@@ -392,7 +391,7 @@ class conversation_manager {
         }
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', $convwhere, $convparams);
         if (!empty($convids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($convids);
+            [$insql, $inparams] = $DB->get_in_or_equal($convids);
             $counts['messages'] = $DB->count_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $inparams);
             $DB->delete_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $inparams);
         } else {

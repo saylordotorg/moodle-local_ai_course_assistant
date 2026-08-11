@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\cost_anomaly_detector
  */
 final class cost_anomaly_detector_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);

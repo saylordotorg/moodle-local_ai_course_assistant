@@ -30,7 +30,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class token_cost_manager {
-
     /**
      * Rate card: USD per 1,000,000 tokens.
      * Keys are model prefix strings matched with str_starts_with.
@@ -40,25 +39,25 @@ class token_cost_manager {
      */
     private static array $rate_cards = [
         // ── OpenAI Chat ───────────────────────────────────────────────────────
-        'gpt-4o-mini'       => ['input' =>  0.15, 'output' =>  0.60],
-        'gpt-4o'            => ['input' =>  2.50, 'output' => 10.00],
+        'gpt-4o-mini'       => ['input' => 0.15, 'output' => 0.60],
+        'gpt-4o'            => ['input' => 2.50, 'output' => 10.00],
         'gpt-4-turbo'       => ['input' => 10.00, 'output' => 30.00],
         'gpt-4'             => ['input' => 30.00, 'output' => 60.00],
-        'gpt-3.5-turbo'     => ['input' =>  0.50, 'output' =>  1.50],
-        'o1-mini'           => ['input' =>  3.00, 'output' => 12.00],
+        'gpt-3.5-turbo'     => ['input' => 0.50, 'output' => 1.50],
+        'o1-mini'           => ['input' => 3.00, 'output' => 12.00],
         'o1-preview'        => ['input' => 15.00, 'output' => 60.00],
         'o1'                => ['input' => 15.00, 'output' => 60.00],
-        'o3-mini'           => ['input' =>  1.10, 'output' =>  4.40],
+        'o3-mini'           => ['input' => 1.10, 'output' => 4.40],
         'o3'                => ['input' => 10.00, 'output' => 40.00],
 
         // ── OpenAI Realtime (voice) ─────────────────────────────────────────
-        'gpt-4o-realtime'   => ['input' =>  5.00, 'output' => 20.00],
+        'gpt-4o-realtime'   => ['input' => 5.00, 'output' => 20.00],
 
         // ── OpenAI TTS ──────────────────────────────────────────────────────
         // TTS-1 charges per character (~$15/M chars). Approximated as per-token
         // at ~4 chars/token for consistency with the token-based rate card.
-        'tts-1'             => ['input' =>  60.00, 'output' =>  0.00],
-        'tts-1-hd'          => ['input' => 120.00, 'output' =>  0.00],
+        'tts-1'             => ['input' => 60.00, 'output' => 0.00],
+        'tts-1-hd'          => ['input' => 120.00, 'output' => 0.00],
 
         // ── OpenAI Embeddings ───────────────────────────────────────────────
         'text-embedding-3-small' => ['input' => 0.02, 'output' => 0.00],
@@ -99,30 +98,30 @@ class token_cost_manager {
 
         // ── OpenAI Whisper (transcription) ──────────────────────────────────
         // Whisper charges ~$0.006/min. Approximated per token for the rate card.
-        'whisper'           => ['input' =>  0.36, 'output' =>  0.00],
+        'whisper'           => ['input' => 0.36, 'output' => 0.00],
 
         // ── Anthropic Claude ──────────────────────────────────────────────────
-        'claude-haiku'      => ['input' =>  0.80, 'output' =>  4.00],
-        'claude-sonnet'     => ['input' =>  3.00, 'output' => 15.00],
+        'claude-haiku'      => ['input' => 0.80, 'output' => 4.00],
+        'claude-sonnet'     => ['input' => 3.00, 'output' => 15.00],
         'claude-opus'       => ['input' => 15.00, 'output' => 75.00],
 
         // ── DeepSeek ──────────────────────────────────────────────────────────
-        'deepseek-chat'     => ['input' =>  0.14, 'output' =>  0.28],
-        'deepseek-reasoner' => ['input' =>  0.55, 'output' =>  2.19],
+        'deepseek-chat'     => ['input' => 0.14, 'output' => 0.28],
+        'deepseek-reasoner' => ['input' => 0.55, 'output' => 2.19],
 
         // ── Google Gemini ─────────────────────────────────────────────────────
-        'gemini-2.0-flash'  => ['input' =>  0.10, 'output' =>  0.40],
-        'gemini-1.5-flash'  => ['input' =>  0.075, 'output' => 0.30],
-        'gemini-1.5-pro'    => ['input' =>  1.25, 'output' =>  5.00],
-        'gemini-pro'        => ['input' =>  0.50, 'output' =>  1.50],
+        'gemini-2.0-flash'  => ['input' => 0.10, 'output' => 0.40],
+        'gemini-1.5-flash'  => ['input' => 0.075, 'output' => 0.30],
+        'gemini-1.5-pro'    => ['input' => 1.25, 'output' => 5.00],
+        'gemini-pro'        => ['input' => 0.50, 'output' => 1.50],
 
         // ── Mistral AI ────────────────────────────────────────────────────────
-        'mistral-large'     => ['input' =>  2.00, 'output' =>  6.00],
-        'mistral-medium'    => ['input' =>  2.70, 'output' =>  8.10],
-        'mistral-small'     => ['input' =>  0.20, 'output' =>  0.60],
-        'open-mistral'      => ['input' =>  0.25, 'output' =>  0.25],
-        'open-mixtral'      => ['input' =>  0.65, 'output' =>  0.65],
-        'codestral'         => ['input' =>  0.30, 'output' =>  0.90],
+        'mistral-large'     => ['input' => 2.00, 'output' => 6.00],
+        'mistral-medium'    => ['input' => 2.70, 'output' => 8.10],
+        'mistral-small'     => ['input' => 0.20, 'output' => 0.60],
+        'open-mistral'      => ['input' => 0.25, 'output' => 0.25],
+        'open-mixtral'      => ['input' => 0.65, 'output' => 0.65],
+        'codestral'         => ['input' => 0.30, 'output' => 0.90],
 
         // ── Together AI (open-weight models, OpenAI-compatible API) ──────────
         // Together's Serverless Inference tier. Llama 3.1 8B Instruct Turbo
@@ -143,30 +142,30 @@ class token_cost_manager {
 
         // ── Groq (open-source models) ─────────────────────────────────────────
         // Groq charges vary by model; these are approximate hosted rates.
-        'llama-3.3-70b'     => ['input' =>  0.59, 'output' =>  0.79],
-        'llama-3.1-70b'     => ['input' =>  0.59, 'output' =>  0.79],
-        'llama-3.1-8b'      => ['input' =>  0.05, 'output' =>  0.08],
-        'llama-3-70b'       => ['input' =>  0.59, 'output' =>  0.79],
-        'llama-3-8b'        => ['input' =>  0.05, 'output' =>  0.08],
-        'mixtral-8x7b'      => ['input' =>  0.24, 'output' =>  0.24],
-        'gemma2-9b'         => ['input' =>  0.20, 'output' =>  0.20],
+        'llama-3.3-70b'     => ['input' => 0.59, 'output' => 0.79],
+        'llama-3.1-70b'     => ['input' => 0.59, 'output' => 0.79],
+        'llama-3.1-8b'      => ['input' => 0.05, 'output' => 0.08],
+        'llama-3-70b'       => ['input' => 0.59, 'output' => 0.79],
+        'llama-3-8b'        => ['input' => 0.05, 'output' => 0.08],
+        'mixtral-8x7b'      => ['input' => 0.24, 'output' => 0.24],
+        'gemma2-9b'         => ['input' => 0.20, 'output' => 0.20],
 
         // ── xAI (Grok) ───────────────────────────────────────────────────────
         // Live rates from xAI /v1/language-models + docs.x.ai (2026-06-03).
         // NOTE: the API silently aliases the (now-retired) name `grok-4-1-fast`
         // to grok-4.3, so it bills at grok-4.3 rates ($1.25/$2.50), NOT a cheap
         // "fast" tier. Benchmark "xai" rows actually ran grok-4.3.
-        'grok-4.3'          => ['input' =>  1.25, 'output' =>  2.50],
-        'grok-4.20'         => ['input' =>  1.25, 'output' =>  2.50],
-        'grok-4-1-fast'     => ['input' =>  1.25, 'output' =>  2.50],
-        'grok-4'            => ['input' =>  1.25, 'output' =>  2.50],
-        'grok-3'            => ['input' =>  3.00, 'output' => 15.00],
-        'grok-3-mini'       => ['input' =>  0.30, 'output' =>  0.50],
-        'grok-2'            => ['input' =>  2.00, 'output' => 10.00],
+        'grok-4.3'          => ['input' => 1.25, 'output' => 2.50],
+        'grok-4.20'         => ['input' => 1.25, 'output' => 2.50],
+        'grok-4-1-fast'     => ['input' => 1.25, 'output' => 2.50],
+        'grok-4'            => ['input' => 1.25, 'output' => 2.50],
+        'grok-3'            => ['input' => 3.00, 'output' => 15.00],
+        'grok-3-mini'       => ['input' => 0.30, 'output' => 0.50],
+        'grok-2'            => ['input' => 2.00, 'output' => 10.00],
 
         // ── MiniMax ───────────────────────────────────────────────────────────
-        'abab5.5'           => ['input' =>  0.50, 'output' =>  0.50],
-        'abab6.5'           => ['input' =>  1.00, 'output' =>  1.00],
+        'abab5.5'           => ['input' => 0.50, 'output' => 0.50],
+        'abab6.5'           => ['input' => 1.00, 'output' => 1.00],
     ];
 
     /**
@@ -184,7 +183,7 @@ class token_cost_manager {
         if ($rates === null) {
             return null;
         }
-        $inputcost  = ($prompttokens     / 1_000_000) * $rates['input'];
+        $inputcost  = ($prompttokens / 1_000_000) * $rates['input'];
         $outputcost = ($completiontokens / 1_000_000) * $rates['output'];
         return $inputcost + $outputcost;
     }
@@ -242,7 +241,7 @@ class token_cost_manager {
         foreach (self::get_effective_rate_cards() as $prefix => $rates) {
             $result[] = [
                 'model'         => $prefix . '…',
-                'input_per_1m'  => '$' . number_format($rates['input'],  2),
+                'input_per_1m'  => '$' . number_format($rates['input'], 2),
                 'output_per_1m' => '$' . number_format($rates['output'], 2),
             ];
         }

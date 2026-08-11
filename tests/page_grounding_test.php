@@ -36,7 +36,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\context_builder
  */
 final class page_grounding_test extends \advanced_testcase {
-
     /**
      * Helper: plant a Page activity with the given body text and return
      * its course_modules id.
@@ -106,15 +105,27 @@ final class page_grounding_test extends \advanced_testcase {
 
         $prompt = $this->build_prompt((int)$course->id, $user->id, $cmid, 'Non Serviam');
 
-        $this->assertStringContainsString('## Current Page Content', $prompt,
-            'Current Page Content section heading must appear when a Page cmid is supplied.');
-        $this->assertStringContainsString($fingerprint, $prompt,
+        $this->assertStringContainsString(
+            '## Current Page Content',
+            $prompt,
+            'Current Page Content section heading must appear when a Page cmid is supplied.'
+        );
+        $this->assertStringContainsString(
+            $fingerprint,
+            $prompt,
             'Page body fingerprint must appear in the prompt — if missing, '
-            . 'get_module_content() returned empty for this Page activity.');
-        $this->assertStringContainsString('Non Serviam', $prompt,
-            'Page title should appear in the Current Page Content section.');
-        $this->assertStringContainsString('Page-grounded answer required', $prompt,
-            'The page-grounded directive must accompany the page content.');
+            . 'get_module_content() returned empty for this Page activity.'
+        );
+        $this->assertStringContainsString(
+            'Non Serviam',
+            $prompt,
+            'Page title should appear in the Current Page Content section.'
+        );
+        $this->assertStringContainsString(
+            'Page-grounded answer required',
+            $prompt,
+            'The page-grounded directive must accompany the page content.'
+        );
     }
 
     /**
@@ -193,16 +204,28 @@ final class page_grounding_test extends \advanced_testcase {
 
         $prompt = $this->build_prompt((int)$course->id, $user->id, $cmid, 'Target');
 
-        $this->assertStringContainsString($targetfp, $prompt,
-            'Target page fingerprint must appear (Current Page Content section).');
-        $this->assertStringNotContainsString($unwanted1, $prompt,
+        $this->assertStringContainsString(
+            $targetfp,
+            $prompt,
+            'Target page fingerprint must appear (Current Page Content section).'
+        );
+        $this->assertStringNotContainsString(
+            $unwanted1,
+            $prompt,
             'Wide dump must be SKIPPED when current page content is firing — '
-            . 'unrelated page 1 must not appear in the prompt.');
-        $this->assertStringNotContainsString($unwanted2, $prompt,
-            'Wide dump must be SKIPPED — unrelated page 2 must not appear.');
+            . 'unrelated page 1 must not appear in the prompt.'
+        );
+        $this->assertStringNotContainsString(
+            $unwanted2,
+            $prompt,
+            'Wide dump must be SKIPPED — unrelated page 2 must not appear.'
+        );
         // The pointer text replacing the wide dump should be present.
-        $this->assertStringContainsString('the **Current Page Content** section above', $prompt,
-            'When wide dump is skipped, the pointer note must replace it.');
+        $this->assertStringContainsString(
+            'the **Current Page Content** section above',
+            $prompt,
+            'When wide dump is skipped, the pointer note must replace it.'
+        );
     }
 
     // v5.3.14: test_no_page_anchor_keeps_wide_dump_active dropped — same
@@ -233,8 +256,11 @@ final class page_grounding_test extends \advanced_testcase {
         // No page exists at this cmid. Build prompt with a dangling pageid.
         $prompt = $this->build_prompt((int)$course->id, $user->id, 999999, 'Ghost');
 
-        $this->assertStringNotContainsString('## Current Page Content', $prompt,
+        $this->assertStringNotContainsString(
+            '## Current Page Content',
+            $prompt,
             'When no page content can be extracted, the Current Page Content '
-            . 'heading must NOT appear (no orphan heading with empty body).');
+            . 'heading must NOT appear (no orphan heading with empty body).'
+        );
     }
 }

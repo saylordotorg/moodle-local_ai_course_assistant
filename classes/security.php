@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class security {
-
     /** @var string[] Audio MIME types accepted by the transcribe endpoint. */
     public const AUDIO_MIME_ALLOWLIST = [
         'audio/webm', 'audio/ogg', 'audio/oga', 'audio/mp4', 'audio/mpeg',
@@ -102,8 +101,13 @@ class security {
             // DNS resolution failed; reject by default.
             return false;
         }
-        if (!filter_var($ip, FILTER_VALIDATE_IP,
-                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+        if (
+            !filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            )
+        ) {
             return false;
         }
         return true;
@@ -231,12 +235,21 @@ class security {
             return null;
         }
         $ip = gethostbyname($host);
-        if ($ip === $host || !filter_var($ip, FILTER_VALIDATE_IP,
-                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+        if (
+            $ip === $host || !filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            )
+        ) {
             // Resolution failed, or the host now resolves to a private/reserved
             // address: treat as a rebinding attempt and refuse to connect.
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'Provider host failed SSRF re-validation (possible DNS rebinding): ' . $host);
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Provider host failed SSRF re-validation (possible DNS rebinding): ' . $host
+            );
         }
         return $host . ':' . $port . ':' . $ip;
     }
@@ -268,8 +281,10 @@ class security {
             return true;
         }
         $generic = ['application/octet-stream', 'text/plain', ''];
-        if (in_array($sniffed, $generic, true)
-            && in_array($declared, self::AUDIO_MIME_ALLOWLIST, true)) {
+        if (
+            in_array($sniffed, $generic, true)
+            && in_array($declared, self::AUDIO_MIME_ALLOWLIST, true)
+        ) {
             return true;
         }
         return false;

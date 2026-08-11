@@ -32,7 +32,6 @@ use local_ai_course_assistant\conversation_classifier;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class classify_conversation_turn extends \core\task\adhoc_task {
-
     public function execute() {
         $data = $this->get_custom_data();
         if (!is_object($data)) {
@@ -47,7 +46,10 @@ class classify_conversation_turn extends \core\task\adhoc_task {
         }
         try {
             conversation_classifier::classify_and_record(
-                $userid, $courseid, $usermsgid, $assistantmsgid
+                $userid,
+                $courseid,
+                $usermsgid,
+                $assistantmsgid
             );
         } catch (\Throwable $e) {
             mtrace('classify_conversation_turn: ' . $e->getMessage());

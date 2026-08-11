@@ -30,7 +30,6 @@ use local_ai_course_assistant\study_planner;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_study_plan extends external_api {
-
     /**
      * Returns description of method parameters.
      *
@@ -84,8 +83,10 @@ class update_study_plan extends external_api {
         // built around it. Clamp to a defensible academic range and surface
         // a friendly error to the chat surface so the learner can correct.
         $hours = (float) $params['hours_per_week'];
-        if ($hours < study_planner::MIN_HOURS_PER_WEEK
-                || $hours > study_planner::MAX_HOURS_PER_WEEK) {
+        if (
+            $hours < study_planner::MIN_HOURS_PER_WEEK
+                || $hours > study_planner::MAX_HOURS_PER_WEEK
+        ) {
             throw new \moodle_exception(
                 'studyplan:hours_out_of_range',
                 'local_ai_course_assistant',

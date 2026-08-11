@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class talking_avatar_cost_manager {
-
     /**
      * Bundled USD per streaming minute by provider key. List-price midpoints
      * as of 2026-04-30 — institutions on enterprise contracts will see

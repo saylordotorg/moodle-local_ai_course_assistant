@@ -26,7 +26,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @covers     \local_ai_course_assistant\provider\coreai_provider
  */
 final class coreai_provider_test extends \advanced_testcase {
-
     /**
      * extract_text picks the generated text across the response-data key names
      * core_ai has used across Moodle versions (the version-defensive matrix).

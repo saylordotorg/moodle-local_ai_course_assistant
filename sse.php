@@ -124,9 +124,18 @@ if ($logonly) {
     }
     $approxtokens = max(1, $durationsec * 50);
     conversation_manager::add_message(
-        $conv->id, $userid, $courseid, 'system', $message,
-        0, 'openai_realtime', $approxtokens, 0, 'gpt-4o-realtime',
-        $interactiontype, $pageid ?: null
+        $conv->id,
+        $userid,
+        $courseid,
+        'system',
+        $message,
+        0,
+        'openai_realtime',
+        $approxtokens,
+        0,
+        'gpt-4o-realtime',
+        $interactiontype,
+        $pageid ?: null
     );
     echo json_encode(['logged' => true]);
     exit;
@@ -248,9 +257,18 @@ try {
 
     // Save user message with interaction context.
     $usermsgid = conversation_manager::add_message(
-        $conv->id, $userid, $courseid, 'user', $message,
-        0, '', null, null, null,
-        $interactiontype, $pageid ?: null
+        $conv->id,
+        $userid,
+        $courseid,
+        'user',
+        $message,
+        0,
+        '',
+        null,
+        null,
+        null,
+        $interactiontype,
+        $pageid ?: null
     );
 
     // Audit log the message.
@@ -271,7 +289,10 @@ try {
     $attachmentmeta = null;      // {filename, mime, url} for the SSE meta event.
     if ($draftitemid > 0 && attachment_manager::is_enabled()) {
         $attachedfile = attachment_manager::promote_draft_to_message(
-            $userid, $draftitemid, $courseid, $usermsgid
+            $userid,
+            $draftitemid,
+            $courseid,
+            $usermsgid
         );
         if ($attachedfile) {
             $mime = strtolower($attachedfile->get_mimetype() ?: '');
@@ -309,7 +330,11 @@ try {
             $sessid = substr(sha1($userid . '|' . $courseid . '|' . userdate(time(), '%Y-%m-%d')), 0, 32);
             $topichint = $pagetitle !== '' ? $pagetitle : ('course:' . $courseid);
             \local_ai_course_assistant\struggle_classifier::record_stage1(
-                $userid, $courseid, $sessid, $topichint, $score
+                $userid,
+                $courseid,
+                $sessid,
+                $topichint,
+                $score
             );
         }
     } catch (\Throwable $e) {
@@ -355,9 +380,12 @@ try {
     // configuration, bypassing the teacher's intended assistance level.
     $quizmode = '';
     if ($pageid > 0) {
-        $cm = $DB->get_record('course_modules',
+        $cm = $DB->get_record(
+            'course_modules',
             ['id' => $pageid, 'course' => $courseid],
-            'id, instance, module', IGNORE_MISSING);
+            'id, instance, module',
+            IGNORE_MISSING
+        );
         if ($cm) {
             $modname = $DB->get_field('modules', 'name', ['id' => $cm->module]);
             if ($modname === 'quiz') {
@@ -371,7 +399,13 @@ try {
 
     // Build system prompt and get history.
     $systemprompt = context_builder::build_system_prompt(
-        $courseid, $userid, $lang, $retrievedchunks, $pageid, $pagetitle, $quizmode
+        $courseid,
+        $userid,
+        $lang,
+        $retrievedchunks,
+        $pageid,
+        $pagetitle,
+        $quizmode
     );
 
     // Accessibility: reading-level adjustment (v3.9.21). Appended after the
@@ -486,8 +520,10 @@ try {
     // Create provider. Admin LLM picker can override the provider/model for
     // side-by-side comparison. Requires the manage capability; students always
     // get the course/global default.
-    $isadmin = has_capability('local/ai_course_assistant:manage',
-        context_course::instance($courseid));
+    $isadmin = has_capability(
+        'local/ai_course_assistant:manage',
+        context_course::instance($courseid)
+    );
     if ($isadmin && !empty($clientprovider)) {
         $provider = base_provider::create_for_comparison($clientprovider, $clientmodel, $courseid);
         $effectiveprovidername = $clientprovider;
@@ -513,7 +549,10 @@ try {
                 );
                 $effectiveprovidername = $premiumdecision['provider'];
                 \local_ai_course_assistant\premium_router::log_decision(
-                    (int) $conv->id, (int) $USER->id, $courseid, $premiumdecision
+                    (int) $conv->id,
+                    (int) $USER->id,
+                    $courseid,
+                    $premiumdecision
                 );
             } catch (\Throwable $e) {
                 debugging('premium_router escalation failed, staying on workhorse: '
@@ -525,8 +564,10 @@ try {
     // If the student attached an image, confirm the effective provider can
     // handle images before we start the stream. A friendly error is better
     // than a silent drop or a provider-side 400.
-    if ($attachmentpayload !== null
-        && !attachment_manager::provider_supports_images((string) $effectiveprovidername)) {
+    if (
+        $attachmentpayload !== null
+        && !attachment_manager::provider_supports_images((string) $effectiveprovidername)
+    ) {
         local_ai_course_assistant_sse_send(['error' => get_string('attachment:error_provider_no_images', 'local_ai_course_assistant')]);
         die();
     }
@@ -623,8 +664,10 @@ try {
     // surface. Always-on (no PII written, just per-section sizes) unless
     // the admin disables prompt_metrics_enabled. Separate from the heavy
     // prompt_debug_enabled file which writes the full prompt body.
-    if ((bool) (get_config('local_ai_course_assistant', 'prompt_metrics_enabled') ?? '1')
-            && !empty(\local_ai_course_assistant\context_builder::$last_breakdown)) {
+    if (
+        (bool) (get_config('local_ai_course_assistant', 'prompt_metrics_enabled') ?? '1')
+            && !empty(\local_ai_course_assistant\context_builder::$last_breakdown)
+    ) {
         \local_ai_course_assistant\prompt_metrics_logger::record(
             $courseid,
             $USER->id,
@@ -711,7 +754,9 @@ try {
         }
     };
     $streamflush = function () use (&$carry) {
-        if ($carry === '') { return; }
+        if ($carry === '') {
+            return;
+        }
         $tail = str_replace(['[OFF_TOPIC]', '[NEEDS_ESCALATION]'], '', $carry);
         $tail = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $tail) ?? $tail;
         if ($tail !== '') {
@@ -725,8 +770,10 @@ try {
         $streamflush();
     } catch (\moodle_exception $e) {
         // On 404 (model not found), retry once with the provider's default model.
-        if (strpos($e->debuginfo ?? '', 'HTTP 404') !== false
-            || strpos($e->debuginfo ?? '', 'was not found') !== false) {
+        if (
+            strpos($e->debuginfo ?? '', 'HTTP 404') !== false
+            || strpos($e->debuginfo ?? '', 'was not found') !== false
+        ) {
             if ($provider->can_retry_with_default_model()) {
                 $provider->use_default_model();
                 $fullresponse = '';
@@ -811,8 +858,10 @@ try {
     // Queue the conversation-mastery classifier as an adhoc task so it runs
     // out of band. Only when mastery is turned on for the course AND the
     // course has at least one objective to classify against.
-    if (\local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid)
-        && !empty(\local_ai_course_assistant\objective_manager::list_for_course($courseid))) {
+    if (
+        \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid)
+        && !empty(\local_ai_course_assistant\objective_manager::list_for_course($courseid))
+    ) {
         try {
             $classifytask = new \local_ai_course_assistant\task\classify_conversation_turn();
             $classifytask->set_custom_data([
@@ -862,8 +911,18 @@ try {
         $consentmsg = get_string('chat:escalation_needs_consent', 'local_ai_course_assistant');
         local_ai_course_assistant_sse_send(['token' => "\n\n" . $consentmsg]);
         conversation_manager::add_message(
-            $conv->id, $userid, $courseid, 'assistant', $consentmsg,
-            0, '', null, null, null, $interactiontype, $pageid ?: null
+            $conv->id,
+            $userid,
+            $courseid,
+            'assistant',
+            $consentmsg,
+            0,
+            '',
+            null,
+            null,
+            null,
+            $interactiontype,
+            $pageid ?: null
         );
     } else if ($needsescalation && zendesk_client::is_enabled()) {
         $messages = conversation_manager::get_messages($conv->id);
@@ -874,8 +933,18 @@ try {
             $escalationmsg = get_string('chat:escalated_to_support', 'local_ai_course_assistant', $ticketref);
             local_ai_course_assistant_sse_send(['token' => "\n\n" . $escalationmsg]);
             conversation_manager::add_message(
-                $conv->id, $userid, $courseid, 'assistant', $escalationmsg,
-                0, '', null, null, null, $interactiontype, $pageid ?: null
+                $conv->id,
+                $userid,
+                $courseid,
+                'assistant',
+                $escalationmsg,
+                0,
+                '',
+                null,
+                null,
+                null,
+                $interactiontype,
+                $pageid ?: null
             );
         }
     }
@@ -896,7 +965,6 @@ try {
             debugging('Profile update skipped: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
     }
-
 } catch (\moodle_exception $e) {
     // Include debuginfo (curl errors, HTTP details) only for site admins on
     // developer-debug environments; never expose internal details to learners.
@@ -908,33 +976,45 @@ try {
     // v5.3.7: always write the underlying error to debugging() and the
     // audit log so an admin can diagnose mid-chat failures from the
     // server-side logs even when the learner-facing message is generic.
-    debugging('SOLA SSE moodle_exception: ' . get_class($e) . ': ' . $errmsg
+    debugging(
+        'SOLA SSE moodle_exception: ' . get_class($e) . ': ' . $errmsg
         . ' (courseid=' . (int)($courseid ?? 0)
         . ', userid=' . (int)($USER->id ?? 0)
         . ', pageid=' . (int)($pageid ?? 0) . ')',
-        DEBUG_DEVELOPER);
+        DEBUG_DEVELOPER
+    );
     try {
-        \local_ai_course_assistant\audit_logger::log('sse_error',
+        \local_ai_course_assistant\audit_logger::log(
+            'sse_error',
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
-            ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]);
-    } catch (\Throwable $ignore) { /* never let audit logging mask the real error */ }
+            ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]
+        );
+    } catch (\Throwable $ignore) {
+        /* never let audit logging mask the real error */
+    }
     local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
     // Send actual message in debug mode, generic otherwise.
     global $CFG, $USER;
     $errmsg = get_class($e) . ': ' . $e->getMessage();
-    debugging('SOLA SSE Throwable: ' . $errmsg
+    debugging(
+        'SOLA SSE Throwable: ' . $errmsg
         . ' (courseid=' . (int)($courseid ?? 0)
         . ', userid=' . (int)($USER->id ?? 0)
         . ', pageid=' . (int)($pageid ?? 0) . ')',
-        DEBUG_DEVELOPER);
+        DEBUG_DEVELOPER
+    );
     try {
-        \local_ai_course_assistant\audit_logger::log('sse_error',
+        \local_ai_course_assistant\audit_logger::log(
+            'sse_error',
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
-            ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)]);
-    } catch (\Throwable $ignore) { /* same */ }
+            ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)]
+        );
+    } catch (\Throwable $ignore) {
+        /* same */
+    }
     $msg = (!empty($CFG->debugdeveloper) || !empty($CFG->debug))
         ? $errmsg
         : get_string('chat:error', 'local_ai_course_assistant');

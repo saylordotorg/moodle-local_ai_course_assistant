@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class history_selector {
-
     /**
      * Build the API-shaped history for a conversation, honouring history_mode.
      *

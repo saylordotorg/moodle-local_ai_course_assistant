@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\analytics::get_overview
  */
 final class analytics_overview_roles_test extends \advanced_testcase {
-
     /**
      * Insert one msgs row.
      *
@@ -48,8 +47,15 @@ final class analytics_overview_roles_test extends \advanced_testcase {
      * @param string $itype interaction_type
      * @param int $timecreated 0 for now.
      */
-    private function msg(int $courseid, string $role, int $userid, int $convid,
-            string $text, string $itype, int $timecreated = 0): void {
+    private function msg(
+        int $courseid,
+        string $role,
+        int $userid,
+        int $convid,
+        string $text,
+        string $itype,
+        int $timecreated = 0
+    ): void {
         global $DB;
         $DB->insert_record('local_ai_course_assistant_msgs', (object) [
             'conversationid' => $convid,

@@ -28,7 +28,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-
     // Read plugin version for the banner text.
     $pluginfo   = core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
     $release    = $pluginfo ? htmlspecialchars($pluginfo->release, ENT_QUOTES) : '?';
@@ -99,10 +98,15 @@ if ($hassiteconfig) {
         if ($lastcourse) {
             $lastlabel = $lastcourse->shortname !== '' ? $lastcourse->shortname : $lastcourse->fullname;
             $lasturl = new moodle_url('/course/view.php', ['id' => $lastcourseid]);
-            $coursesettingsurl = new moodle_url('/local/ai_course_assistant/course_settings.php',
-                ['courseid' => $lastcourseid]);
-            $backlabel = str_replace('{$a}', s($lastlabel),
-                get_string('toc:back_to_course', 'local_ai_course_assistant'));
+            $coursesettingsurl = new moodle_url(
+                '/local/ai_course_assistant/course_settings.php',
+                ['courseid' => $lastcourseid]
+            );
+            $backlabel = str_replace(
+                '{$a}',
+                s($lastlabel),
+                get_string('toc:back_to_course', 'local_ai_course_assistant')
+            );
             $courseaiurl = '<a href="' . $coursesettingsurl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#495057;border-color:#495057;">'
                 . '&#9881; ' . s($lastlabel) . ' AI settings</a>';
@@ -142,7 +146,7 @@ if ($hassiteconfig) {
     ));
 
     // Helper to render a section anchor + heading.
-    $sectionanchor = function(string $id, string $title): string {
+    $sectionanchor = function (string $id, string $title): string {
         return '<span id="' . $id . '" class="sola-section-anchor"></span>'
             . '<h2 class="sola-section-heading">' . $title . '</h2>';
     };
@@ -323,15 +327,21 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/selftest_link',
         get_string('selftest:link', 'local_ai_course_assistant'),
-        get_string('selftest:link_desc', 'local_ai_course_assistant',
-            (new moodle_url('/local/ai_course_assistant/backend_selftest.php'))->out())
+        get_string(
+            'selftest:link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/backend_selftest.php'))->out()
+        )
     ));
     // v5.10.0: link to the deployment presets page.
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/deployment_profile_link',
         get_string('profile:link', 'local_ai_course_assistant'),
-        get_string('profile:link_desc', 'local_ai_course_assistant',
-            (new moodle_url('/local/ai_course_assistant/deployment_profile.php'))->out())
+        get_string(
+            'profile:link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/deployment_profile.php'))->out()
+        )
     ));
     // v5.1.0: per-section cap on the current_page_content body. Lets
     // cost-conscious admins clamp how much of the current page is
@@ -706,13 +716,15 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/rag_window_size',
         get_string('settings:rag_window_size', 'local_ai_course_assistant'),
         get_string('settings:rag_window_size_desc', 'local_ai_course_assistant'),
-        '1', PARAM_INT
+        '1',
+        PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_parent_max_chars',
         get_string('settings:rag_parent_max_chars', 'local_ai_course_assistant'),
         get_string('settings:rag_parent_max_chars_desc', 'local_ai_course_assistant'),
-        '6000', PARAM_INT
+        '6000',
+        PARAM_INT
     ));
 
     // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
@@ -771,9 +783,11 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/rag_admin_link',
         get_string('ragadmin:title', 'local_ai_course_assistant'),
-        html_writer::link($ragadminurl,
+        html_writer::link(
+            $ragadminurl,
             get_string('ragadmin:view_status', 'local_ai_course_assistant'),
-            ['class' => 'btn btn-secondary btn-sm'])
+            ['class' => 'btn btn-secondary btn-sm']
+        )
     ));
 
     // Content source extractors (v3.9.6+). Each flag gates a specific module
@@ -949,25 +963,29 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/spend_cap_chat',
         'Chat cap (USD)',
         'Cap just for student chat + quiz workload. <code>0</code> = use site-wide cap.',
-        '0', PARAM_FLOAT
+        '0',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_voice',
         'Voice cap (USD)',
         'Cap for Voice (Realtime + TTS + STT). Voice is usually the biggest line item — cap it first.',
-        '0', PARAM_FLOAT
+        '0',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_rag',
         'RAG cap (USD)',
         'Cap for embedding calls made during course indexing.',
-        '0', PARAM_FLOAT
+        '0',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_analytics',
         'Analytics cap (USD)',
         'Cap for Learning Radar admin queries.',
-        '0', PARAM_FLOAT
+        '0',
+        PARAM_FLOAT
     ));
 
     // v5.13.0: default per-course cap (applies to any course without an explicit override).
@@ -1079,7 +1097,8 @@ if ($hassiteconfig) {
         . 'Lower values fall over faster on slow providers at the cost of false-positives on temporarily-slow '
         . 'requests; higher values keep the chain on the primary longer. Only consulted when <strong>Per-call '
         . 'failover</strong> is on.',
-        '8', PARAM_INT
+        '8',
+        PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/failover_timeout_voice',
@@ -1087,7 +1106,8 @@ if ($hassiteconfig) {
         'Equivalent timeout for the voice/realtime path. Default 3s; voice has tighter latency expectations '
         . 'than chat. Only consulted when <strong>Per-call failover</strong> is on (and voice failover is '
         . 'wired through; chat-only in v5.5.0).',
-        '3', PARAM_INT
+        '3',
+        PARAM_INT
     ));
 
     // v5.10.0: bounded retry on a transient backend rejection (429/503). Aimed
@@ -1097,13 +1117,15 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/backend_retry_attempts',
         get_string('settings:backend_retry_attempts', 'local_ai_course_assistant'),
         get_string('settings:backend_retry_attempts_desc', 'local_ai_course_assistant'),
-        '2', PARAM_INT
+        '2',
+        PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/backend_retry_max_wait',
         get_string('settings:backend_retry_max_wait', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant')),
-        '5', PARAM_INT
+        '5',
+        PARAM_INT
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1117,13 +1139,15 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/opt_cost_weight',
         'Optimizer: cost weight',
         'How much the optimizer prioritizes cost when ranking providers. 0.0 ignores cost, 1.0 optimizes purely for cost. Must sum with quality weight.',
-        '0.7', PARAM_FLOAT
+        '0.7',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/opt_quality_weight',
         'Optimizer: quality weight',
         'How much the optimizer prioritizes student satisfaction (thumbs-up rate) when ranking providers. 0.0 ignores quality.',
-        '0.3', PARAM_FLOAT
+        '0.3',
+        PARAM_FLOAT
     ));
 
     // ── Section: Safety & Moderation ────────────────────────────────────────
@@ -1814,7 +1838,8 @@ if ($hassiteconfig) {
         get_string('settings:pedagogy_defaults_heading', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:pedagogy_defaults_heading_desc', 'local_ai_course_assistant'))
     ));
-    foreach ([
+    foreach (
+        [
         'mastery_enabled'         => 'pedagogy:mastery',
         'socratic_mode_enabled'   => 'pedagogy:socratic_mode',
         'worked_examples_enabled' => 'pedagogy:worked_examples',
@@ -1825,7 +1850,8 @@ if ($hassiteconfig) {
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
         // crossmastery / mastery_starter / program_path / learning_path render
         // in the Mastery tracking section below (they all require mastery).
-    ] as $key => $stringkey) {
+        ] as $key => $stringkey
+    ) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,
             \local_ai_course_assistant\branding::apply(get_string($stringkey, 'local_ai_course_assistant')),
@@ -1929,12 +1955,14 @@ if ($hassiteconfig) {
     // Mastery-dependent feature defaults (moved here from the pedagogy list so the
     // toggles sit with the mastery knobs they depend on). Each is a site-wide
     // default; per-course overrides remain authoritative. Default off.
-    foreach ([
+    foreach (
+        [
         'crossmastery_enabled'    => 'pedagogy:crossmastery',
         'mastery_starter_enabled' => 'pedagogy:mastery_starter',
         'program_path_enabled'    => 'pedagogy:program_path',
         'learning_path_enabled'   => 'pedagogy:learning_path',
-    ] as $mkey => $mstringkey) {
+        ] as $mkey => $mstringkey
+    ) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $mkey,
             \local_ai_course_assistant\branding::apply(get_string($mstringkey, 'local_ai_course_assistant')),
@@ -2019,7 +2047,7 @@ if ($hassiteconfig) {
         PARAM_RAW_TRIMMED
     ));
 
-$settings->add(new admin_setting_configtext(
+    $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_provider',
         get_string('settings:mastery_classifier_provider', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_provider_desc', 'local_ai_course_assistant'),
@@ -2180,8 +2208,11 @@ $settings->add(new admin_setting_configtext(
     ));
 
     $avatarchoices = [
-        'avatar_01' => get_string('settings:avatar_saylor', 'local_ai_course_assistant',
-            get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University'),
+        'avatar_01' => get_string(
+            'settings:avatar_saylor',
+            'local_ai_course_assistant',
+            get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University'
+        ),
     ];
     for ($i = 2; $i <= 10; $i++) {
         $num = str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -2527,8 +2558,11 @@ $settings->add(new admin_setting_configtext(
     $lastrefresherror = (string) (get_config('local_ai_course_assistant', 'rate_card_last_refresh_error') ?: '');
     $statusparts = [];
     if ($lastrefreshat > 0) {
-        $statusparts[] = get_string('settings:rate_card_last_refresh_at', 'local_ai_course_assistant',
-            userdate($lastrefreshat));
+        $statusparts[] = get_string(
+            'settings:rate_card_last_refresh_at',
+            'local_ai_course_assistant',
+            userdate($lastrefreshat)
+        );
     } else {
         $statusparts[] = get_string('settings:rate_card_never_refreshed', 'local_ai_course_assistant');
     }
@@ -2538,8 +2572,10 @@ $settings->add(new admin_setting_configtext(
         $statusparts[] = '<span class="text-success">'
             . get_string('settings:rate_card_last_refresh_success', 'local_ai_course_assistant') . '</span>';
     }
-    $refreshurl = new moodle_url('/local/ai_course_assistant/rate_card_refresh.php',
-        ['sesskey' => sesskey()]);
+    $refreshurl = new moodle_url(
+        '/local/ai_course_assistant/rate_card_refresh.php',
+        ['sesskey' => sesskey()]
+    );
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/rate_card_refresh_button',
         get_string('settings:rate_card_refresh_now', 'local_ai_course_assistant'),
@@ -2732,8 +2768,11 @@ $settings->add(new admin_setting_configtext(
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_userdata',
-        get_string('admin:user_data:title', 'local_ai_course_assistant',
-            \local_ai_course_assistant\branding::short_name()),
+        get_string(
+            'admin:user_data:title',
+            'local_ai_course_assistant',
+            \local_ai_course_assistant\branding::short_name()
+        ),
         new moodle_url('/local/ai_course_assistant/admin_user_data.php'),
         'moodle/site:config'
     ));
@@ -2746,8 +2785,11 @@ $settings->add(new admin_setting_configtext(
     if ((bool) get_config('local_ai_course_assistant', 'vendor_dpa_admin_page_enabled')) {
         $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
             'local_ai_course_assistant_vendordpa',
-            get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
-                \local_ai_course_assistant\branding::short_name()),
+            get_string(
+                'admin:vendor_dpa:title',
+                'local_ai_course_assistant',
+                \local_ai_course_assistant\branding::short_name()
+            ),
             new moodle_url('/local/ai_course_assistant/vendor_dpa.php'),
             'moodle/site:config'
         ));

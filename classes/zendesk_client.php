@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class zendesk_client {
-
     /**
      * Check if Zendesk integration is configured and enabled.
      *
@@ -71,8 +70,13 @@ class zendesk_client {
      * @param string $summary the conversation summary
      * @return string
      */
-    public static function format_ticket_body(\stdClass $user, \stdClass $course,
-            string $pageurl, string $question, string $summary): string {
+    public static function format_ticket_body(
+        \stdClass $user,
+        \stdClass $course,
+        string $pageurl,
+        string $question,
+        string $summary
+    ): string {
         $body = "Student: {$user->firstname} {$user->lastname} ({$user->email})\n"
             . "Course: {$course->fullname}\n";
         if (trim($pageurl) !== '') {
@@ -172,8 +176,11 @@ class zendesk_client {
         ]);
 
         // Pin to the validated IP, closing the DNS-rebinding window.
-        $response = $curl->post($url, json_encode($ticketdata),
-            security::resolve_pin_options($url));
+        $response = $curl->post(
+            $url,
+            json_encode($ticketdata),
+            security::resolve_pin_options($url)
+        );
         $httpcode = $curl->get_info()['http_code'] ?? 0;
 
         if ($httpcode >= 200 && $httpcode < 300) {

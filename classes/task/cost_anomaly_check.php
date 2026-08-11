@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cost_anomaly_check extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return \local_ai_course_assistant\branding::apply(get_string('task:cost_anomaly_check', 'local_ai_course_assistant'));
     }

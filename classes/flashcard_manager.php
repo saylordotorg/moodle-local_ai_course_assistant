@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class flashcard_manager {
-
     public const QUALITY_AGAIN = 1;  // Did not recall.
     public const QUALITY_HARD  = 3;  // Recalled with effort.
     public const QUALITY_EASY  = 5;  // Recalled fluently.
@@ -88,7 +87,7 @@ class flashcard_manager {
                 'ease'          => 2.50,
                 'interval_days' => 0,
                 'repetitions'   => 0,
-                'next_review'   => $now,  // Available for review immediately.
+                'next_review'   => $now, // Available for review immediately.
                 'timecreated'   => $now,
                 'timemodified'  => $now,
             ];
@@ -114,7 +113,8 @@ class flashcard_manager {
                 AND next_review <= :now
               ORDER BY next_review ASC, id ASC",
             ['userid' => $userid, 'courseid' => $courseid, 'now' => $now],
-            0, $limit
+            0,
+            $limit
         );
     }
 
@@ -129,8 +129,10 @@ class flashcard_manager {
      */
     public static function review(int $cardid, int $userid, int $quality): bool {
         global $DB;
-        $card = $DB->get_record('local_ai_course_assistant_flashcards',
-            ['id' => $cardid, 'userid' => $userid]);
+        $card = $DB->get_record(
+            'local_ai_course_assistant_flashcards',
+            ['id' => $cardid, 'userid' => $userid]
+        );
         if (!$card) {
             return false;
         }
@@ -150,14 +152,22 @@ class flashcard_manager {
             $newrep = $reps + 1;
             if ($quality === self::QUALITY_HARD) {
                 $newease = max(1.30, $ease - 0.15);
-                if ($newrep === 1) { $iv = 1; }
-                else if ($newrep === 2) { $iv = 4; }
-                else { $iv = (int) ceil($prev * ($newease - 0.15)); }
+                if ($newrep === 1) {
+                    $iv = 1;
+                } else if ($newrep === 2) {
+                    $iv = 4;
+                } else {
+                    $iv = (int) ceil($prev * ($newease - 0.15));
+                }
             } else { // QUALITY_EASY
                 $newease = $ease + 0.15;
-                if ($newrep === 1) { $iv = 4; }
-                else if ($newrep === 2) { $iv = 7; }
-                else { $iv = (int) ceil($prev * ($newease + 0.15)); }
+                if ($newrep === 1) {
+                    $iv = 4;
+                } else if ($newrep === 2) {
+                    $iv = 7;
+                } else {
+                    $iv = (int) ceil($prev * ($newease + 0.15));
+                }
             }
             $card->repetitions = $newrep;
 
@@ -168,8 +178,10 @@ class flashcard_manager {
             // re-surfaces sooner than vanilla SM-2 would schedule it.
             // Untagged cards (objectiveid IS NULL) keep vanilla SM-2.
             $boost = false;
-            if (!empty($card->objectiveid)
-                && objective_manager::is_enabled_for_course((int) $card->courseid)) {
+            if (
+                !empty($card->objectiveid)
+                && objective_manager::is_enabled_for_course((int) $card->courseid)
+            ) {
                 $m = objective_manager::compute_mastery((int) $userid, (int) $card->objectiveid);
                 if ($m['status'] !== 'mastered') {
                     $boost = true;

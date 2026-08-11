@@ -28,7 +28,6 @@ namespace local_ai_course_assistant\external;
  * @covers     \local_ai_course_assistant\external\get_realtime_token
  */
 final class get_realtime_token_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -57,8 +56,11 @@ final class get_realtime_token_test extends \advanced_testcase {
         $instructions = $result['instructions'];
         $this->assertNotEmpty($instructions);
         // The core guarantee: no OpenAI reserved special token survives.
-        $this->assertDoesNotMatchRegularExpression('/<\|[a-zA-Z0-9_\-]+\|>/', $instructions,
-            'Realtime instructions must not contain a reserved special token.');
+        $this->assertDoesNotMatchRegularExpression(
+            '/<\|[a-zA-Z0-9_\-]+\|>/',
+            $instructions,
+            'Realtime instructions must not contain a reserved special token.'
+        );
         // The jailbreak-defence line cited <|im_start|>; it is now neutralized.
         $this->assertStringContainsString('[special token]', $instructions);
         $this->assertStringNotContainsString('<|im_start|>', $instructions);

@@ -43,12 +43,20 @@ $PAGE->set_pagelayout('admin');
 
 if ($apply !== '' && confirm_sesskey()) {
     if (!in_array($apply, \local_ai_course_assistant\deployment_profile::profiles(), true)) {
-        redirect($pageurl, get_string('profile:unknown', 'local_ai_course_assistant'), null,
-            \core\output\notification::NOTIFY_ERROR);
+        redirect(
+            $pageurl,
+            get_string('profile:unknown', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_ERROR
+        );
     }
     \local_ai_course_assistant\deployment_profile::apply($apply);
-    redirect($pageurl, get_string('profile:applied', 'local_ai_course_assistant', $apply), null,
-        \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        $pageurl,
+        get_string('profile:applied', 'local_ai_course_assistant', $apply),
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 echo $OUTPUT->header();
@@ -57,9 +65,11 @@ echo html_writer::tag('p', get_string('profile:intro', 'local_ai_course_assistan
 
 $current = (string) get_config('local_ai_course_assistant', 'deployment_profile');
 if ($current !== '') {
-    echo html_writer::tag('p',
+    echo html_writer::tag(
+        'p',
         get_string('profile:current', 'local_ai_course_assistant', s($current)),
-        ['class' => 'alert alert-info']);
+        ['class' => 'alert alert-info']
+    );
 }
 
 foreach (\local_ai_course_assistant\deployment_profile::profiles() as $profile) {

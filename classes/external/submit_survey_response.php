@@ -30,7 +30,6 @@ use local_ai_course_assistant\survey_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submit_survey_response extends external_api {
-
     /**
      * Returns description of method parameters.
      *

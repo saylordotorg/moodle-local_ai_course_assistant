@@ -39,7 +39,6 @@ use local_ai_course_assistant\objective_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class score_speech extends external_api {
-
     /**
      * @return external_function_parameters
      */
@@ -71,9 +70,18 @@ class score_speech extends external_api {
      * @param string $visionnote
      * @return array
      */
-    public static function execute(int $courseid, string $transcript, string $name = '',
-            string $topic = '', int $targetsec = 0, int $durationsec = 0, string $mode = 'informative',
-            string $slidecontext = '', int $slidecount = 0, string $visionnote = ''): array {
+    public static function execute(
+        int $courseid,
+        string $transcript,
+        string $name = '',
+        string $topic = '',
+        int $targetsec = 0,
+        int $durationsec = 0,
+        string $mode = 'informative',
+        string $slidecontext = '',
+        int $slidecount = 0,
+        string $visionnote = ''
+    ): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid, 'transcript' => $transcript, 'name' => $name,
@@ -245,8 +253,15 @@ class score_speech extends external_api {
                 $meta['slide_design_note'] = $visionnote;
             }
             $scoreid = rubric_manager::save_score(
-                $rubricid, (int) $USER->id, $courseid, rubric_manager::TYPE_SPEECH,
-                $criteria, (int) round($sum / max(1, count($criteria))), $overall, $durationsec, $meta
+                $rubricid,
+                (int) $USER->id,
+                $courseid,
+                rubric_manager::TYPE_SPEECH,
+                $criteria,
+                (int) round($sum / max(1, count($criteria))),
+                $overall,
+                $durationsec,
+                $meta
             );
         } catch (\Throwable $e) {
             // History persistence is best-effort; still return the feedback.
@@ -273,7 +288,16 @@ class score_speech extends external_api {
                 $max = max(1, (int) ($def['max_score'] ?? 5));
                 $norm = max(0.0, min(1.0, $scored['score'] / $max));
                 objective_manager::record_attempt(
-                    (int) $USER->id, $courseid, $oid, $norm >= 0.5, 'rubric', 1.0, null, null, $norm);
+                    (int) $USER->id,
+                    $courseid,
+                    $oid,
+                    $norm >= 0.5,
+                    'rubric',
+                    1.0,
+                    null,
+                    null,
+                    $norm
+                );
             }
         } catch (\Throwable $e) {
             // Outcome recording is best-effort; feedback is unaffected.

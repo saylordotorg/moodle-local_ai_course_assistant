@@ -76,8 +76,10 @@ TXT;
     ['h' => 'help']
 );
 
-if ($options['help'] || (!$options['keygen'] && !$options['sign'] && !$options['verify']
-        && !$options['status'] && !$options['sync'])) {
+if (
+    $options['help'] || (!$options['keygen'] && !$options['sign'] && !$options['verify']
+        && !$options['status'] && !$options['sync'])
+) {
     cli_write($usage);
     exit(0);
 }

@@ -26,7 +26,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\spend_guard
  */
 final class spend_guard_per_course_default_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
