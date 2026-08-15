@@ -45,7 +45,7 @@ $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_course($course);
-$PAGE->set_title('Soapbox assignment');
+$PAGE->set_title(get_string('soapbox:assign_single_title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
 $existing = null;
@@ -79,10 +79,10 @@ if ($data = $form->get_data()) {
     ];
     if ($id) {
         soapbox_assignment_manager::update_assignment($id, $payload);
-        $notice = 'Assignment updated.';
+        $notice = get_string('soapbox:assign_updated', 'local_ai_course_assistant');
     } else {
         soapbox_assignment_manager::create_assignment($courseid, $payload);
-        $notice = 'Assignment created.';
+        $notice = get_string('soapbox:assign_created', 'local_ai_course_assistant');
     }
     redirect($listurl, $notice, null, \core\output\notification::NOTIFY_SUCCESS);
 }
@@ -109,6 +109,8 @@ if ($existing) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($id ? 'Edit Soapbox assignment' : 'New Soapbox assignment');
+echo $OUTPUT->heading($id
+    ? get_string('soapbox:assign_edit_heading', 'local_ai_course_assistant')
+    : get_string('soapbox:assign_new_heading', 'local_ai_course_assistant'));
 $form->display();
 echo $OUTPUT->footer();

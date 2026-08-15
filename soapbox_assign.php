@@ -41,7 +41,7 @@ $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_course($course);
-$PAGE->set_title('Soapbox assignments');
+$PAGE->set_title(get_string('soapbox:assign_title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
 // Delete action (sesskey-protected, with a confirm step).
@@ -52,12 +52,17 @@ if ($action === 'delete' && $id) {
     }
     if (optional_param('confirm', 0, PARAM_BOOL) && confirm_sesskey()) {
         soapbox_assignment_manager::delete_assignment($id);
-        redirect($pageurl, 'Assignment deleted.', null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($pageurl, get_string('soapbox:assign_deleted', 'local_ai_course_assistant'), null,
+            \core\output\notification::NOTIFY_SUCCESS);
     }
     echo $OUTPUT->header();
     $confirmurl = new moodle_url($pageurl, ['action' => 'delete', 'id' => $id, 'confirm' => 1, 'sesskey' => sesskey()]);
     echo $OUTPUT->confirm(
-        'Delete "' . format_string($assign->name) . '" and all its recordings? This cannot be undone.',
+        get_string(
+            'soapbox:assign_delete_confirm',
+            'local_ai_course_assistant',
+            format_string($assign->name)
+        ),
         $confirmurl,
         $pageurl
     );
@@ -68,22 +73,31 @@ if ($action === 'delete' && $id) {
 $assignments = soapbox_assignment_manager::get_course_assignments($courseid);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('Soapbox assignments');
+echo $OUTPUT->heading(get_string('soapbox:assign_title', 'local_ai_course_assistant'));
 
 echo html_writer::div(
     $OUTPUT->single_button(
         new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php', ['courseid' => $courseid]),
-        'Add assignment',
+        get_string('soapbox:assign_add', 'local_ai_course_assistant'),
         'get'
     ),
     'mb-3'
 );
 
 if (empty($assignments)) {
-    echo $OUTPUT->notification('No Soapbox assignments yet.', 'info');
+    echo $OUTPUT->notification(get_string('soapbox:assign_none', 'local_ai_course_assistant'), 'info');
 } else {
     $table = new html_table();
-    $table->head = ['Name', 'Type', 'Recording', 'Length', 'Kept', 'Visible', 'Student link', 'Actions'];
+    $table->head = [
+        get_string('name'),
+        get_string('soapbox:col_type', 'local_ai_course_assistant'),
+        get_string('soapbox:col_recording', 'local_ai_course_assistant'),
+        get_string('soapbox:col_length', 'local_ai_course_assistant'),
+        get_string('soapbox:col_kept', 'local_ai_course_assistant'),
+        get_string('visible'),
+        get_string('soapbox:col_student_link', 'local_ai_course_assistant'),
+        get_string('actions'),
+    ];
     $table->attributes['class'] = 'generaltable';
     foreach ($assignments as $a) {
         $editurl = new moodle_url(
@@ -91,9 +105,9 @@ if (empty($assignments)) {
             ['courseid' => $courseid, 'id' => $a->id]
         );
         $delurl = new moodle_url($pageurl, ['action' => 'delete', 'id' => $a->id]);
-        $actions = html_writer::link($editurl, 'Edit')
+        $actions = html_writer::link($editurl, get_string('edit'))
             . ' &middot; '
-            . html_writer::link($delurl, 'Delete');
+            . html_writer::link($delurl, get_string('delete'));
         $length = ((int) $a->min_seconds) . '-' . ((int) $a->max_seconds) . 's';
         // Copyable student URL so an instructor can paste a link to this
         // assignment anywhere in the course (a Label, Page, or section summary).

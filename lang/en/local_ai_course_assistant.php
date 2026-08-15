@@ -1652,6 +1652,38 @@ $string['soapbox:deck_label']       = 'Slides (PDF). Upload your deck, then adva
 $string['soapbox:slide_prev']       = 'Previous slide';
 $string['soapbox:slide_next']       = 'Next slide';
 $string['soapbox:play_slides']      = 'Play with slides';
+
+// Soapbox assignment + presentation pages (v6.9.6): these labels were hardcoded
+// English until this release, so non-English learners saw them untranslated.
+// Generic column labels (Name, Status, Visible, Actions, Edit, Delete) reuse the
+// Moodle core strings instead of duplicating them here.
+$string['soapbox:present_audio']    = 'Audio presentation';
+$string['soapbox:present_video']    = 'Video presentation';
+$string['soapbox:present_target']   = 'target {$a->min}-{$a->max} min';
+$string['soapbox:choose_topic']     = 'Choose a topic';
+$string['soapbox:record_short']     = 'Record';
+$string['soapbox:stop']             = 'Stop';
+$string['soapbox:my_recordings']    = 'My recordings';
+$string['soapbox:no_recordings']    = 'No recordings yet.';
+$string['soapbox:col_recorded']     = 'Recorded';
+$string['soapbox:col_length']       = 'Length';
+$string['soapbox:col_type']         = 'Type';
+$string['soapbox:col_recording']    = 'Recording';
+$string['soapbox:col_kept']         = 'Kept';
+$string['soapbox:col_student_link'] = 'Student link';
+$string['soapbox:view_download']    = 'View / download';
+$string['soapbox:expired']          = 'Expired';
+$string['soapbox:retention_note']   = 'Recordings are available to view and download for {$a} days, then automatically deleted.';
+$string['soapbox:assign_title']     = 'Soapbox assignments';
+$string['soapbox:assign_single_title'] = 'Soapbox assignment';
+$string['soapbox:assign_add']       = 'Add assignment';
+$string['soapbox:assign_none']      = 'No Soapbox assignments yet.';
+$string['soapbox:assign_deleted']   = 'Assignment deleted.';
+$string['soapbox:assign_updated']   = 'Assignment updated.';
+$string['soapbox:assign_created']   = 'Assignment created.';
+$string['soapbox:assign_delete_confirm'] = 'Delete "{$a}" and all its recordings? This cannot be undone.';
+$string['soapbox:assign_edit_heading'] = 'Edit Soapbox assignment';
+$string['soapbox:assign_new_heading']  = 'New Soapbox assignment';
 $string['soapbox:audio_ready']      = 'Audio only. Your microphone will be recorded; your camera is not used.';
 $string['soapbox:audio_recording']  = 'Recording audio...';
 $string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
