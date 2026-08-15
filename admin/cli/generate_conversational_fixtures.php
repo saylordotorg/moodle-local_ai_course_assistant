@@ -45,7 +45,7 @@ global $DB, $CFG;
 require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->libdir . '/filelib.php');
 
-list($options, $unrecognized) = cli_get_params(
+[$options, $unrecognized] = cli_get_params(
     [
         'courses'    => '7,11',
         'per-course' => 20,
@@ -79,7 +79,9 @@ TXT
 }
 
 $courses = array_values(array_filter(array_map(
-    fn($c) => (int) trim($c), explode(',', (string) $options['courses']))));
+    fn($c) => (int) trim($c),
+    explode(',', (string) $options['courses'])
+)));
 $percourse = max(1, (int) $options['per-course']);
 $model = (string) $options['model'];
 $key = $options['apikey'] !== ''
@@ -96,7 +98,12 @@ foreach ($courses as $cid) {
     $rows = $DB->get_records_select(
         'local_ai_course_assistant_chunks',
         'courseid = ? AND embedding IS NOT NULL',
-        [$cid], 'id', 'id, content', 0, $percourse * 3);
+        [$cid],
+        'id',
+        'id, content',
+        0,
+        $percourse * 3
+    );
     $n = 0;
     foreach ($rows as $r) {
         if ($n >= $percourse) {

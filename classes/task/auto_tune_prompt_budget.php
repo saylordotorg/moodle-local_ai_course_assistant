@@ -32,7 +32,6 @@ use local_ai_course_assistant\prompt_metrics_logger;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class auto_tune_prompt_budget extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return \local_ai_course_assistant\branding::apply(get_string('task:auto_tune_prompt_budget', 'local_ai_course_assistant'));
     }
@@ -44,8 +43,12 @@ class auto_tune_prompt_budget extends \core\task\scheduled_task {
         }
         $result = prompt_metrics_logger::apply_recommendation();
         if ($result['applied']) {
-            mtrace(sprintf('  Prompt budget auto-tune: %d → %d chars. %s',
-                $result['old'], $result['new'], $result['reason']));
+            mtrace(sprintf(
+                '  Prompt budget auto-tune: %d → %d chars. %s',
+                $result['old'],
+                $result['new'],
+                $result['reason']
+            ));
         } else {
             mtrace('  Prompt budget auto-tune: no change. ' . $result['reason']);
         }

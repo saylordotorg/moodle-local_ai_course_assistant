@@ -39,8 +39,11 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 if ($courseid <= 0) {
     \local_ai_course_assistant\page_helpers::render_course_picker_landing(
         '/local/ai_course_assistant/sandbox.php',
-        get_string('coursepicker:title', 'local_ai_course_assistant',
-            get_string('sandbox:title', 'local_ai_course_assistant')),
+        get_string(
+            'coursepicker:title',
+            'local_ai_course_assistant',
+            get_string('sandbox:title', 'local_ai_course_assistant')
+        ),
         'local/ai_course_assistant:use'
     );
     exit;

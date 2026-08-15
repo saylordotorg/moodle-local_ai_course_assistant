@@ -32,7 +32,6 @@ use core_external\external_value;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_next_best_action extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course id'),
@@ -85,8 +84,10 @@ class get_next_best_action extends external_api {
                     'title'       => new external_value(PARAM_TEXT, 'Objective title (with optional [code] prefix)'),
                     'status'      => new external_value(PARAM_ALPHAEXT, 'not_started or learning'),
                     'score'       => new external_value(PARAM_FLOAT, 'Adjusted mastery score, 0.0–1.0'),
-                    'action'      => new external_value(PARAM_ALPHAEXT,
-                        'Recommended action: get_started, review, practice, or quiz'),
+                    'action'      => new external_value(
+                        PARAM_ALPHAEXT,
+                        'Recommended action: get_started, review, practice, or quiz'
+                    ),
                     'suggestion'  => new external_value(PARAM_TEXT, 'One-line natural-language nudge'),
                     'moduleurl'   => new external_value(PARAM_URL, 'Best-fit module URL or empty string'),
                     'modulename'  => new external_value(PARAM_TEXT, 'Best-fit module name or empty string'),

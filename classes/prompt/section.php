@@ -37,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class section {
-
     /** @var string Category constants — used for stable section ordering and budgets. */
     public const CAT_IDENTITY = 'identity';
     public const CAT_CONTEXT  = 'context';
@@ -90,8 +89,14 @@ class section {
      * @param int $min_chars
      * @param int $max_chars v5.6.0 proportional cap; 0 = unlimited (legacy)
      */
-    public function __construct(string $name, string $category, int $priority, string $content,
-                                int $min_chars = 0, int $max_chars = 0) {
+    public function __construct(
+        string $name,
+        string $category,
+        int $priority,
+        string $content,
+        int $min_chars = 0,
+        int $max_chars = 0
+    ) {
         $this->name = $name;
         $this->category = $category;
         $this->priority = $priority;

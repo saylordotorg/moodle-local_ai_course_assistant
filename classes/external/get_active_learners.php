@@ -38,7 +38,6 @@ use core_external\external_value;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_active_learners extends external_api {
-
     /** @var int Active window in seconds (15 minutes). */
     private const ACTIVE_WINDOW_SECS = 15 * 60;
 

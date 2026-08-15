@@ -29,7 +29,6 @@ use local_ai_course_assistant\radar_delivery;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class run_anomaly_digest extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return \local_ai_course_assistant\branding::apply(get_string('task:run_anomaly_digest', 'local_ai_course_assistant'));
     }
@@ -50,7 +49,9 @@ class run_anomaly_digest extends \core\task\scheduled_task {
         // Negative ratings: 7-day window vs prior 7-day window.
         $neg = $this->compare_metric_change(
             "SELECT COUNT(id) FROM {local_ai_course_assistant_msg_ratings} WHERE rating = -1 AND timecreated >= ? AND timecreated < ?",
-            7 * 86400, $threshold);
+            7 * 86400,
+            $threshold
+        );
         if ($neg !== null) {
             $alerts[] = "Negative ratings up {$neg['pct']}% week-over-week ({$neg['recent']} vs {$neg['prior']} prior).";
         }
@@ -64,7 +65,9 @@ class run_anomaly_digest extends \core\task\scheduled_task {
             . "FROM {local_ai_course_assistant_msgs} m WHERE "
             . \local_ai_course_assistant\analytics::spend_rows_predicate('m')
             . " AND m.timecreated >= ? AND m.timecreated < ?",
-            86400, $threshold);
+            86400,
+            $threshold
+        );
         if ($tok !== null) {
             $alerts[] = "Token spend up {$tok['pct']}% day-over-day ({$tok['recent']} vs {$tok['prior']} prior).";
         }

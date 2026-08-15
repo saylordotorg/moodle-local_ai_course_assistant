@@ -38,7 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class talking_avatar_session_manager {
-
     /** Stale-session cap (1 hour). Matches Tavus's `max_call_duration` default. */
     public const MAX_OPEN_SECONDS = 3600;
 

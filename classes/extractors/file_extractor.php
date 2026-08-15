@@ -28,7 +28,6 @@ namespace local_ai_course_assistant\extractors;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class file_extractor {
-
     /** @var string[] MIME types we can handle as plain text. */
     private const TEXT_MIMES = ['text/plain', 'text/markdown', 'text/x-markdown'];
 
@@ -73,10 +72,12 @@ class file_extractor {
             $filename = strtolower((string) $file->get_filename());
 
             // Plain text / markdown: always on.
-            if (in_array($mime, self::TEXT_MIMES, true)
+            if (
+                in_array($mime, self::TEXT_MIMES, true)
                 || str_ends_with($filename, '.txt')
                 || str_ends_with($filename, '.md')
-                || str_ends_with($filename, '.markdown')) {
+                || str_ends_with($filename, '.markdown')
+            ) {
                 $content = (string) $file->get_content();
                 return self::normalize_whitespace($content);
             }

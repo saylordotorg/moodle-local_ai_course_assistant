@@ -31,7 +31,6 @@ use local_ai_course_assistant\soapbox_storage;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_cleanup extends \core\task\scheduled_task {
-
     /**
      * @return string
      */
@@ -55,7 +54,8 @@ class soapbox_cleanup extends \core\task\scheduled_task {
         $expired = $DB->get_records_select(
             'local_ai_course_assistant_sbx_rec',
             'status <> :deleted AND expires_at > 0 AND expires_at <= :now',
-            ['deleted' => 'deleted', 'now' => $now]);
+            ['deleted' => 'deleted', 'now' => $now]
+        );
         foreach ($expired as $rec) {
             $this->drop_object($storage, $rec);
         }
@@ -65,10 +65,14 @@ class soapbox_cleanup extends \core\task\scheduled_task {
             "SELECT DISTINCT assignid, userid
                FROM {local_ai_course_assistant_sbx_rec}
               WHERE status <> :deleted",
-            ['deleted' => 'deleted']);
+            ['deleted' => 'deleted']
+        );
         foreach ($pairs as $p) {
-            $assign = $DB->get_record('local_ai_course_assistant_sbx_assign',
-                ['id' => $p->assignid], 'id, stored_attempts');
+            $assign = $DB->get_record(
+                'local_ai_course_assistant_sbx_assign',
+                ['id' => $p->assignid],
+                'id, stored_attempts'
+            );
             if (!$assign) {
                 continue;
             }
@@ -77,7 +81,8 @@ class soapbox_cleanup extends \core\task\scheduled_task {
                 'local_ai_course_assistant_sbx_rec',
                 'assignid = :a AND userid = :u AND status <> :deleted',
                 ['a' => $p->assignid, 'u' => $p->userid, 'deleted' => 'deleted'],
-                'timecreated DESC');
+                'timecreated DESC'
+            );
             $extra = array_slice(array_values($recs), $keep);
             foreach ($extra as $rec) {
                 $this->drop_object($storage, $rec);

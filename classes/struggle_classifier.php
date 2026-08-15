@@ -47,7 +47,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class struggle_classifier {
-
     /** Table for stage-1 + stage-2 outputs. */
     const TABLE_SIGNAL = 'local_ai_course_assistant_struggle_signal';
 
@@ -123,8 +122,13 @@ class struggle_classifier {
      * @param string $topichint
      * @param int $score 1..3 from stage1_score().
      */
-    public static function record_stage1(int $userid, int $courseid, string $sessionid,
-            string $topichint, int $score): void {
+    public static function record_stage1(
+        int $userid,
+        int $courseid,
+        string $sessionid,
+        string $topichint,
+        int $score
+    ): void {
         global $DB;
         if ($score <= 0) {
             return;
@@ -174,9 +178,13 @@ class struggle_classifier {
         $notesrecorded = 0;
         foreach ($sessions as $sess) {
             $label = self::stage2_label((int)$sess->hits, (int)$sess->maxscore, (string)$sess->topic_hint);
-            $DB->set_field_select(self::TABLE_SIGNAL, 'stage2_label', $label,
+            $DB->set_field_select(
+                self::TABLE_SIGNAL,
+                'stage2_label',
+                $label,
                 'userid = ? AND courseid = ? AND session_id = ? AND stage2_label = ?',
-                [$sess->userid, $sess->courseid, $sess->session_id, 'unprocessed']);
+                [$sess->userid, $sess->courseid, $sess->session_id, 'unprocessed']
+            );
 
             if ($label === 'frustrated' && !empty($sess->topic_hint)) {
                 learner_memory_manager::record_sticking_point(

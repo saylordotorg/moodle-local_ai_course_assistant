@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hook_callbacks {
-
     /**
      * Read an int plugin config value, falling back to $default ONLY when the
      * config has never been set. A literal "0" returns 0, not the default —
@@ -54,8 +53,11 @@ class hook_callbacks {
         try {
             self::do_inject_chat_widget($hook);
         } catch (\Throwable $e) {
-            debugging('SOLA widget injection skipped: ' . $e->getMessage(),
-                DEBUG_DEVELOPER, $e->getTrace());
+            debugging(
+                'SOLA widget injection skipped: ' . $e->getMessage(),
+                DEBUG_DEVELOPER,
+                $e->getTrace()
+            );
         }
     }
 
@@ -123,8 +125,11 @@ class hook_callbacks {
                 : 'Content-Security-Policy-Report-Only';
             header($headername . ': ' . $csp);
         } catch (\Throwable $e) {
-            debugging('SOLA course-page CSP send skipped: ' . $e->getMessage(),
-                DEBUG_DEVELOPER, $e->getTrace());
+            debugging(
+                'SOLA course-page CSP send skipped: ' . $e->getMessage(),
+                DEBUG_DEVELOPER,
+                $e->getTrace()
+            );
         }
     }
 
@@ -151,8 +156,10 @@ class hook_callbacks {
         if (($PAGE->pagelayout ?? '') === 'admin') {
             return false;
         }
-        if ($PAGE->url instanceof \moodle_url
-                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0) {
+        if (
+            $PAGE->url instanceof \moodle_url
+                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0
+        ) {
             return false;
         }
         $coursecontext = $context->contextlevel === CONTEXT_MODULE
@@ -197,7 +204,9 @@ class hook_callbacks {
             global $DB;
             try {
                 $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => (int)$user->id]);
-            } catch (\Throwable $e) { /* table absent on older installs */ }
+            } catch (\Throwable $e) {
+                /* table absent on older installs */
+            }
             // Secondary path: route through the Privacy API so every other
             // plugin table (plans, reminders, feedback, surveys, UT, profiles,
             // practice scores, ratings, audit) is cleaned up by the same code
@@ -221,8 +230,11 @@ class hook_callbacks {
                 ['trigger' => 'core_user_deleted_hook']
             );
         } catch (\Throwable $e) {
-            debugging('SOLA user_deleted cascade failed: ' . $e->getMessage(),
-                DEBUG_DEVELOPER, $e->getTrace());
+            debugging(
+                'SOLA user_deleted cascade failed: ' . $e->getMessage(),
+                DEBUG_DEVELOPER,
+                $e->getTrace()
+            );
         }
     }
 
@@ -258,8 +270,10 @@ class hook_callbacks {
         // would otherwise let the widget through. A single URL-prefix guard
         // covers it plus any future SOLA admin page that picks a non-admin
         // layout for visual reasons.
-        if ($PAGE->url instanceof \moodle_url
-                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0) {
+        if (
+            $PAGE->url instanceof \moodle_url
+                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0
+        ) {
             return;
         }
 
@@ -353,10 +367,12 @@ class hook_callbacks {
             $modname_early = (string)($PAGE->cm->modname ?? '');
         }
         $isquizpage = ($modname_early === 'quiz') || (strpos((string)$pagetype, 'mod-quiz-') === 0);
-        if ($isquizpage && (
+        if (
+            $isquizpage && (
             ($hideonquizforstudents && $userrole === 'student') ||
             ($hideonquizforstaff && $userrole !== 'student')
-        )) {
+            )
+        ) {
             return;
         }
 
@@ -455,16 +471,18 @@ class hook_callbacks {
 
         // Build learning objectives by scanning "Unit X Learning Outcomes" pages.
         // Supports two Saylor formats:
-        //   1. GENERICO tags: {GENERICO:type="unit_learning_objectives",unit_objectives="[1]..."}
-        //   2. HTML bullet lists: "Upon successful completion..." followed by <li> items
+        // 1. GENERICO tags: {GENERICO:type="unit_learning_objectives",unit_objectives="[1]..."}
+        // 2. HTML bullet lists: "Upon successful completion..." followed by <li> items
         $learningobjectives = [];
         foreach ($modinfo->get_cms() as $cm) {
             if (!$cm->uservisible || empty($cm->name)) {
                 continue;
             }
             $lower = strtolower($cm->name);
-            if (strpos($lower, 'learning outcome') === false
-                && strpos($lower, 'learning objective') === false) {
+            if (
+                strpos($lower, 'learning outcome') === false
+                && strpos($lower, 'learning objective') === false
+            ) {
                 continue;
             }
             if ($cm->modname !== 'page') {
@@ -556,10 +574,12 @@ class hook_callbacks {
         $quizlocked = false;
         $quizcoachmode = false;
         $quizcmid = 0;
-        if ($modname === 'quiz' && !empty($PAGE->cm) && (
+        if (
+            $modname === 'quiz' && !empty($PAGE->cm) && (
             strpos($pagetype, 'attempt') !== false ||
             (strpos($pagetype, 'view') !== false && strpos($pagetype, 'review') === false)
-        )) {
+            )
+        ) {
             $quizcmid = (int)$PAGE->cm->id;
             $level = \local_ai_course_assistant\quiz_config_manager::get_assistance_level($quizcmid);
             if ($level === 'hidden') {
@@ -612,7 +632,9 @@ class hook_callbacks {
 
         // Load conversation starters from config.
         $starters = \local_ai_course_assistant\starter_manager::get_effective_starters(
-            $courseid, !empty($ttsurl), $realtimeenabled
+            $courseid,
+            !empty($ttsurl),
+            $realtimeenabled
         );
 
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
@@ -867,8 +889,10 @@ class hook_callbacks {
             'digestoptinstate'   => self::digest_optin_state($courseid),
             'showdigestoptin'    => self::digest_optin_state($courseid) === 'unset',
             'flashcardsenabled'  => \local_ai_course_assistant\flashcard_manager::is_enabled_for_course($courseid),
-            'flashcardsurl'      => (new \moodle_url('/local/ai_course_assistant/flashcards.php',
-                ['courseid' => $courseid]))->out(false),
+            'flashcardsurl'      => (new \moodle_url(
+                '/local/ai_course_assistant/flashcards.php',
+                ['courseid' => $courseid]
+            ))->out(false),
             'workedexamplesenabled' => \local_ai_course_assistant\feature_flags::resolve('worked_examples', $courseid),
             'attachmentsenabled' => \local_ai_course_assistant\attachment_manager::is_enabled(),
             'attachmentmaxmb'    => (int) ceil(\local_ai_course_assistant\attachment_manager::get_max_size_bytes() / (1024 * 1024)),
@@ -887,15 +911,24 @@ class hook_callbacks {
             // literal and the consent banner showed `{$a->product}` instead
             // of "SOLA". Fixed by passing the same object shape consent_body
             // already uses below.
-            'consent_heading'    => get_string('chat:consent_heading', 'local_ai_course_assistant',
-                (object)['product' => \local_ai_course_assistant\branding::short_name()]),
-            'consent_body'       => get_string('chat:consent_body', 'local_ai_course_assistant',
+            'consent_heading'    => get_string(
+                'chat:consent_heading',
+                'local_ai_course_assistant',
+                (object)['product' => \local_ai_course_assistant\branding::short_name()]
+            ),
+            'consent_body'       => get_string(
+                'chat:consent_body',
+                'local_ai_course_assistant',
                 (object)[
                     'product'     => \local_ai_course_assistant\branding::short_name(),
                     'institution' => \local_ai_course_assistant\branding::institution_name(),
-                ]),
-            'consent_accept'     => get_string('chat:consent_accept', 'local_ai_course_assistant',
-                \local_ai_course_assistant\branding::short_name()),
+                ]
+            ),
+            'consent_accept'     => get_string(
+                'chat:consent_accept',
+                'local_ai_course_assistant',
+                \local_ai_course_assistant\branding::short_name()
+            ),
             'englishlock'        => (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid),
         ];
 

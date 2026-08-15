@@ -151,8 +151,12 @@ $sections = [
 
 foreach ($sections as $sectionnum => $section) {
     // Rename section.
-    $DB->set_field('course_sections', 'name', $section['name'],
-        ['course' => $course->id, 'section' => $sectionnum]);
+    $DB->set_field(
+        'course_sections',
+        'name',
+        $section['name'],
+        ['course' => $course->id, 'section' => $sectionnum]
+    );
 
     foreach ($section['pages'] as $page) {
         $module = new stdClass();

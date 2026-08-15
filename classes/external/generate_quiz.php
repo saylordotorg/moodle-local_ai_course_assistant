@@ -33,7 +33,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class generate_quiz extends external_api {
-
     /**
      * Returns description of method parameters.
      *
@@ -43,13 +42,19 @@ class generate_quiz extends external_api {
         return new external_function_parameters([
             'courseid'   => new external_value(PARAM_INT, 'Course ID'),
             'count'      => new external_value(PARAM_INT, 'Number of questions (3-10)', VALUE_DEFAULT, 3),
-            'topic'      => new external_value(PARAM_TEXT,
+            'topic'      => new external_value(
+                PARAM_TEXT,
                 'Topic, __guided__ for AI-guided, __adaptive__ for mastery-targeted, or empty for current page.',
-                VALUE_DEFAULT, '__guided__'),
+                VALUE_DEFAULT,
+                '__guided__'
+            ),
             'cmid'       => new external_value(PARAM_INT, 'Current module/page ID (0 if not on a resource page)', VALUE_DEFAULT, 0),
-            'difficulty' => new external_value(PARAM_ALPHA,
+            'difficulty' => new external_value(
+                PARAM_ALPHA,
                 'Difficulty target: easy, medium, hard, or auto (mastery-aware) — defaults to medium',
-                VALUE_DEFAULT, 'medium'),
+                VALUE_DEFAULT,
+                'medium'
+            ),
         ]);
     }
 
@@ -454,7 +459,9 @@ INSTRUCTIONS;
             if (empty($records)) {
                 return 'No recent questions.';
             }
-            $lines = array_map(function($r) { return '- ' . shorten_text($r->message, 120); }, array_values($records));
+            $lines = array_map(function ($r) {
+                return '- ' . shorten_text($r->message, 120);
+            }, array_values($records));
             return implode("\n", $lines);
         } catch (\Throwable $e) {
             return 'Chat history unavailable.';

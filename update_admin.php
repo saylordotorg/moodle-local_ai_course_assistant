@@ -84,14 +84,14 @@ echo $OUTPUT->header();
 
         <div class="sola-update-card">
             <h6><?php echo get_string('update:latest_version', 'local_ai_course_assistant'); ?></h6>
-            <?php if ($latest): ?>
+            <?php if ($latest) : ?>
                 <div class="value"><?php echo s($latest->tag); ?></div>
-                <?php if ($latest->published_at): ?>
+                <?php if ($latest->published_at) : ?>
                     <div class="text-muted" style="font-size:13px;">
                         Released <?php echo s(substr($latest->published_at, 0, 10)); ?>
                     </div>
                 <?php endif; ?>
-            <?php else: ?>
+            <?php else : ?>
                 <div class="value text-muted">?</div>
                 <div class="text-danger" style="font-size:13px;">
                     <?php echo get_string('update:github_error', 'local_ai_course_assistant'); ?>
@@ -101,23 +101,23 @@ echo $OUTPUT->header();
 
         <div class="sola-update-card">
             <h6>Status</h6>
-            <?php if (!$latest): ?>
+            <?php if (!$latest) : ?>
                 <div class="value text-muted">Unknown</div>
             <?php elseif ($latest->update_available): ?>
                 <div class="value update-available"><?php echo get_string('update:available', 'local_ai_course_assistant'); ?></div>
-            <?php else: ?>
+            <?php else : ?>
                 <div class="value up-to-date"><?php echo get_string('update:up_to_date', 'local_ai_course_assistant'); ?></div>
             <?php endif; ?>
         </div>
     </div>
 
-    <?php if ($latest && $latest->update_available): ?>
-        <?php if (!empty($latest->changelog)): ?>
+    <?php if ($latest && $latest->update_available) : ?>
+        <?php if (!empty($latest->changelog)) : ?>
             <h5><?php echo get_string('update:changelog', 'local_ai_course_assistant'); ?></h5>
             <div class="sola-changelog"><?php echo s($latest->changelog); ?></div>
         <?php endif; ?>
 
-        <?php if (!empty($latest->zip_url)): ?>
+        <?php if (!empty($latest->zip_url)) : ?>
             <div class="alert alert-warning">
                 <strong>Before updating:</strong> a backup of the current plugin will be created automatically.
                 After installation, Moodle will redirect you to complete the database upgrade.
@@ -131,7 +131,7 @@ echo $OUTPUT->header();
                     <?php echo get_string('update:install', 'local_ai_course_assistant'); ?> <?php echo s($latest->tag); ?>
                 </button>
             </form>
-        <?php else: ?>
+        <?php else : ?>
             <div class="alert alert-info">
                 Update available but no download link found. Please update manually from
                 <a href="https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases" target="_blank">GitHub Releases</a>.

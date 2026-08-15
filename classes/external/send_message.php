@@ -34,7 +34,6 @@ use local_ai_course_assistant\rag_retriever;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class send_message extends external_api {
-
     /**
      * Parameter definition.
      *
@@ -93,7 +92,11 @@ class send_message extends external_api {
                 $topk = ($rawtopk === false || $rawtopk === '') ? 5 : (int) $rawtopk;
                 $ragstart = microtime(true);
                 $retrievedchunks = rag_retriever::retrieve(
-                    $params['courseid'], $params['message'], $topk, (int) $params['pageid']);
+                    $params['courseid'],
+                    $params['message'],
+                    $topk,
+                    (int) $params['pageid']
+                );
                 $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
             } catch (\Exception $e) {
                 debugging('RAG retrieval failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
@@ -113,8 +116,19 @@ class send_message extends external_api {
 
         // Save assistant response.
         conversation_manager::add_message(
-            $conv->id, $userid, $params['courseid'], 'assistant', $response,
-            0, '', null, null, null, null, null, $raglatencyms
+            $conv->id,
+            $userid,
+            $params['courseid'],
+            'assistant',
+            $response,
+            0,
+            '',
+            null,
+            null,
+            null,
+            null,
+            null,
+            $raglatencyms
         );
 
         return [

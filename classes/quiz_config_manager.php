@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_config_manager {
-
     /** Table name. */
     const TABLE = 'local_ai_course_assistant_quiz_cfg';
 
@@ -159,7 +158,7 @@ class quiz_config_manager {
         }
 
         $cmids = array_keys($rows);
-        list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cm');
+        [$insql, $inparams] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cm');
         $cfgrows = $DB->get_records_select(self::TABLE, "cmid {$insql}", $inparams);
         $bycm = [];
         foreach ($cfgrows as $cfg) {

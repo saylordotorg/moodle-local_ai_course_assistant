@@ -79,12 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $invoker = 'web:' . $USER->username;
     if ($action === 'disable') {
         $touched = emergency_control::disable([$flag], $reason, $invoker);
-        \core\notification::warning(get_string('emergency:disabled_notice', 'local_ai_course_assistant',
-            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]));
+        \core\notification::warning(get_string(
+            'emergency:disabled_notice',
+            'local_ai_course_assistant',
+            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]
+        ));
     } else if ($action === 'restore') {
         $touched = emergency_control::restore([$flag], $reason, $invoker);
-        \core\notification::success(get_string('emergency:restored_notice', 'local_ai_course_assistant',
-            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]));
+        \core\notification::success(get_string(
+            'emergency:restored_notice',
+            'local_ai_course_assistant',
+            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]
+        ));
     }
     purge_all_caches();
     redirect($PAGE->url);

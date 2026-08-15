@@ -43,7 +43,6 @@ use local_ai_course_assistant\external\record_objective_attempt;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class external_services_test extends \advanced_testcase {
-
     /**
      * Common: enrolled student + setUser. The three-line setup pattern.
      *
@@ -76,7 +75,9 @@ final class external_services_test extends \advanced_testcase {
         // execute_returns so PARAM_BOOL coercion + missing-key detection
         // both fire.
         $clean = \core_external\external_api::clean_returnvalue(
-            clear_history::execute_returns(), $result);
+            clear_history::execute_returns(),
+            $result
+        );
         $this->assertSame(['success' => true], $clean);
     }
 
@@ -122,8 +123,10 @@ final class external_services_test extends \advanced_testcase {
 
         $this->assertArrayHasKey('success', $result);
         $this->assertTrue($result['success']);
-        $row = $DB->get_record('local_ai_course_assistant_msg_ratings',
-            ['messageid' => $msg->id, 'userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_msg_ratings',
+            ['messageid' => $msg->id, 'userid' => $user->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals(1, (int)$row->rating);
     }
@@ -154,8 +157,10 @@ final class external_services_test extends \advanced_testcase {
 
         $this->assertArrayHasKey('success', $result);
         $this->assertTrue($result['success']);
-        $this->assertEquals('avatar_07',
-            get_user_preferences('local_ai_course_assistant_avatar', '', $user->id));
+        $this->assertEquals(
+            'avatar_07',
+            get_user_preferences('local_ai_course_assistant_avatar', '', $user->id)
+        );
     }
 
     public function test_save_avatar_preference_rejects_unknown_id(): void {
@@ -215,8 +220,10 @@ final class external_services_test extends \advanced_testcase {
                 $userseen = true;
             }
             if ($m['role'] === 'assistant' && $m['message'] === 'a1') {
-                $this->assertTrue($userseen,
-                    'User message must appear before the assistant reply in get_history.');
+                $this->assertTrue(
+                    $userseen,
+                    'User message must appear before the assistant reply in get_history.'
+                );
             }
         }
     }
@@ -228,8 +235,11 @@ final class external_services_test extends \advanced_testcase {
         $result = get_history::execute((int)$course->id);
 
         $this->assertArrayHasKey('messages', $result);
-        $this->assertSame([], $result['messages'],
-            'Fresh user with no chat history must get an empty messages array, not null or missing key.');
+        $this->assertSame(
+            [],
+            $result['messages'],
+            'Fresh user with no chat history must get an empty messages array, not null or missing key.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -244,9 +254,11 @@ final class external_services_test extends \advanced_testcase {
         $result = record_objective_attempt::execute((int)$course->id, 1, true);
 
         $this->assertArrayHasKey('recorded', $result);
-        $this->assertFalse($result['recorded'],
+        $this->assertFalse(
+            $result['recorded'],
             'When mastery is disabled for the course, the call must short-circuit '
-            . 'and return recorded=false rather than throwing.');
+            . 'and return recorded=false rather than throwing.'
+        );
         $this->assertEquals('not_started', $result['status']);
     }
 
@@ -270,8 +282,10 @@ final class external_services_test extends \advanced_testcase {
 
         $this->assertArrayHasKey('recorded', $result);
         $this->assertTrue($result['recorded']);
-        $row = $DB->get_record('local_ai_course_assistant_obj_att',
-            ['userid' => $user->id, 'objectiveid' => $objid]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_obj_att',
+            ['userid' => $user->id, 'objectiveid' => $objid]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals(1, (int)$row->iscorrect);
     }
@@ -288,9 +302,14 @@ final class external_services_test extends \advanced_testcase {
 
         $result = clear_history::execute((int)$course->id);
         $clean = \core_external\external_api::clean_returnvalue(
-            clear_history::execute_returns(), $result);
-        $this->assertEquals($result, $clean,
-            'clear_history return must round-trip through its declared execute_returns.');
+            clear_history::execute_returns(),
+            $result
+        );
+        $this->assertEquals(
+            $result,
+            $clean,
+            'clear_history return must round-trip through its declared execute_returns.'
+        );
     }
 
     public function test_save_avatar_preference_clean_returnvalue_round_trip(): void {
@@ -299,7 +318,9 @@ final class external_services_test extends \advanced_testcase {
 
         $result = save_avatar_preference::execute('avatar_01');
         $clean = \core_external\external_api::clean_returnvalue(
-            save_avatar_preference::execute_returns(), $result);
+            save_avatar_preference::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 }

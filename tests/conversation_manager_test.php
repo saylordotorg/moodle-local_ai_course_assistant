@@ -187,36 +187,55 @@ final class conversation_manager_test extends \advanced_testcase {
         conversation_manager::add_message($conv->id, $user->id, $course->id, 'user', 'Hi');
 
         // Sanity-check that everything was inserted.
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_learner_goals',
-            ['userid' => $user->id]));
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_learner_memory',
-            ['userid' => $user->id]));
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_streak',
-            ['userid' => $user->id]));
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_struggle_signal',
-            ['userid' => $user->id]));
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_outreach_log',
-            ['userid' => $user->id]));
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_convs',
-            ['userid' => $user->id]));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_learner_goals',
+            ['userid' => $user->id]
+        ));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_learner_memory',
+            ['userid' => $user->id]
+        ));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_streak',
+            ['userid' => $user->id]
+        ));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_struggle_signal',
+            ['userid' => $user->id]
+        ));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_outreach_log',
+            ['userid' => $user->id]
+        ));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_convs',
+            ['userid' => $user->id]
+        ));
 
         // The act under test.
         $counts = conversation_manager::delete_user_data($user->id);
 
         // Every per-user table must be empty for this learner now.
-        foreach ([
+        foreach (
+            [
             'local_ai_course_assistant_convs',
             'local_ai_course_assistant_learner_goals',
             'local_ai_course_assistant_learner_memory',
             'local_ai_course_assistant_streak',
             'local_ai_course_assistant_struggle_signal',
             'local_ai_course_assistant_outreach_log',
-        ] as $table) {
-            $this->assertEquals(0, $DB->count_records($table, ['userid' => $user->id]),
-                "Table {$table} still has rows for the user after delete_user_data");
+            ] as $table
+        ) {
+            $this->assertEquals(
+                0,
+                $DB->count_records($table, ['userid' => $user->id]),
+                "Table {$table} still has rows for the user after delete_user_data"
+            );
         }
-        $this->assertFalse($DB->record_exists('local_ai_course_assistant_msgs',
-            ['conversationid' => $conv->id]));
+        $this->assertFalse($DB->record_exists(
+            'local_ai_course_assistant_msgs',
+            ['conversationid' => $conv->id]
+        ));
 
         // The returned counts dict must include each table label so the
         // audit log can record the per-table impact.
@@ -259,16 +278,24 @@ final class conversation_manager_test extends \advanced_testcase {
         // Delete only user1's data in this course.
         conversation_manager::delete_course_data($course->id, $user1->id);
 
-        $this->assertEquals(0, $DB->count_records('local_ai_course_assistant_learner_goals',
-            ['userid' => $user1->id, 'courseid' => $course->id]));
-        $this->assertEquals(0, $DB->count_records('local_ai_course_assistant_streak',
-            ['userid' => $user1->id, 'courseid' => $course->id]));
+        $this->assertEquals(0, $DB->count_records(
+            'local_ai_course_assistant_learner_goals',
+            ['userid' => $user1->id, 'courseid' => $course->id]
+        ));
+        $this->assertEquals(0, $DB->count_records(
+            'local_ai_course_assistant_streak',
+            ['userid' => $user1->id, 'courseid' => $course->id]
+        ));
 
         // user2's data in the same course MUST remain untouched.
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_learner_goals',
-            ['userid' => $user2->id, 'courseid' => $course->id]));
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_streak',
-            ['userid' => $user2->id, 'courseid' => $course->id]));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_learner_goals',
+            ['userid' => $user2->id, 'courseid' => $course->id]
+        ));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_streak',
+            ['userid' => $user2->id, 'courseid' => $course->id]
+        ));
     }
 
     /**
@@ -287,24 +314,51 @@ final class conversation_manager_test extends \advanced_testcase {
 
         // User row: even when a latency is passed, it must be discarded.
         $usermsgid = conversation_manager::add_message(
-            $conv->id, $user->id, $course->id, 'user', 'Hello',
-            0, '', null, null, null, 'chat', null, 42
+            $conv->id,
+            $user->id,
+            $course->id,
+            'user',
+            'Hello',
+            0,
+            '',
+            null,
+            null,
+            null,
+            'chat',
+            null,
+            42
         );
         $userrow = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $usermsgid], '*', MUST_EXIST);
         $this->assertNull($userrow->rag_latency_ms);
 
         // Assistant row with a latency value: stored as-is.
         $assistantmsgid = conversation_manager::add_message(
-            $conv->id, $user->id, $course->id, 'assistant', 'Hi',
-            0, 'openai', null, null, null, 'chat', null, 137
+            $conv->id,
+            $user->id,
+            $course->id,
+            'assistant',
+            'Hi',
+            0,
+            'openai',
+            null,
+            null,
+            null,
+            'chat',
+            null,
+            137
         );
         $assistantrow = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $assistantmsgid], '*', MUST_EXIST);
         $this->assertEquals(137, (int) $assistantrow->rag_latency_ms);
 
         // Assistant row without a latency value: stays null (RAG was off this turn).
         $assistantnoragid = conversation_manager::add_message(
-            $conv->id, $user->id, $course->id, 'assistant', 'No RAG here',
-            0, 'openai'
+            $conv->id,
+            $user->id,
+            $course->id,
+            'assistant',
+            'No RAG here',
+            0,
+            'openai'
         );
         $noragrow = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $assistantnoragid], '*', MUST_EXIST);
         $this->assertNull($noragrow->rag_latency_ms);

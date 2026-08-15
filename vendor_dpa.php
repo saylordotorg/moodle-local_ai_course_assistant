@@ -36,10 +36,16 @@ require_capability('moodle/site:config', $syscontext);
 
 $PAGE->set_url('/local/ai_course_assistant/vendor_dpa.php');
 $PAGE->set_context($syscontext);
-$PAGE->set_title(get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
-$PAGE->set_heading(get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
+$PAGE->set_title(get_string(
+    'admin:vendor_dpa:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
+$PAGE->set_heading(get_string(
+    'admin:vendor_dpa:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
 
 \local_ai_course_assistant\security::send_security_headers(true);
 
@@ -47,18 +53,18 @@ $PAGE->set_heading(get_string('admin:vendor_dpa:title', 'local_ai_course_assista
 // the template carries no hard-coded English or data-driven inline colours.
 $labels = [
     'contractual' => ['key' => 'admin:vendor_dpa:too_contractual', 'class' => 'sola-dpa-good'],
-    'default_on'  => ['key' => 'admin:vendor_dpa:too_default_on',  'class' => 'sola-dpa-bad'],
-    'none'        => ['key' => 'admin:vendor_dpa:too_none',        'class' => 'sola-dpa-bad'],
-    'local'       => ['key' => 'admin:vendor_dpa:too_local',       'class' => 'sola-dpa-good'],
-    'unknown'     => ['key' => 'admin:vendor_dpa:too_unknown',     'class' => 'sola-dpa-warn'],
+    'default_on'  => ['key' => 'admin:vendor_dpa:too_default_on', 'class' => 'sola-dpa-bad'],
+    'none'        => ['key' => 'admin:vendor_dpa:too_none', 'class' => 'sola-dpa-bad'],
+    'local'       => ['key' => 'admin:vendor_dpa:too_local', 'class' => 'sola-dpa-good'],
+    'unknown'     => ['key' => 'admin:vendor_dpa:too_unknown', 'class' => 'sola-dpa-warn'],
 ];
 $dpalabels = [
-    'signed'         => ['key' => 'admin:vendor_dpa:dpa_signed',         'class' => 'sola-dpa-good'],
-    'available'      => ['key' => 'admin:vendor_dpa:dpa_available',      'class' => 'sola-dpa-good'],
-    'negotiating'    => ['key' => 'admin:vendor_dpa:dpa_negotiating',    'class' => 'sola-dpa-warn'],
-    'not_offered'    => ['key' => 'admin:vendor_dpa:dpa_not_offered',    'class' => 'sola-dpa-bad'],
+    'signed'         => ['key' => 'admin:vendor_dpa:dpa_signed', 'class' => 'sola-dpa-good'],
+    'available'      => ['key' => 'admin:vendor_dpa:dpa_available', 'class' => 'sola-dpa-good'],
+    'negotiating'    => ['key' => 'admin:vendor_dpa:dpa_negotiating', 'class' => 'sola-dpa-warn'],
+    'not_offered'    => ['key' => 'admin:vendor_dpa:dpa_not_offered', 'class' => 'sola-dpa-bad'],
     'not_applicable' => ['key' => 'admin:vendor_dpa:dpa_not_applicable', 'class' => 'sola-dpa-neutral'],
-    'unknown'        => ['key' => 'admin:vendor_dpa:dpa_unknown',        'class' => 'sola-dpa-neutral'],
+    'unknown'        => ['key' => 'admin:vendor_dpa:dpa_unknown', 'class' => 'sola-dpa-neutral'],
 ];
 
 $rows = [];

@@ -35,7 +35,6 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rag_retriever {
-
     /**
      * @var array Decoded chunk vectors, keyed "course_<id>".
      *
@@ -229,8 +228,10 @@ class rag_retriever {
         $hydratelimit = $topk;
         if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')) {
             $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
-            $hydratelimit = max($topk,
-                ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand);
+            $hydratelimit = max(
+                $topk,
+                ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand
+            );
         }
         $scored = self::hydrate_content(array_slice($scored, 0, $hydratelimit));
         if (empty($scored)) {
@@ -243,8 +244,10 @@ class rag_retriever {
         // re-score them with rerank-2.5 (cross-encoder), then keep the top-k.
         // Published recall lifts: +15 Recall@10 enterprise / +39% NDCG BEIR.
         // Falls back to single-stage cosine top-k if reranker fails or is unset.
-        if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')
-                && self::should_rerank($scored)) {
+        if (
+            (bool) get_config('local_ai_course_assistant', 'rerank_enabled')
+                && self::should_rerank($scored)
+        ) {
             $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
             $candidates = ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand;
             $candidates = max($topk, min($candidates, count($scored)));
@@ -294,10 +297,11 @@ class rag_retriever {
         $maxchars = ($rawcap === false || $rawcap === '') ? 6000 : max(500, (int) $rawcap);
 
         $cmids = array_values(array_unique(array_filter(
-            array_map(fn($r) => (int) ($r['cmid'] ?? 0), $final))));
+            array_map(fn($r) => (int) ($r['cmid'] ?? 0), $final)
+        )));
         $siblingsbycmid = [];
         if (!empty($cmids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+            [$insql, $inparams] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
             $rows = $DB->get_records_select(
                 'local_ai_course_assistant_chunks',
                 "courseid = :cid AND cmid {$insql}",
@@ -333,14 +337,20 @@ class rag_retriever {
             return [];
         }
         $ids = array_values(array_unique(array_filter(
-            array_map(fn($r) => (int) ($r['id'] ?? 0), $rows))));
+            array_map(fn($r) => (int) ($r['id'] ?? 0), $rows)
+        )));
         if (empty($ids)) {
             return [];
         }
 
-        list($insql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
-        $texts = $DB->get_records_select_menu('local_ai_course_assistant_chunks',
-            "id {$insql}", $params, '', 'id, content');
+        [$insql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        $texts = $DB->get_records_select_menu(
+            'local_ai_course_assistant_chunks',
+            "id {$insql}",
+            $params,
+            '',
+            'id, content'
+        );
 
         $out = [];
         foreach ($rows as $row) {
@@ -474,8 +484,13 @@ class rag_retriever {
      * @param int    $maxchars       Per-passage cap; over-cap pages fall back.
      * @return array Expanded rows (same shape + 'expand_mode', 'expanded_from').
      */
-    public static function merge_parents(array $topkrows, array $siblingsbycmid,
-            string $mode, int $windowsize, int $maxchars): array {
+    public static function merge_parents(
+        array $topkrows,
+        array $siblingsbycmid,
+        string $mode,
+        int $windowsize,
+        int $maxchars
+    ): array {
         $out = [];
         $seen = [];
         foreach ($topkrows as $row) {
@@ -494,8 +509,10 @@ class rag_retriever {
             $center = (int) ($row['chunkindex'] ?? 0);
 
             $pick = function (int $win) use ($siblings, $center) {
-                return array_values(array_filter($siblings,
-                    fn($s) => abs(((int) $s['chunkindex']) - $center) <= $win));
+                return array_values(array_filter(
+                    $siblings,
+                    fn($s) => abs(((int) $s['chunkindex']) - $center) <= $win
+                ));
             };
 
             $selected = ($mode === 'window') ? $pick($windowsize) : $siblings;
@@ -569,9 +586,11 @@ class rag_retriever {
             static $warned = false;
             if (!$warned) {
                 $warned = true;
-                debugging('rag_retriever: unreadable embedding_bin, falling back to JSON. '
+                debugging(
+                    'rag_retriever: unreadable embedding_bin, falling back to JSON. '
                     . 'Re-run admin/cli/backfill_embedding_bin.php --verify',
-                    DEBUG_DEVELOPER);
+                    DEBUG_DEVELOPER
+                );
             }
         }
         if ($json !== null && $json !== '') {

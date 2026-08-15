@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_config {
-
     /** @var int Fallback ceiling on recording length (12 minutes). */
     const DEFAULT_MAX_SECONDS = 720;
 

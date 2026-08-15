@@ -37,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\rag_retriever
  */
 final class rag_spend_cap_enforcement_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -117,8 +116,10 @@ final class rag_spend_cap_enforcement_test extends \advanced_testcase {
             'embedding' => '[0.1,0.2]', 'model' => 'voyage-3.5',
             'timemodified' => time(),
         ]);
-        $before = $DB->count_records('local_ai_course_assistant_chunks',
-            ['courseid' => $course->id]);
+        $before = $DB->count_records(
+            'local_ai_course_assistant_chunks',
+            ['courseid' => $course->id]
+        );
 
         set_config('spend_cap_rag', '1', 'local_ai_course_assistant');
         $this->spend_on_rag(500_000_000);
@@ -126,8 +127,10 @@ final class rag_spend_cap_enforcement_test extends \advanced_testcase {
 
         // The stale-chunk prune keys off "hashes not seen this run", and a capped
         // run sees none. Pruning here would wipe a working index.
-        $this->assertSame($before, $DB->count_records('local_ai_course_assistant_chunks',
-            ['courseid' => $course->id]));
+        $this->assertSame($before, $DB->count_records(
+            'local_ai_course_assistant_chunks',
+            ['courseid' => $course->id]
+        ));
     }
 
     public function test_site_cap_also_gates_rag_when_no_rag_specific_cap_is_set(): void {

@@ -136,9 +136,9 @@ $assistantreplies = [
 ];
 
 $providers = [
-    ['provider' => 'claude',  'model' => 'claude-opus-4-6',   'promptbase' => 1500, 'completionbase' => 800],
-    ['provider' => 'openai',  'model' => 'gpt-4o-mini',       'promptbase' => 1500, 'completionbase' => 700],
-    ['provider' => 'gemini',  'model' => 'gemini-2.5-flash',  'promptbase' => 1500, 'completionbase' => 750],
+    ['provider' => 'claude', 'model' => 'claude-opus-4-6', 'promptbase' => 1500, 'completionbase' => 800],
+    ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'promptbase' => 1500, 'completionbase' => 700],
+    ['provider' => 'gemini', 'model' => 'gemini-2.5-flash', 'promptbase' => 1500, 'completionbase' => 750],
 ];
 
 $interactiontypes = ['chat', 'chat', 'chat', 'chat', 'voice', 'quiz'];
@@ -148,15 +148,23 @@ $interactiontypes = ['chat', 'chat', 'chat', 'chat', 'voice', 'quiz'];
 // ────────────────────────────────────────────────────────────────────────
 if ($clear) {
     cli_writeln("Clearing existing demo_* users and their data...");
-    $existing = $DB->get_records_select('user', $DB->sql_like('username', ':pattern'),
-        ['pattern' => 'demo_student_%'], '', 'id,username');
+    $existing = $DB->get_records_select(
+        'user',
+        $DB->sql_like('username', ':pattern'),
+        ['pattern' => 'demo_student_%'],
+        '',
+        'id,username'
+    );
     cli_writeln("  Found " . count($existing) . " existing demo users");
     foreach ($existing as $u) {
         if ($dryrun) {
             continue;
         }
-        $DB->delete_records_select('local_ai_course_assistant_msg_ratings',
-            'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)', [$u->id]);
+        $DB->delete_records_select(
+            'local_ai_course_assistant_msg_ratings',
+            'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)',
+            [$u->id]
+        );
         $DB->delete_records('local_ai_course_assistant_msgs', ['userid' => $u->id]);
         $DB->delete_records('local_ai_course_assistant_convs', ['userid' => $u->id]);
         $DB->delete_records('local_ai_course_assistant_feedback', ['userid' => $u->id]);
@@ -170,8 +178,12 @@ if ($clear) {
 // ────────────────────────────────────────────────────────────────────────
 $studentrole = $DB->get_record('role', ['shortname' => 'student'], '*', MUST_EXIST);
 $enrolplugin = enrol_get_plugin('manual');
-$enrolinstance = $DB->get_record('enrol',
-    ['courseid' => $courseid, 'enrol' => 'manual'], '*', MUST_EXIST);
+$enrolinstance = $DB->get_record(
+    'enrol',
+    ['courseid' => $courseid, 'enrol' => 'manual'],
+    '*',
+    MUST_EXIST
+);
 
 $userids = [];
 cli_writeln("Creating {$numusers} demo users and enrolling...");

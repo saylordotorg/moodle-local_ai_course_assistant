@@ -30,7 +30,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\outreach_sender
  */
 final class outreach_sender_test extends \advanced_testcase {
-
     /**
      * Common helper: enable everything that needs to be on, except the
      * specific gate under test.
@@ -52,8 +51,15 @@ final class outreach_sender_test extends \advanced_testcase {
         // Dry-run too, so even if it slipped past nothing would actually email.
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
-        $ok = outreach_sender::send($user->id, $course->id,
-            outreach_sender::CH_STREAK7, 'subj', 'text', 'html', 'reason');
+        $ok = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK7,
+            'subj',
+            'text',
+            'html',
+            'reason'
+        );
 
         $this->assertFalse($ok);
     }
@@ -66,8 +72,15 @@ final class outreach_sender_test extends \advanced_testcase {
         set_config('milestones_feature_enabled', '0', 'local_ai_course_assistant');
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
-        $ok = outreach_sender::send($user->id, $course->id,
-            outreach_sender::CH_STREAK7, 'subj', 'text', 'html', 'reason');
+        $ok = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK7,
+            'subj',
+            'text',
+            'html',
+            'reason'
+        );
 
         $this->assertFalse($ok);
     }
@@ -81,8 +94,15 @@ final class outreach_sender_test extends \advanced_testcase {
         set_user_preferences(['sola_outreach_milestones' => '0'], $user->id);
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
-        $ok = outreach_sender::send($user->id, $course->id,
-            outreach_sender::CH_STREAK7, 'subj', 'text', 'html', 'reason');
+        $ok = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK7,
+            'subj',
+            'text',
+            'html',
+            'reason'
+        );
 
         $this->assertFalse($ok);
     }
@@ -95,12 +115,21 @@ final class outreach_sender_test extends \advanced_testcase {
         $this->enable_everything($user->id);
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
-        $ok = outreach_sender::send($user->id, $course->id,
-            outreach_sender::CH_STREAK7, 'subj', 'text', 'html', 'streak7 reason');
+        $ok = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK7,
+            'subj',
+            'text',
+            'html',
+            'streak7 reason'
+        );
 
         $this->assertTrue($ok);
-        $row = $DB->get_record('local_ai_course_assistant_outreach_log',
-            ['userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_outreach_log',
+            ['userid' => $user->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals('streak7 reason', $row->trigger_reason);
         $this->assertStringStartsWith('dryrun_', $row->message_id);
@@ -113,14 +142,30 @@ final class outreach_sender_test extends \advanced_testcase {
         $this->enable_everything($user->id);
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
-        $first = outreach_sender::send($user->id, $course->id,
-            outreach_sender::CH_STREAK7, 'subj', 'text', 'html', 'first');
-        $second = outreach_sender::send($user->id, $course->id,
-            outreach_sender::CH_STREAK30, 'subj', 'text', 'html', 'second');
+        $first = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK7,
+            'subj',
+            'text',
+            'html',
+            'first'
+        );
+        $second = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK30,
+            'subj',
+            'text',
+            'html',
+            'second'
+        );
 
         $this->assertTrue($first);
-        $this->assertFalse($second,
-            'Cooldown is 7 days across ALL channels. Second send must be blocked.');
+        $this->assertFalse(
+            $second,
+            'Cooldown is 7 days across ALL channels. Second send must be blocked.'
+        );
     }
 
     public function test_cooldown_clear_returns_true_for_fresh_user(): void {
@@ -159,8 +204,10 @@ final class outreach_sender_test extends \advanced_testcase {
      * sent. This test enforces that the constant does not exist.
      */
     public function test_struggle_channel_does_not_exist_on_outreach_sender(): void {
-        $this->assertFalse(defined('\local_ai_course_assistant\outreach_sender::CH_STRUGGLE'),
+        $this->assertFalse(
+            defined('\local_ai_course_assistant\outreach_sender::CH_STRUGGLE'),
             'Struggle channel must NEVER be reintroduced to outreach_sender. '
-            . 'Struggle signals stay inside the chat by design (private memory note).');
+            . 'Struggle signals stay inside the chat by design (private memory note).'
+        );
     }
 }

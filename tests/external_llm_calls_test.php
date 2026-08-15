@@ -39,7 +39,6 @@ use local_ai_course_assistant\provider\stub_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class external_llm_calls_test extends \advanced_testcase {
-
     /**
      * Common setup: every test resets stub state, enables the stub provider,
      * and creates a fresh enrolled student. Tests that need admin override
@@ -82,7 +81,9 @@ final class external_llm_calls_test extends \advanced_testcase {
 
         $result = generate_quiz::execute((int)$course->id);
         $clean = \core_external\external_api::clean_returnvalue(
-            generate_quiz::execute_returns(), $result);
+            generate_quiz::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 
@@ -149,10 +150,10 @@ final class external_llm_calls_test extends \advanced_testcase {
         $payload = json_encode([
             'topic' => 'Mixed',
             'questions' => [
-                ['id' => 1, 'question' => 'Q1?', 'choices' => ['A','B','C','D'],
+                ['id' => 1, 'question' => 'Q1?', 'choices' => ['A', 'B', 'C', 'D'],
                  'correct' => 'A', 'explanation' => 'e1'],
-                ['id' => 2, 'question' => 'Q2?', 'choices' => ['A','B']],
-                ['id' => 3, 'question' => 'Q3?', 'choices' => ['A','B','C','D'],
+                ['id' => 2, 'question' => 'Q2?', 'choices' => ['A', 'B']],
+                ['id' => 3, 'question' => 'Q3?', 'choices' => ['A', 'B', 'C', 'D'],
                  'correct' => 'C', 'explanation' => 'e3'],
             ],
         ]);
@@ -332,7 +333,9 @@ final class external_llm_calls_test extends \advanced_testcase {
 
         $result = score_essay::execute((int)$course->id, $essay);
         $clean = \core_external\external_api::clean_returnvalue(
-            score_essay::execute_returns(), $result);
+            score_essay::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 
@@ -360,8 +363,11 @@ final class external_llm_calls_test extends \advanced_testcase {
 
         $this->assertTrue($result['success']);
         $this->assertNotEmpty($result['insights']);
-        $this->assertCount(0, stub_provider::$calls,
-            'Provider must not be called when there is no data.');
+        $this->assertCount(
+            0,
+            stub_provider::$calls,
+            'Provider must not be called when there is no data.'
+        );
     }
 
     public function test_generate_insights_with_feedback_calls_provider(): void {
@@ -425,7 +431,9 @@ final class external_llm_calls_test extends \advanced_testcase {
         $provider->chat_completion_stream(
             'Generic chat system prompt',
             [['role' => 'user', 'content' => 'Hi']],
-            function (string $c) use (&$chunks) { $chunks[] = $c; }
+            function (string $c) use (&$chunks) {
+                $chunks[] = $c;
+            }
         );
 
         $this->assertNotEmpty($chunks);
@@ -435,7 +443,8 @@ final class external_llm_calls_test extends \advanced_testcase {
     public function test_stub_provider_token_usage_returns_fixed_values(): void {
         [$course, $user] = $this->setup_with_stub();
         $provider = \local_ai_course_assistant\provider\base_provider::create_from_config((int)$course->id);
-        $provider->chat_completion_stream('p', [['role'=>'user','content'=>'q']], function () {});
+        $provider->chat_completion_stream('p', [['role' => 'user', 'content' => 'q']], function () {
+        });
 
         $usage = $provider->get_last_token_usage();
         $this->assertEquals(100, $usage['prompt_tokens']);

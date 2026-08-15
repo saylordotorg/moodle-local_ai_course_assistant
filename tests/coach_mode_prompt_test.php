@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\context_builder
  */
 final class coach_mode_prompt_test extends \advanced_testcase {
-
     public function test_coach_mode_block_lands_in_prompt(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -40,12 +39,21 @@ final class coach_mode_prompt_test extends \advanced_testcase {
         $this->setUser($user);
 
         $prompt = context_builder::build_system_prompt(
-            (int)$course->id, $user->id, '', [], 0, '', 'coach'
+            (int)$course->id,
+            $user->id,
+            '',
+            [],
+            0,
+            '',
+            'coach'
         );
 
         // The coach-mode block carries a distinctive heading.
-        $this->assertStringContainsString('Coach mode active (graded quiz attempt)', $prompt,
-            'Coach-mode SAFETY block must appear when quizmode=coach is supplied.');
+        $this->assertStringContainsString(
+            'Coach mode active (graded quiz attempt)',
+            $prompt,
+            'Coach-mode SAFETY block must appear when quizmode=coach is supplied.'
+        );
         // And the load-bearing rules.
         $this->assertStringContainsString('Do NOT state, hint at, or rephrase the correct answer', $prompt);
         $this->assertStringContainsString('Do NOT confirm or deny whether a specific answer choice is correct', $prompt);
@@ -60,11 +68,20 @@ final class coach_mode_prompt_test extends \advanced_testcase {
         $this->setUser($user);
 
         $prompt = context_builder::build_system_prompt(
-            (int)$course->id, $user->id, '', [], 0, '', ''
+            (int)$course->id,
+            $user->id,
+            '',
+            [],
+            0,
+            '',
+            ''
         );
 
-        $this->assertStringNotContainsString('Coach mode active', $prompt,
-            'Coach-mode block must NOT appear when quizmode is empty.');
+        $this->assertStringNotContainsString(
+            'Coach mode active',
+            $prompt,
+            'Coach-mode block must NOT appear when quizmode is empty.'
+        );
     }
 
     public function test_coach_mode_block_persists_with_full_prompt(): void {
@@ -87,11 +104,20 @@ final class coach_mode_prompt_test extends \advanced_testcase {
         $cm = get_coursemodule_from_instance('page', $page->id);
 
         $prompt = context_builder::build_system_prompt(
-            (int)$course->id, $user->id, '', [], (int)$cm->id, 'Quiz prep page', 'coach'
+            (int)$course->id,
+            $user->id,
+            '',
+            [],
+            (int)$cm->id,
+            'Quiz prep page',
+            'coach'
         );
 
-        $this->assertStringContainsString('Coach mode active', $prompt,
-            'Coach-mode block must coexist with a Current Page Content section.');
+        $this->assertStringContainsString(
+            'Coach mode active',
+            $prompt,
+            'Coach-mode block must coexist with a Current Page Content section.'
+        );
         $this->assertStringContainsString('## Current Page Content', $prompt);
     }
 }

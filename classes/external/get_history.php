@@ -32,7 +32,6 @@ use local_ai_course_assistant\attachment_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_history extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -76,7 +75,9 @@ class get_history extends external_api {
                         'mime' => (string) ($file->get_mimetype() ?: ''),
                         'size' => (int) $file->get_filesize(),
                         'url' => attachment_manager::build_pluginfile_url(
-                            (int) $params['courseid'], (int) $msg->id, $file
+                            (int) $params['courseid'],
+                            (int) $msg->id,
+                            $file
                         ),
                     ];
                 }

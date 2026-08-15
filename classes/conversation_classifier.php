@@ -36,7 +36,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class conversation_classifier {
-
     /** @var float Default minimum confidence before an attempt is recorded. */
     private const MIN_CONFIDENCE = 0.70;
 
@@ -151,8 +150,10 @@ class conversation_classifier {
         $weight = (float) (get_config('local_ai_course_assistant', 'mastery_classifier_weight')
             ?: self::DEFAULT_WEIGHT);
 
-        if ($objid <= 0 || !isset($validids[$objid])
-                || $signal === 'unclear' || $confidence < $threshold) {
+        if (
+            $objid <= 0 || !isset($validids[$objid])
+                || $signal === 'unclear' || $confidence < $threshold
+        ) {
             return [
                 'recorded' => false,
                 'objectiveid' => $objid,

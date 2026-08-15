@@ -40,7 +40,6 @@ namespace local_ai_course_assistant\provider;
  * features. For the best student experience, use a direct provider.
  */
 class coreai_provider extends base_provider {
-
     /** @var array|null Token usage from the last successful call. */
     private ?array $lasttokenusage = null;
 
@@ -112,7 +111,10 @@ class coreai_provider extends base_provider {
 
         if (!class_exists('\\core_ai\\manager') || !class_exists('\\core_ai\\aiactions\\generate_text')) {
             throw new \moodle_exception(
-                'chat:error', 'local_ai_course_assistant', '', null,
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
                 'Moodle core_ai subsystem not available. The Moodle provider requires Moodle 4.5 or later with an aiprovider plugin configured.'
             );
         }
@@ -140,7 +142,10 @@ class coreai_provider extends base_provider {
             $msg = method_exists($response, 'get_errormessage') ? ($response->get_errormessage() ?: '') : '';
             $code = method_exists($response, 'get_errorcode') ? $response->get_errorcode() : 0;
             throw new \moodle_exception(
-                'chat:error', 'local_ai_course_assistant', '', null,
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
                 "Moodle core_ai error ({$code}): " . ($msg ?: 'core_ai returned an error.')
             );
         }

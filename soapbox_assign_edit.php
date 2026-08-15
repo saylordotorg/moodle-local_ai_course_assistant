@@ -37,8 +37,10 @@ $context = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:manage', $context);
 
 $listurl = new moodle_url('/local/ai_course_assistant/soapbox_assign.php', ['courseid' => $courseid]);
-$pageurl = new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php',
-    ['courseid' => $courseid, 'id' => $id]);
+$pageurl = new moodle_url(
+    '/local/ai_course_assistant/soapbox_assign_edit.php',
+    ['courseid' => $courseid, 'id' => $id]
+);
 $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');

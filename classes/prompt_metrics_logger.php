@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class prompt_metrics_logger {
-
     /** Number of days kept on disk. */
     public const RETENTION_DAYS = 7;
 
@@ -198,8 +197,12 @@ class prompt_metrics_logger {
         if ($agg['pct_truncated'] > 1.0) {
             // Truncations happening — raise budget to clear them.
             $rec = (int) (ceil(($max + 500) / 1000) * 1000);
-            $rationale = sprintf('Raise budget to %d chars to eliminate truncation (currently truncating %.1f%% of turns; max observed %d chars).',
-                $rec, $agg['pct_truncated'], $max);
+            $rationale = sprintf(
+                'Raise budget to %d chars to eliminate truncation (currently truncating %.1f%% of turns; max observed %d chars).',
+                $rec,
+                $agg['pct_truncated'],
+                $max
+            );
             // v5.10.0: never recommend above what the backend context window
             // allows, or the prompt would overflow max_model_len at runtime.
             $ceiling = self::window_ceiling();
@@ -220,8 +223,12 @@ class prompt_metrics_logger {
             }
             return [
                 'budget'    => $rec,
-                'rationale' => sprintf('Trim budget to %d chars to save tokens (avg prompt is only %d chars vs current %d budget; headroom unused).',
-                    $rec, $avg, $budget),
+                'rationale' => sprintf(
+                    'Trim budget to %d chars to save tokens (avg prompt is only %d chars vs current %d budget; headroom unused).',
+                    $rec,
+                    $avg,
+                    $budget
+                ),
             ];
         }
         return null;

@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_scorer {
-
     /**
      * Download a stored recording and transcribe it. Returns the transcript
      * text, or null if the object is missing or transcription is unavailable.
@@ -58,8 +57,11 @@ class soapbox_scorer {
         $ext = pathinfo(parse_url($key, PHP_URL_PATH) ?? $key, PATHINFO_EXTENSION) ?: 'bin';
         $tmpfile = make_request_directory() . '/recording.' . preg_replace('/[^a-z0-9]/', '', strtolower($ext));
         $dl = new \curl();
-        $dl->download_one($storage->presign_get($key, 900), null,
-            ['filepath' => $tmpfile, 'timeout' => 180, 'followlocation' => true]);
+        $dl->download_one(
+            $storage->presign_get($key, 900),
+            null,
+            ['filepath' => $tmpfile, 'timeout' => 180, 'followlocation' => true]
+        );
         if (!file_exists($tmpfile) || filesize($tmpfile) === 0) {
             return null;
         }
@@ -74,8 +76,10 @@ class soapbox_scorer {
         if (!empty($cfg['apikey'])) {
             $curl->setHeader('Authorization: Bearer ' . $cfg['apikey']);
         }
-        $options = array_merge(['CURLOPT_TIMEOUT' => 300],
-            security::resolve_pin_options($cfg['endpoint']));
+        $options = array_merge(
+            ['CURLOPT_TIMEOUT' => 300],
+            security::resolve_pin_options($cfg['endpoint'])
+        );
         $response = $curl->post($cfg['endpoint'], $post, $options);
         if ((int) ($curl->get_info()['http_code'] ?? 0) !== 200) {
             return null;
@@ -112,8 +116,11 @@ class soapbox_scorer {
 
         $topictitle = '';
         if (!empty($rec->topicid)) {
-            $topictitle = (string) $DB->get_field('local_ai_course_assistant_sbx_topic', 'title',
-                ['id' => $rec->topicid]);
+            $topictitle = (string) $DB->get_field(
+                'local_ai_course_assistant_sbx_topic',
+                'title',
+                ['id' => $rec->topicid]
+            );
         }
 
         // Slides: extract the deck text and build a slide-by-slide context with
@@ -122,8 +129,10 @@ class soapbox_scorer {
         $slidecontext = '';
         $slidecount = 0;
         $visionnote = '';
-        if (!empty($assign->slides_enabled) && !empty($rec->deck_key)
-                && soapbox_deck_renderer::is_available()) {
+        if (
+            !empty($assign->slides_enabled) && !empty($rec->deck_key)
+                && soapbox_deck_renderer::is_available()
+        ) {
             $deckpdf = self::download_deck($rec->deck_key);
             if ($deckpdf !== null) {
                 $texts = soapbox_deck_renderer::extract_text($deckpdf);
@@ -137,7 +146,10 @@ class soapbox_scorer {
                 if (soapbox_slide_vision::is_enabled($assign)) {
                     $datauris = soapbox_deck_renderer::render_to_datauris($deckpdf);
                     $visionnote = soapbox_slide_vision::design_note(
-                        $datauris, (string) $assign->ptype, (int) $assign->courseid);
+                        $datauris,
+                        (string) $assign->ptype,
+                        (int) $assign->courseid
+                    );
                 }
             }
         }
@@ -151,9 +163,17 @@ class soapbox_scorer {
         \core\session\manager::set_user($user);
 
         $result = score_speech::execute(
-            (int) $assign->courseid, $transcript, '', $topictitle,
-            (int) $assign->max_seconds, (int) $rec->duration_seconds, (string) $assign->ptype,
-            $slidecontext, $slidecount, $visionnote);
+            (int) $assign->courseid,
+            $transcript,
+            '',
+            $topictitle,
+            (int) $assign->max_seconds,
+            (int) $rec->duration_seconds,
+            (string) $assign->ptype,
+            $slidecontext,
+            $slidecount,
+            $visionnote
+        );
 
         $update = (object) [
             'id'         => $recid,
@@ -179,8 +199,11 @@ class soapbox_scorer {
         $storage = new soapbox_storage();
         $tmp = make_request_directory() . '/deck.pdf';
         $curl = new \curl();
-        $curl->download_one($storage->presign_get($deckkey, 900), null,
-            ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]);
+        $curl->download_one(
+            $storage->presign_get($deckkey, 900),
+            null,
+            ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]
+        );
         if (!is_file($tmp) || filesize($tmp) === 0) {
             return null;
         }

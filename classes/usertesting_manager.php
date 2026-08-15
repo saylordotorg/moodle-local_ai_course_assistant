@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class usertesting_manager {
-
     /** @var string Table name for task sets. */
     private const TABLE_TASKS = 'local_ai_course_assistant_ut_tasks';
 
@@ -303,12 +302,24 @@ class usertesting_manager {
             ];
 
             if ($tdef['type'] === 'action_then_rate') {
-                $ratings = array_filter(array_map(function($r) { return $r->rating; }, $responses), function($v) { return $v !== null; });
+                $ratings = array_filter(array_map(function ($r) {
+                    return $r->rating;
+                }, $responses), function ($v) {
+                    return $v !== null;
+                });
                 $result['avg_rating'] = count($ratings) > 0 ? round(array_sum($ratings) / count($ratings), 2) : 0;
-                $result['comments'] = array_filter(array_map(function($r) { return $r->answer; }, $responses), function($v) { return $v !== ''; });
-            } elseif ($tdef['type'] === 'free_response') {
-                $result['answers'] = array_filter(array_map(function($r) { return $r->answer; }, $responses), function($v) { return $v !== ''; });
-            } elseif ($tdef['type'] === 'multiple_choice') {
+                $result['comments'] = array_filter(array_map(function ($r) {
+                    return $r->answer;
+                }, $responses), function ($v) {
+                    return $v !== '';
+                });
+            } else if ($tdef['type'] === 'free_response') {
+                $result['answers'] = array_filter(array_map(function ($r) {
+                    return $r->answer;
+                }, $responses), function ($v) {
+                    return $v !== '';
+                });
+            } else if ($tdef['type'] === 'multiple_choice') {
                 $counts = [];
                 foreach (($tdef['options'] ?? []) as $opt) {
                     $counts[$opt] = 0;
@@ -324,8 +335,12 @@ class usertesting_manager {
             }
 
             // Session context averages.
-            $msgcounts = array_map(function($r) { return (int) $r->message_count; }, $responses);
-            $sessionmins = array_map(function($r) { return (int) $r->session_minutes; }, $responses);
+            $msgcounts = array_map(function ($r) {
+                return (int) $r->message_count;
+            }, $responses);
+            $sessionmins = array_map(function ($r) {
+                return (int) $r->session_minutes;
+            }, $responses);
             $result['avg_messages'] = count($msgcounts) > 0 ? round(array_sum($msgcounts) / count($msgcounts), 1) : 0;
             $result['avg_session_minutes'] = count($sessionmins) > 0 ? round(array_sum($sessionmins) / count($sessionmins), 1) : 0;
 

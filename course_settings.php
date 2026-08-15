@@ -136,14 +136,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // v4.5.0: pedagogy toggles save as three-way (inherit / force on /
     // force off). Empty value = inherit (unset the per-course key, fall
     // back to site-wide default). '1' = force on. '0' = force off.
-    foreach ([
+    foreach (
+        [
         'socratic_mode'           => 'socratic_mode_course_',
         'flashcards_on'           => 'flashcards_enabled_course_',
         'sandbox_on'              => 'code_sandbox_enabled_course_',
         'essay_on'                => 'essay_feedback_enabled_course_',
         'soapbox_on'              => 'soapbox_enabled_course_',
         'we_on'                   => 'worked_examples_enabled_course_',
-    ] as $field => $cfgprefix) {
+        ] as $field => $cfgprefix
+    ) {
         $v = optional_param($field, '', PARAM_RAW_TRIMMED);
         if ($v === '1' || $v === '0') {
             set_config($cfgprefix . $courseid, $v, 'local_ai_course_assistant');
@@ -162,8 +164,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     // Digest email keeps its checkbox semantics — it's a per-course delivery
     // toggle, not a feature on/off.
-    set_config('digest_email_enabled_course_' . $courseid,
-        (int) optional_param('digest_email', 0, PARAM_BOOL), 'local_ai_course_assistant');
+    set_config(
+        'digest_email_enabled_course_' . $courseid,
+        (int) optional_param('digest_email', 0, PARAM_BOOL),
+        'local_ai_course_assistant'
+    );
 
     // v4.2.3: external resources opt-in. Inherit / force on / force off.
     $extres = optional_param('external_resources', '', PARAM_RAW_TRIMMED);
@@ -188,8 +193,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    redirect($pageurl, get_string('coursesettings:saved', 'local_ai_course_assistant'),
-        null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        $pageurl,
+        get_string('coursesettings:saved', 'local_ai_course_assistant'),
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 // Load current course overrides.
@@ -234,17 +243,23 @@ echo $OUTPUT->heading(get_string('coursesettings:title', 'local_ai_course_assist
 $courseurl = new moodle_url('/course/view.php', ['id' => $courseid]);
 $courseanalyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid]);
 echo html_writer::div(
-    html_writer::link($courseurl,
+    html_writer::link(
+        $courseurl,
         '&larr; Back to Course',
-        ['class' => 'btn btn-sm btn-outline-secondary'])
+        ['class' => 'btn btn-sm btn-outline-secondary']
+    )
     . ' '
-    . html_writer::link($globalsettingsurl,
+    . html_writer::link(
+        $globalsettingsurl,
         get_string('coursesettings:global_settings_link', 'local_ai_course_assistant'),
-        ['class' => 'btn btn-sm btn-outline-secondary'])
+        ['class' => 'btn btn-sm btn-outline-secondary']
+    )
     . ' '
-    . html_writer::link($courseanalyticsurl,
+    . html_writer::link(
+        $courseanalyticsurl,
         'Course Analytics',
-        ['class' => 'btn btn-sm btn-outline-secondary']),
+        ['class' => 'btn btn-sm btn-outline-secondary']
+    ),
     'mb-3 d-flex flex-wrap" style="gap:8px'
 );
 
@@ -283,7 +298,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-sola-course-enabled" name="sola_course_enabled" value="1"
-                               <?php if ($solacourseenabled) { echo 'checked'; } ?>>
+                               <?php if ($solacourseenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-sola-course-enabled">
                             <?php echo get_string('coursesettings:sola_enabled_toggle', 'local_ai_course_assistant'); ?>
                         </label>
@@ -309,7 +326,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-enabled" name="enabled" value="1"
-                               <?php if ($current && $current->enabled) { echo 'checked'; } ?>>
+                               <?php if ($current && $current->enabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-enabled">
                             <?php echo get_string('coursesettings:enabled', 'local_ai_course_assistant'); ?>
                         </label>
@@ -333,7 +352,9 @@ echo html_writer::div(
                     <select class="form-control" id="provider" name="provider">
                         <?php foreach ($providers as $val => $label) { ?>
                         <option value="<?php echo s($val); ?>"
-                            <?php if ($current && $current->provider === $val) { echo 'selected'; } ?>>
+                            <?php if ($current && $current->provider === $val) {
+                                echo 'selected';
+                            } ?>>
                             <?php echo s($label); ?>
                         </option>
                         <?php } ?>
@@ -446,7 +467,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-rag-course-enabled" name="rag_course_enabled" value="1"
-                               <?php if ($ragcourseenabled) { echo 'checked'; } ?>>
+                               <?php if ($ragcourseenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-rag-course-enabled">
                             <?php echo get_string('coursesettings:rag_enable', 'local_ai_course_assistant'); ?>
                         </label>
@@ -459,17 +482,25 @@ echo html_writer::div(
                        class="btn btn-sm btn-outline-secondary" target="_blank">
                         <?php echo get_string('ragadmin:title', 'local_ai_course_assistant'); ?> &rarr;
                     </a>
-                    <a href="<?php echo (new moodle_url('/local/ai_course_assistant/objectives_admin.php',
-                            ['courseid' => $courseid]))->out(false); ?>"
+                    <a href="<?php echo (new moodle_url(
+                        '/local/ai_course_assistant/objectives_admin.php',
+                        ['courseid' => $courseid]
+                    ))->out(false); ?>"
                        class="btn btn-sm btn-outline-secondary ml-2" target="_blank">
                         <?php echo get_string('objectives:title', 'local_ai_course_assistant'); ?> &rarr;
                     </a>
-                    <?php if (has_capability('local/ai_course_assistant:viewanalytics',
-                            context_course::instance($courseid))) { ?>
-                    <a href="<?php echo (new moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-                            ['courseid' => $courseid]))->out(false); ?>"
+                    <?php if (
+                    has_capability(
+                        'local/ai_course_assistant:viewanalytics',
+                        context_course::instance($courseid)
+                    )
+) { ?>
+                    <a href="<?php echo (new moodle_url(
+                        '/local/ai_course_assistant/instructor_dashboard.php',
+                        ['courseid' => $courseid]
+                    ))->out(false); ?>"
                        class="btn btn-sm btn-outline-secondary ml-2" target="_blank">
-                        <?php echo get_string('instructor_dashboard:link', 'local_ai_course_assistant'); ?> &rarr;
+                            <?php echo get_string('instructor_dashboard:link', 'local_ai_course_assistant'); ?> &rarr;
                     </a>
                     <?php } ?>
                 </div>
@@ -512,11 +543,14 @@ echo html_writer::div(
 
             // Helper: render a three-way pedagogy select (inherit / force on / force off).
             $renderpedagogyselect = function (string $name, $raw, bool $globalon, string $id) {
-                $on  = get_string('pedagogy:on',  'local_ai_course_assistant');
+                $on  = get_string('pedagogy:on', 'local_ai_course_assistant');
                 $off = get_string('pedagogy:off', 'local_ai_course_assistant');
-                $inheritlabel = get_string('pedagogy:per_course_inherit',
-                    'local_ai_course_assistant', $globalon ? $on : $off);
-                $forceon  = get_string('pedagogy:per_course_force_on',  'local_ai_course_assistant');
+                $inheritlabel = get_string(
+                    'pedagogy:per_course_inherit',
+                    'local_ai_course_assistant',
+                    $globalon ? $on : $off
+                );
+                $forceon  = get_string('pedagogy:per_course_force_on', 'local_ai_course_assistant');
                 $forceoff = get_string('pedagogy:per_course_force_off', 'local_ai_course_assistant');
                 $sel = function ($value, $current) {
                     return ($value === $current) ? ' selected' : '';
@@ -565,8 +599,10 @@ echo html_writer::div(
                     </small>
                     <?php if ($fcon) { ?>
                     <div class="mt-1">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/flashcards.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/flashcards.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('flashcards:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -587,8 +623,10 @@ echo html_writer::div(
                     </small>
                     <?php if ($sbon) { ?>
                     <div class="mt-1">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/sandbox.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/sandbox.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('sandbox:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -609,8 +647,10 @@ echo html_writer::div(
                     </small>
                     <?php if ($esson) { ?>
                     <div class="mt-1">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/essay_feedback.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/essay_feedback.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('essay_feedback:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -646,13 +686,17 @@ echo html_writer::div(
                         </small>
                     </div>
                     <div class="mt-2 d-flex flex-wrap" style="gap:8px">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/soapbox.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/soapbox.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('soapbox:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php',
-                                ['courseid' => $courseid, 'type' => 'speech']))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/rubric_admin.php',
+                            ['courseid' => $courseid, 'type' => 'speech']
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('soapbox:edit_rubric', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -704,9 +748,12 @@ echo html_writer::div(
                 <div class="col-sm-9">
                     <select id="aica-extres" name="external_resources" class="form-control form-control-sm" style="max-width:240px">
                         <option value="" <?php echo ($extresraw === false || $extresraw === '') ? 'selected' : ''; ?>>
-                            <?php echo get_string('external_resources:inherit', 'local_ai_course_assistant',
+                            <?php echo get_string(
+                                'external_resources:inherit',
+                                'local_ai_course_assistant',
                                 $extresglobal ? get_string('external_resources:on', 'local_ai_course_assistant')
-                                              : get_string('external_resources:off', 'local_ai_course_assistant')); ?>
+                                : get_string('external_resources:off', 'local_ai_course_assistant')
+                            ); ?>
                         </option>
                         <option value="1" <?php echo $extresraw === '1' ? 'selected' : ''; ?>>
                             <?php echo get_string('external_resources:force_on', 'local_ai_course_assistant'); ?>
@@ -738,7 +785,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-english-lock" name="english_lock" value="1"
-                               <?php if ($englishlockenabled) { echo 'checked'; } ?>>
+                               <?php if ($englishlockenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-english-lock">
                             Always respond in English
                         </label>
@@ -761,13 +810,19 @@ echo html_writer::div(
                 <label class="col-sm-3 col-form-label" for="voice_tab">Voice Tab</label>
                 <div class="col-sm-9">
                     <select class="form-control" name="voice_tab" id="voice_tab">
-                        <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') { echo 'selected'; } ?>>
+                        <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') {
+                            echo 'selected';
+                                         } ?>>
                             Inherit global (<?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?>)
                         </option>
-                        <option value="1" <?php if ($voicetabcourseraw === '1') { echo 'selected'; } ?>>
+                        <option value="1" <?php if ($voicetabcourseraw === '1') {
+                            echo 'selected';
+                                          } ?>>
                             Force on
                         </option>
-                        <option value="0" <?php if ($voicetabcourseraw === '0') { echo 'selected'; } ?>>
+                        <option value="0" <?php if ($voicetabcourseraw === '0') {
+                            echo 'selected';
+                                          } ?>>
                             Force off
                         </option>
                     </select>
@@ -789,13 +844,19 @@ echo html_writer::div(
                 <label class="col-sm-3 col-form-label" for="auto_open">Auto-open</label>
                 <div class="col-sm-9">
                     <select class="form-control" name="auto_open" id="auto_open">
-                        <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') { echo 'selected'; } ?>>
+                        <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') {
+                            echo 'selected';
+                                         } ?>>
                             Inherit global (<?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?>)
                         </option>
-                        <option value="1" <?php if ($autoopencourseraw === '1') { echo 'selected'; } ?>>
+                        <option value="1" <?php if ($autoopencourseraw === '1') {
+                            echo 'selected';
+                                          } ?>>
                             Force on
                         </option>
-                        <option value="0" <?php if ($autoopencourseraw === '0') { echo 'selected'; } ?>>
+                        <option value="0" <?php if ($autoopencourseraw === '0') {
+                            echo 'selected';
+                                          } ?>>
                             Force off
                         </option>
                     </select>
@@ -837,7 +898,9 @@ echo html_writer::div(
                         <input type="checkbox" role="switch"
                                id="<?php echo $paramname; ?>"
                                name="<?php echo $paramname; ?>" value="1"
-                               <?php if ($isenabled) { echo 'checked'; } ?>>
+                               <?php if ($isenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="<?php echo $paramname; ?>"></label>
                     </div>
                 </div>
@@ -892,7 +955,9 @@ echo html_writer::div(
                             <td>
                                 <select name="<?php echo $field; ?>" class="form-control form-control-sm">
                                     <?php foreach ($levellabels as $key => $label) { ?>
-                                        <option value="<?php echo $key; ?>" <?php if ($stored === $key) { echo 'selected'; } ?>>
+                                        <option value="<?php echo $key; ?>" <?php if ($stored === $key) {
+                                            echo 'selected';
+                                                       } ?>>
                                             <?php echo s($label); ?>
                                         </option>
                                     <?php } ?>

@@ -32,7 +32,6 @@ use local_ai_course_assistant\cross_course_mastery;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rebuild_objective_links extends \core\task\scheduled_task {
-
     /**
      * Return the task's human-readable name.
      *

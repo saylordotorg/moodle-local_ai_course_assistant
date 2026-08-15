@@ -60,8 +60,14 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
             $filepath .= '/';
         }
         $fs = get_file_storage();
-        $file = $fs->get_file($context->id, 'local_ai_course_assistant', 'customavatars',
-            $itemid, $filepath, $filename);
+        $file = $fs->get_file(
+            $context->id,
+            'local_ai_course_assistant',
+            'customavatars',
+            $itemid,
+            $filepath,
+            $filename
+        );
         if (!$file || $file->is_directory()) {
             send_file_not_found();
         }
@@ -89,8 +95,12 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
             $filepath .= '/';
         }
 
-        $msg = $DB->get_record('local_ai_course_assistant_msgs',
-            ['id' => $itemid], 'id, userid, courseid', IGNORE_MISSING);
+        $msg = $DB->get_record(
+            'local_ai_course_assistant_msgs',
+            ['id' => $itemid],
+            'id, userid, courseid',
+            IGNORE_MISSING
+        );
         if (!$msg || (int) $msg->courseid !== (int) $context->instanceid) {
             send_file_not_found();
         }
@@ -128,14 +138,27 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
 function local_ai_course_assistant_get_custom_avatars(): array {
     $fs = get_file_storage();
     $context = context_system::instance();
-    $files = $fs->get_area_files($context->id, 'local_ai_course_assistant',
-        'customavatars', 0, 'filename', false);
+    $files = $fs->get_area_files(
+        $context->id,
+        'local_ai_course_assistant',
+        'customavatars',
+        0,
+        'filename',
+        false
+    );
     $out = [];
     foreach ($files as $file) {
         $name = $file->get_filename();
         $key = 'custom:' . $file->get_contenthash();
-        $url = moodle_url::make_pluginfile_url($context->id, 'local_ai_course_assistant',
-            'customavatars', 0, $file->get_filepath(), $name, false);
+        $url = moodle_url::make_pluginfile_url(
+            $context->id,
+            'local_ai_course_assistant',
+            'customavatars',
+            0,
+            $file->get_filepath(),
+            $name,
+            false
+        );
         $out[] = ['key' => $key, 'label' => $name, 'url' => $url->out(false)];
     }
     return $out;
@@ -157,8 +180,11 @@ function local_ai_course_assistant_get_custom_avatars(): array {
  * @param stdClass $course The course record.
  * @param context_course $context The course context.
  */
-function local_ai_course_assistant_extend_navigation_course(navigation_node $navigation, stdClass $course,
-        context_course $context): void {
+function local_ai_course_assistant_extend_navigation_course(
+    navigation_node $navigation,
+    stdClass $course,
+    context_course $context
+): void {
     if (has_capability('local/ai_course_assistant:manage', $context)) {
         $navigation->add(
             get_string('coursesettings:title', 'local_ai_course_assistant'),
@@ -198,8 +224,10 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
     // v6.7.0: learner-facing Soapbox link. Unlike the admin nodes above, this is
     // shown to any enrolled learner (capability :use) when Soapbox is enabled for
     // the course, so students in speech courses have a discoverable way in.
-    if (has_capability('local/ai_course_assistant:use', $context)
-            && \local_ai_course_assistant\feature_flags::resolve('soapbox', $course->id)) {
+    if (
+        has_capability('local/ai_course_assistant:use', $context)
+            && \local_ai_course_assistant\feature_flags::resolve('soapbox', $course->id)
+    ) {
         $navigation->add(
             get_string('soapbox:link', 'local_ai_course_assistant'),
             new moodle_url('/local/ai_course_assistant/soapbox.php', ['courseid' => $course->id]),
@@ -223,7 +251,9 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
             );
         }
         $assignments = \local_ai_course_assistant\soapbox_assignment_manager::get_course_assignments(
-            $course->id, false);
+            $course->id,
+            false
+        );
         foreach ($assignments as $assign) {
             $navigation->add(
                 format_string($assign->name),

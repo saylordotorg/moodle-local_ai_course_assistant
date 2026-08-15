@@ -30,7 +30,6 @@ use local_ai_course_assistant\reminder_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_reminder_preferences extends external_api {
-
     /**
      * Returns description of method parameters.
      *

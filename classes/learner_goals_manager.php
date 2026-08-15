@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learner_goals_manager {
-
     /** Table name. */
     const TABLE = 'local_ai_course_assistant_learner_goals';
 

@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\health_check
  */
 final class health_check_test extends \advanced_testcase {
-
     public function test_run_all_returns_summary_shape(): void {
         $this->resetAfterTest();
         $r = health_check::run_all();
@@ -56,11 +55,15 @@ final class health_check_test extends \advanced_testcase {
     public function test_clean_install_passes_every_check(): void {
         $this->resetAfterTest();
         $r = health_check::run_all();
-        $failures = array_filter($r['checks'],
-            static fn($c) => $c['status'] === health_check::STATUS_FAIL);
-        $this->assertEmpty($failures,
+        $failures = array_filter(
+            $r['checks'],
+            static fn($c) => $c['status'] === health_check::STATUS_FAIL
+        );
+        $this->assertEmpty(
+            $failures,
             'A freshly-installed PHPUnit env should pass every health check. Failed: '
-            . implode(', ', array_map(static fn($c) => $c['name'] . ' — ' . $c['message'], $failures)));
+            . implode(', ', array_map(static fn($c) => $c['name'] . ' — ' . $c['message'], $failures))
+        );
         $this->assertEquals(0, $r['failed']);
     }
 
@@ -90,16 +93,21 @@ final class health_check_test extends \advanced_testcase {
     public function test_scheduled_tasks_check_passes_on_clean_install(): void {
         $this->resetAfterTest();
         $r = health_check::check_all_scheduled_tasks_registered();
-        $this->assertEquals(health_check::STATUS_PASS, $r['status'],
-            'Fresh install must register every scheduled task. Got: ' . $r['message']);
+        $this->assertEquals(
+            health_check::STATUS_PASS,
+            $r['status'],
+            'Fresh install must register every scheduled task. Got: ' . $r['message']
+        );
     }
 
     public function test_scheduled_tasks_check_flags_unregistered_task(): void {
         $this->resetAfterTest();
         global $DB;
         // Drop one SOLA task from the schedule. health_check should detect.
-        $DB->delete_records_select('task_scheduled',
-            "classname LIKE '%local_ai_course_assistant%audit_cleanup%'");
+        $DB->delete_records_select(
+            'task_scheduled',
+            "classname LIKE '%local_ai_course_assistant%audit_cleanup%'"
+        );
 
         $r = health_check::check_all_scheduled_tasks_registered();
 
@@ -130,8 +138,12 @@ final class health_check_test extends \advanced_testcase {
         $this->resetAfterTest();
         global $DB;
         // Set faildelay > 1h on a SOLA task. health_check should flag it.
-        $DB->set_field_select('task_scheduled', 'faildelay', 7200,
-            "classname LIKE '%local_ai_course_assistant%audit_cleanup%'");
+        $DB->set_field_select(
+            'task_scheduled',
+            'faildelay',
+            7200,
+            "classname LIKE '%local_ai_course_assistant%audit_cleanup%'"
+        );
 
         $r = health_check::check_no_cron_tasks_stuck();
 
@@ -149,9 +161,12 @@ final class health_check_test extends \advanced_testcase {
     public function test_no_falsy_default_pattern_check_passes(): void {
         $this->resetAfterTest();
         $r = health_check::check_no_falsy_default_get_config_pattern();
-        $this->assertEquals(health_check::STATUS_PASS, $r['status'],
+        $this->assertEquals(
+            health_check::STATUS_PASS,
+            $r['status'],
             'classes/ should be free of `?: <numeric>` patterns after the '
-            . 'v5.3.31-v5.3.34 sweep. Got: ' . $r['message']);
+            . 'v5.3.31-v5.3.34 sweep. Got: ' . $r['message']
+        );
     }
 
     public function test_provider_resolves_check_skips_when_plugin_disabled(): void {

@@ -29,7 +29,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\prompt_debug
  */
 final class prompt_debug_test extends \advanced_testcase {
-
     /**
      * Standard entry parts used across tests; override per test as needed.
      *
@@ -146,8 +145,12 @@ final class prompt_debug_test extends \advanced_testcase {
         // Zero chars counts as dropped even without the flag.
         $this->assertSame('dropped', prompt_debug::section_state("     0  current_page_content", 'current_page_content', '', ''));
         // Fallback: heading present in the body when the breakdown is missing.
-        $this->assertSame('kept', prompt_debug::section_state('', 'current_page_content',
-            "intro\n## Current Page Content\nbody", '## Current Page Content'));
+        $this->assertSame('kept', prompt_debug::section_state(
+            '',
+            'current_page_content',
+            "intro\n## Current Page Content\nbody",
+            '## Current Page Content'
+        ));
     }
 
     public function test_parsed_states_flow_to_entry(): void {

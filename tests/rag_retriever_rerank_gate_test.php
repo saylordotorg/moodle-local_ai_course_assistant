@@ -37,7 +37,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\rag_retriever::should_rerank
  */
 final class rag_retriever_rerank_gate_test extends \advanced_testcase {
-
     /**
      * Build a descending-scored candidate list.
      *
@@ -52,14 +51,16 @@ final class rag_retriever_rerank_gate_test extends \advanced_testcase {
         $this->resetAfterTest();
         // margin = 0.700 - 0.660 = 0.040, below the 0.086 default.
         $this->assertTrue(rag_retriever::should_rerank(
-            $this->candidates([0.700, 0.680, 0.660])));
+            $this->candidates([0.700, 0.680, 0.660])
+        ));
     }
 
     public function test_confident_query_is_not_reranked(): void {
         $this->resetAfterTest();
         // margin = 0.800 - 0.600 = 0.200, well above the default.
         $this->assertFalse(rag_retriever::should_rerank(
-            $this->candidates([0.800, 0.700, 0.600])));
+            $this->candidates([0.800, 0.700, 0.600])
+        ));
     }
 
     /**
@@ -78,10 +79,12 @@ final class rag_retriever_rerank_gate_test extends \advanced_testcase {
         set_config('rerank_margin_threshold', '0.100', 'local_ai_course_assistant');
         // Margin 0.05, unambiguously below.
         $this->assertTrue(rag_retriever::should_rerank(
-            $this->candidates([0.900, 0.870, 0.850])));
+            $this->candidates([0.900, 0.870, 0.850])
+        ));
         // Margin 0.15, unambiguously above.
         $this->assertFalse(rag_retriever::should_rerank(
-            $this->candidates([0.900, 0.820, 0.750])));
+            $this->candidates([0.900, 0.820, 0.750])
+        ));
     }
 
     /**
@@ -105,7 +108,8 @@ final class rag_retriever_rerank_gate_test extends \advanced_testcase {
         set_config('rerank_margin_threshold', '0', 'local_ai_course_assistant');
         // Would otherwise be far too confident to rerank.
         $this->assertTrue(rag_retriever::should_rerank(
-            $this->candidates([0.990, 0.500, 0.100])));
+            $this->candidates([0.990, 0.500, 0.100])
+        ));
     }
 
     /**
@@ -118,10 +122,12 @@ final class rag_retriever_rerank_gate_test extends \advanced_testcase {
         unset_config('rerank_margin_threshold', 'local_ai_course_assistant');
         // Confident: would rerank only if the gate had collapsed to 0.
         $this->assertFalse(rag_retriever::should_rerank(
-            $this->candidates([0.800, 0.700, 0.600])));
+            $this->candidates([0.800, 0.700, 0.600])
+        ));
         // Ambiguous: still reranks.
         $this->assertTrue(rag_retriever::should_rerank(
-            $this->candidates([0.700, 0.680, 0.660])));
+            $this->candidates([0.700, 0.680, 0.660])
+        ));
     }
 
     /**
@@ -143,7 +149,8 @@ final class rag_retriever_rerank_gate_test extends \advanced_testcase {
         $this->resetAfterTest();
         set_config('rerank_margin_threshold', '-1', 'local_ai_course_assistant');
         $this->assertTrue(rag_retriever::should_rerank(
-            $this->candidates([0.800, 0.700, 0.600])));
+            $this->candidates([0.800, 0.700, 0.600])
+        ));
     }
 
     /**
@@ -155,8 +162,10 @@ final class rag_retriever_rerank_gate_test extends \advanced_testcase {
         unset_config('rerank_margin_threshold', 'local_ai_course_assistant');
         // Margin 0.0859 is just inside 0.086; 0.0861 is just outside.
         $this->assertTrue(rag_retriever::should_rerank(
-            $this->candidates([0.9000, 0.8900, 0.8141])));
+            $this->candidates([0.9000, 0.8900, 0.8141])
+        ));
         $this->assertFalse(rag_retriever::should_rerank(
-            $this->candidates([0.9000, 0.8900, 0.8139])));
+            $this->candidates([0.9000, 0.8900, 0.8139])
+        ));
     }
 }

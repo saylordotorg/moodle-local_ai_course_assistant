@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plugin_updater {
-
     /** GitHub API endpoint for latest release. */
     const GITHUB_API = 'https://api.github.com/repos/saylordotorg/moodle-local_ai_course_assistant/releases/latest';
 
@@ -87,8 +86,10 @@ class plugin_updater {
         // Also check for a release asset named ai_course_assistant.zip.
         if (!empty($data->assets) && is_array($data->assets)) {
             foreach ($data->assets as $asset) {
-                if (strpos($asset->name, 'ai_course_assistant') !== false
-                    || strpos($asset->name, '.zip') !== false) {
+                if (
+                    strpos($asset->name, 'ai_course_assistant') !== false
+                    || strpos($asset->name, '.zip') !== false
+                ) {
                     $zipurl = $asset->browser_download_url;
                     break;
                 }
@@ -121,9 +122,11 @@ class plugin_updater {
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
 
         // Security: only download from github.com.
-        if (strpos($zipurl, 'https://github.com/') !== 0
+        if (
+            strpos($zipurl, 'https://github.com/') !== 0
             && strpos($zipurl, 'https://api.github.com/') !== 0
-            && strpos($zipurl, 'https://codeload.github.com/') !== 0) {
+            && strpos($zipurl, 'https://codeload.github.com/') !== 0
+        ) {
             return '';
         }
 

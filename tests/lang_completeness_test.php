@@ -38,7 +38,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class lang_completeness_test extends \basic_testcase {
-
     /**
      * Plugin root.
      *
@@ -100,17 +99,25 @@ final class lang_completeness_test extends \basic_testcase {
         // Mustache: `{{#str KEY, local_ai_course_assistant}}`
         foreach ($this->walk($this->plugin_root() . '/templates', ['.mustache']) as $f) {
             $body = file_get_contents($f);
-            if (preg_match_all(
-                '/\{\{#str\}\}\s*([a-zA-Z0-9_:]+)\s*,\s*' . preg_quote($component, '/') . '\s*\{\{\/str\}\}/',
-                $body, $m)) {
+            if (
+                preg_match_all(
+                    '/\{\{#str\}\}\s*([a-zA-Z0-9_:]+)\s*,\s*' . preg_quote($component, '/') . '\s*\{\{\/str\}\}/',
+                    $body,
+                    $m
+                )
+            ) {
                 foreach ($m[1] as $k) {
                     $refs[] = ['key' => $k, 'file' => basename($f)];
                 }
             }
             // Older mustache form: `{{#str}}KEY, comp{{/str}}`
-            if (preg_match_all(
-                '/\{\{#str\}\}\s*([a-zA-Z0-9_:]+)\s*,\s*' . preg_quote($component, '/') . '\s*\{\{\/str\}\}/s',
-                $body, $m2)) {
+            if (
+                preg_match_all(
+                    '/\{\{#str\}\}\s*([a-zA-Z0-9_:]+)\s*,\s*' . preg_quote($component, '/') . '\s*\{\{\/str\}\}/s',
+                    $body,
+                    $m2
+                )
+            ) {
                 foreach ($m2[1] as $k) {
                     $refs[] = ['key' => $k, 'file' => basename($f)];
                 }
@@ -122,9 +129,13 @@ final class lang_completeness_test extends \basic_testcase {
         // or interpolation) are skipped because they need runtime context.
         foreach ($this->walk($this->plugin_root(), ['.php']) as $f) {
             $body = file_get_contents($f);
-            if (preg_match_all(
-                "/get_string\(\s*'([a-zA-Z0-9_:]+)'\s*,\s*'" . preg_quote($component, '/') . "'/",
-                $body, $m)) {
+            if (
+                preg_match_all(
+                    "/get_string\(\s*'([a-zA-Z0-9_:]+)'\s*,\s*'" . preg_quote($component, '/') . "'/",
+                    $body,
+                    $m
+                )
+            ) {
                 foreach ($m[1] as $k) {
                     $refs[] = ['key' => $k, 'file' => str_replace($this->plugin_root() . '/', '', $f)];
                 }
@@ -194,16 +205,20 @@ final class lang_completeness_test extends \basic_testcase {
 
     public function test_translation_parity_has_not_regressed(): void {
         $en = array_keys($this->load_en_strings());
-        $locales = array_filter(scandir($this->plugin_root() . '/lang'),
-            fn($d) => $d !== '.' && $d !== '..' && $d !== 'en');
+        $locales = array_filter(
+            scandir($this->plugin_root() . '/lang'),
+            fn($d) => $d !== '.' && $d !== '..' && $d !== 'en'
+        );
         $this->assertGreaterThan(40, count($locales), 'expected the full locale set');
 
         $unexpected = [];
         foreach ($locales as $lang) {
             $keys = $this->locale_keys($lang);
             foreach ($en as $key) {
-                if (!array_key_exists($key, $keys)
-                        && !in_array($key, self::KNOWN_UNTRANSLATED, true)) {
+                if (
+                    !array_key_exists($key, $keys)
+                        && !in_array($key, self::KNOWN_UNTRANSLATED, true)
+                ) {
                     $unexpected[$key][] = $lang;
                 }
             }

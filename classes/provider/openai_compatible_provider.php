@@ -27,7 +27,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class openai_compatible_provider extends base_provider {
-
     /** @var array|null Token usage from the last streaming call.
      *  v5.11.0 adds `cached_tokens` so dashboards can see the OpenAI auto-prefix
      *  discount hit rate (cached_tokens get 50% off input; auto-fires on any
@@ -113,8 +112,8 @@ abstract class openai_compatible_provider extends base_provider {
         // Multimodal: attach one or more images to the latest user message as a
         // content-block array, matching the OpenAI chat/completions schema that
         // Gemini, xAI, and other compatible endpoints also accept.
-        //   options['attachment']     => single {base64, mime} image
-        //   options['image_datauris'] => list of full data: URI strings (slide vision)
+        // options['attachment']     => single {base64, mime} image
+        // options['image_datauris'] => list of full data: URI strings (slide vision)
         $imageurls = [];
         if (!empty($options['attachment']['base64']) && !empty($options['attachment']['mime'])) {
             $imageurls[] = 'data:' . $options['attachment']['mime']

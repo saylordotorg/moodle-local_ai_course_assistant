@@ -40,10 +40,16 @@ $confirm      = optional_param('confirm', 0, PARAM_INT);
 
 $PAGE->set_url('/local/ai_course_assistant/admin_user_data.php');
 $PAGE->set_context($syscontext);
-$PAGE->set_title(get_string('admin:user_data:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
-$PAGE->set_heading(get_string('admin:user_data:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
+$PAGE->set_title(get_string(
+    'admin:user_data:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
+$PAGE->set_heading(get_string(
+    'admin:user_data:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
 
 $tables = [
     'convs'          => 'local_ai_course_assistant_convs',
@@ -54,7 +60,7 @@ $tables = [
     'survey_resp'    => 'local_ai_course_assistant_survey_resp',
     'ut_resp'        => 'local_ai_course_assistant_ut_resp',
     'audit'          => 'local_ai_course_assistant_audit',
-    'practice_scores'=> 'local_ai_course_assistant_practice_scores',
+    'practice_scores' => 'local_ai_course_assistant_practice_scores',
     'profiles'       => 'local_ai_course_assistant_profiles',
 ];
 
@@ -84,8 +90,12 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
     } catch (\Throwable $e) {
         $bundle['messages'] = ['error' => 'table unavailable'];
     }
-    \local_ai_course_assistant\audit_logger::log('admin_export_learner_data',
-        (int)$USER->id, 0, ['target_userid' => $targetuserid]);
+    \local_ai_course_assistant\audit_logger::log(
+        'admin_export_learner_data',
+        (int)$USER->id,
+        0,
+        ['target_userid' => $targetuserid]
+    );
     header('Content-Type: application/json; charset=utf-8');
     $fnslug = \local_ai_course_assistant\branding::filename_slug();
     header('Content-Disposition: attachment; filename="' . $fnslug . '-data-' . $targetuserid . '-' . date('Ymd') . '.json"');
@@ -100,7 +110,9 @@ if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
         \local_ai_course_assistant\conversation_manager::delete_user_data($targetuserid);
         try {
             $contextlist = \core_privacy\manager::get_contexts_for_userid(
-                $targetuserid, 'local_ai_course_assistant');
+                $targetuserid,
+                'local_ai_course_assistant'
+            );
             if ($contextlist && $contextlist->count() > 0) {
                 $approved = new \core_privacy\local\request\approved_contextlist(
                     \core\user::get_user($targetuserid) ?: (object)['id' => $targetuserid],
@@ -112,10 +124,18 @@ if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
         } catch (\Throwable $e) {
             debugging('Privacy API purge threw: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
-        \local_ai_course_assistant\audit_logger::log('admin_purge_learner_data',
-            (int)$USER->id, 0, ['target_userid' => $targetuserid]);
-        redirect($PAGE->url, get_string('admin:user_data:purged', 'local_ai_course_assistant'),
-            null, \core\output\notification::NOTIFY_SUCCESS);
+        \local_ai_course_assistant\audit_logger::log(
+            'admin_purge_learner_data',
+            (int)$USER->id,
+            0,
+            ['target_userid' => $targetuserid]
+        );
+        redirect(
+            $PAGE->url,
+            get_string('admin:user_data:purged', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
     } else {
         echo $OUTPUT->header();
         $target = core_user::get_user($targetuserid);
@@ -137,9 +157,11 @@ if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
 
 echo $OUTPUT->header();
 
-echo \html_writer::tag('p',
+echo \html_writer::tag(
+    'p',
     get_string('admin:user_data:intro', 'local_ai_course_assistant'),
-    ['style' => 'max-width:720px']);
+    ['style' => 'max-width:720px']
+);
 
 // User search form.
 echo '<form method="get" action="' . $PAGE->url->out() . '" style="margin:16px 0">';
@@ -155,8 +177,10 @@ echo '</form>';
 if ($targetuserid) {
     $target = core_user::get_user($targetuserid);
     if (!$target) {
-        echo $OUTPUT->notification(get_string('admin:user_data:not_found', 'local_ai_course_assistant'),
-            'notifyerror');
+        echo $OUTPUT->notification(
+            get_string('admin:user_data:not_found', 'local_ai_course_assistant'),
+            'notifyerror'
+        );
     } else {
         echo '<h3>' . s(fullname($target)) . ' <small style="color:#888">(id ' . $targetuserid
             . ')</small></h3>';

@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content_extractor {
-
     /** @var int Minimum characters required to keep a module's content. */
     private const MIN_CHARS = 80;
 
@@ -609,10 +608,12 @@ TXT;
             debugging('SOLA transcript fetch blocked by Cloudflare challenge: ' . $url, DEBUG_DEVELOPER);
             return null;
         }
-        if (strlen($body) < 10240
+        if (
+            strlen($body) < 10240
             && (stripos($rawheaders, 'cf-ray') !== false
                 || stripos($body, 'cf-ray') !== false
-                || stripos($body, 'challenge') !== false)) {
+                || stripos($body, 'challenge') !== false)
+        ) {
             debugging('SOLA transcript fetch looks like Cloudflare challenge: ' . $url, DEBUG_DEVELOPER);
             return null;
         }

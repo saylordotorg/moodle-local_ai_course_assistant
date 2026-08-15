@@ -30,8 +30,8 @@ use local_ai_course_assistant\talking_avatar_session_manager;
 
 require_login();
 
-$range    = optional_param('range',    30, PARAM_INT);  // Days: 7, 30, 90, 0 = all.
-$courseid = optional_param('courseid',  0, PARAM_INT);  // 0 = all courses.
+$range    = optional_param('range', 30, PARAM_INT);  // Days: 7, 30, 90, 0 = all.
+$courseid = optional_param('courseid', 0, PARAM_INT);  // 0 = all courses.
 
 $syscontext = context_system::instance();
 $hassiteconfig = has_capability('moodle/site:config', $syscontext);
@@ -40,8 +40,10 @@ $hassiteconfig = has_capability('moodle/site:config', $syscontext);
 require_capability('moodle/site:config', $syscontext);
 $pagecontext = $syscontext;
 
-$PAGE->set_url(new moodle_url('/local/ai_course_assistant/token_analytics.php',
-    ['range' => $range, 'courseid' => $courseid]));
+$PAGE->set_url(new moodle_url(
+    '/local/ai_course_assistant/token_analytics.php',
+    ['range' => $range, 'courseid' => $courseid]
+));
 $PAGE->set_context($pagecontext);
 $PAGE->set_title('AI Course Assistant — Token Usage & Cost');
 $PAGE->set_heading('AI Course Assistant — Token Usage & Cost');
@@ -76,14 +78,14 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // Learning Radar admin chat.
 //
 // Mapping:
-//   chat, quiz, <empty>           -> Chat
-//   voice                         -> Voice (Realtime)
-//   openai_tts, xai_tts           -> Voice (TTS)
-//   openai_whisper, openai_stt,
-//   xai_stt                       -> Voice (STT)
-//   embedding, embed              -> RAG
-//   meta                          -> Analytics
-//   anything else                 -> Other
+// chat, quiz, <empty>           -> Chat
+// voice                         -> Voice (Realtime)
+// openai_tts, xai_tts           -> Voice (TTS)
+// openai_whisper, openai_stt,
+// xai_stt                       -> Voice (STT)
+// embedding, embed              -> RAG
+// meta                          -> Analytics
+// anything else                 -> Other
 
 $categorysql = "CASE
     WHEN m.interaction_type IN ('voice')                                    THEN 'Voice (Realtime)'
@@ -158,7 +160,9 @@ foreach ($bymodel as $row) {
         (int) $row->total_prompt,
         (int) $row->total_completion
     );
-    if ($cost !== null) { $grandcost += $cost; }
+    if ($cost !== null) {
+        $grandcost += $cost;
+    }
     $grandprompt    += (int) $row->total_prompt;
     $grandcompl     += (int) $row->total_completion;
     $grandresponses += (int) $row->response_count;
@@ -196,7 +200,9 @@ $bystudent = $DB->get_records_sql(
                u.firstnamephonetic, u.lastnamephonetic,
                u.middlename, u.alternatename
       ORDER BY SUM(COALESCE(m.prompt_tokens,0)) + SUM(COALESCE(m.completion_tokens,0)) DESC",
-    $params, 0, 100
+    $params,
+    0,
+    100
 );
 
 $bystudentrows = [];
@@ -247,9 +253,11 @@ foreach ($courses as $c) {
 
 // ── Build URL helpers ─────────────────────────────────────────────────────────
 
-$makeurl = function(int $r, int $c) {
-    return (new moodle_url('/local/ai_course_assistant/token_analytics.php',
-        ['range' => $r, 'courseid' => $c]))->out(false);
+$makeurl = function (int $r, int $c) {
+    return (new moodle_url(
+        '/local/ai_course_assistant/token_analytics.php',
+        ['range' => $r, 'courseid' => $c]
+    ))->out(false);
 };
 
 // ── Spend guard status + Optimizer recommendations (v3.9.9+) ─────────────────
@@ -260,10 +268,15 @@ foreach (\local_ai_course_assistant\spend_guard::status_rows() as $row) {
     $spent = (float) $row['spent'];
     $pctnum = $cap > 0 ? min(100, (int) round($spent / $cap * 100)) : 0;
     $color = '#6c757d';
-    if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_BLOCKED) { $color = '#dc3545'; }
-    else if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_WARN_95) { $color = '#fd7e14'; }
-    else if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_WARN_80) { $color = '#ffc107'; }
-    else if ($cap > 0) { $color = '#198754'; }
+    if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_BLOCKED) {
+        $color = '#dc3545';
+    } else if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_WARN_95) {
+        $color = '#fd7e14';
+    } else if ($row['level'] === \local_ai_course_assistant\spend_guard::CAP_WARN_80) {
+        $color = '#ffc107';
+    } else if ($cap > 0) {
+        $color = '#198754';
+    }
     $spendstatus[] = [
         'label'        => $row['label'],
         'spent_fmt'    => \local_ai_course_assistant\token_cost_manager::format_cost($spent),
@@ -284,7 +297,8 @@ foreach ($optimizerdata['capabilities'] as $cap) {
         $satstr = $r['satisfaction'] !== null
             ? sprintf('%d%%', (int) round($r['satisfaction'] * 100))
             : 'n/a';
-        $ranklines[] = sprintf('%d. %s (%s) — %s/req, satisfaction %s, %d samples (%s confidence)',
+        $ranklines[] = sprintf(
+            '%d. %s (%s) — %s/req, satisfaction %s, %d samples (%s confidence)',
             $i + 1,
             htmlspecialchars($r['provider']),
             htmlspecialchars($r['model']),
@@ -366,10 +380,10 @@ $templatedata = [
     'range_30_active'    => $range === 30,
     'range_90_active'    => $range === 90,
     'range_all_active'   => $range === 0,
-    'url_7'              => $makeurl(7,  $courseid),
+    'url_7'              => $makeurl(7, $courseid),
     'url_30'             => $makeurl(30, $courseid),
     'url_90'             => $makeurl(90, $courseid),
-    'url_all'            => $makeurl(0,  $courseid),
+    'url_all'            => $makeurl(0, $courseid),
     'rate_cards'         => token_cost_manager::get_all_rates(),
     'analytics_url'      => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
 ];

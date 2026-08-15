@@ -36,7 +36,6 @@ use local_ai_course_assistant\extractors\file_extractor;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attachment_manager {
-
     /** @var string Moodle file API component and filearea used for persisted attachments. */
     public const COMPONENT = 'local_ai_course_assistant';
     public const FILEAREA = 'message_attachments';

@@ -37,7 +37,6 @@ use local_ai_course_assistant\branding;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class instructor_weekly_digest extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:instructor_weekly_digest', 'local_ai_course_assistant');
     }
@@ -178,8 +177,10 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
         $lines[] = 'Engagement gap:       ' . $gap['not_seen'] . ' of ' . $gap['enrolled']
             . ' enrolled learners not seen in the last 7 days.';
         $lines[] = '';
-        $url = (new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-            ['courseid' => $course->id]))->out(false);
+        $url = (new \moodle_url(
+            '/local/ai_course_assistant/instructor_dashboard.php',
+            ['courseid' => $course->id]
+        ))->out(false);
         $lines[] = 'Open the live dashboard: ' . $url;
         return implode("\n", $lines);
     }
@@ -198,8 +199,10 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
     protected function render_html($course, array $s, array $mastery, array $confusion, array $r, array $gap): string {
         $product = s(branding::short_name());
         $coursename = s($course->fullname);
-        $url = (new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-            ['courseid' => $course->id]))->out(false);
+        $url = (new \moodle_url(
+            '/local/ai_course_assistant/instructor_dashboard.php',
+            ['courseid' => $course->id]
+        ))->out(false);
 
         $html = '<div style="font-family:Helvetica,Arial,sans-serif;line-height:1.5;color:#1f2937">';
         $html .= '<h2 style="color:#111827;margin:0 0 4px">' . $product . ' weekly digest</h2>';

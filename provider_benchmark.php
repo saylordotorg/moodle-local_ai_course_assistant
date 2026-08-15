@@ -45,8 +45,11 @@ $run = optional_param('run', 0, PARAM_INT);
 $export = optional_param('export', '', PARAM_ALPHA);
 
 $cachekey = 'provider_benchmark_last_payload';
-$cache = \cache::make_from_params(\cache_store::MODE_APPLICATION,
-    'local_ai_course_assistant', 'provider_benchmark');
+$cache = \cache::make_from_params(
+    \cache_store::MODE_APPLICATION,
+    'local_ai_course_assistant',
+    'provider_benchmark'
+);
 
 // Run path: execute, store, redirect to clear the ?run=1 from the URL.
 if ($run) {
@@ -61,24 +64,41 @@ if ($export !== '') {
     require_sesskey();
     $payload = $cache->get($cachekey);
     if (!$payload) {
-        throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-            'No benchmark run available to export. Run the benchmark first.');
+        throw new \moodle_exception(
+            'error',
+            'local_ai_course_assistant',
+            '',
+            'No benchmark run available to export. Run the benchmark first.'
+        );
     }
     $stamp = date('Ymd-His', (int) ($payload['generated_at'] ?? time()));
     $filename = "sola-provider-benchmark-{$stamp}";
     switch ($export) {
         case 'json':
-            local_ai_course_assistant_send_file(provider_benchmark::export_json($payload),
-                $filename . '.json', 'application/json; charset=utf-8');
+            local_ai_course_assistant_send_file(
+                provider_benchmark::export_json($payload),
+                $filename . '.json',
+                'application/json; charset=utf-8'
+            );
         case 'csv':
-            local_ai_course_assistant_send_file(provider_benchmark::export_csv($payload),
-                $filename . '.csv', 'text/csv; charset=utf-8');
+            local_ai_course_assistant_send_file(
+                provider_benchmark::export_csv($payload),
+                $filename . '.csv',
+                'text/csv; charset=utf-8'
+            );
         case 'markdown':
-            local_ai_course_assistant_send_file(provider_benchmark::export_markdown($payload),
-                $filename . '.md', 'text/markdown; charset=utf-8');
+            local_ai_course_assistant_send_file(
+                provider_benchmark::export_markdown($payload),
+                $filename . '.md',
+                'text/markdown; charset=utf-8'
+            );
         default:
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'Unknown export format.');
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Unknown export format.'
+            );
     }
 }
 
@@ -115,37 +135,55 @@ echo \html_writer::tag('p', get_string('benchmark:intro', 'local_ai_course_assis
 $payload = $cache->get($cachekey);
 
 // Run button.
-$runurl = new moodle_url('/local/ai_course_assistant/provider_benchmark.php',
-    ['run' => 1, 'sesskey' => sesskey()]);
+$runurl = new moodle_url(
+    '/local/ai_course_assistant/provider_benchmark.php',
+    ['run' => 1, 'sesskey' => sesskey()]
+);
 echo \html_writer::start_div('mb-3');
-echo \html_writer::tag('a', $payload ? 'Re-run benchmark' : 'Run benchmark now',
-    ['href' => $runurl->out(false), 'class' => 'btn btn-primary']);
+echo \html_writer::tag(
+    'a',
+    $payload ? 'Re-run benchmark' : 'Run benchmark now',
+    ['href' => $runurl->out(false), 'class' => 'btn btn-primary']
+);
 if ($payload) {
     echo ' &nbsp; ';
     foreach (['markdown' => 'Export Markdown', 'csv' => 'Export CSV', 'json' => 'Export JSON'] as $fmt => $label) {
-        $u = new moodle_url('/local/ai_course_assistant/provider_benchmark.php',
-            ['export' => $fmt, 'sesskey' => sesskey()]);
-        echo \html_writer::tag('a', $label,
-            ['href' => $u->out(false), 'class' => 'btn btn-secondary mr-2']);
+        $u = new moodle_url(
+            '/local/ai_course_assistant/provider_benchmark.php',
+            ['export' => $fmt, 'sesskey' => sesskey()]
+        );
+        echo \html_writer::tag(
+            'a',
+            $label,
+            ['href' => $u->out(false), 'class' => 'btn btn-secondary mr-2']
+        );
         echo ' ';
     }
 }
 echo \html_writer::end_div();
 
 if (!$payload) {
-    echo \html_writer::tag('p', \html_writer::tag('em',
-        'No benchmark has been run yet. Click the button above to run.'));
+    echo \html_writer::tag('p', \html_writer::tag(
+        'em',
+        'No benchmark has been run yet. Click the button above to run.'
+    ));
     echo $OUTPUT->footer();
     exit;
 }
 
 // Render the results inline as HTML using the markdown export as a base.
 $md = provider_benchmark::export_markdown($payload);
-echo \html_writer::tag('div', format_text($md, FORMAT_MARKDOWN, ['noclean' => true]),
-    ['class' => 'sola-benchmark-results']);
+echo \html_writer::tag(
+    'div',
+    format_text($md, FORMAT_MARKDOWN, ['noclean' => true]),
+    ['class' => 'sola-benchmark-results']
+);
 
 $generated = userdate((int) ($payload['generated_at'] ?? time()), '%Y-%m-%d %H:%M %Z');
-echo \html_writer::tag('p', \html_writer::tag('em', 'Last run: ' . $generated),
-    ['class' => 'text-muted']);
+echo \html_writer::tag(
+    'p',
+    \html_writer::tag('em', 'Last run: ' . $generated),
+    ['class' => 'text-muted']
+);
 
 echo $OUTPUT->footer();

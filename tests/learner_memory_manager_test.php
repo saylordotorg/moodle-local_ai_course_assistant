@@ -25,7 +25,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\learner_memory_manager
  */
 final class learner_memory_manager_test extends \advanced_testcase {
-
     public function test_get_notes_empty_shape_when_row_missing(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -129,7 +128,9 @@ final class learner_memory_manager_test extends \advanced_testcase {
         $longtopic = str_repeat('a', 500);
         learner_memory_manager::record_sticking_point($user->id, $course->id, $longtopic);
         $notes = learner_memory_manager::get_notes($user->id, $course->id);
-        $this->assertEquals(learner_memory_manager::FIELD_CAP_CHARS,
-            mb_strlen($notes['sticking'][0]['topic']));
+        $this->assertEquals(
+            learner_memory_manager::FIELD_CAP_CHARS,
+            mb_strlen($notes['sticking'][0]['topic'])
+        );
     }
 }

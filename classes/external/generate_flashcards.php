@@ -36,7 +36,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class generate_flashcards extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -47,8 +46,10 @@ class generate_flashcards extends external_api {
 
     public static function execute(int $courseid, int $cmid = 0, int $count = 5): array {
         global $USER;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['courseid' => $courseid, 'cmid' => $cmid, 'count' => $count]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['courseid' => $courseid, 'cmid' => $cmid, 'count' => $count]
+        );
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);

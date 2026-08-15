@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class run_integrity_checks extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:run_integrity_checks', 'local_ai_course_assistant');
     }
@@ -124,15 +123,21 @@ class run_integrity_checks extends \core\task\scheduled_task {
                     mtrace("Skipping invalid email: {$addr}");
                     continue;
                 }
-                if (\local_ai_course_assistant\email_optout::is_opted_out($addr,
-                        \local_ai_course_assistant\email_optout::TYPE_INTEGRITY_REPORT)) {
+                if (
+                    \local_ai_course_assistant\email_optout::is_opted_out(
+                        $addr,
+                        \local_ai_course_assistant\email_optout::TYPE_INTEGRITY_REPORT
+                    )
+                ) {
                     mtrace("Integrity report skipped (unsubscribed): {$addr}");
                     continue;
                 }
                 $bodywithfooter = \local_ai_course_assistant\email_footer::append_text(
-                    $body, $addr,
+                    $body,
+                    $addr,
                     \local_ai_course_assistant\email_optout::TYPE_INTEGRITY_REPORT,
-                    $reason);
+                    $reason
+                );
                 $touser = \core_user::get_noreply_user();
                 $touser->email = $addr;
                 $touser->id = -1;
@@ -150,14 +155,19 @@ class run_integrity_checks extends \core\task\scheduled_task {
                 email_to_user($touser, $fromuser, $subject, $bodywithfooter, nl2br(s($bodywithfooter)));
                 mtrace("Integrity report sent to {$addr}.");
             }
-        } else if (!\local_ai_course_assistant\email_optout::is_opted_out(
+        } else if (
+            !\local_ai_course_assistant\email_optout::is_opted_out(
                 (string) $admin->email,
-                \local_ai_course_assistant\email_optout::TYPE_INTEGRITY_REPORT)) {
+                \local_ai_course_assistant\email_optout::TYPE_INTEGRITY_REPORT
+            )
+        ) {
             // Send via Moodle message to admin.
             $bodywithfooter = \local_ai_course_assistant\email_footer::append_text(
-                $body, (string) $admin->email,
+                $body,
+                (string) $admin->email,
                 \local_ai_course_assistant\email_optout::TYPE_INTEGRITY_REPORT,
-                $reason);
+                $reason
+            );
             $message = new \core\message\message();
             $message->component = 'local_ai_course_assistant';
             $message->name = 'integrity_report';

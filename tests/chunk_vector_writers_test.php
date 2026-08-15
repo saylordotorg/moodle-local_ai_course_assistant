@@ -44,7 +44,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\content_indexer
  */
 final class chunk_vector_writers_test extends \basic_testcase {
-
     /**
      * Source of the indexer.
      *
@@ -66,10 +65,13 @@ final class chunk_vector_writers_test extends \basic_testcase {
         $packedwrites = preg_match_all('/->embedding_bin\s*=\s*rag_retriever::pack_vector\(/', $src);
 
         $this->assertGreaterThan(0, $jsonwrites, 'scan pattern has drifted from the source');
-        $this->assertSame($jsonwrites, $packedwrites,
+        $this->assertSame(
+            $jsonwrites,
+            $packedwrites,
             "content_indexer writes the JSON vector {$jsonwrites} time(s) but the packed "
             . "vector {$packedwrites} time(s). Every writer must set both columns until the "
-            . 'JSON column is dropped; a JSON-only row is correct but silently slow.');
+            . 'JSON column is dropped; a JSON-only row is correct but silently slow.'
+        );
     }
 
     public function test_both_known_index_paths_write_the_packed_column(): void {
@@ -80,11 +82,15 @@ final class chunk_vector_writers_test extends \basic_testcase {
         $split = strpos($src, 'function index_module');
         $this->assertNotFalse($split, 'index_module not found; this guard needs updating');
 
-        foreach (['index_course (before index_module)' => substr($src, 0, $split),
-                  'index_module (and after)' => substr($src, $split)] as $label => $part) {
+        foreach (
+            ['index_course (before index_module)' => substr($src, 0, $split),
+                  'index_module (and after)' => substr($src, $split)] as $label => $part
+        ) {
             $this->assertMatchesRegularExpression(
-                '/->embedding_bin\s*=\s*rag_retriever::pack_vector\(/', $part,
-                "the {$label} path does not write embedding_bin");
+                '/->embedding_bin\s*=\s*rag_retriever::pack_vector\(/',
+                $part,
+                "the {$label} path does not write embedding_bin"
+            );
         }
     }
 

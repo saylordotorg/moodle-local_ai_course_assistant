@@ -37,7 +37,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feature_flags {
-
     /**
      * Resolve whether a pedagogy feature is enabled for a given course.
      *

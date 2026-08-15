@@ -24,7 +24,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base_provider implements provider_interface {
-
     /** @var string API key */
     protected string $apikey;
 
@@ -270,8 +269,12 @@ abstract class base_provider implements provider_interface {
         // 12 drivers. Fails loudly so a misconfigured endpoint cannot silently
         // be redirected at 127.0.0.1 or 169.254.169.254.
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'Provider endpoint rejected by SSRF validator: ' . $url);
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Provider endpoint rejected by SSRF validator: ' . $url
+            );
         }
 
         // v5.10.0: wrap the stream in the bounded transient-retry. A header
@@ -445,8 +448,12 @@ abstract class base_provider implements provider_interface {
                     $overrides['apikey']   = $failover['apikey'];
                     $provider = $failover['provider'];
                 } else {
-                    throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                        'SOLA spend cap reached for this period; no failover provider configured.');
+                    throw new \moodle_exception(
+                        'error',
+                        'local_ai_course_assistant',
+                        '',
+                        'SOLA spend cap reached for this period; no failover provider configured.'
+                    );
                 }
             }
         } catch (\moodle_exception $budgeterr) {
@@ -523,8 +530,10 @@ abstract class base_provider implements provider_interface {
                 continue;
             }
             $parts = array_map('trim', explode('|', $line));
-            if (strtolower($parts[0] ?? '') === strtolower($providerid)
-                && ($apikey === '' || ($parts[1] ?? '') === $apikey)) {
+            if (
+                strtolower($parts[0] ?? '') === strtolower($providerid)
+                && ($apikey === '' || ($parts[1] ?? '') === $apikey)
+            ) {
                 return strtolower($parts[0]);
             }
         }

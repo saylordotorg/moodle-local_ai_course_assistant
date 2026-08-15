@@ -30,7 +30,6 @@ use local_ai_course_assistant\rubric_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_rubric extends external_api {
-
     /**
      * Returns description of method parameters.
      *

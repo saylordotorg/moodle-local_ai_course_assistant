@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class deployment_profile {
-
     /** Recommended values per profile. Each maps a config key to its value. */
     private const PRESETS = [
         'self_hosted_small' => [

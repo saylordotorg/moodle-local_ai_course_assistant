@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class spend_guard {
-
     public const SCOPE_SITE      = 'site';
     public const SCOPE_COURSE    = 'course';
 
@@ -238,8 +237,10 @@ class spend_guard {
         // to CAP_BLOCKED so the friendly "SOLA paused" path runs. Previously
         // emergency_control wrote spend_cap_site=0 thinking 0 = paused, but
         // get_cap() treats 0 as unlimited, so --chat was a silent no-op.
-        if (($capability === 'chat' || $capability === null)
-                && (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled')) {
+        if (
+            ($capability === 'chat' || $capability === null)
+                && (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled')
+        ) {
             return self::CAP_BLOCKED;
         }
         $cap = self::get_cap($courseid, $capability);
@@ -284,7 +285,9 @@ class spend_guard {
         if ($recipients === '') {
             // Fall back to site admins.
             $admins = get_admins();
-            $recipients = implode(',', array_map(function($a) { return $a->email; }, $admins));
+            $recipients = implode(',', array_map(function ($a) {
+                return $a->email;
+            }, $admins));
         }
         if ($recipients === '') {
             return;
@@ -296,8 +299,12 @@ class spend_guard {
         $body = "SOLA spend has crossed a configured threshold.\n\n"
             . "Scope: {$scope}\n"
             . "Period: " . self::period_label() . " (since " . userdate(self::period_start()) . ")\n"
-            . sprintf("Spent: \$%.2f of \$%.2f cap (%d%%)\n",
-                $spent, $cap, (int) round(($spent / $cap) * 100))
+            . sprintf(
+                "Spent: \$%.2f of \$%.2f cap (%d%%)\n",
+                $spent,
+                $cap,
+                (int) round(($spent / $cap) * 100)
+            )
             . "Level: {$level}\n\n"
             . "If the level is 'blocked', new requests under this scope are currently paused. "
             . "They will resume automatically at the start of the next period, or when the cap is raised.\n\n"
@@ -310,8 +317,12 @@ class spend_guard {
             if (email_optout::is_opted_out($email, email_optout::TYPE_SPEND_ALERT)) {
                 continue;
             }
-            $bodywithfooter = email_footer::append_text($body, $email,
-                email_optout::TYPE_SPEND_ALERT, $reason);
+            $bodywithfooter = email_footer::append_text(
+                $body,
+                $email,
+                email_optout::TYPE_SPEND_ALERT,
+                $reason
+            );
             $user = \core_user::get_noreply_user();
             $to = clone $user;
             $to->email = $email;
@@ -447,9 +458,9 @@ class spend_guard {
         $rows = [];
         $scopes = [
             ['label' => 'All capabilities (site)', 'capability' => null],
-            ['label' => 'Chat',      'capability' => 'chat'],
-            ['label' => 'Voice',     'capability' => 'voice'],
-            ['label' => 'RAG',       'capability' => 'rag'],
+            ['label' => 'Chat', 'capability' => 'chat'],
+            ['label' => 'Voice', 'capability' => 'voice'],
+            ['label' => 'RAG', 'capability' => 'rag'],
             ['label' => 'Analytics', 'capability' => 'analytics'],
         ];
         foreach ($scopes as $s) {

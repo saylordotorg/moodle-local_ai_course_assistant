@@ -41,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class llm_optimizer {
-
     /** Minimum rated messages for a quality signal to be trusted. */
     private const MIN_RATED_SAMPLE = 30;
 
@@ -169,7 +168,7 @@ class llm_optimizer {
         }
         unset($o);
 
-        usort($options, function($a, $b) {
+        usort($options, function ($a, $b) {
             return $b['composite_score'] <=> $a['composite_score'];
         });
 
@@ -239,7 +238,8 @@ class llm_optimizer {
                FROM {local_ai_course_assistant_msgs} m
               WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.timecreated >= :since",
-            ['since' => $since]) ?: time());
+            ['since' => $since]
+        ) ?: time());
         $days = max(1, (int) floor((time() - $earliest) / 86400));
 
         if ($days < self::MIN_PROJECTION_DAYS) {
@@ -294,5 +294,4 @@ class llm_optimizer {
         // chat, analytics both use the primary provider.
         return (string) (get_config('local_ai_course_assistant', 'provider') ?: 'openai');
     }
-
 }

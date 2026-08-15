@@ -37,7 +37,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rate_card_refresher {
-
     /** @var string Default upstream when admin has not configured one. */
     public const DEFAULT_UPSTREAM_URL =
         'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json';
@@ -65,7 +64,8 @@ class rate_card_refresher {
         // Pin to the validated IP, closing the DNS-rebinding window.
         $body = $curl->get($url, [], array_merge(
             ['CURLOPT_TIMEOUT' => 30, 'CURLOPT_CONNECTTIMEOUT' => 10],
-            security::resolve_pin_options($url)));
+            security::resolve_pin_options($url)
+        ));
         $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code < 200 || $code >= 300 || $body === false || $body === '') {
             return self::record_failure('Upstream HTTP ' . $code . ' (empty or error response)');
@@ -119,7 +119,7 @@ class rate_card_refresher {
             if (!isset($row['input_cost_per_token']) || !isset($row['output_cost_per_token'])) {
                 continue;
             }
-            $input  = (float) $row['input_cost_per_token']  * 1_000_000.0;
+            $input  = (float) $row['input_cost_per_token'] * 1_000_000.0;
             $output = (float) $row['output_cost_per_token'] * 1_000_000.0;
             // Embedding entries legitimately have output=0; chat entries
             // with both 0 are placeholders or free-tier shells we can skip.

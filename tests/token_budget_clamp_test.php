@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\context_builder::effective_budget_chars
  */
 final class token_budget_clamp_test extends \advanced_testcase {
-
     public function test_clamp_shrinks_budget_when_window_small(): void {
         $this->resetAfterTest();
         // 4096-token English window: (4096-768-512)*4.0 = 11264 chars, which is

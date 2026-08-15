@@ -49,7 +49,6 @@ use local_ai_course_assistant\provider\stub_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class cron_tasks_test extends \advanced_testcase {
-
     /**
      * Run a task with stdout suppressed. Tasks call mtrace() which emits to
      * stdout; PHPUnit flags any test that prints output as Risky. Wrapping
@@ -91,8 +90,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new audit_cleanup());
 
-        $this->assertEquals(2, $DB->count_records('local_ai_course_assistant_audit'),
-            'Two rows older than 30d cutoff must be deleted; two fresh rows must remain.');
+        $this->assertEquals(
+            2,
+            $DB->count_records('local_ai_course_assistant_audit'),
+            'Two rows older than 30d cutoff must be deleted; two fresh rows must remain.'
+        );
     }
 
     public function test_audit_cleanup_skips_when_retention_disabled(): void {
@@ -109,8 +111,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new audit_cleanup());
 
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_audit'),
-            'Retention=0 means do not purge; the year-old row must remain.');
+        $this->assertEquals(
+            1,
+            $DB->count_records('local_ai_course_assistant_audit'),
+            'Retention=0 means do not purge; the year-old row must remain.'
+        );
     }
 
     public function test_audit_cleanup_uses_default_365_days_when_unset(): void {
@@ -133,8 +138,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new audit_cleanup());
 
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_audit'),
-            'Default cutoff is 365d; the 400-day-old row goes, the 300-day-old row stays.');
+        $this->assertEquals(
+            1,
+            $DB->count_records('local_ai_course_assistant_audit'),
+            'Default cutoff is 365d; the 400-day-old row goes, the 300-day-old row stays.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -176,10 +184,16 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new conversation_retention());
 
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_convs'),
-            'Only the fresh conversation should remain.');
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_msgs'),
-            'Stale conversation\'s 2 messages must be purged with the conv.');
+        $this->assertEquals(
+            1,
+            $DB->count_records('local_ai_course_assistant_convs'),
+            'Only the fresh conversation should remain.'
+        );
+        $this->assertEquals(
+            1,
+            $DB->count_records('local_ai_course_assistant_msgs'),
+            'Stale conversation\'s 2 messages must be purged with the conv.'
+        );
     }
 
     public function test_conversation_retention_skips_when_disabled(): void {
@@ -197,8 +211,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new conversation_retention());
 
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_convs'),
-            'Retention=0 disables purge; a 1000-day-old conv must remain.');
+        $this->assertEquals(
+            1,
+            $DB->count_records('local_ai_course_assistant_convs'),
+            'Retention=0 disables purge; a 1000-day-old conv must remain.'
+        );
     }
 
     public function test_conversation_retention_no_op_when_nothing_to_purge(): void {
@@ -247,12 +264,19 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $rows = $DB->get_records('local_ai_course_assistant_avatar_sess', null, 'started_at ASC');
         $rows = array_values($rows);
-        $this->assertNotNull($rows[0]->ended_at,
-            'Stale session (>1h open) must be closed by the sweeper.');
-        $this->assertEquals('sweeper', $rows[0]->source,
-            'Closed-by-sweeper rows must be tagged source=sweeper.');
-        $this->assertNull($rows[1]->ended_at,
-            'Fresh session (<1h) must NOT be touched.');
+        $this->assertNotNull(
+            $rows[0]->ended_at,
+            'Stale session (>1h open) must be closed by the sweeper.'
+        );
+        $this->assertEquals(
+            'sweeper',
+            $rows[0]->source,
+            'Closed-by-sweeper rows must be tagged source=sweeper.'
+        );
+        $this->assertNull(
+            $rows[1]->ended_at,
+            'Fresh session (<1h) must NOT be touched.'
+        );
     }
 
     public function test_sweep_avatar_sessions_no_op_when_nothing_open(): void {
@@ -285,8 +309,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $sink = $this->redirectEmails();
         $this->run_task_silently(new send_reminders());
-        $this->assertEquals(0, $sink->count(),
-            'Plugin disabled => no reminder emails sent regardless of due rows.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'Plugin disabled => no reminder emails sent regardless of due rows.'
+        );
         $sink->close();
     }
 
@@ -309,8 +336,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $sink = $this->redirectEmails();
         $this->run_task_silently(new send_reminders());
-        $this->assertEquals(0, $sink->count(),
-            'Daily reminder sent 30 minutes ago is not due; no email goes.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'Daily reminder sent 30 minutes ago is not due; no email goes.'
+        );
         $sink->close();
     }
 
@@ -333,8 +363,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $sink = $this->redirectEmails();
         $this->run_task_silently(new send_reminders());
-        $this->assertEquals(0, $sink->count(),
-            'enabled=0 reminders never send.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'enabled=0 reminders never send.'
+        );
         $sink->close();
     }
 
@@ -370,8 +403,11 @@ final class cron_tasks_test extends \advanced_testcase {
         $messages = $sink->get_messages();
         $sink->close();
 
-        $this->assertCount(1, $messages,
-            'A learner inactive for 14 days with email reminders enabled must get exactly one inactivity message.');
+        $this->assertCount(
+            1,
+            $messages,
+            'A learner inactive for 14 days with email reminders enabled must get exactly one inactivity message.'
+        );
         $this->assertEquals($user->id, $messages[0]->useridto);
         $this->assertStringContainsString('miss you', $messages[0]->subject);
     }
@@ -403,8 +439,11 @@ final class cron_tasks_test extends \advanced_testcase {
         $messages = $sink->get_messages();
         $sink->close();
 
-        $this->assertCount(0, $messages,
-            'Recently-active learner must not receive an inactivity message.');
+        $this->assertCount(
+            0,
+            $messages,
+            'Recently-active learner must not receive an inactivity message.'
+        );
     }
 
     public function test_send_inactivity_reminders_does_not_double_send_within_a_week(): void {
@@ -434,8 +473,11 @@ final class cron_tasks_test extends \advanced_testcase {
         $messages = $sink->get_messages();
         $sink->close();
 
-        $this->assertCount(0, $messages,
-            'A learner who got an inactivity email 2 days ago must not get another one this week.');
+        $this->assertCount(
+            0,
+            $messages,
+            'A learner who got an inactivity email 2 days ago must not get another one this week.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -488,9 +530,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new struggle_signal_review());
 
-        $this->assertEquals($beforecount,
+        $this->assertEquals(
+            $beforecount,
             $DB->count_records('local_ai_course_assistant_struggle_signal'),
-            'Disabled classifier must not touch the signals table.');
+            'Disabled classifier must not touch the signals table.'
+        );
     }
 
     public function test_struggle_signal_review_runs_when_enabled(): void {
@@ -511,8 +555,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $sink = $this->redirectEmails();
         $this->run_task_silently(new run_anomaly_digest());
-        $this->assertEquals(0, $sink->count(),
-            'Disabled anomaly digest must not send anything.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'Disabled anomaly digest must not send anything.'
+        );
         $sink->close();
     }
 
@@ -523,8 +570,11 @@ final class cron_tasks_test extends \advanced_testcase {
         // Empty DB => no metric exceeds threshold => no alert.
         $sink = $this->redirectEmails();
         $this->run_task_silently(new run_anomaly_digest());
-        $this->assertEquals(0, $sink->count(),
-            'No metric over threshold => no email.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'No metric over threshold => no email.'
+        );
         $sink->close();
     }
 
@@ -561,17 +611,23 @@ final class cron_tasks_test extends \advanced_testcase {
             ]);
         }
         // Provide an admin email destination so radar_delivery has somewhere to go.
-        set_config('anomaly_digest_recipient_email', 'admin@example.com',
-            'local_ai_course_assistant');
+        set_config(
+            'anomaly_digest_recipient_email',
+            'admin@example.com',
+            'local_ai_course_assistant'
+        );
 
         $sink = $this->redirectEmails();
         $this->run_task_silently(new run_anomaly_digest());
         $count = $sink->count();
         $sink->close();
 
-        $this->assertGreaterThan(0, $count,
+        $this->assertGreaterThan(
+            0,
+            $count,
             'threshold=0 must mean alert on any positive change. '
-            . 'Pre-fix this would silently apply 50% and skip the alert.');
+            . 'Pre-fix this would silently apply 50% and skip the alert.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -587,7 +643,8 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->assertFalse(
             get_config('local_ai_course_assistant', 'integrity_last_run'),
-            'Disabled integrity checks must not record a last_run timestamp.');
+            'Disabled integrity checks must not record a last_run timestamp.'
+        );
     }
 
     public function test_run_integrity_checks_runs_and_stores_last_results(): void {
@@ -600,11 +657,14 @@ final class cron_tasks_test extends \advanced_testcase {
         $sink->close();
 
         $stored = get_config('local_ai_course_assistant', 'integrity_last_run');
-        $this->assertNotEmpty($stored,
-            'Enabled run must persist integrity_last_run timestamp.');
+        $this->assertNotEmpty(
+            $stored,
+            'Enabled run must persist integrity_last_run timestamp.'
+        );
         $this->assertNotEmpty(
             get_config('local_ai_course_assistant', 'integrity_last_results'),
-            'Enabled run must persist integrity_last_results JSON.');
+            'Enabled run must persist integrity_last_results JSON.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -619,8 +679,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new run_meta_ai_query());
 
-        $this->assertCount(0, stub_provider::$calls,
-            'No schedules => no LLM call.');
+        $this->assertCount(
+            0,
+            stub_provider::$calls,
+            'No schedules => no LLM call.'
+        );
     }
 
     public function test_run_meta_ai_query_invokes_stub_provider_for_due_schedule(): void {
@@ -644,8 +707,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $this->run_task_silently(new run_meta_ai_query());
 
-        $this->assertCount(1, stub_provider::$calls,
-            'A due schedule must trigger exactly one LLM call.');
+        $this->assertCount(
+            1,
+            stub_provider::$calls,
+            'A due schedule must trigger exactly one LLM call.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -658,8 +724,11 @@ final class cron_tasks_test extends \advanced_testcase {
 
         $sink = $this->redirectMessages();
         $this->run_task_silently(new milestone_check());
-        $this->assertCount(0, $sink->get_messages(),
-            'Feature disabled => no milestone emails dispatched.');
+        $this->assertCount(
+            0,
+            $sink->get_messages(),
+            'Feature disabled => no milestone emails dispatched.'
+        );
         $sink->close();
     }
 
@@ -669,8 +738,11 @@ final class cron_tasks_test extends \advanced_testcase {
         // No streak rows. Task must complete without sending.
         $sink = $this->redirectMessages();
         $this->run_task_silently(new milestone_check());
-        $this->assertCount(0, $sink->get_messages(),
-            'No streak rows => no milestone emails.');
+        $this->assertCount(
+            0,
+            $sink->get_messages(),
+            'No streak rows => no milestone emails.'
+        );
         $sink->close();
     }
 
@@ -683,8 +755,11 @@ final class cron_tasks_test extends \advanced_testcase {
         // No user_preferences with the optin name => empty rowset.
         $sink = $this->redirectEmails();
         $this->run_task_silently(new learner_weekly_digest());
-        $this->assertEquals(0, $sink->count(),
-            'No opt-ins => no emails. Opt-in is the only way a learner gets digested.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'No opt-ins => no emails. Opt-in is the only way a learner gets digested.'
+        );
         $sink->close();
     }
 
@@ -697,8 +772,11 @@ final class cron_tasks_test extends \advanced_testcase {
         // No digest_email_enabled_course_<id>=1 config rows => empty rowset.
         $sink = $this->redirectEmails();
         $this->run_task_silently(new instructor_weekly_digest());
-        $this->assertEquals(0, $sink->count(),
-            'No course opt-ins => no instructor digests.');
+        $this->assertEquals(
+            0,
+            $sink->count(),
+            'No course opt-ins => no instructor digests.'
+        );
         $sink->close();
     }
 
@@ -744,9 +822,11 @@ final class cron_tasks_test extends \advanced_testcase {
         set_config('prompt_budget_chars', 12000, 'local_ai_course_assistant');
         $this->run_task_silently(new auto_tune_prompt_budget());
         // Budget must not change when auto-tune is off.
-        $this->assertEquals(12000,
+        $this->assertEquals(
+            12000,
             (int) get_config('local_ai_course_assistant', 'prompt_budget_chars'),
-            'Auto-tune disabled => budget setting untouched.');
+            'Auto-tune disabled => budget setting untouched.'
+        );
     }
 
     public function test_auto_tune_prompt_budget_runs_when_enabled(): void {
@@ -761,8 +841,10 @@ final class cron_tasks_test extends \advanced_testcase {
         $this->resetAfterTest();
         set_config('rate_card_auto_refresh', 0, 'local_ai_course_assistant');
         $this->run_task_silently(new refresh_rate_card());
-        $this->assertTrue(true,
-            'Feature flag off => no upstream fetch. Pinned-to-last-fetch behaviour preserved.');
+        $this->assertTrue(
+            true,
+            'Feature flag off => no upstream fetch. Pinned-to-last-fetch behaviour preserved.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -775,8 +857,10 @@ final class cron_tasks_test extends \advanced_testcase {
         $pluginroot = $CFG->dirroot . '/local/ai_course_assistant/classes';
         $offenders = $this->find_falsy_default_get_config($pluginroot);
 
-        $this->assertEmpty($offenders,
-            "Found get_config(...) ?: <numeric|float-default> patterns. The ?: operator treats the string \"0\" as falsy and silently applies the default, breaking documented \"set to 0 to disable\" contracts. Replace with: \$raw = get_config(...); \$x = (\$raw === false || \$raw === '') ? <default> : (int|float)\$raw;\n\nOffenders:\n  " . implode("\n  ", $offenders));
+        $this->assertEmpty(
+            $offenders,
+            "Found get_config(...) ?: <numeric|float-default> patterns. The ?: operator treats the string \"0\" as falsy and silently applies the default, breaking documented \"set to 0 to disable\" contracts. Replace with: \$raw = get_config(...); \$x = (\$raw === false || \$raw === '') ? <default> : (int|float)\$raw;\n\nOffenders:\n  " . implode("\n  ", $offenders)
+        );
     }
 
     private function find_falsy_default_get_config(string $rootdir): array {
@@ -788,12 +872,12 @@ final class cron_tasks_test extends \advanced_testcase {
         // string-typed configs, and `?: '0'` (a literal-zero string) is not
         // a sensible setting on those.
         // Catches the four real-world shapes the codebase has shipped:
-        //   (int) (get_config(...) ?: 365)
-        //   (float) (get_config(...) ?: 0.7)
-        //   (int) (get_config(...) ?: self::DEFAULT_X)
-        //   (int) (get_config(...) ?: SomeClass::CONST)
+        // (int) (get_config(...) ?: 365)
+        // (float) (get_config(...) ?: 0.7)
+        // (int) (get_config(...) ?: self::DEFAULT_X)
+        // (int) (get_config(...) ?: SomeClass::CONST)
         $defaultpatterns = [
-            '[1-9][0-9]*(?:\\.[0-9]+)?',                          // numeric / float literal, non-zero
+            '[1-9][0-9]*(?:\\.[0-9]+)?', // numeric / float literal, non-zero
             '(?:self|static|[A-Z][A-Za-z0-9_]+)::[A-Z][A-Z0-9_]+', // ::CONSTANT
         ];
         $regex = "/\\((int|float)\\)\\s*\\(\\s*get_config\\s*\\(\\s*'local_ai_course_assistant'.*?\\?:\\s*("
@@ -805,9 +889,13 @@ final class cron_tasks_test extends \advanced_testcase {
             $lines = file($file->getPathname(), FILE_IGNORE_NEW_LINES);
             foreach ($lines as $i => $line) {
                 if (preg_match($regex, $line, $m)) {
-                    $offenders[] = sprintf('%s:%d → (%s) (... ?: %s)',
+                    $offenders[] = sprintf(
+                        '%s:%d → (%s) (... ?: %s)',
                         str_replace($rootdir . '/', '', $file->getPathname()),
-                        $i + 1, $m[1], $m[2]);
+                        $i + 1,
+                        $m[1],
+                        $m[2]
+                    );
                 }
             }
         }

@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class study_planner {
-
     /**
      * Minimum acceptable hours per week. Below this the plan is functionally
      * a no-op (one Pomodoro a week is not a study plan); learners hitting

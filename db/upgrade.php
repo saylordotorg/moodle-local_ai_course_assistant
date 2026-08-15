@@ -318,8 +318,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             }
             unset($q);
             if ($changed) {
-                $DB->set_field('local_ai_course_assistant_surveys', 'questions',
-                    json_encode($questions), ['id' => $survey->id]);
+                $DB->set_field(
+                    'local_ai_course_assistant_surveys',
+                    'questions',
+                    json_encode($questions),
+                    ['id' => $survey->id]
+                );
             }
         }
         upgrade_plugin_savepoint(true, 2026031202, 'local', 'ai_course_assistant');
@@ -476,7 +480,7 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
                     [$dupe->userid, $dupe->courseid, $dupe->keepid]
                 );
                 if (!empty($dupconvids)) {
-                    list($insql, $inparams) = $DB->get_in_or_equal($dupconvids);
+                    [$insql, $inparams] = $DB->get_in_or_equal($dupconvids);
                     $DB->execute(
                         "UPDATE {local_ai_course_assistant_msgs} SET conversationid = ? WHERE conversationid $insql",
                         array_merge([$dupe->keepid], $inparams)
@@ -634,12 +638,23 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $attstable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $attstable->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
             $attstable->add_key('courseid_fk', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
-            $attstable->add_key('objectiveid_fk', XMLDB_KEY_FOREIGN, ['objectiveid'],
-                'local_ai_course_assistant_objs', ['id']);
-            $attstable->add_index('userid_objective_time', XMLDB_INDEX_NOTUNIQUE,
-                ['userid', 'objectiveid', 'timecreated']);
-            $attstable->add_index('courseid_time', XMLDB_INDEX_NOTUNIQUE,
-                ['courseid', 'timecreated']);
+            $attstable->add_key(
+                'objectiveid_fk',
+                XMLDB_KEY_FOREIGN,
+                ['objectiveid'],
+                'local_ai_course_assistant_objs',
+                ['id']
+            );
+            $attstable->add_index(
+                'userid_objective_time',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['userid', 'objectiveid', 'timecreated']
+            );
+            $attstable->add_index(
+                'courseid_time',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['courseid', 'timecreated']
+            );
             $dbman->create_table($attstable);
         }
 
@@ -663,8 +678,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-            $table->add_index('user_course_review', XMLDB_INDEX_NOTUNIQUE,
-                ['userid', 'courseid', 'next_review']);
+            $table->add_index(
+                'user_course_review',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['userid', 'courseid', 'next_review']
+            );
             $dbman->create_table($table);
         }
         upgrade_plugin_savepoint(true, 2026042406, 'local', 'ai_course_assistant');
@@ -673,8 +691,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
     // v3.9.24: prereq_ids column on objs table (prerequisite gap detection).
     if ($oldversion < 2026042408) {
         $table = new xmldb_table('local_ai_course_assistant_objs');
-        $field = new xmldb_field('prereq_ids', XMLDB_TYPE_CHAR, '255', null, null, null, null,
-            'external_ref');
+        $field = new xmldb_field(
+            'prereq_ids',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'external_ref'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -688,8 +714,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
     // fall back to vanilla SM-2 — backwards-compatible.
     if ($oldversion < 2026042700) {
         $table = new xmldb_table('local_ai_course_assistant_flashcards');
-        $field = new xmldb_field('objectiveid', XMLDB_TYPE_INTEGER, '10', null, null, null, null,
-            'cmid');
+        $field = new xmldb_field(
+            'objectiveid',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'cmid'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1006,8 +1040,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // in-PHP cosine-similarity loop starts to degrade (~3,000 chunks).
         // Null means RAG didn't run for this turn (off, not used, or pre-v5.4.6 row).
         $table = new xmldb_table('local_ai_course_assistant_msgs');
-        $field = new xmldb_field('rag_latency_ms', XMLDB_TYPE_INTEGER, '10', null,
-            null, null, null, 'cmid');
+        $field = new xmldb_field(
+            'rag_latency_ms',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'cmid'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1027,10 +1069,20 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('score', XMLDB_TYPE_NUMBER, '5, 4', null, XMLDB_NOTNULL, null, '1.0000');
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-            $table->add_key('objectiveida_fk', XMLDB_KEY_FOREIGN, ['objectiveida'],
-                'local_ai_course_assistant_objs', ['id']);
-            $table->add_key('objectiveidb_fk', XMLDB_KEY_FOREIGN, ['objectiveidb'],
-                'local_ai_course_assistant_objs', ['id']);
+            $table->add_key(
+                'objectiveida_fk',
+                XMLDB_KEY_FOREIGN,
+                ['objectiveida'],
+                'local_ai_course_assistant_objs',
+                ['id']
+            );
+            $table->add_key(
+                'objectiveidb_fk',
+                XMLDB_KEY_FOREIGN,
+                ['objectiveidb'],
+                'local_ai_course_assistant_objs',
+                ['id']
+            );
             $table->add_key('pair_uniq', XMLDB_KEY_UNIQUE, ['objectiveida', 'objectiveidb']);
             // objectiveidb is already indexed by its foreign key; no extra index.
             $dbman->create_table($table);
@@ -1075,8 +1127,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // them to the DB, so the cache-hit visibility feature was
         // unobservable in token analytics. One nullable int column.
         $table = new xmldb_table('local_ai_course_assistant_msgs');
-        $field = new xmldb_field('cached_tokens', XMLDB_TYPE_INTEGER, '10',
-            null, null, null, null, 'rag_latency_ms');
+        $field = new xmldb_field(
+            'cached_tokens',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'rag_latency_ms'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1091,8 +1151,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // courseid index forced a range scan over the whole course's rows for
         // the time filter, which degrades badly at production scale.
         $table = new xmldb_table('local_ai_course_assistant_msgs');
-        $index = new xmldb_index('courseid_role_timecreated', XMLDB_INDEX_NOTUNIQUE,
-            ['courseid', 'role', 'timecreated']);
+        $index = new xmldb_index(
+            'courseid_role_timecreated',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['courseid', 'role', 'timecreated']
+        );
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
@@ -1106,8 +1169,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // (never audio or transcript text) so the speech-history list can label
         // and filter past attempts. Nullable text; pre-existing rows stay NULL.
         $table = new xmldb_table('local_ai_course_assistant_practice_scores');
-        $field = new xmldb_field('session_meta', XMLDB_TYPE_TEXT, null,
-            null, null, null, null, 'session_duration');
+        $field = new xmldb_field(
+            'session_meta',
+            XMLDB_TYPE_TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'session_duration'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1143,8 +1214,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('courseid_fk_sbxa', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
-        $table->add_key('rubricid_fk_sbxa', XMLDB_KEY_FOREIGN, ['rubricid'],
-            'local_ai_course_assistant_rubrics', ['id']);
+        $table->add_key(
+            'rubricid_fk_sbxa',
+            XMLDB_KEY_FOREIGN,
+            ['rubricid'],
+            'local_ai_course_assistant_rubrics',
+            ['id']
+        );
         $table->add_index('course_visible', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'visible']);
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
@@ -1162,8 +1238,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('assignid_fk_sbxt', XMLDB_KEY_FOREIGN, ['assignid'],
-            'local_ai_course_assistant_sbx_assign', ['id']);
+        $table->add_key(
+            'assignid_fk_sbxt',
+            XMLDB_KEY_FOREIGN,
+            ['assignid'],
+            'local_ai_course_assistant_sbx_assign',
+            ['id']
+        );
         $table->add_index('assign_sort', XMLDB_INDEX_NOTUNIQUE, ['assignid', 'sortorder']);
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
@@ -1185,11 +1266,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('expires_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('assignid_fk_sbxr', XMLDB_KEY_FOREIGN, ['assignid'],
-            'local_ai_course_assistant_sbx_assign', ['id']);
+        $table->add_key(
+            'assignid_fk_sbxr',
+            XMLDB_KEY_FOREIGN,
+            ['assignid'],
+            'local_ai_course_assistant_sbx_assign',
+            ['id']
+        );
         $table->add_key('userid_fk_sbxr', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-        $table->add_key('scoreid_fk_sbxr', XMLDB_KEY_FOREIGN, ['scoreid'],
-            'local_ai_course_assistant_practice_scores', ['id']);
+        $table->add_key(
+            'scoreid_fk_sbxr',
+            XMLDB_KEY_FOREIGN,
+            ['scoreid'],
+            'local_ai_course_assistant_practice_scores',
+            ['id']
+        );
         $table->add_index('assign_user', XMLDB_INDEX_NOTUNIQUE, ['assignid', 'userid']);
         $table->add_index('status_expires', XMLDB_INDEX_NOTUNIQUE, ['status', 'expires_at']);
         if (!$dbman->table_exists($table)) {
@@ -1203,20 +1294,44 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // v6.8.21 (Soapbox slides, Phase 2): a slides flag on the assignment and
         // the deck key + slide-advance timeline on the recording.
         $table = new xmldb_table('local_ai_course_assistant_sbx_assign');
-        $field = new xmldb_field('slides_enabled', XMLDB_TYPE_INTEGER, '1', null,
-            XMLDB_NOTNULL, null, '0', 'speaking_level');
+        $field = new xmldb_field(
+            'slides_enabled',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'speaking_level'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         $table = new xmldb_table('local_ai_course_assistant_sbx_rec');
-        $field = new xmldb_field('deck_key', XMLDB_TYPE_CHAR, '255', null,
-            null, null, null, 'transcript');
+        $field = new xmldb_field(
+            'deck_key',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'transcript'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        $field = new xmldb_field('slide_timeline', XMLDB_TYPE_TEXT, null, null,
-            null, null, null, 'deck_key');
+        $field = new xmldb_field(
+            'slide_timeline',
+            XMLDB_TYPE_TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'deck_key'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1229,8 +1344,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // score column on obj_att; when set (0-1) it contributes fractionally to
         // the mastery estimate instead of the binary iscorrect.
         $table = new xmldb_table('local_ai_course_assistant_obj_att');
-        $field = new xmldb_field('score', XMLDB_TYPE_NUMBER, '4, 3', null,
-            null, null, null, 'confidence');
+        $field = new xmldb_field(
+            'score',
+            XMLDB_TYPE_NUMBER,
+            '4, 3',
+            null,
+            null,
+            null,
+            null,
+            'confidence'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1244,8 +1367,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // images for visual-design feedback. Off by default; also gated on the
         // site soapbox_slide_vision toggle.
         $table = new xmldb_table('local_ai_course_assistant_sbx_assign');
-        $field = new xmldb_field('slide_vision', XMLDB_TYPE_INTEGER, '1', null,
-            XMLDB_NOTNULL, null, '0', 'slides_enabled');
+        $field = new xmldb_field(
+            'slide_vision',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'slides_enabled'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1267,8 +1398,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // rather than an upgrade-time loop, because converting a large
         // catalogue inside the upgrade would block the site.
         $table = new xmldb_table('local_ai_course_assistant_chunks');
-        $field = new xmldb_field('embedding_bin', XMLDB_TYPE_BINARY, null, null,
-            null, null, null, 'embedding');
+        $field = new xmldb_field(
+            'embedding_bin',
+            XMLDB_TYPE_BINARY,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'embedding'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }

@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class heygen_provider extends base_provider {
-
     public function get_key(): string {
         return 'heygen';
     }
@@ -44,8 +43,13 @@ class heygen_provider extends base_provider {
 
     public function start_session(array $context): array {
         if (!$this->is_configured()) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'HeyGen: API key or avatar id (persona_id) not configured.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'HeyGen: API key or avatar id (persona_id) not configured.'
+            );
         }
         $base = rtrim($this->cfg('base_url', 'https://api.heygen.com'), '/');
 
@@ -56,8 +60,13 @@ class heygen_provider extends base_provider {
         );
         $accesstoken = (string) ($tokenresp['data']['token'] ?? '');
         if ($accesstoken === '') {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'HeyGen: streaming.create_token response missing data.token.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'HeyGen: streaming.create_token response missing data.token.'
+            );
         }
 
         $newresp = $this->http_post_json(
@@ -74,8 +83,13 @@ class heygen_provider extends base_provider {
         $roomurl = (string) ($newresp['data']['url'] ?? '');
         $sessionid = (string) ($newresp['data']['session_id'] ?? '');
         if ($roomurl === '' || $sessionid === '') {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'HeyGen: streaming.new response missing url or session_id.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'HeyGen: streaming.new response missing url or session_id.'
+            );
         }
 
         $viewer = new \moodle_url('/local/ai_course_assistant/talking_avatar_viewer.php', [

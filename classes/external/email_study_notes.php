@@ -29,7 +29,6 @@ use core_external\external_value;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class email_study_notes extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -56,16 +55,23 @@ class email_study_notes extends external_api {
         // so opting out is rare in practice — but the link is required for
         // CAN-SPAM consistency across every SOLA email type.
         $useremail = (string) $USER->email;
-        if (\local_ai_course_assistant\email_optout::is_opted_out($useremail,
-                \local_ai_course_assistant\email_optout::TYPE_STUDY_NOTES)) {
+        if (
+            \local_ai_course_assistant\email_optout::is_opted_out(
+                $useremail,
+                \local_ai_course_assistant\email_optout::TYPE_STUDY_NOTES
+            )
+        ) {
             return ['success' => false];
         }
         $reason = 'You are receiving this because you clicked "Email my notes" '
             . 'from the SOLA chat drawer.';
 
         $textbody = \local_ai_course_assistant\email_footer::append_text(
-            $params['notes'], $useremail,
-            \local_ai_course_assistant\email_optout::TYPE_STUDY_NOTES, $reason);
+            $params['notes'],
+            $useremail,
+            \local_ai_course_assistant\email_optout::TYPE_STUDY_NOTES,
+            $reason
+        );
         $htmlbody = '<div style="font-family:sans-serif;max-width:600px">'
             . '<h2>' . $display_name . ' Study Notes</h2>'
             . '<p><strong>Course:</strong> ' . htmlspecialchars($course->fullname) . '</p>'
@@ -73,8 +79,11 @@ class email_study_notes extends external_api {
             . '<div style="white-space:pre-wrap">' . htmlspecialchars($params['notes']) . '</div>'
             . '</div>';
         $htmlbody = \local_ai_course_assistant\email_footer::append_html(
-            $htmlbody, $useremail,
-            \local_ai_course_assistant\email_optout::TYPE_STUDY_NOTES, $reason);
+            $htmlbody,
+            $useremail,
+            \local_ai_course_assistant\email_optout::TYPE_STUDY_NOTES,
+            $reason
+        );
 
         $message = new \core\message\message();
         $message->component = 'local_ai_course_assistant';

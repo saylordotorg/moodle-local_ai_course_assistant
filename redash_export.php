@@ -108,7 +108,9 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 // -1 is the "parameter absent" sentinel: absent means the configured lookback
 // window, while an explicit since=0 still means an all-time export.
 $since = redash_export_request::resolve_since(
-    optional_param('since', -1, PARAM_INT), time());
+    optional_param('since', -1, PARAM_INT),
+    time()
+);
 
 // Section allow-list. Building only what the caller asked for keeps the heavy
 // blocks (raw transcript excerpt, Learning Radar query/response bodies) out of
@@ -139,12 +141,14 @@ if (!empty($missingparents)) {
         'requires' => $missingparents,
         'hint' => 'Add the parent, for example sections='
             . implode(',', array_unique(array_merge(
-                array_values($missingparents), array_keys($missingparents)))),
+                array_values($missingparents),
+                array_keys($missingparents)
+            ))),
     ]);
     exit;
 }
 
-$wants = function(string $section) use ($sections): bool {
+$wants = function (string $section) use ($sections): bool {
     return in_array($section, $sections, true);
 };
 
@@ -164,8 +168,11 @@ if (!$anonymize) {
     }
     try {
         \local_ai_course_assistant\audit_logger::log(
-            'redash_export_deanonymized', 0, $courseid,
-            ['ip' => getremoteaddr(), 'since' => $since]);
+            'redash_export_deanonymized',
+            0,
+            $courseid,
+            ['ip' => getremoteaddr(), 'since' => $since]
+        );
     } catch (\Throwable $e) {
         // Best-effort audit; never block the export on a logging failure.
         $unused = $e;
@@ -252,7 +259,10 @@ foreach ($courseids as $cid) {
             // Identity via the shared helper: this block used to emit the real
             // userid next to the pseudonym, which defeated the pseudonym.
             $studentusage[] = redash_export_request::learner_identity(
-                (int) $record->userid, $anonymize, $record->firstname, $record->lastname
+                (int) $record->userid,
+                $anonymize,
+                $record->firstname,
+                $record->lastname
             ) + [
                 'message_count' => (int) $record->message_count,
                 'last_active' => (int) $record->last_active,
@@ -405,8 +415,10 @@ foreach ($radarrecords as $row) {
         $pendinguser = $row;
         continue;
     }
-    if ($row->role === 'assistant' && $pendinguser !== null
-            && (int) $pendinguser->conversationid === (int) $row->conversationid) {
+    if (
+        $row->role === 'assistant' && $pendinguser !== null
+            && (int) $pendinguser->conversationid === (int) $row->conversationid
+    ) {
         // The person here is the admin who ran the Learning Radar query rather
         // than a learner, but it is still a real user id and was emitted raw
         // regardless of the anonymize flag. Same helper, same gate.

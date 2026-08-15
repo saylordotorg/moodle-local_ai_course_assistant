@@ -34,7 +34,6 @@ use local_ai_course_assistant\prompt\section;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class context_builder {
-
     /**
      * Maximum system prompt length in characters.
      * Hosted large-context models (e.g. Claude Sonnet 4.6, 200K tokens) leave
@@ -167,7 +166,7 @@ class context_builder {
         // needs a thin breadcrumb. Halve the cap so a long course stays
         // a one-screen overview instead of dominating the prompt.
         // (Wide-dump skip decision happens below; this trim runs whenever
-        //  a usable current page IS present.)
+        // a usable current page IS present.)
 
         // v5.3.6: Resolve the current-page content EARLY so we can decide
         // whether to skip the course-wide content dump. When the learner is
@@ -184,8 +183,10 @@ class context_builder {
             // and leaves budget for structure/instructions. (With RAG on, the
             // page is instead sliced by its own relevant chunks, current-page
             // biased, so this path only affects RAG-off installs.)
-            $maxpagechars = (int) (get_config('local_ai_course_assistant',
-                'current_page_content_maxchars') ?: 8000);
+            $maxpagechars = (int) (get_config(
+                'local_ai_course_assistant',
+                'current_page_content_maxchars'
+            ) ?: 8000);
             $maxpagechars = max(500, min(8000, $maxpagechars));
             $resolvedpagecontent = self::get_module_content($pageid, $maxpagechars);
         }
@@ -535,7 +536,12 @@ class context_builder {
             $maxpairs = ($rawhist === false || $rawhist === '') ? 20 : (int) $rawhist;
             $historytokens = $maxpairs * self::HISTORY_TOKENS_PER_PAIR;
             $budget = self::effective_budget_chars(
-                $budget, $windowtokens, $outputtokens, $historytokens, $lang);
+                $budget,
+                $windowtokens,
+                $outputtokens,
+                $historytokens,
+                $lang
+            );
         }
 
         // v5.6.0: proportional-budget model. Compute per-section max_chars
@@ -566,8 +572,10 @@ class context_builder {
         // Fix: if the reminder landed but the page content did not, reassemble
         // without the reminder. This frees ~386 chars of budget for other
         // sections too, so the side effect is positive.
-        if (!empty($assembled['breakdown']['page_grounding_reminder']['used'])
-                && empty($assembled['breakdown']['current_page_content']['used'])) {
+        if (
+            !empty($assembled['breakdown']['page_grounding_reminder']['used'])
+                && empty($assembled['breakdown']['current_page_content']['used'])
+        ) {
             $sections = array_values(array_filter(
                 $sections,
                 static function ($s) {
@@ -660,8 +668,7 @@ class context_builder {
                         return substr($raw, 0, $maxchars);
                     }
                 }
-
-            } elseif ($modname === 'book') {
+            } else if ($modname === 'book') {
                 $chapters = $DB->get_records(
                     'book_chapters',
                     ['bookid' => $instance, 'hidden' => 0],
@@ -710,10 +717,18 @@ class context_builder {
      */
     private static function personalisation_fingerprint(int $userid, int $courseid): string {
         global $DB;
-        $goalsmod = (int)$DB->get_field('local_ai_course_assistant_learner_goals', 'timemodified',
-            ['userid' => $userid, 'courseid' => $courseid], IGNORE_MISSING);
-        $memmod = (int)$DB->get_field('local_ai_course_assistant_learner_memory', 'timemodified',
-            ['userid' => $userid, 'courseid' => $courseid], IGNORE_MISSING);
+        $goalsmod = (int)$DB->get_field(
+            'local_ai_course_assistant_learner_goals',
+            'timemodified',
+            ['userid' => $userid, 'courseid' => $courseid],
+            IGNORE_MISSING
+        );
+        $memmod = (int)$DB->get_field(
+            'local_ai_course_assistant_learner_memory',
+            'timemodified',
+            ['userid' => $userid, 'courseid' => $courseid],
+            IGNORE_MISSING
+        );
         $combined = max($goalsmod, $memmod);
         return (string)$combined;
     }
@@ -766,13 +781,20 @@ class context_builder {
      * @param string $lang learner language code
      */
     public static function effective_budget_chars(
-        int $rawbudget, int $windowtokens, int $outputtokens, int $historytokens, string $lang
+        int $rawbudget,
+        int $windowtokens,
+        int $outputtokens,
+        int $historytokens,
+        string $lang
     ): int {
         if ($windowtokens <= 0) {
             return $rawbudget;
         }
         $ceiling = token_estimator::budget_chars_for_window(
-            $windowtokens, $outputtokens > 0 ? $outputtokens : 512, $historytokens, $lang !== '' ? $lang : 'en'
+            $windowtokens,
+            $outputtokens > 0 ? $outputtokens : 512,
+            $historytokens,
+            $lang !== '' ? $lang : 'en'
         );
         return max(self::MIN_BUDGET_FLOOR, min($rawbudget, $ceiling));
     }
@@ -968,11 +990,11 @@ class context_builder {
             'flashcards_enabled',
             'code_sandbox_enabled',
             'external_resources_enabled',
-            'socratic_verbose',     // v4.11.0
-            'wellbeing_enabled',    // v4.11.0 (drives a House-style line)
-            'offtopic_enabled',     // v4.11.0 (drives a marker entry)
-            'prompt_verbosity',     // v4.12.0 (concise/standard/verbose Socratic)
-            'prompt_budget_chars',  // v4.12.0 (assembly budget changes section drops)
+            'socratic_verbose', // v4.11.0
+            'wellbeing_enabled', // v4.11.0 (drives a House-style line)
+            'offtopic_enabled', // v4.11.0 (drives a marker entry)
+            'prompt_verbosity', // v4.12.0 (concise/standard/verbose Socratic)
+            'prompt_budget_chars', // v4.12.0 (assembly budget changes section drops)
         ];
         foreach ($globals as $g) {
             $bits .= ((int) (bool) get_config('local_ai_course_assistant', $g));
@@ -1130,8 +1152,7 @@ class context_builder {
                 } catch (\Throwable $e) {
                     // Skip unavailable resources gracefully.
                 }
-
-            } elseif ($cm->modname === 'book') {
+            } else if ($cm->modname === 'book') {
                 try {
                     $chapters = $DB->get_records(
                         'book_chapters',
@@ -1185,8 +1206,10 @@ class context_builder {
         if (has_capability('moodle/site:config', $systemcontext, $userid)) {
             return 'administrator';
         }
-        if (has_capability('local/ai_course_assistant:manage', $coursecontext, $userid)
-                || has_capability('moodle/course:update', $coursecontext, $userid)) {
+        if (
+            has_capability('local/ai_course_assistant:manage', $coursecontext, $userid)
+                || has_capability('moodle/course:update', $coursecontext, $userid)
+        ) {
             return 'academic_support';
         }
         return 'student';

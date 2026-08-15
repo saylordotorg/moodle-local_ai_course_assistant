@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\provider\base_provider::with_transient_retry
  */
 final class provider_retry_test extends \advanced_testcase {
-
     public function test_retries_then_succeeds(): void {
         $this->resetAfterTest();
         set_config('backend_retry_attempts', 2, 'local_ai_course_assistant');

@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class instructor_analytics {
-
     /**
      * Header summary tile. Active learners (with at least one user-role msg
      * in the period), total user messages, average per learner, last
@@ -191,8 +190,12 @@ class instructor_analytics {
                    AND timecreated > :since
                  GROUP BY cmid
                  ORDER BY q_count DESC";
-        $rows = $DB->get_records_sql($sql,
-            ['courseid' => $courseid, 'since' => $since], 0, $limit);
+        $rows = $DB->get_records_sql(
+            $sql,
+            ['courseid' => $courseid, 'since' => $since],
+            0,
+            $limit
+        );
         $out = [];
         foreach ($rows as $r) {
             $cmid = (int) $r->cmid;
@@ -297,12 +300,14 @@ class instructor_analytics {
         global $DB;
         $coursecontext = \context_course::instance($courseid);
         $enrolled = get_enrolled_users($coursecontext, '', 0, 'u.id', null, 0, 0, true);
-        $enrolledids = array_map(function ($u) { return (int) $u->id; }, array_values($enrolled));
+        $enrolledids = array_map(function ($u) {
+            return (int) $u->id;
+        }, array_values($enrolled));
         if (empty($enrolledids)) {
             return ['not_seen' => 0, 'enrolled' => 0, 'sample_userids' => []];
         }
         $threshold = time() - ($days * 86400);
-        list($insql, $params) = $DB->get_in_or_equal($enrolledids, SQL_PARAMS_NAMED, 'uid');
+        [$insql, $params] = $DB->get_in_or_equal($enrolledids, SQL_PARAMS_NAMED, 'uid');
         $params['courseid'] = $courseid;
         $params['threshold'] = $threshold;
         $activeids = $DB->get_fieldset_sql(

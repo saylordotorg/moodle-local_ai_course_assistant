@@ -37,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\anonymizer
  */
 final class anonymizer_test extends \basic_testcase {
-
     public function test_same_user_always_gets_the_same_pseudonym(): void {
         $this->assertSame(anonymizer::name(4217), anonymizer::name(4217));
     }
@@ -45,8 +44,11 @@ final class anonymizer_test extends \basic_testcase {
     public function test_pseudonym_does_not_contain_the_real_id(): void {
         // The whole point: the label must not be a re-encoding of the input.
         foreach ([1, 42, 4217, 100000, 999999] as $userid) {
-            $this->assertStringNotContainsString((string) $userid, anonymizer::name($userid),
-                "pseudonym for {$userid} leaks the id");
+            $this->assertStringNotContainsString(
+                (string) $userid,
+                anonymizer::name($userid),
+                "pseudonym for {$userid} leaks the id"
+            );
         }
     }
 

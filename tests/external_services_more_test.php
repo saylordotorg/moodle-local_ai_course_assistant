@@ -37,7 +37,6 @@ use local_ai_course_assistant\external\get_analytics_by_course;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class external_services_more_test extends \advanced_testcase {
-
     /**
      * Common: enrolled student + setUser. Same pattern as v5.3.20.
      *
@@ -62,12 +61,22 @@ final class external_services_more_test extends \advanced_testcase {
 
         // Pass a rating outside 1-5; the service must clamp to the range.
         $result = submit_feedback::execute(
-            (int)$course->id, 99, 'Great chat session.',
-            'Chrome 134', 'macOS', 'desktop', '1920x1080', 'Mozilla/5.0', 'https://x/y');
+            (int)$course->id,
+            99,
+            'Great chat session.',
+            'Chrome 134',
+            'macOS',
+            'desktop',
+            '1920x1080',
+            'Mozilla/5.0',
+            'https://x/y'
+        );
 
         $this->assertSame(['success' => true], $result);
-        $row = $DB->get_record('local_ai_course_assistant_feedback',
-            ['userid' => $user->id, 'courseid' => $course->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_feedback',
+            ['userid' => $user->id, 'courseid' => $course->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals(5, (int)$row->rating, 'Rating must be clamped to <=5.');
         $this->assertEquals('Great chat session.', $row->comment);
@@ -79,11 +88,21 @@ final class external_services_more_test extends \advanced_testcase {
         [$course, $user] = $this->enrolled_student();
 
         submit_feedback::execute(
-            (int)$course->id, -3, '',
-            '', '', '', '', '', '');
+            (int)$course->id,
+            -3,
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
+        );
 
-        $row = $DB->get_record('local_ai_course_assistant_feedback',
-            ['userid' => $user->id, 'courseid' => $course->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_feedback',
+            ['userid' => $user->id, 'courseid' => $course->id]
+        );
         $this->assertEquals(1, (int)$row->rating, 'Rating must be clamped to >=1.');
     }
 
@@ -95,15 +114,31 @@ final class external_services_more_test extends \advanced_testcase {
         $long_comment = str_repeat('x', 5000);
         $long_ua = str_repeat('y', 1000);
         submit_feedback::execute(
-            (int)$course->id, 3, $long_comment,
-            '', '', '', '', $long_ua, '');
+            (int)$course->id,
+            3,
+            $long_comment,
+            '',
+            '',
+            '',
+            '',
+            $long_ua,
+            ''
+        );
 
-        $row = $DB->get_record('local_ai_course_assistant_feedback',
-            ['userid' => $user->id, 'courseid' => $course->id]);
-        $this->assertLessThanOrEqual(2000, strlen($row->comment),
-            'Comment must be truncated to fit DB column.');
-        $this->assertLessThanOrEqual(500, strlen($row->user_agent),
-            'User agent must be truncated to fit DB column.');
+        $row = $DB->get_record(
+            'local_ai_course_assistant_feedback',
+            ['userid' => $user->id, 'courseid' => $course->id]
+        );
+        $this->assertLessThanOrEqual(
+            2000,
+            strlen($row->comment),
+            'Comment must be truncated to fit DB column.'
+        );
+        $this->assertLessThanOrEqual(
+            500,
+            strlen($row->user_agent),
+            'User agent must be truncated to fit DB column.'
+        );
     }
 
     public function test_submit_feedback_clean_returnvalue_round_trip(): void {
@@ -111,9 +146,20 @@ final class external_services_more_test extends \advanced_testcase {
         [$course, $user] = $this->enrolled_student();
 
         $result = submit_feedback::execute(
-            (int)$course->id, 4, 'OK', '', '', '', '', '', '');
+            (int)$course->id,
+            4,
+            'OK',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
+        );
         $clean = \core_external\external_api::clean_returnvalue(
-            submit_feedback::execute_returns(), $result);
+            submit_feedback::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 
@@ -127,21 +173,30 @@ final class external_services_more_test extends \advanced_testcase {
         [$course, $user] = $this->enrolled_student();
 
         // Signature: (courseid, rubricid, session_type, scores_json,
-        //            overall_score, ai_feedback, session_duration)
+        // overall_score, ai_feedback, session_duration)
         // Scores is a JSON list of {name, score[, feedback]} entries.
         $scores = json_encode([
             ['name' => 'clarity', 'score' => 4],
-            ['name' => 'depth',   'score' => 3, 'feedback' => 'Could go deeper'],
+            ['name' => 'depth', 'score' => 3, 'feedback' => 'Could go deeper'],
         ]);
         $result = save_practice_score::execute(
-            (int)$course->id, 0, 'conversation', $scores, 4, 'Good session.', 180);
+            (int)$course->id,
+            0,
+            'conversation',
+            $scores,
+            4,
+            'Good session.',
+            180
+        );
 
         $this->assertArrayHasKey('success', $result);
         $this->assertTrue($result['success']);
         $this->assertArrayHasKey('scoreid', $result);
         $this->assertGreaterThan(0, $result['scoreid']);
-        $row = $DB->get_record('local_ai_course_assistant_practice_scores',
-            ['userid' => $user->id, 'courseid' => $course->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_practice_scores',
+            ['userid' => $user->id, 'courseid' => $course->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals('conversation', $row->session_type);
     }
@@ -154,12 +209,23 @@ final class external_services_more_test extends \advanced_testcase {
         [$course, $user] = $this->enrolled_student();
 
         $result = save_practice_score::execute(
-            (int)$course->id, 0, 'conversation', '[]', 0, '', 0);
+            (int)$course->id,
+            0,
+            'conversation',
+            '[]',
+            0,
+            '',
+            0
+        );
 
         $this->assertFalse($result['success']);
-        $this->assertEquals(0,
-            $DB->count_records('local_ai_course_assistant_practice_scores',
-                ['userid' => $user->id]));
+        $this->assertEquals(
+            0,
+            $DB->count_records(
+                'local_ai_course_assistant_practice_scores',
+                ['userid' => $user->id]
+            )
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -170,14 +236,18 @@ final class external_services_more_test extends \advanced_testcase {
         $this->resetAfterTest();
         [$course, $user] = $this->enrolled_student();
 
-        $result = email_study_notes::execute((int)$course->id,
-            "Notes:\n- Photosynthesis happens in chloroplasts.\n- ATP is energy.");
+        $result = email_study_notes::execute(
+            (int)$course->id,
+            "Notes:\n- Photosynthesis happens in chloroplasts.\n- ATP is energy."
+        );
 
         $this->assertArrayHasKey('success', $result);
         // Email may not actually send in test env (no mail config), but
         // the call must not throw and the return shape must round-trip.
         $clean = \core_external\external_api::clean_returnvalue(
-            email_study_notes::execute_returns(), $result);
+            email_study_notes::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 
@@ -204,7 +274,9 @@ final class external_services_more_test extends \advanced_testcase {
         // The exact keys are defined in execute_returns; round-trip the
         // result through it so we know the contract holds.
         $clean = \core_external\external_api::clean_returnvalue(
-            get_analytics_overall::execute_returns(), $result);
+            get_analytics_overall::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 
@@ -219,7 +291,9 @@ final class external_services_more_test extends \advanced_testcase {
         $result = get_analytics_by_course::execute(0, 0);
 
         $clean = \core_external\external_api::clean_returnvalue(
-            get_analytics_by_course::execute_returns(), $result);
+            get_analytics_by_course::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 

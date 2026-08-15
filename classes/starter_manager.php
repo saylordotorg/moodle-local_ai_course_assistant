@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
 class starter_manager {
-
     /** Config key for global custom starters. */
     const CONFIG_KEY = 'custom_starters';
 
@@ -303,7 +302,7 @@ class starter_manager {
         }
 
         // Sort by sort_order.
-        usort($result, function($a, $b) {
+        usort($result, function ($a, $b) {
             return ($a['sort_order'] ?? 99) <=> ($b['sort_order'] ?? 99);
         });
 

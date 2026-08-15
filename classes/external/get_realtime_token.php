@@ -29,7 +29,6 @@ use core_external\external_value;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_realtime_token extends external_api {
-
     /**
      * Test-only override for the OpenAI Realtime curl call (v5.4.0).
      *
@@ -144,10 +143,15 @@ class get_realtime_token extends external_api {
 
         // Resolve active Realtime provider via the voice_providers registry.
         $cfg = \local_ai_course_assistant\voice_registry::resolve(
-            \local_ai_course_assistant\voice_registry::CAPABILITY_REALTIME);
+            \local_ai_course_assistant\voice_registry::CAPABILITY_REALTIME
+        );
         if ($cfg === null) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'No voice provider configured for Realtime.');
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'No voice provider configured for Realtime.'
+            );
         }
 
         // xAI Realtime: the master API key must never leave the server, so
@@ -159,15 +163,23 @@ class get_realtime_token extends external_api {
             $proxyurl = get_config('local_ai_course_assistant', 'xai_proxy_url');
             $jwtsecret = get_config('local_ai_course_assistant', 'xai_proxy_jwt_secret');
             if (empty($proxyurl) || empty($jwtsecret)) {
-                throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                    'xAI Realtime proxy is not configured. Set xai_proxy_url and xai_proxy_jwt_secret in SOLA admin settings, or switch voice to OpenAI.');
+                throw new \moodle_exception(
+                    'error',
+                    'local_ai_course_assistant',
+                    '',
+                    'xAI Realtime proxy is not configured. Set xai_proxy_url and xai_proxy_jwt_secret in SOLA admin settings, or switch voice to OpenAI.'
+                );
             }
             // SSRF check: the proxy URL is wss://; the validator wants https://
             // for the host-and-IP-range check, so map for validation only.
             $proxyurlforcheck = preg_replace('/^wss:\/\//i', 'https://', $proxyurl);
             if (!\local_ai_course_assistant\security::is_safe_provider_url($proxyurlforcheck)) {
-                throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                    'xAI Realtime proxy URL failed SSRF validation.');
+                throw new \moodle_exception(
+                    'error',
+                    'local_ai_course_assistant',
+                    '',
+                    'xAI Realtime proxy URL failed SSRF validation.'
+                );
             }
             $now = time();
             $header = self::b64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
@@ -209,8 +221,12 @@ class get_realtime_token extends external_api {
         $data = json_decode($response, true);
         $token = $data['client_secret']['value'] ?? ($data['value'] ?? '');
         if (empty($token)) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'Unexpected response from OpenAI Realtime API: ' . substr($response, 0, 200));
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Unexpected response from OpenAI Realtime API: ' . substr($response, 0, 200)
+            );
         }
 
         return [

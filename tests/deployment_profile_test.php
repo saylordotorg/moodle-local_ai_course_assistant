@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\deployment_profile
  */
 final class deployment_profile_test extends \advanced_testcase {
-
     public function test_apply_small_context_writes_expected_keys(): void {
         $this->resetAfterTest();
         deployment_profile::apply('self_hosted_small');

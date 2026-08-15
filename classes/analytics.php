@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class analytics {
-
     /**
      * Upper bound on message rows pulled into PHP for text-sampling displays
      * (hotspots, common prompts, keywords). Caps memory on large courses; the
@@ -530,7 +529,10 @@ class analytics {
                 'total_completion_tokens' => $completiontokens,
                 'total_tokens' => (int) $row->total_tokens,
                 'estimated_cost_usd' => token_cost_manager::estimate_cost(
-                    $row->model_name, $prompttokens, $completiontokens),
+                    $row->model_name,
+                    $prompttokens,
+                    $completiontokens
+                ),
             ];
         }
         $rs->close();
@@ -842,7 +844,7 @@ class analytics {
             // Average grade from course total grade item.
             $avggrade = 0.0;
             try {
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
                 $inparams['courseid'] = $courseid;
                 $sql = "SELECT AVG(gg.finalgrade) AS avg_grade
                           FROM {grade_grades} gg
@@ -862,7 +864,7 @@ class analytics {
             // Completion rate.
             $completionrate = 0.0;
             try {
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
                 $inparams['courseid'] = $courseid;
                 $sql = "SELECT COUNT(cc.id) AS completed
                           FROM {course_completions} cc
@@ -878,7 +880,7 @@ class analytics {
             // Average days to completion.
             $avgdays = 0.0;
             try {
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
                 $inparams['courseid'] = $courseid;
                 $sql = "SELECT AVG(cc.timecompleted - ue.timestart) AS avg_seconds
                           FROM {course_completions} cc

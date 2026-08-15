@@ -33,7 +33,6 @@ use local_ai_course_assistant\struggle_classifier;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class struggle_signal_review extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:struggle_signal_review', 'local_ai_course_assistant');
     }

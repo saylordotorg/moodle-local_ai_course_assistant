@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class next_best_action {
-
     /** @var int Default recommendation count. */
     private const DEFAULT_COUNT = 3;
 

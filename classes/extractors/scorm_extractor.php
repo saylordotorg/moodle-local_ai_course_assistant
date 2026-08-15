@@ -29,7 +29,6 @@ namespace local_ai_course_assistant\extractors;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scorm_extractor {
-
     /** @var int Default maximum package size in MB before we skip. */
     private const DEFAULT_MAX_MB = 100;
 

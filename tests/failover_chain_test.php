@@ -25,7 +25,6 @@ namespace local_ai_course_assistant\provider;
  * @covers     \local_ai_course_assistant\provider\failover_chain
  */
 final class failover_chain_test extends \advanced_testcase {
-
     /**
      * Primary succeeds: fallback is never invoked, returned text comes from primary.
      */
@@ -54,8 +53,10 @@ final class failover_chain_test extends \advanced_testcase {
             ['provider' => $fallback, 'label' => 'fallback-label'],
         ], ['audit' => true, 'courseid' => 0, 'userid' => 0]);
 
-        $beforecount = $DB->count_records('local_ai_course_assistant_audit',
-            ['action' => failover_chain::AUDIT_EVENT_FALLTHROUGH]);
+        $beforecount = $DB->count_records(
+            'local_ai_course_assistant_audit',
+            ['action' => failover_chain::AUDIT_EVENT_FALLTHROUGH]
+        );
 
         $result = $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
 
@@ -63,10 +64,15 @@ final class failover_chain_test extends \advanced_testcase {
         $this->assertEquals(1, $primary->callcount);
         $this->assertEquals(1, $fallback->callcount);
 
-        $aftercount = $DB->count_records('local_ai_course_assistant_audit',
-            ['action' => failover_chain::AUDIT_EVENT_FALLTHROUGH]);
-        $this->assertEquals($beforecount + 1, $aftercount,
-            'Expected exactly one failover_fallthrough audit row to be written.');
+        $aftercount = $DB->count_records(
+            'local_ai_course_assistant_audit',
+            ['action' => failover_chain::AUDIT_EVENT_FALLTHROUGH]
+        );
+        $this->assertEquals(
+            $beforecount + 1,
+            $aftercount,
+            'Expected exactly one failover_fallthrough audit row to be written.'
+        );
     }
 
     /**
@@ -100,8 +106,11 @@ final class failover_chain_test extends \advanced_testcase {
         // Second call should skip the primary (circuit open) and go straight to fallback.
         $result = $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi again']]);
         $this->assertEquals('FALLBACK-OUT', $result);
-        $this->assertEquals(1, $primary->callcount,
-            'Primary should NOT have been called a second time while its circuit is open.');
+        $this->assertEquals(
+            1,
+            $primary->callcount,
+            'Primary should NOT have been called a second time while its circuit is open.'
+        );
         $this->assertEquals(2, $fallback->callcount);
     }
 
@@ -119,16 +128,25 @@ final class failover_chain_test extends \advanced_testcase {
         ]);
         $captured = [];
         try {
-            $chain->chat_completion_stream('sys', [['role' => 'user', 'content' => 'hi']],
+            $chain->chat_completion_stream(
+                'sys',
+                [['role' => 'user', 'content' => 'hi']],
                 function (string $chunk) use (&$captured) {
                     $captured[] = $chunk;
-                });
+                }
+            );
             $this->fail('Expected an exception to propagate after mid-stream failure.');
         } catch (\Throwable $e) {
-            $this->assertEquals(['hello'], $captured,
-                'Expected the first chunk from the primary to have been delivered before the failure.');
-            $this->assertEquals(0, $fallback->callcount,
-                'Fallback must NOT be invoked when streaming has already started.');
+            $this->assertEquals(
+                ['hello'],
+                $captured,
+                'Expected the first chunk from the primary to have been delivered before the failure.'
+            );
+            $this->assertEquals(
+                0,
+                $fallback->callcount,
+                'Fallback must NOT be invoked when streaming has already started.'
+            );
         }
     }
 
@@ -141,9 +159,10 @@ final class failover_chain_test extends \advanced_testcase {
      * @return object Anonymous class implementing provider_interface with a public $callcount.
      */
     private static function fake_provider(string $output, bool $shouldfail): object {
-        return new class($output, $shouldfail) implements provider_interface {
+        return new class ($output, $shouldfail) implements provider_interface {
             public int $callcount = 0;
-            public function __construct(private string $output, private bool $shouldfail) {}
+            public function __construct(private string $output, private bool $shouldfail) {
+            }
             public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
                 $this->callcount++;
                 if ($this->shouldfail) {
@@ -173,9 +192,10 @@ final class failover_chain_test extends \advanced_testcase {
      * @return object
      */
     private static function fake_streaming_provider(array $chunks, bool $failafterfirst): object {
-        return new class($chunks, $failafterfirst) implements provider_interface {
+        return new class ($chunks, $failafterfirst) implements provider_interface {
             public int $callcount = 0;
-            public function __construct(private array $chunks, private bool $failafterfirst) {}
+            public function __construct(private array $chunks, private bool $failafterfirst) {
+            }
             public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
                 $this->callcount++;
                 return implode('', $this->chunks);

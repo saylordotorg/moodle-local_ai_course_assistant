@@ -25,7 +25,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\struggle_classifier
  */
 final class struggle_classifier_test extends \advanced_testcase {
-
     public function test_stage1_score_zero_for_neutral_message(): void {
         $this->assertEquals(0, struggle_classifier::stage1_score('Hello, can you help me with chapter 3?'));
     }
@@ -83,8 +82,10 @@ final class struggle_classifier_test extends \advanced_testcase {
 
         struggle_classifier::record_stage1($user->id, $course->id, 'sess-abc', 'Photosynthesis', 2);
 
-        $row = $DB->get_record('local_ai_course_assistant_struggle_signal',
-            ['userid' => $user->id, 'courseid' => $course->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_struggle_signal',
+            ['userid' => $user->id, 'courseid' => $course->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals('unprocessed', $row->stage2_label);
         $this->assertEquals(2, $row->stage1_score);
@@ -101,8 +102,13 @@ final class struggle_classifier_test extends \advanced_testcase {
 
         // Threshold is 3 candidates per session with maxscore >= 2.
         for ($i = 0; $i < 4; $i++) {
-            struggle_classifier::record_stage1($user->id, $course->id, 'sess-X',
-                'Cellular respiration', 2);
+            struggle_classifier::record_stage1(
+                $user->id,
+                $course->id,
+                'sess-X',
+                'Cellular respiration',
+                2
+            );
         }
 
         $notesrecorded = struggle_classifier::process_pending();
@@ -142,14 +148,22 @@ final class struggle_classifier_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         for ($i = 0; $i < 4; $i++) {
-            struggle_classifier::record_stage1($user->id, $course->id, 'sess-Z',
-                'Topic', 2);
+            struggle_classifier::record_stage1(
+                $user->id,
+                $course->id,
+                'sess-Z',
+                'Topic',
+                2
+            );
         }
 
         struggle_classifier::process_pending();
 
-        $this->assertEquals(0, $DB->count_records('local_ai_course_assistant_outreach_log'),
+        $this->assertEquals(
+            0,
+            $DB->count_records('local_ai_course_assistant_outreach_log'),
             'Struggle classifier must NEVER write to the outreach log — the only path '
-            . 'is a private memory note.');
+            . 'is a private memory note.'
+        );
     }
 }

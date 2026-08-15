@@ -56,8 +56,11 @@ $due = flashcard_manager::get_due((int) $USER->id, $courseid, 30);
 echo $OUTPUT->header();
 echo '<div class="aica-flashcards" style="max-width:720px;margin:0 auto">';
 echo html_writer::tag('h2', get_string('flashcards:title', 'local_ai_course_assistant'));
-echo html_writer::tag('p', get_string('flashcards:intro', 'local_ai_course_assistant'),
-    ['class' => 'text-muted']);
+echo html_writer::tag(
+    'p',
+    get_string('flashcards:intro', 'local_ai_course_assistant'),
+    ['class' => 'text-muted']
+);
 
 if (empty($due)) {
     echo '<div style="padding:24px;border:1px dashed #d1d5db;border-radius:10px;text-align:center;color:#6b7280">';

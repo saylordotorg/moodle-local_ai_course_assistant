@@ -27,7 +27,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface validator_interface {
-
     /**
      * Validate an AI response.
      *

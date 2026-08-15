@@ -93,8 +93,11 @@ $pageurl = new moodle_url('/local/ai_course_assistant/demo_admin.php');
 
 echo html_writer::start_tag('div', ['class' => 'card mb-3', 'style' => 'max-width:720px']);
 echo html_writer::start_tag('div', ['class' => 'card-body']);
-echo html_writer::tag('h3', get_string('demo:step1', 'local_ai_course_assistant'),
-    ['class' => 'mb-2', 'style' => 'font-size:18px']);
+echo html_writer::tag(
+    'h3',
+    get_string('demo:step1', 'local_ai_course_assistant'),
+    ['class' => 'mb-2', 'style' => 'font-size:18px']
+);
 
 if ($existing) {
     $badgeclass = !$existing->visible ? 'badge badge-secondary' : 'badge badge-warning';
@@ -106,8 +109,10 @@ if ($existing) {
         'shortname' => s($existing->shortname),
         'id' => $existing->id,
     ]);
-    echo html_writer::tag('p',
-        $existsmsg . ' <span class="' . $badgeclass . '">' . $badgetext . '</span>');
+    echo html_writer::tag(
+        'p',
+        $existsmsg . ' <span class="' . $badgeclass . '">' . $badgetext . '</span>'
+    );
     echo html_writer::link(
         new moodle_url('/course/view.php', ['id' => $existing->id]),
         get_string('demo:open_course', 'local_ai_course_assistant'),
@@ -131,8 +136,11 @@ echo html_writer::end_tag('div');
 if ($existing) {
     echo html_writer::start_tag('div', ['class' => 'card mb-3', 'style' => 'max-width:720px']);
     echo html_writer::start_tag('div', ['class' => 'card-body']);
-    echo html_writer::tag('h3', get_string('demo:step2', 'local_ai_course_assistant'),
-        ['class' => 'mb-2', 'style' => 'font-size:18px']);
+    echo html_writer::tag(
+        'h3',
+        get_string('demo:step2', 'local_ai_course_assistant'),
+        ['class' => 'mb-2', 'style' => 'font-size:18px']
+    );
     echo html_writer::tag('p', get_string('demo:seed_intro', 'local_ai_course_assistant'));
 
     echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(false), 'class' => 'form-inline']);
@@ -141,8 +149,12 @@ if ($existing) {
     echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'courseid', 'value' => $existing->id]);
 
     echo html_writer::start_tag('div', ['class' => 'form-group mr-2']);
-    echo html_writer::label(get_string('demo:users_label', 'local_ai_course_assistant'),
-        'users', false, ['class' => 'mr-1']);
+    echo html_writer::label(
+        get_string('demo:users_label', 'local_ai_course_assistant'),
+        'users',
+        false,
+        ['class' => 'mr-1']
+    );
     echo html_writer::empty_tag('input', [
         'type' => 'number', 'id' => 'users', 'name' => 'users',
         'value' => 15, 'min' => 1, 'max' => 100,
@@ -151,8 +163,12 @@ if ($existing) {
     echo html_writer::end_tag('div');
 
     echo html_writer::start_tag('div', ['class' => 'form-group mr-2']);
-    echo html_writer::label(get_string('demo:weeks_label', 'local_ai_course_assistant'),
-        'weeks', false, ['class' => 'mr-1']);
+    echo html_writer::label(
+        get_string('demo:weeks_label', 'local_ai_course_assistant'),
+        'weeks',
+        false,
+        ['class' => 'mr-1']
+    );
     echo html_writer::empty_tag('input', [
         'type' => 'number', 'id' => 'weeks', 'name' => 'weeks',
         'value' => 4, 'min' => 1, 'max' => 52,
@@ -165,8 +181,11 @@ if ($existing) {
         'type' => 'checkbox', 'id' => 'clear', 'name' => 'clear', 'value' => 1,
         'class' => 'form-check-input',
     ]);
-    echo html_writer::tag('label', get_string('demo:clear_label', 'local_ai_course_assistant'),
-        ['for' => 'clear', 'class' => 'form-check-label']);
+    echo html_writer::tag(
+        'label',
+        get_string('demo:clear_label', 'local_ai_course_assistant'),
+        ['for' => 'clear', 'class' => 'form-check-label']
+    );
     echo html_writer::end_tag('div');
 
     echo html_writer::empty_tag('input', [
@@ -176,19 +195,25 @@ if ($existing) {
     ]);
     echo html_writer::end_tag('form');
 
-    echo html_writer::tag('p',
-        '<a href="' . (new moodle_url('/local/ai_course_assistant/analytics.php',
-            ['courseid' => $existing->id]))->out() . '" class="btn btn-sm btn-outline-secondary mt-3">'
+    echo html_writer::tag(
+        'p',
+        '<a href="' . (new moodle_url(
+            '/local/ai_course_assistant/analytics.php',
+            ['courseid' => $existing->id]
+        ))->out() . '" class="btn btn-sm btn-outline-secondary mt-3">'
         . get_string('demo:view_analytics', 'local_ai_course_assistant') . '</a>',
-        ['class' => 'mt-2']);
+        ['class' => 'mt-2']
+    );
 
     echo html_writer::end_tag('div');
     echo html_writer::end_tag('div');
 }
 
 echo html_writer::start_tag('div', ['style' => 'max-width:720px']);
-echo html_writer::tag('p',
-    '<small class="text-muted">' . get_string('demo:footer', 'local_ai_course_assistant') . '</small>');
+echo html_writer::tag(
+    'p',
+    '<small class="text-muted">' . get_string('demo:footer', 'local_ai_course_assistant') . '</small>'
+);
 echo html_writer::end_tag('div');
 
 echo $output->footer();

@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\rag_retriever::scope_to_document
  */
 final class rag_retriever_test extends \advanced_testcase {
-
     /** @return array[] Helper: three chunks with descending cosine scores. */
     private function sample(): array {
         return [
@@ -65,7 +64,7 @@ final class rag_retriever_test extends \advanced_testcase {
         // Two near-tied chunks; the lower raw score belongs to the current page.
         $scored = [
             ['content' => 'other', 'score' => 0.50, 'cmid' => 20, 'modtype' => 'page', 'chunkindex' => 0],
-            ['content' => 'page',  'score' => 0.48, 'cmid' => 21, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'page', 'score' => 0.48, 'cmid' => 21, 'modtype' => 'page', 'chunkindex' => 0],
         ];
         // Boost of 0.05 lifts the current-page chunk (0.48 + 0.05 = 0.53) above 0.50.
         $out = rag_retriever::filter_and_rank($scored, 0.0, 21, 0.05);
@@ -89,7 +88,7 @@ final class rag_retriever_test extends \advanced_testcase {
         // Current document (cmid 11) contributed a chunk -> return only it.
         $ranked = [
             ['content' => 'other', 'score' => 0.62, 'cmid' => 10, 'modtype' => 'page', 'chunkindex' => 0],
-            ['content' => 'page',  'score' => 0.30, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'page', 'score' => 0.30, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
         ];
         $out = rag_retriever::scope_to_document($ranked, 11, 'document_first');
         $this->assertCount(1, $out);
@@ -118,8 +117,8 @@ final class rag_retriever_test extends \advanced_testcase {
     public function test_scope_document_only_restricts_and_preserves_order(): void {
         $ranked = [
             ['content' => 'other', 'score' => 0.62, 'cmid' => 10, 'modtype' => 'page', 'chunkindex' => 0],
-            ['content' => 'p1',    'score' => 0.40, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
-            ['content' => 'p2',    'score' => 0.35, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 1],
+            ['content' => 'p1', 'score' => 0.40, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 0],
+            ['content' => 'p2', 'score' => 0.35, 'cmid' => 11, 'modtype' => 'page', 'chunkindex' => 1],
         ];
         $out = rag_retriever::scope_to_document($ranked, 11, 'document_only');
         $this->assertSame(['p1', 'p2'], array_column($out, 'content'));
@@ -192,8 +191,8 @@ final class rag_retriever_test extends \advanced_testcase {
         $prefix = "[P] X: ";
         // Distinct 100-char bodies per chunk (no shared words -> no de-overlap
         // collapsing), so reconstructed lengths are exactly predictable:
-        //   full page (5 chunks): 7 + 5*100 + 4 spaces = 511 chars
-        //   ±1 window (3 chunks): 7 + 3*100 + 2 spaces = 309 chars
+        // full page (5 chunks): 7 + 5*100 + 4 spaces = 511 chars
+        // ±1 window (3 chunks): 7 + 3*100 + 2 spaces = 309 chars
         $words = [];
         for ($i = 0; $i < 5; $i++) {
             $words[$i] = str_repeat(chr(97 + $i), 100); // 'a'*100 .. 'e'*100

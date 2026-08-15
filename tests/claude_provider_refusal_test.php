@@ -42,7 +42,6 @@ namespace local_ai_course_assistant\provider;
  * @covers     \local_ai_course_assistant\provider\claude_provider
  */
 final class claude_provider_refusal_test extends \advanced_testcase {
-
     /**
      * The constant must keep the exact wire value Anthropic sends.
      */
@@ -61,10 +60,16 @@ final class claude_provider_refusal_test extends \advanced_testcase {
         $generic = get_string('chat:error', 'local_ai_course_assistant');
 
         $this->assertNotEmpty($refused);
-        $this->assertStringNotContainsString('[[', $refused,
-            'chat:refused is not defined in the language pack.');
-        $this->assertNotSame($generic, $refused,
-            'A model refusal must not present as the generic transport error.');
+        $this->assertStringNotContainsString(
+            '[[',
+            $refused,
+            'chat:refused is not defined in the language pack.'
+        );
+        $this->assertNotSame(
+            $generic,
+            $refused,
+            'A model refusal must not present as the generic transport error.'
+        );
     }
 
     /**
@@ -82,8 +87,10 @@ final class claude_provider_refusal_test extends \advanced_testcase {
         ];
 
         $this->assertSame(claude_provider::STOP_REASON_REFUSAL, $payload['stop_reason']);
-        $this->assertEmpty($payload['content'],
-            'A refusal carries no content blocks; text extraction cannot succeed.');
+        $this->assertEmpty(
+            $payload['content'],
+            'A refusal carries no content blocks; text extraction cannot succeed.'
+        );
 
         // This is precisely why `empty($data['content'])` is not a safe test
         // for "malformed response" on its own: a refusal is well-formed.

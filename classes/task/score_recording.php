@@ -26,7 +26,6 @@ namespace local_ai_course_assistant\task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class score_recording extends \core\task\adhoc_task {
-
     /**
      * Score the recording named in the custom data.
      */

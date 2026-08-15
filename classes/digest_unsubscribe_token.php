@@ -37,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class digest_unsubscribe_token {
-
     /** @var int Default token lifetime in seconds (60 days). */
     private const DEFAULT_TTL = 60 * 24 * 60 * 60;
 

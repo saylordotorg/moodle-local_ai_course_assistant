@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\token_cost_manager
  */
 final class token_cost_manager_voyage_test extends \advanced_testcase {
-
     /**
      * Cost of one million input tokens, which equals the input rate.
      *
@@ -107,15 +106,20 @@ final class token_cost_manager_voyage_test extends \advanced_testcase {
     public function test_realistic_indexing_cost(): void {
         // Sanity-check the order of magnitude an admin would see: 50M tokens of
         // indexing on the default embedding model is $3, not $0 and not $3000.
-        $this->assertEqualsWithDelta(3.0,
-            token_cost_manager::estimate_cost('voyage-3.5', 50_000_000, 0), 1e-9);
+        $this->assertEqualsWithDelta(
+            3.0,
+            token_cost_manager::estimate_cost('voyage-3.5', 50_000_000, 0),
+            1e-9
+        );
     }
 
     public function test_admin_override_still_wins(): void {
         $this->resetAfterTest();
-        set_config('rate_card_overrides',
+        set_config(
+            'rate_card_overrides',
             json_encode(['voyage-3.5' => ['input' => 0.99, 'output' => 0.00]]),
-            'local_ai_course_assistant');
+            'local_ai_course_assistant'
+        );
 
         // Overrides exist so a pricing change needs no code deploy; adding these
         // defaults must not break that path.

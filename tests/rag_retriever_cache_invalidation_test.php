@@ -36,7 +36,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\rag_retriever::flush_cache
  */
 final class rag_retriever_cache_invalidation_test extends \advanced_testcase {
-
     /**
      * Read the private cache.
      *
@@ -78,8 +77,11 @@ final class rag_retriever_cache_invalidation_test extends \advanced_testcase {
 
         $after = $this->cache();
         $this->assertArrayNotHasKey('course_11', $after);
-        $this->assertArrayHasKey('course_22', $after,
-            'flushing one course must not discard another course\'s vectors');
+        $this->assertArrayHasKey(
+            'course_22',
+            $after,
+            'flushing one course must not discard another course\'s vectors'
+        );
     }
 
     public function test_flush_without_argument_clears_everything(): void {
@@ -112,8 +114,11 @@ final class rag_retriever_cache_invalidation_test extends \advanced_testcase {
         content_indexer::delete_course_index(11);
 
         $after = $this->cache();
-        $this->assertArrayNotHasKey('course_11', $after,
-            'delete_course_index must invalidate the retriever cache');
+        $this->assertArrayNotHasKey(
+            'course_11',
+            $after,
+            'delete_course_index must invalidate the retriever cache'
+        );
         $this->assertArrayHasKey('course_22', $after);
     }
 

@@ -64,7 +64,8 @@ echo $OUTPUT->heading(format_string($assign->name));
 if (!empty($assign->intro)) {
     echo html_writer::div(
         format_text($assign->intro, (int) $assign->introformat, ['context' => $context]),
-        'sbx-intro mb-3');
+        'sbx-intro mb-3'
+    );
 }
 
 // A short at-a-glance line.
@@ -74,7 +75,8 @@ echo html_writer::div(
     ($assign->mode === 'audio' ? 'Audio presentation' : 'Video presentation')
     . ' &middot; ' . s(ucfirst($assign->ptype))
     . ' &middot; target ' . $mins . '-' . $maxs . ' min',
-    'sbx-meta text-muted mb-3');
+    'sbx-meta text-muted mb-3'
+);
 
 // Topic picker.
 if ($hastopics) {
@@ -90,7 +92,8 @@ if ($hastopics) {
             echo html_writer::div(
                 html_writer::tag('strong', format_string($t->title) . ': ')
                 . format_text($t->instructions, (int) $t->instructionsformat, ['context' => $context]),
-                'sbx-topic-detail small text-muted mt-2');
+                'sbx-topic-detail small text-muted mt-2'
+            );
         }
     }
     echo html_writer::end_div();
@@ -99,7 +102,9 @@ if ($hastopics) {
 // Recorder widget.
 if (!$storageready) {
     echo $OUTPUT->notification(
-        get_string('soapbox:storage_unconfigured', 'local_ai_course_assistant'), 'warning');
+        get_string('soapbox:storage_unconfigured', 'local_ai_course_assistant'),
+        'warning'
+    );
 } else {
     $modeclass = 'sbx-recorder card p-3 mb-4 sbx-mode-' . ($assign->mode === 'audio' ? 'audio' : 'video');
     echo html_writer::start_div($modeclass, ['id' => 'sbx-recorder']);
@@ -109,15 +114,21 @@ if (!$storageready) {
     // is captured with the recording).
     if (!empty($assign->slides_enabled)) {
         echo html_writer::start_div('sbx-deck mb-3');
-        echo html_writer::tag('label', get_string('soapbox:deck_label', 'local_ai_course_assistant'),
-            ['for' => 'sbx-deck-input', 'class' => 'font-weight-bold d-block']);
+        echo html_writer::tag(
+            'label',
+            get_string('soapbox:deck_label', 'local_ai_course_assistant'),
+            ['for' => 'sbx-deck-input', 'class' => 'font-weight-bold d-block']
+        );
         echo html_writer::empty_tag('input', [
             'type' => 'file', 'accept' => 'application/pdf,.pdf',
             'id' => 'sbx-deck-input', 'class' => 'sbx-deck-input form-control-file',
         ]);
         echo html_writer::div('', 'sbx-deck-status small text-muted mt-1');
-        echo html_writer::div('', 'sbx-slide-viewer mt-2',
-            ['style' => 'max-width:640px']);
+        echo html_writer::div(
+            '',
+            'sbx-slide-viewer mt-2',
+            ['style' => 'max-width:640px']
+        );
         echo html_writer::end_div();
     }
 
@@ -131,9 +142,14 @@ if (!$storageready) {
         // gives the learner clear feedback that audio is being captured.
         echo html_writer::div(
             html_writer::tag('span', '', ['class' => 'sbx-mic-dot'])
-            . html_writer::tag('span', get_string('soapbox:audio_ready', 'local_ai_course_assistant'),
-                ['class' => 'sbx-mic-label']),
-            'sbx-audio-indicator d-flex align-items-center mb-2', ['style' => 'gap:10px']);
+            . html_writer::tag(
+                'span',
+                get_string('soapbox:audio_ready', 'local_ai_course_assistant'),
+                ['class' => 'sbx-mic-label']
+            ),
+            'sbx-audio-indicator d-flex align-items-center mb-2',
+            ['style' => 'gap:10px']
+        );
     }
     echo html_writer::start_div('sbx-controls d-flex align-items-center mb-2', ['style' => 'gap:12px']);
     echo html_writer::tag('button', 'Record', ['type' => 'button', 'class' => 'sbx-record btn btn-primary']);
@@ -175,7 +191,8 @@ $recs = $DB->get_records_select(
     'local_ai_course_assistant_sbx_rec',
     'assignid = :a AND userid = :u AND status <> :d',
     ['a' => $id, 'u' => $USER->id, 'd' => 'deleted'],
-    'timecreated DESC');
+    'timecreated DESC'
+);
 
 echo $OUTPUT->heading('My recordings', 4);
 if (empty($recs)) {
@@ -194,10 +211,12 @@ if (empty($recs)) {
             // Slides playback: recordings that carry a deck can be played back
             // with the slides advancing in sync.
             if (!empty($r->deck_key) && !empty($r->slide_timeline)) {
-                $view .= ' &middot; ' . html_writer::tag('button',
+                $view .= ' &middot; ' . html_writer::tag(
+                    'button',
                     get_string('soapbox:play_slides', 'local_ai_course_assistant'),
                     ['type' => 'button', 'class' => 'sbx-play-btn btn btn-link btn-sm p-0',
-                     'data-recid' => (int) $r->id]);
+                    'data-recid' => (int) $r->id]
+                );
             }
         } else if ($r->status === 'deleted') {
             $view = html_writer::span('Expired', 'text-muted');
@@ -214,9 +233,14 @@ if (empty($recs)) {
     echo html_writer::div('', 'sbx-playback mt-3', ['id' => 'sbx-playback']);
     echo html_writer::div(
         'Recordings are available to view and download for ' . soapbox_config::retention_days()
-        . ' days, then automatically deleted.', 'small text-muted mt-1');
-    $PAGE->requires->js_call_amd('local_ai_course_assistant/soapbox_player', 'init',
-        ['#sbx-playback', '.sbx-play-btn']);
+        . ' days, then automatically deleted.',
+        'small text-muted mt-1'
+    );
+    $PAGE->requires->js_call_amd(
+        'local_ai_course_assistant/soapbox_player',
+        'init',
+        ['#sbx-playback', '.sbx-play-btn']
+    );
 }
 
 echo $OUTPUT->footer();

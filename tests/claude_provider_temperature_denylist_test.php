@@ -39,7 +39,6 @@ namespace local_ai_course_assistant\provider;
  * @covers     \local_ai_course_assistant\provider\claude_provider
  */
 final class claude_provider_temperature_denylist_test extends \advanced_testcase {
-
     /**
      * Invoke the private static `model_supports_temperature($model)` via
      * reflection. The method is private by design (callers go through
@@ -138,8 +137,11 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
     public function test_allowlist_is_overridable_by_config(): void {
         $this->resetAfterTest();
         // A future model can be enabled without a code change...
-        set_config('claude_temperature_allow_prefixes', "claude-opus-7\nclaude-haiku-4-5",
-            'local_ai_course_assistant');
+        set_config(
+            'claude_temperature_allow_prefixes',
+            "claude-opus-7\nclaude-haiku-4-5",
+            'local_ai_course_assistant'
+        );
         $this->assertTrue($this->supports('claude-opus-7'));
         $this->assertTrue($this->supports('claude-haiku-4-5'));
         // ...and anything not on the override is omitted, including models
@@ -155,8 +157,11 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
      */
     public function test_empty_config_falls_back_to_default(): void {
         $this->resetAfterTest();
-        set_config('claude_temperature_allow_prefixes', "\n  \n# just a comment\n",
-            'local_ai_course_assistant');
+        set_config(
+            'claude_temperature_allow_prefixes',
+            "\n  \n# just a comment\n",
+            'local_ai_course_assistant'
+        );
         $this->assertTrue($this->supports('claude-sonnet-4-6'));
         $this->assertFalse($this->supports('claude-opus-5'));
     }

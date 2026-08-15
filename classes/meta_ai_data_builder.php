@@ -28,7 +28,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class meta_ai_data_builder {
-
     private const SYSTEM_PROMPT = <<<'PROMPT'
 You are an analytics assistant for an institution's AI learning assistant (SOLA).
 
@@ -115,14 +114,20 @@ PROMPT;
     public static function build_aggregate_stats(array $courseids = [], int $since = 0, string $filterprovider = ''): string {
         global $DB;
 
-        list($wcl, $params) = self::build_where($courseids, $since, $filterprovider);
+        [$wcl, $params] = self::build_where($courseids, $since, $filterprovider);
 
         $totalmsg = $DB->count_records_sql(
-            "SELECT COUNT(*) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}", $params);
+            "SELECT COUNT(*) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}",
+            $params
+        );
         $totalusers = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT m.userid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl} AND m.role = 'user'", $params);
+            "SELECT COUNT(DISTINCT m.userid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl} AND m.role = 'user'",
+            $params
+        );
         $totalcourses = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT m.courseid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}", $params);
+            "SELECT COUNT(DISTINCT m.courseid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}",
+            $params
+        );
 
         // Token cost totals.
         $tokensql = "SELECT SUM(COALESCE(m.prompt_tokens, 0)) AS prompt_total,
@@ -176,7 +181,7 @@ PROMPT;
     public static function build_provider_stats(array $courseids = [], int $since = 0): string {
         global $DB;
 
-        list($wcl, $params) = self::build_where($courseids, $since);
+        [$wcl, $params] = self::build_where($courseids, $since);
 
         $sql = "SELECT m.provider, m.model_name,
                        COUNT(m.id) AS response_count,
@@ -195,7 +200,8 @@ PROMPT;
 
         $lines = ["Provider | Model | Responses | Prompt Tokens | Completion Tokens | Avg Tokens/Response"];
         foreach ($records as $r) {
-            $lines[] = sprintf("%s | %s | %s | %s | %s | %s",
+            $lines[] = sprintf(
+                "%s | %s | %s | %s | %s | %s",
                 $r->provider ?: '(unknown)',
                 $r->model_name ?: '(default)',
                 number_format((int) $r->response_count),
@@ -220,7 +226,7 @@ PROMPT;
         $params = [];
         $where = ['1=1'];
         if (!empty($courseids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'fc');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'fc');
             $where[] = "f.courseid {$insql}";
             $params = array_merge($params, $inparams);
         }
@@ -256,7 +262,9 @@ PROMPT;
                FROM {local_ai_course_assistant_feedback} f
               WHERE {$wcl} AND f.comment IS NOT NULL AND f.comment != ''
               ORDER BY f.timecreated DESC",
-            $params, 0, 10
+            $params,
+            0,
+            10
         );
         if (!empty($comments)) {
             $lines[] = "\nRecent comments:";
@@ -282,7 +290,7 @@ PROMPT;
         $params = [];
         $where = ['1=1'];
         if (!empty($courseids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'sp');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'sp');
             $where[] = "p.courseid {$insql}";
             $params = array_merge($params, $inparams);
         }
@@ -294,7 +302,9 @@ PROMPT;
                    JOIN {course} c ON c.id = p.courseid
                   WHERE " . implode(' AND ', $where) . "
                   ORDER BY p.courseid, p.userid",
-                $params, 0, 50
+                $params,
+                0,
+                50
             );
         } catch (\Throwable $e) {
             return '';
@@ -335,7 +345,7 @@ PROMPT;
             $courseids = $courseids > 0 ? [$courseids] : [];
         }
 
-        list($wcl, $params) = self::build_where($courseids, $since, $filterprovider);
+        [$wcl, $params] = self::build_where($courseids, $since, $filterprovider);
 
         $sql = "SELECT m.id, m.userid, m.role, m.message, m.courseid, m.timecreated,
                        m.provider, m.model_name,
@@ -430,7 +440,7 @@ PROMPT;
         $params = [];
 
         if (!empty($courseids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'cid');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'cid');
             $where[] = "m.courseid {$insql}";
             $params = array_merge($params, $inparams);
         }

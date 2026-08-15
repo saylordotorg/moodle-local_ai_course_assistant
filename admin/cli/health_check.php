@@ -67,8 +67,13 @@ foreach ($result['checks'] as $c) {
 
 mtrace('');
 mtrace('=============================');
-mtrace(sprintf('Result: %d passed, %d failed, %d warned (%d total)',
-    $result['passed'], $result['failed'], $result['warned'], count($result['checks'])));
+mtrace(sprintf(
+    'Result: %d passed, %d failed, %d warned (%d total)',
+    $result['passed'],
+    $result['failed'],
+    $result['warned'],
+    count($result['checks'])
+));
 mtrace('=============================');
 
 $exitcode = 0;

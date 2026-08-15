@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class vendor_registry {
-
     public const TIER_1 = 1;
     public const TIER_2 = 2;
     public const TIER_3 = 3;

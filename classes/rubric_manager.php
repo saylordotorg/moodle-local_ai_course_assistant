@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rubric_manager {
-
     /** @var string Table name for rubrics. */
     private const TABLE_RUBRICS = 'local_ai_course_assistant_rubrics';
 
@@ -257,8 +256,17 @@ class rubric_manager {
      * @param array|null $meta Optional metadata blob (e.g. Soapbox name/topic/target); JSON-encoded. Never audio/transcript.
      * @return int The new score record ID.
      */
-    public static function save_score(int $rubricid, int $userid, int $courseid, string $sessiontype,
-            array $scores, int $overallscore, string $aifeedback, int $duration, ?array $meta = null): int {
+    public static function save_score(
+        int $rubricid,
+        int $userid,
+        int $courseid,
+        string $sessiontype,
+        array $scores,
+        int $overallscore,
+        string $aifeedback,
+        int $duration,
+        ?array $meta = null
+    ): int {
         global $DB;
 
         $record = new \stdClass();

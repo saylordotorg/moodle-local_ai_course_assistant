@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\llm_optimizer
  */
 final class llm_optimizer_rag_capability_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -41,8 +40,10 @@ final class llm_optimizer_rag_capability_test extends \advanced_testcase {
 
     public function test_capability_mapping_is_not_duplicated(): void {
         // The private mirror is gone: llm_optimizer must not declare its own.
-        $this->assertFalse(method_exists(llm_optimizer::class, 'capability_clause'),
-            'llm_optimizer should use spend_guard::capability_sql, not a local copy');
+        $this->assertFalse(
+            method_exists(llm_optimizer::class, 'capability_clause'),
+            'llm_optimizer should use spend_guard::capability_sql, not a local copy'
+        );
         $this->assertTrue(method_exists(spend_guard::class, 'capability_sql'));
     }
 
@@ -68,7 +69,8 @@ final class llm_optimizer_rag_capability_test extends \advanced_testcase {
         $where = analytics::spend_rows_predicate('m')
             . ' AND m.model_name IS NOT NULL AND ' . spend_guard::capability_sql('rag');
         $count = $DB->count_records_sql(
-            "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m WHERE {$where}");
+            "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m WHERE {$where}"
+        );
 
         // Was 0 for every possible input while the base clause said role='assistant'.
         $this->assertSame(1, $count);
@@ -87,7 +89,8 @@ final class llm_optimizer_rag_capability_test extends \advanced_testcase {
         $where = analytics::spend_rows_predicate('m')
             . ' AND ' . spend_guard::capability_sql('chat');
         $count = $DB->count_records_sql(
-            "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m WHERE {$where}");
+            "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m WHERE {$where}"
+        );
 
         $this->assertSame(0, $count, 'background spend must not leak into the chat bucket');
     }

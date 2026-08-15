@@ -36,7 +36,6 @@ use local_ai_course_assistant\rag_drift_detector;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class auto_reindex_rag_drifted extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:auto_reindex_rag_drifted', 'local_ai_course_assistant');
     }

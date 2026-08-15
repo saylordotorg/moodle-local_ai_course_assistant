@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class outcomes_report {
-
     /** @var int Fallback institution benchmark, as a percentage. */
     const DEFAULT_BENCHMARK_PCT = 70;
 
@@ -105,8 +104,12 @@ class outcomes_report {
         $rows = [];
         foreach ($objectives as $obj) {
             // Students with any attempt on this objective are the assessed set.
-            $userids = $DB->get_fieldset_select(objective_manager::TABLE_ATTS,
-                'DISTINCT userid', 'objectiveid = :oid', ['oid' => $obj->id]);
+            $userids = $DB->get_fieldset_select(
+                objective_manager::TABLE_ATTS,
+                'DISTINCT userid',
+                'objectiveid = :oid',
+                ['oid' => $obj->id]
+            );
             $benchmark = self::benchmark_pct_for((int) $obj->id) / 100;
             $scores = [];
             foreach ($userids as $uid) {
