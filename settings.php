@@ -657,7 +657,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/rag_topk',
         get_string('settings:rag_topk', 'local_ai_course_assistant'),
         get_string('settings:rag_topk_desc', 'local_ai_course_assistant'),
-        '5',
+        '3',
         PARAM_INT
     ));
 
