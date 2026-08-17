@@ -43,3 +43,4 @@ __pycache__/
 secrets.json
 credentials.json
 service-account*.json
+.wiki/
