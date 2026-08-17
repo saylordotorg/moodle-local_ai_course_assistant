@@ -874,6 +874,12 @@ class hook_callbacks {
             'hasstarterdata'     => $hasstarterdata,
             'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),
+            // v6.9.7: active-learners indicator, off by default. Gating the
+            // markup here means the 60-second poll never starts on a site that
+            // has not opted in — chat.js only builds the poller if the element
+            // is present.
+            'activelearnersenabled' => (bool) get_config(
+                'local_ai_course_assistant', 'active_learners_enabled'),
             // Mastery feature: both flags gated on master switch so the chip
             // never renders when mastery tracking is off for the course.
             'masteryenabled'     => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),

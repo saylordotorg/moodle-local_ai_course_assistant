@@ -1753,3 +1753,6 @@ $string['soapbox:assign_created'] = 'ਅਸਾਈਨਮੈਂਟ ਬਣਾਈ �
 $string['soapbox:assign_delete_confirm'] = '"{$a}" ਅਤੇ ਇਸ ਦੀਆਂ ਸਾਰੀਆਂ ਰਿਕਾਰਡਿੰਗਾਂ ਮਿਟਾਉਣੀਆਂ ਹਨ? ਇਸ ਨੂੰ ਵਾਪਸ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ।';
 $string['soapbox:assign_edit_heading'] = 'Soapbox ਅਸਾਈਨਮੈਂਟ ਸੋਧੋ';
 $string['soapbox:assign_new_heading'] = 'ਨਵੀਂ Soapbox ਅਸਾਈਨਮੈਂਟ';
+
+$string['settings:active_learners_enabled'] = 'ਸਰਗਰਮ ਸਿੱਖਿਆਰਥੀ ਸੂਚਕ ਵਿਖਾਓ';
+$string['settings:active_learners_enabled_desc'] = 'ਚੈਟ ਪੈਨਲ ਵਿੱਚ ਵਿਖਾਉਂਦਾ ਹੈ ਕਿ ਇਸ ਵੇਲੇ ਹੋਰ ਕਿੰਨੇ ਲੋਕ ਪੜ੍ਹ ਰਹੇ ਹਨ। ਇਹ ਸਿਖਾਉਣ ਦੀ ਵਿਸ਼ੇਸ਼ਤਾ ਨਹੀਂ ਸਗੋਂ ਇੱਕ ਸਮਾਜਿਕ ਹੱਲਾਸ਼ੇਰੀ ਹੈ, ਅਤੇ ਹਰ ਖੁੱਲ੍ਹੇ ਪੈਨਲ ਲਈ ਮਿੰਟ ਵਿੱਚ ਇੱਕ ਵਾਰ ਸਰਵਰ ਤੋਂ ਪੁੱਛਦਾ ਹੈ, ਇਸ ਲਈ ਇਹ ਮੂਲ ਰੂਪ ਵਿੱਚ ਬੰਦ ਹੈ। ਸੂਚਕ ਤਾਂ ਹੀ ਦਿਸਦਾ ਹੈ ਜਦੋਂ ਘੱਟੋ-ਘੱਟ ਦੋ ਹੋਰ ਲੋਕ ਸਰਗਰਮ ਹੋਣ।';

@@ -60,6 +60,14 @@ class get_active_learners extends external_api {
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
+        // v6.9.7: the indicator is off by default and gated here as well as in
+        // the template. The template gate stops the markup rendering; this one
+        // stops the endpoint answering at all, so a crafted call cannot read a
+        // learner count off a site that has the feature switched off.
+        if (!get_config('local_ai_course_assistant', 'active_learners_enabled')) {
+            return ['count' => 0, 'scope' => 'disabled', 'window_secs' => self::ACTIVE_WINDOW_SECS];
+        }
+
         // v4.1.1: scope selectable via admin setting. Default 'global' is the
         // anti-loneliness default — a global count rarely hits zero, so the
         // indicator actually appears. 'course' is the v4.1.0 behaviour for

@@ -1734,3 +1734,6 @@ $string['soapbox:assign_created'] = 'Hojiin uumameera.';
 $string['soapbox:assign_delete_confirm'] = '"{$a}" fi waraabbiiwwan isaa hunda haquu? Kun deebi\'uu hin danda\'u.';
 $string['soapbox:assign_edit_heading'] = 'Hojii Soapbox gulaali';
 $string['soapbox:assign_new_heading'] = 'Hojii Soapbox haaraa';
+
+$string['settings:active_learners_enabled'] = 'Agarsiiftuu barattoota hojjetanii agarsiisi';
+$string['settings:active_learners_enabled_desc'] = 'Panaalii haasawaa keessatti namoonni biroo meeqa amma barachaa akka jiran agarsiisa. Kun kakaasaa hawaasummaa malee amala barsiisummaa miti, akkasumas panaalii banaa hundaaf daqiiqaatti al tokko saarvara gaafata, kanaaf durtiidhaan cufameera. Agarsiiftuun kan mul\'atu yoo xiqqaate namoonni biroo lama yeroo hojjetan qofa.';

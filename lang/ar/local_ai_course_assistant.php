@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'تم إنشاء المهمة.';
 $string['soapbox:assign_delete_confirm'] = 'هل تريد حذف "{$a}" وجميع تسجيلاتها؟ لا يمكن التراجع عن هذا الإجراء.';
 $string['soapbox:assign_edit_heading'] = 'تعديل مهمة Soapbox';
 $string['soapbox:assign_new_heading'] = 'مهمة Soapbox جديدة';
+
+$string['settings:active_learners_enabled'] = 'إظهار مؤشر المتعلمين النشطين';
+$string['settings:active_learners_enabled_desc'] = 'يعرض في لوحة المحادثة عدد الأشخاص الآخرين الذين يدرسون الآن. هذا حافز اجتماعي وليس ميزة تعليمية، ويستعلم من الخادم مرة كل دقيقة لكل لوحة مفتوحة، لذا فهو معطَّل ما لم تُفعِّله. يظهر المؤشر فقط عند وجود شخصين آخرين نشطين على الأقل.';

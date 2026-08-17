@@ -1766,3 +1766,6 @@ $string['soapbox:assign_created'] = 'A ti ṣẹ̀dá iṣẹ́ náà.';
 $string['soapbox:assign_delete_confirm'] = 'Pa "{$a}" àti gbogbo àwọn àkọsílẹ̀ rẹ̀ rẹ́? A kò lè yí èyí padà.';
 $string['soapbox:assign_edit_heading'] = 'Ṣàtúnṣe iṣẹ́ Soapbox';
 $string['soapbox:assign_new_heading'] = 'Iṣẹ́ Soapbox tuntun';
+
+$string['settings:active_learners_enabled'] = 'Fi àmì akẹ́kọ̀ọ́ tí ń ṣiṣẹ́ hàn';
+$string['settings:active_learners_enabled_desc'] = 'Ó ń fi hàn nínú pánẹ́lì ìjíròrò iye àwọn ẹlòmíràn tí wọ́n ń kẹ́kọ̀ọ́ nísinsìnyí. Ìṣírí àwùjọ ni èyí, kì í ṣe ẹ̀yà ìkọ́ni, ó sì ń bèèrè lọ́wọ́ olùpèsè ẹ̀ẹ̀kan ní ìṣẹ́jú kọ̀ọ̀kan fún gbogbo pánẹ́lì tí ó ṣí, nítorí náà ó wà ní pipa nípa àbùdá. Àmì náà máa hàn kìkì bí ó bá kéré tán àwọn ẹlòmíràn méjì ń ṣiṣẹ́.';

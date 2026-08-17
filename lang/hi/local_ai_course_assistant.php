@@ -1761,3 +1761,6 @@ $string['soapbox:assign_created'] = 'असाइनमेंट बनाया
 $string['soapbox:assign_delete_confirm'] = '"{$a}" और इसकी सभी रिकॉर्डिंग हटाएँ? इसे पूर्ववत नहीं किया जा सकता।';
 $string['soapbox:assign_edit_heading'] = 'Soapbox असाइनमेंट संपादित करें';
 $string['soapbox:assign_new_heading'] = 'नया Soapbox असाइनमेंट';
+
+$string['settings:active_learners_enabled'] = 'सक्रिय शिक्षार्थी संकेतक दिखाएँ';
+$string['settings:active_learners_enabled_desc'] = 'चैट पैनल में दिखाता है कि इस समय कितने अन्य लोग पढ़ रहे हैं। यह शिक्षण सुविधा नहीं बल्कि एक सामाजिक प्रोत्साहन है, और हर खुले पैनल के लिए हर मिनट सर्वर से पूछताछ करता है, इसलिए यह डिफ़ॉल्ट रूप से बंद है। संकेतक तभी दिखता है जब कम से कम दो अन्य लोग सक्रिय हों।';

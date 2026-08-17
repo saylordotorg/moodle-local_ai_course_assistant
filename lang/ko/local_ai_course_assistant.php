@@ -1737,3 +1737,6 @@ $string['soapbox:assign_created'] = '과제가 생성되었습니다.';
 $string['soapbox:assign_delete_confirm'] = '"{$a}" 및 모든 녹음을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.';
 $string['soapbox:assign_edit_heading'] = 'Soapbox 과제 편집';
 $string['soapbox:assign_new_heading'] = '새 Soapbox 과제';
+
+$string['settings:active_learners_enabled'] = '활동 중인 학습자 표시';
+$string['settings:active_learners_enabled_desc'] = '지금 몇 명이 함께 학습 중인지 채팅 패널에 표시합니다. 교육 기능이라기보다 사회적 동기 부여이며, 열려 있는 패널마다 1분에 한 번 서버에 요청하므로 기본적으로 꺼져 있습니다. 다른 학습자가 최소 2명 활동 중일 때만 표시됩니다.';

@@ -1774,3 +1774,6 @@ $string['soapbox:assign_created'] = 'המטלה נוצרה.';
 $string['soapbox:assign_delete_confirm'] = 'למחוק את "{$a}" ואת כל ההקלטות שלה? לא ניתן לבטל פעולה זו.';
 $string['soapbox:assign_edit_heading'] = 'עריכת מטלת Soapbox';
 $string['soapbox:assign_new_heading'] = 'מטלת Soapbox חדשה';
+
+$string['settings:active_learners_enabled'] = 'הצגת מחוון לומדים פעילים';
+$string['settings:active_learners_enabled_desc'] = 'מציג בלוח הצ\'אט כמה אנשים נוספים לומדים כרגע. זהו תמריץ חברתי ולא תכונה לימודית, והוא פונה לשרת פעם בדקה עבור כל לוח פתוח, ולכן הוא כבוי כברירת מחדל. המחוון מופיע רק כששני לומדים אחרים לפחות פעילים.';

@@ -1748,3 +1748,6 @@ $string['soapbox:assign_created'] = 'Hawsha waa la abuuray.';
 $string['soapbox:assign_delete_confirm'] = 'Tirtir "{$a}" iyo dhammaan duubitaannadeeda? Tan lama celin karo.';
 $string['soapbox:assign_edit_heading'] = 'Wax ka beddel hawsha Soapbox';
 $string['soapbox:assign_new_heading'] = 'Hawl Soapbox cusub';
+
+$string['settings:active_learners_enabled'] = 'Muuji tilmaamaha ardayda firfircoon';
+$string['settings:active_learners_enabled_desc'] = 'Waxay ku muujinaysaa bogga sheekada inta qof ee kale ee hadda wax baranaya. Tani waa dhiirrigelin bulsheed, ma aha sifo waxbarasho, waxayna server-ka weydiisaa hal mar daqiiqaddiiba bog kasta oo furan, sidaas darteed way damsan tahay si caadi ah. Tilmaamuhu wuxuu muuqdaa oo keliya marka ugu yaraan laba qof oo kale ay firfircoon yihiin.';

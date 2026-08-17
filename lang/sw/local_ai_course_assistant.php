@@ -1767,3 +1767,6 @@ $string['soapbox:assign_created'] = 'Kazi imeundwa.';
 $string['soapbox:assign_delete_confirm'] = 'Futa "{$a}" na rekodi zake zote? Kitendo hiki hakiwezi kutenduliwa.';
 $string['soapbox:assign_edit_heading'] = 'Hariri kazi ya Soapbox';
 $string['soapbox:assign_new_heading'] = 'Kazi mpya ya Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Onyesha kiashiria cha wanafunzi hai';
+$string['settings:active_learners_enabled_desc'] = 'Huonyesha katika kidirisha cha mazungumzo ni watu wangapi wengine wanaosoma sasa hivi. Hii ni motisha ya kijamii, si kipengele cha ufundishaji, na huuliza seva mara moja kwa dakika kwa kila kidirisha kilichofunguliwa, hivyo imezimwa kwa chaguo-msingi. Kiashiria huonekana tu wakati angalau watu wengine wawili wako hai.';

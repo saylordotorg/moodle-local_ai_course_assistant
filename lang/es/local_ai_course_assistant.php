@@ -1758,3 +1758,6 @@ $string['soapbox:assign_created'] = 'Tarea creada.';
 $string['soapbox:assign_delete_confirm'] = '¿Eliminar "{$a}" y todas sus grabaciones? Esta acción no se puede deshacer.';
 $string['soapbox:assign_edit_heading'] = 'Editar tarea de Soapbox';
 $string['soapbox:assign_new_heading'] = 'Nueva tarea de Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Mostrar el indicador de estudiantes activos';
+$string['settings:active_learners_enabled_desc'] = 'Muestra en el panel de chat cuántas otras personas están estudiando en este momento. Es un estímulo social, no una función docente, y consulta al servidor una vez por minuto por cada panel abierto, por lo que está desactivado salvo que lo actives. El indicador solo aparece cuando hay al menos otras dos personas activas.';

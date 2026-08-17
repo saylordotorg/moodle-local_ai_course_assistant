@@ -1813,6 +1813,19 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
+    // v6.9.7: master switch for the active-learners indicator. Default OFF.
+    // The indicator tells a learner how many others are studying, which is a
+    // social-proof nudge rather than a teaching feature, and it costs a poll
+    // every 60 seconds per open drawer. Sites should opt in deliberately.
+    // Existing sites that had it running will find it off after upgrade; the
+    // setting below controls the count's scope once it is enabled.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/active_learners_enabled',
+        get_string('settings:active_learners_enabled', 'local_ai_course_assistant'),
+        get_string('settings:active_learners_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
     // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
     // anti-loneliness default — a global count rarely hits zero, so the
     // indicator actually appears on small courses). Set to 'course' to

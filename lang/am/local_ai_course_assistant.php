@@ -1760,3 +1760,6 @@ $string['soapbox:assign_created'] = 'ስራው ተፈጥሯል።';
 $string['soapbox:assign_delete_confirm'] = '"{$a}"ን እና ሁሉንም ቅጂዎቹን ይሰረዙ? ይህ መቀልበስ አይችልም።';
 $string['soapbox:assign_edit_heading'] = 'የSoapbox ስራ አርትዕ';
 $string['soapbox:assign_new_heading'] = 'አዲስ የSoapbox ስራ';
+
+$string['settings:active_learners_enabled'] = 'የነቁ ተማሪዎች አመልካች አሳይ';
+$string['settings:active_learners_enabled_desc'] = 'በውይይት ፓነል ውስጥ አሁን ስንት ሌሎች ሰዎች እየተማሩ እንደሆኑ ያሳያል። ይህ የማስተማሪያ ባህሪ ሳይሆን ማህበራዊ ማበረታቻ ነው፣ እና ለእያንዳንዱ ክፍት ፓነል በደቂቃ አንድ ጊዜ አገልጋዩን ይጠይቃል፣ ስለዚህ በነባሪ ጠፍቷል። አመልካቹ የሚታየው ቢያንስ ሁለት ሌሎች ሰዎች ንቁ ሲሆኑ ብቻ ነው።';

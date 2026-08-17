@@ -1761,3 +1761,6 @@ $string['soapbox:assign_created'] = 'Baara dara.';
 $string['soapbox:assign_delete_confirm'] = '"{$a}" ni a ka kumakanw bɛɛ jɔsi wa? O tɛ se ka segin kɔ.';
 $string['soapbox:assign_edit_heading'] = 'Soapbox baara yɛlɛma';
 $string['soapbox:assign_new_heading'] = 'Soapbox baara kura';
+
+$string['settings:active_learners_enabled'] = 'Kalanden minnu bɛ baara la, u taamasyɛn jira';
+$string['settings:active_learners_enabled_desc'] = 'A bɛ jira baro panɛli kɔnɔ ko mɔgɔ wɛrɛ joli bɛ kalan na sisan. Nin ye jamaana lasɔmini ye, a tɛ kalan baara ye, ani a bɛ sɛrɛwɛri ɲininka siɲɛ kelen miniti kelen kɔnɔ panɛli dayɛlɛlen bɛɛ kama, o de kosɔn a faga la ka kɛ landa ye. Taamasyɛn bɛ bɔ dɔrɔn ni mɔgɔ wɛrɛ fila ɲɔgɔn bɛ baara la.';

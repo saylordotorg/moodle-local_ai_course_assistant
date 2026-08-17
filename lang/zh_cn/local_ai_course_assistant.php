@@ -1766,3 +1766,6 @@ $string['soapbox:assign_created'] = '作业已创建。';
 $string['soapbox:assign_delete_confirm'] = '删除“{$a}”及其所有录音？此操作无法撤销。';
 $string['soapbox:assign_edit_heading'] = '编辑 Soapbox 作业';
 $string['soapbox:assign_new_heading'] = '新建 Soapbox 作业';
+
+$string['settings:active_learners_enabled'] = '显示活跃学习者指示条';
+$string['settings:active_learners_enabled_desc'] = '在聊天面板中显示当前有多少其他人正在学习。这是一种社交激励而非教学功能，并且每个打开的面板每分钟都会向服务器轮询一次，因此默认关闭。仅当至少有另外两人活跃时才会显示。';

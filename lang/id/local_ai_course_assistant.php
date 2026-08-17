@@ -1761,3 +1761,6 @@ $string['soapbox:assign_created'] = 'Tugas dibuat.';
 $string['soapbox:assign_delete_confirm'] = 'Hapus "{$a}" dan semua rekamannya? Tindakan ini tidak dapat dibatalkan.';
 $string['soapbox:assign_edit_heading'] = 'Edit tugas Soapbox';
 $string['soapbox:assign_new_heading'] = 'Tugas Soapbox baru';
+
+$string['settings:active_learners_enabled'] = 'Tampilkan indikator pembelajar aktif';
+$string['settings:active_learners_enabled_desc'] = 'Menampilkan di panel obrolan berapa banyak orang lain yang sedang belajar. Ini dorongan sosial, bukan fitur pengajaran, dan meminta data ke server sekali per menit untuk setiap panel yang terbuka, jadi secara bawaan nonaktif. Indikator hanya muncul jika setidaknya ada dua orang lain yang aktif.';

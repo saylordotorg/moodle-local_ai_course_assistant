@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'Úkol vytvořen.';
 $string['soapbox:assign_delete_confirm'] = 'Smazat „{$a}“ a všechny jeho nahrávky? Tuto akci nelze vrátit zpět.';
 $string['soapbox:assign_edit_heading'] = 'Upravit úkol Soapbox';
 $string['soapbox:assign_new_heading'] = 'Nový úkol Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Zobrazit ukazatel aktivních studujících';
+$string['settings:active_learners_enabled_desc'] = 'Zobrazí v panelu chatu, kolik dalších lidí právě studuje. Jde o sociální pobídku, nikoli o výukovou funkci, a pro každý otevřený panel se jednou za minutu dotazuje serveru, proto je ve výchozím stavu vypnuto. Ukazatel se objeví jen tehdy, jsou-li aktivní alespoň dva další lidé.';
