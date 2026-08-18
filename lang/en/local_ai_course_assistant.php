@@ -1820,6 +1820,17 @@ $string['settings:cost_anomaly_multiplier'] = 'Anomaly multiplier';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Today\'s spend must exceed this multiplier × the 7-day median to trigger an alert. Default <code>2.0</code>. Lower to <code>1.5</code> for earlier warnings (more false positives during enrollment bursts). Raise to <code>3.0</code> if [[unishort]]\'s usage is bursty enough that 2x spikes are routine.';
 $string['task:cost_anomaly_check'] = '[[tutorshort]] cost anomaly check (daily)';
 
+// v6.9.7 — unanswered-question monitor.
+$string['task:unanswered_check'] = '[[tutorshort]] unanswered-question check';
+$string['settings:unanswered_check_enabled'] = 'Alert when questions go unanswered';
+$string['settings:unanswered_check_enabled_desc'] = 'Email the spend-notification recipients when learners are asking [[tutorshort]] questions and not getting answers. The cost anomaly detector above only fires when spend goes <em>up</em>, so a provider that rejects every call costs nothing and raises no alert — that gap once hid a nine-day outage across ten courses. This watches the ratio of questions to answers instead, which falls to zero as soon as a provider breaks. Recipients come from the spend notification list; if that is empty, site administrators are used.';
+$string['settings:unanswered_window_hours'] = 'Unanswered check window (hours)';
+$string['settings:unanswered_window_hours_desc'] = 'How far back each run looks. Shorter reacts faster but needs enough traffic in the window to be meaningful.';
+$string['settings:unanswered_min_questions'] = 'Minimum questions before alerting';
+$string['settings:unanswered_min_questions_desc'] = 'A course is only judged once it has had at least this many questions in the window. Below it, a couple of learners closing the tab mid-answer looks the same as an outage.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimum answer rate';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Alert when the fraction of questions that received an answer falls below this. 0.5 catches a partial failure — one provider of several being down — rather than only a total one. Set to 0 to disable the rate test.';
+
 // v4.2: courses_admin page.
 $string['courses_admin:title']             = 'AI Course Assistant — Courses';
 $string['courses_admin:lede']              = 'Enable or disable AI Assistant per course, manage Usability Testing, or run bulk actions across many courses.';

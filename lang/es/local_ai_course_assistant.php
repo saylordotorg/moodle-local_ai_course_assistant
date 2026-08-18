@@ -1761,3 +1761,13 @@ $string['soapbox:assign_new_heading'] = 'Nueva tarea de Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Mostrar el indicador de estudiantes activos';
 $string['settings:active_learners_enabled_desc'] = 'Muestra en el panel de chat cuántas otras personas están estudiando en este momento. Es un estímulo social, no una función docente, y consulta al servidor una vez por minuto por cada panel abierto, por lo que está desactivado salvo que lo actives. El indicador solo aparece cuando hay al menos otras dos personas activas.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] comprobación de preguntas sin respuesta';
+$string['settings:unanswered_check_enabled'] = 'Avisar cuando las preguntas queden sin respuesta';
+$string['settings:unanswered_check_enabled_desc'] = 'Envía un correo a los destinatarios de notificaciones de gasto cuando los estudiantes hacen preguntas a [[tutorshort]] y no reciben respuesta. El detector de anomalías de coste solo se activa cuando el gasto <em>sube</em>, así que un proveedor que rechaza todas las llamadas no cuesta nada y no genera ninguna alerta. Esto vigila la proporción entre preguntas y respuestas, que cae a cero en cuanto un proveedor falla. Si la lista de notificaciones está vacía se usan los administradores del sitio.';
+$string['settings:unanswered_window_hours'] = 'Ventana de comprobación (horas)';
+$string['settings:unanswered_window_hours_desc'] = 'Cuánto tiempo atrás mira cada ejecución. Menos tiempo reacciona antes, pero necesita tráfico suficiente para ser significativo.';
+$string['settings:unanswered_min_questions'] = 'Mínimo de preguntas antes de avisar';
+$string['settings:unanswered_min_questions_desc'] = 'Un curso solo se evalúa cuando ha tenido al menos estas preguntas en la ventana. Por debajo, unos pocos estudiantes cerrando la pestaña parecen una caída del servicio.';
+$string['settings:unanswered_min_answer_rate'] = 'Tasa mínima de respuesta';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Avisar cuando la fracción de preguntas respondidas baje de este valor. 0,5 detecta un fallo parcial, no solo uno total. Ponlo a 0 para desactivar esta comprobación.';

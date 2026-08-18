@@ -1734,3 +1734,13 @@ $string['soapbox:assign_new_heading'] = 'Uusi Soapbox-tehtävä';
 
 $string['settings:active_learners_enabled'] = 'Näytä aktiivisten opiskelijoiden ilmaisin';
 $string['settings:active_learners_enabled_desc'] = 'Näyttää keskustelupaneelissa, kuinka moni muu opiskelee juuri nyt. Tämä on sosiaalinen kannustin eikä opetustoiminto, ja se kysyy palvelimelta kerran minuutissa jokaista avointa paneelia kohden, joten se on oletuksena pois päältä. Ilmaisin näkyy vain, kun vähintään kaksi muuta on aktiivisena.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] vastaamattomien kysymysten tarkistus';
+$string['settings:unanswered_check_enabled'] = 'Varoita, kun kysymykset jäävät vastaamatta';
+$string['settings:unanswered_check_enabled_desc'] = 'Lähettää sähköpostin kulutusilmoitusten vastaanottajille, kun opiskelijat kysyvät [[tutorshort]] eivätkä saa vastausta. Kustannuspoikkeaman tunnistin laukeaa vain kulutuksen <em>noustessa</em>: palveluntarjoaja, joka hylkää kaikki kutsut, ei maksa mitään eikä laukaise varoitusta. Tässä seurataan kysymysten ja vastausten suhdetta, joka putoaa nollaan heti kun palveluntarjoaja hajoaa. Jos lista on tyhjä, käytetään sivuston ylläpitäjiä.';
+$string['settings:unanswered_window_hours'] = 'Tarkistusikkuna (tuntia)';
+$string['settings:unanswered_window_hours_desc'] = 'Kuinka kauas taaksepäin jokainen ajo katsoo. Lyhyempi reagoi nopeammin mutta vaatii riittävästi liikennettä.';
+$string['settings:unanswered_min_questions'] = 'Vähimmäismäärä kysymyksiä ennen varoitusta';
+$string['settings:unanswered_min_questions_desc'] = 'Kurssi arvioidaan vasta tästä kysymysmäärästä alkaen. Sen alle muutama välilehden sulkenut näyttää katkokselta.';
+$string['settings:unanswered_min_answer_rate'] = 'Vähimmäisvastausosuus';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Varoita, kun vastattujen kysymysten osuus laskee tämän alle. 0,5 nappaa myös osittaisen katkoksen. 0 poistaa testin käytöstä.';

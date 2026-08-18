@@ -1747,3 +1747,13 @@ $string['soapbox:assign_new_heading'] = 'Yeni Soapbox ödevi';
 
 $string['settings:active_learners_enabled'] = 'Etkin öğrenen göstergesini göster';
 $string['settings:active_learners_enabled_desc'] = 'Sohbet panelinde şu anda kaç kişinin daha çalıştığını gösterir. Bu bir öğretim özelliği değil sosyal bir teşviktir ve açık her panel için dakikada bir sunucuya sorar, bu yüzden varsayılan olarak kapalıdır. Gösterge yalnızca en az iki kişi daha etkinken görünür.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] yanıtsız soru denetimi';
+$string['settings:unanswered_check_enabled'] = 'Sorular yanıtsız kaldığında uyar';
+$string['settings:unanswered_check_enabled_desc'] = 'Öğrenenler [[tutorshort]] sorduğunda yanıt alamıyorsa harcama bildirimi alıcılarına e-posta gönderir. Maliyet anomali dedektörü yalnızca harcama <em>arttığında</em> tetiklenir; her çağrıyı reddeden bir sağlayıcı hiçbir maliyet üretmez ve uyarı çıkmaz. Burada soru/yanıt oranı izlenir; bir sağlayıcı bozulduğunda bu oran anında sıfıra düşer. Bildirim listesi boşsa site yöneticileri kullanılır.';
+$string['settings:unanswered_window_hours'] = 'Denetim penceresi (saat)';
+$string['settings:unanswered_window_hours_desc'] = 'Her çalıştırmanın ne kadar geriye baktığı. Kısa olması daha hızlı tepki verir ama anlamlı olması için yeterli trafik gerekir.';
+$string['settings:unanswered_min_questions'] = 'Uyarı öncesi en az soru sayısı';
+$string['settings:unanswered_min_questions_desc'] = 'Bir ders ancak pencerede bu kadar soru aldıysa değerlendirilir. Altında, sekmeyi kapatan birkaç öğrenen arıza gibi görünür.';
+$string['settings:unanswered_min_answer_rate'] = 'En düşük yanıt oranı';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Yanıtlanan soru oranı bunun altına düştüğünde uyar. 0,5 kısmi arızayı da yakalar. Bu denetimi kapatmak için 0 yapın.';

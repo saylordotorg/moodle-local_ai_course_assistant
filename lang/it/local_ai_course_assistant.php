@@ -1784,3 +1784,13 @@ $string['soapbox:assign_new_heading'] = 'Nuovo compito Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Mostra l\'indicatore di studenti attivi';
 $string['settings:active_learners_enabled_desc'] = 'Mostra nel pannello della chat quante altre persone stanno studiando in questo momento. È uno stimolo sociale, non una funzione didattica, e interroga il server una volta al minuto per ogni pannello aperto, quindi è disattivato salvo attivazione. L\'indicatore compare solo se ci sono almeno altre due persone attive.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] controllo domande senza risposta';
+$string['settings:unanswered_check_enabled'] = 'Avvisa quando le domande restano senza risposta';
+$string['settings:unanswered_check_enabled_desc'] = 'Invia un\'email ai destinatari delle notifiche di spesa quando gli studenti pongono domande a [[tutorshort]] senza ricevere risposta. Il rilevatore di anomalie di costo scatta solo quando la spesa <em>aumenta</em>: un fornitore che rifiuta ogni chiamata non costa nulla e non genera alcun avviso. Qui si controlla il rapporto tra domande e risposte, che scende a zero appena un fornitore si guasta. Se l\'elenco delle notifiche è vuoto si usano gli amministratori del sito.';
+$string['settings:unanswered_window_hours'] = 'Finestra di controllo (ore)';
+$string['settings:unanswered_window_hours_desc'] = 'Quanto indietro guarda ogni esecuzione. Più breve reagisce prima ma serve traffico sufficiente per essere significativo.';
+$string['settings:unanswered_min_questions'] = 'Numero minimo di domande prima dell\'avviso';
+$string['settings:unanswered_min_questions_desc'] = 'Un corso viene valutato solo con almeno questo numero di domande nella finestra. Al di sotto, pochi studenti che chiudono la scheda sembrano un guasto.';
+$string['settings:unanswered_min_answer_rate'] = 'Tasso minimo di risposta';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Avvisa quando la quota di domande con risposta scende sotto questo valore. 0,5 intercetta anche un guasto parziale. Imposta 0 per disattivare questo controllo.';

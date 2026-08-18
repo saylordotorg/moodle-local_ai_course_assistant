@@ -1734,3 +1734,13 @@ $string['soapbox:assign_new_heading'] = 'Nouveau devoir Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Afficher l\'indicateur d\'apprenants actifs';
 $string['settings:active_learners_enabled_desc'] = 'Affiche dans le volet de discussion le nombre d\'autres personnes en train d\'étudier. C\'est un encouragement social plutôt qu\'une fonction pédagogique, et cela interroge le serveur une fois par minute pour chaque volet ouvert : désactivé par défaut. L\'indicateur n\'apparaît que si au moins deux autres personnes sont actives.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] vérification des questions sans réponse';
+$string['settings:unanswered_check_enabled'] = 'Alerter quand des questions restent sans réponse';
+$string['settings:unanswered_check_enabled_desc'] = 'Envoie un courriel aux destinataires des notifications de dépense lorsque les apprenants posent des questions à [[tutorshort]] sans obtenir de réponse. Le détecteur d\'anomalies de coût ne se déclenche que si la dépense <em>augmente</em> : un fournisseur qui rejette tous les appels ne coûte rien et ne déclenche aucune alerte. Ceci surveille le rapport questions/réponses, qui tombe à zéro dès qu\'un fournisseur tombe en panne. Si la liste de notification est vide, les administrateurs du site sont utilisés.';
+$string['settings:unanswered_window_hours'] = 'Fenêtre de vérification (heures)';
+$string['settings:unanswered_window_hours_desc'] = 'Profondeur d\'analyse de chaque exécution. Plus court réagit plus vite mais demande assez de trafic pour être significatif.';
+$string['settings:unanswered_min_questions'] = 'Nombre minimal de questions avant alerte';
+$string['settings:unanswered_min_questions_desc'] = 'Un cours n\'est évalué qu\'à partir de ce nombre de questions dans la fenêtre. En dessous, quelques apprenants fermant l\'onglet ressemblent à une panne.';
+$string['settings:unanswered_min_answer_rate'] = 'Taux de réponse minimal';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Alerter lorsque la proportion de questions ayant reçu une réponse passe sous ce seuil. 0,5 détecte une panne partielle, pas seulement totale. Mettre 0 pour désactiver ce test.';

@@ -1750,3 +1750,13 @@ $string['soapbox:assign_new_heading'] = 'Ọrụ Soapbox ọhụrụ';
 
 $string['settings:active_learners_enabled'] = 'Gosi ihe ngosi ndị mmụta na-arụ ọrụ';
 $string['settings:active_learners_enabled_desc'] = 'Ọ na-egosi na mpanel mkparịta ụka ka ọtụtụ ndị ọzọ na-amụ ihe ugbu a. Nke a bụ nkwado mmekọrịta, ọ bụghị atụmatụ nkuzi, ọ na-ajụkwa sava otu ugboro kwa nkeji maka mpanel ọ bụla mepere emepe, ya mere a gbanyụrụ ya na ndabara. Ihe ngosi ahụ na-apụta naanị mgbe opekempe mmadụ abụọ ọzọ na-arụ ọrụ.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] nyocha ajụjụ a na-azaghị';
+$string['settings:unanswered_check_enabled'] = 'Dọọ aka ná ntị mgbe ajụjụ na-enweghị azịza';
+$string['settings:unanswered_check_enabled_desc'] = 'Na-eziga ozi-e nye ndị na-anata ọkwa mmefu mgbe ndị mmụta jụrụ [[tutorshort]] ajụjụ ma ha enwetaghị azịza. Ihe nchọpụta mmefu na-arụ ọrụ naanị mgbe mmefu na-<em>arịgo</em>: onye na-ekwenyeghị oku ọ bụla anaghị efu ihe ọ bụla, ya mere ọ dịghị ọkwa. Ebe a, a na-elekọta oke ajụjụ na azịza, nke na-adaba na efu ozugbo onye na-eweta mebiri. Ọ bụrụ na ndepụta ahụ tọgbọrọ chakoo, a ga-eji ndị nchịkwa saịtị.';
+$string['settings:unanswered_window_hours'] = 'Oghere nyocha (awa)';
+$string['settings:unanswered_window_hours_desc'] = 'Ka ọ dị anya ka ọ bụla na-eleghachi azụ. Nke dị mkpụmkpụ na-aza ngwa ngwa mana ọ chọrọ okporo ụzọ zuru ezu.';
+$string['settings:unanswered_min_questions'] = 'Ọnụ ọgụgụ ajụjụ kacha nta tupu ọkwa';
+$string['settings:unanswered_min_questions_desc'] = 'A na-enyocha nkuzi naanị site na ọnụ ọgụgụ ajụjụ a. N\'okpuru ya, ndị mmụta ole na ole mechiri taabụ dị ka mmebi.';
+$string['settings:unanswered_min_answer_rate'] = 'Ọnụego azịza kacha nta';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Dọọ aka mgbe oke ajụjụ nwetara azịza dabara n\'okpuru nke a. 0.5 na-ejide mmebi akụkụ. Tọọ 0 iji gbanyụọ.';

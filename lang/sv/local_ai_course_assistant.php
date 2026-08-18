@@ -1733,3 +1733,13 @@ $string['soapbox:assign_new_heading'] = 'Ny Soapbox-uppgift';
 
 $string['settings:active_learners_enabled'] = 'Visa indikator för aktiva deltagare';
 $string['settings:active_learners_enabled_desc'] = 'Visar i chattpanelen hur många andra som studerar just nu. Det är en social knuff snarare än en undervisningsfunktion, och den frågar servern en gång i minuten för varje öppen panel, därför är den avstängd som standard. Indikatorn visas bara när minst två andra är aktiva.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] kontroll av obesvarade frågor';
+$string['settings:unanswered_check_enabled'] = 'Varna när frågor förblir obesvarade';
+$string['settings:unanswered_check_enabled_desc'] = 'Skickar e-post till mottagarna av utgiftsnotiser när deltagare ställer [[tutorshort]] frågor utan att få svar. Kostnadsdetektorn utlöses bara när utgiften <em>ökar</em>: en leverantör som avvisar alla anrop kostar ingenting och ger ingen varning. Här övervakas förhållandet mellan frågor och svar, som faller till noll så snart en leverantör går sönder. Är listan tom används webbplatsens administratörer.';
+$string['settings:unanswered_window_hours'] = 'Kontrollfönster (timmar)';
+$string['settings:unanswered_window_hours_desc'] = 'Hur långt tillbaka varje körning tittar. Kortare reagerar snabbare men kräver tillräcklig trafik.';
+$string['settings:unanswered_min_questions'] = 'Minsta antal frågor före varning';
+$string['settings:unanswered_min_questions_desc'] = 'En kurs bedöms först från detta antal frågor. Under det ser några deltagare som stänger fliken ut som ett avbrott.';
+$string['settings:unanswered_min_answer_rate'] = 'Lägsta svarsfrekvens';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Varna när andelen besvarade frågor faller under detta. 0,5 fångar även ett partiellt avbrott. 0 stänger av testet.';

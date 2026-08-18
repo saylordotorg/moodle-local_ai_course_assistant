@@ -1770,3 +1770,13 @@ $string['soapbox:assign_new_heading'] = 'Kazi mpya ya Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Onyesha kiashiria cha wanafunzi hai';
 $string['settings:active_learners_enabled_desc'] = 'Huonyesha katika kidirisha cha mazungumzo ni watu wangapi wengine wanaosoma sasa hivi. Hii ni motisha ya kijamii, si kipengele cha ufundishaji, na huuliza seva mara moja kwa dakika kwa kila kidirisha kilichofunguliwa, hivyo imezimwa kwa chaguo-msingi. Kiashiria huonekana tu wakati angalau watu wengine wawili wako hai.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] ukaguzi wa maswali yasiyojibiwa';
+$string['settings:unanswered_check_enabled'] = 'Onya maswali yanapokosa majibu';
+$string['settings:unanswered_check_enabled_desc'] = 'Hutuma barua pepe kwa wapokeaji wa arifa za matumizi wanafunzi wanapouliza [[tutorshort]] bila kupata jibu. Kigunduzi cha hitilafu za gharama hufanya kazi tu gharama <em>zinapoongezeka</em>: mtoa huduma anayekataa kila ombi hagharimu chochote hivyo hakuna onyo. Hapa tunafuatilia uwiano wa maswali kwa majibu, ambao hushuka hadi sifuri mara tu mtoa huduma anapoharibika. Orodha ikiwa tupu, wasimamizi wa tovuti hutumika.';
+$string['settings:unanswered_window_hours'] = 'Dirisha la ukaguzi (saa)';
+$string['settings:unanswered_window_hours_desc'] = 'Kila utekelezaji hutazama nyuma kiasi gani. Fupi hujibu haraka lakini huhitaji trafiki ya kutosha.';
+$string['settings:unanswered_min_questions'] = 'Idadi ya chini ya maswali kabla ya onyo';
+$string['settings:unanswered_min_questions_desc'] = 'Kozi hupimwa tu kuanzia idadi hii ya maswali. Chini ya hapo, wanafunzi wachache wanaofunga kichupo huonekana kama hitilafu.';
+$string['settings:unanswered_min_answer_rate'] = 'Kiwango cha chini cha majibu';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Onya wakati sehemu ya maswali yaliyojibiwa inaposhuka chini ya hii. 0.5 hunasa hitilafu ya sehemu pia. Weka 0 kuzima.';

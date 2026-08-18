@@ -1770,3 +1770,13 @@ $string['soapbox:assign_new_heading'] = 'Bagong takdang-aralin sa Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Ipakita ang indikator ng aktibong mag-aaral';
 $string['settings:active_learners_enabled_desc'] = 'Ipinapakita sa chat panel kung ilan pang iba ang nag-aaral ngayon. Isa itong panlipunang udyok, hindi tampok sa pagtuturo, at nagtatanong ito sa server minsan kada minuto para sa bawat bukas na panel, kaya naka-off ito bilang default. Lumalabas lamang ang indikator kapag may hindi bababa sa dalawang iba pang aktibo.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] pagsusuri ng hindi nasagot na tanong';
+$string['settings:unanswered_check_enabled'] = 'Magbabala kapag hindi nasasagot ang mga tanong';
+$string['settings:unanswered_check_enabled_desc'] = 'Nagpapadala ng email sa mga tatanggap ng abiso sa paggastos kapag nagtatanong ang mga mag-aaral sa [[tutorshort]] at walang sagot. Ang detektor ng anomalya sa gastos ay pumuputok lamang kapag <em>tumataas</em> ang gastos: ang provider na tumatanggi sa lahat ng tawag ay walang gastos kaya walang babala. Dito, ang ratio ng tanong sa sagot ang binabantayan, na bumabagsak sa zero kapag nasira ang provider. Kung walang laman ang listahan, ginagamit ang mga administrador.';
+$string['settings:unanswered_window_hours'] = 'Bintana ng pagsusuri (oras)';
+$string['settings:unanswered_window_hours_desc'] = 'Gaano kalayo pabalik tumitingin ang bawat pagtakbo. Mas maikli ay mas mabilis tumugon ngunit kailangan ng sapat na trapiko.';
+$string['settings:unanswered_min_questions'] = 'Pinakamababang tanong bago magbabala';
+$string['settings:unanswered_min_questions_desc'] = 'Sinusuri lang ang kurso mula sa bilang na ito ng tanong. Sa ibaba nito, ilang mag-aaral na nagsara ng tab ay mukhang pagkasira.';
+$string['settings:unanswered_min_answer_rate'] = 'Pinakamababang antas ng sagot';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Magbabala kapag bumaba rito ang bahagdan ng nasagot na tanong. Nahuhuli ng 0.5 ang bahagyang pagkasira. Itakda sa 0 upang huwag paganahin.';

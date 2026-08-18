@@ -1777,3 +1777,13 @@ $string['soapbox:assign_new_heading'] = 'מטלת Soapbox חדשה';
 
 $string['settings:active_learners_enabled'] = 'הצגת מחוון לומדים פעילים';
 $string['settings:active_learners_enabled_desc'] = 'מציג בלוח הצ\'אט כמה אנשים נוספים לומדים כרגע. זהו תמריץ חברתי ולא תכונה לימודית, והוא פונה לשרת פעם בדקה עבור כל לוח פתוח, ולכן הוא כבוי כברירת מחדל. המחוון מופיע רק כששני לומדים אחרים לפחות פעילים.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] בדיקת שאלות ללא מענה';
+$string['settings:unanswered_check_enabled'] = 'התראה כששאלות נותרות ללא מענה';
+$string['settings:unanswered_check_enabled_desc'] = 'שולח דוא"ל לנמעני התראות ההוצאה כאשר לומדים שואלים את [[tutorshort]] ואינם מקבלים מענה. גלאי חריגות העלות פועל רק כשההוצאה <em>עולה</em>, ולכן ספק שדוחה כל קריאה אינו עולה דבר ואינו מפעיל התראה. כאן נבדק היחס בין שאלות לתשובות, שצונח לאפס ברגע שספק מתקלקל. אם רשימת ההתראות ריקה, נעשה שימוש במנהלי האתר.';
+$string['settings:unanswered_window_hours'] = 'חלון הבדיקה (שעות)';
+$string['settings:unanswered_window_hours_desc'] = 'כמה אחורה מסתכלת כל הרצה. חלון קצר מגיב מהר יותר אך דורש תעבורה מספקת.';
+$string['settings:unanswered_min_questions'] = 'מספר שאלות מזערי לפני התראה';
+$string['settings:unanswered_min_questions_desc'] = 'קורס נבדק רק ממספר שאלות זה בחלון. מתחת לכך, כמה לומדים שסוגרים לשונית נראים כמו תקלה.';
+$string['settings:unanswered_min_answer_rate'] = 'שיעור מענה מזערי';
+$string['settings:unanswered_min_answer_rate_desc'] = 'התרעה כששיעור השאלות שנענו יורד מתחת לערך זה. 0.5 מזהה גם תקלה חלקית. אפס מבטל בדיקה זו.';

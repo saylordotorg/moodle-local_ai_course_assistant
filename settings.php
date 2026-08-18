@@ -1020,6 +1020,43 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    // v6.9.7: unanswered-question monitor. The cost detector above only fires
+    // when spend goes UP, so a provider that rejects every call costs nothing
+    // and stays invisible — that gap hid a nine-day outage across ten courses
+    // in August 2026. This watches the ratio of learner questions to assistant
+    // replies instead, which drops to zero the moment a provider breaks.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/unanswered_check_enabled',
+        get_string('settings:unanswered_check_enabled', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(
+            get_string('settings:unanswered_check_enabled_desc', 'local_ai_course_assistant')),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_window_hours',
+        get_string('settings:unanswered_window_hours', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_window_hours_desc', 'local_ai_course_assistant'),
+        '6',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_min_questions',
+        get_string('settings:unanswered_min_questions', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_min_questions_desc', 'local_ai_course_assistant'),
+        '5',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_min_answer_rate',
+        get_string('settings:unanswered_min_answer_rate', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_min_answer_rate_desc', 'local_ai_course_assistant'),
+        // As with cost_anomaly_multiplier, the default must round-trip through
+        // clean_param(PARAM_FLOAT) unchanged or install-time validation fails:
+        // '0.5' cleans to 0.5 and compares equal, so this one is safe as-is.
+        '0.5',
+        PARAM_FLOAT
+    ));
+
     // v6.4.0: signed policy bundle — behavior-as-data updates without a code
     // deploy. Daily task fetches a JSON envelope, verifies the Ed25519
     // signature, enforces the settings allowlist + monotonic version, applies

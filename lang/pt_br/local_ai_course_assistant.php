@@ -1756,3 +1756,13 @@ $string['soapbox:assign_new_heading'] = 'Nova tarefa do Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Mostrar o indicador de alunos ativos';
 $string['settings:active_learners_enabled_desc'] = 'Mostra no painel de chat quantas outras pessoas estão estudando agora. É um estímulo social, não um recurso pedagógico, e consulta o servidor uma vez por minuto para cada painel aberto, por isso fica desativado a menos que você ative. O indicador só aparece quando há pelo menos duas outras pessoas ativas.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] verificação de perguntas sem resposta';
+$string['settings:unanswered_check_enabled'] = 'Avisar quando perguntas ficarem sem resposta';
+$string['settings:unanswered_check_enabled_desc'] = 'Envia e-mail aos destinatários das notificações de gasto quando os alunos fazem perguntas ao [[tutorshort]] e não recebem resposta. O detector de anomalia de custo só dispara quando o gasto <em>sobe</em>: um provedor que rejeita todas as chamadas não custa nada e não gera alerta. Aqui monitoramos a proporção entre perguntas e respostas, que cai a zero assim que um provedor falha. Se a lista de notificação estiver vazia, usam-se os administradores do site.';
+$string['settings:unanswered_window_hours'] = 'Janela de verificação (horas)';
+$string['settings:unanswered_window_hours_desc'] = 'Quanto tempo atrás cada execução observa. Mais curto reage mais rápido, mas precisa de tráfego suficiente para ter significado.';
+$string['settings:unanswered_min_questions'] = 'Mínimo de perguntas antes de alertar';
+$string['settings:unanswered_min_questions_desc'] = 'Um curso só é avaliado com pelo menos esta quantidade de perguntas na janela. Abaixo disso, alguns alunos fechando a aba parecem uma queda.';
+$string['settings:unanswered_min_answer_rate'] = 'Taxa mínima de resposta';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Alertar quando a fração de perguntas respondidas cair abaixo disso. 0,5 detecta falha parcial, não apenas total. Use 0 para desativar este teste.';

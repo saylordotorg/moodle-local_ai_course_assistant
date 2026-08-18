@@ -1769,3 +1769,13 @@ $string['soapbox:assign_new_heading'] = 'Umsebenzi omusha we-Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Bonisa inkomba yabafundi abasebenzayo';
 $string['settings:active_learners_enabled_desc'] = 'Ikhombisa kwiphaneli yengxoxo ukuthi bangaki abanye abafunda njengamanje. Lokhu ukukhuthaza komphakathi, hhayi isici sokufundisa, futhi ibuza iseva kanye ngomzuzu kuwo wonke amaphaneli avuliwe, ngakho ivaliwe ngokuzenzakalela. Inkomba ivela kuphela lapho kunabanye ababili okungenani abasebenzayo.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] ukuhlola imibuzo engaphendulwanga';
+$string['settings:unanswered_check_enabled'] = 'Xwayisa lapho imibuzo ingaphendulwa';
+$string['settings:unanswered_check_enabled_desc'] = 'Ithumela i-imeyili kubamukeli bezaziso zezindleko lapho abafundi bebuza i-[[tutorshort]] bengatholi mpendulo. Isitholi sokungajwayelekile kwezindleko sisebenza kuphela lapho izindleko <em>zikhuphuka</em>: umhlinzeki owenqaba yonke imiyalo akadli lutho ngakho akukho xwayiso. Lapha kubhekwa isilinganiso semibuzo kuya ezimpendulweni, esehla safika kuziro lapho umhlinzeki elimala. Uma uhlu lungenalutho, kusetshenziswa abaphathi besayithi.';
+$string['settings:unanswered_window_hours'] = 'Iwindi lokuhlola (amahora)';
+$string['settings:unanswered_window_hours_desc'] = 'Ukuthi ukusebenza ngakunye kubuka emuva kangakanani. Okufushane kusabela ngokushesha kodwa kudinga ithrafikhi eyanele.';
+$string['settings:unanswered_min_questions'] = 'Inani eliphansi lemibuzo ngaphambi kokuxwayisa';
+$string['settings:unanswered_min_questions_desc'] = 'Isifundo sihlolwa kuphela kusukela kuleli nani lemibuzo. Ngaphansi kwalokho, abafundi abambalwa abavala ithebhu babukeka njengokwehluleka.';
+$string['settings:unanswered_min_answer_rate'] = 'Izinga eliphansi lezimpendulo';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Xwayisa lapho ingxenye yemibuzo ephenduliwe yehla ngaphansi kwalokhu. U-0.5 uthola nokwehluleka okuyingxenye. Setha ku-0 ukuvala.';

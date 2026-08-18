@@ -1756,3 +1756,13 @@ $string['soapbox:assign_new_heading'] = 'ਨਵੀਂ Soapbox ਅਸਾਈਨਮ
 
 $string['settings:active_learners_enabled'] = 'ਸਰਗਰਮ ਸਿੱਖਿਆਰਥੀ ਸੂਚਕ ਵਿਖਾਓ';
 $string['settings:active_learners_enabled_desc'] = 'ਚੈਟ ਪੈਨਲ ਵਿੱਚ ਵਿਖਾਉਂਦਾ ਹੈ ਕਿ ਇਸ ਵੇਲੇ ਹੋਰ ਕਿੰਨੇ ਲੋਕ ਪੜ੍ਹ ਰਹੇ ਹਨ। ਇਹ ਸਿਖਾਉਣ ਦੀ ਵਿਸ਼ੇਸ਼ਤਾ ਨਹੀਂ ਸਗੋਂ ਇੱਕ ਸਮਾਜਿਕ ਹੱਲਾਸ਼ੇਰੀ ਹੈ, ਅਤੇ ਹਰ ਖੁੱਲ੍ਹੇ ਪੈਨਲ ਲਈ ਮਿੰਟ ਵਿੱਚ ਇੱਕ ਵਾਰ ਸਰਵਰ ਤੋਂ ਪੁੱਛਦਾ ਹੈ, ਇਸ ਲਈ ਇਹ ਮੂਲ ਰੂਪ ਵਿੱਚ ਬੰਦ ਹੈ। ਸੂਚਕ ਤਾਂ ਹੀ ਦਿਸਦਾ ਹੈ ਜਦੋਂ ਘੱਟੋ-ਘੱਟ ਦੋ ਹੋਰ ਲੋਕ ਸਰਗਰਮ ਹੋਣ।';
+
+$string['task:unanswered_check'] = '[[tutorshort]] ਬਿਨਾਂ ਜਵਾਬ ਸਵਾਲਾਂ ਦੀ ਜਾਂਚ';
+$string['settings:unanswered_check_enabled'] = 'ਸਵਾਲ ਬਿਨਾਂ ਜਵਾਬ ਰਹਿਣ \'ਤੇ ਚੇਤਾਵਨੀ ਦਿਓ';
+$string['settings:unanswered_check_enabled_desc'] = 'ਜਦੋਂ ਸਿੱਖਿਆਰਥੀ [[tutorshort]] ਨੂੰ ਸਵਾਲ ਪੁੱਛਣ ਤੇ ਜਵਾਬ ਨਾ ਮਿਲੇ, ਤਾਂ ਖਰਚ ਸੂਚਨਾ ਪ੍ਰਾਪਤਕਰਤਾਵਾਂ ਨੂੰ ਈਮੇਲ ਭੇਜਦਾ ਹੈ। ਖਰਚ ਅਸੰਗਤੀ ਖੋਜਕਰਤਾ ਸਿਰਫ਼ ਖਰਚ <em>ਵਧਣ</em> \'ਤੇ ਚੱਲਦਾ ਹੈ; ਹਰ ਕਾਲ ਰੱਦ ਕਰਨ ਵਾਲੇ ਪ੍ਰਦਾਤਾ ਦਾ ਕੋਈ ਖਰਚ ਨਹੀਂ, ਇਸ ਲਈ ਕੋਈ ਚੇਤਾਵਨੀ ਨਹੀਂ ਆਉਂਦੀ। ਇੱਥੇ ਸਵਾਲ ਤੇ ਜਵਾਬ ਦਾ ਅਨੁਪਾਤ ਵੇਖਿਆ ਜਾਂਦਾ ਹੈ, ਜੋ ਪ੍ਰਦਾਤਾ ਖਰਾਬ ਹੁੰਦਿਆਂ ਹੀ ਸਿਫ਼ਰ ਹੋ ਜਾਂਦਾ ਹੈ। ਸੂਚੀ ਖਾਲੀ ਹੋਵੇ ਤਾਂ ਸਾਈਟ ਪ੍ਰਬੰਧਕ ਵਰਤੇ ਜਾਂਦੇ ਹਨ।';
+$string['settings:unanswered_window_hours'] = 'ਜਾਂਚ ਵਿੰਡੋ (ਘੰਟੇ)';
+$string['settings:unanswered_window_hours_desc'] = 'ਹਰ ਵਾਰ ਕਿੰਨਾ ਪਿੱਛੇ ਵੇਖਿਆ ਜਾਵੇ। ਘੱਟ ਸਮਾਂ ਤੇਜ਼ ਜਵਾਬ ਦਿੰਦਾ ਹੈ ਪਰ ਕਾਫ਼ੀ ਟ੍ਰੈਫਿਕ ਚਾਹੀਦਾ ਹੈ।';
+$string['settings:unanswered_min_questions'] = 'ਚੇਤਾਵਨੀ ਤੋਂ ਪਹਿਲਾਂ ਘੱਟੋ-ਘੱਟ ਸਵਾਲ';
+$string['settings:unanswered_min_questions_desc'] = 'ਕੋਰਸ ਦਾ ਮੁਲਾਂਕਣ ਇਸ ਗਿਣਤੀ ਤੋਂ ਹੀ ਹੁੰਦਾ ਹੈ। ਇਸ ਤੋਂ ਘੱਟ \'ਤੇ, ਕੁਝ ਸਿੱਖਿਆਰਥੀਆਂ ਦਾ ਟੈਬ ਬੰਦ ਕਰਨਾ ਵੀ ਖਰਾਬੀ ਵਾਂਗ ਲੱਗਦਾ ਹੈ।';
+$string['settings:unanswered_min_answer_rate'] = 'ਘੱਟੋ-ਘੱਟ ਜਵਾਬ ਦਰ';
+$string['settings:unanswered_min_answer_rate_desc'] = 'ਜਵਾਬ ਮਿਲੇ ਸਵਾਲਾਂ ਦਾ ਅਨੁਪਾਤ ਇਸ ਤੋਂ ਹੇਠਾਂ ਆਉਣ \'ਤੇ ਚੇਤਾਵਨੀ ਦਿਓ। 0.5 ਅੰਸ਼ਕ ਖਰਾਬੀ ਵੀ ਫੜਦਾ ਹੈ। ਬੰਦ ਕਰਨ ਲਈ 0 ਰੱਖੋ।';
