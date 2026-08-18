@@ -1766,3 +1766,6 @@ $string['soapbox:assign_created'] = 'Umsebenzi wenziwe.';
 $string['soapbox:assign_delete_confirm'] = 'Susa "{$a}" nakho konke okuqoshiwe kwawo? Lokhu akukwazi ukuhlehliswa.';
 $string['soapbox:assign_edit_heading'] = 'Hlela umsebenzi we-Soapbox';
 $string['soapbox:assign_new_heading'] = 'Umsebenzi omusha we-Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Bonisa inkomba yabafundi abasebenzayo';
+$string['settings:active_learners_enabled_desc'] = 'Ikhombisa kwiphaneli yengxoxo ukuthi bangaki abanye abafunda njengamanje. Lokhu ukukhuthaza komphakathi, hhayi isici sokufundisa, futhi ibuza iseva kanye ngomzuzu kuwo wonke amaphaneli avuliwe, ngakho ivaliwe ngokuzenzakalela. Inkomba ivela kuphela lapho kunabanye ababili okungenani abasebenzayo.';

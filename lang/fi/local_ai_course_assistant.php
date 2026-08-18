@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'Tehtävä luotu.';
 $string['soapbox:assign_delete_confirm'] = 'Poistetaanko "{$a}" ja kaikki sen nauhoitukset? Tätä ei voi kumota.';
 $string['soapbox:assign_edit_heading'] = 'Muokkaa Soapbox-tehtävää';
 $string['soapbox:assign_new_heading'] = 'Uusi Soapbox-tehtävä';
+
+$string['settings:active_learners_enabled'] = 'Näytä aktiivisten opiskelijoiden ilmaisin';
+$string['settings:active_learners_enabled_desc'] = 'Näyttää keskustelupaneelissa, kuinka moni muu opiskelee juuri nyt. Tämä on sosiaalinen kannustin eikä opetustoiminto, ja se kysyy palvelimelta kerran minuutissa jokaista avointa paneelia kohden, joten se on oletuksena pois päältä. Ilmaisin näkyy vain, kun vähintään kaksi muuta on aktiivisena.';

@@ -1760,3 +1760,6 @@ $string['soapbox:assign_created'] = 'Tugasan dicipta.';
 $string['soapbox:assign_delete_confirm'] = 'Padam "{$a}" dan semua rakamannya? Tindakan ini tidak boleh dibatalkan.';
 $string['soapbox:assign_edit_heading'] = 'Edit tugasan Soapbox';
 $string['soapbox:assign_new_heading'] = 'Tugasan Soapbox baharu';
+
+$string['settings:active_learners_enabled'] = 'Tunjukkan penunjuk pelajar aktif';
+$string['settings:active_learners_enabled_desc'] = 'Menunjukkan dalam panel sembang berapa ramai orang lain sedang belajar sekarang. Ini dorongan sosial, bukan ciri pengajaran, dan ia bertanya kepada pelayan sekali seminit bagi setiap panel yang terbuka, jadi ia dimatikan secara lalai. Penunjuk hanya muncul apabila sekurang-kurangnya dua orang lain aktif.';

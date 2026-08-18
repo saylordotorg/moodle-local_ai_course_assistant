@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'Devoir créé.';
 $string['soapbox:assign_delete_confirm'] = 'Supprimer « {$a} » et tous ses enregistrements ? Cette action est irréversible.';
 $string['soapbox:assign_edit_heading'] = 'Modifier le devoir Soapbox';
 $string['soapbox:assign_new_heading'] = 'Nouveau devoir Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Afficher l\'indicateur d\'apprenants actifs';
+$string['settings:active_learners_enabled_desc'] = 'Affiche dans le volet de discussion le nombre d\'autres personnes en train d\'étudier. C\'est un encouragement social plutôt qu\'une fonction pédagogique, et cela interroge le serveur une fois par minute pour chaque volet ouvert : désactivé par défaut. L\'indicateur n\'apparaît que si au moins deux autres personnes sont actives.';

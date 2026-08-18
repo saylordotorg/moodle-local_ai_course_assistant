@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'Aufgabe erstellt.';
 $string['soapbox:assign_delete_confirm'] = '„{$a}“ und alle zugehörigen Aufnahmen löschen? Dies kann nicht rückgängig gemacht werden.';
 $string['soapbox:assign_edit_heading'] = 'Soapbox-Aufgabe bearbeiten';
 $string['soapbox:assign_new_heading'] = 'Neue Soapbox-Aufgabe';
+
+$string['settings:active_learners_enabled'] = 'Anzeige aktiver Lernender einblenden';
+$string['settings:active_learners_enabled_desc'] = 'Zeigt im Chat-Bereich, wie viele andere gerade lernen. Das ist ein sozialer Anreiz und keine Lehrfunktion; es fragt den Server einmal pro Minute für jeden geöffneten Bereich ab und ist daher standardmäßig aus. Die Anzeige erscheint nur, wenn mindestens zwei andere aktiv sind.';

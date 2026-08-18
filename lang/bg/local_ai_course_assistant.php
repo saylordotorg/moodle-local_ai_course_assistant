@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'Задачата е създадена.';
 $string['soapbox:assign_delete_confirm'] = 'Да се изтрие ли „{$a}“ и всички негови записи? Това действие е необратимо.';
 $string['soapbox:assign_edit_heading'] = 'Редактиране на задача Soapbox';
 $string['soapbox:assign_new_heading'] = 'Нова задача Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Показване на индикатора за активни учащи';
+$string['settings:active_learners_enabled_desc'] = 'Показва в панела за чат колко други хора учат в момента. Това е социален стимул, а не учебна функция, и прави заявка към сървъра веднъж в минута за всеки отворен панел, затова по подразбиране е изключено. Индикаторът се появява само когато са активни поне двама други.';

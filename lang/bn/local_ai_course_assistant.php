@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'অ্যাসাইনমেন্ট ত
 $string['soapbox:assign_delete_confirm'] = '"{$a}" এবং এর সব রেকর্ডিং মুছে ফেলবেন? এটি ফিরিয়ে আনা যাবে না।';
 $string['soapbox:assign_edit_heading'] = 'Soapbox অ্যাসাইনমেন্ট সম্পাদনা';
 $string['soapbox:assign_new_heading'] = 'নতুন Soapbox অ্যাসাইনমেন্ট';
+
+$string['settings:active_learners_enabled'] = 'সক্রিয় শিক্ষার্থী সূচক দেখান';
+$string['settings:active_learners_enabled_desc'] = 'চ্যাট প্যানেলে দেখায় এই মুহূর্তে আর কতজন পড়াশোনা করছেন। এটি শিক্ষণ বৈশিষ্ট্য নয়, বরং একটি সামাজিক উৎসাহ, এবং প্রতিটি খোলা প্যানেলের জন্য মিনিটে একবার সার্ভারে অনুরোধ করে, তাই এটি ডিফল্টভাবে বন্ধ। অন্তত আরও দুজন সক্রিয় থাকলে তবেই সূচকটি দেখা যায়।';

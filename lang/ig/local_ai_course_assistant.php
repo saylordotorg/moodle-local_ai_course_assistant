@@ -1747,3 +1747,6 @@ $string['soapbox:assign_created'] = 'Emepụtala ọrụ ahụ.';
 $string['soapbox:assign_delete_confirm'] = 'Hichapụ "{$a}" na ndekọ ya niile? Enweghị ike ịgbanwe nke a.';
 $string['soapbox:assign_edit_heading'] = 'Dezie ọrụ Soapbox';
 $string['soapbox:assign_new_heading'] = 'Ọrụ Soapbox ọhụrụ';
+
+$string['settings:active_learners_enabled'] = 'Gosi ihe ngosi ndị mmụta na-arụ ọrụ';
+$string['settings:active_learners_enabled_desc'] = 'Ọ na-egosi na mpanel mkparịta ụka ka ọtụtụ ndị ọzọ na-amụ ihe ugbu a. Nke a bụ nkwado mmekọrịta, ọ bụghị atụmatụ nkuzi, ọ na-ajụkwa sava otu ugboro kwa nkeji maka mpanel ọ bụla mepere emepe, ya mere a gbanyụrụ ya na ndabara. Ihe ngosi ahụ na-apụta naanị mgbe opekempe mmadụ abụọ ọzọ na-arụ ọrụ.';

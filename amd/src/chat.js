@@ -1886,9 +1886,21 @@ define([
                                 const key = (res && res.scope === 'course')
                                     ? 'active_learners:line'
                                     : 'active_learners:line_global';
-                                Str.get_string(key, 'local_ai_course_assistant', n).then(function(line) {
-                                    text.textContent = line;
+                                // Fetch the template and substitute here rather than
+                                // passing n as get_string's third argument. Moodle caches
+                                // JS strings in localStorage keyed by id/component/lang
+                                // WITHOUT the parameter, so a parameterised call can be
+                                // served from that cache and skip the server entirely —
+                                // which yields the raw '{$a} ...' template, or the bare
+                                // string id. Observed on learn.saylor.org in en_us, where
+                                // the widget rendered a literal 'active_learners:line_global'
+                                // on every load and core_get_string was never requested.
+                                Str.get_string(key, 'local_ai_course_assistant').then(function(tpl) {
+                                    text.textContent = String(tpl).replace('{$a}', n);
                                     box.hidden = false;
+                                }).catch(function() {
+                                    // Never leave a half-resolved string on screen.
+                                    box.hidden = true;
                                 });
                             } else {
                                 box.hidden = true;

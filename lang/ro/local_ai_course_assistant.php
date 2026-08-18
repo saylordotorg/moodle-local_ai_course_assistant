@@ -1730,3 +1730,6 @@ $string['soapbox:assign_created'] = 'Tema a fost creată.';
 $string['soapbox:assign_delete_confirm'] = 'Ștergi „{$a}” și toate înregistrările sale? Această acțiune nu poate fi anulată.';
 $string['soapbox:assign_edit_heading'] = 'Editează tema Soapbox';
 $string['soapbox:assign_new_heading'] = 'Temă Soapbox nouă';
+
+$string['settings:active_learners_enabled'] = 'Afișează indicatorul de cursanți activi';
+$string['settings:active_learners_enabled_desc'] = 'Afișează în panoul de chat câți alți oameni învață acum. Este un stimul social, nu o funcție didactică, și interoghează serverul o dată pe minut pentru fiecare panou deschis, de aceea este dezactivat implicit. Indicatorul apare doar când sunt activi cel puțin alți doi.';

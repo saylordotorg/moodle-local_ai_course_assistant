@@ -1730,3 +1730,6 @@ $string['soapbox:assign_created'] = 'Opdracht aangemaakt.';
 $string['soapbox:assign_delete_confirm'] = '"{$a}" en alle bijbehorende opnames verwijderen? Dit kan niet ongedaan worden gemaakt.';
 $string['soapbox:assign_edit_heading'] = 'Soapbox-opdracht bewerken';
 $string['soapbox:assign_new_heading'] = 'Nieuwe Soapbox-opdracht';
+
+$string['settings:active_learners_enabled'] = 'Indicator voor actieve deelnemers tonen';
+$string['settings:active_learners_enabled_desc'] = 'Toont in het chatpaneel hoeveel anderen op dit moment studeren. Dit is een sociale prikkel en geen lesfunctie, en het bevraagt de server één keer per minuut voor elk geopend paneel; daarom staat het standaard uit. De indicator verschijnt alleen als er minstens twee anderen actief zijn.';

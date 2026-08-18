@@ -1731,3 +1731,6 @@ $string['soapbox:assign_created'] = 'Opgaven blev oprettet.';
 $string['soapbox:assign_delete_confirm'] = 'Slet "{$a}" og alle dens optagelser? Dette kan ikke fortrydes.';
 $string['soapbox:assign_edit_heading'] = 'Rediger Soapbox-opgave';
 $string['soapbox:assign_new_heading'] = 'Ny Soapbox-opgave';
+
+$string['settings:active_learners_enabled'] = 'Vis indikator for aktive studerende';
+$string['settings:active_learners_enabled_desc'] = 'Viser i chatpanelet, hvor mange andre der studerer lige nu. Det er et socialt puf snarere end en undervisningsfunktion, og det spørger serveren én gang i minuttet for hvert åbent panel, så det er slået fra som standard. Indikatoren vises kun, når mindst to andre er aktive.';

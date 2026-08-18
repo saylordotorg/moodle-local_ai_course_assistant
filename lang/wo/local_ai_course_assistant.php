@@ -1766,3 +1766,6 @@ $string['soapbox:assign_created'] = 'Liggéey bi sos nañu ko.';
 $string['soapbox:assign_delete_confirm'] = 'Ndax nu far "{$a}" ak enrejistrëmaan yépp? Mënuñu koo delloo.';
 $string['soapbox:assign_edit_heading'] = 'Soppi liggéey bu Soapbox';
 $string['soapbox:assign_new_heading'] = 'Liggéey bu bees bu Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Wone màndargaal jàngkat yi ci liggéey';
+$string['settings:active_learners_enabled_desc'] = 'Mu ngi wone ci panel bu waxtaan bi ñaata ñeneen ñoo di jàng léegi. Lii ay xiirtal la ci wàllu nit ñi, du benn jumtukaay njàngale, te mu ngi laaj sarwar bi benn yoon ci simili bu nekk ngir panel bu ubbeeku bu nekk, moo tax mu tëdd ci anam bu jiitu. Màndargaal bi day feeñ rekk su fekkee ñaari ñeneen ñu nekk ci liggéey.';

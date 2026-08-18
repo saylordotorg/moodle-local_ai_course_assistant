@@ -1774,3 +1774,6 @@ $string['soapbox:assign_created'] = 'A feladat létrehozva.';
 $string['soapbox:assign_delete_confirm'] = 'Törlöd a(z) „{$a}” feladatot és minden felvételét? Ez nem vonható vissza.';
 $string['soapbox:assign_edit_heading'] = 'Soapbox feladat szerkesztése';
 $string['soapbox:assign_new_heading'] = 'Új Soapbox feladat';
+
+$string['settings:active_learners_enabled'] = 'Aktív tanulók jelzésének megjelenítése';
+$string['settings:active_learners_enabled_desc'] = 'Megmutatja a csevegőpanelen, hányan tanulnak éppen rajtad kívül. Ez inkább közösségi ösztönzés, mint oktatási funkció, és minden nyitott panelnél percenként lekérdezi a kiszolgálót, ezért alapértelmezés szerint ki van kapcsolva. A jelzés csak akkor jelenik meg, ha legalább két másik ember aktív.';

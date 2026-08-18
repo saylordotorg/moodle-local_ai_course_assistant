@@ -1766,3 +1766,6 @@ $string['soapbox:assign_created'] = 'Đã tạo bài tập.';
 $string['soapbox:assign_delete_confirm'] = 'Xóa "{$a}" và tất cả bản ghi của nó? Hành động này không thể hoàn tác.';
 $string['soapbox:assign_edit_heading'] = 'Sửa bài tập Soapbox';
 $string['soapbox:assign_new_heading'] = 'Bài tập Soapbox mới';
+
+$string['settings:active_learners_enabled'] = 'Hiển thị chỉ báo người học đang hoạt động';
+$string['settings:active_learners_enabled_desc'] = 'Hiển thị trong bảng trò chuyện số người khác đang học ngay lúc này. Đây là một khích lệ xã hội chứ không phải tính năng giảng dạy, và nó hỏi máy chủ mỗi phút một lần cho mỗi bảng đang mở, nên mặc định tắt. Chỉ báo chỉ xuất hiện khi có ít nhất hai người khác đang hoạt động.';

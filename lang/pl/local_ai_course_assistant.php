@@ -1730,3 +1730,6 @@ $string['soapbox:assign_created'] = 'Zadanie utworzone.';
 $string['soapbox:assign_delete_confirm'] = 'Usunąć „{$a}” i wszystkie jego nagrania? Tej operacji nie można cofnąć.';
 $string['soapbox:assign_edit_heading'] = 'Edytuj zadanie Soapbox';
 $string['soapbox:assign_new_heading'] = 'Nowe zadanie Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Pokaż wskaźnik aktywnych uczestników';
+$string['settings:active_learners_enabled_desc'] = 'Pokazuje w panelu czatu, ile innych osób uczy się w tej chwili. To zachęta społeczna, a nie funkcja dydaktyczna, i odpytuje serwer raz na minutę dla każdego otwartego panelu, dlatego domyślnie jest wyłączona. Wskaźnik pojawia się tylko wtedy, gdy aktywne są co najmniej dwie inne osoby.';

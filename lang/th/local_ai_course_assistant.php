@@ -1744,3 +1744,6 @@ $string['soapbox:assign_created'] = 'สร้างงานแล้ว';
 $string['soapbox:assign_delete_confirm'] = 'ลบ "{$a}" และการบันทึกทั้งหมดหรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้';
 $string['soapbox:assign_edit_heading'] = 'แก้ไขงาน Soapbox';
 $string['soapbox:assign_new_heading'] = 'งาน Soapbox ใหม่';
+
+$string['settings:active_learners_enabled'] = 'แสดงตัวบ่งชี้ผู้เรียนที่กำลังใช้งาน';
+$string['settings:active_learners_enabled_desc'] = 'แสดงในแผงแชทว่ามีคนอื่นกำลังเรียนอยู่กี่คนในขณะนี้ นี่เป็นแรงจูงใจทางสังคมมากกว่าฟีเจอร์การสอน และจะสอบถามเซิร์ฟเวอร์นาทีละครั้งสำหรับทุกแผงที่เปิดอยู่ จึงปิดไว้เป็นค่าเริ่มต้น ตัวบ่งชี้จะปรากฏเมื่อมีผู้อื่นใช้งานอย่างน้อยสองคนเท่านั้น';

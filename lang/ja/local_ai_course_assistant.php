@@ -1737,3 +1737,6 @@ $string['soapbox:assign_created'] = '課題を作成しました。';
 $string['soapbox:assign_delete_confirm'] = '「{$a}」とそのすべての録音を削除しますか？この操作は取り消せません。';
 $string['soapbox:assign_edit_heading'] = 'Soapbox 課題を編集';
 $string['soapbox:assign_new_heading'] = '新しい Soapbox 課題';
+
+$string['settings:active_learners_enabled'] = 'アクティブな学習者の表示';
+$string['settings:active_learners_enabled_desc'] = '現在ほかに何人が学習中かをチャットパネルに表示します。これは学習機能ではなく社会的な後押しであり、開いているパネルごとに毎分サーバーへ問い合わせるため、既定ではオフです。ほかに2人以上が活動している場合にのみ表示されます。';

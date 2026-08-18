@@ -1761,3 +1761,6 @@ $string['soapbox:assign_created'] = 'An ƙirƙiri aikin.';
 $string['soapbox:assign_delete_confirm'] = 'A share "{$a}" da duk rikodinsa? Ba za a iya juyar da wannan ba.';
 $string['soapbox:assign_edit_heading'] = 'Gyara aikin Soapbox';
 $string['soapbox:assign_new_heading'] = 'Sabon aikin Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Nuna alamar ɗalibai masu aiki';
+$string['settings:active_learners_enabled_desc'] = 'Yana nuna a cikin allon tattaunawa yawan sauran mutanen da ke karatu yanzu. Wannan ƙarfafawa ce ta zamantakewa, ba fasalin koyarwa ba, kuma yana tambayar uwar garke sau ɗaya a minti ɗaya ga kowane allo a buɗe, don haka an kashe shi ta tsohuwa. Alamar tana bayyana ne kawai idan aƙalla wasu mutum biyu suna aiki.';

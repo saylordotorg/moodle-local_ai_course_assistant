@@ -1744,3 +1744,6 @@ $string['soapbox:assign_created'] = 'Ödev oluşturuldu.';
 $string['soapbox:assign_delete_confirm'] = '"{$a}" ve tüm kayıtları silinsin mi? Bu işlem geri alınamaz.';
 $string['soapbox:assign_edit_heading'] = 'Soapbox ödevini düzenle';
 $string['soapbox:assign_new_heading'] = 'Yeni Soapbox ödevi';
+
+$string['settings:active_learners_enabled'] = 'Etkin öğrenen göstergesini göster';
+$string['settings:active_learners_enabled_desc'] = 'Sohbet panelinde şu anda kaç kişinin daha çalıştığını gösterir. Bu bir öğretim özelliği değil sosyal bir teşviktir ve açık her panel için dakikada bir sunucuya sorar, bu yüzden varsayılan olarak kapalıdır. Gösterge yalnızca en az iki kişi daha etkinken görünür.';

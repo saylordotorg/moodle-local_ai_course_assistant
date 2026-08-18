@@ -1760,3 +1760,6 @@ $string['soapbox:assign_created'] = 'असाइनमेन्ट सिर्
 $string['soapbox:assign_delete_confirm'] = '"{$a}" र यसका सबै रेकर्डिङ मेट्ने? यसलाई फिर्ता गर्न सकिँदैन।';
 $string['soapbox:assign_edit_heading'] = 'Soapbox असाइनमेन्ट सम्पादन गर्नुहोस्';
 $string['soapbox:assign_new_heading'] = 'नयाँ Soapbox असाइनमेन्ट';
+
+$string['settings:active_learners_enabled'] = 'सक्रिय सिकारुको सूचक देखाउनुहोस्';
+$string['settings:active_learners_enabled_desc'] = 'च्याट प्यानलमा अहिले अरू कति जना अध्ययन गर्दै छन् भनेर देखाउँछ। यो शिक्षण सुविधा होइन, सामाजिक प्रोत्साहन हो, र खुला प्रत्येक प्यानलका लागि मिनेटमा एक पटक सर्भरलाई सोध्छ, त्यसैले पूर्वनिर्धारित रूपमा बन्द छ। कम्तीमा अरू दुई जना सक्रिय भएमा मात्र सूचक देखिन्छ।';

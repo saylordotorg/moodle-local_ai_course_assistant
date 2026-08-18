@@ -1767,3 +1767,6 @@ $string['soapbox:assign_created'] = 'Nagawa ang takdang-aralin.';
 $string['soapbox:assign_delete_confirm'] = 'Burahin ang "{$a}" at lahat ng recording nito? Hindi ito maibabalik.';
 $string['soapbox:assign_edit_heading'] = 'I-edit ang takdang-aralin sa Soapbox';
 $string['soapbox:assign_new_heading'] = 'Bagong takdang-aralin sa Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Ipakita ang indikator ng aktibong mag-aaral';
+$string['settings:active_learners_enabled_desc'] = 'Ipinapakita sa chat panel kung ilan pang iba ang nag-aaral ngayon. Isa itong panlipunang udyok, hindi tampok sa pagtuturo, at nagtatanong ito sa server minsan kada minuto para sa bawat bukas na panel, kaya naka-off ito bilang default. Lumalabas lamang ang indikator kapag may hindi bababa sa dalawang iba pang aktibo.';

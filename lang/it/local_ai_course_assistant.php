@@ -1781,3 +1781,6 @@ $string['soapbox:assign_created'] = 'Compito creato.';
 $string['soapbox:assign_delete_confirm'] = 'Eliminare "{$a}" e tutte le sue registrazioni? L\'operazione non può essere annullata.';
 $string['soapbox:assign_edit_heading'] = 'Modifica compito Soapbox';
 $string['soapbox:assign_new_heading'] = 'Nuovo compito Soapbox';
+
+$string['settings:active_learners_enabled'] = 'Mostra l\'indicatore di studenti attivi';
+$string['settings:active_learners_enabled_desc'] = 'Mostra nel pannello della chat quante altre persone stanno studiando in questo momento. È uno stimolo sociale, non una funzione didattica, e interroga il server una volta al minuto per ogni pannello aperto, quindi è disattivato salvo attivazione. L\'indicatore compare solo se ci sono almeno altre due persone attive.';

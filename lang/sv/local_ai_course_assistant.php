@@ -1730,3 +1730,6 @@ $string['soapbox:assign_created'] = 'Uppgiften har skapats.';
 $string['soapbox:assign_delete_confirm'] = 'Ta bort "{$a}" och alla dess inspelningar? Detta kan inte ångras.';
 $string['soapbox:assign_edit_heading'] = 'Redigera Soapbox-uppgift';
 $string['soapbox:assign_new_heading'] = 'Ny Soapbox-uppgift';
+
+$string['settings:active_learners_enabled'] = 'Visa indikator för aktiva deltagare';
+$string['settings:active_learners_enabled_desc'] = 'Visar i chattpanelen hur många andra som studerar just nu. Det är en social knuff snarare än en undervisningsfunktion, och den frågar servern en gång i minuten för varje öppen panel, därför är den avstängd som standard. Indikatorn visas bara när minst två andra är aktiva.';
