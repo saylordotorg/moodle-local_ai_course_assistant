@@ -24,6 +24,16 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base_provider implements provider_interface {
+
+    /**
+     * Providers that legitimately run without a SOLA-managed API key, and so
+     * must not be refused by the credential guard in create_for_comparison():
+     * a local ollama, coreai routing through Moodle's own AI subsystem, and
+     * the test stub.
+     *
+     * @var string[]
+     */
+    private const KEYLESS_PROVIDERS = ['stub', 'ollama', 'coreai'];
     /** @var string API key */
     protected string $apikey;
 
@@ -567,7 +577,12 @@ abstract class base_provider implements provider_interface {
      * @throws \moodle_exception If provider is unknown.
      */
     public static function create_for_comparison(string $providerid, string $model, int $courseid = 0): provider_interface {
-        $overrides = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+        $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+        // Which vendor the inherited apikey actually belongs to, captured
+        // before 'provider' is overwritten below.
+        $keyowner = (string) ($effective['provider'] ?? '');
+
+        $overrides = $effective;
         $overrides['provider'] = $providerid;
         if ($model !== '') {
             $overrides['model'] = $model;
@@ -586,6 +601,42 @@ abstract class base_provider implements provider_interface {
             if (!empty($row['apibaseurl'])) {
                 $overrides['apibaseurl'] = $row['apibaseurl'];
             }
+        } else if (strcasecmp($providerid, $keyowner) !== 0) {
+            // No comparison row, and the requested provider is NOT the one the
+            // inherited key belongs to. Before v6.9.7 we shipped that key
+            // anyway, so picking a provider with no row sent one vendor's
+            // credential to another. That can only ever fail, and it fails
+            // opaquely: on 2026-08-18 an admin whose LLM picker was set to
+            // gemini got a bare "HTTP 400:" on CS101, because the course's
+            // Anthropic key was handed to Google, whose error body is not in
+            // the shape SOLA parses.
+            //
+            // Prefer the site key when it belongs to the requested provider.
+            // Otherwise drop the credential rather than refusing outright:
+            // several providers legitimately need no SOLA key (a stub in
+            // tests, a local ollama, coreai routing through Moodle's own AI
+            // subsystem), and refusing here would break them. A provider that
+            // does need a key now reports its own "missing credentials" error,
+            // which is accurate and, with the error surfacing in this same
+            // release, reaches the audit log.
+            $siteprovider = (string) (get_config('local_ai_course_assistant', 'provider') ?: '');
+            $sitekey = (string) (get_config('local_ai_course_assistant', 'apikey') ?: '');
+            if (strcasecmp($providerid, $siteprovider) === 0 && $sitekey !== '') {
+                $overrides['apikey'] = $sitekey;
+            } else if (!in_array(strtolower($providerid), self::KEYLESS_PROVIDERS, true)) {
+                // Note we cannot simply blank the key: base_provider's
+                // constructor treats an empty override as "unset" and falls
+                // back to the site key, so there is no way to express "no
+                // credential" through $overrides. Refusing is therefore the
+                // only way to stop the foreign key being sent, and it produces
+                // a message an operator can act on instead of a bare HTTP 400.
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                    'No credentials for provider "' . $providerid . '": it has no Comparison providers row, '
+                    . 'and is not the site provider. Refusing to send the '
+                    . ($keyowner ?: 'configured') . ' API key to a different vendor.');
+            }
+            // A base URL configured for one vendor is meaningless to another.
+            unset($overrides['apibaseurl']);
         }
 
         return self::instantiate($providerid, $overrides);
