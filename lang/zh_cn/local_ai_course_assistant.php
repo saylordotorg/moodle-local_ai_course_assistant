@@ -1769,3 +1769,13 @@ $string['soapbox:assign_new_heading'] = '新建 Soapbox 作业';
 
 $string['settings:active_learners_enabled'] = '显示活跃学习者指示条';
 $string['settings:active_learners_enabled_desc'] = '在聊天面板中显示当前有多少其他人正在学习。这是一种社交激励而非教学功能，并且每个打开的面板每分钟都会向服务器轮询一次，因此默认关闭。仅当至少有另外两人活跃时才会显示。';
+
+$string['task:unanswered_check'] = '[[tutorshort]] 未回答问题检查';
+$string['settings:unanswered_check_enabled'] = '当问题无人回答时发出警报';
+$string['settings:unanswered_check_enabled_desc'] = '当学习者向 [[tutorshort]] 提问却得不到回答时，向支出通知收件人发送邮件。成本异常检测器只在支出<em>上升</em>时触发；拒绝所有调用的服务商不产生费用，因此不会触发任何警报。此项监控提问与回答的比例，一旦服务商故障该比例即降为零。若通知列表为空，则使用站点管理员。';
+$string['settings:unanswered_window_hours'] = '检查窗口（小时）';
+$string['settings:unanswered_window_hours_desc'] = '每次运行回溯的时长。越短反应越快，但需要足够的流量才有意义。';
+$string['settings:unanswered_min_questions'] = '发出警报所需的最少提问数';
+$string['settings:unanswered_min_questions_desc'] = '课程需在窗口内达到此提问数才会被评估。低于此数时，少数学习者关闭标签页看起来就像故障。';
+$string['settings:unanswered_min_answer_rate'] = '最低回答率';
+$string['settings:unanswered_min_answer_rate_desc'] = '当获得回答的提问比例低于此值时发出警报。0.5 也能捕捉部分故障，而不仅是完全故障。设为 0 可停用此项检查。';

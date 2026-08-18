@@ -1740,3 +1740,13 @@ $string['soapbox:assign_new_heading'] = '새 Soapbox 과제';
 
 $string['settings:active_learners_enabled'] = '활동 중인 학습자 표시';
 $string['settings:active_learners_enabled_desc'] = '지금 몇 명이 함께 학습 중인지 채팅 패널에 표시합니다. 교육 기능이라기보다 사회적 동기 부여이며, 열려 있는 패널마다 1분에 한 번 서버에 요청하므로 기본적으로 꺼져 있습니다. 다른 학습자가 최소 2명 활동 중일 때만 표시됩니다.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] 미응답 점검';
+$string['settings:unanswered_check_enabled'] = '질문에 답이 없을 때 알림';
+$string['settings:unanswered_check_enabled_desc'] = '학습자가 [[tutorshort]]에 질문했으나 답을 받지 못할 때 지출 알림 수신자에게 메일을 보냅니다. 비용 이상 감지는 지출이 <em>늘어날</em> 때만 작동하므로, 모든 호출을 거부하는 공급자는 비용이 들지 않아 아무 알림도 발생하지 않습니다. 여기서는 질문 대비 응답 비율을 감시하며, 공급자가 고장 나면 즉시 0으로 떨어집니다. 알림 목록이 비어 있으면 사이트 관리자를 사용합니다.';
+$string['settings:unanswered_window_hours'] = '점검 구간(시간)';
+$string['settings:unanswered_window_hours_desc'] = '각 실행이 거슬러 보는 기간. 짧을수록 빠르게 반응하지만 의미 있으려면 충분한 트래픽이 필요합니다.';
+$string['settings:unanswered_min_questions'] = '알림 전 최소 질문 수';
+$string['settings:unanswered_min_questions_desc'] = '해당 구간에서 이 정도 질문이 있어야 코스를 평가합니다. 그 이하에서는 몇 명이 탭을 닫은 것도 장애처럼 보입니다.';
+$string['settings:unanswered_min_answer_rate'] = '최소 응답률';
+$string['settings:unanswered_min_answer_rate_desc'] = '응답을 받은 질문 비율이 이 값 아래로 떨어지면 알립니다. 0.5는 전체 장애뿐 아니라 부분 장애도 잡습니다. 0으로 두면 이 검사를 끕니다.';

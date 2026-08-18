@@ -1764,3 +1764,13 @@ $string['soapbox:assign_new_heading'] = 'Tugas Soapbox baru';
 
 $string['settings:active_learners_enabled'] = 'Tampilkan indikator pembelajar aktif';
 $string['settings:active_learners_enabled_desc'] = 'Menampilkan di panel obrolan berapa banyak orang lain yang sedang belajar. Ini dorongan sosial, bukan fitur pengajaran, dan meminta data ke server sekali per menit untuk setiap panel yang terbuka, jadi secara bawaan nonaktif. Indikator hanya muncul jika setidaknya ada dua orang lain yang aktif.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] pemeriksaan pertanyaan tak terjawab';
+$string['settings:unanswered_check_enabled'] = 'Beri tahu saat pertanyaan tak terjawab';
+$string['settings:unanswered_check_enabled_desc'] = 'Mengirim email ke penerima notifikasi pengeluaran saat pembelajar bertanya kepada [[tutorshort]] dan tidak mendapat jawaban. Detektor anomali biaya hanya aktif saat pengeluaran <em>naik</em>: penyedia yang menolak semua panggilan tidak memakan biaya sehingga tidak memicu peringatan. Di sini rasio pertanyaan terhadap jawaban dipantau, dan turun ke nol begitu penyedia rusak. Jika daftar kosong, administrator situs yang dipakai.';
+$string['settings:unanswered_window_hours'] = 'Jendela pemeriksaan (jam)';
+$string['settings:unanswered_window_hours_desc'] = 'Seberapa jauh ke belakang tiap jalannya melihat. Lebih pendek bereaksi lebih cepat tetapi butuh lalu lintas memadai.';
+$string['settings:unanswered_min_questions'] = 'Minimum pertanyaan sebelum peringatan';
+$string['settings:unanswered_min_questions_desc'] = 'Kursus baru dinilai mulai dari jumlah pertanyaan ini. Di bawahnya, beberapa pembelajar menutup tab terlihat seperti gangguan.';
+$string['settings:unanswered_min_answer_rate'] = 'Rasio jawaban minimum';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Peringatkan saat proporsi pertanyaan terjawab turun di bawah ini. 0,5 menangkap gangguan sebagian. Setel 0 untuk menonaktifkan.';

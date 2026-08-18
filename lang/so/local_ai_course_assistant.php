@@ -1751,3 +1751,13 @@ $string['soapbox:assign_new_heading'] = 'Hawl Soapbox cusub';
 
 $string['settings:active_learners_enabled'] = 'Muuji tilmaamaha ardayda firfircoon';
 $string['settings:active_learners_enabled_desc'] = 'Waxay ku muujinaysaa bogga sheekada inta qof ee kale ee hadda wax baranaya. Tani waa dhiirrigelin bulsheed, ma aha sifo waxbarasho, waxayna server-ka weydiisaa hal mar daqiiqaddiiba bog kasta oo furan, sidaas darteed way damsan tahay si caadi ah. Tilmaamuhu wuxuu muuqdaa oo keliya marka ugu yaraan laba qof oo kale ay firfircoon yihiin.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] hubinta su\'aalaha aan la jawaabin';
+$string['settings:unanswered_check_enabled'] = 'Digniin marka su\'aalo aan la jawaabin';
+$string['settings:unanswered_check_enabled_desc'] = 'Waxay email u dirtaa qaataha ogeysiisyada kharashka marka ardaydu weydiiyaan [[tutorshort]] oo aan jawaab helin. Baaraha kala duwanaanshaha kharashka wuxuu shaqeeyaa oo kaliya marka kharashku <em>kordho</em>: bixiye diida wicitaan kasta waxba kuma baxo sidaas darteed digniin ma dhalinayo. Halkan waxaa la eegayaa saamiga su\'aalaha iyo jawaabaha, kaas oo eber ku dhaca isla marka bixiyuhu jabo. Haddii liistadu madhan tahay, waxaa la isticmaalaa maamulayaasha goobta.';
+$string['settings:unanswered_window_hours'] = 'Daaqadda hubinta (saacado)';
+$string['settings:unanswered_window_hours_desc'] = 'Inta uu socod kasta gadaal u eegayo. Kooban ayaa si degdeg ah uga jawaabaya laakiin wuxuu u baahan yahay taraafik ku filan.';
+$string['settings:unanswered_min_questions'] = 'Tirada ugu yar ee su\'aalaha ka hor digniinta';
+$string['settings:unanswered_min_questions_desc'] = 'Koorsada waxaa la qiimeeyaa oo kaliya laga bilaabo tiradan su\'aalo ah. Ka hooseeya, dhowr arday oo xiraya tabka waxay u egyihiin cillad.';
+$string['settings:unanswered_min_answer_rate'] = 'Heerka ugu yar ee jawaabta';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Digniin marka boqolkiiba su\'aalaha la jawaabay uu ka hooseeyo tan. 0.5 wuxuu qabtaa cillad qayb ah sidoo kale. U deji 0 si aad u damiso.';

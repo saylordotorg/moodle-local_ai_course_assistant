@@ -1769,3 +1769,13 @@ $string['soapbox:assign_new_heading'] = 'Bài tập Soapbox mới';
 
 $string['settings:active_learners_enabled'] = 'Hiển thị chỉ báo người học đang hoạt động';
 $string['settings:active_learners_enabled_desc'] = 'Hiển thị trong bảng trò chuyện số người khác đang học ngay lúc này. Đây là một khích lệ xã hội chứ không phải tính năng giảng dạy, và nó hỏi máy chủ mỗi phút một lần cho mỗi bảng đang mở, nên mặc định tắt. Chỉ báo chỉ xuất hiện khi có ít nhất hai người khác đang hoạt động.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] kiểm tra câu hỏi chưa được trả lời';
+$string['settings:unanswered_check_enabled'] = 'Cảnh báo khi câu hỏi không được trả lời';
+$string['settings:unanswered_check_enabled_desc'] = 'Gửi email tới người nhận thông báo chi phí khi người học đặt câu hỏi cho [[tutorshort]] mà không nhận được trả lời. Bộ phát hiện bất thường chi phí chỉ kích hoạt khi chi phí <em>tăng</em>: nhà cung cấp từ chối mọi lệnh gọi không tốn gì nên không sinh cảnh báo. Ở đây theo dõi tỉ lệ câu hỏi trên câu trả lời, tỉ lệ này về 0 ngay khi nhà cung cấp hỏng. Nếu danh sách trống, dùng quản trị viên trang.';
+$string['settings:unanswered_window_hours'] = 'Cửa sổ kiểm tra (giờ)';
+$string['settings:unanswered_window_hours_desc'] = 'Mỗi lần chạy nhìn lại bao xa. Ngắn hơn phản ứng nhanh hơn nhưng cần đủ lưu lượng.';
+$string['settings:unanswered_min_questions'] = 'Số câu hỏi tối thiểu trước khi cảnh báo';
+$string['settings:unanswered_min_questions_desc'] = 'Khóa học chỉ được đánh giá từ số câu hỏi này trở lên. Dưới mức đó, vài người học đóng tab trông giống sự cố.';
+$string['settings:unanswered_min_answer_rate'] = 'Tỉ lệ trả lời tối thiểu';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Cảnh báo khi tỉ lệ câu hỏi được trả lời xuống dưới mức này. 0,5 bắt được cả sự cố một phần. Đặt 0 để tắt.';

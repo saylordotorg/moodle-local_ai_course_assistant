@@ -1769,3 +1769,13 @@ $string['soapbox:assign_new_heading'] = 'Liggéey bu bees bu Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Wone màndargaal jàngkat yi ci liggéey';
 $string['settings:active_learners_enabled_desc'] = 'Mu ngi wone ci panel bu waxtaan bi ñaata ñeneen ñoo di jàng léegi. Lii ay xiirtal la ci wàllu nit ñi, du benn jumtukaay njàngale, te mu ngi laaj sarwar bi benn yoon ci simili bu nekk ngir panel bu ubbeeku bu nekk, moo tax mu tëdd ci anam bu jiitu. Màndargaal bi day feeñ rekk su fekkee ñaari ñeneen ñu nekk ci liggéey.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] seetlu laaj yi amul tontu';
+$string['settings:unanswered_check_enabled'] = 'Artu bu laaj yi amul tontu';
+$string['settings:unanswered_check_enabled_desc'] = 'Dafay yónnee email ci ñi ñuy yégle depaas bi bu jàngkat yi laajee [[tutorshort]] te amuñu tontu. Seetlukaayu jafe-jafey depaas dafay dox rekk su depaas bi <em>yokku</em>: jox-liggéeykat bu bàyyi liggéey yépp du depaase dara kon du génne benn artu. Fii ñu ngi seet ratiyoo bu laaj ci tontu, bi di wàcc ci tus su jox-liggéeykat bi yàqoo. Su limu yégle bi feesul, ñu ngi jëfandikoo yilifkat yi.';
+$string['settings:unanswered_window_hours'] = 'Palanteeru seetlu (waxtu)';
+$string['settings:unanswered_window_hours_desc'] = 'Ñaata la yoon wu nekk di seet ginnaaw. Bu gàtt dafay tontu gaaw waaye soxla na trafik bu doy.';
+$string['settings:unanswered_min_questions'] = 'Lim bu gën a tuuti ci laaj laata artu';
+$string['settings:unanswered_min_questions_desc'] = 'Ñu koy natt kurs bi rekk bu amee lim wii ci laaj. Su ko yées, jàngkat yu néew yu tëj taab dafay mel ni yàqute.';
+$string['settings:unanswered_min_answer_rate'] = 'Ratiyoo tontu bu gën a tuuti';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Artu bu limu laaj yi am tontu wàccee ci suufu lii. 0.5 dafay jàpp yàqute bu genn wàll it. Def 0 ngir faye ko.';

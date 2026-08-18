@@ -1763,3 +1763,13 @@ $string['soapbox:assign_new_heading'] = 'አዲስ የSoapbox ስራ';
 
 $string['settings:active_learners_enabled'] = 'የነቁ ተማሪዎች አመልካች አሳይ';
 $string['settings:active_learners_enabled_desc'] = 'በውይይት ፓነል ውስጥ አሁን ስንት ሌሎች ሰዎች እየተማሩ እንደሆኑ ያሳያል። ይህ የማስተማሪያ ባህሪ ሳይሆን ማህበራዊ ማበረታቻ ነው፣ እና ለእያንዳንዱ ክፍት ፓነል በደቂቃ አንድ ጊዜ አገልጋዩን ይጠይቃል፣ ስለዚህ በነባሪ ጠፍቷል። አመልካቹ የሚታየው ቢያንስ ሁለት ሌሎች ሰዎች ንቁ ሲሆኑ ብቻ ነው።';
+
+$string['task:unanswered_check'] = '[[tutorshort]] መልስ ያልተሰጣቸው ጥያቄዎች ምርመራ';
+$string['settings:unanswered_check_enabled'] = 'ጥያቄዎች መልስ ሳያገኙ ሲቀሩ አሳውቅ';
+$string['settings:unanswered_check_enabled_desc'] = 'ተማሪዎች [[tutorshort]]ን ሲጠይቁ መልስ ካላገኙ ለወጪ ማሳወቂያ ተቀባዮች ኢሜይል ይላካል። የወጪ ችግር ፈላጊው የሚሰራው ወጪ <em>ሲጨምር</em> ብቻ ነው፤ ሁሉንም ጥሪ የሚከለክል አቅራቢ ምንም አያስወጣም ስለዚህ ማንቂያ አይፈጥርም። እዚህ የጥያቄ ወደ መልስ ጥምርታ ይከታተላል፤ አቅራቢ ሲበላሽ ወዲያውኑ ወደ ዜሮ ይወርዳል። ዝርዝሩ ባዶ ከሆነ የጣቢያው አስተዳዳሪዎች ይጠቀማሉ።';
+$string['settings:unanswered_window_hours'] = 'የምርመራ መስኮት (ሰዓታት)';
+$string['settings:unanswered_window_hours_desc'] = 'እያንዳንዱ ሩጫ ወደ ኋላ ምን ያህል ይመለከታል። አጭር በፍጥነት ይሰራል ግን በቂ ትራፊክ ይፈልጋል።';
+$string['settings:unanswered_min_questions'] = 'ከማሳወቅ በፊት ዝቅተኛ የጥያቄዎች ብዛት';
+$string['settings:unanswered_min_questions_desc'] = 'ኮርስ የሚገመገመው ከዚህ የጥያቄ ብዛት ጀምሮ ብቻ ነው። ከዚያ በታች ጥቂት ተማሪዎች ትርን መዝጋት እንደ ብልሽት ይመስላል።';
+$string['settings:unanswered_min_answer_rate'] = 'ዝቅተኛ የመልስ መጠን';
+$string['settings:unanswered_min_answer_rate_desc'] = 'መልስ ያገኙ ጥያቄዎች ድርሻ ከዚህ ሲወርድ አሳውቅ። 0.5 ከፊል ብልሽትንም ይይዛል። ለማጥፋት 0 ያድርጉ።';

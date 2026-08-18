@@ -1733,3 +1733,13 @@ $string['soapbox:assign_new_heading'] = 'Nieuwe Soapbox-opdracht';
 
 $string['settings:active_learners_enabled'] = 'Indicator voor actieve deelnemers tonen';
 $string['settings:active_learners_enabled_desc'] = 'Toont in het chatpaneel hoeveel anderen op dit moment studeren. Dit is een sociale prikkel en geen lesfunctie, en het bevraagt de server één keer per minuut voor elk geopend paneel; daarom staat het standaard uit. De indicator verschijnt alleen als er minstens twee anderen actief zijn.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] controle op onbeantwoorde vragen';
+$string['settings:unanswered_check_enabled'] = 'Waarschuwen als vragen onbeantwoord blijven';
+$string['settings:unanswered_check_enabled_desc'] = 'Stuurt een e-mail naar de ontvangers van uitgavenmeldingen wanneer deelnemers [[tutorshort]] vragen stellen en geen antwoord krijgen. De kostenanomaliedetectie slaat alleen aan als de uitgaven <em>stijgen</em>: een aanbieder die elke aanroep weigert kost niets en geeft geen waarschuwing. Dit bewaakt de verhouding tussen vragen en antwoorden, die naar nul zakt zodra een aanbieder uitvalt. Is de meldingslijst leeg, dan worden sitebeheerders gebruikt.';
+$string['settings:unanswered_window_hours'] = 'Controlevenster (uren)';
+$string['settings:unanswered_window_hours_desc'] = 'Hoe ver elke uitvoering terugkijkt. Korter reageert sneller maar heeft genoeg verkeer nodig om betekenisvol te zijn.';
+$string['settings:unanswered_min_questions'] = 'Minimum aantal vragen voor een waarschuwing';
+$string['settings:unanswered_min_questions_desc'] = 'Een cursus wordt pas beoordeeld vanaf dit aantal vragen in het venster. Daaronder lijken een paar deelnemers die het tabblad sluiten op een storing.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimale antwoordratio';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Waarschuw wanneer het aandeel beantwoorde vragen hieronder zakt. 0,5 vangt ook een gedeeltelijke storing. Zet op 0 om deze test uit te schakelen.';

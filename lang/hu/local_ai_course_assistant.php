@@ -1777,3 +1777,13 @@ $string['soapbox:assign_new_heading'] = 'Új Soapbox feladat';
 
 $string['settings:active_learners_enabled'] = 'Aktív tanulók jelzésének megjelenítése';
 $string['settings:active_learners_enabled_desc'] = 'Megmutatja a csevegőpanelen, hányan tanulnak éppen rajtad kívül. Ez inkább közösségi ösztönzés, mint oktatási funkció, és minden nyitott panelnél percenként lekérdezi a kiszolgálót, ezért alapértelmezés szerint ki van kapcsolva. A jelzés csak akkor jelenik meg, ha legalább két másik ember aktív.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] megválaszolatlan kérdések ellenőrzése';
+$string['settings:unanswered_check_enabled'] = 'Riasztás, ha a kérdések válasz nélkül maradnak';
+$string['settings:unanswered_check_enabled_desc'] = 'E-mailt küld a költségértesítések címzettjeinek, ha a tanulók [[tutorshort]] kérdeznek és nem kapnak választ. A költséganomália-érzékelő csak akkor jelez, ha a költés <em>nő</em>: az a szolgáltató, amely minden hívást elutasít, semmibe sem kerül, így riasztás sem születik. Itt a kérdés/válasz arányt figyeljük, amely nullára esik, amint egy szolgáltató elromlik. Üres értesítési lista esetén az oldal adminisztrátorai kapják.';
+$string['settings:unanswered_window_hours'] = 'Ellenőrzési ablak (óra)';
+$string['settings:unanswered_window_hours_desc'] = 'Mennyire néz vissza minden futás. A rövidebb gyorsabban reagál, de elég forgalom kell hozzá.';
+$string['settings:unanswered_min_questions'] = 'Riasztás előtti minimális kérdésszám';
+$string['settings:unanswered_min_questions_desc'] = 'Egy kurzust csak ennyi kérdéstől értékelünk. Ez alatt néhány fület bezáró tanuló is üzemzavarnak látszik.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimális válaszarány';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Riasztás, ha a megválaszolt kérdések aránya ez alá esik. A 0,5 a részleges hibát is elkapja. 0 kikapcsolja.';

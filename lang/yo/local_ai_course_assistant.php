@@ -1769,3 +1769,13 @@ $string['soapbox:assign_new_heading'] = 'Iṣẹ́ Soapbox tuntun';
 
 $string['settings:active_learners_enabled'] = 'Fi àmì akẹ́kọ̀ọ́ tí ń ṣiṣẹ́ hàn';
 $string['settings:active_learners_enabled_desc'] = 'Ó ń fi hàn nínú pánẹ́lì ìjíròrò iye àwọn ẹlòmíràn tí wọ́n ń kẹ́kọ̀ọ́ nísinsìnyí. Ìṣírí àwùjọ ni èyí, kì í ṣe ẹ̀yà ìkọ́ni, ó sì ń bèèrè lọ́wọ́ olùpèsè ẹ̀ẹ̀kan ní ìṣẹ́jú kọ̀ọ̀kan fún gbogbo pánẹ́lì tí ó ṣí, nítorí náà ó wà ní pipa nípa àbùdá. Àmì náà máa hàn kìkì bí ó bá kéré tán àwọn ẹlòmíràn méjì ń ṣiṣẹ́.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] àyẹ̀wò àwọn ìbéèrè tí kò rí ìdáhùn';
+$string['settings:unanswered_check_enabled'] = 'Kìlọ̀ nígbà tí àwọn ìbéèrè kò bá rí ìdáhùn';
+$string['settings:unanswered_check_enabled_desc'] = 'Ó ń fi ìmèlì ránṣẹ́ sí àwọn olùgbà ìfitónilétí ìnáwó nígbà tí àwọn akẹ́kọ̀ọ́ bá bi [[tutorshort]] léèrè tí wọn kò sì rí ìdáhùn. Olùwádìí àìbáradé ìnáwó máa ń ṣiṣẹ́ nígbà tí ìnáwó bá <em>pọ̀ sí i</em> nìkan: olùpèsè tí ó ń kọ gbogbo ìpè kò ná owó kankan nítorí náà kò sí ìkìlọ̀. Níbí a ń wo ìpín ìbéèrè sí ìdáhùn, tí ó ń balẹ̀ sí òdo lẹ́sẹ̀kẹsẹ̀ tí olùpèsè bá bàjẹ́. Bí àkọsílẹ̀ bá ṣófo, a ó lo àwọn alábòójútó ojúlé.';
+$string['settings:unanswered_window_hours'] = 'Fèrèsé àyẹ̀wò (wákàtí)';
+$string['settings:unanswered_window_hours_desc'] = 'Bí ìṣiṣẹ́ kọ̀ọ̀kan ṣe ń wo ẹ̀yìn tó. Kúrú yóò dáhùn kíákíá ṣùgbọ́n ó nílò ìjìnlẹ̀ tó.';
+$string['settings:unanswered_min_questions'] = 'Iye ìbéèrè tó kéré jù kí ìkìlọ̀ tó wá';
+$string['settings:unanswered_min_questions_desc'] = 'A ó ṣe àgbéyẹ̀wò ẹ̀kọ́ nìkan láti iye ìbéèrè yìí. Ní ìsàlẹ̀ rẹ̀, àwọn akẹ́kọ̀ọ́ díẹ̀ tí wọ́n ti pa tabù dà bí àṣìṣe.';
+$string['settings:unanswered_min_answer_rate'] = 'Ìwọ̀n ìdáhùn tó kéré jù';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Kìlọ̀ nígbà tí ìpín àwọn ìbéèrè tí ó rí ìdáhùn bá lọ sí ìsàlẹ̀ èyí. 0.5 yóò mú àṣìṣe apá kan pẹ̀lú. Fi 0 sí i láti pa á.';

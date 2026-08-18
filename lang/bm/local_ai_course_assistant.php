@@ -1764,3 +1764,13 @@ $string['soapbox:assign_new_heading'] = 'Soapbox baara kura';
 
 $string['settings:active_learners_enabled'] = 'Kalanden minnu bɛ baara la, u taamasyɛn jira';
 $string['settings:active_learners_enabled_desc'] = 'A bɛ jira baro panɛli kɔnɔ ko mɔgɔ wɛrɛ joli bɛ kalan na sisan. Nin ye jamaana lasɔmini ye, a tɛ kalan baara ye, ani a bɛ sɛrɛwɛri ɲininka siɲɛ kelen miniti kelen kɔnɔ panɛli dayɛlɛlen bɛɛ kama, o de kosɔn a faga la ka kɛ landa ye. Taamasyɛn bɛ bɔ dɔrɔn ni mɔgɔ wɛrɛ fila ɲɔgɔn bɛ baara la.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] ɲininkali minnu ma jaabi sɛgɛsɛgɛli';
+$string['settings:unanswered_check_enabled'] = 'Kunnafoni di ni ɲininkaliw ma jaabi';
+$string['settings:unanswered_check_enabled_desc'] = 'A bɛ email ci musaka kunnafoni sɔrɔbagaw ma ni kalandenw ye [[tutorshort]] ɲininka ani u ma jaabi sɔrɔ. Musaka fɛnɲɛnama ɲinibaga bɛ baara kɛ dɔrɔn ni musaka <em>bɛ caya</em>: dilanbaga min bɛ weleli bɛɛ ban, o tɛ wari si bɔ o de kosɔn kunnafoni si tɛ bɔ. Yan an bɛ ɲininkali ni jaabi cɛ hakɛ kɔlɔsi, min bɛ jigin fu ma ni dilanbaga tiɲɛna. Ni lisi lakolon don, sitiw ɲɛmɔgɔw bɛ kɛ.';
+$string['settings:unanswered_window_hours'] = 'Sɛgɛsɛgɛli waati (lɛrɛ)';
+$string['settings:unanswered_window_hours_desc'] = 'Baara kelen-kelen bɛ kɔfɛ filɛ cogo di. Waati surun bɛ jaabi teliya nka a mago bɛ taama caman na.';
+$string['settings:unanswered_min_questions'] = 'Ɲininkali hakɛ dɔgɔmannin sanni kunnafoni ka bɔ';
+$string['settings:unanswered_min_questions_desc'] = 'Kalan bɛ jateminɛ dɔrɔn ka bɔ nin ɲininkali hakɛ in na. O jukɔrɔ, kalanden damadɔw minnu ye taabu datugu, o bɛ i n\'a fɔ baara tiɲɛna.';
+$string['settings:unanswered_min_answer_rate'] = 'Jaabi hakɛ dɔgɔmannin';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Kunnafoni di ni ɲininkali minnu jaabira, u hakɛ jiginna nin jukɔrɔ. 0.5 bɛ tiɲɛni yɔrɔ dɔ fana minɛ. A kɛ 0 ye walisa k\'a faga.';

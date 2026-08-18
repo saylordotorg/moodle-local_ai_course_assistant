@@ -1733,3 +1733,13 @@ $string['soapbox:assign_new_heading'] = 'Nowe zadanie Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Pokaż wskaźnik aktywnych uczestników';
 $string['settings:active_learners_enabled_desc'] = 'Pokazuje w panelu czatu, ile innych osób uczy się w tej chwili. To zachęta społeczna, a nie funkcja dydaktyczna, i odpytuje serwer raz na minutę dla każdego otwartego panelu, dlatego domyślnie jest wyłączona. Wskaźnik pojawia się tylko wtedy, gdy aktywne są co najmniej dwie inne osoby.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] kontrola pytań bez odpowiedzi';
+$string['settings:unanswered_check_enabled'] = 'Ostrzegaj, gdy pytania pozostają bez odpowiedzi';
+$string['settings:unanswered_check_enabled_desc'] = 'Wysyła e-mail do odbiorców powiadomień o wydatkach, gdy uczący się zadają [[tutorshort]] pytania i nie otrzymują odpowiedzi. Detektor anomalii kosztów uruchamia się tylko, gdy wydatki <em>rosną</em> — dostawca odrzucający każde wywołanie nic nie kosztuje i nie wywoła alertu. Tutaj monitorujemy stosunek pytań do odpowiedzi, który spada do zera, gdy dostawca przestaje działać. Jeśli lista powiadomień jest pusta, używani są administratorzy witryny.';
+$string['settings:unanswered_window_hours'] = 'Okno kontroli (godziny)';
+$string['settings:unanswered_window_hours_desc'] = 'Jak daleko wstecz sięga każde uruchomienie. Krótsze reaguje szybciej, ale wymaga wystarczającego ruchu.';
+$string['settings:unanswered_min_questions'] = 'Minimalna liczba pytań przed alertem';
+$string['settings:unanswered_min_questions_desc'] = 'Kurs jest oceniany dopiero po tylu pytaniach w oknie. Poniżej kilku uczących się zamykających kartę wygląda jak awaria.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimalny wskaźnik odpowiedzi';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Ostrzegaj, gdy odsetek pytań z odpowiedzią spadnie poniżej tej wartości. 0,5 wykrywa też awarię częściową. Ustaw 0, aby wyłączyć ten test.';

@@ -1763,3 +1763,13 @@ $string['soapbox:assign_new_heading'] = 'Tugasan Soapbox baharu';
 
 $string['settings:active_learners_enabled'] = 'Tunjukkan penunjuk pelajar aktif';
 $string['settings:active_learners_enabled_desc'] = 'Menunjukkan dalam panel sembang berapa ramai orang lain sedang belajar sekarang. Ini dorongan sosial, bukan ciri pengajaran, dan ia bertanya kepada pelayan sekali seminit bagi setiap panel yang terbuka, jadi ia dimatikan secara lalai. Penunjuk hanya muncul apabila sekurang-kurangnya dua orang lain aktif.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] semakan soalan tanpa jawapan';
+$string['settings:unanswered_check_enabled'] = 'Beri amaran apabila soalan tiada jawapan';
+$string['settings:unanswered_check_enabled_desc'] = 'Menghantar e-mel kepada penerima notifikasi perbelanjaan apabila pelajar bertanya kepada [[tutorshort]] tanpa mendapat jawapan. Pengesan anomali kos hanya bertindak apabila perbelanjaan <em>naik</em>: pembekal yang menolak semua panggilan tidak menelan kos dan tidak mencetuskan amaran. Di sini nisbah soalan kepada jawapan dipantau, dan jatuh ke sifar sebaik pembekal rosak. Jika senarai kosong, pentadbir laman digunakan.';
+$string['settings:unanswered_window_hours'] = 'Tetingkap semakan (jam)';
+$string['settings:unanswered_window_hours_desc'] = 'Sejauh mana ke belakang setiap larian melihat. Lebih pendek bertindak lebih pantas tetapi perlukan trafik mencukupi.';
+$string['settings:unanswered_min_questions'] = 'Minimum soalan sebelum amaran';
+$string['settings:unanswered_min_questions_desc'] = 'Kursus hanya dinilai bermula daripada bilangan soalan ini. Di bawahnya, beberapa pelajar menutup tab kelihatan seperti gangguan.';
+$string['settings:unanswered_min_answer_rate'] = 'Kadar jawapan minimum';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Beri amaran apabila kadar soalan berjawab jatuh di bawah nilai ini. 0.5 menangkap gangguan separa. Tetapkan 0 untuk melumpuhkan.';

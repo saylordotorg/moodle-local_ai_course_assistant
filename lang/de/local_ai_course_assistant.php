@@ -1734,3 +1734,13 @@ $string['soapbox:assign_new_heading'] = 'Neue Soapbox-Aufgabe';
 
 $string['settings:active_learners_enabled'] = 'Anzeige aktiver Lernender einblenden';
 $string['settings:active_learners_enabled_desc'] = 'Zeigt im Chat-Bereich, wie viele andere gerade lernen. Das ist ein sozialer Anreiz und keine Lehrfunktion; es fragt den Server einmal pro Minute für jeden geöffneten Bereich ab und ist daher standardmäßig aus. Die Anzeige erscheint nur, wenn mindestens zwei andere aktiv sind.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] Prüfung unbeantworteter Fragen';
+$string['settings:unanswered_check_enabled'] = 'Warnen, wenn Fragen unbeantwortet bleiben';
+$string['settings:unanswered_check_enabled_desc'] = 'Sendet eine E-Mail an die Empfänger der Ausgabenbenachrichtigungen, wenn Lernende [[tutorshort]] Fragen stellen und keine Antwort erhalten. Die Kostenanomalie-Erkennung schlägt nur an, wenn die Ausgaben <em>steigen</em> — ein Anbieter, der jeden Aufruf ablehnt, kostet nichts und löst keine Warnung aus. Hier wird stattdessen das Verhältnis von Fragen zu Antworten überwacht, das bei einem Anbieterausfall sofort auf null fällt. Ist die Benachrichtigungsliste leer, werden die Administrator/innen verwendet.';
+$string['settings:unanswered_window_hours'] = 'Prüfzeitraum (Stunden)';
+$string['settings:unanswered_window_hours_desc'] = 'Wie weit jede Ausführung zurückblickt. Kürzer reagiert schneller, braucht aber genug Verkehr, um aussagekräftig zu sein.';
+$string['settings:unanswered_min_questions'] = 'Mindestanzahl Fragen vor einer Warnung';
+$string['settings:unanswered_min_questions_desc'] = 'Ein Kurs wird erst ab dieser Anzahl Fragen im Zeitraum bewertet. Darunter sehen ein paar Lernende, die den Tab schließen, wie ein Ausfall aus.';
+$string['settings:unanswered_min_answer_rate'] = 'Mindest-Antwortquote';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Warnen, wenn der Anteil beantworteter Fragen darunter fällt. 0,5 erkennt auch einen Teilausfall, nicht nur einen vollständigen. 0 deaktiviert diese Prüfung.';

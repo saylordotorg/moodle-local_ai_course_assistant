@@ -240,6 +240,23 @@ $tasks = [
         'dayofweek' => '*',
     ],
     [
+        // v6.9.7 — Alert when learners are asking and SOLA is not answering.
+        // Every existing monitor watches spend going UP, so a provider that
+        // rejects every call costs nothing and stays invisible: in August 2026
+        // an Anthropic organisation spend cap hid a nine-day outage across ten
+        // courses, 330 questions and 140 learners, with nothing alerting.
+        // Runs every two hours rather than daily because this is a live outage
+        // rather than a slow trend. Off by default; enable via
+        // unanswered_check_enabled. Idempotent per day, like the cost alert.
+        'classname' => \local_ai_course_assistant\task\unanswered_check::class,
+        'blocking' => 0,
+        'minute' => '25',
+        'hour' => '*/2',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
         // v6.4.0 — Daily signed policy bundle sync. Fetches the JSON
         // envelope from policy_bundle_url, verifies the Ed25519 signature
         // against policy_bundle_pubkey, enforces the settings allowlist

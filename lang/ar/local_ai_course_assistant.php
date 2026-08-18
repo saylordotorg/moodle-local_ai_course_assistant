@@ -1734,3 +1734,13 @@ $string['soapbox:assign_new_heading'] = 'مهمة Soapbox جديدة';
 
 $string['settings:active_learners_enabled'] = 'إظهار مؤشر المتعلمين النشطين';
 $string['settings:active_learners_enabled_desc'] = 'يعرض في لوحة المحادثة عدد الأشخاص الآخرين الذين يدرسون الآن. هذا حافز اجتماعي وليس ميزة تعليمية، ويستعلم من الخادم مرة كل دقيقة لكل لوحة مفتوحة، لذا فهو معطَّل ما لم تُفعِّله. يظهر المؤشر فقط عند وجود شخصين آخرين نشطين على الأقل.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] فحص الأسئلة غير المجاب عنها';
+$string['settings:unanswered_check_enabled'] = 'التنبيه عندما تبقى الأسئلة دون إجابة';
+$string['settings:unanswered_check_enabled_desc'] = 'يرسل بريدًا إلى مستلمي إشعارات الإنفاق عندما يطرح المتعلمون أسئلة على [[tutorshort]] دون الحصول على إجابة. كاشف شذوذ التكلفة يعمل فقط عند <em>ارتفاع</em> الإنفاق، أما المزوّد الذي يرفض كل الطلبات فلا يكلّف شيئًا ولا يطلق أي تنبيه. هنا نراقب نسبة الأسئلة إلى الإجابات، وهي تهبط إلى الصفر فور تعطل المزوّد. إذا كانت قائمة الإشعارات فارغة يُستخدم مديرو الموقع.';
+$string['settings:unanswered_window_hours'] = 'نافذة الفحص (بالساعات)';
+$string['settings:unanswered_window_hours_desc'] = 'إلى أي مدى يعود كل تشغيل. الأقصر يستجيب أسرع لكنه يحتاج حركة كافية ليكون ذا معنى.';
+$string['settings:unanswered_min_questions'] = 'الحد الأدنى للأسئلة قبل التنبيه';
+$string['settings:unanswered_min_questions_desc'] = 'لا يُقيَّم المقرر إلا بعد هذا العدد من الأسئلة في النافذة. دون ذلك، إغلاق بضعة متعلمين للصفحة يبدو كعطل.';
+$string['settings:unanswered_min_answer_rate'] = 'الحد الأدنى لمعدل الإجابة';
+$string['settings:unanswered_min_answer_rate_desc'] = 'نبّه عندما تنخفض نسبة الأسئلة المجاب عنها دون هذه القيمة. القيمة 0.5 تكشف العطل الجزئي أيضًا. اضبطها على 0 لتعطيل هذا الفحص.';

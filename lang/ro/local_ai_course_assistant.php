@@ -1733,3 +1733,13 @@ $string['soapbox:assign_new_heading'] = 'Temă Soapbox nouă';
 
 $string['settings:active_learners_enabled'] = 'Afișează indicatorul de cursanți activi';
 $string['settings:active_learners_enabled_desc'] = 'Afișează în panoul de chat câți alți oameni învață acum. Este un stimul social, nu o funcție didactică, și interoghează serverul o dată pe minut pentru fiecare panou deschis, de aceea este dezactivat implicit. Indicatorul apare doar când sunt activi cel puțin alți doi.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] verificarea întrebărilor fără răspuns';
+$string['settings:unanswered_check_enabled'] = 'Alertă când întrebările rămân fără răspuns';
+$string['settings:unanswered_check_enabled_desc'] = 'Trimite un e-mail destinatarilor notificărilor de cheltuieli când cursanții pun întrebări [[tutorshort]] și nu primesc răspuns. Detectorul de anomalii de cost se declanșează doar când cheltuiala <em>crește</em>: un furnizor care respinge toate apelurile nu costă nimic și nu generează alertă. Aici se urmărește raportul întrebări/răspunsuri, care scade la zero imediat ce un furnizor se defectează. Dacă lista e goală, se folosesc administratorii site-ului.';
+$string['settings:unanswered_window_hours'] = 'Fereastra de verificare (ore)';
+$string['settings:unanswered_window_hours_desc'] = 'Cât de mult în urmă se uită fiecare rulare. Mai scurt reacționează mai repede, dar are nevoie de trafic suficient.';
+$string['settings:unanswered_min_questions'] = 'Număr minim de întrebări înainte de alertă';
+$string['settings:unanswered_min_questions_desc'] = 'Un curs este evaluat abia de la acest număr de întrebări. Sub el, câțiva cursanți care închid fila par o defecțiune.';
+$string['settings:unanswered_min_answer_rate'] = 'Rata minimă de răspuns';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Alertă când proporția întrebărilor cu răspuns scade sub această valoare. 0,5 prinde și o defecțiune parțială. 0 dezactivează testul.';

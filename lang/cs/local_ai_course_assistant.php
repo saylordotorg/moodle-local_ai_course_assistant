@@ -1734,3 +1734,13 @@ $string['soapbox:assign_new_heading'] = 'Nový úkol Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Zobrazit ukazatel aktivních studujících';
 $string['settings:active_learners_enabled_desc'] = 'Zobrazí v panelu chatu, kolik dalších lidí právě studuje. Jde o sociální pobídku, nikoli o výukovou funkci, a pro každý otevřený panel se jednou za minutu dotazuje serveru, proto je ve výchozím stavu vypnuto. Ukazatel se objeví jen tehdy, jsou-li aktivní alespoň dva další lidé.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] kontrola nezodpovězených dotazů';
+$string['settings:unanswered_check_enabled'] = 'Upozornit, když dotazy zůstanou bez odpovědi';
+$string['settings:unanswered_check_enabled_desc'] = 'Odešle e-mail příjemcům upozornění na výdaje, když studující kladou [[tutorshort]] dotazy a nedostávají odpověď. Detektor cenových anomálií se spustí jen při <em>růstu</em> výdajů: poskytovatel, který odmítá každé volání, nic nestojí a nevyvolá žádné upozornění. Zde se sleduje poměr dotazů k odpovědím, který klesne na nulu, jakmile poskytovatel selže. Je-li seznam upozornění prázdný, použijí se správci webu.';
+$string['settings:unanswered_window_hours'] = 'Okno kontroly (hodiny)';
+$string['settings:unanswered_window_hours_desc'] = 'Jak daleko zpět se každé spuštění dívá. Kratší reaguje rychleji, ale potřebuje dost provozu.';
+$string['settings:unanswered_min_questions'] = 'Minimální počet dotazů před upozorněním';
+$string['settings:unanswered_min_questions_desc'] = 'Kurz se hodnotí až od tohoto počtu dotazů v okně. Níže vypadá pár studujících zavírajících panel jako výpadek.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimální míra odpovědí';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Upozornit, když podíl zodpovězených dotazů klesne pod tuto hodnotu. 0,5 zachytí i částečný výpadek. Nastavte 0 pro vypnutí.';

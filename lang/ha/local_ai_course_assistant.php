@@ -1764,3 +1764,13 @@ $string['soapbox:assign_new_heading'] = 'Sabon aikin Soapbox';
 
 $string['settings:active_learners_enabled'] = 'Nuna alamar ɗalibai masu aiki';
 $string['settings:active_learners_enabled_desc'] = 'Yana nuna a cikin allon tattaunawa yawan sauran mutanen da ke karatu yanzu. Wannan ƙarfafawa ce ta zamantakewa, ba fasalin koyarwa ba, kuma yana tambayar uwar garke sau ɗaya a minti ɗaya ga kowane allo a buɗe, don haka an kashe shi ta tsohuwa. Alamar tana bayyana ne kawai idan aƙalla wasu mutum biyu suna aiki.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] binciken tambayoyin da ba a amsa ba';
+$string['settings:unanswered_check_enabled'] = 'Yi gargadi lokacin da tambayoyi ba su sami amsa ba';
+$string['settings:unanswered_check_enabled_desc'] = 'Yana aika imel ga masu karɓar sanarwar kashe kuɗi lokacin da ɗalibai suka yi wa [[tutorshort]] tambaya ba tare da samun amsa ba. Mai gano rashin daidaiton kuɗi yana aiki ne kawai idan kashe kuɗi ya <em>karu</em>: mai bayarwa da ke ƙin kowace kira ba ya kashe komai don haka babu gargaɗi. Anan muna sa ido kan rabon tambayoyi zuwa amsoshi, wanda ke faɗuwa zuwa sifiri da zarar mai bayarwa ya lalace. Idan jerin ba komai, ana amfani da masu gudanar da shafin.';
+$string['settings:unanswered_window_hours'] = 'Tagar bincike (awanni)';
+$string['settings:unanswered_window_hours_desc'] = 'Nisan da kowane gudu ke duba baya. Gajarta tana amsawa da sauri amma tana buƙatar isasshen zirga-zirga.';
+$string['settings:unanswered_min_questions'] = 'Mafi ƙarancin tambayoyi kafin gargaɗi';
+$string['settings:unanswered_min_questions_desc'] = 'Ana kimanta kwas ne kawai daga wannan adadin tambayoyi. Ƙasa da haka, ɗalibai kaɗan da suka rufe shafi na kama da lalacewa.';
+$string['settings:unanswered_min_answer_rate'] = 'Mafi ƙarancin adadin amsa';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Yi gargaɗi lokacin da yawan tambayoyin da aka amsa ya faɗi ƙasa da wannan. 0.5 yana kama lalacewa ta ɓangare kuma. Saita 0 don kashewa.';

@@ -1734,3 +1734,13 @@ $string['soapbox:assign_new_heading'] = 'Ny Soapbox-opgave';
 
 $string['settings:active_learners_enabled'] = 'Vis indikator for aktive studerende';
 $string['settings:active_learners_enabled_desc'] = 'Viser i chatpanelet, hvor mange andre der studerer lige nu. Det er et socialt puf snarere end en undervisningsfunktion, og det spørger serveren én gang i minuttet for hvert åbent panel, så det er slået fra som standard. Indikatoren vises kun, når mindst to andre er aktive.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] tjek for ubesvarede spørgsmål';
+$string['settings:unanswered_check_enabled'] = 'Advar når spørgsmål forbliver ubesvarede';
+$string['settings:unanswered_check_enabled_desc'] = 'Sender en e-mail til modtagerne af udgiftsnotifikationer, når studerende stiller [[tutorshort]] spørgsmål uden at få svar. Omkostningsdetektoren udløses kun når forbruget <em>stiger</em>: en udbyder der afviser alle kald koster ingenting og udløser ingen advarsel. Her overvåges forholdet mellem spørgsmål og svar, som falder til nul så snart en udbyder fejler. Er listen tom, bruges sidens administratorer.';
+$string['settings:unanswered_window_hours'] = 'Tjekvindue (timer)';
+$string['settings:unanswered_window_hours_desc'] = 'Hvor langt tilbage hver kørsel kigger. Kortere reagerer hurtigere, men kræver nok trafik.';
+$string['settings:unanswered_min_questions'] = 'Minimum antal spørgsmål før advarsel';
+$string['settings:unanswered_min_questions_desc'] = 'Et kursus vurderes først fra dette antal spørgsmål. Derunder ligner et par studerende der lukker fanen et nedbrud.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimum svarprocent';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Advar når andelen af besvarede spørgsmål falder under dette. 0,5 fanger også et delvist nedbrud. 0 slår testen fra.';

@@ -1737,3 +1737,13 @@ $string['soapbox:assign_new_heading'] = 'Hojii Soapbox haaraa';
 
 $string['settings:active_learners_enabled'] = 'Agarsiiftuu barattoota hojjetanii agarsiisi';
 $string['settings:active_learners_enabled_desc'] = 'Panaalii haasawaa keessatti namoonni biroo meeqa amma barachaa akka jiran agarsiisa. Kun kakaasaa hawaasummaa malee amala barsiisummaa miti, akkasumas panaalii banaa hundaaf daqiiqaatti al tokko saarvara gaafata, kanaaf durtiidhaan cufameera. Agarsiiftuun kan mul\'atu yoo xiqqaate namoonni biroo lama yeroo hojjetan qofa.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] sakatta gaaffiiwwan hin deebiine';
+$string['settings:unanswered_check_enabled'] = 'Yeroo gaaffiin deebii hin argatin akeekkachiisi';
+$string['settings:unanswered_check_enabled_desc'] = 'Barattoonni [[tutorshort]] gaafatanii deebii yoo hin argatin fudhattoota beeksisa baasii tiif imeelii erga. Adda baastuun rakkoo baasii kan hojjetu yeroo baasiin <em>dabalu</em> qofa: dhiyeessaan waamicha hunda dide waan tokko hin baasu kanaaf akeekkachiisni hin uumamu. Asitti wal-simannaa gaaffii fi deebii ni hordofna, innis dhiyeessaan yeroo miidhamu battalumatti zeeroo ta\'a. Tarreen yoo duwwaa ta\'e, bulchitoota marsariitii fayyadamna.';
+$string['settings:unanswered_window_hours'] = 'Foddaa sakattaa (sa\'aatii)';
+$string['settings:unanswered_window_hours_desc'] = 'Yaa\'iin tokkoon tokkoon isaanii hangam duubatti ilaala. Gabaabaan saffisaan deebii kenna garuu tiraafikii ga\'aa barbaada.';
+$string['settings:unanswered_min_questions'] = 'Baay\'ina gaaffii xiqqaa akeekkachiisaan dura';
+$string['settings:unanswered_min_questions_desc'] = 'Koorsiin kan madaalamu baay\'ina gaaffii kanaa irraa qofa. Isaa gadi, barattoonni muraasni taabii cufan akka rakkoo ta\'ee mul\'ata.';
+$string['settings:unanswered_min_answer_rate'] = 'Sadarkaa deebii xiqqaa';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Yeroo harki gaaffiiwwan deebii argatanii kana gadi bu\'u akeekkachiisi. 0.5 rakkoo gartokkees ni qaba. Dhaamsuuf 0 godhi.';

@@ -1740,3 +1740,13 @@ $string['soapbox:assign_new_heading'] = '新しい Soapbox 課題';
 
 $string['settings:active_learners_enabled'] = 'アクティブな学習者の表示';
 $string['settings:active_learners_enabled_desc'] = '現在ほかに何人が学習中かをチャットパネルに表示します。これは学習機能ではなく社会的な後押しであり、開いているパネルごとに毎分サーバーへ問い合わせるため、既定ではオフです。ほかに2人以上が活動している場合にのみ表示されます。';
+
+$string['task:unanswered_check'] = '[[tutorshort]] 未回答チェック';
+$string['settings:unanswered_check_enabled'] = '質問が未回答のときに通知する';
+$string['settings:unanswered_check_enabled_desc'] = '学習者が [[tutorshort]] に質問して回答が得られない場合に、支出通知の宛先へメールを送ります。コスト異常検知は支出が<em>増えた</em>ときにのみ作動するため、すべての呼び出しを拒否するプロバイダーは費用が発生せず、警告も出ません。ここでは質問と回答の比率を監視します。プロバイダーが壊れると即座にゼロになります。通知リストが空の場合はサイト管理者が使われます。';
+$string['settings:unanswered_window_hours'] = 'チェック対象期間（時間）';
+$string['settings:unanswered_window_hours_desc'] = '各実行がさかのぼる時間。短いほど反応は速くなりますが、意味を持つだけの通信量が必要です。';
+$string['settings:unanswered_min_questions'] = '通知に必要な最小質問数';
+$string['settings:unanswered_min_questions_desc'] = 'コースはこの質問数に達して初めて評価されます。これ未満では、数人がタブを閉じただけでも障害のように見えます。';
+$string['settings:unanswered_min_answer_rate'] = '最低回答率';
+$string['settings:unanswered_min_answer_rate_desc'] = '回答が得られた質問の割合がこれを下回ったときに通知します。0.5 なら完全障害だけでなく部分障害も捕捉できます。0 でこのチェックを無効化します。';
