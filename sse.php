@@ -1006,11 +1006,26 @@ try {
         DEBUG_DEVELOPER
     );
     try {
+        // moodle_exception::$debuginfo carries the provider's own error text —
+        // the HTTP status, the vendor error type, the actual message. Without
+        // it the audit row records only the translated learner-facing string
+        // ("Sorry, something went wrong"), which is identical for a dead API
+        // key, a spend cap, an unknown model and a network timeout. Ten courses
+        // failed for nine days in 2026-08 before a manual curl revealed the
+        // cause was an Anthropic org spend cap; the API had been returning that
+        // message on every call the whole time.
+        $detail = ($e instanceof \moodle_exception && !empty($e->debuginfo))
+            ? (string) $e->debuginfo
+            : '';
+        $entry = ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)];
+        if ($detail !== '') {
+            $entry['detail'] = \core_text::substr($detail, 0, 500);
+        }
         \local_ai_course_assistant\audit_logger::log(
             'sse_error',
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
-            ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)]
+            $entry
         );
     } catch (\Throwable $ignore) {
         /* same */

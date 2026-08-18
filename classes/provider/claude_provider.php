@@ -250,6 +250,43 @@ class claude_provider extends base_provider {
         return json_encode($body);
     }
 
+    /**
+     * Turn an Anthropic error payload into a one-line diagnostic for the
+     * exception's debuginfo, which the SSE handler records in the audit log.
+     *
+     * Anthropic reports failures as {"type":"error","error":{"type":..,
+     * "message":..}} with no `content` key, so the empty-content guard fires
+     * and — before this — discarded the payload in favour of the fixed string
+     * "Invalid API response". On 2026-08-10 an org spend cap started returning
+     *
+     *   invalid_request_error: You have reached your specified API usage
+     *   limits. You will regain access on 2026-09-01 at 00:00 UTC.
+     *
+     * on every call for ten courses. The audit recorded only "Sorry, something
+     * went wrong", so the cause took nine days and a manual curl to find. The
+     * message was there the whole time; nothing was reading it.
+     *
+     * Truncated to 400 chars, and falls back to a slice of the raw body when
+     * the payload is not JSON (a proxy error page, say) so the shape of the
+     * failure is still visible.
+     *
+     * @param mixed $data Decoded response body, or null when it did not parse.
+     * @param string $raw Raw response body.
+     * @return string
+     */
+    private static function describe_api_error($data, string $raw): string {
+        if (is_array($data) && isset($data['error']) && is_array($data['error'])) {
+            $type = (string) ($data['error']['type'] ?? 'error');
+            $msg  = (string) ($data['error']['message'] ?? '');
+            return \core_text::substr(trim($type . ': ' . $msg), 0, 400);
+        }
+        $raw = trim($raw);
+        if ($raw !== '') {
+            return 'Unrecognised API response: ' . \core_text::substr($raw, 0, 400);
+        }
+        return 'Empty API response';
+    }
+
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $url = $this->baseurl . '/v1/messages';
         $body = $this->build_body($systemprompt, $messages, false, $options);
@@ -266,7 +303,8 @@ class claude_provider extends base_provider {
         }
 
         if (!$data || empty($data['content'])) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                self::describe_api_error($data, $response));
         }
 
         // Capture token usage including cache metrics.
@@ -308,13 +346,24 @@ class claude_provider extends base_provider {
         // Tracks whether any text reached the learner, so a refusal notice is
         // only emitted when the stream produced nothing.
         $sentanytext = false;
+        // Anthropic reports a failed stream two different ways, and before this
+        // both were discarded: an SSE `error` event mid-stream, or — when the
+        // request is rejected outright — a plain JSON error body that never
+        // starts with "data: " and so was skipped by the SSE parser entirely.
+        // The second is what an org spend cap produces, which is why ten
+        // courses failed for nine days with nothing in the audit but "Sorry,
+        // something went wrong". Captured here and rethrown after the transfer
+        // so the detail reaches the audit log.
+        $apierror = null;
+        $rawseen = '';
 
         $this->http_post_stream(
             $url,
             $this->get_headers($options),
             $body,
-            function ($data) use ($callback, &$buffer, &$sentanytext) {
+            function ($data) use ($callback, &$buffer, &$sentanytext, &$apierror, &$rawseen) {
                 $buffer .= $data;
+                $rawseen .= $data;
 
                 while (($pos = strpos($buffer, "\n")) !== false) {
                     $line = substr($buffer, 0, $pos);
@@ -336,6 +385,12 @@ class claude_provider extends base_provider {
                     }
 
                     $eventtype = $event['type'] ?? '';
+
+                    // Mid-stream failure (overloaded, rate limit, cap reached).
+                    if ($eventtype === 'error') {
+                        $apierror = self::describe_api_error($event, '');
+                        return;
+                    }
 
                     if ($eventtype === 'message_start') {
                         $usage = $event['message']['usage'] ?? [];
@@ -380,5 +435,19 @@ class claude_provider extends base_provider {
                 }
             }
         );
+
+        // A rejected request (bad key, spend cap, unknown model) comes back as
+        // a plain JSON error body rather than an SSE stream, so nothing above
+        // ever matched and the learner just saw an empty reply. Surface it.
+        if ($apierror === null && !$sentanytext && trim($rawseen) !== '' && !str_contains($rawseen, 'data: ')) {
+            $decoded = json_decode(trim($rawseen), true);
+            if (is_array($decoded) && isset($decoded['error'])) {
+                $apierror = self::describe_api_error($decoded, $rawseen);
+            }
+        }
+
+        if ($apierror !== null) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $apierror);
+        }
     }
 }
