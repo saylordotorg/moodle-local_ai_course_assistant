@@ -1139,8 +1139,44 @@ define([
             var alreadyOpened = false;
             try { alreadyOpened = localStorage.getItem(firstVisitKey) === '1'; } catch (e) { /**/ }
             if (courseId && !alreadyOpened) {
-                try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
-                requestAnimationFrame(function() { toggleDrawer(); });
+                // The first-visit key is claimed at the moment we actually
+                // open, not here. Claiming it up front would burn the single
+                // auto-open on a visit where the drawer never opened because
+                // we deferred to a user tour the learner then abandoned.
+                var openOnce = function() {
+                    requestAnimationFrame(function() {
+                        // Claim inside the frame, not before scheduling it.
+                        // requestAnimationFrame is starved while the tab is
+                        // hidden, so a course opened in a background tab
+                        // (cmd-click, restored session) would otherwise burn
+                        // the single auto-open without ever showing the
+                        // drawer — and never retry, because the key is set.
+                        try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
+                        toggleDrawer();
+                    });
+                };
+
+                // v6.9.8: a Moodle user tour and the auto-opened drawer both
+                // claim the screen on a first visit, and the drawer wins —
+                // it renders over the tour's popover, so the learner gets a
+                // half-covered tour behind a chat window they did not ask for.
+                // PHP has already resolved whether a tour will really run for
+                // this user on this page (tool_usertours' own predicate), so
+                // wait for it to finish instead of racing it.
+                if (root.dataset.tourpending === '1') {
+                    var openAfterTour = function() {
+                        document.removeEventListener('tool_usertours/tourEnded', openAfterTour);
+                        openOnce();
+                    };
+                    document.addEventListener('tool_usertours/tourEnded', openAfterTour);
+                    // No timeout fallback on purpose. If the tour never ends
+                    // the learner is still inside it, and opening on top is
+                    // precisely the bug being guarded against. Because the
+                    // first-visit key is untouched, the next page load in this
+                    // course auto-opens normally.
+                } else {
+                    openOnce();
+                }
             }
         }
 

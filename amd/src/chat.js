@@ -1890,11 +1890,19 @@ define([
                                 // passing n as get_string's third argument. Moodle caches
                                 // JS strings in localStorage keyed by id/component/lang
                                 // WITHOUT the parameter, so a parameterised call can be
-                                // served from that cache and skip the server entirely —
-                                // which yields the raw '{$a} ...' template, or the bare
-                                // string id. Observed on learn.saylor.org in en_us, where
-                                // the widget rendered a literal 'active_learners:line_global'
-                                // on every load and core_get_string was never requested.
+                                // served from that cache and skip the server entirely,
+                                // yielding the raw '{$a} ...' template.
+                                //
+                                // That is not what bit learn.saylor.org, though. Saylor
+                                // runs the standalone CDN bundle, whose core/str shim
+                                // resolves only from the window.SOLA_I18N map that PHP
+                                // injects and otherwise returns the key itself. Both of
+                                // these keys were absent from that map, so the widget
+                                // rendered a literal 'active_learners:line_global' and no
+                                // string was ever requested from the server — there is no
+                                // server round-trip to make in CDN mode. Fixed by listing
+                                // them in hook_callbacks::get_js_strings(); keep them
+                                // there, since the build check cannot see a runtime key.
                                 Str.get_string(key, 'local_ai_course_assistant').then(function(tpl) {
                                     text.textContent = String(tpl).replace('{$a}', n);
                                     box.hidden = false;
