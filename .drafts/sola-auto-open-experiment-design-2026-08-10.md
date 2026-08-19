@@ -1,7 +1,39 @@
 # Experiment: does `auto_open` drive SOLA discovery?
 
 **Date:** 2026-08-10
-**Status:** design, not yet applied. Written before the settings change so the hypothesis and success criteria are on record.
+**Status: SUPERSEDED — do not read the design below as a live experiment.**
+
+---
+
+## Superseded 2026-08-19 — no control group ever existed
+
+`auto_open` was turned on globally on Learn as a deliberate rollout, not left off
+as this design assumes. The five treatment courses carry an explicit per-course
+`1`; the five controls carry **no override at all**, so they inherit the global
+setting — which is on. Verified at the attribute actually delivered to the
+browser, not just at the stored config: all ten courses serve
+`data-autoopen="1"`.
+
+| | Stored setting | Delivered |
+|---|---|---|
+| Global `auto_open` | enabled | — |
+| BUS206, CS107, MA121, BUS210, ESL003 (treatment) | explicit `1` | `data-autoopen="1"` |
+| BUS601, CS207, MA007, BUS305, ESL004 (control) | *no override* → inherits global | `data-autoopen="1"` |
+
+There is no contrast between the arms, so the comparison below cannot measure
+anything. Contamination is also already baked in: `aica_autoopened_course_<id>`
+is written on a learner's first visit, so control-course learners who have been
+through have had their one auto-open and will not get another.
+
+The rollout was intentional (confirmed 2026-08-19), which means the treatment
+has effectively shipped catalogue-wide. **The question this design was written to
+answer should now be approached as a pre/post measurement across Learn as a
+whole, not as a paired comparison.** The natural-experiment evidence in "Why"
+below still stands on its own and is the better starting point for that.
+
+Retained because the matched-pair construction, the power calculation, and the
+baseline figures are all reusable for the next discovery experiment. Everything
+from "Design" onward describes a comparison that was never actually run.
 
 ---
 

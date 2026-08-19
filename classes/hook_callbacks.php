@@ -825,6 +825,7 @@ class hook_callbacks {
             'displaymode'        => $displaymode,
             'drawermode'         => ($displaymode === 'drawer'),
             'autoopen'           => self::is_autoopen_for_course($courseid),
+            'tourpending'        => self::is_usertour_pending(),
             'studentmode'        => $studentmode,
             'displayname'        => branding::display_name(),
             'institution'        => branding::institution_name(),
@@ -966,8 +967,19 @@ class hook_callbacks {
      * Get all i18n string keys used by JS at runtime (for CDN mode pre-loading).
      *
      * These are the strings fetched via Str.get_string() / Str.get_strings()
-     * in chat.js and quiz.js. Template-level {{#str}} strings are resolved
+     * in the AMD modules. Template-level {{#str}} strings are resolved
      * server-side by Moodle and do not need to be included here.
+     *
+     * KEEP THIS LIST COMPLETE. In CDN mode the core/str shim resolves only
+     * from this map and falls back to echoing the key itself, so a key missing
+     * here is shown to the learner as a raw string id — which is exactly how
+     * 'active_learners:line_global' reached learners on learn.saylor.org. The
+     * gap is invisible on AMD-mode installs, where Moodle's real string API
+     * serves any key on demand. cdn/rollup.config.mjs asserts this list covers
+     * every literal key used in amd/src and fails the CDN deploy otherwise.
+     *
+     * Keys built at runtime cannot be caught by that check and must be listed
+     * by hand; they are grouped under "dynamic" below.
      *
      * @return array Associative array of string key => translated value.
      */
@@ -1015,6 +1027,28 @@ class hook_callbacks {
             'chat:quiz_score_great',
             'chat:quiz_score_good',
             'chat:quiz_score_practice',
+            'chat:quiz_topic_adaptive',
+            // Mastery chips and popover (chat.js).
+            'mastery:ask_about',
+            'mastery:ask_template',
+            'mastery:chip_label',
+            'mastery:popover_empty',
+            'mastery:status_learning',
+            'mastery:status_mastered',
+            'mastery:status_not_started',
+            // Next-best-action panel (chat.js).
+            'next_best_action:empty_state',
+            'next_best_action:header',
+            // Attachments (chat.js).
+            'attachment:error_provider_no_images',
+            // Dynamic: keys assembled at runtime, so the static build check
+            // cannot see them. active_learners picks course vs global copy from
+            // the server's reported scope; learner_digest picks its confirmation
+            // from the learner's opt-in choice.
+            'active_learners:line',
+            'active_learners:line_global',
+            'learner_digest:optin_thanks',
+            'learner_digest:optin_declined',
         ];
 
         $strings = [];
@@ -1087,6 +1121,42 @@ class hook_callbacks {
             return false;
         }
         return (bool) get_config('local_ai_course_assistant', 'auto_open');
+    }
+
+    /**
+     * Whether a Moodle user tour will actually run for this user on this page.
+     *
+     * Auto-open and a user tour both claim the screen on a first visit, and the
+     * drawer wins: it renders over the tour's popover, so the learner sees
+     * neither properly. Saylor hit this on a course carrying a tour left over
+     * from the assistant that SOLA replaced.
+     *
+     * This deliberately mirrors the predicate core uses for its own bootstrap
+     * (\tool_usertours\helper): a tour must be enabled, match the page and all
+     * its filters, and not already have been completed by this user. Asking
+     * only "does a tour match this URL" would defer for learners who finished
+     * the tour long ago and would never see one.
+     *
+     * @return bool True when a tour is pending, so auto-open should wait for it.
+     */
+    private static function is_usertour_pending(): bool {
+        if (!class_exists('\tool_usertours\manager')) {
+            // The tool is optional and can be uninstalled.
+            return false;
+        }
+        try {
+            foreach (\tool_usertours\manager::get_current_tours() as $tour) {
+                if ($tour->should_show_for_user()) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            // A tour lookup must never be able to break the widget. Falling
+            // back to "no tour" keeps the previous behaviour rather than
+            // suppressing auto-open on an unrelated error.
+            return false;
+        }
+        return false;
     }
 
     /**
