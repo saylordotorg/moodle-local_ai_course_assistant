@@ -1415,5 +1415,33 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026080300, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082000) {
+        // v7.0.0: drop three settings that were registered but never read.
+        //
+        //   failover_timeout_voice        — voice failover was never wired up;
+        //                                   the value was also remotely settable
+        //                                   via a signed policy bundle.
+        //   talking_avatar_provider_url   — v4.8.1 placeholders whose documented
+        //   talking_avatar_provider_api_key  upgrade fallback looked up a
+        //                                   different config name and so could
+        //                                   never fire.
+        //
+        // Unsetting rather than leaving them costs nothing and stops a stale
+        // credential sitting in config for a field that no longer exists. This
+        // is not guarded on existence because unset_config() is a no-op for a
+        // key that is already absent, so a partial rerun is safe.
+        foreach (
+            [
+                'failover_timeout_voice',
+                'talking_avatar_provider_url',
+                'talking_avatar_provider_api_key',
+            ] as $orphan
+        ) {
+            unset_config($orphan, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082000, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

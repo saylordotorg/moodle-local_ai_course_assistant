@@ -88,7 +88,7 @@ class policy_bundle {
         'prompt_verbosity',
         'failover_per_call_enabled',
         'failover_timeout_chat',
-        'failover_timeout_voice',
+        // failover_timeout_voice removed in v7.0.0 — nothing read it.
         'spend_failover_chain',
         // Prompt budgeting (v5.10) and proportions (v6.2).
         'prompt_budget_chars',

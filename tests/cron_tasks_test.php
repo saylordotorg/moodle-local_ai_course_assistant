@@ -378,6 +378,7 @@ final class cron_tasks_test extends \advanced_testcase {
     public function test_send_inactivity_reminders_emails_inactive_learner(): void {
         $this->resetAfterTest();
         global $DB;
+        set_config('enabled', 1, 'local_ai_course_assistant');
         set_config('inactivity_threshold_days', 7, 'local_ai_course_assistant');
 
         $course = $this->getDataGenerator()->create_course();
@@ -415,6 +416,7 @@ final class cron_tasks_test extends \advanced_testcase {
     public function test_send_inactivity_reminders_skips_recently_active_learner(): void {
         $this->resetAfterTest();
         global $DB;
+        set_config('enabled', 1, 'local_ai_course_assistant');
         set_config('inactivity_threshold_days', 7, 'local_ai_course_assistant');
 
         $course = $this->getDataGenerator()->create_course();
@@ -449,6 +451,7 @@ final class cron_tasks_test extends \advanced_testcase {
     public function test_send_inactivity_reminders_does_not_double_send_within_a_week(): void {
         $this->resetAfterTest();
         global $DB;
+        set_config('enabled', 1, 'local_ai_course_assistant');
         set_config('inactivity_threshold_days', 7, 'local_ai_course_assistant');
 
         $course = $this->getDataGenerator()->create_course();
@@ -477,6 +480,95 @@ final class cron_tasks_test extends \advanced_testcase {
             0,
             $messages,
             'A learner who got an inactivity email 2 days ago must not get another one this week.'
+        );
+    }
+
+    /**
+     * Seed one learner who is overdue for an inactivity reminder.
+     *
+     * @param int $lastaccessdaysago Days since the learner last opened the course.
+     * @return \stdClass The learner.
+     */
+    private function seed_overdue_inactive_learner(int $lastaccessdaysago = 14): \stdClass {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        $DB->insert_record('local_ai_course_assistant_reminders', (object)[
+            'userid' => $user->id, 'courseid' => $course->id,
+            'channel' => 'email', 'destination' => $user->email,
+            'frequency' => 'daily', 'enabled' => 1,
+            'unsubscribe_token' => 'tok',
+            'last_sent' => null,
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+        $DB->insert_record('user_lastaccess', (object)[
+            'userid' => $user->id, 'courseid' => $course->id,
+            'timeaccess' => time() - ($lastaccessdaysago * 86400),
+        ]);
+        return $user;
+    }
+
+    public function test_send_inactivity_reminders_returns_early_when_plugin_disabled(): void {
+        $this->resetAfterTest();
+        // The site kill switch must stop learner email. This task had no such
+        // gate before v7.0.0, unlike its sibling send_reminders.
+        set_config('enabled', 0, 'local_ai_course_assistant');
+        set_config('inactivity_threshold_days', 7, 'local_ai_course_assistant');
+        $this->seed_overdue_inactive_learner();
+
+        $sink = $this->redirectMessages();
+        $this->run_task_silently(new send_inactivity_reminders());
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(
+            0,
+            $messages,
+            'Plugin disabled => no inactivity email, however overdue the learner is.'
+        );
+    }
+
+    public function test_send_inactivity_reminders_honours_its_own_off_switch(): void {
+        $this->resetAfterTest();
+        // inactivity_reminder_enabled was registered but never read before
+        // v7.0.0, so unchecking it in the admin UI did nothing at all.
+        set_config('enabled', 1, 'local_ai_course_assistant');
+        set_config('inactivity_reminder_enabled', 0, 'local_ai_course_assistant');
+        set_config('inactivity_threshold_days', 7, 'local_ai_course_assistant');
+        $this->seed_overdue_inactive_learner();
+
+        $sink = $this->redirectMessages();
+        $this->run_task_silently(new send_inactivity_reminders());
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(
+            0,
+            $messages,
+            'Inactivity reminders switched off => no email sent.'
+        );
+    }
+
+    public function test_send_inactivity_reminders_treats_unset_switch_as_on(): void {
+        $this->resetAfterTest();
+        // The setting ships defaulting to 1. A site that never wrote the config
+        // row must keep sending, so the fix cannot silently disable a feature
+        // that was running before the upgrade.
+        set_config('enabled', 1, 'local_ai_course_assistant');
+        unset_config('inactivity_reminder_enabled', 'local_ai_course_assistant');
+        set_config('inactivity_threshold_days', 7, 'local_ai_course_assistant');
+        $this->seed_overdue_inactive_learner();
+
+        $sink = $this->redirectMessages();
+        $this->run_task_silently(new send_inactivity_reminders());
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(
+            1,
+            $messages,
+            'Unset inactivity_reminder_enabled must read as on (its documented default).'
         );
     }
 
