@@ -38,6 +38,10 @@ namespace local_ai_course_assistant\provider;
  *
  * Recommended for courses that do not need streaming or provider-specific
  * features. For the best student experience, use a direct provider.
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class coreai_provider extends base_provider {
     /** @var array|null Token usage from the last successful call. */

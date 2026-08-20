@@ -1943,3 +1943,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams इनकम
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'वैकल्पिक Teams इनकमिंग वेबहुक URL। सारांश Office 365 कनेक्टर कार्ड के रूप में पोस्ट किया जाता है।';
 
 $string['analytics:course_hidden_suffix'] = '(छिपा हुआ)';
+
+$string['radar_report:title'] = '[[tutorshort]] लर्निंग रडार रिपोर्ट';
+$string['radar_report:print'] = 'प्रिंट करें / PDF के रूप में सहेजें';
+$string['radar_report:generated'] = '{$a} को बनाई गई';
+$string['radar_report:query'] = 'क्वेरी';
+$string['radar_report:response'] = 'उत्तर';
+$string['radar_report:privacy_note'] = 'इस रिपोर्ट में सभी शिक्षार्थी डेटा को गुमनाम किया गया है। इसे सार्वजनिक रूप से साझा न करें।';

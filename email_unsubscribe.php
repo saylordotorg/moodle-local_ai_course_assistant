@@ -43,8 +43,11 @@ use local_ai_course_assistant\branding;
 use local_ai_course_assistant\email_optout;
 
 $token = optional_param('token', '', PARAM_RAW_TRIMMED);
+// RFC 8058 one-click POST. Read through optional_param rather than $_POST so
+// the value goes through clean_param like every other input; PARAM_ALPHAEXT
+// covers the literal we compare to.
 $isoneclick = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
-    && (string) ($_POST['List-Unsubscribe'] ?? '') === 'One-Click';
+    && optional_param('List-Unsubscribe', '', PARAM_ALPHAEXT) === 'One-Click';
 
 if ($token === '') {
     if ($isoneclick) {

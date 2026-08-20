@@ -52,6 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'save') {
         $title = required_param('taskset_title', PARAM_TEXT);
+        // PARAM_RAW is required to receive the JSON envelope intact (it is a
+        // json_encode'd array of task objects, not a scalar). Every decoded field
+        // is cleaned field-by-field below: the type slug with PARAM_ALPHANUMEXT,
+        // prose with PARAM_TEXT, bounds int-cast.
         $tasksraw = required_param('tasks_json', PARAM_RAW);
         $tasks = json_decode($tasksraw, true);
         $externalurl = optional_param('external_url', '', PARAM_URL);
@@ -67,22 +71,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($t['instruction']) || empty($t['type'])) {
                 continue;
             }
-            $item = ['type' => $t['type'], 'instruction' => $t['instruction']];
-            if ($t['type'] === 'action_then_rate') {
-                $item['rating_label'] = $t['rating_label'] ?? 'Rate this task';
+            $ttype = clean_param((string) $t['type'], PARAM_ALPHANUMEXT);
+            $item = [
+                'type' => $ttype,
+                'instruction' => clean_param((string) $t['instruction'], PARAM_TEXT),
+            ];
+            if ($ttype === 'action_then_rate') {
+                $item['rating_label'] = clean_param(
+                    (string) ($t['rating_label'] ?? 'Rate this task'),
+                    PARAM_TEXT
+                );
                 $item['min'] = (int) ($t['min'] ?? 1);
                 $item['max'] = (int) ($t['max'] ?? 5);
-                $item['min_label'] = $t['min_label'] ?? '';
-                $item['max_label'] = $t['max_label'] ?? '';
-                $item['follow_up'] = $t['follow_up'] ?? '';
+                $item['min_label'] = clean_param((string) ($t['min_label'] ?? ''), PARAM_TEXT);
+                $item['max_label'] = clean_param((string) ($t['max_label'] ?? ''), PARAM_TEXT);
+                $item['follow_up'] = clean_param((string) ($t['follow_up'] ?? ''), PARAM_TEXT);
             }
-            if ($t['type'] === 'free_response') {
-                $item['follow_up'] = $t['follow_up'] ?? '';
+            if ($ttype === 'free_response') {
+                $item['follow_up'] = clean_param((string) ($t['follow_up'] ?? ''), PARAM_TEXT);
             }
-            if ($t['type'] === 'multiple_choice') {
+            if ($ttype === 'multiple_choice') {
                 $opts = [];
                 foreach (($t['options'] ?? []) as $opt) {
-                    $opt = trim($opt);
+                    $opt = clean_param(trim((string) $opt), PARAM_TEXT);
                     if ($opt !== '') {
                         $opts[] = $opt;
                     }

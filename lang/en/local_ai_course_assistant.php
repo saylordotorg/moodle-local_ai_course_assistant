@@ -2059,3 +2059,72 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Slack incoming webhook URL';
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Optional Slack incoming webhook URL. The digest is posted as a Slack block message.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams incoming webhook URL';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Optional Teams incoming webhook URL. The digest is posted as an Office 365 connector card.';
+
+// Learning Radar printable report (v7.0.1: extracted from radar_export.php).
+$string['radar_report:title'] = '[[tutorshort]] Learning Radar report';
+$string['radar_report:print'] = 'Print / save as PDF';
+$string['radar_report:generated'] = 'Generated {$a}';
+$string['radar_report:query'] = 'Query';
+$string['radar_report:response'] = 'Response';
+$string['radar_report:privacy_note'] = 'All student data in this report is anonymized. Do not share publicly.';
+
+// v7.0.1 (I18N001/I18N003): user-visible text extracted from the admin
+// diagnostic pages prompt_playground.php, provider_benchmark.php and
+// course_settings.php, where it was hardcoded English and untranslatable.
+$string['prompt_playground:pagetitle'] = '[[tutorshort]] Prompt Playground';
+$string['prompt_playground:intro'] = 'Assemble the system prompt and inspect the result. Two modes: (1) enter a <strong>test question</strong> to run the REAL retriever and see exactly which chunks it selects for that question, with relevance scores — the way to verify chunk selection; or (2) paste your own passages to simulate retrieved chunks. Pick a course (and optionally a current-page course-module id), then assemble. You see the chunks chosen, the exact prompt the model would receive, and the per-section size breakdown. Nothing is sent to any AI provider, and it assembles as you (an admin), so no learner data is exposed.';
+$string['prompt_playground:label_courseid'] = '<strong>Course id</strong>';
+$string['prompt_playground:label_pageid'] = '<strong>Current page cmid</strong> (optional)';
+$string['prompt_playground:label_query'] = '<strong>Test question (live RAG retrieval)</strong> (optional — enter a learner question to run the real retriever and see the top chunks it selects, with scores; when set, these are used instead of the pasted chunks below)';
+$string['prompt_playground:label_chunks'] = '<strong>Simulated retrieved chunks</strong> (used only when no test question above; separate chunks with a line containing only <code>---</code>; leave both empty to assemble with RAG off)';
+$string['prompt_playground:assemble'] = 'Assemble prompt';
+$string['prompt_playground:live_retrieval'] = 'Live RAG retrieval';
+$string['prompt_playground:question'] = 'Question: <em>{$a}</em>';
+$string['prompt_playground:retrieval_failed'] = 'Retrieval failed: {$a} (RAG must be enabled for the course and the course indexed).';
+$string['prompt_playground:no_chunks'] = 'No chunks cleared the relevance floor for this question — an off-topic question, or the course is not indexed. The prompt below falls back to the page-and-structure behavior.';
+$string['prompt_playground:selected_chunks'] = 'Selected <strong>{$a}</strong> chunk(s), ranked by relevance:';
+$string['prompt_playground:col_score'] = 'Score';
+$string['prompt_playground:col_type'] = 'Type';
+$string['prompt_playground:col_content'] = 'Content';
+$string['prompt_playground:score_na'] = 'n/a';
+$string['prompt_playground:result'] = 'Result';
+$string['prompt_playground:result_summary'] = '{$a->mode} chunks fed to the prompt: <strong>{$a->chunks}</strong>. Assembled prompt: <strong>{$a->chars}</strong> chars (~{$a->tokens} tokens).';
+$string['prompt_playground:mode_live'] = 'Live-retrieved';
+$string['prompt_playground:mode_simulated'] = 'Simulated';
+$string['prompt_playground:breakdown'] = 'Per-section breakdown';
+$string['prompt_playground:assembled'] = 'Assembled system prompt';
+$string['prompt_playground:assemble_failed'] = 'Could not assemble the prompt: {$a} (check the course id exists).';
+
+$string['benchmark:runnow'] = 'Run benchmark now';
+$string['benchmark:rerun'] = 'Re-run benchmark';
+$string['benchmark:export_markdown'] = 'Export Markdown';
+$string['benchmark:export_csv'] = 'Export CSV';
+$string['benchmark:export_json'] = 'Export JSON';
+$string['benchmark:norun'] = 'No benchmark has been run yet. Click the button above to run.';
+$string['benchmark:lastrun'] = 'Last run: {$a}';
+
+$string['coursesettings:back_to_course'] = 'Back to course';
+$string['coursesettings:course_analytics'] = 'Course analytics';
+$string['coursesettings:how_it_works'] = 'How course settings work:';
+$string['coursesettings:how_it_works_desc'] = 'Settings configured here override the global defaults for this course only. Leave a field blank to use the global setting. Changes here do not affect other courses.';
+$string['coursesettings:systemprompt_hint'] = 'Leave blank to use the global default. Or customize for this course only.';
+$string['coursesettings:reset_prompt'] = 'Reset to default';
+$string['coursesettings:reset_prompt_title'] = 'Replace with the global default template';
+$string['coursesettings:reset_prompt_confirm'] = 'Replace the system prompt with the global default template? Any course-specific edits will be lost.';
+$string['coursesettings:english_lock_heading'] = 'English Lock (ELL Courses)';
+$string['coursesettings:english_lock'] = 'English Lock';
+$string['coursesettings:english_lock_desc'] = 'Force [[tutorshort]] to always respond in English for this course, regardless of the student\'s language preference. Ideal for English language learning courses where students should practice reading and writing in English.';
+$string['coursesettings:english_lock_toggle'] = 'Always respond in English';
+$string['coursesettings:english_lock_help'] = 'When enabled, [[tutorshort]] will respond in English even if the student writes in another language. The student\'s language preference in their settings panel will be overridden.';
+$string['coursesettings:voice_tab'] = 'Voice Tab';
+$string['coursesettings:voice_tab_desc'] = 'Control the Voice Tab (settings panel voice options) for this course. By default it inherits the global setting (currently {$a}).';
+$string['coursesettings:voice_tab_help'] = 'Override the global Voice Tab setting for this course only.';
+$string['coursesettings:auto_open_heading'] = 'Auto-open on first visit';
+$string['coursesettings:auto_open'] = 'Auto-open';
+$string['coursesettings:auto_open_desc'] = 'Control whether the [[tutorshort]] drawer opens automatically the first time a student lands on this course. First-visit state is tracked per course in the student\'s browser via localStorage. By default this course inherits the global setting (currently {$a}).';
+$string['coursesettings:auto_open_help'] = 'Override the global Auto-open setting for this course only.';
+$string['coursesettings:inherit_global'] = 'Inherit global ({$a})';
+$string['coursesettings:force_on'] = 'Force on';
+$string['coursesettings:force_off'] = 'Force off';
+$string['coursesettings:state_enabled'] = 'enabled';
+$string['coursesettings:state_disabled'] = 'disabled';

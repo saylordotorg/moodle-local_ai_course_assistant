@@ -95,6 +95,11 @@ require_sesskey();
 \local_ai_course_assistant\security::send_security_headers();
 
 $courseid   = required_param('courseid', PARAM_INT);
+// PARAM_RAW is required: this is the learner's chat turn. It legitimately carries
+// newlines, quotes, LaTeX, fenced code blocks and non-Latin scripts, all of which
+// PARAM_TEXT/PARAM_NOTAGS would corrupt. Strict handling happens downstream: the
+// string is stored via $DB (parameterised), sent to the provider as a JSON string,
+// and rendered client-side through the markdown renderer, never as raw HTML.
 $message    = required_param('message', PARAM_RAW);
 $lang       = optional_param('lang', '', PARAM_ALPHA);      // ISO 639-1 language preference.
 $pageid     = optional_param('pageid', 0, PARAM_INT);       // Course-module ID of the current page.
@@ -107,7 +112,11 @@ $completion      = optional_param('completion', 0, PARAM_INT);      // Course co
 $interactiontype = optional_param('interaction_type', 'chat', PARAM_ALPHA); // Interaction mode: chat, voice, quiz, etc.
 $logonly         = optional_param('log_only', 0, PARAM_BOOL);              // Log a system message without AI call.
 $clientprovider  = optional_param('provider', '', PARAM_ALPHA);            // Admin LLM picker override.
-$clientmodel     = optional_param('model', '', PARAM_RAW_TRIMMED);         // Admin LLM picker model override.
+// Admin LLM picker model override. Model ids are vendor slugs containing dots and
+// slashes ("gemini-2.5-flash", "meta-llama/Llama-3.1-8B-Instruct") that
+// PARAM_ALPHANUMEXT would strip; PARAM_TEXT is lossless for those and strips
+// markup, and trim() preserves the previous PARAM_RAW_TRIMMED behaviour.
+$clientmodel     = trim(optional_param('model', '', PARAM_TEXT));
 $draftitemid     = optional_param('draftitemid', 0, PARAM_INT);            // Student attachment draft itemid.
 
 // Log-only mode: record a cost/usage entry without calling the AI provider.

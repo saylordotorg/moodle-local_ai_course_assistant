@@ -1919,3 +1919,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams の受信 We
 $string['settings:anomaly_digest_teams_webhook_desc'] = '任意の Teams 受信 Webhook URL です。ダイジェストは Office 365 コネクタカードとして投稿されます。';
 
 $string['analytics:course_hidden_suffix'] = '（非表示）';
+
+$string['radar_report:title'] = '[[tutorshort]] Learning Radar レポート';
+$string['radar_report:print'] = '印刷 / PDF として保存';
+$string['radar_report:generated'] = '作成日時: {$a}';
+$string['radar_report:query'] = 'クエリ';
+$string['radar_report:response'] = '応答';
+$string['radar_report:privacy_note'] = 'このレポート内の受講者データはすべて匿名化されています。公開しないでください。';

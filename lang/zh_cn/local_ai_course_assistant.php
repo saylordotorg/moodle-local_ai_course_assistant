@@ -1948,3 +1948,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams 传入 Webho
 $string['settings:anomaly_digest_teams_webhook_desc'] = '可选的 Teams 传入 Webhook URL。摘要将以 Office 365 连接器卡片的形式发布。';
 
 $string['analytics:course_hidden_suffix'] = '（隐藏）';
+
+$string['radar_report:title'] = '[[tutorshort]] Learning Radar 报告';
+$string['radar_report:print'] = '打印 / 另存为 PDF';
+$string['radar_report:generated'] = '生成时间：{$a}';
+$string['radar_report:query'] = '查询';
+$string['radar_report:response'] = '响应';
+$string['radar_report:privacy_note'] = '本报告中的所有学员数据均已匿名化。请勿公开分享。';

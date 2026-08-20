@@ -55,6 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'save') {
         $title = required_param('survey_title', PARAM_TEXT);
+        // PARAM_RAW is required to receive the JSON envelope intact (it is a
+        // json_encode'd array of question objects, not a scalar). Every decoded
+        // field is cleaned field-by-field below: the type slug with
+        // PARAM_ALPHANUMEXT, prose with PARAM_TEXT, bounds int-cast.
         $questionsraw = required_param('questions_json', PARAM_RAW);
         $questions = json_decode($questionsraw, true);
         $active = optional_param('survey_active', 0, PARAM_INT);
@@ -70,11 +74,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($q['text']) || empty($q['type'])) {
                 continue;
             }
-            $item = ['type' => $q['type'], 'text' => $q['text']];
-            if ($q['type'] === 'multiple_choice') {
+            $qtype = clean_param((string) $q['type'], PARAM_ALPHANUMEXT);
+            $item = [
+                'type' => $qtype,
+                'text' => clean_param((string) $q['text'], PARAM_TEXT),
+            ];
+            if ($qtype === 'multiple_choice') {
                 $opts = [];
                 foreach (($q['options'] ?? []) as $opt) {
-                    $opt = trim($opt);
+                    $opt = clean_param(trim((string) $opt), PARAM_TEXT);
                     if ($opt !== '') {
                         $opts[] = $opt;
                     }
@@ -84,14 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $item['options'] = $opts;
             }
-            if ($q['type'] === 'rating') {
+            if ($qtype === 'rating') {
                 $item['min'] = (int) ($q['min'] ?? 1);
                 $item['max'] = (int) ($q['max'] ?? 5);
                 if (!empty($q['min_label'])) {
-                    $item['min_label'] = $q['min_label'];
+                    $item['min_label'] = clean_param((string) $q['min_label'], PARAM_TEXT);
                 }
                 if (!empty($q['max_label'])) {
-                    $item['max_label'] = $q['max_label'];
+                    $item['max_label'] = clean_param((string) $q['max_label'], PARAM_TEXT);
                 }
             }
             $clean[] = $item;

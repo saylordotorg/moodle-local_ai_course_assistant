@@ -97,8 +97,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     } else if ($action === 'import_detected') {
         $source = required_param('source', PARAM_ALPHA);
+        // PARAM_RAW is required to receive the JSON envelope of detected
+        // objectives intact (it is a json_encode'd array, not a scalar). Each
+        // decoded field is cleaned below with clean_param(PARAM_TEXT) - the same
+        // treatment the manual "add objective" form applies to title and
+        // description - before anything reaches the DB. Codes stay PARAM_TEXT
+        // rather than the manual form's PARAM_ALPHANUMEXT because a detected code
+        // legitimately contains dots ("1.2") that ALPHANUMEXT would silently eat.
         $payload = required_param('payload', PARAM_RAW);
         $items = json_decode($payload, true);
+        if (is_array($items)) {
+            $cleanitems = [];
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $cleanitems[] = [
+                    'title' => clean_param((string) ($item['title'] ?? ''), PARAM_TEXT),
+                    'description' => clean_param((string) ($item['description'] ?? ''), PARAM_TEXT),
+                    'code' => clean_param((string) ($item['code'] ?? ''), PARAM_TEXT),
+                    'external_ref' => clean_param((string) ($item['external_ref'] ?? ''), PARAM_TEXT),
+                ];
+            }
+            $items = $cleanitems;
+        }
         if (!is_array($items)) {
             redirect(
                 $pageurl,

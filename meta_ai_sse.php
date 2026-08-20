@@ -54,13 +54,28 @@ require_sesskey();
 $syscontext = context_system::instance();
 require_capability('moodle/site:config', $syscontext);
 
+// PARAM_RAW is required: this is a free-form analyst question typed into the
+// Learning Radar box. It routinely carries newlines, quotes, LaTeX and fenced
+// code blocks, all of which PARAM_TEXT/PARAM_NOTAGS would mangle. It is never
+// echoed into HTML by this endpoint - it is only appended to the LLM message
+// array below, and the browser renders the transcript with textContent.
 $query    = required_param('query', PARAM_RAW);
 $provider = optional_param('provider', '', PARAM_ALPHA);
-$model    = optional_param('model', '', PARAM_RAW_TRIMMED);
+// Model ids are vendor slugs ("gpt-4o-mini", "gemini-2.5-flash",
+// "meta-llama/Llama-3.1-8B-Instruct"), so PARAM_ALPHANUMEXT would eat the dots
+// and slashes. PARAM_TEXT is lossless for every slug shape we ship while still
+// stripping markup; trim() keeps the old PARAM_RAW_TRIMMED behaviour.
+$model    = trim(optional_param('model', '', PARAM_TEXT));
 $courseid = optional_param('courseid', 0, PARAM_INT);
-$courseids_raw = optional_param('courseids', '', PARAM_RAW_TRIMMED);
+// Comma-separated course IDs from the "custom scope" input (placeholder
+// "2,5,12"); PARAM_SEQUENCE is digits-and-commas only, and the values are
+// int-cast below.
+$courseids_raw = optional_param('courseids', '', PARAM_SEQUENCE);
 $range    = optional_param('range', 30, PARAM_INT);
 $filterprovider = optional_param('filterprovider', '', PARAM_ALPHA);
+// PARAM_RAW is required to receive the JSON conversation envelope intact; it is
+// json_decode'd below and every element is then reduced to a known role plus a
+// string cast, with the array capped at the last 50 turns.
 $history  = optional_param('history', '[]', PARAM_RAW);
 
 $since = $range > 0 ? time() - ($range * 86400) : 0;

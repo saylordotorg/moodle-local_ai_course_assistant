@@ -121,9 +121,9 @@ function local_ai_course_assistant_send_file(string $body, string $filename, str
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/provider_benchmark.php'));
-$PAGE->set_title('SOLA Provider Benchmark');
 $benchmarkheading = \local_ai_course_assistant\branding::short_name() . ' '
     . get_string('benchmark:pagetitle', 'local_ai_course_assistant');
+$PAGE->set_title($benchmarkheading);
 $PAGE->set_heading($benchmarkheading);
 $PAGE->set_pagelayout('admin');
 
@@ -142,12 +142,19 @@ $runurl = new moodle_url(
 echo \html_writer::start_div('mb-3');
 echo \html_writer::tag(
     'a',
-    $payload ? 'Re-run benchmark' : 'Run benchmark now',
+    $payload
+        ? get_string('benchmark:rerun', 'local_ai_course_assistant')
+        : get_string('benchmark:runnow', 'local_ai_course_assistant'),
     ['href' => $runurl->out(false), 'class' => 'btn btn-primary']
 );
 if ($payload) {
     echo ' &nbsp; ';
-    foreach (['markdown' => 'Export Markdown', 'csv' => 'Export CSV', 'json' => 'Export JSON'] as $fmt => $label) {
+    $exportlabels = [
+        'markdown' => get_string('benchmark:export_markdown', 'local_ai_course_assistant'),
+        'csv'      => get_string('benchmark:export_csv', 'local_ai_course_assistant'),
+        'json'     => get_string('benchmark:export_json', 'local_ai_course_assistant'),
+    ];
+    foreach ($exportlabels as $fmt => $label) {
         $u = new moodle_url(
             '/local/ai_course_assistant/provider_benchmark.php',
             ['export' => $fmt, 'sesskey' => sesskey()]
@@ -165,7 +172,7 @@ echo \html_writer::end_div();
 if (!$payload) {
     echo \html_writer::tag('p', \html_writer::tag(
         'em',
-        'No benchmark has been run yet. Click the button above to run.'
+        get_string('benchmark:norun', 'local_ai_course_assistant')
     ));
     echo $OUTPUT->footer();
     exit;
@@ -182,7 +189,7 @@ echo \html_writer::tag(
 $generated = userdate((int) ($payload['generated_at'] ?? time()), '%Y-%m-%d %H:%M %Z');
 echo \html_writer::tag(
     'p',
-    \html_writer::tag('em', 'Last run: ' . $generated),
+    \html_writer::tag('em', get_string('benchmark:lastrun', 'local_ai_course_assistant', $generated)),
     ['class' => 'text-muted']
 );
 

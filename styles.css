@@ -5792,8 +5792,14 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 
 /* ── Admin settings page: jump-to-section TOC and quicklinks (v7.0.0) ──────
    Moved out of an inline <style> block in settings.php. The plugin directory
-   review flagged inline stylesheets; this is where these rules belong. */
-html { scroll-behavior: smooth; }
+   review flagged inline stylesheets; this is where these rules belong.
+
+   v7.0.1: the smooth-scroll rule was a bare `html { }` selector, which
+   styles.css aggregation applies to EVERY Moodle page, not just ours. Gated
+   on :has(.sola-toc) it can only match a page that is already rendering our
+   table of contents. Browsers without :has() simply jump instead of gliding,
+   which is the pre-7.0.0 behaviour and costs nothing. */
+html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-toc { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 14px 18px; margin: 0 0 18px; }
 .sola-toc strong { display: block; font-size: 13px; color: #495057; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
 .sola-toc ul { display: flex; flex-wrap: wrap; gap: 6px 10px; list-style: none; padding: 0; margin: 0; }
@@ -5805,3 +5811,23 @@ html { scroll-behavior: smooth; }
 .sola-quicklinks a:hover { background: #2d47b5; border-color: #2d47b5; color: #fff; }
 .sola-section-anchor { display: block; position: relative; top: -60px; visibility: hidden; }
 .sola-section-heading { margin-top: 24px; padding-top: 8px; border-top: 2px solid #e5e7eb; }
+
+/* ── Learning Radar printable report (v7.0.1) ─────────────────────────────
+   Was an inline <style> block in radar_export.php emitting a detached HTML
+   document with bare `body{}` / `h1{}` / `dl{}` rules. The page now renders
+   through templates/radar_report.mustache on an embedded page layout, so
+   styles.css is loaded and every rule can be namespaced. */
+.sola-radar-report { max-width: 780px; margin: 24px auto; padding: 0 16px; color: #222; line-height: 1.55; }
+.sola-radar-report__title { font-size: 20px; margin: 0 0 4px; }
+.sola-radar-report__heading { font-size: 16px; margin: 24px 0 8px; }
+.sola-radar-report__generated { color: #666; margin: 0 0 12px; }
+.sola-radar-report__meta { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 13px; color: #555; }
+.sola-radar-report__meta dt { font-weight: 600; }
+.sola-radar-report__meta dd { margin: 0; }
+.sola-radar-report__query { background: #f4f6f9; padding: 12px 14px; border-radius: 6px; white-space: pre-wrap; }
+.sola-radar-report__response { padding: 12px 0; white-space: pre-wrap; }
+.sola-radar-report__foot { margin-top: 32px; font-size: 12px; color: #888; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+@media print {
+    .sola-radar-report { margin: 0; max-width: none; }
+    .sola-radar-report__print { display: none; }
+}

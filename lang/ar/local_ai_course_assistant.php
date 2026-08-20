@@ -1913,3 +1913,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'رابط Webhook الوار�
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'رابط اختياري لـ Webhook وارد في Teams. يُنشر الملخص على هيئة بطاقة موصّل Office 365.';
 
 $string['analytics:course_hidden_suffix'] = '(مخفي)';
+
+$string['radar_report:title'] = 'تقرير Learning Radar من [[tutorshort]]';
+$string['radar_report:print'] = 'طباعة / حفظ بصيغة PDF';
+$string['radar_report:generated'] = 'أُنشئ في {$a}';
+$string['radar_report:query'] = 'الاستعلام';
+$string['radar_report:response'] = 'الرد';
+$string['radar_report:privacy_note'] = 'جميع بيانات المتعلمين في هذا التقرير مجهولة الهوية. لا تشاركه علنًا.';

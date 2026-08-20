@@ -87,6 +87,10 @@ $authheader = $_SERVER['HTTP_AUTHORIZATION'] ?? ($_SERVER['REDIRECT_HTTP_AUTHORI
 if ($authheader !== '' && preg_match('/^Bearer\s+(.+)$/i', trim($authheader), $bm)) {
     $bearer = trim($bm[1]);
 }
+// PARAM_RAW is required: an API key is an opaque secret whose byte sequence must
+// reach hash_equals() unaltered - any cleaning would silently rewrite a valid key
+// into a failing one. It is never stored, echoed or interpolated; the only thing
+// done with it is the constant-time comparison below.
 $apikey = $bearer !== '' ? $bearer : optional_param('apikey', '', PARAM_RAW);
 $configuredkey = get_config('local_ai_course_assistant', 'redash_api_key');
 
@@ -115,7 +119,11 @@ $since = redash_export_request::resolve_since(
 // Section allow-list. Building only what the caller asked for keeps the heavy
 // blocks (raw transcript excerpt, Learning Radar query/response bodies) out of
 // a payload that only wants usage, feedback and cost.
-$rawsections = optional_param('sections', '', PARAM_RAW_TRIMMED);
+// Comma-separated section names. PARAM_TEXT is lossless for the slug list this
+// accepts (verified against every value in redash_export_request::SECTIONS) and
+// strips markup; parse_sections() then trims, lowercases and allow-lists each
+// name against that constant, so an unknown name can never widen the payload.
+$rawsections = trim(optional_param('sections', '', PARAM_TEXT));
 $sections = redash_export_request::parse_sections($rawsections);
 if (empty($sections)) {
     // Every name supplied was unrecognised. Fail loudly rather than falling
