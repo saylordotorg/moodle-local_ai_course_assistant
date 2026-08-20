@@ -231,7 +231,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/provider',
         get_string('settings:provider', 'local_ai_course_assistant'),
-        get_string('settings:provider_desc', 'local_ai_course_assistant'),
+        // branding::str(), not get_string(): this description carries a
+        // [[tutorshort]] token, and a bare get_string() would render it raw.
+        \local_ai_course_assistant\branding::str('settings:provider_desc'),
         'auto',
         $providers
     ));
@@ -938,7 +940,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/spend_guard_heading',
         'Spend guard and optimizer',
-        'Set LLM spend caps per period. SOLA pauses requests when a cap is hit or falls back to a cheaper provider from your failover chain. '
+        \local_ai_course_assistant\branding::apply(
+            'Set LLM spend caps per period. [[tutorshort]] pauses requests when a cap is hit or falls back to a cheaper provider from your failover chain. '
+        )
         . 'See the <a href="' . (new moodle_url('/local/ai_course_assistant/token_analytics.php'))->out() . '">Token Cost page</a> '
         . 'for the current spend status and optimizer recommendations.'
     ));
@@ -1104,7 +1108,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/spend_failover_chain',
         'Failover chain',
-        'When a cap is hit, SOLA tries these providers in order. One entry per line, format <code>capability:label</code>. '
+        \local_ai_course_assistant\branding::apply(
+            'When a cap is hit, [[tutorshort]] tries these providers in order. One entry per line, format <code>capability:label</code>. '
+        )
         . 'Labels refer to entries in Comparison providers (for <code>chat</code> / <code>analytics</code>) or Voice providers (for <code>voice</code>). '
         . 'Lines starting with <code>#</code> are comments. Example:<br>'
         . '<code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>',
@@ -1119,12 +1125,15 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/failover_per_call_enabled',
         'Per-call failover (v5.5.0)',
-        'When on, every chat call wraps the primary provider in a failover-chain decorator. '
-        . 'On per-call timeout or 5xx error, SOLA rotates to the next entry in <strong>Failover chain</strong> '
-        . 'above and opens a 15-minute circuit on the failing provider. Emits an audit row '
-        . '(<code>failover_fallthrough</code>) on every fall-through; check Admin -> SOLA -> Audit log '
-        . 'after enabling to verify the chain is healthy. Off by default; turn on once the chain has been '
-        . 'validated and Saylor legal has confirmed FERPA addenda on each chain entry.',
+        \local_ai_course_assistant\branding::apply(
+            'When on, every chat call wraps the primary provider in a failover-chain decorator. '
+            . 'On per-call timeout or 5xx error, [[tutorshort]] rotates to the next entry in '
+            . '<strong>Failover chain</strong> above and opens a 15-minute circuit on the failing provider. '
+            . 'Emits an audit row (<code>failover_fallthrough</code>) on every fall-through; check '
+            . 'Admin -> [[tutorshort]] -> Audit log after enabling to verify the chain is healthy. '
+            . 'Off by default; turn on once the chain has been validated and your institution has '
+            . 'confirmed the required data-processing terms are in place for every provider on it.'
+        ),
         0
     ));
     $settings->add(new admin_setting_configtext(
@@ -1137,15 +1146,10 @@ if ($hassiteconfig) {
         '8',
         PARAM_INT
     ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/failover_timeout_voice',
-        'Per-call failover: voice timeout (seconds)',
-        'Equivalent timeout for the voice/realtime path. Default 3s; voice has tighter latency expectations '
-        . 'than chat. Only consulted when <strong>Per-call failover</strong> is on (and voice failover is '
-        . 'wired through; chat-only in v5.5.0).',
-        '3',
-        PARAM_INT
-    ));
+    // failover_timeout_voice was removed in v7.0.0. It was registered here and
+    // on the policy-bundle allowlist, but nothing ever read it — voice failover
+    // was never wired through, as its own help text admitted. A remotely
+    // settable knob that does nothing reads as a control that works.
 
     // v5.10.0: bounded retry on a transient backend rejection (429/503). Aimed
     // at small self-hosted backends that reject under load. Retries only happen
@@ -1478,7 +1482,8 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/voice_providers_heading',
         'Voice providers (Realtime, TTS, STT)',
         'Configure one or more voice API providers. These settings are independent of the chat provider above and the RAG embedding provider — voice has its own provider list because only OpenAI and xAI currently expose WebSocket Realtime, TTS, and STT endpoints. Use the dropdowns below to choose which registered provider drives each capability. '
-        . 'If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used. Saylor sites running Together AI / Anthropic / DeepSeek / Gemini / Mistral for chat must configure at least one row here for voice to work.'
+        . 'If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used. '
+        . 'A site running Together AI / Anthropic / DeepSeek / Gemini / Mistral for chat must configure at least one row here for voice to work.'
     ));
 
     $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
@@ -1835,7 +1840,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/feedback_link_label',
         'Feedback link label',
-        'Override the footer Feedback link text, e.g. "Send feedback about SOLA to the IT team". '
+        \local_ai_course_assistant\branding::apply(
+            'Override the footer Feedback link text, e.g. "Send feedback about [[tutorshort]] to the IT team". '
+        )
         . 'Leave blank to use the default translated "Feedback" label.',
         '',
         PARAM_TEXT
@@ -1952,21 +1959,13 @@ if ($hassiteconfig) {
                     PARAM_TEXT
                 ));
             }
-            // v4.8.1 fields kept readable as a fallback for upgrades; hidden in
-            // settings UI is unnecessary because the new driver fields are above.
-            $settings->add(new admin_setting_configtext(
-                'local_ai_course_assistant/talking_avatar_provider_url',
-                get_string('settings:talking_avatar_provider_url', 'local_ai_course_assistant'),
-                get_string('settings:talking_avatar_provider_url_desc', 'local_ai_course_assistant'),
-                '',
-                PARAM_URL
-            ));
-            $settings->add(new admin_setting_configpasswordunmask(
-                'local_ai_course_assistant/talking_avatar_provider_api_key',
-                get_string('settings:talking_avatar_provider_api_key', 'local_ai_course_assistant'),
-                get_string('settings:talking_avatar_provider_api_key_desc', 'local_ai_course_assistant'),
-                ''
-            ));
+            // The v4.8.1 placeholder fields (talking_avatar_provider_url and
+            // talking_avatar_provider_api_key) were removed in v7.0.0. They were
+            // documented as an upgrade fallback, but base_provider::cfg() composes
+            // 'talking_avatar_' . $key from suffixes like 'api_key' and 'base_url',
+            // so it looked for talking_avatar_api_key — a name that was never a
+            // registered setting. The fallback could not fire, which made the
+            // API key field a credential prompt for a value nothing would read.
 
             // v4.10.0: avatar rate-card overrides. Mirrors the LLM rate-card
             // overrides editor; takes a JSON object keyed by provider with a
@@ -2415,7 +2414,9 @@ if ($hassiteconfig) {
         'Learning Radar — anomaly digest',
         'Daily check that compares rolling windows of negative ratings, token spend, and integrity flags. '
         . 'When a metric exceeds the configured threshold, a digest is sent to the configured channels. '
-        . 'For per-query scheduled reports, use the Schedules panel on the SOLA Analytics page.'
+        . \local_ai_course_assistant\branding::apply(
+            'For per-query scheduled reports, use the Schedules panel on the [[tutorshort]] Analytics page.'
+        )
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -2724,6 +2725,101 @@ if ($hassiteconfig) {
         '<span id="sec-save" class="sola-section-anchor"></span>'
     ));
 
+    // ── Dependencies: collapse a feature's detail until the feature is on ───
+    //
+    // This page carries well over 200 controls, most of them belonging to
+    // features that ship off. Until v7.0.0 every one of them rendered
+    // unconditionally, which is why this file also grew a hand-rolled table of
+    // contents and jump anchors. Moodle already solves this: hide_if() gives
+    // each detail setting a dependency on the toggle that owns it, so a
+    // default install shows the toggles and nothing else.
+    //
+    // Two rules kept this safe to apply mechanically:
+    //   1. Each setting depends on its NEAREST owning toggle, never on a
+    //      grandparent, so no setting carries two dependencies. rag_scorm_max_mb
+    //      hangs off rag_extract_scorm, which hangs off rag_enabled.
+    //   2. A toggle only owns a setting the toggle genuinely controls. The
+    //      embed_* family sits under the "external resources" heading purely by
+    //      position — external_resources_enabled governs whether the tutor may
+    //      suggest outside links, not embeddings — so they depend on rag_enabled.
+    //
+    // This changes visibility only. Every setting keeps its stored value while
+    // hidden, so toggling a feature back on restores the configuration intact.
+    $dependencies = [
+        // Retrieval. rag_enabled defaults on, so this hides nothing by default;
+        // it matters for sites that deliberately run without retrieval.
+        'rag_enabled' => [
+            'embed_provider', 'embed_apikey', 'embed_model', 'embed_apibaseurl',
+            'embed_dimensions', 'rag_topk', 'rag_min_similarity', 'rag_currentpage_boost',
+            'rag_chunksize', 'rag_return_scope', 'rag_window_size', 'rag_parent_max_chars',
+            'rag_scope', 'rag_auto_reindex_drifted', 'rerank_enabled',
+            'rag_extract_pdf', 'rag_extract_docx', 'rag_extract_pptx',
+            'rag_extract_h5p', 'rag_extract_scorm', 'rag_fetch_transcripts',
+        ],
+        'rag_extract_pdf'   => ['rag_pdftotext_path'],
+        'rag_extract_scorm' => ['rag_scorm_max_mb'],
+        'rag_fetch_transcripts' => ['rag_iframe_host_patterns', 'rag_transcript_url_pattern'],
+        'rerank_enabled' => [
+            'rerank_apikey', 'rerank_model', 'rerank_apibaseurl',
+            'rerank_candidates', 'rerank_margin_threshold',
+        ],
+
+        // Provider routing.
+        'premium_escalation_enabled' => [
+            'premium_escalation_provider', 'premium_escalation_model',
+            'premium_escalation_triggers', 'premium_escalation_course_tags',
+        ],
+        'failover_per_call_enabled' => ['failover_timeout_chat'],
+
+        // Monitoring and alerting.
+        'cost_anomaly_enabled' => ['cost_anomaly_multiplier'],
+        'unanswered_check_enabled' => [
+            'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
+        ],
+        'anomaly_digest_enabled' => [
+            'anomaly_digest_threshold_pct', 'anomaly_digest_recipient_email',
+            'anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook',
+        ],
+
+        // Integrations.
+        'policy_bundle_enabled' => ['policy_bundle_url', 'policy_bundle_pubkey'],
+        'zendesk_enabled' => [
+            'zendesk_require_consent', 'zendesk_subdomain', 'zendesk_email', 'zendesk_token',
+        ],
+
+        // Voice.
+        'realtime_enabled' => ['realtime_apikey', 'realtime_voice'],
+        'stt_selfhosted_enabled' => [
+            'stt_selfhosted_url', 'stt_selfhosted_model',
+            'stt_selfhosted_apikey', 'stt_selfhosted_warm',
+        ],
+
+        // Engagement and outreach.
+        'reminders_whatsapp_enabled' => [
+            'whatsapp_api_url', 'whatsapp_api_token',
+            'whatsapp_from_number', 'whatsapp_blocked_countries',
+        ],
+        'inactivity_reminder_enabled' => ['inactivity_threshold_days'],
+        'survey_enabled' => ['survey_trigger_messages', 'survey_frequency'],
+
+        // Safety, integrity, mastery, attachments, Soapbox.
+        'offtopic_enabled' => ['offtopic_max', 'offtopic_action', 'offtopic_lockout_duration'],
+        'integrity_enabled' => ['integrity_email'],
+        'mastery_decay_enabled' => ['mastery_decay_half_life_days'],
+        'allow_student_attachments' => ['attachment_max_size_mb', 'attachment_allowed_types'],
+        'soapbox_slide_vision' => ['soapbox_vision_provider', 'soapbox_vision_model'],
+    ];
+
+    foreach ($dependencies as $toggle => $dependents) {
+        foreach ($dependents as $dependent) {
+            $settings->hide_if(
+                'local_ai_course_assistant/' . $dependent,
+                'local_ai_course_assistant/' . $toggle,
+                'notchecked'
+            );
+        }
+    }
+
     $ADMIN->add('local_ai_course_assistant', $settings);
 
     // ── External admin pages (tools / editors) ──────────────────────────────
@@ -2790,7 +2886,7 @@ if ($hassiteconfig) {
     // content and inspect the result + per-section breakdown.
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_prompt_playground',
-        'SOLA Prompt Playground',
+        \local_ai_course_assistant\branding::apply('[[tutorshort]] Prompt Playground'),
         new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
         'moodle/site:config'
     ));

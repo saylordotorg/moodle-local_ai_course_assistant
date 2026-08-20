@@ -33,6 +33,23 @@ class send_inactivity_reminders extends \core\task\scheduled_task {
     public function execute(): void {
         global $DB;
 
+        // Both gates were missing until v7.0.0, so this task sent learner email
+        // regardless of the site kill switch and regardless of its own on/off
+        // setting. Its sibling send_reminders has always had the first one.
+        if (!get_config('local_ai_course_assistant', 'enabled')) {
+            return;
+        }
+
+        // Documented default is on (settings.php ships 1), so an unset value
+        // must read as enabled: a site that upgraded before the setting row was
+        // written would otherwise have its reminders silently switched off by
+        // this fix. Only an explicit "0" stops the send.
+        $rawenabled = get_config('local_ai_course_assistant', 'inactivity_reminder_enabled');
+        if ($rawenabled !== false && !(bool) $rawenabled) {
+            mtrace('send_inactivity_reminders: disabled (inactivity_reminder_enabled is off)');
+            return;
+        }
+
         // Use ?? for default-when-unset; ?: would fall through on a literal
         // "0" config value and apply the 7-day default instead of the admin's
         // explicit choice.

@@ -150,6 +150,36 @@ final class policy_bundle_test extends \advanced_testcase {
         }
     }
 
+    public function test_every_allowlisted_key_is_a_registered_setting(): void {
+        // failover_timeout_voice sat on this list for four minor versions while
+        // nothing read it and settings.php had since stopped being its only
+        // home. An allowlisted key that no longer exists is worse than a missing
+        // one: policy_bundle_tool --sign accepts it, the bundle applies it, the
+        // audit row records a change, and nothing anywhere consumes the value.
+        global $CFG;
+        $src = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/settings.php');
+        $this->assertNotFalse($src, 'settings.php must be readable for this guard to mean anything.');
+
+        preg_match_all("/'local_ai_course_assistant\/([a-z0-9_]+)'/", $src, $m);
+        $registered = array_flip($m[1]);
+        $this->assertNotEmpty(
+            $registered,
+            'Parsed zero settings from settings.php — the guard has broken, not passed.'
+        );
+
+        $orphans = [];
+        foreach (policy_bundle::ALLOWED_KEYS as $key) {
+            if (!isset($registered[$key])) {
+                $orphans[] = $key;
+            }
+        }
+        $this->assertSame(
+            [],
+            $orphans,
+            'Allowlisted but not registered in settings.php: ' . implode(', ', $orphans)
+        );
+    }
+
     public function test_older_or_equal_version_skipped(): void {
         policy_bundle::process_envelope($this->envelope([
             'version' => 5, 'settings' => ['rerank_candidates' => 30],
