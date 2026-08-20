@@ -1770,3 +1770,5 @@ $string['settings:unanswered_min_questions'] = 'Minimum pertanyaan sebelum perin
 $string['settings:unanswered_min_questions_desc'] = 'Kursus baru dinilai mulai dari jumlah pertanyaan ini. Di bawahnya, beberapa pembelajar menutup tab terlihat seperti gangguan.';
 $string['settings:unanswered_min_answer_rate'] = 'Rasio jawaban minimum';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Peringatkan saat proporsi pertanyaan terjawab turun di bawah ini. 0,5 menangkap gangguan sebagian. Setel 0 untuk menonaktifkan.';
+
+$string['analytics:course_hidden_suffix'] = '(tersembunyi)';

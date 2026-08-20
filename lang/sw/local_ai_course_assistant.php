@@ -1776,3 +1776,5 @@ $string['settings:unanswered_min_questions'] = 'Idadi ya chini ya maswali kabla 
 $string['settings:unanswered_min_questions_desc'] = 'Kozi hupimwa tu kuanzia idadi hii ya maswali. Chini ya hapo, wanafunzi wachache wanaofunga kichupo huonekana kama hitilafu.';
 $string['settings:unanswered_min_answer_rate'] = 'Kiwango cha chini cha majibu';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Onya wakati sehemu ya maswali yaliyojibiwa inaposhuka chini ya hii. 0.5 hunasa hitilafu ya sehemu pia. Weka 0 kuzima.';
+
+$string['analytics:course_hidden_suffix'] = '(imefichwa)';

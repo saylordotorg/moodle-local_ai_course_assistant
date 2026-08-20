@@ -1746,3 +1746,5 @@ $string['settings:unanswered_min_questions'] = '알림 전 최소 질문 수';
 $string['settings:unanswered_min_questions_desc'] = '해당 구간에서 이 정도 질문이 있어야 코스를 평가합니다. 그 이하에서는 몇 명이 탭을 닫은 것도 장애처럼 보입니다.';
 $string['settings:unanswered_min_answer_rate'] = '최소 응답률';
 $string['settings:unanswered_min_answer_rate_desc'] = '응답을 받은 질문 비율이 이 값 아래로 떨어지면 알립니다. 0.5는 전체 장애뿐 아니라 부분 장애도 잡습니다. 0으로 두면 이 검사를 끕니다.';
+
+$string['analytics:course_hidden_suffix'] = '(숨김)';

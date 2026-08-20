@@ -1783,3 +1783,5 @@ $string['settings:unanswered_min_questions'] = 'Riasztás előtti minimális ké
 $string['settings:unanswered_min_questions_desc'] = 'Egy kurzust csak ennyi kérdéstől értékelünk. Ez alatt néhány fület bezáró tanuló is üzemzavarnak látszik.';
 $string['settings:unanswered_min_answer_rate'] = 'Minimális válaszarány';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Riasztás, ha a megválaszolt kérdések aránya ez alá esik. A 0,5 a részleges hibát is elkapja. 0 kikapcsolja.';
+
+$string['analytics:course_hidden_suffix'] = '(rejtett)';

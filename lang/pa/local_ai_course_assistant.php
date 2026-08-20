@@ -1762,3 +1762,5 @@ $string['settings:unanswered_min_questions'] = 'ਚੇਤਾਵਨੀ ਤੋਂ 
 $string['settings:unanswered_min_questions_desc'] = 'ਕੋਰਸ ਦਾ ਮੁਲਾਂਕਣ ਇਸ ਗਿਣਤੀ ਤੋਂ ਹੀ ਹੁੰਦਾ ਹੈ। ਇਸ ਤੋਂ ਘੱਟ \'ਤੇ, ਕੁਝ ਸਿੱਖਿਆਰਥੀਆਂ ਦਾ ਟੈਬ ਬੰਦ ਕਰਨਾ ਵੀ ਖਰਾਬੀ ਵਾਂਗ ਲੱਗਦਾ ਹੈ।';
 $string['settings:unanswered_min_answer_rate'] = 'ਘੱਟੋ-ਘੱਟ ਜਵਾਬ ਦਰ';
 $string['settings:unanswered_min_answer_rate_desc'] = 'ਜਵਾਬ ਮਿਲੇ ਸਵਾਲਾਂ ਦਾ ਅਨੁਪਾਤ ਇਸ ਤੋਂ ਹੇਠਾਂ ਆਉਣ \'ਤੇ ਚੇਤਾਵਨੀ ਦਿਓ। 0.5 ਅੰਸ਼ਕ ਖਰਾਬੀ ਵੀ ਫੜਦਾ ਹੈ। ਬੰਦ ਕਰਨ ਲਈ 0 ਰੱਖੋ।';
+
+$string['analytics:course_hidden_suffix'] = '(ਲੁਕਿਆ)';

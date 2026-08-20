@@ -1770,3 +1770,5 @@ $string['settings:unanswered_min_questions'] = 'Ɲininkali hakɛ dɔgɔmannin sa
 $string['settings:unanswered_min_questions_desc'] = 'Kalan bɛ jateminɛ dɔrɔn ka bɔ nin ɲininkali hakɛ in na. O jukɔrɔ, kalanden damadɔw minnu ye taabu datugu, o bɛ i n\'a fɔ baara tiɲɛna.';
 $string['settings:unanswered_min_answer_rate'] = 'Jaabi hakɛ dɔgɔmannin';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Kunnafoni di ni ɲininkali minnu jaabira, u hakɛ jiginna nin jukɔrɔ. 0.5 bɛ tiɲɛni yɔrɔ dɔ fana minɛ. A kɛ 0 ye walisa k\'a faga.';
+
+$string['analytics:course_hidden_suffix'] = '(dogolen)';

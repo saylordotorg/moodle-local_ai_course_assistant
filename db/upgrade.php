@@ -1451,5 +1451,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082001, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082002) {
+        // v7.0.0 re-tag: analytics no longer hides hidden courses, and the demo
+        // seeder now enables the assistant on the course it creates. No schema
+        // or config change; the bump exists so installs already on 2026082001
+        // re-read the language files, which gained one string.
+        upgrade_plugin_savepoint(true, 2026082002, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

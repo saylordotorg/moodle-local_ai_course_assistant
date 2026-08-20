@@ -1775,3 +1775,5 @@ $string['settings:unanswered_min_questions'] = 'Inani eliphansi lemibuzo ngapham
 $string['settings:unanswered_min_questions_desc'] = 'Isifundo sihlolwa kuphela kusukela kuleli nani lemibuzo. Ngaphansi kwalokho, abafundi abambalwa abavala ithebhu babukeka njengokwehluleka.';
 $string['settings:unanswered_min_answer_rate'] = 'Izinga eliphansi lezimpendulo';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Xwayisa lapho ingxenye yemibuzo ephenduliwe yehla ngaphansi kwalokhu. U-0.5 uthola nokwehluleka okuyingxenye. Setha ku-0 ukuvala.';
+
+$string['analytics:course_hidden_suffix'] = '(kufihliwe)';

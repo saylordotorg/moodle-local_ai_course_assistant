@@ -1775,3 +1775,5 @@ $string['settings:unanswered_min_questions'] = 'Lim bu gën a tuuti ci laaj laat
 $string['settings:unanswered_min_questions_desc'] = 'Ñu koy natt kurs bi rekk bu amee lim wii ci laaj. Su ko yées, jàngkat yu néew yu tëj taab dafay mel ni yàqute.';
 $string['settings:unanswered_min_answer_rate'] = 'Ratiyoo tontu bu gën a tuuti';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Artu bu limu laaj yi am tontu wàccee ci suufu lii. 0.5 dafay jàpp yàqute bu genn wàll it. Def 0 ngir faye ko.';
+
+$string['analytics:course_hidden_suffix'] = '(nëbbu)';

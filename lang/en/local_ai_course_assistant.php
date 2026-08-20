@@ -386,6 +386,7 @@ $string['analytics:exp_course_b'] = 'Course B';
 $string['analytics:exp_compare'] = 'Compare';
 $string['analytics:exp_metric'] = 'Metric';
 $string['analytics:exp_delta'] = 'B vs A';
+$string['analytics:course_hidden_suffix'] = '(hidden)';
 $string['analytics:exp_enrolled'] = 'Enrolled learners';
 $string['analytics:exp_active_users'] = 'Active [[tutorshort]] users';
 $string['analytics:exp_usage_rate'] = 'Usage rate (%)';

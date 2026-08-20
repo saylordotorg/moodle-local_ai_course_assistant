@@ -1776,3 +1776,5 @@ $string['settings:unanswered_min_questions'] = 'எச்சரிக்கை�
 $string['settings:unanswered_min_questions_desc'] = 'இந்த எண்ணிக்கை கேள்விகள் இருந்தால் மட்டுமே பாடம் மதிப்பிடப்படும். அதற்குக் குறைவாக, சிலர் தாவலை மூடுவதும் செயலிழப்பு போலத் தெரியும்.';
 $string['settings:unanswered_min_answer_rate'] = 'குறைந்தபட்ச பதில் விகிதம்';
 $string['settings:unanswered_min_answer_rate_desc'] = 'பதில் பெற்ற கேள்விகளின் விகிதம் இதற்குக் கீழே வந்தால் எச்சரிக்கவும். 0.5 பகுதி செயலிழப்பையும் பிடிக்கும். முடக்க 0 எனச் செய்யவும்.';
+
+$string['analytics:course_hidden_suffix'] = '(மறைக்கப்பட்டது)';

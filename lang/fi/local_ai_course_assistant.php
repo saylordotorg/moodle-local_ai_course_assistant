@@ -1740,3 +1740,5 @@ $string['settings:unanswered_min_questions'] = 'Vähimmäismäärä kysymyksiä 
 $string['settings:unanswered_min_questions_desc'] = 'Kurssi arvioidaan vasta tästä kysymysmäärästä alkaen. Sen alle muutama välilehden sulkenut näyttää katkokselta.';
 $string['settings:unanswered_min_answer_rate'] = 'Vähimmäisvastausosuus';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Varoita, kun vastattujen kysymysten osuus laskee tämän alle. 0,5 nappaa myös osittaisen katkoksen. 0 poistaa testin käytöstä.';
+
+$string['analytics:course_hidden_suffix'] = '(piilotettu)';

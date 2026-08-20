@@ -1740,3 +1740,5 @@ $string['settings:unanswered_min_questions'] = 'Минимум въпроси п
 $string['settings:unanswered_min_questions_desc'] = 'Курсът се оценява едва при толкова въпроса в прозореца. По-малко и няколко затворени раздела приличат на срив.';
 $string['settings:unanswered_min_answer_rate'] = 'Минимален дял отговори';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Сигнал, когато делът на отговорените въпроси падне под тази стойност. 0,5 улавя и частичен срив. 0 изключва проверката.';
+
+$string['analytics:course_hidden_suffix'] = '(скрит)';

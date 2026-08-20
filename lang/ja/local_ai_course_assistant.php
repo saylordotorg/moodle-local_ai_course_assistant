@@ -1917,3 +1917,5 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Slack の受信 Webhook URL'
 $string['settings:anomaly_digest_slack_webhook_desc'] = '任意の Slack 受信 Webhook URL です。ダイジェストは Slack のブロックメッセージとして投稿されます。';
 $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams の受信 Webhook URL';
 $string['settings:anomaly_digest_teams_webhook_desc'] = '任意の Teams 受信 Webhook URL です。ダイジェストは Office 365 コネクタカードとして投稿されます。';
+
+$string['analytics:course_hidden_suffix'] = '（非表示）';

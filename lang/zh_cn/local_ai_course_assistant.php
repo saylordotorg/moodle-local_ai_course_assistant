@@ -1946,3 +1946,5 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Slack 传入 Webhook URL';
 $string['settings:anomaly_digest_slack_webhook_desc'] = '可选的 Slack 传入 Webhook URL。摘要将以 Slack 区块消息的形式发布。';
 $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams 传入 Webhook URL';
 $string['settings:anomaly_digest_teams_webhook_desc'] = '可选的 Teams 传入 Webhook URL。摘要将以 Office 365 连接器卡片的形式发布。';
+
+$string['analytics:course_hidden_suffix'] = '（隐藏）';

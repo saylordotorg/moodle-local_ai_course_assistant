@@ -352,6 +352,19 @@ class demo_seeder {
             }
         }
 
+        // v7.0.0: turn the assistant on for the testing course.
+        //
+        // Without this the seeder produced conversations, messages, ratings and
+        // feedback that the Analytics Dashboard then filtered straight back out,
+        // because the dashboard only counts courses where the assistant is
+        // enabled. The page's whole stated purpose is previewing that dashboard,
+        // so seeding data it cannot display made the feature look broken and
+        // sent at least one person hunting for a bug in analytics instead.
+        //
+        // set_config() here rather than in create_testing_course() so re-seeding
+        // an older testing course repairs it too.
+        set_config('sola_enabled_course_' . $course->id, '1', 'local_ai_course_assistant');
+
         return [
             'users' => count($userids),
             'conversations' => $counts['conversations'],

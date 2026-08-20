@@ -1746,3 +1746,5 @@ $string['settings:unanswered_min_questions'] = 'Minste antall spørsmål før va
 $string['settings:unanswered_min_questions_desc'] = 'Et kurs vurderes først fra dette antallet spørsmål. Under det ser noen få som lukker fanen ut som et avbrudd.';
 $string['settings:unanswered_min_answer_rate'] = 'Laveste svarandel';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Varsle når andelen besvarte spørsmål faller under dette. 0,5 fanger også delvis avbrudd. 0 slår av testen.';
+
+$string['analytics:course_hidden_suffix'] = '(skjult)';

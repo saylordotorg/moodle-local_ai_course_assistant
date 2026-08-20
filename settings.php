@@ -53,21 +53,13 @@ if ($hassiteconfig) {
     // ── Single settings page with TOC ───────────────────────────────────────
     $settings = new admin_settingpage('local_ai_course_assistant_general', 'Settings');
 
-    // Scoped smooth scrolling + TOC styling.
-    $tocstyle = '<style>'
-        . 'html{scroll-behavior:smooth;}'
-        . '.sola-toc{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:14px 18px;margin:0 0 18px;}'
-        . '.sola-toc strong{display:block;font-size:13px;color:#495057;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}'
-        . '.sola-toc ul{display:flex;flex-wrap:wrap;gap:6px 10px;list-style:none;padding:0;margin:0;}'
-        . '.sola-toc li{margin:0;}'
-        . '.sola-toc a{display:inline-block;padding:4px 10px;background:#fff;border:1px solid #ced4da;border-radius:4px;font-size:13px;color:#3b5bdb;text-decoration:none;}'
-        . '.sola-toc a:hover{background:#e7f0ff;border-color:#3b5bdb;text-decoration:none;}'
-        . '.sola-quicklinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #ced4da;}'
-        . '.sola-quicklinks a{display:inline-block;padding:5px 12px;background:#3b5bdb;border:1px solid #3b5bdb;border-radius:4px;font-size:13px;color:#fff;text-decoration:none;font-weight:500;}'
-        . '.sola-quicklinks a:hover{background:#2d47b5;border-color:#2d47b5;color:#fff;text-decoration:none;}'
-        . '.sola-section-anchor{display:block;position:relative;top:-60px;visibility:hidden;}'
-        . '.sola-section-heading{margin-top:24px;padding-top:8px;border-top:2px solid #e5e7eb;}'
-        . '</style>';
+    // The TOC and quicklink styling lives in styles.css (search .sola-toc).
+    // It used to be an inline <style> block injected through an
+    // admin_setting_description here, which is one of the things the plugin
+    // directory review asked us to stop doing; it came back when the TOC was
+    // added. Moodle loads the plugin's styles.css on admin pages, so nothing
+    // needs injecting.
+    $tocstyle = '';
 
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');

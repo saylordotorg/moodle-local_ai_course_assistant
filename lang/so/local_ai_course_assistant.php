@@ -1757,3 +1757,5 @@ $string['settings:unanswered_min_questions'] = 'Tirada ugu yar ee su\'aalaha ka 
 $string['settings:unanswered_min_questions_desc'] = 'Koorsada waxaa la qiimeeyaa oo kaliya laga bilaabo tiradan su\'aalo ah. Ka hooseeya, dhowr arday oo xiraya tabka waxay u egyihiin cillad.';
 $string['settings:unanswered_min_answer_rate'] = 'Heerka ugu yar ee jawaabta';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Digniin marka boqolkiiba su\'aalaha la jawaabay uu ka hooseeyo tan. 0.5 wuxuu qabtaa cillad qayb ah sidoo kale. U deji 0 si aad u damiso.';
+
+$string['analytics:course_hidden_suffix'] = '(qarsoon)';

@@ -1769,3 +1769,5 @@ $string['settings:unanswered_min_questions'] = 'ከማሳወቅ በፊት ዝቅ
 $string['settings:unanswered_min_questions_desc'] = 'ኮርስ የሚገመገመው ከዚህ የጥያቄ ብዛት ጀምሮ ብቻ ነው። ከዚያ በታች ጥቂት ተማሪዎች ትርን መዝጋት እንደ ብልሽት ይመስላል።';
 $string['settings:unanswered_min_answer_rate'] = 'ዝቅተኛ የመልስ መጠን';
 $string['settings:unanswered_min_answer_rate_desc'] = 'መልስ ያገኙ ጥያቄዎች ድርሻ ከዚህ ሲወርድ አሳውቅ። 0.5 ከፊል ብልሽትንም ይይዛል። ለማጥፋት 0 ያድርጉ።';
+
+$string['analytics:course_hidden_suffix'] = '(የተደበቀ)';

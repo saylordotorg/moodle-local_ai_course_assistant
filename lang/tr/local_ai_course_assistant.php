@@ -1753,3 +1753,5 @@ $string['settings:unanswered_min_questions'] = 'Uyarı öncesi en az soru sayıs
 $string['settings:unanswered_min_questions_desc'] = 'Bir ders ancak pencerede bu kadar soru aldıysa değerlendirilir. Altında, sekmeyi kapatan birkaç öğrenen arıza gibi görünür.';
 $string['settings:unanswered_min_answer_rate'] = 'En düşük yanıt oranı';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Yanıtlanan soru oranı bunun altına düştüğünde uyar. 0,5 kısmi arızayı da yakalar. Bu denetimi kapatmak için 0 yapın.';
+
+$string['analytics:course_hidden_suffix'] = '(gizli)';

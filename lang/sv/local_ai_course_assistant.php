@@ -1739,3 +1739,5 @@ $string['settings:unanswered_min_questions'] = 'Minsta antal frågor före varni
 $string['settings:unanswered_min_questions_desc'] = 'En kurs bedöms först från detta antal frågor. Under det ser några deltagare som stänger fliken ut som ett avbrott.';
 $string['settings:unanswered_min_answer_rate'] = 'Lägsta svarsfrekvens';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Varna när andelen besvarade frågor faller under detta. 0,5 fångar även ett partiellt avbrott. 0 stänger av testet.';
+
+$string['analytics:course_hidden_suffix'] = '(dold)';

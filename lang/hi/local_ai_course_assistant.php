@@ -1941,3 +1941,5 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Slack इनकमिंग 
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'वैकल्पिक Slack इनकमिंग वेबहुक URL। सारांश Slack ब्लॉक संदेश के रूप में पोस्ट किया जाता है।';
 $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams इनकमिंग वेबहुक URL';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'वैकल्पिक Teams इनकमिंग वेबहुक URL। सारांश Office 365 कनेक्टर कार्ड के रूप में पोस्ट किया जाता है।';
+
+$string['analytics:course_hidden_suffix'] = '(छिपा हुआ)';

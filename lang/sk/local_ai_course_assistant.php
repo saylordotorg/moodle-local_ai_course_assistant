@@ -1739,3 +1739,5 @@ $string['settings:unanswered_min_questions'] = 'Minimálny počet otázok pred u
 $string['settings:unanswered_min_questions_desc'] = 'Kurz sa hodnotí až od tohto počtu otázok v okne. Nižšie vyzerá pár študujúcich zatvárajúcich kartu ako výpadok.';
 $string['settings:unanswered_min_answer_rate'] = 'Minimálna miera odpovedí';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Upozorniť, keď podiel zodpovedaných otázok klesne pod túto hodnotu. 0,5 zachytí aj čiastočný výpadok. Nastavte 0 na vypnutie.';
+
+$string['analytics:course_hidden_suffix'] = '(skrytý)';

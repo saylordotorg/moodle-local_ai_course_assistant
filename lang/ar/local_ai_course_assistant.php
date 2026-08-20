@@ -1911,3 +1911,5 @@ $string['settings:anomaly_digest_slack_webhook'] = 'رابط Webhook الوار�
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'رابط اختياري لـ Webhook وارد في Slack. يُنشر الملخص على هيئة رسالة كتل في Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'رابط Webhook الوارد في Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'رابط اختياري لـ Webhook وارد في Teams. يُنشر الملخص على هيئة بطاقة موصّل Office 365.';
+
+$string['analytics:course_hidden_suffix'] = '(مخفي)';

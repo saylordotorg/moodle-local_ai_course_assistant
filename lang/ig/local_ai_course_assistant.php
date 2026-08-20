@@ -1756,3 +1756,5 @@ $string['settings:unanswered_min_questions'] = 'Ọnụ ọgụgụ ajụjụ ka
 $string['settings:unanswered_min_questions_desc'] = 'A na-enyocha nkuzi naanị site na ọnụ ọgụgụ ajụjụ a. N\'okpuru ya, ndị mmụta ole na ole mechiri taabụ dị ka mmebi.';
 $string['settings:unanswered_min_answer_rate'] = 'Ọnụego azịza kacha nta';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Dọọ aka mgbe oke ajụjụ nwetara azịza dabara n\'okpuru nke a. 0.5 na-ejide mmebi akụkụ. Tọọ 0 iji gbanyụọ.';
+
+$string['analytics:course_hidden_suffix'] = '(zoro ezo)';

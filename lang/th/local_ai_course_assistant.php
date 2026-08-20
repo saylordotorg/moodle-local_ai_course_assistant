@@ -1753,3 +1753,5 @@ $string['settings:unanswered_min_questions'] = 'จำนวนคำถาม�
 $string['settings:unanswered_min_questions_desc'] = 'รายวิชาจะถูกประเมินเมื่อมีคำถามถึงจำนวนนี้เท่านั้น ต่ำกว่านั้นผู้เรียนไม่กี่คนที่ปิดแท็บจะดูเหมือนระบบล่ม';
 $string['settings:unanswered_min_answer_rate'] = 'อัตราการตอบขั้นต่ำ';
 $string['settings:unanswered_min_answer_rate_desc'] = 'แจ้งเตือนเมื่อสัดส่วนคำถามที่ได้รับคำตอบต่ำกว่าค่านี้ 0.5 จับความล้มเหลวบางส่วนได้ด้วย ตั้งเป็น 0 เพื่อปิดการตรวจนี้';
+
+$string['analytics:course_hidden_suffix'] = '(ซ่อน)';

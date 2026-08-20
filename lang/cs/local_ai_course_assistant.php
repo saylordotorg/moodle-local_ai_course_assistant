@@ -1740,3 +1740,5 @@ $string['settings:unanswered_min_questions'] = 'Minimální počet dotazů před
 $string['settings:unanswered_min_questions_desc'] = 'Kurz se hodnotí až od tohoto počtu dotazů v okně. Níže vypadá pár studujících zavírajících panel jako výpadek.';
 $string['settings:unanswered_min_answer_rate'] = 'Minimální míra odpovědí';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Upozornit, když podíl zodpovězených dotazů klesne pod tuto hodnotu. 0,5 zachytí i částečný výpadek. Nastavte 0 pro vypnutí.';
+
+$string['analytics:course_hidden_suffix'] = '(skrytý)';

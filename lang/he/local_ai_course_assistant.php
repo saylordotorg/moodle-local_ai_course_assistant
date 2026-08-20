@@ -1783,3 +1783,5 @@ $string['settings:unanswered_min_questions'] = 'מספר שאלות מזערי �
 $string['settings:unanswered_min_questions_desc'] = 'קורס נבדק רק ממספר שאלות זה בחלון. מתחת לכך, כמה לומדים שסוגרים לשונית נראים כמו תקלה.';
 $string['settings:unanswered_min_answer_rate'] = 'שיעור מענה מזערי';
 $string['settings:unanswered_min_answer_rate_desc'] = 'התרעה כששיעור השאלות שנענו יורד מתחת לערך זה. 0.5 מזהה גם תקלה חלקית. אפס מבטל בדיקה זו.';
+
+$string['analytics:course_hidden_suffix'] = '(מוסתר)';

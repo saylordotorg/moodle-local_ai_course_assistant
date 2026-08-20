@@ -1775,3 +1775,5 @@ $string['settings:unanswered_min_questions'] = 'Iye ìbéèrè tó kéré jù k�
 $string['settings:unanswered_min_questions_desc'] = 'A ó ṣe àgbéyẹ̀wò ẹ̀kọ́ nìkan láti iye ìbéèrè yìí. Ní ìsàlẹ̀ rẹ̀, àwọn akẹ́kọ̀ọ́ díẹ̀ tí wọ́n ti pa tabù dà bí àṣìṣe.';
 $string['settings:unanswered_min_answer_rate'] = 'Ìwọ̀n ìdáhùn tó kéré jù';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Kìlọ̀ nígbà tí ìpín àwọn ìbéèrè tí ó rí ìdáhùn bá lọ sí ìsàlẹ̀ èyí. 0.5 yóò mú àṣìṣe apá kan pẹ̀lú. Fi 0 sí i láti pa á.';
+
+$string['analytics:course_hidden_suffix'] = '(ó farasin)';

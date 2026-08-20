@@ -1743,3 +1743,5 @@ $string['settings:unanswered_min_questions'] = 'Baay\'ina gaaffii xiqqaa akeekka
 $string['settings:unanswered_min_questions_desc'] = 'Koorsiin kan madaalamu baay\'ina gaaffii kanaa irraa qofa. Isaa gadi, barattoonni muraasni taabii cufan akka rakkoo ta\'ee mul\'ata.';
 $string['settings:unanswered_min_answer_rate'] = 'Sadarkaa deebii xiqqaa';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Yeroo harki gaaffiiwwan deebii argatanii kana gadi bu\'u akeekkachiisi. 0.5 rakkoo gartokkees ni qaba. Dhaamsuuf 0 godhi.';
+
+$string['analytics:course_hidden_suffix'] = '(dhokate)';

@@ -1739,3 +1739,5 @@ $string['settings:unanswered_min_questions'] = 'Minimum aantal vragen voor een w
 $string['settings:unanswered_min_questions_desc'] = 'Een cursus wordt pas beoordeeld vanaf dit aantal vragen in het venster. Daaronder lijken een paar deelnemers die het tabblad sluiten op een storing.';
 $string['settings:unanswered_min_answer_rate'] = 'Minimale antwoordratio';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Waarschuw wanneer het aandeel beantwoorde vragen hieronder zakt. 0,5 vangt ook een gedeeltelijke storing. Zet op 0 om deze test uit te schakelen.';
+
+$string['analytics:course_hidden_suffix'] = '(verborgen)';

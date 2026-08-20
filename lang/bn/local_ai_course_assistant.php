@@ -1740,3 +1740,5 @@ $string['settings:unanswered_min_questions'] = 'সতর্কতার আগ�
 $string['settings:unanswered_min_questions_desc'] = 'কোর্স কেবল এই সংখ্যক প্রশ্ন হলেই মূল্যায়ন করা হয়। এর কম হলে কয়েকজনের ট্যাব বন্ধ করাও বিভ্রাটের মতো দেখায়।';
 $string['settings:unanswered_min_answer_rate'] = 'ন্যূনতম উত্তর হার';
 $string['settings:unanswered_min_answer_rate_desc'] = 'উত্তর পাওয়া প্রশ্নের অনুপাত এর নিচে নামলে সতর্ক করুন। 0.5 আংশিক বিভ্রাটও ধরে। বন্ধ করতে 0 দিন।';
+
+$string['analytics:course_hidden_suffix'] = '(লুকানো)';

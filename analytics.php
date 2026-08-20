@@ -97,21 +97,54 @@ $PAGE->set_pagelayout('admin');
 $since = $range > 0 ? time() - ($range * 86400) : 0;
 
 // ── Visible courses for the per-course drill-down dropdown ──────────────────
-$all_courses = $DB->get_records_sql(
-    "SELECT c.id, c.fullname, c.shortname
+// v7.0.0: hidden courses are included. The filter used to be
+// `c.visible = 1`, which meant hiding a course silently removed its AI usage
+// and spend from this dashboard while the course carried on costing money —
+// a reporting gap for anyone who hides a course between terms, and the reason
+// the Testing Environment page could seed data that never appeared here (it
+// creates its course hidden on purpose). This page already requires
+// :viewanalytics, and an administrator sees hidden courses everywhere else in
+// Moodle, so there is nothing to protect by omitting them. The picker labels
+// them so nobody mistakes a hidden course for a live one.
+// A recordset, not get_records_sql: the directory review asked us not to load
+// every course into memory for the admin picker, and this page then iterates
+// the list four times. Stream it once, keep only the three small derived
+// arrays the page actually renders, and let the recordset close.
+$rs = $DB->get_recordset_sql(
+    "SELECT c.id, c.fullname, c.shortname, c.visible
        FROM {course} c
-      WHERE c.id > 1 AND c.visible = 1
+      WHERE c.id > 1
       ORDER BY c.fullname ASC"
 );
-
-// ── Header summary (small inline stat, not the old card grid) ───────────────
 $enabled_courses = 0;
-foreach ($all_courses as $c) {
+$total_courses = 0;
+$tabscourses = [];
+$experimentcourses = [];
+$expnamea = '';
+$expnameb = '';
+foreach ($rs as $c) {
+    $total_courses++;
     if (\local_ai_course_assistant\course_config_manager::is_enabled_for_course((int) $c->id)) {
         $enabled_courses++;
     }
+    // Hidden courses are listed but labelled, so a hidden course is never
+    // mistaken for a live one when reading its numbers.
+    $label = $c->shortname;
+    if (empty($c->visible)) {
+        $label .= ' ' . get_string('analytics:course_hidden_suffix', 'local_ai_course_assistant');
+    }
+    $tabscourses[] = ['id' => $c->id, 'shortname' => $label];
+    $experimentcourses[] = ['id' => (int) $c->id, 'shortname' => $c->shortname];
+    if ((int) $c->id === $expa) {
+        $expnamea = $c->shortname;
+    }
+    if ((int) $c->id === $expb) {
+        $expnameb = $c->shortname;
+    }
 }
-$total_courses = count($all_courses);
+$rs->close();
+
+// Header summary counts are built in the recordset pass above.
 
 // ── Per-course analytics (if a course is selected) ──────────────────────────
 $course_data = null;
@@ -694,20 +727,16 @@ $PAGE->requires->js_call_amd('local_ai_course_assistant/analytics_dashboard', 'i
     'strings' => $jsstrings,
 ]]);
 
-// Build course list for tabs filter dropdown.
-$tabscourses = [];
-foreach ($all_courses as $c) {
-    $tabscourses[] = ['id' => $c->id, 'shortname' => $c->shortname];
-}
+// $tabscourses is built in the recordset pass above.
 
 // ── A/B experiment comparison (server-rendered, GET-driven) ────────────────
 $templatedata['experiment_form_action'] = (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false);
 $templatedata['experiment_range'] = $range;
 $templatedata['experiment_courses_a'] = [];
 $templatedata['experiment_courses_b'] = [];
-foreach ($all_courses as $c) {
-    $templatedata['experiment_courses_a'][] = ['id' => $c->id, 'shortname' => $c->shortname, 'sel' => ((int) $c->id === $expa)];
-    $templatedata['experiment_courses_b'][] = ['id' => $c->id, 'shortname' => $c->shortname, 'sel' => ((int) $c->id === $expb)];
+foreach ($experimentcourses as $c) {
+    $templatedata['experiment_courses_a'][] = ['id' => $c['id'], 'shortname' => $c['shortname'], 'sel' => ($c['id'] === $expa)];
+    $templatedata['experiment_courses_b'][] = ['id' => $c['id'], 'shortname' => $c['shortname'], 'sel' => ($c['id'] === $expb)];
 }
 if ($expa > 0 && $expb > 0 && $expa !== $expb) {
     $ma = analytics::get_experiment_metrics($expa, $since);
@@ -735,16 +764,7 @@ if ($expa > 0 && $expb > 0 && $expa !== $expb) {
         }
         $exprows[] = ['label' => $label, 'a' => $a, 'b' => $b, 'delta' => $delta];
     }
-    $expnamea = '';
-    $expnameb = '';
-    foreach ($all_courses as $c) {
-        if ((int) $c->id === $expa) {
-            $expnamea = $c->shortname;
-        }
-        if ((int) $c->id === $expb) {
-            $expnameb = $c->shortname;
-        }
-    }
+    // $expnamea / $expnameb are resolved in the recordset pass above.
     $templatedata['experiment'] = [
         'course_a_name' => $expnamea,
         'course_b_name' => $expnameb,

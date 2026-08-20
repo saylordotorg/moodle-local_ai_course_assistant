@@ -1740,3 +1740,5 @@ $string['settings:unanswered_min_questions'] = 'Minimum antal spørgsmål før a
 $string['settings:unanswered_min_questions_desc'] = 'Et kursus vurderes først fra dette antal spørgsmål. Derunder ligner et par studerende der lukker fanen et nedbrud.';
 $string['settings:unanswered_min_answer_rate'] = 'Minimum svarprocent';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Advar når andelen af besvarede spørgsmål falder under dette. 0,5 fanger også et delvist nedbrud. 0 slår testen fra.';
+
+$string['analytics:course_hidden_suffix'] = '(skjult)';

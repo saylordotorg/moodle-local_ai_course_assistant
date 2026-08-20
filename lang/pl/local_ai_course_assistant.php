@@ -1739,3 +1739,5 @@ $string['settings:unanswered_min_questions'] = 'Minimalna liczba pytań przed al
 $string['settings:unanswered_min_questions_desc'] = 'Kurs jest oceniany dopiero po tylu pytaniach w oknie. Poniżej kilku uczących się zamykających kartę wygląda jak awaria.';
 $string['settings:unanswered_min_answer_rate'] = 'Minimalny wskaźnik odpowiedzi';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Ostrzegaj, gdy odsetek pytań z odpowiedzią spadnie poniżej tej wartości. 0,5 wykrywa też awarię częściową. Ustaw 0, aby wyłączyć ten test.';
+
+$string['analytics:course_hidden_suffix'] = '(ukryty)';

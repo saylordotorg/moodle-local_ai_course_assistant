@@ -1776,3 +1776,5 @@ $string['settings:unanswered_min_questions'] = 'Pinakamababang tanong bago magba
 $string['settings:unanswered_min_questions_desc'] = 'Sinusuri lang ang kurso mula sa bilang na ito ng tanong. Sa ibaba nito, ilang mag-aaral na nagsara ng tab ay mukhang pagkasira.';
 $string['settings:unanswered_min_answer_rate'] = 'Pinakamababang antas ng sagot';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Magbabala kapag bumaba rito ang bahagdan ng nasagot na tanong. Nahuhuli ng 0.5 ang bahagyang pagkasira. Itakda sa 0 upang huwag paganahin.';
+
+$string['analytics:course_hidden_suffix'] = '(nakatago)';

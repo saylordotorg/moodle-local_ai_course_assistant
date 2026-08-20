@@ -1933,3 +1933,5 @@ $string['settings:anomaly_digest_slack_webhook'] = 'URL входящего ве�
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Необязательный URL входящего веб-хука Slack. Сводка публикуется в виде блочного сообщения Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'URL входящего веб-хука Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Необязательный URL входящего веб-хука Teams. Сводка публикуется в виде карточки коннектора Office 365.';
+
+$string['analytics:course_hidden_suffix'] = '(скрыт)';

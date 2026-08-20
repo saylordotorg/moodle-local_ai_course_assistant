@@ -1775,3 +1775,5 @@ $string['settings:unanswered_min_questions'] = 'Số câu hỏi tối thiểu tr
 $string['settings:unanswered_min_questions_desc'] = 'Khóa học chỉ được đánh giá từ số câu hỏi này trở lên. Dưới mức đó, vài người học đóng tab trông giống sự cố.';
 $string['settings:unanswered_min_answer_rate'] = 'Tỉ lệ trả lời tối thiểu';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Cảnh báo khi tỉ lệ câu hỏi được trả lời xuống dưới mức này. 0,5 bắt được cả sự cố một phần. Đặt 0 để tắt.';
+
+$string['analytics:course_hidden_suffix'] = '(đã ẩn)';

@@ -1797,3 +1797,5 @@ $string['settings:unanswered_min_questions'] = 'Мінімум запитань 
 $string['settings:unanswered_min_questions_desc'] = 'Курс оцінюється лише від цієї кількості запитань у вікні. Нижче кілька учнів, що закрили вкладку, виглядають як збій.';
 $string['settings:unanswered_min_answer_rate'] = 'Мінімальна частка відповідей';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Попереджати, коли частка відповіданих запитань падає нижче цього значення. 0,5 ловить і частковий збій. Встановіть 0, щоб вимкнути перевірку.';
+
+$string['analytics:course_hidden_suffix'] = '(прихований)';

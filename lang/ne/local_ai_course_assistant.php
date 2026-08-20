@@ -1769,3 +1769,5 @@ $string['settings:unanswered_min_questions'] = 'चेतावनीअघि �
 $string['settings:unanswered_min_questions_desc'] = 'पाठ्यक्रम यति प्रश्न भएपछि मात्र मूल्याङ्कन हुन्छ। त्यसभन्दा कममा केही सिकारुले ट्याब बन्द गर्नु पनि विफलता जस्तै देखिन्छ।';
 $string['settings:unanswered_min_answer_rate'] = 'न्यूनतम जवाफ दर';
 $string['settings:unanswered_min_answer_rate_desc'] = 'जवाफ पाएका प्रश्नको अनुपात यसभन्दा तल झरे सचेत गराउनुहोस्। ०.५ ले आंशिक विफलता पनि समात्छ। बन्द गर्न ० राख्नुहोस्।';
+
+$string['analytics:course_hidden_suffix'] = '(लुकाइएको)';

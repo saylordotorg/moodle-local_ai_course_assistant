@@ -1739,3 +1739,5 @@ $string['settings:unanswered_min_questions'] = 'Număr minim de întrebări îna
 $string['settings:unanswered_min_questions_desc'] = 'Un curs este evaluat abia de la acest număr de întrebări. Sub el, câțiva cursanți care închid fila par o defecțiune.';
 $string['settings:unanswered_min_answer_rate'] = 'Rata minimă de răspuns';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Alertă când proporția întrebărilor cu răspuns scade sub această valoare. 0,5 prinde și o defecțiune parțială. 0 dezactivează testul.';
+
+$string['analytics:course_hidden_suffix'] = '(ascuns)';

@@ -1938,3 +1938,5 @@ $string['settings:anomaly_digest_slack_webhook'] = 'URL del webhook entrante de 
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'URL opcional de un webhook entrante de Slack. El resumen se publica como un mensaje de bloques de Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'URL del webhook entrante de Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'URL opcional de un webhook entrante de Teams. El resumen se publica como una tarjeta de conector de Office 365.';
+
+$string['analytics:course_hidden_suffix'] = '(oculto)';

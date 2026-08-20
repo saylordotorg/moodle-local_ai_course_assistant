@@ -1784,3 +1784,5 @@ $string['settings:unanswered_min_questions'] = 'Ελάχιστες ερωτήσ�
 $string['settings:unanswered_min_questions_desc'] = 'Ένα μάθημα αξιολογείται μόνο από τόσες ερωτήσεις. Κάτω από αυτό, λίγοι που κλείνουν την καρτέλα μοιάζουν με βλάβη.';
 $string['settings:unanswered_min_answer_rate'] = 'Ελάχιστο ποσοστό απαντήσεων';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Ειδοποίηση όταν το ποσοστό απαντημένων ερωτήσεων πέσει κάτω από αυτό. Το 0,5 πιάνει και μερική βλάβη. 0 απενεργοποιεί.';
+
+$string['analytics:course_hidden_suffix'] = '(κρυφό)';

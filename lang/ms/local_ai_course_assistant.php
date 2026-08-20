@@ -1769,3 +1769,5 @@ $string['settings:unanswered_min_questions'] = 'Minimum soalan sebelum amaran';
 $string['settings:unanswered_min_questions_desc'] = 'Kursus hanya dinilai bermula daripada bilangan soalan ini. Di bawahnya, beberapa pelajar menutup tab kelihatan seperti gangguan.';
 $string['settings:unanswered_min_answer_rate'] = 'Kadar jawapan minimum';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Beri amaran apabila kadar soalan berjawab jatuh di bawah nilai ini. 0.5 menangkap gangguan separa. Tetapkan 0 untuk melumpuhkan.';
+
+$string['analytics:course_hidden_suffix'] = '(tersembunyi)';

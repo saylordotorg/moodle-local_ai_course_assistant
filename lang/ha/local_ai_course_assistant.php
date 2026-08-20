@@ -1770,3 +1770,5 @@ $string['settings:unanswered_min_questions'] = 'Mafi ƙarancin tambayoyi kafin g
 $string['settings:unanswered_min_questions_desc'] = 'Ana kimanta kwas ne kawai daga wannan adadin tambayoyi. Ƙasa da haka, ɗalibai kaɗan da suka rufe shafi na kama da lalacewa.';
 $string['settings:unanswered_min_answer_rate'] = 'Mafi ƙarancin adadin amsa';
 $string['settings:unanswered_min_answer_rate_desc'] = 'Yi gargaɗi lokacin da yawan tambayoyin da aka amsa ya faɗi ƙasa da wannan. 0.5 yana kama lalacewa ta ɓangare kuma. Saita 0 don kashewa.';
+
+$string['analytics:course_hidden_suffix'] = '(ɓoye)';
