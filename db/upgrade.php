@@ -1443,5 +1443,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082000, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082001) {
+        // v7.0.0 re-tag: settings.php titles and descriptions moved from
+        // hardcoded English into lang strings. No schema or config change — the
+        // version bump exists so sites already running 2026082000 pick up the
+        // new language files, which Moodle only re-reads on upgrade.
+        upgrade_plugin_savepoint(true, 2026082001, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }
