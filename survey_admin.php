@@ -40,12 +40,12 @@ $coursename = '';
 if ($courseid > 0) {
     $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
     $coursename = $course->fullname;
-    $PAGE->set_title('Survey Editor: ' . $coursename);
-    $PAGE->set_heading('Survey Editor: ' . $coursename);
+    $pagetitle = get_string('survey_admin:title_course', 'local_ai_course_assistant', $coursename);
 } else {
-    $PAGE->set_title('Survey Editor: Global Default');
-    $PAGE->set_heading('Survey Editor: Global Default');
+    $pagetitle = get_string('survey_admin:title_global', 'local_ai_course_assistant');
 }
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($pagetitle);
 
 // Handle POST.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active = optional_param('survey_active', 0, PARAM_INT);
 
         if (!is_array($questions) || empty($questions)) {
-            \core\notification::error('Questions data is invalid or empty.');
+            \core\notification::error(get_string('survey_admin:err_invalid_questions', 'local_ai_course_assistant'));
             redirect($PAGE->url);
         }
 
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($clean)) {
-            \core\notification::error('No valid questions after cleaning.');
+            \core\notification::error(get_string('survey_admin:err_no_questions', 'local_ai_course_assistant'));
             redirect($PAGE->url);
         }
 
@@ -114,10 +114,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $existing = survey_manager::get_active_survey($courseid);
         if ($existing && (int) $existing->courseid === $courseid) {
             survey_manager::update_survey((int) $existing->id, $title, $clean, (bool) $active);
-            \core\notification::success('Survey updated.');
+            \core\notification::success(get_string('survey_admin:saved_updated', 'local_ai_course_assistant'));
         } else {
             survey_manager::create_survey($courseid, $title, $clean);
-            \core\notification::success('Survey created.');
+            \core\notification::success(get_string('survey_admin:saved_created', 'local_ai_course_assistant'));
         }
 
         redirect($PAGE->url);
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($existing as $s) {
                 $DB->delete_records('local_ai_course_assistant_surveys', ['id' => $s->id]);
             }
-            \core\notification::success('Course survey removed. The global default will be used.');
+            \core\notification::success(get_string('survey_admin:reset_course_done', 'local_ai_course_assistant'));
         } else {
             // Reset global to defaults.
             $existing = $DB->get_records('local_ai_course_assistant_surveys', ['courseid' => 0]);
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $DB->delete_records('local_ai_course_assistant_surveys', ['id' => $s->id]);
             }
             survey_manager::ensure_default_survey();
-            \core\notification::success('Global survey reset to defaults.');
+            \core\notification::success(get_string('survey_admin:reset_global_done', 'local_ai_course_assistant'));
         }
         redirect($PAGE->url);
     }
@@ -156,6 +156,41 @@ $courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname FROM {course} c WHERE c.id > 1 AND c.visible = 1 ORDER BY c.fullname ASC"
 );
 
+// Labels for the question-card editor the browser builds below. Same shape as
+// the rubric editor: one bundle handed to the inline script as JSON.
+$jsstrings = [
+    'typemultiplechoice' => get_string('survey_admin:type_multiple_choice', 'local_ai_course_assistant'),
+    'typerating'         => get_string('survey_admin:type_rating', 'local_ai_course_assistant'),
+    'typeopentext'       => get_string('survey_admin:type_open_text', 'local_ai_course_assistant'),
+    'moveup'             => get_string('rubric_admin:move_up', 'local_ai_course_assistant'),
+    'movedown'           => get_string('rubric_admin:move_down', 'local_ai_course_assistant'),
+    'deletequestion'     => get_string('survey_admin:delete_question', 'local_ai_course_assistant'),
+    'confirmdelete'      => get_string('survey_admin:confirm_delete_question', 'local_ai_course_assistant'),
+    'questiontype'       => get_string('survey_admin:question_type', 'local_ai_course_assistant'),
+    'questiontext'       => get_string('survey_admin:question_text', 'local_ai_course_assistant'),
+    'options'            => get_string('survey_admin:options', 'local_ai_course_assistant'),
+    'optionn'            => get_string('survey_admin:option_n', 'local_ai_course_assistant', '{n}'),
+    'removeoption'       => get_string('survey_admin:remove_option', 'local_ai_course_assistant'),
+    'addoption'          => get_string('survey_admin:add_option', 'local_ai_course_assistant'),
+    'minvalue'           => get_string('survey_admin:min_value', 'local_ai_course_assistant'),
+    'minvaluearia'       => get_string('survey_admin:min_value_aria', 'local_ai_course_assistant'),
+    'maxvalue'           => get_string('survey_admin:max_value', 'local_ai_course_assistant'),
+    'maxvaluearia'       => get_string('survey_admin:max_value_aria', 'local_ai_course_assistant'),
+    'minlabel'           => get_string('survey_admin:min_label', 'local_ai_course_assistant'),
+    'minlabelaria'       => get_string('survey_admin:min_label_aria', 'local_ai_course_assistant'),
+    'minlabelplaceholder' => get_string('survey_admin:min_label_placeholder', 'local_ai_course_assistant'),
+    'maxlabel'           => get_string('survey_admin:max_label', 'local_ai_course_assistant'),
+    'maxlabelaria'       => get_string('survey_admin:max_label_aria', 'local_ai_course_assistant'),
+    'maxlabelplaceholder' => get_string('survey_admin:max_label_placeholder', 'local_ai_course_assistant'),
+    'confirmreset'       => $courseid > 0
+        ? get_string('survey_admin:confirm_reset_course', 'local_ai_course_assistant')
+        : get_string('survey_admin:confirm_reset_global', 'local_ai_course_assistant'),
+    'previewtitle'       => get_string('survey_admin:preview_title', 'local_ai_course_assistant'),
+    'previewnotext'      => get_string('survey_admin:preview_no_text', 'local_ai_course_assistant'),
+    'previewanswerhint'  => get_string('survey_admin:preview_answer_hint', 'local_ai_course_assistant'),
+    'previewclose'       => get_string('rubric_admin:preview_close', 'local_ai_course_assistant'),
+];
+
 echo $OUTPUT->header();
 ?>
 
@@ -164,19 +199,19 @@ echo $OUTPUT->header();
 
     <div class="mb-3 d-flex flex-wrap" style="gap:8px">
         <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
+           class="btn btn-sm btn-outline-secondary">&larr; <?php echo get_string('courses_admin:plugin_settings', 'local_ai_course_assistant'); ?></a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">Analytics Dashboard</a>
+           class="btn btn-sm btn-outline-secondary"><?php echo get_string('rubric_admin:analytics_link', 'local_ai_course_assistant'); ?></a>
     </div>
 
     <!-- Scope selector -->
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" action="<?php echo $PAGE->url->out_omit_querystring(); ?>" class="form-inline" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <label for="aica-scope-select" style="font-weight:600;white-space:nowrap">Editing survey for:</label>
+                <label for="aica-scope-select" style="font-weight:600;white-space:nowrap"><?php echo get_string('survey_admin:scope_label', 'local_ai_course_assistant'); ?></label>
                 <select id="aica-scope-select" name="courseid" class="form-control form-control-sm" style="max-width:350px"
                         onchange="this.form.submit()">
-                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>>Global Default (all courses)</option>
+                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>><?php echo get_string('rubric_admin:scope_global', 'local_ai_course_assistant'); ?></option>
                     <?php foreach ($courses as $c) : ?>
                     <option value="<?php echo $c->id; ?>" <?php echo (int) $c->id === $courseid ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($c->fullname); ?> (<?php echo htmlspecialchars($c->shortname); ?>)
@@ -189,7 +224,7 @@ echo $OUTPUT->header();
 
     <?php if ($is_inherited) : ?>
     <div class="aica-sq-inherited-badge">
-        This course has no custom survey. Showing the global default. Edit below to create a course-specific override.
+        <?php echo get_string('survey_admin:inherited_notice', 'local_ai_course_assistant'); ?>
     </div>
     <?php endif; ?>
 
@@ -200,23 +235,25 @@ echo $OUTPUT->header();
         <input type="hidden" name="questions_json" id="aica-questions-json" value="">
 
         <div class="aica-sq-field mb-3">
-            <label for="aica-survey-title">Survey Title</label>
+            <label for="aica-survey-title"><?php echo get_string('survey_admin:survey_title', 'local_ai_course_assistant'); ?></label>
             <input type="text" id="aica-survey-title" name="survey_title"
                    value="<?php echo htmlspecialchars($title); ?>"
-                   placeholder="e.g. SOLA End-of-Course Survey">
+                   placeholder="<?php echo htmlspecialchars(
+                       \local_ai_course_assistant\branding::str('survey_admin:title_placeholder')
+                   ); ?>">
         </div>
 
         <div id="aica-questions-container"></div>
 
-        <div class="aica-sq-add-question" id="aica-add-question-btn">+ Add Question</div>
+        <div class="aica-sq-add-question" id="aica-add-question-btn"><?php echo get_string('survey_admin:add_question', 'local_ai_course_assistant'); ?></div>
 
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
-            <button type="submit" class="btn btn-primary">Save Survey</button>
-            <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">Preview</button>
+            <button type="submit" class="btn btn-primary"><?php echo get_string('survey_admin:save', 'local_ai_course_assistant'); ?></button>
+            <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn"><?php echo get_string('rubric_admin:preview', 'local_ai_course_assistant'); ?></button>
             <?php if ($courseid > 0 && !$is_inherited) : ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Remove Course Override</button>
+            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn"><?php echo get_string('rubric_admin:remove_override', 'local_ai_course_assistant'); ?></button>
             <?php elseif ($courseid === 0): ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Reset to Defaults</button>
+            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn"><?php echo get_string('rubric_admin:reset_defaults', 'local_ai_course_assistant'); ?></button>
             <?php endif; ?>
         </div>
     </form>
@@ -231,6 +268,7 @@ echo $OUTPUT->header();
 <script>
 (function() {
     var questions = <?php echo json_encode($questions); ?>;
+    var STR = <?php echo json_encode($jsstrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
     var container = document.getElementById('aica-questions-container');
     var addBtn = document.getElementById('aica-add-question-btn');
     var resetBtn = document.getElementById('aica-reset-btn');
@@ -286,22 +324,22 @@ echo $OUTPUT->header();
 
         var typeLabel = document.createElement('span');
         typeLabel.className = 'aica-sq-type';
-        typeLabel.textContent = q.type === 'multiple_choice' ? 'Multiple Choice'
-            : q.type === 'rating' ? 'Rating' : 'Open Text';
+        typeLabel.textContent = q.type === 'multiple_choice' ? STR.typemultiplechoice
+            : q.type === 'rating' ? STR.typerating : STR.typeopentext;
         header.appendChild(typeLabel);
 
         var actions = document.createElement('div');
         actions.className = 'aica-sq-actions';
 
         var upBtn = document.createElement('button');
-        upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = 'Move up';
+        upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = STR.moveup;
         upBtn.addEventListener('click', function() {
             if (idx > 0) { var tmp = questions[idx]; questions[idx] = questions[idx-1]; questions[idx-1] = tmp; renderAll(); }
         });
         actions.appendChild(upBtn);
 
         var downBtn = document.createElement('button');
-        downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = 'Move down';
+        downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = STR.movedown;
         downBtn.addEventListener('click', function() {
             if (idx < questions.length - 1) { var tmp = questions[idx]; questions[idx] = questions[idx+1]; questions[idx+1] = tmp; renderAll(); }
         });
@@ -309,9 +347,9 @@ echo $OUTPUT->header();
 
         var delBtn = document.createElement('button');
         delBtn.type = 'button'; delBtn.className = 'aica-sq-delete';
-        delBtn.innerHTML = '&#10005;'; delBtn.title = 'Delete question';
+        delBtn.innerHTML = '&#10005;'; delBtn.title = STR.deletequestion;
         delBtn.addEventListener('click', function() {
-            if (confirm('Delete this question?')) { questions.splice(idx, 1); renderAll(); }
+            if (confirm(STR.confirmdelete)) { questions.splice(idx, 1); renderAll(); }
         });
         actions.appendChild(delBtn);
 
@@ -322,10 +360,10 @@ echo $OUTPUT->header();
         var typeField = document.createElement('div');
         typeField.className = 'aica-sq-field';
         var typeLbl = document.createElement('label');
-        typeLbl.textContent = 'Question Type';
+        typeLbl.textContent = STR.questiontype;
         typeField.appendChild(typeLbl);
-        var typeSelect = document.createElement('select'); typeSelect.setAttribute('aria-label', 'Question type');
-        [['multiple_choice', 'Multiple Choice'], ['long_text', 'Open Text'], ['rating', 'Rating Scale']].forEach(function(opt) {
+        var typeSelect = document.createElement('select'); typeSelect.setAttribute('aria-label', STR.questiontype);
+        [['multiple_choice', STR.typemultiplechoice], ['long_text', STR.typeopentext], ['rating', STR.typerating]].forEach(function(opt) {
             var o = document.createElement('option');
             o.value = opt[0]; o.textContent = opt[1];
             if (q.type === opt[0]) o.selected = true;
@@ -344,10 +382,10 @@ echo $OUTPUT->header();
         var textField = document.createElement('div');
         textField.className = 'aica-sq-field';
         var textLbl = document.createElement('label');
-        textLbl.textContent = 'Question Text';
+        textLbl.textContent = STR.questiontext;
         textField.appendChild(textLbl);
         var textInput = document.createElement('textarea');
-        textInput.setAttribute('aria-label', 'Question text');
+        textInput.setAttribute('aria-label', STR.questiontext);
         textInput.value = q.text || '';
         textInput.rows = 2;
         textInput.addEventListener('input', function() { q.text = textInput.value; });
@@ -357,7 +395,7 @@ echo $OUTPUT->header();
         // Type-specific fields.
         if (q.type === 'multiple_choice') {
             var optLabel = document.createElement('label');
-            optLabel.textContent = 'Options';
+            optLabel.textContent = STR.options;
             optLabel.style.cssText = 'font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;display:block';
             card.appendChild(optLabel);
 
@@ -367,11 +405,11 @@ echo $OUTPUT->header();
                 var row = document.createElement('div');
                 row.className = 'aica-sq-opt-row';
                 var inp = document.createElement('input');
-                inp.type = 'text'; inp.setAttribute('aria-label', 'Option ' + (oi + 1)); inp.value = opt;
+                inp.type = 'text'; inp.setAttribute('aria-label', STR.optionn.replace('{n}', oi + 1)); inp.value = opt;
                 inp.addEventListener('input', function() { q.options[oi] = inp.value; });
                 row.appendChild(inp);
                 var rmBtn = document.createElement('button');
-                rmBtn.type = 'button'; rmBtn.innerHTML = '&times;'; rmBtn.title = 'Remove option';
+                rmBtn.type = 'button'; rmBtn.innerHTML = '&times;'; rmBtn.title = STR.removeoption;
                 rmBtn.addEventListener('click', function() { q.options.splice(oi, 1); renderAll(); });
                 row.appendChild(rmBtn);
                 optList.appendChild(row);
@@ -380,7 +418,7 @@ echo $OUTPUT->header();
 
             var addOpt = document.createElement('div');
             addOpt.className = 'aica-sq-add-opt';
-            addOpt.textContent = '+ Add Option';
+            addOpt.textContent = STR.addoption;
             addOpt.addEventListener('click', function() {
                 if (!q.options) q.options = [];
                 q.options.push('New option');
@@ -396,10 +434,10 @@ echo $OUTPUT->header();
             // Min.
             var minField = document.createElement('div');
             minField.className = 'aica-sq-field';
-            var minLbl = document.createElement('label'); minLbl.textContent = 'Min Value';
+            var minLbl = document.createElement('label'); minLbl.textContent = STR.minvalue;
             minField.appendChild(minLbl);
             var minInp = document.createElement('input');
-            minInp.type = 'number'; minInp.setAttribute('aria-label', 'Minimum rating value'); minInp.value = q.min || 1; minInp.min = 0; minInp.max = 10;
+            minInp.type = 'number'; minInp.setAttribute('aria-label', STR.minvaluearia); minInp.value = q.min || 1; minInp.min = 0; minInp.max = 10;
             minInp.addEventListener('input', function() { q.min = parseInt(minInp.value, 10) || 1; });
             minField.appendChild(minInp);
             ratingFields.appendChild(minField);
@@ -407,10 +445,10 @@ echo $OUTPUT->header();
             // Max.
             var maxField = document.createElement('div');
             maxField.className = 'aica-sq-field';
-            var maxLbl = document.createElement('label'); maxLbl.textContent = 'Max Value';
+            var maxLbl = document.createElement('label'); maxLbl.textContent = STR.maxvalue;
             maxField.appendChild(maxLbl);
             var maxInp = document.createElement('input');
-            maxInp.type = 'number'; maxInp.setAttribute('aria-label', 'Maximum rating value'); maxInp.value = q.max || 5; maxInp.min = 1; maxInp.max = 10;
+            maxInp.type = 'number'; maxInp.setAttribute('aria-label', STR.maxvaluearia); maxInp.value = q.max || 5; maxInp.min = 1; maxInp.max = 10;
             maxInp.addEventListener('input', function() { q.max = parseInt(maxInp.value, 10) || 5; });
             maxField.appendChild(maxInp);
             ratingFields.appendChild(maxField);
@@ -418,11 +456,11 @@ echo $OUTPUT->header();
             // Min label.
             var minLblField = document.createElement('div');
             minLblField.className = 'aica-sq-field';
-            var minLblLbl = document.createElement('label'); minLblLbl.textContent = 'Min Label (e.g. "Not at all")';
+            var minLblLbl = document.createElement('label'); minLblLbl.textContent = STR.minlabel;
             minLblField.appendChild(minLblLbl);
             var minLblInp = document.createElement('input');
-            minLblInp.type = 'text'; minLblInp.setAttribute('aria-label', 'Minimum rating label'); minLblInp.value = q.min_label || '';
-            minLblInp.placeholder = 'e.g. Not at all';
+            minLblInp.type = 'text'; minLblInp.setAttribute('aria-label', STR.minlabelaria); minLblInp.value = q.min_label || '';
+            minLblInp.placeholder = STR.minlabelplaceholder;
             minLblInp.addEventListener('input', function() { q.min_label = minLblInp.value; });
             minLblField.appendChild(minLblInp);
             ratingFields.appendChild(minLblField);
@@ -430,11 +468,11 @@ echo $OUTPUT->header();
             // Max label.
             var maxLblField = document.createElement('div');
             maxLblField.className = 'aica-sq-field';
-            var maxLblLbl = document.createElement('label'); maxLblLbl.textContent = 'Max Label (e.g. "Very happy")';
+            var maxLblLbl = document.createElement('label'); maxLblLbl.textContent = STR.maxlabel;
             maxLblField.appendChild(maxLblLbl);
             var maxLblInp = document.createElement('input');
-            maxLblInp.type = 'text'; maxLblInp.setAttribute('aria-label', 'Maximum rating label'); maxLblInp.value = q.max_label || '';
-            maxLblInp.placeholder = 'e.g. Very happy';
+            maxLblInp.type = 'text'; maxLblInp.setAttribute('aria-label', STR.maxlabelaria); maxLblInp.value = q.max_label || '';
+            maxLblInp.placeholder = STR.maxlabelplaceholder;
             maxLblInp.addEventListener('input', function() { q.max_label = maxLblInp.value; });
             maxLblField.appendChild(maxLblInp);
             ratingFields.appendChild(maxLblField);
@@ -462,10 +500,7 @@ echo $OUTPUT->header();
     // Reset button.
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            var msg = <?php echo $courseid > 0
-                ? "'Remove the custom survey for this course? Students will see the global default instead.'"
-                : "'Reset the global survey to the built-in default questions?'"; ?>;
-            if (confirm(msg)) {
+            if (confirm(STR.confirmreset)) {
                 document.getElementById('aica-reset-form').submit();
             }
         });
@@ -483,7 +518,7 @@ echo $OUTPUT->header();
             panel.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)';
 
             var h = document.createElement('h4');
-            h.textContent = document.getElementById('aica-survey-title').value || 'Survey Preview';
+            h.textContent = document.getElementById('aica-survey-title').value || STR.previewtitle;
             h.style.marginBottom = '16px';
             panel.appendChild(h);
 
@@ -493,7 +528,7 @@ echo $OUTPUT->header();
 
                 var qText = document.createElement('p');
                 qText.style.cssText = 'font-weight:600;font-size:14px;margin-bottom:8px';
-                qText.textContent = (idx + 1) + '. ' + (q.text || '(no text)');
+                qText.textContent = (idx + 1) + '. ' + (q.text || STR.previewnotext);
                 qDiv.appendChild(qText);
 
                 if (q.type === 'multiple_choice') {
@@ -528,7 +563,10 @@ echo $OUTPUT->header();
                 } else {
                     var ta = document.createElement('div');
                     ta.style.cssText = 'width:100%;min-height:60px;border:1px solid #d1d5db;border-radius:6px;background:#f8fafc;padding:8px';
-                    ta.innerHTML = '<span style="color:#94a3b8;font-size:13px">Type your answer here...</span>';
+                    var taHint = document.createElement('span');
+                    taHint.style.cssText = 'color:#94a3b8;font-size:13px';
+                    taHint.textContent = STR.previewanswerhint;
+                    ta.appendChild(taHint);
                     qDiv.appendChild(ta);
                 }
 
@@ -536,7 +574,7 @@ echo $OUTPUT->header();
             });
 
             var closeBtn = document.createElement('button');
-            closeBtn.textContent = 'Close Preview';
+            closeBtn.textContent = STR.previewclose;
             closeBtn.className = 'btn btn-sm btn-outline-secondary';
             closeBtn.addEventListener('click', function() { document.body.removeChild(overlay); });
             panel.appendChild(closeBtn);
