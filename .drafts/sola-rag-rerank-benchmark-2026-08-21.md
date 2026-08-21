@@ -320,7 +320,11 @@ Sequence: reindex one course to `voyage-3.5-lite` @1024 on dev, confirm live ret
 
 **(b) `rerank_candidates`: leave it at 20.**
 
-Pool 20 is the shipped default and dev's setting. This run reproduces the published pool-20 figures to 0.2 pp, and the 2026-08-01 sweep already settled 20-vs-30 (0.3 pp for 33% more cost). I did not re-run the pool sweep, per instruction, and nothing here disturbs that conclusion. **Prod is still configured at 50, which costs 2.5x pool 20 for no measurable gain — worth fixing regardless of the embedding decision.**
+Pool 20 is the shipped default and dev's setting. This run reproduces the published pool-20 figures to 0.2 pp, and the 2026-08-01 sweep already settled 20-vs-30 (0.3 pp for 33% more cost). I did not re-run the pool sweep, per instruction, and nothing here disturbs that conclusion.
+
+**Correction to an earlier version of this report:** it stated that production was configured at pool 50. It is not — both production sites read `rerank_candidates=20`, verified directly against the databases on 2026-08-21. There is nothing to fix there.
+
+**But the token count per rerank was too low.** Production reranking ran from 23 June to 4 August 2026 and left 1,359 real calls averaging **21,124 tokens** per rerank at pool 20 — **41% above the 15,018 measured here** — because production chunks average 3,917 characters against this corpus's 2,808. Every rerank cost figure in §4 and §6 is therefore understated by 41% relative to production: **$1.06 per 1,000 queries rather than $0.75**, and always-on rerank is about **57% of chat spend rather than 40.6%**. See `.drafts/sola-volumes-and-language-mix-2026-08-21.md`.
 
 **(c) Reranking: keep it off for now, and re-decide after the embedding switch.**
 

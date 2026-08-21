@@ -33,6 +33,35 @@ effect is 50x the measured run-to-run noise.
 case does not require paying their $0.06 tier at all. The $0.06 tier has to earn
 its 3x premium on the incremental **+1.9 pp**.
 
+### Volumes they will ask for
+
+Measured from both production databases today, aggregate SQL only:
+
+| | Today (Aug 2026) | All 266 indexed courses active |
+|---|---|---|
+| Learner turns | 7,608 / mo | 58,839 / mo |
+| **Query embeddings (billable)** | **17,228 / mo** (574/day) | **133,238 / mo** (4,441/day) |
+| Document embeddings, ongoing | 5,135 / mo | ~40,000 / mo |
+| Documents compared (local, **not** billable) | 1,710,194 / mo (~57,000/day) | 16.5M / mo (~550,000/day) |
+| **Rerank queries** | 17,228 / mo if enabled | 133,238 / mo |
+| **Tokens per rerank (measured in prod)** | **21,124** | 21,124 |
+
+Corpus: **86,206 chunks across 266 courses, ~75M tokens.** Only **36 of 266**
+indexed courses currently see traffic, so the capacity column is a 7.7x headroom
+figure, not a forecast of next month.
+
+**Language: 91–97% English.** Only 2.77% of messages contain a non-Latin script
+and Arabic is 95% of that; 9 of 3,391 learners have set a non-English interface
+language. The 46-language support is real but not currently exercised — do not let
+them price multilingual capability as though it were load-bearing for us today.
+
+**Careful with one of these numbers.** "57,000 documents searched per day" is
+local cosine work against our own stored index — Voyage never sees it. If we quote
+it as volume they will reasonably price against it. The billable figure is the
+17,228 query embeddings, about 331K tokens a month.
+
+Full detail: `.drafts/sola-volumes-and-language-mix-2026-08-21.md`.
+
 ---
 
 ## 1. Where we actually stand with Voyage today
@@ -65,10 +94,14 @@ Verified on the dev fleet today:
 > blocker. **So do not tell them we are waiting on a key — we have already run
 > the measurement, on their infrastructure, and the numbers are in Section 0.**
 
-Also worth having straight: **production is not running reranking at all,** and
-prod's `rerank_candidates` is still **50**, which costs 2.5x pool 20 for no
-measurable gain. Any volume commitment we make on reranking is a forecast, not
-an extrapolation of a current bill.
+Also worth having straight: **production is not running reranking at all**
+(`rerank_enabled=0` on both sites). Any volume commitment we make on reranking is
+a forecast, not an extrapolation of a current bill.
+
+> **Correction.** An earlier version of this brief said prod's
+> `rerank_candidates` was 50 and listed fixing it as an open item. **It is 20 on
+> both production sites** — verified directly — so there is nothing to fix. The 50
+> came from an older document that I repeated without checking.
 
 ## 2. What we measured, and why it is defensible
 
@@ -226,8 +259,14 @@ Do not raise these as vendor questions; they are ours to fix.
   +8.7 pp for the embedding switch and +10.8 pp for reranking. The floor is not
   what loses these queries — the embedding is. **Do not raise this in the meeting
   as a major finding.**
-- **Prod `rerank_candidates` = 50** — 2.5x the cost of pool 20 for no measurable
-  gain. Fix regardless of any vendor decision.
+- ~~*Prod `rerank_candidates` = 50*~~ — **not true; it is 20.** Verified on both
+  production sites. Nothing to fix.
+- **Rerank costs 41% more than our benchmark said.** Production reranks average
+  **21,124 tokens** (1,359 real calls, 23 June – 4 August), against the 15,018 the
+  fixtures measure, because prod chunks average 3,917 characters versus the
+  2,808-character dev corpus. So **$1.06 per 1,000 queries, not $0.75**, and
+  always-on rerank is roughly **57% of chat spend, not 40.6%**. This strengthens
+  the embeddings-first case rather than weakening it.
 - **The confidence gate is still not built.** Now modeled: at margin < 0.086 it
   covers 70% of queries for +9.6 pp at ~$0.52/1k. Build it for cost and for the
   18 avoided top-1 breakages — **not for latency.** Newly measured: gating saves
