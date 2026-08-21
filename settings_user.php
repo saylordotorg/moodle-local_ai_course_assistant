@@ -26,6 +26,16 @@ require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
+// AUTH002 (v7.0.1): reject the guest account. require_login() lets it through,
+// but every anonymous visitor on a guest-access site shares the single guest
+// user record — so "download my data" would hand one visitor another
+// visitor's rows, and "delete everything" would erase them. A page whose whole
+// purpose is per-user data has no meaning for a shared identity. Real learners
+// are unaffected: the drawer only links here for authenticated users.
+if (isguestuser()) {
+    throw new \moodle_exception('noguest');
+}
+
 // v5.3.7: optional_param handles both GET and POST sources, so the action
 // handlers below run identically for the new POST forms and any older link
 // pointing at the legacy GET URL. PARAM_ALPHANUMEXT covers 'delete_course',
@@ -92,6 +102,17 @@ if ($action === 'download' && confirm_sesskey()) {
 
 // Handle delete actions.
 if ($action === 'delete_course' && $courseid && confirm_sesskey()) {
+    // AUTH002 (v7.0.1): courseid arrives from the request, so scope it to a
+    // course this user actually holds assistant data in — exactly the set the
+    // page renders below. The deletion itself was always $USER-scoped, but the
+    // unvalidated id still reached get_course(), which ignores visibility, so
+    // any logged-in learner could read an arbitrary course's fullname (hidden
+    // courses included) back out of the confirmation prompt, and a nonexistent
+    // id raised an uncaught dml_missing_record_exception.
+    $owncourses = \local_ai_course_assistant\conversation_manager::get_user_stats((int) $USER->id)['courses'];
+    if (!isset($owncourses[$courseid])) {
+        throw new \moodle_exception('invalidcourseid', 'error');
+    }
     if ($confirm) {
         $manager = new \local_ai_course_assistant\conversation_manager();
         $manager->delete_course_data($courseid, $USER->id);

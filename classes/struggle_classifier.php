@@ -175,6 +175,9 @@ class struggle_classifier {
                 HAVING COUNT(*) >= ?";
         $sessions = $DB->get_records_sql($sql, [self::STAGE2_TRIGGER_THRESHOLD]);
 
+        // The grouped query above already collapsed the signal rows into one
+        // row per (user, course, session); each iteration is a single UPDATE of
+        // that session's rows, so this is a write per group, not an N+1 read.
         $notesrecorded = 0;
         foreach ($sessions as $sess) {
             $label = self::stage2_label((int)$sess->hits, (int)$sess->maxscore, (string)$sess->topic_hint);

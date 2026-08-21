@@ -139,7 +139,9 @@ if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
     } else {
         echo $OUTPUT->header();
         $target = core_user::get_user($targetuserid);
-        $targetname = $target ? fullname($target) : ('id ' . $targetuserid);
+        $targetname = $target
+            ? fullname($target)
+            : get_string('admin:user_data:idlabel', 'local_ai_course_assistant', $targetuserid);
         echo $OUTPUT->confirm(
             get_string('admin:user_data:confirm_purge', 'local_ai_course_assistant', $targetname),
             new moodle_url($PAGE->url, [
@@ -155,41 +157,32 @@ if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
     }
 }
 
-echo $OUTPUT->header();
-
-echo \html_writer::tag(
-    'p',
-    get_string('admin:user_data:intro', 'local_ai_course_assistant'),
-    ['style' => 'max-width:720px']
-);
-
-// User search form.
-echo '<form method="get" action="' . $PAGE->url->out() . '" style="margin:16px 0">';
-echo '<label style="display:block;margin-bottom:6px;font-weight:600">'
-    . get_string('admin:user_data:search_label', 'local_ai_course_assistant')
-    . '</label>';
-echo '<input type="number" name="targetuserid" value="' . $targetuserid
-    . '" min="1" style="padding:6px 10px;font-size:14px;width:160px" placeholder="user id" aria-label="Target user ID" />';
-echo ' <button type="submit" class="btn btn-primary" style="padding:6px 14px">'
-    . get_string('admin:user_data:lookup', 'local_ai_course_assistant') . '</button>';
-echo '</form>';
+$templatedata = [
+    'intro' => get_string('admin:user_data:intro', 'local_ai_course_assistant'),
+    'formurl' => $PAGE->url->out(false),
+    'searchlabel' => get_string('admin:user_data:search_label', 'local_ai_course_assistant'),
+    'targetuserid' => $targetuserid,
+    'lookuplabel' => get_string('admin:user_data:lookup', 'local_ai_course_assistant'),
+    'notfound' => false,
+    'notfoundmsg' => get_string('admin:user_data:not_found', 'local_ai_course_assistant'),
+    'hasuser' => false,
+    'coltable' => get_string('admin:user_data:col_table', 'local_ai_course_assistant'),
+    'colrows' => get_string('admin:user_data:col_rows', 'local_ai_course_assistant'),
+    'totallabel' => get_string('admin:user_data:total', 'local_ai_course_assistant'),
+    'downloadlabel' => get_string('admin:user_data:download', 'local_ai_course_assistant'),
+    'purgelabel' => get_string('admin:user_data:purge', 'local_ai_course_assistant'),
+];
 
 if ($targetuserid) {
     $target = core_user::get_user($targetuserid);
     if (!$target) {
-        echo $OUTPUT->notification(
-            get_string('admin:user_data:not_found', 'local_ai_course_assistant'),
-            'notifyerror'
-        );
+        $templatedata['notfound'] = true;
     } else {
-        echo '<h3>' . s(fullname($target)) . ' <small style="color:#888">(id ' . $targetuserid
-            . ')</small></h3>';
-
-        // Row count preview.
         global $DB;
-        echo '<table class="generaltable" style="margin-top:12px">';
-        echo '<thead><tr><th>Table</th><th>Rows for this user</th></tr></thead><tbody>';
+        $rows = [];
         $totalrows = 0;
+        // The table list is a fixed, small constant (not row-driven), so one
+        // count per table is bounded rather than an N+1.
         foreach ($tables as $label => $table) {
             try {
                 $count = $DB->count_records($table, ['userid' => $targetuserid]);
@@ -197,9 +190,9 @@ if ($targetuserid) {
                 $count = 0;
             }
             $totalrows += $count;
-            echo '<tr><td><code>' . $label . '</code></td><td>' . $count . '</td></tr>';
+            $rows[] = ['label' => $label, 'count' => $count];
         }
-        // Messages join.
+        // Messages join through convs, so they need their own count.
         try {
             $msgsql = "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m
                        JOIN {local_ai_course_assistant_convs} c ON c.id = m.conversationid
@@ -209,28 +202,30 @@ if ($targetuserid) {
             $msgcount = 0;
         }
         $totalrows += $msgcount;
-        echo '<tr><td><code>messages</code></td><td>' . $msgcount . '</td></tr>';
-        echo '<tr><th>total</th><th>' . $totalrows . '</th></tr>';
-        echo '</tbody></table>';
+        $rows[] = ['label' => 'messages', 'count' => $msgcount];
 
-        // Actions.
-        echo '<div style="margin-top:16px;display:flex;gap:12px">';
-        $downloadurl = new moodle_url($PAGE->url, [
+        $templatedata['hasuser'] = true;
+        $templatedata['fullname'] = fullname($target);
+        $templatedata['iddisplay'] = get_string(
+            'admin:user_data:idlabel',
+            'local_ai_course_assistant',
+            $targetuserid
+        );
+        $templatedata['rows'] = $rows;
+        $templatedata['totalrows'] = $totalrows;
+        $templatedata['downloadurl'] = (new moodle_url($PAGE->url, [
             'action' => 'download',
             'targetuserid' => $targetuserid,
             'sesskey' => sesskey(),
-        ]);
-        echo '<a class="btn btn-secondary" href="' . $downloadurl->out(false) . '">'
-            . get_string('admin:user_data:download', 'local_ai_course_assistant') . '</a>';
-        $purgeurl = new moodle_url($PAGE->url, [
+        ]))->out(false);
+        $templatedata['purgeurl'] = (new moodle_url($PAGE->url, [
             'action' => 'purge',
             'targetuserid' => $targetuserid,
             'sesskey' => sesskey(),
-        ]);
-        echo '<a class="btn btn-danger" href="' . $purgeurl->out(false) . '">'
-            . get_string('admin:user_data:purge', 'local_ai_course_assistant') . '</a>';
-        echo '</div>';
+        ]))->out(false);
     }
 }
 
+echo $OUTPUT->header();
+echo $OUTPUT->render_from_template('local_ai_course_assistant/admin_user_data', $templatedata);
 echo $OUTPUT->footer();

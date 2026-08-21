@@ -1,0 +1,195 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/rag_admin
+
+    RAG index admin page: which content extractors are ready, site-wide index
+    totals, and a per-course reindex / clear table. All styling lives in the
+    plugin's styles.css under the .sola-ragadmin namespace.
+
+    Context variables required for this template:
+    * backurl - Link back to the plugin settings category.
+    * backlabel - Label for that link.
+    * sourcestitle - Heading of the content-source card.
+    * sourcesdesc - Trusted HTML blurb under that heading (carries a settings link).
+    * statusrows - List of {label, ok, statelabel, detail} extractor rows; detail
+      is trusted HTML built from lang strings.
+    * statcards - List of {value, label} summary cards.
+    * posturl - Action URL for every POST form on the page.
+    * sesskey - Session key for those forms.
+    * reindexall - Label for the reindex-all button.
+    * reindexallconfirm - Confirm prompt for the reindex-all button.
+    * reindexalldesc - Explanation next to the reindex-all button.
+    * indexstatus - Heading above the per-course table.
+    * nocourses - Message shown when there is nothing to list.
+    * hascourses - Whether any course rows are present.
+    * colcourse, colchunks, colembedded, collastindexed, colactions - Table headers.
+    * never - Label used when a course has never been indexed.
+    * reindex - Label for the per-course reindex button.
+    * clearindex - Label for the per-course clear button.
+    * clearconfirm - Confirm prompt for the clear button.
+    * courses - List of {id, fullname, courseurl, chunks, haschunks, embedded,
+      hasembedded, lastindexed, hasindexed} rows.
+
+    Example context (json):
+    {
+        "backurl": "https://example.org/admin/category.php?category=local_ai_course_assistant",
+        "backlabel": "Back to plugin settings",
+        "sourcestitle": "Content sources",
+        "sourcesdesc": "Each row shows a content type the indexer can extract.",
+        "statusrows": [{"label": "PDF (mod_resource)", "ok": true, "statelabel": "Ready", "detail": "On. pdftotext binary found."}],
+        "statcards": [{"value": "3", "label": "Courses indexed"}],
+        "posturl": "https://example.org/local/ai_course_assistant/rag_admin.php",
+        "sesskey": "abc123",
+        "reindexall": "Reindex all active courses",
+        "reindexallconfirm": "This will call the embedding API. Continue?",
+        "reindexalldesc": "Only new or changed content is re-embedded.",
+        "indexstatus": "Per-course index status",
+        "nocourses": "No indexed courses and no active courses found.",
+        "hascourses": true,
+        "colcourse": "Course",
+        "colchunks": "Chunks",
+        "colembedded": "Embedded",
+        "collastindexed": "Last indexed",
+        "colactions": "Actions",
+        "never": "Never",
+        "reindex": "Reindex",
+        "clearindex": "Clear index",
+        "clearconfirm": "Delete all indexed chunks for this course?",
+        "courses": [{
+            "id": 2, "fullname": "Test Course 101",
+            "courseurl": "https://example.org/course/view.php?id=2",
+            "chunks": "12", "haschunks": true,
+            "embedded": "12", "hasembedded": true,
+            "lastindexed": "20/08/26, 14:03", "hasindexed": true
+        }]
+    }
+}}
+<div class="sola-ragadmin">
+    <div class="mb-2">
+        <a href="{{backurl}}" class="btn btn-sm btn-outline-secondary mb-3">&larr; {{backlabel}}</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="mb-2">{{sourcestitle}}</h4>
+            <p class="text-muted sola-ragadmin__hint">{{{sourcesdesc}}}</p>
+            <table class="table table-sm mb-0">
+                <tbody>
+                    {{#statusrows}}
+                        <tr>
+                            <td class="sola-ragadmin__srclabel">{{label}}</td>
+                            <td class="sola-ragadmin__srcstate">
+                                {{#ok}}<span class="badge sola-ragadmin__badge sola-ragadmin__badge--ready">{{statelabel}}</span>{{/ok}}
+                                {{^ok}}<span class="badge sola-ragadmin__badge sola-ragadmin__badge--off">{{statelabel}}</span>{{/ok}}
+                            </td>
+                            <td class="sola-ragadmin__srcdetail">{{{detail}}}</td>
+                        </tr>
+                    {{/statusrows}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        {{#statcards}}
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title">{{value}}</h3>
+                        <p class="card-text text-muted">{{label}}</p>
+                    </div>
+                </div>
+            </div>
+        {{/statcards}}
+    </div>
+
+    <form method="post" action="{{posturl}}" class="mb-4" data-confirm="{{reindexallconfirm}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="reindexall">
+        <button type="submit" class="btn btn-primary">{{reindexall}}</button>
+        <small class="text-muted ml-2">{{reindexalldesc}}</small>
+    </form>
+
+    <h4>{{indexstatus}}</h4>
+
+    {{^hascourses}}
+        <p class="text-muted">{{nocourses}}</p>
+    {{/hascourses}}
+    {{#hascourses}}
+        <table class="table table-sm generaltable">
+            <thead>
+                <tr>
+                    <th>{{colcourse}}</th>
+                    <th class="text-right">{{colchunks}}</th>
+                    <th class="text-right">{{colembedded}}</th>
+                    <th>{{collastindexed}}</th>
+                    <th>{{colactions}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#courses}}
+                    <tr>
+                        <td><a href="{{courseurl}}" target="_blank">{{fullname}}</a></td>
+                        <td class="text-right">
+                            {{#haschunks}}<span class="badge badge-info">{{chunks}}</span>{{/haschunks}}
+                            {{^haschunks}}<span class="badge badge-secondary">{{chunks}}</span>{{/haschunks}}
+                        </td>
+                        <td class="text-right">
+                            {{#hasembedded}}<span class="badge badge-success">{{embedded}}</span>{{/hasembedded}}
+                            {{^hasembedded}}<span class="badge badge-secondary">{{embedded}}</span>{{/hasembedded}}
+                        </td>
+                        <td>
+                            {{#hasindexed}}{{lastindexed}}{{/hasindexed}}
+                            {{^hasindexed}}<span class="text-muted">{{never}}</span>{{/hasindexed}}
+                        </td>
+                        <td>
+                            <form method="post" action="{{posturl}}" class="d-inline">
+                                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                <input type="hidden" name="action" value="reindexcourse">
+                                <input type="hidden" name="courseid" value="{{id}}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">{{reindex}}</button>
+                            </form>
+                            {{#haschunks}}
+                                <form method="post" action="{{posturl}}" class="d-inline ml-1" data-confirm="{{clearconfirm}}">
+                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                    <input type="hidden" name="action" value="deleteindex">
+                                    <input type="hidden" name="courseid" value="{{id}}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">{{clearindex}}</button>
+                                </form>
+                            {{/haschunks}}
+                        </td>
+                    </tr>
+                {{/courses}}
+            </tbody>
+        </table>
+    {{/hascourses}}
+</div>
+{{#js}}
+(function() {
+    // Every destructive form carries its prompt in data-confirm, which keeps the
+    // handler out of an inline onclick attribute.
+    var forms = document.querySelectorAll('.sola-ragadmin form[data-confirm]');
+    Array.prototype.forEach.call(forms, function(form) {
+        form.addEventListener('submit', function(e) {
+            if (!window.confirm(form.dataset.confirm)) {
+                e.preventDefault();
+            }
+        });
+    });
+})();
+{{/js}}

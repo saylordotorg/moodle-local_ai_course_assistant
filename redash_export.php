@@ -75,7 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Only accept GET requests.
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    echo json_encode([
+        'error' => get_string('redash:err_method_not_allowed', 'local_ai_course_assistant'),
+    ]);
     exit;
 }
 
@@ -96,13 +98,17 @@ $configuredkey = get_config('local_ai_course_assistant', 'redash_api_key');
 
 if (empty($configuredkey)) {
     http_response_code(403);
-    echo json_encode(['error' => 'Redash export is not configured. Set an API key in plugin settings.']);
+    echo json_encode([
+        'error' => get_string('redash:err_not_configured', 'local_ai_course_assistant'),
+    ]);
     exit;
 }
 
 if (empty($apikey) || !hash_equals($configuredkey, $apikey)) {
     http_response_code(401);
-    echo json_encode(['error' => 'Invalid API key']);
+    echo json_encode([
+        'error' => get_string('redash:err_invalid_key', 'local_ai_course_assistant'),
+    ]);
     exit;
 }
 
@@ -130,7 +136,7 @@ if (empty($sections)) {
     // back to the full export, so a typo cannot quietly widen the payload.
     http_response_code(400);
     echo json_encode([
-        'error' => 'No valid sections requested',
+        'error' => get_string('redash:err_no_sections', 'local_ai_course_assistant'),
         'unknown_sections' => redash_export_request::unknown_sections($rawsections),
         'valid_sections' => redash_export_request::SECTIONS,
     ]);
@@ -145,13 +151,16 @@ $missingparents = redash_export_request::missing_parents($sections);
 if (!empty($missingparents)) {
     http_response_code(400);
     echo json_encode([
-        'error' => 'Nested sections require their parent section',
+        'error' => get_string('redash:err_nested_sections', 'local_ai_course_assistant'),
         'requires' => $missingparents,
-        'hint' => 'Add the parent, for example sections='
-            . implode(',', array_unique(array_merge(
+        'hint' => get_string(
+            'redash:hint_add_parent',
+            'local_ai_course_assistant',
+            implode(',', array_unique(array_merge(
                 array_values($missingparents),
                 array_keys($missingparents)
-            ))),
+            )))
+        ),
     ]);
     exit;
 }
@@ -169,8 +178,7 @@ if (!$anonymize) {
     if (!redash_export_request::deanonymize_allowed()) {
         http_response_code(403);
         echo json_encode([
-            'error' => 'De-anonymized export is disabled. Enable the '
-                . '"Allow de-anonymized export" plugin setting to permit anonymize=0.',
+            'error' => get_string('redash:err_deanonymized_disabled', 'local_ai_course_assistant'),
         ]);
         exit;
     }
@@ -237,7 +245,7 @@ foreach ($courseids as $cid) {
     // Get course name.
     $coursename = $DB->get_field('course', 'fullname', ['id' => $cid]);
     if ($coursename === false) {
-        $coursename = 'Unknown (id=' . $cid . ')';
+        $coursename = get_string('redash:unknown_course', 'local_ai_course_assistant', $cid);
     }
 
     $coursedata = [

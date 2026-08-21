@@ -1,0 +1,146 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/flashcards
+
+    Learner-facing spaced-repetition review deck. One card is visible at a time;
+    the learner reveals the answer and self-grades it, which posts an SM-2 lite
+    quality score back through the web service. All styling lives in the plugin's
+    styles.css under the .sola-flashcards namespace.
+
+    Context variables required for this template:
+    * title - Page heading.
+    * intro - Short explanation of the self-grading flow.
+    * hasdue - Whether any cards are due (false renders the empty state only).
+    * nodue - Empty-state message shown when nothing is due.
+    * sesskey - Session key for the review web service call.
+    * courseid - Course the deck belongs to.
+    * serviceurl - Moodle AJAX service endpoint the grade posts to.
+    * questionlabel - Label above the question text.
+    * answerlabel - Label above the answer text.
+    * revealbtn - Label for the reveal-answer button.
+    * againbtn - Label for the "Again" self-grade button (quality 1).
+    * hardbtn - Label for the "Hard" self-grade button (quality 3).
+    * easybtn - Label for the "Easy" self-grade button (quality 5).
+    * sessioncomplete - Message shown once every due card is graded.
+    * cards - List of {id, question, answer} rows. The question and answer have
+      already been through format_text(), so they are trusted HTML.
+
+    Example context (json):
+    {
+        "title": "Flashcards",
+        "intro": "Spaced-repetition review. Reveal the answer, then self-grade.",
+        "hasdue": true,
+        "nodue": "Nothing to review right now.",
+        "sesskey": "abc123",
+        "courseid": 2,
+        "serviceurl": "https://example.org/lib/ajax/service.php?sesskey=abc123",
+        "questionlabel": "Question",
+        "answerlabel": "Answer",
+        "revealbtn": "Reveal answer",
+        "againbtn": "Again",
+        "hardbtn": "Hard",
+        "easybtn": "Easy",
+        "sessioncomplete": "Session complete. Good work.",
+        "cards": [{"id": 7, "question": "What is opportunity cost?", "answer": "The value of the next best alternative."}]
+    }
+}}
+<div class="sola-flashcards">
+    <h2>{{title}}</h2>
+    <p class="text-muted">{{intro}}</p>
+    {{^hasdue}}
+        <div class="sola-flashcards__empty">{{nodue}}</div>
+    {{/hasdue}}
+    {{#hasdue}}
+        <div class="sola-flashcards__stack" data-region="fc-stack"
+             data-sesskey="{{sesskey}}" data-courseid="{{courseid}}" data-serviceurl="{{serviceurl}}">
+            {{#cards}}
+                <div class="sola-flashcards__card" data-region="fc-card" data-card-id="{{id}}">
+                    <div class="sola-flashcards__label">{{questionlabel}}</div>
+                    <div class="sola-flashcards__question">{{{question}}}</div>
+                    <button type="button" class="btn btn-primary" data-action="fc-reveal">{{revealbtn}}</button>
+                    <div class="sola-flashcards__back" data-region="fc-back">
+                        <div class="sola-flashcards__label">{{answerlabel}}</div>
+                        <div class="sola-flashcards__answer">{{{answer}}}</div>
+                        <div class="sola-flashcards__grades">
+                            <button type="button" class="btn btn-warning" data-action="fc-grade" data-quality="1">{{againbtn}}</button>
+                            <button type="button" class="btn btn-secondary" data-action="fc-grade" data-quality="3">{{hardbtn}}</button>
+                            <button type="button" class="btn btn-success" data-action="fc-grade" data-quality="5">{{easybtn}}</button>
+                        </div>
+                    </div>
+                </div>
+            {{/cards}}
+        </div>
+        <div class="sola-flashcards__done" data-region="fc-done">{{sessioncomplete}}</div>
+    {{/hasdue}}
+</div>
+{{#js}}
+(function() {
+    var stack = document.querySelector('.sola-flashcards [data-region="fc-stack"]');
+    if (!stack) { return; }
+    var cards = Array.prototype.slice.call(stack.querySelectorAll('[data-region="fc-card"]'));
+    var done = document.querySelector('.sola-flashcards [data-region="fc-done"]');
+    var serviceurl = stack.dataset.serviceurl;
+    var idx = 0;
+
+    function showNext() {
+        cards.forEach(function(c) { c.classList.remove('sola-flashcards__card--active'); });
+        if (idx >= cards.length) {
+            if (done) { done.classList.add('sola-flashcards__done--visible'); }
+            return;
+        }
+        cards[idx].classList.add('sola-flashcards__card--active');
+    }
+
+    function recordReview(cardid, quality, cb) {
+        var body = JSON.stringify([{
+            index: 0,
+            methodname: 'local_ai_course_assistant_review_flashcard',
+            args: {cardid: parseInt(cardid, 10), quality: parseInt(quality, 10)}
+        }]);
+        fetch(serviceurl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/json'},
+            body: body
+        }).finally(cb);
+    }
+
+    cards.forEach(function(card) {
+        var revealBtn = card.querySelector('[data-action="fc-reveal"]');
+        var back = card.querySelector('[data-region="fc-back"]');
+        var gradeBtns = card.querySelectorAll('[data-action="fc-grade"]');
+        if (revealBtn && back) {
+            revealBtn.addEventListener('click', function() {
+                back.classList.add('sola-flashcards__back--visible');
+                revealBtn.classList.add('sola-flashcards__hidden');
+            });
+        }
+        gradeBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                gradeBtns.forEach(function(b) { b.disabled = true; });
+                recordReview(card.dataset.cardId, btn.dataset.quality, function() {
+                    idx++;
+                    showNext();
+                });
+            });
+        });
+    });
+
+    showNext();
+})();
+{{/js}}

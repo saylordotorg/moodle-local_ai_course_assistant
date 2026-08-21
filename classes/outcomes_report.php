@@ -101,19 +101,49 @@ class outcomes_report {
         global $DB;
 
         $objectives = objective_manager::list_for_course($courseid);
+        if (empty($objectives)) {
+            return [];
+        }
+        $objectiveids = [];
+        foreach ($objectives as $obj) {
+            $objectiveids[] = (int) $obj->id;
+        }
+
+        // Two queries for the whole report instead of one per objective plus
+        // one per (objective, student) inside compute_mastery: the assessed
+        // sets come from a single grouped query and the attempt rows the
+        // mastery math needs are streamed once.
+        [$objsql, $objparams] = $DB->get_in_or_equal($objectiveids, SQL_PARAMS_NAMED, 'obj');
+        $assessed = [];
+        $pairs = $DB->get_recordset_sql(
+            "SELECT objectiveid, userid
+               FROM {" . objective_manager::TABLE_ATTS . "}
+              WHERE objectiveid {$objsql}
+           GROUP BY objectiveid, userid
+           ORDER BY objectiveid ASC, userid ASC",
+            $objparams
+        );
+        try {
+            foreach ($pairs as $pair) {
+                $assessed[(int) $pair->objectiveid][] = (int) $pair->userid;
+            }
+        } finally {
+            $pairs->close();
+        }
+        $preloaded = objective_manager::preload_attempts($objectiveids);
+
         $rows = [];
         foreach ($objectives as $obj) {
             // Students with any attempt on this objective are the assessed set.
-            $userids = $DB->get_fieldset_select(
-                objective_manager::TABLE_ATTS,
-                'DISTINCT userid',
-                'objectiveid = :oid',
-                ['oid' => $obj->id]
-            );
+            $userids = $assessed[(int) $obj->id] ?? [];
             $benchmark = self::benchmark_pct_for((int) $obj->id) / 100;
             $scores = [];
             foreach ($userids as $uid) {
-                $m = objective_manager::compute_mastery((int) $uid, (int) $obj->id);
+                $m = objective_manager::compute_mastery(
+                    (int) $uid,
+                    (int) $obj->id,
+                    $preloaded[(int) $uid . ':' . (int) $obj->id] ?? []
+                );
                 $scores[] = (float) ($m['score'] ?? 0.0);
             }
             $agg = self::aggregate($scores, $benchmark);

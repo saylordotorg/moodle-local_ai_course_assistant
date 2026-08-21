@@ -185,6 +185,8 @@ class survey_manager {
             $record->answer = (string) $answer['answer'];
             $record->timecreated = $now;
 
+            // One INSERT per answer is inherent; bounded by the number of
+            // questions in the survey the learner just submitted.
             $DB->insert_record(self::TABLE_RESPONSES, $record);
         }
     }

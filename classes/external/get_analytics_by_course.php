@@ -62,9 +62,23 @@ class get_analytics_by_course extends external_api {
             $courseids = $DB->get_fieldset_sql($sql);
         }
 
+        // One query for every course name rather than a get_record() per
+        // course id, which on a site with many SOLA-active courses added a
+        // query per course to this admin call.
+        $coursesbyid = [];
+        if (!empty($courseids)) {
+            $coursesbyid = $DB->get_records_list(
+                'course',
+                'id',
+                array_map('intval', $courseids),
+                '',
+                'id, fullname, shortname'
+            );
+        }
+
         $result = [];
         foreach ($courseids as $cid) {
-            $course = $DB->get_record('course', ['id' => $cid], 'id, fullname, shortname');
+            $course = $coursesbyid[(int) $cid] ?? null;
             if (!$course) {
                 continue;
             }

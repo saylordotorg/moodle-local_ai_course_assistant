@@ -489,6 +489,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         $userid = $contextlist->get_user()->id;
 
+        // GDPR subject-access export: a one-off, single-user admin request.
+        // The loop walks that one learner's course contexts and, inside, their
+        // conversations, so the query count is bounded by one person's history
+        // rather than by site data. Reads are deliberately kept per
+        // conversation so each conversation exports as its own sub-context in
+        // the writer, exactly as the privacy API expects.
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel !== CONTEXT_COURSE) {
                 continue;
@@ -757,6 +763,9 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         $userid = $contextlist->get_user()->id;
 
+        // Erasure for one learner: bounded by that learner's course contexts,
+        // and the inner loops below are over hard-coded lists of this plugin's
+        // own tables, so the statement count is fixed per context.
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel !== CONTEXT_COURSE) {
                 continue;
@@ -817,6 +826,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 'local_ai_course_assistant_struggle_signal',
                 'local_ai_course_assistant_outreach_log',
             ];
+            // Bounded loop: one DELETE per hard-coded plugin table.
             foreach ($courseidkeyed as $table) {
                 try {
                     $DB->delete_records($table, [
@@ -926,6 +936,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 'local_ai_course_assistant_struggle_signal',
                 'local_ai_course_assistant_outreach_log',
             ];
+            // Bounded loop: one DELETE per hard-coded plugin table.
             foreach ($courseidkeyed as $table) {
                 try {
                     $DB->delete_records($table, [

@@ -354,6 +354,9 @@ class conversation_manager {
             'outreach_log'    => 'local_ai_course_assistant_outreach_log',
             'audit'           => 'local_ai_course_assistant_audit',
         ];
+        // Bounded loop: $simple is a hard-coded map of this plugin's own tables,
+        // so the query count is fixed (2 per table) and does not grow with the
+        // amount of user data. Each table needs its own count + delete.
         foreach ($simple as $label => $table) {
             try {
                 $counts[$label] = $DB->count_records($table, ['userid' => $userid]);
@@ -416,6 +419,8 @@ class conversation_manager {
             'outreach_log'    => 'local_ai_course_assistant_outreach_log',
             'audit'           => 'local_ai_course_assistant_audit',
         ];
+        // Bounded loop, as above: one count + one delete per hard-coded table,
+        // not per row of data.
         foreach ($tables as $label => $table) {
             try {
                 $params = ['courseid' => $courseid];
