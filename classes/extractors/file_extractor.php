@@ -206,7 +206,8 @@ class file_extractor {
 
         // Request-scoped temp file via the Moodle File API. make_request_directory()
         // returns a unique, non-world-writable directory that Moodle removes at the
-        // end of the request, replacing the manual mkdir(0777)/tempnam dance.
+        // end of the request, replacing the old manual dance of creating a
+        // 0777 directory and a tempnam() file by hand.
         $tmppath = make_request_directory() . '/source.pdf';
 
         try {

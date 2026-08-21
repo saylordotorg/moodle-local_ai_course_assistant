@@ -123,8 +123,9 @@ TXT;
     }
 }
 
-// make_writable_directory(), not a bare mkdir(0775): it is the Moodle API for
-// creating run-time directories and applies the site's configured permissions.
+// make_writable_directory(), not a hand-rolled 0775 directory creation: it is
+// the Moodle API for creating run-time directories and applies the site's
+// configured permissions.
 $outdir = make_writable_directory($outdir);
 
 if ($mode === 'run' || $mode === 'all') {

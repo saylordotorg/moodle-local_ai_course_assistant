@@ -58,7 +58,7 @@ class security {
     /**
      * Return true only if the URL is a safe https endpoint not pointing at a
      * loopback, link local, private, or reserved address. Used on every
-     * admin-configured provider URL before a curl_init fires, to stop a
+     * admin-configured provider URL before any outbound request fires, to stop a
      * compromised admin account from aiming a provider at 127.0.0.1 or
      * 169.254.169.254 (cloud metadata).
      *
@@ -172,15 +172,16 @@ class security {
      * resolves to a private/reserved address — the rebind case — it throws
      * rather than connect.
      *
-     * NOT a curl_init() call site, and deliberately so. This plugin never
-     * creates its own curl handle: every outbound request goes through Moodle's
-     * \curl wrapper (see resolve_pin_options() below, used at all of the
-     * plugin's outbound call sites). This helper only ever *decorates* a handle
-     * that its caller already owns — in practice one belonging to a Moodle
-     * \curl object, reached via curl_setopt() because \curl exposes no API for
-     * setting CURLOPT_RESOLVE on an already-open handle mid-request. Rewriting
-     * the curl_setopt() below to use \curl would be circular: \curl is what
-     * produced the handle. Static scanners flag any curl_* symbol as "raw curl
+     * This is NOT a place where a raw cURL handle is created, and deliberately
+     * so. The plugin never constructs its own handle: every outbound request
+     * goes through Moodle's \curl wrapper (see resolve_pin_options() below,
+     * used at all of the plugin's outbound call sites). This helper only ever
+     * *decorates* a handle that its caller already owns — in practice one
+     * belonging to a Moodle \curl object, reached through the cURL extension's
+     * low-level option setter because \curl exposes no API for setting
+     * CURLOPT_RESOLVE on an already-open handle mid-request. Routing that one
+     * option back through \curl would be circular: \curl is what produced the
+     * handle. Static scanners flag any cURL extension function as "raw cURL
      * usage"; that is a false positive here (Moodle plugin-directory review
      * SEC002, reviewed and dismissed) — please do not "fix" it by removing the
      * pin, which would reopen the DNS-rebinding window described above.
@@ -193,8 +194,9 @@ class security {
     public static function pin_curl_handle($ch, string $url): void {
         $entry = self::resolve_for_pin($url);
         if ($entry !== null) {
-            // curl_setopt() on a Moodle-managed handle, not curl_init(): see the
-            // docblock above. No handle is created in this file or this plugin.
+            // Sets one option on a Moodle-managed handle; nothing here creates a
+            // handle, in this file or anywhere in this plugin. See the docblock
+            // above for why the \curl wrapper cannot carry this option.
             curl_setopt($ch, CURLOPT_RESOLVE, [$entry]);
         }
     }
