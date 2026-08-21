@@ -11,7 +11,7 @@
 
 **Switching embeddings from OpenAI `text-embedding-3-small` to Voyage `voyage-3.5` delivers most of what turning reranking on delivers, for roughly 0.2% of the running cost — and it makes retrieval faster rather than slower.**
 
-Measured on 1,008 labelled queries over 16 indexed courses, on two fixtures: the existing conversational set, and a new fixture re-shaped to the measured production query distribution.
+Measured on 1,008 labeled queries over 16 indexed courses, on two fixtures: the existing conversational set, and a new fixture re-shaped to the measured production query distribution.
 
 | Change | R@3 (conv fixture) | R@3 (production-shaped) | Marginal cost at 25k SOLA users | Added P50 latency |
 |---|---|---|---|---|
@@ -97,7 +97,7 @@ Three things to take into the meeting:
 - **`voyage-3.5` at 256 dimensions (87.8%) beats OpenAI at 1536 (79.2%) by +8.6 pp using one sixth of the vector storage.** Voyage's MRL story is real on our corpus. At 110,300 chunks that is 0.11 GB of float32 vectors against 0.68 GB today.
 - **2048 buys nothing over the native 1024** (90.0% vs 89.6%, a 0.4 pp gap against a 0.2 pp noise floor). Recommend staying at native 1024. This also removes the confound in the earlier head-to-heads, which compared Voyage@1024 against OpenAI@1536 and flagged it as a caveat: Voyage wins at *equal* width (1024: 89.6% vs 78.2%, **+11.4 pp**) and wins at its *smallest* width against OpenAI's largest.
 
-Latency favours Voyage as well — query-embed P50 **140 ms vs 192 ms**, P95 **170 ms vs 300 ms**. Voyage's tail is dramatically tighter.
+Latency favors Voyage as well — query-embed P50 **140 ms vs 192 ms**, P95 **170 ms vs 300 ms**. Voyage's tail is dramatically tighter.
 
 ---
 
@@ -130,7 +130,7 @@ Rerank-2.5 at pool 20, OpenAI embeddings, Fixture A, 1,008 queries. This reprodu
 
 ### The confidence gate, with the latency hole closed
 
-Recommendation #1 of the 2026-08-01 report was never implemented, and its latency was explicitly not modelled. Replaying the gate offline over the recorded `margin_1_3` and the recorded per-query latencies:
+Recommendation #1 of the 2026-08-01 report was never implemented, and its latency was explicitly not modeled. Replaying the gate offline over the recorded `margin_1_3` and the recorded per-query latencies:
 
 | Threshold T | Coverage | R@3 | Δ vs never | Top-1 broken | Deep rescues | P50 ms | P95 ms | $/1k queries |
 |---|---|---|---|---|---|---|---|---|
@@ -210,9 +210,9 @@ Voyage's asymmetric retrieval was flagged as a risk: `input_type: query` presume
 | 200+ | 92.3% | 56.4% | −35.9 pp |
 | **ALL** | **61.0%** | **30.2%** | **−30.8 pp** |
 
-`query` wins in **every** bucket, including the keyword mode. The asymmetric projection is doing real work — using the wrong `input_type` halves recall — and the plugin's `voyage_embedding_provider` already does the right thing (`embed_query()` sends `input_type: query`, indexing sends `document`). The penalty is *smaller* on short queries (−20 pp vs −43 pp), which is the expected shape: a bare noun phrase looks more like a document fragment than a question does. But it is never an advantage. **No change needed, and this is a point in Voyage's favour rather than a risk.**
+`query` wins in **every** bucket, including the keyword mode. The asymmetric projection is doing real work — using the wrong `input_type` halves recall — and the plugin's `voyage_embedding_provider` already does the right thing (`embed_query()` sends `input_type: query`, indexing sends `document`). The penalty is *smaller* on short queries (−20 pp vs −43 pp), which is the expected shape: a bare noun phrase looks more like a document fragment than a question does. But it is never an advantage. **No change needed, and this is a point in Voyage's favor rather than a risk.**
 
-### The `rag_min_similarity` floor silently drops a quarter of short queries
+### The `rag_min_similarity` floor drops a quarter of short-query targets, but costs little recall
 
 The production retriever discards any chunk scoring below `rag_min_similarity` = 0.25 before reranking. On the conversational fixture this was harmless — **0 of 1,008** target chunks fell below it. On production-shaped queries:
 
@@ -225,7 +225,23 @@ The production retriever discards any chunk scoring below `rag_min_similarity` =
 | 200+ | 39 | 0 |
 | **ALL** | **1,008** | **93 (9.2%)** |
 
-**On nearly a quarter of short real-world queries, the correct chunk is thrown away before any ranking happens** — so no reranker and no embedding model can recover it. Reported recall above does not apply this floor, so true production recall on the short mode is lower still. This is entirely a SOLA configuration finding, not a vendor one, and it is arguably the highest-value fix surfaced by this work: a floor tuned against question-shaped fixtures is mis-calibrated for the traffic we actually serve. It should be re-tuned (or made length-aware) on production-shaped queries before any vendor change is credited or blamed for short-query performance.
+On nearly a quarter of short real-world queries the correct chunk scores below the floor and is dropped before ranking. That is a real mis-calibration — the floor was validated on question-shaped fixtures where it cost nothing (0 of 1,008), and it now bites almost exclusively on the short mode.
+
+**But the recall it actually costs is small, and an earlier draft of this report overstated it badly.** The 9.2% figure counts every target below the floor, including targets that ranked far too low to be retrieved regardless. Of the 93:
+
+| Where the discarded target actually ranked | count | share of 1,008 |
+|---|---|---|
+| rank 1 | 3 | 0.30 pp |
+| rank ≤ 3 | 4 | **0.40 pp** |
+| rank ≤ 5 | 8 | 0.79 pp |
+| rank ≤ 10 | 12 | 1.19 pp |
+| rank ≤ 20 (the rerank candidate pool) | 21 | 2.08 pp |
+
+So with reranking off, removing the floor entirely would raise R@3 by **0.40 pp**. With reranking on the floor also keeps 21 targets out of the 20-chunk candidate pool; at the promotion rate measured in this very run — the reranker pulled 150 of 252 deep-but-in-pool targets into the top 3, 59.5% — that is worth about **1.24 pp**, with a hard ceiling of 2.08 pp if the reranker promoted every one.
+
+Against +8.7 pp for the embedding switch and +10.8 pp for reranking on this same fixture, the floor is a rounding error, not a lever. **The floor is not what loses these queries — the embedding is.** A target sitting at cosine rank 38 is not being failed by a threshold.
+
+It is still worth dropping to about 0.15, where the measured cost goes to zero (1 target lost at 0.20, none at 0.15) and nothing in the long-query modes is affected, since their p5 is 0.433 or better. That is a cheap, safe tidy-up. It is not the headline finding of this work.
 
 ---
 
@@ -244,7 +260,7 @@ Usage model taken unchanged from `.drafts/sola-benchmarks-usage-and-cost-2026-08
 | Rerank-2.5 @ pool 20, gated at 0.086 | 10,467 tok/query | $0.05/MTok | **$0.52** |
 | Rerank-2.5 @ pool 20, production-shaped queries | 14,260 tok/query | $0.05/MTok | **$0.71** |
 
-**One-time full-catalogue index** (extrapolating the measured 571 tok/chunk OpenAI, 581 tok/chunk Voyage from 10,910 chunks to the 110,300-chunk catalogue):
+**One-time full-catalog index** (extrapolating the measured 571 tok/chunk OpenAI, 581 tok/chunk Voyage from 10,910 chunks to the 110,300-chunk catalog):
 
 | Provider | Index tokens | One-time cost |
 |---|---|---|
@@ -257,7 +273,7 @@ Usage model taken unchanged from `.drafts/sola-benchmarks-usage-and-cost-2026-08
 | Scenario | RAG queries/mo | Chat spend | Rerank @20 always | Rerank @20 gated | Voyage-3.5 embeddings (delta vs OpenAI) |
 |---|---|---|---|---|---|
 | Today's real footprint | 6,400 | ~$8 | $4.80 | $3.33 | **+$0.01** |
-| Full catalogue, adoption holds | 9,959 | ~$13 | $7.47 | $5.18 | **+$0.01** |
+| Full catalog, adoption holds | 9,959 | ~$13 | $7.47 | $5.18 | **+$0.01** |
 | Adoption doubles | 19,918 | ~$26 | $14.94 | $10.36 | **+$0.02** |
 | Ceiling, 10% adoption | 34,060 | ~$45 | $25.55 | $17.71 | **+$0.03** |
 | 25,000 SOLA users (08-01 projection) | 126,700 | $234 | $95.03 | $65.88 | **+$0.13** |
@@ -314,16 +330,20 @@ But be precise about what that does and does not settle. On production-shaped qu
 
 If rerank is enabled before that measurement exists, use pool 20 with the confidence gate at margin < 0.086 — for the ~30% cost saving and the 18 avoided top-1 breakages, **not** for latency, which the gate barely improves (§4).
 
-**(d) Independent of any vendor decision: re-tune `rag_min_similarity`.**
+**(d) Independent of any vendor decision: drop `rag_min_similarity` to ~0.15. Cheap and safe, but minor.**
 
-The 0.25 floor discards the correct chunk on 23.3% of short queries and 9.2% overall on production-shaped traffic, before ranking happens. It was validated against question-shaped fixtures where it cost nothing (0 of 1,008). This is a bigger lever on real short-query performance than either vendor change and it costs nothing to fix. Re-tune or make it length-aware.
+The 0.25 floor discards the correct chunk on 23.3% of short queries and 9.2% overall, before ranking. It was validated against question-shaped fixtures where it cost nothing (0 of 1,008), so it is genuinely mis-calibrated for real traffic.
+
+**An earlier draft of this report called it "a bigger lever than either vendor change." That was wrong, by roughly 7-25x, and is corrected in §5b.** Most of those 93 discarded targets ranked far too low to be retrieved anyway: only 4 were inside the top 3. Removing the floor is worth **0.40 pp** of R@3 with reranking off, and about **1.24 pp** with it on (21 targets excluded from the 20-chunk rerank pool, times the 59.5% promotion rate measured in this run). Against +8.7 and +10.8 pp for the two real interventions, it is a rounding error.
+
+Drop it to 0.15 — measured cost goes to zero there and no long-query bucket is touched (p5 ≥ 0.433 in every one). Do it because it is free, not because it will move the number.
 
 ## 9. What I could not measure, and what is still open
 
 - **Rerank on top of Voyage embeddings — the single most important gap.** Every rerank number here sits on OpenAI vectors. Since Voyage embeddings alone roughly match always-on rerank, the rerank business case could either evaporate after the switch or compound into a materially better stack. Not measured. It needs one combined run (~$0.75) and it should happen before any rerank rollout. **It is also the sharpest question to put to Voyage: does rerank-2.5 add measurable recall on top of voyage-3.5 retrieval, or is it largely correcting weaker embeddings?**
 - **Judged relevance (nDCG / precision).** This report is recall-mode only, against each fixture's own ground-truth chunk. A judged comparison of OpenAI vs Voyage on production-shaped queries would be a stronger quality claim than recall alone, and would catch cases where a different-but-equally-good chunk is retrieved.
 - **`voyage-4` and `voyage-4-lite`** were not run. The 2026-07-08 40-fixture run put them *below* voyage-3.5, but that sample was too small to conclude anything; at 1,008 fixtures they deserve a re-test, especially since `voyage-4-lite` is also $0.02/MTok.
-- **Cold-path latency.** All latency here is warm-path — the vector load is amortised across 1,008 queries in one process. Prior work measured real cold retrieval at 835 ms typical and 1,957 ms worst case. The P50/P95 figures above are the *incremental* vendor cost, not the learner-visible total.
+- **Cold-path latency.** All latency here is warm-path — the vector load is amortized across 1,008 queries in one process. Prior work measured real cold retrieval at 835 ms typical and 1,957 ms worst case. The P50/P95 figures above are the *incremental* vendor cost, not the learner-visible total.
 - **Prodshape fixture caveat.** Some short-mode items read as truncated fragments ("positive work?", "social norms come?") where discriminating content may have been lost along with the surface form. The ≤20-char bucket may therefore understate achievable recall on genuinely short-but-specific production queries. The bimodal *shape* of the result is trustworthy; the exact 28–36% level on that bucket is not, and should be checked against a fixture whose short queries are short *and* specific before 52% is quoted as "production recall".
 - **Follow-up and deixis.** 76.8% of real messages are turn 2+ and 21.6% contain a bare deictic whose referent the retriever never sees. No fixture here models conversation history, so nothing in this report speaks to how much of the short-query problem is really a *context* problem rather than a retrieval problem. That is plausibly the largest unmeasured factor of all.
 - **The other ~146 production courses are unmeasured**, as in all prior SOLA retrieval work.

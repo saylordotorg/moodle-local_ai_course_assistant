@@ -15,7 +15,7 @@ Section 1. Details flagged inline.
 **Ask for embeddings pricing. Voyage embeddings are measurably better than what
 we run, and effectively free at our scale.**
 
-Measured on 1,008 labelled queries across 16 courses, two fixtures, noise floor
+Measured on 1,008 labeled queries across 16 courses, two fixtures, noise floor
 0.2 pp:
 
 | Change | R@3 (conversational) | R@3 (production-shaped) | Marginal $/mo @25k users | Added latency |
@@ -101,7 +101,7 @@ favor.
    embeddings and rerank versus the two lines priced separately.
 2. **Specifically: what does `voyage-3.5` cost us over `voyage-3.5-lite`?** We
    have measured the quality gap at +1.9 pp. Make them price that gap.
-3. **A pilot allowance for the one-time reindex.** Full-catalogue re-embed is
+3. **A pilot allowance for the one-time reindex.** Full-catalog re-embed is
    64.1 M tokens — $3.85 at list on `voyage-3.5`, $1.28 on lite. Small enough
    that it is a goodwill ask, not a budget item.
 
@@ -213,15 +213,22 @@ evaluating them for generation. Retrieval only — embeddings and reranking.
 
 Do not raise these as vendor questions; they are ours to fix.
 
-- **`rag_min_similarity` = 0.25 discards the correct chunk on 23.3% of short
-  queries** (9.2% overall) before any ranking happens — so no reranker and no
-  embedding model can recover them. The floor was validated against
-  question-shaped fixtures where it cost nothing (0 of 1,008). This is free to
-  fix and it is a bigger lever on real short-query performance than either vendor
-  change. **Highest-value item to come out of this work.**
+- **`rag_min_similarity` = 0.25 is mis-calibrated for short queries** — it
+  discards the correct chunk on 23.3% of them (9.2% overall) before any ranking.
+  It was validated on question-shaped fixtures where it cost nothing (0 of
+  1,008). Drop it to about 0.15; free and safe.
+
+  **Correction to an earlier version of this brief, which called this "a bigger
+  lever than either vendor change." It is not — that was wrong by roughly
+  7-25x.** Most of those discarded targets ranked far too low to be retrieved
+  anyway: of the 93, only 4 were inside the top 3. Removing the floor is worth
+  **0.40 pp** of R@3 with rerank off, and about **1.24 pp** with it on, against
+  +8.7 pp for the embedding switch and +10.8 pp for reranking. The floor is not
+  what loses these queries — the embedding is. **Do not raise this in the meeting
+  as a major finding.**
 - **Prod `rerank_candidates` = 50** — 2.5x the cost of pool 20 for no measurable
   gain. Fix regardless of any vendor decision.
-- **The confidence gate is still not built.** Now modelled: at margin < 0.086 it
+- **The confidence gate is still not built.** Now modeled: at margin < 0.086 it
   covers 70% of queries for +9.6 pp at ~$0.52/1k. Build it for cost and for the
   18 avoided top-1 breakages — **not for latency.** Newly measured: gating saves
   only 43 ms of P50, because it fires precisely on the ambiguous queries and does
@@ -241,7 +248,7 @@ them first:
 - **All figures are recall-mode** against each fixture's own ground-truth chunk.
   No judged relevance (nDCG), so a different-but-equally-good chunk counts as a
   miss.
-- **Latency is warm-path.** Vector load is amortised across 1,008 queries in one
+- **Latency is warm-path.** Vector load is amortized across 1,008 queries in one
   process. Real cold retrieval was previously measured at 835 ms typical. The
   numbers above are the *incremental* vendor cost, not learner-visible total.
 - **The production-shaped fixture's short queries may be unfairly hard.** Some
