@@ -3,12 +3,19 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    # A review run costs real money (~$2-3) and fans out across several
+    # subagents, so don't spend it on pushes that contain no reviewable code.
+    # Release branches here carry a lot of prose churn -- release notes, drafts,
+    # changelog -- and v7.0.2 burned roughly $9 across four runs triggered by
+    # documentation-only pushes, none of which had anything to review.
+    #
+    # A push touching only these paths skips the review entirely. A push that
+    # also touches code still gets reviewed in full.
+    paths-ignore:
+      - '.drafts/**'
+      - '.wiki/**'
+      - '**/*.md'
+      - 'LICENSE'
 
 jobs:
   claude-review:
