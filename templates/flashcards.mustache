@@ -91,33 +91,43 @@
 {{#js}}
 (function() {
     var stack = document.querySelector('.sola-flashcards [data-region="fc-stack"]');
-    if (!stack) { return; }
+    if (!stack) {
+        return;
+    }
     var cards = Array.prototype.slice.call(stack.querySelectorAll('[data-region="fc-card"]'));
     var done = document.querySelector('.sola-flashcards [data-region="fc-done"]');
     var serviceurl = stack.dataset.serviceurl;
     var idx = 0;
 
     function showNext() {
-        cards.forEach(function(c) { c.classList.remove('sola-flashcards__card--active'); });
+        cards.forEach(function(c) {
+            c.classList.remove('sola-flashcards__card--active');
+        });
         if (idx >= cards.length) {
-            if (done) { done.classList.add('sola-flashcards__done--visible'); }
+            if (done) {
+                done.classList.add('sola-flashcards__done--visible');
+            }
             return;
         }
         cards[idx].classList.add('sola-flashcards__card--active');
     }
 
-    function recordReview(cardid, quality, cb) {
+    // Returns the fetch promise rather than taking a callback: Moodle's ESLint
+    // rejects both an unterminated promise chain (promise/catch-or-return) and a
+    // callback invoked inside .then() (promise/no-callback-in-promise), so the
+    // caller terminates the chain itself.
+    function recordReview(cardid, quality) {
         var body = JSON.stringify([{
             index: 0,
             methodname: 'local_ai_course_assistant_review_flashcard',
             args: {cardid: parseInt(cardid, 10), quality: parseInt(quality, 10)}
         }]);
-        fetch(serviceurl, {
+        return fetch(serviceurl, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {'Content-Type': 'application/json'},
             body: body
-        }).finally(cb);
+        });
     }
 
     cards.forEach(function(card) {
@@ -132,11 +142,19 @@
         }
         gradeBtns.forEach(function(btn) {
             btn.addEventListener('click', function() {
-                gradeBtns.forEach(function(b) { b.disabled = true; });
-                recordReview(card.dataset.cardId, btn.dataset.quality, function() {
+                gradeBtns.forEach(function(b) {
+                    b.disabled = true;
+                });
+                // The review is best-effort: whether it succeeds or fails, the
+                // learner must still advance, so both arms do the same thing and
+                // the chain terminates in .catch().
+                var advance = function() {
                     idx++;
                     showNext();
-                });
+                };
+                recordReview(card.dataset.cardId, btn.dataset.quality)
+                    .then(advance)
+                    .catch(advance);
             });
         });
     });

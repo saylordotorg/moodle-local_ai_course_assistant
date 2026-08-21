@@ -180,16 +180,37 @@
     {{/hascourses}}
 </div>
 {{#js}}
-(function() {
-    // Every destructive form carries its prompt in data-confirm, which keeps the
-    // handler out of an inline onclick attribute.
+// Every destructive form carries its prompt in data-confirm, which keeps the
+// handler out of an inline onclick attribute. window.confirm() is not available
+// to us -- Moodle's ESLint forbids it (no-alert) -- so this uses the core
+// save/cancel modal, which is also the accessible, themeable option.
+require(['core/notification', 'core/str'], function(Notification, Str) {
     var forms = document.querySelectorAll('.sola-ragadmin form[data-confirm]');
     Array.prototype.forEach.call(forms, function(form) {
+        var confirmed = false;
         form.addEventListener('submit', function(e) {
-            if (!window.confirm(form.dataset.confirm)) {
-                e.preventDefault();
+            if (confirmed) {
+                return;
             }
+            e.preventDefault();
+            Str.get_strings([
+                {key: 'confirm', component: 'moodle'},
+                {key: 'yes', component: 'moodle'}
+            ]).then(function(labels) {
+                return Notification.saveCancelPromise(
+                    labels[0],
+                    form.dataset.confirm,
+                    labels[1]
+                );
+            }).then(function() {
+                confirmed = true;
+                form.submit();
+                return null;
+            }).catch(function() {
+                // Cancelled, or the modal failed to load: leave the form unsubmitted.
+                return null;
+            });
         });
     });
-})();
+});
 {{/js}}
