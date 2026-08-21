@@ -2220,3 +2220,93 @@ $string['redash:err_nested_sections'] = 'Nested sections require their parent se
 $string['redash:hint_add_parent'] = 'Add the parent, for example sections={$a}';
 $string['redash:err_deanonymized_disabled'] = 'De-anonymized export is disabled. Enable the "Allow de-anonymized export" plugin setting to permit anonymize=0.';
 $string['redash:unknown_course'] = 'Unknown (id={$a})';
+
+// v7.0.2 (I18N001): analytics.php — Learning Radar provider picker, metric chips
+// and suggested starter questions. Previously hardcoded English on the page.
+$string['analytics:provider_primary'] = '{$a} (primary)';
+$string['analytics:chip_tokens_label'] = 'Tokens (30d)';
+$string['analytics:chip_tokens_query'] = 'Break down token spend by provider and course for the last 30 days.';
+$string['analytics:chip_topcourse_label'] = 'Top-cost course (30d)';
+$string['analytics:chip_topcourse_query'] = 'Why is course {$a} the top token consumer this month?';
+$string['analytics:chip_topcourse_query_empty'] = 'Which courses are using the most tokens recently?';
+$string['analytics:chip_activestudents_label'] = 'Active students (7d)';
+$string['analytics:chip_activestudents_query'] = 'Profile the active students this week: which topics are they asking about?';
+$string['analytics:chip_voiceminutes_label'] = 'Voice minutes (30d)';
+$string['analytics:chip_voiceminutes_query'] = 'Which courses and topics are students using voice mode for?';
+$string['analytics:chip_negratings_label'] = 'Negative ratings (7d)';
+$string['analytics:chip_negratings_query'] = 'Summarize the lowest-rated responses from the last week. What patterns explain them?';
+$string['analytics:chip_integrity_label'] = 'Integrity flags (open)';
+$string['analytics:chip_integrity_query'] = 'What types of academic integrity concerns are flagged and how should I respond?';
+$string['analytics:radar_starter_topics_label'] = 'Top topics students struggle with';
+$string['analytics:radar_starter_topics_query'] = 'Which topics have the highest off-topic rate or generate the most clarification requests across all courses?';
+$string['analytics:radar_starter_provider_label'] = 'Best provider per dollar';
+$string['analytics:radar_starter_provider_query'] = 'Compare cost-per-helpful-answer across providers using rating signal as the helpful proxy. Which provider gives the best satisfaction per dollar this month?';
+$string['analytics:radar_starter_bounce_label'] = 'Where students bounce';
+$string['analytics:radar_starter_bounce_query'] = 'Identify courses where conversation drop-off is highest after the first 2 turns. What pattern explains the drop?';
+$string['analytics:radar_starter_frustrated_label'] = 'Most-frustrated students';
+$string['analytics:radar_starter_frustrated_query'] = 'Find anonymized students whose recent feedback shifted from positive to negative this week. What triggered the change?';
+$string['analytics:radar_starter_review_label'] = 'Courses ready for instructor review';
+$string['analytics:radar_starter_review_query'] = 'Which courses have accumulated the most negative ratings or integrity flags this period and would benefit from instructional designer review?';
+$string['analytics:radar_starter_trending_label'] = 'Trending questions';
+$string['analytics:radar_starter_trending_query'] = 'List the 10 most frequently asked questions this week, and how [[tutorshort]] answered them on average.';
+$string['analytics:radar_starter_voice_label'] = 'Voice mode breakdown';
+$string['analytics:radar_starter_voice_query'] = 'Profile voice mode usage: which courses, which topics, and what is the average session length?';
+$string['analytics:radar_starter_quiet_label'] = 'Quiet courses';
+$string['analytics:radar_starter_quiet_query'] = 'Which courses have [[tutorshort]] enabled but very low engagement? What might be missing in those courses to drive more use?';
+
+// v7.0.2 (I18N001): starter_settings.php — collapsible help panel.
+$string['starters:howto_heading'] = 'How to use this page';
+$string['starters:howto_builtin'] = '<strong>Built-in starters</strong> are system managed. You can enable or disable them, change their icon, and reorder them, but you cannot delete them.';
+$string['starters:howto_custom'] = '<strong>Custom starters</strong> are ones you create. Click "{$a}" below to create one. You can edit everything: the name, prompt, icon, and visibility conditions.';
+$string['starters:howto_types'] = '<strong>Starter types:</strong>';
+$string['starters:howto_type_prompt'] = '<strong>Prompt</strong>: when clicked, sends a custom message to the AI on behalf of the student';
+$string['starters:howto_type_quiz'] = 'starts an interactive practice quiz';
+$string['starters:howto_type_voice'] = 'starts a spoken conversation (requires TTS)';
+$string['starters:howto_type_pronunciation'] = 'starts pronunciation practice (requires Realtime Voice Mode)';
+$string['starters:howto_conditional'] = '<strong>Conditional visibility:</strong> choose "Only when TTS enabled" for audio starters, or "Only when Realtime enabled" for pronunciation starters. If the required feature is off, the starter will be hidden from students.';
+$string['starters:howto_placeholders'] = '<strong>Prompt placeholders:</strong> use <code>{page}</code> to insert the current page title. Example: <em>"Explain the key concepts on the {page} page."</em>';
+$string['starters:howto_reorder'] = '<strong>Drag to reorder</strong> using the ≡ handle on the left. The order here is the order students see.';
+$string['starters:howto_overrides'] = '<strong>Per-course overrides:</strong> after configuring starters here, go to each course\'s settings page to enable or disable specific starters for that course.';
+
+// v7.0.2 (I18N001): starter_settings.php — starter card editor rendered in the browser.
+$string['starters:js_drag_handle'] = 'Drag to reorder';
+$string['starters:js_on'] = 'On';
+$string['starters:js_name'] = 'Name';
+$string['starters:js_name_aria'] = 'Chip name';
+$string['starters:js_name_placeholder'] = 'Chip display name';
+$string['starters:js_description'] = 'Description';
+$string['starters:js_desc_aria'] = 'Chip description';
+$string['starters:js_desc_placeholder'] = 'Admin-only description';
+$string['starters:js_desc_help'] = 'Shown only in this admin panel for reference.';
+$string['starters:js_prompt'] = 'AI Prompt';
+$string['starters:js_prompt_aria'] = 'AI prompt template';
+$string['starters:js_prompt_placeholder'] = 'The message sent to the AI when this chip is clicked...';
+$string['starters:js_prompt_help'] = 'Use <code>{page}</code> for the current page title. This is sent as the student\'s message to the AI.';
+$string['starters:js_icon'] = 'Icon';
+$string['starters:js_conditional'] = 'Conditional';
+$string['starters:js_cond_always'] = 'Always shown';
+$string['starters:js_cond_tts'] = 'Only when TTS enabled';
+$string['starters:js_cond_realtime'] = 'Only when Realtime enabled';
+$string['starters:js_delete'] = 'Delete this starter';
+$string['starters:js_builtin_note'] = 'Built-in starter (cannot be deleted)';
+$string['starters:js_confirm_delete'] = 'Delete "{$a}"?';
+$string['starters:js_new_name'] = 'New Starter';
+
+// v7.0.2 (I18N001): starter_settings.php — icon picker tooltips, one per icon key.
+$string['starters:icon_book'] = 'Book';
+$string['starters:icon_lightning'] = 'Quick';
+$string['starters:icon_calendar'] = 'Schedule';
+$string['starters:icon_chat'] = 'Chat';
+$string['starters:icon_refresh'] = 'Review';
+$string['starters:icon_mic'] = 'Microphone';
+$string['starters:icon_speaker'] = 'Speaker';
+$string['starters:icon_lightbulb'] = 'Idea';
+$string['starters:icon_star'] = 'Star';
+$string['starters:icon_graduation'] = 'Academic';
+$string['starters:icon_pencil'] = 'Write';
+$string['starters:icon_compass'] = 'Explore';
+$string['starters:icon_brain'] = 'Brain';
+$string['starters:icon_target'] = 'Goal';
+$string['starters:icon_search'] = 'Search';
+$string['starters:icon_heart'] = 'Wellbeing';
+$string['starters:icon_rocket'] = 'Quick Start';

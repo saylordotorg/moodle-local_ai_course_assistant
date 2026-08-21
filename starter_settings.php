@@ -62,9 +62,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $starters = starter_manager::get_global_starters();
 $iconkeys = starter_manager::get_icon_keys();
 $icons = [];
+$iconlabels = [];
+$sm = get_string_manager();
 foreach ($iconkeys as $k) {
     $icons[$k] = starter_manager::get_icon_svg($k);
+    // One tooltip per icon key. A key with no label yet falls back to the raw
+    // key in the browser, which is what the page did before the extraction.
+    if ($sm->string_exists('starters:icon_' . $k, 'local_ai_course_assistant')) {
+        $iconlabels[$k] = get_string('starters:icon_' . $k, 'local_ai_course_assistant');
+    }
 }
+
+// Labels for the starter-card editor that the inline JS builds in the browser.
+// Resolved here so they are translatable (I18N001); the script reads STR.<key>.
+$jsstrkeys = [
+    'drag_handle', 'on', 'name', 'name_aria', 'name_placeholder',
+    'description', 'desc_aria', 'desc_placeholder', 'desc_help',
+    'prompt', 'prompt_aria', 'prompt_placeholder', 'prompt_help',
+    'icon', 'conditional', 'cond_always', 'cond_tts', 'cond_realtime',
+    'delete', 'builtin_note', 'confirm_delete', 'new_name',
+];
+$jsstrings = [];
+foreach ($jsstrkeys as $jsk) {
+    $jsstrings[$jsk] = get_string('starters:js_' . $jsk, 'local_ai_course_assistant');
+}
+$jsonflags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
 
 echo $OUTPUT->header();
 ?>
@@ -76,22 +98,29 @@ echo $OUTPUT->header();
     <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
         <div class="card-body">
             <h6 style="cursor:pointer;margin:0;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'; this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'▶':'▼';">
-                <span>▶</span> How to use this page
+                <span>▶</span> <?php echo get_string('starters:howto_heading', 'local_ai_course_assistant'); ?>
             </h6>
             <div style="display:none;margin-top:12px;font-size:14px;line-height:1.6;">
-                <p><strong>Built-in starters</strong> are system managed. You can enable or disable them, change their icon, and reorder them, but you cannot delete them.</p>
-                <p><strong>Custom starters</strong> are ones you create. Click "Add New Starter" below to create one. You can edit everything: the name, prompt, icon, and visibility conditions.</p>
-                <p><strong>Starter types:</strong></p>
+                <p><?php echo get_string('starters:howto_builtin', 'local_ai_course_assistant'); ?></p>
+                <p><?php echo get_string(
+                    'starters:howto_custom',
+                    'local_ai_course_assistant',
+                    get_string('starters:add_new', 'local_ai_course_assistant')
+                ); ?></p>
+                <p><?php echo get_string('starters:howto_types', 'local_ai_course_assistant'); ?></p>
                 <ul style="margin-bottom:8px;">
-                    <li><strong>Prompt</strong>: when clicked, sends a custom message to the AI on behalf of the student</li>
-                    <li><span class="aica-starter-type-badge type-quiz" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#fff3cd;color:#856404;">QUIZ</span> starts an interactive practice quiz</li>
-                    <li><span class="aica-starter-type-badge type-voice" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">VOICE</span> starts a spoken conversation (requires TTS)</li>
-                    <li><span class="aica-starter-type-badge type-pronunciation" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">PRONUNCIATION</span> starts pronunciation practice (requires Realtime Voice Mode)</li>
+                    <li><?php echo get_string('starters:howto_type_prompt', 'local_ai_course_assistant'); ?></li>
+                    <li><span class="aica-starter-type-badge type-quiz" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#fff3cd;color:#856404;">QUIZ</span> <?php
+                        echo get_string('starters:howto_type_quiz', 'local_ai_course_assistant'); ?></li>
+                    <li><span class="aica-starter-type-badge type-voice" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">VOICE</span> <?php
+                        echo get_string('starters:howto_type_voice', 'local_ai_course_assistant'); ?></li>
+                    <li><span class="aica-starter-type-badge type-pronunciation" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">PRONUNCIATION</span> <?php
+                        echo get_string('starters:howto_type_pronunciation', 'local_ai_course_assistant'); ?></li>
                 </ul>
-                <p><strong>Conditional visibility:</strong> choose "Only when TTS enabled" for audio starters, or "Only when Realtime enabled" for pronunciation starters. If the required feature is off, the starter will be hidden from students.</p>
-                <p><strong>Prompt placeholders:</strong> use <code>{page}</code> to insert the current page title. Example: <em>"Explain the key concepts on the {page} page."</em></p>
-                <p><strong>Drag to reorder</strong> using the ≡ handle on the left. The order here is the order students see.</p>
-                <p><strong>Per-course overrides:</strong> after configuring starters here, go to each course's settings page to enable or disable specific starters for that course.</p>
+                <p><?php echo get_string('starters:howto_conditional', 'local_ai_course_assistant'); ?></p>
+                <p><?php echo get_string('starters:howto_placeholders', 'local_ai_course_assistant'); ?></p>
+                <p><?php echo get_string('starters:howto_reorder', 'local_ai_course_assistant'); ?></p>
+                <p><?php echo get_string('starters:howto_overrides', 'local_ai_course_assistant'); ?></p>
             </div>
         </div>
     </div>
@@ -151,6 +180,8 @@ echo $OUTPUT->header();
 <script>
 (function() {
     var ICONS = <?php echo json_encode($icons); ?>;
+    var ICON_LABELS = <?php echo json_encode($iconlabels, $jsonflags); ?>;
+    var STR = <?php echo json_encode($jsstrings, $jsonflags); ?>;
     var starters = <?php echo json_encode($starters); ?>;
     var list = document.getElementById('aica-starters-list');
     var nextOrder = starters.length + 1;
@@ -170,58 +201,60 @@ echo $OUTPUT->header();
 
         card.innerHTML =
             '<div class="aica-starter-card-header">' +
-                '<span class="aica-drag-handle" title="Drag to reorder">&#x2630;</span>' +
+                '<span class="aica-drag-handle" title="' + escAttr(STR.drag_handle) + '">&#x2630;</span>' +
                 '<span class="aica-starter-icon-preview">' + (ICONS[s.icon] || ICONS.chat) + '</span>' +
                 '<span class="aica-starter-name">' + escHtml(s.name) + '</span>' +
                 typeBadge + condBadge +
                 '<label style="margin:0;display:flex;align-items:center;gap:4px;" onclick="event.stopPropagation()">' +
                     '<input type="checkbox" class="aica-starter-toggle" ' + (s.enabled ? 'checked' : '') + '>' +
-                    '<span style="font-size:12px;color:#6c757d;">On</span>' +
+                    '<span style="font-size:12px;color:#6c757d;">' + escHtml(STR.on) + '</span>' +
                 '</label>' +
                 '<span class="aica-starter-expand-arrow">&#x25BC;</span>' +
             '</div>' +
             '<div class="aica-starter-card-body">' +
                 '<div class="aica-field">' +
-                    '<label>Name</label>' +
-                    '<input type="text" class="aica-f-name" aria-label="Chip name" value="' + escAttr(s.name) + '" placeholder="Chip display name">' +
+                    '<label>' + escHtml(STR.name) + '</label>' +
+                    '<input type="text" class="aica-f-name" aria-label="' + escAttr(STR.name_aria) + '" value="' +
+                        escAttr(s.name) + '" placeholder="' + escAttr(STR.name_placeholder) + '">' +
                 '</div>' +
                 '<div class="aica-field">' +
-                    '<label>Description</label>' +
-                    '<input type="text" class="aica-f-desc" aria-label="Chip description" value="' + escAttr(s.description || '') + '" placeholder="Admin-only description">' +
-                    '<div class="aica-help">Shown only in this admin panel for reference.</div>' +
+                    '<label>' + escHtml(STR.description) + '</label>' +
+                    '<input type="text" class="aica-f-desc" aria-label="' + escAttr(STR.desc_aria) + '" value="' +
+                        escAttr(s.description || '') + '" placeholder="' + escAttr(STR.desc_placeholder) + '">' +
+                    '<div class="aica-help">' + escHtml(STR.desc_help) + '</div>' +
                 '</div>' +
                 (s.type === 'prompt' ?
                 '<div class="aica-field">' +
-                    '<label>AI Prompt</label>' +
-                    '<textarea class="aica-f-prompt" aria-label="AI prompt template" placeholder="The message sent to the AI when this chip is clicked...">' + escHtml(s.prompt || '') + '</textarea>' +
-                    '<div class="aica-help">Use <code>{page}</code> for the current page title. This is sent as the student\'s message to the AI.</div>' +
+                    '<label>' + escHtml(STR.prompt) + '</label>' +
+                    '<textarea class="aica-f-prompt" aria-label="' + escAttr(STR.prompt_aria) + '" placeholder="' +
+                        escAttr(STR.prompt_placeholder) + '">' + escHtml(s.prompt || '') + '</textarea>' +
+                    '<div class="aica-help">' + STR.prompt_help + '</div>' +
                 '</div>' : '') +
                 '<div class="aica-field">' +
-                    '<label>Icon</label>' +
+                    '<label>' + escHtml(STR.icon) + '</label>' +
                     '<div class="aica-icon-picker">' +
                         Object.keys(ICONS).map(function(k) {
-                            var labels = {chat:'Chat',lightbulb:'Idea',book:'Book',pencil:'Write',question:'Question',
-                                flask:'Experiment',target:'Goal',chart:'Analytics',globe:'Languages',mic:'Microphone',
-                                speaker:'Speaker',puzzle:'Puzzle',star:'Star',heart:'Wellbeing',clock:'Timer',
-                                brain:'Brain',rocket:'Quick Start',compass:'Explore',list:'List',search:'Search',
-                                graduation:'Academic',handshake:'Support',users:'Group',trophy:'Achievement'};
-                            var label = labels[k] || k;
+                            var label = ICON_LABELS[k] || k;
                             return '<span class="aica-icon-option' + (k === s.icon ? ' selected' : '') +
-                                '" data-icon="' + k + '" title="' + label + '">' + ICONS[k] + '</span>';
+                                '" data-icon="' + k + '" title="' + escAttr(label) + '">' + ICONS[k] + '</span>';
                         }).join('') +
                     '</div>' +
                 '</div>' +
                 (s.type === 'prompt' && !s.builtin ?
                 '<div class="aica-field">' +
-                    '<label>Conditional</label>' +
+                    '<label>' + escHtml(STR.conditional) + '</label>' +
                     '<select class="aica-f-conditional">' +
-                        '<option value=""' + (!s.conditional ? ' selected' : '') + '>Always shown</option>' +
-                        '<option value="tts"' + (s.conditional === 'tts' ? ' selected' : '') + '>Only when TTS enabled</option>' +
-                        '<option value="realtime"' + (s.conditional === 'realtime' ? ' selected' : '') + '>Only when Realtime enabled</option>' +
+                        '<option value=""' + (!s.conditional ? ' selected' : '') + '>' + escHtml(STR.cond_always) + '</option>' +
+                        '<option value="tts"' + (s.conditional === 'tts' ? ' selected' : '') + '>' +
+                            escHtml(STR.cond_tts) + '</option>' +
+                        '<option value="realtime"' + (s.conditional === 'realtime' ? ' selected' : '') + '>' +
+                            escHtml(STR.cond_realtime) + '</option>' +
                     '</select>' +
                 '</div>' : '') +
                 '<div class="aica-starter-actions">' +
-                    (!s.builtin ? '<button type="button" class="aica-btn-delete">Delete this starter</button>' : '<span style="font-size:12px;color:#6c757d;">Built-in starter (cannot be deleted)</span>') +
+                    (!s.builtin
+                        ? '<button type="button" class="aica-btn-delete">' + escHtml(STR.delete) + '</button>'
+                        : '<span style="font-size:12px;color:#6c757d;">' + escHtml(STR.builtin_note) + '</span>') +
                 '</div>' +
             '</div>';
 
@@ -283,7 +316,7 @@ echo $OUTPUT->header();
         var delBtn = card.querySelector('.aica-btn-delete');
         if (delBtn) {
             delBtn.addEventListener('click', function() {
-                if (confirm('Delete "' + starters[card.dataset.idx].name + '"?')) {
+                if (confirm(STR.confirm_delete.replace('{$a}', starters[card.dataset.idx].name))) {
                     starters.splice(card.dataset.idx, 1);
                     renderAll();
                 }
@@ -330,7 +363,7 @@ echo $OUTPUT->header();
 
     // Add new starter.
     document.getElementById('aica-add-starter').addEventListener('click', function() {
-        var name = 'New Starter';
+        var name = STR.new_name;
         starters.push({
             key: slug(name + '-' + Date.now()),
             name: name,
