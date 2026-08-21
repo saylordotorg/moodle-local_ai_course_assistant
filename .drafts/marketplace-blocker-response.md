@@ -58,21 +58,25 @@ variable is a string literal defined a few lines above, containing no request
 data, and every user-supplied value is bound through a `:named` placeholder.
 
 The clearest example is `token_analytics.php`. The variable the rule objects to
-is built like this:
+is built like this (quoted from v7.0.2, where it is at line 93; in the v7.0.1
+tag your scan ran against it is at line 90 and the `THEN` values are English
+display strings rather than slugs):
 
 ```php
 $categorysql = "CASE
-    WHEN m.interaction_type IN ('voice')                                 THEN 'Voice (Realtime)'
-    WHEN m.interaction_type IN ('openai_tts','xai_tts')                  THEN 'Voice (TTS)'
-    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt') THEN 'Voice (STT)'
-    WHEN m.interaction_type IN ('embedding','embed','rerank')            THEN 'RAG'
-    WHEN m.interaction_type IN ('meta')                                  THEN 'Analytics'
+    WHEN m.interaction_type IN ('voice')                                 THEN 'voice_realtime'
+    WHEN m.interaction_type IN ('openai_tts','xai_tts')                  THEN 'voice_tts'
+    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt') THEN 'voice_stt'
+    WHEN m.interaction_type IN ('embedding','embed','rerank')            THEN 'rag'
+    WHEN m.interaction_type IN ('meta')                                  THEN 'analytics'
     ...
 END";
 ```
 
-That is a fixed `CASE` expression used as a `GROUP BY` key. It is not derived
-from any parameter, and it cannot be influenced by a request. The same pattern
+That is a fixed `CASE` expression used as a `GROUP BY` key. Every `WHEN` and
+every `THEN` is a literal; no variable is interpolated into the string at any
+point. It is not derived from any parameter, and it cannot be influenced by a
+request. The same pattern
 covers `classes/analytics.php:508`, `:636`, `:722` and
 `classes/meta_ai_data_builder.php:133` — a `CASE` expression or a `WHERE`
 predicate assembled from constants, with the actual values bound:
@@ -150,7 +154,18 @@ Evidence gathered 2026-08-21 against the `v7.0.1` tag:
 - Line-existence check on all 9 SEC006 citations: 5 real SQL, 2 comments, 1
   blank line, 1 non-existent line. `meta_ai_data_builder.php` is 458 lines; the
   report cites 1380.
-- `$categorysql` verified as a literal `CASE` at `token_analytics.php:90`.
+- `$categorysql` verified as a literal `CASE` at `token_analytics.php:90` in
+  v7.0.1, and re-verified at `token_analytics.php:93` in v7.0.2 — the file grew
+  from 426 to 452 lines in the i18n extraction, so the line moved by 3. No
+  variable is interpolated into the string in either version.
+- **Re-checked all the other cited lines against v7.0.2 before sending:** every
+  `classes/analytics.php` citation (246, 260, 334, 508, 636, 722) and
+  `classes/meta_ai_data_builder.php:133` are byte-identical between the two tags,
+  and both files are unchanged in length (1,442 and 458 lines). So the
+  line-by-line table above holds whether the reviewer opens v7.0.1 or v7.0.2 —
+  worth knowing, because uploading v7.0.2 means they may well open the newer one.
+  `meta_ai_data_builder.php` is still 458 lines, so the cited line 1380 still
+  does not exist.
 - Token verification confirmed: `hash_equals` at `classes/email_optout.php:167`
   and `classes/digest_unsubscribe_token.php:76`, both with
   `hash_hmac('sha256', ...)` at `:203` and `:122` respectively.
