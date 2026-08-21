@@ -4,13 +4,19 @@ on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
     # A review run costs real money (~$2-3) and fans out across several
-    # subagents, so don't spend it on pushes that contain no reviewable code.
-    # Release branches here carry a lot of prose churn -- release notes, drafts,
-    # changelog -- and v7.0.2 burned roughly $9 across four runs triggered by
-    # documentation-only pushes, none of which had anything to review.
+    # subagents, so don't spend it on pull requests that contain no reviewable
+    # code. This repo opens plenty of prose-only PRs -- release notes, deploy
+    # requests, changelog updates -- and those now skip the review entirely.
     #
-    # A push touching only these paths skips the review entirely. A push that
-    # also touches code still gets reviewed in full.
+    # IMPORTANT, because this is easy to get wrong: for pull_request events
+    # GitHub evaluates these filters against the ENTIRE PR diff (base...head),
+    # not against the individual push that triggered the run. So this does NOT
+    # stop a doc-only push from re-reviewing a PR that also contains code --
+    # verified on PR #193, where a push touching only .drafts/*.md still
+    # triggered a full run. The only way to avoid that cost is to batch commits
+    # before pushing.
+    #
+    # What it does buy: a wholly-documentation PR is skipped outright.
     paths-ignore:
       - '.drafts/**'
       - '.wiki/**'
