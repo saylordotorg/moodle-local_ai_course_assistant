@@ -83,6 +83,16 @@ class voyage_embedding_provider extends base_embedding_provider {
     }
 
     /**
+     * Voyage's 4 series shares an embedding space, and embed_batch_typed() sends
+     * the query model on query calls, so a separate query model is honored here.
+     *
+     * @return bool
+     */
+    public function supports_query_model(): bool {
+        return true;
+    }
+
+    /**
      * Is the configured document model a contextualized-chunk model?
      *
      * These use a different endpoint and a different request shape: chunks

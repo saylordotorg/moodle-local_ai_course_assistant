@@ -110,17 +110,37 @@ abstract class base_embedding_provider {
     }
 
     /**
-     * Model used to embed queries.
+     * Can this provider embed queries with a different model from documents?
      *
-     * Equal to get_model() unless embed_query_model is set. Callers that need
-     * to know which space a query vector lives in — the retriever, when
-     * deciding whether a query may be scored against stored chunks — must use
-     * this rather than get_model().
+     * Only true where a shared embedding space actually exists and the adapter
+     * sends the query model on the query call. A provider that returns false
+     * ignores embed_query_model entirely, and get_query_model() reports the
+     * document model so callers are told what really produced the vector.
+     *
+     * @return bool
+     */
+    public function supports_query_model(): bool {
+        return false;
+    }
+
+    /**
+     * Model that actually produced the query vector.
+     *
+     * The retriever uses this to decide whether a query may be scored against a
+     * stored chunk, so it MUST name the model that did the embedding rather than
+     * whatever is configured. For a provider that ignores embed_query_model this
+     * is the document model.
+     *
+     * Returning the configured value unconditionally was a bug: with OpenAI
+     * selected, setting embed_query_model made the comparability check test a
+     * model that had embedded nothing, so every row was judged incomparable and
+     * retrieval returned nothing at all — while the query vector had in fact
+     * been produced by the ordinary document model and was perfectly usable.
      *
      * @return string
      */
     public function get_query_model(): string {
-        return $this->querymodel;
+        return $this->supports_query_model() ? $this->querymodel : $this->model;
     }
 
     /**

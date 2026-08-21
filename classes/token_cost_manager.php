@@ -83,6 +83,10 @@ class token_cost_manager {
         'voyage-4-lite'          => ['input' => 0.02, 'output' => 0.00],
         'voyage-4'               => ['input' => 0.06, 'output' => 0.00],
         'voyage-context-4'       => ['input' => 0.12, 'output' => 0.00],
+        // v7.0.3: was missing, so a site using it logged null cost while the
+        // token counts were right -- the same invisibility this block exists to
+        // prevent. Not relevant to course content, but a gap is a gap.
+        'voyage-code-4'          => ['input' => 0.12, 'output' => 0.00],
         'voyage-3.5-lite'        => ['input' => 0.02, 'output' => 0.00],
         'voyage-3.5'             => ['input' => 0.06, 'output' => 0.00],
         'voyage-3-large'         => ['input' => 0.18, 'output' => 0.00],
