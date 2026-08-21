@@ -312,12 +312,29 @@ $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
 // lower precision would occupy instead. Measured from the column rather than
 // estimated, because the index may contain a mixture of encodings while a
 // re-index is still in progress.
-$vectorbytes = (int) $DB->get_field_sql(
-    'SELECT COALESCE(SUM(' . $DB->sql_length('embedding_bin') . '), 0)
-       FROM {local_ai_course_assistant_chunks}
-      WHERE embedding_bin IS NOT NULL'
-);
+// Derived from the recorded encoding rather than measured with a SQL length
+// function. There is no portable byte-length across Moodle's supported
+// databases: sql_length() maps to CHAR_LENGTH() on MySQL and LENGTH() on
+// PostgreSQL, and SQL Server needs DATALENGTH() -- and applying a text-length
+// helper to a binary column is the wrong tool even where it happens to work.
+// Counting rows per encoding and multiplying is portable, and it stays correct
+// while an index holds a mixture of encodings mid-reindex.
 $rawdim = (int) get_config('local_ai_course_assistant', 'embed_dimensions');
+$vectorbytes = 0;
+if ($rawdim > 0) {
+    $bydtype = $DB->get_records_sql(
+        'SELECT COALESCE(embed_dtype, ?) AS dt, COUNT(*) AS n
+           FROM {local_ai_course_assistant_chunks}
+          WHERE embedding_bin IS NOT NULL
+       GROUP BY COALESCE(embed_dtype, ?)',
+        [\local_ai_course_assistant\embedding_compat::DTYPE_FLOAT,
+         \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT]
+    );
+    foreach ($bydtype as $row) {
+        $vectorbytes += (int) $row->n
+            * \local_ai_course_assistant\embedding_compat::vector_bytes($rawdim, (string) $row->dt);
+    }
+}
 $currentdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
     (string) get_config('local_ai_course_assistant', 'embed_dtype')
 );
