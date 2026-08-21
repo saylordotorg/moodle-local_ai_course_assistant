@@ -689,6 +689,8 @@ class rag_retriever {
      * a full course: max element error 0.0 and max cosine-score delta 0.0.
      *
      * @param array $vec
+     * @param string $dtype One of embedding_compat::DTYPES. Defaults to float so
+     *                      every pre-quantization caller keeps its behaviour.
      * @return string Binary blob.
      */
     public static function pack_vector(array $vec, string $dtype = 'float'): string {
@@ -847,9 +849,13 @@ class rag_retriever {
      * converted still read correctly. Once every row has a binary vector the
      * JSON column can be dropped in a later release.
      *
-     * @param string|null $bin Packed float32 blob, or null.
+     * @param string|null $bin Packed vector blob, or null.
      * @param string|null $json Legacy JSON array, or null.
-     * @return array Float vector, empty on failure.
+     * @param string $dtype How $bin is encoded; one of embedding_compat::DTYPES.
+     *                      Defaults to float, which is what every row written
+     *                      before the embed_dtype column contains.
+     * @return array Float vector, empty on failure and empty for binary — see
+     *               the note above on why binary is not expanded here.
      */
     public static function decode_vector(?string $bin, ?string $json, string $dtype = 'float'): array {
         $dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype($dtype);

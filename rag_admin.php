@@ -322,18 +322,29 @@ $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
 $rawdim = (int) get_config('local_ai_course_assistant', 'embed_dimensions');
 $vectorbytes = 0;
 if ($rawdim > 0) {
-    $bydtype = $DB->get_records_sql(
-        'SELECT COALESCE(embed_dtype, ?) AS dt, COUNT(*) AS n
+    // Group on the bare column, with no placeholder in the GROUP BY. Wrapping it
+    // in COALESCE(embed_dtype, ?) would be rejected by PostgreSQL: the two
+    // placeholders are distinct expression nodes, so GROUP BY COALESCE(col, $2)
+    // does not match SELECT COALESCE(col, $1) and the column is reported as
+    // neither grouped nor aggregated. Null is resolved in PHP instead, where
+    // normalize_dtype() already treats it as full precision.
+    //
+    // A recordset rather than get_records_sql(): the first column is the array
+    // key there, and a null dtype would key on the empty string and could
+    // collide with a literal empty value.
+    $rs = $DB->get_recordset_sql(
+        'SELECT embed_dtype, COUNT(*) AS n
            FROM {local_ai_course_assistant_chunks}
           WHERE embedding_bin IS NOT NULL
-       GROUP BY COALESCE(embed_dtype, ?)',
-        [\local_ai_course_assistant\embedding_compat::DTYPE_FLOAT,
-         \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT]
+       GROUP BY embed_dtype'
     );
-    foreach ($bydtype as $row) {
-        $vectorbytes += (int) $row->n
-            * \local_ai_course_assistant\embedding_compat::vector_bytes($rawdim, (string) $row->dt);
+    foreach ($rs as $row) {
+        $vectorbytes += (int) $row->n * \local_ai_course_assistant\embedding_compat::vector_bytes(
+            $rawdim,
+            \local_ai_course_assistant\embedding_compat::normalize_dtype($row->embed_dtype ?? null)
+        );
     }
+    $rs->close();
 }
 $currentdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
     (string) get_config('local_ai_course_assistant', 'embed_dtype')
