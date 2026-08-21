@@ -35,11 +35,12 @@ class plugin_updater {
      * @return object {version, release, component}
      */
     public static function get_current_version(): object {
-        // core_plugin_manager, not include(version.php): manually including a
-        // file that assigns into the local $plugin scope works but sidesteps
-        // Moodle's plugin API and re-parses the file on every call. versiondisk
-        // is what the shipped code declares; it falls back to versiondb for the
-        // window between a code deploy and the upgrade step running.
+        // Read through core_plugin_manager rather than manually pulling in the
+        // plugin's version metadata file. The old approach worked — that file
+        // assigns into a local $plugin scope — but it sidesteps Moodle's plugin
+        // API and re-parses the file on every call. versiondisk is what the
+        // shipped code declares; it falls back to versiondb for the window
+        // between a code deploy and the upgrade step running.
         $info = \core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
         $plugin = new \stdClass();
         $plugin->version = (int) ($info->versiondisk ?? $info->versiondb ?? 0);

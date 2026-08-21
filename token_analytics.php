@@ -45,8 +45,9 @@ $PAGE->set_url(new moodle_url(
     ['range' => $range, 'courseid' => $courseid]
 ));
 $PAGE->set_context($pagecontext);
-$PAGE->set_title('AI Course Assistant — Token Usage & Cost');
-$PAGE->set_heading('AI Course Assistant — Token Usage & Cost');
+$pagetitle = \local_ai_course_assistant\branding::str('token_analytics:title');
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($pagetitle);
 $PAGE->set_pagelayout($hassiteconfig ? 'admin' : 'report');
 
 // ── Query helpers ──────────────────────────────────────────────────────────────
@@ -77,26 +78,42 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // spend on student chat from voice/TTS/STT from RAG embeddings from the
 // Learning Radar admin chat.
 //
-// Mapping:
-// chat, quiz, <empty>           -> Chat
-// voice                         -> Voice (Realtime)
-// openai_tts, xai_tts           -> Voice (TTS)
+// Mapping (the CASE yields a stable slug; the slug is turned into a
+// display label by $categorylabels below, so the label is translatable
+// and the grouping key never changes with the viewer's language):
+// chat, quiz, <empty>           -> chat
+// voice                         -> voice_realtime
+// openai_tts, xai_tts           -> voice_tts
 // openai_whisper, openai_stt,
-// xai_stt                       -> Voice (STT)
-// embedding, embed              -> RAG
-// meta                          -> Analytics
-// anything else                 -> Other
+// xai_stt                       -> voice_stt
+// embedding, embed              -> rag
+// meta                          -> analytics
+// anything else                 -> other
 
 $categorysql = "CASE
-    WHEN m.interaction_type IN ('voice')                                    THEN 'Voice (Realtime)'
-    WHEN m.interaction_type IN ('openai_tts','xai_tts')                     THEN 'Voice (TTS)'
-    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt')    THEN 'Voice (STT)'
-    WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'RAG'
-    WHEN m.interaction_type IN ('meta')                                     THEN 'Analytics'
-    WHEN m.interaction_type IN ('premium_route')                            THEN 'Premium routing (escalation decisions)'
-    WHEN m.interaction_type IN ('chat','quiz') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'Chat'
-    ELSE 'Other'
+    WHEN m.interaction_type IN ('voice')                                    THEN 'voice_realtime'
+    WHEN m.interaction_type IN ('openai_tts','xai_tts')                     THEN 'voice_tts'
+    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt')    THEN 'voice_stt'
+    WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'
+    WHEN m.interaction_type IN ('meta')                                     THEN 'analytics'
+    WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
+    WHEN m.interaction_type IN ('chat','quiz') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'
+    ELSE 'other'
 END";
+
+// Slug -> display label. The single-word Chat and RAG labels reuse the
+// already-translated strings from the kill-switch panel rather than adding
+// two more English-only keys that say exactly the same thing.
+$categorylabels = [
+    'chat'           => get_string('emergency:flag_chat', 'local_ai_course_assistant'),
+    'voice_realtime' => get_string('token_analytics:cat_voice_realtime', 'local_ai_course_assistant'),
+    'voice_tts'      => get_string('token_analytics:cat_voice_tts', 'local_ai_course_assistant'),
+    'voice_stt'      => get_string('token_analytics:cat_voice_stt', 'local_ai_course_assistant'),
+    'rag'            => get_string('emergency:flag_rag', 'local_ai_course_assistant'),
+    'analytics'      => get_string('token_analytics:cat_analytics', 'local_ai_course_assistant'),
+    'premium_route'  => get_string('token_analytics:cat_premium_route', 'local_ai_course_assistant'),
+    'other'          => get_string('token_analytics:cat_other', 'local_ai_course_assistant'),
+];
 
 // v6.1.0: this breakdown includes role='system' cost-log rows (embedding,
 // rerank) and premium_route decision rows — previously the role='assistant'
@@ -124,7 +141,7 @@ foreach ($bycategory as $row) {
     // that category. Cheap estimate; the per-model table below is authoritative.
     $rowtokens = (int) $row->total_prompt + (int) $row->total_completion;
     $bycategoryrows[] = [
-        'category'          => $row->category,
+        'category'          => $categorylabels[$row->category] ?? $row->category,
         'response_count'    => number_format((int) $row->response_count),
         'prompt_tokens'     => number_format((int) $row->total_prompt),
         'completion_tokens' => number_format((int) $row->total_completion),
@@ -242,7 +259,11 @@ $courses = $DB->get_records_sql(
       WHERE m.role = 'assistant'
       ORDER BY c.shortname"
 );
-$courseoptions = [['id' => 0, 'name' => 'All courses', 'selected' => ($courseid === 0)]];
+$courseoptions = [[
+    'id' => 0,
+    'name' => get_string('token_analytics:all_courses', 'local_ai_course_assistant'),
+    'selected' => ($courseid === 0),
+]];
 foreach ($courses as $c) {
     $courseoptions[] = [
         'id'       => (int) $c->id,
@@ -280,7 +301,9 @@ foreach (\local_ai_course_assistant\spend_guard::status_rows() as $row) {
     $spendstatus[] = [
         'label'        => $row['label'],
         'spent_fmt'    => \local_ai_course_assistant\token_cost_manager::format_cost($spent),
-        'cap_fmt'      => $cap > 0 ? \local_ai_course_assistant\token_cost_manager::format_cost($cap) : 'unlimited',
+        'cap_fmt'      => $cap > 0
+            ? \local_ai_course_assistant\token_cost_manager::format_cost($cap)
+            : get_string('token_analytics:cap_unlimited', 'local_ai_course_assistant'),
         'pct'          => $pctnum,
         'color'        => $color,
         'cap_is_set'   => $cap > 0,
@@ -296,22 +319,23 @@ foreach ($optimizerdata['capabilities'] as $cap) {
     foreach ($toprecs as $i => $r) {
         $satstr = $r['satisfaction'] !== null
             ? sprintf('%d%%', (int) round($r['satisfaction'] * 100))
-            : 'n/a';
-        $ranklines[] = sprintf(
-            '%d. %s (%s) — %s/req, satisfaction %s, %d samples (%s confidence)',
-            $i + 1,
-            htmlspecialchars($r['provider']),
-            htmlspecialchars($r['model']),
-            \local_ai_course_assistant\token_cost_manager::format_cost($r['cost_per_request']),
-            $satstr,
-            $r['sample'],
-            $r['confidence']
-        );
+            : get_string('prompt_playground:score_na', 'local_ai_course_assistant');
+        $ranklines[] = get_string('token_analytics:opt_rank_line', 'local_ai_course_assistant', [
+            'rank'         => $i + 1,
+            'provider'     => htmlspecialchars($r['provider']),
+            'model'        => htmlspecialchars($r['model']),
+            'cost'         => \local_ai_course_assistant\token_cost_manager::format_cost($r['cost_per_request']),
+            'satisfaction' => $satstr,
+            'samples'      => $r['sample'],
+            'confidence'   => $r['confidence'],
+        ]);
     }
     $optrows[] = [
         'capability' => ucfirst($cap['capability']),
         'active'     => htmlspecialchars($cap['active']),
-        'rankings_html' => $ranklines ? implode('<br>', $ranklines) : '<em>Not enough data yet — need at least 30 messages of this capability in the last 30 days.</em>',
+        'rankings_html' => $ranklines
+            ? implode('<br>', $ranklines)
+            : '<em>' . get_string('token_analytics:opt_no_data', 'local_ai_course_assistant') . '</em>',
         'has_data'   => !empty($ranklines),
     ];
 }
@@ -319,7 +343,7 @@ foreach ($optimizerdata['capabilities'] as $cap) {
 $projection = [
     'amount'     => $optimizerdata['projected_monthly'] > 0
         ? \local_ai_course_assistant\token_cost_manager::format_cost($optimizerdata['projected_monthly'])
-        : 'Not enough data yet',
+        : get_string('token_analytics:opt_no_projection', 'local_ai_course_assistant'),
     'confidence' => $optimizerdata['projection_confidence'],
     'days'       => $optimizerdata['projection_days'],
 ];
@@ -354,7 +378,9 @@ $templatedata = [
     'grand_total_tokens' => number_format($grandtotal),
     'grand_cost'         => $grandcost > 0
                                 ? token_cost_manager::format_cost($grandcost)
-                                : ($grandtotal > 0 ? 'Unknown model' : '—'),
+                                : ($grandtotal > 0
+                                    ? get_string('token_analytics:unknown_model', 'local_ai_course_assistant')
+                                    : '—'),
     'spend_status'       => $spendstatus,
     'has_spend_status'   => !empty($spendstatus),
     'spend_period_label' => \local_ai_course_assistant\spend_guard::period_label(),

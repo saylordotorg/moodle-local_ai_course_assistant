@@ -43,9 +43,10 @@ use local_ai_course_assistant\branding;
 
 $token = optional_param('token', '', PARAM_RAW_TRIMMED);
 // RFC 8058 also lets clients POST `List-Unsubscribe=One-Click` to the same URL.
-// Recognise either method; we don't care which one we got. Read through
-// optional_param rather than $_POST so the value goes through clean_param
-// like every other input: PARAM_ALPHAEXT covers the literal we compare to.
+// Recognize either method; we don't care which one we got. Read through
+// optional_param rather than the raw request superglobal so the value goes
+// through clean_param like every other input: PARAM_ALPHAEXT covers the
+// literal we compare to.
 $isoneclick = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
     && optional_param('List-Unsubscribe', '', PARAM_ALPHAEXT) === 'One-Click';
 

@@ -90,8 +90,9 @@ $PAGE->set_url(new moodle_url(
     ['courseid' => $courseid, 'range' => $range]
 ));
 $PAGE->set_context($syscontext);
-$PAGE->set_title('AI Course Assistant Analytics');
-$PAGE->set_heading('AI Course Assistant Analytics');
+$analyticstitle = get_string('analytics:title', 'local_ai_course_assistant');
+$PAGE->set_title($analyticstitle);
+$PAGE->set_heading($analyticstitle);
 $PAGE->set_pagelayout('admin');
 
 $since = $range > 0 ? time() - ($range * 86400) : 0;
@@ -519,7 +520,7 @@ $templatedata = [
         $configmodel = get_config('local_ai_course_assistant', 'model') ?: '';
         $providers[] = [
             'id' => $configprovider,
-            'label' => ucfirst($configprovider) . ' (primary)',
+            'label' => get_string('analytics:provider_primary', 'local_ai_course_assistant', ucfirst($configprovider)),
             'models_json' => json_encode($configmodel ? [$configmodel] : []),
         ];
         $seen = [$configprovider => true];
@@ -568,8 +569,8 @@ $templatedata = [
         $toktotal = \local_ai_course_assistant\analytics::get_total_tokens(0, $since30);
         $chips[] = [
             'value' => number_format($toktotal),
-            'label' => 'Tokens (30d)',
-            'query' => 'Break down token spend by provider and course for the last 30 days.',
+            'label' => get_string('analytics:chip_tokens_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:chip_tokens_query', 'local_ai_course_assistant'),
         ];
 
         // Top-cost course (30d). Deliberately still role='assistant': this chip
@@ -590,10 +591,14 @@ $templatedata = [
         );
         $chips[] = [
             'value' => $topcourse ? format_string($topcourse->shortname) : '—',
-            'label' => 'Top-cost course (30d)',
+            'label' => get_string('analytics:chip_topcourse_label', 'local_ai_course_assistant'),
             'query' => $topcourse
-                ? 'Why is course ' . $topcourse->shortname . ' the top token consumer this month?'
-                : 'Which courses are using the most tokens recently?',
+                ? get_string(
+                    'analytics:chip_topcourse_query',
+                    'local_ai_course_assistant',
+                    $topcourse->shortname
+                )
+                : get_string('analytics:chip_topcourse_query_empty', 'local_ai_course_assistant'),
         ];
 
         // Active students this week.
@@ -605,8 +610,8 @@ $templatedata = [
         ) ?: 0;
         $chips[] = [
             'value' => number_format($activeusers),
-            'label' => 'Active students (7d)',
-            'query' => 'Profile the active students this week: which topics are they asking about?',
+            'label' => get_string('analytics:chip_activestudents_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:chip_activestudents_query', 'local_ai_course_assistant'),
         ];
 
         // Voice minutes (30d). Approximate via interaction_type=voice row count
@@ -618,8 +623,8 @@ $templatedata = [
         ) ?: 0;
         $chips[] = [
             'value' => number_format((int) ceil($voicemsgs * 0.5)),
-            'label' => 'Voice minutes (30d)',
-            'query' => 'Which courses and topics are students using voice mode for?',
+            'label' => get_string('analytics:chip_voiceminutes_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:chip_voiceminutes_query', 'local_ai_course_assistant'),
         ];
 
         // Lowest-rated responses (7d).
@@ -630,8 +635,8 @@ $templatedata = [
         ) ?: 0;
         $chips[] = [
             'value' => number_format($neg),
-            'label' => 'Negative ratings (7d)',
-            'query' => 'Summarise the lowest-rated responses from the last week. What patterns explain them?',
+            'label' => get_string('analytics:chip_negratings_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:chip_negratings_query', 'local_ai_course_assistant'),
         ];
 
         // Integrity flags open.
@@ -647,8 +652,8 @@ $templatedata = [
         }
         $chips[] = [
             'value' => number_format($flags),
-            'label' => 'Integrity flags (open)',
-            'query' => 'What types of academic integrity concerns are flagged and how should I respond?',
+            'label' => get_string('analytics:chip_integrity_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:chip_integrity_query', 'local_ai_course_assistant'),
         ];
 
         return $chips;
@@ -658,22 +663,38 @@ $templatedata = [
     // before any data-derived metric chips. Helps admins discover what
     // Learning Radar can answer without staring at a blank input.
     'learning_radar_starters' => [
-        ['label' => 'Top topics students struggle with',
-         'query' => 'Which topics have the highest off-topic rate or generate the most clarification requests across all courses?'],
-        ['label' => 'Best provider per dollar',
-         'query' => 'Compare cost-per-helpful-answer across providers using rating signal as the helpful proxy. Which provider gives the best satisfaction per dollar this month?'],
-        ['label' => 'Where students bounce',
-         'query' => 'Identify courses where conversation drop-off is highest after the first 2 turns. What pattern explains the drop?'],
-        ['label' => 'Most-frustrated students',
-         'query' => 'Find anonymized students whose recent feedback shifted from positive to negative this week. What triggered the change?'],
-        ['label' => 'Courses ready for instructor review',
-         'query' => 'Which courses have accumulated the most negative ratings or integrity flags this period and would benefit from instructional designer review?'],
-        ['label' => 'Trending questions',
-         'query' => 'List the 10 most frequently asked questions this week, and how SOLA answered them on average.'],
-        ['label' => 'Voice mode breakdown',
-         'query' => 'Profile voice mode usage: which courses, which topics, and what is the average session length?'],
-        ['label' => 'Quiet courses',
-         'query' => 'Which courses have SOLA enabled but very low engagement? What might be missing in those courses to drive more use?'],
+        [
+            'label' => get_string('analytics:radar_starter_topics_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:radar_starter_topics_query', 'local_ai_course_assistant'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_provider_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:radar_starter_provider_query', 'local_ai_course_assistant'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_bounce_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:radar_starter_bounce_query', 'local_ai_course_assistant'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_frustrated_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:radar_starter_frustrated_query', 'local_ai_course_assistant'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_review_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:radar_starter_review_query', 'local_ai_course_assistant'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_trending_label', 'local_ai_course_assistant'),
+            'query' => \local_ai_course_assistant\branding::str('analytics:radar_starter_trending_query'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_voice_label', 'local_ai_course_assistant'),
+            'query' => get_string('analytics:radar_starter_voice_query', 'local_ai_course_assistant'),
+        ],
+        [
+            'label' => get_string('analytics:radar_starter_quiet_label', 'local_ai_course_assistant'),
+            'query' => \local_ai_course_assistant\branding::str('analytics:radar_starter_quiet_query'),
+        ],
     ],
 
     // LLM provider list reused by the schedule modal and compare mode.
@@ -681,8 +702,11 @@ $templatedata = [
         $providers = [];
         $configprovider = get_config('local_ai_course_assistant', 'provider') ?: 'openai';
         $configmodel = get_config('local_ai_course_assistant', 'model') ?: '';
-        $providers[] = ['id' => $configprovider, 'label' => ucfirst($configprovider) . ' (primary)',
-            'models' => $configmodel ? [$configmodel] : []];
+        $providers[] = [
+            'id' => $configprovider,
+            'label' => get_string('analytics:provider_primary', 'local_ai_course_assistant', ucfirst($configprovider)),
+            'models' => $configmodel ? [$configmodel] : [],
+        ];
         $seen = [$configprovider => true];
         $compraw = get_config('local_ai_course_assistant', 'comparison_providers') ?: '';
         foreach (explode("\n", $compraw) as $line) {

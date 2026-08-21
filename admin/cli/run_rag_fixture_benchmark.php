@@ -158,10 +158,10 @@ if ($fixturespath === '') {
     $fixturespath = __DIR__ . '/../../' . $fixturespath;
 }
 
-// Run artefacts go to dataroot, never into the plugin directory: dirroot is
-// web-accessible and must be treated as read-only at runtime. make_writable_
-// directory() is the Moodle API for this and applies the correct permissions,
-// so the bare mkdir(0775) this used to do is gone.
+// Run artifacts go to dataroot, never into the plugin directory: dirroot is
+// web-accessible and must be treated as read-only at runtime.
+// make_writable_directory() is the Moodle API for this and applies the correct
+// permissions, so the bare 0775 directory creation this used to do is gone.
 if ($outfile === '') {
     $outdir = make_writable_directory($CFG->dataroot . '/local_ai_course_assistant/runs');
     $outfile = $outdir . '/' . date('Y-m-d-His') . '-rag-bench.json';
@@ -1025,8 +1025,9 @@ function local_ai_course_assistant_ragbench_judge_passages(string $question, arr
         'temperature' => 0,
     ]);
     for ($attempt = 0; $attempt < 4; $attempt++) {
-        // Moodle's \curl wrapper, not curl_init: it honours the site proxy
-        // settings and the SSRF allowlist that a raw handle bypasses.
+        // Moodle's \curl wrapper rather than a raw cURL handle: the wrapper
+        // honors the site proxy settings and the SSRF allowlist that a
+        // hand-built handle bypasses.
         $curl = new \curl();
         $curl->setHeader(['Content-Type: application/json', 'Authorization: Bearer ' . $apikey]);
         $resp = $curl->post(

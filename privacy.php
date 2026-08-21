@@ -33,8 +33,9 @@ require_login();
 
 $PAGE->set_url('/local/ai_course_assistant/privacy.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title(branding::display_name() . ' Privacy Notice');
-$PAGE->set_heading(branding::display_name() . ' Privacy Notice');
+$privacytitle = get_string('privacy:title', 'local_ai_course_assistant', branding::display_name());
+$PAGE->set_title($privacytitle);
+$PAGE->set_heading($privacytitle);
 
 echo $OUTPUT->header();
 

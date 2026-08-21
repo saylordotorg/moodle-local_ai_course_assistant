@@ -1,0 +1,56 @@
+The AI Course Assistant (also known as the Saylor Online Learning Assistant or SOLA) is an AI-powered learning coach embedded directly in Moodle course pages. Students open it from a side tab to get context-aware help grounded in the course they are studying and the page they are viewing, all without leaving Moodle.
+
+Developed at Saylor University and open-sourced under the GNU GPL v3 with simple white-labeling for other institutions (see below). Used in production on Saylor's Learn and Degrees sites.
+
+Works with Moodle 4.5 through Moodle 5.3 LTS.
+
+Available in 46 languages. The learner interface is fully localized, and so are the conversation starters and the speech input and output. The assistant also detects the language a learner writes in and replies in it, so a student can ask about an English-language course in their own language and read the answer in their own language. No separate configuration is needed; detection is automatic and per-message.
+
+Out of the box it can use Moodle's own AI provider (the core_ai subsystem). The shipped chat provider setting is "Auto", which resolves at call time: if you have entered an API key of your own, SOLA uses that provider; if you have not, and a Moodle AI provider is configured at Site administration > AI, it routes through core_ai instead. So the plugin can be installed and used without holding a separate API key. Choosing a specific provider from the dropdown overrides Auto entirely.
+
+WHAT STUDENTS GET
+
+- A tutor that knows the course. Answers are grounded in the actual course content, pages, books, files and activities, not generic web knowledge. Optional semantic retrieval indexes PDF, DOCX, PPTX, H5P and SCORM content, plus transcripts for embedded video.
+
+- Practice quizzes generated from course material, answered inside the drawer, with per-question feedback and a score summary.
+
+- Study plans and reminders. Learners set goals and preferred study days; optional email reminders respect their schedule and their opt-out.
+
+- Voice. Speech input and spoken responses, plus an optional live conversational voice mode. Speech-to-text can run on a self-hosted Whisper server at no per-minute cost. Speech recognition and playback cover the same 46 languages as the interface.
+
+- Spoken presentation practice. Learners record a talk, get it transcribed, and receive rubric-based feedback with per-criterion scores. Audio is deleted on a retention schedule; only the transcript and score are kept.
+
+- 46 languages with automatic detection, including speech input and output.
+
+WHAT ADMINISTRATORS GET
+
+- White-labeling. Four admin settings rename the product throughout the learner interface, the system prompt, emails and the admin pages. The plugin does not assume it is called SOLA.
+
+- Provider choice, not lock-in. Moodle core_ai, OpenAI, Anthropic, Google Gemini, DeepSeek, Together AI, Mistral, xAI, OpenRouter, and any OpenAI-compatible endpoint, including models you host yourself.
+
+- Spend controls that actually stop spending. Caps per period, per capability and per course, with notification at 80/95/100 percent, an optional failover chain to cheaper providers, a daily cost-anomaly check, and a site-wide kill switch reachable from both the admin UI and the CLI.
+
+- Per-course configuration. Any course can override the provider, model, system prompt and feature set, so one course can run a different model from the rest of the site.
+
+- Analytics. Usage, token cost, provider comparison and per-course engagement, with an A/B comparison view for running experiments across two courses.
+
+- A settings page that stays readable. Feature configuration stays hidden until the feature is switched on, so a default install shows the switches rather than 200+ controls.
+
+PRIVACY AND DATA PROTECTION
+
+- Full Moodle Privacy API implementation, including export and erasure, with external-location links declared for every third-party service the plugin can call.
+
+- A first-run consent notice the learner must scroll before accepting, gating any escalation of their conversation to a human support desk.
+
+- Configurable retention for conversations and audit records; presentation recordings are deleted automatically on a schedule of your choosing.
+
+- Per-recipient email opt-out honored across every message type the plugin sends.
+
+- Outbound requests are checked against Moodle's SSRF allowlist, with the resolved address pinned to close the DNS-rebinding window.
+
+REQUIREMENTS
+
+Moodle 4.5 or later, including Moodle 5.3 LTS. Either a configured Moodle core_ai provider or an API key for at least one AI provider. No other server dependencies are required for the core experience; optional features note their own requirements in the settings page.
+
+Source, issue tracker and release notes:
+https://github.com/saylordotorg/moodle-local_ai_course_assistant

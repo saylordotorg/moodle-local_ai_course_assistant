@@ -208,7 +208,14 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
 ## CI and GitHub automation
 
 - **Claude code review triggers on pull requests, not releases.** `.github/workflows/claude-code-review.yml` runs `/code-review` automatically on every PR (opened / synchronize / reopened / ready_for_review); `.github/workflows/claude.yml` runs Claude whenever a comment or issue body contains `@claude`. No tag or release is involved — to get a review, open a PR (or comment `@claude`).
-- **Both workflows need write scope to post their output.** They originally shipped with a read-only `GITHUB_TOKEN` (`pull-requests: read`), so the review job ran and reported success but posted nothing — the job log showed `permission_denials_count` and `No buffered inline comments`. Fixed in **PR #108 (2026-07-03)** by granting `pull-requests: write` + `issues: write` in both files; verified by PR #109. If Claude reviews or `@claude` replies ever stop appearing, check these workflow permissions first.
+- **A review that posts nothing still reports `success`.** There are now three distinct causes for that one symptom, so check them in this order rather than assuming the first. All three log `No buffered inline comments`, and the job goes green in every case.
+  1. **The workflow file differs from the copy on `main`.** The action hard-refuses with *"Workflow validation failed. The workflow file must exist and have identical content to the version on the repository's default branch"* and skips without reviewing. This means **a PR that edits `claude-code-review.yml` can never test its own change** — the fix only takes effect on the next PR after it merges. Seen on PR #192.
+  2. **Missing tool permissions.** `permission_denials_count` is non-zero in the result JSON. `/code-review` fans the work out across Haiku/Sonnet/Opus subagents, so it needs `Task` plus `Read`/`Grep`/`Glob` for those subagents — none of which its own frontmatter declares, and the action grants nothing by default. Fixed in **PR #192** via `claude_args: --allowedTools`. Before that fix the v7.0.1 review billed $3.42 across nine turns, hit 21 denials and posted nothing.
+  3. **Read-only `GITHUB_TOKEN`** (`pull-requests: read`) — the original bug, fixed in **PR #108 (2026-07-03)** by granting `pull-requests: write` + `issues: write` in both files; verified by PR #109.
+
+  To tell 2 from 3: the job log prints a `GITHUB_TOKEN Permissions` block under *Set up job*. If it shows `PullRequests: write` and `Issues: write`, posting was possible and the problem is tool permissions, not API scope.
+
+  When granting tools, keep `Bash` scoped per `gh` subcommand and never grant `Edit`/`Write`. `pull_request` runs check out an untrusted head, so a blanket `Bash` grant would let a contributor's branch run arbitrary commands holding a `pull-requests: write` token.
 
 ---
 

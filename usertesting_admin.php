@@ -38,12 +38,12 @@ $coursename = '';
 if ($courseid > 0) {
     $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
     $coursename = $course->fullname;
-    $PAGE->set_title('Usability Testing Editor: ' . $coursename);
-    $PAGE->set_heading('Usability Testing Editor: ' . $coursename);
+    $pagetitle = get_string('usertesting_admin:title_course', 'local_ai_course_assistant', $coursename);
 } else {
-    $PAGE->set_title('Usability Testing Editor: Global Default');
-    $PAGE->set_heading('Usability Testing Editor: Global Default');
+    $pagetitle = get_string('usertesting_admin:title_global', 'local_ai_course_assistant');
 }
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($pagetitle);
 
 // Handle POST.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $externalurl = optional_param('external_url', '', PARAM_URL);
 
         if (!is_array($tasks) || empty($tasks)) {
-            \core\notification::error('Tasks data is invalid or empty.');
+            \core\notification::error(get_string('usertesting_admin:err_invalid_tasks', 'local_ai_course_assistant'));
             redirect($PAGE->url);
         }
 
@@ -107,17 +107,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($clean)) {
-            \core\notification::error('No valid tasks after cleaning.');
+            \core\notification::error(get_string('usertesting_admin:err_no_tasks', 'local_ai_course_assistant'));
             redirect($PAGE->url);
         }
 
         $existing = usertesting_manager::get_active_taskset($courseid);
         if ($existing && (int) $existing->courseid === $courseid) {
             usertesting_manager::update_taskset((int) $existing->id, $title, $clean, $externalurl, true);
-            \core\notification::success('Task set updated.');
+            \core\notification::success(get_string('usertesting_admin:saved_updated', 'local_ai_course_assistant'));
         } else {
             usertesting_manager::create_taskset($courseid, $title, $clean, $externalurl);
-            \core\notification::success('Task set created.');
+            \core\notification::success(get_string('usertesting_admin:saved_created', 'local_ai_course_assistant'));
         }
         redirect($PAGE->url);
     }
@@ -128,14 +128,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($existing as $s) {
                 $DB->delete_records('local_ai_course_assistant_ut_tasks', ['id' => $s->id]);
             }
-            \core\notification::success('Course tasks removed. The global default will be used.');
+            \core\notification::success(get_string('usertesting_admin:reset_course_done', 'local_ai_course_assistant'));
         } else {
             $existing = $DB->get_records('local_ai_course_assistant_ut_tasks', ['courseid' => 0]);
             foreach ($existing as $s) {
                 $DB->delete_records('local_ai_course_assistant_ut_tasks', ['id' => $s->id]);
             }
             usertesting_manager::ensure_default_taskset();
-            \core\notification::success('Global tasks reset to defaults.');
+            \core\notification::success(get_string('usertesting_admin:reset_global_done', 'local_ai_course_assistant'));
         }
         redirect($PAGE->url);
     }
@@ -154,6 +154,55 @@ $courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname FROM {course} c WHERE c.id > 1 AND c.visible = 1 ORDER BY c.fullname ASC"
 );
 
+// Labels for the task-card editor the browser builds below. Same shape as the
+// rubric editor: one bundle handed to the inline script as JSON. The
+// multiple-choice type label is shared with the survey editor rather than
+// duplicated, since it is the same word for the same concept.
+$jsstrings = [
+    'typeactionrate'      => get_string('usertesting_admin:type_action_then_rate', 'local_ai_course_assistant'),
+    'typemultiplechoice'  => get_string('survey_admin:type_multiple_choice', 'local_ai_course_assistant'),
+    'typefreeresponse'    => get_string('usertesting_admin:type_free_response', 'local_ai_course_assistant'),
+    'moveup'              => get_string('rubric_admin:move_up', 'local_ai_course_assistant'),
+    'movedown'            => get_string('rubric_admin:move_down', 'local_ai_course_assistant'),
+    'deletetask'          => get_string('usertesting_admin:delete_task', 'local_ai_course_assistant'),
+    'confirmdelete'       => get_string('usertesting_admin:confirm_delete_task', 'local_ai_course_assistant'),
+    'tasktype'            => get_string('usertesting_admin:task_type', 'local_ai_course_assistant'),
+    'instruction'         => get_string('usertesting_admin:task_instruction', 'local_ai_course_assistant'),
+    'ratinglabel'         => get_string('usertesting_admin:rating_label', 'local_ai_course_assistant'),
+    'minvalue'            => get_string('usertesting_admin:min_value', 'local_ai_course_assistant'),
+    'minvaluearia'        => get_string('usertesting_admin:min_value_aria', 'local_ai_course_assistant'),
+    'maxvalue'            => get_string('usertesting_admin:max_value', 'local_ai_course_assistant'),
+    'maxvaluearia'        => get_string('usertesting_admin:max_value_aria', 'local_ai_course_assistant'),
+    'minlabel'            => get_string('usertesting_admin:min_label', 'local_ai_course_assistant'),
+    'minlabelplaceholder' => get_string('usertesting_admin:min_label_placeholder', 'local_ai_course_assistant'),
+    'maxlabel'            => get_string('usertesting_admin:max_label', 'local_ai_course_assistant'),
+    'maxlabelplaceholder' => get_string('usertesting_admin:max_label_placeholder', 'local_ai_course_assistant'),
+    'followup'            => get_string('usertesting_admin:follow_up', 'local_ai_course_assistant'),
+    'followuparia'        => get_string('usertesting_admin:follow_up_aria', 'local_ai_course_assistant'),
+    'options'             => get_string('survey_admin:options', 'local_ai_course_assistant'),
+    'optionn'             => get_string('survey_admin:option_n', 'local_ai_course_assistant', '{n}'),
+    'addoption'           => get_string('survey_admin:add_option', 'local_ai_course_assistant'),
+    'addprompt'           => get_string('usertesting_admin:additional_prompt', 'local_ai_course_assistant'),
+    'addpromptaria'       => get_string('usertesting_admin:additional_prompt_aria', 'local_ai_course_assistant'),
+    'confirmreset'        => $courseid > 0
+        ? get_string('usertesting_admin:confirm_reset_course', 'local_ai_course_assistant')
+        : get_string('usertesting_admin:confirm_reset_global', 'local_ai_course_assistant'),
+    'previewtitle'        => get_string('usertesting_admin:preview_title', 'local_ai_course_assistant'),
+    'previewtasklabel'    => get_string('usertesting_admin:preview_task_label', 'local_ai_course_assistant', [
+        'num' => '{n}',
+        'type' => '{t}',
+    ]),
+    'previewnoinstruction' => get_string('usertesting_admin:preview_no_instruction', 'local_ai_course_assistant'),
+    'previewratefallback'  => get_string('usertesting_admin:preview_rate_fallback', 'local_ai_course_assistant'),
+    'previewraterange'     => get_string('usertesting_admin:preview_rate_range', 'local_ai_course_assistant', [
+        'label' => '{l}',
+        'min' => '{min}',
+        'max' => '{max}',
+    ]),
+    'previewfollowup'      => get_string('usertesting_admin:preview_follow_up', 'local_ai_course_assistant', '{t}'),
+    'previewclose'         => get_string('rubric_admin:preview_close', 'local_ai_course_assistant'),
+];
+
 echo $OUTPUT->header();
 ?>
 
@@ -162,19 +211,19 @@ echo $OUTPUT->header();
 
     <div class="mb-3 d-flex flex-wrap" style="gap:8px">
         <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
+           class="btn btn-sm btn-outline-secondary">&larr; <?php echo get_string('courses_admin:plugin_settings', 'local_ai_course_assistant'); ?></a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">Analytics Dashboard</a>
+           class="btn btn-sm btn-outline-secondary"><?php echo get_string('rubric_admin:analytics_link', 'local_ai_course_assistant'); ?></a>
     </div>
 
     <!-- Scope selector -->
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" action="<?php echo $PAGE->url->out_omit_querystring(); ?>" class="form-inline" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <label for="aica-ut-scope" style="font-weight:600;white-space:nowrap">Editing tasks for:</label>
+                <label for="aica-ut-scope" style="font-weight:600;white-space:nowrap"><?php echo get_string('usertesting_admin:scope_label', 'local_ai_course_assistant'); ?></label>
                 <select id="aica-ut-scope" name="courseid" class="form-control form-control-sm" style="max-width:350px"
                         onchange="this.form.submit()">
-                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>>Global Default (all courses)</option>
+                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>><?php echo get_string('rubric_admin:scope_global', 'local_ai_course_assistant'); ?></option>
                     <?php foreach ($courses as $c) : ?>
                     <option value="<?php echo $c->id; ?>" <?php echo (int) $c->id === $courseid ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($c->fullname); ?> (<?php echo htmlspecialchars($c->shortname); ?>)
@@ -187,7 +236,7 @@ echo $OUTPUT->header();
 
     <?php if ($is_inherited) : ?>
     <div class="aica-ut-inherited-badge">
-        This course has no custom task set. Showing the global default. Edit below to create a course-specific override.
+        <?php echo get_string('usertesting_admin:inherited_notice', 'local_ai_course_assistant'); ?>
     </div>
     <?php endif; ?>
 
@@ -197,33 +246,35 @@ echo $OUTPUT->header();
         <input type="hidden" name="tasks_json" id="aica-tasks-json" value="">
 
         <div class="aica-ut-field mb-3">
-            <label for="aica-ut-title">Task Set Title</label>
+            <label for="aica-ut-title"><?php echo get_string('usertesting_admin:taskset_title', 'local_ai_course_assistant'); ?></label>
             <input type="text" id="aica-ut-title" name="taskset_title"
                    value="<?php echo htmlspecialchars($title); ?>"
-                   placeholder="e.g. SOLA Usability Test Round 1">
+                   placeholder="<?php echo htmlspecialchars(
+                       \local_ai_course_assistant\branding::str('usertesting_admin:taskset_title_placeholder')
+                   ); ?>">
         </div>
 
         <div class="aica-ut-field mb-3">
-            <label for="aica-ut-exturl">External Form URL (Option C, optional)</label>
+            <label for="aica-ut-exturl"><?php echo get_string('usertesting_admin:external_url', 'local_ai_course_assistant'); ?></label>
             <input type="url" id="aica-ut-exturl" name="external_url"
                    value="<?php echo htmlspecialchars($externalurl); ?>"
                    placeholder="e.g. https://forms.google.com/d/e/xxx/viewform?entry.1={{userid}}&entry.2={{courseid}}">
             <small style="color:#94a3b8;font-size:11px">
-                Placeholders: <code>{{userid}}</code>, <code>{{courseid}}</code>, <code>{{messages}}</code>, <code>{{session_minutes}}</code>. If set, the footer link opens this URL instead of the in-widget panel.
+                <?php echo get_string('usertesting_admin:external_url_help', 'local_ai_course_assistant'); ?>
             </small>
         </div>
 
-        <h5 style="margin-bottom:12px;color:#334155">Tasks (In-widget Panel)</h5>
+        <h5 style="margin-bottom:12px;color:#334155"><?php echo get_string('usertesting_admin:tasks_heading', 'local_ai_course_assistant'); ?></h5>
         <div id="aica-tasks-container"></div>
-        <div class="aica-ut-add-task" id="aica-add-task-btn">+ Add Task</div>
+        <div class="aica-ut-add-task" id="aica-add-task-btn"><?php echo get_string('usertesting_admin:add_task', 'local_ai_course_assistant'); ?></div>
 
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
-            <button type="submit" class="btn btn-primary">Save Task Set</button>
-            <button type="button" class="btn btn-outline-secondary" id="aica-ut-preview-btn">Preview</button>
+            <button type="submit" class="btn btn-primary"><?php echo get_string('usertesting_admin:save', 'local_ai_course_assistant'); ?></button>
+            <button type="button" class="btn btn-outline-secondary" id="aica-ut-preview-btn"><?php echo get_string('rubric_admin:preview', 'local_ai_course_assistant'); ?></button>
             <?php if ($courseid > 0 && !$is_inherited) : ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn">Remove Course Override</button>
+            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn"><?php echo get_string('rubric_admin:remove_override', 'local_ai_course_assistant'); ?></button>
             <?php elseif ($courseid === 0): ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn">Reset to Defaults</button>
+            <button type="button" class="btn btn-outline-danger" id="aica-ut-reset-btn"><?php echo get_string('rubric_admin:reset_defaults', 'local_ai_course_assistant'); ?></button>
             <?php endif; ?>
         </div>
     </form>
@@ -237,6 +288,15 @@ echo $OUTPUT->header();
 <script>
 (function() {
     var tasks = <?php echo json_encode($tasks); ?>;
+    var STR = <?php echo json_encode($jsstrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+
+    // One lookup for the task-type label, used by both the card badge and the
+    // preview, so the two never disagree about what a stored type is called.
+    function taskTypeLabel(type) {
+        if (type === 'action_then_rate') { return STR.typeactionrate; }
+        if (type === 'multiple_choice') { return STR.typemultiplechoice; }
+        return STR.typefreeresponse;
+    }
     var container = document.getElementById('aica-tasks-container');
     var addBtn = document.getElementById('aica-add-task-btn');
     var resetBtn = document.getElementById('aica-ut-reset-btn');
@@ -280,30 +340,29 @@ echo $OUTPUT->header();
         header.appendChild(num);
         var typeLabel = document.createElement('span');
         typeLabel.className = 'aica-ut-type';
-        typeLabel.textContent = t.type === 'action_then_rate' ? 'Action + Rate'
-            : t.type === 'multiple_choice' ? 'Multiple Choice' : 'Free Response';
+        typeLabel.textContent = taskTypeLabel(t.type);
         header.appendChild(typeLabel);
 
         var actions = document.createElement('div');
         actions.className = 'aica-ut-actions';
-        var upBtn = document.createElement('button'); upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = 'Move up';
+        var upBtn = document.createElement('button'); upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = STR.moveup;
         upBtn.addEventListener('click', function() { if (idx > 0) { var tmp = tasks[idx]; tasks[idx] = tasks[idx-1]; tasks[idx-1] = tmp; renderAll(); } });
         actions.appendChild(upBtn);
-        var downBtn = document.createElement('button'); downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = 'Move down';
+        var downBtn = document.createElement('button'); downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = STR.movedown;
         downBtn.addEventListener('click', function() { if (idx < tasks.length-1) { var tmp = tasks[idx]; tasks[idx] = tasks[idx+1]; tasks[idx+1] = tmp; renderAll(); } });
         actions.appendChild(downBtn);
         var delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.className = 'aica-ut-delete';
-        delBtn.innerHTML = '&#10005;'; delBtn.title = 'Delete task';
-        delBtn.addEventListener('click', function() { if (confirm('Delete this task?')) { tasks.splice(idx, 1); renderAll(); } });
+        delBtn.innerHTML = '&#10005;'; delBtn.title = STR.deletetask;
+        delBtn.addEventListener('click', function() { if (confirm(STR.confirmdelete)) { tasks.splice(idx, 1); renderAll(); } });
         actions.appendChild(delBtn);
         header.appendChild(actions);
         card.appendChild(header);
 
         // Type selector.
         var typeField = document.createElement('div'); typeField.className = 'aica-ut-field';
-        var typeLbl = document.createElement('label'); typeLbl.textContent = 'Task Type'; typeField.appendChild(typeLbl);
-        var typeSelect = document.createElement('select'); typeSelect.setAttribute('aria-label', 'Task type');
-        [['action_then_rate', 'Action + Rate'], ['free_response', 'Free Response'], ['multiple_choice', 'Multiple Choice']].forEach(function(opt) {
+        var typeLbl = document.createElement('label'); typeLbl.textContent = STR.tasktype; typeField.appendChild(typeLbl);
+        var typeSelect = document.createElement('select'); typeSelect.setAttribute('aria-label', STR.tasktype);
+        [['action_then_rate', STR.typeactionrate], ['free_response', STR.typefreeresponse], ['multiple_choice', STR.typemultiplechoice]].forEach(function(opt) {
             var o = document.createElement('option'); o.value = opt[0]; o.textContent = opt[1];
             if (t.type === opt[0]) o.selected = true;
             typeSelect.appendChild(o);
@@ -319,8 +378,8 @@ echo $OUTPUT->header();
 
         // Instruction text.
         var instrField = document.createElement('div'); instrField.className = 'aica-ut-field';
-        var instrLbl = document.createElement('label'); instrLbl.textContent = 'Task Instruction'; instrField.appendChild(instrLbl);
-        var instrInput = document.createElement('textarea'); instrInput.setAttribute('aria-label', 'Task instruction'); instrInput.value = t.instruction || ''; instrInput.rows = 2;
+        var instrLbl = document.createElement('label'); instrLbl.textContent = STR.instruction; instrField.appendChild(instrLbl);
+        var instrInput = document.createElement('textarea'); instrInput.setAttribute('aria-label', STR.instruction); instrInput.value = t.instruction || ''; instrInput.rows = 2;
         instrInput.addEventListener('input', function() { t.instruction = instrInput.value; });
         instrField.appendChild(instrInput);
         card.appendChild(instrField);
@@ -329,22 +388,22 @@ echo $OUTPUT->header();
         if (t.type === 'action_then_rate') {
             // Rating label.
             var rlField = document.createElement('div'); rlField.className = 'aica-ut-field';
-            var rlLbl = document.createElement('label'); rlLbl.textContent = 'Rating Label'; rlField.appendChild(rlLbl);
-            var rlInp = document.createElement('input'); rlInp.type = 'text'; rlInp.setAttribute('aria-label', 'Rating label'); rlInp.value = t.rating_label || '';
+            var rlLbl = document.createElement('label'); rlLbl.textContent = STR.ratinglabel; rlField.appendChild(rlLbl);
+            var rlInp = document.createElement('input'); rlInp.type = 'text'; rlInp.setAttribute('aria-label', STR.ratinglabel); rlInp.value = t.rating_label || '';
             rlInp.addEventListener('input', function() { t.rating_label = rlInp.value; });
             rlField.appendChild(rlInp);
             card.appendChild(rlField);
 
             // Rating config.
             var ratingFields = document.createElement('div'); ratingFields.className = 'aica-ut-rating-fields';
-            [['Min', 'min', 1], ['Max', 'max', 5]].forEach(function(cfg) {
+            [[STR.minvalue, 'min', 1, STR.minvaluearia], [STR.maxvalue, 'max', 5, STR.maxvaluearia]].forEach(function(cfg) {
                 var f = document.createElement('div'); f.className = 'aica-ut-field';
-                var l = document.createElement('label'); l.textContent = cfg[0] + ' Value'; f.appendChild(l);
-                var inp = document.createElement('input'); inp.type = 'number'; inp.setAttribute('aria-label', cfg[0] + ' rating value'); inp.value = t[cfg[1]] || cfg[2]; inp.min = 0; inp.max = 10;
+                var l = document.createElement('label'); l.textContent = cfg[0]; f.appendChild(l);
+                var inp = document.createElement('input'); inp.type = 'number'; inp.setAttribute('aria-label', cfg[3]); inp.value = t[cfg[1]] || cfg[2]; inp.min = 0; inp.max = 10;
                 inp.addEventListener('input', function() { t[cfg[1]] = parseInt(inp.value, 10) || cfg[2]; });
                 f.appendChild(inp); ratingFields.appendChild(f);
             });
-            [['Min Label', 'min_label', 'e.g. Not helpful'], ['Max Label', 'max_label', 'e.g. Very helpful']].forEach(function(cfg) {
+            [[STR.minlabel, 'min_label', STR.minlabelplaceholder], [STR.maxlabel, 'max_label', STR.maxlabelplaceholder]].forEach(function(cfg) {
                 var f = document.createElement('div'); f.className = 'aica-ut-field';
                 var l = document.createElement('label'); l.textContent = cfg[0]; f.appendChild(l);
                 var inp = document.createElement('input'); inp.type = 'text'; inp.setAttribute('aria-label', cfg[0]); inp.value = t[cfg[1]] || ''; inp.placeholder = cfg[2];
@@ -355,8 +414,8 @@ echo $OUTPUT->header();
 
             // Follow-up.
             var fuField = document.createElement('div'); fuField.className = 'aica-ut-field';
-            var fuLbl = document.createElement('label'); fuLbl.textContent = 'Follow-up Question (optional free text)'; fuField.appendChild(fuLbl);
-            var fuInp = document.createElement('input'); fuInp.type = 'text'; fuInp.setAttribute('aria-label', 'Follow-up question'); fuInp.value = t.follow_up || '';
+            var fuLbl = document.createElement('label'); fuLbl.textContent = STR.followup; fuField.appendChild(fuLbl);
+            var fuInp = document.createElement('input'); fuInp.type = 'text'; fuInp.setAttribute('aria-label', STR.followuparia); fuInp.value = t.follow_up || '';
             fuInp.addEventListener('input', function() { t.follow_up = fuInp.value; });
             fuField.appendChild(fuInp);
             card.appendChild(fuField);
@@ -364,13 +423,13 @@ echo $OUTPUT->header();
 
         if (t.type === 'multiple_choice') {
             var optLabel = document.createElement('label');
-            optLabel.textContent = 'Options';
+            optLabel.textContent = STR.options;
             optLabel.style.cssText = 'font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px;display:block';
             card.appendChild(optLabel);
             var optList = document.createElement('div');
             (t.options || []).forEach(function(opt, oi) {
                 var row = document.createElement('div'); row.className = 'aica-ut-opt-row';
-                var inp = document.createElement('input'); inp.type = 'text'; inp.setAttribute('aria-label', 'Option ' + (oi + 1)); inp.value = opt;
+                var inp = document.createElement('input'); inp.type = 'text'; inp.setAttribute('aria-label', STR.optionn.replace('{n}', oi + 1)); inp.value = opt;
                 inp.addEventListener('input', function() { t.options[oi] = inp.value; });
                 row.appendChild(inp);
                 var rmBtn = document.createElement('button'); rmBtn.type = 'button'; rmBtn.innerHTML = '&times;';
@@ -380,15 +439,15 @@ echo $OUTPUT->header();
             });
             card.appendChild(optList);
             var addOpt = document.createElement('div'); addOpt.className = 'aica-ut-add-opt';
-            addOpt.textContent = '+ Add Option';
+            addOpt.textContent = STR.addoption;
             addOpt.addEventListener('click', function() { if (!t.options) t.options = []; t.options.push('New option'); renderAll(); });
             card.appendChild(addOpt);
         }
 
         if (t.type === 'free_response') {
             var fuField2 = document.createElement('div'); fuField2.className = 'aica-ut-field';
-            var fuLbl2 = document.createElement('label'); fuLbl2.textContent = 'Additional Prompt (optional)'; fuField2.appendChild(fuLbl2);
-            var fuInp2 = document.createElement('input'); fuInp2.type = 'text'; fuInp2.setAttribute('aria-label', 'Additional prompt'); fuInp2.value = t.follow_up || '';
+            var fuLbl2 = document.createElement('label'); fuLbl2.textContent = STR.addprompt; fuField2.appendChild(fuLbl2);
+            var fuInp2 = document.createElement('input'); fuInp2.type = 'text'; fuInp2.setAttribute('aria-label', STR.addpromptaria); fuInp2.value = t.follow_up || '';
             fuInp2.addEventListener('input', function() { t.follow_up = fuInp2.value; });
             fuField2.appendChild(fuInp2);
             card.appendChild(fuField2);
@@ -410,10 +469,7 @@ echo $OUTPUT->header();
 
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            var msg = <?php echo $courseid > 0
-                ? "'Remove custom tasks for this course? Students will see the global default.'"
-                : "'Reset global tasks to the built-in defaults?'"; ?>;
-            if (confirm(msg)) { document.getElementById('aica-ut-reset-form').submit(); }
+            if (confirm(STR.confirmreset)) { document.getElementById('aica-ut-reset-form').submit(); }
         });
     }
 
@@ -427,7 +483,7 @@ echo $OUTPUT->header();
             var panel = document.createElement('div');
             panel.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)';
             var h = document.createElement('h4');
-            h.textContent = document.getElementById('aica-ut-title').value || 'Task Set Preview';
+            h.textContent = document.getElementById('aica-ut-title').value || STR.previewtitle;
             h.style.marginBottom = '16px';
             panel.appendChild(h);
 
@@ -436,22 +492,25 @@ echo $OUTPUT->header();
                 tDiv.style.cssText = 'margin-bottom:16px;padding:14px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc';
                 var tNum = document.createElement('div');
                 tNum.style.cssText = 'font-size:11px;font-weight:700;color:#0369a1;text-transform:uppercase;margin-bottom:6px';
-                tNum.textContent = 'Task ' + (idx+1) + ' (' + t.type.replace(/_/g,' ') + ')';
+                tNum.textContent = STR.previewtasklabel.replace('{n}', idx + 1).replace('{t}', taskTypeLabel(t.type));
                 tDiv.appendChild(tNum);
                 var tText = document.createElement('div');
                 tText.style.cssText = 'font-size:14px;color:#1e293b;margin-bottom:8px';
-                tText.textContent = t.instruction || '(no instruction)';
+                tText.textContent = t.instruction || STR.previewnoinstruction;
                 tDiv.appendChild(tText);
 
                 if (t.type === 'action_then_rate') {
                     var rl = document.createElement('div');
                     rl.style.cssText = 'font-size:12px;color:#64748b;font-style:italic';
-                    rl.textContent = (t.rating_label || 'Rate') + ' (' + (t.min||1) + ' to ' + (t.max||5) + ')';
+                    rl.textContent = STR.previewraterange
+                        .replace('{l}', t.rating_label || STR.previewratefallback)
+                        .replace('{min}', (t.min||1))
+                        .replace('{max}', (t.max||5));
                     tDiv.appendChild(rl);
                     if (t.follow_up) {
                         var fu = document.createElement('div');
                         fu.style.cssText = 'font-size:12px;color:#94a3b8;margin-top:4px';
-                        fu.textContent = 'Follow-up: ' + t.follow_up;
+                        fu.textContent = STR.previewfollowup.replace('{t}', t.follow_up);
                         tDiv.appendChild(fu);
                     }
                 }
@@ -467,7 +526,7 @@ echo $OUTPUT->header();
             });
 
             var closeBtn = document.createElement('button');
-            closeBtn.textContent = 'Close Preview';
+            closeBtn.textContent = STR.previewclose;
             closeBtn.className = 'btn btn-sm btn-outline-secondary';
             closeBtn.addEventListener('click', function() { document.body.removeChild(overlay); });
             panel.appendChild(closeBtn);
