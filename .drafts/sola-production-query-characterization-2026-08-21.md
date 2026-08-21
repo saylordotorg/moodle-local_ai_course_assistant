@@ -300,13 +300,25 @@ regime where a reranker should earn its cost.
 - **PII — PASS.** Zero `@` characters, zero email-like strings, zero URLs, zero
   `userid`/`user_id` keys anywhere in the file. The only long digit runs are
   chunk ids inside the `id` field.
-- **Verbatim leakage — PASS, structurally and empirically.** Structurally, no
-  production message body was ever read, so there was nothing to copy.
-  Empirically, all 1,008 fixture questions were tested for exact equality
-  against every learner message in both production databases, and 120
-  randomly-chosen 6-word shingles from the fixture were tested for containment
-  in any production message. Result: see section 8 note — **0 exact matches and
-  0 shingle matches** across 15,188 production messages.
+- **Verbatim leakage — PASS.** Structurally, no production message body was
+  ever read, so there was nothing to copy. Empirically, all 1,008 fixture
+  questions were tested for **exact equality** against every learner message in
+  both production databases (18 batched queries): **0 matches out of 1,008,
+  against 15,188 production messages.**
+
+  A second, deliberately over-sensitive probe tested 120 randomly-chosen 6-word
+  shingles from the fixture for *containment* anywhere in a production message.
+  **119 of 120 returned zero.** One matched, on one message per site. The
+  matching string was `subject line?` — a two-word keyword-realization fixture
+  short enough that the shingle builder fell back to using the whole query, so
+  the probe degenerated into "does any learner message anywhere contain the
+  phrase 'subject line?'". It does.
+
+  That is coincidental vocabulary overlap, not copied text, and it is
+  unavoidable by construction: 20% of this fixture is 1–3 word keyword queries
+  drawn from the same course vocabulary learners use, so short substrings *will*
+  collide. The meaningful test is whole-message equality, which is 0/1,008.
+  No learner phrasing, and nothing identifying, is reproduced.
 - The fixture was also checked against the `classes/demo_seeder.php` canned
   question pool (the source of the dev rows): 170 candidate seeder strings
   extracted, **0 exact matches and 0 six-word shingle matches** against the
