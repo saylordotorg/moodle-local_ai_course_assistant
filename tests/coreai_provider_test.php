@@ -23,6 +23,8 @@ use local_ai_course_assistant\provider\base_provider;
  * Tests for the Moodle core_ai provider adapter and the 'auto' provider default.
  *
  * @package    local_ai_course_assistant
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_ai_course_assistant\provider\coreai_provider
  */
 final class coreai_provider_test extends \advanced_testcase {

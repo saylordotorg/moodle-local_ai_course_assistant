@@ -66,6 +66,9 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
         $since = time() - (7 * 86400);
         $sent = 0;
         $skipped = 0;
+        // One course row per opted-in course. Bounded by how many courses an
+        // admin switched the digest on for, and dwarfed by the analytics
+        // aggregation each iteration runs below, so it is left per-course.
         foreach ($enabledcourseids as $cid) {
             try {
                 $course = $DB->get_record('course', ['id' => $cid]);

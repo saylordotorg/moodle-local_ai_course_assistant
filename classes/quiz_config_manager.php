@@ -59,11 +59,21 @@ class quiz_config_manager {
      *
      * @param int $cmid     course_modules.id of the quiz
      * @param ?float $grade Optional pre-loaded quiz.grade. If null, looks it up.
+     * @param ?string $storedlevel Optional pre-loaded raw config value for this
+     *        cmid ('default' when no row exists). Lets a caller that already
+     *        batched the config rows skip the per-cmid lookup. Null looks it up.
      */
-    public static function get_assistance_level(int $cmid, ?float $grade = null): string {
+    public static function get_assistance_level(
+        int $cmid,
+        ?float $grade = null,
+        ?string $storedlevel = null
+    ): string {
         global $DB;
-        $row = self::get($cmid);
-        $level = $row ? $row->assistance_level : 'default';
+        if ($storedlevel === null) {
+            $row = self::get($cmid);
+            $storedlevel = $row ? $row->assistance_level : 'default';
+        }
+        $level = $storedlevel;
 
         if (!in_array($level, self::LEVELS, true)) {
             $level = 'default';
@@ -168,7 +178,10 @@ class quiz_config_manager {
         $out = [];
         foreach ($rows as $r) {
             $stored = $bycm[$r->cmid] ?? 'default';
-            $effective = self::get_assistance_level((int)$r->cmid, (float)$r->grade);
+            // Hand the already-batched stored level (and grade) to the
+            // resolver: without it, get_assistance_level() re-queries the
+            // config table once per quiz, which made the batch above pointless.
+            $effective = self::get_assistance_level((int)$r->cmid, (float)$r->grade, $stored);
             $r->stored_level = $stored;
             $r->effective_level = $effective;
             $out[] = $r;

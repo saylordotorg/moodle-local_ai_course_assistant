@@ -54,6 +54,14 @@ class context_builder {
     private const HISTORY_TOKENS_PER_PAIR = 250;
 
     /**
+     * How many course modules the wide course-content dump prepares at a time.
+     * Page bodies for a whole slice are read in one query; the dump usually
+     * fills its character cap within the first slice or two, so a large course
+     * never pays a query per module nor loads every page it will not use.
+     */
+    private const CONTENT_SLICE = 20;
+
+    /**
      * v4.12.0: stash the last assembled section breakdown so the prompt-debug
      * log in sse.php can render per-section sizes without re-running the
      * builder. Keyed by section name; values from {@see prompt_builder::assemble}.
@@ -1130,66 +1138,113 @@ class context_builder {
             $cms = [$preemptcmid => $first] + $cms;
         }
 
+        // Page bodies are fetched a slice of modules at a time rather than one
+        // query per module (N+1 over course size). Slicing, instead of one
+        // query for every page in the course, keeps the early exit below
+        // meaningful: a big course stops after the first few slices, so we
+        // never load the HTML of hundreds of pages to use ten of them.
+        $visible = [];
         foreach ($cms as $cm) {
-            if (!$cm->uservisible) {
-                continue;
+            if ($cm->uservisible) {
+                $visible[] = $cm;
             }
+        }
+        $done = false;
+        foreach (array_chunk($visible, self::CONTENT_SLICE) as $slice) {
+            $pagerows = self::load_page_rows($courseid, $slice);
+            foreach ($slice as $cm) {
+                $content = '';
+                $label   = '';
 
-            $content = '';
-            $label   = '';
-
-            if ($cm->modname === 'page') {
-                try {
-                    $record = $DB->get_record('page', ['id' => $cm->instance, 'course' => $courseid]);
-                    if ($record && !empty($record->content)) {
-                        $text = strip_tags(format_text($record->content, $record->contentformat));
-                        $text = preg_replace('/\s+/', ' ', trim($text));
-                        if (strlen($text) > 80) {
-                            $content = substr($text, 0, $maxperresource);
-                            $label   = "Page: {$cm->name}";
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    // Skip unavailable resources gracefully.
-                }
-            } else if ($cm->modname === 'book') {
-                try {
-                    $chapters = $DB->get_records(
-                        'book_chapters',
-                        ['bookid' => $cm->instance, 'hidden' => 0],
-                        'pagenum ASC',
-                        'id, title, content, contentformat'
-                    );
-                    if ($chapters) {
-                        $parts = [];
-                        foreach ($chapters as $ch) {
-                            $text = strip_tags(format_text($ch->content, $ch->contentformat));
+                if ($cm->modname === 'page') {
+                    try {
+                        $record = $pagerows[(int) $cm->instance] ?? null;
+                        if ($record && !empty($record->content)) {
+                            $text = strip_tags(format_text($record->content, $record->contentformat));
                             $text = preg_replace('/\s+/', ' ', trim($text));
-                            if (strlen($text) > 50) {
-                                $heading = !empty($ch->title) ? "{$ch->title}: " : '';
-                                $parts[] = $heading . substr($text, 0, 600);
+                            if (strlen($text) > 80) {
+                                $content = substr($text, 0, $maxperresource);
+                                $label   = "Page: {$cm->name}";
                             }
                         }
-                        if ($parts) {
-                            $content = substr(implode("\n\n", $parts), 0, $maxperresource);
-                            $label   = "Book: {$cm->name}";
-                        }
+                    } catch (\Throwable $e) {
+                        // Skip unavailable resources gracefully.
                     }
-                } catch (\Throwable $e) {
-                    // Skip.
+                } else if ($cm->modname === 'book') {
+                    // Books stay one query each: a course rarely holds more
+                    // than a handful, and chapter bodies are far too big to
+                    // pre-load for modules the cap below may never reach.
+                    try {
+                        $chapters = $DB->get_records(
+                            'book_chapters',
+                            ['bookid' => $cm->instance, 'hidden' => 0],
+                            'pagenum ASC',
+                            'id, title, content, contentformat'
+                        );
+                        if ($chapters) {
+                            $parts = [];
+                            foreach ($chapters as $ch) {
+                                $text = strip_tags(format_text($ch->content, $ch->contentformat));
+                                $text = preg_replace('/\s+/', ' ', trim($text));
+                                if (strlen($text) > 50) {
+                                    $heading = !empty($ch->title) ? "{$ch->title}: " : '';
+                                    $parts[] = $heading . substr($text, 0, 600);
+                                }
+                            }
+                            if ($parts) {
+                                $content = substr(implode("\n\n", $parts), 0, $maxperresource);
+                                $label   = "Book: {$cm->name}";
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        // Skip.
+                    }
+                }
+
+                if (!empty($content) && !empty($label)) {
+                    $sections[] = "### {$label}\n{$content}";
+                    $total += strlen($content);
+                    if ($total >= $maxtotal) {
+                        $done = true;
+                        break;
+                    }
                 }
             }
-
-            if (!empty($content) && !empty($label)) {
-                $sections[] = "### {$label}\n{$content}";
-                $total += strlen($content);
-                if ($total >= $maxtotal) {
-                    break;
-                }
+            if ($done) {
+                break;
             }
         }
 
         return !empty($sections) ? implode("\n\n", $sections) : '';
+    }
+
+    /**
+     * Fetch the mod_page rows for the page modules in one slice of modinfo,
+     * keyed by page id. One query for the slice, none when it holds no pages.
+     *
+     * @param int $courseid
+     * @param array $slice cm_info objects.
+     * @return array<int, \stdClass>
+     */
+    private static function load_page_rows(int $courseid, array $slice): array {
+        global $DB;
+        $ids = [];
+        foreach ($slice as $cm) {
+            if ($cm->modname === 'page') {
+                $ids[(int) $cm->instance] = true;
+            }
+        }
+        if (empty($ids)) {
+            return [];
+        }
+        try {
+            [$insql, $params] = $DB->get_in_or_equal(array_keys($ids), SQL_PARAMS_NAMED, 'pg');
+            $params['courseid'] = $courseid;
+            return $DB->get_records_select('page', "id {$insql} AND course = :courseid", $params);
+        } catch (\Throwable $e) {
+            // Matches the per-module posture: unreadable resources are skipped.
+            return [];
+        }
     }
 
     /**

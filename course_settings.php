@@ -29,6 +29,19 @@ require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\course_config_manager;
 
+/**
+ * Translated inline word for a global on/off state, used inside sentences and
+ * in the "Inherit global (...)" option labels.
+ *
+ * @param bool $on Whether the global setting is currently on.
+ * @return string Localized 'enabled' or 'disabled'.
+ */
+function local_ai_course_assistant_course_settings_state_label(bool $on): string {
+    return $on
+        ? get_string('coursesettings:state_enabled', 'local_ai_course_assistant')
+        : get_string('coursesettings:state_disabled', 'local_ai_course_assistant');
+}
+
 $courseid = required_param('courseid', PARAM_INT);
 
 $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
@@ -245,7 +258,7 @@ $courseanalyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php',
 echo html_writer::div(
     html_writer::link(
         $courseurl,
-        '&larr; Back to Course',
+        '&larr; ' . get_string('coursesettings:back_to_course', 'local_ai_course_assistant'),
         ['class' => 'btn btn-sm btn-outline-secondary']
     )
     . ' '
@@ -257,7 +270,7 @@ echo html_writer::div(
     . ' '
     . html_writer::link(
         $courseanalyticsurl,
-        'Course Analytics',
+        get_string('coursesettings:course_analytics', 'local_ai_course_assistant'),
         ['class' => 'btn btn-sm btn-outline-secondary']
     ),
     'mb-3 d-flex flex-wrap" style="gap:8px'
@@ -278,10 +291,8 @@ echo html_writer::div(
     </div>
 
     <div class="alert alert-info" style="font-size:14px;">
-        <strong>How course settings work:</strong>
-        Settings configured here override the global defaults for this course only.
-        Leave a field blank to use the global setting.
-        Changes here do not affect other courses.
+        <strong><?php echo get_string('coursesettings:how_it_works', 'local_ai_course_assistant'); ?></strong>
+        <?php echo get_string('coursesettings:how_it_works_desc', 'local_ai_course_assistant'); ?>
     </div>
 
     <div class="card mb-3">
@@ -434,17 +445,20 @@ echo html_writer::div(
                               ><?php echo s($current ? $current->systemprompt : ''); ?></textarea>
                     <div class="d-flex align-items-center mt-1" style="gap:8px">
                         <small class="form-text text-muted mb-0">
-                            Leave blank to use the global default. Or customize for this course only.
+                            <?php echo get_string('coursesettings:systemprompt_hint', 'local_ai_course_assistant'); ?>
                         </small>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt" title="Replace with the global default template">
-                            Reset to default
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt"
+                                title="<?php echo s(get_string('coursesettings:reset_prompt_title', 'local_ai_course_assistant')); ?>">
+                            <?php echo get_string('coursesettings:reset_prompt', 'local_ai_course_assistant'); ?>
                         </button>
                     </div>
                 </div>
             </div>
             <script>
             document.getElementById('btn-reset-prompt').addEventListener('click', function() {
-                if (confirm('Replace the system prompt with the global default template? Any course-specific edits will be lost.')) {
+                if (confirm(<?php echo json_encode(
+                    get_string('coursesettings:reset_prompt_confirm', 'local_ai_course_assistant')
+                ); ?>)) {
                     document.getElementById('systemprompt').value = <?php echo json_encode($globalcfg['systemprompt']); ?>;
                 }
             });
@@ -773,13 +787,13 @@ echo html_writer::div(
 
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="mb-0">English Lock (ELL Courses)</h5>
+            <h5 class="mb-0"><?php echo get_string('coursesettings:english_lock_heading', 'local_ai_course_assistant'); ?></h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Force SOLA to always respond in English for this course, regardless of the student's language preference. Ideal for English language learning courses where students should practice reading and writing in English.</p>
+            <p class="text-muted"><?php echo \local_ai_course_assistant\branding::str('coursesettings:english_lock_desc'); ?></p>
             <div class="form-group row">
                 <label class="col-sm-3 col-form-label" for="english_lock">
-                    English Lock
+                    <?php echo get_string('coursesettings:english_lock', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
                     <div>
@@ -789,11 +803,11 @@ echo html_writer::div(
                                     echo 'checked';
                                } ?>>
                         <label class="form-check-label" for="aica-english-lock">
-                            Always respond in English
+                            <?php echo get_string('coursesettings:english_lock_toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </div>
                     <small class="form-text text-muted">
-                        When enabled, SOLA will respond in English even if the student writes in another language. The student's language preference in their settings panel will be overridden.
+                        <?php echo \local_ai_course_assistant\branding::str('coursesettings:english_lock_help'); ?>
                     </small>
                 </div>
             </div>
@@ -802,32 +816,42 @@ echo html_writer::div(
 
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="mb-0">Voice Tab</h5>
+            <h5 class="mb-0"><?php echo get_string('coursesettings:voice_tab', 'local_ai_course_assistant'); ?></h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Control the Voice Tab (settings panel voice options) for this course. By default it inherits the global setting (currently <strong><?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
+            <p class="text-muted"><?php echo get_string(
+                'coursesettings:voice_tab_desc',
+                'local_ai_course_assistant',
+                '<strong>' . local_ai_course_assistant_course_settings_state_label($voicetabglobal) . '</strong>'
+            ); ?></p>
             <div class="form-group row">
-                <label class="col-sm-3 col-form-label" for="voice_tab">Voice Tab</label>
+                <label class="col-sm-3 col-form-label" for="voice_tab">
+                    <?php echo get_string('coursesettings:voice_tab', 'local_ai_course_assistant'); ?>
+                </label>
                 <div class="col-sm-9">
                     <select class="form-control" name="voice_tab" id="voice_tab">
                         <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') {
                             echo 'selected';
                                          } ?>>
-                            Inherit global (<?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?>)
+                            <?php echo get_string(
+                                'coursesettings:inherit_global',
+                                'local_ai_course_assistant',
+                                local_ai_course_assistant_course_settings_state_label($voicetabglobal)
+                            ); ?>
                         </option>
                         <option value="1" <?php if ($voicetabcourseraw === '1') {
                             echo 'selected';
                                           } ?>>
-                            Force on
+                            <?php echo get_string('coursesettings:force_on', 'local_ai_course_assistant'); ?>
                         </option>
                         <option value="0" <?php if ($voicetabcourseraw === '0') {
                             echo 'selected';
                                           } ?>>
-                            Force off
+                            <?php echo get_string('coursesettings:force_off', 'local_ai_course_assistant'); ?>
                         </option>
                     </select>
                     <small class="form-text text-muted">
-                        Override the global Voice Tab setting for this course only.
+                        <?php echo get_string('coursesettings:voice_tab_help', 'local_ai_course_assistant'); ?>
                     </small>
                 </div>
             </div>
@@ -836,32 +860,41 @@ echo html_writer::div(
 
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="mb-0">Auto-open on first visit</h5>
+            <h5 class="mb-0"><?php echo get_string('coursesettings:auto_open_heading', 'local_ai_course_assistant'); ?></h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Control whether the SOLA drawer opens automatically the first time a student lands on this course. First-visit state is tracked per course in the student's browser via localStorage. By default this course inherits the global setting (currently <strong><?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
+            <p class="text-muted"><?php echo \local_ai_course_assistant\branding::str(
+                'coursesettings:auto_open_desc',
+                '<strong>' . local_ai_course_assistant_course_settings_state_label($autoopenglobal) . '</strong>'
+            ); ?></p>
             <div class="form-group row">
-                <label class="col-sm-3 col-form-label" for="auto_open">Auto-open</label>
+                <label class="col-sm-3 col-form-label" for="auto_open">
+                    <?php echo get_string('coursesettings:auto_open', 'local_ai_course_assistant'); ?>
+                </label>
                 <div class="col-sm-9">
                     <select class="form-control" name="auto_open" id="auto_open">
                         <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') {
                             echo 'selected';
                                          } ?>>
-                            Inherit global (<?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?>)
+                            <?php echo get_string(
+                                'coursesettings:inherit_global',
+                                'local_ai_course_assistant',
+                                local_ai_course_assistant_course_settings_state_label($autoopenglobal)
+                            ); ?>
                         </option>
                         <option value="1" <?php if ($autoopencourseraw === '1') {
                             echo 'selected';
                                           } ?>>
-                            Force on
+                            <?php echo get_string('coursesettings:force_on', 'local_ai_course_assistant'); ?>
                         </option>
                         <option value="0" <?php if ($autoopencourseraw === '0') {
                             echo 'selected';
                                           } ?>>
-                            Force off
+                            <?php echo get_string('coursesettings:force_off', 'local_ai_course_assistant'); ?>
                         </option>
                     </select>
                     <small class="form-text text-muted">
-                        Override the global Auto-open setting for this course only.
+                        <?php echo get_string('coursesettings:auto_open_help', 'local_ai_course_assistant'); ?>
                     </small>
                 </div>
             </div>

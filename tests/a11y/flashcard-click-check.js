@@ -13,6 +13,11 @@
 // Seed with a CLI that calls flashcard_manager::save_batch() and
 // set_config('flashcards_enabled_course_2', 1, 'local_ai_course_assistant').
 // Run: node tests/a11y/flashcard-click-check.js
+// v7.0.1: flashcards.php moved from echoed HTML with .aica-fc-* classes to
+// templates/flashcards.mustache, which exposes data-region/data-action hooks
+// and drives visibility with modifier classes instead of inline style.display.
+// Selectors below target the data-* hooks, which are the stable contract; the
+// old class names no longer exist anywhere in the plugin.
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 
@@ -60,7 +65,7 @@ async function login(page) {
       { waitUntil: 'networkidle2', timeout: 30000 });
 
     const init = await page.evaluate(() => {
-      const cards = Array.from(document.querySelectorAll('.aica-fc-card'));
+      const cards = Array.from(document.querySelectorAll('[data-region="fc-card"]'));
       const vis = cards.filter((c) => getComputedStyle(c).display !== 'none');
       return { numCards: cards.length, visibleCards: vis.length };
     });
@@ -73,28 +78,28 @@ async function login(page) {
 
     // Reveal the answer.
     const revealed = await page.evaluate(() => {
-      const card = Array.from(document.querySelectorAll('.aica-fc-card')).find((c) => getComputedStyle(c).display !== 'none');
-      const btn = card && card.querySelector('.aica-fc-reveal');
+      const card = Array.from(document.querySelectorAll('[data-region="fc-card"]')).find((c) => getComputedStyle(c).display !== 'none');
+      const btn = card && card.querySelector('[data-action="fc-reveal"]');
       if (!btn) return false;
       btn.click();
-      const back = card.querySelector('.aica-fc-back');
+      const back = card.querySelector('[data-region="fc-back"]');
       return back ? getComputedStyle(back).display !== 'none' : false;
     });
     if (!revealed) fail('clicking Reveal did not show the answer');
 
     // Grade "Easy" and confirm advance to the next card.
     const firstQ = await page.evaluate(() => {
-      const card = Array.from(document.querySelectorAll('.aica-fc-card')).find((c) => getComputedStyle(c).display !== 'none');
-      return card.querySelector('.aica-fc-q').textContent.trim();
+      const card = Array.from(document.querySelectorAll('[data-region="fc-card"]')).find((c) => getComputedStyle(c).display !== 'none');
+      return card.querySelector('.sola-flashcards__question').textContent.trim();
     });
     await page.evaluate(() => {
-      const card = Array.from(document.querySelectorAll('.aica-fc-card')).find((c) => getComputedStyle(c).display !== 'none');
-      card.querySelector('.aica-fc-grade[data-q="5"]').click();
+      const card = Array.from(document.querySelectorAll('[data-region="fc-card"]')).find((c) => getComputedStyle(c).display !== 'none');
+      card.querySelector('[data-action="fc-grade"][data-quality="5"]').click();
     });
     await new Promise((r) => setTimeout(r, 900));
     const afterGrade = await page.evaluate(() => {
-      const card = Array.from(document.querySelectorAll('.aica-fc-card')).find((c) => getComputedStyle(c).display !== 'none');
-      return card ? card.querySelector('.aica-fc-q').textContent.trim() : null;
+      const card = Array.from(document.querySelectorAll('[data-region="fc-card"]')).find((c) => getComputedStyle(c).display !== 'none');
+      return card ? card.querySelector('.sola-flashcards__question').textContent.trim() : null;
     });
     if (afterGrade === firstQ) fail('grading did not advance to the next card');
 

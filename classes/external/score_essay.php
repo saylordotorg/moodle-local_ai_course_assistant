@@ -57,21 +57,21 @@ class score_essay extends external_api {
             return self::empty_result('disabled');
         }
 
-        $essayText = trim($params['essay']);
-        if (mb_strlen($essayText) < 80) {
+        $essaytext = trim($params['essay']);
+        if (mb_strlen($essaytext) < 80) {
             return self::empty_result('too_short');
         }
-        if (mb_strlen($essayText) > 40000) {
-            $essayText = mb_substr($essayText, 0, 40000);
+        if (mb_strlen($essaytext) > 40000) {
+            $essaytext = mb_substr($essaytext, 0, 40000);
         }
-        $rubricText = trim($params['rubric']);
-        if (mb_strlen($rubricText) > 8000) {
-            $rubricText = mb_substr($rubricText, 0, 8000);
+        $rubrictext = trim($params['rubric']);
+        if (mb_strlen($rubrictext) > 8000) {
+            $rubrictext = mb_substr($rubrictext, 0, 8000);
         }
 
-        $defaultRubric = "If no rubric is provided, score on these four default criteria: "
+        $defaultrubric = "If no rubric is provided, score on these four default criteria: "
             . "1) Thesis clarity, 2) Evidence and support, 3) Organisation and flow, 4) Mechanics and style.";
-        $rubricBlock = $rubricText !== '' ? "RUBRIC:\n{$rubricText}" : $defaultRubric;
+        $rubricblock = $rubrictext !== '' ? "RUBRIC:\n{$rubrictext}" : $defaultrubric;
 
         $sysprompt = "You are a writing coach giving formative feedback on a learner's essay. "
             . "Score each rubric criterion from 0 (not evident) to 4 (strong mastery). "
@@ -79,7 +79,7 @@ class score_essay extends external_api {
             . "Then give a short overall comment and three concrete revision suggestions ordered by impact. "
             . "Encourage revision; do not grade harshly. Respond with JSON only, in this shape:\n"
             . '{"criteria":[{"name":"...","score":3,"feedback":"..."}], "overall":"...", "revisions":["...","...","..."]}'
-            . "\n\n{$rubricBlock}\n\nESSAY:\n{$essayText}";
+            . "\n\n{$rubricblock}\n\nESSAY:\n{$essaytext}";
 
         try {
             $provider = base_provider::create_from_config((int) $params['courseid']);

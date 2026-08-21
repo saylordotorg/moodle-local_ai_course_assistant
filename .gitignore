@@ -21,6 +21,12 @@
 cdn/dist/
 cdn/node_modules/
 
+# Puppeteer for the a11y / click-regression harnesses (32M). Installed on demand
+# with `npm install` in tests/a11y; the lockfile is treated as a build artifact
+# here, matching how cdn/package-lock.json is handled in create_fixed_zip.sh.
+tests/a11y/node_modules/
+tests/a11y/package-lock.json
+
 # Local dev overrides
 *.local.php
 config.local.php

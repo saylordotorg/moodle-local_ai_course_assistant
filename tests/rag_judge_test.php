@@ -17,6 +17,14 @@
 namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Tests for the RAG relevance-judging metrics (nDCG, precision@k, hit@k).
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_ai_course_assistant\rag_judge
+ */
 class rag_judge_test extends \basic_testcase {
     public function test_ndcg_perfect_and_zero_and_mixed() {
         $this->assertEqualsWithDelta(1.0, rag_judge::ndcg_at_k([3, 2, 1], 3), 1e-9);

@@ -48,7 +48,14 @@ if ($action === 'toggle' && confirm_sesskey()) {
 // Per-course Usability Testing toggle ('' = inherit, '1' = on, '0' = off).
 if ($action === 'toggleut' && confirm_sesskey()) {
     $togglecourseid = required_param('togglecourseid', PARAM_INT);
-    $utvalue = required_param('utvalue', PARAM_RAW);
+    // Three-way override: '' = inherit the site default, '1' = on, '0' = off.
+    // PARAM_ALPHANUMEXT (not PARAM_INT) because the empty string must survive as
+    // a distinct value; anything outside the three known tokens is treated as
+    // inherit rather than written to config.
+    $utvalue = required_param('utvalue', PARAM_ALPHANUMEXT);
+    if (!in_array($utvalue, ['', '0', '1'], true)) {
+        $utvalue = '';
+    }
     if ($utvalue === '') {
         unset_config('sola_usertesting_course_' . $togglecourseid, 'local_ai_course_assistant');
     } else {
@@ -61,7 +68,9 @@ if ($action === 'toggleut' && confirm_sesskey()) {
 if ($action === 'bulktoggle' && confirm_sesskey()) {
     $enabled = required_param('enabled', PARAM_INT);
     $scope = optional_param('scope', 'all', PARAM_ALPHA);
-    $selectedids = optional_param('selected_ids', '', PARAM_RAW);
+    // Comma-separated course IDs from the row checkboxes; PARAM_SEQUENCE is
+    // exactly "digits and commas" and is still int-cast below.
+    $selectedids = optional_param('selected_ids', '', PARAM_SEQUENCE);
     if ($scope === 'selected' && !empty($selectedids)) {
         $ids = array_map('intval', explode(',', $selectedids));
     } else {
@@ -75,9 +84,15 @@ if ($action === 'bulktoggle' && confirm_sesskey()) {
 
 // Bulk Usability Testing toggle.
 if ($action === 'bulktoggleut' && confirm_sesskey()) {
-    $utvalue = required_param('utvalue', PARAM_RAW);
+    // Same three-way override as the single-course toggle above.
+    $utvalue = required_param('utvalue', PARAM_ALPHANUMEXT);
+    if (!in_array($utvalue, ['', '0', '1'], true)) {
+        $utvalue = '';
+    }
     $scope = optional_param('scope', 'all', PARAM_ALPHA);
-    $selectedids = optional_param('selected_ids', '', PARAM_RAW);
+    // Comma-separated course IDs from the row checkboxes; PARAM_SEQUENCE is
+    // exactly "digits and commas" and is still int-cast below.
+    $selectedids = optional_param('selected_ids', '', PARAM_SEQUENCE);
     if ($scope === 'selected' && !empty($selectedids)) {
         $ids = array_map('intval', explode(',', $selectedids));
     } else {

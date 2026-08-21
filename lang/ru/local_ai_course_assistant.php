@@ -1935,3 +1935,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'URL входящего ве�
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Необязательный URL входящего веб-хука Teams. Сводка публикуется в виде карточки коннектора Office 365.';
 
 $string['analytics:course_hidden_suffix'] = '(скрыт)';
+
+$string['radar_report:title'] = 'Отчёт Learning Radar [[tutorshort]]';
+$string['radar_report:print'] = 'Печать / сохранить как PDF';
+$string['radar_report:generated'] = 'Создан {$a}';
+$string['radar_report:query'] = 'Запрос';
+$string['radar_report:response'] = 'Ответ';
+$string['radar_report:privacy_note'] = 'Все данные учащихся в этом отчёте обезличены. Не публикуйте его.';

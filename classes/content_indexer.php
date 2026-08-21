@@ -30,6 +30,12 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  */
 class content_indexer {
     /**
+     * How many stale chunk rows are removed per DELETE statement. Bounded so
+     * the IN() list stays well inside every DB's parameter limit.
+     */
+    private const DELETE_BATCH = 200;
+
+    /**
      * Index all content in a course.
      *
      * For each module:
@@ -111,6 +117,13 @@ class content_indexer {
                     $hash = $chunk['contenthash'];
                     $seenhashes[] = $hash;
 
+                    // One indexed lookup per chunk, on the admin/cron reindex
+                    // path only. Deliberately not batched into a single
+                    // hash->row map for the course: get_record() here resolves
+                    // duplicate content hashes (the same boilerplate chunk in
+                    // two modules) to one arbitrary row, and a grouped preload
+                    // would quietly change which row wins. The embed() call
+                    // below dominates this query whenever the hash misses.
                     // Check for existing identical chunk.
                     if (!$force) {
                         $existing = $DB->get_record('local_ai_course_assistant_chunks', [
@@ -202,22 +215,7 @@ class content_indexer {
         // the budget cap never reached the remaining chunks, so their hashes are
         // absent from $seenhashes and would be misread as stale and deleted.
         if ($stats['errors'] === 0 && empty($stats['cap_blocked']) && !empty($seenhashes)) {
-            // O(1) membership via a hash set, not in_array (which was O(n) per
-            // row, O(n^2) overall on large courses). Stream rows with a
-            // recordset so the whole chunk table is never held in memory.
-            $seenset = array_flip($seenhashes);
-            $rs = $DB->get_recordset(
-                'local_ai_course_assistant_chunks',
-                ['courseid' => $courseid],
-                '',
-                'id, contenthash'
-            );
-            foreach ($rs as $row) {
-                if (!isset($seenset[$row->contenthash])) {
-                    $DB->delete_records('local_ai_course_assistant_chunks', ['id' => $row->id]);
-                }
-            }
-            $rs->close();
+            self::prune_stale_chunks($courseid, $seenhashes);
         } else if ($stats['sources'] === 0) {
             // Genuinely no extractable content in the course — clear the index.
             $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);
@@ -231,6 +229,62 @@ class content_indexer {
         rag_retriever::flush_cache($courseid);
 
         return $stats;
+    }
+
+    /**
+     * Delete this course's chunk rows whose content hash is no longer present
+     * in the freshly-extracted source.
+     *
+     * @param int $courseid
+     * @param string[] $seenhashes Content hashes seen in this indexing run.
+     */
+    private static function prune_stale_chunks(int $courseid, array $seenhashes): void {
+        global $DB;
+
+        // O(1) membership via a hash set, not in_array (which was O(n) per
+        // row, O(n^2) overall on large courses). Stream rows with a
+        // recordset so the whole chunk table is never held in memory.
+        $seenset = array_flip($seenhashes);
+        $stale = [];
+        $rs = $DB->get_recordset(
+            'local_ai_course_assistant_chunks',
+            ['courseid' => $courseid],
+            '',
+            'id, contenthash'
+        );
+        try {
+            foreach ($rs as $row) {
+                if (!isset($seenset[$row->contenthash])) {
+                    // Collect and delete in batches below: one DELETE per stale
+                    // row meant a statement per removed chunk, which scales with
+                    // the index, not with what actually changed.
+                    $stale[] = (int) $row->id;
+                    if (count($stale) >= self::DELETE_BATCH) {
+                        self::delete_chunks($stale);
+                        $stale = [];
+                    }
+                }
+            }
+        } finally {
+            $rs->close();
+        }
+        if (!empty($stale)) {
+            self::delete_chunks($stale);
+        }
+    }
+
+    /**
+     * Delete a batch of chunk rows by id in a single statement.
+     *
+     * @param int[] $ids
+     */
+    private static function delete_chunks(array $ids): void {
+        global $DB;
+        if (empty($ids)) {
+            return;
+        }
+        [$insql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'cid');
+        $DB->delete_records_select('local_ai_course_assistant_chunks', "id {$insql}", $params);
     }
 
     /**

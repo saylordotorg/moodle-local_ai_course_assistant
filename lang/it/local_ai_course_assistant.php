@@ -1963,3 +1963,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'URL del webhook in entrata d
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'URL facoltativo di un webhook in entrata di Teams. Il riepilogo viene pubblicato come scheda connettore di Office 365.';
 
 $string['analytics:course_hidden_suffix'] = '(nascosto)';
+
+$string['radar_report:title'] = 'Rapporto Learning Radar di [[tutorshort]]';
+$string['radar_report:print'] = 'Stampa / salva come PDF';
+$string['radar_report:generated'] = 'Generato il {$a}';
+$string['radar_report:query'] = 'Query';
+$string['radar_report:response'] = 'Risposta';
+$string['radar_report:privacy_note'] = 'Tutti i dati degli studenti in questo rapporto sono anonimizzati. Non condividerlo pubblicamente.';

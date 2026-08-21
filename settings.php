@@ -181,7 +181,10 @@ if ($hassiteconfig) {
         get_string('settings:hidden_categories', 'local_ai_course_assistant'),
         get_string('settings:hidden_categories_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Comma-separated category IDs or names. PARAM_TEXT is lossless for
+        // category names (which may contain '&', accents or punctuation) while
+        // refusing markup; hook_callbacks trims and compares each entry.
+        PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -253,6 +256,10 @@ if ($hassiteconfig) {
         get_string('settings:claude_temperature_allow_prefixes', 'local_ai_course_assistant'),
         get_string('settings:claude_temperature_allow_prefixes_desc', 'local_ai_course_assistant'),
         implode("\n", \local_ai_course_assistant\provider\claude_provider::DEFAULT_TEMPERATURE_ALLOW_PREFIXES),
+        // PARAM_RAW is required: this is a newline-separated list, and the
+        // newlines are the record separator. It is never output as HTML - it is
+        // split and matched with str_starts_with() against the configured model
+        // name inside claude_provider::model_supports_temperature().
         PARAM_RAW
     ));
 
@@ -517,6 +524,11 @@ if ($hassiteconfig) {
         get_string('settings:ssrf_trusted_endpoints', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant')),
         '',
+        // PARAM_RAW is required: a newline-separated allowlist of host[:port]
+        // entries, including private/loopback hosts and Docker service names
+        // (underscores) that PARAM_URL/PARAM_HOST would reject outright. Strict
+        // checking happens where it matters - security::is_safe_provider_url()
+        // parses each entry and compares it to the resolved target host.
         PARAM_RAW
     ));
 
@@ -890,7 +902,10 @@ if ($hassiteconfig) {
         get_string('settings:attachment_allowed_types', 'local_ai_course_assistant'),
         get_string('settings:attachment_allowed_types_desc', 'local_ai_course_assistant'),
         'image/png,image/jpeg,image/webp,application/pdf',
-        PARAM_RAW_TRIMMED
+        // Comma-separated MIME types. PARAM_TEXT keeps the '/' and ',' that MIME
+        // lists need (verified lossless for the shipped default) while refusing
+        // markup; attachment_manager lowercases, trims and matches each entry.
+        PARAM_TEXT
     ));
 
     // Performance: caps on how much course content goes into the system prompt.
@@ -1070,7 +1085,11 @@ if ($hassiteconfig) {
         get_string('settings:policy_bundle_url', 'local_ai_course_assistant'),
         get_string('settings:policy_bundle_url_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // A single fetchable URL, so PARAM_URL is the right type (it accepts the
+        // https, localhost and private-IP forms this setting is used with, and
+        // rejects javascript:/data: outright). policy_bundle::sync() still runs
+        // the value through security::is_safe_provider_url() before fetching.
+        PARAM_URL
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1078,7 +1097,10 @@ if ($hassiteconfig) {
         get_string('settings:policy_bundle_pubkey', 'local_ai_course_assistant'),
         get_string('settings:policy_bundle_pubkey_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Base64-encoded 32-byte Ed25519 public key - PARAM_BASE64 is exactly
+        // that character class (verified against a generated key), and
+        // policy_bundle::verify_envelope() still length-checks the decoded key.
+        PARAM_BASE64
     ));
 
     $settings->add(new admin_setting_configtextarea(
@@ -1509,6 +1531,12 @@ if ($hassiteconfig) {
         get_string('settings:stt_selfhosted_url', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:stt_selfhosted_url_desc', 'local_ai_course_assistant')),
         '',
+        // PARAM_RAW_TRIMMED is required: this points at a private Whisper server,
+        // typically a container hostname such as http://whisper_server:8080/...
+        // PARAM_URL discards hostnames containing underscores, which would break
+        // existing docker-compose deployments. The value is not output as HTML;
+        // it is validated by security::is_safe_provider_url() (plus the SSRF
+        // trusted-endpoints allowlist) before any request is made.
         PARAM_RAW_TRIMMED
     ));
 
@@ -1517,7 +1545,10 @@ if ($hassiteconfig) {
         get_string('settings:stt_selfhosted_model', 'local_ai_course_assistant'),
         get_string('settings:stt_selfhosted_model_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Model slug ("whisper-1", "Systran/faster-whisper-large-v3"): PARAM_TEXT
+        // keeps the dots and slashes PARAM_ALPHANUMEXT would strip, and
+        // voice_registry trims the value when it reads it.
+        PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configpasswordunmask(
@@ -1634,7 +1665,8 @@ if ($hassiteconfig) {
         get_string('settings:soapbox_vision_model', 'local_ai_course_assistant'),
         get_string('settings:soapbox_vision_model_desc', 'local_ai_course_assistant'),
         'gpt-4o-mini',
-        PARAM_RAW_TRIMMED
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
 
     // v6.8.13 Soapbox video: object storage for recordings. The browser uploads
@@ -1918,6 +1950,10 @@ if ($hassiteconfig) {
                 get_string('settings:avatar_rate_card_overrides', 'local_ai_course_assistant'),
                 get_string('settings:avatar_rate_card_overrides_desc', 'local_ai_course_assistant'),
                 '',
+                // PARAM_RAW is required: a JSON object (braces, quotes and
+                // newlines must survive verbatim). It is json_decode'd by the
+                // rate-card reader, which keeps only known provider keys and
+                // casts each value to float; it is never echoed as HTML.
                 PARAM_RAW
             ));
             // v4.10.0: optional per-provider webhook signing secrets. When set, the
@@ -1966,7 +2002,11 @@ if ($hassiteconfig) {
         get_string('settings:mastery_threshold', 'local_ai_course_assistant'),
         get_string('settings:mastery_threshold_desc', 'local_ai_course_assistant'),
         '0.75',
-        PARAM_RAW
+        // Decimal fraction, or blank to fall back to the code default (which is
+        // why this is not PARAM_FLOAT - that would coerce '' to 0). A regex
+        // paramtype is accepted by admin_setting_configtext::validate() and
+        // restricts the field to digits and one decimal point.
+        '/^[0-9]*\.?[0-9]*$/'
     ));
     // v6.8.28 Outcomes-based assessment (WSCUC): the institution-set benchmark,
     // as a percentage, for the per-outcome achievement report. Distinct from the
@@ -2033,7 +2073,8 @@ if ($hassiteconfig) {
         get_string('settings:quiz_model', 'local_ai_course_assistant'),
         get_string('settings:quiz_model_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -2048,21 +2089,24 @@ if ($hassiteconfig) {
         get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
         'gpt-4o-mini',
-        PARAM_RAW_TRIMMED
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_weight',
         get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
         '0.3',
-        PARAM_RAW
+        // Decimal fraction, blank = code default; see mastery_threshold above.
+        '/^[0-9]*\.?[0-9]*$/'
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_threshold',
         get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
         '0.7',
-        PARAM_RAW
+        // Decimal fraction, blank = code default; see mastery_threshold above.
+        '/^[0-9]*\.?[0-9]*$/'
     ));
 
     // v5.12.0: premium escalation tier (A.10 follow-on).
@@ -2091,13 +2135,19 @@ if ($hassiteconfig) {
         get_string('settings:premium_escalation_model', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_model_desc', 'local_ai_course_assistant'),
         'claude-opus-4-8',
-        PARAM_RAW_TRIMMED
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/premium_escalation_triggers',
         get_string('settings:premium_escalation_triggers', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_triggers_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: newline-separated regular expressions, whose
+        // metacharacters (\, |, ^, $, backticks) must survive byte-for-byte.
+        // premium_router::matches_trigger() trims each line, skips # comments and
+        // evaluates it with a warning-suppressed preg_match, so a malformed
+        // pattern is a non-match rather than an error; never output as HTML.
         PARAM_RAW
     ));
     $settings->add(new admin_setting_configtextarea(
@@ -2105,6 +2155,9 @@ if ($hassiteconfig) {
         get_string('settings:premium_escalation_course_tags', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_course_tags_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: a newline-separated list of course shortnames /
+        // idnumbers, and the newlines are the record separator. premium_router
+        // trims each line and compares it to the course record; never echoed.
         PARAM_RAW
     ));
 
@@ -2511,6 +2564,10 @@ if ($hassiteconfig) {
         get_string('settings:vendor_dpa_overrides', 'local_ai_course_assistant'),
         get_string('settings:vendor_dpa_overrides_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: a JSON object (braces, quotes and newlines must
+        // survive verbatim). vendor_registry json_decode's it, keeps only
+        // string-keyed array rows, and merges them over the shipped table;
+        // vendor_dpa.php renders every field through Mustache, which escapes.
         PARAM_RAW
     ));
     $settings->add(new admin_setting_configtextarea(
@@ -2518,6 +2575,9 @@ if ($hassiteconfig) {
         get_string('settings:rate_card_overrides', 'local_ai_course_assistant'),
         get_string('settings:rate_card_overrides_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: a JSON object of per-model rates. json_decode'd
+        // by the rate-card reader, which keeps known keys only and casts each
+        // rate to float; never echoed as HTML.
         PARAM_RAW
     ));
 

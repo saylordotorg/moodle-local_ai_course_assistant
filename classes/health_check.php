@@ -138,6 +138,8 @@ class health_check {
             $expected[] = '\\local_ai_course_assistant\\task\\' . $base;
         }
 
+        // Bounded loop: $expected is this plugin's own task classes as found on
+        // disk (a couple of dozen files), not a data-driven result set.
         $missing = [];
         foreach ($expected as $cls) {
             if (!$DB->record_exists('task_scheduled', ['classname' => $cls])) {

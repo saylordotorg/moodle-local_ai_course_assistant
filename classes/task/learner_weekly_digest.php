@@ -65,6 +65,26 @@ class learner_weekly_digest extends \core\task\scheduled_task {
         $supportuser = \core_user::get_support_user();
         $prefix = 'local_ai_course_assistant_digest_optin_';
 
+        // Two queries for the whole run instead of a course record and a user
+        // record per opt-in row, which grew with enrolment across every
+        // digest-enabled course.
+        $wantedcourseids = [];
+        $wanteduserids = [];
+        foreach ($rows as $row) {
+            $cid = (int) substr($row->name, strlen($prefix));
+            $uid = (int) $row->userid;
+            if ($cid > 0 && $uid > 0) {
+                $wantedcourseids[$cid] = true;
+                $wanteduserids[$uid] = true;
+            }
+        }
+        $coursesbyid = !empty($wantedcourseids)
+            ? $DB->get_records_list('course', 'id', array_keys($wantedcourseids))
+            : [];
+        $usersbyid = !empty($wanteduserids)
+            ? $DB->get_records_list('user', 'id', array_keys($wanteduserids))
+            : [];
+
         foreach ($rows as $row) {
             $courseid = (int) substr($row->name, strlen($prefix));
             $userid = (int) $row->userid;
@@ -77,12 +97,15 @@ class learner_weekly_digest extends \core\task\scheduled_task {
                     $skipped++;
                     continue;
                 }
-                $course = $DB->get_record('course', ['id' => $courseid]);
+                // Cloned from the pre-loaded maps so the per-row mutations
+                // below (customheaders) cannot leak across the several rows
+                // that share a user or a course.
+                $course = isset($coursesbyid[$courseid]) ? clone $coursesbyid[$courseid] : null;
                 if (!$course || $course->visible == 0) {
                     $skipped++;
                     continue;
                 }
-                $user = $DB->get_record('user', ['id' => $userid]);
+                $user = isset($usersbyid[$userid]) ? clone $usersbyid[$userid] : null;
                 if (!$user || empty($user->email) || !empty($user->deleted) || !empty($user->suspended)) {
                     $skipped++;
                     continue;

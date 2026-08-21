@@ -133,9 +133,13 @@ foreach ($courses as $cid) {
     cli_writeln(" course {$cid}: {$n}");
 }
 
+// A relative --out lands in dataroot, not in the plugin directory: dirroot is
+// web-accessible and must stay read-only at runtime. An absolute path is the
+// operator's explicit choice and is left alone.
 $outpath = ($options['out'][0] === '/')
     ? $options['out']
-    : realpath(__DIR__ . '/../..') . '/' . $options['out'];
+    : make_writable_directory($CFG->dataroot . '/local_ai_course_assistant/runs')
+        . '/' . basename($options['out']);
 file_put_contents($outpath, json_encode($out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 cli_writeln('Wrote ' . count($out['questions']) . " questions to {$outpath}");
 

@@ -3686,7 +3686,7 @@ define([
                     byteArr[i] = byteChars.charCodeAt(i);
                 }
 
-                // â”€â”€ AudioContext path (iOS-compatible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── AudioContext path (iOS-compatible) ────────────────────────────
                 // sharedAudioCtx was unlocked synchronously in handleSpeak() within
                 // the user gesture; decoding + playing here (in a Promise chain) is
                 // safe because the context is already running.
@@ -3778,7 +3778,7 @@ define([
                     return;
                 }
 
-                // â”€â”€ HTMLAudioElement fallback (non-iOS / no AudioContext) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── HTMLAudioElement fallback (non-iOS / no AudioContext) ──────────
                 const blob = new Blob([byteArr], {type: data.type || 'audio/mpeg'});
                 const objUrl = URL.createObjectURL(blob);
                 const audio = new Audio(objUrl);

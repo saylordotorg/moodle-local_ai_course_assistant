@@ -67,6 +67,11 @@ class soapbox_cleanup extends \core\task\scheduled_task {
               WHERE status <> :deleted",
             ['deleted' => 'deleted']
         );
+        // Known per-pair read on this nightly cleanup: one assignment row and
+        // one attempt list per (assignment, learner) pair with stored
+        // recordings. Batching the assignment lookup is straightforward, but is
+        // left alone until there is seeded Soapbox recording data to prove the
+        // rewrite prunes exactly the same rows.
         foreach ($pairs as $p) {
             $assign = $DB->get_record(
                 'local_ai_course_assistant_sbx_assign',

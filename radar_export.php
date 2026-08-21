@@ -31,6 +31,7 @@
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\radar_delivery;
+use local_ai_course_assistant\branding;
 
 require_login();
 $syscontext = context_system::instance();
@@ -50,35 +51,41 @@ if (!is_array($meta)) {
 
 if ($action === 'download') {
     if ($format === 'pdf') {
-        // Print-friendly HTML view — user uses browser "Save as PDF".
-        header('Content-Type: text/html; charset=utf-8');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        $when = userdate(time(), '%Y-%m-%d %H:%M');
-        $qsafe = s($query);
-        $rsafe = nl2br(s($response));
-        $msafe = '';
+        // Print-friendly view — the admin uses the browser's "Save as PDF".
+        // v7.0.1: rendered through the Output API on an embedded page layout
+        // instead of echoing a detached document with an inline <style> block,
+        // so the markup lives in a template and the rules live in styles.css.
+        $metarows = [];
         foreach ($meta as $k => $v) {
-            $msafe .= '<dt>' . s((string) $k) . '</dt><dd>' . s((string) $v) . '</dd>';
+            $metarows[] = ['key' => (string) $k, 'value' => (string) $v];
         }
-        echo '<!doctype html><html lang="en"><head><meta charset="utf-8">';
-        echo '<title>SOLA Learning Radar Report</title>';
-        echo '<style>body{font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#222}';
-        echo 'h1{font-size:20px;margin:0 0 4px}h2{font-size:16px;margin:24px 0 8px}';
-        echo 'dl{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px;color:#555}';
-        echo 'dt{font-weight:600}.q{background:#f4f6f9;padding:12px 14px;border-radius:6px;white-space:pre-wrap}';
-        echo '.r{padding:12px 0}.foot{margin-top:32px;font-size:12px;color:#888;border-top:1px solid #e5e7eb;padding-top:12px}';
-        echo '@media print{body{margin:0}.noprint{display:none}}';
-        echo '</style></head><body>';
-        echo '<button class="noprint" onclick="window.print()">Print / save as PDF</button>';
-        echo '<h1>SOLA Learning Radar Report</h1>';
-        echo '<p style="color:#666;margin:0 0 12px">Generated ' . s($when) . '</p>';
-        if ($msafe !== '') {
-            echo '<dl>' . $msafe . '</dl>';
-        }
-        echo '<h2>Query</h2><div class="q">' . $qsafe . '</div>';
-        echo '<h2>Response</h2><div class="r">' . $rsafe . '</div>';
-        echo '<div class="foot">All student data in this report is anonymized. Do not share publicly.</div>';
-        echo '</body></html>';
+        $templatedata = [
+            'title' => branding::str('radar_report:title'),
+            'generated' => get_string(
+                'radar_report:generated',
+                'local_ai_course_assistant',
+                userdate(time(), '%Y-%m-%d %H:%M')
+            ),
+            'printlabel' => get_string('radar_report:print', 'local_ai_course_assistant'),
+            'querylabel' => get_string('radar_report:query', 'local_ai_course_assistant'),
+            'responselabel' => get_string('radar_report:response', 'local_ai_course_assistant'),
+            'privacynote' => get_string('radar_report:privacy_note', 'local_ai_course_assistant'),
+            'query' => $query,
+            'response' => $response,
+            'hasmeta' => !empty($metarows),
+            'meta' => $metarows,
+        ];
+
+        $PAGE->set_context($syscontext);
+        $PAGE->set_url(new moodle_url('/local/ai_course_assistant/radar_export.php'));
+        $PAGE->set_pagelayout('embedded');
+        $PAGE->set_title($templatedata['title']);
+        echo $OUTPUT->header();
+        echo $OUTPUT->render_from_template(
+            'local_ai_course_assistant/radar_report',
+            $templatedata
+        );
+        echo $OUTPUT->footer();
         return;
     }
 

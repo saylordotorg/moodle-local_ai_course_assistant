@@ -1913,3 +1913,10 @@ $string['settings:anomaly_digest_teams_webhook'] = 'URL du webhook entrant Micro
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'URL facultative d\'un webhook entrant Teams. Le résumé est publié sous forme de carte de connecteur Office 365.';
 
 $string['analytics:course_hidden_suffix'] = '(masqué)';
+
+$string['radar_report:title'] = 'Rapport Learning Radar de [[tutorshort]]';
+$string['radar_report:print'] = 'Imprimer / enregistrer en PDF';
+$string['radar_report:generated'] = 'Généré le {$a}';
+$string['radar_report:query'] = 'Requête';
+$string['radar_report:response'] = 'Réponse';
+$string['radar_report:privacy_note'] = 'Toutes les données des apprenants dans ce rapport sont anonymisées. Ne le partagez pas publiquement.';

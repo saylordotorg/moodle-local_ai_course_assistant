@@ -91,6 +91,9 @@ class flashcard_manager {
                 'timecreated'   => $now,
                 'timemodified'  => $now,
             ];
+            // One INSERT per card is inherent (each row is new); $cards is a
+            // single AI generation batch, so this is bounded by deck size, not
+            // by anything that grows with the course or the cohort.
             $ids[] = (int) $DB->insert_record('local_ai_course_assistant_flashcards', $row);
         }
         return $ids;

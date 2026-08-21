@@ -833,6 +833,9 @@ class analytics {
         // Ensure aiuserids only includes enrolled students.
         $aiuserids = array_intersect($aiuserids, $enrolled);
 
+        // Bounded loop: exactly two cohorts, and each metric inside is one
+        // aggregate query over the whole cohort via get_in_or_equal() — never a
+        // query per learner.
         $result = [];
         foreach (['ai_users' => $aiuserids, 'non_users' => $nonuserids] as $label => $userids) {
             $count = count($userids);

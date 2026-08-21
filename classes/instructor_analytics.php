@@ -91,25 +91,64 @@ class instructor_analytics {
         if (empty($objectives)) {
             return [];
         }
+        $objectiveids = [];
+        foreach ($objectives as $obj) {
+            $objectiveids[] = (int) $obj->id;
+        }
+
+        // Everything the per-objective loop needs is loaded up front, in a
+        // fixed number of queries, instead of once per objective (and, for the
+        // mastery numbers, once per objective x learner):
+        //  - the enrolled cohort is the same for every objective, so it is
+        //    fetched once rather than inside the loop;
+        //  - one grouped query lists the learners who attempted each objective;
+        //  - one grouped query counts attempts per objective;
+        //  - one query streams the attempt rows the mastery math reads.
+        $coursecontext = \context_course::instance($courseid);
+        $enrolledusers = get_enrolled_users($coursecontext, '', 0, 'u.id', null, 0, 0, true);
+        $enrolledset = [];
+        foreach ($enrolledusers as $u) {
+            $enrolledset[(int) $u->id] = true;
+        }
+
+        [$objsql, $objparams] = $DB->get_in_or_equal($objectiveids, SQL_PARAMS_NAMED, 'obj');
+        $attemptedby = [];
+        $pairs = $DB->get_recordset_sql(
+            "SELECT objectiveid, userid
+               FROM {local_ai_course_assistant_obj_att}
+              WHERE objectiveid {$objsql}
+           GROUP BY objectiveid, userid
+           ORDER BY objectiveid ASC, userid ASC",
+            $objparams
+        );
+        try {
+            foreach ($pairs as $pair) {
+                $attemptedby[(int) $pair->objectiveid][] = (int) $pair->userid;
+            }
+        } finally {
+            $pairs->close();
+        }
+        $attemptcounts = $DB->get_records_sql(
+            "SELECT objectiveid, COUNT(*) AS n
+               FROM {local_ai_course_assistant_obj_att}
+              WHERE objectiveid {$objsql}
+           GROUP BY objectiveid",
+            $objparams
+        );
+        $preloaded = objective_manager::preload_attempts($objectiveids);
+
         $rows = [];
         foreach ($objectives as $obj) {
-            $userids = $DB->get_fieldset_sql(
-                "SELECT DISTINCT userid FROM {local_ai_course_assistant_obj_att}
-                  WHERE objectiveid = :oid",
-                ['oid' => (int) $obj->id]
-            );
+            $userids = $attemptedby[(int) $obj->id] ?? [];
             $mastered = $learning = $notstarted = 0;
-            // Enrolled learners not in $userids count as not_started.
-            $coursecontext = \context_course::instance($courseid);
-            $enrolledusers = get_enrolled_users($coursecontext, '', 0, 'u.id', null, 0, 0, true);
-            $enrolledset = [];
-            foreach ($enrolledusers as $u) {
-                $enrolledset[(int) $u->id] = true;
-            }
             $attempted = [];
             foreach ($userids as $uid) {
                 $attempted[(int) $uid] = true;
-                $m = objective_manager::compute_mastery((int) $uid, (int) $obj->id);
+                $m = objective_manager::compute_mastery(
+                    (int) $uid,
+                    (int) $obj->id,
+                    $preloaded[(int) $uid . ':' . (int) $obj->id] ?? []
+                );
                 if (!empty($m['mastered'])) {
                     $mastered++;
                 } else {
@@ -117,10 +156,9 @@ class instructor_analytics {
                 }
             }
             $notstarted = max(0, count($enrolledset) - count($attempted));
-            $totalattempts = (int) $DB->count_records(
-                'local_ai_course_assistant_obj_att',
-                ['objectiveid' => (int) $obj->id]
-            );
+            $totalattempts = isset($attemptcounts[(int) $obj->id])
+                ? (int) $attemptcounts[(int) $obj->id]->n
+                : 0;
             $cohortsize = max(1, count($enrolledset));
             $rows[] = [
                 'id'              => (int) $obj->id,

@@ -53,110 +53,35 @@ security::send_security_headers(true);
 
 $due = flashcard_manager::get_due((int) $USER->id, $courseid, 30);
 
-echo $OUTPUT->header();
-echo '<div class="aica-flashcards" style="max-width:720px;margin:0 auto">';
-echo html_writer::tag('h2', get_string('flashcards:title', 'local_ai_course_assistant'));
-echo html_writer::tag(
-    'p',
-    get_string('flashcards:intro', 'local_ai_course_assistant'),
-    ['class' => 'text-muted']
-);
-
-if (empty($due)) {
-    echo '<div style="padding:24px;border:1px dashed #d1d5db;border-radius:10px;text-align:center;color:#6b7280">';
-    echo s(get_string('flashcards:no_due', 'local_ai_course_assistant'));
-    echo '</div>';
-    echo $OUTPUT->footer();
-    return;
-}
-
-// Inline JS does the reveal + self-grade flow; one card visible at a time.
-echo '<div id="aica-fc-stack" data-sesskey="' . sesskey() . '" data-courseid="' . $courseid . '">';
+// Card question/answer text is run through format_text() here rather than in the
+// template: the template receives ready-to-print HTML and emits it unescaped.
+$cards = [];
 foreach ($due as $card) {
-    echo '<div class="aica-fc-card" data-card-id="' . (int) $card->id . '" '
-        . 'style="display:none;border:1px solid #e5e7eb;border-radius:10px;padding:18px;background:#fff;margin-bottom:12px">';
-    echo '<div style="font-size:13px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:600;margin-bottom:8px">'
-        . s(get_string('flashcards:question', 'local_ai_course_assistant')) . '</div>';
-    echo '<div class="aica-fc-q" style="font-size:16px;color:#111827;line-height:1.55;margin-bottom:14px">'
-        . format_text($card->question, FORMAT_PLAIN) . '</div>';
-    echo '<button type="button" class="aica-fc-reveal btn btn-primary">'
-        . s(get_string('flashcards:reveal', 'local_ai_course_assistant')) . '</button>';
-    echo '<div class="aica-fc-back" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #e5e7eb">';
-    echo '<div style="font-size:13px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:600;margin-bottom:8px">'
-        . s(get_string('flashcards:answer', 'local_ai_course_assistant')) . '</div>';
-    echo '<div style="font-size:15px;color:#1f2937;line-height:1.55;margin-bottom:14px">'
-        . format_text($card->answer, FORMAT_PLAIN) . '</div>';
-    echo '<div style="display:flex;gap:8px">';
-    echo '<button type="button" class="aica-fc-grade btn btn-warning" data-q="1">'
-        . s(get_string('flashcards:again', 'local_ai_course_assistant')) . '</button>';
-    echo '<button type="button" class="aica-fc-grade btn btn-secondary" data-q="3">'
-        . s(get_string('flashcards:hard', 'local_ai_course_assistant')) . '</button>';
-    echo '<button type="button" class="aica-fc-grade btn btn-success" data-q="5">'
-        . s(get_string('flashcards:easy', 'local_ai_course_assistant')) . '</button>';
-    echo '</div>';
-    echo '</div>'; // .aica-fc-back
-    echo '</div>'; // .aica-fc-card
+    $cards[] = [
+        'id' => (int) $card->id,
+        'question' => format_text($card->question, FORMAT_PLAIN),
+        'answer' => format_text($card->answer, FORMAT_PLAIN),
+    ];
 }
-echo '</div>'; // #aica-fc-stack
-echo '<div id="aica-fc-done" style="display:none;padding:24px;border:1px solid #d1fae5;border-radius:10px;background:#ecfdf5;color:#065f46;text-align:center;font-weight:600">'
-    . s(get_string('flashcards:session_complete', 'local_ai_course_assistant')) . '</div>';
-echo '</div>'; // .aica-flashcards
-?>
-<script>
-(function() {
-    var stack = document.getElementById('aica-fc-stack');
-    if (!stack) { return; }
-    var cards = Array.prototype.slice.call(stack.querySelectorAll('.aica-fc-card'));
-    var done  = document.getElementById('aica-fc-done');
-    var idx = 0;
-    var sesskey = stack.dataset.sesskey;
-    function showNext() {
-        cards.forEach(function(c) { c.style.display = 'none'; });
-        if (idx >= cards.length) {
-            done.style.display = 'block';
-            return;
-        }
-        cards[idx].style.display = 'block';
-    }
-    function recordReview(cardid, quality, cb) {
-        var fd = new URLSearchParams();
-        fd.append('sesskey', sesskey);
-        fd.append('info', 'local_ai_course_assistant_review_flashcard');
-        fd.append('args[0][cardid]', String(cardid));
-        fd.append('args[0][quality]', String(quality));
-        var body = JSON.stringify([{
-            index: 0,
-            methodname: 'local_ai_course_assistant_review_flashcard',
-            args: { cardid: parseInt(cardid, 10), quality: parseInt(quality, 10) }
-        }]);
-        fetch('<?php echo (new moodle_url('/lib/ajax/service.php', ['sesskey' => sesskey()]))->out(false); ?>', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: body
-        }).finally(cb);
-    }
-    cards.forEach(function(card) {
-        var revealBtn = card.querySelector('.aica-fc-reveal');
-        var back = card.querySelector('.aica-fc-back');
-        var gradeBtns = card.querySelectorAll('.aica-fc-grade');
-        revealBtn.addEventListener('click', function() {
-            back.style.display = 'block';
-            revealBtn.style.display = 'none';
-        });
-        gradeBtns.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var q = parseInt(btn.dataset.q, 10);
-                gradeBtns.forEach(function(b) { b.disabled = true; });
-                recordReview(card.dataset.cardId, q, function() {
-                    idx++;
-                    showNext();
-                });
-            });
-        });
-    });
-    showNext();
-})();
-</script>
-<?php
+
+$templatedata = [
+    'title' => get_string('flashcards:title', 'local_ai_course_assistant'),
+    'intro' => get_string('flashcards:intro', 'local_ai_course_assistant'),
+    'hasdue' => !empty($cards),
+    'nodue' => get_string('flashcards:no_due', 'local_ai_course_assistant'),
+    'sesskey' => sesskey(),
+    'courseid' => $courseid,
+    'serviceurl' => (new moodle_url('/lib/ajax/service.php', ['sesskey' => sesskey()]))->out(false),
+    'questionlabel' => get_string('flashcards:question', 'local_ai_course_assistant'),
+    'answerlabel' => get_string('flashcards:answer', 'local_ai_course_assistant'),
+    'revealbtn' => get_string('flashcards:reveal', 'local_ai_course_assistant'),
+    'againbtn' => get_string('flashcards:again', 'local_ai_course_assistant'),
+    'hardbtn' => get_string('flashcards:hard', 'local_ai_course_assistant'),
+    'easybtn' => get_string('flashcards:easy', 'local_ai_course_assistant'),
+    'sessioncomplete' => get_string('flashcards:session_complete', 'local_ai_course_assistant'),
+    'cards' => $cards,
+];
+
+echo $OUTPUT->header();
+echo $OUTPUT->render_from_template('local_ai_course_assistant/flashcards', $templatedata);
 echo $OUTPUT->footer();

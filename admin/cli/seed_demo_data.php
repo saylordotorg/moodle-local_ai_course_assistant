@@ -148,27 +148,15 @@ $interactiontypes = ['chat', 'chat', 'chat', 'chat', 'voice', 'quiz'];
 // ────────────────────────────────────────────────────────────────────────
 if ($clear) {
     cli_writeln("Clearing existing demo_* users and their data...");
-    $existing = $DB->get_records_select(
-        'user',
-        $DB->sql_like('username', ':pattern'),
-        ['pattern' => 'demo_student_%'],
-        '',
-        'id,username'
-    );
-    cli_writeln("  Found " . count($existing) . " existing demo users");
-    foreach ($existing as $u) {
-        if ($dryrun) {
-            continue;
-        }
-        $DB->delete_records_select(
-            'local_ai_course_assistant_msg_ratings',
-            'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)',
-            [$u->id]
-        );
-        $DB->delete_records('local_ai_course_assistant_msgs', ['userid' => $u->id]);
-        $DB->delete_records('local_ai_course_assistant_convs', ['userid' => $u->id]);
-        $DB->delete_records('local_ai_course_assistant_feedback', ['userid' => $u->id]);
-        delete_user($u);
+    // PERF002 bound: count first (no rows hydrated), then delete through
+    // demo_seeder::clear_demo_students(), which pages the matching users with a
+    // forward-only id cursor instead of loading every match into memory. Same
+    // clear semantics as before — all demo_student_* users and their plugin
+    // rows go away — just capped memory on a site with a large demo backlog.
+    cli_writeln("  Found " . \local_ai_course_assistant\demo_seeder::count_demo_students()
+        . " existing demo users");
+    if (!$dryrun) {
+        \local_ai_course_assistant\demo_seeder::clear_demo_students();
     }
     cli_writeln("");
 }

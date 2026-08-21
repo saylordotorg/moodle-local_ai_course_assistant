@@ -28,6 +28,19 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class demo_seeder {
+    /** @var string SQL LIKE pattern matching every username this seeder creates. */
+    private const DEMO_USERNAME_PATTERN = 'demo_student_%';
+
+    /**
+     * @var int Demo users hydrated per query when clearing.
+     *
+     * PERF002 bound: the clear path must never load the whole matching set
+     * into memory at once. On a large site an operator can accumulate
+     * thousands of demo_student_* rows, so clear_demo_students() pages through
+     * them this many at a time.
+     */
+    private const CLEAR_BATCH_SIZE = 100;
+
     /**
      * Create a testing course with sections, pages, and a book.
      *
@@ -172,24 +185,7 @@ class demo_seeder {
         $numweeks = max(1, $numweeks);
 
         if ($clear) {
-            $existing = $DB->get_records_select(
-                'user',
-                $DB->sql_like('username', ':pattern'),
-                ['pattern' => 'demo_student_%'],
-                '',
-                'id,username'
-            );
-            foreach ($existing as $u) {
-                $DB->delete_records_select(
-                    'local_ai_course_assistant_msg_ratings',
-                    'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)',
-                    [$u->id]
-                );
-                $DB->delete_records('local_ai_course_assistant_msgs', ['userid' => $u->id]);
-                $DB->delete_records('local_ai_course_assistant_convs', ['userid' => $u->id]);
-                $DB->delete_records('local_ai_course_assistant_feedback', ['userid' => $u->id]);
-                delete_user($u);
-            }
+            self::clear_demo_students();
         }
 
         $studentrole = $DB->get_record('role', ['shortname' => 'student'], '*', MUST_EXIST);
@@ -372,6 +368,76 @@ class demo_seeder {
             'ratings' => $counts['ratings'],
             'feedback' => $counts['feedback'],
         ];
+    }
+
+    /**
+     * Count the demo users the clear path would remove, without hydrating them.
+     *
+     * @return int
+     */
+    public static function count_demo_students(): int {
+        global $DB;
+        return $DB->count_records_select(
+            'user',
+            $DB->sql_like('username', ':pattern'),
+            ['pattern' => self::DEMO_USERNAME_PATTERN]
+        );
+    }
+
+    /**
+     * Remove every seeded demo_student_* user plus the plugin rows they own
+     * (message ratings, messages, conversations, feedback).
+     *
+     * PERF002 bound: the matching users are never all hydrated at once. The
+     * loop pages through them with a forward-only id cursor, holding at most
+     * $batchsize lightweight id/username rows in memory at a time and deleting
+     * that batch before fetching the next.
+     *
+     * Why nothing is left behind: the cursor only moves forward, and the sole
+     * row whose username the body rewrites is the one it has just passed to
+     * delete_user() — already behind the cursor, so it can neither reappear nor
+     * displace an unvisited row. Nothing inserts users while the loop runs, so
+     * every user matching the pattern at entry is visited exactly once, and the
+     * loop only stops when a query returns fewer rows than the batch size
+     * (i.e. the cursor has reached the end of the matching set).
+     *
+     * @param int $batchsize Maximum users hydrated per query.
+     * @return int Number of demo users removed.
+     */
+    public static function clear_demo_students(int $batchsize = self::CLEAR_BATCH_SIZE): int {
+        global $DB;
+
+        $batchsize = max(1, $batchsize);
+        $like = $DB->sql_like('username', ':pattern');
+        $lastid = 0;
+        $removed = 0;
+
+        do {
+            $batch = $DB->get_records_select(
+                'user',
+                "id > :lastid AND {$like}",
+                ['lastid' => $lastid, 'pattern' => self::DEMO_USERNAME_PATTERN],
+                'id ASC',
+                'id,username',
+                0,
+                $batchsize
+            );
+            foreach ($batch as $u) {
+                $lastid = max($lastid, (int) $u->id);
+                $DB->delete_records_select(
+                    'local_ai_course_assistant_msg_ratings',
+                    'messageid IN (SELECT id FROM {local_ai_course_assistant_msgs} WHERE userid = ?)',
+                    [$u->id]
+                );
+                $DB->delete_records('local_ai_course_assistant_msgs', ['userid' => $u->id]);
+                $DB->delete_records('local_ai_course_assistant_convs', ['userid' => $u->id]);
+                $DB->delete_records('local_ai_course_assistant_feedback', ['userid' => $u->id]);
+                delete_user($u);
+                $removed++;
+            }
+        } while (count($batch) === $batchsize);
+
+        return $removed;
     }
 
     /**

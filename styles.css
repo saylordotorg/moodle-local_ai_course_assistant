@@ -5792,8 +5792,14 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 
 /* ── Admin settings page: jump-to-section TOC and quicklinks (v7.0.0) ──────
    Moved out of an inline <style> block in settings.php. The plugin directory
-   review flagged inline stylesheets; this is where these rules belong. */
-html { scroll-behavior: smooth; }
+   review flagged inline stylesheets; this is where these rules belong.
+
+   v7.0.1: the smooth-scroll rule was a bare `html { }` selector, which
+   styles.css aggregation applies to EVERY Moodle page, not just ours. Gated
+   on :has(.sola-toc) it can only match a page that is already rendering our
+   table of contents. Browsers without :has() simply jump instead of gliding,
+   which is the pre-7.0.0 behaviour and costs nothing. */
+html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-toc { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 14px 18px; margin: 0 0 18px; }
 .sola-toc strong { display: block; font-size: 13px; color: #495057; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
 .sola-toc ul { display: flex; flex-wrap: wrap; gap: 6px 10px; list-style: none; padding: 0; margin: 0; }
@@ -5805,3 +5811,67 @@ html { scroll-behavior: smooth; }
 .sola-quicklinks a:hover { background: #2d47b5; border-color: #2d47b5; color: #fff; }
 .sola-section-anchor { display: block; position: relative; top: -60px; visibility: hidden; }
 .sola-section-heading { margin-top: 24px; padding-top: 8px; border-top: 2px solid #e5e7eb; }
+
+/* ── Learning Radar printable report (v7.0.1) ─────────────────────────────
+   Was an inline <style> block in radar_export.php emitting a detached HTML
+   document with bare `body{}` / `h1{}` / `dl{}` rules. The page now renders
+   through templates/radar_report.mustache on an embedded page layout, so
+   styles.css is loaded and every rule can be namespaced. */
+.sola-radar-report { max-width: 780px; margin: 24px auto; padding: 0 16px; color: #222; line-height: 1.55; }
+.sola-radar-report__title { font-size: 20px; margin: 0 0 4px; }
+.sola-radar-report__heading { font-size: 16px; margin: 24px 0 8px; }
+.sola-radar-report__generated { color: #666; margin: 0 0 12px; }
+.sola-radar-report__meta { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 13px; color: #555; }
+.sola-radar-report__meta dt { font-weight: 600; }
+.sola-radar-report__meta dd { margin: 0; }
+.sola-radar-report__query { background: #f4f6f9; padding: 12px 14px; border-radius: 6px; white-space: pre-wrap; }
+.sola-radar-report__response { padding: 12px 0; white-space: pre-wrap; }
+.sola-radar-report__foot { margin-top: 32px; font-size: 12px; color: #888; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+@media print {
+    .sola-radar-report { margin: 0; max-width: none; }
+    .sola-radar-report__print { display: none; }
+}
+
+/* ── Flashcard review page (v7.0.1) ───────────────────────────────────────
+   Was a stack of inline style="..." attributes in flashcards.php. The page now
+   renders templates/flashcards.mustache, so every rule lives here under the
+   .sola-flashcards namespace. Card visibility is class-driven rather than
+   style.display so the JS never writes inline styles either. */
+.sola-flashcards { max-width: 720px; margin: 0 auto; }
+.sola-flashcards__empty { padding: 24px; border: 1px dashed #d1d5db; border-radius: 10px; text-align: center; color: #6b7280; }
+.sola-flashcards__card { display: none; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px; background: #fff; margin-bottom: 12px; }
+.sola-flashcards__card--active { display: block; }
+.sola-flashcards__label { font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; margin-bottom: 8px; }
+.sola-flashcards__question { font-size: 16px; color: #111827; line-height: 1.55; margin-bottom: 14px; }
+.sola-flashcards__back { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e5e7eb; }
+.sola-flashcards__back--visible { display: block; }
+.sola-flashcards__answer { font-size: 15px; color: #1f2937; line-height: 1.55; margin-bottom: 14px; }
+.sola-flashcards__grades { display: flex; gap: 8px; }
+.sola-flashcards__done { display: none; padding: 24px; border: 1px solid #d1fae5; border-radius: 10px; background: #ecfdf5; color: #065f46; text-align: center; font-weight: 600; }
+.sola-flashcards__done--visible { display: block; }
+.sola-flashcards__hidden { display: none; }
+
+/* ── Learner data export / purge admin page (v7.0.1) ──────────────────────
+   Was inline style="..." on the intro, lookup form and action row in
+   admin_user_data.php, which now renders templates/admin_user_data.mustache. */
+.sola-userdata__intro { max-width: 720px; }
+.sola-userdata__form { margin: 16px 0; }
+.sola-userdata__label { display: block; margin-bottom: 6px; font-weight: 600; }
+.sola-userdata__controls { display: flex; align-items: center; gap: 8px; }
+.sola-userdata__input { padding: 6px 10px; font-size: 14px; width: 160px; }
+.sola-userdata__id { color: #888; }
+.sola-userdata__table { margin-top: 12px; }
+.sola-userdata__actions { margin-top: 16px; display: flex; gap: 12px; }
+
+/* ── RAG index admin page (v7.0.1) ────────────────────────────────────────
+   Was inline style="..." on the content-source card in rag_admin.php, which
+   now renders templates/rag_admin.mustache. The badge colors are kept explicit
+   because Bootstrap 4 badge-success/-secondary are not present on every theme
+   this page has to look right on. */
+.sola-ragadmin__hint { font-size: 13px; }
+.sola-ragadmin__srclabel { width: 260px; font-weight: 500; }
+.sola-ragadmin__srcstate { width: 70px; }
+.sola-ragadmin__srcdetail { font-size: 13px; color: #495057; }
+.sola-ragadmin__badge { color: #fff; }
+.sola-ragadmin__badge--ready { background: #0f9d58; }
+.sola-ragadmin__badge--off { background: #6c757d; }

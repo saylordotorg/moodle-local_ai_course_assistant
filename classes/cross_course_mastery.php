@@ -123,6 +123,9 @@ class cross_course_mastery {
         $tx = $DB->start_delegated_transaction();
         $DB->delete_records(self::TABLE_LINKS);
         $now = time();
+        // One INSERT per discovered link is inherent (the table was just
+        // truncated above); this is the admin/cron rebuild, inside a single
+        // transaction, not a request-path loop.
         foreach ($pairs as $p) {
             $DB->insert_record(self::TABLE_LINKS, (object) [
                 'objectiveida' => $p['a'],
@@ -151,11 +154,26 @@ class cross_course_mastery {
             'objectiveida = ? OR objectiveidb = ?',
             [$objectiveid, $objectiveid]
         );
+        // Resolve every linked objective in ONE query. objective_manager::get()
+        // is a query per row, and the learner-facing path builders call this
+        // method once per course objective, so the per-row lookup multiplied
+        // out into an N+1 over (objectives x links).
+        $otherids = [];
+        foreach ($rows as $r) {
+            $otherids[
+                ((int) $r->objectiveida === $objectiveid)
+                    ? (int) $r->objectiveidb : (int) $r->objectiveida
+            ] = true;
+        }
+        $objs = !empty($otherids)
+            ? $DB->get_records_list(objective_manager::TABLE_OBJS, 'id', array_keys($otherids))
+            : [];
+
         $out = [];
         foreach ($rows as $r) {
             $otherid = ((int) $r->objectiveida === $objectiveid)
                 ? (int) $r->objectiveidb : (int) $r->objectiveida;
-            $obj = objective_manager::get($otherid);
+            $obj = $objs[$otherid] ?? null;
             if (!$obj) {
                 continue; // Stale row pointing at a deleted objective — skip.
             }

@@ -47,11 +47,13 @@ $coursename = '';
 if ($courseid > 0) {
     $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
     $coursename = $course->fullname;
-    $PAGE->set_title('Practice Scoring Rubric Editor: ' . $coursename);
-    $PAGE->set_heading('Practice Scoring Rubric Editor: ' . $coursename);
+    $pagetitle = get_string('rubric_admin:title_course', 'local_ai_course_assistant', $coursename);
+    $PAGE->set_title($pagetitle);
+    $PAGE->set_heading($pagetitle);
 } else {
-    $PAGE->set_title('Practice Scoring Rubric Editor: Global Default');
-    $PAGE->set_heading('Practice Scoring Rubric Editor: Global Default');
+    $pagetitle = get_string('rubric_admin:title_global', 'local_ai_course_assistant');
+    $PAGE->set_title($pagetitle);
+    $PAGE->set_heading($pagetitle);
 }
 
 // Handle POST.
@@ -71,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $criteria = json_decode($criteriaraw, true);
 
         if (!is_array($criteria) || empty($criteria)) {
-            \core\notification::error('Criteria data is invalid or empty.');
+            \core\notification::error(get_string('rubric_admin:err_invalid_criteria', 'local_ai_course_assistant'));
             redirect(new moodle_url($PAGE->url, ['type' => $posttype]));
         }
 
@@ -101,19 +103,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($clean)) {
-            \core\notification::error('No valid criteria after cleaning.');
+            \core\notification::error(get_string('rubric_admin:err_no_criteria', 'local_ai_course_assistant'));
             redirect(new moodle_url($PAGE->url, ['type' => $posttype]));
         }
 
         // Check if a rubric already exists for this scope and type.
-        $title = ucfirst($posttype) . ' Practice Rubric';
+        $title = get_string('rubric_admin:rubric_title_' . $posttype, 'local_ai_course_assistant');
         $existing = rubric_manager::get_rubric($courseid, $posttype);
         if ($existing && (int) $existing->courseid === $courseid) {
             rubric_manager::update_rubric((int) $existing->id, $title, $clean, true);
-            \core\notification::success('Rubric updated.');
+            \core\notification::success(get_string('rubric_admin:saved_updated', 'local_ai_course_assistant'));
         } else {
             rubric_manager::create_rubric($courseid, $posttype, $title, $clean);
-            \core\notification::success('Rubric created.');
+            \core\notification::success(get_string('rubric_admin:saved_created', 'local_ai_course_assistant'));
         }
 
         redirect(new moodle_url($PAGE->url, ['type' => $posttype]));
@@ -123,12 +125,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Delete course-level rubric (falls back to global).
         if ($courseid > 0) {
             rubric_manager::delete_rubric($courseid, $posttype);
-            \core\notification::success('Course rubric removed. The global default will be used.');
+            \core\notification::success(get_string('rubric_admin:reset_course_done', 'local_ai_course_assistant'));
         } else {
             // Reset global to defaults.
             rubric_manager::delete_rubric(0, $posttype);
             rubric_manager::ensure_default_rubric($posttype);
-            \core\notification::success('Global rubric reset to defaults.');
+            \core\notification::success(get_string('rubric_admin:reset_global_done', 'local_ai_course_assistant'));
         }
         redirect(new moodle_url($PAGE->url, ['type' => $posttype]));
     }
@@ -168,6 +170,43 @@ $courses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, c.shortname FROM {course} c WHERE c.id > 1 AND c.visible = 1 ORDER BY c.fullname ASC"
 );
 
+// Practice-type tab labels, reused by the tab strip and the preview dialog.
+$typelabels = [
+    'conversation'  => get_string('rubric_admin:tab_conversation', 'local_ai_course_assistant'),
+    'pronunciation' => get_string('rubric_admin:tab_pronunciation', 'local_ai_course_assistant'),
+    'speech'        => get_string('rubric_admin:tab_speech', 'local_ai_course_assistant'),
+];
+
+// Strings the criterion editor and the preview dialog build client-side. Handed
+// to the script as one JSON blob so no English literal is left in the JS.
+$jsstrings = [
+    'criterion'        => get_string('rubric_admin:criterion', 'local_ai_course_assistant'),
+    'moveup'           => get_string('rubric_admin:move_up', 'local_ai_course_assistant'),
+    'movedown'         => get_string('rubric_admin:move_down', 'local_ai_course_assistant'),
+    'deletecriterion'  => get_string('rubric_admin:delete_criterion', 'local_ai_course_assistant'),
+    'confirmdelete'    => get_string('rubric_admin:confirm_delete_criterion', 'local_ai_course_assistant'),
+    'name'             => get_string('rubric_admin:criterion_name', 'local_ai_course_assistant'),
+    'nameplaceholder'  => get_string('rubric_admin:criterion_name_placeholder', 'local_ai_course_assistant'),
+    'maxscore'         => get_string('rubric_admin:max_score', 'local_ai_course_assistant'),
+    'maxscorearia'     => get_string('rubric_admin:max_score_aria', 'local_ai_course_assistant'),
+    'description'      => get_string('rubric_admin:description', 'local_ai_course_assistant'),
+    'descriptionaria'  => get_string('rubric_admin:description_aria', 'local_ai_course_assistant'),
+    'descplaceholder'  => get_string('rubric_admin:description_placeholder', 'local_ai_course_assistant'),
+    'mapsoutcome'      => get_string('rubric_admin:maps_to_outcome', 'local_ai_course_assistant'),
+    'outcomearia'      => get_string('rubric_admin:outcome_aria', 'local_ai_course_assistant'),
+    'outcomenone'      => get_string('rubric_admin:outcome_none', 'local_ai_course_assistant'),
+    'confirmreset'     => $courseid > 0
+        ? get_string('rubric_admin:confirm_reset_course', 'local_ai_course_assistant')
+        : get_string('rubric_admin:confirm_reset_global', 'local_ai_course_assistant'),
+    'previewtitle'     => get_string('rubric_admin:preview_title', 'local_ai_course_assistant'),
+    'previewtype'      => get_string('rubric_admin:preview_type', 'local_ai_course_assistant', $typelabels[$type]),
+    'previewunnamed'   => get_string('rubric_admin:preview_unnamed', 'local_ai_course_assistant'),
+    'previewscore'     => get_string('rubric_admin:preview_score', 'local_ai_course_assistant'),
+    // Substituted client-side: Moodle's string cache hands back the raw {$a}.
+    'previewtotal'     => get_string('rubric_admin:preview_total', 'local_ai_course_assistant'),
+    'previewclose'     => get_string('rubric_admin:preview_close', 'local_ai_course_assistant'),
+];
+
 echo $OUTPUT->header();
 ?>
 
@@ -176,9 +215,9 @@ echo $OUTPUT->header();
 
     <div class="mb-3 d-flex flex-wrap" style="gap:8px">
         <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
+           class="btn btn-sm btn-outline-secondary">&larr; <?php echo get_string('courses_admin:plugin_settings', 'local_ai_course_assistant'); ?></a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(); ?>"
-           class="btn btn-sm btn-outline-secondary">Analytics Dashboard</a>
+           class="btn btn-sm btn-outline-secondary"><?php echo get_string('rubric_admin:analytics_link', 'local_ai_course_assistant'); ?></a>
     </div>
 
     <!-- Scope selector -->
@@ -186,10 +225,10 @@ echo $OUTPUT->header();
         <div class="card-body">
             <form method="get" action="<?php echo $PAGE->url->out_omit_querystring(); ?>" class="form-inline" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                 <input type="hidden" name="type" value="<?php echo $type; ?>">
-                <label for="aica-scope-select" style="font-weight:600;white-space:nowrap">Editing rubric for:</label>
+                <label for="aica-scope-select" style="font-weight:600;white-space:nowrap"><?php echo get_string('rubric_admin:scope_label', 'local_ai_course_assistant'); ?></label>
                 <select id="aica-scope-select" name="courseid" class="form-control form-control-sm" style="max-width:350px"
                         onchange="this.form.submit()">
-                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>>Global Default (all courses)</option>
+                    <option value="0" <?php echo $courseid === 0 ? 'selected' : ''; ?>><?php echo get_string('rubric_admin:scope_global', 'local_ai_course_assistant'); ?></option>
                     <?php foreach ($courses as $c) : ?>
                     <option value="<?php echo $c->id; ?>" <?php echo (int) $c->id === $courseid ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($c->fullname); ?> (<?php echo htmlspecialchars($c->shortname); ?>)
@@ -203,11 +242,11 @@ echo $OUTPUT->header();
     <!-- Type selector -->
     <div class="aica-rb-type-selector">
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['courseid' => $courseid, 'type' => 'conversation']))->out(); ?>"
-           class="<?php echo $type === 'conversation' ? 'active' : ''; ?>">Conversation Practice</a>
+           class="<?php echo $type === 'conversation' ? 'active' : ''; ?>"><?php echo $typelabels['conversation']; ?></a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['courseid' => $courseid, 'type' => 'pronunciation']))->out(); ?>"
-           class="<?php echo $type === 'pronunciation' ? 'active' : ''; ?>">Pronunciation Practice</a>
+           class="<?php echo $type === 'pronunciation' ? 'active' : ''; ?>"><?php echo $typelabels['pronunciation']; ?></a>
         <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['courseid' => $courseid, 'type' => 'speech']))->out(); ?>"
-           class="<?php echo $type === 'speech' ? 'active' : ''; ?>">Soapbox Speech</a>
+           class="<?php echo $type === 'speech' ? 'active' : ''; ?>"><?php echo $typelabels['speech']; ?></a>
     </div>
 
     <?php if ($type === 'speech') : ?>
@@ -235,7 +274,7 @@ echo $OUTPUT->header();
 
     <?php if ($is_inherited) : ?>
     <div class="aica-rb-inherited-badge">
-        This course has no custom rubric. Showing the global default. Edit below to create a course-specific override.
+        <?php echo get_string('rubric_admin:inherited_notice', 'local_ai_course_assistant'); ?>
     </div>
     <?php endif; ?>
 
@@ -247,15 +286,15 @@ echo $OUTPUT->header();
 
         <div id="aica-criteria-container"></div>
 
-        <div class="aica-rb-add-criterion" id="aica-add-criterion-btn">+ Add Criterion</div>
+        <div class="aica-rb-add-criterion" id="aica-add-criterion-btn"><?php echo get_string('rubric_admin:add_criterion', 'local_ai_course_assistant'); ?></div>
 
         <div class="d-flex flex-wrap" style="gap:8px;margin-top:16px">
-            <button type="submit" class="btn btn-primary">Save Rubric</button>
-            <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn">Preview</button>
+            <button type="submit" class="btn btn-primary"><?php echo get_string('rubric_admin:save', 'local_ai_course_assistant'); ?></button>
+            <button type="button" class="btn btn-outline-secondary" id="aica-preview-btn"><?php echo get_string('rubric_admin:preview', 'local_ai_course_assistant'); ?></button>
             <?php if ($courseid > 0 && !$is_inherited) : ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Remove Course Override</button>
+            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn"><?php echo get_string('rubric_admin:remove_override', 'local_ai_course_assistant'); ?></button>
             <?php elseif ($courseid === 0): ?>
-            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn">Reset to Defaults</button>
+            <button type="button" class="btn btn-outline-danger" id="aica-reset-btn"><?php echo get_string('rubric_admin:reset_defaults', 'local_ai_course_assistant'); ?></button>
             <?php endif; ?>
         </div>
     </form>
@@ -271,6 +310,7 @@ echo $OUTPUT->header();
 <script>
 (function() {
     var criteria = <?php echo json_encode($criteria); ?>;
+    var STR = <?php echo json_encode($jsstrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
     // Course outcomes available to map criteria to (per-course rubrics only).
     var sbxObjectives = <?php echo json_encode($outcomesforjs); ?>;
     var container = document.getElementById('aica-criteria-container');
@@ -328,21 +368,21 @@ echo $OUTPUT->header();
 
         var typeLabel = document.createElement('span');
         typeLabel.className = 'aica-rb-type';
-        typeLabel.textContent = 'Criterion';
+        typeLabel.textContent = STR.criterion;
         header.appendChild(typeLabel);
 
         var actions = document.createElement('div');
         actions.className = 'aica-rb-actions';
 
         var upBtn = document.createElement('button');
-        upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = 'Move up';
+        upBtn.type = 'button'; upBtn.innerHTML = '&#8593;'; upBtn.title = STR.moveup;
         upBtn.addEventListener('click', function() {
             if (idx > 0) { var tmp = criteria[idx]; criteria[idx] = criteria[idx-1]; criteria[idx-1] = tmp; renderAll(); }
         });
         actions.appendChild(upBtn);
 
         var downBtn = document.createElement('button');
-        downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = 'Move down';
+        downBtn.type = 'button'; downBtn.innerHTML = '&#8595;'; downBtn.title = STR.movedown;
         downBtn.addEventListener('click', function() {
             if (idx < criteria.length - 1) { var tmp = criteria[idx]; criteria[idx] = criteria[idx+1]; criteria[idx+1] = tmp; renderAll(); }
         });
@@ -350,9 +390,9 @@ echo $OUTPUT->header();
 
         var delBtn = document.createElement('button');
         delBtn.type = 'button'; delBtn.className = 'aica-rb-delete';
-        delBtn.innerHTML = '&#10005;'; delBtn.title = 'Delete criterion';
+        delBtn.innerHTML = '&#10005;'; delBtn.title = STR.deletecriterion;
         delBtn.addEventListener('click', function() {
-            if (confirm('Delete this criterion?')) { criteria.splice(idx, 1); renderAll(); }
+            if (confirm(STR.confirmdelete)) { criteria.splice(idx, 1); renderAll(); }
         });
         actions.appendChild(delBtn);
 
@@ -366,13 +406,13 @@ echo $OUTPUT->header();
         var nameField = document.createElement('div');
         nameField.className = 'aica-rb-field';
         var nameLbl = document.createElement('label');
-        nameLbl.textContent = 'Criterion Name';
+        nameLbl.textContent = STR.name;
         nameField.appendChild(nameLbl);
         var nameInp = document.createElement('input');
         nameInp.type = 'text';
-        nameInp.setAttribute('aria-label', 'Criterion name');
+        nameInp.setAttribute('aria-label', STR.name);
         nameInp.value = c.name || '';
-        nameInp.placeholder = 'e.g. Grammar & Accuracy';
+        nameInp.placeholder = STR.nameplaceholder;
         nameInp.addEventListener('input', function() { c.name = nameInp.value; });
         nameField.appendChild(nameInp);
         inlineFields.appendChild(nameField);
@@ -380,11 +420,11 @@ echo $OUTPUT->header();
         var scoreField = document.createElement('div');
         scoreField.className = 'aica-rb-field aica-rb-score-field';
         var scoreLbl = document.createElement('label');
-        scoreLbl.textContent = 'Max Score';
+        scoreLbl.textContent = STR.maxscore;
         scoreField.appendChild(scoreLbl);
         var scoreInp = document.createElement('input');
         scoreInp.type = 'number';
-        scoreInp.setAttribute('aria-label', 'Maximum score for this criterion');
+        scoreInp.setAttribute('aria-label', STR.maxscorearia);
         scoreInp.value = c.max_score || 5;
         scoreInp.min = 1;
         scoreInp.max = 100;
@@ -398,13 +438,13 @@ echo $OUTPUT->header();
         var descField = document.createElement('div');
         descField.className = 'aica-rb-field';
         var descLbl = document.createElement('label');
-        descLbl.textContent = 'Description';
+        descLbl.textContent = STR.description;
         descField.appendChild(descLbl);
         var descInp = document.createElement('textarea');
-        descInp.setAttribute('aria-label', 'Criterion description');
+        descInp.setAttribute('aria-label', STR.descriptionaria);
         descInp.value = c.description || '';
         descInp.rows = 2;
-        descInp.placeholder = 'Describe what this criterion measures and how it is scored.';
+        descInp.placeholder = STR.descplaceholder;
         descInp.addEventListener('input', function() { c.description = descInp.value; });
         descField.appendChild(descInp);
         card.appendChild(descField);
@@ -415,13 +455,13 @@ echo $OUTPUT->header();
             var outField = document.createElement('div');
             outField.className = 'aica-rb-field';
             var outLbl = document.createElement('label');
-            outLbl.textContent = 'Maps to outcome (optional)';
+            outLbl.textContent = STR.mapsoutcome;
             outField.appendChild(outLbl);
             var outSel = document.createElement('select');
-            outSel.setAttribute('aria-label', 'Course outcome this criterion maps to');
+            outSel.setAttribute('aria-label', STR.outcomearia);
             var none = document.createElement('option');
             none.value = '0';
-            none.textContent = '- None -';
+            none.textContent = STR.outcomenone;
             outSel.appendChild(none);
             sbxObjectives.forEach(function(o) {
                 var opt = document.createElement('option');
@@ -457,10 +497,7 @@ echo $OUTPUT->header();
     // Reset button.
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            var msg = <?php echo $courseid > 0
-                ? "'Remove the custom rubric for this course? Students will see the global default instead.'"
-                : "'Reset the global rubric to the built-in default criteria?'"; ?>;
-            if (confirm(msg)) {
+            if (confirm(STR.confirmreset)) {
                 document.getElementById('aica-reset-form').submit();
             }
         });
@@ -478,13 +515,13 @@ echo $OUTPUT->header();
             panel.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)';
 
             var h = document.createElement('h4');
-            h.textContent = 'Scoring Rubric Preview';
+            h.textContent = STR.previewtitle;
             h.style.marginBottom = '16px';
             panel.appendChild(h);
 
             var typeNote = document.createElement('p');
             typeNote.style.cssText = 'font-size:13px;color:#64748b;margin-bottom:16px';
-            typeNote.textContent = 'Type: <?php echo ucfirst($type); ?> Practice';
+            typeNote.textContent = STR.previewtype;
             panel.appendChild(typeNote);
 
             criteria.forEach(function(c, idx) {
@@ -493,7 +530,7 @@ echo $OUTPUT->header();
 
                 var cName = document.createElement('p');
                 cName.style.cssText = 'font-weight:600;font-size:14px;margin-bottom:4px';
-                cName.textContent = (idx + 1) + '. ' + (c.name || '(unnamed)');
+                cName.textContent = (idx + 1) + '. ' + (c.name || STR.previewunnamed);
                 cDiv.appendChild(cName);
 
                 if (c.description) {
@@ -509,7 +546,7 @@ echo $OUTPUT->header();
 
                 var scaleLbl = document.createElement('span');
                 scaleLbl.style.cssText = 'font-size:12px;color:#94a3b8;margin-right:4px';
-                scaleLbl.textContent = 'Score:';
+                scaleLbl.textContent = STR.previewscore;
                 scaleRow.appendChild(scaleLbl);
 
                 var maxScore = c.max_score || 5;
@@ -534,11 +571,11 @@ echo $OUTPUT->header();
             totalDiv.style.cssText = 'font-weight:700;font-size:14px;margin-bottom:16px;padding:10px;background:#f1f5f9;border-radius:6px;text-align:center';
             var totalScore = 0;
             criteria.forEach(function(c) { totalScore += (c.max_score || 5); });
-            totalDiv.textContent = 'Total Possible: ' + totalScore + ' points';
+            totalDiv.textContent = STR.previewtotal.replace('{$a}', totalScore);
             panel.appendChild(totalDiv);
 
             var closeBtn = document.createElement('button');
-            closeBtn.textContent = 'Close Preview';
+            closeBtn.textContent = STR.previewclose;
             closeBtn.className = 'btn btn-sm btn-outline-secondary';
             closeBtn.addEventListener('click', function() { document.body.removeChild(overlay); });
             panel.appendChild(closeBtn);

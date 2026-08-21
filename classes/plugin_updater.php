@@ -35,9 +35,16 @@ class plugin_updater {
      * @return object {version, release, component}
      */
     public static function get_current_version(): object {
-        global $CFG;
+        // core_plugin_manager, not include(version.php): manually including a
+        // file that assigns into the local $plugin scope works but sidesteps
+        // Moodle's plugin API and re-parses the file on every call. versiondisk
+        // is what the shipped code declares; it falls back to versiondb for the
+        // window between a code deploy and the upgrade step running.
+        $info = \core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
         $plugin = new \stdClass();
-        include($CFG->dirroot . '/local/ai_course_assistant/version.php');
+        $plugin->version = (int) ($info->versiondisk ?? $info->versiondb ?? 0);
+        $plugin->release = (string) ($info->release ?? '');
+        $plugin->component = (string) ($info->component ?? 'local_ai_course_assistant');
         return $plugin;
     }
 

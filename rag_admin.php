@@ -89,8 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($totalindexed === 0 && $samplereason !== '') {
             redirect(
                 $pageurl,
-                $msg . ' Nothing was embedded — first error: ' . $samplereason
-                    . ' Check the embedding provider and API key in Settings.',
+                $msg . ' ' . get_string(
+                    'ragadmin:nothing_embedded_all',
+                    'local_ai_course_assistant',
+                    $samplereason
+                ),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
@@ -111,8 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($stats['fatal'])) {
             redirect(
                 $pageurl,
-                'Indexing could not run: ' . $stats['fatal']
-                    . ' — check the embedding provider and API key in Settings.',
+                get_string(
+                    'ragadmin:indexing_failed',
+                    'local_ai_course_assistant',
+                    $stats['fatal']
+                ),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
@@ -120,8 +126,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stats['indexed'] === 0 && ($stats['sources'] ?? 0) > 0 && !empty($stats['embed_error'])) {
             redirect(
                 $pageurl,
-                $msg . ' No chunks were embedded — first error: ' . $stats['embed_error']
-                    . ' (most often the embedding API key or provider). The existing index was left untouched.',
+                $msg . ' ' . get_string(
+                    'ragadmin:no_chunks_embedded',
+                    'local_ai_course_assistant',
+                    $stats['embed_error']
+                ),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
@@ -129,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (($stats['sources'] ?? 0) === 0) {
             redirect(
                 $pageurl,
-                $msg . ' No extractable content was found in this course (no pages, books, or supported files).',
+                $msg . ' ' . get_string('ragadmin:no_extractable_content', 'local_ai_course_assistant'),
                 null,
                 \core\output\notification::NOTIFY_WARNING
             );
@@ -193,30 +202,9 @@ $activecourses = $DB->get_records_sql($sql);
 $ragenabled  = (bool) get_config('local_ai_course_assistant', 'rag_enabled');
 $settingsurl = new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('ragadmin:title', 'local_ai_course_assistant'));
-
-// Back link.
-echo html_writer::div(
-    html_writer::link(
-        $settingsurl,
-        '&larr; ' . get_string('ragadmin:back_to_settings', 'local_ai_course_assistant'),
-        ['class' => 'btn btn-sm btn-outline-secondary mb-3']
-    ),
-    'mb-2'
-);
-
-// RAG disabled notice.
-if (!$ragenabled) {
-    echo $OUTPUT->notification(
-        get_string('ragadmin:rag_disabled_notice', 'local_ai_course_assistant'),
-        \core\output\notification::NOTIFY_WARNING
-    );
-}
-
 // Content-source status card. Shows each extractor's gate (config flag) and
-// runtime prerequisite (binary present, network allowlisted) so admins can
-// see at a glance why content isn't being indexed. v3.9.6+.
+// runtime prerequisite (binary present, network allowlisted) so admins can see
+// at a glance why content isn't being indexed. v3.9.6+.
 $statusrows = [];
 
 // Embedding provider is the hard prerequisite: without a working provider and
@@ -227,16 +215,26 @@ $embedmodel    = (string) (get_config('local_ai_course_assistant', 'embed_model'
 $embedkey      = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
 $embedneedskey = ($embedprovider !== 'ollama'); // Local Ollama needs no key.
 $embedok       = $embedneedskey ? ($embedkey !== '') : true;
+if ($embedok) {
+    $embeddetail = [get_string('ragadmin:src_embedding_provider', 'local_ai_course_assistant', s($embedprovider))];
+    if ($embedmodel !== '') {
+        $embeddetail[] = get_string('ragadmin:src_embedding_model', 'local_ai_course_assistant', s($embedmodel));
+    }
+    $embeddetail[] = $embedneedskey
+        ? get_string('ragadmin:src_embedding_keyset', 'local_ai_course_assistant')
+        : get_string('ragadmin:src_embedding_nokey', 'local_ai_course_assistant');
+    $embeddetail = implode(' ', $embeddetail);
+} else {
+    $embeddetail = get_string(
+        'ragadmin:src_embedding_missingkey',
+        'local_ai_course_assistant',
+        s($embedprovider)
+    );
+}
 $statusrows[] = [
-    'label' => 'Embedding provider (required for RAG)',
-    'ok'    => $embedok,
-    'detail' => $embedok
-        ? ('Provider: <code>' . s($embedprovider) . '</code>'
-            . ($embedmodel !== '' ? ', model: <code>' . s($embedmodel) . '</code>' : '')
-            . ($embedneedskey ? ', API key set.' : ', no key required (local).'))
-        : ('Provider <code>' . s($embedprovider) . '</code> needs an API key, but '
-            . '<code>embed_apikey</code> is empty. Set it in Settings — without it every '
-            . 'embedding call fails and a reindex produces zero chunks.'),
+    'label'  => get_string('ragadmin:src_embedding', 'local_ai_course_assistant'),
+    'ok'     => $embedok,
+    'detail' => $embeddetail,
 ];
 
 $pdfon = (bool) get_config('local_ai_course_assistant', 'rag_extract_pdf');
@@ -246,200 +244,160 @@ if (class_exists('\\local_ai_course_assistant\\extractors\\file_extractor')) {
     $pdfavail = false;
 }
 $statusrows[] = [
-    'label' => 'PDF (mod_resource)',
-    'ok'    => $pdfon && $pdfavail,
+    'label'  => get_string('ragadmin:src_pdf', 'local_ai_course_assistant'),
+    'ok'     => $pdfon && $pdfavail,
     'detail' => !$pdfon
-        ? 'Disabled in settings.'
+        ? get_string('ragadmin:src_disabled', 'local_ai_course_assistant')
         : ($pdfavail
-            ? 'On. pdftotext binary found.'
-            : 'On, but pdftotext binary not found. Install poppler-utils (apt: <code>poppler-utils</code>; brew: <code>poppler</code>) or set the path in settings.'),
+            ? get_string('ragadmin:src_pdf_ok', 'local_ai_course_assistant')
+            : get_string('ragadmin:src_pdf_missing', 'local_ai_course_assistant')),
 ];
+$docxon = (bool) get_config('local_ai_course_assistant', 'rag_extract_docx');
 $statusrows[] = [
-    'label' => 'DOCX (mod_resource)',
-    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_docx'),
-    'detail' => get_config('local_ai_course_assistant', 'rag_extract_docx')
-        ? 'On. Uses native PHP ZipArchive, no external dependency.'
-        : 'Disabled in settings.',
+    'label'  => get_string('ragadmin:src_docx', 'local_ai_course_assistant'),
+    'ok'     => $docxon,
+    'detail' => $docxon
+        ? get_string('ragadmin:src_docx_ok', 'local_ai_course_assistant')
+        : get_string('ragadmin:src_disabled', 'local_ai_course_assistant'),
 ];
+$pptxon = (bool) get_config('local_ai_course_assistant', 'rag_extract_pptx');
 $statusrows[] = [
-    'label' => 'PPTX (mod_resource)',
-    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_pptx'),
-    'detail' => get_config('local_ai_course_assistant', 'rag_extract_pptx')
-        ? 'On. Uses native PHP ZipArchive, no external dependency. Walks slide and speaker-note XML. (Legacy binary .ppt is not supported; re-save as .pptx.)'
-        : 'Disabled in settings.',
+    'label'  => get_string('ragadmin:src_pptx', 'local_ai_course_assistant'),
+    'ok'     => $pptxon,
+    'detail' => $pptxon
+        ? get_string('ragadmin:src_pptx_ok', 'local_ai_course_assistant')
+        : get_string('ragadmin:src_disabled', 'local_ai_course_assistant'),
 ];
+$h5pon = (bool) get_config('local_ai_course_assistant', 'rag_extract_h5p');
 $statusrows[] = [
-    'label' => 'H5P content',
-    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_h5p'),
-    'detail' => get_config('local_ai_course_assistant', 'rag_extract_h5p')
-        ? 'On. Walks content JSON for text fields.'
-        : 'Disabled in settings.',
+    'label'  => get_string('ragadmin:src_h5p', 'local_ai_course_assistant'),
+    'ok'     => $h5pon,
+    'detail' => $h5pon
+        ? get_string('ragadmin:src_h5p_ok', 'local_ai_course_assistant')
+        : get_string('ragadmin:src_disabled', 'local_ai_course_assistant'),
 ];
+$scormon = (bool) get_config('local_ai_course_assistant', 'rag_extract_scorm');
 $statusrows[] = [
-    'label' => 'SCORM packages',
-    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_extract_scorm'),
-    'detail' => get_config('local_ai_course_assistant', 'rag_extract_scorm')
-        ? 'On. Max package size ' . (get_config('local_ai_course_assistant', 'rag_scorm_max_mb') ?: 100) . ' MB.'
-        : 'Off by default. Enable in settings to index Articulate Storyline and other packaged content.',
+    'label'  => get_string('ragadmin:src_scorm', 'local_ai_course_assistant'),
+    'ok'     => $scormon,
+    'detail' => $scormon
+        ? get_string(
+            'ragadmin:src_scorm_ok',
+            'local_ai_course_assistant',
+            (int) (get_config('local_ai_course_assistant', 'rag_scorm_max_mb') ?: 100)
+        )
+        : get_string('ragadmin:src_scorm_off', 'local_ai_course_assistant'),
 ];
+$transcriptson = (bool) get_config('local_ai_course_assistant', 'rag_fetch_transcripts');
 $statusrows[] = [
-    'label' => 'Embedded video / interactive transcripts',
-    'ok'    => (bool) get_config('local_ai_course_assistant', 'rag_fetch_transcripts'),
-    'detail' => get_config('local_ai_course_assistant', 'rag_fetch_transcripts')
-        ? 'On. Scans pages/books for Synthesia, YouTube, Articulate, and Genially iframes; pairs each with the closest transcript link (above or below).'
-        : 'Off. Enable in settings once the transcript host has allowlisted this server.',
+    'label'  => get_string('ragadmin:src_transcripts', 'local_ai_course_assistant'),
+    'ok'     => $transcriptson,
+    'detail' => $transcriptson
+        ? get_string('ragadmin:src_transcripts_ok', 'local_ai_course_assistant')
+        : get_string('ragadmin:src_transcripts_off', 'local_ai_course_assistant'),
 ];
 
-echo '<div class="card mb-4"><div class="card-body">';
-echo '<h4 class="mb-2">Content sources</h4>';
-echo '<p class="text-muted" style="font-size:13px;">Each row shows a content type the RAG indexer can extract text from, and whether it is currently enabled and ready to run. Click <a href="' . (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant_general']))->out() . '#sec-content">Settings</a> to toggle.</p>';
-echo '<table class="table table-sm mb-0"><tbody>';
-foreach ($statusrows as $r) {
-    $badge = $r['ok']
-        ? '<span class="badge badge-success" style="background:#0f9d58;color:#fff;">Ready</span>'
-        : '<span class="badge badge-secondary" style="background:#6c757d;color:#fff;">Off</span>';
-    echo '<tr>'
-        . '<td style="width:260px;font-weight:500;">' . s($r['label']) . '</td>'
-        . '<td style="width:70px;">' . $badge . '</td>'
-        . '<td style="font-size:13px;color:#495057;">' . $r['detail'] . '</td>'
-        . '</tr>';
+// The template needs the badge label per row alongside the ok flag.
+foreach ($statusrows as $idx => $row) {
+    $statusrows[$idx]['statelabel'] = $row['ok']
+        ? get_string('ragadmin:badge_ready', 'local_ai_course_assistant')
+        : get_string('ragadmin:badge_off', 'local_ai_course_assistant');
 }
-echo '</tbody></table>';
-echo '</div></div>';
 
 // Summary totals.
 $totalchunks   = array_sum(array_column((array) $indexedcourses, 'chunks'));
 $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
-?>
 
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="card-title"><?php echo count($indexedcourses); ?></h3>
-                <p class="card-text text-muted"><?php echo get_string('ragadmin:stat_courses_indexed', 'local_ai_course_assistant'); ?></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="card-title"><?php echo number_format($totalchunks); ?></h3>
-                <p class="card-text text-muted"><?php echo get_string('ragadmin:stat_total_chunks', 'local_ai_course_assistant'); ?></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="card-title"><?php echo number_format($totalembedded); ?></h3>
-                <p class="card-text text-muted"><?php echo get_string('ragadmin:stat_embedded_chunks', 'local_ai_course_assistant'); ?></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3 class="card-title"><?php echo count($activecourses); ?></h3>
-                <p class="card-text text-muted"><?php echo get_string('ragadmin:stat_active_courses', 'local_ai_course_assistant'); ?></p>
-            </div>
-        </div>
-    </div>
-</div>
+// Merge indexed and active courses, deduplicated, for the per-course table.
+$allcourses = $indexedcourses;
+foreach ($activecourses as $ac) {
+    if (!isset($allcourses[$ac->id])) {
+        $ac->chunks      = 0;
+        $ac->embedded    = 0;
+        $ac->lastindexed = null;
+        $allcourses[$ac->id] = $ac;
+    }
+}
+uasort($allcourses, fn($a, $b) => strcmp($a->fullname, $b->fullname));
 
-<!-- Reindex All button -->
-<form method="post" action="<?php echo $pageurl->out(false); ?>" class="mb-4">
-    <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-    <input type="hidden" name="action" value="reindexall">
-    <button type="submit" class="btn btn-primary"
-        onclick="return confirm('<?php echo get_string('ragadmin:reindexall_confirm', 'local_ai_course_assistant'); ?>')">
-        <?php echo get_string('ragadmin:reindexall', 'local_ai_course_assistant'); ?>
-    </button>
-    <small class="text-muted ml-2"><?php echo get_string('ragadmin:reindexall_desc', 'local_ai_course_assistant'); ?></small>
-</form>
+$courserows = [];
+foreach ($allcourses as $c) {
+    $courserows[] = [
+        'id'          => (int) $c->id,
+        'fullname'    => $c->fullname,
+        'courseurl'   => (new moodle_url('/course/view.php', ['id' => $c->id]))->out(false),
+        'chunks'      => number_format((int) $c->chunks),
+        'haschunks'   => ((int) $c->chunks) > 0,
+        'embedded'    => number_format((int) $c->embedded),
+        'hasembedded' => ((int) $c->embedded) > 0,
+        'hasindexed'  => !empty($c->lastindexed),
+        'lastindexed' => !empty($c->lastindexed)
+            ? userdate((int) $c->lastindexed, get_string('strftimedatetimeshort', 'langconfig'))
+            : '',
+    ];
+}
 
-<!-- Status table -->
-<h4><?php echo get_string('ragadmin:index_status', 'local_ai_course_assistant'); ?></h4>
+$templatedata = [
+    'backurl'   => $settingsurl->out(false),
+    'backlabel' => get_string('ragadmin:back_to_settings', 'local_ai_course_assistant'),
+    'sourcestitle' => get_string('ragadmin:content_sources', 'local_ai_course_assistant'),
+    'sourcesdesc'  => get_string(
+        'ragadmin:content_sources_desc',
+        'local_ai_course_assistant',
+        (new moodle_url(
+            '/admin/settings.php',
+            ['section' => 'local_ai_course_assistant_general'],
+            'sec-content'
+        ))->out()
+    ),
+    'statusrows' => array_values($statusrows),
+    'statcards'  => [
+        [
+            'value' => count($indexedcourses),
+            'label' => get_string('ragadmin:stat_courses_indexed', 'local_ai_course_assistant'),
+        ],
+        [
+            'value' => number_format($totalchunks),
+            'label' => get_string('ragadmin:stat_total_chunks', 'local_ai_course_assistant'),
+        ],
+        [
+            'value' => number_format($totalembedded),
+            'label' => get_string('ragadmin:stat_embedded_chunks', 'local_ai_course_assistant'),
+        ],
+        [
+            'value' => count($activecourses),
+            'label' => get_string('ragadmin:stat_active_courses', 'local_ai_course_assistant'),
+        ],
+    ],
+    'posturl' => $pageurl->out(false),
+    'sesskey' => sesskey(),
+    'reindexall'        => get_string('ragadmin:reindexall', 'local_ai_course_assistant'),
+    'reindexallconfirm' => get_string('ragadmin:reindexall_confirm', 'local_ai_course_assistant'),
+    'reindexalldesc'    => get_string('ragadmin:reindexall_desc', 'local_ai_course_assistant'),
+    'indexstatus'   => get_string('ragadmin:index_status', 'local_ai_course_assistant'),
+    'nocourses'     => get_string('ragadmin:no_courses', 'local_ai_course_assistant'),
+    'hascourses'    => !empty($courserows),
+    'colcourse'     => get_string('ragadmin:col_course', 'local_ai_course_assistant'),
+    'colchunks'     => get_string('ragadmin:col_chunks', 'local_ai_course_assistant'),
+    'colembedded'   => get_string('ragadmin:col_embedded', 'local_ai_course_assistant'),
+    'collastindexed' => get_string('ragadmin:col_lastindexed', 'local_ai_course_assistant'),
+    'colactions'    => get_string('ragadmin:col_actions', 'local_ai_course_assistant'),
+    'never'         => get_string('ragadmin:never', 'local_ai_course_assistant'),
+    'reindex'       => get_string('ragadmin:reindex', 'local_ai_course_assistant'),
+    'clearindex'    => get_string('ragadmin:deleteindex', 'local_ai_course_assistant'),
+    'clearconfirm'  => get_string('ragadmin:deleteindex_confirm', 'local_ai_course_assistant'),
+    'courses'       => $courserows,
+];
 
-<?php if (empty($indexedcourses) && empty($activecourses)) : ?>
-    <p class="text-muted"><?php echo get_string('ragadmin:no_courses', 'local_ai_course_assistant'); ?></p>
-<?php else : ?>
-<table class="table table-sm generaltable">
-    <thead>
-        <tr>
-            <th><?php echo get_string('ragadmin:col_course', 'local_ai_course_assistant'); ?></th>
-            <th class="text-right"><?php echo get_string('ragadmin:col_chunks', 'local_ai_course_assistant'); ?></th>
-            <th class="text-right"><?php echo get_string('ragadmin:col_embedded', 'local_ai_course_assistant'); ?></th>
-            <th><?php echo get_string('ragadmin:col_lastindexed', 'local_ai_course_assistant'); ?></th>
-            <th><?php echo get_string('ragadmin:col_actions', 'local_ai_course_assistant'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        // Merge indexed and active courses, deduplicated.
-        $allcourses = $indexedcourses;
-        foreach ($activecourses as $ac) {
-            if (!isset($allcourses[$ac->id])) {
-                $ac->chunks    = 0;
-                $ac->embedded  = 0;
-                $ac->lastindexed = null;
-                $allcourses[$ac->id] = $ac;
-            }
-        }
-        uasort($allcourses, fn($a, $b) => strcmp($a->fullname, $b->fullname));
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('ragadmin:title', 'local_ai_course_assistant'));
 
-        foreach ($allcourses as $course) : ?>
-        <tr>
-            <td>
-                <?php echo html_writer::link(
-                    new moodle_url('/course/view.php', ['id' => $course->id]),
-                    s($course->fullname),
-                    ['target' => '_blank']
-                ); ?>
-            </td>
-            <td class="text-right">
-                <?php echo $course->chunks > 0
-                    ? html_writer::span(number_format($course->chunks), 'badge badge-info')
-                    : html_writer::span('0', 'badge badge-secondary'); ?>
-            </td>
-            <td class="text-right">
-                <?php echo $course->embedded > 0
-                    ? html_writer::span(number_format($course->embedded), 'badge badge-success')
-                    : html_writer::span('0', 'badge badge-secondary'); ?>
-            </td>
-            <td>
-                <?php if (!empty($course->lastindexed)) : ?>
-                    <?php echo userdate((int)$course->lastindexed, get_string('strftimedatetimeshort', 'langconfig')); ?>
-                <?php else : ?>
-                    <span class="text-muted"><?php echo get_string('ragadmin:never', 'local_ai_course_assistant'); ?></span>
-                <?php endif; ?>
-            </td>
-            <td>
-                <form method="post" action="<?php echo $pageurl->out(false); ?>" class="d-inline">
-                    <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-                    <input type="hidden" name="action" value="reindexcourse">
-                    <input type="hidden" name="courseid" value="<?php echo (int)$course->id; ?>">
-                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                        <?php echo get_string('ragadmin:reindex', 'local_ai_course_assistant'); ?>
-                    </button>
-                </form>
-                <?php if ($course->chunks > 0) : ?>
-                <form method="post" action="<?php echo $pageurl->out(false); ?>" class="d-inline ml-1">
-                    <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-                    <input type="hidden" name="action" value="deleteindex">
-                    <input type="hidden" name="courseid" value="<?php echo (int)$course->id; ?>">
-                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                        onclick="return confirm('<?php echo get_string('ragadmin:deleteindex_confirm', 'local_ai_course_assistant'); ?>')">
-                        <?php echo get_string('ragadmin:deleteindex', 'local_ai_course_assistant'); ?>
-                    </button>
-                </form>
-                <?php endif; ?>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
-<?php endif; ?>
+if (!$ragenabled) {
+    echo $OUTPUT->notification(
+        get_string('ragadmin:rag_disabled_notice', 'local_ai_course_assistant'),
+        \core\output\notification::NOTIFY_WARNING
+    );
+}
 
-<?php
+echo $OUTPUT->render_from_template('local_ai_course_assistant/rag_admin', $templatedata);
 echo $OUTPUT->footer();

@@ -63,7 +63,9 @@ $mode = 'all';
 $providersfilter = '';
 $runin = '';
 $judgein = '';
-$outdir = __DIR__ . '/../../runs';
+// dataroot, not the plugin directory: dirroot is web-accessible and must stay
+// read-only at runtime. An explicit --out=... still wins (handled below).
+$outdir = $CFG->dataroot . '/local_ai_course_assistant/runs';
 $datetag = date('Y-m-d-His');
 $judgeprovider = 'claude';
 $judgemodel = 'claude-sonnet-4-6';
@@ -121,26 +123,26 @@ TXT;
     }
 }
 
-if (!is_dir($outdir)) {
-    mkdir($outdir, 0775, true);
-}
+// make_writable_directory(), not a bare mkdir(0775): it is the Moodle API for
+// creating run-time directories and applies the site's configured permissions.
+$outdir = make_writable_directory($outdir);
 
 if ($mode === 'run' || $mode === 'all') {
-    $runin = mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile, $delay);
+    $runin = local_ai_course_assistant_golden_mode_run($providersfilter, $outdir, $datetag, $limit, $promptsfile, $delay);
 }
 if ($mode === 'judge' || $mode === 'all') {
     if ($runin === '') {
         fwrite(STDERR, "ERROR: --mode=judge requires --in=<run.csv>\n");
         exit(1);
     }
-    $judgein = mode_judge($runin, $outdir, $datetag, $judgeprovider, $judgemodel, $promptsfile);
+    $judgein = local_ai_course_assistant_golden_mode_judge($runin, $outdir, $datetag, $judgeprovider, $judgemodel, $promptsfile);
 }
 if ($mode === 'report' || $mode === 'all') {
     if ($runin === '' || $judgein === '') {
         fwrite(STDERR, "ERROR: --mode=report requires --in=<run.csv>,<judge.csv>\n");
         exit(1);
     }
-    mode_report($runin, $judgein, $outdir, $datetag);
+    local_ai_course_assistant_golden_mode_report($runin, $judgein, $outdir, $datetag);
 }
 exit(0);
 
@@ -159,12 +161,12 @@ exit(0);
  * @param float $delay Seconds to sleep between calls (0 = no throttle).
  * @return string Path to run CSV.
  */
-function mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = '', float $delay = 0.0): string {
-    $prompts = load_prompts($promptsfile);
+function local_ai_course_assistant_golden_mode_run(string $providersfilter, string $outdir, string $datetag, int $limit, string $promptsfile = '', float $delay = 0.0): string {
+    $prompts = local_ai_course_assistant_golden_load_prompts($promptsfile);
     if ($limit > 0) {
         $prompts = array_slice($prompts, 0, $limit);
     }
-    $rows = parse_comparison_providers();
+    $rows = local_ai_course_assistant_golden_parse_comparison_providers();
     if ($providersfilter !== '') {
         $wanted = array_map('strtolower', array_map('trim', explode(',', $providersfilter)));
         // Match by exact label or by provider-id prefix so --providers=claude
@@ -204,7 +206,7 @@ function mode_run(string $providersfilter, string $outdir, string $datetag, int 
         $urltag = !empty($row['apibaseurl']) ? ' @ ' . $row['apibaseurl'] : '';
         printf("\n[provider] %s (%s)%s\n", $row['label'], $row['models'], $urltag);
         foreach ($prompts as $p) {
-            $result = run_one_call($row, $systemprompt, $p['text']);
+            $result = local_ai_course_assistant_golden_run_one_call($row, $systemprompt, $p['text']);
             fputcsv($fh, [
                 $row['label'],
                 $row['provider'],
@@ -246,7 +248,7 @@ function mode_run(string $providersfilter, string $outdir, string $datetag, int 
  * @param string $userprompt
  * @return array Result row: ['response', 'prompt_tokens', 'completion_tokens', 'ttft_ms', 'total_latency_ms', 'cost_cents', 'error'].
  */
-function run_one_call(array $row, string $systemprompt, string $userprompt): array {
+function local_ai_course_assistant_golden_run_one_call(array $row, string $systemprompt, string $userprompt): array {
     try {
         $provider = base_provider::create_for_comparison($row['provider'], $row['models'], 0);
         $start = microtime(true);
@@ -311,7 +313,7 @@ function run_one_call(array $row, string $systemprompt, string $userprompt): arr
  * @param string $promptsfile Optional alternate path to a tutor_prompts.json-shaped file.
  * @return string Path to judge CSV.
  */
-function mode_judge(string $runcsv, string $outdir, string $datetag, string $judgeprovider, string $judgemodel, string $promptsfile = ''): string {
+function local_ai_course_assistant_golden_mode_judge(string $runcsv, string $outdir, string $datetag, string $judgeprovider, string $judgemodel, string $promptsfile = ''): string {
     if (!is_readable($runcsv)) {
         fwrite(STDERR, "ERROR: run CSV not readable: $runcsv\n");
         exit(1);
@@ -325,7 +327,7 @@ function mode_judge(string $runcsv, string $outdir, string $datetag, string $jud
     $header = fgetcsv($in);
     $col = array_flip($header);
 
-    $prompts = load_prompts($promptsfile);
+    $prompts = local_ai_course_assistant_golden_load_prompts($promptsfile);
     $promptmap = [];
     foreach ($prompts as $p) {
         $promptmap[$p['id']] = $p['text'];
@@ -341,7 +343,7 @@ function mode_judge(string $runcsv, string $outdir, string $datetag, string $jud
             fputcsv($fh, [$label, $promptid, $category, '', '', '', '', '', 'skipped: response empty or errored']);
             continue;
         }
-        $rubric = score_one($judge, $promptmap[$promptid] ?? '', $response);
+        $rubric = local_ai_course_assistant_golden_score_one($judge, $promptmap[$promptid] ?? '', $response);
         $total = ($rubric['socratic'] ?? 0) + ($rubric['accuracy'] ?? 0) + ($rubric['tone'] ?? 0);
         fputcsv($fh, [
             $label, $promptid, $category,
@@ -375,7 +377,7 @@ function mode_judge(string $runcsv, string $outdir, string $datetag, string $jud
  * @param string $response
  * @return array{socratic?: int, accuracy?: int, tone?: int, notes?: string, error?: string}
  */
-function score_one($judge, string $prompt, string $response): array {
+function local_ai_course_assistant_golden_score_one($judge, string $prompt, string $response): array {
     $systemprompt = <<<TXT
 You are evaluating a tutoring AI's response on three dimensions. Score 1 to 5 on each.
 
@@ -434,9 +436,9 @@ TXT;
  * @param string $outdir
  * @param string $datetag
  */
-function mode_report(string $runcsv, string $judgecsv, string $outdir, string $datetag): void {
-    $runrows = read_csv($runcsv);
-    $judgerows = read_csv($judgecsv);
+function local_ai_course_assistant_golden_mode_report(string $runcsv, string $judgecsv, string $outdir, string $datetag): void {
+    $runrows = local_ai_course_assistant_golden_read_csv($runcsv);
+    $judgerows = local_ai_course_assistant_golden_read_csv($judgecsv);
 
     $stats = []; // label -> aggregates
     foreach ($runrows as $r) {
@@ -485,9 +487,9 @@ function mode_report(string $runcsv, string $judgecsv, string $outdir, string $d
             'calls'         => $s['calls'],
             'errors'        => $s['errors'],
             'avg_cost_cents' => $s['cost_n'] > 0 ? $s['cost_sum'] / $s['cost_n'] : null,
-            'p50_ttft_ms'   => percentile($s['ttft_ms'], 50),
-            'p95_ttft_ms'   => percentile($s['ttft_ms'], 95),
-            'p50_total_ms'  => percentile($s['total_ms'], 50),
+            'p50_ttft_ms'   => local_ai_course_assistant_golden_percentile($s['ttft_ms'], 50),
+            'p95_ttft_ms'   => local_ai_course_assistant_golden_percentile($s['ttft_ms'], 95),
+            'p50_total_ms'  => local_ai_course_assistant_golden_percentile($s['total_ms'], 50),
             'avg_rubric'    => $s['rubric_n'] > 0 ? $s['rubric_sum'] / $s['rubric_n'] : null,
             'rubric_n'      => $s['rubric_n'],
         ];
@@ -615,7 +617,7 @@ function mode_report(string $runcsv, string $judgecsv, string $outdir, string $d
  * @param string $path Optional absolute or repo-relative path to a tutor_prompts.json-shaped file.
  * @return array<int, array{id: string, category: string, text: string}>
  */
-function load_prompts(string $path = ''): array {
+function local_ai_course_assistant_golden_load_prompts(string $path = ''): array {
     if ($path === '') {
         $path = __DIR__ . '/../../tests/golden/tutor_prompts.json';
     } else if ($path[0] !== '/') {
@@ -645,7 +647,7 @@ function load_prompts(string $path = ''): array {
  *
  * @return array<int, array{label: string, provider: string, models: string, apikey: string, temperature: string, apibaseurl: string}>
  */
-function parse_comparison_providers(): array {
+function local_ai_course_assistant_golden_parse_comparison_providers(): array {
     $raw = (string) (get_config('local_ai_course_assistant', 'comparison_providers') ?: '');
     $out = [];
     foreach (preg_split("/\r?\n/", $raw) as $line) {
@@ -691,7 +693,7 @@ function parse_comparison_providers(): array {
  * @param string $path
  * @return array<int, array<string, string>>
  */
-function read_csv(string $path): array {
+function local_ai_course_assistant_golden_read_csv(string $path): array {
     if (!is_readable($path)) {
         fwrite(STDERR, "ERROR: CSV not readable: $path\n");
         exit(1);
@@ -713,7 +715,7 @@ function read_csv(string $path): array {
  * @param int $p 0..100
  * @return mixed The element at the nearest-rank percentile, or null if $values is empty.
  */
-function percentile(array $values, int $p) {
+function local_ai_course_assistant_golden_percentile(array $values, int $p) {
     if (empty($values)) {
         return null;
     }

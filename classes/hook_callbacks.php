@@ -470,82 +470,7 @@ class hook_callbacks {
         }
 
         // Build learning objectives by scanning "Unit X Learning Outcomes" pages.
-        // Supports two Saylor formats:
-        // 1. GENERICO tags: {GENERICO:type="unit_learning_objectives",unit_objectives="[1]..."}
-        // 2. HTML bullet lists: "Upon successful completion..." followed by <li> items
-        $learningobjectives = [];
-        foreach ($modinfo->get_cms() as $cm) {
-            if (!$cm->uservisible || empty($cm->name)) {
-                continue;
-            }
-            $lower = strtolower($cm->name);
-            if (
-                strpos($lower, 'learning outcome') === false
-                && strpos($lower, 'learning objective') === false
-            ) {
-                continue;
-            }
-            if ($cm->modname !== 'page') {
-                continue;
-            }
-            try {
-                $page = $DB->get_record('page', ['id' => $cm->instance, 'course' => $courseid]);
-                if (!$page || empty($page->content)) {
-                    continue;
-                }
-                $content = $page->content;
-                // Extract unit label from page name (e.g. "Unit 3 Learning Outcomes" -> "Unit 3").
-                $unitlabel = '';
-                if (preg_match('/^(Unit\s+\d+)/i', $cm->name, $um)) {
-                    $unitlabel = $um[1] . ': ';
-                }
-                // Format 1: GENERICO tag with numbered objectives.
-                if (preg_match('/unit_objectives="([^"]+)"/', $content, $gm)) {
-                    $raw = $gm[1];
-                    // Split on [N] markers.
-                    $parts = preg_split('/\[\d+\]\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
-                    foreach ($parts as $part) {
-                        $obj = trim(strip_tags($part), " ;\t\n\r\0\x0B");
-                        if (strlen($obj) > 10) {
-                            $learningobjectives[] = ['name' => $unitlabel . $obj];
-                        }
-                    }
-                    continue;
-                }
-                // Format 2: HTML list items.
-                if (preg_match_all('/<li[^>]*>(.*?)<\/li>/si', $content, $lm)) {
-                    foreach ($lm[1] as $li) {
-                        $obj = trim(strip_tags($li), " ;\t\n\r\0\x0B.");
-                        if (strlen($obj) > 10) {
-                            $learningobjectives[] = ['name' => $unitlabel . $obj];
-                        }
-                    }
-                    continue;
-                }
-                // Format 3: Plain text bullet/numbered lines (fallback).
-                $plaintext = strip_tags($content);
-                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
-                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
-                    if (strlen($line) > 10 && stripos($line, 'upon successful') === false) {
-                        $learningobjectives[] = ['name' => $unitlabel . $line];
-                    }
-                }
-            } catch (\Throwable $e) {
-                // Skip pages that can't be read.
-            }
-        }
-        // Fallback: if no learning outcome pages found, parse course summary.
-        if (empty($learningobjectives)) {
-            if (!empty($course->summary)) {
-                $plaintext = strip_tags($course->summary);
-                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
-                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
-                    if (strlen($line) > 10) {
-                        $learningobjectives[] = ['name' => $line];
-                    }
-                }
-            }
-        }
+        $learningobjectives = self::build_learning_objectives($courseid, $modinfo, $course);
 
         // Build module/activity titles from course structure.
         $moduletitles = [];
@@ -961,6 +886,139 @@ class hook_callbacks {
         }
 
         $hook->add_html($html);
+    }
+
+    /**
+     * Scan the course for "Unit X Learning Outcomes" pages and build the
+     * learning-objectives list handed to the widget template.
+     *
+     * Supports two Saylor formats:
+     * 1. GENERICO tags: {GENERICO:type="unit_learning_objectives",unit_objectives="[1]..."}
+     * 2. HTML bullet lists: "Upon successful completion..." followed by <li> items
+     *
+     * @param int $courseid
+     * @param \course_modinfo $modinfo Pre-built modinfo for this course.
+     * @param \stdClass $course Course record; its summary is the fallback source.
+     * @return array<int, array{name: string}>
+     */
+    private static function build_learning_objectives(
+        int $courseid,
+        \course_modinfo $modinfo,
+        \stdClass $course
+    ): array {
+        global $DB;
+
+        $learningobjectives = [];
+
+        // Pass 1: pick the candidate modules. Pass 2 below reads their page
+        // rows in ONE query — this used to be a get_record() per candidate,
+        // i.e. a query per "Unit N Learning Outcomes" page on every course
+        // page view, growing with the size of the course.
+        $candidates = [];
+        foreach ($modinfo->get_cms() as $cm) {
+            if (!$cm->uservisible || empty($cm->name)) {
+                continue;
+            }
+            $lower = strtolower($cm->name);
+            if (
+                strpos($lower, 'learning outcome') === false
+                && strpos($lower, 'learning objective') === false
+            ) {
+                continue;
+            }
+            if ($cm->modname !== 'page') {
+                continue;
+            }
+            $candidates[] = $cm;
+        }
+
+        $pagerows = [];
+        if (!empty($candidates)) {
+            $instanceids = [];
+            foreach ($candidates as $cm) {
+                $instanceids[(int) $cm->instance] = true;
+            }
+            try {
+                [$insql, $inparams] = $DB->get_in_or_equal(
+                    array_keys($instanceids),
+                    SQL_PARAMS_NAMED,
+                    'pg'
+                );
+                $inparams['courseid'] = $courseid;
+                $pagerows = $DB->get_records_select(
+                    'page',
+                    "id {$insql} AND course = :courseid",
+                    $inparams
+                );
+            } catch (\Throwable $e) {
+                // Same posture as the per-page lookup this replaced: an
+                // unreadable page contributes no objectives, it does not
+                // break the widget.
+                $pagerows = [];
+            }
+        }
+
+        foreach ($candidates as $cm) {
+            try {
+                $page = $pagerows[(int) $cm->instance] ?? null;
+                if (!$page || empty($page->content)) {
+                    continue;
+                }
+                $content = $page->content;
+                // Extract unit label from page name (e.g. "Unit 3 Learning Outcomes" -> "Unit 3").
+                $unitlabel = '';
+                if (preg_match('/^(Unit\s+\d+)/i', $cm->name, $um)) {
+                    $unitlabel = $um[1] . ': ';
+                }
+                // Format 1: GENERICO tag with numbered objectives.
+                if (preg_match('/unit_objectives="([^"]+)"/', $content, $gm)) {
+                    $raw = $gm[1];
+                    // Split on [N] markers.
+                    $parts = preg_split('/\[\d+\]\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
+                    foreach ($parts as $part) {
+                        $obj = trim(strip_tags($part), " ;\t\n\r\0\x0B");
+                        if (strlen($obj) > 10) {
+                            $learningobjectives[] = ['name' => $unitlabel . $obj];
+                        }
+                    }
+                    continue;
+                }
+                // Format 2: HTML list items.
+                if (preg_match_all('/<li[^>]*>(.*?)<\/li>/si', $content, $lm)) {
+                    foreach ($lm[1] as $li) {
+                        $obj = trim(strip_tags($li), " ;\t\n\r\0\x0B.");
+                        if (strlen($obj) > 10) {
+                            $learningobjectives[] = ['name' => $unitlabel . $obj];
+                        }
+                    }
+                    continue;
+                }
+                // Format 3: Plain text bullet/numbered lines (fallback).
+                $plaintext = strip_tags($content);
+                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
+                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
+                    if (strlen($line) > 10 && stripos($line, 'upon successful') === false) {
+                        $learningobjectives[] = ['name' => $unitlabel . $line];
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Skip pages that can't be read.
+            }
+        }
+        // Fallback: if no learning outcome pages found, parse course summary.
+        if (empty($learningobjectives)) {
+            if (!empty($course->summary)) {
+                $plaintext = strip_tags($course->summary);
+                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
+                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
+                    if (strlen($line) > 10) {
+                        $learningobjectives[] = ['name' => $line];
+                    }
+                }
+            }
+        }
+
+        return $learningobjectives;
     }
 
     /**
