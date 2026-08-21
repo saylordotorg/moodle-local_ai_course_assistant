@@ -1926,3 +1926,19 @@ $string['radar_report:generated'] = '作成日時: {$a}';
 $string['radar_report:query'] = 'クエリ';
 $string['radar_report:response'] = '応答';
 $string['radar_report:privacy_note'] = 'このレポート内の受講者データはすべて匿名化されています。公開しないでください。';
+
+$string['settings:embed_query_model'] = 'クエリ埋め込みモデル（詳細設定）';
+$string['settings:embed_query_model_desc'] = '必要だと確信できる場合を除き、空欄のままにしてください。通常はクエリとコース教材を同じモデルで埋め込みます。これがあらゆる場合に安全な唯一の選択です。異なるモデルから得たベクトルは比較できず、混在させるとエラーではなく、一見もっともらしいが無意味な結果が返ります。この設定は、2つのモデルが同一の埋め込み空間を共有している場合にのみ指定してください。現在該当するのは Voyage 4 ファミリー（voyage-4-large、voyage-4、voyage-4-lite、voyage-4-nano）で、相互に置き換え可能であることが文書化されています。利点は、コースカタログ全体を再埋め込みせずに、後からクエリ用モデルを変更できることです。モデルが比較不能と判明した場合、検索は警告を記録し、誤った箇所を返す代わりにそのコースについて何も返しません。';
+$string['settings:embed_dtype'] = '保存ベクトルの精度';
+$string['settings:embed_dtype_desc'] = '保存される各ベクトルが占める容量です。精度を下げるとディスク容量を大幅に節約できますが、検索精度はやや低下します。<strong>この設定の変更には完全な再インデックスが必要です</strong>。各形式は相互に読み取れないため、旧形式で保存されたままのコースは再インデックスされるまでスキップされます（ログに警告が記録されます）。この設定を反映するのは量子化に対応したプロバイダーのみで、それ以外は常に完全精度で保存します。';
+$string['settings:embed_dtype_float'] = '完全精度（最大容量・最高精度）';
+$string['settings:embed_dtype_int8'] = '低精度 — 容量は約4分の1';
+$string['settings:embed_dtype_binary'] = '最小 — 容量は約30分の1、精度は最低';
+
+$string['ragadmin:stat_vector_storage'] = 'ベクトル保存容量';
+$string['ragadmin:storage_projection'] = '別の精度で再インデックスすると次の容量になります：{$a}。精度の変更には完全な再インデックスが必要です。';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — 約 {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = '完全精度';
+$string['settings:embed_dtype_shortint8'] = '低精度';
+$string['settings:embed_dtype_shortbinary'] = '最小';

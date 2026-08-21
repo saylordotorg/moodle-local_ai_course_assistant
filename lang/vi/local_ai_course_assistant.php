@@ -1955,3 +1955,19 @@ $string['radar_report:generated'] = 'Tạo lúc {$a}';
 $string['radar_report:query'] = 'Truy vấn';
 $string['radar_report:response'] = 'Phản hồi';
 $string['radar_report:privacy_note'] = 'Toàn bộ dữ liệu người học trong báo cáo này đã được ẩn danh. Không chia sẻ công khai.';
+
+$string['settings:embed_query_model'] = 'Mô hình nhúng truy vấn (nâng cao)';
+$string['settings:embed_query_model_desc'] = 'Hãy để trống trừ khi bạn chắc chắn cần đến nó. Thông thường truy vấn và nội dung khóa học được nhúng bởi cùng một mô hình, và đó là lựa chọn duy nhất an toàn trong mọi trường hợp: các vectơ từ những mô hình khác nhau không thể so sánh được, và việc trộn lẫn chúng tạo ra kết quả trông có vẻ đáng tin nhưng vô nghĩa, thay vì báo lỗi. Chỉ đặt giá trị này khi hai mô hình dùng chung một không gian nhúng — hiện nay là dòng Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), đã được tài liệu hóa là có thể thay thế cho nhau. Lợi ích là bạn có thể đổi mô hình truy vấn về sau mà không phải nhúng lại toàn bộ danh mục khóa học. Nếu hai mô hình hóa ra không so sánh được, quá trình truy xuất sẽ ghi một cảnh báo và không trả về gì cho khóa học đó, thay vì trả về những đoạn sai.';
+$string['settings:embed_dtype'] = 'Độ chính xác của vectơ đã lưu';
+$string['settings:embed_dtype_desc'] = 'Mỗi vectơ đã lưu chiếm bao nhiêu dung lượng. Độ chính xác thấp hơn tiết kiệm rất nhiều dung lượng đĩa nhưng làm giảm phần nào độ chính xác khi truy xuất. <strong>Thay đổi thiết lập này đòi hỏi lập chỉ mục lại toàn bộ</strong> — các định dạng không thể đọc thay thế cho nhau, và bất kỳ khóa học nào vẫn còn lưu ở định dạng cũ sẽ bị bỏ qua (kèm một cảnh báo trong bản ghi) cho đến khi được lập chỉ mục lại. Chỉ những nhà cung cấp hỗ trợ lượng tử hóa mới tuân theo thiết lập này; các nhà cung cấp khác luôn lưu ở độ chính xác đầy đủ.';
+$string['settings:embed_dtype_float'] = 'Độ chính xác đầy đủ (lớn nhất, chính xác nhất)';
+$string['settings:embed_dtype_int8'] = 'Độ chính xác giảm — khoảng một phần tư dung lượng';
+$string['settings:embed_dtype_binary'] = 'Nhỏ nhất — khoảng một phần ba mươi dung lượng, độ chính xác thấp nhất';
+
+$string['ragadmin:stat_vector_storage'] = 'Dung lượng lưu vectơ';
+$string['ragadmin:storage_projection'] = 'Lập chỉ mục lại ở độ chính xác khác sẽ thay đổi con số này thành: {$a}. Thay đổi độ chính xác đòi hỏi lập chỉ mục lại toàn bộ.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — khoảng {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Độ chính xác đầy đủ';
+$string['settings:embed_dtype_shortint8'] = 'Độ chính xác giảm';
+$string['settings:embed_dtype_shortbinary'] = 'Nhỏ nhất';

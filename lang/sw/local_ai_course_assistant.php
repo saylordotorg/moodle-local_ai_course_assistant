@@ -1956,3 +1956,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Anwani ya webhook inayoingia
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Anwani ya hiari ya webhook inayoingia ya Slack. Muhtasari huchapishwa kama ujumbe wa vizuizi vya Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Anwani ya webhook inayoingia ya Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Anwani ya hiari ya webhook inayoingia ya Teams. Muhtasari huchapishwa kama kadi ya kiunganishi cha Office 365.';
+
+$string['settings:embed_query_model'] = 'Modeli ya kupachika maswali (ya kina)';
+$string['settings:embed_query_model_desc'] = 'Acha wazi isipokuwa unajua kwa uhakika kwamba unaihitaji. Kwa kawaida maswali na maudhui ya kozi hupachikwa kwa modeli moja, na hiyo ni chaguo pekee lililo salama kila wakati: vekta kutoka modeli tofauti haziwezi kulinganishwa, na kuzichanganya hutoa matokeo yanayoonekana ya kuaminika lakini bila maana, badala ya kosa. Weka hii tu wakati modeli hizo mbili zinashiriki nafasi moja ya kupachika — kwa sasa familia ya Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), ambazo zimeandikwa kuwa zinaweza kubadilishana. Faida ni kwamba unaweza kubadilisha modeli ya maswali baadaye bila kupachika tena katalogi yote ya kozi zako. Ikiwa modeli zinaonekana kutokuwa za kulinganishwa, upataji hurekodi onyo na haurudishi kitu kwa kozi hiyo badala ya kurudisha vifungu visivyo sahihi.';
+$string['settings:embed_dtype'] = 'Usahihi wa vekta zilizohifadhiwa';
+$string['settings:embed_dtype_desc'] = 'Nafasi ambayo kila vekta iliyohifadhiwa inachukua. Usahihi wa chini huokoa nafasi kubwa ya diski kwa hasara kidogo ya usahihi wa upataji. <strong>Kubadilisha hii kunahitaji kupanga upya faharasa yote</strong> — miundo haiwezi kusomwa kwa kubadilishana, na kozi yoyote ambayo bado imehifadhiwa katika muundo wa zamani itarukwa (kwa onyo katika kumbukumbu) hadi ipangwe upya. Watoa huduma wanaounga mkono upunguzaji tu wanaifuata hii; wengine huhifadhi kwa usahihi kamili kila wakati.';
+$string['settings:embed_dtype_float'] = 'Usahihi kamili (kubwa zaidi, sahihi zaidi)';
+$string['settings:embed_dtype_int8'] = 'Usahihi uliopunguzwa — takriban robo ya nafasi';
+$string['settings:embed_dtype_binary'] = 'Ndogo zaidi — takriban thelathini moja ya nafasi, usahihi wa chini zaidi';
+
+$string['ragadmin:stat_vector_storage'] = 'Hifadhi ya vekta';
+$string['ragadmin:storage_projection'] = 'Kupanga upya faharasa kwa usahihi tofauti kutabadilisha hii kuwa: {$a}. Kubadilisha usahihi kunahitaji kupanga upya faharasa yote.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — takriban {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Usahihi kamili';
+$string['settings:embed_dtype_shortint8'] = 'Usahihi uliopunguzwa';
+$string['settings:embed_dtype_shortbinary'] = 'Ndogo zaidi';

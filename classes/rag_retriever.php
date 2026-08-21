@@ -60,7 +60,17 @@ class rag_retriever {
             self::$vectorcache = [];
             return;
         }
-        unset(self::$vectorcache["course_{$courseid}"]);
+        // Keys are "course_<id>_<querymodel hash>", because a cached set is
+        // filtered for comparability against one query model. Flushing has to
+        // clear every variant for the course: an exact unset() of
+        // "course_<id>" matches nothing and would leave a reindexed course
+        // scoring against vectors that no longer exist.
+        $prefix = "course_{$courseid}_";
+        foreach (array_keys(self::$vectorcache) as $key) {
+            if ($key === "course_{$courseid}" || strpos($key, $prefix) === 0) {
+                unset(self::$vectorcache[$key]);
+            }
+        }
     }
 
     /**
@@ -142,11 +152,33 @@ class rag_retriever {
             return [];
         }
 
+        // Which embedding space this query vector lives in. Compared against
+        // each stored chunk's recorded model below, so that a query embedded by
+        // one model is never scored against documents embedded by an
+        // incomparable one.
+        $querymodel = $provider->get_query_model();
+
+        // Encoding the index is expected to be in. Used to decide whether the
+        // query vector is a float array (float/int8 indexes) or packed bits
+        // (binary indexes), and to reject rows stored in a different encoding.
+        $configureddtype = $provider->effective_dtype();
+
+        // The cached set is filtered by comparability against the query model,
+        // so it is only reusable for the same query model. Two retrievals in one
+        // request with different query models would otherwise share a cache
+        // entry built for the first one.
+        $cache_key .= '_' . md5($querymodel);
+
         // Load and decode embeddings (cached per-course within the request).
         if (!isset(self::$vectorcache[$cache_key])) {
             $rows = $DB->get_records_select(
                 'local_ai_course_assistant_chunks',
-                'courseid = :courseid AND embedding IS NOT NULL',
+                // Either column is sufficient. Testing only `embedding` made
+                // every quantized row invisible: an int8 or binary index writes
+                // the packed blob and leaves the JSON column null, because
+                // storing a second, larger copy of the vector would defeat the
+                // point of quantizing it.
+                'courseid = :courseid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
                 ['courseid' => $courseid],
                 '',
                 // NB: `content` is deliberately NOT selected here. Scoring
@@ -156,21 +188,101 @@ class rag_retriever {
                 // (course 116: ~318 ms vs ~315 ms; the difference is within
                 // noise) but a real memory one: the largest course holds
                 // 56 MB of chunk text that scoring never looks at.
-                'id, embedding, embedding_bin, cmid, modtype, chunkindex'
+                'id, embedding, embedding_bin, embed_dtype, embed_model, cmid, modtype, chunkindex'
             );
 
             self::$vectorcache[$cache_key] = [];
             if (!empty($rows)) {
+                $skippedincompatible = 0;
+                $skippedmodel = '';
+                $skippeddtype = 0;
+                $skippeddtypename = '';
                 foreach ($rows as $row) {
-                    $vec = self::decode_vector($row->embedding_bin ?? null, $row->embedding ?? null);
+                    $rowdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
+                        $row->embed_dtype ?? null
+                    );
+                    $rowmodel = (string) ($row->embed_model ?? '');
+
+                    // Refuse to score across embedding spaces or encodings.
+                    // Both refusals are decided by classify_row(), which is pure
+                    // and unit-tested; retrieve() itself cannot be exercised in a
+                    // test because it makes a billable API call first.
+                    $verdict = self::classify_row($querymodel, $configureddtype, $rowmodel, $rowdtype);
+                    if ($verdict === 'model') {
+                        $skippedincompatible++;
+                        $skippedmodel = $rowmodel;
+                        continue;
+                    }
+                    if ($verdict === 'dtype') {
+                        $skippeddtype++;
+                        $skippeddtypename = $rowdtype;
+                        continue;
+                    }
+
+                    if ($rowdtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+                        $blob = (string) ($row->embedding_bin ?? '');
+                        if ($blob === '') {
+                            continue;
+                        }
+                        self::$vectorcache[$cache_key][$row->id] = [
+                            'vec'        => [],
+                            'bin'        => $blob,
+                            'dtype'      => $rowdtype,
+                            'cmid'       => isset($row->cmid) ? (int) $row->cmid : null,
+                            'modtype'    => (string) ($row->modtype ?? ''),
+                            'chunkindex' => (int) ($row->chunkindex ?? 0),
+                        ];
+                        continue;
+                    }
+
+                    $vec = self::decode_vector(
+                        $row->embedding_bin ?? null,
+                        $row->embedding ?? null,
+                        $rowdtype
+                    );
                     if (is_array($vec) && !empty($vec)) {
                         self::$vectorcache[$cache_key][$row->id] = [
                             'vec'        => $vec,
+                            'bin'        => null,
+                            'dtype'      => $rowdtype,
                             'cmid'       => isset($row->cmid) ? (int) $row->cmid : null,
                             'modtype'    => (string) ($row->modtype ?? ''),
                             'chunkindex' => (int) ($row->chunkindex ?? 0),
                         ];
                     }
+                }
+
+                if ($skippedincompatible > 0) {
+                    // Loud, because the symptom otherwise is "retrieval quietly
+                    // returns nothing" and the cause is a config change made
+                    // days earlier.
+                    debugging(
+                        sprintf(
+                            'rag_retriever: skipped %d chunk(s) in course %d embedded with "%s", '
+                            . 'which is not comparable to the query model "%s". '
+                            . 'Re-index the course, or set embed_query_model back to a compatible model.',
+                            $skippedincompatible,
+                            $courseid,
+                            shorten_text($skippedmodel, 100),
+                            shorten_text($querymodel, 100)
+                        ),
+                        DEBUG_NORMAL
+                    );
+                }
+
+                if ($skippeddtype > 0) {
+                    debugging(
+                        sprintf(
+                            'rag_retriever: skipped %d chunk(s) in course %d stored as "%s" while the '
+                            . 'configured embed_dtype is "%s". Re-index the course after changing '
+                            . 'embed_dtype — the encodings are not interchangeable.',
+                            $skippeddtype,
+                            $courseid,
+                            shorten_text($skippeddtypename, 40),
+                            $configureddtype
+                        ),
+                        DEBUG_NORMAL
+                    );
                 }
             }
         }
@@ -189,8 +301,33 @@ class rag_retriever {
         }
         $qnorm = sqrt($qnorm);
 
+        // Binary indexes are scored by Hamming distance, which needs the query
+        // in the same bit-packed form. When the configured dtype is binary the
+        // provider has already asked the API for a binary query, so $queryvec
+        // holds packed bytes rather than floats and only needs packing into a
+        // string. It is deliberately NOT derived from a float query: sign(float)
+        // reproduces the API's bits only ~87.5% of the time.
+        $querybin = null;
+        if ($configureddtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+            $querybin = self::pack_vector($queryvec, \local_ai_course_assistant\embedding_compat::DTYPE_BINARY);
+        }
+
         $scored = [];
         foreach (self::$vectorcache[$cache_key] as $chunkid => $entry) {
+            if (($entry['dtype'] ?? '') === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+                $score = ($querybin === null || $querybin === '')
+                    ? 0.0
+                    : self::binary_similarity($querybin, (string) $entry['bin']);
+                $scored[] = [
+                    'id'         => $chunkid,
+                    'content'    => '',
+                    'score'      => $score,
+                    'cmid'       => $entry['cmid'],
+                    'modtype'    => $entry['modtype'],
+                    'chunkindex' => $entry['chunkindex'],
+                ];
+                continue;
+            }
             $score    = self::cosine_against_query($queryvec, $qnorm, $entry['vec']);
             $scored[] = [
                 'id'         => $chunkid,
@@ -552,10 +689,156 @@ class rag_retriever {
      * a full course: max element error 0.0 and max cosine-score delta 0.0.
      *
      * @param array $vec
+     * @param string $dtype One of embedding_compat::DTYPES. Defaults to float so
+     *                      every pre-quantization caller keeps its behaviour.
      * @return string Binary blob.
      */
-    public static function pack_vector(array $vec): string {
-        return pack('g*', ...array_map('floatval', array_values($vec)));
+    public static function pack_vector(array $vec, string $dtype = 'float'): string {
+        $dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype($dtype);
+        $vals = array_values($vec);
+        if ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_INT8) {
+            // Signed bytes, one per dimension. Clamped rather than trusted:
+            // pack('c') on an out-of-range value wraps silently, turning a 130
+            // into -126 and inverting that dimension's contribution.
+            $ints = [];
+            foreach ($vals as $v) {
+                $i = (int) round((float) $v);
+                $ints[] = max(-128, min(127, $i));
+            }
+            return $ints ? pack('c*', ...$ints) : '';
+        }
+        if ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+            // Already bit-packed by the API: each returned value is one byte
+            // holding eight dimensions. Stored verbatim as unsigned bytes.
+            $ints = [];
+            foreach ($vals as $v) {
+                $i = (int) round((float) $v);
+                // The API may hand these back signed (-128..127) or unsigned
+                // (0..255); both describe the same bits. Normalize to unsigned
+                // so the stored blob is one canonical form.
+                $ints[] = ($i < 0) ? ($i + 256) & 0xFF : $i & 0xFF;
+            }
+            return $ints ? pack('C*', ...$ints) : '';
+        }
+        return pack('g*', ...array_map('floatval', $vals));
+    }
+
+    /**
+     * Decide whether a stored chunk row may be scored against this query.
+     *
+     * Pure and static so the two refusal rules can be tested without a live
+     * embedding provider — retrieve() cannot be exercised in a unit test
+     * because it makes a billable API call before it reaches this logic.
+     *
+     * Returns:
+     *  - 'ok'    scoreable
+     *  - 'model' the row's embedding model is not comparable with the query's
+     *  - 'dtype' the row's encoding does not match the query's
+     *
+     * A row with no recorded model is treated as usable: it predates the column
+     * and was written by whichever model was configured then, which is the best
+     * assumption available and preserves existing indexes.
+     *
+     * @param string $querymodel Model that produced the query vector.
+     * @param string $configureddtype Encoding the query is prepared for.
+     * @param string|null $rowmodel Model recorded on the chunk, if any.
+     * @param string|null $rowdtype Encoding recorded on the chunk, if any.
+     * @return string One of 'ok', 'model', 'dtype'.
+     */
+    public static function classify_row(
+        string $querymodel,
+        string $configureddtype,
+        ?string $rowmodel,
+        ?string $rowdtype
+    ): string {
+        $rowmodel = trim((string) $rowmodel);
+        if (
+            $rowmodel !== '' && trim($querymodel) !== ''
+            && !\local_ai_course_assistant\embedding_compat::are_comparable($querymodel, $rowmodel)
+        ) {
+            return 'model';
+        }
+        // Encoding is a stricter test than the model one: binary is scored by
+        // Hamming distance on bits and float/int8 by cosine on numbers, so a
+        // mismatch is not a degraded comparison but a meaningless one.
+        $binaryrow = (\local_ai_course_assistant\embedding_compat::normalize_dtype($rowdtype)
+            === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY);
+        $binaryquery = (\local_ai_course_assistant\embedding_compat::normalize_dtype($configureddtype)
+            === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY);
+        if ($binaryrow !== $binaryquery) {
+            return 'dtype';
+        }
+        return 'ok';
+    }
+
+    /**
+     * Precomputed population count for every byte value.
+     *
+     * Binary vectors are scored by Hamming distance, which needs the number of
+     * set bits in each XOR byte. A 256-entry table turns that into an array
+     * lookup: on a 1024-dimension vector this is 128 lookups per chunk against
+     * 1024 float multiplications, so quantizing to binary makes scoring cheaper
+     * as well as smaller.
+     *
+     * @return int[]
+     */
+    private static function popcount_table(): array {
+        static $table = null;
+        if ($table === null) {
+            $table = [];
+            for ($i = 0; $i < 256; $i++) {
+                $c = 0;
+                $v = $i;
+                while ($v) {
+                    $c += $v & 1;
+                    $v >>= 1;
+                }
+                $table[$i] = $c;
+            }
+        }
+        return $table;
+    }
+
+    /**
+     * Similarity between two bit-packed vectors, on the same scale as cosine.
+     *
+     * Cosine is not defined on bits, so this uses the standard substitute: the
+     * normalized dot product of the sign vectors, which for equal-length bit
+     * strings is (bits - 2 * hamming) / bits. That lands in [-1, 1] with
+     * unrelated vectors near 0 and identical vectors at 1 — the same scale
+     * cosine occupies in practice.
+     *
+     * Returning that raw value matters, and an earlier version of this method
+     * got it wrong by rescaling to [0, 1]. Under that mapping two unrelated
+     * vectors scored 0.5 rather than 0, so every chunk cleared the default
+     * rag_min_similarity of 0.25 and the relevance floor silently stopped
+     * filtering anything. Measured on live vectors, the rescaled scores for a
+     * relevant and two irrelevant documents were 0.659 / 0.523 / 0.506, against
+     * float cosine's 0.499 / 0.062 / 0.019; the raw form gives 0.318 / 0.045 /
+     * 0.012, which the same floor handles correctly.
+     *
+     * @param string $a Packed bytes.
+     * @param string $b Packed bytes.
+     * @return float In [-1, 1].
+     */
+    public static function binary_similarity(string $a, string $b): float {
+        $len = strlen($a);
+        // Different lengths mean different widths, which means the two vectors
+        // are not from the same space. Returning 0 keeps such a row out of the
+        // results instead of scoring it against a truncated comparison.
+        if ($len === 0 || $len !== strlen($b)) {
+            return 0.0;
+        }
+        $table = self::popcount_table();
+        $xor = $a ^ $b;
+        $hamming = 0;
+        for ($i = 0; $i < $len; $i++) {
+            $hamming += $table[ord($xor[$i])];
+        }
+        $bits = $len * 8;
+        // Raw sign-vector cosine, NOT rescaled to [0, 1]: unrelated vectors must
+        // score near 0 so the shared relevance floor keeps working.
+        return 1.0 - (2.0 * $hamming / $bits);
     }
 
     /**
@@ -566,15 +849,38 @@ class rag_retriever {
      * converted still read correctly. Once every row has a binary vector the
      * JSON column can be dropped in a later release.
      *
-     * @param string|null $bin Packed float32 blob, or null.
+     * @param string|null $bin Packed vector blob, or null.
      * @param string|null $json Legacy JSON array, or null.
-     * @return array Float vector, empty on failure.
+     * @param string $dtype How $bin is encoded; one of embedding_compat::DTYPES.
+     *                      Defaults to float, which is what every row written
+     *                      before the embed_dtype column contains.
+     * @return array Float vector, empty on failure and empty for binary — see
+     *               the note above on why binary is not expanded here.
      */
-    public static function decode_vector(?string $bin, ?string $json): array {
+    public static function decode_vector(?string $bin, ?string $json, string $dtype = 'float'): array {
+        $dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype($dtype);
+
         if ($bin !== null && $bin !== '') {
-            // A truncated blob would silently yield a short vector and score
-            // nonsense, so require a whole number of float32s.
-            if (strlen($bin) % 4 === 0) {
+            if ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_INT8) {
+                // One signed byte per dimension, so any length is structurally
+                // valid; there is no alignment check to make.
+                $vec = unpack('c*', $bin);
+                if (is_array($vec) && !empty($vec)) {
+                    // Returned as-is. Cosine is scale-invariant, so int8
+                    // magnitudes score identically to their dequantized
+                    // counterparts without a multiply per element.
+                    return array_map('floatval', array_values($vec));
+                }
+            } else if ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+                // Binary vectors are NOT expanded here. Scoring compares packed
+                // bytes directly via binary_similarity(), which is the whole
+                // point of the encoding: expanding 128 bytes into 1024 floats
+                // would throw away both the memory and the speed win.
+                // decode_binary_vector() is the accessor for this case.
+                return [];
+            } else if (strlen($bin) % 4 === 0) {
+                // A truncated blob would silently yield a short vector and score
+                // nonsense, so require a whole number of float32s.
                 $vec = unpack('g*', $bin);
                 if (is_array($vec) && !empty($vec)) {
                     return array_values($vec);

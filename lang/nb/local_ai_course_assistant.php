@@ -1926,3 +1926,19 @@ $string['radar_report:generated'] = 'Generert {$a}';
 $string['radar_report:query'] = 'Spørring';
 $string['radar_report:response'] = 'Svar';
 $string['radar_report:privacy_note'] = 'Alle studentdata i denne rapporten er anonymisert. Ikke del den offentlig.';
+
+$string['settings:embed_query_model'] = 'Modell for spørringsinnbygging (avansert)';
+$string['settings:embed_query_model_desc'] = 'La feltet stå tomt med mindre du er sikker på at du trenger det. Vanligvis bygges både spørringer og kursinnhold inn av samme modell, og det er det eneste valget som alltid er trygt: vektorer fra ulike modeller kan ikke sammenlignes, og å blande dem gir resultater som ser troverdige ut men er meningsløse, i stedet for en feilmelding. Angi dette bare når de to modellene deler samme innbyggingsrom – for tiden Voyage 4-familien (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), som er dokumentert som utbyttbare. Fordelen er at du kan bytte spørringsmodell senere uten å bygge inn hele kurskatalogen på nytt. Skulle modellene vise seg å ikke være sammenlignbare, logger søket en advarsel og returnerer ingenting for det kurset i stedet for feil tekstutsnitt.';
+$string['settings:embed_dtype'] = 'Presisjon for lagrede vektorer';
+$string['settings:embed_dtype_desc'] = 'Hvor mye plass hver lagrede vektor tar. Lavere presisjon sparer mye diskplass, men gir noe dårligere treffsikkerhet i søk. <strong>Å endre denne innstillingen krever full reindeksering</strong> – formatene kan ikke leses om hverandre, og et kurs som fortsatt er lagret i det gamle formatet blir hoppet over (med en advarsel i loggen) til det er reindeksert. Bare leverandører som støtter kvantisering følger denne innstillingen; andre lagrer alltid med full presisjon.';
+$string['settings:embed_dtype_float'] = 'Full presisjon (størst, mest nøyaktig)';
+$string['settings:embed_dtype_int8'] = 'Redusert presisjon – omtrent en fjerdedel av plassen';
+$string['settings:embed_dtype_binary'] = 'Minst – omtrent en trettiendedel av plassen, lavest nøyaktighet';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektorlagring';
+$string['ragadmin:storage_projection'] = 'Reindeksering med en annen presisjon ville endret dette til: {$a}. Å endre presisjon krever full reindeksering.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — omtrent {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Full presisjon';
+$string['settings:embed_dtype_shortint8'] = 'Redusert presisjon';
+$string['settings:embed_dtype_shortbinary'] = 'Minst';

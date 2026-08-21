@@ -1949,3 +1949,19 @@ $string['radar_report:generated'] = 'Dijana pada {$a}';
 $string['radar_report:query'] = 'Pertanyaan';
 $string['radar_report:response'] = 'Jawapan';
 $string['radar_report:privacy_note'] = 'Semua data pelajar dalam laporan ini telah dilindungi identitinya. Jangan kongsi secara awam.';
+
+$string['settings:embed_query_model'] = 'Model pembenaman pertanyaan (lanjutan)';
+$string['settings:embed_query_model_desc'] = 'Biarkan kosong melainkan anda pasti memerlukannya. Biasanya pertanyaan dan kandungan kursus dibenamkan oleh model yang sama, dan itulah satu-satunya pilihan yang selamat dalam semua keadaan: vektor daripada model berbeza tidak boleh dibandingkan, dan mencampurkannya menghasilkan keputusan yang kelihatan yakin tetapi tidak bermakna, bukan satu ralat. Tetapkan ini hanya apabila kedua-dua model berkongsi satu ruang pembenaman — kini keluarga Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), yang didokumenkan boleh saling ditukar ganti. Kelebihannya, anda boleh menukar model pertanyaan kemudian tanpa membenamkan semula seluruh katalog kursus anda. Jika model didapati tidak boleh dibandingkan, perolehan akan mencatat amaran dan tidak memulangkan apa-apa bagi kursus itu, bukannya memulangkan petikan yang salah.';
+$string['settings:embed_dtype'] = 'Ketepatan vektor tersimpan';
+$string['settings:embed_dtype_desc'] = 'Berapa banyak ruang yang diambil oleh setiap vektor tersimpan. Ketepatan lebih rendah menjimatkan banyak ruang cakera dengan sedikit kehilangan ketepatan perolehan. <strong>Menukar tetapan ini memerlukan pengindeksan semula sepenuhnya</strong> — formatnya tidak boleh dibaca secara silih ganti, dan mana-mana kursus yang masih tersimpan dalam format lama akan dilangkau (dengan amaran dalam log) sampai ia diindeks semula. Hanya penyedia yang menyokong kuantisasi mematuhi tetapan ini; yang lain sentiasa menyimpan pada ketepatan penuh.';
+$string['settings:embed_dtype_float'] = 'Ketepatan penuh (terbesar, paling tepat)';
+$string['settings:embed_dtype_int8'] = 'Ketepatan dikurangkan — kira-kira satu perempat ruang';
+$string['settings:embed_dtype_binary'] = 'Terkecil — kira-kira satu per tiga puluh ruang, ketepatan terendah';
+
+$string['ragadmin:stat_vector_storage'] = 'Storan vektor';
+$string['ragadmin:storage_projection'] = 'Pengindeksan semula pada ketepatan berbeza akan mengubah ini kepada: {$a}. Menukar ketepatan memerlukan pengindeksan semula sepenuhnya.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — kira-kira {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Ketepatan penuh';
+$string['settings:embed_dtype_shortint8'] = 'Ketepatan dikurangkan';
+$string['settings:embed_dtype_shortbinary'] = 'Terkecil';

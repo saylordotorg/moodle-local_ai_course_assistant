@@ -1923,3 +1923,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Teessoo webhook galaa Slack'
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Teessoo webhook galaa Slack filannoo. Cuunfaan akka ergaa bloki Slack maxxanfama.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Teessoo webhook galaa Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Teessoo webhook galaa Teams filannoo. Cuunfaan akka kaardii walqunnamsiisaa Office 365 maxxanfama.';
+
+$string['settings:embed_query_model'] = 'Moodela gaaffii galchuu (olaanaa)';
+$string['settings:embed_query_model_desc'] = 'Isa barbaaddu ta\'uu yoo mirkaneessite malee duwwaa dhiisi. Akkuma barameetti gaaffiiwwanii fi qabiyyeen koorsii moodela tokkoon galchamu, kunis filannoo yeroo hunda nagaa ta\'e qofa: vektaroonni moodeloota adda addaa irraa dhufan wal madaalamuu hin danda\'an, isaan makuun dogoggora agarsiisuu mannaa bu\'aa amanamaa fakkaatu garuu hiika hin qabne kenna. Kana kaa\'i yoo moodelonni lamaan iddoo galchuu tokko qooddatan qofa — amma maatii Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), kanneen wal jijjiiruu danda\'an jedhamanii galmeeffaman. Faayidaan isaa katalogii koorsii keessan guutuu irra deebi\'anii galchuu malee booda moodela gaaffii jijjiiruu dandeessu. Yoo moodelonni wal madaalamuu hin danda\'an ta\'anii argaman, argachuun akeekkachiisa galmeessa, kutaa dogoggoraa deebisuu mannaa koorsii sanaaf homaa hin deebisu.';
+$string['settings:embed_dtype'] = 'Sirrummaa vektara kuufame';
+$string['settings:embed_dtype_desc'] = 'Vektarri kuufame tokkoon tokkoon isaa bakka hangam qabata. Sirrummaan gadi aanaan bakka diskii baay\'ee qusata, garuu sirrummaa argachuu xiqqoo hir\'isa. <strong>Kana jijjiiruun irra deebi\'anii guutummaatti indeeksii gochuu barbaachisa</strong> — caasaaleen walii galaan dubbifamuu hin danda\'an, koorsiin kamiyyuu ammas caasaa duraanii keessa kuufame irra deebi\'ee indeeksii hanga ta\'utti darbaa (akeekkachiisa galmee keessatti). Warri hir\'isuu deeggaran qofti kana kabaju; kaan yeroo hunda sirrummaa guutuun kuusu.';
+$string['settings:embed_dtype_float'] = 'Sirrummaa guutuu (guddaa, sirrii ta\'e)';
+$string['settings:embed_dtype_int8'] = 'Sirrummaa hir\'ate — gara harka afur keessaa tokko bakka';
+$string['settings:embed_dtype_binary'] = 'Xiqqaa — gara harka soddoma keessaa tokko bakka, sirrummaa gadi aanaa';
+
+$string['ragadmin:stat_vector_storage'] = 'Kuusaa vektaraa';
+$string['ragadmin:storage_projection'] = 'Sirrummaa adda ta\'een irra deebi\'anii indeeksii gochuun kana gara kanaa jijjiira: {$a}. Sirrummaa jijjiiruun irra deebi\'anii guutummaatti indeeksii gochuu barbaachisa.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — gara {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Sirrummaa guutuu';
+$string['settings:embed_dtype_shortint8'] = 'Sirrummaa hir\'ate';
+$string['settings:embed_dtype_shortbinary'] = 'Xiqqaa';

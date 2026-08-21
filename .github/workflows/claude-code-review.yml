@@ -57,7 +57,23 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
+          # --comment is REQUIRED for the review to post anything.
+          #
+          # Step 7 of the code-review command reads: "If --comment argument was
+          # NOT provided, stop here. Do not post any GitHub comments." Without it
+          # the command does the entire review -- launches its haiku/sonnet/opus
+          # subagents, finds issues, validates them -- prints the summary to a
+          # terminal nobody reads, and exits. The job goes green and the tokens are
+          # billed either way.
+          #
+          # That silence was misdiagnosed three times as a permissions problem: PR
+          # #192 granted Task/Read/Grep/Glob, then v7.0.3 fixed the allowedTools
+          # whitespace splitting that had made those grants useless. Both were real
+          # bugs, neither was the reason nothing posted. The tell was there all
+          # along -- "No buffered inline comments" is what a review that was told
+          # not to comment prints -- and reading the command's own definition would
+          # have found it in one step.
+          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }} --comment'
 
           # Without this the review runs, reports success, bills for the tokens
           # and posts nothing -- v7.0.1's run finished with

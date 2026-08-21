@@ -1919,3 +1919,19 @@ $string['radar_report:generated'] = 'Wygenerowano {$a}';
 $string['radar_report:query'] = 'Zapytanie';
 $string['radar_report:response'] = 'Odpowiedź';
 $string['radar_report:privacy_note'] = 'Wszystkie dane uczniów w tym raporcie są zanonimizowane. Nie udostępniaj go publicznie.';
+
+$string['settings:embed_query_model'] = 'Model osadzania zapytań (zaawansowane)';
+$string['settings:embed_query_model_desc'] = 'Pozostaw puste, o ile nie masz pewności, że jest potrzebne. Zwykle zapytania i treść kursu są osadzane tym samym modelem, co jest jedynym wyborem bezpiecznym w każdej sytuacji: wektorów z różnych modeli nie da się porównywać, a ich mieszanie daje wyniki wyglądające przekonująco, lecz pozbawione sensu, zamiast błędu. Ustaw to tylko wtedy, gdy oba modele współdzielą jedną przestrzeń osadzeń — obecnie rodzina Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), której wymienność jest udokumentowana. Zaletą jest możliwość późniejszej zmiany modelu zapytań bez ponownego osadzania całego katalogu kursów. Jeśli okaże się, że modele nie są porównywalne, wyszukiwanie zapisze ostrzeżenie i nie zwróci nic dla tego kursu, zamiast zwracać błędne fragmenty.';
+$string['settings:embed_dtype'] = 'Precyzja przechowywanych wektorów';
+$string['settings:embed_dtype_desc'] = 'Ile miejsca zajmuje każdy przechowywany wektor. Niższa precyzja oszczędza bardzo dużo miejsca na dysku, kosztem pewnej utraty dokładności wyszukiwania. <strong>Zmiana tego ustawienia wymaga pełnego przeindeksowania</strong> — formaty nie są czytelne zamiennie, a każdy kurs nadal zapisany w starym formacie będzie pomijany (z ostrzeżeniem w dziennikach), dopóki nie zostanie przeindeksowany. Tylko dostawcy obsługujący kwantyzację respektują to ustawienie; pozostali zawsze zapisują z pełną precyzją.';
+$string['settings:embed_dtype_float'] = 'Pełna precyzja (największa, najdokładniejsza)';
+$string['settings:embed_dtype_int8'] = 'Obniżona precyzja — około jednej czwartej miejsca';
+$string['settings:embed_dtype_binary'] = 'Najmniejsza — około jednej trzydziestej miejsca, najniższa dokładność';
+
+$string['ragadmin:stat_vector_storage'] = 'Magazyn wektorów';
+$string['ragadmin:storage_projection'] = 'Przeindeksowanie z inną precyzją zmieniłoby to na: {$a}. Zmiana precyzji wymaga pełnego przeindeksowania.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — około {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Pełna precyzja';
+$string['settings:embed_dtype_shortint8'] = 'Obniżona precyzja';
+$string['settings:embed_dtype_shortbinary'] = 'Najmniejsza';

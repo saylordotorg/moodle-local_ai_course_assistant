@@ -29,6 +29,7 @@
     * statusrows - List of {label, ok, statelabel, detail} extractor rows; detail
       is trusted HTML built from lang strings.
     * statcards - List of {value, label} summary cards.
+    * storageprojection - Optional sentence estimating storage at other precisions.
     * posturl - Action URL for every POST form on the page.
     * sesskey - Session key for those forms.
     * reindexall - Label for the reindex-all button.
@@ -53,6 +54,7 @@
         "sourcesdesc": "Each row shows a content type the indexer can extract.",
         "statusrows": [{"label": "PDF (mod_resource)", "ok": true, "statelabel": "Ready", "detail": "On. pdftotext binary found."}],
         "statcards": [{"value": "3", "label": "Courses indexed"}],
+        "storageprojection": "At a lower precision this index would occupy about 128 MB.",
         "posturl": "https://example.org/local/ai_course_assistant/rag_admin.php",
         "sesskey": "abc123",
         "reindexall": "Reindex all active courses",
@@ -110,13 +112,17 @@
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h3 class="card-title">{{value}}</h3>
-                        <p class="card-text text-muted">{{label}}</p>
+                        <p class="card-title h3 mb-1">{{value}}</p>
+                        <p class="card-text text-muted mb-0">{{label}}</p>
                     </div>
                 </div>
             </div>
         {{/statcards}}
     </div>
+
+    {{#storageprojection}}
+        <p class="text-muted sola-ragadmin__storagenote">{{.}}</p>
+    {{/storageprojection}}
 
     <form method="post" action="{{posturl}}" class="mb-4" data-confirm="{{reindexallconfirm}}">
         <input type="hidden" name="sesskey" value="{{sesskey}}">

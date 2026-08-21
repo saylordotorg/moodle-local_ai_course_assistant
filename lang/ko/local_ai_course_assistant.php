@@ -1926,3 +1926,19 @@ $string['radar_report:generated'] = '생성 일시: {$a}';
 $string['radar_report:query'] = '질의';
 $string['radar_report:response'] = '응답';
 $string['radar_report:privacy_note'] = '이 보고서의 모든 학습자 데이터는 익명 처리되었습니다. 외부에 공개하지 마십시오.';
+
+$string['settings:embed_query_model'] = '질의 임베딩 모델(고급)';
+$string['settings:embed_query_model_desc'] = '필요하다고 확신하지 않는다면 비워 두십시오. 보통 질의와 강좌 내용은 동일한 모델로 임베딩하며, 이것이 모든 경우에 안전한 유일한 선택입니다. 서로 다른 모델에서 나온 벡터는 비교할 수 없고, 이를 섞으면 오류가 아니라 그럴듯해 보이지만 무의미한 결과가 나옵니다. 두 모델이 하나의 임베딩 공간을 공유하는 경우에만 설정하십시오. 현재는 Voyage 4 계열(voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano)이며, 상호 호환된다고 문서화되어 있습니다. 장점은 전체 강좌 목록을 다시 임베딩하지 않고도 나중에 질의 모델을 변경할 수 있다는 점입니다. 두 모델이 비교 불가능한 것으로 확인되면, 검색은 경고를 기록하고 잘못된 구절을 반환하는 대신 해당 강좌에 대해 아무것도 반환하지 않습니다.';
+$string['settings:embed_dtype'] = '저장 벡터 정밀도';
+$string['settings:embed_dtype_desc'] = '저장되는 각 벡터가 차지하는 공간입니다. 정밀도를 낮추면 디스크 공간을 크게 절약하지만 검색 정확도는 다소 떨어집니다. <strong>이 설정을 변경하려면 전체 재색인이 필요합니다.</strong> 형식은 서로 호환되어 읽을 수 없으며, 이전 형식으로 저장된 강좌는 재색인될 때까지 건너뜁니다(로그에 경고가 기록됩니다). 양자화를 지원하는 공급자만 이 설정을 따르며, 그 외에는 항상 완전 정밀도로 저장합니다.';
+$string['settings:embed_dtype_float'] = '완전 정밀도(가장 크고 가장 정확함)';
+$string['settings:embed_dtype_int8'] = '정밀도 축소 — 공간의 약 4분의 1';
+$string['settings:embed_dtype_binary'] = '가장 작음 — 공간의 약 30분의 1, 정확도 최저';
+
+$string['ragadmin:stat_vector_storage'] = '벡터 저장 용량';
+$string['ragadmin:storage_projection'] = '다른 정밀도로 재색인하면 다음과 같이 바뀝니다: {$a}. 정밀도를 변경하려면 전체 재색인이 필요합니다.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — 약 {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = '완전 정밀도';
+$string['settings:embed_dtype_shortint8'] = '정밀도 축소';
+$string['settings:embed_dtype_shortbinary'] = '가장 작음';

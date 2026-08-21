@@ -1920,3 +1920,19 @@ $string['radar_report:generated'] = 'Genereret {$a}';
 $string['radar_report:query'] = 'Forespørgsel';
 $string['radar_report:response'] = 'Svar';
 $string['radar_report:privacy_note'] = 'Alle kursistdata i denne rapport er anonymiseret. Del den ikke offentligt.';
+
+$string['settings:embed_query_model'] = 'Model til forespørgselsindlejring (avanceret)';
+$string['settings:embed_query_model_desc'] = 'Lad feltet stå tomt, medmindre du er sikker på, at du har brug for det. Normalt indlejres forespørgsler og kursusindhold af den samme model, hvilket er det eneste universelt sikre valg: vektorer fra forskellige modeller kan ikke sammenlignes, og at blande dem giver resultater, der ser troværdige ud, men er meningsløse, i stedet for en fejl. Angiv kun dette, når de to modeller deler et fælles indlejringsrum — aktuelt Voyage 4-familien (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), som er dokumenteret som udskiftelige. Fordelen er, at du senere kan skifte forespørgselsmodel uden at indlejre hele dit kursuskatalog igen. Viser modellerne sig ikke at kunne sammenlignes, logger søgningen en advarsel og returnerer intet for det pågældende kursus i stedet for forkerte passager.';
+$string['settings:embed_dtype'] = 'Præcision for lagrede vektorer';
+$string['settings:embed_dtype_desc'] = 'Hvor meget plads hver lagret vektor optager. Lavere præcision sparer betydelig diskplads mod et vist tab af søgenøjagtighed. <strong>Ændring af denne indstilling kræver fuld genindeksering</strong> — formaterne kan ikke læses på tværs, og et kursus, der stadig er lagret i det gamle format, springes over (med en advarsel i loggen), indtil det genindekseres. Kun udbydere, der understøtter kvantisering, respekterer dette; andre lagrer altid i fuld præcision.';
+$string['settings:embed_dtype_float'] = 'Fuld præcision (størst, mest nøjagtig)';
+$string['settings:embed_dtype_int8'] = 'Reduceret præcision — omkring en fjerdedel af pladsen';
+$string['settings:embed_dtype_binary'] = 'Mindst — omkring en tredivtedel af pladsen, lavest nøjagtighed';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektorlagring';
+$string['ragadmin:storage_projection'] = 'Genindeksering med en anden præcision ville ændre dette til: {$a}. Ændring af præcision kræver fuld genindeksering.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — omkring {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Fuld præcision';
+$string['settings:embed_dtype_shortint8'] = 'Reduceret præcision';
+$string['settings:embed_dtype_shortbinary'] = 'Mindst';

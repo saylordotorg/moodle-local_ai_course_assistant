@@ -1950,3 +1950,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Adireshin webhook mai shigow
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Adireshin webhook mai shigowa na Slack na zaɓi. Ana buga taƙaitaccen bayanin a matsayin saƙon toshe na Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Adireshin webhook mai shigowa na Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Adireshin webhook mai shigowa na Teams na zaɓi. Ana buga taƙaitaccen bayanin a matsayin katin haɗin Office 365.';
+
+$string['settings:embed_query_model'] = 'Samfurin shigar da tambaya (na gaba)';
+$string['settings:embed_query_model_desc'] = 'Ka bar wannan a bayyane sai dai idan ka tabbata kana buƙatarsa. A al\'ada, tambayoyi da abun cikin kwas ana shigar da su da samfuri ɗaya, wanda shi ne kawai zaɓin da ke da aminci a kowane hali: ba za a iya kwatanta vektoci daga samfura dabam-dabam ba, kuma haɗa su yana samar da sakamako mai kama da tabbaci amma ba shi da ma\'ana, maimakon nuna kuskure. Ka saita wannan kawai idan samfuran biyu suna raba sarari ɗaya na shigarwa — a yanzu iyalin Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), waɗanda aka rubuta cewa suna maye gurbin juna. Amfaninsa shi ne za ka iya canza samfurin tambaya daga baya ba tare da sake shigar da dukan kasidar kwasa-kwasan ka ba. Idan ya bayyana cewa samfuran ba za a iya kwatanta su ba, dawo da bayanai zai rubuta gargaɗi kuma ba zai dawo da komai ba don wannan kwas maimakon dawo da sassa marasa daidai.';
+$string['settings:embed_dtype'] = 'Ingancin vektocin da aka adana';
+$string['settings:embed_dtype_desc'] = 'Yawan sarari da kowane vektor da aka adana ke ɗauka. Ƙarancin inganci yana ceton sarari mai yawa a faifai amma yana rage daidaiton dawo da bayanai kaɗan. <strong>Canza wannan yana buƙatar sake ƙididdigewa gaba ɗaya</strong> — ba za a iya karanta tsarukan a maimakon juna ba, kuma duk kwas ɗin da har yanzu aka adana a tsohon tsari za a tsallake shi (tare da gargaɗi a cikin bayanan) har sai an sake ƙididdige shi. Masu bayarwa da ke goyon bayan ragewa kawai ke bin wannan; sauran suna adanawa da cikakken inganci koyaushe.';
+$string['settings:embed_dtype_float'] = 'Cikakken inganci (mafi girma, mafi daidai)';
+$string['settings:embed_dtype_int8'] = 'Ingancin da aka rage — kusan kashi ɗaya cikin huɗu na sarari';
+$string['settings:embed_dtype_binary'] = 'Mafi ƙanƙanta — kusan kashi ɗaya cikin talatin na sarari, mafi ƙarancin daidaito';
+
+$string['ragadmin:stat_vector_storage'] = 'Ajiyar vektoci';
+$string['ragadmin:storage_projection'] = 'Sake ƙididdigewa da wani inganci zai canza wannan zuwa: {$a}. Canza inganci yana buƙatar sake ƙididdigewa gaba ɗaya.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — kusan {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Cikakken inganci';
+$string['settings:embed_dtype_shortint8'] = 'Ingancin da aka rage';
+$string['settings:embed_dtype_shortbinary'] = 'Mafi ƙanƙanta';

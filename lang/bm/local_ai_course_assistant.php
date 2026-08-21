@@ -1950,3 +1950,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Slack donni webhook ladɛrɛ
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Slack donni webhook ladɛrɛsi sugandilen. Cuunfa bɛ bila i n\'a fɔ Slack bloki cikan.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams donni webhook ladɛrɛsi';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Teams donni webhook ladɛrɛsi sugandilen. Cuunfa bɛ bila i n\'a fɔ Office 365 jɛɲɔgɔnya karti.';
+
+$string['settings:embed_query_model'] = 'Ɲininkali donni mɔdɛli (kɔrɔlen)';
+$string['settings:embed_query_model_desc'] = 'A to lankolon na fo n\'i b\'a dɔn ko i mago b\'a la. Cogo gansan na, ɲininkaliw ni kalanko kunnafoniw bɛ don mɔdɛli kelen fɛ, o de ye sugandili min ka kisi tuma bɛɛ: mɔdɛli danfaralen bɛɛ ka vɛkitɛriw tɛ se ka suman ɲɔgɔn na, u ɲagaminni bɛ jaabi di min bɛ i n\'a fɔ a ka kɛnɛ nka a kɔrɔ tɛ foyi, sanni fili ka jira. I kana nin sigi fo ni mɔdɛli fila bɛ donni yɔrɔ kelen tigɛ — sisan Voyage 4 somɔgɔw (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), minnu sɛbɛnna ko u bɛ se ka falen ɲɔgɔn na. Nafa ye ko i bɛ se ka ɲininkali mɔdɛli yɛlɛma kɔfɛ k\'a sɔrɔ i ma i ka kalansen bɛɛ don kokura. Ni a sɔrɔla ko mɔdɛliw tɛ se ka suman ɲɔgɔn na, sɔrɔli bɛ lasɔmini sɛbɛn ani a tɛ foyi lasegin o kalanso kama sanni a ka sɛbɛnni jugu lasegin.';
+$string['settings:embed_dtype'] = 'Vɛkitɛri maralen tiɲɛni';
+$string['settings:embed_dtype_desc'] = 'Vɛkitɛri maralen kelen kelen bɛ yɔrɔ hakɛ min ta. Tiɲɛni dɔgɔmanba bɛ disiki yɔrɔ caman kisi nka sɔrɔli tiɲɛni bɛ dɔgɔya dɔɔni. <strong>Nin yɛlɛmani bɛ sɛbɛnni kura bɛɛ wajibiya</strong> — cogoyaw tɛ se ka kalan ɲɔgɔn na, ani kalanso o kalanso min mara cogo kɔrɔ la, o bɛna to (ni lasɔmini ye sɛbɛnw kɔnɔ) fo a ka sɛbɛn kokura. Dilanbaga minnu bɛ hakɛ dɔgɔyali dɛmɛ dɔrɔn de bɛ nin bato; tɔw bɛ tiɲɛni dafalen mara tuma bɛɛ.';
+$string['settings:embed_dtype_float'] = 'Tiɲɛni dafalen (belebeleba, tiɲɛni ɲuman)';
+$string['settings:embed_dtype_int8'] = 'Tiɲɛni dɔgɔyalen — yɔrɔ tilancɛ naani kelen ɲɔgɔn';
+$string['settings:embed_dtype_binary'] = 'Dɔgɔmanba — yɔrɔ tilancɛ bisaba kelen ɲɔgɔn, tiɲɛni dɔgɔmanba';
+
+$string['ragadmin:stat_vector_storage'] = 'Vɛkitɛri maracogo';
+$string['ragadmin:storage_projection'] = 'Sɛbɛnni kura ni tiɛni wɛrɛ ye bɛna nin yɛlɛma ka kɛ: {$a}. Tiɲɛni yɛlɛmani bɛ sɛbɛnni kura bɛɛ wajibiya.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — ni {$a->size} ɲɔgɔn';
+
+$string['settings:embed_dtype_shortfloat'] = 'Tiɲɛni dafalen';
+$string['settings:embed_dtype_shortint8'] = 'Tiɲɛni dɔgɔyalen';
+$string['settings:embed_dtype_shortbinary'] = 'Dɔgɔmanba';

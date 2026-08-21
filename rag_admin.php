@@ -308,6 +308,73 @@ foreach ($statusrows as $idx => $row) {
 $totalchunks   = array_sum(array_column((array) $indexedcourses, 'chunks'));
 $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
 
+// v7.0.3: what the stored vectors actually occupy, and what re-indexing at a
+// lower precision would occupy instead. Measured from the column rather than
+// estimated, because the index may contain a mixture of encodings while a
+// re-index is still in progress.
+// Derived from the recorded encoding rather than measured with a SQL length
+// function. There is no portable byte-length across Moodle's supported
+// databases: sql_length() maps to CHAR_LENGTH() on MySQL and LENGTH() on
+// PostgreSQL, and SQL Server needs DATALENGTH() -- and applying a text-length
+// helper to a binary column is the wrong tool even where it happens to work.
+// Counting rows per encoding and multiplying is portable, and it stays correct
+// while an index holds a mixture of encodings mid-reindex.
+$rawdim = (int) get_config('local_ai_course_assistant', 'embed_dimensions');
+$vectorbytes = 0;
+if ($rawdim > 0) {
+    // Group on the bare column, with no placeholder in the GROUP BY. Wrapping it
+    // in COALESCE(embed_dtype, ?) would be rejected by PostgreSQL: the two
+    // placeholders are distinct expression nodes, so GROUP BY COALESCE(col, $2)
+    // does not match SELECT COALESCE(col, $1) and the column is reported as
+    // neither grouped nor aggregated. Null is resolved in PHP instead, where
+    // normalize_dtype() already treats it as full precision.
+    //
+    // A recordset rather than get_records_sql(): the first column is the array
+    // key there, and a null dtype would key on the empty string and could
+    // collide with a literal empty value.
+    $rs = $DB->get_recordset_sql(
+        'SELECT embed_dtype, COUNT(*) AS n
+           FROM {local_ai_course_assistant_chunks}
+          WHERE embedding_bin IS NOT NULL
+       GROUP BY embed_dtype'
+    );
+    foreach ($rs as $row) {
+        $vectorbytes += (int) $row->n * \local_ai_course_assistant\embedding_compat::vector_bytes(
+            $rawdim,
+            \local_ai_course_assistant\embedding_compat::normalize_dtype($row->embed_dtype ?? null)
+        );
+    }
+    $rs->close();
+}
+$currentdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
+    (string) get_config('local_ai_course_assistant', 'embed_dtype')
+);
+$storageprojection = '';
+if ($totalembedded > 0 && $rawdim > 0) {
+    $alt = [];
+    foreach (\local_ai_course_assistant\embedding_compat::DTYPES as $d) {
+        if ($d === $currentdtype) {
+            continue;
+        }
+        $alt[] = get_string('ragadmin:storage_alt_item', 'local_ai_course_assistant', [
+            // Short name, not the dropdown label: the label already carries its own
+            // size description, which read as a double explanation here
+            // ("Reduced precision - about a quarter of the space - about 1.0 KB").
+            'dtype' => get_string('settings:embed_dtype_short' . $d, 'local_ai_course_assistant'),
+            'size'  => display_size(
+                $totalembedded * \local_ai_course_assistant\embedding_compat::vector_bytes($rawdim, $d)
+            ),
+        ]);
+    }
+    if (!empty($alt)) {
+        $storageprojection = get_string(
+            'ragadmin:storage_projection',
+            'local_ai_course_assistant',
+            implode('; ', $alt)
+        );
+    }
+}
+
 // Merge indexed and active courses, deduplicated, for the per-course table.
 $allcourses = $indexedcourses;
 foreach ($activecourses as $ac) {
@@ -351,6 +418,7 @@ $templatedata = [
         ))->out()
     ),
     'statusrows' => array_values($statusrows),
+    'storageprojection' => $storageprojection,
     'statcards'  => [
         [
             'value' => count($indexedcourses),
@@ -363,6 +431,10 @@ $templatedata = [
         [
             'value' => number_format($totalembedded),
             'label' => get_string('ragadmin:stat_embedded_chunks', 'local_ai_course_assistant'),
+        ],
+        [
+            'value' => $vectorbytes > 0 ? display_size($vectorbytes) : '—',
+            'label' => get_string('ragadmin:stat_vector_storage', 'local_ai_course_assistant'),
         ],
         [
             'value' => count($activecourses),

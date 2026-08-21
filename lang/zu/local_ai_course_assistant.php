@@ -1955,3 +1955,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Ikheli le-webhook elingenayo
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Ikheli le-webhook elingenayo le-Slack elizikhethelayo. Isifingqo sishicilelwa njengomyalezo webhlokhi we-Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Ikheli le-webhook elingenayo le-Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Ikheli le-webhook elingenayo le-Teams elizikhethelayo. Isifingqo sishicilelwa njengekhadi lomxhumanisi le-Office 365.';
+
+$string['settings:embed_query_model'] = 'Imodeli yokufaka imibuzo (okuthuthukisiwe)';
+$string['settings:embed_query_model_desc'] = 'Yishiye ingenalutho ngaphandle kokuthi uqiniseka ukuthi uyidinga. Ngokuvamile imibuzo kanye nokuqukethwe kwesifundo kufakwa ngemodeli efanayo, futhi yilokho ukuphela kokukhetha okuphephile kuzo zonke izimo: amavektha avela kumamodeli ahlukene awakwazi ukuqhathaniswa, futhi ukuwaxuba kukhiqiza imiphumela ebukeka ithembekile kodwa ingenangqondo, esikhundleni sephutha. Setha lokhu kuphela lapho amamodeli amabili ehlanganyela isikhala esisodwa sokufaka — okwamanje umndeni we-Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), okubhalwe ukuthi angashintshaniswa. Inzuzo yikhona ukuthi ungashintsha imodeli yemibuzo kamuva ngaphandle kokufaka kabusha yonke ikhathalogi yezifundo zakho. Uma amamodeli engatholakala engaqhathaniseki, ukulanda kuzobhala isexwayiso futhi angabuyisi lutho kuleso sifundo esikhundleni sokubuyisa izingxenye ezingalungile.';
+$string['settings:embed_dtype'] = 'Ukunemba kwamavektha agcinwe';
+$string['settings:embed_dtype_desc'] = 'Isikhala esithathwa yivektha ngayinye egcinwe. Ukunemba okuncane kugcina isikhala esikhulu sediski kodwa kunciphisa kancane ukunemba kokulanda. <strong>Ukushintsha lokhu kudinga ukwenza kabusha inkomba yonke</strong> — amafomethi awakwazi ukufundwa ngokushintshana, futhi noma isiphi isifundo esisagcinwe ngefomethi endala sizoyekwa (nesexwayiso kumarekhodi) size senziwe kabusha inkomba. Kuphela abahlinzeki abasekela ukwehlisa amazinga abalandela lokhu; abanye bagcina njalo ngokunemba okuphelele.';
+$string['settings:embed_dtype_float'] = 'Ukunemba okuphelele (okukhulu kunazo zonke, okunembe kunazo zonke)';
+$string['settings:embed_dtype_int8'] = 'Ukunemba okuncishisiwe — cishe ingxenye eyodwa kwezine yesikhala';
+$string['settings:embed_dtype_binary'] = 'Okuncane kunazo zonke — cishe ingxenye eyodwa kwamashumi amathathu yesikhala, ukunemba okuphansi kunazo zonke';
+
+$string['ragadmin:stat_vector_storage'] = 'Isitoreji samavektha';
+$string['ragadmin:storage_projection'] = 'Ukwenza kabusha inkomba ngokunemba okwehlukile kuzoshintsha lokhu kube: {$a}. Ukushintsha ukunemba kudinga ukwenza kabusha inkomba yonke.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — cishe {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Ukunemba okuphelele';
+$string['settings:embed_dtype_shortint8'] = 'Ukunemba okuncishisiwe';
+$string['settings:embed_dtype_shortbinary'] = 'Okuncane kunazo zonke';

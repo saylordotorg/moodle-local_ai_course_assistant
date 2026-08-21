@@ -59,9 +59,12 @@ final class chunk_vector_writers_test extends \basic_testcase {
     public function test_every_json_vector_write_is_paired_with_a_packed_write(): void {
         $src = $this->indexer_source();
 
-        // Assignments of the JSON column from an encoded vector. Excludes the
-        // reuse path, which copies an existing row rather than encoding a vector.
-        $jsonwrites = preg_match_all('/->embedding\s*=\s*json_encode\(/', $src);
+        // v7.0.3 changed this invariant. The JSON column is now written only for
+        // float indexes: a JSON copy of int8 or bit-packed values would be
+        // larger than the binary it duplicates, which would defeat quantizing.
+        // So the assignment is conditional, and the pattern to count is the
+        // conditional form rather than a bare json_encode().
+        $jsonwrites = preg_match_all('/->embedding\s*=\s*\$isfloat\s*\?\s*json_encode\(/', $src);
         $packedwrites = preg_match_all('/->embedding_bin\s*=\s*rag_retriever::pack_vector\(/', $src);
 
         $this->assertGreaterThan(0, $jsonwrites, 'scan pattern has drifted from the source');
@@ -69,8 +72,59 @@ final class chunk_vector_writers_test extends \basic_testcase {
             $jsonwrites,
             $packedwrites,
             "content_indexer writes the JSON vector {$jsonwrites} time(s) but the packed "
-            . "vector {$packedwrites} time(s). Every writer must set both columns until the "
-            . 'JSON column is dropped; a JSON-only row is correct but silently slow.'
+            . "vector {$packedwrites} time(s). Every writer must set both columns; on a float "
+            . 'index a packed-only row loses the rollback copy, and on any index a JSON-only '
+            . 'row is invisible to retrieval.'
+        );
+    }
+
+    public function test_every_packed_write_records_the_encoding_and_passes_it_to_pack(): void {
+        $src = $this->indexer_source();
+
+        $packedwrites = preg_match_all('/->embedding_bin\s*=\s*rag_retriever::pack_vector\(/', $src);
+        $this->assertGreaterThan(0, $packedwrites, 'scan pattern has drifted from the source');
+
+        // Every packed write must pass the dtype. pack_vector() defaults to
+        // float, so omitting the argument would silently write float32 bytes
+        // while embed_dtype claimed otherwise — a row that decodes to garbage.
+        $dtypepassed = preg_match_all(
+            '/->embedding_bin\s*=\s*rag_retriever::pack_vector\(\s*\$vector\s*,\s*\$dtype\s*\)/',
+            $src
+        );
+        $this->assertSame(
+            $packedwrites,
+            $dtypepassed,
+            "content_indexer packs a vector {$packedwrites} time(s) but passes the dtype only "
+            . "{$dtypepassed} time(s). pack_vector() defaults to float, so a missing dtype "
+            . 'writes float bytes under whatever label embed_dtype carries.'
+        );
+
+        // And must record it, or retrieval cannot know how to decode the bytes.
+        $dtyperecorded = preg_match_all('/->embed_dtype\s*=\s*\$dtype\s*;/', $src);
+        $this->assertSame(
+            $packedwrites,
+            $dtyperecorded,
+            "content_indexer packs a vector {$packedwrites} time(s) but records embed_dtype only "
+            . "{$dtyperecorded} time(s). An unrecorded encoding is read as float."
+        );
+    }
+
+    public function test_the_dtype_comes_from_the_provider_not_from_config(): void {
+        $src = $this->indexer_source();
+
+        // effective_dtype() downgrades to float when the provider cannot
+        // actually return quantized vectors. Reading embed_dtype from config
+        // directly would let a provider that ignores output_dtype write float
+        // bytes labelled int8 — unscoreable rows, with no error.
+        $this->assertMatchesRegularExpression(
+            '/\$dtype\s*=\s*\$provider->effective_dtype\(\)/',
+            $src,
+            'the indexer must take its dtype from the provider, not from config'
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            "/\\\$dtype\s*=\s*get_config\(/",
+            $src,
+            'the indexer must not read embed_dtype from config directly'
         );
     }
 
@@ -101,5 +155,7 @@ final class chunk_vector_writers_test extends \basic_testcase {
         // one place cannot pass this file silently.
         $this->assertStringContainsString('NAME="embedding_bin"', $xml);
         $this->assertStringContainsString('NAME="embedding"', $xml);
+        // v7.0.3: the encoding label lives alongside the bytes it describes.
+        $this->assertStringContainsString('NAME="embed_dtype"', $xml);
     }
 }

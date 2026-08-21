@@ -1950,3 +1950,19 @@ $string['radar_report:generated'] = 'Dibuat pada {$a}';
 $string['radar_report:query'] = 'Kueri';
 $string['radar_report:response'] = 'Jawaban';
 $string['radar_report:privacy_note'] = 'Semua data pelajar dalam laporan ini telah dianonimkan. Jangan dibagikan ke publik.';
+
+$string['settings:embed_query_model'] = 'Model penyematan kueri (lanjutan)';
+$string['settings:embed_query_model_desc'] = 'Biarkan kosong kecuali Anda yakin memerlukannya. Biasanya kueri dan materi kursus disematkan oleh model yang sama, dan itulah satu-satunya pilihan yang aman dalam segala keadaan: vektor dari model berbeda tidak dapat dibandingkan, dan mencampurnya menghasilkan hasil yang tampak meyakinkan tetapi tanpa makna, bukan sebuah kesalahan. Setel ini hanya bila kedua model berbagi satu ruang penyematan — saat ini keluarga Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), yang terdokumentasi dapat saling dipertukarkan. Manfaatnya, Anda dapat mengganti model kueri di kemudian hari tanpa menyematkan ulang seluruh katalog kursus. Jika ternyata kedua model tidak dapat dibandingkan, pengambilan akan mencatat peringatan dan tidak mengembalikan apa pun untuk kursus tersebut, alih-alih mengembalikan kutipan yang salah.';
+$string['settings:embed_dtype'] = 'Presisi vektor tersimpan';
+$string['settings:embed_dtype_desc'] = 'Seberapa banyak ruang yang dipakai setiap vektor tersimpan. Presisi lebih rendah menghemat banyak ruang disk dengan sedikit penurunan akurasi pengambilan. <strong>Mengubah pengaturan ini memerlukan pengindeksan ulang menyeluruh</strong> — formatnya tidak dapat dibaca secara bergantian, dan kursus yang masih tersimpan dalam format lama akan dilewati (dengan peringatan di log) sampai diindeks ulang. Hanya penyedia yang mendukung kuantisasi yang mematuhi pengaturan ini; lainnya selalu menyimpan dengan presisi penuh.';
+$string['settings:embed_dtype_float'] = 'Presisi penuh (terbesar, paling akurat)';
+$string['settings:embed_dtype_int8'] = 'Presisi berkurang — sekitar seperempat ruang';
+$string['settings:embed_dtype_binary'] = 'Terkecil — sekitar sepertiga puluh ruang, akurasi terendah';
+
+$string['ragadmin:stat_vector_storage'] = 'Penyimpanan vektor';
+$string['ragadmin:storage_projection'] = 'Pengindeksan ulang pada presisi berbeda akan mengubah ini menjadi: {$a}. Mengubah presisi memerlukan pengindeksan ulang menyeluruh.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — sekitar {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Presisi penuh';
+$string['settings:embed_dtype_shortint8'] = 'Presisi berkurang';
+$string['settings:embed_dtype_shortbinary'] = 'Terkecil';

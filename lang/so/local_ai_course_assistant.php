@@ -1937,3 +1937,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Cinwaanka webhook-ga soo gel
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Cinwaan webhook soo gelaya oo Slack ah oo ikhtiyaari ah. Soo koobidda waxaa la daabacaa sida farriin block Slack ah.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Cinwaanka webhook-ga soo gelaya ee Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Cinwaan webhook soo gelaya oo Teams ah oo ikhtiyaari ah. Soo koobidda waxaa la daabacaa sida kaadh xidhiidhiye Office 365.';
+
+$string['settings:embed_query_model'] = 'Moodalka ku-darista weydiimaha (heer sare)';
+$string['settings:embed_query_model_desc'] = 'Ka tag madhan haddii aadan hubin inaad u baahan tahay. Caadi ahaan weydiimaha iyo waxa ku jira koorsada waxaa lagu daraa moodal isku mid, taasina waa xulashada kaliya ee mar walba ammaan ah: vektaro ka kala yimid moodallo kala duwan lama barbardhigi karo, isku darkoodna waxay soo saartaa natiijooyin u eg kuwo la isku halleyn karo laakiin macno la\'aan ah, halkii ay khalad muujin lahaayeen. Kan u dhig oo kaliya marka labada moodal wadaagaan meel ku-darid isku mid — hadda qoyska Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), kuwaas oo la diiwaangeliyay in la is-beddelin karo. Faa\'iidada waa inaad moodalka weydiinta dib u beddeli karto adigoon dib u darin dhammaan katalooggaaga koorsooyinka. Haddii moodalladu noqdaan kuwo aan la barbardhigi karin, soo-helitaanka wuxuu diiwaangeliyaa digniin oo waxba kuma soo celiyo koorsadaas halkii ay soo celin lahaayeen qaybo qaldan.';
+$string['settings:embed_dtype'] = 'Saxnaanta vektarada la kaydiyay';
+$string['settings:embed_dtype_desc'] = 'Inta meel ee vektar kasta la kaydiyay qaato. Saxnaan hooseeya waxay badbaadisaa meel diski badan laakiin waxay hooseysiisaa saxnaanta soo-helitaanka xoogaa. <strong>Beddelkan wuxuu u baahan yahay dib-u-tilmaamis buuxda</strong> — qaababka lama akhriyi karo si isku beddelan ah, koorsa kasta oo weli lagu kaydiyay qaabkii hore waa la dhaafi doonaa (digniin ku jirta diiwaannada) ilaa dib loo tilmaamo. Kaliya bixiyeyaasha taageera yaraynta ayaa kan raacaya; kuwa kalena mar walba waxay ku kaydiyaan saxnaan buuxda.';
+$string['settings:embed_dtype_float'] = 'Saxnaan buuxda (ugu weyn, ugu sax ah)';
+$string['settings:embed_dtype_int8'] = 'Saxnaan la yareeyay — qiyaastii rubuc meesha';
+$string['settings:embed_dtype_binary'] = 'Ugu yar — qiyaastii soddonaad meesha, saxnaanta ugu hooseysa';
+
+$string['ragadmin:stat_vector_storage'] = 'Kaydinta vektarada';
+$string['ragadmin:storage_projection'] = 'Dib-u-tilmaamis saxnaan kale leh wuxuu tan u beddelayaa: {$a}. Beddelka saxnaanta wuxuu u baahan yahay dib-u-tilmaamis buuxda.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — qiyaastii {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Saxnaan buuxda';
+$string['settings:embed_dtype_shortint8'] = 'Saxnaan la yareeyay';
+$string['settings:embed_dtype_shortbinary'] = 'Ugu yar';

@@ -1920,3 +1920,19 @@ $string['radar_report:generated'] = 'Erstellt am {$a}';
 $string['radar_report:query'] = 'Abfrage';
 $string['radar_report:response'] = 'Antwort';
 $string['radar_report:privacy_note'] = 'Alle Lernendendaten in diesem Bericht sind anonymisiert. Nicht öffentlich weitergeben.';
+
+$string['settings:embed_query_model'] = 'Modell für Abfrage-Embeddings (erweitert)';
+$string['settings:embed_query_model_desc'] = 'Lassen Sie das Feld leer, sofern Sie nicht sicher wissen, dass Sie es benötigen. Normalerweise werden Abfragen und Kursinhalte mit demselben Modell eingebettet – die einzige durchweg sichere Wahl: Vektoren aus unterschiedlichen Modellen sind nicht vergleichbar, und ihre Vermischung liefert überzeugend aussehende, aber bedeutungslose Ergebnisse statt einer Fehlermeldung. Setzen Sie dies nur, wenn beide Modelle einen gemeinsamen Embedding-Raum teilen – derzeit die Voyage-4-Familie (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), für die Austauschbarkeit dokumentiert ist. Der Vorteil: Sie können das Abfragemodell später wechseln, ohne Ihren gesamten Kurskatalog neu einzubetten. Erweisen sich die Modelle als nicht vergleichbar, protokolliert der Abruf eine Warnung und gibt für diesen Kurs nichts zurück, statt falsche Passagen zu liefern.';
+$string['settings:embed_dtype'] = 'Genauigkeit gespeicherter Vektoren';
+$string['settings:embed_dtype_desc'] = 'Wie viel Platz jeder gespeicherte Vektor belegt. Geringere Genauigkeit spart sehr viel Speicherplatz, kostet aber etwas Abrufgenauigkeit. <strong>Eine Änderung erfordert eine vollständige Neuindexierung</strong> – die Formate sind nicht wechselseitig lesbar, und jeder Kurs, der noch im alten Format gespeichert ist, wird übersprungen (mit einer Warnung im Protokoll), bis er neu indexiert wurde. Nur Anbieter, die Quantisierung unterstützen, berücksichtigen diese Einstellung; andere speichern stets in voller Genauigkeit.';
+$string['settings:embed_dtype_float'] = 'Volle Genauigkeit (größter Bedarf, höchste Genauigkeit)';
+$string['settings:embed_dtype_int8'] = 'Reduzierte Genauigkeit – etwa ein Viertel des Platzes';
+$string['settings:embed_dtype_binary'] = 'Kleinster Bedarf – etwa ein Dreißigstel des Platzes, niedrigste Genauigkeit';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektorspeicher';
+$string['ragadmin:storage_projection'] = 'Eine Neuindexierung mit anderer Genauigkeit würde dies ändern auf: {$a}. Eine Änderung der Genauigkeit erfordert eine vollständige Neuindexierung.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — etwa {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Volle Genauigkeit';
+$string['settings:embed_dtype_shortint8'] = 'Reduzierte Genauigkeit';
+$string['settings:embed_dtype_shortbinary'] = 'Kleinster Bedarf';

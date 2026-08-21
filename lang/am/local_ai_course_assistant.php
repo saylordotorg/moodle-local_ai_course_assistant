@@ -1949,3 +1949,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'የSlack ገቢ webhook አ�
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'አማራጭ የSlack ገቢ webhook አድራሻ። ማጠቃለያው እንደ Slack ብሎክ መልእክት ይለጠፋል።';
 $string['settings:anomaly_digest_teams_webhook'] = 'የMicrosoft Teams ገቢ webhook አድራሻ';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'አማራጭ የTeams ገቢ webhook አድራሻ። ማጠቃለያው እንደ Office 365 አያያዥ ካርድ ይለጠፋል።';
+
+$string['settings:embed_query_model'] = 'የጥያቄ ማስረጊያ ሞዴል (ከፍተኛ)';
+$string['settings:embed_query_model_desc'] = 'ይህ እንደሚያስፈልግዎት እርግጠኛ ካልሆኑ ባዶ ይተዉት። በተለምዶ ጥያቄዎችና የኮርስ ይዘት በአንድ ሞዴል ይተረጎማሉ፤ ይህም ብቸኛው ሁልጊዜ አስተማማኝ አማራጭ ነው፦ ከተለያዩ ሞዴሎች የመጡ ቬክተሮች ሊነጻጸሩ አይችሉም፣ እነሱን መቀላቀል ስህተት ከማሳየት ይልቅ አሳማኝ የሚመስል ግን ትርጉም የለሽ ውጤት ይሰጣል። ሁለቱ ሞዴሎች አንድ የማስረጊያ ቦታ ሲጋሩ ብቻ ያስቀምጡት — በአሁኑ ጊዜ የ Voyage 4 ቤተሰብ (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano)፣ እነዚህ እንደሚለዋወጡ ተመዝግቧል። ጥቅሙ ሙሉ የኮርስ ካታሎግዎን ሳይደግሙ በኋላ የጥያቄ ሞዴሉን መቀየር መቻልዎ ነው። ሞዴሎቹ ሊነጻጸሩ የማይችሉ ከሆኑ፣ ማግኘቱ ማስጠንቀቂያ ይመዘግባል እና ለዚያ ኮርስ ስህተት ያለው ምንባብ ከመመለስ ይልቅ ምንም አይመልስም።';
+$string['settings:embed_dtype'] = 'የተቀመጠ ቬክተር ትክክለኛነት';
+$string['settings:embed_dtype_desc'] = 'እያንዳንዱ የተቀመጠ ቬክተር የሚይዘው ቦታ። ዝቅተኛ ትክክለኛነት በማግኘት ትክክለኛነት ላይ በሚያመጣው መጠነኛ ኪሳራ ብዙ ዲስክ ይቆጥባል። <strong>ይህን መቀየር ሙሉ ዳግም ማውጫ ይጠይቃል</strong> — ቅርጸቶቹ እርስ በርስ ሊነበቡ አይችሉም፣ እና በአሮጌው ቅርጸት የተቀመጠ ማንኛውም ኮርስ ዳግም እስኪመዘገብ ድረስ ይዘለላል (በምዝግብ ማስታወሻዎች ውስጥ ማስጠንቀቂያ ጋር)። ይህን የሚያከብሩት መጠን መቀነስን የሚደግፉ አቅራቢዎች ብቻ ናቸው፤ ሌሎቹ ሁልጊዜ ሙሉ ትክክለኛነት ያስቀምጣሉ።';
+$string['settings:embed_dtype_float'] = 'ሙሉ ትክክለኛነት (ትልቁ፣ እጅግ ትክክለኛ)';
+$string['settings:embed_dtype_int8'] = 'የቀነሰ ትክክለኛነት — ከቦታው አንድ አራተኛ ያህል';
+$string['settings:embed_dtype_binary'] = 'ትንሹ — ከቦታው አንድ ሠላሳኛ ያህል፣ ዝቅተኛ ትክክለኛነት';
+
+$string['ragadmin:stat_vector_storage'] = 'የቬክተር ማከማቻ';
+$string['ragadmin:storage_projection'] = 'በተለየ ትክክለኛነት ዳግም ማውጫ ይህን ወደዚህ ይለውጠዋል፦ {$a}። ትክክለኛነትን መቀየር ሙሉ ዳግም ማውጫ ይጠይቃል።';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — በግምት {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'ሙሉ ትክክለኛነት';
+$string['settings:embed_dtype_shortint8'] = 'የቀነሰ ትክክለኛነት';
+$string['settings:embed_dtype_shortbinary'] = 'ትንሹ';

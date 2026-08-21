@@ -1936,3 +1936,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Adreesị webhook na-abata n
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Adreesị webhook na-abata nke Slack nke nhọrọ. A na-ebipụta nchịkọta ahụ dị ka ozi blọk Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Adreesị webhook na-abata nke Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Adreesị webhook na-abata nke Teams nke nhọrọ. A na-ebipụta nchịkọta ahụ dị ka kaadị njikọ Office 365.';
+
+$string['settings:embed_query_model'] = 'Ụdị mgbakwunye ajụjụ (dị elu)';
+$string['settings:embed_query_model_desc'] = 'Hapụ ya efu ma ọ bụghị na ị maara nke ọma na ịchọrọ ya. Na mkpọtụ, a na-etinye ajụjụ na ọdịnaya kọọsụ site n\'otu ụdị, nke bụ naanị nhọrọ dị nchebe mgbe niile: enweghị ike itụnyere vektọ sitere n\'ụdị dị iche iche, na ịgwakọta ha na-enye nsonaazụ nke yiri ka ọ bụ eziokwu mana enweghị uche, kama igosi njehie. Debe nke a naanị mgbe ụdị abụọ ahụ na-ekere oghere mgbakwunye otu — ugbu a ezinụlọ Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), nke edepụtara na ha nwere ike dochie ibe ha. Uru ya bụ na ị nwere ike gbanwee ụdị ajụjụ ma emechaa n\'enweghị itinye katalọgụ kọọsụ gị niile ọzọ. Ọ bụrụ na ụdị ndị ahụ apụta na enweghị ike itụnyere ha, nweta ga-edekọ ịdọ aka ná ntị ma ghara iweghachi ihe ọ bụla maka kọọsụ ahụ kama iweghachi akụkụ na-ezighị ezi.';
+$string['settings:embed_dtype'] = 'Nkenke vektọ echekwara';
+$string['settings:embed_dtype_desc'] = 'Oghere ole ka vektọ ọ bụla echekwara na-ewe. Nkenke dị ala na-echekwa nnukwu oghere diski mana ọ na-ebelata izi ezi nweta ntakịrị. <strong>Ịgbanwe nke a chọrọ ndenye ọzọ zuru ezu</strong> — enweghị ike ịgụ ụdị ndị ahụ n\'ọnọdụ ibe ha, na kọọsụ ọ bụla echekwara n\'ụdị ochie ka a ga-agafere (na ịdọ aka ná ntị na ndekọ) ruo mgbe edenyere ya ọzọ. Naanị ndị na-enye nkwado maka mbelata na-agbaso nke a; ndị ọzọ na-echekwa mgbe niile na nkenke zuru ezu.';
+$string['settings:embed_dtype_float'] = 'Nkenke zuru ezu (nke kacha ukwuu, nke kacha ziri ezi)';
+$string['settings:embed_dtype_int8'] = 'Nkenke ebelatara — ihe dị ka otu ụzọ n\'ụzọ anọ nke oghere';
+$string['settings:embed_dtype_binary'] = 'Nke kacha nta — ihe dị ka otu ụzọ n\'ụzọ iri atọ nke oghere, izi ezi kacha ala';
+
+$string['ragadmin:stat_vector_storage'] = 'Nchekwa vektọ';
+$string['ragadmin:storage_projection'] = 'Idenye ọzọ na nkenke dị iche ga-agbanwe nke a ka: {$a}. Ịgbanwe nkenke chọrọ ndenye ọzọ zuru ezu.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — ihe dị ka {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Nkenke zuru ezu';
+$string['settings:embed_dtype_shortint8'] = 'Nkenke ebelatara';
+$string['settings:embed_dtype_shortbinary'] = 'Nke kacha nta';

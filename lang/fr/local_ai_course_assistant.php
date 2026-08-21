@@ -1920,3 +1920,19 @@ $string['radar_report:generated'] = 'Généré le {$a}';
 $string['radar_report:query'] = 'Requête';
 $string['radar_report:response'] = 'Réponse';
 $string['radar_report:privacy_note'] = 'Toutes les données des apprenants dans ce rapport sont anonymisées. Ne le partagez pas publiquement.';
+
+$string['settings:embed_query_model'] = 'Modèle d\'incorporation des requêtes (avancé)';
+$string['settings:embed_query_model_desc'] = 'Laissez ce champ vide sauf si vous savez que vous en avez besoin. Normalement, les requêtes et le contenu du cours sont incorporés par le même modèle, ce qui est le seul choix universellement sûr : des vecteurs issus de modèles différents ne peuvent pas être comparés, et les mélanger produit des résultats d\'apparence convaincante mais dénués de sens, au lieu d\'une erreur. Ne renseignez ce champ que lorsque les deux modèles partagent un même espace d\'incorporation — actuellement la famille Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), documentée comme interchangeable. L\'avantage est de pouvoir changer le modèle de requête plus tard sans réincorporer l\'intégralité de votre catalogue de cours. Si les modèles s\'avèrent non comparables, la recherche consigne un avertissement et ne renvoie rien pour ce cours plutôt que des passages erronés.';
+$string['settings:embed_dtype'] = 'Précision des vecteurs stockés';
+$string['settings:embed_dtype_desc'] = 'Espace occupé par chaque vecteur stocké. Une précision plus faible économise beaucoup d\'espace disque au prix d\'une certaine perte d\'exactitude de la recherche. <strong>Modifier ce réglage nécessite une réindexation complète</strong> — les formats ne sont pas lisibles indifféremment, et tout cours encore stocké dans l\'ancien format sera ignoré (avec un avertissement dans les journaux) jusqu\'à sa réindexation. Seuls les fournisseurs prenant en charge la quantification respectent ce réglage ; les autres stockent toujours en précision complète.';
+$string['settings:embed_dtype_float'] = 'Précision complète (la plus volumineuse, la plus exacte)';
+$string['settings:embed_dtype_int8'] = 'Précision réduite — environ un quart de l\'espace';
+$string['settings:embed_dtype_binary'] = 'La plus petite — environ un trentième de l\'espace, exactitude la plus faible';
+
+$string['ragadmin:stat_vector_storage'] = 'Stockage des vecteurs';
+$string['ragadmin:storage_projection'] = 'Une réindexation avec une autre précision ramènerait cela à : {$a}. Changer de précision nécessite une réindexation complète.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — environ {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Précision complète';
+$string['settings:embed_dtype_shortint8'] = 'Précision réduite';
+$string['settings:embed_dtype_shortbinary'] = 'La plus petite';
