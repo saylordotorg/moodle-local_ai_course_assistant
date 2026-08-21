@@ -652,6 +652,40 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v7.0.3: separate query-side model. Two vectors are only comparable within
+    // one embedding space, so this is empty by default (meaning "same model as
+    // documents") and is only useful for a model family that guarantees a shared
+    // space — currently Voyage's 4 series. rag_retriever refuses to score a
+    // query against chunks it cannot be compared with, so a wrong value here
+    // degrades to a logged warning and no results rather than to nonsense
+    // rankings.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_query_model',
+        get_string('settings:embed_query_model', 'local_ai_course_assistant'),
+        get_string('settings:embed_query_model_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_TEXT
+    ));
+
+    // v7.0.3: stored-vector quantization. int8 is a quarter of float32 and
+    // binary an eighth of int8, at some cost in recall. Changing this requires a
+    // full reindex — the encodings are not interchangeable, and the retriever
+    // will skip (and warn about) rows that disagree with this setting.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/embed_dtype',
+        get_string('settings:embed_dtype', 'local_ai_course_assistant'),
+        get_string('settings:embed_dtype_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT,
+        [
+            \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT  =>
+                get_string('settings:embed_dtype_float', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_compat::DTYPE_INT8   =>
+                get_string('settings:embed_dtype_int8', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_compat::DTYPE_BINARY =>
+                get_string('settings:embed_dtype_binary', 'local_ai_course_assistant'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_topk',
         get_string('settings:rag_topk', 'local_ai_course_assistant'),
@@ -2746,7 +2780,7 @@ if ($hassiteconfig) {
         // it matters for sites that deliberately run without retrieval.
         'rag_enabled' => [
             'embed_provider', 'embed_apikey', 'embed_model', 'embed_apibaseurl',
-            'embed_dimensions', 'rag_topk', 'rag_min_similarity', 'rag_currentpage_boost',
+            'embed_dimensions', 'embed_query_model', 'embed_dtype', 'rag_topk', 'rag_min_similarity', 'rag_currentpage_boost',
             'rag_chunksize', 'rag_return_scope', 'rag_window_size', 'rag_parent_max_chars',
             'rag_scope', 'rag_auto_reindex_drifted', 'rerank_enabled',
             'rag_extract_pdf', 'rag_extract_docx', 'rag_extract_pptx',

@@ -1459,5 +1459,31 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082002, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082200) {
+        // v7.0.3: record how each chunk's packed vector is encoded.
+        //
+        // Nullable with no default, deliberately. Every existing row holds
+        // float32 in embedding_bin, and null is read as float by
+        // embedding_compat::normalize_dtype(), so existing indexes keep scoring
+        // without a backfill. Writing a default of 'float' across a
+        // hundred-thousand-row table would be a long UPDATE that buys nothing.
+        $table = new xmldb_table('local_ai_course_assistant_chunks');
+        $field = new xmldb_field(
+            'embed_dtype',
+            XMLDB_TYPE_CHAR,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'embed_model'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082200, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

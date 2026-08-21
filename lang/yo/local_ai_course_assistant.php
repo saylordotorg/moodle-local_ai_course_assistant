@@ -1955,3 +1955,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Àdírẹ́sì webhook tí �
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Àdírẹ́sì webhook tí ń wọlé ti Slack ti àṣàyàn. A ń tẹ àkópọ̀ náà jáde gẹ́gẹ́ bí ìránṣẹ́ bulọ́kù Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Àdírẹ́sì webhook tí ń wọlé ti Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Àdírẹ́sì webhook tí ń wọlé ti Teams ti àṣàyàn. A ń tẹ àkópọ̀ náà jáde gẹ́gẹ́ bí káàdì àsopọ̀ Office 365.';
+
+$string['settings:embed_query_model'] = 'Àwòṣe ìfibọ̀ ìbéèrè (gíga)';
+$string['settings:embed_query_model_desc'] = 'Fi í sílẹ̀ ní òfìfo àyàfi tí o bá dá ọ lójú pé o nílò rẹ̀. Ní ìṣe déédéé, àwọn ìbéèrè àti àkóónú ẹ̀kọ́ ni àwòṣe kan náà ń fibọ̀, èyí sì ni àṣàyàn kan ṣoṣo tí ó ní ààbò nígbà gbogbo: a kò lè fi àwọn vẹ́ktọ̀ tí ó wá láti àwòṣe ọ̀tọ̀ọ̀tọ̀ wé ara wọn, àti ìdàpọ̀ wọn ń mú àbájáde tí ó dàbí ẹni pé ó ṣeé gbẹ́kẹ̀lé ṣùgbọ́n tí kò ní ìtumọ̀, dípò kí ó fi àṣìṣe hàn. Ṣàgbékalẹ̀ èyí kìkì nígbà tí àwòṣe méjèèjì bá pín àyè ìfibọ̀ kan náà — lọ́wọ́lọ́wọ́ ìdílé Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), tí a ti ṣàkọsílẹ̀ pé wọ́n lè paarọ̀ ara wọn. Àǹfààní rẹ̀ ni pé o lè yí àwòṣe ìbéèrè padà nígbà tí ó bá yá láìsí ìfibọ̀ gbogbo àkójọpọ̀ ẹ̀kọ́ rẹ padà. Bí àwọn àwòṣe kò bá ṣeé fiwéra, ìgbàpadà yóò kọ ìkìlọ̀ sílẹ̀ kí ó má sì dá ohunkóhun padà fún ẹ̀kọ́ náà dípò kí ó dá àwọn apá tí kò tọ́ padà.';
+$string['settings:embed_dtype'] = 'Ìpéye vẹ́ktọ̀ tí a fi pamọ́';
+$string['settings:embed_dtype_desc'] = 'Àyè tí vẹ́ktọ̀ kọ̀ọ̀kan tí a fi pamọ́ ń gbà. Ìpéye tí ó kéré ń fi àyè díìsíkì púpọ̀ pamọ́ ṣùgbọ́n ó ń dín ìpéye ìgbàpadà kù díẹ̀. <strong>Ìyípadà èyí nílò àtúnṣàkọsílẹ̀ pípé</strong> — a kò lè ka àwọn ọ̀nà náà ní ipò ara wọn, àti ẹ̀kọ́ yòówù tí a ṣì fi pamọ́ ní ọ̀nà àtijọ́ ni a yóò fò (pẹ̀lú ìkìlọ̀ nínú àkọsílẹ̀) títí a ó fi tún ṣàkọsílẹ̀ rẹ̀. Kìkì àwọn olùpèsè tí ó gba ìdínkù ni ó ń tẹ̀lé èyí; àwọn mìíràn ń fi pamọ́ ní ìpéye pípé nígbà gbogbo.';
+$string['settings:embed_dtype_float'] = 'Ìpéye pípé (tí ó tóbi jù, tí ó péye jù)';
+$string['settings:embed_dtype_int8'] = 'Ìpéye tí a dín kù — ìdámẹ́rin àyè náà bí ó ti wù kí ó rí';
+$string['settings:embed_dtype_binary'] = 'Tí ó kéré jù — ìdámọ́gbọ̀n àyè náà, ìpéye tí ó kéré jù';
+
+$string['ragadmin:stat_vector_storage'] = 'Ìkọ̀kọ̀ vẹ́ktọ̀';
+$string['ragadmin:storage_projection'] = 'Àtúnṣàkọsílẹ̀ ní ìpéye mìíràn yóò yí èyí padà sí: {$a}. Ìyípadà ìpéye nílò àtúnṣàkọsílẹ̀ pípé.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — bí {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Ìpéye pípé';
+$string['settings:embed_dtype_shortint8'] = 'Ìpéye tí a dín kù';
+$string['settings:embed_dtype_shortbinary'] = 'Tí ó kéré jù';

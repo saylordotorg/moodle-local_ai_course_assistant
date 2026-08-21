@@ -1956,3 +1956,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Address ng papasok na webhoo
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Opsyonal na address ng papasok na webhook ng Slack. Inilalathala ang buod bilang mensaheng block ng Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Address ng papasok na webhook ng Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Opsyonal na address ng papasok na webhook ng Teams. Inilalathala ang buod bilang connector card ng Office 365.';
+
+$string['settings:embed_query_model'] = 'Modelo ng pag-embed ng tanong (advanced)';
+$string['settings:embed_query_model_desc'] = 'Iwanang blangko maliban kung sigurado kang kailangan ito. Karaniwan, ang mga tanong at ang nilalaman ng kurso ay ini-embed ng parehong modelo, at iyon lamang ang pagpiliang laging ligtas: hindi maihahambing ang mga vector mula sa magkaibang modelo, at ang paghahalo ay nagbubunga ng mga resultang mukhang mapagkakatiwalaan ngunit walang kabuluhan, sa halip na isang error. Itakda ito lamang kapag ang dalawang modelo ay may parehong embedding space — sa ngayon ang pamilyang Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), na nadokumento bilang maaaring ipagpalit. Ang bentahe ay maaari mong palitan ang modelo ng tanong sa hinaharap nang hindi muling ini-embed ang buong katalogo ng iyong mga kurso. Kung lumabas na hindi maihahambing ang mga modelo, magtatala ang pagkuha ng babala at wala itong ibabalik para sa kursong iyon kaysa magbalik ng maling mga bahagi.';
+$string['settings:embed_dtype'] = 'Katumpakan ng nakaimbak na vector';
+$string['settings:embed_dtype_desc'] = 'Gaano karaming espasyo ang kinukuha ng bawat nakaimbak na vector. Ang mas mababang katumpakan ay nakatitipid ng malaking espasyo sa disk sa kapalit ng kaunting pagbaba sa kawastuhan ng pagkuha. <strong>Ang pagbabago nito ay nangangailangan ng buong muling pag-index</strong> — hindi mababasa ang mga format nang palitan, at ang alinmang kursong nakaimbak pa sa lumang format ay lalaktawan (may babala sa mga log) hanggang sa muling ma-index. Tanging ang mga provider na sumusuporta sa quantization ang sumusunod dito; ang iba ay laging nag-iimbak sa buong katumpakan.';
+$string['settings:embed_dtype_float'] = 'Buong katumpakan (pinakamalaki, pinakawasto)';
+$string['settings:embed_dtype_int8'] = 'Nabawasang katumpakan — mga isang kapat ng espasyo';
+$string['settings:embed_dtype_binary'] = 'Pinakamaliit — mga isang katlumpu ng espasyo, pinakamababang kawastuhan';
+
+$string['ragadmin:stat_vector_storage'] = 'Imbakan ng vector';
+$string['ragadmin:storage_projection'] = 'Ang muling pag-index sa ibang katumpakan ay magbabago nito sa: {$a}. Ang pagpapalit ng katumpakan ay nangangailangan ng buong muling pag-index.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — mga {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Buong katumpakan';
+$string['settings:embed_dtype_shortint8'] = 'Nabawasang katumpakan';
+$string['settings:embed_dtype_shortbinary'] = 'Pinakamaliit';

@@ -1942,3 +1942,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Slack ਆਉਣ ਵਾਲਾ
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'ਵਿਕਲਪਿਕ Slack ਆਉਣ ਵਾਲਾ webhook ਪਤਾ। ਸਾਰ Slack ਬਲਾਕ ਸੁਨੇਹੇ ਵਜੋਂ ਪ੍ਰਕਾਸ਼ਿਤ ਹੁੰਦਾ ਹੈ।';
 $string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams ਆਉਣ ਵਾਲਾ webhook ਪਤਾ';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'ਵਿਕਲਪਿਕ Teams ਆਉਣ ਵਾਲਾ webhook ਪਤਾ। ਸਾਰ Office 365 ਕਨੈਕਟਰ ਕਾਰਡ ਵਜੋਂ ਪ੍ਰਕਾਸ਼ਿਤ ਹੁੰਦਾ ਹੈ।';
+
+$string['settings:embed_query_model'] = 'ਪੁੱਛਗਿੱਛ ਏਮਬੈਡਿੰਗ ਮਾਡਲ (ਉੱਚ ਪੱਧਰੀ)';
+$string['settings:embed_query_model_desc'] = 'ਜਦੋਂ ਤੱਕ ਤੁਹਾਨੂੰ ਪੱਕਾ ਪਤਾ ਨਾ ਹੋਵੇ ਕਿ ਲੋੜ ਹੈ, ਇਸਨੂੰ ਖਾਲੀ ਛੱਡੋ। ਆਮ ਤੌਰ \'ਤੇ ਪੁੱਛਗਿੱਛਾਂ ਅਤੇ ਕੋਰਸ ਸਮੱਗਰੀ ਇੱਕੋ ਮਾਡਲ ਨਾਲ ਏਮਬੈਡ ਕੀਤੀ ਜਾਂਦੀ ਹੈ, ਜੋ ਹਰ ਹਾਲਤ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਇੱਕੋ-ਇੱਕ ਚੋਣ ਹੈ: ਵੱਖ-ਵੱਖ ਮਾਡਲਾਂ ਦੇ ਵੈਕਟਰਾਂ ਦੀ ਤੁਲਨਾ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕਦੀ, ਅਤੇ ਉਹਨਾਂ ਨੂੰ ਰਲਾਉਣ ਨਾਲ ਗਲਤੀ ਦੀ ਥਾਂ ਭਰੋਸੇਯੋਗ ਲੱਗਣ ਵਾਲੇ ਪਰ ਅਰਥਹੀਣ ਨਤੀਜੇ ਮਿਲਦੇ ਹਨ। ਇਸਨੂੰ ਸਿਰਫ਼ ਉਦੋਂ ਸੈੱਟ ਕਰੋ ਜਦੋਂ ਦੋਵੇਂ ਮਾਡਲ ਇੱਕੋ ਏਮਬੈਡਿੰਗ ਸਪੇਸ ਸਾਂਝੀ ਕਰਦੇ ਹੋਣ — ਹਾਲੇ Voyage 4 ਪਰਿਵਾਰ (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), ਜਿਨ੍ਹਾਂ ਦੀ ਆਪਸੀ ਬਦਲਵੀਂ ਵਰਤੋਂ ਦਸਤਾਵੇਜ਼ੀ ਹੈ। ਫ਼ਾਇਦਾ ਇਹ ਹੈ ਕਿ ਤੁਸੀਂ ਪੂਰੇ ਕੋਰਸ ਕੈਟਾਲਾਗ ਨੂੰ ਦੁਬਾਰਾ ਏਮਬੈਡ ਕੀਤੇ ਬਿਨਾਂ ਬਾਅਦ ਵਿੱਚ ਪੁੱਛਗਿੱਛ ਮਾਡਲ ਬਦਲ ਸਕਦੇ ਹੋ। ਜੇ ਮਾਡਲ ਤੁਲਨਾਯੋਗ ਨਾ ਨਿਕਲਣ, ਤਾਂ ਪ੍ਰਾਪਤੀ ਇੱਕ ਚਿਤਾਵਨੀ ਦਰਜ ਕਰਦੀ ਹੈ ਅਤੇ ਗਲਤ ਹਿੱਸੇ ਦੇਣ ਦੀ ਥਾਂ ਉਸ ਕੋਰਸ ਲਈ ਕੁਝ ਵੀ ਨਹੀਂ ਦਿੰਦੀ।';
+$string['settings:embed_dtype'] = 'ਸੰਭਾਲੇ ਵੈਕਟਰ ਦੀ ਸ਼ੁੱਧਤਾ';
+$string['settings:embed_dtype_desc'] = 'ਹਰ ਸੰਭਾਲੇ ਵੈਕਟਰ ਕਿੰਨੀ ਥਾਂ ਲੈਂਦਾ ਹੈ। ਘੱਟ ਸ਼ੁੱਧਤਾ ਬਹੁਤ ਸਾਰੀ ਡਿਸਕ ਬਚਾਉਂਦੀ ਹੈ ਪਰ ਪ੍ਰਾਪਤੀ ਦੀ ਸਹੀਪਣ ਕੁਝ ਘਟਦੀ ਹੈ। <strong>ਇਸਨੂੰ ਬਦਲਣ ਲਈ ਪੂਰੀ ਮੁੜ-ਸੂਚੀਕਰਨ ਲੋੜੀਂਦੀ ਹੈ</strong> — ਫਾਰਮੈਟ ਇੱਕ-ਦੂਜੇ ਦੀ ਥਾਂ ਪੜ੍ਹੇ ਨਹੀਂ ਜਾ ਸਕਦੇ, ਅਤੇ ਪੁਰਾਣੇ ਫਾਰਮੈਟ ਵਿੱਚ ਸੰਭਾਲਿਆ ਕੋਈ ਵੀ ਕੋਰਸ ਮੁੜ-ਸੂਚੀਬੱਧ ਹੋਣ ਤੱਕ ਛੱਡ ਦਿੱਤਾ ਜਾਵੇਗਾ (ਲੌਗ ਵਿੱਚ ਚਿਤਾਵਨੀ ਨਾਲ)। ਸਿਰਫ਼ ਕੁਆਂਟਾਈਜ਼ੇਸ਼ਨ ਸਮਰਥਿਤ ਪ੍ਰਦਾਤਾ ਇਸਦੀ ਪਾਲਣਾ ਕਰਦੇ ਹਨ; ਬਾਕੀ ਸਦਾ ਪੂਰੀ ਸ਼ੁੱਧਤਾ ਵਿੱਚ ਸੰਭਾਲਦੇ ਹਨ।';
+$string['settings:embed_dtype_float'] = 'ਪੂਰੀ ਸ਼ੁੱਧਤਾ (ਸਭ ਤੋਂ ਵੱਡੀ, ਸਭ ਤੋਂ ਸਹੀ)';
+$string['settings:embed_dtype_int8'] = 'ਘਟਾਈ ਸ਼ੁੱਧਤਾ — ਥਾਂ ਦਾ ਲਗਭਗ ਚੌਥਾ ਹਿੱਸਾ';
+$string['settings:embed_dtype_binary'] = 'ਸਭ ਤੋਂ ਛੋਟੀ — ਥਾਂ ਦਾ ਲਗਭਗ ਤੀਹਵਾਂ ਹਿੱਸਾ, ਸਭ ਤੋਂ ਘੱਟ ਸਹੀਪਣ';
+
+$string['ragadmin:stat_vector_storage'] = 'ਵੈਕਟਰ ਸਟੋਰੇਜ';
+$string['ragadmin:storage_projection'] = 'ਵੱਖਰੀ ਸ਼ੁੱਧਤਾ \'ਤੇ ਮੁੜ-ਸੂਚੀਕਰਨ ਇਸਨੂੰ ਇਸ ਵਿੱਚ ਬਦਲ ਦੇਵੇਗਾ: {$a}। ਸ਼ੁੱਧਤਾ ਬਦਲਣ ਲਈ ਪੂਰੀ ਮੁੜ-ਸੂਚੀਕਰਨ ਲੋੜੀਂਦੀ ਹੈ।';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — ਲਗਭਗ {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'ਪੂਰੀ ਸ਼ੁੱਧਤਾ';
+$string['settings:embed_dtype_shortint8'] = 'ਘਟਾਈ ਸ਼ੁੱਧਤਾ';
+$string['settings:embed_dtype_shortbinary'] = 'ਸਭ ਤੋਂ ਛੋਟੀ';

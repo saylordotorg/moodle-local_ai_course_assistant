@@ -1955,3 +1955,19 @@ $string['radar_report:generated'] = '生成时间：{$a}';
 $string['radar_report:query'] = '查询';
 $string['radar_report:response'] = '响应';
 $string['radar_report:privacy_note'] = '本报告中的所有学员数据均已匿名化。请勿公开分享。';
+
+$string['settings:embed_query_model'] = '查询嵌入模型（高级）';
+$string['settings:embed_query_model_desc'] = '除非确知需要，请留空。通常查询与课程内容由同一模型嵌入，这也是唯一在所有情况下都安全的选择：来自不同模型的向量无法相互比较，混用不会报错，而是给出看似可信但毫无意义的结果。仅当两个模型共用同一嵌入空间时才设置此项——目前为 Voyage 4 系列（voyage-4-large、voyage-4、voyage-4-lite、voyage-4-nano），其可互换性已有文档说明。好处是日后可以更换查询模型，而无需重新嵌入整个课程目录。若两个模型最终并不可比，检索会记录一条警告，并对该课程不返回任何内容，而不是返回错误的段落。';
+$string['settings:embed_dtype'] = '已存储向量的精度';
+$string['settings:embed_dtype_desc'] = '每个已存储向量占用的空间。降低精度可大幅节省磁盘空间，但检索准确度会有所下降。<strong>更改此项需要完整重建索引</strong>——各格式之间无法互相读取，任何仍以旧格式存储的课程都会被跳过（并在日志中记录警告），直至重建索引为止。只有支持量化的提供方会遵循此设置；其他提供方始终以完整精度存储。';
+$string['settings:embed_dtype_float'] = '完整精度（占用最大，最为准确）';
+$string['settings:embed_dtype_int8'] = '降低精度——约为原空间的四分之一';
+$string['settings:embed_dtype_binary'] = '最小——约为原空间的三十分之一，准确度最低';
+
+$string['ragadmin:stat_vector_storage'] = '向量存储占用';
+$string['ragadmin:storage_projection'] = '以其他精度重建索引会将此值变为：{$a}。更改精度需要完整重建索引。';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — 约 {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = '完整精度';
+$string['settings:embed_dtype_shortint8'] = '降低精度';
+$string['settings:embed_dtype_shortbinary'] = '最小';

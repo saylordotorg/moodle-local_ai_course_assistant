@@ -1955,3 +1955,19 @@ $string['settings:anomaly_digest_slack_webhook'] = 'Adareesu webhook bu dugg ci 
 $string['settings:anomaly_digest_slack_webhook_desc'] = 'Adareesu webhook bu dugg ci Slack bu tànneef. Tënk bi ñungi koy siiwal ni bataaxalu blok bu Slack.';
 $string['settings:anomaly_digest_teams_webhook'] = 'Adareesu webhook bu dugg ci Microsoft Teams';
 $string['settings:anomaly_digest_teams_webhook_desc'] = 'Adareesu webhook bu dugg ci Teams bu tànneef. Tënk bi ñungi koy siiwal ni kartu jokkalekaay bu Office 365.';
+
+$string['settings:embed_query_model'] = 'Modelu duggal laaj (yu kawe)';
+$string['settings:embed_query_model_desc'] = 'Bàyyil ko neen su fekkee doo wóor ne dangaa ko soxla. Ci anam gu yees, laaj yi ak li nekk ci koorsu bi ñu leen di duggal ci menn modelu, mooy tànneef bi rekk di wóor ci mbir mépp: vektoor yu jóge ci modelu yu wute mënuñu leen a mengale, te seen jaxase dafa joxe njariñ yu mel ni yu wóor waaye amul benn solo, moo gën a bon ci njuumte. Def ko rekk su modelu ñaar yi bokk menn barab bu duggal — léegi njabootu Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), yi ñu bind ne ñoo mën a wuutu seen biir. Njariñ li mooy ne mën ngaa soppi modelu laaj bi ci kanam te doo duggal say koorsu yépp ateel. Su fekkee ne modelu yi mënuñu ñoo mengale, jëfandikoo bi day bind artu te du delloo dara ci koorsu boobu, moo gën ci delloo firi yu juum.';
+$string['settings:embed_dtype'] = 'Wóoreef bu vektoor bi ñu denc';
+$string['settings:embed_dtype_desc'] = 'Barab bu vektoor bu ñu denc bu nekk di jël. Wóoreef bu suufe day denc barab bu bare ci disk waaye day yeexal tuuti wóoreef bu jëfandikoo. <strong>Soppi lii day laaj benn indeksaasioŋ bu mat</strong> — cosaan yi mënuñu leen a jàng ci seen biir, te koorsu bu mu mën a doon bu ñu denc ci cosaan bu jëkk day tegtal (ak artu ci mbind yi) ba kera ñu koy indekse ateel. Ku joxe ñi nangu wàññi rekk ñoo topp lii; ñi ci des dañuy denc ci wóoreef bu mat saa su nekk.';
+$string['settings:embed_dtype_float'] = 'Wóoreef bu mat (bi gën a réy, bi gën a wóor)';
+$string['settings:embed_dtype_int8'] = 'Wóoreef bu wàññiku — lu tollu ci genn-ñeent ci barab bi';
+$string['settings:embed_dtype_binary'] = 'Bi gën a tuuti — lu tollu ci genn-fanweer ci barab bi, wóoreef bi gën a suufe';
+
+$string['ragadmin:stat_vector_storage'] = 'Dencukaay vektoor';
+$string['ragadmin:storage_projection'] = 'Indeksaasioŋ bu bees ak wóoreef wu wute day soppi lii ci: {$a}. Soppi wóoreef day laaj benn indeksaasioŋ bu mat.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — lu tollu ci {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Wóoreef bu mat';
+$string['settings:embed_dtype_shortint8'] = 'Wóoreef bu wàññiku';
+$string['settings:embed_dtype_shortbinary'] = 'Bi gën a tuuti';

@@ -1919,3 +1919,19 @@ $string['radar_report:generated'] = 'Skapad {$a}';
 $string['radar_report:query'] = 'Fråga';
 $string['radar_report:response'] = 'Svar';
 $string['radar_report:privacy_note'] = 'Alla studerandedata i denna rapport är anonymiserade. Dela den inte offentligt.';
+
+$string['settings:embed_query_model'] = 'Modell för inbäddning av frågor (avancerat)';
+$string['settings:embed_query_model_desc'] = 'Lämna tomt om du inte är säker på att du behöver det. Normalt bäddas både frågor och kursinnehåll in av samma modell, vilket är det enda val som alltid är säkert: vektorer från olika modeller kan inte jämföras, och att blanda dem ger resultat som ser trovärdiga ut men är meningslösa, i stället för ett felmeddelande. Ange detta endast när de två modellerna delar samma inbäddningsrum – för närvarande Voyage 4-familjen (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), som dokumenterats som utbytbara. Fördelen är att du senare kan byta frågemodell utan att bädda in hela din kurskatalog på nytt. Om modellerna visar sig inte vara jämförbara loggar sökningen en varning och returnerar ingenting för den kursen i stället för felaktiga avsnitt.';
+$string['settings:embed_dtype'] = 'Precision för lagrade vektorer';
+$string['settings:embed_dtype_desc'] = 'Hur mycket plats varje lagrad vektor tar. Lägre precision sparar mycket diskutrymme till priset av något sämre träffsäkerhet vid sökning. <strong>Att ändra denna inställning kräver fullständig omindexering</strong> – formaten kan inte läsas utbytbart, och varje kurs som fortfarande lagras i det gamla formatet hoppas över (med en varning i loggarna) till dess att den omindexerats. Endast leverantörer som stöder kvantisering följer denna inställning; övriga lagrar alltid med full precision.';
+$string['settings:embed_dtype_float'] = 'Full precision (störst, mest exakt)';
+$string['settings:embed_dtype_int8'] = 'Minskad precision – ungefär en fjärdedel av utrymmet';
+$string['settings:embed_dtype_binary'] = 'Minst – ungefär en trettiondel av utrymmet, lägst träffsäkerhet';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektorlagring';
+$string['ragadmin:storage_projection'] = 'Omindexering med annan precision skulle ändra detta till: {$a}. Att ändra precision kräver fullständig omindexering.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — ungefär {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Full precision';
+$string['settings:embed_dtype_shortint8'] = 'Minskad precision';
+$string['settings:embed_dtype_shortbinary'] = 'Minst';

@@ -1920,3 +1920,19 @@ $string['radar_report:generated'] = 'Vygenerováno {$a}';
 $string['radar_report:query'] = 'Dotaz';
 $string['radar_report:response'] = 'Odpověď';
 $string['radar_report:privacy_note'] = 'Veškerá data studentů v této zprávě jsou anonymizována. Nesdílejte ji veřejně.';
+
+$string['settings:embed_query_model'] = 'Model pro vkládání dotazů (pokročilé)';
+$string['settings:embed_query_model_desc'] = 'Ponechte prázdné, pokud si nejste jisti, že to potřebujete. Obvykle jsou dotazy i obsah kurzu vkládány stejným modelem, což je jediná univerzálně bezpečná volba: vektory z různých modelů nelze srovnávat a jejich míchání dává sebevědomě vypadající, ale nesmyslné výsledky místo chyby. Nastavte to pouze tehdy, když oba modely sdílejí jeden prostor vkládání — v současnosti rodina Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), u níž je zaměnitelnost zdokumentována. Výhodou je, že model pro dotazy můžete později změnit bez opětovného vkládání celého katalogu kurzů. Pokud se modely ukážou jako nesrovnatelné, vyhledávání zapíše upozornění a pro daný kurz nevrátí nic, místo aby vrátilo nesprávné pasáže.';
+$string['settings:embed_dtype'] = 'Přesnost uložených vektorů';
+$string['settings:embed_dtype_desc'] = 'Kolik místa zabírá každý uložený vektor. Nižší přesnost ušetří značné množství místa na disku za cenu určité ztráty přesnosti vyhledávání. <strong>Změna tohoto nastavení vyžaduje úplnou reindexaci</strong> — formáty nelze čít zaměnitelně a každý kurz stále uložený ve starém formátu bude přeskočen (s upozorněním v protokolech), dokud nebude reindexován. Toto nastavení respektují pouze poskytovatelé podporující kvantizaci; ostatní ukládají vždy v plné přesnosti.';
+$string['settings:embed_dtype_float'] = 'Plná přesnost (největší, nejpřesnější)';
+$string['settings:embed_dtype_int8'] = 'Snížená přesnost — přibližně čtvrtina místa';
+$string['settings:embed_dtype_binary'] = 'Nejmenší — přibližně třicetina místa, nejnižší přesnost';
+
+$string['ragadmin:stat_vector_storage'] = 'Úložiště vektorů';
+$string['ragadmin:storage_projection'] = 'Reindexace s jinou přesností by to změnila na: {$a}. Změna přesnosti vyžaduje úplnou reindexaci.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — přibližně {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Plná přesnost';
+$string['settings:embed_dtype_shortint8'] = 'Snížená přesnost';
+$string['settings:embed_dtype_shortbinary'] = 'Nejmenší';

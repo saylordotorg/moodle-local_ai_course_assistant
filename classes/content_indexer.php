@@ -84,6 +84,14 @@ class content_indexer {
         // v5.11.0: ask the provider its actual model so non-OpenAI vendors
         // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
         $modelname = $provider->get_model();
+        // Encoding for the vectors this run writes. effective_dtype() falls
+        // back to float when the provider cannot actually return quantized
+        // vectors, so a stored dtype always matches the stored bytes.
+        $dtype = $provider->effective_dtype();
+        // Contextualized-chunk models need the whole document in one call, so
+        // the per-chunk embed() path does not apply to them.
+        $iscontextualized = ($provider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider)
+            && $provider->is_contextualized();
 
         // Budget gate. Indexing is the bulk of RAG spend, so refuse to start a
         // run that is already over a configured 'rag' cap. Unreachable unless an
@@ -113,6 +121,19 @@ class content_indexer {
                     $chunksize
                 );
 
+                // Contextualized models embed a whole document at once so each
+                // chunk vector encodes its surroundings, so the vectors for this
+                // module are computed in one call rather than per chunk. Filled
+                // lazily on the first chunk that actually needs embedding: a
+                // module whose content is unchanged skips the call entirely.
+                //
+                // Note this deliberately embeds EVERY chunk of the module even
+                // when only some need storing. That is not waste — it is the
+                // requirement. Embedding a subset would give the remaining
+                // chunks a different, poorer context than a full-document pass,
+                // so the vectors would not match the rest of the index.
+                $ctxvectors = null;
+
                 foreach ($chunks as $idx => $chunk) {
                     $hash = $chunk['contenthash'];
                     $seenhashes[] = $hash;
@@ -129,9 +150,13 @@ class content_indexer {
                         $existing = $DB->get_record('local_ai_course_assistant_chunks', [
                             'courseid'    => $courseid,
                             'contenthash' => $hash,
-                        ], 'id, embedding');
+                        ], 'id, embedding, embedding_bin');
 
-                        if ($existing && !empty($existing->embedding)) {
+                        // Either column proves the chunk is embedded. Testing only the
+                        // JSON column made every quantized row look unembedded, so a
+                        // reindex re-embedded the entire course on every run and the
+                        // hash-skip optimization silently stopped working.
+                        if ($existing && (!empty($existing->embedding) || !empty($existing->embedding_bin))) {
                             $stats['skipped']++;
                             continue;
                         }
@@ -150,7 +175,37 @@ class content_indexer {
                     }
 
                     // Embed this chunk.
-                    $vector = $provider->embed($chunk['content']);
+                    if ($iscontextualized) {
+                        if ($ctxvectors === null) {
+                            $texts = [];
+                            foreach ($chunks as $c) {
+                                $texts[] = (string) $c['content'];
+                            }
+                            $groups = $provider->embed_contextualized([$texts], 'document');
+                            $ctxvectors = array_values($groups)[0] ?? [];
+                        }
+                        if (!isset($ctxvectors[$idx]) || !is_array($ctxvectors[$idx])) {
+                            // One vector per chunk is the contract. A gap means
+                            // the response did not line up with what was sent,
+                            // and storing a wrong-chunk vector would be worse
+                            // than failing this module.
+                            throw new \moodle_exception(
+                                'chat:error',
+                                'local_ai_course_assistant',
+                                '',
+                                null,
+                                sprintf(
+                                    'contextualized embedding missing vector for chunk %d of %d in cmid %d',
+                                    $idx,
+                                    count($chunks),
+                                    (int) $mod['cmid']
+                                )
+                            );
+                        }
+                        $vector = $ctxvectors[$idx];
+                    } else {
+                        $vector = $provider->embed($chunk['content']);
+                    }
 
                     // Upsert: delete any old row for this cmid+chunkindex first.
                     $DB->delete_records('local_ai_course_assistant_chunks', [
@@ -176,13 +231,22 @@ class content_indexer {
                     $record->chunkindex  = $idx;
                     $record->content     = $sanitized['text'];
                     $record->contenthash = $hash;
-                    // Both forms are written during the transition: the packed
-                    // vector is what retrieval reads, and the JSON copy keeps
-                    // a rollback to the previous release possible without a
-                    // reindex. A later release drops the JSON column.
-                    $record->embedding     = json_encode($vector);
-                    $record->embedding_bin = rag_retriever::pack_vector($vector);
+                    // Float indexes write both forms during the transition:
+                    // the packed vector is what retrieval reads, and the JSON
+                    // copy keeps a rollback to the previous release possible
+                    // without a reindex. A later release drops the JSON column.
+                    //
+                    // Quantized indexes write only the packed form. A JSON copy
+                    // of int8 or bit-packed values would be larger than the
+                    // binary it duplicates, which defeats the entire point of
+                    // quantizing. The consequence is deliberate and documented:
+                    // changing embed_dtype requires a reindex, and so does
+                    // rolling back to a release that cannot read the encoding.
+                    $isfloat = ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
+                    $record->embedding     = $isfloat ? json_encode($vector) : null;
+                    $record->embedding_bin = rag_retriever::pack_vector($vector, $dtype);
                     $record->embed_model   = $modelname;
+                    $record->embed_dtype   = $dtype;
                     $record->timecreated = time();
                     $record->timeindexed = time();
 
@@ -325,6 +389,11 @@ class content_indexer {
         // v5.11.0: ask the provider its actual model so non-OpenAI vendors
         // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
         $modelname = $provider->get_model();
+        // v7.0.3: and its encoding, for the same reason — a row whose recorded
+        // dtype disagreed with its stored bytes would be unscoreable. This path
+        // is the one auto_reindex_rag_drifted uses, so omitting it here would
+        // leave drifted modules writing float bytes labelled as quantized.
+        $dtype = $provider->effective_dtype();
 
         $chunks = content_chunker::chunk($mod['text'], $mod['title'], $section, $chunksize);
 
@@ -339,8 +408,12 @@ class content_indexer {
                 $existing = $DB->get_record('local_ai_course_assistant_chunks', [
                     'courseid'    => $courseid,
                     'contenthash' => $chunk['contenthash'],
-                ], 'id, embedding');
-                if ($existing && !empty($existing->embedding)) {
+                ], 'id, embedding, embedding_bin');
+                // Either column proves the chunk is embedded. Testing only the
+                // JSON column made every quantized row look unembedded, so a
+                // reindex re-embedded the entire course on every run and the
+                // hash-skip optimization silently stopped working.
+                if ($existing && (!empty($existing->embedding) || !empty($existing->embedding_bin))) {
                     // WARNING, do not enable this path without rewriting it. It is
                     // currently unreachable: the only caller of index_module() is
                     // the auto_reindex_rag_drifted task, which passes $force=true.
@@ -374,9 +447,11 @@ class content_indexer {
             // (retrieval falls back to JSON per row, so it stays correct, just
             // slower). Any future writer of this table must set both columns
             // until the JSON column is dropped.
-            $record->embedding     = json_encode($vector);
-            $record->embedding_bin = rag_retriever::pack_vector($vector);
+            $isfloat = ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
+            $record->embedding     = $isfloat ? json_encode($vector) : null;
+            $record->embedding_bin = rag_retriever::pack_vector($vector, $dtype);
             $record->embed_model   = $modelname;
+            $record->embed_dtype   = $dtype;
             $record->timecreated = time();
             $record->timeindexed = time();
 

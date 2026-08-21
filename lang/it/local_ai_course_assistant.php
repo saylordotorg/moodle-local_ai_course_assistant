@@ -1970,3 +1970,19 @@ $string['radar_report:generated'] = 'Generato il {$a}';
 $string['radar_report:query'] = 'Query';
 $string['radar_report:response'] = 'Risposta';
 $string['radar_report:privacy_note'] = 'Tutti i dati degli studenti in questo rapporto sono anonimizzati. Non condividerlo pubblicamente.';
+
+$string['settings:embed_query_model'] = 'Modello di incorporamento delle query (avanzato)';
+$string['settings:embed_query_model_desc'] = 'Lasciare vuoto se non si è certi di averne bisogno. Normalmente le query e i contenuti del corso vengono incorporati dallo stesso modello, che è l\'unica scelta sicura in ogni caso: i vettori di modelli diversi non sono confrontabili e mescolarli produce risultati apparentemente attendibili ma privi di significato, invece di un errore. Impostare questo campo solo quando i due modelli condividono lo stesso spazio di incorporamento: attualmente la famiglia Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), documentata come intercambiabile. Il vantaggio è poter cambiare in seguito il modello per le query senza reincorporare l\'intero catalogo dei corsi. Se i modelli risultano non confrontabili, il recupero registra un avviso e non restituisce nulla per quel corso, anziché restituire passaggi errati.';
+$string['settings:embed_dtype'] = 'Precisione dei vettori memorizzati';
+$string['settings:embed_dtype_desc'] = 'Quanto spazio occupa ciascun vettore memorizzato. Una precisione inferiore fa risparmiare molto spazio su disco a costo di una certa perdita di accuratezza nel recupero. <strong>Modificare questa impostazione richiede una reindicizzazione completa</strong>: i formati non sono leggibili in modo interscambiabile e qualsiasi corso ancora memorizzato nel vecchio formato verrà ignorato (con un avviso nei registri) fino alla reindicizzazione. Solo i fornitori che supportano la quantizzazione rispettano questa impostazione; gli altri memorizzano sempre a precisione piena.';
+$string['settings:embed_dtype_float'] = 'Precisione piena (la più grande, la più accurata)';
+$string['settings:embed_dtype_int8'] = 'Precisione ridotta: circa un quarto dello spazio';
+$string['settings:embed_dtype_binary'] = 'La più piccola: circa un trentesimo dello spazio, accuratezza minima';
+
+$string['ragadmin:stat_vector_storage'] = 'Spazio dei vettori';
+$string['ragadmin:storage_projection'] = 'Reindicizzare con una precisione diversa porterebbe questo valore a: {$a}. Cambiare precisione richiede una reindicizzazione completa.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — circa {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Precisione piena';
+$string['settings:embed_dtype_shortint8'] = 'Precisione ridotta';
+$string['settings:embed_dtype_shortbinary'] = 'La più piccola';

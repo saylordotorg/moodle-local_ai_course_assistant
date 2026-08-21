@@ -1947,3 +1947,19 @@ $string['radar_report:generated'] = 'Generado el {$a}';
 $string['radar_report:query'] = 'Consulta';
 $string['radar_report:response'] = 'Respuesta';
 $string['radar_report:privacy_note'] = 'Todos los datos de los estudiantes en este informe están anonimizados. No lo comparta públicamente.';
+
+$string['settings:embed_query_model'] = 'Modelo de incrustación de consultas (avanzado)';
+$string['settings:embed_query_model_desc'] = 'Déjelo vacío a menos que sepa con certeza que lo necesita. Normalmente las consultas y el contenido del curso se incrustan con el mismo modelo, que es la única opción segura en todos los casos: los vectores de modelos distintos no se pueden comparar, y mezclarlos produce resultados de apariencia convincente pero sin sentido, en lugar de un error. Configure esto solo cuando los dos modelos compartan un mismo espacio de incrustación: actualmente la familia Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), documentada como intercambiable. La ventaja es que podrá cambiar el modelo de consultas más adelante sin volver a incrustar todo el catálogo de cursos. Si los modelos resultan no ser comparables, la recuperación registra una advertencia y no devuelve nada para ese curso, en lugar de devolver pasajes erróneos.';
+$string['settings:embed_dtype'] = 'Precisión de los vectores almacenados';
+$string['settings:embed_dtype_desc'] = 'Cuánto espacio ocupa cada vector almacenado. Una precisión menor ahorra mucho disco a costa de cierta pérdida de exactitud en la recuperación. <strong>Cambiar este ajuste exige reindexar por completo</strong>: los formatos no se pueden leer de forma intercambiable, y cualquier curso que siga almacenado en el formato anterior se omitirá (con una advertencia en los registros) hasta que se reindexe. Solo los proveedores que admiten cuantización respetan este ajuste; los demás almacenan siempre con precisión completa.';
+$string['settings:embed_dtype_float'] = 'Precisión completa (la mayor, la más exacta)';
+$string['settings:embed_dtype_int8'] = 'Precisión reducida: alrededor de una cuarta parte del espacio';
+$string['settings:embed_dtype_binary'] = 'La menor: alrededor de una treintava parte del espacio, exactitud mínima';
+
+$string['ragadmin:stat_vector_storage'] = 'Almacenamiento de vectores';
+$string['ragadmin:storage_projection'] = 'Reindexar con otra precisión cambiaría esto a: {$a}. Cambiar la precisión exige reindexar por completo.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype}: alrededor de {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Precisión completa';
+$string['settings:embed_dtype_shortint8'] = 'Precisión reducida';
+$string['settings:embed_dtype_shortbinary'] = 'La menor';

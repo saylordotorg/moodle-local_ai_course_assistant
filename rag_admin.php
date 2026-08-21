@@ -308,6 +308,45 @@ foreach ($statusrows as $idx => $row) {
 $totalchunks   = array_sum(array_column((array) $indexedcourses, 'chunks'));
 $totalembedded = array_sum(array_column((array) $indexedcourses, 'embedded'));
 
+// v7.0.3: what the stored vectors actually occupy, and what re-indexing at a
+// lower precision would occupy instead. Measured from the column rather than
+// estimated, because the index may contain a mixture of encodings while a
+// re-index is still in progress.
+$vectorbytes = (int) $DB->get_field_sql(
+    'SELECT COALESCE(SUM(' . $DB->sql_length('embedding_bin') . '), 0)
+       FROM {local_ai_course_assistant_chunks}
+      WHERE embedding_bin IS NOT NULL'
+);
+$rawdim = (int) get_config('local_ai_course_assistant', 'embed_dimensions');
+$currentdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
+    (string) get_config('local_ai_course_assistant', 'embed_dtype')
+);
+$storageprojection = '';
+if ($totalembedded > 0 && $rawdim > 0) {
+    $alt = [];
+    foreach (\local_ai_course_assistant\embedding_compat::DTYPES as $d) {
+        if ($d === $currentdtype) {
+            continue;
+        }
+        $alt[] = get_string('ragadmin:storage_alt_item', 'local_ai_course_assistant', [
+            // Short name, not the dropdown label: the label already carries its own
+            // size description, which read as a double explanation here
+            // ("Reduced precision - about a quarter of the space - about 1.0 KB").
+            'dtype' => get_string('settings:embed_dtype_short' . $d, 'local_ai_course_assistant'),
+            'size'  => display_size(
+                $totalembedded * \local_ai_course_assistant\embedding_compat::vector_bytes($rawdim, $d)
+            ),
+        ]);
+    }
+    if (!empty($alt)) {
+        $storageprojection = get_string(
+            'ragadmin:storage_projection',
+            'local_ai_course_assistant',
+            implode('; ', $alt)
+        );
+    }
+}
+
 // Merge indexed and active courses, deduplicated, for the per-course table.
 $allcourses = $indexedcourses;
 foreach ($activecourses as $ac) {
@@ -351,6 +390,7 @@ $templatedata = [
         ))->out()
     ),
     'statusrows' => array_values($statusrows),
+    'storageprojection' => $storageprojection,
     'statcards'  => [
         [
             'value' => count($indexedcourses),
@@ -363,6 +403,10 @@ $templatedata = [
         [
             'value' => number_format($totalembedded),
             'label' => get_string('ragadmin:stat_embedded_chunks', 'local_ai_course_assistant'),
+        ],
+        [
+            'value' => $vectorbytes > 0 ? display_size($vectorbytes) : '—',
+            'label' => get_string('ragadmin:stat_vector_storage', 'local_ai_course_assistant'),
         ],
         [
             'value' => count($activecourses),

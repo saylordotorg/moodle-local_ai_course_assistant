@@ -98,7 +98,15 @@ class send_message extends external_api {
                     (int) $params['pageid']
                 );
                 $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                // \Throwable, not \Exception, matching sse.php and the rest of
+                // the RAG paths. Retrieval decodes packed binary vectors and
+                // calls pack()/unpack(), which raise Error (a TypeError on a
+                // malformed argument) rather than Exception — and an Error here
+                // must degrade to "answer without citations", exactly as an API
+                // failure does, not fail the whole web service call. This
+                // asymmetry with sse.php predates v7.0.3 but matters more now
+                // that quantized encodings add more ways to reach an Error.
                 debugging('RAG retrieval failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
                 $retrievedchunks = [];
                 $raglatencyms = null;

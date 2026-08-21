@@ -1963,3 +1963,19 @@ $string['radar_report:generated'] = 'Létrehozva: {$a}';
 $string['radar_report:query'] = 'Lekérdezés';
 $string['radar_report:response'] = 'Válasz';
 $string['radar_report:privacy_note'] = 'A jelentésben szereplő összes tanulói adat anonimizált. Ne ossza meg nyilvánosan.';
+
+$string['settings:embed_query_model'] = 'Lekérdezés-beágyazási modell (haladó)';
+$string['settings:embed_query_model_desc'] = 'Hagyja üresen, kivéve ha biztosan tudja, hogy szükség van rá. Általában a lekérdezéseket és a kurzustartalmat ugyanaz a modell ágyazza be, és ez az egyetlen minden esetben biztonságos választás: a különböző modellekből származó vektorok nem összehasonlíthatók, összekeverésük pedig hibajelzés helyett meggyőzőnek látszó, de értelmetlen eredményeket ad. Csak akkor állítsa be, ha a két modell közös beágyazási teret használ – jelenleg a Voyage 4 család (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), amelyek felcserélhetősége dokumentált. Az előny, hogy később lecserélheti a lekérdezési modellt anélkül, hogy az egész kurzuskatalógust újra be kellene ágyaznia. Ha kiderül, hogy a modellek nem összehasonlíthatók, a visszakeresés figyelmeztetést naplóz, és az adott kurzushoz semmit sem ad vissza, nem pedig téves szövegrészeket.';
+$string['settings:embed_dtype'] = 'Tárolt vektorok pontossága';
+$string['settings:embed_dtype_desc'] = 'Mennyi helyet foglal el egy-egy tárolt vektor. Az alacsonyabb pontosság sok lemezhelyet megtakarít, a visszakeresés pontosságának némi romlása mellett. <strong>Ennek módosítása teljes újraindexelést igényel</strong> – a formátumok nem olvashatók egymás helyett, és minden kurzus, amely még a régi formátumban van tárolva, kimarad (naplózott figyelmeztetéssel), amíg újra nem indexelik. Csak a kvantálást támogató szolgáltatók tartják be ezt a beállítást; a többiek mindig teljes pontossággal tárolnak.';
+$string['settings:embed_dtype_float'] = 'Teljes pontosság (a legnagyobb, a legpontosabb)';
+$string['settings:embed_dtype_int8'] = 'Csökkentett pontosság – körülbelül a hely negyede';
+$string['settings:embed_dtype_binary'] = 'A legkisebb – körülbelül a hely harmincada, a legkisebb pontosság';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektortárolás';
+$string['ragadmin:storage_projection'] = 'Más pontossággal újraindexelve ez ennyire változna: {$a}. A pontosság módosítása teljes újraindexelést igényel.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — körülbelül {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Teljes pontosság';
+$string['settings:embed_dtype_shortint8'] = 'Csökkentett pontosság';
+$string['settings:embed_dtype_shortbinary'] = 'A legkisebb';

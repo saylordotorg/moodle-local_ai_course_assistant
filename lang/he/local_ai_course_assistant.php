@@ -1963,3 +1963,19 @@ $string['radar_report:generated'] = 'נוצר בתאריך {$a}';
 $string['radar_report:query'] = 'שאילתה';
 $string['radar_report:response'] = 'תשובה';
 $string['radar_report:privacy_note'] = 'כל נתוני הלומדים בדוח זה עברו אנונימיזציה. אין לשתף אותו בפומבי.';
+
+$string['settings:embed_query_model'] = 'מודל הטמעה לשאילתות (מתקדם)';
+$string['settings:embed_query_model_desc'] = 'השאירו ריק אלא אם אתם בטוחים שיש בכך צורך. בדרך כלל שאילתות ותוכן הקורס מוטמעים באותו מודל, וזו הבחירה הבטוחה היחידה בכל מצב: וקטורים ממודלים שונים אינם ניתנים להשוואה, וערבוב שלהם מפיק תוצאות שנראות משכנעות אך חסרות משמעות, במקום שגיאה. הגדירו זאת רק כאשר שני המודלים חולקים מרחב הטמעה אחד — כיום משפחת Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), שמתועדת כניתנת להחלפה. היתרון הוא שתוכלו לשנות את מודל השאילתות בהמשך בלי להטמיע מחדש את כל קטלוג הקורסים. אם יתברר שהמודלים אינם ברי-השוואה, האחזור ירשום אזהרה ולא יחזיר דבר עבור אותו קורס, במקום להחזיר קטעים שגויים.';
+$string['settings:embed_dtype'] = 'דיוק הווקטורים המאוחסנים';
+$string['settings:embed_dtype_desc'] = 'כמה שטח תופס כל וקטור מאוחסן. דיוק נמוך יותר חוסך שטח דיסק רב במחיר אובדן מסוים בדיוק האחזור. <strong>שינוי ההגדרה מחייב אינדוקס מחדש מלא</strong> — הפורמטים אינם קריאים זה במקום זה, וכל קורס שעדיין מאוחסן בפורמט הקודם יידלג (עם אזהרה ביומנים) עד שיעבור אינדוקס מחדש. רק ספקים שתומכים בקוונטיזציה מכבדים הגדרה זו; האחרים מאחסנים תמיד בדיוק מלא.';
+$string['settings:embed_dtype_float'] = 'דיוק מלא (הגדול ביותר, המדויק ביותר)';
+$string['settings:embed_dtype_int8'] = 'דיוק מופחת — כרבע מהשטח';
+$string['settings:embed_dtype_binary'] = 'הקטן ביותר — כשלושים אחד מהשטח, הדיוק הנמוך ביותר';
+
+$string['ragadmin:stat_vector_storage'] = 'אחסון וקטורים';
+$string['ragadmin:storage_projection'] = 'אינדוקס מחדש בדיוק אחר ישנה זאת ל: {$a}. שינוי הדיוק מחייב אינדוקס מחדש מלא.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — כ־{$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'דיוק מלא';
+$string['settings:embed_dtype_shortint8'] = 'דיוק מופחת';
+$string['settings:embed_dtype_shortbinary'] = 'הקטן ביותר';

@@ -1942,3 +1942,19 @@ $string['radar_report:generated'] = 'Gerado em {$a}';
 $string['radar_report:query'] = 'Consulta';
 $string['radar_report:response'] = 'Resposta';
 $string['radar_report:privacy_note'] = 'Todos os dados dos estudantes neste relatório são anonimizados. Não compartilhe publicamente.';
+
+$string['settings:embed_query_model'] = 'Modelo de incorporação de consultas (avançado)';
+$string['settings:embed_query_model_desc'] = 'Deixe em branco a menos que tenha certeza de que precisa disso. Normalmente as consultas e o conteúdo do curso são incorporados pelo mesmo modelo, que é a única escolha segura em todos os casos: vetores de modelos diferentes não podem ser comparados, e misturá-los produz resultados de aparência convincente, mas sem sentido, em vez de um erro. Defina isto apenas quando os dois modelos compartilharem um mesmo espaço de incorporação — atualmente a família Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), documentada como intercambiável. A vantagem é poder trocar o modelo de consultas mais tarde sem reincorporar todo o catálogo de cursos. Se os modelos se revelarem não comparáveis, a recuperação registra um aviso e não devolve nada para aquele curso, em vez de devolver trechos incorretos.';
+$string['settings:embed_dtype'] = 'Precisão dos vetores armazenados';
+$string['settings:embed_dtype_desc'] = 'Quanto espaço cada vetor armazenado ocupa. Menor precisão economiza muito disco ao custo de alguma perda de exatidão na recuperação. <strong>Alterar esta configuração exige reindexação completa</strong> — os formatos não são lidos de forma intercambiável, e qualquer curso ainda armazenado no formato antigo será ignorado (com um aviso nos registros) até ser reindexado. Somente fornecedores que aceitam quantização respeitam esta configuração; os demais armazenam sempre em precisão total.';
+$string['settings:embed_dtype_float'] = 'Precisão total (maior, mais exata)';
+$string['settings:embed_dtype_int8'] = 'Precisão reduzida — cerca de um quarto do espaço';
+$string['settings:embed_dtype_binary'] = 'Menor — cerca de um trigésimo do espaço, exatidão mais baixa';
+
+$string['ragadmin:stat_vector_storage'] = 'Armazenamento de vetores';
+$string['ragadmin:storage_projection'] = 'Reindexar com outra precisão mudaria isto para: {$a}. Alterar a precisão exige reindexação completa.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — cerca de {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Precisão total';
+$string['settings:embed_dtype_shortint8'] = 'Precisão reduzida';
+$string['settings:embed_dtype_shortbinary'] = 'Menor';

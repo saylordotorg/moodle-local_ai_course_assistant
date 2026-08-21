@@ -1919,3 +1919,19 @@ $string['radar_report:generated'] = 'Gegenereerd op {$a}';
 $string['radar_report:query'] = 'Zoekopdracht';
 $string['radar_report:response'] = 'Antwoord';
 $string['radar_report:privacy_note'] = 'Alle cursistgegevens in dit rapport zijn geanonimiseerd. Niet openbaar delen.';
+
+$string['settings:embed_query_model'] = 'Model voor het inbedden van zoekvragen (geavanceerd)';
+$string['settings:embed_query_model_desc'] = 'Laat dit leeg tenzij u zeker weet dat u het nodig hebt. Normaal worden zoekvragen en cursusinhoud door hetzelfde model ingebed, en dat is de enige in alle gevallen veilige keuze: vectoren van verschillende modellen zijn niet vergelijkbaar, en ze mengen levert overtuigend lijkende maar zinloze resultaten op in plaats van een foutmelding. Stel dit alleen in wanneer beide modellen dezelfde inbeddingsruimte delen — momenteel de Voyage 4-familie (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), waarvan is gedocumenteerd dat ze onderling verwisselbaar zijn. Het voordeel is dat u het model voor zoekvragen later kunt wijzigen zonder uw hele cursuscatalogus opnieuw in te bedden. Blijken de modellen niet vergelijkbaar, dan legt het ophalen een waarschuwing vast en geeft het voor die cursus niets terug in plaats van onjuiste passages.';
+$string['settings:embed_dtype'] = 'Precisie van opgeslagen vectoren';
+$string['settings:embed_dtype_desc'] = 'Hoeveel ruimte elke opgeslagen vector inneemt. Een lagere precisie bespaart zeer veel schijfruimte, ten koste van iets minder nauwkeurig ophalen. <strong>Deze instelling wijzigen vereist volledig opnieuw indexeren</strong> — de formaten zijn niet uitwisselbaar leesbaar, en elke cursus die nog in het oude formaat is opgeslagen wordt overgeslagen (met een waarschuwing in de logboeken) tot hij opnieuw is geïndexeerd. Alleen aanbieders die kwantisatie ondersteunen houden zich aan deze instelling; andere slaan altijd op met volledige precisie.';
+$string['settings:embed_dtype_float'] = 'Volledige precisie (grootst, nauwkeurigst)';
+$string['settings:embed_dtype_int8'] = 'Verlaagde precisie — ongeveer een kwart van de ruimte';
+$string['settings:embed_dtype_binary'] = 'Kleinst — ongeveer een dertigste van de ruimte, laagste nauwkeurigheid';
+
+$string['ragadmin:stat_vector_storage'] = 'Vectoropslag';
+$string['ragadmin:storage_projection'] = 'Opnieuw indexeren met een andere precisie zou dit wijzigen naar: {$a}. Het wijzigen van de precisie vereist volledig opnieuw indexeren.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — ongeveer {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Volledige precisie';
+$string['settings:embed_dtype_shortint8'] = 'Verlaagde precisie';
+$string['settings:embed_dtype_shortbinary'] = 'Kleinst';

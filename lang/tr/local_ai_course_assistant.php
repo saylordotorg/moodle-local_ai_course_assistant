@@ -1933,3 +1933,19 @@ $string['radar_report:generated'] = 'Oluşturulma: {$a}';
 $string['radar_report:query'] = 'Sorgu';
 $string['radar_report:response'] = 'Yanıt';
 $string['radar_report:privacy_note'] = 'Bu rapordaki tüm öğrenci verileri anonimleştirilmiştir. Herkese açık olarak paylaşmayın.';
+
+$string['settings:embed_query_model'] = 'Sorgu gömme modeli (ileri düzey)';
+$string['settings:embed_query_model_desc'] = 'İhtiyacınız olduğundan emin değilseniz boş bırakın. Normalde sorgular ve ders içeriği aynı modelle gömülür; her durumda güvenli olan tek seçim budur: farklı modellerden gelen vektörler karşılaştırılamaz ve bunları karıştırmak hata vermek yerine inandırıcı görünen ama anlamsız sonuçlar üretir. Bunu yalnızca iki model aynı gömme uzayını paylaştığında ayarlayın — şu anda Voyage 4 ailesi (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), bunların birbirinin yerine kullanılabilirliği belgelenmiştir. Avantajı, tüm ders kataloğunuzu yeniden gömmeden sorgu modelini daha sonra değiştirebilmenizdir. Modellerin karşılaştırılamaz olduğu anlaşılırsa, getirme işlemi bir uyarı kaydeder ve yanlış bölümler döndürmek yerine o ders için hiçbir şey döndürmez.';
+$string['settings:embed_dtype'] = 'Saklanan vektör hassasiyeti';
+$string['settings:embed_dtype_desc'] = 'Saklanan her vektörün kapladığı alan. Daha düşük hassasiyet, getirme doğruluğunda bir miktar kayba karşılık çok fazla disk alanı kazandırır. <strong>Bunu değiştirmek tam bir yeniden dizinleme gerektirir</strong> — biçimler birbirinin yerine okunamaz ve eski biçimde saklanmaya devam eden herhangi bir ders, yeniden dizinlenene kadar atlanır (günlüklerde bir uyarıyla). Bu ayara yalnızca niceleme destekleyen sağlayıcılar uyar; diğerleri her zaman tam hassasiyetle saklar.';
+$string['settings:embed_dtype_float'] = 'Tam hassasiyet (en büyük, en doğru)';
+$string['settings:embed_dtype_int8'] = 'Azaltılmış hassasiyet — alanın yaklaşık dörtte biri';
+$string['settings:embed_dtype_binary'] = 'En küçük — alanın yaklaşık otuzda biri, en düşük doğruluk';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektör depolama';
+$string['ragadmin:storage_projection'] = 'Farklı bir hassasiyetle yeniden dizinleme bunu şu değere getirir: {$a}. Hassasiyeti değiştirmek tam bir yeniden dizinleme gerektirir.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — yaklaşık {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Tam hassasiyet';
+$string['settings:embed_dtype_shortint8'] = 'Azaltılmış hassasiyet';
+$string['settings:embed_dtype_shortbinary'] = 'En küçük';

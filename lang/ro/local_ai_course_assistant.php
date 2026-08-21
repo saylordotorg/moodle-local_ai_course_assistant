@@ -1919,3 +1919,19 @@ $string['radar_report:generated'] = 'Generat la {$a}';
 $string['radar_report:query'] = 'Interogare';
 $string['radar_report:response'] = 'Răspuns';
 $string['radar_report:privacy_note'] = 'Toate datele studenților din acest raport sunt anonimizate. Nu îl distribuiți public.';
+
+$string['settings:embed_query_model'] = 'Model de încorporare a interogărilor (avansat)';
+$string['settings:embed_query_model_desc'] = 'Lăsați necompletat, cu excepția cazului în care sunteți sigur că aveți nevoie. În mod normal, interogările și conținutul cursului sunt încorporate de același model, singura alegere sigură în toate situațiile: vectorii proveniți din modele diferite nu pot fi comparați, iar amestecarea lor produce rezultate care par convingătoare, dar sunt lipsite de sens, în loc de o eroare. Setați acest câmp numai când cele două modele împart același spațiu de încorporare — în prezent familia Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), documentată ca fiind interschimbabilă. Avantajul este că puteți schimba ulterior modelul pentru interogări fără a reîncorpora întregul catalog de cursuri. Dacă modelele se dovedesc necomparabile, regăsirea înregistrează un avertisment și nu returnează nimic pentru cursul respectiv, în loc să returneze pasaje greșite.';
+$string['settings:embed_dtype'] = 'Precizia vectorilor stocați';
+$string['settings:embed_dtype_desc'] = 'Cât spațiu ocupă fiecare vector stocat. O precizie mai redusă economisește foarte mult spațiu pe disc, cu o oarecare pierdere de acuratețe la regăsire. <strong>Modificarea acestei setări necesită o reindexare completă</strong> — formatele nu pot fi citite interschimbabil, iar orice curs stocat încă în formatul anterior va fi omis (cu un avertisment în jurnale) până la reindexare. Numai furnizorii care acceptă cuantizarea respectă această setare; ceilalți stochează întotdeauna la precizie completă.';
+$string['settings:embed_dtype_float'] = 'Precizie completă (cea mai mare, cea mai exactă)';
+$string['settings:embed_dtype_int8'] = 'Precizie redusă — aproximativ un sfert din spațiu';
+$string['settings:embed_dtype_binary'] = 'Cea mai mică — aproximativ o treizecime din spațiu, acuratețe minimă';
+
+$string['ragadmin:stat_vector_storage'] = 'Stocarea vectorilor';
+$string['ragadmin:storage_projection'] = 'Reindexarea cu o altă precizie ar schimba această valoare în: {$a}. Modificarea preciziei necesită o reindexare completă.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — aproximativ {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Precizie completă';
+$string['settings:embed_dtype_shortint8'] = 'Precizie redusă';
+$string['settings:embed_dtype_shortbinary'] = 'Cea mai mică';

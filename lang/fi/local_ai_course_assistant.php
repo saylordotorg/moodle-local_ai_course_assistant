@@ -1920,3 +1920,19 @@ $string['radar_report:generated'] = 'Luotu {$a}';
 $string['radar_report:query'] = 'Kysely';
 $string['radar_report:response'] = 'Vastaus';
 $string['radar_report:privacy_note'] = 'Kaikki tämän raportin opiskelijatiedot on anonymisoitu. Älä jaa raporttia julkisesti.';
+
+$string['settings:embed_query_model'] = 'Kyselyjen upotusmalli (lisäasetus)';
+$string['settings:embed_query_model_desc'] = 'Jätä tyhjäksi, ellet ole varma tarpeesta. Yleensä kyselyt ja kurssisisältö upotetaan samalla mallilla, mikä on ainoa kaikissa tilanteissa turvallinen valinta: eri malleista tulevia vektoreita ei voi verrata keskenään, ja niiden sekoittaminen tuottaa vakuuttavan näköisiä mutta merkityksettömiä tuloksia virheilmoituksen sijaan. Aseta tämä vain, kun molemmat mallit jakavat saman upotusavaruuden — tällä hetkellä Voyage 4 -perhe (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), joiden vaihdettavuus on dokumentoitu. Hyötynä on, että voit vaihtaa kyselymallin myöhemmin ilman koko kurssiluettelon uudelleenupotusta. Jos mallit osoittautuvat vertailukelvottomiksi, hakutoiminto kirjaa varoituksen eikä palauta kyseiselle kurssille mitään sen sijaan, että palauttaisi vääriä katkelmia.';
+$string['settings:embed_dtype'] = 'Tallennettujen vektorien tarkkuus';
+$string['settings:embed_dtype_desc'] = 'Kuinka paljon tilaa kukin tallennettu vektori vie. Pienempi tarkkuus säästää levytilaa huomattavasti, mutta heikentää hieman haun osuvuutta. <strong>Tämän muuttaminen vaatii täydellisen uudelleenindeksoinnin</strong> — muotoja ei voi lukea ristiin, ja jokainen vanhassa muodossa oleva kurssi ohitetaan (lokiin kirjataan varoitus), kunnes se on indeksoitu uudelleen. Vain kvantisointia tukevat palveluntarjoajat noudattavat tätä asetusta; muut tallentavat aina täydellä tarkkuudella.';
+$string['settings:embed_dtype_float'] = 'Täysi tarkkuus (suurin, tarkin)';
+$string['settings:embed_dtype_int8'] = 'Pienennetty tarkkuus — noin neljäsosa tilasta';
+$string['settings:embed_dtype_binary'] = 'Pienin — noin kolmaskymmenesosa tilasta, heikoin tarkkuus';
+
+$string['ragadmin:stat_vector_storage'] = 'Vektorien tallennustila';
+$string['ragadmin:storage_projection'] = 'Uudelleenindeksointi eri tarkkuudella muuttaisi tämän arvoon: {$a}. Tarkkuuden muuttaminen vaatii täydellisen uudelleenindeksoinnin.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — noin {$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'Täysi tarkkuus';
+$string['settings:embed_dtype_shortint8'] = 'Pienennetty tarkkuus';
+$string['settings:embed_dtype_shortbinary'] = 'Pienin';
