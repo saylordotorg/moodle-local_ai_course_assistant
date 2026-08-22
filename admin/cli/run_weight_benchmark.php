@@ -154,7 +154,13 @@ foreach ($candidates as $label => $weights) {
                 function (string $chunk) use (&$response) {
                     $response .= $chunk;
                 },
-                ['temperature' => 0.4, 'max_tokens' => 256]
+                // 1024, not 256. gemini-2.5-flash spends part of the output
+                // budget before emitting any visible text, so a small cap
+                // truncates the reply being graded: measured on dev 2026-08-22,
+                // a 200-token cap yielded 8 completion tokens where 32 were
+                // needed. Grading a truncated answer measures the cap, not the
+                // weight configuration.
+                ['temperature' => 0.4, 'max_tokens' => 1024]
             );
             $usage = $provider->get_last_token_usage();
             if (!empty($usage['prompt_tokens']) && isset($usage['completion_tokens'])) {
@@ -171,7 +177,14 @@ foreach ($candidates as $label => $weights) {
                 function (string $chunk) use (&$judge_response) {
                     $judge_response .= $chunk;
                 },
-                ['temperature' => 0.0, 'max_tokens' => 200]
+                // 800, not 200. At 200 the judge returned 8 completion tokens
+                // -- '```json\n{\n  "s' -- so json_decode() failed for EVERY
+                // prompt and the harness reported 0.00/15 with n=0 for all five
+                // weight sets, while still printing a sorted summary and a total
+                // spend. That reads like "all configurations scored zero" rather
+                // than "no data was collected". Verified on dev: 800 parses, 200
+                // never does.
+                ['temperature' => 0.0, 'max_tokens' => 800]
             );
             $jusage = $judge->get_last_token_usage();
             if (!empty($jusage['prompt_tokens']) && isset($jusage['completion_tokens'])) {
