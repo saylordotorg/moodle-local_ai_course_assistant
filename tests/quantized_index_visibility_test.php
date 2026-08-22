@@ -176,6 +176,55 @@ final class quantized_index_visibility_test extends \advanced_testcase {
             'these predicates see a quantized index as empty: ' . implode(', ', $offenders));
     }
 
+    public function test_no_vector_is_decoded_from_the_json_column_alone(): void {
+        // A widened WHERE clause is only half the fix. run_rag_fixture_benchmark
+        // shipped with the predicate corrected but the field list still
+        // 'id, content, embedding' and the loop still json_decode()ing that
+        // column — so on a quantized index every newly-admitted row was fetched
+        // and immediately discarded, and the tool reported "Loaded 0 embedded
+        // chunks" on exactly the indexes the predicate was widened to support.
+        //
+        // The predicate scan above cannot see that, because the predicate was
+        // right. So: any file that decodes a vector out of the JSON column must
+        // also know about the packed column.
+        $offenders = [];
+        foreach ($this->sources() as $rel => $src) {
+            // rag_retriever implements decode_vector(), so it necessarily
+            // references both columns; it is covered by its own tests.
+            if ($rel === 'classes/rag_retriever.php') {
+                continue;
+            }
+            if (!preg_match('/json_decode\s*\(\s*\$\w+->embedding\b/', $src)) {
+                continue;
+            }
+            if (strpos($src, 'embedding_bin') === false) {
+                $offenders[] = $rel;
+            }
+        }
+        $this->assertSame([], $offenders,
+            'these files decode a vector from the JSON column without knowing the packed column exists: '
+            . implode(', ', $offenders));
+    }
+
+    public function test_the_benchmark_harness_selects_what_it_decodes(): void {
+        $src = $this->sources()['admin/cli/run_rag_fixture_benchmark.php'] ?? '';
+        $this->assertNotSame('', $src);
+
+        // The chunk loader must select both storage columns and the encoding,
+        // and route them through the retriever's decoder rather than a bare
+        // json_decode of one column.
+        $this->assertStringContainsString(
+            "'id, content, embedding, embedding_bin, embed_dtype'",
+            $src,
+            'the chunk loader must select the packed column and the dtype, not just the JSON column'
+        );
+        $this->assertStringContainsString(
+            'rag_retriever::decode_vector(',
+            $src,
+            'the chunk loader must decode the way retrieval does'
+        );
+    }
+
     public function test_the_hash_skip_also_compares_the_encoding(): void {
         // Content hash covers the text, not the model or dtype that vectorized
         // it. Without an encoding comparison, "change embed_dtype then reindex"
