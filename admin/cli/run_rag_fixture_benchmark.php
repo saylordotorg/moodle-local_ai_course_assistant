@@ -946,15 +946,37 @@ $courseids = array_unique(array_column($fixtures, 'courseid'));
 foreach ($courseids as $courseid) {
     $rows = $DB->get_records_select(
         'local_ai_course_assistant_chunks',
-        'courseid = :cid AND embedding IS NOT NULL',
+        'courseid = :cid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
         ['cid' => $courseid],
         '',
-        'id, content, embedding'
+        'id, content, embedding, embedding_bin, embed_dtype'
     );
     $coursechunks[$courseid] = [];
+    $binaryskipped = 0;
     foreach ($rows as $row) {
-        $vec = json_decode($row->embedding, true);
-        if (is_array($vec) && !empty($vec)) {
+        // Widening the predicate above is not enough on its own: a quantized row
+        // has embedding = NULL, so a json_decode() of that column discarded every
+        // row the predicate had just admitted and the tool reported "Loaded 0
+        // embedded chunks" on exactly the indexes it was widened to support.
+        // Decode through the retriever so this tool reads a vector the same way
+        // retrieval does.
+        $dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype($row->embed_dtype ?? null);
+
+        if ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+            // decode_vector() returns [] for binary by design — those vectors are
+            // scored on packed bytes by binary_similarity(), while this tool's
+            // cosine helper takes float arrays. Count them and say so below,
+            // rather than silently benchmarking nothing.
+            $binaryskipped++;
+            continue;
+        }
+
+        $vec = \local_ai_course_assistant\rag_retriever::decode_vector(
+            $row->embedding_bin ?? null,
+            $row->embedding ?? null,
+            $dtype
+        );
+        if (!empty($vec)) {
             $coursechunks[$courseid][$row->id] = [
                 'content' => $row->content,
                 'vec'     => $vec,
@@ -962,6 +984,11 @@ foreach ($courseids as $courseid) {
         }
     }
     echo "Loaded " . count($coursechunks[$courseid]) . " embedded chunks for courseid={$courseid}\n";
+    if ($binaryskipped > 0) {
+        echo "  WARNING: skipped {$binaryskipped} binary-encoded chunks. This tool scores float\n"
+           . "           arrays; binary vectors are compared as packed bytes. Re-run against a\n"
+           . "           float or int8 index to benchmark this course.\n";
+    }
 }
 echo "\n";
 

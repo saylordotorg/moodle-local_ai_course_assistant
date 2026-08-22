@@ -180,7 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Include: courses that have chunks OR are active (visible + have enrolments).
 $sql = "SELECT c.id, c.fullname,
                COUNT(ch.id) AS chunks,
-               SUM(CASE WHEN ch.embedding IS NOT NULL THEN 1 ELSE 0 END) AS embedded,
+               SUM(CASE WHEN ch.embedding IS NOT NULL OR ch.embedding_bin IS NOT NULL
+                        THEN 1 ELSE 0 END) AS embedded,
                MAX(ch.timeindexed) AS lastindexed
           FROM {course} c
           LEFT JOIN {local_ai_course_assistant_chunks} ch ON ch.courseid = c.id

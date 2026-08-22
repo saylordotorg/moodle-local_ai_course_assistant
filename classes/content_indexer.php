@@ -150,13 +150,28 @@ class content_indexer {
                         $existing = $DB->get_record('local_ai_course_assistant_chunks', [
                             'courseid'    => $courseid,
                             'contenthash' => $hash,
-                        ], 'id, embedding, embedding_bin');
+                        ], 'id, embedding, embedding_bin, embed_model, embed_dtype');
 
                         // Either column proves the chunk is embedded. Testing only the
                         // JSON column made every quantized row look unembedded, so a
                         // reindex re-embedded the entire course on every run and the
                         // hash-skip optimization silently stopped working.
-                        if ($existing && (!empty($existing->embedding) || !empty($existing->embedding_bin))) {
+                        //
+                        // But identical content is NOT sufficient on its own: the
+                        // encoding has to match too. The hash covers the text, not
+                        // the model or the dtype that turned it into a vector, so a
+                        // content-only skip made "change embed_dtype, then reindex"
+                        // a silent no-op — the documented way to adopt quantization
+                        // did nothing, and for binary it left a float index that the
+                        // retriever then refused row by row, emptying retrieval with
+                        // only a DEBUG_NORMAL line to show for it. Re-embed whenever
+                        // the stored encoding differs from what this run writes.
+                        $sameencoding = $existing
+                            && (string) $existing->embed_model === (string) $modelname
+                            && embedding_compat::normalize_dtype($existing->embed_dtype ?? null) === $dtype;
+
+                        if ($existing && $sameencoding
+                                && (!empty($existing->embedding) || !empty($existing->embedding_bin))) {
                             $stats['skipped']++;
                             continue;
                         }
@@ -470,9 +485,16 @@ class content_indexer {
      */
     public static function is_course_indexed(int $courseid): bool {
         global $DB;
+        // Either column proves the course is indexed, matching the predicate
+        // rag_retriever uses to read vectors. Testing only the JSON column made
+        // a quantized index (int8/binary, where that column is null on every
+        // row) look permanently unindexed, so both chat paths re-extracted and
+        // re-chunked the whole course before every single reply — embedding
+        // nothing, reporting "indexed 0, skipped N", and showing up only as
+        // latency.
         return $DB->record_exists_select(
             'local_ai_course_assistant_chunks',
-            'courseid = :courseid AND embedding IS NOT NULL',
+            'courseid = :courseid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
             ['courseid' => $courseid]
         );
     }

@@ -876,7 +876,13 @@ class rag_retriever {
                 // bytes directly via binary_similarity(), which is the whole
                 // point of the encoding: expanding 128 bytes into 1024 floats
                 // would throw away both the memory and the speed win.
-                // decode_binary_vector() is the accessor for this case.
+                //
+                // There is no separate accessor: callers that need the packed
+                // bytes read the embedding_bin column directly and hand it to
+                // binary_similarity(), as retrieve() does. An earlier version of
+                // this comment pointed at a decode_binary_vector() that has never
+                // existed, which sent readers looking for a method rather than
+                // the column.
                 return [];
             } else if (strlen($bin) % 4 === 0) {
                 // A truncated blob would silently yield a short vector and score

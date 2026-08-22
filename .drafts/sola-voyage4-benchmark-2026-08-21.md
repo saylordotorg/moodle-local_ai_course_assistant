@@ -216,3 +216,83 @@ If storage or budget argues against the flagship: **`voyage-4-lite` at $0.02/MTo
 | **Total** | **~$5.62** |
 
 **One caveat on the rerank token figures from this run:** document text was capped at 8,000 characters, giving 11,175–11,822 tokens per rerank against production's 21,124. The recall deltas are unaffected — same candidates, same reranker — but the token and cost figures from *this* run understate production, and the $1.06/1k figure above is the production-measured one.
+
+---
+
+## 8. In-product validation of the shipped asymmetric setting (2026-08-22)
+
+Everything in sections 1-7 was measured with a purpose-written evaluator over cached
+embeddings, because the harness cannot express asymmetric arms. SOLA v7.0.3 shipped the
+`embed_query_model` setting *after* that work, so the configuration we now ship had never
+been exercised end to end. This section covers that gap. It is a validation of the code
+path, not a re-measurement of the quality question settled in section 5.
+
+### Setup
+
+dev.sylr.org, SOLA 7.0.3 (build 2026082200). Config changed from the site's OpenAI default
+to `embed_provider=voyage`, `embed_model=voyage-4-large`, `embed_query_model=voyage-4`,
+`embed_dimensions=1024`, `embed_dtype=float`, reranking off. The corpus was rebuilt through
+the product indexer (`content_indexer::index_course`), not a script: 1,525 chunks over
+courses 2 (108), 11 (793) and 43 (624), zero errors, 313.6s wall.
+
+### The shipped setting does what it claims
+
+Asserted directly against `base_embedding_provider::create_from_config()`:
+
+| Check | Result |
+|---|---|
+| `get_model()` (documents) | `voyage-4-large` |
+| `get_query_model()` (queries) | `voyage-4` |
+| `supports_query_model()` | `true` |
+| `embedding_compat::are_comparable('voyage-4','voyage-4-large')` | `true` (both resolve to family `voyage-4`) |
+| Live round trip | document 1024d, query 1024d, cosine 0.6112 on a relevant pair |
+| `rag_retriever::retrieve()` | returns ranked chunks; top hit for `bus-001` contains its expected substring |
+
+No configured-but-ignored value is reported as the query model, and the comparability gate
+admits the cross-model pair rather than refusing it. 60 live retrievals ran with zero errors.
+
+**The migration-insurance claim holds in practice.** Both arms below ran against the *same*
+stored document vectors with no reindex between them — only `embed_query_model` changed.
+That is the property section 5 argued was the real value of the shared embedding space, and
+it is now demonstrated rather than assumed.
+
+### Paired A/B, product retrieval path
+
+30 content-anchored fixtures from `rag_fixtures_bus101_pol101.json` (course 11; the
+remaining 10 target course 7, which is not indexed on dev). Scored by whether the fixture's
+`expected_substring` appears in the returned chunk, which is immune to chunk-id churn.
+
+| Arm | R@1 | R@3 | MRR | P50 |
+|---|---|---|---|---|
+| docs `voyage-4-large` / queries `voyage-4` (asymmetric) | 26.7% | 33.3% | 0.300 | 203 ms |
+| docs `voyage-4-large` / queries `voyage-4-large` (symmetric) | 26.7% | **36.7%** | **0.317** | 216 ms |
+| **delta (asymmetric - symmetric)** | 0.0 pp | **-3.3 pp** | **-0.017** | -13 ms |
+
+**Direction agrees with section 5; the magnitude here proves nothing.** At n=30 a single
+fixture is worth 3.3 pp, so the R@3 gap *is* one fixture. Read this as "the in-product path
+did not contradict the evaluator", not as a second independent measurement. Section 5's
+1,008-query result remains the number to cite.
+
+Absolute recall is not comparable to sections 1-7: those measured bare cosine rank over a
+cached 10,910-chunk corpus, whereas this runs the real retriever with window expansion,
+`rag_topk=3` and the `rag_min_similarity=0.25` floor, over 1,525 chunks. Only the paired
+delta within this table is meaningful.
+
+### Recommendation unchanged
+
+Use `voyage-4-large` for documents *and* queries. The asymmetric pairing has now been shown
+twice not to help and never to help; its value is that the query model can be changed later
+without re-embedding the corpus, which this run demonstrates directly.
+
+### Fixture debt incurred by this run
+
+Rebuilding the index reassigned chunk ids for courses 2, 11 and 43. The prodshape and
+conv_1k fixtures anchor ground truth on `expected_chunk_id` alone — `expected_substring` is
+empty in all 1,008 rows of both — so **189 of the 1,008 prodshape fixtures (those three
+courses) no longer align with dev's index** and cannot be repaired from the fixture files.
+The other 819, covering 13 untouched courses, are unaffected.
+
+Options: regenerate those 189 against current ids, exclude courses 2/11/43 from prodshape
+runs, or add an `expected_substring` to the generator so future fixtures survive a reindex.
+The third is the one worth doing — content-anchored fixtures are why the 40-row
+`bus101_pol101` set was still usable here and the 1,008-row set was not.
