@@ -97,7 +97,7 @@ foreach ($courses as $cid) {
     // skipped while still reaching the per-course target.
     $rows = $DB->get_records_select(
         'local_ai_course_assistant_chunks',
-        'courseid = ? AND embedding IS NOT NULL',
+        'courseid = ? AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
         [$cid],
         'id',
         'id, content',

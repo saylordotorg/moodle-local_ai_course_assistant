@@ -67,6 +67,12 @@ TXT
 $courseid = (int) $options['courseid'];
 $batch = max(1, (int) $options['batch']);
 
+// Deliberately the JSON column alone, unlike every other predicate in the
+// plugin: this tool packs the float32 vector held in `embedding` into
+// `embedding_bin`, so a row with no JSON has nothing to read. Quantized rows
+// (int8/binary) leave `embedding` null and are therefore correctly invisible
+// here — widening this to `OR embedding_bin IS NOT NULL` would select rows whose
+// only vector is already packed and re-pack them as float32.
 $where = 'embedding IS NOT NULL';
 $params = [];
 if ($courseid > 0) {

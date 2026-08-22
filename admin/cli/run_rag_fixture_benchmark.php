@@ -946,7 +946,7 @@ $courseids = array_unique(array_column($fixtures, 'courseid'));
 foreach ($courseids as $courseid) {
     $rows = $DB->get_records_select(
         'local_ai_course_assistant_chunks',
-        'courseid = :cid AND embedding IS NOT NULL',
+        'courseid = :cid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
         ['cid' => $courseid],
         '',
         'id, content, embedding'
