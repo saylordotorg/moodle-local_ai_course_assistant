@@ -64,22 +64,43 @@ class rate_limiter {
         // Key based on user + endpoint.
         $key = "user_{$userid}_{$endpoint}";
 
-        // Get current window data.
-        $data = $cache->get($key);
-        if (!$data) {
-            $data = ['count' => 0, 'window_start' => $now];
+        // SECURITY: the read-modify-write below must be atomic. Unlocked, N
+        // concurrent requests all read count=0, all write count=1 and all
+        // return false -- so a burst of parallel connections walks straight
+        // through a limit that looks correct in isolation. The whole point of
+        // this function is to stop exactly that burst.
+        // The ratelimit cache is MODE_APPLICATION, so it is an application_cache
+        // and carries the locking API; the declared return type here is the
+        // base \cache, so check before calling rather than relying on it.
+        $lock = null;
+        if (method_exists($cache, 'supports_native_locking') && $cache->supports_native_locking()) {
+            // Blocking acquire: a caller that cannot get the lock must wait
+            // its turn and be counted, never be waved through.
+            $lock = $cache->acquire_lock($key);
         }
 
-        // Check if we need to reset the window.
-        if ($now - $data['window_start'] >= $windowseconds) {
-            $data = ['count' => 0, 'window_start' => $now];
+        try {
+            // Get current window data.
+            $data = $cache->get($key);
+            if (!$data) {
+                $data = ['count' => 0, 'window_start' => $now];
+            }
+
+            // Check if we need to reset the window.
+            if ($now - $data['window_start'] >= $windowseconds) {
+                $data = ['count' => 0, 'window_start' => $now];
+            }
+
+            // Increment counter.
+            $data['count']++;
+
+            // Store back in cache.
+            $cache->set($key, $data);
+        } finally {
+            if ($lock) {
+                $cache->release_lock($key);
+            }
         }
-
-        // Increment counter.
-        $data['count']++;
-
-        // Store back in cache.
-        $cache->set($key, $data);
 
         // Check if limit exceeded.
         return $data['count'] > $maxrequests;

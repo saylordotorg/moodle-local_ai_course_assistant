@@ -240,7 +240,11 @@ final class page_grounding_test extends \advanced_testcase {
      */
     public function test_get_module_content_for_unknown_cmid_returns_empty(): void {
         $this->resetAfterTest();
-        $this->assertSame('', context_builder::get_module_content(999999, 1000));
+        // Signature is (cmid, courseid, maxchars): the second argument became
+        // the authorising course id when the lookup was scoped. A cmid that
+        // does not exist still returns '' rather than throwing.
+        $course = $this->getDataGenerator()->create_course();
+        $this->assertSame('', context_builder::get_module_content(999999, (int) $course->id));
     }
 
     /**

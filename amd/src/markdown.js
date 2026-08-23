@@ -63,7 +63,15 @@ define([], function() {
             /\[([^\]]+)\]\(([^)]+)\)/g,
             function(match, linkText, url) {
                 var trimmed = String(url).trim();
-                if (/^(javascript|data|vbscript|file):/i.test(trimmed)) {
+                // SECURITY: allowlist the scheme, and decide it on the string
+                // the BROWSER will parse. The WHATWG URL parser removes every
+                // ASCII tab, CR and LF before resolving a scheme, so a literal
+                // denylist ("javascript:") never matches "java\tscript:" while
+                // the browser still navigates to javascript:. Checked against
+                // an allowlist after stripping those characters, both forms
+                // fail closed, as does anything else exotic.
+                var probe = trimmed.replace(/[\t\r\n\0-\x1f]/g, '');
+                if (!/^(https?:|mailto:|#|\/|\.\/|\.\.\/)/i.test(probe)) {
                     trimmed = 'about:blank';
                 }
                 return '<a href="' + trimmed + '" target="_blank" rel="noopener noreferrer">' + linkText + '</a>';
@@ -92,8 +100,13 @@ define([], function() {
         out = out.replace(/<script[\s\S]*?<\/script>/gi, '');
         // Remove <iframe>, <object>, <embed>, <form>, <style>, <link>, <meta>.
         out = out.replace(/<\/?(iframe|object|embed|form|style|link|meta)[^>]*>/gi, '');
-        // Strip event-handler attributes (onclick, onerror, onload, etc.).
-        out = out.replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+        // NOTE: an event-handler stripper used to run here. It could never
+        // protect anything -- render() HTML-escapes its input before this
+        // point, so no live attribute survives to be stripped -- but it did
+        // delete real text: "you attach a handler with onclick=\"doThing()\""
+        // rendered as "you attach a handler with", and its unquoted branch ate
+        // across tag boundaries, producing malformed HTML. Any SOLA answer
+        // about DOM events lost words. Escaping is the defence; this was not.
         // Strip javascript:, vbscript:, data:text/html URIs inside href and src.
         out = out.replace(/(\s(?:href|src)\s*=\s*["']?)\s*(?:javascript|vbscript|data\s*:\s*text\/html)\s*:[^"'\s>]*/gi, '$1about:blank');
         return out;

@@ -430,6 +430,8 @@ abstract class base_provider implements provider_interface {
      * @throws \moodle_exception If provider is not configured.
      */
     public static function create_from_config(int $courseid = 0): provider_interface {
+        global $USER;
+
         $overrides = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
         $provider = !empty($overrides['provider'])
             ? $overrides['provider']
@@ -449,6 +451,33 @@ abstract class base_provider implements provider_interface {
         // If no failover is configured, throw; the SSE handler catches this
         // and shows a friendly "budget paused" message to the student.
         // Read defensively; a fresh install has no caps and this is a no-op.
+        //
+        // SECURITY / COST: a per-user floor for every provider call, applied
+        // here because this is the one path they all converge on. Not one of
+        // the ~47 files in classes/external/ contained any throttling, and
+        // spend_guard below is a LAGGING monthly guard that returns CAP_OK
+        // whenever no cap is configured -- the shipped state, since the caps
+        // have no defaults. So out of the box an authenticated student could
+        // loop generate_quiz or generate_flashcards with nothing in the way
+        // but the next morning's cost_anomaly_check, which is off by default.
+        //
+        // Deliberately generous (120/minute) so it never interrupts real use:
+        // it exists to stop a scripted loop, not to pace a person. Endpoints
+        // that need a tighter bound keep their own (sse 20/60, tts 30/60,
+        // transcribe 20/60, soapbox 12/600). Admins are exempt so bulk CLI and
+        // benchmark runs are unaffected.
+        if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()) {
+            if (\local_ai_course_assistant\rate_limiter::is_rate_limited(
+                    (int) $USER->id, 'provider_call', 120, 60)) {
+                throw new \moodle_exception(
+                    'error',
+                    'local_ai_course_assistant',
+                    '',
+                    'Too many AI requests; please wait a moment and try again.'
+                );
+            }
+        }
+
         try {
             $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
             if ($level === spend_guard::CAP_BLOCKED) {

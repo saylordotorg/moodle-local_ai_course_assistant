@@ -80,6 +80,17 @@ class get_realtime_token extends external_api {
         self::validate_context($coursecontext);
         require_capability('local/ai_course_assistant:use', $coursecontext);
 
+        // SECURITY: enforce the voice kill switch HERE, not only where the
+        // button is drawn. `realtime_enabled` was read in exactly one place --
+        // hook_callbacks, deciding whether to render the mic -- so this
+        // endpoint minted live provider credentials even with voice mode
+        // switched off. It is an ajax web service any student holding :use can
+        // POST to directly, so hiding the button hid nothing: turning voice
+        // off in admin settings did not turn voice off.
+        if (!get_config('local_ai_course_assistant', 'realtime_enabled')) {
+            throw new \moodle_exception('realtimedisabled', 'local_ai_course_assistant');
+        }
+
         // v5.3.5: build the same system prompt the chat endpoint uses, then
         // append a small voice-mode tail (no SOLA_NEXT markers, prefer
         // shorter spoken responses, no markdown). The realtime session will

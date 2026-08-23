@@ -170,7 +170,7 @@ class generate_quiz extends external_api {
         } else if ($topic !== '__adaptive__') {
             if (empty($topic) && $cmid > 0) {
                 // "Current page" mode: generate from the specific module's content.
-                $pagecontent = context_builder::get_module_content($cmid);
+                $pagecontent = context_builder::get_module_content($cmid, $courseid);
                 if (!empty($pagecontent)) {
                     $systemprompt =
                         "You are an expert educational quiz generator for the course \"{$course->fullname}\".\n\n" .

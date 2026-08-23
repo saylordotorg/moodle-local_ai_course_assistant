@@ -2429,3 +2429,4 @@ $string['usertesting_admin:preview_no_instruction'] = '(no instruction)';
 $string['usertesting_admin:preview_rate_fallback'] = 'Rate';
 $string['usertesting_admin:preview_rate_range'] = '{$a->label} ({$a->min} to {$a->max})';
 $string['usertesting_admin:preview_follow_up'] = 'Follow-up: {$a}';
+$string['realtimedisabled'] = 'Voice mode is turned off for this site.';

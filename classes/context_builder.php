@@ -196,7 +196,7 @@ class context_builder {
                 'current_page_content_maxchars'
             ) ?: 8000);
             $maxpagechars = max(500, min(8000, $maxpagechars));
-            $resolvedpagecontent = self::get_module_content($pageid, $maxpagechars);
+            $resolvedpagecontent = self::get_module_content($pageid, $courseid, $maxpagechars);
         }
         $skipwidedump = (strlen($resolvedpagecontent) >= 500);
 
@@ -636,17 +636,61 @@ class context_builder {
      * Extract readable text content from a single course module (page or book).
      * Used by quiz generation and system prompt page injection.
      *
+     * SECURITY: $courseid is required and constrains the lookup. Callers take
+     * $cmid straight from request input (sse.php's `pageid`, generate_quiz's
+     * and generate_flashcards' `cmid`) while their capability check is against
+     * a DIFFERENT, caller-supplied course. Resolving the course from the
+     * course_modules row instead -- as this did until now -- meant any student
+     * holding :use in any one course could read any Page or Book on the site,
+     * including hidden ones in their own course, by passing its cmid. cmid is
+     * a global auto-increment, so enumeration is trivial.
+     *
+     * This mirrors the constraint sse.php already applies to the coach-mode
+     * branch of the same parameter (see its "v5.5.4 security fix" note); that
+     * lookup was scoped and this one, which returns the actual text, was not.
+     *
+     * $cm->uservisible additionally enforces visibility, availability and the
+     * capability to view hidden activities, which no check here covered
+     * before -- a hidden Page holding exam solutions was readable by anyone
+     * enrolled in its course.
+     *
      * @param int $cmid Course module ID
+     * @param int $courseid Course the caller is authorised for; the module MUST belong to it.
      * @param int $maxchars Maximum characters to return (default 6000 for quizzes, 12000 for prompt injection).
-     * @return string Extracted text, or empty string if unavailable/unsupported.
+     * @return string Extracted text, or empty string if unavailable/unsupported/not permitted.
      */
-    public static function get_module_content(int $cmid, int $maxchars = 6000): string {
+    public static function get_module_content(int $cmid, int $courseid, int $maxchars = 6000): string {
         global $DB;
 
+        if ($cmid <= 0 || $courseid <= 0) {
+            return '';
+        }
+
         try {
-            $cmrec  = $DB->get_record('course_modules', ['id' => $cmid], 'id,course,module,instance', MUST_EXIST);
+            // Fail closed: the module must belong to the authorised course, and
+            // the current user must actually be able to see it.
+            $modinfo = get_fast_modinfo($courseid);
+            $cminfo = $modinfo->get_cm($cmid);
+            if (!$cminfo || !$cminfo->uservisible) {
+                return '';
+            }
+        } catch (\Throwable $e) {
+            // get_cm() throws when the cmid is not in this course at all.
+            return '';
+        }
+
+        try {
+            $cmrec  = $DB->get_record(
+                'course_modules',
+                ['id' => $cmid, 'course' => $courseid],
+                'id,course,module,instance',
+                MUST_EXIST
+            );
             $module = $DB->get_record('modules', ['id' => $cmrec->module], 'name', MUST_EXIST);
             $modname  = $module->name;
+            // Equal to the parameter by construction now that the lookup is
+            // constrained; kept as the row value so the queries below are
+            // unambiguous about which course they scope to.
             $courseid = (int) $cmrec->course;
             $instance = (int) $cmrec->instance;
 
