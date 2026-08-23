@@ -437,10 +437,21 @@ class provider_benchmark {
                     } else {
                         $instance = base_provider::create_for_comparison($p['id'], $p['model'], $courseid);
                     }
+                    // 4096, not 256. A reasoning-class model spends part of its
+                    // output budget before emitting visible text, and 256 is below
+                    // what some need to produce anything at all: measured on dev
+                    // 2026-08-22, claude-opus-5 fails this call at both 256 and
+                    // 1024 and succeeds at 4000, where it emits 2,610 completion
+                    // tokens. Because ok is just ($response !== ''), a starved call
+                    // was reported as a dead provider -- the same two analytics
+                    // prompts "failed" on two consecutive runs while the model
+                    // answered 50/50 on the chat path, which caps output higher.
+                    // These prompts ask for short answers, so a larger ceiling
+                    // costs nothing for models that do not need it.
                     $response = $instance->chat_completion(
                         $systemprompt,
                         [['role' => 'user', 'content' => $promptdef['prompt']]],
-                        ['max_tokens' => 256]
+                        ['max_tokens' => 4096]
                     );
                     $row['latency_ms'] = (int) round((microtime(true) - $start) * 1000);
                     $row['response_excerpt'] = self::excerpt($response);
