@@ -77,12 +77,28 @@ class redash_client {
         // drill into the response. We prepend the SOLA query+response as a
         // YAML comment block so the admin sees the analytical context next
         // to the chart-generating SQL/URL.
-        $pullurl = (new \moodle_url('/local/ai_course_assistant/redash_export.php', [
-            'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
-        ]))->out(false);
+        // v7.0.5 security fix: the key does NOT go in here.
+        //
+        // This body is POSTed to Redash and stored there as the saved query. The
+        // URL used to carry ?apikey=<redash_api_key>, which is the credential for
+        // bulk export of learner transcripts -- so creating one chart wrote that
+        // credential, in plaintext, into a third-party system, where it stayed and
+        // was visible to anyone who could read the query. redash_export.php has
+        // always documented an Authorization: Bearer header as the preferred
+        // transport; this is the caller that ignored it.
+        //
+        // The trade-off is deliberate: a query created this way needs the header
+        // configured on the Redash data source before it will return data. A
+        // chart that needs one setup step is better than a credential we knowingly
+        // hand to another system in the clear.
+        $pullurl = (new \moodle_url('/local/ai_course_assistant/redash_export.php'))->out(false);
 
         $commented = self::yaml_comment_block($query, $response);
-        $body = $commented . "\nurl: " . $pullurl . "\npath: " . $jsonpath . "\n";
+        $body = $commented
+            . "\n# Authentication: set an 'Authorization: Bearer <SOLA redash_api_key>' header"
+            . "\n# on this Redash data source. The key is deliberately not written here --"
+            . "\n# it would be stored in plaintext in Redash if it were."
+            . "\nurl: " . $pullurl . "\npath: " . $jsonpath . "\n";
 
         $payload = [
             'data_source_id' => $dsid,

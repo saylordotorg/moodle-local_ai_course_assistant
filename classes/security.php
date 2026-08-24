@@ -433,6 +433,61 @@ class security {
             . "\n[[/UNTRUSTED {$label}]]";
     }
 
+    /**
+     * Mint a short-lived download token for the Redash export endpoint.
+     *
+     * v7.0.5. The admin UI used to build its export links with the raw
+     * `redash_api_key` in the query string. That key is the credential for bulk
+     * export of learner transcripts, and a URL carrying it lands in browser
+     * history, in web-server and proxy access logs, in any Referer header, and
+     * -- when an admin pastes the pre-filled URL into Redash, which is what the
+     * UI invited -- in plaintext inside a third-party system. redash_export.php
+     * already documented an Authorization: Bearer header as the preferred
+     * transport; its own UI ignored that.
+     *
+     * A browser following a link cannot set a header, so links now carry a
+     * derived token instead: HMAC over the user id and an expiry, keyed by the
+     * configured API key. It is useless after it expires, useless to another
+     * user, and reveals nothing about the key it came from.
+     *
+     * @param int $userid
+     * @param int $ttl Seconds the token stays valid.
+     * @return string Empty string when no key is configured.
+     */
+    public static function redash_download_token(int $userid, int $ttl = 900): string {
+        $key = (string) get_config('local_ai_course_assistant', 'redash_api_key');
+        if ($key === '') {
+            return '';
+        }
+        $expires = time() + max(60, $ttl);
+        $sig = hash_hmac('sha256', 'redash-download|' . $userid . '|' . $expires, $key);
+        return $expires . '.' . $sig;
+    }
+
+    /**
+     * Verify a token from redash_download_token().
+     *
+     * @param string $token
+     * @param int $userid
+     * @return bool
+     */
+    public static function verify_redash_download_token(string $token, int $userid): bool {
+        $key = (string) get_config('local_ai_course_assistant', 'redash_api_key');
+        if ($key === '' || $token === '' || $userid <= 0) {
+            return false;
+        }
+        $parts = explode('.', $token, 2);
+        if (count($parts) !== 2) {
+            return false;
+        }
+        [$expires, $sig] = $parts;
+        if (!ctype_digit($expires) || (int) $expires < time()) {
+            return false;
+        }
+        $expected = hash_hmac('sha256', 'redash-download|' . $userid . '|' . (int) $expires, $key);
+        return hash_equals($expected, $sig);
+    }
+
     public static function sanitize_rag_chunk(string $text): array {
         $neutralized = 0;
         $patterns = [

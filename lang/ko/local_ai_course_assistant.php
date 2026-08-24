@@ -1356,6 +1356,9 @@ $string['profile:applied'] = '{$a} 프리셋을 적용했습니다. 값은 이�
 $string['profile:unknown'] = '알 수 없는 배포 프리셋입니다.';
 $string['profile:link'] = '배포 프리셋 페이지';
 $string['profile:link_desc'] = '<a href="{$a}">배포 프리셋</a> 페이지를 열어 호스팅 또는 자체 호스팅 백엔드에 권장되는 설정 묶음을 적용하세요.';
+$string['coursesettings:apibaseurl_rejected'] = 'API 기본 URL이 저장되지 않았습니다. SSRF 보안 검사를 통과하는 공개 HTTPS 엔드포인트여야 합니다.';
+$string['settings:escalation_intent_patterns'] = '에스컬레이션 의도 패턴';
+$string['settings:escalation_intent_patterns_desc'] = '한 줄에 정규식 하나를 입력합니다. #으로 시작하는 줄은 무시됩니다. 지원 티켓은 학습자 본인의 메시지가 이 패턴 중 하나와 일치할 때만 생성되므로, 코스 콘텐츠가 학습자를 대신해 에스컬레이션을 유발할 수 없습니다. 비워 두면 내장 기본값이 사용되며, 영어와 함께 스페인어·프랑스어·독일어·포르투갈어의 일반적인 표현을 포함합니다. 학습자가 다른 언어로 작성하는 사이트에서는 여기에 패턴을 추가해야 합니다. 일치하지 않는 메시지는 티켓이 생성되지 않음을 의미합니다.';
 $string['settings:zendesk_require_consent'] = '지원 에스컬레이션 전 동의 요구';
 $string['settings:zendesk_require_consent_desc'] = '켜져 있을 때(권장), SOLA는 학습자가 최초 실행 동의 통지를 수락한 후에만 대화를 Zendesk 지원 데스크로 에스컬레이션합니다. 이 통지는 사람의 도움을 요청하면 대화(이름과 이메일 포함)가 지원팀과 공유됨을 알립니다. 그 동의를 다른 방법으로 얻는 경우에만 이 옵션을 끄세요. 끄면 에스컬레이션이 즉시 전송됩니다. Zendesk 에스컬레이션이 활성화되어 있지 않으면 효과가 없습니다.';
 $string['chat:escalation_needs_consent'] = '이것은 저희 지원팀 구성원이 필요한 것 같습니다. 이를 전달하려면 이 대화(이름과 이메일 포함)를 지원 데스크와 공유해야 합니다. 아직 이에 동의하지 않으셨으므로 아무것도 보내지 않았습니다. 사람의 도움을 원하시면 이 어시스턴트의 데이터 공유 통지를 수락하고 다시 문의하시거나 지원팀에 직접 연락해 주세요.';

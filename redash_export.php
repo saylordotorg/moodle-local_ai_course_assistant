@@ -96,6 +96,19 @@ if ($authheader !== '' && preg_match('/^Bearer\s+(.+)$/i', trim($authheader), $b
 $apikey = $bearer !== '' ? $bearer : optional_param('apikey', '', PARAM_RAW);
 $configuredkey = get_config('local_ai_course_assistant', 'redash_api_key');
 
+// v7.0.5: a short-lived token for links the admin UI generates, so the raw key
+// stops travelling in query strings, browser history, access logs and Referer
+// headers -- and stops being pre-baked into URLs admins paste into Redash,
+// where it would be stored in plaintext by a third party. Derived from the key
+// by HMAC, scoped to one user, and expiring in minutes.
+$downloadtoken = optional_param('t', '', PARAM_RAW_TRIMMED);
+$downloaduser = optional_param('u', 0, PARAM_INT);
+if ($apikey === '' && $downloadtoken !== ''
+        && \local_ai_course_assistant\security::verify_redash_download_token($downloadtoken, $downloaduser)) {
+    // Valid derived token stands in for the key for this one request.
+    $apikey = (string) $configuredkey;
+}
+
 if (empty($configuredkey)) {
     http_response_code(403);
     echo json_encode([

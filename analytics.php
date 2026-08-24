@@ -485,14 +485,19 @@ $templatedata = [
     'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
     'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
     'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
-    'redash_pull_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
-        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
-    ]))->out(false),
+    // v7.0.5: no key in this URL. It is the address an admin pastes into Redash,
+    // and pre-filling the credential is how it ended up stored in plaintext
+    // inside a third-party system. Redash should send it as an
+    // Authorization: Bearer header, which is what the endpoint documents.
+    'redash_pull_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php'))->out(false),
     'has_redash_key' => !empty(get_config('local_ai_course_assistant', 'redash_api_key')),
 
     // CSV export (uses the Redash endpoint with the configured API key).
+    // A browser following a link cannot set a header, so this carries a
+    // short-lived HMAC token derived from the key rather than the key itself.
     'export_csv_url' => (new moodle_url('/local/ai_course_assistant/redash_export.php', [
-        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
+        't' => \local_ai_course_assistant\security::redash_download_token((int) $USER->id),
+        'u' => (int) $USER->id,
         'courseid' => $courseid,
         'since' => $since,
     ]))->out(false),

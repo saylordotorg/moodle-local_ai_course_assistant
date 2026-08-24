@@ -161,7 +161,9 @@ if ($action === 'push_redash') {
 if ($action === 'redash_setup') {
     $configured = \local_ai_course_assistant\redash_client::is_configured();
     $pullurl = (new moodle_url('/local/ai_course_assistant/redash_export.php', [
-        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
+        // v7.0.5: derived short-lived token, never the raw key. See analytics.php.
+        't' => \local_ai_course_assistant\security::redash_download_token((int) $USER->id),
+        'u' => (int) $USER->id,
     ]))->out(false);
     echo json_encode([
         'ok' => true,

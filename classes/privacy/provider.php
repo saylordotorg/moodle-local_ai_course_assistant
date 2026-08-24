@@ -730,6 +730,69 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                     ]
                 );
             }
+
+            // v7.0.5: tables that erasure purged but export never produced.
+            //
+            // delete_data_for_user() has covered these since v5.3.18, so an
+            // Article 17 request removed them correctly. Article 15 is the other
+            // half of the same right, and it was returning nothing for any of
+            // them -- most consequentially _learner_memory and _profiles, which
+            // hold free-text observations the model INFERRED about the learner.
+            // Inferred personal data is precisely what a subject-access request
+            // exists to surface, and a learner had no way to see it.
+            //
+            // Generic because the shapes differ but the export does not: read
+            // the learner's rows for this course, hand every column except the
+            // ids to the writer, and let it nest under a per-table folder.
+            $latecoverage = [
+                'local_ai_course_assistant_profiles',
+                'local_ai_course_assistant_learner_memory',
+                'local_ai_course_assistant_learner_goals',
+                'local_ai_course_assistant_flashcards',
+                'local_ai_course_assistant_msg_ratings',
+                'local_ai_course_assistant_streak',
+                'local_ai_course_assistant_outreach_log',
+                'local_ai_course_assistant_avatar_sess',
+                'local_ai_course_assistant_radar_sched',
+                'local_ai_course_assistant_review_res',
+            ];
+            foreach ($latecoverage as $table) {
+                if (!$DB->get_manager()->table_exists($table)) {
+                    // A table added in a later release than the site is running.
+                    continue;
+                }
+                $columns = $DB->get_columns($table);
+                if (!isset($columns['userid'])) {
+                    continue;
+                }
+                $conditions = ['userid' => $userid];
+                if (isset($columns['courseid'])) {
+                    $conditions['courseid'] = $context->instanceid;
+                }
+                $rows = $DB->get_records($table, $conditions);
+                if (!$rows) {
+                    continue;
+                }
+                $shortname = str_replace('local_ai_course_assistant_', '', $table);
+                foreach ($rows as $row) {
+                    $out = [];
+                    foreach ((array) $row as $field => $value) {
+                        if ($field === 'id' || $field === 'userid') {
+                            continue;
+                        }
+                        // Any *time* column is a unix timestamp in this schema.
+                        if (preg_match('/^(time|expires|last)/', $field) && is_numeric($value) && (int) $value > 0) {
+                            $out[$field] = transform::datetime((int) $value);
+                            continue;
+                        }
+                        $out[$field] = $value;
+                    }
+                    writer::with_context($context)->export_data(
+                        [get_string('pluginname', 'local_ai_course_assistant'), $shortname, $row->id],
+                        (object) $out
+                    );
+                }
+            }
         }
     }
 
