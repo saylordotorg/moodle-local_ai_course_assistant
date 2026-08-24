@@ -73,6 +73,10 @@ class get_realtime_token extends external_api {
      * @param int $pageid Course module id of the current page (optional).
      * @param string $pagetitle Title of the current page (optional).
      * @param string $lang Learner language preference (optional).
+     * @param string $mode Voice mode: 'conversation' or 'ell'. Selects the
+     *      augmentation block appended to the grounded prompt server-side.
+     * @param string $topic Chosen speaking topic, if the learner picked one.
+     * @param string $phrase Pronunciation phrase for ELL mode, if any.
      * @return array
      */
     public static function execute(int $courseid, int $pageid = 0, string $pagetitle = '', string $lang = '',
