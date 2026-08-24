@@ -73,7 +73,16 @@ class emergency_control {
                 set_config('voice_active_realtime_backup', $current, 'local_ai_course_assistant');
             }
             set_config('voice_active_realtime', '', 'local_ai_course_assistant');
-            $touched[] = 'voice_active_realtime';
+            // v7.0.5: a dedicated flag, because blanking the active label was
+            // not actually a kill switch. voice_registry::resolve() treats a
+            // blank label as "admin never picked a row" and falls back to the
+            // first configured row, so on any site with voice_providers set up
+            // this moved voice onto row 0 rather than stopping it. And when the
+            // label was already blank, the guard above wrote no backup at all,
+            // leaving restore() nothing to undo. Same failure the `--chat`
+            // switch had until v5.13, fixed the same way it was.
+            set_config('emergency_voice_disabled', '1', 'local_ai_course_assistant');
+            $touched[] = 'voice_active_realtime, emergency_voice_disabled (set to 1)';
         }
         if ($set[self::FLAG_RAG] || $set[self::FLAG_ALL]) {
             set_config('rag_enabled', '0', 'local_ai_course_assistant');
@@ -133,7 +142,8 @@ class emergency_control {
                 set_config('voice_active_realtime', $backup, 'local_ai_course_assistant');
                 unset_config('voice_active_realtime_backup', 'local_ai_course_assistant');
             }
-            $touched[] = 'voice_active_realtime (restored from backup)';
+            unset_config('emergency_voice_disabled', 'local_ai_course_assistant');
+            $touched[] = 'voice_active_realtime (restored from backup), emergency_voice_disabled (cleared)';
         }
         if ($set[self::FLAG_RAG] || $set[self::FLAG_ALL]) {
             set_config('rag_enabled', '1', 'local_ai_course_assistant');

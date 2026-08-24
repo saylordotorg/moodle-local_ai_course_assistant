@@ -80,6 +80,30 @@ class get_realtime_token extends external_api {
         self::validate_context($coursecontext);
         require_capability('local/ai_course_assistant:use', $coursecontext);
 
+        // v7.0.5 security fix: enforce the voice kill switch HERE, not only in
+        // the UI. Until now `realtime_enabled` was read in exactly one
+        // non-language file — hook_callbacks, which decides whether to draw the
+        // button — so switching voice off in admin settings hid the control but
+        // left this endpoint fully live. Any learner holding :use could POST to
+        // it directly and mint a real OpenAI Realtime client_secret, at roughly
+        // $18/hour for a held session. An admin turning a feature off must
+        // actually turn it off.
+        //
+        // Checked after the capability check so an unauthorised caller still
+        // gets the authorisation error rather than learning the feature state.
+        if (!get_config('local_ai_course_assistant', 'realtime_enabled')) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Voice mode is disabled on this site.'
+            );
+        }
+
+        // The emergency kill switch is enforced inside voice_registry::resolve(),
+        // which returns null when it is engaged; the $cfg === null branch below
+        // turns that into a refusal.
+
         // v5.3.5: build the same system prompt the chat endpoint uses, then
         // append a small voice-mode tail (no SOLA_NEXT markers, prefer
         // shorter spoken responses, no markdown). The realtime session will
@@ -127,7 +151,19 @@ class get_realtime_token extends external_api {
                     . "should briefly summarise that page (one sentence) and ask which part "
                     . "they want to discuss.";
             }
-            $instructions = $systemprompt . $voicetail;
+            // v7.0.5 security fix: keep these two apart.
+            //
+            // $systemprompt carries the jailbreak defences, the course
+            // configuration and the learner's personalisation — exactly what
+            // sse.php runs an output scrubber to keep away from students on the
+            // chat path. This endpoint used to hand the whole thing to the
+            // browser as PARAM_RAW, so a learner who wanted the prompt could skip
+            // the jailbreak and just read the JSON response.
+            //
+            // The full text now goes to OpenAI server-side at mint time, and only
+            // $voicetail — generic spoken-style guidance with no course or learner
+            // data in it — is returned to the client.
+            $fullinstructions = $systemprompt . $voicetail;
             // OpenAI Realtime rejects session.instructions that contain a
             // reserved special token and fails the whole session with
             // "instructions contain a reserved special token". The chat
@@ -135,10 +171,12 @@ class get_realtime_token extends external_api {
             // example of text to ignore; the chat APIs tolerate it, but Realtime
             // validates strictly. Neutralize any <|...|> token so voice mode can
             // start. The surrounding instruction keeps its meaning.
-            $instructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $instructions);
+            $fullinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $fullinstructions);
+            $clientinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $voicetail);
         } catch (\Throwable $e) {
             debugging('realtime instructions build failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
-            $instructions = '';
+            $fullinstructions = '';
+            $clientinstructions = '';
         }
 
         // Resolve active Realtime provider via the voice_providers registry.
@@ -203,12 +241,13 @@ class get_realtime_token extends external_api {
                 'voice'    => $cfg['voice'],
                 'provider' => 'xai',
                 'endpoint' => $proxyurl . $sep . 'token=' . rawurlencode($jwt),
-                'instructions' => $instructions,
+                // Voice-style tail only; see the security note above.
+                'instructions' => $clientinstructions,
             ];
         }
 
         // OpenAI: mint an ephemeral client secret so the key never reaches the browser.
-        [$response, $httpcode] = self::call_openai_realtime((string) $cfg['apikey']);
+        [$response, $httpcode] = self::call_openai_realtime((string) $cfg['apikey'], $fullinstructions);
 
         if ($httpcode !== 200) {
             $errdata = json_decode($response, true);
@@ -234,7 +273,8 @@ class get_realtime_token extends external_api {
             'voice'    => $cfg['voice'],
             'provider' => 'openai',
             'endpoint' => $cfg['endpoint'],
-            'instructions' => $instructions,
+            // Voice-style tail only; the grounded prompt went to OpenAI at mint time.
+            'instructions' => $clientinstructions,
         ];
     }
 
@@ -258,14 +298,25 @@ class get_realtime_token extends external_api {
      * @param string $apikey OpenAI API key (Bearer).
      * @return array{0:string,1:int} [response body, HTTP status]
      */
-    private static function call_openai_realtime(string $apikey): array {
+    private static function call_openai_realtime(string $apikey, string $instructions = ''): array {
         if (self::$test_http_response !== null) {
             return [
                 (string) (self::$test_http_response['body'] ?? ''),
                 (int) (self::$test_http_response['http_code'] ?? 0),
             ];
         }
-        $body = '{}';
+        // The grounded system prompt is attached to the session here rather than
+        // being handed to the browser to send via session.update. Verified
+        // against the live API 2026-08-23: /v1/realtime/client_secrets returns
+        // 200 with a usable client_secret both with and without this body.
+        $payload = [];
+        if ($instructions !== '') {
+            $payload['session'] = [
+                'type'         => 'realtime',
+                'instructions' => $instructions,
+            ];
+        }
+        $body = $payload === [] ? '{}' : json_encode($payload);
         global $CFG;
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
         $endpoint = 'https://api.openai.com/v1/realtime/client_secrets';

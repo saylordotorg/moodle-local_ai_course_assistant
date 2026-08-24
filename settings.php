@@ -2411,6 +2411,15 @@ if ($hassiteconfig) {
     ));
     // v5.10.x (security finding #40): require disclosed learner consent before
     // a conversation (name, email, transcript) is escalated to the support desk.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/escalation_intent_patterns',
+        get_string('settings:escalation_intent_patterns', 'local_ai_course_assistant'),
+        get_string('settings:escalation_intent_patterns_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW,
+        60,
+        6
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/zendesk_require_consent',
         get_string('settings:zendesk_require_consent', 'local_ai_course_assistant'),

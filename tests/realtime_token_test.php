@@ -42,6 +42,14 @@ use local_ai_course_assistant\external\get_realtime_token;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class realtime_token_test extends \advanced_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+        // v7.0.5: get_realtime_token now enforces the site voice switch itself,
+        // so every case here needs it on unless it is specifically testing the
+        // switch. realtime_token_gating_test covers the off path.
+        set_config('realtime_enabled', 1, 'local_ai_course_assistant');
+    }
+
     /**
      * Wire up an xAI voice provider as the active realtime provider, with
      * the proxy URL + JWT secret needed for the xAI mint path.
@@ -243,10 +251,14 @@ final class realtime_token_test extends \advanced_testcase {
         $this->configure_xai_voice();
         [$course, $user] = $this->enrolled_student();
 
-        // Pass a fake pageid + pagetitle. Even though the cmid won't resolve
-        // to a real module (context_builder swallows that), the pagetitle
-        // must propagate into the voice tail.
-        $result = get_realtime_token::execute((int)$course->id, 0, 'Photosynthesis Basics', 'en');
+        // A non-zero pageid, because that is what actually drives the tail: the
+        // endpoint only appends the "currently on the page titled ..." line when
+        // pageid > 0 AND pagetitle is non-empty. With pageid 0 this used to pass
+        // only because the title arrived via the system prompt, which v7.0.5 no
+        // longer returns to the client — the grounded prompt now goes to the
+        // provider server-side. The page title itself is not sensitive (the
+        // learner is looking at that page), so it stays in the client tail.
+        $result = get_realtime_token::execute((int)$course->id, 424242, 'Photosynthesis Basics', 'en');
 
         $this->assertStringContainsString(
             'Photosynthesis Basics',

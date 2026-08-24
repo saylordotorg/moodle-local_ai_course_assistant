@@ -129,6 +129,27 @@ class voice_registry {
         $rows = self::parse_rows();
         $activelabel = get_config('local_ai_course_assistant', 'voice_active_' . $capability);
 
+        // v7.0.5: honour the emergency kill switch.
+        //
+        // emergency_control disables a voice capability by stashing
+        // voice_active_<cap> into voice_active_<cap>_backup and blanking the
+        // live key. But a blank active label is ALSO the ordinary "admin never
+        // picked a row" state, and the fallback below then selects $rows[0] —
+        // so on any site with a voice_providers row configured, engaging the
+        // kill switch simply moved voice onto the first row instead of stopping
+        // it. Same shape as the `--chat` switch that was a silent no-op from
+        // v5.4.5 to v5.12.x.
+        //
+        // emergency_control sets a dedicated `emergency_voice_disabled` flag for
+        // exactly this reason, mirroring `emergency_chat_disabled`.
+        if ((bool) get_config('local_ai_course_assistant', 'emergency_voice_disabled')) {
+            debugging(
+                'SOLA voice capability "' . $capability . '" is disabled by the emergency kill switch.',
+                DEBUG_DEVELOPER
+            );
+            return null;
+        }
+
         $row = null;
         if ($activelabel !== false && $activelabel !== '') {
             foreach ($rows as $r) {
