@@ -87,6 +87,78 @@ class conversation_manager {
      * @param int|null $cachedtokens Cached prompt-token count when the provider reports one; null otherwise.
      * @return int The message ID.
      */
+    /**
+     * Record the token usage of an ancillary (non-conversational) AI call.
+     *
+     * Quiz generation, flashcards, essay and speech scoring, insights,
+     * profiles, objectives and slide vision all call a provider and none of
+     * them recorded a thing, so their spend never reached the dashboard. That
+     * is the larger half of the SOLA undercount: the estimate was a floor, and
+     * model_name only ever showed the chat model because the quiz model has
+     * its own setting and its calls never landed.
+     *
+     * These are not conversation turns, so they attach to the learner's
+     * existing conversation for the course as a `system` row with a short
+     * label -- the shape tts.php and transcribe.php already use. Best-effort
+     * by design: a failure to record cost must never break the feature the
+     * learner asked for.
+     *
+     * @param mixed $provider The provider instance just used.
+     * @param int $userid Learner the call was made for.
+     * @param int $courseid Course context.
+     * @param string $interactiontype Type tag, e.g. 'quiz', 'flashcards'.
+     * @param string $label Short marker stored as the message body, e.g. '[QUIZ]'.
+     * @return void
+     */
+    public static function log_ancillary_usage(
+        $provider,
+        int $userid,
+        int $courseid,
+        string $interactiontype,
+        string $label
+    ): void {
+        global $DB;
+
+        try {
+            if (!is_object($provider) || !method_exists($provider, 'get_last_token_usage')) {
+                return;
+            }
+            $usage = $provider->get_last_token_usage();
+            if (empty($usage)) {
+                // Provider reported nothing; recording a zero row would look
+                // like a free call rather than an unmeasured one.
+                return;
+            }
+            $conv = $DB->get_record('local_ai_course_assistant_convs', [
+                'userid' => $userid,
+                'courseid' => $courseid > 0 ? $courseid : SITEID,
+            ]);
+            if (!$conv) {
+                return;
+            }
+            self::add_message(
+                (int) $conv->id,
+                $userid,
+                $courseid > 0 ? $courseid : SITEID,
+                'system',
+                $label,
+                0,
+                (string) (get_config('local_ai_course_assistant', 'provider') ?: ''),
+                $usage['prompt_tokens'] ?? null,
+                $usage['completion_tokens'] ?? null,
+                $usage['model'] ?? null,
+                $interactiontype,
+                null,
+                null,
+                isset($usage['cached_tokens']) ? (int) $usage['cached_tokens'] : null,
+                isset($usage['reasoning_tokens']) ? (int) $usage['reasoning_tokens'] : null
+            );
+        } catch (\Throwable $e) {
+            // Cost telemetry must never take down a learner-facing feature.
+            unset($e);
+        }
+    }
+
     public static function add_message(
         int $conversationid,
         int $userid,
@@ -101,7 +173,8 @@ class conversation_manager {
         string $interactiontype = 'chat',
         ?int $cmid = null,
         ?int $rag_latency_ms = null,
-        ?int $cachedtokens = null
+        ?int $cachedtokens = null,
+        ?int $reasoningtokens = null
     ): int {
         global $DB;
 
@@ -129,6 +202,10 @@ class conversation_manager {
         // discount). Assistant rows only; makes the cache hit rate visible
         // in token analytics instead of in-memory only.
         $record->cached_tokens     = ($role === 'assistant') ? $cachedtokens : null;
+        // Thinking/reasoning tokens, stored as reported by the provider. See
+        // openai_compatible_provider::extract_usage() for why these are kept
+        // separate from completion_tokens rather than folded in.
+        $record->reasoning_tokens  = ($role === 'assistant') ? $reasoningtokens : null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);

@@ -209,6 +209,13 @@ class generate_quiz extends external_api {
                 [['role' => 'user', 'content' => 'Generate the quiz now.']],
                 ['response_schema' => $quizschema]
             );
+            // Record what this call cost. Quiz generation resolves its OWN
+            // provider/model (resolve_quiz_provider reads the per-course
+            // quiz_model setting), and recorded nothing at all before -- which
+            // is precisely why model_name in spend reporting only ever showed
+            // the chat model.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, (int) $USER->id, (int) $courseid, 'quiz', '[QUIZ]');
         } catch (\Throwable $e) {
             return ['success' => false, 'error' => $e->getMessage(), 'topic' => '', 'questions' => []];
         }

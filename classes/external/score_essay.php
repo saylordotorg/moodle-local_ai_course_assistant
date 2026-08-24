@@ -109,6 +109,10 @@ class score_essay extends external_api {
                     ],
                 ]
             );
+            // Record what this call cost. Ancillary AI calls recorded nothing
+            // at all before, so their spend never reached the dashboard.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, (int) $USER->id, (int) $params['courseid'], 'essay', '[ESSAY]');
         } catch (\Throwable $e) {
             return self::empty_result('provider_error');
         }

@@ -172,6 +172,43 @@ abstract class openai_compatible_provider extends base_provider {
         return json_encode($body);
     }
 
+    /**
+     * Normalise a provider `usage` object into the shape the caller records.
+     *
+     * `reasoning_tokens` is new: models that think before answering report it
+     * under completion_tokens_details, and nothing in this plugin read it. It
+     * matters most on Gemini, which reaches us through Google's
+     * OpenAI-compatible endpoint (gemini_provider is a thin subclass of this
+     * one) and bills thinking as output -- a July reconciliation showed 0.35M
+     * completion tokens logged against 1.78M billed.
+     *
+     * IMPORTANT, and deliberately not resolved here: whether reasoning tokens
+     * are ALREADY counted inside completion_tokens differs by provider. OpenAI
+     * includes them; the Gemini compatibility shim has not reliably done so.
+     * Both numbers are therefore stored exactly as reported, and the decision
+     * about how to combine them for cost is left to the consumer, which knows
+     * the provider. Adding them blindly here would double-count OpenAI; using
+     * completion_tokens alone keeps undercounting Gemini.
+     *
+     * @param array $usage The provider's usage object (may be empty).
+     * @param string|null $model Model id echoed by the response, if any.
+     * @return array|null Null when the provider reported no usage at all.
+     */
+    protected function extract_usage(array $usage, ?string $model = null): ?array {
+        if (empty($usage)) {
+            return null;
+        }
+        return [
+            'prompt_tokens'     => (int) ($usage['prompt_tokens'] ?? 0),
+            'completion_tokens' => (int) ($usage['completion_tokens'] ?? 0),
+            // Per-call, not the configured default: a course may route quiz or
+            // premium traffic to a different model than chat.
+            'model'             => $model ?: $this->model,
+            'cached_tokens'     => (int) ($usage['prompt_tokens_details']['cached_tokens'] ?? 0),
+            'reasoning_tokens'  => (int) ($usage['completion_tokens_details']['reasoning_tokens'] ?? 0),
+        ];
+    }
+
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $url = $this->baseurl . $this->get_endpoint();
         $body = $this->build_body($systemprompt, $messages, false, $options);
@@ -181,6 +218,17 @@ abstract class openai_compatible_provider extends base_provider {
         if (!$data || !isset($data['choices'][0]['message']['content'])) {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
         }
+
+        // Capture usage here too. Until now this was recorded ONLY in the
+        // streaming branch, so every non-streaming caller -- quiz generation,
+        // flashcards, essay and speech scoring, insights, profiles,
+        // objectives, slide vision, the classifier, the meta-AI task, and the
+        // non-streaming chat path in send_message -- reported no tokens at
+        // all. Their spend was invisible on the dashboard, which is why the
+        // SOLA estimate reads as a floor rather than a measurement, and why
+        // model_name only ever showed the chat model: the quiz model has its
+        // own setting and its calls never landed.
+        $this->last_token_usage = $this->extract_usage($data['usage'] ?? [], $data['model'] ?? null);
 
         return $data['choices'][0]['message']['content'];
     }
@@ -217,12 +265,8 @@ abstract class openai_compatible_provider extends base_provider {
                 // Capture usage from the final usage-only chunk (stream_options: include_usage: true).
                 // This chunk has empty choices[] and a populated usage object.
                 if (!empty($event['usage'])) {
-                    $this->last_token_usage = [
-                        'prompt_tokens'     => (int) ($event['usage']['prompt_tokens'] ?? 0),
-                        'completion_tokens' => (int) ($event['usage']['completion_tokens'] ?? 0),
-                        'model'             => $event['model'] ?? $this->model,
-                        'cached_tokens'     => (int) ($event['usage']['prompt_tokens_details']['cached_tokens'] ?? 0),
-                    ];
+                    $this->last_token_usage = $this->extract_usage(
+                        $event['usage'], $event['model'] ?? null);
                 }
 
                 $content = $event['choices'][0]['delta']['content'] ?? '';

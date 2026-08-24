@@ -896,7 +896,10 @@ try {
         $interactiontype,
         $pageid ?: null,
         $raglatencyms,
-        $cachedtokens !== null ? (int) $cachedtokens : null
+        $cachedtokens !== null ? (int) $cachedtokens : null,
+        // Thinking tokens. Null (not 0) when the provider reported none, so
+        // analytics can tell "model does not think" from "thought nothing".
+        isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs

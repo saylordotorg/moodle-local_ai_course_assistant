@@ -112,6 +112,10 @@ class generate_flashcards extends external_api {
                     'response_schema' => self::build_response_schema($tagobjectives),
                 ]
             );
+            // Record what this call cost. Ancillary AI calls recorded nothing
+            // at all before, so their spend never reached the dashboard.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, (int) $USER->id, (int) $params['courseid'], 'flashcards', '[FLASHCARDS]');
         } catch (\Throwable $e) {
             return ['success' => false, 'message' => 'provider_error', 'cards' => []];
         }

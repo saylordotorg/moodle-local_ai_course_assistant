@@ -186,10 +186,14 @@ class generate_insights extends external_api {
         ];
 
         try {
-            global $CFG;
+            global $CFG, $USER;
             require_once($CFG->dirroot . '/lib/filelib.php');
             $provider = base_provider::create_from_config($courseid);
             $response = $provider->chat_completion($systemprompt, $messages);
+            // Record what this call cost. Ancillary AI calls recorded nothing
+            // at all before, so their spend never reached the dashboard.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, (int) $USER->id, (int) $courseid, 'insights', '[INSIGHTS]');
 
             return [
                 'success' => true,

@@ -122,7 +122,14 @@ class send_message extends external_api {
         $provider = base_provider::create_from_config();
         $response = $provider->chat_completion($systemprompt, $history);
 
-        // Save assistant response.
+        // Save assistant response, WITH its token usage. This row previously
+        // carried nulls for provider, tokens and model because
+        // chat_completion() never captured usage -- so the whole non-streaming
+        // chat path was invisible in spend reporting even though the row
+        // existed. It also passed null into the non-nullable string
+        // $interactiontype, which coerces to '' rather than 'chat', dropping
+        // these rows out of any analytics that filter on the type.
+        $usage = $provider->get_last_token_usage() ?? [];
         conversation_manager::add_message(
             $conv->id,
             $userid,
@@ -130,13 +137,17 @@ class send_message extends external_api {
             'assistant',
             $response,
             0,
-            '',
+            (string) (\local_ai_course_assistant\course_config_manager::get_effective_config(
+                $params['courseid'])['provider']
+                ?? get_config('local_ai_course_assistant', 'provider')),
+            $usage['prompt_tokens'] ?? null,
+            $usage['completion_tokens'] ?? null,
+            $usage['model'] ?? null,
+            'chat',
             null,
-            null,
-            null,
-            null,
-            null,
-            $raglatencyms
+            $raglatencyms,
+            isset($usage['cached_tokens']) ? (int) $usage['cached_tokens'] : null,
+            isset($usage['reasoning_tokens']) ? (int) $usage['reasoning_tokens'] : null
         );
 
         return [

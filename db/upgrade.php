@@ -1485,5 +1485,31 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082200, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082401) {
+        // v7.0.6: persist per-call thinking/reasoning tokens. The provider
+        // layer never read completion_tokens_details.reasoning_tokens at all,
+        // so models that think before answering had that portion of their
+        // output invisible -- the same shape of gap cached_tokens had in
+        // v6.1.0. It matters most on Gemini, which bills thinking as output:
+        // a July reconciliation showed 0.35M completion tokens logged against
+        // 1.78M billed. One nullable int column.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $field = new xmldb_field(
+            'reasoning_tokens',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'cached_tokens'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082401, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }
