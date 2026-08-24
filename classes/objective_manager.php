@@ -843,7 +843,7 @@ class objective_manager {
                 if (!$cm->uservisible || !in_array($cm->modname, ['page', 'book'], true)) {
                     continue;
                 }
-                $text = context_builder::get_module_content((int) $cm->id, 12000);
+                $text = context_builder::get_module_content((int) $cm->id, $courseid, 12000);
                 if ($text === '') {
                     continue;
                 }

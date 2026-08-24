@@ -662,7 +662,16 @@ define([], function() {
                 type: 'session.update',
                 session: {
                     type: 'realtime',
-                    instructions: instructions || '',
+                    // v7.0.5: `instructions` is deliberately NOT sent.
+                    //
+                    // session.update REPLACES session.instructions rather than
+                    // merging, so sending the browser's copy here overwrote the
+                    // grounded prompt the server attaches when it mints the
+                    // session -- course content, learner personalisation and the
+                    // jailbreak defences all vanished milliseconds after the
+                    // socket opened, on every voice session. The server now owns
+                    // the whole prompt, including the per-mode augmentation that
+                    // used to be assembled here.
                     output_modalities: ['audio'],
                     audio: {
                         input: {

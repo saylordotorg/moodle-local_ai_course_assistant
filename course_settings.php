@@ -90,6 +90,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'temperature'  => optional_param('temperature', '', PARAM_RAW_TRIMMED),
     ];
 
+    // v7.0.5 security fix: a course-level actor must not be able to redirect
+    // that course's AI traffic to a host of their choosing.
+    //
+    // This page is gated on local/ai_course_assistant:manage in the COURSE
+    // context, which an editing teacher holds. apibaseurl was accepted from it
+    // with no validation on this path at all -- is_safe_provider_url() is never
+    // called here -- so a teacher could point their course at any host they
+    // controlled and capture every student message and every retrieved course
+    // chunk for that course. security::is_safe_provider_url()'s own docblock
+    // says it was written to constrain a compromised admin, not a course-level
+    // actor, and blocking private ranges does nothing about a public collector.
+    //
+    // Changing the endpoint is therefore a site-level act: without
+    // moodle/site:config the submitted value is discarded and the stored one
+    // kept, so an existing override survives an unrelated save by a teacher.
+    // Accepted values still have to pass the SSRF check.
+    if (!has_capability('moodle/site:config', $syscontext)) {
+        $existing = course_config_manager::get($courseid);
+        $data['apibaseurl'] = ($existing && isset($existing->apibaseurl)) ? (string) $existing->apibaseurl : '';
+    } else if ($data['apibaseurl'] !== ''
+            && !\local_ai_course_assistant\security::is_safe_provider_url($data['apibaseurl'])) {
+        \core\notification::error(
+            get_string('coursesettings:apibaseurl_rejected', 'local_ai_course_assistant')
+        );
+        $existing = course_config_manager::get($courseid);
+        $data['apibaseurl'] = ($existing && isset($existing->apibaseurl)) ? (string) $existing->apibaseurl : '';
+    }
+
     // Validate temperature range if provided.
     if ($data['temperature'] !== '') {
         $temp = (float) $data['temperature'];

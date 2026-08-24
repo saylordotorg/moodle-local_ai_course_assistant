@@ -60,7 +60,7 @@ class generate_flashcards extends external_api {
 
         $count = max(3, min(10, (int) $params['count']));
         $content = $params['cmid'] > 0
-            ? context_builder::get_module_content((int) $params['cmid'], 8000)
+            ? context_builder::get_module_content((int) $params['cmid'], (int) $params['courseid'], 8000)
             : '';
         if ($content === '') {
             return ['success' => false, 'message' => 'no_page_content', 'cards' => []];

@@ -160,9 +160,20 @@ if ($action === 'push_redash') {
 // render the Setup Redash helper without re-fetching settings via webservice.
 if ($action === 'redash_setup') {
     $configured = \local_ai_course_assistant\redash_client::is_configured();
-    $pullurl = (new moodle_url('/local/ai_course_assistant/redash_export.php', [
-        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
-    ]))->out(false);
+    // v7.0.5: a BARE url -- no credential and no token.
+    //
+    // This is setup text an admin copies into a Redash JSON data source, not a
+    // link a browser follows now. A short-lived token would work during setup
+    // and then 401 on every scheduled refresh about fifteen minutes later, with
+    // nothing in the UI to explain why; and the raw key would be stored in
+    // plaintext inside Redash, which is the finding this release exists to fix.
+    // Redash sends the credential as an Authorization: Bearer header, which
+    // redash_export.php has always accepted and now documents in the modal.
+    //
+    // analytics.php draws the same distinction: bare URL for the paste-in
+    // address, short-lived token only on export_csv_url, which a browser really
+    // does follow.
+    $pullurl = (new moodle_url('/local/ai_course_assistant/redash_export.php'))->out(false);
     echo json_encode([
         'ok' => true,
         'configured' => $configured,

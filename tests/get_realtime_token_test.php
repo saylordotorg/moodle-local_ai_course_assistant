@@ -31,6 +31,8 @@ final class get_realtime_token_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
+        // v7.0.5: the endpoint enforces the site voice switch itself.
+        set_config('realtime_enabled', 1, 'local_ai_course_assistant');
         // A configured realtime provider (legacy single-key path resolves to
         // OpenAI) plus a mocked ephemeral-token HTTP response, so execute()
         // reaches the return without a real network call.
@@ -61,9 +63,15 @@ final class get_realtime_token_test extends \advanced_testcase {
             $instructions,
             'Realtime instructions must not contain a reserved special token.'
         );
-        // The jailbreak-defence line cited <|im_start|>; it is now neutralized.
-        $this->assertStringContainsString('[special token]', $instructions);
         $this->assertStringNotContainsString('<|im_start|>', $instructions);
+        // The '[special token]' replacement used to be observable here because
+        // the response carried the whole grounded prompt, and the jailbreak
+        // defence line inside it cited <|im_start|>. v7.0.5 sends that prompt to
+        // the provider server-side and returns only the voice-style tail, which
+        // contains no reserved token to neutralise. Both payloads still run
+        // through the same replacement; what changed is which one the client can
+        // see. The negative assertions above are the guarantee that still holds
+        // at this seam.
     }
 
     public function test_instructions_carry_the_voice_mode_tail(): void {

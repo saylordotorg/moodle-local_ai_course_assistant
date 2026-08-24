@@ -567,6 +567,13 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             + '<ol class="small mb-2">'
             + '<li>Settings &rarr; Data Sources &rarr; New &rarr; <strong>JSON</strong> (the JSON ds plugin must be enabled in Redash).</li>'
             + '<li>Name it <code>SOLA</code>. Save.</li>'
+            // v7.0.5: the pull URL deliberately carries no credential. Without
+            // this step the data source 401s, and previously the alternative was
+            // storing the bulk-export key in plaintext inside Redash.
+            + '<li><strong>Add an authorization header.</strong> Set '
+            + '<code>Authorization: Bearer &lt;your SOLA redash_api_key&gt;</code> on this data '
+            + 'source. The URL above intentionally does not contain the key, so that it is never '
+            + 'stored in Redash.</li>'
             + '<li>Note the new data source\'s numeric id (visible in the URL after saving). You will need that id below.</li>'
             + '</ol>'
             + '<h6>3. Configure the SOLA push (optional, but recommended)</h6>'

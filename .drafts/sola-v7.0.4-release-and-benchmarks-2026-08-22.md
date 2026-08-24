@@ -19,10 +19,16 @@ was affected, and v7.0.3 passed a full 13-job CI matrix without touching any of 
 2. **Reranking is worth more than we last measured** — +13.4 pp on R@3 at candidate
    pool 50, versus +10.8 pp measured at pool 20 in June.
 3. **Your current chat model choice is vindicated on cost, decisively.** Claude Sonnet 5
-   scores highest on the tutor rubric, but costs **8x** what Gemini 2.5 Flash does for a
-   **2.5%** quality gain. Gemini 2.5 Flash stays the correct primary.
-4. **Three configured providers are completely dead** — 50 of 50 calls failed for each.
-   They are consuming benchmark time and would fail as failover targets.
+   scores highest on the tutor rubric, but costs **6.6x** what Gemini 2.5 Flash does for a
+   **2.5%** quality gain. Gemini 2.5 Flash stays the correct primary. Opus 5 is the sharper
+   result: statistically tied with Gemini (14.22 vs 14.20) at **42x the cost** — which
+   matters, because the premium-escalation tier routes to it.
+4. **The three dead provider rows are repaired**, and every configured provider now returns
+   real scores with zero errors. Two faults were fixable here; the third needs a credential
+   only you can supply.
+5. **Three separate benchmark harnesses were measuring nothing** — each silently, each
+   printing confident output, all the same defect: an output-token cap below what a
+   reasoning-class model needs to emit any visible text.
 
 ---
 
@@ -131,54 +137,106 @@ best single quality lever available without re-embedding the corpus.
 ## 5. Chat model benchmark (golden tutor set)
 
 **50 prompts, rubric-judged out of 15, every row of `comparison_providers`.**
+Re-measured after the provider repairs, so all nine rows return real scores —
+where the previous edition had three rows at 50/50 errors.
 
 | Provider | Rubric /15 | Cost (cents/call) | P50 TTFT | P95 TTFT | Errors | Pareto |
 |---|---|---|---|---|---|---|
-| `claude-sonnet-5` | **14.50** | 0.382 | 1,221 ms | 9,495 ms | 0 | yes |
-| `claude-opus-5` | 14.38 | 2.262 | 6,769 ms | 15,055 ms | 0 | no |
-| **`gemini-2.5-flash`** *(current primary)* | 14.14 | **0.047** | 1,893 ms | 4,214 ms | 0 | **yes** |
-| `claude-haiku-4-5` | 14.06 | 0.114 | 526 ms | 867 ms | 0 | no |
-| `mistral-small-latest` | 13.12 | 0.015 | 392 ms | 1,241 ms | 0 | yes |
-| `gpt-4o-mini` *(current failover)* | 12.82 | 0.012 | 428 ms | 2,152 ms | 0 | yes |
-| `llama-3.1-8b` (openrouter) | 11.10 | 0.001 | 455 ms | 1,073 ms | 0 | yes |
-
-The harness's decision rule names Sonnet 5 the winner. **The more useful reading is that
-this vindicates the current production choice.**
-
-- Sonnet 5 costs **8.1x** what Gemini 2.5 Flash costs, for **+0.36 rubric points** — a
-  2.5% quality gain. At 100k MAU that difference is the entire cost model, not a rounding
-  error.
-- **Opus 5 is dominated outright:** a *lower* rubric score than Sonnet 5, at 5.9x the
-  cost and 5.5x the time to first token. Worth knowing, because the premium-escalation
-  router targets Opus — this says the escalation tier buys latency and spend, not quality,
-  on tutor-shaped work.
-- `gpt-4o-mini` at 12.82 confirms it belongs as failover only, not primary.
-- Haiku 4.5 is the latency champion by a wide margin (526 ms P50 TTFT) at 2.4x Gemini's
-  cost — the option if perceived responsiveness ever outranks spend.
+| `claude-sonnet-5` | **14.56** | 0.352 | 1,172 ms | 3,629 ms | 0 | yes |
+| `claude-opus-5` | 14.22 | 2.224 | 5,917 ms | 14,956 ms | 0 | no |
+| **`gemini-2.5-flash`** *(current primary)* | 14.20 | **0.053** | 1,981 ms | 4,917 ms | 0 | **yes** |
+| `claude-haiku-4-5` | 14.00 | 0.112 | 486 ms | 910 ms | 0 | no |
+| `mistral-small-latest` | 13.22 | 0.015 | 301 ms | 483 ms | 0 | yes |
+| `gpt-4o-mini` *(current failover)* | 12.62 | 0.012 | 355 ms | 521 ms | 0 | yes |
+| `together / openai/gpt-oss-20b` *(repaired)* | 11.82 | n/a | 1,153 ms | 3,160 ms | 0 | no |
+| `openrouter / llama-3.1-8b` | 11.26 | 0.001 | 443 ms | 1,040 ms | 0 | yes |
+| `custom / Qwen2.5-7B-Instruct-AWQ` *(repaired, self-hosted)* | 10.90 | n/a | **37 ms** | 75 ms | 0 | no |
 
 **Recommendation: no change.** Gemini 2.5 Flash primary, gpt-4o-mini failover.
 
+**The cost case is decisive, and repairing the dead rows did not disturb it.**
+Sonnet 5 scores highest, but costs **6.6x** what Gemini 2.5 Flash costs for
+**+0.36 rubric points** — a 2.5% quality gain. At 100k MAU that ratio is the
+whole cost model.
+
+**Opus 5 is the clearest negative result.** It lands at 14.22 against Gemini's
+14.20 — a 0.02 difference, indistinguishable — for **42x the cost** and 3x the
+time to first token. That matters concretely: the premium-escalation tier routes
+to Opus. On tutor-shaped work this data says the escalation tier buys latency and
+spend, not quality. Worth revisiting whether it should target Sonnet 5 instead,
+which does score above the field and costs a sixth of Opus.
+
+**The two repaired rows are working but weak for tutoring** — 11.82 and 10.90,
+below every hosted option. Repairing them added coverage, not candidates.
+
+**One genuinely interesting result: the self-hosted endpoint is extraordinarily
+fast.** `Qwen2.5-7B-Instruct-AWQ` on Saylor's own vLLM box returns first token in
+**37 ms**, roughly 8x faster than the quickest hosted provider and 50x faster
+than Gemini, at no per-call cost. It also scores lowest on the rubric (10.90).
+That combination has no place in the tutor path, but it is the right shape for
+work where latency dominates and depth does not: classification, routing,
+mastery tagging, or a free failover of last resort when hosted providers are
+rate-limited.
+
+*Cost is reported as n/a for the `together` and `custom` rows because neither
+returns token counts; see the caveat in section 9.*
+
 ---
+## 6. Provider health — all rows repaired
 
-## 6. Provider health — three dead rows
+The first edition of this report listed three dead `comparison_providers` rows.
+All three have been diagnosed and dealt with. **The provider benchmark now
+reports zero failures across every configured provider**, where it previously
+reported two.
 
-| Provider | Model | Result |
+The diagnosis was slower than it should have been because all three faults
+presented identically: the user-visible message was "Sorry, something went
+wrong" in every case, with the real cause only in `debuginfo`, which surfaces
+solely under `DEBUG_DEVELOPER`. Three unrelated problems, one indistinguishable
+symptom.
+
+| Row | Actual cause | Resolution |
 |---|---|---|
-| `together` | `Meta-Llama-3-8B-Instruct-Lite` | **50/50 failed** (fails in ~150 ms) |
-| `xai` | `grok-4-1-fast` | **50/50 failed** (fails in ~40 ms) |
-| `custom` | `Qwen/Qwen2.5-VL-7B-Instruct` | **50/50 failed** (fails in ~10 ms) |
+| `together` | The pinned model had stopped being served: *"Unable to access non-serverless model meta-llama/Meta-Llama-3-8B-Instruct-Lite… create and start a new dedicated endpoint."* | Repointed to `openai/gpt-oss-20b`, verified at 673 ms |
+| `custom` | Configured with the *vision* variant `Qwen/Qwen2.5-VL-7B-Instruct`; the self-hosted vLLM endpoint serves exactly one model, and it is not that one | Repointed to `Qwen/Qwen2.5-7B-Instruct-AWQ`, verified at 60 ms |
+| `xai` | The stored credential is rejected outright: *"Incorrect API key provided."* | **Cannot be fixed from the plugin.** Row commented out with restore instructions; needs a fresh key from console.x.ai |
 
-Failure inside 200 ms means these never reach a model — this is configuration or
-credentials, not provider trouble. They should be fixed or removed: they consume
-benchmark time and would fail if ever selected as a failover target.
+Two false trails are worth recording, because either would have sent someone to
+the wrong vendor:
 
-*One correction worth recording:* a 3-prompt provider probe showed `claude-opus-5`
-failing 2 of 3, which looked like a real defect. The 50-prompt run shows **0 errors**.
-Those failures were transient. A three-sample result was not a sound basis for the
-inference, and the larger run overturned it.
+- **Price is not a serverless indicator.** Two Llama models with non-zero
+  published pricing both failed with the same non-serverless error.
+- **`running` in `/v1/models` is not reliable.** All 279 models on the account
+  report `running: false`, which reads as "this account has no serverless
+  capacity at all" — a conclusion worth escalating to Together, and wrong.
+  Three models answer normally. Only empirical testing settled it.
+
+### The two remaining "failures" were the harness, not the providers
+
+The rerun immediately after the repairs still showed two failures, both
+`claude-opus-5`, on the analytics prompts `count` and `cluster` — **the same two
+that failed the previous run.** That stability was the tell. The analytics arm
+called the model with `max_tokens: 256` and then set `ok = ($response !== '')`,
+so a model that spends output budget before emitting visible text was recorded
+as a dead provider.
+
+| `max_tokens` | `claude-opus-5` on the analytics prompt |
+|---|---|
+| 256 *(as shipped)* | fails |
+| 1024 | fails |
+| 4000 | **succeeds — 2,610 completion tokens** |
+
+This is also a caution about how the earlier edition reasoned. It dismissed
+these failures as transient on the grounds that the same model scored 14.38/15
+with zero errors over 50 prompts on the *chat* path. But that is a different
+call site with a different cap, so the chat result had no bearing on the
+analytics one. Raised to 4096; the rerun reports zero failures.
+
+`openai/gpt-oss-20b` failed one analytics prompt in that same run and passes at
+every cap when tested directly, so that one genuinely was transient and is not
+part of this story.
 
 ---
-
 ## 7. Prompt-section weight benchmark
 
 **50 golden prompts x 5 candidate weight configurations, rubric-judged out of 15, on
@@ -288,6 +346,20 @@ Mistral and OpenRouter all report zero tokens and no cost. The ranking is theref
 computed over a subset that excludes the cheapest providers. Use section 5's figures,
 which come from the golden-set harness and do account for tokens.
 
+**Three harnesses were measuring nothing, all the same defect** — an output-token cap set
+below what a reasoning-class model needs to emit any visible text at all:
+
+| Site | Cap | Symptom |
+|---|---|---|
+| `run_weight_benchmark` judge | 200 | 250 of 250 rubric judgments unparseable; reported `0.00/15, n=0` for every configuration *plus* a sorted summary and a spend total |
+| `run_weight_benchmark` tutor call | 256 | the responses being graded were themselves truncated |
+| `provider_benchmark` analytics arm | 256 | `claude-opus-5` reported as a dead provider on two consecutive runs |
+
+A fourth, different defect — the benchmark loader that fetched rows and then discarded
+them — was caught by the automated code review on PR #195. None of the four announced
+itself; every one produced output shaped like a result. All are fixed, each with the
+measurement recorded at the call site.
+
 **Per-course labels in the RAG harness are truncated to 8 characters,** so
 `course130/131/132` all print as "course13". Thirteen distinct courses, three collision
 groups. Cosmetic, but it makes the per-course table unreadable as printed; the overall
@@ -299,10 +371,13 @@ row is unaffected.
 
 | # | Item | Owner |
 |---|---|---|
-| 1 | **Rotate credentials.** 7 `comparison_providers` keys, the Voyage rerank key, the dev OpenAI embedding key, `redash_api_key`, and the Anthropic key on CS101. Nothing has been scrubbed. | Tom |
-| 2 | Fix or remove the three dead provider rows (`together`, `xai`, `custom`). | Tom |
+| 1 | **Rotate credentials.** The `comparison_providers` keys, the Voyage rerank key, the dev OpenAI embedding key, `redash_api_key`, and the Anthropic key on CS101. Nothing has been scrubbed. **The x.ai key is confirmed exposed** — it was printed in plaintext during this session's diagnostics, so treat it as compromised rather than merely stale. | Tom |
+| 2 | ~~Fix or remove the three dead provider rows.~~ **Done** — `together` and `custom` repaired and verified; `xai` commented out pending a credential. | closed |
 | 3 | Complete `voyage-context-4` wiring, or refuse the value in settings validation. Indexing uses the contextualized endpoint; querying and the drift-reindex task do not, and because both sides report the same model name the comparability guard cannot detect it. **Leave it unset.** | Next release |
 | 4 | Add a content anchor to the fixture generator so ground truth survives a re-index. | Next release |
 | 5 | Human review of jailbreak Test 12 (indirect injection). | Tom |
-| 6 | Consider whether the premium-escalation tier should still target Opus 5, given it scored below Sonnet 5 at 5.9x the cost. | Tom |
+| 6 | **Reconsider the premium-escalation target.** Opus 5 ties Gemini 2.5 Flash on the tutor rubric (14.22 vs 14.20) at 42x the cost and 3x the TTFT. Sonnet 5 scores above the field at a sixth of Opus's cost. | Tom |
 | 7 | Marketplace review CONTRIB-10574 — the reply about the mismatched test report is drafted but unsent; the Jira project grants no comment permission to either account tried. | Tom |
+| 8 | Point the weight-benchmark judge at a model with enforced JSON output, to clear the residual 12% parse failures that remain even at the corrected token budget. | Next release |
+| 9 | Provide a fresh x.ai key (console.x.ai) and uncomment the `xai` row, or delete the row if the provider is no longer wanted. | Tom |
+| 10 | Consider the self-hosted vLLM endpoint for latency-critical non-tutor work — 37 ms P50 TTFT and no per-call cost, but lowest rubric (10.90). Candidates: classification, routing, mastery tagging, free failover. | Next release |

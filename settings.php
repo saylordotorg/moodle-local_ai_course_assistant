@@ -2168,7 +2168,15 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/premium_escalation_model',
         get_string('settings:premium_escalation_model', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_model_desc', 'local_ai_course_assistant'),
-        'claude-opus-4-8',
+        // claude-sonnet-5, not an Opus. Measured on the 50-prompt golden tutor
+        // set 2026-08-22: sonnet-5 scored 14.56/15 against opus-5's 14.22 at
+        // 0.352 cents/call against 2.224 -- higher quality for roughly a sixth
+        // of the cost, and a third of the time to first token. The escalation
+        // tier exists to buy quality on hard turns; on this evidence an Opus
+        // target bought latency and spend instead. Note the previous default
+        // was opus-4-8, which was not itself in that benchmark; the cost
+        // argument holds regardless since 4.8 and 5 share a price tier.
+        'claude-sonnet-5',
         // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
         PARAM_TEXT
     ));
@@ -2403,6 +2411,15 @@ if ($hassiteconfig) {
     ));
     // v5.10.x (security finding #40): require disclosed learner consent before
     // a conversation (name, email, transcript) is escalated to the support desk.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/escalation_intent_patterns',
+        get_string('settings:escalation_intent_patterns', 'local_ai_course_assistant'),
+        get_string('settings:escalation_intent_patterns_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW,
+        60,
+        6
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/zendesk_require_consent',
         get_string('settings:zendesk_require_consent', 'local_ai_course_assistant'),
