@@ -309,6 +309,13 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
             pageid: parseInt(ctx.pageId || ctx.pageid, 10) || 0,
             pagetitle: ctx.pageTitle || ctx.pagetitle || '',
             lang: ctx.lang || '',
+            // v7.0.5: the server assembles the voice-mode augmentation now, so
+            // it needs the mode and its inputs. Previously the browser built the
+            // text and pushed it with session.update, which replaced the
+            // server's grounded prompt outright.
+            mode: ctx.mode || 'conversation',
+            topic: ctx.topic || '',
+            phrase: ctx.phrase || '',
         };
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_get_realtime_token',

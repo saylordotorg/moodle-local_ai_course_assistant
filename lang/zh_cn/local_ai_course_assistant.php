@@ -1381,7 +1381,7 @@ $string['profile:link'] = '部署预设页面';
 $string['profile:link_desc'] = '打开<a href="{$a}">部署预设</a>页面，为托管或自托管后端应用一组推荐的设置。';
 $string['coursesettings:apibaseurl_rejected'] = '未保存 API 基础 URL：它必须是通过 SSRF 安全检查的公开 HTTPS 端点。';
 $string['settings:escalation_intent_patterns'] = '升级意图模式';
-$string['settings:escalation_intent_patterns_desc'] = '每行一个正则表达式；以 # 开头的行将被忽略。只有当学习者自己的消息匹配其中之一时才会创建支持工单，因此课程内容无法代表学习者触发升级。留空则使用内置默认值，涵盖英语以及西班牙语、法语、德语和葡萄牙语中的一些常见表述。学习者使用其他语言书写的站点应在此添加模式：消息未匹配即表示不会创建工单。';
+$string['settings:escalation_intent_patterns_desc'] = 'PCRE, no delimiters. 每行一个正则表达式；以 # 开头的行将被忽略。只有当学习者自己的消息匹配其中之一时才会创建支持工单，因此课程内容无法代表学习者触发升级。留空则使用内置默认值，涵盖英语以及西班牙语、法语、德语和葡萄牙语中的一些常见表述。学习者使用其他语言书写的站点应在此添加模式：消息未匹配即表示不会创建工单。';
 $string['settings:zendesk_require_consent'] = '在支持升级前要求同意';
 $string['settings:zendesk_require_consent_desc'] = '启用时（推荐），只有在学习者接受首次运行同意通知后，[[tutorshort]] 才会将对话升级到 Zendesk 支持台；该通知会披露请求人工帮助会将对话（包括姓名和电子邮件）共享给支持团队。仅当您以其他方式获得该同意时才关闭此选项；关闭后，升级会立即发送。除非启用了 Zendesk 升级，否则此选项无效。';
 $string['chat:escalation_needs_consent'] = '看起来这需要我们支持团队的成员介入。为了将其转交给他们，我必须将本次对话（包括您的姓名和电子邮件）共享给支持台。您尚未同意这样做，因此我尚未发送任何内容。如果您希望获得人工帮助，请接受本助手的数据共享通知并再次提问，或直接联系支持团队。';

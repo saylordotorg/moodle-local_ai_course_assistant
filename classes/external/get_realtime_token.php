@@ -55,6 +55,14 @@ class get_realtime_token extends external_api {
             'pageid' => new external_value(PARAM_INT, 'Course module id of the current page', VALUE_DEFAULT, 0),
             'pagetitle' => new external_value(PARAM_TEXT, 'Title of the current page or activity', VALUE_DEFAULT, ''),
             'lang' => new external_value(PARAM_ALPHA, 'Learner language preference (ISO 639-1)', VALUE_DEFAULT, ''),
+            // v7.0.5: the voice-mode augmentation moved server-side. It used to
+            // be assembled in the browser and pushed with session.update, which
+            // REPLACES session.instructions -- so it silently overwrote the
+            // grounded prompt attached at mint time. The client now sends the
+            // mode and its inputs, and the server assembles the whole thing.
+            'mode' => new external_value(PARAM_ALPHA, 'Voice mode: conversation|ell', VALUE_DEFAULT, 'conversation'),
+            'topic' => new external_value(PARAM_TEXT, 'Chosen speaking topic, if any', VALUE_DEFAULT, ''),
+            'phrase' => new external_value(PARAM_TEXT, 'Pronunciation phrase for ELL mode, if any', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -67,13 +75,17 @@ class get_realtime_token extends external_api {
      * @param string $lang Learner language preference (optional).
      * @return array
      */
-    public static function execute(int $courseid, int $pageid = 0, string $pagetitle = '', string $lang = ''): array {
+    public static function execute(int $courseid, int $pageid = 0, string $pagetitle = '', string $lang = '',
+            string $mode = 'conversation', string $topic = '', string $phrase = ''): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
             'pageid' => $pageid,
             'pagetitle' => $pagetitle,
             'lang' => $lang,
+            'mode' => $mode,
+            'topic' => $topic,
+            'phrase' => $phrase,
         ]);
 
         $coursecontext = \context_course::instance($params['courseid']);
@@ -163,6 +175,12 @@ class get_realtime_token extends external_api {
             // The full text now goes to OpenAI server-side at mint time, and only
             // $voicetail — generic spoken-style guidance with no course or learner
             // data in it — is returned to the client.
+            $voicetail .= self::mode_block(
+                (string) $params['mode'],
+                (string) $params['topic'],
+                (string) $params['phrase'],
+                $pagetitleq
+            );
             $fullinstructions = $systemprompt . $voicetail;
             // OpenAI Realtime rejects session.instructions that contain a
             // reserved special token and fails the whole session with
@@ -289,6 +307,70 @@ class get_realtime_token extends external_api {
     }
 
     /**
+     * The voice-mode augmentation, moved out of the browser in v7.0.5.
+     *
+     * chat.js used to build this and hand it to Realtime.connect(), which pushed
+     * it with session.update. That call REPLACES session.instructions rather than
+     * merging, so it overwrote the grounded prompt attached at mint time — every
+     * OpenAI voice session ran with no course content, no learner personalisation
+     * and no jailbreak defences, while the surviving text still referred to a
+     * "## Current Page Content" section that was no longer in the session.
+     *
+     * Text kept byte-for-byte as it was in the client so voice behaviour does not
+     * change; only where it is assembled does.
+     *
+     * @param string $mode conversation|ell
+     * @param string $topic Chosen speaking topic, if any.
+     * @param string $phrase Pronunciation phrase, if any.
+     * @param string $pagetitle Current page title, used as a topic fallback.
+     * @return string
+     */
+    private static function mode_block(string $mode, string $topic, string $phrase, string $pagetitle): string {
+        if (strtolower($mode) === 'ell') {
+            $out = "\n\n" . 'You are SOLA in a real-time voice conversation. Keep responses brief (2-3 sentences). '
+                . '[ELL Coaching Mode] You are an English conversation and pronunciation coach. '
+                . 'Wait for the user to speak first, then respond. '
+                . 'While having natural conversation: gently correct grammar errors by modeling the correct form '
+                . '("You might say: \'...\'"), offer pronunciation tips when speech sounds unclear. '
+                . 'For pronunciation practice, speak a target phrase clearly, then listen to the learner repeat it '
+                . 'and give specific encouraging feedback. '
+                . 'Do NOT include any markup, tags, or bracketed instructions in your responses. '
+                . 'Keep your output as natural spoken language only.';
+            if ($phrase !== '') {
+                $out .= "\n\n" . 'The student wants to practice pronouncing: "' . $phrase
+                    . '". Begin by welcoming the student, briefly explain the exercise, say this phrase clearly, '
+                    . 'then ask them to repeat it.';
+            } else {
+                $out .= "\n\n" . 'Begin by welcoming the student, briefly explain the exercise, then invite them '
+                    . 'to try a word or short phrase from the current page.';
+            }
+            $out .= ' Base your pronunciation feedback and examples on the current page and nearby course '
+                . 'content when possible.';
+            return $out;
+        }
+
+        // Default: ordinary voice conversation.
+        if ($topic === '' && $pagetitle !== '') {
+            // Same fallback the client applied: anchor on the page the learner is
+            // reading rather than let the model improvise an icebreaker.
+            $topic = $pagetitle;
+        }
+        $out = "\n\n## Voice Conversation\n"
+            . 'Keep every turn grounded in the course content above. '
+            . 'Respond naturally to follow-up questions and let the learner interrupt or redirect. '
+            . 'For your first spoken turn, give a one-sentence welcome and one specific question '
+            . 'about the topic below. Do NOT explain how the speaking practice works, do NOT ask '
+            . 'about hobbies or unrelated personal topics, and do NOT begin with affirmation '
+            . 'fillers like "Great!" or "Absolutely!".';
+        if ($topic !== '') {
+            $out .= ' Topic for this session: "' . $topic . '".';
+        } else {
+            $out .= ' If no specific topic is set, ask the learner which course topic they want to talk through.';
+        }
+        return $out;
+    }
+
+    /**
      * Hit the OpenAI Realtime ephemeral-token endpoint.
      *
      * Returns [body, http_code]. Tests can short-circuit the upstream
@@ -296,6 +378,9 @@ class get_realtime_token extends external_api {
      * static is set, the curl call is skipped entirely.
      *
      * @param string $apikey OpenAI API key (Bearer).
+     * @param string $instructions Grounded system prompt attached to the session
+     *      at mint time so it never has to travel via the browser. Empty sends
+     *      the bare `{}` body the endpoint used before v7.0.5.
      * @return array{0:string,1:int} [response body, HTTP status]
      */
     private static function call_openai_realtime(string $apikey, string $instructions = ''): array {

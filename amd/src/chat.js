@@ -2959,7 +2959,14 @@ define([
             });
 
             Promise.all([
-                Repo.getRealtimeToken(courseId, getRealtimeVoiceRequestContext(root)),
+                Repo.getRealtimeToken(courseId, Object.assign(
+                    getRealtimeVoiceRequestContext(root),
+                    {
+                        mode: config.mode || 'conversation',
+                        topic: config.getTopic ? (config.getTopic(selection) || '') : '',
+                        phrase: config.getPhrase ? (config.getPhrase(selection) || '') : '',
+                    }
+                )),
                 micPromise,
             ]).then(function(results) {
                 if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
@@ -3194,6 +3201,15 @@ define([
                 getInitialText: function(selection) {
                     return buildPracticeSpeakingInitialText(selection);
                 },
+                // v7.0.5: the server assembles the voice-mode text now, so it
+                // needs the mode and the chosen topic. getInstructions is kept
+                // for any caller that still wants the assembled string locally,
+                // but its output no longer reaches the wire -- session.update
+                // would have replaced the server's grounded prompt with it.
+                mode: 'conversation',
+                getTopic: function(selection) {
+                    return extractPracticeSpeakingTopic(selection) || '';
+                },
                 getInstructions: function(baseInstructions, selection) {
                     var instructions = baseInstructions || '';
                     var topic = extractPracticeSpeakingTopic(selection);
@@ -3259,6 +3275,11 @@ define([
             chips: buildELLPronunciationChips(),
             getInitialText: function(selection) {
                 return buildELLPronunciationInitialText(selection);
+            },
+            // v7.0.5: see the note on the conversation config above.
+            mode: 'ell',
+            getPhrase: function(selection) {
+                return extractPronunciationPhrase(selection) || '';
             },
             getInstructions: function(baseInstructions, selection) {
                 var phrase = extractPronunciationPhrase(selection);

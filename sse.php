@@ -837,7 +837,18 @@ try {
     // talk the model into emitting the marker; it cannot make a student type a
     // request for support. Tail-anchoring and the desk check above both still
     // leave the trigger under the model's control -- this does not.
-    if (preg_match('/(?:^|\n)\s*\[NEEDS_ESCALATION\]\s*$/', rtrim($fullresponse))
+    // $fullresponse is the RAW accumulated stream. The markers are stripped only
+    // from the copy sent to the browser, so they are all still here -- and the
+    // security section of the system prompt requires every reply to END with the
+    // SOLA_NEXT block ("required output format on every turn"). A compliant
+    // response therefore NEVER ends with [NEEDS_ESCALATION], which made the
+    // tail-anchored test unsatisfiable: escalation would have fired only when the
+    // model broke a required format rule. Strip the trailing marker cluster
+    // first, then test what the model actually closed its prose with.
+    $escalationtail = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $fullresponse) ?? $fullresponse;
+    $escalationtail = preg_replace('/\[SOURCE:[^\]]*\]/i', '', $escalationtail) ?? $escalationtail;
+
+    if (preg_match('/(?:^|\n)\s*\[NEEDS_ESCALATION\]\s*$/', rtrim($escalationtail))
             && \local_ai_course_assistant\zendesk_client::is_enabled()
             && \local_ai_course_assistant\zendesk_client::learner_requested_help((string) ($message ?? ''))) {
         $needsescalation = true;

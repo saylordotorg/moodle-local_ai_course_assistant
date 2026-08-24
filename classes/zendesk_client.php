@@ -38,15 +38,25 @@ class zendesk_client {
             && !empty(get_config('local_ai_course_assistant', 'zendesk_token'));
     }
 
-    /** Default help-seeking patterns, used when the admin setting is empty. */
+    /**
+     * Default help-seeking patterns, used when the admin setting is empty.
+     *
+     * Stored WITHOUT delimiters, matching the convention of the sibling setting
+     * `premium_escalation_triggers`: the plugin wraps each line itself and
+     * applies case-insensitive matching. Requiring admins to supply their own
+     * delimiters here while the other regex setting in the same plugin forbids
+     * them is how a well-followed instruction silently disables escalation --
+     * a bare `speak to a human` would make preg_match() return false on every
+     * line, the warning is suppressed, and debugging() is a no-op in production.
+     */
     public const DEFAULT_INTENT_PATTERNS = [
-        '/\b(human|person|agent|advisor|adviser|staff|teacher|instructor|tutor|someone)\b/i',
-        '/\b(support|help ?desk|helpdesk|service ?desk)\b/i',
-        '/\b(contact|speak|talk|escalate|ticket|complaint|refund|enrol|enroll)\b/i',
-        '/\b(no ?puedo|ayuda|soporte|persona)\b/iu',
-        '/\b(aide|assistance|humain|personne)\b/iu',
-        '/\b(hilfe|unterst|mensch|person)\b/iu',
-        '/\b(ajuda|suporte|pessoa)\b/iu',
+        '\b(human|person|agent|advisor|adviser|staff|teacher|instructor|tutor|someone)\b',
+        '\b(support|help ?desk|helpdesk|service ?desk)\b',
+        '\b(contact|speak|talk|escalate|ticket|complaint|refund|enrol|enroll)\b',
+        '\b(no ?puedo|ayuda|soporte|persona)\b',
+        '\b(aide|assistance|humain|personne)\b',
+        '\b(hilfe|unterst|mensch|person)\b',
+        '\b(ajuda|suporte|pessoa)\b',
     ];
 
     /**
@@ -94,8 +104,10 @@ class zendesk_client {
         }
 
         foreach ($patterns as $pattern) {
-            // A bad admin-supplied regex must not fatal the chat turn.
-            $matched = @preg_match($pattern, $message);
+            // Wrap with `~` delimiters and the case-insensitive + unicode flags,
+            // exactly as premium_router::first_matching_trigger() does. A bad
+            // admin-supplied regex must not fatal the chat turn.
+            $matched = @preg_match('~' . $pattern . '~iu', $message);
             if ($matched === 1) {
                 return true;
             }

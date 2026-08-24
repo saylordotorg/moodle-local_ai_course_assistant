@@ -100,7 +100,8 @@ final class escalation_intent_test extends \advanced_testcase {
     }
 
     public function test_admin_patterns_replace_the_defaults(): void {
-        set_config('escalation_intent_patterns', '/\bhjælp\b/iu', 'local_ai_course_assistant');
+        // Undelimited, matching premium_escalation_triggers' convention.
+        set_config('escalation_intent_patterns', '\bhjælp\b', 'local_ai_course_assistant');
         $this->assertTrue(zendesk_client::learner_requested_help('Jeg har brug for hjælp'));
         // The English defaults are replaced, not merged.
         $this->assertFalse(zendesk_client::learner_requested_help('I need to talk to a human'));
@@ -109,7 +110,7 @@ final class escalation_intent_test extends \advanced_testcase {
     public function test_comments_and_blank_lines_are_ignored(): void {
         set_config(
             'escalation_intent_patterns',
-            "# support intents\n\n/\\bwibble\\b/i\n",
+            "# support intents\n\n\\bwibble\\b\n",
             'local_ai_course_assistant'
         );
         $this->assertTrue(zendesk_client::learner_requested_help('please wibble'));
@@ -118,9 +119,63 @@ final class escalation_intent_test extends \advanced_testcase {
 
     public function test_an_invalid_admin_regex_does_not_break_the_turn(): void {
         // A bad pattern must be skipped, not fatal the chat request.
-        set_config('escalation_intent_patterns', "/unterminated\n/\\bhuman\\b/i", 'local_ai_course_assistant');
+        // First line is a broken pattern, second is valid; the bad one must be
+        // skipped rather than fatal the turn.
+        set_config('escalation_intent_patterns', "([unclosed\n\\bhuman\\b", 'local_ai_course_assistant');
         $this->assertTrue(zendesk_client::learner_requested_help('I want a human'));
         $this->assertDebuggingCalled();
+    }
+
+    // ---------- the assembled detection path ----------
+    //
+    // These exist because the unit tests above did NOT catch a real bug: the
+    // tail-anchored check was applied to the raw response, and the system prompt
+    // requires every reply to END with the SOLA_NEXT block, so the marker was
+    // structurally never last and escalation was permanently dead. Testing the
+    // pieces proved nothing about the assembly.
+
+    /**
+     * Mirror of the detection in sse.php. Kept in the test so a change to the
+     * marker-stripping order has to be made deliberately in both places.
+     *
+     * @param string $fullresponse
+     * @return bool
+     */
+    private function detects_escalation(string $fullresponse): bool {
+        $tail = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $fullresponse) ?? $fullresponse;
+        $tail = preg_replace('/\[SOURCE:[^\]]*\]/i', '', $tail) ?? $tail;
+        return (bool) preg_match('/(?:^|\n)\s*\[NEEDS_ESCALATION\]\s*$/', rtrim($tail));
+    }
+
+    public function test_marker_is_found_in_a_realistic_compliant_response(): void {
+        // Exactly the shape the system prompt demands: prose, a source marker,
+        // the escalation marker, then the mandatory SOLA_NEXT block last.
+        $response = "I can't resolve that from the course material.\n"
+            . "[SOURCE:course]\n"
+            . "[NEEDS_ESCALATION]\n"
+            . "[SOLA_NEXT]Try again||Ask a human||Show notes||What's next?[/SOLA_NEXT]";
+        $this->assertTrue(
+            $this->detects_escalation($response),
+            'a compliant reply ends with SOLA_NEXT, so the marker must be found before it'
+        );
+    }
+
+    public function test_marker_is_found_with_no_trailing_blocks(): void {
+        $this->assertTrue($this->detects_escalation("Sorry, I cannot help with that.\n[NEEDS_ESCALATION]"));
+    }
+
+    public function test_marker_mid_sentence_does_not_escalate(): void {
+        // The whole point of anchoring: a learner quoting the token, or a model
+        // mentioning it in passing, must not open a ticket.
+        $response = "The marker [NEEDS_ESCALATION] is what I would emit if you needed a person.\n"
+            . "[SOLA_NEXT]a||b||c||d[/SOLA_NEXT]";
+        $this->assertFalse($this->detects_escalation($response));
+    }
+
+    public function test_no_marker_does_not_escalate(): void {
+        $this->assertFalse($this->detects_escalation(
+            "Here is the answer.\n[SOLA_NEXT]a||b||c||d[/SOLA_NEXT]"
+        ));
     }
 
     // ---------- the rate limiter behind the escalation cap ----------
