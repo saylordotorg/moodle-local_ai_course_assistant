@@ -80,6 +80,58 @@ final class quiz_usage_and_starter_scope_test extends \advanced_testcase {
         $this->assertContains('help-page', $keys);
     }
 
+    /**
+     * The wiring, not just the filter.
+     *
+     * This test is why the fix works at all. The first version of hook_callbacks
+     * passed !empty($PAGE->cm), which is ALWAYS FALSE: moodle_page serves cm
+     * through __get() and defines no __isset(), so isset() and empty() report
+     * "unset" whatever the property holds. The chip would have been suppressed on
+     * every page, including the activity pages it is meant for. Three pre-existing
+     * checks in the same file had the same defect.
+     *
+     * $PAGE->cm !== null is the correct test, and ?? is unaffected -- which is why
+     * $PAGE->pagetype and $PAGE->title were never broken.
+     */
+    public function test_page_cm_is_the_right_signal_for_activity_context(): void {
+        global $PAGE;
+
+        $course = $this->getDataGenerator()->create_course();
+        $pageactivity = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
+
+        // A course page: no course module in context.
+        $coursepage = new \moodle_page();
+        $coursepage->set_url('/course/view.php', ['id' => $course->id]);
+        $coursepage->set_course($course);
+        $this->assertNull($coursepage->cm, 'a course page has no activity context');
+
+        // An activity page: cm is set, which is what mod/*/view.php does.
+        $activitypage = new \moodle_page();
+        $activitypage->set_url('/mod/page/view.php', ['id' => $pageactivity->cmid]);
+        $activitypage->set_course($course);
+        $activitypage->set_cm(get_coursemodule_from_id('page', $pageactivity->cmid));
+        $this->assertNotNull($activitypage->cm, 'an activity page has an activity context');
+
+        // The trap, pinned: empty() cannot see either state, so a check built on
+        // it reports "no activity page" on an activity page.
+        $this->assertTrue(empty($activitypage->cm),
+            'empty() on a moodle_page magic property is always true -- if this ever '
+            . 'starts returning false, Moodle added __isset() and the guard comments '
+            . 'in hook_callbacks can be simplified');
+
+        // And the correct flag selects different starter sets, end to end.
+        $onhome = array_column(
+            starter_manager::get_effective_starters($course->id, false, false, $coursepage->cm !== null),
+            'key'
+        );
+        $onactivity = array_column(
+            starter_manager::get_effective_starters($course->id, false, false, $activitypage->cm !== null),
+            'key'
+        );
+        $this->assertNotContains('help-page', $onhome);
+        $this->assertContains('help-page', $onactivity);
+    }
+
     // ---------- the study-plan copy ----------
 
     /**
