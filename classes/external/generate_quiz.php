@@ -269,8 +269,11 @@ class generate_quiz extends external_api {
         // learner's visible history and out of the LLM context. The message
         // body is a short marker rather than the quiz JSON, which would bloat
         // the table for no analytic gain.
-        // capability_sql('chat') already counts interaction_type='quiz', so no
-        // change to spend accounting is needed beyond writing the row.
+        // Writing the row is necessary but was NOT sufficient: rows are gated by
+        // analytics::spend_rows_predicate() before capability_sql('chat') is
+        // ANDed on, and that predicate matched only role='assistant' plus the
+        // embedding/rerank types. v7.0.6 adds 'quiz' to it; without that the row
+        // is stored and priced at zero by every consumer.
         self::record_quiz_usage($provider, $courseid, $count, (string) ($decoded['topic'] ?? $topic), $cmid);
 
         return [

@@ -105,14 +105,45 @@ final class quiz_usage_and_starter_scope_test extends \advanced_testcase {
     // ---------- spend accounting ----------
 
     /**
-     * Regression guard for the actual defect: quiz generation made a billed
-     * provider call that spend_guard could not see, because spend_guard totals
-     * token columns on the msgs table and nothing was ever written.
+     * Regression guard for the actual defect, exercised end to end.
+     *
+     * The first version of this test asserted only that the string 'quiz'
+     * appeared in capability_sql('chat'). That passed while the fix was inert:
+     * rows are gated by analytics::spend_rows_predicate() BEFORE the capability
+     * clause is ANDed on, and that predicate matched only role='assistant' plus
+     * embedding/rerank -- so a role='system' quiz row was rejected before the
+     * capability clause could ever see it. Testing the pieces proved nothing
+     * about the assembled query, again. This writes a row and asserts the total
+     * moves.
      */
-    public function test_quiz_interaction_type_counts_toward_chat_spend(): void {
-        $sql = spend_guard::capability_sql('chat');
+    public function test_a_recorded_quiz_call_actually_increases_measured_spend(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        $before = analytics::get_total_tokens();
+
+        conversation_manager::record_quiz_usage(
+            $user->id, $course->id, '[Quiz] 4 question(s) on Ratios',
+            'openai', 'gpt-4o-mini', 3000, 700
+        );
+
+        $after = analytics::get_total_tokens();
+
+        $this->assertSame($before + 3700, $after,
+            'a quiz call that cost 3700 tokens must move the billable total by 3700');
+    }
+
+    /**
+     * The predicate is the gate that made the first fix inert, so pin it
+     * directly as well -- a future edit that drops 'quiz' from it would
+     * silently stop counting quiz spend again.
+     */
+    public function test_spend_predicate_admits_quiz_rows(): void {
+        $sql = analytics::spend_rows_predicate('m');
         $this->assertStringContainsString("'quiz'", $sql,
-            'quiz rows must fall inside the chat capability, or their cost is uncapped');
+            'quiz telemetry is role=system, so it only counts if the predicate names it');
+        // And the capability bucket it lands in, so the cap applies to it.
+        $this->assertStringContainsString("'quiz'", spend_guard::capability_sql('chat'));
     }
 
     /**

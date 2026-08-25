@@ -406,8 +406,16 @@ class analytics {
      * @return string SQL boolean expression, already parenthesised.
      */
     public static function spend_rows_predicate(string $alias = 'm'): string {
+        // v7.0.6: 'quiz' joins the list for the same reason 'embedding' and
+        // 'rerank' are here. Quiz-generation telemetry is written role='system'
+        // (so it stays out of the learner's history and the model's context),
+        // which means the role='assistant' branch can never match it. Without
+        // this the row is written, counted by nothing, and priced at zero --
+        // capability_sql('chat') already names 'quiz', but it is ANDed on after
+        // this predicate and cannot rescue a row this has already rejected.
+        // That is precisely how RAG spend came to read $0.00, above.
         return "({$alias}.role = 'assistant'
-                 OR {$alias}.interaction_type IN ('embedding', 'rerank'))";
+                 OR {$alias}.interaction_type IN ('embedding', 'rerank', 'quiz'))";
     }
 
     /**
@@ -499,7 +507,11 @@ class analytics {
             $params['since'] = $since;
         }
 
-        $category = "CASE WHEN m.interaction_type IN ('embedding', 'rerank')
+        // v7.0.6: quiz is reported separately. It stays inside the 'chat'
+        // *capability* for cap purposes (see spend_guard::capability_sql) but
+        // is its own *category* for reporting, because folding it into chat is
+        // what hid it. Cap by capability, report by category.
+        $category = "CASE WHEN m.interaction_type IN ('embedding', 'rerank', 'quiz')
                           THEN m.interaction_type ELSE 'chat' END";
 
         // Recordset, not get_records_sql: the grouping key is (model, category),
