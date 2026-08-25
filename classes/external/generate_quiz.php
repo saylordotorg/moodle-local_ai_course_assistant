@@ -259,12 +259,73 @@ class generate_quiz extends external_api {
             return ['success' => false, 'error' => 'No valid questions in AI response.', 'topic' => '', 'questions' => []];
         }
 
+        // v7.0.6: record the call. Until now generate_quiz made a real, billed
+        // provider call and persisted nothing, so quiz spend was invisible to
+        // spend_guard (which totals prompt_tokens/completion_tokens from the
+        // msgs table) and to token analytics, and every cost figure we have
+        // published understates SOLA by whatever quizzes cost. The row is
+        // written with role='system' so conversation_manager::get_messages --
+        // which filters to role IN ('user','assistant') -- keeps it out of the
+        // learner's visible history and out of the LLM context. The message
+        // body is a short marker rather than the quiz JSON, which would bloat
+        // the table for no analytic gain.
+        // capability_sql('chat') already counts interaction_type='quiz', so no
+        // change to spend accounting is needed beyond writing the row.
+        self::record_quiz_usage($provider, $courseid, $count, (string) ($decoded['topic'] ?? $topic), $cmid);
+
         return [
             'success'   => true,
             'error'     => '',
             'topic'     => (string) ($decoded['topic'] ?? $topic),
             'questions' => $questions,
         ];
+    }
+
+    /**
+     * Persist a telemetry row for one quiz-generation call.
+     *
+     * Never throws: a failure to record must not fail the learner's quiz.
+     *
+     * @param mixed  $provider Provider instance the call was made through.
+     * @param int    $courseid Course the quiz was generated for.
+     * @param int    $count    Number of questions requested.
+     * @param string $topic    Resolved topic.
+     * @param int    $cmid     Course module the learner was on, 0 if none.
+     * @return void
+     */
+    private static function record_quiz_usage($provider, int $courseid, int $count, string $topic, int $cmid): void {
+        global $USER;
+
+        try {
+            $usage = method_exists($provider, 'get_last_token_usage')
+                ? $provider->get_last_token_usage()
+                : null;
+
+            // The usage array carries no provider id, so resolve it the way
+            // sse.php does: per-course effective config, falling back to site.
+            $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+            $providername = (string) ($effective['provider']
+                ?? get_config('local_ai_course_assistant', 'provider'));
+
+            $marker = '[Quiz] ' . $count . ' question(s)';
+            if ($topic !== '') {
+                $marker .= ' on ' . $topic;
+            }
+
+            \local_ai_course_assistant\conversation_manager::record_quiz_usage(
+                (int) $USER->id,
+                $courseid,
+                $marker,
+                $providername,
+                isset($usage['model']) ? (string) $usage['model'] : null,
+                isset($usage['prompt_tokens']) ? (int) $usage['prompt_tokens'] : null,
+                isset($usage['completion_tokens']) ? (int) $usage['completion_tokens'] : null,
+                isset($usage['cached_tokens']) ? (int) $usage['cached_tokens'] : null,
+                $cmid > 0 ? $cmid : null
+            );
+        } catch (\Throwable $e) {
+            debugging('generate_quiz: could not record quiz usage: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
     }
 
     /**

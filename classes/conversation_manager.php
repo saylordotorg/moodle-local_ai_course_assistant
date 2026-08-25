@@ -230,6 +230,68 @@ class conversation_manager {
     }
 
     /**
+     * Record one quiz-generation call for spend and analytics.
+     *
+     * v7.0.6. generate_quiz makes a real, billed provider call; until now it
+     * persisted nothing, so quiz spend was invisible to spend_guard (which
+     * totals prompt_tokens/completion_tokens over this table) and to token
+     * analytics, and every cost figure we published understated SOLA by
+     * whatever quizzes cost.
+     *
+     * Written as a direct insert rather than through add_message() on purpose.
+     * add_message() nulls model_name and provider on any row that is not
+     * role='assistant', and spend_guard groups by model and prices via
+     * token_cost_manager::estimate_cost() -- so a row without a model is
+     * counted but cannot be costed, which is how the embedding and rerank
+     * writers already learned to do this. role stays 'system' so
+     * get_messages() keeps it out of the learner's history and the LLM context.
+     *
+     * @param int    $userid
+     * @param int    $courseid
+     * @param string $marker           Short human-readable marker, not the quiz JSON.
+     * @param string $provider         Provider id that served the call.
+     * @param string|null $modelname   Model id, or null if the provider did not report one.
+     * @param int|null $prompttokens
+     * @param int|null $completiontokens
+     * @param int|null $cachedtokens
+     * @param int|null $cmid
+     * @return void
+     */
+    public static function record_quiz_usage(
+        int $userid,
+        int $courseid,
+        string $marker,
+        string $provider,
+        ?string $modelname,
+        ?int $prompttokens,
+        ?int $completiontokens,
+        ?int $cachedtokens = null,
+        ?int $cmid = null
+    ): void {
+        global $DB;
+
+        $convid = self::get_or_create_conversation($userid, $courseid)->id;
+
+        $row = new \stdClass();
+        $row->conversationid   = $convid;
+        $row->userid           = $userid;
+        $row->courseid         = $courseid;
+        $row->role             = 'system';
+        $row->message          = $marker;
+        $row->tokens_used      = (int) ($prompttokens ?? 0) + (int) ($completiontokens ?? 0);
+        $row->prompt_tokens    = $prompttokens;
+        $row->completion_tokens = $completiontokens;
+        $row->model_name       = ($modelname !== null && $modelname !== '') ? $modelname : null;
+        $row->provider         = $provider !== '' ? $provider : null;
+        $row->interaction_type = 'quiz';
+        $row->cmid             = $cmid;
+        $row->cached_tokens    = $cachedtokens;
+        $row->timecreated      = time();
+
+        $DB->insert_record('local_ai_course_assistant_msgs', $row);
+    }
+
+    /**
      * Get all messages for a conversation, ordered by time.
      *
      * @param int $conversationid

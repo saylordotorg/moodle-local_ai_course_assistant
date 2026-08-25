@@ -556,10 +556,15 @@ class hook_callbacks {
         }
 
         // Load conversation starters from config.
+        // v7.0.6: pass whether this is a real activity page. Starters whose
+        // prompt interpolates {page} are suppressed on the course home page,
+        // where {page} would expand to the whole course name.
+        $hasactivity = !empty($PAGE->cm);
         $starters = \local_ai_course_assistant\starter_manager::get_effective_starters(
             $courseid,
             !empty($ttsurl),
-            $realtimeenabled
+            $realtimeenabled,
+            $hasactivity
         );
 
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
