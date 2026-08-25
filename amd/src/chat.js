@@ -2127,6 +2127,14 @@ define([
         }
 
         if (starterType === 'quiz' || starterKey === 'quiz') {
+            // v7.1.1: record the press. The panel opens client-side, so without
+            // this a learner who opened it and backed out left no trace, and we
+            // could see what quiz generation cost but not how often the button
+            // was pressed. Fire-and-forget: telemetry must not delay or block
+            // the panel.
+            Repo.recordQuizOpen(courseId, currentPageId || 0).catch(function() {
+                return;
+            });
             handleQuiz();
             return;
         }

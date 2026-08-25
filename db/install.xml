@@ -41,6 +41,9 @@
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course module ID the student was viewing when sending this message"/>
         <FIELD NAME="rag_latency_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v5.4.6: wall-clock time the rag_retriever::retrieve call took for this turn (null when RAG was off or not used)"/>
         <FIELD NAME="cached_tokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v6.1.0: prompt tokens served from the provider's prompt cache this call (OpenAI prompt_tokens_details.cached_tokens or Anthropic cache_read_input_tokens). Null when the provider reported nothing."/>
+        <FIELD NAME="stream_outcome" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="How the turn ended: complete, client_aborted, provider_error. Null on rows written before v7.1.1."/>
+        <FIELD NAME="chunk_count" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of RAG passages retrieved for this turn; 0 means retrieval ran and found nothing."/>
+        <FIELD NAME="top_score" TYPE="number" LENGTH="10" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="Similarity score of the best retrieved passage."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>

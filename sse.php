@@ -197,6 +197,13 @@ if (function_exists('apache_setenv')) {
 @ini_set('output_buffering', 'Off');
 
 // Set SSE headers.
+// v7.1.1: keep running if the learner closes the tab. The reply row is written
+// only after the stream completes, so without this PHP aborts at the next flush
+// and the turn vanishes -- indistinguishable from a provider error, which is why
+// 9.5% of conversations had a question and no answer and no way to tell which.
+// We still record that the client went away; see $streamoutcome below.
+ignore_user_abort(true);
+
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
@@ -213,6 +220,63 @@ while (ob_get_level() > 0) {
 
 // Ensure each echo/flush goes directly to the client without buffering.
 ob_implicit_flush(true);
+
+/**
+ * Record a turn that failed, so it is not silently missing.
+ *
+ * v7.1.1. Before this, a provider error wrote nothing at all: the learner's
+ * question was already saved, the reply never was, and the conversation was
+ * indistinguishable from one where the learner simply walked away. That is 9.5%
+ * of conversations on production with no way to tell a bug from a bounce.
+ *
+ * Best-effort and never throws — this runs inside a catch block, and an error
+ * while recording an error must not replace the original.
+ *
+ * @param mixed $conv Conversation record, or null if we never got one.
+ * @param int $userid
+ * @param int $courseid
+ * @param string $partial Whatever had streamed before the failure.
+ * @param string $errclass Exception class, recorded instead of the message so
+ *        no provider detail reaches a column learners can export.
+ * @param int|null $pageid
+ * @param string $interactiontype
+ * @return void
+ */
+function local_ai_course_assistant_record_failed_turn(
+    $conv,
+    int $userid,
+    int $courseid,
+    string $partial,
+    string $errclass,
+    ?int $pageid,
+    string $interactiontype
+): void {
+    try {
+        if (empty($conv->id) || empty($userid)) {
+            return;
+        }
+        \local_ai_course_assistant\conversation_manager::add_message(
+            (int) $conv->id,
+            $userid,
+            $courseid,
+            'assistant',
+            $partial !== '' ? $partial : '[no response: ' . $errclass . ']',
+            0,
+            '',
+            null,
+            null,
+            null,
+            $interactiontype,
+            $pageid ?: null,
+            null,
+            null,
+            'provider_error'
+        );
+    } catch (\Throwable $ignore) {
+        // Deliberately swallowed: see the docblock.
+        debugging('could not record failed turn: ' . $ignore->getMessage(), DEBUG_DEVELOPER);
+    }
+}
 
 /**
  * Send an SSE data event.
@@ -369,11 +433,24 @@ try {
             // its own relevant chunks rather than a head-truncated dump).
             $retrievedchunks = rag_retriever::retrieve($courseid, $message, $topk, (int) $pageid);
             $raglatencyms = (int) round((microtime(true) - $ragstart) * 1000);
+            // v7.1.1: record what retrieval actually returned. This was
+            // previously inferred from prompt_tokens, which is not a valid proxy
+            // -- providers report that field differently. 0 is meaningful and
+            // distinct from null: retrieval ran and found nothing.
+            $chunkcount = count($retrievedchunks);
+            $topscore = null;
+            foreach ($retrievedchunks as $c) {
+                if (isset($c['score']) && ($topscore === null || (float) $c['score'] > $topscore)) {
+                    $topscore = (float) $c['score'];
+                }
+            }
         } catch (\Throwable $e) {
             // Fallback to content stuffing — log but don't fail the request.
             debugging('RAG retrieval failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             $retrievedchunks = [];
             $raglatencyms = null;
+            $chunkcount = null;
+            $topscore = null;
         }
     }
 
@@ -913,7 +990,10 @@ try {
         $interactiontype,
         $pageid ?: null,
         $raglatencyms,
-        $cachedtokens !== null ? (int) $cachedtokens : null
+        $cachedtokens !== null ? (int) $cachedtokens : null,
+        connection_aborted() ? 'client_aborted' : 'complete',
+        $chunkcount ?? null,
+        $topscore ?? null
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs
@@ -1059,6 +1139,10 @@ try {
     } catch (\Throwable $ignore) {
         /* never let audit logging mask the real error */
     }
+    local_ai_course_assistant_record_failed_turn(
+        $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
+        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat'
+    );
     local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
     // Send actual message in debug mode, generic otherwise.
@@ -1070,6 +1154,10 @@ try {
         . ', userid=' . (int)($USER->id ?? 0)
         . ', pageid=' . (int)($pageid ?? 0) . ')',
         DEBUG_DEVELOPER
+    );
+    local_ai_course_assistant_record_failed_turn(
+        $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
+        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat'
     );
     try {
         // moodle_exception::$debuginfo carries the provider's own error text —
