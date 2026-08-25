@@ -1,4 +1,4 @@
-# Catalyst: support-hours estimate, SOLA v6.8.2 → v7.1.0
+# Catalyst: support-hours estimate, SOLA v6.8.2 → v7.1.1
 
 Status: DRAFT for Tom to send (Catalyst ticket + cc Artem). Prepared 2026-08-25.
 Not a deployment request — this asks Catalyst to price the work first.
@@ -9,18 +9,18 @@ full scoping detail back.
 
 ---
 
-Subject: Support-hours estimate: SOLA plugin upgrade v6.8.2 → v7.1.0 (Learn + Degrees)
+Subject: Support-hours estimate: SOLA plugin upgrade v6.8.2 → v7.1.1 (Learn + Degrees)
 
 Hi team,
 
 Could you estimate the support hours to upgrade the SOLA plugin
 (`local_ai_course_assistant`) on Learn and Degrees, from v6.8.2 (build
-2026061702) to v7.1.0 (build 2026082501)?
+2026061702) to v7.1.1 (build 2026082600)?
 
-Release: https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.1.0
+Release: https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.1.1
 
 Please take the build number from this message rather than the release page: the
-release is named 7.1.0 and the build we want deployed is 2026082501.
+release is named 7.1.0 and the build we want deployed is 2026082600.
 
 We want the figure before booking a slot, but please include your lead time,
 because this upgrade carries security fixes. An adversarial review produced five
@@ -34,10 +34,11 @@ it during any quiz or exam.
 
 - One plugin, one zip. Install over `local/ai_course_assistant`, run the upgrade,
   purge caches. Nothing outside the plugin directory is touched.
-- 123 commits, 504 files. Fourteen upgrade steps, all additive: 3 new tables, 46
-  fields, 12 keys, 7 indexes. No drops, no renames, no data migrations.
+- 122 commits, 507 files. Fifteen upgrade steps, all additive. The schema gains 3
+  new tables and 6 new columns on existing ones; no keys, no indexes, no drops, no
+  renames, no data migrations.
 - No new server dependencies.
-- 28 JavaScript bundles change, so the cache purge is required rather than
+- 14 JavaScript bundles change, so the cache purge is required rather than
   optional.
 - Rollback is reinstalling the v6.8.2 zip. Because the schema changes are additive
   only, a downgrade leaves the new columns unused rather than broken.
@@ -52,6 +53,10 @@ No action needed from you; listed so they are on the record.
 - Learning Radar charts in Redash will need an `Authorization` header, which we
   will add.
 - Prompts grow modestly on activity pages.
+- The assistant replies in the language a learner writes in. Detection existed but
+  had never run: the client always sent "en". Learners who explicitly choose a
+  language are unaffected. Relevant to the ESL courses, where we may want to pin
+  English deliberately rather than rely on the previous behavior.
 
 ## Questions
 
