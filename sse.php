@@ -385,7 +385,10 @@ try {
     if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()
             && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
         local_ai_course_assistant_sse_send([
-            'token' => get_string('quizlock:blocked', 'local_ai_course_assistant'),
+            // branding::str, not get_string: the string carries a [[tutorshort]]
+            // token and the SSE token path does no brand resolution, so a bare
+            // get_string streams the literal token to the learner.
+            'token' => \local_ai_course_assistant\branding::str('quizlock:blocked'),
         ]);
         local_ai_course_assistant_sse_send(['done' => true]);
         exit;

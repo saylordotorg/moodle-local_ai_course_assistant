@@ -92,12 +92,16 @@ class quiz_lock {
         }
 
         $now = time();
+        // All arithmetic involving a placeholder is done here, not in SQL.
+        // Postgres types placeholders independently, so "$4 - $5" is
+        // `unknown - unknown` and it refuses with "operator is not unique";
+        // MySQL infers happily, which is why this passed locally and failed on
+        // the pgsql matrix. Every placeholder below is now compared against a
+        // column expression, so its type is always inferrable.
         $params = [
-            'userid'  => $userid,
-            'now1'    => $now,
-            'now2'    => $now,
-            'grace'   => self::GRACE_SECONDS,
-            'window'  => self::window_seconds(),
+            'userid'        => $userid,
+            'nowminusgrace' => $now - self::GRACE_SECONDS,
+            'cutoff'        => $now - self::window_seconds(),
         ];
 
         // An attempt counts while it is inside its own time limit (plus grace),
@@ -110,9 +114,15 @@ class quiz_lock {
              LEFT JOIN {local_ai_course_assistant_quiz_cfg} cfg ON cfg.cmid = cm.id
                  WHERE qa.userid = :userid
                    AND qa.state = 'inprogress'
+                   -- Teacher previews write a real attempt row with preview=1
+                   -- and it survives navigating away, so without this a teacher
+                   -- who previewed an untimed quiz is locked out of the
+                   -- assistant in every course for the whole window. Core's
+                   -- quiz_get_user_attempts() filters the same way.
+                   AND qa.preview = 0
                    AND (
-                         (q.timelimit > 0 AND qa.timestart >= :now1 - q.timelimit - :grace)
-                      OR (q.timelimit = 0 AND qa.timestart >= :now2 - :window)
+                         (q.timelimit > 0 AND qa.timestart + q.timelimit >= :nowminusgrace)
+                      OR (q.timelimit = 0 AND qa.timestart >= :cutoff)
                        )
                    AND (cfg.assistance_level IS NULL OR cfg.assistance_level <> 'full')
               ORDER BY qa.timestart DESC";

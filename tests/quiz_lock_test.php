@@ -55,9 +55,15 @@ final class quiz_lock_test extends \advanced_testcase {
      * @param int $timelimit  Quiz time limit in seconds (0 = open ended).
      * @param int $agoseconds How long ago the attempt started.
      * @param string $state   Attempt state.
+     * @param int $preview    1 for a teacher preview attempt.
      * @return \stdClass The quiz module record (has ->cmid).
      */
-    private function make_attempt(int $timelimit, int $agoseconds, string $state = 'inprogress'): \stdClass {
+    private function make_attempt(
+        int $timelimit,
+        int $agoseconds,
+        string $state = 'inprogress',
+        int $preview = 0
+    ): \stdClass {
         global $DB;
         $quiz = $this->getDataGenerator()->create_module('quiz', [
             'course' => $this->course->id,
@@ -70,6 +76,7 @@ final class quiz_lock_test extends \advanced_testcase {
             'uniqueid' => $DB->count_records('quiz_attempts') + 1000,
             'layout' => '1,0',
             'state' => $state,
+            'preview' => $preview,
             'timestart' => time() - $agoseconds,
             'timefinish' => 0,
             'timemodified' => time(),
@@ -110,6 +117,42 @@ final class quiz_lock_test extends \advanced_testcase {
         $this->make_attempt(1800, 10800);
         $this->assertFalse(quiz_lock::is_locked_for((int) $this->user->id),
             'past its own time limit plus grace, the attempt stops counting');
+    }
+
+    /**
+     * A teacher previewing a quiz writes a real attempt row (preview=1,
+     * state='inprogress') that survives navigating away. Without a preview
+     * filter, that teacher is locked out of the assistant in EVERY course for
+     * the whole window, with nothing on screen explaining why. Core's
+     * quiz_get_user_attempts() filters preview rows for the same reason.
+     *
+     * The first version of this fixture omitted the column entirely, so every
+     * attempt defaulted to preview=0 and the gap was invisible to the suite.
+     */
+    public function test_a_teacher_preview_does_not_lock(): void {
+        $this->make_attempt(0, 120, 'inprogress', 1);
+        $this->assertFalse(quiz_lock::is_locked_for((int) $this->user->id),
+            'a preview attempt is not a learner sitting an exam');
+    }
+
+    public function test_a_real_attempt_still_locks_alongside_a_preview(): void {
+        $this->make_attempt(0, 120, 'inprogress', 1);
+        $this->make_attempt(0, 120, 'inprogress', 0);
+        $this->assertTrue(quiz_lock::is_locked_for((int) $this->user->id),
+            'the preview filter must not swallow genuine attempts');
+    }
+
+    /**
+     * The blocked message carries a [[tutorshort]] branding token. Nothing
+     * resolves brand tokens on the way out of an exception or an SSE token, so
+     * the call sites must use branding::str; a bare get_string ships the literal
+     * token to the learner in all 46 languages.
+     */
+    public function test_the_blocked_message_has_no_unresolved_branding_token(): void {
+        $resolved = \local_ai_course_assistant\branding::str('quizlock:blocked');
+        $this->assertStringNotContainsString('[[', $resolved,
+            'brand tokens must be resolved before the learner sees this');
+        $this->assertNotEmpty($resolved);
     }
 
     public function test_a_finished_attempt_does_not_lock(): void {
