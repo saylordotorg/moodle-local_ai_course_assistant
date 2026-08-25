@@ -1396,7 +1396,7 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // this release can be rolled back without a reindex. Backfill is a
         // separate, resumable step (admin/cli/backfill_embedding_bin.php)
         // rather than an upgrade-time loop, because converting a large
-        // catalogue inside the upgrade would block the site.
+        // catalog inside the upgrade would block the site.
         $table = new xmldb_table('local_ai_course_assistant_chunks');
         $field = new xmldb_field(
             'embedding_bin',
@@ -1483,6 +1483,73 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2026082200, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082500) {
+        // v7.0.6: migrate saved conversation-starter config.
+        //
+        // Two changes, both applied ONLY where the site is still on the
+        // superseded default, so an admin who wrote their own copy keeps it:
+        //
+        //  1. study-plan's prompt asked the assistant to open with two
+        //     questions. Learners who opened with that chip bounced at 43.9%
+        //     against 24.2% for learners who typed their own question
+        //     (measured on learn.saylor.org, 90 days to 2026-08-24, and
+        //     replicated on degrees.saylor.org). The new copy proposes a plan
+        //     first and asks afterwards.
+        //
+        //  2. help-page gains conditional='activity' so it is not offered on
+        //     the course home page, where its {page} placeholder expands to
+        //     the whole course name and the answer is a catalog summary.
+        //
+        // Sites that never touched starters have no stored value and simply
+        // pick up the new get_defaults(); nothing to migrate there.
+        $saved = get_config('local_ai_course_assistant', 'custom_starters');
+        if (!empty($saved)) {
+            $starters = json_decode($saved, true);
+            if (is_array($starters)) {
+                $oldstudyplan = "I'd like to plan my current study session. Please ask me: "
+                    . '(1) what I want to accomplish today, and (2) how much time I have '
+                    . "available. If we've discussed a study plan before, build on it.";
+                $newstudyplan = 'Suggest a focused plan for my study session in this course '
+                    . 'right now. Propose a concrete first step and a realistic 30-minute '
+                    . 'sequence based on where I am in the course, and cite the specific '
+                    . 'activities to work through. Then ask if I want to adjust the time '
+                    . 'or the focus.';
+
+                $changed = false;
+                foreach ($starters as $i => $starter) {
+                    $key = $starter['key'] ?? '';
+                    if ($key === 'study-plan'
+                            && trim((string) ($starter['prompt'] ?? '')) === $oldstudyplan) {
+                        $starters[$i]['prompt'] = $newstudyplan;
+                        $changed = true;
+                    }
+                    if ($key === 'help-page' && (string) ($starter['conditional'] ?? '') === '') {
+                        $starters[$i]['conditional'] = 'activity';
+                        $changed = true;
+                    }
+                }
+
+                if ($changed) {
+                    set_config(
+                        'custom_starters',
+                        json_encode($starters),
+                        'local_ai_course_assistant'
+                    );
+                }
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026082500, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082501) {
+        // v7.1.0 introduces the quiz lock. Nothing to migrate: quiz_lock_enabled
+        // defaults to on in code when unset, and quiz_cfg rows are untouched --
+        // an explicit per-quiz 'full' still opts that quiz out. The behaviour
+        // change is documented in the release notes rather than encoded here.
+        upgrade_plugin_savepoint(true, 2026082501, 'local', 'ai_course_assistant');
     }
 
     return true;

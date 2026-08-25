@@ -1961,3 +1961,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — cerca de {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Precisão total';
 $string['settings:embed_dtype_shortint8'] = 'Precisão reduzida';
 $string['settings:embed_dtype_shortbinary'] = 'Menor';
+
+$string['quizlock:blocked'] = 'O assistente [[tutorshort]] não está disponível enquanto você tiver um questionário em andamento. Envie ou feche sua tentativa e ele voltará a ficar disponível.';
+$string['quizlock:heading'] = 'Modo questionário';
+$string['quizlock:enabled'] = 'Bloquear o assistente durante questionários do Moodle';
+$string['quizlock:enabled_desc'] = 'Bloqueia o assistente em todos os lugares — chat, voz, flashcards, questionários de prática — enquanto o estudante tiver uma tentativa de questionário em andamento. A verificação é feita no servidor, então abrir outra aba não contorna. O professor pode isentar um questionário definindo seu nível de assistência como Ajuda completa.';
+$string['quizlock:window'] = 'Janela de validade da tentativa (minutos)';
+$string['quizlock:window_desc'] = 'Por quanto tempo uma tentativa em um questionário sem limite de tempo ainda conta como em andamento. Questionários com limite próprio usam o deles. Tentativas abandonadas permanecem em andamento indefinidamente, então sem esse limite uma delas bloquearia o estudante para sempre. Padrão: 180.';

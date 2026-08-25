@@ -169,6 +169,27 @@ if ($hassiteconfig) {
         $coursemodes
     ));
 
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/quizlock_heading',
+        \local_ai_course_assistant\branding::str('quizlock:heading'),
+        ''
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/quiz_lock_enabled',
+        \local_ai_course_assistant\branding::str('quizlock:enabled'),
+        \local_ai_course_assistant\branding::str('quizlock:enabled_desc'),
+        1
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/quiz_lock_window_minutes',
+        \local_ai_course_assistant\branding::str('quizlock:window'),
+        \local_ai_course_assistant\branding::str('quizlock:window_desc'),
+        180,
+        PARAM_INT
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/auto_open',
         get_string('settings:auto_open', 'local_ai_course_assistant'),

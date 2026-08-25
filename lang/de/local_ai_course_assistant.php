@@ -1939,3 +1939,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — etwa {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Volle Genauigkeit';
 $string['settings:embed_dtype_shortint8'] = 'Reduzierte Genauigkeit';
 $string['settings:embed_dtype_shortbinary'] = 'Kleinster Bedarf';
+
+$string['quizlock:blocked'] = 'Der [[tutorshort]]-Assistent ist nicht verfügbar, solange ein Test läuft. Reichen Sie Ihren Versuch ein oder schließen Sie ihn, dann ist er wieder verfügbar.';
+$string['quizlock:heading'] = 'Testmodus';
+$string['quizlock:enabled'] = 'Assistent während Moodle-Tests sperren';
+$string['quizlock:enabled_desc'] = 'Sperrt den Assistenten überall – Chat, Sprache, Lernkarten, Übungstests – solange ein Lernender einen laufenden Testversuch hat. Die Prüfung erfolgt serverseitig, ein zweiter Tab umgeht sie also nicht. Lehrende können einen Test ausnehmen, indem sie dessen Unterstützungsstufe auf Volle Hilfe setzen.';
+$string['quizlock:window'] = 'Gültigkeitsfenster für Versuche (Minuten)';
+$string['quizlock:window_desc'] = 'Wie lange ein Versuch bei einem Test ohne Zeitbegrenzung noch als laufend gilt. Tests mit eigener Zeitbegrenzung verwenden diese. Abgebrochene Versuche bleiben unbegrenzt laufend; ohne diese Grenze würde einer den Lernenden dauerhaft aussperren. Standard: 180.';

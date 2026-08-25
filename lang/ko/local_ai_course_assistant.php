@@ -1945,3 +1945,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — 약 {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = '완전 정밀도';
 $string['settings:embed_dtype_shortint8'] = '정밀도 축소';
 $string['settings:embed_dtype_shortbinary'] = '가장 작음';
+
+$string['quizlock:blocked'] = '퀴즈를 진행하는 동안에는 [[tutorshort]] 어시스턴트를 사용할 수 없습니다. 응시를 제출하거나 닫으면 다시 사용할 수 있습니다.';
+$string['quizlock:heading'] = '퀴즈 모드';
+$string['quizlock:enabled'] = 'Moodle 퀴즈 중 어시스턴트 잠금';
+$string['quizlock:enabled_desc'] = '학습자가 진행 중인 퀴즈 응시가 있는 동안 채팅, 음성, 플래시카드, 연습 퀴즈 등 모든 화면에서 어시스턴트를 차단합니다. 서버에서 확인하므로 새 탭을 열어도 우회할 수 없습니다. 교사는 퀴즈의 지원 수준을 전체 도움말로 설정해 개별적으로 제외할 수 있습니다.';
+$string['quizlock:window'] = '응시 유효 기간(분)';
+$string['quizlock:window_desc'] = '시간 제한이 없는 퀴즈의 응시가 얼마 동안 진행 중으로 간주되는지입니다. 자체 시간 제한이 있는 퀴즈는 그 값을 사용합니다. 포기된 응시는 무기한 진행 중으로 남으므로, 이 한도가 없으면 하나가 학습자를 영구히 잠급니다. 기본값: 180.';

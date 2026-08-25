@@ -1982,3 +1982,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — körülbelül {$a->size}
 $string['settings:embed_dtype_shortfloat'] = 'Teljes pontosság';
 $string['settings:embed_dtype_shortint8'] = 'Csökkentett pontosság';
 $string['settings:embed_dtype_shortbinary'] = 'A legkisebb';
+
+$string['quizlock:blocked'] = 'A(z) [[tutorshort]] asszisztens nem érhető el, amíg folyamatban lévő tesztje van. Küldje be vagy zárja le a kísérletet, és ismét elérhető lesz.';
+$string['quizlock:heading'] = 'Teszt mód';
+$string['quizlock:enabled'] = 'Az asszisztens zárolása Moodle-tesztek alatt';
+$string['quizlock:enabled_desc'] = 'Mindenhol letiltja az asszisztenst – csevegés, hang, tanulókártyák, gyakorlótesztek –, amíg a tanulónak folyamatban lévő tesztkísérlete van. A vizsgálat a kiszolgálón történik, így egy másik lap megnyitása nem kerüli meg. A tanár egy tesztet felmenthet, ha annak segítségi szintjét Teljes segítségre állítja.';
+$string['quizlock:window'] = 'Kísérlet érvényességi ablaka (perc)';
+$string['quizlock:window_desc'] = 'Meddig számít még folyamatban lévőnek egy kísérlet olyan teszten, amelynek nincs időkorlátja. A saját időkorláttal rendelkező tesztek azt használják. Az elhagyott kísérletek határozatlan ideig folyamatban maradnak, így e korlát nélkül egyetlen kísérlet véglegesen kizárná a tanulót. Alapértelmezett: 180.';

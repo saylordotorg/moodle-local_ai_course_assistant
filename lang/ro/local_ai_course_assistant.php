@@ -1938,3 +1938,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — aproximativ {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Precizie completă';
 $string['settings:embed_dtype_shortint8'] = 'Precizie redusă';
 $string['settings:embed_dtype_shortbinary'] = 'Cea mai mică';
+
+$string['quizlock:blocked'] = 'Asistentul [[tutorshort]] nu este disponibil cât timp aveți un test în curs. Trimiteți sau închideți încercarea și va redeveni disponibil.';
+$string['quizlock:heading'] = 'Mod test';
+$string['quizlock:enabled'] = 'Blocarea asistentului în timpul testelor Moodle';
+$string['quizlock:enabled_desc'] = 'Blochează asistentul peste tot — chat, voce, carduri, teste de exersare — cât timp cursantul are o încercare de test în curs. Verificarea se face pe server, deci deschiderea unei a doua file nu o ocolește. Un profesor poate exclude un test setând nivelul său de asistență la Ajutor complet.';
+$string['quizlock:window'] = 'Fereastra de valabilitate a încercării (minute)';
+$string['quizlock:window_desc'] = 'Cât timp o încercare la un test fără limită de timp mai contează ca fiind în curs. Testele cu limită proprie o folosesc pe aceea. Încercările abandonate rămân în curs pe termen nelimitat, deci fără această limită una singură ar bloca definitiv cursantul. Implicit: 180.';

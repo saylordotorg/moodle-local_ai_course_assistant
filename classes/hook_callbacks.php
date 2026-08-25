@@ -363,7 +363,11 @@ class hook_callbacks {
         $hideonquizforstaff = (bool)get_config('local_ai_course_assistant', 'hide_on_quiz_for_staff');
         $pagetype = $PAGE->pagetype ?? '';
         $modname_early = '';
-        if ($context->contextlevel === CONTEXT_MODULE && !empty($PAGE->cm)) {
+        // v7.0.6: $PAGE->cm !== null, not !empty($PAGE->cm). moodle_page serves
+        // cm through __get() and defines no __isset(), so isset()/empty() on it
+        // report "unset" whatever it holds -- these branches never ran. ?? is
+        // unaffected, which is why $PAGE->pagetype and $PAGE->title work.
+        if ($context->contextlevel === CONTEXT_MODULE && $PAGE->cm !== null) {
             $modname_early = (string)($PAGE->cm->modname ?? '');
         }
         $isquizpage = ($modname_early === 'quiz') || (strpos((string)$pagetype, 'mod-quiz-') === 0);
@@ -485,7 +489,7 @@ class hook_callbacks {
         $currentpagetitle = '';
         $modname = '';
         $pagetype = $PAGE->pagetype ?? '';
-        if ($context->contextlevel === CONTEXT_MODULE && !empty($PAGE->cm)) {
+        if ($context->contextlevel === CONTEXT_MODULE && $PAGE->cm !== null) {
             $currentpageid    = (int)$PAGE->cm->id;
             $currentpagetitle = (string)($PAGE->cm->name ?? '');
             $modname          = (string)($PAGE->cm->modname ?? '');
@@ -500,7 +504,7 @@ class hook_callbacks {
         $quizcoachmode = false;
         $quizcmid = 0;
         if (
-            $modname === 'quiz' && !empty($PAGE->cm) && (
+            $modname === 'quiz' && $PAGE->cm !== null && (
             strpos($pagetype, 'attempt') !== false ||
             (strpos($pagetype, 'view') !== false && strpos($pagetype, 'review') === false)
             )
@@ -556,10 +560,15 @@ class hook_callbacks {
         }
 
         // Load conversation starters from config.
+        // v7.0.6: pass whether this is a real activity page. Starters whose
+        // prompt interpolates {page} are suppressed on the course home page,
+        // where {page} would expand to the whole course name.
+        $hasactivity = $PAGE->cm !== null;
         $starters = \local_ai_course_assistant\starter_manager::get_effective_starters(
             $courseid,
             !empty($ttsurl),
-            $realtimeenabled
+            $realtimeenabled,
+            $hasactivity
         );
 
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the

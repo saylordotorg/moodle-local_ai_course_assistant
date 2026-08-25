@@ -1966,3 +1966,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype}: alrededor de {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Precisión completa';
 $string['settings:embed_dtype_shortint8'] = 'Precisión reducida';
 $string['settings:embed_dtype_shortbinary'] = 'La menor';
+
+$string['quizlock:blocked'] = 'El asistente [[tutorshort]] no está disponible mientras tengas un cuestionario en curso. Envía o cierra tu intento y volverá a estar disponible.';
+$string['quizlock:heading'] = 'Modo cuestionario';
+$string['quizlock:enabled'] = 'Bloquear el asistente durante los cuestionarios de Moodle';
+$string['quizlock:enabled_desc'] = 'Bloquea el asistente en todas partes (chat, voz, tarjetas de memoria, cuestionarios de práctica) mientras un estudiante tenga un intento de cuestionario en curso. Se comprueba en el servidor, así que abrir otra pestaña no lo evita. Un profesor puede eximir un cuestionario poniendo su nivel de asistencia en Ayuda completa.';
+$string['quizlock:window'] = 'Ventana de vigencia del intento (minutos)';
+$string['quizlock:window_desc'] = 'Cuánto tiempo sigue contando como en curso un intento en un cuestionario sin límite de tiempo. Los cuestionarios con su propio límite usan ese. Los intentos abandonados quedan en curso indefinidamente, así que sin este límite uno bloquearía al estudiante para siempre. Valor predeterminado: 180.';

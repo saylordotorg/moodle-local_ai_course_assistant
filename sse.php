@@ -377,6 +377,23 @@ try {
         }
     }
 
+    // v7.1.0: refuse outright while the learner is sitting a quiz. The provider
+    // chokepoint in base_provider enforces this for every surface, but doing it
+    // here too means the learner gets a clear explanation over SSE rather than a
+    // generic provider error, and the refusal costs nothing when it does not
+    // apply. Admins and CLI are exempt via the same conditions used there.
+    if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()
+            && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+        local_ai_course_assistant_sse_send([
+            // branding::str, not get_string: the string carries a [[tutorshort]]
+            // token and the SSE token path does no brand resolution, so a bare
+            // get_string streams the literal token to the learner.
+            'token' => \local_ai_course_assistant\branding::str('quizlock:blocked'),
+        ]);
+        local_ai_course_assistant_sse_send(['done' => true]);
+        exit;
+    }
+
     // v5.2.0: detect per-quiz coach mode. If the current $pageid is a quiz
     // course-module and its assistance level is 'coach', flag it on the prompt
     // so context_builder injects the SAFETY-priority coach-mode block. The

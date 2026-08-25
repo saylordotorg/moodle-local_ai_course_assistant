@@ -1938,3 +1938,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — ungefär {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Full precision';
 $string['settings:embed_dtype_shortint8'] = 'Minskad precision';
 $string['settings:embed_dtype_shortbinary'] = 'Minst';
+
+$string['quizlock:blocked'] = '[[tutorshort]]-assistenten är inte tillgänglig medan du har ett prov igång. Skicka in eller stäng ditt försök, så blir den tillgänglig igen.';
+$string['quizlock:heading'] = 'Provläge';
+$string['quizlock:enabled'] = 'Lås assistenten under Moodle-prov';
+$string['quizlock:enabled_desc'] = 'Blockerar assistenten överallt – chatt, röst, flashkort, övningsprov – så länge en deltagare har ett pågående provförsök. Kontrolleras på servern, så en andra flik kringgår det inte. En lärare kan undanta ett enskilt prov genom att sätta dess hjälpnivå till Full hjälp.';
+$string['quizlock:window'] = 'Giltighetsfönster för försök (minuter)';
+$string['quizlock:window_desc'] = 'Hur länge ett försök på ett prov utan tidsgräns fortfarande räknas som pågående. Prov med egen tidsgräns använder den. Övergivna försök förblir pågående på obestämd tid, så utan denna gräns skulle ett enda låsa ute deltagaren permanent. Standard: 180.';

@@ -97,7 +97,8 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'
     WHEN m.interaction_type IN ('meta')                                     THEN 'analytics'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
-    WHEN m.interaction_type IN ('chat','quiz') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'
+    WHEN m.interaction_type IN ('quiz')                                     THEN 'quiz'
+    WHEN m.interaction_type IN ('chat') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'
     ELSE 'other'
 END";
 
@@ -112,6 +113,9 @@ $categorylabels = [
     'rag'            => get_string('emergency:flag_rag', 'local_ai_course_assistant'),
     'analytics'      => get_string('token_analytics:cat_analytics', 'local_ai_course_assistant'),
     'premium_route'  => get_string('token_analytics:cat_premium_route', 'local_ai_course_assistant'),
+    // v7.1.0: reuse the already-translated column heading rather than adding an
+    // English-only key, same reasoning as the two above.
+    'quiz'           => get_string('quizsettings:colquiz', 'local_ai_course_assistant'),
     'other'          => get_string('token_analytics:cat_other', 'local_ai_course_assistant'),
 ];
 

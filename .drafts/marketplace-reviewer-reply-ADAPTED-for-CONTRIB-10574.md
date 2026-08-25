@@ -2,9 +2,14 @@ Hello Volodymyr,
 
 Answering your 26 June request first: **the latest version is now uploaded.**
 
-v7.0.2 (build `2026082100`) was submitted to Moodle Marketplace on 21 August 2026
-against this review, replacing the 7.0.0 file that was there before. It declares
-Moodle 4.5, 5.0, 5.1 and 5.2, repository tag `v7.0.2`.
+v7.0.5 (build `2026082400`) was submitted to Moodle Marketplace on 24 August 2026
+against this review, replacing the earlier file. It declares Moodle 4.5, 5.0, 5.1
+and 5.2, repository tag `v7.0.5`.
+
+**Please review v7.0.5 rather than any earlier upload.** Three releases have
+landed since the version you last saw, and the most recent is a security release
+we initiated ourselves — details below, because some of it changes answers we
+gave you previously.
 
 ## Your 16 June findings
 
@@ -53,7 +58,7 @@ is cited at line 1380 in a file that is 458 lines long. The remaining five are
 genuine SQL construction, but in each the interpolated variable is a string
 literal defined a few lines above with no request data in it, and every
 user-supplied value is bound through a named placeholder. The clearest case is
-`token_analytics.php` (line 93 in v7.0.2, line 90 in v7.0.1), where the variable
+`token_analytics.php` (line 93 in v7.0.5), where the variable
 is a fixed `CASE` expression used as a `GROUP BY` key:
 
     $categorysql = "CASE
@@ -90,17 +95,17 @@ requires the URL in an email to work without an authenticated session: the
 recipient clicks a link in their mail client, or the mail provider issues an
 unattended POST, and neither carries a Moodle session cookie. Adding
 `require_login()` would redirect the learner to a login page and break the
-unsubscribe mechanism that Gmail and others require us to honour, and it would
+unsubscribe mechanism that Gmail and others require us to honor, and it would
 be worse for the learner, who could no longer opt out without holding an account.
 `talking_avatar_webhook.php` receives callbacks from a third-party video provider
 that has no Moodle account. `redash_export.php` is a reporting API consumed by a
 BI tool with a bearer key.
 
 Each of those files carries a header comment stating that it is deliberately
-token-authenticated and not session-gated, with the reason. We are happy to
-strengthen that documentation, add rate limiting, or restrict them further — but
-session authentication is not something we can add to these five without
-breaking the features.
+token-authenticated and not session-gated, with the reason. Rate limiting, which
+we offered previously, has since been added. We remain happy to strengthen the
+documentation or restrict these further — but session authentication is not
+something we can add to these five without breaking the features.
 
 **One related note that may be useful for other submissions.** Between two of our
 uploads, one rule's count rose from 1 occurrence to 6 with no code change,
@@ -111,6 +116,51 @@ comments as well as in code. We have since reworded those comments, and verified
 the change was comment-only by comparing each file's PHP token stream with
 comments and whitespace stripped.
 
+## What has changed since the version you last reviewed
+
+Three releases have shipped since v7.0.2, and one of them is directly relevant to
+a security review.
+
+**v7.0.5 (24 August) is a security release.** We commissioned an adversarial
+review of our own code and it produced eleven findings, five of them high
+severity. All eleven are fixed in the version now uploaded, along with five more
+found while fixing them. None involved an AI vendor; every one was our own code.
+The five that mattered most:
+
+- A learner holding our `:use` capability in any one course could read the text of
+  any Page or Book on the site, including hidden activities in their own course,
+  by passing that module's id. The helper resolved the course from the id it was
+  given rather than from the caller's authorised course, and did not check
+  visibility. Both are now enforced.
+- The voice feature's enable setting was checked only where the button is drawn,
+  not at the endpoint, so a learner could mint a live voice credential with the
+  feature switched off.
+- That endpoint also returned the full system prompt to the browser. It now goes
+  to the provider server-side.
+- No rate limiting existed on any of our 47 external functions.
+- A support escalation carrying a learner's transcript could be triggered by text
+  written into course content rather than by the learner.
+
+Two of your original findings are worth revisiting in that light, because our
+earlier answers are now out of date in your favor:
+
+**Rate limiting.** In our previous reply we offered to add rate limiting to the
+token-authenticated endpoints. That is now done, and more broadly: a per-user
+limit sits on the single code path every AI provider call passes through, and the
+existing limiter, which performed an unsynchronised read-modify-write and so did
+not actually limit concurrent requests, is now serialised.
+
+**`redash_export.php`.** It still authenticates by bearer key compared with
+`hash_equals()`, but the credential no longer travels in a URL. Our own admin
+interface used to generate links with the key embedded, including into a query
+body stored inside the third-party reporting tool. Links now carry a short-lived
+HMAC token derived from the key and scoped to one user, and the setup flow
+directs administrators to send the key as an `Authorization: Bearer` header.
+
+We mention these not to reopen settled findings but because a reviewer reading
+our June answers alongside the current code would otherwise find them
+inconsistent.
+
 ## On licensing
 
 If it is also relevant to the review: the plugin requires no license key, no
@@ -119,7 +169,7 @@ which uses Moodle's own `core_ai` subsystem when one is configured, so the plugi
 is fully functional with no credential from us. Every outbound host is either a
 third-party AI vendor the administrator brings their own key for, or the GitHub
 API for the optional update check. There is no call to any Saylor service and no
-phone-home. Licence: GNU GPL v3 or later, `LICENSE` in the package root.
+phone-home. License: GNU GPL v3 or later, `LICENSE` in the package root.
 
 ## What would help us
 

@@ -182,6 +182,22 @@ abstract class openai_compatible_provider extends base_provider {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
         }
 
+        // v7.0.6: capture usage on the NON-streaming path too. Until now only
+        // chat_completion_stream() populated this, so every non-streaming
+        // caller -- quiz generation, the mastery classifier, digests, essay
+        // scoring -- reported no tokens at all and contributed nothing to
+        // spend_guard's totals. The non-streaming response carries the same
+        // usage object; there was no reason to drop it.
+        $this->last_token_usage = null;
+        if (!empty($data['usage'])) {
+            $this->last_token_usage = [
+                'prompt_tokens'     => (int) ($data['usage']['prompt_tokens'] ?? 0),
+                'completion_tokens' => (int) ($data['usage']['completion_tokens'] ?? 0),
+                'model'             => $data['model'] ?? $this->model,
+                'cached_tokens'     => (int) ($data['usage']['prompt_tokens_details']['cached_tokens'] ?? 0),
+            ];
+        }
+
         return $data['choices'][0]['message']['content'];
     }
 

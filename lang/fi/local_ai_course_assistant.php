@@ -1939,3 +1939,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — noin {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Täysi tarkkuus';
 $string['settings:embed_dtype_shortint8'] = 'Pienennetty tarkkuus';
 $string['settings:embed_dtype_shortbinary'] = 'Pienin';
+
+$string['quizlock:blocked'] = '[[tutorshort]]-avustaja ei ole käytettävissä, kun sinulla on tentti kesken. Palauta tai sulje yrityksesi, niin avustaja on taas käytettävissä.';
+$string['quizlock:heading'] = 'Tenttitila';
+$string['quizlock:enabled'] = 'Lukitse avustaja Moodle-tenttien ajaksi';
+$string['quizlock:enabled_desc'] = 'Estää avustajan kaikkialla – keskustelu, puhe, muistikortit, harjoitustentit – kun opiskelijalla on tenttiyritys kesken. Tarkistus tehdään palvelimella, joten toisen välilehden avaaminen ei kierrä sitä. Opettaja voi vapauttaa yksittäisen tentin asettamalla sen tukitason arvoon Täysi apu.';
+$string['quizlock:window'] = 'Yrityksen voimassaoloikkuna (minuuttia)';
+$string['quizlock:window_desc'] = 'Kuinka kauan yritys ilman aikarajaa olevassa tentissä lasketaan yhä keskeneräiseksi. Tentit, joilla on oma aikaraja, käyttävät sitä. Hylätyt yritykset jäävät keskeneräisiksi rajattomasti, joten ilman tätä rajaa yksi lukitsisi opiskelijan pysyvästi. Oletus: 180.';

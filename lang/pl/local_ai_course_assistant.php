@@ -1938,3 +1938,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — około {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Pełna precyzja';
 $string['settings:embed_dtype_shortint8'] = 'Obniżona precyzja';
 $string['settings:embed_dtype_shortbinary'] = 'Najmniejsza';
+
+$string['quizlock:blocked'] = 'Asystent [[tutorshort]] jest niedostępny, gdy masz rozpoczęty test. Prześlij lub zamknij swoje podejście, a asystent znów będzie dostępny.';
+$string['quizlock:heading'] = 'Tryb testu';
+$string['quizlock:enabled'] = 'Blokuj asystenta podczas testów Moodle';
+$string['quizlock:enabled_desc'] = 'Blokuje asystenta wszędzie – czat, głos, fiszki, testy ćwiczeniowe – gdy uczący się ma rozpoczęte podejście do testu. Sprawdzane po stronie serwera, więc otwarcie drugiej karty tego nie omija. Nauczyciel może wyłączyć jeden test, ustawiając jego poziom pomocy na Pełna pomoc.';
+$string['quizlock:window'] = 'Okno ważności podejścia (minuty)';
+$string['quizlock:window_desc'] = 'Jak długo podejście do testu bez limitu czasu nadal liczy się jako trwające. Testy z własnym limitem używają swojego. Porzucone podejścia pozostają trwające bezterminowo, więc bez tego ograniczenia jedno zablokowałoby uczącego się na zawsze. Domyślnie: 180.';

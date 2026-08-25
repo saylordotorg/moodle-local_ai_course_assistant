@@ -1974,3 +1974,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — cishe {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Ukunemba okuphelele';
 $string['settings:embed_dtype_shortint8'] = 'Ukunemba okuncishisiwe';
 $string['settings:embed_dtype_shortbinary'] = 'Okuncane kunazo zonke';
+
+$string['quizlock:blocked'] = 'Umsizi we-[[tutorshort]] awutholakali ngenkathi unesivivinyo esiqhubekayo. Thumela noma uvale umzamo wakho, bese uzophinde utholakale.';
+$string['quizlock:heading'] = 'Imodi yesivivinyo';
+$string['quizlock:enabled'] = 'Khiya umsizi ngesikhathi sezivivinyo ze-Moodle';
+$string['quizlock:enabled_desc'] = 'Ivimbela umsizi yonke indawo — ingxoxo, izwi, amakhadi okufunda, izivivinyo zokuzilolonga — uma umfundi enomzamo wesivivinyo oqhubekayo. Kuhlolwa kuseva, ngakho ukuvula ithebhu yesibili akukugwemi. Uthisha angakhipha isivivinyo esisodwa ngokusetha izinga losizo lwaso ku-Usizo olugcwele.';
+$string['quizlock:window'] = 'Isikhathi somzamo osasebenza (imizuzu)';
+$string['quizlock:window_desc'] = 'Isikhathi umzamo esivivinyweni esingenamkhawulo wesikhathi osabalwa ngaso njengoqhubekayo. Izivivinyo ezinomkhawulo wazo zisebenzisa lowo. Imizamo eshiyiwe ihlala iqhubeka ingapheli, ngakho ngaphandle kwalo mkhawulo owodwa ubuzokhiya umfundi unomphela. Okuzenzakalelayo: 180.';

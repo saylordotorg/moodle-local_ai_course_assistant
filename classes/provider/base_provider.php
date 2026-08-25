@@ -446,37 +446,7 @@ abstract class base_provider implements provider_interface {
             $overrides['provider'] = $provider;
         }
 
-        // Spend guard: consult the cap before instantiation. If the site is
-        // over the cap for chat/analytics workload, try the failover chain.
-        // If no failover is configured, throw; the SSE handler catches this
-        // and shows a friendly "budget paused" message to the student.
-        // Read defensively; a fresh install has no caps and this is a no-op.
-        //
-        // SECURITY / COST: a per-user floor for every provider call, applied
-        // here because this is the one path they all converge on. Not one of
-        // the ~47 files in classes/external/ contained any throttling, and
-        // spend_guard below is a LAGGING monthly guard that returns CAP_OK
-        // whenever no cap is configured -- the shipped state, since the caps
-        // have no defaults. So out of the box an authenticated student could
-        // loop generate_quiz or generate_flashcards with nothing in the way
-        // but the next morning's cost_anomaly_check, which is off by default.
-        //
-        // Deliberately generous (120/minute) so it never interrupts real use:
-        // it exists to stop a scripted loop, not to pace a person. Endpoints
-        // that need a tighter bound keep their own (sse 20/60, tts 30/60,
-        // transcribe 20/60, soapbox 12/600). Admins are exempt so bulk CLI and
-        // benchmark runs are unaffected.
-        if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()) {
-            if (\local_ai_course_assistant\rate_limiter::is_rate_limited(
-                    (int) $USER->id, 'provider_call', 120, 60)) {
-                throw new \moodle_exception(
-                    'error',
-                    'local_ai_course_assistant',
-                    '',
-                    'Too many AI requests; please wait a moment and try again.'
-                );
-            }
-        }
+        self::enforce_learner_guards();
 
         try {
             $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
@@ -605,7 +575,74 @@ abstract class base_provider implements provider_interface {
      * @return provider_interface
      * @throws \moodle_exception If provider is unknown.
      */
+    /**
+     * Per-learner guards that must run before ANY provider client is handed out.
+     *
+     * One method, called by every factory. Putting these in create_from_config()
+     * alone left create_for_comparison() open -- and that is the factory
+     * generate_quiz prefers whenever a site configures a separate quiz tier,
+     * which is exactly what the quiz lock exists to stop. A guard that covers
+     * most entry points is the shape of bug this release is fixing.
+     *
+     * Admins and CLI are exempt so bulk scripts and scheduled tasks still run.
+     *
+     * @return void
+     * @throws \moodle_exception
+     */
+    private static function enforce_learner_guards(): void {
+        global $USER;
+
+        if (CLI_SCRIPT || empty($USER->id) || is_siteadmin()) {
+            return;
+        }
+
+        // Spend guard: consult the cap before instantiation. If the site is
+        // over the cap for chat/analytics workload, try the failover chain.
+        // If no failover is configured, throw; the SSE handler catches this
+        // and shows a friendly "budget paused" message to the student.
+        // Read defensively; a fresh install has no caps and this is a no-op.
+        //
+        // SECURITY / COST: a per-user floor for every provider call, applied
+        // here because this is the one path they all converge on. Not one of
+        // the ~47 files in classes/external/ contained any throttling, and
+        // spend_guard below is a LAGGING monthly guard that returns CAP_OK
+        // whenever no cap is configured -- the shipped state, since the caps
+        // have no defaults. So out of the box an authenticated student could
+        // loop generate_quiz or generate_flashcards with nothing in the way
+        // but the next morning's cost_anomaly_check, which is off by default.
+        //
+        // Deliberately generous (120/minute) so it never interrupts real use:
+        // it exists to stop a scripted loop, not to pace a person. Endpoints
+        // that need a tighter bound keep their own (sse 20/60, tts 30/60,
+        // transcribe 20/60, soapbox 12/600). Admins are exempt so bulk CLI and
+        // benchmark runs are unaffected.
+        if (\local_ai_course_assistant\rate_limiter::is_rate_limited(
+                (int) $USER->id, 'provider_call', 120, 60)) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Too many AI requests; please wait a moment and try again.'
+            );
+        }
+
+        // v7.1.0: no AI assistance while the learner is sitting a Moodle quiz.
+        // branding::str, not get_string: the string carries a [[tutorshort]]
+        // token, and nothing resolves brand tokens on the way out of an
+        // exception, so a bare get_string ships the literal token to the learner.
+        if (\local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                \local_ai_course_assistant\branding::str('quizlock:blocked')
+            );
+        }
+    }
+
     public static function create_for_comparison(string $providerid, string $model, int $courseid = 0): provider_interface {
+        self::enforce_learner_guards();
+
         $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
         // Which vendor the inherited apikey actually belongs to, captured
         // before 'provider' is overwritten below.

@@ -1968,3 +1968,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — kira-kira {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Ketepatan penuh';
 $string['settings:embed_dtype_shortint8'] = 'Ketepatan dikurangkan';
 $string['settings:embed_dtype_shortbinary'] = 'Terkecil';
+
+$string['quizlock:blocked'] = 'Pembantu [[tutorshort]] tidak tersedia semasa anda mempunyai kuiz yang sedang berjalan. Hantar atau tutup percubaan anda, kemudian ia akan tersedia semula.';
+$string['quizlock:heading'] = 'Mod kuiz';
+$string['quizlock:enabled'] = 'Kunci pembantu semasa kuiz Moodle';
+$string['quizlock:enabled_desc'] = 'Menyekat pembantu di semua tempat — sembang, suara, kad imbas, kuiz latihan — selagi pelajar mempunyai percubaan kuiz yang sedang berjalan. Diperiksa di pelayan, jadi membuka tab kedua tidak dapat mengelaknya. Guru boleh mengecualikan satu kuiz dengan menetapkan tahap bantuannya kepada Bantuan penuh.';
+$string['quizlock:window'] = 'Tetingkap sah percubaan (minit)';
+$string['quizlock:window_desc'] = 'Berapa lama percubaan pada kuiz tanpa had masa masih dikira sedang berjalan. Kuiz yang mempunyai had masa sendiri menggunakan had itu. Percubaan yang ditinggalkan kekal berjalan tanpa had, jadi tanpa had ini satu sahaja akan mengunci pelajar selama-lamanya. Lalai: 180.';
