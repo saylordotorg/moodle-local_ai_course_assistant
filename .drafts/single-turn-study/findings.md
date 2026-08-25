@@ -4,6 +4,20 @@ Read of 50 single-turn conversations on Learn, with the key result replicated on
 90 days to 24 August 2026. Prepared 24 August 2026; revised same day to add Degrees.
 
 
+STATUS AS OF 25 AUGUST
+
+Everything this study recommended has shipped or is queued:
+  - study-plan chip rewritten on both production sites (config, 24 Aug)
+  - Redash query 2332 splits the bounce metric by opener (24 Aug)
+  - "Explain This Page" scoped to activity pages, and the page-grounding wiring
+    bug behind it fixed, in v7.1.0
+  - quiz spend made visible in v7.1.0
+  - dropped turns and Quiz Me chip instrumentation: still open
+
+One conclusion in section 3b was revised after implementation proved the stated
+cause wrong. That revision is marked inline.
+
+
 BOTTOM LINE
 
 The premise holds on both sites: 1,306 of 3,813 learners (34.3%) sent exactly one message
@@ -159,7 +173,7 @@ Which means the five activity-page answers that cited course material got that
 from RAG retrieval, not from page content. The chip was broken twice: {page}
 expanded to the course name on the course home page, AND the page's text never
 arrived regardless. The second is the larger of the two, and it is a wiring bug
-rather than a targeting problem. Both are fixed in v7.0.6. The numbers above
+rather than a targeting problem. Both are fixed in v7.1.0. The numbers above
 describe behavior with page grounding entirely absent, so the chip should improve
 by more than the targeting fix alone would predict.
 
