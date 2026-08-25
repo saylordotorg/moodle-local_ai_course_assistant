@@ -304,11 +304,21 @@ class generate_quiz extends external_api {
                 ? $provider->get_last_token_usage()
                 : null;
 
-            // The usage array carries no provider id, so resolve it the way
-            // sse.php does: per-course effective config, falling back to site.
-            $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
-            $providername = (string) ($effective['provider']
-                ?? get_config('local_ai_course_assistant', 'provider'));
+            // The usage array carries no provider id, so resolve it the same way
+            // resolve_quiz_provider() picked the client: the dedicated quiz tier
+            // when both its settings are set, otherwise the chat config. Reading
+            // the chat provider unconditionally would misattribute every row on
+            // any site that runs a separate quiz model -- which is the normal
+            // configuration, not an edge case.
+            $quizproviderid = trim((string) get_config('local_ai_course_assistant', 'quiz_provider'));
+            $quizmodel = trim((string) get_config('local_ai_course_assistant', 'quiz_model'));
+            if ($quizproviderid !== '' && $quizmodel !== '') {
+                $providername = $quizproviderid;
+            } else {
+                $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+                $providername = (string) ($effective['provider']
+                    ?? get_config('local_ai_course_assistant', 'provider'));
+            }
 
             $marker = '[Quiz] ' . $count . ' question(s)';
             if ($topic !== '') {
@@ -323,7 +333,11 @@ class generate_quiz extends external_api {
                 isset($usage['model']) ? (string) $usage['model'] : null,
                 isset($usage['prompt_tokens']) ? (int) $usage['prompt_tokens'] : null,
                 isset($usage['completion_tokens']) ? (int) $usage['completion_tokens'] : null,
-                isset($usage['cached_tokens']) ? (int) $usage['cached_tokens'] : null,
+                // Anthropic reports cache_read_tokens, OpenAI reports
+                // cached_tokens. sse.php coalesces both; so must this, or the
+                // counter is silently null for every Claude-served quiz.
+                isset($usage['cached_tokens']) ? (int) $usage['cached_tokens']
+                    : (isset($usage['cache_read_tokens']) ? (int) $usage['cache_read_tokens'] : null),
                 $cmid > 0 ? $cmid : null
             );
         } catch (\Throwable $e) {

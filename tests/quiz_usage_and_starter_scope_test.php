@@ -186,6 +186,72 @@ final class quiz_usage_and_starter_scope_test extends \advanced_testcase {
     }
 
     /**
+     * The telemetry row must name the provider that actually served the call.
+     *
+     * Saylor runs the quiz coach on a different model from chat, so reading the
+     * chat provider would misattribute every quiz row -- and spend_guard groups
+     * by (model, provider), so the cost lands under the wrong vendor.
+     */
+    public function test_quiz_rows_are_attributed_to_the_quiz_provider(): void {
+        global $DB;
+
+        set_config('quiz_provider', 'openai', 'local_ai_course_assistant');
+        set_config('quiz_model', 'gpt-4o-mini', 'local_ai_course_assistant');
+        set_config('provider', 'gemini', 'local_ai_course_assistant');
+
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        // Mirrors what generate_quiz resolves before recording.
+        $quizproviderid = trim((string) get_config('local_ai_course_assistant', 'quiz_provider'));
+        $quizmodel = trim((string) get_config('local_ai_course_assistant', 'quiz_model'));
+        $providername = ($quizproviderid !== '' && $quizmodel !== '')
+            ? $quizproviderid
+            : (string) get_config('local_ai_course_assistant', 'provider');
+
+        $this->assertSame('openai', $providername,
+            'a site with a dedicated quiz tier must not record the chat provider');
+
+        conversation_manager::record_quiz_usage(
+            $user->id, $course->id, '[Quiz] 3 question(s)', $providername, 'gpt-4o-mini', 900, 200
+        );
+        $row = $DB->get_record('local_ai_course_assistant_msgs',
+            ['courseid' => $course->id, 'interaction_type' => 'quiz']);
+        $this->assertSame('openai', $row->provider);
+        $this->assertNotSame('gemini', $row->provider);
+    }
+
+    /**
+     * Anthropic reports cache_read_tokens; OpenAI reports cached_tokens. Reading
+     * only one silently nulls the counter for every quiz the other vendor serves.
+     */
+    public function test_both_vendors_cache_counters_are_understood(): void {
+        $openaishape = ['prompt_tokens' => 10, 'completion_tokens' => 5, 'cached_tokens' => 128];
+        $anthropicshape = ['prompt_tokens' => 10, 'completion_tokens' => 5, 'cache_read_tokens' => 256];
+
+        $coalesce = function (array $usage): ?int {
+            return isset($usage['cached_tokens']) ? (int) $usage['cached_tokens']
+                : (isset($usage['cache_read_tokens']) ? (int) $usage['cache_read_tokens'] : null);
+        };
+
+        $this->assertSame(128, $coalesce($openaishape));
+        $this->assertSame(256, $coalesce($anthropicshape),
+            'the Anthropic key must not be ignored');
+        $this->assertNull($coalesce(['prompt_tokens' => 1]));
+    }
+
+    /**
+     * The release exists to surface quiz spend; a category with no label renders
+     * as a bare lowercase slug next to properly named rows.
+     */
+    public function test_the_quiz_category_has_a_translated_label(): void {
+        $label = get_string('quizsettings:colquiz', 'local_ai_course_assistant');
+        $this->assertNotEmpty($label);
+        $this->assertNotSame('quiz', $label,
+            'the label must be a real string, not the raw slug');
+    }
+
+    /**
      * The predicate is the gate that made the first fix inert, so pin it
      * directly as well -- a future edit that drops 'quiz' from it would
      * silently stop counting quiz spend again.

@@ -113,6 +113,9 @@ $categorylabels = [
     'rag'            => get_string('emergency:flag_rag', 'local_ai_course_assistant'),
     'analytics'      => get_string('token_analytics:cat_analytics', 'local_ai_course_assistant'),
     'premium_route'  => get_string('token_analytics:cat_premium_route', 'local_ai_course_assistant'),
+    // v7.1.0: reuse the already-translated column heading rather than adding an
+    // English-only key, same reasoning as the two above.
+    'quiz'           => get_string('quizsettings:colquiz', 'local_ai_course_assistant'),
     'other'          => get_string('token_analytics:cat_other', 'local_ai_course_assistant'),
 ];
 
