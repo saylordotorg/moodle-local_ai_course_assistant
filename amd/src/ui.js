@@ -5984,7 +5984,11 @@ define([
         const params = new URLSearchParams();
         params.set('sesskey', sesskey);
         params.set('courseid', String(courseId));
-        params.set('lang', lang || 'en');
+        // v7.1.1: empty, not 'en'. sse.php treats an empty lang as "detect from
+        // the learner's writing"; sending 'en' whenever they had not explicitly
+        // picked a language meant that detection path never ran, so a learner
+        // writing Spanish got English back. An explicit choice still wins.
+        params.set('lang', lang || '');
 
         fetch(M.cfg.wwwroot + '/local/ai_course_assistant/talking_avatar_session.php', {
             method: 'POST',

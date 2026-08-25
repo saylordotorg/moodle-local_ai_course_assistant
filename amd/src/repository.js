@@ -488,6 +488,26 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         }])[0];
     };
 
+    /**
+     * Record that the learner opened the practice-quiz panel.
+     *
+     * v7.1.1: the Quiz Me chip opens a panel rather than sending a message, so
+     * without this a press that never reached generation left no trace at all.
+     *
+     * @param {number} courseid
+     * @param {number} cmid Activity the learner is on, 0 if none.
+     * @returns {Promise} Resolves when recorded; failures are non-fatal.
+     */
+    const recordQuizOpen = function(courseid, cmid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_record_quiz_open',
+            args: {
+                courseid: courseid,
+                cmid: cmid || 0,
+            },
+        }])[0];
+    };
+
     const recordObjectiveAttempt = function(courseid, objectiveid, iscorrect) {
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_record_objective_attempt',
@@ -551,6 +571,7 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         submitUserTestingResponse: submitUserTestingResponse,
         getRubric: getRubric,
         savePracticeScore: savePracticeScore,
+        recordQuizOpen: recordQuizOpen,
         recordObjectiveAttempt: recordObjectiveAttempt,
         getMasterySummary: getMasterySummary,
         generateFlashcards: generateFlashcards,

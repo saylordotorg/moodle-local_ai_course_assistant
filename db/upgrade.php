@@ -1552,5 +1552,34 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082501, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082600) {
+        // v7.1.1: make two questions answerable that were previously only
+        // answerable by inference.
+        //
+        // stream_outcome — 9.5% of conversations contain a turn where the learner
+        // asked and no reply was stored. Until now a provider error and a learner
+        // closing the tab mid-answer produced byte-identical evidence: no row at
+        // all. Nullable, so every pre-existing row stays honestly unknown rather
+        // than being back-filled with a guess.
+        //
+        // chunk_count / top_score — whether retrieval found anything was being
+        // inferred from prompt_tokens, a proxy that turned out to be invalid
+        // because different providers report that field differently.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+
+        $fields = [
+            new xmldb_field('stream_outcome', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'cached_tokens'),
+            new xmldb_field('chunk_count', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'stream_outcome'),
+            new xmldb_field('top_score', XMLDB_TYPE_NUMBER, '10, 6', null, null, null, null, 'chunk_count'),
+        ];
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026082600, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

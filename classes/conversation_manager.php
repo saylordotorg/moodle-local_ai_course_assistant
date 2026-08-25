@@ -85,6 +85,9 @@ class conversation_manager {
      * @param int|null $cmid Course module ID when available.
      * @param int|null $rag_latency_ms Wall-clock ms spent in rag_retriever::retrieve for this turn; only stored on assistant rows.
      * @param int|null $cachedtokens Cached prompt-token count when the provider reports one; null otherwise.
+     * @param string|null $streamoutcome How the turn ended: complete, client_aborted, provider_error.
+     * @param int|null $chunkcount Passages retrieved this turn; 0 means retrieval ran and found none.
+     * @param float|null $topscore Similarity of the best retrieved passage.
      * @return int The message ID.
      */
     public static function add_message(
@@ -101,7 +104,10 @@ class conversation_manager {
         string $interactiontype = 'chat',
         ?int $cmid = null,
         ?int $rag_latency_ms = null,
-        ?int $cachedtokens = null
+        ?int $cachedtokens = null,
+        ?string $streamoutcome = null,
+        ?int $chunkcount = null,
+        ?float $topscore = null
     ): int {
         global $DB;
 
@@ -129,6 +135,11 @@ class conversation_manager {
         // discount). Assistant rows only; makes the cache hit rate visible
         // in token analytics instead of in-memory only.
         $record->cached_tokens     = ($role === 'assistant') ? $cachedtokens : null;
+        // v7.1.1: these describe how the turn went, so like the counters above
+        // they only mean anything on the reply row.
+        $record->stream_outcome    = ($role === 'assistant') ? $streamoutcome : null;
+        $record->chunk_count       = ($role === 'assistant') ? $chunkcount : null;
+        $record->top_score         = ($role === 'assistant') ? $topscore : null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);

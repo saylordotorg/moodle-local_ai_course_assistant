@@ -106,6 +106,13 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
+    'local_ai_course_assistant_record_quiz_open' => [
+        'classname' => \local_ai_course_assistant\external\record_quiz_open::class,
+        'description' => 'Record that the learner opened the practice-quiz panel.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/ai_course_assistant:use',
+    ],
     'local_ai_course_assistant_record_consent' => [
         'classname' => \local_ai_course_assistant\external\record_consent::class,
         'description' => 'Record that the learner accepted the first-run privacy notice.',
