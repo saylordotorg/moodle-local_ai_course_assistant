@@ -1969,3 +1969,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — kusan {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Cikakken inganci';
 $string['settings:embed_dtype_shortint8'] = 'Ingancin da aka rage';
 $string['settings:embed_dtype_shortbinary'] = 'Mafi ƙanƙanta';
+
+$string['quizlock:blocked'] = 'Mataimakin [[tutorshort]] ba ya samuwa muddin kana da jarrabawa da ke gudana. Aika ko rufe yunkurinka, sannan zai sake samuwa.';
+$string['quizlock:heading'] = 'Yanayin jarrabawa';
+$string['quizlock:enabled'] = 'Kulle mataimaki lokacin jarrabawar Moodle';
+$string['quizlock:enabled_desc'] = 'Yana hana mataimaki a ko\'ina — hira, murya, katunan koyo, jarrabawar aiki — muddin ɗalibi yana da yunkurin jarrabawa da ke gudana. Ana dubawa a uwar garke, don haka buɗe shafi na biyu ba ya kuɓutar. Malami na iya keɓe jarrabawa ɗaya ta hanyar saita matakin taimakonta zuwa Cikakken taimako.';
+$string['quizlock:window'] = 'Tazarar inganci na yunkuri (mintuna)';
+$string['quizlock:window_desc'] = 'Tsawon lokacin da yunkuri a jarrabawa marar iyakar lokaci ke ci gaba da ƙidaya a matsayin mai gudana. Jarrabawun da ke da nasu iyakar lokaci suna amfani da shi. Yunkurin da aka watsar suna ci gaba da gudana har abada, don haka ba tare da wannan iyaka ba ɗaya zai kulle ɗalibi har abada. Tsohuwa: 180.';

@@ -47,10 +47,25 @@ final class quiz_config_manager_test extends \advanced_testcase {
         $this->assertNull(quiz_config_manager::get($cmid));
     }
 
-    public function test_get_assistance_level_default_grade_zero_means_full(): void {
+    /**
+     * v7.1.0 changed this deliberately. The old rule locked only graded quizzes;
+     * it matched 3,074 of 3,142 quizzes on learn.saylor.org, so the distinction
+     * bought almost nothing, and it had never actually run because the caller
+     * was gated on empty($PAGE->cm). The policy is now "any Moodle quiz", with
+     * an explicit 'full' as the per-quiz opt-out.
+     */
+    public function test_get_assistance_level_default_locks_even_an_ungraded_quiz(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $cmid = $this->make_quiz((int)$course->id, 0.0); // Ungraded.
+        $this->assertEquals('hidden', quiz_config_manager::get_assistance_level($cmid));
+    }
+
+    public function test_an_explicit_full_still_opts_a_quiz_out(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $cmid = $this->make_quiz((int)$course->id, 100.0);
+        quiz_config_manager::save($cmid, (int)$course->id, 'full');
         $this->assertEquals('full', quiz_config_manager::get_assistance_level($cmid));
     }
 
@@ -124,7 +139,8 @@ final class quiz_config_manager_test extends \advanced_testcase {
             $bycm[(int)$r->cmid] = $r;
         }
         $this->assertEquals('default', $bycm[$cmid1]->stored_level);
-        $this->assertEquals('full', $bycm[$cmid1]->effective_level);
+        // v7.1.0: an unconfigured quiz resolves to 'hidden', graded or not.
+        $this->assertEquals('hidden', $bycm[$cmid1]->effective_level);
         $this->assertEquals('coach', $bycm[$cmid2]->stored_level);
         $this->assertEquals('coach', $bycm[$cmid2]->effective_level);
     }

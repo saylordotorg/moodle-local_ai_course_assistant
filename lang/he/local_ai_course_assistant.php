@@ -1982,3 +1982,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — כ־{$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'דיוק מלא';
 $string['settings:embed_dtype_shortint8'] = 'דיוק מופחת';
 $string['settings:embed_dtype_shortbinary'] = 'הקטן ביותר';
+
+$string['quizlock:blocked'] = 'עוזר [[tutorshort]] אינו זמין כל עוד יש לך בוחן פעיל. שלח או סגור את הניסיון והוא יחזור להיות זמין.';
+$string['quizlock:heading'] = 'מצב בוחן';
+$string['quizlock:enabled'] = 'נעילת העוזר במהלך בחנים ב-Moodle';
+$string['quizlock:enabled_desc'] = 'חוסם את העוזר בכל המקומות — צ\'אט, קול, כרטיסיות, בחני תרגול — כל עוד ללומד יש ניסיון בוחן פעיל. הבדיקה מתבצעת בשרת, ולכן פתיחת לשונית נוספת אינה עוקפת אותה. מורה יכול לפטור בוחן יחיד על ידי הגדרת רמת הסיוע שלו לעזרה מלאה.';
+$string['quizlock:window'] = 'חלון תוקף הניסיון (דקות)';
+$string['quizlock:window_desc'] = 'כמה זמן ניסיון בבוחן ללא הגבלת זמן עדיין נחשב פעיל. בחנים עם הגבלת זמן משלהם משתמשים בה. ניסיונות שננטשו נשארים פעילים ללא הגבלה, ולכן בלי גבול זה אחד מהם היה נועל את הלומד לצמיתות. ברירת מחדל: 180.';

@@ -1942,3 +1942,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — gara {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Sirrummaa guutuu';
 $string['settings:embed_dtype_shortint8'] = 'Sirrummaa hir\'ate';
 $string['settings:embed_dtype_shortbinary'] = 'Xiqqaa';
+
+$string['quizlock:blocked'] = 'Gargaaraan [[tutorshort]] yeroo qormaanni deemsa irra jiru hin argamu. Yaalii kee galchi ykn cufi, ergasii ammas ni argama.';
+$string['quizlock:heading'] = 'Haala qormaataa';
+$string['quizlock:enabled'] = 'Yeroo qormaata Moodle gargaaraa cufi';
+$string['quizlock:enabled_desc'] = 'Bakka hundatti gargaaraa dhorka — haasawa, sagalee, kaardii yaadannoo, qormaata shaakalaa — yeroo barataan yaalii qormaataa deemsa irra jiru qabu. Sarvarii irratti ni mirkanaa\'a, kanaaf caancala lammaffaa banuun hin oolchu. Barsiisaan sadarkaa gargaarsa qormaata tokkoo Gargaarsa guutuu gochuun addaan baasuu danda\'a.';
+$string['quizlock:window'] = 'Yeroo yaaliin itti fudhatama qabu (daqiiqaa)';
+$string['quizlock:window_desc'] = 'Yaaliin qormaata daangaa yeroo hin qabne irratti hangam yeroo akka deemaa jirutti lakkaa\'ama. Qormaanni daangaa mataa isaa qabu isa fayyadama. Yaaliiwwan gataman daangaa malee deemaa turu, kanaaf daangaa kana malee tokko barataa bara baraan cufa ture. Durtii: 180.';

@@ -1084,6 +1084,12 @@ $string['chat:voice_speaking']          = 'Speaking...';
 $string['chat:voice_idle']              = 'Ready';
 $string['chat:voice_error']             = 'Voice connection failed. Please check your settings.';
 $string['chat:quiz_locked']             = 'The assistant is paused during quizzes to support academic integrity. Good luck!';
+$string['quizlock:blocked'] = 'The [[tutorshort]] assistant is unavailable while you have a quiz in progress. Submit or close your attempt and it will be available again.';
+$string['quizlock:heading'] = 'Quiz mode';
+$string['quizlock:enabled'] = 'Lock the assistant during Moodle quizzes';
+$string['quizlock:enabled_desc'] = 'Blocks the assistant everywhere -- chat, voice, flashcards, practice quizzes -- while a learner has a quiz attempt in progress. Checked on the server, so opening a second tab does not get around it. A teacher can exempt one quiz by setting its assistance level to Full help.';
+$string['quizlock:window'] = 'Attempt freshness window (minutes)';
+$string['quizlock:window_desc'] = 'How long an attempt on a quiz with no time limit still counts as in progress. Quizzes with their own time limit use that instead. Abandoned attempts stay in progress indefinitely, so without this bound one would lock a learner out for good. Default 180.';
 
 // Bottom navigation modes.
 $string['chat:mode_nav']                = 'Mode navigation';

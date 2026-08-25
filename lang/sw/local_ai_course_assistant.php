@@ -1975,3 +1975,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — takriban {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Usahihi kamili';
 $string['settings:embed_dtype_shortint8'] = 'Usahihi uliopunguzwa';
 $string['settings:embed_dtype_shortbinary'] = 'Ndogo zaidi';
+
+$string['quizlock:blocked'] = 'Msaidizi wa [[tutorshort]] hapatikani unapokuwa na jaribio linaloendelea. Wasilisha au funga jaribio lako, kisha atapatikana tena.';
+$string['quizlock:heading'] = 'Hali ya jaribio';
+$string['quizlock:enabled'] = 'Funga msaidizi wakati wa majaribio ya Moodle';
+$string['quizlock:enabled_desc'] = 'Huzuia msaidizi kila mahali — gumzo, sauti, kadi za kumbukumbu, majaribio ya mazoezi — mwanafunzi anapokuwa na jaribio linaloendelea. Hukaguliwa kwenye seva, kwa hivyo kufungua kichupo cha pili hakusaidii kukwepa. Mwalimu anaweza kusamehe jaribio moja kwa kuweka kiwango chake cha usaidizi kuwa Msaada kamili.';
+$string['quizlock:window'] = 'Muda wa kuhesabiwa kwa jaribio (dakika)';
+$string['quizlock:window_desc'] = 'Muda ambao jaribio kwenye jaribio lisilo na kikomo cha muda bado linahesabiwa kuwa linaendelea. Majaribio yenye kikomo chao hutumia hicho. Majaribio yaliyoachwa hubaki yakiendelea bila kikomo, hivyo bila mpaka huu moja lingemfunga mwanafunzi milele. Chaguo-msingi: 180.';

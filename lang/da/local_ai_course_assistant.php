@@ -1939,3 +1939,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — omkring {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Fuld præcision';
 $string['settings:embed_dtype_shortint8'] = 'Reduceret præcision';
 $string['settings:embed_dtype_shortbinary'] = 'Mindst';
+
+$string['quizlock:blocked'] = '[[tutorshort]]-assistenten er ikke tilgængelig, mens du har en igangværende prøve. Aflever eller luk dit forsøg, så bliver den tilgængelig igen.';
+$string['quizlock:heading'] = 'Prøvetilstand';
+$string['quizlock:enabled'] = 'Lås assistenten under Moodle-prøver';
+$string['quizlock:enabled_desc'] = 'Blokerer assistenten alle steder – chat, tale, flashcards, øvelsesprøver – så længe en deltager har et igangværende prøveforsøg. Kontrolleres på serveren, så en ekstra fane omgår det ikke. En underviser kan undtage en enkelt prøve ved at sætte dens hjælpeniveau til Fuld hjælp.';
+$string['quizlock:window'] = 'Gyldighedsvindue for forsøg (minutter)';
+$string['quizlock:window_desc'] = 'Hvor længe et forsøg på en prøve uden tidsgrænse stadig tæller som igangværende. Prøver med egen tidsgrænse bruger den. Forladte forsøg forbliver igangværende uden ophør, så uden denne grænse ville ét låse deltageren ude permanent. Standard: 180.';

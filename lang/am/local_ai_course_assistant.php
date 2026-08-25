@@ -1968,3 +1968,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — በግምት {$a->size}'
 $string['settings:embed_dtype_shortfloat'] = 'ሙሉ ትክክለኛነት';
 $string['settings:embed_dtype_shortint8'] = 'የቀነሰ ትክክለኛነት';
 $string['settings:embed_dtype_shortbinary'] = 'ትንሹ';
+
+$string['quizlock:blocked'] = 'ፈተና በሂደት ላይ እያለ የ[[tutorshort]] ረዳት አይገኝም። ሙከራዎን ያስገቡ ወይም ይዝጉ፣ ከዚያ እንደገና ይገኛል።';
+$string['quizlock:heading'] = 'የፈተና ሁነታ';
+$string['quizlock:enabled'] = 'በMoodle ፈተናዎች ጊዜ ረዳቱን ቆልፍ';
+$string['quizlock:enabled_desc'] = 'ተማሪው በሂደት ላይ ያለ የፈተና ሙከራ እያለው ረዳቱን በሁሉም ቦታ ያግዳል — ውይይት፣ ድምፅ፣ ፍላሽ ካርዶች፣ የልምምድ ፈተናዎች። ማረጋገጫው በአገልጋዩ ላይ ስለሚደረግ ሁለተኛ ትር መክፈት አያመልጥም። መምህር የአንድ ፈተናን የእገዛ ደረጃ ወደ ሙሉ እገዛ በማድረግ ማግለል ይችላል።';
+$string['quizlock:window'] = 'የሙከራ ተቀባይነት ጊዜ (ደቂቃዎች)';
+$string['quizlock:window_desc'] = 'የጊዜ ገደብ በሌለው ፈተና ላይ ሙከራ ለምን ያህል ጊዜ በሂደት ላይ ተደርጎ ይቆጠራል። የራሳቸው የጊዜ ገደብ ያላቸው ፈተናዎች እሱን ይጠቀማሉ። የተተዉ ሙከራዎች ላልተወሰነ ጊዜ በሂደት ላይ ይቆያሉ፣ ስለዚህ ይህ ገደብ ከሌለ አንዱ ተማሪውን ለዘላለም ይቆልፈው ነበር። ነባሪ፡ 180።';

@@ -1544,5 +1544,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082500, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082501) {
+        // v7.1.0 introduces the quiz lock. Nothing to migrate: quiz_lock_enabled
+        // defaults to on in code when unset, and quiz_cfg rows are untouched --
+        // an explicit per-quiz 'full' still opts that quiz out. The behaviour
+        // change is documented in the release notes rather than encoded here.
+        upgrade_plugin_savepoint(true, 2026082501, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

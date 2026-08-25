@@ -1938,3 +1938,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — približne {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Plná presnosť';
 $string['settings:embed_dtype_shortint8'] = 'Znížená presnosť';
 $string['settings:embed_dtype_shortbinary'] = 'Najmenšia';
+
+$string['quizlock:blocked'] = 'Asistent [[tutorshort]] nie je dostupný, kým máte rozpracovaný test. Odošlite alebo zatvorte svoj pokus a asistent bude opäť k dispozícii.';
+$string['quizlock:heading'] = 'Režim testu';
+$string['quizlock:enabled'] = 'Uzamknúť asistenta počas testov v Moodle';
+$string['quizlock:enabled_desc'] = 'Blokuje asistenta všade – chat, hlas, kartičky, cvičné testy – kým má študent rozpracovaný pokus o test. Kontrola prebieha na serveri, takže otvorenie druhej karty ju neobíde. Učiteľ môže jeden test vyňať nastavením úrovne pomoci na Plná pomoc.';
+$string['quizlock:window'] = 'Okno platnosti pokusu (minúty)';
+$string['quizlock:window_desc'] = 'Ako dlho sa pokus pri teste bez časového limitu stále počíta ako prebiehajúci. Testy s vlastným limitom používajú ten svoj. Opustené pokusy zostávajú prebiehajúce neobmedzene, takže bez tohto obmedzenia by jediný študenta zamkol natrvalo. Predvolené: 180.';

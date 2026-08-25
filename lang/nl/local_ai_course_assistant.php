@@ -1938,3 +1938,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — ongeveer {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Volledige precisie';
 $string['settings:embed_dtype_shortint8'] = 'Verlaagde precisie';
 $string['settings:embed_dtype_shortbinary'] = 'Kleinst';
+
+$string['quizlock:blocked'] = 'De [[tutorshort]]-assistent is niet beschikbaar zolang je een toets open hebt staan. Dien je poging in of sluit die af, dan is hij weer beschikbaar.';
+$string['quizlock:heading'] = 'Toetsmodus';
+$string['quizlock:enabled'] = 'Assistent vergrendelen tijdens Moodle-toetsen';
+$string['quizlock:enabled_desc'] = 'Blokkeert de assistent overal – chat, spraak, flashcards, oefentoetsen – zolang een cursist een lopende toetspoging heeft. De controle gebeurt op de server, dus een tweede tabblad omzeilt het niet. Een docent kan één toets uitzonderen door het hulpniveau op Volledige hulp te zetten.';
+$string['quizlock:window'] = 'Geldigheidsvenster van poging (minuten)';
+$string['quizlock:window_desc'] = 'Hoelang een poging bij een toets zonder tijdslimiet nog als lopend telt. Toetsen met een eigen limiet gebruiken die. Verlaten pogingen blijven onbeperkt lopend, dus zonder deze grens zou er één een cursist permanent buitensluiten. Standaard: 180.';

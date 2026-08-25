@@ -1975,3 +1975,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — mga {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Buong katumpakan';
 $string['settings:embed_dtype_shortint8'] = 'Nabawasang katumpakan';
 $string['settings:embed_dtype_shortbinary'] = 'Pinakamaliit';
+
+$string['quizlock:blocked'] = 'Hindi magagamit ang [[tutorshort]] assistant habang may kasalukuyang pagsusulit ka. Isumite o isara ang iyong pagsubok at magiging available itong muli.';
+$string['quizlock:heading'] = 'Quiz mode';
+$string['quizlock:enabled'] = 'I-lock ang assistant tuwing may Moodle quiz';
+$string['quizlock:enabled_desc'] = 'Hinaharangan ang assistant sa lahat ng bahagi — chat, boses, flashcard, practice quiz — habang may kasalukuyang pagsubok sa quiz ang mag-aaral. Sinusuri sa server, kaya hindi ito maiiwasan sa pagbukas ng pangalawang tab. Maaaring ipagpaliban ng guro ang isang quiz sa pamamagitan ng pagtatakda ng antas ng tulong nito sa Buong tulong.';
+$string['quizlock:window'] = 'Bisa ng pagsubok (minuto)';
+$string['quizlock:window_desc'] = 'Gaano katagal pa ituturing na kasalukuyan ang isang pagsubok sa quiz na walang takdang oras. Ang mga quiz na may sariling limitasyon ay gumagamit niyon. Ang mga iniwang pagsubok ay nananatiling kasalukuyan nang walang katapusan, kaya kung wala ang hangganang ito ay tuluyan nang mala-lock ang mag-aaral. Default: 180.';

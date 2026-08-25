@@ -476,6 +476,21 @@ abstract class base_provider implements provider_interface {
                     'Too many AI requests; please wait a moment and try again.'
                 );
             }
+
+            // v7.1.0: no AI assistance while the learner is sitting a Moodle quiz.
+            // This sits at the provider chokepoint rather than in sse.php so it
+            // covers every surface -- chat, voice, flashcards, essay scoring,
+            // practice-quiz generation -- instead of the one endpoint someone
+            // remembered. The pre-7.1.0 lock keyed off a course-module id the
+            // browser supplied, so it stopped nobody who opened a second tab.
+            if (\local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+                throw new \moodle_exception(
+                    'error',
+                    'local_ai_course_assistant',
+                    '',
+                    get_string('quizlock:blocked', 'local_ai_course_assistant')
+                );
+            }
         }
 
         try {

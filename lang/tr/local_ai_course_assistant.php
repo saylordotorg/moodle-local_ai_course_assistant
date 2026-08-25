@@ -1952,3 +1952,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — yaklaşık {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Tam hassasiyet';
 $string['settings:embed_dtype_shortint8'] = 'Azaltılmış hassasiyet';
 $string['settings:embed_dtype_shortbinary'] = 'En küçük';
+
+$string['quizlock:blocked'] = 'Devam eden bir sınavınız varken [[tutorshort]] asistanı kullanılamaz. Denemenizi gönderin veya kapatın, ardından tekrar kullanılabilir olacaktır.';
+$string['quizlock:heading'] = 'Sınav modu';
+$string['quizlock:enabled'] = 'Moodle sınavları sırasında asistanı kilitle';
+$string['quizlock:enabled_desc'] = 'Öğrencinin devam eden bir sınav denemesi varken asistanı her yerde engeller: sohbet, ses, bilgi kartları, alıştırma sınavları. Kontrol sunucu tarafında yapılır, bu yüzden ikinci bir sekme açmak bunu aşmaz. Öğretmen, bir sınavın yardım düzeyini Tam yardım yaparak onu muaf tutabilir.';
+$string['quizlock:window'] = 'Deneme geçerlilik penceresi (dakika)';
+$string['quizlock:window_desc'] = 'Süre sınırı olmayan bir sınavdaki denemenin ne kadar süre devam ediyor sayılacağı. Kendi süre sınırı olan sınavlar onu kullanır. Terk edilen denemeler süresiz olarak devam eder durumda kalır, bu sınır olmasa biri öğrenciyi kalıcı olarak kilitlerdi. Varsayılan: 180.';

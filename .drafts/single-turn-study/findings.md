@@ -146,6 +146,23 @@ written without our content. That is the only place the "generic answer" hypothe
 true, and it is a targeting problem, not a retrieval problem. Fixing it needs a new
 display condition, which means code, which means the 7.0.5 upgrade.
 
+REVISED 25 August. The above is right about the symptom and wrong about the cause.
+Implementing the fix turned up a second, larger defect: the current activity's
+content was never reaching the prompt on ANY page. hook_callbacks computed the
+page's course-module id inside a branch gated on empty($PAGE->cm), which is always
+true -- moodle_page serves cm through __get() and defines no __isset(), so isset()
+and empty() report it unset whatever it holds. So currentpageid stayed 0
+everywhere, chat.js never sent pageid at all, and sse.php never page-scoped
+retrieval or injected page content.
+
+Which means the five activity-page answers that cited course material got that
+from RAG retrieval, not from page content. The chip was broken twice: {page}
+expanded to the course name on the course home page, AND the page's text never
+arrived regardless. The second is the larger of the two, and it is a wiring bug
+rather than a targeting problem. Both are fixed in v7.0.6. The numbers above
+describe behavior with page grounding entirely absent, so the chip should improve
+by more than the targeting fix alone would predict.
+
 
 4. THE SECOND CAUSE: ANSWERS THAT WERE NEVER STORED
 
@@ -271,6 +288,13 @@ courses. Degrees confirms the numbers, not the reading.
 Expect the next read to be slow. The rewritten chip only affects learners who click it
 from 24 August onward, and at n=50 the confidence interval is still around 13 points
 either way. Give it a few hundred learners before drawing conclusions.
+
+One conclusion has already been revised. Section 3b attributed the "Explain This
+Page" chip's generic answers to where it was clicked. Implementing the fix showed
+the deeper cause was that page content never reached the prompt at all. Reading
+transcripts told us the chip underperformed, and roughly where; it could not tell
+us why, and the mechanism we inferred from the transcripts alone was wrong. Worth
+remembering the next time a study like this produces a confident causal story.
 
 Reproducing this. Queries, codebook, and the transcript-pairing script are in
 .drafts/single-turn-study/ in the plugin repo. Raw transcripts are deliberately not

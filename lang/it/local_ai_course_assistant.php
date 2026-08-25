@@ -1989,3 +1989,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — circa {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Precisione piena';
 $string['settings:embed_dtype_shortint8'] = 'Precisione ridotta';
 $string['settings:embed_dtype_shortbinary'] = 'La più piccola';
+
+$string['quizlock:blocked'] = 'L\'assistente [[tutorshort]] non è disponibile mentre hai un quiz in corso. Invia o chiudi il tentativo e tornerà disponibile.';
+$string['quizlock:heading'] = 'Modalità quiz';
+$string['quizlock:enabled'] = 'Blocca l\'assistente durante i quiz di Moodle';
+$string['quizlock:enabled_desc'] = 'Blocca l\'assistente ovunque — chat, voce, flashcard, quiz di esercitazione — mentre uno studente ha un tentativo di quiz in corso. Il controllo avviene lato server, quindi aprire una seconda scheda non lo aggira. Un docente può escludere un quiz impostando il suo livello di assistenza su Aiuto completo.';
+$string['quizlock:window'] = 'Finestra di validità del tentativo (minuti)';
+$string['quizlock:window_desc'] = 'Per quanto tempo un tentativo su un quiz senza limite di tempo conta ancora come in corso. I quiz con un proprio limite usano quello. I tentativi abbandonati restano in corso a tempo indeterminato, quindi senza questo limite uno bloccherebbe lo studente per sempre. Predefinito: 180.';

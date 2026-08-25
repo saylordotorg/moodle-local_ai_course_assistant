@@ -1956,3 +1956,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — qiyaastii {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Saxnaan buuxda';
 $string['settings:embed_dtype_shortint8'] = 'Saxnaan la yareeyay';
 $string['settings:embed_dtype_shortbinary'] = 'Ugu yar';
+
+$string['quizlock:blocked'] = 'Kaaliyaha [[tutorshort]] ma diyaar aha inta aad haysato imtixaan socda. Gudbi ama xir isku daygaaga, ka dibna wuu mar kale diyaar noqonayaa.';
+$string['quizlock:heading'] = 'Habka imtixaanka';
+$string['quizlock:enabled'] = 'Xir kaaliyaha inta lagu jiro imtixaannada Moodle';
+$string['quizlock:enabled_desc'] = 'Wuxuu joojiyaa kaaliyaha meel kasta — sheeko, cod, kaararka xusuusta, imtixaannada tababarka — inta ardaygu hayo isku day imtixaan oo socda. Waxaa lagu hubiyaa server-ka, sidaas darteed furitaanka tab labaad kama badbaadiyo. Macallinku wuxuu ka dhaafi karaa hal imtixaan isagoo heerka caawimaadda u dhigaya Caawimaad buuxda.';
+$string['quizlock:window'] = 'Muddada uu isku daygu ansax yahay (daqiiqado)';
+$string['quizlock:window_desc'] = 'Inta muddo ee isku day imtixaan aan lahayn xad waqti weli loo tiriyo mid socda. Imtixaannada leh xaddoodii ayaa isticmaala kooda. Isku dayada la iska daayay waxay sii socdaan mudo aan xad lahayn, sidaas darteed xadkan la\'aantiis mid keliya wuxuu ardayga xiri lahaa weligiis. Caadiga: 180.';

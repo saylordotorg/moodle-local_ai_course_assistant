@@ -1974,3 +1974,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — khoảng {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Độ chính xác đầy đủ';
 $string['settings:embed_dtype_shortint8'] = 'Độ chính xác giảm';
 $string['settings:embed_dtype_shortbinary'] = 'Nhỏ nhất';
+
+$string['quizlock:blocked'] = 'Trợ lý [[tutorshort]] không khả dụng khi bạn đang làm một bài kiểm tra. Hãy nộp hoặc đóng lượt làm bài, sau đó trợ lý sẽ khả dụng trở lại.';
+$string['quizlock:heading'] = 'Chế độ kiểm tra';
+$string['quizlock:enabled'] = 'Khóa trợ lý trong các bài kiểm tra Moodle';
+$string['quizlock:enabled_desc'] = 'Chặn trợ lý ở mọi nơi — trò chuyện, giọng nói, thẻ ghi nhớ, bài kiểm tra luyện tập — khi người học đang có một lượt làm bài kiểm tra. Việc kiểm tra thực hiện ở máy chủ, nên mở tab thứ hai không lách được. Giáo viên có thể miễn trừ một bài kiểm tra bằng cách đặt mức hỗ trợ của nó thành Trợ giúp đầy đủ.';
+$string['quizlock:window'] = 'Khoảng thời gian lượt làm bài còn hiệu lực (phút)';
+$string['quizlock:window_desc'] = 'Một lượt làm bài trên bài kiểm tra không giới hạn thời gian còn được tính là đang diễn ra trong bao lâu. Bài kiểm tra có giới hạn riêng thì dùng giới hạn đó. Các lượt bị bỏ dở vẫn ở trạng thái đang diễn ra vô thời hạn, nên nếu không có giới hạn này thì một lượt sẽ khóa người học vĩnh viễn. Mặc định: 180.';

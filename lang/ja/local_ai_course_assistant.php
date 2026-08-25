@@ -1945,3 +1945,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — 約 {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = '完全精度';
 $string['settings:embed_dtype_shortint8'] = '低精度';
 $string['settings:embed_dtype_shortbinary'] = '最小';
+
+$string['quizlock:blocked'] = '小テストの受験中は [[tutorshort]] アシスタントを利用できません。受験を送信または終了すると再び利用できます。';
+$string['quizlock:heading'] = '小テストモード';
+$string['quizlock:enabled'] = 'Moodle の小テスト中にアシスタントをロックする';
+$string['quizlock:enabled_desc'] = '学習者が受験中の小テストを持っている間、チャット・音声・フラッシュカード・練習用小テストを含むすべての画面でアシスタントを利用できなくします。サーバー側で確認するため、別のタブを開いても回避できません。教員は小テストの支援レベルを「フルヘルプ」に設定して個別に除外できます。';
+$string['quizlock:window'] = '受験の有効期間（分）';
+$string['quizlock:window_desc'] = '制限時間のない小テストの受験が、どれだけの間「受験中」として扱われるか。独自の制限時間がある小テストはそちらを使います。放棄された受験は無期限に受験中のまま残るため、この上限がないと学習者が永久にロックされます。既定値: 180。';

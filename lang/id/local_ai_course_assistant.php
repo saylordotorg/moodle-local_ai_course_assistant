@@ -1969,3 +1969,10 @@ $string['ragadmin:storage_alt_item'] = '{$a->dtype} — sekitar {$a->size}';
 $string['settings:embed_dtype_shortfloat'] = 'Presisi penuh';
 $string['settings:embed_dtype_shortint8'] = 'Presisi berkurang';
 $string['settings:embed_dtype_shortbinary'] = 'Terkecil';
+
+$string['quizlock:blocked'] = 'Asisten [[tutorshort]] tidak tersedia selama Anda memiliki kuis yang sedang berlangsung. Kirim atau tutup percobaan Anda, lalu asisten akan tersedia kembali.';
+$string['quizlock:heading'] = 'Mode kuis';
+$string['quizlock:enabled'] = 'Kunci asisten selama kuis Moodle';
+$string['quizlock:enabled_desc'] = 'Memblokir asisten di semua tempat — obrolan, suara, kartu hafalan, kuis latihan — selama peserta memiliki percobaan kuis yang berlangsung. Diperiksa di sisi server, jadi membuka tab kedua tidak bisa mengakalinya. Pengajar dapat mengecualikan satu kuis dengan mengatur tingkat bantuannya ke Bantuan penuh.';
+$string['quizlock:window'] = 'Jendela masa berlaku percobaan (menit)';
+$string['quizlock:window_desc'] = 'Berapa lama percobaan pada kuis tanpa batas waktu masih dihitung sedang berlangsung. Kuis yang punya batas waktu sendiri memakai batas itu. Percobaan yang ditinggalkan tetap berlangsung tanpa batas, jadi tanpa batas ini satu saja akan mengunci peserta selamanya. Bawaan: 180.';
