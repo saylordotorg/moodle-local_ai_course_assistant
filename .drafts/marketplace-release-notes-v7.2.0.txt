@@ -1,0 +1,126 @@
+Version 7.2.0 (build 2026082700)
+
+This release addresses all seven issues reported in the review of 7.0.5. Two of
+them had also been raised in the June round, so those were treated as sweeps
+rather than fixes to the cited lines.
+
+1. Course-scoped plugin data is not included in backup and restore
+
+Implemented backup/moodle2/ for the course connection point. Course
+configuration always travels: per-course AI settings, per-quiz assistance
+levels, learning objectives, practice rubrics, and presentation assignments with
+their topics. Learner activity travels only when the backup includes users:
+conversations with their messages and ratings, objective attempts, study plans,
+reminder subscriptions, onboarding goals, streaks, practice scores and
+flashcards.
+
+Ids are translated rather than trusted. User ids go through the user mapping;
+course-module ids through course_module, and a cmid that does not resolve on the
+target site is stored as null rather than left pointing at whatever module holds
+that id there. Objective and rubric ids go through mappings the restore sets
+itself.
+
+Three things are deliberately excluded, documented in the class:
+ - Per-course API keys and reminder unsubscribe tokens are withheld from the
+   backup file. A course backup is a file administrators move between sites, so
+   it is the wrong place for a credential. The restore mints a fresh
+   unsubscribe token, since that column is NOT NULL.
+ - The retrieval index is not carried. It is derived data that reindexing
+   rebuilds, and it is the largest table the plugin owns, so including it would
+   multiply the size of every course backup. Restored courses need a reindex.
+
+Verified by driving the real backup and restore controllers, including a merge
+restore into a course that already holds the learner's rows, and a practice score
+written against a global rubric. Both of those cases aborted the restore in an
+earlier draft of this work.
+
+2. Transition to Templates, Output API, and AMD JavaScript Modules
+
+prompt_playground.php now builds a data array and renders
+local_ai_course_assistant/prompt_playground through
+$OUTPUT->render_from_template; sixty lines of echoed markup are gone, and the
+PHP does data retrieval and access checks only.
+
+starter_settings.php had a 229-line inline script; it is now
+amd/src/starter_admin.js, initialised with $PAGE->requires->js_call_amd and
+receiving as arguments the data that was previously echoed into the page as JSON
+literals.
+
+Two inline blocks in templates/chat_widget.mustache became
+amd/src/consent_gate.js and amd/src/student_mode.js, initialised the same way.
+
+Also cleared, since they sit in the same files and the June round raised them:
+an inline onclick handler that toggled a sibling element's inline display is now
+a native <details> element, which needs no JavaScript and is keyboard
+accessible; and fifteen inline style attributes moved into styles.css.
+
+Two script tags remain in chat_widget.mustache, with a comment explaining why.
+They bootstrap the optional standalone bundle, which is loaded by script src from
+outside Moodle's AMD loader and therefore has no core modules available; its
+translation payload has to be handed over as a global before it runs. Converting
+those two would break that delivery path rather than modernize it.
+
+3. Add Moodle boilerplate headers to two Mustache templates
+
+Five templates were missing the header, not two: analytics_tabs, mobile_chat,
+prompt_debug_view, prompt_metrics and token_analytics. All five now carry the
+license header and a @template docblock. All 21 templates in the plugin were
+checked.
+
+4. Replace MySQL-only date SQL in return-rate analytics
+
+The return-rate query used FROM_UNIXTIME(timecreated, '%Y-%m-%d'), which does not
+exist in PostgreSQL, so that metric could not run on half the supported
+platforms. It now uses FLOOR(timecreated / 86400), which buckets by UTC day
+rather than by the database session's timezone.
+
+The rest of the codebase was swept for the same class of problem: DATE_FORMAT,
+DATEDIFF, CURDATE, GROUP_CONCAT and IFNULL. Nothing else remained.
+
+5. Do not implement self-updates by replacing the installed plugin directory
+
+Removed. classes/plugin_updater.php and update_admin.php are deleted, along with
+the settings heading, the update link, the GitHub token setting and the admin
+external page that reached it. The upgrade step also clears the stored values for
+those settings, because the token field held a credential for a feature that no
+longer exists and leaving it in config_plugins would keep it on disk.
+
+Updates now go through Moodle's normal administrator-controlled plugin
+installation and upgrade flow.
+
+6. Move hard-coded interface text into language strings
+
+Seventeen strings extracted from settings.php: the section navigation and its
+seven section names, the two analytics quick-link cards with their descriptions,
+the button that restores the default prompt template, and the long explanatory
+paragraphs for retrieval and for Realtime Voice Mode.
+
+These are administrator-only strings on one page. They are staged for a
+translation batch rather than machine-translated into 45 locales, following the
+approach already used in this plugin for the admin diagnostic pages: every locale
+falls back to lang/en, which is byte-for-byte what the page displayed before the
+extraction, so nothing regressed for any language.
+
+7. Update the packaged README for the submitted release
+
+The README identified itself as 6.8.6 and did not describe features the listing
+advertises. It now documents practice quizzes, flashcards, spoken presentation
+practice, essay feedback, the three voice capabilities, retrieval with its
+index-size controls, the quiz-time integrity lock, and what does and does not
+travel in a course backup.
+
+Two claims in it were also wrong and are corrected: it advertised "100+
+languages" when 46 locales ship, and listed five AI providers when eleven are
+supported, including Moodle's own core_ai subsystem.
+
+Also in this release
+
+The cost-anomaly digest gains an absolute spend floor alongside its existing
+percentage threshold, because a percentage on a small base produces alerts that
+carry no information.
+
+Testing
+
+967 tests, 4,065 assertions, no failures, across PHP 8.1, 8.2 and 8.3 on both
+MariaDB and PostgreSQL. The plugin's own validator suite passes 36 of 36. All 46
+language files parse and all 21 templates carry the required header.
