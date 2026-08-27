@@ -45,7 +45,7 @@ require_once($CFG->libdir . '/clilib.php');
 
 use local_ai_course_assistant\rubric_manager;
 
-[$options, $unrecognised] = cli_get_params([
+[$options, $unrecognized] = cli_get_params([
     'help' => false,
     'courseid' => 0,
     'shortname' => '',
@@ -54,8 +54,8 @@ use local_ai_course_assistant\rubric_manager;
     'clear' => false,
 ], ['h' => 'help']);
 
-if ($unrecognised) {
-    cli_error('Unrecognised option: ' . implode(', ', $unrecognised));
+if ($unrecognized) {
+    cli_error('Unrecognised option: ' . implode(', ', $unrecognized));
 }
 
 if ($options['help'] || (empty($options['courseid']) && $options['shortname'] === '')) {

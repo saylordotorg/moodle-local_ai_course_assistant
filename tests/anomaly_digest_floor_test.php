@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * The behaviour that most needs pinning is the fail-open case. A floor that
  * silenced an alert because the spend could not be priced would hide exactly the
- * situation worth seeing -- an unrecognised model appearing in the mix.
+ * situation worth seeing -- an unrecognized model appearing in the mix.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
@@ -125,7 +125,7 @@ final class anomaly_digest_floor_test extends \advanced_testcase {
     }
 
     /**
-     * The one that matters. An unrecognised model must NOT be treated as cheap.
+     * The one that matters. An unrecognized model must NOT be treated as cheap.
      */
     public function test_an_unpriceable_model_fails_open(): void {
         $this->spend('gpt-4o-mini', 1000, 1000);
@@ -133,7 +133,7 @@ final class anomaly_digest_floor_test extends \advanced_testcase {
 
         $this->assertNull($this->call('window_cost_usd', [86400]),
             'null tells the caller not to suppress; pricing part of the window '
-            . 'and calling it the total would hide an unrecognised model');
+            . 'and calling it the total would hide an unrecognized model');
     }
 
     public function test_rows_outside_the_window_are_not_counted(): void {
