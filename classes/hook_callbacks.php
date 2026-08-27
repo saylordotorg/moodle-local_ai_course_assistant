@@ -892,6 +892,21 @@ class hook_callbacks {
         // Load JS: CDN mode uses <script> tags in the template; local mode uses AMD loader.
         if (empty($cdnurl)) {
             $PAGE->requires->js_call_amd('local_ai_course_assistant/chat', 'init');
+            // v7.2.0 (CONTRIB-10574 #201): behaviour that used to sit in inline
+            // <script> blocks inside chat_widget.mustache.
+            //
+            // consent_gate looks for .aica-consent-banner and returns when it is
+            // absent, so it can be requested unconditionally.
+            //
+            // student_mode is gated, because it binds a global keydown listener
+            // and has no markup to look for. The template only emitted it inside
+            // {{#studentmode}}; requesting it unconditionally would bind
+            // Ctrl+Shift+A for every learner, which is a behaviour change rather
+            // than a refactor.
+            $PAGE->requires->js_call_amd('local_ai_course_assistant/consent_gate', 'init');
+            if ($studentmode) {
+                $PAGE->requires->js_call_amd('local_ai_course_assistant/student_mode', 'init');
+            }
         }
 
         $hook->add_html($html);
