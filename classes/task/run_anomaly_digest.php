@@ -69,7 +69,29 @@ class run_anomaly_digest extends \core\task\scheduled_task {
             $threshold
         );
         if ($tok !== null) {
-            $alerts[] = "Token spend up {$tok['pct']}% day-over-day ({$tok['recent']} vs {$tok['prior']} prior).";
+            // v7.1.2: an absolute floor, because a percentage on a small base is
+            // noise. Learn's daily token volume swings between roughly 1.7M and
+            // 3.7M with nothing behind it, which clears 50% day-over-day
+            // routinely -- and the day that triggered the 76% alert cost $1.33
+            // in total. Percentages cannot tell "doubled" from "doubled and
+            // worth worrying about"; money can.
+            $floor = self::floor_usd();
+            $cost = $floor > 0 ? self::window_cost_usd(86400) : null;
+
+            if ($floor > 0 && $cost !== null && $cost < $floor) {
+                mtrace(sprintf(
+                    '  Token spend up %s%% but the last 24h cost $%.2f, below the $%.2f floor: not alerting.',
+                    $tok['pct'],
+                    $cost,
+                    $floor
+                ));
+            } else {
+                $line = "Token spend up {$tok['pct']}% day-over-day ({$tok['recent']} vs {$tok['prior']} prior).";
+                if ($cost !== null) {
+                    $line .= sprintf(' Last 24h cost about $%.2f.', $cost);
+                }
+                $alerts[] = $line;
+            }
         }
 
         // New integrity flags in last 24h (any count above floor triggers).
@@ -147,5 +169,74 @@ class run_anomaly_digest extends \core\task\scheduled_task {
             return null;
         }
         return ['recent' => (int) $recent, 'prior' => (int) $prior, 'pct' => $pct];
+    }
+
+    /**
+     * Configured absolute floor, in US dollars. 0 disables it.
+     *
+     * Defaults to 0 so an upgrade does not silently start suppressing alerts an
+     * admin was relying on.
+     *
+     * @return float
+     */
+    private static function floor_usd(): float {
+        $raw = get_config('local_ai_course_assistant', 'anomaly_digest_floor_usd');
+        if ($raw === false || $raw === '') {
+            return 0.0;
+        }
+        return max(0.0, (float) $raw);
+    }
+
+    /**
+     * Priced spend over the last $seconds, or null if it cannot be priced.
+     *
+     * Returns null -- which callers treat as "do not suppress" -- when any
+     * billable tokens in the window came from a model with no rate card entry.
+     * Failing open matters here: a floor that silences an alert because the
+     * spend was unpriceable would hide exactly the case worth seeing, which is
+     * an unrecognized model appearing in the mix.
+     *
+     * @param int $seconds Window length.
+     * @return float|null
+     */
+    private static function window_cost_usd(int $seconds): ?float {
+        global $DB;
+
+        $since = time() - $seconds;
+        $sql = "SELECT m.model_name,
+                       SUM(COALESCE(m.prompt_tokens, 0))     AS prompt_tokens,
+                       SUM(COALESCE(m.completion_tokens, 0)) AS completion_tokens
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE " . \local_ai_course_assistant\analytics::spend_rows_predicate('m') . "
+                   AND m.timecreated >= :since
+              GROUP BY m.model_name";
+
+        try {
+            $rows = $DB->get_recordset_sql($sql, ['since' => $since]);
+        } catch (\Throwable $e) {
+            debugging('anomaly digest: could not price the window: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return null;
+        }
+
+        $total = 0.0;
+        foreach ($rows as $r) {
+            $tokens = (int) $r->prompt_tokens + (int) $r->completion_tokens;
+            if ($tokens === 0) {
+                continue;
+            }
+            $cost = \local_ai_course_assistant\token_cost_manager::estimate_cost(
+                (string) ($r->model_name ?? ''),
+                (int) $r->prompt_tokens,
+                (int) $r->completion_tokens
+            );
+            if ($cost === null) {
+                $rows->close();
+                return null;
+            }
+            $total += (float) $cost;
+        }
+        $rows->close();
+
+        return $total;
     }
 }

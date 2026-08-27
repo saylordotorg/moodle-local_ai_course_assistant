@@ -40,7 +40,7 @@ require_once($CFG->libdir . '/clilib.php');
 
 use local_ai_course_assistant\rag_retriever;
 
-[$options, $unrecognised] = cli_get_params([
+[$options, $unrecognized] = cli_get_params([
     'help'     => false,
     'dry-run'  => false,
     'verify'   => false,

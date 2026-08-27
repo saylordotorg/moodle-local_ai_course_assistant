@@ -92,7 +92,7 @@ class claude_provider extends base_provider {
      *
      * Anthropic has removed sampling parameters from every reasoning-class
      * model since Opus 4.7 (Opus 4.7/4.8, and the whole Claude 5 family), so
-     * an unrecognised model is now more likely to reject them than accept
+     * an unrecognized model is now more likely to reject them than accept
      * them. Defaulting to "omit" means a newly released model works on day
      * one instead of failing every request until the plugin is updated.
      *

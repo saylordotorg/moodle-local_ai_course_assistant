@@ -145,7 +145,7 @@ $since = redash_export_request::resolve_since(
 $rawsections = trim(optional_param('sections', '', PARAM_TEXT));
 $sections = redash_export_request::parse_sections($rawsections);
 if (empty($sections)) {
-    // Every name supplied was unrecognised. Fail loudly rather than falling
+    // Every name supplied was unrecognized. Fail loudly rather than falling
     // back to the full export, so a typo cannot quietly widen the payload.
     http_response_code(400);
     echo json_encode([

@@ -116,7 +116,7 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
     }
 
     /**
-     * An unrecognised / brand-new model defaults to OMITTING temperature.
+     * An unrecognized / brand-new model defaults to OMITTING temperature.
      * This is the point of the allow-list: a model released after this
      * version of the plugin must not break every call.
      *
@@ -180,7 +180,7 @@ final class claude_provider_temperature_denylist_test extends \advanced_testcase
         // BEHAVIOUR CHANGE (allow-list migration). Previously an empty model
         // defaulted to SENDING temperature, on the reasoning that a
         // misconfigured row should not trip the deny-list. Under the
-        // allow-list the safe default inverts: an unrecognised model omits
+        // allow-list the safe default inverts: an unrecognized model omits
         // temperature, which costs nothing (the model uses its own default)
         // whereas sending it to a model that rejects it fails every call.
         $this->assertFalse($this->supports(''));

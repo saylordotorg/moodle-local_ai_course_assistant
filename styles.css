@@ -5875,3 +5875,47 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-ragadmin__badge { color: #fff; }
 .sola-ragadmin__badge--ready { background: #0f9d58; }
 .sola-ragadmin__badge--off { background: #6c757d; }
+
+/* v7.2.0 (CONTRIB-10574 #201): prompt playground, moved off inline style
+   attributes when the page was migrated to a Mustache template. */
+.sola-pp-narrow { max-width: 200px; }
+.sola-pp-mono { font-family: monospace; font-size: 13px; }
+.sola-pp-pre {
+    background: #f6f8fa;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.sola-pp-pre-tall { max-height: 600px; }
+.sola-pp-chunkcell {
+    max-height: 140px;
+    overflow: auto;
+    font-size: 12px;
+    white-space: pre-wrap;
+}
+
+/* v7.2.0 (CONTRIB-10574 #201): starter admin page, moved off inline style
+   attributes. The how-to panel is now a native <details>, which replaced an
+   onclick that toggled a sibling's inline display. */
+.sola-starters-howto { border-left: 4px solid #0d6efd; }
+.sola-starters-howto-summary { cursor: pointer; margin: 0; font-weight: 600; }
+.sola-starters-howto-body { margin-top: 12px; font-size: 14px; line-height: 1.6; }
+.sola-starters-howto-list { margin-bottom: 8px; }
+.sola-inline-form { display: inline; }
+.sola-starters-plus { font-size: 20px; }
+.aica-starter-type-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #fff3cd;
+    color: #856404;
+}
+.aica-starter-type-badge.type-voice,
+.aica-starter-type-badge.type-pronunciation {
+    background: #d4edda;
+    color: #155724;
+}
+.sola-toc-save { background: #16a34a; border-color: #16a34a; color: #fff; font-weight: 500; }

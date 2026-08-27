@@ -731,12 +731,18 @@ class analytics {
         }
 
         // Users with messages on 2+ distinct days.
+        //
+        // FLOOR(timecreated / 86400), not FROM_UNIXTIME(..., '%Y-%m-%d'):
+        // FROM_UNIXTIME is MySQL-only and this query is fatal on Postgres. The
+        // integer form buckets by UTC day rather than by the database session's
+        // timezone, which is a small semantic shift and arguably the steadier
+        // definition -- "two distinct days" no longer depends on server config.
         $sql = "SELECT COUNT(*) FROM (
                     SELECT m.userid
                       FROM {local_ai_course_assistant_msgs} m
                      WHERE {$where}
                      GROUP BY m.userid
-                    HAVING COUNT(DISTINCT FROM_UNIXTIME(m.timecreated, '%Y-%m-%d')) >= 2
+                    HAVING COUNT(DISTINCT FLOOR(m.timecreated / 86400)) >= 2
                 ) returning_users";
         $returningusers = (int) $DB->count_records_sql($sql, $params);
 

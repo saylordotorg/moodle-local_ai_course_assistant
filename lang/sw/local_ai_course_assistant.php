@@ -697,21 +697,6 @@ $string['starters:save'] = 'Save changes';
 $string['starters:saved'] = 'Starter configuration saved.';
 $string['task:index_course_content'] = 'Index course content for RAG semantic search';
 $string['task:run_integrity_checks'] = 'Run daily [[tutorshort]] plugin integrity checks';
-$string['update:available'] = 'Update Available';
-$string['update:back_to_settings'] = 'Back to Settings';
-$string['update:changelog'] = 'Release Notes';
-$string['update:check'] = 'Check for Updates';
-$string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
-$string['update:current_version'] = 'Installed Version';
-$string['update:desc'] = 'Check for and install [[tutorshort]] plugin updates directly from GitHub releases.';
-$string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
-$string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
-$string['update:github_token'] = 'GitHub Token (optional)';
-$string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
-$string['update:install'] = 'Install Update';
-$string['update:latest_version'] = 'Latest Available';
-$string['update:title'] = 'Plugin Updates';
-$string['update:up_to_date'] = 'Up to Date';
 
 // Testing Environment admin page and TOC quick links (v3.9.4+).
 $string['demo:title'] = 'Mazingira ya majaribio';

@@ -357,58 +357,8 @@
             </button>
         </div>
     </div>
-    <script>
-    (function() {
-        var banner = document.querySelector('.aica-consent-banner');
-        if (!banner) { return; }
-        var scroller = banner.querySelector('.aica-consent-scroll');
-        var btn = banner.querySelector('.aica-consent-accept');
-        var hint = banner.querySelector('.aica-consent-scrollhint');
-        if (!scroller || !btn) { return; }
-        var unlocked = false;
-        function unlock() {
-            if (unlocked) { return; }
-            unlocked = true;
-            btn.disabled = false;
-            btn.setAttribute('aria-disabled', 'false');
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
-            if (hint) { hint.style.display = 'none'; }
-        }
-        function reevaluate() {
-            // While the drawer is closed the region has no layout (0 height); a
-            // 0-height region would read as "already at the bottom" and unlock
-            // before the learner has seen anything, so skip until it is shown.
-            if (scroller.scrollHeight <= 0 || scroller.clientHeight <= 0) { return; }
-            // True both when the policy fits without scrolling and when the
-            // learner has scrolled to the bottom.
-            if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4) {
-                unlock();
-            }
-        }
-        reevaluate();
-        scroller.addEventListener('scroll', reevaluate);
-        // The drawer may render hidden (clientHeight 0); re-check once it has a
-        // real size so a short policy that needs no scrolling still unlocks.
-        if (window.ResizeObserver) {
-            var ro = new window.ResizeObserver(reevaluate);
-            ro.observe(scroller);
-        }
-        btn.addEventListener('click', function() {
-            if (btn.disabled) { return; }
-            // Record consent through the external service (core/ajax adds the
-            // sesskey); hide the banner regardless of the call outcome.
-            require(['core/ajax'], function(Ajax) {
-                Ajax.call([{
-                    methodname: 'local_ai_course_assistant_record_consent',
-                    args: {}
-                }])[0].always(function() {
-                    banner.style.display = 'none';
-                });
-            });
-        });
-    })();
-    </script>
+    {{! Behaviour lives in amd/src/consent_gate.js; initialised from
+        hook_callbacks via js_call_amd. CONTRIB-10574 #201. }}
     {{/consentgiven}}
 
     {{! Help guide panel — toggled by the ? button in the header }}
@@ -975,18 +925,16 @@
     </div>
 </div>
 {{#studentmode}}
-<script>
-// Student mode exit: Ctrl+Shift+A from any page.
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        window.location.href = window.location.pathname + '?sola_student_mode=0';
-    }
-});
-</script>
+{{! Behaviour lives in amd/src/student_mode.js; initialised from
+    hook_callbacks via js_call_amd. CONTRIB-10574 #201. }}
 {{/studentmode}}
 {{#use_cdn}}
 <link rel="stylesheet" href="{{cdn_css_url}}" />
+{{! The two tags below are the standalone CDN bundle's bootstrap, not page JS.
+    They must stay inline: the bundle is loaded by <script src> from outside
+    Moodle's AMD loader and has no core/* available, so its i18n payload has to
+    be handed over as a global before it runs. Converting these to AMD would
+    break the CDN delivery path by design. CONTRIB-10574 #201. }}
 <script>window.SOLA_I18N = {{{i18n_json}}};</script>
 <script src="{{cdn_js_url}}" defer></script>
 {{/use_cdn}}

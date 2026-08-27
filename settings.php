@@ -117,16 +117,17 @@ if ($hassiteconfig) {
     // TOC link still jumps to the right anchor.
     $toc = $tocstyle
         . '<div class="sola-toc">'
-        . '<strong>Jump to section</strong>'
+        . '<strong>' . get_string('settingspage:toc_heading', 'local_ai_course_assistant') . '</strong>'
         . '<ul>'
-        . '<li><a href="#sec-general">General</a></li>'
-        . '<li><a href="#sec-ai">AI Provider &amp; Models</a></li>'
-        . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
-        . '<li><a href="#sec-content">Content &amp; RAG</a></li>'
-        . '<li><a href="#sec-safety">Safety &amp; Moderation</a></li>'
-        . '<li><a href="#sec-engagement">Engagement</a></li>'
-        . '<li><a href="#sec-integrations">Integrations &amp; Delivery</a></li>'
-        . '<li><a href="#sec-save" style="background:#16a34a;border-color:#16a34a;color:#fff;font-weight:500">&#8595; Save</a></li>'
+        . '<li><a href="#sec-general">' . get_string('settingspage:sec_general', 'local_ai_course_assistant') . '</a></li>'
+        . '<li><a href="#sec-ai">' . s(get_string('settingspage:sec_ai', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-branding">' . s(get_string('settingspage:sec_branding', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-content">' . s(get_string('settingspage:sec_content', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-safety">' . s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-engagement">' . get_string('settingspage:sec_engagement', 'local_ai_course_assistant') . '</a></li>'
+        . '<li><a href="#sec-integrations">' . s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-save" class="sola-toc-save">&#8595; '
+        . get_string('settingspage:toc_save', 'local_ai_course_assistant') . '</a></li>'
         . '</ul>'
         . '<div class="sola-quicklinks">' . $quicklinks . '</div>'
         . '</div>';
@@ -147,7 +148,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_general_anchor',
         '',
-        $sectionanchor('sec-general', 'General')
+        $sectionanchor('sec-general', get_string('settingspage:sec_general', 'local_ai_course_assistant'))
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -220,7 +221,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_ai_anchor',
         '',
-        $sectionanchor('sec-ai', 'AI Provider &amp; Models')
+        $sectionanchor('sec-ai', s(get_string('settingspage:sec_ai', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
@@ -306,7 +307,7 @@ if ($hassiteconfig) {
         get_string('settings:systemprompt_desc', 'local_ai_course_assistant')
         . '<br><button type="button" class="btn btn-sm btn-outline-secondary mt-1" '
         . 'onclick="document.getElementById(\'id_s_local_ai_course_assistant_systemprompt\').value='
-        . 'atob(\'' . base64_encode($defaultprompt) . '\');">Reset to default template</button>',
+        . 'atob(\'' . base64_encode($defaultprompt) . '\');">' . get_string('settingspage:reset_prompt_template', 'local_ai_course_assistant') . '</button>',
         ''
     ));
 
@@ -520,19 +521,19 @@ if ($hassiteconfig) {
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/token_analytics_link',
-        'Token Cost & Analytics',
+        s(get_string('settingspage:token_analytics_title', 'local_ai_course_assistant')),
         '<a href="' . $tokenanalyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
-        . 'View Token Analytics &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">Monitor token usage and costs across courses and providers.</p>'
+        . s(get_string('settingspage:token_analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
+        . '<p class="text-muted mt-1" style="font-size:13px;">' . get_string('settingspage:token_analytics_blurb', 'local_ai_course_assistant') . '</p>'
     ));
 
     // Quick link to analytics dashboard.
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/analytics_link',
-        'Analytics Dashboard',
+        get_string('settingspage:analytics_title', 'local_ai_course_assistant'),
         '<a href="' . $analyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
-        . 'View Analytics Dashboard &rarr;</a>'
+        . s(get_string('settingspage:analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
         . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.</p>'
     ));
 
@@ -574,16 +575,14 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_content_anchor',
         '',
-        $sectionanchor('sec-content', 'Content &amp; RAG')
+        $sectionanchor('sec-content', s(get_string('settingspage:sec_content', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rag_heading',
         get_string('settings:rag_heading', 'local_ai_course_assistant'),
         get_string('settings:rag_heading_desc', 'local_ai_course_assistant')
-        . '<br><small class="text-muted">RAG (Retrieval-Augmented Generation) indexes your course content and retrieves '
-        . 'relevant passages when students ask questions, so the AI can give answers grounded in your materials. '
-        . 'Requires an embedding API key (OpenAI recommended). After enabling, use the RAG Admin page to index courses.</small>'
+        . '<br><small class="text-muted">' . get_string('settingspage:rag_explainer', 'local_ai_course_assistant') . '</small>'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -1232,7 +1231,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_safety_anchor',
         '',
-        $sectionanchor('sec-safety', 'Safety &amp; Moderation')
+        $sectionanchor('sec-safety', s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
@@ -1392,7 +1391,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_engagement_anchor',
         '',
-        $sectionanchor('sec-engagement', 'Engagement')
+        $sectionanchor('sec-engagement', get_string('settingspage:sec_engagement', 'local_ai_course_assistant'))
     ));
 
     // Study plans and reminders.
@@ -1470,10 +1469,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/realtime_heading',
         get_string('settings:realtime_heading', 'local_ai_course_assistant'),
-        '<small class="text-muted">Realtime Voice Mode enables live, two-way spoken conversations between students '
-        . 'and the AI using OpenAI\'s Realtime API. This is different from standard text-to-speech (TTS), which reads '
-        . 'AI responses aloud. Realtime Voice requires a separate API key and is billed per minute of audio. '
-        . 'Once enabled globally, you can toggle it per course in each course\'s settings page.</small>'
+        '<small class="text-muted">' . get_string('settingspage:realtime_explainer', 'local_ai_course_assistant') . '</small>'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -2228,7 +2224,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_branding_anchor',
         '',
-        $sectionanchor('sec-branding', 'Branding &amp; UI')
+        $sectionanchor('sec-branding', s(get_string('settingspage:sec_branding', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
@@ -2407,7 +2403,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_integrations_anchor',
         '',
-        $sectionanchor('sec-integrations', 'Integrations &amp; Delivery')
+        $sectionanchor('sec-integrations', s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')))
     ));
 
     // FAQ & Zendesk.
@@ -2493,6 +2489,14 @@ if ($hassiteconfig) {
         get_string('settings:anomaly_digest_threshold_pct_desc', 'local_ai_course_assistant'),
         '50',
         PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/anomaly_digest_floor_usd',
+        get_string('settings:anomaly_digest_floor_usd', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_floor_usd_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -2761,27 +2765,6 @@ if ($hassiteconfig) {
         '0'
     ));
 
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/updates_heading',
-        get_string('update:title', 'local_ai_course_assistant'),
-        get_string('update:desc', 'local_ai_course_assistant')
-    ));
-
-    $updateurl = new moodle_url('/local/ai_course_assistant/update_admin.php');
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/update_link',
-        '',
-        '<a href="' . $updateurl->out() . '" class="btn btn-sm btn-outline-primary">'
-        . get_string('update:check', 'local_ai_course_assistant') . ' &rarr;</a>'
-    ));
-
-    $settings->add(new admin_setting_configpasswordunmask(
-        'local_ai_course_assistant/github_token',
-        get_string('update:github_token', 'local_ai_course_assistant'),
-        get_string('update:github_token_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
     // v5.5.6: invisible anchor at the bottom of the registered settings so
     // the TOC can offer a "jump to Save" shortcut without forcing admins to
     // scroll through 2,000 lines of settings to commit a single change.
@@ -2845,7 +2828,8 @@ if ($hassiteconfig) {
             'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
         ],
         'anomaly_digest_enabled' => [
-            'anomaly_digest_threshold_pct', 'anomaly_digest_recipient_email',
+            'anomaly_digest_threshold_pct', 'anomaly_digest_floor_usd',
+            'anomaly_digest_recipient_email',
             'anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook',
         ],
 
@@ -2956,13 +2940,6 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_prompt_playground',
         \local_ai_course_assistant\branding::apply('[[tutorshort]] Prompt Playground'),
         new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
-        'moodle/site:config'
-    ));
-
-    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
-        'local_ai_course_assistant_updates',
-        get_string('update:title', 'local_ai_course_assistant'),
-        new moodle_url('/local/ai_course_assistant/update_admin.php'),
         'moodle/site:config'
     ));
 

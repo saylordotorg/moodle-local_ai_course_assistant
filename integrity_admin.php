@@ -65,7 +65,7 @@ echo $OUTPUT->header();
 <div style="max-width: 800px;">
     <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
        class="btn btn-sm btn-outline-secondary mb-3">
-        &larr; <?php echo get_string('update:back_to_settings', 'local_ai_course_assistant'); ?>
+        &larr; <?php echo get_string('ragadmin:back_to_settings', 'local_ai_course_assistant'); ?>
     </a>
 
     <div class="sola-integrity-cards">
