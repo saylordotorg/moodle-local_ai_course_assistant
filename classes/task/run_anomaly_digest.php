@@ -194,7 +194,7 @@ class run_anomaly_digest extends \core\task\scheduled_task {
      * billable tokens in the window came from a model with no rate card entry.
      * Failing open matters here: a floor that silences an alert because the
      * spend was unpriceable would hide exactly the case worth seeing, which is
-     * an unrecognised model appearing in the mix.
+     * an unrecognized model appearing in the mix.
      *
      * @param int $seconds Window length.
      * @return float|null

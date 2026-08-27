@@ -75,7 +75,7 @@ class token_cost_manager {
         // Prefix matching is longest-wins, so the -lite and -large variants must
         // stay as their own keys; they are cheaper/dearer than the base model and
         // would otherwise inherit the shorter prefix's rate.
-        // Deliberately NO bare 'voyage' or 'rerank' catch-all: an unrecognised
+        // Deliberately NO bare 'voyage' or 'rerank' catch-all: an unrecognized
         // future model should return null (unknown) rather than be priced at a
         // guessed rate. Admins can still add one via the rate_card_overrides
         // setting without a code change.

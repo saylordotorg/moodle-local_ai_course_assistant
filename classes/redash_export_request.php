@@ -133,7 +133,7 @@ final class redash_export_request {
      * which word was wrong instead of just "invalid".
      *
      * @param string $raw Raw comma-separated parameter value.
-     * @return array List of unrecognised names, in the order supplied.
+     * @return array List of unrecognized names, in the order supplied.
      */
     public static function unknown_sections(string $raw): array {
         $raw = trim($raw);

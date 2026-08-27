@@ -1581,5 +1581,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082600, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082700) {
+        // v7.2.0 is the Marketplace review remediation: removals, a backup/
+        // restore implementation, template and AMD migrations, and string
+        // extraction. No schema change of its own.
+        //
+        // One tidy-up: the self-updater's settings are gone with the feature, so
+        // their stored values are dead weight. github_token in particular held a
+        // credential for a feature that no longer exists, and leaving it in
+        // config_plugins would keep it on disk indefinitely.
+        foreach (['github_token', 'update_link', 'updates_heading'] as $dead) {
+            unset_config($dead, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082700, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

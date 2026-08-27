@@ -161,7 +161,7 @@ class vendor_registry {
 
     /**
      * Look up DPA status for a provider id. Returns a fallback "unknown"
-     * row for unrecognised providers so the UI always renders something.
+     * row for unrecognized providers so the UI always renders something.
      *
      * @param string $providerid
      * @return array
