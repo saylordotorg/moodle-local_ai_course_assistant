@@ -2060,6 +2060,25 @@ $string['settings:anomaly_digest_enabled'] = 'Enable anomaly digest';
 $string['settings:anomaly_digest_enabled_desc'] = 'Run the daily anomaly digest task. Quiet by default — only fires when a metric crosses the threshold.';
 $string['settings:anomaly_digest_threshold_pct'] = 'Alert threshold (%)';
 $string['settings:anomaly_digest_threshold_pct_desc'] = 'Percent change between the recent and prior window that triggers an alert. Default: 50.';
+// v7.2.0 (CONTRIB-10574 #205): settings-page interface text, previously written
+// as hardcoded English literals inside settings.php and therefore untranslatable.
+$string['settingspage:toc_heading'] = 'Jump to section';
+$string['settingspage:sec_general'] = 'General';
+$string['settingspage:sec_ai'] = 'AI Provider & Models';
+$string['settingspage:sec_branding'] = 'Branding & UI';
+$string['settingspage:sec_content'] = 'Content & RAG';
+$string['settingspage:sec_safety'] = 'Safety & Moderation';
+$string['settingspage:sec_engagement'] = 'Engagement';
+$string['settingspage:sec_integrations'] = 'Integrations & Delivery';
+$string['settingspage:toc_save'] = 'Save';
+$string['settingspage:token_analytics_title'] = 'Token Cost & Analytics';
+$string['settingspage:token_analytics_link'] = 'View Token Analytics';
+$string['settingspage:token_analytics_blurb'] = 'Monitor token usage and costs across courses and providers.';
+$string['settingspage:analytics_title'] = 'Analytics Dashboard';
+$string['settingspage:analytics_link'] = 'View Analytics Dashboard';
+$string['settingspage:reset_prompt_template'] = 'Reset to default template';
+$string['settingspage:rag_explainer'] = 'RAG (Retrieval-Augmented Generation) indexes your course content and retrieves relevant passages when students ask questions, so the AI can give answers grounded in your materials. Requires an embedding API key (OpenAI recommended). After enabling, use the RAG Admin page to index courses.';
+$string['settingspage:realtime_explainer'] = 'Realtime Voice Mode enables live, two-way spoken conversations between students and the AI using OpenAI\'s Realtime API. This is different from standard text-to-speech (TTS), which reads AI responses aloud. Realtime Voice requires a separate API key and is billed per minute of audio. Once enabled globally, you can toggle it per course in each course\'s settings page.';
 $string['settings:anomaly_digest_floor_usd'] = 'Anomaly digest: minimum spend to alert on (USD)';
 $string['settings:anomaly_digest_floor_usd_desc'] = 'Suppress the token-spend alert when the last 24 hours cost less than this, however large the percentage jump. A percentage on a small base is noise: doubling from $1 to $2 clears any threshold and means nothing. Set this to a daily figure you would actually want waking you. 0 disables the floor and alerts on percentage alone. If any spend in the window comes from a model with no rate-card entry it cannot be priced, and the alert is sent regardless -- an unrecognised model in the mix is itself worth seeing.';
 $string['settings:anomaly_digest_recipient_email'] = 'Recipient email';

@@ -192,6 +192,45 @@ final class lang_completeness_test extends \basic_testcase {
         // What is left is the admin-only diagnostic pages, extracted in
         // v7.0.1 and still awaiting a translation batch.
         ...self::ADMIN_DIAGNOSTIC_UNTRANSLATED,
+        ...self::SETTINGS_PAGE_UNTRANSLATED,
+    ];
+
+    /**
+     * v7.2.0 (CONTRIB-10574 #205): interface text extracted from settings.php,
+     * where it was written as hardcoded English literals and so could not be
+     * translated at all -- the reviewer's finding, and a repeat of the same
+     * finding from the June round.
+     *
+     * Staged here rather than machine-translated for the same reason as the
+     * batch above: these are administrator-only strings on one settings page,
+     * every locale falls back to lang/en, and that fallback is byte-for-byte
+     * what the page displayed before extraction, so nothing regressed. Pushing
+     * seventeen strings through 45 locales unreviewed would add plausible-looking
+     * translations nobody has checked, which is worse than an honest fallback.
+     *
+     * The two anomaly_digest_floor keys are here for the same reason: admin-only
+     * settings copy, added in the same release.
+     */
+    private const SETTINGS_PAGE_UNTRANSLATED = [
+        'settings:anomaly_digest_floor_usd',
+        'settings:anomaly_digest_floor_usd_desc',
+        'settingspage:analytics_link',
+        'settingspage:analytics_title',
+        'settingspage:rag_explainer',
+        'settingspage:realtime_explainer',
+        'settingspage:reset_prompt_template',
+        'settingspage:sec_ai',
+        'settingspage:sec_branding',
+        'settingspage:sec_content',
+        'settingspage:sec_engagement',
+        'settingspage:sec_general',
+        'settingspage:sec_integrations',
+        'settingspage:sec_safety',
+        'settingspage:toc_heading',
+        'settingspage:toc_save',
+        'settingspage:token_analytics_blurb',
+        'settingspage:token_analytics_link',
+        'settingspage:token_analytics_title',
     ];
 
     /**
