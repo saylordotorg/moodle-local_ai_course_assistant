@@ -68,22 +68,58 @@ $USER = $admin;
 // the prompt as a plain learner instead, which is the identity the suite is
 // actually reasoning about. The CLI still runs with admin rights; only the
 // identity the prompt is built for changes.
-$learner = $DB->get_record_sql(
+//
+// v7.2.1: the v7.0.5 version of this selected any enrolled user except
+// get_admin(), by lowest id. That excluded exactly ONE site admin. On a site with
+// several -- dev has seventeen -- it happily picked another one, whose prompt then
+// resolved to role 'administrator', and no warning fired because an enrolled
+// non-admin user did technically exist. So the fix silently did not work: the
+// MemoryLeak probes were still being answered in an admin persona, where "did it
+// refuse to name other learners?" is not the question the suite means to ask.
+//
+// Ask context_builder the same question the prompt builder asks, and accept only
+// an identity that actually resolves to 'student'.
+$candidates = $DB->get_records_sql(
     "SELECT u.* FROM {user} u
        JOIN {user_enrolments} ue ON ue.userid = u.id
        JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = :courseid
-      WHERE u.deleted = 0 AND u.id <> :adminid
+      WHERE u.deleted = 0 AND u.suspended = 0 AND u.id <> :guestid
    ORDER BY u.id ASC",
-    ['courseid' => $courseid, 'adminid' => $admin->id],
-    IGNORE_MULTIPLE
+    ['courseid' => $courseid, 'guestid' => (int) $CFG->siteguest]
 );
-if (!$learner) {
-    // No enrolled learner on this course: fall back to the admin so the suite
-    // still runs, but say so, because the two role-sensitive checks are then
-    // not meaningful.
+
+$learner = null;
+$rejected = [];
+foreach ($candidates as $candidate) {
+    $role = \local_ai_course_assistant\context_builder::detect_role($courseid, (int) $candidate->id);
+    if ($role === 'student') {
+        $learner = $candidate;
+        break;
+    }
+    $rejected[$role] = ($rejected[$role] ?? 0) + 1;
+}
+
+if ($learner === null) {
+    // Nobody on this course resolves to a plain student. Fall back to the admin
+    // so the suite still runs, but be loud: the role-sensitive probes (the
+    // MemoryLeak group) are measuring an administrator's entitlements, not a
+    // learner's, and a PASS from them means nothing about the learner threat
+    // model.
     $learner = $admin;
-    echo "WARNING: no enrolled non-admin user on course {$courseid}; "
-        . "building the prompt as admin. Role-sensitive checks are not meaningful in this run.\n";
+    $summary = [];
+    foreach ($rejected as $role => $count) {
+        $summary[] = "{$count} x {$role}";
+    }
+    echo "WARNING: no enrolled user on course {$courseid} resolves to role 'student'"
+        . ($summary ? ' (found: ' . implode(', ', $summary) . ')' : ' (course has no enrolled users)')
+        . ".\n"
+        . "         Building the prompt as an administrator. The MemoryLeak probes\n"
+        . "         are NOT meaningful in this run -- an admin may legitimately be\n"
+        . "         told what learners are struggling with.\n"
+        . "         Enrol a plain student on this course for a meaningful run.\n";
+} else {
+    echo "Prompt identity: {$learner->firstname} {$learner->lastname} "
+        . "(id {$learner->id}, role student)\n";
 }
 
 $course = get_course($courseid);
