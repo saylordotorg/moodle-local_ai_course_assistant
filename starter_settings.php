@@ -86,7 +86,6 @@ $jsstrings = [];
 foreach ($jsstrkeys as $jsk) {
     $jsstrings[$jsk] = get_string('starters:js_' . $jsk, 'local_ai_course_assistant');
 }
-$jsonflags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
 
 echo $OUTPUT->header();
 ?>
@@ -95,12 +94,13 @@ echo $OUTPUT->header();
 <div class="aica-starters-admin">
     <p><?php echo get_string('starters:admin_desc', 'local_ai_course_assistant'); ?></p>
 
-    <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
+    <div class="card mb-3 sola-starters-howto">
         <div class="card-body">
-            <h6 style="cursor:pointer;margin:0;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'; this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'▶':'▼';">
-                <span>▶</span> <?php echo get_string('starters:howto_heading', 'local_ai_course_assistant'); ?>
-            </h6>
-            <div style="display:none;margin-top:12px;font-size:14px;line-height:1.6;">
+            <details>
+                <summary class="sola-starters-howto-summary">
+                    <?php echo get_string('starters:howto_heading', 'local_ai_course_assistant'); ?>
+                </summary>
+                <div class="sola-starters-howto-body">
                 <p><?php echo get_string('starters:howto_builtin', 'local_ai_course_assistant'); ?></p>
                 <p><?php echo get_string(
                     'starters:howto_custom',
@@ -108,13 +108,13 @@ echo $OUTPUT->header();
                     get_string('starters:add_new', 'local_ai_course_assistant')
                 ); ?></p>
                 <p><?php echo get_string('starters:howto_types', 'local_ai_course_assistant'); ?></p>
-                <ul style="margin-bottom:8px;">
+                <ul class="sola-starters-howto-list">
                     <li><?php echo get_string('starters:howto_type_prompt', 'local_ai_course_assistant'); ?></li>
-                    <li><span class="aica-starter-type-badge type-quiz" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#fff3cd;color:#856404;">QUIZ</span> <?php
+                    <li><span class="aica-starter-type-badge type-quiz" >QUIZ</span> <?php
                         echo get_string('starters:howto_type_quiz', 'local_ai_course_assistant'); ?></li>
-                    <li><span class="aica-starter-type-badge type-voice" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">VOICE</span> <?php
+                    <li><span class="aica-starter-type-badge type-voice" >VOICE</span> <?php
                         echo get_string('starters:howto_type_voice', 'local_ai_course_assistant'); ?></li>
-                    <li><span class="aica-starter-type-badge type-pronunciation" style="font-size:11px;padding:2px 8px;border-radius:12px;background:#d4edda;color:#155724;">PRONUNCIATION</span> <?php
+                    <li><span class="aica-starter-type-badge type-pronunciation" >PRONUNCIATION</span> <?php
                         echo get_string('starters:howto_type_pronunciation', 'local_ai_course_assistant'); ?></li>
                 </ul>
                 <p><?php echo get_string('starters:howto_conditional', 'local_ai_course_assistant'); ?></p>
@@ -122,11 +122,12 @@ echo $OUTPUT->header();
                 <p><?php echo get_string('starters:howto_reorder', 'local_ai_course_assistant'); ?></p>
                 <p><?php echo get_string('starters:howto_overrides', 'local_ai_course_assistant'); ?></p>
             </div>
+            </details>
         </div>
     </div>
 
     <div class="aica-admin-actions mb-3">
-        <form method="post" style="display: inline;">
+        <form method="post" class="sola-inline-form">
             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="starters_json" class="aica-starters-json" value="">
@@ -134,7 +135,7 @@ echo $OUTPUT->header();
                 <?php echo get_string('starters:save', 'local_ai_course_assistant'); ?>
             </button>
         </form>
-        <form method="post" style="display: inline;" onsubmit="return confirm('<?php echo get_string('starters:reset_confirm', 'local_ai_course_assistant'); ?>');">
+        <form method="post" class="sola-inline-form" onsubmit="return confirm('<?php echo get_string('starters:reset_confirm', 'local_ai_course_assistant'); ?>');">
             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
             <input type="hidden" name="action" value="reset">
             <button type="submit" class="btn btn-outline-secondary">
@@ -150,12 +151,12 @@ echo $OUTPUT->header();
     <div id="aica-starters-list"></div>
 
     <button type="button" class="aica-btn-add" id="aica-add-starter">
-        <span style="font-size: 20px;">+</span>
+        <span class="sola-starters-plus">+</span>
         <?php echo get_string('starters:add_new', 'local_ai_course_assistant'); ?>
     </button>
 
     <div class="aica-admin-actions">
-        <form method="post" style="display: inline;">
+        <form method="post" class="sola-inline-form">
             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="starters_json" class="aica-starters-json" value="">
@@ -163,7 +164,7 @@ echo $OUTPUT->header();
                 <?php echo get_string('starters:save', 'local_ai_course_assistant'); ?>
             </button>
         </form>
-        <form method="post" style="display: inline;" onsubmit="return confirm('<?php echo get_string('starters:reset_confirm', 'local_ai_course_assistant'); ?>');">
+        <form method="post" class="sola-inline-form" onsubmit="return confirm('<?php echo get_string('starters:reset_confirm', 'local_ai_course_assistant'); ?>');">
             <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
             <input type="hidden" name="action" value="reset">
             <button type="submit" class="btn btn-outline-secondary">
@@ -177,235 +178,15 @@ echo $OUTPUT->header();
     </div>
 </div>
 
-<script>
-(function() {
-    var ICONS = <?php echo json_encode($icons); ?>;
-    var ICON_LABELS = <?php echo json_encode($iconlabels, $jsonflags); ?>;
-    var STR = <?php echo json_encode($jsstrings, $jsonflags); ?>;
-    var starters = <?php echo json_encode($starters); ?>;
-    var list = document.getElementById('aica-starters-list');
-    var nextOrder = starters.length + 1;
-
-    function slug(name) {
-        return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 30) || 'custom-' + Date.now();
-    }
-
-    function renderCard(s, idx) {
-        var card = document.createElement('div');
-        card.className = 'aica-starter-card';
-        card.draggable = true;
-        card.dataset.idx = idx;
-
-        var typeBadge = s.type !== 'prompt' ? '<span class="aica-starter-type-badge type-' + s.type + '">' + s.type + '</span>' : '';
-        var condBadge = s.conditional ? '<span class="aica-starter-type-badge">' + s.conditional + '</span>' : '';
-
-        card.innerHTML =
-            '<div class="aica-starter-card-header">' +
-                '<span class="aica-drag-handle" title="' + escAttr(STR.drag_handle) + '">&#x2630;</span>' +
-                '<span class="aica-starter-icon-preview">' + (ICONS[s.icon] || ICONS.chat) + '</span>' +
-                '<span class="aica-starter-name">' + escHtml(s.name) + '</span>' +
-                typeBadge + condBadge +
-                '<label style="margin:0;display:flex;align-items:center;gap:4px;" onclick="event.stopPropagation()">' +
-                    '<input type="checkbox" class="aica-starter-toggle" ' + (s.enabled ? 'checked' : '') + '>' +
-                    '<span style="font-size:12px;color:#6c757d;">' + escHtml(STR.on) + '</span>' +
-                '</label>' +
-                '<span class="aica-starter-expand-arrow">&#x25BC;</span>' +
-            '</div>' +
-            '<div class="aica-starter-card-body">' +
-                '<div class="aica-field">' +
-                    '<label>' + escHtml(STR.name) + '</label>' +
-                    '<input type="text" class="aica-f-name" aria-label="' + escAttr(STR.name_aria) + '" value="' +
-                        escAttr(s.name) + '" placeholder="' + escAttr(STR.name_placeholder) + '">' +
-                '</div>' +
-                '<div class="aica-field">' +
-                    '<label>' + escHtml(STR.description) + '</label>' +
-                    '<input type="text" class="aica-f-desc" aria-label="' + escAttr(STR.desc_aria) + '" value="' +
-                        escAttr(s.description || '') + '" placeholder="' + escAttr(STR.desc_placeholder) + '">' +
-                    '<div class="aica-help">' + escHtml(STR.desc_help) + '</div>' +
-                '</div>' +
-                (s.type === 'prompt' ?
-                '<div class="aica-field">' +
-                    '<label>' + escHtml(STR.prompt) + '</label>' +
-                    '<textarea class="aica-f-prompt" aria-label="' + escAttr(STR.prompt_aria) + '" placeholder="' +
-                        escAttr(STR.prompt_placeholder) + '">' + escHtml(s.prompt || '') + '</textarea>' +
-                    '<div class="aica-help">' + STR.prompt_help + '</div>' +
-                '</div>' : '') +
-                '<div class="aica-field">' +
-                    '<label>' + escHtml(STR.icon) + '</label>' +
-                    '<div class="aica-icon-picker">' +
-                        Object.keys(ICONS).map(function(k) {
-                            var label = ICON_LABELS[k] || k;
-                            return '<span class="aica-icon-option' + (k === s.icon ? ' selected' : '') +
-                                '" data-icon="' + k + '" title="' + escAttr(label) + '">' + ICONS[k] + '</span>';
-                        }).join('') +
-                    '</div>' +
-                '</div>' +
-                (s.type === 'prompt' && !s.builtin ?
-                '<div class="aica-field">' +
-                    '<label>' + escHtml(STR.conditional) + '</label>' +
-                    '<select class="aica-f-conditional">' +
-                        '<option value=""' + (!s.conditional ? ' selected' : '') + '>' + escHtml(STR.cond_always) + '</option>' +
-                        '<option value="tts"' + (s.conditional === 'tts' ? ' selected' : '') + '>' +
-                            escHtml(STR.cond_tts) + '</option>' +
-                        '<option value="realtime"' + (s.conditional === 'realtime' ? ' selected' : '') + '>' +
-                            escHtml(STR.cond_realtime) + '</option>' +
-                    '</select>' +
-                '</div>' : '') +
-                '<div class="aica-starter-actions">' +
-                    (!s.builtin
-                        ? '<button type="button" class="aica-btn-delete">' + escHtml(STR.delete) + '</button>'
-                        : '<span style="font-size:12px;color:#6c757d;">' + escHtml(STR.builtin_note) + '</span>') +
-                '</div>' +
-            '</div>';
-
-        // Expand/collapse.
-        card.querySelector('.aica-starter-card-header').addEventListener('click', function(e) {
-            if (e.target.closest('.aica-starter-toggle') || e.target.closest('label')) return;
-            card.classList.toggle('expanded');
-        });
-
-        // Toggle.
-        card.querySelector('.aica-starter-toggle').addEventListener('change', function() {
-            starters[card.dataset.idx].enabled = this.checked;
-        });
-
-        // Name.
-        var nameInput = card.querySelector('.aica-f-name');
-        if (nameInput) {
-            nameInput.addEventListener('input', function() {
-                starters[card.dataset.idx].name = this.value;
-                card.querySelector('.aica-starter-name').textContent = this.value;
-            });
-        }
-
-        // Description.
-        var descInput = card.querySelector('.aica-f-desc');
-        if (descInput) {
-            descInput.addEventListener('input', function() {
-                starters[card.dataset.idx].description = this.value;
-            });
-        }
-
-        // Prompt.
-        var promptInput = card.querySelector('.aica-f-prompt');
-        if (promptInput) {
-            promptInput.addEventListener('input', function() {
-                starters[card.dataset.idx].prompt = this.value;
-            });
-        }
-
-        // Conditional.
-        var condSelect = card.querySelector('.aica-f-conditional');
-        if (condSelect) {
-            condSelect.addEventListener('change', function() {
-                starters[card.dataset.idx].conditional = this.value;
-            });
-        }
-
-        // Icon picker.
-        card.querySelectorAll('.aica-icon-option').forEach(function(opt) {
-            opt.addEventListener('click', function() {
-                card.querySelectorAll('.aica-icon-option').forEach(function(o) { o.classList.remove('selected'); });
-                opt.classList.add('selected');
-                starters[card.dataset.idx].icon = opt.dataset.icon;
-                card.querySelector('.aica-starter-icon-preview').innerHTML = ICONS[opt.dataset.icon];
-            });
-        });
-
-        // Delete.
-        var delBtn = card.querySelector('.aica-btn-delete');
-        if (delBtn) {
-            delBtn.addEventListener('click', function() {
-                if (confirm(STR.confirm_delete.replace('{$a}', starters[card.dataset.idx].name))) {
-                    starters.splice(card.dataset.idx, 1);
-                    renderAll();
-                }
-            });
-        }
-
-        // Drag events.
-        card.addEventListener('dragstart', function(e) {
-            card.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', card.dataset.idx);
-        });
-        card.addEventListener('dragend', function() {
-            card.classList.remove('dragging');
-        });
-        card.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        });
-        card.addEventListener('drop', function(e) {
-            e.preventDefault();
-            var fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-            var toIdx = parseInt(card.dataset.idx);
-            if (fromIdx !== toIdx) {
-                var item = starters.splice(fromIdx, 1)[0];
-                starters.splice(toIdx, 0, item);
-                renderAll();
-            }
-        });
-
-        return card;
-    }
-
-    function renderAll() {
-        list.innerHTML = '';
-        starters.forEach(function(s, i) {
-            s.sort_order = i + 1;
-            list.appendChild(renderCard(s, i));
-        });
-    }
-
-    function escHtml(str) { var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
-    function escAttr(str) { return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-    // Add new starter.
-    document.getElementById('aica-add-starter').addEventListener('click', function() {
-        var name = STR.new_name;
-        starters.push({
-            key: slug(name + '-' + Date.now()),
-            name: name,
-            description: '',
-            prompt: '',
-            icon: 'lightbulb',
-            type: 'prompt',
-            enabled: true,
-            sort_order: starters.length + 1,
-            builtin: false,
-            conditional: ''
-        });
-        renderAll();
-        // Expand the new card.
-        var cards = list.querySelectorAll('.aica-starter-card');
-        var last = cards[cards.length - 1];
-        if (last) {
-            last.classList.add('expanded');
-            last.querySelector('.aica-f-name').focus();
-            last.scrollIntoView({behavior: 'smooth', block: 'center'});
-        }
-    });
-
-    // Save: serialize starters to all hidden fields (top + bottom forms).
-    document.querySelectorAll('.aica-save-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            // Generate keys for new custom starters based on name.
-            starters.forEach(function(s) {
-                if (!s.builtin && s.key.indexOf('custom-') === 0) {
-                    s.key = slug(s.name);
-                }
-            });
-            var json = JSON.stringify(starters);
-            document.querySelectorAll('.aica-starters-json').forEach(function(el) {
-                el.value = json;
-            });
-        });
-    });
-
-    renderAll();
-})();
-</script>
-
 <?php
+// v7.2.0 (CONTRIB-10574 #201): the 229-line inline <script> that used to sit
+// here is now amd/src/starter_admin.js, initialised via js_call_amd with the
+// data that was previously echoed into the page as JSON literals.
+$PAGE->requires->js_call_amd('local_ai_course_assistant/starter_admin', 'init', [[
+    'icons' => $icons,
+    'iconlabels' => $iconlabels,
+    'strings' => $jsstrings,
+    'starters' => $starters,
+]]);
+
 echo $OUTPUT->footer();
