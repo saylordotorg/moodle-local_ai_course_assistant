@@ -37,6 +37,22 @@
 class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
 
     /**
+     * Tables reached by insert_simple_user_row() that carry a unique constraint,
+     * mapped to the fields that constraint covers.
+     *
+     * Taken from db/install.xml rather than assumed: plans, learner_goals and
+     * streak are unique on (userid, courseid); reminders adds channel. The other
+     * callers -- practice_scores and flashcards -- are UNIQUE="false" and are
+     * deliberately absent, so repeat rows are allowed there.
+     */
+    private const UNIQUE_KEYS = [
+        'local_ai_course_assistant_plans' => ['userid', 'courseid'],
+        'local_ai_course_assistant_learner_goals' => ['userid', 'courseid'],
+        'local_ai_course_assistant_streak' => ['userid', 'courseid'],
+        'local_ai_course_assistant_reminders' => ['userid', 'courseid', 'channel'],
+    ];
+
+    /**
      * Paths this plugin claims at the course level.
      *
      * @return restore_path_element[]
@@ -248,7 +264,18 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $data->userid = $userid;
         $data->courseid = $this->task->get_courseid();
         unset($data->id);
-        $newid = $DB->insert_record('local_ai_course_assistant_convs', $data);
+
+        // convs carries UNIQUE (userid, courseid). Restoring into a course that
+        // already holds this learner's conversation would abort the restore, so
+        // reuse the existing row and map onto it -- the messages beneath then
+        // append to the conversation already there, which is what a merge
+        // restore should do.
+        $existing = $DB->get_field(
+            'local_ai_course_assistant_convs',
+            'id',
+            ['userid' => $userid, 'courseid' => $data->courseid]
+        );
+        $newid = $existing ?: $DB->insert_record('local_ai_course_assistant_convs', $data);
         $this->set_mapping('aica_conv', $oldid, $newid);
     }
 
@@ -352,10 +379,39 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      * @return void
      */
     public function process_aica_practice_score($data) {
+        global $DB;
+
         $data = (array) $data;
-        if (!empty($data['rubricid'])) {
-            $data['rubricid'] = $this->get_mappingid('aica_rubric', $data['rubricid']) ?: null;
+
+        // rubricid is NOT NULL, so it cannot simply be nulled when the mapping
+        // misses -- and it misses on the COMMON case, not an edge one: the
+        // default rubrics are global (courseid = 0), a course backup only carries
+        // course-scoped ones, so any score written against a default rubric has
+        // no mapping. Nulling it aborted the whole restore with a
+        // dml_write_exception.
+        //
+        // Resolve in order: the rubric restored alongside this course, then a
+        // global rubric of the same type on the target site, then give up on the
+        // row. Losing one score is better than losing the restore.
+        $mapped = !empty($data['rubricid'])
+            ? $this->get_mappingid('aica_rubric', $data['rubricid'])
+            : 0;
+
+        if (!$mapped) {
+            $type = (string) ($data['session_type'] ?? '');
+            $mapped = (int) $DB->get_field_select(
+                'local_ai_course_assistant_rubrics',
+                'id',
+                'courseid = 0' . ($type !== '' ? ' AND type = :type' : ''),
+                $type !== '' ? ['type' => $type] : [],
+                IGNORE_MULTIPLE
+            );
         }
+        if (!$mapped) {
+            return;
+        }
+        $data['rubricid'] = $mapped;
+
         $this->insert_simple_user_row('local_ai_course_assistant_practice_scores', $data);
     }
 
@@ -397,6 +453,24 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $data->userid = $userid;
         $data->courseid = $this->task->get_courseid();
         unset($data->id);
+
+        // Several of these tables carry a unique constraint on (userid,
+        // courseid) -- plans, learner_goals and streak -- and reminders adds
+        // channel to it. A merge restore into a course that already holds the
+        // learner's row would abort the whole restore on a duplicate key, so
+        // skip rather than insert. The existing row is the live one and the
+        // backup's copy is by definition older.
+        $unique = self::UNIQUE_KEYS[$table] ?? null;
+        if ($unique !== null) {
+            $conditions = [];
+            foreach ($unique as $field) {
+                $conditions[$field] = $data->$field ?? null;
+            }
+            if ($DB->record_exists($table, $conditions)) {
+                return;
+            }
+        }
+
         $DB->insert_record($table, $data);
     }
 }

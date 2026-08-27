@@ -5918,3 +5918,4 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
     background: #d4edda;
     color: #155724;
 }
+.sola-toc-save { background: #16a34a; border-color: #16a34a; color: #fff; font-weight: 500; }

@@ -226,6 +226,108 @@ final class backup_restore_test extends \advanced_testcase {
     }
 
     /**
+     * A practice score written against a GLOBAL rubric must not abort the restore.
+     *
+     * practice_scores.rubricid is NOT NULL, and the default rubrics are global
+     * (courseid = 0), so a course backup never carries the rubric those scores
+     * point at. Nulling the column on a missed mapping threw
+     * dml_write_exception and took the whole restore down with it -- and because
+     * global rubrics are the default state rather than an edge case, this was the
+     * common path, not a rare one.
+     */
+    public function test_a_score_against_a_global_rubric_does_not_abort_the_restore(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        // A global rubric, as ensure_default_rubrics() creates them.
+        $globalrubric = $DB->insert_record('local_ai_course_assistant_rubrics', (object) [
+            'courseid' => 0,
+            'type' => 'speech',
+            'title' => 'Default speech rubric',
+            'criteria' => '[]',
+            'active' => 1,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $DB->insert_record('local_ai_course_assistant_practice_scores', (object) [
+            'rubricid' => $globalrubric,
+            'userid' => $user->id,
+            'courseid' => $course->id,
+            'session_type' => 'speech',
+            'scores' => '{}',
+            'overall_score' => '4.00000',
+            'timecreated' => time(),
+        ]);
+
+        // Must not throw.
+        $newid = $this->duplicate_course((int) $course->id, true);
+
+        $scores = $DB->get_records('local_ai_course_assistant_practice_scores', ['courseid' => $newid]);
+        $this->assertCount(1, $scores, 'the score should survive, resolved to the global rubric');
+        $this->assertEquals($globalrubric, (int) reset($scores)->rubricid);
+    }
+
+    /**
+     * Restoring into a course that already holds the learner's rows must not
+     * abort on a duplicate key. convs, plans, learner_goals and streak all carry
+     * a unique constraint on (userid, courseid).
+     */
+    public function test_restoring_over_existing_learner_rows_does_not_abort(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $conv = conversation_manager::get_or_create_conversation($user->id, $course->id);
+        conversation_manager::add_message($conv->id, $user->id, $course->id, 'user', 'First question');
+        $DB->insert_record('local_ai_course_assistant_streak', (object) [
+            'userid' => $user->id, 'courseid' => $course->id,
+            'current_streak_days' => 3, 'longest_streak_days' => 5,
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        // Restore the course's own backup back into itself: the target already
+        // holds a conversation and a streak row for this learner.
+        $bc = new \backup_controller(
+            \backup::TYPE_1COURSE, (int) $course->id, \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, get_admin()->id
+        );
+        $bc->get_plan()->get_setting('users')->set_value(true);
+        $bc->execute_plan();
+        $file = $bc->get_results()['backup_destination'];
+        $bc->destroy();
+
+        global $CFG;
+        $tmp = 'aica_merge_restore';
+        $file->extract_to_pathname(
+            get_file_packer('application/vnd.moodle.backup'),
+            $CFG->tempdir . '/backup/' . $tmp
+        );
+        $rc = new \restore_controller(
+            $tmp, (int) $course->id, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL,
+            get_admin()->id, \backup::TARGET_EXISTING_ADDING
+        );
+        $rc->get_plan()->get_setting('users')->set_value(true);
+        $rc->execute_precheck();
+        // The assertion is that this does not throw a duplicate-key exception.
+        $rc->execute_plan();
+        $rc->destroy();
+
+        $this->assertSame(1,
+            $DB->count_records('local_ai_course_assistant_streak',
+                ['userid' => $user->id, 'courseid' => $course->id]),
+            'the unique row must not be duplicated');
+    }
+
+    /**
      * The RAG index is deliberately excluded: derived, regenerable, and by far
      * the largest table the plugin owns.
      */

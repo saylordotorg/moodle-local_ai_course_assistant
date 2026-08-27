@@ -126,7 +126,8 @@ if ($hassiteconfig) {
         . '<li><a href="#sec-safety">' . s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')) . '</a></li>'
         . '<li><a href="#sec-engagement">' . get_string('settingspage:sec_engagement', 'local_ai_course_assistant') . '</a></li>'
         . '<li><a href="#sec-integrations">' . s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')) . '</a></li>'
-        . '<li><a href="#sec-save" style="background:#16a34a;border-color:#16a34a;color:#fff;font-weight:500">&#8595; Save</a></li>'
+        . '<li><a href="#sec-save" class="sola-toc-save">&#8595; '
+        . get_string('settingspage:toc_save', 'local_ai_course_assistant') . '</a></li>'
         . '</ul>'
         . '<div class="sola-quicklinks">' . $quicklinks . '</div>'
         . '</div>';

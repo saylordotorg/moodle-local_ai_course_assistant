@@ -89,12 +89,14 @@
     <div class="card mb-3">
         <div class="card-body">
             <h4>{{heading}}</h4>
-            <p class="text-muted mb-2">{{question}}</p>
+            {{! This string carries <em> markup, so it renders unescaped; the
+                interpolated query is escaped in PHP before it gets here. }}
+            <p class="text-muted mb-2">{{{question}}}</p>
             {{#failed}}{{{errorhtml}}}{{/failed}}
             {{^failed}}
                 {{#empty}}<p class="text-muted">{{emptytext}}</p>{{/empty}}
                 {{^empty}}
-                    <p class="mb-2">{{summary}}</p>
+                    <p class="mb-2">{{{summary}}}</p>
                     <table class="table table-sm mb-0">
                         <thead>
                             <tr>
@@ -127,7 +129,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <h4>{{heading}}</h4>
-            <p class="mb-2">{{summary}}</p>
+            <p class="mb-2">{{{summary}}}</p>
             {{#breakdown}}
                 <h5>{{breakdownheading}}</h5>
                 <pre class="sola-pp-pre">{{breakdowntext}}</pre>
