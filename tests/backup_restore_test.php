@@ -254,13 +254,17 @@ final class backup_restore_test extends \advanced_testcase {
             'timecreated' => time(),
             'timemodified' => time(),
         ]);
+        // overall_score is int(3) and session_duration is NOT NULL with no
+        // default. MySQL coerced a decimal string and defaulted the missing
+        // column; Postgres rejected both, which is how CI caught this fixture.
         $DB->insert_record('local_ai_course_assistant_practice_scores', (object) [
             'rubricid' => $globalrubric,
             'userid' => $user->id,
             'courseid' => $course->id,
             'session_type' => 'speech',
             'scores' => '{}',
-            'overall_score' => '4.00000',
+            'overall_score' => 4,
+            'session_duration' => 120,
             'timecreated' => time(),
         ]);
 
