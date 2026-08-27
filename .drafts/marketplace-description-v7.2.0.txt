@@ -1,6 +1,6 @@
 The AI Course Assistant (also known as the Saylor Online Learning Assistant or SOLA) is an AI-powered learning coach embedded directly in Moodle course pages. Students open it from a side tab to get context-aware help grounded in the course they are studying and the page they are viewing, all without leaving Moodle.
 
-Developed at Saylor University and open-sourced under the GNU GPL v3 with simple white-labeling for other institutions (see below). Used in production on Saylor's Learn and Degrees sites.
+Developed at Saylor University and open-sourced under the GNU GPL v3, with simple white-labeling for other institutions. Used in production on Saylor's Learn and Degrees sites.
 
 Works with Moodle 4.5 through Moodle 5.3 LTS.
 
@@ -39,7 +39,7 @@ WHAT ADMINISTRATORS GET
 
 - Control over index size. Stored vectors can be kept at full precision or compressed to roughly a quarter, or a thirtieth, of the space. The RAG admin page shows what the index occupies now and what each option would occupy, before you commit to a re-index.
 
-- A settings page that stays readable. Feature configuration stays hidden until the feature is switched on, so a default install shows the switches rather than 200+ controls.
+- A settings page that stays readable. Feature configuration stays hidden until the feature is switched on, so a default install shows switches rather than 200+ controls.
 
 PRIVACY AND DATA PROTECTION
 
@@ -47,7 +47,7 @@ PRIVACY AND DATA PROTECTION
 
 - A first-run consent notice the learner must scroll before accepting, gating any escalation of their conversation to a human support desk.
 
-- Configurable retention for conversations and audit records; presentation recordings are deleted automatically on a schedule of your choosing.
+- Configurable retention for conversations and audit records; presentation recordings are deleted automatically on your chosen schedule.
 
 - Per-recipient email opt-out honored across every message type the plugin sends.
 
