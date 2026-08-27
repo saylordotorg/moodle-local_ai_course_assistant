@@ -2496,6 +2496,14 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/anomaly_digest_floor_usd',
+        get_string('settings:anomaly_digest_floor_usd', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_floor_usd_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/anomaly_digest_recipient_email',
         get_string('settings:anomaly_digest_recipient_email', 'local_ai_course_assistant'),
         get_string('settings:anomaly_digest_recipient_email_desc', 'local_ai_course_assistant'),
@@ -2845,7 +2853,8 @@ if ($hassiteconfig) {
             'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
         ],
         'anomaly_digest_enabled' => [
-            'anomaly_digest_threshold_pct', 'anomaly_digest_recipient_email',
+            'anomaly_digest_threshold_pct', 'anomaly_digest_floor_usd',
+            'anomaly_digest_recipient_email',
             'anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook',
         ],
 
