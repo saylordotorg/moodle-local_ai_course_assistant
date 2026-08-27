@@ -538,21 +538,6 @@ $string['milestone:trigger_streak30'] = '30-day activity streak reached';
 $string['milestone:trigger_completion'] = 'Course completion recorded';
 
 // Plugin Updates.
-$string['update:title'] = 'Plugin Updates';
-$string['update:desc'] = 'Check for and install plugin updates directly from GitHub releases.';
-$string['update:check'] = 'Check for Updates';
-$string['update:install'] = 'Install Update';
-$string['update:current_version'] = 'Installed Version';
-$string['update:latest_version'] = 'Latest Available';
-$string['update:up_to_date'] = 'Up to Date';
-$string['update:available'] = 'Update Available';
-$string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
-$string['update:changelog'] = 'Release Notes';
-$string['update:back_to_settings'] = 'Back to Settings';
-$string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
-$string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
-$string['update:github_token'] = 'GitHub Token (optional)';
-$string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
 
 // CDN / Frontend Delivery settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend Delivery';

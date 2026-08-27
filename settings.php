@@ -2769,27 +2769,6 @@ if ($hassiteconfig) {
         '0'
     ));
 
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/updates_heading',
-        get_string('update:title', 'local_ai_course_assistant'),
-        get_string('update:desc', 'local_ai_course_assistant')
-    ));
-
-    $updateurl = new moodle_url('/local/ai_course_assistant/update_admin.php');
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/update_link',
-        '',
-        '<a href="' . $updateurl->out() . '" class="btn btn-sm btn-outline-primary">'
-        . get_string('update:check', 'local_ai_course_assistant') . ' &rarr;</a>'
-    ));
-
-    $settings->add(new admin_setting_configpasswordunmask(
-        'local_ai_course_assistant/github_token',
-        get_string('update:github_token', 'local_ai_course_assistant'),
-        get_string('update:github_token_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
     // v5.5.6: invisible anchor at the bottom of the registered settings so
     // the TOC can offer a "jump to Save" shortcut without forcing admins to
     // scroll through 2,000 lines of settings to commit a single change.
@@ -2965,13 +2944,6 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_prompt_playground',
         \local_ai_course_assistant\branding::apply('[[tutorshort]] Prompt Playground'),
         new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
-        'moodle/site:config'
-    ));
-
-    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
-        'local_ai_course_assistant_updates',
-        get_string('update:title', 'local_ai_course_assistant'),
-        new moodle_url('/local/ai_course_assistant/update_admin.php'),
         'moodle/site:config'
     ));
 
