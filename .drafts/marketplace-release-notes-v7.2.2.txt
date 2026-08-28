@@ -1,4 +1,4 @@
-Version 7.2.2 (build 2026082900)
+Version 7.2.2 (build 2026082801)
 
 A repair release for 7.2.1, following a structured test pass over that build.
 7.2.1 was tagged from a commit continuous integration had not finished
