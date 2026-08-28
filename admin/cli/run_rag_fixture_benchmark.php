@@ -185,6 +185,89 @@ if (!is_array($fixturedoc) || empty($fixturedoc['fixtures'])) {
 $fixtures = $fixturedoc['fixtures'];
 echo "Loaded " . count($fixtures) . " fixtures from " . basename($fixturespath) . "\n";
 
+// ---------- Fixture anchor integrity preflight ----------
+// Recall scoring matches on expected_chunk_id, and falls back to a text match
+// when a reindex has renumbered the chunks. That fallback truncates the anchor
+// to ANCHOR_MATCH_BYTES (see the str_contains() calls further down). Two ways
+// an anchor can be quietly useless: it is not a verbatim substring of its own
+// chunk (whitespace was normalised when it was generated), or its truncated
+// prefix also appears in an overlapping neighbour, so any of them scores a hit.
+// Both fail silently, and only once the chunk ids have gone stale -- which is
+// exactly when the anchor is the only thing left. Check it up front instead.
+define('ANCHOR_MATCH_BYTES', 50);
+$anchorstale = 0;
+$anchormissing = 0;
+$anchorbroken = [];
+$anchorambiguous = [];
+$fxids = array_values(array_unique(array_filter(
+    array_map(fn($f) => (int) ($f['expected_chunk_id'] ?? 0), $fixtures)
+)));
+if ($fxids) {
+    [$insql, $inparams] = $DB->get_in_or_equal($fxids, SQL_PARAMS_NAMED);
+    $fxchunks = $DB->get_records_select(
+        'local_ai_course_assistant_chunks',
+        "id {$insql}",
+        $inparams,
+        '',
+        'id, courseid, content'
+    );
+    $courseblob = [];
+    foreach ($fixtures as $f) {
+        $anchor = (string) ($f['expected_substring'] ?? '');
+        $cid    = (int) ($f['expected_chunk_id'] ?? 0);
+        $label  = (string) ($f['id'] ?? $cid);
+        if ($anchor === '') {
+            $anchormissing++;
+        }
+        if (!$cid || !isset($fxchunks[$cid])) {
+            $anchorstale++;
+            continue; // Cannot verify an anchor against a chunk that is gone.
+        }
+        if ($anchor === '') {
+            continue;
+        }
+        $prefix  = substr($anchor, 0, ANCHOR_MATCH_BYTES);
+        $content = (string) $fxchunks[$cid]->content;
+        if (!str_contains($content, $prefix)) {
+            $anchorbroken[] = $label;
+            continue;
+        }
+        $course = (int) $fxchunks[$cid]->courseid;
+        if (!isset($courseblob[$course])) {
+            $courseblob[$course] = implode("\x00", $DB->get_fieldset_select(
+                'local_ai_course_assistant_chunks',
+                'content',
+                'courseid = :cid',
+                ['cid' => $course]
+            ));
+        }
+        if (substr_count($courseblob[$course], $prefix) !== 1) {
+            $anchorambiguous[] = $label;
+        }
+    }
+}
+$anchorbad = count($anchorbroken) + count($anchorambiguous);
+echo "Anchor preflight: {$anchorstale} stale chunk id(s), {$anchormissing} without a text anchor, "
+    . count($anchorbroken) . " anchor(s) not verbatim, " . count($anchorambiguous)
+    . " ambiguous at " . ANCHOR_MATCH_BYTES . " bytes\n";
+if ($anchorbad > 0 || ($anchorstale > 0 && $anchormissing > 0)) {
+    echo "\n!! WARNING: fixture anchors are not sound; recall figures from this run may be wrong.\n";
+    if ($anchorbroken) {
+        echo "   not verbatim in their chunk (text match can never fire): "
+            . implode(', ', array_slice($anchorbroken, 0, 8))
+            . (count($anchorbroken) > 8 ? ', +' . (count($anchorbroken) - 8) . ' more' : '') . "\n";
+    }
+    if ($anchorambiguous) {
+        echo "   ambiguous at " . ANCHOR_MATCH_BYTES . " bytes (an overlapping neighbour also scores a hit): "
+            . implode(', ', array_slice($anchorambiguous, 0, 8))
+            . (count($anchorambiguous) > 8 ? ', +' . (count($anchorambiguous) - 8) . ' more' : '') . "\n";
+    }
+    if ($anchorstale > 0 && $anchormissing > 0) {
+        echo "   {$anchorstale} fixture(s) have a stale chunk id and no text anchor to fall back on.\n";
+    }
+    echo "   Regenerate with admin/cli/generate_conversational_fixtures.php, which enforces the contract.\n\n";
+}
+
 // ---------- Judge mode (2026-07-18): label-free LLM relevance grading ----------
 if ($judgemode) {
     // ---------- Judge mode: label-free relevance grading ----------
@@ -1514,8 +1597,18 @@ echo "Rerank arm: " . ($rerankavailable ? "ACTIVE (rerank-2.5)" : "SKIPPED (no k
 echo "Candidates (N): {$candidates}  Top-K: {$topk}\n\n";
 
 $cols = ['Group', 'N', 'Cos@1', 'Cos@3', 'Cos@5', 'Cos MRR', 'Rnk@1', 'Rnk@3', 'Rnk@5', 'Rnk MRR', 'Delta@3', 'P50emb', 'P50rnk', 'Cost/q'];
-echo implode(' | ', array_map(fn($c) => str_pad($c, 8), $cols)) . "\n";
-echo str_repeat('-', 8 * count($cols) + 3 * (count($cols) - 1)) . "\n";
+// Group labels are course names ("course115"), which run past the 8-character
+// data columns. Truncating them made distinct courses print under the same
+// label -- course115/116/117 all read as "course11" -- so size this one column
+// to its contents and leave the rest fixed.
+$groupw = 8;
+foreach ($summary as $s) {
+    $groupw = max($groupw, strlen((string) $s['group']));
+}
+$widths = array_fill(0, count($cols), 8);
+$widths[0] = $groupw;
+echo implode(' | ', array_map(fn($c, $w) => str_pad($c, $w), $cols, $widths)) . "\n";
+echo str_repeat('-', array_sum($widths) + 3 * (count($cols) - 1)) . "\n";
 
 foreach ($summary as $s) {
     $pct3 = function ($v) {
@@ -1529,7 +1622,7 @@ foreach ($summary as $s) {
     };
 
     $row = [
-        str_pad(substr($s['group'], 0, 8), 8),
+        str_pad((string) $s['group'], $groupw),
         str_pad($s['n'], 8),
         str_pad($pct3($s['cosine_recall_at_1']), 8),
         str_pad($pct3($s['cosine_recall_at_3']), 8),
