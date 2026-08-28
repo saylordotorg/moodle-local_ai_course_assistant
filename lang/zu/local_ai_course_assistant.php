@@ -1966,3 +1966,6 @@ $string['quizlock:enabled'] = 'Khiya umsizi ngesikhathi sezivivinyo ze-Moodle';
 $string['quizlock:enabled_desc'] = 'Ivimbela umsizi yonke indawo — ingxoxo, izwi, amakhadi okufunda, izivivinyo zokuzilolonga — uma umfundi enomzamo wesivivinyo oqhubekayo. Kuhlolwa kuseva, ngakho ukuvula ithebhu yesibili akukugwemi. Uthisha angakhipha isivivinyo esisodwa ngokusetha izinga losizo lwaso ku-Usizo olugcwele.';
 $string['quizlock:window'] = 'Isikhathi somzamo osasebenza (imizuzu)';
 $string['quizlock:window_desc'] = 'Isikhathi umzamo esivivinyweni esingenamkhawulo wesikhathi osabalwa ngaso njengoqhubekayo. Izivivinyo ezinomkhawulo wazo zisebenzisa lowo. Imizamo eshiyiwe ihlala iqhubeka ingapheli, ngakho ngaphandle kwalo mkhawulo owodwa ubuzokhiya umfundi unomphela. Okuzenzakalelayo: 180.';
+
+$string['emergency:chat_stopped'] = 'I-[[tutorshort]] imisiwe okwamanje. Izinto zekhosi yakho azithintekile, futhi akulona iphutha lakho — sicela uzame futhi ngemuva kwesikhathi.';
+$string['settings:money_nonnegative_invalid'] = 'Faka inani elingu-0 noma ngaphezulu, elinamanani angemuva kwekhefu angadluli amabili (isibonelo 25 noma 25.50).';

@@ -1981,3 +1981,6 @@ $string['quizlock:enabled'] = 'Blocca l\'assistente durante i quiz di Moodle';
 $string['quizlock:enabled_desc'] = 'Blocca l\'assistente ovunque — chat, voce, flashcard, quiz di esercitazione — mentre uno studente ha un tentativo di quiz in corso. Il controllo avviene lato server, quindi aprire una seconda scheda non lo aggira. Un docente può escludere un quiz impostando il suo livello di assistenza su Aiuto completo.';
 $string['quizlock:window'] = 'Finestra di validità del tentativo (minuti)';
 $string['quizlock:window_desc'] = 'Per quanto tempo un tentativo su un quiz senza limite di tempo conta ancora come in corso. I quiz con un proprio limite usano quello. I tentativi abbandonati restano in corso a tempo indeterminato, quindi senza questo limite uno bloccherebbe lo studente per sempre. Predefinito: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] è in pausa in questo momento. I materiali del corso non sono stati modificati e non dipende da te: riprova più tardi.';
+$string['settings:money_nonnegative_invalid'] = 'Inserisci un importo pari o superiore a 0, con al massimo due decimali (ad esempio 25 o 25.50).';

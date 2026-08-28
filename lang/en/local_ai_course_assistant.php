@@ -593,6 +593,19 @@ $string['settings:redash_export_window_days_desc'] = 'How far back the export re
 $string['settings:redash_allow_deanonymized'] = 'Allow de-anonymized export';
 $string['settings:redash_allow_deanonymized_desc'] = 'Off by default. When off, a request for anonymize=0 is refused and learners always appear as pseudonyms. Turn this on only if an external report genuinely needs real learner names, and remember that the export authenticates with a shared API key rather than a signed-in administrator, so anyone holding the key can then retrieve those names. De-anonymized requests are audit-logged with the requesting IP either way.';
 
+// v7.2.1: audit log viewer. The rows were always written; nothing could read them.
+$string['auditlog:title'] = '[[tutorshort]] Audit Log';
+$string['auditlog:intro'] = 'Actions recorded by [[tutorshort]]: emergency switches, provider failover, de-anonymised exports and integrity checks. Read-only. Rows are removed automatically once they pass the retention period set in the plugin settings.';
+$string['auditlog:empty'] = 'Nothing has been recorded yet.';
+$string['auditlog:col_time'] = 'Time';
+$string['auditlog:col_action'] = 'Action';
+$string['auditlog:col_user'] = 'User';
+$string['auditlog:col_course'] = 'Course';
+$string['auditlog:col_ip'] = 'IP address';
+$string['auditlog:col_details'] = 'Details';
+$string['auditlog:settings_link'] = 'Open the audit log';
+$string['auditlog:settings_link_desc'] = 'Every emergency switch, provider failover and de-anonymised export is recorded. This is where you read those rows.';
+
 // v6.1.0: web emergency panel.
 $string['emergency:title'] = '[[tutorshort]] Emergency Controls';
 $string['emergency:page_warning'] = 'These switches take effect immediately for every learner on the site. Each action writes an audit row. Granular switches leave the rest of [[tutorshort]] running; the master kill removes the widget entirely.';
@@ -607,6 +620,7 @@ $string['emergency:restore_button'] = 'Restore';
 $string['emergency:disabled_notice'] = 'Subsystem "{$a->flag}" disabled. Config touched: {$a->touched}';
 $string['emergency:restored_notice'] = 'Subsystem "{$a->flag}" restored. Config touched: {$a->touched}';
 $string['emergency:cli_reference'] = 'The same controls are available from the on-call shell:';
+$string['emergency:chat_stopped'] = '[[tutorshort]] is paused right now. Your course materials are unaffected, and this is not something you did — please try again later.';
 $string['emergency:flag_chat'] = 'Chat';
 $string['emergency:flag_chat_desc'] = 'Blocks chat traffic via the dedicated kill flag (v5.13 fix). The widget keeps rendering; learners see the friendly "[[tutorshort]] paused" message. Use when an LLM provider is misbehaving or a cost spike is in progress.';
 $string['emergency:flag_voice'] = 'Voice';
@@ -1364,7 +1378,7 @@ $string['settings:socratic_verbose']      = 'Verbose Socratic mode prompt';
 $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses receive the full ~600-token do/don\'t directive originally added in v3.9.30. When off (default), they receive a single-line directive that modern hosted models follow reliably and saves ~600 tokens per turn. Turn this on if a course is running on a weaker self-hosted model that needs the explicit scaffolding.';
 // v4.12.0: structured prompt budget + verbosity.
 $string['settings:prompt_budget_chars']      = 'System prompt character budget';
-$string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organises sections by category (identity, course context, learner state, behaviour, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 12,000 characters (~3,000 tokens) as of v5.0.0. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';
+$string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organises sections by category (identity, course context, learner state, behaviour, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 24,000 characters (~6,000 tokens) as of v7.2.1, raised from 12,000: a stock prompt with retrieval on measures about 23,800 characters, so the previous default dropped or truncated sections on every turn. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';
 $string['settings:backend_context_tokens']      = 'Backend context window (tokens)';
 $string['settings:backend_context_tokens_desc'] = 'The maximum context length (max_model_len) of your AI backend, in tokens. Set to 0 for hosted models with a large window (no clamping). When set above 0 (for example 8192 on a self-hosted vLLM backend), [[tutorshort]] shrinks the system-prompt character budget above so the prompt plus reserved output and conversation history fit the window, even in token-dense languages. See the Deployment Sizing wiki page for how this maps to concurrent users.';
 $string['settings:backend_retry_attempts']      = 'Backend retry attempts';
@@ -2079,6 +2093,7 @@ $string['settingspage:analytics_link'] = 'View Analytics Dashboard';
 $string['settingspage:reset_prompt_template'] = 'Reset to default template';
 $string['settingspage:rag_explainer'] = 'RAG (Retrieval-Augmented Generation) indexes your course content and retrieves relevant passages when students ask questions, so the AI can give answers grounded in your materials. Requires an embedding API key (OpenAI recommended). After enabling, use the RAG Admin page to index courses.';
 $string['settingspage:realtime_explainer'] = 'Realtime Voice Mode enables live, two-way spoken conversations between students and the AI using OpenAI\'s Realtime API. This is different from standard text-to-speech (TTS), which reads AI responses aloud. Realtime Voice requires a separate API key and is billed per minute of audio. Once enabled globally, you can toggle it per course in each course\'s settings page.';
+$string['settings:money_nonnegative_invalid'] = 'Enter an amount of 0 or more, using at most two decimal places (for example 25 or 25.50).';
 $string['settings:anomaly_digest_floor_usd'] = 'Anomaly digest: minimum spend to alert on (USD)';
 $string['settings:anomaly_digest_floor_usd_desc'] = 'Suppress the token-spend alert when the last 24 hours cost less than this, however large the percentage jump. A percentage on a small base is noise: doubling from $1 to $2 clears any threshold and means nothing. Set this to a daily figure you would actually want waking you. 0 disables the floor and alerts on percentage alone. If any spend in the window comes from a model with no rate-card entry it cannot be priced, and the alert is sent regardless -- an unrecognized model in the mix is itself worth seeing.';
 $string['settings:anomaly_digest_recipient_email'] = 'Recipient email';

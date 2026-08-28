@@ -1931,3 +1931,6 @@ $string['quizlock:enabled'] = 'Assistent während Moodle-Tests sperren';
 $string['quizlock:enabled_desc'] = 'Sperrt den Assistenten überall – Chat, Sprache, Lernkarten, Übungstests – solange ein Lernender einen laufenden Testversuch hat. Die Prüfung erfolgt serverseitig, ein zweiter Tab umgeht sie also nicht. Lehrende können einen Test ausnehmen, indem sie dessen Unterstützungsstufe auf Volle Hilfe setzen.';
 $string['quizlock:window'] = 'Gültigkeitsfenster für Versuche (Minuten)';
 $string['quizlock:window_desc'] = 'Wie lange ein Versuch bei einem Test ohne Zeitbegrenzung noch als laufend gilt. Tests mit eigener Zeitbegrenzung verwenden diese. Abgebrochene Versuche bleiben unbegrenzt laufend; ohne diese Grenze würde einer den Lernenden dauerhaft aussperren. Standard: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] ist derzeit pausiert. Ihre Kursmaterialien sind davon nicht betroffen, und es liegt nicht an Ihnen — bitte versuchen Sie es später erneut.';
+$string['settings:money_nonnegative_invalid'] = 'Geben Sie einen Betrag von 0 oder mehr mit höchstens zwei Nachkommastellen ein (zum Beispiel 25 oder 25.50).';

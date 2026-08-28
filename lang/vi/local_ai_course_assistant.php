@@ -1966,3 +1966,6 @@ $string['quizlock:enabled'] = 'Khóa trợ lý trong các bài kiểm tra Moodle
 $string['quizlock:enabled_desc'] = 'Chặn trợ lý ở mọi nơi — trò chuyện, giọng nói, thẻ ghi nhớ, bài kiểm tra luyện tập — khi người học đang có một lượt làm bài kiểm tra. Việc kiểm tra thực hiện ở máy chủ, nên mở tab thứ hai không lách được. Giáo viên có thể miễn trừ một bài kiểm tra bằng cách đặt mức hỗ trợ của nó thành Trợ giúp đầy đủ.';
 $string['quizlock:window'] = 'Khoảng thời gian lượt làm bài còn hiệu lực (phút)';
 $string['quizlock:window_desc'] = 'Một lượt làm bài trên bài kiểm tra không giới hạn thời gian còn được tính là đang diễn ra trong bao lâu. Bài kiểm tra có giới hạn riêng thì dùng giới hạn đó. Các lượt bị bỏ dở vẫn ở trạng thái đang diễn ra vô thời hạn, nên nếu không có giới hạn này thì một lượt sẽ khóa người học vĩnh viễn. Mặc định: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] hiện đang tạm dừng. Tài liệu khóa học của bạn không bị ảnh hưởng và đây không phải lỗi của bạn — vui lòng thử lại sau.';
+$string['settings:money_nonnegative_invalid'] = 'Nhập số tiền từ 0 trở lên, tối đa hai chữ số thập phân (ví dụ 25 hoặc 25.50).';

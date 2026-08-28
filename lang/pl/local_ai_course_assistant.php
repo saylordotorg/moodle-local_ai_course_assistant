@@ -1930,3 +1930,6 @@ $string['quizlock:enabled'] = 'Blokuj asystenta podczas testów Moodle';
 $string['quizlock:enabled_desc'] = 'Blokuje asystenta wszędzie – czat, głos, fiszki, testy ćwiczeniowe – gdy uczący się ma rozpoczęte podejście do testu. Sprawdzane po stronie serwera, więc otwarcie drugiej karty tego nie omija. Nauczyciel może wyłączyć jeden test, ustawiając jego poziom pomocy na Pełna pomoc.';
 $string['quizlock:window'] = 'Okno ważności podejścia (minuty)';
 $string['quizlock:window_desc'] = 'Jak długo podejście do testu bez limitu czasu nadal liczy się jako trwające. Testy z własnym limitem używają swojego. Porzucone podejścia pozostają trwające bezterminowo, więc bez tego ograniczenia jedno zablokowałoby uczącego się na zawsze. Domyślnie: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] jest w tej chwili wstrzymany. Materiały kursu pozostały bez zmian i nie jest to spowodowane twoim działaniem — spróbuj ponownie później.';
+$string['settings:money_nonnegative_invalid'] = 'Podaj kwotę równą 0 lub większą, z maksymalnie dwoma miejscami po przecinku (na przykład 25 lub 25.50).';

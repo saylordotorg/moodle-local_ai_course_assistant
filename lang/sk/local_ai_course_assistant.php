@@ -1930,3 +1930,6 @@ $string['quizlock:enabled'] = 'Uzamknúť asistenta počas testov v Moodle';
 $string['quizlock:enabled_desc'] = 'Blokuje asistenta všade – chat, hlas, kartičky, cvičné testy – kým má študent rozpracovaný pokus o test. Kontrola prebieha na serveri, takže otvorenie druhej karty ju neobíde. Učiteľ môže jeden test vyňať nastavením úrovne pomoci na Plná pomoc.';
 $string['quizlock:window'] = 'Okno platnosti pokusu (minúty)';
 $string['quizlock:window_desc'] = 'Ako dlho sa pokus pri teste bez časového limitu stále počíta ako prebiehajúci. Testy s vlastným limitom používajú ten svoj. Opustené pokusy zostávajú prebiehajúce neobmedzene, takže bez tohto obmedzenia by jediný študenta zamkol natrvalo. Predvolené: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] je momentálne pozastavený. Vaše študijné materiály to neovplyvnilo a nie je to vaša chyba — skúste to prosím neskôr.';
+$string['settings:money_nonnegative_invalid'] = 'Zadajte sumu 0 alebo vyššiu, najviac na dve desatinné miesta (napríklad 25 alebo 25.50).';

@@ -89,6 +89,61 @@ final class backup_restore_test extends \advanced_testcase {
     /**
      * The headline case: course configuration survives a duplicate.
      */
+    public function test_per_course_pedagogy_overrides_survive_a_duplicate(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $cid = (int) $course->id;
+
+        // These live in config_plugins as "<setting>_course_<id>", not in the
+        // course_cfg table, and none of them travelled before v7.2.1. A teacher
+        // duplicating a course kept the model and system prompt -- so the copy
+        // looked right -- while every pedagogy decision reverted to site default.
+        set_config('socratic_mode_course_' . $cid, '1', 'local_ai_course_assistant');
+        set_config('flashcards_enabled_course_' . $cid, '0', 'local_ai_course_assistant');
+        set_config('english_lock_course_' . $cid, '1', 'local_ai_course_assistant');
+        set_config('rag_enabled_course_' . $cid, '0', 'local_ai_course_assistant');
+
+        $newid = $this->duplicate_course($cid, false);
+
+        $this->assertSame(
+            '1',
+            get_config('local_ai_course_assistant', 'socratic_mode_course_' . $newid),
+            'Socratic mode was silently reset to the site default on the copy.'
+        );
+        $this->assertSame(
+            '0',
+            get_config('local_ai_course_assistant', 'flashcards_enabled_course_' . $newid),
+            'A deliberate "force off" must survive; falling back to the site '
+                . 'default silently turns the feature back on.'
+        );
+        $this->assertSame('1', get_config('local_ai_course_assistant', 'english_lock_course_' . $newid));
+        $this->assertSame('0', get_config('local_ai_course_assistant', 'rag_enabled_course_' . $newid));
+    }
+
+    public function test_a_per_course_credential_is_never_written_into_the_backup(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $cid = (int) $course->id;
+        set_config('rerank_apikey_course_' . $cid, 'sk-live-must-not-travel', 'local_ai_course_assistant');
+        set_config('socratic_mode_course_' . $cid, '1', 'local_ai_course_assistant');
+
+        $newid = $this->duplicate_course($cid, false);
+
+        $this->assertFalse(
+            get_config('local_ai_course_assistant', 'rerank_apikey_course_' . $newid),
+            'A per-course credential must not be carried across by the settings backup.'
+        );
+        $this->assertSame(
+            '1',
+            get_config('local_ai_course_assistant', 'socratic_mode_course_' . $newid),
+            'Excluding credentials must not also exclude ordinary overrides.'
+        );
+    }
+
     public function test_course_configuration_survives_a_duplicate(): void {
         global $DB;
         $this->resetAfterTest(true);

@@ -300,9 +300,31 @@ class context_builder {
         $verbosity = self::resolve_verbosity($courseid);
 
         // Render the base template (identity + base course placeholders).
+        // v7.2.1: course structure and course content are NEVER substituted into
+        // the template body. Both used to be, whenever the template carried their
+        // placeholder -- which the shipped default does, for both.
+        //
+        // The substituted text then became part of base_template, and
+        // base_template is budgeted from the `safety_identity` bucket: 10% of the
+        // prompt budget, sized for a ~1.6 KB identity block. Meanwhile the
+        // `course_structure` (10%) and `course_content` (40%) buckets were never
+        // spent, because no section was ever named for them -- section_to_bucket()
+        // has mapped 'course_topics' and 'course_content' since v5.6.0, but
+        // nothing created a section by either name unless the admin's template
+        // happened to omit the placeholder.
+        //
+        // At the shipped 12,000-char budget that truncated base_template to 1,235
+        // chars. Course structure and every retrieved passage were cut, while the
+        // output-marker section still told the model to cite passages inline with
+        // [[c:N]] -- so it cited passages it had never been shown. It also meant
+        // the assembled prompt did not change length when retrieval returned more
+        // chunks, which is what made the fault look like "retrieval never ran".
+        //
+        // Both now flow through their own budgeted sections, exactly as they
+        // already did for admins whose custom template omitted the placeholders.
         $base = str_replace(
             ['{{coursename}}', '{{userrole}}', '{{coursetopics}}', '{{coursecontent}}', '{{institution}}'],
-            [$course->fullname, $userrole, $coursetopics, $coursecontent, $institution],
+            [$course->fullname, $userrole, '', '', $institution],
             $template
         );
         // Resolve the product/institution brand tokens ([[tutorshort]],
@@ -314,9 +336,19 @@ class context_builder {
         $sections = [];
         $sections[] = new section('base_template', section::CAT_IDENTITY, 100, $base, 200);
 
-        // If the template did not slot {{coursecontent}}, course content is
-        // a separate context section so the budget can truncate it.
-        if (!empty($coursecontent) && strpos($template, '{{coursecontent}}') === false) {
+        // Course structure and course content are context, not identity, and are
+        // budgeted as such. Priorities keep content above structure: when the
+        // budget is tight the course map is the cheaper thing to lose.
+        if (!empty($coursetopics)) {
+            $sections[] = new section(
+                'course_topics',
+                section::CAT_CONTEXT,
+                92,
+                "\n\n## Course Structure\n" . $coursetopics,
+                200
+            );
+        }
+        if (!empty($coursecontent)) {
             $sections[] = new section(
                 'course_content',
                 section::CAT_CONTEXT,
@@ -557,8 +589,15 @@ class context_builder {
         // v5.0.0 patch (Tomi UT round 2): code-level fallback raised
         // 10000 → 12000 to give the new current_page_content section
         // headroom alongside the existing learner + behavior sections.
+        // v7.2.1: raised from 12,000. A stock RAG-mode prompt measures 23,824
+        // chars at rag_topk=3 (identity 1,599 + course structure 2,558 + three
+        // retrieved passages + persona, house style, Socratic mode, multilingual,
+        // memory handling, practice scoring, output markers, and a 3,836-char
+        // safety block). At 12,000 the assembler was therefore always dropping or
+        // truncating something on a default install -- most visibly the
+        // multilingual section, on a product that ships 46 languages.
         $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
-        $budget = ($rawbudget === false || $rawbudget === '') ? 12000 : (int) $rawbudget;
+        $budget = ($rawbudget === false || $rawbudget === '') ? 24000 : (int) $rawbudget;
 
         // v5.10.0: clamp to the backend context window when configured, so the
         // assembled prompt (plus reserved output and history) fits a small
@@ -586,7 +625,16 @@ class context_builder {
         // boosts course_content when pageid == 0). The assembler honors
         // max_chars first, then falls through to drop-on-priority as the
         // safety net for any residual overflow.
-        $budgets = self::section_budgets($budget, $pageid, $quizmode);
+        // Everything without a bucket is fixed overhead: it is neither clipped
+        // nor sized by the weight map, so the elastic context sections can only
+        // have what it leaves behind.
+        $reservedchars = 0;
+        foreach ($sections as $sec) {
+            if (self::section_to_bucket($sec->name) === null) {
+                $reservedchars += $sec->length();
+            }
+        }
+        $budgets = self::section_budgets($budget, $pageid, $quizmode, $reservedchars);
         foreach ($sections as $sec) {
             $bucket = self::section_to_bucket($sec->name);
             if ($bucket !== null && isset($budgets[$bucket])) {
@@ -827,7 +875,15 @@ class context_builder {
     private static function section_to_bucket(string $sectionname): ?string {
         static $map = [
             // safety_identity bucket
-            'base_template'           => 'safety_identity',
+            //
+            // v7.2.1: 'base_template' is deliberately NOT mapped. It carries the
+            // operator's own system-prompt template (persona, precedence rules,
+            // the safety identity), and clipping it to a percentage of the budget
+            // silently cut the tail off the shipped default -- it was arriving
+            // truncated at 1,235 of its 1,640 chars on a stock install. It is
+            // CAT_IDENTITY at the highest priority, so the drop-on-priority net
+            // still guards a pathological custom template; what it no longer does
+            // is quietly amputate a well-behaved one.
             'security'                => 'safety_identity',
             'quiz_coach_mode'         => 'safety_identity',
             'page_grounding_reminder' => 'safety_identity',
@@ -908,7 +964,12 @@ class context_builder {
      * @param string $quizmode '' or 'coach'.
      * @return array<string,int> Map of bucket key -> char budget.
      */
-    public static function section_budgets(int $total_budget, int $pageid, string $quizmode = ''): array {
+    public static function section_budgets(
+        int $total_budget,
+        int $pageid,
+        string $quizmode = '',
+        int $reserved_chars = 0
+    ): array {
         // Per-coach-mode override: when the active turn is a graded quiz
         // attempt (quizmode='coach'), prefer the coach-specific weight set
         // if the admin set one. This lets institutions force a heavier
@@ -933,9 +994,23 @@ class context_builder {
         $weights = self::apply_boost($weights, $boost, $page_in_scope);
 
         // Convert percentages to char budgets.
+        //
+        // v7.2.1: allocate from what is left AFTER the sections that are not
+        // budgeted by bucket -- persona, house style, Socratic mode, multilingual,
+        // memory handling, output markers, the safety block and so on. Those four
+        // bucket weights sum to 100, so charging them against the whole budget
+        // over-subscribed it by exactly the size of everything else (~9,900 chars
+        // on a stock install against a 12,000 budget). Whichever sections the
+        // drop-on-priority net reached first then vanished, which is why raising
+        // the budget appeared to "bring back" unrelated sections.
+        //
+        // $reserved_chars defaults to 0, which reproduces the pre-v7.2.1
+        // allocation exactly for any caller that does not measure its fixed
+        // sections first.
+        $pool = max(0, $total_budget - $reserved_chars);
         $budgets = [];
         foreach ($weights as $bucket => $pct) {
-            $budgets[$bucket] = (int) round($total_budget * ($pct / 100.0));
+            $budgets[$bucket] = (int) round($pool * ($pct / 100.0));
         }
         return $budgets;
     }

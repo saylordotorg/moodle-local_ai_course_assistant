@@ -1931,3 +1931,6 @@ $string['quizlock:enabled'] = 'Lukitse avustaja Moodle-tenttien ajaksi';
 $string['quizlock:enabled_desc'] = 'Estää avustajan kaikkialla – keskustelu, puhe, muistikortit, harjoitustentit – kun opiskelijalla on tenttiyritys kesken. Tarkistus tehdään palvelimella, joten toisen välilehden avaaminen ei kierrä sitä. Opettaja voi vapauttaa yksittäisen tentin asettamalla sen tukitason arvoon Täysi apu.';
 $string['quizlock:window'] = 'Yrityksen voimassaoloikkuna (minuuttia)';
 $string['quizlock:window_desc'] = 'Kuinka kauan yritys ilman aikarajaa olevassa tentissä lasketaan yhä keskeneräiseksi. Tentit, joilla on oma aikaraja, käyttävät sitä. Hylätyt yritykset jäävät keskeneräisiksi rajattomasti, joten ilman tätä rajaa yksi lukitsisi opiskelijan pysyvästi. Oletus: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] on juuri nyt tauolla. Kurssimateriaalisi eivät ole muuttuneet, eikä tämä johdu sinusta — yritä myöhemmin uudelleen.';
+$string['settings:money_nonnegative_invalid'] = 'Anna vähintään 0:n suuruinen summa, enintään kahdella desimaalilla (esimerkiksi 25 tai 25.50).';

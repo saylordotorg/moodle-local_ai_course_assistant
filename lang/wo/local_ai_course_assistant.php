@@ -1966,3 +1966,6 @@ $string['quizlock:enabled'] = 'Tëj jariñukaay bi ci jamono u ceet yu Moodle';
 $string['quizlock:enabled_desc'] = 'Dafay tëj jariñukaay bi ci fépp — waxtaan, baat, kart yu njàng, ceet yu tayeer — bu jàngkat bi amee jéego ceet bu ngi dox. Ñu koy seet ci serwóor bi, kon ubbi beneen taab du ko wër. Jàngalekat bi mën na génne benn ceet ci def seen daraja ndimbal ci Ndimbal bu mat.';
 $string['quizlock:window'] = 'Diirub jéego bi (simili)';
 $string['quizlock:window_desc'] = 'Ñaata diir la jéego ci ceet bu amul àpp u waxtu di ame ni mu ngi dox. Ceet yu am seen àpp bopp dañuy jëfandikoo bii. Jéego yu ñu bàyyi dañuy des di dox ba fàww, kon te àpp bii benn dina tëj jàngkat bi ba fàww. Bu ëpp: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] taxaw na léegi. Sa jumtukaayu njàng yi soppiku wuñu, te du sa njuumte — nangeen jéem ci kanam.';
+$string['settings:money_nonnegative_invalid'] = 'Bindal xaalis bu tollu ci 0 walla lu ko ëpp, ak ñaari tomb yu mucc (misaal 25 walla 25.50).';

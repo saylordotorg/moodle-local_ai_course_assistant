@@ -1958,3 +1958,6 @@ $string['quizlock:enabled'] = 'Bloquear el asistente durante los cuestionarios d
 $string['quizlock:enabled_desc'] = 'Bloquea el asistente en todas partes (chat, voz, tarjetas de memoria, cuestionarios de práctica) mientras un estudiante tenga un intento de cuestionario en curso. Se comprueba en el servidor, así que abrir otra pestaña no lo evita. Un profesor puede eximir un cuestionario poniendo su nivel de asistencia en Ayuda completa.';
 $string['quizlock:window'] = 'Ventana de vigencia del intento (minutos)';
 $string['quizlock:window_desc'] = 'Cuánto tiempo sigue contando como en curso un intento en un cuestionario sin límite de tiempo. Los cuestionarios con su propio límite usan ese. Los intentos abandonados quedan en curso indefinidamente, así que sin este límite uno bloquearía al estudiante para siempre. Valor predeterminado: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] está en pausa en este momento. Los materiales de tu curso no se ven afectados y no es algo que hayas hecho tú: inténtalo de nuevo más tarde.';
+$string['settings:money_nonnegative_invalid'] = 'Introduce un importe de 0 o más, con un máximo de dos decimales (por ejemplo, 25 o 25.50).';

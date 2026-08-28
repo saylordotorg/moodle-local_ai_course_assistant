@@ -1,0 +1,94 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/audit_log
+
+    Read-only listing of the plugin audit trail.
+
+    Every value is rendered through {{ }}. The details column in particular is
+    built from data recorded at the time of the event and must stay escaped.
+
+    Context variables required for this template:
+    * intro string
+    * hasrows bool
+    * rows array of {time, action, username, userid, courseid, ipaddress, details}
+    * empty string
+    * col_* string column headings
+    * back_to_settings string, settings_url string
+    * hasprev bool, prevurl string, prevlabel string
+    * hasnext bool, nexturl string, nextlabel string
+
+    Example context (json):
+    {
+        "intro": "Actions recorded by the plugin.",
+        "hasrows": true,
+        "rows": [{"time": "1/01/26, 09:14", "action": "emergency_disable",
+                  "username": "Admin User", "userid": 2, "courseid": 0,
+                  "ipaddress": "10.0.0.1", "details": "flag=chat"}],
+        "empty": "Nothing recorded yet.",
+        "col_time": "Time", "col_action": "Action", "col_user": "User",
+        "col_course": "Course", "col_ip": "IP address", "col_details": "Details",
+        "back_to_settings": "Settings", "settings_url": "#",
+        "hasprev": false, "prevurl": "#", "prevlabel": "Previous",
+        "hasnext": false, "nexturl": "#", "nextlabel": "Next"
+    }
+}}
+<div class="mb-3">
+    <a href="{{settings_url}}" class="btn btn-sm btn-outline-secondary">&larr; {{back_to_settings}}</a>
+</div>
+
+<p class="text-muted">{{intro}}</p>
+
+{{^hasrows}}
+    <div class="alert alert-info">{{empty}}</div>
+{{/hasrows}}
+
+{{#hasrows}}
+<div class="table-responsive">
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th scope="col">{{col_time}}</th>
+                <th scope="col">{{col_action}}</th>
+                <th scope="col">{{col_user}}</th>
+                <th scope="col">{{col_course}}</th>
+                <th scope="col">{{col_ip}}</th>
+                <th scope="col">{{col_details}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#rows}}
+            <tr>
+                <td>{{time}}</td>
+                <td><code>{{action}}</code></td>
+                <td>{{username}}</td>
+                <td>{{courseid}}</td>
+                <td>{{ipaddress}}</td>
+                <td class="small text-muted">{{details}}</td>
+            </tr>
+            {{/rows}}
+        </tbody>
+    </table>
+</div>
+
+<nav>
+    <ul class="pagination pagination-sm">
+        {{#hasprev}}<li class="page-item"><a class="page-link" href="{{prevurl}}">{{prevlabel}}</a></li>{{/hasprev}}
+        {{#hasnext}}<li class="page-item"><a class="page-link" href="{{nexturl}}">{{nextlabel}}</a></li>{{/hasnext}}
+    </ul>
+</nav>
+{{/hasrows}}

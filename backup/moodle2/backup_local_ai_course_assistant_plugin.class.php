@@ -49,6 +49,8 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
      * @return backup_plugin_element
      */
     protected function define_course_plugin_structure() {
+        global $DB;
+
         // Only include user activity when the backup is set to include users.
         $userinfo = $this->get_setting_value('users');
 
@@ -68,6 +70,53 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
         $wrapper->add_child($configs);
         $configs->add_child($config);
         $config->set_source_table('local_ai_course_assistant_course_cfg', ['courseid' => backup::VAR_COURSEID]);
+
+        // ---------- per-course overrides held in config_plugins ----------
+        //
+        // The course_cfg table carries only provider, model, system prompt and
+        // temperature. Every other per-course decision on the Course AI Settings
+        // page -- Socratic mode, flashcards, sandbox, essay feedback, Soapbox,
+        // worked examples, external resources, the voice tab, auto-open, digest
+        // email, English lock, the per-course RAG toggle, the widget on/off
+        // choice and all seven starter chips -- is stored as a config_plugins row
+        // named "<setting>_course_<courseid>". None of it travelled, so a
+        // duplicated course kept its model and prompt (making the copy look
+        // correct) while every pedagogy decision silently reverted to the site
+        // default.
+        //
+        // Credentials are excluded here rather than on restore, so they never
+        // enter the backup file at all.
+        $courseid = (int) $this->task->get_courseid();
+        $settings = new backup_nested_element('aica_course_settings');
+        $setting = new backup_nested_element('aica_course_setting', ['id'], ['name', 'value']);
+        $wrapper->add_child($settings);
+        $settings->add_child($setting);
+
+        // set_source_array rather than set_source_sql: in a backup structure a
+        // string param value is interpreted as a path to another element, so a
+        // literal like the plugin name is looked up as an element and the plan
+        // fails to build. Reading the config in PHP is also an exact suffix
+        // match, where a LIKE would need escaping that MySQL string literals
+        // then re-interpret.
+        $suffix = '_course_' . $courseid;
+        $rows = [];
+        $rowid = 0;
+        foreach ((array) get_config('local_ai_course_assistant') as $key => $value) {
+            if (substr($key, -strlen($suffix)) !== $suffix) {
+                continue;
+            }
+            foreach (['apikey', 'token', 'secret', 'password', 'webhook'] as $deny) {
+                if (stripos($key, $deny) !== false) {
+                    continue 2;
+                }
+            }
+            $rows[] = (object) [
+                'id' => ++$rowid,
+                'name' => $key,
+                'value' => (string) $value,
+            ];
+        }
+        $setting->set_source_array($rows);
 
         // Per-quiz assistance levels. cmid is remapped on restore.
         $quizcfgs = new backup_nested_element('aica_quiz_cfgs');

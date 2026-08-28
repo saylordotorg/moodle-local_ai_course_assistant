@@ -1961,3 +1961,6 @@ $string['quizlock:enabled'] = 'Kunci asisten selama kuis Moodle';
 $string['quizlock:enabled_desc'] = 'Memblokir asisten di semua tempat — obrolan, suara, kartu hafalan, kuis latihan — selama peserta memiliki percobaan kuis yang berlangsung. Diperiksa di sisi server, jadi membuka tab kedua tidak bisa mengakalinya. Pengajar dapat mengecualikan satu kuis dengan mengatur tingkat bantuannya ke Bantuan penuh.';
 $string['quizlock:window'] = 'Jendela masa berlaku percobaan (menit)';
 $string['quizlock:window_desc'] = 'Berapa lama percobaan pada kuis tanpa batas waktu masih dihitung sedang berlangsung. Kuis yang punya batas waktu sendiri memakai batas itu. Percobaan yang ditinggalkan tetap berlangsung tanpa batas, jadi tanpa batas ini satu saja akan mengunci peserta selamanya. Bawaan: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] sedang dijeda saat ini. Materi kursus Anda tidak terpengaruh, dan ini bukan karena kesalahan Anda — silakan coba lagi nanti.';
+$string['settings:money_nonnegative_invalid'] = 'Masukkan jumlah 0 atau lebih, dengan maksimal dua angka desimal (misalnya 25 atau 25.50).';

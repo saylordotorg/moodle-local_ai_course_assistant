@@ -1948,3 +1948,6 @@ $string['quizlock:enabled'] = 'Xir kaaliyaha inta lagu jiro imtixaannada Moodle'
 $string['quizlock:enabled_desc'] = 'Wuxuu joojiyaa kaaliyaha meel kasta — sheeko, cod, kaararka xusuusta, imtixaannada tababarka — inta ardaygu hayo isku day imtixaan oo socda. Waxaa lagu hubiyaa server-ka, sidaas darteed furitaanka tab labaad kama badbaadiyo. Macallinku wuxuu ka dhaafi karaa hal imtixaan isagoo heerka caawimaadda u dhigaya Caawimaad buuxda.';
 $string['quizlock:window'] = 'Muddada uu isku daygu ansax yahay (daqiiqado)';
 $string['quizlock:window_desc'] = 'Inta muddo ee isku day imtixaan aan lahayn xad waqti weli loo tiriyo mid socda. Imtixaannada leh xaddoodii ayaa isticmaala kooda. Isku dayada la iska daayay waxay sii socdaan mudo aan xad lahayn, sidaas darteed xadkan la\'aantiis mid keliya wuxuu ardayga xiri lahaa weligiis. Caadiga: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] hadda waa la joojiyay. Agabkaaga koorsadu ma uusan wax dhib ah gaarin, mana aha wax adigu sameeyay — fadlan mar kale isku day goor dambe.';
+$string['settings:money_nonnegative_invalid'] = 'Geli qadar ah 0 ama ka badan, ugu badnaan laba god oo tobanle ah (tusaale 25 ama 25.50).';

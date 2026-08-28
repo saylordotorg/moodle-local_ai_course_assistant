@@ -736,7 +736,17 @@ $templatedata = [
 ];
 
 // Load Chart.js and analytics dashboard AMD module.
+//
+// v7.2.1: the Chart.js UMD bundle is bracketed by a pair of guards that hide
+// window.define across its load. It prefers AMD when it sees a loader, and
+// Moodle always has RequireJS on the page, so it was registering an anonymous
+// module that RequireJS then rejected ("Mismatched anonymous define()") instead
+// of installing window.Chart. Every canvas on this page rendered empty while
+// the headline numbers populated normally, which made it look like a data
+// problem. Order matters: these three are classic scripts and run in sequence.
+$PAGE->requires->js(new moodle_url('/local/ai_course_assistant/cdn/chartjs/amd-guard-before.js'));
 $PAGE->requires->js(new moodle_url('/local/ai_course_assistant/cdn/chartjs/chart.umd.min.js'));
+$PAGE->requires->js(new moodle_url('/local/ai_course_assistant/cdn/chartjs/amd-guard-after.js'));
 // Resolve the dashboard's JS-rendered labels server-side so they are translatable
 // (CONTRIB-10574 #79); the JS reads config.strings.<key>.
 $jsstringkeys = [

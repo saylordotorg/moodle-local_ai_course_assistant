@@ -1961,3 +1961,6 @@ $string['quizlock:enabled'] = 'Dɛmɛbaga datugu Moodle kɔrɔbɔliw waati la';
 $string['quizlock:enabled_desc'] = 'A bɛ dɛmɛbaga bali yɔrɔ bɛɛ la — baro, kumakan, kalan kartiw, degeli kɔrɔbɔliw — ni kalanden bɛ kɔrɔbɔli kɛcogo dɔ la min bɛ ka kɛ. A bɛ lajɛ sɛrɛwu kan, o la taabu filanan dayɛlɛli tɛ se ka a tanga. Karamɔgɔ bɛ se ka kɔrɔbɔli kelen bɔ a la ni a ye a ka dɛmɛ hakɛ kɛ Dɛmɛ dafalen ye.';
 $string['quizlock:window'] = 'Kɛcogo ka waati hakɛ (miniti)';
 $string['quizlock:window_desc'] = 'Kɔrɔbɔli min tɛ waati dan sɔrɔ, a kɛcogo bɛ jate i n\'a fɔ a bɛ ka kɛ waati jumɛn na. Kɔrɔbɔli minnu bɛ n\'u yɛrɛ ka waati dan ye, olu bɛ o de kɛ. Kɛcogo minnu bilala bɛ to ka kɛ waati dan tɛ, o la ni nin dan tɛ, kelen bɛna kalanden datugu fo abada. Fɔlɔ: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] jɔɔlen don sisan. I ka kalan fɛnw ma yɛlɛma, ani o tɛ i ka fili ye — i ni ce, a lajɛ kokura kɔfɛ.';
+$string['settings:money_nonnegative_invalid'] = 'Hakɛ min ye 0 ye walima ka tɛmɛ o kan, sɛbɛn; desimali fila dama (misali 25 walima 25.50).';

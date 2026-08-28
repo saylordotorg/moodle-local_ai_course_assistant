@@ -1930,3 +1930,6 @@ $string['quizlock:enabled'] = 'Blocarea asistentului în timpul testelor Moodle'
 $string['quizlock:enabled_desc'] = 'Blochează asistentul peste tot — chat, voce, carduri, teste de exersare — cât timp cursantul are o încercare de test în curs. Verificarea se face pe server, deci deschiderea unei a doua file nu o ocolește. Un profesor poate exclude un test setând nivelul său de asistență la Ajutor complet.';
 $string['quizlock:window'] = 'Fereastra de valabilitate a încercării (minute)';
 $string['quizlock:window_desc'] = 'Cât timp o încercare la un test fără limită de timp mai contează ca fiind în curs. Testele cu limită proprie o folosesc pe aceea. Încercările abandonate rămân în curs pe termen nelimitat, deci fără această limită una singură ar bloca definitiv cursantul. Implicit: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] este pus pe pauză în acest moment. Materialele cursului nu sunt afectate și nu este din vina ta — încearcă din nou mai târziu.';
+$string['settings:money_nonnegative_invalid'] = 'Introdu o sumă de 0 sau mai mare, cu cel mult două zecimale (de exemplu 25 sau 25.50).';

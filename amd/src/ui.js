@@ -482,7 +482,12 @@ define([
         const cites = currentCitations || [];
         const order = {};
         let nextNum = 0;
-        return html.replace(/\[\[c:(\d+)\]\]/g, function(_m, nStr) {
+        // The leading whitespace is captured so it can be dropped along with an
+        // unresolvable marker. Returning just '' left the space the model wrote
+        // before the citation, producing "...the basic elements of art ." -- and
+        // that dangling space was the only visible sign that the model had cited
+        // a passage it was never given.
+        return html.replace(/(\s*)\[\[c:(\d+)\]\]/g, function(_m, lead, nStr) {
             const n = parseInt(nStr, 10);
             if (!(n >= 0) || n >= cites.length || !cites[n] || !cites[n].url) {
                 return '';
@@ -496,7 +501,7 @@ define([
             const titleAttr = cite.title
                 ? ' title="' + escapeAttr(cite.title) + '"'
                 : '';
-            return '<sup class="aica-citation">'
+            return lead + '<sup class="aica-citation">'
                 + '<a href="' + escapeAttr(cite.url) + '"' + titleAttr
                 + ' target="_blank" rel="noopener noreferrer">'
                 + num + '</a></sup>';

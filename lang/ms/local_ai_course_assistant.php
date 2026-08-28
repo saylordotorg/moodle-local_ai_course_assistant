@@ -1960,3 +1960,6 @@ $string['quizlock:enabled'] = 'Kunci pembantu semasa kuiz Moodle';
 $string['quizlock:enabled_desc'] = 'Menyekat pembantu di semua tempat — sembang, suara, kad imbas, kuiz latihan — selagi pelajar mempunyai percubaan kuiz yang sedang berjalan. Diperiksa di pelayan, jadi membuka tab kedua tidak dapat mengelaknya. Guru boleh mengecualikan satu kuiz dengan menetapkan tahap bantuannya kepada Bantuan penuh.';
 $string['quizlock:window'] = 'Tetingkap sah percubaan (minit)';
 $string['quizlock:window_desc'] = 'Berapa lama percubaan pada kuiz tanpa had masa masih dikira sedang berjalan. Kuiz yang mempunyai had masa sendiri menggunakan had itu. Percubaan yang ditinggalkan kekal berjalan tanpa had, jadi tanpa had ini satu sahaja akan mengunci pelajar selama-lamanya. Lalai: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] dijeda buat masa ini. Bahan kursus anda tidak terjejas, dan ini bukan disebabkan oleh anda — sila cuba lagi kemudian.';
+$string['settings:money_nonnegative_invalid'] = 'Masukkan jumlah 0 atau lebih, dengan maksimum dua tempat perpuluhan (contohnya 25 atau 25.50).';

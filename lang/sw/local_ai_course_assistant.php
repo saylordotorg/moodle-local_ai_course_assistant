@@ -1967,3 +1967,6 @@ $string['quizlock:enabled'] = 'Funga msaidizi wakati wa majaribio ya Moodle';
 $string['quizlock:enabled_desc'] = 'Huzuia msaidizi kila mahali — gumzo, sauti, kadi za kumbukumbu, majaribio ya mazoezi — mwanafunzi anapokuwa na jaribio linaloendelea. Hukaguliwa kwenye seva, kwa hivyo kufungua kichupo cha pili hakusaidii kukwepa. Mwalimu anaweza kusamehe jaribio moja kwa kuweka kiwango chake cha usaidizi kuwa Msaada kamili.';
 $string['quizlock:window'] = 'Muda wa kuhesabiwa kwa jaribio (dakika)';
 $string['quizlock:window_desc'] = 'Muda ambao jaribio kwenye jaribio lisilo na kikomo cha muda bado linahesabiwa kuwa linaendelea. Majaribio yenye kikomo chao hutumia hicho. Majaribio yaliyoachwa hubaki yakiendelea bila kikomo, hivyo bila mpaka huu moja lingemfunga mwanafunzi milele. Chaguo-msingi: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] imesitishwa kwa sasa. Nyenzo za kozi yako hazijaathiriwa, na hili si kosa lako — tafadhali jaribu tena baadaye.';
+$string['settings:money_nonnegative_invalid'] = 'Weka kiasi cha 0 au zaidi, kwa nafasi mbili za desimali kwa juu zaidi (kwa mfano 25 au 25.50).';

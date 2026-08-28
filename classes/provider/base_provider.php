@@ -16,6 +16,15 @@
 
 namespace local_ai_course_assistant\provider;
 
+// v7.2.1: spend_guard lives in the plugin root namespace, not in \provider.
+// Without this import every `spend_guard::` reference below resolved to
+// local_ai_course_assistant\provider\spend_guard, which does not exist, and
+// threw a fatal Error -- straight into the two `catch (\Throwable $ignore)`
+// blocks that wrap them. The spend cap, cap failover, and the per-call
+// failover chain were therefore all inert at the one point every provider
+// call converges on, and had been since the guard was added.
+use local_ai_course_assistant\spend_guard;
+
 /**
  * Base provider with shared configuration and cURL helpers.
  *
@@ -451,6 +460,20 @@ abstract class base_provider implements provider_interface {
         try {
             $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
             if ($level === spend_guard::CAP_BLOCKED) {
+                // Defence in depth. enforce_learner_guards() has already thrown
+                // for web requests, but CAP_BLOCKED covers two different events
+                // and only one of them may be answered by failing over. Without
+                // this, an emergency stop reaching here would be read as "this
+                // provider is capped" and silently resolved by moving chat onto
+                // the failover provider, which is the opposite of stopping.
+                if (spend_guard::emergency_chat_stopped()) {
+                    throw new \moodle_exception(
+                        'error',
+                        'local_ai_course_assistant',
+                        '',
+                        \local_ai_course_assistant\branding::str('emergency:chat_stopped')
+                    );
+                }
                 $failover = spend_guard::resolve_failover('chat');
                 if ($failover !== null) {
                     $overrides['provider'] = $failover['provider'];
@@ -467,8 +490,14 @@ abstract class base_provider implements provider_interface {
             }
         } catch (\moodle_exception $budgeterr) {
             throw $budgeterr;
-        } catch (\Throwable $ignore) {
-            // Never let the guard break core flow on a fresh install.
+        } catch (\Throwable $guarderr) {
+            // Still never break the call path on a fresh install -- but say so.
+            // Swallowing this silently is what let a missing import disable the
+            // spend guard entirely without a single symptom.
+            debugging(
+                'SOLA spend guard did not run: ' . $guarderr->getMessage(),
+                DEBUG_DEVELOPER
+            );
         }
 
         $primary = self::instantiate($provider, $overrides);
@@ -512,8 +541,13 @@ abstract class base_provider implements provider_interface {
                         'userid'          => (int) ($USER->id ?? 0),
                     ]);
                 }
-            } catch (\Throwable $ignore) {
-                // Never let chain construction break the primary call path.
+            } catch (\Throwable $chainerr) {
+                // Never let chain construction break the primary call path,
+                // but do not hide the reason it did not build.
+                debugging(
+                    'SOLA per-call failover chain not built: ' . $chainerr->getMessage(),
+                    DEBUG_DEVELOPER
+                );
             }
         }
 
@@ -591,6 +625,26 @@ abstract class base_provider implements provider_interface {
      */
     private static function enforce_learner_guards(): void {
         global $USER;
+
+        // v7.2.1: the emergency chat stop is checked FIRST, ahead of every
+        // exemption below, because it is a kill switch rather than a learner
+        // guard. It applies to site admins, to scheduled tasks and to CLI alike:
+        // an operator who pauses chat during an incident means everyone, and a
+        // switch with exemptions is a switch you cannot reason about at 3am.
+        //
+        // Admins being exempt is precisely how this was reported -- the panel
+        // read DISABLED while chat kept answering, from an admin session.
+        // Operator tooling that genuinely needs a model (benchmarks, the
+        // jailbreak suite) is unblocked by clearing the flag, which is one
+        // command and leaves an audit row.
+        if (spend_guard::emergency_chat_stopped()) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                \local_ai_course_assistant\branding::str('emergency:chat_stopped')
+            );
+        }
 
         if (CLI_SCRIPT || empty($USER->id) || is_siteadmin()) {
             return;

@@ -231,6 +231,23 @@ class spend_guard {
      * @param string|null $capability
      * @return string One of the CAP_* constants
      */
+    /**
+     * Is the emergency chat stop engaged?
+     *
+     * check() folds this into CAP_BLOCKED so that everything which already
+     * refuses on a spend cap also refuses here. But the two are not the same
+     * event and must not be handled the same way: a spend cap means "this
+     * provider's budget is gone, use another one", while the emergency stop
+     * means "stop answering". Callers that respond to CAP_BLOCKED by failing
+     * over need to ask this first, or the kill switch quietly turns into a
+     * provider switch and chat keeps answering.
+     *
+     * @return bool
+     */
+    public static function emergency_chat_stopped(): bool {
+        return (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled');
+    }
+
     public static function check(int $courseid = 0, ?string $capability = null): string {
         // v5.13.0: emergency_control --chat sets a dedicated flag that
         // short-circuits every chat-shaped call (and only chat-shaped calls)

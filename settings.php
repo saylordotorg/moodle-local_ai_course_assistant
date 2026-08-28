@@ -70,6 +70,10 @@ if ($hassiteconfig) {
     // review found the kill switch was CLI-only, leaving incident response
     // dependent on SSH access.
     $emergencyurl = new moodle_url('/local/ai_course_assistant/emergency_admin.php');
+    // v7.2.1: the audit log is reachable. Two settings told admins to go and
+    // read it -- Emergency Controls and per-call failover -- while no page
+    // existed to read it in.
+    $auditurl = new moodle_url('/local/ai_course_assistant/audit_log.php');
     $quicklinks = '<a href="' . $analyticsurl->out() . '">'
             . get_string('toc:analytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $tokenanalyticsurl->out() . '">'
@@ -77,6 +81,8 @@ if ($hassiteconfig) {
         . '<a href="' . $demoadminurl->out() . '">'
             . get_string('toc:testing', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $playgroundurl->out() . '">Prompt Playground</a>'
+        . '<a href="' . $auditurl->out() . '">'
+            . \local_ai_course_assistant\branding::str('auditlog:settings_link') . '</a>'
         . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
             . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 
@@ -330,7 +336,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/prompt_budget_chars',
         get_string('settings:prompt_budget_chars', 'local_ai_course_assistant'),
         get_string('settings:prompt_budget_chars_desc', 'local_ai_course_assistant'),
-        '12000',
+        '24000',
         PARAM_INT
     ));
     // v5.10.0: backend context window (max_model_len) for self-hosted/small
@@ -2491,12 +2497,14 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    $settings->add(new admin_setting_configtext(
+    // v7.2.1: PARAM_FLOAT rejected "25.50" (it cleans to 25.5, and configtext
+    // compares the cleaned value to the input as a string) while happily storing
+    // "-5" as a spend floor. See setting_money_nonnegative.
+    $settings->add(new \local_ai_course_assistant\admin\setting_money_nonnegative(
         'local_ai_course_assistant/anomaly_digest_floor_usd',
         get_string('settings:anomaly_digest_floor_usd', 'local_ai_course_assistant'),
         get_string('settings:anomaly_digest_floor_usd_desc', 'local_ai_course_assistant'),
-        '0',
-        PARAM_FLOAT
+        '0'
     ));
 
     $settings->add(new admin_setting_configtext(

@@ -1597,5 +1597,29 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082700, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082800) {
+        // v7.2.1: raise the system-prompt character budget for sites still on
+        // the old default.
+        //
+        // A stock prompt with retrieval on measures about 23,800 characters, so
+        // the previous 12,000 default could never hold it: the assembler dropped
+        // or truncated sections on every single turn. Combined with course
+        // content being charged to the wrong budget bucket (see
+        // context_builder::build_system_prompt), retrieved passages were cut out
+        // of the prompt entirely while the model was still instructed to cite
+        // them, and it cited passages it had never been shown.
+        //
+        // Only sites still sitting on the literal old default are moved. An
+        // admin who deliberately tuned this -- down for cost, or up already --
+        // keeps their value; raising a configured budget would change their spend
+        // without asking.
+        $budget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
+        if ((string) $budget === '12000') {
+            set_config('prompt_budget_chars', 24000, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082800, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

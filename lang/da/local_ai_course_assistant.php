@@ -1931,3 +1931,6 @@ $string['quizlock:enabled'] = 'Lås assistenten under Moodle-prøver';
 $string['quizlock:enabled_desc'] = 'Blokerer assistenten alle steder – chat, tale, flashcards, øvelsesprøver – så længe en deltager har et igangværende prøveforsøg. Kontrolleres på serveren, så en ekstra fane omgår det ikke. En underviser kan undtage en enkelt prøve ved at sætte dens hjælpeniveau til Fuld hjælp.';
 $string['quizlock:window'] = 'Gyldighedsvindue for forsøg (minutter)';
 $string['quizlock:window_desc'] = 'Hvor længe et forsøg på en prøve uden tidsgrænse stadig tæller som igangværende. Prøver med egen tidsgrænse bruger den. Forladte forsøg forbliver igangværende uden ophør, så uden denne grænse ville ét låse deltageren ude permanent. Standard: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] er sat på pause lige nu. Dit kursusmateriale er upåvirket, og det er ikke noget, du har gjort — prøv igen senere.';
+$string['settings:money_nonnegative_invalid'] = 'Indtast et beløb på 0 eller derover med højst to decimaler (for eksempel 25 eller 25.50).';

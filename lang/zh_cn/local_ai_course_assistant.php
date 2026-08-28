@@ -1966,3 +1966,6 @@ $string['quizlock:enabled'] = '在 Moodle 测验期间锁定助手';
 $string['quizlock:enabled_desc'] = '当学习者有正在进行的测验答题时，在所有界面（聊天、语音、闪卡、练习测验）屏蔽助手。检查在服务器端进行，因此另开标签页无法绕过。教师可将某个测验的协助级别设为“完全帮助”以将其豁免。';
 $string['quizlock:window'] = '答题有效窗口（分钟）';
 $string['quizlock:window_desc'] = '没有时限的测验，其答题在多长时间内仍算作进行中。设有自身时限的测验使用该时限。被放弃的答题会无限期保持进行中状态，若无此上限，一次答题就会永久锁住学习者。默认值：180。';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] 目前已暂停。您的课程材料不受影响，这也不是您造成的 — 请稍后再试。';
+$string['settings:money_nonnegative_invalid'] = '请输入 0 或更大的金额，最多保留两位小数（例如 25 或 25.50）。';

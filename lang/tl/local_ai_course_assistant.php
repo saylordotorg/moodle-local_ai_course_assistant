@@ -1967,3 +1967,6 @@ $string['quizlock:enabled'] = 'I-lock ang assistant tuwing may Moodle quiz';
 $string['quizlock:enabled_desc'] = 'Hinaharangan ang assistant sa lahat ng bahagi — chat, boses, flashcard, practice quiz — habang may kasalukuyang pagsubok sa quiz ang mag-aaral. Sinusuri sa server, kaya hindi ito maiiwasan sa pagbukas ng pangalawang tab. Maaaring ipagpaliban ng guro ang isang quiz sa pamamagitan ng pagtatakda ng antas ng tulong nito sa Buong tulong.';
 $string['quizlock:window'] = 'Bisa ng pagsubok (minuto)';
 $string['quizlock:window_desc'] = 'Gaano katagal pa ituturing na kasalukuyan ang isang pagsubok sa quiz na walang takdang oras. Ang mga quiz na may sariling limitasyon ay gumagamit niyon. Ang mga iniwang pagsubok ay nananatiling kasalukuyan nang walang katapusan, kaya kung wala ang hangganang ito ay tuluyan nang mala-lock ang mag-aaral. Default: 180.';
+
+$string['emergency:chat_stopped'] = 'Pansamantalang naka-pause ang [[tutorshort]] ngayon. Hindi naapektuhan ang mga materyales ng iyong kurso, at hindi ito dahil sa iyo — pakisubukan muli mamaya.';
+$string['settings:money_nonnegative_invalid'] = 'Maglagay ng halagang 0 o higit pa, na may hindi hihigit sa dalawang decimal (halimbawa 25 o 25.50).';

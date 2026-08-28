@@ -1961,3 +1961,6 @@ $string['quizlock:enabled'] = 'Kulle mataimaki lokacin jarrabawar Moodle';
 $string['quizlock:enabled_desc'] = 'Yana hana mataimaki a ko\'ina — hira, murya, katunan koyo, jarrabawar aiki — muddin ɗalibi yana da yunkurin jarrabawa da ke gudana. Ana dubawa a uwar garke, don haka buɗe shafi na biyu ba ya kuɓutar. Malami na iya keɓe jarrabawa ɗaya ta hanyar saita matakin taimakonta zuwa Cikakken taimako.';
 $string['quizlock:window'] = 'Tazarar inganci na yunkuri (mintuna)';
 $string['quizlock:window_desc'] = 'Tsawon lokacin da yunkuri a jarrabawa marar iyakar lokaci ke ci gaba da ƙidaya a matsayin mai gudana. Jarrabawun da ke da nasu iyakar lokaci suna amfani da shi. Yunkurin da aka watsar suna ci gaba da gudana har abada, don haka ba tare da wannan iyaka ba ɗaya zai kulle ɗalibi har abada. Tsohuwa: 180.';
+
+$string['emergency:chat_stopped'] = 'An dakatar da [[tutorshort]] a yanzu. Kayan karatunku ba su canza ba, kuma ba laifinku ba ne — don Allah a sake gwadawa daga baya.';
+$string['settings:money_nonnegative_invalid'] = 'Shigar da adadi 0 ko sama da haka, da matsakaicin lambobi biyu bayan aya (misali 25 ko 25.50).';

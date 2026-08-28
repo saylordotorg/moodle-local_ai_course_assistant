@@ -1930,3 +1930,6 @@ $string['quizlock:enabled'] = 'Assistent vergrendelen tijdens Moodle-toetsen';
 $string['quizlock:enabled_desc'] = 'Blokkeert de assistent overal – chat, spraak, flashcards, oefentoetsen – zolang een cursist een lopende toetspoging heeft. De controle gebeurt op de server, dus een tweede tabblad omzeilt het niet. Een docent kan één toets uitzonderen door het hulpniveau op Volledige hulp te zetten.';
 $string['quizlock:window'] = 'Geldigheidsvenster van poging (minuten)';
 $string['quizlock:window_desc'] = 'Hoelang een poging bij een toets zonder tijdslimiet nog als lopend telt. Toetsen met een eigen limiet gebruiken die. Verlaten pogingen blijven onbeperkt lopend, dus zonder deze grens zou er één een cursist permanent buitensluiten. Standaard: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] is op dit moment gepauzeerd. Je cursusmateriaal is niet gewijzigd en dit ligt niet aan jou — probeer het later opnieuw.';
+$string['settings:money_nonnegative_invalid'] = 'Voer een bedrag van 0 of hoger in, met maximaal twee decimalen (bijvoorbeeld 25 of 25.50).';

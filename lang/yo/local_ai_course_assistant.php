@@ -1966,3 +1966,6 @@ $string['quizlock:enabled'] = 'Tì olùrànlọ́wọ́ nígbà ìdánwò Moodle
 $string['quizlock:enabled_desc'] = 'Ó ń dí olùrànlọ́wọ́ lọ́wọ́ níbi gbogbo — ìjíròrò, ohùn, káàdì ìkọ́, ìdánwò ìdánrawò — nígbà tí akẹ́kọ̀ọ́ bá ní ìgbìyànjú ìdánwò tí ń lọ lọ́wọ́. A ń ṣàyẹ̀wò rẹ̀ ní sáfà, nítorí náà ṣíṣí táàbù kejì kò lè yẹ̀ ẹ́. Olùkọ́ lè yọ ìdánwò kan kúrò nípa ṣíṣètò ìpele ìrànlọ́wọ́ rẹ̀ sí Ìrànlọ́wọ́ kíkún.';
 $string['quizlock:window'] = 'Àkókò ìgbẹ́kẹ̀lé ìgbìyànjú (ìṣẹ́jú)';
 $string['quizlock:window_desc'] = 'Bí ìgbìyànjú lórí ìdánwò tí kò ní ààlà àkókò ṣe máa jẹ́ èyí tí ń lọ lọ́wọ́ pẹ́ tó. Ìdánwò tí ó ní ààlà tirẹ̀ yóò lo èyí. Àwọn ìgbìyànjú tí a kọ̀ sílẹ̀ máa ń wà lọ́wọ́ láìlópin, nítorí náà láìsí ààlà yìí ọ̀kan yóò tì akẹ́kọ̀ọ́ mọ́lé títí láé. Àbùdá: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] ti dúró fún ìgbà díẹ̀ báyìí. Àwọn ohun èlò ẹ̀kọ́ rẹ kò yí padà, kì í sì í ṣe àṣìṣe rẹ — jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí i nígbà tó bá yá.';
+$string['settings:money_nonnegative_invalid'] = 'Tẹ iye owó tí ó jẹ́ 0 tàbí jù bẹ́ẹ̀ lọ, pẹ̀lú ààyè eléèwádì méjì tí ó pọ̀ jù (bí àpẹẹrẹ 25 tàbí 25.50).';

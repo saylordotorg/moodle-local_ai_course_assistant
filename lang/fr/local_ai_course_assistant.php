@@ -1931,3 +1931,6 @@ $string['quizlock:enabled'] = 'Verrouiller l\'assistant pendant les tests Moodle
 $string['quizlock:enabled_desc'] = 'Bloque l\'assistant partout (discussion, voix, cartes mémoire, tests d\'entraînement) tant qu\'un apprenant a une tentative de test en cours. La vérification se fait côté serveur : ouvrir un second onglet ne permet pas de contourner. Un enseignant peut exempter un test en réglant son niveau d\'assistance sur Aide complète.';
 $string['quizlock:window'] = 'Fenêtre de validité de la tentative (minutes)';
 $string['quizlock:window_desc'] = 'Durée pendant laquelle une tentative sur un test sans limite de temps compte encore comme en cours. Les tests ayant leur propre limite utilisent celle-ci. Les tentatives abandonnées restent en cours indéfiniment ; sans cette limite, l\'une d\'elles bloquerait l\'apprenant définitivement. Valeur par défaut : 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] est en pause pour le moment. Vos supports de cours ne sont pas affectés et cela ne vient pas de vous — merci de réessayer plus tard.';
+$string['settings:money_nonnegative_invalid'] = 'Saisissez un montant supérieur ou égal à 0, avec deux décimales au maximum (par exemple 25 ou 25.50).';

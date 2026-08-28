@@ -1944,3 +1944,6 @@ $string['quizlock:enabled'] = 'Moodle sınavları sırasında asistanı kilitle'
 $string['quizlock:enabled_desc'] = 'Öğrencinin devam eden bir sınav denemesi varken asistanı her yerde engeller: sohbet, ses, bilgi kartları, alıştırma sınavları. Kontrol sunucu tarafında yapılır, bu yüzden ikinci bir sekme açmak bunu aşmaz. Öğretmen, bir sınavın yardım düzeyini Tam yardım yaparak onu muaf tutabilir.';
 $string['quizlock:window'] = 'Deneme geçerlilik penceresi (dakika)';
 $string['quizlock:window_desc'] = 'Süre sınırı olmayan bir sınavdaki denemenin ne kadar süre devam ediyor sayılacağı. Kendi süre sınırı olan sınavlar onu kullanır. Terk edilen denemeler süresiz olarak devam eder durumda kalır, bu sınır olmasa biri öğrenciyi kalıcı olarak kilitlerdi. Varsayılan: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] şu anda duraklatıldı. Ders materyalleriniz etkilenmedi ve bu sizden kaynaklanmıyor — lütfen daha sonra tekrar deneyin.';
+$string['settings:money_nonnegative_invalid'] = '0 veya daha büyük bir tutar girin; en fazla iki ondalık basamak kullanın (örneğin 25 veya 25.50).';

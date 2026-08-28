@@ -1947,3 +1947,6 @@ $string['quizlock:enabled'] = 'Kpọchie onye enyemaka n\'oge ule Moodle';
 $string['quizlock:enabled_desc'] = 'Ọ na-egbochi onye enyemaka n\'ebe niile — nkata, olu, kaadị mmụta, ule omume — mgbe onye mmụta nwere mgbalị ule na-aga n\'ihu. A na-enyocha ya na sava, ya mere imepe taabụ nke abụọ agaghị enyere aka ịgbanahụ ya. Onye nkuzi nwere ike wepụ otu ule site n\'ịtọ ọkwa enyemaka ya na Enyemaka zuru oke.';
 $string['quizlock:window'] = 'Oge mgbalị ka dị irè (nkeji)';
 $string['quizlock:window_desc'] = 'Ogologo oge mgbalị na ule na-enweghị oke oge ka a na-agụ dịka nke na-aga n\'ihu. Ule ndị nwere oke oge nke ha na-eji nke ha. Mgbalị ndị a hapụrụ na-anọgide na-aga n\'ihu ruo mgbe ebighị ebi, ya mere na-enweghị oke a otu ga-akpọchi onye mmụta ruo mgbe ebighị ebi. Ndabara: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] kwụsịtụrụ ugbu a. Ihe ọmụmụ gị enweghị nsogbu, ọ bụghịkwa ihe i mere — biko nwaa ọzọ ma emesịa.';
+$string['settings:money_nonnegative_invalid'] = 'Tinye ego ruru 0 ma ọ bụ karịa, na-eji ọnụọgụ abụọ kacha na-esote akara (dịka 25 ma ọ bụ 25.50).';

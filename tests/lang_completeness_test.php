@@ -246,6 +246,26 @@ final class lang_completeness_test extends \basic_testcase {
      * the pages displayed before the extraction, so nothing regressed.
      */
     private const ADMIN_DIAGNOSTIC_UNTRANSLATED = [
+        // v7.2.1: the audit log viewer, added because two settings told admins
+        // to go and read a page that had never been built. Staged here on the
+        // same reasoning as the batches above -- it is one administrator-only
+        // diagnostic page, every locale falls back to lang/en, and eleven
+        // unreviewed machine translations would read as finished work while
+        // nobody had checked them.
+        //
+        // Deliberately NOT staged: emergency:chat_stopped, translated into all
+        // 45 locales in this release because a learner sees it.
+        'auditlog:col_action',
+        'auditlog:col_course',
+        'auditlog:col_details',
+        'auditlog:col_ip',
+        'auditlog:col_time',
+        'auditlog:col_user',
+        'auditlog:empty',
+        'auditlog:intro',
+        'auditlog:settings_link',
+        'auditlog:settings_link_desc',
+        'auditlog:title',
         'benchmark:export_csv',
         'benchmark:export_json',
         'benchmark:export_markdown',

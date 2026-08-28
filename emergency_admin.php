@@ -110,16 +110,23 @@ $rows = [];
 foreach ($validflags as $flag) {
     $rows[] = [
         'flag' => $flag,
-        'label' => get_string('emergency:flag_' . $flag, 'local_ai_course_assistant'),
-        'description' => get_string('emergency:flag_' . $flag . '_desc', 'local_ai_course_assistant'),
+        'label' => \local_ai_course_assistant\branding::str('emergency:flag_' . $flag),
+        'description' => \local_ai_course_assistant\branding::str('emergency:flag_' . $flag . '_desc'),
         'disabled' => $state[$flag],
         'is_all' => ($flag === emergency_control::FLAG_ALL),
     ];
 }
 
 echo $OUTPUT->header();
+// v7.2.1: brand-bearing strings are pre-rendered here rather than pulled in
+// with {{#str}}. The Mustache string helper does not resolve [[tutorshort]] and
+// friends, so four of them were rendering the raw token on the one page an
+// admin reaches mid-incident. Same treatment the widget's brand label already
+// gets; see branding::token_map().
 echo $OUTPUT->render_from_template('local_ai_course_assistant/emergency_admin', [
     'rows' => $rows,
+    'back_to_settings' => \local_ai_course_assistant\branding::str('emergency:back_to_settings'),
+    'page_warning' => \local_ai_course_assistant\branding::str('emergency:page_warning'),
     'sesskey' => sesskey(),
     'actionurl' => $PAGE->url->out(false),
     'settings_url' => (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']))->out(false),

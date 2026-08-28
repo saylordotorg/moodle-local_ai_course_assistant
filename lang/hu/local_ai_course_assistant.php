@@ -1974,3 +1974,6 @@ $string['quizlock:enabled'] = 'Az asszisztens zárolása Moodle-tesztek alatt';
 $string['quizlock:enabled_desc'] = 'Mindenhol letiltja az asszisztenst – csevegés, hang, tanulókártyák, gyakorlótesztek –, amíg a tanulónak folyamatban lévő tesztkísérlete van. A vizsgálat a kiszolgálón történik, így egy másik lap megnyitása nem kerüli meg. A tanár egy tesztet felmenthet, ha annak segítségi szintjét Teljes segítségre állítja.';
 $string['quizlock:window'] = 'Kísérlet érvényességi ablaka (perc)';
 $string['quizlock:window_desc'] = 'Meddig számít még folyamatban lévőnek egy kísérlet olyan teszten, amelynek nincs időkorlátja. A saját időkorláttal rendelkező tesztek azt használják. Az elhagyott kísérletek határozatlan ideig folyamatban maradnak, így e korlát nélkül egyetlen kísérlet véglegesen kizárná a tanulót. Alapértelmezett: 180.';
+
+$string['emergency:chat_stopped'] = 'A(z) [[tutorshort]] jelenleg szünetel. A kurzus anyagait ez nem érinti, és nem ön okozta — kérjük, próbálja meg később.';
+$string['settings:money_nonnegative_invalid'] = 'Adjon meg egy 0 vagy annál nagyobb összeget, legfeljebb két tizedesjeggyel (például 25 vagy 25.50).';

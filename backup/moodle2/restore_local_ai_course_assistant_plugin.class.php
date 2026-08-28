@@ -65,6 +65,8 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $paths[] = new restore_path_element(
             'aica_course_config', $elepath . '/aica_course_configs/aica_course_config');
         $paths[] = new restore_path_element(
+            'aica_course_setting', $elepath . '/aica_course_settings/aica_course_setting');
+        $paths[] = new restore_path_element(
             'aica_quiz_cfg', $elepath . '/aica_quiz_cfgs/aica_quiz_cfg');
         $paths[] = new restore_path_element(
             'aica_objective', $elepath . '/aica_objectives/aica_objective');
@@ -106,6 +108,52 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      * @param array $data
      * @return void
      */
+    /**
+     * A per-course override stored in config_plugins as "<setting>_course_<id>".
+     *
+     * The course id is part of the setting name, so it is remapped here the way
+     * a foreign key would be elsewhere. Without this the row would either be
+     * dropped or, worse, written back against the ORIGINATING course and change
+     * the settings of the course that was backed up.
+     *
+     * @param array|object $data
+     * @return void
+     */
+    public function process_aica_course_setting($data) {
+        $data = (object) $data;
+        $name = (string) ($data->name ?? '');
+        if ($name === '') {
+            return;
+        }
+
+        // Defence in depth: the backup already excludes credentials, but an
+        // archive built by an older release, or edited by hand, must not be able
+        // to write one into this site's config.
+        foreach (['apikey', 'token', 'secret', 'password', 'webhook'] as $deny) {
+            if (stripos($name, $deny) !== false) {
+                return;
+            }
+        }
+
+        // Only ever rewrite a trailing course id, and only when there is one.
+        if (!preg_match('/_course_\d+$/', $name)) {
+            return;
+        }
+        $newname = preg_replace(
+            '/_course_\d+$/',
+            '_course_' . (int) $this->task->get_courseid(),
+            $name
+        );
+
+        // Restoring into a course that already carries this override must not
+        // silently overwrite the teacher's current choice, matching how the
+        // course_cfg row is handled below.
+        if (get_config('local_ai_course_assistant', $newname) !== false) {
+            return;
+        }
+        set_config($newname, $data->value, 'local_ai_course_assistant');
+    }
+
     public function process_aica_course_config($data) {
         global $DB;
 
