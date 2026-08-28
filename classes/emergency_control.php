@@ -208,7 +208,12 @@ class emergency_control {
         array $touched
     ): void {
         try {
-            audit_logger::log('emergency_' . $action, 0, 0, [
+            // Attribute the row to whoever threw the switch. It was hardcoded to
+            // userid 0, so every emergency action in the audit trail was
+            // unattributed and the identity survived only in the free-text
+            // invoked_by field. CLI runs legitimately have no user, hence the ?? 0.
+            global $USER;
+            audit_logger::log('emergency_' . $action, (int) ($USER->id ?? 0), 0, [
                 'flags' => array_values($flags),
                 'touched' => $touched,
                 'reason' => $reason,

@@ -83,7 +83,11 @@ class send_message extends external_api {
         // v5.4.6: time the retrieve call so we can attribute it to the assistant row.
         $retrievedchunks = [];
         $raglatencyms = null;
-        if (get_config('local_ai_course_assistant', 'rag_enabled')) {
+        // v7.2.2: skip retrieval while the emergency stop is engaged, so a paused
+        // site stops spending on embeddings and reranking too. The provider
+        // factory refuses further down; retrieval runs first. See sse.php.
+        if (!\local_ai_course_assistant\spend_guard::emergency_chat_stopped()
+                && get_config('local_ai_course_assistant', 'rag_enabled')) {
             try {
                 if (!content_indexer::is_course_indexed($params['courseid'])) {
                     content_indexer::index_course($params['courseid']);

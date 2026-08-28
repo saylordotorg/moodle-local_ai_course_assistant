@@ -42,6 +42,19 @@ class run_meta_ai_query extends \core\task\scheduled_task {
     }
 
     public function execute(): void {
+        // An emergency chat stop pauses this task rather than failing it: without
+        // it the provider factory throws on every cron run for the length of the
+        // incident. Checked here rather than per-schedule because a schedule with
+        // no explicit provider takes a different branch to the primary factory,
+        // so a guard further down covered only half the schedules -- and because
+        // returning before the loop means no schedule records a run at all. A
+        // skipped period previously recorded 'success' and advanced last_run,
+        // making a paused stretch look like a stretch of completed reports.
+        if (\local_ai_course_assistant\spend_guard::emergency_chat_stopped()) {
+            mtrace('  Learning Radar cron: emergency chat stop is engaged; skipping this run.');
+            return;
+        }
+
         $schedules = radar_schedule_manager::all(true);
         if (empty($schedules)) {
             mtrace('  Learning Radar cron: no schedules configured.');
@@ -99,15 +112,6 @@ class run_meta_ai_query extends \core\task\scheduled_task {
         $providerid = (string) ($sched->provider ?? '');
         $modelid = (string) ($sched->model ?? '');
         if ($providerid !== '') {
-            // An emergency chat stop pauses this task rather than failing it. Without
-            // this the provider factory throws on every cron run for the length of the
-            // incident, and Moodle's scheduler accumulates failure delays for a task
-            // that is working exactly as intended.
-            if (\local_ai_course_assistant\spend_guard::emergency_chat_stopped()) {
-                mtrace('SOLA: emergency chat stop is engaged; skipping this run.');
-                return;
-            }
-
             $llm = base_provider::create_for_comparison($providerid, $modelid);
         } else {
             $llm = base_provider::create_from_config(0);

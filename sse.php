@@ -421,7 +421,16 @@ try {
     $raglatencyms = null;
     $ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
     $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw; // default enabled
-    if (get_config('local_ai_course_assistant', 'rag_enabled') && $ragcourseenabled) {
+    // v7.2.2: do not spend on retrieval while the emergency stop is engaged.
+    // The chat factory refuses ~200 lines below, but retrieval runs first, so
+    // every turn during a stop still billed one embedding call and, with
+    // reranking on, one Voyage rerank before reaching the refusal. A kill switch
+    // whose usual trigger is a cost incident must not keep spending. Indexing
+    // elsewhere is unaffected; this is only the per-turn retrieval path.
+    $emergencystopped = \local_ai_course_assistant\spend_guard::emergency_chat_stopped();
+    if (!$emergencystopped
+            && get_config('local_ai_course_assistant', 'rag_enabled')
+            && $ragcourseenabled) {
         try {
             if (!content_indexer::is_course_indexed($courseid)) {
                 content_indexer::index_course($courseid);

@@ -1,0 +1,90 @@
+Version 7.2.2 (build 2026082900)
+
+A repair release for 7.2.1, following a structured test pass over that build.
+7.2.1 was tagged from a commit continuous integration had not finished
+validating; two of its own fixes turned out to be incomplete, and the test pass
+found a sibling of the bug it was written to fix.
+
+1. Continuous integration was failing on the 7.2.1 tag
+
+Two gating checks failed. A Mustache comment ends at the first closing
+double-brace, and two comments explaining output escaping contained brace
+examples, so each comment closed early and the licence header beneath it spilled
+into the rendered page. The prompt playground admin page displayed its own GPL
+text as visible content. Separately, three functions had gained a parameter
+without their documentation block being updated. Both are fixed and the full
+matrix is green.
+
+2. The prompt budget bug had a sibling, on the default configuration
+
+The current-page section of the prompt is only built when retrieval is off, but
+the weight map still allocated that bucket 55% of the available budget whenever
+the learner was on a course page, which is the ordinary case. Nothing spent that
+allocation, while the course-content bucket was squeezed from 68% to 28%. At the
+shipped 24,000-character budget this cost two of six retrieved passages with
+6,286 characters of budget unused. Buckets with no section now have their share
+redistributed across the sections that exist; on the same course and budget the
+course-content allocation rises from 5,040 to 11,200 characters.
+
+3. The citation instruction could still outlive the passages
+
+The output-marker block and the course-content block are dropped independently
+under budget pressure, so a band existed where the model was told to cite
+retrieved passages while every passage had been dropped. That is an instruction
+to invent citations, and it was reachable without an unusual setting: a
+self-hosted context window of 8192 tokens clamps directly into it. The citation
+instruction is now withdrawn when no passage survived assembly.
+
+4. Truncation could cut inside the untrusted-content fence
+
+Course text is wrapped in markers telling the model the enclosed text is
+reference material and must never be followed as instructions. Truncation was
+byte-wise and discarded the closing marker, leaving every later section --
+persona, house style, output markers and the safety block itself -- nominally
+inside the untrusted region. Truncation now closes whatever the cut left open,
+verified at every cut point across single and multiple fences.
+
+5. The 7.2.1 template cleanup reached only 6 of 46 languages
+
+7.2.1 stopped substituting two template placeholders and removed the headings
+above them. That edit matched markdown headings, but forty of the shipped
+languages write the heading as a colon-terminated label, so in those languages
+the placeholder was removed and the heading left behind, announcing a section
+that was no longer there. Japanese and Simplified Chinese additionally kept a
+list separator after the placeholder was dropped. All 46 languages are now
+correct, with a test that pins the removed headings per language.
+
+Smaller repairs
+
+- An empty retrieved chunk no longer counts as a retrieval turn; it was
+  previously labelled and offered for citation with no content in it.
+- The audit log names a deleted account plainly instead of falling back to the
+  no-reply user, pairs each course id with its shortname, renders a boolean
+  false as false rather than blank, and offers a way back from an out-of-range
+  page.
+- The spend-floor setting rejects whitespace-padded input instead of storing it
+  padded.
+- The audit log reader no longer treats a limit of zero as "every row".
+- The per-call failover setting now points at where the audit log actually is.
+- Six British spellings corrected in the English language file.
+
+Known limitations, unchanged in this release
+
+Course-module mappings are not yet populated when the course-level restore step
+runs, so per-quiz assistance levels are dropped on restore and on course
+duplication, and message and flashcard course-module references restore as null.
+A restore into an existing course also carries no plugin data unless "overwrite
+course configuration" is selected, and Import does not carry it at all. Both
+predate 7.2.1 and both require moving the affected work into the post-restore
+hook, which is a larger change than belongs in a same-day repair release.
+
+Upgrade notes
+
+No schema change. The single upgrade step raises the system-prompt character
+budget for sites still on the old 12,000 default and touches nothing else.
+
+Testing
+
+998 unit tests, 4,795 assertions, no failures. 36 of 36 corpus validators. Full
+continuous integration matrix green across PHP 8.1/8.2/8.3 on MariaDB and
+PostgreSQL.
