@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Model da za a yi amfani da shi. Tsoho ya dogar
 $string['settings:apibaseurl'] = 'URL ɗin Tushen API';
 $string['settings:apibaseurl_desc'] = 'URL ɗin tushe don API. Ana cika shi ta atomatik ga kowane mai bada sabis amma ana iya canzawa. Bar fanko don tsoho na mai bada sabis.';
 $string['settings:systemprompt'] = 'Samfurin Umarni na Tsarin';
-$string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Kai malami ne mai taimako na AI don kozi "{{coursename}}". Rawar ɗalibin ita ce {{userrole}}.
 
 Batutuwan kozi da aka rufe:
-{{coursetopics}}
 
 Taimaki ɗalibin ya fahimci kayan kozi. Kasance mai ƙarfafawa, a sarari, da koyarwa mai inganci.';
 $string['settings:temperature'] = 'Zafi';
@@ -1432,7 +1431,7 @@ $string['emergency:disabled_notice'] = 'An kashe tsarin "{$a->flag}". Config da 
 $string['emergency:restored_notice'] = 'An maido tsarin "{$a->flag}". Config da aka taba: {$a->touched}';
 $string['emergency:cli_reference'] = 'Ana samun iko iri ɗaya daga harshen na-kira:';
 $string['emergency:flag_chat'] = 'Tattaunawa';
-$string['emergency:flag_chat_desc'] = 'Yana toshe zirga-zirgar tattaunawa ta hanyar tutar kashe musamman (gyare-gyaren v5.13). Widget yana ci gaba da bayyanawa; masu koyo suna ganin saƙon "[[tutorshort]] ya tsaya" mai alheri. Yi amfani lokacin da mai bayar da LLM yana ɓarna ko farashin ya ƙaru.';
+$string['emergency:flag_chat_desc'] = 'Yana dakatar da duk kiran AI na [[tutorshort]] — hira, jarabawa, katunan karatu da ba da maki — ga ɗalibai, masu gudanarwa da ayyukan da aka tsara duka. Widget ɗin yana ci gaba da bayyana kuma ɗalibai suna ganin taƙaitaccen sanarwar dakatarwa. Gwajin baya da binciken lafiya sun ci gaba da samuwa, don a duba mai bayarwa kafin dawowa.';
 $string['emergency:flag_voice'] = 'Murya';
 $string['emergency:flag_voice_desc'] = 'Yana share mai bayarwa na murya a lokaci na aiki (an ajiye don maido daidai). Tattaunawa ta rubutu tana ci gaba da aiki.';
 $string['emergency:flag_rag'] = 'RAG';

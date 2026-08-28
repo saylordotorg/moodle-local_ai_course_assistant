@@ -82,13 +82,40 @@ final class emergency_chat_stop_test extends \advanced_testcase {
         );
     }
 
+    /**
+     * Assert the callable throws specifically because of the emergency stop.
+     *
+     * expectException(moodle_exception) alone is not regression cover here: on a
+     * site with no provider configured both factories throw anyway, so such a
+     * test passes with the fix reverted. The message has to be checked.
+     *
+     * @param callable $fn
+     * @param string $context
+     */
+    private function assert_refuses_with_emergency_message(callable $fn, string $context): void {
+        $expected = \local_ai_course_assistant\branding::str('emergency:chat_stopped');
+        try {
+            $fn();
+            $this->fail("{$context}: expected a refusal while the emergency stop was engaged.");
+        } catch (\moodle_exception $e) {
+            $this->assertStringContainsString(
+                $expected,
+                $e->getMessage(),
+                "{$context}: threw, but not because of the emergency stop -- which is "
+                    . 'what this test exists to detect.'
+            );
+        }
+    }
+
     public function test_chat_refuses_for_a_site_admin_while_stopped(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         set_config('emergency_chat_disabled', '1', 'local_ai_course_assistant');
 
-        $this->expectException(\moodle_exception::class);
-        base_provider::create_from_config();
+        $this->assert_refuses_with_emergency_message(
+            fn() => base_provider::create_from_config(),
+            'create_from_config as admin'
+        );
     }
 
     public function test_the_comparison_path_also_refuses_while_stopped(): void {
@@ -98,8 +125,30 @@ final class emergency_chat_stop_test extends \advanced_testcase {
 
         // sse.php reaches the provider through this factory too, and it carried
         // no spend or emergency check of its own at all.
-        $this->expectException(\moodle_exception::class);
-        base_provider::create_for_comparison('openai', 'gpt-4o-mini', 0);
+        $this->assert_refuses_with_emergency_message(
+            fn() => base_provider::create_for_comparison('openai', 'gpt-4o-mini', 0),
+            'create_for_comparison as admin'
+        );
+    }
+
+    public function test_diagnostics_still_reach_the_provider_while_stopped(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('emergency_chat_disabled', '1', 'local_ai_course_assistant');
+
+        // backend_probe and health_check are what an operator opens DURING the
+        // incident to decide whether it is safe to clear the flag. If the stop
+        // blocks them they report the backend as broken when the only thing
+        // wrong is the operator's own switch.
+        try {
+            base_provider::create_from_config(0, true);
+        } catch (\moodle_exception $e) {
+            $this->assertStringNotContainsString(
+                \local_ai_course_assistant\branding::str('emergency:chat_stopped'),
+                $e->getMessage(),
+                'The diagnostic path must not be blocked by the emergency stop.'
+            );
+        }
     }
 
     public function test_clearing_the_stop_lets_the_guard_pass_again(): void {

@@ -264,7 +264,6 @@ final class lang_completeness_test extends \basic_testcase {
         'auditlog:empty',
         'auditlog:intro',
         'auditlog:settings_link',
-        'auditlog:settings_link_desc',
         'auditlog:title',
         'benchmark:export_csv',
         'benchmark:export_json',

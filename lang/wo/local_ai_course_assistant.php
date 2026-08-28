@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Modèle bi ngay jëfandikoo. Valeur par défau
 $string['settings:apibaseurl'] = 'URL de Base API';
 $string['settings:apibaseurl_desc'] = 'URL de base API bi. Dañ ko rempli automatiquement ci fournisseur yi waye dafay mën a yegeel. Samp sax valeur par défaut fournisseur bi.';
 $string['settings:systemprompt'] = 'Modèle Invite Système';
-$string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Yàgg nga jël rôle wu professeur AI ci cours "{{coursename}}". Rôle élève bi dafa {{userrole}}.
 
 Sujets cours bi ñu dakkal:
-{{coursetopics}}
 
 Ndimm élève bi jàng matière cours bi. Yëgël, wëjj, te jàng ci yoon bu baax.';
 $string['settings:temperature'] = 'Température';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Sous-système "{$a->flag}" faralo na. Co
 $string['emergency:restored_notice'] = 'Sous-système "{$a->flag}" restabli na. Config bi ñu tëmm: {$a->touched}';
 $string['emergency:cli_reference'] = 'Contrôle yi ay jëfandikoo ci shell bi ci on-call:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Day baaral trafik chat bi ak kill flag bi ñu defal ko (correction v5.13). Widget bi dafay rende; njàngalekat yi di gis message bu jëm "[[tutorshort]] pausee na". Jëfandikool su benn prestataire LLM dafay sekkoo walla benn hausse njëg dafay dox.';
+$string['emergency:flag_chat_desc'] = 'Dafay taxaw woote yu AI yépp yu [[tutorshort]] — waxtaan, ceet, kart yu njàng ak joxe not — ci jàngalekat yi, yilifkat yi ak liggéey yu ëmbu yi ñoom ñépp. Widget bi dina wéy di feeñ te jàngalekat yi dañuy gis benn bataaxal bu gàtt bu taxaw. Seetlu bopp bu backend ak seetlu wér-gi-yaram day wéy di jariñu, ngir nga man a seet jox-boroom bi laata nga koy delloo.';
 $string['emergency:flag_voice'] = 'Dëggu';
 $string['emergency:flag_voice_desc'] = 'Dafay clear prestataire dëggu realtime bi ñu nëkk aktif (sauvegardé ngir restore bu jëm). Chat texte bi dafay dox ba sëriñ.';
 $string['emergency:flag_rag'] = 'RAG';

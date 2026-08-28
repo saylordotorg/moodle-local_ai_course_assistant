@@ -73,11 +73,10 @@ $string['settings:model_desc'] = 'Moodeelii fayyadamuu. Durtiin dhiyeessaa irrat
 $string['settings:apibaseurl'] = 'URL Bu\'uura API';
 $string['settings:apibaseurl_desc'] = 'URL bu\'uura API. Dhiyeessaa hundaaf ofumaan guutama garuu jijjiiruu ni danda\'ama. Dhiyeessaa durtii\'f duwwaa dhiisi.';
 $string['settings:systemprompt'] = 'Caasima Gaaffii Sirna';
-$string['settings:systemprompt_desc'] = 'Gaaffii sirna AI\'f ergamu. Bakka-buutu fayyadami: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Gaaffii sirna AI\'f ergamu. Bakka-buutu fayyadami: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ati barsiisaa AI gargaaraa koorsii "{{coursename}}" ti. Gaheen barataa {{userrole}} dha.
 
 Mata-duree koorsii hammatame:
-{{coursetopics}}
 
 Barataa qabiyyee koorsii hubachuuf gargaari. Jajjabeessaa, ifa fi barnoota cimaa ta\'i.';
 $string['settings:temperature'] = 'Ho\'a';
@@ -1405,7 +1404,7 @@ $string['emergency:disabled_notice'] = 'Systema "{$a->flag}" cufame. Qindaa\'ina
 $string['emergency:restored_notice'] = 'Systema "{$a->flag}" deebi\'e. Qindaa\'ina tuqame: {$a->touched}';
 $string['emergency:cli_reference'] = 'Qindaa\'inoota walfakkaatan on-call shell irraa ni argamu:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Daandii chat kill flag addaa (v5.13 sirreeffama) dhaan cufaa. Widget hojjechaa itti fufa; barattoonni ergaa gaarii "[[tutorshort]] dhaabate" arguu. LLM fornidarii badaa ta\'u ykn baasii olfufiinsa jirtu yeroo fayyadami.';
+$string['emergency:flag_chat_desc'] = 'Waamicha AI [[tutorshort]] hunda ni dhaaba — haasaa, qormaata, kaardii barnootaa fi qabxii kennuu — barattootaaf, bulchitootaa fi hojiiwwan yeroon qophaa\'aniif walqixa. Widgetichi mul\'achuu itti fufa, barattoonnis beeksisa gabaabaa dhaabbate argu. Qorannoo ofii duubaa fi qorannoo fayyaa argamuu itti fufu, akka deebisuun dura dhiyeessaa qoruu dandeessan.';
 $string['emergency:flag_voice'] = 'Voice';
 $string['emergency:flag_voice_desc'] = 'Fornidarii voice realtime hojiirra jiru kassa (deebi\'isuuf eeggannoo kaayyamuun). Chat barruu hojjechaa itti fufa.';
 $string['emergency:flag_rag'] = 'RAG';

@@ -76,11 +76,10 @@ $string['settings:model_desc'] = 'Modèle min bɛ kɛ. Default bɛ bɛɛlɛ dɔn
 $string['settings:apibaseurl'] = 'API Taaribolɔ URL';
 $string['settings:apibaseurl_desc'] = 'API taaribolɔ URL. Bɛɛlɛ dɔnbaga bɛɛ ye a yɛrɛ tilɛ ɲɛ fɔlɔ, nka a bɛ se ka yɛlɛma. Bɛɛlɛ dɔnbaga default kama a bɔ ɲɛ.';
 $string['settings:systemprompt'] = 'Système Invite Misali';
-$string['settings:systemprompt_desc'] = 'AI ci invite. Jagomaw jɔminɛ: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'AI ci invite. Jagomaw jɔminɛ: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'I ye AI karamɔgɔ dɛmɛbaga ye kalanso "{{coursename}}" kama. Kalandenw ka wɛlɛya ye {{userrole}}.
 
 Kalanso kow minw kɛra:
-{{coursetopics}}
 
 Kalanden dɛmɛ kalanso kow kalan kama. Kɔlɔsili kɛ, a jɛ, ani kalan fan na ɲɛ.';
 $string['settings:temperature'] = 'Température';
@@ -1431,7 +1430,7 @@ $string['emergency:disabled_notice'] = 'Subsystem "{$a->flag}" jɛlen. Config to
 $string['emergency:restored_notice'] = 'Subsystem "{$a->flag}" seginnen. Config touché: {$a->touched}';
 $string['emergency:cli_reference'] = 'Dalilikɛlaw nunu bɛ sɔrɔ on-call kɔnɔ:';
 $string['emergency:flag_chat'] = 'Baro';
-$string['emergency:flag_chat_desc'] = 'Baro taamalaw jɛ kill flag ɲɛnafɔlen fɛ (v5.13 sɛmɛntiya). Widget bɛ to k\'a yira; kalanden bɛ "[[tutorshort]] seginnen" kuma duman ye. A baara kɛ ni LLM fɔbaa bɛ kɛ cogo jugu ye walima sara bɛ yɛlɛma.';
+$string['emergency:flag_chat_desc'] = 'A bɛ [[tutorshort]] ka AI weleli bɛɛ jɔ — baro, kɔrɔbɔliw, kartiw ani hakɛ dilan — kalandenw, ɲɛmɔgɔw ani baara latigɛlenw bɛɛ kama. Widget bɛ to ka yira, kalandenw bɛ jɔli kunnafoni surun ye. Kɔfɛla yɛrɛsegin ni kɛnɛya sɛgɛsɛgɛli bɛ to sen na walisa i ka se ka dilanbaga sɛgɛsɛgɛ sanni i ka a segin.';
 $string['emergency:flag_voice'] = 'Kumakan';
 $string['emergency:flag_voice_desc'] = 'Realtime kumakan fɔbaa bilalen bɛ ɲɛnabɔ (hakilinafili nɔgɔya kama). Sɛbɛn baro bɛ to baara la.';
 $string['emergency:flag_rag'] = 'RAG';

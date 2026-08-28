@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Модель для використання. 
 $string['settings:apibaseurl'] = 'Базова URL API';
 $string['settings:apibaseurl_desc'] = 'Базова URL для API. Заповнюється автоматично за постачальником, але може бути змінена.';
 $string['settings:systemprompt'] = 'Шаблон системного повідомлення';
-$string['settings:systemprompt_desc'] = 'Системне повідомлення, яке надсилається AI. Використовуйте заповнювачі: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Системне повідомлення, яке надсилається AI. Використовуйте заповнювачі: {{coursename}}, {{userrole}}.';
 $string['settings:temperature'] = 'Температура';
 $string['settings:temperature_desc'] = 'Контролює випадковість. Нижчі значення більш зосереджені. Діапазон: 0.0 до 2.0.';
 $string['settings:maxhistory'] = 'Максимальна історія розмови';
@@ -652,14 +652,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -1445,7 +1437,7 @@ $string['emergency:disabled_notice'] = 'Підсистему "{$a->flag}" вим
 $string['emergency:restored_notice'] = 'Підсистему "{$a->flag}" відновлено. Торкнуто конфіг: {$a->touched}';
 $string['emergency:cli_reference'] = 'Ті самі засоби керування доступні з чергового командного рядка:';
 $string['emergency:flag_chat'] = 'Чат';
-$string['emergency:flag_chat_desc'] = 'Блокує трафік чату через спеціальний kill flag (виправлення v5.13). Віджет продовжує рендеритися; студенти бачать дружнє повідомлення "[[tutorshort]] призупинено". Використовуйте, коли LLM-провайдер веде себе некоректно або відбувається стрибок витрат.';
+$string['emergency:flag_chat_desc'] = 'Зупиняє всі звернення [[tutorshort]] до ШІ — чат, тести, картки та оцінювання — однаково для студентів, адміністраторів і запланованих завдань. Віджет і далі відображається, а студенти бачать коротке повідомлення про паузу. Самоперевірка бекенда та перевірка стану залишаються доступними, щоб перевірити постачальника перед відновленням.';
 $string['emergency:flag_voice'] = 'Голос';
 $string['emergency:flag_voice_desc'] = 'Очищує активного провайдера голосу в реальному часі (зберігається для точного відновлення). Текстовий чат продовжує працювати.';
 $string['emergency:flag_rag'] = 'RAG';

@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Ang modelong gagamitin. Ang default ay depende
 $string['settings:apibaseurl'] = 'Base URL ng API';
 $string['settings:apibaseurl_desc'] = 'Base URL para sa API. Awtomatikong napupuno ayon sa provider ngunit maaaring i-override. Mag-iwan ng blangko para sa default ng provider.';
 $string['settings:systemprompt'] = 'Template ng System Prompt';
-$string['settings:systemprompt_desc'] = 'System prompt na ipinapadala sa AI. Gumamit ng mga placeholder: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'System prompt na ipinapadala sa AI. Gumamit ng mga placeholder: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ikaw ay isang kapaki-pakinabang na AI tutor para sa kurso na "{{coursename}}". Ang papel ng mag-aaral ay {{userrole}}.
 
 Mga paksa ng kurso:
-{{coursetopics}}
 
 Tulungan ang mag-aaral na maunawaan ang materyal ng kurso. Maging nakakaengganyo, malinaw, at may magandang paraan ng pagtuturo.';
 $string['settings:temperature'] = 'Temperatura';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Ang subsystem na "{$a->flag}" ay na-disa
 $string['emergency:restored_notice'] = 'Ang subsystem na "{$a->flag}" ay na-restore. Naabot ang config: {$a->touched}';
 $string['emergency:cli_reference'] = 'Ang parehong mga kontrol ay available mula sa on-call shell:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Hina-hadlangan ang trapiko ng chat sa pamamagitan ng dedikadong kill flag (ayos sa v5.13). Patuloy na nire-render ang widget; nakikita ng mga mag-aaral ang friendly na mensaheng "[[tutorshort]] naka-pause". Gamitin kapag ang isang LLM provider ay nagkakaproblema o may nagaganap na cost spike.';
+$string['emergency:flag_chat_desc'] = 'Hinihinto ang lahat ng tawag sa AI ng [[tutorshort]] — chat, pagsusulit, flashcard at pagmamarka — para sa mga mag-aaral, administrador at nakatakdang gawain nang pantay. Nananatiling lumalabas ang widget at nakikita ng mga mag-aaral ang maikling paunawa ng pag-pause. Nananatiling available ang backend self-test at health check para masuri ang provider bago magbalik.';
 $string['emergency:flag_voice'] = 'Boses';
 $string['emergency:flag_voice_desc'] = 'Nili-clear ang aktibong realtime voice provider (nakatago para sa eksaktong pag-restore). Patuloy na gumagana ang text chat.';
 $string['emergency:flag_rag'] = 'RAG';

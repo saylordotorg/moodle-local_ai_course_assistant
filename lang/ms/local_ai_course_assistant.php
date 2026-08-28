@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Model yang hendak digunakan. Default bergantun
 $string['settings:apibaseurl'] = 'URL Asas API';
 $string['settings:apibaseurl_desc'] = 'URL asas untuk API. Diisi secara automatik mengikut pembekal tetapi boleh ditindih. Biarkan kosong untuk default pembekal.';
 $string['settings:systemprompt'] = 'Templat Prompt Sistem';
-$string['settings:systemprompt_desc'] = 'Prompt sistem yang dihantar kepada AI. Gunakan placeholder: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Prompt sistem yang dihantar kepada AI. Gunakan placeholder: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Anda adalah tutor AI yang berguna untuk kursus "{{coursename}}". Peranan pelajar ialah {{userrole}}.
 
 Topik kursus yang diliputi:
-{{coursetopics}}
 
 Bantu pelajar memahami bahan kursus. Jadilah menggalakkan, jelas, dan berkaedah pedagogi yang baik.';
 $string['settings:temperature'] = 'Suhu';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Subsistem "{$a->flag}" dilumpuhkan. Konf
 $string['emergency:restored_notice'] = 'Subsistem "{$a->flag}" dipulihkan. Konfigurasi disentuh: {$a->touched}';
 $string['emergency:cli_reference'] = 'Kawalan yang sama tersedia dari shell on-call:';
 $string['emergency:flag_chat'] = 'Sembang';
-$string['emergency:flag_chat_desc'] = 'Menyekat trafik sembang melalui bendera bunuh khusus (pembetulan v5.13). Widget terus dirender; pelajar melihat mesej "[[tutorshort]] dijeda" yang mesra. Gunakan apabila penyedia LLM berkelakuan buruk atau lonjakan kos sedang berlangsung.';
+$string['emergency:flag_chat_desc'] = 'Menghentikan semua panggilan AI [[tutorshort]] — sembang, kuiz, kad imbas dan pemarkahan — untuk pelajar, pentadbir dan tugas berjadual sama rata. Widget masih dipaparkan dan pelajar melihat notis jeda ringkas. Ujian kendiri backend dan pemeriksaan kesihatan kekal tersedia supaya anda boleh menyemak pembekal sebelum memulihkan.';
 $string['emergency:flag_voice'] = 'Suara';
 $string['emergency:flag_voice_desc'] = 'Mengosongkan penyedia suara masa nyata yang aktif (disimpan untuk pemulihan tepat). Sembang teks terus berfungsi.';
 $string['emergency:flag_rag'] = 'RAG';

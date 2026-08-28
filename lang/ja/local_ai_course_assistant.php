@@ -70,11 +70,10 @@ $string['settings:model_desc'] = '使用するモデル。デフォルトはプ�
 $string['settings:apibaseurl'] = 'APIベースURL';
 $string['settings:apibaseurl_desc'] = 'APIベースURL。プロバイダーに基づいて自動入力されますが、上書き可能です。プロバイダーのデフォルトを使用するには空白のままにしてください。';
 $string['settings:systemprompt'] = 'システムプロンプトテンプレート';
-$string['settings:systemprompt_desc'] = 'AIに送信されるシステムプロンプト。プレースホルダー {{coursename}}、{{userrole}}、{{coursetopics}} を使用してください。';
+$string['settings:systemprompt_desc'] = 'AIに送信されるシステムプロンプト。プレースホルダー {{coursename}}、{{userrole}}、 を使用してください。';
 $string['settings:systemprompt_default'] = 'あなたは「{{coursename}}」コースの役立つAIチューターです。学生の役割は{{userrole}}です。
 
 コースで取り上げるトピック：
-{{coursetopics}}
 
 学生がコースの内容を理解できるよう支援してください。励みになり、明確で、教育的に厳密であってください。';
 $string['settings:temperature'] = '温度';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'サブシステム "{$a->flag}" を無�
 $string['emergency:restored_notice'] = 'サブシステム "{$a->flag}" を復元しました。変更された設定: {$a->touched}';
 $string['emergency:cli_reference'] = '同じコントロールはオンコールシェルからも使用できます:';
 $string['emergency:flag_chat'] = 'チャット';
-$string['emergency:flag_chat_desc'] = '専用のキルフラグ（v5.13修正）でチャットトラフィックをブロックします。ウィジェットは引き続き表示され、学習者にはフレンドリーな「SOLAが一時停止中」のメッセージが表示されます。LLMプロバイダーが誤動作しているとき、またはコストスパイクが進行中のときに使用します。';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]] のすべての AI 呼び出し（チャット、クイズ、フラッシュカード、採点）を、学習者・管理者・定期タスクのいずれについても停止します。ウィジェットは表示され続け、学習者には短い一時停止の案内が表示されます。復旧前にプロバイダーを確認できるよう、バックエンド自己診断とヘルスチェックは引き続き利用できます。';
 $string['emergency:flag_voice'] = '音声';
 $string['emergency:flag_voice_desc'] = 'アクティブなリアルタイム音声プロバイダーをクリアします（正確な復元のために保存されます）。テキストチャットは引き続き動作します。';
 $string['emergency:flag_rag'] = 'RAG';

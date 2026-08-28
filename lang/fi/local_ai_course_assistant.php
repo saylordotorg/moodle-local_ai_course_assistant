@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Käytettävä malli. Oletusarvo riippuu palvel
 $string['settings:apibaseurl'] = 'API:n perus-URL';
 $string['settings:apibaseurl_desc'] = 'API:n perus-URL. Täytetään automaattisesti palveluntarjoajan mukaan, mutta voidaan korvata. Jätä tyhjäksi käyttääksesi palveluntarjoajan oletusarvoa.';
 $string['settings:systemprompt'] = 'Järjestelmäkehotteen malli';
-$string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Olet hyödyllinen AI-tutori kurssille "{{coursename}}". Opiskelijan rooli on {{userrole}}.
 
 Kurssilla käsitellyt aiheet:
-{{coursetopics}}
 
 Auta opiskelijaa ymmärtämään kurssin sisältö. Ole kannustava, selkeä ja pedagogisesti perusteellinen.';
 $string['settings:temperature'] = 'Lämpötila';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Alijärjestelmä "{$a->flag}" poistettu 
 $string['emergency:restored_notice'] = 'Alijärjestelmä "{$a->flag}" palautettu. Kosketettu asetus: {$a->touched}';
 $string['emergency:cli_reference'] = 'Samat kontrollit ovat käytettävissä päivystysshellissä:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Estää chat-liikenteen omistautuneen kill-lipun kautta (v5.13-korjaus). Widget jatkaa renderöintiä; oppijat näkevät ystävällisen "[[tutorshort]] tauolla" -viestin. Käytä, kun LLM-palveluntarjoaja käyttäytyy huonosti tai kustannuspiikki on käynnissä.';
+$string['emergency:flag_chat_desc'] = 'Pysäyttää kaikki [[tutorshort]]-tekoälykutsut — keskustelun, tietovisat, muistikortit ja pisteytyksen — yhtä lailla opiskelijoilta, ylläpitäjiltä ja ajastetuilta tehtäviltä. Widget näkyy edelleen ja opiskelijat näkevät lyhyen taukoilmoituksen. Taustajärjestelmän itsetesti ja kuntotarkistus pysyvät käytettävissä, jotta voit tarkistaa palveluntarjoajan ennen palauttamista.';
 $string['emergency:flag_voice'] = 'Ääni';
 $string['emergency:flag_voice_desc'] = 'Tyhjentää aktiivisen reaaliaikaisen äänipalveluntarjoajan (tallennettu tarkan palautuksen varalta). Tekstichat jatkaa toimintaansa.';
 $string['emergency:flag_rag'] = 'RAG';

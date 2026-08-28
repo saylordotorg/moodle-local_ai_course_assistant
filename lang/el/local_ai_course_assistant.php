@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Το μοντέλο προς χρήση. Η π
 $string['settings:apibaseurl'] = 'Βασικό URL API';
 $string['settings:apibaseurl_desc'] = 'Βασικό URL για το API. Αυτόματη συμπλήρωση ανά πάροχο, αλλά μπορεί να αντικατασταθεί.';
 $string['settings:systemprompt'] = 'Πρότυπο Μηνύματος Συστήματος';
-$string['settings:systemprompt_desc'] = 'Μήνυμα συστήματος που αποστέλλεται στο AI. Χρήση θέσεων: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Μήνυμα συστήματος που αποστέλλεται στο AI. Χρήση θέσεων: {{coursename}}, {{userrole}}.';
 $string['settings:temperature'] = 'Θερμοκρασία';
 $string['settings:temperature_desc'] = 'Ελέγχει την τυχαιότητα. Χαμηλότερες τιμές είναι πιο εστιασμένες. Εύρος: 0.0 έως 2.0.';
 $string['settings:maxhistory'] = 'Μέγιστο Ιστορικό Συνομιλίας';
@@ -652,14 +652,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -1445,7 +1437,7 @@ $string['emergency:disabled_notice'] = 'Το υποσύστημα "{$a->flag}" �
 $string['emergency:restored_notice'] = 'Το υποσύστημα "{$a->flag}" επαναφέρθηκε. Διαμόρφωση που άλλαξε: {$a->touched}';
 $string['emergency:cli_reference'] = 'Οι ίδιοι έλεγχοι είναι διαθέσιμοι από το κέλυφος εφημερίας:';
 $string['emergency:flag_chat'] = 'Συνομιλία';
-$string['emergency:flag_chat_desc'] = 'Αποκλείει την κίνηση συνομιλίας μέσω ειδικής σημαίας kill (διόρθωση v5.13). Το widget συνεχίζει να εμφανίζεται· οι εκπαιδευόμενοι βλέπουν το φιλικό μήνυμα «Το [[tutorshort]] έχει τεθεί σε παύση». Χρησιμοποιήστε όταν ένας πάροχος LLM συμπεριφέρεται εσφαλμένα ή κατά τη διάρκεια έξαρσης κόστους.';
+$string['emergency:flag_chat_desc'] = 'Σταματά κάθε κλήση AI του [[tutorshort]] — συνομιλία, κουίζ, κάρτες και βαθμολόγηση — για εκπαιδευόμενους, διαχειριστές και προγραμματισμένες εργασίες εξίσου. Το widget εξακολουθεί να εμφανίζεται και οι εκπαιδευόμενοι βλέπουν σύντομη ειδοποίηση παύσης. Ο αυτοέλεγχος του backend και ο έλεγχος υγείας παραμένουν διαθέσιμοι, ώστε να ελέγξετε τον πάροχο πριν την επαναφορά.';
 $string['emergency:flag_voice'] = 'Φωνή';
 $string['emergency:flag_voice_desc'] = 'Διαγράφει τον ενεργό πάροχο φωνής πραγματικού χρόνου (αποθηκευμένος για ακριβή επαναφορά). Η κειμενική συνομιλία συνεχίζει να λειτουργεί.';
 $string['emergency:flag_rag'] = 'RAG';

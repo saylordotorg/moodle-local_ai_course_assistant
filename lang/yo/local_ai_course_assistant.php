@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Àwòrán tí a ó lò. Àìpéye da lórí ol
 $string['settings:apibaseurl'] = 'URL Ìpìlẹ̀ API';
 $string['settings:apibaseurl_desc'] = 'URL ìpìlẹ̀ fún API. A máa ń yín àmúlò fún olùpèsè kọ̀ọ̀kan ṣùgbọ́n a lè yípadà. Fi sílẹ̀ fún àìpéye olùpèsè.';
 $string['settings:systemprompt'] = 'Àpẹrẹ Ìgbékalẹ̀ Ètò';
-$string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ìwọ jẹ́ olùkọ́ AI olùrànlọ́wọ́ fún ẹkọ "{{coursename}}". Ipa akẹ́kọ̀ọ́ ni {{userrole}}.
 
 Àwọn ìdánimọ̀ ẹkọ tí a bò:
-{{coursetopics}}
 
 Ràn akẹ́kọ̀ọ́ lọ́wọ́ láti lóye ohun tí wọ́n ń kọ́. Jẹ́ olùránnilétí, kedere, àti ó dára lè pèdàgógì.';
 $string['settings:temperature'] = 'Ìwọ̀n Ìyípadà';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Ẹ̀ka ọ̀nà "{$a->flag}" ti pa. Èt
 $string['emergency:restored_notice'] = 'Ẹ̀ka ọ̀nà "{$a->flag}" ti dá padà. Ètò tí a fọwọ́ kàn: {$a->touched}';
 $string['emergency:cli_reference'] = 'Àwọn ìṣàkóso kannáà wà láti shell on-call:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Dí ìsànsé chat ní kill flag ìpínrẹ̀ (atunṣe v5.13). Widget máa ń ṣe títúnṣe; akẹ́kọ̀ọ́ máa ń rí ìfiránṣẹ́ àánú "[[tutorshort]] ti dúró". Lo nígbà tí olùpèsè LLM ń ṣe àṣìṣe tàbí nígbà tí ìjà iye ń ṣẹlẹ̀.';
+$string['emergency:flag_chat_desc'] = 'Ó dá gbogbo ìpè AI ti [[tutorshort]] dúró — ìjíròrò, ìdánwò, káàdì ìkọ́ àti fífúnni ní àmì — fún àwọn akẹ́kọ̀ọ́, àwọn alábòójútó àti àwọn iṣẹ́ tí a ti ṣètò bákan náà. Widget náà ń bá a lọ láti hàn, àwọn akẹ́kọ̀ọ́ sì rí ìkéde ìdáwọ́dúró kúkúrú. Àyẹ̀wò ara-ẹni ti ẹ̀yìn àti àyẹ̀wò ìlera ṣì wà, kí o lè yẹ olùpèsè wò kí o tó dá a padà.';
 $string['emergency:flag_voice'] = 'Voice';
 $string['emergency:flag_voice_desc'] = 'Pa olùpèsè ohùn realtime tí ó ṣiṣẹ́ (tí a tọjú fún dídá padà gangan). Chat ọ̀rọ̀ kọ máa ń ṣiṣẹ́.';
 $string['emergency:flag_rag'] = 'RAG';

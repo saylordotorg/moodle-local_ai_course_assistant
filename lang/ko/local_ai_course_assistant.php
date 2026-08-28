@@ -70,11 +70,10 @@ $string['settings:model_desc'] = '사용할 모델. 기본값은 제공자에 �
 $string['settings:apibaseurl'] = 'API 기본 URL';
 $string['settings:apibaseurl_desc'] = 'API 기본 URL. 제공자에 따라 자동으로 채워지지만 재정의할 수 있습니다. 제공자 기본값을 사용하려면 비워 두세요.';
 $string['settings:systemprompt'] = '시스템 프롬프트 템플릿';
-$string['settings:systemprompt_desc'] = 'AI에 전송되는 시스템 프롬프트. 플레이스홀더 {{coursename}}, {{userrole}}, {{coursetopics}}를 사용하세요.';
+$string['settings:systemprompt_desc'] = 'AI에 전송되는 시스템 프롬프트. 플레이스홀더 {{coursename}}, {{userrole}}를 사용하세요.';
 $string['settings:systemprompt_default'] = '당신은 "{{coursename}}" 코스의 유용한 AI 튜터입니다. 학생의 역할은 {{userrole}}입니다.
 
 코스에서 다루는 주제:
-{{coursetopics}}
 
 학생이 코스 내용을 이해할 수 있도록 도와주세요. 격려하고, 명확하며, 교육적으로 엄격하게 응답하세요.';
 $string['settings:temperature'] = '온도';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = '하위 시스템 "{$a->flag}"이(가) �
 $string['emergency:restored_notice'] = '하위 시스템 "{$a->flag}"이(가) 복원되었습니다. 변경된 구성: {$a->touched}';
 $string['emergency:cli_reference'] = '동일한 제어를 온콜 셸에서도 사용할 수 있습니다:';
 $string['emergency:flag_chat'] = '채팅';
-$string['emergency:flag_chat_desc'] = '전용 킬 플래그(v5.13 수정)를 통해 채팅 트래픽을 차단합니다. 위젯은 계속 렌더링되며 학습자에게는 친절한 "[[tutorshort]] 일시 중지" 메시지가 표시됩니다. LLM 제공자가 오작동하거나 비용 급증이 진행 중일 때 사용합니다.';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]]의 모든 AI 호출(채팅, 퀴즈, 플래시카드, 채점)을 학습자와 관리자, 예약 작업 모두에 대해 중지합니다. 위젯은 계속 표시되며 학습자에게는 짧은 일시 중지 안내가 나타납니다. 복구 전에 공급자를 확인할 수 있도록 백엔드 자체 진단과 상태 점검은 계속 사용할 수 있습니다.';
 $string['emergency:flag_voice'] = '음성';
 $string['emergency:flag_voice_desc'] = '활성 실시간 음성 제공자를 지웁니다(정확한 복원을 위해 저장됨). 텍스트 채팅은 계속 작동합니다.';
 $string['emergency:flag_rag'] = 'RAG';

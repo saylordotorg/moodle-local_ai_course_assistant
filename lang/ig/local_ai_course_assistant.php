@@ -73,11 +73,10 @@ $string['settings:model_desc'] = 'Ụdị iji. Ndabara na-adabere na onye nnye (
 $string['settings:apibaseurl'] = 'URL Ntọala API';
 $string['settings:apibaseurl_desc'] = 'URL ntọala maka API. Ọ na-azụlite n\'onye nnye ọ bụla mana enwere ike gbanwee ya. Hapụ ọhọ maka ndabara onye nnye.';
 $string['settings:systemprompt'] = 'Templeeti Arịọ Sistemu';
-$string['settings:systemprompt_desc'] = 'Arịọ sistemu ezigara AI. Jiri ihe ngọpụta: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Arịọ sistemu ezigara AI. Jiri ihe ngọpụta: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ị bụ nkuzi AI na-enyere aka maka kọọsị "{{coursename}}". Ọrụ nwa akwụkwọ bụ {{userrole}}.
 
 Isiokwu kọọsị a kọwara:
-{{coursetopics}}
 
 Nyere nwa akwụkwọ aka ịghọta ihe kọọsị a. Bụrụ onye na-agba ume, doo anya, ma nwee ezigbo usoro nkuzi.';
 $string['settings:temperature'] = 'Okpomọkụ';
@@ -1418,7 +1417,7 @@ $string['emergency:disabled_notice'] = 'Gbanyụọrọ usoro "{$a->flag}". Nhaz
 $string['emergency:restored_notice'] = 'Weghachiri usoro "{$a->flag}". Nhazi dotara: {$a->touched}';
 $string['emergency:cli_reference'] = 'Enyere njikwa ndị ahị n\'aka si na shell on-call:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Na-egbochi okporo ụzọ chat site na flag ihe mgbanyụ nwere nnọchiteanya (ngwọta v5.13). Widget na-aga n\'ihu na-egosi; ndị mmụta na-ahụ ozi "[[tutorshort]] kwusịrị" dị mma. Jiri ya mgbe onye na-enye LLM na-adịghị mma ma ọ bụ ọnụahịa na-arị elu.';
+$string['emergency:flag_chat_desc'] = 'Ọ na-akwụsị oku AI [[tutorshort]] niile — mkparịta ụka, ajụjụ, kaadị mmụta na inye akara — maka ndị mmụta, ndị nchịkwa na ọrụ e hazitere otu aka. Widget ahụ ka na-egosi, ndị mmụta na-ahụ ozi nkwụsịtụ dị mkpirikpi. Nnwale onwe azụ na nyocha ahụike ka dịpụta ka i nwee ike nyochaa onye na-eweta tupu iweghachi.';
 $string['emergency:flag_voice'] = 'Olu';
 $string['emergency:flag_voice_desc'] = 'Na-ekpochapụ onye na-enye olu na-arụsi ọrụ ike (echekwara maka nweghachi ziri ezi). Chat ederede na-aga n\'ihu na-arụ ọrụ.';
 $string['emergency:flag_rag'] = 'RAG';

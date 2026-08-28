@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Imodeli ezosetshenziselwa. Okuzenzakalelayo ku
 $string['settings:apibaseurl'] = 'I-URL Yisisekelo se-API';
 $string['settings:apibaseurl_desc'] = 'I-URL yasisekelo ye-API. Igcwaliswa ngokwawo umhlinzeki ngamunye kodwa ingashintshwa. Yishiye ingenalutho ukuthola okuzenzakalelayo komhlinzeki.';
 $string['settings:systemprompt'] = 'Isifanekiso Sesicelo Sesistimu';
-$string['settings:systemprompt_desc'] = 'Isicelo esithumelwa ku-AI. Sebenzisa izindawo: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Isicelo esithumelwa ku-AI. Sebenzisa izindawo: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ungu-AI omfundisi osizayo wesifundo "{{coursename}}". Indima yomfundi ngu-{{userrole}}.
 
 Izihloko zesifundo ezifundisiwe:
-{{coursetopics}}
 
 Siza umfundi ukuqonda izinto zesifundo. Yiba nokukhuthaza, ucace, futhi usetshenziselwe imfundo.';
 $string['settings:temperature'] = 'Ubushisa';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Ingxenye yohlelo "{$a->flag}" ikhubazwe.
 $string['emergency:restored_notice'] = 'Ingxenye yohlelo "{$a->flag}" ibuyiselwe. Ukumiswa kwezilungiselelo: {$a->touched}';
 $string['emergency:cli_reference'] = 'Izilawuli ezifanayo zitholakala ku-shell ye-on-call:';
 $string['emergency:flag_chat'] = 'Ukuxhumana';
-$string['emergency:flag_chat_desc'] = 'Ivimba umsinga we-chat nge-kill flag ezinikele (ukulungiswa kwe-v5.13). I-widget iqhubeka inikeza; abafundi babona umyalezo omuhle "I-[[tutorshort]] imile". Sebenzisa lapho umhlinzeki we-LLM eziphatha kabi noma ezinkulu zenkosi.';
+$string['emergency:flag_chat_desc'] = 'Imisa zonke izicelo ze-AI ze-[[tutorshort]] — ingxoxo, izivivinyo, amakhadi okufunda nokunikeza amaphuzu — kubafundi, abaphathi nemisebenzi ehleliwe ngokufanayo. Iwijethi iyaqhubeka ibonakala futhi abafundi babona isaziso esifushane sokumiswa. Ukuzihlola kwe-backend nokuhlola impilo kuyaqhubeka kutholakala, ukuze uhlole umhlinzeki ngaphambi kokubuyisela.';
 $string['emergency:flag_voice'] = 'Izwi';
 $string['emergency:flag_voice_desc'] = 'Sula umhlinzeki we-voice we-realtime osebenzayo (ugcinwe ukuze ubuyiselwe ngokunembile). Ukuxhumana okubhaliwe kuqhubeka kusebenza.';
 $string['emergency:flag_rag'] = 'RAG';

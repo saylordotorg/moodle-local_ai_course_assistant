@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Model yang akan digunakan. Nilai default berga
 $string['settings:apibaseurl'] = 'URL Dasar API';
 $string['settings:apibaseurl_desc'] = 'URL dasar untuk API. Diisi otomatis sesuai penyedia namun dapat diganti. Kosongkan untuk menggunakan default penyedia.';
 $string['settings:systemprompt'] = 'Template Prompt Sistem';
-$string['settings:systemprompt_desc'] = 'Prompt sistem yang dikirim ke AI. Gunakan placeholder: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Prompt sistem yang dikirim ke AI. Gunakan placeholder: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Anda adalah tutor AI yang membantu untuk kursus "{{coursename}}". Peran siswa adalah {{userrole}}.
 
 Topik yang dibahas dalam kursus:
-{{coursetopics}}
 
 Bantu siswa memahami materi kursus. Jadilah penyemangat, jelas, dan berwawasan pedagogis.';
 $string['settings:temperature'] = 'Temperatur';
@@ -1432,7 +1431,7 @@ $string['emergency:disabled_notice'] = 'Subsistem "{$a->flag}" dinonaktifkan. Ko
 $string['emergency:restored_notice'] = 'Subsistem "{$a->flag}" dipulihkan. Konfigurasi yang diubah: {$a->touched}';
 $string['emergency:cli_reference'] = 'Kontrol yang sama tersedia dari shell on-call:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Memblokir lalu lintas chat melalui flag pemutus khusus (perbaikan v5.13). Widget tetap ditampilkan; pelajar melihat pesan "[[tutorshort]] dijeda" yang ramah. Gunakan bila penyedia LLM bermasalah atau lonjakan biaya sedang terjadi.';
+$string['emergency:flag_chat_desc'] = 'Menghentikan semua panggilan AI [[tutorshort]] — obrolan, kuis, kartu belajar, dan penilaian — bagi pelajar, administrator, maupun tugas terjadwal. Widget tetap tampil dan pelajar melihat pemberitahuan jeda singkat. Uji mandiri backend dan pemeriksaan kesehatan tetap tersedia agar Anda dapat memeriksa penyedia sebelum memulihkan.';
 $string['emergency:flag_voice'] = 'Suara';
 $string['emergency:flag_voice_desc'] = 'Menghapus penyedia suara realtime aktif (disimpan untuk pemulihan tepat). Chat teks tetap berfungsi.';
 $string['emergency:flag_rag'] = 'RAG';

@@ -105,7 +105,7 @@ $string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s def
 $string['settings:apibaseurl'] = 'API Base URL';
 $string['settings:apibaseurl_desc'] = 'Base URL for the API. Auto-filled per provider but can be overridden. Leave blank for provider default.';
 $string['settings:systemprompt'] = 'System Prompt Template';
-$string['settings:systemprompt_desc'] = 'System prompt sent to the AI. Use placeholders: {{coursename}}, {{userrole}}, {{coursetopics}}, {{institution}}.';
+$string['settings:systemprompt_desc'] = 'System prompt sent to the AI. Use placeholders: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
 
 ## Role
@@ -116,14 +116,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -604,7 +596,6 @@ $string['auditlog:col_course'] = 'Course';
 $string['auditlog:col_ip'] = 'IP address';
 $string['auditlog:col_details'] = 'Details';
 $string['auditlog:settings_link'] = 'Open the audit log';
-$string['auditlog:settings_link_desc'] = 'Every emergency switch, provider failover and de-anonymised export is recorded. This is where you read those rows.';
 
 // v6.1.0: web emergency panel.
 $string['emergency:title'] = '[[tutorshort]] Emergency Controls';
@@ -622,7 +613,7 @@ $string['emergency:restored_notice'] = 'Subsystem "{$a->flag}" restored. Config 
 $string['emergency:cli_reference'] = 'The same controls are available from the on-call shell:';
 $string['emergency:chat_stopped'] = '[[tutorshort]] is paused right now. Your course materials are unaffected, and this is not something you did — please try again later.';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blocks chat traffic via the dedicated kill flag (v5.13 fix). The widget keeps rendering; learners see the friendly "[[tutorshort]] paused" message. Use when an LLM provider is misbehaving or a cost spike is in progress.';
+$string['emergency:flag_chat_desc'] = 'Stops every [[tutorshort]] AI call — chat, quizzes, flashcards and scoring — for learners, administrators and scheduled tasks alike. The widget still renders and learners see a short paused notice. The backend self-test and health check stay available, so you can check the provider before restoring.';
 $string['emergency:flag_voice'] = 'Voice';
 $string['emergency:flag_voice_desc'] = 'Clears the active realtime voice provider (stashed for exact restore). Text chat keeps working.';
 $string['emergency:flag_rag'] = 'RAG';

@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'ব্যবহার করার মডে�
 $string['settings:apibaseurl'] = 'API বেস URL';
 $string['settings:apibaseurl_desc'] = 'API-এর বেস URL। প্রদানকারী অনুযায়ী স্বয়ংক্রিয়ভাবে পূরণ হয় তবে পরিবর্তন করা যায়। প্রদানকারীর ডিফল্টের জন্য খালি রাখুন।';
 $string['settings:systemprompt'] = 'সিস্টেম প্রম্পট টেমপ্লেট';
-$string['settings:systemprompt_desc'] = 'AI-এ পাঠানো সিস্টেম প্রম্পট। প্লেসহোল্ডার ব্যবহার করুন: {{coursename}}, {{userrole}}, {{coursetopics}}।';
+$string['settings:systemprompt_desc'] = 'AI-এ পাঠানো সিস্টেম প্রম্পট। প্লেসহোল্ডার ব্যবহার করুন: {{coursename}}, {{userrole}}।';
 $string['settings:systemprompt_default'] = 'আপনি "{{coursename}}" কোর্সের একজন সহায়ক AI টিউটর। শিক্ষার্থীর ভূমিকা হলো {{userrole}}।
 
 কোর্সে আলোচিত বিষয়সমূহ:
-{{coursetopics}}
 
 শিক্ষার্থীকে কোর্সের বিষয়বস্তু বুঝতে সাহায্য করুন। উৎসাহজনক, স্পষ্ট এবং শিক্ষাগতভাবে সঠিক হোন।';
 $string['settings:temperature'] = 'তাপমাত্রা';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'সাবসিস্টেম "{$a->fla
 $string['emergency:restored_notice'] = 'সাবসিস্টেম "{$a->flag}" পুনরুদ্ধার করা হয়েছে। পরিবর্তিত কনফিগ: {$a->touched}';
 $string['emergency:cli_reference'] = 'একই নিয়ন্ত্রণ অন-কল শেল থেকেও পাওয়া যায়:';
 $string['emergency:flag_chat'] = 'চ্যাট';
-$string['emergency:flag_chat_desc'] = 'নিবেদিত kill flag-এর মাধ্যমে চ্যাট ট্রাফিক ব্লক করে (v5.13 সংশোধন)। উইজেট রেন্ডারিং চলতে থাকে; শিক্ষার্থীরা বন্ধুত্বপূর্ণ "[[tutorshort]] বিরতিতে" বার্তা দেখেন। LLM প্রোভাইডার সমস্যায় বা খরচ বাড়লে ব্যবহার করুন।';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]]-এর সব AI কল বন্ধ করে — চ্যাট, কুইজ, ফ্ল্যাশকার্ড ও স্কোরিং — শিক্ষার্থী, প্রশাসক এবং নির্ধারিত কাজ সবার জন্যই। উইজেটটি দেখা যেতে থাকে এবং শিক্ষার্থীরা একটি সংক্ষিপ্ত বিরতির বার্তা দেখেন। পুনরুদ্ধারের আগে প্রদানকারী যাচাই করার জন্য ব্যাকএন্ড সেল্ফ-টেস্ট ও হেলথ চেক চালু থাকে।';
 $string['emergency:flag_voice'] = 'ভয়েস';
 $string['emergency:flag_voice_desc'] = 'সক্রিয় realtime ভয়েস প্রোভাইডার সাফ করে (সঠিক পুনরুদ্ধারের জন্য সংরক্ষিত)। টেক্সট চ্যাট চলতে থাকে।';
 $string['emergency:flag_rag'] = 'RAG';

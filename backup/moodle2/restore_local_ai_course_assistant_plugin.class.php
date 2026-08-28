@@ -103,12 +103,6 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     }
 
     /**
-     * Per-course AI configuration.
-     *
-     * @param array $data
-     * @return void
-     */
-    /**
      * A per-course override stored in config_plugins as "<setting>_course_<id>".
      *
      * The course id is part of the setting name, so it is remapped here the way
@@ -126,13 +120,12 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
             return;
         }
 
-        // Defence in depth: the backup already excludes credentials, but an
-        // archive built by an older release, or edited by hand, must not be able
-        // to write one into this site's config.
-        foreach (['apikey', 'token', 'secret', 'password', 'webhook'] as $deny) {
-            if (stripos($name, $deny) !== false) {
-                return;
-            }
+        // The archive is user-supplied: a restore capability does not imply
+        // site:config, so anything off the allowlist is ignored no matter what the
+        // file says. Checked here as well as at backup time, because a file can be
+        // edited and because an older release wrote these rows under a denylist.
+        if (!\local_ai_course_assistant\course_setting_transfer::is_transferable($name)) {
+            return;
         }
 
         // Only ever rewrite a trailing course id, and only when there is one.
@@ -154,6 +147,12 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         set_config($newname, $data->value, 'local_ai_course_assistant');
     }
 
+    /**
+     * Per-course AI configuration.
+     *
+     * @param array $data
+     * @return void
+     */
     public function process_aica_course_config($data) {
         global $DB;
 

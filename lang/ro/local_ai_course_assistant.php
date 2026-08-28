@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Modelul de utilizat. Valoarea implicită depin
 $string['settings:apibaseurl'] = 'URL de bază API';
 $string['settings:apibaseurl_desc'] = 'URL-ul de bază API. Completat automat în funcție de furnizor, dar poate fi suprascris. Lăsați gol pentru a utiliza valoarea implicită a furnizorului.';
 $string['settings:systemprompt'] = 'Șablon prompt de sistem';
-$string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ești un tutore AI util pentru cursul „{{coursename}}". Rolul studentului este {{userrole}}.
 
 Subiecte acoperite în curs:
-{{coursetopics}}
 
 Ajută studentul să înțeleagă conținutul cursului. Fii încurajator, clar și riguros din punct de vedere pedagogic.';
 $string['settings:temperature'] = 'Temperatură';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Subsistemul „{$a->flag}" dezactivat. C
 $string['emergency:restored_notice'] = 'Subsistemul „{$a->flag}" restaurat. Configurare atinsă: {$a->touched}';
 $string['emergency:cli_reference'] = 'Aceleași controale sunt disponibile din shell-ul de gardă:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blochează traficul de chat prin flag-ul de kill dedicat (remediere v5.13). Widgetul continuă să se randeze; cursanții văd mesajul prietenos „[[tutorshort]] în pauză". Utilizați când un furnizor LLM se comportă necorespunzător sau un vârf de costuri este în desfășurare.';
+$string['emergency:flag_chat_desc'] = 'Oprește toate apelurile AI ale [[tutorshort]] — chat, teste, cartonașe și notare — deopotrivă pentru cursanți, administratori și sarcini programate. Widgetul rămâne afișat, iar cursanții văd o scurtă notificare de pauză. Autotestul backendului și verificarea stării rămân disponibile, ca să verifici furnizorul înainte de restaurare.';
 $string['emergency:flag_voice'] = 'Voce';
 $string['emergency:flag_voice_desc'] = 'Golește furnizorul de voce realtime activ (salvat pentru restaurare exactă). Chat-ul text continuă să funcționeze.';
 $string['emergency:flag_rag'] = 'RAG';

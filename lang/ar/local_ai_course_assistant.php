@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'النموذج المراد استخدامه. 
 $string['settings:apibaseurl'] = 'عنوان URL الأساسي لـ API';
 $string['settings:apibaseurl_desc'] = 'عنوان URL الأساسي لـ API. يُملأ تلقائيًا وفق المزوّد لكن يمكن تجاوزه. اتركه فارغًا لاستخدام الافتراضي.';
 $string['settings:systemprompt'] = 'قالب النظام التوجيهي';
-$string['settings:systemprompt_desc'] = 'النظام التوجيهي المرسل إلى الذكاء الاصطناعي. استخدم العناصر النائبة: {{coursename}}، {{userrole}}، {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'النظام التوجيهي المرسل إلى الذكاء الاصطناعي. استخدم العناصر النائبة: {{coursename}}، {{userrole}}.';
 $string['settings:systemprompt_default'] = 'أنت مدرّس افتراضي مفيد بالذكاء الاصطناعي لمقرر "{{coursename}}". دور الطالب هو {{userrole}}.
 
 موضوعات المقرر المغطاة:
-{{coursetopics}}
 
 ساعد الطالب على فهم محتوى المقرر. كن مشجعًا وواضحًا وسليمًا من الناحية التربوية.';
 $string['settings:temperature'] = 'درجة الحرارة (التلقائية)';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'تم تعطيل النظام الفرع�
 $string['emergency:restored_notice'] = 'تمت استعادة النظام الفرعي "{$a->flag}". الإعداد المُعدَّل: {$a->touched}';
 $string['emergency:cli_reference'] = 'تتوفر نفس الأدوات من الطرفية:';
 $string['emergency:flag_chat'] = 'المحادثة';
-$string['emergency:flag_chat_desc'] = 'يحجب حركة المحادثة عبر علامة الإيقاف المخصصة (إصلاح v5.13). تستمر الأداة في العرض؛ يرى المتعلمون رسالة "[[tutorshort]] متوقف" الودية. استخدمه عند تصرف مزود LLM بصورة غير صحيحة أو حدوث ارتفاع في التكاليف.';
+$string['emergency:flag_chat_desc'] = 'يوقف كل استدعاءات الذكاء الاصطناعي في [[tutorshort]] — المحادثة والاختبارات والبطاقات والتقييم — للمتعلمين والمسؤولين والمهام المجدولة على حد سواء. تظل الأداة ظاهرة ويرى المتعلمون إشعارًا قصيرًا بالإيقاف المؤقت. يبقى الاختبار الذاتي للخادم وفحص السلامة متاحين لتتمكن من فحص المزوّد قبل الاستعادة.';
 $string['emergency:flag_voice'] = 'الصوت';
 $string['emergency:flag_voice_desc'] = 'يمسح مزود الصوت الفوري النشط (محفوظ للاستعادة التامة). تستمر المحادثة النصية في العمل.';
 $string['emergency:flag_rag'] = 'RAG';

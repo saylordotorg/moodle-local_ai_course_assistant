@@ -99,6 +99,15 @@ class run_meta_ai_query extends \core\task\scheduled_task {
         $providerid = (string) ($sched->provider ?? '');
         $modelid = (string) ($sched->model ?? '');
         if ($providerid !== '') {
+            // An emergency chat stop pauses this task rather than failing it. Without
+            // this the provider factory throws on every cron run for the length of the
+            // incident, and Moodle's scheduler accumulates failure delays for a task
+            // that is working exactly as intended.
+            if (\local_ai_course_assistant\spend_guard::emergency_chat_stopped()) {
+                mtrace('SOLA: emergency chat stop is engaged; skipping this run.');
+                return;
+            }
+
             $llm = base_provider::create_for_comparison($providerid, $modelid);
         } else {
             $llm = base_provider::create_from_config(0);

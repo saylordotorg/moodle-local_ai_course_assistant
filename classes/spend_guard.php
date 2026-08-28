@@ -224,14 +224,6 @@ class spend_guard {
     }
 
     /**
-     * Check whether a new request under this scope/capability is allowed.
-     * Emits notification emails when crossing 80% and 95% thresholds.
-     *
-     * @param int $courseid 0 for site-wide
-     * @param string|null $capability
-     * @return string One of the CAP_* constants
-     */
-    /**
      * Is the emergency chat stop engaged?
      *
      * check() folds this into CAP_BLOCKED so that everything which already
@@ -248,10 +240,23 @@ class spend_guard {
         return (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled');
     }
 
+    /**
+     * Check whether a new request under this scope/capability is allowed.
+     * Emits notification emails when crossing 80% and 95% thresholds.
+     *
+     * @param int $courseid 0 for site-wide
+     * @param string|null $capability
+     * @return string One of the CAP_* constants
+     */
     public static function check(int $courseid = 0, ?string $capability = null): string {
         // v5.13.0: emergency_control --chat sets a dedicated flag that
-        // short-circuits every chat-shaped call (and only chat-shaped calls)
-        // to CAP_BLOCKED so the friendly "SOLA paused" path runs. Previously
+        // short-circuits chat-shaped calls to CAP_BLOCKED so the friendly
+        // "SOLA paused" path runs. Note that since v7.2.1 this is no longer the
+        // only place the flag is enforced: base_provider::enforce_learner_guards()
+        // consults it for EVERY provider call, capability-blind and without the
+        // site-admin exemption, because a kill switch with exemptions is not one.
+        // The scope of the switch is therefore wider than this method alone
+        // suggests -- see emergency:flag_chat_desc, which documents it. Previously
         // emergency_control wrote spend_cap_site=0 thinking 0 = paused, but
         // get_cap() treats 0 as unlimited, so --chat was a silent no-op.
         if (

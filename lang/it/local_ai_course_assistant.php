@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Il modello da utilizzare. Il predefinito dipen
 $string['settings:apibaseurl'] = 'URL Base API';
 $string['settings:apibaseurl_desc'] = 'URL base per l\'API. Compilato automaticamente per provider ma può essere sovrascritto.';
 $string['settings:systemprompt'] = 'Modello Prompt di Sistema';
-$string['settings:systemprompt_desc'] = 'Prompt di sistema inviato all\'AI. Usa segnaposto: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Prompt di sistema inviato all\'AI. Usa segnaposto: {{coursename}}, {{userrole}}.';
 $string['settings:temperature'] = 'Temperatura';
 $string['settings:temperature_desc'] = 'Controlla la casualità. Valori più bassi sono più focalizzati. Intervallo: 0.0 a 2.0.';
 $string['settings:maxhistory'] = 'Cronologia conversazione massima';
@@ -652,14 +652,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -1445,7 +1437,7 @@ $string['emergency:disabled_notice'] = 'Sottosistema "{$a->flag}" disabilitato. 
 $string['emergency:restored_notice'] = 'Sottosistema "{$a->flag}" ripristinato. Configurazione modificata: {$a->touched}';
 $string['emergency:cli_reference'] = 'Gli stessi controlli sono disponibili dalla shell on-call:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blocca il traffico chat tramite il flag di kill dedicato (correzione v5.13). Il widget continua a essere visualizzato; gli studenti vedono il messaggio amichevole "[[tutorshort]] in pausa". Da usare quando un provider LLM si comporta in modo anomalo o è in corso un picco di costi.';
+$string['emergency:flag_chat_desc'] = 'Blocca ogni chiamata di IA di [[tutorshort]] — chat, quiz, flashcard e valutazione — allo stesso modo per studenti, amministratori e attività pianificate. Il widget continua a essere visualizzato e gli studenti vedono un breve avviso di pausa. L\'autotest del backend e il controllo di stato restano disponibili per verificare il fornitore prima del ripristino.';
 $string['emergency:flag_voice'] = 'Voce';
 $string['emergency:flag_voice_desc'] = 'Cancella il provider vocale realtime attivo (salvato per un ripristino esatto). La chat testuale continua a funzionare.';
 $string['emergency:flag_rag'] = 'RAG';

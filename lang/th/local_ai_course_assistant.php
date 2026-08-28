@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'โมเดลที่จะใช้ ค่
 $string['settings:apibaseurl'] = 'URL ฐาน API';
 $string['settings:apibaseurl_desc'] = 'URL ฐาน API กรอกอัตโนมัติตามผู้ให้บริการ แต่สามารถแก้ไขได้ เว้นว่างเพื่อใช้ค่าเริ่มต้นของผู้ให้บริการ';
 $string['settings:systemprompt'] = 'แม่แบบพรอมต์ระบบ';
-$string['settings:systemprompt_desc'] = 'พรอมต์ระบบที่ส่งไปยัง AI ใช้ตัวแทนที่: {{coursename}}, {{userrole}}, {{coursetopics}}';
+$string['settings:systemprompt_desc'] = 'พรอมต์ระบบที่ส่งไปยัง AI ใช้ตัวแทนที่: {{coursename}}, {{userrole}}';
 $string['settings:systemprompt_default'] = 'คุณเป็นผู้สอน AI ที่มีประโยชน์สำหรับรายวิชา "{{coursename}}" บทบาทของนักศึกษาคือ {{userrole}}
 
 หัวข้อที่ครอบคลุมในรายวิชา:
-{{coursetopics}}
 
 ช่วยนักศึกษาเข้าใจเนื้อหารายวิชา ให้กำลังใจ ชัดเจน และเข้มงวดทางการศึกษา';
 $string['settings:temperature'] = 'อุณหภูมิ';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'ระบบย่อย "{$a->flag}" �
 $string['emergency:restored_notice'] = 'ระบบย่อย "{$a->flag}" ได้รับการกู้คืนแล้ว การกำหนดค่าที่เปลี่ยนแปลง: {$a->touched}';
 $string['emergency:cli_reference'] = 'ตัวควบคุมเดียวกันนี้มีอยู่ใน shell ของทีม on-call:';
 $string['emergency:flag_chat'] = 'แชท';
-$string['emergency:flag_chat_desc'] = 'บล็อกการรับส่งข้อมูลแชทผ่าน kill flag เฉพาะ (แก้ไขใน v5.13) widget ยังคงแสดงอยู่; ผู้เรียนจะเห็นข้อความ "[[tutorshort]] หยุดชั่วคราว" ที่เป็นมิตร ใช้เมื่อผู้ให้บริการ LLM ทำงานผิดปกติหรือมีค่าใช้จ่ายพุ่งสูงขึ้น';
+$string['emergency:flag_chat_desc'] = 'หยุดการเรียกใช้ AI ทั้งหมดของ [[tutorshort]] — แชท แบบทดสอบ บัตรคำ และการให้คะแนน — ทั้งสำหรับผู้เรียน ผู้ดูแลระบบ และงานตามกำหนดเวลา วิดเจ็ตยังคงแสดงอยู่ และผู้เรียนจะเห็นข้อความแจ้งหยุดชั่วคราวสั้น ๆ การทดสอบตัวเองของแบ็กเอนด์และการตรวจสอบสถานะยังใช้งานได้ เพื่อให้คุณตรวจสอบผู้ให้บริการก่อนกู้คืน';
 $string['emergency:flag_voice'] = 'เสียง';
 $string['emergency:flag_voice_desc'] = 'ล้างผู้ให้บริการเสียง realtime ที่ใช้งานอยู่ (เก็บไว้เพื่อกู้คืนได้แน่นอน) แชทข้อความยังคงทำงานได้';
 $string['emergency:flag_rag'] = 'RAG';

@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'ጥቅም ላይ የሚውለው ሞዴል። 
 $string['settings:apibaseurl'] = 'የAPI መሰረታዊ URL';
 $string['settings:apibaseurl_desc'] = 'ለAPI መሰረታዊ URL። እንደ አቅራቢ ራሱ ይሞላል ግን ሊሻሻል ይችላል። ለአቅራቢ ነባሪ ባዶ ይተው።';
 $string['settings:systemprompt'] = 'የስርዓት ፕሮምት ቅጥ';
-$string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}, {{coursetopics}}።';
+$string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}።';
 $string['settings:systemprompt_default'] = 'ለ"{{coursename}}" ኮርስ ጠቃሚ የAI አስተማሪ ነዎት። የተማሪው ሚና {{userrole}} ነው።
 
 የሚሸፈኑ የኮርስ ርዕሶች፦
-{{coursetopics}}
 
 ተማሪው የኮርሱን ቁሳቁስ እንዲረዳ ይርዱ። አበረታቱ፣ ግልጽ ይሁኑ እና ትምህርታዊ ዘዴ ይጠቀሙ።';
 $string['settings:temperature'] = 'ሙቀት';
@@ -1430,7 +1429,7 @@ $string['emergency:disabled_notice'] = '"{$a->flag}" ንዑስ-ስርዓት ጠ�
 $string['emergency:restored_notice'] = '"{$a->flag}" ንዑስ-ስርዓት ወደ ነበረ ተመልሷል። የተነካ Config: {$a->touched}';
 $string['emergency:cli_reference'] = 'ተመሳሳይ ቁጥጥሮች ከ on-call shell ይገኛሉ፦';
 $string['emergency:flag_chat'] = 'ውይይት';
-$string['emergency:flag_chat_desc'] = 'የውይይት ትራፊክን በተዘጋጀ kill flag አማካኝነት ይዘጋል (v5.13 ማስተካከያ)። Widget መሳቢያ ይቀጥላል፤ ተማሪዎች ወዳጃዊ "[[tutorshort]] ቆሟል" መልዕክት ያዩ ናቸው። LLM አቅራቢ ሲቸገር ወይም ወጪ ሲንፈሰፈስ ይጠቀሙ።';
+$string['emergency:flag_chat_desc'] = 'ሁሉንም የ[[tutorshort]] AI ጥሪ — ውይይት፣ ፈተናዎች፣ ካርዶች እና ውጤት አሰጣጥ — ለተማሪዎች፣ ለአስተዳዳሪዎችና ለታቀዱ ተግባራት በእኩል ያቆማል። መግብሩ መታየቱን ይቀጥላል፤ ተማሪዎችም አጭር የማቆሚያ ማስታወቂያ ያያሉ። ከመመለስዎ በፊት አገልጋዩን መፈተሽ እንዲችሉ የጀርባ ራስ-ፈተናና የጤና ምርመራ ይቀጥላሉ።';
 $string['emergency:flag_voice'] = 'ድምጽ';
 $string['emergency:flag_voice_desc'] = 'ንቁ realtime ድምጽ አቅራቢን ያጠፋል (ለትክክለኛ ወደ ነበረ ለመልስ ይቀዳጃል)። የጽሑፍ ውይይት ይቀጥላል።';
 $string['emergency:flag_rag'] = 'RAG';

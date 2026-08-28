@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Modhel-ka la isticmaalay. Default-ku waxuu ku 
 $string['settings:apibaseurl'] = 'URL-ka Aasaaska API';
 $string['settings:apibaseurl_desc'] = 'URL-ka aasaaska ee API-ga. Si toos ah ayaa loo buuxiyaa bixiyaha kasta laakiin waa la beddeli karaa. Ka tag oo madhan default-ka bixiyaha.';
 $string['settings:systemprompt'] = 'Qaab-dhismeedka Tilmaanta Nidaamka';
-$string['settings:systemprompt_desc'] = 'Tilmaanta la u dirayo AI. Isticmaal meel-buuxiyeyaasha: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Tilmaanta la u dirayo AI. Isticmaal meel-buuxiyeyaasha: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Adiga waxaad tahay bari AI oo kaalmeeya koorso "{{coursename}}". Doorka ardayda waa {{userrole}}.
 
 Mawduucyada koorsada la daboolay:
-{{coursetopics}}
 
 Caawin ardayga si uu u fahmo agabka koorsada. Noqo mid dhiirigeliya, cad, oo waxbarasho u fiican.';
 $string['settings:temperature'] = 'Heerkulka';
@@ -1419,7 +1418,7 @@ $string['emergency:disabled_notice'] = 'Nidaamka hoosaadka "{$a->flag}" waa la d
 $string['emergency:restored_notice'] = 'Nidaamka hoosaadka "{$a->flag}" waa la soo celiyay. Dejimaha la taabay: {$a->touched}';
 $string['emergency:cli_reference'] = 'Xukumaadka isku mid ah ayaa laga heli karaa shell-ka xilliga dayrta:';
 $string['emergency:flag_chat'] = 'Wadahadal';
-$string['emergency:flag_chat_desc'] = 'Xukumada taraafikada wadahadallka iyada oo loo marayo calaamadda kill-ka gaar ah (dayactir v5.13). Wijidhka wuu sii samaynayaa; ardaydu waxay arkaan farriinta saaxiibka ah ee "[[tutorshort]] waa la joojiyay". Isticmaal marka bixiyaha LLM-ku si khaldan u dhaqmayo ama kharashka korriintu socdaa.';
+$string['emergency:flag_chat_desc'] = 'Wuxuu joojiyaa dhammaan wicitaannada AI ee [[tutorshort]] — sheeko, imtixaanno, kaararka waxbarashada iyo qiimaynta — ardayda, maamulayaasha iyo hawlaha jadwalaysan si isku mid ah. Widget-ku wuu muuqanayaa, ardayduna waxay arkaan ogeysiis gaaban oo hakad ah. Baaritaanka backend-ka iyo hubinta caafimaadka way sii socdaan, si aad u hubiso bixiyaha ka hor inta aadan soo celin.';
 $string['emergency:flag_voice'] = 'Cod';
 $string['emergency:flag_voice_desc'] = 'Nadiifiyaa bixiyaha codka ee firfircoon ee wakhti-dhabta ah (lagu kaydiyay soo celinta saxda ah). Wadahadallka qoraalka wuu sii shaqeynayaa.';
 $string['emergency:flag_rag'] = 'RAG';

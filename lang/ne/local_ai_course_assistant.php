@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'प्रयोग गर्ने मोड�
 $string['settings:apibaseurl'] = 'API आधार URL';
 $string['settings:apibaseurl_desc'] = 'API को आधार URL। प्रत्येक प्रदायकका लागि स्वचालित रूपमा भरिन्छ तर परिवर्तन गर्न सकिन्छ। प्रदायकको पूर्वनिर्धारितका लागि खाली छोड्नुहोस्।';
 $string['settings:systemprompt'] = 'सिस्टम प्रम्प्ट टेम्प्लेट';
-$string['settings:systemprompt_desc'] = 'AI लाई पठाइने सिस्टम प्रम्प्ट। प्लेसहोल्डरहरू प्रयोग गर्नुहोस्: {{coursename}}, {{userrole}}, {{coursetopics}}।';
+$string['settings:systemprompt_desc'] = 'AI लाई पठाइने सिस्टम प्रम्प्ट। प्लेसहोल्डरहरू प्रयोग गर्नुहोस्: {{coursename}}, {{userrole}}।';
 $string['settings:systemprompt_default'] = 'तपाईं "{{coursename}}" पाठ्यक्रमका लागि एक उपयोगी AI ट्युटर हुनुहुन्छ। विद्यार्थीको भूमिका {{userrole}} हो।
 
 समेटिएका पाठ्यक्रम विषयहरू:
-{{coursetopics}}
 
 विद्यार्थीलाई पाठ्यक्रम सामग्री बुझ्न मद्दत गर्नुहोस्। उत्साहजनक, स्पष्ट र शैक्षणिक रूपमा सही रहनुहोस्।';
 $string['settings:temperature'] = 'तापमान';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'उपप्रणाली "{$a->flag}"
 $string['emergency:restored_notice'] = 'उपप्रणाली "{$a->flag}" पुनःस्थापना गरियो। स्पर्श गरिएको कन्फिगरेसन: {$a->touched}';
 $string['emergency:cli_reference'] = 'उही नियन्त्रणहरू अन-कल शेलबाट उपलब्ध छन्:';
 $string['emergency:flag_chat'] = 'च्याट';
-$string['emergency:flag_chat_desc'] = 'समर्पित किल फ्ल्याग (v5.13 सुधार) मार्फत च्याट ट्राफिक रोक्छ। विजेट रेन्डर हुन जारी राख्छ; सिकारुहरूले मैत्रीपूर्ण "[[tutorshort]] रोकिएको" सन्देश देख्छन्। LLM प्रदायक गलत व्यवहार गरिरहेको वा लागत स्पाइक भइरहेको बेला प्रयोग गर्नुहोस्।';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]] का सबै AI कल रोक्छ — च्याट, क्विज, फ्ल्यासकार्ड र अङ्कन — विद्यार्थी, प्रशासक र तालिकाबद्ध कार्यहरू सबैका लागि समान रूपमा। विजेट देखिइरहन्छ र विद्यार्थीहरूले छोटो रोकिएको सूचना देख्छन्। पुनःस्थापना गर्नुअघि प्रदायक जाँच्न सकियोस् भनी ब्याकइन्ड सेल्फ-टेस्ट र हेल्थ चेक उपलब्ध रहन्छन्।';
 $string['emergency:flag_voice'] = 'आवाज';
 $string['emergency:flag_voice_desc'] = 'सक्रिय रियलटाइम आवाज प्रदायक सफा गर्छ (सटीक पुनःस्थापनाका लागि सुरक्षित गरिन्छ)। पाठ च्याट काम गर्न जारी राख्छ।';
 $string['emergency:flag_rag'] = 'RAG';

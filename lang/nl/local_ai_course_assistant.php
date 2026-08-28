@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Het te gebruiken model. De standaardwaarde han
 $string['settings:apibaseurl'] = 'API-basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-basis-URL. Wordt automatisch ingevuld op basis van de provider, maar kan worden overschreven. Laat leeg om de standaard van de provider te gebruiken.';
 $string['settings:systemprompt'] = 'Systeempromptsjabloon';
-$string['settings:systemprompt_desc'] = 'Systeemprompt die naar de AI wordt gestuurd. Gebruik plaatshouders: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Systeemprompt die naar de AI wordt gestuurd. Gebruik plaatshouders: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'U bent een behulpzame AI-tutor voor de cursus "{{coursename}}". De rol van de student is {{userrole}}.
 
 Onderwerpen die in de cursus worden behandeld:
-{{coursetopics}}
 
 Help de student de cursusinhoud te begrijpen. Wees bemoedigend, duidelijk en pedagogisch grondig.';
 $string['settings:temperature'] = 'Temperatuur';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Subsysteem "{$a->flag}" uitgeschakeld. C
 $string['emergency:restored_notice'] = 'Subsysteem "{$a->flag}" hersteld. Configuratie gewijzigd: {$a->touched}';
 $string['emergency:cli_reference'] = 'Dezelfde bediening is beschikbaar via de wachtdienstshell:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blokkeert chatverkeer via de speciale kill-vlag (v5.13-correctie). De widget blijft zichtbaar; lerende zien het vriendelijke bericht "[[tutorshort]] gepauzeerd". Gebruik wanneer een LLM-aanbieder problemen veroorzaakt of een kostenpiek gaande is.';
+$string['emergency:flag_chat_desc'] = 'Stopt alle AI-aanroepen van [[tutorshort]] — chat, quizzen, flashcards en beoordeling — voor cursisten, beheerders en geplande taken. De widget blijft zichtbaar en cursisten zien een korte pauzemelding. De backend-zelftest en gezondheidscontrole blijven beschikbaar, zodat u de provider kunt controleren voordat u herstelt.';
 $string['emergency:flag_voice'] = 'Spraak';
 $string['emergency:flag_voice_desc'] = 'Verwijdert de actieve realtime spraak-aanbieder (opgeslagen voor exacte herstel). Tekstchat blijft werken.';
 $string['emergency:flag_rag'] = 'RAG';

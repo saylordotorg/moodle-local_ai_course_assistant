@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Mô hình cần sử dụng. Mặc định ph�
 $string['settings:apibaseurl'] = 'URL cơ sở API';
 $string['settings:apibaseurl_desc'] = 'URL cơ sở cho API. Được tự động điền theo nhà cung cấp nhưng có thể ghi đè. Để trống để dùng mặc định của nhà cung cấp.';
 $string['settings:systemprompt'] = 'Mẫu Prompt Hệ thống';
-$string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Bạn là gia sư AI hữu ích cho khóa học "{{coursename}}". Vai trò của học viên là {{userrole}}.
 
 Các chủ đề khóa học được đề cập:
-{{coursetopics}}
 
 Hãy giúp học viên hiểu tài liệu khóa học. Hãy khích lệ, rõ ràng và có phương pháp sư phạm tốt.';
 $string['settings:temperature'] = 'Nhiệt độ';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Hệ thống con "{$a->flag}" đã bị 
 $string['emergency:restored_notice'] = 'Hệ thống con "{$a->flag}" đã được khôi phục. Cấu hình đã chạm: {$a->touched}';
 $string['emergency:cli_reference'] = 'Các điều khiển tương tự cũng có sẵn từ shell trực chiến:';
 $string['emergency:flag_chat'] = 'Trò chuyện';
-$string['emergency:flag_chat_desc'] = 'Chặn lưu lượng chat qua kill flag chuyên dụng (bản sửa lỗi v5.13). Widget vẫn hiển thị; học viên thấy thông báo thân thiện "[[tutorshort]] đã tạm dừng". Sử dụng khi nhà cung cấp LLM gặp sự cố hoặc đang xảy ra tăng đột biến chi phí.';
+$string['emergency:flag_chat_desc'] = 'Dừng mọi lệnh gọi AI của [[tutorshort]] — trò chuyện, câu hỏi, thẻ ghi nhớ và chấm điểm — cho người học, quản trị viên và tác vụ theo lịch như nhau. Tiện ích vẫn hiển thị và người học thấy thông báo tạm dừng ngắn. Tự kiểm tra backend và kiểm tra tình trạng vẫn khả dụng để bạn kiểm tra nhà cung cấp trước khi khôi phục.';
 $string['emergency:flag_voice'] = 'Giọng nói';
 $string['emergency:flag_voice_desc'] = 'Xóa nhà cung cấp giọng nói realtime đang hoạt động (được lưu để khôi phục chính xác). Chat văn bản tiếp tục hoạt động.';
 $string['emergency:flag_rag'] = 'RAG';

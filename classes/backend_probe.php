@@ -94,7 +94,7 @@ final class backend_probe {
      */
     public static function probe_chat(): array {
         try {
-            $provider = base_provider::create_from_config(0);
+            $provider = base_provider::create_from_config(0, /* diagnostic */ true);
             $started = microtime(true);
             $reply = $provider->chat_completion(
                 'You are a connectivity probe. Answer in one word.',
@@ -145,7 +145,7 @@ final class backend_probe {
      */
     public static function detect_window(): int {
         try {
-            $provider = base_provider::create_from_config(0);
+            $provider = base_provider::create_from_config(0, /* diagnostic */ true);
             return $provider->detect_context_window();
         } catch (\Throwable $e) {
             return 0;

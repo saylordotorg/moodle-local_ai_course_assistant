@@ -339,7 +339,7 @@ class health_check {
             ];
         }
         try {
-            $instance = \local_ai_course_assistant\provider\base_provider::create_from_config(0);
+            $instance = \local_ai_course_assistant\provider\base_provider::create_from_config(0, /* diagnostic */ true);
             if (!is_object($instance)) {
                 return self::fail($name, "provider factory returned non-object for provider={$providerid}.");
             }

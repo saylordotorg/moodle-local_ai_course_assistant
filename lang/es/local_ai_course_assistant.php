@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'El modelo a utilizar. El valor predeterminado 
 $string['settings:apibaseurl'] = 'URL base de la API';
 $string['settings:apibaseurl_desc'] = 'URL base para la API. Se rellena automáticamente según el proveedor, pero puede modificarse. Déjelo en blanco para usar el valor predeterminado del proveedor.';
 $string['settings:systemprompt'] = 'Plantilla de instrucción del sistema';
-$string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Eres un tutor de IA útil para el curso "{{coursename}}". El rol del estudiante es {{userrole}}.
 
 Temas del curso:
-{{coursetopics}}
 
 Ayuda al estudiante a comprender el contenido del curso. Sé alentador, claro y pedagógicamente riguroso.';
 $string['settings:temperature'] = 'Temperatura';
@@ -1428,7 +1427,7 @@ $string['emergency:disabled_notice'] = 'Subsistema "{$a->flag}" desactivado. Con
 $string['emergency:restored_notice'] = 'Subsistema "{$a->flag}" restaurado. Configuración modificada: {$a->touched}';
 $string['emergency:cli_reference'] = 'Los mismos controles están disponibles desde el shell de guardia:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Bloquea el tráfico de chat mediante el indicador de kill dedicado (corrección v5.13). El widget sigue renderizándose; los estudiantes ven el mensaje amigable "[[tutorshort]] pausado". Úselo cuando un proveedor de LLM se comporta mal o hay un pico de costes en curso.';
+$string['emergency:flag_chat_desc'] = 'Detiene todas las llamadas de IA de [[tutorshort]] — chat, cuestionarios, tarjetas y puntuación — por igual para estudiantes, administradores y tareas programadas. El widget sigue mostrándose y los estudiantes ven un breve aviso de pausa. La autocomprobación del backend y la comprobación de estado siguen disponibles para revisar el proveedor antes de restaurar.';
 $string['emergency:flag_voice'] = 'Voz';
 $string['emergency:flag_voice_desc'] = 'Borra el proveedor de voz en tiempo real activo (guardado para restauración exacta). El chat de texto sigue funcionando.';
 $string['emergency:flag_rag'] = 'RAG';

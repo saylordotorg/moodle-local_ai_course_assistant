@@ -84,8 +84,9 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
         // correct) while every pedagogy decision silently reverted to the site
         // default.
         //
-        // Credentials are excluded here rather than on restore, so they never
-        // enter the backup file at all.
+        // course_setting_transfer holds the allowlist, shared with restore. It is
+        // an allowlist rather than a credential denylist so a setting added in a
+        // later release does not travel until someone decides it should.
         $courseid = (int) $this->task->get_courseid();
         $settings = new backup_nested_element('aica_course_settings');
         $setting = new backup_nested_element('aica_course_setting', ['id'], ['name', 'value']);
@@ -98,22 +99,14 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
         // fails to build. Reading the config in PHP is also an exact suffix
         // match, where a LIKE would need escaping that MySQL string literals
         // then re-interpret.
-        $suffix = '_course_' . $courseid;
         $rows = [];
         $rowid = 0;
-        foreach ((array) get_config('local_ai_course_assistant') as $key => $value) {
-            if (substr($key, -strlen($suffix)) !== $suffix) {
-                continue;
-            }
-            foreach (['apikey', 'token', 'secret', 'password', 'webhook'] as $deny) {
-                if (stripos($key, $deny) !== false) {
-                    continue 2;
-                }
-            }
+        foreach (\local_ai_course_assistant\course_setting_transfer::collect_for_course($courseid)
+                as $key => $value) {
             $rows[] = (object) [
                 'id' => ++$rowid,
                 'name' => $key,
-                'value' => (string) $value,
+                'value' => $value,
             ];
         }
         $setting->set_source_array($rows);

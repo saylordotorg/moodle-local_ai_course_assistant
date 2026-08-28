@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'המודל לשימוש. ברירת המחדל
 $string['settings:apibaseurl'] = 'כתובת בסיס API';
 $string['settings:apibaseurl_desc'] = 'כתובת בסיס ל-API. ממולאת אוטומטית לפי ספק אבל ניתנת לשינוי.';
 $string['settings:systemprompt'] = 'תבנית הודעת מערכת';
-$string['settings:systemprompt_desc'] = 'הודעת מערכת הנשלחת ל-AI. שימוש במקומות: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'הודעת מערכת הנשלחת ל-AI. שימוש במקומות: {{coursename}}, {{userrole}}.';
 $string['settings:temperature'] = 'טמפרטורה';
 $string['settings:temperature_desc'] = 'שולט באקראיות. ערכים נמוכים יותר ממוקדים יותר. טווח: 0.0 עד 2.0.';
 $string['settings:maxhistory'] = 'היסטוריית שיחה מקסימלית';
@@ -652,14 +652,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -1445,7 +1437,7 @@ $string['emergency:disabled_notice'] = 'תת-מערכת "{$a->flag}" הושבת�
 $string['emergency:restored_notice'] = 'תת-מערכת "{$a->flag}" שוחזרה. הגדרה שנגעה בה: {$a->touched}';
 $string['emergency:cli_reference'] = 'אותם פקדים זמינים מה-shell של הכוננות:';
 $string['emergency:flag_chat'] = 'צ\'אט';
-$string['emergency:flag_chat_desc'] = 'חוסם תעבורת צ\'אט דרך דגל ה-kill הייעודי (תיקון v5.13). הווידג\'ט ממשיך להיות מוצג; הלומדים רואים את ההודעה הידידותית "[[tutorshort]] בהפסקה". השתמש כאשר ספק LLM מתנהג רע או שקיים עלייה בעלויות.';
+$string['emergency:flag_chat_desc'] = 'עוצר כל קריאת AI של [[tutorshort]] — צ\'אט, בחנים, כרטיסיות וניקוד — עבור לומדים, מנהלים ומשימות מתוזמנות כאחד. הווידג\'ט ממשיך להופיע והלומדים רואים הודעת השהיה קצרה. בדיקת השרת ובדיקת התקינות נשארות זמינות כדי לבדוק את הספק לפני השחזור.';
 $string['emergency:flag_voice'] = 'קול';
 $string['emergency:flag_voice_desc'] = 'מנקה את ספק הקול בזמן אמת הפעיל (שמור לשחזור מדויק). הצ\'אט הטקסטואלי ממשיך לעבוד.';
 $string['emergency:flag_rag'] = 'RAG';

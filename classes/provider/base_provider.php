@@ -438,7 +438,7 @@ abstract class base_provider implements provider_interface {
      * @return provider_interface
      * @throws \moodle_exception If provider is not configured.
      */
-    public static function create_from_config(int $courseid = 0): provider_interface {
+    public static function create_from_config(int $courseid = 0, bool $diagnostic = false): provider_interface {
         global $USER;
 
         $overrides = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
@@ -455,7 +455,7 @@ abstract class base_provider implements provider_interface {
             $overrides['provider'] = $provider;
         }
 
-        self::enforce_learner_guards();
+        self::enforce_learner_guards($diagnostic);
 
         try {
             $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
@@ -466,7 +466,7 @@ abstract class base_provider implements provider_interface {
                 // this, an emergency stop reaching here would be read as "this
                 // provider is capped" and silently resolved by moving chat onto
                 // the failover provider, which is the opposite of stopping.
-                if (spend_guard::emergency_chat_stopped()) {
+                if (!$diagnostic && spend_guard::emergency_chat_stopped()) {
                     throw new \moodle_exception(
                         'error',
                         'local_ai_course_assistant',
@@ -623,7 +623,7 @@ abstract class base_provider implements provider_interface {
      * @return void
      * @throws \moodle_exception
      */
-    private static function enforce_learner_guards(): void {
+    private static function enforce_learner_guards(bool $diagnostic = false): void {
         global $USER;
 
         // v7.2.1: the emergency chat stop is checked FIRST, ahead of every
@@ -637,7 +637,13 @@ abstract class base_provider implements provider_interface {
         // Operator tooling that genuinely needs a model (benchmarks, the
         // jailbreak suite) is unblocked by clearing the flag, which is one
         // command and leaves an audit row.
-        if (spend_guard::emergency_chat_stopped()) {
+        //
+        // $diagnostic is the one exemption, and it is narrow: backend_probe and
+        // health_check are the pages an operator opens DURING the incident to
+        // decide whether it is safe to clear the flag. Without it they report
+        // the backend as broken when the only thing wrong is the operator's own
+        // switch. They report on the provider; they do not answer learners.
+        if (!$diagnostic && spend_guard::emergency_chat_stopped()) {
             throw new \moodle_exception(
                 'error',
                 'local_ai_course_assistant',

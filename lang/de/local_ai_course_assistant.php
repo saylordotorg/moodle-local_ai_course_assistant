@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Das zu verwendende Modell. Der Standardwert h�
 $string['settings:apibaseurl'] = 'API-Basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-Basis-URL. Wird automatisch basierend auf dem Anbieter ausgefüllt, kann aber überschrieben werden. Leer lassen, um den Standard des Anbieters zu verwenden.';
 $string['settings:systemprompt'] = 'System-Prompt-Vorlage';
-$string['settings:systemprompt_desc'] = 'Der an die KI gesendete System-Prompt. Verwenden Sie Platzhalter: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Der an die KI gesendete System-Prompt. Verwenden Sie Platzhalter: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Sie sind ein hilfreicher KI-Tutor für den Kurs "{{coursename}}". Die Rolle des Studierenden ist {{userrole}}.
 
 Im Kurs behandelte Themen:
-{{coursetopics}}
 
 Helfen Sie dem Studierenden, den Kursinhalt zu verstehen. Seien Sie ermutigend, klar und pädagogisch gründlich.';
 $string['settings:temperature'] = 'Temperatur';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Teilsystem „{$a->flag}" deaktiviert. G
 $string['emergency:restored_notice'] = 'Teilsystem „{$a->flag}" wiederhergestellt. Geänderte Konfiguration: {$a->touched}';
 $string['emergency:cli_reference'] = 'Dieselben Steuerungen stehen auch über die Bereitschafts-Shell zur Verfügung:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blockiert Chat-Datenverkehr über das dedizierte Kill-Flag (Behebung v5.13). Das Widget wird weiterhin angezeigt; Lernende sehen die freundliche Meldung „[[tutorshort]] ist pausiert". Verwenden Sie dies bei fehlerhaftem Verhalten des LLM-Anbieters oder bei einem Kostenanstieg.';
+$string['emergency:flag_chat_desc'] = 'Stoppt sämtliche KI-Aufrufe von [[tutorshort]] — Chat, Tests, Lernkarten und Bewertung — gleichermaßen für Lernende, Administratoren und geplante Aufgaben. Das Widget wird weiterhin angezeigt und Lernende sehen einen kurzen Pausenhinweis. Backend-Selbsttest und Systemprüfung bleiben verfügbar, damit Sie den Anbieter vor dem Wiederherstellen prüfen können.';
 $string['emergency:flag_voice'] = 'Sprache';
 $string['emergency:flag_voice_desc'] = 'Löscht den aktiven Echtzeit-Sprachanbieter (für genaue Wiederherstellung gespeichert). Der Text-Chat läuft weiter.';
 $string['emergency:flag_rag'] = 'RAG';

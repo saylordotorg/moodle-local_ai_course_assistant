@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'A használandó modell. Az alapértelmezés a 
 $string['settings:apibaseurl'] = 'API Alap URL';
 $string['settings:apibaseurl_desc'] = 'Alap URL az API-hoz. Automatikusan kitöltve szolgáltatónként, de felülírható.';
 $string['settings:systemprompt'] = 'Rendszerüzenet sablon';
-$string['settings:systemprompt_desc'] = 'Az AI-nak küldött rendszerüzenet. Használjon helyőrzőket: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Az AI-nak küldött rendszerüzenet. Használjon helyőrzőket: {{coursename}}, {{userrole}}.';
 $string['settings:temperature'] = 'Hőmérséklet';
 $string['settings:temperature_desc'] = 'Véletlenszerűséget szabályoz. Alacsonyabb értékek fókuszáltabbak. Tartomány: 0.0-tól 2.0-ig.';
 $string['settings:maxhistory'] = 'Maximális beszélgetési előzmény';
@@ -652,14 +652,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -1445,7 +1437,7 @@ $string['emergency:disabled_notice'] = 'A(z) „{$a->flag}" alrendszer letiltva.
 $string['emergency:restored_notice'] = 'A(z) „{$a->flag}" alrendszer visszaállítva. Érintett beállítások: {$a->touched}';
 $string['emergency:cli_reference'] = 'Ugyanezek a vezérlők elérhetők az ügyeletesi parancssorból:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blokkolja a chat-forgalmat a dedikált leállítási jellel (v5.13-as javítás). A widget tovább jelenik meg; a tanulók a barátságos „[[tutorshort]] szünetel" üzenetet látják. Használja, ha egy LLM-szolgáltató hibásan működik vagy költségnövekedés van folyamatban.';
+$string['emergency:flag_chat_desc'] = 'Leállítja a(z) [[tutorshort]] összes MI-hívását — csevegés, kvízek, tanulókártyák és pontozás — a tanulók, adminisztrátorok és ütemezett feladatok számára egyaránt. A widget továbbra is megjelenik, a tanulók rövid szüneteltetési üzenetet látnak. A háttérrendszer öntesztje és az állapotellenőrzés elérhető marad, hogy visszaállítás előtt ellenőrizhesse a szolgáltatót.';
 $string['emergency:flag_voice'] = 'Hang';
 $string['emergency:flag_voice_desc'] = 'Törli az aktív valós idejű hangszolgáltatót (pontos visszaállításhoz eltárolva). A szöveges chat továbbra is működik.';
 $string['emergency:flag_rag'] = 'RAG';

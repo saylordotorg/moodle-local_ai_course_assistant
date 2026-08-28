@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Model do użycia. Wartość domyślna zależy 
 $string['settings:apibaseurl'] = 'Bazowy URL API';
 $string['settings:apibaseurl_desc'] = 'Bazowy URL API. Wypełniany automatycznie na podstawie dostawcy, ale można go nadpisać. Pozostaw puste, aby użyć domyślnego dostawcy.';
 $string['settings:systemprompt'] = 'Szablon promptu systemowego';
-$string['settings:systemprompt_desc'] = 'Prompt systemowy wysyłany do AI. Użyj symboli zastępczych: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Prompt systemowy wysyłany do AI. Użyj symboli zastępczych: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Jesteś pomocnym korepetytorem AI dla kursu „{{coursename}}". Rola studenta to {{userrole}}.
 
 Tematy omawiane w kursie:
-{{coursetopics}}
 
 Pomóż studentowi zrozumieć treść kursu. Bądź zachęcający, jasny i pedagogicznie rzetelny.';
 $string['settings:temperature'] = 'Temperatura';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Podsystem „{$a->flag}" wyłączony. Do
 $string['emergency:restored_notice'] = 'Podsystem „{$a->flag}" przywrócony. Dotknięta konfiguracja: {$a->touched}';
 $string['emergency:cli_reference'] = 'Te same kontrolki są dostępne z powłoki dyżurnej:';
 $string['emergency:flag_chat'] = 'Czat';
-$string['emergency:flag_chat_desc'] = 'Blokuje ruch czatu za pomocą dedykowanej flagi wyłączania (poprawka v5.13). Widżet nadal się renderuje; uczniowie widzą przyjazny komunikat „[[tutorshort]] wstrzymana". Użyj gdy dostawca LLM zachowuje się nieprawidłowo lub trwa wzrost kosztów.';
+$string['emergency:flag_chat_desc'] = 'Zatrzymuje wszystkie wywołania AI w [[tutorshort]] — czat, quizy, fiszki i ocenianie — jednakowo dla uczących się, administratorów i zadań zaplanowanych. Widżet nadal się wyświetla, a uczący się widzą krótki komunikat o wstrzymaniu. Autotest zaplecza i kontrola stanu pozostają dostępne, aby sprawdzić dostawcę przed przywróceniem.';
 $string['emergency:flag_voice'] = 'Głos';
 $string['emergency:flag_voice_desc'] = 'Czyści aktywnego dostawcę głosu realtime (zachowanego do dokładnego przywrócenia). Czat tekstowy działa dalej.';
 $string['emergency:flag_rag'] = 'RAG';

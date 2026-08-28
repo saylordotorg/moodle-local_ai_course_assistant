@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Modellen, der skal bruges. Standardværdien af
 $string['settings:apibaseurl'] = 'API-basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-basis-URL. Udfyldes automatisk baseret på udbyderen, men kan tilsidesættes. Lad feltet stå tomt for at bruge udbyderens standard.';
 $string['settings:systemprompt'] = 'Systempromptskabelon';
-$string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Du er en hjælpsom AI-tutor til kurset "{{coursename}}". Studentens rolle er {{userrole}}.
 
 Emner dækket i kurset:
-{{coursetopics}}
 
 Hjælp studenten med at forstå kursusindholdet. Vær opmuntrende, klar og pædagogisk grundig.';
 $string['settings:temperature'] = 'Temperatur';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Undersystem „{$a->flag}" er deaktivere
 $string['emergency:restored_notice'] = 'Undersystem „{$a->flag}" er genoprettet. Berørt konfiguration: {$a->touched}';
 $string['emergency:cli_reference'] = 'De samme kontroller er tilgængelige fra vagtens shell:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blokerer chattrafik via et dedikeret kill-flag (v5.13-rettelse). Widgetten fortsætter med at vise; kursister ser den venlige besked „[[tutorshort]] er sat på pause". Brug ved fejlagtig LLM-udbyderadfærd eller ved omkostningsudbrud.';
+$string['emergency:flag_chat_desc'] = 'Stopper alle AI-kald i [[tutorshort]] — chat, quizzer, flashcards og bedømmelse — for studerende, administratorer og planlagte opgaver på samme måde. Widgetten vises fortsat, og studerende ser en kort pausebesked. Backend-selvtest og helbredstjek forbliver tilgængelige, så du kan tjekke udbyderen før genoprettelse.';
 $string['emergency:flag_voice'] = 'Stemme';
 $string['emergency:flag_voice_desc'] = 'Rydder den aktive realtids-stemmeudbyder (gemt til nøjagtig gendannelse). Tekstchat fortsætter med at fungere.';
 $string['emergency:flag_rag'] = 'RAG';

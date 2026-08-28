@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Kullanılacak model. Varsayılan sağlayıcıy
 $string['settings:apibaseurl'] = 'API temel URL\'si';
 $string['settings:apibaseurl_desc'] = 'API temel URL\'si. Sağlayıcıya göre otomatik doldurulur ancak geçersiz kılınabilir. Sağlayıcı varsayılanını kullanmak için boş bırakın.';
 $string['settings:systemprompt'] = 'Sistem istemi şablonu';
-$string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = '"{{coursename}}" dersi için yardımcı bir AI eğitmensiniz. Öğrencinin rolü {{userrole}}.
 
 Derste işlenen konular:
-{{coursetopics}}
 
 Öğrencinin ders içeriğini anlamasına yardımcı olun. Teşvik edici, açık ve pedagojik olarak titiz olun.';
 $string['settings:temperature'] = 'Sıcaklık';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = '"{$a->flag}" alt sistemi devre dışı b
 $string['emergency:restored_notice'] = '"{$a->flag}" alt sistemi geri yüklendi. Dokunulan yapılandırma: {$a->touched}';
 $string['emergency:cli_reference'] = 'Aynı kontroller nöbetçi shell\'inden de kullanılabilir:';
 $string['emergency:flag_chat'] = 'Sohbet';
-$string['emergency:flag_chat_desc'] = 'Özel kill flag aracılığıyla sohbet trafiğini engeller (v5.13 düzeltmesi). Widget oluşturmaya devam eder; öğrenciler dostane "[[tutorshort]] duraklatıldı" mesajını görür. Bir LLM sağlayıcısı hatalı davrandığında veya bir maliyet artışı yaşandığında kullanın.';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]] için tüm yapay zekâ çağrılarını — sohbet, testler, bilgi kartları ve puanlama — öğrenciler, yöneticiler ve zamanlanmış görevler için eşit şekilde durdurur. Bileşen görünmeye devam eder ve öğrenciler kısa bir duraklatma bildirimi görür. Geri almadan önce sağlayıcıyı kontrol edebilmeniz için arka uç kendi kendine testi ve durum denetimi kullanılabilir kalır.';
 $string['emergency:flag_voice'] = 'Ses';
 $string['emergency:flag_voice_desc'] = 'Etkin gerçek zamanlı ses sağlayıcısını temizler (tam geri yükleme için saklanır). Metin sohbeti çalışmaya devam eder.';
 $string['emergency:flag_rag'] = 'RAG';

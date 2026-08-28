@@ -149,6 +149,61 @@ final class rag_context_reaches_prompt_test extends \advanced_testcase {
         );
     }
 
+    public function test_assembled_prompt_stays_within_the_budget(): void {
+        $this->resetAfterTest();
+        set_config('prompt_budget_chars', 24000, 'local_ai_course_assistant');
+        $course  = $this->getDataGenerator()->create_course(['fullname' => 'Chemistry 101']);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+
+        // The four bucket weights sum to 100% of the budget, so anything the
+        // assembler cannot reclaim -- the CAT_SAFETY block especially, which is
+        // exempt from both the cap and the drop loop -- has to be reserved before
+        // the buckets are sized, or the prompt is over-subscribed by exactly its
+        // length. Assert the outcome rather than the arithmetic.
+        $prompt = context_builder::build_system_prompt($course->id, $student->id, '', $this->chunks(12));
+
+        $this->assertLessThanOrEqual(
+            24000,
+            strlen($prompt),
+            'The assembled prompt exceeded prompt_budget_chars on a stock install.'
+        );
+    }
+
+    public function test_a_pathological_template_does_not_crowd_out_everything_else(): void {
+        $this->resetAfterTest();
+        set_config('prompt_budget_chars', 24000, 'local_ai_course_assistant');
+        // base_template is CAT_IDENTITY at priority 100, so it is the LAST thing
+        // the drop loop touches. Unbucketed, a pasted template would destroy every
+        // other section before losing a character itself.
+        set_config('systemprompt', str_repeat('Persona line for the tutor. ', 4000), 'local_ai_course_assistant');
+        $course  = $this->getDataGenerator()->create_course(['fullname' => 'Chemistry 101']);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+
+        context_builder::build_system_prompt($course->id, $student->id, '', $this->chunks(3));
+        $breakdown = context_builder::$last_breakdown;
+
+        $this->assertNotEmpty(
+            $breakdown['base_template']['truncated'] ?? false,
+            'An oversized operator template must still be capped.'
+        );
+    }
+
+    public function test_a_normal_template_is_never_truncated(): void {
+        $this->resetAfterTest();
+        set_config('prompt_budget_chars', 24000, 'local_ai_course_assistant');
+        $course  = $this->getDataGenerator()->create_course(['fullname' => 'Chemistry 101']);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+
+        context_builder::build_system_prompt($course->id, $student->id, '', $this->chunks(3));
+        $breakdown = context_builder::$last_breakdown;
+
+        $this->assertEmpty(
+            $breakdown['base_template']['truncated'] ?? false,
+            'The shipped template must clear the identity cap; it was arriving cut '
+                . 'at 1,235 of its 1,640 characters.'
+        );
+    }
+
     public function test_section_budgets_allocate_from_what_the_fixed_sections_leave(): void {
         $this->resetAfterTest();
 

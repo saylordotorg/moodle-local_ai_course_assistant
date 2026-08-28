@@ -75,11 +75,10 @@ $string['settings:model_desc'] = '要使用的模型。默认值取决于提供�
 $string['settings:apibaseurl'] = 'API 基础 URL';
 $string['settings:apibaseurl_desc'] = 'API 的基础 URL。会根据提供商自动填写，但可以覆盖。留空则使用提供商默认值。';
 $string['settings:systemprompt'] = '系统提示模板';
-$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}、{{coursetopics}}。';
+$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}、。';
 $string['settings:systemprompt_default'] = '您是课程"{{coursename}}"的 AI 辅导助手。学生的角色为 {{userrole}}。
 
 课程涵盖的主题：
-{{coursetopics}}
 
 请帮助学生理解课程内容。请保持鼓励、清晰且具有教学意义的态度。';
 $string['settings:temperature'] = '温度';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = '子系统"{$a->flag}"已禁用。触及�
 $string['emergency:restored_notice'] = '子系统"{$a->flag}"已恢复。触及的配置项：{$a->touched}';
 $string['emergency:cli_reference'] = '相同的控制也可通过值班 shell 执行：';
 $string['emergency:flag_chat'] = '聊天';
-$string['emergency:flag_chat_desc'] = '通过专用 kill 标志（v5.13 修复）阻断聊天流量。挂件继续渲染；学习者将看到友好的"[[tutorshort]] 已暂停"提示。在 LLM 提供商行为异常或成本激增时使用。';
+$string['emergency:flag_chat_desc'] = '停止 [[tutorshort]] 的所有 AI 调用——聊天、测验、抽认卡和评分——对学习者、管理员和计划任务一律生效。挂件仍会显示，学习者会看到一条简短的暂停提示。后端自检和健康检查仍可使用，以便您在恢复前检查服务商。';
 $string['emergency:flag_voice'] = '语音';
 $string['emergency:flag_voice_desc'] = '清除当前活跃的实时语音提供商（已存储以便精确恢复）。文字聊天继续正常工作。';
 $string['emergency:flag_rag'] = 'RAG';

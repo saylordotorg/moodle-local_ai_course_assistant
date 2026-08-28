@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'उपयोग करने के लिए 
 $string['settings:apibaseurl'] = 'API बेस URL';
 $string['settings:apibaseurl_desc'] = 'API के लिए बेस URL। प्रदाता के अनुसार स्वचालित रूप से भरा जाता है, लेकिन इसे बदला जा सकता है। प्रदाता के डिफ़ॉल्ट के लिए खाली छोड़ें।';
 $string['settings:systemprompt'] = 'सिस्टम प्रॉम्प्ट टेम्पलेट';
-$string['settings:systemprompt_desc'] = 'AI को भेजा गया सिस्टम प्रॉम्प्ट। प्लेसहोल्डर का उपयोग करें: {{coursename}}, {{userrole}}, {{coursetopics}}।';
+$string['settings:systemprompt_desc'] = 'AI को भेजा गया सिस्टम प्रॉम्प्ट। प्लेसहोल्डर का उपयोग करें: {{coursename}}, {{userrole}}।';
 $string['settings:systemprompt_default'] = 'आप पाठ्यक्रम "{{coursename}}" के लिए एक सहायक AI ट्यूटर हैं। छात्र की भूमिका {{userrole}} है।
 
 पाठ्यक्रम में शामिल विषय:
-{{coursetopics}}
 
 छात्र को पाठ्यक्रम सामग्री समझने में मदद करें। प्रोत्साहक, स्पष्ट और शैक्षणिक रूप से उचित रहें।';
 $string['settings:temperature'] = 'तापमान';
@@ -1432,7 +1431,7 @@ $string['emergency:disabled_notice'] = 'उपतंत्र "{$a->flag}" अ�
 $string['emergency:restored_notice'] = 'उपतंत्र "{$a->flag}" पुनर्स्थापित किया गया। स्पर्श की गई कॉन्फ़िग: {$a->touched}';
 $string['emergency:cli_reference'] = 'वही नियंत्रण ऑन-कॉल शेल से उपलब्ध हैं:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'समर्पित kill flag के माध्यम से chat ट्रैफ़िक को ब्लॉक करता है (v5.13 सुधार)। Widget रेंडर करता रहता है; शिक्षार्थी मित्रवत "[[tutorshort]] रुका हुआ" संदेश देखते हैं। जब कोई LLM प्रदाता गलत व्यवहार कर रहा हो या लागत में उछाल जारी हो तब उपयोग करें।';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]] की सभी AI कॉल रोक देता है — चैट, क्विज़, फ़्लैशकार्ड और स्कोरिंग — शिक्षार्थियों, प्रशासकों और निर्धारित कार्यों सभी के लिए समान रूप से। विजेट दिखता रहता है और शिक्षार्थियों को एक संक्षिप्त विराम सूचना दिखती है। बहाल करने से पहले प्रदाता जाँचने के लिए बैकएंड सेल्फ़-टेस्ट और हेल्थ चेक उपलब्ध रहते हैं।';
 $string['emergency:flag_voice'] = 'आवाज़';
 $string['emergency:flag_voice_desc'] = 'सक्रिय रियलटाइम वॉयस प्रदाता को साफ़ करता है (सटीक पुनर्स्थापना के लिए संग्रहीत)। टेक्स्ट chat काम करती रहती है।';
 $string['emergency:flag_rag'] = 'RAG';

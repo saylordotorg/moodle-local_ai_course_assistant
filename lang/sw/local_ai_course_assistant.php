@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'Modeli ya kutumia. Chaguo-msingi inategemea mt
 $string['settings:apibaseurl'] = 'URL ya Msingi ya API';
 $string['settings:apibaseurl_desc'] = 'URL ya msingi kwa API. Inajazwa kiotomatiki kwa kila mtoa huduma lakini inaweza kubadilishwa. Acha wazi kwa chaguo-msingi la mtoa huduma.';
 $string['settings:systemprompt'] = 'Kiolezo cha Ombi la Mfumo';
-$string['settings:systemprompt_desc'] = 'Ombi la mfumo linalotumwa kwa AI. Tumia viashiria: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Ombi la mfumo linalotumwa kwa AI. Tumia viashiria: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Wewe ni mshauri wa AI msaidizi kwa kozi "{{coursename}}". Jukumu la mwanafunzi ni {{userrole}}.
 
 Mada za kozi zinazoshughulikiwa:
-{{coursetopics}}
 
 Saidia mwanafunzi kuelewa maudhui ya kozi. Kuwa wa kuhimiza, wazi, na sahihi kielimu.';
 $string['settings:temperature'] = 'Joto';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'Mfumo mdogo "{$a->flag}" umezimwa. Usani
 $string['emergency:restored_notice'] = 'Mfumo mdogo "{$a->flag}" umekolezwa. Usanidi ulioguswa: {$a->touched}';
 $string['emergency:cli_reference'] = 'Udhibiti huo huo unapatikana kutoka kwenye ganda la zamu:';
 $string['emergency:flag_chat'] = 'Mazungumzo';
-$string['emergency:flag_chat_desc'] = 'Inazuia trafiki ya mazungumzo kupitia alama maalum ya kill (marekebisho v5.13). Widget inaendelea kuonyeshwa; wanafunzi wanaona ujumbe wa kirafiki "[[tutorshort]] imesimamishwa". Tumia wakati mtoa huduma wa LLM anafanya vibaya au ongezeko la gharama linaendelea.';
+$string['emergency:flag_chat_desc'] = 'Husimamisha miito yote ya AI ya [[tutorshort]] — gumzo, maswali, kadi za kujifunza na upangaji alama — kwa wanafunzi, wasimamizi na kazi zilizoratibiwa sawia. Kijenzi kinaendelea kuonekana na wanafunzi wanaona taarifa fupi ya kusitishwa. Jaribio la ndani la seva na ukaguzi wa afya hubaki yanapatikana ili uweze kukagua mtoa huduma kabla ya kurejesha.';
 $string['emergency:flag_voice'] = 'Sauti';
 $string['emergency:flag_voice_desc'] = 'Inafuta mtoa huduma wa sauti ya muda halisi unaofanya kazi (umehifadhiwa kwa urejesho sahihi). Mazungumzo ya maandishi yanaendelea kufanya kazi.';
 $string['emergency:flag_rag'] = 'RAG';

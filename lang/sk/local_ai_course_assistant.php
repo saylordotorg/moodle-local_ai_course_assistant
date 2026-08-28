@@ -70,11 +70,10 @@ $string['settings:model_desc'] = 'Model, ktorý sa má použiť. Predvolená hod
 $string['settings:apibaseurl'] = 'Základná URL API';
 $string['settings:apibaseurl_desc'] = 'Základná URL API. Automaticky vyplnená podľa poskytovateľa, ale môže byť prepísaná. Nechajte prázdne pre použitie predvolenej hodnoty poskytovateľa.';
 $string['settings:systemprompt'] = 'Šablóna systémového promptu';
-$string['settings:systemprompt_desc'] = 'Systémový prompt odoslaný AI. Použite zástupné symboly: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Systémový prompt odoslaný AI. Použite zástupné symboly: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ste užitočný AI tútor pre kurz „{{coursename}}". Rola študenta je {{userrole}}.
 
 Témy preberané v kurze:
-{{coursetopics}}
 
 Pomôžte študentovi pochopiť obsah kurzu. Buďte povzbudzujúci, jasný a pedagogicky dôsledný.';
 $string['settings:temperature'] = 'Teplota';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Subsystém „{$a->flag}" vypnutý. Dotk
 $string['emergency:restored_notice'] = 'Subsystém „{$a->flag}" obnovený. Dotknutá konfigurácia: {$a->touched}';
 $string['emergency:cli_reference'] = 'Rovnaké ovládacie prvky sú dostupné z pohotovostného shellu:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blokuje chatovú prevádzku pomocou dedikovaného kill flagu (oprava v5.13). Widget sa naďalej renderuje; študenti vidia priateľskú správu „[[tutorshort]] pozastavená". Použite, keď sa poskytovateľ LLM správa nesprávne alebo prebieha nárast nákladov.';
+$string['emergency:flag_chat_desc'] = 'Zastaví všetky volania AI v [[tutorshort]] — chat, kvízy, kartičky aj hodnotenie — rovnako pre študentov, správcov aj naplánované úlohy. Widget sa naďalej zobrazuje a študenti vidia krátke upozornenie o pozastavení. Samotest backendu a kontrola stavu zostávajú dostupné, aby ste mohli overiť poskytovateľa pred obnovením.';
 $string['emergency:flag_voice'] = 'Hlas';
 $string['emergency:flag_voice_desc'] = 'Vymaže aktívneho poskytovateľa hlasu v reálnom čase (uloženého pre presné obnovenie). Textový chat naďalej funguje.';
 $string['emergency:flag_rag'] = 'RAG';

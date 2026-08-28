@@ -41,6 +41,16 @@ class context_builder {
      * is set (self-hosted small-context backends), effective_budget_chars()
      * computes a tighter, window-aware budget below this value.
      */
+    /**
+     * Floor for the base_template cap, in characters.
+     *
+     * Sized so the shipped 1,640-char default and any reasonable operator
+     * rewrite of it clear the cap comfortably, while a pasted 100 KB template
+     * is still bounded rather than being allowed to crowd out the entire rest
+     * of the prompt from the front of the drop queue.
+     */
+    public const IDENTITY_MIN_CHARS = 4000;
+
     private const MAX_PROMPT_LENGTH = 60000;
 
     /** v5.10.0: hard lower bound so safety/identity always survive the clamp. */
@@ -625,12 +635,16 @@ class context_builder {
         // boosts course_content when pageid == 0). The assembler honors
         // max_chars first, then falls through to drop-on-priority as the
         // safety net for any residual overflow.
-        // Everything without a bucket is fixed overhead: it is neither clipped
-        // nor sized by the weight map, so the elastic context sections can only
-        // have what it leaves behind.
+        // Fixed overhead is anything the assembler cannot take space back from,
+        // which is a different question from whether a section has a bucket.
+        // CAT_SAFETY sections are exempt from BOTH the max_chars cap and the drop
+        // loop (see prompt\builder::assemble), so the 3,836-char security block is
+        // unclippable and undroppable -- yet it is mapped to safety_identity and
+        // so was skipped by the first version of this loop, leaving the prompt
+        // over-subscribed by exactly its size. Reserve on reclaimability.
         $reservedchars = 0;
         foreach ($sections as $sec) {
-            if (self::section_to_bucket($sec->name) === null) {
+            if ($sec->category === section::CAT_SAFETY || self::section_to_bucket($sec->name) === null) {
                 $reservedchars += $sec->length();
             }
         }
@@ -639,6 +653,10 @@ class context_builder {
             $bucket = self::section_to_bucket($sec->name);
             if ($bucket !== null && isset($budgets[$bucket])) {
                 $sec->max_chars = $budgets[$bucket];
+            }
+            if ($sec->name === 'base_template') {
+                // Never clip an ordinary operator template; still bound a huge one.
+                $sec->max_chars = max($sec->max_chars, self::IDENTITY_MIN_CHARS);
             }
         }
 
@@ -876,14 +894,19 @@ class context_builder {
         static $map = [
             // safety_identity bucket
             //
-            // v7.2.1: 'base_template' is deliberately NOT mapped. It carries the
-            // operator's own system-prompt template (persona, precedence rules,
-            // the safety identity), and clipping it to a percentage of the budget
-            // silently cut the tail off the shipped default -- it was arriving
-            // truncated at 1,235 of its 1,640 chars on a stock install. It is
-            // CAT_IDENTITY at the highest priority, so the drop-on-priority net
-            // still guards a pathological custom template; what it no longer does
-            // is quietly amputate a well-behaved one.
+            // 'base_template' stays mapped, but its cap is floored at
+            // IDENTITY_MIN_CHARS so a well-behaved template is never clipped --
+            // the shipped 1,640-char default was arriving truncated at 1,235 on a
+            // stock install. Unmapping it entirely (the first v7.2.1 attempt) was
+            // worse: it is CAT_IDENTITY at priority 100, so a pathological pasted
+            // template would destroy every learner-state, behaviour and context
+            // section before losing a single character itself. A floor covers the
+            // normal case; the cap still bounds the pathological one.
+            //
+            // The other three members are CAT_SAFETY, which the assembler exempts
+            // from both the cap and the drop loop, so they spend nothing from this
+            // bucket -- they are counted as reserved overhead instead.
+            'base_template'           => 'safety_identity',
             'security'                => 'safety_identity',
             'quiz_coach_mode'         => 'safety_identity',
             'page_grounding_reminder' => 'safety_identity',
@@ -1007,7 +1030,14 @@ class context_builder {
         // $reserved_chars defaults to 0, which reproduces the pre-v7.2.1
         // allocation exactly for any caller that does not measure its fixed
         // sections first.
-        $pool = max(0, $total_budget - $reserved_chars);
+        // Floored at a quarter of the budget. Two reasons. Oversized fixed
+        // sections must not starve course content to nothing; and section
+        // documents max_chars = 0 as UNLIMITED, so a pool of 0 would compute
+        // every bucket to 0 and silently switch the whole proportional model
+        // off rather than down -- non-monotonic behaviour where a smaller
+        // budget produces a larger prompt. Reachable via effective_budget_chars
+        // clamping for a small self-hosted context window.
+        $pool = max((int) round($total_budget * 0.25), $total_budget - $reserved_chars);
         $budgets = [];
         foreach ($weights as $bucket => $pct) {
             $budgets[$bucket] = (int) round($pool * ($pct / 100.0));

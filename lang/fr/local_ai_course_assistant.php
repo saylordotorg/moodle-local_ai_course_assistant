@@ -71,11 +71,10 @@ $string['settings:model_desc'] = 'Le modèle à utiliser. La valeur par défaut 
 $string['settings:apibaseurl'] = 'URL de base de l\'API';
 $string['settings:apibaseurl_desc'] = 'URL de base de l\'API. Remplie automatiquement selon le fournisseur, mais peut être remplacée. Laisser vide pour utiliser la valeur par défaut du fournisseur.';
 $string['settings:systemprompt'] = 'Modèle de prompt système';
-$string['settings:systemprompt_desc'] = 'Prompt système envoyé à l\'IA. Utilisez les espaces réservés : {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'Prompt système envoyé à l\'IA. Utilisez les espaces réservés : {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Vous êtes un tuteur IA utile pour le cours "{{coursename}}". Le rôle de l\'étudiant est {{userrole}}.
 
 Sujets abordés dans le cours :
-{{coursetopics}}
 
 Aidez l\'étudiant à comprendre le contenu du cours. Soyez encourageant, clair et pédagogiquement rigoureux.';
 $string['settings:temperature'] = 'Température';
@@ -1401,7 +1400,7 @@ $string['emergency:disabled_notice'] = 'Sous-système "{$a->flag}" désactivé. 
 $string['emergency:restored_notice'] = 'Sous-système "{$a->flag}" restauré. Configuration modifiée : {$a->touched}';
 $string['emergency:cli_reference'] = 'Les mêmes contrôles sont disponibles depuis le shell d\'astreinte :';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Bloque le trafic de chat via le drapeau kill dédié (correctif v5.13). Le widget continue de s\'afficher ; les apprenants voient le message amical "[[tutorshort]] en pause". À utiliser quand un fournisseur LLM se comporte mal ou qu\'un pic de coûts est en cours.';
+$string['emergency:flag_chat_desc'] = 'Arrête tous les appels d\'IA de [[tutorshort]] — chat, quiz, cartes mémoire et notation — pour les apprenants, les administrateurs et les tâches planifiées. Le widget continue de s\'afficher et les apprenants voient un bref message de pause. L\'autotest du backend et la vérification d\'état restent disponibles afin de contrôler le fournisseur avant de rétablir.';
 $string['emergency:flag_voice'] = 'Voix';
 $string['emergency:flag_voice_desc'] = 'Efface le fournisseur de voix temps réel actif (mis en cache pour une restauration exacte). Le chat texte continue de fonctionner.';
 $string['emergency:flag_rag'] = 'RAG';

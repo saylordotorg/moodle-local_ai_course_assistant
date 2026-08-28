@@ -75,11 +75,10 @@ $string['settings:model_desc'] = 'ਵਰਤਣ ਵਾਲਾ ਮਾਡਲ। ਡ�
 $string['settings:apibaseurl'] = 'API ਅਧਾਰ URL';
 $string['settings:apibaseurl_desc'] = 'API ਲਈ ਅਧਾਰ URL। ਹਰ ਪ੍ਰਦਾਤਾ ਲਈ ਆਪਣੇ ਆਪ ਭਰਿਆ ਜਾਂਦਾ ਹੈ ਪਰ ਬਦਲਿਆ ਜਾ ਸਕਦਾ ਹੈ। ਪ੍ਰਦਾਤਾ ਡਿਫਾਲਟ ਲਈ ਖਾਲੀ ਛੱਡੋ।';
 $string['settings:systemprompt'] = 'ਸਿਸਟਮ ਪ੍ਰੌਂਪਟ ਟੈਂਪਲੇਟ';
-$string['settings:systemprompt_desc'] = 'AI ਨੂੰ ਭੇਜਿਆ ਜਾਣ ਵਾਲਾ ਸਿਸਟਮ ਪ੍ਰੌਂਪਟ। ਪਲੇਸਹੋਲਡਰ ਵਰਤੋ: {{coursename}}, {{userrole}}, {{coursetopics}}।';
+$string['settings:systemprompt_desc'] = 'AI ਨੂੰ ਭੇਜਿਆ ਜਾਣ ਵਾਲਾ ਸਿਸਟਮ ਪ੍ਰੌਂਪਟ। ਪਲੇਸਹੋਲਡਰ ਵਰਤੋ: {{coursename}}, {{userrole}}।';
 $string['settings:systemprompt_default'] = 'ਤੁਸੀਂ ਕੋਰਸ "{{coursename}}" ਲਈ ਇੱਕ ਮਦਦਗਾਰ AI ਟਿਊਟਰ ਹੋ। ਵਿਦਿਆਰਥੀ ਦੀ ਭੂਮਿਕਾ {{userrole}} ਹੈ।
 
 ਕੋਰਸ ਦੇ ਵਿਸ਼ੇ:
-{{coursetopics}}
 
 ਵਿਦਿਆਰਥੀ ਨੂੰ ਕੋਰਸ ਸਮੱਗਰੀ ਸਮਝਣ ਵਿੱਚ ਮਦਦ ਕਰੋ। ਉਤਸ਼ਾਹਿਤ ਕਰਨ ਵਾਲੇ, ਸਪੱਸ਼ਟ ਅਤੇ ਵਿੱਦਿਅਕ ਤੌਰ ਉੱਤੇ ਸਹੀ ਰਹੋ।';
 $string['settings:temperature'] = 'ਤਾਪਮਾਨ';
@@ -1424,7 +1423,7 @@ $string['emergency:disabled_notice'] = 'ਉਪ-ਪ੍ਰਣਾਲੀ "{$a->flag}
 $string['emergency:restored_notice'] = 'ਉਪ-ਪ੍ਰਣਾਲੀ "{$a->flag}" ਬਹਾਲ ਕੀਤੀ ਗਈ। ਛੂਹੀ ਸੰਰਚਨਾ: {$a->touched}';
 $string['emergency:cli_reference'] = 'ਉਹੀ ਨਿਯੰਤਰਣ on-call ਸ਼ੈੱਲ ਤੋਂ ਉਪਲਬਧ ਹਨ:';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'ਸਮਰਪਿਤ kill flag (v5.13 ਸੁਧਾਰ) ਰਾਹੀਂ chat ਟ੍ਰੈਫਿਕ ਰੋਕਦਾ ਹੈ। ਵਿਜੇਟ ਰੈਂਡਰ ਹੁੰਦਾ ਰਹਿੰਦਾ ਹੈ; ਸਿੱਖਣ ਵਾਲੇ ਦੋਸਤਾਨਾ "[[tutorshort]] ਰੁਕਿਆ ਹੋਇਆ ਹੈ" ਸੁਨੇਹਾ ਦੇਖਦੇ ਹਨ। LLM ਪ੍ਰਦਾਤਾ ਦੇ ਗਲਤ ਵਿਵਹਾਰ ਜਾਂ ਖਰਚ ਵਾਧੇ ਦੌਰਾਨ ਵਰਤੋ।';
+$string['emergency:flag_chat_desc'] = '[[tutorshort]] ਦੀਆਂ ਸਾਰੀਆਂ AI ਕਾਲਾਂ ਰੋਕ ਦਿੰਦਾ ਹੈ — ਚੈਟ, ਕਵਿਜ਼, ਫਲੈਸ਼ਕਾਰਡ ਅਤੇ ਸਕੋਰਿੰਗ — ਸਿੱਖਿਆਰਥੀਆਂ, ਪ੍ਰਬੰਧਕਾਂ ਅਤੇ ਨਿਯਤ ਕੰਮਾਂ ਸਭ ਲਈ ਬਰਾਬਰ। ਵਿਜੇਟ ਦਿਖਦਾ ਰਹਿੰਦਾ ਹੈ ਅਤੇ ਸਿੱਖਿਆਰਥੀਆਂ ਨੂੰ ਇੱਕ ਛੋਟਾ ਰੁਕਾਵਟ ਸੁਨੇਹਾ ਦਿਖਦਾ ਹੈ। ਬਹਾਲ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਪ੍ਰਦਾਤਾ ਜਾਂਚਣ ਲਈ ਬੈਕਐਂਡ ਸਵੈ-ਜਾਂਚ ਅਤੇ ਹੈਲਥ ਚੈੱਕ ਉਪਲਬਧ ਰਹਿੰਦੇ ਹਨ।';
 $string['emergency:flag_voice'] = 'Voice';
 $string['emergency:flag_voice_desc'] = 'ਕਿਰਿਆਸ਼ੀਲ realtime voice ਪ੍ਰਦਾਤਾ ਸਾਫ਼ ਕਰਦਾ ਹੈ (ਸਹੀ ਬਹਾਲੀ ਲਈ ਸੁਰੱਖਿਅਤ)। ਟੈਕਸਟ chat ਕੰਮ ਕਰਦਾ ਰਹਿੰਦਾ ਹੈ।';
 $string['emergency:flag_rag'] = 'RAG';
