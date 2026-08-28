@@ -435,6 +435,9 @@ abstract class base_provider implements provider_interface {
      * Factory method to create a provider from plugin config, with optional per-course overrides.
      *
      * @param int $courseid Course ID to look up per-course overrides (0 = use global only).
+     * @param bool $diagnostic True for backend_probe / health_check, which must keep
+     *                         working while the emergency stop is engaged so an operator
+     *                         can verify the provider before restoring service.
      * @return provider_interface
      * @throws \moodle_exception If provider is not configured.
      */
@@ -600,16 +603,6 @@ abstract class base_provider implements provider_interface {
     }
 
     /**
-     * Factory for the admin LLM comparison picker. Looks up the API key from
-     * the comparison_providers admin setting, falling back to the primary key.
-     *
-     * @param string $providerid Provider ID selected by the admin.
-     * @param string $model Model name selected by the admin (may be blank).
-     * @param int $courseid Course context for base config inheritance.
-     * @return provider_interface
-     * @throws \moodle_exception If provider is unknown.
-     */
-    /**
      * Per-learner guards that must run before ANY provider client is handed out.
      *
      * One method, called by every factory. Putting these in create_from_config()
@@ -618,8 +611,15 @@ abstract class base_provider implements provider_interface {
      * which is exactly what the quiz lock exists to stop. A guard that covers
      * most entry points is the shape of bug this release is fixing.
      *
-     * Admins and CLI are exempt so bulk scripts and scheduled tasks still run.
+     * Admins and CLI are exempt from the rate limit and the quiz lock, so bulk
+     * scripts and scheduled tasks still run. They are NOT exempt from the
+     * emergency stop: that is a kill switch, and v7.2.1 fixed it reporting
+     * DISABLED while an admin session kept getting answers.
      *
+     * @param bool $diagnostic True to exempt the caller from the emergency stop.
+     *                         backend_probe and health_check pass this: they are
+     *                         what an operator opens during the incident to decide
+     *                         whether it is safe to restore service.
      * @return void
      * @throws \moodle_exception
      */
@@ -700,6 +700,16 @@ abstract class base_provider implements provider_interface {
         }
     }
 
+    /**
+     * Factory for the admin LLM comparison picker. Looks up the API key from
+     * the comparison_providers admin setting, falling back to the primary key.
+     *
+     * @param string $providerid Provider ID selected by the admin.
+     * @param string $model Model name selected by the admin (may be blank).
+     * @param int $courseid Course context for base config inheritance.
+     * @return provider_interface
+     * @throws \moodle_exception If provider is unknown.
+     */
     public static function create_for_comparison(string $providerid, string $model, int $courseid = 0): provider_interface {
         self::enforce_learner_guards();
 

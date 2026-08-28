@@ -19,8 +19,8 @@
 
     Read-only listing of the plugin audit trail.
 
-    Every value is rendered through {{ }}. The details column in particular is
-    built from data recorded at the time of the event and must stay escaped.
+    Every value is escaped on output. The details column in particular is built
+    from data recorded at the time of the event and must stay escaped.
 
     Context variables required for this template:
     * intro string

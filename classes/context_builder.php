@@ -985,6 +985,9 @@ class context_builder {
      * @param int $total_budget Total system-prompt budget in chars.
      * @param int $pageid Current Moodle pageid (0 means no page in scope).
      * @param string $quizmode '' or 'coach'.
+     * @param int $reserved_chars Chars already committed to sections the assembler
+     *                            cannot reclaim space from; the buckets are sized
+     *                            from what is left after these.
      * @return array<string,int> Map of bucket key -> char budget.
      */
     public static function section_budgets(

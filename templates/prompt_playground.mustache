@@ -1,8 +1,13 @@
 {{!
-    v7.2.1: the five fields below use {{{ }}} because their lang strings carry
-    <strong> markup for the field name. Rendered through {{ }} they printed the
-    tags as literal text. These are plugin-authored language strings, never user
-    input; anything derived from a request stays escaped.
+    v7.2.1: the five field labels below use triple-brace (unescaped) output,
+    because their lang strings carry strong-tag markup for the field name.
+    Rendered escaped, they printed the tags as literal text. These are
+    plugin-authored language strings, never user input; anything derived from a
+    request stays escaped.
+
+    (Written without brace examples on purpose: a mustache comment ends at the
+    first closing double-brace, so an inline example would terminate this
+    comment early and spill the rest of it into the rendered page.)
 
     This file is part of Moodle - http://moodle.org/
 
