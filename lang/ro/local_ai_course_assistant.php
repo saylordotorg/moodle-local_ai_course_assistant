@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Șablon prompt de sistem';
 $string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ești un tutore AI util pentru cursul „{{coursename}}". Rolul studentului este {{userrole}}.
 
-Subiecte acoperite în curs:
-
 Ajută studentul să înțeleagă conținutul cursului. Fii încurajator, clar și riguros din punct de vedere pedagogic.';
 $string['settings:temperature'] = 'Temperatură';
 $string['settings:temperature_desc'] = 'Controlează aleatorismul. Valorile mici sunt mai concentrate, valorile mari sunt mai creative. Interval: 0,0 până la 2,0.';

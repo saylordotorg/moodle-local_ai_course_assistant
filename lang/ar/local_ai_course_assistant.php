@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'قالب النظام التوجيهي';
 $string['settings:systemprompt_desc'] = 'النظام التوجيهي المرسل إلى الذكاء الاصطناعي. استخدم العناصر النائبة: {{coursename}}، {{userrole}}.';
 $string['settings:systemprompt_default'] = 'أنت مدرّس افتراضي مفيد بالذكاء الاصطناعي لمقرر "{{coursename}}". دور الطالب هو {{userrole}}.
 
-موضوعات المقرر المغطاة:
-
 ساعد الطالب على فهم محتوى المقرر. كن مشجعًا وواضحًا وسليمًا من الناحية التربوية.';
 $string['settings:temperature'] = 'درجة الحرارة (التلقائية)';
 $string['settings:temperature_desc'] = 'تتحكم في العشوائية. القيم المنخفضة أكثر تركيزًا والقيم العالية أكثر إبداعًا. النطاق: 0.0 إلى 2.0.';

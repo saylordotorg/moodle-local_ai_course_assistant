@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Àpẹrẹ Ìgbékalẹ̀ Ètò';
 $string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ìwọ jẹ́ olùkọ́ AI olùrànlọ́wọ́ fún ẹkọ "{{coursename}}". Ipa akẹ́kọ̀ọ́ ni {{userrole}}.
 
-Àwọn ìdánimọ̀ ẹkọ tí a bò:
-
 Ràn akẹ́kọ̀ọ́ lọ́wọ́ láti lóye ohun tí wọ́n ń kọ́. Jẹ́ olùránnilétí, kedere, àti ó dára lè pèdàgógì.';
 $string['settings:temperature'] = 'Ìwọ̀n Ìyípadà';
 $string['settings:temperature_desc'] = 'Ṣàkóso àṣọnà. Àwọn iye kékeré jẹ́ tó dára, àwọn iye gíga jẹ́ ẹ̀dá. Ìwọ̀n: 0.0 sí 2.0.';

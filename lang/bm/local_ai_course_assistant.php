@@ -79,8 +79,6 @@ $string['settings:systemprompt'] = 'Système Invite Misali';
 $string['settings:systemprompt_desc'] = 'AI ci invite. Jagomaw jɔminɛ: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'I ye AI karamɔgɔ dɛmɛbaga ye kalanso "{{coursename}}" kama. Kalandenw ka wɛlɛya ye {{userrole}}.
 
-Kalanso kow minw kɛra:
-
 Kalanden dɛmɛ kalanso kow kalan kama. Kɔlɔsili kɛ, a jɛ, ani kalan fan na ɲɛ.';
 $string['settings:temperature'] = 'Température';
 $string['settings:temperature_desc'] = 'Aléatoire laadi. Keyi dɔgɔmanw ye focus ka bon, keyi gɛlɛnmanw ye créatif ka bon. Kɛmɛ: 0.0 ni 2.0.';

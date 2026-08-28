@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'সিস্টেম প্রম্পট 
 $string['settings:systemprompt_desc'] = 'AI-এ পাঠানো সিস্টেম প্রম্পট। প্লেসহোল্ডার ব্যবহার করুন: {{coursename}}, {{userrole}}।';
 $string['settings:systemprompt_default'] = 'আপনি "{{coursename}}" কোর্সের একজন সহায়ক AI টিউটর। শিক্ষার্থীর ভূমিকা হলো {{userrole}}।
 
-কোর্সে আলোচিত বিষয়সমূহ:
-
 শিক্ষার্থীকে কোর্সের বিষয়বস্তু বুঝতে সাহায্য করুন। উৎসাহজনক, স্পষ্ট এবং শিক্ষাগতভাবে সঠিক হোন।';
 $string['settings:temperature'] = 'তাপমাত্রা';
 $string['settings:temperature_desc'] = 'এলোমেলোতা নিয়ন্ত্রণ করে। কম মান আরও কেন্দ্রীভূত, বেশি মান আরও সৃজনশীল। পরিসীমা: ০.০ থেকে ২.০।';

@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Plantilla de instrucción del sistema';
 $string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Eres un tutor de IA útil para el curso "{{coursename}}". El rol del estudiante es {{userrole}}.
 
-Temas del curso:
-
 Ayuda al estudiante a comprender el contenido del curso. Sé alentador, claro y pedagógicamente riguroso.';
 $string['settings:temperature'] = 'Temperatura';
 $string['settings:temperature_desc'] = 'Controla la aleatoriedad. Los valores más bajos son más enfocados, los valores más altos son más creativos. Rango: 0.0 a 2.0.';

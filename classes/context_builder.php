@@ -132,6 +132,15 @@ class context_builder {
     ): string {
         global $DB;
 
+        // Filter before deciding whether this is a RAG turn. A chunk with empty
+        // content cannot ground anything, and counting it would put the prompt in
+        // RAG mode -- citation instruction and all -- with nothing to cite.
+        $retrieved_chunks = array_values(array_filter(
+            $retrieved_chunks,
+            static function ($chunk) {
+                return trim((string) ($chunk['content'] ?? '')) !== '';
+            }
+        ));
         $ragmode = !empty($retrieved_chunks);
 
         // Whether RAG is enabled for this course (independent of whether this
@@ -648,7 +657,28 @@ class context_builder {
                 $reservedchars += $sec->length();
             }
         }
-        $budgets = self::section_budgets($budget, $pageid, $quizmode, $reservedchars);
+        // Which buckets actually have a section to spend their share? In RAG mode
+        // current_page_content is never built (see the !$ragmode guard above), yet
+        // apply_boost() hands the current_page bucket 55% of the pool whenever a
+        // pageid is in scope -- which is the normal case for a learner reading a
+        // page. That share was then spent by nobody while course_content was
+        // squeezed from 68% to 28%, costing real retrieved passages with thousands
+        // of characters of budget left unused. Same shape as the bug this release
+        // fixes, relocated from safety_identity to current_page.
+        $activebuckets = [];
+        foreach ($sections as $sec) {
+            $bucket = self::section_to_bucket($sec->name);
+            if ($bucket !== null && $sec->length() > 0) {
+                $activebuckets[$bucket] = true;
+            }
+        }
+        $budgets = self::section_budgets(
+            $budget,
+            $pageid,
+            $quizmode,
+            $reservedchars,
+            array_keys($activebuckets)
+        );
         foreach ($sections as $sec) {
             $bucket = self::section_to_bucket($sec->name);
             if ($bucket !== null && isset($budgets[$bucket])) {
@@ -684,6 +714,31 @@ class context_builder {
                     return $s->name !== 'page_grounding_reminder';
                 }
             ));
+            $assembled = prompt_builder::assemble($sections, $budget);
+        }
+
+        // v7.2.1: same coupling, for the citation instruction. The marker block
+        // is built from whether chunks were PASSED IN, never from whether the
+        // course_content section survived assembly -- and the two are dropped
+        // independently (CAT_MARKERS priority 90 vs CAT_CONTEXT priority 90).
+        // There is a budget band where the markers win and the passages do not,
+        // leaving the model told to "cite a retrieved passage you actually used"
+        // with no passages present. That is an instruction to invent citations,
+        // and it is exactly the pathway that produced the fabricated ARTH101
+        // answers. The band is reachable without an odd setting: a self-hosted
+        // backend_context_tokens of 8192 clamps straight into it.
+        //
+        // Rebuild the markers without the citation instruction and reassemble.
+        if (
+            $ragmode
+                && !empty($assembled['breakdown']['output_markers']['used'])
+                && empty($assembled['breakdown']['course_content']['used'])
+        ) {
+            foreach ($sections as $sec) {
+                if ($sec->name === 'output_markers') {
+                    $sec->content = self::get_marker_instructions(false, $offtopicon, !empty($faq));
+                }
+            }
             $assembled = prompt_builder::assemble($sections, $budget);
         }
 
@@ -988,13 +1043,18 @@ class context_builder {
      * @param int $reserved_chars Chars already committed to sections the assembler
      *                            cannot reclaim space from; the buckets are sized
      *                            from what is left after these.
+     * @param array|null $active_buckets Bucket names that actually have a section
+     *                            this turn. When given, the share of any absent
+     *                            bucket is redistributed across the rest rather
+     *                            than left unspent. Null keeps the fixed split.
      * @return array<string,int> Map of bucket key -> char budget.
      */
     public static function section_budgets(
         int $total_budget,
         int $pageid,
         string $quizmode = '',
-        int $reserved_chars = 0
+        int $reserved_chars = 0,
+        ?array $active_buckets = null
     ): array {
         // Per-coach-mode override: when the active turn is a graded quiz
         // attempt (quizmode='coach'), prefer the coach-specific weight set
@@ -1041,9 +1101,29 @@ class context_builder {
         // budget produces a larger prompt. Reachable via effective_budget_chars
         // clamping for a small self-hosted context window.
         $pool = max((int) round($total_budget * 0.25), $total_budget - $reserved_chars);
+
+        // Redistribute the share of any bucket that has no section to spend it.
+        // Weights are a fixed split of the pool, so a bucket that is funded but
+        // never built silently removes its percentage from the prompt: in RAG mode
+        // current_page_content is not created at all, yet page_focus hands
+        // current_page 55% whenever a pageid is in scope. Redistributing in
+        // proportion keeps the relative priorities the admin configured.
+        if ($active_buckets !== null) {
+            $active = array_flip($active_buckets);
+            $keep = array_intersect_key($weights, $active);
+            $keptsum = array_sum($keep);
+            if ($keptsum > 0) {
+                foreach ($weights as $bucket => $pct) {
+                    $weights[$bucket] = isset($active[$bucket])
+                        ? ($pct / $keptsum) * 100.0
+                        : 0.0;
+                }
+            }
+        }
+
         $budgets = [];
         foreach ($weights as $bucket => $pct) {
-            $budgets[$bucket] = (int) round($pool * ($pct / 100.0));
+            $budgets[$bucket] = ($pct > 0) ? max(200, (int) round($pool * ($pct / 100.0))) : 0;
         }
         return $budgets;
     }

@@ -25,7 +25,7 @@
     Context variables required for this template:
     * intro string
     * hasrows bool
-    * rows array of {time, action, username, userid, courseid, ipaddress, details}
+    * rows array of {time, action, username, course, ipaddress, details}
     * empty string
     * col_* string column headings
     * back_to_settings string, settings_url string
@@ -37,7 +37,7 @@
         "intro": "Actions recorded by the plugin.",
         "hasrows": true,
         "rows": [{"time": "1/01/26, 09:14", "action": "emergency_disable",
-                  "username": "Admin User", "userid": 2, "courseid": 0,
+                  "username": "Admin User", "userid": 2, "course": "BUS101 (11)",
                   "ipaddress": "10.0.0.1", "details": "flag=chat"}],
         "empty": "Nothing recorded yet.",
         "col_time": "Time", "col_action": "Action", "col_user": "User",
@@ -76,7 +76,7 @@
                 <td>{{time}}</td>
                 <td><code>{{action}}</code></td>
                 <td>{{username}}</td>
-                <td>{{courseid}}</td>
+                <td>{{course}}</td>
                 <td>{{ipaddress}}</td>
                 <td class="small text-muted">{{details}}</td>
             </tr>
@@ -84,11 +84,15 @@
         </tbody>
     </table>
 </div>
+{{/hasrows}}
 
+{{!
+    Outside the hasrows block on purpose: a page past the end has no rows, and
+    leaving the pager inside meant no way back except editing the URL.
+}}
 <nav>
     <ul class="pagination pagination-sm">
         {{#hasprev}}<li class="page-item"><a class="page-link" href="{{prevurl}}">{{prevlabel}}</a></li>{{/hasprev}}
         {{#hasnext}}<li class="page-item"><a class="page-link" href="{{nexturl}}">{{nextlabel}}</a></li>{{/hasnext}}
     </ul>
 </nav>
-{{/hasrows}}

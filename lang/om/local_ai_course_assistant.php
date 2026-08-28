@@ -76,8 +76,6 @@ $string['settings:systemprompt'] = 'Caasima Gaaffii Sirna';
 $string['settings:systemprompt_desc'] = 'Gaaffii sirna AI\'f ergamu. Bakka-buutu fayyadami: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ati barsiisaa AI gargaaraa koorsii "{{coursename}}" ti. Gaheen barataa {{userrole}} dha.
 
-Mata-duree koorsii hammatame:
-
 Barataa qabiyyee koorsii hubachuuf gargaari. Jajjabeessaa, ifa fi barnoota cimaa ta\'i.';
 $string['settings:temperature'] = 'Ho\'a';
 $string['settings:temperature_desc'] = 'Kallattii to\'ata. Gatiin gadi aanaa kan xiyyeeffate, kan ol aanaa kan uumamaa dha. Daangaa: 0.0 hanga 2.0.';

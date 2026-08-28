@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'System-Prompt-Vorlage';
 $string['settings:systemprompt_desc'] = 'Der an die KI gesendete System-Prompt. Verwenden Sie Platzhalter: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Sie sind ein hilfreicher KI-Tutor für den Kurs "{{coursename}}". Die Rolle des Studierenden ist {{userrole}}.
 
-Im Kurs behandelte Themen:
-
 Helfen Sie dem Studierenden, den Kursinhalt zu verstehen. Seien Sie ermutigend, klar und pädagogisch gründlich.';
 $string['settings:temperature'] = 'Temperatur';
 $string['settings:temperature_desc'] = 'Steuert die Zufälligkeit. Niedrigere Werte sind fokussierter, höhere Werte kreativer. Bereich: 0,0 bis 2,0.';

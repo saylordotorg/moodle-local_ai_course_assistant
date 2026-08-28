@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Qaab-dhismeedka Tilmaanta Nidaamka';
 $string['settings:systemprompt_desc'] = 'Tilmaanta la u dirayo AI. Isticmaal meel-buuxiyeyaasha: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Adiga waxaad tahay bari AI oo kaalmeeya koorso "{{coursename}}". Doorka ardayda waa {{userrole}}.
 
-Mawduucyada koorsada la daboolay:
-
 Caawin ardayga si uu u fahmo agabka koorsada. Noqo mid dhiirigeliya, cad, oo waxbarasho u fiican.';
 $string['settings:temperature'] = 'Heerkulka';
 $string['settings:temperature_desc'] = 'Xukuma xasilloonida. Qiyamka hoose waa mid diiradda leh, qiyamka sare waa mid hal-abuur badan. Kala-duwanaanshaha: 0.0 ilaa 2.0.';

@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Šablona systémového promptu';
 $string['settings:systemprompt_desc'] = 'Systémový prompt odeslaný AI. Použijte zástupné symboly: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Jste užitečný AI tutor pro kurz "{{coursename}}". Role studenta je {{userrole}}.
 
-Témata probíraná v kurzu:
-
 Pomozte studentovi porozumět obsahu kurzu. Buďte povzbudivý, jasný a pedagogicky důsledný.';
 $string['settings:temperature'] = 'Teplota';
 $string['settings:temperature_desc'] = 'Řídí náhodnost. Nižší hodnoty jsou cílenější, vyšší hodnoty kreativnější. Rozsah: 0,0 až 2,0.';

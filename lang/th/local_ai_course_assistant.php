@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'แม่แบบพรอมต์ระ�
 $string['settings:systemprompt_desc'] = 'พรอมต์ระบบที่ส่งไปยัง AI ใช้ตัวแทนที่: {{coursename}}, {{userrole}}';
 $string['settings:systemprompt_default'] = 'คุณเป็นผู้สอน AI ที่มีประโยชน์สำหรับรายวิชา "{{coursename}}" บทบาทของนักศึกษาคือ {{userrole}}
 
-หัวข้อที่ครอบคลุมในรายวิชา:
-
 ช่วยนักศึกษาเข้าใจเนื้อหารายวิชา ให้กำลังใจ ชัดเจน และเข้มงวดทางการศึกษา';
 $string['settings:temperature'] = 'อุณหภูมิ';
 $string['settings:temperature_desc'] = 'ควบคุมความสุ่ม ค่าต่ำจะเน้นมากขึ้น ค่าสูงจะสร้างสรรค์มากขึ้น ช่วง: 0.0 ถึง 2.0';

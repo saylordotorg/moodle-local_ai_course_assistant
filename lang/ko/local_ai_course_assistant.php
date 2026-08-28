@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = '시스템 프롬프트 템플릿';
 $string['settings:systemprompt_desc'] = 'AI에 전송되는 시스템 프롬프트. 플레이스홀더 {{coursename}}, {{userrole}}를 사용하세요.';
 $string['settings:systemprompt_default'] = '당신은 "{{coursename}}" 코스의 유용한 AI 튜터입니다. 학생의 역할은 {{userrole}}입니다.
 
-코스에서 다루는 주제:
-
 학생이 코스 내용을 이해할 수 있도록 도와주세요. 격려하고, 명확하며, 교육적으로 엄격하게 응답하세요.';
 $string['settings:temperature'] = '온도';
 $string['settings:temperature_desc'] = '무작위성을 제어합니다. 낮은 값은 더 집중적이고, 높은 값은 더 창의적입니다. 범위: 0.0~2.0.';

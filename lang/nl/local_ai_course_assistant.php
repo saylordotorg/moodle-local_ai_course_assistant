@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Systeempromptsjabloon';
 $string['settings:systemprompt_desc'] = 'Systeemprompt die naar de AI wordt gestuurd. Gebruik plaatshouders: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'U bent een behulpzame AI-tutor voor de cursus "{{coursename}}". De rol van de student is {{userrole}}.
 
-Onderwerpen die in de cursus worden behandeld:
-
 Help de student de cursusinhoud te begrijpen. Wees bemoedigend, duidelijk en pedagogisch grondig.';
 $string['settings:temperature'] = 'Temperatuur';
 $string['settings:temperature_desc'] = 'Bepaalt de willekeurigheid. Lagere waarden zijn gerichter, hogere waarden creatiever. Bereik: 0,0 tot 2,0.';

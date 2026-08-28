@@ -70,10 +70,8 @@ $string['settings:model_desc'] = '使用するモデル。デフォルトはプ�
 $string['settings:apibaseurl'] = 'APIベースURL';
 $string['settings:apibaseurl_desc'] = 'APIベースURL。プロバイダーに基づいて自動入力されますが、上書き可能です。プロバイダーのデフォルトを使用するには空白のままにしてください。';
 $string['settings:systemprompt'] = 'システムプロンプトテンプレート';
-$string['settings:systemprompt_desc'] = 'AIに送信されるシステムプロンプト。プレースホルダー {{coursename}}、{{userrole}}、 を使用してください。';
+$string['settings:systemprompt_desc'] = 'AIに送信されるシステムプロンプト。プレースホルダー {{coursename}}、{{userrole}} を使用してください。';
 $string['settings:systemprompt_default'] = 'あなたは「{{coursename}}」コースの役立つAIチューターです。学生の役割は{{userrole}}です。
-
-コースで取り上げるトピック：
 
 学生がコースの内容を理解できるよう支援してください。励みになり、明確で、教育的に厳密であってください。';
 $string['settings:temperature'] = '温度';

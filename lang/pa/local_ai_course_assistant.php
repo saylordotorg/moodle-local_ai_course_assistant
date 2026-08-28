@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'ਸਿਸਟਮ ਪ੍ਰੌਂਪਟ ਟੈ
 $string['settings:systemprompt_desc'] = 'AI ਨੂੰ ਭੇਜਿਆ ਜਾਣ ਵਾਲਾ ਸਿਸਟਮ ਪ੍ਰੌਂਪਟ। ਪਲੇਸਹੋਲਡਰ ਵਰਤੋ: {{coursename}}, {{userrole}}।';
 $string['settings:systemprompt_default'] = 'ਤੁਸੀਂ ਕੋਰਸ "{{coursename}}" ਲਈ ਇੱਕ ਮਦਦਗਾਰ AI ਟਿਊਟਰ ਹੋ। ਵਿਦਿਆਰਥੀ ਦੀ ਭੂਮਿਕਾ {{userrole}} ਹੈ।
 
-ਕੋਰਸ ਦੇ ਵਿਸ਼ੇ:
-
 ਵਿਦਿਆਰਥੀ ਨੂੰ ਕੋਰਸ ਸਮੱਗਰੀ ਸਮਝਣ ਵਿੱਚ ਮਦਦ ਕਰੋ। ਉਤਸ਼ਾਹਿਤ ਕਰਨ ਵਾਲੇ, ਸਪੱਸ਼ਟ ਅਤੇ ਵਿੱਦਿਅਕ ਤੌਰ ਉੱਤੇ ਸਹੀ ਰਹੋ।';
 $string['settings:temperature'] = 'ਤਾਪਮਾਨ';
 $string['settings:temperature_desc'] = 'ਬੇਤਰਤੀਬਤਾ ਨੂੰ ਕੰਟਰੋਲ ਕਰਦਾ ਹੈ। ਘੱਟ ਮੁੱਲ ਵਧੇਰੇ ਕੇਂਦ੍ਰਿਤ ਹਨ, ਵੱਧ ਮੁੱਲ ਵਧੇਰੇ ਰਚਨਾਤਮਕ। ਸੀਮਾ: 0.0 ਤੋਂ 2.0।';

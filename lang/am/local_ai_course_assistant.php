@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'የስርዓት ፕሮምት ቅጥ';
 $string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}።';
 $string['settings:systemprompt_default'] = 'ለ"{{coursename}}" ኮርስ ጠቃሚ የAI አስተማሪ ነዎት። የተማሪው ሚና {{userrole}} ነው።
 
-የሚሸፈኑ የኮርስ ርዕሶች፦
-
 ተማሪው የኮርሱን ቁሳቁስ እንዲረዳ ይርዱ። አበረታቱ፣ ግልጽ ይሁኑ እና ትምህርታዊ ዘዴ ይጠቀሙ።';
 $string['settings:temperature'] = 'ሙቀት';
 $string['settings:temperature_desc'] = 'ዘፈቀደነትን ይቆጣጠራል። ዝቅተኛ እሴቶች ይበልጥ ያተኩሩ፣ ከፍተኛ እሴቶች ይበልጥ ፈጠራዊ ናቸው። ክልል፦ 0.0 እስከ 2.0።';

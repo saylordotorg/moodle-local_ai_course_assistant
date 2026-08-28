@@ -204,6 +204,77 @@ final class rag_context_reaches_prompt_test extends \advanced_testcase {
         );
     }
 
+    public function test_a_bucket_with_no_section_does_not_hold_its_share(): void {
+        $this->resetAfterTest();
+
+        // In RAG mode current_page_content is never built, but page_focus hands
+        // the current_page bucket 55% of the pool whenever a pageid is in scope --
+        // the normal case for a learner reading a page. That share was spent by
+        // nobody while course_content was squeezed, costing real passages with
+        // thousands of characters of budget sitting unused.
+        $withpage = context_builder::section_budgets(24000, 4082, '', 6000);
+        $nopagesection = context_builder::section_budgets(
+            24000,
+            4082,
+            '',
+            6000,
+            ['safety_identity', 'course_structure', 'course_content']
+        );
+
+        $this->assertSame(0, $nopagesection['current_page']);
+        $this->assertGreaterThan(
+            $withpage['course_content'],
+            $nopagesection['course_content'],
+            'The share of a bucket with no section must be redistributed, not left unspent.'
+        );
+    }
+
+    public function test_the_model_is_never_told_to_cite_passages_it_was_not_given(): void {
+        $this->resetAfterTest();
+        $course  = $this->getDataGenerator()->create_course(['fullname' => 'Chemistry 101']);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+
+        // output_markers (CAT_MARKERS) and course_content (CAT_CONTEXT) are
+        // dropped independently, so there is a budget band where the citation
+        // instruction survives and the passages do not. That is an instruction to
+        // invent citations. Reachable without an odd setting: a self-hosted
+        // backend_context_tokens of 8192 clamps straight into it.
+        foreach ([5000, 6000, 6400, 7200, 8000, 12000, 24000] as $budget) {
+            set_config('prompt_budget_chars', $budget, 'local_ai_course_assistant');
+            $prompt = context_builder::build_system_prompt(
+                $course->id,
+                $student->id,
+                '',
+                $this->chunks(6)
+            );
+            $breakdown = context_builder::$last_breakdown;
+            $hascontent = !empty($breakdown['course_content']['used']);
+            $hascite = str_contains($prompt, 'cite a retrieved passage');
+
+            if ($hascite) {
+                $this->assertTrue(
+                    $hascontent,
+                    "At budget {$budget} the prompt asks the model to cite retrieved "
+                        . 'passages, but every passage was dropped from assembly.'
+                );
+            }
+        }
+    }
+
+    public function test_an_empty_passage_is_not_labelled_or_offered_for_citation(): void {
+        $this->resetAfterTest();
+        $course  = $this->getDataGenerator()->create_course(['fullname' => 'Chemistry 101']);
+        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+
+        $prompt = context_builder::build_system_prompt($course->id, $student->id, '', [
+            ['content' => '', 'score' => 0.9, 'cmid' => 0],
+            ['content' => '   ', 'score' => 0.8, 'cmid' => 0],
+        ]);
+
+        $this->assertStringNotContainsString('[c:0]', $prompt);
+        $this->assertStringNotContainsString('cite a retrieved passage', $prompt);
+    }
+
     public function test_section_budgets_allocate_from_what_the_fixed_sections_leave(): void {
         $this->resetAfterTest();
 

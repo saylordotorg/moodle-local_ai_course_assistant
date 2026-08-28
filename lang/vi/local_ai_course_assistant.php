@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Mẫu Prompt Hệ thống';
 $string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Bạn là gia sư AI hữu ích cho khóa học "{{coursename}}". Vai trò của học viên là {{userrole}}.
 
-Các chủ đề khóa học được đề cập:
-
 Hãy giúp học viên hiểu tài liệu khóa học. Hãy khích lệ, rõ ràng và có phương pháp sư phạm tốt.';
 $string['settings:temperature'] = 'Nhiệt độ';
 $string['settings:temperature_desc'] = 'Kiểm soát tính ngẫu nhiên. Giá trị thấp hơn tập trung hơn, giá trị cao hơn sáng tạo hơn. Phạm vi: 0.0 đến 2.0.';

@@ -76,8 +76,6 @@ $string['settings:systemprompt'] = 'Templeeti Arịọ Sistemu';
 $string['settings:systemprompt_desc'] = 'Arịọ sistemu ezigara AI. Jiri ihe ngọpụta: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Ị bụ nkuzi AI na-enyere aka maka kọọsị "{{coursename}}". Ọrụ nwa akwụkwọ bụ {{userrole}}.
 
-Isiokwu kọọsị a kọwara:
-
 Nyere nwa akwụkwọ aka ịghọta ihe kọọsị a. Bụrụ onye na-agba ume, doo anya, ma nwee ezigbo usoro nkuzi.';
 $string['settings:temperature'] = 'Okpomọkụ';
 $string['settings:temperature_desc'] = 'Na-achịkwa ụdịdị oge ntụgharị. Ọnụọgụ dị ala bụ nke nwere ọsọ isi, ọnụọgụ dị elu bụ nke na-emepụta ihe ọhụrụ. Ọnụọgụ: 0.0 ruo 2.0.';

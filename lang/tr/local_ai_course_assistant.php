@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Sistem istemi şablonu';
 $string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = '"{{coursename}}" dersi için yardımcı bir AI eğitmensiniz. Öğrencinin rolü {{userrole}}.
 
-Derste işlenen konular:
-
 Öğrencinin ders içeriğini anlamasına yardımcı olun. Teşvik edici, açık ve pedagojik olarak titiz olun.';
 $string['settings:temperature'] = 'Sıcaklık';
 $string['settings:temperature_desc'] = 'Rastgeleliği kontrol eder. Düşük değerler daha odaklı, yüksek değerler daha yaratıcıdır. Aralık: 0,0 ile 2,0.';

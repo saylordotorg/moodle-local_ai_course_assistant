@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Kiolezo cha Ombi la Mfumo';
 $string['settings:systemprompt_desc'] = 'Ombi la mfumo linalotumwa kwa AI. Tumia viashiria: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Wewe ni mshauri wa AI msaidizi kwa kozi "{{coursename}}". Jukumu la mwanafunzi ni {{userrole}}.
 
-Mada za kozi zinazoshughulikiwa:
-
 Saidia mwanafunzi kuelewa maudhui ya kozi. Kuwa wa kuhimiza, wazi, na sahihi kielimu.';
 $string['settings:temperature'] = 'Joto';
 $string['settings:temperature_desc'] = 'Inadhibiti nasibu. Thamani za chini ni za kuzingatia zaidi, thamani za juu ni za ubunifu zaidi. Kipindi: 0.0 hadi 2.0.';

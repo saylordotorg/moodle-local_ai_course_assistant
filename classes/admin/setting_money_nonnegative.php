@@ -57,10 +57,14 @@ class setting_money_nonnegative extends \admin_setting_configtext {
      * @return true|string true when valid, else the error to display.
      */
     public function validate($data) {
-        $data = trim((string) $data);
+        $data = (string) $data;
         if ($data === '') {
             return get_string('validateerror', 'admin');
         }
+        // Not trimmed before matching: validate() trimming while write_setting()
+        // does not meant " 25 " passed validation and was then stored with its
+        // spaces intact, so the admin saw padded input round-trip into the field.
+        // Rejecting it is simpler than overriding write_setting to normalise.
         if (!preg_match('/^\d+(\.\d{1,2})?$/', $data)) {
             return get_string(
                 'settings:money_nonnegative_invalid',

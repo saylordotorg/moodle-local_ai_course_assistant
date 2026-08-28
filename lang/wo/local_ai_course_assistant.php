@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Modèle Invite Système';
 $string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Yàgg nga jël rôle wu professeur AI ci cours "{{coursename}}". Rôle élève bi dafa {{userrole}}.
 
-Sujets cours bi ñu dakkal:
-
 Ndimm élève bi jàng matière cours bi. Yëgël, wëjj, te jàng ci yoon bu baax.';
 $string['settings:temperature'] = 'Température';
 $string['settings:temperature_desc'] = 'Kontrole aléatoire bi. Valeurs yu yëëf dañ focus, valeurs yu dëkk dañ créatif. Plaage: 0.0 ci 2.0.';

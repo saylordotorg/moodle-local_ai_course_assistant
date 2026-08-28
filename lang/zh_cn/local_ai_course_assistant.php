@@ -75,10 +75,8 @@ $string['settings:model_desc'] = '要使用的模型。默认值取决于提供�
 $string['settings:apibaseurl'] = 'API 基础 URL';
 $string['settings:apibaseurl_desc'] = 'API 的基础 URL。会根据提供商自动填写，但可以覆盖。留空则使用提供商默认值。';
 $string['settings:systemprompt'] = '系统提示模板';
-$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}、。';
+$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}。';
 $string['settings:systemprompt_default'] = '您是课程"{{coursename}}"的 AI 辅导助手。学生的角色为 {{userrole}}。
-
-课程涵盖的主题：
 
 请帮助学生理解课程内容。请保持鼓励、清晰且具有教学意义的态度。';
 $string['settings:temperature'] = '温度';

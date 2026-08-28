@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Templat Prompt Sistem';
 $string['settings:systemprompt_desc'] = 'Prompt sistem yang dihantar kepada AI. Gunakan placeholder: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Anda adalah tutor AI yang berguna untuk kursus "{{coursename}}". Peranan pelajar ialah {{userrole}}.
 
-Topik kursus yang diliputi:
-
 Bantu pelajar memahami bahan kursus. Jadilah menggalakkan, jelas, dan berkaedah pedagogi yang baik.';
 $string['settings:temperature'] = 'Suhu';
 $string['settings:temperature_desc'] = 'Mengawal rawak. Nilai lebih rendah lebih fokus, nilai lebih tinggi lebih kreatif. Julat: 0.0 hingga 2.0.';

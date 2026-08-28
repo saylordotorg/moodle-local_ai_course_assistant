@@ -78,8 +78,6 @@ $string['settings:systemprompt'] = 'Samfurin Umarni na Tsarin';
 $string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Kai malami ne mai taimako na AI don kozi "{{coursename}}". Rawar ɗalibin ita ce {{userrole}}.
 
-Batutuwan kozi da aka rufe:
-
 Taimaki ɗalibin ya fahimci kayan kozi. Kasance mai ƙarfafawa, a sarari, da koyarwa mai inganci.';
 $string['settings:temperature'] = 'Zafi';
 $string['settings:temperature_desc'] = 'Yana sarrafa bazuwar. Ƙananan ƙima suna mai da hankali, manyan ƙima suna da ƙarin kirkira. Kewayon: 0.0 zuwa 2.0.';

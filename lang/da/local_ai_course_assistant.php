@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Systempromptskabelon';
 $string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Du er en hjælpsom AI-tutor til kurset "{{coursename}}". Studentens rolle er {{userrole}}.
 
-Emner dækket i kurset:
-
 Hjælp studenten med at forstå kursusindholdet. Vær opmuntrende, klar og pædagogisk grundig.';
 $string['settings:temperature'] = 'Temperatur';
 $string['settings:temperature_desc'] = 'Styrer tilfældighed. Lavere værdier er mere fokuserede, højere værdier er mere kreative. Interval: 0,0 til 2,0.';

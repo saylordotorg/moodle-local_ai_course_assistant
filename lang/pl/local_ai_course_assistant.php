@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Szablon promptu systemowego';
 $string['settings:systemprompt_desc'] = 'Prompt systemowy wysyłany do AI. Użyj symboli zastępczych: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Jesteś pomocnym korepetytorem AI dla kursu „{{coursename}}". Rola studenta to {{userrole}}.
 
-Tematy omawiane w kursie:
-
 Pomóż studentowi zrozumieć treść kursu. Bądź zachęcający, jasny i pedagogicznie rzetelny.';
 $string['settings:temperature'] = 'Temperatura';
 $string['settings:temperature_desc'] = 'Kontroluje losowość. Niskie wartości są bardziej skoncentrowane, wysokie bardziej kreatywne. Zakres: 0,0 do 2,0.';

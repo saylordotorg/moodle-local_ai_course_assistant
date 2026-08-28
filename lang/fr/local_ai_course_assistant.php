@@ -74,8 +74,6 @@ $string['settings:systemprompt'] = 'Modèle de prompt système';
 $string['settings:systemprompt_desc'] = 'Prompt système envoyé à l\'IA. Utilisez les espaces réservés : {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Vous êtes un tuteur IA utile pour le cours "{{coursename}}". Le rôle de l\'étudiant est {{userrole}}.
 
-Sujets abordés dans le cours :
-
 Aidez l\'étudiant à comprendre le contenu du cours. Soyez encourageant, clair et pédagogiquement rigoureux.';
 $string['settings:temperature'] = 'Température';
 $string['settings:temperature_desc'] = 'Contrôle l\'aléatoire. Les valeurs basses sont plus ciblées, les valeurs élevées plus créatives. Plage : 0,0 à 2,0.';

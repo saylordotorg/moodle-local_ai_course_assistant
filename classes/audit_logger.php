@@ -103,6 +103,10 @@ class audit_logger {
      * @return array
      */
     public static function get_all_logs(int $limit = 100, int $offset = 0): array {
+        // Moodle's DML reads limitnum <= 0 as "no limit", so a caller asking for
+        // zero rows would be handed the entire audit table.
+        $limit = max(1, $limit);
+        $offset = max(0, $offset);
         global $DB;
 
         return $DB->get_records(

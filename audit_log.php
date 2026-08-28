@@ -58,7 +58,9 @@ if ($hasnext) {
     array_pop($records);
 }
 
+global $DB;
 $rows = [];
+$coursenames = [];
 foreach ($records as $rec) {
     // details is a JSON blob written by audit_logger::log(). Render it as
     // readable text rather than raw JSON, and never trust it as markup: it
@@ -69,7 +71,14 @@ foreach ($records as $rec) {
         if (is_array($decoded)) {
             $parts = [];
             foreach ($decoded as $k => $v) {
-                $parts[] = $k . '=' . (is_scalar($v) ? (string) $v : json_encode($v));
+                // json_encode, not a string cast: (string) false is '' , which in
+                // an audit trail is indistinguishable from "not recorded".
+                if (is_bool($v) || $v === null) {
+                    $rendered = json_encode($v);
+                } else {
+                    $rendered = is_scalar($v) ? (string) $v : json_encode($v);
+                }
+                $parts[] = $k . '=' . $rendered;
             }
             $details = implode(', ', $parts);
         } else {
@@ -77,14 +86,39 @@ foreach ($records as $rec) {
         }
     }
 
+    // A deleted or unknown account previously fell back to the no-reply user,
+    // so the audit trail read "Do not reply to this email" where an actor name
+    // belongs. Say plainly that the account is gone, and keep the id.
+    $username = '-';
+    if (!empty($rec->userid)) {
+        $actor = \core_user::get_user((int) $rec->userid, '*', IGNORE_MISSING);
+        $username = $actor
+            ? fullname($actor)
+            : get_string('auditlog:unknown_user', 'local_ai_course_assistant', (int) $rec->userid);
+    }
+
+    // Course id paired with its shortname: a bare number is hard to place, and
+    // the id alone is the thing most likely to be misread.
+    $course = '-';
+    if (!empty($rec->courseid)) {
+        if (!isset($coursenames[(int) $rec->courseid])) {
+            $coursenames[(int) $rec->courseid] = $DB->get_field(
+                'course',
+                'shortname',
+                ['id' => (int) $rec->courseid]
+            );
+        }
+        $shortname = $coursenames[(int) $rec->courseid];
+        $course = $shortname === false
+            ? (string) (int) $rec->courseid
+            : $shortname . ' (' . (int) $rec->courseid . ')';
+    }
+
     $rows[] = [
         'time' => userdate((int) $rec->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
         'action' => (string) $rec->action,
-        'userid' => (int) $rec->userid,
-        'username' => !empty($rec->userid)
-            ? fullname(\core_user::get_user((int) $rec->userid, '*', IGNORE_MISSING) ?: \core_user::get_noreply_user())
-            : '-',
-        'courseid' => (int) $rec->courseid,
+        'username' => $username,
+        'course' => $course,
         'ipaddress' => (string) $rec->ipaddress,
         'details' => $details,
     ];
@@ -96,7 +130,9 @@ echo $OUTPUT->render_from_template('local_ai_course_assistant/audit_log', [
     'intro' => branding::str('auditlog:intro'),
     'rows' => $rows,
     'hasrows' => !empty($rows),
-    'empty' => get_string('auditlog:empty', 'local_ai_course_assistant'),
+    'empty' => $page > 0
+        ? get_string('auditlog:empty_page', 'local_ai_course_assistant')
+        : get_string('auditlog:empty', 'local_ai_course_assistant'),
     'col_time' => get_string('auditlog:col_time', 'local_ai_course_assistant'),
     'col_action' => get_string('auditlog:col_action', 'local_ai_course_assistant'),
     'col_user' => get_string('auditlog:col_user', 'local_ai_course_assistant'),

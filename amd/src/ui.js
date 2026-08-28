@@ -487,7 +487,11 @@ define([
         // before the citation, producing "...the basic elements of art ." -- and
         // that dangling space was the only visible sign that the model had cited
         // a passage it was never given.
-        return html.replace(/(\s*)\[\[c:(\d+)\]\]/g, function(_m, lead, nStr) {
+        //
+        // Horizontal whitespace only, deliberately. This runs over rendered HTML,
+        // so a marker the model emitted inside a fenced code block is matched too;
+        // swallowing a newline there would join two lines of someone's code.
+        return html.replace(/([^\S\r\n]*)\[\[c:(\d+)\]\]/g, function(_m, lead, nStr) {
             const n = parseInt(nStr, 10);
             if (!(n >= 0) || n >= cites.length || !cites[n] || !cites[n].url) {
                 return '';

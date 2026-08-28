@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Systempromptmall';
 $string['settings:systemprompt_desc'] = 'Systemprompten som skickas till AI:n. Använd platshållarna {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Du är en hjälpsam AI-handledare för kursen "{{coursename}}". Studentens roll är {{userrole}}.
 
-Ämnen som behandlas i kursen:
-
 Hjälp studenten att förstå kursinnehållet. Var uppmuntrande, tydlig och pedagogiskt noggrann.';
 $string['settings:temperature'] = 'Temperatur';
 $string['settings:temperature_desc'] = 'Styr slumpmässighet. Låga värden är mer fokuserade, höga värden mer kreativa. Intervall: 0,0 till 2,0.';

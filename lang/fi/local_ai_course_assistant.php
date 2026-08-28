@@ -73,8 +73,6 @@ $string['settings:systemprompt'] = 'Järjestelmäkehotteen malli';
 $string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}.';
 $string['settings:systemprompt_default'] = 'Olet hyödyllinen AI-tutori kurssille "{{coursename}}". Opiskelijan rooli on {{userrole}}.
 
-Kurssilla käsitellyt aiheet:
-
 Auta opiskelijaa ymmärtämään kurssin sisältö. Ole kannustava, selkeä ja pedagogisesti perusteellinen.';
 $string['settings:temperature'] = 'Lämpötila';
 $string['settings:temperature_desc'] = 'Säätää satunnaisuutta. Matalammat arvot ovat kohdennetumpia, korkeammat luovempia. Alue: 0,0 – 2,0.';

@@ -262,6 +262,8 @@ final class lang_completeness_test extends \basic_testcase {
         'auditlog:col_time',
         'auditlog:col_user',
         'auditlog:empty',
+        'auditlog:empty_page',
+        'auditlog:unknown_user',
         'auditlog:intro',
         'auditlog:settings_link',
         'auditlog:title',
