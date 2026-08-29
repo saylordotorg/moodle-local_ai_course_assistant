@@ -77,6 +77,9 @@ define([
     // before finding out. Both sides now read the same check for the same
     // course.
     let attemptLocked = false;
+    // Rendered server-side: the string carries a [[tutorshort]] brand token and
+    // Moodle's string cache would hand us the raw value, token and all.
+    let attemptLockedNotice = '';
     /** @type {HTMLAudioElement|{pause:Function}|null} Currently playing OpenAI TTS audio (or AudioContext proxy) */
     let currentAudio = null;
     /** @type {AudioContext|null} Shared AudioContext unlocked by user gesture (iOS TTS fix) */
@@ -1212,6 +1215,7 @@ define([
         currentPageTitle = root.dataset.currentPageTitle || '';
         quizLocked = root.dataset.quizLocked === '1';
         attemptLocked = root.dataset.attemptLocked === '1';
+        attemptLockedNotice = root.dataset.attemptLockedNotice || '';
 
         // Fallbacks for themes/pages where Moodle does not populate PAGE->cm in the footer hook.
         if (!currentPageId && document.body) {
@@ -1261,6 +1265,11 @@ define([
         UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
         if (attemptLocked) {
             UI.setInputEnabled(false);
+            // The practice-quiz button is not a mode button, so setModeButtons
+            // does not reach it. Left live it is the same self-contradicting
+            // surface -- everything grey except the one control that starts an
+            // AI call the server is about to refuse.
+            UI.setQuizButtonEnabled(false);
         }
         setBottomMode('chat', {force: true});
         // Cache English starter labels before any language update overwrites them.
@@ -4678,22 +4687,18 @@ define([
         if (opened && attemptLocked && !historyLoaded) {
             // The learner has a quiz open in THIS course. Say so in the server's
             // own words, which name the remedy: submit or close the attempt.
+            //
+            // The flag is a page-render snapshot. Submitting the attempt in a
+            // second tab leaves this one disabled until the page is reloaded, so
+            // the notice says to reload rather than leaving the learner to
+            // wonder why doing what it asked changed nothing.
             historyLoaded = true;
             UI.clearMessages();
             setConversationHistory([]);
-            Str.get_string('quizlock:blocked', 'local_ai_course_assistant').then(function(msg) {
-                addAssistantMsg(msg, null, {skipHistory: true});
-                return;
-            }).catch(function() {
-                addAssistantMsg(
-                    'The assistant is unavailable while you have a quiz in progress. '
-                    + 'Submit or close your attempt and it will be available again.',
-                    null,
-                    {skipHistory: true}
-                );
-            });
+            addAssistantMsg(attemptLockedNotice, null, {skipHistory: true});
             UI.setInputEnabled(false);
             UI.setModeButtonsEnabled(false);
+            UI.setQuizButtonEnabled(false);
             return;
         }
         if (opened && quizLocked && !historyLoaded) {

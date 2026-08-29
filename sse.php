@@ -479,7 +479,10 @@ try {
     // apply. Admins and CLI are exempt via the same conditions used there.
     // v7.2.5: scoped to this course. See quiz_lock -- site-wide meant one
     // forgotten attempt anywhere disabled the assistant in every course.
-    if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()
+    // No is_siteadmin() carve-out: base_provider refuses admins too since
+    // v7.2.4, so exempting them here only replaces a clear explanation with a
+    // generic provider error.
+    if (!CLI_SCRIPT && !empty($USER->id)
             && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id, (int) $courseid)) {
         local_ai_course_assistant_sse_send([
             // branding::str, not get_string: the string carries a [[tutorshort]]

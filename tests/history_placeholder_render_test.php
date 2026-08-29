@@ -248,4 +248,72 @@ final class history_placeholder_render_test extends \advanced_testcase {
         // rewritten, so a learner asking about an exception keeps their words.
         $this->assertStringContainsString('balance sheet', $blob);
     }
+
+    /**
+     * Real prose that merely contains "error" is never rewritten.
+     *
+     * The first version of the matcher tested for the substrings exception,
+     * throwable and error anywhere in the text. "error" is a substring of
+     * "terrorism", so a one-word reply of "Terrorism." was replaced with the
+     * failure notice -- and because get_history_for_api() applies the same
+     * scrub, the model was then told it had failed to answer when it had
+     * answered correctly. Deleting a real answer is much worse than leaving an
+     * ugly one, so these cases are the ones that matter.
+     *
+     * @dataProvider prose_provider
+     * @param string $text An assistant reply that must survive untouched.
+     */
+    public function test_legitimate_prose_survives(string $text): void {
+        $this->assertSame($text, conversation_manager::display_turn_text($text));
+    }
+
+    /**
+     * Assistant replies that must not be treated as internal identifiers.
+     *
+     * @return array
+     */
+    public static function prose_provider(): array {
+        return [
+            'one-word topic containing "error"' => ['Terrorism.'],
+            'same without the full stop' => ['Terrorism'],
+            'shorter, still prose' => ['Terror'],
+            'bare link whose path contains Error' => ['https://en.wikipedia.org/wiki/Error_analysis'],
+            'bracketed prose containing error' => ['[Terrorism in the 20th century]'],
+            'sentence about error analysis' => ['Error analysis is the study of mistakes.'],
+            'sentence using the word exception' => ['An exception to that rule is depreciation.'],
+            'the bare word' => ['error'],
+        ];
+    }
+
+    /**
+     * Moodle's own lowercase class names are still caught.
+     *
+     * Tightening the matcher must not swing so far that it stops catching the
+     * thing it was written for: core uses snake_case exception names, so a
+     * suffix rule keyed only on CamelCase would have missed every one of them.
+     *
+     * @dataProvider typename_provider
+     * @param string $text A stored internal identifier that must be replaced.
+     */
+    public function test_type_names_are_still_caught(string $text): void {
+        $this->assertNotSame($text, conversation_manager::display_turn_text($text));
+    }
+
+    /**
+     * Stored values that are internal identifiers.
+     *
+     * @return array
+     */
+    public static function typename_provider(): array {
+        return [
+            'the reported v7.1.1 form' => ['[no response: core\\exception\\moodle_exception]'],
+            'its bare cousin' => ['[no response]'],
+            'namespaced, unbracketed' => ['core\\exception\\moodle_exception'],
+            'leading separator' => ['\\core\\exception\\moodle_exception'],
+            'moodle snake_case' => ['moodle_exception'],
+            'moodle snake_case, bracketed' => ['[moodle_exception]'],
+            'php CamelCase' => ['TypeError'],
+            'spl CamelCase' => ['RuntimeException'],
+        ];
+    }
 }

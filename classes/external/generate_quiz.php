@@ -103,7 +103,12 @@ class generate_quiz extends external_api {
         // retry that cannot succeed and never saying why. Checking up front also
         // skips the grade/topic/context work the refusal would have thrown away.
         // base_provider remains the enforcing guard; this only classifies.
-        if (quiz_lock::is_locked_for($userid)) {
+        //
+        // The courseid is not optional. Omitting it takes the site-wide branch,
+        // which would leave this one button still refusing because of an attempt
+        // in an unrelated course -- the exact P1 v7.2.5 exists to fix -- while
+        // chat in the same drawer answered normally.
+        if (quiz_lock::is_locked_for($userid, $courseid)) {
             return self::quiz_locked_result();
         }
 
@@ -226,7 +231,13 @@ class generate_quiz extends external_api {
             // The learner can start an attempt between the check above and this
             // call, in which case the throwable IS the lock; re-check rather
             // than string-matching a translated message.
-            if (quiz_lock::is_locked_for($userid)) {
+            //
+            // Same scope as the guard that would have thrown, or this misreads
+            // a genuine provider timeout as the lock: unscoped, an attempt in
+            // another course makes this true even though base_provider allowed
+            // the call, and the learner is told to submit a quiz they are not
+            // sitting while the real, retryable error is discarded.
+            if (quiz_lock::is_locked_for($userid, $courseid)) {
                 return self::quiz_locked_result();
             }
             return [

@@ -169,4 +169,59 @@ final class quiz_lock_enforcement_test extends \advanced_testcase {
             );
         }
     }
+
+    /**
+     * The practice-quiz button uses the same scope as chat.
+     *
+     * Both lock checks in generate_quiz took the courseid default, so they ran
+     * site-wide while base_provider and sse.php scoped to the course. The
+     * learner got a working chat and a quiz button that refused, in the same
+     * drawer, over an attempt in a course they were not in. The catch-block
+     * re-check had the sharper edge: it fires on any throwable, so an unrelated
+     * attempt turned a genuine provider timeout into errorcode=quizlocked,
+     * which the client treats as non-retryable -- discarding a real error and
+     * discouraging the retry that would have worked.
+     */
+    public function test_quiz_generation_scopes_the_lock_to_its_own_course(): void {
+        $this->resetAfterTest(true);
+
+        $gen = $this->getDataGenerator();
+        $quizcourse = $gen->create_course();
+        $othercourse = $gen->create_course();
+        $student = $gen->create_user();
+        $gen->enrol_user($student->id, $quizcourse->id);
+        $gen->enrol_user($student->id, $othercourse->id);
+        $this->setUser($student);
+
+        set_config('quiz_lock_enabled', 1, 'local_ai_course_assistant');
+        set_config('quiz_lock_scope', quiz_lock::SCOPE_COURSE, 'local_ai_course_assistant');
+
+        global $DB;
+        $quiz = $gen->create_module('quiz', ['course' => $quizcourse->id]);
+        $DB->insert_record('quiz_attempts', (object) [
+            'quiz' => $quiz->id,
+            'userid' => $student->id,
+            'attempt' => 1,
+            'uniqueid' => random_int(100000, 999999),
+            'layout' => '',
+            'state' => 'inprogress',
+            'timestart' => time(),
+            'preview' => 0,
+            'timemodified' => time(),
+            'timemodifiedoffline' => 0,
+            'sumgrades' => null,
+        ]);
+
+        // The course holding the attempt is locked, as it should be.
+        $this->assertTrue(
+            quiz_lock::is_locked_for((int) $student->id, (int) $quizcourse->id)
+        );
+
+        // The other course must not be, and that is the scope generate_quiz has
+        // to use or the drawer contradicts itself.
+        $this->assertFalse(
+            quiz_lock::is_locked_for((int) $student->id, (int) $othercourse->id),
+            'Quiz generation in an unrelated course must not see this attempt.'
+        );
+    }
 }

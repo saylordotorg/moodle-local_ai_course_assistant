@@ -3089,6 +3089,26 @@ define([
     };
 
     /**
+     * Enable or disable the practice-quiz button.
+     *
+     * Separate from setModeButtonsEnabled because the quiz button is not a mode
+     * button, so the quiz-lock path was greying out the textarea and every chip
+     * while leaving live the one control that starts an AI call the server is
+     * about to refuse.
+     *
+     * @param {boolean} enabled
+     */
+    const setQuizButtonEnabled = function(enabled) {
+        if (!root) {
+            return;
+        }
+        const quizBtn = root.querySelector('.local-ai-course-assistant__btn-quiz');
+        if (quizBtn) {
+            quizBtn.disabled = !enabled;
+        }
+    };
+
+    /**
      * Update the voice panel copy and CTA state.
      *
      * @param {{title?:string,text?:string,status?:string,buttonText?:string,disabled?:boolean}} config
@@ -6101,6 +6121,7 @@ define([
         showStarters: showStarters,
         setBottomMode: setBottomMode,
         setModeButtonsEnabled: setModeButtonsEnabled,
+        setQuizButtonEnabled: setQuizButtonEnabled,
         configureVoicePanel: configureVoicePanel,
         renderHistoryPanel: renderHistoryPanel,
         showTopicPicker: showTopicPicker,

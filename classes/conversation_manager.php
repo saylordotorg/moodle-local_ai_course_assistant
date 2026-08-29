@@ -643,14 +643,39 @@ class conversation_manager {
             return true;
         }
 
-        // Any fully bracketed note that names an internal type.
-        if (preg_match('/^\[[^\]]*(exception|throwable|error)[^\]]*\]$/i', $text)) {
+        // The two patterns below match a type-name SHAPE, not the substrings
+        // "exception", "throwable" or "error" anywhere in the text.
+        //
+        // Matching substrings looked equivalent and is not: "error" is a
+        // substring of "terrorism", so a one-word reply of "Terrorism." was
+        // being replaced with the failure notice -- and because
+        // get_history_for_api() applies the same scrub, the model was then told
+        // it had previously failed to answer when it had answered correctly.
+        // A bare link to .../wiki/Error_analysis did the same. Deleting a real
+        // answer is far worse than leaving an ugly one, so this errs the other
+        // way: it wants a namespace separator, or a class-like identifier
+        // ending in Exception/Error/Throwable.
+        // Three accepted shapes, and nothing else:
+        //   a\b\moodle_exception   namespaced, any leaf
+        //   dml_write_exception     snake_case with the suffix after an "_"
+        //   TypeError               CamelCase with a capitalised suffix
+        // The underscore and the capital are what keep "Terror" out: it has an
+        // "error" in it but no boundary before one, so it is prose.
+        $name = '[A-Za-z_][A-Za-z0-9_]*';
+        $classlike = '(?:'
+            . '\\\\?' . $name . '(?:\\\\' . $name . ')+'
+            . '|' . $name . '_(?:exception|error|throwable)'
+            . '|' . $name . '(?:Exception|Error|Throwable)'
+            . ')';
+
+        // A fully bracketed note whose content is a type name.
+        if (preg_match('/^\[\s*' . $classlike . '\s*\]$/', $text)) {
             return true;
         }
 
-        // A bare type name and nothing else: no whitespace, so it cannot be
-        // prose. Covers an unbracketed get_class() leak from any future path.
-        if (preg_match('/^\S*(exception|throwable|error)\S*$/i', $text)) {
+        // A bare type name and nothing else. Covers an unbracketed get_class()
+        // leak from any future path.
+        if (preg_match('/^' . $classlike . '$/', $text)) {
             return true;
         }
 
