@@ -56,6 +56,32 @@ class observer {
         'local_ai_course_assistant_avatar_sess',
         'local_ai_course_assistant_chunks',
         'local_ai_course_assistant_keywords',
+        'local_ai_course_assistant_feedback',
+        'local_ai_course_assistant_msg_ratings',
+        'local_ai_course_assistant_obj_att',
+        'local_ai_course_assistant_review_res',
+        'local_ai_course_assistant_outreach_log',
+    ];
+
+    /**
+     * Child tables with no courseid of their own, keyed to a parent that is.
+     *
+     * Deleting the parent without these leaves rows that point at nothing --
+     * and course ids are reused, so an orphan can resurface attached to an
+     * unrelated course. sbx_rec is the one that matters most: it holds speech
+     * transcripts and storage keys, which is the same retention argument the
+     * class docblock makes for conversations.
+     *
+     * Ordered child-before-parent, and each pair names the parent's own table
+     * so the id lookup happens while the parent rows still exist.
+     *
+     * @var array<string, array{0: string, 1: string}> child table => [parent
+     *      table, child column holding the parent id].
+     */
+    private const CHILD_TABLES = [
+        'local_ai_course_assistant_obj_links' => ['local_ai_course_assistant_objs', 'objectiveida'],
+        'local_ai_course_assistant_sbx_rec' => ['local_ai_course_assistant_sbx_assign', 'assignid'],
+        'local_ai_course_assistant_sbx_topic' => ['local_ai_course_assistant_sbx_assign', 'assignid'],
     ];
 
     /**
@@ -80,6 +106,35 @@ class observer {
         $courseid = (int) $event->objectid;
         if ($courseid <= 0) {
             return;
+        }
+
+        // Children first: their parent ids have to still be resolvable.
+        foreach (self::CHILD_TABLES as $child => [$parent, $column]) {
+            try {
+                if (!$DB->get_manager()->table_exists(new \xmldb_table($child))
+                    || !$DB->get_manager()->table_exists(new \xmldb_table($parent))) {
+                    continue;
+                }
+                $parentids = $DB->get_fieldset_select($parent, 'id', 'courseid = :courseid',
+                    ['courseid' => $courseid]);
+                if (empty($parentids)) {
+                    continue;
+                }
+                [$insql, $inparams] = $DB->get_in_or_equal($parentids, SQL_PARAMS_NAMED, 'pid');
+                $DB->delete_records_select($child, "{$column} {$insql}", $inparams);
+
+                // obj_links joins two objectives; a link is dead if either end
+                // belonged to this course, so sweep the second column too.
+                if ($child === 'local_ai_course_assistant_obj_links') {
+                    [$insql2, $inparams2] = $DB->get_in_or_equal($parentids, SQL_PARAMS_NAMED, 'pidb');
+                    $DB->delete_records_select($child, "objectiveidb {$insql2}", $inparams2);
+                }
+            } catch (\Throwable $e) {
+                debugging(
+                    "SOLA: could not clear {$child} for deleted course {$courseid}: " . $e->getMessage(),
+                    DEBUG_DEVELOPER
+                );
+            }
         }
 
         foreach (self::COURSE_TABLES as $table) {

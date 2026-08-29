@@ -87,6 +87,27 @@ final class prompt_budget_window_test extends \advanced_testcase {
     }
 
     /**
+     * The window table must not overstate a model's context.
+     *
+     * Claiming a million tokens for a 200k model is the direction that breaks
+     * things, and the table reads as a reference someone will copy.
+     */
+    public function test_base_claude_4_models_are_200k_not_1m(): void {
+        set_config('model', 'claude-sonnet-4', 'local_ai_course_assistant');
+        $this->assertSame(200000, context_builder::resolve_window_tokens(0));
+
+        set_config('model', 'claude-opus-4', 'local_ai_course_assistant');
+        $this->assertSame(200000, context_builder::resolve_window_tokens(0));
+
+        // The 4.6+ variants really are 1M, and longest-prefix must reach them.
+        set_config('model', 'claude-sonnet-4-6', 'local_ai_course_assistant');
+        $this->assertSame(1000000, context_builder::resolve_window_tokens(0));
+
+        set_config('model', 'claude-opus-4-8', 'local_ai_course_assistant');
+        $this->assertSame(1000000, context_builder::resolve_window_tokens(0));
+    }
+
+    /**
      * A large window lifts the budget well past the character count that a real
      * four-chunk BUS 101 turn assembled to on dev (27,991 characters).
      */
@@ -107,16 +128,39 @@ final class prompt_budget_window_test extends \advanced_testcase {
     }
 
     /**
-     * The configured setting is a floor. An administrator who raised the number
-     * deliberately is never argued back down by the model's window.
+     * A number an administrator typed wins, in both directions.
+     *
+     * Treating the setting only as a floor would silently ignore the site that
+     * lowered it to hold per-turn cost down -- the setting's own description
+     * promises that lowering it reduces cost, and a derive step that only ever
+     * raised would make that promise false with nothing on screen to say so.
      */
-    public function test_configured_budget_is_a_floor(): void {
-        set_config('model', 'gpt-4o-mini', 'local_ai_course_assistant');
+    public function test_an_explicit_setting_is_authoritative_both_ways(): void {
+        set_config('model', 'gemini-2.5-flash', 'local_ai_course_assistant');
+
+        // Raised deliberately: kept.
         $this->assertSame(200000, context_builder::resolve_budget_chars(200000, 0, 'en'));
 
-        // Including when the window is small enough to clamp the derived value.
+        // Lowered deliberately, to control cost: also kept.
+        $this->assertSame(12000, context_builder::resolve_budget_chars(12000, 0, 'en'));
+
+        // Left at the shipped default: the model's window decides.
+        $this->assertGreaterThan(
+            context_builder::DEFAULT_BUDGET_CHARS,
+            context_builder::resolve_budget_chars(context_builder::DEFAULT_BUDGET_CHARS, 0, 'en')
+        );
+    }
+
+    /**
+     * A small self-hosted window clamps the derived value.
+     */
+    public function test_small_window_clamps_the_derived_budget(): void {
+        set_config('model', 'gemini-2.5-flash', 'local_ai_course_assistant');
         set_config('backend_context_tokens', 4096, 'local_ai_course_assistant');
-        $this->assertSame(36000, context_builder::resolve_budget_chars(36000, 0, 'en'));
+        $this->assertSame(
+            context_builder::DEFAULT_BUDGET_CHARS,
+            context_builder::resolve_budget_chars(context_builder::DEFAULT_BUDGET_CHARS, 0, 'en')
+        );
     }
 
     /**

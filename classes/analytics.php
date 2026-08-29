@@ -101,14 +101,10 @@ class analytics {
         $avgmessages = $activestudents > 0 ? round($totalmessages / $activestudents, 1) : 0;
 
         // User messages count (for off-topic rate calculation).
-        $usermessages = $activestudents > 0 || $sitewide
-            ? (int) $DB->count_records_sql(
-                "SELECT COUNT(m.id)
-                   FROM {local_ai_course_assistant_msgs} m
-                  WHERE m.role = 'user'{$coursewhere}{$timewhere}",
-                $params
-            )
-            : 0;
+        $sql = "SELECT COUNT(m.id)
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE m.role = 'user'{$coursewhere}{$timewhere}";
+        $usermessages = (int) $DB->count_records_sql($sql, $params);
 
         // Off-topic conversations (those with offtopic_count > 0).
         $convwhere = $sitewide ? '' : ' WHERE c.courseid = :courseid';

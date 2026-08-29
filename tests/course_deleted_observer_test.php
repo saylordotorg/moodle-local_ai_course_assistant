@@ -86,6 +86,85 @@ final class course_deleted_observer_test extends \advanced_testcase {
         );
     }
 
+    /**
+     * Every table with a courseid is cleared, and every orphan-able child too.
+     *
+     * The first version of this observer covered 23 tables and missed five more
+     * that carry a courseid -- including learner free text in feedback and
+     * message ratings -- plus three children keyed to parents it did delete.
+     * Enumerating install.xml rather than re-listing the constant is the point:
+     * a table added later fails this test instead of quietly leaking.
+     */
+    public function test_every_course_scoped_table_is_cleared(): void {
+        global $CFG, $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $xml = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/db/install.xml');
+        preg_match_all('/<TABLE NAME="([^"]+)"(.*?)<\/TABLE>/s', $xml, $matches, PREG_SET_ORDER);
+
+        // Documented, deliberate exclusions -- both are argued in the observer's
+        // own docblock, so a change of mind has to edit that reasoning too.
+        $keep = [
+            'local_ai_course_assistant_audit',
+            'local_ai_course_assistant_email_optout',
+        ];
+
+        $observed = file_get_contents($CFG->dirroot . '/local/ai_course_assistant/classes/observer.php');
+        $missing = [];
+        foreach ($matches as $match) {
+            [, $table, $body] = $match;
+            if (!str_contains($body, 'NAME="courseid"') || in_array($table, $keep, true)) {
+                continue;
+            }
+            if (!str_contains($observed, "'{$table}'")) {
+                $missing[] = $table;
+            }
+        }
+
+        $this->assertSame([], $missing,
+            'These tables carry a courseid and would survive the course being deleted.');
+    }
+
+    /**
+     * A child row whose parent belonged to the course goes with it.
+     *
+     * Course ids are reused, so an orphan does not merely waste a row -- it can
+     * resurface attached to an unrelated course.
+     */
+    public function test_child_rows_do_not_outlive_their_parent(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $assignid = $DB->insert_record('local_ai_course_assistant_sbx_assign', (object) [
+            'courseid' => $course->id,
+            'name' => 'Practice talk',
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $DB->insert_record('local_ai_course_assistant_sbx_topic', (object) [
+            'assignid' => $assignid,
+            'title' => 'Topic',
+            'instructions' => '',
+            'instructionsformat' => 1,
+            'sortorder' => 0,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+
+        $this->assertSame(1, $DB->count_records('local_ai_course_assistant_sbx_topic',
+            ['assignid' => $assignid]));
+
+        delete_course($course->id, false);
+
+        $this->assertSame(0, $DB->count_records('local_ai_course_assistant_sbx_topic',
+            ['assignid' => $assignid]),
+            'A Soapbox topic outlived the assignment and the course it belonged to.');
+    }
+
     public function test_the_audit_trail_survives_the_course(): void {
         global $DB;
         $this->resetAfterTest();

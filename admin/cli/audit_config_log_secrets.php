@@ -26,8 +26,14 @@
  * a property of how the value was written, so a site that has this plugin
  * configured correctly can still be leaking another plugin's key.
  *
+ * Both stored columns are covered. /report/configlog shows `value` as New value
+ * and `oldvalue` as Original value, so a credential that has since been changed
+ * or cleared is still on screen under the second one. That also means rotating a
+ * key writes the retired key into the next row's `oldvalue` -- run this again
+ * after any rotation.
+ *
  * No key value is ever printed. Rows are identified by plugin, setting name,
- * length, and date, which is enough to decide what to rotate.
+ * column, length, and date, which is enough to decide what to rotate.
  *
  * Usage:
  *   php admin/cli/audit_config_log_secrets.php
@@ -79,15 +85,19 @@ if (empty($exposed)) {
 
 cli_writeln(count($exposed) . ' credential(s) stored in the clear in config_log:');
 cli_writeln('');
-cli_writeln(sprintf('%-8s %-34s %-26s %-6s %s', 'ID', 'PLUGIN', 'SETTING', 'LEN', 'WRITTEN'));
+cli_writeln(sprintf('%-8s %-30s %-26s %-9s %-5s %s',
+    'ID', 'PLUGIN', 'SETTING', 'COLUMN', 'LEN', 'WRITTEN'));
 
 $plugins = [];
 foreach ($exposed as $row) {
     cli_writeln(sprintf(
-        '%-8d %-34s %-26s %-6d %s',
+        '%-8d %-30s %-26s %-9s %-5d %s',
         $row['id'],
         $row['plugin'] !== '' ? $row['plugin'] : 'core',
         $row['name'],
+        // "previous" is config_log.oldvalue, which /report/configlog renders as
+        // Original value -- every bit as readable as the current one.
+        $row['column'] === 'oldvalue' ? 'previous' : 'current',
         $row['length'],
         userdate($row['timemodified'], get_string('strftimedate', 'langconfig'))
     ));
@@ -103,14 +113,20 @@ if (trim((string) $options['ids']) !== '') {
 
 if (!$options['redact'] && empty($ids)) {
     cli_writeln('Every value above is readable at /report/configlog by anyone who can');
-    cli_writeln('reach site administration. Treat each one as disclosed and rotate it.');
+    cli_writeln('reach site administration -- a "previous" row shows there under');
+    cli_writeln('Original value, and is just as readable as a current one.');
+    cli_writeln('Treat each one as disclosed and rotate it.');
     cli_writeln('Re-run with --redact to overwrite the stored values.');
     exit(1);
 }
 
-$count = \local_ai_course_assistant\config_log_audit::redact($ids);
-cli_writeln("Redacted {$count} row(s). The rows remain; only the values were overwritten.");
+$count = \local_ai_course_assistant\config_log_audit::redact($ids, $exposed);
+cli_writeln("Redacted {$count} value(s). The rows remain; only the values were overwritten.");
 cli_writeln('');
 cli_writeln('Redaction is not rotation. These keys were readable before this ran, so');
 cli_writeln('rotate them at the vendor: ' . implode(', ', array_keys($plugins)) . '.');
+cli_writeln('');
+cli_writeln('Then run this again. Rotating through the settings form writes the key');
+cli_writeln('you retired into the next log row, so the act of fixing this re-creates');
+cli_writeln('the exposure one row further down.');
 exit(0);

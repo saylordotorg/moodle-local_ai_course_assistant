@@ -33,6 +33,14 @@ defined('MOODLE_INTERNAL') || die();
  * ratio is the argument for this class: the exposure is not hard to fix, it is
  * hard to notice.
  *
+ * config_log stores two values per row and /report/configlog renders both:
+ * `value` as New value and `oldvalue` as Original value. Scanning only `value`
+ * misses every credential that has since been changed -- and makes rotation
+ * actively harmful, because set_config() writes the key being retired into the
+ * next row's `oldvalue`. An admin who follows this tool's own advice would mint
+ * a fresh exposure of the key they had just rotated away from. Both columns are
+ * scanned and both are overwritten.
+ *
  * This class never returns, prints, or logs a secret value. It reports where
  * the exposure is and, on request, overwrites it.
  *
@@ -81,46 +89,61 @@ class config_log_audit {
     private const MIN_SECRET_LENGTH = 12;
 
     /**
-     * Config-log rows whose value looks like a credential in the clear.
+     * Config-log rows holding a credential in the clear, in either column.
+     *
+     * The name filter runs in SQL and the rows stream: config_log on a site
+     * upgraded over several years is large, and this runs from a CLI that may
+     * have a modest memory limit. Pulling the whole table in one
+     * get_records_sql -- values included -- was not a size anyone should have to
+     * discover in production.
      *
      * @param int|null $since Only consider rows modified at or after this time.
-     * @return array List of ['id', 'plugin', 'name', 'length', 'timemodified'].
-     *               The value itself is never included.
+     * @return array List of ['id', 'plugin', 'name', 'column', 'length',
+     *               'timemodified']. No value is ever included.
      */
     public static function find_exposed(?int $since = null): array {
         global $DB;
 
         $params = [];
-        $where = '';
+        $clauses = [];
+        foreach (self::SECRET_NAME_FRAGMENTS as $i => $fragment) {
+            // sql_like's third argument is $casesensitive; false is portable
+            // across the DB drivers Moodle supports, unlike wrapping the column
+            // in a LOWER() the DML layer does not expose.
+            $clauses[] = $DB->sql_like('name', ':frag' . $i, false);
+            $params['frag' . $i] = '%' . $DB->sql_like_escape($fragment) . '%';
+        }
+        $where = '(' . implode(' OR ', $clauses) . ')';
         if ($since !== null) {
-            $where = ' WHERE timemodified >= :since';
+            $where .= ' AND timemodified >= :since';
             $params['since'] = $since;
         }
 
-        // Pull names and lengths rather than values: nothing in this method
-        // needs the secret, so nothing in this method reads it.
-        $rows = $DB->get_records_sql(
-            'SELECT id, plugin, name, value, timemodified FROM {config_log}' . $where . ' ORDER BY id DESC',
-            $params
-        );
-
         $exposed = [];
-        foreach ($rows as $row) {
+        $rs = $DB->get_recordset_select('config_log', $where, $params, 'id DESC',
+            'id, plugin, name, value, oldvalue, timemodified');
+        foreach ($rs as $row) {
+            // The SQL filter is a superset -- it cannot express the NOT_SECRETS
+            // allowlist -- so the authoritative decision still happens here.
             if (!self::is_secret_name((string) $row->name)) {
                 continue;
             }
-            $value = (string) $row->value;
-            if (!self::looks_exposed($value)) {
-                continue;
+            foreach (['value', 'oldvalue'] as $column) {
+                $candidate = (string) ($row->{$column} ?? '');
+                if (!self::looks_exposed($candidate)) {
+                    continue;
+                }
+                $exposed[] = [
+                    'id' => (int) $row->id,
+                    'plugin' => (string) $row->plugin,
+                    'name' => (string) $row->name,
+                    'column' => $column,
+                    'length' => strlen($candidate),
+                    'timemodified' => (int) $row->timemodified,
+                ];
             }
-            $exposed[] = [
-                'id' => (int) $row->id,
-                'plugin' => (string) $row->plugin,
-                'name' => (string) $row->name,
-                'length' => strlen($value),
-                'timemodified' => (int) $row->timemodified,
-            ];
         }
+        $rs->close();
 
         return $exposed;
     }
@@ -168,13 +191,18 @@ class config_log_audit {
      * question the config log exists to answer, and deleting it to hide a
      * credential would destroy that. Only the value is replaced.
      *
+     * Each exposed column is overwritten independently, so a row whose `value`
+     * is a live key and whose `oldvalue` is the key it replaced loses both.
+     *
      * @param array $ids Row ids to redact; empty means every exposed row.
-     * @return int Number of rows redacted.
+     * @param array|null $targets Pre-computed find_exposed() result, to avoid
+     *                            scanning the table twice.
+     * @return int Number of column values overwritten.
      */
-    public static function redact(array $ids = []): int {
+    public static function redact(array $ids = [], ?array $targets = null): int {
         global $DB;
 
-        $targets = self::find_exposed();
+        $targets = $targets ?? self::find_exposed();
         if (!empty($ids)) {
             $wanted = array_map('intval', $ids);
             $targets = array_filter($targets, function ($row) use ($wanted) {
@@ -184,7 +212,9 @@ class config_log_audit {
 
         $count = 0;
         foreach ($targets as $row) {
-            $DB->set_field('config_log', 'value', self::REDACTED, ['id' => $row['id']]);
+            // Column comes from this class's own fixed pair, never from input.
+            $column = $row['column'] === 'oldvalue' ? 'oldvalue' : 'value';
+            $DB->set_field('config_log', $column, self::REDACTED, ['id' => $row['id']]);
             $count++;
         }
 

@@ -1969,6 +1969,6 @@ $string['settings:money_nonnegative_invalid'] = '请输入 0 或更大的金额�
 
 $string['chat:turn_failed'] = '本次回复未能完成。这不是你操作导致的——请再试一次。';
 $string['settings:prompt_budget_mode'] = '系统提示词预算模式';
-$string['settings:prompt_budget_mode_desc'] = '决定系统提示词字符预算的方式。<strong>由模型推导</strong>会算出所配置的模型实际能提供多少空间——即其上下文窗口，减去预留的回复和对话历史——然后在该值与下方固定预算之间取较大者。这是推荐设置：固定数值已有两次是通过测量单一配置得出的，而两次都在另一种配置下显得过小。<strong>固定</strong>只使用下方的数值。自托管后端则应改为设置后端上下文窗口，该设置始终优先。';
+$string['settings:prompt_budget_mode_desc'] = '决定系统提示词字符预算的方式。<strong>由模型推导</strong>会算出所配置的模型实际能提供多少空间——即其上下文窗口，减去预留的回复和对话历史——并使用该值，同时设有上限，以免很大的窗口成为很大提示词的理由。此设置仅在下方字符预算保持默认的 36,000 时生效：一旦你改动那个数字，就以它为准，无论调高还是调低，因为管理员亲手填写的数字是决定，而非猜测。<strong>固定</strong>始终使用下方的数值。自托管后端应设置后端上下文窗口，该设置优先于此处的一切。';
 $string['settings:prompt_budget_mode_auto'] = '由模型推导（推荐）';
 $string['settings:prompt_budget_mode_fixed'] = '固定字符预算';

@@ -420,26 +420,21 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
      * a merge restore or an import is not a context in which someone else's
      * conversations should appear, and neither carries users anyway.
      *
-     * Emitted for the first section only. Every section gets this callback, and
-     * course-scoped rows repeated per section would bloat the archive for no
-     * gain. Restore is idempotent regardless -- every process method here skips
-     * a row that already exists -- so a new-course restore seeing both copies is
-     * harmless.
+     * Emitted for EVERY section, deliberately. Restricting it to the course's
+     * first section is the obvious way to avoid repeating course-scoped rows,
+     * and it reintroduces the bug on a narrower path: sections are individually
+     * deselectable in the Include step of both Backup and Import, so deselecting
+     * the first one produced an archive with no SOLA configuration at all --
+     * silently, again. The payload is one config row plus a handful of setting
+     * names, which is nothing against a course backup, and restore is idempotent
+     * three ways over: every process method below returns early on a row that
+     * already exists. Emitting everywhere also drops the per-section
+     * get_field_sql this used to run at define time.
      *
      * @return backup_plugin_element|null
      */
     protected function define_section_plugin_structure() {
-        global $DB;
-
         $courseid = (int) $this->task->get_courseid();
-        $sectionid = (int) $this->task->get_sectionid();
-        $firstsection = (int) $DB->get_field_sql(
-            "SELECT MIN(id) FROM {course_sections} WHERE course = :courseid",
-            ['courseid' => $courseid]
-        );
-        if ($sectionid !== $firstsection) {
-            return null;
-        }
 
         $plugin = $this->get_plugin_element(null, null, null);
         $wrapper = new backup_nested_element($this->get_recommended_name());

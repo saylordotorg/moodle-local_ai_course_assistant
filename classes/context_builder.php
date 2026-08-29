@@ -68,9 +68,13 @@ class context_builder {
         'gpt-4o' => 128000,
         'gpt-4.1' => 1047576,
         'claude-haiku-4-5' => 200000,
-        'claude-sonnet-4' => 1000000,
+        'claude-sonnet-4' => 200000,
+        'claude-sonnet-4-6' => 1000000,
         'claude-sonnet-5' => 1000000,
-        'claude-opus-4' => 1000000,
+        'claude-opus-4' => 200000,
+        'claude-opus-4-6' => 1000000,
+        'claude-opus-4-7' => 1000000,
+        'claude-opus-4-8' => 1000000,
         'claude-opus-5' => 1000000,
         'mistral-small' => 128000,
     ];
@@ -85,8 +89,27 @@ class context_builder {
      */
     private const DERIVED_BUDGET_CAP = 120000;
 
+    /**
+     * The shipped default for prompt_budget_chars.
+     *
+     * Used to tell an administrator's deliberate number from the one we chose
+     * for them. A stored value that differs from this was typed by a person and
+     * is treated as authoritative; a value equal to it is our own default and
+     * the model's window is the better answer.
+     */
+    public const DEFAULT_BUDGET_CHARS = 36000;
+
     public const IDENTITY_MIN_CHARS = 4000;
 
+    /**
+     * Historical hard ceiling. Nothing reads this.
+     *
+     * Kept only so the number in old prompt-debug logs and release notes can
+     * still be looked up. The section assembler's budget is the live limit; see
+     * resolve_budget_chars(). Removed truncate_prompt() in v7.2.4 -- it had had
+     * no callers for several releases and, at a derived budget of 120,000, a
+     * dormant substr at 60,000 was a trap waiting for whoever wired it back up.
+     */
     private const MAX_PROMPT_LENGTH = 60000;
 
     /** v5.10.0: hard lower bound so safety/identity always survive the clamp. */
@@ -638,9 +661,12 @@ class context_builder {
             );
         }
 
-        // Assemble within budget. The legacy MAX_PROMPT_LENGTH sets the upper
-        // bound; an admin-configurable budget below it lets operators trade
-        // detail for tokens.
+        // Assemble within budget. MAX_PROMPT_LENGTH no longer bounds anything --
+        // the only thing that ever consulted it was truncate_prompt(), which has
+        // had no callers since the section assembler replaced it. Saying it sets
+        // the upper bound mattered once a 120,000-character budget became
+        // reachable, because it reads as a blind substr waiting at 60,000. There
+        // is none; the budget is the only limit.
         // v5.0.0 patch (Tomi UT round 2): code-level fallback raised
         // 10000 → 12000 to give the new current_page_content section
         // headroom alongside the existing learner + behavior sections.
@@ -657,7 +683,9 @@ class context_builder {
         // 36,000 clears the observed worst case with real margin. Deriving this
         // from the model's context window would be the durable answer.
         $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
-        $budget = ($rawbudget === false || $rawbudget === '') ? 36000 : (int) $rawbudget;
+        $budget = ($rawbudget === false || $rawbudget === '')
+            ? self::DEFAULT_BUDGET_CHARS
+            : (int) $rawbudget;
 
         // v7.2.4: derive from the model's context window where it is known. The
         // setting remains the floor; see resolve_budget_chars().
@@ -1068,6 +1096,7 @@ class context_builder {
 
         $model = strtolower($model);
         $best = 0;
+        $window = 0;
         foreach (self::MODEL_CONTEXT_WINDOWS as $prefix => $tokens) {
             // Longest matching prefix wins, so claude-sonnet-5 does not resolve
             // through a shorter claude-sonnet entry.
@@ -1087,9 +1116,17 @@ class context_builder {
      * Both were set by measuring one configuration and assuming it generalised.
      * The window the model actually offers is the durable input.
      *
-     * The configured setting stays the floor, so an administrator who raised it
-     * is never overridden downward, and the derived value is capped so a
-     * million-token window does not license a million-character prompt.
+     * A configured value that differs from the shipped default was typed by an
+     * administrator and wins outright, in BOTH directions. Treating it only as a
+     * floor would quietly ignore the site that lowered it to hold per-turn cost
+     * down -- the setting's own description promises "lower values reduce
+     * per-turn cost", and a derived budget that overrode it downward-only would
+     * make that promise false with nothing on screen to say so. Deriving applies
+     * to the sites that never expressed a preference, which is the case it was
+     * meant for.
+     *
+     * The derived value is capped so a million-token window does not license a
+     * million-character prompt, billed on every message.
      *
      * @param int $configured The prompt_budget_chars setting.
      * @param int $courseid
@@ -1098,6 +1135,10 @@ class context_builder {
      */
     public static function resolve_budget_chars(int $configured, int $courseid, string $lang): int {
         if ((string) get_config('local_ai_course_assistant', 'prompt_budget_mode') === 'fixed') {
+            return $configured;
+        }
+
+        if ($configured !== self::DEFAULT_BUDGET_CHARS) {
             return $configured;
         }
 
@@ -1119,9 +1160,10 @@ class context_builder {
             $lang
         );
 
-        // Never below what the administrator asked for: a small window clamps
-        // through effective_budget_chars above, but the setting is a floor for
-        // the derived value, not something the model gets to argue down.
+        // A small window has already clamped $ceiling through
+        // effective_budget_chars() above, and the caller clamps again against
+        // backend_context_tokens immediately after this returns -- so a floor
+        // applied here cannot escape onto a backend that cannot hold it.
         return max($configured, $ceiling);
     }
 
@@ -2227,28 +2269,4 @@ class context_builder {
         return $base;
     }
 
-    /**
-     * Truncate the prompt if it exceeds the max length.
-     *
-     * Strategy: drop activity details first, then section summaries.
-     *
-     * @param string $prompt
-     * @param int $courseid
-     * @return string
-     */
-    private static function truncate_prompt(string $prompt, int $courseid): string {
-        if (strlen($prompt) <= self::MAX_PROMPT_LENGTH) {
-            return $prompt;
-        }
-
-        // Try removing activity lines ("  Activities: ..." lines).
-        $prompt = preg_replace('/\n  Activities: [^\n]+/', '', $prompt);
-
-        if (strlen($prompt) <= self::MAX_PROMPT_LENGTH) {
-            return $prompt;
-        }
-
-        // Hard truncate as last resort.
-        return substr($prompt, 0, self::MAX_PROMPT_LENGTH - 3) . '...';
-    }
 }

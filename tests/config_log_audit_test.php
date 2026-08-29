@@ -34,7 +34,7 @@ final class config_log_audit_test extends \advanced_testcase {
      * @param string $value
      * @return int
      */
-    private function log_row(string $plugin, string $name, string $value): int {
+    private function log_row(string $plugin, string $name, string $value, string $oldvalue = ''): int {
         global $DB;
         return (int) $DB->insert_record('config_log', (object) [
             'userid' => 2,
@@ -42,7 +42,7 @@ final class config_log_audit_test extends \advanced_testcase {
             'plugin' => $plugin,
             'name' => $name,
             'value' => $value,
-            'oldvalue' => '',
+            'oldvalue' => $oldvalue,
         ]);
     }
 
@@ -113,6 +113,57 @@ final class config_log_audit_test extends \advanced_testcase {
     /**
      * Redaction removes the value and keeps the row.
      */
+    public function test_a_rotated_key_is_still_exposed_in_oldvalue(): void {
+        $this->resetAfterTest(true);
+
+        // The shape a rotation leaves behind: the new key in value, the key it
+        // replaced in oldvalue. /report/configlog renders both. A scan of value
+        // alone calls this site clean while the retired key is still on screen.
+        $id = $this->log_row('local_ai_course_assistant', 'apikey',
+            str_repeat('n', 53), str_repeat('o', 53));
+
+        $found = config_log_audit::find_exposed();
+        $columns = array_column($found, 'column');
+        sort($columns);
+        $this->assertSame(['oldvalue', 'value'], $columns);
+        $this->assertSame([$id, $id], array_column($found, 'id'));
+    }
+
+    /**
+     * A cleared key leaves nothing in value and the whole key in oldvalue.
+     *
+     * This is the case that made the value-only scan actively misleading: the
+     * row it needs to find is the one whose value column is empty.
+     */
+    public function test_a_cleared_key_is_found_in_oldvalue_alone(): void {
+        $this->resetAfterTest(true);
+
+        $this->log_row('local_saylorcode', 'jobeapikey', '', str_repeat('p', 64));
+
+        $found = config_log_audit::find_exposed();
+        $this->assertCount(1, $found);
+        $this->assertSame('oldvalue', $found[0]['column']);
+        $this->assertSame(64, $found[0]['length']);
+    }
+
+    /**
+     * Redaction clears both columns of a rotation row.
+     */
+    public function test_redaction_covers_both_columns(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $id = $this->log_row('local_ai_course_assistant', 'apikey',
+            str_repeat('n', 53), str_repeat('o', 53));
+
+        $this->assertSame(2, config_log_audit::redact());
+        $this->assertSame([], config_log_audit::find_exposed());
+
+        $row = $DB->get_record('config_log', ['id' => $id]);
+        $this->assertSame(config_log_audit::REDACTED, $row->value);
+        $this->assertSame(config_log_audit::REDACTED, $row->oldvalue);
+    }
+
     public function test_redaction_preserves_the_audit_trail(): void {
         global $DB;
         $this->resetAfterTest(true);
