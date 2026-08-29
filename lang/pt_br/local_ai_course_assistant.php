@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'O modelo a ser utilizado. O padrão depende do
 $string['settings:apibaseurl'] = 'URL Base da API';
 $string['settings:apibaseurl_desc'] = 'URL base para a API. Preenchida automaticamente por provedor, mas pode ser substituída. Deixe em branco para usar o padrão do provedor.';
 $string['settings:systemprompt'] = 'Modelo de Prompt do Sistema';
-$string['settings:systemprompt_desc'] = 'Prompt do sistema enviado à IA. Use os marcadores: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Prompt do sistema enviado à IA. Use os marcadores: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Você é um tutor de IA útil para o curso "{{coursename}}". O papel do estudante é {{userrole}}.
 
 Ajude o estudante a compreender o material do curso. Seja encorajador, claro e pedagogicamente consistente.';
@@ -1953,3 +1953,9 @@ $string['quizlock:window_desc'] = 'Por quanto tempo uma tentativa em um question
 
 $string['emergency:chat_stopped'] = 'O [[tutorshort]] está pausado no momento. Os materiais do seu curso não foram afetados, e isso não foi causado por você — tente novamente mais tarde.';
 $string['settings:money_nonnegative_invalid'] = 'Informe um valor igual ou maior que 0, com no máximo duas casas decimais (por exemplo, 25 ou 25.50).';
+
+$string['chat:turn_failed'] = 'Não foi possível concluir esta resposta. Nada do que você fez causou isso — tente novamente.';
+$string['settings:prompt_budget_mode'] = 'Modo de orçamento do prompt do sistema';
+$string['settings:prompt_budget_mode_desc'] = 'Como o orçamento de caracteres do prompt do sistema é definido. <strong>Derivar do modelo</strong> calcula o espaço que o modelo configurado realmente oferece — sua janela de contexto, menos a resposta reservada e o histórico da conversa — e usa o maior entre esse valor e o orçamento fixo abaixo. É a configuração recomendada: um número fixo já foi definido duas vezes medindo uma única configuração e duas vezes se mostrou pequeno demais em outra. <strong>Fixo</strong> usa somente o número abaixo. Um backend auto-hospedado deve, em vez disso, informar a janela de contexto do backend, que sempre tem precedência.';
+$string['settings:prompt_budget_mode_auto'] = 'Derivar do modelo (recomendado)';
+$string['settings:prompt_budget_mode_fixed'] = 'Orçamento fixo de caracteres';

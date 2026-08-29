@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Modelul de utilizat. Valoarea implicită depin
 $string['settings:apibaseurl'] = 'URL de bază API';
 $string['settings:apibaseurl_desc'] = 'URL-ul de bază API. Completat automat în funcție de furnizor, dar poate fi suprascris. Lăsați gol pentru a utiliza valoarea implicită a furnizorului.';
 $string['settings:systemprompt'] = 'Șablon prompt de sistem';
-$string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Ești un tutore AI util pentru cursul „{{coursename}}". Rolul studentului este {{userrole}}.
 
 Ajută studentul să înțeleagă conținutul cursului. Fii încurajator, clar și riguros din punct de vedere pedagogic.';
@@ -1930,3 +1930,9 @@ $string['quizlock:window_desc'] = 'Cât timp o încercare la un test fără limi
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] este pus pe pauză în acest moment. Materialele cursului nu sunt afectate și nu este din vina ta — încearcă din nou mai târziu.';
 $string['settings:money_nonnegative_invalid'] = 'Introdu o sumă de 0 sau mai mare, cu cel mult două zecimale (de exemplu 25 sau 25.50).';
+
+$string['chat:turn_failed'] = 'Acest răspuns nu a putut fi finalizat. Nimic din ce ai făcut nu a cauzat asta — încearcă din nou.';
+$string['settings:prompt_budget_mode'] = 'Modul bugetului promptului de sistem';
+$string['settings:prompt_budget_mode_desc'] = 'Cum se stabilește bugetul de caractere al promptului de sistem. <strong>Derivă din model</strong> calculează spațiul pe care îl oferă cu adevărat modelul configurat — fereastra sa de context, minus răspunsul rezervat și istoricul conversației — și folosește valoarea mai mare dintre aceasta și bugetul fix de mai jos. Aceasta este setarea recomandată: un număr fix a fost stabilit deja de două ori măsurând o singură configurație și de două ori s-a dovedit prea mic în alta. <strong>Fix</strong> folosește doar numărul de mai jos. Un backend găzduit propriu ar trebui să seteze în schimb fereastra de context a backendului, care are întotdeauna prioritate.';
+$string['settings:prompt_budget_mode_auto'] = 'Derivă din model (recomandat)';
+$string['settings:prompt_budget_mode_fixed'] = 'Buget fix de caractere';

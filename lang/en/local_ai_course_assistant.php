@@ -588,6 +588,7 @@ $string['settings:redash_allow_deanonymized_desc'] = 'Off by default. When off, 
 // v7.2.1: audit log viewer. The rows were always written; nothing could read them.
 $string['auditlog:title'] = '[[tutorshort]] Audit Log';
 $string['auditlog:intro'] = 'Actions recorded by [[tutorshort]]: emergency switches, provider failover, de-anonymized exports and integrity checks. Read-only. Rows are removed automatically once they pass the retention period set in the plugin settings.';
+$string['chat:turn_failed'] = 'This reply could not be completed. Nothing you did caused it — please try again.';
 $string['auditlog:empty'] = 'Nothing has been recorded yet.';
 $string['auditlog:empty_page'] = 'No entries on this page. Use Previous to go back.';
 $string['auditlog:unknown_user'] = 'Deleted or unknown user (id {$a})';
@@ -1371,6 +1372,10 @@ $string['settings:prompt_debug_enabled_desc'] = 'When on, every chat-turn writes
 $string['settings:socratic_verbose']      = 'Verbose Socratic mode prompt';
 $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses receive the full ~600-token do/don\'t directive originally added in v3.9.30. When off (default), they receive a single-line directive that modern hosted models follow reliably and saves ~600 tokens per turn. Turn this on if a course is running on a weaker self-hosted model that needs the explicit scaffolding.';
 // v4.12.0: structured prompt budget + verbosity.
+$string['settings:prompt_budget_mode'] = 'System prompt budget mode';
+$string['settings:prompt_budget_mode_desc'] = 'How the system prompt character budget is decided. <strong>Derive from the model</strong> works out how much room the configured model actually offers, using its context window less the reserved reply and conversation history, and uses the larger of that and the fixed budget below. This is the recommended setting: a fixed number has twice been set by measuring one configuration and has twice turned out too small on another. <strong>Fixed</strong> uses the number below and nothing else. A self-hosted backend should set the backend context window instead, which always takes precedence.';
+$string['settings:prompt_budget_mode_auto'] = 'Derive from the model (recommended)';
+$string['settings:prompt_budget_mode_fixed'] = 'Fixed character budget';
 $string['settings:prompt_budget_chars']      = 'System prompt character budget';
 $string['settings:prompt_truncated_warning'] = '[[tutorshort]] has had to cut retrieved course content out of the prompt to fit the character budget, most recently on {$a}. The model is answering with less course material than the retriever selected. Raise the system prompt character budget below, or reduce how much is retrieved.';
 $string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organizes sections by category (identity, course context, learner state, behavior, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 36,000 characters (~9,000 tokens) as of v7.2.3. The v7.2.1 default of 24,000 was measured against a stock prompt at the default retrieval depth and left only about 200 characters of margin, so on real turns retrieved course content was being truncated. If this page warns that content was recently truncated, raise this value. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';

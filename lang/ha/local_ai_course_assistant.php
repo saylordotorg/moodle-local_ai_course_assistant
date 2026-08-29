@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Model da za a yi amfani da shi. Tsoho ya dogar
 $string['settings:apibaseurl'] = 'URL ɗin Tushen API';
 $string['settings:apibaseurl_desc'] = 'URL ɗin tushe don API. Ana cika shi ta atomatik ga kowane mai bada sabis amma ana iya canzawa. Bar fanko don tsoho na mai bada sabis.';
 $string['settings:systemprompt'] = 'Samfurin Umarni na Tsarin';
-$string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Kai malami ne mai taimako na AI don kozi "{{coursename}}". Rawar ɗalibin ita ce {{userrole}}.
 
 Taimaki ɗalibin ya fahimci kayan kozi. Kasance mai ƙarfafawa, a sarari, da koyarwa mai inganci.';
@@ -1961,3 +1961,9 @@ $string['quizlock:window_desc'] = 'Tsawon lokacin da yunkuri a jarrabawa marar i
 
 $string['emergency:chat_stopped'] = 'An dakatar da [[tutorshort]] a yanzu. Kayan karatunku ba su canza ba, kuma ba laifinku ba ne — don Allah a sake gwadawa daga baya.';
 $string['settings:money_nonnegative_invalid'] = 'Shigar da adadi 0 ko sama da haka, da matsakaicin lambobi biyu bayan aya (misali 25 ko 25.50).';
+
+$string['chat:turn_failed'] = 'Ba a iya kammala wannan amsar ba. Babu abin da ka yi da ya haddasa hakan — don Allah a sake gwadawa.';
+$string['settings:prompt_budget_mode'] = 'Yanayin kasafin umarnin tsarin';
+$string['settings:prompt_budget_mode_desc'] = 'Yadda ake tantance kasafin haruffa na umarnin tsarin. <strong>Cirowa daga samfurin</strong> yana lissafin sararin da samfurin da aka daidaita yake bayarwa da gaske — tagar mahallinsa, ban da amsar da aka ajiye da tarihin tattaunawa — sannan ya yi amfani da mafi girma tsakanin wannan da kasafin da aka kafa a kasa. Wannan shi ne saitin da ake ba da shawara: an riga an kafa adadi tsayayye sau biyu ta hanyar auna tsari guda daya, kuma sau biyu ya zama karami sosai a wani tsarin. <strong>Tsayayye</strong> yana amfani da adadin da ke kasa kadai. Sabar da ake dauka da kai ya kamata ta saita tagar mahallin bayan-gida maimakon haka, wanda kullum yake da fifiko.';
+$string['settings:prompt_budget_mode_auto'] = 'Cirowa daga samfurin (ana ba da shawara)';
+$string['settings:prompt_budget_mode_fixed'] = 'Kasafin haruffa tsayayye';

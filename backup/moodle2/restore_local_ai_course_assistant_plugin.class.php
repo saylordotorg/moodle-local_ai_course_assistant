@@ -50,6 +50,11 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         'local_ai_course_assistant_learner_goals' => ['userid', 'courseid'],
         'local_ai_course_assistant_streak' => ['userid', 'courseid'],
         'local_ai_course_assistant_reminders' => ['userid', 'courseid', 'channel'],
+        // Both carry a unique (userid, courseid): a merge restore into a course
+        // where the learner already has a profile or memory row would abort the
+        // whole restore on a duplicate key without this.
+        'local_ai_course_assistant_profiles' => ['userid', 'courseid'],
+        'local_ai_course_assistant_learner_memory' => ['userid', 'courseid'],
     ];
 
     /**
@@ -68,6 +73,22 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
             'aica_course_setting', $elepath . '/aica_course_settings/aica_course_setting');
         $paths[] = new restore_path_element(
             'aica_quiz_cfg', $elepath . '/aica_quiz_cfgs/aica_quiz_cfg');
+        $paths[] = new restore_path_element(
+            'aica_survey', $elepath . '/aica_surveys/aica_survey');
+        $paths[] = new restore_path_element(
+            'aica_survey_resp',
+            $elepath . '/aica_surveys/aica_survey/aica_survey_resps/aica_survey_resp');
+        $paths[] = new restore_path_element(
+            'aica_ut_task', $elepath . '/aica_ut_tasks/aica_ut_task');
+        $paths[] = new restore_path_element(
+            'aica_ut_resp',
+            $elepath . '/aica_ut_tasks/aica_ut_task/aica_ut_resps/aica_ut_resp');
+        $paths[] = new restore_path_element(
+            'aica_obj_link', $elepath . '/aica_obj_links/aica_obj_link');
+        $paths[] = new restore_path_element(
+            'aica_profile', $elepath . '/aica_profiles/aica_profile');
+        $paths[] = new restore_path_element(
+            'aica_memory', $elepath . '/aica_memories/aica_memory');
         $paths[] = new restore_path_element(
             'aica_objective', $elepath . '/aica_objectives/aica_objective');
         $paths[] = new restore_path_element(
@@ -539,6 +560,118 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     }
 
     /**
+     * Instructor-authored survey. Its responses are nested beneath it.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_survey($data) {
+        global $DB;
+        $data = (object) $data;
+        $oldid = $data->id;
+        $data->courseid = $this->task->get_courseid();
+        unset($data->id);
+        $newid = $DB->insert_record('local_ai_course_assistant_surveys', $data);
+        $this->set_mapping('aica_survey', $oldid, $newid);
+    }
+
+    /**
+     * A learner's answer to one survey question.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_survey_resp($data) {
+        $data = (array) $data;
+        $surveyid = $this->get_mappingid('aica_survey', $data['surveyid'] ?? 0);
+        if (!$surveyid) {
+            return;
+        }
+        $data['surveyid'] = $surveyid;
+        $this->insert_simple_user_row('local_ai_course_assistant_survey_resp', $data);
+    }
+
+    /**
+     * Instructor-authored user-testing task set.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_ut_task($data) {
+        global $DB;
+        $data = (object) $data;
+        $oldid = $data->id;
+        $data->courseid = $this->task->get_courseid();
+        unset($data->id);
+        $newid = $DB->insert_record('local_ai_course_assistant_ut_tasks', $data);
+        $this->set_mapping('aica_ut_task', $oldid, $newid);
+    }
+
+    /**
+     * A learner's response to one user-testing task.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_ut_resp($data) {
+        $data = (array) $data;
+        $tasksetid = $this->get_mappingid('aica_ut_task', $data['tasksetid'] ?? 0);
+        if (!$tasksetid) {
+            return;
+        }
+        $data['tasksetid'] = $tasksetid;
+        $this->insert_simple_user_row('local_ai_course_assistant_ut_resp', $data);
+    }
+
+    /**
+     * A link between two learning objectives.
+     *
+     * Dropped unless BOTH ends resolve to objectives restored in this course --
+     * a half-mapped link would point at an objective belonging to someone else's
+     * course, which is worse than losing a derived relationship.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_obj_link($data) {
+        global $DB;
+        $data = (object) $data;
+        $a = $this->get_mappingid('aica_objective', $data->objectiveida ?? 0);
+        $b = $this->get_mappingid('aica_objective', $data->objectiveidb ?? 0);
+        if (!$a || !$b) {
+            return;
+        }
+        $data->objectiveida = $a;
+        $data->objectiveidb = $b;
+        unset($data->id);
+        if ($DB->record_exists('local_ai_course_assistant_obj_links',
+                ['objectiveida' => $a, 'objectiveidb' => $b])) {
+            return;
+        }
+        $DB->insert_record('local_ai_course_assistant_obj_links', $data);
+    }
+
+    /**
+     * Per-course learner profile summary.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_profile($data) {
+        $this->insert_simple_user_row('local_ai_course_assistant_profiles', (array) $data);
+    }
+
+    /**
+     * Per-course learner memory notes.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function process_aica_memory($data) {
+        $this->insert_simple_user_row('local_ai_course_assistant_learner_memory', (array) $data);
+    }
+
+    /**
      * Resolve everything that needed a course-module mapping.
      *
      * Dispatched by restore_plugin::launch_after_restore_methods(), which runs
@@ -581,5 +714,42 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
             }
         }
         $this->deferredcmids = [];
+    }
+
+    /**
+     * The same three configuration paths, reached through the section task.
+     *
+     * The course task only runs for a new course or an explicit overwrite, so
+     * restoring into an existing course and importing both arrived with no
+     * configuration. Section tasks have no such gate. The process methods are
+     * shared with the course connection point and every one of them skips a row
+     * that already exists, so a new-course restore that sees both copies is a
+     * no-op the second time.
+     *
+     * @return array
+     */
+    protected function define_section_plugin_structure() {
+        $elepath = $this->get_pathfor('/');
+        return [
+            new restore_path_element(
+                'aica_course_config', $elepath . '/aica_course_configs/aica_course_config'),
+            new restore_path_element(
+                'aica_course_setting', $elepath . '/aica_course_settings/aica_course_setting'),
+            new restore_path_element(
+                'aica_quiz_cfg', $elepath . '/aica_quiz_cfgs/aica_quiz_cfg'),
+        ];
+    }
+
+    /**
+     * Resolve deferred cmids for rows that arrived through the section task.
+     *
+     * Section tasks run before activity tasks just as the course task does, so
+     * the course_module mappings are equally unavailable there. Dispatched from
+     * restore_final_task, by which point every activity exists.
+     *
+     * @return void
+     */
+    public function after_restore_section() {
+        $this->after_restore_course();
     }
 }

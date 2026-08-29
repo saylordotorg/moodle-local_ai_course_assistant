@@ -47,6 +47,45 @@ final class backup_restore_test extends \advanced_testcase {
      * @param bool $withusers Include user data.
      * @return int New course id.
      */
+    /**
+     * Restore a course archive INTO an existing course, without overwriting.
+     *
+     * This is the path that carried nothing: restore_course_task only adds
+     * restore_course_structure_step for a new course or an explicit overwrite,
+     * and the whole payload used to hang off course.xml.
+     *
+     * @param int $sourceid Course to back up.
+     * @param int $targetid Existing course to restore into.
+     * @return void
+     */
+    private function merge_restore_into(int $sourceid, int $targetid): void {
+        global $USER, $CFG;
+
+        $bc = new \backup_controller(
+            \backup::TYPE_1COURSE, $sourceid, \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id
+        );
+        $bc->get_plan()->get_setting('users')->set_value(false);
+        $bc->execute_plan();
+        $file = $bc->get_results()['backup_destination'];
+        $bc->destroy();
+
+        $tmp = 'aica_merge_restore';
+        $file->extract_to_pathname(
+            get_file_packer('application/vnd.moodle.backup'),
+            $CFG->tempdir . '/backup/' . $tmp
+        );
+
+        $rc = new \restore_controller(
+            $tmp, $targetid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL,
+            $USER->id, \backup::TARGET_EXISTING_ADDING
+        );
+        // Deliberately NOT setting overwrite_conf: that is the whole point.
+        $rc->execute_precheck();
+        $rc->execute_plan();
+        $rc->destroy();
+    }
+
     private function duplicate_course(int $courseid, bool $withusers): int {
         global $USER, $CFG;
 
@@ -89,6 +128,54 @@ final class backup_restore_test extends \advanced_testcase {
     /**
      * The headline case: course configuration survives a duplicate.
      */
+    public function test_configuration_reaches_a_course_restored_into(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $src = $this->getDataGenerator()->create_course();
+        $dst = $this->getDataGenerator()->create_course();
+        $quiz = $this->getDataGenerator()->create_module('quiz', ['course' => $src->id]);
+
+        set_config('socratic_mode_course_' . $src->id, '1', 'local_ai_course_assistant');
+        set_config('flashcards_enabled_course_' . $src->id, '0', 'local_ai_course_assistant');
+        $DB->insert_record('local_ai_course_assistant_course_cfg', (object) [
+            'courseid' => $src->id, 'enabled' => 1, 'provider' => 'claude',
+            'model' => 'claude-haiku-4-5', 'systemprompt' => 'MERGE-RESTORE-PROBE',
+            'temperature' => '0.40000', 'timecreated' => time(), 'timemodified' => time(),
+        ]);
+        $DB->insert_record('local_ai_course_assistant_quiz_cfg', (object) [
+            'cmid' => $quiz->cmid, 'courseid' => $src->id, 'assistance_level' => 'hidden',
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        $this->merge_restore_into((int) $src->id, (int) $dst->id);
+
+        $this->assertSame(
+            '1',
+            get_config('local_ai_course_assistant', 'socratic_mode_course_' . $dst->id),
+            'A restore into an existing course carried no per-course settings.'
+        );
+        $this->assertSame(
+            '0',
+            get_config('local_ai_course_assistant', 'flashcards_enabled_course_' . $dst->id)
+        );
+        $cfg = $DB->get_record('local_ai_course_assistant_course_cfg', ['courseid' => $dst->id]);
+        $this->assertNotFalse($cfg, 'The course configuration row did not arrive.');
+        $this->assertSame('MERGE-RESTORE-PROBE', $cfg->systemprompt);
+
+        $qc = $DB->get_records('local_ai_course_assistant_quiz_cfg', ['courseid' => $dst->id]);
+        $this->assertCount(1, $qc, 'The per-quiz assistance level did not arrive.');
+        $row = reset($qc);
+        $this->assertSame('hidden', $row->assistance_level);
+        $newcm = $DB->get_record('course_modules', ['id' => (int) $row->cmid]);
+        $this->assertEquals(
+            $dst->id,
+            (int) $newcm->course,
+            'The assistance level points at a module in the wrong course.'
+        );
+    }
+
     public function test_quiz_assistance_levels_survive_and_are_remapped(): void {
         global $DB;
         $this->resetAfterTest(true);

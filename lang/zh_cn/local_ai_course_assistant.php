@@ -75,7 +75,7 @@ $string['settings:model_desc'] = '要使用的模型。默认值取决于提供�
 $string['settings:apibaseurl'] = 'API 基础 URL';
 $string['settings:apibaseurl_desc'] = 'API 的基础 URL。会根据提供商自动填写，但可以覆盖。留空则使用提供商默认值。';
 $string['settings:systemprompt'] = '系统提示模板';
-$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}。';
+$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}、{{institution}}。';
 $string['settings:systemprompt_default'] = '您是课程"{{coursename}}"的 AI 辅导助手。学生的角色为 {{userrole}}。
 
 请帮助学生理解课程内容。请保持鼓励、清晰且具有教学意义的态度。';
@@ -1966,3 +1966,9 @@ $string['quizlock:window_desc'] = '没有时限的测验，其答题在多长时
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] 目前已暂停。您的课程材料不受影响，这也不是您造成的 — 请稍后再试。';
 $string['settings:money_nonnegative_invalid'] = '请输入 0 或更大的金额，最多保留两位小数（例如 25 或 25.50）。';
+
+$string['chat:turn_failed'] = '本次回复未能完成。这不是你操作导致的——请再试一次。';
+$string['settings:prompt_budget_mode'] = '系统提示词预算模式';
+$string['settings:prompt_budget_mode_desc'] = '决定系统提示词字符预算的方式。<strong>由模型推导</strong>会算出所配置的模型实际能提供多少空间——即其上下文窗口，减去预留的回复和对话历史——然后在该值与下方固定预算之间取较大者。这是推荐设置：固定数值已有两次是通过测量单一配置得出的，而两次都在另一种配置下显得过小。<strong>固定</strong>只使用下方的数值。自托管后端则应改为设置后端上下文窗口，该设置始终优先。';
+$string['settings:prompt_budget_mode_auto'] = '由模型推导（推荐）';
+$string['settings:prompt_budget_mode_fixed'] = '固定字符预算';

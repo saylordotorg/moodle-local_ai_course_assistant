@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Mô hình cần sử dụng. Mặc định ph�
 $string['settings:apibaseurl'] = 'URL cơ sở API';
 $string['settings:apibaseurl_desc'] = 'URL cơ sở cho API. Được tự động điền theo nhà cung cấp nhưng có thể ghi đè. Để trống để dùng mặc định của nhà cung cấp.';
 $string['settings:systemprompt'] = 'Mẫu Prompt Hệ thống';
-$string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Bạn là gia sư AI hữu ích cho khóa học "{{coursename}}". Vai trò của học viên là {{userrole}}.
 
 Hãy giúp học viên hiểu tài liệu khóa học. Hãy khích lệ, rõ ràng và có phương pháp sư phạm tốt.';
@@ -1966,3 +1966,9 @@ $string['quizlock:window_desc'] = 'Một lượt làm bài trên bài kiểm tra
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] hiện đang tạm dừng. Tài liệu khóa học của bạn không bị ảnh hưởng và đây không phải lỗi của bạn — vui lòng thử lại sau.';
 $string['settings:money_nonnegative_invalid'] = 'Nhập số tiền từ 0 trở lên, tối đa hai chữ số thập phân (ví dụ 25 hoặc 25.50).';
+
+$string['chat:turn_failed'] = 'Không thể hoàn tất câu trả lời này. Không phải do bạn làm gì sai — vui lòng thử lại.';
+$string['settings:prompt_budget_mode'] = 'Chế độ ngân sách lời nhắc hệ thống';
+$string['settings:prompt_budget_mode_desc'] = 'Cách xác định ngân sách ký tự cho lời nhắc hệ thống. <strong>Suy ra từ mô hình</strong> tính toán khoảng trống mà mô hình đã cấu hình thực sự cung cấp — cửa sổ ngữ cảnh của nó, trừ đi phần trả lời được dành riêng và lịch sử hội thoại — rồi dùng giá trị lớn hơn giữa con số đó và ngân sách cố định bên dưới. Đây là thiết lập được khuyến nghị: một con số cố định đã hai lần được đặt ra bằng cách đo một cấu hình duy nhất, và cả hai lần đều tỏ ra quá nhỏ ở cấu hình khác. <strong>Cố định</strong> chỉ dùng con số bên dưới. Với máy chủ tự vận hành, hãy đặt cửa sổ ngữ cảnh của backend thay vào đó; giá trị này luôn được ưu tiên.';
+$string['settings:prompt_budget_mode_auto'] = 'Suy ra từ mô hình (khuyến nghị)';
+$string['settings:prompt_budget_mode_fixed'] = 'Ngân sách ký tự cố định';

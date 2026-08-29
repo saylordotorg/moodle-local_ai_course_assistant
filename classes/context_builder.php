@@ -49,6 +49,42 @@ class context_builder {
      * is still bounded rather than being allowed to crowd out the entire rest
      * of the prompt from the front of the drop queue.
      */
+    /**
+     * Context window, in tokens, for the models this plugin routes to.
+     *
+     * Matched on prefix, so a dated or regional variant of a model resolves to
+     * its family. A model that is not listed simply has no window here and the
+     * configured budget is used unchanged -- an unknown model must never silently
+     * shrink or inflate the prompt.
+     *
+     * A self-hosted backend should set backend_context_tokens instead; that is
+     * an explicit operator statement and always wins over this table.
+     */
+    private const MODEL_CONTEXT_WINDOWS = [
+        'gemini-2.5-flash' => 1048576,
+        'gemini-2.5-pro' => 1048576,
+        'gemini-3' => 1048576,
+        'gpt-4o-mini' => 128000,
+        'gpt-4o' => 128000,
+        'gpt-4.1' => 1047576,
+        'claude-haiku-4-5' => 200000,
+        'claude-sonnet-4' => 1000000,
+        'claude-sonnet-5' => 1000000,
+        'claude-opus-4' => 1000000,
+        'claude-opus-5' => 1000000,
+        'mistral-small' => 128000,
+    ];
+
+    /**
+     * Ceiling for a window-derived budget, in characters.
+     *
+     * A million-token window would otherwise permit a prompt far larger than any
+     * course turn needs, and the prompt is billed on every message. The budget is
+     * a ceiling rather than a target -- it only fills if retrieval has that much
+     * to put in it -- but an unbounded ceiling is still the wrong shape.
+     */
+    private const DERIVED_BUDGET_CAP = 120000;
+
     public const IDENTITY_MIN_CHARS = 4000;
 
     private const MAX_PROMPT_LENGTH = 60000;
@@ -623,6 +659,10 @@ class context_builder {
         $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
         $budget = ($rawbudget === false || $rawbudget === '') ? 36000 : (int) $rawbudget;
 
+        // v7.2.4: derive from the model's context window where it is known. The
+        // setting remains the floor; see resolve_budget_chars().
+        $budget = self::resolve_budget_chars($budget, $courseid, $lang);
+
         // v5.10.0: clamp to the backend context window when configured, so the
         // assembled prompt (plus reserved output and history) fits a small
         // self-hosted max_model_len even in token-dense languages. A window of
@@ -1000,6 +1040,91 @@ class context_builder {
      * @param int $historytokens estimated conversation-history tokens
      * @param string $lang learner language code
      */
+    /**
+     * The model's context window in tokens, or 0 when it cannot be known.
+     *
+     * @param int $courseid Course whose provider override may apply.
+     * @return int
+     */
+    public static function resolve_window_tokens(int $courseid = 0): int {
+        // An explicit self-hosted setting is an operator statement about their
+        // own backend and outranks anything inferred from a model name.
+        $explicit = (int) get_config('local_ai_course_assistant', 'backend_context_tokens');
+        if ($explicit > 0) {
+            return $explicit;
+        }
+
+        $model = '';
+        if ($courseid > 0 && class_exists(course_config_manager::class)) {
+            $cfg = course_config_manager::get_effective_config($courseid);
+            $model = (string) ($cfg['model'] ?? '');
+        }
+        if ($model === '') {
+            $model = (string) get_config('local_ai_course_assistant', 'model');
+        }
+        if ($model === '') {
+            return 0;
+        }
+
+        $model = strtolower($model);
+        $best = 0;
+        foreach (self::MODEL_CONTEXT_WINDOWS as $prefix => $tokens) {
+            // Longest matching prefix wins, so claude-sonnet-5 does not resolve
+            // through a shorter claude-sonnet entry.
+            if (str_starts_with($model, $prefix) && strlen($prefix) > $best) {
+                $best = strlen($prefix);
+                $window = $tokens;
+            }
+        }
+        return $best > 0 ? $window : 0;
+    }
+
+    /**
+     * The prompt budget for this turn, derived from the model where possible.
+     *
+     * A fixed character budget has now been wrong twice: 12,000 could not hold
+     * the prompt at all, and 24,000 cleared it by 46 characters on a real turn.
+     * Both were set by measuring one configuration and assuming it generalised.
+     * The window the model actually offers is the durable input.
+     *
+     * The configured setting stays the floor, so an administrator who raised it
+     * is never overridden downward, and the derived value is capped so a
+     * million-token window does not license a million-character prompt.
+     *
+     * @param int $configured The prompt_budget_chars setting.
+     * @param int $courseid
+     * @param string $lang
+     * @return int
+     */
+    public static function resolve_budget_chars(int $configured, int $courseid, string $lang): int {
+        if ((string) get_config('local_ai_course_assistant', 'prompt_budget_mode') === 'fixed') {
+            return $configured;
+        }
+
+        $window = self::resolve_window_tokens($courseid);
+        if ($window <= 0) {
+            return $configured;
+        }
+
+        $rawmax = get_config('local_ai_course_assistant', 'max_tokens');
+        $outputtokens = ($rawmax === false || $rawmax === '') ? 1024 : (int) $rawmax;
+        $rawhist = get_config('local_ai_course_assistant', 'maxhistory');
+        $maxpairs = ($rawhist === false || $rawhist === '') ? 20 : (int) $rawhist;
+
+        $ceiling = self::effective_budget_chars(
+            self::DERIVED_BUDGET_CAP,
+            $window,
+            $outputtokens,
+            $maxpairs * self::HISTORY_TOKENS_PER_PAIR,
+            $lang
+        );
+
+        // Never below what the administrator asked for: a small window clamps
+        // through effective_budget_chars above, but the setting is a floor for
+        // the derived value, not something the model gets to argue down.
+        return max($configured, $ceiling);
+    }
+
     public static function effective_budget_chars(
         int $rawbudget,
         int $windowtokens,

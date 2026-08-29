@@ -557,4 +557,31 @@ class conversation_manager {
             'courses' => $courses,
         ];
     }
+
+    /**
+     * What a failed assistant turn should say when the learner reads it back.
+     *
+     * Ordered by how much it tells them: whatever actually streamed, else the
+     * notice they were shown live, else a neutral sentence. Never an exception
+     * class, provider name or other internal identifier.
+     *
+     * This column is replayed into the learner's history, so a paused turn used
+     * to come back as "[no response: core\exception\moodle_exception]" after a
+     * reload -- the friendly notice existed only in the live stream and was
+     * never stored. The path is reached by timeouts and provider errors too,
+     * not only by the kill switch, so the floor has to be safe for all of them.
+     *
+     * @param string $partial Whatever had streamed before the failure.
+     * @param string $learnertext The notice shown at the time, if there was one.
+     * @return string
+     */
+    public static function failed_turn_text(string $partial, string $learnertext = ''): string {
+        if (trim($partial) !== '') {
+            return $partial;
+        }
+        if (trim($learnertext) !== '') {
+            return $learnertext;
+        }
+        return \local_ai_course_assistant\branding::str('chat:turn_failed');
+    }
 }

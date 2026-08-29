@@ -73,7 +73,7 @@ $string['settings:model_desc'] = 'Ụdị iji. Ndabara na-adabere na onye nnye (
 $string['settings:apibaseurl'] = 'URL Ntọala API';
 $string['settings:apibaseurl_desc'] = 'URL ntọala maka API. Ọ na-azụlite n\'onye nnye ọ bụla mana enwere ike gbanwee ya. Hapụ ọhọ maka ndabara onye nnye.';
 $string['settings:systemprompt'] = 'Templeeti Arịọ Sistemu';
-$string['settings:systemprompt_desc'] = 'Arịọ sistemu ezigara AI. Jiri ihe ngọpụta: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Arịọ sistemu ezigara AI. Jiri ihe ngọpụta: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Ị bụ nkuzi AI na-enyere aka maka kọọsị "{{coursename}}". Ọrụ nwa akwụkwọ bụ {{userrole}}.
 
 Nyere nwa akwụkwọ aka ịghọta ihe kọọsị a. Bụrụ onye na-agba ume, doo anya, ma nwee ezigbo usoro nkuzi.';
@@ -1947,3 +1947,9 @@ $string['quizlock:window_desc'] = 'Ogologo oge mgbalị na ule na-enweghị oke 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] kwụsịtụrụ ugbu a. Ihe ọmụmụ gị enweghị nsogbu, ọ bụghịkwa ihe i mere — biko nwaa ọzọ ma emesịa.';
 $string['settings:money_nonnegative_invalid'] = 'Tinye ego ruru 0 ma ọ bụ karịa, na-eji ọnụọgụ abụọ kacha na-esote akara (dịka 25 ma ọ bụ 25.50).';
+
+$string['chat:turn_failed'] = 'Enweghị ike ịmecha azịza a. Ọ dịghị ihe i mere kpatara ya — biko nwaa ọzọ.';
+$string['settings:prompt_budget_mode'] = 'Ụdị mmefu ntuziaka sistemu';
+$string['settings:prompt_budget_mode_desc'] = 'Otú e si ekpebi mmefu mkpụrụedemede nke ntuziaka sistemu. <strong>Site na ihe nlereanya nweta ya</strong> na-agbakọ ohere ihe nlereanya ahaziri na-enye n’ezie — mpio ihe gbara ya gburugburu, wepụ azịza echekwara na akụkọ mkparịta ụka — wee jiri nke ka ukwuu n’etiti ya na mmefu edobere n’okpuru. Nke a bụ ntọala a na-akwado: e debere ọnụọgụ edobere ugboro abụọ site n’ịtụle otu nhazi, ugboro abụọ ọ pụtakwara na ọ dị obere n’ime nhazi ọzọ. <strong>Edobere</strong> na-eji naanị ọnụọgụ dị n’okpuru. Sava a na-akwado onwe ya kwesịrị ịtọ mpio ihe gbara sava ahụ gburugburu kama nke ahụ; ọ na-ebute ụzọ mgbe niile.';
+$string['settings:prompt_budget_mode_auto'] = 'Site na ihe nlereanya nweta ya (a na-akwado ya)';
+$string['settings:prompt_budget_mode_fixed'] = 'Mmefu mkpụrụedemede edobere';

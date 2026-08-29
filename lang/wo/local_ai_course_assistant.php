@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Modèle bi ngay jëfandikoo. Valeur par défau
 $string['settings:apibaseurl'] = 'URL de Base API';
 $string['settings:apibaseurl_desc'] = 'URL de base API bi. Dañ ko rempli automatiquement ci fournisseur yi waye dafay mën a yegeel. Samp sax valeur par défaut fournisseur bi.';
 $string['settings:systemprompt'] = 'Modèle Invite Système';
-$string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Yàgg nga jël rôle wu professeur AI ci cours "{{coursename}}". Rôle élève bi dafa {{userrole}}.
 
 Ndimm élève bi jàng matière cours bi. Yëgël, wëjj, te jàng ci yoon bu baax.';
@@ -1966,3 +1966,9 @@ $string['quizlock:window_desc'] = 'Ñaata diir la jéego ci ceet bu amul àpp u 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] taxaw na léegi. Sa jumtukaayu njàng yi soppiku wuñu, te du sa njuumte — nangeen jéem ci kanam.';
 $string['settings:money_nonnegative_invalid'] = 'Bindal xaalis bu tollu ci 0 walla lu ko ëpp, ak ñaari tomb yu mucc (misaal 25 walla 25.50).';
+
+$string['chat:turn_failed'] = 'Tontu bii mënul woon a mat. Dara nga defoon du ko waral — nanga jéem waat.';
+$string['settings:prompt_budget_mode'] = 'Anam bu bujeetu ndigalu sistem bi';
+$string['settings:prompt_budget_mode_desc'] = 'Ni ñuy tànne bujeetu araf yu ndigalu sistem bi. <strong>Jële ko ci moodel bi</strong> dafay xayma barab bi moodel bi ñu tëral di jox ci dëgg — palanteeru kontekst bi, ñu jële ci tontu bi ñu denc ak taariixu waxtaan wi — te jëfandikoo bi gëna mag ci bi ak bujeet bu sax bi ci suuf. Kii mooy tërël bi ñuy digle: ñaari yoon lañu tëral limu sax ci xayma benn tërël rekk, te ñaari yoon yépp mu ne tuuti lool ci beneen tërël. <strong>Bu sax</strong> dafay jëfandikoo limu ci suuf rekk. Waaye serwóor bu boppam ci moom war naa tëral palanteeru kontekstu bakkend bi ci kaw loolu; moom lay jiitu saa su ne.';
+$string['settings:prompt_budget_mode_auto'] = 'Jële ko ci moodel bi (ñu koy digle)';
+$string['settings:prompt_budget_mode_fixed'] = 'Bujeetu araf bu sax';

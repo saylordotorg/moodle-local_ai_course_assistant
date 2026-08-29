@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Àwòrán tí a ó lò. Àìpéye da lórí ol
 $string['settings:apibaseurl'] = 'URL Ìpìlẹ̀ API';
 $string['settings:apibaseurl_desc'] = 'URL ìpìlẹ̀ fún API. A máa ń yín àmúlò fún olùpèsè kọ̀ọ̀kan ṣùgbọ́n a lè yípadà. Fi sílẹ̀ fún àìpéye olùpèsè.';
 $string['settings:systemprompt'] = 'Àpẹrẹ Ìgbékalẹ̀ Ètò';
-$string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Ìwọ jẹ́ olùkọ́ AI olùrànlọ́wọ́ fún ẹkọ "{{coursename}}". Ipa akẹ́kọ̀ọ́ ni {{userrole}}.
 
 Ràn akẹ́kọ̀ọ́ lọ́wọ́ láti lóye ohun tí wọ́n ń kọ́. Jẹ́ olùránnilétí, kedere, àti ó dára lè pèdàgógì.';
@@ -1966,3 +1966,9 @@ $string['quizlock:window_desc'] = 'Bí ìgbìyànjú lórí ìdánwò tí kò n�
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] ti dúró fún ìgbà díẹ̀ báyìí. Àwọn ohun èlò ẹ̀kọ́ rẹ kò yí padà, kì í sì í ṣe àṣìṣe rẹ — jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí i nígbà tó bá yá.';
 $string['settings:money_nonnegative_invalid'] = 'Tẹ iye owó tí ó jẹ́ 0 tàbí jù bẹ́ẹ̀ lọ, pẹ̀lú ààyè eléèwádì méjì tí ó pọ̀ jù (bí àpẹẹrẹ 25 tàbí 25.50).';
+
+$string['chat:turn_failed'] = 'A kò lè pari ìdáhùn yìí. Kò sí ohun tí o ṣe tí ó fà á — jọ̀wọ́ gbìyànjú lẹ́ẹ̀kansí.';
+$string['settings:prompt_budget_mode'] = 'Ipò ìnáwó àṣẹ ètò';
+$string['settings:prompt_budget_mode_desc'] = 'Bí a ṣe ń pinnu ìnáwó lẹ́tà fún àṣẹ ètò. <strong>Rí i láti inú àwòṣe</strong> ń ṣírò àyè tí àwòṣe tí a ṣètò ń pèsè ní tòótọ́ — fèrèsé ọ̀rọ̀ rẹ̀, lẹ́yìn yíyọ ìdáhùn tí a fi pamọ́ àti ìtàn ìjíròrò kúrò — ó sì ń lo èyí tí ó tóbi jù láàrin ìyẹn àti ìnáwó tí a gbé kalẹ̀ nísàlẹ̀. Èyí ni ètò tí a gbani nímọ̀ràn: nọ́mbà tí a gbé kalẹ̀ ni a ti ṣètò lẹ́ẹ̀mejì nípa wíwọn ìṣètò kan ṣoṣo, ó sì kéré jù lẹ́ẹ̀mejì nínú ìṣètò mìíràn. <strong>Tí a gbé kalẹ̀</strong> ń lo nọ́mbà tí ó wà nísàlẹ̀ nìkan. Sáfà tí ẹnì kan ń gbé fúnra rẹ̀ gbọ́dọ̀ ṣètò fèrèsé ọ̀rọ̀ sáfà náà dípò; ìyẹn ni ó máa ń ṣáájú nígbà gbogbo.';
+$string['settings:prompt_budget_mode_auto'] = 'Rí i láti inú àwòṣe (a gbani nímọ̀ràn)';
+$string['settings:prompt_budget_mode_fixed'] = 'Ìnáwó lẹ́tà tí a gbé kalẹ̀';

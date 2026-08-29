@@ -44,7 +44,25 @@ class analytics {
     public static function get_overview(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid];
+        // v7.2.4: courseid 0 means every course, which is what the Overall Usage
+        // panel asks for. This method was the only counter in the class that did
+        // not implement that -- get_session_stats(), get_return_rate() and
+        // get_daily_usage() all branch on $courseid > 0, and this one hard-coded
+        // "WHERE m.courseid = :courseid" into every query. Site-wide therefore
+        // matched only rows literally stored against course 0, of which there are
+        // none, so the panel an administrator opens to answer "is anyone using
+        // this" reported zero students, zero sessions and zero messages on a site
+        // with real traffic. Per-course reporting was correct throughout, which
+        // is why this survived: the panel is only wrong in the one mode nobody
+        // cross-checks against a course page.
+        $sitewide = ($courseid <= 0);
+
+        $params = [];
+        $coursewhere = '';
+        if (!$sitewide) {
+            $coursewhere = ' AND m.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -52,7 +70,9 @@ class analytics {
         }
 
         // Total conversations.
-        $totalconvs = $DB->count_records('local_ai_course_assistant_convs', ['courseid' => $courseid]);
+        $totalconvs = $sitewide
+            ? $DB->count_records('local_ai_course_assistant_convs')
+            : $DB->count_records('local_ai_course_assistant_convs', ['courseid' => $courseid]);
 
         // Total messages. Restricted to conversation roles: the msgs table also
         // carries role='system' telemetry rows that are not learner messages at
@@ -68,47 +88,47 @@ class analytics {
         // already filter by role; this one was the outlier.
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid
-                   AND " . self::conversation_rows_predicate('m') . "{$timewhere}";
+                 WHERE " . self::conversation_rows_predicate('m') . "{$coursewhere}{$timewhere}";
         $totalmessages = $DB->count_records_sql($sql, $params);
 
         // Active students (users who sent at least one message).
         $sql = "SELECT COUNT(DISTINCT m.userid)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhere}";
+                 WHERE m.role = 'user'{$coursewhere}{$timewhere}";
         $activestudents = $DB->count_records_sql($sql, $params);
 
         // Average messages per student.
         $avgmessages = $activestudents > 0 ? round($totalmessages / $activestudents, 1) : 0;
 
         // User messages count (for off-topic rate calculation).
-        $paramsuser = ['courseid' => $courseid];
-        $timewhereuser = '';
-        if ($since > 0) {
-            $timewhereuser = ' AND m.timecreated >= :since';
-            $paramsuser['since'] = $since;
-        }
-        $sql = "SELECT COUNT(m.id)
-                  FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhereuser}";
-        $usermessages = $DB->count_records_sql($sql, $paramsuser);
+        $usermessages = $activestudents > 0 || $sitewide
+            ? (int) $DB->count_records_sql(
+                "SELECT COUNT(m.id)
+                   FROM {local_ai_course_assistant_msgs} m
+                  WHERE m.role = 'user'{$coursewhere}{$timewhere}",
+                $params
+            )
+            : 0;
 
         // Off-topic conversations (those with offtopic_count > 0).
+        $convwhere = $sitewide ? '' : ' WHERE c.courseid = :courseid';
+        $convparams = $sitewide ? [] : ['courseid' => $courseid];
         $sql = "SELECT SUM(c.offtopic_count)
-                  FROM {local_ai_course_assistant_convs} c
-                 WHERE c.courseid = :courseid";
-        $offtopiccount = (int) $DB->get_field_sql($sql, ['courseid' => $courseid]);
+                  FROM {local_ai_course_assistant_convs} c{$convwhere}";
+        $offtopiccount = (int) $DB->get_field_sql($sql, $convparams);
         $offtopicrate = $usermessages > 0 ? round(($offtopiccount / $usermessages) * 100, 1) : 0;
 
         // Escalation count (messages containing ticket references).
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'assistant'
-                   AND m.message LIKE '%support ticket%'{$timewhere}";
+                 WHERE m.role = 'assistant'
+                   AND m.message LIKE '%support ticket%'{$coursewhere}{$timewhere}";
         $escalations = $DB->count_records_sql($sql, $params);
 
         // Students with study plans.
-        $studyplans = $DB->count_records('local_ai_course_assistant_plans', ['courseid' => $courseid]);
+        $studyplans = $sitewide
+            ? $DB->count_records('local_ai_course_assistant_plans')
+            : $DB->count_records('local_ai_course_assistant_plans', ['courseid' => $courseid]);
 
         return [
             'total_conversations' => $totalconvs,
@@ -132,6 +152,8 @@ class analytics {
         global $DB;
 
         $since = time() - ($days * 86400);
+        [$coursewhere, $params] = self::course_clause($courseid);
+        $params['since'] = $since;
 
         // Get all message timestamps in the range, group by day.
         // get_fieldset_sql returns a flat array of values rather than a
@@ -139,9 +161,9 @@ class analytics {
         // timecreated values collide for messages sent in the same second.
         $sql = "SELECT m.timecreated
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.timecreated >= :since AND m.role = 'user'
+                 WHERE m.timecreated >= :since AND m.role = 'user'{$coursewhere}
                  ORDER BY m.timecreated ASC";
-        $timestamps = $DB->get_fieldset_sql($sql, ['courseid' => $courseid, 'since' => $since]);
+        $timestamps = $DB->get_fieldset_sql($sql, $params);
 
         // Aggregate by day.
         $dailycounts = [];
@@ -199,7 +221,8 @@ class analytics {
         }
 
         // Get user messages.
-        $params = ['courseid' => $courseid, 'role' => 'user'];
+        [$coursewhere, $params] = self::course_clause($courseid, '');
+        $params['role'] = 'user';
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND timecreated >= :since';
@@ -211,7 +234,7 @@ class analytics {
         // load every message body in a large course into memory. The most
         // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
         $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE courseid = :courseid AND role = :role{$timewhere}
+                 WHERE role = :role{$coursewhere}{$timewhere}
                  ORDER BY timecreated DESC";
         $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
@@ -248,7 +271,8 @@ class analytics {
     public static function get_common_prompts(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid, 'role' => 'user'];
+        [$coursewhere, $params] = self::course_clause($courseid, '');
+        $params['role'] = 'user';
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND timecreated >= :since';
@@ -260,7 +284,7 @@ class analytics {
         // load every message body in a large course into memory. The most
         // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
         $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE courseid = :courseid AND role = :role{$timewhere}
+                 WHERE role = :role{$coursewhere}{$timewhere}
                  ORDER BY timecreated DESC";
         $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
@@ -332,7 +356,8 @@ class analytics {
     public static function get_provider_comparison(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid, 'role' => 'assistant'];
+        [$coursewhere, $params] = self::course_clause($courseid);
+        $params['role'] = 'assistant';
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -345,7 +370,7 @@ class analytics {
                        SUM(COALESCE(m.tokens_used, 0)) AS total_tokens,
                        AVG(COALESCE(m.tokens_used, 0)) AS avg_tokens
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = :role{$timewhere}
+                 WHERE m.role = :role{$coursewhere}{$timewhere}
                  GROUP BY COALESCE(m.provider, 'unknown')
                  ORDER BY response_count DESC";
 
@@ -562,7 +587,7 @@ class analytics {
     public static function get_student_usage(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid];
+        [$coursewhere, $params] = self::course_clause($courseid);
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -576,11 +601,37 @@ class analytics {
                        MAX(m.timecreated) AS last_active
                   FROM {local_ai_course_assistant_msgs} m
                   JOIN {user} u ON u.id = m.userid
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhere}
+                 WHERE m.role = 'user'{$coursewhere}{$timewhere}
                  GROUP BY m.userid, u.firstname, u.lastname
                  ORDER BY message_count DESC";
 
         return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
+     * SQL fragment and params restricting a query to one course, or to all.
+     *
+     * Course id 0 means "every course" throughout the dashboard: it is what the
+     * All courses option in the picker sends, and what the Overall Usage panel
+     * asks for. Several counters here used to interpolate
+     * "WHERE courseid = :courseid" unconditionally, which turned that request
+     * into a filter for rows literally stored against course 0 -- of which there
+     * are none. The panels went quietly empty instead of erroring, and only in
+     * site-wide mode, which is the one mode there is no per-course page to
+     * cross-check against. Routing every counter through one helper is what
+     * stops that drifting apart again.
+     *
+     * @param int $courseid Course id, or 0 for every course.
+     * @param string $alias Table alias used in the query, empty for none.
+     * @return array [string $whereclause, array $params] -- the clause is a
+     *               trailing AND fragment, so the caller supplies the WHERE.
+     */
+    private static function course_clause(int $courseid, string $alias = 'm'): array {
+        if ($courseid <= 0) {
+            return ['', []];
+        }
+        $prefix = $alias !== '' ? $alias . '.' : '';
+        return [" AND {$prefix}courseid = :courseid", ['courseid' => $courseid]];
     }
 
     /**
@@ -830,7 +881,7 @@ class analytics {
         }
 
         // Get AI users (those who sent at least one message).
-        $msgparams = ['courseid' => $courseid];
+        [$coursewhere, $msgparams] = self::course_clause($courseid);
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -838,7 +889,7 @@ class analytics {
         }
         $sql = "SELECT DISTINCT m.userid
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhere}";
+                 WHERE m.role = 'user'{$coursewhere}{$timewhere}";
         $aiuserids = $DB->get_fieldset_sql($sql, $msgparams);
 
         $aiuserset = array_flip($aiuserids);

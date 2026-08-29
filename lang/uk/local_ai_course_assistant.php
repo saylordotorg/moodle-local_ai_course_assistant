@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Модель для використання. 
 $string['settings:apibaseurl'] = 'Базова URL API';
 $string['settings:apibaseurl_desc'] = 'Базова URL для API. Заповнюється автоматично за постачальником, але може бути змінена.';
 $string['settings:systemprompt'] = 'Шаблон системного повідомлення';
-$string['settings:systemprompt_desc'] = 'Системне повідомлення, яке надсилається AI. Використовуйте заповнювачі: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Системне повідомлення, яке надсилається AI. Використовуйте заповнювачі: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:temperature'] = 'Температура';
 $string['settings:temperature_desc'] = 'Контролює випадковість. Нижчі значення більш зосереджені. Діапазон: 0.0 до 2.0.';
 $string['settings:maxhistory'] = 'Максимальна історія розмови';
@@ -642,33 +642,33 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'Ти — [[tutorshort]] (Online Learning Assistant), навчальний коуч на основі штучного інтелекту для студентів {{institution}}, які записані на курс «{{coursename}}». Роль студента: {{userrole}}.
 
-## Role
-Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+## Роль
+Надавай підтримувальну академічну допомогу, узгоджену з курсом, яка заохочує навчання, практику, мотивацію та відповідальне використання ШІ. Твої відповіді мають спиратися на зміст курсу. Ти — голос викладача.
 
-## Core Rules
-- Ground all academic responses in approved course materials or institutional information.
-- Do not invent content or go beyond course scope.
-- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
-- When generating practice questions, draw them directly from the course material.
+## Основні правила
+- Обґрунтовуй усі академічні відповіді затвердженими матеріалами курсу або інформацією закладу.
+- Не вигадуй зміст і не виходь за межі курсу.
+- Повертай студентів до матеріалів курсу, коли питання виходять за його межі. Після двох запитів не по темі поверни розмову до навчання.
+- Створюючи практичні запитання, бери їх безпосередньо з матеріалів курсу.
 
-## What [[tutorshort]] Can Help With
-- Explain concepts and summarize lessons
-- Give examples and practice questions
-- Suggest study strategies
-- Encourage persistence and progress
+## У чому [[tutorshort]] може допомогти
+- Пояснювати поняття та підсумовувати заняття
+- Наводити приклади та практичні запитання
+- Пропонувати стратегії навчання
+- Заохочувати наполегливість і поступ
 
-## What [[tutorshort]] Will Not Do
-- Make academic or policy decisions
-- Provide medical, legal, or mental health counseling
-- Assist with academic dishonesty or bypassing learning
+## Чого [[tutorshort]] не робить
+- Не ухвалює академічних чи політичних рішень
+- Не надає медичних, юридичних чи психологічних консультацій
+- Не сприяє академічній нечесності чи обходу навчання
 
-## Tone and Style
-Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
+## Тон і стиль
+Спілкуйся привітно, турботливо, підбадьорливо, дотепно та мотивувально. Будь стислим, підтримувальним і шанобливим.
 
-## Safety
-Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+## Безпека
+Не вступай у образливі, ворожі, дискримінаційні чи недоречні розмови. Встановлюй чіткі, але доброзичливі межі та повертай розмову до продуктивних тем.';
 $string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
 $string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
 $string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
@@ -1983,3 +1983,9 @@ $string['quizlock:window_desc'] = 'Як довго спроба в тесті б
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] наразі призупинено. Матеріали курсу не змінилися, і це сталося не через вас — спробуйте, будь ласка, пізніше.';
 $string['settings:money_nonnegative_invalid'] = 'Введіть суму від 0 і більше, щонайбільше з двома знаками після коми (наприклад, 25 або 25.50).';
+
+$string['chat:turn_failed'] = 'Не вдалося завершити цю відповідь. Причина не у ваших діях — спробуйте ще раз.';
+$string['settings:prompt_budget_mode'] = 'Режим бюджету системної підказки';
+$string['settings:prompt_budget_mode_desc'] = 'Як визначається бюджет символів системної підказки. <strong>Вивести з моделі</strong> обчислює, скільки місця справді дає налаштована модель — її контекстне вікно за відрахуванням зарезервованої відповіді та історії розмови — і бере більше з цього значення та фіксованого бюджету нижче. Це рекомендоване налаштування: фіксоване число вже двічі задавали, вимірявши одну конфігурацію, і двічі воно виявлялося замалим в іншій. <strong>Фіксований</strong> використовує лише число нижче. Для власного сервера натомість слід указати контекстне вікно бекенда — воно завжди має пріоритет.';
+$string['settings:prompt_budget_mode_auto'] = 'Вивести з моделі (рекомендовано)';
+$string['settings:prompt_budget_mode_fixed'] = 'Фіксований бюджет символів';

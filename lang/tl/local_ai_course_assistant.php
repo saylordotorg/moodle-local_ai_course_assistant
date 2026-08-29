@@ -75,10 +75,34 @@ $string['settings:model_desc'] = 'Ang modelong gagamitin. Ang default ay depende
 $string['settings:apibaseurl'] = 'Base URL ng API';
 $string['settings:apibaseurl_desc'] = 'Base URL para sa API. Awtomatikong napupuno ayon sa provider ngunit maaaring i-override. Mag-iwan ng blangko para sa default ng provider.';
 $string['settings:systemprompt'] = 'Template ng System Prompt';
-$string['settings:systemprompt_desc'] = 'System prompt na ipinapadala sa AI. Gumamit ng mga placeholder: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Ikaw ay isang kapaki-pakinabang na AI tutor para sa kurso na "{{coursename}}". Ang papel ng mag-aaral ay {{userrole}}.
+$string['settings:systemprompt_desc'] = 'System prompt na ipinapadala sa AI. Gumamit ng mga placeholder: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Ikaw si [[tutorshort]] (Online Learning Assistant), isang AI learning coach para sa mga mag-aaral ng {{institution}} na naka-enroll sa "{{coursename}}". Ang papel ng mag-aaral ay {{userrole}}.
 
-Tulungan ang mag-aaral na maunawaan ang materyal ng kurso. Maging nakakaengganyo, malinaw, at may magandang paraan ng pagtuturo.';
+## Papel
+Magbigay ng sumusuportang tulong akademiko na naaayon sa kurso, na naghihikayat ng pagkatuto, pagsasanay, motibasyon, at responsableng paggamit ng AI. Ang iyong mga sagot ay dapat nakabatay sa nilalaman ng kurso. Ikaw ang tinig ng guro.
+
+## Pangunahing Alituntunin
+- Ibatay ang lahat ng sagot na pang-akademiko sa aprubadong materyales ng kurso o impormasyon ng institusyon.
+- Huwag mag-imbento ng nilalaman at huwag lumampas sa saklaw ng kurso.
+- Ibalik ang mga mag-aaral sa materyales ng kurso kapag ang tanong ay wala sa saklaw. Pagkatapos ng dalawang hiling na wala sa paksa, ibalik ang usapan sa pagkatuto.
+- Kapag gumagawa ng mga pagsasanay na tanong, kunin ang mga ito nang direkta mula sa materyales ng kurso.
+
+## Kayang Tulungan ni [[tutorshort]]
+- Ipaliwanag ang mga konsepto at buurin ang mga aralin
+- Magbigay ng mga halimbawa at pagsasanay na tanong
+- Magmungkahi ng mga estratehiya sa pag-aaral
+- Hikayatin ang pagtitiyaga at pag-unlad
+
+## Hindi Gagawin ni [[tutorshort]]
+- Gumawa ng desisyong akademiko o patakaran
+- Magbigay ng payong medikal, legal, o pangkalusugang pangkaisipan
+- Tumulong sa pandaraya o pag-iwas sa pagkatuto
+
+## Tono at Estilo
+Makipag-usap nang magiliw, maalaga, nakapagpapalakas ng loob, mapagpatawa, at nakakaganyak. Maging maikli, sumusuporta, at magalang.
+
+## Kaligtasan
+Huwag makilahok sa mapang-abuso, mapoot, mapanlait, o hindi angkop na usapan. Maglagay ng matatag ngunit mabait na hangganan at ibalik sa kapaki-pakinabang na paksa.';
 $string['settings:temperature'] = 'Temperatura';
 $string['settings:temperature_desc'] = 'Kinokontrol ang randomness. Ang mas mababang halaga ay mas nakatuon, ang mas mataas na halaga ay mas malikhain. Saklaw: 0.0 hanggang 2.0.';
 $string['settings:maxhistory'] = 'Maximum na Kasaysayan ng Pakikipag-usap';
@@ -1967,3 +1991,9 @@ $string['quizlock:window_desc'] = 'Gaano katagal pa ituturing na kasalukuyan ang
 
 $string['emergency:chat_stopped'] = 'Pansamantalang naka-pause ang [[tutorshort]] ngayon. Hindi naapektuhan ang mga materyales ng iyong kurso, at hindi ito dahil sa iyo — pakisubukan muli mamaya.';
 $string['settings:money_nonnegative_invalid'] = 'Maglagay ng halagang 0 o higit pa, na may hindi hihigit sa dalawang decimal (halimbawa 25 o 25.50).';
+
+$string['chat:turn_failed'] = 'Hindi natapos ang sagot na ito. Walang ginawa ka na naging dahilan nito — pakisubukan muli.';
+$string['settings:prompt_budget_mode'] = 'Mode ng badyet ng system prompt';
+$string['settings:prompt_budget_mode_desc'] = 'Kung paano tinutukoy ang badyet ng mga karakter ng system prompt. Kinakalkula ng <strong>Kunin mula sa modelo</strong> ang espasyong talagang ibinibigay ng nakatakdang modelo — ang context window nito, bawas ang nakalaang sagot at ang kasaysayan ng usapan — at ginagamit ang mas malaki sa halagang iyon at sa nakatakdang badyet sa ibaba. Ito ang inirerekomendang setting: dalawang beses nang itinakda ang isang tiyak na numero sa pamamagitan ng pagsukat sa iisang konpigurasyon, at dalawang beses ding napatunayang masyadong maliit ito sa ibang konpigurasyon. Ang <strong>Nakatakda</strong> ay gumagamit lamang ng numero sa ibaba. Ang backend na sarili ang nagho-host ay dapat na itakda ang context window ng backend sa halip, at iyon ang laging nauuna.';
+$string['settings:prompt_budget_mode_auto'] = 'Kunin mula sa modelo (inirerekomenda)';
+$string['settings:prompt_budget_mode_fixed'] = 'Nakatakdang badyet ng karakter';

@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Käytettävä malli. Oletusarvo riippuu palvel
 $string['settings:apibaseurl'] = 'API:n perus-URL';
 $string['settings:apibaseurl_desc'] = 'API:n perus-URL. Täytetään automaattisesti palveluntarjoajan mukaan, mutta voidaan korvata. Jätä tyhjäksi käyttääksesi palveluntarjoajan oletusarvoa.';
 $string['settings:systemprompt'] = 'Järjestelmäkehotteen malli';
-$string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Olet hyödyllinen AI-tutori kurssille "{{coursename}}". Opiskelijan rooli on {{userrole}}.
 
 Auta opiskelijaa ymmärtämään kurssin sisältö. Ole kannustava, selkeä ja pedagogisesti perusteellinen.';
@@ -1931,3 +1931,9 @@ $string['quizlock:window_desc'] = 'Kuinka kauan yritys ilman aikarajaa olevassa 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] on juuri nyt tauolla. Kurssimateriaalisi eivät ole muuttuneet, eikä tämä johdu sinusta — yritä myöhemmin uudelleen.';
 $string['settings:money_nonnegative_invalid'] = 'Anna vähintään 0:n suuruinen summa, enintään kahdella desimaalilla (esimerkiksi 25 tai 25.50).';
+
+$string['chat:turn_failed'] = 'Tätä vastausta ei voitu viimeistellä. Syy ei ollut mikään tekemäsi asia — yritä uudelleen.';
+$string['settings:prompt_budget_mode'] = 'Järjestelmäkehotteen budjettitila';
+$string['settings:prompt_budget_mode_desc'] = 'Miten järjestelmäkehotteen merkkibudjetti määritetään. <strong>Johda mallista</strong> laskee, kuinka paljon tilaa määritetty malli todella tarjoaa — sen konteksti-ikkunan, josta on vähennetty varattu vastaus ja keskusteluhistoria — ja käyttää suurempaa tästä ja alla olevasta kiinteästä budjetista. Tämä on suositeltu asetus: kiinteä luku on jo kahdesti asetettu mittaamalla yhtä kokoonpanoa, ja se on kahdesti osoittautunut liian pieneksi toisessa. <strong>Kiinteä</strong> käyttää vain alla olevaa lukua. Itse ylläpidetyn taustapalvelun tulisi sen sijaan asettaa taustapalvelun konteksti-ikkuna, joka menee aina edelle.';
+$string['settings:prompt_budget_mode_auto'] = 'Johda mallista (suositus)';
+$string['settings:prompt_budget_mode_fixed'] = 'Kiinteä merkkibudjetti';

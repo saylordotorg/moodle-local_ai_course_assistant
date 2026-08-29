@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Το μοντέλο προς χρήση. Η π
 $string['settings:apibaseurl'] = 'Βασικό URL API';
 $string['settings:apibaseurl_desc'] = 'Βασικό URL για το API. Αυτόματη συμπλήρωση ανά πάροχο, αλλά μπορεί να αντικατασταθεί.';
 $string['settings:systemprompt'] = 'Πρότυπο Μηνύματος Συστήματος';
-$string['settings:systemprompt_desc'] = 'Μήνυμα συστήματος που αποστέλλεται στο AI. Χρήση θέσεων: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Μήνυμα συστήματος που αποστέλλεται στο AI. Χρήση θέσεων: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:temperature'] = 'Θερμοκρασία';
 $string['settings:temperature_desc'] = 'Ελέγχει την τυχαιότητα. Χαμηλότερες τιμές είναι πιο εστιασμένες. Εύρος: 0.0 έως 2.0.';
 $string['settings:maxhistory'] = 'Μέγιστο Ιστορικό Συνομιλίας';
@@ -642,33 +642,33 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'Είσαι ο/η [[tutorshort]] (Online Learning Assistant), ένας εκπαιδευτικός βοηθός τεχνητής νοημοσύνης για φοιτητές του/της {{institution}} που παρακολουθούν το μάθημα "{{coursename}}". Ο ρόλος του φοιτητή είναι {{userrole}}.
 
-## Role
-Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+## Ρόλος
+Παρέχεις υποστηρικτική ακαδημαϊκή βοήθεια, ευθυγραμμισμένη με το μάθημα, που ενθαρρύνει τη μάθηση, την εξάσκηση, τα κίνητρα και την υπεύθυνη χρήση της τεχνητής νοημοσύνης. Οι απαντήσεις σου πρέπει να στηρίζονται στο περιεχόμενο του μαθήματος. Είσαι η φωνή του διδάσκοντα.
 
-## Core Rules
-- Ground all academic responses in approved course materials or institutional information.
-- Do not invent content or go beyond course scope.
-- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
-- When generating practice questions, draw them directly from the course material.
+## Βασικοί κανόνες
+- Στήριξε κάθε ακαδημαϊκή απάντηση σε εγκεκριμένο υλικό του μαθήματος ή σε πληροφορίες του ιδρύματος.
+- Μην επινοείς περιεχόμενο και μην ξεπερνάς το πεδίο του μαθήματος.
+- Παρέπεμπε τους φοιτητές πίσω στο υλικό όταν οι ερωτήσεις βγαίνουν εκτός μαθήματος. Μετά από δύο άσχετα αιτήματα, επανάφερε τη συζήτηση στη μάθηση.
+- Όταν δημιουργείς ερωτήσεις εξάσκησης, άντλησέ τες απευθείας από το υλικό του μαθήματος.
 
-## What [[tutorshort]] Can Help With
-- Explain concepts and summarize lessons
-- Give examples and practice questions
-- Suggest study strategies
-- Encourage persistence and progress
+## Σε τι μπορεί να βοηθήσει ο/η [[tutorshort]]
+- Να εξηγεί έννοιες και να συνοψίζει μαθήματα
+- Να δίνει παραδείγματα και ερωτήσεις εξάσκησης
+- Να προτείνει στρατηγικές μελέτης
+- Να ενθαρρύνει την επιμονή και την πρόοδο
 
-## What [[tutorshort]] Will Not Do
-- Make academic or policy decisions
-- Provide medical, legal, or mental health counseling
-- Assist with academic dishonesty or bypassing learning
+## Τι δεν κάνει ο/η [[tutorshort]]
+- Δεν λαμβάνει ακαδημαϊκές αποφάσεις ή αποφάσεις πολιτικής
+- Δεν παρέχει ιατρικές, νομικές ή ψυχολογικές συμβουλές
+- Δεν διευκολύνει την ακαδημαϊκή ανεντιμότητα ή την παράκαμψη της μάθησης
 
-## Tone and Style
-Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
+## Ύφος και στυλ
+Επικοινώνησε με φιλικό, φροντιστικό, ενθαρρυντικό, ευχάριστο και παρακινητικό τρόπο. Να είσαι σύντομος, υποστηρικτικός και με σεβασμό.
 
-## Safety
-Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+## Ασφάλεια
+Μην συμμετέχεις σε υβριστικές, μισαλλόδοξες, ρατσιστικές ή ακατάλληλες συζητήσεις. Θέσε σαφή αλλά ευγενικά όρια και επανάφερε τη συζήτηση σε παραγωγικά θέματα.';
 $string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
 $string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
 $string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
@@ -1970,3 +1970,9 @@ $string['quizlock:window_desc'] = 'Για πόση ώρα μια προσπάθ�
 
 $string['emergency:chat_stopped'] = 'Το [[tutorshort]] είναι προσωρινά σε παύση. Το υλικό του μαθήματός σας δεν επηρεάζεται και δεν φταίτε εσείς — δοκιμάστε ξανά αργότερα.';
 $string['settings:money_nonnegative_invalid'] = 'Εισαγάγετε ποσό 0 ή μεγαλύτερο, με έως δύο δεκαδικά ψηφία (για παράδειγμα 25 ή 25.50).';
+
+$string['chat:turn_failed'] = 'Αυτή η απάντηση δεν μπόρεσε να ολοκληρωθεί. Τίποτα από όσα κάνατε δεν το προκάλεσε — δοκιμάστε ξανά.';
+$string['settings:prompt_budget_mode'] = 'Λειτουργία προϋπολογισμού προτροπής συστήματος';
+$string['settings:prompt_budget_mode_desc'] = 'Πώς καθορίζεται ο προϋπολογισμός χαρακτήρων της προτροπής συστήματος. Η επιλογή <strong>Εξαγωγή από το μοντέλο</strong> υπολογίζει τον χώρο που προσφέρει πραγματικά το ρυθμισμένο μοντέλο — το παράθυρο συμφραζομένων του, μείον τη δεσμευμένη απάντηση και το ιστορικό της συνομιλίας — και χρησιμοποιεί τη μεγαλύτερη τιμή ανάμεσα σε αυτήν και στον σταθερό προϋπολογισμό παρακάτω. Αυτή είναι η συνιστώμενη ρύθμιση: ένας σταθερός αριθμός ορίστηκε ήδη δύο φορές μετρώντας μία μόνο διαμόρφωση και δύο φορές αποδείχθηκε υπερβολικά μικρός σε άλλη. Η επιλογή <strong>Σταθερός</strong> χρησιμοποιεί μόνο τον αριθμό παρακάτω. Ένα αυτοφιλοξενούμενο backend θα πρέπει αντ’ αυτού να ορίσει το παράθυρο συμφραζομένων του backend, το οποίο υπερισχύει πάντα.';
+$string['settings:prompt_budget_mode_auto'] = 'Εξαγωγή από το μοντέλο (συνιστάται)';
+$string['settings:prompt_budget_mode_fixed'] = 'Σταθερός προϋπολογισμός χαρακτήρων';

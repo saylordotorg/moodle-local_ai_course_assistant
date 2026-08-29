@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'El modelo a utilizar. El valor predeterminado 
 $string['settings:apibaseurl'] = 'URL base de la API';
 $string['settings:apibaseurl_desc'] = 'URL base para la API. Se rellena automáticamente según el proveedor, pero puede modificarse. Déjelo en blanco para usar el valor predeterminado del proveedor.';
 $string['settings:systemprompt'] = 'Plantilla de instrucción del sistema';
-$string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Eres un tutor de IA útil para el curso "{{coursename}}". El rol del estudiante es {{userrole}}.
 
 Ayuda al estudiante a comprender el contenido del curso. Sé alentador, claro y pedagógicamente riguroso.';
@@ -1958,3 +1958,9 @@ $string['quizlock:window_desc'] = 'Cuánto tiempo sigue contando como en curso u
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] está en pausa en este momento. Los materiales de tu curso no se ven afectados y no es algo que hayas hecho tú: inténtalo de nuevo más tarde.';
 $string['settings:money_nonnegative_invalid'] = 'Introduce un importe de 0 o más, con un máximo de dos decimales (por ejemplo, 25 o 25.50).';
+
+$string['chat:turn_failed'] = 'No se pudo completar esta respuesta. Nada de lo que hiciste lo provocó: inténtalo de nuevo.';
+$string['settings:prompt_budget_mode'] = 'Modo de presupuesto del prompt del sistema';
+$string['settings:prompt_budget_mode_desc'] = 'Cómo se decide el presupuesto de caracteres del prompt del sistema. <strong>Derivar del modelo</strong> calcula el espacio que ofrece realmente el modelo configurado —su ventana de contexto, menos la respuesta reservada y el historial de la conversación— y usa el mayor entre ese valor y el presupuesto fijo de abajo. Es la opción recomendada: un número fijo ya se estableció dos veces midiendo una sola configuración y dos veces resultó demasiado pequeño en otra. <strong>Fijo</strong> usa únicamente el número de abajo. Un backend autoalojado debería configurar en su lugar la ventana de contexto del backend, que siempre tiene prioridad.';
+$string['settings:prompt_budget_mode_auto'] = 'Derivar del modelo (recomendado)';
+$string['settings:prompt_budget_mode_fixed'] = 'Presupuesto fijo de caracteres';

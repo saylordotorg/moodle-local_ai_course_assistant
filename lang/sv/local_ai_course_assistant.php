@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Modellen som ska användas. Standardvärdet be
 $string['settings:apibaseurl'] = 'API-bas-URL';
 $string['settings:apibaseurl_desc'] = 'API-bas-URL. Fylls i automatiskt baserat på leverantör men kan åsidosättas. Lämna tomt för att använda leverantörens standardvärde.';
 $string['settings:systemprompt'] = 'Systempromptmall';
-$string['settings:systemprompt_desc'] = 'Systemprompten som skickas till AI:n. Använd platshållarna {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Systemprompten som skickas till AI:n. Använd platshållarna {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Du är en hjälpsam AI-handledare för kursen "{{coursename}}". Studentens roll är {{userrole}}.
 
 Hjälp studenten att förstå kursinnehållet. Var uppmuntrande, tydlig och pedagogiskt noggrann.';
@@ -1930,3 +1930,9 @@ $string['quizlock:window_desc'] = 'Hur länge ett försök på ett prov utan tid
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] är pausad just nu. Ditt kursmaterial påverkas inte, och det beror inte på något du gjort — försök igen senare.';
 $string['settings:money_nonnegative_invalid'] = 'Ange ett belopp på 0 eller mer, med högst två decimaler (till exempel 25 eller 25.50).';
+
+$string['chat:turn_failed'] = 'Det gick inte att slutföra det här svaret. Inget du gjorde orsakade det — försök gärna igen.';
+$string['settings:prompt_budget_mode'] = 'Läge för systempromptens budget';
+$string['settings:prompt_budget_mode_desc'] = 'Hur systempromptens teckenbudget bestäms. <strong>Härled från modellen</strong> räknar ut hur mycket utrymme den konfigurerade modellen faktiskt ger — dess kontextfönster minus det reserverade svaret och konversationshistoriken — och använder det största av detta och den fasta budgeten nedan. Det här är den rekommenderade inställningen: ett fast tal har redan två gånger satts genom att mäta en enda konfiguration, och har två gånger visat sig för litet i en annan. <strong>Fast</strong> använder bara talet nedan. En självhostad backend bör i stället ange backendens kontextfönster, som alltid har företräde.';
+$string['settings:prompt_budget_mode_auto'] = 'Härled från modellen (rekommenderas)';
+$string['settings:prompt_budget_mode_fixed'] = 'Fast teckenbudget';

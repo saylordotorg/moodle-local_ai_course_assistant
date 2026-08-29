@@ -2497,6 +2497,17 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/prompt_budget_mode',
+        get_string('settings:prompt_budget_mode', 'local_ai_course_assistant'),
+        get_string('settings:prompt_budget_mode_desc', 'local_ai_course_assistant'),
+        'auto',
+        [
+            'auto' => get_string('settings:prompt_budget_mode_auto', 'local_ai_course_assistant'),
+            'fixed' => get_string('settings:prompt_budget_mode_fixed', 'local_ai_course_assistant'),
+        ]
+    ));
+
     // v7.2.3: warn when the assembler has recently had to cut retrieved course
     // content. Truncation used to be visible only in the prompt debug log, which
     // is off by default, so a budget too small to hold the prompt shipped twice

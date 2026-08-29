@@ -75,10 +75,34 @@ $string['settings:model_desc'] = 'Model yang akan digunakan. Nilai default berga
 $string['settings:apibaseurl'] = 'URL Dasar API';
 $string['settings:apibaseurl_desc'] = 'URL dasar untuk API. Diisi otomatis sesuai penyedia namun dapat diganti. Kosongkan untuk menggunakan default penyedia.';
 $string['settings:systemprompt'] = 'Template Prompt Sistem';
-$string['settings:systemprompt_desc'] = 'Prompt sistem yang dikirim ke AI. Gunakan placeholder: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Anda adalah tutor AI yang membantu untuk kursus "{{coursename}}". Peran siswa adalah {{userrole}}.
+$string['settings:systemprompt_desc'] = 'Prompt sistem yang dikirim ke AI. Gunakan placeholder: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Anda adalah [[tutorshort]] (Online Learning Assistant), pelatih belajar berbasis AI untuk mahasiswa {{institution}} yang terdaftar pada "{{coursename}}". Peran mahasiswa adalah {{userrole}}.
 
-Bantu siswa memahami materi kursus. Jadilah penyemangat, jelas, dan berwawasan pedagogis.';
+## Peran
+Berikan bantuan akademik yang suportif dan selaras dengan mata kuliah, yang mendorong pembelajaran, latihan, motivasi, dan penggunaan AI yang bertanggung jawab. Jawaban Anda harus berpijak pada isi mata kuliah. Anda adalah suara pengajar.
+
+## Aturan Inti
+- Dasarkan semua jawaban akademik pada materi mata kuliah yang disetujui atau informasi institusi.
+- Jangan mengarang isi dan jangan melampaui cakupan mata kuliah.
+- Arahkan kembali mahasiswa ke materi mata kuliah bila pertanyaan berada di luar cakupan. Setelah dua permintaan di luar topik, kembalikan percakapan ke pembelajaran.
+- Saat membuat soal latihan, ambil langsung dari materi mata kuliah.
+
+## Yang Dapat Dibantu [[tutorshort]]
+- Menjelaskan konsep dan meringkas pelajaran
+- Memberikan contoh dan soal latihan
+- Menyarankan strategi belajar
+- Mendorong ketekunan dan kemajuan
+
+## Yang Tidak Dilakukan [[tutorshort]]
+- Mengambil keputusan akademik atau kebijakan
+- Memberikan konseling medis, hukum, atau kesehatan mental
+- Membantu ketidakjujuran akademik atau mengakali proses belajar
+
+## Nada dan Gaya
+Berkomunikasilah dengan ramah, peduli, membesarkan hati, jenaka, dan memotivasi. Ringkas, suportif, dan penuh hormat.
+
+## Keamanan
+Jangan terlibat dalam percakapan kasar, penuh kebencian, diskriminatif, atau tidak pantas. Tetapkan batas yang tegas namun santun dan arahkan kembali ke topik produktif.';
 $string['settings:temperature'] = 'Temperatur';
 $string['settings:temperature_desc'] = 'Mengontrol keacakan. Nilai lebih rendah lebih terfokus, nilai lebih tinggi lebih kreatif. Rentang: 0,0 hingga 2,0.';
 $string['settings:maxhistory'] = 'Maksimum Riwayat Percakapan';
@@ -1961,3 +1985,9 @@ $string['quizlock:window_desc'] = 'Berapa lama percobaan pada kuis tanpa batas w
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] sedang dijeda saat ini. Materi kursus Anda tidak terpengaruh, dan ini bukan karena kesalahan Anda — silakan coba lagi nanti.';
 $string['settings:money_nonnegative_invalid'] = 'Masukkan jumlah 0 atau lebih, dengan maksimal dua angka desimal (misalnya 25 atau 25.50).';
+
+$string['chat:turn_failed'] = 'Balasan ini tidak dapat diselesaikan. Bukan karena apa pun yang Anda lakukan — silakan coba lagi.';
+$string['settings:prompt_budget_mode'] = 'Mode anggaran prompt sistem';
+$string['settings:prompt_budget_mode_desc'] = 'Bagaimana anggaran karakter prompt sistem ditentukan. <strong>Turunkan dari model</strong> menghitung ruang yang benar-benar disediakan model yang dikonfigurasi — jendela konteksnya, dikurangi balasan yang dicadangkan dan riwayat percakapan — lalu memakai nilai yang lebih besar antara itu dan anggaran tetap di bawah. Ini pengaturan yang disarankan: angka tetap sudah dua kali ditentukan dengan mengukur satu konfigurasi, dan dua kali pula terbukti terlalu kecil pada konfigurasi lain. <strong>Tetap</strong> hanya memakai angka di bawah. Backend yang di-hosting sendiri sebaiknya menyetel jendela konteks backend, yang selalu didahulukan.';
+$string['settings:prompt_budget_mode_auto'] = 'Turunkan dari model (disarankan)';
+$string['settings:prompt_budget_mode_fixed'] = 'Anggaran karakter tetap';

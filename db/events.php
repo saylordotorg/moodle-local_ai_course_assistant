@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data.
+ * Event observers.
  *
  * @package    local_ai_course_assistant
- * @copyright  2025-2026 Tom Caswell & David Ta / Saylor University
+ * @copyright  2026 Tom Caswell / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_ai_course_assistant';
-$plugin->version = 2026082900;
-$plugin->requires = 2024100700; // Moodle 4.5+.
-$plugin->supported = [405, 503]; // Tested on Moodle 4.5 through 5.3dev.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '7.2.4';
+$observers = [
+    [
+        'eventname' => '\core\event\course_deleted',
+        'callback'  => '\local_ai_course_assistant\observer::course_deleted',
+    ],
+];

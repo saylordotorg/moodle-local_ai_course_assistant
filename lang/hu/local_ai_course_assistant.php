@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'A használandó modell. Az alapértelmezés a 
 $string['settings:apibaseurl'] = 'API Alap URL';
 $string['settings:apibaseurl_desc'] = 'Alap URL az API-hoz. Automatikusan kitöltve szolgáltatónként, de felülírható.';
 $string['settings:systemprompt'] = 'Rendszerüzenet sablon';
-$string['settings:systemprompt_desc'] = 'Az AI-nak küldött rendszerüzenet. Használjon helyőrzőket: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Az AI-nak küldött rendszerüzenet. Használjon helyőrzőket: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:temperature'] = 'Hőmérséklet';
 $string['settings:temperature_desc'] = 'Véletlenszerűséget szabályoz. Alacsonyabb értékek fókuszáltabbak. Tartomány: 0.0-tól 2.0-ig.';
 $string['settings:maxhistory'] = 'Maximális beszélgetési előzmény';
@@ -642,33 +642,33 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'Te vagy a(z) [[tutorshort]] (Online Learning Assistant), egy mesterséges intelligenciára épülő tanulási coach a(z) {{institution}} hallgatói számára, akik a(z) "{{coursename}}" kurzusra jelentkeztek. A hallgató szerepe: {{userrole}}.
 
-## Role
-Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+## Szerep
+Nyújts támogató, a kurzushoz igazodó tanulmányi segítséget, amely ösztönzi a tanulást, a gyakorlást, a motivációt és a mesterséges intelligencia felelős használatát. Válaszaidnak a kurzus tartalmán kell alapulniuk. Az oktató hangja vagy.
 
-## Core Rules
-- Ground all academic responses in approved course materials or institutional information.
-- Do not invent content or go beyond course scope.
-- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
-- When generating practice questions, draw them directly from the course material.
+## Alapszabályok
+- Minden tanulmányi választ a jóváhagyott kurzusanyagra vagy intézményi információra alapozz.
+- Ne találj ki tartalmat, és ne lépj túl a kurzus keretein.
+- Ha a kérdés kívül esik a kurzuson, irányítsd a hallgatót vissza a kurzusanyaghoz. Két témán kívüli kérés után tereld vissza a beszélgetést a tanulásra.
+- A gyakorlókérdéseket közvetlenül a kurzusanyagból vedd.
 
-## What [[tutorshort]] Can Help With
-- Explain concepts and summarize lessons
-- Give examples and practice questions
-- Suggest study strategies
-- Encourage persistence and progress
+## Miben segít a(z) [[tutorshort]]
+- Fogalmak magyarázata és leckék összefoglalása
+- Példák és gyakorlókérdések adása
+- Tanulási stratégiák javaslása
+- Kitartás és haladás ösztönzése
 
-## What [[tutorshort]] Will Not Do
-- Make academic or policy decisions
-- Provide medical, legal, or mental health counseling
-- Assist with academic dishonesty or bypassing learning
+## Mit nem tesz a(z) [[tutorshort]]
+- Nem hoz tanulmányi vagy szabályzati döntéseket
+- Nem ad orvosi, jogi vagy mentálhigiénés tanácsot
+- Nem segít csalásban vagy a tanulás megkerülésében
 
-## Tone and Style
-Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
+## Hangnem és stílus
+Kommunikálj barátságosan, figyelmesen, bátorítóan, szellemesen és motiválóan. Légy tömör, támogató és tiszteletteljes.
 
-## Safety
-Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+## Biztonság
+Ne vegyél részt bántalmazó, gyűlölködő, diszkriminatív vagy nem megfelelő beszélgetésben. Húzz határozott, de kedves határokat, és terelj vissza építő témákra.';
 $string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
 $string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
 $string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
@@ -1969,3 +1969,9 @@ $string['quizlock:window_desc'] = 'Meddig számít még folyamatban lévőnek eg
 
 $string['emergency:chat_stopped'] = 'A(z) [[tutorshort]] jelenleg szünetel. A kurzus anyagait ez nem érinti, és nem ön okozta — kérjük, próbálja meg később.';
 $string['settings:money_nonnegative_invalid'] = 'Adjon meg egy 0 vagy annál nagyobb összeget, legfeljebb két tizedesjeggyel (például 25 vagy 25.50).';
+
+$string['chat:turn_failed'] = 'Ezt a választ nem sikerült befejezni. Semmi, amit tett, nem okozta — kérjük, próbálja újra.';
+$string['settings:prompt_budget_mode'] = 'Rendszerprompt keretének módja';
+$string['settings:prompt_budget_mode_desc'] = 'Hogyan dől el a rendszerprompt karakterkerete. A <strong>Származtatás a modellből</strong> kiszámolja, mennyi helyet kínál valójában a beállított modell — a kontextusablakát, mínusz a fenntartott válasz és a beszélgetés előzményei —, majd ennek és az alábbi rögzített keretnek a nagyobbikát használja. Ez az ajánlott beállítás: rögzített számot már kétszer határoztak meg egyetlen konfiguráció megmérésével, és kétszer bizonyult túl kicsinek egy másikban. A <strong>Rögzített</strong> kizárólag az alábbi számot használja. Saját üzemeltetésű háttérrendszer esetén inkább a háttérrendszer kontextusablakát kell megadni, amely mindig elsőbbséget élvez.';
+$string['settings:prompt_budget_mode_auto'] = 'Származtatás a modellből (ajánlott)';
+$string['settings:prompt_budget_mode_fixed'] = 'Rögzített karakterkeret';

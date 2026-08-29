@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Modèle min bɛ kɛ. Default bɛ bɛɛlɛ dɔn
 $string['settings:apibaseurl'] = 'API Taaribolɔ URL';
 $string['settings:apibaseurl_desc'] = 'API taaribolɔ URL. Bɛɛlɛ dɔnbaga bɛɛ ye a yɛrɛ tilɛ ɲɛ fɔlɔ, nka a bɛ se ka yɛlɛma. Bɛɛlɛ dɔnbaga default kama a bɔ ɲɛ.';
 $string['settings:systemprompt'] = 'Système Invite Misali';
-$string['settings:systemprompt_desc'] = 'AI ci invite. Jagomaw jɔminɛ: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'AI ci invite. Jagomaw jɔminɛ: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'I ye AI karamɔgɔ dɛmɛbaga ye kalanso "{{coursename}}" kama. Kalandenw ka wɛlɛya ye {{userrole}}.
 
 Kalanden dɛmɛ kalanso kow kalan kama. Kɔlɔsili kɛ, a jɛ, ani kalan fan na ɲɛ.';
@@ -1961,3 +1961,9 @@ $string['quizlock:window_desc'] = 'Kɔrɔbɔli min tɛ waati dan sɔrɔ, a kɛco
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] jɔɔlen don sisan. I ka kalan fɛnw ma yɛlɛma, ani o tɛ i ka fili ye — i ni ce, a lajɛ kokura kɔfɛ.';
 $string['settings:money_nonnegative_invalid'] = 'Hakɛ min ye 0 ye walima ka tɛmɛ o kan, sɛbɛn; desimali fila dama (misali 25 walima 25.50).';
+
+$string['chat:turn_failed'] = 'Jaabi in tun tɛ se ka dafa. I ma foyi kɛ min y’a lase — i ni ce, a lajɛ tugun.';
+$string['settings:prompt_budget_mode'] = 'Sistɛmu ɲininkali budzɛ cogoya';
+$string['settings:prompt_budget_mode_desc'] = 'Sistɛmu ɲininkali sɛbɛnden hakɛ budzɛ latigɛcogo. <strong>A bɔ modɛli la</strong> b’a jate minɛ modɛli latigɛlen bɛ yɔrɔ min di tiɲɛ na — a kɔnɔkow palanjɛ, ka jaabi marata ni baro kɔfɛkow bɔ a la — o kɔ, a bɛ min ka bon ta olu ni budzɛ sigilen duguma cɛ. Nin de bɛ laadi: siɲɛ fila, hakɛ sigilen dɔ sigira ni sigicogo kelen sumanni ye, ani siɲɛ fila a ye dɔgɔya kojugu sigicogo wɛrɛ la. <strong>Sigilen</strong> bɛ hakɛ min bɛ duguma dɔrɔn de kɛ. Nka yɛrɛmahɔrɔnya jiyɔrɔ ka kan ka kɔfɛla kɔnɔkow palanjɛ sigi ka bɔ o nɔ na; o de bɛ fɔlɔ tuma bɛɛ.';
+$string['settings:prompt_budget_mode_auto'] = 'A bɔ modɛli la (laadilen)';
+$string['settings:prompt_budget_mode_fixed'] = 'Sɛbɛnden hakɛ budzɛ sigilen';

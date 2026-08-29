@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'המודל לשימוש. ברירת המחדל
 $string['settings:apibaseurl'] = 'כתובת בסיס API';
 $string['settings:apibaseurl_desc'] = 'כתובת בסיס ל-API. ממולאת אוטומטית לפי ספק אבל ניתנת לשינוי.';
 $string['settings:systemprompt'] = 'תבנית הודעת מערכת';
-$string['settings:systemprompt_desc'] = 'הודעת מערכת הנשלחת ל-AI. שימוש במקומות: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'הודעת מערכת הנשלחת ל-AI. שימוש במקומות: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:temperature'] = 'טמפרטורה';
 $string['settings:temperature_desc'] = 'שולט באקראיות. ערכים נמוכים יותר ממוקדים יותר. טווח: 0.0 עד 2.0.';
 $string['settings:maxhistory'] = 'היסטוריית שיחה מקסימלית';
@@ -642,33 +642,33 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'את/ה [[tutorshort]] (Online Learning Assistant), מאמן/ת למידה מבוסס בינה מלאכותית עבור סטודנטים של {{institution}} הרשומים לקורס "{{coursename}}". תפקיד הסטודנט הוא {{userrole}}.
 
-## Role
-Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+## תפקיד
+ספק/י עזרה אקדמית תומכת ותואמת לקורס, המעודדת למידה, תרגול, מוטיבציה ושימוש אחראי בבינה מלאכותית. התשובות שלך חייבות להתבסס על תוכן הקורס. את/ה קולו של המרצה.
 
-## Core Rules
-- Ground all academic responses in approved course materials or institutional information.
-- Do not invent content or go beyond course scope.
-- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
-- When generating practice questions, draw them directly from the course material.
+## כללי יסוד
+- בסס/י כל תשובה אקדמית על חומרי הקורס המאושרים או על מידע מהמוסד.
+- אין להמציא תוכן ואין לחרוג מגבולות הקורס.
+- הפנה/י את הלומדים בחזרה לחומרי הקורס כאשר השאלות חורגות ממנו. לאחר שתי פניות מחוץ לנושא, החזר/י את השיחה ללמידה.
+- בעת יצירת שאלות תרגול, גזור/י אותן ישירות מחומרי הקורס.
 
-## What [[tutorshort]] Can Help With
-- Explain concepts and summarize lessons
-- Give examples and practice questions
-- Suggest study strategies
-- Encourage persistence and progress
+## במה [[tutorshort]] יכול לעזור
+- להסביר מושגים ולסכם שיעורים
+- לתת דוגמאות ושאלות תרגול
+- להציע אסטרטגיות למידה
+- לעודד התמדה והתקדמות
 
-## What [[tutorshort]] Will Not Do
-- Make academic or policy decisions
-- Provide medical, legal, or mental health counseling
-- Assist with academic dishonesty or bypassing learning
+## מה [[tutorshort]] לא יעשה
+- לקבל החלטות אקדמיות או החלטות מדיניות
+- לספק ייעוץ רפואי, משפטי או נפשי
+- לסייע באי-יושר אקדמי או בעקיפת הלמידה
 
-## Tone and Style
-Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
+## סגנון ונימה
+תקשר/י בצורה ידידותית, אכפתית, מעודדת, שנונה ומניעה לפעולה. היה/י תמציתי, תומך ומכבד.
 
-## Safety
-Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+## בטיחות
+אין להשתתף בשיחות פוגעניות, שנאה, מפלות או בלתי הולמות. הצב/י גבולות ברורים אך אדיבים והחזר/י את השיחה לנושאים פוריים.';
 $string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
 $string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
 $string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
@@ -1969,3 +1969,9 @@ $string['quizlock:window_desc'] = 'כמה זמן ניסיון בבוחן ללא 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] מושהה כרגע. חומרי הקורס שלך לא הושפעו, וזו אינה תקלה שגרמת לה — נסה שוב מאוחר יותר.';
 $string['settings:money_nonnegative_invalid'] = 'הזן סכום של 0 או יותר, עם שתי ספרות אחרי הנקודה לכל היותר (לדוגמה 25 או 25.50).';
+
+$string['chat:turn_failed'] = 'לא ניתן היה להשלים את התשובה הזו. שום דבר שעשית לא גרם לכך — נסו שוב.';
+$string['settings:prompt_budget_mode'] = 'מצב תקציב הנחיית המערכת';
+$string['settings:prompt_budget_mode_desc'] = 'כיצד נקבע תקציב התווים של הנחיית המערכת. <strong>גזירה מהמודל</strong> מחשבת כמה מקום המודל המוגדר באמת מציע — חלון ההקשר שלו, פחות התשובה השמורה והיסטוריית השיחה — ומשתמשת בגדול מבין הערך הזה לבין התקציב הקבוע שלמטה. זו ההגדרה המומלצת: מספר קבוע כבר נקבע פעמיים על סמך מדידת תצורה אחת, ופעמיים התברר כקטן מדי בתצורה אחרת. <strong>קבוע</strong> משתמש רק במספר שלמטה. שרת באחסון עצמי צריך במקום זאת להגדיר את חלון ההקשר של השרת, ולו תמיד יש עדיפות.';
+$string['settings:prompt_budget_mode_auto'] = 'גזירה מהמודל (מומלץ)';
+$string['settings:prompt_budget_mode_fixed'] = 'תקציב תווים קבוע';

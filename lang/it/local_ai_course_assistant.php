@@ -76,7 +76,7 @@ $string['settings:model_desc'] = 'Il modello da utilizzare. Il predefinito dipen
 $string['settings:apibaseurl'] = 'URL Base API';
 $string['settings:apibaseurl_desc'] = 'URL base per l\'API. Compilato automaticamente per provider ma può essere sovrascritto.';
 $string['settings:systemprompt'] = 'Modello Prompt di Sistema';
-$string['settings:systemprompt_desc'] = 'Prompt di sistema inviato all\'AI. Usa segnaposto: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Prompt di sistema inviato all\'AI. Usa segnaposto: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:temperature'] = 'Temperatura';
 $string['settings:temperature_desc'] = 'Controlla la casualità. Valori più bassi sono più focalizzati. Intervallo: 0.0 a 2.0.';
 $string['settings:maxhistory'] = 'Cronologia conversazione massima';
@@ -642,33 +642,33 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'Sei [[tutorshort]] (Online Learning Assistant), un coach di apprendimento basato sull\'IA per gli studenti di {{institution}} iscritti a "{{coursename}}". Il ruolo dello studente è {{userrole}}.
 
-## Role
-Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+## Ruolo
+Fornisci un aiuto accademico di supporto e allineato al corso, che incoraggi l\'apprendimento, la pratica, la motivazione e un uso responsabile dell\'IA. Le tue risposte devono basarsi sui contenuti del corso. Sei la voce del docente.
 
-## Core Rules
-- Ground all academic responses in approved course materials or institutional information.
-- Do not invent content or go beyond course scope.
-- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
-- When generating practice questions, draw them directly from the course material.
+## Regole fondamentali
+- Fonda ogni risposta accademica sui materiali approvati del corso o su informazioni dell\'istituzione.
+- Non inventare contenuti e non andare oltre l\'ambito del corso.
+- Riporta gli studenti ai materiali del corso quando le domande ne escono. Dopo due richieste fuori tema, riconduci la conversazione all\'apprendimento.
+- Quando generi domande di esercitazione, ricavale direttamente dal materiale del corso.
 
-## What [[tutorshort]] Can Help With
-- Explain concepts and summarize lessons
-- Give examples and practice questions
-- Suggest study strategies
-- Encourage persistence and progress
+## In che cosa [[tutorshort]] può aiutare
+- Spiegare concetti e riassumere lezioni
+- Fornire esempi e domande di esercitazione
+- Suggerire strategie di studio
+- Incoraggiare costanza e progressi
 
-## What [[tutorshort]] Will Not Do
-- Make academic or policy decisions
-- Provide medical, legal, or mental health counseling
-- Assist with academic dishonesty or bypassing learning
+## Che cosa [[tutorshort]] non fa
+- Prendere decisioni accademiche o di politica dell\'istituzione
+- Fornire consulenza medica, legale o psicologica
+- Agevolare la disonestà accademica o l\'elusione dell\'apprendimento
 
-## Tone and Style
-Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
+## Tono e stile
+Comunica in modo cordiale, attento, incoraggiante, arguto e motivante. Sii conciso, di supporto e rispettoso.
 
-## Safety
-Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+## Sicurezza
+Non partecipare a conversazioni offensive, di odio, discriminatorie o inappropriate. Poni limiti fermi ma gentili e riporta il discorso su temi produttivi.';
 $string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
 $string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
 $string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
@@ -1976,3 +1976,9 @@ $string['quizlock:window_desc'] = 'Per quanto tempo un tentativo su un quiz senz
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] è in pausa in questo momento. I materiali del corso non sono stati modificati e non dipende da te: riprova più tardi.';
 $string['settings:money_nonnegative_invalid'] = 'Inserisci un importo pari o superiore a 0, con al massimo due decimali (ad esempio 25 o 25.50).';
+
+$string['chat:turn_failed'] = 'Non è stato possibile completare questa risposta. Non è dipeso da nulla che tu abbia fatto: riprova.';
+$string['settings:prompt_budget_mode'] = 'Modalità del budget del prompt di sistema';
+$string['settings:prompt_budget_mode_desc'] = 'Come viene deciso il budget di caratteri del prompt di sistema. <strong>Deriva dal modello</strong> calcola lo spazio che il modello configurato offre davvero — la sua finestra di contesto, meno la risposta riservata e la cronologia della conversazione — e usa il maggiore tra quel valore e il budget fisso qui sotto. È l’impostazione consigliata: un numero fisso è già stato definito due volte misurando una sola configurazione e due volte si è rivelato troppo piccolo su un’altra. <strong>Fisso</strong> usa soltanto il numero qui sotto. Un backend self-hosted dovrebbe invece impostare la finestra di contesto del backend, che ha sempre la precedenza.';
+$string['settings:prompt_budget_mode_auto'] = 'Deriva dal modello (consigliato)';
+$string['settings:prompt_budget_mode_fixed'] = 'Budget di caratteri fisso';

@@ -2454,6 +2454,23 @@ define([
     const setInputEnabled = function(enabled) {
         input.disabled = !enabled;
         updateSendButton();
+
+        // The starter chips are part of the same surface. During a quiz lock the
+        // textarea was disabled while all six chips stayed live directly beneath
+        // a notice saying the assistant was paused -- so the page contradicted
+        // itself, and clicking one reached the server before being refused.
+        // One condition governs the whole input area.
+        if (!root) { return; }
+        root.querySelectorAll('[data-starter]').forEach(function(chip) {
+            chip.disabled = !enabled;
+            chip.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+            chip.classList.toggle('aica-starter--disabled', !enabled);
+            if (!enabled) {
+                chip.setAttribute('tabindex', '-1');
+            } else {
+                chip.removeAttribute('tabindex');
+            }
+        });
     };
 
     // -----------------------------------------------------------------------

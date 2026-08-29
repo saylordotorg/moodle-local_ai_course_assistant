@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Model, který se má použít. Výchozí hodno
 $string['settings:apibaseurl'] = 'Základní URL API';
 $string['settings:apibaseurl_desc'] = 'Základní URL API. Vyplní se automaticky podle poskytovatele, ale lze jej přepsat. Ponechte prázdné pro použití výchozí hodnoty poskytovatele.';
 $string['settings:systemprompt'] = 'Šablona systémového promptu';
-$string['settings:systemprompt_desc'] = 'Systémový prompt odeslaný AI. Použijte zástupné symboly: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Systémový prompt odeslaný AI. Použijte zástupné symboly: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Jste užitečný AI tutor pro kurz "{{coursename}}". Role studenta je {{userrole}}.
 
 Pomozte studentovi porozumět obsahu kurzu. Buďte povzbudivý, jasný a pedagogicky důsledný.';
@@ -1931,3 +1931,9 @@ $string['quizlock:window_desc'] = 'Jak dlouho se pokus u testu bez časového li
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] je nyní pozastaven. Vaše studijní materiály to neovlivnilo a není to vaše chyba — zkuste to prosím později.';
 $string['settings:money_nonnegative_invalid'] = 'Zadejte částku 0 nebo vyšší, nejvýše na dvě desetinná místa (například 25 nebo 25.50).';
+
+$string['chat:turn_failed'] = 'Tuto odpověď se nepodařilo dokončit. Nezpůsobilo to nic, co jste udělali — zkuste to prosím znovu.';
+$string['settings:prompt_budget_mode'] = 'Režim rozpočtu systémového promptu';
+$string['settings:prompt_budget_mode_desc'] = 'Jak se určuje znakový rozpočet systémového promptu. <strong>Odvodit z modelu</strong> spočítá, kolik místa nastavený model skutečně nabízí — jeho kontextové okno mínus rezervovaná odpověď a historie konverzace — a použije větší z této hodnoty a pevného rozpočtu níže. Toto je doporučené nastavení: pevné číslo bylo už dvakrát stanoveno změřením jediné konfigurace a dvakrát se v jiné ukázalo jako příliš malé. <strong>Pevný</strong> použije pouze číslo níže. Vlastní hostovaný backend by měl místo toho nastavit kontextové okno backendu, které má vždy přednost.';
+$string['settings:prompt_budget_mode_auto'] = 'Odvodit z modelu (doporučeno)';
+$string['settings:prompt_budget_mode_fixed'] = 'Pevný znakový rozpočet';

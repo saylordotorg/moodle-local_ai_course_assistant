@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Modellen, der skal bruges. Standardværdien af
 $string['settings:apibaseurl'] = 'API-basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-basis-URL. Udfyldes automatisk baseret på udbyderen, men kan tilsidesættes. Lad feltet stå tomt for at bruge udbyderens standard.';
 $string['settings:systemprompt'] = 'Systempromptskabelon';
-$string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Du er en hjælpsom AI-tutor til kurset "{{coursename}}". Studentens rolle er {{userrole}}.
 
 Hjælp studenten med at forstå kursusindholdet. Vær opmuntrende, klar og pædagogisk grundig.';
@@ -1931,3 +1931,9 @@ $string['quizlock:window_desc'] = 'Hvor længe et forsøg på en prøve uden tid
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] er sat på pause lige nu. Dit kursusmateriale er upåvirket, og det er ikke noget, du har gjort — prøv igen senere.';
 $string['settings:money_nonnegative_invalid'] = 'Indtast et beløb på 0 eller derover med højst to decimaler (for eksempel 25 eller 25.50).';
+
+$string['chat:turn_failed'] = 'Dette svar kunne ikke fuldføres. Intet, du gjorde, var årsagen — prøv venligst igen.';
+$string['settings:prompt_budget_mode'] = 'Tilstand for systempromptens budget';
+$string['settings:prompt_budget_mode_desc'] = 'Hvordan systempromptens tegnbudget fastlægges. <strong>Udled fra modellen</strong> beregner, hvor meget plads den konfigurerede model faktisk giver — dens kontekstvindue minus det reserverede svar og samtalehistorikken — og bruger det største af den værdi og det faste budget nedenfor. Dette er den anbefalede indstilling: et fast tal er allerede to gange blevet fastsat ved at måle én konfiguration og har to gange vist sig for lille i en anden. <strong>Fast</strong> bruger kun tallet nedenfor. En selvhostet backend bør i stedet angive backendens kontekstvindue, som altid har forrang.';
+$string['settings:prompt_budget_mode_auto'] = 'Udled fra modellen (anbefales)';
+$string['settings:prompt_budget_mode_fixed'] = 'Fast tegnbudget';

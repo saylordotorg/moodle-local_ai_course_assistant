@@ -246,12 +246,15 @@ final class lang_completeness_test extends \basic_testcase {
      * the pages displayed before the extraction, so nothing regressed.
      */
     private const ADMIN_DIAGNOSTIC_UNTRANSLATED = [
-        // v7.2.1: the audit log viewer, added because two settings told admins
-        // to go and read a page that had never been built. Staged here on the
-        // same reasoning as the batches above -- it is one administrator-only
-        // diagnostic page, every locale falls back to lang/en, and eleven
-        // unreviewed machine translations would read as finished work while
-        // nobody had checked them.
+        // Administrator-only diagnostic-page strings, staged rather than
+        // machine-translated: every locale falls back to lang/en, which is
+        // byte-for-byte what those pages displayed before extraction, and
+        // unreviewed translations would read as finished work nobody had
+        // checked. This list has grown well past the audit-log batch it was
+        // written for -- it now covers the benchmark, rubric, survey,
+        // user-testing, RAG-admin, playground, token-analytics, starters,
+        // Redash and course-settings admin surfaces. Count it rather than
+        // trusting any number written here.
         //
         // Deliberately NOT staged: emergency:chat_stopped, translated into all
         // 45 locales in this release because a learner sees it.

@@ -652,7 +652,40 @@ abstract class base_provider implements provider_interface {
             );
         }
 
-        if (CLI_SCRIPT || empty($USER->id) || is_siteadmin()) {
+        // Nothing learner-shaped to guard: cron, install, CLI with no session.
+        if (empty($USER->id)) {
+            return;
+        }
+
+        // v7.2.4: the quiz lock is checked BEFORE the administrator exemption.
+        //
+        // It sat after it, so a site administrator with an attempt in progress
+        // could still reach a provider -- and because every AI surface goes
+        // through this factory, that meant practice-quiz generation, flashcards
+        // and the rest all worked while the drawer displayed the integrity
+        // notice. The setting's own text promises the opposite: "Blocks the
+        // assistant everywhere ... Checked on the server, so opening a second
+        // tab does not get around it." An integrity control with an exemption
+        // nobody documented is the same shape as the emergency-stop bug fixed
+        // in 7.2.1.
+        //
+        // CLI stays exempt because there is no learner sitting a quiz there,
+        // but not under PHPUnit -- otherwise this branch is untestable, which
+        // is precisely how it went unnoticed: every quiz-lock test asserts
+        // quiz_lock::is_locked_for() directly and none exercised enforcement.
+        $realcli = CLI_SCRIPT && !(defined('PHPUNIT_TEST') && PHPUNIT_TEST);
+        if (!$realcli && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                \local_ai_course_assistant\branding::str('quizlock:blocked')
+            );
+        }
+
+        // The rate limit keeps its exemptions: it exists to stop a scripted
+        // loop, and bulk CLI and benchmark runs are the legitimate exception.
+        if ($realcli || is_siteadmin()) {
             return;
         }
 
@@ -686,18 +719,6 @@ abstract class base_provider implements provider_interface {
             );
         }
 
-        // v7.1.0: no AI assistance while the learner is sitting a Moodle quiz.
-        // branding::str, not get_string: the string carries a [[tutorshort]]
-        // token, and nothing resolves brand tokens on the way out of an
-        // exception, so a bare get_string ships the literal token to the learner.
-        if (\local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
-            throw new \moodle_exception(
-                'error',
-                'local_ai_course_assistant',
-                '',
-                \local_ai_course_assistant\branding::str('quizlock:blocked')
-            );
-        }
     }
 
     /**

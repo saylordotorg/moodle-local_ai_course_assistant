@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Kullanılacak model. Varsayılan sağlayıcıy
 $string['settings:apibaseurl'] = 'API temel URL\'si';
 $string['settings:apibaseurl_desc'] = 'API temel URL\'si. Sağlayıcıya göre otomatik doldurulur ancak geçersiz kılınabilir. Sağlayıcı varsayılanını kullanmak için boş bırakın.';
 $string['settings:systemprompt'] = 'Sistem istemi şablonu';
-$string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = '"{{coursename}}" dersi için yardımcı bir AI eğitmensiniz. Öğrencinin rolü {{userrole}}.
 
 Öğrencinin ders içeriğini anlamasına yardımcı olun. Teşvik edici, açık ve pedagojik olarak titiz olun.';
@@ -1944,3 +1944,9 @@ $string['quizlock:window_desc'] = 'Süre sınırı olmayan bir sınavdaki deneme
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] şu anda duraklatıldı. Ders materyalleriniz etkilenmedi ve bu sizden kaynaklanmıyor — lütfen daha sonra tekrar deneyin.';
 $string['settings:money_nonnegative_invalid'] = '0 veya daha büyük bir tutar girin; en fazla iki ondalık basamak kullanın (örneğin 25 veya 25.50).';
+
+$string['chat:turn_failed'] = 'Bu yanıt tamamlanamadı. Bunun nedeni yaptığınız hiçbir şey değil — lütfen tekrar deneyin.';
+$string['settings:prompt_budget_mode'] = 'Sistem istemi bütçe modu';
+$string['settings:prompt_budget_mode_desc'] = 'Sistem isteminin karakter bütçesinin nasıl belirlendiği. <strong>Modelden türet</strong>, yapılandırılmış modelin gerçekte ne kadar yer sunduğunu hesaplar — bağlam penceresinden, ayrılan yanıt ile konuşma geçmişi düşülerek — ve bu değer ile aşağıdaki sabit bütçeden büyük olanı kullanır. Önerilen ayar budur: sabit bir sayı iki kez tek bir yapılandırma ölçülerek belirlendi ve iki kez de başka bir yapılandırmada fazla küçük kaldı. <strong>Sabit</strong> yalnızca aşağıdaki sayıyı kullanır. Kendi sunucusunda barındırılan bir arka uç ise bunun yerine arka uç bağlam penceresini ayarlamalıdır; o her zaman önceliklidir.';
+$string['settings:prompt_budget_mode_auto'] = 'Modelden türet (önerilir)';
+$string['settings:prompt_budget_mode_fixed'] = 'Sabit karakter bütçesi';

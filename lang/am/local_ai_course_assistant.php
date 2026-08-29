@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'ጥቅም ላይ የሚውለው ሞዴል። 
 $string['settings:apibaseurl'] = 'የAPI መሰረታዊ URL';
 $string['settings:apibaseurl_desc'] = 'ለAPI መሰረታዊ URL። እንደ አቅራቢ ራሱ ይሞላል ግን ሊሻሻል ይችላል። ለአቅራቢ ነባሪ ባዶ ይተው።';
 $string['settings:systemprompt'] = 'የስርዓት ፕሮምት ቅጥ';
-$string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}።';
+$string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}, {{institution}}።';
 $string['settings:systemprompt_default'] = 'ለ"{{coursename}}" ኮርስ ጠቃሚ የAI አስተማሪ ነዎት። የተማሪው ሚና {{userrole}} ነው።
 
 ተማሪው የኮርሱን ቁሳቁስ እንዲረዳ ይርዱ። አበረታቱ፣ ግልጽ ይሁኑ እና ትምህርታዊ ዘዴ ይጠቀሙ።';
@@ -1960,3 +1960,9 @@ $string['quizlock:window_desc'] = 'የጊዜ ገደብ በሌለው ፈተና �
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] አሁን ለጊዜው ቆሟል። የኮርስዎ ግብዓቶች አልተነኩም፤ ይህ በእርስዎ ስህተት አይደለም — እባክዎ ቆይተው እንደገና ይሞክሩ።';
 $string['settings:money_nonnegative_invalid'] = 'ከ0 በላይ የሆነ መጠን ያስገቡ፤ ቢበዛ ሁለት አስርዮሽ ቦታዎች (ለምሳሌ 25 ወይም 25.50)።';
+
+$string['chat:turn_failed'] = 'ይህ ምላሽ ሊጠናቀቅ አልቻለም። ያደረጉት ነገር ምንም ምክንያት አልሆነም — እባክዎ እንደገና ይሞክሩ።';
+$string['settings:prompt_budget_mode'] = 'የሥርዓት ጥያቄ በጀት ሁኔታ';
+$string['settings:prompt_budget_mode_desc'] = 'የሥርዓት ጥያቄው የቁምፊ በጀት እንዴት እንደሚወሰን። <strong>ከሞዴሉ አውጣ</strong> የተዋቀረው ሞዴል በትክክል የሚሰጠውን ቦታ ያሰላል፦ የአውድ መስኮቱን ቀንሶ የተያዘውን ምላሽና የውይይት ታሪክ፣ ከዚያም ከዚህ በታች ካለው ቋሚ በጀት ጋር አወዳድሮ ትልቁን ይጠቀማል። ይህ የሚመከረው ቅንብር ነው፦ ቋሚ ቁጥር ሁለት ጊዜ በአንድ ውቅር ልኬት ተቀምጦ ሁለት ጊዜ በሌላ ውቅር በጣም ትንሽ ሆኖ ተገኝቷል። <strong>ቋሚ</strong> ከዚህ በታች ያለውን ቁጥር ብቻ ይጠቀማል። በራስ የሚስተናገድ ጀርባ ግን በምትኩ የጀርባውን የአውድ መስኮት ማዘጋጀት አለበት፤ ያም ሁልጊዜ ቀዳሚነት አለው።';
+$string['settings:prompt_budget_mode_auto'] = 'ከሞዴሉ አውጣ (የሚመከር)';
+$string['settings:prompt_budget_mode_fixed'] = 'ቋሚ የቁምፊ በጀት';
