@@ -345,10 +345,19 @@ class conversation_manager {
             $messages = array_slice($messages, -$maxmessages);
         }
 
+        // v7.2.5: the same read-side scrub the learner's transcript gets. A
+        // stored '[no response: core\exception\moodle_exception]' row is not
+        // just ugly on screen -- fed back as prior assistant output it is an
+        // example the model can reasonably imitate, and the one thing it must
+        // never learn to emit is an internal identifier.
         return array_map(function ($msg) {
+            $content = (string) $msg->message;
+            if ($msg->role === 'assistant') {
+                $content = self::display_turn_text($content);
+            }
             return [
                 'role' => $msg->role,
-                'content' => $msg->message,
+                'content' => $content,
             ];
         }, $messages);
     }
@@ -583,5 +592,68 @@ class conversation_manager {
             return $learnertext;
         }
         return \local_ai_course_assistant\branding::str('chat:turn_failed');
+    }
+
+    /**
+     * What a stored assistant turn should say when it is replayed to a learner.
+     *
+     * failed_turn_text() fixed what gets WRITTEN from v7.2.4 on. This is the
+     * read side, and it has to hold for rows written before that: pre-7.2.4
+     * rows still say "[no response: core\exception\moodle_exception]"
+     * verbatim, and no forward fix can rewrite history. It also covers the
+     * paths that never reach the writer at all -- a provider timeout, a 5xx, an
+     * exhausted failover chain -- any of which can leave an empty assistant row
+     * behind.
+     *
+     * So the rule is about the OUTPUT, not the cause: an assistant row that is
+     * empty, or that is nothing but an internal identifier, renders as the
+     * learner-facing notice. Anything else is returned untouched.
+     *
+     * Only ever apply this to role='assistant'. A learner may legitimately type
+     * a class name into the chat box while asking about it, and their own words
+     * must come back as they wrote them.
+     *
+     * @param string $stored The message column as persisted.
+     * @return string Safe to show a learner.
+     */
+    public static function display_turn_text(string $stored): string {
+        if (trim($stored) === '' || self::is_internal_placeholder($stored)) {
+            return \local_ai_course_assistant\branding::str('chat:turn_failed');
+        }
+        return $stored;
+    }
+
+    /**
+     * Is this stored text an internal identifier rather than a reply?
+     *
+     * Deliberately narrow. It matches text that is ENTIRELY a placeholder or a
+     * type name, never text that merely mentions one -- a tutor explaining PHP
+     * namespaces will write a backslashed class name inside a real answer, and
+     * that answer must survive.
+     *
+     * @param string $stored The message column as persisted.
+     * @return bool
+     */
+    private static function is_internal_placeholder(string $stored): bool {
+        $text = trim($stored);
+
+        // The v7.1.1 form: "[no response: core\exception\moodle_exception]",
+        // and its bare cousin "[no response]".
+        if (preg_match('/^\[\s*no response\b[^\]]*\]$/i', $text)) {
+            return true;
+        }
+
+        // Any fully bracketed note that names an internal type.
+        if (preg_match('/^\[[^\]]*(exception|throwable|error)[^\]]*\]$/i', $text)) {
+            return true;
+        }
+
+        // A bare type name and nothing else: no whitespace, so it cannot be
+        // prose. Covers an unbracketed get_class() leak from any future path.
+        if (preg_match('/^\S*(exception|throwable|error)\S*$/i', $text)) {
+            return true;
+        }
+
+        return false;
     }
 }

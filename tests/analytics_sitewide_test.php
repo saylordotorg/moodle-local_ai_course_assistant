@@ -160,4 +160,67 @@ final class analytics_sitewide_test extends \advanced_testcase {
         $this->assertCount(1, $students);
         $this->assertArrayHasKey($this->usera->id, $students);
     }
+
+    /**
+     * The TOTAL STUDENTS tile has a number site-wide, not just per course.
+     *
+     * get_enrollment_counts() was the counter v7.2.4 missed: site-wide it
+     * returned a bare list of per-course rows with no top-level total_enrolled,
+     * so the tile read 0 next to a site-wide 25.3 messages per student. The
+     * total can never be smaller than any single course's, nor smaller than the
+     * count of learners who actually sent a message.
+     */
+    public function test_total_students_counts_every_course(): void {
+        $all = analytics::get_enrollment_counts(0);
+        $a = analytics::get_enrollment_counts($this->coursea->id);
+        $b = analytics::get_enrollment_counts($this->courseb->id);
+
+        $this->assertArrayHasKey(
+            'total_enrolled',
+            $all,
+            'The site-wide call returns no total_enrolled key, so the tile renders 0.'
+        );
+        $this->assertGreaterThan(0, (int) $all['total_enrolled']);
+        $this->assertGreaterThanOrEqual(
+            max((int) $a['total_enrolled'], (int) $b['total_enrolled']),
+            (int) $all['total_enrolled'],
+            'Site-wide TOTAL STUDENTS is below a single course\'s count.'
+        );
+
+        $active = (int) analytics::get_overview(0)['active_students'];
+        $this->assertGreaterThanOrEqual(
+            $active,
+            (int) $all['total_enrolled'],
+            'Fewer students than active AI users: the zero-students-with-traffic signature.'
+        );
+    }
+
+    /**
+     * A named course still reports only its own enrolments.
+     */
+    public function test_named_course_enrolment_is_still_scoped(): void {
+        $this->assertSame(1, (int) analytics::get_enrollment_counts($this->coursea->id)['total_enrolled']);
+        $this->assertSame(1, (int) analytics::get_enrollment_counts($this->courseb->id)['total_enrolled']);
+    }
+
+    /**
+     * The tile survives the trip through the web service the dashboard calls.
+     *
+     * The payload is JSON-encoded PARAM_RAW, so no return-structure check would
+     * have caught the shape change; only reading the key the way the dashboard
+     * reads it does.
+     */
+    public function test_sitewide_payload_carries_the_total_students_tile(): void {
+        $this->setAdminUser();
+
+        $raw = \local_ai_course_assistant\external\get_analytics_overall::execute(0, 0);
+        $data = json_decode($raw['data'], true);
+
+        $this->assertArrayHasKey('enrollment', $data);
+        $this->assertArrayHasKey('total_enrolled', $data['enrollment']);
+        $this->assertGreaterThanOrEqual(
+            (int) $data['overview']['active_students'],
+            (int) $data['enrollment']['total_enrolled']
+        );
+    }
 }

@@ -518,6 +518,23 @@ class hook_callbacks {
             }
         }
 
+        // v7.2.5: the server-side attempt lock, surfaced to the browser.
+        //
+        // The widget had no idea this existed. `$quizlocked` above is the
+        // per-quiz assistance level, a different mechanism that only applies on
+        // a quiz page -- so anywhere else the drawer rendered a normal, enabled
+        // textarea while base_provider was going to refuse. A learner typed a
+        // full question and only found out after sending it. Both sides now read
+        // the same check with the same course, so the input is disabled exactly
+        // when the server will refuse.
+        $attemptlocked = false;
+        if (!empty($USER->id) && !is_siteadmin()) {
+            $attemptlocked = \local_ai_course_assistant\quiz_lock::is_locked_for(
+                (int) $USER->id,
+                (int) $courseid
+            );
+        }
+
         // Position offsets for fine-grained widget placement. ?: would treat
         // a literal 0 ("snap to corner") as falsy and silently apply the
         // default; use the explicit-default helper.
@@ -748,6 +765,7 @@ class hook_callbacks {
             'modname'            => $modname,
             'pagetype'           => $pagetype,
             'quizlocked'         => $quizlocked,
+            'attemptlocked'      => $attemptlocked,
             'quizcoachmode'      => $quizcoachmode,
             'quizcmid'           => $quizcmid,
             'realtimeenabled'         => $realtimeenabled,

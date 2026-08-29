@@ -197,6 +197,19 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/quiz_lock_scope',
+        \local_ai_course_assistant\branding::str('quizlock:scope'),
+        \local_ai_course_assistant\branding::str('quizlock:scope_desc'),
+        \local_ai_course_assistant\quiz_lock::SCOPE_COURSE,
+        [
+            \local_ai_course_assistant\quiz_lock::SCOPE_COURSE
+                => \local_ai_course_assistant\branding::str('quizlock:scope_course'),
+            \local_ai_course_assistant\quiz_lock::SCOPE_SITE
+                => \local_ai_course_assistant\branding::str('quizlock:scope_site'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/auto_open',
         get_string('settings:auto_open', 'local_ai_course_assistant'),

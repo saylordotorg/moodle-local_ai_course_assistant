@@ -458,7 +458,7 @@ abstract class base_provider implements provider_interface {
             $overrides['provider'] = $provider;
         }
 
-        self::enforce_learner_guards($diagnostic);
+        self::enforce_learner_guards($diagnostic, $courseid);
 
         try {
             $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
@@ -611,19 +611,24 @@ abstract class base_provider implements provider_interface {
      * which is exactly what the quiz lock exists to stop. A guard that covers
      * most entry points is the shape of bug this release is fixing.
      *
-     * Admins and CLI are exempt from the rate limit and the quiz lock, so bulk
-     * scripts and scheduled tasks still run. They are NOT exempt from the
-     * emergency stop: that is a kill switch, and v7.2.1 fixed it reporting
-     * DISABLED while an admin session kept getting answers.
+     * Admins and CLI are exempt from the rate limit, so bulk scripts and
+     * scheduled tasks still run. They are NOT exempt from the emergency stop --
+     * that is a kill switch, and v7.2.1 fixed it reporting DISABLED while an
+     * admin session kept getting answers -- and, since v7.2.4, admins are not
+     * exempt from the quiz lock either. Real CLI still is; PHPUnit is not, so
+     * the branch is testable.
      *
      * @param bool $diagnostic True to exempt the caller from the emergency stop.
      *                         backend_probe and health_check pass this: they are
      *                         what an operator opens during the incident to decide
      *                         whether it is safe to restore service.
+     * @param int $courseid Course this request belongs to. Scopes the quiz lock;
+     *                      0 means no course context and falls back to the
+     *                      site-wide attempt test.
      * @return void
      * @throws \moodle_exception
      */
-    private static function enforce_learner_guards(bool $diagnostic = false): void {
+    private static function enforce_learner_guards(bool $diagnostic = false, int $courseid = 0): void {
         global $USER;
 
         // v7.2.1: the emergency chat stop is checked FIRST, ahead of every
@@ -673,8 +678,12 @@ abstract class base_provider implements provider_interface {
         // but not under PHPUnit -- otherwise this branch is untestable, which
         // is precisely how it went unnoticed: every quiz-lock test asserts
         // quiz_lock::is_locked_for() directly and none exercised enforcement.
+        //
+        // v7.2.5: the course is passed through so the lock can be scoped to the
+        // course holding the attempt. Site-wide, one forgotten attempt in an
+        // unrelated course killed the assistant everywhere -- see quiz_lock.
         $realcli = CLI_SCRIPT && !(defined('PHPUNIT_TEST') && PHPUNIT_TEST);
-        if (!$realcli && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+        if (!$realcli && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id, $courseid)) {
             throw new \moodle_exception(
                 'error',
                 'local_ai_course_assistant',
@@ -732,7 +741,7 @@ abstract class base_provider implements provider_interface {
      * @throws \moodle_exception If provider is unknown.
      */
     public static function create_for_comparison(string $providerid, string $model, int $courseid = 0): provider_interface {
-        self::enforce_learner_guards();
+        self::enforce_learner_guards(false, $courseid);
 
         $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
         // Which vendor the inherited apikey actually belongs to, captured

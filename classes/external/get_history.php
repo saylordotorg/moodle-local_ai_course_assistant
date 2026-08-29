@@ -55,10 +55,19 @@ class get_history extends external_api {
 
         $result = [];
         foreach ($messages as $msg) {
+            // Assistant rows are laundered on the way out, never on the way in:
+            // rows written before v7.2.4 can hold "[no response: <class>]", and
+            // a timeout or an exhausted failover chain can leave the column
+            // empty, both of which reached the learner verbatim. User rows are
+            // returned exactly as typed -- a learner asking about an exception
+            // class must see their own question back.
+            $text = $msg->role === 'assistant'
+                ? conversation_manager::display_turn_text((string) $msg->message)
+                : $msg->message;
             $entry = [
                 'id' => (int) $msg->id,
                 'role' => $msg->role,
-                'message' => $msg->message,
+                'message' => $text,
                 'timecreated' => (int) $msg->timecreated,
                 'attachment' => [
                     'filename' => '',

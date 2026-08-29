@@ -477,8 +477,10 @@ try {
     // here too means the learner gets a clear explanation over SSE rather than a
     // generic provider error, and the refusal costs nothing when it does not
     // apply. Admins and CLI are exempt via the same conditions used there.
+    // v7.2.5: scoped to this course. See quiz_lock -- site-wide meant one
+    // forgotten attempt anywhere disabled the assistant in every course.
     if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()
-            && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+            && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id, (int) $courseid)) {
         local_ai_course_assistant_sse_send([
             // branding::str, not get_string: the string carries a [[tutorshort]]
             // token and the SSE token path does no brand resolution, so a bare

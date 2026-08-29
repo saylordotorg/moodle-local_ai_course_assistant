@@ -121,6 +121,36 @@ final class quiz_lock_enforcement_test extends \advanced_testcase {
         );
     }
 
+    /**
+     * A blocked quiz-generation request must say WHY, not "please try again".
+     *
+     * The refusal is not retryable, so borrowing the generic failure message
+     * sends the learner round a loop that cannot succeed. The external
+     * function reports errorcode='quizlocked' and the drawer's own integrity
+     * wording, which is what the client renders instead.
+     */
+    public function test_quiz_generation_reports_the_lock_not_a_generic_failure(): void {
+        $this->resetAfterTest();
+        $student = $this->getDataGenerator()->create_user();
+        $course = $this->seed_attempt_for($student);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $this->setUser($student);
+
+        $result = \local_ai_course_assistant\external\generate_quiz::execute($course->id, 3, 'Photosynthesis');
+
+        // Also proves the field is declared in execute_returns(); an undeclared
+        // key is stripped here and never reaches the browser.
+        $cleaned = \core_external\external_api::clean_returnvalue(
+            \local_ai_course_assistant\external\generate_quiz::execute_returns(),
+            $result
+        );
+
+        $this->assertFalse($cleaned['success']);
+        $this->assertSame('quizlocked', $cleaned['errorcode']);
+        $this->assertSame(branding::str('quizlock:blocked'), $cleaned['error']);
+        $this->assertSame([], $cleaned['questions']);
+    }
+
     public function test_no_attempt_means_no_lock(): void {
         $this->resetAfterTest();
         $student = $this->getDataGenerator()->create_user();

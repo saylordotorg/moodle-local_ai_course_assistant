@@ -1967,3 +1967,8 @@ $string['settings:prompt_budget_mode'] = 'Sistɛmu ɲininkali budzɛ cogoya';
 $string['settings:prompt_budget_mode_desc'] = 'Sistɛmu ɲininkali sɛbɛnden hakɛ budzɛ latigɛcogo. <strong>A bɔ modɛli la</strong> b’a jate minɛ modɛli latigɛlen bɛ yɔrɔ min di tiɲɛ na — a kɔnɔkow palanjɛ, ka jaabi marata ni baro kɔfɛkow bɔ a la — o de bɛ kɛ, dan dɔ b’a kan walisa palanjɛ belebele kana ɲininkali belebele daga. O bɛ baara kɛ dɔrɔn ni sɛbɛnden hakɛ budzɛ min bɛ duguma tora a ta 36 000 kan: n’i y’o hakɛ Changé, o de bɛ se sɔrɔ, sira fila bɛɛ la, katuguni ɲɛmɔgɔ ye hakɛ min sɛbɛn, o ye latigɛli ye, jateminɛ tɛ. <strong>Sigilen</strong> bɛ hakɛ min bɛ duguma kɛ tuma bɛɛ. Yɛrɛmahɔrɔnya jiyɔrɔ ka kan ka kɔfɛla kɔnɔkow palanjɛ sigi, o de bɛ fɔlɔ nin bɛɛ kan.';
 $string['settings:prompt_budget_mode_auto'] = 'A bɔ modɛli la (laadilen)';
 $string['settings:prompt_budget_mode_fixed'] = 'Sɛbɛnden hakɛ budzɛ sigilen';
+
+$string['quizlock:scope'] = 'Sɔgɔsɔgɔli bɛ se yɔrɔ min na';
+$string['quizlock:scope_course'] = 'Nin kalanso dɔrɔn (laadilen)';
+$string['quizlock:scope_site'] = 'Kalanso bɛɛ';
+$string['quizlock:scope_desc'] = 'Ni kɔrɔbɔli min bɛ senna b’a bali [[tutorshort]] ma kalanso min b’a kɔnɔ dɔrɔn na, walima yɔrɔ bɛɛ. <strong>Nin kalanso dɔrɔn</strong> de ye a ta ye ka a laadi, o de bɛ ɲini tuma caman. Sitiwu bɛɛ tun ye cogo ye fo v7.2.4, nka a tun ye baasi ye min ka kan ka dɔn: kɔrɔbɔli min bilala kɛ, o bɛ to «senna» abada, o la kɔrɔbɔli kelen ɲinɛnen kalanden ka kɔfɛko la, o tun bɛ dɛmɛbaga faga a ka kalanso bɛɛ kɔnɔ, ɲɛfɔli si tɛ ekran kan. Sitiwu bɛɛ tɛ nafa caman di kalanden min y’a latigɛ ka namara, katuguni sɛbɛnnikɛlan filanan b’a bolo, ani dɛmɛbaga ka kalanko ni a ka ɲinini bɛɛ bɛ kalanso kelen dɔrɔn na.';

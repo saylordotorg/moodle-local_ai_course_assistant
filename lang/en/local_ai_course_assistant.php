@@ -1081,7 +1081,11 @@ $string['chat:quiz_locked']             = 'The assistant is paused during quizze
 $string['quizlock:blocked'] = 'The [[tutorshort]] assistant is unavailable while you have a quiz in progress. Submit or close your attempt and it will be available again.';
 $string['quizlock:heading'] = 'Quiz mode';
 $string['quizlock:enabled'] = 'Lock the assistant during Moodle quizzes';
-$string['quizlock:enabled_desc'] = 'Blocks the assistant everywhere -- chat, voice, flashcards, practice quizzes -- while a learner has a quiz attempt in progress. Checked on the server, so opening a second tab does not get around it. A teacher can exempt one quiz by setting its assistance level to Full help.';
+$string['quizlock:enabled_desc'] = 'Blocks the assistant -- chat, voice, flashcards, practice quizzes -- while a learner has a quiz attempt in progress, in the course holding that quiz or site-wide depending on the scope setting below. Checked on the server, so opening a second tab does not get around it. A teacher can exempt one quiz by setting its assistance level to Full help.';
+$string['quizlock:scope'] = 'How far the lock reaches';
+$string['quizlock:scope_desc'] = 'Whether an attempt in progress blocks [[tutorshort]] only in the course holding the quiz, or everywhere. <strong>This course only</strong> is the default and is almost always what you want. Site-wide was the behaviour up to v7.2.4 and had a failure mode worth knowing about: an abandoned attempt stays in progress forever, so a single forgotten quiz somewhere in a learner\'s history disabled the assistant in every course they took, with nothing on screen to explain why. Site-wide buys very little against a determined learner, who has a second browser, and the assistant\'s course material and retrieval are course-scoped in any case.';
+$string['quizlock:scope_course'] = 'This course only (recommended)';
+$string['quizlock:scope_site'] = 'Every course';
 $string['quizlock:window'] = 'Attempt freshness window (minutes)';
 $string['quizlock:window_desc'] = 'How long an attempt on a quiz with no time limit still counts as in progress. Quizzes with their own time limit use that instead. Abandoned attempts stay in progress indefinitely, so without this bound one would lock a learner out for good. Default 180.';
 

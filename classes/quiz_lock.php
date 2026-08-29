@@ -37,6 +37,17 @@ defined('MOODLE_INTERNAL') || die();
  * is bounded by its own time limit where it has one and by a configured window
  * where it does not.
  *
+ * Scope, changed in v7.2.5, for the same reason. The lock was site-wide: one
+ * open attempt anywhere disabled the assistant in every course. On dev that
+ * showed up as SOLA being dead in a course containing no quizzes at all,
+ * because of a forgotten attempt in an unrelated sandbox course; against the
+ * production numbers above it would do that to tens of thousands of learners
+ * who have an abandoned attempt somewhere in their history and no idea it
+ * exists. The integrity case for site-wide is thin -- a learner determined to
+ * cheat has a second browser, and the assistant's course context and retrieval
+ * are course-scoped anyway -- so the default is now the course holding the
+ * attempt. A site that wants the old behaviour sets quiz_lock_scope to 'site'.
+ *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -49,6 +60,12 @@ class quiz_lock {
     /** Grace added to a quiz's own time limit before an attempt stops counting. */
     const GRACE_SECONDS = 900;
 
+    /** Lock only the course holding the attempt. The default. */
+    const SCOPE_COURSE = 'course';
+
+    /** Lock every course, as v7.1.0 to v7.2.4 did. */
+    const SCOPE_SITE = 'site';
+
     /**
      * Is the lock switched on for this site?
      *
@@ -59,6 +76,16 @@ class quiz_lock {
         // Default on: an integrity control that ships off protects nobody, and
         // this one was requested as the default behaviour for all quizzes.
         return ($raw === false || $raw === '') ? true : (bool) $raw;
+    }
+
+    /**
+     * How far the lock reaches: the attempt's own course, or the whole site.
+     *
+     * @return string One of SCOPE_COURSE or SCOPE_SITE.
+     */
+    public static function scope(): string {
+        $raw = (string) get_config('local_ai_course_assistant', 'quiz_lock_scope');
+        return $raw === self::SCOPE_SITE ? self::SCOPE_SITE : self::SCOPE_COURSE;
     }
 
     /**
@@ -82,9 +109,14 @@ class quiz_lock {
      * teacher setting its assistance level to 'full'.
      *
      * @param int $userid
-     * @return \stdClass|null Row with quizid, quizname, cmid and timestart, or null.
+     * @param int $courseid Course the request is being made from. Under the
+     *        default course scope only an attempt in this course locks. Pass 0
+     *        when the surface has no course context, which falls back to the
+     *        site-wide test rather than to no test at all.
+     * @return \stdClass|null Row with quizid, quizname, cmid, courseid and
+     *         timestart, or null.
      */
-    public static function active_attempt(int $userid): ?\stdClass {
+    public static function active_attempt(int $userid, int $courseid = 0): ?\stdClass {
         global $DB;
 
         if ($userid <= 0 || !self::is_enabled()) {
@@ -104,15 +136,30 @@ class quiz_lock {
             'cutoff'        => $now - self::window_seconds(),
         ];
 
+        // Course scope needs a course to scope to. With none, the caller has no
+        // course context to protect, so fall back to the site-wide test: the
+        // conservative direction for an integrity control.
+        $coursewhere = '';
+        if ($courseid > 0 && self::scope() === self::SCOPE_COURSE) {
+            $coursewhere = ' AND cm.course = :courseid';
+            $params['courseid'] = $courseid;
+        }
+
         // An attempt counts while it is inside its own time limit (plus grace),
         // or, for the open-ended majority, inside the configured window.
-        $sql = "SELECT qa.id, qa.timestart, q.id AS quizid, q.name AS quizname, cm.id AS cmid
+        $sql = "SELECT qa.id, qa.timestart, q.id AS quizid, q.name AS quizname,
+                       cm.id AS cmid, cm.course AS courseid
                   FROM {quiz_attempts} qa
                   JOIN {quiz} q ON q.id = qa.quiz
                   JOIN {course_modules} cm ON cm.instance = q.id
                   JOIN {modules} m ON m.id = cm.module AND m.name = 'quiz'
              LEFT JOIN {local_ai_course_assistant_quiz_cfg} cfg ON cfg.cmid = cm.id
                  WHERE qa.userid = :userid
+                   -- Only an attempt the learner still has open. A submitted or
+                   -- abandoned attempt moves to 'finished' or 'abandoned' and
+                   -- stops matching here the moment it does; there is no cache
+                   -- in front of this query, so submitting lifts the lock on the
+                   -- learner's very next request.
                    AND qa.state = 'inprogress'
                    -- Teacher previews write a real attempt row with preview=1
                    -- and it survives navigating away, so without this a teacher
@@ -125,6 +172,7 @@ class quiz_lock {
                       OR (q.timelimit = 0 AND qa.timestart >= :cutoff)
                        )
                    AND (cfg.assistance_level IS NULL OR cfg.assistance_level <> 'full')
+                       {$coursewhere}
               ORDER BY qa.timestart DESC";
 
         $rows = $DB->get_records_sql($sql, $params, 0, 1);
@@ -135,9 +183,10 @@ class quiz_lock {
      * Convenience wrapper.
      *
      * @param int $userid
+     * @param int $courseid Course the request comes from; see active_attempt().
      * @return bool
      */
-    public static function is_locked_for(int $userid): bool {
-        return self::active_attempt($userid) !== null;
+    public static function is_locked_for(int $userid, int $courseid = 0): bool {
+        return self::active_attempt($userid, $courseid) !== null;
     }
 }

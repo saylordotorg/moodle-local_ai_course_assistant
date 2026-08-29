@@ -631,33 +631,56 @@ class analytics {
     }
 
     /**
-     * Get enrollment counts per course or for a specific course.
+     * Get enrollment counts for one course, or for the whole site.
+     *
+     * Course id 0 means every course here as it does everywhere else in this
+     * class, and the shape of the answer has to stay the same in both modes.
+     * It did not: the site-wide branch returned a bare list of per-course rows
+     * ([['courseid' => 3, 'total_enrolled' => 40], ...]) with no top-level
+     * total_enrolled key at all. get_analytics_overall JSON-encodes this array
+     * as PARAM_RAW, so nothing validated the shape; the dashboard read
+     * enrollment.total_enrolled off a list, got undefined, and painted the
+     * TOTAL STUDENTS tile as 0 while every neighbouring tile -- routed through
+     * course_clause() in v7.2.4 -- showed real site-wide traffic. Zero students
+     * next to 25.3 messages per student is the signature.
+     *
+     * Site-wide counts distinct users, not enrolment rows: a learner enrolled
+     * in six courses is one student, and summing the per-course rows would have
+     * counted them six times. The per-course number is distinct users for the
+     * same reason -- a user carrying both a manual and a self enrolment in one
+     * course is still one student. The per-course breakdown the old site-wide
+     * branch returned is preserved under 'courses' so no data is lost.
      *
      * @param int $courseid Course ID (0 = all courses).
-     * @return array Enrollment data.
+     * @param int $since Unused; accepted because the sibling getters take a time
+     *                   window and the external functions pass one positionally.
+     *                   Enrolment is a point-in-time count and is not windowed.
+     * @return array ['total_enrolled' => int] plus, site-wide, 'courses' => list.
      */
-    public static function get_enrollment_counts(int $courseid = 0): array {
+    public static function get_enrollment_counts(int $courseid = 0, int $since = 0): array {
         global $DB;
 
+        [$coursewhere, $params] = self::course_clause($courseid, 'e');
+
+        $sql = "SELECT COUNT(DISTINCT ue.userid)
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE ue.status = 0{$coursewhere}";
+        $result = ['total_enrolled' => (int) $DB->count_records_sql($sql, $params)];
+
         if ($courseid > 0) {
-            $sql = "SELECT COUNT(ue.id) AS total_enrolled
-                      FROM {user_enrolments} ue
-                      JOIN {enrol} e ON e.id = ue.enrolid
-                     WHERE e.courseid = :courseid AND ue.status = 0";
-            $count = $DB->count_records_sql($sql, ['courseid' => $courseid]);
-            return ['total_enrolled' => (int) $count];
+            return $result;
         }
 
-        $sql = "SELECT e.courseid, COUNT(ue.id) AS total_enrolled
+        $sql = "SELECT e.courseid, COUNT(DISTINCT ue.userid) AS total_enrolled
                   FROM {user_enrolments} ue
                   JOIN {enrol} e ON e.id = ue.enrolid
                  WHERE ue.status = 0
                  GROUP BY e.courseid
                  ORDER BY e.courseid ASC";
-        $rows = $DB->get_records_sql($sql);
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = [
+        $result['courses'] = [];
+        foreach ($DB->get_records_sql($sql) as $row) {
+            $result['courses'][] = [
                 'courseid' => (int) $row->courseid,
                 'total_enrolled' => (int) $row->total_enrolled,
             ];
