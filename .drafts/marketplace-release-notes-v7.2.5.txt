@@ -1,0 +1,129 @@
+Version 7.2.5 (build 2026082901)
+
+This release also carries version 7.2.4, which was verified on a staging site
+but never published.
+
+A verification pass over 7.2.4 found a serious regression in the quiz integrity
+lock introduced by the previous release, along with several fixes that had
+landed only halfway. Sites running 7.2.3 should upgrade directly to this
+version.
+
+1. The quiz lock no longer disables the assistant in unrelated courses
+
+Version 7.2.1 added a server-side check that blocks the assistant while a
+learner has a quiz attempt in progress. That check applied across the entire
+site: an attempt open anywhere disabled the assistant in every course the
+learner was enrolled in.
+
+That is a much larger problem than it first appears, because an abandoned
+attempt is never transitioned out of the in-progress state by the platform. On a
+large self-paced site the great majority of in-progress attempts are months old
+and will never be submitted. Under site-wide scope, every learner holding one of
+those forgotten attempts loses the assistant in all of their courses
+indefinitely, with nothing on screen to explain why. It was reported as the
+assistant refusing to answer in a course that contains no quizzes at all.
+
+The lock is now limited to the course containing the quiz. A new setting
+restores the previous site-wide behaviour for institutions that prefer it. The
+integrity argument for the wider scope is weak in practice, since the assistant's
+course material and retrieval are course-scoped in any case.
+
+2. The chat input is now disabled exactly when the server will refuse
+
+The widget had no knowledge of the attempt-based lock; the flag it did read
+covers a different mechanism that only applies on a quiz page. Everywhere else
+the input box appeared normal while the server was going to refuse, so a learner
+could type an entire question and only discover the block after sending it. Both
+sides now perform the same check for the same course, the practice quiz button
+is disabled alongside the input, and the message shown names the remedy rather
+than stating only that the assistant is unavailable.
+
+Administrators are no longer exempt from the visible half of this, matching the
+server, which has not exempted them since 7.2.4.
+
+3. A failed reply can no longer display an internal error identifier
+
+Replies that failed were stored with the internal exception class name in place
+of the message, and the conversation view printed it back to the learner on
+every reload. Version 7.2.4 corrected how these are written but not how they are
+read, so existing conversations continued to display it. The reader now
+substitutes a plain, non-technical notice for any stored internal identifier,
+which covers historical records without a migration and also covers provider
+timeouts and failover exhaustion, which bypass the write path entirely. The same
+substitution is applied to the history supplied to the model, so that prior
+output cannot be imitated.
+
+4. Blocked quiz generation explains itself
+
+Requesting a practice quiz while the integrity lock applied returned "Could not
+generate a quiz. Please try again", inviting a retry that could not succeed. The
+blocked case now returns the integrity message; genuine failures keep the
+retryable one.
+
+5. Site-wide analytics reported no data
+
+With the course selector set to all courses, several panels reported zero on
+sites with substantial activity. Six counters treated the all-courses request as
+a filter for a course whose identifier is zero, which matches nothing. Each was
+correct for a single course, so the fault was visible only in the one mode that
+has no per-course page to compare against, which is also the panel an
+administrator opens to answer whether the assistant is being used at all.
+Separately, the total students figure returned a different data shape for all
+courses than for one course, and the dashboard read zero from it.
+
+6. Credentials left in clear text in the configuration change log
+
+Registering a setting as a password field masks it when saved through the
+settings form and does nothing when the value is written by a command-line
+script, an installation step or an upgrade step. The configuration change log is
+readable by anyone who can reach site administration.
+
+A new command-line tool reports affected entries across every plugin on the
+site, not only this one, and can overwrite the stored values while preserving
+the log entries themselves. It never prints a credential. Both the current and
+previous value columns are covered: the previous-value column is displayed on
+the same report page, and saving a replacement writes the retired credential
+into it, so rotating a key without this would create a fresh exposure of the key
+just retired.
+
+7. Course deletion now removes the plugin's data
+
+Deleting a course left every course-scoped record behind, including learner
+conversations and messages. An observer now clears all of them, together with
+per-course setting overrides and child records whose parents are removed. The
+audit log and email opt-out preferences are deliberately retained.
+
+8. Course backups were missing ten tables
+
+Surveys, unit task responses, objective links, learner profiles and learner
+memory were silently absent from course backups. They are now included, together
+with course-level plugin settings, which also restore correctly when a backup is
+restored into an existing course or imported, not only into a new one.
+
+9. The system prompt budget is derived from the model
+
+A fixed character budget has twice been set by measuring one configuration and
+twice proved too small in another. The plugin now reads the configured model's
+context window, subtracts the reserved reply and the conversation history, and
+uses the result. A budget an administrator has changed from the default remains
+authoritative in both directions, so a site that lowered it to control cost keeps
+the value it chose. An unknown model changes nothing.
+
+Upgrade notes
+
+No schema change and no upgrade step. The new quiz lock scope defaults to the
+course containing the quiz. Administrators are advised to run the configuration
+log audit tool once after upgrading; it covers all plugins, not only this one.
+
+The per-course student count now counts distinct users rather than enrolment
+records, so a course in which some learners hold two enrolment methods will
+report a slightly lower figure than before. This is a correction, not a
+regression.
+
+Testing
+
+1,072 unit tests, 5,029 assertions, no failures. 36 of 36 corpus validators.
+Full continuous integration matrix across PHP 8.1, 8.2 and 8.3 on MariaDB and
+PostgreSQL. Prompt injection suite: 27 passed, no failures and no errors. Each
+fix was additionally verified against the staging database that produced the
+original reports.
