@@ -1,0 +1,89 @@
+Version 7.2.3 (build 2026082802)
+
+A verification pass over 7.2.1 confirmed all nine of its fixes and then found
+that the most important one had been given too little room to work in. This
+release corrects that, and closes the backup limitation 7.2.2 documented rather
+than fixed.
+
+1. The system prompt budget was still too small
+
+7.2.1 raised the budget to 24,000 characters after measuring a stock prompt at
+23,824. That measurement was accurate but taken at the default retrieval depth,
+so the remaining margin looked adequate. On a real chat turn in a live course
+the margin was 46 characters and the assembler was already trimming: roughly a
+third of the retrieved course material was being discarded on an ordinary
+four-chunk question, and one prompt section was dropped entirely. That material
+is exactly what the previous release existed to deliver to the model.
+
+The default is now 36,000, which clears the observed worst case with real
+margin. Sites still on the previous default are moved by the upgrade step; a
+deliberately tuned value is left alone.
+
+2. Truncation is now visible to an administrator
+
+Until now, the markers showing that content had been cut appeared only in the
+prompt debug log, which is off by default. That is why a budget too small to
+hold the prompt shipped twice without being noticed. The plugin now records when
+retrieved course content had to be cut and shows a warning on the settings page,
+next to the setting an administrator would change.
+
+3. Per-quiz assistance levels survive a restore again
+
+Course-module mappings are not populated while the course-level restore step
+runs; the platform creates them later, during the activity steps. Every lookup
+therefore failed, so per-quiz assistance levels were dropped on every restore
+and every course duplicate, including the setting used to restrict assistance
+during summative quizzes, and message and flashcard module references were
+stored as empty. Those rows are now held and resolved after every activity has
+been restored, using the platform's own post-restore hook. This is the same
+approach the platform uses for completion data, availability and course logs.
+
+4. Two of the three analytics charts were never drawn
+
+Chart.js has loaded correctly since 7.2.1 and the daily trend renders, but the
+hour-of-day and day-of-week canvases were never handed to it: the server sends
+those two nested inside a container the dashboard script was not reading. The
+tab shipped one chart and two empty headings, which read as missing data rather
+than as a wiring fault. All three now draw.
+
+5. Provider API keys are no longer written to the configuration change log
+
+The configuration log records the full previous and new value of every setting
+change. The provider comparison field is pipe-delimited with the API key in the
+second position, so each edit wrote provider credentials into that log in clear
+text, where they persisted independently of the setting itself. The key is now
+redacted. Which provider, model and base URL changed is still recorded, since
+that is what the log is for.
+
+6. The spend floor now says when it refuses input
+
+7.2.2 made the field accept amounts such as 25.50 and reject negatives, but the
+rejection was silent: the field redisplayed the typed value and an administrator
+could leave believing a floor had been set when it had been discarded. The field
+now refuses invalid input in the browser with the reason attached to it, and the
+server-side check remains the authority.
+
+Smaller changes
+
+- An administrator-initiated pause is recorded as "chat_paused" rather than as
+  an error, so pausing chat no longer registers as a spike in error monitoring.
+- The audit log's per-message row -- time, course, message length and originating
+  address, never message content -- is now described in the privacy notice and in
+  the platform's privacy registry.
+- The total-tokens figure on the analytics page now states that it counts every
+  AI call including retrieval. On a site with retrieval enabled that figure is
+  dominated by embedding and reranking and can be very large next to the chat
+  session counts, which measure something different. Both were correct; only the
+  labelling implied otherwise.
+
+Upgrade notes
+
+No schema change. One upgrade step, which raises the system prompt character
+budget for sites still on the previous default and touches nothing else.
+
+Testing
+
+999 unit tests, 4,800 assertions, no failures. 36 of 36 corpus validators. Full
+continuous integration matrix across PHP 8.1, 8.2 and 8.3 on MariaDB and
+PostgreSQL. The restore fix is covered by a test that fails against the previous
+implementation.
