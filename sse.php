@@ -238,11 +238,11 @@ ob_implicit_flush(true);
  * @param string $partial Whatever had streamed before the failure.
  * @param string $errclass Exception class. Used for diagnostics only; it must
  *        never reach the stored message, which the learner reads back.
+ * @param int|null $pageid
+ * @param string $interactiontype
  * @param string $learnertext What the learner was shown at the time. Persisted
  *        verbatim when present, so a refusal replays as the notice they saw
  *        rather than as an internal identifier.
- * @param int|null $pageid
- * @param string $interactiontype
  * @return void
  */
 function local_ai_course_assistant_record_failed_turn(

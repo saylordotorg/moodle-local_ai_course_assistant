@@ -32,6 +32,7 @@ final class config_log_audit_test extends \advanced_testcase {
      * @param string $plugin
      * @param string $name
      * @param string $value
+     * @param string $oldvalue The value this row replaced, as core records it.
      * @return int
      */
     private function log_row(string $plugin, string $name, string $value, string $oldvalue = ''): int {
