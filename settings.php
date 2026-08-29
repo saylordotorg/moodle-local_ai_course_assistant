@@ -336,7 +336,7 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/prompt_budget_chars',
         get_string('settings:prompt_budget_chars', 'local_ai_course_assistant'),
         get_string('settings:prompt_budget_chars_desc', 'local_ai_course_assistant'),
-        '24000',
+        '36000',
         PARAM_INT
     ));
     // v5.10.0: backend context window (max_model_len) for self-hosted/small
@@ -2496,6 +2496,26 @@ if ($hassiteconfig) {
         '50',
         PARAM_INT
     ));
+
+    // v7.2.3: warn when the assembler has recently had to cut retrieved course
+    // content. Truncation used to be visible only in the prompt debug log, which
+    // is off by default, so a budget too small to hold the prompt shipped twice
+    // without an administrator having any way to see it happening.
+    global $OUTPUT;
+    $trunclast = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
+    if ($trunclast > 0 && (time() - $trunclast) < (7 * DAYSECS)) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_truncation_warning',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str(
+                    'settings:prompt_truncated_warning',
+                    userdate($trunclast)
+                ),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
 
     // v7.2.1: PARAM_FLOAT rejected "25.50" (it cleans to 25.5, and configtext
     // compares the cleaned value to the input as a string) while happily storing

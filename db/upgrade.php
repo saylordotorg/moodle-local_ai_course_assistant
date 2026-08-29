@@ -1621,5 +1621,24 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082800, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026082802) {
+        // v7.2.3: raise the prompt budget again, 24,000 -> 36,000.
+        //
+        // The 24,000 figure was measured against a stock prompt at the default
+        // retrieval depth and cleared it by about 200 characters. On real turns
+        // that margin was 46 characters and roughly a third of the retrieved
+        // course material was being discarded -- the exact payload the release
+        // before it existed to deliver.
+        //
+        // As before, only sites still sitting on the previous default are moved.
+        // An admin who tuned this keeps their value.
+        $budget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
+        if ((string) $budget === '24000') {
+            set_config('prompt_budget_chars', 36000, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082802, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

@@ -1138,9 +1138,17 @@ try {
         . ', pageid=' . (int)($pageid ?? 0) . ')',
         DEBUG_DEVELOPER
     );
+    // v7.2.3: an administrator-initiated pause is not an error. It arrives here
+    // as a moodle_exception like any other failure, so it was landing in the
+    // audit log as sse_error carrying the learner-facing pause text -- which
+    // means anyone charting sse_error as a health signal sees a spike every time
+    // the kill switch is used. Give the expected state its own action name.
+    $auditaction = \local_ai_course_assistant\spend_guard::emergency_chat_stopped()
+        ? 'chat_paused'
+        : 'sse_error';
     try {
         \local_ai_course_assistant\audit_logger::log(
-            'sse_error',
+            $auditaction,
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
             ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]
@@ -1185,7 +1193,9 @@ try {
             $entry['detail'] = \core_text::substr($detail, 0, 500);
         }
         \local_ai_course_assistant\audit_logger::log(
-            'sse_error',
+            \local_ai_course_assistant\spend_guard::emergency_chat_stopped()
+                ? 'chat_paused'
+                : 'sse_error',
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
             $entry

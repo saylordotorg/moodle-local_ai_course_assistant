@@ -701,7 +701,7 @@ $string['privacy:metadata:local_ai_course_assistant_ut_resp:task_index'] = 'The 
 $string['privacy:metadata:local_ai_course_assistant_ut_resp:rating'] = 'The numeric rating given for the task.';
 $string['privacy:metadata:local_ai_course_assistant_ut_resp:answer'] = 'The free-text response for the task.';
 $string['privacy:metadata:local_ai_course_assistant_ut_resp:timecreated'] = 'The time the response was submitted.';
-$string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking.';
+$string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking. As well as administrator actions such as emergency switches and provider failover, a row is recorded for each message a learner sends, holding the time, course, conversation, message length and originating IP address. Message content is never stored here.';
 $string['privacy:metadata:local_ai_course_assistant_audit:userid'] = 'The ID of the user whose action was logged.';
 $string['privacy:metadata:local_ai_course_assistant_audit:courseid'] = 'The course context of the action.';
 $string['privacy:metadata:local_ai_course_assistant_audit:action'] = 'The action that was performed.';
@@ -835,7 +835,8 @@ $string['analytics:provider_comparison_desc'] = 'Compare per-turn response count
 $string['analytics:provider'] = 'Provider';
 $string['analytics:response_count'] = 'Responses';
 $string['analytics:avg_response_length'] = 'Avg response length';
-$string['analytics:total_tokens'] = 'Total tokens';
+$string['analytics:total_tokens'] = 'Total tokens (all AI calls)';
+$string['analytics:total_tokens_hint'] = 'Includes retrieval: embedding and reranking calls, which dominate this figure on a site with RAG enabled. Chat replies are counted here too but are a small fraction of it. The session and learner counts elsewhere on this page measure chat only, which is why the two can look wildly different.';
 $string['analytics:avg_tokens'] = 'Avg tokens / response';
 
 // User settings.
@@ -1371,7 +1372,8 @@ $string['settings:socratic_verbose']      = 'Verbose Socratic mode prompt';
 $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses receive the full ~600-token do/don\'t directive originally added in v3.9.30. When off (default), they receive a single-line directive that modern hosted models follow reliably and saves ~600 tokens per turn. Turn this on if a course is running on a weaker self-hosted model that needs the explicit scaffolding.';
 // v4.12.0: structured prompt budget + verbosity.
 $string['settings:prompt_budget_chars']      = 'System prompt character budget';
-$string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organizes sections by category (identity, course context, learner state, behavior, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 24,000 characters (~6,000 tokens) as of v7.2.1, raised from 12,000: a stock prompt with retrieval on measures about 23,800 characters, so the previous default dropped or truncated sections on every turn. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';
+$string['settings:prompt_truncated_warning'] = '[[tutorshort]] has had to cut retrieved course content out of the prompt to fit the character budget, most recently on {$a}. The model is answering with less course material than the retriever selected. Raise the system prompt character budget below, or reduce how much is retrieved.';
+$string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organizes sections by category (identity, course context, learner state, behavior, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 36,000 characters (~9,000 tokens) as of v7.2.3. The v7.2.1 default of 24,000 was measured against a stock prompt at the default retrieval depth and left only about 200 characters of margin, so on real turns retrieved course content was being truncated. If this page warns that content was recently truncated, raise this value. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';
 $string['settings:backend_context_tokens']      = 'Backend context window (tokens)';
 $string['settings:backend_context_tokens_desc'] = 'The maximum context length (max_model_len) of your AI backend, in tokens. Set to 0 for hosted models with a large window (no clamping). When set above 0 (for example 8192 on a self-hosted vLLM backend), [[tutorshort]] shrinks the system-prompt character budget above so the prompt plus reserved output and conversation history fit the window, even in token-dense languages. See the Deployment Sizing wiki page for how this maps to concurrent users.';
 $string['settings:backend_retry_attempts']      = 'Backend retry attempts';

@@ -226,4 +226,52 @@ class admin_setting_comparison_providers extends \admin_setting {
 </script>
 JS;
     }
+
+    /**
+     * Keep the API keys out of the configuration change log.
+     *
+     * config_log records the full old and new value of every setting change.
+     * This field is pipe-delimited with the API key in the second position, so
+     * every edit was writing provider credentials to mdl_config_log in plain
+     * text, where they persist independently of the setting itself and are
+     * visible to anyone who can read that table. The UI already masks the key
+     * on redisplay; the log did not.
+     *
+     * Only the key is redacted. Masking the whole value the way core's password
+     * setting does would also hide which provider, model or base URL changed,
+     * which is the part of the row an audit trail is for.
+     *
+     * @param string $name
+     * @param mixed $oldvalue
+     * @param mixed $value
+     * @return void
+     */
+    protected function add_to_config_log($name, $oldvalue, $value) {
+        parent::add_to_config_log($name, self::redact_keys($oldvalue), self::redact_keys($value));
+    }
+
+    /**
+     * Replace the API key in each pipe-delimited row with a fixed placeholder.
+     *
+     * @param mixed $raw
+     * @return mixed The redacted value, or the input unchanged when not a string.
+     */
+    public static function redact_keys($raw) {
+        if (!is_string($raw) || $raw === '') {
+            return $raw;
+        }
+        $out = [];
+        foreach (explode("\n", $raw) as $line) {
+            if (trim($line) === '') {
+                $out[] = $line;
+                continue;
+            }
+            $parts = explode('|', $line);
+            if (isset($parts[1]) && trim($parts[1]) !== '') {
+                $parts[1] = '********';
+            }
+            $out[] = implode('|', $parts);
+        }
+        return implode("\n", $out);
+    }
 }

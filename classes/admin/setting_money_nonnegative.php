@@ -73,4 +73,39 @@ class setting_money_nonnegative extends \admin_setting_configtext {
         }
         return true;
     }
+
+    /**
+     * Render the field with native browser validation attached.
+     *
+     * The server-side validate() above returns an error string, which Moodle
+     * surfaces as "Some settings were not changed due to an error". That was
+     * reported as not appearing: an administrator typing "abc" or "-5" saw the
+     * field redisplay their input with no message, and walked away believing the
+     * floor was set when it had been discarded. Rather than rely on that banner
+     * alone, refuse the input in the browser too, where the feedback is attached
+     * to the field the person is looking at.
+     *
+     * The pattern mirrors validate() exactly. Both are kept: the browser check is
+     * a convenience and anything can bypass it, so the server remains the
+     * authority.
+     *
+     * @param mixed $data
+     * @param string $query
+     * @return string
+     */
+    public function output_html($data, $query = '') {
+        $html = parent::output_html($data, $query);
+
+        $attrs = ' pattern="\\d+(\\.\\d{1,2})?" inputmode="decimal" title="'
+            . s(get_string('settings:money_nonnegative_invalid', 'local_ai_course_assistant'))
+            . '"';
+
+        // Target this setting's own input by id so nothing else on the page is
+        // touched, and no-op safely if the core template ever changes shape.
+        $needle = 'id="' . $this->get_id() . '"';
+        if (strpos($html, $needle) !== false) {
+            $html = str_replace($needle, $needle . $attrs, $html);
+        }
+        return $html;
+    }
 }

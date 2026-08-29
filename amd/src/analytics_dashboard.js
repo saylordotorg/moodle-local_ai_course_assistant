@@ -236,21 +236,29 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
                 }],
             });
         }
-        if (data.hourly) {
+        // The server sends these nested under time_distribution (see
+        // get_analytics_overall::execute). Reading data.hourly / data.daily at
+        // the top level meant both guards were always undefined, so these two
+        // canvases were never handed to Chart.js at all -- the tab shipped one
+        // chart and two bare headings, which read as "no data" rather than as a
+        // wiring fault. data.daily here is day-of-week, not the daily trend;
+        // that one is data.daily_usage.
+        var dist = data.time_distribution || {};
+        if (dist.hourly) {
             var hours = [];
             var hcounts = [];
             for (var h = 0; h < 24; h++) {
                 hours.push(h + ':00');
-                hcounts.push(data.hourly[h] || 0);
+                hcounts.push(dist.hourly[h] || 0);
             }
             charts['hourly'] = createChart('sola-chart-hourly', 'bar', {
                 labels: hours,
                 datasets: [{label: s('messages'), data: hcounts, backgroundColor: COLORS[1]}],
             });
         }
-        if (data.daily) {
+        if (dist.daily) {
             var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            var dcounts = days.map(function(d) { return data.daily[d] || 0; });
+            var dcounts = days.map(function(d) { return dist.daily[d] || 0; });
             charts['dow'] = createChart('sola-chart-dow', 'bar', {
                 labels: days,
                 datasets: [{label: s('messages'), data: dcounts, backgroundColor: COLORS[2]}],

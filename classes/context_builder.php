@@ -608,15 +608,20 @@ class context_builder {
         // v5.0.0 patch (Tomi UT round 2): code-level fallback raised
         // 10000 → 12000 to give the new current_page_content section
         // headroom alongside the existing learner + behavior sections.
-        // v7.2.1: raised from 12,000. A stock RAG-mode prompt measures 23,824
-        // chars at rag_topk=3 (identity 1,599 + course structure 2,558 + three
-        // retrieved passages + persona, house style, Socratic mode, multilingual,
-        // memory handling, practice scoring, output markers, and a 3,836-char
-        // safety block). At 12,000 the assembler was therefore always dropping or
-        // truncating something on a default install -- most visibly the
-        // multilingual section, on a product that ships 46 languages.
+        // v7.2.3: raised again, from 24,000. The v7.2.1 figure was measured on a
+        // stock prompt at rag_topk=3 and came out at 23,824 -- about 200
+        // characters of margin, which looked adequate and was not. On a live
+        // BUS101 turn the margin was 46 characters and the assembler was already
+        // trimming: roughly a third of the retrieved course material was being
+        // discarded on a routine four-chunk question, with widget_features
+        // dropped outright. Measuring at default retrieval settings was the
+        // mistake; the budget has to clear the high end of rag_topk, a long topic
+        // list and a per-course system prompt, not the median case.
+        //
+        // 36,000 clears the observed worst case with real margin. Deriving this
+        // from the model's context window would be the durable answer.
         $rawbudget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
-        $budget = ($rawbudget === false || $rawbudget === '') ? 24000 : (int) $rawbudget;
+        $budget = ($rawbudget === false || $rawbudget === '') ? 36000 : (int) $rawbudget;
 
         // v5.10.0: clamp to the backend context window when configured, so the
         // assembled prompt (plus reserved output and history) fits a small
@@ -759,6 +764,14 @@ class context_builder {
         // Stash the breakdown so the optional debug log can render it
         // without re-running assembly.
         self::$last_breakdown = $assembled['breakdown'];
+
+        // v7.2.3: leave a mark when course content did not survive intact, so the
+        // settings page can warn. Until now [TRUNCATED] and [DROPPED] appeared
+        // only in the prompt debug log, which is off by default -- which is how a
+        // budget too small to hold the prompt shipped twice without anyone
+        // noticing. Throttled to one write an hour: this runs on every chat turn
+        // and set_config purges the config cache.
+        self::note_content_truncation($assembled['breakdown']);
 
         // Cache only for non-RAG mode (RAG prompts are query-specific).
         if (!$ragmode) {
@@ -1049,6 +1062,32 @@ class context_builder {
      *                            than left unspent. Null keeps the fixed split.
      * @return array<string,int> Map of bucket key -> char budget.
      */
+    /**
+     * Note that retrieved course content was cut, for the settings-page warning.
+     *
+     * Throttled to at most one config write per hour. The value is the timestamp
+     * of the most recent turn on which course_content was dropped or truncated.
+     *
+     * @param array $breakdown Assembly breakdown from prompt\builder::assemble().
+     * @return void
+     */
+    private static function note_content_truncation(array $breakdown): void {
+        $cc = $breakdown['course_content'] ?? null;
+        if ($cc === null) {
+            return;
+        }
+        $lost = empty($cc['used']) || !empty($cc['truncated']);
+        if (!$lost) {
+            return;
+        }
+        $last = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
+        $now = time();
+        if ($now - $last < HOURSECS) {
+            return;
+        }
+        set_config('prompt_truncation_seen', $now, 'local_ai_course_assistant');
+    }
+
     public static function section_budgets(
         int $total_budget,
         int $pageid,

@@ -113,6 +113,26 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      * @param array|object $data
      * @return void
      */
+    /**
+     * Rows whose cmid cannot be resolved yet, held until after_restore_course().
+     *
+     * Course-module mappings do not exist while the COURSE task runs: core sets
+     * them in restore_module_structure_step, which belongs to the activity tasks
+     * that run afterwards (restore_plan_builder::build_course_plan adds the
+     * course task first). So get_mappingid('course_module', ...) returned false
+     * for every row here, on every restore and every course duplicate. Quiz
+     * assistance levels were dropped outright -- including 'hidden', the control
+     * used for summative quizzes -- and message and flashcard cmids were stored
+     * as null. Core has the same problem and solves it the same way: completion,
+     * availability and course logs are all deferred to restore_final_task.
+     *
+     * @var array
+     */
+    private $deferredquizcfg = [];
+
+    /** @var array [table => [[newid, oldcmid], ...]] rows needing a cmid fix-up. */
+    private $deferredcmids = [];
+
     public function process_aica_course_setting($data) {
         $data = (object) $data;
         $name = (string) ($data->name ?? '');
@@ -179,18 +199,11 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
 
         $data = (object) $data;
         $data->courseid = $this->task->get_courseid();
-        $cmid = $this->get_mappingid('course_module', $data->cmid);
-        if (!$cmid) {
-            // The quiz did not come across. Dropping the row is correct: keeping
-            // it would attach an assistance level to an unrelated module.
-            return;
-        }
-        $data->cmid = $cmid;
         unset($data->id);
-        if ($DB->record_exists('local_ai_course_assistant_quiz_cfg', ['cmid' => $data->cmid])) {
-            return;
-        }
-        $DB->insert_record('local_ai_course_assistant_quiz_cfg', $data);
+
+        // Held until after_restore_course(): the quiz's course-module mapping is
+        // not created until the activity tasks run, which is after this one.
+        $this->deferredquizcfg[] = $data;
     }
 
     /**
@@ -345,11 +358,13 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $data->conversationid = $conversationid;
         $data->userid = $userid;
         $data->courseid = $this->task->get_courseid();
-        $data->cmid = !empty($data->cmid)
-            ? ($this->get_mappingid('course_module', $data->cmid) ?: null)
-            : null;
+        $oldcmid = !empty($data->cmid) ? (int) $data->cmid : 0;
+        $data->cmid = null;
         unset($data->id);
         $newid = $DB->insert_record('local_ai_course_assistant_msgs', $data);
+        if ($oldcmid) {
+            $this->deferredcmids['local_ai_course_assistant_msgs'][] = [(int) $newid, $oldcmid];
+        }
         $this->set_mapping('aica_msg', $oldid, $newid);
     }
 
@@ -470,13 +485,15 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      */
     public function process_aica_flashcard($data) {
         $data = (array) $data;
-        $data['cmid'] = !empty($data['cmid'])
-            ? ($this->get_mappingid('course_module', $data['cmid']) ?: null)
-            : null;
+        $oldcmid = !empty($data['cmid']) ? (int) $data['cmid'] : 0;
+        $data['cmid'] = null;
         if (!empty($data['objectiveid'])) {
             $data['objectiveid'] = $this->get_mappingid('aica_objective', $data['objectiveid']) ?: null;
         }
-        $this->insert_simple_user_row('local_ai_course_assistant_flashcards', $data);
+        $newid = $this->insert_simple_user_row('local_ai_course_assistant_flashcards', $data);
+        if ($newid && $oldcmid) {
+            $this->deferredcmids['local_ai_course_assistant_flashcards'][] = [$newid, $oldcmid];
+        }
     }
 
     /**
@@ -489,13 +506,13 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      * @param array|object $data
      * @return void
      */
-    private function insert_simple_user_row(string $table, $data): void {
+    private function insert_simple_user_row(string $table, $data): ?int {
         global $DB;
 
         $data = (object) $data;
         $userid = $this->get_mappingid('user', $data->userid ?? 0);
         if (!$userid) {
-            return;
+            return null;
         }
         $data->userid = $userid;
         $data->courseid = $this->task->get_courseid();
@@ -514,10 +531,55 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
                 $conditions[$field] = $data->$field ?? null;
             }
             if ($DB->record_exists($table, $conditions)) {
-                return;
+                return null;
             }
         }
 
-        $DB->insert_record($table, $data);
+        return (int) $DB->insert_record($table, $data);
+    }
+
+    /**
+     * Resolve everything that needed a course-module mapping.
+     *
+     * Dispatched by restore_plugin::launch_after_restore_methods(), which runs
+     * from restore_final_task -- after every activity task, so the
+     * 'course_module' mappings this needs now exist. See $deferredquizcfg for
+     * why the work could not be done inline.
+     *
+     * @return void
+     */
+    public function after_restore_course() {
+        global $DB;
+
+        foreach ($this->deferredquizcfg as $row) {
+            $cmid = $this->get_mappingid('course_module', $row->cmid);
+            if (!$cmid) {
+                // The quiz genuinely did not come across -- an activity-level
+                // restore, or a backup that excluded it. Dropping is right:
+                // keeping the row would attach an assistance level to whatever
+                // module happens to hold that id on this site.
+                continue;
+            }
+            $row->cmid = $cmid;
+            // cmid carries a unique key, so a merge restore into a course that
+            // already configures this quiz must not insert a second row.
+            if ($DB->record_exists('local_ai_course_assistant_quiz_cfg', ['cmid' => $row->cmid])) {
+                continue;
+            }
+            $DB->insert_record('local_ai_course_assistant_quiz_cfg', $row);
+        }
+        $this->deferredquizcfg = [];
+
+        foreach ($this->deferredcmids as $table => $rows) {
+            foreach ($rows as [$newid, $oldcmid]) {
+                $cmid = $this->get_mappingid('course_module', $oldcmid);
+                if (!$cmid) {
+                    // Leave it null rather than pointing at an unrelated module.
+                    continue;
+                }
+                $DB->set_field($table, 'cmid', $cmid, ['id' => $newid]);
+            }
+        }
+        $this->deferredcmids = [];
     }
 }

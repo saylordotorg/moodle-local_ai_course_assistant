@@ -89,6 +89,52 @@ final class backup_restore_test extends \advanced_testcase {
     /**
      * The headline case: course configuration survives a duplicate.
      */
+    public function test_quiz_assistance_levels_survive_and_are_remapped(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $quiz = $this->getDataGenerator()->create_module('quiz', ['course' => $course->id]);
+
+        // 'hidden' is the academic-integrity control for a summative quiz. It was
+        // dropped on every restore and every duplicate, because course-module
+        // mappings do not exist while the course task runs -- so the assistance
+        // level silently reverted to the site default on the copy.
+        $DB->insert_record('local_ai_course_assistant_quiz_cfg', (object) [
+            'cmid' => $quiz->cmid,
+            'courseid' => $course->id,
+            'assistance_level' => 'hidden',
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+
+        $newid = $this->duplicate_course((int) $course->id, false);
+
+        $restored = $DB->get_records('local_ai_course_assistant_quiz_cfg', ['courseid' => $newid]);
+        $this->assertCount(
+            1,
+            $restored,
+            'The per-quiz assistance level did not survive the duplicate.'
+        );
+        $row = reset($restored);
+        $this->assertSame('hidden', $row->assistance_level);
+
+        // And it must point at the COPY's quiz, not the source's.
+        $this->assertNotEquals(
+            (int) $quiz->cmid,
+            (int) $row->cmid,
+            'cmid was copied rather than remapped: it still points at the source quiz.'
+        );
+        $newcm = $DB->get_record('course_modules', ['id' => (int) $row->cmid]);
+        $this->assertNotFalse($newcm, 'The remapped cmid does not resolve to a course module.');
+        $this->assertEquals(
+            $newid,
+            (int) $newcm->course,
+            'The remapped cmid belongs to a different course.'
+        );
+    }
+
     public function test_per_course_pedagogy_overrides_survive_a_duplicate(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
