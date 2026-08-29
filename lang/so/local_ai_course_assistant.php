@@ -75,10 +75,34 @@ $string['settings:model_desc'] = 'Modhel-ka la isticmaalay. Default-ku waxuu ku 
 $string['settings:apibaseurl'] = 'URL-ka Aasaaska API';
 $string['settings:apibaseurl_desc'] = 'URL-ka aasaaska ee API-ga. Si toos ah ayaa loo buuxiyaa bixiyaha kasta laakiin waa la beddeli karaa. Ka tag oo madhan default-ka bixiyaha.';
 $string['settings:systemprompt'] = 'Qaab-dhismeedka Tilmaanta Nidaamka';
-$string['settings:systemprompt_desc'] = 'Tilmaanta la u dirayo AI. Isticmaal meel-buuxiyeyaasha: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Adiga waxaad tahay bari AI oo kaalmeeya koorso "{{coursename}}". Doorka ardayda waa {{userrole}}.
+$string['settings:systemprompt_desc'] = 'Tilmaanta la u dirayo AI. Isticmaal meel-buuxiyeyaasha: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Waxaad tahay [[tutorshort]] (Online Learning Assistant), tababare waxbarasho oo ku shaqeeya garaadka macmalka ah oo u talinaya ardayda {{institution}} ee isku qoray "{{coursename}}". Doorka ardayga waa {{userrole}}.
 
-Caawin ardayga si uu u fahmo agabka koorsada. Noqo mid dhiirigeliya, cad, oo waxbarasho u fiican.';
+## Doorka
+Bixi caawimo tacliimeed oo taageero leh oo la jaanqaadaysa koorsada, taasoo dhiirrigelinaysa waxbarasho, tababar, dhiirrigelin iyo isticmaal mas\'uuliyad leh oo garaadka macmalka ah. Jawaabahaagu waa inay ku salaysnaadaan waxa ku jira koorsada. Waxaad tahay codka macallinka.
+
+## Xeerarka Aasaasiga ah
+- Ku saleey dhammaan jawaabaha tacliimeed agabka koorsada ee la ansixiyay ama macluumaadka machadka.
+- Ha abuurin wax aan jirin, hana ka bixin baaxadda koorsada.
+- U celi ardayda agabka koorsada marka su\'aaluhu ka baxaan koorsada. Kadib laba codsi oo mowduuca ka baxsan, wadahadalka ku celi waxbarashada.
+- Marka aad samaynayso su\'aalo tababar, si toos ah uga soo qaad agabka koorsada.
+
+## Waxa uu [[tutorshort]] Ku Caawin Karo
+- Sharaxaadda fikradaha iyo soo koobidda casharrada
+- Bixinta tusaalooyin iyo su\'aalo tababar
+- Soo jeedinta xeelado waxbarasho
+- Dhiirrigelinta adkaysiga iyo horumarka
+
+## Waxa uusan [[tutorshort]] Samayn Doonin
+- Go\'aamo tacliimeed ama siyaasadeed
+- Talo caafimaad, sharci ama caafimaad maskaxeed
+- Caawinta khiyaanada tacliimeed ama ka gudubka waxbarashada
+
+## Codka iyo Qaabka
+La xiriir si saaxiibtinimo, daryeel, dhiirrigelin, kaftan iyo kicin leh. Noqo mid kooban, taageero leh oo ixtiraam leh.
+
+## Badbaadada
+Ha ku lug yeelan wadahadallo caay, nacayb, takoor ama aan habboonayn. Dhig xuduud adag laakiin naxariis leh oo u celi mowduucyo waxtar leh.';
 $string['settings:temperature'] = 'Heerkulka';
 $string['settings:temperature_desc'] = 'Xukuma xasilloonida. Qiyamka hoose waa mid diiradda leh, qiyamka sare waa mid hal-abuur badan. Kala-duwanaanshaha: 0.0 ilaa 2.0.';
 $string['settings:maxhistory'] = 'Taariikhda Ugu Badan ee Wada-hadalka';
@@ -1948,3 +1972,14 @@ $string['quizlock:window_desc'] = 'Inta muddo ee isku day imtixaan aan lahayn xa
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] hadda waa la joojiyay. Agabkaaga koorsadu ma uusan wax dhib ah gaarin, mana aha wax adigu sameeyay — fadlan mar kale isku day goor dambe.';
 $string['settings:money_nonnegative_invalid'] = 'Geli qadar ah 0 ama ka badan, ugu badnaan laba god oo tobanle ah (tusaale 25 ama 25.50).';
+
+$string['chat:turn_failed'] = 'Jawaabtan lama dhammaystiri karin. Wax aad samaysay midna sabab uma ahayn — fadlan mar kale isku day.';
+$string['settings:prompt_budget_mode'] = 'Habka miisaaniyadda amarka nidaamka';
+$string['settings:prompt_budget_mode_desc'] = 'Sida loo go\'aamiyo miisaaniyadda xarfaha ee amarka nidaamka. <strong>Ka soo saar moodalka</strong> wuxuu xisaabiyaa booska uu moodalka la habeeyey dhab ahaan bixiyo — daaqadda macnaha guud, laga jaray jawaabta la keydiyey iyo taariikhda wada hadalka — kadibna wuu isticmaalaa, isagoo xad sare leh si daaqad aad u weyn aysan u suurtagelin amar aad u weyn. Tanina waxay shaqaysaa oo keliya inta miisaaniyadda xarfaha ee hoose ay ku hartay qiimaheeda caadiga ah ee 36,000: haddaad tiradaas beddesho, iyadaa adkaanaysa, labada dhinacba, maxaa yeelay tiro uu maamule qoray waa go\'aan ee ma aha malayn. <strong>Go\'an</strong> had iyo jeer wuxuu isticmaalaa tirada hoose. Server-ka is-martigaliya waa inuu dejiyaa daaqadda macnaha guud ee gadaasha, taasoo mudnaanta ka leh wax kasta oo halkan ku jira.';
+$string['settings:prompt_budget_mode_auto'] = 'Ka soo saar moodalka (lagula talinayo)';
+$string['settings:prompt_budget_mode_fixed'] = 'Miisaaniyad xarfo go\'an';
+
+$string['quizlock:scope'] = 'Inta uu qufulku gaaro';
+$string['quizlock:scope_course'] = 'Koorsadan oo keliya (lagula talinayo)';
+$string['quizlock:scope_site'] = 'Dhammaan koorsooyinka';
+$string['quizlock:scope_desc'] = 'Inuu isku day socda ka joojiyo [[tutorshort]] koorsada imtixaanku ku jiro oo keliya, mise meel kasta. <strong>Koorsadan oo keliya</strong> waa caadiga waana waxa aad rabto ku dhawaad mar walba. Goobta oo dhan waxay ahayd habdhaqanka ilaa v7.2.4, waxayna lahayd cillad mudan in la ogaado: isku day la iska daayay wuxuu ahaanayaa mid «socda» weligiis, sidaas darteed hal imtixaan oo la ilaaway taariikhda ardayga wuxuu damiyay caawiyaha koorsa kasta oo uu qaato, iyadoo waxba shaashadda kuma qorna sababta. Goobta oo dhan wax yar ayay ka tarayaan arday go\'aansaday inuu khiyaamo, isagoo haysta browser labaad, agabka koorsada iyo raadinta caawiyahuna horeba way ku koobnaayeen koorsada.';

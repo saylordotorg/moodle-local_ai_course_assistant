@@ -70,7 +70,7 @@ $string['settings:model_desc'] = '使用するモデル。デフォルトはプ�
 $string['settings:apibaseurl'] = 'APIベースURL';
 $string['settings:apibaseurl_desc'] = 'APIベースURL。プロバイダーに基づいて自動入力されますが、上書き可能です。プロバイダーのデフォルトを使用するには空白のままにしてください。';
 $string['settings:systemprompt'] = 'システムプロンプトテンプレート';
-$string['settings:systemprompt_desc'] = 'AIに送信されるシステムプロンプト。プレースホルダー {{coursename}}、{{userrole}} を使用してください。';
+$string['settings:systemprompt_desc'] = 'AIに送信されるシステムプロンプト。プレースホルダー {{coursename}}、{{userrole}}、{{institution}} を使用してください。';
 $string['settings:systemprompt_default'] = 'あなたは「{{coursename}}」コースの役立つAIチューターです。学生の役割は{{userrole}}です。
 
 学生がコースの内容を理解できるよう支援してください。励みになり、明確で、教育的に厳密であってください。';
@@ -1937,3 +1937,14 @@ $string['quizlock:window_desc'] = '制限時間のない小テストの受験が
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] は現在一時停止しています。コース教材には影響がなく、あなたの操作が原因ではありません。しばらくしてからもう一度お試しください。';
 $string['settings:money_nonnegative_invalid'] = '0 以上の金額を、小数点以下 2 桁までで入力してください（例: 25 または 25.50）。';
+
+$string['chat:turn_failed'] = 'この回答を完了できませんでした。あなたの操作が原因ではありません。もう一度お試しください。';
+$string['settings:prompt_budget_mode'] = 'システムプロンプトの予算モード';
+$string['settings:prompt_budget_mode_desc'] = 'システムプロンプトの文字数予算をどのように決めるかを指定します。<strong>モデルから算出</strong>は、設定中のモデルが実際に使える余地—コンテキストウィンドウから、確保しておく応答分と会話履歴を差し引いた量—を計算してそれを使います。非常に大きなウィンドウが非常に大きなプロンプトを正当化しないよう、上限を設けています。これが効くのは、下の文字数予算が既定値の 36,000 のままのあいだだけです。その数値を変更すると、以後はそちらが優先されます。増やす場合も減らす場合も同様で、管理者が入力した数値は推測ではなく判断だからです。<strong>固定</strong>は常に下の数値を使います。セルフホストのバックエンドではバックエンドのコンテキストウィンドウを設定してください。それがここのすべてに優先します。';
+$string['settings:prompt_budget_mode_auto'] = 'モデルから算出（推奨）';
+$string['settings:prompt_budget_mode_fixed'] = '固定の文字数予算';
+
+$string['quizlock:scope'] = 'ロックが及ぶ範囲';
+$string['quizlock:scope_course'] = 'このコースのみ（推奨）';
+$string['quizlock:scope_site'] = 'すべてのコース';
+$string['quizlock:scope_desc'] = '進行中の受験が [[tutorshort]] を止める範囲を、小テストのあるコースだけにするか、どこでも止めるかを指定します。<strong>このコースのみ</strong>が既定で、ほとんどの場合こちらが適切です。サイト全体は v7.2.4 までの動作で、知っておく価値のある不具合がありました。放棄された受験は永久に「進行中」のままなので、学習者の履歴のどこかにある忘れられた小テスト一つが、その人の受講するすべてのコースでアシスタントを無効にし、しかも画面には理由が何も出ませんでした。サイト全体にしても、別のブラウザーを持つ本気の学習者にはほとんど効果がなく、アシスタントの教材も検索も元々コース単位です。';

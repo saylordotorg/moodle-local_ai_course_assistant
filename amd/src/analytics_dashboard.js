@@ -205,13 +205,24 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function renderOverall(data) {
         var pane = document.getElementById('sola-pane-overall');
         if (!pane) { return; }
+        var enrollment = data.enrollment || {};
+        var overview = data.overview || {};
+        var sessions = data.sessions || {};
+        var returnrate = data.return_rate || {};
         var html = '<div class="sola-stat-cards">' +
-            statCard(s('total_students'), data.total_enrolled || 0, 'users') +
-            statCard(s('active_ai_users'), data.active_students || 0, 'chat') +
-            statCard(s('msgs_per_student'), data.avg_messages_per_student || 0, 'message') +
-            statCard(s('avg_session'), formatMinutes(data.avg_session_minutes || 0), 'clock') +
-            statCard(s('return_rate'), (data.return_rate_pct || 0) + '%', 'return') +
-            statCard(s('total_sessions'), data.total_sessions || 0, 'sessions') +
+            // The server nests these (see get_analytics_overall::execute):
+            // enrollment, overview, sessions and return_rate are each their own
+            // object. Reading them at the top level meant every one of the six
+            // tiles resolved to undefined and rendered 0 -- including TOTAL
+            // STUDENTS, which is a plain enrolment count, on courses with a
+            // hundred participants. Same shape as the chart wiring fixed in
+            // 7.2.3: the payload grew a level and the dashboard did not follow.
+            statCard(s('total_students'), enrollment.total_enrolled || 0, 'users') +
+            statCard(s('active_ai_users'), overview.active_students || 0, 'chat') +
+            statCard(s('msgs_per_student'), overview.avg_messages_per_student || 0, 'message') +
+            statCard(s('avg_session'), formatMinutes(sessions.avg_duration_minutes || 0), 'clock') +
+            statCard(s('return_rate'), (returnrate.return_rate_pct || 0) + '%', 'return') +
+            statCard(s('total_sessions'), sessions.total_sessions || 0, 'sessions') +
             '</div>';
         html += '<div class="row mt-4">';
         html += '<div class="col-md-12 mb-4"><h5>Daily Usage Trend</h5><canvas id="sola-chart-daily" height="80"></canvas></div>';

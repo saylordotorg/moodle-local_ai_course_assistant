@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'ጥቅም ላይ የሚውለው ሞዴል። 
 $string['settings:apibaseurl'] = 'የAPI መሰረታዊ URL';
 $string['settings:apibaseurl_desc'] = 'ለAPI መሰረታዊ URL። እንደ አቅራቢ ራሱ ይሞላል ግን ሊሻሻል ይችላል። ለአቅራቢ ነባሪ ባዶ ይተው።';
 $string['settings:systemprompt'] = 'የስርዓት ፕሮምት ቅጥ';
-$string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}።';
+$string['settings:systemprompt_desc'] = 'ለAI የሚላከው የስርዓት ፕሮምት። ቅጦቹን ይጠቀሙ፦ {{coursename}}, {{userrole}}, {{institution}}።';
 $string['settings:systemprompt_default'] = 'ለ"{{coursename}}" ኮርስ ጠቃሚ የAI አስተማሪ ነዎት። የተማሪው ሚና {{userrole}} ነው።
 
 ተማሪው የኮርሱን ቁሳቁስ እንዲረዳ ይርዱ። አበረታቱ፣ ግልጽ ይሁኑ እና ትምህርታዊ ዘዴ ይጠቀሙ።';
@@ -1960,3 +1960,14 @@ $string['quizlock:window_desc'] = 'የጊዜ ገደብ በሌለው ፈተና �
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] አሁን ለጊዜው ቆሟል። የኮርስዎ ግብዓቶች አልተነኩም፤ ይህ በእርስዎ ስህተት አይደለም — እባክዎ ቆይተው እንደገና ይሞክሩ።';
 $string['settings:money_nonnegative_invalid'] = 'ከ0 በላይ የሆነ መጠን ያስገቡ፤ ቢበዛ ሁለት አስርዮሽ ቦታዎች (ለምሳሌ 25 ወይም 25.50)።';
+
+$string['chat:turn_failed'] = 'ይህ ምላሽ ሊጠናቀቅ አልቻለም። ያደረጉት ነገር ምንም ምክንያት አልሆነም — እባክዎ እንደገና ይሞክሩ።';
+$string['settings:prompt_budget_mode'] = 'የሥርዓት ጥያቄ በጀት ሁኔታ';
+$string['settings:prompt_budget_mode_desc'] = 'የሥርዓት ጥያቄው የቁምፊ በጀት እንዴት እንደሚወሰን። <strong>ከሞዴሉ አውጣ</strong> የተዋቀረው ሞዴል በትክክል የሚሰጠውን ቦታ ያሰላል — የአውድ መስኮቱን ቀንሶ የተያዘውን ምላሽና የውይይት ታሪክ — ከዚያም ይጠቀምበታል፤ በጣም ትልቅ መስኮት በጣም ትልቅ ጥያቄ እንዳይፈቅድ ጣሪያ ተቀምጦለታል። ይህ የሚሠራው ከዚህ በታች ያለው የቁምፊ በጀት በነባሪው 36,000 ላይ እስከቆየ ድረስ ብቻ ነው፦ ያንን ቁጥር ከቀየሩት እሱ ያሸንፋል፣ በሁለቱም አቅጣጫ፣ ምክንያቱም አስተዳዳሪ የጻፈው ቁጥር ግምት ሳይሆን ውሳኔ ነው። <strong>ቋሚ</strong> ሁልጊዜ ከዚህ በታች ያለውን ቁጥር ይጠቀማል። በራስ የሚስተናገድ ጀርባ የጀርባውን የአውድ መስኮት ማዘጋጀት አለበት፤ ያም ከዚህ ሁሉ ቀዳሚነት አለው።';
+$string['settings:prompt_budget_mode_auto'] = 'ከሞዴሉ አውጣ (የሚመከር)';
+$string['settings:prompt_budget_mode_fixed'] = 'ቋሚ የቁምፊ በጀት';
+
+$string['quizlock:scope'] = 'መቆለፊያው የሚደርስበት ስፋት';
+$string['quizlock:scope_course'] = 'ይህ ኮርስ ብቻ (የሚመከር)';
+$string['quizlock:scope_site'] = 'ሁሉም ኮርሶች';
+$string['quizlock:scope_desc'] = 'በሂደት ላይ ያለ ሙከራ [[tutorshort]]ን ፈተናውን በያዘው ኮርስ ውስጥ ብቻ ይከልክል ወይስ በሁሉም ቦታ። <strong>ይህ ኮርስ ብቻ</strong> ነባሪው ሲሆን ሁልጊዜ ማለት ይቻላል የሚፈለገው ነው። መላ-ጣቢያ እስከ v7.2.4 ድረስ የነበረው ባህሪ ሲሆን ማወቅ የሚገባው ችግር ነበረው፦ የተተወ ሙከራ ለዘላለም በሂደት ላይ ሆኖ ይቆያል፣ ስለዚህ በተማሪው ታሪክ ውስጥ የተረሳ አንድ ፈተና በሚማረው በእያንዳንዱ ኮርስ ውስጥ ረዳቱን ያሰናክል ነበር፣ በስክሪኑ ላይ ምንም ማብራሪያ ሳይኖር። መላ-ጣቢያ በቆረጠ ተማሪ ላይ የሚያተርፈው በጣም ጥቂት ነው፤ ሁለተኛ አሳሽ አለውና፣ የረዳቱ የኮርስ ይዘትና ማውጣቱም በኮርስ የተወሰነ ነው።';

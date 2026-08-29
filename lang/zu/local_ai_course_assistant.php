@@ -75,10 +75,34 @@ $string['settings:model_desc'] = 'Imodeli ezosetshenziselwa. Okuzenzakalelayo ku
 $string['settings:apibaseurl'] = 'I-URL Yisisekelo se-API';
 $string['settings:apibaseurl_desc'] = 'I-URL yasisekelo ye-API. Igcwaliswa ngokwawo umhlinzeki ngamunye kodwa ingashintshwa. Yishiye ingenalutho ukuthola okuzenzakalelayo komhlinzeki.';
 $string['settings:systemprompt'] = 'Isifanekiso Sesicelo Sesistimu';
-$string['settings:systemprompt_desc'] = 'Isicelo esithumelwa ku-AI. Sebenzisa izindawo: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Ungu-AI omfundisi osizayo wesifundo "{{coursename}}". Indima yomfundi ngu-{{userrole}}.
+$string['settings:systemprompt_desc'] = 'Isicelo esithumelwa ku-AI. Sebenzisa izindawo: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Ungu-[[tutorshort]] (Online Learning Assistant), umqeqeshi wokufunda osebenzisa ubuhlakani bokwenziwa kubafundi be-{{institution}} ababhalisele "{{coursename}}". Indima yomfundi ngu-{{userrole}}.
 
-Siza umfundi ukuqonda izinto zesifundo. Yiba nokukhuthaza, ucace, futhi usetshenziselwe imfundo.';
+## Indima
+Nikeza usizo lwezemfundo olusekelayo noluhambisana nekhosi, olukhuthaza ukufunda, ukuzilolonga, ugqozi kanye nokusebenzisa ubuhlakani bokwenziwa ngokuzibophezela. Izimpendulo zakho kumele zisekelwe okuqukethwe kwekhosi. Uyizwi likathisha.
+
+## Imithetho Eyisisekelo
+- Sekela zonke izimpendulo zezemfundo ezintweni ezigunyaziwe zekhosi noma emininingwaneni yesikhungo.
+- Ungaqambi okuqukethwe futhi ungeqi umkhawulo wekhosi.
+- Buyisela abafundi ezintweni zekhosi lapho imibuzo iphuma ngaphandle kwayo. Ngemva kwezicelo ezimbili ezingaphandle kwesihloko, buyisela ingxoxo ekufundeni.
+- Uma wenza imibuzo yokuzilolonga, yithathe ngqo ezintweni zekhosi.
+
+## Lokho u-[[tutorshort]] Angasiza Ngakho
+- Ukuchaza imiqondo nokufingqa izifundo
+- Ukunikeza izibonelo nemibuzo yokuzilolonga
+- Ukuphakamisa amasu okufunda
+- Ukukhuthaza ukuphikelela nenqubekelaphambili
+
+## Lokho u-[[tutorshort]] Angeke Akwenze
+- Ukuthatha izinqumo zezemfundo noma zenqubomgomo
+- Ukunikeza iseluleko sezokwelapha, sezomthetho noma sempilo yengqondo
+- Ukusiza ekukhwabaniseni kwezemfundo noma ukugwema ukufunda
+
+## Ithoni Nesitayela
+Xhumana ngendlela enobungane, enakekelayo, ekhuthazayo, ehlakaniphile negqugquzelayo. Yiba mfushane, usekele futhi uhloniphe.
+
+## Ukuphepha
+Ungabambi iqhaza ezingxoxweni ezihlukumezayo, ezinenzondo, ezibandlululayo noma ezingafanele. Beka imikhawulo eqinile kodwa enomusa bese ubuyisela ezihlokweni ezakhayo.';
 $string['settings:temperature'] = 'Ubushisa';
 $string['settings:temperature_desc'] = 'Lawula ukungaqiniseki. Amanani aphansi agxile, amanani aphezulu nawo akhiqizayo. Ibanga: 0.0 kuya ku-2.0.';
 $string['settings:maxhistory'] = 'Umlando Omakhulu Wengxoxo';
@@ -1966,3 +1990,14 @@ $string['quizlock:window_desc'] = 'Isikhathi umzamo esivivinyweni esingenamkhawu
 
 $string['emergency:chat_stopped'] = 'I-[[tutorshort]] imisiwe okwamanje. Izinto zekhosi yakho azithintekile, futhi akulona iphutha lakho — sicela uzame futhi ngemuva kwesikhathi.';
 $string['settings:money_nonnegative_invalid'] = 'Faka inani elingu-0 noma ngaphezulu, elinamanani angemuva kwekhefu angadluli amabili (isibonelo 25 noma 25.50).';
+
+$string['chat:turn_failed'] = 'Le mpendulo ayikwazanga ukuqedwa. Akukho okwenzile okubangele lokhu — sicela uzame futhi.';
+$string['settings:prompt_budget_mode'] = 'Imodi yesabelomali sesicelo sesistimu';
+$string['settings:prompt_budget_mode_desc'] = 'Indlela isabelomali sezinhlamvu sesicelo sesistimu esinqunywa ngayo. <strong>Thola kumodeli</strong> ibala indawo imodeli emisiwe eyinikeza ngempela — iwindi layo lomongo, kususwe impendulo egodliwe nomlando wengxoxo — bese isebenzisa lokho, ngomkhawulo ophezulu ukuze iwindi elikhulu kakhulu lingavumeli isicelo esikhulu kakhulu. Lokhu kusebenza kuphela ngenkathi isabelomali sezinhlamvu esingezansi sisele kunani laso elizenzakalelayo lika-36,000: uma ushintsha lelo nani, yilona elinqumayo, ezinhlangothini zombili, ngoba inani elithayiphwe umlawuli liyisinqumo hhayi ukuqagela. <strong>Emisiwe</strong> ihlala isebenzisa inani elingezansi. Isiphetho esizisingathayo kufanele simise iwindi lomongo lesiphetho; lokho kubaluleke ukudlula konke okulapha.';
+$string['settings:prompt_budget_mode_auto'] = 'Thola kumodeli (kunconyiwe)';
+$string['settings:prompt_budget_mode_fixed'] = 'Isabelomali sezinhlamvu esimisiwe';
+
+$string['quizlock:scope'] = 'Ukuthi ukukhiya kufinyelela kuphi';
+$string['quizlock:scope_course'] = 'Lesi sifundo kuphela (kunconyiwe)';
+$string['quizlock:scope_site'] = 'Zonke izifundo';
+$string['quizlock:scope_desc'] = 'Ukuthi umzamo osaqhubeka uvimbela i-[[tutorshort]] esifundweni esiqukethe isivivinyo kuphela, noma yonke indawo. <strong>Lesi sifundo kuphela</strong> yikho okuzenzakalelayo futhi cishe njalo yikho okufunayo. Isayithi lonke bekuyindlela ebisebenza kuze kufike ku-v7.2.4 futhi inenkinga okufanele uyazi: umzamo oshiyiwe uhlala «usaqhubeka» phakade, ngakho isivivinyo esisodwa esikhohliwe kwesinye isikhathi emlandweni womfundi besicisha umsizi kuzo zonke izifundo azithathayo, kungekho lutho esikrinini oluchazayo. Isayithi lonke linikeza okuncane kakhulu kumfundi ozimisele ukukopela, onesiphequluli sesibili, futhi izinto zesifundo nokusesha komsizi sekuvele kuvalelwe esifundweni.';

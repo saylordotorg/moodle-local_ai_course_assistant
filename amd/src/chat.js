@@ -70,6 +70,16 @@ define([
     let streamMeta = null;
     /** @type {boolean} Whether SOLA is locked due to a Moodle quiz attempt/view page */
     let quizLocked = false;
+    // v7.2.5: the server-side attempt lock. Distinct from quizLocked, which is
+    // the per-quiz assistance level and only ever set on a quiz page. Without
+    // this the drawer rendered an enabled textarea everywhere else while
+    // base_provider was going to refuse, so a learner typed a whole question
+    // before finding out. Both sides now read the same check for the same
+    // course.
+    let attemptLocked = false;
+    // Rendered server-side: the string carries a [[tutorshort]] brand token and
+    // Moodle's string cache would hand us the raw value, token and all.
+    let attemptLockedNotice = '';
     /** @type {HTMLAudioElement|{pause:Function}|null} Currently playing OpenAI TTS audio (or AudioContext proxy) */
     let currentAudio = null;
     /** @type {AudioContext|null} Shared AudioContext unlocked by user gesture (iOS TTS fix) */
@@ -1204,6 +1214,8 @@ define([
         currentPageId = parseInt(root.dataset.currentPageId, 10) || 0;
         currentPageTitle = root.dataset.currentPageTitle || '';
         quizLocked = root.dataset.quizLocked === '1';
+        attemptLocked = root.dataset.attemptLocked === '1';
+        attemptLockedNotice = root.dataset.attemptLockedNotice || '';
 
         // Fallbacks for themes/pages where Moodle does not populate PAGE->cm in the footer hook.
         if (!currentPageId && document.body) {
@@ -1250,7 +1262,15 @@ define([
         syncComposerLlmControls(root);
         initSpeech();
         syncVoicePanel();
-        UI.setModeButtonsEnabled(!quizLocked);
+        UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
+        if (attemptLocked) {
+            UI.setInputEnabled(false);
+            // The practice-quiz button is not a mode button, so setModeButtons
+            // does not reach it. Left live it is the same self-contradicting
+            // surface -- everything grey except the one control that starts an
+            // AI call the server is about to refuse.
+            UI.setQuizButtonEnabled(false);
+        }
         setBottomMode('chat', {force: true});
         // Cache English starter labels before any language update overwrites them.
         root.querySelectorAll('.local-ai-course-assistant__starter').forEach(function(btn) {
@@ -4071,6 +4091,13 @@ define([
                     if (!result.success) {
                         quizModeActive = false;
                         setQuizBtnActive(quizBtn, false);
+                        // The academic-integrity lock is not a retryable failure, so it must
+                        // not borrow the generic "please try again" wording. The server sends
+                        // back the same branded, translated notice the drawer shows.
+                        if (result.errorcode === 'quizlocked' && result.error) {
+                            addAssistantMsg(result.error);
+                            return;
+                        }
                         Str.get_string('chat:quiz_error', 'local_ai_course_assistant').then(function(msg) {
                             addAssistantMsg(msg);
                             return;
@@ -4657,6 +4684,23 @@ define([
             syncVoicePanel();
             hydrateMasteryChip();
         }
+        if (opened && attemptLocked && !historyLoaded) {
+            // The learner has a quiz open in THIS course. Say so in the server's
+            // own words, which name the remedy: submit or close the attempt.
+            //
+            // The flag is a page-render snapshot. Submitting the attempt in a
+            // second tab leaves this one disabled until the page is reloaded, so
+            // the notice says to reload rather than leaving the learner to
+            // wonder why doing what it asked changed nothing.
+            historyLoaded = true;
+            UI.clearMessages();
+            setConversationHistory([]);
+            addAssistantMsg(attemptLockedNotice, null, {skipHistory: true});
+            UI.setInputEnabled(false);
+            UI.setModeButtonsEnabled(false);
+            UI.setQuizButtonEnabled(false);
+            return;
+        }
         if (opened && quizLocked && !historyLoaded) {
             // Show quiz-locked notice instead of normal history/starters flow.
             // Explicitly clear any messages to prevent previous chat from being visible (cheating risk).
@@ -5117,7 +5161,7 @@ define([
      * Handle sending a message.
      */
     const handleSend = function() {
-        if (quizLocked) {
+        if (quizLocked || attemptLocked) {
             return;
         }
         const text = UI.getInputValue();

@@ -255,6 +255,15 @@ $courses = [];
 foreach ($courseids as $cid) {
     $cid = (int) $cid;
 
+    // v7.2.4: course id 0 now means "every course" to the analytics class, so a
+    // stray courseid=0 row in the messages table would make this entry report
+    // whole-site totals under a single course heading. The ids here come
+    // straight from SELECT DISTINCT courseid, so nothing upstream guarantees
+    // they are real courses.
+    if ($cid <= 0) {
+        continue;
+    }
+
     // Get course name.
     $coursename = $DB->get_field('course', 'fullname', ['id' => $cid]);
     if ($coursename === false) {

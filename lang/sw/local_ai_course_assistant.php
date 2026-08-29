@@ -75,10 +75,34 @@ $string['settings:model_desc'] = 'Modeli ya kutumia. Chaguo-msingi inategemea mt
 $string['settings:apibaseurl'] = 'URL ya Msingi ya API';
 $string['settings:apibaseurl_desc'] = 'URL ya msingi kwa API. Inajazwa kiotomatiki kwa kila mtoa huduma lakini inaweza kubadilishwa. Acha wazi kwa chaguo-msingi la mtoa huduma.';
 $string['settings:systemprompt'] = 'Kiolezo cha Ombi la Mfumo';
-$string['settings:systemprompt_desc'] = 'Ombi la mfumo linalotumwa kwa AI. Tumia viashiria: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Wewe ni mshauri wa AI msaidizi kwa kozi "{{coursename}}". Jukumu la mwanafunzi ni {{userrole}}.
+$string['settings:systemprompt_desc'] = 'Ombi la mfumo linalotumwa kwa AI. Tumia viashiria: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Wewe ni [[tutorshort]] (Online Learning Assistant), kocha wa kujifunza anayetumia akili bandia kwa wanafunzi wa {{institution}} waliojiandikisha katika "{{coursename}}". Nafasi ya mwanafunzi ni {{userrole}}.
 
-Saidia mwanafunzi kuelewa maudhui ya kozi. Kuwa wa kuhimiza, wazi, na sahihi kielimu.';
+## Jukumu
+Toa msaada wa kitaaluma unaotia moyo na unaoendana na kozi, unaohimiza kujifunza, mazoezi, motisha na matumizi ya kuwajibika ya akili bandia. Majibu yako lazima yategemee maudhui ya kozi. Wewe ni sauti ya mwalimu.
+
+## Kanuni za Msingi
+- Tegemeza majibu yote ya kitaaluma kwenye nyenzo zilizoidhinishwa za kozi au taarifa za taasisi.
+- Usibuni maudhui wala kuvuka mipaka ya kozi.
+- Rudisha wanafunzi kwenye nyenzo za kozi pale maswali yanapotoka nje ya kozi. Baada ya maombi mawili yasiyohusiana, rudisha mazungumzo kwenye kujifunza.
+- Unapotunga maswali ya mazoezi, yatoe moja kwa moja kwenye nyenzo za kozi.
+
+## Mambo Ambayo [[tutorshort]] Anaweza Kusaidia
+- Kueleza dhana na kufupisha masomo
+- Kutoa mifano na maswali ya mazoezi
+- Kupendekeza mbinu za kusoma
+- Kuhimiza uvumilivu na maendeleo
+
+## Mambo Ambayo [[tutorshort]] Hatafanya
+- Kufanya maamuzi ya kitaaluma au ya sera
+- Kutoa ushauri wa kitabibu, kisheria au wa afya ya akili
+- Kusaidia udanganyifu wa kitaaluma au kukwepa kujifunza
+
+## Sauti na Mtindo
+Wasiliana kwa njia ya kirafiki, ya kujali, yenye kutia moyo, ya ucheshi na yenye kuhamasisha. Kuwa mfupi, mwenye kuunga mkono na mwenye heshima.
+
+## Usalama
+Usishiriki katika mazungumzo ya matusi, chuki, ubaguzi au yasiyofaa. Weka mipaka thabiti lakini ya upole na urudishe mazungumzo kwenye mada zenye tija.';
 $string['settings:temperature'] = 'Joto';
 $string['settings:temperature_desc'] = 'Inadhibiti nasibu. Thamani za chini ni za kuzingatia zaidi, thamani za juu ni za ubunifu zaidi. Kipindi: 0.0 hadi 2.0.';
 $string['settings:maxhistory'] = 'Historia ya Juu ya Mazungumzo';
@@ -1967,3 +1991,14 @@ $string['quizlock:window_desc'] = 'Muda ambao jaribio kwenye jaribio lisilo na k
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] imesitishwa kwa sasa. Nyenzo za kozi yako hazijaathiriwa, na hili si kosa lako — tafadhali jaribu tena baadaye.';
 $string['settings:money_nonnegative_invalid'] = 'Weka kiasi cha 0 au zaidi, kwa nafasi mbili za desimali kwa juu zaidi (kwa mfano 25 au 25.50).';
+
+$string['chat:turn_failed'] = 'Jibu hili halikuweza kukamilika. Hakuna ulichofanya kilichosababisha hili — tafadhali jaribu tena.';
+$string['settings:prompt_budget_mode'] = 'Hali ya bajeti ya kidokezo cha mfumo';
+$string['settings:prompt_budget_mode_desc'] = 'Jinsi bajeti ya herufi ya kidokezo cha mfumo inavyoamuliwa. <strong>Kokotoa kutoka kwa modeli</strong> hupima nafasi ambayo modeli iliyosanidiwa hutoa kwa kweli — dirisha lake la muktadha, ukiondoa jibu lililotengwa na historia ya mazungumzo — kisha hutumia hiyo, ikiwa na kikomo cha juu ili dirisha kubwa mno lisihalalishe kidokezo kikubwa mno. Hii hufanya kazi tu wakati bajeti ya herufi iliyo hapa chini imebaki kwenye thamani yake chaguo-msingi ya 36,000: ukibadilisha namba hiyo, hiyo ndiyo hushinda, pande zote mbili, kwa sababu namba aliyoandika msimamizi ni uamuzi si ubashiri. <strong>Isiyobadilika</strong> hutumia namba iliyo hapa chini kila wakati. Seva inayojiendesha yenyewe inapaswa kuweka dirisha la muktadha la seva, ambalo hupewa kipaumbele kuliko kila kitu hapa.';
+$string['settings:prompt_budget_mode_auto'] = 'Kokotoa kutoka kwa modeli (inapendekezwa)';
+$string['settings:prompt_budget_mode_fixed'] = 'Bajeti ya herufi isiyobadilika';
+
+$string['quizlock:scope'] = 'Kufuli linafika mbali kiasi gani';
+$string['quizlock:scope_course'] = 'Kozi hii pekee (inapendekezwa)';
+$string['quizlock:scope_site'] = 'Kozi zote';
+$string['quizlock:scope_desc'] = 'Iwapo jaribio linaloendelea linazuia [[tutorshort]] katika kozi yenye jaribio pekee, au kila mahali. <strong>Kozi hii pekee</strong> ndicho chaguo-msingi na karibu kila mara ndicho unachotaka. Tovuti nzima ndio ilikuwa tabia hadi v7.2.4 na ilikuwa na hitilafu inayostahili kujulikana: jaribio lililoachwa hubaki «linaendelea» milele, hivyo jaribio moja lililosahaulika mahali fulani katika historia ya mwanafunzi lilizima msaidizi katika kila kozi anayosoma, bila chochote skrini kueleza kwa nini. Tovuti nzima haitoi manufaa mengi dhidi ya mwanafunzi aliyeazimia kudanganya, mwenye kivinjari cha pili, na maudhui ya kozi na utafutaji wa msaidizi tayari yamefungwa kwenye kozi.';

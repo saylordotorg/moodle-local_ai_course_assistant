@@ -75,10 +75,34 @@ $string['settings:model_desc'] = 'Model yang hendak digunakan. Default bergantun
 $string['settings:apibaseurl'] = 'URL Asas API';
 $string['settings:apibaseurl_desc'] = 'URL asas untuk API. Diisi secara automatik mengikut pembekal tetapi boleh ditindih. Biarkan kosong untuk default pembekal.';
 $string['settings:systemprompt'] = 'Templat Prompt Sistem';
-$string['settings:systemprompt_desc'] = 'Prompt sistem yang dihantar kepada AI. Gunakan placeholder: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Anda adalah tutor AI yang berguna untuk kursus "{{coursename}}". Peranan pelajar ialah {{userrole}}.
+$string['settings:systemprompt_desc'] = 'Prompt sistem yang dihantar kepada AI. Gunakan placeholder: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Anda ialah [[tutorshort]] (Online Learning Assistant), jurulatih pembelajaran AI untuk pelajar {{institution}} yang mendaftar dalam "{{coursename}}". Peranan pelajar ialah {{userrole}}.
 
-Bantu pelajar memahami bahan kursus. Jadilah menggalakkan, jelas, dan berkaedah pedagogi yang baik.';
+## Peranan
+Berikan bantuan akademik yang menyokong dan selaras dengan kursus, yang menggalakkan pembelajaran, latihan, motivasi dan penggunaan AI secara bertanggungjawab. Jawapan anda mesti berasaskan kandungan kursus. Anda ialah suara pensyarah.
+
+## Peraturan Teras
+- Asaskan semua jawapan akademik pada bahan kursus yang diluluskan atau maklumat institusi.
+- Jangan cipta kandungan dan jangan melangkaui skop kursus.
+- Bawa pelajar kembali kepada bahan kursus apabila soalan berada di luar skop. Selepas dua permintaan di luar topik, kembalikan perbualan kepada pembelajaran.
+- Apabila menjana soalan latihan, ambil terus daripada bahan kursus.
+
+## Perkara yang Boleh Dibantu oleh [[tutorshort]]
+- Menerangkan konsep dan meringkaskan pelajaran
+- Memberikan contoh dan soalan latihan
+- Mencadangkan strategi pembelajaran
+- Menggalakkan ketekunan dan kemajuan
+
+## Perkara yang Tidak Dilakukan oleh [[tutorshort]]
+- Membuat keputusan akademik atau dasar
+- Memberikan kaunseling perubatan, undang-undang atau kesihatan mental
+- Membantu ketidakjujuran akademik atau memintas pembelajaran
+
+## Nada dan Gaya
+Berkomunikasi secara mesra, prihatin, memberi galakan, bijak dan memotivasikan. Ringkas, menyokong dan hormat.
+
+## Keselamatan
+Jangan terlibat dalam perbualan kesat, kebencian, diskriminasi atau tidak wajar. Tetapkan batas yang tegas tetapi baik dan bawa perbualan kembali kepada topik produktif.';
 $string['settings:temperature'] = 'Suhu';
 $string['settings:temperature_desc'] = 'Mengawal rawak. Nilai lebih rendah lebih fokus, nilai lebih tinggi lebih kreatif. Julat: 0.0 hingga 2.0.';
 $string['settings:maxhistory'] = 'Sejarah Perbualan Maksimum';
@@ -1960,3 +1984,14 @@ $string['quizlock:window_desc'] = 'Berapa lama percubaan pada kuiz tanpa had mas
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] dijeda buat masa ini. Bahan kursus anda tidak terjejas, dan ini bukan disebabkan oleh anda — sila cuba lagi kemudian.';
 $string['settings:money_nonnegative_invalid'] = 'Masukkan jumlah 0 atau lebih, dengan maksimum dua tempat perpuluhan (contohnya 25 atau 25.50).';
+
+$string['chat:turn_failed'] = 'Balasan ini tidak dapat diselesaikan. Ia bukan disebabkan oleh apa-apa yang anda lakukan — sila cuba lagi.';
+$string['settings:prompt_budget_mode'] = 'Mod bajet gesaan sistem';
+$string['settings:prompt_budget_mode_desc'] = 'Cara bajet aksara gesaan sistem ditentukan. <strong>Terbitkan daripada model</strong> mengira ruang yang benar-benar ditawarkan oleh model yang dikonfigurasikan — tetingkap konteksnya, ditolak balasan yang dikhaskan dan sejarah perbualan — lalu menggunakan nilai itu, dengan had atas supaya tetingkap yang sangat besar tidak mewajarkan gesaan yang sangat besar. Ini terpakai hanya selagi bajet aksara di bawah kekal pada nilai lalainya 36,000: sebaik anda mengubah nombor itu, nombor itulah yang menang, ke dua-dua arah, kerana angka yang ditaip oleh pentadbir ialah keputusan dan bukan tekaan. <strong>Tetap</strong> sentiasa menggunakan nombor di bawah. Backend hos sendiri sepatutnya menetapkan tetingkap konteks backend, yang diutamakan mengatasi semua di sini.';
+$string['settings:prompt_budget_mode_auto'] = 'Terbitkan daripada model (disyorkan)';
+$string['settings:prompt_budget_mode_fixed'] = 'Bajet aksara tetap';
+
+$string['quizlock:scope'] = 'Sejauh mana kunci itu sampai';
+$string['quizlock:scope_course'] = 'Kursus ini sahaja (disyorkan)';
+$string['quizlock:scope_site'] = 'Semua kursus';
+$string['quizlock:scope_desc'] = 'Sama ada percubaan yang sedang berjalan menyekat [[tutorshort]] hanya dalam kursus yang mengandungi kuiz itu, atau di mana-mana. <strong>Kursus ini sahaja</strong> ialah tetapan lalai dan hampir selalu yang anda mahukan. Seluruh tapak ialah kelakuan sehingga v7.2.4 dan mempunyai kegagalan yang wajar diketahui: percubaan yang ditinggalkan kekal «sedang berjalan» selama-lamanya, jadi satu kuiz yang terlupa dalam sejarah pelajar melumpuhkan pembantu itu dalam setiap kursus yang diambilnya, tanpa apa-apa di skrin yang menerangkan sebabnya. Seluruh tapak memberi sedikit sahaja terhadap pelajar yang berazam menipu, yang mempunyai pelayar kedua, dan bahan kursus serta capaian pembantu itu memang terhad kepada kursus.';

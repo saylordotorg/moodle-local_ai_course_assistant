@@ -518,6 +518,38 @@ class hook_callbacks {
             }
         }
 
+        // v7.2.5: the server-side attempt lock, surfaced to the browser.
+        //
+        // The widget had no idea this existed. `$quizlocked` above is the
+        // per-quiz assistance level, a different mechanism that only applies on
+        // a quiz page -- so anywhere else the drawer rendered a normal, enabled
+        // textarea while base_provider was going to refuse. A learner typed a
+        // full question and only found out after sending it. Both sides now read
+        // the same check with the same course, so the input is disabled exactly
+        // when the server will refuse.
+        //
+        // No is_siteadmin() carve-out, deliberately. v7.2.4 moved the lock ahead
+        // of the admin exemption in base_provider, so an admin with an attempt
+        // open IS refused; exempting them here only means they get an enabled
+        // textarea and discover it after sending -- the precise failure this
+        // flag exists to remove, preserved for the people who test dev.
+        $attemptlocked = false;
+        if (!empty($USER->id)) {
+            $attemptlocked = \local_ai_course_assistant\quiz_lock::is_locked_for(
+                (int) $USER->id,
+                (int) $courseid
+            );
+        }
+
+        // Pre-rendered server-side because the string carries a [[tutorshort]]
+        // brand token. Moodle's string cache hands JS the raw value, and the one
+        // token-replace block in chat.js is reachable only from the greeting --
+        // so a Str.get_string here would ship the literal token to every locked
+        // learner. chat_open_label is the existing precedent.
+        $attemptlockednotice = $attemptlocked
+            ? \local_ai_course_assistant\branding::str('quizlock:blocked')
+            : '';
+
         // Position offsets for fine-grained widget placement. ?: would treat
         // a literal 0 ("snap to corner") as falsy and silently apply the
         // default; use the explicit-default helper.
@@ -748,6 +780,8 @@ class hook_callbacks {
             'modname'            => $modname,
             'pagetype'           => $pagetype,
             'quizlocked'         => $quizlocked,
+            'attemptlocked'      => $attemptlocked,
+            'attemptlockednotice' => $attemptlockednotice,
             'quizcoachmode'      => $quizcoachmode,
             'quizcmid'           => $quizcmid,
             'realtimeenabled'         => $realtimeenabled,

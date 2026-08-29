@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Käytettävä malli. Oletusarvo riippuu palvel
 $string['settings:apibaseurl'] = 'API:n perus-URL';
 $string['settings:apibaseurl_desc'] = 'API:n perus-URL. Täytetään automaattisesti palveluntarjoajan mukaan, mutta voidaan korvata. Jätä tyhjäksi käyttääksesi palveluntarjoajan oletusarvoa.';
 $string['settings:systemprompt'] = 'Järjestelmäkehotteen malli';
-$string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'AI:lle lähetetty järjestelmäkehote. Käytä paikkamerkkejä: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Olet hyödyllinen AI-tutori kurssille "{{coursename}}". Opiskelijan rooli on {{userrole}}.
 
 Auta opiskelijaa ymmärtämään kurssin sisältö. Ole kannustava, selkeä ja pedagogisesti perusteellinen.';
@@ -1931,3 +1931,14 @@ $string['quizlock:window_desc'] = 'Kuinka kauan yritys ilman aikarajaa olevassa 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] on juuri nyt tauolla. Kurssimateriaalisi eivät ole muuttuneet, eikä tämä johdu sinusta — yritä myöhemmin uudelleen.';
 $string['settings:money_nonnegative_invalid'] = 'Anna vähintään 0:n suuruinen summa, enintään kahdella desimaalilla (esimerkiksi 25 tai 25.50).';
+
+$string['chat:turn_failed'] = 'Tätä vastausta ei voitu viimeistellä. Syy ei ollut mikään tekemäsi asia — yritä uudelleen.';
+$string['settings:prompt_budget_mode'] = 'Järjestelmäkehotteen budjettitila';
+$string['settings:prompt_budget_mode_desc'] = 'Miten järjestelmäkehotteen merkkibudjetti määritetään. <strong>Johda mallista</strong> laskee, kuinka paljon tilaa määritetty malli todella tarjoaa — sen konteksti-ikkunan, josta on vähennetty varattu vastaus ja keskusteluhistoria — ja käyttää sitä, ylärajalla, jottei hyvin suuri ikkuna oikeuta hyvin suurta kehotetta. Tämä pätee vain niin kauan kuin alla oleva merkkibudjetti on oletusarvossaan 36 000: jos muutat sitä lukua, se voittaa, molempiin suuntiin, sillä ylläpitäjän kirjoittama luku on päätös eikä arvaus. <strong>Kiinteä</strong> käyttää aina alla olevaa lukua. Itse ylläpidetyn taustapalvelun tulisi asettaa taustapalvelun konteksti-ikkuna, joka menee kaiken tämän edelle.';
+$string['settings:prompt_budget_mode_auto'] = 'Johda mallista (suositus)';
+$string['settings:prompt_budget_mode_fixed'] = 'Kiinteä merkkibudjetti';
+
+$string['quizlock:scope'] = 'Kuinka laajalle lukitus ulottuu';
+$string['quizlock:scope_course'] = 'Vain tämä kurssi (suositus)';
+$string['quizlock:scope_site'] = 'Kaikki kurssit';
+$string['quizlock:scope_desc'] = 'Estääkö kesken oleva yritys [[tutorshort]]in vain tentin sisältävällä kurssilla vai kaikkialla. <strong>Vain tämä kurssi</strong> on oletus ja lähes aina se, mitä haluat. Koko sivusto oli toiminta versioon v7.2.4 asti, ja siinä oli tuntemisen arvoinen vikatila: hylätty yritys jää ikuisesti kesken, joten yksi unohtunut tentti jossain opiskelijan historiassa poisti avustajan käytöstä jokaisella hänen kurssillaan, eikä ruudulla ollut mitään selitystä. Koko sivusto tuo hyvin vähän päättäväistä opiskelijaa vastaan, jolla on toinen selain, ja avustajan kurssimateriaali ja haku ovat muutenkin kurssikohtaisia.';

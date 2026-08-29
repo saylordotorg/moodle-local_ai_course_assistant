@@ -32,6 +32,7 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/cdn/test/*" \
   -x "*/services/*" \
   -x "*/tests/a11y/node_modules/*" \
+  -x "*/tests/golden/*" \
   -x "*/.wiki/*" \
   -x "*/.drafts/*" \
   -x "*/__pycache__/*" \

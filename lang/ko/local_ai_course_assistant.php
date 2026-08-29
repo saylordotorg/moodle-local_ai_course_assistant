@@ -70,7 +70,7 @@ $string['settings:model_desc'] = '사용할 모델. 기본값은 제공자에 �
 $string['settings:apibaseurl'] = 'API 기본 URL';
 $string['settings:apibaseurl_desc'] = 'API 기본 URL. 제공자에 따라 자동으로 채워지지만 재정의할 수 있습니다. 제공자 기본값을 사용하려면 비워 두세요.';
 $string['settings:systemprompt'] = '시스템 프롬프트 템플릿';
-$string['settings:systemprompt_desc'] = 'AI에 전송되는 시스템 프롬프트. 플레이스홀더 {{coursename}}, {{userrole}}를 사용하세요.';
+$string['settings:systemprompt_desc'] = 'AI에 전송되는 시스템 프롬프트. 플레이스홀더 {{coursename}}, {{userrole}}, {{institution}}를 사용하세요.';
 $string['settings:systemprompt_default'] = '당신은 "{{coursename}}" 코스의 유용한 AI 튜터입니다. 학생의 역할은 {{userrole}}입니다.
 
 학생이 코스 내용을 이해할 수 있도록 도와주세요. 격려하고, 명확하며, 교육적으로 엄격하게 응답하세요.';
@@ -1937,3 +1937,14 @@ $string['quizlock:window_desc'] = '시간 제한이 없는 퀴즈의 응시가 �
 
 $string['emergency:chat_stopped'] = '[[tutorshort]]이(가) 현재 일시 중지되었습니다. 강의 자료에는 영향이 없으며, 학습자의 잘못이 아닙니다. 잠시 후 다시 시도해 주세요.';
 $string['settings:money_nonnegative_invalid'] = '0 이상의 금액을 소수점 두 자리까지 입력하세요(예: 25 또는 25.50).';
+
+$string['chat:turn_failed'] = '이 답변을 완료하지 못했습니다. 사용자가 한 일 때문이 아니니 다시 시도해 주세요.';
+$string['settings:prompt_budget_mode'] = '시스템 프롬프트 예산 모드';
+$string['settings:prompt_budget_mode_desc'] = '시스템 프롬프트의 문자 예산을 정하는 방식입니다. <strong>모델에서 산출</strong>은 설정된 모델이 실제로 제공하는 여유 공간, 즉 컨텍스트 윈도에서 예약된 응답과 대화 기록을 뺀 크기를 계산해 그 값을 사용합니다. 아주 큰 윈도가 아주 큰 프롬프트를 정당화하지 않도록 상한을 둡니다. 이는 아래의 문자 예산이 기본값 36,000으로 남아 있는 동안에만 적용됩니다. 그 숫자를 바꾸면 이후로는 그 값이 우선하며, 올릴 때도 내릴 때도 마찬가지입니다. 관리자가 입력한 숫자는 추측이 아니라 결정이기 때문입니다. <strong>고정</strong>은 항상 아래 숫자를 사용합니다. 자체 호스팅 백엔드는 백엔드 컨텍스트 윈도를 설정해야 하며, 그 값이 여기의 모든 것보다 우선합니다.';
+$string['settings:prompt_budget_mode_auto'] = '모델에서 산출(권장)';
+$string['settings:prompt_budget_mode_fixed'] = '고정 문자 예산';
+
+$string['quizlock:scope'] = '잠금이 미치는 범위';
+$string['quizlock:scope_course'] = '이 강좌만(권장)';
+$string['quizlock:scope_site'] = '모든 강좌';
+$string['quizlock:scope_desc'] = '진행 중인 응시가 [[tutorshort]]을(를) 퀴즈가 있는 강좌에서만 막을지, 모든 곳에서 막을지 정합니다. <strong>이 강좌만</strong>이 기본값이며 거의 언제나 적절한 선택입니다. 사이트 전체는 v7.2.4까지의 동작으로, 알아둘 만한 결함이 있었습니다. 중단된 응시는 영원히 ‘진행 중’으로 남기 때문에, 학습자 이력 어딘가에 잊힌 퀴즈 하나가 그 사람이 수강하는 모든 강좌에서 어시스턴트를 꺼버렸고, 화면에는 이유가 전혀 표시되지 않았습니다. 사이트 전체로 막아도 두 번째 브라우저를 가진 작정한 학습자에게는 거의 효과가 없으며, 어시스턴트의 강좌 자료와 검색은 원래 강좌 단위입니다.';

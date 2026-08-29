@@ -5919,3 +5919,12 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
     color: #155724;
 }
 .sola-toc-save { background: #16a34a; border-color: #16a34a; color: #fff; font-weight: 500; }
+
+/* A starter chip disabled alongside the input, e.g. during a quiz lock.
+   pointer-events off as well as the disabled attribute, because the chips are
+   rendered as buttons in some layouts and anchors in others. */
+.aica-starter--disabled {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed;
+}

@@ -36,6 +36,15 @@
  *  - email_optout. A learner's site-wide contact preference, not course content.
  *  - outreach_log. Delivery history; meaningless once restored elsewhere.
  *  - review_res. Moderation-queue state belonging to the original site's staff.
+ *  - sbx_rec. Soapbox recordings. The row is a pointer: storage_key names audio
+ *    held outside Moodle, which no backup file carries, so a restored row would
+ *    reference a recording that does not exist on the target site. The
+ *    assignment and its topics do travel; the attempts against them do not.
+ *  - struggle_signal. Outreach state -- which learner has already been followed
+ *    up, and when. It describes a conversation the originating site had, and
+ *    replaying it on another site would either re-send or wrongly suppress.
+ *  - avatar_sess. Session and billing telemetry: upstream session ids and
+ *    per-session cost belonging to the originating site's provider account.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
@@ -175,9 +184,91 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
         $sbxtopics->add_child($sbxtopic);
         $sbxtopic->set_source_table('local_ai_course_assistant_sbx_topic', ['assignid' => '../../id']);
 
+        // Instructor-authored surveys and user-testing task sets, each with its
+        // learner responses nested so the parent id is remapped for them.
+        $surveys = new backup_nested_element('aica_surveys');
+        $survey = new backup_nested_element('aica_survey', ['id'], [
+            'title', 'questions', 'active', 'timecreated', 'timemodified',
+        ]);
+        $surveyresps = new backup_nested_element('aica_survey_resps');
+        $surveyresp = new backup_nested_element('aica_survey_resp', ['id'], [
+            'userid', 'question_index', 'answer', 'timecreated',
+        ]);
+        $wrapper->add_child($surveys);
+        $surveys->add_child($survey);
+        $survey->add_child($surveyresps);
+        $surveyresps->add_child($surveyresp);
+        $survey->set_source_table('local_ai_course_assistant_surveys', ['courseid' => backup::VAR_COURSEID]);
+        if ($userinfo) {
+            $surveyresp->set_source_table(
+                'local_ai_course_assistant_survey_resp',
+                ['surveyid' => backup::VAR_PARENTID]
+            );
+        }
+
+        $uttasks = new backup_nested_element('aica_ut_tasks');
+        $uttask = new backup_nested_element('aica_ut_task', ['id'], [
+            'title', 'tasks', 'external_url', 'active', 'timecreated', 'timemodified',
+        ]);
+        $utresps = new backup_nested_element('aica_ut_resps');
+        $utresp = new backup_nested_element('aica_ut_resp', ['id'], [
+            'userid', 'task_index', 'rating', 'answer', 'message_count',
+            'session_minutes', 'timecreated',
+        ]);
+        $wrapper->add_child($uttasks);
+        $uttasks->add_child($uttask);
+        $uttask->add_child($utresps);
+        $utresps->add_child($utresp);
+        $uttask->set_source_table('local_ai_course_assistant_ut_tasks', ['courseid' => backup::VAR_COURSEID]);
+        if ($userinfo) {
+            $utresp->set_source_table(
+                'local_ai_course_assistant_ut_resp',
+                ['tasksetid' => backup::VAR_PARENTID]
+            );
+        }
+
+        // Objective-to-objective links. Both ends go through the objective
+        // mapping the restore sets for itself, so a link never points at an
+        // objective belonging to another course.
+        $objlinks = new backup_nested_element('aica_obj_links');
+        $objlink = new backup_nested_element('aica_obj_link', ['id'], [
+            'objectiveida', 'objectiveidb', 'method', 'score', 'timemodified',
+        ]);
+        $wrapper->add_child($objlinks);
+        $objlinks->add_child($objlink);
+        $objlink->set_source_sql(
+            'SELECT l.* FROM {local_ai_course_assistant_obj_links} l
+               JOIN {local_ai_course_assistant_objs} o ON o.id = l.objectiveida
+              WHERE o.courseid = :courseid',
+            ['courseid' => backup::VAR_COURSEID]
+        );
+
         // ---------- learner activity (users only) ----------
 
         if ($userinfo) {
+            // Per-course learner profile and memory notes.
+            $profiles = new backup_nested_element('aica_profiles');
+            $profile = new backup_nested_element('aica_profile', ['id'], [
+                'userid', 'profile_summary', 'timecreated', 'timemodified',
+            ]);
+            $wrapper->add_child($profiles);
+            $profiles->add_child($profile);
+            $profile->set_source_table(
+                'local_ai_course_assistant_profiles',
+                ['courseid' => backup::VAR_COURSEID]
+            );
+
+            $memories = new backup_nested_element('aica_memories');
+            $memory = new backup_nested_element('aica_memory', ['id'], [
+                'userid', 'notes_json', 'timecreated', 'timemodified',
+            ]);
+            $wrapper->add_child($memories);
+            $memories->add_child($memory);
+            $memory->set_source_table(
+                'local_ai_course_assistant_learner_memory',
+                ['courseid' => backup::VAR_COURSEID]
+            );
+
             // Conversations, with their messages and any ratings on those
             // messages nested, so message ids never need remapping across files.
             $convs = new backup_nested_element('aica_convs');
@@ -313,5 +404,74 @@ class backup_local_ai_course_assistant_plugin extends backup_local_plugin {
                 $this->annotate_user_ids($child);
             }
         }
+    }
+
+    /**
+     * Course configuration, attached to the course's first section as well.
+     *
+     * The whole payload hangs off course.xml, and restore_course_task only adds
+     * restore_course_structure_step for TARGET_NEW_COURSE or when "overwrite
+     * course configuration" is ticked. So "restore this .mbz into course X"
+     * produced a course with no SOLA configuration at all, and Import never
+     * carried any -- silently, which is the same failure the backup work was
+     * written to prevent. Section tasks are not gated that way.
+     *
+     * Configuration only. Learner activity stays on the course connection point:
+     * a merge restore or an import is not a context in which someone else's
+     * conversations should appear, and neither carries users anyway.
+     *
+     * Emitted for EVERY section, deliberately. Restricting it to the course's
+     * first section is the obvious way to avoid repeating course-scoped rows,
+     * and it reintroduces the bug on a narrower path: sections are individually
+     * deselectable in the Include step of both Backup and Import, so deselecting
+     * the first one produced an archive with no SOLA configuration at all --
+     * silently, again. The payload is one config row plus a handful of setting
+     * names, which is nothing against a course backup, and restore is idempotent
+     * three ways over: every process method below returns early on a row that
+     * already exists. Emitting everywhere also drops the per-section
+     * get_field_sql this used to run at define time.
+     *
+     * @return backup_plugin_element|null
+     */
+    protected function define_section_plugin_structure() {
+        $courseid = (int) $this->task->get_courseid();
+
+        $plugin = $this->get_plugin_element(null, null, null);
+        $wrapper = new backup_nested_element($this->get_recommended_name());
+        $plugin->add_child($wrapper);
+
+        // Per-course configuration row (credentials still withheld).
+        $configs = new backup_nested_element('aica_course_configs');
+        $config = new backup_nested_element('aica_course_config', ['id'], [
+            'enabled', 'provider', 'model', 'systemprompt', 'temperature',
+            'timecreated', 'timemodified',
+        ]);
+        $wrapper->add_child($configs);
+        $configs->add_child($config);
+        $config->set_source_table('local_ai_course_assistant_course_cfg', ['courseid' => backup::VAR_COURSEID]);
+
+        // Per-course overrides held in config_plugins.
+        $settings = new backup_nested_element('aica_course_settings');
+        $setting = new backup_nested_element('aica_course_setting', ['id'], ['name', 'value']);
+        $wrapper->add_child($settings);
+        $settings->add_child($setting);
+        $rows = [];
+        $rowid = 0;
+        foreach (\local_ai_course_assistant\course_setting_transfer::collect_for_course($courseid)
+                as $key => $value) {
+            $rows[] = (object) ['id' => ++$rowid, 'name' => $key, 'value' => $value];
+        }
+        $setting->set_source_array($rows);
+
+        // Per-quiz assistance levels. cmid is resolved in after_restore_section.
+        $quizcfgs = new backup_nested_element('aica_quiz_cfgs');
+        $quizcfg = new backup_nested_element('aica_quiz_cfg', ['id'], [
+            'cmid', 'assistance_level', 'timecreated', 'timemodified',
+        ]);
+        $wrapper->add_child($quizcfgs);
+        $quizcfgs->add_child($quizcfg);
+        $quizcfg->set_source_table('local_ai_course_assistant_quiz_cfg', ['courseid' => backup::VAR_COURSEID]);
+
+        return $plugin;
     }
 }

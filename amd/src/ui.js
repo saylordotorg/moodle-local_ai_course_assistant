@@ -2454,6 +2454,23 @@ define([
     const setInputEnabled = function(enabled) {
         input.disabled = !enabled;
         updateSendButton();
+
+        // The starter chips are part of the same surface. During a quiz lock the
+        // textarea was disabled while all six chips stayed live directly beneath
+        // a notice saying the assistant was paused -- so the page contradicted
+        // itself, and clicking one reached the server before being refused.
+        // One condition governs the whole input area.
+        if (!root) { return; }
+        root.querySelectorAll('[data-starter]').forEach(function(chip) {
+            chip.disabled = !enabled;
+            chip.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+            chip.classList.toggle('aica-starter--disabled', !enabled);
+            if (!enabled) {
+                chip.setAttribute('tabindex', '-1');
+            } else {
+                chip.removeAttribute('tabindex');
+            }
+        });
     };
 
     // -----------------------------------------------------------------------
@@ -3069,6 +3086,26 @@ define([
         root.querySelectorAll('.local-ai-course-assistant__mode-btn').forEach(function(btn) {
             btn.disabled = !enabled;
         });
+    };
+
+    /**
+     * Enable or disable the practice-quiz button.
+     *
+     * Separate from setModeButtonsEnabled because the quiz button is not a mode
+     * button, so the quiz-lock path was greying out the textarea and every chip
+     * while leaving live the one control that starts an AI call the server is
+     * about to refuse.
+     *
+     * @param {boolean} enabled
+     */
+    const setQuizButtonEnabled = function(enabled) {
+        if (!root) {
+            return;
+        }
+        const quizBtn = root.querySelector('.local-ai-course-assistant__btn-quiz');
+        if (quizBtn) {
+            quizBtn.disabled = !enabled;
+        }
     };
 
     /**
@@ -6084,6 +6121,7 @@ define([
         showStarters: showStarters,
         setBottomMode: setBottomMode,
         setModeButtonsEnabled: setModeButtonsEnabled,
+        setQuizButtonEnabled: setQuizButtonEnabled,
         configureVoicePanel: configureVoicePanel,
         renderHistoryPanel: renderHistoryPanel,
         showTopicPicker: showTopicPicker,

@@ -236,10 +236,13 @@ ob_implicit_flush(true);
  * @param int $userid
  * @param int $courseid
  * @param string $partial Whatever had streamed before the failure.
- * @param string $errclass Exception class, recorded instead of the message so
- *        no provider detail reaches a column learners can export.
+ * @param string $errclass Exception class. Used for diagnostics only; it must
+ *        never reach the stored message, which the learner reads back.
  * @param int|null $pageid
  * @param string $interactiontype
+ * @param string $learnertext What the learner was shown at the time. Persisted
+ *        verbatim when present, so a refusal replays as the notice they saw
+ *        rather than as an internal identifier.
  * @return void
  */
 function local_ai_course_assistant_record_failed_turn(
@@ -249,7 +252,8 @@ function local_ai_course_assistant_record_failed_turn(
     string $partial,
     string $errclass,
     ?int $pageid,
-    string $interactiontype
+    string $interactiontype,
+    string $learnertext = ''
 ): void {
     try {
         if (empty($conv->id) || empty($userid)) {
@@ -260,7 +264,12 @@ function local_ai_course_assistant_record_failed_turn(
             $userid,
             $courseid,
             'assistant',
-            $partial !== '' ? $partial : '[no response: ' . $errclass . ']',
+            // Never the exception class. This column is replayed into the
+            // learner's history, so a pause used to come back as
+            // "[no response: core\exception\moodle_exception]" once the page
+            // was reloaded -- the friendly notice existed only in the live
+            // stream and was never stored. $errclass stays for the audit row.
+            \local_ai_course_assistant\conversation_manager::failed_turn_text($partial, $learnertext),
             0,
             '',
             null,
@@ -468,8 +477,13 @@ try {
     // here too means the learner gets a clear explanation over SSE rather than a
     // generic provider error, and the refusal costs nothing when it does not
     // apply. Admins and CLI are exempt via the same conditions used there.
-    if (!CLI_SCRIPT && !empty($USER->id) && !is_siteadmin()
-            && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id)) {
+    // v7.2.5: scoped to this course. See quiz_lock -- site-wide meant one
+    // forgotten attempt anywhere disabled the assistant in every course.
+    // No is_siteadmin() carve-out: base_provider refuses admins too since
+    // v7.2.4, so exempting them here only replaces a clear explanation with a
+    // generic provider error.
+    if (!CLI_SCRIPT && !empty($USER->id)
+            && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id, (int) $courseid)) {
         local_ai_course_assistant_sse_send([
             // branding::str, not get_string: the string carries a [[tutorshort]]
             // token and the SSE token path does no brand resolution, so a bare
@@ -1125,6 +1139,10 @@ try {
     // developer-debug environments; never expose internal details to learners.
     global $CFG, $USER;
     $errmsg = $e->getMessage();
+    // Our own guards -- emergency stop, quiz lock, rate limit -- carry the
+    // learner-facing notice as the exception message. Capture it before
+    // debuginfo is appended, so history replays exactly what was on screen.
+    $learnernotice = $errmsg;
     if (!empty($e->debuginfo) && !empty($CFG->debugdeveloper) && is_siteadmin($USER->id)) {
         $errmsg .= ' [' . $e->debuginfo . ']';
     }
@@ -1158,13 +1176,17 @@ try {
     }
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
-        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat'
+        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
+        $learnernotice ?? ''
     );
     local_ai_course_assistant_sse_send(['error' => $errmsg]);
 } catch (\Throwable $e) {
     // Send actual message in debug mode, generic otherwise.
     global $CFG, $USER;
     $errmsg = get_class($e) . ': ' . $e->getMessage();
+    // A raw Throwable is not a learner-facing message. Leave the notice empty
+    // so the neutral fallback is stored rather than a class name.
+    $learnernotice = '';
     debugging(
         'SOLA SSE Throwable: ' . $errmsg
         . ' (courseid=' . (int)($courseid ?? 0)
@@ -1174,7 +1196,8 @@ try {
     );
     local_ai_course_assistant_record_failed_turn(
         $conv ?? null, (int)($USER->id ?? 0), (int)($courseid ?? 0),
-        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat'
+        $fullresponse ?? '', get_class($e), $pageid ?? null, $interactiontype ?? 'chat',
+        $learnernotice ?? ''
     );
     try {
         // moodle_exception::$debuginfo carries the provider's own error text —

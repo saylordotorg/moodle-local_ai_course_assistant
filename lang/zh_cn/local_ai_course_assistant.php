@@ -75,7 +75,7 @@ $string['settings:model_desc'] = '要使用的模型。默认值取决于提供�
 $string['settings:apibaseurl'] = 'API 基础 URL';
 $string['settings:apibaseurl_desc'] = 'API 的基础 URL。会根据提供商自动填写，但可以覆盖。留空则使用提供商默认值。';
 $string['settings:systemprompt'] = '系统提示模板';
-$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}。';
+$string['settings:systemprompt_desc'] = '发送给 AI 的系统提示。可使用占位符：{{coursename}}、{{userrole}}、{{institution}}。';
 $string['settings:systemprompt_default'] = '您是课程"{{coursename}}"的 AI 辅导助手。学生的角色为 {{userrole}}。
 
 请帮助学生理解课程内容。请保持鼓励、清晰且具有教学意义的态度。';
@@ -1966,3 +1966,14 @@ $string['quizlock:window_desc'] = '没有时限的测验，其答题在多长时
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] 目前已暂停。您的课程材料不受影响，这也不是您造成的 — 请稍后再试。';
 $string['settings:money_nonnegative_invalid'] = '请输入 0 或更大的金额，最多保留两位小数（例如 25 或 25.50）。';
+
+$string['chat:turn_failed'] = '本次回复未能完成。这不是你操作导致的——请再试一次。';
+$string['settings:prompt_budget_mode'] = '系统提示词预算模式';
+$string['settings:prompt_budget_mode_desc'] = '决定系统提示词字符预算的方式。<strong>由模型推导</strong>会算出所配置的模型实际能提供多少空间——即其上下文窗口，减去预留的回复和对话历史——并使用该值，同时设有上限，以免很大的窗口成为很大提示词的理由。此设置仅在下方字符预算保持默认的 36,000 时生效：一旦你改动那个数字，就以它为准，无论调高还是调低，因为管理员亲手填写的数字是决定，而非猜测。<strong>固定</strong>始终使用下方的数值。自托管后端应设置后端上下文窗口，该设置优先于此处的一切。';
+$string['settings:prompt_budget_mode_auto'] = '由模型推导（推荐）';
+$string['settings:prompt_budget_mode_fixed'] = '固定字符预算';
+
+$string['quizlock:scope'] = '锁定的覆盖范围';
+$string['quizlock:scope_course'] = '仅本课程（推荐）';
+$string['quizlock:scope_site'] = '所有课程';
+$string['quizlock:scope_desc'] = '进行中的答题是仅在包含该测验的课程中阻止 [[tutorshort]]，还是在所有地方都阻止。<strong>仅本课程</strong>为默认值，几乎总是你想要的。全站范围是 v7.2.4 之前的行为，它有一个值得了解的缺陷：被放弃的答题会永远停留在“进行中”，因此学习者历史记录中某个被遗忘的测验，就会让助手在他所修的每一门课程中失效，而屏幕上没有任何说明。对于铁了心要作弊、手边就有第二个浏览器的学习者，全站范围几乎没有帮助，而助手的课程材料与检索本来就以课程为界。';

@@ -197,6 +197,19 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/quiz_lock_scope',
+        \local_ai_course_assistant\branding::str('quizlock:scope'),
+        \local_ai_course_assistant\branding::str('quizlock:scope_desc'),
+        \local_ai_course_assistant\quiz_lock::SCOPE_COURSE,
+        [
+            \local_ai_course_assistant\quiz_lock::SCOPE_COURSE
+                => \local_ai_course_assistant\branding::str('quizlock:scope_course'),
+            \local_ai_course_assistant\quiz_lock::SCOPE_SITE
+                => \local_ai_course_assistant\branding::str('quizlock:scope_site'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/auto_open',
         get_string('settings:auto_open', 'local_ai_course_assistant'),
@@ -2495,6 +2508,17 @@ if ($hassiteconfig) {
         get_string('settings:anomaly_digest_threshold_pct_desc', 'local_ai_course_assistant'),
         '50',
         PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/prompt_budget_mode',
+        get_string('settings:prompt_budget_mode', 'local_ai_course_assistant'),
+        get_string('settings:prompt_budget_mode_desc', 'local_ai_course_assistant'),
+        'auto',
+        [
+            'auto' => get_string('settings:prompt_budget_mode_auto', 'local_ai_course_assistant'),
+            'fixed' => get_string('settings:prompt_budget_mode_fixed', 'local_ai_course_assistant'),
+        ]
     ));
 
     // v7.2.3: warn when the assembler has recently had to cut retrieved course

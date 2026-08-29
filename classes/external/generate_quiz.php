@@ -21,9 +21,11 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
+use local_ai_course_assistant\branding;
 use local_ai_course_assistant\context_builder;
 use local_ai_course_assistant\objective_manager;
 use local_ai_course_assistant\provider\base_provider;
+use local_ai_course_assistant\quiz_lock;
 
 /**
  * Generate a practice quiz for a course.
@@ -67,7 +69,7 @@ class generate_quiz extends external_api {
      *                      mastery-targeted (v4.0 / M1), or empty for current page.
      * @param int $cmid Course module ID for current-page mode (0 if not applicable).
      * @param string $difficulty Difficulty target: easy, medium, hard, or auto. Default medium.
-     * @return array Quiz data with success flag, error message, topic, and questions.
+     * @return array Quiz data with success flag, error code, error message, topic, and questions.
      */
     public static function execute(int $courseid, int $count = 3, string $topic = '__guided__', int $cmid = 0, string $difficulty = 'medium'): array {
         global $DB, $USER;
@@ -93,6 +95,22 @@ class generate_quiz extends external_api {
             $difficulty = 'medium';
         }
         $userid   = (int) $USER->id;
+
+        // v7.2.5: report the integrity lock as itself. base_provider refuses to
+        // hand out a client while the learner has a live quiz attempt, but that
+        // refusal used to arrive here as an anonymous throwable and the client
+        // rendered its generic "please try again" message for it -- inviting a
+        // retry that cannot succeed and never saying why. Checking up front also
+        // skips the grade/topic/context work the refusal would have thrown away.
+        // base_provider remains the enforcing guard; this only classifies.
+        //
+        // The courseid is not optional. Omitting it takes the site-wide branch,
+        // which would leave this one button still refusing because of an attempt
+        // in an unrelated course -- the exact P1 v7.2.5 exists to fix -- while
+        // chat in the same drawer answered normally.
+        if (quiz_lock::is_locked_for($userid, $courseid)) {
+            return self::quiz_locked_result();
+        }
 
         $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
         $coursetopics = context_builder::get_course_topics_text($courseid);
@@ -210,7 +228,25 @@ class generate_quiz extends external_api {
                 ['response_schema' => $quizschema]
             );
         } catch (\Throwable $e) {
-            return ['success' => false, 'error' => $e->getMessage(), 'topic' => '', 'questions' => []];
+            // The learner can start an attempt between the check above and this
+            // call, in which case the throwable IS the lock; re-check rather
+            // than string-matching a translated message.
+            //
+            // Same scope as the guard that would have thrown, or this misreads
+            // a genuine provider timeout as the lock: unscoped, an attempt in
+            // another course makes this true even though base_provider allowed
+            // the call, and the learner is told to submit a quiz they are not
+            // sitting while the real, retryable error is discarded.
+            if (quiz_lock::is_locked_for($userid, $courseid)) {
+                return self::quiz_locked_result();
+            }
+            return [
+                'success' => false,
+                'errorcode' => '',
+                'error' => $e->getMessage(),
+                'topic' => '',
+                'questions' => [],
+            ];
         }
 
         // Try structured output first (provider returned raw JSON).
@@ -226,7 +262,13 @@ class generate_quiz extends external_api {
             $decoded = json_decode($response, true);
         }
         if (!$decoded || !isset($decoded['questions']) || !is_array($decoded['questions'])) {
-            return ['success' => false, 'error' => 'Could not parse quiz JSON.', 'topic' => '', 'questions' => []];
+            return [
+                'success' => false,
+                'errorcode' => '',
+                'error' => 'Could not parse quiz JSON.',
+                'topic' => '',
+                'questions' => [],
+            ];
         }
 
         // Normalise and validate questions.
@@ -256,7 +298,13 @@ class generate_quiz extends external_api {
         }
 
         if (empty($questions)) {
-            return ['success' => false, 'error' => 'No valid questions in AI response.', 'topic' => '', 'questions' => []];
+            return [
+                'success' => false,
+                'errorcode' => '',
+                'error' => 'No valid questions in AI response.',
+                'topic' => '',
+                'questions' => [],
+            ];
         }
 
         // v7.0.6: record the call. Until now generate_quiz made a real, billed
@@ -278,9 +326,29 @@ class generate_quiz extends external_api {
 
         return [
             'success'   => true,
+            'errorcode' => '',
             'error'     => '',
             'topic'     => (string) ($decoded['topic'] ?? $topic),
             'questions' => $questions,
+        ];
+    }
+
+    /**
+     * The result payload for a request refused by the academic-integrity lock.
+     *
+     * Carries the same wording the chat drawer shows for the lock, so the two
+     * surfaces cannot drift apart, and an errorcode the client uses to tell a
+     * non-retryable refusal from a genuine generation failure.
+     *
+     * @return array Result array with success=false and errorcode='quizlocked'.
+     */
+    private static function quiz_locked_result(): array {
+        return [
+            'success' => false,
+            'errorcode' => 'quizlocked',
+            'error' => branding::str('quizlock:blocked'),
+            'topic' => '',
+            'questions' => [],
         ];
     }
 
@@ -353,6 +421,11 @@ class generate_quiz extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success'   => new external_value(PARAM_BOOL, 'Whether the quiz was generated successfully'),
+            'errorcode' => new external_value(
+                PARAM_ALPHANUMEXT,
+                'Machine-readable failure reason. "quizlocked" means the request was refused by the '
+                    . 'academic-integrity lock and retrying cannot help; empty for a retryable failure.'
+            ),
             'error'     => new external_value(PARAM_TEXT, 'Error message if not successful'),
             'topic'     => new external_value(PARAM_TEXT, 'Quiz topic'),
             'questions' => new external_multiple_structure(

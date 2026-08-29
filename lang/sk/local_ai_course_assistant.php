@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Model, ktorý sa má použiť. Predvolená hod
 $string['settings:apibaseurl'] = 'Základná URL API';
 $string['settings:apibaseurl_desc'] = 'Základná URL API. Automaticky vyplnená podľa poskytovateľa, ale môže byť prepísaná. Nechajte prázdne pre použitie predvolenej hodnoty poskytovateľa.';
 $string['settings:systemprompt'] = 'Šablóna systémového promptu';
-$string['settings:systemprompt_desc'] = 'Systémový prompt odoslaný AI. Použite zástupné symboly: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Systémový prompt odoslaný AI. Použite zástupné symboly: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Ste užitočný AI tútor pre kurz „{{coursename}}". Rola študenta je {{userrole}}.
 
 Pomôžte študentovi pochopiť obsah kurzu. Buďte povzbudzujúci, jasný a pedagogicky dôsledný.';
@@ -1930,3 +1930,14 @@ $string['quizlock:window_desc'] = 'Ako dlho sa pokus pri teste bez časového li
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] je momentálne pozastavený. Vaše študijné materiály to neovplyvnilo a nie je to vaša chyba — skúste to prosím neskôr.';
 $string['settings:money_nonnegative_invalid'] = 'Zadajte sumu 0 alebo vyššiu, najviac na dve desatinné miesta (napríklad 25 alebo 25.50).';
+
+$string['chat:turn_failed'] = 'Túto odpoveď sa nepodarilo dokončiť. Nespôsobilo to nič, čo ste urobili — skúste to znova.';
+$string['settings:prompt_budget_mode'] = 'Režim rozpočtu systémového promptu';
+$string['settings:prompt_budget_mode_desc'] = 'Ako sa určuje znakový rozpočet systémového promptu. <strong>Odvodiť z modelu</strong> vypočíta, koľko miesta nastavený model naozaj ponúka — jeho kontextové okno mínus rezervovaná odpoveď a história konverzácie — a použije ho, so stropom, aby veľmi veľké okno neospravedlnilo veľmi veľký prompt. Platí to len dovtedy, kým je znakový rozpočet nižšie ponechaný na predvolených 36 000: len čo to číslo zmeníte, vyhráva ono, a to v oboch smeroch, pretože číslo, ktoré napísal správca, je rozhodnutie, nie odhad. <strong>Pevný</strong> vždy použije číslo nižšie. Vlastný hostovaný backend by mal nastaviť kontextové okno backendu, ktoré má prednosť pred všetkým tu.';
+$string['settings:prompt_budget_mode_auto'] = 'Odvodiť z modelu (odporúčané)';
+$string['settings:prompt_budget_mode_fixed'] = 'Pevný znakový rozpočet';
+
+$string['quizlock:scope'] = 'Ako ďaleko zámok siaha';
+$string['quizlock:scope_course'] = 'Len tento kurz (odporúčané)';
+$string['quizlock:scope_site'] = 'Všetky kurzy';
+$string['quizlock:scope_desc'] = 'Či prebiehajúci pokus blokuje [[tutorshort]] len v kurze s testom, alebo všade. <strong>Len tento kurz</strong> je predvolená hodnota a takmer vždy je to, čo chcete. Celá stránka bola správaním do verzie 7.2.4 a mala poruchu, ktorú stojí za to poznať: opustený pokus zostáva „prebiehajúci“ navždy, takže jediný zabudnutý test kdesi v histórii študujúceho vypol asistenta v každom jeho kurze, pričom na obrazovke to nič nevysvetlilo. Proti odhodlanému študujúcemu, ktorý má druhý prehliadač, prináša celá stránka veľmi málo, a študijné materiály aj vyhľadávanie asistenta sú aj tak obmedzené na kurz.';

@@ -345,10 +345,19 @@ class conversation_manager {
             $messages = array_slice($messages, -$maxmessages);
         }
 
+        // v7.2.5: the same read-side scrub the learner's transcript gets. A
+        // stored '[no response: core\exception\moodle_exception]' row is not
+        // just ugly on screen -- fed back as prior assistant output it is an
+        // example the model can reasonably imitate, and the one thing it must
+        // never learn to emit is an internal identifier.
         return array_map(function ($msg) {
+            $content = (string) $msg->message;
+            if ($msg->role === 'assistant') {
+                $content = self::display_turn_text($content);
+            }
             return [
                 'role' => $msg->role,
-                'content' => $msg->message,
+                'content' => $content,
             ];
         }, $messages);
     }
@@ -556,5 +565,120 @@ class conversation_manager {
             'total_messages' => $totalmessages,
             'courses' => $courses,
         ];
+    }
+
+    /**
+     * What a failed assistant turn should say when the learner reads it back.
+     *
+     * Ordered by how much it tells them: whatever actually streamed, else the
+     * notice they were shown live, else a neutral sentence. Never an exception
+     * class, provider name or other internal identifier.
+     *
+     * This column is replayed into the learner's history, so a paused turn used
+     * to come back as "[no response: core\exception\moodle_exception]" after a
+     * reload -- the friendly notice existed only in the live stream and was
+     * never stored. The path is reached by timeouts and provider errors too,
+     * not only by the kill switch, so the floor has to be safe for all of them.
+     *
+     * @param string $partial Whatever had streamed before the failure.
+     * @param string $learnertext The notice shown at the time, if there was one.
+     * @return string
+     */
+    public static function failed_turn_text(string $partial, string $learnertext = ''): string {
+        if (trim($partial) !== '') {
+            return $partial;
+        }
+        if (trim($learnertext) !== '') {
+            return $learnertext;
+        }
+        return \local_ai_course_assistant\branding::str('chat:turn_failed');
+    }
+
+    /**
+     * What a stored assistant turn should say when it is replayed to a learner.
+     *
+     * failed_turn_text() fixed what gets WRITTEN from v7.2.4 on. This is the
+     * read side, and it has to hold for rows written before that: pre-7.2.4
+     * rows still say "[no response: core\exception\moodle_exception]"
+     * verbatim, and no forward fix can rewrite history. It also covers the
+     * paths that never reach the writer at all -- a provider timeout, a 5xx, an
+     * exhausted failover chain -- any of which can leave an empty assistant row
+     * behind.
+     *
+     * So the rule is about the OUTPUT, not the cause: an assistant row that is
+     * empty, or that is nothing but an internal identifier, renders as the
+     * learner-facing notice. Anything else is returned untouched.
+     *
+     * Only ever apply this to role='assistant'. A learner may legitimately type
+     * a class name into the chat box while asking about it, and their own words
+     * must come back as they wrote them.
+     *
+     * @param string $stored The message column as persisted.
+     * @return string Safe to show a learner.
+     */
+    public static function display_turn_text(string $stored): string {
+        if (trim($stored) === '' || self::is_internal_placeholder($stored)) {
+            return \local_ai_course_assistant\branding::str('chat:turn_failed');
+        }
+        return $stored;
+    }
+
+    /**
+     * Is this stored text an internal identifier rather than a reply?
+     *
+     * Deliberately narrow. It matches text that is ENTIRELY a placeholder or a
+     * type name, never text that merely mentions one -- a tutor explaining PHP
+     * namespaces will write a backslashed class name inside a real answer, and
+     * that answer must survive.
+     *
+     * @param string $stored The message column as persisted.
+     * @return bool
+     */
+    private static function is_internal_placeholder(string $stored): bool {
+        $text = trim($stored);
+
+        // The v7.1.1 form: "[no response: core\exception\moodle_exception]",
+        // and its bare cousin "[no response]".
+        if (preg_match('/^\[\s*no response\b[^\]]*\]$/i', $text)) {
+            return true;
+        }
+
+        // The two patterns below match a type-name SHAPE, not the substrings
+        // "exception", "throwable" or "error" anywhere in the text.
+        //
+        // Matching substrings looked equivalent and is not: "error" is a
+        // substring of "terrorism", so a one-word reply of "Terrorism." was
+        // being replaced with the failure notice -- and because
+        // get_history_for_api() applies the same scrub, the model was then told
+        // it had previously failed to answer when it had answered correctly.
+        // A bare link to .../wiki/Error_analysis did the same. Deleting a real
+        // answer is far worse than leaving an ugly one, so this errs the other
+        // way: it wants a namespace separator, or a class-like identifier
+        // ending in Exception/Error/Throwable.
+        // Three accepted shapes, and nothing else:
+        //   a\b\moodle_exception   namespaced, any leaf
+        //   dml_write_exception     snake_case with the suffix after an "_"
+        //   TypeError               CamelCase with a capitalised suffix
+        // The underscore and the capital are what keep "Terror" out: it has an
+        // "error" in it but no boundary before one, so it is prose.
+        $name = '[A-Za-z_][A-Za-z0-9_]*';
+        $classlike = '(?:'
+            . '\\\\?' . $name . '(?:\\\\' . $name . ')+'
+            . '|' . $name . '_(?:exception|error|throwable)'
+            . '|' . $name . '(?:Exception|Error|Throwable)'
+            . ')';
+
+        // A fully bracketed note whose content is a type name.
+        if (preg_match('/^\[\s*' . $classlike . '\s*\]$/', $text)) {
+            return true;
+        }
+
+        // A bare type name and nothing else. Covers an unbracketed get_class()
+        // leak from any future path.
+        if (preg_match('/^' . $classlike . '$/', $text)) {
+            return true;
+        }
+
+        return false;
     }
 }

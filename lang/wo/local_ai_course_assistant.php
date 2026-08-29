@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Modèle bi ngay jëfandikoo. Valeur par défau
 $string['settings:apibaseurl'] = 'URL de Base API';
 $string['settings:apibaseurl_desc'] = 'URL de base API bi. Dañ ko rempli automatiquement ci fournisseur yi waye dafay mën a yegeel. Samp sax valeur par défaut fournisseur bi.';
 $string['settings:systemprompt'] = 'Modèle Invite Système';
-$string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Invite dañ ko yónn ci AI bi. Jëfandikoo ay substituts: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Yàgg nga jël rôle wu professeur AI ci cours "{{coursename}}". Rôle élève bi dafa {{userrole}}.
 
 Ndimm élève bi jàng matière cours bi. Yëgël, wëjj, te jàng ci yoon bu baax.';
@@ -1966,3 +1966,14 @@ $string['quizlock:window_desc'] = 'Ñaata diir la jéego ci ceet bu amul àpp u 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] taxaw na léegi. Sa jumtukaayu njàng yi soppiku wuñu, te du sa njuumte — nangeen jéem ci kanam.';
 $string['settings:money_nonnegative_invalid'] = 'Bindal xaalis bu tollu ci 0 walla lu ko ëpp, ak ñaari tomb yu mucc (misaal 25 walla 25.50).';
+
+$string['chat:turn_failed'] = 'Tontu bii mënul woon a mat. Dara nga defoon du ko waral — nanga jéem waat.';
+$string['settings:prompt_budget_mode'] = 'Anam bu bujeetu ndigalu sistem bi';
+$string['settings:prompt_budget_mode_desc'] = 'Ni ñuy tànne bujeetu araf yu ndigalu sistem bi. <strong>Jële ko ci moodel bi</strong> dafay xayma barab bi moodel bi ñu tëral di jox ci dëgg — palanteeru kontekst bi, ñu jële ci tontu bi ñu denc ak taariixu waxtaan wi — te jëfandikoo ko, ak dig ci kaw ngir palanteer bu réy lool bañ a àttan ndigal lu réy lool. Loolu dafay dox rekk fii ak bujeetu araf bi ci suuf des ci ay xayma bu ñu tënk 36 000: soo soppee limu boobu, moom lay àttan, ci ñaari yoon yépp, ndaxte limu bu njiit bindee, décision la, du xalaat rekk. <strong>Bu sax</strong> dafay jëfandikoo limu ci suuf saa su ne. Serwóor bu boppam ci moom war naa tëral palanteeru kontekstu bakkend bi; moom lay jiitu lépp lu fi nekk.';
+$string['settings:prompt_budget_mode_auto'] = 'Jële ko ci moodel bi (ñu koy digle)';
+$string['settings:prompt_budget_mode_fixed'] = 'Bujeetu araf bu sax';
+
+$string['quizlock:scope'] = 'Fu tëj bi àgg';
+$string['quizlock:scope_course'] = 'Kurs bii rekk (ñu koy digle)';
+$string['quizlock:scope_site'] = 'Kurs yépp';
+$string['quizlock:scope_desc'] = 'Ndax jéego bi di dox dina tëj [[tutorshort]] ci kurs bi ëmb tegtal bi rekk, walla ci fépp. <strong>Kurs bii rekk</strong> mooy bi ñu tëral te mooy li ñuy soxla ci lu ëpp. Sit bi yépp mooy jikko bi ba v7.2.4, te am na jafe-jafe bu war a ràññeeku: jéego bu ñu bàyyi dafay des «di dox» ba fàww, kon benn tegtal bu ñu fàtte ci taariixu jàngalekat bi dafay faral di fey ndimbal li ci kurs bu nekk mu jàng, te dara du feeñ ci ekraan bi ngir leeral ko. Sit bi yépp du am solo ci jàngalekat bu ne dina def kañ-kañ, ndax am na naataangeem ñaareelu naawarukaay, te matiere kurs bi ak seetu ndimbal li ci kurs bi rekk lañu tëdd.';

@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Das zu verwendende Modell. Der Standardwert h�
 $string['settings:apibaseurl'] = 'API-Basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-Basis-URL. Wird automatisch basierend auf dem Anbieter ausgefüllt, kann aber überschrieben werden. Leer lassen, um den Standard des Anbieters zu verwenden.';
 $string['settings:systemprompt'] = 'System-Prompt-Vorlage';
-$string['settings:systemprompt_desc'] = 'Der an die KI gesendete System-Prompt. Verwenden Sie Platzhalter: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Der an die KI gesendete System-Prompt. Verwenden Sie Platzhalter: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Sie sind ein hilfreicher KI-Tutor für den Kurs "{{coursename}}". Die Rolle des Studierenden ist {{userrole}}.
 
 Helfen Sie dem Studierenden, den Kursinhalt zu verstehen. Seien Sie ermutigend, klar und pädagogisch gründlich.';
@@ -1931,3 +1931,14 @@ $string['quizlock:window_desc'] = 'Wie lange ein Versuch bei einem Test ohne Zei
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] ist derzeit pausiert. Ihre Kursmaterialien sind davon nicht betroffen, und es liegt nicht an Ihnen — bitte versuchen Sie es später erneut.';
 $string['settings:money_nonnegative_invalid'] = 'Geben Sie einen Betrag von 0 oder mehr mit höchstens zwei Nachkommastellen ein (zum Beispiel 25 oder 25.50).';
+
+$string['chat:turn_failed'] = 'Diese Antwort konnte nicht abgeschlossen werden. Es lag an nichts, was Sie getan haben — bitte versuchen Sie es erneut.';
+$string['settings:prompt_budget_mode'] = 'Modus für das Budget des System-Prompts';
+$string['settings:prompt_budget_mode_desc'] = 'Wie das Zeichenbudget des System-Prompts bestimmt wird. <strong>Aus dem Modell ableiten</strong> berechnet, wie viel Platz das konfigurierte Modell tatsächlich bietet — sein Kontextfenster abzüglich der reservierten Antwort und des Gesprächsverlaufs — und verwendet diesen Wert, gedeckelt, damit ein sehr großes Fenster keinen sehr großen Prompt rechtfertigt. Das gilt nur, solange das Zeichenbudget unten auf dem Standardwert 36.000 steht: Ändern Sie diese Zahl, setzt sie sich durch, und zwar in beide Richtungen, denn eine von einer Administratorin oder einem Administrator eingetragene Zahl ist eine Entscheidung und keine Schätzung. <strong>Fest</strong> verwendet immer die Zahl unten. Ein selbst gehostetes Backend sollte das Kontextfenster des Backends angeben; dieses hat Vorrang vor allem hier.';
+$string['settings:prompt_budget_mode_auto'] = 'Aus dem Modell ableiten (empfohlen)';
+$string['settings:prompt_budget_mode_fixed'] = 'Festes Zeichenbudget';
+
+$string['quizlock:scope'] = 'Wie weit die Sperre reicht';
+$string['quizlock:scope_course'] = 'Nur dieser Kurs (empfohlen)';
+$string['quizlock:scope_site'] = 'Alle Kurse';
+$string['quizlock:scope_desc'] = 'Ob ein laufender Versuch [[tutorshort]] nur in dem Kurs mit dem Test blockiert oder überall. <strong>Nur dieser Kurs</strong> ist die Voreinstellung und fast immer die richtige Wahl. Websiteweit war das Verhalten bis v7.2.4 und hatte einen Fehlerfall, den man kennen sollte: Ein abgebrochener Versuch bleibt für immer „in Bearbeitung“, sodass ein einziger vergessener Test irgendwo in der Historie einer Lernenden den Assistenten in jedem ihrer Kurse abschaltete, ohne dass auf dem Bildschirm ein Grund stand. Gegen eine entschlossene Person bringt websiteweit sehr wenig — sie hat einen zweiten Browser —, und die Kursinhalte und die Suche des Assistenten sind ohnehin kursbezogen.';

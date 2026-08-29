@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Modellen, der skal bruges. Standardværdien af
 $string['settings:apibaseurl'] = 'API-basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-basis-URL. Udfyldes automatisk baseret på udbyderen, men kan tilsidesættes. Lad feltet stå tomt for at bruge udbyderens standard.';
 $string['settings:systemprompt'] = 'Systempromptskabelon';
-$string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Systemprompten sendt til AI\'en. Brug pladsholdere: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Du er en hjælpsom AI-tutor til kurset "{{coursename}}". Studentens rolle er {{userrole}}.
 
 Hjælp studenten med at forstå kursusindholdet. Vær opmuntrende, klar og pædagogisk grundig.';
@@ -1931,3 +1931,14 @@ $string['quizlock:window_desc'] = 'Hvor længe et forsøg på en prøve uden tid
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] er sat på pause lige nu. Dit kursusmateriale er upåvirket, og det er ikke noget, du har gjort — prøv igen senere.';
 $string['settings:money_nonnegative_invalid'] = 'Indtast et beløb på 0 eller derover med højst to decimaler (for eksempel 25 eller 25.50).';
+
+$string['chat:turn_failed'] = 'Dette svar kunne ikke fuldføres. Intet, du gjorde, var årsagen — prøv venligst igen.';
+$string['settings:prompt_budget_mode'] = 'Tilstand for systempromptens budget';
+$string['settings:prompt_budget_mode_desc'] = 'Hvordan systempromptens tegnbudget fastlægges. <strong>Udled fra modellen</strong> beregner, hvor meget plads den konfigurerede model faktisk giver — dens kontekstvindue minus det reserverede svar og samtalehistorikken — og bruger det, med et loft, så et meget stort vindue ikke retfærdiggør en meget stor prompt. Det gælder kun, så længe tegnbudgettet nedenfor står på standardværdien 36.000: ændrer du det tal, vinder det i stedet, i begge retninger, for et tal, en administrator har skrevet, er en beslutning og ikke et gæt. <strong>Fast</strong> bruger altid tallet nedenfor. En selvhostet backend bør angive backendens kontekstvindue, som går forud for alt her.';
+$string['settings:prompt_budget_mode_auto'] = 'Udled fra modellen (anbefales)';
+$string['settings:prompt_budget_mode_fixed'] = 'Fast tegnbudget';
+
+$string['quizlock:scope'] = 'Hvor langt låsen rækker';
+$string['quizlock:scope_course'] = 'Kun dette kursus (anbefales)';
+$string['quizlock:scope_site'] = 'Alle kurser';
+$string['quizlock:scope_desc'] = 'Om et igangværende forsøg blokerer [[tutorshort]] kun på kurset med quizzen eller alle steder. <strong>Kun dette kursus</strong> er standard og er næsten altid det, du vil have. Hele siden var adfærden til og med v7.2.4 og havde en fejltilstand, der er værd at kende: et forladt forsøg bliver ved med at være i gang for altid, så en enkelt glemt quiz et sted i den studerendes historik slog assistenten fra på hvert eneste kursus, uden noget på skærmen der forklarede hvorfor. Hele siden giver meget lidt over for en studerende, der er fast besluttet på at snyde og har en browser mere, og assistentens kursusmateriale og opslag er kursusafgrænsede i forvejen.';

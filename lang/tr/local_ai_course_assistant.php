@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Kullanılacak model. Varsayılan sağlayıcıy
 $string['settings:apibaseurl'] = 'API temel URL\'si';
 $string['settings:apibaseurl_desc'] = 'API temel URL\'si. Sağlayıcıya göre otomatik doldurulur ancak geçersiz kılınabilir. Sağlayıcı varsayılanını kullanmak için boş bırakın.';
 $string['settings:systemprompt'] = 'Sistem istemi şablonu';
-$string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'AI\'ye gönderilen sistem istemi. Yer tutucuları kullanın: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = '"{{coursename}}" dersi için yardımcı bir AI eğitmensiniz. Öğrencinin rolü {{userrole}}.
 
 Öğrencinin ders içeriğini anlamasına yardımcı olun. Teşvik edici, açık ve pedagojik olarak titiz olun.';
@@ -1944,3 +1944,14 @@ $string['quizlock:window_desc'] = 'Süre sınırı olmayan bir sınavdaki deneme
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] şu anda duraklatıldı. Ders materyalleriniz etkilenmedi ve bu sizden kaynaklanmıyor — lütfen daha sonra tekrar deneyin.';
 $string['settings:money_nonnegative_invalid'] = '0 veya daha büyük bir tutar girin; en fazla iki ondalık basamak kullanın (örneğin 25 veya 25.50).';
+
+$string['chat:turn_failed'] = 'Bu yanıt tamamlanamadı. Bunun nedeni yaptığınız hiçbir şey değil — lütfen tekrar deneyin.';
+$string['settings:prompt_budget_mode'] = 'Sistem istemi bütçe modu';
+$string['settings:prompt_budget_mode_desc'] = 'Sistem isteminin karakter bütçesinin nasıl belirlendiği. <strong>Modelden türet</strong>, yapılandırılmış modelin gerçekte ne kadar yer sunduğunu hesaplar — bağlam penceresinden, ayrılan yanıt ile konuşma geçmişi düşülerek — ve bunu kullanır; çok büyük bir pencerenin çok büyük bir istemi haklı çıkarmaması için bir üst sınır uygulanır. Bu yalnızca aşağıdaki karakter bütçesi varsayılan 36.000 değerinde bırakıldığı sürece geçerlidir: o sayıyı değiştirdiğinizde artık o üstün gelir, hem artırırken hem azaltırken, çünkü bir yöneticinin yazdığı sayı tahmin değil karardır. <strong>Sabit</strong> her zaman aşağıdaki sayıyı kullanır. Kendi sunucusunda barındırılan bir arka uç, arka uç bağlam penceresini ayarlamalıdır; o buradaki her şeyin önüne geçer.';
+$string['settings:prompt_budget_mode_auto'] = 'Modelden türet (önerilir)';
+$string['settings:prompt_budget_mode_fixed'] = 'Sabit karakter bütçesi';
+
+$string['quizlock:scope'] = 'Kilidin eriştiği alan';
+$string['quizlock:scope_course'] = 'Yalnızca bu ders (önerilir)';
+$string['quizlock:scope_site'] = 'Tüm dersler';
+$string['quizlock:scope_desc'] = 'Devam eden bir denemenin [[tutorshort]] uygulamasını yalnızca sınavın bulunduğu derste mi, yoksa her yerde mi engelleyeceği. <strong>Yalnızca bu ders</strong> varsayılandır ve neredeyse her zaman istediğiniz şeydir. Site geneli, v7.2.4\'e kadarki davranıştı ve bilinmeye değer bir arızası vardı: terk edilmiş bir deneme sonsuza dek «devam ediyor» kalır, dolayısıyla bir öğrencinin geçmişinde unutulmuş tek bir sınav, aldığı her derste yardımcıyı devre dışı bırakıyordu ve ekranda bunu açıklayan hiçbir şey olmuyordu. Site geneli, ikinci bir tarayıcısı olan ve kopya çekmeye kararlı bir öğrenciye karşı çok az şey kazandırır; yardımcının ders içeriği ve araması zaten derse sınırlıdır.';

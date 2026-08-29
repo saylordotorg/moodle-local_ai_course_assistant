@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Àwòrán tí a ó lò. Àìpéye da lórí ol
 $string['settings:apibaseurl'] = 'URL Ìpìlẹ̀ API';
 $string['settings:apibaseurl_desc'] = 'URL ìpìlẹ̀ fún API. A máa ń yín àmúlò fún olùpèsè kọ̀ọ̀kan ṣùgbọ́n a lè yípadà. Fi sílẹ̀ fún àìpéye olùpèsè.';
 $string['settings:systemprompt'] = 'Àpẹrẹ Ìgbékalẹ̀ Ètò';
-$string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Ìgbékalẹ̀ tí a firánṣẹ́ sí AI. Lo àwọn aṣojú: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Ìwọ jẹ́ olùkọ́ AI olùrànlọ́wọ́ fún ẹkọ "{{coursename}}". Ipa akẹ́kọ̀ọ́ ni {{userrole}}.
 
 Ràn akẹ́kọ̀ọ́ lọ́wọ́ láti lóye ohun tí wọ́n ń kọ́. Jẹ́ olùránnilétí, kedere, àti ó dára lè pèdàgógì.';
@@ -1966,3 +1966,14 @@ $string['quizlock:window_desc'] = 'Bí ìgbìyànjú lórí ìdánwò tí kò n�
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] ti dúró fún ìgbà díẹ̀ báyìí. Àwọn ohun èlò ẹ̀kọ́ rẹ kò yí padà, kì í sì í ṣe àṣìṣe rẹ — jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí i nígbà tó bá yá.';
 $string['settings:money_nonnegative_invalid'] = 'Tẹ iye owó tí ó jẹ́ 0 tàbí jù bẹ́ẹ̀ lọ, pẹ̀lú ààyè eléèwádì méjì tí ó pọ̀ jù (bí àpẹẹrẹ 25 tàbí 25.50).';
+
+$string['chat:turn_failed'] = 'A kò lè pari ìdáhùn yìí. Kò sí ohun tí o ṣe tí ó fà á — jọ̀wọ́ gbìyànjú lẹ́ẹ̀kansí.';
+$string['settings:prompt_budget_mode'] = 'Ipò ìnáwó àṣẹ ètò';
+$string['settings:prompt_budget_mode_desc'] = 'Bí a ṣe ń pinnu ìnáwó lẹ́tà fún àṣẹ ètò. <strong>Rí i láti inú àwòṣe</strong> ń ṣírò àyè tí àwòṣe tí a ṣètò ń pèsè ní tòótọ́ — fèrèsé ọ̀rọ̀ rẹ̀, lẹ́yìn yíyọ ìdáhùn tí a fi pamọ́ àti ìtàn ìjíròrò kúrò — ó sì ń lo ìyẹn, pẹ̀lú òkè ààlà kí fèrèsé tí ó tóbi jọjọ má baà fún àṣẹ tí ó tóbi jọjọ láṣẹ. Èyí ń ṣiṣẹ́ nìkan níwọ̀n ìgbà tí ìnáwó lẹ́tà tí ó wà nísàlẹ̀ bá dúró sí iye àbáyọ rẹ̀ 36,000: bí o bá yí nọ́mbà náà padà, òun ni yóò borí, ní ọ̀nà méjèèjì, nítorí nọ́mbà tí alábòójútó kọ jẹ́ ìpinnu kì í ṣe àbá. <strong>Tí a gbé kalẹ̀</strong> ń lo nọ́mbà tí ó wà nísàlẹ̀ nígbà gbogbo. Sáfà tí ẹnì kan ń gbé fúnra rẹ̀ gbọ́dọ̀ ṣètò fèrèsé ọ̀rọ̀ sáfà náà; ìyẹn ni ó ṣáájú gbogbo ohun tí ó wà níbí.';
+$string['settings:prompt_budget_mode_auto'] = 'Rí i láti inú àwòṣe (a gbani nímọ̀ràn)';
+$string['settings:prompt_budget_mode_fixed'] = 'Ìnáwó lẹ́tà tí a gbé kalẹ̀';
+
+$string['quizlock:scope'] = 'Bí ìtìlé náà ṣe dé';
+$string['quizlock:scope_course'] = 'Ẹ̀kọ́ yìí nìkan (a gbani nímọ̀ràn)';
+$string['quizlock:scope_site'] = 'Gbogbo ẹ̀kọ́';
+$string['quizlock:scope_desc'] = 'Bóyá ìgbìyànjú tí ń lọ lọ́wọ́ yóò dí [[tutorshort]] lọ́wọ́ nínú ẹ̀kọ́ tí ó ní ìdánwò náà nìkan, tàbí níbi gbogbo. <strong>Ẹ̀kọ́ yìí nìkan</strong> ni àbáyọ, ó sì fẹ́rẹ̀ẹ́ jẹ́ ohun tí o fẹ́ nígbà gbogbo. Gbogbo ojúlé ni ìwà rẹ̀ títí di v7.2.4, ó sì ní àbùkù tí ó tọ́ sí mímọ̀: ìgbìyànjú tí a kọ̀ sílẹ̀ ń wà ní «ń lọ lọ́wọ́» títí láé, nítorí náà ìdánwò kan tí a gbàgbé níbìkan nínú ìtàn akẹ́kọ̀ọ́ máa ń pa olùrànlọ́wọ́ náà nínú gbogbo ẹ̀kọ́ tí ó ń kọ́, láìsí ohunkóhun lórí ìbòjú tí ó ṣàlàyé ìdí. Gbogbo ojúlé kò mú ọ̀pọ̀ wá lòdì sí akẹ́kọ̀ọ́ tí ó pinnu láti ṣe ẹ̀tàn, tí ó ní ẹ̀rọ aṣàwákiri kejì, àti pé ohun èlò ẹ̀kọ́ àti ìwádìí olùrànlọ́wọ́ náà ti wà nínú ẹ̀kọ́ kan ṣoṣo tẹ́lẹ̀.';

@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Mô hình cần sử dụng. Mặc định ph�
 $string['settings:apibaseurl'] = 'URL cơ sở API';
 $string['settings:apibaseurl_desc'] = 'URL cơ sở cho API. Được tự động điền theo nhà cung cấp nhưng có thể ghi đè. Để trống để dùng mặc định của nhà cung cấp.';
 $string['settings:systemprompt'] = 'Mẫu Prompt Hệ thống';
-$string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Prompt hệ thống gửi đến AI. Sử dụng các placeholder: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Bạn là gia sư AI hữu ích cho khóa học "{{coursename}}". Vai trò của học viên là {{userrole}}.
 
 Hãy giúp học viên hiểu tài liệu khóa học. Hãy khích lệ, rõ ràng và có phương pháp sư phạm tốt.';
@@ -1966,3 +1966,14 @@ $string['quizlock:window_desc'] = 'Một lượt làm bài trên bài kiểm tra
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] hiện đang tạm dừng. Tài liệu khóa học của bạn không bị ảnh hưởng và đây không phải lỗi của bạn — vui lòng thử lại sau.';
 $string['settings:money_nonnegative_invalid'] = 'Nhập số tiền từ 0 trở lên, tối đa hai chữ số thập phân (ví dụ 25 hoặc 25.50).';
+
+$string['chat:turn_failed'] = 'Không thể hoàn tất câu trả lời này. Không phải do bạn làm gì sai — vui lòng thử lại.';
+$string['settings:prompt_budget_mode'] = 'Chế độ ngân sách lời nhắc hệ thống';
+$string['settings:prompt_budget_mode_desc'] = 'Cách xác định ngân sách ký tự cho lời nhắc hệ thống. <strong>Suy ra từ mô hình</strong> tính toán khoảng trống mà mô hình đã cấu hình thực sự cung cấp — cửa sổ ngữ cảnh của nó, trừ đi phần trả lời được dành riêng và lịch sử hội thoại — rồi dùng giá trị đó, có giới hạn trên để một cửa sổ rất lớn không biện minh cho một lời nhắc rất lớn. Điều này chỉ áp dụng khi ngân sách ký tự bên dưới vẫn để ở giá trị mặc định 36.000: nếu bạn đổi con số đó, chính nó sẽ quyết định, theo cả hai chiều, vì con số do quản trị viên gõ vào là một quyết định chứ không phải phỏng đoán. <strong>Cố định</strong> luôn dùng con số bên dưới. Máy chủ tự vận hành nên đặt cửa sổ ngữ cảnh của backend; giá trị đó được ưu tiên hơn tất cả những gì ở đây.';
+$string['settings:prompt_budget_mode_auto'] = 'Suy ra từ mô hình (khuyến nghị)';
+$string['settings:prompt_budget_mode_fixed'] = 'Ngân sách ký tự cố định';
+
+$string['quizlock:scope'] = 'Khóa có hiệu lực đến đâu';
+$string['quizlock:scope_course'] = 'Chỉ khóa học này (khuyến nghị)';
+$string['quizlock:scope_site'] = 'Tất cả khóa học';
+$string['quizlock:scope_desc'] = 'Một lượt làm bài đang mở sẽ chặn [[tutorshort]] chỉ trong khóa học chứa bài kiểm tra, hay ở mọi nơi. <strong>Chỉ khóa học này</strong> là mặc định và gần như luôn là điều bạn muốn. Toàn trang là cách hoạt động cho tới v7.2.4 và có một lỗi đáng biết: lượt làm bài bị bỏ dở vẫn ở trạng thái đang làm mãi mãi, nên chỉ một bài kiểm tra bị quên đâu đó trong lịch sử của người học sẽ tắt trợ lý trong mọi khóa học họ tham gia, mà màn hình không hề giải thích lý do. Toàn trang mang lại rất ít trước một người học quyết tâm gian lận, vốn có sẵn trình duyệt thứ hai, còn tài liệu và truy xuất của trợ lý dù sao cũng chỉ giới hạn trong khóa học.';

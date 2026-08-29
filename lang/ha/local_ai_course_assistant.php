@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'Model da za a yi amfani da shi. Tsoho ya dogar
 $string['settings:apibaseurl'] = 'URL ɗin Tushen API';
 $string['settings:apibaseurl_desc'] = 'URL ɗin tushe don API. Ana cika shi ta atomatik ga kowane mai bada sabis amma ana iya canzawa. Bar fanko don tsoho na mai bada sabis.';
 $string['settings:systemprompt'] = 'Samfurin Umarni na Tsarin';
-$string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Umarnin tsarin da aka aiko wa AI. Yi amfani da masu canji: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Kai malami ne mai taimako na AI don kozi "{{coursename}}". Rawar ɗalibin ita ce {{userrole}}.
 
 Taimaki ɗalibin ya fahimci kayan kozi. Kasance mai ƙarfafawa, a sarari, da koyarwa mai inganci.';
@@ -1961,3 +1961,14 @@ $string['quizlock:window_desc'] = 'Tsawon lokacin da yunkuri a jarrabawa marar i
 
 $string['emergency:chat_stopped'] = 'An dakatar da [[tutorshort]] a yanzu. Kayan karatunku ba su canza ba, kuma ba laifinku ba ne — don Allah a sake gwadawa daga baya.';
 $string['settings:money_nonnegative_invalid'] = 'Shigar da adadi 0 ko sama da haka, da matsakaicin lambobi biyu bayan aya (misali 25 ko 25.50).';
+
+$string['chat:turn_failed'] = 'Ba a iya kammala wannan amsar ba. Babu abin da ka yi da ya haddasa hakan — don Allah a sake gwadawa.';
+$string['settings:prompt_budget_mode'] = 'Yanayin kasafin umarnin tsarin';
+$string['settings:prompt_budget_mode_desc'] = 'Yadda ake tantance kasafin haruffa na umarnin tsarin. <strong>Cirowa daga samfurin</strong> yana lissafin sararin da samfurin da aka daidaita yake bayarwa da gaske — tagar mahallinsa, ban da amsar da aka ajiye da tarihin tattaunawa — sannan ya yi amfani da shi, tare da iyaka domin kada babbar taga ta halasta babban umarni. Wannan yana aiki ne kawai muddin kasafin haruffa da ke kasa ya kasance a kan tsohon darajarsa 36,000: idan ka canza wannan adadi, shi ne ya fi karfi, ta bangarorin biyu, domin adadin da mai gudanarwa ya rubuta shawara ce ba tsammani ba. <strong>Tsayayye</strong> koyaushe yana amfani da adadin da ke kasa. Sabar da ake dauka da kai ya kamata ta saita tagar mahallin bayan-gida, wanda ke da fifiko a kan komai anan.';
+$string['settings:prompt_budget_mode_auto'] = 'Cirowa daga samfurin (ana ba da shawara)';
+$string['settings:prompt_budget_mode_fixed'] = 'Kasafin haruffa tsayayye';
+
+$string['quizlock:scope'] = 'Nisan da kullen yake kaiwa';
+$string['quizlock:scope_course'] = 'Wannan kwas kadai (ana ba da shawara)';
+$string['quizlock:scope_site'] = 'Duk kwasa-kwasan';
+$string['quizlock:scope_desc'] = 'Ko wani yunkuri da ake ci gaba da shi zai hana [[tutorshort]] a kwas din da ke dauke da jarrabawar kadai, ko a ko\'ina. <strong>Wannan kwas kadai</strong> shi ne tsoho kuma kusan koyaushe shi ake so. Duk shafin shi ne halin har zuwa v7.2.4, kuma yana da matsalar da ya kamata a sani: yunkurin da aka yi watsi da shi yana ci gaba da kasancewa «ana ci gaba» har abada, don haka jarrabawa guda daya da aka manta a tarihin dalibi tana kashe mataimakin a kowane kwas dinsa, ba tare da wani bayani a allo ba. Duk shafin ba ya kawo komai sosai a kan dalibin da ya kudurta yin damfara, tunda yana da wani burauza na biyu, kuma abin da mataimakin ke koyarwa da bincikensa duk sun tsaya kan kwas daya.';

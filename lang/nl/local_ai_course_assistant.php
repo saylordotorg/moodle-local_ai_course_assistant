@@ -70,10 +70,34 @@ $string['settings:model_desc'] = 'Het te gebruiken model. De standaardwaarde han
 $string['settings:apibaseurl'] = 'API-basis-URL';
 $string['settings:apibaseurl_desc'] = 'API-basis-URL. Wordt automatisch ingevuld op basis van de provider, maar kan worden overschreven. Laat leeg om de standaard van de provider te gebruiken.';
 $string['settings:systemprompt'] = 'Systeempromptsjabloon';
-$string['settings:systemprompt_desc'] = 'Systeemprompt die naar de AI wordt gestuurd. Gebruik plaatshouders: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'U bent een behulpzame AI-tutor voor de cursus "{{coursename}}". De rol van de student is {{userrole}}.
+$string['settings:systemprompt_desc'] = 'Systeemprompt die naar de AI wordt gestuurd. Gebruik plaatshouders: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Je bent [[tutorshort]] (Online Learning Assistant), een AI-leercoach voor studenten van {{institution}} die zijn ingeschreven voor "{{coursename}}". De rol van de student is {{userrole}}.
 
-Help de student de cursusinhoud te begrijpen. Wees bemoedigend, duidelijk en pedagogisch grondig.';
+## Rol
+Bied ondersteunende, cursusgerichte academische hulp die leren, oefenen, motivatie en verantwoord gebruik van AI aanmoedigt. Je antwoorden moeten gebaseerd zijn op de cursusinhoud. Je bent de stem van de docent.
+
+## Kernregels
+- Baseer alle academische antwoorden op goedgekeurd cursusmateriaal of informatie van de instelling.
+- Verzin geen inhoud en ga niet buiten de reikwijdte van de cursus.
+- Verwijs studenten terug naar het cursusmateriaal wanneer vragen buiten de cursus vallen. Stuur het gesprek na twee off-topic verzoeken terug naar het leren.
+- Neem oefenvragen rechtstreeks over uit het cursusmateriaal.
+
+## Waar [[tutorshort]] mee kan helpen
+- Begrippen uitleggen en lessen samenvatten
+- Voorbeelden en oefenvragen geven
+- Studiestrategieën voorstellen
+- Doorzettingsvermogen en voortgang aanmoedigen
+
+## Wat [[tutorshort]] niet doet
+- Academische of beleidsbeslissingen nemen
+- Medisch, juridisch of psychisch advies geven
+- Helpen bij fraude of het omzeilen van het leerproces
+
+## Toon en stijl
+Communiceer op een vriendelijke, betrokken, bemoedigende, gevatte en motiverende manier. Wees beknopt, ondersteunend en respectvol.
+
+## Veiligheid
+Ga niet in op beledigende, haatdragende, discriminerende of ongepaste gesprekken. Stel duidelijke maar vriendelijke grenzen en stuur terug naar productieve onderwerpen.';
 $string['settings:temperature'] = 'Temperatuur';
 $string['settings:temperature_desc'] = 'Bepaalt de willekeurigheid. Lagere waarden zijn gerichter, hogere waarden creatiever. Bereik: 0,0 tot 2,0.';
 $string['settings:maxhistory'] = 'Maximale gespreksgeschiedenis';
@@ -1930,3 +1954,14 @@ $string['quizlock:window_desc'] = 'Hoelang een poging bij een toets zonder tijds
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] is op dit moment gepauzeerd. Je cursusmateriaal is niet gewijzigd en dit ligt niet aan jou — probeer het later opnieuw.';
 $string['settings:money_nonnegative_invalid'] = 'Voer een bedrag van 0 of hoger in, met maximaal twee decimalen (bijvoorbeeld 25 of 25.50).';
+
+$string['chat:turn_failed'] = 'Dit antwoord kon niet worden voltooid. Het lag niet aan iets wat u deed — probeer het opnieuw.';
+$string['settings:prompt_budget_mode'] = 'Modus voor het budget van de systeemprompt';
+$string['settings:prompt_budget_mode_desc'] = 'Hoe het tekenbudget van de systeemprompt wordt bepaald. <strong>Afleiden uit het model</strong> berekent hoeveel ruimte het ingestelde model werkelijk biedt — het contextvenster, min het gereserveerde antwoord en de gespreksgeschiedenis — en gebruikt die waarde, met een bovengrens zodat een heel groot venster geen heel grote prompt rechtvaardigt. Dit geldt alleen zolang het tekenbudget hieronder op de standaardwaarde 36.000 blijft staan: wijzigt u dat getal, dan wint dat, in beide richtingen, want een getal dat een beheerder heeft ingetypt is een beslissing en geen gok. <strong>Vast</strong> gebruikt altijd het getal hieronder. Een zelfgehoste backend stelt het contextvenster van de backend in; dat gaat boven alles hier.';
+$string['settings:prompt_budget_mode_auto'] = 'Afleiden uit het model (aanbevolen)';
+$string['settings:prompt_budget_mode_fixed'] = 'Vast tekenbudget';
+
+$string['quizlock:scope'] = 'Hoe ver de blokkering reikt';
+$string['quizlock:scope_course'] = 'Alleen deze cursus (aanbevolen)';
+$string['quizlock:scope_site'] = 'Alle cursussen';
+$string['quizlock:scope_desc'] = 'Of een lopende poging [[tutorshort]] alleen blokkeert in de cursus met de toets, of overal. <strong>Alleen deze cursus</strong> is de standaard en is vrijwel altijd wat u wilt. Sitebreed was het gedrag tot en met v7.2.4 en had een storing die het waard is te kennen: een verlaten poging blijft voor altijd «bezig», zodat één vergeten toets ergens in de geschiedenis van een deelnemer de assistent uitschakelde in elke cursus die hij volgde, zonder dat iets op het scherm uitlegde waarom. Sitebreed levert erg weinig op tegen iemand die vastbesloten is te spieken en een tweede browser heeft, en het cursusmateriaal en het zoeken van de assistent zijn sowieso tot de cursus beperkt.';

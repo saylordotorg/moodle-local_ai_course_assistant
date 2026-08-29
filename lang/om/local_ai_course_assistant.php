@@ -73,10 +73,34 @@ $string['settings:model_desc'] = 'Moodeelii fayyadamuu. Durtiin dhiyeessaa irrat
 $string['settings:apibaseurl'] = 'URL Bu\'uura API';
 $string['settings:apibaseurl_desc'] = 'URL bu\'uura API. Dhiyeessaa hundaaf ofumaan guutama garuu jijjiiruu ni danda\'ama. Dhiyeessaa durtii\'f duwwaa dhiisi.';
 $string['settings:systemprompt'] = 'Caasima Gaaffii Sirna';
-$string['settings:systemprompt_desc'] = 'Gaaffii sirna AI\'f ergamu. Bakka-buutu fayyadami: {{coursename}}, {{userrole}}.';
-$string['settings:systemprompt_default'] = 'Ati barsiisaa AI gargaaraa koorsii "{{coursename}}" ti. Gaheen barataa {{userrole}} dha.
+$string['settings:systemprompt_desc'] = 'Gaaffii sirna AI\'f ergamu. Bakka-buutu fayyadami: {{coursename}}, {{userrole}}, {{institution}}.';
+$string['settings:systemprompt_default'] = 'Ati [[tutorshort]] (Online Learning Assistant), leenjisaa barnootaa sammuu namtolchee fayyadamu kan barattoota {{institution}} kanneen "{{coursename}}" keessatti galmaa\'aniif. Gahee barataa {{userrole}} dha.
 
-Barataa qabiyyee koorsii hubachuuf gargaari. Jajjabeessaa, ifa fi barnoota cimaa ta\'i.';
+## Gahee
+Gargaarsa barnootaa deggersa qabuu fi koorsii waliin walsimu kenni, kan barumsa, shaakala, kaka\'umsaa fi itti fayyadama sammuu namtolchee itti gaafatamummaa qabu jajjabeessu. Deebiin kee qabiyyee koorsii irratti hundaa\'uu qaba. Ati sagalee barsiisaati.
+
+## Seerota Bu\'uuraa
+- Deebii barnootaa hunda meeshaalee koorsii mirkanaa\'an ykn odeeffannoo dhaabbataa irratti hundeessi.
+- Qabiyyee hin uumin, daangaa koorsii hin darbin.
+- Yeroo gaaffiin koorsii ala ta\'u barattoota gara meeshaalee koorsiitti deebisi. Gaaffii mata duree ala ta\'e lama booda, marii gara barumsaatti deebisi.
+- Yeroo gaaffii shaakalaa uumtu, kallattiin meeshaalee koorsii irraa fudhu.
+
+## Wanti [[tutorshort]] Gargaaruu Danda\'u
+- Yaadota ibsuu fi barnoota gabaabsuu
+- Fakkeenyaa fi gaaffii shaakalaa kennuu
+- Tooftaalee barnootaa gorsuu
+- Obsaa fi guddina jajjabeessuu
+
+## Wanti [[tutorshort]] Hin Goone
+- Murtii barnootaa ykn imaammataa kennuu
+- Gorsa fayyaa, seeraa ykn fayyaa sammuu kennuu
+- Hanna barnootaa ykn barumsa cinaatti dabruu gargaaruu
+
+## Sagalee fi Akkaataa
+Haala firummaa, kunuunsa, jajjabeessaa, gammachiisaa fi kakaasaa ta\'een wal quunnami. Gabaabaa, deggersa qabuu fi kabaja qabu ta\'i.
+
+## Nageenya
+Marii arrabsoo, jibbaa, loogii ykn hin malle keessatti hin hirmaatin. Daangaa cimaa garuu gaarii kaa\'i, gara mata duree bu\'a qabeessaatti deebisi.';
 $string['settings:temperature'] = 'Ho\'a';
 $string['settings:temperature_desc'] = 'Kallattii to\'ata. Gatiin gadi aanaa kan xiyyeeffate, kan ol aanaa kan uumamaa dha. Daangaa: 0.0 hanga 2.0.';
 $string['settings:maxhistory'] = 'Seenaa Haasawa Guddaa';
@@ -1934,3 +1958,14 @@ $string['quizlock:window_desc'] = 'Yaaliin qormaata daangaa yeroo hin qabne irra
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] yeroo ammaa dhaabbateera. Meeshaaleen barnoota keessanii hin miidhamne, kunis dogoggora keessan miti — maaloo booda irra deebi\'aa yaalaa.';
 $string['settings:money_nonnegative_invalid'] = 'Baay\'ina 0 ykn isaa ol galchaa, iddoo kurnyee lama caalaa hin taane (fakkeenyaaf 25 ykn 25.50).';
+
+$string['chat:turn_failed'] = 'Deebiin kun xumuramuu hin dandeenye. Wanti ati goote tokkollee kanaaf sababa hin taane — mee irra deebi\'ii yaali.';
+$string['settings:prompt_budget_mode'] = 'Haala baajata gaaffii sirnaa';
+$string['settings:prompt_budget_mode_desc'] = 'Baajanni qubee gaaffii sirnaa akkamitti akka murtaa\'u. <strong>Moodeela irraa argachuu</strong> iddoo moodeelli qindaa\'e dhugumaan kennu ni shallaga — foddaa hiikaa isaa irraa deebii qabame fi seenaa haasawaa hir\'isee — sanas ni fayyadama, daangaa ol\'aanaa waliin, akka foddaan baay\'ee guddaan gaaffii baay\'ee guddaa hin heyyamneef. Kunis kan hojjetu yeroo baajanni qubee gadii jiru gatii durtii 36,000 irratti hafutti qofa: lakkoofsa sana yoo jijjiirte, isatu injifata, karaa lamaanuu, sababiin isaas lakkoofsi bulchaan barreesse tilmaama utuu hin taane murtoo waan ta\'eef. <strong>Kan hin jijjiiramne</strong> yeroo hunda lakkoofsa gadii fayyadama. Duubbeen ofiin kuufamu foddaa hiikaa duubbee qindeessuu qaba; sunis waan asii jiru hunda irra dursa qaba.';
+$string['settings:prompt_budget_mode_auto'] = 'Moodeela irraa argachuu (kan gorfamu)';
+$string['settings:prompt_budget_mode_fixed'] = 'Baajata qubee hin jijjiiramne';
+
+$string['quizlock:scope'] = 'Cufaan hangam akka ga\'u';
+$string['quizlock:scope_course'] = 'Koorsii kana qofa (kan gorfamu)';
+$string['quizlock:scope_site'] = 'Koorsiiwwan hunda';
+$string['quizlock:scope_desc'] = 'Yaaliin adeemsa irra jiru [[tutorshort]] koorsii qormaanni sun keessa jiru qofa keessatti dhorku, moo bakka hundatti. <strong>Koorsii kana qofa</strong> durtii yoo ta\'u, kan barbaadamu yeroo hunda gandaa. Marsariitii guutuu hanga v7.2.4 amala ture, rakkoo beekamuu qabus qaba ture: yaaliin gatame bara baraan «adeemsa irra» ta\'ee hafa, kanaafuu qormaanni tokko seenaa barataa keessatti irraanfatame koorsii inni fudhatu hunda keessatti gargaaraa sana ni dhaamsa ture, ibsi tokkoyyuu iskiriinii irratti utuu hin mul\'atiin. Marsariitii guutuun barataa hanna gochuuf murteeffate irratti waan xiqqoo qofa buusa, inni biraawuzarii lammaffaa qaba, meeshaan barnootaa fi barbaachi gargaaraa sanaas dursanii koorsiitti daangeffamaniiru.';

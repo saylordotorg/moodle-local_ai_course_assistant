@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Modelul de utilizat. Valoarea implicită depin
 $string['settings:apibaseurl'] = 'URL de bază API';
 $string['settings:apibaseurl_desc'] = 'URL-ul de bază API. Completat automat în funcție de furnizor, dar poate fi suprascris. Lăsați gol pentru a utiliza valoarea implicită a furnizorului.';
 $string['settings:systemprompt'] = 'Șablon prompt de sistem';
-$string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Promptul de sistem trimis către AI. Utilizați substituenții: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Ești un tutore AI util pentru cursul „{{coursename}}". Rolul studentului este {{userrole}}.
 
 Ajută studentul să înțeleagă conținutul cursului. Fii încurajator, clar și riguros din punct de vedere pedagogic.';
@@ -1930,3 +1930,14 @@ $string['quizlock:window_desc'] = 'Cât timp o încercare la un test fără limi
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] este pus pe pauză în acest moment. Materialele cursului nu sunt afectate și nu este din vina ta — încearcă din nou mai târziu.';
 $string['settings:money_nonnegative_invalid'] = 'Introdu o sumă de 0 sau mai mare, cu cel mult două zecimale (de exemplu 25 sau 25.50).';
+
+$string['chat:turn_failed'] = 'Acest răspuns nu a putut fi finalizat. Nimic din ce ai făcut nu a cauzat asta — încearcă din nou.';
+$string['settings:prompt_budget_mode'] = 'Modul bugetului promptului de sistem';
+$string['settings:prompt_budget_mode_desc'] = 'Cum se stabilește bugetul de caractere al promptului de sistem. <strong>Derivă din model</strong> calculează spațiul pe care îl oferă cu adevărat modelul configurat — fereastra sa de context, minus răspunsul rezervat și istoricul conversației — și îl folosește, cu un plafon, ca o fereastră foarte mare să nu justifice un prompt foarte mare. Se aplică doar cât timp bugetul de caractere de mai jos rămâne la valoarea implicită de 36.000: dacă schimbi acel număr, el are câștig de cauză, în ambele direcții, pentru că o cifră scrisă de un administrator este o decizie, nu o presupunere. <strong>Fix</strong> folosește întotdeauna numărul de mai jos. Un backend găzduit propriu ar trebui să seteze fereastra de context a backendului, care are prioritate față de tot ce este aici.';
+$string['settings:prompt_budget_mode_auto'] = 'Derivă din model (recomandat)';
+$string['settings:prompt_budget_mode_fixed'] = 'Buget fix de caractere';
+
+$string['quizlock:scope'] = 'Cât de departe ajunge blocarea';
+$string['quizlock:scope_course'] = 'Doar acest curs (recomandat)';
+$string['quizlock:scope_site'] = 'Toate cursurile';
+$string['quizlock:scope_desc'] = 'Dacă o încercare în curs blochează [[tutorshort]] doar în cursul care conține testul sau peste tot. <strong>Doar acest curs</strong> este valoarea implicită și este aproape întotdeauna ce vrei. Întregul site a fost comportamentul până la v7.2.4 și avea o defecțiune care merită cunoscută: o încercare abandonată rămâne «în curs» pentru totdeauna, așa că un singur test uitat undeva în istoricul unui cursant dezactiva asistentul în fiecare curs al său, fără nimic pe ecran care să explice de ce. Întregul site aduce foarte puțin în fața cuiva hotărât să copieze, care are un al doilea browser, iar materialul și căutarea asistentului sunt oricum limitate la curs.';

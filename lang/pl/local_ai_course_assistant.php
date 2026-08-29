@@ -70,7 +70,7 @@ $string['settings:model_desc'] = 'Model do użycia. Wartość domyślna zależy 
 $string['settings:apibaseurl'] = 'Bazowy URL API';
 $string['settings:apibaseurl_desc'] = 'Bazowy URL API. Wypełniany automatycznie na podstawie dostawcy, ale można go nadpisać. Pozostaw puste, aby użyć domyślnego dostawcy.';
 $string['settings:systemprompt'] = 'Szablon promptu systemowego';
-$string['settings:systemprompt_desc'] = 'Prompt systemowy wysyłany do AI. Użyj symboli zastępczych: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Prompt systemowy wysyłany do AI. Użyj symboli zastępczych: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Jesteś pomocnym korepetytorem AI dla kursu „{{coursename}}". Rola studenta to {{userrole}}.
 
 Pomóż studentowi zrozumieć treść kursu. Bądź zachęcający, jasny i pedagogicznie rzetelny.';
@@ -1930,3 +1930,14 @@ $string['quizlock:window_desc'] = 'Jak długo podejście do testu bez limitu cza
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] jest w tej chwili wstrzymany. Materiały kursu pozostały bez zmian i nie jest to spowodowane twoim działaniem — spróbuj ponownie później.';
 $string['settings:money_nonnegative_invalid'] = 'Podaj kwotę równą 0 lub większą, z maksymalnie dwoma miejscami po przecinku (na przykład 25 lub 25.50).';
+
+$string['chat:turn_failed'] = 'Nie udało się dokończyć tej odpowiedzi. Nic, co zrobiłeś, tego nie spowodowało — spróbuj ponownie.';
+$string['settings:prompt_budget_mode'] = 'Tryb budżetu promptu systemowego';
+$string['settings:prompt_budget_mode_desc'] = 'Sposób ustalania budżetu znaków promptu systemowego. <strong>Wyprowadź z modelu</strong> oblicza, ile miejsca faktycznie daje skonfigurowany model — jego okno kontekstu pomniejszone o zarezerwowaną odpowiedź i historię rozmowy — i używa tej wartości, z górnym ograniczeniem, żeby bardzo duże okno nie usprawiedliwiało bardzo dużego promptu. Działa to tylko dopóki budżet znaków poniżej pozostaje przy domyślnych 36 000: gdy zmienisz tę liczbę, to ona wygrywa, w obie strony, bo liczba wpisana przez administratora jest decyzją, a nie domysłem. <strong>Stały</strong> zawsze korzysta z liczby poniżej. Backend hostowany samodzielnie powinien określić okno kontekstu backendu, które ma pierwszeństwo przed wszystkim tutaj.';
+$string['settings:prompt_budget_mode_auto'] = 'Wyprowadź z modelu (zalecane)';
+$string['settings:prompt_budget_mode_fixed'] = 'Stały budżet znaków';
+
+$string['quizlock:scope'] = 'Jak daleko sięga blokada';
+$string['quizlock:scope_course'] = 'Tylko ten kurs (zalecane)';
+$string['quizlock:scope_site'] = 'Wszystkie kursy';
+$string['quizlock:scope_desc'] = 'Czy trwające podejście blokuje [[tutorshort]] tylko w kursie zawierającym test, czy wszędzie. <strong>Tylko ten kurs</strong> to ustawienie domyślne i niemal zawsze właściwe. Cała witryna była zachowaniem do wersji 7.2.4 i miała usterkę wartą poznania: porzucone podejście pozostaje „w toku” na zawsze, więc jeden zapomniany test gdzieś w historii uczącego się wyłączał asystenta w każdym jego kursie, a na ekranie nic tego nie tłumaczyło. Wobec osoby zdeterminowanej, która ma drugą przeglądarkę, cała witryna daje bardzo niewiele, a materiały kursu i wyszukiwanie asystenta i tak ograniczają się do kursu.';

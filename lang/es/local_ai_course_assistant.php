@@ -75,7 +75,7 @@ $string['settings:model_desc'] = 'El modelo a utilizar. El valor predeterminado 
 $string['settings:apibaseurl'] = 'URL base de la API';
 $string['settings:apibaseurl_desc'] = 'URL base para la API. Se rellena automáticamente según el proveedor, pero puede modificarse. Déjelo en blanco para usar el valor predeterminado del proveedor.';
 $string['settings:systemprompt'] = 'Plantilla de instrucción del sistema';
-$string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Instrucción del sistema enviada a la IA. Use los marcadores de posición: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Eres un tutor de IA útil para el curso "{{coursename}}". El rol del estudiante es {{userrole}}.
 
 Ayuda al estudiante a comprender el contenido del curso. Sé alentador, claro y pedagógicamente riguroso.';
@@ -1958,3 +1958,14 @@ $string['quizlock:window_desc'] = 'Cuánto tiempo sigue contando como en curso u
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] está en pausa en este momento. Los materiales de tu curso no se ven afectados y no es algo que hayas hecho tú: inténtalo de nuevo más tarde.';
 $string['settings:money_nonnegative_invalid'] = 'Introduce un importe de 0 o más, con un máximo de dos decimales (por ejemplo, 25 o 25.50).';
+
+$string['chat:turn_failed'] = 'No se pudo completar esta respuesta. Nada de lo que hiciste lo provocó: inténtalo de nuevo.';
+$string['settings:prompt_budget_mode'] = 'Modo de presupuesto del prompt del sistema';
+$string['settings:prompt_budget_mode_desc'] = 'Cómo se decide el presupuesto de caracteres del prompt del sistema. <strong>Derivar del modelo</strong> calcula el espacio que ofrece realmente el modelo configurado —su ventana de contexto, menos la respuesta reservada y el historial de la conversación— y usa ese valor, con un tope para que una ventana muy grande no justifique un prompt muy grande. Solo se aplica mientras el presupuesto de caracteres de abajo siga en su valor predeterminado de 36.000: si cambias ese número, manda él, en ambas direcciones, porque una cifra que escribe una persona administradora es una decisión y no una conjetura. <strong>Fijo</strong> usa siempre el número de abajo. Un backend autoalojado debería configurar la ventana de contexto del backend, que tiene prioridad sobre todo lo de aquí.';
+$string['settings:prompt_budget_mode_auto'] = 'Derivar del modelo (recomendado)';
+$string['settings:prompt_budget_mode_fixed'] = 'Presupuesto fijo de caracteres';
+
+$string['quizlock:scope'] = 'Hasta dónde llega el bloqueo';
+$string['quizlock:scope_course'] = 'Solo este curso (recomendado)';
+$string['quizlock:scope_site'] = 'Todos los cursos';
+$string['quizlock:scope_desc'] = 'Si un intento en curso bloquea [[tutorshort]] solo en el curso que contiene el cuestionario o en todas partes. <strong>Solo este curso</strong> es el valor predeterminado y casi siempre es lo que quieres. En todo el sitio fue el comportamiento hasta la v7.2.4 y tenía un fallo que conviene conocer: un intento abandonado sigue «en curso» para siempre, así que un único cuestionario olvidado en el historial de una persona desactivaba el asistente en todos sus cursos, sin nada en pantalla que lo explicara. En todo el sitio aporta muy poco frente a quien está decidido a copiar, que tiene un segundo navegador, y el material y la recuperación del asistente ya están acotados al curso.';

@@ -71,7 +71,7 @@ $string['settings:model_desc'] = 'Le modèle à utiliser. La valeur par défaut 
 $string['settings:apibaseurl'] = 'URL de base de l\'API';
 $string['settings:apibaseurl_desc'] = 'URL de base de l\'API. Remplie automatiquement selon le fournisseur, mais peut être remplacée. Laisser vide pour utiliser la valeur par défaut du fournisseur.';
 $string['settings:systemprompt'] = 'Modèle de prompt système';
-$string['settings:systemprompt_desc'] = 'Prompt système envoyé à l\'IA. Utilisez les espaces réservés : {{coursename}}, {{userrole}}.';
+$string['settings:systemprompt_desc'] = 'Prompt système envoyé à l\'IA. Utilisez les espaces réservés : {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'Vous êtes un tuteur IA utile pour le cours "{{coursename}}". Le rôle de l\'étudiant est {{userrole}}.
 
 Aidez l\'étudiant à comprendre le contenu du cours. Soyez encourageant, clair et pédagogiquement rigoureux.';
@@ -1931,3 +1931,14 @@ $string['quizlock:window_desc'] = 'Durée pendant laquelle une tentative sur un 
 
 $string['emergency:chat_stopped'] = '[[tutorshort]] est en pause pour le moment. Vos supports de cours ne sont pas affectés et cela ne vient pas de vous — merci de réessayer plus tard.';
 $string['settings:money_nonnegative_invalid'] = 'Saisissez un montant supérieur ou égal à 0, avec deux décimales au maximum (par exemple 25 ou 25.50).';
+
+$string['chat:turn_failed'] = 'Cette réponse n’a pas pu être terminée. Rien de ce que vous avez fait n’en est la cause — veuillez réessayer.';
+$string['settings:prompt_budget_mode'] = 'Mode de budget du prompt système';
+$string['settings:prompt_budget_mode_desc'] = 'Comment le budget de caractères du prompt système est déterminé. <strong>Déduire du modèle</strong> calcule la place réellement offerte par le modèle configuré — sa fenêtre de contexte, moins la réponse réservée et l’historique de la conversation — et retient cette valeur, plafonnée pour qu’une très grande fenêtre n’autorise pas un très grand prompt. Cela ne s’applique que tant que le budget de caractères ci-dessous reste à sa valeur par défaut de 36 000 : si vous modifiez ce nombre, c’est lui qui l’emporte, dans les deux sens, car un chiffre saisi par une personne administratrice est une décision et non une supposition. <strong>Fixe</strong> utilise toujours le nombre ci-dessous. Un backend auto-hébergé devrait renseigner la fenêtre de contexte du backend, qui prime sur tout ce qui précède.';
+$string['settings:prompt_budget_mode_auto'] = 'Déduire du modèle (recommandé)';
+$string['settings:prompt_budget_mode_fixed'] = 'Budget de caractères fixe';
+
+$string['quizlock:scope'] = 'Jusqu’où va le verrouillage';
+$string['quizlock:scope_course'] = 'Ce cours uniquement (recommandé)';
+$string['quizlock:scope_site'] = 'Tous les cours';
+$string['quizlock:scope_desc'] = 'Si une tentative en cours bloque [[tutorshort]] uniquement dans le cours contenant le test, ou partout. <strong>Ce cours uniquement</strong> est la valeur par défaut et convient presque toujours. À l’échelle du site était le comportement jusqu’à la v7.2.4, avec un défaut qu’il vaut mieux connaître : une tentative abandonnée reste « en cours » indéfiniment, si bien qu’un seul test oublié quelque part dans l’historique d’une personne désactivait l’assistant dans tous ses cours, sans la moindre explication à l’écran. À l’échelle du site n’apporte presque rien face à quelqu’un de déterminé, qui dispose d’un second navigateur, et le contenu comme la recherche de l’assistant sont de toute façon limités au cours.';
