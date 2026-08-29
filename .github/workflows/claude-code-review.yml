@@ -99,10 +99,37 @@ jobs:
           # match anything, so every gh call was still denied: 28 denials, $2.34
           # billed, nothing posted. Keep every pattern space-free.
           #
+          # The read-only shell utilities are here because Claude Code matches a
+          # compound command segment by segment: `gh pr diff 207 | head -200`
+          # needs BOTH `gh` and `head` granted or the whole call is denied. The
+          # review's subagents pipe gh output constantly, which is the most
+          # likely source of the 26 denials on the v7.2.1 run (11 turns, $1.61,
+          # nothing posted, `--comment` correctly present). None of these
+          # binaries can execute code from the checked-out branch, so the
+          # untrusted-head property the gh scoping protects is unaffected --
+          # unlike a blanket Bash grant, or a grant of php/npm/make.
+          #
           # Edit and Write are deliberately absent. A reviewer reports; it does
           # not rewrite the branch it is reviewing.
           claude_args: >-
             --allowedTools
-            Task,Read,Grep,Glob,TodoWrite,Bash(gh:*),mcp__github_inline_comment__create_inline_comment
+            Task,Read,Grep,Glob,TodoWrite,Bash(gh:*),Bash(git:*),Bash(jq:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(tr:*),Bash(find:*),Bash(ls:*),Bash(echo:*),mcp__github_inline_comment__create_inline_comment
+
+          # This has now been diagnosed five times from a log that does not say
+          # what was denied -- the action hides the SDK output by default, so
+          # every round has been a guess, and three of the guesses were wrong.
+          # Turning it on ends that: the next run names the denied calls
+          # directly. The repository is public and the review output is posted
+          # publicly anyway, so there is nothing here the log did not already
+          # contain; the API key is masked by the action, not by this flag.
+          show_full_output: true
+          # One more way this posts nothing, and it is in the command, not here:
+          # step 1 of /code-review launches a haiku agent that stops the whole
+          # review if the PR is closed, is a draft, looks automated, or if
+          # "claude has already commented on this PR". So asking @claude for a
+          # review in a comment and then pushing again means the second review
+          # exits at step 1 by design. Not a bug, but indistinguishable from
+          # the failure modes above unless you know to look for it.
+          #
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
