@@ -113,7 +113,7 @@ jobs:
           # not rewrite the branch it is reviewing.
           claude_args: >-
             --allowedTools
-            Task,Read,Grep,Glob,TodoWrite,Bash(gh:*),Bash(git:*),Bash(jq:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(tr:*),Bash(find:*),Bash(ls:*),Bash(echo:*),mcp__github_inline_comment__create_inline_comment
+            Task,Read,Grep,Glob,TodoWrite,Bash(gh:*),Bash(git:*),Bash(jq:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(grep:*),Bash(awk:*),Bash(sed:*),Bash(sort:*),Bash(uniq:*),Bash(cut:*),Bash(tr:*),Bash(find:*),Bash(ls:*),Bash(echo:*),mcp__github_inline_comment__create_inline_comment
 
           # This has now been diagnosed five times from a log that does not say
           # what was denied -- the action hides the SDK output by default, so
@@ -123,6 +123,38 @@ jobs:
           # publicly anyway, so there is nothing here the log did not already
           # contain; the API key is masked by the action, not by this flag.
           show_full_output: true
+          # WHAT THE FULL LOG ACTUALLY SHOWED, once show_full_output was on.
+          # Six rounds of guessing ended here, and neither cause was guessable
+          # from the old log. Run 33258383102 on PR #208:
+          #
+          #   1. Every single denial was `gh pr diff <N> ... > somefile`. The
+          #      review's subagents redirect the diff to a file because it is
+          #      large. Shell output redirection is a WRITE, and it is refused
+          #      even for a path inside the checkout:
+          #        "Output redirection to '.../diffout.txt' was blocked. For
+          #         security, Claude Code may only write to files in the allowed
+          #         working directories for this session: '.../<the checkout>'"
+          #      The tool grant cannot lift this -- the block is on redirection
+          #      itself, not on the `gh` binary, and granting Write to a
+          #      pull_request run that checks out an untrusted head is not a
+          #      trade worth making. Adding awk/sed here at least lets a subagent
+          #      fall back to piping instead of redirecting; one denial in that
+          #      run was a pipe into awk.
+          #
+          #   2. The run then ENDED without waiting. Final result text was
+          #      literally "All four review agents are running in parallel.
+          #      Waiting for results.", num_turns 9, $1.69 billed. Step 4 of the
+          #      command launches its four reviewers, the SDK launched them
+          #      ASYNCHRONOUSLY, and the session terminated before any of them
+          #      reported back. Nothing was ever synthesised, so there was
+          #      nothing to post -- which is why the log says "No buffered
+          #      inline comments" while looking, once again, exactly like a
+          #      clean review.
+          #
+          # Neither of these lives in this file. Until they are fixed upstream,
+          # `@claude please review this diff` in a PR comment is the working
+          # path -- that workflow posts, and it produced ten findings on #207.
+          #
           # One more way this posts nothing, and it is in the command, not here:
           # step 1 of /code-review launches a haiku agent that stops the whole
           # review if the PR is closed, is a draft, looks automated, or if
