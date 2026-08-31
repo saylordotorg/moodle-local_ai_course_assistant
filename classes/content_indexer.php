@@ -319,7 +319,20 @@ class content_indexer {
             self::prune_stale_chunks($courseid, $seenhashes);
         } else if ($stats['sources'] === 0) {
             // Genuinely no extractable content in the course — clear the index.
-            $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);
+            //
+            // v7.2.7: except the site-wide FAQ, which lives under SITEID but is
+            // not course material. delete_course_index() was guarded for this
+            // and these two paths were not, which mattered because index_faq()
+            // runs ~220 lines above in this same call: indexing the site course
+            // embedded every Q/A pair (billable) and then deleted the rows
+            // before returning, leaving faq_indexed_hash set so is_retrievable()
+            // stayed false forever and the prompt silently went back to the
+            // 4,451 inline characters this release set out to remove.
+            $DB->delete_records_select(
+                'local_ai_course_assistant_chunks',
+                'courseid = :courseid AND (modtype IS NULL OR modtype <> :faqtype)',
+                ['courseid' => $courseid, 'faqtype' => faq_manager::MODTYPE]
+            );
         }
         // Otherwise (sources existed but embeds errored) leave the existing
         // index untouched rather than risk wiping good data on a flaky run.
@@ -347,9 +360,14 @@ class content_indexer {
         // recordset so the whole chunk table is never held in memory.
         $seenset = array_flip($seenhashes);
         $stale = [];
-        $rs = $DB->get_recordset(
+        // v7.2.7: never stream FAQ rows. $seenhashes is filled only from
+        // content_chunker::chunk() output for course modules, so a site-wide FAQ
+        // chunk can never appear in it and every one of them would be classified
+        // stale and deleted on the next reindex of the site course.
+        $rs = $DB->get_recordset_select(
             'local_ai_course_assistant_chunks',
-            ['courseid' => $courseid],
+            'courseid = :courseid AND (modtype IS NULL OR modtype <> :faqtype)',
+            ['courseid' => $courseid, 'faqtype' => faq_manager::MODTYPE],
             '',
             'id, contenthash'
         );

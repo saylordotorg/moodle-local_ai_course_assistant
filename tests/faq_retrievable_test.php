@@ -185,4 +185,105 @@ final class faq_retrievable_test extends \advanced_testcase {
         // Pinning both halves so a change to either is visible here.
         $this->assertNotSame('', faq_manager::get_faq_for_prompt());
     }
+
+    /**
+     * A course with RAG forced off must keep its FAQ inline.
+     *
+     * The per-course override is a genuine three-state toggle: unset means
+     * default-on, and course_settings.php writes a literal '0' for an unchecked
+     * box. Reporting the FAQ retrievable there suppressed the inline copy while
+     * sse.php never called the retriever, so it reached the model by neither
+     * path.
+     */
+    public function test_per_course_rag_override_forces_inline(): void {
+        $this->fake_index();
+        $course = $this->getDataGenerator()->create_course();
+
+        // Unset: default-on, so retrieval serves it.
+        $this->assertTrue(faq_manager::is_retrievable($course->id));
+
+        // Explicitly on.
+        set_config('rag_enabled_course_' . $course->id, '1', 'local_ai_course_assistant');
+        $this->assertTrue(faq_manager::is_retrievable($course->id));
+
+        // Explicitly off: fall back to inline for this course only.
+        set_config('rag_enabled_course_' . $course->id, '0', 'local_ai_course_assistant');
+        $this->assertFalse(faq_manager::is_retrievable($course->id));
+
+        // The site-wide question is unchanged by one course's override.
+        $this->assertTrue(faq_manager::is_retrievable());
+    }
+
+    /**
+     * The prompt keeps the FAQ section on a course where RAG is off.
+     */
+    public function test_prompt_keeps_faq_when_course_rag_is_off(): void {
+        $this->fake_index();
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        set_config('rag_enabled_course_' . $course->id, '0', 'local_ai_course_assistant');
+        $prompt = context_builder::build_system_prompt($course->id, $user->id);
+        $this->assertStringContainsString('## Support FAQ', $prompt);
+    }
+
+    /**
+     * Reindexing the site course must not delete the FAQ it just embedded.
+     *
+     * index_faq() runs inside index_course(), so an unguarded prune or
+     * empty-course wipe deletes the rows before the same call returns -- and
+     * leaves faq_indexed_hash set, so is_retrievable() stays false permanently
+     * while every subsequent reindex re-bills the embedding.
+     */
+    public function test_reindexing_the_site_course_preserves_the_faq(): void {
+        global $DB;
+        $this->fake_index();
+        $before = $DB->count_records('local_ai_course_assistant_chunks',
+            ['courseid' => SITEID, 'modtype' => faq_manager::MODTYPE]);
+        $this->assertSame(2, $before);
+
+        // The site course has no extractable modules, which is the branch that
+        // fires here.
+        content_indexer::index_course(SITEID);
+
+        $after = $DB->count_records('local_ai_course_assistant_chunks',
+            ['courseid' => SITEID, 'modtype' => faq_manager::MODTYPE]);
+        $this->assertSame(2, $after, 'the site-course reindex deleted the FAQ index');
+        $this->assertTrue(faq_manager::is_retrievable());
+    }
+
+    /**
+     * Document scoping is for course material; the FAQ is not course material.
+     *
+     * FAQ rows carry cmid = 0, and scope_to_document() hard-filters rather than
+     * re-ranks, so without an exemption every FAQ row is dropped the moment the
+     * current page contributes one chunk -- on exactly the module-page turns
+     * where a learner asks a support question.
+     */
+    public function test_document_scoping_keeps_faq_rows(): void {
+        $faq = ['cmid' => 0, 'modtype' => faq_manager::MODTYPE, 'rank' => 0.9];
+        $onpage = ['cmid' => 42, 'modtype' => 'page', 'rank' => 0.8];
+        $offpage = ['cmid' => 99, 'modtype' => 'page', 'rank' => 0.7];
+        $ranked = [$faq, $onpage, $offpage];
+
+        // Current document contributes: its chunk is kept, the other module's
+        // is filtered, and the FAQ survives both.
+        $this->assertSame([$faq, $onpage],
+            rag_retriever::scope_to_document($ranked, 42, 'document_first'));
+
+        // Current document contributes nothing: document_first widens to the
+        // course, so everything stays.
+        $this->assertSame($ranked,
+            rag_retriever::scope_to_document($ranked, 7, 'document_first'));
+
+        // document_only drops course material from other pages but must not
+        // drop the FAQ, which belongs to no page at all.
+        $this->assertSame([$faq],
+            rag_retriever::scope_to_document($ranked, 7, 'document_only'));
+
+        // Unscoped paths are untouched.
+        $this->assertSame($ranked, rag_retriever::scope_to_document($ranked, 0, 'document_first'));
+        $this->assertSame($ranked, rag_retriever::scope_to_document($ranked, 42, 'course'));
+    }
 }

@@ -600,7 +600,7 @@ class context_builder {
         // when an administrator has edited it since. In each of those a site
         // must keep getting its FAQ rather than silently losing it to a stale
         // background index.
-        $faq = faq_manager::is_retrievable() ? '' : faq_manager::get_faq_for_prompt();
+        $faq = faq_manager::is_retrievable($courseid) ? '' : faq_manager::get_faq_for_prompt();
         if (!empty($faq)) {
             $sections[] = new section(
                 'faq',

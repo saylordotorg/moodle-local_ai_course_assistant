@@ -51,13 +51,28 @@ class faq_manager {
      * and a cached answer would go stale inside cron and between tests for no
      * measurable gain.
      *
+     * @param int $courseid Course being assembled for; 0 asks the site-wide question only.
      * @return bool
      */
-    public static function is_retrievable(): bool {
+    public static function is_retrievable(int $courseid = 0): bool {
         global $DB;
 
         if (!get_config('local_ai_course_assistant', 'rag_enabled')) {
             return false;
+        }
+        // v7.2.7: retrieval is gated per course as well as site-wide, and the
+        // per-course override is a genuine three-state default-on toggle --
+        // course_settings.php writes a literal '0' for an unchecked box. Without
+        // this test, a course with RAG forced off reported the FAQ retrievable,
+        // so context_builder dropped the inline copy while sse.php never called
+        // the retriever: the FAQ reached the model by neither path, which is the
+        // exact failure this method exists to prevent. Callers that pass 0 are
+        // asking the site-wide question and get the site-wide answer.
+        if ($courseid > 0) {
+            $courseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
+            if (!(($courseraw === false) || (bool) $courseraw)) {
+                return false;
+            }
         }
         $raw = (string) get_config('local_ai_course_assistant', 'faq_content');
         if (trim($raw) === '') {
