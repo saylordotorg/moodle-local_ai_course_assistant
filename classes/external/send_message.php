@@ -136,6 +136,24 @@ class send_message extends external_api {
             ((int) $params['pageid']) ?: null
         );
 
+        // v7.2.7: audit the turn, as sse.php does. This path wrote no
+        // message_sent row at all, so every call through the mobile fallback
+        // was invisible to the audit log -- and because the endpoint threw
+        // after committing the learner's question, the staging probe left three
+        // questions in a learner's visible history with no reply and no audit
+        // trail explaining why. Same action and same detail keys as the
+        // streaming path, or the two cannot be read together.
+        \local_ai_course_assistant\audit_logger::log(
+            'message_sent',
+            $userid,
+            (int) $params['courseid'],
+            [
+                'conversation_id' => $conv->id,
+                'role' => 'user',
+                'message_length' => strlen($params['message']),
+            ]
+        );
+
         // RAG retrieval.
         // v5.4.6: time the retrieve call so we can attribute it to the assistant row.
         $retrievedchunks = [];

@@ -176,4 +176,34 @@ final class send_message_service_test extends \advanced_testcase {
             'The non-streaming fallback must stay available to the mobile app.'
         );
     }
+
+    /**
+     * The turn is audited, as the streaming path audits it.
+     *
+     * This endpoint wrote no message_sent row at all, so calls through the
+     * mobile fallback were invisible to the audit log. The staging probe made
+     * that concrete: three questions committed to a learner's visible history
+     * with no reply under them and no audit row explaining why.
+     */
+    public function test_the_turn_is_audited(): void {
+        global $DB;
+
+        try {
+            send_message::execute((int) $this->course->id, 'What is management?', 0);
+        } catch (\Throwable $e) {
+            // No provider configured; the audit row precedes the model call.
+            $this->assertInstanceOf(\moodle_exception::class, $e);
+        }
+
+        $row = $DB->get_record('local_ai_course_assistant_audit', [
+            'action' => 'message_sent',
+            'userid' => $this->student->id,
+        ]);
+        $this->assertNotFalse($row, 'The mobile fallback must audit its turns.');
+        $this->assertSame((int) $this->course->id, (int) $row->courseid);
+
+        $details = json_decode($row->details, true);
+        $this->assertSame('user', $details['role']);
+        $this->assertSame(strlen('What is management?'), $details['message_length']);
+    }
 }
