@@ -56,15 +56,26 @@ class prompt_metrics_logger {
             $by_cat = ['identity' => 0, 'context' => 0, 'learner' => 0, 'behavior' => 0, 'markers' => 0, 'safety' => 0];
             $dropped = 0;
             $truncated = 0;
-            foreach ($breakdown as $info) {
+            // v7.2.7: record WHICH sections went, not just how many.
+            //
+            // The metrics page reported 57.9% of turns dropping a section and
+            // could not say which, so there was no way to tell a dropped `faq`
+            // from a dropped `safety` -- and those are not remotely the same
+            // event. $breakdown is already keyed by section name; the names were
+            // simply being thrown away here.
+            $droppednames = [];
+            $truncatednames = [];
+            foreach ($breakdown as $name => $info) {
                 if (isset($by_cat[$info['category']])) {
                     $by_cat[$info['category']] += (int) $info['chars'];
                 }
                 if (empty($info['used'])) {
                     $dropped++;
+                    $droppednames[] = (string) $name;
                 }
                 if (!empty($info['truncated'])) {
                     $truncated++;
+                    $truncatednames[] = (string) $name;
                 }
             }
             $row = [
@@ -75,6 +86,8 @@ class prompt_metrics_logger {
                 'budget'    => $budgetchars,
                 'cats'      => $by_cat,
                 'dropped'   => $dropped,
+                'dropped_names'   => $droppednames,
+                'truncated_names' => $truncatednames,
                 'truncated' => $truncated,
             ];
             $path = $dir . '/' . date('Y-m-d') . '.log';
@@ -97,6 +110,8 @@ class prompt_metrics_logger {
      *     avg_budget: int,
      *     pct_truncated: float,
      *     pct_dropped: float,
+     *     dropped_by_section: array<string, int>,
+     *     truncated_by_section: array<string, int>,
      *     by_cat_avg: array<string, int>,
      *     last_seen: int|null
      * }
@@ -111,6 +126,8 @@ class prompt_metrics_logger {
             'avg_budget'    => 0,
             'pct_truncated' => 0.0,
             'pct_dropped'   => 0.0,
+            'dropped_by_section'   => [],
+            'truncated_by_section' => [],
             'by_cat_avg'    => ['identity' => 0, 'context' => 0, 'learner' => 0, 'behavior' => 0, 'markers' => 0, 'safety' => 0],
             'last_seen'     => null,
         ];
@@ -122,6 +139,8 @@ class prompt_metrics_logger {
         $maxtotal = 0;
         $truncatedturns = 0;
         $droppedturns = 0;
+        $droppedsections = [];
+        $truncatedsections = [];
         $catsums = ['identity' => 0, 'context' => 0, 'learner' => 0, 'behavior' => 0, 'markers' => 0, 'safety' => 0];
         $samples = 0;
         $lastseen = null;
@@ -149,6 +168,15 @@ class prompt_metrics_logger {
                 if (!empty($row['dropped'])) {
                     $droppedturns++;
                 }
+                // Tally by section name so a dropped `safety` is distinguishable
+                // from a dropped `faq`. Rows written before v7.2.7 carry no
+                // names and simply contribute nothing here.
+                foreach ((array) ($row['dropped_names'] ?? []) as $name) {
+                    $droppedsections[$name] = ($droppedsections[$name] ?? 0) + 1;
+                }
+                foreach ((array) ($row['truncated_names'] ?? []) as $name) {
+                    $truncatedsections[$name] = ($truncatedsections[$name] ?? 0) + 1;
+                }
                 if (isset($row['cats']) && is_array($row['cats'])) {
                     foreach ($row['cats'] as $cat => $chars) {
                         if (isset($catsums[$cat])) {
@@ -172,6 +200,10 @@ class prompt_metrics_logger {
         foreach ($catsums as $cat => $sum) {
             $out['by_cat_avg'][$cat] = (int) round($sum / $samples);
         }
+        arsort($droppedsections);
+        arsort($truncatedsections);
+        $out['dropped_by_section'] = $droppedsections;
+        $out['truncated_by_section'] = $truncatedsections;
         $out['last_seen'] = $lastseen ?: null;
         return $out;
     }
