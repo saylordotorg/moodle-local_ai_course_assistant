@@ -1188,8 +1188,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = 'የሥርዓት ጥያቄ በጀትን በየቀኑ በራስ-ማስተካከል (የተተወ)';
+$string['settings:prompt_budget_auto_tune_desc'] = 'የተተወ። ከላይ ያለው የበጀት ሁኔታ <strong>ቋሚ</strong> ተብሎ ካልተቀመጠ በስተቀር ምንም አያደርግም። የዕለት ተዕለት ተግባር መቆረጥን በመከታተልና ያየውን ትልቁን ጥያቄ በመከተል የቁምፊ በጀቱን ይገምት ነበር። በጀቱን ከሞዴሉ የአውድ መስኮት ማውጣት ግን ይህን በተሻለ ይሠራል፦ አይወዛወዝም፣ የመሞቅ መረጃም አያስፈልገውም። ሁለቱም ይጋጩ ነበር፣ ምክንያቱም ተግባሩ የቁምፊ በጀቱን ይጽፋል፣ ከነባሪው ውጪ ያለ ማንኛውም ዋጋ ደግሞ የተወጣውን በጀት ያሰናክላል። ይህን አጥፍተው ይተዉት፤ በቀጣይ ልቀት ይወገዳል። ምክሩ አሁንም በ<a href="/local/ai_course_assistant/prompt_metrics.php">የጥያቄ መለኪያዎች</a> ገጽ ላይ ይታያል።';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1971,3 +1971,5 @@ $string['quizlock:scope'] = 'መቆለፊያው የሚደርስበት ስፋት'
 $string['quizlock:scope_course'] = 'ይህ ኮርስ ብቻ (የሚመከር)';
 $string['quizlock:scope_site'] = 'ሁሉም ኮርሶች';
 $string['quizlock:scope_desc'] = 'በሂደት ላይ ያለ ሙከራ [[tutorshort]]ን ፈተናውን በያዘው ኮርስ ውስጥ ብቻ ይከልክል ወይስ በሁሉም ቦታ። <strong>ይህ ኮርስ ብቻ</strong> ነባሪው ሲሆን ሁልጊዜ ማለት ይቻላል የሚፈለገው ነው። መላ-ጣቢያ እስከ v7.2.4 ድረስ የነበረው ባህሪ ሲሆን ማወቅ የሚገባው ችግር ነበረው፦ የተተወ ሙከራ ለዘላለም በሂደት ላይ ሆኖ ይቆያል፣ ስለዚህ በተማሪው ታሪክ ውስጥ የተረሳ አንድ ፈተና በሚማረው በእያንዳንዱ ኮርስ ውስጥ ረዳቱን ያሰናክል ነበር፣ በስክሪኑ ላይ ምንም ማብራሪያ ሳይኖር። መላ-ጣቢያ በቆረጠ ተማሪ ላይ የሚያተርፈው በጣም ጥቂት ነው፤ ሁለተኛ አሳሽ አለውና፣ የረዳቱ የኮርስ ይዘትና ማውጣቱም በኮርስ የተወሰነ ነው።';
+
+$string['settings:prompt_budget_tuner_conflict'] = 'የተተወው የጥያቄ-በጀት በራስ-ማስተካከያ ተግባር ተነስቷል፣ የበጀት ሁኔታው ግን ከሞዴሉ እንዲወጣ ተቀምጧል። እነዚህ ሁለቱ ይጋጫሉ፦ ተግባሩ የቁምፊ በጀቱን ይጽፋል፣ ከነባሪው ውጪ ያለ ማንኛውም ዋጋ ደግሞ እንደ ሆን ተብሎ የተመረጠ ይቆጠራል፣ ይህም የተወጣውን በጀት ያሰናክላል። ተግባሩ በዚህ ሁኔታ አሁን በራሱ ይቆማል፣ ስለዚህ ምንም አይተካም — ግን ግልጽነት እንዲኖር አጥፉት።';

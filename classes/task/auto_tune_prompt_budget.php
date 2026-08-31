@@ -41,6 +41,27 @@ class auto_tune_prompt_budget extends \core\task\scheduled_task {
             mtrace('  Prompt budget auto-tune: disabled, skipping.');
             return;
         }
+
+        // v7.2.6: stand down unless the budget is explicitly fixed.
+        //
+        // In auto mode the budget is derived from the model's context window,
+        // and resolve_budget_chars() reads any stored value other than the
+        // default as a deliberate administrator decision -- so a single write
+        // from this task switches the derived budget off and leaves the site on
+        // whatever number the tuner last inferred. Both sites in Saylor
+        // production were in exactly that state: tuner on, neither budget at the
+        // default, derivation silently inert.
+        //
+        // Checked here rather than in apply_recommendation() so the metrics page
+        // can still SHOW a recommendation for an administrator to consider. The
+        // objection is to writing it unattended, not to computing it.
+        $mode = (string) get_config('local_ai_course_assistant', 'prompt_budget_mode');
+        if ($mode !== 'fixed') {
+            mtrace('  Prompt budget auto-tune: budget mode is "' . ($mode ?: 'auto')
+                . '", which derives the budget from the model context window. '
+                . 'This task is deprecated and does nothing unless the mode is "fixed".');
+            return;
+        }
         $result = prompt_metrics_logger::apply_recommendation();
         if ($result['applied']) {
             mtrace(sprintf(

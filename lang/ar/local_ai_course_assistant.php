@@ -1159,8 +1159,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = 'الضبط اليومي التلقائي لميزانية موجّه النظام (مهجور)';
+$string['settings:prompt_budget_auto_tune_desc'] = 'مهجور. لا يفعل شيئًا إلا إذا كان وضع الميزانية أعلاه مضبوطًا على <strong>ثابت</strong>. كانت مهمة يومية تستنتج ميزانية الأحرف بمراقبة القصّ ومطاردة أكبر موجّه رأته. أمّا اشتقاق الميزانية من نافذة سياق النموذج فيؤدي ذلك على نحو أفضل: فهو لا يتذبذب ولا يحتاج بيانات تسخين. كما تعارض الاثنان، لأن المهمة تكتب ميزانية الأحرف وأي قيمة غير الافتراضية تُبطل الميزانية المشتقّة. اترك هذا مُعطّلًا؛ وسيُحذف في إصدار قادم. ولا تزال التوصية تظهر في صفحة <a href="/local/ai_course_assistant/prompt_metrics.php">مقاييس الموجّه</a>.';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1942,3 +1942,5 @@ $string['quizlock:scope'] = 'مدى امتداد القفل';
 $string['quizlock:scope_course'] = 'هذه المادة فقط (موصى به)';
 $string['quizlock:scope_site'] = 'كل المواد';
 $string['quizlock:scope_desc'] = 'ما إذا كانت محاولة جارية تمنع [[tutorshort]] في المادة التي تحتوي على الاختبار فقط، أم في كل مكان. <strong>هذه المادة فقط</strong> هو الافتراضي وهو المناسب في الغالب. أمّا الامتداد لكل الموقع فكان السلوك حتى الإصدار 7.2.4، وله عطب يستحق المعرفة: المحاولة المهجورة تبقى «جارية» إلى الأبد، فمحاولة منسية واحدة في سجل المتعلّم كانت تعطّل المساعد في كل مادة يدرسها، دون أي توضيح على الشاشة. كما أن الامتداد لكل الموقع لا يضيف إلا القليل أمام متعلّم مصمّم على الغش، إذ يملك متصفحًا ثانيًا، ومواد المساعد واسترجاعه محصوران بالمادة أصلًا.';
+
+$string['settings:prompt_budget_tuner_conflict'] = 'مهمة الضبط التلقائي المهجورة لميزانية الموجّه مُشغّلة في حين أن وضع الميزانية مضبوط على الاشتقاق من النموذج. والاثنان متعارضان: فالمهمة تكتب ميزانية الأحرف، وأي قيمة غير الافتراضية تُقرأ كاختيار متعمّد، وهذا يُبطل الميزانية المشتقّة. المهمة الآن تتوقف من تلقاء نفسها في هذا الوضع، فلا شيء يُكتب فوقه — لكن أوقفها لإزالة الالتباس.';
