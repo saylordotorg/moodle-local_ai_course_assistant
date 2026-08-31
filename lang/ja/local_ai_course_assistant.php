@@ -1159,8 +1159,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = 'システムプロンプト予算の毎日の自動調整（非推奨）';
+$string['settings:prompt_budget_auto_tune_desc'] = '非推奨です。上の予算モードが<strong>固定</strong>に設定されていない限り、何も行いません。以前は毎日のタスクが、切り詰めを監視してそれまでに見た最大のプロンプトを追いかけることで文字数予算を推定していました。モデルのコンテキストウィンドウから予算を導出するほうが優れています。振動せず、助走用のデータも要りません。さらに両者は衝突していました。このタスクが文字数予算を書き込み、既定値以外の値は導出された予算を無効にするからです。オフのままにしてください。将来のリリースで削除されます。推奨値は引き続き<a href="/local/ai_course_assistant/prompt_metrics.php">プロンプト指標</a>ページに表示されます。';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1948,3 +1948,5 @@ $string['quizlock:scope'] = 'ロックが及ぶ範囲';
 $string['quizlock:scope_course'] = 'このコースのみ（推奨）';
 $string['quizlock:scope_site'] = 'すべてのコース';
 $string['quizlock:scope_desc'] = '進行中の受験が [[tutorshort]] を止める範囲を、小テストのあるコースだけにするか、どこでも止めるかを指定します。<strong>このコースのみ</strong>が既定で、ほとんどの場合こちらが適切です。サイト全体は v7.2.4 までの動作で、知っておく価値のある不具合がありました。放棄された受験は永久に「進行中」のままなので、学習者の履歴のどこかにある忘れられた小テスト一つが、その人の受講するすべてのコースでアシスタントを無効にし、しかも画面には理由が何も出ませんでした。サイト全体にしても、別のブラウザーを持つ本気の学習者にはほとんど効果がなく、アシスタントの教材も検索も元々コース単位です。';
+
+$string['settings:prompt_budget_tuner_conflict'] = '非推奨のプロンプト予算の自動調整タスクが有効になっていますが、予算モードはモデルから導出する設定になっています。この二つは衝突します。タスクが文字数予算を書き込み、既定値以外の値は意図的な選択と解釈されるため、導出された予算が無効になるからです。このモードではタスクが自分で停止するようになったので上書きは起きていませんが、あいまいさをなくすためオフにしてください。';

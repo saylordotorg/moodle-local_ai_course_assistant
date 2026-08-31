@@ -1198,8 +1198,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = 'כיול יומי אוטומטי של תקציב הנחיית המערכת (מיושן)';
+$string['settings:prompt_budget_auto_tune_desc'] = 'מיושן. אינו עושה דבר אלא אם מצב התקציב שלמעלה מוגדר כ<strong>קבוע</strong>. משימה יומית הסיקה את תקציב התווים על ידי מעקב אחר קטיעות ורדיפה אחר ההנחיה הגדולה ביותר שראתה. גזירת התקציב מחלון ההקשר של המודל עושה זאת טוב יותר: היא אינה מתנדנדת ואינה זקוקה לנתוני התחלה. השניים גם התנגשו, כי המשימה כותבת את תקציב התווים, וכל ערך שאינו ברירת המחדל מבטל את התקציב הנגזר. השאירו זאת כבוי; יוסר בגרסה עתידית. ההמלצה עדיין מופיעה בעמוד <a href="/local/ai_course_assistant/prompt_metrics.php">מדדי הנחיה</a>.';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1980,3 +1980,5 @@ $string['quizlock:scope'] = 'עד לאן הנעילה מגיעה';
 $string['quizlock:scope_course'] = 'קורס זה בלבד (מומלץ)';
 $string['quizlock:scope_site'] = 'כל הקורסים';
 $string['quizlock:scope_desc'] = 'האם ניסיון פעיל חוסם את [[tutorshort]] רק בקורס שמכיל את הבוחן, או בכל מקום. <strong>קורס זה בלבד</strong> הוא ברירת המחדל וכמעט תמיד מה שתרצו. חסימה כלל-אתרית הייתה ההתנהגות עד גרסה 7.2.4, והיה לה כשל שכדאי להכיר: ניסיון נטוש נשאר «בתהליך» לנצח, ולכן בוחן שכוח אחד אי-שם בהיסטוריה של לומד השבית את העוזר בכל קורס שלו, בלי שום הסבר על המסך. חסימה כלל-אתרית מוסיפה מעט מאוד מול לומד נחוש שיש לו דפדפן שני, וחומרי הקורס והאחזור של העוזר מוגבלים לקורס ממילא.';
+
+$string['settings:prompt_budget_tuner_conflict'] = 'משימת הכיול האוטומטי המיושנת של תקציב ההנחיה פעילה בעוד מצב התקציב מוגדר להיגזר מהמודל. השניים מתנגשים: המשימה כותבת את תקציב התווים, וכל ערך שאינו ברירת המחדל נקרא כבחירה מכוונת, מה שמבטל את התקציב הנגזר. המשימה נסוגה כעת מעצמה במצב הזה, כך שדבר אינו נדרס — אך כבו אותה כדי להסיר את אי-הבהירות.';

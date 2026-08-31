@@ -1182,8 +1182,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = '每日自动调整系统提示词预算（已弃用）';
+$string['settings:prompt_budget_auto_tune_desc'] = '已弃用。除非上方的预算模式设为<strong>固定</strong>，否则本项不起作用。过去有一个每日任务，通过观察截断情况并追逐它见过的最大提示词来推断字符预算。由模型的上下文窗口推导预算做得更好：它不会来回摆动，也不需要预热数据。两者还会互相冲突，因为该任务会写入字符预算，而任何非默认值都会关闭推导出的预算。请保持关闭；将在未来版本中移除。建议值仍会显示在<a href="/local/ai_course_assistant/prompt_metrics.php">提示词指标</a>页面上。';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1977,3 +1977,5 @@ $string['quizlock:scope'] = '锁定的覆盖范围';
 $string['quizlock:scope_course'] = '仅本课程（推荐）';
 $string['quizlock:scope_site'] = '所有课程';
 $string['quizlock:scope_desc'] = '进行中的答题是仅在包含该测验的课程中阻止 [[tutorshort]]，还是在所有地方都阻止。<strong>仅本课程</strong>为默认值，几乎总是你想要的。全站范围是 v7.2.4 之前的行为，它有一个值得了解的缺陷：被放弃的答题会永远停留在“进行中”，因此学习者历史记录中某个被遗忘的测验，就会让助手在他所修的每一门课程中失效，而屏幕上没有任何说明。对于铁了心要作弊、手边就有第二个浏览器的学习者，全站范围几乎没有帮助，而助手的课程材料与检索本来就以课程为界。';
+
+$string['settings:prompt_budget_tuner_conflict'] = '已弃用的提示词预算自动调整任务处于开启状态，而预算模式却设为由模型推导。两者相互冲突：该任务会写入字符预算，而任何非默认值都会被视为有意的选择，从而关闭推导出的预算。在此模式下该任务现在会自行停止，因此并没有东西被覆盖——但仍请将其关闭，以消除歧义。';

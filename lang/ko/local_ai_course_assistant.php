@@ -1159,8 +1159,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = '시스템 프롬프트 예산 매일 자동 조정(사용 중단)';
+$string['settings:prompt_budget_auto_tune_desc'] = '사용이 중단되었습니다. 위의 예산 모드가 <strong>고정</strong>으로 설정된 경우가 아니면 아무 일도 하지 않습니다. 예전에는 매일 실행되는 작업이 잘림을 관찰하고 지금까지 본 가장 큰 프롬프트를 뒤쫓아 문자 예산을 추정했습니다. 모델의 컨텍스트 윈도에서 예산을 산출하는 편이 더 낫습니다. 진동하지 않고 준비 데이터도 필요 없습니다. 게다가 둘은 충돌했습니다. 이 작업이 문자 예산을 기록하는데, 기본값이 아닌 값은 산출된 예산을 꺼버리기 때문입니다. 꺼둔 채로 두십시오. 향후 릴리스에서 제거됩니다. 권장값은 <a href="/local/ai_course_assistant/prompt_metrics.php">프롬프트 지표</a> 페이지에 계속 표시됩니다.';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1948,3 +1948,5 @@ $string['quizlock:scope'] = '잠금이 미치는 범위';
 $string['quizlock:scope_course'] = '이 강좌만(권장)';
 $string['quizlock:scope_site'] = '모든 강좌';
 $string['quizlock:scope_desc'] = '진행 중인 응시가 [[tutorshort]]을(를) 퀴즈가 있는 강좌에서만 막을지, 모든 곳에서 막을지 정합니다. <strong>이 강좌만</strong>이 기본값이며 거의 언제나 적절한 선택입니다. 사이트 전체는 v7.2.4까지의 동작으로, 알아둘 만한 결함이 있었습니다. 중단된 응시는 영원히 ‘진행 중’으로 남기 때문에, 학습자 이력 어딘가에 잊힌 퀴즈 하나가 그 사람이 수강하는 모든 강좌에서 어시스턴트를 꺼버렸고, 화면에는 이유가 전혀 표시되지 않았습니다. 사이트 전체로 막아도 두 번째 브라우저를 가진 작정한 학습자에게는 거의 효과가 없으며, 어시스턴트의 강좌 자료와 검색은 원래 강좌 단위입니다.';
+
+$string['settings:prompt_budget_tuner_conflict'] = '사용이 중단된 프롬프트 예산 자동 조정 작업이 켜져 있는데, 예산 모드는 모델에서 산출하도록 설정되어 있습니다. 두 가지는 충돌합니다. 작업이 문자 예산을 기록하고, 기본값이 아닌 값은 의도적인 선택으로 읽혀 산출된 예산을 꺼버립니다. 이 모드에서 작업은 이제 스스로 물러나므로 덮어써지는 것은 없지만, 모호함을 없애려면 꺼두십시오.';

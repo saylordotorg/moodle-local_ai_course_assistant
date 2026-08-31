@@ -344,6 +344,29 @@ if ($hassiteconfig) {
         '0'
     ));
 
+    // Both budget banners below render through $OUTPUT. Declared here rather
+    // than beside either one: they are 130 lines apart and whichever came
+    // second would silently get a null if this were attached to the first.
+    global $OUTPUT;
+
+    // v4.12.0: structured prompt budget + verbosity controls.
+    //
+    // v7.2.6: the mode select and the truncation warning now sit with the
+    // budget they describe. v7.2.4 added the mode select next to the
+    // cost-anomaly settings, 2,165 lines away, while its own description told
+    // the reader to look at "the character budget below" -- which was above it,
+    // in a different section, and unfindable without searching.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/prompt_budget_mode',
+        get_string('settings:prompt_budget_mode', 'local_ai_course_assistant'),
+        get_string('settings:prompt_budget_mode_desc', 'local_ai_course_assistant'),
+        'auto',
+        [
+            'auto' => get_string('settings:prompt_budget_mode_auto', 'local_ai_course_assistant'),
+            'fixed' => get_string('settings:prompt_budget_mode_fixed', 'local_ai_course_assistant'),
+        ]
+    ));
+
     // v4.12.0: structured prompt budget + verbosity controls.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/prompt_budget_chars',
@@ -352,6 +375,21 @@ if ($hassiteconfig) {
         '36000',
         PARAM_INT
     ));
+
+    $trunclast = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
+    if ($trunclast > 0 && (time() - $trunclast) < (7 * DAYSECS)) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_truncation_warning',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str(
+                    'settings:prompt_truncated_warning',
+                    userdate($trunclast)
+                ),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
     // v5.10.0: backend context window (max_model_len) for self-hosted/small
     // backends. 0 = hosted/unlimited (no clamping). When set, the system-prompt
     // character budget above is clamped so the prompt fits the token window.
@@ -436,12 +474,43 @@ if ($hassiteconfig) {
         get_string('settings:prompt_metrics_enabled_desc', 'local_ai_course_assistant'),
         '1'
     ));
+    // v7.2.6: DEPRECATED. The tuner infers a ceiling by watching for truncation
+    // and chasing the largest prompt it has seen; the v7.2.4 derived budget
+    // reads the model's context window directly. The second is strictly better
+    // -- it cannot oscillate, cannot chase noise, and needs no warm-up samples.
+    //
+    // Worse than redundant, the two collide. The tuner writes
+    // prompt_budget_chars, and resolve_budget_chars() treats any value other
+    // than the default as a deliberate administrator decision and stops
+    // deriving. So on a site with both enabled the tuner's first write silently
+    // switches the derived budget off. Found on Saylor production, where both
+    // were on and neither site's budget was the default.
+    //
+    // The task now stands down in auto mode, so the collision cannot happen
+    // even if this stays ticked. Kept for one release so nobody's configuration
+    // changes under them; scheduled for removal after that.
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/prompt_budget_auto_tune',
         get_string('settings:prompt_budget_auto_tune', 'local_ai_course_assistant'),
-        get_string('settings:prompt_budget_auto_tune_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::str('settings:prompt_budget_auto_tune_desc'),
         '0'
     ));
+
+    // Warn only when both are actually on: a deprecation notice that fires for
+    // everyone is noise, and this page already has a lot of it.
+    if (
+        (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune')
+        && (string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
+    ) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_budget_tuner_conflict',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str('settings:prompt_budget_tuner_conflict'),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/prompt_verbosity',
@@ -2509,37 +2578,6 @@ if ($hassiteconfig) {
         '50',
         PARAM_INT
     ));
-
-    $settings->add(new admin_setting_configselect(
-        'local_ai_course_assistant/prompt_budget_mode',
-        get_string('settings:prompt_budget_mode', 'local_ai_course_assistant'),
-        get_string('settings:prompt_budget_mode_desc', 'local_ai_course_assistant'),
-        'auto',
-        [
-            'auto' => get_string('settings:prompt_budget_mode_auto', 'local_ai_course_assistant'),
-            'fixed' => get_string('settings:prompt_budget_mode_fixed', 'local_ai_course_assistant'),
-        ]
-    ));
-
-    // v7.2.3: warn when the assembler has recently had to cut retrieved course
-    // content. Truncation used to be visible only in the prompt debug log, which
-    // is off by default, so a budget too small to hold the prompt shipped twice
-    // without an administrator having any way to see it happening.
-    global $OUTPUT;
-    $trunclast = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
-    if ($trunclast > 0 && (time() - $trunclast) < (7 * DAYSECS)) {
-        $settings->add(new admin_setting_description(
-            'local_ai_course_assistant/prompt_truncation_warning',
-            '',
-            $OUTPUT->notification(
-                \local_ai_course_assistant\branding::str(
-                    'settings:prompt_truncated_warning',
-                    userdate($trunclast)
-                ),
-                \core\output\notification::NOTIFY_WARNING
-            )
-        ));
-    }
 
     // v7.2.1: PARAM_FLOAT rejected "25.50" (it cleans to 25.5, and configtext
     // compares the cleaned value to the input as a string) while happily storing
