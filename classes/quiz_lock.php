@@ -180,6 +180,51 @@ class quiz_lock {
     }
 
     /**
+     * Record that a request was refused because of an open attempt.
+     *
+     * The lock is an academic-integrity control, so the event an integrity
+     * review most needs is the one the log did not have: a learner tried to use
+     * the assistant during an open attempt and was turned away. The audit
+     * vocabulary held four actions and none of them covered it, so a blocked
+     * turn was indistinguishable from an ordinary one after the fact.
+     *
+     * Called at the points that actually refuse, not from is_locked_for():
+     * that is also called on every page render to decide whether to grey the
+     * composer, and logging there would record a row for merely opening a
+     * course page.
+     *
+     * @param int $userid
+     * @param int $courseid Course the request was made from.
+     * @param \stdClass|null $attempt Row from active_attempt(), when the caller
+     *        has one. Carries the attempt and quiz this refusal relates to.
+     * @param string $surface Which entry point refused, e.g. 'chat', 'quiz'.
+     * @return void
+     */
+    public static function record_refusal(
+        int $userid,
+        int $courseid,
+        ?\stdClass $attempt = null,
+        string $surface = 'chat'
+    ): void {
+        // Best-effort: a refusal must not become an error because the audit
+        // write failed. The refusal itself has already happened either way.
+        try {
+            audit_logger::log('quiz_lock_refused', $userid, $courseid, [
+                'surface' => $surface,
+                'scope' => self::scope(),
+                // The attempt is what an integrity review would query on.
+                'attempt_id' => $attempt ? (int) $attempt->id : null,
+                'quiz_id' => $attempt ? (int) $attempt->quizid : null,
+                'quiz_cmid' => $attempt ? (int) $attempt->cmid : null,
+                'quiz_courseid' => $attempt ? (int) $attempt->courseid : null,
+                'quiz_name' => $attempt ? (string) $attempt->quizname : null,
+            ]);
+        } catch (\Throwable $e) {
+            debugging('quiz_lock refusal audit failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+    }
+
+    /**
      * Convenience wrapper.
      *
      * @param int $userid

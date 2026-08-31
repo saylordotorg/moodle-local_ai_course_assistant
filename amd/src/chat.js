@@ -4562,7 +4562,9 @@ define([
         });
         panel.appendChild(cancelBtn);
 
-        drawer.appendChild(panel);
+        // Same mount rule as every other runtime panel: above the input area,
+        // not appended past the footer and the bottom nav.
+        UI.mountPanel(drawer, panel);
     };
 
     /**
@@ -4686,7 +4688,7 @@ define([
         content.appendChild(clearSection);
 
         panel.appendChild(content);
-        drawer.appendChild(panel);
+        UI.mountPanel(drawer, panel);
     };
 
     /**

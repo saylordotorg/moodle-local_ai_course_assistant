@@ -482,8 +482,19 @@ try {
     // No is_siteadmin() carve-out: base_provider refuses admins too since
     // v7.2.4, so exempting them here only replaces a clear explanation with a
     // generic provider error.
-    if (!CLI_SCRIPT && !empty($USER->id)
-            && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id, (int) $courseid)) {
+    $lockedattempt = (!CLI_SCRIPT && !empty($USER->id))
+        ? \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, (int) $courseid)
+        : null;
+    if ($lockedattempt !== null) {
+        // v7.2.7: record the refusal. Without this the audit log cannot tell a
+        // blocked turn from an ordinary one, which is the single row an
+        // academic-integrity review would want.
+        \local_ai_course_assistant\quiz_lock::record_refusal(
+            (int) $USER->id,
+            (int) $courseid,
+            $lockedattempt,
+            'chat'
+        );
         local_ai_course_assistant_sse_send([
             // branding::str, not get_string: the string carries a [[tutorshort]]
             // token and the SSE token path does no brand resolution, so a bare

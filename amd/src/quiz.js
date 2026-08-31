@@ -254,7 +254,10 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             });
             panel.appendChild(cancelBtn);
 
-            container.appendChild(panel);
+            // Into the content flow, not the drawer root: appending puts the
+            // panel after the footer and the bottom nav, which is what made the
+            // quiz setup render below both.
+            UI.mountPanel(container, panel);
             return;
         }).catch(function() {
             // Silently fail.
@@ -295,7 +298,7 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
 
         const quizEl = document.createElement('div');
         quizEl.className = 'aica-quiz';
-        container.appendChild(quizEl);
+        UI.mountPanel(container, quizEl);
 
         const renderCurrent = function() {
             quizEl.innerHTML = '';
@@ -718,7 +721,10 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             });
             panel.appendChild(cancelBtn);
 
-            container.appendChild(panel);
+            // Into the content flow, not the drawer root: appending puts the
+            // panel after the footer and the bottom nav, which is what made the
+            // quiz setup render below both.
+            UI.mountPanel(container, panel);
             return;
         }).catch(function() { /**/ });
     };
