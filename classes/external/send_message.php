@@ -34,6 +34,17 @@ use local_ai_course_assistant\rag_retriever;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class send_message extends external_api {
+
+    /**
+     * Interaction type recorded for rows written by this endpoint.
+     *
+     * sse.php takes this from an `interaction_type` request parameter and
+     * defaults it to 'chat'. This endpoint does not accept that parameter, so
+     * it writes the same default explicitly -- rows from the two paths have to
+     * be comparable in token analytics and the audit trail, and until v7.2.7
+     * this one passed null and raised a TypeError instead.
+     */
+    private const INTERACTION_TYPE = 'chat';
     /**
      * Parameter definition.
      *
@@ -74,10 +85,56 @@ class send_message extends external_api {
         require_capability('local/ai_course_assistant:use', $context);
 
         $userid = $USER->id;
+
+        // v7.2.7: an internal failure must not travel to the caller verbatim.
+        // The TypeError this endpoint raised on every call arrived at the client
+        // complete with the class name and the dirroot path of the file that
+        // threw. A moodle_exception is deliberate operator-facing text -- the
+        // quiz lock, the emergency stop, the spend cap all use it -- so those
+        // are re-thrown unchanged; anything else is logged in full server-side
+        // and reported generically.
+        try {
+            return self::handle($params, $userid);
+        } catch (\moodle_exception $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            debugging(
+                'send_message failed: ' . get_class($e) . ': ' . $e->getMessage()
+                    . ' at ' . $e->getFile() . ':' . $e->getLine(),
+                DEBUG_DEVELOPER
+            );
+            return [
+                'response' => \local_ai_course_assistant\branding::str('chat:turn_failed'),
+                'success' => false,
+            ];
+        }
+    }
+
+    /**
+     * The body of the request, so execute() can be a thin error boundary.
+     *
+     * @param array $params Validated parameters.
+     * @param int $userid
+     * @return array
+     */
+    private static function handle(array $params, int $userid): array {
         $conv = conversation_manager::get_or_create_conversation($userid, $params['courseid']);
 
         // Save user message.
-        conversation_manager::add_message($conv->id, $userid, $params['courseid'], 'user', $params['message']);
+        conversation_manager::add_message(
+            $conv->id,
+            $userid,
+            $params['courseid'],
+            'user',
+            $params['message'],
+            0,
+            '',
+            null,
+            null,
+            null,
+            self::INTERACTION_TYPE,
+            ((int) $params['pageid']) ?: null
+        );
 
         // RAG retrieval.
         // v5.4.6: time the retrieve call so we can attribute it to the assistant row.
@@ -123,10 +180,33 @@ class send_message extends external_api {
         $history = \local_ai_course_assistant\history_selector::select_for_api($conv->id, $params['message']);
 
         // Get AI response.
-        $provider = base_provider::create_from_config();
+        //
+        // v7.2.7: the courseid was missing. Without it this path ignored every
+        // per-course provider and model override -- 30 courses carry one in
+        // production, so the mobile fallback was silently answering with the
+        // site default while the widget used the course's chosen model. It also
+        // scoped the spend cap and the quiz lock to course 0 rather than to the
+        // course the learner is actually in.
+        $effectivecfg = \local_ai_course_assistant\course_config_manager::get_effective_config(
+            (int) $params['courseid']
+        );
+        $provider = base_provider::create_from_config((int) $params['courseid']);
         $response = $provider->chat_completion($systemprompt, $history);
+        $tokenusage = $provider->get_last_token_usage();
 
         // Save assistant response.
+        //
+        // v7.2.7: argument 11 is $interactiontype, which is typed `string` and
+        // was being passed an explicit null -- a TypeError on every single call,
+        // thrown AFTER the provider request had completed and been billed. The
+        // endpoint has therefore never returned a reply to anyone; it charged
+        // for one and raised.
+        //
+        // The remaining arguments were 0/''/null, so even had it worked the row
+        // would have carried no tokens, no provider and no model: invisible to
+        // token analytics and to every cost report. Matched to what sse.php
+        // writes for an equivalent turn so rows from the two paths are
+        // comparable.
         conversation_manager::add_message(
             $conv->id,
             $userid,
@@ -134,13 +214,16 @@ class send_message extends external_api {
             'assistant',
             $response,
             0,
-            '',
-            null,
-            null,
-            null,
-            null,
-            null,
-            $raglatencyms
+            (string) ($effectivecfg['provider']
+                ?? get_config('local_ai_course_assistant', 'provider')),
+            $tokenusage['prompt_tokens'] ?? null,
+            $tokenusage['completion_tokens'] ?? null,
+            $tokenusage['model'] ?? null,
+            self::INTERACTION_TYPE,
+            ((int) $params['pageid']) ?: null,
+            $raglatencyms,
+            $tokenusage['cached_tokens'] ?? null,
+            'complete'
         );
 
         return [

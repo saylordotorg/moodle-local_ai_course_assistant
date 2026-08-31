@@ -45,6 +45,48 @@ define(['core/ajax'], function(Ajax) {
                 return;
             }
 
+            // Seal the rest of the widget while consent is pending.
+            //
+            // Staging found the banner's own CTA sitting directly over the
+            // footer's "Send feedback" control, and a single click reaching
+            // both: a first-run learner's very first action granted consent and
+            // opened a feedback form. Covering the footer geometrically is not
+            // enough on its own, because that depends on a stacking context
+            // that anything else in the widget can change. `inert` removes the
+            // region from pointer, focus and assistive-tech reachability
+            // outright, which is the property actually wanted.
+            var root = banner.parentElement;
+            var sealed = [];
+            if (root) {
+                root.classList.add('aica-consent-pending');
+                Array.prototype.forEach.call(root.children, function(child) {
+                    if (child === banner) {
+                        return;
+                    }
+                    // Remember what was already inert so releasing does not
+                    // switch on something the widget had deliberately disabled.
+                    sealed.push([child, child.hasAttribute('inert')]);
+                    child.setAttribute('inert', '');
+                });
+            }
+
+            /**
+             * Let the rest of the widget take input again.
+             *
+             * @returns {void}
+             */
+            var release = function() {
+                if (root) {
+                    root.classList.remove('aica-consent-pending');
+                }
+                sealed.forEach(function(pair) {
+                    if (!pair[1]) {
+                        pair[0].removeAttribute('inert');
+                    }
+                });
+                sealed = [];
+            };
+
             var unlocked = false;
 
             /**
@@ -108,6 +150,7 @@ define(['core/ajax'], function(Ajax) {
                     args: {}
                 }])[0].always(function() {
                     banner.style.display = 'none';
+                    release();
                 });
             });
         }

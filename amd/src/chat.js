@@ -1674,11 +1674,47 @@ define([
         els.sendBtn.addEventListener('click', handleSend);
 
         // Input events.
-        els.input.addEventListener('keydown', handleInputKeydown);
-        els.input.addEventListener('input', function() {
-            UI.autoResizeInput();
-            UI.updateSendButton();
-        });
+        //
+        // Guarded, and delegated as well, because of a staging report that Enter
+        // did not send while the arrow button did. That pair of symptoms has
+        // exactly one shape: els.input was null, the unguarded addEventListener
+        // below threw, and every binding AFTER this point was silently lost --
+        // the send button binds three lines earlier and so survived. The handler
+        // itself has been correct since the initial commit and is present in the
+        // shipped bundle, so the wiring is the only thing left that can fail.
+        //
+        // The root cause was not reproducible off staging. Rather than guess,
+        // this makes the failure loud instead of silent, and keeps Enter working
+        // through the root even if the direct binding is ever lost.
+        if (els.input) {
+            els.input.addEventListener('keydown', handleInputKeydown);
+            els.input.addEventListener('input', function() {
+                UI.autoResizeInput();
+                UI.updateSendButton();
+            });
+        } else if (window.console && window.console.warn) {
+            window.console.warn(
+                '[SOLA] composer textarea not found; Enter-to-send and auto-resize are unavailable. '
+                + 'Expected .local-ai-course-assistant__input inside the widget root.'
+            );
+        }
+
+        // Delegated fallback on the widget root. The root outlives any re-render
+        // of the composer, so this survives what a direct binding would not.
+        // Guarded against double-send when the direct binding is also live.
+        if (els.root) {
+            els.root.addEventListener('keydown', function(e) {
+                if (e.key !== 'Enter' || e.shiftKey || e.defaultPrevented) {
+                    return;
+                }
+                var t = e.target;
+                if (!t || !t.classList
+                        || !t.classList.contains('local-ai-course-assistant__input')) {
+                    return;
+                }
+                handleInputKeydown(e);
+            });
+        }
 
         // Clear button.
         if (els.clearBtn) {
