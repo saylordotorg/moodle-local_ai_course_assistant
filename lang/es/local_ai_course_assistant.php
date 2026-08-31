@@ -1618,9 +1618,9 @@ $string['privacy:metadata:zendesk:message'] = 'El contenido del mensaje o la con
 $string['privacy:metadata:radar_webhook'] = 'Cuando se configura la entrega de Learning Radar a un webhook de Slack o Microsoft Teams, el informe generado se publica en ese punto de conexión externo.';
 $string['privacy:metadata:radar_webhook:report'] = 'El contenido del informe de Learning Radar, que puede hacer referencia a la actividad del estudiante en el curso.';
 $string['instructor_dashboard:navlink'] = 'Panel del tutor de AI';
-$string['analytics_js:total_students'] = 'Total de estudiantes';
+$string['analytics_js:total_students'] = 'Total matriculados';
 $string['analytics_js:active_ai_users'] = 'Usuarios activos de AI';
-$string['analytics_js:msgs_per_student'] = 'Mensajes / estudiante';
+$string['analytics_js:msgs_per_student'] = 'Mens. / usuario activo';
 $string['analytics_js:avg_session'] = 'Sesión promedio';
 $string['analytics_js:return_rate'] = 'Tasa de retorno';
 $string['analytics_js:total_sessions'] = 'Total de sesiones';
@@ -1971,3 +1971,8 @@ $string['quizlock:scope_site'] = 'Todos los cursos';
 $string['quizlock:scope_desc'] = 'Si un intento en curso bloquea [[tutorshort]] solo en el curso que contiene el cuestionario o en todas partes. <strong>Solo este curso</strong> es el valor predeterminado y casi siempre es lo que quieres. En todo el sitio fue el comportamiento hasta la v7.2.4 y tenía un fallo que conviene conocer: un intento abandonado sigue «en curso» para siempre, así que un único cuestionario olvidado en el historial de una persona desactivaba el asistente en todos sus cursos, sin nada en pantalla que lo explicara. En todo el sitio aporta muy poco frente a quien está decidido a copiar, que tiene un segundo navegador, y el material y la recuperación del asistente ya están acotados al curso.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'La tarea obsoleta de ajuste automático del presupuesto del prompt está activada mientras el modo de presupuesto está configurado para derivarse del modelo. Ambos entran en conflicto: la tarea escribe el presupuesto de caracteres y cualquier valor distinto del predeterminado se lee como una elección deliberada, lo que desactiva el presupuesto derivado. La tarea ahora se retira por sí sola en este modo, así que no se está sobrescribiendo nada, pero desactívala para eliminar la ambigüedad.';
+
+$string['settings:prompt_budget_no_window'] = 'El modo de presupuesto de arriba está configurado para derivarse del modelo, pero no hay nada de donde derivarlo: el modelo de chat no está definido y no se ha configurado ninguna ventana de contexto del backend, así que la derivación recurre al presupuesto fijo de caracteres de abajo. Define el modelo de chat, o configura la ventana de contexto del backend a mano, y después vuelve a ejecutar la autocomprobación del backend y confirma que la comprobación de la ventana de contexto pasa. Hasta entonces, el presupuesto es el número de abajo, diga lo que diga el modo.';
+
+$string['analytics_js:section'] = 'Sección';
+$string['analytics_js:course'] = 'Course';

@@ -1650,9 +1650,9 @@ $string['privacy:metadata:zendesk:message'] = 'Umlayezo noma okuqukethwe kwengxo
 $string['privacy:metadata:radar_webhook'] = 'Uma ukulethwa kwe-Learning Radar ku-webhook ye-Slack noma ye-Microsoft Teams kumisiwe, umbiko okhiqiziwe uthunyelwa kuleso siphetho sangaphandle.';
 $string['privacy:metadata:radar_webhook:report'] = 'Okuqukethwe kombiko we-Learning Radar, okungase kubhekise emsebenzini womfundi esifundweni.';
 $string['instructor_dashboard:navlink'] = 'Ideshibhodi Kathisha we-AI';
-$string['analytics_js:total_students'] = 'Isamba Sabafundi';
+$string['analytics_js:total_students'] = 'Isamba sababhalisile';
 $string['analytics_js:active_ai_users'] = 'Abasebenzisi be-AI Abasebenzayo';
-$string['analytics_js:msgs_per_student'] = 'Imilayezo / Umfundi';
+$string['analytics_js:msgs_per_student'] = 'Imilayezo / umsebenzisi okhuthele';
 $string['analytics_js:avg_session'] = 'Iseshini Emaphakathi';
 $string['analytics_js:return_rate'] = 'Izinga Lokubuya';
 $string['analytics_js:total_sessions'] = 'Isamba Samaseshini';
@@ -2003,3 +2003,8 @@ $string['quizlock:scope_site'] = 'Zonke izifundo';
 $string['quizlock:scope_desc'] = 'Ukuthi umzamo osaqhubeka uvimbela i-[[tutorshort]] esifundweni esiqukethe isivivinyo kuphela, noma yonke indawo. <strong>Lesi sifundo kuphela</strong> yikho okuzenzakalelayo futhi cishe njalo yikho okufunayo. Isayithi lonke bekuyindlela ebisebenza kuze kufike ku-v7.2.4 futhi inenkinga okufanele uyazi: umzamo oshiyiwe uhlala «usaqhubeka» phakade, ngakho isivivinyo esisodwa esikhohliwe kwesinye isikhathi emlandweni womfundi besicisha umsizi kuzo zonke izifundo azithathayo, kungekho lutho esikrinini oluchazayo. Isayithi lonke linikeza okuncane kakhulu kumfundi ozimisele ukukopela, onesiphequluli sesibili, futhi izinto zesifundo nokusesha komsizi sekuvele kuvalelwe esifundweni.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Umsebenzi wokulungisa okuzenzakalelayo kwesabelomali sesicelo osuyekiwe uvulekile, kanti imodi yesabelomali imisiwe ukuthi itholakale kumodeli. Lokhu kubili kushayisana: umsebenzi ubhala isabelomali sezinhlamvu, futhi noma yiliphi inani elingelona elizenzakalelayo lifundwa njengokukhetha okuhlosiwe, okucisha isabelomali esitholakele. Umsebenzi manje uyahoxa ngokwawo kule modi, ngakho akukho okubhalwa phezu kwako — kodwa uwucishe ukususa ukungaqiniseki.';
+
+$string['settings:prompt_budget_no_window'] = 'Imodi yesabelomali engenhla isethelwe ukuthi ithathwe kumodeli, kodwa akukho okungathathwa kukho: imodeli yengxoxo ayisethiwe futhi newindi lomongo lengemuva alilungiselelwanga, ngakho lokho kuthathwa kubuyela esabelweni sezinhlamvu esimisiwe esingezansi. Setha imodeli yengxoxo, noma usethe iwindi lomongo lengemuva ngesandla, bese uphinda usebenzise ukuzihlola kwengemuva futhi uqinisekise ukuthi ukuhlolwa kwewindi lomongo kuyaphumelela. Kuze kube yilapho, isabelomali yinombolo engezansi, noma ngabe imodi ithini.';
+
+$string['analytics_js:section'] = 'Ingxenye';
+$string['analytics_js:course'] = 'Course';

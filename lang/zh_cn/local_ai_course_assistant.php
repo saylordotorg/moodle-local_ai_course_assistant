@@ -1626,9 +1626,9 @@ $string['privacy:metadata:zendesk:message'] = '学习者选择升级的消息或
 $string['privacy:metadata:radar_webhook'] = '当配置了 Learning Radar 向 Slack 或 Microsoft Teams webhook 的投递时，生成的报告会被发布到该外部端点。';
 $string['privacy:metadata:radar_webhook:report'] = 'Learning Radar 报告内容，其中可能涉及学习者在课程中的活动。';
 $string['instructor_dashboard:navlink'] = 'AI 辅导助手仪表盘';
-$string['analytics_js:total_students'] = '学生总数';
+$string['analytics_js:total_students'] = '注册总人数';
 $string['analytics_js:active_ai_users'] = '活跃 AI 用户';
-$string['analytics_js:msgs_per_student'] = '消息数／学生';
+$string['analytics_js:msgs_per_student'] = '消息数 / 活跃用户';
 $string['analytics_js:avg_session'] = '平均会话';
 $string['analytics_js:return_rate'] = '回访率';
 $string['analytics_js:total_sessions'] = '会话总数';
@@ -1979,3 +1979,8 @@ $string['quizlock:scope_site'] = '所有课程';
 $string['quizlock:scope_desc'] = '进行中的答题是仅在包含该测验的课程中阻止 [[tutorshort]]，还是在所有地方都阻止。<strong>仅本课程</strong>为默认值，几乎总是你想要的。全站范围是 v7.2.4 之前的行为，它有一个值得了解的缺陷：被放弃的答题会永远停留在“进行中”，因此学习者历史记录中某个被遗忘的测验，就会让助手在他所修的每一门课程中失效，而屏幕上没有任何说明。对于铁了心要作弊、手边就有第二个浏览器的学习者，全站范围几乎没有帮助，而助手的课程材料与检索本来就以课程为界。';
 
 $string['settings:prompt_budget_tuner_conflict'] = '已弃用的提示词预算自动调整任务处于开启状态，而预算模式却设为由模型推导。两者相互冲突：该任务会写入字符预算，而任何非默认值都会被视为有意的选择，从而关闭推导出的预算。在此模式下该任务现在会自行停止，因此并没有东西被覆盖——但仍请将其关闭，以消除歧义。';
+
+$string['settings:prompt_budget_no_window'] = '上方的预算模式设置为从模型推导，但没有可供推导的依据：聊天模型未设置，后端上下文窗口也未配置，因此推导会退回到下方的固定字符预算。请设置聊天模型，或手动设置后端上下文窗口，然后重新运行后端自检并确认上下文窗口检查通过。在此之前，无论模式声称什么，预算都是下方的这个数字。';
+
+$string['analytics_js:section'] = '章节';
+$string['analytics_js:course'] = 'Course';

@@ -1651,9 +1651,9 @@ $string['privacy:metadata:zendesk:message'] = 'Maudhui ya ujumbe au mazungumzo a
 $string['privacy:metadata:radar_webhook'] = 'Wakati uwasilishaji wa Learning Radar kwa webhook ya Slack au Microsoft Teams umewekwa, ripoti iliyotengenezwa huchapishwa kwenye kituo hicho cha nje.';
 $string['privacy:metadata:radar_webhook:report'] = 'Maudhui ya ripoti ya Learning Radar, ambayo yanaweza kurejelea shughuli za mwanafunzi katika kozi.';
 $string['instructor_dashboard:navlink'] = 'Dashibodi ya Mkufunzi wa AI';
-$string['analytics_js:total_students'] = 'Jumla ya Wanafunzi';
+$string['analytics_js:total_students'] = 'Jumla waliojiandikisha';
 $string['analytics_js:active_ai_users'] = 'Watumiaji Hai wa AI';
-$string['analytics_js:msgs_per_student'] = 'Jumbe / Mwanafunzi';
+$string['analytics_js:msgs_per_student'] = 'Ujumbe / mtumiaji hai';
 $string['analytics_js:avg_session'] = 'Wastani wa Kipindi';
 $string['analytics_js:return_rate'] = 'Kiwango cha Kurudi';
 $string['analytics_js:total_sessions'] = 'Jumla ya Vipindi';
@@ -2004,3 +2004,8 @@ $string['quizlock:scope_site'] = 'Kozi zote';
 $string['quizlock:scope_desc'] = 'Iwapo jaribio linaloendelea linazuia [[tutorshort]] katika kozi yenye jaribio pekee, au kila mahali. <strong>Kozi hii pekee</strong> ndicho chaguo-msingi na karibu kila mara ndicho unachotaka. Tovuti nzima ndio ilikuwa tabia hadi v7.2.4 na ilikuwa na hitilafu inayostahili kujulikana: jaribio lililoachwa hubaki «linaendelea» milele, hivyo jaribio moja lililosahaulika mahali fulani katika historia ya mwanafunzi lilizima msaidizi katika kila kozi anayosoma, bila chochote skrini kueleza kwa nini. Tovuti nzima haitoi manufaa mengi dhidi ya mwanafunzi aliyeazimia kudanganya, mwenye kivinjari cha pili, na maudhui ya kozi na utafutaji wa msaidizi tayari yamefungwa kwenye kozi.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Kazi iliyoachwa ya kurekebisha kiotomatiki bajeti ya kidokezo imewashwa, ilhali hali ya bajeti imewekwa ipatikane kutoka kwa modeli. Hizi mbili zinapingana: kazi hii huandika bajeti ya herufi, na thamani yoyote isipokuwa ile chaguo-msingi husomwa kama chaguo la kukusudia, ambalo huzima bajeti iliyopatikana. Kazi hii sasa hujiondoa yenyewe katika hali hii, hivyo hakuna kinachoandikwa juu yake — lakini izime ili kuondoa utata.';
+
+$string['settings:prompt_budget_no_window'] = 'Hali ya bajeti hapo juu imewekwa itokane na modeli, lakini hakuna cha kuitolea: modeli ya mazungumzo haijawekwa na dirisha la muktadha la seva halijasanidiwa, kwa hivyo utoaji unarudi kwenye bajeti thabiti ya herufi iliyo hapa chini. Weka modeli ya mazungumzo, au weka dirisha la muktadha la seva kwa mkono, kisha endesha tena kijitihada cha seva na uthibitishe kuwa ukaguzi wa dirisha la muktadha unapita. Hadi wakati huo, bajeti ni namba iliyo hapa chini, hali iseme lolote.';
+
+$string['analytics_js:section'] = 'Sehemu';
+$string['analytics_js:course'] = 'Course';

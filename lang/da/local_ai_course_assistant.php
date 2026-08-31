@@ -1591,9 +1591,9 @@ $string['privacy:metadata:zendesk:message'] = 'Beskeden eller samtaleindholdet, 
 $string['privacy:metadata:radar_webhook'] = 'Når levering af Learning Radar til en Slack- eller Microsoft Teams-webhook er konfigureret, sendes den genererede rapport til det eksterne endepunkt.';
 $string['privacy:metadata:radar_webhook:report'] = 'Indholdet af Learning Radar-rapporten, som kan henvise til lærendes aktivitet i kurset.';
 $string['instructor_dashboard:navlink'] = 'AI-vejleder-dashboard';
-$string['analytics_js:total_students'] = 'Studerende i alt';
+$string['analytics_js:total_students'] = 'Tilmeldte i alt';
 $string['analytics_js:active_ai_users'] = 'Aktive AI-brugere';
-$string['analytics_js:msgs_per_student'] = 'Beskeder / studerende';
+$string['analytics_js:msgs_per_student'] = 'Beskeder / aktiv bruger';
 $string['analytics_js:avg_session'] = 'Gns. session';
 $string['analytics_js:return_rate'] = 'Tilbagevendingsrate';
 $string['analytics_js:total_sessions'] = 'Sessioner i alt';
@@ -1944,3 +1944,8 @@ $string['quizlock:scope_site'] = 'Alle kurser';
 $string['quizlock:scope_desc'] = 'Om et igangværende forsøg blokerer [[tutorshort]] kun på kurset med quizzen eller alle steder. <strong>Kun dette kursus</strong> er standard og er næsten altid det, du vil have. Hele siden var adfærden til og med v7.2.4 og havde en fejltilstand, der er værd at kende: et forladt forsøg bliver ved med at være i gang for altid, så en enkelt glemt quiz et sted i den studerendes historik slog assistenten fra på hvert eneste kursus, uden noget på skærmen der forklarede hvorfor. Hele siden giver meget lidt over for en studerende, der er fast besluttet på at snyde og har en browser mere, og assistentens kursusmateriale og opslag er kursusafgrænsede i forvejen.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Den udfasede opgave til automatisk justering af promptbudgettet er slået til, mens budgettilstanden er sat til at udlede fra modellen. De to er i konflikt: opgaven skriver tegnbudgettet, og enhver værdi ud over standardværdien læses som et bevidst valg, hvilket slår det udledte budget fra. Opgaven trækker sig nu selv i denne tilstand, så intet bliver overskrevet — men slå den fra for at fjerne tvetydigheden.';
+
+$string['settings:prompt_budget_no_window'] = 'Budgettilstanden ovenfor er sat til at udlede fra modellen, men der er intet at udlede fra: chatmodellen er ikke angivet, og der er ikke konfigureret et kontekstvindue for backenden, så udledningen falder tilbage til det faste tegnbudget nedenfor. Angiv chatmodellen, eller angiv backendens kontekstvindue manuelt, kør derefter backendens selvtest igen og bekræft, at kontekstvindue-kontrollen består. Indtil da er budgettet det tal, der står nedenfor, uanset hvad tilstanden hævder.';
+
+$string['analytics_js:section'] = 'Sektion';
+$string['analytics_js:course'] = 'Course';

@@ -1590,9 +1590,9 @@ $string['privacy:metadata:zendesk:message'] = 'Det meddelande eller konversation
 $string['privacy:metadata:radar_webhook'] = 'När leverans av Learning Radar till en webhook i Slack eller Microsoft Teams är konfigurerad, publiceras den genererade rapporten till den externa slutpunkten.';
 $string['privacy:metadata:radar_webhook:report'] = 'Innehållet i Learning Radar-rapporten, som kan hänvisa till studentaktivitet i kursen.';
 $string['instructor_dashboard:navlink'] = 'AI-handledarpanel';
-$string['analytics_js:total_students'] = 'Totalt antal studenter';
+$string['analytics_js:total_students'] = 'Totalt registrerade';
 $string['analytics_js:active_ai_users'] = 'Aktiva AI-användare';
-$string['analytics_js:msgs_per_student'] = 'Medd. / student';
+$string['analytics_js:msgs_per_student'] = 'Medd. / aktiv användare';
 $string['analytics_js:avg_session'] = 'Genomsn. session';
 $string['analytics_js:return_rate'] = 'Återkomstfrekvens';
 $string['analytics_js:total_sessions'] = 'Totalt antal sessioner';
@@ -1943,3 +1943,8 @@ $string['quizlock:scope_site'] = 'Alla kurser';
 $string['quizlock:scope_desc'] = 'Om ett pågående försök blockerar [[tutorshort]] bara i kursen som innehåller quizet, eller överallt. <strong>Endast den här kursen</strong> är standard och är nästan alltid det du vill ha. Hela webbplatsen var beteendet till och med v7.2.4 och hade ett fel som är värt att känna till: ett övergivet försök står kvar som pågående för alltid, så ett enda bortglömt quiz någonstans i en students historik stängde av assistenten i varje kurs personen läste, utan att något på skärmen förklarade varför. Hela webbplatsen ger väldigt lite mot en student som är fast besluten att fuska och har en andra webbläsare, och assistentens kursmaterial och sökning är ändå kursavgränsade.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Den utfasade uppgiften för automatisk justering av promptbudgeten är påslagen medan budgetläget är satt att härledas från modellen. De två står i konflikt: uppgiften skriver teckenbudgeten, och varje värde utom standardvärdet läses som ett medvetet val, vilket stänger av den härledda budgeten. Uppgiften drar sig nu tillbaka av sig själv i detta läge, så inget skrivs över — men stäng av den för att få bort tvetydigheten.';
+
+$string['settings:prompt_budget_no_window'] = 'Budgetläget ovan är inställt på att härledas från modellen, men det finns inget att härleda från: chattmodellen är inte angiven och inget kontextfönster för backend är konfigurerat, så härledningen faller tillbaka på den fasta teckenbudgeten nedan. Ange chattmodellen, eller ange backendens kontextfönster manuellt, kör sedan backendens självtest igen och bekräfta att kontrollen av kontextfönstret går igenom. Fram till dess är budgeten talet nedan, vad läget än påstår.';
+
+$string['analytics_js:section'] = 'Avsnitt';
+$string['analytics_js:course'] = 'Course';

@@ -1621,9 +1621,9 @@ $string['privacy:metadata:zendesk:message'] = 'Saqo ko abun cikin tattaunawa da 
 $string['privacy:metadata:radar_webhook'] = 'Lokacin da aka saita isar da Learning Radar zuwa webhook na Slack ko Microsoft Teams, ana buga rahoton da aka samar zuwa wannan wurin waje.';
 $string['privacy:metadata:radar_webhook:report'] = 'Abun cikin rahoton Learning Radar, wanda zai iya nuni ga ayyukan xalibi cikin kwas.';
 $string['instructor_dashboard:navlink'] = 'Dashboard na Mai Koyarwa na AI';
-$string['analytics_js:total_students'] = 'Jimillar Xalibai';
+$string['analytics_js:total_students'] = 'Jimillar masu rajista';
 $string['analytics_js:active_ai_users'] = 'Masu Amfani da AI Masu Aiki';
-$string['analytics_js:msgs_per_student'] = 'Saqonni / Xalibi';
+$string['analytics_js:msgs_per_student'] = 'Saƙonni / mai amfani mai aiki';
 $string['analytics_js:avg_session'] = 'Matsakaicin Zama';
 $string['analytics_js:return_rate'] = 'Yawan Dawowa';
 $string['analytics_js:total_sessions'] = 'Jimillar Zaman';
@@ -1974,3 +1974,8 @@ $string['quizlock:scope_site'] = 'Duk kwasa-kwasan';
 $string['quizlock:scope_desc'] = 'Ko wani yunkuri da ake ci gaba da shi zai hana [[tutorshort]] a kwas din da ke dauke da jarrabawar kadai, ko a ko\'ina. <strong>Wannan kwas kadai</strong> shi ne tsoho kuma kusan koyaushe shi ake so. Duk shafin shi ne halin har zuwa v7.2.4, kuma yana da matsalar da ya kamata a sani: yunkurin da aka yi watsi da shi yana ci gaba da kasancewa «ana ci gaba» har abada, don haka jarrabawa guda daya da aka manta a tarihin dalibi tana kashe mataimakin a kowane kwas dinsa, ba tare da wani bayani a allo ba. Duk shafin ba ya kawo komai sosai a kan dalibin da ya kudurta yin damfara, tunda yana da wani burauza na biyu, kuma abin da mataimakin ke koyarwa da bincikensa duk sun tsaya kan kwas daya.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Aikin daidaita kasafin umarni ta atomatik da aka yi watsi da shi yana kunne, yayin da yanayin kasafin an saita shi don cirowa daga samfurin. Su biyu suna karo: aikin yana rubuta kasafin haruffa, kuma duk wani darajar da ba ta tsoho ba ana karanta ta a matsayin zabi da aka yi da gangan, wanda ke kashe kasafin da aka ciro. Aikin yanzu yana tsayawa da kansa a wannan yanayin, don haka ba a rubuta kan komai — amma ka kashe shi don kawar da shakku.';
+
+$string['settings:prompt_budget_no_window'] = 'Yanayin kasafin da ke sama an saita shi don a ciro shi daga samfurin, amma babu abin da za a ciro daga gare shi: ba a saita samfurin hira ba kuma ba a saita tagar mahallin bayan-gida ba, don haka cirowar tana komawa ga kasafin haruffa tsayayye da ke kasa. Ka saita samfurin hira, ko ka saita tagar mahallin bayan-gida da hannu, sannan ka sake gudanar da gwajin kai na bayan-gida ka tabbatar cewa binciken tagar mahalli ya wuce. Har sai lokacin, kasafin shi ne adadin da ke kasa, ko me yanayin ya ce.';
+
+$string['analytics_js:section'] = 'Sashe';
+$string['analytics_js:course'] = 'Course';

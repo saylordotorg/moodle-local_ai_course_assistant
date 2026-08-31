@@ -1621,9 +1621,9 @@ $string['privacy:metadata:zendesk:message'] = 'Cikan walima baro kɔnɔfɛn kala
 $string['privacy:metadata:radar_webhook'] = 'Ni Learning Radar cili Slack walima Microsoft Teams webhook ma labɛnna, rapɔɔri dilannen bɛ bila o kɛnɛma yɔrɔ la.';
 $string['privacy:metadata:radar_webhook:report'] = 'Learning Radar rapɔɔri kɔnɔfɛn, min bɛ se ka kalanden ka baara jira kalansen kɔnɔ.';
 $string['instructor_dashboard:navlink'] = 'AI Karamɔgɔ Ɲɛnabɔyɔrɔ';
-$string['analytics_js:total_students'] = 'Kalandenw Bɛɛ Lajɛlen';
+$string['analytics_js:total_students'] = 'Tɔgɔsɛbɛnnenw bɛɛ lajɛlen';
 $string['analytics_js:active_ai_users'] = 'AI Baarakɛla Ɲɛnamaw';
-$string['analytics_js:msgs_per_student'] = 'Cikanw / Kalanden';
+$string['analytics_js:msgs_per_student'] = 'Cikanw / baarakɛla bɛrɛ';
 $string['analytics_js:avg_session'] = 'Baaraɲɛnabɔ Cɛmancɛ';
 $string['analytics_js:return_rate'] = 'Seginni Hakɛ';
 $string['analytics_js:total_sessions'] = 'Baaraɲɛnabɔw Bɛɛ Lajɛlen';
@@ -1974,3 +1974,8 @@ $string['quizlock:scope_site'] = 'Kalanso bɛɛ';
 $string['quizlock:scope_desc'] = 'Ni kɔrɔbɔli min bɛ senna b’a bali [[tutorshort]] ma kalanso min b’a kɔnɔ dɔrɔn na, walima yɔrɔ bɛɛ. <strong>Nin kalanso dɔrɔn</strong> de ye a ta ye ka a laadi, o de bɛ ɲini tuma caman. Sitiwu bɛɛ tun ye cogo ye fo v7.2.4, nka a tun ye baasi ye min ka kan ka dɔn: kɔrɔbɔli min bilala kɛ, o bɛ to «senna» abada, o la kɔrɔbɔli kelen ɲinɛnen kalanden ka kɔfɛko la, o tun bɛ dɛmɛbaga faga a ka kalanso bɛɛ kɔnɔ, ɲɛfɔli si tɛ ekran kan. Sitiwu bɛɛ tɛ nafa caman di kalanden min y’a latigɛ ka namara, katuguni sɛbɛnnikɛlan filanan b’a bolo, ani dɛmɛbaga ka kalanko ni a ka ɲinini bɛɛ bɛ kalanso kelen dɔrɔn na.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Ɲininkali-budzɛ yɛrɛlabɛn baara min bilala, o bɛ senna, nka budzɛ cogoya sigilen bɛ bɔ modɛli la. Nin fila bɛ ɲɔgɔn kɛlɛ: baara bɛ sɛbɛnden hakɛ budzɛ sɛbɛn, ani hakɛ o hakɛ min tɛ a ta ye, o bɛ jate i n\'a fɔ latigɛli, o bɛ budzɛ bɔlen na. Baara bɛ yɛrɛ jɔ sisan nin cogoya la, o la foyi tɛ sɛbɛn a nɔ na — nka a faga walisa siga bɛɛ ka ban.';
+
+$string['settings:prompt_budget_no_window'] = 'Budzɛ cogoya min bɛ sanfɛ, o sigilen don ka bɔ modɛli la, nka fɛn si tɛ yen a bɛ bɔ min na: baro modɛli ma sigi ani kɔfɛla kɔnɔkow palanjɛ ma latigɛ, o la bɔli bɛ segin sɛbɛnden hakɛ budzɛ sigilen kan duguma. Baro modɛli sigi, walima kɔfɛla kɔnɔkow palanjɛ sigi i bolo la, o kɔ, kɔfɛla yɛrɛsɛgɛsɛgɛli kɛ tugun ka a lajɛ ko kɔnɔkow palanjɛ sɛgɛsɛgɛli tɛmɛna. Fo o waati, budzɛ ye hakɛ min bɛ duguma ye, cogoya bɛ fɛn o fɛn fɔ.';
+
+$string['analytics_js:section'] = 'Yɔrɔ';
+$string['analytics_js:course'] = 'Course';

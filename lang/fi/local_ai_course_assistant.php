@@ -1591,9 +1591,9 @@ $string['privacy:metadata:zendesk:message'] = 'Viesti tai keskustelusisältö, j
 $string['privacy:metadata:radar_webhook'] = 'Kun Learning Radar -toimitus Slack- tai Microsoft Teams -webhookiin on määritetty, luotu raportti lähetetään kyseiseen ulkoiseen päätepisteeseen.';
 $string['privacy:metadata:radar_webhook:report'] = 'Learning Radar -raportin sisältö, joka voi viitata oppijan toimintaan kurssilla.';
 $string['instructor_dashboard:navlink'] = 'AI-ohjaajan hallintanäkymä';
-$string['analytics_js:total_students'] = 'Opiskelijoita yhteensä';
+$string['analytics_js:total_students'] = 'Ilmoittautuneita yhteensä';
 $string['analytics_js:active_ai_users'] = 'Aktiivisia AI-käyttäjiä';
-$string['analytics_js:msgs_per_student'] = 'Viestejä / opiskelija';
+$string['analytics_js:msgs_per_student'] = 'Viestit / aktiivinen käyttäjä';
 $string['analytics_js:avg_session'] = 'Istunnon keskikesto';
 $string['analytics_js:return_rate'] = 'Paluuprosentti';
 $string['analytics_js:total_sessions'] = 'Istuntoja yhteensä';
@@ -1944,3 +1944,8 @@ $string['quizlock:scope_site'] = 'Kaikki kurssit';
 $string['quizlock:scope_desc'] = 'Estääkö kesken oleva yritys [[tutorshort]]in vain tentin sisältävällä kurssilla vai kaikkialla. <strong>Vain tämä kurssi</strong> on oletus ja lähes aina se, mitä haluat. Koko sivusto oli toiminta versioon v7.2.4 asti, ja siinä oli tuntemisen arvoinen vikatila: hylätty yritys jää ikuisesti kesken, joten yksi unohtunut tentti jossain opiskelijan historiassa poisti avustajan käytöstä jokaisella hänen kurssillaan, eikä ruudulla ollut mitään selitystä. Koko sivusto tuo hyvin vähän päättäväistä opiskelijaa vastaan, jolla on toinen selain, ja avustajan kurssimateriaali ja haku ovat muutenkin kurssikohtaisia.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Vanhentunut kehotebudjetin automaattiviritystehtävä on päällä, kun budjettitila on asetettu johtamaan arvo mallista. Nämä kaksi ovat ristiriidassa: tehtävä kirjoittaa merkkibudjetin, ja mikä tahansa oletuksesta poikkeava arvo luetaan tarkoitukselliseksi valinnaksi, mikä kytkee johdetun budjetin pois. Tehtävä vetäytyy nyt itse tässä tilassa, joten mitään ei korvata — kytke se silti pois, niin epäselvyys poistuu.';
+
+$string['settings:prompt_budget_no_window'] = 'Yllä oleva budjettitila on asetettu johtamaan arvo mallista, mutta johdettavaa ei ole: keskustelumallia ei ole asetettu eikä taustapalvelun konteksti-ikkunaa ole määritetty, joten johtaminen palaa alla olevaan kiinteään merkkibudjettiin. Aseta keskustelumalli tai aseta taustapalvelun konteksti-ikkuna käsin, aja sitten taustapalvelun itsetesti uudelleen ja varmista, että konteksti-ikkunan tarkistus menee läpi. Siihen asti budjetti on alla oleva luku, väittipä tila mitä tahansa.';
+
+$string['analytics_js:section'] = 'Osio';
+$string['analytics_js:course'] = 'Course';

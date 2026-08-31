@@ -1626,9 +1626,9 @@ $string['privacy:metadata:zendesk:message'] = 'Nội dung tin nhắn hoặc cu�
 $string['privacy:metadata:radar_webhook'] = 'Khi cấu hình gửi Learning Radar đến webhook của Slack hoặc Microsoft Teams, báo cáo được tạo sẽ được đăng lên điểm cuối bên ngoài đó.';
 $string['privacy:metadata:radar_webhook:report'] = 'Nội dung báo cáo Learning Radar, có thể tham chiếu đến hoạt động của học viên trong khóa học.';
 $string['instructor_dashboard:navlink'] = 'Bảng điều khiển Trợ giảng AI';
-$string['analytics_js:total_students'] = 'Tổng số học viên';
+$string['analytics_js:total_students'] = 'Tổng số ghi danh';
 $string['analytics_js:active_ai_users'] = 'Người dùng AI đang hoạt động';
-$string['analytics_js:msgs_per_student'] = 'Tin nhắn / Học viên';
+$string['analytics_js:msgs_per_student'] = 'Tin nhắn / người dùng hoạt động';
 $string['analytics_js:avg_session'] = 'Phiên trung bình';
 $string['analytics_js:return_rate'] = 'Tỷ lệ quay lại';
 $string['analytics_js:total_sessions'] = 'Tổng số phiên';
@@ -1979,3 +1979,8 @@ $string['quizlock:scope_site'] = 'Tất cả khóa học';
 $string['quizlock:scope_desc'] = 'Một lượt làm bài đang mở sẽ chặn [[tutorshort]] chỉ trong khóa học chứa bài kiểm tra, hay ở mọi nơi. <strong>Chỉ khóa học này</strong> là mặc định và gần như luôn là điều bạn muốn. Toàn trang là cách hoạt động cho tới v7.2.4 và có một lỗi đáng biết: lượt làm bài bị bỏ dở vẫn ở trạng thái đang làm mãi mãi, nên chỉ một bài kiểm tra bị quên đâu đó trong lịch sử của người học sẽ tắt trợ lý trong mọi khóa học họ tham gia, mà màn hình không hề giải thích lý do. Toàn trang mang lại rất ít trước một người học quyết tâm gian lận, vốn có sẵn trình duyệt thứ hai, còn tài liệu và truy xuất của trợ lý dù sao cũng chỉ giới hạn trong khóa học.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Tác vụ tự động điều chỉnh ngân sách lời nhắc đã bị loại bỏ nhưng đang bật, trong khi chế độ ngân sách được đặt để suy ra từ mô hình. Hai điều này xung đột: tác vụ ghi ngân sách ký tự, và bất kỳ giá trị nào khác mặc định đều được hiểu là lựa chọn có chủ ý, khiến ngân sách suy ra bị tắt. Ở chế độ này tác vụ giờ tự lùi lại, nên không có gì bị ghi đè — nhưng hãy tắt nó để loại bỏ sự mơ hồ.';
+
+$string['settings:prompt_budget_no_window'] = 'Chế độ ngân sách ở trên được đặt để suy ra từ mô hình, nhưng không có gì để suy ra: mô hình trò chuyện chưa được đặt và cũng chưa cấu hình cửa sổ ngữ cảnh của backend, nên việc suy ra quay về ngân sách ký tự cố định bên dưới. Hãy đặt mô hình trò chuyện, hoặc đặt cửa sổ ngữ cảnh của backend theo cách thủ công, rồi chạy lại phần tự kiểm tra backend và xác nhận rằng kiểm tra cửa sổ ngữ cảnh đạt. Cho đến lúc đó, ngân sách chính là con số bên dưới, bất kể chế độ nói gì.';
+
+$string['analytics_js:section'] = 'Phần';
+$string['analytics_js:course'] = 'Course';

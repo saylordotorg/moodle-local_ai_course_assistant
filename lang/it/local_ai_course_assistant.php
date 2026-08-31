@@ -1636,9 +1636,9 @@ $string['privacy:metadata:zendesk:message'] = 'Il messaggio o il contenuto della
 $string['privacy:metadata:radar_webhook'] = 'Quando è configurata la consegna di Learning Radar a un webhook di Slack o Microsoft Teams, il report generato viene pubblicato su quell\'endpoint esterno.';
 $string['privacy:metadata:radar_webhook:report'] = 'Il contenuto del report di Learning Radar, che può fare riferimento all\'attività del discente nel corso.';
 $string['instructor_dashboard:navlink'] = 'Dashboard del tutor AI';
-$string['analytics_js:total_students'] = 'Studenti totali';
+$string['analytics_js:total_students'] = 'Totale iscritti';
 $string['analytics_js:active_ai_users'] = 'Utenti AI attivi';
-$string['analytics_js:msgs_per_student'] = 'Msg / studente';
+$string['analytics_js:msgs_per_student'] = 'Msg / utente attivo';
 $string['analytics_js:avg_session'] = 'Sessione media';
 $string['analytics_js:return_rate'] = 'Tasso di ritorno';
 $string['analytics_js:total_sessions'] = 'Sessioni totali';
@@ -1989,3 +1989,8 @@ $string['quizlock:scope_site'] = 'Tutti i corsi';
 $string['quizlock:scope_desc'] = 'Se un tentativo in corso blocca [[tutorshort]] solo nel corso che contiene il quiz o ovunque. <strong>Solo questo corso</strong> è l’impostazione predefinita ed è quasi sempre quella giusta. L’intero sito era il comportamento fino alla v7.2.4 e aveva un guasto che vale la pena conoscere: un tentativo abbandonato resta «in corso» per sempre, quindi un solo quiz dimenticato nella cronologia di uno studente disattivava l’assistente in ogni suo corso, senza nulla a schermo che lo spiegasse. L’intero sito serve a poco contro chi è deciso a copiare, che ha un secondo browser, e il materiale e il recupero dell’assistente sono comunque limitati al corso.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'L\'attività deprecata di regolazione automatica del budget del prompt è attiva mentre la modalità di budget è impostata per derivare dal modello. Le due cose sono in conflitto: l\'attività scrive il budget di caratteri e qualsiasi valore diverso da quello predefinito viene letto come una scelta deliberata, il che disattiva il budget derivato. L\'attività ora si ritira da sola in questa modalità, quindi non viene sovrascritto nulla — ma disattivala per togliere ogni ambiguità.';
+
+$string['settings:prompt_budget_no_window'] = 'La modalità di budget qui sopra è impostata per derivare dal modello, ma non c\'è nulla da cui derivare: il modello di chat non è impostato e non è configurata alcuna finestra di contesto del backend, quindi la derivazione ripiega sul budget di caratteri fisso qui sotto. Imposta il modello di chat, oppure imposta a mano la finestra di contesto del backend, poi riesegui l\'autotest del backend e verifica che il controllo della finestra di contesto vada a buon fine. Fino ad allora il budget è il numero qui sotto, qualunque cosa dichiari la modalità.';
+
+$string['analytics_js:section'] = 'Section';
+$string['analytics_js:course'] = 'Course';

@@ -1644,9 +1644,9 @@ $string['privacy:metadata:zendesk:message'] = 'Kandungan mesej atau perbualan ya
 $string['privacy:metadata:radar_webhook'] = 'Apabila penghantaran Learning Radar ke webhook Slack atau Microsoft Teams dikonfigurasikan, laporan yang dijana disiarkan ke titik akhir luaran tersebut.';
 $string['privacy:metadata:radar_webhook:report'] = 'Kandungan laporan Learning Radar, yang mungkin merujuk aktiviti pelajar dalam kursus.';
 $string['instructor_dashboard:navlink'] = 'Papan Pemuka Tutor AI';
-$string['analytics_js:total_students'] = 'Jumlah Pelajar';
+$string['analytics_js:total_students'] = 'Jumlah pendaftaran';
 $string['analytics_js:active_ai_users'] = 'Pengguna AI Aktif';
-$string['analytics_js:msgs_per_student'] = 'Mesej / Pelajar';
+$string['analytics_js:msgs_per_student'] = 'Mesej / pengguna aktif';
 $string['analytics_js:avg_session'] = 'Purata Sesi';
 $string['analytics_js:return_rate'] = 'Kadar Kembali';
 $string['analytics_js:total_sessions'] = 'Jumlah Sesi';
@@ -1997,3 +1997,8 @@ $string['quizlock:scope_site'] = 'Semua kursus';
 $string['quizlock:scope_desc'] = 'Sama ada percubaan yang sedang berjalan menyekat [[tutorshort]] hanya dalam kursus yang mengandungi kuiz itu, atau di mana-mana. <strong>Kursus ini sahaja</strong> ialah tetapan lalai dan hampir selalu yang anda mahukan. Seluruh tapak ialah kelakuan sehingga v7.2.4 dan mempunyai kegagalan yang wajar diketahui: percubaan yang ditinggalkan kekal «sedang berjalan» selama-lamanya, jadi satu kuiz yang terlupa dalam sejarah pelajar melumpuhkan pembantu itu dalam setiap kursus yang diambilnya, tanpa apa-apa di skrin yang menerangkan sebabnya. Seluruh tapak memberi sedikit sahaja terhadap pelajar yang berazam menipu, yang mempunyai pelayar kedua, dan bahan kursus serta capaian pembantu itu memang terhad kepada kursus.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Tugas penalaan automatik bajet gesaan yang ditamatkan sedang dihidupkan sedangkan mod bajet ditetapkan untuk diterbitkan daripada model. Kedua-duanya bercanggah: tugas itu menulis bajet aksara, dan sebarang nilai selain lalai dibaca sebagai pilihan yang disengajakan, lalu mematikan bajet terbitan. Tugas itu kini berundur sendiri dalam mod ini, jadi tiada apa yang ditulis ganti — tetapi matikannya untuk menghapuskan kekaburan.';
+
+$string['settings:prompt_budget_no_window'] = 'Mod bajet di atas ditetapkan untuk diterbitkan daripada model, tetapi tiada apa-apa untuk diterbitkan daripadanya: model sembang belum ditetapkan dan tetingkap konteks bahagian belakang juga belum dikonfigurasikan, jadi penerbitan itu kembali kepada bajet aksara tetap di bawah. Tetapkan model sembang, atau tetapkan tetingkap konteks bahagian belakang secara manual, kemudian jalankan semula ujian kendiri bahagian belakang dan sahkan bahawa pemeriksaan tetingkap konteks lulus. Sehingga itu, bajetnya ialah nombor di bawah, walau apa pun yang dinyatakan oleh mod itu.';
+
+$string['analytics_js:section'] = 'Bahagian';
+$string['analytics_js:course'] = 'Course';

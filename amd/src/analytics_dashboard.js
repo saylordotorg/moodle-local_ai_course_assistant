@@ -289,7 +289,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         }
         var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-bycourse" height="' + Math.max(80, courses.length * 25) + '"></canvas></div></div>';
         html += '<table class="table table-sm table-striped sola-analytics-table"><thead><tr>' +
-            '<th>Course</th><th>Students</th><th>Messages</th><th>Msgs/Student</th><th>Return Rate</th><th>Avg Session</th>' +
+            '<th>' + esc(s('course')) + '</th>' + '<th>' + esc(s('active_ai_users')) + '</th>' + '<th>' + esc(s('messages')) + '</th>' + '<th>' + esc(s('msgs_per_student')) + '</th>' + '<th>' + esc(s('return_rate')) + '</th>' + '<th>' + esc(s('avg_session')) + '</th>' +
             '</tr></thead><tbody>';
         courses.forEach(function(c) {
             html += '<tr><td>' + esc(c.coursename || c.fullname || '') + '</td>' +
@@ -347,7 +347,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             return;
         }
         var html = '<div class="row mb-4"><div class="col-12"><canvas id="sola-chart-byunit" height="' + Math.max(80, units.length * 30) + '"></canvas></div></div>';
-        html += '<table class="table table-sm table-striped"><thead><tr><th>Section</th><th>Students</th><th>Messages</th><th>Msgs/Student</th></tr></thead><tbody>';
+        html += '<table class="table table-sm table-striped"><thead><tr>' + '<th>' + esc(s('section')) + '</th>' + '<th>' + esc(s('active_ai_users')) + '</th>' + '<th>' + esc(s('messages')) + '</th>' + '<th>' + esc(s('msgs_per_student')) + '</th>' + '</tr></thead><tbody>';
         units.forEach(function(u) {
             var avg = u.student_count > 0 ? (u.message_count / u.student_count).toFixed(1) : 0;
             html += '<tr><td>' + esc(u.section_name) + '</td><td>' + u.student_count + '</td><td>' + u.message_count + '</td><td>' + avg + '</td></tr>';
