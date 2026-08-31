@@ -201,12 +201,59 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $data->courseid = $this->task->get_courseid();
         unset($data->id);
 
-        // A course can only hold one configuration row. Restoring into a course
-        // that already has one must not create a second.
-        if ($DB->record_exists('local_ai_course_assistant_course_cfg', ['courseid' => $data->courseid])) {
+        $existing = $DB->get_record(
+            'local_ai_course_assistant_course_cfg',
+            ['courseid' => $data->courseid]
+        );
+        if (!$existing) {
+            // A course can only hold one configuration row.
+            $DB->insert_record('local_ai_course_assistant_course_cfg', $data);
             return;
         }
-        $DB->insert_record('local_ai_course_assistant_course_cfg', $data);
+
+        // v7.2.7: merge field by field instead of skipping the whole row.
+        //
+        // The previous guard returned as soon as ANY row existed, which lost the
+        // instructor's system prompt on every restore into a course that had
+        // ever opened its AI settings -- and a row survives having its fields
+        // cleared, so "no settings" and "no row" are not the same thing. The
+        // per-course *setting* path looked like it behaved differently only
+        // because clearing one of those deletes its config_plugins key outright,
+        // so there was nothing left to block the restore. Same intent, different
+        // storage, opposite outcome.
+        //
+        // That mattered because rolling a course into a new term is a restore:
+        // course-level prompt tuning was being discarded every term while every
+        // other SOLA setting survived.
+        //
+        // Field level keeps the original intent -- never overwrite a choice
+        // somebody has actually made -- while still filling in what the target
+        // has left empty. `enabled` is excluded deliberately: it is NOT NULL, so
+        // 0 means "switched off" and "never set" indistinguishably, and guessing
+        // wrong would silently turn the assistant on in a course that had turned
+        // it off.
+        $update = new \stdClass();
+        $update->id = $existing->id;
+        $changed = false;
+        foreach (['provider', 'model', 'systemprompt'] as $field) {
+            $incoming = isset($data->$field) ? (string) $data->$field : '';
+            $current = isset($existing->$field) ? (string) $existing->$field : '';
+            if ($incoming !== '' && $current === '') {
+                $update->$field = $incoming;
+                $changed = true;
+            }
+        }
+        // Nullable numeric: only null counts as unset, since 0.0 is a real
+        // temperature somebody may have chosen.
+        if (($existing->temperature ?? null) === null && ($data->temperature ?? null) !== null) {
+            $update->temperature = $data->temperature;
+            $changed = true;
+        }
+
+        if ($changed) {
+            $update->timemodified = time();
+            $DB->update_record('local_ai_course_assistant_course_cfg', $update);
+        }
     }
 
     /**

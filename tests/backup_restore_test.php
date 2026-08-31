@@ -546,4 +546,90 @@ final class backup_restore_test extends \advanced_testcase {
             $DB->count_records('local_ai_course_assistant_chunks', ['courseid' => $newid]),
             'the index is rebuilt by reindexing, not carried in every backup');
     }
+
+    /**
+     * A cleared-but-existing config row must not block the restore.
+     *
+     * Reported from staging: the per-course system prompt was written into the
+     * archive and never came back, while every other SOLA setting did. The row
+     * survives having its fields cleared, so "no settings" and "no row" are not
+     * the same thing -- and the old guard returned as soon as ANY row existed.
+     * Rolling a course into a new term is a restore, so instructor prompt tuning
+     * was being discarded every term.
+     */
+    public function test_a_cleared_config_row_still_receives_the_backup(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $src = $this->getDataGenerator()->create_course();
+        $dst = $this->getDataGenerator()->create_course();
+
+        $DB->insert_record('local_ai_course_assistant_course_cfg', (object) [
+            'courseid' => $src->id, 'enabled' => 1, 'provider' => 'claude',
+            'model' => 'claude-haiku-4-5', 'systemprompt' => 'QA-PROBE-7251',
+            'temperature' => '0.40000', 'timecreated' => time(), 'timemodified' => time(),
+        ]);
+        // The destination has opened its AI settings and then cleared them: a
+        // row exists, but every transferable field is empty. This is exactly the
+        // state the staging repro produced.
+        $DB->insert_record('local_ai_course_assistant_course_cfg', (object) [
+            'courseid' => $dst->id, 'enabled' => 0, 'provider' => '',
+            'model' => '', 'systemprompt' => '', 'temperature' => null,
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        $this->merge_restore_into((int) $src->id, (int) $dst->id);
+
+        $cfg = $DB->get_record('local_ai_course_assistant_course_cfg', ['courseid' => $dst->id]);
+        $this->assertNotFalse($cfg);
+        $this->assertSame('QA-PROBE-7251', $cfg->systemprompt,
+            'The system prompt was in the archive and did not come back.');
+        $this->assertSame('claude', $cfg->provider,
+            'provider travels in the same block and was lost with it.');
+        $this->assertSame('claude-haiku-4-5', $cfg->model);
+        $this->assertEquals(0.4, (float) $cfg->temperature);
+
+        // Still one row, not two.
+        $this->assertSame(1, $DB->count_records('local_ai_course_assistant_course_cfg',
+            ['courseid' => $dst->id]));
+    }
+
+    /**
+     * A choice somebody has actually made is still never overwritten.
+     *
+     * The original guard existed for a real reason. Field-level merge keeps that
+     * intent: it fills what the target left empty and leaves the rest alone.
+     */
+    public function test_an_existing_choice_is_not_overwritten(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $src = $this->getDataGenerator()->create_course();
+        $dst = $this->getDataGenerator()->create_course();
+
+        $DB->insert_record('local_ai_course_assistant_course_cfg', (object) [
+            'courseid' => $src->id, 'enabled' => 1, 'provider' => 'claude',
+            'model' => 'claude-haiku-4-5', 'systemprompt' => 'FROM-BACKUP',
+            'temperature' => '0.40000', 'timecreated' => time(), 'timemodified' => time(),
+        ]);
+        $DB->insert_record('local_ai_course_assistant_course_cfg', (object) [
+            'courseid' => $dst->id, 'enabled' => 0, 'provider' => 'openai',
+            'model' => '', 'systemprompt' => 'THE TEACHER WROTE THIS',
+            'temperature' => null, 'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        $this->merge_restore_into((int) $src->id, (int) $dst->id);
+
+        $cfg = $DB->get_record('local_ai_course_assistant_course_cfg', ['courseid' => $dst->id]);
+        $this->assertSame('THE TEACHER WROTE THIS', $cfg->systemprompt,
+            'A restore overwrote a prompt the destination course already had.');
+        $this->assertSame('openai', $cfg->provider);
+        // The empty field is the one that gets filled.
+        $this->assertSame('claude-haiku-4-5', $cfg->model);
+        // enabled is deliberately untouched: 0 means "off" and "never set"
+        // indistinguishably, so guessing would silently switch the assistant on.
+        $this->assertEquals(0, (int) $cfg->enabled);
+    }
 }
