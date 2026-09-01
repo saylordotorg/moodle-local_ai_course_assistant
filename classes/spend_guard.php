@@ -440,10 +440,16 @@ class spend_guard {
             }
             $parts = array_map('trim', explode('|', $cprow));
             if (strtolower($parts[0] ?? '') === strtolower($label) && !empty($parts[1])) {
+                // v7.2.8: the 3rd column is the row's model list
+                // (provider_id|api_key|model1,model2|temperature|baseurl). It was
+                // parsed for the LLM picker but dropped here, so a failover entry
+                // had no model of its own and inherited the primary's.
+                $rowmodels = array_values(array_filter(array_map('trim', explode(',', (string) ($parts[2] ?? '')))));
                 return [
                     'provider'   => strtolower($parts[0]),
                     'apikey'     => $parts[1],
                     'label'      => $label,
+                    'model'      => $rowmodels[0] ?? '',
                     'apibaseurl' => $parts[4] ?? '',
                 ];
             }

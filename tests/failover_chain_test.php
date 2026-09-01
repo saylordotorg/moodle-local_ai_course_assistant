@@ -76,17 +76,55 @@ final class failover_chain_test extends \advanced_testcase {
     }
 
     /**
-     * All entries fail: the last exception propagates out.
+     * All entries fail: the FIRST exception propagates, with a trail naming
+     * every attempt.
+     *
+     * Rethrowing the last error meant the surfaced message came from the end of
+     * the chain: a gemini primary that failed was reported as an openai "model
+     * not found", which points the administrator at a setting that is correct
+     * and hides the provider that actually broke.
      */
-    public function test_all_paths_fail_propagates_last_error(): void {
+    public function test_all_paths_fail_propagates_first_error_with_trail(): void {
         $this->resetAfterTest();
-        $primary = self::fake_provider('PRIMARY-OUT', true);
-        $fallback = self::fake_provider('FALLBACK-OUT', true);
+        $primary = self::failing_provider('primary boom');
+        $fallback = self::failing_provider('fallback boom');
         $chain = new failover_chain($primary, 'primary-label', [
             ['provider' => $fallback, 'label' => 'fallback-label'],
         ]);
-        $this->expectException(\Throwable::class);
-        $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+        try {
+            $chain->chat_completion('sys', [['role' => 'user', 'content' => 'hi']]);
+            $this->fail('expected the exhausted chain to throw');
+        } catch (\moodle_exception $e) {
+            $this->assertStringContainsString('primary boom', (string) $e->debuginfo);
+            $this->assertStringContainsString('primary-label', (string) $e->debuginfo);
+            $this->assertStringContainsString('fallback-label', (string) $e->debuginfo);
+            $this->assertStringContainsString('Failover chain exhausted', (string) $e->debuginfo);
+        }
+    }
+
+    /**
+     * Provider whose chat_completion always throws a distinguishable error.
+     *
+     * @param string $marker Text carried in the exception debuginfo.
+     * @return object
+     */
+    private static function failing_provider(string $marker): object {
+        return new class ($marker) implements provider_interface {
+            public int $callcount = 0;
+            public function __construct(private string $marker) {
+            }
+            public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+                $this->callcount++;
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $this->marker);
+            }
+            public function chat_completion_stream(string $systemprompt, array $messages, callable $cb, array $options = []): void {
+                $this->callcount++;
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $this->marker);
+            }
+            public function get_last_token_usage(): ?array {
+                return null;
+            }
+        };
     }
 
     /**

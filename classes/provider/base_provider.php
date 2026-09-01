@@ -182,6 +182,22 @@ abstract class base_provider implements provider_interface {
             $response = $curl->post($url, $body);
             $httpcode = $curl->get_info()['http_code'] ?? 0;
 
+            // v7.2.8: check the transport error before the HTTP status. On a
+            // connection-level failure (proxy refusal, DNS, TLS) curl returns no
+            // status at all, so http_code is 0, every branch of
+            // check_http_error() falls through, and the operator is told
+            // "HTTP 0" with the real reason discarded. The streaming path has
+            // always checked this; this one never did.
+            if ($curl->error) {
+                throw new \moodle_exception(
+                    'chat:error',
+                    'local_ai_course_assistant',
+                    '',
+                    null,
+                    'Transport error: ' . $curl->error
+                );
+            }
+
             $this->check_http_error($httpcode, $response);
 
             return $response;
@@ -528,8 +544,28 @@ abstract class base_provider implements provider_interface {
                             // a row that didn't set one.
                             unset($entryoverrides['apibaseurl']);
                         }
+                        // v7.2.8: do not carry the primary's model onto a
+                        // different provider. $overrides (and, when it is empty,
+                        // the global `model` setting read in the constructor)
+                        // meant an openai fallback behind a gemini primary was
+                        // asked for "gemini-2.5-flash" and answered HTTP 404
+                        // "model not found" -- so the failover could never
+                        // succeed, and the error blamed a model name that was
+                        // correct. Prefer the model column of the
+                        // comparison_providers row; otherwise let the fallback
+                        // use its own default.
+                        if (!empty($entry['model'])) {
+                            $entryoverrides['model'] = $entry['model'];
+                        } else {
+                            unset($entryoverrides['model']);
+                        }
+                        $fallbackprovider = self::instantiate($entry['provider'], $entryoverrides);
+                        if (empty($entry['model'])
+                                && strtolower((string) $entry['provider']) !== strtolower((string) $provider)) {
+                            $fallbackprovider->use_default_model();
+                        }
                         $fallbacks[] = [
-                            'provider' => self::instantiate($entry['provider'], $entryoverrides),
+                            'provider' => $fallbackprovider,
                             'label'    => $entry['label'],
                         ];
                     }
