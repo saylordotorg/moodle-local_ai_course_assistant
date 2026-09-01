@@ -1632,9 +1632,9 @@ $string['privacy:metadata:zendesk:message'] = 'Fariinta ama waxa ku jira wada-ha
 $string['privacy:metadata:radar_webhook'] = 'Marka gaarsiinta Learning Radar loo habeeyo webhook Slack ama Microsoft Teams, warbixinta la soo saaray waxaa lagu daabacaa dhamaadkaas dibadda ah.';
 $string['privacy:metadata:radar_webhook:report'] = 'Waxa ku jira warbixinta Learning Radar, kaas oo laga yaabo inuu tixraaco dhaqdhaqaaqa ardayga ee koorsada.';
 $string['instructor_dashboard:navlink'] = 'Dashboard-ka Macallinka AI';
-$string['analytics_js:total_students'] = 'Wadarta Ardayda';
+$string['analytics_js:total_students'] = 'Wadarta diiwaangashan';
 $string['analytics_js:active_ai_users'] = 'Isticmaalayaasha AI ee Firfircoon';
-$string['analytics_js:msgs_per_student'] = 'Fariimo / Arday';
+$string['analytics_js:msgs_per_student'] = 'Fariimo / isticmaale firfircoon';
 $string['analytics_js:avg_session'] = 'Celceliska Fadhiga';
 $string['analytics_js:return_rate'] = 'Heerka Soo-noqoshada';
 $string['analytics_js:total_sessions'] = 'Wadarta Fadhiyada';
@@ -1985,3 +1985,8 @@ $string['quizlock:scope_site'] = 'Dhammaan koorsooyinka';
 $string['quizlock:scope_desc'] = 'Inuu isku day socda ka joojiyo [[tutorshort]] koorsada imtixaanku ku jiro oo keliya, mise meel kasta. <strong>Koorsadan oo keliya</strong> waa caadiga waana waxa aad rabto ku dhawaad mar walba. Goobta oo dhan waxay ahayd habdhaqanka ilaa v7.2.4, waxayna lahayd cillad mudan in la ogaado: isku day la iska daayay wuxuu ahaanayaa mid «socda» weligiis, sidaas darteed hal imtixaan oo la ilaaway taariikhda ardayga wuxuu damiyay caawiyaha koorsa kasta oo uu qaato, iyadoo waxba shaashadda kuma qorna sababta. Goobta oo dhan wax yar ayay ka tarayaan arday go\'aansaday inuu khiyaamo, isagoo haysta browser labaad, agabka koorsada iyo raadinta caawiyahuna horeba way ku koobnaayeen koorsada.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Hawsha habaynta tooska ah ee miisaaniyadda amarka oo laga tanaasulay waa shidan, halka habka miisaaniyadda loo dejiyay in laga soo saaro moodalka. Labadan way isku dhacaan: hawshu waxay qortaa miisaaniyadda xarfaha, qiime kasta oo aan ahayn kii caadiga ah waxaa loo akhriyaa doorasho ula kac ah, taasoo damisa miisaaniyadda la soo saaray. Hawshu hadda iskeed ayay dib u noqotaa habkan, sidaas darteed waxba lama beddelayo — hase yeeshee dami si loo tirtiro shakiga.';
+
+$string['settings:prompt_budget_no_window'] = 'Habka miisaaniyadda ee kor ku xusan waxaa loo dejiyay in laga soo saaro moodalka, laakiin wax laga soo saaro ma jiraan: moodalka sheekaysiga lama dejin, daaqadda macnaha guud ee gadaasha sidoo kale lama habeyn, sidaas darteed soo saaridda waxay ku noqoneysaa miisaaniyadda xarfaha ee go\'an ee hoose. Deji moodalka sheekaysiga, ama gacanta ku deji daaqadda macnaha guud ee gadaasha, ka dibna dib u socodsii is-hubinta gadaasha oo xaqiiji in hubinta daaqadda macnaha guud ay gudubtay. Ilaa markaas, miisaaniyaddu waa tirada hoose, wax kasta oo habku sheegaba.';
+
+$string['analytics_js:section'] = 'Qaybta';
+$string['analytics_js:course'] = 'Course';

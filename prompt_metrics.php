@@ -77,6 +77,17 @@ foreach ($agg['by_cat_avg'] as $cat => $chars) {
 
 $auto_tune_on = (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune');
 
+// Section-name tallies, most frequent first. Rows written before v7.2.7 carry
+// no names, so these stay empty until the log rotates.
+$dropped_rows = [];
+foreach ($agg['dropped_by_section'] ?? [] as $secname => $count) {
+    $dropped_rows[] = ['name' => $secname, 'count' => number_format($count)];
+}
+$truncated_rows = [];
+foreach ($agg['truncated_by_section'] ?? [] as $secname => $count) {
+    $truncated_rows[] = ['name' => $secname, 'count' => number_format($count)];
+}
+
 $templatedata = [
     'samples'         => number_format($agg['samples']),
     'has_data'        => $agg['samples'] > 0,
@@ -86,6 +97,13 @@ $templatedata = [
     'avg_budget'      => number_format($agg['avg_budget']),
     'pct_truncated'   => $agg['pct_truncated'],
     'pct_dropped'     => $agg['pct_dropped'],
+    // v7.2.7: which sections, not just how many. A dropped `safety` and a
+    // dropped `faq` were indistinguishable on this page, and they are not
+    // remotely the same event.
+    'dropped_sections'   => $dropped_rows,
+    'has_dropped_names'  => !empty($dropped_rows),
+    'truncated_sections' => $truncated_rows,
+    'has_truncated_names' => !empty($truncated_rows),
     'last_seen'       => $agg['last_seen'] ? userdate($agg['last_seen'], '%Y-%m-%d %H:%M') : '—',
     'by_cat'          => $by_cat_rows,
     'current_budget'  => number_format($current),

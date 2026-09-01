@@ -1613,9 +1613,9 @@ $string['privacy:metadata:zendesk:message'] = 'A mensagem ou o conteúdo da conv
 $string['privacy:metadata:radar_webhook'] = 'Quando a entrega do Learning Radar a um webhook do Slack ou do Microsoft Teams está configurada, o relatório gerado é publicado nesse endpoint externo.';
 $string['privacy:metadata:radar_webhook:report'] = 'O conteúdo do relatório do Learning Radar, que pode referenciar a atividade do aluno no curso.';
 $string['instructor_dashboard:navlink'] = 'Painel do Tutor de AI';
-$string['analytics_js:total_students'] = 'Total de estudantes';
+$string['analytics_js:total_students'] = 'Total de inscritos';
 $string['analytics_js:active_ai_users'] = 'Usuários ativos de AI';
-$string['analytics_js:msgs_per_student'] = 'Msgs / estudante';
+$string['analytics_js:msgs_per_student'] = 'Msgs / usuário ativo';
 $string['analytics_js:avg_session'] = 'Sessão média';
 $string['analytics_js:return_rate'] = 'Taxa de retorno';
 $string['analytics_js:total_sessions'] = 'Total de sessões';
@@ -1966,3 +1966,8 @@ $string['quizlock:scope_site'] = 'Todos os cursos';
 $string['quizlock:scope_desc'] = 'Se uma tentativa em andamento bloqueia o [[tutorshort]] somente no curso que contém o questionário ou em todo lugar. <strong>Somente este curso</strong> é o padrão e quase sempre é o que você quer. Todo o site era o comportamento até a v7.2.4 e tinha uma falha que vale conhecer: uma tentativa abandonada continua «em andamento» para sempre, então um único questionário esquecido no histórico de um estudante desativava o assistente em todos os cursos dele, sem nada na tela explicando o motivo. Todo o site rende muito pouco diante de quem está decidido a colar, que tem um segundo navegador, e o material e a recuperação do assistente já são restritos ao curso.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'A tarefa obsoleta de ajuste automático do orçamento do prompt está ligada enquanto o modo de orçamento está definido para derivar do modelo. Os dois entram em conflito: a tarefa grava o orçamento de caracteres, e qualquer valor diferente do padrão é lido como uma escolha deliberada, o que desliga o orçamento derivado. A tarefa agora se retira sozinha nesse modo, então nada está sendo sobrescrito — mas desligue-a para eliminar a ambiguidade.';
+
+$string['settings:prompt_budget_no_window'] = 'O modo de orçamento acima está definido para ser derivado do modelo, mas não há de onde derivar: o modelo de chat não está definido e nenhuma janela de contexto do backend foi configurada, então a derivação recorre ao orçamento fixo de caracteres abaixo. Defina o modelo de chat, ou defina a janela de contexto do backend manualmente, depois execute novamente o autoteste do backend e confirme que a verificação da janela de contexto passa. Até lá, o orçamento é o número abaixo, seja o que for que o modo afirme.';
+
+$string['analytics_js:section'] = 'Seção';
+$string['analytics_js:course'] = 'Course';

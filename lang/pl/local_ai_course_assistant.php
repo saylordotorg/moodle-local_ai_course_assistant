@@ -1590,9 +1590,9 @@ $string['privacy:metadata:zendesk:message'] = 'Treść wiadomości lub rozmowy, 
 $string['privacy:metadata:radar_webhook'] = 'Gdy skonfigurowane jest dostarczanie Learning Radar do webhooka Slack lub Microsoft Teams, wygenerowany raport jest publikowany w tym zewnętrznym punkcie końcowym.';
 $string['privacy:metadata:radar_webhook:report'] = 'Treść raportu Learning Radar, która może odnosić się do aktywności uczącego się w kursie.';
 $string['instructor_dashboard:navlink'] = 'Panel tutora AI';
-$string['analytics_js:total_students'] = 'Wszyscy studenci';
+$string['analytics_js:total_students'] = 'Łącznie zapisanych';
 $string['analytics_js:active_ai_users'] = 'Aktywni użytkownicy AI';
-$string['analytics_js:msgs_per_student'] = 'Wiadomości / student';
+$string['analytics_js:msgs_per_student'] = 'Wiad. / aktywny użytkownik';
 $string['analytics_js:avg_session'] = 'Śr. sesja';
 $string['analytics_js:return_rate'] = 'Wskaźnik powrotów';
 $string['analytics_js:total_sessions'] = 'Wszystkie sesje';
@@ -1943,3 +1943,8 @@ $string['quizlock:scope_site'] = 'Wszystkie kursy';
 $string['quizlock:scope_desc'] = 'Czy trwające podejście blokuje [[tutorshort]] tylko w kursie zawierającym test, czy wszędzie. <strong>Tylko ten kurs</strong> to ustawienie domyślne i niemal zawsze właściwe. Cała witryna była zachowaniem do wersji 7.2.4 i miała usterkę wartą poznania: porzucone podejście pozostaje „w toku” na zawsze, więc jeden zapomniany test gdzieś w historii uczącego się wyłączał asystenta w każdym jego kursie, a na ekranie nic tego nie tłumaczyło. Wobec osoby zdeterminowanej, która ma drugą przeglądarkę, cała witryna daje bardzo niewiele, a materiały kursu i wyszukiwanie asystenta i tak ograniczają się do kursu.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Wycofane zadanie automatycznego dostrajania budżetu promptu jest włączone, podczas gdy tryb budżetu ustawiono na wyprowadzanie z modelu. Te dwie rzeczy kolidują: zadanie zapisuje budżet znaków, a każda wartość inna niż domyślna jest odczytywana jako świadomy wybór, co wyłącza budżet wyprowadzony. Zadanie w tym trybie samo się teraz wycofuje, więc nic nie jest nadpisywane — mimo to wyłącz je, aby usunąć niejednoznaczność.';
+
+$string['settings:prompt_budget_no_window'] = 'Tryb budżetu powyżej jest ustawiony na wyprowadzanie z modelu, ale nie ma z czego wyprowadzać: model czatu nie jest ustawiony ani nie skonfigurowano okna kontekstu zaplecza, więc wyprowadzanie wraca do stałego budżetu znaków poniżej. Ustaw model czatu albo ustaw okno kontekstu zaplecza ręcznie, następnie ponownie uruchom autotest zaplecza i potwierdź, że kontrola okna kontekstu przechodzi. Do tego czasu budżetem jest liczba poniżej, cokolwiek twierdzi tryb.';
+
+$string['analytics_js:section'] = 'Sekcja';
+$string['analytics_js:course'] = 'Course';

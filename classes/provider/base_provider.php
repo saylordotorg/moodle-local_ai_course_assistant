@@ -683,7 +683,19 @@ abstract class base_provider implements provider_interface {
         // course holding the attempt. Site-wide, one forgotten attempt in an
         // unrelated course killed the assistant everywhere -- see quiz_lock.
         $realcli = CLI_SCRIPT && !(defined('PHPUNIT_TEST') && PHPUNIT_TEST);
-        if (!$realcli && \local_ai_course_assistant\quiz_lock::is_locked_for((int) $USER->id, $courseid)) {
+        $lockedattempt = $realcli
+            ? null
+            : \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, $courseid);
+        if ($lockedattempt !== null) {
+            // v7.2.7: the refusal is auditable. This is the chokepoint every
+            // surface except the SSE stream reaches, and sse.php records its own
+            // before it gets here, so a refusal is logged exactly once.
+            \local_ai_course_assistant\quiz_lock::record_refusal(
+                (int) $USER->id,
+                $courseid,
+                $lockedattempt,
+                'provider'
+            );
             throw new \moodle_exception(
                 'error',
                 'local_ai_course_assistant',

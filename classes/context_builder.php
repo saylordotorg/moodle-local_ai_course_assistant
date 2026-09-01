@@ -588,7 +588,19 @@ class context_builder {
         }
 
         // Context: FAQ (reference data, not behaviour).
-        $faq = faq_manager::get_faq_for_prompt();
+        //
+        // v7.2.7: only when it is not retrievable. The FAQ was assembled into
+        // every prompt unconditionally -- 4,451 characters on a staging
+        // measurement, a third of the fixed overhead sitting between the budget
+        // and the retrieved course material, spent on turns it could not help.
+        // Once embedded it competes on relevance like any other passage.
+        //
+        // The fallback is deliberate and not merely defensive: is_retrievable()
+        // is false when RAG is off, when the FAQ has never been embedded, and
+        // when an administrator has edited it since. In each of those a site
+        // must keep getting its FAQ rather than silently losing it to a stale
+        // background index.
+        $faq = faq_manager::is_retrievable($courseid) ? '' : faq_manager::get_faq_for_prompt();
         if (!empty($faq)) {
             $sections[] = new section(
                 'faq',

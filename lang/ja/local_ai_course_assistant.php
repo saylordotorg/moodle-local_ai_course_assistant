@@ -1597,9 +1597,9 @@ $string['privacy:metadata:zendesk:message'] = '学習者がエスカレーショ
 $string['privacy:metadata:radar_webhook'] = 'SlackまたはMicrosoft TeamsのWebhookへのLearning Radar配信が設定されている場合、生成されたレポートがその外部エンドポイントに投稿されます。';
 $string['privacy:metadata:radar_webhook:report'] = 'コース内の学習者の活動を参照する可能性がある、Learning Radarレポートの内容。';
 $string['instructor_dashboard:navlink'] = 'AIチューターダッシュボード';
-$string['analytics_js:total_students'] = '学生総数';
+$string['analytics_js:total_students'] = '登録者総数';
 $string['analytics_js:active_ai_users'] = 'アクティブなAIユーザー';
-$string['analytics_js:msgs_per_student'] = 'メッセージ数／学生';
+$string['analytics_js:msgs_per_student'] = 'メッセージ / アクティブ利用者';
 $string['analytics_js:avg_session'] = '平均セッション';
 $string['analytics_js:return_rate'] = 'リピート率';
 $string['analytics_js:total_sessions'] = 'セッション総数';
@@ -1950,3 +1950,8 @@ $string['quizlock:scope_site'] = 'すべてのコース';
 $string['quizlock:scope_desc'] = '進行中の受験が [[tutorshort]] を止める範囲を、小テストのあるコースだけにするか、どこでも止めるかを指定します。<strong>このコースのみ</strong>が既定で、ほとんどの場合こちらが適切です。サイト全体は v7.2.4 までの動作で、知っておく価値のある不具合がありました。放棄された受験は永久に「進行中」のままなので、学習者の履歴のどこかにある忘れられた小テスト一つが、その人の受講するすべてのコースでアシスタントを無効にし、しかも画面には理由が何も出ませんでした。サイト全体にしても、別のブラウザーを持つ本気の学習者にはほとんど効果がなく、アシスタントの教材も検索も元々コース単位です。';
 
 $string['settings:prompt_budget_tuner_conflict'] = '非推奨のプロンプト予算の自動調整タスクが有効になっていますが、予算モードはモデルから導出する設定になっています。この二つは衝突します。タスクが文字数予算を書き込み、既定値以外の値は意図的な選択と解釈されるため、導出された予算が無効になるからです。このモードではタスクが自分で停止するようになったので上書きは起きていませんが、あいまいさをなくすためオフにしてください。';
+
+$string['settings:prompt_budget_no_window'] = '上の予算モードはモデルから導出する設定になっていますが、導出の材料がありません。チャットモデルが未設定で、バックエンドのコンテキストウィンドウも設定されていないため、導出は下の固定文字数予算にフォールバックします。チャットモデルを設定するか、バックエンドのコンテキストウィンドウを手動で設定したうえで、バックエンドのセルフテストを再実行し、コンテキストウィンドウの確認が通ることを確かめてください。それまでは、モードが何と表示していても、予算は下の数値です。';
+
+$string['analytics_js:section'] = 'セクション';
+$string['analytics_js:course'] = 'Course';

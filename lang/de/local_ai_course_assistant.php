@@ -1591,9 +1591,9 @@ $string['privacy:metadata:zendesk:message'] = 'Der Nachrichten- oder Gesprächsi
 $string['privacy:metadata:radar_webhook'] = 'Wenn die Zustellung von Learning Radar an einen Slack- oder Microsoft-Teams-Webhook konfiguriert ist, wird der erstellte Bericht an diesen externen Endpunkt gesendet.';
 $string['privacy:metadata:radar_webhook:report'] = 'Der Inhalt des Learning-Radar-Berichts, der auf die Aktivität der Lernenden im Kurs verweisen kann.';
 $string['instructor_dashboard:navlink'] = 'AI-Tutor-Dashboard';
-$string['analytics_js:total_students'] = 'Lernende gesamt';
+$string['analytics_js:total_students'] = 'Eingeschrieben gesamt';
 $string['analytics_js:active_ai_users'] = 'Aktive AI-Nutzer';
-$string['analytics_js:msgs_per_student'] = 'Nachr. / Lernende';
+$string['analytics_js:msgs_per_student'] = 'Nachr. / aktiver Nutzer';
 $string['analytics_js:avg_session'] = 'Durchschn. Sitzung';
 $string['analytics_js:return_rate'] = 'Rückkehrrate';
 $string['analytics_js:total_sessions'] = 'Sitzungen gesamt';
@@ -1944,3 +1944,8 @@ $string['quizlock:scope_site'] = 'Alle Kurse';
 $string['quizlock:scope_desc'] = 'Ob ein laufender Versuch [[tutorshort]] nur in dem Kurs mit dem Test blockiert oder überall. <strong>Nur dieser Kurs</strong> ist die Voreinstellung und fast immer die richtige Wahl. Websiteweit war das Verhalten bis v7.2.4 und hatte einen Fehlerfall, den man kennen sollte: Ein abgebrochener Versuch bleibt für immer „in Bearbeitung“, sodass ein einziger vergessener Test irgendwo in der Historie einer Lernenden den Assistenten in jedem ihrer Kurse abschaltete, ohne dass auf dem Bildschirm ein Grund stand. Gegen eine entschlossene Person bringt websiteweit sehr wenig — sie hat einen zweiten Browser —, und die Kursinhalte und die Suche des Assistenten sind ohnehin kursbezogen.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Die veraltete Aufgabe zur automatischen Anpassung des Prompt-Budgets ist eingeschaltet, während der Budgetmodus auf Ableitung aus dem Modell gesetzt ist. Beides steht im Widerspruch: die Aufgabe schreibt das Zeichenbudget, und jeder Wert außer der Voreinstellung wird als bewusste Entscheidung gelesen, was das abgeleitete Budget abschaltet. Die Aufgabe hält sich in diesem Modus nun selbst zurück, es wird also nichts überschrieben — schalten Sie sie dennoch aus, um die Unklarheit zu beseitigen.';
+
+$string['settings:prompt_budget_no_window'] = 'Der Budgetmodus oben ist auf Ableitung aus dem Modell gestellt, aber es gibt nichts, woraus abgeleitet werden könnte: Das Chat-Modell ist nicht gesetzt und es ist kein Kontextfenster für das Backend konfiguriert, sodass die Ableitung auf das feste Zeichenbudget unten zurückfällt. Setzen Sie das Chat-Modell, oder tragen Sie das Kontextfenster des Backends von Hand ein, führen Sie dann den Backend-Selbsttest erneut aus und prüfen Sie, dass die Kontextfenster-Prüfung besteht. Bis dahin ist das Budget die Zahl unten, was der Modus auch behauptet.';
+
+$string['analytics_js:section'] = 'Abschnitt';
+$string['analytics_js:course'] = 'Course';

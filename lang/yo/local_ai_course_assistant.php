@@ -1626,9 +1626,9 @@ $string['privacy:metadata:zendesk:message'] = 'Àkóónú ìránṣẹ́ tàbí 
 $string['privacy:metadata:radar_webhook'] = 'Nígbà tí a bá ṣètò ìfijíṣẹ́ Learning Radar sí webhook Slack tàbí Microsoft Teams, a ń fi ìjábọ̀ tí a ṣe sí ibi jíjìnnà náà.';
 $string['privacy:metadata:radar_webhook:report'] = 'Àkóónú ìjábọ̀ Learning Radar, tí ó lè tọ́ka sí iṣẹ́ akẹ́kọ̀ọ́ nínú ẹ̀kọ́.';
 $string['instructor_dashboard:navlink'] = 'Dáṣíbọ́ọ̀dì Olùkọ́ AI';
-$string['analytics_js:total_students'] = 'Àpapọ̀ Akẹ́kọ̀ọ́';
+$string['analytics_js:total_students'] = 'Àpapọ̀ tí wọ́n forúkọsílẹ̀';
 $string['analytics_js:active_ai_users'] = 'Àwọn Olùmúlò AI Tó Ń Ṣiṣẹ́';
-$string['analytics_js:msgs_per_student'] = 'Ìránṣẹ́ / Akẹ́kọ̀ọ́';
+$string['analytics_js:msgs_per_student'] = 'Ìránṣẹ́ / olùmúlò tí ń ṣiṣẹ́';
 $string['analytics_js:avg_session'] = 'Ìpàdé Àpapọ̀';
 $string['analytics_js:return_rate'] = 'Ìdíwọ̀n Ìpadàbọ̀';
 $string['analytics_js:total_sessions'] = 'Àpapọ̀ Ìpàdé';
@@ -1979,3 +1979,8 @@ $string['quizlock:scope_site'] = 'Gbogbo ẹ̀kọ́';
 $string['quizlock:scope_desc'] = 'Bóyá ìgbìyànjú tí ń lọ lọ́wọ́ yóò dí [[tutorshort]] lọ́wọ́ nínú ẹ̀kọ́ tí ó ní ìdánwò náà nìkan, tàbí níbi gbogbo. <strong>Ẹ̀kọ́ yìí nìkan</strong> ni àbáyọ, ó sì fẹ́rẹ̀ẹ́ jẹ́ ohun tí o fẹ́ nígbà gbogbo. Gbogbo ojúlé ni ìwà rẹ̀ títí di v7.2.4, ó sì ní àbùkù tí ó tọ́ sí mímọ̀: ìgbìyànjú tí a kọ̀ sílẹ̀ ń wà ní «ń lọ lọ́wọ́» títí láé, nítorí náà ìdánwò kan tí a gbàgbé níbìkan nínú ìtàn akẹ́kọ̀ọ́ máa ń pa olùrànlọ́wọ́ náà nínú gbogbo ẹ̀kọ́ tí ó ń kọ́, láìsí ohunkóhun lórí ìbòjú tí ó ṣàlàyé ìdí. Gbogbo ojúlé kò mú ọ̀pọ̀ wá lòdì sí akẹ́kọ̀ọ́ tí ó pinnu láti ṣe ẹ̀tàn, tí ó ní ẹ̀rọ aṣàwákiri kejì, àti pé ohun èlò ẹ̀kọ́ àti ìwádìí olùrànlọ́wọ́ náà ti wà nínú ẹ̀kọ́ kan ṣoṣo tẹ́lẹ̀.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Iṣẹ́ ìtúnṣe ìnáwó àṣẹ fúnra rẹ̀ tí a ti kọ̀ sílẹ̀ wà ní títan, nígbà tí ipò ìnáwó wà ní ìtò láti rí i láti inú àwòṣe. Àwọn méjèèjì ń takò ara wọn: iṣẹ́ náà ń kọ ìnáwó lẹ́tà, àti pé iye yòówù tí kò jẹ́ àbáyọ ni a ń kà sí àṣàyàn tí a mọ̀ọ́mọ̀ ṣe, èyí tí ó ń pa ìnáwó tí a rí. Iṣẹ́ náà ti ń fà sẹ́yìn fúnra rẹ̀ nínú ipò yìí, nítorí náà kò sí ohun tí a ń kọ lé lórí — ṣùgbọ́n pa á kí àìdánilójú kúrò.';
+
+$string['settings:prompt_budget_no_window'] = 'Ipo isuna ti o wa loke ni a ti ṣeto lati mu jade lati inu awoṣe naa, ṣugbọn ko si ohun ti a le mu jade lati inu rẹ: a ko ti ṣeto awoṣe ibaraẹnisọrọ, bẹẹ ni a ko si ti ṣeto ferese ọrọ-ipilẹ ti ẹhin, nitorina mimu jade naa pada si isuna lẹta ti o duro ṣinṣin ni isalẹ. Ṣeto awoṣe ibaraẹnisọrọ, tabi ṣeto ferese ọrọ-ipilẹ ti ẹhin pẹlu ọwọ, lẹhinna tun ṣiṣe idanwo ara-ẹni ti ẹhin ki o si jẹrisi pe ayẹwo ferese ọrọ-ipilẹ kọja. Titi di igba naa, isuna ni nọmba ti o wa ni isalẹ, ohunkohun ti ipo naa ba sọ.';
+
+$string['analytics_js:section'] = 'Abala';
+$string['analytics_js:course'] = 'Course';

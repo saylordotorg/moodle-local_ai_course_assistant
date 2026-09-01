@@ -1604,9 +1604,9 @@ $string['privacy:metadata:zendesk:message'] = 'Öğrencinin yönlendirmeyi seçt
 $string['privacy:metadata:radar_webhook'] = 'Learning Radar teslimatı bir Slack veya Microsoft Teams webhook\'una yapılandırıldığında, oluşturulan rapor o dış uç noktaya gönderilir.';
 $string['privacy:metadata:radar_webhook:report'] = 'Derste öğrenci etkinliğine atıfta bulunabilecek Learning Radar rapor içeriği.';
 $string['instructor_dashboard:navlink'] = 'AI Eğitmen Panosu';
-$string['analytics_js:total_students'] = 'Toplam Öğrenci';
+$string['analytics_js:total_students'] = 'Toplam kayıtlı';
 $string['analytics_js:active_ai_users'] = 'Aktif AI Kullanıcıları';
-$string['analytics_js:msgs_per_student'] = 'Mesaj / Öğrenci';
+$string['analytics_js:msgs_per_student'] = 'Mesaj / etkin kullanıcı';
 $string['analytics_js:avg_session'] = 'Ort. Oturum';
 $string['analytics_js:return_rate'] = 'Geri Dönüş Oranı';
 $string['analytics_js:total_sessions'] = 'Toplam Oturum';
@@ -1957,3 +1957,8 @@ $string['quizlock:scope_site'] = 'Tüm dersler';
 $string['quizlock:scope_desc'] = 'Devam eden bir denemenin [[tutorshort]] uygulamasını yalnızca sınavın bulunduğu derste mi, yoksa her yerde mi engelleyeceği. <strong>Yalnızca bu ders</strong> varsayılandır ve neredeyse her zaman istediğiniz şeydir. Site geneli, v7.2.4\'e kadarki davranıştı ve bilinmeye değer bir arızası vardı: terk edilmiş bir deneme sonsuza dek «devam ediyor» kalır, dolayısıyla bir öğrencinin geçmişinde unutulmuş tek bir sınav, aldığı her derste yardımcıyı devre dışı bırakıyordu ve ekranda bunu açıklayan hiçbir şey olmuyordu. Site geneli, ikinci bir tarayıcısı olan ve kopya çekmeye kararlı bir öğrenciye karşı çok az şey kazandırır; yardımcının ders içeriği ve araması zaten derse sınırlıdır.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Kullanımdan kaldırılan istem bütçesi otomatik ayar görevi açıkken bütçe modu modelden türetilecek şekilde ayarlanmış. İkisi çatışır: görev karakter bütçesini yazar ve varsayılan dışındaki her değer bilinçli bir seçim olarak okunur, bu da türetilmiş bütçeyi kapatır. Görev bu modda artık kendiliğinden geri çekiliyor, yani hiçbir şeyin üzerine yazılmıyor — yine de belirsizliği gidermek için kapatın.';
+
+$string['settings:prompt_budget_no_window'] = 'Yukarıdaki bütçe kipi modelden türetilecek şekilde ayarlanmış, ancak türetilecek bir şey yok: sohbet modeli ayarlanmamış ve arka uç bağlam penceresi de yapılandırılmamış, bu yüzden türetme aşağıdaki sabit karakter bütçesine geri düşüyor. Sohbet modelini ayarlayın veya arka uç bağlam penceresini elle girin, ardından arka uç kendi kendine testini yeniden çalıştırıp bağlam penceresi denetiminin geçtiğini doğrulayın. O zamana kadar kip ne iddia ederse etsin, bütçe aşağıdaki sayıdır.';
+
+$string['analytics_js:section'] = 'Bölüm';
+$string['analytics_js:course'] = 'Course';

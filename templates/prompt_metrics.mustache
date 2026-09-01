@@ -72,9 +72,23 @@
         <dt class="col-sm-4">{{#str}}prompt_metrics:avg_budget, local_ai_course_assistant{{/str}}</dt>
         <dd class="col-sm-8">{{avg_budget}} chars</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:pct_truncated, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{pct_truncated}}%</dd>
+        <dd class="col-sm-8">
+            {{pct_truncated}}%
+            {{#has_truncated_names}}
+            <span class="text-muted">
+                &mdash; {{#truncated_sections}}<code>{{name}}</code> &times;{{count}} {{/truncated_sections}}
+            </span>
+            {{/has_truncated_names}}
+        </dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:pct_dropped, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{pct_dropped}}%</dd>
+        <dd class="col-sm-8">
+            {{pct_dropped}}%
+            {{#has_dropped_names}}
+            <span class="text-muted">
+                &mdash; {{#dropped_sections}}<code>{{name}}</code> &times;{{count}} {{/dropped_sections}}
+            </span>
+            {{/has_dropped_names}}
+        </dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:last_seen, local_ai_course_assistant{{/str}}</dt>
         <dd class="col-sm-8">{{last_seen}}</dd>
     </dl>

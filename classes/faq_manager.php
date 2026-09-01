@@ -27,6 +27,188 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class faq_manager {
+
+    /**
+     * modtype recorded on FAQ chunks, so they are distinguishable from course
+     * material everywhere the index is read.
+     */
+    public const MODTYPE = 'faq';
+
+    /**
+     * Is the FAQ served by retrieval rather than injected into every prompt?
+     *
+     * The FAQ used to be assembled unconditionally: 4,451 characters on every
+     * turn, including the great majority it cannot help. On a staging course
+     * that was a third of the fixed overhead standing between the budget and
+     * the retrieved course content, and it was pushing real passages out.
+     *
+     * Retrieval is only used when there is an index to retrieve from. If RAG is
+     * off, or the FAQ has never been embedded, or an administrator has edited it
+     * since, the caller falls back to injecting it -- a site must never silently
+     * lose its FAQ, or keep answering from one that was already changed.
+     *
+     * Deliberately not memoized. It is one indexed lookup against a model call,
+     * and a cached answer would go stale inside cron and between tests for no
+     * measurable gain.
+     *
+     * @param int $courseid Course being assembled for; 0 asks the site-wide question only.
+     * @return bool
+     */
+    public static function is_retrievable(int $courseid = 0): bool {
+        global $DB;
+
+        if (!get_config('local_ai_course_assistant', 'rag_enabled')) {
+            return false;
+        }
+        // v7.2.7: retrieval is gated per course as well as site-wide, and the
+        // per-course override is a genuine three-state default-on toggle --
+        // course_settings.php writes a literal '0' for an unchecked box. Without
+        // this test, a course with RAG forced off reported the FAQ retrievable,
+        // so context_builder dropped the inline copy while sse.php never called
+        // the retriever: the FAQ reached the model by neither path, which is the
+        // exact failure this method exists to prevent. Callers that pass 0 are
+        // asking the site-wide question and get the site-wide answer.
+        if ($courseid > 0) {
+            $courseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $courseid);
+            if (!(($courseraw === false) || (bool) $courseraw)) {
+                return false;
+            }
+        }
+        $raw = (string) get_config('local_ai_course_assistant', 'faq_content');
+        if (trim($raw) === '') {
+            return false;
+        }
+        if ((string) get_config('local_ai_course_assistant', 'faq_indexed_hash') !== self::content_hash($raw)) {
+            return false;
+        }
+
+        return $DB->record_exists('local_ai_course_assistant_chunks', [
+            'courseid' => SITEID,
+            'modtype' => self::MODTYPE,
+        ]);
+    }
+
+    /**
+     * Hash of the FAQ setting, used to detect that the index is stale.
+     *
+     * @param string|null $raw Defaults to the stored setting.
+     * @return string
+     */
+    public static function content_hash(?string $raw = null): string {
+        if ($raw === null) {
+            $raw = (string) get_config('local_ai_course_assistant', 'faq_content');
+        }
+        return sha1(trim($raw));
+    }
+
+    /**
+     * Embed each FAQ pair as its own retrievable chunk.
+     *
+     * Stored against SITEID rather than duplicated into every course: the FAQ
+     * is a single site-wide setting, and copying seventeen pairs into each of
+     * thirty-odd course indexes would mean re-embedding all of them every time
+     * an administrator fixes a typo.
+     *
+     * One chunk per question-and-answer pair, deliberately. Retrieval scores
+     * whole chunks, so a pair is the unit that either answers the learner or
+     * does not; splitting an answer across chunks would surface half of one.
+     *
+     * Idempotent and best-effort: unchanged content is a no-op, and a provider
+     * failure leaves the previous index in place rather than a half-built one.
+     *
+     * @param bool $force Reindex even when the content hash is unchanged.
+     * @return array{indexed: int, skipped: bool, error: string|null}
+     */
+    public static function index_faq(bool $force = false): array {
+        global $DB;
+
+        $out = ['indexed' => 0, 'skipped' => false, 'error' => null];
+
+        $raw = (string) get_config('local_ai_course_assistant', 'faq_content');
+        $hash = self::content_hash($raw);
+
+        if (trim($raw) === '') {
+            // The setting was cleared. Drop the index so retrieval cannot keep
+            // serving answers an administrator has deleted.
+            $DB->delete_records('local_ai_course_assistant_chunks', [
+                'courseid' => SITEID,
+                'modtype' => self::MODTYPE,
+            ]);
+            unset_config('faq_indexed_hash', 'local_ai_course_assistant');
+            return $out;
+        }
+
+        if (!$force && (string) get_config('local_ai_course_assistant', 'faq_indexed_hash') === $hash
+                && $DB->record_exists('local_ai_course_assistant_chunks',
+                    ['courseid' => SITEID, 'modtype' => self::MODTYPE])) {
+            $out['skipped'] = true;
+            return $out;
+        }
+
+        $entries = self::parse_faq($raw);
+        if (empty($entries)) {
+            $out['error'] = 'faq_content is set but no Q/A pairs could be parsed';
+            return $out;
+        }
+
+        try {
+            $provider = \local_ai_course_assistant\embedding_provider\base_embedding_provider::create_from_config();
+            $modelname = $provider->get_model();
+            $dtype = $provider->effective_dtype();
+        } catch (\Throwable $e) {
+            $out['error'] = 'embedding provider unavailable: ' . $e->getMessage();
+            return $out;
+        }
+
+        // Build every row before touching the table, so a provider failure
+        // halfway through leaves the existing index intact.
+        $records = [];
+        foreach (array_values($entries) as $idx => $entry) {
+            $text = 'Q: ' . $entry['question'] . "\nA: " . $entry['answer'];
+            // Sanitised on the same terms as course material. The FAQ is
+            // admin-authored rather than learner-authored, but it is still text
+            // that re-enters the prompt at retrieval time.
+            $sanitized = \local_ai_course_assistant\security::sanitize_rag_chunk($text);
+            try {
+                $vector = $provider->embed($sanitized['text']);
+            } catch (\Throwable $e) {
+                $out['error'] = 'embedding failed on pair ' . ($idx + 1) . ': ' . $e->getMessage();
+                return $out;
+            }
+            if (empty($vector)) {
+                $out['error'] = 'embedding returned nothing for pair ' . ($idx + 1);
+                return $out;
+            }
+
+            $record = new \stdClass();
+            $record->courseid    = SITEID;
+            $record->cmid        = 0;
+            $record->modtype     = self::MODTYPE;
+            $record->chunkindex  = $idx;
+            $record->content     = $sanitized['text'];
+            $record->contenthash = sha1($sanitized['text']);
+            $isfloat = ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
+            $record->embedding     = $isfloat ? json_encode($vector) : null;
+            $record->embedding_bin = rag_retriever::pack_vector($vector, $dtype);
+            $record->embed_model   = $modelname;
+            $record->embed_dtype   = $dtype;
+            $record->timecreated   = time();
+            $record->timeindexed   = time();
+            $records[] = $record;
+        }
+
+        $DB->delete_records('local_ai_course_assistant_chunks', [
+            'courseid' => SITEID,
+            'modtype' => self::MODTYPE,
+        ]);
+        foreach ($records as $record) {
+            $DB->insert_record('local_ai_course_assistant_chunks', $record);
+            $out['indexed']++;
+        }
+        set_config('faq_indexed_hash', $hash, 'local_ai_course_assistant');
+
+        return $out;
+    }
     /**
      * Get the FAQ content formatted for inclusion in the system prompt.
      *

@@ -376,6 +376,27 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v7.2.7: auto mode with nothing to derive from.
+    //
+    // Staging ran with prompt_budget_mode=auto, model empty and
+    // backend_context_tokens 0, so resolve_window_tokens() returned 0 and the
+    // budget quietly fell back to the configured number -- while the setting
+    // above told the administrator it was being derived from the model. The
+    // only place that said otherwise was a self-test nobody has to run, and
+    // 89.5% of turns were truncating with no indication why.
+    if ((string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
+        && \local_ai_course_assistant\context_builder::resolve_window_tokens(0) <= 0
+    ) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_budget_nowindow_warning',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str('settings:prompt_budget_no_window'),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
+
     $trunclast = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
     if ($trunclast > 0 && (time() - $trunclast) < (7 * DAYSECS)) {
         $settings->add(new admin_setting_description(

@@ -751,6 +751,7 @@ $PAGE->requires->js(new moodle_url('/local/ai_course_assistant/cdn/chartjs/amd-g
 // (CONTRIB-10574 #79); the JS reads config.strings.<key>.
 $jsstringkeys = [
     'total_students', 'active_ai_users', 'msgs_per_student', 'avg_session', 'return_rate',
+    'course', 'section',
     'total_sessions', 'ai_users', 'non_users', 'thumbs_up', 'thumbs_down', 'hallucination_flags',
     'avg_star_rating', 'avg_msgs_resolution', 'survey_respondents', 'messages', 'students',
     'frequency', 'responses', 'error_loading', 'loading', 'no_course_data', 'no_unit_data',

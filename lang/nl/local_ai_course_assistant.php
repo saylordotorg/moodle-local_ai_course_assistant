@@ -1614,9 +1614,9 @@ $string['privacy:metadata:zendesk:message'] = 'De bericht- of gespreksinhoud die
 $string['privacy:metadata:radar_webhook'] = 'Wanneer bezorging van Learning Radar naar een Slack- of Microsoft Teams-webhook is geconfigureerd, wordt het gegenereerde rapport naar dat externe eindpunt geplaatst.';
 $string['privacy:metadata:radar_webhook:report'] = 'De inhoud van het Learning Radar-rapport, dat kan verwijzen naar activiteit van cursisten in de cursus.';
 $string['instructor_dashboard:navlink'] = 'AI-tutordashboard';
-$string['analytics_js:total_students'] = 'Totaal aantal studenten';
+$string['analytics_js:total_students'] = 'Totaal ingeschreven';
 $string['analytics_js:active_ai_users'] = 'Actieve AI-gebruikers';
-$string['analytics_js:msgs_per_student'] = 'Berichten / student';
+$string['analytics_js:msgs_per_student'] = 'Ber. / actieve gebruiker';
 $string['analytics_js:avg_session'] = 'Gem. sessie';
 $string['analytics_js:return_rate'] = 'Terugkeerpercentage';
 $string['analytics_js:total_sessions'] = 'Totaal aantal sessies';
@@ -1967,3 +1967,8 @@ $string['quizlock:scope_site'] = 'Alle cursussen';
 $string['quizlock:scope_desc'] = 'Of een lopende poging [[tutorshort]] alleen blokkeert in de cursus met de toets, of overal. <strong>Alleen deze cursus</strong> is de standaard en is vrijwel altijd wat u wilt. Sitebreed was het gedrag tot en met v7.2.4 en had een storing die het waard is te kennen: een verlaten poging blijft voor altijd «bezig», zodat één vergeten toets ergens in de geschiedenis van een deelnemer de assistent uitschakelde in elke cursus die hij volgde, zonder dat iets op het scherm uitlegde waarom. Sitebreed levert erg weinig op tegen iemand die vastbesloten is te spieken en een tweede browser heeft, en het cursusmateriaal en het zoeken van de assistent zijn sowieso tot de cursus beperkt.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'De verouderde taak voor automatische afstemming van het promptbudget staat aan terwijl de budgetmodus is ingesteld op afleiden uit het model. Die twee botsen: de taak schrijft het tekenbudget en elke waarde behalve de standaard wordt gelezen als een bewuste keuze, waardoor het afgeleide budget wordt uitgeschakeld. De taak trekt zich in deze modus nu vanzelf terug, dus er wordt niets overschreven — zet haar toch uit om de dubbelzinnigheid weg te nemen.';
+
+$string['settings:prompt_budget_no_window'] = 'De budgetmodus hierboven staat ingesteld op afleiden uit het model, maar er valt niets af te leiden: het chatmodel is niet ingesteld en er is geen contextvenster voor de backend geconfigureerd, dus de afleiding valt terug op het vaste tekenbudget hieronder. Stel het chatmodel in, of stel het contextvenster van de backend handmatig in, voer daarna de zelftest van de backend opnieuw uit en controleer of de contextvenstercontrole slaagt. Tot die tijd is het budget het getal hieronder, wat de modus ook beweert.';
+
+$string['analytics_js:section'] = 'Sectie';
+$string['analytics_js:course'] = 'Course';

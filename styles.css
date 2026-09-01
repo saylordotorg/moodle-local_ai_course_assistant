@@ -5928,3 +5928,48 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
     pointer-events: none;
     cursor: not-allowed;
 }
+
+/* ── First-run consent banner ──────────────────────────────────────────────
+   Was inline-styled on the element with a 0.98-alpha white background and
+   z-index 20. Two defects came out of that on staging: the panel behind it
+   showed through the privacy notice, and the widget footer stayed clickable,
+   so the very first click a learner made granted consent AND opened the
+   feedback form.
+
+   Opacity is the load-bearing part. On the one screen whose entire purpose is
+   that a learner reads a data-processing disclosure, being able to see the
+   layer underneath through the words is not cosmetic. Fully opaque, and
+   theme-aware -- the inline white was wrong in dark mode regardless.
+
+   The z-index clears the header's 10. Covering the footer geometrically is not
+   relied on by itself: consent_gate.js also marks everything outside the
+   banner inert while consent is pending, so a stacking-context change
+   somewhere else in the widget cannot bring the click-through back. */
+.aica-consent-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    background: #fff;
+    color: #1f2933;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+    .aica-consent-banner {
+        background: #1b2430;
+        color: #e6ecf2;
+    }
+}
+
+/* Everything outside the banner is unreachable while consent is pending.
+   `inert` covers pointer, focus and assistive tech in one attribute; the
+   pointer-events rule is the fallback for browsers that do not support it. */
+.aica-consent-pending .local-ai-course-assistant__footer-feedback,
+.aica-consent-pending .local-ai-course-assistant__input-area,
+.aica-consent-pending .local-ai-course-assistant__bottom-nav {
+    pointer-events: none;
+}

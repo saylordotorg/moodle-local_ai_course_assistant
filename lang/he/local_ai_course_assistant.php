@@ -1629,9 +1629,9 @@ $string['privacy:metadata:zendesk:message'] = 'תוכן ההודעה או השי
 $string['privacy:metadata:radar_webhook'] = 'כאשר משלוח Learning Radar ל-webhook של Slack או Microsoft Teams מוגדר, הדוח שנוצר מתפרסם לנקודת הקצה החיצונית ההיא.';
 $string['privacy:metadata:radar_webhook:report'] = 'תוכן דוח Learning Radar, שעשוי להתייחס לפעילות הלומד בקורס.';
 $string['instructor_dashboard:navlink'] = 'לוח בקרה של מורה AI';
-$string['analytics_js:total_students'] = 'סך התלמידים';
+$string['analytics_js:total_students'] = 'סה"כ רשומים';
 $string['analytics_js:active_ai_users'] = 'משתמשי AI פעילים';
-$string['analytics_js:msgs_per_student'] = 'הודעות / תלמיד';
+$string['analytics_js:msgs_per_student'] = 'הודעות / משתמש פעיל';
 $string['analytics_js:avg_session'] = 'הפעלה ממוצעת';
 $string['analytics_js:return_rate'] = 'שיעור חזרה';
 $string['analytics_js:total_sessions'] = 'סך ההפעלות';
@@ -1982,3 +1982,8 @@ $string['quizlock:scope_site'] = 'כל הקורסים';
 $string['quizlock:scope_desc'] = 'האם ניסיון פעיל חוסם את [[tutorshort]] רק בקורס שמכיל את הבוחן, או בכל מקום. <strong>קורס זה בלבד</strong> הוא ברירת המחדל וכמעט תמיד מה שתרצו. חסימה כלל-אתרית הייתה ההתנהגות עד גרסה 7.2.4, והיה לה כשל שכדאי להכיר: ניסיון נטוש נשאר «בתהליך» לנצח, ולכן בוחן שכוח אחד אי-שם בהיסטוריה של לומד השבית את העוזר בכל קורס שלו, בלי שום הסבר על המסך. חסימה כלל-אתרית מוסיפה מעט מאוד מול לומד נחוש שיש לו דפדפן שני, וחומרי הקורס והאחזור של העוזר מוגבלים לקורס ממילא.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'משימת הכיול האוטומטי המיושנת של תקציב ההנחיה פעילה בעוד מצב התקציב מוגדר להיגזר מהמודל. השניים מתנגשים: המשימה כותבת את תקציב התווים, וכל ערך שאינו ברירת המחדל נקרא כבחירה מכוונת, מה שמבטל את התקציב הנגזר. המשימה נסוגה כעת מעצמה במצב הזה, כך שדבר אינו נדרס — אך כבו אותה כדי להסיר את אי-הבהירות.';
+
+$string['settings:prompt_budget_no_window'] = 'מצב התקציב שלמעלה מוגדר לגזירה מהמודל, אבל אין ממה לגזור: מודל השיחה לא הוגדר ולא הוגדר חלון הקשר לשרת, ולכן הגזירה חוזרת לתקציב התווים הקבוע שלמטה. הגדירו את מודל השיחה, או הגדירו את חלון ההקשר של השרת ידנית, ואז הריצו שוב את הבדיקה העצמית של השרת וודאו שבדיקת חלון ההקשר עוברת. עד אז התקציב הוא המספר שלמטה, מה שלא יטען המצב.';
+
+$string['analytics_js:section'] = 'Section';
+$string['analytics_js:course'] = 'Course';

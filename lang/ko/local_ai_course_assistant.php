@@ -1597,9 +1597,9 @@ $string['privacy:metadata:zendesk:message'] = '학습자가 에스컬레이션�
 $string['privacy:metadata:radar_webhook'] = 'Learning Radar 전달이 Slack 또는 Microsoft Teams 웹훅으로 구성되면, 생성된 보고서가 해당 외부 엔드포인트로 게시됩니다.';
 $string['privacy:metadata:radar_webhook:report'] = '강좌 내 학습자 활동을 참조할 수 있는 Learning Radar 보고서 내용.';
 $string['instructor_dashboard:navlink'] = 'AI 튜터 대시보드';
-$string['analytics_js:total_students'] = '전체 학생 수';
+$string['analytics_js:total_students'] = '총 수강 등록';
 $string['analytics_js:active_ai_users'] = '활성 AI 사용자';
-$string['analytics_js:msgs_per_student'] = '학생당 메시지';
+$string['analytics_js:msgs_per_student'] = '메시지 / 활성 사용자';
 $string['analytics_js:avg_session'] = '평균 세션';
 $string['analytics_js:return_rate'] = '재방문율';
 $string['analytics_js:total_sessions'] = '전체 세션';
@@ -1950,3 +1950,8 @@ $string['quizlock:scope_site'] = '모든 강좌';
 $string['quizlock:scope_desc'] = '진행 중인 응시가 [[tutorshort]]을(를) 퀴즈가 있는 강좌에서만 막을지, 모든 곳에서 막을지 정합니다. <strong>이 강좌만</strong>이 기본값이며 거의 언제나 적절한 선택입니다. 사이트 전체는 v7.2.4까지의 동작으로, 알아둘 만한 결함이 있었습니다. 중단된 응시는 영원히 ‘진행 중’으로 남기 때문에, 학습자 이력 어딘가에 잊힌 퀴즈 하나가 그 사람이 수강하는 모든 강좌에서 어시스턴트를 꺼버렸고, 화면에는 이유가 전혀 표시되지 않았습니다. 사이트 전체로 막아도 두 번째 브라우저를 가진 작정한 학습자에게는 거의 효과가 없으며, 어시스턴트의 강좌 자료와 검색은 원래 강좌 단위입니다.';
 
 $string['settings:prompt_budget_tuner_conflict'] = '사용이 중단된 프롬프트 예산 자동 조정 작업이 켜져 있는데, 예산 모드는 모델에서 산출하도록 설정되어 있습니다. 두 가지는 충돌합니다. 작업이 문자 예산을 기록하고, 기본값이 아닌 값은 의도적인 선택으로 읽혀 산출된 예산을 꺼버립니다. 이 모드에서 작업은 이제 스스로 물러나므로 덮어써지는 것은 없지만, 모호함을 없애려면 꺼두십시오.';
+
+$string['settings:prompt_budget_no_window'] = '위의 예산 모드는 모델에서 도출하도록 설정되어 있지만 도출할 근거가 없습니다. 채팅 모델이 설정되지 않았고 백엔드 컨텍스트 창도 구성되지 않아, 도출은 아래의 고정 문자 예산으로 되돌아갑니다. 채팅 모델을 설정하거나 백엔드 컨텍스트 창을 직접 설정한 다음, 백엔드 자체 점검을 다시 실행해 컨텍스트 창 점검이 통과하는지 확인하세요. 그때까지는 모드가 무엇이라 표시하든 예산은 아래의 숫자입니다.';
+
+$string['analytics_js:section'] = '섹션';
+$string['analytics_js:course'] = 'Course';

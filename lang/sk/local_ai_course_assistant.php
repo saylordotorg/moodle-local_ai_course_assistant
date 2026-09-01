@@ -1590,9 +1590,9 @@ $string['privacy:metadata:zendesk:message'] = 'Obsah správy alebo konverzácie,
 $string['privacy:metadata:radar_webhook'] = 'Keď je nakonfigurované doručovanie funkcie Learning Radar do webhooku Slack alebo Microsoft Teams, vygenerovaná správa sa odošle na tento externý koncový bod.';
 $string['privacy:metadata:radar_webhook:report'] = 'Obsah správy Learning Radar, ktorý môže odkazovať na aktivitu učiaceho sa v kurze.';
 $string['instructor_dashboard:navlink'] = 'Nástenka AI tútora';
-$string['analytics_js:total_students'] = 'Celkový počet študentov';
+$string['analytics_js:total_students'] = 'Celkom zapísaných';
 $string['analytics_js:active_ai_users'] = 'Aktívni používatelia AI';
-$string['analytics_js:msgs_per_student'] = 'Správy / študent';
+$string['analytics_js:msgs_per_student'] = 'Správy / aktívny používateľ';
 $string['analytics_js:avg_session'] = 'Priem. relácia';
 $string['analytics_js:return_rate'] = 'Miera návratnosti';
 $string['analytics_js:total_sessions'] = 'Celkový počet relácií';
@@ -1943,3 +1943,8 @@ $string['quizlock:scope_site'] = 'Všetky kurzy';
 $string['quizlock:scope_desc'] = 'Či prebiehajúci pokus blokuje [[tutorshort]] len v kurze s testom, alebo všade. <strong>Len tento kurz</strong> je predvolená hodnota a takmer vždy je to, čo chcete. Celá stránka bola správaním do verzie 7.2.4 a mala poruchu, ktorú stojí za to poznať: opustený pokus zostáva „prebiehajúci“ navždy, takže jediný zabudnutý test kdesi v histórii študujúceho vypol asistenta v každom jeho kurze, pričom na obrazovke to nič nevysvetlilo. Proti odhodlanému študujúcemu, ktorý má druhý prehliadač, prináša celá stránka veľmi málo, a študijné materiály aj vyhľadávanie asistenta sú aj tak obmedzené na kurz.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Zastaraná úloha automatického ladenia rozpočtu promptu je zapnutá, zatiaľ čo režim rozpočtu je nastavený na odvodenie z modelu. Tieto dve veci si protirečia: úloha zapisuje znakový rozpočet a akákoľvek hodnota iná než predvolená sa číta ako zámerná voľba, čo vypne odvodený rozpočet. Úloha sa v tomto režime teraz sama stiahne, takže sa nič neprepisuje — napriek tomu ju vypnite, aby nejednoznačnosť zmizla.';
+
+$string['settings:prompt_budget_no_window'] = 'Režim rozpočtu vyššie je nastavený na odvodenie z modelu, ale nie je z čoho odvodzovať: model pre chat nie je nastavený a nie je nakonfigurované ani kontextové okno backendu, takže odvodenie sa vracia k pevnému znakovému rozpočtu nižšie. Nastavte model pre chat alebo nastavte kontextové okno backendu ručne, potom znova spustite samokontrolu backendu a overte, že kontrola kontextového okna prejde. Dovtedy je rozpočtom číslo nižšie, nech už režim tvrdí čokoľvek.';
+
+$string['analytics_js:section'] = 'Sekcia';
+$string['analytics_js:course'] = 'Course';

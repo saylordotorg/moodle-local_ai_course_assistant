@@ -1645,9 +1645,9 @@ $string['privacy:metadata:zendesk:message'] = 'Isi pesan atau percakapan yang di
 $string['privacy:metadata:radar_webhook'] = 'Ketika pengiriman Learning Radar ke webhook Slack atau Microsoft Teams dikonfigurasi, laporan yang dihasilkan diposting ke endpoint eksternal tersebut.';
 $string['privacy:metadata:radar_webhook:report'] = 'Isi laporan Learning Radar, yang mungkin merujuk pada aktivitas pelajar dalam kursus.';
 $string['instructor_dashboard:navlink'] = 'Dasbor Tutor AI';
-$string['analytics_js:total_students'] = 'Total Siswa';
+$string['analytics_js:total_students'] = 'Total terdaftar';
 $string['analytics_js:active_ai_users'] = 'Pengguna AI Aktif';
-$string['analytics_js:msgs_per_student'] = 'Pesan / Siswa';
+$string['analytics_js:msgs_per_student'] = 'Pesan / pengguna aktif';
 $string['analytics_js:avg_session'] = 'Sesi Rata-rata';
 $string['analytics_js:return_rate'] = 'Tingkat Kembali';
 $string['analytics_js:total_sessions'] = 'Total Sesi';
@@ -1998,3 +1998,8 @@ $string['quizlock:scope_site'] = 'Semua kursus';
 $string['quizlock:scope_desc'] = 'Apakah percobaan yang sedang berlangsung memblokir [[tutorshort]] hanya di kursus yang memuat kuis, atau di mana saja. <strong>Hanya kursus ini</strong> adalah bawaan dan hampir selalu yang Anda inginkan. Seluruh situs adalah perilaku sampai v7.2.4 dan punya kegagalan yang perlu diketahui: percobaan yang ditinggalkan tetap berstatus berlangsung selamanya, sehingga satu kuis terlupakan di riwayat seorang pelajar menonaktifkan asisten di setiap kursus yang diikutinya, tanpa penjelasan apa pun di layar. Seluruh situs hanya memberi sedikit manfaat terhadap pelajar yang bertekad curang, yang punya peramban kedua, dan materi serta pengambilan asisten memang sudah dibatasi per kursus.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Tugas penyetelan otomatis anggaran prompt yang usang sedang aktif, sementara mode anggaran disetel untuk diturunkan dari model. Keduanya bertentangan: tugas ini menulis anggaran karakter, dan nilai apa pun selain bawaan dibaca sebagai pilihan yang disengaja, sehingga mematikan anggaran turunan. Tugas kini mundur sendiri dalam mode ini, jadi tidak ada yang ditimpa — tetapi matikan untuk menghilangkan keraguan.';
+
+$string['settings:prompt_budget_no_window'] = 'Mode anggaran di atas disetel untuk diturunkan dari model, tetapi tidak ada yang bisa dijadikan dasar: model obrolan belum disetel dan jendela konteks backend belum dikonfigurasi, sehingga penurunan itu kembali ke anggaran karakter tetap di bawah. Setel model obrolan, atau setel jendela konteks backend secara manual, lalu jalankan lagi swauji backend dan pastikan pemeriksaan jendela konteks lulus. Sampai saat itu, anggarannya adalah angka di bawah, apa pun yang diklaim mode tersebut.';
+
+$string['analytics_js:section'] = 'Bagian';
+$string['analytics_js:course'] = 'Course';

@@ -178,8 +178,24 @@ class rag_retriever {
                 // the packed blob and leaves the JSON column null, because
                 // storing a second, larger copy of the vector would defeat the
                 // point of quantizing it.
-                'courseid = :courseid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
-                ['courseid' => $courseid],
+                // v7.2.7: site-wide FAQ chunks are scored alongside the
+                // course's own material. The FAQ is one admin setting, so it is
+                // embedded once against SITEID rather than copied into every
+                // course index; without this clause it would be invisible to
+                // every course that is not the site course.
+                //
+                // It competes on relevance like anything else, which is the
+                // point: a question about certificates retrieves the
+                // certificate answer, and a question about marginal cost
+                // retrieves none of it. Previously all 4,451 characters were
+                // injected into every prompt regardless.
+                '(courseid = :courseid OR (courseid = :siteid AND modtype = :faqtype))
+                   AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
+                [
+                    'courseid' => $courseid,
+                    'siteid' => SITEID,
+                    'faqtype' => \local_ai_course_assistant\faq_manager::MODTYPE,
+                ],
                 '',
                 // NB: `content` is deliberately NOT selected here. Scoring
                 // reads vectors only, so the text is fetched below for the
@@ -188,7 +204,7 @@ class rag_retriever {
                 // (course 116: ~318 ms vs ~315 ms; the difference is within
                 // noise) but a real memory one: the largest course holds
                 // 56 MB of chunk text that scoring never looks at.
-                'id, embedding, embedding_bin, embed_dtype, embed_model, cmid, modtype, chunkindex'
+                'id, courseid, embedding, embedding_bin, embed_dtype, embed_model, cmid, modtype, chunkindex'
             );
 
             self::$vectorcache[$cache_key] = [];
@@ -599,15 +615,49 @@ class rag_retriever {
         if ($currentcmid <= 0 || $scope === 'course') {
             return $ranked;
         }
-        $docchunks = array_values(array_filter(
-            $ranked,
-            fn($r) => (int) ($r['cmid'] ?? 0) === $currentcmid
-        ));
-        if (!empty($docchunks)) {
-            return $docchunks;
+
+        // v7.2.7: site-wide FAQ rows are exempt from the document filter.
+        //
+        // They carry cmid = 0 because they belong to no module, so the filter
+        // below discarded every one of them as soon as the current page
+        // contributed a single chunk -- and under 'document_only' it discarded
+        // them even when it did not. That is a hard filter, not a re-rank, and
+        // it runs before hydration, so nothing downstream could put them back.
+        // Combined with context_builder dropping the inline copy on the strength
+        // of the FAQ being retrievable, a turn started from a module page -- the
+        // ordinary case, and exactly where a learner asks "how do I get my
+        // certificate?" -- reached the model with the FAQ in neither the prompt
+        // nor the retrieved set.
+        $faqtype = \local_ai_course_assistant\faq_manager::MODTYPE;
+
+        $docpresent = false;
+        foreach ($ranked as $row) {
+            if (($row['modtype'] ?? '') === $faqtype) {
+                continue;
+            }
+            if ((int) ($row['cmid'] ?? 0) === $currentcmid) {
+                $docpresent = true;
+                break;
+            }
         }
-        // The current document contributed no chunks to the set.
-        return $scope === 'document_only' ? [] : $ranked;
+
+        // Single pass, so the caller's rank order survives across both partitions.
+        $out = [];
+        foreach ($ranked as $row) {
+            if (($row['modtype'] ?? '') === $faqtype) {
+                $out[] = $row;
+                continue;
+            }
+            if ($docpresent) {
+                if ((int) ($row['cmid'] ?? 0) === $currentcmid) {
+                    $out[] = $row;
+                }
+            } else if ($scope !== 'document_only') {
+                // The current document contributed no chunks to the set.
+                $out[] = $row;
+            }
+        }
+        return $out;
     }
 
     /**

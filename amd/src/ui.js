@@ -1895,14 +1895,26 @@ define([
             textEl.textContent = 'Switch to ' + langName + '?';
         }
 
-        const accept = function() {
+        // v7.2.7: `inert` moves with aria-hidden, in both directions.
+        //
+        // The dormant banner was hidden from assistive technology with
+        // aria-hidden and collapsed to 1px with max-height, but its two buttons
+        // kept tabIndex 0. A keyboard user tabbing through the widget landed on
+        // an invisible, unannounced control that would switch the assistant's
+        // language if activated -- the WCAG 4.1.2 pattern of aria-hidden with
+        // focusable descendants. inert removes it from pointer, focus and the
+        // accessibility tree together, which is the property actually wanted.
+        const conceal = function() {
             langBanner.setAttribute('aria-hidden', 'true');
+            langBanner.setAttribute('inert', '');
             langBanner.classList.remove('local-ai-course-assistant__lang-banner--visible');
+        };
+        const accept = function() {
+            conceal();
             onAccept();
         };
         const dismiss = function() {
-            langBanner.setAttribute('aria-hidden', 'true');
-            langBanner.classList.remove('local-ai-course-assistant__lang-banner--visible');
+            conceal();
             onDismiss();
         };
 
@@ -1915,6 +1927,7 @@ define([
         }
 
         langBanner.setAttribute('aria-hidden', 'false');
+        langBanner.removeAttribute('inert');
         langBanner.classList.add('local-ai-course-assistant__lang-banner--visible');
     };
 
@@ -2981,7 +2994,9 @@ define([
         if (headerEl && headerEl.nextSibling) {
             drawer.insertBefore(panel, headerEl.nextSibling);
         } else {
-            drawer.appendChild(panel);
+            // In-flow panel: same mount rule as the quiz setup, or it paints
+            // after the footer and the bottom nav.
+            mountPanel(drawer, panel);
         }
 
         // Hide starters, messages, and input while welcome is showing so the
@@ -3098,6 +3113,36 @@ define([
      *
      * @param {boolean} enabled
      */
+    /**
+     * Insert a dynamically-built panel into the drawer's content flow.
+     *
+     * The drawer is a flex column ending in the input area, the footer and the
+     * bottom nav. Panels built at runtime were appended to the drawer root,
+     * which puts them AFTER all three -- so opening Quiz Me pushed "Send
+     * feedback" and the Chat/Notes bar up under the header and started the setup
+     * form two thirds of the way down. Every panel the template ships sits
+     * before the input area; these now go to the same place.
+     *
+     * @param {HTMLElement} drawer
+     * @param {HTMLElement} panel
+     * @returns {void}
+     */
+    const mountPanel = function(drawer, panel) {
+        if (!drawer || !panel) {
+            return;
+        }
+        // Ordered by preference: the first of these that exists marks the start
+        // of the drawer's trailing furniture, and the panel belongs above it.
+        var anchor = drawer.querySelector('.local-ai-course-assistant__input-area')
+            || drawer.querySelector('.local-ai-course-assistant__footer-feedback')
+            || drawer.querySelector('.local-ai-course-assistant__bottom-nav');
+        if (anchor && anchor.parentNode === drawer) {
+            drawer.insertBefore(panel, anchor);
+            return;
+        }
+        drawer.appendChild(panel);
+    };
+
     const setQuizButtonEnabled = function(enabled) {
         if (!root) {
             return;
@@ -3749,7 +3794,9 @@ define([
         if (inputArea) {
             drawer.insertBefore(bar, inputArea);
         } else {
-            drawer.appendChild(bar);
+            // In-flow panel: same mount rule as the quiz setup, or it paints
+            // after the footer and the bottom nav.
+            mountPanel(drawer, bar);
         }
         return bar;
     };
@@ -6122,6 +6169,7 @@ define([
         setBottomMode: setBottomMode,
         setModeButtonsEnabled: setModeButtonsEnabled,
         setQuizButtonEnabled: setQuizButtonEnabled,
+        mountPanel: mountPanel,
         configureVoicePanel: configureVoicePanel,
         renderHistoryPanel: renderHistoryPanel,
         showTopicPicker: showTopicPicker,

@@ -1597,9 +1597,9 @@ $string['privacy:metadata:zendesk:message'] = 'Meldingen eller samtaleinnholdet 
 $string['privacy:metadata:radar_webhook'] = 'Når levering av Learning Radar til en Slack- eller Microsoft Teams-webhook er konfigurert, publiseres den genererte rapporten til det eksterne endepunktet.';
 $string['privacy:metadata:radar_webhook:report'] = 'Innholdet i Learning Radar-rapporten, som kan referere til studentaktivitet i emnet.';
 $string['instructor_dashboard:navlink'] = 'AI-veileder-oversikt';
-$string['analytics_js:total_students'] = 'Totalt antall studenter';
+$string['analytics_js:total_students'] = 'Påmeldte totalt';
 $string['analytics_js:active_ai_users'] = 'Aktive AI-brukere';
-$string['analytics_js:msgs_per_student'] = 'Meld. / student';
+$string['analytics_js:msgs_per_student'] = 'Meldinger / aktiv bruker';
 $string['analytics_js:avg_session'] = 'Gj.sn. økt';
 $string['analytics_js:return_rate'] = 'Tilbakevendingsrate';
 $string['analytics_js:total_sessions'] = 'Totalt antall økter';
@@ -1950,3 +1950,8 @@ $string['quizlock:scope_site'] = 'Alle kurs';
 $string['quizlock:scope_desc'] = 'Om et pågående forsøk blokkerer [[tutorshort]] bare i kurset som inneholder quizen, eller overalt. <strong>Bare dette kurset</strong> er standard og er nesten alltid det du vil ha. Hele nettstedet var virkemåten til og med v7.2.4, og hadde en feil det er verdt å kjenne til: et forlatt forsøk blir stående som pågående for alltid, så én glemt quiz et sted i historikken til en student slo av assistenten i hvert eneste kurs vedkommende tok, uten at noe på skjermen forklarte hvorfor. Hele nettstedet gir svært lite mot en student som er fast bestemt på å jukse og har en nettleser til, og assistentens kursmateriale og søk er kursavgrenset uansett.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Den utfasede oppgaven for automatisk justering av ledetekstbudsjettet er slått på, mens budsjettmodus er satt til å utledes fra modellen. De to er i konflikt: oppgaven skriver tegnbudsjettet, og enhver verdi utenom standardverdien leses som et bevisst valg, noe som slår av det utledede budsjettet. Oppgaven trekker seg nå selv i denne modusen, så ingenting overskrives — men slå den av for å fjerne tvetydigheten.';
+
+$string['settings:prompt_budget_no_window'] = 'Budsjettmodusen ovenfor er satt til å utledes fra modellen, men det finnes ingenting å utlede fra: chatmodellen er ikke angitt, og det er ikke satt opp noe kontekstvindu for bakenden, så utledningen faller tilbake på det faste tegnbudsjettet nedenfor. Angi chatmodellen, eller sett bakendens kontekstvindu manuelt, kjør deretter selvtesten for bakenden på nytt og bekreft at kontrollen av kontekstvinduet går gjennom. Inntil da er budsjettet tallet nedenfor, uansett hva modusen hevder.';
+
+$string['analytics_js:section'] = 'Seksjon';
+$string['analytics_js:course'] = 'Course';

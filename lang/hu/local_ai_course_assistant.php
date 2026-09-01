@@ -1629,9 +1629,9 @@ $string['privacy:metadata:zendesk:message'] = 'Az üzenet vagy beszélgetés tar
 $string['privacy:metadata:radar_webhook'] = 'Ha a Learning Radar kézbesítése egy Slack- vagy Microsoft Teams-webhookra van beállítva, a generált jelentés arra a külső végpontra kerül közzétételre.';
 $string['privacy:metadata:radar_webhook:report'] = 'A Learning Radar jelentés tartalma, amely hivatkozhat a tanuló kurzusbeli tevékenységére.';
 $string['instructor_dashboard:navlink'] = 'AI-oktató irányítópult';
-$string['analytics_js:total_students'] = 'Diákok összesen';
+$string['analytics_js:total_students'] = 'Összes beiratkozott';
 $string['analytics_js:active_ai_users'] = 'Aktív AI-felhasználók';
-$string['analytics_js:msgs_per_student'] = 'Üzenet / diák';
+$string['analytics_js:msgs_per_student'] = 'Üzenet / aktív felhasználó';
 $string['analytics_js:avg_session'] = 'Átlagos munkamenet';
 $string['analytics_js:return_rate'] = 'Visszatérési arány';
 $string['analytics_js:total_sessions'] = 'Munkamenetek összesen';
@@ -1982,3 +1982,8 @@ $string['quizlock:scope_site'] = 'Minden kurzus';
 $string['quizlock:scope_desc'] = 'Egy folyamatban lévő kísérlet csak a tesztet tartalmazó kurzuson tiltja-e a(z) [[tutorshort]] használatát, vagy mindenhol. A <strong>Csak ez a kurzus</strong> az alapérték, és szinte mindig ezt szeretné. Az egész webhelyre kiterjedő zárolás a v7.2.4-ig volt a viselkedés, és volt egy ismerésre érdemes hibája: az elhagyott kísérlet örökre „folyamatban” marad, így egyetlen elfelejtett teszt a hallgató előzményeiben minden kurzusán letiltotta az asszisztenst, anélkül hogy a képernyőn bármi megmagyarázta volna. Egy elszánt hallgatóval szemben, akinek van másik böngészője, ez nagyon keveset ér, az asszisztens kurzusanyaga és keresése pedig amúgy is kurzusra szűkített.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Az elavult prompt-keret automatikus hangoló feladat be van kapcsolva, miközben a keretmód a modellből való származtatásra van állítva. A kettő ütközik: a feladat írja a karakterkeretet, és minden, az alapértéktől eltérő érték szándékos döntésként olvasódik, ami kikapcsolja a származtatott keretet. A feladat ebben a módban most már magától visszalép, tehát semmi nem íródik felül — mégis kapcsolja ki, hogy megszűnjön a kétértelműség.';
+
+$string['settings:prompt_budget_no_window'] = 'A fenti keretmód a modellből való származtatásra van állítva, de nincs miből származtatni: a csevegőmodell nincs beállítva és háttérrendszer-kontextusablak sincs megadva, így a származtatás visszaesik az alábbi rögzített karakterkeretre. Állítsa be a csevegőmodellt, vagy adja meg kézzel a háttérrendszer kontextusablakát, majd futtassa újra a háttérrendszer önellenőrzését és győződjön meg róla, hogy a kontextusablak-ellenőrzés átmegy. Addig a keret az alábbi szám, bármit is állít a mód.';
+
+$string['analytics_js:section'] = 'Section';
+$string['analytics_js:course'] = 'Course';

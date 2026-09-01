@@ -1607,9 +1607,9 @@ $string['privacy:metadata:zendesk:message'] = 'Ozi ma ọ bụ ọdịnaya mkpar
 $string['privacy:metadata:radar_webhook'] = 'Mgbe a haziri nnyefe Learning Radar na webhook Slack ma ọ bụ Microsoft Teams, a na-ebufe akụkọ e mepụtara na ebe njikọ mpụga ahụ.';
 $string['privacy:metadata:radar_webhook:report'] = 'Ọdịnaya akụkọ Learning Radar, nke nwere ike izo aka na ọrụ onye mmụta na nkuzi.';
 $string['instructor_dashboard:navlink'] = 'Dashboard Onye Nkuzi AI';
-$string['analytics_js:total_students'] = 'Ngụkọta Ụmụ Akwụkwọ';
+$string['analytics_js:total_students'] = 'Ngụkọta ndị debanyere aha';
 $string['analytics_js:active_ai_users'] = 'Ndị Ọrụ AI Na-arụ Ọrụ';
-$string['analytics_js:msgs_per_student'] = 'Ozi / Nwa Akwụkwọ';
+$string['analytics_js:msgs_per_student'] = 'Ozi / onye ọrụ na-arụ ọrụ';
 $string['analytics_js:avg_session'] = 'Nkezi Nnọkọ';
 $string['analytics_js:return_rate'] = 'Ọnụego Nlaghachi';
 $string['analytics_js:total_sessions'] = 'Ngụkọta Nnọkọ';
@@ -1960,3 +1960,8 @@ $string['quizlock:scope_site'] = 'Nkuzi niile';
 $string['quizlock:scope_desc'] = 'Ma mgbalị na-aga n\'ihu ọ ga-egbochi [[tutorshort]] naanị na nkuzi nwere ajụjụ ahụ, ka ọ bụ ebe niile. <strong>Naanị nkuzi a</strong> bụ ndabara, ọ bụkwa ihe ị chọrọ ihe fọrọ nke nta ka ọ bụrụ mgbe niile. Saịtị niile bụ omume ruo v7.2.4, o nwekwara nsogbu kwesịrị ịmara: mgbalị a hapụrụ ahapụ na-anọgide «na-aga n\'ihu» ruo mgbe ebighị ebi, ya mere otu ajụjụ echefuru n\'akụkọ nke onye mmụta na-agbanyụ onye enyemaka ahụ na nkuzi ọ bụla ọ na-amụ, n\'enweghị ihe ọ bụla na ihuenyo kọwara ya. Saịtị niile enweghị ike ime ihe dị ukwuu megide onye kpebisiri ike ịghọ aghụghọ, ebe ọ nwere ihe nchọgharị nke abụọ, ihe ọmụmụ na nchọta nke onye enyemaka ahụ bụkwa nke nkuzi naanị.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Ọrụ ndozi akpaaka nke mmefu ntuziaka akwụsịla agbanyere ka ụdị mmefu edobere ka e wepụta ya site n\'ihe nlereanya. Ha abụọ na-emegide onwe ha: ọrụ ahụ na-ede mmefu mkpụrụedemede, uru ọ bụla na-abụghị ndabara ka a na-agụ dịka nhọrọ ezubere, nke na-agbanyụ mmefu ewepụtara. Ọrụ ahụ na-akwụsị onwe ya ugbu a n\'ụdị a, ya mere ọ dịghị ihe a na-edegharị — mana gbanyụọ ya ka enweghị mgbagwoju anya.';
+
+$string['settings:prompt_budget_no_window'] = 'Ụdị mmefu ego dị n\'elu ka edobere ka esite na ụdị ahụ nweta ya, mana ọ dịghị ihe esi na ya nweta: edobeghị ụdị nkata ahụ, edobeghịkwa windo ọnọdụ nke azụ, ya mere nweta ahụ na-alaghachi na mmefu mkpụrụedemede kwụsiri ike nke dị n\'okpuru. Debe ụdị nkata ahụ, ma ọ bụ debe windo ọnọdụ azụ site n\'aka gị, mgbe ahụ mee nnwale onwe azụ ọzọ ma chọpụta na nlele windo ọnọdụ gafere. Ruo mgbe ahụ, mmefu ahụ bụ ọnụọgụ dị n\'okpuru, n\'agbanyeghị ihe ụdị ahụ na-ekwu.';
+
+$string['analytics_js:section'] = 'Ngalaba';
+$string['analytics_js:course'] = 'Course';

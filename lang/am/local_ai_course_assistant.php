@@ -1620,9 +1620,9 @@ $string['privacy:metadata:zendesk:message'] = 'ተማሪው ለማሳደግ የ�
 $string['privacy:metadata:radar_webhook'] = 'የ Learning Radar አቅርቦት ወደ Slack ወይም Microsoft Teams webhook ሲዋቀር፣ የተመነጨው ሪፖርት ወደ ያ ውጫዊ መዳረሻ ይለጠፋል።';
 $string['privacy:metadata:radar_webhook:report'] = 'በኮርሱ ውስጥ የተማሪ እንቅስቃሴን ሊጠቅስ የሚችል የ Learning Radar ሪፖርት ይዘት።';
 $string['instructor_dashboard:navlink'] = 'የ AI አስተማሪ ዳሽቦርድ';
-$string['analytics_js:total_students'] = 'ጠቅላላ ተማሪዎች';
+$string['analytics_js:total_students'] = 'በአጠቃላይ የተመዘገቡ';
 $string['analytics_js:active_ai_users'] = 'ንቁ የ AI ተጠቃሚዎች';
-$string['analytics_js:msgs_per_student'] = 'መልእክቶች / ተማሪ';
+$string['analytics_js:msgs_per_student'] = 'መልእክቶች / ንቁ ተጠቃሚ';
 $string['analytics_js:avg_session'] = 'አማካይ ክፍለ-ጊዜ';
 $string['analytics_js:return_rate'] = 'የመመለስ መጠን';
 $string['analytics_js:total_sessions'] = 'ጠቅላላ ክፍለ-ጊዜዎች';
@@ -1973,3 +1973,8 @@ $string['quizlock:scope_site'] = 'ሁሉም ኮርሶች';
 $string['quizlock:scope_desc'] = 'በሂደት ላይ ያለ ሙከራ [[tutorshort]]ን ፈተናውን በያዘው ኮርስ ውስጥ ብቻ ይከልክል ወይስ በሁሉም ቦታ። <strong>ይህ ኮርስ ብቻ</strong> ነባሪው ሲሆን ሁልጊዜ ማለት ይቻላል የሚፈለገው ነው። መላ-ጣቢያ እስከ v7.2.4 ድረስ የነበረው ባህሪ ሲሆን ማወቅ የሚገባው ችግር ነበረው፦ የተተወ ሙከራ ለዘላለም በሂደት ላይ ሆኖ ይቆያል፣ ስለዚህ በተማሪው ታሪክ ውስጥ የተረሳ አንድ ፈተና በሚማረው በእያንዳንዱ ኮርስ ውስጥ ረዳቱን ያሰናክል ነበር፣ በስክሪኑ ላይ ምንም ማብራሪያ ሳይኖር። መላ-ጣቢያ በቆረጠ ተማሪ ላይ የሚያተርፈው በጣም ጥቂት ነው፤ ሁለተኛ አሳሽ አለውና፣ የረዳቱ የኮርስ ይዘትና ማውጣቱም በኮርስ የተወሰነ ነው።';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'የተተወው የጥያቄ-በጀት በራስ-ማስተካከያ ተግባር ተነስቷል፣ የበጀት ሁኔታው ግን ከሞዴሉ እንዲወጣ ተቀምጧል። እነዚህ ሁለቱ ይጋጫሉ፦ ተግባሩ የቁምፊ በጀቱን ይጽፋል፣ ከነባሪው ውጪ ያለ ማንኛውም ዋጋ ደግሞ እንደ ሆን ተብሎ የተመረጠ ይቆጠራል፣ ይህም የተወጣውን በጀት ያሰናክላል። ተግባሩ በዚህ ሁኔታ አሁን በራሱ ይቆማል፣ ስለዚህ ምንም አይተካም — ግን ግልጽነት እንዲኖር አጥፉት።';
+
+$string['settings:prompt_budget_no_window'] = 'ከላይ ያለው የበጀት ሁኔታ ከሞዴሉ እንዲወጣ ተቀምጧል፣ ግን የሚወጣበት ነገር የለም፦ የውይይት ሞዴሉ አልተቀመጠም እና የጀርባ አውድ መስኮትም አልተዋቀረም፣ ስለዚህ ማውጣቱ ወደ ታች ወዳለው ቋሚ የቁምፊ በጀት ይመለሳል። የውይይት ሞዴሉን ያዘጋጁ፣ ወይም የጀርባውን አውድ መስኮት በእጅ ያዘጋጁ፣ ከዚያ የጀርባውን ራስ-ምርመራ እንደገና አሂደው የአውድ መስኮት ፍተሻው እንዳለፈ ያረጋግጡ። እስከዚያ ድረስ በጀቱ ሁኔታው ምንም ቢል ከታች ያለው ቁጥር ነው።';
+
+$string['analytics_js:section'] = 'ክፍል';
+$string['analytics_js:course'] = 'Course';

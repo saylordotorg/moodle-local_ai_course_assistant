@@ -1618,9 +1618,9 @@ $string['privacy:metadata:zendesk:message'] = 'Qabiyyee ergaa ykn marii barataan
 $string['privacy:metadata:radar_webhook'] = 'Yeroo geessuun Learning Radar gara webhook Slack ykn Microsoft Teams qindaa\'u, gabaasni uumame gara qabsiisaa alaa sanaatti ergama.';
 $string['privacy:metadata:radar_webhook:report'] = 'Qabiyyee gabaasa Learning Radar, kan sochii barataa koorsii keessaa caqasuu danda\'u.';
 $string['instructor_dashboard:navlink'] = 'Daashboordii Barsiisaa AI';
-$string['analytics_js:total_students'] = 'Barattoota Waliigalaa';
+$string['analytics_js:total_students'] = 'Ida galmaa\'an';
 $string['analytics_js:active_ai_users'] = 'Fayyadamtoota AI Sochii Qaban';
-$string['analytics_js:msgs_per_student'] = 'Ergaa / Barataa';
+$string['analytics_js:msgs_per_student'] = 'Ergaa / fayyadamaa sochii qabu';
 $string['analytics_js:avg_session'] = 'Marii Giddugaleessaa';
 $string['analytics_js:return_rate'] = 'Sadarkaa Deebi\'uu';
 $string['analytics_js:total_sessions'] = 'Marii Waliigalaa';
@@ -1971,3 +1971,8 @@ $string['quizlock:scope_site'] = 'Koorsiiwwan hunda';
 $string['quizlock:scope_desc'] = 'Yaaliin adeemsa irra jiru [[tutorshort]] koorsii qormaanni sun keessa jiru qofa keessatti dhorku, moo bakka hundatti. <strong>Koorsii kana qofa</strong> durtii yoo ta\'u, kan barbaadamu yeroo hunda gandaa. Marsariitii guutuu hanga v7.2.4 amala ture, rakkoo beekamuu qabus qaba ture: yaaliin gatame bara baraan «adeemsa irra» ta\'ee hafa, kanaafuu qormaanni tokko seenaa barataa keessatti irraanfatame koorsii inni fudhatu hunda keessatti gargaaraa sana ni dhaamsa ture, ibsi tokkoyyuu iskiriinii irratti utuu hin mul\'atiin. Marsariitii guutuun barataa hanna gochuuf murteeffate irratti waan xiqqoo qofa buusa, inni biraawuzarii lammaffaa qaba, meeshaan barnootaa fi barbaachi gargaaraa sanaas dursanii koorsiitti daangeffamaniiru.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Hojiin sirreeffama ofumaa baajata gaaffii kan hafe banaa dha, haalli baajataa garuu moodeela irraa akka argamu qindaa\'eera. Lamaan kun walitti bu\'u: hojiin sun baajata qubee barreessa, gatiin durtii hin taane kamiyyuu filannoo beekamaadhaan godhame jedhamee dubbifama, kunis baajata argame ni dhaamsa. Hojiin sun haala kana keessatti amma ofumaa dhaabata, kanaaf wanti irratti barreeffamu hin jiru — haa ta\'u malee shakkii balleessuuf dhaamsi.';
+
+$string['settings:prompt_budget_no_window'] = 'Haalli baajata armaan olii moodeelicha irraa akka argamu qindaa\'eera, garuu wanti irraa argamu hin jiru: moodeelli haasawaa hin qindoofne, foddaan haala duubbee illee hin qindoofne, kanaaf argannoon sun gara baajata qubee dhaabbataa armaan gadiitti deebi\'a. Moodeela haasawaa qindeessi, yookaan foddaa haala duubbee harkaan qindeessi, ergasii qorannoo ofii duubbee irra deebi\'ii yaali, akkasumas qorannoon foddaa haalaa akka dabre mirkaneessi. Hanga sanaatti, haalli waan barbaade haa jedhu malee, baajanni lakkoofsa armaan gadii ti.';
+
+$string['analytics_js:section'] = 'Kutaa';
+$string['analytics_js:course'] = 'Course';

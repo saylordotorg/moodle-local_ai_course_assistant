@@ -1626,9 +1626,9 @@ $string['privacy:metadata:zendesk:message'] = 'Message walla waxtaan bi njàngka
 $string['privacy:metadata:radar_webhook'] = 'Bu delivery bu Learning Radar ci webhook bu Slack walla Microsoft Teams ñu ko configure, rapoor bi ñu jur dañu koy yónnee endpoint boobu bu biti.';
 $string['privacy:metadata:radar_webhook:report'] = 'Dàttu bu rapoor bu Learning Radar, bu mën référencer activité bu njàngkat bi ci cours bi.';
 $string['instructor_dashboard:navlink'] = 'Dashboard bu Coach AI';
-$string['analytics_js:total_students'] = 'Njàngkat yépp';
+$string['analytics_js:total_students'] = 'Ñi bind lépp';
 $string['analytics_js:active_ai_users'] = 'Jëfandikukat AI yu yëngu';
-$string['analytics_js:msgs_per_student'] = 'Msg / Njàngkat';
+$string['analytics_js:msgs_per_student'] = 'Bataaxal / jëfandikukat bu jàng';
 $string['analytics_js:avg_session'] = 'Diggante Session';
 $string['analytics_js:return_rate'] = 'Yoonu dellusi';
 $string['analytics_js:total_sessions'] = 'Session yépp';
@@ -1979,3 +1979,8 @@ $string['quizlock:scope_site'] = 'Kurs yépp';
 $string['quizlock:scope_desc'] = 'Ndax jéego bi di dox dina tëj [[tutorshort]] ci kurs bi ëmb tegtal bi rekk, walla ci fépp. <strong>Kurs bii rekk</strong> mooy bi ñu tëral te mooy li ñuy soxla ci lu ëpp. Sit bi yépp mooy jikko bi ba v7.2.4, te am na jafe-jafe bu war a ràññeeku: jéego bu ñu bàyyi dafay des «di dox» ba fàww, kon benn tegtal bu ñu fàtte ci taariixu jàngalekat bi dafay faral di fey ndimbal li ci kurs bu nekk mu jàng, te dara du feeñ ci ekraan bi ngir leeral ko. Sit bi yépp du am solo ci jàngalekat bu ne dina def kañ-kañ, ndax am na naataangeem ñaareelu naawarukaay, te matiere kurs bi ak seetu ndimbal li ci kurs bi rekk lañu tëdd.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Liggéey bu yeesalu bujeetu ndigal ci boppam bi ñu bàyyi mungi tàkk, te anam bu bujeet bi ñu ko tëral ngir mu jóge ci moodel bi. Ñaar yi dañu bëre: liggéey bi dafay bind bujeetu araf yi, te kaw-kaw bu dul bi ñu tëral dañu koy jàng ni tànn gu ñu def ci dëgg, loolu dafay fey bujeet bi ñu jële. Liggéey bi léegi dafay dellu ci boppam ci anam bii, kon dara du bind ci kaw — waaye feyal ko ngir jafe-jafe bi wéy.';
+
+$string['settings:prompt_budget_no_window'] = 'Anam bu bujet bi ci kaw dañu koy defal ngir mu jóge ci moodal bi, waaye amul dara lu mu jóge: moodal waxtaan wi dañu ko defalul te fenetar bi ngir këriñ bi itam dañu ko defalul, kon jóge gi dafay dellu ci bujet araf bu wóor bi ci suuf. Defal moodal waxtaan wi, walla nga defal fenetar këriñ bi ak sa loxo, ba noppi nga doxal ateel këriñ bi ci sa bopp te wóoral ne saytu fenetar bi dafa wees. Ba léegi, bujet bi mooy limu ci suuf, lu anam bi wax lu mu doon.';
+
+$string['analytics_js:section'] = 'Section';
+$string['analytics_js:course'] = 'Course';

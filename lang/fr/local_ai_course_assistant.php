@@ -1591,9 +1591,9 @@ $string['privacy:metadata:zendesk:message'] = 'Le message ou le contenu de la co
 $string['privacy:metadata:radar_webhook'] = 'Lorsque la diffusion de Learning Radar vers un webhook Slack ou Microsoft Teams est configurée, le rapport généré est publié sur ce point de terminaison externe.';
 $string['privacy:metadata:radar_webhook:report'] = 'Le contenu du rapport Learning Radar, qui peut faire référence à l\'activité de l\'apprenant dans le cours.';
 $string['instructor_dashboard:navlink'] = 'Tableau de bord du tuteur IA';
-$string['analytics_js:total_students'] = 'Total des étudiants';
+$string['analytics_js:total_students'] = 'Total inscrits';
 $string['analytics_js:active_ai_users'] = 'Utilisateurs actifs de l\'IA';
-$string['analytics_js:msgs_per_student'] = 'Msgs / étudiant';
+$string['analytics_js:msgs_per_student'] = 'Msg / utilisateur actif';
 $string['analytics_js:avg_session'] = 'Session moy.';
 $string['analytics_js:return_rate'] = 'Taux de retour';
 $string['analytics_js:total_sessions'] = 'Total des sessions';
@@ -1944,3 +1944,8 @@ $string['quizlock:scope_site'] = 'Tous les cours';
 $string['quizlock:scope_desc'] = 'Si une tentative en cours bloque [[tutorshort]] uniquement dans le cours contenant le test, ou partout. <strong>Ce cours uniquement</strong> est la valeur par défaut et convient presque toujours. À l’échelle du site était le comportement jusqu’à la v7.2.4, avec un défaut qu’il vaut mieux connaître : une tentative abandonnée reste « en cours » indéfiniment, si bien qu’un seul test oublié quelque part dans l’historique d’une personne désactivait l’assistant dans tous ses cours, sans la moindre explication à l’écran. À l’échelle du site n’apporte presque rien face à quelqu’un de déterminé, qui dispose d’un second navigateur, et le contenu comme la recherche de l’assistant sont de toute façon limités au cours.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'La tâche obsolète d’ajustement automatique du budget de prompt est activée alors que le mode de budget est réglé pour être déduit du modèle. Les deux entrent en conflit : la tâche écrit le budget de caractères, et toute valeur autre que celle par défaut est lue comme un choix délibéré, ce qui désactive le budget déduit. La tâche se retire désormais d’elle-même dans ce mode, donc rien n’est écrasé — désactivez-la tout de même pour lever l’ambiguïté.';
+
+$string['settings:prompt_budget_no_window'] = 'Le mode de budget ci-dessus est réglé pour être déduit du modèle, mais il n’y a rien à en déduire : le modèle de conversation n’est pas renseigné et aucune fenêtre de contexte du backend n’est configurée, si bien que la déduction retombe sur le budget de caractères fixe ci-dessous. Renseignez le modèle de conversation, ou saisissez la fenêtre de contexte du backend à la main, puis relancez l’autotest du backend et vérifiez que le contrôle de la fenêtre de contexte réussit. D’ici là, le budget est le nombre ci-dessous, quoi qu’affirme le mode.';
+
+$string['analytics_js:section'] = 'Section';
+$string['analytics_js:course'] = 'Course';

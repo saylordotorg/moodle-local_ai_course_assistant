@@ -1590,9 +1590,9 @@ $string['privacy:metadata:zendesk:message'] = 'Conținutul mesajului sau al conv
 $string['privacy:metadata:radar_webhook'] = 'Când livrarea Learning Radar către un webhook Slack sau Microsoft Teams este configurată, raportul generat este postat pe acel punct final extern.';
 $string['privacy:metadata:radar_webhook:report'] = 'Conținutul raportului Learning Radar, care poate face referire la activitatea cursantului în cadrul cursului.';
 $string['instructor_dashboard:navlink'] = 'Panou tutore AI';
-$string['analytics_js:total_students'] = 'Total studenți';
+$string['analytics_js:total_students'] = 'Total înscriși';
 $string['analytics_js:active_ai_users'] = 'Utilizatori AI activi';
-$string['analytics_js:msgs_per_student'] = 'Mesaje / student';
+$string['analytics_js:msgs_per_student'] = 'Mesaje / utilizator activ';
 $string['analytics_js:avg_session'] = 'Sesiune medie';
 $string['analytics_js:return_rate'] = 'Rată de revenire';
 $string['analytics_js:total_sessions'] = 'Total sesiuni';
@@ -1943,3 +1943,8 @@ $string['quizlock:scope_site'] = 'Toate cursurile';
 $string['quizlock:scope_desc'] = 'Dacă o încercare în curs blochează [[tutorshort]] doar în cursul care conține testul sau peste tot. <strong>Doar acest curs</strong> este valoarea implicită și este aproape întotdeauna ce vrei. Întregul site a fost comportamentul până la v7.2.4 și avea o defecțiune care merită cunoscută: o încercare abandonată rămâne «în curs» pentru totdeauna, așa că un singur test uitat undeva în istoricul unui cursant dezactiva asistentul în fiecare curs al său, fără nimic pe ecran care să explice de ce. Întregul site aduce foarte puțin în fața cuiva hotărât să copieze, care are un al doilea browser, iar materialul și căutarea asistentului sunt oricum limitate la curs.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Sarcina învechită de ajustare automată a bugetului promptului este pornită, în timp ce modul de buget este setat să derive din model. Cele două intră în conflict: sarcina scrie bugetul de caractere, iar orice valoare diferită de cea implicită este citită ca o alegere deliberată, ceea ce dezactivează bugetul derivat. Sarcina se retrage acum singură în acest mod, deci nimic nu este suprascris — dar oprește-o pentru a elimina ambiguitatea.';
+
+$string['settings:prompt_budget_no_window'] = 'Modul de buget de mai sus este setat să fie dedus din model, dar nu există din ce să fie dedus: modelul de chat nu este setat și nici fereastra de context a backendului nu este configurată, așa că deducerea revine la bugetul fix de caractere de mai jos. Setați modelul de chat sau setați manual fereastra de context a backendului, apoi rulați din nou autotestul backendului și confirmați că verificarea ferestrei de context trece. Până atunci, bugetul este numărul de mai jos, orice ar pretinde modul.';
+
+$string['analytics_js:section'] = 'Secțiune';
+$string['analytics_js:course'] = 'Course';

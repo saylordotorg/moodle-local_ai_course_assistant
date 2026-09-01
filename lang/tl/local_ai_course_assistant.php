@@ -1651,9 +1651,9 @@ $string['privacy:metadata:zendesk:message'] = 'Ang mensahe o nilalaman ng pag-uu
 $string['privacy:metadata:radar_webhook'] = 'Kapag na-configure ang paghahatid ng Learning Radar sa isang Slack o Microsoft Teams webhook, ang nabuong ulat ay ipo-post sa panlabas na endpoint na iyon.';
 $string['privacy:metadata:radar_webhook:report'] = 'Ang nilalaman ng ulat ng Learning Radar, na maaaring tumukoy sa aktibidad ng mag-aaral sa kurso.';
 $string['instructor_dashboard:navlink'] = 'Dashboard ng AI Tutor';
-$string['analytics_js:total_students'] = 'Kabuuang Estudyante';
+$string['analytics_js:total_students'] = 'Kabuuang naka-enroll';
 $string['analytics_js:active_ai_users'] = 'Aktibong Gumagamit ng AI';
-$string['analytics_js:msgs_per_student'] = 'Mga Mensahe / Estudyante';
+$string['analytics_js:msgs_per_student'] = 'Mensahe / aktibong user';
 $string['analytics_js:avg_session'] = 'Karaniwang Session';
 $string['analytics_js:return_rate'] = 'Return Rate';
 $string['analytics_js:total_sessions'] = 'Kabuuang Session';
@@ -2004,3 +2004,8 @@ $string['quizlock:scope_site'] = 'Lahat ng kurso';
 $string['quizlock:scope_desc'] = 'Kung ang isang kasalukuyang pagsubok ay humaharang sa [[tutorshort]] sa kursong naglalaman lamang ng pagsusulit, o kahit saan. Ang <strong>Ang kursong ito lamang</strong> ang default at halos palaging ito ang gusto mo. Ang buong site ang naging asal hanggang v7.2.4 at may depektong dapat malaman: ang iniwang pagsubok ay nananatiling «kasalukuyan» habambuhay, kaya ang isang nakalimutang pagsusulit sa kasaysayan ng isang mag-aaral ay nagpapatay sa katulong sa bawat kursong kinukuha niya, na walang anumang paliwanag sa screen. Kakaunti ang naiaambag ng buong site laban sa mag-aaral na determinadong mandaya, na may pangalawang browser, at ang materyal at paghahanap ng katulong ay nakakulong na sa kurso.';
 
 $string['settings:prompt_budget_tuner_conflict'] = 'Nakabukas ang hindi na ginagamit na gawain sa awtomatikong pag-aayos ng badyet ng prompt, samantalang ang mode ng badyet ay nakatakdang hanguin mula sa modelo. Nagkakasalungat ang dalawa: isinusulat ng gawain ang badyet ng karakter, at ang anumang halagang bukod sa default ay binabasa bilang sadyang pinili, kaya na-o-off ang hinangong badyet. Ang gawain ay umaatras na mismo sa mode na ito, kaya walang na-o-overwrite — ngunit i-off ito upang maalis ang kalabuan.';
+
+$string['settings:prompt_budget_no_window'] = 'Nakatakda ang budget mode sa itaas na kunin mula sa modelo, ngunit walang mapagkukunan: hindi nakatakda ang modelo ng chat at walang nakaconfigure na context window para sa backend, kaya bumabalik ang pagkuha sa nakapirming budget ng mga karakter sa ibaba. Itakda ang modelo ng chat, o itakda nang manu-mano ang context window ng backend, pagkatapos ay patakbuhing muli ang self-test ng backend at tiyaking pumapasa ang pagsusuri sa context window. Hanggang doon, ang budget ay ang numerong nasa ibaba, anuman ang sabihin ng mode.';
+
+$string['analytics_js:section'] = 'Seksyon';
+$string['analytics_js:course'] = 'Course';
