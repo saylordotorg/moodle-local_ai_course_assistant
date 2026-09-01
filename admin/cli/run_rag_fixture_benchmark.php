@@ -78,6 +78,10 @@ $judgemode     = false;
 $questionspath = '';
 $samplesize    = 100;
 $judgemodel    = 'gpt-4o-mini';
+// Voyage MRL width for A/B arms. 1024 is the native default; 2048 is the
+// ceiling and is the only way to compare Voyage against OpenAI's native
+// 1536 without the narrower vector confounding the result.
+$voyagedim     = 1024;
 
 foreach ($argv as $arg) {
     if (preg_match('/^--fixtures=(.+)$/', $arg, $m)) {
@@ -98,6 +102,8 @@ foreach ($argv as $arg) {
         $openaiapikey = trim($m[1]);
     } else if (preg_match('/^--voyage-apikey=(.+)$/', $arg, $m)) {
         $voyageapikey = trim($m[1]);
+    } else if (preg_match('/^--voyage-dim=(\d+)$/', $arg, $m)) {
+        $voyagedim = (int) $m[1];
     } else if ($arg === '--judge') {
         $judgemode = true;
     } else if (preg_match('/^--questions=(.+)$/', $arg, $m)) {
@@ -129,6 +135,9 @@ embedding-only recall comparison; the rerank arm is skipped in this mode):
                         arm and restored at exit.
   --openai-apikey=KEY   API key used for openai:* arms (in memory only).
   --voyage-apikey=KEY   API key used for voyage:* arms (in memory only).
+  --voyage-dim=N        MRL width for voyage:* arms (256/512/1024/2048;
+                        default 1024). OpenAI arms always use native 1536,
+                        so pass 2048 to rule out width as a confound.
 
   Example three-way A/B:
     php run_rag_fixture_benchmark.php \
@@ -381,6 +390,17 @@ if ($judgemode) {
     $famb = [
         ['label' => 'openai:3-small', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey)],
         ['label' => 'voyage:3.5', 'prov' => 'voyage', 'model' => 'voyage-3.5', 'dim' => 1024, 'key' => $voyageapikey],
+        // 2026-09-01: voyage-4 line. Same MRL widths as the 3.x line
+        // (256/512/1024/2048), so 1024 keeps the comparison honest -- a wider
+        // vector would win on recall partly by being wider, not better.
+        // voyage-4-lite is here because it is a third of voyage-4's list price
+        // and the question that matters is whether the quality gap justifies it.
+        ['label' => 'voyage:4', 'prov' => 'voyage', 'model' => 'voyage-4', 'dim' => 1024, 'key' => $voyageapikey],
+        ['label' => 'voyage:4-lite', 'prov' => 'voyage', 'model' => 'voyage-4-lite', 'dim' => 1024, 'key' => $voyageapikey],
+        ['label' => 'voyage:4-large', 'prov' => 'voyage', 'model' => 'voyage-4-large', 'dim' => 1024, 'key' => $voyageapikey],
+        // NB: voyage-context-4 is deliberately absent. Probed live 2026-09-01 and
+        // /v1/embeddings rejects it with HTTP 400 -- it is a contextualized-embedding
+        // model on a different endpoint, not a drop-in for this arm.
     ];
     $origb = [
         'embed_provider'   => get_config('local_ai_course_assistant', 'embed_provider'),
@@ -795,7 +815,7 @@ if (!empty($abproviders)) {
         // The base provider hard-defaults an unset width to 1536, which Voyage
         // rejects (its MRL widths are only 256/512/1024/2048), so the width must
         // be pinned per provider rather than left unset.
-        $armdim = ($prov === 'voyage') ? 1024 : 1536;
+        $armdim = ($prov === 'voyage') ? $voyagedim : 1536;
         set_config('embed_provider', $prov, 'local_ai_course_assistant');
         set_config('embed_model', ($model !== '') ? $model : null, 'local_ai_course_assistant');
         set_config('embed_dimensions', $armdim, 'local_ai_course_assistant');
