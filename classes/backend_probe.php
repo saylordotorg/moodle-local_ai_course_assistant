@@ -99,7 +99,16 @@ final class backend_probe {
             $reply = $provider->chat_completion(
                 'You are a connectivity probe. Answer in one word.',
                 [['role' => 'user', 'content' => 'Reply with the single word OK.']],
-                ['max_tokens' => 8]
+                // v7.2.8: NOT 8. Reasoning models spend the completion budget on
+                // internal thinking tokens before emitting anything, so a tiny
+                // ceiling returns HTTP 200 with finish_reason=length and null
+                // content. Measured against live gemini-2.5-flash on 2026-09-01:
+                // max_tokens 8 and 16 both yield null; 64 yields "OK". At 8 this
+                // probe reported a perfectly healthy production backend as FAIL,
+                // which is the worst possible behaviour for the one page an admin
+                // opens to answer "is my backend up?". 256 is far above the knee
+                // and still costs a fraction of a cent per run.
+                ['max_tokens' => 256]
             );
             $ms = (int) round((microtime(true) - $started) * 1000);
             if (trim((string) $reply) === '') {
@@ -107,7 +116,18 @@ final class backend_probe {
             }
             return self::row(self::STATUS_PASS, "Chat round-trip OK in {$ms} ms.");
         } catch (\Throwable $e) {
-            return self::row(self::STATUS_FAIL, 'Chat probe failed: ' . $e->getMessage());
+            // v7.2.8: surface debuginfo. moodle_exception keeps the HTTP status
+            // and response body there, not in getMessage(), so reporting the
+            // message alone reduced every backend fault to the same generic
+            // sentence -- on the page whose entire job is telling an admin what
+            // is wrong. Diagnosing the 2026-09-01 staging incident took a dozen
+            // steps for exactly this reason.
+            $detail = trim((string) ($e->debuginfo ?? ''));
+            $msg = 'Chat probe failed: ' . $e->getMessage();
+            if ($detail !== '') {
+                $msg .= ' [' . \core_text::substr($detail, 0, 300) . ']';
+            }
+            return self::row(self::STATUS_FAIL, $msg);
         }
     }
 
