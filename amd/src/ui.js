@@ -482,6 +482,21 @@ define([
         const cites = currentCitations || [];
         const order = {};
         let nextNum = 0;
+        // Models fairly often compress two citations into one bracket group,
+        // "[[c:2], [c:4]]", instead of writing "[[c:2]] [[c:4]]". The per-marker
+        // replace below only knows the single form, so the compressed form was
+        // reaching learners as raw markup (seen live on staging, 7.2.7, in both
+        // English and Spanish replies). Normalise it to consecutive single
+        // markers first; the regex is anchored on "[[c:" so ordinary prose with
+        // brackets is untouched.
+        html = html.replace(/\[\[c:(\d+)((?:\]\s*,\s*\[c:\d+)+)\]\]/g, function(_m, first, rest) {
+            const nums = [first].concat(
+                (rest.match(/\d+/g) || [])
+            );
+            return nums.map(function(n) {
+                return '[[c:' + n + ']]';
+            }).join('');
+        });
         // The leading whitespace is captured so it can be dropped along with an
         // unresolvable marker. Returning just '' left the space the model wrote
         // before the citation, producing "...the basic elements of art ." -- and

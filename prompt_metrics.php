@@ -21,8 +21,8 @@
  * captured by {@see prompt_metrics_logger}, plus a recommendation for
  * `prompt_budget_chars` based on observed truncation / headroom. An
  * "Apply recommendation" button is shown when the recommendation
- * differs from the current setting; admins can also opt into daily
- * auto-tune via the plugin settings.
+ * differs from the current setting. The daily auto-tune task is
+ * deprecated (v7.2.6) and is no longer offered from this page.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
@@ -75,8 +75,6 @@ foreach ($agg['by_cat_avg'] as $cat => $chars) {
     ];
 }
 
-$auto_tune_on = (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune');
-
 // Section-name tallies, most frequent first. Rows written before v7.2.7 carry
 // no names, so these stay empty until the log rotates.
 $dropped_rows = [];
@@ -112,8 +110,6 @@ $templatedata = [
     'rec_rationale'   => $rec ? $rec['rationale'] : '',
     'rec_diff'        => $rec ? ($rec['budget'] !== $current) : false,
     'apply_url'       => (new moodle_url($pageurl, ['apply' => 1, 'sesskey' => sesskey()]))->out(false),
-    'auto_tune_on'    => $auto_tune_on,
-    'settings_url'    => (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(false),
 ];
 
 echo $OUTPUT->header();
