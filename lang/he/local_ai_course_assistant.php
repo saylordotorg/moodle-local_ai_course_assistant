@@ -1987,3 +1987,4 @@ $string['coursesettings:apikey_clear'] = 'מחק את המפתח השמור וה
 $string['coursesettings:spend_cap_monthly'] = 'תקרת הוצאה חודשית לקורס זה (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'השאירו ריק כדי להשתמש בברירת המחדל של האתר. כאשר מוגדר, תכונות ה-AI בקורס זה נעצרות כאשר ההוצאה החודשית מגיעה לסכום זה.';
 $string['soapbox:rate_limited'] = 'נשלחו יותר מדי הקלטות בזמן קצר. המתן כמה דקות ונסה שוב.';
+$string['token_analytics:cost_partial'] = 'לא כולל {$a->tokens} אסימונים בדגמים ללא מחיר מפורסם ({$a->models}), ולכן העלות בפועל גבוהה יותר.';

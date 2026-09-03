@@ -436,7 +436,15 @@ PROMPT;
     private static function build_where(array $courseids = [], int $since = 0, string $filterprovider = ''): array {
         global $DB;
 
-        $where = ['m.courseid > 1'];
+        // Real learner conversation only. Without the role filter, role='system'
+        // quiz and indexing telemetry was fed to the Learning Radar model
+        // labelled "SOLA", and radar meta rows fed themselves back in. This
+        // matters more now that the Redash transcript_excerpt actually carries
+        // content -- see the arg-order fix in redash_export.php.
+        $where = [
+            'm.courseid > 1',
+            \local_ai_course_assistant\analytics::conversation_rows_predicate('m'),
+        ];
         $params = [];
 
         if (!empty($courseids)) {

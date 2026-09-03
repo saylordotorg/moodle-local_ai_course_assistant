@@ -1972,3 +1972,4 @@ $string['coursesettings:apikey_clear'] = 'Wis de opgeslagen sleutel en gebruik d
 $string['coursesettings:spend_cap_monthly'] = 'Maandelijkse uitgavenlimiet voor deze cursus (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Laat leeg om de standaardwaarde van de site te gebruiken. Indien ingesteld stoppen de AI-functies in deze cursus zodra de uitgaven van de maand dit bedrag bereiken.';
 $string['soapbox:rate_limited'] = 'Te veel opnamen in korte tijd verzonden. Wacht een paar minuten en probeer het opnieuw.';
+$string['token_analytics:cost_partial'] = 'Exclusief {$a->tokens} tokens op modellen zonder gepubliceerd tarief ({$a->models}); de werkelijke kosten liggen hoger.';

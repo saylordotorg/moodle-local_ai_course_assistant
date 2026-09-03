@@ -2009,3 +2009,4 @@ $string['coursesettings:apikey_clear'] = 'Burahin ang naka-save na key at gamiti
 $string['coursesettings:spend_cap_monthly'] = 'Buwanang limitasyon sa paggastos para sa kursong ito (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Iwanang blangko para gamitin ang default ng site. Kapag nakatakda, hihinto ang mga tampok na AI sa kursong ito kapag umabot sa halagang ito ang gastos ng buwan.';
 $string['soapbox:rate_limited'] = 'Masyadong maraming recording ang naisumite sa maikling panahon. Maghintay ng ilang minuto at subukan ulit.';
+$string['token_analytics:cost_partial'] = 'Hindi kasama ang {$a->tokens} token sa mga modelong walang nakalathalang presyo ({$a->models}), kaya mas mataas ang tunay na gastos.';

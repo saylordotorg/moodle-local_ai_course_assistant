@@ -1949,3 +1949,4 @@ $string['coursesettings:apikey_clear'] = 'Tyhjennä tallennettu avain ja käytä
 $string['coursesettings:spend_cap_monthly'] = 'Tämän kurssin kuukausittainen kulukatto (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Jätä tyhjäksi käyttääksesi sivuston oletusarvoa. Kun arvo on asetettu, kurssin tekoälytoiminnot pysähtyvät, kun kuukauden kulut saavuttavat tämän summan.';
 $string['soapbox:rate_limited'] = 'Lähetit liian monta tallennetta lyhyessä ajassa. Odota muutama minuutti ja yritä uudelleen.';
+$string['token_analytics:cost_partial'] = 'Ei sisällä {$a->tokens} tokenia malleilla, joilla ei ole julkaistua hintaa ({$a->models}), joten todellinen kustannus on suurempi.';

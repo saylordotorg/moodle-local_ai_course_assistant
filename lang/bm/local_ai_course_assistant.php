@@ -1979,3 +1979,4 @@ $string['coursesettings:apikey_clear'] = 'Kilisi marata jɔsi ka siti kilisi kɛ
 $string['coursesettings:spend_cap_monthly'] = 'Kalan in kalo musaka dan (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'A to lakolon walisa siti ta ka kɛ. Ni a sigilen don, kalan in ka AI baaraw bɛ jɔ ni kalo musaka sera nin hakɛ ma.';
 $string['soapbox:rate_limited'] = 'Kan marali caman bɛ ci waati surun kɔnɔ. I ka miniti damadɔ makɔnɔ ka segin ka a lajɛ.';
+$string['token_analytics:cost_partial'] = 'A tɛ tokɛn {$a->tokens} jate sɔngɔ tɛ minnu na ({$a->models}), o de kosɔn musaka yɛrɛyɛrɛ ka bon ni nin ye.';

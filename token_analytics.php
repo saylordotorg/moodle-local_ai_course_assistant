@@ -171,6 +171,8 @@ $bymodel = $DB->get_records_sql(
 
 $bymodelrows    = [];
 $grandcost      = 0.0;
+$unpricedtokens = 0;
+$unpricedmodels = [];
 $grandprompt    = 0;
 $grandcompl     = 0;
 $grandresponses = 0;
@@ -183,6 +185,13 @@ foreach ($bymodel as $row) {
     );
     if ($cost !== null) {
         $grandcost += $cost;
+    } else {
+        // Track what the headline is NOT counting. The rate card will always lag
+        // some model, and the primary chat tier is currently one of them -- so a
+        // clean dollar figure built from the priced rows only is a confident
+        // understatement with nothing on screen to say so.
+        $unpricedtokens += (int) $row->total_prompt + (int) $row->total_completion;
+        $unpricedmodels[] = (string) $row->model;
     }
     $grandprompt    += (int) $row->total_prompt;
     $grandcompl     += (int) $row->total_completion;
@@ -212,8 +221,7 @@ $bystudent = $DB->get_records_sql(
             u.middlename, u.alternatename,
             COUNT(m.id)                           AS response_count,
             SUM(COALESCE(m.prompt_tokens,0))      AS total_prompt,
-            SUM(COALESCE(m.completion_tokens,0))  AS total_completion,
-            MIN(m.model_name)                     AS sample_model
+            SUM(COALESCE(m.completion_tokens,0))  AS total_completion
        FROM {local_ai_course_assistant_msgs} m
        JOIN {user} u ON u.id = m.userid
       WHERE {$msgwhere}
@@ -226,20 +234,54 @@ $bystudent = $DB->get_records_sql(
     100
 );
 
+// Price each learner against their ACTUAL model mix, in one extra query.
+//
+// This used MIN(m.model_name) -- the alphabetically-first model in the learner's
+// rows -- and applied that single rate to their entire token total. Alphabetical
+// order puts claude-* ahead of gemini-*, gpt-* and text-embedding-*, so one
+// premium-router escalation re-priced a learner's whole month of chat and quiz
+// traffic at Sonnet rates: a 20-25x overstatement on exactly the top-spender
+// rows an admin acts on. The table caption also claimed "the model of their most
+// recent session", which MIN() is not.
+$permodelcost = [];
+$permodelpartial = [];
+if (!empty($bystudent)) {
+    [$insql, $inparams] = $DB->get_in_or_equal(array_keys($bystudent), SQL_PARAMS_NAMED, 'tu');
+    $rs = $DB->get_recordset_sql(
+        "SELECT m.userid, m.model_name,
+                SUM(COALESCE(m.prompt_tokens,0))     AS p,
+                SUM(COALESCE(m.completion_tokens,0)) AS c
+           FROM {local_ai_course_assistant_msgs} m
+          WHERE {$msgwhere} AND m.userid {$insql}
+          GROUP BY m.userid, m.model_name",
+        $params + $inparams
+    );
+    foreach ($rs as $r) {
+        $uid = (int) $r->userid;
+        $c = token_cost_manager::estimate_cost((string) ($r->model_name ?? ''), (int) $r->p, (int) $r->c);
+        if ($c === null) {
+            // An unpriced model contributes tokens but no dollars. Flag it
+            // rather than letting the row read as a complete figure.
+            $permodelpartial[$uid] = true;
+            continue;
+        }
+        $permodelcost[$uid] = ($permodelcost[$uid] ?? 0.0) + $c;
+    }
+    $rs->close();
+}
+
 $bystudentrows = [];
 foreach ($bystudent as $row) {
-    $cost = token_cost_manager::estimate_cost(
-        $row->sample_model ?? '',
-        (int) $row->total_prompt,
-        (int) $row->total_completion
-    );
+    $uid = (int) $row->userid;
+    $cost = $permodelcost[$uid] ?? null;
     $bystudentrows[] = [
         'name'              => htmlspecialchars(fullname($row)),
         'response_count'    => number_format((int) $row->response_count),
         'prompt_tokens'     => number_format((int) $row->total_prompt),
         'completion_tokens' => number_format((int) $row->total_completion),
         'total_tokens'      => number_format((int)$row->total_prompt + (int)$row->total_completion),
-        'estimated_cost'    => token_cost_manager::format_cost($cost),
+        'estimated_cost'    => token_cost_manager::format_cost($cost)
+            . (!empty($permodelpartial[$uid]) && $cost !== null ? '+' : ''),
     ];
 }
 
@@ -385,6 +427,17 @@ $templatedata = [
                                 : ($grandtotal > 0
                                     ? get_string('token_analytics:unknown_model', 'local_ai_course_assistant')
                                     : '—'),
+    // True when a dollar figure IS shown but some models had no published rate,
+    // so the headline is a floor rather than the total.
+    'cost_partial'         => ($grandcost > 0 && $unpricedtokens > 0),
+    // Pre-rendered server-side: Moodle's {{#str}} helper takes a literal, so a
+    // nested {{var}} inside its argument would not resolve.
+    'cost_partial_note'    => ($grandcost > 0 && $unpricedtokens > 0)
+        ? get_string('token_analytics:cost_partial', 'local_ai_course_assistant', (object) [
+            'tokens' => number_format($unpricedtokens),
+            'models' => implode(', ', array_unique(array_filter($unpricedmodels))),
+        ])
+        : '',
     'spend_status'       => $spendstatus,
     'has_spend_status'   => !empty($spendstatus),
     'spend_period_label' => \local_ai_course_assistant\spend_guard::period_label(),

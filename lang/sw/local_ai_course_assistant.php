@@ -2009,3 +2009,4 @@ $string['coursesettings:apikey_clear'] = 'Futa ufunguo uliohifadhiwa na utumie u
 $string['coursesettings:spend_cap_monthly'] = 'Kikomo cha matumizi ya kila mwezi kwa kozi hii (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Acha wazi ili kutumia chaguo-msingi la tovuti. Ikiwekwa, huduma za AI katika kozi hii husimama matumizi ya mwezi yanapofikia kiasi hiki.';
 $string['soapbox:rate_limited'] = 'Rekodi nyingi mno zimetumwa kwa muda mfupi. Tafadhali subiri dakika chache kisha ujaribu tena.';
+$string['token_analytics:cost_partial'] = 'Haijumuishi tokeni {$a->tokens} kwenye miundo isiyo na bei iliyochapishwa ({$a->models}), hivyo gharama halisi ni kubwa zaidi.';

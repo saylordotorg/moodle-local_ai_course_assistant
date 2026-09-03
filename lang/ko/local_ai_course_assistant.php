@@ -1955,3 +1955,4 @@ $string['coursesettings:apikey_clear'] = '저장된 키를 지우고 사이트 �
 $string['coursesettings:spend_cap_monthly'] = '이 강좌의 월간 지출 한도(USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = '사이트 기본값을 사용하려면 비워 두세요. 설정하면 해당 월의 지출이 이 금액에 도달할 때 이 강좌의 AI 기능이 중지됩니다.';
 $string['soapbox:rate_limited'] = '짧은 시간에 너무 많은 녹음을 제출했습니다. 몇 분 후에 다시 시도하세요.';
+$string['token_analytics:cost_partial'] = '공개 단가가 없는 모델({$a->models})의 토큰 {$a->tokens}개는 제외되어 있어 실제 비용은 더 높습니다.';

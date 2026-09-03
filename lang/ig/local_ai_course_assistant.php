@@ -1965,3 +1965,4 @@ $string['coursesettings:apikey_clear'] = 'Hichapụ igodo echekwara wee jiri igo
 $string['coursesettings:spend_cap_monthly'] = 'Oke mmefu kwa ọnwa maka nkuzi a (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Hapụ ya efu iji jiri ndabara saịtị. Ọ bụrụ na edobere ya, atụmatụ AI na nkuzi a na-akwụsị mgbe mmefu ọnwa ruru ego a.';
 $string['soapbox:rate_limited'] = 'E zigara ndekọ dị ukwuu n\'ime obere oge. Chere nkeji ole na ole wee nwaa ọzọ.';
+$string['token_analytics:cost_partial'] = 'Ọ gụnyeghị tokin {$a->tokens} na ụdị na-enweghị ọnụahịa e bipụtara ({$a->models}), ya mere ezigbo ọnụ ahịa dị elu karịa.';

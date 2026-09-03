@@ -2008,3 +2008,4 @@ $string['coursesettings:apikey_clear'] = 'Sula ukhiye ogciniwe futhi usebenzise 
 $string['coursesettings:spend_cap_monthly'] = 'Umkhawulo wokusetshenziswa kwenyanga kule nkambo (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Shiya kungenalutho ukuze usebenzise okuzenzakalelayo kwesayithi. Uma kusethiwe, izici ze-AI kule nkambo ziyama lapho izindleko zenyanga zifinyelela kule nani.';
 $string['soapbox:rate_limited'] = 'Kuthunyelwe amarekhodi amaningi kakhulu esikhathini esifushane. Sicela ulinde imizuzu embalwa uphinde uzame.';
+$string['token_analytics:cost_partial'] = 'Akufaki amathokheni angu-{$a->tokens} kumamodeli angenayo intengo eshicilelwe ({$a->models}), ngakho izindleko zangempela ziphakeme.';

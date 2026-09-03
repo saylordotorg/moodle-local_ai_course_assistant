@@ -1962,3 +1962,4 @@ $string['coursesettings:apikey_clear'] = 'Kayıtlı anahtarı temizle ve site an
 $string['coursesettings:spend_cap_monthly'] = 'Bu ders için aylık harcama üst sınırı (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Sitenin varsayılanını kullanmak için boş bırakın. Ayarlandığında, ayın harcaması bu tutara ulaştığında bu dersteki yapay zekâ özellikleri durur.';
 $string['soapbox:rate_limited'] = 'Kısa sürede çok fazla kayıt gönderildi. Lütfen birkaç dakika bekleyip tekrar deneyin.';
+$string['token_analytics:cost_partial'] = 'Yayımlanmış ücreti olmayan modellerdeki ({$a->models}) {$a->tokens} jetonu içermez; gerçek maliyet daha yüksektir.';

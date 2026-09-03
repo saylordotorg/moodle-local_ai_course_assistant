@@ -1978,3 +1978,4 @@ $string['coursesettings:apikey_clear'] = 'የተቀመጠውን ቁልፍ አጥ
 $string['coursesettings:spend_cap_monthly'] = 'የዚህ ኮርስ ወርሃዊ የወጪ ጣሪያ (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'የጣቢያውን ነባሪ ለመጠቀም ባዶ ይተዉት። ሲቀመጥ፣ የወሩ ወጪ ይህን መጠን ሲደርስ የዚህ ኮርስ AI አገልግሎቶች ይቆማሉ።';
 $string['soapbox:rate_limited'] = 'በአጭር ጊዜ ውስጥ በጣም ብዙ ቅጂዎች ተልከዋል። እባክዎ ጥቂት ደቂቃዎች ጠብቀው እንደገና ይሞክሩ።';
+$string['token_analytics:cost_partial'] = '{$a->tokens} ቶክኖችን በዋጋ ያልተመዘገቡ ሞዴሎች ({$a->models}) ላይ አያካትትም፣ ስለዚህ ትክክለኛው ወጪ ከዚህ ይበልጣል።';

@@ -1949,3 +1949,4 @@ $string['coursesettings:apikey_clear'] = 'Effacer la clé enregistrée et utilis
 $string['coursesettings:spend_cap_monthly'] = 'Plafond de dépenses mensuel pour ce cours (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Laissez vide pour utiliser la valeur par défaut du site. Lorsqu\'il est défini, les fonctions d\'IA de ce cours s\'arrêtent dès que la dépense du mois atteint ce montant.';
 $string['soapbox:rate_limited'] = 'Trop d\'enregistrements envoyés en peu de temps. Patientez quelques minutes et réessayez.';
+$string['token_analytics:cost_partial'] = 'N\'inclut pas {$a->tokens} jetons sur des modèles sans tarif publié ({$a->models}) ; le coût réel est donc plus élevé.';

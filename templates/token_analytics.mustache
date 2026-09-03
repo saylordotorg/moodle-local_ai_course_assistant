@@ -134,6 +134,9 @@
         <div class="aica-cost-card aica-cost-card--highlight">
             <div class="aica-cost-card__label">Estimated Cost</div>
             <div class="aica-cost-card__value">{{grand_cost}}</div>
+            {{#cost_partial}}
+            <div class="aica-cost-card__warn text-warning small">{{cost_partial_note}}</div>
+            {{/cost_partial}}
         </div>
         {{#has_cache_data}}
         <div class="aica-cost-card">
@@ -334,7 +337,7 @@
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
             <p class="aica-cost-section__title">Cost per Student</p>
-            <p class="aica-cost-section__sub">Top 100 students by token usage. Cost estimated using the model of their most recent session.</p>
+            <p class="aica-cost-section__sub">Top 100 students by token usage. Cost is calculated per model from each student&#39;s actual mix. A trailing + means some of their usage is on a model with no published rate, so the real figure is higher.</p>
         </div>
         {{#has_by_student}}
         <table class="aica-cost-table">

@@ -428,7 +428,12 @@ $metaai = [];
 if ($wants('meta_ai')) {
     $metaai = [
         'summary' => \local_ai_course_assistant\meta_ai_data_builder::build_stats_summary($courseid, $since),
-        'transcript_excerpt' => \local_ai_course_assistant\meta_ai_data_builder::build_transcript($courseid, $since, 50000),
+        // 50000 was landing in $filterprovider, not $maxchars -- the signature is
+        // (courseids, since, filterprovider, maxchars). Weak typing coerced it to
+        // the string "50000", which matched no provider, so this field was the
+        // constant "(No conversation data found...)" placeholder in every export.
+        // Shipped WITH the role/meta filter above, never before it.
+        'transcript_excerpt' => \local_ai_course_assistant\meta_ai_data_builder::build_transcript($courseid, $since, '', 50000),
     ];
 }
 

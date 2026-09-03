@@ -65,7 +65,11 @@ class update_reminder_preferences extends external_api {
         string $frequency = 'daily',
         bool $enabled = true
     ): array {
-        global $USER;
+        // $DB was declared only inside the else branch below, while the enable
+        // branch calls $DB->set_field() -- global binds at runtime, so that path
+        // fataled on a null. Latent only because reminders_whatsapp_enabled
+        // ships off and subscribe() throws first.
+        global $USER, $DB;
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
@@ -103,7 +107,6 @@ class update_reminder_preferences extends external_api {
             }
         } else {
             // Disable existing reminder.
-            global $DB;
             $existing = $DB->get_record('local_ai_course_assistant_reminders', [
                 'userid' => $USER->id,
                 'courseid' => $params['courseid'],

@@ -2003,3 +2003,4 @@ $string['coursesettings:apikey_clear'] = 'Hapus kunci tersimpan dan gunakan kunc
 $string['coursesettings:spend_cap_monthly'] = 'Batas pengeluaran bulanan untuk kursus ini (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Biarkan kosong untuk memakai default situs. Bila diisi, fitur AI di kursus ini berhenti setelah pengeluaran bulan ini mencapai jumlah tersebut.';
 $string['soapbox:rate_limited'] = 'Terlalu banyak rekaman dikirim dalam waktu singkat. Tunggu beberapa menit lalu coba lagi.';
+$string['token_analytics:cost_partial'] = 'Tidak termasuk {$a->tokens} token pada model tanpa tarif resmi ({$a->models}), jadi biaya sebenarnya lebih tinggi.';

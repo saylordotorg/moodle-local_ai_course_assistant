@@ -1948,3 +1948,4 @@ $string['coursesettings:apikey_clear'] = 'Rensa den sparade nyckeln och använd 
 $string['coursesettings:spend_cap_monthly'] = 'Månatligt utgiftstak för denna kurs (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Lämna tomt för att använda webbplatsens standardvärde. När det är angivet stoppas AI-funktionerna i kursen när månadens utgifter når detta belopp.';
 $string['soapbox:rate_limited'] = 'För många inspelningar skickade på kort tid. Vänta några minuter och försök igen.';
+$string['token_analytics:cost_partial'] = 'Exkluderar {$a->tokens} token på modeller utan publicerat pris ({$a->models}), så den verkliga kostnaden är högre.';

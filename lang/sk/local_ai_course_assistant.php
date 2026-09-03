@@ -1948,3 +1948,4 @@ $string['coursesettings:apikey_clear'] = 'Vymazať uložený kľúč a použiť 
 $string['coursesettings:spend_cap_monthly'] = 'Mesačný limit výdavkov pre tento kurz (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Ponechajte prázdne na použitie predvolenej hodnoty lokality. Ak je nastavené, funkcie AI v tomto kurze sa zastavia, keď mesačné výdavky dosiahnu túto sumu.';
 $string['soapbox:rate_limited'] = 'Za krátky čas bolo odoslaných príliš veľa nahrávok. Počkajte niekoľko minút a skúste to znova.';
+$string['token_analytics:cost_partial'] = 'Nezahŕňa {$a->tokens} tokenov na modeloch bez zverejnenej ceny ({$a->models}), takže skutočné náklady sú vyššie.';

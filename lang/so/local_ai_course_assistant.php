@@ -1990,3 +1990,4 @@ $string['coursesettings:apikey_clear'] = 'Tirtir furaha la keydiyay oo isticmaal
 $string['coursesettings:spend_cap_monthly'] = 'Xadka kharashka bishii ee koorsadan (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Bannaan uga tag si loo isticmaalo qiimaha caadiga ah ee goobta. Marka la dejiyo, adeegyada AI ee koorsadan way joogsadaan marka kharashka bisha uu gaaro qaddarkan.';
 $string['soapbox:rate_limited'] = 'Duubisyo aad u badan ayaa la soo diray waqti gaaban gudahood. Fadlan sug dhowr daqiiqo oo isku day mar kale.';
+$string['token_analytics:cost_partial'] = 'Kuma jiraan {$a->tokens} token oo ku saabsan moodooyin aan qiimo la daabacay lahayn ({$a->models}), sidaas darteed kharashka dhabta ah ayaa ka sarreeya.';

@@ -1962,3 +1962,4 @@ $string['coursesettings:apikey_clear'] = 'ล้างคีย์ที่บ�
 $string['coursesettings:spend_cap_monthly'] = 'เพดานค่าใช้จ่ายรายเดือนของรายวิชานี้ (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'เว้นว่างไว้เพื่อใช้ค่าเริ่มต้นของเว็บไซต์ เมื่อกำหนดแล้ว ฟีเจอร์ AI ในรายวิชานี้จะหยุดทำงานเมื่อค่าใช้จ่ายของเดือนถึงจำนวนนี้';
 $string['soapbox:rate_limited'] = 'ส่งไฟล์บันทึกเสียงมากเกินไปในเวลาอันสั้น โปรดรอสักครู่แล้วลองอีกครั้ง';
+$string['token_analytics:cost_partial'] = 'ไม่รวม {$a->tokens} โทเคนของโมเดลที่ไม่มีราคาประกาศ ({$a->models}) ค่าใช้จ่ายจริงจึงสูงกว่านี้';

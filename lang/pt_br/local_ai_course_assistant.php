@@ -1971,3 +1971,4 @@ $string['coursesettings:apikey_clear'] = 'Limpar a chave salva e usar a chave do
 $string['coursesettings:spend_cap_monthly'] = 'Limite de gasto mensal para este curso (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Deixe em branco para usar o padrão do site. Quando definido, os recursos de IA neste curso param assim que o gasto do mês atingir esse valor.';
 $string['soapbox:rate_limited'] = 'Muitas gravações enviadas em pouco tempo. Aguarde alguns minutos e tente novamente.';
+$string['token_analytics:cost_partial'] = 'Não inclui {$a->tokens} tokens em modelos sem preço publicado ({$a->models}), portanto o custo real é maior.';

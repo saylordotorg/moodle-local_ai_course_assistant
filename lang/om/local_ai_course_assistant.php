@@ -1976,3 +1976,4 @@ $string['coursesettings:apikey_clear'] = 'Furtuu olkaa\'ame haqiitii furtuu mars
 $string['coursesettings:spend_cap_monthly'] = 'Daangaa baasii ji\'aa koorsii kanaaf (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Durtii marsariitii fayyadamuuf duwwaa dhiisi. Yoo qindaa\'e, baasiin ji\'aa hanga kana yeroo ga\'u tajaajilli AI koorsii kana keessatti ni dhaabata.';
 $string['soapbox:rate_limited'] = 'Yeroo gabaabaa keessatti waraabbii baay\'een ergameera. Daqiiqaa muraasa eegii irra deebi\'ii yaali.';
+$string['token_analytics:cost_partial'] = 'Tokenii {$a->tokens} moodeloota gatii maxxanfame hin qabne ({$a->models}) irratti hin dabalatu, kanaaf baasiin dhugaa kana caala.';

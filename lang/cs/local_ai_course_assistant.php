@@ -1949,3 +1949,4 @@ $string['coursesettings:apikey_clear'] = 'Smazat uložený klíč a použít kl�
 $string['coursesettings:spend_cap_monthly'] = 'Měsíční limit útraty pro tento kurz (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Ponechte prázdné pro použití výchozí hodnoty webu. Je-li nastaveno, funkce AI v tomto kurzu se zastaví, jakmile měsíční útrata dosáhne této částky.';
 $string['soapbox:rate_limited'] = 'Za krátkou dobu bylo odesláno příliš mnoho nahrávek. Počkejte několik minut a zkuste to znovu.';
+$string['token_analytics:cost_partial'] = 'Nezahrnuje {$a->tokens} tokenů u modelů bez zveřejněné ceny ({$a->models}), skutečné náklady jsou tedy vyšší.';

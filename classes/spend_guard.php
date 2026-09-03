@@ -285,7 +285,7 @@ class spend_guard {
      * @param string|null $capability
      * @return string One of the CAP_* constants
      */
-    public static function check(int $courseid = 0, ?string $capability = null): string {
+    public static function check(int $courseid = 0, ?string $capability = null, bool $notify = true): string {
         // v5.13.0: emergency_control --chat sets a dedicated flag that
         // short-circuits chat-shaped calls to CAP_BLOCKED so the friendly
         // "SOLA paused" path runs. Note that since v7.2.1 this is no longer the
@@ -310,15 +310,21 @@ class spend_guard {
         $pct = $cap > 0 ? ($spent / $cap) : 0;
 
         if ($pct >= 1.0) {
-            self::maybe_notify(self::CAP_BLOCKED, $courseid, $capability, $spent, $cap);
+            if ($notify) {
+                self::maybe_notify(self::CAP_BLOCKED, $courseid, $capability, $spent, $cap);
+            }
             return self::CAP_BLOCKED;
         }
         if ($pct >= 0.95) {
-            self::maybe_notify(self::CAP_WARN_95, $courseid, $capability, $spent, $cap);
+            if ($notify) {
+                self::maybe_notify(self::CAP_WARN_95, $courseid, $capability, $spent, $cap);
+            }
             return self::CAP_WARN_95;
         }
         if ($pct >= 0.80) {
-            self::maybe_notify(self::CAP_WARN_80, $courseid, $capability, $spent, $cap);
+            if ($notify) {
+                self::maybe_notify(self::CAP_WARN_80, $courseid, $capability, $spent, $cap);
+            }
             return self::CAP_WARN_80;
         }
         return self::CAP_OK;
@@ -537,7 +543,16 @@ class spend_guard {
                 'spent' => $spent,
                 'cap'   => $cap,
                 'pct'   => $pct,
-                'level' => self::check(0, $s['capability']),
+                // $notify = false: this is a READ-ONLY status panel.
+                //
+                // check() fires maybe_notify(), which sends the spend-alert
+                // email and then sets a once-per-period suppression flag. With
+                // five scopes, merely loading token_analytics.php sent up to
+                // five alerts and consumed the suppression -- so an admin
+                // refreshing the dashboard during an incident is precisely how
+                // the real 95% warning fails to arrive. Rendering a number must
+                // never consume the alert about that number.
+                'level' => self::check(0, $s['capability'], false),
             ];
         }
         return $rows;

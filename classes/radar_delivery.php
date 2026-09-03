@@ -221,6 +221,10 @@ class radar_delivery {
      * @return bool
      */
     public static function send_slack(string $webhookurl, string $query, string $response, array $meta = []): bool {
+        // Slack and Teams do not go through format(), which is where the marker
+        // strip lives, so the literal [SOLA_NEXT]chip||chip[/SOLA_NEXT] block
+        // was posting verbatim into scheduled channel messages.
+        $response = self::strip_marker_tags($response);
         if (!security::is_safe_provider_url($webhookurl)) {
             debugging('Learning Radar Slack webhook rejected by SSRF allowlist', DEBUG_DEVELOPER);
             return false;
@@ -234,7 +238,9 @@ class radar_delivery {
         if (!empty($meta)) {
             $fields = [];
             foreach ($meta as $k => $v) {
-                $fields[] = ['type' => 'mrkdwn', 'text' => '*' . ucfirst((string) $k) . ':*\n' . (string) $v];
+                // Double-quoted: a single-quoted '\n' posts the two characters
+                // backslash-n into the Slack message instead of a line break.
+                $fields[] = ['type' => 'mrkdwn', 'text' => '*' . ucfirst((string) $k) . ":*\n" . (string) $v];
             }
             $blocks[] = ['type' => 'section', 'fields' => array_slice($fields, 0, 10)];
         }
@@ -256,6 +262,10 @@ class radar_delivery {
      * @return bool
      */
     public static function send_teams(string $webhookurl, string $query, string $response, array $meta = []): bool {
+        // Slack and Teams do not go through format(), which is where the marker
+        // strip lives, so the literal [SOLA_NEXT]chip||chip[/SOLA_NEXT] block
+        // was posting verbatim into scheduled channel messages.
+        $response = self::strip_marker_tags($response);
         if (!security::is_safe_provider_url($webhookurl)) {
             debugging('Learning Radar Teams webhook rejected by SSRF allowlist', DEBUG_DEVELOPER);
             return false;

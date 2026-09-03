@@ -1949,3 +1949,4 @@ $string['coursesettings:apikey_clear'] = 'সংরক্ষিত কী মু
 $string['coursesettings:spend_cap_monthly'] = 'এই কোর্সের মাসিক ব্যয়সীমা (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'সাইটের ডিফল্ট ব্যবহার করতে ফাঁকা রাখুন। নির্ধারিত থাকলে, মাসের ব্যয় এই পরিমাণে পৌঁছালে এই কোর্সের AI সুবিধাগুলি বন্ধ হয়ে যায়।';
 $string['soapbox:rate_limited'] = 'অল্প সময়ে অনেক বেশি রেকর্ডিং জমা দেওয়া হয়েছে। কয়েক মিনিট অপেক্ষা করে আবার চেষ্টা করুন।';
+$string['token_analytics:cost_partial'] = 'প্রকাশিত মূল্য নেই এমন মডেলে ({$a->models}) {$a->tokens}টি টোকেন এতে ধরা হয়নি, তাই প্রকৃত খরচ আরও বেশি।';

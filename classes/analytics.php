@@ -94,7 +94,7 @@ class analytics {
         // Active students (users who sent at least one message).
         $sql = "SELECT COUNT(DISTINCT m.userid)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.role = 'user'{$coursewhere}{$timewhere}";
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
         $activestudents = $DB->count_records_sql($sql, $params);
 
         // Average messages per student.
@@ -103,7 +103,7 @@ class analytics {
         // User messages count (for off-topic rate calculation).
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.role = 'user'{$coursewhere}{$timewhere}";
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
         $usermessages = (int) $DB->count_records_sql($sql, $params);
 
         // Off-topic conversations (those with offtopic_count > 0).
@@ -157,7 +157,7 @@ class analytics {
         // timecreated values collide for messages sent in the same second.
         $sql = "SELECT m.timecreated
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.timecreated >= :since AND m.role = 'user'{$coursewhere}
+                 WHERE m.timecreated >= :since AND m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}
                  ORDER BY m.timecreated ASC";
         $timestamps = $DB->get_fieldset_sql($sql, $params);
 
@@ -400,7 +400,29 @@ class analytics {
      * @return string SQL boolean expression.
      */
     public static function conversation_rows_predicate(string $alias = 'm'): string {
-        return "{$alias}.role IN ('user', 'assistant')";
+        return "{$alias}.role IN ('user', 'assistant') AND " . self::meta_rows_excluded($alias);
+    }
+
+    /**
+     * SQL predicate excluding Learning Radar meta rows from learner metrics.
+     *
+     * record_meta_query() writes an admin's radar question and the model's answer
+     * as role='user'/'assistant' against SITEID. Its own docblock says this is so
+     * "analytics that filter on interaction_type can exclude them" -- but nothing
+     * did, so on the site-wide dashboard the admin running a radar query was
+     * counted as an active learner, their prose landed in total messages, session
+     * stats, return rate, hour-of-day and the Themes keywords, and scheduled runs
+     * attributed to the cron admin with no human present.
+     *
+     * NOT IN is NULL-propagating and rows written before v6 have a NULL
+     * interaction_type, so the IS NULL branch is required or those rows vanish.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression.
+     */
+    public static function meta_rows_excluded(string $alias = 'm'): string {
+        return "({$alias}.interaction_type IS NULL"
+            . " OR {$alias}.interaction_type NOT IN ('meta', 'meta_scheduled'))";
     }
 
     /**
@@ -597,7 +619,7 @@ class analytics {
                        MAX(m.timecreated) AS last_active
                   FROM {local_ai_course_assistant_msgs} m
                   JOIN {user} u ON u.id = m.userid
-                 WHERE m.role = 'user'{$coursewhere}{$timewhere}
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}
                  GROUP BY m.userid, u.firstname, u.lastname
                  ORDER BY message_count DESC";
 
@@ -702,7 +724,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -780,7 +802,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -834,7 +856,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -908,7 +930,7 @@ class analytics {
         }
         $sql = "SELECT DISTINCT m.userid
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.role = 'user'{$coursewhere}{$timewhere}";
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
         $aiuserids = $DB->get_fieldset_sql($sql, $msgparams);
 
         $aiuserset = array_flip($aiuserids);
@@ -1021,10 +1043,28 @@ class analytics {
             $params['since'] = $since;
         }
 
-        $sql = "SELECT m.cmid, COUNT(m.id) AS message_count, COUNT(DISTINCT m.userid) AS student_count
+        // Aggregate BY SECTION in SQL, not per-cmid then summed in PHP.
+        //
+        // COUNT(DISTINCT userid) was computed per activity and the results added
+        // together, so one learner who chatted from four activities in a unit
+        // counted as four students. On a Saylor unit with 8-12 subunit pages the
+        // students column was inflated several-fold, and the dashboard derives
+        // "msgs/student" by dividing by it, so that figure was deflated by the
+        // same factor. The old comment on the summing line even said the
+        // re-aggregation was needed; the code summed anyway.
+        //
+        // course_modules.section is an FK to course_sections.id, so the join
+        // gives a true per-section distinct count.
+        $sql = "SELECT cs.id AS sectionid,
+                       cs.section AS sectionnum,
+                       COUNT(m.id) AS message_count,
+                       COUNT(DISTINCT m.userid) AS student_count
                   FROM {local_ai_course_assistant_msgs} m
+                  JOIN {course_modules} cm ON cm.id = m.cmid AND cm.course = m.courseid
+                  JOIN {course_sections} cs ON cs.id = cm.section
                  WHERE m.courseid = :courseid AND m.cmid IS NOT NULL AND m.role = 'user'{$timewhere}
-                 GROUP BY m.cmid";
+                 GROUP BY cs.id, cs.section
+                 ORDER BY cs.section ASC";
         $rows = $DB->get_records_sql($sql, $params);
 
         if (empty($rows)) {
@@ -1038,34 +1078,25 @@ class analytics {
             return [];
         }
 
-        $sectiondata = [];
+        // modinfo is now needed only for the display name; the counts are
+        // already correct and already ordered by the query.
+        $result = [];
         foreach ($rows as $row) {
             try {
-                $cm = $modinfo->get_cm($row->cmid);
-                $sectionnum = $cm->sectionnum;
-                $sectioninfo = $modinfo->get_section_info($sectionnum);
+                $sectioninfo = $modinfo->get_section_info((int) $row->sectionnum);
                 $sectionname = get_section_name($courseid, $sectioninfo);
             } catch (\Throwable $e) {
                 continue;
             }
-
-            if (!isset($sectiondata[$sectionnum])) {
-                $sectiondata[$sectionnum] = [
-                    'section_name' => $sectionname,
-                    'section_num' => (int) $sectionnum,
-                    'student_count' => 0,
-                    'message_count' => 0,
-                ];
-            }
-            $sectiondata[$sectionnum]['message_count'] += (int) $row->message_count;
-            // Student count needs re-aggregation across cmids in same section.
-            $sectiondata[$sectionnum]['student_count'] += (int) $row->student_count;
+            $result[] = [
+                'section_name'  => $sectionname,
+                'section_num'   => (int) $row->sectionnum,
+                'student_count' => (int) $row->student_count,
+                'message_count' => (int) $row->message_count,
+            ];
         }
 
-        // Sort by section_num.
-        ksort($sectiondata);
-
-        return array_values($sectiondata);
+        return $result;
     }
 
     /**
@@ -1079,7 +1110,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -1123,7 +1154,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -1275,7 +1306,7 @@ class analytics {
         try {
             // Get all user messages with their ratings.
             $params = [];
-            $where = "m.role = 'user'";
+            $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
             if ($courseid > 0) {
                 $where .= ' AND m.courseid = :courseid';
                 $params['courseid'] = $courseid;
