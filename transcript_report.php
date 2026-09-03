@@ -160,7 +160,28 @@ if (empty($rows)) {
         get_string('nothingtodisplay', 'core'),
         \core\output\notification::NOTIFY_WARNING);
 } else {
-    $dl = new moodle_url($pageurl, $_GET + ['download' => 1, 'sesskey' => sesskey()]);
+    // Rebuild the download URL from the already-validated locals rather than
+    // from raw $_GET. PHP's array union keeps the LEFT operand on a key
+    // collision, so `$_GET + ['download' => 1]` let an incoming `download=0`
+    // (PARAM_BOOL reads '0' as false, so the page renders) override the 1 this
+    // button needs -- the button just re-rendered the page. A stale sesskey in
+    // a shared or bookmarked link won the same way and tripped require_sesskey.
+    // Raw $_GET also carries integer keys (?7=x) and array values (?foo[]=x),
+    // both of which moodle_url::params() rejects with a coding_exception.
+    $dlparams = ['courseid' => $courseid, 'mode' => $mode];
+    foreach (['section' => $section, 'topic' => $topic, 'from' => $fromraw,
+              'to' => $toraw, 'outcome' => $outcome] as $k => $v) {
+        if ($v !== '') {
+            $dlparams[$k] = $v;
+        }
+    }
+    if ($objid > 0) {
+        $dlparams['objectiveid'] = $objid;
+    }
+    // download/sesskey last so they cannot be displaced by a filter value.
+    $dlparams['download'] = 1;
+    $dlparams['sesskey'] = sesskey();
+    $dl = new moodle_url($pageurl, $dlparams);
     echo html_writer::div(
         $OUTPUT->single_button($dl, get_string('download', 'core'), 'get'),
         'mb-3');

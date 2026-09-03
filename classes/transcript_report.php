@@ -75,6 +75,32 @@ class transcript_report {
     }
 
     /**
+     * Per-report label for a conversation.
+     *
+     * The raw conversationid must never leave this class. It is the
+     * auto-increment PK of _convs, and get_or_create_conversation() looks a row
+     * up by ['userid', 'courseid'] -- one conversation per learner per course --
+     * so the id is a stable, globally persistent per-learner key. Emitting it
+     * beside the salted learner label would hand back exactly the join column
+     * the pseudonyms exist to remove: two exports taken with different salts
+     * would relink every pair in one step, and even a single export would carry
+     * a permanent learner identifier.
+     *
+     * Salting it with the same per-report salt keeps the column's only real
+     * purpose -- grouping the rows of one conversation together, which the
+     * ORDER BY already relies on -- while making it meaningless across reports.
+     *
+     * @param int $convid
+     * @param string $salt Per-report salt; the same salt must be used throughout one report.
+     * @return string
+     */
+    public static function conversation_label(int $convid, string $salt): string {
+        $secret = get_site_identifier();
+        $hash = hash_hmac('sha256', $salt . ':conv:' . $convid, $secret);
+        return 'C-' . strtoupper(substr($hash, 0, 6));
+    }
+
+    /**
      * Generate a fresh per-report salt.
      *
      * @return string
@@ -153,16 +179,29 @@ class transcript_report {
         }
 
         // Outcome: obj_att.msgid ties an attempt to the exact message.
-        if (!empty($filters['objectiveid'])) {
-            $where[] = 'EXISTS (SELECT 1 FROM {local_ai_course_assistant_obj_att} oa
-                                 WHERE oa.msgid = m.id AND oa.objectiveid = :objid'
-                     . (isset($filters['outcome']) && $filters['outcome'] !== ''
-                         ? ' AND oa.iscorrect = :iscorrect' : '')
-                     . ')';
-            $params['objid'] = (int) $filters['objectiveid'];
-            if (isset($filters['outcome']) && $filters['outcome'] !== '') {
+        //
+        // Outcome and objective are two independent selects in the UI, and the
+        // objective defaults to 0 = "All". Nesting the outcome predicate inside
+        // the objective branch meant the most natural use of the control --
+        // Status "Not met", Objective "All" -- skipped the EXISTS clause
+        // entirely and returned every row, while the export audit record logged
+        // the outcome as though it had been applied. A filter that silently does
+        // nothing is worse on an audited export than one that errors.
+        $hasoutcome = isset($filters['outcome']) && $filters['outcome'] !== '';
+        $hasobjective = !empty($filters['objectiveid']);
+
+        if ($hasoutcome || $hasobjective) {
+            $conds = ['oa.msgid = m.id'];
+            if ($hasobjective) {
+                $conds[] = 'oa.objectiveid = :objid';
+                $params['objid'] = (int) $filters['objectiveid'];
+            }
+            if ($hasoutcome) {
+                $conds[] = 'oa.iscorrect = :iscorrect';
                 $params['iscorrect'] = (int) $filters['outcome'];
             }
+            $where[] = 'EXISTS (SELECT 1 FROM {local_ai_course_assistant_obj_att} oa WHERE '
+                     . implode(' AND ', $conds) . ')';
         }
 
         return [implode(' AND ', $where), $params];
@@ -210,12 +249,12 @@ class transcript_report {
         $out = [];
         foreach ($rows as $r) {
             $out[] = [
-                'conversation' => (int) $r->conversationid,
+                'conversation' => self::conversation_label((int) $r->conversationid, $salt),
                 'learner'      => self::pseudonym((int) $r->userid, $salt),
                 'role'         => (string) $r->role,
                 'unit'         => $r->cmid !== null ? ($sectionof[(int) $r->cmid] ?? '') : '',
                 'type'         => (string) ($r->interaction_type ?? ''),
-                'when'         => userdate((int) $r->timecreated, get_string('strftimedatetimeshort')),
+                'when'         => userdate((int) $r->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
                 'message'      => (string) $r->message,
             ];
         }
@@ -256,11 +295,11 @@ class transcript_report {
                   WHERE mm.conversationid = :cid
                ORDER BY o.code", ['cid' => (int) $r->conversationid]);
             $out[] = [
-                'conversation' => (int) $r->conversationid,
+                'conversation' => self::conversation_label((int) $r->conversationid, $salt),
                 'learner'      => self::pseudonym((int) $r->userid, $salt),
                 'messages'     => (int) $r->msgs,
-                'first'        => userdate((int) $r->firstts, get_string('strftimedatetimeshort')),
-                'last'         => userdate((int) $r->lastts, get_string('strftimedatetimeshort')),
+                'first'        => userdate((int) $r->firstts, get_string('strftimedatetimeshort', 'langconfig')),
+                'last'         => userdate((int) $r->lastts, get_string('strftimedatetimeshort', 'langconfig')),
                 'outcomes'     => implode(' ', array_map('strval', $objs ?: [])),
             ];
         }
