@@ -93,14 +93,14 @@ final class transcript_report_test extends \advanced_testcase {
     }
 
     /**
-     * A cell that Excel would execute as a formula is neutralised; ordinary
+     * A cell that Excel would execute as a formula is neutralized; ordinary
      * text is untouched. Learner-authored message text lands in these cells,
      * so this is reachable by anyone who can type into the chat box.
      */
     public function test_csv_cells_are_escaped_against_formula_injection(): void {
         foreach (['=1+1', '+1', '-1', '@SUM(A1)', "\tSUM", "\r=cmd"] as $dangerous) {
             $this->assertSame("'" . $dangerous, transcript_report::csv_cell($dangerous),
-                "formula-leading cell not neutralised: " . json_encode($dangerous));
+                "formula-leading cell not neutralized: " . json_encode($dangerous));
         }
         foreach (['hello', 'What is management?', '', '1+1', 'a=b'] as $safe) {
             $this->assertSame($safe, transcript_report::csv_cell($safe),
@@ -226,7 +226,7 @@ final class transcript_report_test extends \advanced_testcase {
 
         $this->assertStringContainsString('conversation', $csv, 'header row missing');
         $this->assertStringContainsString("'=SUM(1,1)", $csv,
-            'a formula-leading message was not neutralised in the CSV');
+            'a formula-leading message was not neutralized in the CSV');
     }
 
     /**
