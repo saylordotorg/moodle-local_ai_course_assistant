@@ -337,6 +337,47 @@ try {
         $conv->offtopic_locked_until = null;
     }
 
+    // v7.2.9 (S11): this check moved ABOVE the persist and the audit row.
+    // It used to sit ~140 lines further down, so a turn refused by the lock
+    // had already written the learner's message to their visible transcript
+    // and an audit row saying `message_sent` -- the transcript gained a
+    // question with no answer under it, and the one row an integrity review
+    // would read said the opposite of what happened. Nothing between here
+    // and the old position is needed to evaluate the lock.
+    //
+    // v7.1.0: refuse outright while the learner is sitting a quiz. The provider
+    // chokepoint in base_provider enforces this for every surface, but doing it
+    // here too means the learner gets a clear explanation over SSE rather than a
+    // generic provider error, and the refusal costs nothing when it does not
+    // apply. Admins and CLI are exempt via the same conditions used there.
+    // v7.2.5: scoped to this course. See quiz_lock -- site-wide meant one
+    // forgotten attempt anywhere disabled the assistant in every course.
+    // No is_siteadmin() carve-out: base_provider refuses admins too since
+    // v7.2.4, so exempting them here only replaces a clear explanation with a
+    // generic provider error.
+    $lockedattempt = (!CLI_SCRIPT && !empty($USER->id))
+        ? \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, (int) $courseid)
+        : null;
+    if ($lockedattempt !== null) {
+        // v7.2.7: record the refusal. Without this the audit log cannot tell a
+        // blocked turn from an ordinary one, which is the single row an
+        // academic-integrity review would want.
+        \local_ai_course_assistant\quiz_lock::record_refusal(
+            (int) $USER->id,
+            (int) $courseid,
+            $lockedattempt,
+            'chat'
+        );
+        local_ai_course_assistant_sse_send([
+            // branding::str, not get_string: the string carries a [[tutorshort]]
+            // token and the SSE token path does no brand resolution, so a bare
+            // get_string streams the literal token to the learner.
+            'token' => \local_ai_course_assistant\branding::str('quizlock:blocked'),
+        ]);
+        local_ai_course_assistant_sse_send(['done' => true]);
+        exit;
+    }
+
     // Save user message with interaction context.
     $usermsgid = conversation_manager::add_message(
         $conv->id,
@@ -470,39 +511,6 @@ try {
             $chunkcount = null;
             $topscore = null;
         }
-    }
-
-    // v7.1.0: refuse outright while the learner is sitting a quiz. The provider
-    // chokepoint in base_provider enforces this for every surface, but doing it
-    // here too means the learner gets a clear explanation over SSE rather than a
-    // generic provider error, and the refusal costs nothing when it does not
-    // apply. Admins and CLI are exempt via the same conditions used there.
-    // v7.2.5: scoped to this course. See quiz_lock -- site-wide meant one
-    // forgotten attempt anywhere disabled the assistant in every course.
-    // No is_siteadmin() carve-out: base_provider refuses admins too since
-    // v7.2.4, so exempting them here only replaces a clear explanation with a
-    // generic provider error.
-    $lockedattempt = (!CLI_SCRIPT && !empty($USER->id))
-        ? \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, (int) $courseid)
-        : null;
-    if ($lockedattempt !== null) {
-        // v7.2.7: record the refusal. Without this the audit log cannot tell a
-        // blocked turn from an ordinary one, which is the single row an
-        // academic-integrity review would want.
-        \local_ai_course_assistant\quiz_lock::record_refusal(
-            (int) $USER->id,
-            (int) $courseid,
-            $lockedattempt,
-            'chat'
-        );
-        local_ai_course_assistant_sse_send([
-            // branding::str, not get_string: the string carries a [[tutorshort]]
-            // token and the SSE token path does no brand resolution, so a bare
-            // get_string streams the literal token to the learner.
-            'token' => \local_ai_course_assistant\branding::str('quizlock:blocked'),
-        ]);
-        local_ai_course_assistant_sse_send(['done' => true]);
-        exit;
     }
 
     // v5.2.0: detect per-quiz coach mode. If the current $pageid is a quiz

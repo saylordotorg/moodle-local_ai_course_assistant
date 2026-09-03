@@ -118,6 +118,37 @@ class send_message extends external_api {
      * @return array
      */
     private static function handle(array $params, int $userid): array {
+        global $USER;
+
+        // v7.2.9 (S11): refuse before writing anything.
+        //
+        // base_provider is the enforcement chokepoint and it does refuse this
+        // path, but it is reached AFTER the user message and the `message_sent`
+        // audit row are written. A learner blocked mid-quiz therefore ended up
+        // with a question in their transcript that has no answer under it, and
+        // the audit log recorded `message_sent` for a turn that was refused --
+        // the one row an academic-integrity review would read, saying the
+        // opposite of what happened. Checking here costs a single indexed query
+        // and leaves base_provider as the backstop for every other surface.
+        $lockedattempt = (!CLI_SCRIPT && !empty($USER->id))
+            ? \local_ai_course_assistant\quiz_lock::active_attempt(
+                (int) $USER->id,
+                (int) $params['courseid']
+            )
+            : null;
+        if ($lockedattempt !== null) {
+            \local_ai_course_assistant\quiz_lock::record_refusal(
+                (int) $USER->id,
+                (int) $params['courseid'],
+                $lockedattempt,
+                'webservice'
+            );
+            return [
+                'response' => \local_ai_course_assistant\branding::str('quizlock:blocked'),
+                'success'  => false,
+            ];
+        }
+
         $conv = conversation_manager::get_or_create_conversation($userid, $params['courseid']);
 
         // Save user message.

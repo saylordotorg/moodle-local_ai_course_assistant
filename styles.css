@@ -5230,6 +5230,44 @@ a.aica-history-panel__source:hover {
     outline-offset: 2px !important;
 }
 
+/* v7.2.9 (S13): repaint the settings panel under high contrast.
+ *
+ * The drawer rule above sets color:#fff, and .aica-settings-panel keeps its own
+ * background:#fff, so every label inside it rendered white on white -- a
+ * measured contrast ratio of exactly 1:1, i.e. invisible. The panel is an
+ * absolutely-positioned overlay with its own surface, so it has to be repainted
+ * explicitly; inheriting the drawer's colour without its background is what
+ * caused this. The panel's links were 1.22:1 (#ffeb3b on white) for the same
+ * reason and come good once the surface is black. */
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel {
+    background: #000 !important;
+    color: #fff !important;
+}
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__header,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__footer {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__title,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__section-title,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__empty-note,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel label {
+    color: #fff !important;
+}
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__section + .aica-settings-panel__section {
+    border-top-color: #fff !important;
+}
+/* Form controls follow the composer's treatment: white surface, black text, so
+ * the selected value is readable rather than white-on-white. */
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__select,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel select,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel input {
+    background: #fff !important;
+    color: #000 !important;
+    border: 2px solid #fff !important;
+}
+
 /* v4.9.0: Talking avatar overlay panel */
 .aica-talking-avatar-panel {
     position: absolute;
