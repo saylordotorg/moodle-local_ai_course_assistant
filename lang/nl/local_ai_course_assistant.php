@@ -1972,3 +1972,15 @@ $string['settings:prompt_budget_no_window'] = 'De budgetmodus hierboven staat in
 
 $string['analytics_js:section'] = 'Sectie';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Geanonimiseerde chattranscripties';
+$string['transcripts:privacynote'] = 'De identiteit van cursisten wordt vervangen door pseudonymen die alleen binnen één rapport geldig zijn, voordat er iets wordt weergegeven of gedownload. Een label blijft binnen hetzelfde rapport gelijk, zodat u een gesprek kunt volgen, en heeft geen betekenis tussen rapporten, zodat twee downloads er niet op kunnen worden samengevoegd. Downloads worden vastgelegd in het auditlogboek.';
+$string['transcripts:mode'] = 'Weergeven';
+$string['transcripts:met'] = 'Behaald';
+$string['transcripts:notmet'] = 'Niet behaald';
+$string['transcripts:to'] = 'Tot';
+$string['transcripts:truncated'] = 'De eerste {$a} rijen worden weergegeven. Beperk het datumbereik of de eenheid om de rest te zien.';
+$string['transcripts:rowcount'] = '{$a} rijen.';
+$string['transcripts:col_conversation'] = 'Gesprek';
+$string['transcripts:col_learner'] = 'Cursist';
+$string['transcripts:col_type'] = 'Type';
+$string['transcripts:col_message'] = 'Bericht';

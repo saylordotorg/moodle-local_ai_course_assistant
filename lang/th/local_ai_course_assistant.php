@@ -1962,3 +1962,15 @@ $string['settings:prompt_budget_no_window'] = 'โหมดงบประมา
 
 $string['analytics_js:section'] = 'ส่วน';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'บันทึกการสนทนาที่ปิดบังตัวตน';
+$string['transcripts:privacynote'] = 'ระบบจะแทนที่ข้อมูลระบุตัวตนของผู้เรียนด้วยนามแฝงเฉพาะของแต่ละรายงานก่อนที่จะแสดงหรือดาวน์โหลดข้อมูลใด ๆ ป้ายชื่อจะคงเดิมภายในรายงานเดียวกันเพื่อให้คุณติดตามบทสนทนาได้ แต่ไม่มีความหมายเมื่อเทียบระหว่างรายงาน จึงไม่สามารถเชื่อมโยงไฟล์ดาวน์โหลดสองไฟล์เข้าด้วยกันได้ การดาวน์โหลดทุกครั้งจะถูกบันทึกไว้ในบันทึกการตรวจสอบ';
+$string['transcripts:mode'] = 'แสดง';
+$string['transcripts:met'] = 'บรรลุแล้ว';
+$string['transcripts:notmet'] = 'ยังไม่บรรลุ';
+$string['transcripts:to'] = 'ถึง';
+$string['transcripts:truncated'] = 'กำลังแสดง {$a} แถวแรก จำกัดช่วงวันที่หรือหน่วยการเรียนเพื่อดูส่วนที่เหลือ';
+$string['transcripts:rowcount'] = '{$a} แถว';
+$string['transcripts:col_conversation'] = 'บทสนทนา';
+$string['transcripts:col_learner'] = 'ผู้เรียน';
+$string['transcripts:col_type'] = 'ประเภท';
+$string['transcripts:col_message'] = 'ข้อความ';

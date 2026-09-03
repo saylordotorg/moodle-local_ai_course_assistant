@@ -1990,3 +1990,15 @@ $string['settings:prompt_budget_no_window'] = 'Habka miisaaniyadda ee kor ku xus
 
 $string['analytics_js:section'] = 'Qaybta';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Qoraallo wadahadal oo magac la\'aan ah';
+$string['transcripts:privacynote'] = 'Aqoonsiga ardayda waxaa lagu beddelaa magacyo been-abuur ah oo warbixin kasta u gaar ah ka hor inta aan wax la muujin ama la soo dejin. Calaamadda way isku mid tahay gudaha warbixin keliya, sidaas darteed waad raacsan kartaa wadahadal, laakiin macno kama dhaxeeyo warbixinno kala duwan, sidaas darteed laba soo dejis lama isku xidhi karo iyada. Soo dejinta waxaa lagu diiwaangeliyaa buugga hubinta.';
+$string['transcripts:mode'] = 'Muuji';
+$string['transcripts:met'] = 'La gaadhay';
+$string['transcripts:notmet'] = 'Lama gaadhin';
+$string['transcripts:to'] = 'Ilaa';
+$string['transcripts:truncated'] = 'Waxaa la muujinayaa {$a} saf ee ugu horreeya. Yaree xadka taariikhda ama qaybta si aad u aragto inta kale.';
+$string['transcripts:rowcount'] = '{$a} saf.';
+$string['transcripts:col_conversation'] = 'Wadahadal';
+$string['transcripts:col_learner'] = 'Arday';
+$string['transcripts:col_type'] = 'Nooc';
+$string['transcripts:col_message'] = 'Fariin';

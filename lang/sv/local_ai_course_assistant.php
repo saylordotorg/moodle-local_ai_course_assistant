@@ -1948,3 +1948,15 @@ $string['settings:prompt_budget_no_window'] = 'Budgetläget ovan är inställt p
 
 $string['analytics_js:section'] = 'Avsnitt';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonymiserade chattutskrifter';
+$string['transcripts:privacynote'] = 'Deltagarnas identitet ersätts med pseudonymer som endast gäller inom en enskild rapport innan något visas eller laddas ner. Beteckningen är densamma inom en och samma rapport så att du kan följa en konversation, men den betyder ingenting mellan olika rapporter, så två nedladdningar kan inte kopplas samman utifrån den. Nedladdningar registreras i granskningsloggen.';
+$string['transcripts:mode'] = 'Visa';
+$string['transcripts:met'] = 'Uppnått';
+$string['transcripts:notmet'] = 'Inte uppnått';
+$string['transcripts:to'] = 'Till';
+$string['transcripts:truncated'] = 'Visar de första {$a} raderna. Begränsa datumintervallet eller modulen för att se resten.';
+$string['transcripts:rowcount'] = '{$a} rader.';
+$string['transcripts:col_conversation'] = 'Konversation';
+$string['transcripts:col_learner'] = 'Deltagare';
+$string['transcripts:col_type'] = 'Typ';
+$string['transcripts:col_message'] = 'Meddelande';

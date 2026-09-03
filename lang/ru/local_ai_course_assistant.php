@@ -1971,3 +1971,15 @@ $string['settings:prompt_budget_no_window'] = 'Режим бюджета выш�
 
 $string['analytics_js:section'] = 'Раздел';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Анонимизированные расшифровки чатов';
+$string['transcripts:privacynote'] = 'Личность учащихся заменяется псевдонимами, действующими только в пределах одного отчёта, прежде чем что-либо будет показано или загружено. Внутри одного отчёта метка остаётся неизменной, поэтому вы можете проследить разговор, но между отчётами она не имеет никакого смысла, поэтому две загрузки нельзя сопоставить по ней. Загрузки фиксируются в журнале аудита.';
+$string['transcripts:mode'] = 'Показать';
+$string['transcripts:met'] = 'Достигнута';
+$string['transcripts:notmet'] = 'Не достигнута';
+$string['transcripts:to'] = 'До';
+$string['transcripts:truncated'] = 'Показаны первые {$a} строк. Сузьте диапазон дат или модуль, чтобы увидеть остальные.';
+$string['transcripts:rowcount'] = 'Строк: {$a}.';
+$string['transcripts:col_conversation'] = 'Разговор';
+$string['transcripts:col_learner'] = 'Учащийся';
+$string['transcripts:col_type'] = 'Тип';
+$string['transcripts:col_message'] = 'Сообщение';

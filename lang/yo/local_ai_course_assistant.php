@@ -1984,3 +1984,15 @@ $string['settings:prompt_budget_no_window'] = 'Ipo isuna ti o wa loke ni a ti �
 
 $string['analytics_js:section'] = 'Abala';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Àkọsílẹ̀ ìjíròrò tí a fi orúkọ pamọ́';
+$string['transcripts:privacynote'] = 'A fi orúkọ àpèjẹ tí ó jẹ́ ti ìròyìn kọ̀ọ̀kan rọ́pò ìdánimọ̀ àwọn akẹ́kọ̀ọ́ kí a tó fi ohunkóhun hàn tàbí gbà á sílẹ̀. Àmì náà kò yí padà nínú ìròyìn kan náà, nítorí náà o lè tọ̀ ìjíròrò kan; kò ní ìtumọ̀ kankan láàrin àwọn ìròyìn ọ̀tọ̀ọ̀tọ̀, nítorí náà a kò lè so ìgbàsílẹ̀ méjì pọ̀ lórí rẹ̀. A ń kọ gbogbo ìgbàsílẹ̀ sínú ìwé ìṣàyẹ̀wò.';
+$string['transcripts:mode'] = 'Fi hàn';
+$string['transcripts:met'] = 'Ó ti ṣẹ';
+$string['transcripts:notmet'] = 'Kò ṣẹ';
+$string['transcripts:to'] = 'Dé';
+$string['transcripts:truncated'] = 'Àwọn ẹ̀ka {$a} àkọ́kọ́ ni a fi hàn. Dín ọjọ́ tàbí ìdìpọ̀ kù láti rí àwọn tí ó ṣẹ́kù.';
+$string['transcripts:rowcount'] = 'Ẹ̀ka {$a}.';
+$string['transcripts:col_conversation'] = 'Ìjíròrò';
+$string['transcripts:col_learner'] = 'Akẹ́kọ̀ọ́';
+$string['transcripts:col_type'] = 'Irú';
+$string['transcripts:col_message'] = 'Ìránṣẹ́';

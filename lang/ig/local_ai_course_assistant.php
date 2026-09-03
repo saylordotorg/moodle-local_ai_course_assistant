@@ -1965,3 +1965,15 @@ $string['settings:prompt_budget_no_window'] = 'Ụdị mmefu ego dị n\'elu ka 
 
 $string['analytics_js:section'] = 'Ngalaba';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Ederede mkparịta ụka na-enweghị aha';
+$string['transcripts:privacynote'] = 'A na-eji aha ọzọ nke akụkọ ọ bụla dochie aha ndị mmụta tupu e gosi ma ọ bụ budata ihe ọ bụla. Akara ahụ na-adịgide otu ụzọ n\'ime otu akụkọ ka i wee nwee ike soro mkparịta ụka, mana o nweghị ihe ọ pụtara n\'etiti akụkọ dị iche iche, ya mere enweghị ike ijikọ budata abụọ site na ya. A na-edekọ budata niile n\'ime akwụkwọ nyocha.';
+$string['transcripts:mode'] = 'Gosi';
+$string['transcripts:met'] = 'Emezuru';
+$string['transcripts:notmet'] = 'Emezughị';
+$string['transcripts:to'] = 'Ruo';
+$string['transcripts:truncated'] = 'Na-egosi ahịrị {$a} mbụ. Belata oge ma ọ bụ nkeji iji hụ ndị ọzọ.';
+$string['transcripts:rowcount'] = 'Ahịrị {$a}.';
+$string['transcripts:col_conversation'] = 'Mkparịta ụka';
+$string['transcripts:col_learner'] = 'Onye mmụta';
+$string['transcripts:col_type'] = 'Ụdị';
+$string['transcripts:col_message'] = 'Ozi';

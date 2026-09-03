@@ -1984,3 +1984,15 @@ $string['settings:prompt_budget_no_window'] = '上方的预算模式设置为从
 
 $string['analytics_js:section'] = '章节';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = '匿名化聊天记录';
+$string['transcripts:privacynote'] = '在显示或下载任何内容之前，学习者的身份信息都会被替换为该报告专用的化名。同一份报告内的标识保持一致，便于您追踪一段对话；不同报告之间的标识没有任何关联，因此无法据此将两次下载的数据合并。所有下载都会记入审计日志。';
+$string['transcripts:mode'] = '显示';
+$string['transcripts:met'] = '已达成';
+$string['transcripts:notmet'] = '未达成';
+$string['transcripts:to'] = '截至';
+$string['transcripts:truncated'] = '正在显示前 {$a} 行。请缩小日期范围或单元范围以查看其余内容。';
+$string['transcripts:rowcount'] = '{$a} 行。';
+$string['transcripts:col_conversation'] = '对话';
+$string['transcripts:col_learner'] = '学习者';
+$string['transcripts:col_type'] = '类型';
+$string['transcripts:col_message'] = '消息';

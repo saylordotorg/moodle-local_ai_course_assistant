@@ -2003,3 +2003,15 @@ $string['settings:prompt_budget_no_window'] = 'Mode anggaran di atas disetel unt
 
 $string['analytics_js:section'] = 'Bagian';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Transkrip obrolan anonim';
+$string['transcripts:privacynote'] = 'Identitas peserta digantikan dengan nama samaran khusus per laporan sebelum apa pun ditampilkan atau diunduh. Label tetap konsisten di dalam satu laporan sehingga Anda dapat mengikuti sebuah percakapan, dan tidak memiliki makna antar laporan, sehingga dua unduhan tidak dapat digabungkan berdasarkan label tersebut. Setiap unduhan dicatat dalam log audit.';
+$string['transcripts:mode'] = 'Tampilkan';
+$string['transcripts:met'] = 'Tercapai';
+$string['transcripts:notmet'] = 'Tidak tercapai';
+$string['transcripts:to'] = 'Sampai';
+$string['transcripts:truncated'] = 'Menampilkan {$a} baris pertama. Persempit rentang tanggal atau unit untuk melihat sisanya.';
+$string['transcripts:rowcount'] = '{$a} baris.';
+$string['transcripts:col_conversation'] = 'Percakapan';
+$string['transcripts:col_learner'] = 'Peserta';
+$string['transcripts:col_type'] = 'Jenis';
+$string['transcripts:col_message'] = 'Pesan';

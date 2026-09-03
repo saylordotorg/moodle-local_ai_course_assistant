@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'Režim rozpočtu výše je nastav
 
 $string['analytics_js:section'] = 'Sekce';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonymizované přepisy konverzací';
+$string['transcripts:privacynote'] = 'Identita studentů je před jakýmkoli zobrazením nebo stažením nahrazena pseudonymy platnými pouze pro daný report. Označení zůstává v rámci jednoho reportu stejné, takže můžete sledovat konverzaci, ale mezi reporty nemá žádný význam, takže dvě stažení podle něj nelze spojit. Stažení se zaznamenávají do auditního protokolu.';
+$string['transcripts:mode'] = 'Zobrazit';
+$string['transcripts:met'] = 'Splněno';
+$string['transcripts:notmet'] = 'Nesplněno';
+$string['transcripts:to'] = 'Do';
+$string['transcripts:truncated'] = 'Zobrazuje se prvních {$a} řádků. Chcete-li zobrazit zbytek, zužte časové rozmezí nebo modul.';
+$string['transcripts:rowcount'] = 'Řádků: {$a}.';
+$string['transcripts:col_conversation'] = 'Konverzace';
+$string['transcripts:col_learner'] = 'Student';
+$string['transcripts:col_type'] = 'Typ';
+$string['transcripts:col_message'] = 'Zpráva';

@@ -1984,3 +1984,15 @@ $string['settings:prompt_budget_no_window'] = 'Anam bu bujet bi ci kaw dañu koy
 
 $string['analytics_js:section'] = 'Section';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Mbind waxtaan yu tur wéddi';
+$string['transcripts:privacynote'] = 'Turu jàngkat yi ñu koy soppi ak tur wu bees wu ñu jagleel rapoor bu nekk, laata dara wone walla yeb. Marka mi dafay des ni mu mel ci rapoor bu nekk, ngir nga man a topp waxtaan; waaye amul benn maana diggante rapoor yi, kon ñaari yeb duñu man a boole ci moom. Yeb yépp ñu leen di bind ci teerey seetlu.';
+$string['transcripts:mode'] = 'Wone';
+$string['transcripts:met'] = 'Mattal na';
+$string['transcripts:notmet'] = 'Mattalul';
+$string['transcripts:to'] = 'Ba';
+$string['transcripts:truncated'] = 'Ñu wone {$a} rëdd yu njëkk. Wàññi diirub bés walla xaaj ngir gis ñi ci des.';
+$string['transcripts:rowcount'] = '{$a} rëdd.';
+$string['transcripts:col_conversation'] = 'Waxtaan';
+$string['transcripts:col_learner'] = 'Jàngkat';
+$string['transcripts:col_type'] = 'Xeet';
+$string['transcripts:col_message'] = 'Bataaxal';

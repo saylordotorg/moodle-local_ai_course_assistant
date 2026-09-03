@@ -1984,3 +1984,15 @@ $string['settings:prompt_budget_no_window'] = 'Chế độ ngân sách ở trên
 
 $string['analytics_js:section'] = 'Phần';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Bản ghi hội thoại đã ẩn danh';
+$string['transcripts:privacynote'] = 'Danh tính của người học được thay bằng biệt danh riêng cho từng báo cáo trước khi bất kỳ nội dung nào được hiển thị hoặc tải xuống. Nhãn này giữ nguyên trong cùng một báo cáo để bạn có thể theo dõi một cuộc hội thoại, và không mang ý nghĩa gì giữa các báo cáo khác nhau, nên không thể ghép hai lần tải xuống dựa trên nhãn đó. Mọi lần tải xuống đều được ghi vào nhật ký kiểm toán.';
+$string['transcripts:mode'] = 'Hiển thị';
+$string['transcripts:met'] = 'Đã đạt';
+$string['transcripts:notmet'] = 'Chưa đạt';
+$string['transcripts:to'] = 'Đến';
+$string['transcripts:truncated'] = 'Đang hiển thị {$a} dòng đầu tiên. Hãy thu hẹp khoảng thời gian hoặc đơn vị học để xem phần còn lại.';
+$string['transcripts:rowcount'] = '{$a} dòng.';
+$string['transcripts:col_conversation'] = 'Hội thoại';
+$string['transcripts:col_learner'] = 'Người học';
+$string['transcripts:col_type'] = 'Loại';
+$string['transcripts:col_message'] = 'Tin nhắn';

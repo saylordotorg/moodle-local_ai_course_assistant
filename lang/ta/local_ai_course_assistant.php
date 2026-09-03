@@ -1985,3 +1985,15 @@ $string['settings:prompt_budget_no_window'] = 'மேலுள்ள பட்�
 
 $string['analytics_js:section'] = 'பிரிவு';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'அடையாளம் நீக்கப்பட்ட உரையாடல் பிரதிகள்';
+$string['transcripts:privacynote'] = 'எதையும் காட்டுவதற்கு அல்லது பதிவிறக்குவதற்கு முன், கற்பவர்களின் அடையாளங்கள் ஒவ்வொரு அறிக்கைக்கும் தனித்தனியான புனைப்பெயர்களால் மாற்றப்படுகின்றன. ஒரே அறிக்கைக்குள் இந்தப் பெயர் மாறாமல் இருப்பதால் நீங்கள் ஒரு உரையாடலைப் பின்தொடர முடியும்; வெவ்வேறு அறிக்கைகளுக்கு இடையே அதற்கு எந்தப் பொருளும் இல்லை, எனவே இரண்டு பதிவிறக்கங்களை அதன் அடிப்படையில் இணைக்க முடியாது. பதிவிறக்கங்கள் தணிக்கைப் பட்டியலில் பதிவு செய்யப்படுகின்றன.';
+$string['transcripts:mode'] = 'காட்டு';
+$string['transcripts:met'] = 'அடையப்பட்டது';
+$string['transcripts:notmet'] = 'அடையப்படவில்லை';
+$string['transcripts:to'] = 'வரை';
+$string['transcripts:truncated'] = 'முதல் {$a} வரிசைகள் காட்டப்படுகின்றன. மற்றவற்றைக் காண தேதி வரம்பையோ அலகையோ குறுக்குங்கள்.';
+$string['transcripts:rowcount'] = '{$a} வரிசைகள்.';
+$string['transcripts:col_conversation'] = 'உரையாடல்';
+$string['transcripts:col_learner'] = 'கற்பவர்';
+$string['transcripts:col_type'] = 'வகை';
+$string['transcripts:col_message'] = 'செய்தி';

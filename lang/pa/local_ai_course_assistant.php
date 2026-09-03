@@ -1971,3 +1971,15 @@ $string['settings:prompt_budget_no_window'] = 'ਉੱਪਰਲਾ ਬਜਟ ਮ�
 
 $string['analytics_js:section'] = 'ਭਾਗ';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'ਗੁਪਤ ਰੱਖੀਆਂ ਗੱਲਬਾਤ ਲਿਖਤਾਂ';
+$string['transcripts:privacynote'] = 'ਕੁਝ ਵੀ ਦਿਖਾਉਣ ਜਾਂ ਡਾਊਨਲੋਡ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਸਿੱਖਿਆਰਥੀਆਂ ਦੀ ਪਛਾਣ ਨੂੰ ਹਰ ਰਿਪੋਰਟ ਦੇ ਆਪਣੇ ਫਰਜ਼ੀ ਨਾਵਾਂ ਨਾਲ ਬਦਲ ਦਿੱਤਾ ਜਾਂਦਾ ਹੈ। ਇੱਕੋ ਰਿਪੋਰਟ ਦੇ ਅੰਦਰ ਲੇਬਲ ਇੱਕੋ ਜਿਹਾ ਰਹਿੰਦਾ ਹੈ, ਇਸ ਲਈ ਤੁਸੀਂ ਗੱਲਬਾਤ ਦਾ ਪਿੱਛਾ ਕਰ ਸਕਦੇ ਹੋ; ਵੱਖ-ਵੱਖ ਰਿਪੋਰਟਾਂ ਵਿਚਕਾਰ ਇਸਦਾ ਕੋਈ ਅਰਥ ਨਹੀਂ ਹੁੰਦਾ, ਇਸ ਲਈ ਦੋ ਡਾਊਨਲੋਡਾਂ ਨੂੰ ਇਸ ਦੇ ਆਧਾਰ \'ਤੇ ਜੋੜਿਆ ਨਹੀਂ ਜਾ ਸਕਦਾ। ਡਾਊਨਲੋਡ ਆਡਿਟ ਲੌਗ ਵਿੱਚ ਦਰਜ ਕੀਤੇ ਜਾਂਦੇ ਹਨ।';
+$string['transcripts:mode'] = 'ਦਿਖਾਓ';
+$string['transcripts:met'] = 'ਪੂਰਾ ਹੋਇਆ';
+$string['transcripts:notmet'] = 'ਪੂਰਾ ਨਹੀਂ ਹੋਇਆ';
+$string['transcripts:to'] = 'ਤੱਕ';
+$string['transcripts:truncated'] = 'ਪਹਿਲੀਆਂ {$a} ਕਤਾਰਾਂ ਦਿਖਾਈਆਂ ਜਾ ਰਹੀਆਂ ਹਨ। ਬਾਕੀ ਦੇਖਣ ਲਈ ਤਾਰੀਖ ਦੀ ਸੀਮਾ ਜਾਂ ਇਕਾਈ ਘਟਾਓ।';
+$string['transcripts:rowcount'] = '{$a} ਕਤਾਰਾਂ।';
+$string['transcripts:col_conversation'] = 'ਗੱਲਬਾਤ';
+$string['transcripts:col_learner'] = 'ਸਿੱਖਿਆਰਥੀ';
+$string['transcripts:col_type'] = 'ਕਿਸਮ';
+$string['transcripts:col_message'] = 'ਸੁਨੇਹਾ';

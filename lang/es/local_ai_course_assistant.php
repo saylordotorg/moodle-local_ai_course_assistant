@@ -1976,3 +1976,15 @@ $string['settings:prompt_budget_no_window'] = 'El modo de presupuesto de arriba 
 
 $string['analytics_js:section'] = 'Sección';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Transcripciones de chat anonimizadas';
+$string['transcripts:privacynote'] = 'La identidad de los estudiantes se sustituye por seudónimos propios de cada informe antes de mostrar o descargar cualquier dato. La etiqueta se mantiene estable dentro de un mismo informe, de modo que puede seguir una conversación, y no significa nada entre informes distintos, por lo que dos descargas no pueden vincularse a partir de ella. Las descargas se registran en el registro de auditoría.';
+$string['transcripts:mode'] = 'Mostrar';
+$string['transcripts:met'] = 'Alcanzado';
+$string['transcripts:notmet'] = 'No alcanzado';
+$string['transcripts:to'] = 'Hasta';
+$string['transcripts:truncated'] = 'Se muestran las primeras {$a} filas. Acote el intervalo de fechas o la unidad para ver el resto.';
+$string['transcripts:rowcount'] = '{$a} filas.';
+$string['transcripts:col_conversation'] = 'Conversación';
+$string['transcripts:col_learner'] = 'Estudiante';
+$string['transcripts:col_type'] = 'Tipo';
+$string['transcripts:col_message'] = 'Mensaje';

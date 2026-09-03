@@ -1955,3 +1955,15 @@ $string['settings:prompt_budget_no_window'] = 'Budsjettmodusen ovenfor er satt t
 
 $string['analytics_js:section'] = 'Seksjon';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonymiserte samtaleutskrifter';
+$string['transcripts:privacynote'] = 'Identiteten til deltakerne erstattes med pseudonymer som bare gjelder for den enkelte rapporten, før noe vises eller lastes ned. Merket er det samme innenfor én rapport, slik at du kan følge en samtale, men det betyr ingenting på tvers av rapporter, så to nedlastinger kan ikke kobles sammen ut fra det. Nedlastinger registreres i revisjonsloggen.';
+$string['transcripts:mode'] = 'Vis';
+$string['transcripts:met'] = 'Oppnådd';
+$string['transcripts:notmet'] = 'Ikke oppnådd';
+$string['transcripts:to'] = 'Til';
+$string['transcripts:truncated'] = 'Viser de første {$a} radene. Begrens datointervallet eller modulen for å se resten.';
+$string['transcripts:rowcount'] = '{$a} rader.';
+$string['transcripts:col_conversation'] = 'Samtale';
+$string['transcripts:col_learner'] = 'Deltaker';
+$string['transcripts:col_type'] = 'Type';
+$string['transcripts:col_message'] = 'Melding';

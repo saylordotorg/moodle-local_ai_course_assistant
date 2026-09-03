@@ -1979,3 +1979,15 @@ $string['settings:prompt_budget_no_window'] = 'ऊपर का बजट मो
 
 $string['analytics_js:section'] = 'अनुभाग';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'गुमनाम चैट प्रतिलेख';
+$string['transcripts:privacynote'] = 'कुछ भी दिखाने या डाउनलोड करने से पहले शिक्षार्थियों की पहचान को प्रत्येक रिपोर्ट के अपने छद्म नामों से बदल दिया जाता है। एक ही रिपोर्ट के भीतर लेबल स्थिर रहता है, जिससे आप बातचीत का अनुसरण कर सकते हैं; विभिन्न रिपोर्टों के बीच इसका कोई अर्थ नहीं होता, इसलिए दो डाउनलोड को इसके आधार पर जोड़ा नहीं जा सकता। डाउनलोड ऑडिट लॉग में दर्ज किए जाते हैं।';
+$string['transcripts:mode'] = 'दिखाएँ';
+$string['transcripts:met'] = 'प्राप्त';
+$string['transcripts:notmet'] = 'प्राप्त नहीं';
+$string['transcripts:to'] = 'तक';
+$string['transcripts:truncated'] = 'पहली {$a} पंक्तियाँ दिखाई जा रही हैं। बाकी देखने के लिए तिथि सीमा या इकाई को सीमित करें।';
+$string['transcripts:rowcount'] = '{$a} पंक्तियाँ।';
+$string['transcripts:col_conversation'] = 'बातचीत';
+$string['transcripts:col_learner'] = 'शिक्षार्थी';
+$string['transcripts:col_type'] = 'प्रकार';
+$string['transcripts:col_message'] = 'संदेश';

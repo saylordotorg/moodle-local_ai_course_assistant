@@ -1955,3 +1955,15 @@ $string['settings:prompt_budget_no_window'] = '上の予算モードはモデル
 
 $string['analytics_js:section'] = 'セクション';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = '匿名化されたチャット記録';
+$string['transcripts:privacynote'] = '表示やダウンロードの前に、学習者の識別情報はレポートごとの仮名に置き換えられます。ラベルは同一レポート内では一貫しているため会話を追うことができますが、レポート間では意味を持たないため、2つのダウンロードをラベルで結び付けることはできません。ダウンロードは監査ログに記録されます。';
+$string['transcripts:mode'] = '表示';
+$string['transcripts:met'] = '達成';
+$string['transcripts:notmet'] = '未達成';
+$string['transcripts:to'] = '終了日';
+$string['transcripts:truncated'] = '最初の{$a}行を表示しています。残りを見るには期間またはユニットを絞り込んでください。';
+$string['transcripts:rowcount'] = '{$a}行';
+$string['transcripts:col_conversation'] = '会話';
+$string['transcripts:col_learner'] = '学習者';
+$string['transcripts:col_type'] = '種類';
+$string['transcripts:col_message'] = 'メッセージ';

@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'وضع الميزانية أعل�
 
 $string['analytics_js:section'] = 'القسم';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'نصوص المحادثات مجهولة الهوية';
+$string['transcripts:privacynote'] = 'يتم استبدال هويات المتعلمين بأسماء مستعارة خاصة بكل تقرير قبل عرض أي شيء أو تنزيله. يبقى الاسم المستعار ثابتًا داخل التقرير نفسه حتى تتمكن من متابعة المحادثة، ولا يحمل أي معنى بين التقارير المختلفة، لذا لا يمكن الربط بين تنزيلين بناءً عليه. يتم تسجيل عمليات التنزيل في سجل التدقيق.';
+$string['transcripts:mode'] = 'إظهار';
+$string['transcripts:met'] = 'تم تحقيقه';
+$string['transcripts:notmet'] = 'لم يتم تحقيقه';
+$string['transcripts:to'] = 'إلى';
+$string['transcripts:truncated'] = 'يتم عرض أول {$a} صفوف. قم بتضييق النطاق الزمني أو الوحدة لعرض الباقي.';
+$string['transcripts:rowcount'] = '{$a} صفوف.';
+$string['transcripts:col_conversation'] = 'المحادثة';
+$string['transcripts:col_learner'] = 'المتعلم';
+$string['transcripts:col_type'] = 'النوع';
+$string['transcripts:col_message'] = 'الرسالة';

@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'Budgettilstanden ovenfor er sat t
 
 $string['analytics_js:section'] = 'Sektion';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonymiserede chatudskrifter';
+$string['transcripts:privacynote'] = 'Kursisternes identitet erstattes med pseudonymer, der kun gælder for den enkelte rapport, før noget vises eller downloades. Betegnelsen er den samme inden for én rapport, så du kan følge en samtale, men den betyder ikke noget på tværs af rapporter, så to downloads kan ikke sammenkædes ud fra den. Downloads registreres i revisionsloggen.';
+$string['transcripts:mode'] = 'Vis';
+$string['transcripts:met'] = 'Opnået';
+$string['transcripts:notmet'] = 'Ikke opnået';
+$string['transcripts:to'] = 'Til';
+$string['transcripts:truncated'] = 'Viser de første {$a} rækker. Indsnævr datointervallet eller modulet for at se resten.';
+$string['transcripts:rowcount'] = '{$a} rækker.';
+$string['transcripts:col_conversation'] = 'Samtale';
+$string['transcripts:col_learner'] = 'Kursist';
+$string['transcripts:col_type'] = 'Type';
+$string['transcripts:col_message'] = 'Besked';

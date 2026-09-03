@@ -2467,3 +2467,17 @@ $string['usertesting_admin:preview_no_instruction'] = '(no instruction)';
 $string['usertesting_admin:preview_rate_fallback'] = 'Rate';
 $string['usertesting_admin:preview_rate_range'] = '{$a->label} ({$a->min} to {$a->max})';
 $string['usertesting_admin:preview_follow_up'] = 'Follow-up: {$a}';
+
+// Anonymised transcript and summary report (v7.2.10).
+$string['transcripts:title'] = 'Anonymized chat transcripts';
+$string['transcripts:privacynote'] = 'Learner identities are replaced with per-report pseudonyms before anything is shown or downloaded. A label is stable within one report so you can follow a conversation, and carries no meaning across reports, so two downloads cannot be joined on it. Downloads are recorded in the audit log.';
+$string['transcripts:mode'] = 'Show';
+$string['transcripts:met'] = 'Met';
+$string['transcripts:notmet'] = 'Not met';
+$string['transcripts:to'] = 'To';
+$string['transcripts:truncated'] = 'Showing the first {$a} rows. Narrow the date range or unit to see the rest.';
+$string['transcripts:rowcount'] = '{$a} rows.';
+$string['transcripts:col_conversation'] = 'Conversation';
+$string['transcripts:col_learner'] = 'Learner';
+$string['transcripts:col_type'] = 'Type';
+$string['transcripts:col_message'] = 'Message';

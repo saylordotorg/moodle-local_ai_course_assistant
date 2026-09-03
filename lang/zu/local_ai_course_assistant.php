@@ -2008,3 +2008,15 @@ $string['settings:prompt_budget_no_window'] = 'Imodi yesabelomali engenhla iseth
 
 $string['analytics_js:section'] = 'Ingxenye';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Amabhalwa engxoxo angadalulwa magama';
+$string['transcripts:privacynote'] = 'Ubunikazi babafundi bushintshwa ngamagama mbumbulu ahlukile kuwo wonke umbiko ngaphambi kokuthi kuboniswe noma kulandwe okuthile. Ilebula lihlala lifana kumbiko owodwa ukuze ukwazi ukulandelela ingxoxo, kodwa alisho lutho phakathi kwemibiko ehlukene, ngakho-ke ukulandwa okubili akunakuhlanganiswa ngalo. Ukulandwa kubhalwa kurekhodi lokuhlola.';
+$string['transcripts:mode'] = 'Bonisa';
+$string['transcripts:met'] = 'Kufeziwe';
+$string['transcripts:notmet'] = 'Akufezwanga';
+$string['transcripts:to'] = 'Kuya';
+$string['transcripts:truncated'] = 'Kuboniswa amagele {$a} okuqala. Nciphisa ububanzi bosuku noma iyunithi ukuze ubone okusele.';
+$string['transcripts:rowcount'] = 'Amagele {$a}.';
+$string['transcripts:col_conversation'] = 'Ingxoxo';
+$string['transcripts:col_learner'] = 'Umfundi';
+$string['transcripts:col_type'] = 'Uhlobo';
+$string['transcripts:col_message'] = 'Umlayezo';

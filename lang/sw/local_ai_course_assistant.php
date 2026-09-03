@@ -2009,3 +2009,15 @@ $string['settings:prompt_budget_no_window'] = 'Hali ya bajeti hapo juu imewekwa 
 
 $string['analytics_js:section'] = 'Sehemu';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Nakala za mazungumzo zilizofichwa majina';
+$string['transcripts:privacynote'] = 'Utambulisho wa wanafunzi hubadilishwa kwa majina ya siri ya kila ripoti kabla ya kitu chochote kuonyeshwa au kupakuliwa. Lebo hubaki sawa katika ripoti moja ili uweze kufuatilia mazungumzo, na haina maana kati ya ripoti tofauti, hivyo upakuaji mbili hauwezi kuunganishwa kwa msingi wake. Upakuaji wote huandikwa katika kumbukumbu ya ukaguzi.';
+$string['transcripts:mode'] = 'Onyesha';
+$string['transcripts:met'] = 'Imefikiwa';
+$string['transcripts:notmet'] = 'Haijafikiwa';
+$string['transcripts:to'] = 'Hadi';
+$string['transcripts:truncated'] = 'Inaonyesha safu {$a} za kwanza. Punguza kipindi cha tarehe au kipengele ili kuona zilizosalia.';
+$string['transcripts:rowcount'] = 'Safu {$a}.';
+$string['transcripts:col_conversation'] = 'Mazungumzo';
+$string['transcripts:col_learner'] = 'Mwanafunzi';
+$string['transcripts:col_type'] = 'Aina';
+$string['transcripts:col_message'] = 'Ujumbe';

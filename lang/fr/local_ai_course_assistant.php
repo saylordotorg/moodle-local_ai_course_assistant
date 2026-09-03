@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'Le mode de budget ci-dessus est r
 
 $string['analytics_js:section'] = 'Section';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Transcriptions de conversations anonymisées';
+$string['transcripts:privacynote'] = 'L\'identité des apprenants est remplacée par des pseudonymes propres à chaque rapport avant tout affichage ou téléchargement. L\'étiquette reste stable au sein d\'un même rapport, ce qui vous permet de suivre une conversation, et n\'a aucune signification d\'un rapport à l\'autre : deux téléchargements ne peuvent donc pas être rapprochés sur cette base. Les téléchargements sont consignés dans le journal d\'audit.';
+$string['transcripts:mode'] = 'Afficher';
+$string['transcripts:met'] = 'Atteint';
+$string['transcripts:notmet'] = 'Non atteint';
+$string['transcripts:to'] = 'Jusqu\'au';
+$string['transcripts:truncated'] = 'Affichage des {$a} premières lignes. Restreignez la période ou l\'unité pour voir les autres.';
+$string['transcripts:rowcount'] = '{$a} lignes.';
+$string['transcripts:col_conversation'] = 'Conversation';
+$string['transcripts:col_learner'] = 'Apprenant';
+$string['transcripts:col_type'] = 'Type';
+$string['transcripts:col_message'] = 'Message';

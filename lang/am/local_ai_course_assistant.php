@@ -1978,3 +1978,15 @@ $string['settings:prompt_budget_no_window'] = 'ከላይ ያለው የበጀት 
 
 $string['analytics_js:section'] = 'ክፍል';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'ስም ያልተጠቀሰባቸው የውይይት ግልባጮች';
+$string['transcripts:privacynote'] = 'የተማሪዎች መለያ ከመታየቱ ወይም ከመውረዱ በፊት በየሪፖርቱ በሚለወጥ ስም ይተካል። መለያው በአንድ ሪፖርት ውስጥ ተመሳሳይ ሆኖ ይቆያል፣ ስለዚህ ውይይትን መከታተል ይችላሉ፤ በሪፖርቶች መካከል ግን ትርጉም የለውም፣ በመሆኑም ሁለት የወረዱ ፋይሎችን በእሱ ማገናኘት አይቻልም። የወረዱ ፋይሎች በኦዲት መዝገብ ውስጥ ይመዘገባሉ።';
+$string['transcripts:mode'] = 'አሳይ';
+$string['transcripts:met'] = 'ተሟልቷል';
+$string['transcripts:notmet'] = 'አልተሟላም';
+$string['transcripts:to'] = 'እስከ';
+$string['transcripts:truncated'] = 'የመጀመሪያዎቹ {$a} ረድፎች ታይተዋል። ቀሪውን ለማየት የቀኑን ክልል ወይም ክፍሉን ያጥሩ።';
+$string['transcripts:rowcount'] = '{$a} ረድፎች።';
+$string['transcripts:col_conversation'] = 'ውይይት';
+$string['transcripts:col_learner'] = 'ተማሪ';
+$string['transcripts:col_type'] = 'ዓይነት';
+$string['transcripts:col_message'] = 'መልእክት';

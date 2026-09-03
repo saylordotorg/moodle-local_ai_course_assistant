@@ -1979,3 +1979,15 @@ $string['settings:prompt_budget_no_window'] = 'Yanayin kasafin da ke sama an sai
 
 $string['analytics_js:section'] = 'Sashe';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Rubutattun tattaunawa marasa sunan mai amfani';
+$string['transcripts:privacynote'] = 'Ana maye gurbin sunayen ɗalibai da sunayen ƙarya na kowane rahoto kafin a nuna ko a sauke wani abu. Alamar tana tsayawa ɗaya a cikin rahoto guda don ku iya bin tattaunawa, amma ba ta ma\'ana tsakanin rahotanni daban-daban, don haka ba za a iya haɗa saukewa biyu da ita ba. Ana rubuta saukewa a cikin littafin binciken.';
+$string['transcripts:mode'] = 'Nuna';
+$string['transcripts:met'] = 'An cimma';
+$string['transcripts:notmet'] = 'Ba a cimma ba';
+$string['transcripts:to'] = 'Zuwa';
+$string['transcripts:truncated'] = 'Ana nuna layuka {$a} na farko. Rage kwanan wata ko sashe don ganin sauran.';
+$string['transcripts:rowcount'] = 'Layuka {$a}.';
+$string['transcripts:col_conversation'] = 'Tattaunawa';
+$string['transcripts:col_learner'] = 'Ɗalibi';
+$string['transcripts:col_type'] = 'Nau\'i';
+$string['transcripts:col_message'] = 'Saƙo';

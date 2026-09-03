@@ -1994,3 +1994,15 @@ $string['settings:prompt_budget_no_window'] = 'La modalità di budget qui sopra 
 
 $string['analytics_js:section'] = 'Section';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Trascrizioni delle conversazioni anonimizzate';
+$string['transcripts:privacynote'] = 'L\'identità degli studenti viene sostituita con pseudonimi validi solo per il singolo report prima che qualsiasi dato venga mostrato o scaricato. L\'etichetta rimane stabile all\'interno di uno stesso report, così da poter seguire una conversazione, e non ha alcun significato tra report diversi, quindi due download non possono essere collegati sulla sua base. I download vengono registrati nel log di audit.';
+$string['transcripts:mode'] = 'Mostra';
+$string['transcripts:met'] = 'Raggiunto';
+$string['transcripts:notmet'] = 'Non raggiunto';
+$string['transcripts:to'] = 'Al';
+$string['transcripts:truncated'] = 'Vengono mostrate le prime {$a} righe. Restringi l\'intervallo di date o l\'unità per vedere le altre.';
+$string['transcripts:rowcount'] = '{$a} righe.';
+$string['transcripts:col_conversation'] = 'Conversazione';
+$string['transcripts:col_learner'] = 'Studente';
+$string['transcripts:col_type'] = 'Tipo';
+$string['transcripts:col_message'] = 'Messaggio';

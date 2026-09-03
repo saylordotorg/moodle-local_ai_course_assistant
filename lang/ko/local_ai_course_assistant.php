@@ -1955,3 +1955,15 @@ $string['settings:prompt_budget_no_window'] = '위의 예산 모드는 모델에
 
 $string['analytics_js:section'] = '섹션';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = '익명화된 대화 기록';
+$string['transcripts:privacynote'] = '학습자의 신원은 표시하거나 다운로드하기 전에 보고서별 가명으로 대체됩니다. 라벨은 하나의 보고서 안에서는 동일하게 유지되어 대화를 따라갈 수 있지만, 보고서 간에는 아무런 의미가 없으므로 두 개의 다운로드를 라벨로 연결할 수 없습니다. 다운로드는 감사 로그에 기록됩니다.';
+$string['transcripts:mode'] = '표시';
+$string['transcripts:met'] = '달성';
+$string['transcripts:notmet'] = '미달성';
+$string['transcripts:to'] = '종료일';
+$string['transcripts:truncated'] = '처음 {$a}개 행을 표시하고 있습니다. 나머지를 보려면 기간이나 학습 단위를 좁히세요.';
+$string['transcripts:rowcount'] = '{$a}개 행';
+$string['transcripts:col_conversation'] = '대화';
+$string['transcripts:col_learner'] = '학습자';
+$string['transcripts:col_type'] = '유형';
+$string['transcripts:col_message'] = '메시지';

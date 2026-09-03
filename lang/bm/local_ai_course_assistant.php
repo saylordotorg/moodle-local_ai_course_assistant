@@ -1979,3 +1979,15 @@ $string['settings:prompt_budget_no_window'] = 'Budzɛ cogoya min bɛ sanfɛ, o s
 
 $string['analytics_js:section'] = 'Yɔrɔ';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Baro sɛbɛnniw tɔgɔ dogolen';
+$string['transcripts:privacynote'] = 'Kalandenw tɔgɔ bɛ falen ni tɔgɔ wɛrɛw ye rapɔɔri kelen kɔnɔ sani foyi ka jira walima ka jigin. Tɔgɔ nin bɛ to a cogo la rapɔɔri kelen kɔnɔ walisa i ka se ka baro tugu, nka a tɛ kuma foyi fɔ rapɔɔriw ni ɲɔgɔn cɛ, o de kosɔn jiginni fila tɛ se ka fara ɲɔgɔn kan a barisa. Jiginniw bɛ sɛbɛn sɛgɛsɛgɛli sɛbɛn kɔnɔ.';
+$string['transcripts:mode'] = 'A jira';
+$string['transcripts:met'] = 'A dafara';
+$string['transcripts:notmet'] = 'A ma dafa';
+$string['transcripts:to'] = 'Fo';
+$string['transcripts:truncated'] = 'Fɔlɔ {$a} lajɛlenw bɛ jira. Don hakɛ walima yɔrɔ dɔgɔya walisa ka tɔw ye.';
+$string['transcripts:rowcount'] = 'Lajɛlen {$a}.';
+$string['transcripts:col_conversation'] = 'Baro';
+$string['transcripts:col_learner'] = 'Kalanden';
+$string['transcripts:col_type'] = 'Suguya';
+$string['transcripts:col_message'] = 'Bataki';

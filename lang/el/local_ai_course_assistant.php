@@ -1988,3 +1988,15 @@ $string['settings:prompt_budget_no_window'] = 'Η λειτουργία προϋ�
 
 $string['analytics_js:section'] = 'Section';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Ανωνυμοποιημένα απομαγνητοφωνήματα συνομιλιών';
+$string['transcripts:privacynote'] = 'Η ταυτότητα των εκπαιδευομένων αντικαθίσταται με ψευδώνυμα που ισχύουν μόνο για την κάθε αναφορά, πριν εμφανιστεί ή μεταφορτωθεί οτιδήποτε. Η ετικέτα παραμένει σταθερή μέσα στην ίδια αναφορά, ώστε να μπορείτε να παρακολουθήσετε μια συνομιλία, αλλά δεν έχει καμία σημασία μεταξύ διαφορετικών αναφορών, οπότε δύο μεταφορτώσεις δεν μπορούν να συνδεθούν με βάση αυτήν. Οι μεταφορτώσεις καταγράφονται στο αρχείο ελέγχου.';
+$string['transcripts:mode'] = 'Εμφάνιση';
+$string['transcripts:met'] = 'Επιτεύχθηκε';
+$string['transcripts:notmet'] = 'Δεν επιτεύχθηκε';
+$string['transcripts:to'] = 'Έως';
+$string['transcripts:truncated'] = 'Εμφανίζονται οι πρώτες {$a} γραμμές. Περιορίστε το χρονικό διάστημα ή την ενότητα για να δείτε τις υπόλοιπες.';
+$string['transcripts:rowcount'] = '{$a} γραμμές.';
+$string['transcripts:col_conversation'] = 'Συνομιλία';
+$string['transcripts:col_learner'] = 'Εκπαιδευόμενος';
+$string['transcripts:col_type'] = 'Τύπος';
+$string['transcripts:col_message'] = 'Μήνυμα';

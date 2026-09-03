@@ -2001,3 +2001,15 @@ $string['settings:prompt_budget_no_window'] = 'Режим бюджету вищ�
 
 $string['analytics_js:section'] = 'Section';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Анонімізовані стенограми чатів';
+$string['transcripts:privacynote'] = 'Особу учнів замінюють псевдонімами, дійсними лише в межах одного звіту, перш ніж щось буде показано або завантажено. У межах одного звіту позначка залишається незмінною, тож ви можете прослідкувати розмову, але між різними звітами вона не має жодного значення, тому два завантаження не можна поєднати за нею. Завантаження фіксуються в журналі аудиту.';
+$string['transcripts:mode'] = 'Показати';
+$string['transcripts:met'] = 'Досягнуто';
+$string['transcripts:notmet'] = 'Не досягнуто';
+$string['transcripts:to'] = 'До';
+$string['transcripts:truncated'] = 'Показано перші {$a} рядків. Звузьте діапазон дат або модуль, щоб побачити решту.';
+$string['transcripts:rowcount'] = 'Рядків: {$a}.';
+$string['transcripts:col_conversation'] = 'Розмова';
+$string['transcripts:col_learner'] = 'Учень';
+$string['transcripts:col_type'] = 'Тип';
+$string['transcripts:col_message'] = 'Повідомлення';

@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'Der Budgetmodus oben ist auf Able
 
 $string['analytics_js:section'] = 'Abschnitt';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonymisierte Chatprotokolle';
+$string['transcripts:privacynote'] = 'Die Identität der Lernenden wird durch berichtsspezifische Pseudonyme ersetzt, bevor etwas angezeigt oder heruntergeladen wird. Innerhalb eines Berichts bleibt eine Kennung gleich, sodass Sie einer Unterhaltung folgen können; über Berichte hinweg hat sie keine Bedeutung, sodass zwei Downloads nicht darüber verknüpft werden können. Downloads werden im Prüfprotokoll erfasst.';
+$string['transcripts:mode'] = 'Anzeigen';
+$string['transcripts:met'] = 'Erreicht';
+$string['transcripts:notmet'] = 'Nicht erreicht';
+$string['transcripts:to'] = 'Bis';
+$string['transcripts:truncated'] = 'Es werden die ersten {$a} Zeilen angezeigt. Schränken Sie den Zeitraum oder das Modul ein, um die übrigen zu sehen.';
+$string['transcripts:rowcount'] = '{$a} Zeilen.';
+$string['transcripts:col_conversation'] = 'Unterhaltung';
+$string['transcripts:col_learner'] = 'Lernende/r';
+$string['transcripts:col_type'] = 'Typ';
+$string['transcripts:col_message'] = 'Nachricht';

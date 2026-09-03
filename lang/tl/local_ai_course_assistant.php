@@ -2009,3 +2009,15 @@ $string['settings:prompt_budget_no_window'] = 'Nakatakda ang budget mode sa itaa
 
 $string['analytics_js:section'] = 'Seksyon';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Mga anonimong transkripsiyon ng chat';
+$string['transcripts:privacynote'] = 'Pinapalitan ang pagkakakilanlan ng mga mag-aaral ng mga sagisag-panganlan na para lamang sa isang ulat bago may maipakita o ma-download. Nananatiling pareho ang label sa loob ng isang ulat upang masubaybayan mo ang isang pag-uusap, at wala itong kahulugan sa pagitan ng magkaibang ulat, kaya hindi maiuugnay ang dalawang download batay dito. Naitatala ang mga download sa audit log.';
+$string['transcripts:mode'] = 'Ipakita';
+$string['transcripts:met'] = 'Naabot';
+$string['transcripts:notmet'] = 'Hindi naabot';
+$string['transcripts:to'] = 'Hanggang';
+$string['transcripts:truncated'] = 'Ipinapakita ang unang {$a} hanay. Paliitin ang saklaw ng petsa o yunit para makita ang iba pa.';
+$string['transcripts:rowcount'] = '{$a} hanay.';
+$string['transcripts:col_conversation'] = 'Pag-uusap';
+$string['transcripts:col_learner'] = 'Mag-aaral';
+$string['transcripts:col_type'] = 'Uri';
+$string['transcripts:col_message'] = 'Mensahe';

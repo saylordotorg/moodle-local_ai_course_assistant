@@ -1978,3 +1978,15 @@ $string['settings:prompt_budget_no_window'] = 'माथिको बजेट �
 
 $string['analytics_js:section'] = 'खण्ड';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'नाम लुकाइएका कुराकानीका प्रतिलिपिहरू';
+$string['transcripts:privacynote'] = 'कुनै पनि विवरण देखाउनु वा डाउनलोड गर्नु अघि सिकारुको पहिचानलाई प्रत्येक प्रतिवेदनका आफ्नै छद्म नामले प्रतिस्थापन गरिन्छ। एउटै प्रतिवेदनभित्र लेबल स्थिर रहन्छ, त्यसैले तपाईं कुराकानी पछ्याउन सक्नुहुन्छ; विभिन्न प्रतिवेदनबीच यसको कुनै अर्थ हुँदैन, त्यसैले दुई डाउनलोडलाई यसको आधारमा जोड्न सकिँदैन। डाउनलोडहरू लेखापरीक्षण लगमा अभिलेख हुन्छन्।';
+$string['transcripts:mode'] = 'देखाउनु';
+$string['transcripts:met'] = 'पूरा भयो';
+$string['transcripts:notmet'] = 'पूरा भएन';
+$string['transcripts:to'] = 'सम्म';
+$string['transcripts:truncated'] = 'पहिलो {$a} पङ्क्ति देखाइँदै छ। बाँकी हेर्न मिति दायरा वा एकाइ साँघुरो बनाउनुहोस्।';
+$string['transcripts:rowcount'] = '{$a} पङ्क्ति।';
+$string['transcripts:col_conversation'] = 'कुराकानी';
+$string['transcripts:col_learner'] = 'सिकारु';
+$string['transcripts:col_type'] = 'प्रकार';
+$string['transcripts:col_message'] = 'सन्देश';

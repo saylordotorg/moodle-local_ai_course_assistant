@@ -1948,3 +1948,15 @@ $string['settings:prompt_budget_no_window'] = 'Modul de buget de mai sus este se
 
 $string['analytics_js:section'] = 'Secțiune';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Transcrieri anonimizate ale conversațiilor';
+$string['transcripts:privacynote'] = 'Identitatea cursanților este înlocuită cu pseudonime valabile doar pentru raportul respectiv, înainte ca ceva să fie afișat sau descărcat. Eticheta rămâne aceeași în cadrul unui raport, astfel încât puteți urmări o conversație, dar nu are nicio semnificație între rapoarte diferite, așa că două descărcări nu pot fi corelate pe baza ei. Descărcările sunt înregistrate în jurnalul de audit.';
+$string['transcripts:mode'] = 'Afișează';
+$string['transcripts:met'] = 'Atins';
+$string['transcripts:notmet'] = 'Neatins';
+$string['transcripts:to'] = 'Până la';
+$string['transcripts:truncated'] = 'Se afișează primele {$a} rânduri. Restrângeți intervalul de date sau unitatea pentru a vedea restul.';
+$string['transcripts:rowcount'] = '{$a} rânduri.';
+$string['transcripts:col_conversation'] = 'Conversație';
+$string['transcripts:col_learner'] = 'Cursant';
+$string['transcripts:col_type'] = 'Tip';
+$string['transcripts:col_message'] = 'Mesaj';

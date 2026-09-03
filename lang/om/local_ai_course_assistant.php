@@ -1976,3 +1976,15 @@ $string['settings:prompt_budget_no_window'] = 'Haalli baajata armaan olii moodee
 
 $string['analytics_js:section'] = 'Kutaa';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Galmee haasawaa maqaa dhabsiifame';
+$string['transcripts:privacynote'] = 'Eenyummaan barattootaa waan tokko agarsiisuu yookaan buufachuu dura maqaa sobaa gabaasa tokkoof qofa hojjatuun bakka bu\'a. Mallattoon kun gabaasa tokko keessatti hin jijjiiramu, kanaaf haasawa hordofuu dandeessa; gabaasota gidduu garuu hiika hin qabu, kanaaf buufannaa lama isa irratti hundaa\'uun walitti fiduun hin danda\'amu. Buufannaan hundi galmee qorannoo keessatti galmeeffama.';
+$string['transcripts:mode'] = 'Agarsiisi';
+$string['transcripts:met'] = 'Guuttameera';
+$string['transcripts:notmet'] = 'Hin guutamne';
+$string['transcripts:to'] = 'Hanga';
+$string['transcripts:truncated'] = 'Sararoota {$a} jalqabaa agarsiisaa jira. Kaan arguuf hangii guyyaa yookaan qaama xiqqeessi.';
+$string['transcripts:rowcount'] = 'Sararoota {$a}.';
+$string['transcripts:col_conversation'] = 'Haasawa';
+$string['transcripts:col_learner'] = 'Barataa';
+$string['transcripts:col_type'] = 'Gosa';
+$string['transcripts:col_message'] = 'Ergaa';

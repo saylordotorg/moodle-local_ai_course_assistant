@@ -1962,3 +1962,15 @@ $string['settings:prompt_budget_no_window'] = 'Yukarıdaki bütçe kipi modelden
 
 $string['analytics_js:section'] = 'Bölüm';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonimleştirilmiş sohbet dökümleri';
+$string['transcripts:privacynote'] = 'Herhangi bir bilgi gösterilmeden veya indirilmeden önce öğrenci kimlikleri, her rapora özgü takma adlarla değiştirilir. Etiket tek bir rapor içinde aynı kalır, böylece bir konuşmayı izleyebilirsiniz; farklı raporlar arasında ise hiçbir anlam taşımaz, dolayısıyla iki indirme bu etiket üzerinden eşleştirilemez. İndirmeler denetim günlüğüne kaydedilir.';
+$string['transcripts:mode'] = 'Göster';
+$string['transcripts:met'] = 'Karşılandı';
+$string['transcripts:notmet'] = 'Karşılanmadı';
+$string['transcripts:to'] = 'Bitiş';
+$string['transcripts:truncated'] = 'İlk {$a} satır gösteriliyor. Geri kalanını görmek için tarih aralığını veya üniteyi daraltın.';
+$string['transcripts:rowcount'] = '{$a} satır.';
+$string['transcripts:col_conversation'] = 'Konuşma';
+$string['transcripts:col_learner'] = 'Öğrenci';
+$string['transcripts:col_type'] = 'Tür';
+$string['transcripts:col_message'] = 'Mesaj';

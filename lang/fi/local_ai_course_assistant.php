@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'Yllä oleva budjettitila on asete
 
 $string['analytics_js:section'] = 'Osio';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Anonymisoidut keskustelutallenteet';
+$string['transcripts:privacynote'] = 'Opiskelijoiden henkilöllisyys korvataan raporttikohtaisilla peitenimillä ennen kuin mitään näytetään tai ladataan. Tunniste pysyy samana yhden raportin sisällä, jotta voit seurata keskustelua, mutta se ei merkitse mitään eri raporttien välillä, joten kahta latausta ei voi yhdistää sen perusteella. Lataukset kirjataan valvontalokiin.';
+$string['transcripts:mode'] = 'Näytä';
+$string['transcripts:met'] = 'Saavutettu';
+$string['transcripts:notmet'] = 'Ei saavutettu';
+$string['transcripts:to'] = 'Päättyen';
+$string['transcripts:truncated'] = 'Näytetään {$a} ensimmäistä riviä. Rajaa aikaväliä tai osiota nähdäksesi loput.';
+$string['transcripts:rowcount'] = '{$a} riviä.';
+$string['transcripts:col_conversation'] = 'Keskustelu';
+$string['transcripts:col_learner'] = 'Opiskelija';
+$string['transcripts:col_type'] = 'Tyyppi';
+$string['transcripts:col_message'] = 'Viesti';

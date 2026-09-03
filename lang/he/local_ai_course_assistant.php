@@ -1987,3 +1987,15 @@ $string['settings:prompt_budget_no_window'] = 'מצב התקציב שלמעלה 
 
 $string['analytics_js:section'] = 'Section';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'תמלילי שיחות אנונימיים';
+$string['transcripts:privacynote'] = 'זהות הלומדים מוחלפת בשמות בדויים ייחודיים לכל דוח לפני שמוצג או מורד מידע כלשהו. התווית נשארת קבועה בתוך אותו דוח, כך שניתן לעקוב אחר שיחה, ואין לה כל משמעות בין דוחות שונים, ולכן לא ניתן לקשר בין שתי הורדות על בסיסה. ההורדות נרשמות ביומן הביקורת.';
+$string['transcripts:mode'] = 'הצג';
+$string['transcripts:met'] = 'הושג';
+$string['transcripts:notmet'] = 'לא הושג';
+$string['transcripts:to'] = 'עד';
+$string['transcripts:truncated'] = 'מוצגות {$a} השורות הראשונות. צמצם את טווח התאריכים או את היחידה כדי לראות את השאר.';
+$string['transcripts:rowcount'] = '{$a} שורות.';
+$string['transcripts:col_conversation'] = 'שיחה';
+$string['transcripts:col_learner'] = 'לומד';
+$string['transcripts:col_type'] = 'סוג';
+$string['transcripts:col_message'] = 'הודעה';

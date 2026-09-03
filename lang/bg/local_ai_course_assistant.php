@@ -1949,3 +1949,15 @@ $string['settings:prompt_budget_no_window'] = 'Режимът на бюджет�
 
 $string['analytics_js:section'] = 'Секция';
 $string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'Анонимизирани стенограми на разговорите';
+$string['transcripts:privacynote'] = 'Самоличността на учащите се заменя с псевдоними, валидни само за конкретния отчет, преди нещо да бъде показано или изтеглено. Етикетът е постоянен в рамките на един отчет, за да можете да следите разговора, но не означава нищо между различните отчети, така че две изтегляния не могат да бъдат свързани по него. Изтеглянията се записват в одитния дневник.';
+$string['transcripts:mode'] = 'Покажи';
+$string['transcripts:met'] = 'Постигната';
+$string['transcripts:notmet'] = 'Непостигната';
+$string['transcripts:to'] = 'До';
+$string['transcripts:truncated'] = 'Показани са първите {$a} реда. Стеснете периода или модула, за да видите останалите.';
+$string['transcripts:rowcount'] = '{$a} реда.';
+$string['transcripts:col_conversation'] = 'Разговор';
+$string['transcripts:col_learner'] = 'Учащ';
+$string['transcripts:col_type'] = 'Тип';
+$string['transcripts:col_message'] = 'Съобщение';
