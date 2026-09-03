@@ -100,12 +100,14 @@ class score_essay extends external_api {
                                         'feedback' => ['type' => 'string'],
                                     ],
                                     'required' => ['name', 'score', 'feedback'],
+                                    'additionalProperties' => false,
                                 ],
                             ],
                             'overall'   => ['type' => 'string'],
                             'revisions' => ['type' => 'array', 'items' => ['type' => 'string']],
                         ],
                         'required' => ['criteria', 'overall', 'revisions'],
+                        'additionalProperties' => false,
                     ],
                 ]
             );

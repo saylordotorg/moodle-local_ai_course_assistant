@@ -1707,6 +1707,7 @@ $string['soapbox:audio_ready']      = 'Audio only. Your microphone will be recor
 $string['soapbox:audio_recording']  = 'Recording audio...';
 $string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
 $string['soapbox:cap_reached']      = 'You have reached the maximum number of recordings for this assignment.';
+$string['soapbox:rate_limited']     = 'Too many recordings submitted in a short time. Please wait a few minutes and try again.';
 $string['soapbox:storage_unconfigured'] = 'Recording storage is not set up yet. Please contact your administrator.';
 $string['soapbox:bad_key']          = 'That upload does not belong to you.';
 $string['soapbox:slides_disabled']  = 'Slides are not enabled for this assignment.';

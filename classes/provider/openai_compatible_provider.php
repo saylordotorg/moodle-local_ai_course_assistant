@@ -158,7 +158,13 @@ abstract class openai_compatible_provider extends base_provider {
                 'type' => 'json_schema',
                 'json_schema' => [
                     'name' => $schema['name'] ?? 'structured_output',
-                    'schema' => $schema['schema'],
+                    // Accept both the wrapped shape ['name'=>..,'schema'=>[..]]
+                    // and a bare JSON Schema. score_speech, score_essay and
+                    // generate_flashcards all passed bare schemas, so this read
+                    // yielded null and the request carried "schema": null --
+                    // which upstream rejects, taking every speech, essay and
+                    // flashcard scoring call down with a generic provider error.
+                    'schema' => $schema['schema'] ?? $schema,
                     'strict' => true,
                 ],
             ];

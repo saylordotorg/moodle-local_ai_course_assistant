@@ -1989,3 +1989,4 @@ $string['coursesettings:apikey_stored'] = 'Fure ayaa la keydiyay. Bannaan uga ta
 $string['coursesettings:apikey_clear'] = 'Tirtir furaha la keydiyay oo isticmaal furaha goobta';
 $string['coursesettings:spend_cap_monthly'] = 'Xadka kharashka bishii ee koorsadan (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Bannaan uga tag si loo isticmaalo qiimaha caadiga ah ee goobta. Marka la dejiyo, adeegyada AI ee koorsadan way joogsadaan marka kharashka bisha uu gaaro qaddarkan.';
+$string['soapbox:rate_limited'] = 'Duubisyo aad u badan ayaa la soo diray waqti gaaban gudahood. Fadlan sug dhowr daqiiqo oo isku day mar kale.';

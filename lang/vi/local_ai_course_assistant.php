@@ -1983,3 +1983,4 @@ $string['coursesettings:apikey_stored'] = 'Đã lưu một khóa. Để trống 
 $string['coursesettings:apikey_clear'] = 'Xóa khóa đã lưu và dùng khóa của trang';
 $string['coursesettings:spend_cap_monthly'] = 'Hạn mức chi tiêu hằng tháng cho khóa học này (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Để trống để dùng giá trị mặc định của trang. Khi được đặt, các tính năng AI trong khóa học này sẽ dừng khi chi tiêu của tháng đạt tới mức này.';
+$string['soapbox:rate_limited'] = 'Đã gửi quá nhiều bản ghi trong thời gian ngắn. Vui lòng đợi vài phút rồi thử lại.';

@@ -2002,3 +2002,4 @@ $string['coursesettings:apikey_stored'] = 'Kunci tersimpan. Biarkan kosong untuk
 $string['coursesettings:apikey_clear'] = 'Hapus kunci tersimpan dan gunakan kunci situs';
 $string['coursesettings:spend_cap_monthly'] = 'Batas pengeluaran bulanan untuk kursus ini (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Biarkan kosong untuk memakai default situs. Bila diisi, fitur AI di kursus ini berhenti setelah pengeluaran bulan ini mencapai jumlah tersebut.';
+$string['soapbox:rate_limited'] = 'Terlalu banyak rekaman dikirim dalam waktu singkat. Tunggu beberapa menit lalu coba lagi.';

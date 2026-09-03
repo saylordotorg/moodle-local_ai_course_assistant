@@ -186,14 +186,30 @@ class hook_callbacks {
      * try/catch so a delete-cascade error cannot block the user-deleted hook
      * chain; any failure is logged for the site admin to investigate.
      *
-     * @param \core\hook\user\deleted $hook
+     * @param \core_user\hook\before_user_deleted $hook
      */
-    public static function on_user_deleted(\core\hook\user\deleted $hook): void {
+    public static function on_user_deleted(\core_user\hook\before_user_deleted $hook): void {
         try {
             $user = $hook->user;
             if (empty($user) || empty($user->id)) {
                 return;
             }
+            // Compute the contextlist BEFORE deleting anything.
+            //
+            // provider::get_contexts_for_userid() derives contexts from convs,
+            // plans, reminders, feedback, survey_resp, ut_resp, audit,
+            // practice_scores and sbx_rec. delete_user_data() empties the first
+            // eight, so computing this afterwards returned an empty list and the
+            // Privacy leg below was skipped entirely -- meaning a corrected hook
+            // name alone would still not have finished the job.
+            $contextids = [];
+            try {
+                $contextlist = \local_ai_course_assistant\privacy\provider::get_contexts_for_userid((int)$user->id);
+                $contextids = $contextlist ? $contextlist->get_contextids() : [];
+            } catch (\Throwable $e) {
+                debugging('SOLA user_deleted: contextlist failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+
             // Primary path: the conversation manager owns message and conversation rows.
             \local_ai_course_assistant\conversation_manager::delete_user_data((int)$user->id);
             // v5.10.x: email opt-out is user-global and may exist for a user who
@@ -211,15 +227,16 @@ class hook_callbacks {
             // plugin table (plans, reminders, feedback, surveys, UT, profiles,
             // practice scores, ratings, audit) is cleaned up by the same code
             // that services a formal data subject request.
-            $contextlist = \core_privacy\manager::get_contexts_for_userid(
-                (int)$user->id,
-                'local_ai_course_assistant'
-            );
-            if ($contextlist && $contextlist->count() > 0) {
+            // NOT \core_privacy\manager::get_contexts_for_userid() -- that is a
+            // non-static instance method taking one argument, so the old static
+            // two-argument call raised an Error that the catch below swallowed.
+            // The plugin's own provider is also correctly scoped and cheaper
+            // than a whole-site component sweep.
+            if (!empty($contextids)) {
                 $approved = new \core_privacy\local\request\approved_contextlist(
                     \core\user::get_user((int)$user->id) ?: (object)['id' => (int)$user->id],
                     'local_ai_course_assistant',
-                    $contextlist->get_contextids()
+                    $contextids
                 );
                 \local_ai_course_assistant\privacy\provider::delete_data_for_user($approved);
             }

@@ -1971,3 +1971,4 @@ $string['coursesettings:apikey_stored'] = 'Er is een sleutel opgeslagen. Laat le
 $string['coursesettings:apikey_clear'] = 'Wis de opgeslagen sleutel en gebruik de sitesleutel';
 $string['coursesettings:spend_cap_monthly'] = 'Maandelijkse uitgavenlimiet voor deze cursus (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Laat leeg om de standaardwaarde van de site te gebruiken. Indien ingesteld stoppen de AI-functies in deze cursus zodra de uitgaven van de maand dit bedrag bereiken.';
+$string['soapbox:rate_limited'] = 'Te veel opnamen in korte tijd verzonden. Wacht een paar minuten en probeer het opnieuw.';

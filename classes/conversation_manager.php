@@ -435,6 +435,14 @@ class conversation_manager {
             'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
             'outreach_log'    => 'local_ai_course_assistant_outreach_log',
             'audit'           => 'local_ai_course_assistant_audit',
+            // v7.3.2 (F42): these four are declared in the plugin's own privacy
+            // metadata and were exported by the provider, but no deletion path
+            // reached them -- so a learner who used the "delete my data" button
+            // kept their mastery attempts, flashcards and avatar sessions.
+            'obj_att'         => 'local_ai_course_assistant_obj_att',
+            'flashcards'      => 'local_ai_course_assistant_flashcards',
+            'avatar_sess'     => 'local_ai_course_assistant_avatar_sess',
+            'email_optout'    => 'local_ai_course_assistant_email_optout',
         ];
         // Bounded loop: $simple is a hard-coded map of this plugin's own tables,
         // so the query count is fixed (2 per table) and does not grow with the
@@ -447,6 +455,36 @@ class conversation_manager {
                 // Table may not exist on older installs; skip gracefully.
                 $counts[$label] = 0;
             }
+        }
+
+        // Tables that identify the user by a column other than `userid`, so they
+        // cannot join the loop above.
+        try {
+            // review_res records WHO resolved a flagged item, not whose data it
+            // was. Deleting removes that staff attribution along with the user.
+            $counts['review_res'] = $DB->count_records(
+                'local_ai_course_assistant_review_res', ['resolved_by' => $userid]);
+            $DB->delete_records('local_ai_course_assistant_review_res', ['resolved_by' => $userid]);
+        } catch (\Throwable $e) {
+            $counts['review_res'] = 0;
+        }
+        try {
+            // radar_sched is the creator's own saved report config. It has no
+            // courseid column -- see the note in privacy\provider.
+            $counts['radar_sched'] = $DB->count_records(
+                'local_ai_course_assistant_radar_sched', ['creator' => $userid]);
+            $DB->delete_records('local_ai_course_assistant_radar_sched', ['creator' => $userid]);
+        } catch (\Throwable $e) {
+            $counts['radar_sched'] = 0;
+        }
+
+        // Soapbox recordings are assignid-keyed and their media lives in object
+        // storage, so they need the provider's purge rather than a row delete.
+        try {
+            \local_ai_course_assistant\privacy\provider::purge_soapbox_recordings($userid, null);
+            $counts['sbx_rec'] = 0;
+        } catch (\Throwable $e) {
+            $counts['sbx_rec'] = 0;
         }
 
         return $counts;
@@ -500,6 +538,14 @@ class conversation_manager {
             'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
             'outreach_log'    => 'local_ai_course_assistant_outreach_log',
             'audit'           => 'local_ai_course_assistant_audit',
+            // v7.3.2 (F43): declared in the privacy metadata, exported by the
+            // provider, and reached by no course-scoped deletion path. That made
+            // delete_data_for_all_users_in_context -- which core calls for
+            // context-expiry purges, where no course_deleted event fires --
+            // weaker than the per-user erasure in the same class.
+            'obj_att'         => 'local_ai_course_assistant_obj_att',
+            'flashcards'      => 'local_ai_course_assistant_flashcards',
+            'avatar_sess'     => 'local_ai_course_assistant_avatar_sess',
         ];
         // Bounded loop, as above: one count + one delete per hard-coded table,
         // not per row of data.
@@ -517,6 +563,34 @@ class conversation_manager {
                 $counts[$label] = 0;
             }
         }
+
+        // review_res is course-scoped but identifies the actor as resolved_by,
+        // so it cannot use the (courseid, userid) shape above.
+        try {
+            $where = 'courseid = :courseid';
+            $params = ['courseid' => $courseid];
+            if ($userid) {
+                $where .= ' AND resolved_by = :resolvedby';
+                $params['resolvedby'] = $userid;
+            }
+            $counts['review_res'] = $DB->count_records_select(
+                'local_ai_course_assistant_review_res', $where, $params);
+            $DB->delete_records_select('local_ai_course_assistant_review_res', $where, $params);
+        } catch (\Throwable $e) {
+            $counts['review_res'] = 0;
+        }
+
+        // Soapbox recordings: assignid-keyed, and the media lives in object
+        // storage, so route through the provider's purge. Only meaningful for a
+        // single user -- the all-users course purge is handled by the observer.
+        if ($userid) {
+            try {
+                \local_ai_course_assistant\privacy\provider::purge_soapbox_recordings($userid, $courseid);
+            } catch (\Throwable $e) {
+                /* tables absent on older installs */
+            }
+        }
+        $counts['sbx_rec'] = 0;
 
         return $counts;
     }

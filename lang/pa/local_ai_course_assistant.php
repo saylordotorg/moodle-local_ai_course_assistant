@@ -1970,3 +1970,4 @@ $string['coursesettings:apikey_stored'] = 'ਇੱਕ ਕੁੰਜੀ ਸੰਭ�
 $string['coursesettings:apikey_clear'] = 'ਸੰਭਾਲੀ ਕੁੰਜੀ ਮਿਟਾਓ ਅਤੇ ਸਾਈਟ ਕੁੰਜੀ ਵਰਤੋ';
 $string['coursesettings:spend_cap_monthly'] = 'ਇਸ ਕੋਰਸ ਲਈ ਮਹੀਨਾਵਾਰ ਖਰਚ ਸੀਮਾ (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'ਸਾਈਟ ਦੀ ਮੂਲ ਵਰਤਣ ਲਈ ਖਾਲੀ ਛੱਡੋ। ਸੈੱਟ ਹੋਣ ਤੇ, ਮਹੀਨੇ ਦਾ ਖਰਚ ਇਸ ਰਕਮ ਤੇ ਪਹੁੰਚਦੇ ਹੀ ਇਸ ਕੋਰਸ ਦੀਆਂ AI ਸਹੂਲਤਾਂ ਰੁਕ ਜਾਂਦੀਆਂ ਹਨ।';
+$string['soapbox:rate_limited'] = 'ਥੋੜ੍ਹੇ ਸਮੇਂ ਵਿੱਚ ਬਹੁਤ ਸਾਰੀਆਂ ਰਿਕਾਰਡਿੰਗਾਂ ਭੇਜੀਆਂ ਗਈਆਂ। ਕੁਝ ਮਿੰਟ ਉਡੀਕੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।';

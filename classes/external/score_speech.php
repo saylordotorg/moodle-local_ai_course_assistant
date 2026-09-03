@@ -115,14 +115,14 @@ class score_speech extends external_api {
             ?: rubric_manager::SPEECH_LEVEL_GENERAL);
         $preset = rubric_manager::speech_preset($level);
 
-        // Resolve the per-course speech rubric. An explicit course/global rubric
-        // wins; otherwise fall back to the level preset's sample criteria.
-        // get_active_rubric() returns the criteria already decoded to an array.
-        $rubric = rubric_manager::get_active_rubric($courseid, rubric_manager::TYPE_SPEECH);
-        $criteriadefs = ($rubric && is_array($rubric->criteria)) ? $rubric->criteria : $preset['criteria'];
-        if (!is_array($criteriadefs) || empty($criteriadefs)) {
-            $criteriadefs = $preset['criteria'];
-        }
+        // Resolve the per-course speech rubric, honouring the course's ESL level.
+        // See rubric_manager::resolve_speech_criteria() for why a global rubric
+        // must not silently outrank a course's configured level.
+        $resolved = rubric_manager::resolve_speech_criteria($courseid, $level);
+        $criteriadefs = $resolved['criteria'];
+        $rubric = $resolved['rubricid'] > 0
+            ? rubric_manager::get_active_rubric($courseid, rubric_manager::TYPE_SPEECH)
+            : null;
         $maxscore = 5;
         $rubriclines = [];
         foreach ($criteriadefs as $c) {
@@ -196,16 +196,26 @@ class score_speech extends external_api {
                                         'feedback' => ['type' => 'string'],
                                     ],
                                     'required' => ['name', 'score', 'feedback'],
+                                    // OpenAI strict mode (the provider sets
+                                    // strict => true) requires this on every
+                                    // object node, or the request is rejected.
+                                    'additionalProperties' => false,
                                 ],
                             ],
                             'overall' => ['type' => 'string'],
                             'tips'    => ['type' => 'array', 'items' => ['type' => 'string']],
                         ],
                         'required' => ['criteria', 'overall', 'tips'],
+                        'additionalProperties' => false,
                     ],
                 ]
             );
         } catch (\Throwable $e) {
+            // Do not discard the reason. Three of the things that land here are
+            // deliberate policy refusals -- emergency stop, quiz lock, exhausted
+            // spend cap -- and reporting them as a provider outage is how a
+            // working control looks like a broken vendor.
+            debugging('SOLA score_speech provider error: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return self::empty_result('provider_error');
         }
 

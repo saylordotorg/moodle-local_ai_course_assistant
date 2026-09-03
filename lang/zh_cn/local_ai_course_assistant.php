@@ -1983,3 +1983,4 @@ $string['coursesettings:apikey_stored'] = '已保存密钥。留空即可保留�
 $string['coursesettings:apikey_clear'] = '清除已保存的密钥并使用站点密钥';
 $string['coursesettings:spend_cap_monthly'] = '本课程的每月支出上限（美元）';
 $string['coursesettings:spend_cap_monthly_desc'] = '留空则使用站点默认值。设置后，当本月支出达到该金额时，本课程的 AI 功能将停止。';
+$string['soapbox:rate_limited'] = '短时间内提交的录音过多。请稍候几分钟后重试。';

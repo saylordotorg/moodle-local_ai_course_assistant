@@ -139,7 +139,7 @@ echo $OUTPUT->render_from_template('local_ai_course_assistant/audit_log', [
     'col_course' => get_string('auditlog:col_course', 'local_ai_course_assistant'),
     'col_ip' => get_string('auditlog:col_ip', 'local_ai_course_assistant'),
     'col_details' => get_string('auditlog:col_details', 'local_ai_course_assistant'),
-    'settings_url' => (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']))->out(false),
+    'settings_url' => (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant_general']))->out(false),
     'back_to_settings' => branding::str('ragadmin:back_to_settings'),
     'hasprev' => $page > 0,
     'prevurl' => (new moodle_url($baseurl, ['page' => $page - 1]))->out(false),

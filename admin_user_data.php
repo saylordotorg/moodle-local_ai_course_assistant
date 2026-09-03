@@ -107,17 +107,27 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
 // Handle purge action (two step confirm).
 if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
     if ($confirm) {
+        // Contexts first: the provider derives them from tables that
+        // delete_user_data() is about to empty, so computing them afterwards
+        // yields an empty list and silently skips the Privacy leg.
+        // Also note this was \core_privacy\manager::get_contexts_for_userid()
+        // called statically with two arguments -- it is a non-static one-argument
+        // instance method, so it raised an Error straight into the catch below.
+        $contextids = [];
+        try {
+            $contextlist = \local_ai_course_assistant\privacy\provider::get_contexts_for_userid($targetuserid);
+            $contextids = $contextlist ? $contextlist->get_contextids() : [];
+        } catch (\Throwable $e) {
+            debugging('Privacy API contextlist threw: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+
         \local_ai_course_assistant\conversation_manager::delete_user_data($targetuserid);
         try {
-            $contextlist = \core_privacy\manager::get_contexts_for_userid(
-                $targetuserid,
-                'local_ai_course_assistant'
-            );
-            if ($contextlist && $contextlist->count() > 0) {
+            if (!empty($contextids)) {
                 $approved = new \core_privacy\local\request\approved_contextlist(
                     \core\user::get_user($targetuserid) ?: (object)['id' => $targetuserid],
                     'local_ai_course_assistant',
-                    $contextlist->get_contextids()
+                    $contextids
                 );
                 \local_ai_course_assistant\privacy\provider::delete_data_for_user($approved);
             }

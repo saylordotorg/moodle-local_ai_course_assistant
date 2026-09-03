@@ -1986,3 +1986,4 @@ $string['coursesettings:apikey_stored'] = 'Egy kulcs mentve van. Hagyja üresen 
 $string['coursesettings:apikey_clear'] = 'A mentett kulcs törlése és az oldal kulcsának használata';
 $string['coursesettings:spend_cap_monthly'] = 'Havi költségkeret ehhez a kurzushoz (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Hagyja üresen az oldal alapértelmezésének használatához. Ha be van állítva, a kurzus MI-funkciói leállnak, amint a havi költés eléri ezt az összeget.';
+$string['soapbox:rate_limited'] = 'Túl sok felvételt küldött rövid idő alatt. Várjon néhány percet, és próbálja újra.';

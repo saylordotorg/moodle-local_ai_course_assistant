@@ -1983,3 +1983,4 @@ $string['coursesettings:apikey_stored'] = 'Am na kaley bu ñu denc. Bàyyi ko ne
 $string['coursesettings:apikey_clear'] = 'Far kaley bi ñu denc te jëfandikoo kaleyu sit bi';
 $string['coursesettings:spend_cap_monthly'] = 'Àppu depaas bu weer ci jàng bii (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Bàyyi ko neen ngir jëfandikoo bu sit bi. Bu ñu ko defee, jumtukaayu AI yi ci jàng bii dañuy taxaw bu depaasu weer bi àggee ci lim bii.';
+$string['soapbox:rate_limited'] = 'Enregistrement yu bare la ñu yónnee ci diir bu gàtt. Xaaral ay simili ba noppi jéemaat.';

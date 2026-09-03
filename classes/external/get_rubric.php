@@ -59,8 +59,11 @@ class get_rubric extends external_api {
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
-        // Ensure defaults exist before querying.
-        rubric_manager::ensure_default_rubrics();
+        // Seed ONLY the type that was asked for. ensure_default_rubrics() seeds
+        // all three, including speech -- so a learner starting conversation or
+        // pronunciation practice created a global speech rubric that then
+        // outranked every course's configured ESL level site-wide.
+        rubric_manager::ensure_default_rubric($params['type']);
 
         $rubric = rubric_manager::get_active_rubric($params['courseid'], $params['type']);
 

@@ -1947,3 +1947,4 @@ $string['coursesettings:apikey_stored'] = 'En nyckel är sparad. Lämna tomt fö
 $string['coursesettings:apikey_clear'] = 'Rensa den sparade nyckeln och använd webbplatsens nyckel';
 $string['coursesettings:spend_cap_monthly'] = 'Månatligt utgiftstak för denna kurs (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Lämna tomt för att använda webbplatsens standardvärde. När det är angivet stoppas AI-funktionerna i kursen när månadens utgifter når detta belopp.';
+$string['soapbox:rate_limited'] = 'För många inspelningar skickade på kort tid. Vänta några minuter och försök igen.';

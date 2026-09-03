@@ -1947,3 +1947,4 @@ $string['coursesettings:apikey_stored'] = 'Klucz jest zapisany. Pozostaw puste, 
 $string['coursesettings:apikey_clear'] = 'Wyczyść zapisany klucz i użyj klucza witryny';
 $string['coursesettings:spend_cap_monthly'] = 'Miesięczny limit wydatków dla tego kursu (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Pozostaw puste, aby użyć wartości domyślnej witryny. Po ustawieniu funkcje AI w tym kursie zatrzymują się, gdy wydatki miesiąca osiągną tę kwotę.';
+$string['soapbox:rate_limited'] = 'Wysłano zbyt wiele nagrań w krótkim czasie. Odczekaj kilka minut i spróbuj ponownie.';

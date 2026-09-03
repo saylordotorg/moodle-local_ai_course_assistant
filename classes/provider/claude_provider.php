@@ -235,7 +235,8 @@ class claude_provider extends base_provider {
             $body['tools'] = [[
                 'name' => $schema['name'] ?? 'structured_output',
                 'description' => $schema['description'] ?? 'Return structured data',
-                'input_schema' => $schema['schema'],
+                // Wrapped or bare -- see the note in openai_compatible_provider.
+                'input_schema' => $schema['schema'] ?? $schema,
             ]];
             $body['tool_choice'] = [
                 'type' => 'tool',

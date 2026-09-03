@@ -1954,3 +1954,4 @@ $string['coursesettings:apikey_stored'] = 'En nøkkel er lagret. La feltet stå 
 $string['coursesettings:apikey_clear'] = 'Tøm den lagrede nøkkelen og bruk nettstedets nøkkel';
 $string['coursesettings:spend_cap_monthly'] = 'Månedlig forbruksgrense for dette kurset (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'La feltet stå tomt for å bruke nettstedets standard. Når den er satt, stopper AI-funksjonene i dette kurset når månedens forbruk når dette beløpet.';
+$string['soapbox:rate_limited'] = 'For mange opptak sendt på kort tid. Vent noen minutter og prøv igjen.';

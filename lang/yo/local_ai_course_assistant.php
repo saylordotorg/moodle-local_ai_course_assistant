@@ -1983,3 +1983,4 @@ $string['coursesettings:apikey_stored'] = 'A ti fi kọ́kọ́rọ́ pamọ́. 
 $string['coursesettings:apikey_clear'] = 'Pa kọ́kọ́rọ́ tí a fi pamọ́ rẹ́ kí o sì lo ti ojúlé';
 $string['coursesettings:spend_cap_monthly'] = 'Ààlà ìnáwó oṣooṣù fún ẹ̀kọ́ yìí (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Fi sílẹ̀ ní òfìfo láti lo àbáwọlé ojúlé. Nígbà tí a bá ṣètò rẹ̀, àwọn ẹ̀ya AI nínú ẹ̀kọ́ yìí yóò dúró nígbà tí ìnáwó oṣù bá dé iye yìí.';
+$string['soapbox:rate_limited'] = 'A fi ọ̀pọ̀ ìgbàsílẹ̀ ránṣẹ́ ní àkókò kúkúrú. Jọ̀wọ́ dúró fún ìṣẹ́jú díẹ̀ kí o sì tún gbìyànjú.';

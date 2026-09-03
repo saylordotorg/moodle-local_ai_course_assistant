@@ -110,6 +110,40 @@ class rubric_manager {
      * @param string $type 'conversation' or 'pronunciation'
      * @return object|null Rubric record with decoded criteria, or null if none found.
      */
+    /**
+     * Resolve the speech criteria for a course, honouring its ESL level.
+     *
+     * A course-scoped rubric is always a deliberate authoring act, so it wins.
+     * A GLOBAL (courseid = 0) speech rubric may be auto-seeded boilerplate --
+     * ensure_default_rubrics() creates one carrying the general criteria, and it
+     * is reached from get_rubric, which any learner starting conversation or
+     * pronunciation practice in any course on the site can trigger. Letting that
+     * row win silently replaced a course's ESL criteria with the general set
+     * from the moment anyone, anywhere, touched an unrelated feature. The level
+     * select kept displaying "ESL (beginner)" and the coaching prose still
+     * sounded ESL-aware, so nothing surfaced the swap.
+     *
+     * Nothing is destroyed by that -- the preset is shadowed, not deleted -- so
+     * this resolution restores the intended behaviour with no data migration.
+     *
+     * @param int $courseid
+     * @param string $level One of the SPEECH_LEVEL_* constants.
+     * @return array{criteria: array, rubricid: int} rubricid 0 when the preset was used
+     */
+    public static function resolve_speech_criteria(int $courseid, string $level): array {
+        $preset = self::speech_preset($level);
+        $rubric = self::get_active_rubric($courseid, self::TYPE_SPEECH);
+
+        $iscoursescoped = $rubric && (int) $rubric->courseid === $courseid && $courseid > 0;
+        $isgenerallevel = ($level === self::SPEECH_LEVEL_GENERAL);
+        $explicit = $rubric && ($iscoursescoped || $isgenerallevel);
+
+        if ($explicit && is_array($rubric->criteria) && !empty($rubric->criteria)) {
+            return ['criteria' => $rubric->criteria, 'rubricid' => (int) $rubric->id];
+        }
+        return ['criteria' => $preset['criteria'], 'rubricid' => 0];
+    }
+
     public static function get_active_rubric(int $courseid, string $type): ?object {
         global $DB;
 

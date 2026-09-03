@@ -1978,3 +1978,4 @@ $string['coursesettings:apikey_stored'] = 'एक कुंजी सहेज�
 $string['coursesettings:apikey_clear'] = 'सहेजी गई कुंजी हटाएँ और साइट कुंजी का उपयोग करें';
 $string['coursesettings:spend_cap_monthly'] = 'इस कोर्स के लिए मासिक व्यय सीमा (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'साइट डिफ़ॉल्ट का उपयोग करने के लिए खाली छोड़ें। निर्धारित होने पर, महीने का खर्च इस राशि तक पहुँचते ही इस कोर्स की AI सुविधाएँ रुक जाती हैं।';
+$string['soapbox:rate_limited'] = 'कम समय में बहुत अधिक रिकॉर्डिंग भेजी गईं। कृपया कुछ मिनट प्रतीक्षा करें और फिर प्रयास करें।';

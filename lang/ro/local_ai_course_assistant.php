@@ -1947,3 +1947,4 @@ $string['coursesettings:apikey_stored'] = 'O cheie este salvată. Lăsați gol p
 $string['coursesettings:apikey_clear'] = 'Șterge cheia salvată și folosește cheia sitului';
 $string['coursesettings:spend_cap_monthly'] = 'Plafon lunar de cheltuieli pentru acest curs (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Lăsați gol pentru a folosi valoarea implicită a sitului. Când este setat, funcțiile AI din acest curs se opresc când cheltuiala lunii atinge această sumă.';
+$string['soapbox:rate_limited'] = 'Prea multe înregistrări trimise într-un timp scurt. Așteptați câteva minute și încercați din nou.';

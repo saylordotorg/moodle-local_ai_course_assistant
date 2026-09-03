@@ -175,10 +175,13 @@ class generate_flashcards extends external_api {
                         'type' => 'object',
                         'properties' => $cardprops,
                         'required' => $required,
+                        // Required on every object node under OpenAI strict mode.
+                        'additionalProperties' => false,
                     ],
                 ],
             ],
             'required' => ['cards'],
+            'additionalProperties' => false,
         ];
     }
 

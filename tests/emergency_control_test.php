@@ -62,7 +62,7 @@ final class emergency_control_test extends \advanced_testcase {
         $this->assertEquals('', get_config('local_ai_course_assistant', 'voice_active_realtime'));
         $this->assertEquals(
             'MyOpenAIVoice',
-            get_config('local_ai_course_assistant', 'voice_active_realtime_backup')
+            get_config('local_ai_course_assistant', 'voice_active_realtime_emergency_backup')
         );
     }
 
@@ -80,7 +80,7 @@ final class emergency_control_test extends \advanced_testcase {
             'restore must put the stashed voice provider back exactly.'
         );
         $this->assertFalse(
-            get_config('local_ai_course_assistant', 'voice_active_realtime_backup'),
+            get_config('local_ai_course_assistant', 'voice_active_realtime_emergency_backup'),
             'backup row must be cleaned up after restore.'
         );
     }
@@ -98,7 +98,7 @@ final class emergency_control_test extends \advanced_testcase {
         );
         $this->assertEquals(
             '500',
-            get_config('local_ai_course_assistant', 'spend_cap_site_backup')
+            get_config('local_ai_course_assistant', 'spend_cap_site_emergency_backup')
         );
     }
 
@@ -110,7 +110,7 @@ final class emergency_control_test extends \advanced_testcase {
         emergency_control::restore([emergency_control::FLAG_CHAT], '', 'test');
 
         $this->assertEquals('500', get_config('local_ai_course_assistant', 'spend_cap_site'));
-        $this->assertFalse(get_config('local_ai_course_assistant', 'spend_cap_site_backup'));
+        $this->assertFalse(get_config('local_ai_course_assistant', 'spend_cap_site_emergency_backup'));
     }
 
     public function test_disable_writes_audit_row_with_reason_and_invoker(): void {

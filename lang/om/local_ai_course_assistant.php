@@ -1975,3 +1975,4 @@ $string['coursesettings:apikey_stored'] = 'Furtuun tokko olkaa\'ameera. Akka tur
 $string['coursesettings:apikey_clear'] = 'Furtuu olkaa\'ame haqiitii furtuu marsariitii fayyadami';
 $string['coursesettings:spend_cap_monthly'] = 'Daangaa baasii ji\'aa koorsii kanaaf (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Durtii marsariitii fayyadamuuf duwwaa dhiisi. Yoo qindaa\'e, baasiin ji\'aa hanga kana yeroo ga\'u tajaajilli AI koorsii kana keessatti ni dhaabata.';
+$string['soapbox:rate_limited'] = 'Yeroo gabaabaa keessatti waraabbii baay\'een ergameera. Daqiiqaa muraasa eegii irra deebi\'ii yaali.';

@@ -1961,3 +1961,4 @@ $string['coursesettings:apikey_stored'] = 'Bir anahtar kayıtlı. Korumak için 
 $string['coursesettings:apikey_clear'] = 'Kayıtlı anahtarı temizle ve site anahtarını kullan';
 $string['coursesettings:spend_cap_monthly'] = 'Bu ders için aylık harcama üst sınırı (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Sitenin varsayılanını kullanmak için boş bırakın. Ayarlandığında, ayın harcaması bu tutara ulaştığında bu dersteki yapay zekâ özellikleri durur.';
+$string['soapbox:rate_limited'] = 'Kısa sürede çok fazla kayıt gönderildi. Lütfen birkaç dakika bekleyip tekrar deneyin.';

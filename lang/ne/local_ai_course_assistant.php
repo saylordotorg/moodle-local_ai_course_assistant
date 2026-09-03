@@ -1977,3 +1977,4 @@ $string['coursesettings:apikey_stored'] = 'कुञ्जी सुरक्ष
 $string['coursesettings:apikey_clear'] = 'सुरक्षित कुञ्जी हटाउनुहोस् र साइट कुञ्जी प्रयोग गर्नुहोस्';
 $string['coursesettings:spend_cap_monthly'] = 'यस पाठ्यक्रमको मासिक खर्च सीमा (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'साइटको पूर्वनिर्धारित प्रयोग गर्न खाली छोड्नुहोस्। सेट गरिएमा, महिनाको खर्च यो रकममा पुगेपछि यस पाठ्यक्रमका AI सुविधाहरू रोकिन्छन्।';
+$string['soapbox:rate_limited'] = 'छोटो समयमा धेरै रेकर्डिङ पठाइयो। केही मिनेट पर्खेर फेरि प्रयास गर्नुहोस्।';

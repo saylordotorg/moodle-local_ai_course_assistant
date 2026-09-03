@@ -1954,3 +1954,4 @@ $string['coursesettings:apikey_stored'] = '키가 저장되어 있습니다. 유
 $string['coursesettings:apikey_clear'] = '저장된 키를 지우고 사이트 키 사용';
 $string['coursesettings:spend_cap_monthly'] = '이 강좌의 월간 지출 한도(USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = '사이트 기본값을 사용하려면 비워 두세요. 설정하면 해당 월의 지출이 이 금액에 도달할 때 이 강좌의 AI 기능이 중지됩니다.';
+$string['soapbox:rate_limited'] = '짧은 시간에 너무 많은 녹음을 제출했습니다. 몇 분 후에 다시 시도하세요.';

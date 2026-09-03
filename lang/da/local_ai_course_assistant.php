@@ -1948,3 +1948,4 @@ $string['coursesettings:apikey_stored'] = 'En nøgle er gemt. Lad feltet stå to
 $string['coursesettings:apikey_clear'] = 'Ryd den gemte nøgle og brug sidens nøgle';
 $string['coursesettings:spend_cap_monthly'] = 'Månedligt forbrugsloft for dette kursus (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Lad feltet stå tomt for at bruge sidens standard. Når det er sat, stopper AI-funktionerne i dette kursus, når månedens forbrug når dette beløb.';
+$string['soapbox:rate_limited'] = 'Der er sendt for mange optagelser på kort tid. Vent et par minutter, og prøv igen.';

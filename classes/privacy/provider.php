@@ -442,18 +442,29 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * object (best-effort, so erasure removes the media not just the row) then
      * the rows. sbx_rec is keyed on the assignment, so scope via a join.
      *
+     * v7.3.2: public, and $courseid is nullable. conversation_manager's
+     * all-courses erasure needs the same media-deleting path -- deleting the
+     * rows alone would strand the audio in object storage, which is the part of
+     * a Soapbox recording that actually contains the learner's voice.
+     *
      * @param int $userid
-     * @param int $courseid
+     * @param int|null $courseid null = every course
      */
-    private static function purge_soapbox_recordings(int $userid, int $courseid): void {
+    public static function purge_soapbox_recordings(int $userid, ?int $courseid = null): void {
         global $DB;
+        $params = ['userid' => $userid];
+        $coursejoin = '';
+        if ($courseid !== null) {
+            $coursejoin = ' AND a.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
         try {
             $recs = $DB->get_records_sql(
                 "SELECT r.id, r.storage_key, r.deck_key
                    FROM {local_ai_course_assistant_sbx_rec} r
                    JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
-                  WHERE r.userid = :userid AND a.courseid = :courseid",
-                ['userid' => $userid, 'courseid' => $courseid]
+                  WHERE r.userid = :userid" . $coursejoin,
+                $params
             );
         } catch (\Throwable $e) {
             return; // Tables absent on older installs.
@@ -910,9 +921,13 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 /* ignore */
             }
             try {
+                // Keyed on creator alone: this table has no courseid column
+                // (it stores a comma-separated `courseids` list), so passing one
+                // raised a dml_exception straight into the swallow below and the
+                // rows were never deleted by ANY path. A schedule is the
+                // creator's own admin config, so user-scoped deletion is right.
                 $DB->delete_records('local_ai_course_assistant_radar_sched', [
                     'creator' => $userid,
-                    'courseid' => $context->instanceid,
                 ]);
             } catch (\Throwable $e) {
                 /* ignore */
@@ -1019,9 +1034,13 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 /* ignore */
             }
             try {
+                // Keyed on creator alone: this table has no courseid column
+                // (it stores a comma-separated `courseids` list), so passing one
+                // raised a dml_exception straight into the swallow below and the
+                // rows were never deleted by ANY path. A schedule is the
+                // creator's own admin config, so user-scoped deletion is right.
                 $DB->delete_records('local_ai_course_assistant_radar_sched', [
                     'creator' => $userid,
-                    'courseid' => $context->instanceid,
                 ]);
             } catch (\Throwable $e) {
                 /* ignore */

@@ -1993,3 +1993,4 @@ $string['coursesettings:apikey_stored'] = 'Una chiave è salvata. Lascia vuoto p
 $string['coursesettings:apikey_clear'] = 'Cancella la chiave salvata e usa quella del sito';
 $string['coursesettings:spend_cap_monthly'] = 'Tetto di spesa mensile per questo corso (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Lascia vuoto per usare il valore predefinito del sito. Se impostato, le funzioni IA di questo corso si fermano quando la spesa del mese raggiunge questo importo.';
+$string['soapbox:rate_limited'] = 'Troppe registrazioni inviate in poco tempo. Attendi qualche minuto e riprova.';

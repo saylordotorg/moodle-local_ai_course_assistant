@@ -1948,3 +1948,4 @@ $string['coursesettings:apikey_stored'] = 'تم حفظ مفتاح. اتركه ف
 $string['coursesettings:apikey_clear'] = 'امسح المفتاح المحفوظ واستخدم مفتاح الموقع';
 $string['coursesettings:spend_cap_monthly'] = 'حد الإنفاق الشهري لهذه المقررة (بالدولار)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'اتركه فارغًا لاستخدام الحد الافتراضي للموقع. عند تعيينه، تتوقف ميزات الذكاء الاصطناعي في هذه المقررة عندما يبلغ إنفاق الشهر هذا المبلغ.';
+$string['soapbox:rate_limited'] = 'تم إرسال عدد كبير جدًا من التسجيلات في وقت قصير. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.';

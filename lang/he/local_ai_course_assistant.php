@@ -1986,3 +1986,4 @@ $string['coursesettings:apikey_stored'] = 'מפתח שמור. השאירו רי�
 $string['coursesettings:apikey_clear'] = 'מחק את המפתח השמור והשתמש במפתח האתר';
 $string['coursesettings:spend_cap_monthly'] = 'תקרת הוצאה חודשית לקורס זה (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'השאירו ריק כדי להשתמש בברירת המחדל של האתר. כאשר מוגדר, תכונות ה-AI בקורס זה נעצרות כאשר ההוצאה החודשית מגיעה לסכום זה.';
+$string['soapbox:rate_limited'] = 'נשלחו יותר מדי הקלטות בזמן קצר. המתן כמה דקות ונסה שוב.';

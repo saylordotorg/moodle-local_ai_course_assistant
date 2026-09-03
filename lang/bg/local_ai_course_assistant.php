@@ -1948,3 +1948,4 @@ $string['coursesettings:apikey_stored'] = 'Ключът е запазен. Ос�
 $string['coursesettings:apikey_clear'] = 'Изтрий запазения ключ и използвай ключа на сайта';
 $string['coursesettings:spend_cap_monthly'] = 'Месечен лимит на разходите за този курс (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Оставете празно, за да се използва стойността по подразбиране на сайта. Когато е зададено, AI функциите в този курс спират щом месечният разход достигне тази сума.';
+$string['soapbox:rate_limited'] = 'Изпратени са твърде много записи за кратко време. Изчакайте няколко минути и опитайте отново.';

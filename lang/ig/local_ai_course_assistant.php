@@ -1964,3 +1964,4 @@ $string['coursesettings:apikey_stored'] = 'Edebere igodo. Hapụ ya efu ka ọ n
 $string['coursesettings:apikey_clear'] = 'Hichapụ igodo echekwara wee jiri igodo saịtị';
 $string['coursesettings:spend_cap_monthly'] = 'Oke mmefu kwa ọnwa maka nkuzi a (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Hapụ ya efu iji jiri ndabara saịtị. Ọ bụrụ na edobere ya, atụmatụ AI na nkuzi a na-akwụsị mgbe mmefu ọnwa ruru ego a.';
+$string['soapbox:rate_limited'] = 'E zigara ndekọ dị ukwuu n\'ime obere oge. Chere nkeji ole na ole wee nwaa ọzọ.';

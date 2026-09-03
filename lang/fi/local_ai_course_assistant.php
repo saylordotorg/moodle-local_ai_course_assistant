@@ -1948,3 +1948,4 @@ $string['coursesettings:apikey_stored'] = 'Avain on tallennettu. Jätä tyhjäks
 $string['coursesettings:apikey_clear'] = 'Tyhjennä tallennettu avain ja käytä sivuston avainta';
 $string['coursesettings:spend_cap_monthly'] = 'Tämän kurssin kuukausittainen kulukatto (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Jätä tyhjäksi käyttääksesi sivuston oletusarvoa. Kun arvo on asetettu, kurssin tekoälytoiminnot pysähtyvät, kun kuukauden kulut saavuttavat tämän summan.';
+$string['soapbox:rate_limited'] = 'Lähetit liian monta tallennetta lyhyessä ajassa. Odota muutama minuutti ja yritä uudelleen.';

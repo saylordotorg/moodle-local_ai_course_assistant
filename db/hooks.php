@@ -33,7 +33,13 @@ $callbacks = [
         // GDPR cascade: when a Moodle user is hard-deleted, remove their SOLA
         // conversations, plans, reminders, ratings, profiles, and audit rows
         // so we do not leave orphan rows behind.
-        'hook' => \core\hook\user\deleted::class,
+        // \core\hook\user\deleted does NOT exist. Moodle dispatches
+        // \core_user\hook\before_user_deleted (lib/moodlelib.php, inside
+        // delete_user()). PHP resolves ::class lexically without autoloading,
+        // and the hook manager stores the name as a plain string with no
+        // class_exists() check -- so the wrong name registered silently and
+        // this callback never ran once between v3.9.11 and v7.3.1.
+        'hook' => \core_user\hook\before_user_deleted::class,
         'callback' => \local_ai_course_assistant\hook_callbacks::class . '::on_user_deleted',
     ],
     [

@@ -23,6 +23,8 @@ use core_external\external_value;
 use local_ai_course_assistant\soapbox_config;
 use local_ai_course_assistant\soapbox_storage;
 use local_ai_course_assistant\soapbox_assignment_manager;
+use local_ai_course_assistant\feature_flags;
+use local_ai_course_assistant\rate_limiter;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -84,6 +86,30 @@ class soapbox_finalize_recording extends external_api {
         $context = \context_course::instance((int) $assign->courseid);
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
+
+        // The three guards this endpoint was missing, all of which its sibling
+        // soapbox_get_upload_url already enforced.
+        //
+        // The cap in get_upload_url counts sbx_rec rows -- but finalize is what
+        // CREATES those rows, and it never checked the cap itself. So one
+        // legitimate upload could be finalized N times against the same still
+        // present object key, and each call inserted a row and queued a
+        // score_recording task that pays for a fresh Whisper transcription plus
+        // an LLM scoring pass. One upload, N bills.
+        if (!feature_flags::resolve('soapbox', (int) $assign->courseid)) {
+            throw new \moodle_exception('soapbox:disabled', 'local_ai_course_assistant');
+        }
+        if (rate_limiter::is_rate_limited($USER->id, 'soapbox_finalize', 10, 600)) {
+            throw new \moodle_exception('soapbox:rate_limited', 'local_ai_course_assistant');
+        }
+        $made = $DB->count_records_select(
+            'local_ai_course_assistant_sbx_rec',
+            'assignid = :a AND userid = :u AND status <> :d',
+            ['a' => $assign->id, 'u' => $USER->id, 'd' => 'deleted']
+        );
+        if ($made >= soapbox_config::effective_recording_cap((int) $assign->max_attempts)) {
+            throw new \moodle_exception('soapbox:cap_reached', 'local_ai_course_assistant');
+        }
 
         // The key must live under this learner's own path for this course, so a
         // learner cannot register another learner's or an arbitrary object.
@@ -148,6 +174,22 @@ class soapbox_finalize_recording extends external_api {
             'expires_at'       => $now + (soapbox_config::retention_days() * DAYSECS),
             'timecreated'      => $now,
         ];
+        // Idempotent per object key. Independent of the cap above: it also makes
+        // a client-side retry after a flaky network safe, which it was not --
+        // a double-submit from the real UI already double-billed.
+        $existing = $DB->get_record(
+            'local_ai_course_assistant_sbx_rec',
+            ['storage_key' => $key],
+            'id, status, expires_at'
+        );
+        if ($existing) {
+            return [
+                'recordingid' => (int) $existing->id,
+                'status'      => (string) $existing->status,
+                'expires_at'  => (int) $existing->expires_at,
+                'viewurl'     => $storage->presign_get($key, 3600),
+            ];
+        }
         $recid = (int) $DB->insert_record('local_ai_course_assistant_sbx_rec', $rec);
 
         // Transcribe + score off the request.

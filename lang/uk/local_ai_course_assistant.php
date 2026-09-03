@@ -2000,3 +2000,4 @@ $string['coursesettings:apikey_stored'] = 'Ключ збережено. Зали
 $string['coursesettings:apikey_clear'] = 'Очистити збережений ключ і використовувати ключ сайту';
 $string['coursesettings:spend_cap_monthly'] = 'Місячний ліміт витрат для цього курсу (USD)';
 $string['coursesettings:spend_cap_monthly_desc'] = 'Залиште порожнім, щоб використати типове значення сайту. Якщо задано, функції ШІ в цьому курсі зупиняються, коли витрати за місяць досягають цієї суми.';
+$string['soapbox:rate_limited'] = 'Надіслано забагато записів за короткий час. Зачекайте кілька хвилин і повторіть спробу.';
