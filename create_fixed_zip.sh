@@ -17,6 +17,8 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/__MACOSX/*" \
   -x "__MACOSX/*" \
   -x "*/create_fixed_zip.sh" \
+  -x "*/*.zip" \
+  -x "*.zip" \
   -x "*/TROUBLESHOOTING.md" \
   -x "*/ENHANCEMENT_ESTIMATE.md" \
   -x "*/SAYLOR_ACADEMY_PROPOSAL.md" \
