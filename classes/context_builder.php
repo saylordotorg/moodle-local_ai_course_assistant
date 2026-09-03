@@ -601,6 +601,18 @@ class context_builder {
         // must keep getting its FAQ rather than silently losing it to a stale
         // background index.
         $faq = faq_manager::is_retrievable($courseid) ? '' : faq_manager::get_faq_for_prompt();
+        // v7.2.9 (S12): the escalation marker is gated on escalation being
+        // AVAILABLE, not on the FAQ happening to be inline.
+        //
+        // It used to read `!empty($faq)`, which was harmless while the FAQ was
+        // always injected. Making the FAQ retrievable in 7.2.7 empties $faq on
+        // exactly the sites where retrieval works, so the instruction vanished
+        // from the prompt, the model stopped emitting [NEEDS_ESCALATION], and
+        // sse.php -- which requires that marker tail-anchored -- could never
+        // escalate. A privacy notice promising human handover was left with no
+        // path to reach one, and nothing logged a failure because nothing
+        // failed.
+        $canescalate = \local_ai_course_assistant\zendesk_client::is_enabled();
         if (!empty($faq)) {
             $sections[] = new section(
                 'faq',
@@ -617,7 +629,7 @@ class context_builder {
             'output_markers',
             section::CAT_MARKERS,
             90,
-            self::get_marker_instructions($ragmode, $offtopicon, !empty($faq)),
+            self::get_marker_instructions($ragmode, $offtopicon, $canescalate),
             0
         );
 
@@ -821,7 +833,7 @@ class context_builder {
         ) {
             foreach ($sections as $sec) {
                 if ($sec->name === 'output_markers') {
-                    $sec->content = self::get_marker_instructions(false, $offtopicon, !empty($faq));
+                    $sec->content = self::get_marker_instructions(false, $offtopicon, $canescalate);
                 }
             }
             $assembled = prompt_builder::assemble($sections, $budget);
@@ -1932,11 +1944,11 @@ class context_builder {
      *
      * @param bool $hasrag Whether RAG chunks are present (controls citation marker).
      * @param bool $offtopic Whether off-topic detection is enabled.
-     * @param bool $hasfaq Whether FAQ content is appended.
+     * @param bool $canescalate Whether a support escalation can actually be opened.
      * @param bool $hasnext Whether SOLA_NEXT suggestions are wired (always true today).
      * @return string
      */
-    private static function get_marker_instructions(bool $hasrag, bool $offtopic, bool $hasfaq, bool $hasnext = true): string {
+    private static function get_marker_instructions(bool $hasrag, bool $offtopic, bool $canescalate, bool $hasnext = true): string {
         $lines = ["\n\n## Output markers\nUse exactly the markers below when applicable, on their own line at the very end of your response unless otherwise noted. Markers are stripped before display."];
         if ($hasrag) {
             $lines[] = "- `[[c:N]]` inline (not at end) — cite a retrieved passage you actually used. Example: \"Photosynthesis occurs in chloroplasts [[c:0]].\"";
@@ -1948,8 +1960,8 @@ class context_builder {
         if ($offtopic) {
             $lines[] = "- `[OFF_TOPIC]` — only if the message is clearly unrelated to this course or learning.";
         }
-        if ($hasfaq) {
-            $lines[] = "- `[NEEDS_ESCALATION]` — only on a support/admin question the FAQ does not cover.";
+        if ($canescalate) {
+            $lines[] = "- `[NEEDS_ESCALATION]` — only on a support/admin question the course material and support FAQ do not answer.";
         }
         return implode("\n", $lines);
     }

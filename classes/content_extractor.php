@@ -88,6 +88,76 @@ TXT;
     ];
 
     /**
+     * Extract the course-level text a course carries outside its activities:
+     * the course summary and every section summary.
+     *
+     * S14, found on staging 2026-09-02. Nothing indexed these. The extractor
+     * walked $modinfo->get_cms() only, and the prompt path appended a section
+     * summary just when it was under 200 characters (below a 2,500-char course
+     * overview backstop). ARTH101 states its five-step analysis system in a
+     * 2,037-character section-0 summary, so the assistant could not see it: 258
+     * of 258 chunks were module-derived, and a live turn declined to answer.
+     * Every course with substantive front matter had the same hole.
+     *
+     * Returned as ONE logical document rather than one per section, and that is
+     * deliberate. Course-level rows carry cmid = null (the schema documents the
+     * column as "null = course-level content"), so the indexer's upsert key of
+     * courseid + cmid + chunkindex is identical for every course-level document
+     * in a course. Emitting several would make section 2's chunk 0 delete
+     * section 1's chunk 0 on every run. One document means one continuous
+     * chunkindex range and no collision to fix.
+     *
+     * @param int $courseid
+     * @return array|null ['cmid'=>null, 'modtype'=>'course', 'title'=>string,
+     *                     'section'=>'', 'text'=>string] or null when the course
+     *                     carries no substantial front matter.
+     */
+    public static function extract_course_level(int $courseid): ?array {
+        global $DB;
+
+        $course = $DB->get_record('course', ['id' => $courseid], 'id, fullname, summary', IGNORE_MISSING);
+        if (!$course) {
+            return null;
+        }
+
+        $parts = [];
+
+        $coursesummary = trim(html_to_text((string) ($course->summary ?? ''), 0, false));
+        if ($coursesummary !== '') {
+            $parts[] = "Course overview\n" . $coursesummary;
+        }
+
+        // Section summaries, in course order, each labelled with its own name so
+        // a retrieved chunk still says which part of the course it came from.
+        $modinfo = get_fast_modinfo($courseid);
+        foreach ($modinfo->get_section_info_all() as $section) {
+            $summary = trim(html_to_text((string) ($section->summary ?? ''), 0, false));
+            if ($summary === '') {
+                continue;
+            }
+            $name = get_section_name($courseid, $section);
+            $parts[] = trim($name) . "\n" . $summary;
+        }
+
+        if (empty($parts)) {
+            return null;
+        }
+
+        $text = implode("\n\n", $parts);
+        if (!self::is_indexable_text($text)) {
+            return null;
+        }
+
+        return [
+            'cmid'    => null,
+            'modtype' => 'course',
+            'title'   => (string) $course->fullname,
+            'section' => '',
+            'text'    => $text,
+        ];
+    }
+
+    /**
      * Extract text content from all supported modules in a course.
      *
      * @param int $courseid
@@ -170,6 +240,15 @@ TXT;
                 'section' => $sectionnames[$cm->id] ?? '',
                 'text'    => $text,
             ];
+        }
+
+        // S14: course-level front matter is indexed alongside the activities, so
+        // it flows through the same chunking, embedding and prune paths. Placed
+        // first because a course overview is the most general context a learner
+        // question can match against.
+        $courselevel = self::extract_course_level($courseid);
+        if ($courselevel !== null) {
+            array_unshift($results, $courselevel);
         }
 
         return ['modules' => $results, 'skipped' => $skipped];

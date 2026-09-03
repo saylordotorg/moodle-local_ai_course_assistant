@@ -628,11 +628,17 @@ class rag_retriever {
         // ordinary case, and exactly where a learner asks "how do I get my
         // certificate?" -- reached the model with the FAQ in neither the prompt
         // nor the retrieved set.
+        // v7.2.9 (S14): course-level rows are exempt for the same reason. The
+        // course summary and section summaries carry cmid = null (the schema
+        // documents it as "null = course-level content"), which reads back as 0
+        // here, so without this they would be discarded on exactly the
+        // module-page turns where a learner asks about the course as a whole.
         $faqtype = \local_ai_course_assistant\faq_manager::MODTYPE;
+        $exempt = [$faqtype, 'course'];
 
         $docpresent = false;
         foreach ($ranked as $row) {
-            if (($row['modtype'] ?? '') === $faqtype) {
+            if (in_array($row['modtype'] ?? '', $exempt, true)) {
                 continue;
             }
             if ((int) ($row['cmid'] ?? 0) === $currentcmid) {
@@ -644,7 +650,7 @@ class rag_retriever {
         // Single pass, so the caller's rank order survives across both partitions.
         $out = [];
         foreach ($ranked as $row) {
-            if (($row['modtype'] ?? '') === $faqtype) {
+            if (in_array($row['modtype'] ?? '', $exempt, true)) {
                 $out[] = $row;
                 continue;
             }
