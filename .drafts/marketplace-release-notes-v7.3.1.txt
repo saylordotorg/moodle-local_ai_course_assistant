@@ -1,0 +1,32 @@
+SOLA v7.3.1
+
+Removes a feature that could never work, and defines what happens when two spend caps disagree.
+
+REMOVED: CHAT ATTACHMENTS
+
+- The paperclip button in the chat composer shipped enabled by default and could never work. The upload endpoint it posted to does not exist in the plugin, so every attempt failed.
+- Rather than build the missing endpoint, the feature has been removed in full: the composer button, the file picker and preview, the rendering inside message bubbles, the three admin settings, the file-serving handler, the server-side promotion and PDF text extraction, conversation-history rehydration, the supporting class, the stylesheet rules, and 782 language strings across all 46 locales.
+- The upgrade step also removes any files left behind in the plugin's message-attachment storage area. A crafted request could deposit files there even with the interface path dead, and those files were never covered by the privacy provider's export or erasure paths, so they would otherwise have remained as learner data with no way to view or delete it.
+- No manual action is required. Any site that had the setting enabled simply loses a control that never functioned.
+
+CHANGED: WHICH SPEND CAP APPLIES
+
+- The most specific cap that is set now wins, in this order: per-course cap, then per-capability cap (chat / voice / rag / analytics), then the site-wide per-course default, then the site cap.
+- Caps do not stack and are not combined by taking the lowest. The first cap found in that order replaces the others entirely, so the number entered on a course is the number that applies to that course.
+- Previously a site-wide per-capability cap was evaluated first and so overrode an explicit per-course cap, meaning the least specific setting beat the most specific one.
+- Note for anyone who set per-course caps before v7.3.0: they were not being enforced at all. Review them after upgrading, because they now take effect.
+
+FIXED: TRANSCRIPT REPORT SUMMARIES
+
+- The outcomes column in the summaries view was filtered only by conversation, so it ignored the date range, unit and outcome filters that the rest of the row respected. A report limited to one week could list objectives attempted months earlier.
+- The same column issued one database query per conversation, up to five thousand on a single page. It is now a single batched query.
+
+OTHER
+
+- Interface parity maintained across all 46 supported languages.
+- Full test suite: 1136 tests, no failures. Static validator suite: 36 of 36.
+- Continuous integration green on PHP 8.1, 8.2 and 8.3 against both MariaDB and PostgreSQL.
+
+UPGRADE NOTES
+
+- This release runs a short upgrade step that clears the three attachment settings and sweeps any orphaned attachment files. No manual action is required.
