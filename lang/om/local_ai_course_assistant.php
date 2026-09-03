@@ -1988,3 +1988,7 @@ $string['transcripts:col_conversation'] = 'Haasawa';
 $string['transcripts:col_learner'] = 'Barataa';
 $string['transcripts:col_type'] = 'Gosa';
 $string['transcripts:col_message'] = 'Ergaa';
+$string['coursesettings:apikey_stored'] = 'Furtuun tokko olkaa\'ameera. Akka turuuf duwwaa dhiisi.';
+$string['coursesettings:apikey_clear'] = 'Furtuu olkaa\'ame haqiitii furtuu marsariitii fayyadami';
+$string['coursesettings:spend_cap_monthly'] = 'Daangaa baasii ji\'aa koorsii kanaaf (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Durtii marsariitii fayyadamuuf duwwaa dhiisi. Yoo qindaa\'e, baasiin ji\'aa hanga kana yeroo ga\'u tajaajilli AI koorsii kana keessatti ni dhaabata.';

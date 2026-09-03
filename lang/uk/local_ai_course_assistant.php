@@ -2013,3 +2013,7 @@ $string['transcripts:col_conversation'] = 'Розмова';
 $string['transcripts:col_learner'] = 'Учень';
 $string['transcripts:col_type'] = 'Тип';
 $string['transcripts:col_message'] = 'Повідомлення';
+$string['coursesettings:apikey_stored'] = 'Ключ збережено. Залиште порожнім, щоб зберегти його.';
+$string['coursesettings:apikey_clear'] = 'Очистити збережений ключ і використовувати ключ сайту';
+$string['coursesettings:spend_cap_monthly'] = 'Місячний ліміт витрат для цього курсу (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Залиште порожнім, щоб використати типове значення сайту. Якщо задано, функції ШІ в цьому курсі зупиняються, коли витрати за місяць досягають цієї суми.';

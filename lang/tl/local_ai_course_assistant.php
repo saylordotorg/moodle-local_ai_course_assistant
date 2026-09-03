@@ -2021,3 +2021,7 @@ $string['transcripts:col_conversation'] = 'Pag-uusap';
 $string['transcripts:col_learner'] = 'Mag-aaral';
 $string['transcripts:col_type'] = 'Uri';
 $string['transcripts:col_message'] = 'Mensahe';
+$string['coursesettings:apikey_stored'] = 'May naka-save na key. Iwanang blangko para panatilihin ito.';
+$string['coursesettings:apikey_clear'] = 'Burahin ang naka-save na key at gamitin ang key ng site';
+$string['coursesettings:spend_cap_monthly'] = 'Buwanang limitasyon sa paggastos para sa kursong ito (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Iwanang blangko para gamitin ang default ng site. Kapag nakatakda, hihinto ang mga tampok na AI sa kursong ito kapag umabot sa halagang ito ang gastos ng buwan.';

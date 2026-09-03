@@ -2015,3 +2015,7 @@ $string['transcripts:col_conversation'] = 'Percakapan';
 $string['transcripts:col_learner'] = 'Peserta';
 $string['transcripts:col_type'] = 'Jenis';
 $string['transcripts:col_message'] = 'Pesan';
+$string['coursesettings:apikey_stored'] = 'Kunci tersimpan. Biarkan kosong untuk mempertahankannya.';
+$string['coursesettings:apikey_clear'] = 'Hapus kunci tersimpan dan gunakan kunci situs';
+$string['coursesettings:spend_cap_monthly'] = 'Batas pengeluaran bulanan untuk kursus ini (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Biarkan kosong untuk memakai default situs. Bila diisi, fitur AI di kursus ini berhenti setelah pengeluaran bulan ini mencapai jumlah tersebut.';

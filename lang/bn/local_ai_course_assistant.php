@@ -1961,3 +1961,7 @@ $string['transcripts:col_conversation'] = 'কথোপকথন';
 $string['transcripts:col_learner'] = 'শিক্ষার্থী';
 $string['transcripts:col_type'] = 'ধরন';
 $string['transcripts:col_message'] = 'বার্তা';
+$string['coursesettings:apikey_stored'] = 'একটি কী সংরক্ষিত আছে। এটি রাখতে ফাঁকা রাখুন।';
+$string['coursesettings:apikey_clear'] = 'সংরক্ষিত কী মুছে সাইটের কী ব্যবহার করুন';
+$string['coursesettings:spend_cap_monthly'] = 'এই কোর্সের মাসিক ব্যয়সীমা (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'সাইটের ডিফল্ট ব্যবহার করতে ফাঁকা রাখুন। নির্ধারিত থাকলে, মাসের ব্যয় এই পরিমাণে পৌঁছালে এই কোর্সের AI সুবিধাগুলি বন্ধ হয়ে যায়।';

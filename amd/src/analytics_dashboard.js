@@ -460,10 +460,16 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function renderFeedback(data) {
         var pane = document.getElementById('sola-pane-feedback');
         if (!pane) { return; }
-        var ratings = data.ratings || {};
-        var survey = data.survey || {};
-        var resolution = data.resolution || {};
-        var negatives = data.negatives || [];
+        // The server sends rating_summary / survey_summary / messages_to_resolution
+        // / negative_feedback (get_analytics_feedback::execute builds $result with
+        // those keys). This read the four names below instead, so every lookup was
+        // undefined and the tab painted six zero tiles, skipped both charts and
+        // never emitted the negative-feedback table. Same defect class as the
+        // By Course tab. Old names kept as a fallback.
+        var ratings = data.rating_summary || data.ratings || {};
+        var survey = data.survey_summary || data.survey || {};
+        var resolution = data.messages_to_resolution || data.resolution || {};
+        var negatives = data.negative_feedback || data.negatives || [];
 
         var html = '<div class="sola-stat-cards">' +
             statCard(s('thumbs_up'), ratings.thumbs_up || 0, 'up') +

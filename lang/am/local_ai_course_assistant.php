@@ -1990,3 +1990,7 @@ $string['transcripts:col_conversation'] = 'ውይይት';
 $string['transcripts:col_learner'] = 'ተማሪ';
 $string['transcripts:col_type'] = 'ዓይነት';
 $string['transcripts:col_message'] = 'መልእክት';
+$string['coursesettings:apikey_stored'] = 'ቁልፍ ተቀምጧል። እንዲቆይ ባዶ ይተዉት።';
+$string['coursesettings:apikey_clear'] = 'የተቀመጠውን ቁልፍ አጥፋና የጣቢያውን ቁልፍ ተጠቀም';
+$string['coursesettings:spend_cap_monthly'] = 'የዚህ ኮርስ ወርሃዊ የወጪ ጣሪያ (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'የጣቢያውን ነባሪ ለመጠቀም ባዶ ይተዉት። ሲቀመጥ፣ የወሩ ወጪ ይህን መጠን ሲደርስ የዚህ ኮርስ AI አገልግሎቶች ይቆማሉ።';

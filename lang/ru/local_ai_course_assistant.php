@@ -1983,3 +1983,7 @@ $string['transcripts:col_conversation'] = 'Разговор';
 $string['transcripts:col_learner'] = 'Учащийся';
 $string['transcripts:col_type'] = 'Тип';
 $string['transcripts:col_message'] = 'Сообщение';
+$string['coursesettings:apikey_stored'] = 'Ключ сохранён. Оставьте поле пустым, чтобы сохранить его.';
+$string['coursesettings:apikey_clear'] = 'Удалить сохранённый ключ и использовать ключ сайта';
+$string['coursesettings:spend_cap_monthly'] = 'Месячный лимит расходов для этого курса (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Оставьте пустым, чтобы использовать значение сайта по умолчанию. Если задано, функции ИИ в этом курсе останавливаются, когда расходы за месяц достигают этой суммы.';

@@ -1999,3 +1999,7 @@ $string['transcripts:col_conversation'] = 'Beszélgetés';
 $string['transcripts:col_learner'] = 'Tanuló';
 $string['transcripts:col_type'] = 'Típus';
 $string['transcripts:col_message'] = 'Üzenet';
+$string['coursesettings:apikey_stored'] = 'Egy kulcs mentve van. Hagyja üresen a megtartásához.';
+$string['coursesettings:apikey_clear'] = 'A mentett kulcs törlése és az oldal kulcsának használata';
+$string['coursesettings:spend_cap_monthly'] = 'Havi költségkeret ehhez a kurzushoz (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Hagyja üresen az oldal alapértelmezésének használatához. Ha be van állítva, a kurzus MI-funkciói leállnak, amint a havi költés eléri ezt az összeget.';

@@ -2000,3 +2000,7 @@ $string['transcripts:col_conversation'] = 'Συνομιλία';
 $string['transcripts:col_learner'] = 'Εκπαιδευόμενος';
 $string['transcripts:col_type'] = 'Τύπος';
 $string['transcripts:col_message'] = 'Μήνυμα';
+$string['coursesettings:apikey_stored'] = 'Ένα κλειδί έχει αποθηκευτεί. Αφήστε το κενό για να διατηρηθεί.';
+$string['coursesettings:apikey_clear'] = 'Διαγραφή του αποθηκευμένου κλειδιού και χρήση του κλειδιού του ιστότοπου';
+$string['coursesettings:spend_cap_monthly'] = 'Μηνιαίο όριο δαπανών για αυτό το μάθημα (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Αφήστε το κενό για να χρησιμοποιηθεί η προεπιλογή του ιστότοπου. Όταν οριστεί, οι λειτουργίες AI σε αυτό το μάθημα σταματούν μόλις η δαπάνη του μήνα φτάσει αυτό το ποσό.';

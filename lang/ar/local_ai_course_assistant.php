@@ -1961,3 +1961,7 @@ $string['transcripts:col_conversation'] = 'المحادثة';
 $string['transcripts:col_learner'] = 'المتعلم';
 $string['transcripts:col_type'] = 'النوع';
 $string['transcripts:col_message'] = 'الرسالة';
+$string['coursesettings:apikey_stored'] = 'تم حفظ مفتاح. اتركه فارغًا للإبقاء عليه.';
+$string['coursesettings:apikey_clear'] = 'امسح المفتاح المحفوظ واستخدم مفتاح الموقع';
+$string['coursesettings:spend_cap_monthly'] = 'حد الإنفاق الشهري لهذه المقررة (بالدولار)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'اتركه فارغًا لاستخدام الحد الافتراضي للموقع. عند تعيينه، تتوقف ميزات الذكاء الاصطناعي في هذه المقررة عندما يبلغ إنفاق الشهر هذا المبلغ.';

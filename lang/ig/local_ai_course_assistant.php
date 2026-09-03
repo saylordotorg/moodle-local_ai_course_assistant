@@ -1977,3 +1977,7 @@ $string['transcripts:col_conversation'] = 'Mkparịta ụka';
 $string['transcripts:col_learner'] = 'Onye mmụta';
 $string['transcripts:col_type'] = 'Ụdị';
 $string['transcripts:col_message'] = 'Ozi';
+$string['coursesettings:apikey_stored'] = 'Edebere igodo. Hapụ ya efu ka ọ nọgide.';
+$string['coursesettings:apikey_clear'] = 'Hichapụ igodo echekwara wee jiri igodo saịtị';
+$string['coursesettings:spend_cap_monthly'] = 'Oke mmefu kwa ọnwa maka nkuzi a (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Hapụ ya efu iji jiri ndabara saịtị. Ọ bụrụ na edobere ya, atụmatụ AI na nkuzi a na-akwụsị mgbe mmefu ọnwa ruru ego a.';

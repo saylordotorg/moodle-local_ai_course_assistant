@@ -1960,3 +1960,7 @@ $string['transcripts:col_conversation'] = 'Conversație';
 $string['transcripts:col_learner'] = 'Cursant';
 $string['transcripts:col_type'] = 'Tip';
 $string['transcripts:col_message'] = 'Mesaj';
+$string['coursesettings:apikey_stored'] = 'O cheie este salvată. Lăsați gol pentru a o păstra.';
+$string['coursesettings:apikey_clear'] = 'Șterge cheia salvată și folosește cheia sitului';
+$string['coursesettings:spend_cap_monthly'] = 'Plafon lunar de cheltuieli pentru acest curs (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Lăsați gol pentru a folosi valoarea implicită a sitului. Când este setat, funcțiile AI din acest curs se opresc când cheltuiala lunii atinge această sumă.';

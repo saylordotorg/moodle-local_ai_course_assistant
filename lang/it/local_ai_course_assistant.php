@@ -2006,3 +2006,7 @@ $string['transcripts:col_conversation'] = 'Conversazione';
 $string['transcripts:col_learner'] = 'Studente';
 $string['transcripts:col_type'] = 'Tipo';
 $string['transcripts:col_message'] = 'Messaggio';
+$string['coursesettings:apikey_stored'] = 'Una chiave è salvata. Lascia vuoto per conservarla.';
+$string['coursesettings:apikey_clear'] = 'Cancella la chiave salvata e usa quella del sito';
+$string['coursesettings:spend_cap_monthly'] = 'Tetto di spesa mensile per questo corso (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Lascia vuoto per usare il valore predefinito del sito. Se impostato, le funzioni IA di questo corso si fermano quando la spesa del mese raggiunge questo importo.';

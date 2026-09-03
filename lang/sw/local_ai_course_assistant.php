@@ -2021,3 +2021,7 @@ $string['transcripts:col_conversation'] = 'Mazungumzo';
 $string['transcripts:col_learner'] = 'Mwanafunzi';
 $string['transcripts:col_type'] = 'Aina';
 $string['transcripts:col_message'] = 'Ujumbe';
+$string['coursesettings:apikey_stored'] = 'Ufunguo umehifadhiwa. Acha wazi ili kuubakiza.';
+$string['coursesettings:apikey_clear'] = 'Futa ufunguo uliohifadhiwa na utumie ufunguo wa tovuti';
+$string['coursesettings:spend_cap_monthly'] = 'Kikomo cha matumizi ya kila mwezi kwa kozi hii (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Acha wazi ili kutumia chaguo-msingi la tovuti. Ikiwekwa, huduma za AI katika kozi hii husimama matumizi ya mwezi yanapofikia kiasi hiki.';

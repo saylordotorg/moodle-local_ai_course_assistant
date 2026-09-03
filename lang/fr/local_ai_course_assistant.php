@@ -1961,3 +1961,7 @@ $string['transcripts:col_conversation'] = 'Conversation';
 $string['transcripts:col_learner'] = 'Apprenant';
 $string['transcripts:col_type'] = 'Type';
 $string['transcripts:col_message'] = 'Message';
+$string['coursesettings:apikey_stored'] = 'Une clé est enregistrée. Laissez vide pour la conserver.';
+$string['coursesettings:apikey_clear'] = 'Effacer la clé enregistrée et utiliser celle du site';
+$string['coursesettings:spend_cap_monthly'] = 'Plafond de dépenses mensuel pour ce cours (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Laissez vide pour utiliser la valeur par défaut du site. Lorsqu\'il est défini, les fonctions d\'IA de ce cours s\'arrêtent dès que la dépense du mois atteint ce montant.';

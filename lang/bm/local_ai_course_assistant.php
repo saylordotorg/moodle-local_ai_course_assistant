@@ -1991,3 +1991,7 @@ $string['transcripts:col_conversation'] = 'Baro';
 $string['transcripts:col_learner'] = 'Kalanden';
 $string['transcripts:col_type'] = 'Suguya';
 $string['transcripts:col_message'] = 'Bataki';
+$string['coursesettings:apikey_stored'] = 'Kilisi dɔ marala. A to lakolon walisa a ka to.';
+$string['coursesettings:apikey_clear'] = 'Kilisi marata jɔsi ka siti kilisi kɛ';
+$string['coursesettings:spend_cap_monthly'] = 'Kalan in kalo musaka dan (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'A to lakolon walisa siti ta ka kɛ. Ni a sigilen don, kalan in ka AI baaraw bɛ jɔ ni kalo musaka sera nin hakɛ ma.';

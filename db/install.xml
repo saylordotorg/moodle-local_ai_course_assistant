@@ -161,6 +161,7 @@
         <FIELD NAME="apibaseurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="API base URL override (blank = inherit global)"/>
         <FIELD NAME="systemprompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="System prompt override (blank = inherit global)"/>
         <FIELD NAME="temperature" TYPE="number" LENGTH="3" DECIMALS="2" NOTNULL="false" SEQUENCE="false" COMMENT="Temperature override (null = inherit global)"/>
+        <FIELD NAME="spend_cap_monthly" TYPE="number" LENGTH="10" DECIMALS="2" NOTNULL="false" SEQUENCE="false" COMMENT="Per-course monthly spend cap in USD (null/0 = fall back to spend_cap_per_course_default)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>

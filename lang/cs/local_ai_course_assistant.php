@@ -1961,3 +1961,7 @@ $string['transcripts:col_conversation'] = 'Konverzace';
 $string['transcripts:col_learner'] = 'Student';
 $string['transcripts:col_type'] = 'Typ';
 $string['transcripts:col_message'] = 'Zpráva';
+$string['coursesettings:apikey_stored'] = 'Klíč je uložen. Ponechte prázdné, aby zůstal zachován.';
+$string['coursesettings:apikey_clear'] = 'Smazat uložený klíč a použít klíč webu';
+$string['coursesettings:spend_cap_monthly'] = 'Měsíční limit útraty pro tento kurz (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Ponechte prázdné pro použití výchozí hodnoty webu. Je-li nastaveno, funkce AI v tomto kurzu se zastaví, jakmile měsíční útrata dosáhne této částky.';

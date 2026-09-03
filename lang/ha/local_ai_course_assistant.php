@@ -1991,3 +1991,7 @@ $string['transcripts:col_conversation'] = 'Tattaunawa';
 $string['transcripts:col_learner'] = 'Ɗalibi';
 $string['transcripts:col_type'] = 'Nau\'i';
 $string['transcripts:col_message'] = 'Saƙo';
+$string['coursesettings:apikey_stored'] = 'An adana maɓalli. Bar shi fanko don a riƙe shi.';
+$string['coursesettings:apikey_clear'] = 'Share maɓallin da aka adana kuma a yi amfani da na shafin';
+$string['coursesettings:spend_cap_monthly'] = 'Iyakar kashewa kowane wata don wannan kwas ɗin (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Bar shi fanko don amfani da tsoho na shafin. Idan an saita, ayyukan AI a wannan kwas ɗin za su tsaya idan kashewar wata ta kai wannan adadin.';

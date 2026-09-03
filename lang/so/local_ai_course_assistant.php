@@ -2002,3 +2002,7 @@ $string['transcripts:col_conversation'] = 'Wadahadal';
 $string['transcripts:col_learner'] = 'Arday';
 $string['transcripts:col_type'] = 'Nooc';
 $string['transcripts:col_message'] = 'Fariin';
+$string['coursesettings:apikey_stored'] = 'Fure ayaa la keydiyay. Bannaan uga tag si loo hayo.';
+$string['coursesettings:apikey_clear'] = 'Tirtir furaha la keydiyay oo isticmaal furaha goobta';
+$string['coursesettings:spend_cap_monthly'] = 'Xadka kharashka bishii ee koorsadan (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Bannaan uga tag si loo isticmaalo qiimaha caadiga ah ee goobta. Marka la dejiyo, adeegyada AI ee koorsadan way joogsadaan marka kharashka bisha uu gaaro qaddarkan.';

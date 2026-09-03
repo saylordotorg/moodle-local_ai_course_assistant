@@ -2481,3 +2481,7 @@ $string['transcripts:col_conversation'] = 'Conversation';
 $string['transcripts:col_learner'] = 'Learner';
 $string['transcripts:col_type'] = 'Type';
 $string['transcripts:col_message'] = 'Message';
+$string['coursesettings:apikey_stored'] = 'A key is saved. Leave blank to keep it.';
+$string['coursesettings:apikey_clear'] = 'Clear the saved key and use the site key';
+$string['coursesettings:spend_cap_monthly'] = 'Monthly spend cap for this course (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Leave blank to use the site-wide default per-course cap. When set, AI features in this course stop once the month\'s spend reaches this amount.';

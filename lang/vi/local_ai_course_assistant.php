@@ -1996,3 +1996,7 @@ $string['transcripts:col_conversation'] = 'Hội thoại';
 $string['transcripts:col_learner'] = 'Người học';
 $string['transcripts:col_type'] = 'Loại';
 $string['transcripts:col_message'] = 'Tin nhắn';
+$string['coursesettings:apikey_stored'] = 'Đã lưu một khóa. Để trống để giữ nguyên.';
+$string['coursesettings:apikey_clear'] = 'Xóa khóa đã lưu và dùng khóa của trang';
+$string['coursesettings:spend_cap_monthly'] = 'Hạn mức chi tiêu hằng tháng cho khóa học này (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Để trống để dùng giá trị mặc định của trang. Khi được đặt, các tính năng AI trong khóa học này sẽ dừng khi chi tiêu của tháng đạt tới mức này.';

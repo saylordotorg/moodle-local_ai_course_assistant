@@ -1967,3 +1967,7 @@ $string['transcripts:col_conversation'] = 'Samtale';
 $string['transcripts:col_learner'] = 'Deltaker';
 $string['transcripts:col_type'] = 'Type';
 $string['transcripts:col_message'] = 'Melding';
+$string['coursesettings:apikey_stored'] = 'En nøkkel er lagret. La feltet stå tomt for å beholde den.';
+$string['coursesettings:apikey_clear'] = 'Tøm den lagrede nøkkelen og bruk nettstedets nøkkel';
+$string['coursesettings:spend_cap_monthly'] = 'Månedlig forbruksgrense for dette kurset (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'La feltet stå tomt for å bruke nettstedets standard. Når den er satt, stopper AI-funksjonene i dette kurset når månedens forbruk når dette beløpet.';

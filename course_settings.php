@@ -80,6 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'provider'    => optional_param('provider', '', PARAM_ALPHA),
         // API keys legitimately contain arbitrary characters, so PARAM_RAW_TRIMMED
         // is the correct (and Moodle-conventional) type for a secret credential.
+        // Submitted blank means "unchanged", not "clear it" -- the field is
+        // rendered empty now (the stored key is never sent to the browser), so
+        // treating blank as a wipe would destroy the key on every unrelated save.
+        // Clearing is still possible: see the explicit clear handling below.
         'apikey'      => optional_param('apikey', '', PARAM_RAW_TRIMMED),
         'model'       => optional_param('model', '', PARAM_TEXT),
         'apibaseurl'  => optional_param('apibaseurl', '', PARAM_URL),
@@ -88,6 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'systemprompt' => optional_param('systemprompt', '', PARAM_RAW),
         // Received raw, then range-validated and cast to float just below.
         'temperature'  => optional_param('temperature', '', PARAM_RAW_TRIMMED),
+        // Per-course monthly spend cap in USD. Blank/0 = no per-course cap, in
+        // which case spend_guard falls back to spend_cap_per_course_default.
+        'spend_cap_monthly' => optional_param('spend_cap_monthly', '', PARAM_RAW_TRIMMED),
     ];
 
     // v7.0.5 security fix: a course-level actor must not be able to redirect
@@ -116,6 +123,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $existing = course_config_manager::get($courseid);
         $data['apibaseurl'] = ($existing && isset($existing->apibaseurl)) ? (string) $existing->apibaseurl : '';
+    }
+
+    // Blank API key means "keep the stored one". The field is rendered empty
+    // (the credential is never sent to the browser), so without this every save
+    // of an unrelated field -- the enable toggle, the model, the system prompt --
+    // would silently clear the course's key and drop it back to the site key.
+    // An explicit clear is available via the dedicated checkbox.
+    if ($data['apikey'] === '') {
+        $existingkey = course_config_manager::get($courseid);
+        $data['apikey'] = ($existingkey && isset($existingkey->apikey)) ? (string) $existingkey->apikey : '';
+    }
+    if (optional_param('apikey_clear', 0, PARAM_INT)) {
+        $data['apikey'] = '';
     }
 
     // Validate temperature range if provided.
@@ -403,13 +423,50 @@ echo html_writer::div(
 
             <!-- API Key -->
             <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="spend_cap_monthly">
+                    <?php echo get_string('coursesettings:spend_cap_monthly', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <input type="number" step="0.01" min="0" class="form-control" id="spend_cap_monthly"
+                           name="spend_cap_monthly"
+                           value="<?php echo s($current && $current->spend_cap_monthly > 0
+                               ? (string) (float) $current->spend_cap_monthly : ''); ?>">
+                    <small class="form-text text-muted">
+                        <?php echo get_string('coursesettings:spend_cap_monthly_desc', 'local_ai_course_assistant'); ?>
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label class="col-sm-3 col-form-label" for="apikey">
                     <?php echo get_string('settings:apikey', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
+                    <?php
+                    // Never render the stored credential into the served HTML.
+                    // This was `value="<?php echo s($current->apikey) ?>"`, which
+                    // put the course's provider API key in cleartext in the page
+                    // source for everyone holding :manage in the course context
+                    // (an editing teacher), and in any proxy or browser cache that
+                    // saw the response. The field now always renders empty; a blank
+                    // submission keeps the stored key (see the POST handler above).
+                    $haskey = $current && $current->apikey !== '';
+                    $keyph = $haskey
+                        ? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')
+                        : get_string('coursesettings:using_global', 'local_ai_course_assistant');
+                    ?>
                     <input type="password" class="form-control" id="apikey" name="apikey"
-                           value="<?php echo s($current ? $current->apikey : ''); ?>"
-                           placeholder="<?php echo get_string('coursesettings:using_global', 'local_ai_course_assistant'); ?>">
+                           value="" autocomplete="new-password"
+                           placeholder="<?php echo s($keyph); ?>">
+                    <?php if ($haskey) { ?>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" value="1"
+                               id="apikey_clear" name="apikey_clear">
+                        <label class="form-check-label" for="apikey_clear">
+                            <?php echo get_string('coursesettings:apikey_clear', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
+                    <?php } ?>
                     <small class="form-text text-muted">
                         <?php echo get_string('settings:apikey_desc', 'local_ai_course_assistant'); ?>
                     </small>

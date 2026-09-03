@@ -1999,3 +1999,7 @@ $string['transcripts:col_conversation'] = 'שיחה';
 $string['transcripts:col_learner'] = 'לומד';
 $string['transcripts:col_type'] = 'סוג';
 $string['transcripts:col_message'] = 'הודעה';
+$string['coursesettings:apikey_stored'] = 'מפתח שמור. השאירו ריק כדי לשמור עליו.';
+$string['coursesettings:apikey_clear'] = 'מחק את המפתח השמור והשתמש במפתח האתר';
+$string['coursesettings:spend_cap_monthly'] = 'תקרת הוצאה חודשית לקורס זה (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'השאירו ריק כדי להשתמש בברירת המחדל של האתר. כאשר מוגדר, תכונות ה-AI בקורס זה נעצרות כאשר ההוצאה החודשית מגיעה לסכום זה.';

@@ -1961,3 +1961,7 @@ $string['transcripts:col_conversation'] = 'Unterhaltung';
 $string['transcripts:col_learner'] = 'Lernende/r';
 $string['transcripts:col_type'] = 'Typ';
 $string['transcripts:col_message'] = 'Nachricht';
+$string['coursesettings:apikey_stored'] = 'Ein Schlüssel ist gespeichert. Leer lassen, um ihn zu behalten.';
+$string['coursesettings:apikey_clear'] = 'Gespeicherten Schlüssel löschen und Site-Schlüssel verwenden';
+$string['coursesettings:spend_cap_monthly'] = 'Monatliches Ausgabenlimit für diesen Kurs (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Leer lassen, um den Site-Standard zu verwenden. Wenn gesetzt, werden die KI-Funktionen in diesem Kurs gestoppt, sobald die Ausgaben des Monats diesen Betrag erreichen.';

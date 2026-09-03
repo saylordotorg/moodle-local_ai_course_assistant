@@ -1961,3 +1961,7 @@ $string['transcripts:col_conversation'] = 'Keskustelu';
 $string['transcripts:col_learner'] = 'Opiskelija';
 $string['transcripts:col_type'] = 'Tyyppi';
 $string['transcripts:col_message'] = 'Viesti';
+$string['coursesettings:apikey_stored'] = 'Avain on tallennettu. Jätä tyhjäksi säilyttääksesi sen.';
+$string['coursesettings:apikey_clear'] = 'Tyhjennä tallennettu avain ja käytä sivuston avainta';
+$string['coursesettings:spend_cap_monthly'] = 'Tämän kurssin kuukausittainen kulukatto (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Jätä tyhjäksi käyttääksesi sivuston oletusarvoa. Kun arvo on asetettu, kurssin tekoälytoiminnot pysähtyvät, kun kuukauden kulut saavuttavat tämän summan.';

@@ -1960,3 +1960,7 @@ $string['transcripts:col_conversation'] = 'Konverzácia';
 $string['transcripts:col_learner'] = 'Študent';
 $string['transcripts:col_type'] = 'Typ';
 $string['transcripts:col_message'] = 'Správa';
+$string['coursesettings:apikey_stored'] = 'Kľúč je uložený. Ponechajte prázdne, aby zostal zachovaný.';
+$string['coursesettings:apikey_clear'] = 'Vymazať uložený kľúč a použiť kľúč lokality';
+$string['coursesettings:spend_cap_monthly'] = 'Mesačný limit výdavkov pre tento kurz (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Ponechajte prázdne na použitie predvolenej hodnoty lokality. Ak je nastavené, funkcie AI v tomto kurze sa zastavia, keď mesačné výdavky dosiahnu túto sumu.';

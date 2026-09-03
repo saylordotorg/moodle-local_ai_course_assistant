@@ -1640,5 +1640,34 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082802, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026090400) {
+        // v7.3.0 (F31): create the per-course spend cap column that
+        // spend_guard::get_cap() has been reading since v5.13.
+        //
+        // The read was `$coursecfg['spend_cap_monthly']` against
+        // course_config_manager::get_effective_config(), which returns exactly six
+        // keys -- provider, apikey, model, apibaseurl, systemprompt, temperature.
+        // spend_cap_monthly was never one of them, there was no column to hold it
+        // and no UI to set it, so the branch was unreachable and every course fell
+        // through to the site-wide default. A per-course cap could be documented,
+        // expected and believed in, and it did nothing.
+        $table = new xmldb_table('local_ai_course_assistant_course_cfg');
+        $field = new xmldb_field(
+            'spend_cap_monthly',
+            XMLDB_TYPE_NUMBER,
+            '10, 2',
+            null,
+            null,
+            null,
+            null,
+            'temperature'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026090400, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

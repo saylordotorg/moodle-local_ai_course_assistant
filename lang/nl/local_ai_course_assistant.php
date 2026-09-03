@@ -1984,3 +1984,7 @@ $string['transcripts:col_conversation'] = 'Gesprek';
 $string['transcripts:col_learner'] = 'Cursist';
 $string['transcripts:col_type'] = 'Type';
 $string['transcripts:col_message'] = 'Bericht';
+$string['coursesettings:apikey_stored'] = 'Er is een sleutel opgeslagen. Laat leeg om deze te behouden.';
+$string['coursesettings:apikey_clear'] = 'Wis de opgeslagen sleutel en gebruik de sitesleutel';
+$string['coursesettings:spend_cap_monthly'] = 'Maandelijkse uitgavenlimiet voor deze cursus (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Laat leeg om de standaardwaarde van de site te gebruiken. Indien ingesteld stoppen de AI-functies in deze cursus zodra de uitgaven van de maand dit bedrag bereiken.';

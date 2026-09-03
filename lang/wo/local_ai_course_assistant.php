@@ -1996,3 +1996,7 @@ $string['transcripts:col_conversation'] = 'Waxtaan';
 $string['transcripts:col_learner'] = 'Jàngkat';
 $string['transcripts:col_type'] = 'Xeet';
 $string['transcripts:col_message'] = 'Bataaxal';
+$string['coursesettings:apikey_stored'] = 'Am na kaley bu ñu denc. Bàyyi ko neen ngir mu des.';
+$string['coursesettings:apikey_clear'] = 'Far kaley bi ñu denc te jëfandikoo kaleyu sit bi';
+$string['coursesettings:spend_cap_monthly'] = 'Àppu depaas bu weer ci jàng bii (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Bàyyi ko neen ngir jëfandikoo bu sit bi. Bu ñu ko defee, jumtukaayu AI yi ci jàng bii dañuy taxaw bu depaasu weer bi àggee ci lim bii.';

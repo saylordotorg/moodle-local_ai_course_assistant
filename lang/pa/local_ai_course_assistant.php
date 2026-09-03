@@ -1983,3 +1983,7 @@ $string['transcripts:col_conversation'] = 'ਗੱਲਬਾਤ';
 $string['transcripts:col_learner'] = 'ਸਿੱਖਿਆਰਥੀ';
 $string['transcripts:col_type'] = 'ਕਿਸਮ';
 $string['transcripts:col_message'] = 'ਸੁਨੇਹਾ';
+$string['coursesettings:apikey_stored'] = 'ਇੱਕ ਕੁੰਜੀ ਸੰਭਾਲੀ ਹੋਈ ਹੈ। ਇਸਨੂੰ ਰੱਖਣ ਲਈ ਖਾਲੀ ਛੱਡੋ।';
+$string['coursesettings:apikey_clear'] = 'ਸੰਭਾਲੀ ਕੁੰਜੀ ਮਿਟਾਓ ਅਤੇ ਸਾਈਟ ਕੁੰਜੀ ਵਰਤੋ';
+$string['coursesettings:spend_cap_monthly'] = 'ਇਸ ਕੋਰਸ ਲਈ ਮਹੀਨਾਵਾਰ ਖਰਚ ਸੀਮਾ (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'ਸਾਈਟ ਦੀ ਮੂਲ ਵਰਤਣ ਲਈ ਖਾਲੀ ਛੱਡੋ। ਸੈੱਟ ਹੋਣ ਤੇ, ਮਹੀਨੇ ਦਾ ਖਰਚ ਇਸ ਰਕਮ ਤੇ ਪਹੁੰਚਦੇ ਹੀ ਇਸ ਕੋਰਸ ਦੀਆਂ AI ਸਹੂਲਤਾਂ ਰੁਕ ਜਾਂਦੀਆਂ ਹਨ।';

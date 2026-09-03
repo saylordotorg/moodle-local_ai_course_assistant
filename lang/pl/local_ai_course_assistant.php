@@ -1960,3 +1960,7 @@ $string['transcripts:col_conversation'] = 'Rozmowa';
 $string['transcripts:col_learner'] = 'Uczestnik';
 $string['transcripts:col_type'] = 'Typ';
 $string['transcripts:col_message'] = 'Wiadomość';
+$string['coursesettings:apikey_stored'] = 'Klucz jest zapisany. Pozostaw puste, aby go zachować.';
+$string['coursesettings:apikey_clear'] = 'Wyczyść zapisany klucz i użyj klucza witryny';
+$string['coursesettings:spend_cap_monthly'] = 'Miesięczny limit wydatków dla tego kursu (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Pozostaw puste, aby użyć wartości domyślnej witryny. Po ustawieniu funkcje AI w tym kursie zatrzymują się, gdy wydatki miesiąca osiągną tę kwotę.';

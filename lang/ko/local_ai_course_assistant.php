@@ -1967,3 +1967,7 @@ $string['transcripts:col_conversation'] = '대화';
 $string['transcripts:col_learner'] = '학습자';
 $string['transcripts:col_type'] = '유형';
 $string['transcripts:col_message'] = '메시지';
+$string['coursesettings:apikey_stored'] = '키가 저장되어 있습니다. 유지하려면 비워 두세요.';
+$string['coursesettings:apikey_clear'] = '저장된 키를 지우고 사이트 키 사용';
+$string['coursesettings:spend_cap_monthly'] = '이 강좌의 월간 지출 한도(USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = '사이트 기본값을 사용하려면 비워 두세요. 설정하면 해당 월의 지출이 이 금액에 도달할 때 이 강좌의 AI 기능이 중지됩니다.';

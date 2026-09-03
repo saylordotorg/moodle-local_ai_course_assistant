@@ -1967,3 +1967,7 @@ $string['transcripts:col_conversation'] = '会話';
 $string['transcripts:col_learner'] = '学習者';
 $string['transcripts:col_type'] = '種類';
 $string['transcripts:col_message'] = 'メッセージ';
+$string['coursesettings:apikey_stored'] = 'キーが保存されています。保持するには空欄のままにしてください。';
+$string['coursesettings:apikey_clear'] = '保存されたキーを消去してサイトのキーを使用する';
+$string['coursesettings:spend_cap_monthly'] = 'このコースの月間支出上限（USD）';
+$string['coursesettings:spend_cap_monthly_desc'] = 'サイトの既定値を使用するには空欄にしてください。設定すると、当月の支出がこの金額に達した時点でこのコースのAI機能が停止します。';

@@ -1990,3 +1990,7 @@ $string['transcripts:col_conversation'] = 'कुराकानी';
 $string['transcripts:col_learner'] = 'सिकारु';
 $string['transcripts:col_type'] = 'प्रकार';
 $string['transcripts:col_message'] = 'सन्देश';
+$string['coursesettings:apikey_stored'] = 'कुञ्जी सुरक्षित छ। यसलाई राख्न खाली छोड्नुहोस्।';
+$string['coursesettings:apikey_clear'] = 'सुरक्षित कुञ्जी हटाउनुहोस् र साइट कुञ्जी प्रयोग गर्नुहोस्';
+$string['coursesettings:spend_cap_monthly'] = 'यस पाठ्यक्रमको मासिक खर्च सीमा (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'साइटको पूर्वनिर्धारित प्रयोग गर्न खाली छोड्नुहोस्। सेट गरिएमा, महिनाको खर्च यो रकममा पुगेपछि यस पाठ्यक्रमका AI सुविधाहरू रोकिन्छन्।';

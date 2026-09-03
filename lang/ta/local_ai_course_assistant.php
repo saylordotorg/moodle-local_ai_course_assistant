@@ -1997,3 +1997,7 @@ $string['transcripts:col_conversation'] = 'உரையாடல்';
 $string['transcripts:col_learner'] = 'கற்பவர்';
 $string['transcripts:col_type'] = 'வகை';
 $string['transcripts:col_message'] = 'செய்தி';
+$string['coursesettings:apikey_stored'] = 'ஒரு விசை சேமிக்கப்பட்டுள்ளது. அதை வைத்திருக்க காலியாக விடவும்.';
+$string['coursesettings:apikey_clear'] = 'சேமித்த விசையை அழித்து தளத்தின் விசையைப் பயன்படுத்து';
+$string['coursesettings:spend_cap_monthly'] = 'இந்தப் படிப்பிற்கான மாதாந்திர செலவு வரம்பு (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'தளத்தின் இயல்புநிலையைப் பயன்படுத்த காலியாக விடவும். அமைக்கப்பட்டால், மாதத்தின் செலவு இந்தத் தொகையை அடையும்போது இந்தப் படிப்பின் AI வசதிகள் நிற்கும்.';

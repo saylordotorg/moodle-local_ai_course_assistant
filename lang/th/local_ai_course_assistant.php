@@ -1974,3 +1974,7 @@ $string['transcripts:col_conversation'] = 'บทสนทนา';
 $string['transcripts:col_learner'] = 'ผู้เรียน';
 $string['transcripts:col_type'] = 'ประเภท';
 $string['transcripts:col_message'] = 'ข้อความ';
+$string['coursesettings:apikey_stored'] = 'มีคีย์บันทึกไว้แล้ว เว้นว่างไว้เพื่อคงคีย์เดิม';
+$string['coursesettings:apikey_clear'] = 'ล้างคีย์ที่บันทึกไว้และใช้คีย์ของเว็บไซต์';
+$string['coursesettings:spend_cap_monthly'] = 'เพดานค่าใช้จ่ายรายเดือนของรายวิชานี้ (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'เว้นว่างไว้เพื่อใช้ค่าเริ่มต้นของเว็บไซต์ เมื่อกำหนดแล้ว ฟีเจอร์ AI ในรายวิชานี้จะหยุดทำงานเมื่อค่าใช้จ่ายของเดือนถึงจำนวนนี้';

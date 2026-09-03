@@ -63,6 +63,7 @@ class course_config_manager {
             $record->systemprompt = $data['systemprompt'] ?? '';
             $record->temperature = isset($data['temperature']) && $data['temperature'] !== ''
                 ? (float) $data['temperature'] : null;
+            $record->spend_cap_monthly = self::normalise_cap($data['spend_cap_monthly'] ?? null);
             $record->timemodified = $now;
             $DB->update_record('local_ai_course_assistant_course_cfg', $record);
         } else {
@@ -76,10 +77,55 @@ class course_config_manager {
             $record->systemprompt = $data['systemprompt'] ?? '';
             $record->temperature = isset($data['temperature']) && $data['temperature'] !== ''
                 ? (float) $data['temperature'] : null;
+            $record->spend_cap_monthly = self::normalise_cap($data['spend_cap_monthly'] ?? null);
             $record->timecreated = $now;
             $record->timemodified = $now;
             $DB->insert_record('local_ai_course_assistant_course_cfg', $record);
         }
+    }
+
+    /**
+     * Normalise a submitted spend cap to a positive float, or null.
+     *
+     * Blank, zero and negative all mean "no per-course cap", which is stored as
+     * null so the site-wide default applies rather than a literal 0 (which
+     * spend_guard reads as unlimited).
+     *
+     * @param mixed $raw
+     * @return float|null
+     */
+    private static function normalise_cap($raw): ?float {
+        if ($raw === null || $raw === '' || !is_numeric($raw)) {
+            return null;
+        }
+        $val = (float) $raw;
+        return $val > 0 ? $val : null;
+    }
+
+    /**
+     * The per-course monthly spend cap, or 0.0 when the course has none.
+     *
+     * Deliberately NOT routed through get_effective_config(). That method
+     * returns global config whenever the course row is missing or its `enabled`
+     * flag is 0, because `enabled` governs whether the course overrides the
+     * PROVIDER. A spend cap is a safety control, not a provider override: a cap
+     * an admin set on a course must keep applying even when that course is not
+     * overriding the provider. Reading it through get_effective_config would tie
+     * a financial limit to an unrelated toggle.
+     *
+     * @param int $courseid
+     * @return float USD cap, 0.0 when unset
+     */
+    public static function get_spend_cap(int $courseid): float {
+        if ($courseid <= 0) {
+            return 0.0;
+        }
+        $record = self::get($courseid);
+        if (!$record || !isset($record->spend_cap_monthly)) {
+            return 0.0;
+        }
+        $cap = (float) $record->spend_cap_monthly;
+        return $cap > 0 ? $cap : 0.0;
     }
 
     /**

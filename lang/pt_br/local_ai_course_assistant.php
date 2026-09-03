@@ -1983,3 +1983,7 @@ $string['transcripts:col_conversation'] = 'Conversa';
 $string['transcripts:col_learner'] = 'Estudante';
 $string['transcripts:col_type'] = 'Tipo';
 $string['transcripts:col_message'] = 'Mensagem';
+$string['coursesettings:apikey_stored'] = 'Uma chave está salva. Deixe em branco para mantê-la.';
+$string['coursesettings:apikey_clear'] = 'Limpar a chave salva e usar a chave do site';
+$string['coursesettings:spend_cap_monthly'] = 'Limite de gasto mensal para este curso (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Deixe em branco para usar o padrão do site. Quando definido, os recursos de IA neste curso param assim que o gasto do mês atingir esse valor.';

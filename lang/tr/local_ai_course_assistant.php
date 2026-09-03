@@ -1974,3 +1974,7 @@ $string['transcripts:col_conversation'] = 'Konuşma';
 $string['transcripts:col_learner'] = 'Öğrenci';
 $string['transcripts:col_type'] = 'Tür';
 $string['transcripts:col_message'] = 'Mesaj';
+$string['coursesettings:apikey_stored'] = 'Bir anahtar kayıtlı. Korumak için boş bırakın.';
+$string['coursesettings:apikey_clear'] = 'Kayıtlı anahtarı temizle ve site anahtarını kullan';
+$string['coursesettings:spend_cap_monthly'] = 'Bu ders için aylık harcama üst sınırı (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Sitenin varsayılanını kullanmak için boş bırakın. Ayarlandığında, ayın harcaması bu tutara ulaştığında bu dersteki yapay zekâ özellikleri durur.';
