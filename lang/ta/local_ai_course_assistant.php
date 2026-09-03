@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI பாட உதவியாளர்';
-$string['attachment:attach'] = 'இணைக்கவும்';
-$string['attachment:attach_image_or_pdf'] = 'படம் அல்லது PDF ஐ இணைக்கவும்';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'ஒவ்வொரு பயனர் மற்றும் பாடத்திற்கான AI ஆசிரியர் உரையாடல்களை சேமிக்கிறது.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'உரையாடலை வைத்திருக்கும் பயனரின் ID.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'உரையாடல் சார்ந்த பாடத்தின் ID.';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'பாடநெறிகளுக்கு இடையேயான தேர்ச்சித் தொகுப்பு இயல்பாகவே இயக்கப்பட்டுள்ளது';
@@ -1805,14 +1796,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe புரவலன் வ
 $string['settings:rag_iframe_host_patterns_desc'] = 'ஒரு வரிக்கு ஒரு வழக்கமான வெளிப்பாடு, iframe-இன் <code>src</code> பண்புக்கூறுடன் பொருத்தப்படும். பொருந்தும் ஒவ்வொரு சட்டகமும், உரையாக்கத்தை இணைத்து அட்டவணையாக்க வேண்டிய ஊடாடும் உட்பொதிவாகக் கருதப்படும். <code>#</code> இல் தொடங்கும் வரிகள் கருத்துரைகள்.';
 $string['settings:rag_transcript_url_pattern'] = 'உரையாக்க முகவரி வடிவம்';
 $string['settings:rag_transcript_url_pattern_desc'] = 'உரையாக்க இணைப்புகளின் முகவரிகளுடன் பொருந்தும் வழக்கமான வெளிப்பாடு. கண்டறியப்பட்ட ஒவ்வொரு iframe-க்கும், அட்டவணையாக்கி மிக அருகில் பொருந்தும் இணைப்பைத் (மேலே அல்லது கீழே) தேர்ந்தெடுத்து இரண்டையும் இணைக்கிறது. உரையாக்க இணைப்பை முடக்க வெறுமையாக விடவும்.';
-$string['settings:attachments_heading'] = 'கற்பவர் இணைப்புகள்';
-$string['settings:attachments_heading_desc'] = 'கற்பவர்கள் அரட்டைச் செய்திகளுடன் ஒரு படத்தையோ PDF-ஐயோ இணைக்க அனுமதிக்கிறது. படங்கள் பன்முகப் பாங்கு வழங்குநர்களுக்கு (OpenAI, Anthropic, Gemini, xAI) அனுப்பப்படுகின்றன; PDF-களிலிருந்து உரை எப்போதும் சேவையகத்தில் பிரித்தெடுக்கப்படுகிறது, எனவே எந்த வழங்குநரும் அவற்றைப் படிக்க முடியும்.';
-$string['settings:allow_student_attachments'] = 'இணைப்புகளை அனுமதி';
-$string['settings:allow_student_attachments_desc'] = 'இயக்கப்பட்டால், கற்பவர்கள் அரட்டை எழுதும் புலத்தில் ஒரு கிளிப் பொத்தானைக் காண்பர். கோப்புகள் பாடநெறிச் சூழலில் சேமிக்கப்பட்டு, அந்தச் செய்திக் குமிழியிலிருந்து இணைக்கப்படும்.';
-$string['settings:attachment_max_size_mb'] = 'அதிகபட்ச இணைப்பு அளவு (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'ஒரு இணைப்பின் அளவுக்கான உறுதியான உச்ச வரம்பு. இயங்கும்போது 1–25 MB வரம்பிற்குள் கட்டுப்படுத்தப்படும்.';
-$string['settings:attachment_allowed_types'] = 'அனுமதிக்கப்பட்ட MIME வகைகள்';
-$string['settings:attachment_allowed_types_desc'] = 'அனுமதிக்கப்பட்ட MIME வகைகளின் காற்புள்ளியால் பிரிக்கப்பட்ட பட்டியல். சேவையகம் பதிவேற்றப்பட்ட கோப்பையும் சரிபார்க்கிறது; போலியான Content-Type தலைப்பு நிராகரிக்கப்படும்.';
 $string['settings:performance_heading'] = 'செயல்திறன்';
 $string['settings:performance_heading_desc'] = 'செயற்கை நுண்ணறிவுக்கான தூண்டுதலில் எவ்வளவு பாடநெறி உள்ளடக்கம் சேர்க்கப்படும் என்பதைக் கட்டுப்படுத்துகிறது. குறைந்த மதிப்புகள் விரைவான பதில்களைத் தரும், ஆனால் செயற்கை நுண்ணறிவுக்குக் குறைந்த சூழல் கிடைக்கும்.';
 $string['settings:max_content_per_resource'] = 'ஒரு வளத்திற்கான அதிகபட்ச உள்ளடக்கம் (எழுத்துகள்)';

@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Assistente de Curso com IA';
-$string['attachment:attach'] = 'Anexar';
-$string['attachment:attach_image_or_pdf'] = 'Anexar imagem ou PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Armazena as conversas do chat do tutor de IA por usuário e curso.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'O ID do usuário proprietário da conversa.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'O ID do curso ao qual a conversa pertence.';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Consolidação de domínio entre cursos ativada por padrão';
@@ -1782,14 +1773,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Padrões de host de iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Uma expressão regular por linha que corresponda ao atributo <code>src</code> de um iframe. Cada iframe correspondente é tratado como uma incorporação interativa cuja transcrição deve ser associada e indexada. Linhas que começam com <code>#</code> são comentários.';
 $string['settings:rag_transcript_url_pattern'] = 'Padrão de URL de transcrição';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Expressão regular que corresponde às URLs dos links de transcrição. O indexador escolhe o link correspondente mais próximo (acima ou abaixo) de cada iframe detectado e associa os dois. Deixe em branco para desativar a associação de transcrições.';
-$string['settings:attachments_heading'] = 'Anexos dos estudantes';
-$string['settings:attachments_heading_desc'] = 'Permite que os estudantes anexem uma imagem ou um PDF às suas mensagens de chat. As imagens são enviadas a provedores multimodais (OpenAI, Anthropic, Gemini, xAI); dos PDFs o texto é sempre extraído no servidor, para que qualquer provedor consiga lê-los.';
-$string['settings:allow_student_attachments'] = 'Permitir anexos';
-$string['settings:allow_student_attachments_desc'] = 'Quando ativado, os estudantes veem um botão de clipe no campo de composição do chat. Os arquivos são armazenados no contexto do curso e vinculados a partir do balão de mensagem.';
-$string['settings:attachment_max_size_mb'] = 'Tamanho máximo do anexo (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Limite rígido do tamanho de cada anexo individual. Restringido a 1–25 MB em tempo de execução.';
-$string['settings:attachment_allowed_types'] = 'Tipos MIME permitidos';
-$string['settings:attachment_allowed_types_desc'] = 'Lista de permissões de tipos MIME separados por vírgulas. O servidor também inspeciona o arquivo enviado; um Content-Type falsificado será rejeitado.';
 $string['settings:performance_heading'] = 'Desempenho';
 $string['settings:performance_heading_desc'] = 'Controla a quantidade de conteúdo do curso incluída no prompt da IA. Valores menores significam respostas mais rápidas, porém menos contexto para a IA.';
 $string['settings:max_content_per_resource'] = 'Conteúdo máximo por recurso (caracteres)';

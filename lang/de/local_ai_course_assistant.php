@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'KI-Kursassistent';
-$string['attachment:attach'] = 'Anhängen';
-$string['attachment:attach_image_or_pdf'] = 'Bild oder PDF anhängen';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Speichert die Unterhaltungen des KI-Tutors pro Benutzer und Kurs.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Die ID des Benutzers, dem die Unterhaltung gehört.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Die ID des Kurses, zu dem die Unterhaltung gehört.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Kursübergreifende Kompetenzübersicht standardmäßig aktiviert';
@@ -1760,14 +1751,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Iframe-Host-Muster';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Ein regulärer Ausdruck pro Zeile, der auf das <code>src</code>-Attribut eines iframes passt. Jedes passende iframe wird als interaktive Einbettung behandelt, deren Transkript zugeordnet und indexiert werden soll. Zeilen, die mit <code>#</code> beginnen, sind Kommentare.';
 $string['settings:rag_transcript_url_pattern'] = 'Muster für Transkript-URLs';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Regulärer Ausdruck, der auf Transkript-Links passt. Der Indexer wählt den nächstgelegenen passenden Link (ober- oder unterhalb) zu jedem erkannten iframe und ordnet beide einander zu. Leer lassen, um die Transkriptzuordnung zu deaktivieren.';
-$string['settings:attachments_heading'] = 'Dateianhänge von Lernenden';
-$string['settings:attachments_heading_desc'] = 'Erlaubt Lernenden, ein Bild oder PDF an ihre Chatnachrichten anzuhängen. Bilder werden an multimodale Anbieter gesendet (OpenAI, Anthropic, Gemini, xAI); aus PDFs wird immer serverseitig der Text extrahiert, damit jeder Anbieter sie lesen kann.';
-$string['settings:allow_student_attachments'] = 'Anhänge erlauben';
-$string['settings:allow_student_attachments_desc'] = 'Wenn aktiviert, sehen Lernende eine Büroklammer-Schaltfläche im Chat-Eingabefeld. Dateien werden im Kurskontext gespeichert und aus ihrer Nachrichtenblase verlinkt.';
-$string['settings:attachment_max_size_mb'] = 'Maximale Anhangsgröße (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Feste Obergrenze für die Größe eines einzelnen Anhangs. Wird zur Laufzeit auf 1–25 MB begrenzt.';
-$string['settings:attachment_allowed_types'] = 'Erlaubte MIME-Typen';
-$string['settings:attachment_allowed_types_desc'] = 'Kommagetrennte Freigabeliste von MIME-Typen. Der Server prüft zusätzlich die hochgeladene Datei; ein gefälschter Content-Type wird abgelehnt.';
 $string['settings:performance_heading'] = 'Leistung';
 $string['settings:performance_heading_desc'] = 'Steuert, wie viel Kursinhalt in den KI-Prompt aufgenommen wird. Niedrigere Werte bedeuten schnellere Antworten, aber weniger Kontext für die KI.';
 $string['settings:max_content_per_resource'] = 'Maximaler Inhalt pro Ressource (Zeichen)';

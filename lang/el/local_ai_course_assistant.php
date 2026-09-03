@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Βοηθός Μαθήματος με Τεχνητή Νοημοσύνη';
-$string['attachment:attach'] = 'Επισύναψη';
-$string['attachment:attach_image_or_pdf'] = 'Επισύναψη εικόνας ή PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Αποθηκεύει τις συνομιλίες του AI βοηθού ανά χρήστη και μάθημα.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Το αναγνωριστικό του χρήστη που κατέχει τη συνομιλία.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Το αναγνωριστικό του μαθήματος στο οποίο ανήκει η συνομιλία.';
@@ -1303,13 +1301,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Συγκεντρωτική παρακολούθηση μάθησης μεταξύ μαθημάτων ενεργή από προεπιλογή';
@@ -1801,14 +1792,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Μοτίβα διακομιστ�
 $string['settings:rag_iframe_host_patterns_desc'] = 'Μία κανονική έκφραση ανά γραμμή που αντιστοιχίζεται με το χαρακτηριστικό <code>src</code> ενός iframe. Κάθε πλαίσιο που αντιστοιχεί θεωρείται διαδραστική ενσωμάτωση για την οποία πρέπει να αντιστοιχιστεί και να ευρετηριαστεί μια απομαγνητοφώνηση. Οι γραμμές που ξεκινούν με <code>#</code> είναι σχόλια.';
 $string['settings:rag_transcript_url_pattern'] = 'Μοτίβο URL απομαγνητοφώνησης';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Κανονική έκφραση που αντιστοιχίζεται με τις διευθύνσεις URL των συνδέσμων απομαγνητοφώνησης. Ο δείκτης επιλέγει για κάθε iframe που εντοπίζει τον πλησιέστερο σύνδεσμο που αντιστοιχεί (πάνω ή κάτω) και τα συνδυάζει. Αφήστε το κενό για να απενεργοποιήσετε την αντιστοίχιση απομαγνητοφωνήσεων.';
-$string['settings:attachments_heading'] = 'Συνημμένα μαθητών';
-$string['settings:attachments_heading_desc'] = 'Επιτρέπει στους μαθητές να επισυνάπτουν μια εικόνα ή ένα PDF στα μηνύματα συνομιλίας. Οι εικόνες αποστέλλονται σε πολυτροπικούς παρόχους (OpenAI, Anthropic, Gemini, xAI)· από τα PDF το κείμενο εξάγεται πάντα στον διακομιστή, ώστε να μπορεί να τα διαβάσει οποιοσδήποτε πάροχος.';
-$string['settings:allow_student_attachments'] = 'Να επιτρέπονται τα συνημμένα';
-$string['settings:allow_student_attachments_desc'] = 'Όταν είναι ενεργό, οι μαθητές βλέπουν ένα κουμπί συνδετήρα στο πεδίο σύνταξης της συνομιλίας. Τα αρχεία αποθηκεύονται στο πλαίσιο του μαθήματος και συνδέονται από τη φούσκα του μηνύματός τους.';
-$string['settings:attachment_max_size_mb'] = 'Μέγιστο μέγεθος συνημμένου (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Αυστηρό ανώτατο όριο για το μέγεθος ενός μεμονωμένου συνημμένου. Κατά την εκτέλεση περιορίζεται στο εύρος 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Επιτρεπόμενοι τύποι MIME';
-$string['settings:attachment_allowed_types_desc'] = 'Λίστα επιτρεπόμενων τύπων MIME, χωρισμένων με κόμμα. Ο διακομιστής ελέγχει και το ίδιο το μεταφορτωμένο αρχείο· μια πλαστή κεφαλίδα Content-Type απορρίπτεται.';
 $string['settings:performance_heading'] = 'Επιδόσεις';
 $string['settings:performance_heading_desc'] = 'Ελέγχει πόσο περιεχόμενο μαθήματος συμπεριλαμβάνεται στο μήνυμα προς την τεχνητή νοημοσύνη. Οι μικρότερες τιμές σημαίνουν ταχύτερες απαντήσεις αλλά λιγότερο πλαίσιο για την τεχνητή νοημοσύνη.';
 $string['settings:max_content_per_resource'] = 'Μέγιστο περιεχόμενο ανά πόρο (χαρακτήρες)';

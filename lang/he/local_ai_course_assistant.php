@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'עוזר קורס מבוסס בינה מלאכותית';
-$string['attachment:attach'] = 'צרף';
-$string['attachment:attach_image_or_pdf'] = 'צרף תמונה או PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'מאחסן שיחות של מורה AI לפי משתמש וקורס.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'מזהה המשתמש שבבעלותו השיחה.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'מזהה הקורס שאליו שייכת השיחה.';
@@ -1303,13 +1301,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'סיכום שליטה חוצה-קורסים מופעל כברירת מחדל';
@@ -1800,14 +1791,6 @@ $string['settings:rag_iframe_host_patterns'] = 'תבניות מארחי iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'ביטוי רגולרי אחד בכל שורה, המותאם למאפיין <code>src</code> של iframe. כל מסגרת תואמת נחשבת להטמעה אינטראקטיבית שיש להתאים לה תמלול ולאנדקס אותו. שורות המתחילות ב-<code>#</code> הן הערות.';
 $string['settings:rag_transcript_url_pattern'] = 'תבנית כתובת התמלול';
 $string['settings:rag_transcript_url_pattern_desc'] = 'ביטוי רגולרי המותאם לכתובות של קישורי תמלול. עבור כל iframe שזוהה, מנוע האינדוקס בוחר את הקישור התואם הקרוב ביותר (מעליו או מתחתיו) ומצמיד ביניהם. השאירו ריק כדי לבטל את הצמדת התמלולים.';
-$string['settings:attachments_heading'] = 'קבצים מצורפים של לומדים';
-$string['settings:attachments_heading_desc'] = 'מאפשר ללומדים לצרף תמונה או קובץ PDF להודעות בצ\'אט. תמונות נשלחות לספקים רב-מודליים (OpenAI, Anthropic, Gemini, xAI); הטקסט מקובצי PDF תמיד מחולץ בשרת, כך שכל ספק יכול לקרוא אותם.';
-$string['settings:allow_student_attachments'] = 'לאפשר קבצים מצורפים';
-$string['settings:allow_student_attachments_desc'] = 'כאשר מופעל, הלומדים רואים לחצן מהדק בשדה הכתיבה של הצ\'אט. הקבצים נשמרים בהקשר הקורס ומקושרים מבועית ההודעה שלהם.';
-$string['settings:attachment_max_size_mb'] = 'גודל מרבי של קובץ מצורף (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'מגבלה נוקשה לגודל של קובץ מצורף בודד. בזמן ריצה מוגבל לטווח 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'סוגי MIME מותרים';
-$string['settings:attachment_allowed_types_desc'] = 'רשימה מופרדת בפסיקים של סוגי MIME מותרים. השרת בודק גם את הקובץ שהועלה עצמו; כותרת Content-Type מזויפת תידחה.';
 $string['settings:performance_heading'] = 'ביצועים';
 $string['settings:performance_heading_desc'] = 'קובע כמה מתוכן הקורס ייכלל בהנחיה לבינה המלאכותית. ערכים נמוכים יותר משמעם תשובות מהירות יותר אך פחות הקשר עבור הבינה המלאכותית.';
 $string['settings:max_content_per_resource'] = 'תוכן מרבי לכל משאב (תווים)';

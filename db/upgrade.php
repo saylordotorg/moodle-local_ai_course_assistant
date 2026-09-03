@@ -1669,5 +1669,43 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026090400, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026090500) {
+        // v7.3.1 (F11): remove the chat attachment feature.
+        //
+        // The paperclip shipped enabled by default and could never work: the
+        // endpoint amd/src/repository.js posted to,
+        // /local/ai_course_assistant/upload_attachment.php, does not exist in
+        // the plugin and never has. Learners saw a control that failed every
+        // time. The settings are dropped here so they stop appearing in
+        // config_log and in the settings export.
+        unset_config('allow_student_attachments', 'local_ai_course_assistant');
+        unset_config('attachment_max_size_mb', 'local_ai_course_assistant');
+        unset_config('attachment_allowed_types', 'local_ai_course_assistant');
+
+        // sse.php would promote a client-supplied draftitemid into the
+        // permanent message_attachments area, so a crafted request could leave
+        // files behind even though the UI upload path was dead. Those files are
+        // now unreachable (the pluginfile handler is gone) and were never
+        // covered by the privacy provider's export or erasure paths, so leaving
+        // them would be orphaned learner data with no way to see or delete it.
+        $fs = get_file_storage();
+        $deleted = 0;
+        $areas = $DB->get_records_sql(
+            "SELECT DISTINCT contextid
+               FROM {files}
+              WHERE component = :component AND filearea = :filearea",
+            ['component' => 'local_ai_course_assistant', 'filearea' => 'message_attachments']
+        );
+        foreach ($areas as $area) {
+            $fs->delete_area_files((int) $area->contextid, 'local_ai_course_assistant', 'message_attachments');
+            $deleted++;
+        }
+        if ($deleted > 0) {
+            mtrace("local_ai_course_assistant: removed orphaned chat attachments in {$deleted} context(s)");
+        }
+
+        upgrade_plugin_savepoint(true, 2026090500, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

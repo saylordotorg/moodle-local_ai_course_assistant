@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI Асистент Курсу';
-$string['attachment:attach'] = 'Прикріпити';
-$string['attachment:attach_image_or_pdf'] = 'Прикріпити зображення або PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Зберігає розмови AI-тьютора за користувачем і курсом.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Ідентифікатор користувача, якому належить розмова.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Ідентифікатор курсу, до якого належить розмова.';
@@ -1303,13 +1301,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Зведення засвоєння між курсами увімкнено за замовчуванням';
@@ -1814,14 +1805,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Шаблони хостів ifra
 $string['settings:rag_iframe_host_patterns_desc'] = 'По одному регулярному виразу в рядку, який зіставляється з атрибутом <code>src</code> елемента iframe. Кожна рамка, що збігається, вважається інтерактивним вбудуванням, для якого потрібно зіставити та проіндексувати транскрипцію. Рядки, що починаються з <code>#</code>, є коментарями.';
 $string['settings:rag_transcript_url_pattern'] = 'Шаблон адреси транскрипції';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Регулярний вираз, який зіставляється з адресами посилань на транскрипції. Для кожного виявленого iframe індексатор обирає найближче відповідне посилання (над ним або під ним) і поєднує їх. Залиште порожнім, щоб вимкнути зіставлення транскрипцій.';
-$string['settings:attachments_heading'] = 'Вкладення студентів';
-$string['settings:attachments_heading_desc'] = 'Дозволяє студентам додавати зображення або PDF до повідомлень у чаті. Зображення надсилаються мультимодальним постачальникам (OpenAI, Anthropic, Gemini, xAI); текст із файлів PDF завжди видобувається на сервері, тож їх може прочитати будь-який постачальник.';
-$string['settings:allow_student_attachments'] = 'Дозволити вкладення';
-$string['settings:allow_student_attachments_desc'] = 'Коли увімкнено, студенти бачать кнопку зі скріпкою в полі введення чату. Файли зберігаються в контексті курсу, і на них веде посилання з бульбашки відповідного повідомлення.';
-$string['settings:attachment_max_size_mb'] = 'Максимальний розмір вкладення (МБ)';
-$string['settings:attachment_max_size_mb_desc'] = 'Жорстка верхня межа розміру одного вкладення. Під час виконання обмежується діапазоном 1–25 МБ.';
-$string['settings:attachment_allowed_types'] = 'Дозволені типи MIME';
-$string['settings:attachment_allowed_types_desc'] = 'Список дозволених типів MIME через кому. Сервер перевіряє і сам завантажений файл; підроблений заголовок Content-Type буде відхилено.';
 $string['settings:performance_heading'] = 'Продуктивність';
 $string['settings:performance_heading_desc'] = 'Визначає, скільки вмісту курсу потрапляє до підказки для ШІ. Менші значення означають швидші відповіді, але менше контексту для ШІ.';
 $string['settings:max_content_per_resource'] = 'Максимум вмісту на ресурс (символів)';

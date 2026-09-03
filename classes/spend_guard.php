@@ -80,22 +80,37 @@ class spend_guard {
     /**
      * Get the spend cap in USD for a scope and capability. 0 = unlimited.
      *
-     * Precedence: per-course override (if a positive course cap is set)
-     * beats site cap. Per-capability cap (if set) stacks on top.
+     * PRECEDENCE: THE MOST SPECIFIC CAP THAT IS SET WINS.
+     *
+     * Ordered from most to least specific, first positive value returned:
+     *
+     *   1. Per-course cap        -- names one course. The narrowest scope, so it
+     *                               wins outright: an admin who caps one runaway
+     *                               course means that number, not a site-wide
+     *                               per-capability figure that happens to differ.
+     *   2. Per-capability cap    -- site-wide, but limited to chat / voice / rag /
+     *                               analytics.
+     *   3. Per-course default    -- site-wide fallback applied to every course
+     *                               with no explicit cap of its own.
+     *   4. Site cap              -- the whole installation.
+     *
+     * Caps do NOT stack and are not combined by minimum: the most specific one
+     * that is set replaces the others entirely. That is what makes the setting
+     * predictable to an admin -- the number you typed on the course is the number
+     * that applies, and you do not have to reason about a site-wide setting
+     * silently overriding it.
+     *
+     * v7.3.1 (F40): the per-capability branch used to return before the
+     * per-course branch was reached, so a site-wide capability cap silently beat
+     * an explicit per-course cap -- the least specific setting winning over the
+     * most specific. Order corrected here; tests/course_spend_cap_test.php pins it.
      *
      * @param int $courseid 0 for site-wide
      * @param string|null $capability One of: chat, voice, rag, analytics, or null for total
      * @return float USD cap; 0.0 if unlimited
      */
     public static function get_cap(int $courseid = 0, ?string $capability = null): float {
-        if ($capability !== null) {
-            $rawcap = get_config('local_ai_course_assistant', 'spend_cap_' . $capability);
-            $val = ($rawcap === false || $rawcap === '') ? 0.0 : (float) $rawcap;
-            if ($val > 0) {
-                return $val;
-            }
-        }
-        // Per-course cap takes priority when positive.
+        // 1. Per-course cap -- the most specific scope, so it wins outright.
         //
         // v7.3.0 (F31): this read $coursecfg['spend_cap_monthly'] out of
         // course_config_manager::get_effective_config(), which returns exactly six
@@ -109,16 +124,30 @@ class spend_guard {
             if ($coursecap > 0) {
                 return $coursecap;
             }
-            // v5.13.0: site-wide default per-course cap. Lets an admin set a
-            // defensive cap once (say $30/mo) that propagates to every course
-            // without an explicit override, so a runaway course is bounded
-            // even when no one has tuned its individual settings.
+        }
+
+        // 2. Per-capability cap -- site-wide, narrowed to one capability.
+        if ($capability !== null) {
+            $rawcap = get_config('local_ai_course_assistant', 'spend_cap_' . $capability);
+            $val = ($rawcap === false || $rawcap === '') ? 0.0 : (float) $rawcap;
+            if ($val > 0) {
+                return $val;
+            }
+        }
+
+        // 3. Site-wide default per-course cap (v5.13.0). Lets an admin set a
+        // defensive cap once (say $30/mo) that propagates to every course
+        // without an explicit override, so a runaway course is bounded even
+        // when no one has tuned its individual settings.
+        if ($courseid > 0) {
             $rawdefault = get_config('local_ai_course_assistant', 'spend_cap_per_course_default');
             $coursedefault = ($rawdefault === false || $rawdefault === '') ? 0.0 : (float) $rawdefault;
             if ($coursedefault > 0) {
                 return $coursedefault;
             }
         }
+
+        // 4. Site cap -- the whole installation.
         $rawsite = get_config('local_ai_course_assistant', 'spend_cap_site');
         return ($rawsite === false || $rawsite === '') ? 0.0 : (float) $rawsite;
     }

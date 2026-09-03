@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI Kurzus Asszisztens';
-$string['attachment:attach'] = 'Csatolás';
-$string['attachment:attach_image_or_pdf'] = 'Kép vagy PDF csatolása';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Az AI tutor csevegési beszélgetéseit tárolja felhasználónként és kurzusonként.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'A beszélgetés tulajdonosának azonosítója.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'A kurzus azonosítója, amelyhez a beszélgetés tartozik.';
@@ -1303,13 +1301,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Tantárgyak közötti tudásösszesítés alapértelmezetten bekapcsolva';
@@ -1800,14 +1791,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Iframe-kiszolgálók mintái';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Soronként egy reguláris kifejezés, amely egy iframe <code>src</code> attribútumára illeszkedik. Minden illeszkedő keretet olyan interaktív beágyazásnak tekint, amelyhez átiratot kell párosítani és indexelni. A <code>#</code> jellel kezdődő sorok megjegyzések.';
 $string['settings:rag_transcript_url_pattern'] = 'Átirat URL-mintája';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Az átiratokra mutató hivatkozások URL-címére illeszkedő reguláris kifejezés. Az indexelő minden felismert iframe-hez a legközelebbi illeszkedő hivatkozást választja (felette vagy alatta), és párosítja őket. Hagyja üresen az átiratpárosítás kikapcsolásához.';
-$string['settings:attachments_heading'] = 'Tanulói mellékletek';
-$string['settings:attachments_heading_desc'] = 'Lehetővé teszi a tanulóknak, hogy képet vagy PDF-et csatoljanak a csevegőüzenetekhez. A képek a multimodális szolgáltatókhoz kerülnek (OpenAI, Anthropic, Gemini, xAI); a PDF-ekből a szöveg mindig a kiszolgálón kerül kinyerésre, így bármely szolgáltató el tudja olvasni.';
-$string['settings:allow_student_attachments'] = 'Mellékletek engedélyezése';
-$string['settings:allow_student_attachments_desc'] = 'Bekapcsolva a tanulók egy gemkapocs gombot látnak a csevegés beviteli mezőjében. A fájlok a kurzus környezetében tárolódnak, és az üzenetbuborékból hivatkozás mutat rájuk.';
-$string['settings:attachment_max_size_mb'] = 'A melléklet legnagyobb mérete (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Kemény felső korlát egyetlen melléklet méretére. Futásidőben 1–25 MB közé kerül szorításra.';
-$string['settings:attachment_allowed_types'] = 'Engedélyezett MIME-típusok';
-$string['settings:attachment_allowed_types_desc'] = 'Az engedélyezett MIME-típusok vesszővel elválasztott listája. A kiszolgáló a feltöltött fájlt is ellenőrzi; a hamisított Content-Type fejlécet elutasítja.';
 $string['settings:performance_heading'] = 'Teljesítmény';
 $string['settings:performance_heading_desc'] = 'Szabályozza, mennyi kurzustartalom kerül be az MI-promptba. A kisebb érték gyorsabb válaszokat, de kevesebb környezeti információt jelent az MI számára.';
 $string['settings:max_content_per_resource'] = 'Legnagyobb tartalom forrásonként (karakter)';

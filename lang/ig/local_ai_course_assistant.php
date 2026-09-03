@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Onye Enyemaka AI Nkuzi';
-$string['attachment:attach'] = 'Ntinye';
-$string['attachment:attach_image_or_pdf'] = 'Tinye foto ma ọ bụ PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Echekwa mkparịta ụka AI nkuzi maka onye ọ bụla na kọọsị.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID nke onye nwe mkparịta ụka.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID nke kọọsị nke mkparịta ụka dị na ya.';
@@ -1281,13 +1279,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Ntinye nke ọmụma n\'agbata usoro ọmụmụ dị iche iche site na ndabara';
@@ -1785,14 +1776,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Ụkpụrụ onye nnabata iframe
 $string['settings:rag_iframe_host_patterns_desc'] = 'Otu okwu nkịtị n\'ahịrị ọ bụla, nke a na-eji dakọrịta na àgwà <code>src</code> nke iframe. A na-ewere etiti ọ bụla dakọrọ dị ka ntinye mmekọrịta nke a ga-ejikọ ederede okwu ya ma depụta ya. Ahịrị ndị na-amalite na <code>#</code> bụ nkọwa.';
 $string['settings:rag_transcript_url_pattern'] = 'Ụkpụrụ adreesị ederede okwu';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Okwu nkịtị nke dakọrọ na adreesị njikọ ederede okwu. Maka iframe ọ bụla a chọpụtara, onye nhazi ndepụta na-ahọrọ njikọ dakọrọ kacha nso (n\'elu ma ọ bụ n\'okpuru ya) ma jikọọ ha abụọ. Hapụ ya nkịtị iji mechie njikọ ederede okwu.';
-$string['settings:attachments_heading'] = 'Ihe ụmụ akwụkwọ na-etinye';
-$string['settings:attachments_heading_desc'] = 'Ọ na-enye ụmụ akwụkwọ ohere itinye foto ma ọ bụ PDF na ozi mkparịta ụka. A na-eziga foto na ndị na-enye ọtụtụ ụdị (OpenAI, Anthropic, Gemini, xAI); a na-ewepụta ederede site na PDF mgbe niile na sava, ka onye na-enye ọ bụla nwee ike ịgụ ya.';
-$string['settings:allow_student_attachments'] = 'Kwe ka etinye ihe';
-$string['settings:allow_student_attachments_desc'] = 'Mgbe agbanyere ya, ụmụ akwụkwọ na-ahụ bọtịnụ klip n\'ebe ederede mkparịta ụka. A na-echekwa faịlụ n\'ime ọnọdụ nkuzi ma na-ejikọ ha site na afụ ozi ha.';
-$string['settings:attachment_max_size_mb'] = 'Nha ihe etinyere kachasị (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Oke elu siri ike maka nha otu ihe etinyere. N\'oge ọrụ, a na-amachi ya n\'ime oke 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Ụdị MIME ekwere';
-$string['settings:attachment_allowed_types_desc'] = 'Ndepụta ụdị MIME ekwere, nke e kewara site na rịkọm. Sava na-enyokwa faịlụ ebugoro n\'onwe ya; a ga-ajụ isi Content-Type ụgha.';
 $string['settings:performance_heading'] = 'Arụmọrụ';
 $string['settings:performance_heading_desc'] = 'Ọ na-achịkwa ogo ọdịnaya nkuzi a na-etinye n\'ime ntuziaka AI. Uru dị ala pụtara azịza ngwa ngwa mana ọnọdụ nta maka AI.';
 $string['settings:max_content_per_resource'] = 'Ọdịnaya kachasị maka akụ ọ bụla (mkpụrụedemede)';

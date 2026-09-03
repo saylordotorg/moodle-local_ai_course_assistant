@@ -108,4 +108,57 @@ final class course_spend_cap_test extends \advanced_testcase {
         course_config_manager::save($course->id, ['enabled' => 1, 'model' => 'gpt-4o-mini']);
         $this->assertSame(0.0, course_config_manager::get_spend_cap($course->id));
     }
+
+    /**
+     * F40: the most specific cap that is set wins.
+     *
+     * A per-capability cap is site-wide; a per-course cap names one course. The
+     * per-capability branch used to return first, so the least specific setting
+     * beat the most specific one and an admin who capped a runaway course found
+     * the course still spending to the site-wide chat figure.
+     */
+    public function test_course_cap_beats_a_site_wide_capability_cap(): void {
+        set_config('spend_cap_chat', '500', 'local_ai_course_assistant');
+        set_config('spend_cap_site', '9999', 'local_ai_course_assistant');
+        $course = $this->getDataGenerator()->create_course();
+        course_config_manager::save($course->id, ['enabled' => 1, 'spend_cap_monthly' => '20']);
+
+        $this->assertSame(20.0, spend_guard::get_cap($course->id, 'chat'),
+            'the per-course cap is the most specific setting and must win');
+    }
+
+    /**
+     * With no per-course cap, the capability cap is the most specific thing set.
+     */
+    public function test_capability_cap_applies_when_the_course_has_none(): void {
+        set_config('spend_cap_chat', '500', 'local_ai_course_assistant');
+        set_config('spend_cap_per_course_default', '30', 'local_ai_course_assistant');
+        $course = $this->getDataGenerator()->create_course();
+
+        $this->assertSame(500.0, spend_guard::get_cap($course->id, 'chat'),
+            'a capability cap is more specific than the site-wide per-course default');
+    }
+
+    /**
+     * The full ladder, most specific first.
+     */
+    public function test_precedence_ladder(): void {
+        set_config('spend_cap_site', '1000', 'local_ai_course_assistant');
+        $course = $this->getDataGenerator()->create_course();
+
+        // 4. Only the site cap is set.
+        $this->assertSame(1000.0, spend_guard::get_cap($course->id, 'chat'));
+
+        // 3. Site-wide per-course default beats the site cap.
+        set_config('spend_cap_per_course_default', '300', 'local_ai_course_assistant');
+        $this->assertSame(300.0, spend_guard::get_cap($course->id, 'chat'));
+
+        // 2. A capability cap beats the per-course default.
+        set_config('spend_cap_chat', '200', 'local_ai_course_assistant');
+        $this->assertSame(200.0, spend_guard::get_cap($course->id, 'chat'));
+
+        // 1. An explicit per-course cap beats everything.
+        course_config_manager::save($course->id, ['enabled' => 1, 'spend_cap_monthly' => '100']);
+        $this->assertSame(100.0, spend_guard::get_cap($course->id, 'chat'));
+    }
 }

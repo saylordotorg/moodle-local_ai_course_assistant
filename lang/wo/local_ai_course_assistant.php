@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Jëkkër AI bi ci Cours bi';
-$string['attachment:attach'] = 'Boole';
-$string['attachment:attach_image_or_pdf'] = 'Boole nataal walla PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Dëkk ay wax-ak-wax yu AI jàng ak ay jëkkëram ak cours yépp.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID bi bu nekkee nit ki am wax-ak-wax bi.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID bi bu nekkee cours bi moo moom wax-ak-wax bi.';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Ycoon ëmbu ci diggante kurs yi nafter ci ñu-am';
@@ -1804,14 +1795,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Melokaanu dalukaay yu iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Benn wax bu wóor ci rëdd bu nekk, ñu koy dëppale ak jikkob <code>src</code> bu iframe. Càkkaay bu nekk bu dëppoo dañu koy jàppe ni dugal bu jokkoo bu ñu war a dëppale bindu waxinam te limal ko. Rëdd yi tàmbalee ak <code>#</code> ay wax lañu.';
 $string['settings:rag_transcript_url_pattern'] = 'Melokaanu adareesu bindu waxin';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Wax bu wóor bu dëppoo ak adarees yu jokkalekaay yu bindu waxin. Ci iframe bu nekk bu ñu gis, limukat bi dafay tànn jokkalekaay bi gën a jege bu dëppoo (ci kawam walla ci suufam) te dafay dëppale ñaari yi. Bàyyi ko neen ngir tëj dëppaleb bindu waxin.';
-$string['settings:attachments_heading'] = 'Li jàngkat yi tekki';
-$string['settings:attachments_heading_desc'] = 'Dafay may jàngkat yi ñu tekki nataal walla PDF ci bataaxal yu waxtaan. Nataal yi ñungi leen yónnee ci joxekat yu bare-anam (OpenAI, Anthropic, Gemini, xAI); mbind mi jóge ci PDF ñungi koy génne ci sarwóor bi saa su nekk, ngir joxekat bu nekk mën ko jàng.';
-$string['settings:allow_student_attachments'] = 'May li ñu tekki';
-$string['settings:allow_student_attachments_desc'] = 'Su ubbeeku, jàngkat yi dañuy gis butoŋu klip ci toolu bindu waxtaan. Dencukaay yi ñungi leen denc ci mbirum njàngale te dañuy jokkale ak buumu bataaxalam.';
-$string['settings:attachment_max_size_mb'] = 'Réyaayu li ñu tekki bi gën a réy (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Dig bu dëgër ci kaw ngir réyaayu benn li ñu tekki. Ci jamonoy jëf, dañu koy tënk ci diggante 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Xeetu MIME yu ñu may';
-$string['settings:attachment_allowed_types_desc'] = 'Limu xeetu MIME yu ñu may, xaajale ak firnde. Sarwóor bi dafay seet it dencukaay bi ñu yeb; kaw-bindu Content-Type bu nax dañu koy bañ.';
 $string['settings:performance_heading'] = 'Jëf';
 $string['settings:performance_heading_desc'] = 'Dafay yor ñaata li nekk ci njàngale lañuy dugal ci ndigalu AI. Xayma yu ndaw dañu tekki tontu yu gaaw waaye mbir mu ndaw ngir AI.';
 $string['settings:max_content_per_resource'] = 'Li nekk bi gën a réy ci buntu bu nekk (araf)';

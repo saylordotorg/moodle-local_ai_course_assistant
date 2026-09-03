@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Asistent de curs AI';
-$string['attachment:attach'] = 'Atașați';
-$string['attachment:attach_image_or_pdf'] = 'Atașați imagine sau PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Stochează conversațiile cu tutorele AI pe utilizator și curs.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID-ul utilizatorului care deține conversația.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID-ul cursului căruia îi aparține conversația.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Cumulare a competențelor dobândite în alte cursuri, activată implicit';
@@ -1761,14 +1752,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Tipare pentru gazdele iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'O expresie regulată pe linie care corespunde atributului <code>src</code> al unui cadru iframe. Fiecare cadru care corespunde este tratat ca o încorporare interactivă a cărei transcriere trebuie asociată și indexată. Liniile care încep cu <code>#</code> sunt comentarii.';
 $string['settings:rag_transcript_url_pattern'] = 'Tiparul adresei URL a transcrierii';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Expresie regulată care corespunde adreselor URL ale linkurilor către transcrieri. Indexatorul alege pentru fiecare cadru iframe detectat cel mai apropiat link corespunzător (deasupra sau dedesubt) și le asociază. Lăsați gol pentru a dezactiva asocierea transcrierilor.';
-$string['settings:attachments_heading'] = 'Atașamentele studenților';
-$string['settings:attachments_heading_desc'] = 'Permite studenților să atașeze o imagine sau un PDF la mesajele din chat. Imaginile sunt trimise furnizorilor multimodali (OpenAI, Anthropic, Gemini, xAI); din fișierele PDF textul este întotdeauna extras pe server, astfel încât orice furnizor să le poată citi.';
-$string['settings:allow_student_attachments'] = 'Permite atașamentele';
-$string['settings:allow_student_attachments_desc'] = 'Când este activat, studenții văd un buton cu agrafă în câmpul de scriere al chatului. Fișierele sunt stocate în contextul cursului și sunt legate din bula lor de mesaj.';
-$string['settings:attachment_max_size_mb'] = 'Dimensiunea maximă a atașamentului (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Limită fermă pentru dimensiunea unui singur atașament. La execuție este restrânsă la intervalul 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Tipuri MIME permise';
-$string['settings:attachment_allowed_types_desc'] = 'Listă de tipuri MIME permise, separate prin virgule. Serverul verifică și fișierul încărcat; un antet Content-Type falsificat va fi respins.';
 $string['settings:performance_heading'] = 'Performanță';
 $string['settings:performance_heading_desc'] = 'Controlează cât conținut al cursului este inclus în promptul AI. Valorile mai mici înseamnă răspunsuri mai rapide, dar mai puțin context pentru AI.';
 $string['settings:max_content_per_resource'] = 'Conținut maxim per resursă (caractere)';

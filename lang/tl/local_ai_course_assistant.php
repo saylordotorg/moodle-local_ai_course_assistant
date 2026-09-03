@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI Course Assistant';
-$string['attachment:attach'] = 'I-attach';
-$string['attachment:attach_image_or_pdf'] = 'I-attach ang larawan o PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Nag-iimbak ng mga AI tutor chat na pakikipag-usap bawat gumagamit at kurso.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Ang ID ng gumagamit na nagmamay-ari ng pakikipag-usap.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Ang ID ng kurso na kinabibilangan ng pakikipag-usap.';
@@ -1311,13 +1309,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'I-on bilang default ang cross-course mastery rollup';
@@ -1829,14 +1820,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Mga pattern ng host ng iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Isang regular expression bawat linya, itinutugma sa attribute na <code>src</code> ng isang iframe. Bawat tumutugmang frame ay itinuturing na interactive na embed na dapat pagtambalin at i-index ang transkripsyon. Ang mga linyang nagsisimula sa <code>#</code> ay mga komento.';
 $string['settings:rag_transcript_url_pattern'] = 'Pattern ng address ng transkripsyon';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Regular expression na tumutugma sa mga address ng link ng transkripsyon. Para sa bawat natukoy na iframe, pinipili ng indexer ang pinakamalapit na tumutugmang link (sa itaas o ibaba nito) at pinagtatambal ang dalawa. Iwanang blangko upang isara ang pagtatambal ng transkripsyon.';
-$string['settings:attachments_heading'] = 'Mga kalakip ng mag-aaral';
-$string['settings:attachments_heading_desc'] = 'Pinapayagan ang mga mag-aaral na maglakip ng larawan o PDF sa mga mensahe sa chat. Ipinapadala ang mga larawan sa mga multimodal na tagapagbigay (OpenAI, Anthropic, Gemini, xAI); laging kinukuha sa server ang teksto mula sa PDF upang mabasa ito ng kahit sinong tagapagbigay.';
-$string['settings:allow_student_attachments'] = 'Payagan ang mga kalakip';
-$string['settings:allow_student_attachments_desc'] = 'Kapag nakabukas, nakikita ng mga mag-aaral ang pindutang clip sa kahon ng pagsulat sa chat. Iniimbak ang mga file sa konteksto ng kurso at nililink mula sa bula ng kanilang mensahe.';
-$string['settings:attachment_max_size_mb'] = 'Pinakamalaking sukat ng kalakip (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Mahigpit na pinakamataas na hangganan para sa sukat ng isang kalakip. Sa oras ng pagtakbo, nililimitahan ito sa saklaw na 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Mga pinapayagang uri ng MIME';
-$string['settings:attachment_allowed_types_desc'] = 'Listahan ng mga pinapayagang uri ng MIME, pinaghihiwalay ng kuwit. Sinusuri rin ng server ang mismong na-upload na file; tatanggihan ang pekeng Content-Type header.';
 $string['settings:performance_heading'] = 'Pagganap';
 $string['settings:performance_heading_desc'] = 'Kinokontrol kung gaano karaming nilalaman ng kurso ang isasama sa prompt para sa AI. Ang mas mababang halaga ay nangangahulugang mas mabilis na sagot ngunit mas kaunting konteksto para sa AI.';
 $string['settings:max_content_per_resource'] = 'Pinakamaraming nilalaman bawat mapagkukunan (mga karakter)';

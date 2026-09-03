@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI-kursusassistent';
-$string['attachment:attach'] = 'Vedhæft';
-$string['attachment:attach_image_or_pdf'] = 'Vedhæft billede eller PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Gemmer AI-tutorsamtaler pr. bruger og kursus.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID\'et for den bruger, der ejer samtalen.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID\'et for det kursus, samtalen tilhører.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Beherskelsesoversigt på tværs af kurser slået til som standard';
@@ -1762,14 +1753,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Mønstre for iframe-værter';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Ét regulært udtryk pr. linje, der matcher en iframes <code>src</code>-attribut. Hver matchende iframe behandles som en interaktiv indlejring, hvis transskription skal parres og indekseres. Linjer, der begynder med <code>#</code>, er kommentarer.';
 $string['settings:rag_transcript_url_pattern'] = 'Mønster for transskriptions-URL';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Regulært udtryk, der matcher URL\'er til transskriptionslinks. Indekseringen vælger det nærmeste matchende link (over eller under) for hver fundet iframe og parrer dem. Lad feltet stå tomt for at slå parring af transskriptioner fra.';
-$string['settings:attachments_heading'] = 'Studerendes vedhæftede filer';
-$string['settings:attachments_heading_desc'] = 'Lader studerende vedhæfte et billede eller en PDF til deres chatbeskeder. Billeder sendes til multimodale udbydere (OpenAI, Anthropic, Gemini, xAI); fra PDF-filer hentes teksten altid på serveren, så alle udbydere kan læse dem.';
-$string['settings:allow_student_attachments'] = 'Tillad vedhæftede filer';
-$string['settings:allow_student_attachments_desc'] = 'Når dette er slået til, ser studerende en clips-knap i chattens skrivefelt. Filer gemmes i kursets kontekst og linkes fra deres beskedboble.';
-$string['settings:attachment_max_size_mb'] = 'Maksimal størrelse på vedhæftet fil (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Hård grænse for størrelsen på en enkelt vedhæftet fil. Begrænses ved kørsel til 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Tilladte MIME-typer';
-$string['settings:attachment_allowed_types_desc'] = 'Kommasepareret tilladelsesliste over MIME-typer. Serveren undersøger også den uploadede fil; en forfalsket Content-Type afvises.';
 $string['settings:performance_heading'] = 'Ydelse';
 $string['settings:performance_heading_desc'] = 'Styrer hvor meget kursusindhold der medtages i AI-prompten. Lavere værdier giver hurtigere svar, men mindre kontekst til AI\'en.';
 $string['settings:max_content_per_resource'] = 'Maksimalt indhold pr. ressource (tegn)';

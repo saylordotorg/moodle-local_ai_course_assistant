@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI 课程助手';
-$string['attachment:attach'] = '附加';
-$string['attachment:attach_image_or_pdf'] = '附加图片或PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = '存储每位用户和课程的 AI 辅导聊天会话。';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = '拥有该会话的用户 ID。';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = '该会话所属课程的 ID。';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = '默认开启跨课程掌握度汇总';
@@ -1795,14 +1786,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe 主机匹配模式';
 $string['settings:rag_iframe_host_patterns_desc'] = '每行一个用于匹配 iframe <code>src</code> 属性的正则表达式。每个匹配到的 iframe 都会被视为互动嵌入内容，其文字稿应被配对并索引。以 <code>#</code> 开头的行为注释。';
 $string['settings:rag_transcript_url_pattern'] = '文字稿 URL 匹配模式';
 $string['settings:rag_transcript_url_pattern_desc'] = '用于匹配文字稿链接 URL 的正则表达式。索引器会为每个检测到的 iframe 选择距离最近的匹配链接（上方或下方）并将两者配对。留空可停用文字稿配对。';
-$string['settings:attachments_heading'] = '学生附件';
-$string['settings:attachments_heading_desc'] = '允许学生在聊天消息中附加图片或 PDF。图片会发送给多模态提供方（OpenAI、Anthropic、Gemini、xAI）；PDF 始终在服务器端提取文本，以便任何提供方都能读取。';
-$string['settings:allow_student_attachments'] = '允许附件';
-$string['settings:allow_student_attachments_desc'] = '启用后，学生会在聊天输入框中看到回形针按钮。文件存储在课程上下文中，并从其消息气泡中链接。';
-$string['settings:attachment_max_size_mb'] = '附件大小上限（MB）';
-$string['settings:attachment_max_size_mb_desc'] = '单个附件大小的硬性上限。运行时会被限制在 1–25 MB 之间。';
-$string['settings:attachment_allowed_types'] = '允许的 MIME 类型';
-$string['settings:attachment_allowed_types_desc'] = '以逗号分隔的 MIME 类型白名单。服务器还会嗅探上传的文件；伪造的 Content-Type 将被拒绝。';
 $string['settings:performance_heading'] = '性能';
 $string['settings:performance_heading_desc'] = '控制注入 AI 提示词的课程内容数量。数值越低，回复越快，但 AI 获得的上下文越少。';
 $string['settings:max_content_per_resource'] = '每个资源的最大内容量（字符）';

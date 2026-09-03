@@ -751,18 +751,7 @@
 
         {{! Input area }}
         <div class="local-ai-course-assistant__input-area">
-            <div class="local-ai-course-assistant__composer-card"
-                 data-attachments-enabled="{{#attachmentsenabled}}1{{/attachmentsenabled}}"
-                 data-attachments-max-mb="{{attachmentmaxmb}}"
-                 data-attachments-allowed-mimes="{{attachmentallowedmimes}}"
-                 data-provider-supports-images="{{#providersupportsimages}}1{{/providersupportsimages}}">
-                {{! Attachment preview slot (shown above the textarea after upload). }}
-                <div class="aica-attachment-preview" hidden></div>
-                {{! Hidden input — the paperclip button triggers it. }}
-                {{#attachmentsenabled}}
-                <input type="file" class="aica-attachment-file-input" hidden
-                       accept="{{attachmentallowedmimes}}">
-                {{/attachmentsenabled}}
+            <div class="local-ai-course-assistant__composer-card">
                 <textarea class="local-ai-course-assistant__input"
                           placeholder="{{#str}}chat:placeholder, local_ai_course_assistant{{/str}}"
                           rows="1"
@@ -791,18 +780,6 @@
                         </label>
                     </div>
                     <div class="local-ai-course-assistant__composer-right">
-                        {{#attachmentsenabled}}
-                        <button class="aica-attachment-btn"
-                                title="{{#str}}attachment:attach, local_ai_course_assistant{{/str}}"
-                                aria-label="{{#str}}attachment:attach_image_or_pdf, local_ai_course_assistant{{/str}}"
-                                type="button">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" aria-hidden="true">
-                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                            </svg>
-                        </button>
-                        {{/attachmentsenabled}}
                         {{#voiceenabled}}
                         <button class="local-ai-course-assistant__btn-mic"
                                 title="{{#str}}chat:mic, local_ai_course_assistant{{/str}}"

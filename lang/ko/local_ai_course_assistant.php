@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI 코스 어시스턴트';
-$string['attachment:attach'] = '첨부';
-$string['attachment:attach_image_or_pdf'] = '이미지 또는 PDF 첨부';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AI 튜터 대화를 사용자 및 코스별로 저장합니다.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = '대화를 소유한 사용자의 ID.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = '대화가 속한 코스의 ID.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = '과정 간 숙달도 통합 기본 활성화';
@@ -1768,14 +1759,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe 호스트 패턴';
 $string['settings:rag_iframe_host_patterns_desc'] = 'iframe의 <code>src</code> 속성과 대조할 정규식을 한 줄에 하나씩 입력합니다. 일치하는 프레임은 대본을 연결해 인덱싱해야 하는 대화형 삽입으로 처리됩니다. <code>#</code>로 시작하는 줄은 주석입니다.';
 $string['settings:rag_transcript_url_pattern'] = '대본 URL 패턴';
 $string['settings:rag_transcript_url_pattern_desc'] = '대본 링크의 URL과 대조할 정규식입니다. 인덱서는 감지한 iframe마다 가장 가까운 일치 링크(위 또는 아래)를 골라 서로 연결합니다. 대본 연결을 사용하지 않으려면 비워 두십시오.';
-$string['settings:attachments_heading'] = '학습자 첨부 파일';
-$string['settings:attachments_heading_desc'] = '학습자가 채팅 메시지에 이미지나 PDF를 첨부할 수 있게 합니다. 이미지는 멀티모달 공급자(OpenAI, Anthropic, Gemini, xAI)로 전송되며, PDF의 텍스트는 항상 서버에서 추출되므로 어떤 공급자든 읽을 수 있습니다.';
-$string['settings:allow_student_attachments'] = '첨부 파일 허용';
-$string['settings:allow_student_attachments_desc'] = '켜면 학습자에게 채팅 입력창의 클립 버튼이 표시됩니다. 파일은 강좌 컨텍스트에 저장되며 해당 메시지 말풍선에서 링크로 연결됩니다.';
-$string['settings:attachment_max_size_mb'] = '첨부 파일 최대 크기(MB)';
-$string['settings:attachment_max_size_mb_desc'] = '첨부 파일 한 개의 크기에 대한 절대 상한입니다. 실행 시 1~25MB 범위로 제한됩니다.';
-$string['settings:attachment_allowed_types'] = '허용 MIME 유형';
-$string['settings:attachment_allowed_types_desc'] = '허용할 MIME 유형을 쉼표로 구분한 목록입니다. 서버는 업로드된 파일 자체도 검사하며, 위조된 Content-Type 헤더는 거부됩니다.';
 $string['settings:performance_heading'] = '성능';
 $string['settings:performance_heading_desc'] = 'AI 프롬프트에 얼마나 많은 강좌 콘텐츠를 포함할지 정합니다. 값이 작을수록 응답은 빨라지지만 AI가 참고할 맥락은 줄어듭니다.';
 $string['settings:max_content_per_resource'] = '리소스당 최대 콘텐츠(문자)';

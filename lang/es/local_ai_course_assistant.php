@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Asistente de Curso con IA';
-$string['attachment:attach'] = 'Adjuntar';
-$string['attachment:attach_image_or_pdf'] = 'Adjuntar imagen o PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Almacena las conversaciones del tutor de IA por usuario y curso.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'El ID del usuario propietario de la conversación.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'El ID del curso al que pertenece la conversación.';
@@ -1291,13 +1289,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Resumen de dominio entre cursos activado de forma predeterminada';
@@ -1787,14 +1778,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Patrones de host para iframes';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Una expresión regular por línea que coincida con el atributo <code>src</code> de un iframe. Cada iframe coincidente se trata como una incrustación interactiva cuya transcripción debe emparejarse e indexarse. Las líneas que empiezan por <code>#</code> son comentarios.';
 $string['settings:rag_transcript_url_pattern'] = 'Patrón de URL de transcripción';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Expresión regular que coincide con las URL de los enlaces a transcripciones. El indexador elige el enlace coincidente más cercano (por encima o por debajo) a cada iframe detectado y los empareja. Déjelo en blanco para desactivar el emparejamiento de transcripciones.';
-$string['settings:attachments_heading'] = 'Archivos adjuntos de los estudiantes';
-$string['settings:attachments_heading_desc'] = 'Permite a los estudiantes adjuntar una imagen o un PDF a sus mensajes de chat. Las imágenes se envían a proveedores multimodales (OpenAI, Anthropic, Gemini, xAI); de los PDF siempre se extrae el texto en el servidor para que cualquier proveedor pueda leerlos.';
-$string['settings:allow_student_attachments'] = 'Permitir archivos adjuntos';
-$string['settings:allow_student_attachments_desc'] = 'Cuando está activado, los estudiantes ven un botón de clip en el redactor del chat. Los archivos se almacenan en el contexto del curso y se enlazan desde su burbuja de mensaje.';
-$string['settings:attachment_max_size_mb'] = 'Tamaño máximo de adjunto (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Límite estricto del tamaño de cada archivo adjunto. Se ajusta a un rango de 1 a 25 MB en tiempo de ejecución.';
-$string['settings:attachment_allowed_types'] = 'Tipos MIME permitidos';
-$string['settings:attachment_allowed_types_desc'] = 'Lista de tipos MIME permitidos separados por comas. El servidor también inspecciona el archivo subido; un Content-Type falsificado será rechazado.';
 $string['settings:performance_heading'] = 'Rendimiento';
 $string['settings:performance_heading_desc'] = 'Controla la cantidad de contenido del curso incluido en el prompt de la IA. Los valores bajos aceleran las respuestas pero dan menos contexto a la IA.';
 $string['settings:max_content_per_resource'] = 'Contenido máximo por recurso (caracteres)';

@@ -38,7 +38,6 @@ use local_ai_course_assistant\rate_limiter;
 use local_ai_course_assistant\audit_logger;
 use local_ai_course_assistant\content_indexer;
 use local_ai_course_assistant\rag_retriever;
-use local_ai_course_assistant\attachment_manager;
 
 /**
  * Scrub leaked system prompt fragments, PII, and credentials from LLM
@@ -117,7 +116,6 @@ $clientprovider  = optional_param('provider', '', PARAM_ALPHA);            // Ad
 // PARAM_ALPHANUMEXT would strip; PARAM_TEXT is lossless for those and strips
 // markup, and trim() preserves the previous PARAM_RAW_TRIMMED behaviour.
 $clientmodel     = trim(optional_param('model', '', PARAM_TEXT));
-$draftitemid     = optional_param('draftitemid', 0, PARAM_INT);            // Student attachment draft itemid.
 
 // Log-only mode: record a cost/usage entry without calling the AI provider.
 if ($logonly) {
@@ -401,41 +399,6 @@ try {
         'message_length' => strlen($message),
     ]);
 
-    // Resolve and promote any student attachment that was uploaded for this
-    // message. Draft files live in the user's draft area; once we have the
-    // user-message id we move the file into the permanent per-message area
-    // so history reload can render it. PDF attachments are always text-
-    // extracted and injected into the system prompt so every provider can
-    // see them; image attachments travel as a content block to the provider.
-    $attachmentpayload = null;   // Prepared payload for the provider, if image.
-    $attachedpdftext = '';       // Extracted PDF text, if PDF.
-    $attachmentmeta = null;      // {filename, mime, url} for the SSE meta event.
-    if ($draftitemid > 0 && attachment_manager::is_enabled()) {
-        $attachedfile = attachment_manager::promote_draft_to_message(
-            $userid,
-            $draftitemid,
-            $courseid,
-            $usermsgid
-        );
-        if ($attachedfile) {
-            $mime = strtolower($attachedfile->get_mimetype() ?: '');
-            if (attachment_manager::is_mime_allowed($mime)) {
-                $url = attachment_manager::build_pluginfile_url($courseid, $usermsgid, $attachedfile);
-                $attachmentmeta = [
-                    'filename' => $attachedfile->get_filename(),
-                    'mime' => $mime,
-                    'size' => (int) $attachedfile->get_filesize(),
-                    'url' => $url,
-                ];
-                if (attachment_manager::is_pdf_mime($mime)) {
-                    $attachedpdftext = attachment_manager::extract_pdf_text($attachedfile);
-                } else if (attachment_manager::is_image_mime($mime)) {
-                    $attachmentpayload = attachment_manager::get_image_payload($attachedfile);
-                }
-            }
-        }
-    }
-
     // v5.3.0: record activity for streak tracking. Idempotent within a day.
     // Also feed stage-1 struggle classifier from the user's message — score is
     // pure-function on the text, then a single insert. No external IO.
@@ -635,27 +598,6 @@ try {
         }
     }
 
-    // Inject PDF attachment text before the conversation history. This runs
-    // on every provider (text only, provider-agnostic), so the assistant can
-    // reason about the document's contents even when the provider can't
-    // accept native PDFs.
-    if ($attachedpdftext !== '' && $attachmentmeta !== null) {
-        $maxpdfchars = 24000;
-        $pdfsnippet = mb_substr($attachedpdftext, 0, $maxpdfchars);
-        $suffix = (mb_strlen($attachedpdftext) > $maxpdfchars) ? "\n\n[Document truncated for length.]" : '';
-        // v5.5.4 security fix: scrub characters that could break prompt
-        // structure or inject pseudo-instructions when the filename is
-        // interpolated into the system prompt. PARAM_FILE upstream limits
-        // the alphabet, but this is a belt-and-suspenders pass.
-        $safefilename = preg_replace('/["\r\n\t\\\\]/u', ' ', (string) $attachmentmeta['filename']);
-        $safefilename = trim(mb_substr($safefilename, 0, 200));
-        $systemprompt .= "\n\n## Attached Document\n"
-            . "The student attached a PDF titled \"" . $safefilename . "\". "
-            . "Here is its extracted text. Reason about it directly when it is relevant to the question, "
-            . "and quote short passages when helpful.\n\n"
-            . $pdfsnippet . $suffix;
-    }
-
     // v6.2.0: history_mode-aware selection. In semantic mode this keeps only
     // recent turns relevant to the current question (plus the latest pair),
     // so stale off-topic history does not inflate cost or invite drift; in
@@ -706,17 +648,6 @@ try {
         }
     }
 
-    // If the student attached an image, confirm the effective provider can
-    // handle images before we start the stream. A friendly error is better
-    // than a silent drop or a provider-side 400.
-    if (
-        $attachmentpayload !== null
-        && !attachment_manager::provider_supports_images((string) $effectiveprovidername)
-    ) {
-        local_ai_course_assistant_sse_send(['error' => get_string('attachment:error_provider_no_images', 'local_ai_course_assistant')]);
-        die();
-    }
-
     $fullresponse = '';
 
     // Pass max_tokens from config (0 = no limit / provider default).
@@ -732,12 +663,6 @@ try {
         if ($maxtokens > 0 && $maxtokens < 8192) {
             $streamoptions['max_tokens'] = 8192;
         }
-    }
-
-    // Multimodal: image attachment travels as a content block on the last
-    // user message. Each provider adapts this to its native shape.
-    if ($attachmentpayload !== null) {
-        $streamoptions['attachment'] = $attachmentpayload;
     }
 
     // Emit source attribution metadata before streaming begins.
@@ -800,9 +725,6 @@ try {
         'citations' => $citations,
         'usermsgid' => (int) $usermsgid,
     ];
-    if ($attachmentmeta !== null) {
-        $metaevent['attachment'] = $attachmentmeta;
-    }
     local_ai_course_assistant_sse_send($metaevent);
 
     // v5.0.0 patch 3: lightweight per-turn metrics for the admin analytics
@@ -825,7 +747,7 @@ try {
     // v4.11.0+v4.12.0+v5.0.0p6: optional FULL-payload debug log. When the
     // admin flag is on, write what the model actually receives this turn:
     // assembled system prompt + per-section breakdown + conversation history
-    // array + the current user message + attachment metadata. Per Tomi UT
+    // array + the current user message. Per Tomi UT
     // round 3, the system-prompt-only dump was misleading because it did not
     // show the history that the LLM is also seeing — and conversation drift
     // (Garfield leakage etc.) is invisible without it.
@@ -856,8 +778,6 @@ try {
                     'retrievedchunks'   => $retrievedchunks,
                     'history'           => $history,
                     'message'           => $message,
-                    'attachmentmeta'    => $attachmentmeta,
-                    'pdfextractedchars' => ($attachedpdftext !== '') ? mb_strlen($attachedpdftext) : 0,
                 ])
             );
         } catch (\Throwable $e) {

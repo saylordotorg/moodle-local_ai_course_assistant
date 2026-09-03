@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Olùrànlọ́wọ́ Ẹkọ AI';
-$string['attachment:attach'] = 'So mọ́';
-$string['attachment:attach_image_or_pdf'] = 'So àwòrán tàbí PDF mọ́';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Tọjú àwọn ìjíròrò ìdánilẹ́kọ̀ọ́ AI fún olùmúlò àti ẹkọ kọ̀ọ̀kan.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID olùmúlò tó ní ìjíròrò náà.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID ẹkọ tí ìjíròrò náà jẹ́ tirẹ̀.';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Àkójọpọ̀ ìmọ̀ jíjinlẹ̀ káàkiri ẹ̀kọ́ ti ṣiṣẹ́ látinwá';
@@ -1804,14 +1795,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Àwọn àpẹẹrẹ olùgbàle
 $string['settings:rag_iframe_host_patterns_desc'] = 'Ọ̀rọ̀ àṣàyàn déédéé kan ní ìlà kọ̀ọ̀kan, tí a fi bá àbùdá <code>src</code> ti iframe mu. A kà férémù kọ̀ọ̀kan tí ó bá mu sí ìfisínú ìbáṣepọ̀ tí a gbọdọ̀ so àkọsílẹ̀ ọ̀rọ̀ rẹ̀ pọ̀ kí a tọ́jú u. Àwọn ìlà tí ó bẹ̀rẹ̀ pẹ̀lú <code>#</code> jẹ́ àlàyé.';
 $string['settings:rag_transcript_url_pattern'] = 'Àpẹẹrẹ àdírẹ́sì àkọsílẹ̀ ọ̀rọ̀';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Ọ̀rọ̀ àṣàyàn déédéé tí ó bá àdírẹ́sì àwọn ìjápọ̀ àkọsílẹ̀ ọ̀rọ̀ mu. Fún iframe kọ̀ọ̀kan tí a rí, olùtọ́jú àkọsílẹ̀ ń yan ìjápọ̀ tí ó bá mu tí ó sún mọ́ jùlọ (lókè tàbí nísàlẹ̀ rẹ̀) kí ó so àwọn méjèèjì pọ̀. Fi sílẹ̀ ní òfìfo láti pa ìsopọ̀ àkọsílẹ̀ ọ̀rọ̀.';
-$string['settings:attachments_heading'] = 'Àwọn ohun àfimọ́ akẹ́kọ̀ọ́';
-$string['settings:attachments_heading_desc'] = 'Ó ń jẹ́ kí àwọn akẹ́kọ̀ọ́ fi àwòrán tàbí PDF mọ́ àwọn ìránṣẹ́ ìjíròrò. A ń fi àwọn àwòrán ránṣẹ́ sí àwọn olùpèsè oríṣiríṣi ọ̀nà (OpenAI, Anthropic, Gemini, xAI); a ń yọ ọ̀rọ̀ láti inú PDF nígbà gbogbo lórí ẹ̀rọ ìsìn, kí olùpèsè kankan lè kà á.';
-$string['settings:allow_student_attachments'] = 'Yọ̀ǹda àwọn ohun àfimọ́';
-$string['settings:allow_student_attachments_desc'] = 'Nígbà tí a ṣí i, àwọn akẹ́kọ̀ọ́ ń rí bọ́tìnnì kíláìpì nínú pápá ìkọ̀wé ìjíròrò. A tọ́jú àwọn fáìlì nínú àyíká ìdálẹ́kọ̀ọ́ àti a ṣe ìjápọ̀ sí wọn láti inú ìdùnnù ìránṣẹ́ wọn.';
-$string['settings:attachment_max_size_mb'] = 'Ìwọ̀n ohun àfimọ́ tí ó pọ̀ jùlọ (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Ààlà òkè tí ó le fún ìwọ̀n ohun àfimọ́ kan. Nígbà ṣíṣe, a há a sínú ààlà 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Àwọn irú MIME tí a yọ̀ǹda';
-$string['settings:attachment_allowed_types_desc'] = 'Àkọsílẹ̀ àwọn irú MIME tí a yọ̀ǹda, tí a pín pẹ̀lú kọ́mà. Ẹ̀rọ ìsìn tún ń yẹ fáìlì tí a gbé sókè fúnra rẹ̀ wò; a ó kọ̀ orí Content-Type èké.';
 $string['settings:performance_heading'] = 'Ìṣiṣẹ́';
 $string['settings:performance_heading_desc'] = 'Ó ń darí ìwọ̀n àkóónú ìdálẹ́kọ̀ọ́ tí a fi sínú àṣẹ AI. Iye kékeré túmọ̀ sí ìdáhùn kíákíá ṣùgbọ́n àyíká kéré fún AI.';
 $string['settings:max_content_per_resource'] = 'Àkóónú tí ó pọ̀ jùlọ fún orísun kọ̀ọ̀kan (àmì)';

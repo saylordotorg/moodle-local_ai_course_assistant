@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI-kurssiavustaja';
-$string['attachment:attach'] = 'Liitä';
-$string['attachment:attach_image_or_pdf'] = 'Liitä kuva tai PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Tallentaa AI-tutorin keskustelut käyttäjä- ja kurssikohtaisesti.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Keskustelun omistavan käyttäjän tunniste.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Kurssin tunniste, johon keskustelu kuuluu.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Kurssien välinen osaamiskooste oletuksena käytössä';
@@ -1762,14 +1753,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Iframe-palvelinten hakumallit';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Yksi säännöllinen lauseke riviä kohden, joka vastaa iframe-kehyksen <code>src</code>-määritettä. Jokainen osuva kehys käsitellään vuorovaikutteisena upotuksena, jonka tekstivastine tulee liittää ja indeksoida. Rivit, jotka alkavat merkillä <code>#</code>, ovat kommentteja.';
 $string['settings:rag_transcript_url_pattern'] = 'Tekstivastineen URL-hakumalli';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Säännöllinen lauseke, joka vastaa tekstivastinelinkkien URL-osoitteita. Indeksoija valitsee kullekin löydetylle iframe-kehykselle lähimmän osuvan linkin (ylä- tai alapuolelta) ja liittää ne yhteen. Jätä tyhjäksi poistaaksesi tekstivastineiden liittämisen käytöstä.';
-$string['settings:attachments_heading'] = 'Opiskelijoiden liitetiedostot';
-$string['settings:attachments_heading_desc'] = 'Sallii opiskelijoiden liittää kuvan tai PDF-tiedoston chat-viesteihinsä. Kuvat lähetetään monimodaalisille palveluntarjoajille (OpenAI, Anthropic, Gemini, xAI); PDF-tiedostoista teksti poimitaan aina palvelimella, jotta kaikki palveluntarjoajat voivat lukea ne.';
-$string['settings:allow_student_attachments'] = 'Salli liitetiedostot';
-$string['settings:allow_student_attachments_desc'] = 'Kun tämä on käytössä, opiskelijat näkevät paperiliitinpainikkeen chatin kirjoituskentässä. Tiedostot tallennetaan kurssin kontekstiin ja niihin linkitetään opiskelijan viestikuplasta.';
-$string['settings:attachment_max_size_mb'] = 'Liitetiedoston enimmäiskoko (Mt)';
-$string['settings:attachment_max_size_mb_desc'] = 'Ehdoton yläraja yksittäisen liitetiedoston koolle. Rajataan suorituksen aikana välille 1–25 Mt.';
-$string['settings:attachment_allowed_types'] = 'Sallitut MIME-tyypit';
-$string['settings:attachment_allowed_types_desc'] = 'Pilkuilla erotettu sallittujen MIME-tyyppien luettelo. Palvelin tarkistaa myös ladatun tiedoston; väärennetty Content-Type hylätään.';
 $string['settings:performance_heading'] = 'Suorituskyky';
 $string['settings:performance_heading_desc'] = 'Säätelee, kuinka paljon kurssisisältöä sisällytetään tekoälyn kehotteeseen. Pienemmät arvot nopeuttavat vastauksia mutta antavat tekoälylle vähemmän asiayhteyttä.';
 $string['settings:max_content_per_resource'] = 'Sisällön enimmäismäärä aineistoa kohden (merkkiä)';

@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Gargaaraa Barnoota AI';
-$string['attachment:attach'] = 'Maxxansi';
-$string['attachment:attach_image_or_pdf'] = 'Suuraa ykn PDF maxxansi';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Haasawa barsiisaa AI kan fayyadamaa fi koorsii hunda ol kaa\'a.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID fayyadamaa haasawa qabu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID koorsii haasawni itti dhihaatu.';
@@ -1292,13 +1290,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Walitti qabama gahumsa koorsiiwwan gidduu durtiidhaan banaa';
@@ -1796,14 +1787,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Bocawwan keessummeessaa iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Sararaa tokkotti ibsa idilee tokko, amala <code>src</code> iframe waliin walsimsiisama. Kaaddirri walsimu tokkoon tokkoon isaa akka galcha walqunnamsiisaa barreeffamni sagalee isaa walitti hidhamee tarreeffamuu qabu ilaalama. Sararoonni <code>#</code>\'n jalqaban yaada dha.';
 $string['settings:rag_transcript_url_pattern'] = 'Boca teessoo barreeffama sagalee';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Ibsa idilee teessoo hidhaawwan barreeffama sagalee waliin walsimu. Iframe tokkoon tokkoon argameef, tarreessaan hidhaa walsimu dhiyoo jiru (gubbaa yookaan jala isaa) filatee lamaan walitti hidha. Walitti hidhuu barreeffama sagalee cufuuf duwwaa dhiisi.';
-$string['settings:attachments_heading'] = 'Maxxansaawwan barataa';
-$string['settings:attachments_heading_desc'] = 'Barattoonni ergaawwan haasawaa irratti suuraa yookaan PDF maxxansuu akka danda\'an hayyama. Suuraawwan gara dhiyeessitoota karaa hedduu (OpenAI, Anthropic, Gemini, xAI) ergamu; barreeffamni PDF irraa yeroo hunda sarvarii irratti baafama, kanaaf dhiyeessaan kamiyyuu dubbisuu danda\'a.';
-$string['settings:allow_student_attachments'] = 'Maxxansaawwan hayyami';
-$string['settings:allow_student_attachments_desc'] = 'Yeroo banaa ta\'u, barattoonni bakka barreeffama haasawaa keessatti qabduu kiliipii argan. Faayilonni haala qabiyyee koorsii keessatti kuufamu, hidhaanis buqqee ergaa isaanii irraa kennama.';
-$string['settings:attachment_max_size_mb'] = 'Guddina maxxansaa ol\'aanaa (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Daangaa gubbaa cimaa guddina maxxansaa tokkoof. Yeroo hojii keessatti hanga 1–25 MB gidduutti daangeffama.';
-$string['settings:attachment_allowed_types'] = 'Gosoota MIME hayyamaman';
-$string['settings:attachment_allowed_types_desc'] = 'Tarreeffama gosoota MIME hayyamaman, qoodduudhaan adda baafame. Sarvariin faayilii olkaa\'ame mataa isaas ilaala; mataduree Content-Type sobaa ni didama.';
 $string['settings:performance_heading'] = 'Raawwii';
 $string['settings:performance_heading_desc'] = 'Hangam qabiyyeen koorsii gaaffii AI keessatti akka galu to\'ata. Gatiiwwan gadi aanaan deebii saffisaa jechuu dha garuu haala qabiyyee AI\'f xiqqoo ta\'a.';
 $string['settings:max_content_per_resource'] = 'Qabiyyee ol\'aanaa madda tokkoof (arfiiwwan)';

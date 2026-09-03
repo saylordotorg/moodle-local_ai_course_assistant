@@ -335,4 +335,86 @@ final class transcript_report_test extends \advanced_testcase {
         $this->assertSame(['i got it'], array_column($metrows, 'message'),
             'outcome=1 must return only the met message');
     }
+
+    /**
+     * Insert an objective and return its id.
+     *
+     * @param string $code
+     * @return int
+     */
+    private function objective(string $code): int {
+        global $DB;
+        return (int) $DB->insert_record('local_ai_course_assistant_objs', (object) [
+            'courseid' => (int) $this->course->id,
+            'sortorder' => 0,
+            'code' => $code,
+            'title' => 'Objective ' . $code,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+    }
+
+    /**
+     * The outcomes column must describe the same slice as the rest of the row.
+     *
+     * It used to filter on conversationid alone, so the messages count honoured
+     * the date range while the objectives beside it did not: a report scoped to
+     * one week listed objectives touched months earlier. On an export written to
+     * the audit log, that is the report claiming a scope it did not apply.
+     */
+    public function test_summary_outcomes_respect_the_date_filter(): void {
+        $salt = transcript_report::new_salt();
+        $now = time();
+        $old = $now - (86400 * 60);
+
+        $objold = $this->objective('OLD-1');
+        $objnew = $this->objective('NEW-1');
+
+        $oldmsg = $this->msg((int) $this->alice->id, 'user', 'months ago', $old, null, 55);
+        $newmsg = $this->msg((int) $this->alice->id, 'user', 'this week', $now, null, 55);
+        $this->outcome($oldmsg, 1, $objold);
+        $this->outcome($newmsg, 1, $objnew);
+
+        $recent = transcript_report::summaries(
+            ['courseid' => (int) $this->course->id, 'from' => $now - 86400], $salt);
+
+        $this->assertCount(1, $recent, 'only the in-range message should form a row');
+        $row = reset($recent);
+        $this->assertSame(1, $row['messages'], 'the count must exclude the out-of-range message');
+        $this->assertStringContainsString('NEW-1', $row['outcomes']);
+        $this->assertStringNotContainsString('OLD-1', $row['outcomes'],
+            'an objective from outside the date range must not appear in the outcomes column');
+    }
+
+    /**
+     * Every objective in a conversation must survive, not just one.
+     *
+     * The batched lookup returns one row per (conversation, code) pair, so
+     * keying it with get_records_sql would collapse each conversation to a
+     * single objective -- the same silent collapse that once broke
+     * get_session_stats().
+     */
+    public function test_summary_outcomes_keep_every_objective(): void {
+        $salt = transcript_report::new_salt();
+        $now = time();
+
+        $a = $this->objective('AAA');
+        $b = $this->objective('BBB');
+        $c = $this->objective('CCC');
+
+        $m1 = $this->msg((int) $this->alice->id, 'user', 'one', $now, null, 66);
+        $m2 = $this->msg((int) $this->alice->id, 'user', 'two', $now + 1, null, 66);
+        $this->outcome($m1, 1, $a);
+        $this->outcome($m1, 1, $b);
+        $this->outcome($m2, 1, $c);
+
+        $rows = transcript_report::summaries(['courseid' => (int) $this->course->id], $salt);
+        $this->assertCount(1, $rows);
+        $row = reset($rows);
+
+        foreach (['AAA', 'BBB', 'CCC'] as $code) {
+            $this->assertStringContainsString($code, $row['outcomes'],
+                "objective $code was dropped from the outcomes column");
+        }
+    }
 }

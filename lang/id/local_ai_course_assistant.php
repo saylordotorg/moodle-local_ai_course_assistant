@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Asisten Kursus AI';
-$string['attachment:attach'] = 'Lampirkan';
-$string['attachment:attach_image_or_pdf'] = 'Lampirkan gambar atau PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Menyimpan percakapan chat tutor AI per pengguna dan kursus.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID pengguna pemilik percakapan.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID kursus yang memiliki percakapan ini.';
@@ -1319,13 +1317,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Rangkuman penguasaan lintas kursus aktif secara default';
@@ -1816,14 +1807,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Pola host iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Satu ekspresi reguler per baris yang dicocokkan dengan atribut <code>src</code> sebuah iframe. Setiap bingkai yang cocok diperlakukan sebagai sematan interaktif yang transkripnya perlu dipasangkan dan diindeks. Baris yang diawali <code>#</code> adalah komentar.';
 $string['settings:rag_transcript_url_pattern'] = 'Pola alamat transkrip';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Ekspresi reguler yang dicocokkan dengan alamat tautan transkrip. Untuk setiap iframe yang terdeteksi, pengindeks memilih tautan cocok terdekat (di atas atau di bawahnya) lalu memasangkannya. Kosongkan untuk menonaktifkan pemasangan transkrip.';
-$string['settings:attachments_heading'] = 'Lampiran pelajar';
-$string['settings:attachments_heading_desc'] = 'Memungkinkan pelajar melampirkan gambar atau PDF pada pesan obrolan. Gambar dikirim ke penyedia multimodal (OpenAI, Anthropic, Gemini, xAI); teks dari PDF selalu diekstrak di peladen sehingga penyedia mana pun dapat membacanya.';
-$string['settings:allow_student_attachments'] = 'Izinkan lampiran';
-$string['settings:allow_student_attachments_desc'] = 'Jika aktif, pelajar melihat tombol penjepit kertas di kolom tulis obrolan. Berkas disimpan dalam konteks kursus dan ditautkan dari gelembung pesannya.';
-$string['settings:attachment_max_size_mb'] = 'Ukuran lampiran maksimum (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Batas atas tegas untuk ukuran satu lampiran. Saat berjalan dibatasi pada rentang 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Jenis MIME yang diizinkan';
-$string['settings:attachment_allowed_types_desc'] = 'Daftar jenis MIME yang diizinkan, dipisahkan koma. Peladen juga memeriksa berkas unggahan itu sendiri; tajuk Content-Type palsu akan ditolak.';
 $string['settings:performance_heading'] = 'Kinerja';
 $string['settings:performance_heading_desc'] = 'Mengatur seberapa banyak konten kursus yang disertakan dalam prompt AI. Nilai yang lebih kecil berarti jawaban lebih cepat tetapi konteks bagi AI lebih sedikit.';
 $string['settings:max_content_per_resource'] = 'Konten maksimum per sumber daya (karakter)';

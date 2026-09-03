@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Assistant de cours IA';
-$string['attachment:attach'] = 'Joindre';
-$string['attachment:attach_image_or_pdf'] = 'Joindre une image ou un PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Stocke les conversations du tuteur IA par utilisateur et par cours.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'L\'identifiant de l\'utilisateur propriétaire de la conversation.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'L\'identifiant du cours auquel appartient la conversation.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Activer par défaut le récapitulatif de maîtrise inter-cours';
@@ -1760,14 +1751,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Motifs d\'hôtes d\'iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Une expression régulière par ligne correspondant à l\'attribut <code>src</code> d\'une iframe. Chaque iframe correspondante est traitée comme une intégration interactive dont la transcription doit être associée et indexée. Les lignes commençant par <code>#</code> sont des commentaires.';
 $string['settings:rag_transcript_url_pattern'] = 'Motif d\'URL de transcription';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Expression régulière correspondant aux URL des liens de transcription. L\'indexeur choisit le lien correspondant le plus proche (au-dessus ou au-dessous) de chaque iframe détectée et les associe. Laissez vide pour désactiver l\'association des transcriptions.';
-$string['settings:attachments_heading'] = 'Pièces jointes des étudiants';
-$string['settings:attachments_heading_desc'] = 'Permet aux étudiants de joindre une image ou un PDF à leurs messages de chat. Les images sont envoyées aux fournisseurs multimodaux (OpenAI, Anthropic, Gemini, xAI) ; le texte des PDF est toujours extrait sur le serveur afin que tous les fournisseurs puissent les lire.';
-$string['settings:allow_student_attachments'] = 'Autoriser les pièces jointes';
-$string['settings:allow_student_attachments_desc'] = 'Lorsque cette option est activée, les étudiants voient un bouton trombone dans la zone de rédaction du chat. Les fichiers sont stockés dans le contexte du cours et liés depuis leur bulle de message.';
-$string['settings:attachment_max_size_mb'] = 'Taille maximale d\'une pièce jointe (Mo)';
-$string['settings:attachment_max_size_mb_desc'] = 'Limite stricte de la taille de chaque pièce jointe. Ramenée à une plage de 1 à 25 Mo à l\'exécution.';
-$string['settings:attachment_allowed_types'] = 'Types MIME autorisés';
-$string['settings:attachment_allowed_types_desc'] = 'Liste blanche de types MIME séparés par des virgules. Le serveur inspecte également le fichier déposé ; un Content-Type falsifié sera rejeté.';
 $string['settings:performance_heading'] = 'Performances';
 $string['settings:performance_heading_desc'] = 'Contrôle la quantité de contenu de cours incluse dans le prompt de l\'IA. Des valeurs plus basses accélèrent les réponses mais donnent moins de contexte à l\'IA.';
 $string['settings:max_content_per_resource'] = 'Contenu maximal par ressource (caractères)';

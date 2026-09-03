@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'ผู้ช่วยรายวิชา AI';
-$string['attachment:attach'] = 'แนบไฟล์';
-$string['attachment:attach_image_or_pdf'] = 'แนบรูปภาพหรือ PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'จัดเก็บการสนทนากับผู้สอน AI ตามผู้ใช้และรายวิชา';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'รหัสผู้ใช้ที่เป็นเจ้าของการสนทนา';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'รหัสรายวิชาที่การสนทนาสังกัดอยู่';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'เปิดใช้การรวมความเชี่ยวชาญข้ามรายวิชาเป็นค่าเริ่มต้น';
@@ -1775,14 +1766,6 @@ $string['settings:rag_iframe_host_patterns'] = 'รูปแบบโฮสต�
 $string['settings:rag_iframe_host_patterns_desc'] = 'นิพจน์ปกติบรรทัดละหนึ่งรายการ ซึ่งจับคู่กับแอตทริบิวต์ <code>src</code> ของ iframe เฟรมที่ตรงกันจะถือเป็นการฝังเชิงโต้ตอบที่ต้องจับคู่และจัดทำดัชนีบทถอดความ บรรทัดที่ขึ้นต้นด้วย <code>#</code> เป็นหมายเหตุ';
 $string['settings:rag_transcript_url_pattern'] = 'รูปแบบที่อยู่ของบทถอดความ';
 $string['settings:rag_transcript_url_pattern_desc'] = 'นิพจน์ปกติที่จับคู่กับที่อยู่ของลิงก์บทถอดความ สำหรับ iframe แต่ละรายการที่ตรวจพบ ตัวจัดทำดัชนีจะเลือกลิงก์ที่ตรงกันซึ่งอยู่ใกล้ที่สุด (ด้านบนหรือด้านล่าง) แล้วจับคู่เข้าด้วยกัน เว้นว่างไว้เพื่อปิดการจับคู่บทถอดความ';
-$string['settings:attachments_heading'] = 'ไฟล์แนบของผู้เรียน';
-$string['settings:attachments_heading_desc'] = 'อนุญาตให้ผู้เรียนแนบรูปภาพหรือไฟล์ PDF ไปกับข้อความแชท รูปภาพจะถูกส่งไปยังผู้ให้บริการแบบหลายรูปแบบ (OpenAI, Anthropic, Gemini, xAI) ส่วนข้อความในไฟล์ PDF จะถูกดึงบนเซิร์ฟเวอร์เสมอ เพื่อให้ผู้ให้บริการรายใดก็อ่านได้';
-$string['settings:allow_student_attachments'] = 'อนุญาตไฟล์แนบ';
-$string['settings:allow_student_attachments_desc'] = 'เมื่อเปิดใช้งาน ผู้เรียนจะเห็นปุ่มคลิปหนีบกระดาษในช่องพิมพ์ข้อความ ไฟล์จะถูกเก็บไว้ในบริบทของรายวิชาและมีลิงก์จากกล่องข้อความนั้น';
-$string['settings:attachment_max_size_mb'] = 'ขนาดไฟล์แนบสูงสุด (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'ขีดจำกัดสูงสุดแบบตายตัวของขนาดไฟล์แนบหนึ่งไฟล์ ขณะทำงานจะถูกจำกัดอยู่ในช่วง 1–25 MB';
-$string['settings:attachment_allowed_types'] = 'ชนิด MIME ที่อนุญาต';
-$string['settings:attachment_allowed_types_desc'] = 'รายการชนิด MIME ที่อนุญาต คั่นด้วยจุลภาค เซิร์ฟเวอร์จะตรวจสอบตัวไฟล์ที่อัปโหลดด้วย ส่วนหัว Content-Type ที่ปลอมแปลงจะถูกปฏิเสธ';
 $string['settings:performance_heading'] = 'ประสิทธิภาพ';
 $string['settings:performance_heading_desc'] = 'ควบคุมปริมาณเนื้อหารายวิชาที่จะรวมไว้ในพรอมต์ที่ส่งให้ AI ค่าที่น้อยลงหมายถึงตอบเร็วขึ้นแต่ AI มีบริบทน้อยลง';
 $string['settings:max_content_per_resource'] = 'เนื้อหาสูงสุดต่อแหล่งข้อมูล (อักขระ)';

@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AIコースアシスタント';
-$string['attachment:attach'] = '添付';
-$string['attachment:attach_image_or_pdf'] = '画像またはPDFを添付';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AIチューターの会話をユーザーおよびコースごとに保存します。';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = '会話を所有するユーザーのID。';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = '会話が属するコースのID。';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'コース横断の習得状況の集約をデフォルトで有効にする';
@@ -1766,14 +1757,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe ホストのパターン'
 $string['settings:rag_iframe_host_patterns_desc'] = 'iframe の <code>src</code> 属性に一致する正規表現を1行につき1つ指定します。一致した iframe は、書き起こしを対応付けてインデックスすべきインタラクティブな埋め込みとして扱われます。<code>#</code> で始まる行はコメントです。';
 $string['settings:rag_transcript_url_pattern'] = '書き起こし URL のパターン';
 $string['settings:rag_transcript_url_pattern_desc'] = '書き起こしリンクの URL に一致する正規表現です。インデクサは検出した各 iframe に最も近い一致リンク（上または下）を選び、両者を対応付けます。空欄にすると書き起こしの対応付けを無効にします。';
-$string['settings:attachments_heading'] = '学習者の添付ファイル';
-$string['settings:attachments_heading_desc'] = '学習者がチャットメッセージに画像または PDF を添付できるようにします。画像はマルチモーダル対応のプロバイダ（OpenAI、Anthropic、Gemini、xAI）に送信されます。PDF はどのプロバイダでも読めるよう、常にサーバ側でテキストを抽出します。';
-$string['settings:allow_student_attachments'] = '添付ファイルを許可する';
-$string['settings:allow_student_attachments_desc'] = '有効にすると、学習者のチャット入力欄にクリップのボタンが表示されます。ファイルはコースのコンテキストに保存され、メッセージの吹き出しからリンクされます。';
-$string['settings:attachment_max_size_mb'] = '添付ファイルの最大サイズ（MB）';
-$string['settings:attachment_max_size_mb_desc'] = '個々の添付ファイルサイズの上限です。実行時に 1〜25 MB の範囲に収められます。';
-$string['settings:attachment_allowed_types'] = '許可する MIME タイプ';
-$string['settings:attachment_allowed_types_desc'] = 'カンマ区切りの MIME タイプ許可リストです。サーバはアップロードされたファイル自体も検査するため、偽装された Content-Type は拒否されます。';
 $string['settings:performance_heading'] = 'パフォーマンス';
 $string['settings:performance_heading_desc'] = 'AI のプロンプトに含めるコースコンテンツの量を制御します。値を小さくすると応答は速くなりますが、AI が利用できる文脈は少なくなります。';
 $string['settings:max_content_per_resource'] = 'リソースあたりの最大コンテンツ量（文字数）';

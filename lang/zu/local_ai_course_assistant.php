@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Umsizi Wesifundo AI';
-$string['attachment:attach'] = 'Faka';
-$string['attachment:attach_image_or_pdf'] = 'Faka isithombe noma i-PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Igcina izingxoxo zomfundisi we-AI ngomuntu ngamunye nezifundo.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'I-ID yomsebenzisi owengamele ingxoxo.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'I-ID yesifundo elingxoxo lize kulo.';
@@ -1311,13 +1309,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Ukuhlanganisa ukukhona kuyo yonke izifundo kuvuliwe ngokuzenzakalelayo';
@@ -1828,14 +1819,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Amaphethini wababungazi be-ifram
 $string['settings:rag_iframe_host_patterns_desc'] = 'Inkulumo evamile eyodwa kulayini ngamunye, efaniswa nesici <code>src</code> se-iframe. Uhlaka ngalunye oluhambisanayo lubhekwa njengokufakwa okusebenzisanayo okumele ibhalwa lakho lihlanganiswe lihlelwe. Imigqa eqala ngo-<code>#</code> imibhalo yokuchaza.';
 $string['settings:rag_transcript_url_pattern'] = 'Iphethini lekheli lebhalwa';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Inkulumo evamile ehambisana namakheli wezixhumanisi zamabhalwa. Ku-iframe ngayinye etholiwe, isihleli sohlu sikhetha isixhumanisi esihambisanayo esiseduze kakhulu (ngenhla noma ngaphansi kwayo) bese sihlanganisa zombili. Shiya kungenalutho ukuvala ukuhlanganisa amabhalwa.';
-$string['settings:attachments_heading'] = 'Okunanyathiselwe kwabafundi';
-$string['settings:attachments_heading_desc'] = 'Ivumela abafundi ukunamathisela isithombe noma i-PDF kumiyalezo yokuxoxa. Izithombe zithunyelwa kubahlinzeki bezindlela eziningi (OpenAI, Anthropic, Gemini, xAI); umbhalo ovela kuma-PDF ukhishwa njalo eseveni, ukuze umhlinzeki noma yimuphi akwazi ukuwufunda.';
-$string['settings:allow_student_attachments'] = 'Vumela okunanyathiselwe';
-$string['settings:allow_student_attachments_desc'] = 'Uma kuvulwe, abafundi babona inkinobho yekliphu esikhaleni sokubhala kwengxoxo. Amafayela agcinwa kumongo wesifundo futhi axhunywe kusuka kubhamuza lomyalezo wabo.';
-$string['settings:attachment_max_size_mb'] = 'Usayizi omkhulu wokunanyathiselwe (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Umkhawulo ophezulu oqinile wosayizi wokunanyathiselwe okukodwa. Ngesikhathi sokusebenza kuncishiswa kubanga le-1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Izinhlobo ze-MIME ezivumelekile';
-$string['settings:attachment_allowed_types_desc'] = 'Uhlu lwezinhlobo ze-MIME ezivumelekile, ezihlukanisiwe ngokhefana. Iseva ihlola nefayela elilayishiwe uqobo; isihloko esimbumbulu se-Content-Type sizokwenqatshwa.';
 $string['settings:performance_heading'] = 'Ukusebenza';
 $string['settings:performance_heading_desc'] = 'Ilawula ubungako bokuqukethwe kwesifundo okufakwa esiqalisweni se-AI. Amanani aphansi asho izimpendulo ezisheshayo kodwa umongo omncane we-AI.';
 $string['settings:max_content_per_resource'] = 'Okuqukethwe okukhulu ngokwensiza ngayinye (izinhlamvu)';

@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI асистент за курсове';
-$string['attachment:attach'] = 'Прикачи';
-$string['attachment:attach_image_or_pdf'] = 'Прикачи изображение или PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Съхранява разговорите с AI тутора по потребител и курс.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Идентификаторът на потребителя, притежаващ разговора.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Идентификаторът на курса, към който принадлежи разговорът.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Обобщаване на овладяното между курсове, включено по подразбиране';
@@ -1762,14 +1753,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Шаблони за хостов
 $string['settings:rag_iframe_host_patterns_desc'] = 'По един регулярен израз на ред, съответстващ на атрибута <code>src</code> на iframe. Всяка съвпадаща рамка се третира като интерактивно вграждане, за което трябва да се съпостави и индексира транскрипция. Редовете, започващи с <code>#</code>, са коментари.';
 $string['settings:rag_transcript_url_pattern'] = 'Шаблон за адрес на транскрипция';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Регулярен израз, съответстващ на адресите на връзките към транскрипции. За всеки открит iframe индексаторът избира най-близката съвпадаща връзка (над или под него) и ги съпоставя. Оставете празно, за да изключите съпоставянето на транскрипции.';
-$string['settings:attachments_heading'] = 'Прикачени файлове от учащите';
-$string['settings:attachments_heading_desc'] = 'Позволява на учащите да прикачват изображение или PDF към съобщенията в чата. Изображенията се изпращат към мултимодалните доставчици (OpenAI, Anthropic, Gemini, xAI); текстът от PDF файловете винаги се извлича на сървъра, за да може всеки доставчик да ги прочете.';
-$string['settings:allow_student_attachments'] = 'Разрешаване на прикачени файлове';
-$string['settings:allow_student_attachments_desc'] = 'Когато е включено, учащите виждат бутон с кламер в полето за писане в чата. Файловете се съхраняват в контекста на курса и към тях води връзка от мехурчето на съответното съобщение.';
-$string['settings:attachment_max_size_mb'] = 'Максимален размер на прикачен файл (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Твърда горна граница за размера на един прикачен файл. По време на изпълнение се ограничава в диапазона 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Разрешени типове MIME';
-$string['settings:attachment_allowed_types_desc'] = 'Списък от разрешени типове MIME, разделени със запетая. Сървърът проверява и самия качен файл; фалшифицирана заглавка Content-Type се отхвърля.';
 $string['settings:performance_heading'] = 'Производителност';
 $string['settings:performance_heading_desc'] = 'Определя колко съдържание на курса се включва в подсказката към ИИ. По-ниските стойности означават по-бързи отговори, но по-малко контекст за ИИ.';
 $string['settings:max_content_per_resource'] = 'Максимално съдържание на ресурс (знаци)';

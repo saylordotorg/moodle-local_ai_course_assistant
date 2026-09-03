@@ -869,13 +869,6 @@ class hook_callbacks {
                 ['courseid' => $courseid]
             ))->out(false),
             'workedexamplesenabled' => \local_ai_course_assistant\feature_flags::resolve('worked_examples', $courseid),
-            'attachmentsenabled' => \local_ai_course_assistant\attachment_manager::is_enabled(),
-            'attachmentmaxmb'    => (int) ceil(\local_ai_course_assistant\attachment_manager::get_max_size_bytes() / (1024 * 1024)),
-            'attachmentallowedmimes' => implode(',', \local_ai_course_assistant\attachment_manager::get_allowed_mimes()),
-            'providersupportsimages' => \local_ai_course_assistant\attachment_manager::provider_supports_images(
-                (string) (\local_ai_course_assistant\course_config_manager::get_effective_config($courseid)['provider']
-                    ?? get_config('local_ai_course_assistant', 'provider'))
-            ),
             'consentgiven'       => (bool) get_user_preferences('aica_sola_consent_given', 0),
             'privacynoticeurl'   => (new \moodle_url('/local/ai_course_assistant/privacy.php'))->out(false),
             // Pre-substituted consent banner strings. Mustache cannot pass an
@@ -1163,8 +1156,6 @@ class hook_callbacks {
             // Next-best-action panel (chat.js).
             'next_best_action:empty_state',
             'next_best_action:header',
-            // Attachments (chat.js).
-            'attachment:error_provider_no_images',
             // Dynamic: keys assembled at runtime, so the static build check
             // cannot see them. active_learners picks course vs global copy from
             // the server's reported scope; learner_digest picks its confirmation

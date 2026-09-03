@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI Ders Asistanı';
-$string['attachment:attach'] = 'Ekle';
-$string['attachment:attach_image_or_pdf'] = 'Resim veya PDF ekle';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'AI eğitmen konuşmalarını kullanıcı ve ders bazında saklar.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Konuşmanın sahibi olan kullanıcının kimliği.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Konuşmanın ait olduğu dersin kimliği.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Kurslar arası yetkinlik birleştirme varsayılan olarak açık';
@@ -1775,14 +1766,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe sunucu kalıpları';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Her satırda bir düzenli ifade; iframe\'in <code>src</code> özniteliğiyle eşleştirilir. Eşleşen her çerçeve, deşifre metniyle eşlenip dizinlenmesi gereken etkileşimli bir gömme olarak değerlendirilir. <code>#</code> ile başlayan satırlar açıklamadır.';
 $string['settings:rag_transcript_url_pattern'] = 'Deşifre metni adresi kalıbı';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Deşifre metni bağlantılarının adresleriyle eşleşen düzenli ifade. Dizinleyici, algıladığı her iframe için en yakın eşleşen bağlantıyı (üstünde ya da altında) seçer ve ikisini eşler. Deşifre metni eşlemesini kapatmak için boş bırakın.';
-$string['settings:attachments_heading'] = 'Öğrenci ekleri';
-$string['settings:attachments_heading_desc'] = 'Öğrencilerin sohbet mesajlarına bir görsel veya PDF eklemesine izin verir. Görseller çok kipli sağlayıcılara gönderilir (OpenAI, Anthropic, Gemini, xAI); PDF\'lerdeki metin her zaman sunucuda çıkarılır; böylece her sağlayıcı bunları okuyabilir.';
-$string['settings:allow_student_attachments'] = 'Eklere izin ver';
-$string['settings:allow_student_attachments_desc'] = 'Açıkken öğrenciler sohbet yazma alanında bir ataç düğmesi görür. Dosyalar ders bağlamında saklanır ve ilgili mesaj balonundan bağlantı verilir.';
-$string['settings:attachment_max_size_mb'] = 'En büyük ek boyutu (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Tek bir ekin boyutu için kesin üst sınır. Çalışma sırasında 1–25 MB aralığına sıkıştırılır.';
-$string['settings:attachment_allowed_types'] = 'İzin verilen MIME türleri';
-$string['settings:attachment_allowed_types_desc'] = 'İzin verilen MIME türlerinin virgülle ayrılmış listesi. Sunucu yüklenen dosyanın kendisini de denetler; sahte bir Content-Type başlığı reddedilir.';
 $string['settings:performance_heading'] = 'Başarım';
 $string['settings:performance_heading_desc'] = 'Yapay zekâ istemine ne kadar ders içeriğinin ekleneceğini belirler. Düşük değerler daha hızlı yanıt, ancak yapay zekâ için daha az bağlam demektir.';
 $string['settings:max_content_per_resource'] = 'Kaynak başına en fazla içerik (karakter)';

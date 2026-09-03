@@ -75,58 +75,6 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
         return true;
     }
 
-    if ($filearea === \local_ai_course_assistant\attachment_manager::FILEAREA) {
-        // Student message attachments live under the course context. Access
-        // rules: the owner of the message can always view their own upload;
-        // course managers (capability manage) can view any message in the
-        // course to support troubleshooting.
-        if ($context->contextlevel !== CONTEXT_COURSE) {
-            return false;
-        }
-        if (empty($USER->id)) {
-            send_file_not_found();
-        }
-        require_login(null, false);
-
-        $itemid = (int) array_shift($args);
-        $filename = array_pop($args);
-        $filepath = '/' . (implode('/', $args) ?: '');
-        if (!str_ends_with($filepath, '/')) {
-            $filepath .= '/';
-        }
-
-        $msg = $DB->get_record(
-            'local_ai_course_assistant_msgs',
-            ['id' => $itemid],
-            'id, userid, courseid',
-            IGNORE_MISSING
-        );
-        if (!$msg || (int) $msg->courseid !== (int) $context->instanceid) {
-            send_file_not_found();
-        }
-
-        $isowner = ((int) $msg->userid === (int) $USER->id);
-        $canmanage = has_capability('local/ai_course_assistant:manage', $context);
-        if (!$isowner && !$canmanage) {
-            send_file_not_found();
-        }
-
-        $fs = get_file_storage();
-        $file = $fs->get_file(
-            $context->id,
-            \local_ai_course_assistant\attachment_manager::COMPONENT,
-            \local_ai_course_assistant\attachment_manager::FILEAREA,
-            $itemid,
-            $filepath,
-            $filename
-        );
-        if (!$file || $file->is_directory()) {
-            send_file_not_found();
-        }
-        send_stored_file($file, HOURSECS, 0, $forcedownload, $options);
-        return true;
-    }
-
     return false;
 }
 

@@ -22,7 +22,6 @@ use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_value;
 use local_ai_course_assistant\conversation_manager;
-use local_ai_course_assistant\attachment_manager;
 
 /**
  * Get conversation history for a course.
@@ -69,28 +68,7 @@ class get_history extends external_api {
                 'role' => $msg->role,
                 'message' => $text,
                 'timecreated' => (int) $msg->timecreated,
-                'attachment' => [
-                    'filename' => '',
-                    'mime' => '',
-                    'size' => 0,
-                    'url' => '',
-                ],
             ];
-            if ($msg->role === 'user') {
-                $file = attachment_manager::get_for_message((int) $params['courseid'], (int) $msg->id);
-                if ($file) {
-                    $entry['attachment'] = [
-                        'filename' => $file->get_filename(),
-                        'mime' => (string) ($file->get_mimetype() ?: ''),
-                        'size' => (int) $file->get_filesize(),
-                        'url' => attachment_manager::build_pluginfile_url(
-                            (int) $params['courseid'],
-                            (int) $msg->id,
-                            $file
-                        ),
-                    ];
-                }
-            }
             $result[] = $entry;
         }
 
@@ -105,12 +83,6 @@ class get_history extends external_api {
                     'role' => new external_value(PARAM_ALPHA, 'Message role'),
                     'message' => new external_value(PARAM_RAW, 'Message content'),
                     'timecreated' => new external_value(PARAM_INT, 'Timestamp'),
-                    'attachment' => new external_single_structure([
-                        'filename' => new external_value(PARAM_RAW, 'Attachment filename or empty'),
-                        'mime' => new external_value(PARAM_RAW, 'Attachment MIME type or empty'),
-                        'size' => new external_value(PARAM_INT, 'Attachment size in bytes'),
-                        'url' => new external_value(PARAM_URL, 'Pluginfile URL or empty'),
-                    ]),
                 ])
             ),
         ]);

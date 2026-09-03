@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI पाठ्यक्रम सहायक';
-$string['attachment:attach'] = 'संलग्न गर्नुहोस्';
-$string['attachment:attach_image_or_pdf'] = 'छवि वा PDF संलग्न गर्नुहोस्';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'प्रत्येक प्रयोगकर्ता र पाठ्यक्रमका लागि AI ट्युटर च्याट वार्तालापहरू भण्डारण गर्छ।';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'वार्तालापको स्वामी प्रयोगकर्ताको ID।';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'वार्तालाप सम्बन्धित पाठ्यक्रमको ID।';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'पूर्वनिर्धारित रूपमा अन्तर-पाठ्यक्रम दक्षता रोलअप सक्रिय';
@@ -1798,14 +1789,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe होस्टका ढ
 $string['settings:rag_iframe_host_patterns_desc'] = 'प्रति लाइन एउटा नियमित अभिव्यक्ति, जुन iframe को <code>src</code> विशेषतासँग मिलाइन्छ। मिल्ने प्रत्येक फ्रेमलाई अन्तर्क्रियात्मक सम्मिलन मानिन्छ जसको प्रतिलिपि जोडेर अनुक्रमणिका गर्नुपर्छ। <code>#</code> बाट सुरु हुने लाइनहरू टिप्पणी हुन्।';
 $string['settings:rag_transcript_url_pattern'] = 'प्रतिलिपिको ठेगानाको ढाँचा';
 $string['settings:rag_transcript_url_pattern_desc'] = 'प्रतिलिपि लिङ्कका ठेगानासँग मिल्ने नियमित अभिव्यक्ति। पत्ता लागेको प्रत्येक iframe का लागि अनुक्रमणिकाकर्ताले सबैभन्दा नजिकको मिल्ने लिङ्क (माथि वा तल) छानेर दुवैलाई जोड्छ। प्रतिलिपि जोड्ने काम निष्क्रिय पार्न खाली छोड्नुहोस्।';
-$string['settings:attachments_heading'] = 'सिकारुका संलग्न फाइल';
-$string['settings:attachments_heading_desc'] = 'सिकारुहरूलाई कुराकानीका सन्देशमा तस्बिर वा PDF संलग्न गर्न दिन्छ। तस्बिरहरू बहुविध प्रदायकहरूलाई (OpenAI, Anthropic, Gemini, xAI) पठाइन्छ; PDF बाट पाठ सधैँ सर्भरमै झिकिन्छ, ताकि जुनसुकै प्रदायकले पढ्न सकोस्।';
-$string['settings:allow_student_attachments'] = 'संलग्न फाइललाई अनुमति दिनुहोस्';
-$string['settings:allow_student_attachments_desc'] = 'सक्रिय हुँदा सिकारुहरूले कुराकानी लेख्ने ठाउँमा क्लिपको बटन देख्छन्। फाइलहरू पाठ्यक्रमको सन्दर्भमा सुरक्षित हुन्छन् र सम्बन्धित सन्देशको बुलबुलाबाट लिङ्क गरिन्छन्।';
-$string['settings:attachment_max_size_mb'] = 'अधिकतम संलग्न फाइलको आकार (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'एउटा संलग्न फाइलको आकारको कडा माथिल्लो सीमा। चल्दा 1–25 MB को दायरामा सीमित गरिन्छ।';
-$string['settings:attachment_allowed_types'] = 'अनुमति दिइएका MIME प्रकार';
-$string['settings:attachment_allowed_types_desc'] = 'अल्पविरामले छुट्याइएको अनुमति दिइएका MIME प्रकारको सूची। सर्भरले अपलोड गरिएको फाइल पनि जाँच्छ; नक्कली Content-Type हेडर अस्वीकार गरिन्छ।';
 $string['settings:performance_heading'] = 'कार्यसम्पादन';
 $string['settings:performance_heading_desc'] = 'एआई प्रम्प्टमा कति पाठ्यक्रम सामग्री समावेश हुने भन्ने नियन्त्रण गर्छ। कम मानले छिटो उत्तर दिन्छ तर एआईलाई कम सन्दर्भ मिल्छ।';
 $string['settings:max_content_per_resource'] = 'प्रति स्रोत अधिकतम सामग्री (अक्षर)';

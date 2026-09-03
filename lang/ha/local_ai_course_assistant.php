@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Mataimakin Horo na AI';
-$string['attachment:attach'] = 'Haɗawa';
-$string['attachment:attach_image_or_pdf'] = 'Haɗa hoto ko PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Yana adana tattaunawar mai koyarwa na AI ga kowane mai amfani da kozi.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID na mai amfani wanda yake da tattaunawar.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID na kozi da tattaunawar ta shafi.';
@@ -1295,13 +1293,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Tara cancantar koyo a tsakanin darussa a kunne ta tsohuwa';
@@ -1799,14 +1790,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Tsarin masu masaukin iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Furuci na yau da kullun ɗaya a kowane layi, wanda ake daidaita shi da halayen <code>src</code> na iframe. Ana ɗaukar kowane firam da ya dace a matsayin sakawa mai hulɗa wanda dole ne a haɗa rubutaccen kalmominsa a tsara shi. Layukan da ke farawa da <code>#</code> sharhi ne.';
 $string['settings:rag_transcript_url_pattern'] = 'Tsarin adireshin rubutaccen kalmomi';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Furuci na yau da kullun da ke daidaita da adireshin haɗin rubutattun kalmomi. Ga kowane iframe da aka gano, mai tsara jerin yana zaɓar haɗin da ya fi kusa (sama ko ƙasa) sannan ya haɗa su. Ka bar shi babu komai don kashe haɗa rubutattun kalmomi.';
-$string['settings:attachments_heading'] = 'Abubuwan da ɗalibai suka haɗa';
-$string['settings:attachments_heading_desc'] = 'Yana ba ɗalibai damar haɗa hoto ko PDF cikin saƙonnin hira. Ana aika hotuna zuwa masu bayarwa masu hanyoyi da yawa (OpenAI, Anthropic, Gemini, xAI); ana fitar da rubutu daga PDF koyaushe a kan uwar garken, don kowane mai bayarwa ya iya karanta shi.';
-$string['settings:allow_student_attachments'] = 'Ba da izinin haɗe-haɗe';
-$string['settings:allow_student_attachments_desc'] = 'Idan an kunna, ɗalibai suna ganin maɓallin manne a filin rubuta hira. Ana adana fayiloli a cikin mahallin kwas kuma ana haɗa su daga kumfar saƙon nasu.';
-$string['settings:attachment_max_size_mb'] = 'Matsakaicin girman abin haɗawa (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Iyaka mai tsauri na girman abin haɗawa ɗaya. Yayin gudanarwa ana taƙaita shi cikin kewayon 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Nau\'ikan MIME da aka yarda';
-$string['settings:attachment_allowed_types_desc'] = 'Jerin nau\'ikan MIME da aka yarda, waɗanda aka raba da waƙafi. Uwar garken kuma tana duba fayil ɗin da aka ɗora; za a ƙi kanun Content-Type na ƙarya.';
 $string['settings:performance_heading'] = 'Aiki';
 $string['settings:performance_heading_desc'] = 'Yana sarrafa yawan abun cikin kwas da ake saka a cikin umarnin AI. Ƙananan ƙima na nufin amsoshi masu sauri amma ƙarancin mahalli ga AI.';
 $string['settings:max_content_per_resource'] = 'Matsakaicin abun ciki ga kowace hanya (haruffa)';

@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AI asistent kurzu';
-$string['attachment:attach'] = 'Priložiť';
-$string['attachment:attach_image_or_pdf'] = 'Priložiť obrázok alebo PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Ukladá konverzácie AI tútora podľa používateľa a kurzu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID používateľa, ktorý vlastní konverzáciu.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID kurzu, ku ktorému konverzácia patrí.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Súhrn ovládania naprieč kurzami predvolene zapnutý';
@@ -1761,14 +1752,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Vzory hostiteľov iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Jeden regulárny výraz na riadok, ktorý zodpovedá atribútu <code>src</code> rámca iframe. Každý zodpovedajúci rámec sa považuje za interaktívne vloženie, ktorého prepis sa má spárovať a zaindexovať. Riadky začínajúce znakom <code>#</code> sú komentáre.';
 $string['settings:rag_transcript_url_pattern'] = 'Vzor adresy URL prepisu';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Regulárny výraz zodpovedajúci adresám URL odkazov na prepisy. Indexer vyberie pre každý nájdený rámec iframe najbližší zodpovedajúci odkaz (nad ním alebo pod ním) a oba spáruje. Ponechajte prázdne, ak chcete párovanie prepisov vypnúť.';
-$string['settings:attachments_heading'] = 'Prílohy študentov';
-$string['settings:attachments_heading_desc'] = 'Umožňuje študentom priložiť k správam v chate obrázok alebo PDF. Obrázky sa odosielajú multimodálnym poskytovateľom (OpenAI, Anthropic, Gemini, xAI); z PDF sa text vždy získava na serveri, aby ho mohol prečítať každý poskytovateľ.';
-$string['settings:allow_student_attachments'] = 'Povoliť prílohy';
-$string['settings:allow_student_attachments_desc'] = 'Ak je zapnuté, študenti uvidia v poli na písanie správ tlačidlo so sponkou. Súbory sa ukladajú v kontexte kurzu a odkazuje sa na ne z bubliny so správou.';
-$string['settings:attachment_max_size_mb'] = 'Maximálna veľkosť prílohy (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Pevný limit veľkosti jednej prílohy. Za behu je obmedzený na rozsah 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Povolené typy MIME';
-$string['settings:attachment_allowed_types_desc'] = 'Čiarkami oddelený zoznam povolených typov MIME. Server navyše kontroluje samotný nahraný súbor; podvrhnutá hlavička Content-Type bude odmietnutá.';
 $string['settings:performance_heading'] = 'Výkon';
 $string['settings:performance_heading_desc'] = 'Určuje, koľko obsahu kurzu sa zahrnie do promptu pre AI. Nižšie hodnoty znamenajú rýchlejšie odpovede, ale menej kontextu pre AI.';
 $string['settings:max_content_per_resource'] = 'Maximálny obsah na zdroj (znaky)';

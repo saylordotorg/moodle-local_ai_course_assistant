@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'AI पाठ्यक्रम सहायक';
-$string['attachment:attach'] = 'संलग्न करें';
-$string['attachment:attach_image_or_pdf'] = 'छवि या PDF संलग्न करें';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'प्रत्येक उपयोगकर्ता और पाठ्यक्रम के लिए AI ट्यूटर चैट वार्तालाप संग्रहीत करता है।';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'वार्तालाप के स्वामी उपयोगकर्ता की ID।';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'जिस पाठ्यक्रम से वार्तालाप संबंधित है उसकी ID।';
@@ -1295,13 +1293,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'क्रॉस-कोर्स महारत रोलअप डिफ़ॉल्ट रूप से चालू';
@@ -1790,14 +1781,6 @@ $string['settings:rag_iframe_host_patterns'] = 'iframe होस्ट पैट
 $string['settings:rag_iframe_host_patterns_desc'] = 'प्रति पंक्ति एक रेगुलर एक्सप्रेशन जो iframe के <code>src</code> गुण से मेल खाता हो। मेल खाने वाले प्रत्येक iframe को ऐसा इंटरैक्टिव एम्बेड माना जाता है जिसका प्रतिलेख जोड़कर इंडेक्स किया जाना चाहिए। <code>#</code> से शुरू होने वाली पंक्तियाँ टिप्पणियाँ हैं।';
 $string['settings:rag_transcript_url_pattern'] = 'प्रतिलेख URL पैटर्न';
 $string['settings:rag_transcript_url_pattern_desc'] = 'प्रतिलेख लिंक के URL से मेल खाने वाला रेगुलर एक्सप्रेशन। इंडेक्सर प्रत्येक पहचाने गए iframe के सबसे निकट मेल खाने वाले लिंक (ऊपर या नीचे) को चुनकर दोनों को जोड़ता है। प्रतिलेख जोड़ना बंद करने के लिए खाली छोड़ें।';
-$string['settings:attachments_heading'] = 'विद्यार्थियों के अनुलग्नक';
-$string['settings:attachments_heading_desc'] = 'विद्यार्थियों को अपने चैट संदेशों के साथ चित्र या PDF संलग्न करने देता है। चित्र मल्टीमॉडल प्रदाताओं (OpenAI, Anthropic, Gemini, xAI) को भेजे जाते हैं; PDF का पाठ हमेशा सर्वर पर निकाला जाता है ताकि हर प्रदाता उसे पढ़ सके।';
-$string['settings:allow_student_attachments'] = 'अनुलग्नकों की अनुमति दें';
-$string['settings:allow_student_attachments_desc'] = 'सक्षम होने पर विद्यार्थियों को चैट लेखन-क्षेत्र में क्लिप बटन दिखाई देता है। फ़ाइलें पाठ्यक्रम के संदर्भ में संग्रहीत होती हैं और उनके संदेश बुलबुले से लिंक की जाती हैं।';
-$string['settings:attachment_max_size_mb'] = 'अनुलग्नक का अधिकतम आकार (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'किसी एक अनुलग्नक के आकार की कठोर सीमा। चलने के समय इसे 1–25 MB के बीच सीमित किया जाता है।';
-$string['settings:attachment_allowed_types'] = 'अनुमत MIME प्रकार';
-$string['settings:attachment_allowed_types_desc'] = 'अल्पविराम से अलग की गई MIME अनुमति-सूची। सर्वर अपलोड की गई फ़ाइल की जाँच भी करता है; नकली Content-Type अस्वीकार कर दिया जाएगा।';
 $string['settings:performance_heading'] = 'प्रदर्शन';
 $string['settings:performance_heading_desc'] = 'AI प्रॉम्प्ट में शामिल पाठ्यक्रम सामग्री की मात्रा नियंत्रित करता है। कम मान से उत्तर तेज़ होते हैं पर AI को कम संदर्भ मिलता है।';
 $string['settings:max_content_per_resource'] = 'प्रति संसाधन अधिकतम सामग्री (अक्षर)';

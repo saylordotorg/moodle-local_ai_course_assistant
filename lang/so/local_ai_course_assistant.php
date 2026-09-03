@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Kaaliyaha Koorsada AI';
-$string['attachment:attach'] = 'Lifaaq';
-$string['attachment:attach_image_or_pdf'] = 'Lifaaq sawir ama PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Kaydiya wada-hadalada barida AI ee isticmaalaha iyo koorsada kasta.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID-ga isticmaalaha leh wada-hadalkii.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID-ga koorsada ay wada-hadalku u dhigan tahay.';
@@ -1306,13 +1304,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Isku-darka aqoonta koorsooyinka dhexdooda waxaa daacad ahaan loo hawlgeliyaa';
@@ -1810,14 +1801,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Qaababka martigeliyayaasha ifram
 $string['settings:rag_iframe_host_patterns_desc'] = 'Hal tibaax caadi ah sadar kasta, oo la barbar dhigo sifada <code>src</code> ee iframe. Sawir kasta oo la mid ah waxaa loo tixgeliyaa dhex gelin is dhexgal ah oo qoraalkeeda hadalka lagu tallaabsan karo oo liis loo sameeyo. Sadarrada ku bilaabmaya <code>#</code> waa faallo.';
 $string['settings:rag_transcript_url_pattern'] = 'Qaabka cinwaanka qoraalka hadalka';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Tibaax caadi ah oo la mid ah cinwaannada xiriirinta qoraallada hadalka. Iframe kasta oo la helay, liis samaystaha wuxuu doortaa xiriirinta ugu dhow ee la mid ah (kor ama hoos) wuxuuna labada isku xiraa. U dhaaf madhan si aad u xidho isku xirka qoraallada hadalka.';
-$string['settings:attachments_heading'] = 'Waxyaabaha ardayda lifaaqda';
-$string['settings:attachments_heading_desc'] = 'Waxay u oggolaataa ardayda inay sawir ama PDF ku lifaaqaan farriimaha wada sheekaysiga. Sawirrada waxaa loo diraa bixiyayaasha noocyada badan (OpenAI, Anthropic, Gemini, xAI); qoraalka PDF-yada waa mar walba server-ka lagu soo saaraa, si bixiye kasta uu u akhriyo.';
-$string['settings:allow_student_attachments'] = 'Ogolow lifaaqyada';
-$string['settings:allow_student_attachments_desc'] = 'Marka la furo, ardayda waxay arkaan badhan gaashaan ah oo ku yaal meesha qoraalka wada sheekaysiga. Faylalka waxaa lagu kaydiyaa macnaha guud ee koorsada waxaana lagu xiraa buufinta farriintooda.';
-$string['settings:attachment_max_size_mb'] = 'Cabbirka lifaaqa ugu badan (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Xad sare adag oo cabbirka hal lifaaq. Waqtiga socodka waxaa lagu xadidaa inta u dhaxaysa 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Noocyada MIME la ogol yahay';
-$string['settings:attachment_allowed_types_desc'] = 'Liis noocyada MIME la ogol yahay, oo lagu kala saaray comma. Server-ka sidoo kale wuxuu hubiyaa faylka la soo geliyay laftiisa; madax Content-Type been abuur waa la diidi doonaa.';
 $string['settings:performance_heading'] = 'Waxqabadka';
 $string['settings:performance_heading_desc'] = 'Wuxuu xakameeyaa inta waxa ku jira koorsada lagu daro amarka AI. Qiimayaasha hooseeya waxay ka dhigan yihiin jawaabo degdeg ah laakiin macne guud yar oo AI.';
 $string['settings:max_content_per_resource'] = 'Waxa ku jira ugu badan ilo kasta (xarfo)';

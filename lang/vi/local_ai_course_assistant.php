@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Trợ Lý AI Khóa Học';
-$string['attachment:attach'] = 'Đính kèm';
-$string['attachment:attach_image_or_pdf'] = 'Đính kèm hình ảnh hoặc PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Lưu trữ các cuộc trò chuyện với gia sư AI theo người dùng và khóa học.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ID của người dùng sở hữu cuộc trò chuyện.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ID của khóa học mà cuộc trò chuyện thuộc về.';
@@ -1287,13 +1285,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Mặc định bật tổng hợp mức độ thành thạo liên khóa học';
@@ -1797,14 +1788,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Mẫu máy chủ iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Mỗi dòng một biểu thức chính quy khớp với thuộc tính <code>src</code> của iframe. Mỗi khung khớp được xem là một phần nhúng tương tác cần ghép và lập chỉ mục bản ghi lời thoại. Các dòng bắt đầu bằng <code>#</code> là chú thích.';
 $string['settings:rag_transcript_url_pattern'] = 'Mẫu địa chỉ bản ghi lời thoại';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Biểu thức chính quy khớp với địa chỉ của các liên kết bản ghi lời thoại. Với mỗi iframe phát hiện được, bộ lập chỉ mục chọn liên kết khớp gần nhất (phía trên hoặc phía dưới) và ghép chúng lại. Để trống để tắt việc ghép bản ghi lời thoại.';
-$string['settings:attachments_heading'] = 'Tệp đính kèm của người học';
-$string['settings:attachments_heading_desc'] = 'Cho phép người học đính kèm một hình ảnh hoặc tệp PDF vào tin nhắn trò chuyện. Hình ảnh được gửi tới các nhà cung cấp đa phương thức (OpenAI, Anthropic, Gemini, xAI); văn bản trong tệp PDF luôn được trích xuất trên máy chủ để mọi nhà cung cấp đều đọc được.';
-$string['settings:allow_student_attachments'] = 'Cho phép tệp đính kèm';
-$string['settings:allow_student_attachments_desc'] = 'Khi bật, người học thấy nút kẹp giấy trong ô soạn tin nhắn. Tệp được lưu trong ngữ cảnh khóa học và được liên kết từ bong bóng tin nhắn tương ứng.';
-$string['settings:attachment_max_size_mb'] = 'Kích thước tệp đính kèm tối đa (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Giới hạn trên cứng cho kích thước một tệp đính kèm. Khi chạy sẽ được giới hạn trong khoảng 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Các loại MIME được phép';
-$string['settings:attachment_allowed_types_desc'] = 'Danh sách các loại MIME được phép, phân tách bằng dấu phẩy. Máy chủ cũng kiểm tra chính tệp được tải lên; tiêu đề Content-Type giả mạo sẽ bị từ chối.';
 $string['settings:performance_heading'] = 'Hiệu năng';
 $string['settings:performance_heading_desc'] = 'Kiểm soát lượng nội dung khóa học được đưa vào lời nhắc gửi cho AI. Giá trị nhỏ hơn cho phản hồi nhanh hơn nhưng ít ngữ cảnh hơn cho AI.';
 $string['settings:max_content_per_resource'] = 'Nội dung tối đa mỗi tài nguyên (ký tự)';

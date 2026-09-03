@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'مساعد الذكاء الاصطناعي للمقررات';
-$string['attachment:attach'] = 'إرفاق';
-$string['attachment:attach_image_or_pdf'] = 'إرفاق صورة أو PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'يخزّن محادثات المدرّس الافتراضي بالذكاء الاصطناعي لكل مستخدم ومقرر.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'معرّف المستخدم الذي يمتلك المحادثة.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'معرّف المقرر الذي تنتمي إليه المحادثة.';
@@ -1264,13 +1262,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'تجميع الإتقان عبر المقررات مُفعَّل افتراضيًا';
@@ -1760,14 +1751,6 @@ $string['settings:rag_iframe_host_patterns'] = 'أنماط مضيفات iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'تعبير نمطي واحد في كل سطر يطابق السمة <code>src</code> لإطار iframe. يُعامَل كل إطار مطابق على أنه تضمين تفاعلي ينبغي اقتران نصه المكتوب وفهرسته. الأسطر التي تبدأ بـ <code>#</code> تعليقات.';
 $string['settings:rag_transcript_url_pattern'] = 'نمط رابط النص المكتوب';
 $string['settings:rag_transcript_url_pattern_desc'] = 'تعبير نمطي يطابق روابط النصوص المكتوبة. يختار المفهرس أقرب رابط مطابق (أعلى الإطار أو أسفله) لكل إطار iframe مكتشَف ويقرن بينهما. اتركه فارغًا لتعطيل اقتران النصوص المكتوبة.';
-$string['settings:attachments_heading'] = 'مرفقات الطلاب';
-$string['settings:attachments_heading_desc'] = 'يتيح للطلاب إرفاق صورة أو ملف PDF برسائل المحادثة. تُرسَل الصور إلى المزوّدات متعددة الوسائط (OpenAI وAnthropic وGemini وxAI)؛ أما ملفات PDF فيُستخرج نصها دائمًا على الخادم ليتمكن أي مزوّد من قراءتها.';
-$string['settings:allow_student_attachments'] = 'السماح بالمرفقات';
-$string['settings:allow_student_attachments_desc'] = 'عند التفعيل، يرى الطلاب زر مشبك الورق في محرّر المحادثة. تُخزَّن الملفات ضمن سياق المقرر ويُربط إليها من فقاعة رسالتهم.';
-$string['settings:attachment_max_size_mb'] = 'الحد الأقصى لحجم المرفق (ميغابايت)';
-$string['settings:attachment_max_size_mb_desc'] = 'حد صارم لحجم كل مرفق على حدة. يُضبط وقت التشغيل ضمن النطاق 1–25 ميغابايت.';
-$string['settings:attachment_allowed_types'] = 'أنواع MIME المسموح بها';
-$string['settings:attachment_allowed_types_desc'] = 'قائمة سماح بأنواع MIME مفصولة بفواصل. كما يفحص الخادم الملف المرفوع؛ وسيُرفض أي Content-Type مزيّف.';
 $string['settings:performance_heading'] = 'الأداء';
 $string['settings:performance_heading_desc'] = 'يتحكم في كمية محتوى المقرر المُدرَجة في موجّه الذكاء الاصطناعي. القيم الأقل تعني ردودًا أسرع لكن سياقًا أقل للذكاء الاصطناعي.';
 $string['settings:max_content_per_resource'] = 'الحد الأقصى للمحتوى لكل مورد (أحرف)';

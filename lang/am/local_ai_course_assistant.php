@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'የAI ኮርስ ረዳት';
-$string['attachment:attach'] = 'አያይዝ';
-$string['attachment:attach_image_or_pdf'] = 'ምስል ወይም PDF አያይዝ';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'የAI አስተማሪ ውይይቶችን በተጠቃሚ እና በኮርስ ያከማቻል።';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'ውይይቱን የሚያቀርበው ተጠቃሚ መለያ።';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'ውይይቱ የሚነካው ኮርስ መለያ።';
@@ -1293,13 +1291,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'የተደጋጋሚ ኮርስ ብቃት ማጠቃለያ በነባሪ ይብራ';
@@ -1798,14 +1789,6 @@ $string['settings:rag_iframe_host_patterns'] = 'የiframe አስተናጋጅ ን
 $string['settings:rag_iframe_host_patterns_desc'] = 'በየመስመሩ አንድ መደበኛ አገላለጽ፣ ከiframe <code>src</code> ባህርይ ጋር ይዛመዳል። የሚዛመድ እያንዳንዱ ክፈፍ ግልባጩ ተጣምሮ መረጃ መጠቆም ያለበት መስተጋብራዊ ማካተት ተብሎ ይቆጠራል። በ<code>#</code> የሚጀምሩ መስመሮች አስተያየቶች ናቸው።';
 $string['settings:rag_transcript_url_pattern'] = 'የግልባጭ አድራሻ ንድፍ';
 $string['settings:rag_transcript_url_pattern_desc'] = 'ከግልባጭ አገናኞች አድራሻዎች ጋር የሚዛመድ መደበኛ አገላለጽ። ለተገኘ እያንዳንዱ iframe መረጃ ጠቋሚው በጣም ቅርብ የሆነውን የሚዛመድ አገናኝ (ከበላዩ ወይም ከበታቱ) መርጦ ሁለቱን ያጣምራል። የግልባጭ ማጣመርን ለማጥፋት ባዶ ይተዉት።';
-$string['settings:attachments_heading'] = 'የተማሪ አባሪዎች';
-$string['settings:attachments_heading_desc'] = 'ተማሪዎች በውይይት መልእክቶች ላይ ምስል ወይም PDF እንዲያያዙ ይፈቅዳል። ምስሎች ለብዙ ዘዴ አቅራቢዎች ይላካሉ (OpenAI፣ Anthropic፣ Gemini፣ xAI)፤ ከPDF ጽሑፍ ሁልጊዜ በአገልጋዩ ላይ ይወጣል፣ ስለዚህ ማንኛውም አቅራቢ ማንበብ ይችላል።';
-$string['settings:allow_student_attachments'] = 'አባሪዎችን ፍቀድ';
-$string['settings:allow_student_attachments_desc'] = 'ሲበራ ተማሪዎች በውይይት መጻፊያ ሳጥን ውስጥ የወረቀት መቆንጠጫ አዝራር ያያሉ። ፋይሎች በኮርሱ አውድ ውስጥ ይቀመጡና ከመልእክቱ አረፋ ይገናኛሉ።';
-$string['settings:attachment_max_size_mb'] = 'ከፍተኛ የአባሪ መጠን (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'ለአንድ አባሪ መጠን ጥብቅ የላይኛው ወሰን። በሥራ ጊዜ በ1–25 MB ክልል ውስጥ ይገደባል።';
-$string['settings:attachment_allowed_types'] = 'የተፈቀዱ የMIME ዓይነቶች';
-$string['settings:attachment_allowed_types_desc'] = 'በኮማ የተለዩ የተፈቀዱ የMIME ዓይነቶች ዝርዝር። አገልጋዩ የተጫነውን ፋይል ራሱንም ይመረምራል፤ የተጭበረበረ የContent-Type ራስጌ ይከለከላል።';
 $string['settings:performance_heading'] = 'አፈጻጸም';
 $string['settings:performance_heading_desc'] = 'በAI መመሪያ ውስጥ ምን ያህል የኮርስ ይዘት እንደሚካተት ይቆጣጠራል። ዝቅተኛ እሴቶች ፈጣን መልሶች ማለት ነው፣ ግን ለAI ያለው አውድ ያንሳል።';
 $string['settings:max_content_per_resource'] = 'በየመርጃ ከፍተኛ ይዘት (ቁምፊዎች)';

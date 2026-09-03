@@ -21,37 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/config'], function(Ajax, Config) {
-
-    /**
-     * Upload a student attachment to the server and get back a Moodle draft
-     * itemid that can be included in the next SSE chat submission. Uses
-     * fetch() directly because the endpoint is a multipart receiver, not a
-     * Moodle external function.
-     *
-     * @param {number} courseid
-     * @param {File} file
-     * @returns {Promise<{draftitemid:number, filename:string, mime:string, size:number, url:string}>}
-     */
-    const uploadAttachment = function(courseid, file) {
-        const form = new FormData();
-        form.append('courseid', String(courseid));
-        form.append('sesskey', Config.sesskey);
-        form.append('file', file);
-        const url = Config.wwwroot + '/local/ai_course_assistant/upload_attachment.php';
-        return fetch(url, {
-            method: 'POST',
-            body: form,
-            credentials: 'same-origin',
-        }).then(function(resp) {
-            return resp.json().then(function(data) {
-                if (!resp.ok || data.error) {
-                    throw new Error(data.error || ('Upload failed (' + resp.status + ')'));
-                }
-                return data;
-            });
-        });
-    };
+define(['core/ajax'], function(Ajax) {
 
     /**
      * Send a message (non-streaming fallback).
@@ -551,7 +521,6 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         getHistory: getHistory,
         clearHistory: clearHistory,
         getConfig: getConfig,
-        uploadAttachment: uploadAttachment,
         updateStudyPlan: updateStudyPlan,
         getStudyPlan: getStudyPlan,
         updateReminderPreferences: updateReminderPreferences,

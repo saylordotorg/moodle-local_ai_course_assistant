@@ -191,16 +191,19 @@ class transcript_report {
         $hasobjective = !empty($filters['objectiveid']);
 
         if ($hasoutcome || $hasobjective) {
-            $conds = ['oa.msgid = m.id'];
+            // Alias oaf, not oa: this predicate is reused inside summaries()'s
+            // batched objectives query, which already has an `oa` in its FROM.
+            // A repeated alias there would shadow rather than error.
+            $conds = ['oaf.msgid = m.id'];
             if ($hasobjective) {
-                $conds[] = 'oa.objectiveid = :objid';
+                $conds[] = 'oaf.objectiveid = :objid';
                 $params['objid'] = (int) $filters['objectiveid'];
             }
             if ($hasoutcome) {
-                $conds[] = 'oa.iscorrect = :iscorrect';
+                $conds[] = 'oaf.iscorrect = :iscorrect';
                 $params['iscorrect'] = (int) $filters['outcome'];
             }
-            $where[] = 'EXISTS (SELECT 1 FROM {local_ai_course_assistant_obj_att} oa WHERE '
+            $where[] = 'EXISTS (SELECT 1 FROM {local_ai_course_assistant_obj_att} oaf WHERE '
                      . implode(' AND ', $conds) . ')';
         }
 
@@ -285,15 +288,42 @@ class transcript_report {
               ORDER BY MIN(m.timecreated) DESC";
         $rows = $DB->get_records_sql($sql, $params, 0, $limit);
 
-        $out = [];
-        foreach ($rows as $r) {
-            $objs = $DB->get_fieldset_sql(
-                "SELECT DISTINCT o.code
+        // Objectives for every conversation on the page, in ONE query.
+        //
+        // This ran per row before, so a full page or download issued up to
+        // MAX_ROWS + 1 queries. Worse, it filtered on conversationid alone: the
+        // messages count beside it honoured the date/unit/outcome filters while
+        // this column did not, so a report scoped to one week listed objectives
+        // touched months earlier, and Status "Not met" listed met ones. Reusing
+        // $where fixes both -- the column now describes the same slice the rest
+        // of the row does, which is what the audit record claims was exported.
+        $objsby = [];
+        if (!empty($rows)) {
+            [$insql, $inparams] = $DB->get_in_or_equal(
+                array_map(static fn($r) => (int) $r->conversationid, $rows),
+                SQL_PARAMS_NAMED, 'conv');
+            // get_recordset_sql, NOT get_records_sql: the latter keys the array by
+            // the first column, and conversationid repeats once per objective
+            // code, so every conversation would silently collapse to a single
+            // objective. That exact collapse already cost this plugin once, in
+            // get_session_stats().
+            $rs = $DB->get_recordset_sql(
+                "SELECT DISTINCT m.conversationid, o.code
                    FROM {local_ai_course_assistant_obj_att} oa
                    JOIN {local_ai_course_assistant_objs} o ON o.id = oa.objectiveid
-                   JOIN {local_ai_course_assistant_msgs} mm ON mm.id = oa.msgid
-                  WHERE mm.conversationid = :cid
-               ORDER BY o.code", ['cid' => (int) $r->conversationid]);
+                   JOIN {local_ai_course_assistant_msgs} m ON m.id = oa.msgid
+                  WHERE {$where} AND m.conversationid {$insql}
+               ORDER BY m.conversationid, o.code",
+                $params + $inparams);
+            foreach ($rs as $orow) {
+                $objsby[(int) $orow->conversationid][] = (string) $orow->code;
+            }
+            $rs->close();
+        }
+
+        $out = [];
+        foreach ($rows as $r) {
+            $objs = $objsby[(int) $r->conversationid] ?? [];
             $out[] = [
                 'conversation' => self::conversation_label((int) $r->conversationid, $salt),
                 'learner'      => self::pseudonym((int) $r->userid, $salt),

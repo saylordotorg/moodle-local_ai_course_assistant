@@ -1038,39 +1038,6 @@ if ($hassiteconfig) {
         ""
     ));
 
-    // Student attachments (images + PDFs) on chat messages.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/attachments_heading',
-        get_string('settings:attachments_heading', 'local_ai_course_assistant'),
-        get_string('settings:attachments_heading_desc', 'local_ai_course_assistant'),
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/allow_student_attachments',
-        get_string('settings:allow_student_attachments', 'local_ai_course_assistant'),
-        get_string('settings:allow_student_attachments_desc', 'local_ai_course_assistant'),
-        1
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/attachment_max_size_mb',
-        get_string('settings:attachment_max_size_mb', 'local_ai_course_assistant'),
-        get_string('settings:attachment_max_size_mb_desc', 'local_ai_course_assistant'),
-        '10',
-        PARAM_INT
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/attachment_allowed_types',
-        get_string('settings:attachment_allowed_types', 'local_ai_course_assistant'),
-        get_string('settings:attachment_allowed_types_desc', 'local_ai_course_assistant'),
-        'image/png,image/jpeg,image/webp,application/pdf',
-        // Comma-separated MIME types. PARAM_TEXT keeps the '/' and ',' that MIME
-        // lists need (verified lossless for the shipped default) while refusing
-        // markup; attachment_manager lowercases, trims and matches each entry.
-        PARAM_TEXT
-    ));
-
     // Performance: caps on how much course content goes into the system prompt.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/performance_heading',
@@ -2965,11 +2932,10 @@ if ($hassiteconfig) {
         'inactivity_reminder_enabled' => ['inactivity_threshold_days'],
         'survey_enabled' => ['survey_trigger_messages', 'survey_frequency'],
 
-        // Safety, integrity, mastery, attachments, Soapbox.
+        // Safety, integrity, mastery, Soapbox.
         'offtopic_enabled' => ['offtopic_max', 'offtopic_action', 'offtopic_lockout_duration'],
         'integrity_enabled' => ['integrity_email'],
         'mastery_decay_enabled' => ['mastery_decay_half_life_days'],
-        'allow_student_attachments' => ['attachment_max_size_mb', 'attachment_allowed_types'],
         'soapbox_slide_vision' => ['soapbox_vision_provider', 'soapbox_vision_model'],
     ];
 

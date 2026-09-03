@@ -28,8 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // General.
 $string['pluginname'] = 'Msaidizi wa Kozi wa AI';
-$string['attachment:attach'] = 'Ambatisha';
-$string['attachment:attach_image_or_pdf'] = 'Ambatisha picha au PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Huhifadhi mazungumzo ya mshauri wa AI kwa kila mtumiaji na kozi.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'Kitambulisho cha mtumiaji anayemiliki mazungumzo.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'Kitambulisho cha kozi ambayo mazungumzo yanahusiana nazo.';
@@ -1311,13 +1309,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'Mkusanyiko wa umahiri wa kozi mtambuka umewashwa kwa chaguo-msingi';
@@ -1829,14 +1820,6 @@ $string['settings:rag_iframe_host_patterns'] = 'Mifumo ya wenyeji wa iframe';
 $string['settings:rag_iframe_host_patterns_desc'] = 'Usemi mmoja wa kawaida kwa kila mstari, unaolinganishwa na sifa ya <code>src</code> ya iframe. Kila fremu inayolingana huchukuliwa kama kipachiko shirikishi ambacho manukuu yake yanapaswa kuoanishwa na kuorodheshwa. Mistari inayoanza na <code>#</code> ni maelezo.';
 $string['settings:rag_transcript_url_pattern'] = 'Mfumo wa anwani ya manukuu';
 $string['settings:rag_transcript_url_pattern_desc'] = 'Usemi wa kawaida unaolingana na anwani za viungo vya manukuu. Kwa kila iframe iliyogunduliwa, kiorodheshaji huchagua kiungo kinacholingana kilicho karibu zaidi (juu au chini yake) na kuvioanisha. Acha wazi ili kuzima uoanishaji wa manukuu.';
-$string['settings:attachments_heading'] = 'Viambatisho vya wanafunzi';
-$string['settings:attachments_heading_desc'] = 'Huruhusu wanafunzi kuambatisha picha au PDF kwenye ujumbe wa mazungumzo. Picha hutumwa kwa watoa huduma wa aina nyingi (OpenAI, Anthropic, Gemini, xAI); maandishi kutoka PDF hutolewa daima kwenye seva, ili mtoa huduma yeyote aweze kuyasoma.';
-$string['settings:allow_student_attachments'] = 'Ruhusu viambatisho';
-$string['settings:allow_student_attachments_desc'] = 'Ikiwashwa, wanafunzi huona kitufe cha klipu kwenye sehemu ya kuandika ujumbe. Faili huhifadhiwa katika muktadha wa kozi na huunganishwa kutoka kwenye kiputo cha ujumbe husika.';
-$string['settings:attachment_max_size_mb'] = 'Ukubwa wa juu wa kiambatisho (MB)';
-$string['settings:attachment_max_size_mb_desc'] = 'Kikomo kigumu cha juu cha ukubwa wa kiambatisho kimoja. Wakati wa utekelezaji hubanwa katika kipimo cha 1–25 MB.';
-$string['settings:attachment_allowed_types'] = 'Aina za MIME zinazoruhusiwa';
-$string['settings:attachment_allowed_types_desc'] = 'Orodha ya aina za MIME zinazoruhusiwa, zikitenganishwa kwa koma. Seva pia huchunguza faili iliyopakiwa yenyewe; kichwa bandia cha Content-Type kitakataliwa.';
 $string['settings:performance_heading'] = 'Utendaji';
 $string['settings:performance_heading_desc'] = 'Hudhibiti kiasi cha maudhui ya kozi yanayojumuishwa katika kidokezo cha AI. Thamani ndogo humaanisha majibu ya haraka lakini muktadha mdogo kwa AI.';
 $string['settings:max_content_per_resource'] = 'Maudhui ya juu kwa kila rasilimali (herufi)';

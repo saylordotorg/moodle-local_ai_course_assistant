@@ -589,119 +589,6 @@ define([
     };
 
     /**
-     * Build the attachment node shown inside a user bubble.
-     *
-     * For images: an inline <img> thumbnail that links to the full file.
-     * For PDFs (and other non-image types): a compact filename chip.
-     *
-     * @param {{filename:string, mime:string, url:string}} att
-     * @returns {HTMLElement}
-     */
-    const buildAttachmentNode = function(att) {
-        const wrap = document.createElement('a');
-        wrap.className = 'aica-attachment';
-        wrap.href = att.url;
-        wrap.target = '_blank';
-        wrap.rel = 'noopener noreferrer';
-        wrap.title = att.filename || '';
-
-        const isImage = typeof att.mime === 'string' && att.mime.indexOf('image/') === 0;
-        if (isImage) {
-            const img = document.createElement('img');
-            img.className = 'aica-attachment__thumb';
-            img.src = att.url;
-            img.alt = att.filename || '';
-            img.loading = 'lazy';
-            wrap.appendChild(img);
-        } else {
-            wrap.classList.add('aica-attachment--file');
-            const icon = document.createElement('span');
-            icon.className = 'aica-attachment__icon';
-            icon.innerHTML =
-                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"' +
-                ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"' +
-                ' stroke-linejoin="round" aria-hidden="true">' +
-                '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
-                '<polyline points="14 2 14 8 20 8"/>' +
-                '</svg>';
-            const label = document.createElement('span');
-            label.className = 'aica-attachment__name';
-            label.textContent = att.filename || 'attachment';
-            wrap.appendChild(icon);
-            wrap.appendChild(label);
-        }
-        return wrap;
-    };
-
-    /**
-     * Show the composer preview chip for an uploaded-but-not-yet-sent
-     * attachment. The "remove" button's click handler is wired by the
-     * caller to clear the draft state.
-     *
-     * @param {{filename:string, mime:string, url:string, size?:number}} meta
-     * @param {Function} onRemove
-     */
-    const showAttachmentPreview = function(meta, onRemove) {
-        const els = getElements();
-        const slot = els.attachPreview;
-        if (!slot) {
-            return;
-        }
-        slot.innerHTML = '';
-        slot.hidden = false;
-
-        const chip = document.createElement('div');
-        chip.className = 'aica-attachment-preview__chip';
-
-        const isImage = meta && typeof meta.mime === 'string' && meta.mime.indexOf('image/') === 0;
-        if (isImage && meta.url) {
-            const img = document.createElement('img');
-            img.className = 'aica-attachment-preview__thumb';
-            img.src = meta.url;
-            img.alt = meta.filename || '';
-            chip.appendChild(img);
-        } else {
-            const icon = document.createElement('span');
-            icon.className = 'aica-attachment-preview__icon';
-            icon.textContent = 'PDF';
-            chip.appendChild(icon);
-        }
-
-        const name = document.createElement('span');
-        name.className = 'aica-attachment-preview__name';
-        name.textContent = (meta && meta.filename) || 'attachment';
-        chip.appendChild(name);
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'aica-attachment-preview__remove';
-        removeBtn.setAttribute('aria-label', 'Remove attachment');
-        removeBtn.innerHTML = '&times;';
-        removeBtn.addEventListener('click', function() {
-            hideAttachmentPreview();
-            if (typeof onRemove === 'function') {
-                onRemove();
-            }
-        });
-        chip.appendChild(removeBtn);
-
-        slot.appendChild(chip);
-    };
-
-    /**
-     * Hide and reset the attachment preview chip.
-     */
-    const hideAttachmentPreview = function() {
-        const els = getElements();
-        const slot = els.attachPreview;
-        if (!slot) {
-            return;
-        }
-        slot.innerHTML = '';
-        slot.hidden = true;
-    };
-
-    /**
      * Render the compact Learning Mastery Chip with a summary payload from
      * the get_mastery_summary external function. The chip is hidden until
      * there is at least one objective to report. Clicking it toggles a
@@ -2085,23 +1972,15 @@ define([
      * @param {string}        text        The message text (markdown for assistant, plain for user)
      * @param {Function|null} onSpeak     Optional callback when TTS button is clicked; receives (text, el)
      * @param {number|null}   ts          Optional Unix timestamp (ms) — shown as tooltip on message
-     * @param {Object|null}   attachment  Optional user-message attachment {filename, mime, url}
      * @returns {HTMLElement} The message element
      */
-    const addMessage = function(role, text, onSpeak, ts, attachment) {
+    const addMessage = function(role, text, onSpeak, ts) {
         const el = document.createElement('div');
         el.className = 'local-ai-course-assistant__message local-ai-course-assistant__message--' + role;
         el.setAttribute('data-role', role);
         // Store timestamp for tooltip display.
         const msgTs = ts || Date.now();
         el.dataset.ts = msgTs;
-
-        // Attachment rendering for user messages: thumbnail for images,
-        // filename pill for PDFs. Appended before the text content so the
-        // reading order is "student shared this, and asked this".
-        if (role === 'user' && attachment && attachment.url) {
-            el.appendChild(buildAttachmentNode(attachment));
-        }
 
         const content = document.createElement('div');
         content.className = 'local-ai-course-assistant__message-content';
@@ -2847,9 +2726,6 @@ define([
             modeButtons: root.querySelectorAll('.local-ai-course-assistant__mode-btn'),
             voiceStartBtn: root.querySelector('.aica-voice-panel__start'),
             historyRefreshBtn: root.querySelector('.aica-history-panel__refresh'),
-            attachBtn: root.querySelector('.aica-attachment-btn'),
-            attachFileInput: root.querySelector('.aica-attachment-file-input'),
-            attachPreview: root.querySelector('.aica-attachment-preview'),
             composerCard: root.querySelector('.local-ai-course-assistant__composer-card'),
             masteryChip: root.querySelector('.aica-mastery-chip'),
             masteryChipLabel: root.querySelector('.aica-mastery-chip__label'),
@@ -6146,8 +6022,6 @@ define([
         updateStreamContent: updateStreamContent,
         finishStreaming: finishStreaming,
         setStreamCitations: setStreamCitations,
-        showAttachmentPreview: showAttachmentPreview,
-        hideAttachmentPreview: hideAttachmentPreview,
         renderMasteryChip: renderMasteryChip,
         hideMasteryChip: hideMasteryChip,
         renderMasteryDashboard: renderMasteryDashboard,
