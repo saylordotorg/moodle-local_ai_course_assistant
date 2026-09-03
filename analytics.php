@@ -500,6 +500,9 @@ $templatedata = [
         'u' => (int) $USER->id,
         'courseid' => $courseid,
         'since' => $since,
+        // v7.2.10: ask for CSV. Without this the button downloaded JSON, which
+        // the browser rendered inline because no Content-Disposition was set.
+        'format' => 'csv',
     ]))->out(false),
 
     // Past Learning Radar queries (most recent 50).

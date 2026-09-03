@@ -37,7 +37,22 @@ $definitions = [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'simpledata' => false,
-        'ttl' => 120, // 2 minutes.
+        // INVARIANT: this ttl must be >= the longest window passed to
+        // rate_limiter::is_rate_limited(). rate_limiter stores the whole sliding
+        // window as ONE entry (window_start + count) and restarts the window on a
+        // cache miss, so an entry that expires mid-window silently resets the
+        // count. At ttl=120 the soapbox_stt bucket (12 per 600s) was enforcing
+        // 12 per 120s -- five times its intended allowance -- with no error.
+        // The worst case was NOT soapbox: sse.php limits Zendesk escalation to
+        // 2 tickets per learner per 3600s, and each ticket ships the learner's
+        // name, email and full transcript to an external desk. At ttl=120 that
+        // control was enforcing 2 per 120s -- up to 60 tickets an hour. It is the
+        // v7.0.5 anti-abuse fix, and it was silently 30x weaker than written.
+        // Longest window in the codebase today is 3600s (escalation); the ttl is
+        // set above it rather than equal to it so an early eviction under memory
+        // pressure cannot clip the tail of a window.
+        // tests/rate_limit_ttl_test.php pins this invariant.
+        'ttl' => 7200, // 2 hours: headroom over every window in use.
     ],
     // System prompt cache (per-course).
     'systemprompt' => [

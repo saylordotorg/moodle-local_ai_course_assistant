@@ -279,6 +279,48 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
 
     // ── Tab 2: By Course ──
 
+    /**
+     * Per-course metrics, whichever shape the service sends.
+     *
+     * get_analytics_by_course returns each course NESTED --
+     * {fullname, shortname, overview:{...}, sessions:{...}, return_rate:{...}} --
+     * while this table used to read flat keys (c.active_students,
+     * c.return_rate_pct, c.coursename). Every read was undefined, so the tab
+     * painted a course name from fullname beside five zeros on every row, for
+     * every course, and looked exactly like a site with no activity. Other
+     * callers in analytics.php do build a flat shape, so both are accepted.
+     *
+     * @param {Object} c one course row
+     * @returns {Object} numeric metrics, zero-filled
+     */
+    function courseMetrics(c) {
+        var ov = c.overview || {};
+        var se = c.sessions || {};
+        var rr = c.return_rate || {};
+        var num = function (v) { return (typeof v === 'number' && isFinite(v)) ? v : (parseFloat(v) || 0); };
+        return {
+            active_students: num(ov.active_students !== undefined ? ov.active_students : c.active_students),
+            total_messages: num(ov.total_messages !== undefined ? ov.total_messages : c.total_messages),
+            avg_messages_per_student: num(ov.avg_messages_per_student !== undefined
+                ? ov.avg_messages_per_student : c.avg_messages_per_student),
+            return_rate_pct: num(rr.return_rate_pct !== undefined ? rr.return_rate_pct : c.return_rate_pct),
+            avg_session_minutes: num(se.avg_duration_minutes !== undefined
+                ? se.avg_duration_minutes
+                : (c.avg_session_minutes !== undefined ? c.avg_session_minutes : se.avg_session_minutes))
+        };
+    }
+
+    /**
+     * Display name for a course row. The service sends fullname/shortname;
+     * `coursename` was never one of its keys.
+     *
+     * @param {Object} c
+     * @returns {String}
+     */
+    function courseLabel(c) {
+        return c.fullname || c.shortname || c.coursename || '';
+    }
+
     function renderByCourse(data) {
         var pane = document.getElementById('sola-pane-bycourse');
         if (!pane) { return; }
@@ -292,19 +334,20 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             '<th>' + esc(s('course')) + '</th>' + '<th>' + esc(s('active_ai_users')) + '</th>' + '<th>' + esc(s('messages')) + '</th>' + '<th>' + esc(s('msgs_per_student')) + '</th>' + '<th>' + esc(s('return_rate')) + '</th>' + '<th>' + esc(s('avg_session')) + '</th>' +
             '</tr></thead><tbody>';
         courses.forEach(function(c) {
-            html += '<tr><td>' + esc(c.coursename || c.fullname || '') + '</td>' +
-                '<td>' + (c.active_students || 0) + '</td>' +
-                '<td>' + (c.total_messages || 0) + '</td>' +
-                '<td>' + (c.avg_messages_per_student || 0) + '</td>' +
-                '<td>' + (c.return_rate_pct || 0) + '%</td>' +
-                '<td>' + formatMinutes(c.avg_session_minutes || 0) + '</td></tr>';
+            var m = courseMetrics(c);
+            html += '<tr><td>' + esc(courseLabel(c)) + '</td>' +
+                '<td>' + m.active_students + '</td>' +
+                '<td>' + m.total_messages + '</td>' +
+                '<td>' + m.avg_messages_per_student + '</td>' +
+                '<td>' + m.return_rate_pct + '%</td>' +
+                '<td>' + formatMinutes(m.avg_session_minutes) + '</td></tr>';
         });
         html += '</tbody></table>';
         pane.querySelector('.sola-analytics-content').innerHTML = html;
 
         charts['bycourse'] = createChart('sola-chart-bycourse', 'bar', {
-            labels: courses.map(function(c) { return c.coursename || c.shortname || ''; }),
-            datasets: [{label: s('messages'), data: courses.map(function(c) { return c.total_messages || 0; }), backgroundColor: COLORS[0]}],
+            labels: courses.map(function(c) { return c.shortname || courseLabel(c); }),
+            datasets: [{label: s('messages'), data: courses.map(function(c) { return courseMetrics(c).total_messages; }), backgroundColor: COLORS[0]}],
         }, {indexAxis: 'y'});
     }
 
@@ -417,10 +460,16 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function renderFeedback(data) {
         var pane = document.getElementById('sola-pane-feedback');
         if (!pane) { return; }
-        var ratings = data.ratings || {};
-        var survey = data.survey || {};
-        var resolution = data.resolution || {};
-        var negatives = data.negatives || [];
+        // The server sends rating_summary / survey_summary / messages_to_resolution
+        // / negative_feedback (get_analytics_feedback::execute builds $result with
+        // those keys). This read the four names below instead, so every lookup was
+        // undefined and the tab painted six zero tiles, skipped both charts and
+        // never emitted the negative-feedback table. Same defect class as the
+        // By Course tab. Old names kept as a fallback.
+        var ratings = data.rating_summary || data.ratings || {};
+        var survey = data.survey_summary || data.survey || {};
+        var resolution = data.messages_to_resolution || data.resolution || {};
+        var negatives = data.negative_feedback || data.negatives || [];
 
         var html = '<div class="sola-stat-cards">' +
             statCard(s('thumbs_up'), ratings.thumbs_up || 0, 'up') +

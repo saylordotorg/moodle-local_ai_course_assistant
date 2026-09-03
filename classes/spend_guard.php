@@ -96,10 +96,18 @@ class spend_guard {
             }
         }
         // Per-course cap takes priority when positive.
+        //
+        // v7.3.0 (F31): this read $coursecfg['spend_cap_monthly'] out of
+        // course_config_manager::get_effective_config(), which returns exactly six
+        // keys and never that one. There was also no column to store it and no UI
+        // to set it, so the branch was dead from v5.13 to v7.2.10 and every course
+        // silently fell through to the site-wide default. Per-course caps are now
+        // a real column, read directly rather than through the provider-override
+        // merge -- see course_config_manager::get_spend_cap() for why.
         if ($courseid > 0) {
-            $coursecfg = course_config_manager::get_effective_config($courseid);
-            if (!empty($coursecfg['spend_cap_monthly']) && (float) $coursecfg['spend_cap_monthly'] > 0) {
-                return (float) $coursecfg['spend_cap_monthly'];
+            $coursecap = course_config_manager::get_spend_cap($courseid);
+            if ($coursecap > 0) {
+                return $coursecap;
             }
             // v5.13.0: site-wide default per-course cap. Lets an admin set a
             // defensive cap once (say $30/mo) that propagates to every course

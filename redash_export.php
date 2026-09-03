@@ -56,7 +56,18 @@ use local_ai_course_assistant\redash_export_request;
 // Access-Control-Allow-Origin would let any web page fetch bulk learner data if
 // it learned the key. Emit a CORS origin header ONLY when an admin has
 // explicitly configured one (redash_allowed_origin), and never the wildcard.
-header('Content-Type: application/json; charset=utf-8');
+// v7.2.10: the analytics dashboard's "Export CSV" button has always pointed
+// here, and this endpoint only ever emitted JSON -- no format parameter, no
+// Content-Disposition -- so the button downloaded a JSON body that the browser
+// rendered inline. A CSV-producing external function existed but nothing called
+// it. `format=csv` now emits one requested section as a real CSV attachment.
+$outputformat = optional_param('format', 'json', PARAM_ALPHA) === 'csv' ? 'csv' : 'json';
+if ($outputformat === 'csv') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('X-Content-Type-Options: nosniff');
+} else {
+    header('Content-Type: application/json; charset=utf-8');
+}
 header('Cache-Control: no-cache, no-store, must-revalidate');
 $allowedorigin = trim((string) get_config('local_ai_course_assistant', 'redash_allowed_origin'));
 if ($allowedorigin !== '') {
@@ -503,6 +514,60 @@ foreach ($payload as $key => $value) {
     if ($wants($key)) {
         $response[$key] = $value;
     }
+}
+
+if ($outputformat === 'csv') {
+    // One CSV holds one table. Emit the first requested dataset that has rows,
+    // preferring `courses`, and say in the filename which one it was so a
+    // download is never ambiguous about what it contains.
+    $chosenkey = null;
+    $chosenrows = [];
+    $order = array_merge(['courses'], array_keys($payload));
+    foreach ($order as $key) {
+        if (!array_key_exists($key, $response) || !is_array($response[$key]) || empty($response[$key])) {
+            continue;
+        }
+        $chosenkey = $key;
+        $chosenrows = $response[$key];
+        break;
+    }
+
+    $filename = clean_filename('sola-' . ($chosenkey ?? 'export') . '-' . date('Y-m-d')) . '.csv';
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+    if ($chosenkey === null) {
+        echo "no_rows\n";
+        exit;
+    }
+
+    // Flatten one level: a nested array becomes compact JSON in its cell rather
+    // than "Array", which is what naive casting produces.
+    $flatten = static function (array $row): array {
+        $out = [];
+        foreach ($row as $k => $v) {
+            $out[$k] = is_scalar($v) || $v === null
+                ? (string) $v
+                : json_encode($v, JSON_UNESCAPED_UNICODE);
+        }
+        return $out;
+    };
+
+    $rows = array_map($flatten, array_map(static function ($r) {
+        return (array) $r;
+    }, array_values($chosenrows)));
+
+    $handle = fopen('php://output', 'w');
+    fputcsv($handle, array_keys($rows[0]));
+    foreach ($rows as $row) {
+        // Same formula-injection escaping as the transcript report: learner text
+        // reaches these cells, so a leading = + - @ would execute in Excel.
+        fputcsv($handle, array_map(
+            [\local_ai_course_assistant\transcript_report::class, 'csv_cell'],
+            array_values($row)
+        ));
+    }
+    fclose($handle);
+    exit;
 }
 
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

@@ -1,0 +1,46 @@
+SOLA v7.3.0
+
+A new reporting surface, and four controls that read as working and were not.
+
+NEW: ANONYMIZED CHAT TRANSCRIPTS AND SUMMARIES
+
+- A new report page lets staff view and download chat transcripts and per-conversation summaries, filtered by course, unit, date range and outcome.
+- Learner identities are replaced with per-report pseudonyms before anything is shown or downloaded. A label is stable within one report, so a conversation can be followed end to end, and carries no meaning across reports, so two downloads cannot be joined on it.
+- The conversation grouping column is pseudonymized on the same basis, so no persistent per-learner identifier travels with an export.
+- Every download is written to the audit log, and requires the analytics-viewing capability plus a valid session key.
+- CSV cells beginning with =, +, - or @ are neutralized, so learner-authored message text cannot execute as a formula when the file is opened in a spreadsheet.
+- Conversation history is filtered to learner and assistant turns, so internal telemetry rows never appear in an export.
+- Note: topic has no backing column in the schema, so the topic filter is a text search over message content. This is stated on the page rather than implied.
+
+FIXED: PER-COURSE SPEND CAPS NEVER APPLIED
+
+- The spend guard has read a per-course monthly cap since v5.13, but no database column held the value and no admin field set it, so the lookup always missed and every course silently fell back to the site-wide default.
+- This release adds the column, the upgrade step and the course settings field, so a per-course cap now does what it says.
+- The cap is deliberately read independently of the per-course "enable overrides" flag. That flag governs provider overrides; tying a spending limit to it would let an unrelated toggle disable a financial control.
+
+FIXED: RATE LIMITS LONGER THAN TWO MINUTES WERE NOT ENFORCED
+
+- The rate limiter stores an entire sliding window as a single cache entry and restarts the window whenever that entry is missing, while the cache itself expired after 120 seconds. Any limit with a window longer than that silently reset partway through and enforced a shorter period than it declared.
+- The most consequential case was the support-escalation limit of two tickets per learner per hour, where each ticket sends a transcript to an external help desk. It was in practice allowing far more.
+- The cache lifetime now exceeds the longest window in use, and an automated test fails the build if a future window is added that exceeds it.
+
+FIXED: PER-COURSE API KEYS APPEARED IN THE PAGE SOURCE
+
+- The course settings form rendered the stored provider API key as the value of its password field, placing the credential in the served HTML for anyone able to edit that course, and in any cache that saw the response.
+- The field now always renders empty. Submitting it blank keeps the stored key; an explicit checkbox clears it.
+
+FIXED: TWO ANALYTICS TABS SHOWED NOTHING
+
+- The AI Feedback tab and the By Course tab each read result keys the server does not send, so every value was undefined: zero tiles, no charts, and no detail tables.
+- Export CSV now exports CSV. The button had only ever produced JSON.
+
+OTHER
+
+- Interface parity maintained across all 46 supported languages, with 184 new translations in this release.
+- Full test suite: 1131 tests, no failures. Static validator suite: 36 of 36.
+- Continuous integration green on PHP 8.1, 8.2 and 8.3 against both MariaDB and PostgreSQL.
+
+UPGRADE NOTES
+
+- This release adds a database column and so runs a short upgrade step. No manual action is required.
+- Sites that rely on per-course spend caps should be aware that those caps were previously inert; after upgrading they will take effect, and any course whose real spend already exceeds its intended cap will begin refusing AI requests.
