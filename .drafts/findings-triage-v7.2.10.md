@@ -2,6 +2,38 @@
 
 Generated 2026-09-03 for v7.2.10.
 
+## Status as of v7.3.2 (2026-09-03)
+
+- Fixed in v7.3.0 / v7.3.1: 11 findings (F11, F13, F16, F31, F40, F46, F48, F50, F57, F72, F83)
+- Fixed in v7.3.2: 27 findings (F02, F17, F19, F20, F26, F34, F35, F36, F37, F39, F41, F42, F43, F49, F51, F52, F53, F59, F60, F66, F67, F69, F70, F71, F75, F79, F87)
+- **Remaining: 55 of the original 93.**
+
+Three of the v7.3.2 fixes were materially worse than this document records, and
+the corrected accounts live in the v7.3.2 changelog rather than here:
+
+- **F41** is three defects, not one. Correcting the hook name alone would have
+  left the cascade broken, because the context list was computed after the
+  deletion that empties the tables it is derived from.
+- **F34** loses the entire emitted segment, not a single character: invalid UTF-8
+  makes json_encode return false and the whole frame is dropped.
+- **F37** was rated low here and belongs near the top: viewing the token
+  analytics page sends the spend alert and burns the once-per-period suppression
+  flag, so refreshing the dashboard during an incident is how the real warning
+  fails to arrive.
+
+Two findings were deliberately NOT fixed, with reasons:
+
+- **F52 (rate card)** — the partial-data indicator shipped, but no Gemini prices
+  were added. They could not be verified against a current price sheet, and an
+  unverified rate produces a confidently wrong cost, which is the failure class
+  this release exists to remove. Supply the current Vertex rates and it is a
+  four-line change.
+- **F05 (dead SVG avatar)** — a product decision, not a defect. The procedural
+  avatar is unreachable and its animation code is dead, but removing it or
+  reviving it are both deliberate choices, and the A/B experiment that depends on
+  it is measuring the launcher glow rather than a face.
+
+
 ## Provenance
 
 These are the surviving findings from the two review workflows run on 2026-09-02
