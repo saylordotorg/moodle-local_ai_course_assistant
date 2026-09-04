@@ -61,10 +61,19 @@ class soapbox_cleanup extends \core\task\scheduled_task {
         }
 
         // 2. Stored-attempts pruning: keep newest N per (assignid, userid).
+        // get_records_sql keys the result by the FIRST column. Two learners on
+        // the same assignment share assignid, so later rows silently overwrote
+        // earlier ones and pruning ran for exactly one learner per assignment --
+        // everyone else's over-quota recordings (and their storage objects)
+        // survived until retention expiry. A synthetic unique key fixes the
+        // collapse; sql_concat handles the int casts across DB drivers, which
+        // matters because the local suite is MySQL-only.
         $pairs = $DB->get_records_sql(
-            "SELECT DISTINCT assignid, userid
+            "SELECT " . $DB->sql_concat('assignid', "'-'", 'userid') . " AS pairkey,
+                    assignid, userid
                FROM {local_ai_course_assistant_sbx_rec}
-              WHERE status <> :deleted",
+              WHERE status <> :deleted
+           GROUP BY assignid, userid",
             ['deleted' => 'deleted']
         );
         // Known per-pair read on this nightly cleanup: one assignment row and

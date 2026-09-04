@@ -501,6 +501,15 @@ $response = [
     'generated_at' => date('c'),
     'plugin_version' => $pluginversion,
     'anonymized' => $anonymize,
+    // Honest scope for that flag. Pseudonymization relabels the IDENTITY
+    // columns; message bodies and profile text travel verbatim, and the chat
+    // system prompt instructs the tutor to address learners by first name, so
+    // bodies routinely CONTAIN real first names beside the "Student NNNN"
+    // label. Downstream consumers treating this payload as fully de-identified
+    // would be wrong, and nothing in the envelope said so.
+    'anonymization_scope' => $anonymize
+        ? 'identity_columns_only: message bodies and profile text are verbatim and may contain names'
+        : 'none',
     'sections' => $sections,
     'since' => $since,
 ];

@@ -147,4 +147,39 @@ final class analytics_accuracy_test extends \advanced_testcase {
         $this->assertSame(1, analytics::get_overview(0)['active_students'],
             'a legacy row with a NULL interaction_type is still a real learner message');
     }
+
+    /**
+     * F55: "messages to resolution" must be able to match at all.
+     *
+     * Ratings land on ASSISTANT message ids, but the session walk fetched only
+     * role='user' rows and tested their ids against the rated set -- one shared
+     * id sequence, so the intersection was permanently empty and the Feedback
+     * tab showed a confident 0.0 on sites with thousands of thumbs-ups.
+     */
+    public function test_resolution_metric_matches_rated_assistant_replies(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $u = $this->getDataGenerator()->create_user();
+        $t = time() - 600;
+
+        // Three learner turns, each answered; thumbs-up on the THIRD answer.
+        $aid = 0;
+        for ($i = 0; $i < 3; $i++) {
+            $this->msg((int) $u->id, (int) $course->id, 'user');
+            $DB->execute("UPDATE {local_ai_course_assistant_msgs} SET timecreated = ? WHERE id = (SELECT * FROM (SELECT MAX(id) FROM {local_ai_course_assistant_msgs}) x)", [$t + $i * 20]);
+            $aid = $DB->insert_record('local_ai_course_assistant_msgs', (object) [
+                'conversationid' => 1, 'userid' => $u->id, 'courseid' => $course->id,
+                'role' => 'assistant', 'message' => 'answer', 'cmid' => null,
+                'interaction_type' => 'chat', 'timecreated' => $t + $i * 20 + 5,
+            ]);
+        }
+        $DB->insert_record('local_ai_course_assistant_msg_ratings', (object) [
+            'messageid' => $aid, 'userid' => $u->id, 'courseid' => $course->id,
+            'rating' => 1, 'is_hallucination' => 0, 'comment' => '', 'timecreated' => time(),
+        ]);
+
+        $r = analytics::get_messages_to_resolution((int) $course->id);
+        $this->assertSame(1, $r['sample_size'], 'one rated session must yield one data point');
+        $this->assertSame(3.0, $r['avg_messages'], 'it took three learner turns to reach the rated answer');
+    }
 }

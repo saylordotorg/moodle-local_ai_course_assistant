@@ -106,13 +106,35 @@ class analytics {
                  WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
         $usermessages = (int) $DB->count_records_sql($sql, $params);
 
-        // Off-topic conversations (those with offtopic_count > 0).
-        $convwhere = $sitewide ? '' : ' WHERE c.courseid = :courseid';
-        $convparams = $sitewide ? [] : ['courseid' => $courseid];
-        $sql = "SELECT SUM(c.offtopic_count)
-                  FROM {local_ai_course_assistant_convs} c{$convwhere}";
-        $offtopiccount = (int) $DB->get_field_sql($sql, $convparams);
-        $offtopicrate = $usermessages > 0 ? round(($offtopiccount / $usermessages) * 100, 1) : 0;
+        // Conversations currently off-topic.
+        //
+        // This used to publish an "off-topic rate": SUM(offtopic_count) divided
+        // by the windowed user-message count. Two things made that number
+        // untrue. offtopic_count is a CURRENT-STREAK counter -- sse.php resets
+        // it to zero on the next on-topic message -- so the numerator was a
+        // point-in-time snapshot of open streaks, not a count of off-topic
+        // events: a course where 500 learners each drifted once and came back
+        // read 0%. And the numerator carried no time window while the
+        // denominator did, so the figure disagreed with itself across range
+        // selections. The schema records no off-topic event ledger, so an
+        // honest rate is not derivable; what IS honest is the number of
+        // conversations sitting in an off-topic streak right now, windowed by
+        // recent activity when a range is selected.
+        $convconds = [];
+        $convparams = [];
+        if (!$sitewide) {
+            $convconds[] = 'c.courseid = :courseid';
+            $convparams['courseid'] = $courseid;
+        }
+        if ($since > 0) {
+            $convconds[] = 'c.timemodified >= :convsince';
+            $convparams['convsince'] = $since;
+        }
+        $convconds[] = 'c.offtopic_count > 0';
+        $sql = "SELECT COUNT(c.id)
+                  FROM {local_ai_course_assistant_convs} c
+                 WHERE " . implode(' AND ', $convconds);
+        $offtopicopen = (int) $DB->count_records_sql($sql, $convparams);
 
         // Escalation count (messages containing ticket references).
         $sql = "SELECT COUNT(m.id)
@@ -131,7 +153,7 @@ class analytics {
             'total_messages' => $totalmessages,
             'active_students' => $activestudents,
             'avg_messages_per_student' => $avgmessages,
-            'offtopic_rate' => $offtopicrate,
+            'offtopic_open' => $offtopicopen,
             'escalation_count' => $escalations,
             'studyplan_adoption' => $studyplans,
         ];
@@ -1304,9 +1326,20 @@ class analytics {
         $zeroresult = ['avg_messages' => 0.0, 'median_messages' => 0, 'sample_size' => 0];
 
         try {
-            // Get all user messages with their ratings.
+            // The session walk needs BOTH roles.
+            //
+            // Ratings are recorded against ASSISTANT message ids (the client
+            // submits the id from the SSE done frame, i.e. the assistant row),
+            // but this walk used to fetch role='user' rows only and test THEIR
+            // ids against the rated set. msgs.id is one shared sequence, so the
+            // intersection was always empty and the metric was a permanent 0.0
+            // on sites with thousands of thumbs-ups -- rendered, since v7.3.0,
+            // as a confident stat card on the Feedback tab.
+            //
+            // Bounding to learners who actually rated keeps this from being a
+            // full-table walk: only they can contribute a data point.
             $params = [];
-            $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
+            $where = "m.role IN ('user', 'assistant') AND " . self::meta_rows_excluded('m');
             if ($courseid > 0) {
                 $where .= ' AND m.courseid = :courseid';
                 $params['courseid'] = $courseid;
@@ -1315,12 +1348,26 @@ class analytics {
                 $where .= ' AND m.timecreated >= :since';
                 $params['since'] = $since;
             }
+            $where .= " AND m.userid IN (
+                SELECT r2.userid
+                  FROM {local_ai_course_assistant_msg_ratings} r2
+                 WHERE r2.rating = 1"
+                . ($courseid > 0 ? ' AND r2.courseid = :rcourseid' : '')
+                . ($since > 0 ? ' AND r2.timecreated >= :rsince' : '')
+                . ')';
+            if ($courseid > 0) {
+                $params['rcourseid'] = $courseid;
+            }
+            if ($since > 0) {
+                $params['rsince'] = $since;
+            }
 
-            // Get user messages.
-            $sql = "SELECT m.id, m.userid, m.timecreated
+            // id tiebreak matters: a user turn and its assistant reply can share
+            // a timecreated second, and inverting them undercounts by one.
+            $sql = "SELECT m.id, m.userid, m.role, m.timecreated
                       FROM {local_ai_course_assistant_msgs} m
                      WHERE {$where}
-                     ORDER BY m.userid ASC, m.timecreated ASC";
+                     ORDER BY m.userid ASC, m.timecreated ASC, m.id ASC";
             $messages = $DB->get_records_sql($sql, $params);
 
             if (empty($messages)) {
@@ -1357,19 +1404,23 @@ class analytics {
             $sessionresolved = false;
 
             foreach ($messages as $msg) {
+                $isuser = ($msg->role === 'user');
                 if ($msg->userid !== $currentuserid || ($msg->timecreated - $sessionend) > 1800) {
-                    // New session.
+                    // New session. Count only the learner's own turns.
                     $currentuserid = $msg->userid;
-                    $sessionmsgcount = 1;
+                    $sessionmsgcount = $isuser ? 1 : 0;
                     $sessionend = $msg->timecreated;
                     $sessionresolved = false;
                 } else {
                     $sessionend = $msg->timecreated;
-                    $sessionmsgcount++;
+                    if ($isuser) {
+                        $sessionmsgcount++;
+                    }
                 }
 
-                // Check if this message has a thumbs-up.
-                if (!$sessionresolved && isset($ratedset[$msg->id])) {
+                // A thumbs-up lands on an ASSISTANT row; the answer is how many
+                // learner turns it took to get there.
+                if (!$isuser && !$sessionresolved && $sessionmsgcount > 0 && isset($ratedset[$msg->id])) {
                     $resolutioncounts[] = $sessionmsgcount;
                     $sessionresolved = true;
                 }

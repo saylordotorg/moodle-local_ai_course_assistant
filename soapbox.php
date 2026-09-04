@@ -171,6 +171,7 @@ echo $OUTPUT->header();
         browser_note: <?php echo json_encode(get_string('soapbox:browser_note', 'local_ai_course_assistant')); ?>,
         server_note: <?php echo json_encode(get_string('soapbox:server_note', 'local_ai_course_assistant')); ?>,
         error: <?php echo json_encode(get_string('soapbox:error', 'local_ai_course_assistant')); ?>,
+        no_media_support: <?php echo json_encode(get_string('soapbox:no_media_support', 'local_ai_course_assistant')); ?>,
         err_provider: <?php echo json_encode(get_string('soapbox:err_provider', 'local_ai_course_assistant')); ?>,
         err_parse: <?php echo json_encode(get_string('soapbox:err_parse', 'local_ai_course_assistant')); ?>,
         err_disabled: <?php echo json_encode(get_string('soapbox:err_disabled', 'local_ai_course_assistant')); ?>,
@@ -262,14 +263,37 @@ echo $OUTPUT->header();
     };
 
     // ---- Server mode: MediaRecorder -> upload blob -> soapbox_transcribe.php ----
+    var showWarn = function(msg) {
+        setBusy('');
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = '<div class="alert alert-warning">' + esc(msg) + '</div>';
+    };
     var startServer = function() {
+        // Capability gate FIRST. On an insecure (plain-http) context
+        // navigator.mediaDevices is undefined, so the old code threw a
+        // synchronous TypeError inside the click handler -- no promise, no
+        // catch, no alert: a silent dead Record button. And every failure that
+        // DID reach the catch below, including "this browser cannot record at
+        // all", was reported as a microphone-permission denial.
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+            showWarn(STR.no_media_support);
+            return;
+        }
         navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
             chunks = [];
             var mime = '';
             ['audio/webm', 'audio/mp4', 'audio/ogg'].some(function(m) {
-                if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) { mime = m; return true; } return false;
+                if (MediaRecorder.isTypeSupported(m)) { mime = m; return true; } return false;
             });
-            mediaRec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+            try {
+                mediaRec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+            } catch (e) {
+                // Release the mic -- without this the browser's recording
+                // indicator stayed lit with nothing on screen to explain it.
+                stream.getTracks().forEach(function(t) { t.stop(); });
+                showWarn(STR.error + ' (' + ((e && e.name) || 'MediaRecorder') + ')');
+                return;
+            }
             mediaRec.ondataavailable = function(e) { if (e.data && e.data.size) { chunks.push(e.data); } };
             mediaRec.onstop = function() {
                 stream.getTracks().forEach(function(t) { t.stop(); });
@@ -301,7 +325,12 @@ echo $OUTPUT->header();
             };
             mediaRec.start();
             beginUI();
-        }).catch(function() { alert(STR.mic_denied); });
+        }).catch(function(err) {
+            var denied = err && (err.name === 'NotAllowedError'
+                || err.name === 'PermissionDeniedError' || err.name === 'SecurityError');
+            showWarn(denied ? STR.mic_denied
+                : (STR.error + (err && err.name ? ' (' + err.name + ')' : '')));
+        });
     };
     var stopServer = function() { if (mediaRec && mediaRec.state !== 'inactive') { mediaRec.stop(); } endUI(); };
 

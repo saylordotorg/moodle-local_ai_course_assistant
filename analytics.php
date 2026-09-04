@@ -209,18 +209,21 @@ if ($courseid > 0) {
             for ($s = 0; $s < 5; $s++) {
                 $stars .= $s < (int) $fb->rating ? '&#9733;' : '&#9734;';
             }
-            $realname = htmlspecialchars($fb->firstname . ' ' . $fb->lastname);
+            // No htmlspecialchars here or below: these render through {{ }} in the
+            // Mustache template, which escapes (escape => 's'). Escaping twice made
+            // O'Brien display as O&#39;Brien in the feedback table.
+            $realname = $fb->firstname . ' ' . $fb->lastname;
             $anonname = \local_ai_course_assistant\anonymizer::name((int) $fb->userid);
             $feedbackentries[] = [
                 'name'        => $show_real_names ? $realname : $anonname,
                 'stars'       => $stars,
                 'rating'      => (int) $fb->rating,
-                'comment'     => htmlspecialchars($fb->comment ?: ''),
+                'comment'     => $fb->comment ?: '',
                 'has_comment' => !empty($fb->comment),
-                'browser'     => htmlspecialchars($fb->browser ?: ''),
-                'os'          => htmlspecialchars($fb->os ?: ''),
-                'device'      => htmlspecialchars($fb->device ?: ''),
-                'screen'      => htmlspecialchars($fb->screen_size ?: ''),
+                'browser'     => $fb->browser ?: '',
+                'os'          => $fb->os ?: '',
+                'device'      => $fb->device ?: '',
+                'screen'      => $fb->screen_size ?: '',
                 'date'        => userdate($fb->timecreated),
             ];
         }
@@ -264,7 +267,7 @@ if ($courseid > 0) {
                     if ($q['type'] === 'long_text' && !empty($q['answers'])) {
                         $text_answers = [];
                         foreach (array_slice($q['answers'], 0, 20) as $a) {
-                            $text_answers[] = ['text' => htmlspecialchars($a)];
+                            $text_answers[] = ['text' => $a];
                         }
                         $sq['answers'] = $text_answers;
                         $sq['has_answers'] = true;
@@ -301,7 +304,7 @@ if ($courseid > 0) {
                         $ut['avg_rating'] = $t['avg_rating'] ?? 0;
                         $comments = [];
                         foreach (array_slice($t['comments'] ?? [], 0, 20) as $c) {
-                            $comments[] = ['text' => htmlspecialchars($c)];
+                            $comments[] = ['text' => $c];
                         }
                         $ut['comments'] = $comments;
                         $ut['has_comments'] = !empty($comments);
@@ -316,7 +319,7 @@ if ($courseid > 0) {
                     if ($t['type'] === 'free_response' && !empty($t['answers'])) {
                         $answers = [];
                         foreach (array_slice($t['answers'], 0, 20) as $a) {
-                            $answers[] = ['text' => htmlspecialchars($a)];
+                            $answers[] = ['text' => $a];
                         }
                         $ut['answers'] = $answers;
                         $ut['has_answers'] = !empty($answers);
@@ -373,13 +376,29 @@ if ($courseid > 0) {
 }
 
 // ── Past Learning Radar queries (most recent 50, paired by conversation) ────
-$radarpastraw = $DB->get_records_sql(
-    "SELECT id, conversationid, role, message, prompt_tokens, completion_tokens,
-            model_name, provider, interaction_type, timecreated
-       FROM {local_ai_course_assistant_msgs}
+// Bounded two-step fetch. This used to pull EVERY radar row ever written --
+// full multi-KB message bodies for both query and answer, no LIMIT, no window --
+// on every load of this page, then truncate to 200/280 chars and slice to 50 in
+// PHP. Radar rows bypass the 100-row conversation cap and reuse one long-lived
+// conversation per admin, so the scan grew without bound (56k-row msgs table in
+// production). 200 newest ids = 100 pairs, comfortably past the 50 rendered.
+// The pairing walk needs conversationid ASC, id ASC ordering, so the ids are
+// selected newest-first and the bodies re-fetched in pairing order -- a naive
+// ORDER BY id DESC LIMIT interleaves conversations and breaks the walk.
+$radarids = $DB->get_fieldset_sql(
+    "SELECT id FROM {local_ai_course_assistant_msgs}
       WHERE interaction_type IN ('meta', 'meta_scheduled')
-      ORDER BY conversationid ASC, id ASC"
-);
+      ORDER BY id DESC", [], 0, 200);
+$radarpastraw = [];
+if (!empty($radarids)) {
+    [$radarinsql, $radarinparams] = $DB->get_in_or_equal($radarids, SQL_PARAMS_NAMED, 'rid');
+    $radarpastraw = $DB->get_records_sql(
+        "SELECT id, conversationid, role, message, prompt_tokens, completion_tokens,
+                model_name, provider, interaction_type, timecreated
+           FROM {local_ai_course_assistant_msgs}
+          WHERE id {$radarinsql}
+          ORDER BY conversationid ASC, id ASC", $radarinparams);
+}
 $radar_past = [];
 $pendinguser = null;
 foreach ($radarpastraw as $row) {

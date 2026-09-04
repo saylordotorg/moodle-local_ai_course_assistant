@@ -96,7 +96,7 @@ class soapbox_scorer {
      *
      * @param int $recid
      */
-    public static function score_recording(int $recid): void {
+    public static function score_recording(int $recid, bool $retrytransient = false): void {
         global $DB;
 
         $rec = $DB->get_record('local_ai_course_assistant_sbx_rec', ['id' => $recid]);
@@ -110,6 +110,15 @@ class soapbox_scorer {
 
         $transcript = self::transcribe_object($rec->storage_key);
         if ($transcript === null) {
+            if ($retrytransient) {
+                // Throw so the adhoc task manager reschedules with backoff.
+                // STT cold starts, 429s and timeouts are transient; marking the
+                // row failed here made ONE Whisper hiccup permanently consume
+                // one of the learner's attempts, while the task reported
+                // success so nothing ever retried -- despite this class's own
+                // docblock promising the runner would.
+                throw new \moodle_exception('soapbox:err_transcribe', 'local_ai_course_assistant');
+            }
             $DB->set_field('local_ai_course_assistant_sbx_rec', 'status', 'failed', ['id' => $recid]);
             return;
         }
@@ -175,6 +184,12 @@ class soapbox_scorer {
             $visionnote
         );
 
+        if (empty($result['success']) && $retrytransient
+                && (string) ($result['message'] ?? '') === 'provider_error') {
+            // Provider outage or a spend-cap race: transient, let the runner
+            // retry. disabled / too_short / parse_error stay permanent.
+            throw new \moodle_exception('soapbox:err_provider', 'local_ai_course_assistant');
+        }
         $update = (object) [
             'id'         => $recid,
             'transcript' => $transcript,

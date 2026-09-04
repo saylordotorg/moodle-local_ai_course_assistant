@@ -249,7 +249,12 @@ class radar_delivery {
         ]];
 
         $payload = ['blocks' => $blocks, 'text' => 'SOLA Learning Radar report'];
-        return self::http_post($webhookurl, json_encode($payload), 'application/json');
+        $json = json_encode($payload);
+        if ($json === false) {
+            debugging('SOLA radar delivery: payload failed to encode: ' . json_last_error_msg(), DEBUG_DEVELOPER);
+            return false;
+        }
+        return self::http_post($webhookurl, $json, 'application/json');
     }
 
     /**
@@ -296,7 +301,12 @@ class radar_delivery {
                 ],
             ],
         ];
-        return self::http_post($webhookurl, json_encode($card), 'application/json');
+        $json = json_encode($card);
+        if ($json === false) {
+            debugging('SOLA radar delivery: card failed to encode: ' . json_last_error_msg(), DEBUG_DEVELOPER);
+            return false;
+        }
+        return self::http_post($webhookurl, $json, 'application/json');
     }
 
     /**
@@ -330,10 +340,14 @@ class radar_delivery {
      */
     private static function truncate_for_slack(string $text): string {
         $max = 2800;
-        if (strlen($text) <= $max) {
+        // mb functions, not byte substr: a byte-offset cut through a multi-byte
+        // character leaves invalid UTF-8, json_encode() then returns false, and
+        // the POST body goes out empty -- a silent delivery failure recorded as
+        // success. Unreachable on an all-ASCII site, guaranteed on any other.
+        if (mb_strlen($text, 'UTF-8') <= $max) {
             return $text;
         }
-        return substr($text, 0, $max) . "\n\n_(truncated)_";
+        return mb_substr($text, 0, $max, 'UTF-8') . "\n\n_(truncated)_";
     }
 
     /**
@@ -344,10 +358,14 @@ class radar_delivery {
      */
     private static function truncate_for_teams(string $text): string {
         $max = 18000;
-        if (strlen($text) <= $max) {
+        // mb functions, not byte substr: a byte-offset cut through a multi-byte
+        // character leaves invalid UTF-8, json_encode() then returns false, and
+        // the POST body goes out empty -- a silent delivery failure recorded as
+        // success. Unreachable on an all-ASCII site, guaranteed on any other.
+        if (mb_strlen($text, 'UTF-8') <= $max) {
             return $text;
         }
-        return substr($text, 0, $max) . "\n\n_(truncated)_";
+        return mb_substr($text, 0, $max, 'UTF-8') . "\n\n_(truncated)_";
     }
 
     /**

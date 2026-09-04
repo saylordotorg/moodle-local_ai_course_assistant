@@ -297,7 +297,7 @@ PROMPT;
 
         try {
             $profiles = $DB->get_records_sql(
-                "SELECT p.userid, p.courseid, p.profile_summary, c.fullname AS coursename
+                "SELECT p.id, p.userid, p.courseid, p.profile_summary, c.fullname AS coursename
                    FROM {local_ai_course_assistant_profiles} p
                    JOIN {course} c ON c.id = p.courseid
                   WHERE " . implode(' AND ', $where) . "
@@ -347,15 +347,33 @@ PROMPT;
 
         [$wcl, $params] = self::build_where($courseids, $since, $filterprovider);
 
-        $sql = "SELECT m.id, m.userid, m.role, m.message, m.courseid, m.timecreated,
-                       m.provider, m.model_name,
-                       c.fullname AS coursename
-                  FROM {local_ai_course_assistant_msgs} m
-                  JOIN {course} c ON c.id = m.courseid
-                 WHERE {$wcl}
-                 ORDER BY m.courseid ASC, m.userid ASC, m.timecreated ASC";
+        // Bound the fetch in SQL and sample RECENT rows.
+        //
+        // This fetched every matching row unbounded and truncated afterwards in
+        // PHP, with courseid-ascending order -- so the lowest-numbered courses
+        // always filled the character budget and the newest courses were always
+        // absent from a site-wide radar query. Deterministic bias, not a random
+        // sample. Selecting the newest ids first and re-sorting for readability
+        // gives the sample an analyst would expect.
+        $rowcap = max(200, (int) ($maxchars / 400));
+        $recentids = $DB->get_fieldset_sql(
+            "SELECT m.id
+               FROM {local_ai_course_assistant_msgs} m
+              WHERE {$wcl}
+              ORDER BY m.id DESC", $params, 0, $rowcap);
 
-        $messages = $DB->get_records_sql($sql, $params);
+        $messages = [];
+        if (!empty($recentids)) {
+            [$tinsql, $tinparams] = $DB->get_in_or_equal($recentids, SQL_PARAMS_NAMED, 'tid');
+            $messages = $DB->get_records_sql(
+                "SELECT m.id, m.userid, m.role, m.message, m.courseid, m.timecreated,
+                        m.provider, m.model_name,
+                        c.fullname AS coursename
+                   FROM {local_ai_course_assistant_msgs} m
+                   JOIN {course} c ON c.id = m.courseid
+                  WHERE m.id {$tinsql}
+                  ORDER BY m.courseid ASC, m.userid ASC, m.timecreated ASC", $tinparams);
+        }
 
         if (empty($messages)) {
             return "(No conversation data found for the selected filters.)\n";
@@ -365,6 +383,7 @@ PROMPT;
         $currentcourse = 0;
         $totalchars = 0;
         $truncated = false;
+        $emitted = 0;
 
         foreach ($messages as $msg) {
             if ($msg->courseid !== $currentcourse) {
@@ -398,6 +417,7 @@ PROMPT;
                 break;
             }
             $lines[] = $line;
+            $emitted++;
         }
 
         $result = implode('', $lines);
@@ -405,8 +425,14 @@ PROMPT;
             $result .= "\n(Data truncated to ~" . number_format($maxchars) . " characters.)\n";
         }
 
-        $total = count($messages);
-        $result = "Total messages in transcript: {$total}\n" . $result;
+        // Report what is actually IN the block, not the fetch count. The radar
+        // model was being told "Total messages in transcript: 41,203" and handed
+        // a few hundred, so every "out of N, X% ..." claim it produced was
+        // computed against a denominator that did not match the evidence.
+        $result = "Messages included in transcript: {$emitted}"
+            . (($truncated || count($messages) >= $rowcap)
+                ? " (recent sample; more messages exist for these filters)" : "")
+            . "\n" . $result;
 
         return $result;
     }

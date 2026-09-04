@@ -453,11 +453,22 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         });
 
         // Dismiss on outside click.
+        //
+        // The old predicate compared the clicked element's citeId against THIS
+        // handler's id, so clicking a SECOND citation badge hid the popover the
+        // badge's own handler had just opened -- every subsequent citation
+        // needed two clicks. Now: a click on any badge hands off to that
+        // badge's handler (this listener just unbinds); only a genuine outside
+        // click hides. Unbinding on badge clicks also stops stale listeners
+        // stacking up as the user moves between citations.
         setTimeout(function() {
             document.addEventListener('click', function dismiss(ev) {
-                if (!pop.contains(ev.target) && ev.target.dataset.citeId !== id) {
+                if (pop.contains(ev.target)) {
+                    return;
+                }
+                document.removeEventListener('click', dismiss);
+                if (!ev.target.dataset.citeId) {
                     pop.style.display = 'none';
-                    document.removeEventListener('click', dismiss);
                 }
             });
         }, 0);

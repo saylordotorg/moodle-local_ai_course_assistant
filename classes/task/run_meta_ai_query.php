@@ -66,8 +66,16 @@ class run_meta_ai_query extends \core\task\scheduled_task {
                 continue;
             }
             try {
-                $this->run_schedule($sched);
-                radar_schedule_manager::record_run((int) $sched->id, 'success');
+                // record_run used to say 'success' on the mere absence of a
+                // thrown exception, while every delivery failure is signalled by
+                // a false RETURN from radar_delivery -- so a dead Slack webhook
+                // wore a green badge indefinitely.
+                $ok = $this->run_schedule($sched);
+                radar_schedule_manager::record_run(
+                    (int) $sched->id,
+                    $ok ? 'success' : 'error',
+                    $ok ? '' : 'No destination accepted the delivery (webhook or email returned failure).'
+                );
             } catch (\Throwable $e) {
                 mtrace('  Learning Radar cron ERROR (#' . $sched->id . '): ' . $e->getMessage());
                 radar_schedule_manager::record_run((int) $sched->id, 'error', $e->getMessage());
@@ -81,16 +89,16 @@ class run_meta_ai_query extends \core\task\scheduled_task {
      * persist for export.
      *
      * @param \stdClass $sched Row from local_ai_course_assistant_radar_sched.
-     * @return void
+     * @return bool true when at least one destination accepted the delivery.
      */
-    private function run_schedule(\stdClass $sched): void {
+    private function run_schedule(\stdClass $sched): bool {
         global $CFG;
         require_once($CFG->dirroot . '/lib/filelib.php');
 
         $query = (string) $sched->query;
         if ($query === '') {
             mtrace('  Learning Radar cron: schedule #' . $sched->id . ' has no query, skipping.');
-            return;
+            return true;
         }
 
         $rangedays = !empty($sched->range_days)
@@ -156,10 +164,11 @@ class run_meta_ai_query extends \core\task\scheduled_task {
         }
 
         if (!$delivered) {
-            // Fall back to the site admin so the report does not vanish.
+            // Fall back to the site admin so the report does not vanish -- and
+            // count that fallback's own outcome, which used to be discarded.
             $admin = get_admin();
             mtrace("  Learning Radar cron #{$sched->id}: no destination delivered; falling back to admin email.");
-            radar_delivery::send_email(
+            $delivered = radar_delivery::send_email(
                 (string) $admin->email,
                 $query,
                 $response,
@@ -192,5 +201,7 @@ class run_meta_ai_query extends \core\task\scheduled_task {
             mtrace('  Learning Radar cron #' . $sched->id . ': persistence failed (non-fatal): '
                 . $persisterr->getMessage());
         }
+
+        return $delivered;
     }
 }

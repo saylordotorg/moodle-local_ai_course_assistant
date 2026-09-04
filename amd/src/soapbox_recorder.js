@@ -285,13 +285,26 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str', 'core/ajax'], 
                     timerId = window.setInterval(tick, 500);
                     setStatus('Recording...');
                     return s;
-                }).catch(function() {
-                    Str.get_string('soapbox:mic_denied', 'local_ai_course_assistant').then(function(m) {
-                        setStatus(m);
-                        return m;
-                    }).catch(function() {
-                        setStatus('Camera or microphone permission was denied.');
-                    });
+                }).catch(function(err) {
+                    // Release the camera/mic before reporting anything: a
+                    // MediaRecorder constructor throw or a preview.play()
+                    // rejection lands here AFTER the stream was acquired, and
+                    // without this the camera light stayed on with no control
+                    // left on screen that could turn it off.
+                    stopStream();
+                    var denied = err && (err.name === 'NotAllowedError'
+                        || err.name === 'PermissionDeniedError' || err.name === 'SecurityError');
+                    if (denied) {
+                        Str.get_string('soapbox:mic_denied', 'local_ai_course_assistant').then(function(m) {
+                            setStatus(m);
+                            return m;
+                        }).catch(function() {
+                            setStatus('Camera or microphone permission was denied.');
+                        });
+                    } else {
+                        setStatus('Could not start recording'
+                            + (err && err.name ? ' (' + err.name + ')' : '') + '. Please try again.');
+                    }
                 });
             };
 

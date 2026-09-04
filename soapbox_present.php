@@ -236,10 +236,16 @@ if (empty($recs)) {
         } else if ($r->status === 'deleted') {
             $view = html_writer::span(get_string('soapbox:expired', 'local_ai_course_assistant'), 'text-muted');
         }
+        // Human status, not the raw DB value: a learner whose row said
+        // `failed` got no guidance, and with v7.3.3's cap change a failed
+        // attempt no longer counts, which the label should say.
+        $statuskey = in_array($r->status, ['uploaded', 'scored', 'failed'], true)
+            ? 'soapbox:status_' . $r->status
+            : null;
         $table->data[] = [
-            userdate((int) $r->timecreated, get_string('strftimedatetimeshort')),
+            userdate((int) $r->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
             $len,
-            s($r->status),
+            $statuskey ? get_string($statuskey, 'local_ai_course_assistant') : s($r->status),
             $view,
         ];
     }

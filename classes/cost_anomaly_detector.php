@@ -71,6 +71,17 @@ class cost_anomaly_detector {
     /** @var int Minimum days of history required before evaluating an anomaly. */
     public const MIN_HISTORY_DAYS = 7;
 
+    /**
+     * How many of the prior days must show spend before the detector activates.
+     *
+     * The old gate required ALL seven prior days to be nonzero, which is a
+     * traffic profile, not a history check: a low-traffic site with quiet
+     * weekends reported insufficient_history forever, silently, while the admin
+     * believed the anomaly alarm was armed. Three active days is enough signal
+     * for a median to mean something.
+     */
+    public const MIN_ACTIVE_DAYS = 3;
+
     /** @var float Default multiplier (today must exceed median by this much). */
     public const DEFAULT_MULTIPLIER = 2.0;
 
@@ -259,11 +270,14 @@ class cost_anomaly_detector {
             $prior[] = self::compute_daily_spend(self::utc_day_start($d));
         }
 
-        // Insufficient-history shape: the first 7 days after the feature is
+        // Insufficient-history shape: the first days after the feature is
         // enabled produce $0 medians because there's no historical data yet.
-        // Detect by counting how many of the prior days had nonzero spend.
-        $nonzero = count(array_filter($prior, fn($v) => $v > 0));
-        if ($nonzero < self::MIN_HISTORY_DAYS) {
+        // Gate on a minimum number of ACTIVE days, and take the median over the
+        // active days only -- zero-spend weekend days are absence of traffic,
+        // not evidence about a normal day's spend.
+        $active = array_values(array_filter($prior, fn($v) => $v > 0));
+        $nonzero = count($active);
+        if ($nonzero < self::MIN_ACTIVE_DAYS) {
             return [
                 'status' => 'insufficient_history',
                 'today_usd' => round($today, 4),
@@ -275,7 +289,7 @@ class cost_anomaly_detector {
             ];
         }
 
-        $median = self::median($prior);
+        $median = self::median($active);
         $ratio = $median > 0 ? ($today / $median) : 0.0;
 
         if ($today > $multiplier * $median) {
@@ -285,7 +299,7 @@ class cost_anomaly_detector {
                 'median_usd' => round($median, 4),
                 'ratio' => round($ratio, 2),
                 'multiplier' => $multiplier,
-                'window_days' => self::MIN_HISTORY_DAYS,
+                'window_days' => $nonzero,
                 'top_courses' => self::per_course_spend_for_day(self::utc_day_start(0)),
             ];
         }
@@ -296,7 +310,7 @@ class cost_anomaly_detector {
             'median_usd' => round($median, 4),
             'ratio' => round($ratio, 2),
             'multiplier' => $multiplier,
-            'window_days' => self::MIN_HISTORY_DAYS,
+            'window_days' => $nonzero,
             'top_courses' => [],
         ];
     }

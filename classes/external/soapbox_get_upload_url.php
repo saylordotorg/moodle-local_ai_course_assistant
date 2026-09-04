@@ -104,7 +104,10 @@ class soapbox_get_upload_url extends external_api {
         // bounded by the admin max).
         $made = $DB->count_records_select(
             'local_ai_course_assistant_sbx_rec',
-            'assignid = :a AND userid = :u AND status <> :d',
+            // 'failed' rows are excluded: a transient scoring failure is not a
+            // learner attempt, and counting it let one STT hiccup permanently
+            // burn one of the (default three) allowed recordings.
+            "assignid = :a AND userid = :u AND status <> :d AND status <> 'failed'",
             ['a' => $assign->id, 'u' => $USER->id, 'd' => 'deleted']
         );
         if ($made >= soapbox_config::effective_recording_cap((int) $assign->max_attempts)) {

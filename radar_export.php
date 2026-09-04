@@ -102,6 +102,12 @@ if ($action === 'download') {
 // Send actions return JSON to the AMD module.
 header('Content-Type: application/json; charset=utf-8');
 
+// Everything below has promised JSON. Without this, any exception from a
+// delivery branch (notably a curl failure inside radar_delivery or
+// redash_client) rendered Moodle's themed HTML error page against the JSON
+// content-type, which the AMD module reports as an unparseable response with
+// no hint of the actual cause.
+try {
 if ($action === 'email') {
     $to = required_param('to', PARAM_EMAIL);
     if ($to === '') {
@@ -187,3 +193,7 @@ if ($action === 'redash_setup') {
 
 http_response_code(400);
 echo json_encode(['ok' => false, 'error' => 'Unknown action']);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+}

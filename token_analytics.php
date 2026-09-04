@@ -198,8 +198,8 @@ foreach ($bymodel as $row) {
     $grandresponses += (int) $row->response_count;
 
     $bymodelrows[] = [
-        'model'              => htmlspecialchars($row->model),
-        'provider'           => htmlspecialchars($row->provider),
+        'model'              => $row->model,
+        'provider'           => $row->provider,
         'response_count'     => number_format((int) $row->response_count),
         'prompt_tokens'      => number_format((int) $row->total_prompt),
         'completion_tokens'  => number_format((int) $row->total_completion),
@@ -275,7 +275,7 @@ foreach ($bystudent as $row) {
     $uid = (int) $row->userid;
     $cost = $permodelcost[$uid] ?? null;
     $bystudentrows[] = [
-        'name'              => htmlspecialchars(fullname($row)),
+        'name'              => fullname($row),
         'response_count'    => number_format((int) $row->response_count),
         'prompt_tokens'     => number_format((int) $row->total_prompt),
         'completion_tokens' => number_format((int) $row->total_completion),
@@ -313,7 +313,7 @@ $courseoptions = [[
 foreach ($courses as $c) {
     $courseoptions[] = [
         'id'       => (int) $c->id,
-        'name'     => htmlspecialchars($c->shortname . ': ' . $c->fullname),
+        'name'     => $c->shortname . ': ' . $c->fullname,
         'selected' => ($courseid === (int) $c->id),
     ];
 }
@@ -368,8 +368,8 @@ foreach ($optimizerdata['capabilities'] as $cap) {
             : get_string('prompt_playground:score_na', 'local_ai_course_assistant');
         $ranklines[] = get_string('token_analytics:opt_rank_line', 'local_ai_course_assistant', [
             'rank'         => $i + 1,
-            'provider'     => htmlspecialchars($r['provider']),
-            'model'        => htmlspecialchars($r['model']),
+            'provider'     => $r['provider'],
+            'model'        => $r['model'],
             'cost'         => \local_ai_course_assistant\token_cost_manager::format_cost($r['cost_per_request']),
             'satisfaction' => $satstr,
             'samples'      => $r['sample'],
@@ -378,7 +378,7 @@ foreach ($optimizerdata['capabilities'] as $cap) {
     }
     $optrows[] = [
         'capability' => ucfirst($cap['capability']),
-        'active'     => htmlspecialchars($cap['active']),
+        'active'     => $cap['active'],
         'rankings_html' => $ranklines
             ? implode('<br>', $ranklines)
             : '<em>' . get_string('token_analytics:opt_no_data', 'local_ai_course_assistant') . '</em>',

@@ -1223,6 +1223,14 @@ define([
                 }
             }
         }
+        // The "Generate flashcards from this page" starter is guaranteed to
+        // fail without a module page: generate_flashcards returns
+        // no_page_content for cmid 0, and course home pages have no cmid. A
+        // starter that always errors is worse than an absent one.
+        if (!currentPageId) {
+            root.querySelectorAll('.local-ai-course-assistant__starter[data-starter="generate-flashcards"]')
+                .forEach(function(btn) { btn.hidden = true; });
+        }
         if (!currentPageTitle) {
             currentPageTitle = getContextDebugHeading() || root.dataset.serverPageTitle || '';
             if (currentPageTitle) {
@@ -2189,17 +2197,36 @@ define([
                     UI.hideTypingIndicator();
                     var url = (starterBtn && starterBtn.dataset.flashcardsUrl) || '';
                     if (res && res.success && res.cards && res.cards.length) {
-                        var msg = 'Saved ' + res.cards.length + ' flashcards from this page. '
-                            + (url ? '[Open the review page](' + url + ') to study them with spaced repetition.' : '');
-                        UI.appendMessage('assistant', msg);
+                        Str.get_strings([
+                            {key: 'flashcards:starter_saved', component: 'local_ai_course_assistant'},
+                            {key: 'flashcards:starter_open_review', component: 'local_ai_course_assistant'},
+                        ]).then(function(strs) {
+                            // Moodle's string cache returns raw {$a}; substitute here.
+                            var msg = strs[0].replace('{$a}', String(res.cards.length))
+                                + (url ? ' [' + strs[1] + '](' + url + ')' : '');
+                            UI.appendMessage('assistant', msg);
+                            return null;
+                        }).catch(function() {
+                            UI.appendMessage('assistant', 'Saved ' + res.cards.length + ' flashcards from this page.');
+                        });
                     } else {
                         var why = res && res.message ? res.message : 'unknown_error';
-                        UI.appendMessage('assistant', 'I could not generate flashcards from this page (' + why + '). Try again or pick a page with more content.');
+                        Str.get_string('flashcards:starter_failed', 'local_ai_course_assistant').then(function(str) {
+                            UI.appendMessage('assistant', str.replace('{$a}', why));
+                            return null;
+                        }).catch(function() {
+                            UI.appendMessage('assistant', 'I could not generate flashcards from this page (' + why + ').');
+                        });
                     }
                 })
                 .catch(function() {
                     UI.hideTypingIndicator();
-                    UI.appendMessage('assistant', 'I could not generate flashcards from this page right now. Try again later.');
+                    Str.get_string('flashcards:starter_error', 'local_ai_course_assistant').then(function(str) {
+                        UI.appendMessage('assistant', str);
+                        return null;
+                    }).catch(function() {
+                        UI.appendMessage('assistant', 'I could not generate flashcards from this page right now.');
+                    });
                 });
             return;
         }

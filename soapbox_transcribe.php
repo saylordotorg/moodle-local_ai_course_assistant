@@ -170,23 +170,26 @@ $filesizebytes = filesize($tmpfile) ?: 0;
 $approxminutes = max(0.1, $filesizebytes / 1_000_000);
 $approxtokens = (int) ceil($approxminutes * 1000);
 try {
-    $conv = $DB->get_record('local_ai_course_assistant_convs', [
-        'userid' => $USER->id, 'courseid' => $courseid > 0 ? $courseid : SITEID,
-    ]);
-    if ($conv) {
-        \local_ai_course_assistant\conversation_manager::add_message(
-            $conv->id,
-            $USER->id,
-            $courseid > 0 ? $courseid : SITEID,
-            'system',
-            '[Soapbox STT]',
-            0,
-            $cfg['provider'] . '_stt',
-            $approxtokens,
-            0,
-            $model
-        );
-    }
+    // get_or_create, not lookup: a Soapbox-only learner who never opened the
+    // chat drawer has no conversation row, and the old `if ($conv)` guard
+    // silently skipped the telemetry write for exactly the heaviest STT users --
+    // undercounting usage and spend where they matter most.
+    $conv = \local_ai_course_assistant\conversation_manager::get_or_create_conversation(
+        $USER->id,
+        $courseid > 0 ? $courseid : SITEID
+    );
+    \local_ai_course_assistant\conversation_manager::add_message(
+        $conv->id,
+        $USER->id,
+        $courseid > 0 ? $courseid : SITEID,
+        'system',
+        '[Soapbox STT]',
+        0,
+        $cfg['provider'] . '_stt',
+        $approxtokens,
+        0,
+        $model
+    );
 } catch (\Throwable $e) {
     unset($e);
 }

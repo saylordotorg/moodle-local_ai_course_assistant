@@ -111,10 +111,21 @@ try {
                 'format' => optional_param('format', 'text', PARAM_ALPHA),
                 // Comma-separated course IDs (UI placeholder "2,5,12").
                 'courseids' => optional_param('courseids', '', PARAM_SEQUENCE),
-                'filterprovider' => optional_param('filterprovider', '', PARAM_ALPHANUMEXT),
+                // null default distinguishes ABSENT from empty: the schedule
+                // modal has no filterprovider input, so every edit used to post
+                // without the key and save() wrote '' over a provider filter
+                // migrated from the legacy metaai_cron_filterprovider setting.
+                // Absent now preserves the stored value; an explicit empty
+                // string still clears it.
+                'filterprovider' => optional_param('filterprovider', null, PARAM_ALPHANUMEXT),
                 'range_days' => $rangedays,
                 'enabled' => optional_param('enabled', 0, PARAM_INT),
             ];
+            if ($data['filterprovider'] === null) {
+                $editid = (int) ($data['id'] ?? 0);
+                $existingrow = $editid > 0 ? radar_schedule_manager::get($editid) : null;
+                $data['filterprovider'] = $existingrow ? (string) $existingrow->filterprovider : '';
+            }
             if ($data['name'] === '' || $data['query'] === '') {
                 http_response_code(400);
                 echo json_encode(['ok' => false, 'error' => 'Name and query are required']);

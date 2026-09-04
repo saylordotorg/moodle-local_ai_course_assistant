@@ -110,8 +110,22 @@ $sections = [];
 foreach ($modinfo->get_section_info_all() as $sec) {
     $sections[(string) $sec->section] = get_section_name($courseid, $sec);
 }
-$objectives = $DB->get_records_menu('local_ai_course_assistant_objs',
-    ['courseid' => $courseid], 'sortorder, code', 'id, code');
+// Offer only objectives that HAVE conversation-linked attempts. The outcome
+// filter joins through obj_att.msgid, which only the conversation classifier
+// populates; quiz and rubric attempts carry msgid NULL. An objective assessed
+// solely by quiz or Soapbox rubric therefore always returned an empty table,
+// which an instructor reads as "no learner discussed this" -- a wrong
+// conclusion from a correct query, on a WSCUC accreditation artifact.
+$objectives = $DB->get_records_sql_menu(
+    "SELECT o.id, o.code
+       FROM {local_ai_course_assistant_objs} o
+      WHERE o.courseid = :courseid
+        AND EXISTS (SELECT 1
+                      FROM {local_ai_course_assistant_obj_att} a
+                     WHERE a.objectiveid = o.id AND a.msgid IS NOT NULL)
+   ORDER BY o.sortorder, o.code",
+    ['courseid' => $courseid]
+);
 
 echo html_writer::start_tag('form', ['method' => 'get', 'action' => $pageurl->out(false),
     'class' => 'mb-4']);
