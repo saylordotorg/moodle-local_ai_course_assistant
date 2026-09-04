@@ -788,8 +788,34 @@ abstract class base_provider implements provider_interface {
      * @return provider_interface
      * @throws \moodle_exception If provider is unknown.
      */
-    public static function create_for_comparison(string $providerid, string $model, int $courseid = 0): provider_interface {
+    public static function create_for_comparison(
+        string $providerid,
+        string $model,
+        int $courseid = 0,
+        bool $enforcespend = true
+    ): provider_interface {
         self::enforce_learner_guards(false, $courseid);
+
+        // enforce_learner_guards() covers the emergency stop, the quiz lock and
+        // the 120/60 request limit -- but NOT the spend cap, which only
+        // create_from_config() checked. That left the priciest path uncapped:
+        // sse.php calls create_from_config() first (so a capped site correctly
+        // fails over to the cheap tier) and then, if the premium router fires,
+        // overwrites that provider with an escalated one built HERE. The cap's
+        // failover was honoured for one line and then discarded.
+        // conversation_classifier also routes through here by default, so
+        // per-turn mastery classification was uncapped on a stock install.
+        //
+        // $enforcespend = false is for operator tooling that is deliberately
+        // measuring providers and must not be stopped by a learner spend cap.
+        // When capped, defer to create_from_config(), which already implements
+        // the whole ladder -- emergency-stop distinction, failover chain, and
+        // the learner-facing refusal. Deliberately NOT a new exception: the
+        // correct capped behavior here is "do not escalate, use the provider
+        // the cap already resolved", which is exactly what that method returns.
+        if ($enforcespend && spend_guard::check($courseid, 'chat') === spend_guard::CAP_BLOCKED) {
+            return self::create_from_config($courseid);
+        }
 
         $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
         // Which vendor the inherited apikey actually belongs to, captured

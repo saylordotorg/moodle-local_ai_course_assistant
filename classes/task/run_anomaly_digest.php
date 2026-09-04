@@ -100,7 +100,8 @@ class run_anomaly_digest extends \core\task\scheduled_task {
         try {
             $flags = (int) $DB->count_records_select(
                 'local_ai_course_assistant_audit',
-                'event = ? AND timecreated >= ?',
+                // action, not event -- see the note in review_queue.
+                'action = ? AND timecreated >= ?',
                 ['integrity_flagged', time() - 86400]
             );
             if ($flags >= $floor) {

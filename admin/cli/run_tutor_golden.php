@@ -251,7 +251,7 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
  */
 function local_ai_course_assistant_golden_run_one_call(array $row, string $systemprompt, string $userprompt): array {
     try {
-        $provider = base_provider::create_for_comparison($row['provider'], $row['models'], 0);
+        $provider = base_provider::create_for_comparison($row['provider'], $row['models'], 0, false);
         $start = microtime(true);
         $ttft = null;
         $response = '';
@@ -323,7 +323,7 @@ function local_ai_course_assistant_golden_mode_judge(string $runcsv, string $out
     $fh = fopen($outfile, 'w');
     fputcsv($fh, ['provider_label', 'prompt_id', 'category', 'score_socratic', 'score_accuracy', 'score_tone', 'score_total', 'judge_notes', 'judge_error']);
 
-    $judge = base_provider::create_for_comparison($judgeprovider, $judgemodel, 0);
+    $judge = base_provider::create_for_comparison($judgeprovider, $judgemodel, 0, false);
     $in = fopen($runcsv, 'r');
     $header = fgetcsv($in);
     $col = array_flip($header);

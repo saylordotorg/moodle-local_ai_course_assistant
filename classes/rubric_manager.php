@@ -124,7 +124,7 @@ class rubric_manager {
      * sounded ESL-aware, so nothing surfaced the swap.
      *
      * Nothing is destroyed by that -- the preset is shadowed, not deleted -- so
-     * this resolution restores the intended behaviour with no data migration.
+     * this resolution restores the intended behavior with no data migration.
      *
      * @param int $courseid
      * @param string $level One of the SPEECH_LEVEL_* constants.

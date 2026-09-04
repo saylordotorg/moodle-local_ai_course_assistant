@@ -435,7 +435,7 @@ class provider_benchmark {
                     if ($p['is_primary']) {
                         $instance = base_provider::create_from_config($courseid);
                     } else {
-                        $instance = base_provider::create_for_comparison($p['id'], $p['model'], $courseid);
+                        $instance = base_provider::create_for_comparison($p['id'], $p['model'], $courseid, false);
                     }
                     // 4096, not 256. A reasoning-class model spends part of its
                     // output budget before emitting visible text, and 256 is below

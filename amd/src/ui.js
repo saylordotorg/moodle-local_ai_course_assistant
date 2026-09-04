@@ -2875,7 +2875,7 @@ define([
                 : '') +
             '</ul>' +
             '<div class="local-ai-course-assistant__welcome-disclaimer">' +
-            '<strong>AI notice:</strong> ' + displayName + ' uses AI-generated responses to support learning. It can be wrong, incomplete, or outdated, so students should double-check important information with course materials and their instructor.' +
+            '<strong>AI notice:</strong> ' + escHtml(displayName) + ' uses AI-generated responses to support learning. It can be wrong, incomplete, or outdated, so students should double-check important information with course materials and their instructor.' +
             '</div>' +
             '<button class="local-ai-course-assistant__welcome-cta">Continue \u2192</button>';
 

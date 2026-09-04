@@ -127,7 +127,7 @@ $course = get_course($courseid);
 if ($provideroverride !== '') {
     // create_for_comparison resolves the key from the comparison_providers row,
     // so nothing site-wide is touched and no key is echoed.
-    $provider = base_provider::create_for_comparison($provideroverride, $modeloverride, $courseid);
+    $provider = base_provider::create_for_comparison($provideroverride, $modeloverride, $courseid, false);
     $providerlabel = $provideroverride . ($modeloverride !== '' ? ':' . $modeloverride : '');
 } else {
     $provider = base_provider::create_from_config($courseid);

@@ -117,9 +117,15 @@ class review_queue {
         // 3. Integrity audit flags for this course.
         try {
             $audit = $DB->get_records_sql(
-                "SELECT id AS sourceid, userid, payload, timecreated AS twhen
+                // The audit table has `action` and `details`, not `event` and
+                // `payload` -- so this threw a dml_exception into the swallow
+                // below and the instructor review queue's integrity section has
+                // always been empty. NOTE: nothing writes 'integrity_flagged'
+                // either, so correcting the columns removes a latent trap rather
+                // than making a number move.
+                "SELECT id AS sourceid, userid, details AS payload, timecreated AS twhen
                    FROM {local_ai_course_assistant_audit}
-                  WHERE event = :event AND courseid = :courseid
+                  WHERE action = :event AND courseid = :courseid
                   ORDER BY timecreated DESC",
                 ['event' => 'integrity_flagged', 'courseid' => $courseid],
                 0,

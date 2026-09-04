@@ -652,7 +652,8 @@ $templatedata = [
         try {
             $flags = (int) $DB->count_records_select(
                 'local_ai_course_assistant_audit',
-                'event = ?',
+                // action, not event -- see classes/review_queue.php.
+                'action = ?',
                 ['integrity_flagged']
             );
         } catch (\Throwable $e) {

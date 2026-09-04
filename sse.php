@@ -291,7 +291,15 @@ function local_ai_course_assistant_record_failed_turn(
  * @param array $data Data to encode as JSON.
  */
 function local_ai_course_assistant_sse_send(array $data): void {
-    echo 'data: ' . json_encode($data) . "\n\n";
+    $json = json_encode($data);
+    if ($json === false) {
+        // Emitting the empty frame silently drops the payload. Say so instead:
+        // a swallowed encode error here is what made the UTF-8 split defect
+        // invisible for so long.
+        debugging('SOLA SSE frame failed to encode: ' . json_last_error_msg(), DEBUG_DEVELOPER);
+        return;
+    }
+    echo 'data: ' . $json . "\n\n";
     if (ob_get_level() > 0) {
         ob_flush();
     }
@@ -803,8 +811,23 @@ try {
         // a safety margin.
         $holdback = 24;
         if (mb_strlen($buf, '8bit') > $holdback) {
-            $emit = substr($buf, 0, -$holdback);
-            $carry = substr($buf, -$holdback);
+            // Back the split up to a UTF-8 character boundary.
+            //
+            // This split on a raw byte offset, so a multi-byte character
+            // straddling it left $emit ending in a partial sequence.
+            // json_encode() then returned false for the whole frame and the
+            // send emitted a bare "data: \n\n" -- so the ENTIRE segment was
+            // dropped, not just the character. Any non-ASCII stream (every
+            // non-English language, plus curly quotes and em dashes in English)
+            // could lose a run of text mid-answer, while the copy written to
+            // the database stayed correct. What the learner saw and what the
+            // history holds silently diverged.
+            $cut = mb_strlen($buf, '8bit') - $holdback;
+            while ($cut > 0 && (ord($buf[$cut]) & 0xC0) === 0x80) {
+                $cut--;
+            }
+            $emit = substr($buf, 0, $cut);
+            $carry = substr($buf, $cut);
         } else {
             $emit = '';
             $carry = $buf;
