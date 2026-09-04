@@ -681,7 +681,23 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     if (!connected) { return; }
-                    if (data.error || !data.text || !data.text.trim()) {
+                    // A real error and a genuinely empty transcript used to
+                    // share one branch: silently return to listening. Every
+                    // transcribe.php failure -- rate limit, oversize, no STT
+                    // provider, SSRF refusal, upstream 5xx -- looked like the
+                    // learner said nothing, over and over, with the reason
+                    // visible only in the Network tab. Errors now end the
+                    // session with a message (chat.js's onError disconnects,
+                    // so no restart into a torn-down session); only true
+                    // silence keeps listening. The raw server detail goes to
+                    // the console, not the learner.
+                    if (data && data.error) {
+                        window.console && console.warn('[SOLA voice STT]', data.error);
+                        if (onErrorCb) { onErrorCb('Transcription failed. Please try again in a moment.'); }
+                        return;
+                    }
+                    if (!data || !data.text || !data.text.trim()) {
+                        // Genuinely nothing heard -- keep listening.
                         setState('idle');
                         scheduleRecognitionRestart();
                         return;
@@ -690,8 +706,7 @@ define(['local_ai_course_assistant/sse_client'], function(SSE) {
                 })
                 .catch(function() {
                     if (!connected) { return; }
-                    setState('idle');
-                    scheduleRecognitionRestart();
+                    if (onErrorCb) { onErrorCb('Transcription is unavailable right now.'); }
                 });
         };
 

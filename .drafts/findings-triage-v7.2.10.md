@@ -34,6 +34,30 @@ Two findings were deliberately NOT fixed, with reasons:
   it is measuring the launcher glow rather than a face.
 
 
+## Status as of v7.3.3 (2026-09-04)
+
+- Fixed in v7.3.3: 44 findings (F01, F03, F04, F06, F07, F08, F09, F10, F14, F15, F18, F22, F23, F24, F25, F27, F28, F29, F30, F33, F44, F45, F47, F54, F55, F56, F58, F61, F62, F63, F64, F65, F68, F74, F76, F77, F78, F80, F81, F82, F84, F85, F86, F92)
+- Confirmed duplicates / already resolved by earlier releases: F12, F21, F38, F73
+- Design notes resolved by documentation (no defect to fix): F88, F89, F90, F91, F93
+  — except F89's one live extract (a per-course profile collapse in the radar
+  data builder), which is fixed in code.
+- **Remaining open: 2 of the original 93.**
+  - **F05** — the unreachable procedural SVG avatar. A product decision, not a
+    defect: removing it or reviving it both change what the v6.5.0 A/B
+    experiment measures (today it measures the launcher glow, not a face).
+    Needs Tom's call.
+  - **F32 residual** — the flashcards backfill and the comms/milestone
+    namespaces are translated in v7.3.3, but the byte-identical sweep found
+    further untranslated namespaces (essay_feedback 18 keys, sandbox 15,
+    goals 11, studytip 7, talking_avatar 7, instructor_dashboard 48, and admin
+    surfaces). Those predate this cycle and are catalogued for a dedicated
+    i18n batch; the parity TEST also only checks key existence, so
+    byte-identical English remains invisible to CI.
+
+Plus four NEW defects found and fixed by the v7.3.3 Soapbox audit (transient
+failures burning attempts; the presentation recorder leaking the camera; a
+placeholder date format; cleanup pruning one learner per assignment).
+
 ## Provenance
 
 These are the surviving findings from the two review workflows run on 2026-09-02

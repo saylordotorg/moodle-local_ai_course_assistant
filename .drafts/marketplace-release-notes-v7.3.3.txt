@@ -1,0 +1,52 @@
+SOLA v7.3.3
+
+Forty-seven findings closed from the September adversarial review, plus four new defects a fresh audit of the Soapbox feature surfaced. Three themes run through them: features that could never have worked, numbers that were not true, and controls that consumed the very thing they guarded.
+
+SOAPBOX, MADE WHOLE
+
+- A brief transcription outage no longer permanently uses up one of a learner's recording attempts. Scoring retries transient failures with backoff, failed attempts no longer count toward the attempt limit, and the learner's history explains each status instead of showing raw database values.
+- The recorder now distinguishes "microphone permission was denied" from "this browser cannot record here" (previously every failure, including loading the page over plain http, was reported as a permission problem or as nothing at all), and it releases the microphone and camera when starting fails, instead of leaving the recording light on.
+- Speech-to-text usage by learners who only use Soapbox is now counted; previously the heaviest users were precisely the ones missing from usage reporting.
+- The nightly cleanup now prunes stored recordings for every learner; a query-keying fault meant only one learner per assignment was ever processed.
+
+OUTREACH: THE FEATURE THAT EXISTED BUT NEVER RAN
+
+- Dry-run mode no longer permanently destroys milestone emails. A preview row used to arm the real 7-day cooldown, and the "sent" marker is terminal, so every learner who crossed a milestone while an administrator previewed in dry-run mode lost that email forever - and the setting's own help text recommended previewing first.
+- The consent setting the entire feature gates on finally has a way to be set. It was undeclared, so even direct writes were silently dropped: the feature could be enabled, disclosed and translated into 46 languages without ever being able to send a single email. Learners now have a "My communications" section on their settings page, including a log of what has actually been sent to them.
+- The weekly digest emails now respect the emergency kill switches, as the emergency panel has always claimed.
+
+PRIVACY: THE PROMISES NOW HOLD
+
+- Both "download my data" bundles exported 11 of the 23 kinds of stored data the plugin itself declares. The worst omissions were the model's inferred observations about the learner and the learner's own volunteered goals - the heart of what a data access request exists to surface. All 23 now export, in the learner bundle, the admin bundle, and the Moodle privacy system alike.
+- The privacy notice no longer claims data ends with course enrollment (nothing ever deleted at unenrollment; the retention policy is the truth) and no longer claims no email address is stored.
+- Editing a saved note and clicking away without typing no longer destroys its paragraph formatting.
+
+VOICE AND AVATARS
+
+- Realtime voice no longer bills two audio generations per connection, and a prompt-construction failure now refuses to open a session instead of opening one with no safety instructions at all.
+- Voice spend is visible for the first time: synthesis and transcription usage was structurally unpriceable, and the Whisper rate in the cost table was the per-hour price entered as a per-token rate, underpricing transcription by a factor of nearly seventeen.
+- Token minting and avatar sessions are rate-limited; avatar sessions have an open-session cap; a closed session's recorded cost can no longer be inflated afterward.
+- Administrator-uploaded custom avatars can now actually be selected; HeyGen and D-ID sessions no longer fail their own owner's viewer check; the avatar viewer's setup instructions now refer to a setting that exists.
+
+REPORTING ACCURACY
+
+- "Average messages to resolution" could never be anything but zero (it compared learner message ids against ratings that are recorded on answers). It works now.
+- The off-topic rate has been replaced by an honest metric. The old number was a snapshot of currently-open streaks divided by a mismatched time window: a course where every learner drifted off-topic once and came back read 0%.
+- The Learning Radar told its model the total message count of an unbounded fetch while giving it a small sample biased against newer courses; it now reports what it actually included.
+- A dead Slack webhook no longer shows a green success badge; scheduled posts no longer leak internal markup or literal escape characters; editing a schedule no longer silently erases its provider filter; non-English text can no longer empty a webhook delivery.
+- Sixteen instances of double-escaped text (names like O'Brien rendering with HTML entities) corrected across the admin tables.
+- The cost-anomaly detector now arms on low-traffic sites: it used to require all seven prior days to have spend, so a site with quiet weekends was never protected and nothing said so.
+
+LANGUAGE COVERAGE
+
+- Roughly 1,900 new translations: the flashcards feature shipped with byte-identical English text in all 45 non-English languages (invisible to the completeness check, which verifies keys exist rather than that they differ); it is now translated everywhere, along with the communications and milestone-email text this release made functional, and 12 new strings.
+
+OTHER
+
+- Full test suite passes with no failures; static validators 36 of 36. Three tests that had pinned broken behavior as correct were inverted, with new coverage pinning the correct behavior.
+- Client-supplied page titles are re-derived server-side and can no longer reach the AI instruction text unfenced.
+
+UPGRADE NOTES
+
+- One new column on the outreach log (marked automatically for existing dry-run rows) and one short upgrade step. No manual action required.
+- If your site used outreach dry-run mode in the past: milestones burned during those previews are not retroactively restored; the fix prevents new losses.
