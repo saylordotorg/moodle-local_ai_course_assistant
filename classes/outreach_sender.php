@@ -77,26 +77,26 @@ class outreach_sender {
 
         // 1. Master site-wide outreach kill switch.
         if (!(bool)get_config('local_ai_course_assistant', 'outreach_master_enabled')) {
-            return false;
+            return self::block('outreach_master_enabled is off');
         }
 
         // 2. Per-channel admin kill switch.
         if (!self::channel_admin_enabled($channel)) {
-            return false;
+            return self::block("admin switch off for channel {$channel}");
         }
 
         // 3. Per-learner consent (user_preferences).
         if (!self::learner_consents($userid, $channel)) {
-            return false;
+            return self::block("user {$userid} has not consented to {$channel}");
         }
 
         // 4. Cooldown — most recent send across ALL channels.
         $lastsent = (int)$DB->get_field_sql(
-            "SELECT MAX(timesent) FROM {" . self::TABLE_LOG . "} WHERE userid = ?",
+            "SELECT MAX(timesent) FROM {" . self::TABLE_LOG . "} WHERE userid = ? AND dryrun = 0",
             [$userid]
         );
         if ($lastsent > 0 && (time() - $lastsent) < self::COOLDOWN_SEC) {
-            return false;
+            return self::block("7-day cooldown active for user {$userid}");
         }
 
         // 5. Dry-run mode: write the audit row but skip the email.
@@ -105,7 +105,7 @@ class outreach_sender {
         if (!$dryrun) {
             $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
             if (!$user || !empty($user->deleted) || !empty($user->suspended)) {
-                return false;
+                return self::block("user {$userid} missing, deleted, or suspended");
             }
             // v5.4.3: per-recipient unsubscribe footer + opt-out check.
             if (
@@ -114,7 +114,7 @@ class outreach_sender {
                     email_optout::TYPE_OUTREACH
                 )
             ) {
-                return false;
+                return self::block("user {$userid} email is opted out");
             }
             $reason = 'You receive these from time to time when you hit a '
                 . 'milestone or finish a streak in your SOLA-supported course.';
@@ -133,7 +133,7 @@ class outreach_sender {
             $from = \core_user::get_noreply_user();
             $sent = email_to_user($user, $from, $subject, $bodytextf, $bodyhtmlf);
             if (!$sent) {
-                return false;
+                return self::block("email_to_user failed for user {$userid}");
             }
             $msgid = 'sent_' . time() . '_' . $userid;
         } else {
@@ -148,6 +148,7 @@ class outreach_sender {
             'trigger_reason' => self::truncate_for_db($triggerreason, 255),
             'message_id' => $msgid,
             'timesent' => time(),
+            'dryrun' => $dryrun ? 1 : 0,
         ]);
 
         return true;
@@ -212,7 +213,7 @@ class outreach_sender {
     public static function cooldown_clear(int $userid): bool {
         global $DB;
         $lastsent = (int)$DB->get_field_sql(
-            "SELECT MAX(timesent) FROM {" . self::TABLE_LOG . "} WHERE userid = ?",
+            "SELECT MAX(timesent) FROM {" . self::TABLE_LOG . "} WHERE userid = ? AND dryrun = 0",
             [$userid]
         );
         return $lastsent === 0 || (time() - $lastsent) >= self::COOLDOWN_SEC;
@@ -239,6 +240,22 @@ class outreach_sender {
      * @param int $max
      * @return string
      */
+    /**
+     * Record a block reason in cron output and refuse the send.
+     *
+     * The class docblock promises an audit trace for every send AND every
+     * block reason; only the success path ever wrote one, so all the gates
+     * below -- master switch, channel switch, consent, cooldown, deleted user,
+     * opt-out, failed send -- were indistinguishable from "nothing eligible".
+     *
+     * @param string $reason
+     * @return bool Always false.
+     */
+    private static function block(string $reason): bool {
+        mtrace('outreach_sender: blocked: ' . $reason);
+        return false;
+    }
+
     private static function truncate_for_db(string $s, int $max): string {
         if (function_exists('mb_substr')) {
             return mb_substr($s, 0, $max);

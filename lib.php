@@ -214,3 +214,30 @@ function local_ai_course_assistant_extend_navigation_course(
         }
     }
 }
+
+/**
+ * Return a list of all the user preferences used by local_ai_course_assistant.
+ *
+ * Declares the milestone-outreach consent toggle so it is writable through
+ * set_user_preference / the user_preferences web service and covered by core's
+ * preference validation. Without this declaration core_user's
+ * can_edit_preference() throws for the unknown key and the write is silently
+ * dropped -- which is why the consent gate in outreach_sender::learner_consents
+ * had NO writer anywhere: the milestone email feature could be enabled,
+ * disclosed and documented, and never send to anyone.
+ *
+ * Default '0' = not consented (learner_consents treats absence as opt-out).
+ * Scoped to the user themselves so staff cannot opt learners in.
+ *
+ * @return array[]
+ */
+function local_ai_course_assistant_user_preferences(): array {
+    $preferences = [];
+    $preferences['sola_outreach_milestones'] = [
+        'type' => PARAM_BOOL,
+        'null' => NULL_NOT_ALLOWED,
+        'default' => '0',
+        'permissioncallback' => [core_user::class, 'is_current_user'],
+    ];
+    return $preferences;
+}

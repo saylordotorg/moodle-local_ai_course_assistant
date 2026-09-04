@@ -319,20 +319,7 @@ define(['core/ajax'], function(Ajax) {
         }])[0];
     };
 
-    /**
-     * Email study session notes to the current user.
-     *
-     * @param {number} courseid
-     * @param {string} notes
-     * @returns {Promise}
-     */
-    const emailStudyNotes = function(courseid, notes) {
-        return Ajax.call([{
-            methodname: 'local_ai_course_assistant_email_study_notes',
-            args: {courseid: courseid, notes: notes},
-        }])[0];
-    };
-
+    
     /**
      * Get the active survey for a course.
      *
@@ -533,7 +520,6 @@ define(['core/ajax'], function(Ajax) {
         saveAvatarPreference: saveAvatarPreference,
         getRealtimeToken: getRealtimeToken,
         submitFeedback: submitFeedback,
-        emailStudyNotes: emailStudyNotes,
         getSurvey: getSurvey,
         submitSurveyResponse: submitSurveyResponse,
         getUserTesting: getUserTesting,

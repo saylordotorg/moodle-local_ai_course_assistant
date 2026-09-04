@@ -113,10 +113,16 @@ final class milestone_check_test extends \advanced_testcase {
             'outreach_dryrun must produce a dryrun-prefixed message id.'
         );
 
-        // streak_tracker must record that the milestone fired so it does
-        // not re-fire on the next cron tick.
+        $this->assertEquals(1, $row->dryrun, 'Dry-run rows must carry dryrun = 1.');
+
+        // F25 INVERTED: dry-run must NOT burn the milestone. mark_sent() is
+        // terminal, so the old assertion here pinned data loss as correct:
+        // every learner who crossed a milestone during a dry-run preview lost
+        // that email permanently. No mail left the building, so the streak
+        // must stay eligible to fire for real once dry-run is switched off.
         $streak = streak_tracker::get($user->id, $course->id);
-        $this->assertEquals('streak7', $streak->last_milestone_kind);
+        $this->assertSame('', (string) $streak->last_milestone_kind,
+            'Dry-run must not mark the milestone as sent.');
     }
 
     public function test_already_sent_streak_does_not_refire(): void {

@@ -98,7 +98,12 @@ class milestone_check extends \core\task\scheduled_task {
 
             $ok = outreach_sender::send((int)$row->userid, (int)$row->courseid, $channel, $subject, $text, $html, $reason);
             if ($ok) {
-                streak_tracker::mark_sent((int)$row->userid, (int)$row->courseid, $kind);
+                // F25: dry-run must never burn the milestone. mark_sent() is
+                // terminal (the streak query excludes a marked kind forever),
+                // so marking on a preview permanently lost the real email.
+                if (!(bool)get_config('local_ai_course_assistant', 'outreach_dryrun')) {
+                    streak_tracker::mark_sent((int)$row->userid, (int)$row->courseid, $kind);
+                }
                 $sent++;
             }
         }
@@ -145,7 +150,10 @@ class milestone_check extends \core\task\scheduled_task {
                 $reason
             );
             if ($ok) {
-                streak_tracker::mark_sent((int)$row->userid, (int)$row->courseid, 'completion');
+                // F25: see process_streak_milestones -- dry-run never marks.
+                if (!(bool)get_config('local_ai_course_assistant', 'outreach_dryrun')) {
+                    streak_tracker::mark_sent((int)$row->userid, (int)$row->courseid, 'completion');
+                }
                 $sent++;
             }
         }

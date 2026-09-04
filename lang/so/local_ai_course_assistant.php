@@ -420,7 +420,6 @@ $string['chat:mode_history'] = 'Xusuusin';
 $string['chat:history_title'] = 'Xusuusin iyo Taariikhdii Wada-hadalka';
 $string['task:send_inactivity_reminders'] = 'Dir iimaylasha xusuusinta toddobaadlaha ee aan firfircoonayn';
 $string['task:run_meta_ai_query'] = 'Orod su\'aasha falanqaynta Raadaarka Barashada ee la qorsheeyay';
-$string['messageprovider:study_notes'] = 'Qoraallada fadhiga daraasadda';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Gudbin Hore';

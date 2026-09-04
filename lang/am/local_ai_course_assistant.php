@@ -404,10 +404,8 @@ $string['chat:mode_history'] = 'ማስታወሻዎች';
 // History panel.
 $string['chat:history_title'] = 'ማስታወሻዎች እና የውይይት ታሪክ';
 $string['task:send_inactivity_reminders'] = 'ሳምንታዊ የእንቅስቃሴ-አልባ ማስታወሻ ኢሜይሎችን ላክ';
-$string['messageprovider:study_notes'] = 'የጥናት ክፍለ ጊዜ ማስታወሻዎች';
 $string['task:send_inactivity_reminders'] = 'ሳምንታዊ የእንቅስቃሴ ማስታወሻ ኢሜይሎችን ላክ';
 $string['task:run_meta_ai_query'] = 'የታቀደውን የመማሪያ ራዳር ትንታኔ ጥያቄ አስኪድ';
-$string['messageprovider:study_notes'] = 'የጥናት ክፍለ ጊዜ ማስታወሻዎች';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / የፊት-ገጽ ማቅረቢያ';

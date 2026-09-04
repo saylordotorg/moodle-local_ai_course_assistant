@@ -45,6 +45,17 @@ class learner_weekly_digest extends \core\task\scheduled_task {
     public function execute(): void {
         global $DB;
 
+        // v7.3.3 (F22): honor the emergency switches. The panel copy promises
+        // MASTER KILL and the Outreach kill stop every automated email, and
+        // neither digest consulted either flag -- the promise was broken
+        // exactly where an operator under incident pressure relies on it.
+        if (!(bool) get_config('local_ai_course_assistant', 'enabled')
+                || !(bool) get_config('local_ai_course_assistant', 'outreach_master_enabled')) {
+            mtrace('  digest: skipped -- plugin disabled or outreach master switch off.');
+            return;
+        }
+
+
         // Find every (userid, courseid) pair where the opt-in preference
         // is set to '1'. The user_preferences `name` carries the courseid
         // suffix, so a single LIKE query enumerates all opted-in pairs

@@ -422,10 +422,8 @@ $string['chat:mode_history'] = 'Mga Tala';
 // History panel.
 $string['chat:history_title'] = 'Mga Tala at Kasaysayan ng Pag-uusap';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa email dahil sa kawalan ng aktibidad';
-$string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 $string['task:send_inactivity_reminders'] = 'Magpadala ng lingguhang paalala sa kawalan ng aktibidad';
 $string['task:run_meta_ai_query'] = 'Patakbuhin ang nakaiskedyul na Learning Radar analytics query';
-$string['messageprovider:study_notes'] = 'Mga tala ng sesyon ng pag-aaral';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend Delivery';

@@ -405,10 +405,8 @@ $string['chat:mode_history'] = 'Dɔgɔkun';
 // History panel.
 $string['chat:history_title'] = 'Dɔgɔkunw ni kuma taarixi';
 $string['task:send_inactivity_reminders'] = 'Dɔgɔkun kelen kelen na hakili-jigin-bataki ci baara-bali kama';
-$string['messageprovider:study_notes'] = 'Kalanko waati sɛbɛnniw';
 $string['task:send_inactivity_reminders'] = 'Ci dɔgɔkun dɔgɔkun ladilikan bataki walasa ka baarakɛbaliya kɔfɔ';
 $string['task:run_meta_ai_query'] = 'Ka Learning Radar jateminɛ ɲininkali latilennin boli';
-$string['messageprovider:study_notes'] = 'Kalanko waati kunnafoni sɛbɛnw';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Ɲɛfɛla yiriwali';

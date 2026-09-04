@@ -378,7 +378,6 @@ $string['chat:mode_history'] = '메모';
 $string['chat:history_title'] = '메모 및 대화 기록';
 $string['task:send_inactivity_reminders'] = '주간 비활동 알림 이메일 보내기';
 $string['task:run_meta_ai_query'] = '예약된 학습 레이더 분석 쿼리 실행';
-$string['messageprovider:study_notes'] = '학습 세션 노트';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / 프론트엔드 전송';

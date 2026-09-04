@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Notizen';
 $string['chat:history_title'] = 'Notizen und Gesprächsverlauf';
 $string['task:send_inactivity_reminders'] = 'Wöchentliche Erinnerungs-E-Mails bei Inaktivität senden';
 $string['task:run_meta_ai_query'] = 'Geplante Lernradar-Analyseabfrage ausführen';
-$string['messageprovider:study_notes'] = 'Lernsitzungsnotizen';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend-Bereitstellung';

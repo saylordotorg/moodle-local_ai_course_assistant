@@ -402,7 +402,6 @@ $string['chat:mode_history'] = 'Notities';
 $string['chat:history_title'] = 'Notities en gespreksgeschiedenis';
 $string['task:send_inactivity_reminders'] = 'Wekelijkse herinneringse-mails bij inactiviteit verzenden';
 $string['task:run_meta_ai_query'] = 'Geplande Leerradar-analysequery uitvoeren';
-$string['messageprovider:study_notes'] = 'Notities van studiesessie';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend-levering';

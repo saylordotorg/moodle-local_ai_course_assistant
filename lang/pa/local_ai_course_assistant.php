@@ -398,10 +398,8 @@ $string['chat:mode_history'] = 'ਨੋਟਸ';
 // History panel.
 $string['chat:history_title'] = 'ਨੋਟਸ ਅਤੇ ਗੱਲਬਾਤ ਦਾ ਇਤਿਹਾਸ';
 $string['task:send_inactivity_reminders'] = 'ਹਫ਼ਤਾਵਾਰੀ ਅਕਿਰਿਆਸ਼ੀਲਤਾ ਯਾਦ-ਦਹਾਨੀ ਈਮੇਲ ਭੇਜੋ';
-$string['messageprovider:study_notes'] = 'ਅਧਿਐਨ ਸੈਸ਼ਨ ਨੋਟਸ';
 $string['task:send_inactivity_reminders'] = 'ਹਫ਼ਤਾਵਾਰੀ ਅਕਿਰਿਆਸ਼ੀਲਤਾ ਯਾਦ-ਦਹਾਨੀ ਈਮੇਲ ਭੇਜੋ';
 $string['task:run_meta_ai_query'] = 'ਤਹਿ ਕੀਤੀ ਲਰਨਿੰਗ ਰਡਾਰ ਵਿਸ਼ਲੇਸ਼ਣ ਪੁੱਛ-ਗਿੱਛ ਚਲਾਓ';
-$string['messageprovider:study_notes'] = 'ਅਧਿਐਨ ਸੈਸ਼ਨ ਨੋਟਸ';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / ਫਰੰਟਐਂਡ ਡਿਲੀਵਰੀ';

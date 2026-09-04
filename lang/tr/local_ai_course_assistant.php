@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Notlar';
 $string['chat:history_title'] = 'Notlar ve Konuşma Geçmişi';
 $string['task:send_inactivity_reminders'] = 'Haftalık hareketsizlik hatırlatma e-postaları gönder';
 $string['task:run_meta_ai_query'] = 'Zamanlanmış Öğrenme Radarı analiz sorgusunu çalıştır';
-$string['messageprovider:study_notes'] = 'Çalışma oturumu notları';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Ön Uç Dağıtımı';

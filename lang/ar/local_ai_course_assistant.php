@@ -375,10 +375,8 @@ $string['chat:mode_history'] = 'ملاحظات';
 // History panel.
 $string['chat:history_title'] = 'الملاحظات وتاريخ المحادثة';
 $string['task:send_inactivity_reminders'] = 'إرسال رسائل تذكير أسبوعية بالبريد الإلكتروني بسبب عدم النشاط';
-$string['messageprovider:study_notes'] = 'ملاحظات جلسة الدراسة';
 $string['task:send_inactivity_reminders'] = 'إرسال رسائل تذكير أسبوعية بعدم النشاط';
 $string['task:run_meta_ai_query'] = 'تشغيل استعلام تحليلات رادار التعلم المجدول';
-$string['messageprovider:study_notes'] = 'ملاحظات جلسة الدراسة';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / توصيل الواجهة الأمامية';

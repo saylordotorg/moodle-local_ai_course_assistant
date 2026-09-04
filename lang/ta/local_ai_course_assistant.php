@@ -398,10 +398,8 @@ $string['chat:mode_history'] = 'குறிப்புகள்';
 // History panel.
 $string['chat:history_title'] = 'குறிப்புகள் மற்றும் உரையாடல் வரலாறு';
 $string['task:send_inactivity_reminders'] = 'வாராந்திர செயலற்ற நிலை நினைவூட்டல் மின்னஞ்சல்களை அனுப்பு';
-$string['messageprovider:study_notes'] = 'படிப்பு அமர்வு குறிப்புகள்';
 $string['task:send_inactivity_reminders'] = 'வாராந்திர செயலற்ற நினைவூட்டல் மின்னஞ்சல்களை அனுப்பவும்';
 $string['task:run_meta_ai_query'] = 'திட்டமிடப்பட்ட கற்றல் ரேடார் பகுப்பாய்வு வினவலை இயக்கு';
-$string['messageprovider:study_notes'] = 'படிப்பு அமர்வு குறிப்புகள்';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / முன்னோக்கு வழங்கல்';

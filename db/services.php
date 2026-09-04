@@ -176,13 +176,6 @@ $functions = [
         'ajax'         => true,
         'capabilities' => 'local/ai_course_assistant:use',
     ],
-    'local_ai_course_assistant_email_study_notes' => [
-        'classname'    => \local_ai_course_assistant\external\email_study_notes::class,
-        'description'  => 'Email study session notes to the current user.',
-        'type'         => 'write',
-        'ajax'         => true,
-        'capabilities' => 'local/ai_course_assistant:use',
-    ],
     'local_ai_course_assistant_get_survey' => [
         'classname'    => \local_ai_course_assistant\external\get_survey::class,
         'description'  => 'Get the active survey for a course.',

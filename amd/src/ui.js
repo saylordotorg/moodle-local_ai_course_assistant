@@ -3215,7 +3215,16 @@ define([
                     text.removeAttribute('aria-label');
                     text.classList.remove('aica-history-panel__message--editing');
                     var newText = text.textContent.trim();
-                    if (newText && newText !== item.text) {
+                    // The DISPLAY is whitespace-collapsed (multi-line notes
+                    // render on one line), so reading textContent back always
+                    // differs from the stored multi-line original. Without the
+                    // second guard, entering edit mode and clicking away --
+                    // typing nothing -- silently overwrote the stored note with
+                    // the collapsed copy, permanently destroying paragraph
+                    // structure in the ONLY copy that exists (localStorage; no
+                    // server side, no undo).
+                    var collapsedOriginal = (item.text || '').replace(/\s+/g, ' ').trim();
+                    if (newText && newText !== item.text && newText !== collapsedOriginal) {
                         // Update the bookmark in storage.
                         var bmarks = getBookmarks();
                         var realIdx = bmarks.length - 1 - itemIdx;
@@ -4430,23 +4439,6 @@ define([
             freqRow.appendChild(freqSelect);
             remSection.appendChild(freqRow);
 
-            // Email study notes toggle.
-            if (config.emailRemindersEnabled) {
-                var notesRow = document.createElement('div');
-                notesRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px';
-                var notesToggle = document.createElement('input');
-                notesToggle.type = 'checkbox';
-                notesToggle.id = 'aica-email-notes-toggle';
-                try { notesToggle.checked = localStorage.getItem('aica_email_notes') === '1'; } catch (e) { /**/ }
-                var notesLabel = document.createElement('label');
-                notesLabel.htmlFor = 'aica-email-notes-toggle';
-                notesLabel.textContent = 'Email me study session notes';
-                notesLabel.style.cssText = 'font-size:12px;cursor:pointer;color:#6c757d';
-                notesRow.appendChild(notesToggle);
-                notesRow.appendChild(notesLabel);
-                remSection.appendChild(notesRow);
-            }
-
             // Store references for save handler.
             remSection._freqSelect = freqSelect;
             remSection.dataset.hasReminders = '1';
@@ -4562,12 +4554,6 @@ define([
                     var phone = remSec._phoneInput ? remSec._phoneInput.value.trim() : '';
                     callbacks.onReminderUpdate('whatsapp', remSec._waToggle.checked, phone, '', freq);
                 }
-            }
-            // Save email study notes preference.
-            var notesCheck = content.querySelector('#aica-email-notes-toggle');
-            if (notesCheck) {
-                if (notesCheck.checked) { localStorage.setItem('aica_email_notes', '1'); }
-                else { localStorage.removeItem('aica_email_notes'); }
             }
             panel.remove();
         });

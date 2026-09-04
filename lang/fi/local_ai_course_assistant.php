@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Muistiinpanot';
 $string['chat:history_title'] = 'Muistiinpanot ja keskusteluhistoria';
 $string['task:send_inactivity_reminders'] = 'Lähetä viikoittaiset muistutussähköpostit toimettomuudesta';
 $string['task:run_meta_ai_query'] = 'Suorita ajoitettu Oppimistutka-analytiikkakysely';
-$string['messageprovider:study_notes'] = 'Opiskeluistunnon muistiinpanot';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Käyttöliittymän jakelu';

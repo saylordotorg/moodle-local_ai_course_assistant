@@ -398,10 +398,8 @@ $string['chat:mode_history'] = 'Xam-xam';
 // History panel.
 $string['chat:history_title'] = 'Xam-xam ak Waxtaan bi';
 $string['task:send_inactivity_reminders'] = 'Yónne bataaxal ci ayu-bis yu ngën-ngën yi ngir bañ liggéey';
-$string['messageprovider:study_notes'] = 'Téere yi ci diggante jàng bi';
 $string['task:send_inactivity_reminders'] = 'Yónnal bataaxal xalaat ci at ci biir ayu-bés';
 $string['task:run_meta_ai_query'] = 'Doxal laaj bu Learning Radar ci waxtu bu ñu tànn';
-$string['messageprovider:study_notes'] = 'Bindu ci jàng yi';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Yónnee ci kanam';

@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Notatki';
 $string['chat:history_title'] = 'Notatki i historia rozmowy';
 $string['task:send_inactivity_reminders'] = 'Wyślij tygodniowe e-maile z przypomnieniem o nieaktywności';
 $string['task:run_meta_ai_query'] = 'Uruchom zaplanowane zapytanie analityczne Radar nauki';
-$string['messageprovider:study_notes'] = 'Notatki z sesji nauki';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Dostarczanie frontendu';

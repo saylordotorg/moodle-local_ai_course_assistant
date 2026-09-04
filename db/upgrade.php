@@ -1707,5 +1707,30 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026090500, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026090700) {
+        // v7.3.3 (F25): mark dry-run outreach rows so they never trip the
+        // 7-day cooldown or burn a milestone. The insert was identical in both
+        // modes apart from a message_id prefix that nothing ever read: a
+        // dry-run row armed the real cooldown, and a dry-run "send" returning
+        // true drove streak_tracker::mark_sent(), which is terminal -- so every
+        // learner who crossed a milestone while the admin previewed in dry-run
+        // mode lost that email permanently. The setting's own description said
+        // to use dry-run "to verify the cooldown and consent logic before
+        // going live", which is precisely the trap.
+        $table = new xmldb_table('local_ai_course_assistant_outreach_log');
+        $field = new xmldb_field('dryrun', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timesent');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Backfill: dry-run rows are identifiable by their message_id prefix.
+        $DB->execute(
+            "UPDATE {local_ai_course_assistant_outreach_log}
+                SET dryrun = 1
+              WHERE " . $DB->sql_like('message_id', ':pfx'),
+            ['pfx' => 'dryrun_%']
+        );
+        upgrade_plugin_savepoint(true, 2026090700, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

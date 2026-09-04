@@ -51,6 +51,7 @@ final class outreach_sender_test extends \advanced_testcase {
         // Dry-run too, so even if it slipped past nothing would actually email.
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
+        ob_start();
         $ok = outreach_sender::send(
             $user->id,
             $course->id,
@@ -60,6 +61,7 @@ final class outreach_sender_test extends \advanced_testcase {
             'html',
             'reason'
         );
+        ob_end_clean();
 
         $this->assertFalse($ok);
     }
@@ -72,6 +74,7 @@ final class outreach_sender_test extends \advanced_testcase {
         set_config('milestones_feature_enabled', '0', 'local_ai_course_assistant');
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
+        ob_start();
         $ok = outreach_sender::send(
             $user->id,
             $course->id,
@@ -81,6 +84,7 @@ final class outreach_sender_test extends \advanced_testcase {
             'html',
             'reason'
         );
+        ob_end_clean();
 
         $this->assertFalse($ok);
     }
@@ -94,6 +98,7 @@ final class outreach_sender_test extends \advanced_testcase {
         set_user_preferences(['sola_outreach_milestones' => '0'], $user->id);
         set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
 
+        ob_start();
         $ok = outreach_sender::send(
             $user->id,
             $course->id,
@@ -103,6 +108,7 @@ final class outreach_sender_test extends \advanced_testcase {
             'html',
             'reason'
         );
+        ob_end_clean();
 
         $this->assertFalse($ok);
     }
@@ -133,6 +139,7 @@ final class outreach_sender_test extends \advanced_testcase {
         $this->assertNotFalse($row);
         $this->assertEquals('streak7 reason', $row->trigger_reason);
         $this->assertStringStartsWith('dryrun_', $row->message_id);
+        $this->assertEquals(1, $row->dryrun);
     }
 
     public function test_cooldown_blocks_second_send_within_window(): void {
@@ -162,10 +169,48 @@ final class outreach_sender_test extends \advanced_testcase {
         );
 
         $this->assertTrue($first);
-        $this->assertFalse(
+        // F25 INVERTED: both sends here run in dry-run mode, and dry-run rows
+        // must NOT trip the 7-day cooldown -- a preview that arms the real
+        // cooldown suppresses the learner's genuine email for a week.
+        $this->assertTrue(
             $second,
-            'Cooldown is 7 days across ALL channels. Second send must be blocked.'
+            'F25: dry-run rows must not trip the 7-day cooldown.'
         );
+    }
+
+    /**
+     * The cooldown must still hold after a REAL send -- F25 exempts only
+     * dry-run rows, and this pins that the exemption did not widen.
+     */
+    public function test_cooldown_blocks_send_after_real_send(): void {
+        $this->resetAfterTest();
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->enable_everything($user->id);
+        set_config('outreach_dryrun', '1', 'local_ai_course_assistant');
+
+        // Seed a REAL (non-dry-run) send one hour ago.
+        $DB->insert_record('local_ai_course_assistant_outreach_log', (object)[
+            'userid' => $user->id, 'courseid' => $course->id,
+            'channel' => outreach_sender::CH_STREAK7,
+            'trigger_reason' => 'real send', 'message_id' => 'sent_x',
+            'timesent' => time() - 3600, 'dryrun' => 0,
+        ]);
+
+        $this->assertFalse(outreach_sender::cooldown_clear($user->id));
+        ob_start();
+        $ok = outreach_sender::send(
+            $user->id,
+            $course->id,
+            outreach_sender::CH_STREAK30,
+            'subj',
+            'text',
+            'html',
+            'second'
+        );
+        ob_end_clean();
+        $this->assertFalse($ok, 'Cooldown is 7 days across ALL channels after a REAL send.');
     }
 
     public function test_cooldown_clear_returns_true_for_fresh_user(): void {

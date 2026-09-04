@@ -406,10 +406,8 @@ $string['chat:mode_history'] = 'नोट्स';
 // History panel.
 $string['chat:history_title'] = 'नोट्स और बातचीत का इतिहास';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता अनुस्मारक ईमेल भेजें';
-$string['messageprovider:study_notes'] = 'अध्ययन सत्र नोट्स';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता अनुस्मारक ईमेल भेजें';
 $string['task:run_meta_ai_query'] = 'निर्धारित लर्निंग रडार विश्लेषण क्वेरी चलाएं';
-$string['messageprovider:study_notes'] = 'अध्ययन सत्र नोट्स';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / फ्रंटएंड डिलीवरी';

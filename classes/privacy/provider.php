@@ -227,7 +227,10 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         );
         $collection->add_database_table(
             'local_ai_course_assistant_outreach_log',
-            ['userid' => 'privacy:metadata:outreach_log:userid'],
+            [
+                'userid' => 'privacy:metadata:outreach_log:userid',
+                'dryrun' => 'privacy:metadata:outreach_log:dryrun',
+            ],
             'privacy:metadata:outreach_log'
         );
         // v5.10.x: per-recipient email opt-out (user-global; courseid may be null).
@@ -773,10 +776,18 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                     continue;
                 }
                 $columns = $DB->get_columns($table);
-                if (!isset($columns['userid'])) {
+                // v7.3.3 (F44 adjacent): review_res and radar_sched identify
+                // the user as resolved_by / creator, so the userid-only guard
+                // silently skipped them -- they were listed above and never
+                // exported. radar_sched additionally has no courseid, which
+                // the conditional below already tolerates.
+                $usercol = isset($columns['userid']) ? 'userid'
+                    : (isset($columns['resolved_by']) ? 'resolved_by'
+                    : (isset($columns['creator']) ? 'creator' : null));
+                if ($usercol === null) {
                     continue;
                 }
-                $conditions = ['userid' => $userid];
+                $conditions = [$usercol => $userid];
                 if (isset($columns['courseid'])) {
                     $conditions['courseid'] = $context->instanceid;
                 }
@@ -788,7 +799,8 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 foreach ($rows as $row) {
                     $out = [];
                     foreach ((array) $row as $field => $value) {
-                        if ($field === 'id' || $field === 'userid') {
+                        if ($field === 'id' || $field === 'userid'
+                                || $field === 'resolved_by' || $field === 'creator') {
                             continue;
                         }
                         // Any *time* column is a unix timestamp in this schema.

@@ -468,7 +468,6 @@ $string['task:run_integrity_checks'] = 'Run daily AI Course Assistant plugin int
 $string['task:milestone_check'] = 'Send daily milestone reflection emails (v5.3.0)';
 $string['task:struggle_signal_review'] = 'Review struggle signals into private learner memory (v5.3.0)';
 $string['task:rebuild_objective_links'] = 'Rebuild cross-course objective links for mastery rollup (v5.7.0)';
-$string['messageprovider:study_notes'] = 'Study session notes';
 $string['messageprovider:study_reminder'] = 'Study reminders';
 $string['messageprovider:integrity_report'] = 'AI Course Assistant integrity check failure report';
 
@@ -744,6 +743,7 @@ $string['privacy:metadata:sbx_rec:duration_seconds'] = 'The length of the record
 $string['privacy:metadata:sbx_rec:timecreated'] = 'When the recording was made.';
 $string['privacy:metadata:outreach_log'] = 'Audit log of empathetic outreach emails.';
 $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was sent to.';
+$string['privacy:metadata:outreach_log:dryrun'] = 'Whether the row was written in dry-run mode (no email was actually sent).';
 $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferences (which email types a recipient has unsubscribed from).';
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';

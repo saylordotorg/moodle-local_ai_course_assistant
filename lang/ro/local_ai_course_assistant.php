@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Note';
 $string['chat:history_title'] = 'Note și istoricul conversației';
 $string['task:send_inactivity_reminders'] = 'Trimiteți e-mailuri săptămânale de memento privind inactivitatea';
 $string['task:run_meta_ai_query'] = 'Rulează interogarea programată de analiză Radar de învățare';
-$string['messageprovider:study_notes'] = 'Note ale sesiunii de studiu';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Livrarea frontend-ului';

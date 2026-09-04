@@ -422,10 +422,8 @@ $string['chat:mode_history'] = 'Amanothi';
 // History panel.
 $string['chat:history_title'] = 'Amanothi nomlando wengxoxo';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo samasonto ngokungasebenzi';
-$string['messageprovider:study_notes'] = 'Amanothi esikhathi sokufunda';
 $string['task:send_inactivity_reminders'] = 'Thumela ama-imeyili esikhumbuzo sokungasebenzi njalo ngesonto';
 $string['task:run_meta_ai_query'] = 'Sebenzisa umbuzo wokuhlaziya we-Learning Radar ohleliwe';
-$string['messageprovider:study_notes'] = 'Amanothi eseshini yokufunda';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Ukulethwa kwe-Frontend';

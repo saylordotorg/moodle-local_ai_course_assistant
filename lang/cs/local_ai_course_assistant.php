@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Poznámky';
 $string['chat:history_title'] = 'Poznámky a historie konverzace';
 $string['task:send_inactivity_reminders'] = 'Odeslat týdenní e-maily s připomínkou při nečinnosti';
 $string['task:run_meta_ai_query'] = 'Spustit naplánovaný dotaz Radar učení analytiky';
-$string['messageprovider:study_notes'] = 'Poznámky ze studijní relace';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Doručování frontendu';

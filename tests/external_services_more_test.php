@@ -18,7 +18,6 @@ namespace local_ai_course_assistant;
 
 use local_ai_course_assistant\external\submit_feedback;
 use local_ai_course_assistant\external\save_practice_score;
-use local_ai_course_assistant\external\email_study_notes;
 use local_ai_course_assistant\external\get_analytics_overall;
 use local_ai_course_assistant\external\get_analytics_by_course;
 
@@ -30,7 +29,7 @@ use local_ai_course_assistant\external\get_analytics_by_course;
  * clean_returnvalue round-trip.
  *
  * Coverage in this file: submit_feedback, save_practice_score,
- * email_study_notes, get_analytics_overall, get_analytics_by_course.
+ * get_analytics_overall, get_analytics_by_course.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
@@ -226,29 +225,6 @@ final class external_services_more_test extends \advanced_testcase {
                 ['userid' => $user->id]
             )
         );
-    }
-
-    // ───────────────────────────────────────────────────────────
-    // email_study_notes
-    // ───────────────────────────────────────────────────────────
-
-    public function test_email_study_notes_returns_success_shape(): void {
-        $this->resetAfterTest();
-        [$course, $user] = $this->enrolled_student();
-
-        $result = email_study_notes::execute(
-            (int)$course->id,
-            "Notes:\n- Photosynthesis happens in chloroplasts.\n- ATP is energy."
-        );
-
-        $this->assertArrayHasKey('success', $result);
-        // Email may not actually send in test env (no mail config), but
-        // the call must not throw and the return shape must round-trip.
-        $clean = \core_external\external_api::clean_returnvalue(
-            email_study_notes::execute_returns(),
-            $result
-        );
-        $this->assertEquals($result, $clean);
     }
 
     // ───────────────────────────────────────────────────────────

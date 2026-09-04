@@ -405,7 +405,6 @@ $string['chat:mode_history'] = 'Notas';
 $string['chat:history_title'] = 'Notas e historial de conversación';
 $string['task:send_inactivity_reminders'] = 'Enviar correos electrónicos semanales de recordatorio por inactividad';
 $string['task:run_meta_ai_query'] = 'Ejecutar consulta programada de analíticas Radar de Aprendizaje';
-$string['messageprovider:study_notes'] = 'Notas de sesión de estudio';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Entrega del frontend';

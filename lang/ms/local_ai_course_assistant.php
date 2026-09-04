@@ -422,10 +422,8 @@ $string['chat:mode_history'] = 'Nota';
 // History panel.
 $string['chat:history_title'] = 'Nota dan Sejarah Perbualan';
 $string['task:send_inactivity_reminders'] = 'Hantar e-mel peringatan ketidakaktifan mingguan';
-$string['messageprovider:study_notes'] = 'Nota sesi pengajian';
 $string['task:send_inactivity_reminders'] = 'Hantar e-mel peringatan ketidakaktifan mingguan';
 $string['task:run_meta_ai_query'] = 'Jalankan pertanyaan analitik Radar Pembelajaran berjadual';
-$string['messageprovider:study_notes'] = 'Nota sesi pengajian';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Penghantaran Frontend';

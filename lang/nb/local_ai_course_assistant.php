@@ -378,7 +378,6 @@ $string['chat:mode_history'] = 'Notater';
 $string['chat:history_title'] = 'Notater og samtalehistorikk';
 $string['task:send_inactivity_reminders'] = 'Send ukentlige inaktivitetspåminnelser via e-post';
 $string['task:run_meta_ai_query'] = 'Kjør planlagt Læringsradar-analyseforespørsel';
-$string['messageprovider:study_notes'] = 'Studieøktnotater';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend-levering';

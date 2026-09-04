@@ -398,10 +398,8 @@ $string['chat:mode_history'] = 'Заметки';
 // History panel.
 $string['chat:history_title'] = 'Заметки и история разговора';
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания по электронной почте о неактивности';
-$string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 $string['task:send_inactivity_reminders'] = 'Отправлять еженедельные напоминания о неактивности';
 $string['task:run_meta_ai_query'] = 'Запустить запланированный запрос аналитики Радар обучения';
-$string['messageprovider:study_notes'] = 'Заметки учебной сессии';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / Доставка фронтенда';

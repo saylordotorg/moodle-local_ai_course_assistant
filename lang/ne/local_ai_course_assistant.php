@@ -398,10 +398,8 @@ $string['chat:mode_history'] = 'नोट्स';
 // History panel.
 $string['chat:history_title'] = 'नोट्स र कुराकानीको इतिहास';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता सम्झाउने इमेलहरू पठाउनुहोस्';
-$string['messageprovider:study_notes'] = 'अध्ययन सत्र टिप्पणीहरू';
 $string['task:send_inactivity_reminders'] = 'साप्ताहिक निष्क्रियता सम्झाउने इमेलहरू पठाउनुहोस्';
 $string['task:run_meta_ai_query'] = 'तालिकाबद्ध सिकाइ रडार विश्लेषण क्वेरी चलाउनुहोस्';
-$string['messageprovider:study_notes'] = 'अध्ययन सत्र टिप्पणीहरू';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / फ्रन्टएन्ड डेलिभरी';

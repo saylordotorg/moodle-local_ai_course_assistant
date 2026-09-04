@@ -62,6 +62,26 @@ $tables = [
     'audit'          => 'local_ai_course_assistant_audit',
     'practice_scores' => 'local_ai_course_assistant_practice_scores',
     'profiles'       => 'local_ai_course_assistant_profiles',
+    // v7.3.3 (F44): the remaining metadata-declared tables -- this export
+    // covered 11 of 23. learner_memory (model-inferred observations) and
+    // learner_goals (volunteered free text) were the material omissions.
+    'obj_att'         => 'local_ai_course_assistant_obj_att',
+    'flashcards'      => 'local_ai_course_assistant_flashcards',
+    'avatar_sess'     => 'local_ai_course_assistant_avatar_sess',
+    'learner_goals'   => 'local_ai_course_assistant_learner_goals',
+    'learner_memory'  => 'local_ai_course_assistant_learner_memory',
+    'streak'          => 'local_ai_course_assistant_streak',
+    'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
+    'outreach_log'    => 'local_ai_course_assistant_outreach_log',
+    'email_optout'    => 'local_ai_course_assistant_email_optout',
+    'sbx_rec'         => 'local_ai_course_assistant_sbx_rec',
+    'review_res'      => 'local_ai_course_assistant_review_res',
+    'radar_sched'     => 'local_ai_course_assistant_radar_sched',
+];
+// Two tables identify the user by a column other than `userid`.
+$altkeys = [
+    'review_res'  => 'resolved_by',
+    'radar_sched' => 'creator',
 ];
 
 // Handle download JSON action.
@@ -76,7 +96,8 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
     // small constant (not row-driven), so this is bounded, not an N+1.
     foreach ($tables as $label => $table) {
         try {
-            $bundle[$label] = array_values($DB->get_records($table, ['userid' => $targetuserid]));
+            $keycol = $altkeys[$label] ?? 'userid';
+            $bundle[$label] = array_values($DB->get_records($table, [$keycol => $targetuserid]));
         } catch (\Throwable $e) {
             $bundle[$label] = ['error' => 'table unavailable'];
         }
@@ -195,7 +216,7 @@ if ($targetuserid) {
         // count per table is bounded rather than an N+1.
         foreach ($tables as $label => $table) {
             try {
-                $count = $DB->count_records($table, ['userid' => $targetuserid]);
+                $count = $DB->count_records($table, [($altkeys[$label] ?? 'userid') => $targetuserid]);
             } catch (\Throwable $e) {
                 $count = 0;
             }

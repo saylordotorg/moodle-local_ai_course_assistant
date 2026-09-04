@@ -375,10 +375,8 @@ $string['chat:mode_history'] = 'নোট';
 // History panel.
 $string['chat:history_title'] = 'নোট এবং কথোপকথনের ইতিহাস';
 $string['task:send_inactivity_reminders'] = 'সাপ্তাহিক নিষ্ক্রিয়তা স্মরণ ইমেল পাঠান';
-$string['messageprovider:study_notes'] = 'অধ্যয়ন সেশন নোট';
 $string['task:send_inactivity_reminders'] = 'সাপ্তাহিক নিষ্ক্রিয়তা অনুস্মারক ইমেল পাঠান';
 $string['task:run_meta_ai_query'] = 'নির্ধারিত লার্নিং রাডার বিশ্লেষণ প্রশ্ন চালান';
-$string['messageprovider:study_notes'] = 'অধ্যয়ন সেশন নোট';
 
 // CDN settings.
 $string['settings:cdn_heading'] = 'CDN / ফ্রন্টএন্ড ডেলিভারি';
