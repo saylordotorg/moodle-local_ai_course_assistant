@@ -94,15 +94,21 @@ class talking_avatar_session_manager {
         if ($row->source === 'webhook' && $source !== 'webhook') {
             return false;
         }
-        if ($row->ended_at && $source === 'sweeper') {
+        // Idempotent for real this time: the docblock always claimed it, but
+        // only webhook-vs-nonwebhook and sweeper-vs-closed were refused. A
+        // repeat heartbeat (an honest one from a long-idle tab, or a crafted
+        // POST against the caller's own row) recomputed the duration from
+        // started_at to NOW and overwrote duration_sec and est_cost_usd --
+        // inflating a closed session's recorded cost indefinitely.
+        if ($row->ended_at && $source !== 'webhook') {
             return false;
         }
         $endtime = $endtime ?? time();
         $duration = max(0, $endtime - (int) $row->started_at);
-        if ($source === 'sweeper') {
-            $duration = min($duration, self::MAX_OPEN_SECONDS);
-            $endtime = (int) $row->started_at + $duration;
-        }
+        // Clamp EVERY source, not just the sweeper: no session may record more
+        // than the sweeper would have allowed it.
+        $duration = min($duration, self::MAX_OPEN_SECONDS);
+        $endtime = (int) $row->started_at + $duration;
         $row->ended_at = $endtime;
         $row->duration_sec = $duration;
         $row->est_cost_usd = talking_avatar_cost_manager::cost_for_session($row->provider, $duration);

@@ -38,7 +38,12 @@ class save_avatar_preference extends external_api {
 
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'avatar' => new external_value(PARAM_ALPHANUMEXT, 'Avatar identifier'),
+            // PARAM_TEXT, not PARAM_ALPHANUMEXT: custom avatar keys are
+            // 'custom:<contenthash>' and ALPHANUMEXT strips the colon, so
+            // validate_parameters threw before the allowlist ever ran --
+            // admin-uploaded avatars appeared as picker tiles and could never
+            // be selected, with the rejection swallowed by an empty JS catch.
+            'avatar' => new external_value(PARAM_TEXT, 'Avatar identifier'),
         ]);
     }
 
@@ -52,8 +57,19 @@ class save_avatar_preference extends external_api {
         self::validate_context($context);
         require_capability('moodle/user:editownprofile', $context);
 
-        if (!in_array($params['avatar'], self::$allowed, true)) {
-            throw new \invalid_parameter_exception('Invalid avatar: ' . $params['avatar']);
+        $choice = $params['avatar'];
+        $iscustom = str_starts_with($choice, 'custom:');
+        if ($iscustom) {
+            // Allowlist against what actually exists in the admin-uploaded
+            // filearea -- the same enumeration the picker itself is built from.
+            global $CFG;
+            require_once($CFG->dirroot . '/local/ai_course_assistant/lib.php');
+            $validcustom = array_column(local_ai_course_assistant_get_custom_avatars(), 'key');
+            if (!in_array($choice, $validcustom, true)) {
+                throw new \invalid_parameter_exception('Invalid avatar: ' . $choice);
+            }
+        } else if (!in_array($choice, self::$allowed, true)) {
+            throw new \invalid_parameter_exception('Invalid avatar: ' . $choice);
         }
 
         set_user_preference('local_ai_course_assistant_avatar', $params['avatar']);

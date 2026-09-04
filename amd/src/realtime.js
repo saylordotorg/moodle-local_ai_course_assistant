@@ -464,7 +464,13 @@ define([], function() {
                 // stays gated until this greeting's response.done so turn-taking
                 // (server VAD) only kicks in after the learner has been greeted.
                 setState('idle');
-                if (!awaitingGreeting && !micHot) {
+                // !responseActive: session.created has already fired
+                // setState('idle'), which synchronously triggers the
+                // bootstrap's first-idle kickoff (an initial-text
+                // response.create). Without this guard the greeting here was a
+                // SECOND response.create on the same connect -- two billed
+                // audio generations, sometimes talking over each other.
+                if (!awaitingGreeting && !micHot && !responseActive) {
                     awaitingGreeting = true;
                     responseActive = true;
                     ws.send(JSON.stringify({

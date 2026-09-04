@@ -2045,6 +2045,16 @@ if ($hassiteconfig) {
                     'synthesia' => get_string('settings:talking_avatar_provider_synthesia', 'local_ai_course_assistant'),
                 ]
             ));
+            // v7.3.3 (F10): the viewer's fallback notice has always told admins
+            // to "set the CDN bundle URL in plugin settings" -- and the setting
+            // had no admin surface, so the instruction was unfollowable.
+            $settings->add(new admin_setting_configtext(
+                'local_ai_course_assistant/cdn_bundle_url',
+                get_string('settings:cdn_bundle_url', 'local_ai_course_assistant'),
+                get_string('settings:cdn_bundle_url_desc', 'local_ai_course_assistant'),
+                '',
+                PARAM_URL
+            ));
             foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
                 $settings->add(new admin_setting_configpasswordunmask(
                     'local_ai_course_assistant/' . $tap . '_api_key',

@@ -4464,14 +4464,20 @@ define([
         // a direct URL with no link from the drawer.
         const dataSection = document.createElement('div');
         dataSection.className = 'aica-settings-panel__section';
+        // Brand-aware, matching the pattern used elsewhere in this panel:
+        // literal "SOLA" here bypassed the white-label token system, so a
+        // rebranded install showed the Saylor product name on its privacy
+        // teaser. (The strings remain English pending the panel-wide i18n
+        // pass -- this panel is built in JS and predates the tagging system.)
+        var brandShort = (root && (root.dataset.shortname || root.dataset.displayname)) || 'SOLA';
         const dataHead = document.createElement('h3');
         dataHead.className = 'aica-settings-panel__section-title';
-        dataHead.textContent = 'My SOLA data';
+        dataHead.textContent = 'My ' + brandShort + ' data';
         dataSection.appendChild(dataHead);
 
         const dataDesc = document.createElement('p');
         dataDesc.className = 'aica-settings-panel__empty-note';
-        dataDesc.textContent = 'Download a copy of everything SOLA has stored about you, '
+        dataDesc.textContent = 'Download a copy of everything ' + brandShort + ' has stored about you, '
             + 'or delete it from this course or across every course. Opens in a new tab.';
         dataSection.appendChild(dataDesc);
 
@@ -5930,10 +5936,18 @@ define([
         if (!drawer) {
             return;
         }
+        // Keep the toggle's ARIA state true to the panel. The template shipped
+        // aria-pressed="false" that nothing ever updated; expanded/collapsed is
+        // the actual semantic (the button opens a region).
+        var taBtn = drawer.querySelector('.local-ai-course-assistant__btn-talking-avatar');
+        var setExpanded = function(on) {
+            if (taBtn) { taBtn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+        };
         let panel = drawer.querySelector('.aica-talking-avatar-panel');
         if (panel) {
             endAvatarSession();
             panel.remove();
+            setExpanded(false);
             return;
         }
         panel = document.createElement('div');
@@ -5944,10 +5958,12 @@ define([
             '<button class="aica-talking-avatar-panel__close" type="button" aria-label="Close avatar">&times;</button>' +
             '<div class="aica-talking-avatar-panel__loading">Loading avatar...</div>';
         drawer.appendChild(panel);
+        setExpanded(true);
         const closeBtn = panel.querySelector('.aica-talking-avatar-panel__close');
         closeBtn.addEventListener('click', function() {
             endAvatarSession();
             panel.remove();
+            setExpanded(false);
         });
 
         const sesskey = (root && root.dataset.sesskey) || (M && M.cfg && M.cfg.sesskey) || '';

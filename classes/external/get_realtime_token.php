@@ -96,6 +96,15 @@ class get_realtime_token extends external_api {
         self::validate_context($coursecontext);
         require_capability('local/ai_course_assistant:use', $coursecontext);
 
+        // F80: throttle the mint. Each token opens a paid realtime session and
+        // nothing here wrote a usage row, so this was the one paid endpoint
+        // with neither a request limit nor spend accounting. Six per five
+        // minutes is ample for genuine reconnects; a mint loop is not.
+        global $USER;
+        if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'realtime_mint', 6, 300)) {
+            throw new \moodle_exception('soapbox:rate_limited', 'local_ai_course_assistant');
+        }
+
         // v7.0.5 security fix: enforce the voice kill switch HERE, not only in
         // the UI. Until now `realtime_enabled` was read in exactly one
         // non-language file — hook_callbacks, which decides whether to draw the
@@ -196,9 +205,13 @@ class get_realtime_token extends external_api {
             $fullinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $fullinstructions);
             $clientinstructions = preg_replace('/<\|[a-zA-Z0-9_\-]+\|>/', '[special token]', $voicetail);
         } catch (\Throwable $e) {
+            // Fail CLOSED. The old handler blanked the instructions and minted
+            // anyway, so a prompt-build failure produced a live voice session
+            // running on provider defaults -- no persona, no fencing, none of
+            // the security section's jailbreak defenses -- for its whole life.
+            // sse.php fails closed on the same builder; voice must too.
             debugging('realtime instructions build failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
-            $fullinstructions = '';
-            $clientinstructions = '';
+            throw new \moodle_exception('error:realtime_unavailable', 'local_ai_course_assistant');
         }
 
         // Resolve active Realtime provider via the voice_providers registry.

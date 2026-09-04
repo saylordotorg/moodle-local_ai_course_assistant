@@ -204,9 +204,14 @@
         {{! Header }}
         <div class="local-ai-course-assistant__header">
             <div class="local-ai-course-assistant__header-title">
+                {{! The avatar picker interaction was removed; the image is
+                    decoration. aria-hidden + tabindex=-1 because a focusable,
+                    labeled "Change avatar" control that does nothing sends a
+                    screen-reader user hunting for a dialog that never opens.
+                    styles.css already sets pointer-events:none for mouse users. }}
                 <button class="local-ai-course-assistant__btn-avatar"
-                        title="{{#str}}chat:change_avatar, local_ai_course_assistant{{/str}}"
-                        aria-label="{{#str}}chat:change_avatar, local_ai_course_assistant{{/str}}"
+                        aria-hidden="true"
+                        tabindex="-1"
                         type="button">
                     <span class="aica-avatar-svg aica-avatar-svg--header" aria-hidden="true"
                           data-fallback-avatar="{{avatarurl}}">
@@ -220,7 +225,7 @@
                 <button class="local-ai-course-assistant__btn-talking-avatar"
                         title="{{#str}}talking_avatar:open, local_ai_course_assistant{{/str}}"
                         aria-label="{{#str}}talking_avatar:open, local_ai_course_assistant{{/str}}"
-                        aria-pressed="false"
+                        aria-expanded="false"
                         type="button">
                     {{! Person icon — talking avatar }}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"

@@ -86,6 +86,9 @@ class did_provider extends base_provider {
         return [
             'embed_url' => $viewer->out(false),
             'session_token' => $sessiontoken,
+            // See heygen_provider: the viewer's `sid` is the stream id, not the
+            // session_id credential.
+            'upstream_session_id' => $sessionid,
             'provider' => 'did',
             'expires_in' => 600,
             'extras' => [

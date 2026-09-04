@@ -479,8 +479,17 @@ class analytics {
         // capability_sql('chat') already names 'quiz', but it is ANDed on after
         // this predicate and cannot rescue a row this has already rejected.
         // That is precisely how RAG spend came to read $0.00, above.
+        // F81 (v7.3.3): the voice interaction types join the billable set now
+        // that their rows carry a model_name. The role='system' guard on the
+        // second arm is LOAD-BEARING: learner role='user' rows in voice mode
+        // carry interaction_type='voice', and get_total_tokens() applies this
+        // predicate without a model_name filter -- without the guard, learner
+        // rows would join the spend totals.
         return "({$alias}.role = 'assistant'
-                 OR {$alias}.interaction_type IN ('embedding', 'rerank', 'quiz'))";
+                 OR ({$alias}.role = 'system' AND {$alias}.interaction_type IN (
+                     'embedding', 'rerank', 'quiz',
+                     'voice', 'openai_tts', 'xai_tts',
+                     'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt')))";
     }
 
     /**

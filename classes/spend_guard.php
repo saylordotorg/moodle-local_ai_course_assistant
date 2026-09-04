@@ -246,7 +246,7 @@ class spend_guard {
             case 'chat':
                 return "(m.interaction_type IS NULL OR m.interaction_type IN ('chat','quiz',''))";
             case 'voice':
-                return "m.interaction_type IN ('voice','openai_tts','xai_tts','openai_whisper','openai_stt','xai_stt')";
+                return "m.interaction_type IN ('voice','openai_tts','xai_tts','openai_whisper','openai_stt','xai_stt','selfhosted_stt')";
             case 'rag':
                 // 'rerank' belongs to RAG spend too: voyage_reranker is the second
                 // half of the retrieval pipeline and was in no capability bucket at

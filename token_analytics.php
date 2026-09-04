@@ -93,7 +93,7 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 $categorysql = "CASE
     WHEN m.interaction_type IN ('voice')                                    THEN 'voice_realtime'
     WHEN m.interaction_type IN ('openai_tts','xai_tts')                     THEN 'voice_tts'
-    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt')    THEN 'voice_stt'
+    WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt','selfhosted_stt')    THEN 'voice_stt'
     WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'
     WHEN m.interaction_type IN ('meta')                                     THEN 'analytics'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'

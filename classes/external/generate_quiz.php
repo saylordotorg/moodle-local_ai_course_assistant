@@ -230,6 +230,13 @@ class generate_quiz extends external_api {
                 ['response_schema' => $quizschema]
             );
         } catch (\Throwable $e) {
+            // F85: a throwable can arrive AFTER a billed 200 (unusable
+            // content). get_last_token_usage() is null when nothing was billed
+            // and record_quiz_usage tolerates null, so this is safe everywhere;
+            // isset() guards the case where resolve_quiz_provider itself threw.
+            if (isset($provider)) {
+                self::record_quiz_usage($provider, $courseid, $count, $topic, $cmid);
+            }
             // The learner can start an attempt between the check above and this
             // call, in which case the throwable IS the lock; re-check rather
             // than string-matching a translated message.
@@ -252,6 +259,12 @@ class generate_quiz extends external_api {
                 'questions' => [],
             ];
         }
+
+        // F85 (v7.3.3): record NOW -- the provider call above is already
+        // billed. Recording only on the success return dropped the spend of
+        // every turn that failed JSON parsing or question validation below:
+        // billed, uncounted, invisible to the caps.
+        self::record_quiz_usage($provider, $courseid, $count, $topic, $cmid);
 
         // Try structured output first (provider returned raw JSON).
         $decoded = json_decode($response, true);
@@ -326,7 +339,8 @@ class generate_quiz extends external_api {
         // ANDed on, and that predicate matched only role='assistant' plus the
         // embedding/rerank types. v7.0.6 adds 'quiz' to it; without that the row
         // is stored and priced at zero by every consumer.
-        self::record_quiz_usage($provider, $courseid, $count, (string) ($decoded['topic'] ?? $topic), $cmid);
+        // F85 (v7.3.3): usage is recorded immediately after the billed call
+        // (see above); nothing to record here.
 
         return [
             'success'   => true,

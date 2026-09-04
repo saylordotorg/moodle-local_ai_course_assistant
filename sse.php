@@ -141,7 +141,12 @@ if ($logonly) {
         $approxtokens,
         0,
         'gpt-4o-realtime',
-        $interactiontype,
+        // F81: hardcoded. The only log-only client is the realtime session
+        // logger, whose 'practice_pronunciation' arrives PARAM_ALPHA-mangled as
+        // 'practicepronunciation' -- in no voice list, so realtime audio spend
+        // landed in "other". 'voice' is the bucket both spend_guard and
+        // token_analytics read.
+        'voice',
         $pageid ?: null
     );
     echo json_encode(['logged' => true]);
@@ -511,6 +516,27 @@ try {
                 }
             }
         }
+    }
+
+    // F76 (v7.3.3): the client-supplied pagetitle reached the system prompt's
+    // instruction region unfenced -- including the sentence that ESTABLISHES
+    // the untrusted fence -- while every sibling input on this path is fenced
+    // and the sibling pageid is re-validated. Self-directed only (the learner
+    // already controls $message), but a poisoned title was also cached under a
+    // key that ignored it and served back to later legitimate turns. Re-derive
+    // from the validated module where possible; neutralize otherwise.
+    if ($pageid > 0) {
+        try {
+            $mi = get_fast_modinfo($courseid);
+            $micm = $mi->cms[$pageid] ?? null;
+            $pagetitle = $micm ? format_string($micm->name) : '';
+        } catch (\Throwable $e) {
+            $pagetitle = '';
+        }
+    } else if ($pagetitle !== '') {
+        // No validated module to re-derive from (course home page): strip the
+        // characters that could break prompt structure and clamp.
+        $pagetitle = trim(mb_substr(preg_replace('/[\[\]\r\n]+/', ' ', $pagetitle), 0, 200));
     }
 
     // Build system prompt and get history.

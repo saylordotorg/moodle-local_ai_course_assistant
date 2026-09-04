@@ -123,8 +123,14 @@ class conversation_manager {
             : $tokensused;
         $record->prompt_tokens     = $prompttokens;
         $record->completion_tokens = $completiontokens;
-        $record->model_name        = ($role === 'assistant' && $modelname !== null) ? $modelname : null;
-        $record->provider = ($role === 'assistant' && $provider !== '') ? $provider : null;
+        // F81 (v7.3.3): keep provider/model on role='system' cost-log rows too
+        // (TTS / STT / realtime-session telemetry). spend_guard groups by model
+        // and prices via token_cost_manager, so nulling these made every voice
+        // row unpriceable: the synthesis and transcription slice of spend was
+        // invisible to the spend guard, the anomaly detector and token
+        // analytics alike. role='user' rows still carry neither.
+        $record->model_name        = ($role !== 'user' && $modelname !== null && $modelname !== '') ? $modelname : null;
+        $record->provider          = ($role !== 'user' && $provider !== '') ? $provider : null;
         $record->interaction_type  = $interactiontype ?: 'chat';
         $record->cmid              = $cmid ?: null;
         // v5.4.6: only attach RAG latency to assistant messages — user messages

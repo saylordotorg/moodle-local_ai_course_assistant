@@ -190,10 +190,14 @@ try {
             'system',
             '[STT Transcription]',
             0,
-            $cfg['provider'] . '_stt',
+            // F81: the capability suffix belongs in interaction_type (arg 11),
+            // where spend_guard's voice bucket and token_analytics' categories
+            // read it -- not welded onto the provider name.
+            $cfg['provider'],
             $approxtokens,
             0,
-            $model
+            $model,
+            $cfg['provider'] . '_stt'
         );
     }
 } catch (\Throwable $e) {

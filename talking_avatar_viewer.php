@@ -70,7 +70,10 @@ if (!\local_ai_course_assistant\talking_avatar_session_manager::user_owns_sessio
     );
 }
 
-\local_ai_course_assistant\security::send_security_headers();
+// Full-page mode: this page renders through $OUTPUT with Moodle's own JS, and
+// the strict endpoint CSP (no unsafe-eval) breaks YUI/requirejs on full pages
+// -- see build_security_headers()'s own docblock, which this call contradicted.
+\local_ai_course_assistant\security::send_security_headers(true);
 
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/talking_avatar_viewer.php'));
 $PAGE->set_context(context_system::instance());

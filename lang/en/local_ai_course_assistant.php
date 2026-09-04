@@ -1614,7 +1614,6 @@ $string['flashcards:hard']          = 'Hard';
 $string['flashcards:easy']          = 'Easy';
 $string['flashcards:no_due']        = 'Nothing to review right now. Generate flashcards from a course page in the assistant widget, or check back later.';
 $string['flashcards:session_complete'] = 'Session complete. Good work.';
-$string['flashcards:disabled']      = 'Flashcards are not enabled for this course.';
 $string['flashcards:toggle']        = 'Enable flashcards for this course';
 $string['flashcards:toggle_help']   = 'Adds a Generate-flashcards starter to the assistant widget and a learner review page at /local/ai_course_assistant/flashcards.php?courseid=X. Off by default.';
 $string['flashcards:starter_generate'] = 'Generate flashcards from this page';
@@ -2478,3 +2477,6 @@ $string['soapbox:no_media_support'] = 'This browser cannot record audio here. Us
 $string['soapbox:status_uploaded'] = 'Processing — transcription and scoring in progress';
 $string['soapbox:status_scored'] = 'Scored';
 $string['soapbox:status_failed'] = 'Scoring failed — this attempt does not count. Please record again.';
+$string['error:realtime_unavailable'] = 'Voice mode is temporarily unavailable. Please try again in a moment, or use text chat.';
+$string['settings:cdn_bundle_url'] = 'Talking avatar viewer bundle URL';
+$string['settings:cdn_bundle_url_desc'] = 'URL of the JavaScript bundle the talking-avatar viewer page loads (WebRTC/LiveKit glue). Leave blank to disable the viewer; the page then shows a notice instead of a broken stage.';

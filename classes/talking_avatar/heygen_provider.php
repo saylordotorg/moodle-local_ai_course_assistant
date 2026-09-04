@@ -101,6 +101,11 @@ class heygen_provider extends base_provider {
         return [
             'embed_url' => $viewer->out(false),
             'session_token' => $accesstoken,
+            // The id the viewer URL carries as `sid`; ownership checks match on
+            // THIS, not on the LiveKit access token above -- storing the token
+            // made the legitimate owner fail the viewer's ownership check after
+            // the billable vendor session had already been created.
+            'upstream_session_id' => $sessionid,
             'provider' => 'heygen',
             'expires_in' => 1800,
             'extras' => [

@@ -102,7 +102,11 @@ class token_cost_manager {
 
         // ── OpenAI Whisper (transcription) ──────────────────────────────────
         // Whisper charges ~$0.006/min. Approximated per token for the rate card.
-        'whisper'           => ['input' => 0.36, 'output' => 0.00],
+        // $6.00/1M tokens x the 1000-tokens-per-minute convention used by the
+        // STT telemetry writers = $0.006/min, OpenAI's published Whisper rate.
+        // The old 0.36 was the PER-HOUR price entered as a per-1M-token rate,
+        // underpricing STT by a factor of 16.7.
+        'whisper'           => ['input' => 6.00, 'output' => 0.00],
 
         // ── Anthropic Claude ──────────────────────────────────────────────────
         'claude-haiku'      => ['input' => 0.80, 'output' => 4.00],

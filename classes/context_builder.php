@@ -231,8 +231,12 @@ class context_builder {
             // so a save invalidates this learner's cached prompt without
             // a manual purge.
             $persfp = self::personalisation_fingerprint($userid, $courseid);
+            // F76: pagetitle participates in the key. It is interpolated into
+            // the prompt but was absent here, so a title from one request was
+            // cached under (course, user, page) and served to later turns.
+            $titlefp = substr(sha1($pagetitle), 0, 8);
             $cachekey = "prompt_{$courseid}_{$userid}_{$pageid}_" . ($lang ?: 'auto')
-                . "_{$togglefp}_{$qmkey}_{$persfp}";
+                . "_{$togglefp}_{$qmkey}_{$persfp}_{$titlefp}";
             $cached = $cache->get($cachekey);
             if ($cached !== false) {
                 return $cached;
@@ -422,7 +426,10 @@ class context_builder {
                 'course_topics',
                 section::CAT_CONTEXT,
                 92,
-                "\n\n## Course Structure\n" . $coursetopics,
+                // F78: fenced like its siblings -- section names and summaries
+                // are course-author content, the one such path that skipped
+                // fence_untrusted.
+                "\n\n## Course Structure\n" . security::fence_untrusted($coursetopics, 'course structure'),
                 200
             );
         }
@@ -471,7 +478,13 @@ class context_builder {
                     60,
                     "\n\n## Student Learning Profile\n"
                         . "Profile generated from this learner's previous conversations. Personalise your responses: match their depth preference, reference strengths encouragingly, focus on weak areas, use their preferred explanation style.\n\n"
-                        . $profile,
+                        // F74: fenced. The profile is LLM-generated from the
+                        // learner's own messages, persisted with only trim(),
+                        // and re-injected here on every turn -- a self-seeded
+                        // channel, but one that survives conversation resets
+                        // and history clears, unlike anything else the learner
+                        // controls.
+                        . security::fence_untrusted($profile, 'learner profile'),
                     150
                 );
             }
@@ -1893,6 +1906,13 @@ class context_builder {
      * @return string Empty when no pagetitle is provided.
      */
     private static function get_topic_focus_instructions(string $pagetitle): string {
+        if ($pagetitle === '') {
+            return '';
+        }
+        // Defense in depth behind sse.php's re-derivation: never let a title
+        // carry fence markers, newlines or unbounded length into the
+        // instruction region.
+        $pagetitle = trim(mb_substr(preg_replace('/[\[\]\r\n"]+/', ' ', $pagetitle), 0, 200));
         if ($pagetitle === '') {
             return '';
         }

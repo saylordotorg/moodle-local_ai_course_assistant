@@ -185,10 +185,14 @@ try {
         'system',
         '[Soapbox STT]',
         0,
-        $cfg['provider'] . '_stt',
+        // F81: capability suffix belongs in interaction_type (arg 11), where
+        // the spend buckets read it. The '[Soapbox STT]' marker already
+        // distinguishes soapbox rows from chat-mic STT.
+        $cfg['provider'],
         $approxtokens,
         0,
-        $model
+        $model,
+        $cfg['provider'] . '_stt'
     );
 } catch (\Throwable $e) {
     unset($e);

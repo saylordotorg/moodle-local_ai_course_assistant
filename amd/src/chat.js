@@ -2609,7 +2609,13 @@ define([
                             root.dataset.avatarurl = avatarUrl;
                             UI.updateAvatarImages(avatarUrl);
                             return;
-                        }).catch(function() { /**/ });
+                        }).catch(function(err) {
+                            // The empty catch here is what hid F8 for months:
+                            // custom avatars were rejected server-side and the
+                            // picker looked like it simply did not work.
+                            window.console && console.warn('[SOLA avatar]', err);
+                            UI.showNotification('Could not save the avatar choice.', 'error');
+                        });
                     },
                     onVoiceSelect: function(voice) {
                         localStorage.setItem('aica_tts_voice', voice);
@@ -3680,7 +3686,7 @@ define([
         // Chrome desktop can take 30+ seconds to initialize voices on first
         // use. Renamed to match the defined helper.
         var ctx = getOrCreateAudioCtx();
-        if (!ctx) { Speech.speak(text, callback); return; }
+        if (!ctx) { clearTtsLoadingState(); Speech.speak(text, callback); return; }
 
         var promises = chunks.map(function(c) {
             return fetchAndDecodeTts(c, ttsUrl, voice);
@@ -3924,6 +3930,7 @@ define([
                     URL.revokeObjectURL(objUrl);
                     currentAudio = null;
                     UI.stopMouthSync();
+                    clearTtsLoadingState();
                     Speech.speak(text, callback);
                 });
                 audio.play().catch(function() {
@@ -3931,13 +3938,22 @@ define([
                     URL.revokeObjectURL(objUrl);
                     currentAudio = null;
                     UI.stopMouthSync();
+                    clearTtsLoadingState();
                     Speech.speak(text, callback);
                 });
             } catch (e) {
+                // Every fallback must clear the loading pulse. These terminal
+                // handlers did not, so on short messages (the chunked path
+                // clears correctly) a tts.php failure left the speak button
+                // pulsing "loading" while the browser voice was already
+                // speaking -- during a TTS outage the UI read as a hang, not a
+                // fallback.
+                clearTtsLoadingState();
                 Speech.speak(text, callback);
             }
         })
         .catch(function() {
+            clearTtsLoadingState();
             Speech.speak(text, callback);
         });
     };

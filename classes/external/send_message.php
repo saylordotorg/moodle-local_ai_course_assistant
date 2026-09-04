@@ -120,6 +120,20 @@ class send_message extends external_api {
     private static function handle(array $params, int $userid): array {
         global $USER;
 
+        // F82 (v7.3.3): same per-user budget as the streaming path (sse.php).
+        // This fallback had no throttle at all before RAG retrieval, so each
+        // request spent an embedding (and rerank) call with nothing in the way;
+        // base_provider's 120/60 floor only fires after retrieval has paid.
+        // Shares the 'sse_stream' bucket deliberately: one 20/60 budget across
+        // both transports of the same action, so alternating endpoints cannot
+        // double throughput. Checked before anything is written.
+        if (\local_ai_course_assistant\rate_limiter::is_rate_limited($userid, 'sse_stream', 20, 60)) {
+            return [
+                'response' => get_string('chat:error_ratelimit', 'local_ai_course_assistant'),
+                'success'  => false,
+            ];
+        }
+
         // v7.2.9 (S11): refuse before writing anything.
         //
         // base_provider is the enforcement chokepoint and it does refuse this
@@ -192,8 +206,14 @@ class send_message extends external_api {
         // v7.2.2: skip retrieval while the emergency stop is engaged, so a paused
         // site stops spending on embeddings and reranking too. The provider
         // factory refuses further down; retrieval runs first. See sse.php.
+        // F82 (v7.3.3): honor the per-course override exactly as sse.php does;
+        // unset means enabled. An admin disabling RAG for one course was
+        // silently ignored on this transport.
+        $ragcourseraw = get_config('local_ai_course_assistant', 'rag_enabled_course_' . $params['courseid']);
+        $ragcourseenabled = ($ragcourseraw === false) || (bool) $ragcourseraw;
         if (!\local_ai_course_assistant\spend_guard::emergency_chat_stopped()
-                && get_config('local_ai_course_assistant', 'rag_enabled')) {
+                && get_config('local_ai_course_assistant', 'rag_enabled')
+                && $ragcourseenabled) {
             try {
                 if (!content_indexer::is_course_indexed($params['courseid'])) {
                     content_indexer::index_course($params['courseid']);
