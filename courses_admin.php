@@ -116,11 +116,14 @@ $PAGE->set_heading(get_string('courses_admin:title', 'local_ai_course_assistant'
 $PAGE->set_pagelayout('admin');
 
 // Build course list.
+// EXISTS, not DISTINCT-over-a-join: get_records_sql keys by the first column,
+// and leading with the base table's unique id makes that safe by construction.
 $courses_with_data = $DB->get_records_sql(
-    "SELECT DISTINCT m.courseid, c.fullname, c.shortname
-       FROM {local_ai_course_assistant_msgs} m
-       JOIN {course} c ON c.id = m.courseid
+    "SELECT c.id AS courseid, c.fullname, c.shortname
+       FROM {course} c
       WHERE c.id > 1
+        AND EXISTS (SELECT 1 FROM {local_ai_course_assistant_msgs} m
+                     WHERE m.courseid = c.id)
       ORDER BY c.fullname ASC"
 );
 

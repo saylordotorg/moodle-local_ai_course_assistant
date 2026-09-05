@@ -104,13 +104,18 @@ if ($options['clear']) {
 }
 
 // Enrolled learners on this course.
+// EXISTS instead of DISTINCT over the role join: a learner with two role
+// assignments produced duplicate rows the DISTINCT then folded; leading with
+// u.id keeps get_records_sql keying safe by construction.
 $learners = $DB->get_records_sql(
-    "SELECT DISTINCT u.id, u.firstname, u.lastname
-       FROM {role_assignments} ra
-       JOIN {context} ctx ON ctx.id = ra.contextid
-       JOIN {user} u ON u.id = ra.userid
-      WHERE ctx.contextlevel = 50 AND ctx.instanceid = :courseid
-        AND u.deleted = 0
+    "SELECT u.id, u.firstname, u.lastname
+       FROM {user} u
+      WHERE u.deleted = 0
+        AND EXISTS (SELECT 1
+                      FROM {role_assignments} ra
+                      JOIN {context} ctx ON ctx.id = ra.contextid
+                     WHERE ctx.contextlevel = 50 AND ctx.instanceid = :courseid
+                       AND ra.userid = u.id)
    ORDER BY u.id", ['courseid' => $course->id]);
 
 if (!$learners) {

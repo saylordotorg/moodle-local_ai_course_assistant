@@ -299,10 +299,10 @@ $missingcount = (int) $DB->count_records_sql(
 // ── Course filter options ─────────────────────────────────────────────────────
 
 $courses = $DB->get_records_sql(
-    "SELECT DISTINCT c.id, c.shortname, c.fullname
+    "SELECT c.id, c.shortname, c.fullname
        FROM {course} c
-       JOIN {local_ai_course_assistant_msgs} m ON m.courseid = c.id
-      WHERE m.role = 'assistant'
+      WHERE EXISTS (SELECT 1 FROM {local_ai_course_assistant_msgs} m
+                     WHERE m.courseid = c.id AND m.role = 'assistant')
       ORDER BY c.shortname"
 );
 $courseoptions = [[
