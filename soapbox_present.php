@@ -16,7 +16,8 @@
 
 /**
  * Soapbox presentation assignment — learner page (v6.8.16). Record a video or
- * audio presentation, upload it, and see past attempts.
+ * audio presentation, upload it, and see past attempts. Rendered via the
+ * Templates API (templates/soapbox_present.mustache).
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor
@@ -58,117 +59,79 @@ $hastopics = !empty($topics);
 $storageready = soapbox_storage::is_configured();
 $quality = soapbox_config::quality();
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($assign->name));
-
-if (!empty($assign->intro)) {
-    echo html_writer::div(
-        format_text($assign->intro, (int) $assign->introformat, ['context' => $context]),
-        'sbx-intro mb-3'
-    );
-}
-
 // A short at-a-glance line.
 $mins = ceil((int) $assign->min_seconds / 60);
 $maxs = ceil((int) $assign->max_seconds / 60);
-echo html_writer::div(
-    ($assign->mode === 'audio'
+
+$templatedata = [
+    'hasintro' => !empty($assign->intro),
+    'introhtml' => !empty($assign->intro)
+        ? format_text($assign->intro, (int) $assign->introformat, ['context' => $context])
+        : '',
+    'modelabel' => $assign->mode === 'audio'
         ? get_string('soapbox:present_audio', 'local_ai_course_assistant')
-        : get_string('soapbox:present_video', 'local_ai_course_assistant'))
-    . ' &middot; ' . s(ucfirst($assign->ptype))
-    . ' &middot; ' . get_string(
+        : get_string('soapbox:present_video', 'local_ai_course_assistant'),
+    'ptype' => ucfirst($assign->ptype),
+    'targetlabel' => get_string(
         'soapbox:present_target',
         'local_ai_course_assistant',
         (object) ['min' => $mins, 'max' => $maxs]
     ),
-    'sbx-meta text-muted mb-3'
-);
+    'hastopics' => $hastopics,
+    'choosetopic' => get_string('soapbox:choose_topic', 'local_ai_course_assistant'),
+    'topics' => [],
+    'topicdetails' => [],
+    'storageready' => $storageready,
+    'storagewarninghtml' => $storageready ? '' : $OUTPUT->notification(
+        get_string('soapbox:storage_unconfigured', 'local_ai_course_assistant'),
+        'warning'
+    ),
+    'modeclass' => $assign->mode === 'audio' ? 'sbx-mode-audio' : 'sbx-mode-video',
+    'isaudio' => $assign->mode === 'audio',
+    'isvideo' => $assign->mode !== 'audio',
+    'slidesenabled' => !empty($assign->slides_enabled),
+    'decklabel' => get_string('soapbox:deck_label', 'local_ai_course_assistant'),
+    'audioready' => get_string('soapbox:audio_ready', 'local_ai_course_assistant'),
+    'recordlabel' => get_string('soapbox:record_short', 'local_ai_course_assistant'),
+    'stoplabel' => get_string('soapbox:stop', 'local_ai_course_assistant'),
+    'recordingsheadinghtml' => $OUTPUT->heading(
+        get_string('soapbox:my_recordings', 'local_ai_course_assistant'),
+        4
+    ),
+    'hasrecordings' => false,
+    'norecordingstext' => get_string('soapbox:no_recordings', 'local_ai_course_assistant'),
+    'colrecorded' => get_string('soapbox:col_recorded', 'local_ai_course_assistant'),
+    'collength' => get_string('soapbox:col_length', 'local_ai_course_assistant'),
+    'colstatus' => get_string('status'),
+    'viewlabel' => get_string('soapbox:view_download', 'local_ai_course_assistant'),
+    'playlabel' => get_string('soapbox:play_slides', 'local_ai_course_assistant'),
+    'expiredlabel' => get_string('soapbox:expired', 'local_ai_course_assistant'),
+    'recordings' => [],
+    'retentionnote' => get_string(
+        'soapbox:retention_note',
+        'local_ai_course_assistant',
+        soapbox_config::retention_days()
+    ),
+];
 
 // Topic picker.
 if ($hastopics) {
-    $options = [];
     foreach ($topics as $t) {
-        $options[$t->id] = format_string($t->title);
-    }
-    echo html_writer::start_div('sbx-topics mb-3');
-    echo html_writer::tag('label', get_string('soapbox:choose_topic', 'local_ai_course_assistant'),
-        ['for' => 'sbx-topic', 'class' => 'font-weight-bold d-block']);
-    echo html_writer::select($options, 'sbx-topic', '', false, ['id' => 'sbx-topic']);
-    foreach ($topics as $t) {
+        $templatedata['topics'][] = [
+            'id' => (int) $t->id,
+            'title' => format_string($t->title),
+        ];
         if (!empty($t->instructions)) {
-            echo html_writer::div(
-                html_writer::tag('strong', format_string($t->title) . ': ')
-                . format_text($t->instructions, (int) $t->instructionsformat, ['context' => $context]),
-                'sbx-topic-detail small text-muted mt-2'
-            );
+            $templatedata['topicdetails'][] = [
+                'title' => format_string($t->title),
+                'instructions' => format_text($t->instructions, (int) $t->instructionsformat, ['context' => $context]),
+            ];
         }
     }
-    echo html_writer::end_div();
 }
 
 // Recorder widget.
-if (!$storageready) {
-    echo $OUTPUT->notification(
-        get_string('soapbox:storage_unconfigured', 'local_ai_course_assistant'),
-        'warning'
-    );
-} else {
-    $modeclass = 'sbx-recorder card p-3 mb-4 sbx-mode-' . ($assign->mode === 'audio' ? 'audio' : 'video');
-    echo html_writer::start_div($modeclass, ['id' => 'sbx-recorder']);
-
-    // Slides: deck upload + viewer. The learner uploads a PDF deck, which is
-    // rendered to page images they advance while recording (the advance timeline
-    // is captured with the recording).
-    if (!empty($assign->slides_enabled)) {
-        echo html_writer::start_div('sbx-deck mb-3');
-        echo html_writer::tag(
-            'label',
-            get_string('soapbox:deck_label', 'local_ai_course_assistant'),
-            ['for' => 'sbx-deck-input', 'class' => 'font-weight-bold d-block']
-        );
-        echo html_writer::empty_tag('input', [
-            'type' => 'file', 'accept' => 'application/pdf,.pdf',
-            'id' => 'sbx-deck-input', 'class' => 'sbx-deck-input form-control-file',
-        ]);
-        echo html_writer::div('', 'sbx-deck-status small text-muted mt-1');
-        echo html_writer::div(
-            '',
-            'sbx-slide-viewer mt-2',
-            ['style' => 'max-width:640px']
-        );
-        echo html_writer::end_div();
-    }
-
-    if ($assign->mode !== 'audio') {
-        echo html_writer::empty_tag('video', [
-            'class' => 'sbx-preview w-100 mb-2', 'playsinline' => 'playsinline',
-            'style' => 'max-height:360px;background:#000;border-radius:6px',
-        ]);
-    } else {
-        // Audio-only: no camera. A mic indicator that pulses while recording
-        // gives the learner clear feedback that audio is being captured.
-        echo html_writer::div(
-            html_writer::tag('span', '', ['class' => 'sbx-mic-dot'])
-            . html_writer::tag(
-                'span',
-                get_string('soapbox:audio_ready', 'local_ai_course_assistant'),
-                ['class' => 'sbx-mic-label']
-            ),
-            'sbx-audio-indicator d-flex align-items-center mb-2',
-            ['style' => 'gap:10px']
-        );
-    }
-    echo html_writer::start_div('sbx-controls d-flex align-items-center mb-2', ['style' => 'gap:12px']);
-    echo html_writer::tag('button', get_string('soapbox:record_short', 'local_ai_course_assistant'),
-        ['type' => 'button', 'class' => 'sbx-record btn btn-primary']);
-    echo html_writer::tag('button', get_string('soapbox:stop', 'local_ai_course_assistant'),
-        ['type' => 'button', 'class' => 'sbx-stop btn btn-outline-secondary']);
-    echo html_writer::tag('span', '0:00', ['class' => 'sbx-timer font-weight-bold']);
-    echo html_writer::end_div();
-    echo html_writer::div('', 'sbx-status text-muted');
-    echo html_writer::div('', 'sbx-result mt-2');
-    echo html_writer::end_div();
-
+if ($storageready) {
     $PAGE->requires->js_call_amd('local_ai_course_assistant/soapbox_present', 'init', [
         [
             'assignid'      => (int) $assign->id,
@@ -203,38 +166,27 @@ $recs = $DB->get_records_select(
     'timecreated DESC'
 );
 
-echo $OUTPUT->heading(get_string('soapbox:my_recordings', 'local_ai_course_assistant'), 4);
-if (empty($recs)) {
-    echo html_writer::div(get_string('soapbox:no_recordings', 'local_ai_course_assistant'), 'text-muted');
-} else {
+if (!empty($recs)) {
+    $templatedata['hasrecordings'] = true;
     $storage = $storageready ? new soapbox_storage() : null;
-    $table = new html_table();
-    $table->head = [
-        get_string('soapbox:col_recorded', 'local_ai_course_assistant'),
-        get_string('soapbox:col_length', 'local_ai_course_assistant'),
-        get_string('status'),
-        '',
-    ];
-    $table->attributes['class'] = 'generaltable';
     foreach ($recs as $r) {
-        $len = gmdate('i:s', (int) $r->duration_seconds);
-        $view = '';
+        $row = [
+            'recorded' => userdate((int) $r->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
+            'length' => gmdate('i:s', (int) $r->duration_seconds),
+            'viewurl' => '',
+            'hasplay' => false,
+            'recid' => (int) $r->id,
+            'expired' => false,
+        ];
         if ($storage && $r->storage_key && $r->status !== 'deleted') {
-            $url = $storage->presign_get($r->storage_key, 3600);
-            $view = html_writer::link($url, get_string('soapbox:view_download', 'local_ai_course_assistant'),
-                ['target' => '_blank', 'rel' => 'noopener']);
+            $row['viewurl'] = $storage->presign_get($r->storage_key, 3600);
             // Slides playback: recordings that carry a deck can be played back
             // with the slides advancing in sync.
             if (!empty($r->deck_key) && !empty($r->slide_timeline)) {
-                $view .= ' &middot; ' . html_writer::tag(
-                    'button',
-                    get_string('soapbox:play_slides', 'local_ai_course_assistant'),
-                    ['type' => 'button', 'class' => 'sbx-play-btn btn btn-link btn-sm p-0',
-                    'data-recid' => (int) $r->id]
-                );
+                $row['hasplay'] = true;
             }
         } else if ($r->status === 'deleted') {
-            $view = html_writer::span(get_string('soapbox:expired', 'local_ai_course_assistant'), 'text-muted');
+            $row['expired'] = true;
         }
         // Human status, not the raw DB value: a learner whose row said
         // `failed` got no guidance, and with v7.3.3's cap change a failed
@@ -242,24 +194,11 @@ if (empty($recs)) {
         $statuskey = in_array($r->status, ['uploaded', 'scored', 'failed'], true)
             ? 'soapbox:status_' . $r->status
             : null;
-        $table->data[] = [
-            userdate((int) $r->timecreated, get_string('strftimedatetimeshort', 'langconfig')),
-            $len,
-            $statuskey ? get_string($statuskey, 'local_ai_course_assistant') : s($r->status),
-            $view,
-        ];
+        $row['status'] = $statuskey
+            ? get_string($statuskey, 'local_ai_course_assistant')
+            : s($r->status);
+        $templatedata['recordings'][] = $row;
     }
-    echo html_writer::table($table);
-    // Container the player renders into when a "Play with slides" button is used.
-    echo html_writer::div('', 'sbx-playback mt-3', ['id' => 'sbx-playback']);
-    echo html_writer::div(
-        get_string(
-            'soapbox:retention_note',
-            'local_ai_course_assistant',
-            soapbox_config::retention_days()
-        ),
-        'small text-muted mt-1'
-    );
     $PAGE->requires->js_call_amd(
         'local_ai_course_assistant/soapbox_player',
         'init',
@@ -267,4 +206,7 @@ if (empty($recs)) {
     );
 }
 
+echo $OUTPUT->header();
+echo $OUTPUT->heading(format_string($assign->name));
+echo $OUTPUT->render_from_template('local_ai_course_assistant/soapbox_present', $templatedata);
 echo $OUTPUT->footer();

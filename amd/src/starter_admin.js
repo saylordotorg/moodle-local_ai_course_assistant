@@ -37,6 +37,7 @@ define([], function() {
          * @param {Object} config.iconlabels Icon key to human label.
          * @param {Object} config.strings Translated UI strings.
          * @param {Array} config.starters The starter set to edit.
+         * @param {String} config.resetconfirm Confirm text for the reset-to-defaults forms.
          * @returns {void}
          */
         init: function(config) {
@@ -262,6 +263,22 @@ define([], function() {
                     document.querySelectorAll('.aica-starters-json').forEach(function(el) {
                         el.value = json;
                     });
+                });
+            });
+
+            // Reset-to-defaults forms: confirm before posting. This was an inline
+            // onsubmit attribute on the page before the template conversion; the
+            // forms are found by their hidden action=reset field so the markup
+            // needs no extra hook class.
+            document.querySelectorAll('input[name="action"][value="reset"]').forEach(function(input) {
+                var form = input.closest('form');
+                if (!form) {
+                    return;
+                }
+                form.addEventListener('submit', function(e) {
+                    if (!confirm(config.resetconfirm)) {
+                        e.preventDefault();
+                    }
                 });
             });
 

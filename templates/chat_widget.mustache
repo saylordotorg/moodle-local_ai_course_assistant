@@ -183,7 +183,7 @@
         {{#studentmode}}
         {{! Subtle 2px indicator that student mode is active. Observers won't notice;
             admin knows to look for the thin bar. Ctrl+Shift+A exits. }}
-        <div style="height:2px;background:linear-gradient(90deg,#ffc107,#fd7e14);flex-shrink:0" title="Student mode active (Ctrl+Shift+A to exit)"></div>
+        <div style="height:2px;background:linear-gradient(90deg,#ffc107,#fd7e14);flex-shrink:0" title="{{#str}}chat:studentmode_active, local_ai_course_assistant{{/str}}"></div>
         {{/studentmode}}
         <button id="local-ai-course-assistant-close-toggle"
                 class="local-ai-course-assistant__toggle local-ai-course-assistant__toggle--close"
@@ -293,8 +293,8 @@
                 </button>
                 {{/contextdebugvisible}}
                 <button class="local-ai-course-assistant__btn-help"
-                        title="Help"
-                        aria-label="Help guide"
+                        title="{{#str}}help:button_title, local_ai_course_assistant{{/str}}"
+                        aria-label="{{#str}}help:button_label, local_ai_course_assistant{{/str}}"
                         type="button">
                     {{! Question mark / help icon }}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
@@ -369,27 +369,33 @@
     {{! Help guide panel — toggled by the ? button in the header }}
     <div class="aica-help-panel" hidden style="position:absolute;inset:0;z-index:10;background:#fff;overflow-y:auto;padding:16px 20px;font-size:14px;line-height:1.6">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <h4 style="margin:0;font-size:16px">How to use {{shortname_label}}</h4>
-            <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="Close help">&times;</button>
+            <h4 style="margin:0;font-size:16px">{{help_title}}</h4>
+            <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="{{#str}}help:close, local_ai_course_assistant{{/str}}">&times;</button>
         </div>
-        <p><strong>{{displayname}}</strong> is your AI learning assistant for this course. It reads the course content and helps you study, practice, and understand the material.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Getting started</h5>
-        <p>Click any conversation starter to begin, or type your own question. {{shortname_label}} answers based on the page you are on.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Practice quizzes</h5>
-        <p>Click <strong>Quiz Me</strong> to get multiple-choice questions from the course content. You will see explanations after each answer and a score summary at the end.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Study plans</h5>
-        <p>Click <strong>Study Plan</strong> to create a personalised week-by-week plan. Tell {{shortname_label}} your goal, how many hours you can study, and your deadline. You can opt into email reminders.</p>
+        {{! help_title / help_intro / help_start_body / help_plans_body /
+            help_languages_body / help_data_download are pre-rendered in
+            hook_callbacks: they carry a brand name (a $a placeholder or a
+            [[tutorshort]] token) which the str helper cannot resolve.
+            Triple-stache only where the string contains markup (strong
+            tags); the $a values are escaped server-side. }}
+        <p>{{{help_intro}}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:start_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{help_start_body}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:quizzes_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{#str}}help:quizzes_body, local_ai_course_assistant{{/str}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:plans_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{{help_plans_body}}}</p>
         {{#voiceenabled}}
-        <h5 style="margin:14px 0 6px;font-size:14px">Voice</h5>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:voice_title, local_ai_course_assistant{{/str}}</h5>
         <p>
-            Use the mic icon to speak your question.{{#voicetabenabled}} You can also switch to the Voice tab for a live two-way conversation.{{/voicetabenabled}}
+            {{#str}}help:voice_body, local_ai_course_assistant{{/str}}{{#voicetabenabled}} {{#str}}help:voice_body_tab, local_ai_course_assistant{{/str}}{{/voicetabenabled}}
         </p>
         {{/voiceenabled}}
-        <h5 style="margin:14px 0 6px;font-size:14px">Languages</h5>
-        <p>Click the gear icon and change the language. {{shortname_label}} supports 46 languages. All labels and responses switch instantly.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Your data</h5>
-        <p>Your conversations are private to you and the institution. The eraser icon in the header permanently deletes your conversation for this course.</p>
-        <p>For a full data download, or to delete every {{shortname_label}} record across every course, open <strong>My SOLA data</strong> from the gear icon → Settings panel. The page also lets you delete the data for one specific course.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:languages_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{help_languages_body}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:data_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{#str}}help:data_body, local_ai_course_assistant{{/str}}</p>
+        <p>{{{help_data_download}}}</p>
     </div>
 
     {{! Language banner — shown by JS when browser language is detected }}

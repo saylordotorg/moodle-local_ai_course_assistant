@@ -1,0 +1,137 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/transcript_report
+
+    Anonymized chat transcripts and summaries report: privacy notice, filter
+    form (mode / unit / outcome / status dropdowns, topic and date-range
+    inputs) and the result table with a download button and row count. All
+    labels and notifications are resolved to final text (or pre-rendered
+    HTML) in PHP; the template carries no lang-string lookups.
+
+    Context variables required for this template:
+    * privacynoticehtml string - Pre-rendered info notification (trusted HTML).
+    * formaction string - URL the GET filter form submits to.
+    * courseid int - Course id for the hidden form field.
+    * selects array - Dropdown filters: name, label, options
+      (value / label / selected bool).
+    * textinputs array - Text and date filters: name, type, label, value.
+    * applylabel string - Submit button label.
+    * hasrows bool - Whether the report returned any rows.
+    * noresultshtml string - Pre-rendered warning notification when empty.
+    * downloadbuttonhtml string - Pre-rendered CSV download single_button.
+    * truncatedhtml string - Pre-rendered truncation warning, or empty.
+    * headcells array - Column headings: label, class.
+    * rows array - Result rows: lastrow bool, cells (value, class).
+    * rowcounttext string - "N rows." footer line.
+
+    Example context (json):
+    {
+        "privacynoticehtml": "<div class=\"alert alert-info\">Identities are pseudonymized.</div>",
+        "formaction": "https://example.com/local/ai_course_assistant/transcript_report.php?courseid=2",
+        "courseid": 2,
+        "selects": [
+            {
+                "name": "mode",
+                "label": "Show",
+                "options": [
+                    {"value": "transcripts", "label": "Messages", "selected": true},
+                    {"value": "summaries", "label": "Summary", "selected": false}
+                ]
+            }
+        ],
+        "textinputs": [
+            {"name": "topic", "type": "text", "label": "Topic", "value": ""}
+        ],
+        "applylabel": "Apply",
+        "hasrows": true,
+        "noresultshtml": "",
+        "downloadbuttonhtml": "<div class=\"singlebutton\">Download</div>",
+        "truncatedhtml": "",
+        "headcells": [
+            {"label": "Conversation", "class": "header c0"},
+            {"label": "Message", "class": "header c1 lastcol"}
+        ],
+        "rows": [
+            {
+                "lastrow": true,
+                "cells": [
+                    {"value": "a3f2", "class": "cell c0"},
+                    {"value": "What is opportunity cost?", "class": "cell c1 lastcol"}
+                ]
+            }
+        ],
+        "rowcounttext": "1 rows."
+    }
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+{{{privacynoticehtml}}}
+
+<form method="get" action="{{formaction}}" class="mb-4">
+    <input type="hidden" name="courseid" value="{{courseid}}">
+    <div class="form-row align-items-end">
+        {{#selects}}
+            <div class="col-auto mb-2">
+                <label for="id_{{name}}" class="d-block small">{{label}}</label>
+                <select id="id_{{name}}" class="custom-select" name="{{name}}">
+                    {{#options}}
+                        <option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>
+                    {{/options}}
+                </select>
+            </div>
+        {{/selects}}
+        {{#textinputs}}
+            <div class="col-auto mb-2">
+                <label for="id_{{name}}" class="d-block small">{{label}}</label>
+                <input type="{{type}}" name="{{name}}" id="id_{{name}}" value="{{value}}" class="form-control">
+            </div>
+        {{/textinputs}}
+        <div class="col-auto mb-2">
+            <input type="submit" class="btn btn-primary" value="{{applylabel}}">
+        </div>
+    </div>
+</form>
+
+{{^hasrows}}
+    {{{noresultshtml}}}
+{{/hasrows}}
+{{#hasrows}}
+    <div class="mb-3">{{{downloadbuttonhtml}}}</div>
+    {{{truncatedhtml}}}
+    <table class="generaltable table-sm">
+        <thead>
+            <tr>
+                {{#headcells}}
+                    <th class="{{class}}" scope="col">{{label}}</th>
+                {{/headcells}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#rows}}
+                <tr{{#lastrow}} class="lastrow"{{/lastrow}}>
+                    {{#cells}}
+                        <td class="{{class}}">{{value}}</td>
+                    {{/cells}}
+                </tr>
+            {{/rows}}
+        </tbody>
+    </table>
+    <div class="text-muted small">{{rowcounttext}}</div>
+{{/hasrows}}

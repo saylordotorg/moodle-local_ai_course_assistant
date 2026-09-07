@@ -51,7 +51,8 @@ if ($hassiteconfig) {
     ));
 
     // ── Single settings page with TOC ───────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_general', 'Settings');
+    $settings = new admin_settingpage('local_ai_course_assistant_general',
+        get_string('settingspage:pagetitle', 'local_ai_course_assistant'));
 
     // The TOC and quicklink styling lives in styles.css (search .sola-toc).
     // It used to be an inline <style> block injected through an
@@ -80,7 +81,8 @@ if ($hassiteconfig) {
             . get_string('toc:tokenanalytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $demoadminurl->out() . '">'
             . get_string('toc:testing', 'local_ai_course_assistant') . '</a>'
-        . '<a href="' . $playgroundurl->out() . '">Prompt Playground</a>'
+        . '<a href="' . $playgroundurl->out() . '">'
+            . get_string('toc:playground', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $auditurl->out() . '">'
             . \local_ai_course_assistant\branding::str('auditlog:settings_link') . '</a>'
         . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
@@ -105,9 +107,14 @@ if ($hassiteconfig) {
                 s($lastlabel),
                 get_string('toc:back_to_course', 'local_ai_course_assistant')
             );
+            $courseailabel = str_replace(
+                '{$a}',
+                s($lastlabel),
+                get_string('toc:course_ai_settings', 'local_ai_course_assistant')
+            );
             $courseaiurl = '<a href="' . $coursesettingsurl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#495057;border-color:#495057;">'
-                . '&#9881; ' . s($lastlabel) . ' AI settings</a>';
+                . '&#9881; ' . $courseailabel . '</a>';
             $backbtn = '<a href="' . $lasturl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#6c757d;border-color:#6c757d;">'
                 . $backlabel . '</a>';
@@ -643,7 +650,8 @@ if ($hassiteconfig) {
         get_string('settingspage:analytics_title', 'local_ai_course_assistant'),
         '<a href="' . $analyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
         . s(get_string('settingspage:analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.</p>'
+        . '<p class="text-muted mt-1" style="font-size:13px;">'
+        . get_string('settingspage:analytics_blurb', 'local_ai_course_assistant') . '</p>'
     ));
 
     // v3.9.28: SSRF trusted-endpoints allowlist. Operators running a self-hosted
@@ -1073,7 +1081,11 @@ if ($hassiteconfig) {
         get_string('settings:spend_cap_period', 'local_ai_course_assistant'),
         get_string('settings:spend_cap_period_desc', 'local_ai_course_assistant'),
         'monthly',
-        ['daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly']
+        [
+            'daily'   => get_string('settings:spend_cap_period_daily', 'local_ai_course_assistant'),
+            'weekly'  => get_string('settings:spend_cap_period_weekly', 'local_ai_course_assistant'),
+            'monthly' => get_string('settings:spend_cap_period_monthly', 'local_ai_course_assistant'),
+        ]
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1595,11 +1607,11 @@ if ($hassiteconfig) {
 
     $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
         'local_ai_course_assistant/voice_providers',
-        'Voice providers',
-        'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).'
+        get_string('settings:voice_providers', 'local_ai_course_assistant'),
+        get_string('settings:voice_providers_desc', 'local_ai_course_assistant')
     ));
 
-    $activechoices = ['' => '(use first configured or legacy fallback)'];
+    $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
     foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
@@ -1622,9 +1634,9 @@ if ($hassiteconfig) {
     // STT additionally offers the selfhosted Whisper server (v6.2.0). When a
     // server URL is configured below, the blank default prefers selfhosted;
     // picking a paid label here overrides that.
-    $sttchoices = ['' => '(selfhosted if configured, else first row or legacy fallback)'];
+    $sttchoices = ['' => get_string('settings:voice_active_stt_default', 'local_ai_course_assistant')];
     $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
-        'Selfhosted Whisper server (free, uses the URL below)';
+        get_string('settings:voice_active_stt_selfhosted', 'local_ai_course_assistant');
     foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
@@ -1727,11 +1739,12 @@ if ($hassiteconfig) {
     // speech rubric; the editor also loads the General / ESL level presets).
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/soapbox_rubric_link',
-        'Soapbox speech rubric',
-        'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, '
-        . 'ESL intermediate, ESL advanced). '
-        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
-        . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
+        get_string('settings:soapbox_rubric_link', 'local_ai_course_assistant'),
+        get_string(
+            'settings:soapbox_rubric_link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
+        )
     ));
 
     // v6.8.12 Soapbox video: site-wide caps and defaults for the video/audio
@@ -1764,9 +1777,9 @@ if ($hassiteconfig) {
         get_string('settings:soapbox_video_quality_desc', 'local_ai_course_assistant'),
         'standard_480p',
         [
-            'low_360p'      => 'Low (360p, ~3 MB/min)',
-            'standard_480p' => 'Standard (480p, ~4 MB/min)',
-            'high_720p'     => 'High (720p, ~9 MB/min)',
+            'low_360p'      => get_string('settings:soapbox_video_quality_low', 'local_ai_course_assistant'),
+            'standard_480p' => get_string('settings:soapbox_video_quality_standard', 'local_ai_course_assistant'),
+            'high_720p'     => get_string('settings:soapbox_video_quality_high', 'local_ai_course_assistant'),
         ]
     ));
 
@@ -1868,10 +1881,10 @@ if ($hassiteconfig) {
         get_string('settings:survey_frequency_desc', 'local_ai_course_assistant'),
         'once',
         [
-            'once' => 'Once per course (default)',
-            'monthly' => 'Once per month',
-            'quarterly' => 'Once per quarter',
-            'unlimited' => 'Every time (no limit)',
+            'once' => get_string('settings:survey_frequency_once', 'local_ai_course_assistant'),
+            'monthly' => get_string('settings:survey_frequency_monthly', 'local_ai_course_assistant'),
+            'quarterly' => get_string('settings:survey_frequency_quarterly', 'local_ai_course_assistant'),
+            'unlimited' => get_string('settings:survey_frequency_unlimited', 'local_ai_course_assistant'),
         ]
     ));
 
@@ -1913,9 +1926,12 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/usertesting_editor_link',
-        'Edit Testing Tasks',
-        '<a href="' . (new moodle_url('/local/ai_course_assistant/usertesting_admin.php'))->out()
-        . '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
+        get_string('settings:usertesting_editor_link', 'local_ai_course_assistant'),
+        get_string(
+            'settings:usertesting_editor_link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/usertesting_admin.php'))->out()
+        )
     ));
 
     // Footer links: an "explore courses" link below the Feedback link, plus
@@ -2979,21 +2995,21 @@ if ($hassiteconfig) {
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_survey',
-        'Survey Editor',
+        get_string('survey_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/survey_admin.php'),
         'moodle/site:config'
     ));
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_usertesting',
-        'Usability Testing Editor',
+        get_string('usertesting_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/usertesting_admin.php'),
         'moodle/site:config'
     ));
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_rubric',
-        'Rubric Editor',
+        get_string('rubric_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/rubric_admin.php'),
         'moodle/site:config'
     ));
@@ -3025,7 +3041,7 @@ if ($hassiteconfig) {
     // content and inspect the result + per-section breakdown.
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_prompt_playground',
-        \local_ai_course_assistant\branding::apply('[[tutorshort]] Prompt Playground'),
+        \local_ai_course_assistant\branding::str('settings:prompt_playground_navtitle'),
         new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
         'moodle/site:config'
     ));
@@ -3080,7 +3096,7 @@ if ($hassiteconfig) {
     if (file_exists(__DIR__ . '/whatsapp_test.php')) {
         $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
             'local_ai_course_assistant_whatsapptest',
-            'WhatsApp Integration Test',
+            get_string('settings:whatsapptest_navtitle', 'local_ai_course_assistant'),
             new moodle_url('/local/ai_course_assistant/whatsapp_test.php'),
             'moodle/site:config',
             true

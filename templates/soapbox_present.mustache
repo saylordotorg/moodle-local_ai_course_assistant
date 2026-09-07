@@ -1,0 +1,155 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/soapbox_present
+
+    Soapbox presentation assignment learner page: intro, topic picker,
+    recorder widget (video or audio-only, optional slide deck), and the
+    learner's past-attempts table. All user-facing strings are resolved in
+    PHP and passed in as data; ids/classes are bound by the
+    soapbox_present/soapbox_recorder/soapbox_player AMD modules and must
+    not change.
+
+    Example context (json):
+    {
+        "hasintro": true,
+        "introhtml": "<p>Give a short persuasive talk.</p>",
+        "modelabel": "Record a video presentation",
+        "ptype": "Persuasive",
+        "targetlabel": "Aim for 2-5 minutes",
+        "hastopics": true,
+        "choosetopic": "Choose your topic",
+        "topics": [
+            {"id": 3, "title": "Renewable energy"}
+        ],
+        "topicdetails": [
+            {"title": "Renewable energy", "instructions": "<p>Argue for or against.</p>"}
+        ],
+        "storageready": true,
+        "storagewarninghtml": "",
+        "modeclass": "sbx-mode-video",
+        "isaudio": false,
+        "isvideo": true,
+        "slidesenabled": true,
+        "decklabel": "Slide deck (PDF)",
+        "audioready": "Microphone ready",
+        "recordlabel": "Record",
+        "stoplabel": "Stop",
+        "recordingsheadinghtml": "<h4>My recordings</h4>",
+        "hasrecordings": true,
+        "norecordingstext": "No recordings yet.",
+        "colrecorded": "Recorded",
+        "collength": "Length",
+        "colstatus": "Status",
+        "viewlabel": "View / download",
+        "playlabel": "Play with slides",
+        "expiredlabel": "Expired",
+        "recordings": [
+            {
+                "recorded": "6/09/26, 14:00",
+                "length": "03:12",
+                "status": "Scored",
+                "viewurl": "https://example.com/presigned",
+                "hasplay": true,
+                "recid": 12,
+                "expired": false
+            }
+        ],
+        "retentionnote": "Recordings are kept for 90 days."
+    }
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+{{#hasintro}}
+<div class="sbx-intro mb-3">{{{introhtml}}}</div>
+{{/hasintro}}
+
+<div class="sbx-meta text-muted mb-3">{{{modelabel}}} &middot; {{ptype}} &middot; {{{targetlabel}}}</div>
+
+{{#hastopics}}
+<div class="sbx-topics mb-3">
+    <label for="sbx-topic" class="font-weight-bold d-block">{{{choosetopic}}}</label>
+    <select class="select custom-select menusbx-topic" id="sbx-topic" name="sbx-topic">
+        {{#topics}}
+        <option value="{{id}}">{{{title}}}</option>
+        {{/topics}}
+    </select>
+    {{#topicdetails}}
+    <div class="sbx-topic-detail small text-muted mt-2"><strong>{{{title}}}: </strong>{{{instructions}}}</div>
+    {{/topicdetails}}
+</div>
+{{/hastopics}}
+
+{{^storageready}}
+{{{storagewarninghtml}}}
+{{/storageready}}
+{{#storageready}}
+<div class="sbx-recorder card p-3 mb-4 {{modeclass}}" id="sbx-recorder">
+    {{#slidesenabled}}
+    <div class="sbx-deck mb-3">
+        <label for="sbx-deck-input" class="font-weight-bold d-block">{{{decklabel}}}</label>
+        <input type="file" accept="application/pdf,.pdf" id="sbx-deck-input" class="sbx-deck-input form-control-file" />
+        <div class="sbx-deck-status small text-muted mt-1"></div>
+        <div class="sbx-slide-viewer mt-2" style="max-width:640px"></div>
+    </div>
+    {{/slidesenabled}}
+    {{#isvideo}}
+    <video class="sbx-preview w-100 mb-2" playsinline="playsinline" style="max-height:360px;background:#000;border-radius:6px"></video>
+    {{/isvideo}}
+    {{#isaudio}}
+    <div class="sbx-audio-indicator d-flex align-items-center mb-2" style="gap:10px"><span class="sbx-mic-dot"></span><span class="sbx-mic-label">{{{audioready}}}</span></div>
+    {{/isaudio}}
+    <div class="sbx-controls d-flex align-items-center mb-2" style="gap:12px">
+        <button type="button" class="sbx-record btn btn-primary">{{{recordlabel}}}</button>
+        <button type="button" class="sbx-stop btn btn-outline-secondary">{{{stoplabel}}}</button>
+        <span class="sbx-timer font-weight-bold">0:00</span>
+    </div>
+    <div class="sbx-status text-muted"></div>
+    <div class="sbx-result mt-2"></div>
+</div>
+{{/storageready}}
+
+{{{recordingsheadinghtml}}}
+{{^hasrecordings}}
+<div class="text-muted">{{{norecordingstext}}}</div>
+{{/hasrecordings}}
+{{#hasrecordings}}
+<table class="generaltable">
+    <thead>
+        <tr>
+            <th>{{{colrecorded}}}</th>
+            <th>{{{collength}}}</th>
+            <th>{{{colstatus}}}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#recordings}}
+        <tr>
+            <td>{{recorded}}</td>
+            <td>{{length}}</td>
+            <td>{{{status}}}</td>
+            <td>{{#viewurl}}<a href="{{viewurl}}" target="_blank" rel="noopener">{{{viewlabel}}}</a>{{/viewurl}}{{#hasplay}} &middot; <button type="button" class="sbx-play-btn btn btn-link btn-sm p-0" data-recid="{{recid}}">{{{playlabel}}}</button>{{/hasplay}}{{#expired}}<span class="text-muted">{{{expiredlabel}}}</span>{{/expired}}</td>
+        </tr>
+        {{/recordings}}
+    </tbody>
+</table>
+<div class="sbx-playback mt-3" id="sbx-playback"></div>
+<div class="small text-muted mt-1">{{{retentionnote}}}</div>
+{{/hasrecordings}}

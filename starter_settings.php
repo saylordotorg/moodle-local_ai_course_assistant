@@ -73,8 +73,9 @@ foreach ($iconkeys as $k) {
     }
 }
 
-// Labels for the starter-card editor that the inline JS builds in the browser.
-// Resolved here so they are translatable (I18N001); the script reads STR.<key>.
+// Labels for the starter-card editor that amd/src/starter_admin.js builds in
+// the browser. Resolved here so they are translatable (I18N001); the script
+// reads STR.<key>.
 $jsstrkeys = [
     'drag_handle', 'on', 'name', 'name_aria', 'name_placeholder',
     'description', 'desc_aria', 'desc_placeholder', 'desc_help',
@@ -87,106 +88,58 @@ foreach ($jsstrkeys as $jsk) {
     $jsstrings[$jsk] = get_string('starters:js_' . $jsk, 'local_ai_course_assistant');
 }
 
+// CONTRIB-10574 #201: page body moved from PHP/HTML alternation to
+// templates/starter_settings.mustache. Every string is resolved here — the
+// template carries no str helpers. The howto.* strings ship inline markup
+// (strong/code/em) in the lang pack and the old page echoed them raw, so the
+// template renders them unescaped; sesskey, URLs, and labels stay escaped.
+$templatedata = [
+    'intro' => get_string('starters:admin_desc', 'local_ai_course_assistant'),
+    'sesskey' => sesskey(),
+    'backurl' => (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(false),
+    'howto' => [
+        'heading' => get_string('starters:howto_heading', 'local_ai_course_assistant'),
+        'builtin' => get_string('starters:howto_builtin', 'local_ai_course_assistant'),
+        'custom' => get_string(
+            'starters:howto_custom',
+            'local_ai_course_assistant',
+            get_string('starters:add_new', 'local_ai_course_assistant')
+        ),
+        'types' => get_string('starters:howto_types', 'local_ai_course_assistant'),
+        'typeprompt' => get_string('starters:howto_type_prompt', 'local_ai_course_assistant'),
+        'typequiz' => get_string('starters:howto_type_quiz', 'local_ai_course_assistant'),
+        'typevoice' => get_string('starters:howto_type_voice', 'local_ai_course_assistant'),
+        'typepronunciation' => get_string('starters:howto_type_pronunciation', 'local_ai_course_assistant'),
+        'badgequiz' => get_string('starters:badge_quiz', 'local_ai_course_assistant'),
+        'badgevoice' => get_string('starters:badge_voice', 'local_ai_course_assistant'),
+        'badgepronunciation' => get_string('starters:badge_pronunciation', 'local_ai_course_assistant'),
+        'conditional' => get_string('starters:howto_conditional', 'local_ai_course_assistant'),
+        'placeholders' => get_string('starters:howto_placeholders', 'local_ai_course_assistant'),
+        'reorder' => get_string('starters:howto_reorder', 'local_ai_course_assistant'),
+        'overrides' => get_string('starters:howto_overrides', 'local_ai_course_assistant'),
+    ],
+    'labels' => [
+        'save' => get_string('starters:save', 'local_ai_course_assistant'),
+        'resetdefaults' => get_string('starters:reset_defaults', 'local_ai_course_assistant'),
+        'back' => get_string('starters:back_settings', 'local_ai_course_assistant'),
+        'addnew' => get_string('starters:add_new', 'local_ai_course_assistant'),
+    ],
+];
+
 echo $OUTPUT->header();
-?>
+echo $OUTPUT->render_from_template('local_ai_course_assistant/starter_settings', $templatedata);
 
-
-<div class="aica-starters-admin">
-    <p><?php echo get_string('starters:admin_desc', 'local_ai_course_assistant'); ?></p>
-
-    <div class="card mb-3 sola-starters-howto">
-        <div class="card-body">
-            <details>
-                <summary class="sola-starters-howto-summary">
-                    <?php echo get_string('starters:howto_heading', 'local_ai_course_assistant'); ?>
-                </summary>
-                <div class="sola-starters-howto-body">
-                <p><?php echo get_string('starters:howto_builtin', 'local_ai_course_assistant'); ?></p>
-                <p><?php echo get_string(
-                    'starters:howto_custom',
-                    'local_ai_course_assistant',
-                    get_string('starters:add_new', 'local_ai_course_assistant')
-                ); ?></p>
-                <p><?php echo get_string('starters:howto_types', 'local_ai_course_assistant'); ?></p>
-                <ul class="sola-starters-howto-list">
-                    <li><?php echo get_string('starters:howto_type_prompt', 'local_ai_course_assistant'); ?></li>
-                    <li><span class="aica-starter-type-badge type-quiz" >QUIZ</span> <?php
-                        echo get_string('starters:howto_type_quiz', 'local_ai_course_assistant'); ?></li>
-                    <li><span class="aica-starter-type-badge type-voice" >VOICE</span> <?php
-                        echo get_string('starters:howto_type_voice', 'local_ai_course_assistant'); ?></li>
-                    <li><span class="aica-starter-type-badge type-pronunciation" >PRONUNCIATION</span> <?php
-                        echo get_string('starters:howto_type_pronunciation', 'local_ai_course_assistant'); ?></li>
-                </ul>
-                <p><?php echo get_string('starters:howto_conditional', 'local_ai_course_assistant'); ?></p>
-                <p><?php echo get_string('starters:howto_placeholders', 'local_ai_course_assistant'); ?></p>
-                <p><?php echo get_string('starters:howto_reorder', 'local_ai_course_assistant'); ?></p>
-                <p><?php echo get_string('starters:howto_overrides', 'local_ai_course_assistant'); ?></p>
-            </div>
-            </details>
-        </div>
-    </div>
-
-    <div class="aica-admin-actions mb-3">
-        <form method="post" class="sola-inline-form">
-            <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-            <input type="hidden" name="action" value="save">
-            <input type="hidden" name="starters_json" class="aica-starters-json" value="">
-            <button type="submit" class="btn btn-primary aica-save-btn">
-                <?php echo get_string('starters:save', 'local_ai_course_assistant'); ?>
-            </button>
-        </form>
-        <form method="post" class="sola-inline-form" onsubmit="return confirm('<?php echo get_string('starters:reset_confirm', 'local_ai_course_assistant'); ?>');">
-            <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-            <input type="hidden" name="action" value="reset">
-            <button type="submit" class="btn btn-outline-secondary">
-                <?php echo get_string('starters:reset_defaults', 'local_ai_course_assistant'); ?>
-            </button>
-        </form>
-        <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
-           class="btn btn-outline-secondary">
-            <?php echo get_string('starters:back_settings', 'local_ai_course_assistant'); ?>
-        </a>
-    </div>
-
-    <div id="aica-starters-list"></div>
-
-    <button type="button" class="aica-btn-add" id="aica-add-starter">
-        <span class="sola-starters-plus">+</span>
-        <?php echo get_string('starters:add_new', 'local_ai_course_assistant'); ?>
-    </button>
-
-    <div class="aica-admin-actions">
-        <form method="post" class="sola-inline-form">
-            <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-            <input type="hidden" name="action" value="save">
-            <input type="hidden" name="starters_json" class="aica-starters-json" value="">
-            <button type="submit" class="btn btn-primary aica-save-btn">
-                <?php echo get_string('starters:save', 'local_ai_course_assistant'); ?>
-            </button>
-        </form>
-        <form method="post" class="sola-inline-form" onsubmit="return confirm('<?php echo get_string('starters:reset_confirm', 'local_ai_course_assistant'); ?>');">
-            <input type="hidden" name="sesskey" value="<?php echo sesskey(); ?>">
-            <input type="hidden" name="action" value="reset">
-            <button type="submit" class="btn btn-outline-secondary">
-                <?php echo get_string('starters:reset_defaults', 'local_ai_course_assistant'); ?>
-            </button>
-        </form>
-        <a href="<?php echo (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(); ?>"
-           class="btn btn-outline-secondary">
-            <?php echo get_string('starters:back_settings', 'local_ai_course_assistant'); ?>
-        </a>
-    </div>
-</div>
-
-<?php
 // v7.2.0 (CONTRIB-10574 #201): the 229-line inline <script> that used to sit
 // here is now amd/src/starter_admin.js, initialised via js_call_amd with the
-// data that was previously echoed into the page as JSON literals.
+// data that was previously echoed into the page as JSON literals. The
+// resetconfirm string replaces the inline onsubmit confirm the reset forms
+// carried before the template conversion; starter_admin.js binds it.
 $PAGE->requires->js_call_amd('local_ai_course_assistant/starter_admin', 'init', [[
     'icons' => $icons,
     'iconlabels' => $iconlabels,
     'strings' => $jsstrings,
     'starters' => $starters,
+    'resetconfirm' => get_string('starters:reset_confirm', 'local_ai_course_assistant'),
 ]]);
 
 echo $OUTPUT->footer();

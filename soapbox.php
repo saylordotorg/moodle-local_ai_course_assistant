@@ -82,12 +82,12 @@ echo $OUTPUT->header();
             <label for="sb-target"><strong><?php echo get_string('soapbox:time_label', 'local_ai_course_assistant'); ?></strong></label>
             <select id="sb-target" class="form-control" style="max-width:220px">
                 <option value="0"><?php echo get_string('soapbox:no_target', 'local_ai_course_assistant'); ?></option>
-                <option value="60">1 min</option>
-                <option value="120">2 min</option>
-                <option value="180" selected>3 min</option>
-                <option value="300">5 min</option>
-                <option value="420">7 min</option>
-                <option value="600">10 min</option>
+                <option value="60"><?php echo get_string('soapbox:target_minutes', 'local_ai_course_assistant', 1); ?></option>
+                <option value="120"><?php echo get_string('soapbox:target_minutes', 'local_ai_course_assistant', 2); ?></option>
+                <option value="180" selected><?php echo get_string('soapbox:target_minutes', 'local_ai_course_assistant', 3); ?></option>
+                <option value="300"><?php echo get_string('soapbox:target_minutes', 'local_ai_course_assistant', 5); ?></option>
+                <option value="420"><?php echo get_string('soapbox:target_minutes', 'local_ai_course_assistant', 7); ?></option>
+                <option value="600"><?php echo get_string('soapbox:target_minutes', 'local_ai_course_assistant', 10); ?></option>
             </select>
         </div>
         <div class="form-group mt-2">

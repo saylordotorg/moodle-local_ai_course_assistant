@@ -86,13 +86,19 @@ foreach ($agg['truncated_by_section'] ?? [] as $secname => $count) {
     $truncated_rows[] = ['name' => $secname, 'count' => number_format($count)];
 }
 
+// The "N chars" unit strings are pre-rendered so the template carries no
+// hardcoded English unit suffix (v7.x i18n extraction).
+$charsvalue = function ($n): string {
+    return get_string('prompt_metrics:chars_value', 'local_ai_course_assistant', number_format($n));
+};
+
 $templatedata = [
     'samples'         => number_format($agg['samples']),
     'has_data'        => $agg['samples'] > 0,
     'enough_for_rec'  => $agg['samples'] >= 30,
-    'avg_total'       => number_format($agg['avg_total']),
-    'max_total'       => number_format($agg['max_total']),
-    'avg_budget'      => number_format($agg['avg_budget']),
+    'avg_total'       => $charsvalue($agg['avg_total']),
+    'max_total'       => $charsvalue($agg['max_total']),
+    'avg_budget'      => $charsvalue($agg['avg_budget']),
     'pct_truncated'   => $agg['pct_truncated'],
     'pct_dropped'     => $agg['pct_dropped'],
     // v7.2.7: which sections, not just how many. A dropped `safety` and a
@@ -104,9 +110,9 @@ $templatedata = [
     'has_truncated_names' => !empty($truncated_rows),
     'last_seen'       => $agg['last_seen'] ? userdate($agg['last_seen'], '%Y-%m-%d %H:%M') : '—',
     'by_cat'          => $by_cat_rows,
-    'current_budget'  => number_format($current),
+    'current_budget'  => $charsvalue($current),
     'has_rec'         => !empty($rec),
-    'rec_budget'      => $rec ? number_format($rec['budget']) : '',
+    'rec_budget'      => $rec ? $charsvalue($rec['budget']) : '',
     'rec_rationale'   => $rec ? $rec['rationale'] : '',
     'rec_diff'        => $rec ? ($rec['budget'] !== $current) : false,
     'apply_url'       => (new moodle_url($pageurl, ['apply' => 1, 'sesskey' => sesskey()]))->out(false),

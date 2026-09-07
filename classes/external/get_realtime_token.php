@@ -117,12 +117,7 @@ class get_realtime_token extends external_api {
         // Checked after the capability check so an unauthorised caller still
         // gets the authorisation error rather than learning the feature state.
         if (!get_config('local_ai_course_assistant', 'realtime_enabled')) {
-            throw new \moodle_exception(
-                'error',
-                'local_ai_course_assistant',
-                '',
-                'Voice mode is disabled on this site.'
-            );
+            throw new \moodle_exception('realtime:err_disabled', 'local_ai_course_assistant');
         }
 
         // The emergency kill switch is enforced inside voice_registry::resolve(),
@@ -219,12 +214,7 @@ class get_realtime_token extends external_api {
             \local_ai_course_assistant\voice_registry::CAPABILITY_REALTIME
         );
         if ($cfg === null) {
-            throw new \moodle_exception(
-                'error',
-                'local_ai_course_assistant',
-                '',
-                'No voice provider configured for Realtime.'
-            );
+            throw new \moodle_exception('realtime:err_no_provider', 'local_ai_course_assistant');
         }
 
         // xAI Realtime: the master API key must never leave the server, so
@@ -240,19 +230,14 @@ class get_realtime_token extends external_api {
                     'error',
                     'local_ai_course_assistant',
                     '',
-                    'xAI Realtime proxy is not configured. Set xai_proxy_url and xai_proxy_jwt_secret in SOLA admin settings, or switch voice to OpenAI.'
+                    \local_ai_course_assistant\branding::str('realtime:err_xai_proxy_unconfigured')
                 );
             }
             // SSRF check: the proxy URL is wss://; the validator wants https://
             // for the host-and-IP-range check, so map for validation only.
             $proxyurlforcheck = preg_replace('/^wss:\/\//i', 'https://', $proxyurl);
             if (!\local_ai_course_assistant\security::is_safe_provider_url($proxyurlforcheck)) {
-                throw new \moodle_exception(
-                    'error',
-                    'local_ai_course_assistant',
-                    '',
-                    'xAI Realtime proxy URL failed SSRF validation.'
-                );
+                throw new \moodle_exception('realtime:err_xai_proxy_ssrf', 'local_ai_course_assistant');
             }
             $now = time();
             $header = self::b64url(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));

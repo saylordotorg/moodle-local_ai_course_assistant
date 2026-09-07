@@ -282,7 +282,7 @@ class generate_quiz extends external_api {
             return [
                 'success' => false,
                 'errorcode' => '',
-                'error' => 'Could not parse quiz JSON.',
+                'error' => get_string('quiz:error_parse', 'local_ai_course_assistant'),
                 'topic' => '',
                 'questions' => [],
             ];
@@ -318,7 +318,7 @@ class generate_quiz extends external_api {
             return [
                 'success' => false,
                 'errorcode' => '',
-                'error' => 'No valid questions in AI response.',
+                'error' => get_string('quiz:error_noquestions', 'local_ai_course_assistant'),
                 'topic' => '',
                 'questions' => [],
             ];

@@ -243,6 +243,11 @@ if ($courseid > 0) {
                         'text' => $q['text'],
                         'type' => $q['type'],
                         'response_count' => $q['response_count'],
+                        'response_count_label' => get_string(
+                            'analytics:responses_badge',
+                            'local_ai_course_assistant',
+                            $q['response_count']
+                        ),
                         'is_multiple_choice' => $q['type'] === 'multiple_choice',
                         'is_rating' => $q['type'] === 'rating',
                         'is_long_text' => $q['type'] === 'long_text',
@@ -276,6 +281,14 @@ if ($courseid > 0) {
                 }
                 $survey_data = [
                     'total_responses' => $survey_results['total_responses'],
+                    // Whole sentence resolved here so translators control word
+                    // order; the count carries its own <strong> markup, so the
+                    // template renders this with triple braces.
+                    'collected_line' => get_string(
+                        'analytics:survey_responses_collected',
+                        'local_ai_course_assistant',
+                        '<strong>' . (int) $survey_results['total_responses'] . '</strong>'
+                    ),
                     'questions' => $survey_questions,
                 ];
             }
@@ -294,14 +307,35 @@ if ($courseid > 0) {
                         'instruction' => $t['instruction'],
                         'type' => $t['type'],
                         'response_count' => $t['response_count'],
+                        'response_count_label' => get_string(
+                            'analytics:responses_badge',
+                            'local_ai_course_assistant',
+                            $t['response_count']
+                        ),
                         'avg_messages' => $t['avg_messages'],
+                        'avg_messages_label' => get_string(
+                            'analytics:avg_msgs_badge',
+                            'local_ai_course_assistant',
+                            $t['avg_messages']
+                        ),
                         'avg_session_minutes' => $t['avg_session_minutes'],
+                        'avg_session_label' => get_string(
+                            'analytics:avg_min_badge',
+                            'local_ai_course_assistant',
+                            $t['avg_session_minutes']
+                        ),
                         'is_action_then_rate' => $t['type'] === 'action_then_rate',
                         'is_multiple_choice' => $t['type'] === 'multiple_choice',
                         'is_free_response' => $t['type'] === 'free_response',
                     ];
                     if ($t['type'] === 'action_then_rate') {
                         $ut['avg_rating'] = $t['avg_rating'] ?? 0;
+                        // Carries <strong> markup; rendered with triple braces.
+                        $ut['avg_rating_line'] = get_string(
+                            'analytics:avg_rating_line',
+                            'local_ai_course_assistant',
+                            $ut['avg_rating']
+                        );
                         $comments = [];
                         foreach (array_slice($t['comments'] ?? [], 0, 20) as $c) {
                             $comments[] = ['text' => $c];
@@ -328,6 +362,12 @@ if ($courseid > 0) {
                 }
                 $ut_data = [
                     'total_respondents' => $ut_results['total_respondents'],
+                    // Carries <strong> markup; rendered with triple braces.
+                    'testers_line' => get_string(
+                        'analytics:testers_submitted',
+                        'local_ai_course_assistant',
+                        '<strong>' . (int) $ut_results['total_respondents'] . '</strong>'
+                    ),
                     'tasks' => $ut_tasks,
                 ];
             }
@@ -345,7 +385,14 @@ if ($courseid > 0) {
             'has_hotspots'     => !empty($hotspots),
             'common_prompts'   => $commonprompts,
             'has_common_prompts' => !empty($commonprompts),
-            'provider_comparison' => $providercomparison,
+            'provider_comparison' => array_map(function ($row) {
+                $row['avg_response_length_label'] = get_string(
+                    'analytics:chars_suffix',
+                    'local_ai_course_assistant',
+                    $row['avg_response_length']
+                );
+                return $row;
+            }, $providercomparison),
             'has_provider_comparison' => !empty($providercomparison),
             'students' => array_values(array_map(function ($s) use ($show_real_names) {
                 $realname = $s->firstname . ' ' . $s->lastname;
@@ -457,7 +504,174 @@ try {
 }
 
 // ── Build template data ─────────────────────────────────────────────────────
-$templatedata = [
+// Shorthand for this plugin's analytics:* strings.
+$aistr = function (string $key, $a = null): string {
+    return get_string('analytics:' . $key, 'local_ai_course_assistant', $a);
+};
+
+// UI strings for the dashboard template, resolved server-side so they are
+// translatable (and brand-token-resolvable) without {{#str}} in the template.
+// Top-level keys are reachable from any nested Mustache section via the
+// context stack.
+$templatestrings = [
+    // Nav / top bar.
+    'str_plugin_settings' => $aistr('plugin_settings'),
+    'str_token_usage_cost' => $aistr('token_usage_cost'),
+    'str_export_csv' => $aistr('export_csv'),
+    'str_export_csv_title' => $aistr('export_csv_title'),
+    'str_hide_real_names' => $aistr('hide_real_names'),
+    'str_show_real_names' => $aistr('show_real_names'),
+    'str_exit_student_mode' => $aistr('exit_student_mode'),
+    'str_student_mode' => $aistr('student_mode'),
+    // Carries <strong> markup; rendered with triple braces.
+    'str_real_names_warning' => $aistr('real_names_warning'),
+    // Carries <strong> markup + brand token; rendered with triple braces.
+    'str_student_mode_notice' => \local_ai_course_assistant\branding::str('analytics:student_mode_notice'),
+    'str_courses_enabled_summary' => $aistr('courses_enabled_summary', (object) [
+        'enabled' => $enabled_courses,
+        'total' => $total_courses,
+    ]),
+    'str_manage_course_enrollment' => $aistr('manage_course_enrollment'),
+    // Learning Radar card.
+    'str_radar_heading' => $aistr('radar_heading'),
+    'str_radar_subtitle' => $aistr('radar_subtitle'),
+    'str_radar_share' => $aistr('radar_share'),
+    'str_radar_share_title' => $aistr('radar_share_title'),
+    'str_radar_schedules' => $aistr('radar_schedules'),
+    'str_radar_history' => $aistr('radar_history'),
+    'str_radar_try_question' => $aistr('radar_try_question'),
+    'str_radar_click_metric' => $aistr('radar_click_metric'),
+    'str_provider' => $aistr('provider'),
+    'str_model' => $aistr('model'),
+    'str_data_scope' => $aistr('data_scope'),
+    'str_all_courses' => $aistr('all_courses'),
+    'str_scope_current' => $aistr('scope_current_course'),
+    'str_scope_custom' => $aistr('scope_custom'),
+    'str_scope_byprovider' => $aistr('scope_byprovider'),
+    'str_scope_detail_label' => $aistr('scope_detail_label'),
+    'str_scope_detail_placeholder' => $aistr('scope_detail_placeholder'),
+    'str_range' => $aistr('range'),
+    'str_last_24_hours' => $aistr('last_24_hours'),
+    'str_last_7_days' => $aistr('last_7_days'),
+    'str_last_30_days' => $aistr('last_30_days'),
+    'str_last_90_days' => $aistr('last_90_days'),
+    'str_all_time' => $aistr('all_time'),
+    'str_compare_two_models' => $aistr('compare_two_models'),
+    'str_compare_two_models_title' => $aistr('compare_two_models_title'),
+    'str_provider_b' => $aistr('provider_b'),
+    'str_model_b' => $aistr('model_b'),
+    'str_compare_cost_warning' => $aistr('compare_cost_warning'),
+    'str_radar_intro' => $aistr('radar_intro_placeholder'),
+    'str_input_placeholder' => $aistr('radar_input_placeholder'),
+    'str_send' => $aistr('send'),
+    'str_export_menu' => $aistr('export_menu'),
+    'str_download' => $aistr('download'),
+    'str_json' => $aistr('format_json'),
+    'str_csv' => $aistr('format_csv'),
+    'str_markdown' => $aistr('format_markdown'),
+    'str_pdf_print' => $aistr('format_pdf'),
+    'str_send_email' => $aistr('send_email'),
+    'str_send_slack' => $aistr('send_slack'),
+    'str_send_teams' => $aistr('send_teams'),
+    'str_redash' => $aistr('redash'),
+    'str_redash_push' => $aistr('redash_push'),
+    'str_redash_setup' => $aistr('redash_setup'),
+    'str_schedule_this' => $aistr('schedule_this'),
+    'str_schedule_this_title' => $aistr('schedule_this_title'),
+    // Saved schedules panel.
+    'str_scheduled_queries' => $aistr('scheduled_queries'),
+    'str_new_schedule' => $aistr('new_schedule'),
+    'str_name' => $aistr('name'),
+    'str_frequency' => $aistr('frequency'),
+    'str_channels' => $aistr('channels'),
+    'str_last_run' => $aistr('last_run'),
+    'str_status' => $aistr('status'),
+    'str_channel_email' => $aistr('channel_email'),
+    'str_channel_slack' => $aistr('channel_slack'),
+    'str_channel_teams' => $aistr('channel_teams'),
+    'str_edit' => $aistr('edit'),
+    'str_pause' => $aistr('pause'),
+    'str_enable' => $aistr('enable'),
+    'str_delete' => $aistr('delete'),
+    'str_no_schedules' => $aistr('no_schedules'),
+    // Past queries panel.
+    'str_past_queries' => $aistr('past_queries'),
+    'str_search_placeholder' => $aistr('search_query_placeholder'),
+    'str_search_aria' => $aistr('search_past_queries'),
+    'str_when' => $aistr('when'),
+    'str_query' => $aistr('query'),
+    'str_type' => $aistr('type'),
+    'str_badge_scheduled' => $aistr('badge_scheduled'),
+    'str_badge_adhoc' => $aistr('badge_adhoc'),
+    'str_rerun' => $aistr('rerun'),
+    'str_no_queries' => $aistr('no_queries_yet'),
+    // Per-course drill-down.
+    'str_back_all_courses' => $aistr('back_all_courses'),
+    'str_time_range' => $aistr('filter_timerange'),
+    'str_no_usage_data' => $aistr('no_usage_data'),
+    'str_overview' => $aistr('overview'),
+    'str_conversations' => $aistr('card_conversations'),
+    'str_messages' => $aistr('messages'),
+    'str_active_students' => $aistr('card_active_students'),
+    'str_avg_msgs_student' => $aistr('card_avg_msgs_student'),
+    'str_offtopic_open' => $aistr('card_offtopic_open'),
+    'str_escalations' => $aistr('card_escalations'),
+    'str_study_plans' => $aistr('card_study_plans'),
+    'str_usage_trends' => $aistr('usage_trends'),
+    'str_hotspots' => $aistr('hotspots_heading'),
+    'str_hotspots_intro' => $aistr('hotspots_intro'),
+    'str_section' => $aistr('section'),
+    'str_mentions' => $aistr('mention_count'),
+    'str_no_hotspots' => $aistr('no_hotspot_data'),
+    'str_common_prompts' => $aistr('common_prompts_heading'),
+    'str_common_prompts_intro' => $aistr('common_prompts_intro'),
+    'str_pattern' => $aistr('prompt_pattern'),
+    'str_no_prompt_patterns' => $aistr('no_prompt_patterns'),
+    'str_provider_comparison' => $aistr('provider_comparison_heading'),
+    'str_responses' => $aistr('response_count'),
+    'str_avg_length' => $aistr('avg_length'),
+    'str_total_tokens' => $aistr('total_tokens_short'),
+    'str_avg_tokens' => $aistr('avg_tokens_short'),
+    'str_student_activity' => $aistr('student_activity'),
+    'str_student' => $aistr('student'),
+    'str_last_active' => $aistr('last_active'),
+    'str_user_feedback' => $aistr('user_feedback'),
+    'str_total_responses' => $aistr('total_responses'),
+    'str_average_rating' => $aistr('average_rating'),
+    'str_rating_distribution' => $aistr('rating_distribution'),
+    'str_rating' => $aistr('rating'),
+    'str_comment' => $aistr('comment'),
+    'str_browser_os' => $aistr('browser_os'),
+    'str_device' => $aistr('device'),
+    'str_date' => $aistr('date'),
+    'str_no_feedback' => $aistr('no_feedback_yet'),
+    'str_survey_results' => $aistr('survey_results'),
+    'str_option' => $aistr('option'),
+    'str_count' => $aistr('count'),
+    'str_average_label' => $aistr('average_label'),
+    'str_no_text_responses' => $aistr('no_text_responses'),
+    'str_no_survey_responses' => $aistr('no_survey_responses'),
+    'str_usertesting_results' => $aistr('usertesting_results'),
+    'str_avg_msgs_title' => $aistr('avg_msgs_badge_title'),
+    'str_avg_min_title' => $aistr('avg_min_badge_title'),
+    'str_no_responses' => $aistr('no_responses_yet'),
+    'str_no_usertesting' => $aistr('no_usertesting_responses'),
+    'str_ai_insights' => $aistr('ai_insights'),
+    'str_ai_insights_intro' => $aistr('ai_insights_intro'),
+    'str_generate_insights' => $aistr('generate_insights'),
+    'str_analyzing' => $aistr('analyzing_data'),
+    'str_no_feedback_data' => $aistr('no_feedback_data'),
+    // Carries a link + brand token; rendered with triple braces.
+    'str_pick_course_hint' => \local_ai_course_assistant\branding::str(
+        'analytics:pick_course_hint',
+        html_writer::link(
+            new moodle_url('/local/ai_course_assistant/courses_admin.php'),
+            $aistr('manage_course_enrollment')
+        )
+    ),
+];
+
+$templatedata = $templatestrings + [
     // Header summary line (small inline counts, not card grid).
     'enabled_courses' => $enabled_courses,
     'total_courses'   => $total_courses,
@@ -504,6 +718,8 @@ $templatedata = [
     'courses_admin_url' => (new moodle_url('/local/ai_course_assistant/courses_admin.php'))->out(false),
     'radar_schedule_url' => (new moodle_url('/local/ai_course_assistant/radar_schedule.php'))->out(false),
     'radar_export_url' => (new moodle_url('/local/ai_course_assistant/radar_export.php'))->out(false),
+    'radar_name_prompt' => get_string('radar:js_name_prompt', 'local_ai_course_assistant'),
+    'radar_redash_name_tpl' => \local_ai_course_assistant\branding::str('radar:redash_default_name'),
     // v7.0.5: no key in this URL. It is the address an admin pastes into Redash,
     // and pre-filling the credential is how it ended up stored in plaintext
     // inside a third-party system. Redash should send it as an
@@ -836,6 +1052,22 @@ if ($expa > 0 && $expb > 0 && $expa !== $expb) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('local_ai_course_assistant/analytics_tabs', ['courses' => $tabscourses]);
+echo $OUTPUT->render_from_template('local_ai_course_assistant/analytics_tabs', [
+    'courses' => $tabscourses,
+    'str_time_range' => $aistr('filter_timerange'),
+    'str_last_7_days' => $aistr('last_7_days'),
+    'str_last_30_days' => $aistr('last_30_days'),
+    'str_last_90_days' => $aistr('last_90_days'),
+    'str_all_time' => $aistr('all_time'),
+    'str_course' => $aistr('course'),
+    'str_all_courses' => $aistr('all_courses'),
+    'str_tab_overall' => $aistr('tab_overall'),
+    'str_tab_bycourse' => $aistr('tab_bycourse'),
+    'str_tab_comparison' => $aistr('tab_comparison'),
+    'str_tab_byunit' => $aistr('tab_byunit'),
+    'str_tab_usagetypes' => $aistr('tab_usagetypes'),
+    'str_tab_themes' => $aistr('tab_themes'),
+    'str_tab_feedback' => $aistr('tab_feedback'),
+]);
 echo $OUTPUT->render_from_template('local_ai_course_assistant/analytics_dashboard', $templatedata);
 echo $OUTPUT->footer();

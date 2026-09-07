@@ -59,6 +59,20 @@ if ($logexists && $logsize > 0) {
     }
 }
 
+// Pre-render the parameterized summary badges per entry; the static badge
+// labels/tooltips are passed once at the top level below and resolved via
+// mustache context bubbling.
+foreach ($entries as $i => $entry) {
+    $entries[$i]['badge_course'] = get_string(
+        'prompt_debug_view:badge_course', 'local_ai_course_assistant', $entry['courseid'] ?? 0);
+    $entries[$i]['badge_user'] = get_string(
+        'prompt_debug_view:badge_user', 'local_ai_course_assistant', $entry['userid'] ?? 0);
+    if (!empty($entry['has_chunks'])) {
+        $entries[$i]['badge_chunks'] = get_string(
+            'prompt_debug_view:badge_chunks', 'local_ai_course_assistant', $entry['chunk_count'] ?? 0);
+    }
+}
+
 $settingsurl = new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']);
 
 $templatedata = [
@@ -71,6 +85,21 @@ $templatedata = [
     'next_limit'   => min(50, $limit + 10),
     'can_show_more' => count($entries) === $limit,
     'settings_url' => $settingsurl->out(false),
+    // Static badge labels + title tooltips (v7.x i18n extraction).
+    'str_page_kept'            => get_string('prompt_debug_view:badge_page_kept', 'local_ai_course_assistant'),
+    'str_page_kept_title'      => get_string('prompt_debug_view:badge_page_kept_title', 'local_ai_course_assistant'),
+    'str_page_truncated'       => get_string('prompt_debug_view:badge_page_truncated', 'local_ai_course_assistant'),
+    'str_page_truncated_title' => get_string('prompt_debug_view:badge_page_truncated_title', 'local_ai_course_assistant'),
+    'str_page_dropped'         => get_string('prompt_debug_view:badge_page_dropped', 'local_ai_course_assistant'),
+    'str_page_dropped_title'   => get_string('prompt_debug_view:badge_page_dropped_title', 'local_ai_course_assistant'),
+    'str_page_absent'          => get_string('prompt_debug_view:badge_page_absent', 'local_ai_course_assistant'),
+    'str_page_absent_title'    => get_string('prompt_debug_view:badge_page_absent_title', 'local_ai_course_assistant'),
+    'str_topic_kept'           => get_string('prompt_debug_view:badge_topic_kept', 'local_ai_course_assistant'),
+    'str_topic_truncated'      => get_string('prompt_debug_view:badge_topic_truncated', 'local_ai_course_assistant'),
+    'str_topic_dropped'        => get_string('prompt_debug_view:badge_topic_dropped', 'local_ai_course_assistant'),
+    'str_topic_dropped_title'  => get_string('prompt_debug_view:badge_topic_dropped_title', 'local_ai_course_assistant'),
+    'str_attachment_badge'     => get_string('prompt_debug_view:badge_attachment', 'local_ai_course_assistant'),
+    'str_chunks_title'         => get_string('prompt_debug_view:badge_chunks_title', 'local_ai_course_assistant'),
 ];
 
 echo $OUTPUT->header();

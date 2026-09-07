@@ -149,7 +149,9 @@ survey_manager::ensure_default_survey();
 $survey = survey_manager::get_active_survey($courseid);
 $is_inherited = ($survey && (int) $survey->courseid !== $courseid && $courseid > 0);
 $questions = $survey ? $survey->questions : survey_manager::DEFAULT_QUESTIONS;
-$title = $survey ? $survey->title : 'SOLA End-of-Course Survey';
+$title = $survey
+    ? $survey->title
+    : \local_ai_course_assistant\branding::str('survey_admin:default_title');
 
 // Get list of courses for the scope selector.
 $courses = $DB->get_records_sql(
@@ -172,6 +174,7 @@ $jsstrings = [
     'optionn'            => get_string('survey_admin:option_n', 'local_ai_course_assistant', '{n}'),
     'removeoption'       => get_string('survey_admin:remove_option', 'local_ai_course_assistant'),
     'addoption'          => get_string('survey_admin:add_option', 'local_ai_course_assistant'),
+    'newoption'          => get_string('survey_admin:new_option', 'local_ai_course_assistant'),
     'minvalue'           => get_string('survey_admin:min_value', 'local_ai_course_assistant'),
     'minvaluearia'       => get_string('survey_admin:min_value_aria', 'local_ai_course_assistant'),
     'maxvalue'           => get_string('survey_admin:max_value', 'local_ai_course_assistant'),
@@ -371,7 +374,7 @@ echo $OUTPUT->header();
         });
         typeSelect.addEventListener('change', function() {
             q.type = typeSelect.value;
-            if (q.type === 'multiple_choice' && !q.options) q.options = ['Option 1', 'Option 2'];
+            if (q.type === 'multiple_choice' && !q.options) q.options = [STR.optionn.replace('{n}', 1), STR.optionn.replace('{n}', 2)];
             if (q.type === 'rating') { q.min = q.min || 1; q.max = q.max || 5; }
             renderAll();
         });
@@ -421,7 +424,7 @@ echo $OUTPUT->header();
             addOpt.textContent = STR.addoption;
             addOpt.addEventListener('click', function() {
                 if (!q.options) q.options = [];
-                q.options.push('New option');
+                q.options.push(STR.newoption);
                 renderAll();
             });
             card.appendChild(addOpt);

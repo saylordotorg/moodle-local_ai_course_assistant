@@ -78,12 +78,18 @@ class export_analytics_csv extends external_api {
         switch ($tab) {
             case 'overall':
                 $data = analytics::get_overview($courseid, $since);
-                $csv = self::array_to_csv(['Metric', 'Value'], self::flatten_kv($data));
+                $csv = self::array_to_csv([
+                    get_string('analytics:csv_metric', 'local_ai_course_assistant'),
+                    get_string('analytics:csv_value', 'local_ai_course_assistant'),
+                ], self::flatten_kv($data));
                 break;
 
             case 'courses':
                 $data = analytics::get_overview($courseid, $since);
-                $csv = self::array_to_csv(['Metric', 'Value'], self::flatten_kv($data));
+                $csv = self::array_to_csv([
+                    get_string('analytics:csv_metric', 'local_ai_course_assistant'),
+                    get_string('analytics:csv_value', 'local_ai_course_assistant'),
+                ], self::flatten_kv($data));
                 break;
 
             case 'comparison':
@@ -133,13 +139,16 @@ class export_analytics_csv extends external_api {
             case 'feedback':
                 if (method_exists(analytics::class, 'get_message_rating_summary')) {
                     $data = analytics::get_message_rating_summary($courseid, $since);
-                    $csv = self::array_to_csv(['Metric', 'Value'], self::flatten_kv($data));
+                    $csv = self::array_to_csv([
+                    get_string('analytics:csv_metric', 'local_ai_course_assistant'),
+                    get_string('analytics:csv_value', 'local_ai_course_assistant'),
+                ], self::flatten_kv($data));
                 }
                 break;
         }
 
         if (empty($csv)) {
-            $csv = "No data available for the selected filters.\n";
+            $csv = get_string('analytics:csv_nodata', 'local_ai_course_assistant') . "\n";
         }
 
         return [
