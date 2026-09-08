@@ -263,7 +263,6 @@ settings:embed_apibaseurl_desc
 settings:embed_apikey
 settings:embed_apikey_desc
 settings:embed_dimensions
-settings:embed_dimensions_desc
 settings:embed_model_desc
 settings:embed_provider_ollama
 settings:embed_provider_openai

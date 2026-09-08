@@ -48,10 +48,23 @@ class content_indexer {
      *
      * @param int  $courseid
      * @param bool $force    If true, re-embed all chunks regardless of hash.
+     * @param array $options v7.4.0 shadow-index options, for the
+     *        embedding-model migration:
+     *          'provider' => a base_embedding_provider built against the
+     *              migration target instead of the live settings;
+     *          'shadow'   => true to write the new vectors ALONGSIDE the
+     *              existing ones instead of replacing them.
+     *        In shadow mode the per-chunk upsert deletes only rows already
+     *        recorded against the model being written, so the old vectors keep
+     *        serving retrieval until an administrator changes the live
+     *        settings. Nothing is deleted before its replacement exists.
      * @return array ['indexed' => int, 'skipped' => int, 'errors' => int]
      */
-    public static function index_course(int $courseid, bool $force = false): array {
+    public static function index_course(int $courseid, bool $force = false, array $options = []): array {
         global $DB;
+
+        $shadow = !empty($options['shadow']);
+        $injected = $options['provider'] ?? null;
 
         $rawchunksize = get_config('local_ai_course_assistant', 'rag_chunksize');
         $chunksize = ($rawchunksize === false || $rawchunksize === '') ? 400 : (int) $rawchunksize;
@@ -77,7 +90,9 @@ class content_indexer {
         // with no explanation" failure mode admins hit when embed_apikey is
         // unset. The reason is returned to the caller (rag_admin) to display.
         try {
-            $provider = base_embedding_provider::create_from_config();
+            $provider = $injected instanceof base_embedding_provider
+                ? $injected
+                : base_embedding_provider::create_from_config();
         } catch (\Throwable $e) {
             $stats['fatal'] = $e->getMessage();
             return $stats;
@@ -92,7 +107,13 @@ class content_indexer {
         // injecting the FAQ inline, so a stale index costs prompt budget rather
         // than breaking anything, and nobody would notice it had happened.
         try {
-            $faqstats = faq_manager::index_faq();
+            // Not in shadow mode. index_faq() builds its own provider from the
+            // LIVE settings and deletes-then-reinserts the FAQ rows, so calling
+            // it here would write FAQ vectors in the model being migrated AWAY
+            // from and, worse, do it in the middle of a migration run. The FAQ
+            // is one admin setting and a handful of chunks; rag_admin offers a
+            // dedicated "re-embed the FAQ" action for after the flip.
+            $faqstats = $shadow ? ['indexed' => 0] : faq_manager::index_faq();
             if (!empty($faqstats['indexed'])) {
                 $stats['faq_chunks_indexed'] = $faqstats['indexed'];
             }
@@ -169,10 +190,27 @@ class content_indexer {
                     // below dominates this query whenever the hash misses.
                     // Check for existing identical chunk.
                     if (!$force) {
-                        $existing = $DB->get_record('local_ai_course_assistant_chunks', [
+                        $lookup = [
                             'courseid'    => $courseid,
                             'contenthash' => $hash,
-                        ], 'id, embedding, embedding_bin, embed_model, embed_dtype');
+                        ];
+                        if ($shadow) {
+                            // Narrowed to the model being written, for two
+                            // reasons. A shadow index holds two rows per chunk
+                            // (old model and new), so the un-narrowed lookup
+                            // would match both, emit a "found more than one
+                            // record" debugging notice, and resolve to an
+                            // arbitrary one -- if that were the old-model row,
+                            // every already-migrated chunk would be re-embedded
+                            // and a re-queued course would bill the whole
+                            // course again instead of resuming.
+                            $lookup['embed_model'] = $modelname;
+                        }
+                        $existing = $DB->get_record(
+                            'local_ai_course_assistant_chunks',
+                            $lookup,
+                            'id, embedding, embedding_bin, embed_model, embed_dtype'
+                        );
 
                         // Either column proves the chunk is embedded. Testing only the
                         // JSON column made every quantized row look unembedded, so a
@@ -245,11 +283,21 @@ class content_indexer {
                     }
 
                     // Upsert: delete any old row for this cmid+chunkindex first.
-                    $DB->delete_records('local_ai_course_assistant_chunks', [
+                    // In shadow mode, only rows already written by THIS model:
+                    // the whole point of a shadow index is that the vectors
+                    // serving retrieval survive until an administrator switches
+                    // over. The retriever skips rows whose embed_model is not
+                    // comparable with the query's, so the two sets coexist
+                    // without either polluting the other.
+                    $deletecriteria = [
                         'courseid'   => $courseid,
                         'cmid'       => $mod['cmid'],
                         'chunkindex' => $idx,
-                    ]);
+                    ];
+                    if ($shadow) {
+                        $deletecriteria['embed_model'] = $modelname;
+                    }
+                    $DB->delete_records('local_ai_course_assistant_chunks', $deletecriteria);
 
                     // Neutralize prompt-injection markers embedded in course
                     // content before the chunk is stored. Role delimiters and
@@ -315,7 +363,14 @@ class content_indexer {
         // `cap_blocked` joins `errors` as a reason not to prune: a run cut short by
         // the budget cap never reached the remaining chunks, so their hashes are
         // absent from $seenhashes and would be misread as stale and deleted.
-        if ($stats['errors'] === 0 && empty($stats['cap_blocked']) && !empty($seenhashes)) {
+        // A shadow run never prunes and never blanks. Its hash set covers only
+        // what it re-embedded; treating anything outside that as stale would
+        // delete the index that is still serving retrieval, which is the one
+        // thing a migration must not do.
+        if ($shadow) {
+            // Nothing to prune.
+            $stats['shadow'] = true;
+        } else if ($stats['errors'] === 0 && empty($stats['cap_blocked']) && !empty($seenhashes)) {
             self::prune_stale_chunks($courseid, $seenhashes);
         } else if ($stats['sources'] === 0) {
             // Genuinely no extractable content in the course — clear the index.

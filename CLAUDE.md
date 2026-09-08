@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026080500`, release `6.9.5`
+- **Current version:** `2026091000`, release `7.4.0`
 - **Source folder (canonical):** the git repo at `~/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
@@ -72,6 +72,12 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - **Judge harness:** Claude Sonnet 4.6 (out of contestant pool).
 - **Ultimate-fallback chat for EU residency (NOT in Saylor default):** Mistral Small. Provider class stays available so non-Saylor sites can select it; not in Saylor's `spend_failover_chain` (pending Mistral training-opt-out + ZDR, and Saylor doesn't need EU residency at current scale).
 - **Audio / Voice / Avatar:** deferred (Appendix B of `.drafts/sola-vendor-recommendations-2026-06-09.md`).
+
+### Two decisions recorded here on purpose (2026-09-08, v7.4.0)
+
+**(a) No change to the chat stack.** Gemini 2.5 Flash stays primary, gpt-4o-mini stays failover, Claude Sonnet 5 stays the premium escalation target. The v7.4.0 registry/benchmark work exists to make that decision *re-checkable*, not to change it — and rechecking it produced no reason to move. **Re-open only if adoption drifts more than 5 percentage points** from the shape above (i.e. the share of turns going to a tier moves by >5pp, or a bake-off moves a model's rubric mean by >5pp against the current pick). A price change alone is not a trigger: the registry now reports it and the drift check emails about it, which is the right response to a price change.
+
+**(b) The 40-row fixture set is regression smoke only.** `rag_fixtures_bus101_pol101.json` (40 fixtures, two courses) is a "did retrieval break" check and nothing else. **Every vendor and configuration decision is made on the 816-row production-shaped set** (`rag_fixtures_prodshape_anchored_2026-08-27.json`, 13 courses). This is enforced, not just documented: `run_rag_fixture_benchmark.php` grades the set (floor 200 fixtures, plus a name-based demotion of any `bus101_pol101` set so padding it cannot promote it) and exits before spending anything unless `--allow-small-set` is passed; the grade stamp appears above every results table and in the stored JSON, and the admin UI shows the same SMOKE / DECISION-GRADE stamp next to any stored benchmark number.
 
 See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and `.drafts/sola-vendor-optimization-by-mau-2026-06-09.md` (per-MAU-tier optimization playbook) for the full vendor story.
 

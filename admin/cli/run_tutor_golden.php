@@ -33,15 +33,27 @@
  *                  on 1-5 each. CSV out.
  *
  *   --mode=report  Join run + judge CSVs, compute Pareto frontier on
- *                  cost vs. quality, print a Markdown decision matrix.
+ *                  cost vs. quality, print a Markdown decision matrix, and
+ *                  PERSIST each provider's aggregate to
+ *                  local_ai_course_assistant_bench via model_bench.
  *
  *   --mode=all     run, then judge, then report. Default.
+ *
+ * v7.4.0: the aggregate this script has always computed — rubric mean out of
+ * 15, average cents/call, P50/P95 TTFT, error count, Pareto flag — used to be
+ * written to a CSV in dataroot and then discarded, so no part of the plugin
+ * could read a benchmark result and "similar quality" was never a stored
+ * measurement. The same numbers now also land in a table, unchanged and
+ * un-recomputed. The CSVs still get written; they are no longer the only
+ * output, and the equivalent run is available with no shell at all via the
+ * run_model_benchmark ad-hoc task queued from the admin page.
  *
  * Usage:
  *   php admin/cli/run_tutor_golden.php
  *   php admin/cli/run_tutor_golden.php --mode=run --providers=together-llama8b,openai-mini
  *   php admin/cli/run_tutor_golden.php --mode=judge --in=runs/2026-05-13-run.csv
  *   php admin/cli/run_tutor_golden.php --mode=report --in=runs/2026-05-13-run.csv,runs/2026-05-13-judge.csv
+ *   php admin/cli/run_tutor_golden.php --providers=claude --registry-key=claude-sonnet-5
  *
  * Output files default to runs/YYYY-MM-DD-{run,judge,report}.{csv,md}.
  *
@@ -55,7 +67,9 @@ require(__DIR__ . '/../../../../config.php');
 global $CFG;
 require_once($CFG->dirroot . '/lib/filelib.php');
 
+use local_ai_course_assistant\model_bench;
 use local_ai_course_assistant\provider\base_provider;
+use local_ai_course_assistant\task\run_model_benchmark;
 use local_ai_course_assistant\token_cost_manager;
 
 // ---------- CLI args ----------
@@ -71,6 +85,7 @@ $judgeprovider = 'claude';
 $judgemodel = 'claude-sonnet-4-6';
 $limit = 0; // 0 = all prompts
 $promptsfile = ''; // empty = use tutor_prompts.json default
+$registrykey = ''; // optional local_ai_course_assistant_models.modelkey to attribute the run to
 $delay = 0.0; // seconds to sleep between calls (throttle for rate-limited free tiers)
 
 foreach ($argv as $arg) {
@@ -94,6 +109,8 @@ foreach ($argv as $arg) {
         $promptsfile = trim($m[1]);
     } else if (preg_match('/^--delay=([\d.]+)$/', $arg, $m)) {
         $delay = (float) $m[1];
+    } else if (preg_match('/^--registry-key=(.+)$/', $arg, $m)) {
+        $registrykey = strtolower(trim($m[1]));
     } else if ($arg === '--help' || $arg === '-h') {
         $help = <<<TXT
 Usage: php run_tutor_golden.php [--mode=run|judge|report|all] [options]
@@ -117,6 +134,11 @@ Options:
   --out=DIR                     Output directory (default: <plugin>/runs).
   --judge-provider=ID           Provider id for the rubric judge (default: claude).
   --judge-model=NAME            Model name for the rubric judge (default: claude-sonnet-4-6).
+  --registry-key=KEY            Attribute the persisted result to this model-registry
+                                modelkey, so the admin page and the recommendation
+                                engine can find it. Applied to a provider row only
+                                when it is the single row in the report or its model
+                                name starts with KEY; other rows persist with no key.
 TXT;
         echo $help . "\n";
         exit(0);
@@ -143,7 +165,12 @@ if ($mode === 'report' || $mode === 'all') {
         fwrite(STDERR, "ERROR: --mode=report requires --in=<run.csv>,<judge.csv>\n");
         exit(1);
     }
-    local_ai_course_assistant_golden_mode_report($runin, $judgein, $outdir, $datetag);
+    local_ai_course_assistant_golden_mode_report($runin, $judgein, $outdir, $datetag, [
+        'registry_key'   => $registrykey,
+        'fixture_set'    => $promptsfile !== '' ? $promptsfile : run_model_benchmark::DEFAULT_FIXTURE,
+        'judge_provider' => $judgeprovider,
+        'judge_model'    => $judgemodel,
+    ]);
 }
 exit(0);
 
@@ -199,9 +226,11 @@ function local_ai_course_assistant_golden_mode_run(string $providersfilter, stri
         'ttft_ms', 'total_latency_ms', 'cost_cents', 'error', 'timestamp',
     ]);
 
-    $systemprompt = "You are SOLA, Saylor University's AI learning coach. "
-        . "Coach learners toward understanding rather than handing over answers. "
-        . "Match the learner's language. Stay focused on the course material.";
+    // The prompt under test lives on the ad-hoc task, which is the
+    // web-triggerable path; this script references it rather than keeping a
+    // second copy. Two copies drift, and two drifted prompts produce two rubric
+    // means that look comparable in the same table and are not.
+    $systemprompt = run_model_benchmark::SYSTEM_PROMPT;
 
     foreach ($rows as $row) {
         $urltag = !empty($row['apibaseurl']) ? ' @ ' . $row['apibaseurl'] : '';
@@ -379,29 +408,10 @@ function local_ai_course_assistant_golden_mode_judge(string $runcsv, string $out
  * @return array{socratic?: int, accuracy?: int, tone?: int, notes?: string, error?: string}
  */
 function local_ai_course_assistant_golden_score_one($judge, string $prompt, string $response): array {
-    $systemprompt = <<<TXT
-You are evaluating a tutoring AI's response on three dimensions. Score 1 to 5 on each.
-
-Original student prompt is provided. Tutor response is provided. Score the response.
-
-1. SOCRATIC (1 to 5): Does the tutor guide the student toward discovering the answer rather than handing it over?
-   5 = excellent Socratic guidance, asks clarifying questions, scaffolds hints
-   3 = mixed; gives some direct content but also asks/scaffolds
-   1 = pure spoonfeeding; states the answer directly without engaging the learner
-
-2. ACCURACY (1 to 5): Is the content factually correct and well grounded?
-   5 = factually solid; no errors
-   3 = mostly accurate; minor issues or oversimplifications
-   1 = significant factual errors
-
-3. TONE (1 to 5): Does the response sound like a warm, encouraging, professional tutor for adult learners at a free university? Not condescending, not robotic, not overly casual.
-   5 = excellent tone match
-   3 = neutral / acceptable
-   1 = poor tone (cold, condescending, or off)
-
-Output STRICT JSON only, no markdown fencing, no commentary:
-{"socratic": N, "accuracy": N, "tone": N, "notes": "one sentence"}
-TXT;
+    // Shared with the ad-hoc task for the same reason as the tutor prompt
+    // above: a rubric that differs between the two runners silently makes their
+    // scores incomparable.
+    $systemprompt = run_model_benchmark::JUDGE_PROMPT;
 
     $user = "STUDENT PROMPT:\n" . $prompt . "\n\nTUTOR RESPONSE:\n" . $response;
 
@@ -432,12 +442,17 @@ TXT;
  * Join the run + judge CSVs, compute per-provider aggregates, identify the
  * Pareto frontier on (cost, quality), and write a Markdown decision matrix.
  *
+ * v7.4.0: also persists each provider's aggregate to the bench table. The
+ * numbers written are the ones already computed here for the Markdown table —
+ * nothing is recomputed, so the file and the row can never disagree.
+ *
  * @param string $runcsv
  * @param string $judgecsv
  * @param string $outdir
  * @param string $datetag
+ * @param array $context registry_key, fixture_set, judge_provider, judge_model.
  */
-function local_ai_course_assistant_golden_mode_report(string $runcsv, string $judgecsv, string $outdir, string $datetag): void {
+function local_ai_course_assistant_golden_mode_report(string $runcsv, string $judgecsv, string $outdir, string $datetag, array $context = []): void {
     $runrows = local_ai_course_assistant_golden_read_csv($runcsv);
     $judgerows = local_ai_course_assistant_golden_read_csv($judgecsv);
 
@@ -451,8 +466,15 @@ function local_ai_course_assistant_golden_mode_report(string $runcsv, string $ju
             'rubric_sum' => 0, 'rubric_n' => 0,
             'model' => $r['model'],
             'provider_id' => $r['provider_id'],
+            // Distinct prompts behind the aggregate, so the persisted row can
+            // record fixture_n and a 3-prompt smoke run can never be compared
+            // against a 50-prompt golden run.
+            'prompt_ids' => [],
         ];
         $stats[$label]['calls']++;
+        if (($r['prompt_id'] ?? '') !== '') {
+            $stats[$label]['prompt_ids'][$r['prompt_id']] = true;
+        }
         if (($r['error'] ?? '') !== '') {
             $stats[$label]['errors']++;
         }
@@ -493,6 +515,7 @@ function local_ai_course_assistant_golden_mode_report(string $runcsv, string $ju
             'p50_total_ms'  => local_ai_course_assistant_golden_percentile($s['total_ms'], 50),
             'avg_rubric'    => $s['rubric_n'] > 0 ? $s['rubric_sum'] / $s['rubric_n'] : null,
             'rubric_n'      => $s['rubric_n'],
+            'fixture_n'     => count($s['prompt_ids']),
         ];
     }
 
@@ -606,6 +629,85 @@ function local_ai_course_assistant_golden_mode_report(string $runcsv, string $ju
     file_put_contents($outfile, $md);
     echo "\nreport: $outfile\n";
     echo file_get_contents($outfile);
+
+    // The CSV/Markdown pair is no longer the only output.
+    local_ai_course_assistant_golden_persist_summary($summary, $pareto, $winner, $context);
+}
+
+/**
+ * Persist one bench row per provider row of the report.
+ *
+ * Deliberately additive and deliberately dumb: it takes the aggregates the
+ * report already computed and stores them. If persistence fails — no upgrade
+ * run yet, a locked DB — the run still stands, because the CSVs and the printed
+ * report are unaffected; the failure is reported and the script exits 0 rather
+ * than throwing away a benchmark that cost real money to produce.
+ *
+ * @param array $summary Per-provider aggregates from the report.
+ * @param string[] $pareto Labels on the Pareto frontier.
+ * @param array|null $winner The section 3.5 winner, if any.
+ * @param array $context registry_key, fixture_set, judge_provider, judge_model.
+ * @return void
+ */
+function local_ai_course_assistant_golden_persist_summary(array $summary, array $pareto, ?array $winner, array $context): void {
+    $key = strtolower(trim((string) ($context['registry_key'] ?? '')));
+    $single = count($summary) === 1;
+
+    echo "\npersisted to local_ai_course_assistant_bench:\n";
+    foreach ($summary as $s) {
+        // --registry-key names ONE registry entry, and a report can cover many
+        // providers. Attribute it only where that is unambiguous: a single-row
+        // report, or a row whose model name the key prefixes (registry keys are
+        // model-name prefixes). Guessing wrong would file a benchmark under the
+        // wrong model, which is worse than filing it under none.
+        $rowkey = '';
+        if ($key !== '' && ($single || str_starts_with(strtolower((string) $s['model']), $key))) {
+            $rowkey = $key;
+        }
+        try {
+            $runid = model_bench::start_run([
+                'harness'        => run_model_benchmark::HARNESS_TUTOR_GOLDEN,
+                'sola_function'  => 'chat',
+                'registry_key'   => $rowkey,
+                'provider'       => (string) $s['provider_id'],
+                'model_name'     => (string) $s['model'],
+                'fixture_set'    => (string) ($context['fixture_set'] ?? ''),
+                'fixture_n'      => (int) ($s['fixture_n'] ?? 0),
+                'judge_provider' => (string) ($context['judge_provider'] ?? ''),
+                'judge_model'    => (string) ($context['judge_model'] ?? ''),
+                'quality_metric' => 'rubric_mean',
+                'status'         => model_bench::STATUS_RUNNING,
+                'params'         => [
+                    'source'         => 'cli:run_tutor_golden',
+                    'provider_label' => (string) $s['label'],
+                ],
+            ]);
+            model_bench::complete_run($runid, [
+                'quality_metric'      => 'rubric_mean',
+                'quality_raw'         => $s['avg_rubric'],
+                // Null when nothing was judged, so quality_score stays null
+                // rather than becoming a 0.0 that ranks the model last.
+                'quality_max'         => $s['avg_rubric'] !== null ? run_model_benchmark::RUBRIC_MAX : null,
+                'quality_n'           => (int) $s['rubric_n'],
+                'cost_cents_per_call' => $s['avg_cost_cents'],
+                'p50_ttft_ms'         => $s['p50_ttft_ms'],
+                'p95_ttft_ms'         => $s['p95_ttft_ms'],
+                'p50_total_ms'        => $s['p50_total_ms'],
+                'calls'               => (int) $s['calls'],
+                'errors'              => (int) $s['errors'],
+                'params'              => [
+                    'source'         => 'cli:run_tutor_golden',
+                    'provider_label' => (string) $s['label'],
+                    'pareto'         => in_array($s['label'], $pareto, true),
+                    'decision_winner' => $winner !== null && $winner['label'] === $s['label'],
+                ],
+            ]);
+            printf("  %s -> run %s%s\n", $s['label'], $runid, $rowkey !== '' ? " (registry key $rowkey)" : '');
+        } catch (\Throwable $e) {
+            fwrite(STDERR, sprintf(
+                "  WARNING: could not persist %s: %s\n", $s['label'], $e->getMessage()));
+        }
+    }
 }
 
 // ---------- helpers ----------

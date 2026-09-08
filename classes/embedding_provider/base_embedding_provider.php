@@ -49,35 +49,63 @@ abstract class base_embedding_provider {
     protected string $dtype;
 
     /**
+     * Config values that override plugin config for the next construction.
+     *
+     * Set only by {@see create_from_config()} and cleared in its finally block,
+     * so nothing outside that one call can be built against a config the site
+     * is not running. It exists for the embedding-model migration: a migration
+     * has to embed with the model it is moving TO while the live settings keep
+     * serving retrieval with the model it is moving FROM, and there is no other
+     * way to do that without a set_config() that would break every course at
+     * once.
+     *
+     * @var array<string, mixed>
+     */
+    private static array $configoverrides = [];
+
+    /**
+     * Read one plugin config value, honoring an active construction override.
+     *
+     * @param string $name Setting name, without the plugin prefix.
+     * @return mixed The override when one is set for this construction, else config.
+     */
+    protected static function cfg(string $name) {
+        if (array_key_exists($name, self::$configoverrides)) {
+            return self::$configoverrides[$name];
+        }
+        return get_config('local_ai_course_assistant', $name);
+    }
+
+    /**
      * Constructor — reads plugin RAG config.
      */
     public function __construct() {
-        $this->apikey     = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
-        $this->model      = (string) (get_config('local_ai_course_assistant', 'embed_model') ?: $this->get_default_model());
+        $this->apikey     = (string) (self::cfg('embed_apikey') ?: '');
+        $this->model      = (string) (self::cfg('embed_model') ?: $this->get_default_model());
         // Query-side model. Empty (the default) means "same as the document
         // model", which is the only universally safe choice: vectors from
         // different models are comparable only within a declared shared
         // embedding space. Mixing is gated by embedding_compat at read time, so
         // a misconfiguration here degrades to a warning and a same-model
         // fallback rather than silently meaningless scores.
-        $rawqm = get_config('local_ai_course_assistant', 'embed_query_model');
+        $rawqm = self::cfg('embed_query_model');
         $this->querymodel = (trim((string) $rawqm) !== '') ? trim((string) $rawqm) : $this->model;
         // Stored-vector encoding. Normalized against an allowlist rather than
         // trusted: this value reaches an outbound API payload and selects a
         // decode path, so an unrecognized string must resolve to float rather
         // than propagate.
         $this->dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
-            (string) get_config('local_ai_course_assistant', 'embed_dtype')
+            (string) self::cfg('embed_dtype')
         );
         // 0 means "use the provider's native default width". An unset config
         // must NOT fall back to a hard 1536: that is only valid for OpenAI, and
         // forcing it on Voyage (whose MRL widths are 256/512/1024/2048) makes
         // every embedding call fail. Each provider skips sending an explicit
         // width when this is 0 and lets its own model default apply.
-        $rawdim = get_config('local_ai_course_assistant', 'embed_dimensions');
+        $rawdim = self::cfg('embed_dimensions');
         $this->dimensions = ($rawdim === false || $rawdim === '') ? 0 : (int) $rawdim;
 
-        $configurl = get_config('local_ai_course_assistant', 'embed_apibaseurl');
+        $configurl = self::cfg('embed_apibaseurl');
         $this->baseurl = !empty($configurl) ? rtrim($configurl, '/') : $this->get_default_base_url();
     }
 
@@ -207,27 +235,42 @@ abstract class base_embedding_provider {
     /**
      * Factory: create the configured embedding provider from plugin settings.
      *
+     * @param array $overrides Config values to use instead of the site's, for
+     *        THIS construction only. Keys are plain setting names
+     *        (embed_provider, embed_apikey, embed_model, embed_dimensions,
+     *        embed_dtype, embed_query_model, embed_apibaseurl). Used by the
+     *        embedding-model migration, which has to embed with the model it is
+     *        moving to while the live settings keep serving retrieval with the
+     *        model it is moving from.
      * @return base_embedding_provider
      * @throws \moodle_exception If embed_provider is not set or unsupported.
      */
-    public static function create_from_config(): base_embedding_provider {
-        $provider = (string) (get_config('local_ai_course_assistant', 'embed_provider') ?: 'openai');
+    public static function create_from_config(array $overrides = []): base_embedding_provider {
+        // Overrides apply to THIS construction only. The finally block is not
+        // optional: leaking them would silently re-point live retrieval at a
+        // migration target for the rest of the request.
+        self::$configoverrides = $overrides;
+        try {
+            $provider = (string) (self::cfg('embed_provider') ?: 'openai');
 
-        switch ($provider) {
-            case 'openai':
-                return new openai_embedding_provider();
-            case 'ollama':
-                return new ollama_embedding_provider();
-            case 'voyage':
-                return new voyage_embedding_provider();
-            default:
-                throw new \moodle_exception(
-                    'chat:error_notconfigured',
-                    'local_ai_course_assistant',
-                    '',
-                    null,
-                    "Unknown embed_provider: {$provider}"
-                );
+            switch ($provider) {
+                case 'openai':
+                    return new openai_embedding_provider();
+                case 'ollama':
+                    return new ollama_embedding_provider();
+                case 'voyage':
+                    return new voyage_embedding_provider();
+                default:
+                    throw new \moodle_exception(
+                        'chat:error_notconfigured',
+                        'local_ai_course_assistant',
+                        '',
+                        null,
+                        "Unknown embed_provider: {$provider}"
+                    );
+            }
+        } finally {
+            self::$configoverrides = [];
         }
     }
 

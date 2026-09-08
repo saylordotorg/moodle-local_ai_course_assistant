@@ -177,6 +177,68 @@ class voyage_reranker {
     }
 
     /**
+     * Record that stage 2 was gated off for this query, and why.
+     *
+     * A skipped rerank has to be observable. Without a row here the only
+     * evidence that a gate is working is spend going down, which is
+     * indistinguishable from the reranker being misconfigured, the Voyage key
+     * having expired, or retrieval returning nothing at all — three failures
+     * that also look like a cost drop. So the skip is written to the same
+     * telemetry channel as log_rerank_cost() (which is untouched: a rerank that
+     * DOES run still logs its tokens), and an operator can count both:
+     *
+     *   SELECT message, COUNT(*) FROM {local_ai_course_assistant_msgs}
+     *    WHERE interaction_type IN ('rerank', 'rerank_skipped')
+     *      AND timecreated > ? GROUP BY message;
+     *
+     * interaction_type is 'rerank_skipped', deliberately NOT 'rerank': these
+     * rows carry zero tokens, and analytics::spend_rows_predicate() names the
+     * billable system interaction types explicitly, so a new one is excluded
+     * from spend, from the RAG cap in spend_guard, and from token analytics
+     * rather than diluting cost-per-rerank with rows that cost nothing.
+     * role='system' keeps them out of learner history, the model's context and
+     * conversation_rows_predicate() for the same reason the cost rows are.
+     *
+     * Static because the whole point is that no reranker was constructed and no
+     * API call was made; the model name is read from config only so the row
+     * says which reranker would have run.
+     *
+     * @param string $reason Machine-readable gate reason, e.g. 'short_query'.
+     * @param int $courseid Course whose retrieval was gated (0 = site).
+     */
+    public static function log_skip(string $reason, int $courseid = 0): void {
+        global $DB;
+        try {
+            // Allowlisted shape rather than trusted: this string is
+            // concatenated into a stored message, and a caller-supplied reason
+            // must not be able to put arbitrary text there.
+            $slug = preg_replace('/[^a-z0-9_]/', '', strtolower(trim($reason)));
+            if ($slug === '' || $slug === null) {
+                $slug = 'unspecified';
+            }
+            $record = new \stdClass();
+            $record->conversationid = 0;
+            $record->userid = 0;
+            $record->courseid = $courseid > 0 ? $courseid : SITEID;
+            $record->role = 'system';
+            $record->message = '[Rerank skipped: ' . $slug . ']';
+            $record->tokens_used = 0;
+            $record->prompt_tokens = 0;
+            $record->completion_tokens = 0;
+            $record->model_name = (string) (
+                get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5'
+            );
+            $record->provider = 'rerank';
+            $record->interaction_type = 'rerank_skipped';
+            $record->timecreated = time();
+            $DB->insert_record('local_ai_course_assistant_msgs', $record);
+        } catch (\Throwable $e) {
+            // Non-critical: never break retrieval to record that it was cheap.
+            debugging('rerank skip telemetry failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+    }
+
+    /**
      * HTTP POST via Moodle's curl class with SSRF guard.
      *
      * @param string $url

@@ -756,5 +756,95 @@
         <INDEX NAME="status_expires" UNIQUE="false" FIELDS="status, expires_at"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_models" COMMENT="v7.4.0 model registry: per-key pricing/capability overlay with provenance. Admin-editable so a price fix needs no code deploy; the source column records whether a row came from a human or a feed.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="modelkey" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Lowercase model-name prefix or exact model id, matched longest-prefix-wins like the committed baseline table"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Vendor/provider key this model belongs to (openai, google, claude, voyage, ...)"/>
+        <FIELD NAME="capability" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="chat | embedding | rerank | tts | stt | vision | judge. Free text, deliberately not enforced so a new capability needs no code change."/>
+        <FIELD NAME="input_rate" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="USD per 1M input tokens"/>
+        <FIELD NAME="output_rate" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="USD per 1M output tokens"/>
+        <FIELD NAME="context_tokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Model context window in tokens, when known"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="active" SEQUENCE="false" COMMENT="active | deprecated | candidate"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="manual" SEQUENCE="false" COMMENT="manual | upstream | drift | bundle. Load-bearing: model_registry::upsert refuses to let an upstream/drift feed overwrite a manual row."/>
+        <FIELD NAME="notes" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="addedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who last wrote this row; null for feed writes"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="addedby_fk_mdl" TYPE="foreign" FIELDS="addedby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="modelkey_uq" UNIQUE="true" FIELDS="modelkey"/>
+        <INDEX NAME="status_capability" UNIQUE="false" FIELDS="status, capability"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_pricesrc" COMMENT="v7.4.0 admin-editable pricing sources. A new vendor feed is a DB row with a declarative parse spec, never a new PHP class.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="url" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Fetched through security::is_safe_provider_url + resolve_pin_options; never unchecked"/>
+        <FIELD NAME="format" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="litellm | openrouter | json_generic | html_regex"/>
+        <FIELD NAME="spec" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON parse spec: json_generic {modelpath, inputpath, outputpath, scale}; html_regex {pattern, groups}"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="lastfetch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="laststatus" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="lastmessage" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="addedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="addedby_fk_psrc" TYPE="foreign" FIELDS="addedby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="enabled" UNIQUE="false" FIELDS="enabled"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_ai_course_assistant_bench" COMMENT="v7.4.0 benchmark results. Nothing persisted a benchmark result before this table existed: run_tutor_golden.php computed the row and wrote it to a discarded CSV.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="runid" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="Opaque unique id for one benchmark run"/>
+        <FIELD NAME="harness" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="tutor_golden | rag_fixture | jailbreak | ..."/>
+        <FIELD NAME="sola_function" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Which SOLA function was benchmarked (chat, quiz, classifier, embedding, rerank, judge)"/>
+        <FIELD NAME="registry_key" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Matching local_ai_course_assistant_models.modelkey, when the model is registered"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="model_name" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="fixture_set" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="fixture_n" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="params" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON of the run parameters (temperature, max_tokens, repeats, ...)"/>
+        <FIELD NAME="judge_provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="judge_model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="quality_metric" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="rubric_mean | recall_at_3 | pass_rate | ..."/>
+        <FIELD NAME="quality_raw" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="Metric in its native units (e.g. 14.56 out of 15)"/>
+        <FIELD NAME="quality_max" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="Native scale maximum (e.g. 15)"/>
+        <FIELD NAME="quality_score" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="Normalized 0..1 score, comparable across harnesses"/>
+        <FIELD NAME="quality_n" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of scored items behind the metric"/>
+        <FIELD NAME="cost_cents_per_call" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="p50_ttft_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="p95_ttft_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="p50_total_ms" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="calls" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="errors" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="plugin_release" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="complete" SEQUENCE="false" COMMENT="queued | running | complete | failed"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="createdby_fk_bench" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="runid_uq" UNIQUE="true" FIELDS="runid"/>
+        <INDEX NAME="function_model_time" UNIQUE="false" FIELDS="sola_function, model_name, timecreated"/>
+        <INDEX NAME="registrykey_time" UNIQUE="false" FIELDS="registry_key, timecreated"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
