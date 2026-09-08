@@ -25,8 +25,8 @@ namespace local_ai_course_assistant;
  * plugin, both times from the v7.3.5 i18n extraction, and both times the cost
  * was a CI round trip because nothing local reproduced it:
  *
- *  - Eight templates had @package/@copyright/@license placed AFTER the example
- *    JSON. The linter treats everything from the example line to the end of
+ *  - Eight templates had their Moodle boilerplate tags (package, copyright,
+ *    license) placed AFTER the example JSON. The linter treats everything from the example line to the end of
  *    the docblock as the blob, so those tags landed inside it and it failed to
  *    parse. Invisible to php -l and to every other test.
  *  - analytics_dashboard.mustache rendered nine `<option value="x"></option>`

@@ -66,7 +66,7 @@ final class emergency_restore_symmetry_test extends \advanced_testcase {
     /**
      * @dataProvider flag_provider
      * @param string $flag
-     * @param array<string,string> $before
+     * @param array $before
      */
     public function test_restore_returns_every_flag_to_its_prior_value(string $flag, array $before): void {
         foreach ($before as $k => $v) {
