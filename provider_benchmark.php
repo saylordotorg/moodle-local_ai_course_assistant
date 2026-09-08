@@ -68,7 +68,7 @@ if ($export !== '') {
             'error',
             'local_ai_course_assistant',
             '',
-            'No benchmark run available to export. Run the benchmark first.'
+            get_string('benchmark:export_norun', 'local_ai_course_assistant')
         );
     }
     $stamp = date('Ymd-His', (int) ($payload['generated_at'] ?? time()));
@@ -97,7 +97,7 @@ if ($export !== '') {
                 'error',
                 'local_ai_course_assistant',
                 '',
-                'Unknown export format.'
+                get_string('benchmark:export_unknownformat', 'local_ai_course_assistant')
             );
     }
 }

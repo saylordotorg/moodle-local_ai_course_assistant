@@ -45,9 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         set_config('integrity_last_run', time(), 'local_ai_course_assistant');
 
         if ($results['failed'] > 0) {
-            \core\notification::warning("{$results['failed']} issue(s) found. See details below.");
+            \core\notification::warning(
+                get_string('integrity:notify_issues', 'local_ai_course_assistant', $results['failed'])
+            );
         } else {
-            \core\notification::success("All {$results['passed']} checks passed.");
+            \core\notification::success(
+                get_string('integrity:notify_passed', 'local_ai_course_assistant', $results['passed'])
+            );
         }
         redirect($PAGE->url);
     }
@@ -70,24 +74,26 @@ echo $OUTPUT->header();
 
     <div class="sola-integrity-cards">
         <div class="sola-integrity-card">
-            <h6>Last Run</h6>
+            <h6><?php echo get_string('integrity:last_run', 'local_ai_course_assistant'); ?></h6>
             <div class="value" style="font-size:16px;">
-                <?php echo $lastrun ? userdate($lastrun, '%Y-%m-%d %H:%M') : 'Never'; ?>
+                <?php echo $lastrun
+                    ? userdate($lastrun, '%Y-%m-%d %H:%M')
+                    : get_string('ragadmin:never', 'local_ai_course_assistant'); ?>
             </div>
         </div>
         <?php if ($results) : ?>
         <div class="sola-integrity-card">
-            <h6>Passed</h6>
+            <h6><?php echo get_string('integrity:passed', 'local_ai_course_assistant'); ?></h6>
             <div class="value" style="color:#28a745;"><?php echo $results['passed']; ?></div>
         </div>
         <div class="sola-integrity-card">
-            <h6>Failed</h6>
+            <h6><?php echo get_string('integrity:failed', 'local_ai_course_assistant'); ?></h6>
             <div class="value" style="color:<?php echo $results['failed'] > 0 ? '#dc3545' : '#28a745'; ?>;">
                 <?php echo $results['failed']; ?>
             </div>
         </div>
         <div class="sola-integrity-card">
-            <h6>Warnings</h6>
+            <h6><?php echo get_string('integrity:warnings', 'local_ai_course_assistant'); ?></h6>
             <div class="value" style="color:<?php echo ($results['warned'] ?? 0) > 0 ? '#ffc107' : '#28a745'; ?>;">
                 <?php echo $results['warned'] ?? 0; ?>
             </div>
@@ -104,13 +110,13 @@ echo $OUTPUT->header();
     </form>
 
     <?php if ($results && !empty($results['results'])) : ?>
-    <h5>Test Results</h5>
+    <h5><?php echo get_string('integrity:results_heading', 'local_ai_course_assistant'); ?></h5>
     <table class="sola-result-table">
         <thead>
             <tr>
-                <th>Status</th>
-                <th>Check</th>
-                <th>Details</th>
+                <th><?php echo get_string('integrity:col_status', 'local_ai_course_assistant'); ?></th>
+                <th><?php echo get_string('integrity:col_check', 'local_ai_course_assistant'); ?></th>
+                <th><?php echo get_string('integrity:col_details', 'local_ai_course_assistant'); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -125,7 +131,7 @@ echo $OUTPUT->header();
     </table>
     <?php elseif (!$results): ?>
     <div class="alert alert-info">
-        No integrity checks have been run yet. Click "Run Now" to check plugin health, or wait for the daily scheduled task.
+        <?php echo get_string('integrity:norun', 'local_ai_course_assistant'); ?>
     </div>
     <?php endif; ?>
 </div>

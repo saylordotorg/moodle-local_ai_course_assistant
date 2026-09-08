@@ -98,12 +98,6 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title(get_string('transcripts:title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('transcripts:title', 'local_ai_course_assistant'));
-echo $OUTPUT->notification(
-    get_string('transcripts:privacynote', 'local_ai_course_assistant'),
-    \core\output\notification::NOTIFY_INFO);
-
 // ---- filter form -----------------------------------------------------------
 $modinfo = get_fast_modinfo($courseid);
 $sections = [];
@@ -127,11 +121,6 @@ $objectives = $DB->get_records_sql_menu(
     ['courseid' => $courseid]
 );
 
-echo html_writer::start_tag('form', ['method' => 'get', 'action' => $pageurl->out(false),
-    'class' => 'mb-4']);
-echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'courseid', 'value' => $courseid]);
-echo html_writer::start_div('form-row align-items-end');
-
 $selects = [
     ['mode', get_string('transcripts:mode', 'local_ai_course_assistant'),
         ['transcripts' => get_string('messages', 'core_message'),
@@ -145,32 +134,45 @@ $selects = [
          '1' => get_string('transcripts:met', 'local_ai_course_assistant'),
          '0' => get_string('transcripts:notmet', 'local_ai_course_assistant')], $outcome],
 ];
+$templatedata = [
+    'privacynoticehtml' => $OUTPUT->notification(
+        get_string('transcripts:privacynote', 'local_ai_course_assistant'),
+        \core\output\notification::NOTIFY_INFO),
+    'formaction' => $pageurl->out(false),
+    'courseid' => $courseid,
+    'selects' => [],
+    'textinputs' => [],
+    'applylabel' => get_string('apply', 'core'),
+    'hasrows' => !empty($rows),
+    'noresultshtml' => '',
+    'downloadbuttonhtml' => '',
+    'truncatedhtml' => '',
+    'headcells' => [],
+    'rows' => [],
+    'rowcounttext' => '',
+];
 foreach ($selects as [$name, $label, $options, $selected]) {
-    echo html_writer::start_div('col-auto mb-2');
-    echo html_writer::label($label, 'id_' . $name, true, ['class' => 'd-block small']);
-    echo html_writer::select($options, $name, $selected, false,
-        ['id' => 'id_' . $name, 'class' => 'custom-select']);
-    echo html_writer::end_div();
+    $opts = [];
+    foreach ($options as $value => $optlabel) {
+        $opts[] = [
+            'value' => (string) $value,
+            'label' => $optlabel,
+            // Loose comparison on the string casts mirrors what
+            // html_writer::select_option() did before the template migration.
+            'selected' => ((string) $value == (string) $selected),
+        ];
+    }
+    $templatedata['selects'][] = ['name' => $name, 'label' => $label, 'options' => $opts];
 }
 foreach ([['topic', get_string('topic', 'core'), $topic, 'text'],
-          ['from', get_string('from', 'core'), $fromraw, 'date'],
+          ['from', get_string('transcripts:from', 'local_ai_course_assistant'), $fromraw, 'date'],
           ['to', get_string('transcripts:to', 'local_ai_course_assistant'), $toraw, 'date']] as [$n, $l, $v, $t]) {
-    echo html_writer::start_div('col-auto mb-2');
-    echo html_writer::label($l, 'id_' . $n, true, ['class' => 'd-block small']);
-    echo html_writer::empty_tag('input', ['type' => $t, 'name' => $n, 'id' => 'id_' . $n,
-        'value' => $v, 'class' => 'form-control']);
-    echo html_writer::end_div();
+    $templatedata['textinputs'][] = ['name' => $n, 'label' => $l, 'value' => $v, 'type' => $t];
 }
-echo html_writer::start_div('col-auto mb-2');
-echo html_writer::empty_tag('input', ['type' => 'submit', 'class' => 'btn btn-primary',
-    'value' => get_string('apply', 'core')]);
-echo html_writer::end_div();
-echo html_writer::end_div();
-echo html_writer::end_tag('form');
 
 // ---- results ---------------------------------------------------------------
 if (empty($rows)) {
-    echo $OUTPUT->notification(
+    $templatedata['noresultshtml'] = $OUTPUT->notification(
         get_string('nothingtodisplay', 'core'),
         \core\output\notification::NOTIFY_WARNING);
 } else {
@@ -196,12 +198,11 @@ if (empty($rows)) {
     $dlparams['download'] = 1;
     $dlparams['sesskey'] = sesskey();
     $dl = new moodle_url($pageurl, $dlparams);
-    echo html_writer::div(
-        $OUTPUT->single_button($dl, get_string('download', 'core'), 'get'),
-        'mb-3');
+    $templatedata['downloadbuttonhtml'] = $OUTPUT->single_button($dl, get_string('download', 'core'), 'get');
 
     if (count($rows) >= transcript_report::MAX_ROWS) {
-        echo $OUTPUT->notification(get_string('transcripts:truncated', 'local_ai_course_assistant',
+        $templatedata['truncatedhtml'] = $OUTPUT->notification(
+            get_string('transcripts:truncated', 'local_ai_course_assistant',
             transcript_report::MAX_ROWS), \core\output\notification::NOTIFY_WARNING);
     }
 
@@ -221,20 +222,34 @@ if (empty($rows)) {
         'last'         => ['last', 'core'],
         'outcomes'     => ['outcomes', 'grades'],
     ];
-    $table = new html_table();
-    $table->head = array_map(static function ($k) use ($colstrings) {
+    // Cell text is escaped by the template ({{var}} runs through s(), same as
+    // the html_table cells did); the cN/lastcol/lastrow classes reproduce the
+    // ones html_writer::table() generated.
+    $colkeys = array_keys($rows[0]);
+    $lastcol = count($colkeys) - 1;
+    foreach ($colkeys as $i => $k) {
         [$id, $comp] = $colstrings[$k] ?? ['transcripts:col_' . $k, 'local_ai_course_assistant'];
-        return get_string($id, $comp);
-    }, array_keys($rows[0]));
-    $table->attributes['class'] = 'generaltable table-sm';
-    foreach ($rows as $r) {
-        $table->data[] = array_map(static function ($v) {
-            return s((string) $v);
-        }, array_values($r));
+        $templatedata['headcells'][] = [
+            'label' => get_string($id, $comp),
+            'class' => 'header c' . $i . ($i === $lastcol ? ' lastcol' : ''),
+        ];
     }
-    echo html_writer::table($table);
-    echo html_writer::div(get_string('transcripts:rowcount', 'local_ai_course_assistant',
-        count($rows)), 'text-muted small');
+    $lastrow = count($rows) - 1;
+    foreach (array_values($rows) as $ri => $r) {
+        $cells = [];
+        foreach (array_values($r) as $ci => $v) {
+            $cells[] = [
+                'value' => (string) $v,
+                'class' => 'cell c' . $ci . ($ci === $lastcol ? ' lastcol' : ''),
+            ];
+        }
+        $templatedata['rows'][] = ['lastrow' => ($ri === $lastrow), 'cells' => $cells];
+    }
+    $templatedata['rowcounttext'] = get_string('transcripts:rowcount', 'local_ai_course_assistant',
+        count($rows));
 }
 
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('transcripts:title', 'local_ai_course_assistant'));
+echo $OUTPUT->render_from_template('local_ai_course_assistant/transcript_report', $templatedata);
 echo $OUTPUT->footer();

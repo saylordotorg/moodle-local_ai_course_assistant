@@ -467,9 +467,86 @@ $templatedata = [
     'url_30'             => $makeurl(30, $courseid),
     'url_90'             => $makeurl(90, $courseid),
     'url_all'            => $makeurl(0, $courseid),
-    'rate_cards'         => token_cost_manager::get_all_rates(),
+    'rate_cards'         => array_map(function (array $rc) {
+        $rc['price_label'] = get_string('token_analytics:rate_in_out', 'local_ai_course_assistant', (object) [
+            'in'  => $rc['input_per_1m'],
+            'out' => $rc['output_per_1m'],
+        ]);
+        return $rc;
+    }, token_cost_manager::get_all_rates()),
     'analytics_url'      => (new moodle_url('/local/ai_course_assistant/analytics.php'))->out(false),
 ];
+
+// Static UI strings, resolved server-side so the template stays free of
+// {{#str}} helpers (every label below is plain data by the time the
+// template sees it). Parameterized notes are pre-rendered here for the
+// same reason the cost_partial_note above is.
+$strs = [
+    'str_back'                  => 'token_analytics:back_to_analytics',
+    'str_heading'               => 'token_analytics:heading',
+    'str_period'                => 'token_analytics:filter_period',
+    'str_range_all'             => 'token_analytics:range_all',
+    'str_course'                => 'token_analytics:filter_course',
+    'str_card_responses'        => 'token_analytics:card_responses',
+    'str_card_prompt'           => 'token_analytics:card_prompt_tokens',
+    'str_card_completion'       => 'token_analytics:card_completion_tokens',
+    'str_card_total'            => 'token_analytics:card_total_tokens',
+    'str_card_cost'             => 'token_analytics:card_estimated_cost',
+    'str_spend_title'           => 'token_analytics:spend_title',
+    'str_col_scope'             => 'token_analytics:col_scope',
+    'str_col_spent'             => 'token_analytics:col_spent',
+    'str_col_cap'               => 'token_analytics:col_cap',
+    'str_col_status'            => 'token_analytics:col_status',
+    'str_no_cap'                => 'token_analytics:no_cap',
+    'str_opt_title'             => 'token_analytics:opt_title',
+    'str_col_capability'        => 'token_analytics:col_capability',
+    'str_col_active'            => 'token_analytics:col_active',
+    'str_col_recommendations'   => 'token_analytics:col_recommendations',
+    'str_bycat_title'           => 'token_analytics:bycat_title',
+    'str_bycat_sub'             => 'token_analytics:bycat_sub',
+    'str_col_category'          => 'token_analytics:col_category',
+    'str_col_responses'         => 'token_analytics:col_responses',
+    'str_col_prompt_tokens'     => 'token_analytics:col_prompt_tokens',
+    'str_col_completion_tokens' => 'token_analytics:col_completion_tokens',
+    'str_col_total_tokens'      => 'token_analytics:col_total_tokens',
+    'str_bymodel_title'         => 'token_analytics:bymodel_title',
+    'str_bymodel_sub'           => 'token_analytics:bymodel_sub',
+    'str_col_model'             => 'token_analytics:col_model',
+    'str_col_provider'          => 'token_analytics:col_provider',
+    'str_col_est_cost'          => 'token_analytics:col_est_cost',
+    'str_no_data_tracking'      => 'token_analytics:no_data_tracking',
+    'str_no_data'               => 'token_analytics:no_data',
+    'str_avatar_sub'            => 'analytics:avatar_cost_sub',
+    'str_avatar_total_row'      => 'analytics:avatar_cost_total_row',
+    'str_bystudent_title'       => 'token_analytics:bystudent_title',
+    'str_bystudent_sub'         => 'token_analytics:bystudent_sub',
+    'str_col_student'           => 'token_analytics:col_student',
+    'str_ratecard_title'        => 'token_analytics:ratecard_title',
+];
+foreach ($strs as $key => $identifier) {
+    $templatedata[$key] = get_string($identifier, 'local_ai_course_assistant');
+}
+$templatedata['str_range_7']  = get_string('token_analytics:range_days', 'local_ai_course_assistant', 7);
+$templatedata['str_range_30'] = get_string('token_analytics:range_days', 'local_ai_course_assistant', 30);
+$templatedata['str_range_90'] = get_string('token_analytics:range_days', 'local_ai_course_assistant', 90);
+$templatedata['str_card_cached'] = get_string('token_analytics:card_cached_tokens', 'local_ai_course_assistant', $cachepct);
+$templatedata['str_spend_sub'] = get_string('token_analytics:spend_sub', 'local_ai_course_assistant', (object) [
+    'period' => $templatedata['spend_period_label'],
+    'start'  => $templatedata['spend_period_start'],
+]);
+// Rendered unescaped in the template ({{{ }}}): the string carries a <strong>
+// wrapper / a <code> literal; every interpolated value is escaped here first.
+$templatedata['str_opt_sub'] = get_string('token_analytics:opt_sub', 'local_ai_course_assistant', (object) [
+    'amount'     => s($projection['amount']),
+    'days'       => s($projection['days']),
+    'confidence' => s($projection['confidence']),
+]);
+$templatedata['str_missing_note'] = get_string(
+    'token_analytics:missing_note',
+    'local_ai_course_assistant',
+    s(number_format($missingcount))
+);
+$templatedata['str_ratecard_sub'] = get_string('token_analytics:ratecard_sub', 'local_ai_course_assistant');
 
 // v4.10.0: talking-avatar cost rollup. Same range + courseid filters as
 // the LLM rollup; uses the dedicated avatar session log + per-minute rate

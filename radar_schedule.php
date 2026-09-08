@@ -75,7 +75,7 @@ try {
             $row = radar_schedule_manager::get($id);
             if (!$row) {
                 http_response_code(404);
-                echo json_encode(['ok' => false, 'error' => 'Schedule not found']);
+                echo json_encode(['ok' => false, 'error' => get_string('radar:err_schedule_not_found', 'local_ai_course_assistant')]);
                 return;
             }
             echo json_encode(['ok' => true, 'schedule' => $row]);
@@ -128,7 +128,7 @@ try {
             }
             if ($data['name'] === '' || $data['query'] === '') {
                 http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'Name and query are required']);
+                echo json_encode(['ok' => false, 'error' => get_string('radar:err_name_query_required', 'local_ai_course_assistant')]);
                 return;
             }
             $id = radar_schedule_manager::save($data, (int) $USER->id);
@@ -147,7 +147,7 @@ try {
             $row = radar_schedule_manager::get($id);
             if (!$row) {
                 http_response_code(404);
-                echo json_encode(['ok' => false, 'error' => 'Schedule not found']);
+                echo json_encode(['ok' => false, 'error' => get_string('radar:err_schedule_not_found', 'local_ai_course_assistant')]);
                 return;
             }
             radar_schedule_manager::save([
@@ -171,7 +171,7 @@ try {
 
         default:
             http_response_code(400);
-            echo json_encode(['ok' => false, 'error' => 'Unknown action']);
+            echo json_encode(['ok' => false, 'error' => get_string('radar:err_unknown_action', 'local_ai_course_assistant')]);
     }
 } catch (\Throwable $e) {
     http_response_code(500);

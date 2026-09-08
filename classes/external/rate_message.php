@@ -84,7 +84,12 @@ class rate_message extends external_api {
             MUST_EXIST
         );
         if ((int) $conv->userid !== (int) $USER->id) {
-            throw new \moodle_exception('nopermissions', 'error', '', 'rate this message');
+            throw new \moodle_exception(
+                'nopermissions',
+                'error',
+                '',
+                get_string('realtime:action_rate_message', 'local_ai_course_assistant')
+            );
         }
 
         // Check for existing rating by this user on this message.

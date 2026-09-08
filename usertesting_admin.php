@@ -78,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             if ($ttype === 'action_then_rate') {
                 $item['rating_label'] = clean_param(
-                    (string) ($t['rating_label'] ?? 'Rate this task'),
+                    (string) ($t['rating_label']
+                        ?? get_string('usertesting_admin:rating_label_default', 'local_ai_course_assistant')),
                     PARAM_TEXT
                 );
                 $item['min'] = (int) ($t['min'] ?? 1);
@@ -146,7 +147,9 @@ usertesting_manager::ensure_default_taskset();
 $taskset = usertesting_manager::get_active_taskset($courseid);
 $is_inherited = ($taskset && (int) $taskset->courseid !== $courseid && $courseid > 0);
 $tasks = $taskset ? $taskset->tasks : usertesting_manager::DEFAULT_TASKS;
-$title = $taskset ? $taskset->title : 'SOLA Usability Test';
+$title = $taskset
+    ? $taskset->title
+    : \local_ai_course_assistant\branding::str('usertesting_admin:default_title');
 $externalurl = ($taskset && isset($taskset->external_url)) ? $taskset->external_url : '';
 
 // Get list of courses.
@@ -182,6 +185,8 @@ $jsstrings = [
     'options'             => get_string('survey_admin:options', 'local_ai_course_assistant'),
     'optionn'             => get_string('survey_admin:option_n', 'local_ai_course_assistant', '{n}'),
     'addoption'           => get_string('survey_admin:add_option', 'local_ai_course_assistant'),
+    'newoption'           => get_string('survey_admin:new_option', 'local_ai_course_assistant'),
+    'ratinglabeldefault'  => get_string('usertesting_admin:rating_label_default', 'local_ai_course_assistant'),
     'addprompt'           => get_string('usertesting_admin:additional_prompt', 'local_ai_course_assistant'),
     'addpromptaria'       => get_string('usertesting_admin:additional_prompt_aria', 'local_ai_course_assistant'),
     'confirmreset'        => $courseid > 0
@@ -369,8 +374,8 @@ echo $OUTPUT->header();
         });
         typeSelect.addEventListener('change', function() {
             t.type = typeSelect.value;
-            if (t.type === 'action_then_rate') { t.rating_label = t.rating_label || 'Rate this task'; t.min = t.min || 1; t.max = t.max || 5; }
-            if (t.type === 'multiple_choice' && !t.options) { t.options = ['Option 1', 'Option 2']; }
+            if (t.type === 'action_then_rate') { t.rating_label = t.rating_label || STR.ratinglabeldefault; t.min = t.min || 1; t.max = t.max || 5; }
+            if (t.type === 'multiple_choice' && !t.options) { t.options = [STR.optionn.replace('{n}', 1), STR.optionn.replace('{n}', 2)]; }
             renderAll();
         });
         typeField.appendChild(typeSelect);
@@ -440,7 +445,7 @@ echo $OUTPUT->header();
             card.appendChild(optList);
             var addOpt = document.createElement('div'); addOpt.className = 'aica-ut-add-opt';
             addOpt.textContent = STR.addoption;
-            addOpt.addEventListener('click', function() { if (!t.options) t.options = []; t.options.push('New option'); renderAll(); });
+            addOpt.addEventListener('click', function() { if (!t.options) t.options = []; t.options.push(STR.newoption); renderAll(); });
             card.appendChild(addOpt);
         }
 
@@ -457,7 +462,7 @@ echo $OUTPUT->header();
     }
 
     addBtn.addEventListener('click', function() {
-        tasks.push({type: 'action_then_rate', instruction: '', rating_label: 'Rate this task', min: 1, max: 5, min_label: '', max_label: '', follow_up: ''});
+        tasks.push({type: 'action_then_rate', instruction: '', rating_label: STR.ratinglabeldefault, min: 1, max: 5, min_label: '', max_label: '', follow_up: ''});
         renderAll();
         var cards = container.querySelectorAll('.aica-ut-card');
         if (cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'center'});

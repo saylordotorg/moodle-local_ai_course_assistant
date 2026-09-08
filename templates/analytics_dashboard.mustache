@@ -22,33 +22,43 @@
 
     Example context (json):
     {
-        "settings_url": "#",
-        "token_analytics_url": "#",
-        "analytics_base_url": "#",
-        "form_action": "https://example.invalid/local/ai_course_assistant/analytics.php",
-        "experiment_form_action": "https://example.invalid/local/ai_course_assistant/analytics.php",
-        "meta_ai_sse_url": "https://example.invalid/local/ai_course_assistant/meta_ai_sse.php",
-        "sesskey": "abc123",
-        "courseid_param": 0,
-        "range": 30,
-        "enabled_courses": 12,
-        "total_courses": 24,
-        "active_courses": 9,
-        "total_messages_all": 1420,
-        "active_students_all": 318,
-        "has_courses": false,
-        "show_real_names": false,
-        "student_mode": false,
-        "has_meta_ai_providers": false
+            "settings_url": "#",
+            "token_analytics_url": "#",
+            "analytics_base_url": "#",
+            "form_action": "https://example.invalid/local/ai_course_assistant/analytics.php",
+            "experiment_form_action": "https://example.invalid/local/ai_course_assistant/analytics.php",
+            "meta_ai_sse_url": "https://example.invalid/local/ai_course_assistant/meta_ai_sse.php",
+            "sesskey": "abc123",
+            "courseid_param": 0,
+            "range": 30,
+            "enabled_courses": 12,
+            "total_courses": 24,
+            "active_courses": 9,
+            "total_messages_all": 1420,
+            "active_students_all": 318,
+            "has_courses": false,
+            "show_real_names": false,
+            "student_mode": false,
+            "has_meta_ai_providers": false,
+            "str_scope_all": "All courses",
+            "str_all_courses": "All courses",
+            "str_scope_current": "Current course only",
+            "str_scope_custom": "Specific course IDs…",
+            "str_scope_byprovider": "By LLM provider used",
+            "str_last_24_hours": "Last 24 hours",
+            "str_last_7_days": "Last 7 days",
+            "str_last_30_days": "Last 30 days",
+            "str_last_90_days": "Last 90 days",
+            "str_all_time": "All time"
     }
 }}
 <div class="local-ai-tutor-analytics">
 
     {{! Navigation + Anonymization toggle }}
     <div class="mb-3 d-flex flex-wrap align-items-center" style="gap:8px">
-        <a href="{{settings_url}}" class="btn btn-sm btn-outline-secondary">&larr; Plugin Settings</a>
-        <a href="{{token_analytics_url}}" class="btn btn-sm btn-outline-secondary">&#36; Token Usage &amp; Cost</a>
-        <a href="{{export_csv_url}}" class="btn btn-sm btn-outline-secondary" title="Download analytics as CSV">&#8615; Export CSV</a>
+        <a href="{{settings_url}}" class="btn btn-sm btn-outline-secondary">&larr; {{str_plugin_settings}}</a>
+        <a href="{{token_analytics_url}}" class="btn btn-sm btn-outline-secondary">&#36; {{str_token_usage_cost}}</a>
+        <a href="{{export_csv_url}}" class="btn btn-sm btn-outline-secondary" title="{{str_export_csv_title}}">&#8615; {{str_export_csv}}</a>
         <div style="margin-left:auto;display:flex;gap:8px">
             <form method="post" action="{{form_action}}" style="display:inline">
                 <input type="hidden" name="sesskey" value="{{sesskey}}">
@@ -56,7 +66,7 @@
                 <input type="hidden" name="courseid" value="{{courseid_param}}">
                 <input type="hidden" name="range" value="{{range}}">
                 <button type="submit" class="btn btn-sm {{#show_real_names}}btn-warning{{/show_real_names}}{{^show_real_names}}btn-outline-secondary{{/show_real_names}}">
-                    {{#show_real_names}}&#128275; Hide Real Names{{/show_real_names}}{{^show_real_names}}&#128274; Show Real Names{{/show_real_names}}
+                    {{#show_real_names}}&#128275; {{str_hide_real_names}}{{/show_real_names}}{{^show_real_names}}&#128274; {{str_show_real_names}}{{/show_real_names}}
                 </button>
             </form>
             <form method="post" action="{{form_action}}" style="display:inline">
@@ -65,26 +75,26 @@
                 <input type="hidden" name="courseid" value="{{courseid_param}}">
                 <input type="hidden" name="range" value="{{range}}">
                 <button type="submit" class="btn btn-sm {{#student_mode}}btn-info{{/student_mode}}{{^student_mode}}btn-outline-secondary{{/student_mode}}">
-                    {{#student_mode}}Exit Student Mode{{/student_mode}}{{^student_mode}}Student Mode{{/student_mode}}
+                    {{#student_mode}}{{str_exit_student_mode}}{{/student_mode}}{{^student_mode}}{{str_student_mode}}{{/student_mode}}
                 </button>
             </form>
         </div>
     </div>
     {{#show_real_names}}
     <div class="alert alert-warning py-2 mb-3" style="font-size:13px">
-        <strong>Real names are visible.</strong> Student data is not anonymized in this session. Toggle off before sharing your screen or leaving this page.
+        {{{str_real_names_warning}}}
     </div>
     {{/show_real_names}}
     {{#student_mode}}
     <div class="alert alert-info py-2 mb-3" style="font-size:13px">
-        <strong>Student Mode active.</strong> The SOLA widget on course pages now shows exactly what students see. Exit here or press Ctrl+Shift+A from any page.
+        {{{str_student_mode_notice}}}
     </div>
     {{/student_mode}}
 
     {{! ═══ Header summary line ═══ }}
     <p class="text-muted small mb-3">
-        {{enabled_courses}} of {{total_courses}} courses have AI Assistant enabled —
-        <a href="{{courses_admin_url}}">manage course enrollment &rarr;</a>
+        {{str_courses_enabled_summary}} —
+        <a href="{{courses_admin_url}}">{{str_manage_course_enrollment}} &rarr;</a>
     </p>
 
     {{! ═══ Learning Radar (always visible — no collapse) ═══ }}
@@ -97,29 +107,31 @@
          data-sesskey="{{sesskey}}"
          data-courseid="{{courseid_param}}"
          data-range="{{range}}"
+         data-name-prompt="{{radar_name_prompt}}"
+         data-redash-name-tpl="{{radar_redash_name_tpl}}"
          data-providers='{{{meta_ai_providers_json}}}'>
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="gap:8px">
-            <h4 class="mb-0">Learning Radar
-                <small class="text-muted" style="font-size:13px">— ask questions about anonymized student data</small>
+            <h4 class="mb-0">{{str_radar_heading}}
+                <small class="text-muted" style="font-size:13px">— {{str_radar_subtitle}}</small>
             </h4>
             <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-share" title="Copy a link that pre-fills this query for another admin">
-                    &#128279; Copy share link
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-share" title="{{str_radar_share_title}}">
+                    &#128279; {{str_radar_share}}
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-toggle-schedules"
                         data-bs-toggle="collapse" data-bs-target="#radar-schedules-body" aria-controls="radar-schedules-body" aria-expanded="false">
-                    &#9881; Schedules (<span id="radar-schedule-count">{{radar_schedule_count}}</span>)
+                    &#9881; {{str_radar_schedules}} (<span id="radar-schedule-count">{{radar_schedule_count}}</span>)
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="radar-toggle-history"
                         data-bs-toggle="collapse" data-bs-target="#radar-history-body" aria-controls="radar-history-body" aria-expanded="false">
-                    &#128240; History
+                    &#128240; {{str_radar_history}}
                 </button>
             </div>
         </div>
         <div class="card-body">
 
             {{! Suggested starters (curated, always shown) }}
-            <div class="text-muted small mb-1">Try a question:</div>
+            <div class="text-muted small mb-1">{{str_radar_try_question}}</div>
             <div class="learning-radar-starters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
                 {{#learning_radar_starters}}
                 <button type="button" class="learning-radar-starter btn btn-sm btn-outline-primary"
@@ -132,7 +144,7 @@
 
             {{! Live metric chips (data-derived, click-to-query) }}
             {{#learning_radar_chips.0}}
-            <div class="text-muted small mb-1">Or click a metric to dig in:</div>
+            <div class="text-muted small mb-1">{{str_radar_click_metric}}</div>
             <div class="learning-radar-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
                 {{#learning_radar_chips}}
                 <button type="button"
@@ -149,40 +161,40 @@
             {{! Provider/model/scope/range row }}
             <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px">
                 <div>
-                    <label for="ai-analysis-provider" class="small text-muted mb-0">Provider</label>
+                    <label for="ai-analysis-provider" class="small text-muted mb-0">{{str_provider}}</label>
                     <select id="ai-analysis-provider" class="form-control form-control-sm" style="width:180px"></select>
                 </div>
                 <div>
-                    <label for="ai-analysis-model" class="small text-muted mb-0">Model</label>
+                    <label for="ai-analysis-model" class="small text-muted mb-0">{{str_model}}</label>
                     <select id="ai-analysis-model" class="form-control form-control-sm" style="width:200px"></select>
                 </div>
                 <div>
-                    <label for="ai-analysis-scope" class="small text-muted mb-0">Data scope</label>
+                    <label for="ai-analysis-scope" class="small text-muted mb-0">{{str_data_scope}}</label>
                     <select id="ai-analysis-scope" class="form-control form-control-sm" style="width:200px">
-                        <option value="all">All courses</option>
-                        <option value="current" {{#courseid_param}}selected{{/courseid_param}}>Current course only</option>
-                        <option value="custom">Specific course IDs...</option>
-                        <option value="byprovider">By LLM provider used...</option>
+                        <option value="all">{{str_all_courses}}</option>
+                        <option value="current" {{#courseid_param}}selected{{/courseid_param}}>{{str_scope_current}}</option>
+                        <option value="custom">{{str_scope_custom}}</option>
+                        <option value="byprovider">{{str_scope_byprovider}}</option>
                     </select>
                 </div>
                 <div id="ai-analysis-scope-detail" style="display:none">
-                    <label for="ai-analysis-scope-value" class="small text-muted mb-0">Course IDs or provider</label>
-                    <input type="text" id="ai-analysis-scope-value" class="form-control form-control-sm" style="width:200px" placeholder="e.g. 2,5,12 or openai">
+                    <label for="ai-analysis-scope-value" class="small text-muted mb-0">{{str_scope_detail_label}}</label>
+                    <input type="text" id="ai-analysis-scope-value" class="form-control form-control-sm" style="width:200px" placeholder="{{str_scope_detail_placeholder}}">
                 </div>
                 <div>
-                    <label for="ai-analysis-range-select" class="small text-muted mb-0">Range</label>
+                    <label for="ai-analysis-range-select" class="small text-muted mb-0">{{str_range}}</label>
                     <select id="ai-analysis-range-select" class="form-control form-control-sm" style="width:140px">
-                        <option value="1">Last 24 hours</option>
-                        <option value="7">Last 7 days</option>
-                        <option value="30" selected>Last 30 days</option>
-                        <option value="90">Last 90 days</option>
-                        <option value="0">All time</option>
+                        <option value="1">{{str_last_24_hours}}</option>
+                        <option value="7">{{str_last_7_days}}</option>
+                        <option value="30" selected>{{str_last_30_days}}</option>
+                        <option value="90">{{str_last_90_days}}</option>
+                        <option value="0">{{str_all_time}}</option>
                     </select>
                 </div>
                 <div class="form-check ml-2" style="margin-top:18px">
                     <input class="form-check-input" type="checkbox" id="ai-analysis-compare">
-                    <label class="form-check-label small" for="ai-analysis-compare" title="Run the same query against a second provider/model">
-                        Compare 2 models
+                    <label class="form-check-label small" for="ai-analysis-compare" title="{{str_compare_two_models_title}}">
+                        {{str_compare_two_models}}
                     </label>
                 </div>
             </div>
@@ -190,52 +202,52 @@
             {{! Compare-mode second provider/model (shown only when toggle is on) }}
             <div class="d-flex flex-wrap align-items-end mb-2" style="gap:8px;display:none" id="ai-analysis-compare-row">
                 <div>
-                    <label for="ai-analysis-provider-b" class="small text-muted mb-0">Provider B</label>
+                    <label for="ai-analysis-provider-b" class="small text-muted mb-0">{{str_provider_b}}</label>
                     <select id="ai-analysis-provider-b" class="form-control form-control-sm" style="width:180px"></select>
                 </div>
                 <div>
-                    <label for="ai-analysis-model-b" class="small text-muted mb-0">Model B</label>
+                    <label for="ai-analysis-model-b" class="small text-muted mb-0">{{str_model_b}}</label>
                     <select id="ai-analysis-model-b" class="form-control form-control-sm" style="width:200px"></select>
                 </div>
-                <div class="text-muted small" style="margin-left:auto">⚠ Compare runs 2 queries — cost will roughly double.</div>
+                <div class="text-muted small" style="margin-left:auto">⚠ {{str_compare_cost_warning}}</div>
             </div>
 
             {{! Two side-by-side message panes (right hidden when not comparing) }}
             <div id="ai-analysis-panes" style="display:flex;gap:8px;margin-bottom:12px">
                 <div id="ai-analysis-messages" style="flex:1;max-height:420px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;background:#f8f9fa;font-size:14px;min-width:0">
-                    <p class="text-muted mb-0" style="font-size:13px">All data is anonymized. Pick a starter above, click a metric, or type a question.</p>
+                    <p class="text-muted mb-0" style="font-size:13px">{{str_radar_intro}}</p>
                 </div>
                 <div id="ai-analysis-messages-b" style="display:none;flex:1;max-height:420px;overflow-y:auto;border:1px solid #dee2e6;border-radius:6px;padding:12px;background:#f8f9fa;font-size:14px;min-width:0"></div>
             </div>
 
             <div class="input-group">
                 <input type="text" id="ai-analysis-input" class="form-control"
-                       placeholder="Ask about student data, trends, costs, feedback...">
+                       placeholder="{{str_input_placeholder}}">
                 <div class="input-group-append" style="display:flex;flex-wrap:wrap;gap:0">
-                    <button class="btn btn-primary" id="ai-analysis-send" type="button">Send</button>
+                    <button class="btn btn-primary" id="ai-analysis-send" type="button">{{str_send}}</button>
                     <button class="btn btn-outline-secondary dropdown-toggle" id="radar-export-toggle" type="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                        Export
+                        {{str_export_menu}}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="radar-export-menu">
-                        <li><h6 class="dropdown-header">Download</h6></li>
-                        <li><a class="dropdown-item" data-export="json" href="#">JSON</a></li>
-                        <li><a class="dropdown-item" data-export="csv" href="#">CSV</a></li>
-                        <li><a class="dropdown-item" data-export="markdown" href="#">Markdown</a></li>
-                        <li><a class="dropdown-item" data-export="pdf" href="#">PDF (print)</a></li>
+                        <li><h6 class="dropdown-header">{{str_download}}</h6></li>
+                        <li><a class="dropdown-item" data-export="json" href="#">{{str_json}}</a></li>
+                        <li><a class="dropdown-item" data-export="csv" href="#">{{str_csv}}</a></li>
+                        <li><a class="dropdown-item" data-export="markdown" href="#">{{str_markdown}}</a></li>
+                        <li><a class="dropdown-item" data-export="pdf" href="#">{{str_pdf_print}}</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><h6 class="dropdown-header">Send</h6></li>
-                        <li><a class="dropdown-item" data-send="email" href="#">Email&hellip;</a></li>
-                        <li><a class="dropdown-item" data-send="slack" href="#">Slack webhook&hellip;</a></li>
-                        <li><a class="dropdown-item" data-send="teams" href="#">Teams webhook&hellip;</a></li>
+                        <li><h6 class="dropdown-header">{{str_send}}</h6></li>
+                        <li><a class="dropdown-item" data-send="email" href="#">{{str_send_email}}</a></li>
+                        <li><a class="dropdown-item" data-send="slack" href="#">{{str_send_slack}}</a></li>
+                        <li><a class="dropdown-item" data-send="teams" href="#">{{str_send_teams}}</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><h6 class="dropdown-header">Redash</h6></li>
-                        <li><a class="dropdown-item" data-redash-push href="#">Send to Redash&hellip;</a></li>
-                        <li><a class="dropdown-item" data-redash-setup href="#">Set up Redash&hellip;</a></li>
+                        <li><h6 class="dropdown-header">{{str_redash}}</h6></li>
+                        <li><a class="dropdown-item" data-redash-push href="#">{{str_redash_push}}</a></li>
+                        <li><a class="dropdown-item" data-redash-setup href="#">{{str_redash_setup}}</a></li>
                     </ul>
                     <button class="btn btn-outline-secondary" id="radar-schedule-this" type="button"
-                            title="Save this query as a recurring scheduled report">
-                        &#128338; Schedule&hellip;
+                            title="{{str_schedule_this_title}}">
+                        &#128338; {{str_schedule_this}}
                     </button>
                 </div>
             </div>
@@ -246,18 +258,18 @@
         <div class="collapse border-top" id="radar-schedules-body">
             <div class="card-body" id="radar-schedules-pane">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0">Scheduled Queries</h5>
-                    <button class="btn btn-sm btn-outline-primary" id="radar-new-schedule" type="button">+ New schedule</button>
+                    <h5 class="mb-0">{{str_scheduled_queries}}</h5>
+                    <button class="btn btn-sm btn-outline-primary" id="radar-new-schedule" type="button">+ {{str_new_schedule}}</button>
                 </div>
                 {{#has_radar_schedules}}
                 <table class="table table-sm" id="radar-schedule-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Frequency</th>
-                            <th>Channels</th>
-                            <th>Last run</th>
-                            <th>Status</th>
+                            <th>{{str_name}}</th>
+                            <th>{{str_frequency}}</th>
+                            <th>{{str_channels}}</th>
+                            <th>{{str_last_run}}</th>
+                            <th>{{str_status}}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -267,9 +279,9 @@
                             <td><strong>{{name}}</strong></td>
                             <td>{{frequency}}</td>
                             <td>
-                                {{#recipient}}<span class="badge bg-secondary me-1" title="{{recipient}}">email</span>{{/recipient}}
-                                {{#has_slack}}<span class="badge bg-secondary me-1">slack</span>{{/has_slack}}
-                                {{#has_teams}}<span class="badge bg-secondary me-1">teams</span>{{/has_teams}}
+                                {{#recipient}}<span class="badge bg-secondary me-1" title="{{recipient}}">{{str_channel_email}}</span>{{/recipient}}
+                                {{#has_slack}}<span class="badge bg-secondary me-1">{{str_channel_slack}}</span>{{/has_slack}}
+                                {{#has_teams}}<span class="badge bg-secondary me-1">{{str_channel_teams}}</span>{{/has_teams}}
                             </td>
                             <td>{{last_run}}</td>
                             <td>
@@ -277,12 +289,12 @@
                                 {{^last_status}}—{{/last_status}}
                             </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-outline-secondary radar-sched-edit" data-id="{{id}}">Edit</button>
+                                <button class="btn btn-sm btn-outline-secondary radar-sched-edit" data-id="{{id}}">{{str_edit}}</button>
                                 <button class="btn btn-sm btn-outline-{{#enabled}}warning{{/enabled}}{{^enabled}}success{{/enabled}} radar-sched-toggle"
                                         data-id="{{id}}" data-enabled="{{#enabled}}0{{/enabled}}{{^enabled}}1{{/enabled}}">
-                                    {{#enabled}}Pause{{/enabled}}{{^enabled}}Enable{{/enabled}}
+                                    {{#enabled}}{{str_pause}}{{/enabled}}{{^enabled}}{{str_enable}}{{/enabled}}
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger radar-sched-delete" data-id="{{id}}">Delete</button>
+                                <button class="btn btn-sm btn-outline-danger radar-sched-delete" data-id="{{id}}">{{str_delete}}</button>
                             </td>
                         </tr>
                         {{/radar_schedules}}
@@ -290,7 +302,7 @@
                 </table>
                 {{/has_radar_schedules}}
                 {{^has_radar_schedules}}
-                <p class="text-muted mb-0">No scheduled queries yet. Run a query above and click "Schedule" to set one up.</p>
+                <p class="text-muted mb-0">{{str_no_schedules}}</p>
                 {{/has_radar_schedules}}
             </div>
         </div>
@@ -299,18 +311,18 @@
         <div class="collapse border-top" id="radar-history-body">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap" style="gap:8px">
-                    <h5 class="mb-0">Past Queries</h5>
+                    <h5 class="mb-0">{{str_past_queries}}</h5>
                     <input type="text" id="radar-history-search" class="form-control form-control-sm" style="max-width:280px"
-                           placeholder="Search query text&hellip;" aria-label="Search past queries">
+                           placeholder="{{str_search_placeholder}}" aria-label="{{str_search_aria}}">
                 </div>
                 {{#has_radar_past}}
                 <table class="table table-sm table-striped" id="radar-history-table">
                     <thead>
                         <tr>
-                            <th>When</th>
-                            <th>Query</th>
-                            <th>Provider</th>
-                            <th>Type</th>
+                            <th>{{str_when}}</th>
+                            <th>{{str_query}}</th>
+                            <th>{{str_provider}}</th>
+                            <th>{{str_type}}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -321,11 +333,11 @@
                             <td><div style="max-width:480px">{{query}}</div></td>
                             <td><small>{{provider}}<br>{{model}}</small></td>
                             <td>
-                                {{#scheduled}}<span class="badge bg-info-subtle">scheduled</span>{{/scheduled}}
-                                {{^scheduled}}<span class="badge bg-secondary-subtle">ad-hoc</span>{{/scheduled}}
+                                {{#scheduled}}<span class="badge bg-info-subtle">{{str_badge_scheduled}}</span>{{/scheduled}}
+                                {{^scheduled}}<span class="badge bg-secondary-subtle">{{str_badge_adhoc}}</span>{{/scheduled}}
                             </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-outline-secondary radar-history-rerun" data-id="{{id}}">Re-run</button>
+                                <button class="btn btn-sm btn-outline-secondary radar-history-rerun" data-id="{{id}}">{{str_rerun}}</button>
                             </td>
                         </tr>
                         {{/radar_past}}
@@ -333,7 +345,7 @@
                 </table>
                 {{/has_radar_past}}
                 {{^has_radar_past}}
-                <p class="text-muted mb-0">No queries run yet.</p>
+                <p class="text-muted mb-0">{{str_no_queries}}</p>
                 {{/has_radar_past}}
             </div>
         </div>
@@ -345,59 +357,59 @@
     {{#has_course_selected}}
     <hr>
     <div class="mb-2">
-        <a href="{{analytics_base_url}}" class="btn btn-sm btn-outline-secondary">&larr; Back to All Courses</a>
+        <a href="{{analytics_base_url}}" class="btn btn-sm btn-outline-secondary">&larr; {{str_back_all_courses}}</a>
     </div>
     <h2>{{course.coursename}}</h2>
 
     {{! Time range selector }}
     <div class="mb-3">
-        <span class="mr-2"><strong>Time Range:</strong></span>
+        <span class="mr-2"><strong>{{str_time_range}}:</strong></span>
         <div class="btn-group" role="group">
             <a href="{{url_7}}" class="btn btn-sm {{#range_7_selected}}btn-primary{{/range_7_selected}}{{^range_7_selected}}btn-outline-secondary{{/range_7_selected}}">
-                Last 7 days
+                {{str_last_7_days}}
             </a>
             <a href="{{url_30}}" class="btn btn-sm {{#range_30_selected}}btn-primary{{/range_30_selected}}{{^range_30_selected}}btn-outline-secondary{{/range_30_selected}}">
-                Last 30 days
+                {{str_last_30_days}}
             </a>
             <a href="{{url_all}}" class="btn btn-sm {{#range_all_selected}}btn-primary{{/range_all_selected}}{{^range_all_selected}}btn-outline-secondary{{/range_all_selected}}">
-                All time
+                {{str_all_time}}
             </a>
         </div>
         <a href="{{course.token_analytics_url}}" class="btn btn-sm btn-outline-secondary ml-2">
-            &#36; Token Usage &amp; Cost &rarr;
+            &#36; {{str_token_usage_cost}} &rarr;
         </a>
     </div>
 
     {{^course.has_data}}
-    <div class="alert alert-info">No AI Assistant usage data for this course yet.</div>
+    <div class="alert alert-info">{{str_no_usage_data}}</div>
     {{/course.has_data}}
 
     {{#course.has_data}}
 
     {{! Overview cards }}
-    <h3>Overview</h3>
+    <h3>{{str_overview}}</h3>
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Conversations</h5>
+                <h5 class="card-title text-muted">{{str_conversations}}</h5>
                 <p class="display-4">{{course.overview.total_conversations}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Messages</h5>
+                <h5 class="card-title text-muted">{{str_messages}}</h5>
                 <p class="display-4">{{course.overview.total_messages}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Active Students</h5>
+                <h5 class="card-title text-muted">{{str_active_students}}</h5>
                 <p class="display-4">{{course.overview.active_students}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Avg Msgs/Student</h5>
+                <h5 class="card-title text-muted">{{str_avg_msgs_student}}</h5>
                 <p class="display-4">{{course.overview.avg_messages_per_student}}</p>
             </div>
         </div>
@@ -405,26 +417,26 @@
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Conversations currently off-topic</h5>
+                <h5 class="card-title text-muted">{{str_offtopic_open}}</h5>
                 <p class="display-4">{{course.overview.offtopic_open}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Escalations</h5>
+                <h5 class="card-title text-muted">{{str_escalations}}</h5>
                 <p class="display-4">{{course.overview.escalation_count}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Study Plans</h5>
+                <h5 class="card-title text-muted">{{str_study_plans}}</h5>
                 <p class="display-4">{{course.overview.studyplan_adoption}}</p>
             </div>
         </div>
     </div>
 
     {{! Usage trend chart }}
-    <h3>Usage Trends</h3>
+    <h3>{{str_usage_trends}}</h3>
     <div class="card mb-4">
         <div class="card-body">
             <canvas id="aitc-usage-chart" height="80" data-daily-usage="{{course.daily_usage_json}}"></canvas>
@@ -434,14 +446,14 @@
     <div class="row">
         {{! Hotspots }}
         <div class="col-md-6">
-            <h3>Hotspots</h3>
-            <p class="text-muted">Course sections most frequently referenced in student messages.</p>
+            <h3>{{str_hotspots}}</h3>
+            <p class="text-muted">{{str_hotspots_intro}}</p>
             {{#course.has_hotspots}}
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Section</th>
-                        <th class="text-right">Mentions</th>
+                        <th>{{str_section}}</th>
+                        <th class="text-right">{{str_mentions}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -455,20 +467,20 @@
             </table>
             {{/course.has_hotspots}}
             {{^course.has_hotspots}}
-            <p class="text-muted">No hotspot data available yet.</p>
+            <p class="text-muted">{{str_no_hotspots}}</p>
             {{/course.has_hotspots}}
         </div>
 
         {{! Common prompts }}
         <div class="col-md-6">
-            <h3>Common Prompts</h3>
-            <p class="text-muted">Recurring question patterns from students.</p>
+            <h3>{{str_common_prompts}}</h3>
+            <p class="text-muted">{{str_common_prompts_intro}}</p>
             {{#course.has_common_prompts}}
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Pattern</th>
-                        <th class="text-right">Frequency</th>
+                        <th>{{str_pattern}}</th>
+                        <th class="text-right">{{str_frequency}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -482,24 +494,24 @@
             </table>
             {{/course.has_common_prompts}}
             {{^course.has_common_prompts}}
-            <p class="text-muted">No recurring prompt patterns detected yet.</p>
+            <p class="text-muted">{{str_no_prompt_patterns}}</p>
             {{/course.has_common_prompts}}
         </div>
     </div>
 
     {{! Provider comparison }}
     {{#course.has_provider_comparison}}
-    <h3 class="mt-4">Provider Comparison</h3>
+    <h3 class="mt-4">{{str_provider_comparison}}</h3>
     <div class="card mb-4">
         <div class="card-body p-0">
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Provider</th>
-                        <th class="text-right">Responses</th>
-                        <th class="text-right">Avg Length</th>
-                        <th class="text-right">Total Tokens</th>
-                        <th class="text-right">Avg Tokens</th>
+                        <th>{{str_provider}}</th>
+                        <th class="text-right">{{str_responses}}</th>
+                        <th class="text-right">{{str_avg_length}}</th>
+                        <th class="text-right">{{str_total_tokens}}</th>
+                        <th class="text-right">{{str_avg_tokens}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -507,7 +519,7 @@
                     <tr>
                         <td><strong>{{provider}}</strong></td>
                         <td class="text-right"><span class="badge badge-primary">{{response_count}}</span></td>
-                        <td class="text-right">{{avg_response_length}} chars</td>
+                        <td class="text-right">{{avg_response_length_label}}</td>
                         <td class="text-right">{{total_tokens}}</td>
                         <td class="text-right">{{avg_tokens}}</td>
                     </tr>
@@ -520,13 +532,13 @@
 
     {{! Student activity }}
     {{#course.has_students}}
-    <h3 class="mt-4">Student Activity</h3>
+    <h3 class="mt-4">{{str_student_activity}}</h3>
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Student</th>
-                <th class="text-right">Messages</th>
-                <th>Last Active</th>
+                <th>{{str_student}}</th>
+                <th class="text-right">{{str_messages}}</th>
+                <th>{{str_last_active}}</th>
             </tr>
         </thead>
         <tbody>
@@ -542,24 +554,24 @@
     {{/course.has_students}}
 
     {{! User feedback }}
-    <h3 class="mt-4">User Feedback</h3>
+    <h3 class="mt-4">{{str_user_feedback}}</h3>
     {{#course.has_feedback}}
     <div class="card-deck mb-4">
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Total Responses</h5>
+                <h5 class="card-title text-muted">{{str_total_responses}}</h5>
                 <p class="display-4">{{course.feedback_total}}</p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Average Rating</h5>
+                <h5 class="card-title text-muted">{{str_average_rating}}</h5>
                 <p class="display-4">{{course.feedback_avg}} <small style="font-size:0.4em">/ 5</small></p>
             </div>
         </div>
         <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title text-muted">Rating Distribution</h5>
+                <h5 class="card-title text-muted">{{str_rating_distribution}}</h5>
                 <div style="text-align:left;max-width:200px;margin:0 auto">
                     {{#course.feedback_ratings}}
                     <div style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:2px">
@@ -580,12 +592,12 @@
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Student</th>
-                        <th>Rating</th>
-                        <th>Comment</th>
-                        <th>Browser / OS</th>
-                        <th>Device</th>
-                        <th>Date</th>
+                        <th>{{str_student}}</th>
+                        <th>{{str_rating}}</th>
+                        <th>{{str_comment}}</th>
+                        <th>{{str_browser_os}}</th>
+                        <th>{{str_device}}</th>
+                        <th>{{str_date}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -605,26 +617,26 @@
     </div>
     {{/course.has_feedback}}
     {{^course.has_feedback}}
-    <p class="text-muted">No feedback received yet.</p>
+    <p class="text-muted">{{str_no_feedback}}</p>
     {{/course.has_feedback}}
 
     {{! Survey Results }}
     {{#course.has_survey_data}}
-    <h3 class="mt-4">Survey Results</h3>
+    <h3 class="mt-4">{{str_survey_results}}</h3>
     <div class="alert alert-info">
-        <strong>{{course.survey_data.total_responses}}</strong> survey response(s) collected.
+        {{{course.survey_data.collected_line}}}
     </div>
 
     {{#course.survey_data.questions}}
     <div class="card mb-3">
         <div class="card-header">
             <strong>{{text}}</strong>
-            <span class="badge badge-secondary ml-2">{{response_count}} responses</span>
+            <span class="badge badge-secondary ml-2">{{response_count_label}}</span>
         </div>
         <div class="card-body">
             {{#is_multiple_choice}}
             <table class="table table-sm table-striped mb-0">
-                <thead><tr><th>Option</th><th class="text-right" style="width:80px">Count</th></tr></thead>
+                <thead><tr><th>{{str_option}}</th><th class="text-right" style="width:80px">{{str_count}}</th></tr></thead>
                 <tbody>
                     {{#options}}
                     <tr>
@@ -638,7 +650,7 @@
 
             {{#is_rating}}
             <div class="d-flex align-items-center mb-2">
-                <span class="mr-2"><strong>Average:</strong></span>
+                <span class="mr-2"><strong>{{str_average_label}}</strong></span>
                 <span class="display-4" style="font-size:2rem;color:#f59e0b">{{average}}</span>
                 <span class="ml-1 text-muted">/ 5</span>
             </div>
@@ -665,7 +677,7 @@
             </ul>
             {{/has_answers}}
             {{^has_answers}}
-            <p class="text-muted mb-0">No text responses yet.</p>
+            <p class="text-muted mb-0">{{str_no_text_responses}}</p>
             {{/has_answers}}
             {{/is_long_text}}
         </div>
@@ -673,28 +685,28 @@
     {{/course.survey_data.questions}}
     {{/course.has_survey_data}}
     {{^course.has_survey_data}}
-    <h3 class="mt-4">Survey Results</h3>
-    <p class="text-muted">No survey responses collected yet.</p>
+    <h3 class="mt-4">{{str_survey_results}}</h3>
+    <p class="text-muted">{{str_no_survey_responses}}</p>
     {{/course.has_survey_data}}
 
     {{! Usability Testing Results }}
     {{#course.has_usertesting_data}}
-    <h3 class="mt-4">Usability Testing Results</h3>
+    <h3 class="mt-4">{{str_usertesting_results}}</h3>
     <div class="alert alert-info">
-        <strong>{{course.usertesting_data.total_respondents}}</strong> tester(s) have submitted responses.
+        {{{course.usertesting_data.testers_line}}}
     </div>
 
     {{#course.usertesting_data.tasks}}
     <div class="card mb-3">
         <div class="card-header">
             <strong>{{instruction}}</strong>
-            <span class="badge badge-secondary ml-2">{{response_count}} responses</span>
-            <span class="badge badge-light ml-1" title="Average messages at time of response">Avg {{avg_messages}} msgs</span>
-            <span class="badge badge-light ml-1" title="Average session duration at time of response">Avg {{avg_session_minutes}} min</span>
+            <span class="badge badge-secondary ml-2">{{response_count_label}}</span>
+            <span class="badge badge-light ml-1" title="{{str_avg_msgs_title}}">{{avg_messages_label}}</span>
+            <span class="badge badge-light ml-1" title="{{str_avg_min_title}}">{{avg_session_label}}</span>
         </div>
         <div class="card-body">
             {{#is_action_then_rate}}
-            <p><strong>Average Rating:</strong> {{avg_rating}} / 5</p>
+            <p>{{{avg_rating_line}}}</p>
             {{#has_comments}}
             <div style="max-height:200px;overflow-y:auto">
                 {{#comments}}
@@ -706,7 +718,7 @@
 
             {{#is_multiple_choice}}
             <table class="table table-sm">
-                <thead><tr><th>Option</th><th>Count</th></tr></thead>
+                <thead><tr><th>{{str_option}}</th><th>{{str_count}}</th></tr></thead>
                 <tbody>
                 {{#options}}
                 <tr><td>{{label}}</td><td>{{count}}</td></tr>
@@ -724,7 +736,7 @@
             </div>
             {{/has_answers}}
             {{^has_answers}}
-            <p class="text-muted">No responses yet.</p>
+            <p class="text-muted">{{str_no_responses}}</p>
             {{/has_answers}}
             {{/is_free_response}}
         </div>
@@ -732,13 +744,13 @@
     {{/course.usertesting_data.tasks}}
     {{/course.has_usertesting_data}}
     {{^course.has_usertesting_data}}
-    <h3 class="mt-4">Usability Testing Results</h3>
-    <p class="text-muted">No user testing responses collected yet.</p>
+    <h3 class="mt-4">{{str_usertesting_results}}</h3>
+    <p class="text-muted">{{str_no_usertesting}}</p>
     {{/course.has_usertesting_data}}
 
     {{! AI Insights }}
-    <h3 class="mt-4">AI Insights</h3>
-    <p class="text-muted">Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.</p>
+    <h3 class="mt-4">{{str_ai_insights}}</h3>
+    <p class="text-muted">{{str_ai_insights_intro}}</p>
     {{#course.has_any_feedback_data}}
     <div class="card mb-4" id="ai-insights-card">
         <div class="card-body">
@@ -746,18 +758,18 @@
             <div id="ai-insights-placeholder">
                 <button type="button" class="btn btn-primary" id="btn-generate-insights"
                         data-courseid="{{course.courseid}}">
-                    Generate AI Insights
+                    {{str_generate_insights}}
                 </button>
                 <span id="ai-insights-spinner" class="ml-2" style="display:none">
                     <span class="spinner-border spinner-border-sm" role="status"></span>
-                    Analyzing data&hellip; this may take a moment.
+                    {{str_analyzing}}
                 </span>
             </div>
         </div>
     </div>
     {{/course.has_any_feedback_data}}
     {{^course.has_any_feedback_data}}
-    <p class="text-muted">No feedback, survey, or usability testing data to analyze yet.</p>
+    <p class="text-muted">{{str_no_feedback_data}}</p>
     {{/course.has_any_feedback_data}}
 
     {{/course.has_data}}
@@ -765,9 +777,7 @@
 
     {{^has_course_selected}}
     <div class="alert alert-info mt-3">
-        Pick a course from the tabs above to drill into its analytics, or
-        <a href="{{courses_admin_url}}">manage course enrollment</a> to
-        enable SOLA on more courses.
+        {{{str_pick_course_hint}}}
     </div>
     {{/has_course_selected}}
 

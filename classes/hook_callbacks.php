@@ -820,6 +820,26 @@ class hook_callbacks {
             // Pre-resolved brand label for the open button (the only brand-bearing
             // string the mustache renders directly via {{#str}}).
             'chat_open_label'    => branding::str('chat:open'),
+            // Help-panel strings pre-rendered server-side because each carries
+            // the brand name -- either as a {$a} placeholder filled with the
+            // configured short/display name, or (data_download) as a
+            // [[tutorshort]] token -- which the mustache {{#str}} helper cannot
+            // resolve. chat_open_label above is the precedent. intro,
+            // plans_body and data_download contain <strong> markup and are
+            // triple-stached in the template, so their $a values are escaped
+            // here; the rest render through escaped {{ }} tags.
+            'help_title'         => get_string('help:title',
+                'local_ai_course_assistant', branding::short_name()),
+            'help_intro'         => get_string('help:intro',
+                'local_ai_course_assistant',
+                '<strong>' . s(branding::display_name()) . '</strong>'),
+            'help_start_body'    => get_string('help:start_body',
+                'local_ai_course_assistant', branding::short_name()),
+            'help_plans_body'    => get_string('help:plans_body',
+                'local_ai_course_assistant', s(branding::short_name())),
+            'help_languages_body' => get_string('help:languages_body',
+                'local_ai_course_assistant', branding::short_name()),
+            'help_data_download' => branding::str('help:data_download'),
             // Brand token map for the browser: lets JS resolve [[tutorshort]] etc.
             // in strings fetched at runtime via the Moodle string API (e.g. the
             // personalized greeting). Consumed in chat.js init.
@@ -1135,6 +1155,13 @@ class hook_callbacks {
             'chat:topic_picker_title',
             'chat:topic_picker_title_explain',
             'chat:topic_start',
+            // Flashcard starter feedback (chat.js ~2201-2224). These are
+            // requested by the browser bundle, so they must be preloaded
+            // here or the CDN build's dependency-check fails.
+            'flashcards:starter_saved',
+            'flashcards:starter_open_review',
+            'flashcards:starter_failed',
+            'flashcards:starter_error',
             // quiz.js strings.
             'chat:quiz_setup_title',
             'chat:quiz_questions',

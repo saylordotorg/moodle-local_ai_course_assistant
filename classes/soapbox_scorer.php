@@ -95,6 +95,7 @@ class soapbox_scorer {
      * right learner's history. Idempotent-ish: only acts on 'uploaded' rows.
      *
      * @param int $recid
+     * @param bool $retrytransient Throw on a transient transcription failure so the task retries, instead of failing the row
      */
     public static function score_recording(int $recid, bool $retrytransient = false): void {
         global $DB;

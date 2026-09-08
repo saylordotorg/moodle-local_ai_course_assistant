@@ -64,11 +64,11 @@
         <dt class="col-sm-4">{{#str}}prompt_metrics:samples, local_ai_course_assistant{{/str}}</dt>
         <dd class="col-sm-8">{{samples}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:avg_total, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{avg_total}} chars</dd>
+        <dd class="col-sm-8">{{avg_total}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:max_total, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{max_total}} chars</dd>
+        <dd class="col-sm-8">{{max_total}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:avg_budget, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{avg_budget}} chars</dd>
+        <dd class="col-sm-8">{{avg_budget}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:pct_truncated, local_ai_course_assistant{{/str}}</dt>
         <dd class="col-sm-8">
             {{pct_truncated}}%
@@ -117,8 +117,8 @@
     {{/enough_for_rec}}
     {{#enough_for_rec}}
         {{#has_rec}}
-        <p><strong>{{#str}}prompt_metrics:current_budget, local_ai_course_assistant{{/str}}:</strong> {{current_budget}} chars</p>
-        <p><strong>{{#str}}prompt_metrics:recommended, local_ai_course_assistant{{/str}}:</strong> {{rec_budget}} chars</p>
+        <p><strong>{{#str}}prompt_metrics:current_budget, local_ai_course_assistant{{/str}}:</strong> {{current_budget}}</p>
+        <p><strong>{{#str}}prompt_metrics:recommended, local_ai_course_assistant{{/str}}:</strong> {{rec_budget}}</p>
         <p>{{rec_rationale}}</p>
         {{#rec_diff}}
         <p>

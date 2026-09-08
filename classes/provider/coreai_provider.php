@@ -135,7 +135,16 @@ class coreai_provider extends base_provider {
             prompttext: $prompttext,
         );
 
-        $manager = new \core_ai\manager();
+        // Moodle 5.0 gave core_ai\manager a required \moodle_database
+        // constructor argument, so `new manager()` is a fatal
+        // ArgumentCountError on 5.0-5.3 -- and this provider is what
+        // `auto` resolves to whenever no SOLA key is set, so the shipped
+        // default was broken on every Moodle 5.x (issue #218). Core made
+        // the same move: ai/placement/courseassist and
+        // ai/classes/external/set_action.php both use di::get(). The
+        // container autowires the DB on 4.5 too, where the constructor
+        // takes no arguments.
+        $manager = \core\di::get(\core_ai\manager::class);
         $response = $manager->process_action($action);
 
         // Version-defensive response handling. core_ai's response object and

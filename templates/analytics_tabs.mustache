@@ -17,16 +17,8 @@
 {{!
     @template local_ai_course_assistant/analytics_tabs
 
-    Tab strip for the analytics dashboard pages.
-
-    Example context (json):
-    {
-    }
-}}
-{{!
-    @template local_ai_course_assistant/analytics_tabs
-
     Analytics dashboard tabs for the SOLA reporting UI.
+    All UI strings are resolved in PHP (analytics.php) and passed as str_* context.
 
     Example context (json):
     {
@@ -35,24 +27,38 @@
                 "id": 2,
                 "shortname": "TEST101"
             }
-        ]
+        ],
+        "str_time_range": "Time Range",
+        "str_last_7_days": "Last 7 days",
+        "str_last_30_days": "Last 30 days",
+        "str_last_90_days": "Last 90 days",
+        "str_all_time": "All time",
+        "str_course": "Course",
+        "str_all_courses": "All courses",
+        "str_tab_overall": "Overall Usage",
+        "str_tab_bycourse": "By Course",
+        "str_tab_comparison": "AI vs Non-Users",
+        "str_tab_byunit": "By Unit",
+        "str_tab_usagetypes": "Usage Types",
+        "str_tab_themes": "Themes",
+        "str_tab_feedback": "AI Feedback"
     }
 }}
 <div class="sola-analytics-dashboard mt-4">
     <div class="sola-analytics-filters d-flex align-items-center gap-3 mb-3 flex-wrap">
         <div>
-            <label for="sola-analytics-range" class="form-label mb-0 small text-muted">Time Range</label>
+            <label for="sola-analytics-range" class="form-label mb-0 small text-muted">{{str_time_range}}</label>
             <select id="sola-analytics-range" class="form-select form-select-sm" style="width:auto;">
-                <option value="7">Last 7 days</option>
-                <option value="30" selected>Last 30 days</option>
-                <option value="90">Last 90 days</option>
-                <option value="0">All time</option>
+                <option value="7">{{str_last_7_days}}</option>
+                <option value="30" selected>{{str_last_30_days}}</option>
+                <option value="90">{{str_last_90_days}}</option>
+                <option value="0">{{str_all_time}}</option>
             </select>
         </div>
         <div>
-            <label for="sola-analytics-course" class="form-label mb-0 small text-muted">Course</label>
+            <label for="sola-analytics-course" class="form-label mb-0 small text-muted">{{str_course}}</label>
             <select id="sola-analytics-course" class="form-select form-select-sm" style="width:auto;">
-                <option value="0">All courses</option>
+                <option value="0">{{str_all_courses}}</option>
                 {{#courses}}
                 <option value="{{id}}">{{shortname}}</option>
                 {{/courses}}
@@ -61,13 +67,13 @@
     </div>
 
     <ul class="nav nav-tabs sola-analytics-tabs mb-0">
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab active" data-tab="overall">Overall Usage</a></li>
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="bycourse">By Course</a></li>
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="comparison">AI vs Non-Users</a></li>
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="byunit">By Unit</a></li>
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="usagetypes">Usage Types</a></li>
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="themes">Themes</a></li>
-        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="feedback">AI Feedback</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab active" data-tab="overall">{{str_tab_overall}}</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="bycourse">{{str_tab_bycourse}}</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="comparison">{{str_tab_comparison}}</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="byunit">{{str_tab_byunit}}</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="usagetypes">{{str_tab_usagetypes}}</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="themes">{{str_tab_themes}}</a></li>
+        <li class="nav-item"><a href="#" class="nav-link sola-analytics-tab" data-tab="feedback">{{str_tab_feedback}}</a></li>
     </ul>
 
     <div class="sola-analytics-panes border border-top-0 rounded-bottom p-4 bg-white">

@@ -40,6 +40,10 @@
  *    held outside Moodle, which no backup file carries, so a restored row would
  *    reference a recording that does not exist on the target site. The
  *    assignment and its topics do travel; the attempts against them do not.
+ *  - feedback. Product feedback about the assistant itself (star rating plus
+ *    browser/OS telemetry). It is addressed to the originating site's product
+ *    team, not course content, and the telemetry describes devices on that
+ *    site's audience.
  *  - struggle_signal. Outreach state -- which learner has already been followed
  *    up, and when. It describes a conversation the originating site had, and
  *    replaying it on another site would either re-send or wrongly suppress.

@@ -112,7 +112,7 @@ if ($action === 'email') {
     $to = required_param('to', PARAM_EMAIL);
     if ($to === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Recipient email is required']);
+        echo json_encode(['ok' => false, 'error' => get_string('radar:err_email_required', 'local_ai_course_assistant')]);
         return;
     }
     $sent = radar_delivery::send_email($to, $query, $response, $format, 'On-demand', $meta);
@@ -124,7 +124,7 @@ if ($action === 'slack') {
     $url = required_param('webhook', PARAM_URL);
     if ($url === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Slack webhook URL is required']);
+        echo json_encode(['ok' => false, 'error' => get_string('radar:err_slack_webhook_required', 'local_ai_course_assistant')]);
         return;
     }
     $sent = radar_delivery::send_slack($url, $query, $response, $meta);
@@ -136,7 +136,7 @@ if ($action === 'teams') {
     $url = required_param('webhook', PARAM_URL);
     if ($url === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Teams webhook URL is required']);
+        echo json_encode(['ok' => false, 'error' => get_string('radar:err_teams_webhook_required', 'local_ai_course_assistant')]);
         return;
     }
     $sent = radar_delivery::send_teams($url, $query, $response, $meta);
@@ -150,7 +150,7 @@ if ($action === 'teams') {
 if ($action === 'push_redash') {
     $name = optional_param('name', '', PARAM_TEXT);
     if ($name === '') {
-        $name = 'SOLA Learning Radar — ' . userdate(time(), '%Y-%m-%d %H:%M');
+        $name = branding::str('radar:redash_default_name', userdate(time(), '%Y-%m-%d %H:%M'));
     }
     $result = \local_ai_course_assistant\redash_client::push_query($name, $query, $response);
     if (!$result['ok']) {
@@ -192,7 +192,7 @@ if ($action === 'redash_setup') {
 }
 
 http_response_code(400);
-echo json_encode(['ok' => false, 'error' => 'Unknown action']);
+echo json_encode(['ok' => false, 'error' => get_string('radar:err_unknown_action', 'local_ai_course_assistant')]);
 } catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['ok' => false, 'error' => $e->getMessage()]);

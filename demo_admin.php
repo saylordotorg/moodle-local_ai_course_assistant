@@ -40,10 +40,10 @@ $weeks = optional_param('weeks', 4, PARAM_INT);
 $clear = optional_param('clear', 0, PARAM_BOOL);
 
 $output = $PAGE->get_renderer('core');
-echo $output->header();
-echo $output->heading(get_string('demo:heading', 'local_ai_course_assistant'));
 
 $existing = $DB->get_record('course', ['shortname' => 'SOLATEST'], 'id,fullname,shortname,visible');
+
+$notifications = [];
 
 if ($action === 'create' && confirm_sesskey()) {
     try {
@@ -57,13 +57,13 @@ if ($action === 'create' && confirm_sesskey()) {
             'fullname' => format_string($course->fullname),
             'id' => $course->id,
         ]);
-        echo $output->notification($msg, \core\output\notification::NOTIFY_SUCCESS);
+        $notifications[] = ['html' => $output->notification($msg, \core\output\notification::NOTIFY_SUCCESS)];
         $existing = $DB->get_record('course', ['id' => $course->id], 'id,fullname,shortname,visible');
     } catch (\Throwable $e) {
-        echo $output->notification(
+        $notifications[] = ['html' => $output->notification(
             get_string('demo:notify_create_fail', 'local_ai_course_assistant', $e->getMessage()),
             \core\output\notification::NOTIFY_ERROR
-        );
+        )];
     }
 }
 
@@ -76,144 +76,59 @@ if ($action === 'seed' && confirm_sesskey() && $courseid > 0) {
             (bool) $clear
         );
         $msg = get_string('demo:notify_seeded', 'local_ai_course_assistant', (object) $counts);
-        echo $output->notification($msg, \core\output\notification::NOTIFY_SUCCESS);
+        $notifications[] = ['html' => $output->notification($msg, \core\output\notification::NOTIFY_SUCCESS)];
         purge_caches(['theme' => false, 'lang' => false]);
     } catch (\Throwable $e) {
-        echo $output->notification(
+        $notifications[] = ['html' => $output->notification(
             get_string('demo:notify_seed_fail', 'local_ai_course_assistant', $e->getMessage()),
             \core\output\notification::NOTIFY_ERROR
-        );
+        )];
     }
 }
 
-echo html_writer::tag('p', get_string('demo:intro', 'local_ai_course_assistant'));
-
-$sesskey = sesskey();
 $pageurl = new moodle_url('/local/ai_course_assistant/demo_admin.php');
 
-echo html_writer::start_tag('div', ['class' => 'card mb-3', 'style' => 'max-width:720px']);
-echo html_writer::start_tag('div', ['class' => 'card-body']);
-echo html_writer::tag(
-    'h3',
-    get_string('demo:step1', 'local_ai_course_assistant'),
-    ['class' => 'mb-2', 'style' => 'font-size:18px']
-);
+$templatedata = [
+    'notifications' => $notifications,
+    'intro' => get_string('demo:intro', 'local_ai_course_assistant'),
+    'formaction' => $pageurl->out(false),
+    'sesskey' => sesskey(),
+    'step1heading' => get_string('demo:step1', 'local_ai_course_assistant'),
+    'nocoursetext' => get_string('demo:no_course', 'local_ai_course_assistant'),
+    'createbtn' => get_string('demo:create_btn', 'local_ai_course_assistant'),
+    'footer' => get_string('demo:footer', 'local_ai_course_assistant'),
+    'course' => false,
+];
 
 if ($existing) {
-    $badgeclass = !$existing->visible ? 'badge badge-secondary' : 'badge badge-warning';
-    $badgetext = !$existing->visible
-        ? get_string('demo:badge_hidden', 'local_ai_course_assistant')
-        : get_string('demo:badge_visible', 'local_ai_course_assistant');
-    $existsmsg = get_string('demo:course_exists', 'local_ai_course_assistant', (object) [
-        'fullname' => s($existing->fullname),
-        'shortname' => s($existing->shortname),
+    $templatedata['course'] = [
         'id' => $existing->id,
-    ]);
-    echo html_writer::tag(
-        'p',
-        $existsmsg . ' <span class="' . $badgeclass . '">' . $badgetext . '</span>'
-    );
-    echo html_writer::link(
-        new moodle_url('/course/view.php', ['id' => $existing->id]),
-        get_string('demo:open_course', 'local_ai_course_assistant'),
-        ['class' => 'btn btn-sm btn-outline-primary']
-    );
-} else {
-    echo html_writer::tag('p', get_string('demo:no_course', 'local_ai_course_assistant'));
-    echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(false)]);
-    echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => $sesskey]);
-    echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'action', 'value' => 'create']);
-    echo html_writer::empty_tag('input', [
-        'type' => 'submit',
-        'value' => get_string('demo:create_btn', 'local_ai_course_assistant'),
-        'class' => 'btn btn-primary',
-    ]);
-    echo html_writer::end_tag('form');
-}
-echo html_writer::end_tag('div');
-echo html_writer::end_tag('div');
-
-if ($existing) {
-    echo html_writer::start_tag('div', ['class' => 'card mb-3', 'style' => 'max-width:720px']);
-    echo html_writer::start_tag('div', ['class' => 'card-body']);
-    echo html_writer::tag(
-        'h3',
-        get_string('demo:step2', 'local_ai_course_assistant'),
-        ['class' => 'mb-2', 'style' => 'font-size:18px']
-    );
-    echo html_writer::tag('p', get_string('demo:seed_intro', 'local_ai_course_assistant'));
-
-    echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(false), 'class' => 'form-inline']);
-    echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => $sesskey]);
-    echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'action', 'value' => 'seed']);
-    echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'courseid', 'value' => $existing->id]);
-
-    echo html_writer::start_tag('div', ['class' => 'form-group mr-2']);
-    echo html_writer::label(
-        get_string('demo:users_label', 'local_ai_course_assistant'),
-        'users',
-        false,
-        ['class' => 'mr-1']
-    );
-    echo html_writer::empty_tag('input', [
-        'type' => 'number', 'id' => 'users', 'name' => 'users',
-        'value' => 15, 'min' => 1, 'max' => 100,
-        'class' => 'form-control form-control-sm', 'style' => 'width:80px',
-    ]);
-    echo html_writer::end_tag('div');
-
-    echo html_writer::start_tag('div', ['class' => 'form-group mr-2']);
-    echo html_writer::label(
-        get_string('demo:weeks_label', 'local_ai_course_assistant'),
-        'weeks',
-        false,
-        ['class' => 'mr-1']
-    );
-    echo html_writer::empty_tag('input', [
-        'type' => 'number', 'id' => 'weeks', 'name' => 'weeks',
-        'value' => 4, 'min' => 1, 'max' => 52,
-        'class' => 'form-control form-control-sm', 'style' => 'width:80px',
-    ]);
-    echo html_writer::end_tag('div');
-
-    echo html_writer::start_tag('div', ['class' => 'form-check mr-3']);
-    echo html_writer::empty_tag('input', [
-        'type' => 'checkbox', 'id' => 'clear', 'name' => 'clear', 'value' => 1,
-        'class' => 'form-check-input',
-    ]);
-    echo html_writer::tag(
-        'label',
-        get_string('demo:clear_label', 'local_ai_course_assistant'),
-        ['for' => 'clear', 'class' => 'form-check-label']
-    );
-    echo html_writer::end_tag('div');
-
-    echo html_writer::empty_tag('input', [
-        'type' => 'submit',
-        'value' => get_string('demo:seed_btn', 'local_ai_course_assistant'),
-        'class' => 'btn btn-primary',
-    ]);
-    echo html_writer::end_tag('form');
-
-    echo html_writer::tag(
-        'p',
-        '<a href="' . (new moodle_url(
+        'existsmsg' => get_string('demo:course_exists', 'local_ai_course_assistant', (object) [
+            'fullname' => s($existing->fullname),
+            'shortname' => s($existing->shortname),
+            'id' => $existing->id,
+        ]),
+        'badgeclass' => !$existing->visible ? 'badge badge-secondary' : 'badge badge-warning',
+        'badgetext' => !$existing->visible
+            ? get_string('demo:badge_hidden', 'local_ai_course_assistant')
+            : get_string('demo:badge_visible', 'local_ai_course_assistant'),
+        'courseurl' => (new moodle_url('/course/view.php', ['id' => $existing->id]))->out(false),
+        'opencourse' => get_string('demo:open_course', 'local_ai_course_assistant'),
+        'step2heading' => get_string('demo:step2', 'local_ai_course_assistant'),
+        'seedintro' => get_string('demo:seed_intro', 'local_ai_course_assistant'),
+        'userslabel' => get_string('demo:users_label', 'local_ai_course_assistant'),
+        'weekslabel' => get_string('demo:weeks_label', 'local_ai_course_assistant'),
+        'clearlabel' => get_string('demo:clear_label', 'local_ai_course_assistant'),
+        'seedbtn' => get_string('demo:seed_btn', 'local_ai_course_assistant'),
+        'analyticsurl' => (new moodle_url(
             '/local/ai_course_assistant/analytics.php',
             ['courseid' => $existing->id]
-        ))->out() . '" class="btn btn-sm btn-outline-secondary mt-3">'
-        . get_string('demo:view_analytics', 'local_ai_course_assistant') . '</a>',
-        ['class' => 'mt-2']
-    );
-
-    echo html_writer::end_tag('div');
-    echo html_writer::end_tag('div');
+        ))->out(false),
+        'viewanalytics' => get_string('demo:view_analytics', 'local_ai_course_assistant'),
+    ];
 }
 
-echo html_writer::start_tag('div', ['style' => 'max-width:720px']);
-echo html_writer::tag(
-    'p',
-    '<small class="text-muted">' . get_string('demo:footer', 'local_ai_course_assistant') . '</small>'
-);
-echo html_writer::end_tag('div');
-
+echo $output->header();
+echo $output->heading(get_string('demo:heading', 'local_ai_course_assistant'));
+echo $output->render_from_template('local_ai_course_assistant/demo_admin', $templatedata);
 echo $output->footer();

@@ -1,0 +1,122 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/starter_settings
+
+    Conversation-starter admin page: how-to card, save/reset action bars
+    (rendered above and below the editor), and the empty list container that
+    amd/src/starter_admin.js fills with editable starter cards.
+
+    All strings are resolved in PHP (starter_settings.php) — no str helpers
+    here. The howto.* strings are plugin-authored language strings that carry
+    inline markup (strong/code/em), so they render unescaped; everything
+    request-derived stays escaped.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "intro": "Configure the conversation starter chips shown to students.",
+        "sesskey": "abc123",
+        "backurl": "/admin/category.php?category=local_ai_course_assistant",
+        "howto": {
+            "heading": "How to use this page",
+            "builtin": "<strong>Built-in starters</strong> are system managed.",
+            "custom": "<strong>Custom starters</strong> are ones you create.",
+            "types": "<strong>Starter types:</strong>",
+            "typeprompt": "<strong>Prompt</strong>: sends a custom message",
+            "typequiz": "starts an interactive practice quiz",
+            "typevoice": "starts a spoken conversation (requires TTS)",
+            "typepronunciation": "starts pronunciation practice",
+            "conditional": "<strong>Conditional visibility:</strong> ...",
+            "placeholders": "<strong>Prompt placeholders:</strong> ...",
+            "reorder": "<strong>Drag to reorder</strong> ...",
+            "overrides": "<strong>Per-course overrides:</strong> ..."
+        },
+        "labels": {
+            "save": "Save changes",
+            "resetdefaults": "Reset to defaults",
+            "back": "Back to settings",
+            "addnew": "Add new starter"
+        }
+    }
+}}
+<div class="aica-starters-admin">
+    <p>{{{intro}}}</p>
+
+    <div class="card mb-3 sola-starters-howto">
+        <div class="card-body">
+            <details>
+                <summary class="sola-starters-howto-summary">{{howto.heading}}</summary>
+                <div class="sola-starters-howto-body">
+                    <p>{{{howto.builtin}}}</p>
+                    <p>{{{howto.custom}}}</p>
+                    <p>{{{howto.types}}}</p>
+                    <ul class="sola-starters-howto-list">
+                        <li>{{{howto.typeprompt}}}</li>
+                        <li><span class="aica-starter-type-badge type-quiz">{{howto.badgequiz}}</span> {{{howto.typequiz}}}</li>
+                        <li><span class="aica-starter-type-badge type-voice">{{howto.badgevoice}}</span> {{{howto.typevoice}}}</li>
+                        <li><span class="aica-starter-type-badge type-pronunciation">{{howto.badgepronunciation}}</span> {{{howto.typepronunciation}}}</li>
+                    </ul>
+                    <p>{{{howto.conditional}}}</p>
+                    <p>{{{howto.placeholders}}}</p>
+                    <p>{{{howto.reorder}}}</p>
+                    <p>{{{howto.overrides}}}</p>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <div class="aica-admin-actions mb-3">
+        <form method="post" class="sola-inline-form">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="save">
+            <input type="hidden" name="starters_json" class="aica-starters-json" value="">
+            <button type="submit" class="btn btn-primary aica-save-btn">{{labels.save}}</button>
+        </form>
+        <form method="post" class="sola-inline-form">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="reset">
+            <button type="submit" class="btn btn-outline-secondary">{{labels.resetdefaults}}</button>
+        </form>
+        <a href="{{backurl}}" class="btn btn-outline-secondary">{{labels.back}}</a>
+    </div>
+
+    <div id="aica-starters-list"></div>
+
+    <button type="button" class="aica-btn-add" id="aica-add-starter">
+        <span class="sola-starters-plus">+</span>
+        {{labels.addnew}}
+    </button>
+
+    <div class="aica-admin-actions">
+        <form method="post" class="sola-inline-form">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="save">
+            <input type="hidden" name="starters_json" class="aica-starters-json" value="">
+            <button type="submit" class="btn btn-primary aica-save-btn">{{labels.save}}</button>
+        </form>
+        <form method="post" class="sola-inline-form">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="reset">
+            <button type="submit" class="btn btn-outline-secondary">{{labels.resetdefaults}}</button>
+        </form>
+        <a href="{{backurl}}" class="btn btn-outline-secondary">{{labels.back}}</a>
+    </div>
+</div>

@@ -43,7 +43,6 @@ const PAGES = [
   'essay_feedback.php?courseid=2',
   'integrity_admin.php',
   'usertesting_admin.php',
-  'update_admin.php',
   'vendor_dpa.php',
   'survey_admin.php',
   'rubric_admin.php',

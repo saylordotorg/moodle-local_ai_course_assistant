@@ -1,0 +1,19 @@
+v7.3.5 responds to the plugin-directory review: all six open reviewer issues are addressed and closed.
+
+Templates and Output API (issue #201). The last six echo-rendered pages are now Mustache templates rendered through the Output API: objectives admin, demo admin, the Soapbox presenter, the transcript report, the outcomes report, and starter settings. Every page the plugin owns now renders via render_from_template, and no page-level JavaScript remains inline. Each conversion preserved element ids, CSS classes, form field names and escaping semantics so the AMD modules that bind to those pages keep working; two were verified by rendering old and new markup with identical data and diffing the result.
+
+Language strings (issue #205). The specific instances the reviewer cited were already fixed, so we swept the whole plugin for what remained and found 378 hardcoded strings, including the analytics dashboard, token analytics, the entire learner-facing privacy notice, the in-drawer help panel and the Moodle-app mobile interface. All 378 are now language strings, translated into all 45 non-English locales; completeness is 46/46 with zero missing keys. Interpolations use {$a} placeholders so translators control word order, and the plugin's white-label branding tokens now reach every one of those surfaces.
+
+Boilerplate (issue #202). The @package, @copyright and @license markers were added to the two templates that were missing them.
+
+Backup and restore (issue #200), cross-database SQL (issue #203) and removal of the in-plugin self-updater (issue #204) shipped earlier in the 7.x line. This release documents the one backup exclusion that had never been written down, and re-verifies the backup/restore roundtrip.
+
+Two bugs surfaced during the work and are fixed here. The plugin had no component-level "error" language string, so several exception messages were silently demoted to debug information and users saw a bare "error". And the transcript report had been fatal under developer-level debugging since v7.3.0 because it reused a core string that Moodle 4.5 deprecates; a sweep confirms no other deprecated core string is used anywhere in the plugin.
+
+New in the test kit: a page smoke that logs in, loads every plugin page, and fails on PHP error surfaces, unresolved language keys, unresolved branding tokens or leaked template tags. Status codes alone are not enough, because themed Moodle error pages return 200. That smoke is what caught the transcript-report fatal.
+
+Quality gate: 1,166 automated tests, 36/36 validators, 46/46 locales, 23/23 pages clean.
+
+Three further defects were found during the work and fixed here. Three translated strings had malformed interpolation placeholders, so Bambara, Somali and Tagalog learners saw a raw fragment where a number or title belonged. 265 duplicate language-key definitions across 36 locales were removed; PHP keeps only the last assignment, so the 221 of them whose text differed from the winning copy were dead text that would mislead anyone editing those strings. And 127 translations drop a branding token their English string carries, which silently opts them out of white-label rebranding; these are documented as debt that can only shrink.
+
+A new test enforces what a key-existence check cannot: that interpolation placeholders survive translation exactly, that branding tokens survive, and that no language key is defined twice.

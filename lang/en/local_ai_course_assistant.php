@@ -1680,7 +1680,6 @@ $string['soapbox:present_video']    = 'Video presentation';
 $string['soapbox:present_target']   = 'target {$a->min}-{$a->max} min';
 $string['soapbox:choose_topic']     = 'Choose a topic';
 $string['soapbox:record_short']     = 'Record';
-$string['soapbox:stop']             = 'Stop';
 $string['soapbox:my_recordings']    = 'My recordings';
 $string['soapbox:no_recordings']    = 'No recordings yet.';
 $string['soapbox:col_recorded']     = 'Recorded';
@@ -2457,6 +2456,7 @@ $string['transcripts:privacynote'] = 'Learner identities are replaced with per-r
 $string['transcripts:mode'] = 'Show';
 $string['transcripts:met'] = 'Met';
 $string['transcripts:notmet'] = 'Not met';
+$string['transcripts:from'] = 'From';
 $string['transcripts:to'] = 'To';
 $string['transcripts:truncated'] = 'Showing the first {$a} rows. Narrow the date range or unit to see the rest.';
 $string['transcripts:rowcount'] = '{$a} rows.';
@@ -2480,3 +2480,440 @@ $string['soapbox:status_failed'] = 'Scoring failed — this attempt does not cou
 $string['error:realtime_unavailable'] = 'Voice mode is temporarily unavailable. Please try again in a moment, or use text chat.';
 $string['settings:cdn_bundle_url'] = 'Talking avatar viewer bundle URL';
 $string['settings:cdn_bundle_url_desc'] = 'URL of the JavaScript bundle the talking-avatar viewer page loads (WebRTC/LiveKit glue). Leave blank to disable the viewer; the page then shows a notice instead of a broken stage.';
+
+// --- v7.3.5: plugin-directory issue #205 extraction (378-key batch) ---
+// --- from newstrings_a.php ---
+// Analytics dashboard + tabs + CSV export i18n extraction (job a).
+// Dashboard nav / top bar.
+$string['analytics:plugin_settings'] = 'Plugin Settings';
+$string['analytics:token_usage_cost'] = 'Token Usage & Cost';
+$string['analytics:export_csv'] = 'Export CSV';
+$string['analytics:export_csv_title'] = 'Download analytics as CSV';
+$string['analytics:hide_real_names'] = 'Hide Real Names';
+$string['analytics:show_real_names'] = 'Show Real Names';
+$string['analytics:exit_student_mode'] = 'Exit Student Mode';
+$string['analytics:student_mode'] = 'Student Mode';
+$string['analytics:real_names_warning'] = '<strong>Real names are visible.</strong> Student data is not anonymized in this session. Toggle off before sharing your screen or leaving this page.';
+$string['analytics:student_mode_notice'] = '<strong>Student Mode active.</strong> The [[tutorshort]] widget on course pages now shows exactly what students see. Exit here or press Ctrl+Shift+A from any page.';
+$string['analytics:courses_enabled_summary'] = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
+$string['analytics:manage_course_enrollment'] = 'manage course enrollment';
+// Learning Radar card.
+$string['analytics:radar_heading'] = 'Learning Radar';
+$string['analytics:radar_subtitle'] = 'ask questions about anonymized student data';
+$string['analytics:radar_share'] = 'Copy share link';
+$string['analytics:radar_share_title'] = 'Copy a link that pre-fills this query for another admin';
+$string['analytics:radar_schedules'] = 'Schedules';
+$string['analytics:radar_history'] = 'History';
+$string['analytics:radar_try_question'] = 'Try a question:';
+$string['analytics:radar_click_metric'] = 'Or click a metric to dig in:';
+$string['analytics:model'] = 'Model';
+$string['analytics:data_scope'] = 'Data scope';
+$string['analytics:all_courses'] = 'All courses';
+$string['analytics:scope_current_course'] = 'Current course only';
+$string['analytics:scope_custom'] = 'Specific course IDs...';
+$string['analytics:scope_byprovider'] = 'By LLM provider used...';
+$string['analytics:scope_detail_label'] = 'Course IDs or provider';
+$string['analytics:scope_detail_placeholder'] = 'e.g. 2,5,12 or openai';
+$string['analytics:range'] = 'Range';
+$string['analytics:last_24_hours'] = 'Last 24 hours';
+$string['analytics:last_90_days'] = 'Last 90 days';
+$string['analytics:compare_two_models'] = 'Compare 2 models';
+$string['analytics:compare_two_models_title'] = 'Run the same query against a second provider/model';
+$string['analytics:provider_b'] = 'Provider B';
+$string['analytics:model_b'] = 'Model B';
+$string['analytics:compare_cost_warning'] = 'Compare runs 2 queries — cost will roughly double.';
+$string['analytics:radar_intro_placeholder'] = 'All data is anonymized. Pick a starter above, click a metric, or type a question.';
+$string['analytics:radar_input_placeholder'] = 'Ask about student data, trends, costs, feedback...';
+$string['analytics:send'] = 'Send';
+$string['analytics:export_menu'] = 'Export';
+$string['analytics:download'] = 'Download';
+$string['analytics:format_json'] = 'JSON';
+$string['analytics:format_csv'] = 'CSV';
+$string['analytics:format_markdown'] = 'Markdown';
+$string['analytics:format_pdf'] = 'PDF (print)';
+$string['analytics:send_email'] = 'Email…';
+$string['analytics:send_slack'] = 'Slack webhook…';
+$string['analytics:send_teams'] = 'Teams webhook…';
+$string['analytics:redash'] = 'Redash';
+$string['analytics:redash_push'] = 'Send to Redash…';
+$string['analytics:redash_setup'] = 'Set up Redash…';
+$string['analytics:schedule_this'] = 'Schedule…';
+$string['analytics:schedule_this_title'] = 'Save this query as a recurring scheduled report';
+// Saved schedules panel.
+$string['analytics:scheduled_queries'] = 'Scheduled Queries';
+$string['analytics:new_schedule'] = 'New schedule';
+$string['analytics:name'] = 'Name';
+$string['analytics:channels'] = 'Channels';
+$string['analytics:last_run'] = 'Last run';
+$string['analytics:status'] = 'Status';
+$string['analytics:channel_email'] = 'email';
+$string['analytics:channel_slack'] = 'slack';
+$string['analytics:channel_teams'] = 'teams';
+$string['analytics:edit'] = 'Edit';
+$string['analytics:pause'] = 'Pause';
+$string['analytics:enable'] = 'Enable';
+$string['analytics:delete'] = 'Delete';
+$string['analytics:no_schedules'] = 'No scheduled queries yet. Run a query above and click "Schedule" to set one up.';
+// Past queries panel.
+$string['analytics:past_queries'] = 'Past Queries';
+$string['analytics:search_query_placeholder'] = 'Search query text…';
+$string['analytics:search_past_queries'] = 'Search past queries';
+$string['analytics:when'] = 'When';
+$string['analytics:query'] = 'Query';
+$string['analytics:type'] = 'Type';
+$string['analytics:badge_scheduled'] = 'scheduled';
+$string['analytics:badge_adhoc'] = 'ad-hoc';
+$string['analytics:rerun'] = 'Re-run';
+$string['analytics:no_queries_yet'] = 'No queries run yet.';
+// Per-course drill-down.
+$string['analytics:back_all_courses'] = 'Back to All Courses';
+$string['analytics:filter_timerange'] = 'Time Range';
+$string['analytics:course'] = 'Course';
+$string['analytics:no_usage_data'] = 'No AI Assistant usage data for this course yet.';
+$string['analytics:card_conversations'] = 'Conversations';
+$string['analytics:messages'] = 'Messages';
+$string['analytics:card_active_students'] = 'Active Students';
+$string['analytics:card_avg_msgs_student'] = 'Avg Msgs/Student';
+$string['analytics:card_offtopic_open'] = 'Conversations currently off-topic';
+$string['analytics:card_escalations'] = 'Escalations';
+$string['analytics:card_study_plans'] = 'Study Plans';
+$string['analytics:hotspots_heading'] = 'Hotspots';
+$string['analytics:hotspots_intro'] = 'Course sections most frequently referenced in student messages.';
+$string['analytics:no_hotspot_data'] = 'No hotspot data available yet.';
+$string['analytics:common_prompts_heading'] = 'Common Prompts';
+$string['analytics:common_prompts_intro'] = 'Recurring question patterns from students.';
+$string['analytics:no_prompt_patterns'] = 'No recurring prompt patterns detected yet.';
+$string['analytics:provider_comparison_heading'] = 'Provider Comparison';
+$string['analytics:avg_length'] = 'Avg Length';
+$string['analytics:total_tokens_short'] = 'Total Tokens';
+$string['analytics:avg_tokens_short'] = 'Avg Tokens';
+$string['analytics:chars_suffix'] = '{$a} chars';
+$string['analytics:student_activity'] = 'Student Activity';
+$string['analytics:student'] = 'Student';
+$string['analytics:last_active'] = 'Last Active';
+// User feedback.
+$string['analytics:user_feedback'] = 'User Feedback';
+$string['analytics:total_responses'] = 'Total Responses';
+$string['analytics:average_rating'] = 'Average Rating';
+$string['analytics:rating_distribution'] = 'Rating Distribution';
+$string['analytics:rating'] = 'Rating';
+$string['analytics:comment'] = 'Comment';
+$string['analytics:browser_os'] = 'Browser / OS';
+$string['analytics:device'] = 'Device';
+$string['analytics:date'] = 'Date';
+$string['analytics:no_feedback_yet'] = 'No feedback received yet.';
+// Survey results.
+$string['analytics:survey_results'] = 'Survey Results';
+$string['analytics:survey_responses_collected'] = '{$a} survey response(s) collected.';
+$string['analytics:responses_badge'] = '{$a} responses';
+$string['analytics:option'] = 'Option';
+$string['analytics:count'] = 'Count';
+$string['analytics:average_label'] = 'Average:';
+$string['analytics:no_text_responses'] = 'No text responses yet.';
+$string['analytics:no_survey_responses'] = 'No survey responses collected yet.';
+// Usability testing results.
+$string['analytics:usertesting_results'] = 'Usability Testing Results';
+$string['analytics:testers_submitted'] = '{$a} tester(s) have submitted responses.';
+$string['analytics:avg_msgs_badge'] = 'Avg {$a} msgs';
+$string['analytics:avg_msgs_badge_title'] = 'Average messages at time of response';
+$string['analytics:avg_min_badge'] = 'Avg {$a} min';
+$string['analytics:avg_min_badge_title'] = 'Average session duration at time of response';
+$string['analytics:avg_rating_line'] = '<strong>Average Rating:</strong> {$a} / 5';
+$string['analytics:no_responses_yet'] = 'No responses yet.';
+$string['analytics:no_usertesting_responses'] = 'No user testing responses collected yet.';
+// AI insights.
+$string['analytics:ai_insights'] = 'AI Insights';
+$string['analytics:ai_insights_intro'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
+$string['analytics:generate_insights'] = 'Generate AI Insights';
+$string['analytics:analyzing_data'] = 'Analyzing data… this may take a moment.';
+$string['analytics:no_feedback_data'] = 'No feedback, survey, or usability testing data to analyze yet.';
+// No-course-selected hint ({$a} is the manage-enrollment link).
+$string['analytics:pick_course_hint'] = 'Pick a course from the tabs above to drill into its analytics, or {$a} to enable [[tutorshort]] on more courses.';
+// CSV export (classes/external/export_analytics_csv.php).
+$string['analytics:csv_metric'] = 'Metric';
+$string['analytics:csv_value'] = 'Value';
+$string['analytics:csv_nodata'] = 'No data available for the selected filters.';
+
+// --- from newstrings_b.php ---
+$string['analytics:avatar_cost_sub'] = 'Per-minute streaming cost across the four configured talking-avatar providers. Heartbeat-based — webhook-confirmed sessions are exact, others are estimated from session open/close.';
+$string['analytics:avatar_cost_total_row'] = 'Total';
+$string['prompt_debug_view:badge_attachment'] = 'attachment';
+$string['prompt_debug_view:badge_chunks'] = '{$a} chunks';
+$string['prompt_debug_view:badge_chunks_title'] = 'Number of RAG chunks the retriever selected and showed the model this turn';
+$string['prompt_debug_view:badge_course'] = 'course {$a}';
+$string['prompt_debug_view:badge_page_absent'] = 'no page section';
+$string['prompt_debug_view:badge_page_absent_title'] = 'No current_page_content section was added this turn. Either pageid did not reach the server, the module type does not yield text, or the page record has no content.';
+$string['prompt_debug_view:badge_page_dropped'] = 'page DROPPED by budget';
+$string['prompt_debug_view:badge_page_dropped_title'] = 'current_page_content section was added but dropped under prompt-budget pressure. Raise the budget or reduce other sections.';
+$string['prompt_debug_view:badge_page_kept'] = 'page content';
+$string['prompt_debug_view:badge_page_kept_title'] = 'current_page_content section assembled in full this turn';
+$string['prompt_debug_view:badge_page_truncated'] = 'page content (truncated)';
+$string['prompt_debug_view:badge_page_truncated_title'] = 'current_page_content section landed but was truncated to fit the prompt budget';
+$string['prompt_debug_view:badge_topic_dropped'] = 'topic DROPPED';
+$string['prompt_debug_view:badge_topic_dropped_title'] = 'topic_focus section dropped by prompt budget';
+$string['prompt_debug_view:badge_topic_kept'] = 'topic focus';
+$string['prompt_debug_view:badge_topic_truncated'] = 'topic focus (truncated)';
+$string['prompt_debug_view:badge_user'] = 'user {$a}';
+$string['prompt_metrics:chars_value'] = '{$a} chars';
+$string['token_analytics:back_to_analytics'] = 'Back to Analytics';
+$string['token_analytics:bycat_sub'] = 'Token totals grouped by workload: student Chat, Voice (Realtime / TTS / STT), RAG embedding, Learning Radar analytics queries.';
+$string['token_analytics:bycat_title'] = 'Cost by Category';
+$string['token_analytics:bymodel_sub'] = 'Responses with confirmed token data, grouped by model and provider.';
+$string['token_analytics:bymodel_title'] = 'Cost by Model';
+$string['token_analytics:bystudent_sub'] = 'Top 100 students by token usage. Cost is calculated per model from each student\'s actual mix. A trailing + means some of their usage is on a model with no published rate, so the real figure is higher.';
+$string['token_analytics:bystudent_title'] = 'Cost per Student';
+$string['token_analytics:card_cached_tokens'] = 'Cached Tokens ({$a}% of prompt)';
+$string['token_analytics:card_completion_tokens'] = 'Completion Tokens';
+$string['token_analytics:card_estimated_cost'] = 'Estimated Cost';
+$string['token_analytics:card_prompt_tokens'] = 'Prompt Tokens';
+$string['token_analytics:card_responses'] = 'AI Responses';
+$string['token_analytics:card_total_tokens'] = 'Total Tokens';
+$string['token_analytics:col_active'] = 'Active';
+$string['token_analytics:col_cap'] = 'Cap';
+$string['token_analytics:col_capability'] = 'Capability';
+$string['token_analytics:col_category'] = 'Category';
+$string['token_analytics:col_completion_tokens'] = 'Completion tokens';
+$string['token_analytics:col_est_cost'] = 'Est. cost';
+$string['token_analytics:col_model'] = 'Model';
+$string['token_analytics:col_prompt_tokens'] = 'Prompt tokens';
+$string['token_analytics:col_provider'] = 'Provider';
+$string['token_analytics:col_recommendations'] = 'Top recommendations';
+$string['token_analytics:col_responses'] = 'Responses';
+$string['token_analytics:col_scope'] = 'Scope';
+$string['token_analytics:col_spent'] = 'Spent';
+$string['token_analytics:col_status'] = 'Status';
+$string['token_analytics:col_student'] = 'Student';
+$string['token_analytics:col_total_tokens'] = 'Total tokens';
+$string['token_analytics:filter_course'] = 'Course:';
+$string['token_analytics:filter_period'] = 'Period:';
+$string['token_analytics:heading'] = 'Token Usage & Cost';
+$string['token_analytics:missing_note'] = '<strong>{$a}</strong> assistant messages in this period have no token data (generated before v1.1.0 or by a provider that does not report usage).';
+$string['token_analytics:no_cap'] = 'no cap';
+$string['token_analytics:no_data'] = 'No token data recorded yet.';
+$string['token_analytics:no_data_tracking'] = 'No token data recorded yet. Token tracking begins with v1.1.0.';
+$string['token_analytics:opt_sub'] = 'Projected monthly spend at current mix: <strong>{$a->amount}</strong> ({$a->days} days of data, {$a->confidence} confidence). Recommendations rank each capability\'s providers by composite cost + quality score.';
+$string['token_analytics:opt_title'] = 'LLM Optimizer';
+$string['token_analytics:range_all'] = 'All time';
+$string['token_analytics:range_days'] = '{$a} days';
+$string['token_analytics:rate_in_out'] = 'in {$a->in} / out {$a->out}';
+$string['token_analytics:ratecard_sub'] = 'USD per 1,000,000 tokens. Model strings are matched by prefix. Update <code>classes/token_cost_manager.php</code> when provider pricing changes.';
+$string['token_analytics:ratecard_title'] = 'Rate Card Reference';
+$string['token_analytics:spend_sub'] = '{$a->period} period, since {$a->start}. Configure caps in Settings → Spend guard and optimizer.';
+$string['token_analytics:spend_title'] = 'Spend status';
+
+// --- from newstrings_c.php ---
+// Learner-facing privacy notice (privacy.php → templates/privacy_notice.mustache).
+// Branding tokens ([[tutorname]], [[tutorshort]], [[uniname]]) are resolved by
+// \local_ai_course_assistant\branding::str() at render time.
+$string['privacynotice:title'] = '[[tutorname]] Privacy Notice';
+$string['privacynotice:lastupdated'] = 'Last updated: {$a}. Version 1.0.';
+$string['privacynotice:whatis'] = 'What [[tutorshort]] Is';
+$string['privacynotice:whatis_p1'] = '[[tutorshort]] is [[uniname]]\'s AI powered learning coach, built into some courses. When [[tutorshort]] is available on a course, you will see a chat widget on the course pages. You can ask [[tutorshort]] questions about the material, get practice questions, plan your study schedule, and use voice features if your course has them enabled.';
+$string['privacynotice:whatis_p2'] = '[[tutorshort]] is not available on every course at [[uniname]]. The decision to enable [[tutorshort]] on a course is made by the course developer.';
+$string['privacynotice:collects'] = 'What Information [[tutorshort]] Collects';
+$string['privacynotice:collects_p1'] = 'When you use [[tutorshort]] on a course, [[uniname]] records your messages, [[tutorshort]]\'s responses, the course and time of each exchange, ratings and feedback you give, your study plan and reminder preferences if you create them, your chosen avatar, and a short profile summary that [[tutorshort]] generates from your conversations to personalize future sessions.';
+$string['privacynotice:collects_p2'] = '[[tutorshort]] also collects standard technical data needed to operate the service: your Moodle user id, IP address, browser type, and a timestamp. [[tutorshort]] keeps no record of its own of your full name, email address (unless you opt out of emails, which stores the address the opt-out applies to), home address, phone number (unless you give one for reminders), payment information, or government issued identifiers; where your name appears alongside [[tutorshort]] data, it has been read from your existing [[uniname]] account rather than stored by [[tutorshort]].';
+$string['privacynotice:uses'] = 'How Your Information Is Used';
+$string['privacynotice:uses_item1'] = 'Answer your questions at the moment.';
+$string['privacynotice:uses_item2'] = 'Personalize [[tutorshort]]\'s responses to you.';
+$string['privacynotice:uses_item3'] = 'Improve [[tutorshort]] itself, using anonymized and aggregated data.';
+$string['privacynotice:uses_item4'] = 'Detect and prevent abuse.';
+$string['privacynotice:uses_item5'] = 'Generate analytics that help course authors improve course materials. Analytics are anonymized before they reach a human reviewer.';
+$string['privacynotice:uses_nosell'] = '[[uniname]] does not sell your information. [[uniname]] does not use your [[tutorshort]] conversations to market unrelated products to you.';
+$string['privacynotice:whosees'] = 'Who Sees Your Information';
+$string['privacynotice:whosees_intro'] = 'To answer your questions, [[tutorshort]] works with an AI service (similar to ChatGPT or Claude) behind the scenes. Here\'s exactly what [[tutorshort]] shares with that service:';
+$string['privacynotice:shared_item1'] = 'Your first name';
+$string['privacynotice:shared_item2'] = 'A summary of the course material you\'re studying';
+$string['privacynotice:shared_item3'] = 'The last 10 messages from your current [[tutorshort]] conversation';
+$string['privacynotice:shared_item4'] = 'Your study plan, if you\'ve created one';
+$string['privacynotice:shared_item5'] = 'Your profile summary, if you\'ve created one';
+$string['privacynotice:whosees_never'] = 'Here\'s what [[tutorshort]] never shares:';
+$string['privacynotice:notshared_item1'] = 'Your last name';
+$string['privacynotice:notshared_item2'] = 'Your email address';
+$string['privacynotice:notshared_item3'] = 'Your Moodle username or ID number';
+$string['privacynotice:notshared_item4'] = 'Your home address';
+$string['privacynotice:notshared_item5'] = 'Any other information that could identify you personally';
+$string['privacynotice:whosees_contract'] = '[[uniname]] only uses AI services we have carefully reviewed and approved. Each one has a contract with [[uniname]] that limits how they can use your information and forbids them from using your [[tutorshort]] conversations to train their AI.';
+$string['privacynotice:retention'] = 'How Long [[tutorshort]] Keeps Your Information';
+$string['privacynotice:retention_item1'] = 'Your conversations are stored until you delete them or until the site\'s conversation retention period (two years of inactivity by default) removes them automatically. Only the most recent 10 turns are ever sent to the AI model.';
+$string['privacynotice:retention_item2'] = 'Ratings, study plans, and reminders are retained until you remove them.';
+$string['privacynotice:retention_item3'] = 'Anonymized analytics are retained under [[uniname]]\'s Records Retention Policy and cannot be linked back to you.';
+$string['privacynotice:retention_item4'] = 'Audit and operational logs are retained for up to 365 days. These record that a message was sent — the time, the course, and the network address it came from — but never the content of what you wrote. Those entries record your user id, not your name; where an administrator\'s view of that log shows a name, it is read from your existing [[uniname]] account record.';
+$string['privacynotice:retention_deletion'] = 'When your [[uniname]] user account is deleted, all [[tutorshort]] data tied to your user id is deleted within the same operation.';
+$string['privacynotice:rights'] = 'Your Rights';
+$string['privacynotice:rights_access'] = 'Access.';
+$string['privacynotice:rights_access_desc'] = 'View your current conversation in the widget; download a complete copy of all [[tutorshort]] data from the [[tutorshort]] user settings page.';
+$string['privacynotice:rights_download'] = 'Download.';
+$string['privacynotice:rights_download_desc'] = 'The user settings page offers a "Download my [[tutorshort]] data" button that produces a structured file with all your [[tutorshort]] data.';
+$string['privacynotice:rights_delete'] = 'Delete.';
+$string['privacynotice:rights_delete_desc'] = 'The same page offers course level and global delete options. Deletion is immediate.';
+$string['privacynotice:rights_correction'] = 'Correction.';
+$string['privacynotice:rights_correction_desc'] = '[[tutorshort]] conversations are raw transcripts and are not normally amended. If a derived record looks wrong, continue using [[tutorshort]] or contact [[uniname]] at the address below.';
+$string['privacynotice:rights_object'] = 'Object or restrict.';
+$string['privacynotice:rights_object_desc'] = 'You do not have to use [[tutorshort]]. You can remove your data at any time.';
+$string['privacynotice:rights_portability'] = 'Portability.';
+$string['privacynotice:rights_portability_desc'] = 'The download is in a standard JSON format and can be imported into other systems.';
+$string['privacynotice:rights_complaint'] = 'Complaint.';
+$string['privacynotice:rights_complaint_desc'] = 'Contact [[uniname]]. Learners in the EU, UK, Switzerland, Brazil, or Canada may also complain to their national data protection authority.';
+$string['privacynotice:international'] = 'International Learners';
+$string['privacynotice:international_body'] = '[[uniname]] serves learners globally. If you are based in a region with specific data protection rules (GDPR, UK GDPR, LGPD, PIPEDA, Swiss FADP, CCPA), those rules apply to your [[tutorshort]] data. The lawful basis for processing is the performance of the education contract you have with [[uniname]], combined with [[uniname]]\'s legitimate interest in improving its education services.';
+$string['privacynotice:security'] = 'Security';
+$string['privacynotice:security_intro'] = '[[tutorshort]] lives inside [[uniname]]\'s Moodle platform, so you have to be logged in to use it. A few specific things we do to keep your information safe:';
+$string['privacynotice:security_transit'] = 'In transit:';
+$string['privacynotice:security_transit_desc'] = 'When your messages travel between your device and [[tutorshort]], they are encrypted. That means if anyone tried to intercept them, they would only see scrambled code.';
+$string['privacynotice:security_rest'] = 'At rest:';
+$string['privacynotice:security_rest_desc'] = 'When your information is stored, it lives in [[uniname]]\'s Moodle database, protected by the same security controls [[uniname]] uses for the rest of your student data.';
+$string['privacynotice:security_incident'] = 'If something goes wrong:';
+$string['privacynotice:security_incident_desc'] = 'If we ever detect a security incident that affects your [[tutorshort]] data, [[uniname]] will notify you as required by law.';
+$string['privacynotice:children'] = 'Children';
+$string['privacynotice:children_body'] = '[[tutorshort]] is available only to learners who meet the age requirements of the course they are enrolled in. [[uniname]] does not knowingly collect [[tutorshort]] data from children under the age of 13.';
+$string['privacynotice:contact'] = 'Contact';
+$string['privacynotice:contact_email'] = '[[uniname]] Contact: {$a}';
+$string['privacynotice:contact_privacypage'] = '[[uniname]] Privacy Page: {$a}';
+$string['privacynotice:contact_widget'] = 'Within [[tutorshort]]: open the widget, click the gear icon, open the Privacy and data section.';
+
+// --- from newstrings_d.php ---
+// Widget header / student-mode attribute strings (templates/chat_widget.mustache).
+$string['chat:studentmode_active'] = 'Student mode active (Ctrl+Shift+A to exit)';
+
+// In-drawer help guide panel (templates/chat_widget.mustache).
+$string['help:button_title'] = 'Help';
+$string['help:button_label'] = 'Help guide';
+$string['help:close'] = 'Close help';
+$string['help:title'] = 'How to use {$a}';
+$string['help:intro'] = '{$a} is your AI learning assistant for this course. It reads the course content and helps you study, practice, and understand the material.';
+$string['help:start_title'] = 'Getting started';
+$string['help:start_body'] = 'Click any conversation starter to begin, or type your own question. {$a} answers based on the page you are on.';
+$string['help:quizzes_title'] = 'Practice quizzes';
+$string['help:quizzes_body'] = 'Click <strong>Quiz Me</strong> to get multiple-choice questions from the course content. You will see explanations after each answer and a score summary at the end.';
+$string['help:plans_title'] = 'Study plans';
+$string['help:plans_body'] = 'Click <strong>Study Plan</strong> to create a personalized week-by-week plan. Tell {$a} your goal, how many hours you can study, and your deadline. You can opt into email reminders.';
+$string['help:voice_title'] = 'Voice';
+$string['help:voice_body'] = 'Use the mic icon to speak your question.';
+$string['help:voice_body_tab'] = 'You can also switch to the Voice tab for a live two-way conversation.';
+$string['help:languages_title'] = 'Languages';
+$string['help:languages_body'] = 'Click the gear icon and change the language. {$a} supports 46 languages. All labels and responses switch instantly.';
+$string['help:data_title'] = 'Your data';
+$string['help:data_body'] = 'Your conversations are private to you and the institution. The eraser icon in the header permanently deletes your conversation for this course.';
+$string['help:data_download'] = 'For a full data download, or to delete every [[tutorshort]] record across every course, open <strong>My [[tutorshort]] data</strong> from the gear icon → Settings panel. The page also lets you delete the data for one specific course.';
+
+// Moodle mobile app chat view (classes/output/mobile.php).
+$string['mobile:greeting'] = 'Hi, {$a}!';
+$string['mobile:intro'] = 'I\'m {$a}, your learning assistant. How can I help?';
+$string['mobile:chip_concepts'] = 'Key Concepts';
+$string['mobile:chip_concepts_prompt'] = 'What are the key concepts in this course?';
+$string['mobile:chip_studyplan'] = 'Study Plan';
+$string['mobile:chip_studyplan_prompt'] = 'Help me create a study plan';
+$string['mobile:chip_quiz'] = 'Quiz Me';
+$string['mobile:chip_quiz_prompt'] = 'Quiz me on this course';
+$string['mobile:input_placeholder'] = 'Ask a question...';
+$string['mobile:clear_history'] = 'Clear history';
+$string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again.';
+
+// --- from newstrings_e.php ---
+// settings.php — page/nav chrome and select options (i18n extraction batch E).
+$string['settingspage:pagetitle'] = 'Settings';
+$string['toc:playground'] = 'Prompt Playground';
+$string['toc:course_ai_settings'] = '{$a} AI settings';
+$string['settingspage:analytics_blurb'] = 'Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.';
+$string['settings:spend_cap_period_daily'] = 'Daily';
+$string['settings:spend_cap_period_weekly'] = 'Weekly';
+$string['settings:spend_cap_period_monthly'] = 'Monthly';
+$string['settings:voice_providers'] = 'Voice providers';
+$string['settings:voice_providers_desc'] = 'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).';
+$string['settings:voice_active_default'] = '(use first configured or legacy fallback)';
+$string['settings:voice_active_stt_default'] = '(selfhosted if configured, else first row or legacy fallback)';
+$string['settings:voice_active_stt_selfhosted'] = 'Selfhosted Whisper server (free, uses the URL below)';
+$string['settings:soapbox_rubric_link'] = 'Soapbox speech rubric';
+$string['settings:soapbox_rubric_link_desc'] = 'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, ESL intermediate, ESL advanced). <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>';
+$string['settings:soapbox_video_quality_low'] = 'Low (360p, ~3 MB/min)';
+$string['settings:soapbox_video_quality_standard'] = 'Standard (480p, ~4 MB/min)';
+$string['settings:soapbox_video_quality_high'] = 'High (720p, ~9 MB/min)';
+$string['settings:survey_frequency_once'] = 'Once per course (default)';
+$string['settings:survey_frequency_monthly'] = 'Once per month';
+$string['settings:survey_frequency_quarterly'] = 'Once per quarter';
+$string['settings:survey_frequency_unlimited'] = 'Every time (no limit)';
+$string['settings:usertesting_editor_link'] = 'Edit Testing Tasks';
+$string['settings:usertesting_editor_link_desc'] = '<a href="{$a}" class="btn btn-sm btn-outline-primary">Open Task Editor</a>';
+$string['settings:prompt_playground_navtitle'] = '[[tutorshort]] Prompt Playground';
+$string['settings:whatsapptest_navtitle'] = 'WhatsApp Integration Test';
+$string['survey_admin:navtitle'] = 'Survey Editor';
+$string['usertesting_admin:navtitle'] = 'Usability Testing Editor';
+$string['rubric_admin:navtitle'] = 'Rubric Editor';
+
+// integrity_admin.php — result cards, table, notifications.
+$string['integrity:notify_issues'] = '{$a} issue(s) found. See details below.';
+$string['integrity:notify_passed'] = 'All {$a} checks passed.';
+$string['integrity:last_run'] = 'Last Run';
+$string['integrity:passed'] = 'Passed';
+$string['integrity:failed'] = 'Failed';
+$string['integrity:warnings'] = 'Warnings';
+$string['integrity:results_heading'] = 'Test Results';
+$string['integrity:col_status'] = 'Status';
+$string['integrity:col_check'] = 'Check';
+$string['integrity:col_details'] = 'Details';
+$string['integrity:norun'] = 'No integrity checks have been run yet. Click "Run Now" to check plugin health, or wait for the daily scheduled task.';
+
+// provider_benchmark.php — export error messages.
+$string['benchmark:export_norun'] = 'No benchmark run available to export. Run the benchmark first.';
+$string['benchmark:export_unknownformat'] = 'Unknown export format.';
+
+// survey_admin.php — default survey title and new-option placeholder.
+$string['survey_admin:default_title'] = '[[tutorshort]] End-of-Course Survey';
+$string['survey_admin:new_option'] = 'New option';
+
+// usertesting_admin.php — default task set title and rating-label default.
+$string['usertesting_admin:default_title'] = '[[tutorshort]] Usability Test';
+$string['usertesting_admin:rating_label_default'] = 'Rate this task';
+
+// --- from newstrings_f.php ---
+// Learning Radar delivery endpoints (radar_export.php / radar_schedule.php).
+$string['radar:err_email_required'] = 'Recipient email is required';
+$string['radar:err_slack_webhook_required'] = 'Slack webhook URL is required';
+$string['radar:err_teams_webhook_required'] = 'Teams webhook URL is required';
+$string['radar:err_unknown_action'] = 'Unknown action';
+$string['radar:err_schedule_not_found'] = 'Schedule not found';
+$string['radar:err_name_query_required'] = 'Name and query are required';
+$string['radar:redash_default_name'] = '[[tutorshort]] Learning Radar — {$a}';
+
+// Learning Radar AMD module alert prefixes (amd/src/learning_radar.js).
+$string['radar:js_redash_push_failed'] = 'Redash push failed: {$a}';
+$string['radar:js_redash_setup_failed'] = 'Could not load Redash setup: {$a}';
+$string['radar:js_send_failed'] = 'Send failed: {$a}';
+$string['radar:js_schedule_load_failed'] = 'Could not load schedule: {$a}';
+$string['radar:js_save_failed'] = 'Save failed: {$a}';
+
+// Generic passthrough for moodle_exception('error', 'local_ai_course_assistant', '', $text).
+// Without this key Moodle renders "local_ai_course_assistant/error" and demotes $a to
+// debuginfo, so every existing throw using this pattern was losing its message.
+
+// Realtime voice token endpoint (classes/external/get_realtime_token.php).
+$string['realtime:err_disabled'] = 'Voice mode is disabled on this site.';
+$string['realtime:err_no_provider'] = 'No voice provider configured for Realtime.';
+$string['realtime:err_xai_proxy_unconfigured'] = 'xAI Realtime proxy is not configured. Set xai_proxy_url and xai_proxy_jwt_secret in [[tutorshort]] admin settings, or switch voice to OpenAI.';
+$string['realtime:err_xai_proxy_ssrf'] = 'xAI Realtime proxy URL failed SSRF validation.';
+
+// Message-rating ownership check (classes/external/rate_message.php); $a for core 'nopermissions'.
+$string['realtime:action_rate_message'] = 'rate this message';
+
+// Learning objectives admin page (objectives_admin.php + template).
+$string['objectives:err_invalid_import'] = 'Invalid import payload.';
+$string['objectives:err_unknown'] = 'Unknown objective.';
+$string['objectives:more_items'] = '… {$a} more';
+$string['objectives:move_up'] = 'Move up';
+$string['objectives:move_down'] = 'Move down';
+
+// --- from newstrings_g.php ---
+$string['soapbox:target_minutes'] = '{$a} min';
+$string['starters:badge_quiz'] = 'QUIZ';
+$string['starters:badge_voice'] = 'VOICE';
+$string['starters:badge_pronunciation'] = 'PRONUNCIATION';
+$string['outcomes:csv_code'] = 'Outcome code';
+$string['outcomes:csv_benchmark'] = 'Benchmark (%)';
+$string['sandbox:code_placeholder'] = '# Write Python here. Click Run.';
+$string['sandbox:default_code_comment'] = '# Try this — square the numbers 1 to 10';
+$string['quiz:error_parse'] = 'Could not parse quiz JSON.';
+$string['quiz:error_noquestions'] = 'No valid questions in AI response.';
+
+$string['radar:js_name_prompt'] = 'Name for the new Redash query:';
+$string['radar:js_run_first'] = 'Run a query first.';
