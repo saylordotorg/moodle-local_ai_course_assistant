@@ -1155,6 +1155,13 @@ class hook_callbacks {
             'chat:topic_picker_title',
             'chat:topic_picker_title_explain',
             'chat:topic_start',
+            // Flashcard starter feedback (chat.js ~2201-2224). These are
+            // requested by the browser bundle, so they must be preloaded
+            // here or the CDN build's dependency-check fails.
+            'flashcards:starter_saved',
+            'flashcards:starter_open_review',
+            'flashcards:starter_failed',
+            'flashcards:starter_error',
             // quiz.js strings.
             'chat:quiz_setup_title',
             'chat:quiz_questions',

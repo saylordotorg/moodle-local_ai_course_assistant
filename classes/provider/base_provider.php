@@ -785,6 +785,7 @@ abstract class base_provider implements provider_interface {
      * @param string $providerid Provider ID selected by the admin.
      * @param string $model Model name selected by the admin (may be blank).
      * @param int $courseid Course context for base config inheritance.
+     * @param bool $enforcespend Whether the learner spend cap applies; false for operator tooling that must measure providers.
      * @return provider_interface
      * @throws \moodle_exception If provider is unknown.
      */

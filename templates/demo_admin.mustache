@@ -32,6 +32,10 @@
       step 2 seeding form), or false when no course exists yet.
     * footer string - Footer note (carries markup; rendered unescaped).
 
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
     Example context (json):
     {
         "notifications": [],
@@ -59,10 +63,6 @@
         },
         "footer": "Data created here lives in the standard Moodle tables."
     }
-
-    @package    local_ai_course_assistant
-    @copyright  2026 Saylor Academy
-    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 }}
 {{#notifications}}{{{html}}}{{/notifications}}
 {{! intro / existsmsg / opencourse / viewanalytics / footer are plugin-authored

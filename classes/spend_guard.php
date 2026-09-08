@@ -283,6 +283,7 @@ class spend_guard {
      *
      * @param int $courseid 0 for site-wide
      * @param string|null $capability
+     * @param bool $notify Whether crossing a threshold sends the notification emails
      * @return string One of the CAP_* constants
      */
     public static function check(int $courseid = 0, ?string $capability = null, bool $notify = true): string {

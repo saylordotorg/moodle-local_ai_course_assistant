@@ -443,13 +443,24 @@ echo html_writer::div(
                 </label>
                 <div class="col-sm-9">
                     <?php
-                    // Never render the stored credential into the served HTML.
-                    // This was `value="<?php echo s($current->apikey) ?>"`, which
-                    // put the course's provider API key in cleartext in the page
-                    // source for everyone holding :manage in the course context
-                    // (an editing teacher), and in any proxy or browser cache that
-                    // saw the response. The field now always renders empty; a blank
-                    // submission keeps the stored key (see the POST handler above).
+                    /*
+                     * Never render the stored credential into the served HTML.
+                     * The field used to carry a value="..." echoing
+                     * s($current->apikey), which put the course's provider API
+                     * key in cleartext in the page source for everyone holding
+                     * :manage in the course context (an editing teacher), and in
+                     * any proxy or browser cache that saw the response. The field
+                     * now always renders empty; a blank submission keeps the
+                     * stored key (see the POST handler above).
+                     *
+                     * Do not quote a literal PHP close tag in a comment here. A
+                     * close tag ends PHP mode even inside a comment, and the
+                     * earlier `//` version of this note carried one: it dropped
+                     * the block mid-sentence, printed these lines to the page,
+                     * and left $haskey and $keyph unassigned -- which silently
+                     * removed the only UI path to clear a stored per-course key
+                     * (issue #218, broken v7.3.0 through v7.3.5).
+                     */
                     $haskey = $current && $current->apikey !== '';
                     $keyph = $haskey
                         ? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')
