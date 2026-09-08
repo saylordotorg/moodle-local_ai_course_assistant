@@ -39,8 +39,11 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 if ($courseid <= 0) {
     \local_ai_course_assistant\page_helpers::render_course_picker_landing(
         '/local/ai_course_assistant/sandbox.php',
-        get_string('coursepicker:title', 'local_ai_course_assistant',
-            get_string('sandbox:title', 'local_ai_course_assistant')),
+        get_string(
+            'coursepicker:title',
+            'local_ai_course_assistant',
+            get_string('sandbox:title', 'local_ai_course_assistant')
+        ),
         'local/ai_course_assistant:use'
     );
     exit;
@@ -85,7 +88,7 @@ echo $OUTPUT->header();
     <textarea id="aica-sandbox-code" rows="14"
               spellcheck="false"
               style="width:100%;font-family:Menlo,Monaco,Consolas,monospace;font-size:13px;line-height:1.55;padding:10px;border:1px solid #d1d5db;border-radius:8px;tab-size:4"
-              placeholder="# Write Python here. Click Run.&#10;print('hello')"># Try this — square the numbers 1 to 10
+              placeholder="<?php echo s(get_string('sandbox:code_placeholder', 'local_ai_course_assistant')); ?>&#10;print('hello')"><?php echo s(get_string('sandbox:default_code_comment', 'local_ai_course_assistant')); ?>
 for n in range(1, 11):
     print(n, n*n)
 </textarea>

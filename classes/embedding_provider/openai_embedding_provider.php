@@ -26,7 +26,6 @@ namespace local_ai_course_assistant\embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class openai_embedding_provider extends base_embedding_provider {
-
     /** Maximum texts per batch request. */
     private const BATCH_SIZE = 100;
 

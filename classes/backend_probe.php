@@ -36,7 +36,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class backend_probe {
-
     public const STATUS_PASS = 'pass';
     public const STATUS_WARN = 'warn';
     public const STATUS_FAIL = 'fail';
@@ -49,18 +48,24 @@ final class backend_probe {
      */
     public static function compare_window(int $configured, int $detected): array {
         if ($detected === 0) {
-            return self::row(self::STATUS_WARN,
-                'Could not detect max_model_len from the backend. Set the Backend context window setting manually.');
+            return self::row(
+                self::STATUS_WARN,
+                'Could not detect max_model_len from the backend. Set the Backend context window setting manually.'
+            );
         }
         if ($configured === 0) {
-            return self::row(self::STATUS_WARN,
+            return self::row(
+                self::STATUS_WARN,
                 "The backend reports a {$detected}-token window but SOLA clamping is off (Backend context window = 0). "
-                . "Consider setting it to {$detected} so prompts cannot overflow.");
+                . "Consider setting it to {$detected} so prompts cannot overflow."
+            );
         }
         if ($configured > $detected) {
-            return self::row(self::STATUS_WARN,
+            return self::row(
+                self::STATUS_WARN,
                 "Configured window {$configured} exceeds the backend's {$detected}; prompts may overflow. "
-                . "Lower the Backend context window setting to {$detected} or less.");
+                . "Lower the Backend context window setting to {$detected} or less."
+            );
         }
         return self::row(self::STATUS_PASS, "Window OK (configured {$configured} is within the backend's {$detected}).");
     }
@@ -75,9 +80,11 @@ final class backend_probe {
     public static function check_floor_fits(int $windowtokens, int $outputtokens, string $lang): array {
         $chars = token_estimator::budget_chars_for_window($windowtokens, $outputtokens > 0 ? $outputtokens : 512, 0, $lang);
         if ($chars < context_builder::MIN_BUDGET_FLOOR) {
-            return self::row(self::STATUS_FAIL,
+            return self::row(
+                self::STATUS_FAIL,
                 "Window too small: only {$chars} chars remain for the system prompt, below the "
-                . context_builder::MIN_BUDGET_FLOOR . '-char safety floor. Raise the window or lower Max Response Length (max_tokens).');
+                . context_builder::MIN_BUDGET_FLOOR . '-char safety floor. Raise the window or lower Max Response Length (max_tokens).'
+            );
         }
         return self::row(self::STATUS_PASS, "System-prompt budget of {$chars} chars clears the safety floor.");
     }
@@ -87,12 +94,21 @@ final class backend_probe {
      */
     public static function probe_chat(): array {
         try {
-            $provider = base_provider::create_from_config(0);
+            $provider = base_provider::create_from_config(0, /* diagnostic */ true);
             $started = microtime(true);
             $reply = $provider->chat_completion(
                 'You are a connectivity probe. Answer in one word.',
                 [['role' => 'user', 'content' => 'Reply with the single word OK.']],
-                ['max_tokens' => 8]
+                // v7.2.8: NOT 8. Reasoning models spend the completion budget on
+                // internal thinking tokens before emitting anything, so a tiny
+                // ceiling returns HTTP 200 with finish_reason=length and null
+                // content. Measured against live gemini-2.5-flash on 2026-09-01:
+                // max_tokens 8 and 16 both yield null; 64 yields "OK". At 8 this
+                // probe reported a perfectly healthy production backend as FAIL,
+                // which is the worst possible behaviour for the one page an admin
+                // opens to answer "is my backend up?". 256 is far above the knee
+                // and still costs a fraction of a cent per run.
+                ['max_tokens' => 256]
             );
             $ms = (int) round((microtime(true) - $started) * 1000);
             if (trim((string) $reply) === '') {
@@ -100,8 +116,48 @@ final class backend_probe {
             }
             return self::row(self::STATUS_PASS, "Chat round-trip OK in {$ms} ms.");
         } catch (\Throwable $e) {
-            return self::row(self::STATUS_FAIL, 'Chat probe failed: ' . $e->getMessage());
+            // v7.2.8: surface debuginfo. moodle_exception keeps the HTTP status
+            // and response body there, not in getMessage(), so reporting the
+            // message alone reduced every backend fault to the same generic
+            // sentence -- on the page whose entire job is telling an admin what
+            // is wrong. Diagnosing the 2026-09-01 staging incident took a dozen
+            // steps for exactly this reason.
+            $detail = trim((string) ($e->debuginfo ?? ''));
+            $msg = 'Chat probe failed: ' . $e->getMessage();
+            if ($detail !== '') {
+                $msg .= ' [' . \core_text::substr($detail, 0, 300) . ']';
+            }
+            return self::row(self::STATUS_FAIL, $msg);
         }
+    }
+
+    /**
+     * Structural: report Moodle core_ai availability and how the 'auto' chat
+     * provider default would resolve. Network-free.
+     */
+    public static function probe_coreai(): array {
+        $available = \local_ai_course_assistant\provider\coreai_provider::is_available();
+        $configured = get_config('local_ai_course_assistant', 'provider') ?: 'auto';
+        if ($available) {
+            $note = ($configured === 'auto')
+                ? 'Auto routes chat through it when no SOLA key is set.'
+                : "Chat provider is set to '{$configured}', so core_ai is available but not in use.";
+            return self::row(
+                self::STATUS_PASS,
+                "Moodle core_ai is available with a configured provider. {$note}"
+            );
+        }
+        if (!class_exists('\\core_ai\\manager')) {
+            return self::row(
+                self::STATUS_PASS,
+                'Moodle core_ai subsystem not present (needs Moodle 4.5+); SOLA uses its own providers.'
+            );
+        }
+        return self::row(
+            self::STATUS_PASS,
+            'Moodle core_ai is present but has no configured AI provider; SOLA uses its own providers. '
+            . 'Configure one under Site admin > AI to route chat through it.'
+        );
     }
 
     /**
@@ -109,7 +165,7 @@ final class backend_probe {
      */
     public static function detect_window(): int {
         try {
-            $provider = base_provider::create_from_config(0);
+            $provider = base_provider::create_from_config(0, /* diagnostic */ true);
             return $provider->detect_context_window();
         } catch (\Throwable $e) {
             return 0;
@@ -145,6 +201,8 @@ final class backend_probe {
      */
     public static function run_all(): array {
         $rows = [];
+
+        $rows[] = ['label' => 'Moodle core_ai'] + self::probe_coreai();
 
         $chat = self::probe_chat();
         $rows[] = ['label' => 'Chat round-trip'] + $chat;

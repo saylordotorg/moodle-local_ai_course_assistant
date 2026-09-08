@@ -1,5 +1,13 @@
 # SOLA Vendor Recommendations (Pilot → 100k Saylor MAU)
 
+> **CORRECTION (2026-08-01) — the rerank cost and per-user volume figures below are superseded.**
+>
+> Two errors compound in the original model. Measured production usage is **5.07 chat turns per SOLA user per month**, not the ~70 implied by the capacity table here (**13.7x overstated**). And the measured rerank cost is **$0.00187/query at pool 50** against real ~700-token Saylor chunks, not the snippet-sized assumption behind the $63/mo figure (**52x understated**).
+>
+> They partly cancel, so the net error in absolute cost is **3.8x understated**: at 25,000 SOLA users, reranking at pool 50 is **~$237/month**, not $63. The bigger correction is proportional — reranking is **~101% of chat spend at pool 50** and **~41% at pool 20**, not the "~6% of chat spend" claimed here. Enabling it at pool 50 would roughly double the AI bill.
+>
+> Canonical figures: `sola-retrieval-cost-projections-2026-07-31.md`. Measurement: `sola-model-benchmark-2026-07-30.md`.
+
 **Author:** Tom Caswell. **Date:** 2026-06-09. **Status:** Ready for finance, procurement, ops, and DPO review.
 
 **Revised 2026-07-12:** added **Appendix C (Soapbox spoken-presentation activity)** for the cost of the video/audio feature shipped in v6.8.32 (previously only sketched in Appendix B's deferred audio tier). Soapbox has a different cost shape from the text baseline — per-assignment, not monthly-per-user — so it is scoped separately and does not change the baseline monthly figures below. Standalone cost guide: `.drafts/sola-soapbox-cost-estimate-2026-07-12.md`.
@@ -16,7 +24,7 @@ Concise rev of `.drafts/sola-pilot-to-scale-vendor-recommendations-2026-06-01.md
 
 | Component | Primary | Failover | Why |
 |---|---|---|---|
-| Core chat tutor | **Gemini 2.5 Flash** (Vertex AI) | gpt-4o-mini | Wins every domain × function bucket (2026-06-04). 14.35/15 overall, only model >14 on every subject. |
+| Core chat tutor | **Gemini 2.5 Flash** (Vertex AI) | gpt-4o-mini | Wins every domain × function bucket (2026-06-04). 14.35/15 overall, only model >14 on every subject. **Reconfirmed 2026-07-24** vs Gemini 3.6-flash and 3.5-flash-lite: 2.5-flash is the most compliant Gemini (86% jailbreak vs 79% lite / 62% 3.6) and cheapest (0.056¢/call vs 0.117 lite; 3.6 ~10x list); newer Flash models rejected on safety + cost. See `sola-chat-model-benchmark-2026-07-24.md`. |
 | Quiz coach | gpt-4o-mini | Mistral Small | Function saturated; gpt-4o-mini at 14.00/15 is cheapest TIER 1. |
 | Anti-cheat / integrity reference | Claude Haiku 4.5 (~5% of turns) | Gemini 2.5 Flash | Best refusal discipline (14.60/15); budget Llamas cave (10.30–11.50). |
 | ESL / multilingual chat | Gemini 2.5 Flash | gpt-4o-mini | Decisive multilingual lead (14.50/15). |
@@ -68,7 +76,7 @@ A "100k MAU" scale point = 100k Saylor MAU with ~25k active SOLA users. **Chat i
 | Mastery classifier (gpt-4o-mini) | $25 | $53 | $105 |
 | Analytics + digests + Radar | $4 | $15 | $30 |
 | Embeddings (OpenAI 3-small; kept per 2026-07-08 A/B, was Voyage-3.5) | <$1 | <$1 | <$1 |
-| Re-ranker (Voyage rerank-2.5) | $15 | $31 | $63 |
+| Re-ranker (Voyage rerank-2.5) | $15 | $31 | $63 <br>**[corrected: ~$237/mo at pool 50, ~$95 at pool 20]** |
 | Judge harness | $4 | $4 | $4 |
 | **Baseline total** | **~$330** | **~$690** | **~$1,370** |
 | Premium escalation (Opus 4.8, 5% of turns, ships v5.12+) | $170 | $350 | $700 |
@@ -104,10 +112,10 @@ Mistral Small was originally specified as the EU-resident ultimate fallback (ste
 
 | Vendor | Component | Approx volume / day | Required tier |
 |---|---|---|---|
-| Vertex AI (Gemini Flash) | chat | ~58k chat turns | Tier 3+ (5k+ RPM) |
+| Vertex AI (Gemini Flash) | chat | ~58k chat turns <br>**[corrected: ~4.2k/day measured]** | Tier 3+ (5k+ RPM) |
 | OpenAI (gpt-4o-mini) | quiz + classifier + analytics + failover | ~25k structured calls | Tier 4 (10k+ RPM) |
 | Anthropic (Haiku 4.5) | integrity reference | ~3k calls | Tier 3 |
-| Voyage (embeddings + rerank-2.5) | RAG index + runtime | ~125k reranks | Pay-as-you-go fine |
+| Voyage (embeddings + rerank-2.5) | RAG index + runtime | ~125k reranks <br>**[corrected: ~4.2k/day]** | Pay-as-you-go fine |
 
 ---
 
@@ -236,7 +244,7 @@ OpenAI leads R@1 and MRR; Voyage-3.5 only edges R@5 by a single fixture (a tie a
 | **Voyage rerank-2.5** (pick) | $0.05 |
 | Cohere Rerank 3.5 (failover) | $2.00 |
 
-40x cheaper than Cohere for near-equivalent quality. Two-stage retrieval (top-50 embed → top-5 cross-encoder) is the dominant 2026 RAG pattern; published lifts include +15 Recall@10 (enterprise corpora) and +39% NDCG on BEIR. ~$63/mo at 100k Saylor MAU; ~6% of chat spend for material answer-quality lift.
+40x cheaper than Cohere for near-equivalent quality. Two-stage retrieval (top-50 embed → top-5 cross-encoder) is the dominant 2026 RAG pattern; published lifts include +15 Recall@10 (enterprise corpora) and +39% NDCG on BEIR. ~$63/mo at 100k Saylor MAU; ~6% of chat spend for material answer-quality lift. **[CORRECTED 2026-08-01: measured at ~$237/mo and ~101% of chat spend at pool 50; ~$95/mo and ~41% at pool 20.]**
 
 ### A.9 Judge / benchmark harness: Claude Sonnet 4.6 (keep)
 

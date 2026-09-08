@@ -29,7 +29,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class radar_schedule_manager {
-
     /** @var string[] Allowed frequency values. */
     public const FREQUENCIES = ['daily', 'weekly', 'monthly'];
 
@@ -157,9 +156,12 @@ class radar_schedule_manager {
      */
     public static function frequency_to_days(string $frequency): int {
         switch ($frequency) {
-            case 'daily':   return 1;
-            case 'weekly':  return 7;
-            case 'monthly': return 30;
+            case 'daily':
+                return 1;
+            case 'weekly':
+                return 7;
+            case 'monthly':
+                return 30;
         }
         return 7;
     }

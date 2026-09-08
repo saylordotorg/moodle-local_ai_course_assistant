@@ -25,7 +25,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\streak_tracker
  */
 final class streak_tracker_test extends \advanced_testcase {
-
     public function test_record_first_activity_creates_row_with_streak_one(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -51,8 +50,11 @@ final class streak_tracker_test extends \advanced_testcase {
         $this->assertNull($milestone);
 
         $row = streak_tracker::get($user->id, $course->id);
-        $this->assertEquals(1, $row->current_streak_days,
-            'Two activity calls on the same day must not double-count.');
+        $this->assertEquals(
+            1,
+            $row->current_streak_days,
+            'Two activity calls on the same day must not double-count.'
+        );
     }
 
     public function test_date_diff_days_handles_consecutive_and_gap(): void {

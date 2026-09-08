@@ -37,16 +37,7 @@ $string['cachedef_systemprompt'] = 'Assembled AI system prompt (per course)';
 $string['cachedef_remoteconfig'] = 'Remote configuration fetched from the update channel';
 $string['cachedef_spend'] = 'Per-period AI spend totals for the spend guard';
 $string['cachedef_failover_circuit'] = 'Provider failover circuit-breaker state';
-$string['attachment:attach'] = 'Attach';
-$string['attachment:attach_image_or_pdf'] = 'Attach image or PDF';
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'Stores AI tutor chat conversations per user and course.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'The ID of the user who owns the conversation.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'The ID of the course the conversation belongs to.';
@@ -83,7 +74,7 @@ $string['settings:comparison_providers_desc'] = 'Add extra AI providers to the i
 $string['settings:auto_open'] = 'Auto-open on first visit';
 $string['settings:auto_open_desc'] = 'When enabled, the assistant drawer opens automatically the first time a student lands on each course. Subsequent page loads in the same course do not re-open the drawer — state is tracked per course in the student\'s browser via localStorage. Applies on desktop and mobile. Can be overridden per course from the Course AI Settings page.';
 $string['settings:provider'] = 'Default chat AI provider';
-$string['settings:provider_desc'] = 'Provider used for the student chat drawer (text). This setting controls chat only — the RAG embedding provider is configured separately under "RAG Embedding Provider" below, and the live voice / TTS / STT providers are configured under "Voice providers (Realtime, TTS, STT)". Voice (Realtime, TTS, STT) is currently only available with OpenAI or xAI; choosing a chat-only provider here (Together AI, Anthropic, DeepSeek, Google Gemini, Mistral, MiniMax, OpenRouter) will not break voice as long as the Voice providers table is configured. Choose "Moodle AI (core_ai subsystem)" to route chat through Moodle\'s built-in AI configuration at Site admin > AI; the API key, model, and base URL fields below are then ignored. Streaming, tool use, and prompt caching are not available via core_ai — responses are delivered as a single chunk.';
+$string['settings:provider_desc'] = 'Provider used for the student chat drawer (text). The default, <strong>Auto</strong>, routes chat through your Moodle-configured AI provider (Site admin &gt; AI) when one is set and no [[tutorshort]] API key is entered here, and otherwise uses a direct provider — so a fresh install works with either your central Moodle AI setup or a [[tutorshort]]-managed key. Pick a specific provider to override Auto. This setting controls chat only — the RAG embedding provider is configured separately under "RAG Embedding Provider" below, and the live voice / TTS / STT providers are configured under "Voice providers (Realtime, TTS, STT)". Voice (Realtime, TTS, STT) is currently only available with OpenAI or xAI; choosing a chat-only provider here (Together AI, Anthropic, DeepSeek, Google Gemini, Mistral, MiniMax, OpenRouter) will not break voice as long as the Voice providers table is configured. Choose "Moodle AI (core_ai subsystem)" to route chat through Moodle\'s built-in AI configuration at Site admin > AI; the API key, model, and base URL fields below are then ignored. Streaming, tool use, and prompt caching are not available via core_ai — responses are delivered as a single chunk.';
 $string['settings:provider_claude'] = 'Claude (Anthropic)';
 $string['settings:provider_openai'] = 'OpenAI';
 $string['settings:provider_deepseek'] = 'DeepSeek';
@@ -95,6 +86,7 @@ $string['settings:provider_together'] = 'Together AI (Llama 3.1 8B/70B/405B Turb
 $string['settings:provider_xai'] = 'xAI (Grok)';
 $string['settings:provider_gemini'] = 'Google Gemini';
 $string['settings:provider_coreai'] = 'Moodle AI (core_ai subsystem)';
+$string['settings:provider_auto'] = 'Auto (use Moodle AI if configured, else a direct provider)';
 $string['settings:provider_custom'] = 'Custom (OpenAI-compatible)';
 $string['settings:apikey'] = 'API Key';
 $string['settings:apikey_desc'] = 'API key for the selected provider. Not required for Ollama.';
@@ -104,7 +96,7 @@ $string['settings:model_desc_dynamic'] = 'Leave blank to use the provider\'s def
 $string['settings:apibaseurl'] = 'API Base URL';
 $string['settings:apibaseurl_desc'] = 'Base URL for the API. Auto-filled per provider but can be overridden. Leave blank for provider default.';
 $string['settings:systemprompt'] = 'System Prompt Template';
-$string['settings:systemprompt_desc'] = 'System prompt sent to the AI. Use placeholders: {{coursename}}, {{userrole}}, {{coursetopics}}, {{institution}}.';
+$string['settings:systemprompt_desc'] = 'System prompt sent to the AI. Use placeholders: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
 
 ## Role
@@ -115,14 +107,6 @@ Provide supportive, course-aligned academic help that encourages learning, pract
 - Do not invent content or go beyond course scope.
 - Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
 - When generating practice questions, draw them directly from the course material.
-
-## Course Structure
-{{coursetopics}}
-
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
-
-{{coursecontent}}
 
 ## What [[tutorshort]] Can Help With
 - Explain concepts and summarize lessons
@@ -147,7 +131,7 @@ $string['settings:temperature_desc'] = 'Controls randomness. Lower values are mo
 $string['settings:maxhistory'] = 'Max Conversation History';
 $string['settings:maxhistory_desc'] = 'Maximum number of message pairs to include in API requests. Older messages are trimmed.';
 $string['settings:history_mode'] = 'History Selection Mode';
-$string['settings:history_mode_desc'] = 'How past conversation turns are chosen before being sent to the model. <strong>Semantic</strong> keeps only the recent turns relevant to the current question (and always the most recent exchange), so a stale, off-topic earlier turn does not inflate cost or pull the answer off course; it does one extra embedding call per message. <strong>Recency</strong> keeps the last "Max Conversation History" pairs regardless of relevance (the long-standing behaviour, no extra call). If embedding is unavailable, semantic mode falls back to recency automatically.';
+$string['settings:history_mode_desc'] = 'How past conversation turns are chosen before being sent to the model. <strong>Semantic</strong> keeps only the recent turns relevant to the current question (and always the most recent exchange), so a stale, off-topic earlier turn does not inflate cost or pull the answer off course; it does one extra embedding call per message. <strong>Recency</strong> keeps the last "Max Conversation History" pairs regardless of relevance (the long-standing behavior, no extra call). If embedding is unavailable, semantic mode falls back to recency automatically.';
 $string['settings:history_mode_semantic'] = 'Semantic (relevant recent turns)';
 $string['settings:history_mode_recency'] = 'Recency (last N pairs)';
 $string['settings:history_semantic_minscore'] = 'History Relevance Floor (cosine)';
@@ -232,6 +216,7 @@ $string['chat:copy_failed'] = 'Failed to copy conversation';
 $string['chat:greeting'] = 'Hi, {$a}! I\'m [[tutorshort]]. How can I help you today?';
 $string['chat:thinking'] = 'Thinking...';
 $string['chat:error'] = 'Sorry, something went wrong. Please try again.';
+$string['chat:refused'] = 'I am not able to help with that request. Let us get back to your coursework -- what would you like to work on next?';
 $string['chat:error_auth'] = 'Authentication error. Please contact your administrator.';
 $string['chat:error_ratelimit'] = 'Too many requests. Please wait a moment and try again.';
 $string['chat:error_unavailable'] = 'The AI service is temporarily unavailable. Please try again later.';
@@ -249,6 +234,9 @@ $string['chat:offtopic_ended'] = 'Your AI tutor access has been temporarily susp
 $string['chat:offtopic_locked'] = 'Your AI tutor access is temporarily suspended. You can try again in {$a} minutes. Please focus on course-related questions when you return.';
 $string['chat:escalated_to_support'] = 'I was unable to fully answer your question, so I\'ve created a support ticket for you. A support team member will follow up. Your ticket reference is: {$a}';
 $string['chat:escalation_needs_consent'] = 'It looks like this needs a member of our support team. To pass it to them I would have to share this conversation, including your name and email, with the support desk. You have not agreed to that yet, so I have not sent anything. If you would like human help, please accept the data-sharing notice for this assistant and ask again, or contact support directly.';
+$string['coursesettings:apibaseurl_rejected'] = 'The API base URL was not saved: it must be a public HTTPS endpoint that passes the SSRF safety check.';
+$string['settings:escalation_intent_patterns'] = 'Escalation intent patterns';
+$string['settings:escalation_intent_patterns_desc'] = 'One PCRE regex per line, WITHOUT delimiters (case-insensitive matching is applied automatically, as for premium escalation triggers); lines beginning with # are ignored. A support ticket is only opened when the learner\'s own message matches one of these, so course content cannot trigger an escalation on a learner\'s behalf. Leave empty to use the built-in defaults, which cover English plus a few common phrasings in Spanish, French, German and Portuguese. Sites whose learners write in another language should add patterns here: an unmatched message means no ticket is opened.';
 $string['settings:zendesk_require_consent'] = 'Require consent before support escalation';
 $string['settings:zendesk_require_consent_desc'] = 'When on (recommended), [[tutorshort]] escalates a conversation to the Zendesk support desk only after the learner has accepted the first-run consent notice, which discloses that requesting human help shares the conversation (including name and email) with support. Turn this off only if you obtain that consent some other way; with it off, escalations send immediately. Has no effect unless Zendesk escalation is enabled.';
 $string['chat:studyplan_intro'] = 'I can help you create a study plan for this course! Just tell me how many hours per week you can dedicate to studying, and I\'ll help you build a structured plan.';
@@ -315,10 +303,23 @@ $string['settings:embed_model'] = 'Embedding Model';
 $string['settings:embed_model_desc'] = 'Model to use for generating embeddings. OpenAI default: text-embedding-3-small. Ollama example: nomic-embed-text.';
 $string['settings:embed_apibaseurl'] = 'Embedding API Base URL';
 $string['settings:embed_apibaseurl_desc'] = 'Base URL for the embedding API. Leave blank for OpenAI default. For Ollama: http://localhost:11434/api';
+$string['settings:embed_dtype_shortfloat'] = 'Full precision';
+$string['settings:embed_dtype_shortint8'] = 'Reduced precision';
+$string['settings:embed_dtype_shortbinary'] = 'Smallest';
+$string['ragadmin:stat_vector_storage'] = 'Vector storage';
+$string['ragadmin:storage_projection'] = 'Re-indexing at a different precision would change this to: {$a}. Changing precision requires a full re-index.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — about {$a->size}';
+$string['settings:embed_query_model'] = 'Query embedding model (advanced)';
+$string['settings:embed_query_model_desc'] = 'Leave empty unless you know you need this. Normally queries and course content are embedded by the same model, which is the only universally safe choice: vectors from different models cannot be compared, and mixing them produces confident-looking but meaningless results rather than an error. Set this only when the two models share an embedding space — currently the Voyage 4 family (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), which is documented as interchangeable. The benefit is that you can change the query model later without re-embedding your whole course catalogue. If the models turn out not to be comparable, retrieval logs a warning and returns nothing for that course rather than returning wrong passages.';
+$string['settings:embed_dtype'] = 'Stored vector precision';
+$string['settings:embed_dtype_desc'] = 'How much space each stored vector takes. Lower precision saves a great deal of disk at some cost in retrieval accuracy. <strong>Changing this requires a full re-index</strong> — the formats cannot be read interchangeably, and any course still stored in the old format will be skipped (with a warning in the logs) until it is re-indexed. Only providers that support quantization honour this; others always store full precision.';
+$string['settings:embed_dtype_float'] = 'Full precision (largest, most accurate)';
+$string['settings:embed_dtype_int8'] = 'Reduced precision — about a quarter of the space';
+$string['settings:embed_dtype_binary'] = 'Smallest — about a thirtieth of the space, lowest accuracy';
 $string['settings:embed_dimensions'] = 'Embedding Dimensions';
 $string['settings:embed_dimensions_desc'] = 'Number of dimensions in the embedding vector. Must match your model output. OpenAI text-embedding-3-small: 1536. nomic-embed-text: 768.';
 $string['settings:rag_topk'] = 'Top-K Chunks';
-$string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt.';
+$string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt. The default of 3 was chosen from a blind A/B over 40 questions in which 3 and 5 were statistically tied (11 wins vs 12, 17 ties) while 3 used 31% fewer prompt tokens. Raise it only if answers are visibly missing context.';
 $string['settings:rag_min_similarity'] = 'Minimum Relevance (cosine)';
 $string['settings:rag_min_similarity_desc'] = 'Drop retrieved chunks whose cosine similarity to the question is below this value, so an off-topic or sparse question injects fewer (or zero) passages instead of always padding to Top-K with weak matches. Range 0 to 1; 0 disables the gate. The right value depends on the embedding model: 0.25 suits text-embedding-3-small. Raise it to be stricter (less, more on-topic context), lower it to be more permissive.';
 $string['settings:rag_currentpage_boost'] = 'Current-Page Boost';
@@ -350,7 +351,9 @@ $string['settings:rerank_model_desc'] = 'Default <code>rerank-2.5</code>. Newer 
 $string['settings:rerank_apibaseurl'] = 'Rerank API base URL';
 $string['settings:rerank_apibaseurl_desc'] = 'Override the Voyage rerank base URL. Leave blank to use the Embedding API Base URL above, or Voyage default (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'Rerank candidate window';
-$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 50. Larger windows give the reranker more material to work with at small extra cost (~10k tokens per rerank op).';
+$string['settings:rerank_candidates_desc'] = 'How many cosine top-N candidates feed the rerank stage. Default 20. Measured over 1,008 queries: 20 matches 30 on recall (R@3 89.0% vs 89.3%) for a third less cost, and 50 costs 2.5x with no measurable gain. Below 10 recall degrades. Cost scales linearly with this value.';
+$string['settings:rerank_margin_threshold'] = 'Rerank ambiguity threshold';
+$string['settings:rerank_margin_threshold_desc'] = 'Only rerank when the cosine margin between the top-1 and top-3 candidates is below this value, i.e. when retrieval is ambiguous. Measured over 1,008 queries: at the default 0.086 this skips about 30% of queries with no measurable recall loss, and avoids cases where reranking displaces an already-correct top result. Set to 0 to rerank every query.';
 
 // Selfhosted Whisper STT server (v6.2.0).
 $string['settings:stt_selfhosted_heading'] = 'Selfhosted transcription (Whisper)';
@@ -382,6 +385,7 @@ $string['analytics:exp_course_b'] = 'Course B';
 $string['analytics:exp_compare'] = 'Compare';
 $string['analytics:exp_metric'] = 'Metric';
 $string['analytics:exp_delta'] = 'B vs A';
+$string['analytics:course_hidden_suffix'] = '(hidden)';
 $string['analytics:exp_enrolled'] = 'Enrolled learners';
 $string['analytics:exp_active_users'] = 'Active [[tutorshort]] users';
 $string['analytics:exp_usage_rate'] = 'Usage rate (%)';
@@ -439,7 +443,7 @@ To stop receiving these reminders, click here: {$a->unsubscribe_url}';
 $string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
 $string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
 $string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
-$string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
+$string['studytip:summarise']           = 'Take a few minutes to summarize what you have learned in your own words.';
 $string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
 $string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
 $string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
@@ -464,7 +468,6 @@ $string['task:run_integrity_checks'] = 'Run daily AI Course Assistant plugin int
 $string['task:milestone_check'] = 'Send daily milestone reflection emails (v5.3.0)';
 $string['task:struggle_signal_review'] = 'Review struggle signals into private learner memory (v5.3.0)';
 $string['task:rebuild_objective_links'] = 'Rebuild cross-course objective links for mastery rollup (v5.7.0)';
-$string['messageprovider:study_notes'] = 'Study session notes';
 $string['messageprovider:study_reminder'] = 'Study reminders';
 $string['messageprovider:integrity_report'] = 'AI Course Assistant integrity check failure report';
 
@@ -517,21 +520,6 @@ $string['milestone:trigger_streak30'] = '30-day activity streak reached';
 $string['milestone:trigger_completion'] = 'Course completion recorded';
 
 // Plugin Updates.
-$string['update:title'] = 'Plugin Updates';
-$string['update:desc'] = 'Check for and install plugin updates directly from GitHub releases.';
-$string['update:check'] = 'Check for Updates';
-$string['update:install'] = 'Install Update';
-$string['update:current_version'] = 'Installed Version';
-$string['update:latest_version'] = 'Latest Available';
-$string['update:up_to_date'] = 'Up to Date';
-$string['update:available'] = 'Update Available';
-$string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
-$string['update:changelog'] = 'Release Notes';
-$string['update:back_to_settings'] = 'Back to Settings';
-$string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
-$string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
-$string['update:github_token'] = 'GitHub Token (optional)';
-$string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
 
 // CDN / Frontend Delivery settings.
 $string['settings:cdn_heading'] = 'CDN / Frontend Delivery';
@@ -581,6 +569,26 @@ $string['redash_heading'] = 'Analytics Export';
 $string['redash_heading_desc'] = 'Configure API key access for external analytics platforms like Redash. The export endpoint provides read-only JSON access to usage data, feedback, and cost analytics.';
 $string['redash_api_key'] = 'Redash API Key';
 $string['redash_api_key_desc'] = 'API key for external analytics platforms like Redash. Provides read-only access to usage data, feedback, and cost analytics. Leave blank to disable the export endpoint.';
+$string['rag_cap_blocked'] = 'Indexing did not run: the RAG spend cap for this period has been reached. Raise the cap, or wait for the next period. The existing index is left untouched.';
+$string['settings:redash_export_window_days'] = 'Export lookback window (days)';
+$string['settings:redash_export_window_days_desc'] = 'How far back the export reaches when the caller does not pass a "since" timestamp. The default of 90 days keeps a data source that omits the parameter from pulling every row ever recorded; a caller can still request a specific window, or pass since=0 for an all-time backfill. Set to 0 to make all-time the default again.';
+$string['settings:redash_allow_deanonymized'] = 'Allow de-anonymized export';
+$string['settings:redash_allow_deanonymized_desc'] = 'Off by default. When off, a request for anonymize=0 is refused and learners always appear as pseudonyms. Turn this on only if an external report genuinely needs real learner names, and remember that the export authenticates with a shared API key rather than a signed-in administrator, so anyone holding the key can then retrieve those names. De-anonymized requests are audit-logged with the requesting IP either way.';
+
+// v7.2.1: audit log viewer. The rows were always written; nothing could read them.
+$string['auditlog:title'] = '[[tutorshort]] Audit Log';
+$string['auditlog:intro'] = 'Actions recorded by [[tutorshort]]: emergency switches, provider failover, de-anonymized exports and integrity checks. Read-only. Rows are removed automatically once they pass the retention period set in the plugin settings.';
+$string['chat:turn_failed'] = 'This reply could not be completed. Nothing you did caused it — please try again.';
+$string['auditlog:empty'] = 'Nothing has been recorded yet.';
+$string['auditlog:empty_page'] = 'No entries on this page. Use Previous to go back.';
+$string['auditlog:unknown_user'] = 'Deleted or unknown user (id {$a})';
+$string['auditlog:col_time'] = 'Time';
+$string['auditlog:col_action'] = 'Action';
+$string['auditlog:col_user'] = 'User';
+$string['auditlog:col_course'] = 'Course';
+$string['auditlog:col_ip'] = 'IP address';
+$string['auditlog:col_details'] = 'Details';
+$string['auditlog:settings_link'] = 'Open the audit log';
 
 // v6.1.0: web emergency panel.
 $string['emergency:title'] = '[[tutorshort]] Emergency Controls';
@@ -596,8 +604,9 @@ $string['emergency:restore_button'] = 'Restore';
 $string['emergency:disabled_notice'] = 'Subsystem "{$a->flag}" disabled. Config touched: {$a->touched}';
 $string['emergency:restored_notice'] = 'Subsystem "{$a->flag}" restored. Config touched: {$a->touched}';
 $string['emergency:cli_reference'] = 'The same controls are available from the on-call shell:';
+$string['emergency:chat_stopped'] = '[[tutorshort]] is paused right now. Your course materials are unaffected, and this is not something you did — please try again later.';
 $string['emergency:flag_chat'] = 'Chat';
-$string['emergency:flag_chat_desc'] = 'Blocks chat traffic via the dedicated kill flag (v5.13 fix). The widget keeps rendering; learners see the friendly "[[tutorshort]] paused" message. Use when an LLM provider is misbehaving or a cost spike is in progress.';
+$string['emergency:flag_chat_desc'] = 'Stops every [[tutorshort]] AI call — chat, quizzes, flashcards and scoring — for learners, administrators and scheduled tasks alike. The widget still renders and learners see a short paused notice. The backend self-test and health check stay available, so you can check the provider before restoring.';
 $string['emergency:flag_voice'] = 'Voice';
 $string['emergency:flag_voice_desc'] = 'Clears the active realtime voice provider (stashed for exact restore). Text chat keeps working.';
 $string['emergency:flag_rag'] = 'RAG';
@@ -683,7 +692,7 @@ $string['privacy:metadata:local_ai_course_assistant_ut_resp:task_index'] = 'The 
 $string['privacy:metadata:local_ai_course_assistant_ut_resp:rating'] = 'The numeric rating given for the task.';
 $string['privacy:metadata:local_ai_course_assistant_ut_resp:answer'] = 'The free-text response for the task.';
 $string['privacy:metadata:local_ai_course_assistant_ut_resp:timecreated'] = 'The time the response was submitted.';
-$string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking.';
+$string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking. As well as administrator actions such as emergency switches and provider failover, a row is recorded for each message a learner sends, holding the time, course, conversation, message length and originating IP address. Message content is never stored here.';
 $string['privacy:metadata:local_ai_course_assistant_audit:userid'] = 'The ID of the user whose action was logged.';
 $string['privacy:metadata:local_ai_course_assistant_audit:courseid'] = 'The course context of the action.';
 $string['privacy:metadata:local_ai_course_assistant_audit:action'] = 'The action that was performed.';
@@ -734,6 +743,7 @@ $string['privacy:metadata:sbx_rec:duration_seconds'] = 'The length of the record
 $string['privacy:metadata:sbx_rec:timecreated'] = 'When the recording was made.';
 $string['privacy:metadata:outreach_log'] = 'Audit log of empathetic outreach emails.';
 $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was sent to.';
+$string['privacy:metadata:outreach_log:dryrun'] = 'Whether the row was written in dry-run mode (no email was actually sent).';
 $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferences (which email types a recipient has unsubscribed from).';
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
@@ -764,9 +774,9 @@ $string['insights:error'] = 'Could not generate insights.';
 $string['analytics:title'] = 'AI Tutor Analytics';
 $string['instructor_dashboard:navlink'] = 'AI Tutor Dashboard';
 // Analytics dashboard labels rendered by amd/src/analytics_dashboard.js (passed in from PHP).
-$string['analytics_js:total_students'] = 'Total Students';
+$string['analytics_js:total_students'] = 'Total Enrolled';
 $string['analytics_js:active_ai_users'] = 'Active AI Users';
-$string['analytics_js:msgs_per_student'] = 'Msgs / Student';
+$string['analytics_js:msgs_per_student'] = 'Msgs / Active User';
 $string['analytics_js:avg_session'] = 'Avg Session';
 $string['analytics_js:return_rate'] = 'Return Rate';
 $string['analytics_js:total_sessions'] = 'Total Sessions';
@@ -779,6 +789,8 @@ $string['analytics_js:avg_star_rating'] = 'Avg Star Rating';
 $string['analytics_js:avg_msgs_resolution'] = 'Avg Msgs to Resolution';
 $string['analytics_js:survey_respondents'] = 'Survey Respondents';
 $string['analytics_js:messages'] = 'Messages';
+$string['analytics_js:course'] = 'Course';
+$string['analytics_js:section'] = 'Section';
 $string['analytics_js:students'] = 'Students';
 $string['analytics_js:frequency'] = 'Frequency';
 $string['analytics_js:responses'] = 'Responses';
@@ -817,7 +829,8 @@ $string['analytics:provider_comparison_desc'] = 'Compare per-turn response count
 $string['analytics:provider'] = 'Provider';
 $string['analytics:response_count'] = 'Responses';
 $string['analytics:avg_response_length'] = 'Avg response length';
-$string['analytics:total_tokens'] = 'Total tokens';
+$string['analytics:total_tokens'] = 'Total tokens (all AI calls)';
+$string['analytics:total_tokens_hint'] = 'Includes retrieval: embedding and reranking calls, which dominate this figure on a site with RAG enabled. Chat replies are counted here too but are a small fraction of it. The session and learner counts elsewhere on this page measure chat only, which is why the two can look wildly different.';
 $string['analytics:avg_tokens'] = 'Avg tokens / response';
 
 // User settings.
@@ -940,6 +953,8 @@ $string['next_best_action:header']                = 'Here are {$a} things to foc
 $string['mastery_starter:practice_label']         = 'Practice: {$a}';
 $string['active_learners:line']                    = '{$a} others are studying this course right now.';
 $string['active_learners:line_global']             = '{$a} others are studying right now.';
+$string['settings:active_learners_enabled']        = 'Show the active-learners indicator';
+$string['settings:active_learners_enabled_desc']   = 'Show a line in the chat drawer telling the learner how many others are studying right now. This is a social-proof nudge rather than a teaching feature, and it polls the server once a minute for every open drawer, so it is off unless you turn it on. The indicator only appears when at least two other learners are active — a "0 others" badge would make a learner feel more alone, not less.';
 $string['settings:active_learners_scope']          = 'Active-learners indicator scope';
 $string['settings:active_learners_scope_desc']     = 'Whether the "others studying right now" indicator above the chat starters counts learners on the same course only, or learners across the whole site. Default <strong>global</strong> — a global count rarely hits zero, so the indicator actually appears on small courses. Switch to <strong>per-course</strong> for institutions that prefer the more specific signal.';
 $string['settings:active_learners_scope_global']   = 'Global (any course)';
@@ -1028,7 +1043,7 @@ $string['starters:course_desc']     = 'Enable or disable individual starters for
 // Topic picker (used by conversation starters).
 $string['chat:topic_picker_title']        = 'What would you like to focus on?';
 $string['chat:topic_picker_title_help']   = 'What would you like help with?';
-$string['chat:topic_picker_title_explain']= 'What would you like me to explain?';
+$string['chat:topic_picker_title_explain'] = 'What would you like me to explain?';
 $string['chat:topic_picker_title_study']  = 'What area would you like to focus on?';
 $string['chat:topic_start']               = 'Continue';
 
@@ -1056,6 +1071,16 @@ $string['chat:voice_speaking']          = 'Speaking...';
 $string['chat:voice_idle']              = 'Ready';
 $string['chat:voice_error']             = 'Voice connection failed. Please check your settings.';
 $string['chat:quiz_locked']             = 'The assistant is paused during quizzes to support academic integrity. Good luck!';
+$string['quizlock:blocked'] = 'The [[tutorshort]] assistant is unavailable while you have a quiz in progress. Submit or close your attempt and it will be available again.';
+$string['quizlock:heading'] = 'Quiz mode';
+$string['quizlock:enabled'] = 'Lock the assistant during Moodle quizzes';
+$string['quizlock:enabled_desc'] = 'Blocks the assistant -- chat, voice, flashcards, practice quizzes -- while a learner has a quiz attempt in progress, in the course holding that quiz or site-wide depending on the scope setting below. Checked on the server, so opening a second tab does not get around it. A teacher can exempt one quiz by setting its assistance level to Full help.';
+$string['quizlock:scope'] = 'How far the lock reaches';
+$string['quizlock:scope_desc'] = 'Whether an attempt in progress blocks [[tutorshort]] only in the course holding the quiz, or everywhere. <strong>This course only</strong> is the default and is almost always what you want. Site-wide was the behaviour up to v7.2.4 and had a failure mode worth knowing about: an abandoned attempt stays in progress forever, so a single forgotten quiz somewhere in a learner\'s history disabled the assistant in every course they took, with nothing on screen to explain why. Site-wide buys very little against a determined learner, who has a second browser, and the assistant\'s course material and retrieval are course-scoped in any case.';
+$string['quizlock:scope_course'] = 'This course only (recommended)';
+$string['quizlock:scope_site'] = 'Every course';
+$string['quizlock:window'] = 'Attempt freshness window (minutes)';
+$string['quizlock:window_desc'] = 'How long an attempt on a quiz with no time limit still counts as in progress. Quizzes with their own time limit use that instead. Abandoned attempts stay in progress indefinitely, so without this bound one would lock a learner out for good. Default 180.';
 
 // Bottom navigation modes.
 $string['chat:mode_nav']                = 'Mode navigation';
@@ -1217,7 +1242,7 @@ $string['objectives:saved']             = 'Objective saved.';
 $string['objectives:deleted']           = 'Objective deleted.';
 $string['objectives:delete_confirm']    = 'Delete this objective and all attempt history for it?';
 $string['objectives:delete_all']        = 'Delete all objectives for this course';
-$string['objectives:delete_all_confirm']= 'Delete every objective and all attempt history for this course? Cannot be undone.';
+$string['objectives:delete_all_confirm'] = 'Delete every objective and all attempt history for this course? Cannot be undone.';
 $string['objectives:deleted_all']       = 'All objectives for this course deleted.';
 
 // Cross-course mastery rebuild (v5.7.0).
@@ -1331,10 +1356,6 @@ $string['settings:talking_avatar_synthesia_api_key']         = 'Synthesia API ke
 $string['settings:talking_avatar_synthesia_api_key_desc']    = 'API key from <a href="https://app.synthesia.io/#/account/api" target="_blank" rel="noopener">Synthesia → Account → API</a>. Sent as <code>Authorization</code> header (Synthesia accepts the raw key).';
 $string['settings:talking_avatar_synthesia_persona_id']      = 'Synthesia agent id';
 $string['settings:talking_avatar_synthesia_persona_id_desc'] = 'Agent id created in the Synthesia Agents dashboard. Knowledge, persona, and allowed origins are configured agent-side; [[tutorshort]] only opens a session against this id.';
-$string['settings:talking_avatar_provider_url']      = 'Provider API base URL (legacy)';
-$string['settings:talking_avatar_provider_url_desc'] = 'v4.8.1 placeholder, kept for upgrade safety. The active drivers in v4.9.0 read their own per-provider settings; this field is only used as a fallback when an admin upgraded mid-release.';
-$string['settings:talking_avatar_provider_api_key']      = 'Provider API key (legacy)';
-$string['settings:talking_avatar_provider_api_key_desc'] = 'v4.8.1 placeholder, kept for upgrade safety. The active drivers in v4.9.0 read their own per-provider settings; this field is only used as a fallback when an admin upgraded mid-release.';
 $string['talking_avatar:disabled']        = 'Talking avatar is not enabled for this course.';
 $string['talking_avatar:unconfigured']    = 'Talking avatar is enabled but no provider has been configured. An administrator must pick a provider and supply credentials in plugin settings.';
 $string['talking_avatar:session_failed']  = 'The talking-avatar provider declined the session request. Check the provider configuration or try again in a moment.';
@@ -1348,8 +1369,15 @@ $string['settings:prompt_debug_enabled_desc'] = 'When on, every chat-turn writes
 $string['settings:socratic_verbose']      = 'Verbose Socratic mode prompt';
 $string['settings:socratic_verbose_desc'] = 'When on, Socratic-mode courses receive the full ~600-token do/don\'t directive originally added in v3.9.30. When off (default), they receive a single-line directive that modern hosted models follow reliably and saves ~600 tokens per turn. Turn this on if a course is running on a weaker self-hosted model that needs the explicit scaffolding.';
 // v4.12.0: structured prompt budget + verbosity.
+$string['settings:prompt_budget_tuner_conflict'] = 'The deprecated prompt-budget auto-tune task is switched on while the budget mode is set to derive from the model. These two conflict: the task writes the character budget, and any value other than the default is read as a deliberate choice, which switches the derived budget off. The task now stands down by itself in this mode, so nothing is being overwritten — but switch it off to remove the ambiguity.';
+$string['settings:prompt_budget_no_window'] = 'The budget mode above is set to derive from the model, but there is nothing to derive from: the chat model is not set and no backend context window has been configured, so the derivation falls back to the fixed character budget below. Set the chat model, or set the backend context window by hand, then re-run the backend self-test and confirm the context-window check passes. Until then the budget is whatever the number below says, whatever the mode claims.';
+$string['settings:prompt_budget_mode'] = 'System prompt budget mode';
+$string['settings:prompt_budget_mode_desc'] = 'How the system prompt character budget is decided. <strong>Derive from the model</strong> works out how much room the configured model actually offers — its context window, less the reserved reply and the conversation history — and uses that, capped so a very large window does not license a very large prompt. It applies only while the character budget below is left at its default of 36,000: change that number and it wins instead, in both directions, because a figure an administrator typed is a decision rather than a guess. <strong>Fixed</strong> always uses the number below. A self-hosted backend should set the backend context window, which takes precedence over everything here.';
+$string['settings:prompt_budget_mode_auto'] = 'Derive from the model (recommended)';
+$string['settings:prompt_budget_mode_fixed'] = 'Fixed character budget';
 $string['settings:prompt_budget_chars']      = 'System prompt character budget';
-$string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organises sections by category (identity, course context, learner state, behaviour, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 12,000 characters (~3,000 tokens) as of v5.0.0. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt.';
+$string['settings:prompt_truncated_warning'] = '[[tutorshort]] has had to cut retrieved course content out of the prompt to fit the character budget, most recently on {$a}. The model is answering with less course material than the retriever selected. Raise the system prompt character budget below, or reduce how much is retrieved.';
+$string['settings:prompt_budget_chars_desc'] = 'Maximum total size of the assembled system prompt before the user message, in characters. The structured prompt builder organizes sections by category (identity, course context, learner state, behavior, markers, safety) and drops or truncates the lowest-priority sections when the budget is exceeded. Safety guidance is always preserved in full. Default 36,000 characters (~9,000 tokens) as of v7.2.3. The v7.2.1 default of 24,000 was measured against a stock prompt at the default retrieval depth and left only about 200 characters of margin, so on real turns retrieved course content was being truncated. If this page warns that content was recently truncated, raise this value. Lower values reduce per-turn cost; higher values allow more course content to land in-prompt. Note how this interacts with the budget mode above: while the mode is <strong>Derive from the model</strong>, changing this number away from the 36,000 default makes it authoritative and the model\'s window is ignored, in both directions. Leaving it at 36,000 means the window decides.';
 $string['settings:backend_context_tokens']      = 'Backend context window (tokens)';
 $string['settings:backend_context_tokens_desc'] = 'The maximum context length (max_model_len) of your AI backend, in tokens. Set to 0 for hosted models with a large window (no clamping). When set above 0 (for example 8192 on a self-hosted vLLM backend), [[tutorshort]] shrinks the system-prompt character budget above so the prompt plus reserved output and conversation history fit the window, even in token-dense languages. See the Deployment Sizing wiki page for how this maps to concurrent users.';
 $string['settings:backend_retry_attempts']      = 'Backend retry attempts';
@@ -1402,8 +1430,8 @@ $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted
 // v5.0.0 patch 3: prompt metrics + budget auto-tune.
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily (deprecated)';
+$string['settings:prompt_budget_auto_tune_desc'] = 'Deprecated. Does nothing unless the budget mode above is set to <strong>Fixed</strong>. A daily task used to infer the character budget by watching for truncation and chasing the largest prompt it had seen. Deriving the budget from the model\'s context window does that better: it cannot oscillate and needs no warm-up data. The two also conflicted, because the task writes the character budget and any value other than the default switches the derived budget off. Leave this off; it will be removed in a future release. The recommendation still appears on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> page.';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1495,7 +1523,7 @@ $string['settings:rate_card_refresh_now_label']  = 'Refresh rate card from upstr
 $string['settings:rate_card_refresh_success']    = 'Rate card refreshed: {$a} entries written.';
 $string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$a}';
 $string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
-$string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
+$string['settings:rate_card_last_refresh_success'] = 'Last fetch succeeded.';
 $string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
 $string['task:refresh_rate_card']                = 'Refresh [[tutorshort]] LLM rate card from upstream';
 
@@ -1586,7 +1614,6 @@ $string['flashcards:hard']          = 'Hard';
 $string['flashcards:easy']          = 'Easy';
 $string['flashcards:no_due']        = 'Nothing to review right now. Generate flashcards from a course page in the assistant widget, or check back later.';
 $string['flashcards:session_complete'] = 'Session complete. Good work.';
-$string['flashcards:disabled']      = 'Flashcards are not enabled for this course.';
 $string['flashcards:toggle']        = 'Enable flashcards for this course';
 $string['flashcards:toggle_help']   = 'Adds a Generate-flashcards starter to the assistant widget and a learner review page at /local/ai_course_assistant/flashcards.php?courseid=X. Off by default.';
 $string['flashcards:starter_generate'] = 'Generate flashcards from this page';
@@ -1594,7 +1621,7 @@ $string['flashcards:generated']     = 'Saved {$a} flashcards. Open the review pa
 
 // Worked examples (v3.9.23).
 $string['worked_examples:toggle']     = 'Enable Worked Examples starter for this course';
-$string['worked_examples:toggle_help']= 'Adds a "Show me a worked example" starter that asks the assistant to walk through a fully solved example, then guide the learner through similar problems with progressively less scaffolding (worked → partial → blank).';
+$string['worked_examples:toggle_help'] = 'Adds a "Show me a worked example" starter that asks the assistant to walk through a fully solved example, then guide the learner through similar problems with progressively less scaffolding (worked → partial → blank).';
 $string['worked_examples:starter']    = 'Show me a worked example';
 
 // Prerequisite gap detection (v3.9.24).
@@ -1608,16 +1635,16 @@ $string['essay_feedback:link']         = 'Essay feedback';
 $string['essay_feedback:disabled']     = 'Essay feedback is not enabled for this course.';
 $string['essay_feedback:intro']        = 'Paste your draft below and the assistant will score it against a rubric and suggest three concrete revisions. Aim for at least 80 words. Your essay text is only used for this feedback run — it is not saved.';
 $string['essay_feedback:rubric_label'] = 'Rubric (optional)';
-$string['essay_feedback:rubric_help']  = 'Paste a rubric as a bulleted list of criteria, or leave blank to use a default four-criterion rubric (thesis, evidence, organisation, mechanics).';
+$string['essay_feedback:rubric_help']  = 'Paste a rubric as a bulleted list of criteria, or leave blank to use a default four-criterion rubric (thesis, evidence, organization, mechanics).';
 $string['essay_feedback:essay_label']  = 'Your essay draft';
 $string['essay_feedback:submit']       = 'Get feedback';
 $string['essay_feedback:scoring']      = 'Scoring your draft…';
 $string['essay_feedback:too_short']    = 'Please paste at least 80 words so the assistant has something to score.';
 $string['essay_feedback:error']        = 'Could not score this draft right now. Try again in a moment.';
 $string['essay_feedback:result_heading'] = 'Rubric scores';
-$string['essay_feedback:overall_heading']= 'Overall';
+$string['essay_feedback:overall_heading'] = 'Overall';
 $string['essay_feedback:revisions_heading'] = 'Top 3 revision suggestions';
-$string['essay_feedback:col_criterion']= 'Criterion';
+$string['essay_feedback:col_criterion'] = 'Criterion';
 $string['essay_feedback:col_score']    = 'Score';
 $string['essay_feedback:col_feedback'] = 'Feedback';
 $string['essay_feedback:toggle']       = 'Enable Essay feedback for this course';
@@ -1627,7 +1654,7 @@ $string['essay_feedback:toggle_help']  = 'Learners get a dedicated page to paste
 $string['settings:soapbox_stt_mode']        = 'Soapbox transcription mode';
 $string['settings:soapbox_stt_mode_desc']   = 'How Soapbox turns a recorded speech into text. Server uses the configured Whisper provider (self-hosted is free; hosted OpenAI is about USD 0.006 per minute). Browser uses the learner\'s built-in speech recognition (free, no server, works in Chrome and Safari only). Server is recommended so transcription quality does not depend on the learner\'s browser.';
 $string['settings:soapbox_stt_mode_server'] = 'Server (Whisper provider)';
-$string['settings:soapbox_stt_mode_browser']= 'Browser (free, no server)';
+$string['settings:soapbox_stt_mode_browser'] = 'Browser (free, no server)';
 $string['settings:soapbox_slide_vision']      = 'Soapbox slide visual-design feedback';
 $string['settings:soapbox_slide_vision_desc'] = 'Allow a single vision pass over the rendered slide images to add a short visual-design note to a scored presentation. Off by default and privacy-conscious: no images are stored, and each assignment must also opt in with its own Slide visual-design feedback checkbox. Only slide presentations with an uploaded deck are affected.';
 $string['settings:soapbox_vision_provider']      = 'Soapbox slide-vision provider';
@@ -1643,10 +1670,42 @@ $string['soapbox:deck_label']       = 'Slides (PDF). Upload your deck, then adva
 $string['soapbox:slide_prev']       = 'Previous slide';
 $string['soapbox:slide_next']       = 'Next slide';
 $string['soapbox:play_slides']      = 'Play with slides';
+
+// Soapbox assignment + presentation pages (v6.9.6): these labels were hardcoded
+// English until this release, so non-English learners saw them untranslated.
+// Generic column labels (Name, Status, Visible, Actions, Edit, Delete) reuse the
+// Moodle core strings instead of duplicating them here.
+$string['soapbox:present_audio']    = 'Audio presentation';
+$string['soapbox:present_video']    = 'Video presentation';
+$string['soapbox:present_target']   = 'target {$a->min}-{$a->max} min';
+$string['soapbox:choose_topic']     = 'Choose a topic';
+$string['soapbox:record_short']     = 'Record';
+$string['soapbox:my_recordings']    = 'My recordings';
+$string['soapbox:no_recordings']    = 'No recordings yet.';
+$string['soapbox:col_recorded']     = 'Recorded';
+$string['soapbox:col_length']       = 'Length';
+$string['soapbox:col_type']         = 'Type';
+$string['soapbox:col_recording']    = 'Recording';
+$string['soapbox:col_kept']         = 'Kept';
+$string['soapbox:col_student_link'] = 'Student link';
+$string['soapbox:view_download']    = 'View / download';
+$string['soapbox:expired']          = 'Expired';
+$string['soapbox:retention_note']   = 'Recordings are available to view and download for {$a} days, then automatically deleted.';
+$string['soapbox:assign_title']     = 'Soapbox assignments';
+$string['soapbox:assign_single_title'] = 'Soapbox assignment';
+$string['soapbox:assign_add']       = 'Add assignment';
+$string['soapbox:assign_none']      = 'No Soapbox assignments yet.';
+$string['soapbox:assign_deleted']   = 'Assignment deleted.';
+$string['soapbox:assign_updated']   = 'Assignment updated.';
+$string['soapbox:assign_created']   = 'Assignment created.';
+$string['soapbox:assign_delete_confirm'] = 'Delete "{$a}" and all its recordings? This cannot be undone.';
+$string['soapbox:assign_edit_heading'] = 'Edit Soapbox assignment';
+$string['soapbox:assign_new_heading']  = 'New Soapbox assignment';
 $string['soapbox:audio_ready']      = 'Audio only. Your microphone will be recorded; your camera is not used.';
 $string['soapbox:audio_recording']  = 'Recording audio...';
 $string['soapbox:disabled']         = 'Soapbox is not enabled for this course.';
 $string['soapbox:cap_reached']      = 'You have reached the maximum number of recordings for this assignment.';
+$string['soapbox:rate_limited']     = 'Too many recordings submitted in a short time. Please wait a few minutes and try again.';
 $string['soapbox:storage_unconfigured'] = 'Recording storage is not set up yet. Please contact your administrator.';
 $string['soapbox:bad_key']          = 'That upload does not belong to you.';
 $string['soapbox:slides_disabled']  = 'Slides are not enabled for this assignment.';
@@ -1744,9 +1803,9 @@ $string['settings:mastery_decay_half_life_days_desc'] = 'Half-life in days for t
 $string['settings:mastery_classifier_provider']  = 'Classifier provider';
 $string['settings:mastery_classifier_provider_desc'] = 'Provider id used for the per-turn mastery classifier. Leave empty to inherit the default AI provider. Default <code>openai</code> pairs with the <code>gpt-4o-mini</code> classifier model below — the cheapest TIER 1 option for structured-output classification (~$220/mo saving at 100k MAU vs the chat tier). When set, the row in Comparison providers with this provider id supplies the API key, base URL, and temperature.';
 $string['settings:mastery_classifier_model']     = 'Classifier model';
-$string['settings:mastery_classifier_model_desc']= 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini. Default <code>gpt-4o-mini</code>.';
+$string['settings:mastery_classifier_model_desc'] = 'Model used to classify assistant turns against objectives. Leave empty to inherit the default AI provider model; otherwise specify a cheap model like gpt-4o-mini. Default <code>gpt-4o-mini</code>.';
 $string['settings:mastery_classifier_weight']    = 'Classifier weight';
-$string['settings:mastery_classifier_weight_desc']= 'How much a conversation attempt counts relative to a quiz attempt (1.0). Default 0.3.';
+$string['settings:mastery_classifier_weight_desc'] = 'How much a conversation attempt counts relative to a quiz attempt (1.0). Default 0.3.';
 $string['settings:mastery_classifier_threshold'] = 'Classifier confidence threshold';
 $string['settings:mastery_classifier_threshold_desc'] = 'Minimum classifier confidence required to record a conversation attempt. 0.0 to 1.0. Default 0.7.';
 
@@ -1758,7 +1817,7 @@ $string['settings:premium_escalation_enabled_desc'] = 'When on, the per-turn rou
 $string['settings:premium_escalation_provider'] = 'Premium provider';
 $string['settings:premium_escalation_provider_desc'] = 'Provider id to route premium calls through. Must match a row in Comparison providers (so the API key, base URL, and temperature come from the same place admins already manage). Default <code>claude</code>.';
 $string['settings:premium_escalation_model'] = 'Premium model';
-$string['settings:premium_escalation_model_desc'] = 'Model name passed to the premium provider. Default <code>claude-opus-4-8</code> per the A.10 bake-off verdict.';
+$string['settings:premium_escalation_model_desc'] = 'Model name passed to the premium provider. Default <code>claude-sonnet-5</code> per the August 2026 tutor benchmark, which scored it above Opus at roughly a sixth of the cost per call.';
 $string['settings:premium_escalation_triggers'] = 'Premium trigger regexes';
 $string['settings:premium_escalation_triggers_desc'] = 'One PCRE regex per line (without delimiters; case-insensitive matching is applied automatically). Lines starting with # are comments. Leave blank to use the curated default set from the A.10 bake-off (multi-step STEM markers: "derive", "prove that", "step by step", LaTeX math, fenced code blocks, big-O, integrals, optimization, etc.).';
 $string['settings:premium_escalation_course_tags'] = 'Premium course allowlist';
@@ -1777,13 +1836,24 @@ $string['settings:cost_anomaly_multiplier'] = 'Anomaly multiplier';
 $string['settings:cost_anomaly_multiplier_desc'] = 'Today\'s spend must exceed this multiplier × the 7-day median to trigger an alert. Default <code>2.0</code>. Lower to <code>1.5</code> for earlier warnings (more false positives during enrollment bursts). Raise to <code>3.0</code> if [[unishort]]\'s usage is bursty enough that 2x spikes are routine.';
 $string['task:cost_anomaly_check'] = '[[tutorshort]] cost anomaly check (daily)';
 
+// v6.9.7 — unanswered-question monitor.
+$string['task:unanswered_check'] = '[[tutorshort]] unanswered-question check';
+$string['settings:unanswered_check_enabled'] = 'Alert when questions go unanswered';
+$string['settings:unanswered_check_enabled_desc'] = 'Email the spend-notification recipients when learners are asking [[tutorshort]] questions and not getting answers. The cost anomaly detector above only fires when spend goes <em>up</em>, so a provider that rejects every call costs nothing and raises no alert — that gap once hid a nine-day outage across ten courses. This watches the ratio of questions to answers instead, which falls to zero as soon as a provider breaks. Recipients come from the spend notification list; if that is empty, site administrators are used.';
+$string['settings:unanswered_window_hours'] = 'Unanswered check window (hours)';
+$string['settings:unanswered_window_hours_desc'] = 'How far back each run looks. Shorter reacts faster but needs enough traffic in the window to be meaningful.';
+$string['settings:unanswered_min_questions'] = 'Minimum questions before alerting';
+$string['settings:unanswered_min_questions_desc'] = 'A course is only judged once it has had at least this many questions in the window. Below it, a couple of learners closing the tab mid-answer looks the same as an outage.';
+$string['settings:unanswered_min_answer_rate'] = 'Minimum answer rate';
+$string['settings:unanswered_min_answer_rate_desc'] = 'Alert when the fraction of questions that received an answer falls below this. 0.5 catches a partial failure — one provider of several being down — rather than only a total one. Set to 0 to disable the rate test.';
+
 // v4.2: courses_admin page.
 $string['courses_admin:title']             = 'AI Course Assistant — Courses';
 $string['courses_admin:lede']              = 'Enable or disable AI Assistant per course, manage Usability Testing, or run bulk actions across many courses.';
 $string['courses_admin:back_to_analytics'] = '← Back to Analytics';
 $string['courses_admin:plugin_settings']   = 'Plugin Settings';
 $string['courses_admin:enabled_count']     = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
-$string['courses_admin:search_placeholder']= 'Search courses…';
+$string['courses_admin:search_placeholder'] = 'Search courses…';
 $string['courses_admin:filter_status']     = 'AI Assistant status';
 $string['courses_admin:filter_enabled']    = 'Enabled';
 $string['courses_admin:filter_disabled']   = 'Disabled';
@@ -1827,7 +1897,7 @@ $string['external_resources:force_on']   = 'Force on for this course';
 $string['external_resources:force_off']  = 'Force off for this course';
 $string['external_resources:on']         = 'on';
 $string['external_resources:off']        = 'off';
-$string['external_resources:toggle_help']= 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
+$string['external_resources:toggle_help'] = 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
 
 // v4.3.0: real Redash push integration.
 $string['settings:redash_base_url']           = 'Redash base URL';
@@ -1835,6 +1905,1015 @@ $string['settings:redash_base_url_desc']      = 'Base URL of your Redash instanc
 $string['settings:redash_user_api_key']       = 'Redash user API key';
 $string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the [[tutorshort]] Redash API key (which controls inbound auth on redash_export.php).';
 $string['settings:redash_data_source_id']     = 'Redash data source ID';
-$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
+$string['settings:redash_data_source_id_desc'] = 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
 
+// i18n batch appended by scripts/apply_i18n.py.
+$string['settings:hidden_categories'] = 'Hidden course categories';
+$string['settings:hidden_categories_desc'] = 'Comma-separated list of course category names or IDs where the assistant should not appear. Example: "Course Development, 42". The assistant is also automatically hidden when editing mode is turned on.';
+$string['settings:provider_heading'] = 'AI Provider & Conversation';
+$string['settings:provider_heading_desc'] = 'Configure the AI backend, model, and conversation behavior.';
+$string['settings:claude_temperature_allow_prefixes'] = 'Claude models accepting temperature';
+$string['settings:claude_temperature_allow_prefixes_desc'] = 'One model-name prefix per line. Anthropic models whose name starts with one of these still accept the <code>temperature</code> sampling parameter. Any Claude model NOT matching a prefix has temperature omitted (reasoning-class models since Opus 4.7 reject it with an HTTP 400). Leave blank to use the shipped default.';
+$string['settings:max_tokens'] = 'Max Response Length (tokens)';
+$string['settings:max_tokens_desc'] = 'Maximum number of tokens per AI response. Lower values produce shorter, faster responses. 512 = ~2-3 sentences, 1024 = ~1-2 paragraphs, 2048 = longer explanations. Set to 0 for no limit (provider default).';
+$string['settings:profile_update_interval'] = 'Student Profile Update Interval';
+$string['settings:profile_update_interval_desc'] = 'After this many student messages in a course, the assistant generates (or refreshes) a learning profile summarizing the student\'s strengths, weaknesses, learning style, and interests. The profile is injected into the system prompt for personalized responses. Set to 0 to disable. Default: 10.';
+$string['settings:enable_thinking'] = 'Extended Thinking (Claude only)';
+$string['settings:enable_thinking_desc'] = 'Enable adaptive thinking for Claude models. Claude decides when and how much to reason through a problem before answering. Improves accuracy for complex questions but increases token usage and latency. Thinking content is not shown to students. Other providers ignore this setting.';
+$string['settings:rag_sources_heading'] = 'RAG content sources';
+$string['settings:rag_sources_heading_desc'] = 'Choose which course content types the RAG indexer extracts text from. Status indicators on the <a href="{$a}">RAG Admin page</a> show whether each extractor has what it needs (e.g. the pdftotext binary, Cloudflare allowlist) to run.';
+$string['settings:rag_extract_pdf'] = 'Index PDF files (mod_resource)';
+$string['settings:rag_extract_pdf_desc'] = 'Extract text from PDF uploads via the <code>pdftotext</code> binary (poppler). Auto-detects the binary path; override below if needed.';
+$string['settings:rag_pdftotext_path'] = 'pdftotext binary path';
+$string['settings:rag_pdftotext_path_desc'] = 'Leave blank to auto-detect (checks <code>/usr/bin/pdftotext</code>, <code>/usr/local/bin/pdftotext</code>, and <code>which pdftotext</code>). Set this only if your installation lives somewhere else.';
+$string['settings:rag_extract_docx'] = 'Index DOCX files (mod_resource)';
+$string['settings:rag_extract_docx_desc'] = 'Extract text from Word uploads via PHP ZipArchive. No external dependency required.';
+$string['settings:rag_extract_pptx'] = 'Index PPTX files (mod_resource)';
+$string['settings:rag_extract_pptx_desc'] = 'Extract text from modern PowerPoint uploads via PHP ZipArchive. Walks slide and speaker-note XML in deck order; no external dependency required. Legacy binary <code>.ppt</code> files are not supported — re-save those decks as <code>.pptx</code>.';
+$string['settings:rag_extract_h5p'] = 'Index H5P content (mod_h5p)';
+$string['settings:rag_extract_h5p_desc'] = 'Walk H5P content JSON and index every text-bearing field (questions, answers, feedback, descriptions). H5P content type metadata is broad; expect some false positives in edge cases.';
+$string['settings:rag_extract_scorm'] = 'Index SCORM packages (mod_scorm)';
+$string['settings:rag_extract_scorm_desc'] = 'Unzip SCORM packages and index <code>imsmanifest.xml</code>, any <code>.html</code> files, and Articulate Storyline content strings. <strong>Off by default</strong> because SCORM parses can be expensive. Max package size is controlled by <code>rag_scorm_max_mb</code>.';
+$string['settings:rag_scorm_max_mb'] = 'Max SCORM package size to index (MB)';
+$string['settings:rag_scorm_max_mb_desc'] = 'Skip SCORM packages larger than this to avoid excessive memory use.';
+$string['settings:rag_fetch_transcripts'] = 'Fetch transcripts for embedded videos/interactives';
+$string['settings:rag_fetch_transcripts_desc'] = 'Scan mod_page and mod_book content for embedded iframes (Synthesia, YouTube, Articulate, Genially) and fetch the companion transcript URL paired with each embed (searching both above and below the iframe). Requires outbound HTTPS from this server to the transcript host. <strong>Off by default</strong>; enable once the transcript host has allowlisted this server (e.g. Cloudflare IP Access Rule).';
+$string['settings:rag_iframe_host_patterns'] = 'Iframe host patterns';
+$string['settings:rag_iframe_host_patterns_desc'] = 'One regex per line matching an iframe <code>src</code> attribute. Each matching iframe is treated as an interactive embed whose transcript should be paired and indexed. Lines starting with <code>#</code> are comments.';
+$string['settings:rag_transcript_url_pattern'] = 'Transcript URL pattern';
+$string['settings:rag_transcript_url_pattern_desc'] = 'Regex that matches transcript anchor URLs. The indexer picks the nearest matching anchor (above or below) to each detected iframe and pairs them. Leave blank to disable transcript pairing.';
+$string['settings:performance_heading'] = 'Performance';
+$string['settings:performance_heading_desc'] = 'Control the amount of course content included in the AI prompt. Lower values mean faster responses but less context for the AI.';
+$string['settings:max_content_per_resource'] = 'Max Content Per Resource (chars)';
+$string['settings:max_content_per_resource_desc'] = 'Maximum characters of content extracted from each page or book chapter. Lower values reduce prompt size and speed up responses.';
+$string['settings:max_total_content'] = 'Max Total Content (chars)';
+$string['settings:max_total_content_desc'] = 'Maximum total characters of course content included in the system prompt. Lower values reduce prompt size and speed up responses.';
+$string['settings:spend_guard_heading'] = 'Spend guard and optimizer';
+$string['settings:spend_guard_heading_desc'] = 'Set LLM spend caps per period. [[tutorshort]] pauses requests when a cap is hit or falls back to a cheaper provider from your failover chain. See the <a href="{$a}">Token Cost page</a> for the current spend status and optimizer recommendations.';
+$string['settings:spend_cap_period'] = 'Spend cap period';
+$string['settings:spend_cap_period_desc'] = 'How often the spend cap resets. Calendar-aligned: monthly starts on the 1st of the month, weekly on Monday, daily at midnight.';
+$string['settings:spend_cap_site'] = 'Site-wide spend cap (USD)';
+$string['settings:spend_cap_site_desc'] = 'Total USD cap across all courses and capabilities for the current period. <code>0</code> = unlimited. Per-capability caps below override this when set.';
+$string['settings:spend_cap_chat'] = 'Chat cap (USD)';
+$string['settings:spend_cap_chat_desc'] = 'Cap just for student chat + quiz workload. <code>0</code> = use site-wide cap.';
+$string['settings:spend_cap_voice'] = 'Voice cap (USD)';
+$string['settings:spend_cap_voice_desc'] = 'Cap for Voice (Realtime + TTS + STT). Voice is usually the biggest line item — cap it first.';
+$string['settings:spend_cap_rag'] = 'RAG cap (USD)';
+$string['settings:spend_cap_rag_desc'] = 'Cap for embedding calls made during course indexing.';
+$string['settings:spend_cap_analytics'] = 'Analytics cap (USD)';
+$string['settings:spend_cap_analytics_desc'] = 'Cap for Learning Radar admin queries.';
+$string['settings:spend_failover_chain'] = 'Failover chain';
+$string['settings:spend_failover_chain_desc'] = 'When a cap is hit, [[tutorshort]] tries these providers in order. One entry per line, format <code>capability:label</code>. Labels refer to entries in Comparison providers (for <code>chat</code> / <code>analytics</code>) or Voice providers (for <code>voice</code>). Lines starting with <code>#</code> are comments. Example:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
+$string['settings:failover_per_call_enabled'] = 'Per-call failover (v5.5.0)';
+$string['settings:failover_per_call_enabled_desc'] = 'When on, every chat call wraps the primary provider in a failover-chain decorator. On per-call timeout or 5xx error, [[tutorshort]] rotates to the next entry in <strong>Failover chain</strong> above and opens a 15-minute circuit on the failing provider. Emits an audit row (<code>failover_fallthrough</code>) on every fall-through; open the Audit log from the quick links at the top of these settings after enabling to verify the chain is healthy. Off by default; turn on once the chain has been validated and your institution has confirmed the required data-processing terms are in place for every provider on it.';
+$string['settings:failover_timeout_chat'] = 'Per-call failover: chat timeout (seconds)';
+$string['settings:failover_timeout_chat_desc'] = 'How long to wait for the first token from a chat provider before falling through. Default 8s. Lower values fall over faster on slow providers at the cost of false-positives on temporarily-slow requests; higher values keep the chain on the primary longer. Only consulted when <strong>Per-call failover</strong> is on.';
+$string['settings:spend_notify_emails'] = 'Spend alert recipients';
+$string['settings:spend_notify_emails_desc'] = 'Comma-separated email addresses to notify at 80%, 95%, and 100% of the cap. Leave blank to notify all site admins.';
+$string['settings:opt_cost_weight'] = 'Optimizer: cost weight';
+$string['settings:opt_cost_weight_desc'] = 'How much the optimizer prioritizes cost when ranking providers. 0.0 ignores cost, 1.0 optimizes purely for cost. Must sum with quality weight.';
+$string['settings:opt_quality_weight'] = 'Optimizer: quality weight';
+$string['settings:opt_quality_weight_desc'] = 'How much the optimizer prioritizes student satisfaction (thumbs-up rate) when ranking providers. 0.0 ignores quality.';
+$string['settings:inactivity_reminder_enabled'] = 'Inactivity Reminders';
+$string['settings:inactivity_reminder_enabled_desc'] = 'Send a weekly email to students who have not accessed their course in the configured number of days.';
+$string['settings:inactivity_threshold_days'] = 'Inactivity Threshold (days)';
+$string['settings:inactivity_threshold_days_desc'] = 'Number of days of inactivity before sending a reminder email.';
+$string['settings:voice_providers_heading'] = 'Voice providers (Realtime, TTS, STT)';
+$string['settings:voice_providers_heading_desc'] = 'Configure one or more voice API providers. These settings are independent of the chat provider above and the RAG embedding provider — voice has its own provider list because only OpenAI and xAI currently expose WebSocket Realtime, TTS, and STT endpoints. Use the dropdowns below to choose which registered provider drives each capability. If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used. A site running Together AI / Anthropic / DeepSeek / Gemini / Mistral for chat must configure at least one row here for voice to work.';
+$string['settings:voice_active_realtime'] = 'Active Realtime provider';
+$string['settings:voice_active_realtime_desc'] = 'Which configured voice provider handles Realtime Voice Agent sessions.';
+$string['settings:voice_active_tts'] = 'Active TTS provider';
+$string['settings:voice_active_tts_desc'] = 'Which configured voice provider handles text-to-speech playback of AI responses.';
+$string['settings:voice_active_stt'] = 'Active STT provider';
+$string['settings:voice_active_stt_desc'] = 'Which provider handles speech-to-text transcription of student audio. Leave blank to prefer the selfhosted Whisper server when one is configured below, falling back to the first voice provider row or the legacy key.';
+$string['settings:stt_selfhosted_enabled'] = 'Enable self-hosted transcription';
+$string['settings:stt_selfhosted_enabled_desc'] = 'Use the self-hosted Whisper server below as the speech-to-text path for voice input and Soapbox. Requires a server URL below. When off, transcription falls back to the hosted (OpenAI Whisper) or in-browser path even if a URL is set.';
+$string['settings:stt_selfhosted_warm'] = 'Pre-warm on Soapbox record start';
+$string['settings:stt_selfhosted_warm_desc'] = 'When on, starting a Soapbox recording sends a lightweight, best-effort "warm-up" ping to the self-hosted transcription server so a scale-to-zero host (e.g. Cloud Run) boots while the student is still recording — hiding the cold-start delay from the transcription that runs on submit. No effect unless a self-hosted server URL is set above. Off by default.';
+$string['settings:voice_tab_enabled'] = 'Enable Voice Tab';
+$string['settings:voice_tab_enabled_desc'] = 'Show the Voice tab in the bottom navigation bar. When disabled, students only see Chat and Notes tabs. Voice features (Conversation Practice, Pronunciation Practice) can still be accessed via conversation starters if enabled separately.';
+$string['settings:soapbox_heading'] = 'Soapbox';
+$string['settings:soapbox_heading_desc'] = 'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. Turn Soapbox on per course with the Soapbox pedagogy toggle in the Pedagogy section.';
+$string['settings:soapbox_max_seconds'] = 'Soapbox max recording length (seconds)';
+$string['settings:soapbox_max_seconds_desc'] = 'Hard ceiling on any assignment\'s recording length. Instructors may set a shorter range. Default 720 (12 minutes).';
+$string['settings:soapbox_max_recordings'] = 'Soapbox max recordings per student per assignment';
+$string['settings:soapbox_max_recordings_desc'] = 'Hard ceiling on how many recordings a student may make for one assignment, regardless of the per-assignment attempts setting. Default 3.';
+$string['settings:soapbox_retention_days'] = 'Soapbox recording retention (days)';
+$string['settings:soapbox_retention_days_desc'] = 'How long a recording is stored before automatic deletion; the transcript, score, and feedback are kept. Clamped to 1 to 28 days. Shorter is better data minimization. Default 7.';
+$string['settings:soapbox_video_quality'] = 'Soapbox video quality';
+$string['settings:soapbox_video_quality_desc'] = 'Recording resolution and bitrate. This is the main cost and bandwidth lever; a talking-head presenter is legible at Standard. Low suits weak connections; High only when visual detail matters.';
+$string['settings:soapbox_storage_bucket'] = 'Soapbox storage bucket';
+$string['settings:soapbox_storage_bucket_desc'] = 'S3 bucket for recordings. Default: the shared archive bucket.';
+$string['settings:soapbox_storage_region'] = 'Soapbox storage region';
+$string['settings:soapbox_storage_region_desc'] = 'AWS region of the bucket, e.g. us-east-1.';
+$string['settings:soapbox_storage_prefix'] = 'Soapbox storage key prefix';
+$string['settings:soapbox_storage_prefix_desc'] = 'Key prefix within the bucket. Recordings are stored under this path so a lifecycle rule can target them.';
+$string['settings:soapbox_storage_key'] = 'Soapbox storage access key ID';
+$string['settings:soapbox_storage_key_desc'] = 'Access key ID for an IAM principal limited to PutObject/GetObject/DeleteObject on the prefix above.';
+$string['settings:soapbox_storage_secret'] = 'Soapbox storage secret access key';
+$string['settings:soapbox_storage_secret_desc'] = 'Secret access key for the access key ID above.';
+$string['settings:survey_heading'] = 'Student Survey';
+$string['settings:survey_heading_desc'] = 'Configure the in-chat student experience survey. <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">Edit Survey Questions &rarr;</a>';
+$string['settings:survey_enabled'] = 'Enable surveys';
+$string['settings:survey_enabled_desc'] = 'When enabled, students will be offered a survey about their AI tutor experience.';
+$string['settings:survey_trigger_messages'] = 'Trigger after N messages';
+$string['settings:survey_trigger_messages_desc'] = 'Show the survey prompt after the student has sent this many messages in a course. Set to 0 to only show via manual trigger.';
+$string['settings:survey_frequency'] = 'Survey frequency per user';
+$string['settings:survey_frequency_desc'] = 'How often a student can be prompted to take the survey in each course.';
+$string['settings:rubric_heading'] = 'Practice Scoring Rubrics';
+$string['settings:rubric_heading_desc'] = 'Configure scoring rubrics for conversation and pronunciation practice sessions. Students receive AI-generated scores and feedback when a practice session ends. <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">Edit Rubrics &rarr;</a>';
+$string['settings:practice_scoring_enabled'] = 'Enable practice scoring';
+$string['settings:practice_scoring_enabled_desc'] = 'When enabled, students receive a score card with per-criterion ratings and feedback after conversation and pronunciation practice sessions.';
+$string['settings:usertesting_heading'] = 'Usability Testing';
+$string['settings:usertesting_heading_desc'] = 'In-widget usability testing with task-based evaluation. Students complete tasks inside the assistant and rate their experience. Results appear in the analytics dashboard.';
+$string['settings:usertesting_enabled'] = 'Enable Usability Testing';
+$string['settings:usertesting_enabled_desc'] = 'Show the "Usability Testing" link in the widget footer. When enabled, students can access testing tasks.';
+$string['settings:usertesting_external_url'] = 'External form URL (Option C)';
+$string['settings:usertesting_external_url_desc'] = 'Optional: an external form URL (e.g. Google Forms, Typeform). Use placeholders: {{userid}}, {{courseid}}, {{messages}}, {{session_minutes}}. If set, clicking "Usability Testing" opens this URL with context filled in. Leave blank to use the in-widget testing panel only.';
+$string['settings:footer_links_heading'] = 'Footer Links';
+$string['settings:footer_links_heading_desc'] = 'Customize the links shown at the bottom of the assistant: an optional "explore courses" link below the Feedback link, and the wording of the Feedback link and its panel.';
+$string['settings:footer_courses_text'] = 'Courses link text';
+$string['settings:footer_courses_text_desc'] = 'Text for a link shown below the Feedback link. Leave blank to hide the link entirely.';
+$string['settings:footer_courses_url'] = 'Courses link URL';
+$string['settings:footer_courses_url_desc'] = 'Destination for the courses link (opens in a new tab). The link is hidden if this is blank.';
+$string['settings:feedback_link_label'] = 'Feedback link label';
+$string['settings:feedback_link_label_desc'] = 'Override the footer Feedback link text, e.g. "Send feedback about [[tutorshort]] to the IT team". Leave blank to use the default translated "Feedback" label.';
+$string['settings:feedback_panel_intro'] = 'Feedback panel intro';
+$string['settings:feedback_panel_intro_desc'] = 'Intro line shown at the top of the feedback panel. Clarifies where feedback goes. Leave blank for no intro line.';
+$string['settings:quiz_provider'] = 'Quiz coach provider';
+$string['settings:quiz_provider_desc'] = 'Provider id (e.g. <code>claude</code>, <code>openai</code>) for quiz generation. Must match a row in Comparison providers. Leave blank to use the chat provider.';
+$string['settings:quiz_model'] = 'Quiz coach model';
+$string['settings:quiz_model_desc'] = 'Model name for quiz generation, e.g. <code>claude-haiku-4-5</code>. Both this and the provider must be set for the override to apply.';
+$string['settings:branding_heading'] = 'Branding';
+$string['settings:branding_heading_desc'] = 'Customize the assistant name and appearance.';
+$string['settings:institution_short_name'] = 'Institution Short Name';
+$string['settings:institution_short_name_desc'] = 'Abbreviated institution name for compact UI elements (e.g. "State U").';
+$string['settings:display_name'] = 'Assistant Display Name';
+$string['settings:display_name_desc'] = 'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").';
+$string['settings:short_name'] = 'Assistant Short Name';
+$string['settings:short_name_desc'] = 'Short name shown in the header bar and compact UI elements (e.g. "Assistant").';
+$string['settings:welcome_message'] = 'Welcome Screen Message';
+$string['settings:welcome_message_desc'] = 'Message shown on the first-visit welcome screen. Use <code>{{firstname}}</code> for the student\'s first name and <code>{{coursename}}</code> for the course name. Leave blank for the default.';
+$string['settings:chat_greeting'] = 'Chat Greeting';
+$string['settings:chat_greeting_desc'] = 'Greeting message shown when the chat window opens. Use <code>{{firstname}}</code> for the student\'s first name and <code>{{coursename}}</code> for the course name. Leave blank for the default.';
+$string['settings:customavatars'] = 'Custom avatars';
+$string['settings:customavatars_desc'] = 'Upload square PNG or SVG images here to add them to the avatar dropdown above. Each uploaded file becomes a selectable default (prefixed "Custom:"). Remove a file from this list to remove it from the dropdown. Tip: 256×256 PNG works well for Retina displays.';
+$string['settings:anomaly_digest_heading'] = 'Learning Radar — anomaly digest';
+$string['settings:anomaly_digest_heading_desc'] = 'Daily check that compares rolling windows of negative ratings, token spend, and integrity flags. When a metric exceeds the configured threshold, a digest is sent to the configured channels. For per-query scheduled reports, use the Schedules panel on the [[tutorshort]] Analytics page.';
+$string['settings:anomaly_digest_enabled'] = 'Enable anomaly digest';
+$string['settings:anomaly_digest_enabled_desc'] = 'Run the daily anomaly digest task. Quiet by default — only fires when a metric crosses the threshold.';
+$string['settings:anomaly_digest_threshold_pct'] = 'Alert threshold (%)';
+$string['settings:anomaly_digest_threshold_pct_desc'] = 'Percent change between the recent and prior window that triggers an alert. Default: 50.';
+// v7.2.0 (CONTRIB-10574 #205): settings-page interface text, previously written
+// as hardcoded English literals inside settings.php and therefore untranslatable.
+$string['settingspage:toc_heading'] = 'Jump to section';
+$string['settingspage:sec_general'] = 'General';
+$string['settingspage:sec_ai'] = 'AI Provider & Models';
+$string['settingspage:sec_branding'] = 'Branding & UI';
+$string['settingspage:sec_content'] = 'Content & RAG';
+$string['settingspage:sec_safety'] = 'Safety & Moderation';
+$string['settingspage:sec_engagement'] = 'Engagement';
+$string['settingspage:sec_integrations'] = 'Integrations & Delivery';
+$string['settingspage:toc_save'] = 'Save';
+$string['settingspage:token_analytics_title'] = 'Token Cost & Analytics';
+$string['settingspage:token_analytics_link'] = 'View Token Analytics';
+$string['settingspage:token_analytics_blurb'] = 'Monitor token usage and costs across courses and providers.';
+$string['settingspage:analytics_title'] = 'Analytics Dashboard';
+$string['settingspage:analytics_link'] = 'View Analytics Dashboard';
+$string['settingspage:reset_prompt_template'] = 'Reset to default template';
+$string['settingspage:rag_explainer'] = 'RAG (Retrieval-Augmented Generation) indexes your course content and retrieves relevant passages when students ask questions, so the AI can give answers grounded in your materials. Requires an embedding API key (OpenAI recommended). After enabling, use the RAG Admin page to index courses.';
+$string['settingspage:realtime_explainer'] = 'Realtime Voice Mode enables live, two-way spoken conversations between students and the AI using OpenAI\'s Realtime API. This is different from standard text-to-speech (TTS), which reads AI responses aloud. Realtime Voice requires a separate API key and is billed per minute of audio. Once enabled globally, you can toggle it per course in each course\'s settings page.';
+$string['settings:money_nonnegative_invalid'] = 'Enter an amount of 0 or more, using at most two decimal places (for example 25 or 25.50).';
+$string['settings:anomaly_digest_floor_usd'] = 'Anomaly digest: minimum spend to alert on (USD)';
+$string['settings:anomaly_digest_floor_usd_desc'] = 'Suppress the token-spend alert when the last 24 hours cost less than this, however large the percentage jump. A percentage on a small base is noise: doubling from $1 to $2 clears any threshold and means nothing. Set this to a daily figure you would actually want waking you. 0 disables the floor and alerts on percentage alone. If any spend in the window comes from a model with no rate-card entry it cannot be priced, and the alert is sent regardless -- an unrecognized model in the mix is itself worth seeing.';
+$string['settings:anomaly_digest_recipient_email'] = 'Recipient email';
+$string['settings:anomaly_digest_recipient_email_desc'] = 'Email address that receives the anomaly digest. Leave blank to use the site admin.';
+$string['settings:anomaly_digest_slack_webhook'] = 'Slack incoming webhook URL';
+$string['settings:anomaly_digest_slack_webhook_desc'] = 'Optional Slack incoming webhook URL. The digest is posted as a Slack block message.';
+$string['settings:anomaly_digest_teams_webhook'] = 'Microsoft Teams incoming webhook URL';
+$string['settings:anomaly_digest_teams_webhook_desc'] = 'Optional Teams incoming webhook URL. The digest is posted as an Office 365 connector card.';
 
+// Learning Radar printable report (v7.0.1: extracted from radar_export.php).
+$string['radar_report:title'] = '[[tutorshort]] Learning Radar report';
+$string['radar_report:print'] = 'Print / save as PDF';
+$string['radar_report:generated'] = 'Generated {$a}';
+$string['radar_report:query'] = 'Query';
+$string['radar_report:response'] = 'Response';
+$string['radar_report:privacy_note'] = 'All student data in this report is anonymized. Do not share publicly.';
+
+// v7.0.1 (I18N001/I18N003): user-visible text extracted from the admin
+// diagnostic pages prompt_playground.php, provider_benchmark.php and
+// course_settings.php, where it was hardcoded English and untranslatable.
+$string['prompt_playground:pagetitle'] = '[[tutorshort]] Prompt Playground';
+$string['prompt_playground:intro'] = 'Assemble the system prompt and inspect the result. Two modes: (1) enter a <strong>test question</strong> to run the REAL retriever and see exactly which chunks it selects for that question, with relevance scores — the way to verify chunk selection; or (2) paste your own passages to simulate retrieved chunks. Pick a course (and optionally a current-page course-module id), then assemble. You see the chunks chosen, the exact prompt the model would receive, and the per-section size breakdown. Nothing is sent to any AI provider, and it assembles as you (an admin), so no learner data is exposed.';
+$string['prompt_playground:label_courseid'] = '<strong>Course id</strong>';
+$string['prompt_playground:label_pageid'] = '<strong>Current page cmid</strong> (optional)';
+$string['prompt_playground:label_query'] = '<strong>Test question (live RAG retrieval)</strong> (optional — enter a learner question to run the real retriever and see the top chunks it selects, with scores; when set, these are used instead of the pasted chunks below)';
+$string['prompt_playground:label_chunks'] = '<strong>Simulated retrieved chunks</strong> (used only when no test question above; separate chunks with a line containing only <code>---</code>; leave both empty to assemble with RAG off)';
+$string['prompt_playground:assemble'] = 'Assemble prompt';
+$string['prompt_playground:live_retrieval'] = 'Live RAG retrieval';
+$string['prompt_playground:question'] = 'Question: <em>{$a}</em>';
+$string['prompt_playground:retrieval_failed'] = 'Retrieval failed: {$a} (RAG must be enabled for the course and the course indexed).';
+$string['prompt_playground:no_chunks'] = 'No chunks cleared the relevance floor for this question — an off-topic question, or the course is not indexed. The prompt below falls back to the page-and-structure behavior.';
+$string['prompt_playground:selected_chunks'] = 'Selected <strong>{$a}</strong> chunk(s), ranked by relevance:';
+$string['prompt_playground:col_score'] = 'Score';
+$string['prompt_playground:col_type'] = 'Type';
+$string['prompt_playground:col_content'] = 'Content';
+$string['prompt_playground:score_na'] = 'n/a';
+$string['prompt_playground:result'] = 'Result';
+$string['prompt_playground:result_summary'] = '{$a->mode} chunks fed to the prompt: <strong>{$a->chunks}</strong>. Assembled prompt: <strong>{$a->chars}</strong> chars (~{$a->tokens} tokens).';
+$string['prompt_playground:mode_live'] = 'Live-retrieved';
+$string['prompt_playground:mode_simulated'] = 'Simulated';
+$string['prompt_playground:breakdown'] = 'Per-section breakdown';
+$string['prompt_playground:assembled'] = 'Assembled system prompt';
+$string['prompt_playground:assemble_failed'] = 'Could not assemble the prompt: {$a} (check the course id exists).';
+
+$string['benchmark:runnow'] = 'Run benchmark now';
+$string['benchmark:rerun'] = 'Re-run benchmark';
+$string['benchmark:export_markdown'] = 'Export Markdown';
+$string['benchmark:export_csv'] = 'Export CSV';
+$string['benchmark:export_json'] = 'Export JSON';
+$string['benchmark:norun'] = 'No benchmark has been run yet. Click the button above to run.';
+$string['benchmark:lastrun'] = 'Last run: {$a}';
+
+$string['coursesettings:back_to_course'] = 'Back to course';
+$string['coursesettings:course_analytics'] = 'Course analytics';
+$string['coursesettings:how_it_works'] = 'How course settings work:';
+$string['coursesettings:how_it_works_desc'] = 'Settings configured here override the global defaults for this course only. Leave a field blank to use the global setting. Changes here do not affect other courses.';
+$string['coursesettings:systemprompt_hint'] = 'Leave blank to use the global default. Or customize for this course only.';
+$string['coursesettings:reset_prompt'] = 'Reset to default';
+$string['coursesettings:reset_prompt_title'] = 'Replace with the global default template';
+$string['coursesettings:reset_prompt_confirm'] = 'Replace the system prompt with the global default template? Any course-specific edits will be lost.';
+$string['coursesettings:english_lock_heading'] = 'English Lock (ELL Courses)';
+$string['coursesettings:english_lock'] = 'English Lock';
+$string['coursesettings:english_lock_desc'] = 'Force [[tutorshort]] to always respond in English for this course, regardless of the student\'s language preference. Ideal for English language learning courses where students should practice reading and writing in English.';
+$string['coursesettings:english_lock_toggle'] = 'Always respond in English';
+$string['coursesettings:english_lock_help'] = 'When enabled, [[tutorshort]] will respond in English even if the student writes in another language. The student\'s language preference in their settings panel will be overridden.';
+$string['coursesettings:voice_tab'] = 'Voice Tab';
+$string['coursesettings:voice_tab_desc'] = 'Control the Voice Tab (settings panel voice options) for this course. By default it inherits the global setting (currently {$a}).';
+$string['coursesettings:voice_tab_help'] = 'Override the global Voice Tab setting for this course only.';
+$string['coursesettings:auto_open_heading'] = 'Auto-open on first visit';
+$string['coursesettings:auto_open'] = 'Auto-open';
+$string['coursesettings:auto_open_desc'] = 'Control whether the [[tutorshort]] drawer opens automatically the first time a student lands on this course. First-visit state is tracked per course in the student\'s browser via localStorage. By default this course inherits the global setting (currently {$a}).';
+$string['coursesettings:auto_open_help'] = 'Override the global Auto-open setting for this course only.';
+$string['coursesettings:inherit_global'] = 'Inherit global ({$a})';
+$string['coursesettings:force_on'] = 'Force on';
+$string['coursesettings:force_off'] = 'Force off';
+$string['coursesettings:state_enabled'] = 'enabled';
+$string['coursesettings:state_disabled'] = 'disabled';
+
+// ── v7.0.1 (I18N001): strings extracted from admin/learner pages that had
+// hardcoded English — rag_admin.php, admin_user_data.php, rubric_admin.php and
+// the redash_export.php JSON error payloads.
+$string['ragadmin:nothing_embedded_all'] = 'Nothing was embedded — first error: {$a} Check the embedding provider and API key in Settings.';
+$string['ragadmin:indexing_failed'] = 'Indexing could not run: {$a} — check the embedding provider and API key in Settings.';
+$string['ragadmin:no_chunks_embedded'] = 'No chunks were embedded — first error: {$a} (most often the embedding API key or provider). The existing index was left untouched.';
+$string['ragadmin:no_extractable_content'] = 'No extractable content was found in this course (no pages, books, or supported files).';
+$string['ragadmin:content_sources'] = 'Content sources';
+$string['ragadmin:content_sources_desc'] = 'Each row shows a content type the RAG indexer can extract text from, and whether it is currently enabled and ready to run. Open <a href="{$a}">Settings</a> to change any of them.';
+$string['ragadmin:badge_ready'] = 'Ready';
+$string['ragadmin:badge_off'] = 'Off';
+$string['ragadmin:src_disabled'] = 'Disabled in settings.';
+$string['ragadmin:src_embedding'] = 'Embedding provider (required for RAG)';
+$string['ragadmin:src_embedding_provider'] = 'Provider: <code>{$a}</code>.';
+$string['ragadmin:src_embedding_model'] = 'Model: <code>{$a}</code>.';
+$string['ragadmin:src_embedding_keyset'] = 'API key set.';
+$string['ragadmin:src_embedding_nokey'] = 'No key required (local provider).';
+$string['ragadmin:src_embedding_missingkey'] = 'Provider <code>{$a}</code> needs an API key, but <code>embed_apikey</code> is empty. Set it in Settings — without it every embedding call fails and a reindex produces zero chunks.';
+$string['ragadmin:src_pdf'] = 'PDF (mod_resource)';
+$string['ragadmin:src_pdf_ok'] = 'On. pdftotext binary found.';
+$string['ragadmin:src_pdf_missing'] = 'On, but the pdftotext binary was not found. Install poppler-utils (apt: <code>poppler-utils</code>; brew: <code>poppler</code>) or set the path in settings.';
+$string['ragadmin:src_docx'] = 'DOCX (mod_resource)';
+$string['ragadmin:src_docx_ok'] = 'On. Uses native PHP ZipArchive, no external dependency.';
+$string['ragadmin:src_pptx'] = 'PPTX (mod_resource)';
+$string['ragadmin:src_pptx_ok'] = 'On. Uses native PHP ZipArchive, no external dependency. Walks slide and speaker-note XML. (Legacy binary .ppt is not supported; re-save as .pptx.)';
+$string['ragadmin:src_h5p'] = 'H5P content';
+$string['ragadmin:src_h5p_ok'] = 'On. Walks content JSON for text fields.';
+$string['ragadmin:src_scorm'] = 'SCORM packages';
+$string['ragadmin:src_scorm_ok'] = 'On. Maximum package size {$a} MB.';
+$string['ragadmin:src_scorm_off'] = 'Off by default. Enable in settings to index Articulate Storyline and other packaged content.';
+$string['ragadmin:src_transcripts'] = 'Embedded video / interactive transcripts';
+$string['ragadmin:src_transcripts_ok'] = 'On. Scans pages and books for Synthesia, YouTube, Articulate, and Genially iframes; pairs each with the closest transcript link (above or below).';
+$string['ragadmin:src_transcripts_off'] = 'Off. Enable in settings once the transcript host has allowlisted this server.';
+$string['admin:user_data:col_table'] = 'Table';
+$string['admin:user_data:col_rows'] = 'Rows for this user';
+$string['admin:user_data:total'] = 'Total';
+$string['admin:user_data:idlabel'] = 'id {$a}';
+$string['rubric_admin:title_course'] = 'Practice scoring rubric editor: {$a}';
+$string['rubric_admin:title_global'] = 'Practice scoring rubric editor: global default';
+$string['rubric_admin:err_invalid_criteria'] = 'Criteria data is invalid or empty.';
+$string['rubric_admin:err_no_criteria'] = 'No valid criteria after cleaning.';
+$string['rubric_admin:saved_updated'] = 'Rubric updated.';
+$string['rubric_admin:saved_created'] = 'Rubric created.';
+$string['rubric_admin:reset_course_done'] = 'Course rubric removed. The global default will be used.';
+$string['rubric_admin:reset_global_done'] = 'Global rubric reset to defaults.';
+$string['rubric_admin:rubric_title_conversation'] = 'Conversation Practice Rubric';
+$string['rubric_admin:rubric_title_pronunciation'] = 'Pronunciation Practice Rubric';
+$string['rubric_admin:rubric_title_speech'] = 'Speech Practice Rubric';
+$string['rubric_admin:analytics_link'] = 'Analytics dashboard';
+$string['rubric_admin:scope_label'] = 'Editing rubric for:';
+$string['rubric_admin:scope_global'] = 'Global default (all courses)';
+$string['rubric_admin:tab_conversation'] = 'Conversation practice';
+$string['rubric_admin:tab_pronunciation'] = 'Pronunciation practice';
+$string['rubric_admin:tab_speech'] = 'Soapbox speech';
+$string['rubric_admin:inherited_notice'] = 'This course has no custom rubric. Showing the global default. Edit below to create a course-specific override.';
+$string['rubric_admin:add_criterion'] = '+ Add criterion';
+$string['rubric_admin:save'] = 'Save rubric';
+$string['rubric_admin:preview'] = 'Preview';
+$string['rubric_admin:remove_override'] = 'Remove course override';
+$string['rubric_admin:reset_defaults'] = 'Reset to defaults';
+$string['rubric_admin:criterion'] = 'Criterion';
+$string['rubric_admin:move_up'] = 'Move up';
+$string['rubric_admin:move_down'] = 'Move down';
+$string['rubric_admin:delete_criterion'] = 'Delete criterion';
+$string['rubric_admin:confirm_delete_criterion'] = 'Delete this criterion?';
+$string['rubric_admin:criterion_name'] = 'Criterion name';
+$string['rubric_admin:criterion_name_placeholder'] = 'e.g. Grammar and accuracy';
+$string['rubric_admin:max_score'] = 'Max score';
+$string['rubric_admin:max_score_aria'] = 'Maximum score for this criterion';
+$string['rubric_admin:description'] = 'Description';
+$string['rubric_admin:description_aria'] = 'Criterion description';
+$string['rubric_admin:description_placeholder'] = 'Describe what this criterion measures and how it is scored.';
+$string['rubric_admin:maps_to_outcome'] = 'Maps to outcome (optional)';
+$string['rubric_admin:outcome_aria'] = 'Course outcome this criterion maps to';
+$string['rubric_admin:outcome_none'] = '- None -';
+$string['rubric_admin:confirm_reset_course'] = 'Remove the custom rubric for this course? Students will see the global default instead.';
+$string['rubric_admin:confirm_reset_global'] = 'Reset the global rubric to the built-in default criteria?';
+$string['rubric_admin:preview_title'] = 'Scoring rubric preview';
+$string['rubric_admin:preview_type'] = 'Type: {$a}';
+$string['rubric_admin:preview_unnamed'] = '(unnamed)';
+$string['rubric_admin:preview_score'] = 'Score:';
+$string['rubric_admin:preview_total'] = 'Total possible: {$a} points';
+$string['rubric_admin:preview_close'] = 'Close preview';
+$string['redash:err_method_not_allowed'] = 'Method not allowed';
+$string['redash:err_not_configured'] = 'Redash export is not configured. Set an API key in plugin settings.';
+$string['redash:err_invalid_key'] = 'Invalid API key';
+$string['redash:err_no_sections'] = 'No valid sections requested';
+$string['redash:err_nested_sections'] = 'Nested sections require their parent section';
+$string['redash:hint_add_parent'] = 'Add the parent, for example sections={$a}';
+$string['redash:err_deanonymized_disabled'] = 'De-anonymized export is disabled. Enable the "Allow de-anonymized export" plugin setting to permit anonymize=0.';
+$string['redash:unknown_course'] = 'Unknown (id={$a})';
+
+// v7.0.2 (I18N001): analytics.php — Learning Radar provider picker, metric chips
+// and suggested starter questions. Previously hardcoded English on the page.
+$string['analytics:provider_primary'] = '{$a} (primary)';
+$string['analytics:chip_tokens_label'] = 'Tokens (30d)';
+$string['analytics:chip_tokens_query'] = 'Break down token spend by provider and course for the last 30 days.';
+$string['analytics:chip_topcourse_label'] = 'Top-cost course (30d)';
+$string['analytics:chip_topcourse_query'] = 'Why is course {$a} the top token consumer this month?';
+$string['analytics:chip_topcourse_query_empty'] = 'Which courses are using the most tokens recently?';
+$string['analytics:chip_activestudents_label'] = 'Active students (7d)';
+$string['analytics:chip_activestudents_query'] = 'Profile the active students this week: which topics are they asking about?';
+$string['analytics:chip_voiceminutes_label'] = 'Voice minutes (30d)';
+$string['analytics:chip_voiceminutes_query'] = 'Which courses and topics are students using voice mode for?';
+$string['analytics:chip_negratings_label'] = 'Negative ratings (7d)';
+$string['analytics:chip_negratings_query'] = 'Summarize the lowest-rated responses from the last week. What patterns explain them?';
+$string['analytics:chip_integrity_label'] = 'Integrity flags (open)';
+$string['analytics:chip_integrity_query'] = 'What types of academic integrity concerns are flagged and how should I respond?';
+$string['analytics:radar_starter_topics_label'] = 'Top topics students struggle with';
+$string['analytics:radar_starter_topics_query'] = 'Which topics have the highest off-topic rate or generate the most clarification requests across all courses?';
+$string['analytics:radar_starter_provider_label'] = 'Best provider per dollar';
+$string['analytics:radar_starter_provider_query'] = 'Compare cost-per-helpful-answer across providers using rating signal as the helpful proxy. Which provider gives the best satisfaction per dollar this month?';
+$string['analytics:radar_starter_bounce_label'] = 'Where students bounce';
+$string['analytics:radar_starter_bounce_query'] = 'Identify courses where conversation drop-off is highest after the first 2 turns. What pattern explains the drop?';
+$string['analytics:radar_starter_frustrated_label'] = 'Most-frustrated students';
+$string['analytics:radar_starter_frustrated_query'] = 'Find anonymized students whose recent feedback shifted from positive to negative this week. What triggered the change?';
+$string['analytics:radar_starter_review_label'] = 'Courses ready for instructor review';
+$string['analytics:radar_starter_review_query'] = 'Which courses have accumulated the most negative ratings or integrity flags this period and would benefit from instructional designer review?';
+$string['analytics:radar_starter_trending_label'] = 'Trending questions';
+$string['analytics:radar_starter_trending_query'] = 'List the 10 most frequently asked questions this week, and how [[tutorshort]] answered them on average.';
+$string['analytics:radar_starter_voice_label'] = 'Voice mode breakdown';
+$string['analytics:radar_starter_voice_query'] = 'Profile voice mode usage: which courses, which topics, and what is the average session length?';
+$string['analytics:radar_starter_quiet_label'] = 'Quiet courses';
+$string['analytics:radar_starter_quiet_query'] = 'Which courses have [[tutorshort]] enabled but very low engagement? What might be missing in those courses to drive more use?';
+
+// v7.0.2 (I18N001): starter_settings.php — collapsible help panel.
+$string['starters:howto_heading'] = 'How to use this page';
+$string['starters:howto_builtin'] = '<strong>Built-in starters</strong> are system managed. You can enable or disable them, change their icon, and reorder them, but you cannot delete them.';
+$string['starters:howto_custom'] = '<strong>Custom starters</strong> are ones you create. Click "{$a}" below to create one. You can edit everything: the name, prompt, icon, and visibility conditions.';
+$string['starters:howto_types'] = '<strong>Starter types:</strong>';
+$string['starters:howto_type_prompt'] = '<strong>Prompt</strong>: when clicked, sends a custom message to the AI on behalf of the student';
+$string['starters:howto_type_quiz'] = 'starts an interactive practice quiz';
+$string['starters:howto_type_voice'] = 'starts a spoken conversation (requires TTS)';
+$string['starters:howto_type_pronunciation'] = 'starts pronunciation practice (requires Realtime Voice Mode)';
+$string['starters:howto_conditional'] = '<strong>Conditional visibility:</strong> choose "Only when TTS enabled" for audio starters, or "Only when Realtime enabled" for pronunciation starters. If the required feature is off, the starter will be hidden from students.';
+$string['starters:howto_placeholders'] = '<strong>Prompt placeholders:</strong> use <code>{page}</code> to insert the current page title. Example: <em>"Explain the key concepts on the {page} page."</em>';
+$string['starters:howto_reorder'] = '<strong>Drag to reorder</strong> using the ≡ handle on the left. The order here is the order students see.';
+$string['starters:howto_overrides'] = '<strong>Per-course overrides:</strong> after configuring starters here, go to each course\'s settings page to enable or disable specific starters for that course.';
+
+// v7.0.2 (I18N001): starter_settings.php — starter card editor rendered in the browser.
+$string['starters:js_drag_handle'] = 'Drag to reorder';
+$string['starters:js_on'] = 'On';
+$string['starters:js_name'] = 'Name';
+$string['starters:js_name_aria'] = 'Chip name';
+$string['starters:js_name_placeholder'] = 'Chip display name';
+$string['starters:js_description'] = 'Description';
+$string['starters:js_desc_aria'] = 'Chip description';
+$string['starters:js_desc_placeholder'] = 'Admin-only description';
+$string['starters:js_desc_help'] = 'Shown only in this admin panel for reference.';
+$string['starters:js_prompt'] = 'AI Prompt';
+$string['starters:js_prompt_aria'] = 'AI prompt template';
+$string['starters:js_prompt_placeholder'] = 'The message sent to the AI when this chip is clicked...';
+$string['starters:js_prompt_help'] = 'Use <code>{page}</code> for the current page title. This is sent as the student\'s message to the AI.';
+$string['starters:js_icon'] = 'Icon';
+$string['starters:js_conditional'] = 'Conditional';
+$string['starters:js_cond_always'] = 'Always shown';
+$string['starters:js_cond_tts'] = 'Only when TTS enabled';
+$string['starters:js_cond_realtime'] = 'Only when Realtime enabled';
+$string['starters:js_delete'] = 'Delete this starter';
+$string['starters:js_builtin_note'] = 'Built-in starter (cannot be deleted)';
+$string['starters:js_confirm_delete'] = 'Delete "{$a}"?';
+$string['starters:js_new_name'] = 'New Starter';
+
+// v7.0.2 (I18N001): starter_settings.php — icon picker tooltips, one per icon key.
+$string['starters:icon_book'] = 'Book';
+$string['starters:icon_lightning'] = 'Quick';
+$string['starters:icon_calendar'] = 'Schedule';
+$string['starters:icon_chat'] = 'Chat';
+$string['starters:icon_refresh'] = 'Review';
+$string['starters:icon_mic'] = 'Microphone';
+$string['starters:icon_speaker'] = 'Speaker';
+$string['starters:icon_lightbulb'] = 'Idea';
+$string['starters:icon_star'] = 'Star';
+$string['starters:icon_graduation'] = 'Academic';
+$string['starters:icon_pencil'] = 'Write';
+$string['starters:icon_compass'] = 'Explore';
+$string['starters:icon_brain'] = 'Brain';
+$string['starters:icon_target'] = 'Goal';
+$string['starters:icon_search'] = 'Search';
+$string['starters:icon_heart'] = 'Wellbeing';
+$string['starters:icon_rocket'] = 'Quick Start';
+
+// v7.0.2 (I18N001): token_analytics.php — page heading, spend-category labels,
+// course filter, optimizer recommendation lines. Previously hardcoded English.
+$string['token_analytics:title'] = '[[tutorname]] — Token Usage & Cost';
+$string['token_analytics:cat_voice_realtime'] = 'Voice (Realtime)';
+$string['token_analytics:cat_voice_tts'] = 'Voice (TTS)';
+$string['token_analytics:cat_voice_stt'] = 'Voice (STT)';
+$string['token_analytics:cat_analytics'] = 'Analytics';
+$string['token_analytics:cat_premium_route'] = 'Premium routing (escalation decisions)';
+$string['token_analytics:cat_other'] = 'Other';
+$string['token_analytics:all_courses'] = 'All courses';
+$string['token_analytics:cap_unlimited'] = 'unlimited';
+$string['token_analytics:opt_rank_line'] = '{$a->rank}. {$a->provider} ({$a->model}) — {$a->cost}/req, satisfaction {$a->satisfaction}, {$a->samples} samples ({$a->confidence} confidence)';
+$string['token_analytics:opt_no_data'] = 'Not enough data yet — need at least 30 messages of this capability in the last 30 days.';
+$string['token_analytics:opt_no_projection'] = 'Not enough data yet';
+$string['token_analytics:unknown_model'] = 'Unknown model';
+
+// v7.0.2 (I18N001): survey_admin.php — page heading, scope picker, save/reset
+// notices, and the question-card editor the page builds in the browser.
+$string['survey_admin:title_course'] = 'Survey editor: {$a}';
+$string['survey_admin:title_global'] = 'Survey editor: global default';
+$string['survey_admin:err_invalid_questions'] = 'Questions data is invalid or empty.';
+$string['survey_admin:err_no_questions'] = 'No valid questions after cleaning.';
+$string['survey_admin:saved_updated'] = 'Survey updated.';
+$string['survey_admin:saved_created'] = 'Survey created.';
+$string['survey_admin:reset_course_done'] = 'Course survey removed. The global default will be used.';
+$string['survey_admin:reset_global_done'] = 'Global survey reset to defaults.';
+$string['survey_admin:scope_label'] = 'Editing survey for:';
+$string['survey_admin:inherited_notice'] = 'This course has no custom survey. Showing the global default. Edit below to create a course-specific override.';
+$string['survey_admin:survey_title'] = 'Survey title';
+$string['survey_admin:title_placeholder'] = 'e.g. [[tutorshort]] End-of-Course Survey';
+$string['survey_admin:add_question'] = '+ Add question';
+$string['survey_admin:save'] = 'Save survey';
+$string['survey_admin:type_multiple_choice'] = 'Multiple choice';
+$string['survey_admin:type_rating'] = 'Rating scale';
+$string['survey_admin:type_open_text'] = 'Open text';
+$string['survey_admin:delete_question'] = 'Delete question';
+$string['survey_admin:confirm_delete_question'] = 'Delete this question?';
+$string['survey_admin:question_type'] = 'Question type';
+$string['survey_admin:question_text'] = 'Question text';
+$string['survey_admin:options'] = 'Options';
+$string['survey_admin:option_n'] = 'Option {$a}';
+$string['survey_admin:remove_option'] = 'Remove option';
+$string['survey_admin:add_option'] = '+ Add option';
+$string['survey_admin:min_value'] = 'Min value';
+$string['survey_admin:min_value_aria'] = 'Minimum rating value';
+$string['survey_admin:max_value'] = 'Max value';
+$string['survey_admin:max_value_aria'] = 'Maximum rating value';
+$string['survey_admin:min_label'] = 'Min label (e.g. "Not at all")';
+$string['survey_admin:min_label_aria'] = 'Minimum rating label';
+$string['survey_admin:min_label_placeholder'] = 'e.g. Not at all';
+$string['survey_admin:max_label'] = 'Max label (e.g. "Very happy")';
+$string['survey_admin:max_label_aria'] = 'Maximum rating label';
+$string['survey_admin:max_label_placeholder'] = 'e.g. Very happy';
+$string['survey_admin:confirm_reset_course'] = 'Remove the custom survey for this course? Students will see the global default instead.';
+$string['survey_admin:confirm_reset_global'] = 'Reset the global survey to the built-in default questions?';
+$string['survey_admin:preview_title'] = 'Survey preview';
+$string['survey_admin:preview_no_text'] = '(no text)';
+$string['survey_admin:preview_answer_hint'] = 'Type your answer here...';
+
+// v7.0.2 (I18N001): usertesting_admin.php — page heading, scope picker,
+// save/reset notices, and the task-card editor the page builds in the browser.
+$string['usertesting_admin:title_course'] = 'Usability testing editor: {$a}';
+$string['usertesting_admin:title_global'] = 'Usability testing editor: global default';
+$string['usertesting_admin:err_invalid_tasks'] = 'Tasks data is invalid or empty.';
+$string['usertesting_admin:err_no_tasks'] = 'No valid tasks after cleaning.';
+$string['usertesting_admin:saved_updated'] = 'Task set updated.';
+$string['usertesting_admin:saved_created'] = 'Task set created.';
+$string['usertesting_admin:reset_course_done'] = 'Course tasks removed. The global default will be used.';
+$string['usertesting_admin:reset_global_done'] = 'Global tasks reset to defaults.';
+$string['usertesting_admin:scope_label'] = 'Editing tasks for:';
+$string['usertesting_admin:inherited_notice'] = 'This course has no custom task set. Showing the global default. Edit below to create a course-specific override.';
+$string['usertesting_admin:taskset_title'] = 'Task set title';
+$string['usertesting_admin:taskset_title_placeholder'] = 'e.g. [[tutorshort]] usability test round 1';
+$string['usertesting_admin:external_url'] = 'External form URL (Option C, optional)';
+$string['usertesting_admin:external_url_help'] = 'Placeholders: <code>{{userid}}</code>, <code>{{courseid}}</code>, <code>{{messages}}</code>, <code>{{session_minutes}}</code>. If set, the footer link opens this URL instead of the in-widget panel.';
+$string['usertesting_admin:tasks_heading'] = 'Tasks (in-widget panel)';
+$string['usertesting_admin:add_task'] = '+ Add task';
+$string['usertesting_admin:save'] = 'Save task set';
+$string['usertesting_admin:type_action_then_rate'] = 'Action + rate';
+$string['usertesting_admin:type_free_response'] = 'Free response';
+$string['usertesting_admin:delete_task'] = 'Delete task';
+$string['usertesting_admin:confirm_delete_task'] = 'Delete this task?';
+$string['usertesting_admin:task_type'] = 'Task type';
+$string['usertesting_admin:task_instruction'] = 'Task instruction';
+$string['usertesting_admin:rating_label'] = 'Rating label';
+$string['usertesting_admin:min_value'] = 'Min value';
+$string['usertesting_admin:min_value_aria'] = 'Minimum rating value';
+$string['usertesting_admin:max_value'] = 'Max value';
+$string['usertesting_admin:max_value_aria'] = 'Maximum rating value';
+$string['usertesting_admin:min_label'] = 'Min label';
+$string['usertesting_admin:min_label_placeholder'] = 'e.g. Not helpful';
+$string['usertesting_admin:max_label'] = 'Max label';
+$string['usertesting_admin:max_label_placeholder'] = 'e.g. Very helpful';
+$string['usertesting_admin:follow_up'] = 'Follow-up question (optional free text)';
+$string['usertesting_admin:follow_up_aria'] = 'Follow-up question';
+$string['usertesting_admin:additional_prompt'] = 'Additional prompt (optional)';
+$string['usertesting_admin:additional_prompt_aria'] = 'Additional prompt';
+$string['usertesting_admin:confirm_reset_course'] = 'Remove custom tasks for this course? Students will see the global default.';
+$string['usertesting_admin:confirm_reset_global'] = 'Reset global tasks to the built-in defaults?';
+$string['usertesting_admin:preview_title'] = 'Task set preview';
+$string['usertesting_admin:preview_task_label'] = 'Task {$a->num} ({$a->type})';
+$string['usertesting_admin:preview_no_instruction'] = '(no instruction)';
+$string['usertesting_admin:preview_rate_fallback'] = 'Rate';
+$string['usertesting_admin:preview_rate_range'] = '{$a->label} ({$a->min} to {$a->max})';
+$string['usertesting_admin:preview_follow_up'] = 'Follow-up: {$a}';
+
+// Anonymised transcript and summary report (v7.2.10).
+$string['transcripts:title'] = 'Anonymized chat transcripts';
+$string['transcripts:privacynote'] = 'Learner identities are replaced with per-report pseudonyms before anything is shown or downloaded. A label is stable within one report so you can follow a conversation, and carries no meaning across reports, so two downloads cannot be joined on it. Downloads are recorded in the audit log.';
+$string['transcripts:mode'] = 'Show';
+$string['transcripts:met'] = 'Met';
+$string['transcripts:notmet'] = 'Not met';
+$string['transcripts:from'] = 'From';
+$string['transcripts:to'] = 'To';
+$string['transcripts:truncated'] = 'Showing the first {$a} rows. Narrow the date range or unit to see the rest.';
+$string['transcripts:rowcount'] = '{$a} rows.';
+$string['transcripts:col_conversation'] = 'Conversation';
+$string['transcripts:col_learner'] = 'Learner';
+$string['transcripts:col_type'] = 'Type';
+$string['transcripts:col_message'] = 'Message';
+$string['coursesettings:apikey_stored'] = 'A key is saved. Leave blank to keep it.';
+$string['coursesettings:apikey_clear'] = 'Clear the saved key and use the site key';
+$string['coursesettings:spend_cap_monthly'] = 'Monthly spend cap for this course (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'Leave blank to use the site-wide default per-course cap. When set, AI features in this course stop once the month\'s spend reaches this amount.';
+$string['token_analytics:cost_partial'] = 'Excludes {$a->tokens} tokens on models with no published rate ({$a->models}), so the real cost is higher.';
+$string['flashcards:starter_saved'] = 'Saved {$a} flashcards from this page.';
+$string['flashcards:starter_open_review'] = 'Open the review page to study them with spaced repetition.';
+$string['flashcards:starter_failed'] = 'I could not generate flashcards from this page ({$a}). Try again or pick a page with more content.';
+$string['flashcards:starter_error'] = 'I could not generate flashcards from this page right now. Try again later.';
+$string['soapbox:no_media_support'] = 'This browser cannot record audio here. Use a recent Chrome, Edge, Firefox, or Safari over a secure (https) connection.';
+$string['soapbox:status_uploaded'] = 'Processing — transcription and scoring in progress';
+$string['soapbox:status_scored'] = 'Scored';
+$string['soapbox:status_failed'] = 'Scoring failed — this attempt does not count. Please record again.';
+$string['error:realtime_unavailable'] = 'Voice mode is temporarily unavailable. Please try again in a moment, or use text chat.';
+$string['settings:cdn_bundle_url'] = 'Talking avatar viewer bundle URL';
+$string['settings:cdn_bundle_url_desc'] = 'URL of the JavaScript bundle the talking-avatar viewer page loads (WebRTC/LiveKit glue). Leave blank to disable the viewer; the page then shows a notice instead of a broken stage.';
+
+// --- v7.3.5: plugin-directory issue #205 extraction (378-key batch) ---
+// --- from newstrings_a.php ---
+// Analytics dashboard + tabs + CSV export i18n extraction (job a).
+// Dashboard nav / top bar.
+$string['analytics:plugin_settings'] = 'Plugin Settings';
+$string['analytics:token_usage_cost'] = 'Token Usage & Cost';
+$string['analytics:export_csv'] = 'Export CSV';
+$string['analytics:export_csv_title'] = 'Download analytics as CSV';
+$string['analytics:hide_real_names'] = 'Hide Real Names';
+$string['analytics:show_real_names'] = 'Show Real Names';
+$string['analytics:exit_student_mode'] = 'Exit Student Mode';
+$string['analytics:student_mode'] = 'Student Mode';
+$string['analytics:real_names_warning'] = '<strong>Real names are visible.</strong> Student data is not anonymized in this session. Toggle off before sharing your screen or leaving this page.';
+$string['analytics:student_mode_notice'] = '<strong>Student Mode active.</strong> The [[tutorshort]] widget on course pages now shows exactly what students see. Exit here or press Ctrl+Shift+A from any page.';
+$string['analytics:courses_enabled_summary'] = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
+$string['analytics:manage_course_enrollment'] = 'manage course enrollment';
+// Learning Radar card.
+$string['analytics:radar_heading'] = 'Learning Radar';
+$string['analytics:radar_subtitle'] = 'ask questions about anonymized student data';
+$string['analytics:radar_share'] = 'Copy share link';
+$string['analytics:radar_share_title'] = 'Copy a link that pre-fills this query for another admin';
+$string['analytics:radar_schedules'] = 'Schedules';
+$string['analytics:radar_history'] = 'History';
+$string['analytics:radar_try_question'] = 'Try a question:';
+$string['analytics:radar_click_metric'] = 'Or click a metric to dig in:';
+$string['analytics:model'] = 'Model';
+$string['analytics:data_scope'] = 'Data scope';
+$string['analytics:all_courses'] = 'All courses';
+$string['analytics:scope_current_course'] = 'Current course only';
+$string['analytics:scope_custom'] = 'Specific course IDs...';
+$string['analytics:scope_byprovider'] = 'By LLM provider used...';
+$string['analytics:scope_detail_label'] = 'Course IDs or provider';
+$string['analytics:scope_detail_placeholder'] = 'e.g. 2,5,12 or openai';
+$string['analytics:range'] = 'Range';
+$string['analytics:last_24_hours'] = 'Last 24 hours';
+$string['analytics:last_90_days'] = 'Last 90 days';
+$string['analytics:compare_two_models'] = 'Compare 2 models';
+$string['analytics:compare_two_models_title'] = 'Run the same query against a second provider/model';
+$string['analytics:provider_b'] = 'Provider B';
+$string['analytics:model_b'] = 'Model B';
+$string['analytics:compare_cost_warning'] = 'Compare runs 2 queries — cost will roughly double.';
+$string['analytics:radar_intro_placeholder'] = 'All data is anonymized. Pick a starter above, click a metric, or type a question.';
+$string['analytics:radar_input_placeholder'] = 'Ask about student data, trends, costs, feedback...';
+$string['analytics:send'] = 'Send';
+$string['analytics:export_menu'] = 'Export';
+$string['analytics:download'] = 'Download';
+$string['analytics:format_json'] = 'JSON';
+$string['analytics:format_csv'] = 'CSV';
+$string['analytics:format_markdown'] = 'Markdown';
+$string['analytics:format_pdf'] = 'PDF (print)';
+$string['analytics:send_email'] = 'Email…';
+$string['analytics:send_slack'] = 'Slack webhook…';
+$string['analytics:send_teams'] = 'Teams webhook…';
+$string['analytics:redash'] = 'Redash';
+$string['analytics:redash_push'] = 'Send to Redash…';
+$string['analytics:redash_setup'] = 'Set up Redash…';
+$string['analytics:schedule_this'] = 'Schedule…';
+$string['analytics:schedule_this_title'] = 'Save this query as a recurring scheduled report';
+// Saved schedules panel.
+$string['analytics:scheduled_queries'] = 'Scheduled Queries';
+$string['analytics:new_schedule'] = 'New schedule';
+$string['analytics:name'] = 'Name';
+$string['analytics:channels'] = 'Channels';
+$string['analytics:last_run'] = 'Last run';
+$string['analytics:status'] = 'Status';
+$string['analytics:channel_email'] = 'email';
+$string['analytics:channel_slack'] = 'slack';
+$string['analytics:channel_teams'] = 'teams';
+$string['analytics:edit'] = 'Edit';
+$string['analytics:pause'] = 'Pause';
+$string['analytics:enable'] = 'Enable';
+$string['analytics:delete'] = 'Delete';
+$string['analytics:no_schedules'] = 'No scheduled queries yet. Run a query above and click "Schedule" to set one up.';
+// Past queries panel.
+$string['analytics:past_queries'] = 'Past Queries';
+$string['analytics:search_query_placeholder'] = 'Search query text…';
+$string['analytics:search_past_queries'] = 'Search past queries';
+$string['analytics:when'] = 'When';
+$string['analytics:query'] = 'Query';
+$string['analytics:type'] = 'Type';
+$string['analytics:badge_scheduled'] = 'scheduled';
+$string['analytics:badge_adhoc'] = 'ad-hoc';
+$string['analytics:rerun'] = 'Re-run';
+$string['analytics:no_queries_yet'] = 'No queries run yet.';
+// Per-course drill-down.
+$string['analytics:back_all_courses'] = 'Back to All Courses';
+$string['analytics:filter_timerange'] = 'Time Range';
+$string['analytics:course'] = 'Course';
+$string['analytics:no_usage_data'] = 'No AI Assistant usage data for this course yet.';
+$string['analytics:card_conversations'] = 'Conversations';
+$string['analytics:messages'] = 'Messages';
+$string['analytics:card_active_students'] = 'Active Students';
+$string['analytics:card_avg_msgs_student'] = 'Avg Msgs/Student';
+$string['analytics:card_offtopic_open'] = 'Conversations currently off-topic';
+$string['analytics:card_escalations'] = 'Escalations';
+$string['analytics:card_study_plans'] = 'Study Plans';
+$string['analytics:hotspots_heading'] = 'Hotspots';
+$string['analytics:hotspots_intro'] = 'Course sections most frequently referenced in student messages.';
+$string['analytics:no_hotspot_data'] = 'No hotspot data available yet.';
+$string['analytics:common_prompts_heading'] = 'Common Prompts';
+$string['analytics:common_prompts_intro'] = 'Recurring question patterns from students.';
+$string['analytics:no_prompt_patterns'] = 'No recurring prompt patterns detected yet.';
+$string['analytics:provider_comparison_heading'] = 'Provider Comparison';
+$string['analytics:avg_length'] = 'Avg Length';
+$string['analytics:total_tokens_short'] = 'Total Tokens';
+$string['analytics:avg_tokens_short'] = 'Avg Tokens';
+$string['analytics:chars_suffix'] = '{$a} chars';
+$string['analytics:student_activity'] = 'Student Activity';
+$string['analytics:student'] = 'Student';
+$string['analytics:last_active'] = 'Last Active';
+// User feedback.
+$string['analytics:user_feedback'] = 'User Feedback';
+$string['analytics:total_responses'] = 'Total Responses';
+$string['analytics:average_rating'] = 'Average Rating';
+$string['analytics:rating_distribution'] = 'Rating Distribution';
+$string['analytics:rating'] = 'Rating';
+$string['analytics:comment'] = 'Comment';
+$string['analytics:browser_os'] = 'Browser / OS';
+$string['analytics:device'] = 'Device';
+$string['analytics:date'] = 'Date';
+$string['analytics:no_feedback_yet'] = 'No feedback received yet.';
+// Survey results.
+$string['analytics:survey_results'] = 'Survey Results';
+$string['analytics:survey_responses_collected'] = '{$a} survey response(s) collected.';
+$string['analytics:responses_badge'] = '{$a} responses';
+$string['analytics:option'] = 'Option';
+$string['analytics:count'] = 'Count';
+$string['analytics:average_label'] = 'Average:';
+$string['analytics:no_text_responses'] = 'No text responses yet.';
+$string['analytics:no_survey_responses'] = 'No survey responses collected yet.';
+// Usability testing results.
+$string['analytics:usertesting_results'] = 'Usability Testing Results';
+$string['analytics:testers_submitted'] = '{$a} tester(s) have submitted responses.';
+$string['analytics:avg_msgs_badge'] = 'Avg {$a} msgs';
+$string['analytics:avg_msgs_badge_title'] = 'Average messages at time of response';
+$string['analytics:avg_min_badge'] = 'Avg {$a} min';
+$string['analytics:avg_min_badge_title'] = 'Average session duration at time of response';
+$string['analytics:avg_rating_line'] = '<strong>Average Rating:</strong> {$a} / 5';
+$string['analytics:no_responses_yet'] = 'No responses yet.';
+$string['analytics:no_usertesting_responses'] = 'No user testing responses collected yet.';
+// AI insights.
+$string['analytics:ai_insights'] = 'AI Insights';
+$string['analytics:ai_insights_intro'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
+$string['analytics:generate_insights'] = 'Generate AI Insights';
+$string['analytics:analyzing_data'] = 'Analyzing data… this may take a moment.';
+$string['analytics:no_feedback_data'] = 'No feedback, survey, or usability testing data to analyze yet.';
+// No-course-selected hint ({$a} is the manage-enrollment link).
+$string['analytics:pick_course_hint'] = 'Pick a course from the tabs above to drill into its analytics, or {$a} to enable [[tutorshort]] on more courses.';
+// CSV export (classes/external/export_analytics_csv.php).
+$string['analytics:csv_metric'] = 'Metric';
+$string['analytics:csv_value'] = 'Value';
+$string['analytics:csv_nodata'] = 'No data available for the selected filters.';
+
+// --- from newstrings_b.php ---
+$string['analytics:avatar_cost_sub'] = 'Per-minute streaming cost across the four configured talking-avatar providers. Heartbeat-based — webhook-confirmed sessions are exact, others are estimated from session open/close.';
+$string['analytics:avatar_cost_total_row'] = 'Total';
+$string['prompt_debug_view:badge_attachment'] = 'attachment';
+$string['prompt_debug_view:badge_chunks'] = '{$a} chunks';
+$string['prompt_debug_view:badge_chunks_title'] = 'Number of RAG chunks the retriever selected and showed the model this turn';
+$string['prompt_debug_view:badge_course'] = 'course {$a}';
+$string['prompt_debug_view:badge_page_absent'] = 'no page section';
+$string['prompt_debug_view:badge_page_absent_title'] = 'No current_page_content section was added this turn. Either pageid did not reach the server, the module type does not yield text, or the page record has no content.';
+$string['prompt_debug_view:badge_page_dropped'] = 'page DROPPED by budget';
+$string['prompt_debug_view:badge_page_dropped_title'] = 'current_page_content section was added but dropped under prompt-budget pressure. Raise the budget or reduce other sections.';
+$string['prompt_debug_view:badge_page_kept'] = 'page content';
+$string['prompt_debug_view:badge_page_kept_title'] = 'current_page_content section assembled in full this turn';
+$string['prompt_debug_view:badge_page_truncated'] = 'page content (truncated)';
+$string['prompt_debug_view:badge_page_truncated_title'] = 'current_page_content section landed but was truncated to fit the prompt budget';
+$string['prompt_debug_view:badge_topic_dropped'] = 'topic DROPPED';
+$string['prompt_debug_view:badge_topic_dropped_title'] = 'topic_focus section dropped by prompt budget';
+$string['prompt_debug_view:badge_topic_kept'] = 'topic focus';
+$string['prompt_debug_view:badge_topic_truncated'] = 'topic focus (truncated)';
+$string['prompt_debug_view:badge_user'] = 'user {$a}';
+$string['prompt_metrics:chars_value'] = '{$a} chars';
+$string['token_analytics:back_to_analytics'] = 'Back to Analytics';
+$string['token_analytics:bycat_sub'] = 'Token totals grouped by workload: student Chat, Voice (Realtime / TTS / STT), RAG embedding, Learning Radar analytics queries.';
+$string['token_analytics:bycat_title'] = 'Cost by Category';
+$string['token_analytics:bymodel_sub'] = 'Responses with confirmed token data, grouped by model and provider.';
+$string['token_analytics:bymodel_title'] = 'Cost by Model';
+$string['token_analytics:bystudent_sub'] = 'Top 100 students by token usage. Cost is calculated per model from each student\'s actual mix. A trailing + means some of their usage is on a model with no published rate, so the real figure is higher.';
+$string['token_analytics:bystudent_title'] = 'Cost per Student';
+$string['token_analytics:card_cached_tokens'] = 'Cached Tokens ({$a}% of prompt)';
+$string['token_analytics:card_completion_tokens'] = 'Completion Tokens';
+$string['token_analytics:card_estimated_cost'] = 'Estimated Cost';
+$string['token_analytics:card_prompt_tokens'] = 'Prompt Tokens';
+$string['token_analytics:card_responses'] = 'AI Responses';
+$string['token_analytics:card_total_tokens'] = 'Total Tokens';
+$string['token_analytics:col_active'] = 'Active';
+$string['token_analytics:col_cap'] = 'Cap';
+$string['token_analytics:col_capability'] = 'Capability';
+$string['token_analytics:col_category'] = 'Category';
+$string['token_analytics:col_completion_tokens'] = 'Completion tokens';
+$string['token_analytics:col_est_cost'] = 'Est. cost';
+$string['token_analytics:col_model'] = 'Model';
+$string['token_analytics:col_prompt_tokens'] = 'Prompt tokens';
+$string['token_analytics:col_provider'] = 'Provider';
+$string['token_analytics:col_recommendations'] = 'Top recommendations';
+$string['token_analytics:col_responses'] = 'Responses';
+$string['token_analytics:col_scope'] = 'Scope';
+$string['token_analytics:col_spent'] = 'Spent';
+$string['token_analytics:col_status'] = 'Status';
+$string['token_analytics:col_student'] = 'Student';
+$string['token_analytics:col_total_tokens'] = 'Total tokens';
+$string['token_analytics:filter_course'] = 'Course:';
+$string['token_analytics:filter_period'] = 'Period:';
+$string['token_analytics:heading'] = 'Token Usage & Cost';
+$string['token_analytics:missing_note'] = '<strong>{$a}</strong> assistant messages in this period have no token data (generated before v1.1.0 or by a provider that does not report usage).';
+$string['token_analytics:no_cap'] = 'no cap';
+$string['token_analytics:no_data'] = 'No token data recorded yet.';
+$string['token_analytics:no_data_tracking'] = 'No token data recorded yet. Token tracking begins with v1.1.0.';
+$string['token_analytics:opt_sub'] = 'Projected monthly spend at current mix: <strong>{$a->amount}</strong> ({$a->days} days of data, {$a->confidence} confidence). Recommendations rank each capability\'s providers by composite cost + quality score.';
+$string['token_analytics:opt_title'] = 'LLM Optimizer';
+$string['token_analytics:range_all'] = 'All time';
+$string['token_analytics:range_days'] = '{$a} days';
+$string['token_analytics:rate_in_out'] = 'in {$a->in} / out {$a->out}';
+$string['token_analytics:ratecard_sub'] = 'USD per 1,000,000 tokens. Model strings are matched by prefix. Update <code>classes/token_cost_manager.php</code> when provider pricing changes.';
+$string['token_analytics:ratecard_title'] = 'Rate Card Reference';
+$string['token_analytics:spend_sub'] = '{$a->period} period, since {$a->start}. Configure caps in Settings → Spend guard and optimizer.';
+$string['token_analytics:spend_title'] = 'Spend status';
+
+// --- from newstrings_c.php ---
+// Learner-facing privacy notice (privacy.php → templates/privacy_notice.mustache).
+// Branding tokens ([[tutorname]], [[tutorshort]], [[uniname]]) are resolved by
+// \local_ai_course_assistant\branding::str() at render time.
+$string['privacynotice:title'] = '[[tutorname]] Privacy Notice';
+$string['privacynotice:lastupdated'] = 'Last updated: {$a}. Version 1.0.';
+$string['privacynotice:whatis'] = 'What [[tutorshort]] Is';
+$string['privacynotice:whatis_p1'] = '[[tutorshort]] is [[uniname]]\'s AI powered learning coach, built into some courses. When [[tutorshort]] is available on a course, you will see a chat widget on the course pages. You can ask [[tutorshort]] questions about the material, get practice questions, plan your study schedule, and use voice features if your course has them enabled.';
+$string['privacynotice:whatis_p2'] = '[[tutorshort]] is not available on every course at [[uniname]]. The decision to enable [[tutorshort]] on a course is made by the course developer.';
+$string['privacynotice:collects'] = 'What Information [[tutorshort]] Collects';
+$string['privacynotice:collects_p1'] = 'When you use [[tutorshort]] on a course, [[uniname]] records your messages, [[tutorshort]]\'s responses, the course and time of each exchange, ratings and feedback you give, your study plan and reminder preferences if you create them, your chosen avatar, and a short profile summary that [[tutorshort]] generates from your conversations to personalize future sessions.';
+$string['privacynotice:collects_p2'] = '[[tutorshort]] also collects standard technical data needed to operate the service: your Moodle user id, IP address, browser type, and a timestamp. [[tutorshort]] keeps no record of its own of your full name, email address (unless you opt out of emails, which stores the address the opt-out applies to), home address, phone number (unless you give one for reminders), payment information, or government issued identifiers; where your name appears alongside [[tutorshort]] data, it has been read from your existing [[uniname]] account rather than stored by [[tutorshort]].';
+$string['privacynotice:uses'] = 'How Your Information Is Used';
+$string['privacynotice:uses_item1'] = 'Answer your questions at the moment.';
+$string['privacynotice:uses_item2'] = 'Personalize [[tutorshort]]\'s responses to you.';
+$string['privacynotice:uses_item3'] = 'Improve [[tutorshort]] itself, using anonymized and aggregated data.';
+$string['privacynotice:uses_item4'] = 'Detect and prevent abuse.';
+$string['privacynotice:uses_item5'] = 'Generate analytics that help course authors improve course materials. Analytics are anonymized before they reach a human reviewer.';
+$string['privacynotice:uses_nosell'] = '[[uniname]] does not sell your information. [[uniname]] does not use your [[tutorshort]] conversations to market unrelated products to you.';
+$string['privacynotice:whosees'] = 'Who Sees Your Information';
+$string['privacynotice:whosees_intro'] = 'To answer your questions, [[tutorshort]] works with an AI service (similar to ChatGPT or Claude) behind the scenes. Here\'s exactly what [[tutorshort]] shares with that service:';
+$string['privacynotice:shared_item1'] = 'Your first name';
+$string['privacynotice:shared_item2'] = 'A summary of the course material you\'re studying';
+$string['privacynotice:shared_item3'] = 'The last 10 messages from your current [[tutorshort]] conversation';
+$string['privacynotice:shared_item4'] = 'Your study plan, if you\'ve created one';
+$string['privacynotice:shared_item5'] = 'Your profile summary, if you\'ve created one';
+$string['privacynotice:whosees_never'] = 'Here\'s what [[tutorshort]] never shares:';
+$string['privacynotice:notshared_item1'] = 'Your last name';
+$string['privacynotice:notshared_item2'] = 'Your email address';
+$string['privacynotice:notshared_item3'] = 'Your Moodle username or ID number';
+$string['privacynotice:notshared_item4'] = 'Your home address';
+$string['privacynotice:notshared_item5'] = 'Any other information that could identify you personally';
+$string['privacynotice:whosees_contract'] = '[[uniname]] only uses AI services we have carefully reviewed and approved. Each one has a contract with [[uniname]] that limits how they can use your information and forbids them from using your [[tutorshort]] conversations to train their AI.';
+$string['privacynotice:retention'] = 'How Long [[tutorshort]] Keeps Your Information';
+$string['privacynotice:retention_item1'] = 'Your conversations are stored until you delete them or until the site\'s conversation retention period (two years of inactivity by default) removes them automatically. Only the most recent 10 turns are ever sent to the AI model.';
+$string['privacynotice:retention_item2'] = 'Ratings, study plans, and reminders are retained until you remove them.';
+$string['privacynotice:retention_item3'] = 'Anonymized analytics are retained under [[uniname]]\'s Records Retention Policy and cannot be linked back to you.';
+$string['privacynotice:retention_item4'] = 'Audit and operational logs are retained for up to 365 days. These record that a message was sent — the time, the course, and the network address it came from — but never the content of what you wrote. Those entries record your user id, not your name; where an administrator\'s view of that log shows a name, it is read from your existing [[uniname]] account record.';
+$string['privacynotice:retention_deletion'] = 'When your [[uniname]] user account is deleted, all [[tutorshort]] data tied to your user id is deleted within the same operation.';
+$string['privacynotice:rights'] = 'Your Rights';
+$string['privacynotice:rights_access'] = 'Access.';
+$string['privacynotice:rights_access_desc'] = 'View your current conversation in the widget; download a complete copy of all [[tutorshort]] data from the [[tutorshort]] user settings page.';
+$string['privacynotice:rights_download'] = 'Download.';
+$string['privacynotice:rights_download_desc'] = 'The user settings page offers a "Download my [[tutorshort]] data" button that produces a structured file with all your [[tutorshort]] data.';
+$string['privacynotice:rights_delete'] = 'Delete.';
+$string['privacynotice:rights_delete_desc'] = 'The same page offers course level and global delete options. Deletion is immediate.';
+$string['privacynotice:rights_correction'] = 'Correction.';
+$string['privacynotice:rights_correction_desc'] = '[[tutorshort]] conversations are raw transcripts and are not normally amended. If a derived record looks wrong, continue using [[tutorshort]] or contact [[uniname]] at the address below.';
+$string['privacynotice:rights_object'] = 'Object or restrict.';
+$string['privacynotice:rights_object_desc'] = 'You do not have to use [[tutorshort]]. You can remove your data at any time.';
+$string['privacynotice:rights_portability'] = 'Portability.';
+$string['privacynotice:rights_portability_desc'] = 'The download is in a standard JSON format and can be imported into other systems.';
+$string['privacynotice:rights_complaint'] = 'Complaint.';
+$string['privacynotice:rights_complaint_desc'] = 'Contact [[uniname]]. Learners in the EU, UK, Switzerland, Brazil, or Canada may also complain to their national data protection authority.';
+$string['privacynotice:international'] = 'International Learners';
+$string['privacynotice:international_body'] = '[[uniname]] serves learners globally. If you are based in a region with specific data protection rules (GDPR, UK GDPR, LGPD, PIPEDA, Swiss FADP, CCPA), those rules apply to your [[tutorshort]] data. The lawful basis for processing is the performance of the education contract you have with [[uniname]], combined with [[uniname]]\'s legitimate interest in improving its education services.';
+$string['privacynotice:security'] = 'Security';
+$string['privacynotice:security_intro'] = '[[tutorshort]] lives inside [[uniname]]\'s Moodle platform, so you have to be logged in to use it. A few specific things we do to keep your information safe:';
+$string['privacynotice:security_transit'] = 'In transit:';
+$string['privacynotice:security_transit_desc'] = 'When your messages travel between your device and [[tutorshort]], they are encrypted. That means if anyone tried to intercept them, they would only see scrambled code.';
+$string['privacynotice:security_rest'] = 'At rest:';
+$string['privacynotice:security_rest_desc'] = 'When your information is stored, it lives in [[uniname]]\'s Moodle database, protected by the same security controls [[uniname]] uses for the rest of your student data.';
+$string['privacynotice:security_incident'] = 'If something goes wrong:';
+$string['privacynotice:security_incident_desc'] = 'If we ever detect a security incident that affects your [[tutorshort]] data, [[uniname]] will notify you as required by law.';
+$string['privacynotice:children'] = 'Children';
+$string['privacynotice:children_body'] = '[[tutorshort]] is available only to learners who meet the age requirements of the course they are enrolled in. [[uniname]] does not knowingly collect [[tutorshort]] data from children under the age of 13.';
+$string['privacynotice:contact'] = 'Contact';
+$string['privacynotice:contact_email'] = '[[uniname]] Contact: {$a}';
+$string['privacynotice:contact_privacypage'] = '[[uniname]] Privacy Page: {$a}';
+$string['privacynotice:contact_widget'] = 'Within [[tutorshort]]: open the widget, click the gear icon, open the Privacy and data section.';
+
+// --- from newstrings_d.php ---
+// Widget header / student-mode attribute strings (templates/chat_widget.mustache).
+$string['chat:studentmode_active'] = 'Student mode active (Ctrl+Shift+A to exit)';
+
+// In-drawer help guide panel (templates/chat_widget.mustache).
+$string['help:button_title'] = 'Help';
+$string['help:button_label'] = 'Help guide';
+$string['help:close'] = 'Close help';
+$string['help:title'] = 'How to use {$a}';
+$string['help:intro'] = '{$a} is your AI learning assistant for this course. It reads the course content and helps you study, practice, and understand the material.';
+$string['help:start_title'] = 'Getting started';
+$string['help:start_body'] = 'Click any conversation starter to begin, or type your own question. {$a} answers based on the page you are on.';
+$string['help:quizzes_title'] = 'Practice quizzes';
+$string['help:quizzes_body'] = 'Click <strong>Quiz Me</strong> to get multiple-choice questions from the course content. You will see explanations after each answer and a score summary at the end.';
+$string['help:plans_title'] = 'Study plans';
+$string['help:plans_body'] = 'Click <strong>Study Plan</strong> to create a personalized week-by-week plan. Tell {$a} your goal, how many hours you can study, and your deadline. You can opt into email reminders.';
+$string['help:voice_title'] = 'Voice';
+$string['help:voice_body'] = 'Use the mic icon to speak your question.';
+$string['help:voice_body_tab'] = 'You can also switch to the Voice tab for a live two-way conversation.';
+$string['help:languages_title'] = 'Languages';
+$string['help:languages_body'] = 'Click the gear icon and change the language. {$a} supports 46 languages. All labels and responses switch instantly.';
+$string['help:data_title'] = 'Your data';
+$string['help:data_body'] = 'Your conversations are private to you and the institution. The eraser icon in the header permanently deletes your conversation for this course.';
+$string['help:data_download'] = 'For a full data download, or to delete every [[tutorshort]] record across every course, open <strong>My [[tutorshort]] data</strong> from the gear icon → Settings panel. The page also lets you delete the data for one specific course.';
+
+// Moodle mobile app chat view (classes/output/mobile.php).
+$string['mobile:greeting'] = 'Hi, {$a}!';
+$string['mobile:intro'] = 'I\'m {$a}, your learning assistant. How can I help?';
+$string['mobile:chip_concepts'] = 'Key Concepts';
+$string['mobile:chip_concepts_prompt'] = 'What are the key concepts in this course?';
+$string['mobile:chip_studyplan'] = 'Study Plan';
+$string['mobile:chip_studyplan_prompt'] = 'Help me create a study plan';
+$string['mobile:chip_quiz'] = 'Quiz Me';
+$string['mobile:chip_quiz_prompt'] = 'Quiz me on this course';
+$string['mobile:input_placeholder'] = 'Ask a question...';
+$string['mobile:clear_history'] = 'Clear history';
+$string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again.';
+
+// --- from newstrings_e.php ---
+// settings.php — page/nav chrome and select options (i18n extraction batch E).
+$string['settingspage:pagetitle'] = 'Settings';
+$string['toc:playground'] = 'Prompt Playground';
+$string['toc:course_ai_settings'] = '{$a} AI settings';
+$string['settingspage:analytics_blurb'] = 'Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.';
+$string['settings:spend_cap_period_daily'] = 'Daily';
+$string['settings:spend_cap_period_weekly'] = 'Weekly';
+$string['settings:spend_cap_period_monthly'] = 'Monthly';
+$string['settings:voice_providers'] = 'Voice providers';
+$string['settings:voice_providers_desc'] = 'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).';
+$string['settings:voice_active_default'] = '(use first configured or legacy fallback)';
+$string['settings:voice_active_stt_default'] = '(selfhosted if configured, else first row or legacy fallback)';
+$string['settings:voice_active_stt_selfhosted'] = 'Selfhosted Whisper server (free, uses the URL below)';
+$string['settings:soapbox_rubric_link'] = 'Soapbox speech rubric';
+$string['settings:soapbox_rubric_link_desc'] = 'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, ESL intermediate, ESL advanced). <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>';
+$string['settings:soapbox_video_quality_low'] = 'Low (360p, ~3 MB/min)';
+$string['settings:soapbox_video_quality_standard'] = 'Standard (480p, ~4 MB/min)';
+$string['settings:soapbox_video_quality_high'] = 'High (720p, ~9 MB/min)';
+$string['settings:survey_frequency_once'] = 'Once per course (default)';
+$string['settings:survey_frequency_monthly'] = 'Once per month';
+$string['settings:survey_frequency_quarterly'] = 'Once per quarter';
+$string['settings:survey_frequency_unlimited'] = 'Every time (no limit)';
+$string['settings:usertesting_editor_link'] = 'Edit Testing Tasks';
+$string['settings:usertesting_editor_link_desc'] = '<a href="{$a}" class="btn btn-sm btn-outline-primary">Open Task Editor</a>';
+$string['settings:prompt_playground_navtitle'] = '[[tutorshort]] Prompt Playground';
+$string['settings:whatsapptest_navtitle'] = 'WhatsApp Integration Test';
+$string['survey_admin:navtitle'] = 'Survey Editor';
+$string['usertesting_admin:navtitle'] = 'Usability Testing Editor';
+$string['rubric_admin:navtitle'] = 'Rubric Editor';
+
+// integrity_admin.php — result cards, table, notifications.
+$string['integrity:notify_issues'] = '{$a} issue(s) found. See details below.';
+$string['integrity:notify_passed'] = 'All {$a} checks passed.';
+$string['integrity:last_run'] = 'Last Run';
+$string['integrity:passed'] = 'Passed';
+$string['integrity:failed'] = 'Failed';
+$string['integrity:warnings'] = 'Warnings';
+$string['integrity:results_heading'] = 'Test Results';
+$string['integrity:col_status'] = 'Status';
+$string['integrity:col_check'] = 'Check';
+$string['integrity:col_details'] = 'Details';
+$string['integrity:norun'] = 'No integrity checks have been run yet. Click "Run Now" to check plugin health, or wait for the daily scheduled task.';
+
+// provider_benchmark.php — export error messages.
+$string['benchmark:export_norun'] = 'No benchmark run available to export. Run the benchmark first.';
+$string['benchmark:export_unknownformat'] = 'Unknown export format.';
+
+// survey_admin.php — default survey title and new-option placeholder.
+$string['survey_admin:default_title'] = '[[tutorshort]] End-of-Course Survey';
+$string['survey_admin:new_option'] = 'New option';
+
+// usertesting_admin.php — default task set title and rating-label default.
+$string['usertesting_admin:default_title'] = '[[tutorshort]] Usability Test';
+$string['usertesting_admin:rating_label_default'] = 'Rate this task';
+
+// --- from newstrings_f.php ---
+// Learning Radar delivery endpoints (radar_export.php / radar_schedule.php).
+$string['radar:err_email_required'] = 'Recipient email is required';
+$string['radar:err_slack_webhook_required'] = 'Slack webhook URL is required';
+$string['radar:err_teams_webhook_required'] = 'Teams webhook URL is required';
+$string['radar:err_unknown_action'] = 'Unknown action';
+$string['radar:err_schedule_not_found'] = 'Schedule not found';
+$string['radar:err_name_query_required'] = 'Name and query are required';
+$string['radar:redash_default_name'] = '[[tutorshort]] Learning Radar — {$a}';
+
+// Learning Radar AMD module alert prefixes (amd/src/learning_radar.js).
+$string['radar:js_redash_push_failed'] = 'Redash push failed: {$a}';
+$string['radar:js_redash_setup_failed'] = 'Could not load Redash setup: {$a}';
+$string['radar:js_send_failed'] = 'Send failed: {$a}';
+$string['radar:js_schedule_load_failed'] = 'Could not load schedule: {$a}';
+$string['radar:js_save_failed'] = 'Save failed: {$a}';
+
+// Generic passthrough for moodle_exception('error', 'local_ai_course_assistant', '', $text).
+// Without this key Moodle renders "local_ai_course_assistant/error" and demotes $a to
+// debuginfo, so every existing throw using this pattern was losing its message.
+
+// Realtime voice token endpoint (classes/external/get_realtime_token.php).
+$string['realtime:err_disabled'] = 'Voice mode is disabled on this site.';
+$string['realtime:err_no_provider'] = 'No voice provider configured for Realtime.';
+$string['realtime:err_xai_proxy_unconfigured'] = 'xAI Realtime proxy is not configured. Set xai_proxy_url and xai_proxy_jwt_secret in [[tutorshort]] admin settings, or switch voice to OpenAI.';
+$string['realtime:err_xai_proxy_ssrf'] = 'xAI Realtime proxy URL failed SSRF validation.';
+
+// Message-rating ownership check (classes/external/rate_message.php); $a for core 'nopermissions'.
+$string['realtime:action_rate_message'] = 'rate this message';
+
+// Learning objectives admin page (objectives_admin.php + template).
+$string['objectives:err_invalid_import'] = 'Invalid import payload.';
+$string['objectives:err_unknown'] = 'Unknown objective.';
+$string['objectives:more_items'] = '… {$a} more';
+$string['objectives:move_up'] = 'Move up';
+$string['objectives:move_down'] = 'Move down';
+
+// --- from newstrings_g.php ---
+$string['soapbox:target_minutes'] = '{$a} min';
+$string['starters:badge_quiz'] = 'QUIZ';
+$string['starters:badge_voice'] = 'VOICE';
+$string['starters:badge_pronunciation'] = 'PRONUNCIATION';
+$string['outcomes:csv_code'] = 'Outcome code';
+$string['outcomes:csv_benchmark'] = 'Benchmark (%)';
+$string['sandbox:code_placeholder'] = '# Write Python here. Click Run.';
+$string['sandbox:default_code_comment'] = '# Try this — square the numbers 1 to 10';
+$string['quiz:error_parse'] = 'Could not parse quiz JSON.';
+$string['quiz:error_noquestions'] = 'No valid questions in AI response.';
+
+$string['radar:js_name_prompt'] = 'Name for the new Redash query:';
+$string['radar:js_run_first'] = 'Run a query first.';

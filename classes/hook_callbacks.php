@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hook_callbacks {
-
     /**
      * Read an int plugin config value, falling back to $default ONLY when the
      * config has never been set. A literal "0" returns 0, not the default —
@@ -54,8 +53,11 @@ class hook_callbacks {
         try {
             self::do_inject_chat_widget($hook);
         } catch (\Throwable $e) {
-            debugging('SOLA widget injection skipped: ' . $e->getMessage(),
-                DEBUG_DEVELOPER, $e->getTrace());
+            debugging(
+                'SOLA widget injection skipped: ' . $e->getMessage(),
+                DEBUG_DEVELOPER,
+                $e->getTrace()
+            );
         }
     }
 
@@ -123,8 +125,11 @@ class hook_callbacks {
                 : 'Content-Security-Policy-Report-Only';
             header($headername . ': ' . $csp);
         } catch (\Throwable $e) {
-            debugging('SOLA course-page CSP send skipped: ' . $e->getMessage(),
-                DEBUG_DEVELOPER, $e->getTrace());
+            debugging(
+                'SOLA course-page CSP send skipped: ' . $e->getMessage(),
+                DEBUG_DEVELOPER,
+                $e->getTrace()
+            );
         }
     }
 
@@ -151,8 +156,10 @@ class hook_callbacks {
         if (($PAGE->pagelayout ?? '') === 'admin') {
             return false;
         }
-        if ($PAGE->url instanceof \moodle_url
-                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0) {
+        if (
+            $PAGE->url instanceof \moodle_url
+                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0
+        ) {
             return false;
         }
         $coursecontext = $context->contextlevel === CONTEXT_MODULE
@@ -179,14 +186,30 @@ class hook_callbacks {
      * try/catch so a delete-cascade error cannot block the user-deleted hook
      * chain; any failure is logged for the site admin to investigate.
      *
-     * @param \core\hook\user\deleted $hook
+     * @param \core_user\hook\before_user_deleted $hook
      */
-    public static function on_user_deleted(\core\hook\user\deleted $hook): void {
+    public static function on_user_deleted(\core_user\hook\before_user_deleted $hook): void {
         try {
             $user = $hook->user;
             if (empty($user) || empty($user->id)) {
                 return;
             }
+            // Compute the contextlist BEFORE deleting anything.
+            //
+            // provider::get_contexts_for_userid() derives contexts from convs,
+            // plans, reminders, feedback, survey_resp, ut_resp, audit,
+            // practice_scores and sbx_rec. delete_user_data() empties the first
+            // eight, so computing this afterwards returned an empty list and the
+            // Privacy leg below was skipped entirely -- meaning a corrected hook
+            // name alone would still not have finished the job.
+            $contextids = [];
+            try {
+                $contextlist = \local_ai_course_assistant\privacy\provider::get_contexts_for_userid((int)$user->id);
+                $contextids = $contextlist ? $contextlist->get_contextids() : [];
+            } catch (\Throwable $e) {
+                debugging('SOLA user_deleted: contextlist failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+
             // Primary path: the conversation manager owns message and conversation rows.
             \local_ai_course_assistant\conversation_manager::delete_user_data((int)$user->id);
             // v5.10.x: email opt-out is user-global and may exist for a user who
@@ -197,20 +220,23 @@ class hook_callbacks {
             global $DB;
             try {
                 $DB->delete_records('local_ai_course_assistant_email_optout', ['userid' => (int)$user->id]);
-            } catch (\Throwable $e) { /* table absent on older installs */ }
+            } catch (\Throwable $e) {
+                /* table absent on older installs */
+            }
             // Secondary path: route through the Privacy API so every other
             // plugin table (plans, reminders, feedback, surveys, UT, profiles,
             // practice scores, ratings, audit) is cleaned up by the same code
             // that services a formal data subject request.
-            $contextlist = \core_privacy\manager::get_contexts_for_userid(
-                (int)$user->id,
-                'local_ai_course_assistant'
-            );
-            if ($contextlist && $contextlist->count() > 0) {
+            // NOT \core_privacy\manager::get_contexts_for_userid() -- that is a
+            // non-static instance method taking one argument, so the old static
+            // two-argument call raised an Error that the catch below swallowed.
+            // The plugin's own provider is also correctly scoped and cheaper
+            // than a whole-site component sweep.
+            if (!empty($contextids)) {
                 $approved = new \core_privacy\local\request\approved_contextlist(
                     \core\user::get_user((int)$user->id) ?: (object)['id' => (int)$user->id],
                     'local_ai_course_assistant',
-                    $contextlist->get_contextids()
+                    $contextids
                 );
                 \local_ai_course_assistant\privacy\provider::delete_data_for_user($approved);
             }
@@ -221,8 +247,11 @@ class hook_callbacks {
                 ['trigger' => 'core_user_deleted_hook']
             );
         } catch (\Throwable $e) {
-            debugging('SOLA user_deleted cascade failed: ' . $e->getMessage(),
-                DEBUG_DEVELOPER, $e->getTrace());
+            debugging(
+                'SOLA user_deleted cascade failed: ' . $e->getMessage(),
+                DEBUG_DEVELOPER,
+                $e->getTrace()
+            );
         }
     }
 
@@ -258,8 +287,10 @@ class hook_callbacks {
         // would otherwise let the widget through. A single URL-prefix guard
         // covers it plus any future SOLA admin page that picks a non-admin
         // layout for visual reasons.
-        if ($PAGE->url instanceof \moodle_url
-                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0) {
+        if (
+            $PAGE->url instanceof \moodle_url
+                && strpos($PAGE->url->get_path(), '/local/ai_course_assistant/') === 0
+        ) {
             return;
         }
 
@@ -349,14 +380,20 @@ class hook_callbacks {
         $hideonquizforstaff = (bool)get_config('local_ai_course_assistant', 'hide_on_quiz_for_staff');
         $pagetype = $PAGE->pagetype ?? '';
         $modname_early = '';
-        if ($context->contextlevel === CONTEXT_MODULE && !empty($PAGE->cm)) {
+        // v7.0.6: $PAGE->cm !== null, not !empty($PAGE->cm). moodle_page serves
+        // cm through __get() and defines no __isset(), so isset()/empty() on it
+        // report "unset" whatever it holds -- these branches never ran. ?? is
+        // unaffected, which is why $PAGE->pagetype and $PAGE->title work.
+        if ($context->contextlevel === CONTEXT_MODULE && $PAGE->cm !== null) {
             $modname_early = (string)($PAGE->cm->modname ?? '');
         }
         $isquizpage = ($modname_early === 'quiz') || (strpos((string)$pagetype, 'mod-quiz-') === 0);
-        if ($isquizpage && (
+        if (
+            $isquizpage && (
             ($hideonquizforstudents && $userrole === 'student') ||
             ($hideonquizforstaff && $userrole !== 'student')
-        )) {
+            )
+        ) {
             return;
         }
 
@@ -454,80 +491,7 @@ class hook_callbacks {
         }
 
         // Build learning objectives by scanning "Unit X Learning Outcomes" pages.
-        // Supports two Saylor formats:
-        //   1. GENERICO tags: {GENERICO:type="unit_learning_objectives",unit_objectives="[1]..."}
-        //   2. HTML bullet lists: "Upon successful completion..." followed by <li> items
-        $learningobjectives = [];
-        foreach ($modinfo->get_cms() as $cm) {
-            if (!$cm->uservisible || empty($cm->name)) {
-                continue;
-            }
-            $lower = strtolower($cm->name);
-            if (strpos($lower, 'learning outcome') === false
-                && strpos($lower, 'learning objective') === false) {
-                continue;
-            }
-            if ($cm->modname !== 'page') {
-                continue;
-            }
-            try {
-                $page = $DB->get_record('page', ['id' => $cm->instance, 'course' => $courseid]);
-                if (!$page || empty($page->content)) {
-                    continue;
-                }
-                $content = $page->content;
-                // Extract unit label from page name (e.g. "Unit 3 Learning Outcomes" -> "Unit 3").
-                $unitlabel = '';
-                if (preg_match('/^(Unit\s+\d+)/i', $cm->name, $um)) {
-                    $unitlabel = $um[1] . ': ';
-                }
-                // Format 1: GENERICO tag with numbered objectives.
-                if (preg_match('/unit_objectives="([^"]+)"/', $content, $gm)) {
-                    $raw = $gm[1];
-                    // Split on [N] markers.
-                    $parts = preg_split('/\[\d+\]\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
-                    foreach ($parts as $part) {
-                        $obj = trim(strip_tags($part), " ;\t\n\r\0\x0B");
-                        if (strlen($obj) > 10) {
-                            $learningobjectives[] = ['name' => $unitlabel . $obj];
-                        }
-                    }
-                    continue;
-                }
-                // Format 2: HTML list items.
-                if (preg_match_all('/<li[^>]*>(.*?)<\/li>/si', $content, $lm)) {
-                    foreach ($lm[1] as $li) {
-                        $obj = trim(strip_tags($li), " ;\t\n\r\0\x0B.");
-                        if (strlen($obj) > 10) {
-                            $learningobjectives[] = ['name' => $unitlabel . $obj];
-                        }
-                    }
-                    continue;
-                }
-                // Format 3: Plain text bullet/numbered lines (fallback).
-                $plaintext = strip_tags($content);
-                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
-                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
-                    if (strlen($line) > 10 && stripos($line, 'upon successful') === false) {
-                        $learningobjectives[] = ['name' => $unitlabel . $line];
-                    }
-                }
-            } catch (\Throwable $e) {
-                // Skip pages that can't be read.
-            }
-        }
-        // Fallback: if no learning outcome pages found, parse course summary.
-        if (empty($learningobjectives)) {
-            if (!empty($course->summary)) {
-                $plaintext = strip_tags($course->summary);
-                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
-                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
-                    if (strlen($line) > 10) {
-                        $learningobjectives[] = ['name' => $line];
-                    }
-                }
-            }
-        }
+        $learningobjectives = self::build_learning_objectives($courseid, $modinfo, $course);
 
         // Build module/activity titles from course structure.
         $moduletitles = [];
@@ -542,7 +506,7 @@ class hook_callbacks {
         $currentpagetitle = '';
         $modname = '';
         $pagetype = $PAGE->pagetype ?? '';
-        if ($context->contextlevel === CONTEXT_MODULE && !empty($PAGE->cm)) {
+        if ($context->contextlevel === CONTEXT_MODULE && $PAGE->cm !== null) {
             $currentpageid    = (int)$PAGE->cm->id;
             $currentpagetitle = (string)($PAGE->cm->name ?? '');
             $modname          = (string)($PAGE->cm->modname ?? '');
@@ -556,10 +520,12 @@ class hook_callbacks {
         $quizlocked = false;
         $quizcoachmode = false;
         $quizcmid = 0;
-        if ($modname === 'quiz' && !empty($PAGE->cm) && (
+        if (
+            $modname === 'quiz' && $PAGE->cm !== null && (
             strpos($pagetype, 'attempt') !== false ||
             (strpos($pagetype, 'view') !== false && strpos($pagetype, 'review') === false)
-        )) {
+            )
+        ) {
             $quizcmid = (int)$PAGE->cm->id;
             $level = \local_ai_course_assistant\quiz_config_manager::get_assistance_level($quizcmid);
             if ($level === 'hidden') {
@@ -568,6 +534,38 @@ class hook_callbacks {
                 $quizcoachmode = true;
             }
         }
+
+        // v7.2.5: the server-side attempt lock, surfaced to the browser.
+        //
+        // The widget had no idea this existed. `$quizlocked` above is the
+        // per-quiz assistance level, a different mechanism that only applies on
+        // a quiz page -- so anywhere else the drawer rendered a normal, enabled
+        // textarea while base_provider was going to refuse. A learner typed a
+        // full question and only found out after sending it. Both sides now read
+        // the same check with the same course, so the input is disabled exactly
+        // when the server will refuse.
+        //
+        // No is_siteadmin() carve-out, deliberately. v7.2.4 moved the lock ahead
+        // of the admin exemption in base_provider, so an admin with an attempt
+        // open IS refused; exempting them here only means they get an enabled
+        // textarea and discover it after sending -- the precise failure this
+        // flag exists to remove, preserved for the people who test dev.
+        $attemptlocked = false;
+        if (!empty($USER->id)) {
+            $attemptlocked = \local_ai_course_assistant\quiz_lock::is_locked_for(
+                (int) $USER->id,
+                (int) $courseid
+            );
+        }
+
+        // Pre-rendered server-side because the string carries a [[tutorshort]]
+        // brand token. Moodle's string cache hands JS the raw value, and the one
+        // token-replace block in chat.js is reachable only from the greeting --
+        // so a Str.get_string here would ship the literal token to every locked
+        // learner. chat_open_label is the existing precedent.
+        $attemptlockednotice = $attemptlocked
+            ? \local_ai_course_assistant\branding::str('quizlock:blocked')
+            : '';
 
         // Position offsets for fine-grained widget placement. ?: would treat
         // a literal 0 ("snap to corner") as falsy and silently apply the
@@ -611,8 +609,15 @@ class hook_callbacks {
         }
 
         // Load conversation starters from config.
+        // v7.0.6: pass whether this is a real activity page. Starters whose
+        // prompt interpolates {page} are suppressed on the course home page,
+        // where {page} would expand to the whole course name.
+        $hasactivity = $PAGE->cm !== null;
         $starters = \local_ai_course_assistant\starter_manager::get_effective_starters(
-            $courseid, !empty($ttsurl), $realtimeenabled
+            $courseid,
+            !empty($ttsurl),
+            $realtimeenabled,
+            $hasactivity
         );
 
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
@@ -792,6 +797,8 @@ class hook_callbacks {
             'modname'            => $modname,
             'pagetype'           => $pagetype,
             'quizlocked'         => $quizlocked,
+            'attemptlocked'      => $attemptlocked,
+            'attemptlockednotice' => $attemptlockednotice,
             'quizcoachmode'      => $quizcoachmode,
             'quizcmid'           => $quizcmid,
             'realtimeenabled'         => $realtimeenabled,
@@ -803,6 +810,7 @@ class hook_callbacks {
             'displaymode'        => $displaymode,
             'drawermode'         => ($displaymode === 'drawer'),
             'autoopen'           => self::is_autoopen_for_course($courseid),
+            'tourpending'        => self::is_usertour_pending(),
             'studentmode'        => $studentmode,
             'displayname'        => branding::display_name(),
             'institution'        => branding::institution_name(),
@@ -812,6 +820,26 @@ class hook_callbacks {
             // Pre-resolved brand label for the open button (the only brand-bearing
             // string the mustache renders directly via {{#str}}).
             'chat_open_label'    => branding::str('chat:open'),
+            // Help-panel strings pre-rendered server-side because each carries
+            // the brand name -- either as a {$a} placeholder filled with the
+            // configured short/display name, or (data_download) as a
+            // [[tutorshort]] token -- which the mustache {{#str}} helper cannot
+            // resolve. chat_open_label above is the precedent. intro,
+            // plans_body and data_download contain <strong> markup and are
+            // triple-stached in the template, so their $a values are escaped
+            // here; the rest render through escaped {{ }} tags.
+            'help_title'         => get_string('help:title',
+                'local_ai_course_assistant', branding::short_name()),
+            'help_intro'         => get_string('help:intro',
+                'local_ai_course_assistant',
+                '<strong>' . s(branding::display_name()) . '</strong>'),
+            'help_start_body'    => get_string('help:start_body',
+                'local_ai_course_assistant', branding::short_name()),
+            'help_plans_body'    => get_string('help:plans_body',
+                'local_ai_course_assistant', s(branding::short_name())),
+            'help_languages_body' => get_string('help:languages_body',
+                'local_ai_course_assistant', branding::short_name()),
+            'help_data_download' => branding::str('help:data_download'),
             // Brand token map for the browser: lets JS resolve [[tutorshort]] etc.
             // in strings fetched at runtime via the Moodle string API (e.g. the
             // personalized greeting). Consumed in chat.js init.
@@ -852,6 +880,12 @@ class hook_callbacks {
             'hasstarterdata'     => $hasstarterdata,
             'voicetabenabled'    => self::is_voice_tab_enabled($courseid),
             'voiceenabled'       => \local_ai_course_assistant\voice_registry::any_voice_enabled(),
+            // v6.9.7: active-learners indicator, off by default. Gating the
+            // markup here means the 60-second poll never starts on a site that
+            // has not opted in — chat.js only builds the poller if the element
+            // is present.
+            'activelearnersenabled' => (bool) get_config(
+                'local_ai_course_assistant', 'active_learners_enabled'),
             // Mastery feature: both flags gated on master switch so the chip
             // never renders when mastery tracking is off for the course.
             'masteryenabled'     => \local_ai_course_assistant\objective_manager::is_enabled_for_course($courseid),
@@ -867,16 +901,11 @@ class hook_callbacks {
             'digestoptinstate'   => self::digest_optin_state($courseid),
             'showdigestoptin'    => self::digest_optin_state($courseid) === 'unset',
             'flashcardsenabled'  => \local_ai_course_assistant\flashcard_manager::is_enabled_for_course($courseid),
-            'flashcardsurl'      => (new \moodle_url('/local/ai_course_assistant/flashcards.php',
-                ['courseid' => $courseid]))->out(false),
+            'flashcardsurl'      => (new \moodle_url(
+                '/local/ai_course_assistant/flashcards.php',
+                ['courseid' => $courseid]
+            ))->out(false),
             'workedexamplesenabled' => \local_ai_course_assistant\feature_flags::resolve('worked_examples', $courseid),
-            'attachmentsenabled' => \local_ai_course_assistant\attachment_manager::is_enabled(),
-            'attachmentmaxmb'    => (int) ceil(\local_ai_course_assistant\attachment_manager::get_max_size_bytes() / (1024 * 1024)),
-            'attachmentallowedmimes' => implode(',', \local_ai_course_assistant\attachment_manager::get_allowed_mimes()),
-            'providersupportsimages' => \local_ai_course_assistant\attachment_manager::provider_supports_images(
-                (string) (\local_ai_course_assistant\course_config_manager::get_effective_config($courseid)['provider']
-                    ?? get_config('local_ai_course_assistant', 'provider'))
-            ),
             'consentgiven'       => (bool) get_user_preferences('aica_sola_consent_given', 0),
             'privacynoticeurl'   => (new \moodle_url('/local/ai_course_assistant/privacy.php'))->out(false),
             // Pre-substituted consent banner strings. Mustache cannot pass an
@@ -887,15 +916,24 @@ class hook_callbacks {
             // literal and the consent banner showed `{$a->product}` instead
             // of "SOLA". Fixed by passing the same object shape consent_body
             // already uses below.
-            'consent_heading'    => get_string('chat:consent_heading', 'local_ai_course_assistant',
-                (object)['product' => \local_ai_course_assistant\branding::short_name()]),
-            'consent_body'       => get_string('chat:consent_body', 'local_ai_course_assistant',
+            'consent_heading'    => get_string(
+                'chat:consent_heading',
+                'local_ai_course_assistant',
+                (object)['product' => \local_ai_course_assistant\branding::short_name()]
+            ),
+            'consent_body'       => get_string(
+                'chat:consent_body',
+                'local_ai_course_assistant',
                 (object)[
                     'product'     => \local_ai_course_assistant\branding::short_name(),
                     'institution' => \local_ai_course_assistant\branding::institution_name(),
-                ]),
-            'consent_accept'     => get_string('chat:consent_accept', 'local_ai_course_assistant',
-                \local_ai_course_assistant\branding::short_name()),
+                ]
+            ),
+            'consent_accept'     => get_string(
+                'chat:consent_accept',
+                'local_ai_course_assistant',
+                \local_ai_course_assistant\branding::short_name()
+            ),
             'englishlock'        => (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid),
         ];
 
@@ -920,15 +958,182 @@ class hook_callbacks {
             $PAGE->requires->js_call_amd('local_ai_course_assistant/chat', 'init');
         }
 
+        // v7.2.0 (CONTRIB-10574 #201): behaviour that used to sit in inline
+        // <script> blocks inside chat_widget.mustache.
+        //
+        // These sit OUTSIDE the CDN branch on purpose. The consent banner is not
+        // CDN-gated -- it renders under {{^consentgiven}} in either delivery mode,
+        // with the Accept button shipping disabled -- and the CDN bundle contains
+        // neither module and only calls chat.init(). Requesting these only in
+        // local mode would leave the Accept button permanently disabled on a
+        // CDN-delivered site, locking the learner out of the assistant entirely.
+        // The code this replaced was a plain inline <script> using
+        // require(['core/ajax']), which works on any Moodle page regardless of
+        // how the widget itself is delivered; js_call_amd has the same reach.
+        //
+        // consent_gate looks for .aica-consent-banner and returns when it is
+        // absent, so it is safe unconditionally. student_mode is gated, because
+        // it binds a global keydown listener and has no markup to look for: the
+        // template only emitted it inside {{#studentmode}}, so requesting it
+        // unconditionally would bind Ctrl+Shift+A for every learner.
+        $PAGE->requires->js_call_amd('local_ai_course_assistant/consent_gate', 'init');
+        if ($studentmode) {
+            $PAGE->requires->js_call_amd('local_ai_course_assistant/student_mode', 'init');
+        }
+
         $hook->add_html($html);
+    }
+
+    /**
+     * Scan the course for "Unit X Learning Outcomes" pages and build the
+     * learning-objectives list handed to the widget template.
+     *
+     * Supports two Saylor formats:
+     * 1. GENERICO tags: {GENERICO:type="unit_learning_objectives",unit_objectives="[1]..."}
+     * 2. HTML bullet lists: "Upon successful completion..." followed by <li> items
+     *
+     * @param int $courseid
+     * @param \course_modinfo $modinfo Pre-built modinfo for this course.
+     * @param \stdClass $course Course record; its summary is the fallback source.
+     * @return array<int, array{name: string}>
+     */
+    private static function build_learning_objectives(
+        int $courseid,
+        \course_modinfo $modinfo,
+        \stdClass $course
+    ): array {
+        global $DB;
+
+        $learningobjectives = [];
+
+        // Pass 1: pick the candidate modules. Pass 2 below reads their page
+        // rows in ONE query — this used to be a get_record() per candidate,
+        // i.e. a query per "Unit N Learning Outcomes" page on every course
+        // page view, growing with the size of the course.
+        $candidates = [];
+        foreach ($modinfo->get_cms() as $cm) {
+            if (!$cm->uservisible || empty($cm->name)) {
+                continue;
+            }
+            $lower = strtolower($cm->name);
+            if (
+                strpos($lower, 'learning outcome') === false
+                && strpos($lower, 'learning objective') === false
+            ) {
+                continue;
+            }
+            if ($cm->modname !== 'page') {
+                continue;
+            }
+            $candidates[] = $cm;
+        }
+
+        $pagerows = [];
+        if (!empty($candidates)) {
+            $instanceids = [];
+            foreach ($candidates as $cm) {
+                $instanceids[(int) $cm->instance] = true;
+            }
+            try {
+                [$insql, $inparams] = $DB->get_in_or_equal(
+                    array_keys($instanceids),
+                    SQL_PARAMS_NAMED,
+                    'pg'
+                );
+                $inparams['courseid'] = $courseid;
+                $pagerows = $DB->get_records_select(
+                    'page',
+                    "id {$insql} AND course = :courseid",
+                    $inparams
+                );
+            } catch (\Throwable $e) {
+                // Same posture as the per-page lookup this replaced: an
+                // unreadable page contributes no objectives, it does not
+                // break the widget.
+                $pagerows = [];
+            }
+        }
+
+        foreach ($candidates as $cm) {
+            try {
+                $page = $pagerows[(int) $cm->instance] ?? null;
+                if (!$page || empty($page->content)) {
+                    continue;
+                }
+                $content = $page->content;
+                // Extract unit label from page name (e.g. "Unit 3 Learning Outcomes" -> "Unit 3").
+                $unitlabel = '';
+                if (preg_match('/^(Unit\s+\d+)/i', $cm->name, $um)) {
+                    $unitlabel = $um[1] . ': ';
+                }
+                // Format 1: GENERICO tag with numbered objectives.
+                if (preg_match('/unit_objectives="([^"]+)"/', $content, $gm)) {
+                    $raw = $gm[1];
+                    // Split on [N] markers.
+                    $parts = preg_split('/\[\d+\]\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
+                    foreach ($parts as $part) {
+                        $obj = trim(strip_tags($part), " ;\t\n\r\0\x0B");
+                        if (strlen($obj) > 10) {
+                            $learningobjectives[] = ['name' => $unitlabel . $obj];
+                        }
+                    }
+                    continue;
+                }
+                // Format 2: HTML list items.
+                if (preg_match_all('/<li[^>]*>(.*?)<\/li>/si', $content, $lm)) {
+                    foreach ($lm[1] as $li) {
+                        $obj = trim(strip_tags($li), " ;\t\n\r\0\x0B.");
+                        if (strlen($obj) > 10) {
+                            $learningobjectives[] = ['name' => $unitlabel . $obj];
+                        }
+                    }
+                    continue;
+                }
+                // Format 3: Plain text bullet/numbered lines (fallback).
+                $plaintext = strip_tags($content);
+                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
+                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
+                    if (strlen($line) > 10 && stripos($line, 'upon successful') === false) {
+                        $learningobjectives[] = ['name' => $unitlabel . $line];
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Skip pages that can't be read.
+            }
+        }
+        // Fallback: if no learning outcome pages found, parse course summary.
+        if (empty($learningobjectives)) {
+            if (!empty($course->summary)) {
+                $plaintext = strip_tags($course->summary);
+                foreach (preg_split('/[\r\n]+/', $plaintext) as $line) {
+                    $line = trim(ltrim(trim($line), '-•*0123456789.)'));
+                    if (strlen($line) > 10) {
+                        $learningobjectives[] = ['name' => $line];
+                    }
+                }
+            }
+        }
+
+        return $learningobjectives;
     }
 
     /**
      * Get all i18n string keys used by JS at runtime (for CDN mode pre-loading).
      *
      * These are the strings fetched via Str.get_string() / Str.get_strings()
-     * in chat.js and quiz.js. Template-level {{#str}} strings are resolved
+     * in the AMD modules. Template-level {{#str}} strings are resolved
      * server-side by Moodle and do not need to be included here.
+     *
+     * KEEP THIS LIST COMPLETE. In CDN mode the core/str shim resolves only
+     * from this map and falls back to echoing the key itself, so a key missing
+     * here is shown to the learner as a raw string id — which is exactly how
+     * 'active_learners:line_global' reached learners on learn.saylor.org. The
+     * gap is invisible on AMD-mode installs, where Moodle's real string API
+     * serves any key on demand. cdn/rollup.config.mjs asserts this list covers
+     * every literal key used in amd/src and fails the CDN deploy otherwise.
+     *
+     * Keys built at runtime cannot be caught by that check and must be listed
+     * by hand; they are grouped under "dynamic" below.
      *
      * @return array Associative array of string key => translated value.
      */
@@ -950,6 +1155,13 @@ class hook_callbacks {
             'chat:topic_picker_title',
             'chat:topic_picker_title_explain',
             'chat:topic_start',
+            // Flashcard starter feedback (chat.js ~2201-2224). These are
+            // requested by the browser bundle, so they must be preloaded
+            // here or the CDN build's dependency-check fails.
+            'flashcards:starter_saved',
+            'flashcards:starter_open_review',
+            'flashcards:starter_failed',
+            'flashcards:starter_error',
             // quiz.js strings.
             'chat:quiz_setup_title',
             'chat:quiz_questions',
@@ -976,6 +1188,26 @@ class hook_callbacks {
             'chat:quiz_score_great',
             'chat:quiz_score_good',
             'chat:quiz_score_practice',
+            'chat:quiz_topic_adaptive',
+            // Mastery chips and popover (chat.js).
+            'mastery:ask_about',
+            'mastery:ask_template',
+            'mastery:chip_label',
+            'mastery:popover_empty',
+            'mastery:status_learning',
+            'mastery:status_mastered',
+            'mastery:status_not_started',
+            // Next-best-action panel (chat.js).
+            'next_best_action:empty_state',
+            'next_best_action:header',
+            // Dynamic: keys assembled at runtime, so the static build check
+            // cannot see them. active_learners picks course vs global copy from
+            // the server's reported scope; learner_digest picks its confirmation
+            // from the learner's opt-in choice.
+            'active_learners:line',
+            'active_learners:line_global',
+            'learner_digest:optin_thanks',
+            'learner_digest:optin_declined',
         ];
 
         $strings = [];
@@ -1048,6 +1280,42 @@ class hook_callbacks {
             return false;
         }
         return (bool) get_config('local_ai_course_assistant', 'auto_open');
+    }
+
+    /**
+     * Whether a Moodle user tour will actually run for this user on this page.
+     *
+     * Auto-open and a user tour both claim the screen on a first visit, and the
+     * drawer wins: it renders over the tour's popover, so the learner sees
+     * neither properly. Saylor hit this on a course carrying a tour left over
+     * from the assistant that SOLA replaced.
+     *
+     * This deliberately mirrors the predicate core uses for its own bootstrap
+     * (\tool_usertours\helper): a tour must be enabled, match the page and all
+     * its filters, and not already have been completed by this user. Asking
+     * only "does a tour match this URL" would defer for learners who finished
+     * the tour long ago and would never see one.
+     *
+     * @return bool True when a tour is pending, so auto-open should wait for it.
+     */
+    private static function is_usertour_pending(): bool {
+        if (!class_exists('\tool_usertours\manager')) {
+            // The tool is optional and can be uninstalled.
+            return false;
+        }
+        try {
+            foreach (\tool_usertours\manager::get_current_tours() as $tour) {
+                if ($tour->should_show_for_user()) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            // A tour lookup must never be able to break the widget. Falling
+            // back to "no tour" keeps the previous behaviour rather than
+            // suppressing auto-open on an unrelated error.
+            return false;
+        }
+        return false;
     }
 
     /**

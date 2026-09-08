@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
 defined('MOODLE_INTERNAL') || die();
 
 class starter_manager {
-
     /** Config key for global custom starters. */
     const CONFIG_KEY = 'custom_starters';
 
@@ -72,7 +71,13 @@ class starter_manager {
                 'enabled'     => true,
                 'sort_order'  => 1,
                 'builtin'     => true,
-                'conditional' => '',
+                // v7.0.6: 'activity' — only offer this on a real activity page.
+                // On the course home page {page} expands to the whole course
+                // name, so the prompt asks for a summary of the entire course
+                // and the answer is a catalog blurb: 2 of 13 sampled replies
+                // cited any course material, against 4 of 5 when the same chip
+                // fired from an activity page.
+                'conditional' => 'activity',
             ],
             [
                 'key'         => 'quiz',
@@ -92,7 +97,7 @@ class starter_manager {
                 'key'         => 'study-plan',
                 'name'        => 'Study Plan',
                 'description' => 'Creates a focused study session plan',
-                'prompt'      => "I'd like to plan my current study session. Please ask me: (1) what I want to accomplish today, and (2) how much time I have available. If we've discussed a study plan before, build on it.",
+                'prompt'      => "Suggest a focused plan for my study session in this course right now. Propose a concrete first step and a realistic 30-minute sequence based on where I am in the course, and cite the specific activities to work through. Then ask if I want to adjust the time or the focus.",
                 'icon'        => 'calendar',
                 'type'        => 'prompt',
                 'enabled'     => true,
@@ -254,9 +259,15 @@ class starter_manager {
      * @param int  $courseid
      * @param bool $hastts       Whether TTS is available
      * @param bool $hasrealtime  Whether Realtime is available
+     * @param bool $hasactivity  Whether the learner is on a real activity page (not the course home)
      * @return array Starters ready for template rendering (filtered + enriched with icon_svg)
      */
-    public static function get_effective_starters(int $courseid, bool $hastts = false, bool $hasrealtime = false): array {
+    public static function get_effective_starters(
+        int $courseid,
+        bool $hastts = false,
+        bool $hasrealtime = false,
+        bool $hasactivity = true
+    ): array {
         $starters = self::get_global_starters();
 
         // Per-course enable/disable overrides.
@@ -283,6 +294,12 @@ class starter_manager {
             if ($cond === 'realtime' && !$hasrealtime) {
                 continue;
             }
+            // v7.0.6: 'activity' — the starter's prompt refers to the current
+            // page, so it only makes sense where there IS one. Defaults to true
+            // so existing callers that cannot tell keep their old behavior.
+            if ($cond === 'activity' && !$hasactivity) {
+                continue;
+            }
             // v4.0 / M2: 'mastery' conditional — only show when mastery is
             // enabled for this course AND at least one objective exists, so
             // the focus-next starter does not appear in courses that have
@@ -303,7 +320,7 @@ class starter_manager {
         }
 
         // Sort by sort_order.
-        usort($result, function($a, $b) {
+        usort($result, function ($a, $b) {
             return ($a['sort_order'] ?? 99) <=> ($b['sort_order'] ?? 99);
         });
 

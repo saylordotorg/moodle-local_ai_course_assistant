@@ -40,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class builder {
-
     /**
      * Assemble the final prompt and per-section breakdown.
      *
@@ -86,7 +85,7 @@ class builder {
             if ($newlen >= $sec->length()) {
                 continue;
             }
-            $sec->content = substr($sec->content, 0, $newlen) . "\n[…truncated by prompt budget…]";
+            $sec->content = self::truncate_content($sec->content, $newlen);
             $truncated[$sec->name] = true;
         }
 
@@ -121,7 +120,7 @@ class builder {
                 if ($sec->min_chars > 0 && $sec->length() - $excess >= $sec->min_chars) {
                     // Truncate from the end with an ellipsis marker.
                     $newlen = max($sec->min_chars, $sec->length() - $excess);
-                    $sec->content = substr($sec->content, 0, $newlen) . "\n[…truncated by prompt budget…]";
+                    $sec->content = self::truncate_content($sec->content, $newlen);
                     $total = 0;
                     foreach ($sections as $s) {
                         $total += $s->length();
@@ -196,12 +195,54 @@ class builder {
                 if ($row['info']['truncated']) {
                     $flags[] = 'TRUNCATED';
                 }
-                $lines[] = sprintf("    %5d  %s%s",
+                $lines[] = sprintf(
+                    "    %5d  %s%s",
                     $row['info']['chars'],
                     $row['name'],
-                    $flags ? ' ['.implode(',', $flags).']' : '');
+                    $flags ? ' [' . implode(',', $flags) . ']' : ''
+                );
             }
         }
         return implode("\n", $lines);
+    }
+
+    /**
+     * Truncate a section, leaving any untrusted fence it opened properly closed.
+     *
+     * Course content is wrapped by security::fence_untrusted() in
+     * "[[UNTRUSTED ...]] ... [[/UNTRUSTED ...]]" markers that tell the model the
+     * enclosed text is reference material and must never be followed as
+     * instructions. A byte-wise cut lands mid-fence and discards the closing
+     * marker, so everything after it in the assembled prompt -- persona, house
+     * style, output markers and the safety block itself -- reads as if it were
+     * inside the untrusted region. Re-close whatever the cut left open.
+     *
+     * @param string $content
+     * @param int $newlen Byte length to cut to.
+     * @return string
+     */
+    private static function truncate_content(string $content, int $newlen): string {
+        $cut = substr($content, 0, $newlen);
+
+        // A cut can land part-way through a marker, leaving a dangling "[[UNTRU"
+        // or "[[/UNTRU". Drop the fragment FIRST, then count -- deciding what is
+        // unclosed before removing it gets the arithmetic wrong whenever the
+        // fragment happens to be a closing marker.
+        $lastmarker = strrpos($cut, '[[');
+        if ($lastmarker !== false && strpos($cut, ']]', $lastmarker) === false) {
+            $cut = substr($cut, 0, $lastmarker);
+        }
+
+        // Labels, in the order they were opened.
+        preg_match_all('/\[\[UNTRUSTED ([^\]]*?)\s*\x{2014}/u', $cut, $opens);
+        $openlabels = $opens[1] ?? [];
+        $closecount = substr_count($cut, '[[/UNTRUSTED');
+
+        $unclosed = array_slice($openlabels, $closecount);
+        foreach (array_reverse($unclosed) as $label) {
+            $cut .= "\n[[/UNTRUSTED " . $label . "]]";
+        }
+
+        return $cut . "\n[…truncated by prompt budget…]";
     }
 }

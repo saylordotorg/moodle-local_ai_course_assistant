@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class instructor_analytics {
-
     /**
      * Header summary tile. Active learners (with at least one user-role msg
      * in the period), total user messages, average per learner, last
@@ -92,25 +91,64 @@ class instructor_analytics {
         if (empty($objectives)) {
             return [];
         }
+        $objectiveids = [];
+        foreach ($objectives as $obj) {
+            $objectiveids[] = (int) $obj->id;
+        }
+
+        // Everything the per-objective loop needs is loaded up front, in a
+        // fixed number of queries, instead of once per objective (and, for the
+        // mastery numbers, once per objective x learner):
+        //  - the enrolled cohort is the same for every objective, so it is
+        //    fetched once rather than inside the loop;
+        //  - one grouped query lists the learners who attempted each objective;
+        //  - one grouped query counts attempts per objective;
+        //  - one query streams the attempt rows the mastery math reads.
+        $coursecontext = \context_course::instance($courseid);
+        $enrolledusers = get_enrolled_users($coursecontext, '', 0, 'u.id', null, 0, 0, true);
+        $enrolledset = [];
+        foreach ($enrolledusers as $u) {
+            $enrolledset[(int) $u->id] = true;
+        }
+
+        [$objsql, $objparams] = $DB->get_in_or_equal($objectiveids, SQL_PARAMS_NAMED, 'obj');
+        $attemptedby = [];
+        $pairs = $DB->get_recordset_sql(
+            "SELECT objectiveid, userid
+               FROM {local_ai_course_assistant_obj_att}
+              WHERE objectiveid {$objsql}
+           GROUP BY objectiveid, userid
+           ORDER BY objectiveid ASC, userid ASC",
+            $objparams
+        );
+        try {
+            foreach ($pairs as $pair) {
+                $attemptedby[(int) $pair->objectiveid][] = (int) $pair->userid;
+            }
+        } finally {
+            $pairs->close();
+        }
+        $attemptcounts = $DB->get_records_sql(
+            "SELECT objectiveid, COUNT(*) AS n
+               FROM {local_ai_course_assistant_obj_att}
+              WHERE objectiveid {$objsql}
+           GROUP BY objectiveid",
+            $objparams
+        );
+        $preloaded = objective_manager::preload_attempts($objectiveids);
+
         $rows = [];
         foreach ($objectives as $obj) {
-            $userids = $DB->get_fieldset_sql(
-                "SELECT DISTINCT userid FROM {local_ai_course_assistant_obj_att}
-                  WHERE objectiveid = :oid",
-                ['oid' => (int) $obj->id]
-            );
+            $userids = $attemptedby[(int) $obj->id] ?? [];
             $mastered = $learning = $notstarted = 0;
-            // Enrolled learners not in $userids count as not_started.
-            $coursecontext = \context_course::instance($courseid);
-            $enrolledusers = get_enrolled_users($coursecontext, '', 0, 'u.id', null, 0, 0, true);
-            $enrolledset = [];
-            foreach ($enrolledusers as $u) {
-                $enrolledset[(int) $u->id] = true;
-            }
             $attempted = [];
             foreach ($userids as $uid) {
                 $attempted[(int) $uid] = true;
-                $m = objective_manager::compute_mastery((int) $uid, (int) $obj->id);
+                $m = objective_manager::compute_mastery(
+                    (int) $uid,
+                    (int) $obj->id,
+                    $preloaded[(int) $uid . ':' . (int) $obj->id] ?? []
+                );
                 if (!empty($m['mastered'])) {
                     $mastered++;
                 } else {
@@ -118,10 +156,9 @@ class instructor_analytics {
                 }
             }
             $notstarted = max(0, count($enrolledset) - count($attempted));
-            $totalattempts = (int) $DB->count_records(
-                'local_ai_course_assistant_obj_att',
-                ['objectiveid' => (int) $obj->id]
-            );
+            $totalattempts = isset($attemptcounts[(int) $obj->id])
+                ? (int) $attemptcounts[(int) $obj->id]->n
+                : 0;
             $cohortsize = max(1, count($enrolledset));
             $rows[] = [
                 'id'              => (int) $obj->id,
@@ -191,8 +228,12 @@ class instructor_analytics {
                    AND timecreated > :since
                  GROUP BY cmid
                  ORDER BY q_count DESC";
-        $rows = $DB->get_records_sql($sql,
-            ['courseid' => $courseid, 'since' => $since], 0, $limit);
+        $rows = $DB->get_records_sql(
+            $sql,
+            ['courseid' => $courseid, 'since' => $since],
+            0,
+            $limit
+        );
         $out = [];
         foreach ($rows as $r) {
             $cmid = (int) $r->cmid;
@@ -297,12 +338,14 @@ class instructor_analytics {
         global $DB;
         $coursecontext = \context_course::instance($courseid);
         $enrolled = get_enrolled_users($coursecontext, '', 0, 'u.id', null, 0, 0, true);
-        $enrolledids = array_map(function ($u) { return (int) $u->id; }, array_values($enrolled));
+        $enrolledids = array_map(function ($u) {
+            return (int) $u->id;
+        }, array_values($enrolled));
         if (empty($enrolledids)) {
             return ['not_seen' => 0, 'enrolled' => 0, 'sample_userids' => []];
         }
         $threshold = time() - ($days * 86400);
-        list($insql, $params) = $DB->get_in_or_equal($enrolledids, SQL_PARAMS_NAMED, 'uid');
+        [$insql, $params] = $DB->get_in_or_equal($enrolledids, SQL_PARAMS_NAMED, 'uid');
         $params['courseid'] = $courseid;
         $params['threshold'] = $threshold;
         $activeids = $DB->get_fieldset_sql(

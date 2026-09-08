@@ -40,6 +40,15 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Algorithm: compute today's site-wide SOLA spend in USD by aggregating
  * tokens from `local_ai_course_assistant_msgs` × `token_cost_manager`
+ * Counts every billable row via analytics::spend_rows_predicate(), so background
+ * RAG spend (embedding + rerank, written with role='system') is included. It used
+ * to filter role='assistant' inline, which meant a runaway reindex -- precisely
+ * the runaway this detector exists to catch -- was invisible to it.
+ *
+ * Changing that population does not produce a spurious first alert: today's
+ * figure and each of the prior 7 days come from this same method, so the median
+ * moves with the numerator rather than being a stored baseline.
+ *
  * rates. Compute the same for each of the prior 7 days. Take the median
  * of the prior 7 days. If today exceeds MULTIPLIER × median, emit an
  * alert email to the `spend_notify_emails` recipient list (falling back
@@ -59,9 +68,19 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cost_anomaly_detector {
-
     /** @var int Minimum days of history required before evaluating an anomaly. */
     public const MIN_HISTORY_DAYS = 7;
+
+    /**
+     * How many of the prior days must show spend before the detector activates.
+     *
+     * The old gate required ALL seven prior days to be nonzero, which is a
+     * traffic profile, not a history check: a low-traffic site with quiet
+     * weekends reported insufficient_history forever, silently, while the admin
+     * believed the anomaly alarm was armed. Three active days is enough signal
+     * for a median to mean something.
+     */
+    public const MIN_ACTIVE_DAYS = 3;
 
     /** @var float Default multiplier (today must exceed median by this much). */
     public const DEFAULT_MULTIPLIER = 2.0;
@@ -89,7 +108,7 @@ class cost_anomaly_detector {
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion
                FROM {local_ai_course_assistant_msgs} m
-              WHERE m.role = 'assistant'
+              WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :daystart
                 AND m.timecreated <  :dayend
@@ -129,7 +148,7 @@ class cost_anomaly_detector {
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion
                FROM {local_ai_course_assistant_msgs} m
-              WHERE m.role = 'assistant'
+              WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :daystart
                 AND m.timecreated <  :dayend
@@ -160,7 +179,11 @@ class cost_anomaly_detector {
         $shortnames = [];
         if (!empty($top)) {
             $rows = $DB->get_records_list(
-                'course', 'id', array_keys($top), '', 'id,shortname'
+                'course',
+                'id',
+                array_keys($top),
+                '',
+                'id,shortname'
             );
             foreach ($rows as $r) {
                 $shortnames[(int) $r->id] = (string) $r->shortname;
@@ -247,11 +270,14 @@ class cost_anomaly_detector {
             $prior[] = self::compute_daily_spend(self::utc_day_start($d));
         }
 
-        // Insufficient-history shape: the first 7 days after the feature is
+        // Insufficient-history shape: the first days after the feature is
         // enabled produce $0 medians because there's no historical data yet.
-        // Detect by counting how many of the prior days had nonzero spend.
-        $nonzero = count(array_filter($prior, fn($v) => $v > 0));
-        if ($nonzero < self::MIN_HISTORY_DAYS) {
+        // Gate on a minimum number of ACTIVE days, and take the median over the
+        // active days only -- zero-spend weekend days are absence of traffic,
+        // not evidence about a normal day's spend.
+        $active = array_values(array_filter($prior, fn($v) => $v > 0));
+        $nonzero = count($active);
+        if ($nonzero < self::MIN_ACTIVE_DAYS) {
             return [
                 'status' => 'insufficient_history',
                 'today_usd' => round($today, 4),
@@ -263,7 +289,7 @@ class cost_anomaly_detector {
             ];
         }
 
-        $median = self::median($prior);
+        $median = self::median($active);
         $ratio = $median > 0 ? ($today / $median) : 0.0;
 
         if ($today > $multiplier * $median) {
@@ -273,7 +299,7 @@ class cost_anomaly_detector {
                 'median_usd' => round($median, 4),
                 'ratio' => round($ratio, 2),
                 'multiplier' => $multiplier,
-                'window_days' => self::MIN_HISTORY_DAYS,
+                'window_days' => $nonzero,
                 'top_courses' => self::per_course_spend_for_day(self::utc_day_start(0)),
             ];
         }
@@ -284,7 +310,7 @@ class cost_anomaly_detector {
             'median_usd' => round($median, 4),
             'ratio' => round($ratio, 2),
             'multiplier' => $multiplier,
-            'window_days' => self::MIN_HISTORY_DAYS,
+            'window_days' => $nonzero,
             'top_courses' => [],
         ];
     }
@@ -332,7 +358,8 @@ class cost_anomaly_detector {
         if (!empty($eval['top_courses'])) {
             $body .= "Top courses by spend today:\n";
             foreach ($eval['top_courses'] as $c) {
-                $body .= sprintf("  %-40s \$%.4f  (courseid=%d)\n",
+                $body .= sprintf(
+                    "  %-40s \$%.4f  (courseid=%d)\n",
                     substr($c['shortname'] ?? '<unknown>', 0, 40),
                     $c['spend_usd'],
                     $c['courseid']

@@ -7,6 +7,28 @@ on:
       - 'amd/src/**'
       - 'styles.css'
       - 'cdn/**'
+      # The bundle's dependency-check parses get_js_strings() out of
+      # hook_callbacks.php and resolves the keys against lang/en, so a change to
+      # either can break or fix this workflow. Without them in the trigger the
+      # guard could be broken by a commit that never ran it -- which is what
+      # happened on 2026-09-04: four flashcards:starter_* keys went missing from
+      # get_js_strings(), the deploy failed, and the published gh-pages bundle
+      # then sat three releases behind while every push that could have fixed it
+      # was filtered out.
+      - 'classes/hook_callbacks.php'
+      - 'lang/en/**'
+
+  # Validate cdn changes at PR time too. Before this, a PR touching cdn/ (every
+  # dependabot rollup bump, for instance) had no validation at all: the only job
+  # that builds the bundle ran on push to main, after the merge. The deploy step
+  # below is guarded so a PR run tests without publishing.
+  pull_request:
+    paths:
+      - 'amd/src/**'
+      - 'styles.css'
+      - 'cdn/**'
+      - 'classes/hook_callbacks.php'
+      - 'lang/en/**'
 
   workflow_dispatch:
 
@@ -103,6 +125,7 @@ jobs:
           echo "{\"version\":\"${SHA}\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > manifest.json
 
       - name: Deploy to GitHub Pages
+        if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

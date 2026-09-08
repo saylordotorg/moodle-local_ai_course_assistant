@@ -27,9 +27,15 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class claude_provider extends base_provider {
-
     /** @var string Anthropic API version */
     private const API_VERSION = '2023-06-01';
+
+    /**
+     * @var string stop_reason returned when the model's own safety layer
+     * declines the request. The response carries NO content blocks at all,
+     * so it must be handled explicitly or it looks like a malformed reply.
+     */
+    public const STOP_REASON_REFUSAL = 'refusal';
 
     /** @var array|null Token usage from the last streaming call */
     private ?array $last_token_usage = null;
@@ -49,23 +55,86 @@ class claude_provider extends base_provider {
     }
 
     /**
+     * Prefixes of Anthropic models known to ACCEPT sampling parameters.
+     *
+     * Used as the default when the `claude_temperature_allow_prefixes` setting
+     * is empty. Deliberately an allow-list, not a deny-list: see
+     * {@see model_supports_temperature()} for why.
+     *
+     * @var string[]
+     */
+    public const DEFAULT_TEMPERATURE_ALLOW_PREFIXES = [
+        // Aliases.
+        'claude-opus-4-6', 'claude-opus-4-5', 'claude-opus-4-1', 'claude-opus-4-0',
+        'claude-sonnet-4-6', 'claude-sonnet-4-5', 'claude-sonnet-4-0',
+        'claude-haiku-4-5', 'claude-haiku-3-5', 'claude-haiku-3',
+        // Dated full IDs for the 4.0 generation, whose alias form does not
+        // prefix-match them: e.g. claude-sonnet-4-20250514 (this provider's
+        // own get_default_model()) and claude-opus-4-20250514. We cannot use a
+        // bare 'claude-opus-4' prefix here because it would also match the
+        // denied claude-opus-4-7 / 4-8.
+        'claude-opus-4-2025', 'claude-sonnet-4-2025',
+        // Claude 3.x and 2.x, all of which accept sampling parameters.
+        'claude-3', 'claude-2',
+    ];
+
+    /**
      * Whether the given Anthropic model accepts a `temperature` parameter.
-     * Opus 4.7 and 4.8 (reasoning-class models) reject temperature with HTTP
-     * 400; their successors will likely behave the same way. Maintain this
-     * as a per-prefix denylist so the model-specific 400 doesn't bubble up
-     * as the generic "something went wrong" error.
+     *
+     * This is an ALLOW-list: a model we do not recognise is assumed NOT to
+     * accept sampling parameters, and temperature is omitted.
+     *
+     * The reason is that the two failure modes are asymmetric:
+     *   - Omitting temperature from a model that accepts it: the model uses
+     *     its own default. Harmless.
+     *   - Sending temperature to a model that rejects it: HTTP 400 on EVERY
+     *     call, surfacing as the generic "something went wrong" error.
+     *
+     * Anthropic has removed sampling parameters from every reasoning-class
+     * model since Opus 4.7 (Opus 4.7/4.8, and the whole Claude 5 family), so
+     * an unrecognized model is now more likely to reject them than accept
+     * them. Defaulting to "omit" means a newly released model works on day
+     * one instead of failing every request until the plugin is updated.
+     *
+     * The list is read from the `claude_temperature_allow_prefixes` setting so
+     * it can be corrected without a plugin release — by an admin, or pushed
+     * fleet-wide via a signed policy bundle (the key is on
+     * {@see \local_ai_course_assistant\policy_bundle::ALLOWED_KEYS}). This
+     * mirrors how `rate_card_overrides` keeps per-model pricing current
+     * without a redeploy.
      *
      * @param string $model
      * @return bool
      */
     private static function model_supports_temperature(string $model): bool {
-        $denyprefixes = ['claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-4-9'];
-        foreach ($denyprefixes as $prefix) {
+        $model = strtolower(trim($model));
+        if ($model === '') {
+            return false;
+        }
+        foreach (self::temperature_allow_prefixes() as $prefix) {
             if (str_starts_with($model, $prefix)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * The effective allow-list: the admin/policy-bundle setting when set and
+     * parseable, otherwise the shipped default.
+     *
+     * @return string[]
+     */
+    private static function temperature_allow_prefixes(): array {
+        $raw = (string) get_config('local_ai_course_assistant', 'claude_temperature_allow_prefixes');
+        $out = [];
+        foreach (preg_split('/[\r\n,]+/', $raw) as $line) {
+            $line = strtolower(trim($line));
+            if ($line !== '' && $line[0] !== '#') {
+                $out[] = $line;
+            }
+        }
+        return $out ?: self::DEFAULT_TEMPERATURE_ALLOW_PREFIXES;
     }
 
     protected function get_default_base_url(): string {
@@ -166,7 +235,8 @@ class claude_provider extends base_provider {
             $body['tools'] = [[
                 'name' => $schema['name'] ?? 'structured_output',
                 'description' => $schema['description'] ?? 'Return structured data',
-                'input_schema' => $schema['schema'],
+                // Wrapped or bare -- see the note in openai_compatible_provider.
+                'input_schema' => $schema['schema'] ?? $schema,
             ]];
             $body['tool_choice'] = [
                 'type' => 'tool',
@@ -181,14 +251,61 @@ class claude_provider extends base_provider {
         return json_encode($body);
     }
 
+    /**
+     * Turn an Anthropic error payload into a one-line diagnostic for the
+     * exception's debuginfo, which the SSE handler records in the audit log.
+     *
+     * Anthropic reports failures as {"type":"error","error":{"type":..,
+     * "message":..}} with no `content` key, so the empty-content guard fires
+     * and — before this — discarded the payload in favour of the fixed string
+     * "Invalid API response". On 2026-08-10 an org spend cap started returning
+     *
+     *   invalid_request_error: You have reached your specified API usage
+     *   limits. You will regain access on 2026-09-01 at 00:00 UTC.
+     *
+     * on every call for ten courses. The audit recorded only "Sorry, something
+     * went wrong", so the cause took nine days and a manual curl to find. The
+     * message was there the whole time; nothing was reading it.
+     *
+     * Truncated to 400 chars, and falls back to a slice of the raw body when
+     * the payload is not JSON (a proxy error page, say) so the shape of the
+     * failure is still visible.
+     *
+     * @param mixed $data Decoded response body, or null when it did not parse.
+     * @param string $raw Raw response body.
+     * @return string
+     */
+    private static function describe_api_error($data, string $raw): string {
+        if (is_array($data) && isset($data['error']) && is_array($data['error'])) {
+            $type = (string) ($data['error']['type'] ?? 'error');
+            $msg  = (string) ($data['error']['message'] ?? '');
+            return \core_text::substr(trim($type . ': ' . $msg), 0, 400);
+        }
+        $raw = trim($raw);
+        if ($raw !== '') {
+            return 'Unrecognised API response: ' . \core_text::substr($raw, 0, 400);
+        }
+        return 'Empty API response';
+    }
+
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $url = $this->baseurl . '/v1/messages';
         $body = $this->build_body($systemprompt, $messages, false, $options);
         $response = $this->http_post($url, $this->get_headers($options), $body);
 
         $data = json_decode($response, true);
+
+        // A model-level safety refusal is a WELL-FORMED response that carries
+        // no content blocks, so it must be checked before the empty-content
+        // guard below -- otherwise it is misreported as a transport failure
+        // and the learner sees the generic "something went wrong" string.
+        if (is_array($data) && ($data['stop_reason'] ?? '') === self::STOP_REASON_REFUSAL) {
+            return get_string('chat:refused', 'local_ai_course_assistant');
+        }
+
         if (!$data || empty($data['content'])) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                self::describe_api_error($data, $response));
         }
 
         // Capture token usage including cache metrics.
@@ -227,59 +344,111 @@ class claude_provider extends base_provider {
 
         $buffer = '';
         $this->last_token_usage = null;
+        // Tracks whether any text reached the learner, so a refusal notice is
+        // only emitted when the stream produced nothing.
+        $sentanytext = false;
+        // Anthropic reports a failed stream two different ways, and before this
+        // both were discarded: an SSE `error` event mid-stream, or — when the
+        // request is rejected outright — a plain JSON error body that never
+        // starts with "data: " and so was skipped by the SSE parser entirely.
+        // The second is what an org spend cap produces, which is why ten
+        // courses failed for nine days with nothing in the audit but "Sorry,
+        // something went wrong". Captured here and rethrown after the transfer
+        // so the detail reaches the audit log.
+        $apierror = null;
+        $rawseen = '';
 
-        $this->http_post_stream($url, $this->get_headers($options), $body, function ($data) use ($callback, &$buffer) {
-            $buffer .= $data;
+        $this->http_post_stream(
+            $url,
+            $this->get_headers($options),
+            $body,
+            function ($data) use ($callback, &$buffer, &$sentanytext, &$apierror, &$rawseen) {
+                $buffer .= $data;
+                $rawseen .= $data;
 
-            while (($pos = strpos($buffer, "\n")) !== false) {
-                $line = substr($buffer, 0, $pos);
-                $buffer = substr($buffer, $pos + 1);
-                $line = trim($line);
+                while (($pos = strpos($buffer, "\n")) !== false) {
+                    $line = substr($buffer, 0, $pos);
+                    $buffer = substr($buffer, $pos + 1);
+                    $line = trim($line);
 
-                if (empty($line) || !str_starts_with($line, 'data: ')) {
-                    continue;
-                }
+                    if (empty($line) || !str_starts_with($line, 'data: ')) {
+                        continue;
+                    }
 
-                $json = substr($line, 6);
-                if ($json === '[DONE]') {
-                    return;
-                }
+                    $json = substr($line, 6);
+                    if ($json === '[DONE]') {
+                        return;
+                    }
 
-                $event = json_decode($json, true);
-                if (!$event) {
-                    continue;
-                }
+                    $event = json_decode($json, true);
+                    if (!$event) {
+                        continue;
+                    }
 
-                $eventtype = $event['type'] ?? '';
+                    $eventtype = $event['type'] ?? '';
 
-                if ($eventtype === 'message_start') {
-                    $usage = $event['message']['usage'] ?? [];
-                    $this->last_token_usage = [
+                    // Mid-stream failure (overloaded, rate limit, cap reached).
+                    if ($eventtype === 'error') {
+                        $apierror = self::describe_api_error($event, '');
+                        return;
+                    }
+
+                    if ($eventtype === 'message_start') {
+                        $usage = $event['message']['usage'] ?? [];
+                        $this->last_token_usage = [
                         'prompt_tokens'          => (int) ($usage['input_tokens'] ?? 0),
                         'completion_tokens'      => 0,
                         'model'                  => $event['message']['model'] ?? $this->model,
                         'cache_creation_tokens'  => (int) ($usage['cache_creation_input_tokens'] ?? 0),
                         'cache_read_tokens'      => (int) ($usage['cache_read_input_tokens'] ?? 0),
-                    ];
-                }
-
-                if ($eventtype === 'message_delta' && isset($event['usage']['output_tokens'])) {
-                    if ($this->last_token_usage !== null) {
-                        $this->last_token_usage['completion_tokens'] = (int) $event['usage']['output_tokens'];
+                        ];
                     }
-                }
 
-                // Only forward text deltas; skip thinking deltas and tool input deltas.
-                if ($eventtype === 'content_block_delta') {
-                    $deltatype = $event['delta']['type'] ?? '';
-                    if ($deltatype === 'text_delta') {
-                        $text = $event['delta']['text'] ?? '';
-                        if ($text !== '') {
-                            $callback($text);
+                    if ($eventtype === 'message_delta' && isset($event['usage']['output_tokens'])) {
+                        if ($this->last_token_usage !== null) {
+                            $this->last_token_usage['completion_tokens'] = (int) $event['usage']['output_tokens'];
+                        }
+                    }
+
+                    // A safety refusal streams as a message_delta carrying
+                    // stop_reason "refusal" with no content_block_delta events at
+                    // all, so without this the learner would see an empty reply.
+                    if (
+                        $eventtype === 'message_delta'
+                        && ($event['delta']['stop_reason'] ?? '') === self::STOP_REASON_REFUSAL
+                        && !$sentanytext
+                    ) {
+                        $callback(get_string('chat:refused', 'local_ai_course_assistant'));
+                        $sentanytext = true;
+                    }
+
+                    // Only forward text deltas; skip thinking deltas and tool input deltas.
+                    if ($eventtype === 'content_block_delta') {
+                        $deltatype = $event['delta']['type'] ?? '';
+                        if ($deltatype === 'text_delta') {
+                            $text = $event['delta']['text'] ?? '';
+                            if ($text !== '') {
+                                $sentanytext = true;
+                                $callback($text);
+                            }
                         }
                     }
                 }
             }
-        });
+        );
+
+        // A rejected request (bad key, spend cap, unknown model) comes back as
+        // a plain JSON error body rather than an SSE stream, so nothing above
+        // ever matched and the learner just saw an empty reply. Surface it.
+        if ($apierror === null && !$sentanytext && trim($rawseen) !== '' && !str_contains($rawseen, 'data: ')) {
+            $decoded = json_decode(trim($rawseen), true);
+            if (is_array($decoded) && isset($decoded['error'])) {
+                $apierror = self::describe_api_error($decoded, $rawseen);
+            }
+        }
+
+        if ($apierror !== null) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, $apierror);
+        }
     }
 }

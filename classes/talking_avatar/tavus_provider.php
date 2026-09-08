@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class tavus_provider extends base_provider {
-
     public function get_key(): string {
         return 'tavus';
     }
@@ -44,8 +43,13 @@ class tavus_provider extends base_provider {
 
     public function start_session(array $context): array {
         if (!$this->is_configured()) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'Tavus: API key or replica_id (persona_id) not configured.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'Tavus: API key or replica_id (persona_id) not configured.'
+            );
         }
         $base = rtrim($this->cfg('base_url', 'https://tavusapi.com'), '/');
 
@@ -72,8 +76,13 @@ class tavus_provider extends base_provider {
         $convurl = (string) ($resp['conversation_url'] ?? '');
         $convid = (string) ($resp['conversation_id'] ?? '');
         if ($convurl === '' || $convid === '') {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'Tavus: response missing conversation_url or conversation_id.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'Tavus: response missing conversation_url or conversation_id.'
+            );
         }
         // Tavus's conversation_url is itself iframable, so we don't need a
         // local viewer page — point the widget directly at it.

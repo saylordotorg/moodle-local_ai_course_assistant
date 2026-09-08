@@ -30,7 +30,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class credential_leak_validator implements validator_interface {
-
     /** @var array<string,string> kind => regex */
     // Note: no `stripe_secret` / `stripe_publish` corpus fixture lives in
     // tests/security/credential_leak/. GitHub push protection rejects any

@@ -21,9 +21,11 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
+use local_ai_course_assistant\branding;
 use local_ai_course_assistant\context_builder;
 use local_ai_course_assistant\objective_manager;
 use local_ai_course_assistant\provider\base_provider;
+use local_ai_course_assistant\quiz_lock;
 
 /**
  * Generate a practice quiz for a course.
@@ -33,7 +35,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class generate_quiz extends external_api {
-
     /**
      * Returns description of method parameters.
      *
@@ -43,13 +44,19 @@ class generate_quiz extends external_api {
         return new external_function_parameters([
             'courseid'   => new external_value(PARAM_INT, 'Course ID'),
             'count'      => new external_value(PARAM_INT, 'Number of questions (3-10)', VALUE_DEFAULT, 3),
-            'topic'      => new external_value(PARAM_TEXT,
+            'topic'      => new external_value(
+                PARAM_TEXT,
                 'Topic, __guided__ for AI-guided, __adaptive__ for mastery-targeted, or empty for current page.',
-                VALUE_DEFAULT, '__guided__'),
+                VALUE_DEFAULT,
+                '__guided__'
+            ),
             'cmid'       => new external_value(PARAM_INT, 'Current module/page ID (0 if not on a resource page)', VALUE_DEFAULT, 0),
-            'difficulty' => new external_value(PARAM_ALPHA,
+            'difficulty' => new external_value(
+                PARAM_ALPHA,
                 'Difficulty target: easy, medium, hard, or auto (mastery-aware) — defaults to medium',
-                VALUE_DEFAULT, 'medium'),
+                VALUE_DEFAULT,
+                'medium'
+            ),
         ]);
     }
 
@@ -62,7 +69,7 @@ class generate_quiz extends external_api {
      *                      mastery-targeted (v4.0 / M1), or empty for current page.
      * @param int $cmid Course module ID for current-page mode (0 if not applicable).
      * @param string $difficulty Difficulty target: easy, medium, hard, or auto. Default medium.
-     * @return array Quiz data with success flag, error message, topic, and questions.
+     * @return array Quiz data with success flag, error code, error message, topic, and questions.
      */
     public static function execute(int $courseid, int $count = 3, string $topic = '__guided__', int $cmid = 0, string $difficulty = 'medium'): array {
         global $DB, $USER;
@@ -88,6 +95,24 @@ class generate_quiz extends external_api {
             $difficulty = 'medium';
         }
         $userid   = (int) $USER->id;
+
+        // v7.2.5: report the integrity lock as itself. base_provider refuses to
+        // hand out a client while the learner has a live quiz attempt, but that
+        // refusal used to arrive here as an anonymous throwable and the client
+        // rendered its generic "please try again" message for it -- inviting a
+        // retry that cannot succeed and never saying why. Checking up front also
+        // skips the grade/topic/context work the refusal would have thrown away.
+        // base_provider remains the enforcing guard; this only classifies.
+        //
+        // The courseid is not optional. Omitting it takes the site-wide branch,
+        // which would leave this one button still refusing because of an attempt
+        // in an unrelated course -- the exact P1 v7.2.5 exists to fix -- while
+        // chat in the same drawer answered normally.
+        $lockedattempt = quiz_lock::active_attempt($userid, $courseid);
+        if ($lockedattempt !== null) {
+            quiz_lock::record_refusal($userid, $courseid, $lockedattempt, 'quiz');
+            return self::quiz_locked_result();
+        }
 
         $course = $DB->get_record('course', ['id' => $courseid], 'id,fullname', MUST_EXIST);
         $coursetopics = context_builder::get_course_topics_text($courseid);
@@ -165,7 +190,7 @@ class generate_quiz extends external_api {
         } else if ($topic !== '__adaptive__') {
             if (empty($topic) && $cmid > 0) {
                 // "Current page" mode: generate from the specific module's content.
-                $pagecontent = context_builder::get_module_content($cmid);
+                $pagecontent = context_builder::get_module_content($cmid, $courseid);
                 if (!empty($pagecontent)) {
                     $systemprompt =
                         "You are an expert educational quiz generator for the course \"{$course->fullname}\".\n\n" .
@@ -198,15 +223,48 @@ class generate_quiz extends external_api {
 
         $quizschema = self::get_quiz_json_schema($count, $objectivesblock !== '');
         try {
-            $provider = base_provider::create_from_config($courseid);
+            $provider = self::resolve_quiz_provider($courseid);
             $response = $provider->chat_completion(
                 $systemprompt,
                 [['role' => 'user', 'content' => 'Generate the quiz now.']],
                 ['response_schema' => $quizschema]
             );
         } catch (\Throwable $e) {
-            return ['success' => false, 'error' => $e->getMessage(), 'topic' => '', 'questions' => []];
+            // F85: a throwable can arrive AFTER a billed 200 (unusable
+            // content). get_last_token_usage() is null when nothing was billed
+            // and record_quiz_usage tolerates null, so this is safe everywhere;
+            // isset() guards the case where resolve_quiz_provider itself threw.
+            if (isset($provider)) {
+                self::record_quiz_usage($provider, $courseid, $count, $topic, $cmid);
+            }
+            // The learner can start an attempt between the check above and this
+            // call, in which case the throwable IS the lock; re-check rather
+            // than string-matching a translated message.
+            //
+            // Same scope as the guard that would have thrown, or this misreads
+            // a genuine provider timeout as the lock: unscoped, an attempt in
+            // another course makes this true even though base_provider allowed
+            // the call, and the learner is told to submit a quiz they are not
+            // sitting while the real, retryable error is discarded.
+            $racedattempt = quiz_lock::active_attempt($userid, $courseid);
+            if ($racedattempt !== null) {
+                quiz_lock::record_refusal($userid, $courseid, $racedattempt, 'quiz');
+                return self::quiz_locked_result();
+            }
+            return [
+                'success' => false,
+                'errorcode' => '',
+                'error' => $e->getMessage(),
+                'topic' => '',
+                'questions' => [],
+            ];
         }
+
+        // F85 (v7.3.3): record NOW -- the provider call above is already
+        // billed. Recording only on the success return dropped the spend of
+        // every turn that failed JSON parsing or question validation below:
+        // billed, uncounted, invisible to the caps.
+        self::record_quiz_usage($provider, $courseid, $count, $topic, $cmid);
 
         // Try structured output first (provider returned raw JSON).
         $decoded = json_decode($response, true);
@@ -221,7 +279,13 @@ class generate_quiz extends external_api {
             $decoded = json_decode($response, true);
         }
         if (!$decoded || !isset($decoded['questions']) || !is_array($decoded['questions'])) {
-            return ['success' => false, 'error' => 'Could not parse quiz JSON.', 'topic' => '', 'questions' => []];
+            return [
+                'success' => false,
+                'errorcode' => '',
+                'error' => get_string('quiz:error_parse', 'local_ai_course_assistant'),
+                'topic' => '',
+                'questions' => [],
+            ];
         }
 
         // Normalise and validate questions.
@@ -251,15 +315,120 @@ class generate_quiz extends external_api {
         }
 
         if (empty($questions)) {
-            return ['success' => false, 'error' => 'No valid questions in AI response.', 'topic' => '', 'questions' => []];
+            return [
+                'success' => false,
+                'errorcode' => '',
+                'error' => get_string('quiz:error_noquestions', 'local_ai_course_assistant'),
+                'topic' => '',
+                'questions' => [],
+            ];
         }
+
+        // v7.0.6: record the call. Until now generate_quiz made a real, billed
+        // provider call and persisted nothing, so quiz spend was invisible to
+        // spend_guard (which totals prompt_tokens/completion_tokens from the
+        // msgs table) and to token analytics, and every cost figure we have
+        // published understates SOLA by whatever quizzes cost. The row is
+        // written with role='system' so conversation_manager::get_messages --
+        // which filters to role IN ('user','assistant') -- keeps it out of the
+        // learner's visible history and out of the LLM context. The message
+        // body is a short marker rather than the quiz JSON, which would bloat
+        // the table for no analytic gain.
+        // Writing the row is necessary but was NOT sufficient: rows are gated by
+        // analytics::spend_rows_predicate() before capability_sql('chat') is
+        // ANDed on, and that predicate matched only role='assistant' plus the
+        // embedding/rerank types. v7.0.6 adds 'quiz' to it; without that the row
+        // is stored and priced at zero by every consumer.
+        // F85 (v7.3.3): usage is recorded immediately after the billed call
+        // (see above); nothing to record here.
 
         return [
             'success'   => true,
+            'errorcode' => '',
             'error'     => '',
             'topic'     => (string) ($decoded['topic'] ?? $topic),
             'questions' => $questions,
         ];
+    }
+
+    /**
+     * The result payload for a request refused by the academic-integrity lock.
+     *
+     * Carries the same wording the chat drawer shows for the lock, so the two
+     * surfaces cannot drift apart, and an errorcode the client uses to tell a
+     * non-retryable refusal from a genuine generation failure.
+     *
+     * @return array Result array with success=false and errorcode='quizlocked'.
+     */
+    private static function quiz_locked_result(): array {
+        return [
+            'success' => false,
+            'errorcode' => 'quizlocked',
+            'error' => branding::str('quizlock:blocked'),
+            'topic' => '',
+            'questions' => [],
+        ];
+    }
+
+    /**
+     * Persist a telemetry row for one quiz-generation call.
+     *
+     * Never throws: a failure to record must not fail the learner's quiz.
+     *
+     * @param mixed  $provider Provider instance the call was made through.
+     * @param int    $courseid Course the quiz was generated for.
+     * @param int    $count    Number of questions requested.
+     * @param string $topic    Resolved topic.
+     * @param int    $cmid     Course module the learner was on, 0 if none.
+     * @return void
+     */
+    private static function record_quiz_usage($provider, int $courseid, int $count, string $topic, int $cmid): void {
+        global $USER;
+
+        try {
+            $usage = method_exists($provider, 'get_last_token_usage')
+                ? $provider->get_last_token_usage()
+                : null;
+
+            // The usage array carries no provider id, so resolve it the same way
+            // resolve_quiz_provider() picked the client: the dedicated quiz tier
+            // when both its settings are set, otherwise the chat config. Reading
+            // the chat provider unconditionally would misattribute every row on
+            // any site that runs a separate quiz model -- which is the normal
+            // configuration, not an edge case.
+            $quizproviderid = trim((string) get_config('local_ai_course_assistant', 'quiz_provider'));
+            $quizmodel = trim((string) get_config('local_ai_course_assistant', 'quiz_model'));
+            if ($quizproviderid !== '' && $quizmodel !== '') {
+                $providername = $quizproviderid;
+            } else {
+                $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+                $providername = (string) ($effective['provider']
+                    ?? get_config('local_ai_course_assistant', 'provider'));
+            }
+
+            $marker = '[Quiz] ' . $count . ' question(s)';
+            if ($topic !== '') {
+                $marker .= ' on ' . $topic;
+            }
+
+            \local_ai_course_assistant\conversation_manager::record_quiz_usage(
+                (int) $USER->id,
+                $courseid,
+                $marker,
+                $providername,
+                isset($usage['model']) ? (string) $usage['model'] : null,
+                isset($usage['prompt_tokens']) ? (int) $usage['prompt_tokens'] : null,
+                isset($usage['completion_tokens']) ? (int) $usage['completion_tokens'] : null,
+                // Anthropic reports cache_read_tokens, OpenAI reports
+                // cached_tokens. sse.php coalesces both; so must this, or the
+                // counter is silently null for every Claude-served quiz.
+                isset($usage['cached_tokens']) ? (int) $usage['cached_tokens']
+                    : (isset($usage['cache_read_tokens']) ? (int) $usage['cache_read_tokens'] : null),
+                $cmid > 0 ? $cmid : null
+            );
+        } catch (\Throwable $e) {
+            debugging('generate_quiz: could not record quiz usage: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
     }
 
     /**
@@ -270,6 +439,11 @@ class generate_quiz extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success'   => new external_value(PARAM_BOOL, 'Whether the quiz was generated successfully'),
+            'errorcode' => new external_value(
+                PARAM_ALPHANUMEXT,
+                'Machine-readable failure reason. "quizlocked" means the request was refused by the '
+                    . 'academic-integrity lock and retrying cannot help; empty for a retryable failure.'
+            ),
             'error'     => new external_value(PARAM_TEXT, 'Error message if not successful'),
             'topic'     => new external_value(PARAM_TEXT, 'Quiz topic'),
             'questions' => new external_multiple_structure(
@@ -454,10 +628,43 @@ INSTRUCTIONS;
             if (empty($records)) {
                 return 'No recent questions.';
             }
-            $lines = array_map(function($r) { return '- ' . shorten_text($r->message, 120); }, array_values($records));
+            $lines = array_map(function ($r) {
+                return '- ' . shorten_text($r->message, 120);
+            }, array_values($records));
             return implode("\n", $lines);
         } catch (\Throwable $e) {
             return 'Chat history unavailable.';
         }
+    }
+
+    /**
+     * Resolve which provider runs the quiz-coach turn.
+     *
+     * Mirrors conversation_classifier::resolve_classifier_provider(): if both
+     * quiz_provider and quiz_model are set, route through
+     * comparison_providers so the API key, base URL and temperature come from
+     * the row admins already manage. Otherwise fall back to the course's
+     * primary chat provider — preserving the previous behaviour on every site
+     * that never touches these settings.
+     *
+     * Before this, quiz generation always ran on the chat tier, so the vendor
+     * recommendation of a cheaper dedicated quiz model was unimplementable
+     * without changing the chat model too.
+     *
+     * @param int $courseid
+     * @return \local_ai_course_assistant\provider\provider_interface
+     */
+    private static function resolve_quiz_provider(int $courseid) {
+        $providerid = trim((string) get_config('local_ai_course_assistant', 'quiz_provider'));
+        $model = trim((string) get_config('local_ai_course_assistant', 'quiz_model'));
+        if ($providerid !== '' && $model !== '') {
+            try {
+                return base_provider::create_for_comparison($providerid, $model, $courseid);
+            } catch (\Throwable $e) {
+                debugging('quiz provider unavailable, falling back to chat tier: '
+                    . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+        }
+        return base_provider::create_from_config($courseid);
     }
 }

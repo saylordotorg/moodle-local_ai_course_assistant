@@ -1,5 +1,13 @@
 # SOLA AI Vendor Optimization by Scale (10K / 50K / 100K MAU)
 
+> **CORRECTION (2026-08-01) — the rerank cost and per-user volume figures below are superseded.**
+>
+> Two errors compound in the original model. Measured production usage is **5.07 chat turns per SOLA user per month**, not the ~70 implied by the capacity table here (**13.7x overstated**). And the measured rerank cost is **$0.00187/query at pool 50** against real ~700-token Saylor chunks, not the snippet-sized assumption behind the $63/mo figure (**52x understated**).
+>
+> They partly cancel, so the net error in absolute cost is **3.8x understated**: at 25,000 SOLA users, reranking at pool 50 is **~$237/month**, not $63. The bigger correction is proportional — reranking is **~101% of chat spend at pool 50** and **~41% at pool 20**, not the "~6% of chat spend" claimed here. Enabling it at pool 50 would roughly double the AI bill.
+>
+> Canonical figures: `sola-retrieval-cost-projections-2026-07-31.md`. Measurement: `sola-model-benchmark-2026-07-30.md`.
+
 **Author:** Tom Caswell. **Date:** 2026-06-09. **Status:** decision-grade. Sits alongside `.drafts/sola-vendor-recommendations-2026-06-09.md` (the "which vendors" doc); this doc answers the orthogonal question: **at each scale point, which optimizations are worth doing, which are over-engineering, and what trigger metric moves you to the next tier?**
 
 All cost projections assume 25% of Saylor MAU actively uses SOLA per month (the established baseline). Text-only universal rollout; audio / voice / avatar stay deferred per Appendix B of the companion doc. Reflects the v5.11.0 + v5.12.0 work that just shipped (mastery classifier off chat tier, Voyage embeddings + opt-in rerank, OpenAI auto-prefix cache visibility, Claude Opus 4.7+ temperature fix, premium escalation router).
@@ -122,7 +130,7 @@ The thing to monitor: max chunks per course. Currently ~1,250 median; if Saylor 
 | Mastery classifier (gpt-4o-mini) | ~$105 |
 | Analytics + digests + Radar (gpt-4o-mini) | ~$30 |
 | Embeddings (Voyage-3.5) | <$1 |
-| Re-ranker (Voyage rerank-2.5) | ~$63 |
+| Re-ranker (Voyage rerank-2.5) | ~$63 <br>**[corrected: ~$237 at pool 50, ~$95 at pool 20]** |
 | Judge harness | ~$4 |
 | **Baseline subtotal** | **~$1,370** |
 | Premium tier (Opus 4.8, 5% of turns) | ~$700 |

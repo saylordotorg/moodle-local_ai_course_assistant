@@ -32,7 +32,6 @@ use local_ai_course_assistant\provider\stub_provider;
  * @covers     \local_ai_course_assistant\provider_benchmark
  */
 final class provider_benchmark_test extends \advanced_testcase {
-
     private function setup_stub_primary(): void {
         stub_provider::reset();
         set_config('provider', 'stub', 'local_ai_course_assistant');
@@ -56,9 +55,11 @@ final class provider_benchmark_test extends \advanced_testcase {
         // Comparison config: one extra (fake) provider line. The benchmark
         // never actually instantiates this in the test (we filter to stub
         // before run_*), but list_chat_providers must surface it.
-        set_config('comparison_providers',
+        set_config(
+            'comparison_providers',
             "claude|sk-claude-test|claude-3-5-sonnet|0.7\nopenai|sk-openai-test|gpt-4o-mini|0.7",
-            'local_ai_course_assistant');
+            'local_ai_course_assistant'
+        );
         $providers = provider_benchmark::list_chat_providers();
         $ids = array_column($providers, 'id');
         $this->assertContains('stub', $ids);
@@ -166,8 +167,11 @@ final class provider_benchmark_test extends \advanced_testcase {
         ];
         $rec = provider_benchmark::recommend($rows, 2);
         $this->assertNotNull($rec);
-        $this->assertEquals('a', $rec['provider'],
-            'Provider B was cheaper but did not complete every prompt — must be excluded.');
+        $this->assertEquals(
+            'a',
+            $rec['provider'],
+            'Provider B was cheaper but did not complete every prompt — must be excluded.'
+        );
     }
 
     public function test_recommend_returns_null_when_zero_providers_complete(): void {
@@ -204,7 +208,8 @@ final class provider_benchmark_test extends \advanced_testcase {
         $csv = provider_benchmark::export_csv($payload);
         $this->assertStringContainsString(
             'capability,provider,model,prompt_label,ok,prompt_tokens,completion_tokens,cost_usd,latency_ms',
-            $csv);
+            $csv
+        );
         // Should include at least one chat data row.
         $this->assertStringContainsString('chat,stub,', $csv);
         // Recommendation summary block.

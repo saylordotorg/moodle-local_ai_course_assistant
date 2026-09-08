@@ -21,9 +21,20 @@
 cdn/dist/
 cdn/node_modules/
 
+# Puppeteer for the a11y / click-regression harnesses (32M). Installed on demand
+# with `npm install` in tests/a11y; the lockfile is treated as a build artifact
+# here, matching how cdn/package-lock.json is handled in create_fixed_zip.sh.
+tests/a11y/node_modules/
+tests/a11y/package-lock.json
+
 # Local dev overrides
 *.local.php
 config.local.php
+
+# Python bytecode. deploy_dev.py is imported by local tooling, which leaves
+# __pycache__ in the repo root on every run.
+__pycache__/
+*.py[cod]
 
 # Secrets — never commit (v5.4.5). GitHub's built-in secret scanning catches
 # live tokens in pushes, but excluding these patterns from the index in the
@@ -38,3 +49,4 @@ config.local.php
 secrets.json
 credentials.json
 service-account*.json
+.wiki/

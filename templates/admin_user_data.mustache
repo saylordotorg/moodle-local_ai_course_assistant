@@ -1,0 +1,105 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/admin_user_data
+
+    Admin page for a GDPR access or erasure request: look up a learner by Moodle
+    user id, review the row counts this plugin holds for them, then export or
+    purge. All styling lives in the plugin's styles.css under the
+    .sola-userdata namespace.
+
+    Context variables required for this template:
+    * intro - Explanation of what the page does.
+    * formurl - Action URL for the lookup form (GET).
+    * searchlabel - Label and placeholder for the user id field.
+    * targetuserid - Currently looked-up user id (0 when none).
+    * lookuplabel - Label for the submit button.
+    * notfound - Whether a user id was supplied but matched no user.
+    * notfoundmsg - Message shown when the lookup found nobody.
+    * hasuser - Whether a matching user was found (renders the result block).
+    * fullname - The found user's full name.
+    * iddisplay - Localized "id 42" line under the name.
+    * coltable - Header for the table-name column.
+    * colrows - Header for the row-count column.
+    * totallabel - Label for the totals row.
+    * totalrows - Total row count across every table.
+    * rows - List of {label, count} per plugin table.
+    * downloadurl - Sesskey-signed JSON export URL.
+    * downloadlabel - Label for the export button.
+    * purgeurl - Sesskey-signed purge URL (confirmed on the next screen).
+    * purgelabel - Label for the purge button.
+
+    Example context (json):
+    {
+        "intro": "Operational path for a GDPR Article 15 or Article 17 request.",
+        "formurl": "https://example.org/local/ai_course_assistant/admin_user_data.php",
+        "searchlabel": "Moodle user id",
+        "targetuserid": 42,
+        "lookuplabel": "Look up",
+        "notfound": false,
+        "notfoundmsg": "No user found with that id.",
+        "hasuser": true,
+        "fullname": "Demo Student",
+        "iddisplay": "id 42",
+        "coltable": "Table",
+        "colrows": "Rows for this user",
+        "totallabel": "Total",
+        "totalrows": 12,
+        "rows": [{"label": "convs", "count": 3}, {"label": "messages", "count": 9}],
+        "downloadurl": "https://example.org/local/ai_course_assistant/admin_user_data.php?action=download",
+        "downloadlabel": "Download all learner data as JSON",
+        "purgeurl": "https://example.org/local/ai_course_assistant/admin_user_data.php?action=purge",
+        "purgelabel": "Purge all learner data for this user"
+    }
+}}
+<div class="sola-userdata">
+    <p class="sola-userdata__intro">{{intro}}</p>
+
+    <form method="get" action="{{formurl}}" class="sola-userdata__form">
+        <label class="sola-userdata__label" for="sola-userdata-userid">{{searchlabel}}</label>
+        <div class="sola-userdata__controls">
+            <input type="number" id="sola-userdata-userid" name="targetuserid" min="1"
+                   class="sola-userdata__input" value="{{targetuserid}}" placeholder="{{searchlabel}}">
+            <button type="submit" class="btn btn-primary">{{lookuplabel}}</button>
+        </div>
+    </form>
+
+    {{#notfound}}
+        <div class="alert alert-danger" role="alert">{{notfoundmsg}}</div>
+    {{/notfound}}
+
+    {{#hasuser}}
+        <h3 class="sola-userdata__name">{{fullname}} <small class="sola-userdata__id">({{iddisplay}})</small></h3>
+
+        <table class="generaltable sola-userdata__table">
+            <thead>
+                <tr><th>{{coltable}}</th><th>{{colrows}}</th></tr>
+            </thead>
+            <tbody>
+                {{#rows}}
+                    <tr><td><code>{{label}}</code></td><td>{{count}}</td></tr>
+                {{/rows}}
+                <tr><th>{{totallabel}}</th><th>{{totalrows}}</th></tr>
+            </tbody>
+        </table>
+
+        <div class="sola-userdata__actions">
+            <a class="btn btn-secondary" href="{{downloadurl}}">{{downloadlabel}}</a>
+            <a class="btn btn-danger" href="{{purgeurl}}">{{purgelabel}}</a>
+        </div>
+    {{/hasuser}}
+</div>

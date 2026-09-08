@@ -33,7 +33,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class prompt_debug {
-
     /** Rotation threshold in bytes. */
     const MAX_LOG_BYTES = 1048576;
 
@@ -223,10 +222,18 @@ class prompt_debug {
         // Both badges require non-zero chars AND no DROPPED flag in the
         // breakdown line; TRUNCATED surfaces as its own state so the diagnosis
         // is unambiguous from the card header alone.
-        $pagestate = self::section_state($sectionstext, 'current_page_content',
-            (string) $systemprompt, '## Current Page Content');
-        $topicstate = self::section_state($sectionstext, 'topic_focus',
-            (string) $systemprompt, '## Current focus');
+        $pagestate = self::section_state(
+            $sectionstext,
+            'current_page_content',
+            (string) $systemprompt,
+            '## Current Page Content'
+        );
+        $topicstate = self::section_state(
+            $sectionstext,
+            'topic_focus',
+            (string) $systemprompt,
+            '## Current focus'
+        );
 
         return [
             'timestamp'         => $timestamp,
@@ -267,8 +274,12 @@ class prompt_debug {
      * @param string $heading      Heading to look for in the body.
      * @return string 'kept' | 'truncated' | 'dropped' | 'absent'
      */
-    public static function section_state(string $sectionstext, string $sectionname,
-            string $promptbody, string $heading): string {
+    public static function section_state(
+        string $sectionstext,
+        string $sectionname,
+        string $promptbody,
+        string $heading
+    ): string {
         $pattern = '/^\s*(\d+)\s+' . preg_quote($sectionname, '/') . '\b(.*)$/m';
         if (preg_match($pattern, $sectionstext, $m)) {
             $chars = (int) $m[1];

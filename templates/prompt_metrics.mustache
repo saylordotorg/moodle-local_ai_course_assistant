@@ -1,4 +1,29 @@
 {{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/prompt_metrics
+
+    Prompt size and token metrics summary table.
+
+    Example context (json):
+    {
+    }
+}}
+{{!
     @template local_ai_course_assistant/prompt_metrics
 
     Per-section prompt metrics + budget recommendation admin page.
@@ -20,9 +45,7 @@
         "rec_budget": "11000",
         "rec_rationale": "Trim to save tokens",
         "rec_diff": true,
-        "apply_url": "https://example.com/local/ai_course_assistant/prompt_metrics.php?apply=1",
-        "auto_tune_on": false,
-        "settings_url": "https://example.com/admin/settings.php?section=local_ai_course_assistant"
+        "apply_url": "https://example.com/local/ai_course_assistant/prompt_metrics.php?apply=1"
     }
 }}
 <div class="container-fluid sola-prompt-metrics" role="region" aria-labelledby="sola-pm-h1">
@@ -41,15 +64,29 @@
         <dt class="col-sm-4">{{#str}}prompt_metrics:samples, local_ai_course_assistant{{/str}}</dt>
         <dd class="col-sm-8">{{samples}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:avg_total, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{avg_total}} chars</dd>
+        <dd class="col-sm-8">{{avg_total}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:max_total, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{max_total}} chars</dd>
+        <dd class="col-sm-8">{{max_total}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:avg_budget, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{avg_budget}} chars</dd>
+        <dd class="col-sm-8">{{avg_budget}}</dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:pct_truncated, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{pct_truncated}}%</dd>
+        <dd class="col-sm-8">
+            {{pct_truncated}}%
+            {{#has_truncated_names}}
+            <span class="text-muted">
+                &mdash; {{#truncated_sections}}<code>{{name}}</code> &times;{{count}} {{/truncated_sections}}
+            </span>
+            {{/has_truncated_names}}
+        </dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:pct_dropped, local_ai_course_assistant{{/str}}</dt>
-        <dd class="col-sm-8">{{pct_dropped}}%</dd>
+        <dd class="col-sm-8">
+            {{pct_dropped}}%
+            {{#has_dropped_names}}
+            <span class="text-muted">
+                &mdash; {{#dropped_sections}}<code>{{name}}</code> &times;{{count}} {{/dropped_sections}}
+            </span>
+            {{/has_dropped_names}}
+        </dd>
         <dt class="col-sm-4">{{#str}}prompt_metrics:last_seen, local_ai_course_assistant{{/str}}</dt>
         <dd class="col-sm-8">{{last_seen}}</dd>
     </dl>
@@ -80,8 +117,8 @@
     {{/enough_for_rec}}
     {{#enough_for_rec}}
         {{#has_rec}}
-        <p><strong>{{#str}}prompt_metrics:current_budget, local_ai_course_assistant{{/str}}:</strong> {{current_budget}} chars</p>
-        <p><strong>{{#str}}prompt_metrics:recommended, local_ai_course_assistant{{/str}}:</strong> {{rec_budget}} chars</p>
+        <p><strong>{{#str}}prompt_metrics:current_budget, local_ai_course_assistant{{/str}}:</strong> {{current_budget}}</p>
+        <p><strong>{{#str}}prompt_metrics:recommended, local_ai_course_assistant{{/str}}:</strong> {{rec_budget}}</p>
         <p>{{rec_rationale}}</p>
         {{#rec_diff}}
         <p>
@@ -98,13 +135,5 @@
         {{/has_rec}}
     {{/enough_for_rec}}
 
-    <h3>{{#str}}prompt_metrics:auto_tune_heading, local_ai_course_assistant{{/str}}</h3>
-    {{#auto_tune_on}}
-    <p>{{#str}}prompt_metrics:auto_tune_on, local_ai_course_assistant{{/str}}</p>
-    {{/auto_tune_on}}
-    {{^auto_tune_on}}
-    <p>{{#str}}prompt_metrics:auto_tune_off, local_ai_course_assistant{{/str}}</p>
-    {{/auto_tune_on}}
-    <p><a href="{{settings_url}}">{{#str}}prompt_metrics:settings_link, local_ai_course_assistant{{/str}}</a></p>
     {{/has_data}}
 </div>

@@ -482,7 +482,31 @@ define([
         const cites = currentCitations || [];
         const order = {};
         let nextNum = 0;
-        return html.replace(/\[\[c:(\d+)\]\]/g, function(_m, nStr) {
+        // Models fairly often compress two citations into one bracket group,
+        // "[[c:2], [c:4]]", instead of writing "[[c:2]] [[c:4]]". The per-marker
+        // replace below only knows the single form, so the compressed form was
+        // reaching learners as raw markup (seen live on staging, 7.2.7, in both
+        // English and Spanish replies). Normalise it to consecutive single
+        // markers first; the regex is anchored on "[[c:" so ordinary prose with
+        // brackets is untouched.
+        html = html.replace(/\[\[c:(\d+)((?:\]\s*,\s*\[c:\d+)+)\]\]/g, function(_m, first, rest) {
+            const nums = [first].concat(
+                (rest.match(/\d+/g) || [])
+            );
+            return nums.map(function(n) {
+                return '[[c:' + n + ']]';
+            }).join('');
+        });
+        // The leading whitespace is captured so it can be dropped along with an
+        // unresolvable marker. Returning just '' left the space the model wrote
+        // before the citation, producing "...the basic elements of art ." -- and
+        // that dangling space was the only visible sign that the model had cited
+        // a passage it was never given.
+        //
+        // Horizontal whitespace only, deliberately. This runs over rendered HTML,
+        // so a marker the model emitted inside a fenced code block is matched too;
+        // swallowing a newline there would join two lines of someone's code.
+        return html.replace(/([^\S\r\n]*)\[\[c:(\d+)\]\]/g, function(_m, lead, nStr) {
             const n = parseInt(nStr, 10);
             if (!(n >= 0) || n >= cites.length || !cites[n] || !cites[n].url) {
                 return '';
@@ -496,7 +520,7 @@ define([
             const titleAttr = cite.title
                 ? ' title="' + escapeAttr(cite.title) + '"'
                 : '';
-            return '<sup class="aica-citation">'
+            return lead + '<sup class="aica-citation">'
                 + '<a href="' + escapeAttr(cite.url) + '"' + titleAttr
                 + ' target="_blank" rel="noopener noreferrer">'
                 + num + '</a></sup>';
@@ -562,119 +586,6 @@ define([
                 });
             }
         } catch (e) { /* never block the chat surface on a math typeset error */ }
-    };
-
-    /**
-     * Build the attachment node shown inside a user bubble.
-     *
-     * For images: an inline <img> thumbnail that links to the full file.
-     * For PDFs (and other non-image types): a compact filename chip.
-     *
-     * @param {{filename:string, mime:string, url:string}} att
-     * @returns {HTMLElement}
-     */
-    const buildAttachmentNode = function(att) {
-        const wrap = document.createElement('a');
-        wrap.className = 'aica-attachment';
-        wrap.href = att.url;
-        wrap.target = '_blank';
-        wrap.rel = 'noopener noreferrer';
-        wrap.title = att.filename || '';
-
-        const isImage = typeof att.mime === 'string' && att.mime.indexOf('image/') === 0;
-        if (isImage) {
-            const img = document.createElement('img');
-            img.className = 'aica-attachment__thumb';
-            img.src = att.url;
-            img.alt = att.filename || '';
-            img.loading = 'lazy';
-            wrap.appendChild(img);
-        } else {
-            wrap.classList.add('aica-attachment--file');
-            const icon = document.createElement('span');
-            icon.className = 'aica-attachment__icon';
-            icon.innerHTML =
-                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"' +
-                ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"' +
-                ' stroke-linejoin="round" aria-hidden="true">' +
-                '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
-                '<polyline points="14 2 14 8 20 8"/>' +
-                '</svg>';
-            const label = document.createElement('span');
-            label.className = 'aica-attachment__name';
-            label.textContent = att.filename || 'attachment';
-            wrap.appendChild(icon);
-            wrap.appendChild(label);
-        }
-        return wrap;
-    };
-
-    /**
-     * Show the composer preview chip for an uploaded-but-not-yet-sent
-     * attachment. The "remove" button's click handler is wired by the
-     * caller to clear the draft state.
-     *
-     * @param {{filename:string, mime:string, url:string, size?:number}} meta
-     * @param {Function} onRemove
-     */
-    const showAttachmentPreview = function(meta, onRemove) {
-        const els = getElements();
-        const slot = els.attachPreview;
-        if (!slot) {
-            return;
-        }
-        slot.innerHTML = '';
-        slot.hidden = false;
-
-        const chip = document.createElement('div');
-        chip.className = 'aica-attachment-preview__chip';
-
-        const isImage = meta && typeof meta.mime === 'string' && meta.mime.indexOf('image/') === 0;
-        if (isImage && meta.url) {
-            const img = document.createElement('img');
-            img.className = 'aica-attachment-preview__thumb';
-            img.src = meta.url;
-            img.alt = meta.filename || '';
-            chip.appendChild(img);
-        } else {
-            const icon = document.createElement('span');
-            icon.className = 'aica-attachment-preview__icon';
-            icon.textContent = 'PDF';
-            chip.appendChild(icon);
-        }
-
-        const name = document.createElement('span');
-        name.className = 'aica-attachment-preview__name';
-        name.textContent = (meta && meta.filename) || 'attachment';
-        chip.appendChild(name);
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'aica-attachment-preview__remove';
-        removeBtn.setAttribute('aria-label', 'Remove attachment');
-        removeBtn.innerHTML = '&times;';
-        removeBtn.addEventListener('click', function() {
-            hideAttachmentPreview();
-            if (typeof onRemove === 'function') {
-                onRemove();
-            }
-        });
-        chip.appendChild(removeBtn);
-
-        slot.appendChild(chip);
-    };
-
-    /**
-     * Hide and reset the attachment preview chip.
-     */
-    const hideAttachmentPreview = function() {
-        const els = getElements();
-        const slot = els.attachPreview;
-        if (!slot) {
-            return;
-        }
-        slot.innerHTML = '';
-        slot.hidden = true;
     };
 
     /**
@@ -1139,8 +1050,44 @@ define([
             var alreadyOpened = false;
             try { alreadyOpened = localStorage.getItem(firstVisitKey) === '1'; } catch (e) { /**/ }
             if (courseId && !alreadyOpened) {
-                try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
-                requestAnimationFrame(function() { toggleDrawer(); });
+                // The first-visit key is claimed at the moment we actually
+                // open, not here. Claiming it up front would burn the single
+                // auto-open on a visit where the drawer never opened because
+                // we deferred to a user tour the learner then abandoned.
+                var openOnce = function() {
+                    requestAnimationFrame(function() {
+                        // Claim inside the frame, not before scheduling it.
+                        // requestAnimationFrame is starved while the tab is
+                        // hidden, so a course opened in a background tab
+                        // (cmd-click, restored session) would otherwise burn
+                        // the single auto-open without ever showing the
+                        // drawer — and never retry, because the key is set.
+                        try { localStorage.setItem(firstVisitKey, '1'); } catch (e) { /**/ }
+                        toggleDrawer();
+                    });
+                };
+
+                // v6.9.8: a Moodle user tour and the auto-opened drawer both
+                // claim the screen on a first visit, and the drawer wins —
+                // it renders over the tour's popover, so the learner gets a
+                // half-covered tour behind a chat window they did not ask for.
+                // PHP has already resolved whether a tour will really run for
+                // this user on this page (tool_usertours' own predicate), so
+                // wait for it to finish instead of racing it.
+                if (root.dataset.tourpending === '1') {
+                    var openAfterTour = function() {
+                        document.removeEventListener('tool_usertours/tourEnded', openAfterTour);
+                        openOnce();
+                    };
+                    document.addEventListener('tool_usertours/tourEnded', openAfterTour);
+                    // No timeout fallback on purpose. If the tour never ends
+                    // the learner is still inside it, and opening on top is
+                    // precisely the bug being guarded against. Because the
+                    // first-visit key is untouched, the next page load in this
+                    // course auto-opens normally.
+                } else {
+                    openOnce();
+                }
             }
         }
 
@@ -1850,14 +1797,26 @@ define([
             textEl.textContent = 'Switch to ' + langName + '?';
         }
 
-        const accept = function() {
+        // v7.2.7: `inert` moves with aria-hidden, in both directions.
+        //
+        // The dormant banner was hidden from assistive technology with
+        // aria-hidden and collapsed to 1px with max-height, but its two buttons
+        // kept tabIndex 0. A keyboard user tabbing through the widget landed on
+        // an invisible, unannounced control that would switch the assistant's
+        // language if activated -- the WCAG 4.1.2 pattern of aria-hidden with
+        // focusable descendants. inert removes it from pointer, focus and the
+        // accessibility tree together, which is the property actually wanted.
+        const conceal = function() {
             langBanner.setAttribute('aria-hidden', 'true');
+            langBanner.setAttribute('inert', '');
             langBanner.classList.remove('local-ai-course-assistant__lang-banner--visible');
+        };
+        const accept = function() {
+            conceal();
             onAccept();
         };
         const dismiss = function() {
-            langBanner.setAttribute('aria-hidden', 'true');
-            langBanner.classList.remove('local-ai-course-assistant__lang-banner--visible');
+            conceal();
             onDismiss();
         };
 
@@ -1870,6 +1829,7 @@ define([
         }
 
         langBanner.setAttribute('aria-hidden', 'false');
+        langBanner.removeAttribute('inert');
         langBanner.classList.add('local-ai-course-assistant__lang-banner--visible');
     };
 
@@ -2012,23 +1972,15 @@ define([
      * @param {string}        text        The message text (markdown for assistant, plain for user)
      * @param {Function|null} onSpeak     Optional callback when TTS button is clicked; receives (text, el)
      * @param {number|null}   ts          Optional Unix timestamp (ms) — shown as tooltip on message
-     * @param {Object|null}   attachment  Optional user-message attachment {filename, mime, url}
      * @returns {HTMLElement} The message element
      */
-    const addMessage = function(role, text, onSpeak, ts, attachment) {
+    const addMessage = function(role, text, onSpeak, ts) {
         const el = document.createElement('div');
         el.className = 'local-ai-course-assistant__message local-ai-course-assistant__message--' + role;
         el.setAttribute('data-role', role);
         // Store timestamp for tooltip display.
         const msgTs = ts || Date.now();
         el.dataset.ts = msgTs;
-
-        // Attachment rendering for user messages: thumbnail for images,
-        // filename pill for PDFs. Appended before the text content so the
-        // reading order is "student shared this, and asked this".
-        if (role === 'user' && attachment && attachment.url) {
-            el.appendChild(buildAttachmentNode(attachment));
-        }
 
         const content = document.createElement('div');
         content.className = 'local-ai-course-assistant__message-content';
@@ -2409,6 +2361,23 @@ define([
     const setInputEnabled = function(enabled) {
         input.disabled = !enabled;
         updateSendButton();
+
+        // The starter chips are part of the same surface. During a quiz lock the
+        // textarea was disabled while all six chips stayed live directly beneath
+        // a notice saying the assistant was paused -- so the page contradicted
+        // itself, and clicking one reached the server before being refused.
+        // One condition governs the whole input area.
+        if (!root) { return; }
+        root.querySelectorAll('[data-starter]').forEach(function(chip) {
+            chip.disabled = !enabled;
+            chip.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+            chip.classList.toggle('aica-starter--disabled', !enabled);
+            if (!enabled) {
+                chip.setAttribute('tabindex', '-1');
+            } else {
+                chip.removeAttribute('tabindex');
+            }
+        });
     };
 
     // -----------------------------------------------------------------------
@@ -2757,9 +2726,6 @@ define([
             modeButtons: root.querySelectorAll('.local-ai-course-assistant__mode-btn'),
             voiceStartBtn: root.querySelector('.aica-voice-panel__start'),
             historyRefreshBtn: root.querySelector('.aica-history-panel__refresh'),
-            attachBtn: root.querySelector('.aica-attachment-btn'),
-            attachFileInput: root.querySelector('.aica-attachment-file-input'),
-            attachPreview: root.querySelector('.aica-attachment-preview'),
             composerCard: root.querySelector('.local-ai-course-assistant__composer-card'),
             masteryChip: root.querySelector('.aica-mastery-chip'),
             masteryChipLabel: root.querySelector('.aica-mastery-chip__label'),
@@ -2909,7 +2875,7 @@ define([
                 : '') +
             '</ul>' +
             '<div class="local-ai-course-assistant__welcome-disclaimer">' +
-            '<strong>AI notice:</strong> ' + displayName + ' uses AI-generated responses to support learning. It can be wrong, incomplete, or outdated, so students should double-check important information with course materials and their instructor.' +
+            '<strong>AI notice:</strong> ' + escHtml(displayName) + ' uses AI-generated responses to support learning. It can be wrong, incomplete, or outdated, so students should double-check important information with course materials and their instructor.' +
             '</div>' +
             '<button class="local-ai-course-assistant__welcome-cta">Continue \u2192</button>';
 
@@ -2919,7 +2885,9 @@ define([
         if (headerEl && headerEl.nextSibling) {
             drawer.insertBefore(panel, headerEl.nextSibling);
         } else {
-            drawer.appendChild(panel);
+            // In-flow panel: same mount rule as the quiz setup, or it paints
+            // after the footer and the bottom nav.
+            mountPanel(drawer, panel);
         }
 
         // Hide starters, messages, and input while welcome is showing so the
@@ -3024,6 +2992,56 @@ define([
         root.querySelectorAll('.local-ai-course-assistant__mode-btn').forEach(function(btn) {
             btn.disabled = !enabled;
         });
+    };
+
+    /**
+     * Enable or disable the practice-quiz button.
+     *
+     * Separate from setModeButtonsEnabled because the quiz button is not a mode
+     * button, so the quiz-lock path was greying out the textarea and every chip
+     * while leaving live the one control that starts an AI call the server is
+     * about to refuse.
+     *
+     * @param {boolean} enabled
+     */
+    /**
+     * Insert a dynamically-built panel into the drawer's content flow.
+     *
+     * The drawer is a flex column ending in the input area, the footer and the
+     * bottom nav. Panels built at runtime were appended to the drawer root,
+     * which puts them AFTER all three -- so opening Quiz Me pushed "Send
+     * feedback" and the Chat/Notes bar up under the header and started the setup
+     * form two thirds of the way down. Every panel the template ships sits
+     * before the input area; these now go to the same place.
+     *
+     * @param {HTMLElement} drawer
+     * @param {HTMLElement} panel
+     * @returns {void}
+     */
+    const mountPanel = function(drawer, panel) {
+        if (!drawer || !panel) {
+            return;
+        }
+        // Ordered by preference: the first of these that exists marks the start
+        // of the drawer's trailing furniture, and the panel belongs above it.
+        var anchor = drawer.querySelector('.local-ai-course-assistant__input-area')
+            || drawer.querySelector('.local-ai-course-assistant__footer-feedback')
+            || drawer.querySelector('.local-ai-course-assistant__bottom-nav');
+        if (anchor && anchor.parentNode === drawer) {
+            drawer.insertBefore(panel, anchor);
+            return;
+        }
+        drawer.appendChild(panel);
+    };
+
+    const setQuizButtonEnabled = function(enabled) {
+        if (!root) {
+            return;
+        }
+        const quizBtn = root.querySelector('.local-ai-course-assistant__btn-quiz');
+        if (quizBtn) {
+            quizBtn.disabled = !enabled;
+        }
     };
 
     /**
@@ -3197,7 +3215,16 @@ define([
                     text.removeAttribute('aria-label');
                     text.classList.remove('aica-history-panel__message--editing');
                     var newText = text.textContent.trim();
-                    if (newText && newText !== item.text) {
+                    // The DISPLAY is whitespace-collapsed (multi-line notes
+                    // render on one line), so reading textContent back always
+                    // differs from the stored multi-line original. Without the
+                    // second guard, entering edit mode and clicking away --
+                    // typing nothing -- silently overwrote the stored note with
+                    // the collapsed copy, permanently destroying paragraph
+                    // structure in the ONLY copy that exists (localStorage; no
+                    // server side, no undo).
+                    var collapsedOriginal = (item.text || '').replace(/\s+/g, ' ').trim();
+                    if (newText && newText !== item.text && newText !== collapsedOriginal) {
                         // Update the bookmark in storage.
                         var bmarks = getBookmarks();
                         var realIdx = bmarks.length - 1 - itemIdx;
@@ -3667,7 +3694,9 @@ define([
         if (inputArea) {
             drawer.insertBefore(bar, inputArea);
         } else {
-            drawer.appendChild(bar);
+            // In-flow panel: same mount rule as the quiz setup, or it paints
+            // after the footer and the bottom nav.
+            mountPanel(drawer, bar);
         }
         return bar;
     };
@@ -4410,23 +4439,6 @@ define([
             freqRow.appendChild(freqSelect);
             remSection.appendChild(freqRow);
 
-            // Email study notes toggle.
-            if (config.emailRemindersEnabled) {
-                var notesRow = document.createElement('div');
-                notesRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px';
-                var notesToggle = document.createElement('input');
-                notesToggle.type = 'checkbox';
-                notesToggle.id = 'aica-email-notes-toggle';
-                try { notesToggle.checked = localStorage.getItem('aica_email_notes') === '1'; } catch (e) { /**/ }
-                var notesLabel = document.createElement('label');
-                notesLabel.htmlFor = 'aica-email-notes-toggle';
-                notesLabel.textContent = 'Email me study session notes';
-                notesLabel.style.cssText = 'font-size:12px;cursor:pointer;color:#6c757d';
-                notesRow.appendChild(notesToggle);
-                notesRow.appendChild(notesLabel);
-                remSection.appendChild(notesRow);
-            }
-
             // Store references for save handler.
             remSection._freqSelect = freqSelect;
             remSection.dataset.hasReminders = '1';
@@ -4452,14 +4464,20 @@ define([
         // a direct URL with no link from the drawer.
         const dataSection = document.createElement('div');
         dataSection.className = 'aica-settings-panel__section';
+        // Brand-aware, matching the pattern used elsewhere in this panel:
+        // literal "SOLA" here bypassed the white-label token system, so a
+        // rebranded install showed the Saylor product name on its privacy
+        // teaser. (The strings remain English pending the panel-wide i18n
+        // pass -- this panel is built in JS and predates the tagging system.)
+        var brandShort = (root && (root.dataset.shortname || root.dataset.displayname)) || 'SOLA';
         const dataHead = document.createElement('h3');
         dataHead.className = 'aica-settings-panel__section-title';
-        dataHead.textContent = 'My SOLA data';
+        dataHead.textContent = 'My ' + brandShort + ' data';
         dataSection.appendChild(dataHead);
 
         const dataDesc = document.createElement('p');
         dataDesc.className = 'aica-settings-panel__empty-note';
-        dataDesc.textContent = 'Download a copy of everything SOLA has stored about you, '
+        dataDesc.textContent = 'Download a copy of everything ' + brandShort + ' has stored about you, '
             + 'or delete it from this course or across every course. Opens in a new tab.';
         dataSection.appendChild(dataDesc);
 
@@ -4542,12 +4560,6 @@ define([
                     var phone = remSec._phoneInput ? remSec._phoneInput.value.trim() : '';
                     callbacks.onReminderUpdate('whatsapp', remSec._waToggle.checked, phone, '', freq);
                 }
-            }
-            // Save email study notes preference.
-            var notesCheck = content.querySelector('#aica-email-notes-toggle');
-            if (notesCheck) {
-                if (notesCheck.checked) { localStorage.setItem('aica_email_notes', '1'); }
-                else { localStorage.removeItem('aica_email_notes'); }
             }
             panel.remove();
         });
@@ -5924,10 +5936,18 @@ define([
         if (!drawer) {
             return;
         }
+        // Keep the toggle's ARIA state true to the panel. The template shipped
+        // aria-pressed="false" that nothing ever updated; expanded/collapsed is
+        // the actual semantic (the button opens a region).
+        var taBtn = drawer.querySelector('.local-ai-course-assistant__btn-talking-avatar');
+        var setExpanded = function(on) {
+            if (taBtn) { taBtn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+        };
         let panel = drawer.querySelector('.aica-talking-avatar-panel');
         if (panel) {
             endAvatarSession();
             panel.remove();
+            setExpanded(false);
             return;
         }
         panel = document.createElement('div');
@@ -5938,17 +5958,23 @@ define([
             '<button class="aica-talking-avatar-panel__close" type="button" aria-label="Close avatar">&times;</button>' +
             '<div class="aica-talking-avatar-panel__loading">Loading avatar...</div>';
         drawer.appendChild(panel);
+        setExpanded(true);
         const closeBtn = panel.querySelector('.aica-talking-avatar-panel__close');
         closeBtn.addEventListener('click', function() {
             endAvatarSession();
             panel.remove();
+            setExpanded(false);
         });
 
         const sesskey = (root && root.dataset.sesskey) || (M && M.cfg && M.cfg.sesskey) || '';
         const params = new URLSearchParams();
         params.set('sesskey', sesskey);
         params.set('courseid', String(courseId));
-        params.set('lang', lang || 'en');
+        // v7.1.1: empty, not 'en'. sse.php treats an empty lang as "detect from
+        // the learner's writing"; sending 'en' whenever they had not explicitly
+        // picked a language meant that detection path never ran, so a learner
+        // writing Spanish got English back. An explicit choice still wins.
+        params.set('lang', lang || '');
 
         fetch(M.cfg.wwwroot + '/local/ai_course_assistant/talking_avatar_session.php', {
             method: 'POST',
@@ -5998,8 +6024,6 @@ define([
         updateStreamContent: updateStreamContent,
         finishStreaming: finishStreaming,
         setStreamCitations: setStreamCitations,
-        showAttachmentPreview: showAttachmentPreview,
-        hideAttachmentPreview: hideAttachmentPreview,
         renderMasteryChip: renderMasteryChip,
         hideMasteryChip: hideMasteryChip,
         renderMasteryDashboard: renderMasteryDashboard,
@@ -6035,6 +6059,8 @@ define([
         showStarters: showStarters,
         setBottomMode: setBottomMode,
         setModeButtonsEnabled: setModeButtonsEnabled,
+        setQuizButtonEnabled: setQuizButtonEnabled,
+        mountPanel: mountPanel,
         configureVoicePanel: configureVoicePanel,
         renderHistoryPanel: renderHistoryPanel,
         showTopicPicker: showTopicPicker,

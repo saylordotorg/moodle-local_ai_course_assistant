@@ -25,7 +25,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\learner_goals_manager
  */
 final class learner_goals_manager_test extends \advanced_testcase {
-
     public function test_get_returns_null_when_no_row(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -41,8 +40,10 @@ final class learner_goals_manager_test extends \advanced_testcase {
 
         learner_goals_manager::save($user->id, $course->id, 'I want to be a nurse.', 'Doctorate.', '');
 
-        $row = $DB->get_record('local_ai_course_assistant_learner_goals',
-            ['userid' => $user->id, 'courseid' => $course->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_learner_goals',
+            ['userid' => $user->id, 'courseid' => $course->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals('I want to be a nurse.', $row->q1_answer);
         $this->assertEquals('Doctorate.', $row->q2_answer);
@@ -61,8 +62,11 @@ final class learner_goals_manager_test extends \advanced_testcase {
         sleep(1);
         learner_goals_manager::save($user->id, $course->id, 'A revised', 'B');
         $second = learner_goals_manager::get($user->id, $course->id);
-        $this->assertEquals($firsttime, (int)$second->consented_at,
-            'consented_at must remain anchored to the first save, not advance on edit.');
+        $this->assertEquals(
+            $firsttime,
+            (int)$second->consented_at,
+            'consented_at must remain anchored to the first save, not advance on edit.'
+        );
     }
 
     public function test_should_prompt_disabled_globally(): void {
@@ -96,8 +100,10 @@ final class learner_goals_manager_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         learner_goals_manager::dismiss($user->id, $course->id);
-        $this->assertFalse(learner_goals_manager::should_prompt($user->id, $course->id),
-            'Within the 30-day cooldown the prompt must not re-fire.');
+        $this->assertFalse(
+            learner_goals_manager::should_prompt($user->id, $course->id),
+            'Within the 30-day cooldown the prompt must not re-fire.'
+        );
     }
 
     public function test_clear_wipes_answers_but_keeps_consent_timestamp(): void {
@@ -128,8 +134,13 @@ final class learner_goals_manager_test extends \advanced_testcase {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
-        learner_goals_manager::save($user->id, $course->id, 'I want to be a paramedic.',
-            'EMT certification.', 'I learn best with case studies.');
+        learner_goals_manager::save(
+            $user->id,
+            $course->id,
+            'I want to be a paramedic.',
+            'EMT certification.',
+            'I learn best with case studies.'
+        );
 
         $block = learner_goals_manager::build_prompt_section($user->id, $course->id);
 

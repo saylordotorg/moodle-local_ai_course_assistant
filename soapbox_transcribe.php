@@ -77,7 +77,9 @@ if ($size <= 0 || $size > \local_ai_course_assistant\security::MAX_AUDIO_BYTES) 
 }
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 $sniffed = $finfo ? finfo_file($finfo, $tmp) : '';
-if ($finfo) { finfo_close($finfo); }
+if ($finfo) {
+    finfo_close($finfo);
+}
 $declaredtype = !empty($_FILES['audio']['type']) ? (string) $_FILES['audio']['type'] : '';
 if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $sniffed, $declaredtype)) {
     http_response_code(415);
@@ -88,7 +90,8 @@ if (!\local_ai_course_assistant\security::is_allowed_audio_upload((string) $snif
 // Resolve active STT provider via the voice_providers registry (self-hosted
 // Whisper first when configured, else hosted OpenAI/xAI).
 $cfg = \local_ai_course_assistant\voice_registry::resolve(
-    \local_ai_course_assistant\voice_registry::CAPABILITY_STT);
+    \local_ai_course_assistant\voice_registry::CAPABILITY_STT
+);
 if ($cfg === null) {
     http_response_code(503);
     echo json_encode(['error' => get_string('soapbox:no_stt', 'local_ai_course_assistant')]);
@@ -167,16 +170,30 @@ $filesizebytes = filesize($tmpfile) ?: 0;
 $approxminutes = max(0.1, $filesizebytes / 1_000_000);
 $approxtokens = (int) ceil($approxminutes * 1000);
 try {
-    $conv = $DB->get_record('local_ai_course_assistant_convs', [
-        'userid' => $USER->id, 'courseid' => $courseid > 0 ? $courseid : SITEID,
-    ]);
-    if ($conv) {
-        \local_ai_course_assistant\conversation_manager::add_message(
-            $conv->id, $USER->id, $courseid > 0 ? $courseid : SITEID,
-            'system', '[Soapbox STT]',
-            0, $cfg['provider'] . '_stt', $approxtokens, 0, $model
-        );
-    }
+    // get_or_create, not lookup: a Soapbox-only learner who never opened the
+    // chat drawer has no conversation row, and the old `if ($conv)` guard
+    // silently skipped the telemetry write for exactly the heaviest STT users --
+    // undercounting usage and spend where they matter most.
+    $conv = \local_ai_course_assistant\conversation_manager::get_or_create_conversation(
+        $USER->id,
+        $courseid > 0 ? $courseid : SITEID
+    );
+    \local_ai_course_assistant\conversation_manager::add_message(
+        $conv->id,
+        $USER->id,
+        $courseid > 0 ? $courseid : SITEID,
+        'system',
+        '[Soapbox STT]',
+        0,
+        // F81: capability suffix belongs in interaction_type (arg 11), where
+        // the spend buckets read it. The '[Soapbox STT]' marker already
+        // distinguishes soapbox rows from chat-mic STT.
+        $cfg['provider'],
+        $approxtokens,
+        0,
+        $model,
+        $cfg['provider'] . '_stt'
+    );
 } catch (\Throwable $e) {
     unset($e);
 }

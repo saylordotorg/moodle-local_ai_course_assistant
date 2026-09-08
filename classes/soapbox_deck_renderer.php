@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_deck_renderer {
-
     /** @var int Hard cap on rendered pages (bounds cost / response size). */
     const MAX_PAGES = 60;
 

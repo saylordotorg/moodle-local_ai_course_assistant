@@ -32,7 +32,6 @@ use local_ai_course_assistant\streak_tracker;
  * @covers     \local_ai_course_assistant\task\milestone_check
  */
 final class milestone_check_test extends \advanced_testcase {
-
     /**
      * Helper: enable everything that needs to be on, set dry-run so no
      * real email goes out, return the (course, user) pair.
@@ -72,8 +71,10 @@ final class milestone_check_test extends \advanced_testcase {
         ob_end_clean();
 
         // Audit log must remain empty when the feature flag is off.
-        $this->assertEquals(0,
-            $DB->count_records('local_ai_course_assistant_outreach_log', ['userid' => $user->id]));
+        $this->assertEquals(
+            0,
+            $DB->count_records('local_ai_course_assistant_outreach_log', ['userid' => $user->id])
+        );
     }
 
     public function test_streak7_milestone_fires_through_outreach_sender(): void {
@@ -95,19 +96,33 @@ final class milestone_check_test extends \advanced_testcase {
         $task->execute();
         ob_end_clean();
 
-        $log = $DB->get_records('local_ai_course_assistant_outreach_log',
-            ['userid' => $user->id]);
-        $this->assertCount(1, $log,
-            'milestone_check must dispatch one streak7 outreach for a 7-day streak.');
+        $log = $DB->get_records(
+            'local_ai_course_assistant_outreach_log',
+            ['userid' => $user->id]
+        );
+        $this->assertCount(
+            1,
+            $log,
+            'milestone_check must dispatch one streak7 outreach for a 7-day streak.'
+        );
         $row = reset($log);
         $this->assertEquals(outreach_sender::CH_STREAK7, $row->channel);
-        $this->assertStringStartsWith('dryrun_', $row->message_id,
-            'outreach_dryrun must produce a dryrun-prefixed message id.');
+        $this->assertStringStartsWith(
+            'dryrun_',
+            $row->message_id,
+            'outreach_dryrun must produce a dryrun-prefixed message id.'
+        );
 
-        // streak_tracker must record that the milestone fired so it does
-        // not re-fire on the next cron tick.
+        $this->assertEquals(1, $row->dryrun, 'Dry-run rows must carry dryrun = 1.');
+
+        // F25 INVERTED: dry-run must NOT burn the milestone. mark_sent() is
+        // terminal, so the old assertion here pinned data loss as correct:
+        // every learner who crossed a milestone during a dry-run preview lost
+        // that email permanently. No mail left the building, so the streak
+        // must stay eligible to fire for real once dry-run is switched off.
         $streak = streak_tracker::get($user->id, $course->id);
-        $this->assertEquals('streak7', $streak->last_milestone_kind);
+        $this->assertSame('', (string) $streak->last_milestone_kind,
+            'Dry-run must not mark the milestone as sent.');
     }
 
     public function test_already_sent_streak_does_not_refire(): void {
@@ -131,9 +146,11 @@ final class milestone_check_test extends \advanced_testcase {
         $task->execute();
         ob_end_clean();
 
-        $this->assertEquals(0,
+        $this->assertEquals(
+            0,
             $DB->count_records('local_ai_course_assistant_outreach_log', ['userid' => $user->id]),
-            'Already-fired streak7 must not re-fire.');
+            'Already-fired streak7 must not re-fire.'
+        );
     }
 
     public function test_completion_milestone_fires(): void {
@@ -163,8 +180,10 @@ final class milestone_check_test extends \advanced_testcase {
         $task->execute();
         ob_end_clean();
 
-        $row = $DB->get_record('local_ai_course_assistant_outreach_log',
-            ['userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_outreach_log',
+            ['userid' => $user->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals(outreach_sender::CH_COMPLETION, $row->channel);
     }

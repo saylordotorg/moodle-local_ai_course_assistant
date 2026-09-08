@@ -127,6 +127,38 @@
         </div>
     </div>
 
+    {{! F24: My communications -- milestone-email consent + sent-mail audit log. }}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h3>{{#str}}comms:title, local_ai_course_assistant{{/str}}</h3>
+            <p>{{commsdesc}}</p>
+            <form method="post" action="{{posturl}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="savecomms">
+                <input type="hidden" name="milestones" value="0">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="milestones" value="1"
+                           id="aica-comms-milestones" {{#commsmilestones}}checked{{/commsmilestones}}>
+                    <label class="form-check-label" for="aica-comms-milestones">
+                        {{#str}}comms:milestones_label, local_ai_course_assistant{{/str}}
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">{{#str}}savechanges, core{{/str}}</button>
+            </form>
+            <h4 class="mt-4">{{commsauditlogtitle}}</h4>
+            {{#hasoutreachlog}}
+            <ul class="list-unstyled mb-0">
+                {{#outreachlog}}
+                <li><strong>{{date}}</strong> &mdash; {{reason}}</li>
+                {{/outreachlog}}
+            </ul>
+            {{/hasoutreachlog}}
+            {{^hasoutreachlog}}
+            <p class="text-muted mb-0">{{commsauditlogempty}}</p>
+            {{/hasoutreachlog}}
+        </div>
+    </div>
+
     <div class="card border-danger mt-4">
         <div class="card-body">
             <h3 class="text-danger">{{#str}}usersettings:delete_all_title, local_ai_course_assistant{{/str}}</h3>

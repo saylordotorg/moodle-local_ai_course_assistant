@@ -92,6 +92,15 @@ export function buildBundle() {
     // build (and therefore cdn-deploy) loudly instead of shipping a dead widget.
     assertDependenciesResolvable(amdSources, modules);
 
+    // Second build-time safeguard, same class of bug one layer up: in CDN mode
+    // core/str is a shim that resolves only from the window.SOLA_I18N map PHP
+    // injects, and falls back to returning the key itself. A JS string key that
+    // nobody added to hook_callbacks::get_js_strings() therefore renders to the
+    // learner as a raw string id. Invisible on AMD-mode installs (dev), where
+    // the real string API serves any key on demand — so, like the 06-04 module
+    // outage, it only ever shows up on prod.
+    assertJsStringsPreloaded(amdSources);
+
     // Build the bundle: mini AMD loader + shims + modules + init.
     let bundle = `
 // CDN bundle for SOLA - auto-generated, do not edit.
@@ -250,6 +259,102 @@ export function assertDependenciesResolvable(amdSources, modules) {
             + 'CDN-mode install:\n' + errors.join('\n')
             + '\n\nFix: add the module to `modules` in cdn/rollup.config.mjs, '
             + 'or add a shim in cdn/shims/ and register it in buildBundle().\n'
+        );
+    }
+}
+
+/**
+ * Extract the string keys declared in hook_callbacks::get_js_strings().
+ *
+ * Kept as a parse of the PHP rather than a duplicated list, because a second
+ * copy of the keys is exactly the thing that drifts.
+ *
+ * @param {string} php Source of classes/hook_callbacks.php.
+ * @return {Set<string>} Declared keys.
+ */
+export function parseDeclaredJsStrings(php) {
+    const match = php.match(
+        /private static function get_js_strings\(\)[\s\S]*?\$keys\s*=\s*\[([\s\S]*?)\n\s*\];/
+    );
+    if (!match) {
+        throw new Error(
+            'SOLA CDN: could not find get_js_strings() in classes/hook_callbacks.php. '
+            + 'If it was renamed or restructured, update parseDeclaredJsStrings() — do '
+            + 'not delete this check, it is the only thing standing between a missing '
+            + 'key and a raw string id on a learner\'s screen.'
+        );
+    }
+    // Strip // comments before extracting quoted keys. An apostrophe inside a
+    // comment ("the server's scope") otherwise opens a bogus quoted run and
+    // injects a garbage key, which is noise at best and misleading at worst.
+    const body = match[1].replace(/\/\/[^\n]*/g, '');
+
+    return new Set([...body.matchAll(/'([^']+)'/g)].map(m => m[1]));
+}
+
+/**
+ * Collect the literal string keys each bundled module asks core/str for.
+ *
+ * Only literals are collected. Keys assembled at runtime are invisible here by
+ * construction, which is why get_js_strings() carries a hand-maintained
+ * "dynamic" group.
+ *
+ * @param {{name: string, code: string}[]} amdSources Bundled module sources.
+ * @return {Map<string, string[]>} key → modules requesting it.
+ */
+export function collectUsedJsStrings(amdSources) {
+    const used = new Map();
+    const add = (key, name) => {
+        if (!used.has(key)) {
+            used.set(key, []);
+        }
+        if (!used.get(key).includes(name)) {
+            used.get(key).push(name);
+        }
+    };
+
+    for (const { name, code } of amdSources) {
+        for (const m of code.matchAll(/\bget_string\(\s*'([^']+)'/g)) {
+            add(m[1], name);
+        }
+        for (const m of code.matchAll(/\bgetString\(\s*'([^']+)'/g)) {
+            add(m[1], name);
+        }
+        // get_strings([{key: 'x', ...}, ...])
+        for (const blob of code.matchAll(/get_strings\(\s*\[([\s\S]*?)\]\s*\)/g)) {
+            for (const m of blob[1].matchAll(/key\s*:\s*'([^']+)'/g)) {
+                add(m[1], name);
+            }
+        }
+    }
+    return used;
+}
+
+/**
+ * Fail the build if a bundled module requests a string the CDN map will not
+ * carry. See the call site in buildBundle() for why this matters.
+ *
+ * @param {{name: string, code: string}[]} amdSources Bundled module sources.
+ * @param {string=} phpSource Override for the PHP source (tests).
+ */
+export function assertJsStringsPreloaded(amdSources, phpSource) {
+    const php = phpSource !== undefined
+        ? phpSource
+        : readFileSync(resolve(__dirname, '..', 'classes', 'hook_callbacks.php'), 'utf8');
+
+    const declared = parseDeclaredJsStrings(php);
+    const used = collectUsedJsStrings(amdSources);
+
+    const missing = [...used.entries()]
+        .filter(([key]) => !declared.has(key))
+        .map(([key, mods]) => `  "${key}" — requested by ${mods.join(', ')}`);
+
+    if (missing.length) {
+        throw new Error(
+            '\nSOLA CDN i18n preload check FAILED. In CDN mode these keys resolve '
+            + 'to themselves, so learners would see a raw string id instead of text:\n'
+            + missing.sort().join('\n')
+            + '\n\nFix: add each key to get_js_strings() in classes/hook_callbacks.php.\n'
         );
     }
 }

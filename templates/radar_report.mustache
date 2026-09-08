@@ -1,0 +1,76 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/radar_report
+
+    Printable Learning Radar report. Rendered on an embedded page layout so the
+    admin can use the browser's own print-to-PDF; all styling lives in the
+    plugin's styles.css under the .sola-radar-report namespace.
+
+    Context variables required for this template:
+    * title - Report heading.
+    * generated - Localised "Generated <date>" line.
+    * printlabel - Label for the print button.
+    * querylabel - Heading above the query block.
+    * responselabel - Heading above the response block.
+    * privacynote - Anonymisation warning shown in the footer.
+    * query - The submitted query text (plain, escaped by Mustache).
+    * response - The response text (plain, escaped by Mustache).
+    * hasmeta - Whether any metadata rows are present.
+    * meta - List of {key, value} metadata rows.
+
+    Example context (json):
+    {
+        "title": "Learning Radar report",
+        "generated": "Generated 2026-08-20 14:03",
+        "printlabel": "Print / save as PDF",
+        "querylabel": "Query",
+        "responselabel": "Response",
+        "privacynote": "All student data in this report is anonymized.",
+        "query": "Which learners are disengaging?",
+        "response": "Three learners show declining activity.",
+        "hasmeta": true,
+        "meta": [{"key": "Course", "value": "BUS101"}]
+    }
+}}
+<div class="sola-radar-report">
+    <button type="button" class="sola-radar-report__print btn btn-secondary" data-action="print">
+        {{printlabel}}
+    </button>
+    <h1 class="sola-radar-report__title">{{title}}</h1>
+    <p class="sola-radar-report__generated">{{generated}}</p>
+    {{#hasmeta}}
+        <dl class="sola-radar-report__meta">
+            {{#meta}}
+                <dt>{{key}}</dt>
+                <dd>{{value}}</dd>
+            {{/meta}}
+        </dl>
+    {{/hasmeta}}
+    <h2 class="sola-radar-report__heading">{{querylabel}}</h2>
+    <div class="sola-radar-report__query">{{query}}</div>
+    <h2 class="sola-radar-report__heading">{{responselabel}}</h2>
+    <div class="sola-radar-report__response">{{response}}</div>
+    <div class="sola-radar-report__foot">{{privacynote}}</div>
+</div>
+{{#js}}
+    require(['jquery'], function($) {
+        $('.sola-radar-report [data-action="print"]').on('click', function() {
+            window.print();
+        });
+    });
+{{/js}}

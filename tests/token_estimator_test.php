@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\token_estimator
  */
 final class token_estimator_test extends \advanced_testcase {
-
     public function test_chars_per_token_known_and_fallback(): void {
         $this->assertEqualsWithDelta(4.0, token_estimator::chars_per_token('en'), 0.01);
         $this->assertEqualsWithDelta(2.8, token_estimator::chars_per_token('hu'), 0.01);

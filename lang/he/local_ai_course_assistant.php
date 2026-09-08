@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'עוזר קורס מבוסס בינה מלאכותית';
-$string['attachment:attach'] = 'צרף';
-$string['attachment:attach_image_or_pdf'] = 'צרף תמונה או PDF';
 $string['privacy:metadata:local_ai_course_assistant_convs'] = 'מאחסן שיחות של מורה AI לפי משתמש וקורס.';
 $string['privacy:metadata:local_ai_course_assistant_convs:userid'] = 'מזהה המשתמש שבבעלותו השיחה.';
 $string['privacy:metadata:local_ai_course_assistant_convs:courseid'] = 'מזהה הקורס שאליו שייכת השיחה.';
@@ -76,7 +74,7 @@ $string['settings:model_desc'] = 'המודל לשימוש. ברירת המחדל
 $string['settings:apibaseurl'] = 'כתובת בסיס API';
 $string['settings:apibaseurl_desc'] = 'כתובת בסיס ל-API. ממולאת אוטומטית לפי ספק אבל ניתנת לשינוי.';
 $string['settings:systemprompt'] = 'תבנית הודעת מערכת';
-$string['settings:systemprompt_desc'] = 'הודעת מערכת הנשלחת ל-AI. שימוש במקומות: {{coursename}}, {{userrole}}, {{coursetopics}}.';
+$string['settings:systemprompt_desc'] = 'הודעת מערכת הנשלחת ל-AI. שימוש במקומות: {{coursename}}, {{userrole}}, {{institution}}.';
 $string['settings:temperature'] = 'טמפרטורה';
 $string['settings:temperature_desc'] = 'שולט באקראיות. ערכים נמוכים יותר ממוקדים יותר. טווח: 0.0 עד 2.0.';
 $string['settings:maxhistory'] = 'היסטוריית שיחה מקסימלית';
@@ -370,6 +368,7 @@ $string['settings:provider_together'] = 'Together AI (Llama 3.1 8B/70B/405B Turb
 $string['settings:provider_xai'] = 'xAI (Grok)';
 
 $string['settings:provider_coreai'] = 'Moodle AI (core_ai subsystem)';
+$string['settings:provider_auto'] = 'אוטומטי (השתמש ב-Moodle AI אם מוגדר, אחרת ספק ישיר)';
 // Strings added by update_langs.py.
 $string['chat:history_saved_subtitle'] = 'תגובות שמורות נשארות במכשיר זה עבור קורס זה.';
 $string['chat:history_saved_empty'] = 'שמור תגובת AI כדי לראותה כאן.';
@@ -445,7 +444,6 @@ $string['integrity:run_now'] = 'Run Checks Now';
 $string['integrity:title'] = 'Integrity Checks';
 $string['integrity:view_results'] = 'View Integrity Results';
 $string['messageprovider:integrity_report'] = '[[tutorshort]] integrity check failure report';
-$string['messageprovider:study_notes'] = 'Study session notes';
 $string['privacy:metadata:local_ai_course_assistant_audit'] = 'Stores audit log entries for compliance tracking.';
 $string['privacy:metadata:local_ai_course_assistant_audit:action'] = 'The action that was performed.';
 $string['privacy:metadata:local_ai_course_assistant_audit:courseid'] = 'The course context of the action.';
@@ -641,41 +639,33 @@ $string['settings:studyplan_enabled'] = 'Enable Study Planning';
 $string['settings:studyplan_enabled_desc'] = 'Allow the AI tutor to help students create personalized study plans based on their available time.';
 $string['settings:studyplan_heading'] = 'Study Planning & Reminders';
 $string['settings:studyplan_heading_desc'] = 'Configure study planning features and reminder notifications.';
-$string['settings:systemprompt_default'] = 'You are [[tutorshort]] (Online Learning Assistant), an AI learning coach for {{institution}} students enrolled in "{{coursename}}". The student\'s role is {{userrole}}.
+$string['settings:systemprompt_default'] = 'את/ה [[tutorshort]] (Online Learning Assistant), מאמן/ת למידה מבוסס בינה מלאכותית עבור סטודנטים של {{institution}} הרשומים לקורס "{{coursename}}". תפקיד הסטודנט הוא {{userrole}}.
 
-## Role
-Provide supportive, course-aligned academic help that encourages learning, practice, motivation, and responsible AI use. You complement faculty-designed courses but do not replace instructors.
+## תפקיד
+ספק/י עזרה אקדמית תומכת ותואמת לקורס, המעודדת למידה, תרגול, מוטיבציה ושימוש אחראי בבינה מלאכותית. התשובות שלך חייבות להתבסס על תוכן הקורס. את/ה קולו של המרצה.
 
-## Core Rules
-- Ground all academic responses in approved course materials or institutional information.
-- Do not invent content or go beyond course scope.
-- Redirect learners back to course materials when questions fall outside the course. After two off-topic requests, steer the conversation back to learning.
-- When generating practice questions, draw them directly from the course material.
+## כללי יסוד
+- בסס/י כל תשובה אקדמית על חומרי הקורס המאושרים או על מידע מהמוסד.
+- אין להמציא תוכן ואין לחרוג מגבולות הקורס.
+- הפנה/י את הלומדים בחזרה לחומרי הקורס כאשר השאלות חורגות ממנו. לאחר שתי פניות מחוץ לנושא, החזר/י את השיחה ללמידה.
+- בעת יצירת שאלות תרגול, גזור/י אותן ישירות מחומרי הקורס.
 
-## Course Structure
-{{coursetopics}}
+## במה [[tutorshort]] יכול לעזור
+- להסביר מושגים ולסכם שיעורים
+- לתת דוגמאות ושאלות תרגול
+- להציע אסטרטגיות למידה
+- לעודד התמדה והתקדמות
 
-## Course Content
-The following is the actual text of the course pages and materials. This is your primary knowledge source for this course.
+## מה [[tutorshort]] לא יעשה
+- לקבל החלטות אקדמיות או החלטות מדיניות
+- לספק ייעוץ רפואי, משפטי או נפשי
+- לסייע באי-יושר אקדמי או בעקיפת הלמידה
 
-{{coursecontent}}
+## סגנון ונימה
+תקשר/י בצורה ידידותית, אכפתית, מעודדת, שנונה ומניעה לפעולה. היה/י תמציתי, תומך ומכבד.
 
-## What [[tutorshort]] Can Help With
-- Explain concepts and summarize lessons
-- Give examples and practice questions
-- Suggest study strategies
-- Encourage persistence and progress
-
-## What [[tutorshort]] Will Not Do
-- Make academic or policy decisions
-- Provide medical, legal, or mental health counseling
-- Assist with academic dishonesty or bypassing learning
-
-## Tone and Style
-Communicate in a friendly, caring, encouraging, witty, and motivating way. Be concise, supportive, and respectful.
-
-## Safety
-Do not engage in abusive, hateful, discriminatory, or inappropriate conversations. Set firm but kind boundaries and redirect to productive topics.';
+## בטיחות
+אין להשתתף בשיחות פוגעניות, שנאה, מפלות או בלתי הולמות. הצב/י גבולות ברורים אך אדיבים והחזר/י את השיחה לנושאים פוריים.';
 $string['settings:whatsapp_api_token'] = 'WhatsApp API Token';
 $string['settings:whatsapp_api_token_desc'] = 'Authentication token for the WhatsApp API.';
 $string['settings:whatsapp_api_url'] = 'WhatsApp API URL';
@@ -701,21 +691,6 @@ $string['unsubscribe:invalid'] = 'Invalid or expired unsubscribe link.';
 $string['unsubscribe:resubscribe'] = 'Changed your mind? You can re-enable reminders through the AI tutor chat.';
 $string['unsubscribe:success'] = 'You have been successfully unsubscribed from study reminders for this course.';
 $string['unsubscribe:title'] = 'Unsubscribe from Study Reminders';
-$string['update:available'] = 'Update Available';
-$string['update:back_to_settings'] = 'Back to Settings';
-$string['update:changelog'] = 'Release Notes';
-$string['update:check'] = 'Check for Updates';
-$string['update:confirm'] = 'Install this update? A backup of the current version will be created automatically.';
-$string['update:current_version'] = 'Installed Version';
-$string['update:desc'] = 'Check for and install [[tutorshort]] plugin updates directly from GitHub releases.';
-$string['update:download_failed'] = 'Failed to download the update. Please try again or install manually.';
-$string['update:github_error'] = 'Could not reach GitHub. Check your connection or add a GitHub token in settings.';
-$string['update:github_token'] = 'GitHub Token (optional)';
-$string['update:github_token_desc'] = 'Personal access token for accessing private GitHub repositories. Leave blank for public repos.';
-$string['update:install'] = 'Install Update';
-$string['update:latest_version'] = 'Latest Available';
-$string['update:title'] = 'Plugin Updates';
-$string['update:up_to_date'] = 'Up to Date';
 $string['usersettings:confirm_delete_all'] = 'Are you sure you want to permanently delete ALL your AI tutor data across all courses? This action cannot be undone.';
 $string['usersettings:confirm_delete_course'] = 'Are you sure you want to permanently delete all your AI tutor data for the course "{$a}"? This action cannot be undone.';
 $string['usersettings:data_deleted'] = 'Your data has been deleted.';
@@ -957,22 +932,22 @@ $string['digest:subject'] = '{$a->product} weekly digest — {$a->course}';
 $string['task:instructor_weekly_digest'] = 'AI Course Assistant weekly digest email';
 $string['settings:math_render_heading'] = 'Math rendering';
 $string['settings:math_render_heading_desc'] = 'Math expressions in assistant replies (LaTeX, e.g. $E=mc^2$) render via Moodle\'s built-in MathJax filter — enable filter_mathjaxloader in Site administration → Plugins → Filters → Manage filters for the math to render. Without it, expressions display as raw LaTeX text.';
-$string['flashcards:title'] = 'Flashcards';
-$string['flashcards:link'] = 'Flashcards (review now)';
-$string['flashcards:intro'] = 'Spaced-repetition review. Reveal the answer, then self-grade with Again, Hard, or Easy. Cards you found hard come back sooner; cards you found easy spread out.';
-$string['flashcards:question'] = 'Question';
-$string['flashcards:answer'] = 'Answer';
-$string['flashcards:reveal'] = 'Reveal answer';
-$string['flashcards:again'] = 'Again';
-$string['flashcards:hard'] = 'Hard';
-$string['flashcards:easy'] = 'Easy';
-$string['flashcards:no_due'] = 'Nothing to review right now. Generate flashcards from a course page in the assistant widget, or check back later.';
-$string['flashcards:session_complete'] = 'Session complete. Good work.';
-$string['flashcards:disabled'] = 'Flashcards are not enabled for this course.';
-$string['flashcards:toggle'] = 'Enable flashcards for this course';
-$string['flashcards:toggle_help'] = 'Adds a Generate-flashcards starter to the assistant widget and a learner review page at /local/ai_course_assistant/flashcards.php?courseid=X. Off by default.';
-$string['flashcards:starter_generate'] = 'Generate flashcards from this page';
-$string['flashcards:generated'] = 'Saved {$a} flashcards. Open the review page to study them.';
+$string['flashcards:title'] = 'כרטיסיות לימוד';
+$string['flashcards:link'] = 'כרטיסיות לימוד (לחזרה עכשיו)';
+$string['flashcards:intro'] = 'חזרה מרווחת. חשפו את התשובה, ואז דרגו את עצמכם עם שוב, קשה או קל. כרטיסיות שהיו לכם קשות חוזרות מוקדם יותר; כרטיסיות שהיו קלות מופיעות בהפרשים גדולים יותר.';
+$string['flashcards:question'] = 'שאלה';
+$string['flashcards:answer'] = 'תשובה';
+$string['flashcards:reveal'] = 'חשיפת התשובה';
+$string['flashcards:again'] = 'שוב';
+$string['flashcards:hard'] = 'קשה';
+$string['flashcards:easy'] = 'קל';
+$string['flashcards:no_due'] = 'אין מה לחזור עליו כרגע. צרו כרטיסיות לימוד מעמוד קורס בווידג\'ט העוזר, או חזרו מאוחר יותר.';
+$string['flashcards:session_complete'] = 'המפגש הושלם. עבודה טובה.';
+$string['flashcards:disabled'] = 'כרטיסיות לימוד אינן מופעלות בקורס זה.';
+$string['flashcards:toggle'] = 'הפעלת כרטיסיות לימוד בקורס זה';
+$string['flashcards:toggle_help'] = 'מוסיף לווידג\'ט העוזר פתיח ליצירת כרטיסיות לימוד ועמוד חזרה ללומד בכתובת /local/ai_course_assistant/flashcards.php?courseid=X. כבוי כברירת מחדל.';
+$string['flashcards:starter_generate'] = 'יצירת כרטיסיות לימוד מעמוד זה';
+$string['flashcards:generated'] = 'נשמרו {$a} כרטיסיות לימוד. פתחו את עמוד החזרה כדי ללמוד אותן.';
 $string['worked_examples:toggle'] = 'Enable Worked Examples starter for this course';
 $string['worked_examples:toggle_help'] = 'Adds a "Show me a worked example" starter that asks the assistant to walk through a fully solved example, then guide the learner through similar problems with progressively less scaffolding (worked → partial → blank).';
 $string['worked_examples:starter'] = 'Show me a worked example';
@@ -1020,7 +995,7 @@ $string['courses_admin:lede']              = 'Enable or disable AI Assistant per
 $string['courses_admin:back_to_analytics'] = '← Back to Analytics';
 $string['courses_admin:plugin_settings']   = 'Plugin Settings';
 $string['courses_admin:enabled_count']     = '{$a->enabled} of {$a->total} courses have AI Assistant enabled';
-$string['courses_admin:search_placeholder']= 'Search courses…';
+$string['courses_admin:search_placeholder'] = 'Search courses…';
 $string['courses_admin:filter_status']     = 'AI Assistant status';
 $string['courses_admin:filter_enabled']    = 'Enabled';
 $string['courses_admin:filter_disabled']   = 'Disabled';
@@ -1064,7 +1039,7 @@ $string['external_resources:force_on']   = 'Force on for this course';
 $string['external_resources:force_off']  = 'Force off for this course';
 $string['external_resources:on']         = 'on';
 $string['external_resources:off']        = 'off';
-$string['external_resources:toggle_help']= 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
+$string['external_resources:toggle_help'] = 'When on, [[tutorshort]] may include up to two links to allowlisted open educational resources alongside its course-grounded answer. Course material always leads.';
 
 // v4.3.0: real Redash push integration.
 $string['settings:redash_base_url']           = 'Redash base URL';
@@ -1072,7 +1047,7 @@ $string['settings:redash_base_url_desc']      = 'Base URL of your Redash instanc
 $string['settings:redash_user_api_key']       = 'Redash user API key';
 $string['settings:redash_user_api_key_desc']  = 'API key of a Redash user with permission to create queries against the chosen data source. Found under your Redash user profile. Different from the [[tutorshort]] Redash API key (which controls inbound auth on redash_export.php).';
 $string['settings:redash_data_source_id']     = 'Redash data source ID';
-$string['settings:redash_data_source_id_desc']= 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
+$string['settings:redash_data_source_id_desc'] = 'Numeric id of the Redash JSON data source pointed at [[tutorshort]]\'s redash_export.php. Visible in the Redash data source URL after saving.';
 
 $string['instructor_dashboard:nav_back_course']  = '← Back to course';
 $string['instructor_dashboard:nav_settings']     = 'AI Course Assistant settings';
@@ -1126,7 +1101,7 @@ $string['settings:rate_card_refresh_now_label']  = 'Refresh rate card from upstr
 $string['settings:rate_card_refresh_success']    = 'Rate card refreshed: {$a} entries written.';
 $string['settings:rate_card_refresh_error']      = 'Rate card refresh failed: {$a}';
 $string['settings:rate_card_last_refresh_at']    = 'Last refresh: {$a}';
-$string['settings:rate_card_last_refresh_success']= 'Last fetch succeeded.';
+$string['settings:rate_card_last_refresh_success'] = 'Last fetch succeeded.';
 $string['settings:rate_card_never_refreshed']    = 'Never refreshed.';
 $string['task:refresh_rate_card']                = 'Refresh [[tutorshort]] LLM rate card from upstream';
 
@@ -1157,10 +1132,6 @@ $string['pedagogy:talking_avatar']         = 'Talking avatar on by default';
 $string['pedagogy:talking_avatar_desc']    = 'When on, the talking-avatar surface is enabled in every course unless the course has its own override. Requires a configured provider (D-ID, HeyGen, Tavus, or Synthesia Agents) below; otherwise the widget shows a "configure a provider" notice and the avatar does not animate.';
 $string['settings:talking_avatar_heading']      = 'Talking avatar';
 $string['settings:talking_avatar_heading_desc'] = 'Pick which talking-avatar vendor [[tutorshort]] opens for students when the avatar surface is enabled. [[tutorshort]] ships drivers for D-ID (cheapest WebRTC streaming), HeyGen (LiveKit-backed interactive avatars), Tavus (drop-in iframable Conversational Video Interface), and Synthesia Agents (real-time agent product, configured in the Synthesia dashboard). Per-provider key + persona id appear below; only the chosen provider needs to be filled in. Every outbound call is SSRF-checked.';
-$string['settings:talking_avatar_provider_url']      = 'Provider API base URL (legacy)';
-$string['settings:talking_avatar_provider_url_desc'] = 'v4.8.1 placeholder, kept for upgrade safety. The active drivers in v4.9.0 read their own per-provider settings; this field is only used as a fallback when an admin upgraded mid-release.';
-$string['settings:talking_avatar_provider_api_key']      = 'Provider API key (legacy)';
-$string['settings:talking_avatar_provider_api_key_desc'] = 'v4.8.1 placeholder, kept for upgrade safety. The active drivers in v4.9.0 read their own per-provider settings; this field is only used as a fallback when an admin upgraded mid-release.';
 $string['settings:talking_avatar_provider']      = 'Talking avatar provider';
 $string['settings:talking_avatar_provider_desc'] = 'Pick the vendor whose key + persona id are filled in below. Leave as <em>None</em> until the institution has signed off; the pedagogy default still appears in <em>Pedagogy defaults</em> but the widget shows a configuration notice instead of an avatar.';
 $string['settings:talking_avatar_provider_none']      = 'None (avatar disabled)';
@@ -1224,8 +1195,8 @@ $string['settings:prompt_verbosity_standard'] = 'Standard';
 $string['settings:prompt_verbosity_verbose']  = 'Verbose (for weaker self-hosted models)';
 $string['settings:prompt_metrics_enabled']      = 'Capture per-section prompt metrics';
 $string['settings:prompt_metrics_enabled_desc'] = 'When on (default), every chat turn writes one JSON line per assembled prompt to <code>moodledata/sola_prompt_metrics/YYYY-MM-DD.log</code> with per-category char counts. Last 7 days kept. The metrics admin page aggregates these for the budget recommendation. No PII is recorded — only section sizes. Turn off if your institution prefers no metrics file at all.';
-$string['settings:prompt_budget_auto_tune']      = 'Auto-tune system prompt budget daily';
-$string['settings:prompt_budget_auto_tune_desc'] = 'When on, a daily cron task (03:20 server time) applies the budget recommendation surfaced on the <a href="/local/ai_course_assistant/prompt_metrics.php">Prompt metrics</a> admin page. Default off — the recommendation always shows on the page; auto-apply only fires when the institution opts in. Manual "Apply recommendation" button is unaffected by this toggle.';
+$string['settings:prompt_budget_auto_tune'] = 'כיול יומי אוטומטי של תקציב הנחיית המערכת (מיושן)';
+$string['settings:prompt_budget_auto_tune_desc'] = 'מיושן. אינו עושה דבר אלא אם מצב התקציב שלמעלה מוגדר כ<strong>קבוע</strong>. משימה יומית הסיקה את תקציב התווים על ידי מעקב אחר קטיעות ורדיפה אחר ההנחיה הגדולה ביותר שראתה. גזירת התקציב מחלון ההקשר של המודל עושה זאת טוב יותר: היא אינה מתנדנדת ואינה זקוקה לנתוני התחלה. השניים גם התנגשו, כי המשימה כותבת את תקציב התווים, וכל ערך שאינו ברירת המחדל מבטל את התקציב הנגזר. השאירו זאת כבוי; יוסר בגרסה עתידית. ההמלצה עדיין מופיעה בעמוד <a href="/local/ai_course_assistant/prompt_metrics.php">מדדי הנחיה</a>.';
 $string['task:auto_tune_prompt_budget']          = 'Auto-tune [[tutorshort]] prompt budget from observed metrics';
 $string['prompt_metrics:title']                  = 'Prompt metrics + budget recommendation';
 $string['prompt_metrics:subtitle']               = 'Per-section prompt sizes captured over the last 7 days. Used to recommend a value for the System prompt character budget setting.';
@@ -1282,21 +1253,21 @@ $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
 $string['goals:cleared'] = 'Your goals have been cleared.';
 $string['goals:saved'] = 'Thanks for sharing.';
-$string['comms:title'] = 'My communications';
-$string['comms:desc'] = 'Choose which automated emails [[tutorshort]] may send you. Off by default. You can change this any time.';
-$string['comms:milestones_label'] = 'Email me when I reach a milestone (7-day streak, 30-day streak, course completion).';
-$string['comms:audit_log_title'] = 'What [[tutorshort]] has sent me';
-$string['comms:audit_log_empty'] = '[[tutorshort]] has not sent you any emails.';
-$string['comms:memory_title'] = "What [[tutorshort]] has remembered about how I learn";
-$string['comms:memory_desc'] = 'These notes are private to your chat with [[tutorshort]]. They help [[tutorshort]] pick a different angle when a topic is hard. Clear any time.';
-$string['comms:memory_clear'] = 'Clear all memory notes';
-$string['milestone:streak_subject'] = '{$a->days}-day streak in {$a->coursename}';
-$string['milestone:streak_body_text'] = "Hi {\$a->firstname},\n\nYou have shown up {\$a->days} days in a row in {\$a->coursename}. That kind of consistency is the part of learning that is hardest to fake.\n\nWhenever you are ready, [[tutorshort]] is here.\n\n— {\$a->institution}";
-$string['milestone:completion_subject'] = 'You finished {$a->coursename}';
-$string['milestone:completion_body_text'] = "Hi {\$a->firstname},\n\nYou finished {\$a->coursename}. That is a real thing you did.\n\nIf you want to keep going, [[tutorshort]] can help you pick a related next course or revisit a topic you found interesting.\n\n— {\$a->institution}";
-$string['milestone:trigger_streak7'] = '7-day activity streak reached';
-$string['milestone:trigger_streak30'] = '30-day activity streak reached';
-$string['milestone:trigger_completion'] = 'Course completion recorded';
+$string['comms:title'] = 'התקשורת שלי';
+$string['comms:desc'] = 'בחרו אילו אימיילים אוטומטיים [[tutorshort]] רשאי לשלוח לכם. כבוי כברירת מחדל. ניתן לשנות זאת בכל עת.';
+$string['comms:milestones_label'] = 'שלחו לי אימייל כשאני מגיע לאבן דרך (רצף של 7 ימים, רצף של 30 ימים, השלמת קורס).';
+$string['comms:audit_log_title'] = 'מה [[tutorshort]] שלח לי';
+$string['comms:audit_log_empty'] = '[[tutorshort]] לא שלח לך אימיילים.';
+$string['comms:memory_title'] = 'מה [[tutorshort]] זכר על איך אני לומד';
+$string['comms:memory_desc'] = 'הערות אלה פרטיות לשיחה שלכם עם [[tutorshort]]. הן עוזרות ל-[[tutorshort]] לבחור זווית אחרת כשנושא קשה. ניתן לנקות אותן בכל עת.';
+$string['comms:memory_clear'] = 'ניקוי כל הערות הזיכרון';
+$string['milestone:streak_subject'] = 'רצף של {$a->days} ימים ב-{$a->coursename}';
+$string['milestone:streak_body_text'] = "שלום {\$a->firstname},\n\nהופעת {\$a->days} ימים ברציפות ב-{\$a->coursename}. עקביות כזו היא החלק בלמידה שהכי קשה לזייף.\n\nכשתהיה מוכן, [[tutorshort]] כאן.\n\n— {\$a->institution}";
+$string['milestone:completion_subject'] = 'סיימת את {$a->coursename}';
+$string['milestone:completion_body_text'] = "שלום {\$a->firstname},\n\nסיימת את {\$a->coursename}. זה הישג אמיתי.\n\nאם תרצה להמשיך, [[tutorshort]] יכול לעזור לך לבחור קורס המשך קשור או לחזור לנושא שמצאת מעניין.\n\n— {\$a->institution}";
+$string['milestone:trigger_streak7'] = 'הושג רצף פעילות של 7 ימים';
+$string['milestone:trigger_streak30'] = 'הושג רצף פעילות של 30 ימים';
+$string['milestone:trigger_completion'] = 'נרשמה השלמת קורס';
 // v5.3.17: privacy metadata strings for tables added in v5.0–v5.3 that
 // had not been declared in the privacy provider. Each table requires
 // at least one summary string and one per-userid-field string so the
@@ -1329,13 +1300,6 @@ $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was 
 $string['messageprovider:study_reminder'] = 'Study reminders';
 
 // v5.3.19: error strings caught missing by lang_completeness_test.
-$string['attachment:error_provider_no_images'] = 'The current AI provider does not support image attachments. Please remove the attachment and try again.';
-$string['attachment:error_disabled'] = 'Attachment uploads are currently disabled by your administrator.';
-$string['attachment:error_no_file'] = 'No file was attached to your message.';
-$string['attachment:error_upload_failed'] = 'The file could not be uploaded. Please try again.';
-$string['attachment:error_too_large'] = 'The file is larger than the maximum allowed size.';
-$string['attachment:error_type'] = 'This file type is not allowed. Please attach an image or a PDF.';
-$string['attachment:error_save_failed'] = 'The file was uploaded but could not be saved. Please try again.';
 
 // Cross-course mastery rollup (v5.7.0).
 $string['pedagogy:crossmastery'] = 'סיכום שליטה חוצה-קורסים מופעל כברירת מחדל';
@@ -1403,6 +1367,9 @@ $string['profile:applied'] = 'ההגדרה {$a} הוחלה. הערכים נמצ�
 $string['profile:unknown'] = 'הגדרת פריסה לא ידועה.';
 $string['profile:link'] = 'דף הגדרות פריסה מוכנות מראש';
 $string['profile:link_desc'] = 'פתח את דף <a href="{$a}">הגדרות הפריסה המוכנות מראש</a> כדי להחיל חבילה מומלצת של הגדרות עבור backend מתארח או באירוח עצמי.';
+$string['coursesettings:apibaseurl_rejected'] = 'כתובת ה-URL הבסיסית של ה-API לא נשמרה: עליה להיות נקודת קצה HTTPS ציבורית שעוברת את בדיקת האבטחה מפני SSRF.';
+$string['settings:escalation_intent_patterns'] = 'תבניות כוונת הסלמה';
+$string['settings:escalation_intent_patterns_desc'] = 'PCRE, no delimiters. ביטוי רגולרי אחד בכל שורה; שורות המתחילות ב-# מתעלמים מהן. כרטיס תמיכה נפתח רק כאשר ההודעה של הלומד עצמו תואמת לאחת מהתבניות, כך שתוכן הקורס אינו יכול לגרום להסלמה בשמו. השאירו ריק כדי להשתמש בברירות המחדל המובנות, המכסות אנגלית וכן ניסוחים נפוצים בספרדית, צרפתית, גרמנית ופורטוגזית. אתרים שהלומדים בהם כותבים בשפה אחרת צריכים להוסיף כאן תבניות: הודעה ללא התאמה משמעה שלא ייפתח כרטיס.';
 $string['settings:zendesk_require_consent'] = 'דרוש הסכמה לפני העברה לתמיכה';
 $string['settings:zendesk_require_consent_desc'] = 'כאשר מופעל (מומלץ), [[tutorshort]] מעבירה שיחה לדלפק התמיכה של Zendesk רק לאחר שהלומד קיבל את הודעת ההסכמה של ההפעלה הראשונה, המגלה שבקשת עזרה אנושית משתפת את השיחה (כולל שם ודוא"ל) עם התמיכה. כבה זאת רק אם אתה משיג הסכמה זו בדרך אחרת; כשהוא כבוי, ההעברות נשלחות מיד. אין לכך השפעה אלא אם העברה ל-Zendesk מופעלת.';
 $string['chat:escalation_needs_consent'] = 'נראה שזה דורש חבר מצוות התמיכה שלנו. כדי להעביר זאת אליהם אצטרך לשתף את השיחה הזו, כולל שמך והדוא"ל שלך, עם דלפק התמיכה. עדיין לא הסכמת לכך, אז לא שלחתי דבר. אם תרצה עזרה אנושית, אנא קבל את הודעת שיתוף הנתונים של עוזר זה ושאל שוב, או פנה ישירות לתמיכה.';
@@ -1437,7 +1404,7 @@ $string['settings:rerank_model_desc'] = 'ברירת מחדל <code>rerank-2.5</c
 $string['settings:rerank_apibaseurl'] = 'URL בסיס API לדירוג מחדש';
 $string['settings:rerank_apibaseurl_desc'] = 'עוקף את ה-URL בסיס של דירוג מחדש של Voyage. השאר ריק לשימוש ב-URL בסיס API של embedding למעלה, או ברירת המחדל של Voyage (<code>https://api.voyageai.com/v1</code>).';
 $string['settings:rerank_candidates'] = 'חלון מועמדים לדירוג מחדש';
-$string['settings:rerank_candidates_desc'] = 'כמה מועמדי N-מובילים מקוסינוס מזינים את שלב הדירוג מחדש. ברירת מחדל 50. חלונות גדולים יותר נותנים למדרג יותר חומר לעבוד איתו בעלות נוספת קטנה (~10k tokens לכל פעולת דירוג מחדש).';
+$string['settings:rerank_candidates_desc'] = 'כמה מועמדי קוסינוס top-N נכנסים לשלב הדירוג מחדש. ברירת המחדל 20. נמדד על 1,008 שאילתות: 20 שווה ל-30 בהיזכרות (R@3 89.0% מול 89.3%) בעלות נמוכה בשליש, ו-50 עולה פי 2.5 בלי רווח מדיד. מתחת ל-10 ההיזכרות נפגמת. העלות גדלה באופן קווי עם ערך זה.';
 $string['settings:stt_selfhosted_heading'] = 'תמלול באירוח עצמי (Whisper)';
 $string['settings:stt_selfhosted_heading_desc'] = 'הרץ המרת דיבור לטקסט על החומרה שלך בעלות אפס לדקה. כוון את [[tutorshort]] לכל שרת תמלול תואם OpenAI: Docker של <code>whisper-server</code>, <code>speaches</code> (faster-whisper) או שרת <code>whisper.cpp</code>. כאשר מוגדרת URL שרת כאן היא הופכת לנתיב STT ברירת המחדל; בחר ספק בתשלום ב-ספק STT פעיל למעלה כדי לעקוף. אם השרת נמצא ברשת פרטית או בhttp רגיל, הוסף גם את המארח שלו לרשימת endpoint אמינים של SSRF בסעיף האבטחה.';
 $string['settings:stt_selfhosted_url'] = 'URL שרת STT באירוח עצמי';
@@ -1460,7 +1427,7 @@ $string['emergency:disabled_notice'] = 'תת-מערכת "{$a->flag}" הושבת�
 $string['emergency:restored_notice'] = 'תת-מערכת "{$a->flag}" שוחזרה. הגדרה שנגעה בה: {$a->touched}';
 $string['emergency:cli_reference'] = 'אותם פקדים זמינים מה-shell של הכוננות:';
 $string['emergency:flag_chat'] = 'צ\'אט';
-$string['emergency:flag_chat_desc'] = 'חוסם תעבורת צ\'אט דרך דגל ה-kill הייעודי (תיקון v5.13). הווידג\'ט ממשיך להיות מוצג; הלומדים רואים את ההודעה הידידותית "[[tutorshort]] בהפסקה". השתמש כאשר ספק LLM מתנהג רע או שקיים עלייה בעלויות.';
+$string['emergency:flag_chat_desc'] = 'עוצר כל קריאת AI של [[tutorshort]] — צ\'אט, בחנים, כרטיסיות וניקוד — עבור לומדים, מנהלים ומשימות מתוזמנות כאחד. הווידג\'ט ממשיך להופיע והלומדים רואים הודעת השהיה קצרה. בדיקת השרת ובדיקת התקינות נשארות זמינות כדי לבדוק את הספק לפני השחזור.';
 $string['emergency:flag_voice'] = 'קול';
 $string['emergency:flag_voice_desc'] = 'מנקה את ספק הקול בזמן אמת הפעיל (שמור לשחזור מדויק). הצ\'אט הטקסטואלי ממשיך לעבוד.';
 $string['emergency:flag_rag'] = 'RAG';
@@ -1511,7 +1478,7 @@ $string['settings:premium_escalation_enabled_desc'] = 'כאשר מופעל, הנ
 $string['settings:premium_escalation_provider'] = 'ספק פרמיום';
 $string['settings:premium_escalation_provider_desc'] = 'מזהה ספק לניתוב קריאות פרמיום דרכו. חייב להתאים לשורה בספקי השוואה (כדי שמפתח ה-API, URL הבסיס והטמפרטורה יגיעו מאותו מקום שהמנהלים כבר מנהלים). ברירת מחדל <code>claude</code>.';
 $string['settings:premium_escalation_model'] = 'מודל פרמיום';
-$string['settings:premium_escalation_model_desc'] = 'שם מודל המועבר לספק הפרמיום. ברירת מחדל <code>claude-opus-4-8</code> לפי פסיקת bake-off A.10.';
+$string['settings:premium_escalation_model_desc'] = 'שם מודל המועבר לספק הפרמיום. ברירת מחדל <code>claude-sonnet-5</code> לפי פסיקת bake-off A.10.';
 $string['settings:premium_escalation_triggers'] = 'regex של הפעלת פרמיום';
 $string['settings:premium_escalation_triggers_desc'] = 'regex אחד של PCRE לשורה (ללא מפרידים; התאמה ללא תלות ברישיות מיושמת אוטומטית). שורות המתחילות ב-# הן תגובות. השאר ריק לשימוש בסט ברירת המחדל שנבחר מ-bake-off A.10 (סמני STEM רב-שלביים: "derive", "prove that", "step by step", LaTeX math, בלוקי קוד מגודרים, big-O, אינטגרלים, אופטימיזציה וכו\').';
 $string['settings:premium_escalation_course_tags'] = 'רשימת קורסים מאושרים לפרמיום';
@@ -1581,7 +1548,7 @@ $string['soapbox:topic_label'] = 'נושא';
 $string['soapbox:time_label'] = 'אורך יעד';
 $string['soapbox:no_target'] = 'ללא יעד';
 $string['soapbox:record'] = 'הקלט נאום';
-$string['soapbox:stop'] = 'עצור וקבל משוב';
+$string['soapbox:stop'] = 'עצור';
 $string['soapbox:recording'] = 'מקליט. דבר בטבעיות; לחץ על עצור כשתסיים.';
 $string['soapbox:transcribing'] = 'מתמלל את הנאום שלך…';
 $string['soapbox:scoring'] = 'מנקד את הנאום שלך…';
@@ -1652,9 +1619,9 @@ $string['privacy:metadata:zendesk:message'] = 'תוכן ההודעה או השי
 $string['privacy:metadata:radar_webhook'] = 'כאשר משלוח Learning Radar ל-webhook של Slack או Microsoft Teams מוגדר, הדוח שנוצר מתפרסם לנקודת הקצה החיצונית ההיא.';
 $string['privacy:metadata:radar_webhook:report'] = 'תוכן דוח Learning Radar, שעשוי להתייחס לפעילות הלומד בקורס.';
 $string['instructor_dashboard:navlink'] = 'לוח בקרה של מורה AI';
-$string['analytics_js:total_students'] = 'סך התלמידים';
+$string['analytics_js:total_students'] = 'סה"כ רשומים';
 $string['analytics_js:active_ai_users'] = 'משתמשי AI פעילים';
-$string['analytics_js:msgs_per_student'] = 'הודעות / תלמיד';
+$string['analytics_js:msgs_per_student'] = 'הודעות / משתמש פעיל';
 $string['analytics_js:avg_session'] = 'הפעלה ממוצעת';
 $string['analytics_js:return_rate'] = 'שיעור חזרה';
 $string['analytics_js:total_sessions'] = 'סך ההפעלות';
@@ -1735,3 +1702,682 @@ $string['outcomes:col_met'] = 'עמדו ברף';
 $string['outcomes:col_pct'] = 'אחוז שעמדו';
 $string['outcomes:footnote'] = 'תלמידים שהוערכו הם אלה עם ניסיון אחד לפחות בתוצאת הלמידה. ההישגים מדווחים במצטבר; התקדמות אישית לעולם אינה מותנית בתוצאת למידה בודדת כלשהי.';
 $string['outcomes:navlink'] = 'דוח תוצאות למידה';
+
+// v6.9.5 i18n batch: RAG budget cap, Redash export window and de-anonymisation gate.
+$string['chat:refused'] = 'אין באפשרותי לסייע בבקשה הזו. נחזור לקורס שלך: במה תרצה לעבוד כעת?';
+$string['settings:rerank_margin_threshold'] = 'סף העמימות של הדירוג מחדש';
+$string['settings:rerank_margin_threshold_desc'] = 'בצע דירוג מחדש רק כאשר מרווח הקוסינוס בין המועמד הראשון והשלישי נמוך מערך זה, כלומר כאשר האחזור עמום. נמדד על 1,008 שאילתות: בערך ברירת המחדל 0.086 מדלגים על כ-30% מהשאילתות בלי אובדן מדיד של היזכרות, ונמנעים מקרים שבהם הדירוג מחדש דוחק תוצאה ראשונה שכבר נכונה. הגדר 0 כדי לדרג מחדש כל שאילתה.';
+$string['rag_cap_blocked'] = 'האינדוקס לא הורץ: תקרת ההוצאות של RAG לתקופה זו הושגה. הגדל את התקרה או המתן לתקופה הבאה. האינדקס הקיים נשאר ללא שינוי.';
+$string['settings:redash_export_window_days'] = 'חלון המבט לאחור של הייצוא (ימים)';
+$string['settings:redash_export_window_days_desc'] = 'עד כמה אחורה מגיע הייצוא כאשר הקורא אינו מעביר חתימת זמן "since". ברירת המחדל של 90 יום מונעת ממקור נתונים שמשמיט את הפרמטר לשלוף כל שורה שנרשמה מעולם; הקורא עדיין יכול לבקש חלון מסוים או להעביר since=0 לשליפה מלאה. הגדר 0 כדי שברירת המחדל תחזור להיות כל ההיסטוריה.';
+$string['settings:redash_allow_deanonymized'] = 'אפשר ייצוא ללא אנונימיזציה';
+$string['settings:redash_allow_deanonymized_desc'] = 'כבוי כברירת מחדל. כאשר ההגדרה כבויה, בקשה עם anonymize=0 נדחית והלומדים מופיעים תמיד בשמות חלופיים. הפעל זאת רק אם דוח חיצוני זקוק באמת לשמות האמיתיים, וזכור שהייצוא מאמת באמצעות מפתח API משותף ולא באמצעות מנהל מחובר, ולכן כל מי שמחזיק במפתח יוכל לאחזר את השמות. בכל מקרה, בקשות ללא אנונימיזציה נרשמות ביומן הביקורת יחד עם כתובת ה-IP המבקשת.';
+
+// i18n batch appended by scripts/apply_i18n.py.
+$string['soapbox:present_audio'] = 'מצגת אודיו';
+$string['soapbox:present_video'] = 'מצגת וידאו';
+$string['soapbox:present_target'] = 'יעד {$a->min}-{$a->max} דקות';
+$string['soapbox:choose_topic'] = 'בחר נושא';
+$string['soapbox:record_short'] = 'הקלטה';
+$string['soapbox:my_recordings'] = 'ההקלטות שלי';
+$string['soapbox:no_recordings'] = 'אין הקלטות עדיין.';
+$string['soapbox:col_recorded'] = 'הוקלט';
+$string['soapbox:col_length'] = 'אורך';
+$string['soapbox:col_type'] = 'סוג';
+$string['soapbox:col_recording'] = 'הקלטה';
+$string['soapbox:col_kept'] = 'נשמר';
+$string['soapbox:col_student_link'] = 'קישור לסטודנט';
+$string['soapbox:view_download'] = 'צפייה / הורדה';
+$string['soapbox:expired'] = 'פג תוקף';
+$string['soapbox:retention_note'] = 'ההקלטות זמינות לצפייה ולהורדה במשך {$a} ימים, ולאחר מכן נמחקות אוטומטית.';
+$string['soapbox:assign_title'] = 'מטלות Soapbox';
+$string['soapbox:assign_single_title'] = 'מטלת Soapbox';
+$string['soapbox:assign_add'] = 'הוספת מטלה';
+$string['soapbox:assign_none'] = 'אין עדיין מטלות Soapbox.';
+$string['soapbox:assign_deleted'] = 'המטלה נמחקה.';
+$string['soapbox:assign_updated'] = 'המטלה עודכנה.';
+$string['soapbox:assign_created'] = 'המטלה נוצרה.';
+$string['soapbox:assign_delete_confirm'] = 'למחוק את "{$a}" ואת כל ההקלטות שלה? לא ניתן לבטל פעולה זו.';
+$string['soapbox:assign_edit_heading'] = 'עריכת מטלת Soapbox';
+$string['soapbox:assign_new_heading'] = 'מטלת Soapbox חדשה';
+
+$string['settings:active_learners_enabled'] = 'הצגת מחוון לומדים פעילים';
+$string['settings:active_learners_enabled_desc'] = 'מציג בלוח הצ\'אט כמה אנשים נוספים לומדים כרגע. זהו תמריץ חברתי ולא תכונה לימודית, והוא פונה לשרת פעם בדקה עבור כל לוח פתוח, ולכן הוא כבוי כברירת מחדל. המחוון מופיע רק כששני לומדים אחרים לפחות פעילים.';
+
+$string['task:unanswered_check'] = '[[tutorshort]] בדיקת שאלות ללא מענה';
+$string['settings:unanswered_check_enabled'] = 'התראה כששאלות נותרות ללא מענה';
+$string['settings:unanswered_check_enabled_desc'] = 'שולח דוא"ל לנמעני התראות ההוצאה כאשר לומדים שואלים את [[tutorshort]] ואינם מקבלים מענה. גלאי חריגות העלות פועל רק כשההוצאה <em>עולה</em>, ולכן ספק שדוחה כל קריאה אינו עולה דבר ואינו מפעיל התראה. כאן נבדק היחס בין שאלות לתשובות, שצונח לאפס ברגע שספק מתקלקל. אם רשימת ההתראות ריקה, נעשה שימוש במנהלי האתר.';
+$string['settings:unanswered_window_hours'] = 'חלון הבדיקה (שעות)';
+$string['settings:unanswered_window_hours_desc'] = 'כמה אחורה מסתכלת כל הרצה. חלון קצר מגיב מהר יותר אך דורש תעבורה מספקת.';
+$string['settings:unanswered_min_questions'] = 'מספר שאלות מזערי לפני התראה';
+$string['settings:unanswered_min_questions_desc'] = 'קורס נבדק רק ממספר שאלות זה בחלון. מתחת לכך, כמה לומדים שסוגרים לשונית נראים כמו תקלה.';
+$string['settings:unanswered_min_answer_rate'] = 'שיעור מענה מזערי';
+$string['settings:unanswered_min_answer_rate_desc'] = 'התרעה כששיעור השאלות שנענו יורד מתחת לערך זה. 0.5 מזהה גם תקלה חלקית. אפס מבטל בדיקה זו.';
+
+$string['analytics:course_hidden_suffix'] = '(מוסתר)';
+
+$string['settings:hidden_categories'] = 'קטגוריות קורסים מוסתרות';
+$string['settings:hidden_categories_desc'] = 'רשימה מופרדת בפסיקים של שמות או מזהים של קטגוריות קורסים שבהן העוזר לא אמור להופיע. לדוגמה: "פיתוח קורסים, 42". העוזר מוסתר אוטומטית גם כאשר מצב העריכה מופעל.';
+$string['settings:provider_heading'] = 'ספק בינה מלאכותית ושיחה';
+$string['settings:provider_heading_desc'] = 'הגדרת פלטפורמת הבינה המלאכותית, המודל והתנהגות השיחה.';
+$string['settings:claude_temperature_allow_prefixes'] = 'מודלי Claude התומכים בפרמטר temperature';
+$string['settings:claude_temperature_allow_prefixes_desc'] = 'קידומת אחת של שם מודל בכל שורה. מודלים של Anthropic ששמם מתחיל באחת מהן ממשיכים לקבל את פרמטר הדגימה <code>temperature</code>. בכל מודל Claude שאינו תואם לקידומת כלשהי, הפרמטר temperature מושמט (מודלי חשיבה החל מ-Opus 4.7 דוחים אותו בשגיאת HTTP 400). השאירו ריק כדי להשתמש בברירת המחדל המסופקת עם התוסף.';
+$string['settings:max_tokens'] = 'אורך תשובה מרבי (טוקנים)';
+$string['settings:max_tokens_desc'] = 'מספר הטוקנים המרבי לכל תשובה של הבינה המלאכותית. ערכים נמוכים יותר מפיקים תשובות קצרות ומהירות יותר. 512 = כשניים-שלושה משפטים, 1024 = פסקה או שתיים, 2048 = הסברים ארוכים יותר. הגדירו 0 לביטול המגבלה (ברירת המחדל של הספק חלה).';
+$string['settings:profile_update_interval'] = 'תדירות עדכון פרופיל הלומד';
+$string['settings:profile_update_interval_desc'] = 'לאחר מספר זה של הודעות מהלומד בקורס, העוזר בונה (או מרענן) פרופיל למידה המסכם חוזקות, חולשות, סגנון למידה ותחומי עניין. הפרופיל נכלל בהנחיית המערכת לצורך תשובות מותאמות אישית. הגדירו 0 לביטול. ברירת מחדל: 10.';
+$string['settings:enable_thinking'] = 'חשיבה מורחבת (Claude בלבד)';
+$string['settings:enable_thinking_desc'] = 'מפעיל חשיבה מסתגלת במודלי Claude. Claude מחליט בעצמו מתי וכמה להעמיק בבעיה לפני מתן תשובה. משפר דיוק בשאלות מורכבות, אך מגדיל את צריכת הטוקנים ואת ההשהיה. תוכן החשיבה אינו מוצג ללומדים. ספקים אחרים מתעלמים מהגדרה זו.';
+$string['settings:rag_sources_heading'] = 'מקורות תוכן ל-RAG';
+$string['settings:rag_sources_heading_desc'] = 'בחרו מאילו סוגי תוכן קורס מנוע האינדוקס של RAG יחלץ טקסט. מחווני המצב ב<a href="{$a}">דף ניהול ה-RAG</a> מראים אם לכל מחלץ יש את מה שדרוש לו כדי לפעול (למשל הכלי pdftotext או רשימת ההיתרים של Cloudflare).';
+$string['settings:rag_extract_pdf'] = 'אינדוקס קובצי PDF (mod_resource)';
+$string['settings:rag_extract_pdf_desc'] = 'מחלץ טקסט מקובצי PDF שהועלו באמצעות הכלי <code>pdftotext</code> (poppler). נתיב הכלי מזוהה אוטומטית; ציינו אותו למטה במידת הצורך.';
+$string['settings:rag_pdftotext_path'] = 'נתיב הכלי pdftotext';
+$string['settings:rag_pdftotext_path_desc'] = 'השאירו ריק לזיהוי אוטומטי (נבדקים <code>/usr/bin/pdftotext</code>, <code>/usr/local/bin/pdftotext</code> ו-<code>which pdftotext</code>). מלאו רק אם ההתקנה שלכם נמצאת במקום אחר.';
+$string['settings:rag_extract_docx'] = 'אינדוקס קובצי DOCX (mod_resource)';
+$string['settings:rag_extract_docx_desc'] = 'מחלץ טקסט ממסמכי Word שהועלו באמצעות ZipArchive של PHP. אין צורך בתלויות חיצוניות.';
+$string['settings:rag_extract_pptx'] = 'אינדוקס קובצי PPTX (mod_resource)';
+$string['settings:rag_extract_pptx_desc'] = 'מחלץ טקסט ממצגות PowerPoint מודרניות שהועלו באמצעות ZipArchive של PHP. עובר על ה-XML של השקופיות ושל הערות המרצה לפי סדר השקופיות; אין צורך בתלויות חיצוניות. קובצי <code>.ppt</code> בינאריים ישנים אינם נתמכים — שמרו מצגות אלה מחדש כ-<code>.pptx</code>.';
+$string['settings:rag_extract_h5p'] = 'אינדוקס תוכן H5P (mod_h5p)';
+$string['settings:rag_extract_h5p_desc'] = 'עובר על נתוני ה-JSON של תוכן H5P ומאנדקס את כל השדות המכילים טקסט (שאלות, תשובות, משוב, תיאורים). נתוני העל של סוגי תוכן H5P רחבים; במקרי קצה צפויות התאמות שגויות בודדות.';
+$string['settings:rag_extract_scorm'] = 'אינדוקס חבילות SCORM (mod_scorm)';
+$string['settings:rag_extract_scorm_desc'] = 'פורק חבילות SCORM ומאנדקס את <code>imsmanifest.xml</code>, את כל קובצי <code>.html</code> ואת מחרוזות התוכן של Articulate Storyline. <strong>מושבת כברירת מחדל</strong>, מכיוון שעיבוד SCORM עלול להיות יקר. גודל החבילה המרבי נקבע על ידי <code>rag_scorm_max_mb</code>.';
+$string['settings:rag_scorm_max_mb'] = 'גודל מרבי של חבילת SCORM לאינדוקס (MB)';
+$string['settings:rag_scorm_max_mb_desc'] = 'מדלג על חבילות SCORM גדולות מערך זה כדי להימנע משימוש מופרז בזיכרון.';
+$string['settings:rag_fetch_transcripts'] = 'הורדת תמלולים לסרטונים ולתוכן אינטראקטיבי מוטמע';
+$string['settings:rag_fetch_transcripts_desc'] = 'סורק את התוכן של mod_page ו-mod_book לאיתור מסגרות iframe מוטמעות (Synthesia, YouTube, Articulate, Genially) ומוריד את כתובת התמלול הנלווית לכל הטמעה (מחפש הן מעל המסגרת והן מתחתיה). דורש חיבור HTTPS יוצא משרת זה אל שרת התמלולים. <strong>מושבת כברירת מחדל</strong>; הפעילו לאחר שספק התמלולים הוסיף שרת זה לרשימת ההיתרים שלו (למשל באמצעות כלל Cloudflare לפי כתובת IP).';
+$string['settings:rag_iframe_host_patterns'] = 'תבניות מארחי iframe';
+$string['settings:rag_iframe_host_patterns_desc'] = 'ביטוי רגולרי אחד בכל שורה, המותאם למאפיין <code>src</code> של iframe. כל מסגרת תואמת נחשבת להטמעה אינטראקטיבית שיש להתאים לה תמלול ולאנדקס אותו. שורות המתחילות ב-<code>#</code> הן הערות.';
+$string['settings:rag_transcript_url_pattern'] = 'תבנית כתובת התמלול';
+$string['settings:rag_transcript_url_pattern_desc'] = 'ביטוי רגולרי המותאם לכתובות של קישורי תמלול. עבור כל iframe שזוהה, מנוע האינדוקס בוחר את הקישור התואם הקרוב ביותר (מעליו או מתחתיו) ומצמיד ביניהם. השאירו ריק כדי לבטל את הצמדת התמלולים.';
+$string['settings:performance_heading'] = 'ביצועים';
+$string['settings:performance_heading_desc'] = 'קובע כמה מתוכן הקורס ייכלל בהנחיה לבינה המלאכותית. ערכים נמוכים יותר משמעם תשובות מהירות יותר אך פחות הקשר עבור הבינה המלאכותית.';
+$string['settings:max_content_per_resource'] = 'תוכן מרבי לכל משאב (תווים)';
+$string['settings:max_content_per_resource_desc'] = 'מספר התווים המרבי של תוכן המחולץ מכל עמוד או פרק בספר. ערכים נמוכים יותר מקטינים את גודל ההנחיה ומאיצים את התשובות.';
+$string['settings:max_total_content'] = 'תוכן כולל מרבי (תווים)';
+$string['settings:max_total_content_desc'] = 'מספר התווים הכולל המרבי של תוכן הקורס הנכלל בהנחיית המערכת. ערכים נמוכים יותר מקטינים את גודל ההנחיה ומאיצים את התשובות.';
+$string['settings:spend_guard_heading'] = 'הגנת הוצאות ומייעל';
+$string['settings:spend_guard_heading_desc'] = 'הגדירו תקרות הוצאה ל-LLM לכל תקופה. כאשר תקרה מגיעה למיצוי, [[tutorshort]] משהה בקשות או עובר לספק זול יותר משרשרת הגיבוי שלכם. ראו את <a href="{$a}">דף עלות הטוקנים</a> למצב ההוצאות הנוכחי ולהמלצות המייעל.';
+$string['settings:spend_cap_period'] = 'תקופת תקרת ההוצאה';
+$string['settings:spend_cap_period_desc'] = 'באיזו תדירות מתאפסת תקרת ההוצאה. מיושר ללוח השנה: החודשי מתחיל ב-1 בחודש, השבועי ביום שני והיומי בחצות.';
+$string['settings:spend_cap_site'] = 'תקרת הוצאה לכלל האתר (USD)';
+$string['settings:spend_cap_site_desc'] = 'תקרה כוללת ב-USD לכל הקורסים והיכולות בתקופה הנוכחית. <code>0</code> = ללא הגבלה. התקרות לפי יכולת שלהלן גוברות כאשר הן מוגדרות.';
+$string['settings:spend_cap_chat'] = 'תקרת צ\'אט (USD)';
+$string['settings:spend_cap_chat_desc'] = 'תקרה לצ\'אט ולבחנים של הלומדים בלבד. <code>0</code> = נעשה שימוש בתקרת האתר.';
+$string['settings:spend_cap_voice'] = 'תקרת קול (USD)';
+$string['settings:spend_cap_voice_desc'] = 'תקרה ליכולות הקול (Realtime + TTS + STT). הקול הוא בדרך כלל ההוצאה הגדולה ביותר — הגבילו אותו ראשון.';
+$string['settings:spend_cap_rag'] = 'תקרת RAG (USD)';
+$string['settings:spend_cap_rag_desc'] = 'תקרה לקריאות ההטמעה המתבצעות בעת אינדוקס הקורסים.';
+$string['settings:spend_cap_analytics'] = 'תקרת ניתוח נתונים (USD)';
+$string['settings:spend_cap_analytics_desc'] = 'תקרה לשאילתות Learning Radar של מנהלי המערכת.';
+$string['settings:spend_failover_chain'] = 'שרשרת גיבוי';
+$string['settings:spend_failover_chain_desc'] = 'כאשר תקרה מגיעה למיצוי, [[tutorshort]] מנסה את הספקים האלה לפי הסדר. רשומה אחת בכל שורה, בתבנית <code>capability:label</code>. התוויות מפנות לרשומות בספקי ההשוואה (עבור <code>chat</code> / <code>analytics</code>) או בספקי הקול (עבור <code>voice</code>). שורות המתחילות ב-<code>#</code> הן הערות. לדוגמה:<br><code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>';
+$string['settings:failover_per_call_enabled'] = 'מעבר לגיבוי בכל קריאה (v5.5.0)';
+$string['settings:failover_per_call_enabled_desc'] = 'כאשר מופעל, כל קריאת צ\'אט עוטפת את הספק הראשי במעטפת של שרשרת גיבוי. אם בקריאה מסוימת חלה חריגת זמן או שגיאת 5xx, [[tutorshort]] עובר לרשומה הבאה ב<strong>שרשרת הגיבוי</strong> שלמעלה ופותח מפסק ל-15 דקות עבור הספק שנכשל. כל מעבר כותב שורת ביקורת (<code>failover_fallthrough</code>); לאחר ההפעלה בדקו ניהול -> [[tutorshort]] -> יומן ביקורת כדי לוודא שהשרשרת פועלת. מושבת כברירת מחדל; הפעילו רק לאחר שהשרשרת אומתה והמוסד שלכם אישר שקיימים הסכמי עיבוד הנתונים הנדרשים לכל ספק בשרשרת.';
+$string['settings:failover_timeout_chat'] = 'גיבוי: חריגת זמן לצ\'אט (שניות)';
+$string['settings:failover_timeout_chat_desc'] = 'כמה זמן להמתין לטוקן הראשון מספק צ\'אט לפני מעבר. ברירת מחדל 8 שניות. ערכים נמוכים יותר מתרחקים מהר יותר מספקים איטיים, במחיר יותר אזעקות שווא בבקשות איטיות באופן זמני; ערכים גבוהים יותר מחזיקים את השרשרת זמן רב יותר אצל הספק הראשי. נלקח בחשבון רק כאשר <strong>מעבר לגיבוי בכל קריאה</strong> מופעל.';
+$string['settings:spend_notify_emails'] = 'נמעני התראות הוצאה';
+$string['settings:spend_notify_emails_desc'] = 'כתובות דואר אלקטרוני מופרדות בפסיקים שיקבלו התראה ב-80%, 95% ו-100% מהתקרה. השאירו ריק כדי להתריע לכל מנהלי האתר.';
+$string['settings:opt_cost_weight'] = 'מייעל: משקל העלות';
+$string['settings:opt_cost_weight_desc'] = 'עד כמה המייעל מתחשב בעלות בעת דירוג הספקים. 0.0 מתעלם מהעלות, 1.0 מייעל אך ורק לפי עלות. נשקל יחד עם משקל האיכות.';
+$string['settings:opt_quality_weight'] = 'מייעל: משקל האיכות';
+$string['settings:opt_quality_weight_desc'] = 'עד כמה המייעל מתחשב בשביעות רצון הלומדים (שיעור הדירוגים החיוביים) בעת דירוג הספקים. 0.0 מתעלם מהאיכות.';
+$string['settings:inactivity_reminder_enabled'] = 'תזכורות על חוסר פעילות';
+$string['settings:inactivity_reminder_enabled_desc'] = 'שולח הודעת דואר אלקטרוני שבועית ללומדים שלא נכנסו לקורס שלהם במשך מספר הימים שהוגדר.';
+$string['settings:inactivity_threshold_days'] = 'סף חוסר פעילות (ימים)';
+$string['settings:inactivity_threshold_days_desc'] = 'כמה ימי חוסר פעילות יחלפו לפני שליחת הודעת תזכורת.';
+$string['settings:voice_providers_heading'] = 'ספקי קול (Realtime, TTS, STT)';
+$string['settings:voice_providers_heading_desc'] = 'הגדירו ספק אחד או יותר של ממשק קול. הגדרות אלה אינן תלויות בספק הצ\'אט שלמעלה ובספק ההטמעות של RAG — לקול יש רשימת ספקים משלו, מכיוון שכיום רק OpenAI ו-xAI מציעים נקודות קצה של Realtime מבוססות WebSocket, TTS ו-STT. באמצעות הרשימות הנפתחות שלהלן תבחרו איזה ספק רשום מטפל בכל יכולת. אם לא מוגדרת אף שורה, חלה ההתנהגות הישנה של מפתח יחיד (מפתח ה-API של Realtime שלמעלה או מפתח OpenAI הראשי). אתר המשתמש ב-Together AI / Anthropic / DeepSeek / Gemini / Mistral לצ\'אט חייב להגדיר כאן לפחות שורה אחת כדי שהקול יפעל.';
+$string['settings:voice_active_realtime'] = 'ספק Realtime פעיל';
+$string['settings:voice_active_realtime_desc'] = 'איזה ספק קול מוגדר מטפל בהפעלות סוכן הקול Realtime.';
+$string['settings:voice_active_tts'] = 'ספק TTS פעיל';
+$string['settings:voice_active_tts_desc'] = 'איזה ספק קול מוגדר מקריא בקול את תשובות הבינה המלאכותית.';
+$string['settings:voice_active_stt'] = 'ספק STT פעיל';
+$string['settings:voice_active_stt_desc'] = 'איזה ספק ממיר את דיבור הלומדים לטקסט. השאירו ריק כדי להעדיף את שרת Whisper המתארח אצלכם, אם הוגדר למטה, ולאחר מכן את השורה הראשונה של ספקי הקול או את המפתח הישן.';
+$string['settings:stt_selfhosted_enabled'] = 'הפעלת תמלול בשרת עצמאי';
+$string['settings:stt_selfhosted_enabled_desc'] = 'משתמש בשרת Whisper העצמאי שלמטה כמסלול להמרת דיבור לטקסט בקלט הקולי וב-Soapbox. דורש כתובת שרת למטה. כאשר מושבת, התמלול חוזר למסלול המתארח (OpenAI Whisper) או למסלול הדפדפן, גם אם הכתובת מוגדרת.';
+$string['settings:stt_selfhosted_warm'] = 'חימום בתחילת הקלטת Soapbox';
+$string['settings:stt_selfhosted_warm_desc'] = 'כאשר מופעל, תחילת הקלטת Soapbox שולחת בקשת "חימום" קלה (במידת האפשר) לשרת התמלול העצמאי, כך ששרת המצטמצם לאפס (למשל Cloud Run) יספיק לעלות בזמן שהלומד עדיין מקליט — כך השהיית ההתנעה הקרה נותרת מוסתרת מהתמלול המתבצע בעת השליחה. אין לכך השפעה אם לא הוגדרה למעלה כתובת של שרת עצמאי. מושבת כברירת מחדל.';
+$string['settings:voice_tab_enabled'] = 'הפעלת לשונית הקול';
+$string['settings:voice_tab_enabled_desc'] = 'מציג את לשונית הקול בסרגל הניווט התחתון. כאשר מושבת, הלומדים רואים רק את הלשוניות צ\'אט והערות. יכולות הקול (תרגול שיחה, תרגול הגייה) נותרות נגישות דרך פותחי השיחה, אם הופעלו בנפרד.';
+$string['settings:soapbox_heading'] = 'Soapbox';
+$string['settings:soapbox_heading_desc'] = 'תרגול מצגת בעל פה: כיצד מתומללות ההקלטות ולפי איזו מחוון הן מנוקדות. הפעילו את Soapbox לכל קורס באמצעות מתג Soapbox במקטע הפדגוגיה.';
+$string['settings:soapbox_max_seconds'] = 'אורך מרבי של הקלטת Soapbox (שניות)';
+$string['settings:soapbox_max_seconds_desc'] = 'מגבלה עליונה מוחלטת לאורך ההקלטה בכל מטלה. מרצים יכולים להגדיר טווח קצר יותר. ברירת מחדל 720 (12 דקות).';
+$string['settings:soapbox_max_recordings'] = 'מספר הקלטות Soapbox מרבי ללומד ולמטלה';
+$string['settings:soapbox_max_recordings_desc'] = 'מגבלה עליונה מוחלטת למספר ההקלטות שלומד יכול לבצע במטלה, ללא תלות בהגדרת מספר הניסיונות למטלה. ברירת מחדל 3.';
+$string['settings:soapbox_retention_days'] = 'שמירת הקלטות Soapbox (ימים)';
+$string['settings:soapbox_retention_days_desc'] = 'כמה זמן נשמרת הקלטה לפני מחיקה אוטומטית; התמלול, הניקוד והמשוב נשמרים. מוגבל ל-1–28 ימים. ככל שקצר יותר, כך טוב יותר מבחינת צמצום נתונים. ברירת מחדל 7.';
+$string['settings:soapbox_video_quality'] = 'איכות הווידאו ב-Soapbox';
+$string['settings:soapbox_video_quality_desc'] = 'הרזולוציה וקצב הסיביות של ההקלטה. זהו הגורם המרכזי לעלות ולרוחב הפס; דובר בצילום בינוני נראה בבירור גם באיכות רגילה. איכות נמוכה מתאימה לחיבורים חלשים; איכות גבוהה רק כאשר פרטים חזותיים חשובים.';
+$string['settings:soapbox_storage_bucket'] = 'דלי האחסון של Soapbox';
+$string['settings:soapbox_storage_bucket_desc'] = 'דלי S3 עבור ההקלטות. ברירת מחדל: דלי הארכיון המשותף.';
+$string['settings:soapbox_storage_region'] = 'אזור האחסון של Soapbox';
+$string['settings:soapbox_storage_region_desc'] = 'אזור ה-AWS של הדלי, למשל us-east-1.';
+$string['settings:soapbox_storage_prefix'] = 'קידומת מפתחות האחסון של Soapbox';
+$string['settings:soapbox_storage_prefix_desc'] = 'קידומת המפתחות בתוך הדלי. ההקלטות נשמרות תחת נתיב זה, כך שכלל מחזור חיים יוכל לכוון אליהן.';
+$string['settings:soapbox_storage_key'] = 'מזהה מפתח הגישה לאחסון Soapbox';
+$string['settings:soapbox_storage_key_desc'] = 'מזהה מפתח הגישה של גורם IAM המוגבל לפעולות PutObject/GetObject/DeleteObject על הקידומת שלמעלה.';
+$string['settings:soapbox_storage_secret'] = 'מפתח הגישה הסודי לאחסון Soapbox';
+$string['settings:soapbox_storage_secret_desc'] = 'מפתח הגישה הסודי המתאים למזהה מפתח הגישה שלמעלה.';
+$string['settings:survey_heading'] = 'סקר לומדים';
+$string['settings:survey_heading_desc'] = 'הגדירו את סקר חוויית הלומדים בתוך הצ\'אט. <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">עריכת שאלות הסקר &rarr;</a>';
+$string['settings:survey_enabled'] = 'הפעלת סקרים';
+$string['settings:survey_enabled_desc'] = 'כאשר מופעל, ללומדים תוצע האפשרות למלא סקר על חווייתם עם המורה הפרטי מבוסס הבינה המלאכותית.';
+$string['settings:survey_trigger_messages'] = 'הצגה לאחר N הודעות';
+$string['settings:survey_trigger_messages_desc'] = 'מציג את ההזמנה לסקר לאחר שהלומד שלח מספר זה של הודעות בקורס. הגדירו 0 כדי להציג רק בהפעלה ידנית.';
+$string['settings:survey_frequency'] = 'תדירות הסקר לכל משתמש';
+$string['settings:survey_frequency_desc'] = 'באיזו תדירות ניתן להזמין לומד למלא את הסקר בכל קורס.';
+$string['settings:rubric_heading'] = 'מחווני תרגול';
+$string['settings:rubric_heading_desc'] = 'הגדירו את מחווני הניקוד להפעלות תרגול שיחה והגייה. בסיום הפעלת תרגול הלומדים מקבלים ניקוד ומשוב שנוצרו על ידי הבינה המלאכותית. <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">עריכת המחוונים &rarr;</a>';
+$string['settings:practice_scoring_enabled'] = 'הפעלת ניקוד תרגול';
+$string['settings:practice_scoring_enabled_desc'] = 'כאשר מופעל, לאחר הפעלות תרגול שיחה והגייה הלומדים מקבלים כרטיס ניקוד עם הערכה לכל קריטריון ומשוב.';
+$string['settings:usertesting_heading'] = 'בדיקות שמישות';
+$string['settings:usertesting_heading_desc'] = 'בדיקות שמישות בתוך היישומון עם דירוג מבוסס משימות. הלומדים משלימים משימות בעוזר ומדרגים את חווייתם. התוצאות מופיעות בלוח הבקרה של ניתוח הנתונים.';
+$string['settings:usertesting_enabled'] = 'הפעלת בדיקות שמישות';
+$string['settings:usertesting_enabled_desc'] = 'מציג את הקישור "בדיקות שמישות" בכותרת התחתונה של היישומון. כאשר מופעל, הלומדים יכולים לגשת למשימות הבדיקה.';
+$string['settings:usertesting_external_url'] = 'כתובת טופס חיצוני (וריאנט C)';
+$string['settings:usertesting_external_url_desc'] = 'אופציונלי: כתובת של טופס חיצוני (למשל Google Forms או Typeform). השתמשו בשומרי המקום: {{userid}}, {{courseid}}, {{messages}}, {{session_minutes}}. אם מוגדרת, לחיצה על "בדיקות שמישות" פותחת כתובת זו עם פרטי ההקשר ממולאים. השאירו ריק כדי להשתמש רק בלוח הבדיקות שבתוך היישומון.';
+$string['settings:footer_links_heading'] = 'קישורים בכותרת התחתונה';
+$string['settings:footer_links_heading_desc'] = 'התאימו את הקישורים המוצגים בתחתית העוזר: קישור אופציונלי להיצע הקורסים מתחת לקישור המשוב, וכן הניסוח של קישור המשוב ושל הלוח שלו.';
+$string['settings:footer_courses_text'] = 'טקסט הקישור לקורסים';
+$string['settings:footer_courses_text_desc'] = 'הטקסט של קישור המוצג מתחת לקישור המשוב. השאירו ריק כדי להסתיר את הקישור לחלוטין.';
+$string['settings:footer_courses_url'] = 'כתובת הקישור לקורסים';
+$string['settings:footer_courses_url_desc'] = 'יעד הקישור לקורסים (נפתח בלשונית חדשה). הקישור מוסתר אם שדה זה ריק.';
+$string['settings:feedback_link_label'] = 'תווית קישור המשוב';
+$string['settings:feedback_link_label_desc'] = 'מחליף את הטקסט של קישור המשוב בכותרת התחתונה, למשל "שלחו משוב על [[tutorshort]] לצוות המחשוב". השאירו ריק כדי להשתמש בתווית המתורגמת המוגדרת כברירת מחדל "משוב".';
+$string['settings:feedback_panel_intro'] = 'מבוא לוח המשוב';
+$string['settings:feedback_panel_intro_desc'] = 'שורת המבוא המוצגת בראש לוח המשוב. מבהירה לאן מגיע המשוב. השאירו ריק כדי שלא תוצג שורת מבוא.';
+$string['settings:quiz_provider'] = 'ספק עוזר הבחנים';
+$string['settings:quiz_provider_desc'] = 'מזהה הספק (למשל <code>claude</code> או <code>openai</code>) ליצירת בחנים. חייב להתאים לשורה בספקי ההשוואה. השאירו ריק כדי להשתמש בספק הצ\'אט.';
+$string['settings:quiz_model'] = 'מודל עוזר הבחנים';
+$string['settings:quiz_model_desc'] = 'שם המודל ליצירת בחנים, למשל <code>claude-haiku-4-5</code>. כדי שהדריסה תחול, יש למלא גם שדה זה וגם את הספק.';
+$string['settings:branding_heading'] = 'מיתוג';
+$string['settings:branding_heading_desc'] = 'התאימו את השם והמראה של העוזר.';
+$string['settings:institution_short_name'] = 'שם קצר של המוסד';
+$string['settings:institution_short_name_desc'] = 'השם המקוצר של המוסד עבור רכיבי ממשק צרים (למשל "State U").';
+$string['settings:display_name'] = 'שם התצוגה של העוזר';
+$string['settings:display_name_desc'] = 'השם המלא של העוזר החכם, כפי שהוא מוצג בברכות ובמסך הפתיחה (למשל "עוזר למידה מקוון").';
+$string['settings:short_name'] = 'שם קצר של העוזר';
+$string['settings:short_name_desc'] = 'השם הקצר המשמש בשורת הכותרת וברכיבי ממשק צרים (למשל "עוזר").';
+$string['settings:welcome_message'] = 'הודעת מסך הפתיחה';
+$string['settings:welcome_message_desc'] = 'ההודעה המוצגת במסך הפתיחה בביקור הראשון. השתמשו ב-<code>{{firstname}}</code> לשם הפרטי של הלומד וב-<code>{{coursename}}</code> לשם הקורס. השאירו ריק לטקסט ברירת המחדל.';
+$string['settings:chat_greeting'] = 'ברכת הצ\'אט';
+$string['settings:chat_greeting_desc'] = 'הודעת הברכה המוצגת בעת פתיחת חלון הצ\'אט. השתמשו ב-<code>{{firstname}}</code> לשם הפרטי של הלומד וב-<code>{{coursename}}</code> לשם הקורס. השאירו ריק לטקסט ברירת המחדל.';
+$string['settings:customavatars'] = 'דמויות מותאמות אישית';
+$string['settings:customavatars_desc'] = 'העלו לכאן תמונות מרובעות בפורמט PNG או SVG כדי להוסיף אותן לרשימת הדמויות שלמעלה. כל קובץ שמועלה הופך לברירת מחדל שניתן לבחור (עם הקידומת "Custom:"). מחקו קובץ מרשימה זו כדי להסירו מהרשימה הנפתחת. טיפ: קובץ PNG בגודל 256×256 נראה חד במסכי Retina.';
+$string['settings:anomaly_digest_heading'] = 'Learning Radar — תקציר חריגות';
+$string['settings:anomaly_digest_heading_desc'] = 'בדיקה יומית המשווה חלונות זמן נעים של דירוגים שליליים, הוצאות טוקנים וסימוני יושרה. כאשר מדד חוצה את הסף שהוגדר, נשלח תקציר לערוצים שהוגדרו. לדוחות מתוזמנים לפי שאילתה, השתמשו בלוח התזמונים בדף ניתוח הנתונים של [[tutorshort]].';
+$string['settings:anomaly_digest_enabled'] = 'הפעלת תקציר החריגות';
+$string['settings:anomaly_digest_enabled_desc'] = 'מריץ את המשימה היומית של תקציר החריגות. שקטה כברירת מחדל — נשלחת רק כאשר מדד חוצה את הסף.';
+$string['settings:anomaly_digest_threshold_pct'] = 'סף התראה (%)';
+$string['settings:anomaly_digest_threshold_pct_desc'] = 'השינוי באחוזים בין החלון האחרון לחלון הקודם שמפעיל התראה. ברירת מחדל: 50.';
+$string['settings:anomaly_digest_recipient_email'] = 'כתובת הדואר האלקטרוני של הנמען';
+$string['settings:anomaly_digest_recipient_email_desc'] = 'כתובת הדואר האלקטרוני המקבלת את תקציר החריגות. השאירו ריק כדי להשתמש בכתובת של מנהל האתר.';
+$string['settings:anomaly_digest_slack_webhook'] = 'כתובת webhook נכנס של Slack';
+$string['settings:anomaly_digest_slack_webhook_desc'] = 'כתובת אופציונלית של webhook נכנס ב-Slack. התקציר מתפרסם כהודעת בלוקים של Slack.';
+$string['settings:anomaly_digest_teams_webhook'] = 'כתובת webhook נכנס של Microsoft Teams';
+$string['settings:anomaly_digest_teams_webhook_desc'] = 'כתובת אופציונלית של webhook נכנס ב-Teams. התקציר מתפרסם ככרטיס מחבר של Office 365.';
+
+$string['radar_report:title'] = 'דוח Learning Radar של [[tutorshort]]';
+$string['radar_report:print'] = 'הדפסה / שמירה כ-PDF';
+$string['radar_report:generated'] = 'נוצר בתאריך {$a}';
+$string['radar_report:query'] = 'שאילתה';
+$string['radar_report:response'] = 'תשובה';
+$string['radar_report:privacy_note'] = 'כל נתוני הלומדים בדוח זה עברו אנונימיזציה. אין לשתף אותו בפומבי.';
+
+$string['settings:embed_query_model'] = 'מודל הטמעה לשאילתות (מתקדם)';
+$string['settings:embed_query_model_desc'] = 'השאירו ריק אלא אם אתם בטוחים שיש בכך צורך. בדרך כלל שאילתות ותוכן הקורס מוטמעים באותו מודל, וזו הבחירה הבטוחה היחידה בכל מצב: וקטורים ממודלים שונים אינם ניתנים להשוואה, וערבוב שלהם מפיק תוצאות שנראות משכנעות אך חסרות משמעות, במקום שגיאה. הגדירו זאת רק כאשר שני המודלים חולקים מרחב הטמעה אחד — כיום משפחת Voyage 4 (voyage-4-large, voyage-4, voyage-4-lite, voyage-4-nano), שמתועדת כניתנת להחלפה. היתרון הוא שתוכלו לשנות את מודל השאילתות בהמשך בלי להטמיע מחדש את כל קטלוג הקורסים. אם יתברר שהמודלים אינם ברי-השוואה, האחזור ירשום אזהרה ולא יחזיר דבר עבור אותו קורס, במקום להחזיר קטעים שגויים.';
+$string['settings:embed_dtype'] = 'דיוק הווקטורים המאוחסנים';
+$string['settings:embed_dtype_desc'] = 'כמה שטח תופס כל וקטור מאוחסן. דיוק נמוך יותר חוסך שטח דיסק רב במחיר אובדן מסוים בדיוק האחזור. <strong>שינוי ההגדרה מחייב אינדוקס מחדש מלא</strong> — הפורמטים אינם קריאים זה במקום זה, וכל קורס שעדיין מאוחסן בפורמט הקודם יידלג (עם אזהרה ביומנים) עד שיעבור אינדוקס מחדש. רק ספקים שתומכים בקוונטיזציה מכבדים הגדרה זו; האחרים מאחסנים תמיד בדיוק מלא.';
+$string['settings:embed_dtype_float'] = 'דיוק מלא (הגדול ביותר, המדויק ביותר)';
+$string['settings:embed_dtype_int8'] = 'דיוק מופחת — כרבע מהשטח';
+$string['settings:embed_dtype_binary'] = 'הקטן ביותר — כשלושים אחד מהשטח, הדיוק הנמוך ביותר';
+
+$string['ragadmin:stat_vector_storage'] = 'אחסון וקטורים';
+$string['ragadmin:storage_projection'] = 'אינדוקס מחדש בדיוק אחר ישנה זאת ל: {$a}. שינוי הדיוק מחייב אינדוקס מחדש מלא.';
+$string['ragadmin:storage_alt_item'] = '{$a->dtype} — כ־{$a->size}';
+
+$string['settings:embed_dtype_shortfloat'] = 'דיוק מלא';
+$string['settings:embed_dtype_shortint8'] = 'דיוק מופחת';
+$string['settings:embed_dtype_shortbinary'] = 'הקטן ביותר';
+
+$string['quizlock:blocked'] = 'עוזר [[tutorshort]] אינו זמין כל עוד יש לך בוחן פעיל. שלח או סגור את הניסיון והוא יחזור להיות זמין.';
+$string['quizlock:heading'] = 'מצב בוחן';
+$string['quizlock:enabled'] = 'נעילת העוזר במהלך בחנים ב-Moodle';
+$string['quizlock:enabled_desc'] = 'חוסם את העוזר בכל המקומות — צ\'אט, קול, כרטיסיות, בחני תרגול — כל עוד ללומד יש ניסיון בוחן פעיל. הבדיקה מתבצעת בשרת, ולכן פתיחת לשונית נוספת אינה עוקפת אותה. מורה יכול לפטור בוחן יחיד על ידי הגדרת רמת הסיוע שלו לעזרה מלאה.';
+$string['quizlock:window'] = 'חלון תוקף הניסיון (דקות)';
+$string['quizlock:window_desc'] = 'כמה זמן ניסיון בבוחן ללא הגבלת זמן עדיין נחשב פעיל. בחנים עם הגבלת זמן משלהם משתמשים בה. ניסיונות שננטשו נשארים פעילים ללא הגבלה, ולכן בלי גבול זה אחד מהם היה נועל את הלומד לצמיתות. ברירת מחדל: 180.';
+
+$string['emergency:chat_stopped'] = '[[tutorshort]] מושהה כרגע. חומרי הקורס שלך לא הושפעו, וזו אינה תקלה שגרמת לה — נסה שוב מאוחר יותר.';
+$string['settings:money_nonnegative_invalid'] = 'הזן סכום של 0 או יותר, עם שתי ספרות אחרי הנקודה לכל היותר (לדוגמה 25 או 25.50).';
+
+$string['chat:turn_failed'] = 'לא ניתן היה להשלים את התשובה הזו. שום דבר שעשית לא גרם לכך — נסו שוב.';
+$string['settings:prompt_budget_mode'] = 'מצב תקציב הנחיית המערכת';
+$string['settings:prompt_budget_mode_desc'] = 'כיצד נקבע תקציב התווים של הנחיית המערכת. <strong>גזירה מהמודל</strong> מחשבת כמה מקום המודל המוגדר באמת מציע — חלון ההקשר שלו, פחות התשובה השמורה והיסטוריית השיחה — ומשתמשת בו, עם תקרה כדי שחלון גדול מאוד לא יצדיק הנחיה גדולה מאוד. הדבר חל רק כל עוד תקציב התווים שלמטה נשאר בערך ברירת המחדל 36,000: אם תשנו את המספר הזה, הוא הקובע, בשני הכיוונים, כי מספר שמנהל הקליד הוא החלטה ולא ניחוש. <strong>קבוע</strong> משתמש תמיד במספר שלמטה. שרת באחסון עצמי צריך להגדיר את חלון ההקשר של השרת, ולו יש עדיפות על כל האמור כאן.';
+$string['settings:prompt_budget_mode_auto'] = 'גזירה מהמודל (מומלץ)';
+$string['settings:prompt_budget_mode_fixed'] = 'תקציב תווים קבוע';
+
+$string['quizlock:scope'] = 'עד לאן הנעילה מגיעה';
+$string['quizlock:scope_course'] = 'קורס זה בלבד (מומלץ)';
+$string['quizlock:scope_site'] = 'כל הקורסים';
+$string['quizlock:scope_desc'] = 'האם ניסיון פעיל חוסם את [[tutorshort]] רק בקורס שמכיל את הבוחן, או בכל מקום. <strong>קורס זה בלבד</strong> הוא ברירת המחדל וכמעט תמיד מה שתרצו. חסימה כלל-אתרית הייתה ההתנהגות עד גרסה 7.2.4, והיה לה כשל שכדאי להכיר: ניסיון נטוש נשאר «בתהליך» לנצח, ולכן בוחן שכוח אחד אי-שם בהיסטוריה של לומד השבית את העוזר בכל קורס שלו, בלי שום הסבר על המסך. חסימה כלל-אתרית מוסיפה מעט מאוד מול לומד נחוש שיש לו דפדפן שני, וחומרי הקורס והאחזור של העוזר מוגבלים לקורס ממילא.';
+
+$string['settings:prompt_budget_tuner_conflict'] = 'משימת הכיול האוטומטי המיושנת של תקציב ההנחיה פעילה בעוד מצב התקציב מוגדר להיגזר מהמודל. השניים מתנגשים: המשימה כותבת את תקציב התווים, וכל ערך שאינו ברירת המחדל נקרא כבחירה מכוונת, מה שמבטל את התקציב הנגזר. המשימה נסוגה כעת מעצמה במצב הזה, כך שדבר אינו נדרס — אך כבו אותה כדי להסיר את אי-הבהירות.';
+
+$string['settings:prompt_budget_no_window'] = 'מצב התקציב שלמעלה מוגדר לגזירה מהמודל, אבל אין ממה לגזור: מודל השיחה לא הוגדר ולא הוגדר חלון הקשר לשרת, ולכן הגזירה חוזרת לתקציב התווים הקבוע שלמטה. הגדירו את מודל השיחה, או הגדירו את חלון ההקשר של השרת ידנית, ואז הריצו שוב את הבדיקה העצמית של השרת וודאו שבדיקת חלון ההקשר עוברת. עד אז התקציב הוא המספר שלמטה, מה שלא יטען המצב.';
+
+$string['analytics_js:section'] = 'Section';
+$string['analytics_js:course'] = 'Course';
+$string['transcripts:title'] = 'תמלילי שיחות אנונימיים';
+$string['transcripts:privacynote'] = 'זהות הלומדים מוחלפת בשמות בדויים ייחודיים לכל דוח לפני שמוצג או מורד מידע כלשהו. התווית נשארת קבועה בתוך אותו דוח, כך שניתן לעקוב אחר שיחה, ואין לה כל משמעות בין דוחות שונים, ולכן לא ניתן לקשר בין שתי הורדות על בסיסה. ההורדות נרשמות ביומן הביקורת.';
+$string['transcripts:mode'] = 'הצג';
+$string['transcripts:met'] = 'הושג';
+$string['transcripts:notmet'] = 'לא הושג';
+$string['transcripts:from'] = 'מ-';
+$string['transcripts:to'] = 'עד';
+$string['transcripts:truncated'] = 'מוצגות {$a} השורות הראשונות. צמצם את טווח התאריכים או את היחידה כדי לראות את השאר.';
+$string['transcripts:rowcount'] = '{$a} שורות.';
+$string['transcripts:col_conversation'] = 'שיחה';
+$string['transcripts:col_learner'] = 'לומד';
+$string['transcripts:col_type'] = 'סוג';
+$string['transcripts:col_message'] = 'הודעה';
+$string['coursesettings:apikey_stored'] = 'מפתח שמור. השאירו ריק כדי לשמור עליו.';
+$string['coursesettings:apikey_clear'] = 'מחק את המפתח השמור והשתמש במפתח האתר';
+$string['coursesettings:spend_cap_monthly'] = 'תקרת הוצאה חודשית לקורס זה (USD)';
+$string['coursesettings:spend_cap_monthly_desc'] = 'השאירו ריק כדי להשתמש בברירת המחדל של האתר. כאשר מוגדר, תכונות ה-AI בקורס זה נעצרות כאשר ההוצאה החודשית מגיעה לסכום זה.';
+$string['soapbox:rate_limited'] = 'נשלחו יותר מדי הקלטות בזמן קצר. המתן כמה דקות ונסה שוב.';
+$string['token_analytics:cost_partial'] = 'לא כולל {$a->tokens} אסימונים בדגמים ללא מחיר מפורסם ({$a->models}), ולכן העלות בפועל גבוהה יותר.';
+$string['privacy:metadata:outreach_log:dryrun'] = 'האם השורה נכתבה במצב הרצה יבשה (dry-run) — לא נשלח אימייל בפועל.';
+$string['flashcards:starter_saved'] = 'נשמרו {$a} כרטיסיות לימוד מעמוד זה.';
+$string['flashcards:starter_open_review'] = 'פתחו את עמוד החזרה כדי ללמוד אותן בשיטת חזרה מרווחת.';
+$string['flashcards:starter_failed'] = 'לא הצלחתי ליצור כרטיסיות לימוד מעמוד זה ({$a}). נסו שוב או בחרו עמוד עם יותר תוכן.';
+$string['flashcards:starter_error'] = 'אינני יכול ליצור כרטיסיות לימוד מעמוד זה כרגע. נסו שוב מאוחר יותר.';
+$string['soapbox:no_media_support'] = 'דפדפן זה אינו יכול להקליט שמע כאן. השתמשו בגרסה עדכנית של Chrome, Edge, Firefox או Safari בחיבור מאובטח (https).';
+$string['soapbox:status_uploaded'] = 'מעבד — תמלול ומתן ציון בתהליך';
+$string['soapbox:status_scored'] = 'התקבל ציון';
+$string['soapbox:status_failed'] = 'מתן הציון נכשל — ניסיון זה אינו נספר. אנא הקליטו שוב.';
+$string['error:realtime_unavailable'] = 'מצב הקול אינו זמין באופן זמני. נסו שוב בעוד רגע, או השתמשו בצ\'אט טקסט.';
+$string['settings:cdn_bundle_url'] = 'כתובת URL של חבילת מציג האווטאר המדבר';
+$string['settings:cdn_bundle_url_desc'] = 'כתובת ה-URL של חבילת ה-JavaScript שעמוד מציג האווטאר המדבר טוען (חיבור WebRTC/LiveKit). השאירו ריק כדי להשבית את המציג; העמוד יציג אז הודעה במקום במה שבורה.';
+
+// --- v7.3.5: 379-key batch (issue #205 extraction) ---
+$string['analytics:plugin_settings'] = 'הגדרות התוסף';
+$string['analytics:token_usage_cost'] = 'שימוש בטוקנים ועלות';
+$string['analytics:export_csv'] = 'ייצוא CSV';
+$string['analytics:export_csv_title'] = 'הורדת הניתוחים כקובץ CSV';
+$string['analytics:hide_real_names'] = 'הסתרת שמות אמיתיים';
+$string['analytics:show_real_names'] = 'הצגת שמות אמיתיים';
+$string['analytics:exit_student_mode'] = 'יציאה ממצב תלמיד';
+$string['analytics:student_mode'] = 'מצב תלמיד';
+$string['analytics:real_names_warning'] = '<strong>שמות אמיתיים גלויים.</strong> נתוני הסטודנטים אינם אנונימיים בהפעלה זו. כבו את האפשרות לפני שיתוף המסך או יציאה מהעמוד.';
+$string['analytics:student_mode_notice'] = '<strong>מצב תלמיד פעיל.</strong> הווידג\'ט של [[tutorshort]] בעמודי הקורס מציג עכשיו בדיוק את מה שהסטודנטים רואים. צאו מכאן או הקישו Ctrl+Shift+A מכל עמוד.';
+$string['analytics:courses_enabled_summary'] = 'ב-{$a->enabled} מתוך {$a->total} קורסים עוזר ה-AI מופעל';
+$string['analytics:manage_course_enrollment'] = 'ניהול רישום לקורסים';
+$string['analytics:radar_heading'] = 'Learning Radar';
+$string['analytics:radar_subtitle'] = 'שאלו שאלות על נתוני סטודנטים אנונימיים';
+$string['analytics:radar_share'] = 'העתקת קישור לשיתוף';
+$string['analytics:radar_share_title'] = 'העתקת קישור שממלא מראש את השאילתה הזו עבור מנהל אחר';
+$string['analytics:radar_schedules'] = 'תזמונים';
+$string['analytics:radar_history'] = 'היסטוריה';
+$string['analytics:radar_try_question'] = 'נסו שאלה:';
+$string['analytics:radar_click_metric'] = 'או לחצו על מדד כדי להעמיק:';
+$string['analytics:model'] = 'מודל';
+$string['analytics:data_scope'] = 'היקף הנתונים';
+$string['analytics:all_courses'] = 'כל הקורסים';
+$string['analytics:scope_current_course'] = 'הקורס הנוכחי בלבד';
+$string['analytics:scope_custom'] = 'מזהי קורסים ספציפיים...';
+$string['analytics:scope_byprovider'] = 'לפי ספק ה-LLM שנעשה בו שימוש...';
+$string['analytics:scope_detail_label'] = 'מזהי קורסים או ספק';
+$string['analytics:scope_detail_placeholder'] = 'למשל 2,5,12 או openai';
+$string['analytics:range'] = 'טווח';
+$string['analytics:last_24_hours'] = '24 השעות האחרונות';
+$string['analytics:last_90_days'] = '90 הימים האחרונים';
+$string['analytics:compare_two_models'] = 'השוואת 2 מודלים';
+$string['analytics:compare_two_models_title'] = 'הרצת אותה שאילתה מול ספק/מודל שני';
+$string['analytics:provider_b'] = 'ספק B';
+$string['analytics:model_b'] = 'מודל B';
+$string['analytics:compare_cost_warning'] = 'השוואה מריצה 2 שאילתות — העלות תוכפל בקירוב.';
+$string['analytics:radar_intro_placeholder'] = 'כל הנתונים אנונימיים. בחרו פתיחה מלמעלה, לחצו על מדד, או הקלידו שאלה.';
+$string['analytics:radar_input_placeholder'] = 'שאלו על נתוני סטודנטים, מגמות, עלויות, משוב...';
+$string['analytics:send'] = 'שליחה';
+$string['analytics:export_menu'] = 'ייצוא';
+$string['analytics:download'] = 'הורדה';
+$string['analytics:format_json'] = 'JSON';
+$string['analytics:format_csv'] = 'CSV';
+$string['analytics:format_markdown'] = 'Markdown';
+$string['analytics:format_pdf'] = 'PDF (הדפסה)';
+$string['analytics:send_email'] = 'אימייל…';
+$string['analytics:send_slack'] = 'Webhook של Slack…';
+$string['analytics:send_teams'] = 'Webhook של Teams…';
+$string['analytics:redash'] = 'Redash';
+$string['analytics:redash_push'] = 'שליחה ל-Redash…';
+$string['analytics:redash_setup'] = 'הגדרת Redash…';
+$string['analytics:schedule_this'] = 'תזמון…';
+$string['analytics:schedule_this_title'] = 'שמירת השאילתה הזו כדוח מתוזמן חוזר';
+$string['analytics:scheduled_queries'] = 'שאילתות מתוזמנות';
+$string['analytics:new_schedule'] = 'תזמון חדש';
+$string['analytics:name'] = 'שם';
+$string['analytics:channels'] = 'ערוצים';
+$string['analytics:last_run'] = 'הרצה אחרונה';
+$string['analytics:status'] = 'מצב';
+$string['analytics:channel_email'] = 'אימייל';
+$string['analytics:channel_slack'] = 'slack';
+$string['analytics:channel_teams'] = 'teams';
+$string['analytics:edit'] = 'עריכה';
+$string['analytics:pause'] = 'השהיה';
+$string['analytics:enable'] = 'הפעלה';
+$string['analytics:delete'] = 'מחיקה';
+$string['analytics:no_schedules'] = 'אין עדיין שאילתות מתוזמנות. הריצו שאילתה למעלה ולחצו על "תזמון" כדי להגדיר אחת.';
+$string['analytics:past_queries'] = 'שאילתות קודמות';
+$string['analytics:search_query_placeholder'] = 'חיפוש בטקסט השאילתה…';
+$string['analytics:search_past_queries'] = 'חיפוש בשאילתות קודמות';
+$string['analytics:when'] = 'מתי';
+$string['analytics:query'] = 'שאילתה';
+$string['analytics:type'] = 'סוג';
+$string['analytics:badge_scheduled'] = 'מתוזמן';
+$string['analytics:badge_adhoc'] = 'אד-הוק';
+$string['analytics:rerun'] = 'הרצה מחדש';
+$string['analytics:no_queries_yet'] = 'לא הורצו עדיין שאילתות.';
+$string['analytics:back_all_courses'] = 'חזרה לכל הקורסים';
+$string['analytics:filter_timerange'] = 'טווח זמן';
+$string['analytics:course'] = 'קורס';
+$string['analytics:no_usage_data'] = 'אין עדיין נתוני שימוש בעוזר ה-AI בקורס זה.';
+$string['analytics:card_conversations'] = 'שיחות';
+$string['analytics:messages'] = 'הודעות';
+$string['analytics:card_active_students'] = 'סטודנטים פעילים';
+$string['analytics:card_avg_msgs_student'] = 'הודעות בממוצע לסטודנט';
+$string['analytics:card_offtopic_open'] = 'שיחות שיצאו מהנושא';
+$string['analytics:card_escalations'] = 'הסלמות';
+$string['analytics:card_study_plans'] = 'תוכניות לימודים';
+$string['analytics:hotspots_heading'] = 'נקודות חמות';
+$string['analytics:hotspots_intro'] = 'מקטעי הקורס שאליהם מתייחסים לרוב בהודעות הסטודנטים.';
+$string['analytics:no_hotspot_data'] = 'אין עדיין נתוני נקודות חמות.';
+$string['analytics:common_prompts_heading'] = 'הנחיות נפוצות';
+$string['analytics:common_prompts_intro'] = 'תבניות שאלות חוזרות מהסטודנטים.';
+$string['analytics:no_prompt_patterns'] = 'לא זוהו עדיין תבניות שאלות חוזרות.';
+$string['analytics:provider_comparison_heading'] = 'השוואת ספקים';
+$string['analytics:avg_length'] = 'אורך ממוצע';
+$string['analytics:total_tokens_short'] = 'סך הטוקנים';
+$string['analytics:avg_tokens_short'] = 'טוקנים בממוצע';
+$string['analytics:chars_suffix'] = '{$a} תווים';
+$string['analytics:student_activity'] = 'פעילות סטודנטים';
+$string['analytics:student'] = 'סטודנט';
+$string['analytics:last_active'] = 'פעילות אחרונה';
+$string['analytics:user_feedback'] = 'משוב משתמשים';
+$string['analytics:total_responses'] = 'סך התגובות';
+$string['analytics:average_rating'] = 'דירוג ממוצע';
+$string['analytics:rating_distribution'] = 'התפלגות הדירוגים';
+$string['analytics:rating'] = 'דירוג';
+$string['analytics:comment'] = 'הערה';
+$string['analytics:browser_os'] = 'דפדפן / מערכת הפעלה';
+$string['analytics:device'] = 'מכשיר';
+$string['analytics:date'] = 'תאריך';
+$string['analytics:no_feedback_yet'] = 'לא התקבל עדיין משוב.';
+$string['analytics:survey_results'] = 'תוצאות הסקר';
+$string['analytics:survey_responses_collected'] = 'נאספו {$a} תגובות לסקר.';
+$string['analytics:responses_badge'] = '{$a} תגובות';
+$string['analytics:option'] = 'אפשרות';
+$string['analytics:count'] = 'מספר';
+$string['analytics:average_label'] = 'ממוצע:';
+$string['analytics:no_text_responses'] = 'אין עדיין תגובות טקסט.';
+$string['analytics:no_survey_responses'] = 'לא נאספו עדיין תגובות לסקר.';
+$string['analytics:usertesting_results'] = 'תוצאות בדיקות השמישות';
+$string['analytics:testers_submitted'] = '{$a} בודקים שלחו תגובות.';
+$string['analytics:avg_msgs_badge'] = '{$a} הודעות בממוצע';
+$string['analytics:avg_msgs_badge_title'] = 'מספר ההודעות הממוצע בזמן התגובה';
+$string['analytics:avg_min_badge'] = '{$a} דקות בממוצע';
+$string['analytics:avg_min_badge_title'] = 'משך ההפעלה הממוצע בזמן התגובה';
+$string['analytics:avg_rating_line'] = '<strong>דירוג ממוצע:</strong> {$a} / 5';
+$string['analytics:no_responses_yet'] = 'אין עדיין תגובות.';
+$string['analytics:no_usertesting_responses'] = 'לא נאספו עדיין תגובות לבדיקות שמישות.';
+$string['analytics:ai_insights'] = 'תובנות AI';
+$string['analytics:ai_insights_intro'] = 'ניתוח נתוני משוב, סקרים ובדיקות שמישות כדי לחשוף בעיות, בקשות לתכונות והמלצות.';
+$string['analytics:generate_insights'] = 'הפקת תובנות AI';
+$string['analytics:analyzing_data'] = 'מנתח נתונים… זה עשוי לקחת רגע.';
+$string['analytics:no_feedback_data'] = 'אין עדיין נתוני משוב, סקר או בדיקות שמישות לניתוח.';
+$string['analytics:pick_course_hint'] = 'בחרו קורס מהלשוניות שלמעלה כדי להעמיק בניתוחים שלו, או {$a} כדי להפעיל את [[tutorshort]] בקורסים נוספים.';
+$string['analytics:csv_metric'] = 'מדד';
+$string['analytics:csv_value'] = 'ערך';
+$string['analytics:csv_nodata'] = 'אין נתונים זמינים עבור המסננים שנבחרו.';
+$string['analytics:avatar_cost_sub'] = 'עלות הסטרימינג לדקה בארבעת ספקי האווטאר המדבר המוגדרים. מבוסס פעימות לב — הפעלות שאושרו ב-webhook מדויקות, השאר מוערכות לפי פתיחת וסגירת ההפעלה.';
+$string['analytics:avatar_cost_total_row'] = 'סה"כ';
+$string['prompt_debug_view:badge_attachment'] = 'קובץ מצורף';
+$string['prompt_debug_view:badge_chunks'] = '{$a} מקטעים';
+$string['prompt_debug_view:badge_chunks_title'] = 'מספר מקטעי ה-RAG שהמאחזר בחר והציג למודל בתור הזה';
+$string['prompt_debug_view:badge_course'] = 'קורס {$a}';
+$string['prompt_debug_view:badge_page_absent'] = 'ללא מקטע עמוד';
+$string['prompt_debug_view:badge_page_absent_title'] = 'לא נוסף מקטע current_page_content בתור הזה. או שה-pageid לא הגיע לשרת, או שסוג הפעילות אינו מפיק טקסט, או שברשומת העמוד אין תוכן.';
+$string['prompt_debug_view:badge_page_dropped'] = 'העמוד הושמט בגלל התקציב';
+$string['prompt_debug_view:badge_page_dropped_title'] = 'מקטע current_page_content נוסף אך הושמט בשל לחץ תקציב ההנחיה. הגדילו את התקציב או צמצמו מקטעים אחרים.';
+$string['prompt_debug_view:badge_page_kept'] = 'תוכן העמוד';
+$string['prompt_debug_view:badge_page_kept_title'] = 'מקטע current_page_content הורכב במלואו בתור הזה';
+$string['prompt_debug_view:badge_page_truncated'] = 'תוכן העמוד (מקוצר)';
+$string['prompt_debug_view:badge_page_truncated_title'] = 'מקטע current_page_content הגיע אך קוצר כדי להתאים לתקציב ההנחיה';
+$string['prompt_debug_view:badge_topic_dropped'] = 'הנושא הושמט';
+$string['prompt_debug_view:badge_topic_dropped_title'] = 'מקטע topic_focus הושמט בשל תקציב ההנחיה';
+$string['prompt_debug_view:badge_topic_kept'] = 'מיקוד נושא';
+$string['prompt_debug_view:badge_topic_truncated'] = 'מיקוד נושא (מקוצר)';
+$string['prompt_debug_view:badge_user'] = 'משתמש {$a}';
+$string['prompt_metrics:chars_value'] = '{$a} תווים';
+$string['token_analytics:back_to_analytics'] = 'חזרה לניתוחים';
+$string['token_analytics:bycat_sub'] = 'סך הטוקנים מקובץ לפי עומס עבודה: צ\'אט סטודנטים, קול (Realtime / TTS / STT), הטמעת RAG, שאילתות ניתוח של Learning Radar.';
+$string['token_analytics:bycat_title'] = 'עלות לפי קטגוריה';
+$string['token_analytics:bymodel_sub'] = 'תגובות עם נתוני טוקנים מאומתים, מקובצות לפי מודל וספק.';
+$string['token_analytics:bymodel_title'] = 'עלות לפי מודל';
+$string['token_analytics:bystudent_sub'] = '100 הסטודנטים המובילים בשימוש בטוקנים. העלות מחושבת לכל מודל לפי התמהיל בפועל של כל סטודנט. סימן + בסוף מציין שחלק מהשימוש הוא במודל ללא תעריף מפורסם, ולכן הנתון האמיתי גבוה יותר.';
+$string['token_analytics:bystudent_title'] = 'עלות לכל סטודנט';
+$string['token_analytics:card_cached_tokens'] = 'טוקנים במטמון ({$a}% מההנחיה)';
+$string['token_analytics:card_completion_tokens'] = 'טוקני השלמה';
+$string['token_analytics:card_estimated_cost'] = 'עלות משוערת';
+$string['token_analytics:card_prompt_tokens'] = 'טוקני הנחיה';
+$string['token_analytics:card_responses'] = 'תגובות AI';
+$string['token_analytics:card_total_tokens'] = 'סך הטוקנים';
+$string['token_analytics:col_active'] = 'פעיל';
+$string['token_analytics:col_cap'] = 'תקרה';
+$string['token_analytics:col_capability'] = 'יכולת';
+$string['token_analytics:col_category'] = 'קטגוריה';
+$string['token_analytics:col_completion_tokens'] = 'טוקני השלמה';
+$string['token_analytics:col_est_cost'] = 'עלות משוערת';
+$string['token_analytics:col_model'] = 'מודל';
+$string['token_analytics:col_prompt_tokens'] = 'טוקני הנחיה';
+$string['token_analytics:col_provider'] = 'ספק';
+$string['token_analytics:col_recommendations'] = 'המלצות מובילות';
+$string['token_analytics:col_responses'] = 'תגובות';
+$string['token_analytics:col_scope'] = 'היקף';
+$string['token_analytics:col_spent'] = 'הוצא';
+$string['token_analytics:col_status'] = 'מצב';
+$string['token_analytics:col_student'] = 'סטודנט';
+$string['token_analytics:col_total_tokens'] = 'סך הטוקנים';
+$string['token_analytics:filter_course'] = 'קורס:';
+$string['token_analytics:filter_period'] = 'תקופה:';
+$string['token_analytics:heading'] = 'שימוש בטוקנים ועלות';
+$string['token_analytics:missing_note'] = '<strong>{$a}</strong> הודעות עוזר בתקופה זו ללא נתוני טוקנים (נוצרו לפני גרסה 1.1.0 או על ידי ספק שאינו מדווח על שימוש).';
+$string['token_analytics:no_cap'] = 'ללא תקרה';
+$string['token_analytics:no_data'] = 'לא נרשמו עדיין נתוני טוקנים.';
+$string['token_analytics:no_data_tracking'] = 'לא נרשמו עדיין נתוני טוקנים. מעקב הטוקנים מתחיל בגרסה 1.1.0.';
+$string['token_analytics:opt_sub'] = 'הוצאה חודשית חזויה בתמהיל הנוכחי: <strong>{$a->amount}</strong> ({$a->days} ימי נתונים, רמת ודאות {$a->confidence}). ההמלצות מדרגות את הספקים של כל יכולת לפי ציון משולב של עלות ואיכות.';
+$string['token_analytics:opt_title'] = 'ממטב ה-LLM';
+$string['token_analytics:range_all'] = 'כל הזמן';
+$string['token_analytics:range_days'] = '{$a} ימים';
+$string['token_analytics:rate_in_out'] = 'כניסה {$a->in} / יציאה {$a->out}';
+$string['token_analytics:ratecard_sub'] = 'דולר לכל 1,000,000 טוקנים. מזהי המודלים מותאמים לפי תחילית. עדכנו את <code>classes/token_cost_manager.php</code> כאשר תמחור הספק משתנה.';
+$string['token_analytics:ratecard_title'] = 'טבלת תעריפים לעיון';
+$string['token_analytics:spend_sub'] = 'תקופת {$a->period}, מאז {$a->start}. הגדירו תקרות בהגדרות → שומר ההוצאות והממטב.';
+$string['token_analytics:spend_title'] = 'מצב ההוצאות';
+$string['privacynotice:title'] = 'הצהרת הפרטיות של [[tutorname]]';
+$string['privacynotice:lastupdated'] = 'עודכן לאחרונה: {$a}. גרסה 1.0.';
+$string['privacynotice:whatis'] = 'מהו [[tutorshort]]';
+$string['privacynotice:whatis_p1'] = '[[tutorshort]] הוא מאמן הלמידה מבוסס ה-AI של [[uniname]], המשולב בחלק מהקורסים. כאשר [[tutorshort]] זמין בקורס, תראו ווידג\'ט צ\'אט בעמודי הקורס. תוכלו לשאול את [[tutorshort]] שאלות על החומר, לקבל שאלות תרגול, לתכנן את לוח הזמנים ללמידה ולהשתמש בתכונות הקוליות אם הן מופעלות בקורס שלכם.';
+$string['privacynotice:whatis_p2'] = '[[tutorshort]] אינו זמין בכל קורס ב-[[uniname]]. ההחלטה להפעיל את [[tutorshort]] בקורס מתקבלת על ידי מפתח הקורס.';
+$string['privacynotice:collects'] = 'איזה מידע [[tutorshort]] אוסף';
+$string['privacynotice:collects_p1'] = 'כאשר אתם משתמשים ב-[[tutorshort]] בקורס, [[uniname]] מתעדת את ההודעות שלכם, את תגובות [[tutorshort]], את הקורס והשעה של כל חילופי דברים, דירוגים ומשוב שאתם נותנים, את תוכנית הלימודים והעדפות התזכורות שלכם אם יצרתם אותן, את האווטאר שבחרתם, ותקציר פרופיל קצר ש-[[tutorshort]] מפיק מהשיחות שלכם כדי להתאים אישית הפעלות עתידיות.';
+$string['privacynotice:collects_p2'] = '[[tutorshort]] אוסף גם נתונים טכניים סטנדרטיים הנחוצים להפעלת השירות: מזהה המשתמש שלכם ב-Moodle, כתובת IP, סוג הדפדפן וחותמת זמן. [[tutorshort]] אינו שומר תיעוד משלו של שמכם המלא, כתובת הדוא"ל שלכם (אלא אם ביטלתם הסכמה לקבלת דוא"ל, מה ששומר את הכתובת שעליה חל הביטול), כתובת מקום מגוריכם, מספר טלפון (אלא אם מסרתם אחד לצורך תזכורות), פרטי תשלום או מזהים ממשלתיים; במקומות שבהם שמכם מופיע לצד נתוני [[tutorshort]], הוא נקרא מחשבון [[uniname]] הקיים שלכם ולא נשמר על ידי [[tutorshort]].';
+$string['privacynotice:uses'] = 'כיצד נעשה שימוש במידע שלכם';
+$string['privacynotice:uses_item1'] = 'מענה לשאלותיכם ברגע זה.';
+$string['privacynotice:uses_item2'] = 'התאמה אישית של תגובות [[tutorshort]] אליכם.';
+$string['privacynotice:uses_item3'] = 'שיפור [[tutorshort]] עצמו, בעזרת נתונים אנונימיים ומצטברים.';
+$string['privacynotice:uses_item4'] = 'זיהוי ומניעה של שימוש לרעה.';
+$string['privacynotice:uses_item5'] = 'הפקת ניתוחים שעוזרים למחברי הקורסים לשפר את חומרי הלימוד. הניתוחים עוברים אנונימיזציה לפני שהם מגיעים לבודק אנושי.';
+$string['privacynotice:uses_nosell'] = '[[uniname]] אינה מוכרת את המידע שלכם. [[uniname]] אינה משתמשת בשיחות [[tutorshort]] שלכם כדי לשווק לכם מוצרים שאינם קשורים.';
+$string['privacynotice:whosees'] = 'מי רואה את המידע שלכם';
+$string['privacynotice:whosees_intro'] = 'כדי לענות על שאלותיכם, [[tutorshort]] עובד מאחורי הקלעים עם שירות AI (דומה ל-ChatGPT או Claude). זה בדיוק מה ש-[[tutorshort]] משתף עם אותו שירות:';
+$string['privacynotice:shared_item1'] = 'שמכם הפרטי';
+$string['privacynotice:shared_item2'] = 'תקציר של חומר הקורס שאתם לומדים';
+$string['privacynotice:shared_item3'] = '10 ההודעות האחרונות בשיחת [[tutorshort]] הנוכחית שלכם';
+$string['privacynotice:shared_item4'] = 'תוכנית הלימודים שלכם, אם יצרתם אחת';
+$string['privacynotice:shared_item5'] = 'תקציר הפרופיל שלכם, אם יצרתם אחד';
+$string['privacynotice:whosees_never'] = 'וזה מה ש-[[tutorshort]] מעולם אינו משתף:';
+$string['privacynotice:notshared_item1'] = 'שם המשפחה שלכם';
+$string['privacynotice:notshared_item2'] = 'כתובת הדוא"ל שלכם';
+$string['privacynotice:notshared_item3'] = 'שם המשתמש או מספר הזיהוי שלכם ב-Moodle';
+$string['privacynotice:notshared_item4'] = 'כתובת מקום מגוריכם';
+$string['privacynotice:notshared_item5'] = 'כל מידע אחר שעלול לזהות אתכם באופן אישי';
+$string['privacynotice:whosees_contract'] = '[[uniname]] משתמשת רק בשירותי AI שבדקנו ואישרנו בקפידה. לכל אחד מהם יש חוזה עם [[uniname]] המגביל את אופן השימוש שלו במידע שלכם ואוסר עליו להשתמש בשיחות [[tutorshort]] שלכם לאימון ה-AI שלו.';
+$string['privacynotice:retention'] = 'למשך כמה זמן [[tutorshort]] שומר את המידע שלכם';
+$string['privacynotice:retention_item1'] = 'השיחות שלכם נשמרות עד שתמחקו אותן או עד שתקופת שמירת השיחות של האתר (שנתיים של חוסר פעילות כברירת מחדל) תסיר אותן אוטומטית. רק 10 התורים האחרונים נשלחים אי פעם למודל ה-AI.';
+$string['privacynotice:retention_item2'] = 'דירוגים, תוכניות לימודים ותזכורות נשמרים עד שתסירו אותם.';
+$string['privacynotice:retention_item3'] = 'ניתוחים אנונימיים נשמרים בהתאם למדיניות שמירת הרשומות של [[uniname]] ולא ניתן לקשר אותם אליכם בחזרה.';
+$string['privacynotice:retention_item4'] = 'יומני ביקורת ותפעול נשמרים עד 365 ימים. הם מתעדים שהודעה נשלחה — השעה, הקורס וכתובת הרשת שממנה הגיעה — אך מעולם לא את תוכן מה שכתבתם. רשומות אלה מתעדות את מזהה המשתמש שלכם, לא את שמכם; במקום שבו תצוגת היומן של מנהל מציגה שם, הוא נקרא מרשומת חשבון [[uniname]] הקיימת שלכם.';
+$string['privacynotice:retention_deletion'] = 'כאשר חשבון המשתמש שלכם ב-[[uniname]] נמחק, כל נתוני [[tutorshort]] הקשורים למזהה המשתמש שלכם נמחקים באותה פעולה.';
+$string['privacynotice:rights'] = 'הזכויות שלכם';
+$string['privacynotice:rights_access'] = 'גישה.';
+$string['privacynotice:rights_access_desc'] = 'צפו בשיחה הנוכחית שלכם בווידג\'ט; הורידו עותק מלא של כל נתוני [[tutorshort]] מעמוד הגדרות המשתמש של [[tutorshort]].';
+$string['privacynotice:rights_download'] = 'הורדה.';
+$string['privacynotice:rights_download_desc'] = 'עמוד הגדרות המשתמש מציע כפתור "הורדת נתוני [[tutorshort]] שלי" שמפיק קובץ מסודר עם כל נתוני [[tutorshort]] שלכם.';
+$string['privacynotice:rights_delete'] = 'מחיקה.';
+$string['privacynotice:rights_delete_desc'] = 'אותו עמוד מציע אפשרויות מחיקה ברמת הקורס וברמה הגלובלית. המחיקה מתבצעת מיד.';
+$string['privacynotice:rights_correction'] = 'תיקון.';
+$string['privacynotice:rights_correction_desc'] = 'שיחות [[tutorshort]] הן תמלולים גולמיים ובדרך כלל אינן מתוקנות. אם רשומה נגזרת נראית שגויה, המשיכו להשתמש ב-[[tutorshort]] או פנו ל-[[uniname]] בכתובת שלמטה.';
+$string['privacynotice:rights_object'] = 'התנגדות או הגבלה.';
+$string['privacynotice:rights_object_desc'] = 'אינכם חייבים להשתמש ב-[[tutorshort]]. תוכלו להסיר את הנתונים שלכם בכל עת.';
+$string['privacynotice:rights_portability'] = 'ניידות.';
+$string['privacynotice:rights_portability_desc'] = 'ההורדה היא בתסדיר JSON סטנדרטי וניתן לייבא אותה למערכות אחרות.';
+$string['privacynotice:rights_complaint'] = 'תלונה.';
+$string['privacynotice:rights_complaint_desc'] = 'פנו ל-[[uniname]]. לומדים באיחוד האירופי, בבריטניה, בשווייץ, בברזיל או בקנדה יכולים גם להתלונן לרשות הלאומית להגנת נתונים שלהם.';
+$string['privacynotice:international'] = 'לומדים בינלאומיים';
+$string['privacynotice:international_body'] = '[[uniname]] משרתת לומדים בכל העולם. אם אתם נמצאים באזור עם כללי הגנת נתונים ספציפיים (GDPR, UK GDPR, LGPD, PIPEDA, Swiss FADP, CCPA), כללים אלה חלים על נתוני [[tutorshort]] שלכם. הבסיס החוקי לעיבוד הוא קיום חוזה החינוך שיש לכם עם [[uniname]], בשילוב עם האינטרס הלגיטימי של [[uniname]] בשיפור שירותי החינוך שלה.';
+$string['privacynotice:security'] = 'אבטחה';
+$string['privacynotice:security_intro'] = '[[tutorshort]] חי בתוך פלטפורמת ה-Moodle של [[uniname]], כך שעליכם להיות מחוברים כדי להשתמש בו. כמה דברים ספציפיים שאנחנו עושים כדי לשמור על המידע שלכם:';
+$string['privacynotice:security_transit'] = 'בהעברה:';
+$string['privacynotice:security_transit_desc'] = 'כאשר ההודעות שלכם עוברות בין המכשיר שלכם ל-[[tutorshort]], הן מוצפנות. כלומר, אם מישהו ינסה ליירט אותן, הוא יראה רק קוד מבולבל.';
+$string['privacynotice:security_rest'] = 'באחסון:';
+$string['privacynotice:security_rest_desc'] = 'כאשר המידע שלכם מאוחסן, הוא נמצא במסד הנתונים של Moodle של [[uniname]], מוגן על ידי אותן בקרות אבטחה ש-[[uniname]] מפעילה על שאר נתוני הסטודנטים שלכם.';
+$string['privacynotice:security_incident'] = 'אם משהו משתבש:';
+$string['privacynotice:security_incident_desc'] = 'אם נזהה אי פעם תקרית אבטחה שמשפיעה על נתוני [[tutorshort]] שלכם, [[uniname]] תודיע לכם כנדרש בחוק.';
+$string['privacynotice:children'] = 'ילדים';
+$string['privacynotice:children_body'] = '[[tutorshort]] זמין רק ללומדים העומדים בדרישות הגיל של הקורס שבו הם רשומים. [[uniname]] אינה אוספת ביודעין נתוני [[tutorshort]] מילדים מתחת לגיל 13.';
+$string['privacynotice:contact'] = 'יצירת קשר';
+$string['privacynotice:contact_email'] = 'כתובת הדוא"ל של [[uniname]]: {$a}';
+$string['privacynotice:contact_privacypage'] = 'עמוד הפרטיות של [[uniname]]: {$a}';
+$string['privacynotice:contact_widget'] = 'בתוך [[tutorshort]]: פתחו את הווידג\'ט, לחצו על סמל גלגל השיניים ופתחו את המקטע פרטיות ונתונים.';
+$string['chat:studentmode_active'] = 'מצב תלמיד פעיל (Ctrl+Shift+A ליציאה)';
+$string['help:button_title'] = 'עזרה';
+$string['help:button_label'] = 'מדריך עזרה';
+$string['help:close'] = 'סגירת העזרה';
+$string['help:title'] = 'איך להשתמש ב-{$a}';
+$string['help:intro'] = '{$a} הוא עוזר הלמידה מבוסס ה-AI שלכם בקורס זה. הוא קורא את תוכן הקורס ועוזר לכם ללמוד, להתרגל ולהבין את החומר.';
+$string['help:start_title'] = 'צעדים ראשונים';
+$string['help:start_body'] = 'לחצו על כל פתיחת שיחה כדי להתחיל, או הקלידו שאלה משלכם. {$a} עונה בהתבסס על העמוד שבו אתם נמצאים.';
+$string['help:quizzes_title'] = 'מבחני תרגול';
+$string['help:quizzes_body'] = 'לחצו על <strong>בחן אותי בזה</strong> כדי לקבל שאלות רב-ברירה מתוכן הקורס. תראו הסברים לאחר כל תשובה וסיכום ציון בסוף.';
+$string['help:plans_title'] = 'תוכניות לימודים';
+$string['help:plans_body'] = 'לחצו על <strong>תוכנית לימודים</strong> כדי ליצור תוכנית שבועית מותאמת אישית. ספרו ל-{$a} מה המטרה שלכם, כמה שעות אתם יכולים ללמוד ומהו התאריך היעד. תוכלו לבחור לקבל תזכורות בדוא"ל.';
+$string['help:voice_title'] = 'קול';
+$string['help:voice_body'] = 'השתמשו בסמל המיקרופון כדי להגיד את השאלה שלכם.';
+$string['help:voice_body_tab'] = 'תוכלו גם לעבור ללשונית הקול לשיחה דו-כיוונית בזמן אמת.';
+$string['help:languages_title'] = 'שפות';
+$string['help:languages_body'] = 'לחצו על סמל גלגל השיניים ושנו את השפה. {$a} תומך ב-46 שפות. כל התוויות והתגובות מתחלפות מיד.';
+$string['help:data_title'] = 'הנתונים שלכם';
+$string['help:data_body'] = 'השיחות שלכם פרטיות לכם ולמוסד. סמל המחק בכותרת מוחק לצמיתות את השיחה שלכם בקורס זה.';
+$string['help:data_download'] = 'להורדת נתונים מלאה, או למחיקת כל רשומת [[tutorshort]] בכל הקורסים, פתחו את <strong>נתוני [[tutorshort]] שלי</strong> מסמל גלגל השיניים → לוח ההגדרות. העמוד גם מאפשר לכם למחוק את הנתונים של קורס אחד ספציפי.';
+$string['mobile:greeting'] = 'שלום, {$a}!';
+$string['mobile:intro'] = 'אני {$a}, עוזר הלמידה שלכם. איך אפשר לעזור?';
+$string['mobile:chip_concepts'] = 'מושגי מפתח';
+$string['mobile:chip_concepts_prompt'] = 'מהם מושגי המפתח בקורס הזה?';
+$string['mobile:chip_studyplan'] = 'תוכנית לימודים';
+$string['mobile:chip_studyplan_prompt'] = 'עזרו לי ליצור תוכנית לימודים';
+$string['mobile:chip_quiz'] = 'בחן אותי בזה';
+$string['mobile:chip_quiz_prompt'] = 'בחן אותי על הקורס הזה';
+$string['mobile:input_placeholder'] = 'שאלו שאלה...';
+$string['mobile:clear_history'] = 'ניקוי ההיסטוריה';
+$string['mobile:error_generic'] = 'מצטערים, משהו השתבש. אנא נסו שוב.';
+$string['settingspage:pagetitle'] = 'הגדרות';
+$string['toc:playground'] = 'מגרש משחקים להנחיות';
+$string['toc:course_ai_settings'] = 'הגדרות ה-AI של {$a}';
+$string['settingspage:analytics_blurb'] = 'ניתוחי שימוש חוצי-קורסים, הפעלה/כיבוי של ה-AI בכל קורס, משוב סטודנטים ו-Learning Radar.';
+$string['settings:spend_cap_period_daily'] = 'יומי';
+$string['settings:spend_cap_period_weekly'] = 'שבועי';
+$string['settings:spend_cap_period_monthly'] = 'חודשי';
+$string['settings:voice_providers'] = 'ספקי קול';
+$string['settings:voice_providers_desc'] = 'הוסיפו שורה אחת לכל API קולי. מזהי ספקים חוקיים: openai, xai (אלה הספקים היחידים עם WebSocket Realtime + TTS + STT כיום). התווית היא שם ידידותי שבו אתם משתמשים כדי לבחור את הספק הפעיל לכל יכולת שלמטה. אפשר להשאיר את קול ה-Realtime ואת קול ה-TTS ריקים כדי להשתמש בברירת המחדל של הספק (shimmer עבור OpenAI, eve עבור xAI).';
+$string['settings:voice_active_default'] = '(שימוש בשורה המוגדרת הראשונה או בגיבוי מדור קודם)';
+$string['settings:voice_active_stt_default'] = '(selfhosted אם הוגדר, אחרת השורה הראשונה או גיבוי מדור קודם)';
+$string['settings:voice_active_stt_selfhosted'] = 'שרת Whisper בהתקנה עצמית (חינם, משתמש בכתובת ה-URL שלמטה)';
+$string['settings:soapbox_rubric_link'] = 'מדד הערכה לנאום Soapbox';
+$string['settings:soapbox_rubric_link_desc'] = 'ערכו את המדד שלפיו Soapbox מעניק ניקוד, או טענו הגדרה קדומה לפי רמה (כללי, ESL מתחילים, ESL בינוני, ESL מתקדם). <a href="{$a}" class="btn btn-sm btn-outline-primary ml-2">פתיחת עורך המדד &rarr;</a>';
+$string['settings:soapbox_video_quality_low'] = 'נמוכה (360p, ~3 MB לדקה)';
+$string['settings:soapbox_video_quality_standard'] = 'רגילה (480p, ~4 MB לדקה)';
+$string['settings:soapbox_video_quality_high'] = 'גבוהה (720p, ~9 MB לדקה)';
+$string['settings:survey_frequency_once'] = 'פעם אחת לקורס (ברירת מחדל)';
+$string['settings:survey_frequency_monthly'] = 'פעם בחודש';
+$string['settings:survey_frequency_quarterly'] = 'פעם ברבעון';
+$string['settings:survey_frequency_unlimited'] = 'בכל פעם (בלי הגבלה)';
+$string['settings:usertesting_editor_link'] = 'עריכת מטלות הבדיקה';
+$string['settings:usertesting_editor_link_desc'] = '<a href="{$a}" class="btn btn-sm btn-outline-primary">פתיחת עורך המטלות</a>';
+$string['settings:prompt_playground_navtitle'] = 'מגרש משחקים להנחיות של [[tutorshort]]';
+$string['settings:whatsapptest_navtitle'] = 'בדיקת האינטגרציה עם WhatsApp';
+$string['survey_admin:navtitle'] = 'עורך הסקרים';
+$string['usertesting_admin:navtitle'] = 'עורך בדיקות השמישות';
+$string['rubric_admin:navtitle'] = 'עורך מדדי ההערכה';
+$string['integrity:notify_issues'] = 'נמצאו {$a} בעיות. ראו פרטים למטה.';
+$string['integrity:notify_passed'] = 'כל {$a} הבדיקות עברו בהצלחה.';
+$string['integrity:last_run'] = 'הרצה אחרונה';
+$string['integrity:passed'] = 'עברו';
+$string['integrity:failed'] = 'נכשלו';
+$string['integrity:warnings'] = 'אזהרות';
+$string['integrity:results_heading'] = 'תוצאות הבדיקות';
+$string['integrity:col_status'] = 'מצב';
+$string['integrity:col_check'] = 'בדיקה';
+$string['integrity:col_details'] = 'פרטים';
+$string['integrity:norun'] = 'לא הורצו עדיין בדיקות תקינות. לחצו על "הרץ עכשיו" כדי לבדוק את בריאות התוסף, או המתינו למשימה המתוזמנת היומית.';
+$string['benchmark:export_norun'] = 'אין הרצת מדידה זמינה לייצוא. הריצו קודם את המדידה.';
+$string['benchmark:export_unknownformat'] = 'תסדיר ייצוא לא מוכר.';
+$string['survey_admin:default_title'] = 'סקר סוף הקורס של [[tutorshort]]';
+$string['survey_admin:new_option'] = 'אפשרות חדשה';
+$string['usertesting_admin:default_title'] = 'בדיקת שמישות של [[tutorshort]]';
+$string['usertesting_admin:rating_label_default'] = 'דרגו את המטלה הזו';
+$string['radar:err_email_required'] = 'נדרשת כתובת דוא"ל של הנמען';
+$string['radar:err_slack_webhook_required'] = 'נדרשת כתובת webhook של Slack';
+$string['radar:err_teams_webhook_required'] = 'נדרשת כתובת webhook של Teams';
+$string['radar:err_unknown_action'] = 'פעולה לא מוכרת';
+$string['radar:err_schedule_not_found'] = 'התזמון לא נמצא';
+$string['radar:err_name_query_required'] = 'נדרשים שם ושאילתה';
+$string['radar:redash_default_name'] = '[[tutorshort]] Learning Radar — {$a}';
+$string['radar:js_redash_push_failed'] = 'השליחה ל-Redash נכשלה: {$a}';
+$string['radar:js_redash_setup_failed'] = 'לא ניתן לטעון את הגדרת Redash: {$a}';
+$string['radar:js_send_failed'] = 'השליחה נכשלה: {$a}';
+$string['radar:js_schedule_load_failed'] = 'לא ניתן לטעון את התזמון: {$a}';
+$string['radar:js_save_failed'] = 'השמירה נכשלה: {$a}';
+$string['realtime:err_disabled'] = 'מצב הקול מושבת באתר זה.';
+$string['realtime:err_no_provider'] = 'לא הוגדר ספק קול עבור Realtime.';
+$string['realtime:err_xai_proxy_unconfigured'] = 'פרוקסי ה-Realtime של xAI אינו מוגדר. הגדירו xai_proxy_url ו-xai_proxy_jwt_secret בהגדרות המנהל של [[tutorshort]], או העבירו את הקול ל-OpenAI.';
+$string['realtime:err_xai_proxy_ssrf'] = 'כתובת ה-URL של פרוקסי ה-Realtime של xAI נכשלה באימות SSRF.';
+$string['realtime:action_rate_message'] = 'לדרג את ההודעה הזו';
+$string['objectives:err_invalid_import'] = 'מטען ייבוא לא חוקי.';
+$string['objectives:err_unknown'] = 'יעד לא מוכר.';
+$string['objectives:more_items'] = '… עוד {$a}';
+$string['objectives:move_up'] = 'העברה למעלה';
+$string['objectives:move_down'] = 'העברה למטה';
+$string['soapbox:target_minutes'] = '{$a} דקות';
+$string['starters:badge_quiz'] = 'מבחן';
+$string['starters:badge_voice'] = 'קול';
+$string['starters:badge_pronunciation'] = 'הגייה';
+$string['outcomes:csv_code'] = 'קוד תוצאה';
+$string['outcomes:csv_benchmark'] = 'מדד ייחוס (%)';
+$string['sandbox:code_placeholder'] = '# כתבו כאן קוד Python. לחצו על הרצה.';
+$string['sandbox:default_code_comment'] = '# נסו את זה — העלו בריבוע את המספרים 1 עד 10';
+$string['quiz:error_parse'] = 'לא ניתן לנתח את ה-JSON של המבחן.';
+$string['quiz:error_noquestions'] = 'אין שאלות חוקיות בתגובת ה-AI.';
+$string['radar:js_name_prompt'] = 'שם לשאילתת ה-Redash החדשה:';
+$string['radar:js_run_first'] = 'הריצו קודם שאילתה.';

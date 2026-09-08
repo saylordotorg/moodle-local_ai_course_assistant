@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\privacy\provider
  */
 final class provider_soapbox_test extends \advanced_testcase {
-
     /**
      * Seed an assignment and one recording for a user. Returns [course, user, recid].
      *
@@ -74,11 +73,13 @@ final class provider_soapbox_test extends \advanced_testcase {
         $ctx = \context_course::instance($course->id);
         $this->setUser($user);
         provider::export_user_data(
-            new approved_contextlist($user, 'local_ai_course_assistant', [$ctx->id]));
+            new approved_contextlist($user, 'local_ai_course_assistant', [$ctx->id])
+        );
         $writer = writer::with_context($ctx);
         $this->assertTrue($writer->has_any_data());
         $data = $writer->get_data(
-            [get_string('pluginname', 'local_ai_course_assistant'), 'soapbox_recordings', $recid]);
+            [get_string('pluginname', 'local_ai_course_assistant'), 'soapbox_recordings', $recid]
+        );
         $this->assertNotEmpty($data);
         $this->assertStringContainsString('persuasive pitch', $data->transcript);
     }
@@ -90,8 +91,11 @@ final class provider_soapbox_test extends \advanced_testcase {
         $ctx = \context_course::instance($course->id);
         // Storage is unconfigured in the test, so no object delete is attempted.
         provider::delete_data_for_user(
-            new approved_contextlist($user, 'local_ai_course_assistant', [$ctx->id]));
+            new approved_contextlist($user, 'local_ai_course_assistant', [$ctx->id])
+        );
         $this->assertEquals(0, $DB->count_records(
-            'local_ai_course_assistant_sbx_rec', ['userid' => $user->id]));
+            'local_ai_course_assistant_sbx_rec',
+            ['userid' => $user->id]
+        ));
     }
 }

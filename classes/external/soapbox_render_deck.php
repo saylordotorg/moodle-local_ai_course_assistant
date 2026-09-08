@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_render_deck extends external_api {
-
     /**
      * @return external_function_parameters
      */
@@ -58,8 +57,10 @@ class soapbox_render_deck extends external_api {
     public static function execute(int $assignid, string $deckkey): array {
         global $USER, $CFG;
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['assignid' => $assignid, 'deckkey' => $deckkey]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['assignid' => $assignid, 'deckkey' => $deckkey]
+        );
 
         $assign = soapbox_assignment_manager::get_assignment((int) $params['assignid']);
         if (!$assign || !$assign->visible) {
@@ -69,8 +70,10 @@ class soapbox_render_deck extends external_api {
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
-        if (!feature_flags::resolve('soapbox', (int) $assign->courseid)
-                || empty($assign->slides_enabled)) {
+        if (
+            !feature_flags::resolve('soapbox', (int) $assign->courseid)
+                || empty($assign->slides_enabled)
+        ) {
             throw new \moodle_exception('soapbox:slides_disabled', 'local_ai_course_assistant');
         }
         if (!soapbox_deck_renderer::is_available()) {
@@ -89,8 +92,11 @@ class soapbox_render_deck extends external_api {
         $storage = new soapbox_storage();
         $tmp = make_request_directory() . '/deck.pdf';
         $curl = new \curl();
-        $curl->download_one($storage->presign_get($key, 900), null,
-            ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]);
+        $curl->download_one(
+            $storage->presign_get($key, 900),
+            null,
+            ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]
+        );
         if (!is_file($tmp) || filesize($tmp) === 0) {
             throw new \moodle_exception('soapbox:upload_missing', 'local_ai_course_assistant');
         }
@@ -107,7 +113,8 @@ class soapbox_render_deck extends external_api {
             'pagecount' => new external_value(PARAM_INT, 'Number of pages rendered'),
             'pages' => new external_multiple_structure(
                 new external_value(PARAM_RAW, 'Page image as a data URI'),
-                'Ordered page images'),
+                'Ordered page images'
+            ),
         ]);
     }
 }

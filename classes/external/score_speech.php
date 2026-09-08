@@ -39,7 +39,6 @@ use local_ai_course_assistant\objective_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class score_speech extends external_api {
-
     /**
      * @return external_function_parameters
      */
@@ -71,9 +70,18 @@ class score_speech extends external_api {
      * @param string $visionnote
      * @return array
      */
-    public static function execute(int $courseid, string $transcript, string $name = '',
-            string $topic = '', int $targetsec = 0, int $durationsec = 0, string $mode = 'informative',
-            string $slidecontext = '', int $slidecount = 0, string $visionnote = ''): array {
+    public static function execute(
+        int $courseid,
+        string $transcript,
+        string $name = '',
+        string $topic = '',
+        int $targetsec = 0,
+        int $durationsec = 0,
+        string $mode = 'informative',
+        string $slidecontext = '',
+        int $slidecount = 0,
+        string $visionnote = ''
+    ): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid, 'transcript' => $transcript, 'name' => $name,
@@ -107,14 +115,14 @@ class score_speech extends external_api {
             ?: rubric_manager::SPEECH_LEVEL_GENERAL);
         $preset = rubric_manager::speech_preset($level);
 
-        // Resolve the per-course speech rubric. An explicit course/global rubric
-        // wins; otherwise fall back to the level preset's sample criteria.
-        // get_active_rubric() returns the criteria already decoded to an array.
-        $rubric = rubric_manager::get_active_rubric($courseid, rubric_manager::TYPE_SPEECH);
-        $criteriadefs = ($rubric && is_array($rubric->criteria)) ? $rubric->criteria : $preset['criteria'];
-        if (!is_array($criteriadefs) || empty($criteriadefs)) {
-            $criteriadefs = $preset['criteria'];
-        }
+        // Resolve the per-course speech rubric, honouring the course's ESL level.
+        // See rubric_manager::resolve_speech_criteria() for why a global rubric
+        // must not silently outrank a course's configured level.
+        $resolved = rubric_manager::resolve_speech_criteria($courseid, $level);
+        $criteriadefs = $resolved['criteria'];
+        $rubric = $resolved['rubricid'] > 0
+            ? rubric_manager::get_active_rubric($courseid, rubric_manager::TYPE_SPEECH)
+            : null;
         $maxscore = 5;
         $rubriclines = [];
         foreach ($criteriadefs as $c) {
@@ -188,16 +196,26 @@ class score_speech extends external_api {
                                         'feedback' => ['type' => 'string'],
                                     ],
                                     'required' => ['name', 'score', 'feedback'],
+                                    // OpenAI strict mode (the provider sets
+                                    // strict => true) requires this on every
+                                    // object node, or the request is rejected.
+                                    'additionalProperties' => false,
                                 ],
                             ],
                             'overall' => ['type' => 'string'],
                             'tips'    => ['type' => 'array', 'items' => ['type' => 'string']],
                         ],
                         'required' => ['criteria', 'overall', 'tips'],
+                        'additionalProperties' => false,
                     ],
                 ]
             );
         } catch (\Throwable $e) {
+            // Do not discard the reason. Three of the things that land here are
+            // deliberate policy refusals -- emergency stop, quiz lock, exhausted
+            // spend cap -- and reporting them as a provider outage is how a
+            // working control looks like a broken vendor.
+            debugging('SOLA score_speech provider error: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return self::empty_result('provider_error');
         }
 
@@ -245,8 +263,15 @@ class score_speech extends external_api {
                 $meta['slide_design_note'] = $visionnote;
             }
             $scoreid = rubric_manager::save_score(
-                $rubricid, (int) $USER->id, $courseid, rubric_manager::TYPE_SPEECH,
-                $criteria, (int) round($sum / max(1, count($criteria))), $overall, $durationsec, $meta
+                $rubricid,
+                (int) $USER->id,
+                $courseid,
+                rubric_manager::TYPE_SPEECH,
+                $criteria,
+                (int) round($sum / max(1, count($criteria))),
+                $overall,
+                $durationsec,
+                $meta
             );
         } catch (\Throwable $e) {
             // History persistence is best-effort; still return the feedback.
@@ -273,7 +298,16 @@ class score_speech extends external_api {
                 $max = max(1, (int) ($def['max_score'] ?? 5));
                 $norm = max(0.0, min(1.0, $scored['score'] / $max));
                 objective_manager::record_attempt(
-                    (int) $USER->id, $courseid, $oid, $norm >= 0.5, 'rubric', 1.0, null, null, $norm);
+                    (int) $USER->id,
+                    $courseid,
+                    $oid,
+                    $norm >= 0.5,
+                    'rubric',
+                    1.0,
+                    null,
+                    null,
+                    $norm
+                );
             }
         } catch (\Throwable $e) {
             // Outcome recording is best-effort; feedback is unaffected.

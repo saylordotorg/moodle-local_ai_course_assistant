@@ -29,7 +29,6 @@ use local_ai_course_assistant\program\stub_program_source;
  * @covers     \local_ai_course_assistant\program\program_path
  */
 final class program_path_test extends \advanced_testcase {
-
     /**
      * Build a program_path over a stub source.
      *

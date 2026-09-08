@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class conversation_manager {
-
     /**
      * Get or create a conversation for a user in a course.
      *
@@ -86,6 +85,9 @@ class conversation_manager {
      * @param int|null $cmid Course module ID when available.
      * @param int|null $rag_latency_ms Wall-clock ms spent in rag_retriever::retrieve for this turn; only stored on assistant rows.
      * @param int|null $cachedtokens Cached prompt-token count when the provider reports one; null otherwise.
+     * @param string|null $streamoutcome How the turn ended: complete, client_aborted, provider_error.
+     * @param int|null $chunkcount Passages retrieved this turn; 0 means retrieval ran and found none.
+     * @param float|null $topscore Similarity of the best retrieved passage.
      * @return int The message ID.
      */
     public static function add_message(
@@ -102,7 +104,10 @@ class conversation_manager {
         string $interactiontype = 'chat',
         ?int $cmid = null,
         ?int $rag_latency_ms = null,
-        ?int $cachedtokens = null
+        ?int $cachedtokens = null,
+        ?string $streamoutcome = null,
+        ?int $chunkcount = null,
+        ?float $topscore = null
     ): int {
         global $DB;
 
@@ -118,8 +123,14 @@ class conversation_manager {
             : $tokensused;
         $record->prompt_tokens     = $prompttokens;
         $record->completion_tokens = $completiontokens;
-        $record->model_name        = ($role === 'assistant' && $modelname !== null) ? $modelname : null;
-        $record->provider = ($role === 'assistant' && $provider !== '') ? $provider : null;
+        // F81 (v7.3.3): keep provider/model on role='system' cost-log rows too
+        // (TTS / STT / realtime-session telemetry). spend_guard groups by model
+        // and prices via token_cost_manager, so nulling these made every voice
+        // row unpriceable: the synthesis and transcription slice of spend was
+        // invisible to the spend guard, the anomaly detector and token
+        // analytics alike. role='user' rows still carry neither.
+        $record->model_name        = ($role !== 'user' && $modelname !== null && $modelname !== '') ? $modelname : null;
+        $record->provider          = ($role !== 'user' && $provider !== '') ? $provider : null;
         $record->interaction_type  = $interactiontype ?: 'chat';
         $record->cmid              = $cmid ?: null;
         // v5.4.6: only attach RAG latency to assistant messages — user messages
@@ -130,6 +141,11 @@ class conversation_manager {
         // discount). Assistant rows only; makes the cache hit rate visible
         // in token analytics instead of in-memory only.
         $record->cached_tokens     = ($role === 'assistant') ? $cachedtokens : null;
+        // v7.1.1: these describe how the turn went, so like the counters above
+        // they only mean anything on the reply row.
+        $record->stream_outcome    = ($role === 'assistant') ? $streamoutcome : null;
+        $record->chunk_count       = ($role === 'assistant') ? $chunkcount : null;
+        $record->top_score         = ($role === 'assistant') ? $topscore : null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);
@@ -150,7 +166,7 @@ class conversation_manager {
                 $excess
             );
             if (!empty($oldest)) {
-                list($insql, $inparams) = $DB->get_in_or_equal(array_keys($oldest));
+                [$insql, $inparams] = $DB->get_in_or_equal(array_keys($oldest));
                 $DB->delete_records_select('local_ai_course_assistant_msgs', "id {$insql}", $inparams);
             }
         }
@@ -231,6 +247,68 @@ class conversation_manager {
     }
 
     /**
+     * Record one quiz-generation call for spend and analytics.
+     *
+     * v7.0.6. generate_quiz makes a real, billed provider call; until now it
+     * persisted nothing, so quiz spend was invisible to spend_guard (which
+     * totals prompt_tokens/completion_tokens over this table) and to token
+     * analytics, and every cost figure we published understated SOLA by
+     * whatever quizzes cost.
+     *
+     * Written as a direct insert rather than through add_message() on purpose.
+     * add_message() nulls model_name and provider on any row that is not
+     * role='assistant', and spend_guard groups by model and prices via
+     * token_cost_manager::estimate_cost() -- so a row without a model is
+     * counted but cannot be costed, which is how the embedding and rerank
+     * writers already learned to do this. role stays 'system' so
+     * get_messages() keeps it out of the learner's history and the LLM context.
+     *
+     * @param int    $userid
+     * @param int    $courseid
+     * @param string $marker           Short human-readable marker, not the quiz JSON.
+     * @param string $provider         Provider id that served the call.
+     * @param string|null $modelname   Model id, or null if the provider did not report one.
+     * @param int|null $prompttokens
+     * @param int|null $completiontokens
+     * @param int|null $cachedtokens
+     * @param int|null $cmid
+     * @return void
+     */
+    public static function record_quiz_usage(
+        int $userid,
+        int $courseid,
+        string $marker,
+        string $provider,
+        ?string $modelname,
+        ?int $prompttokens,
+        ?int $completiontokens,
+        ?int $cachedtokens = null,
+        ?int $cmid = null
+    ): void {
+        global $DB;
+
+        $convid = self::get_or_create_conversation($userid, $courseid)->id;
+
+        $row = new \stdClass();
+        $row->conversationid   = $convid;
+        $row->userid           = $userid;
+        $row->courseid         = $courseid;
+        $row->role             = 'system';
+        $row->message          = $marker;
+        $row->tokens_used      = (int) ($prompttokens ?? 0) + (int) ($completiontokens ?? 0);
+        $row->prompt_tokens    = $prompttokens;
+        $row->completion_tokens = $completiontokens;
+        $row->model_name       = ($modelname !== null && $modelname !== '') ? $modelname : null;
+        $row->provider         = $provider !== '' ? $provider : null;
+        $row->interaction_type = 'quiz';
+        $row->cmid             = $cmid;
+        $row->cached_tokens    = $cachedtokens;
+        $row->timecreated      = time();
+
+        $DB->insert_record('local_ai_course_assistant_msgs', $row);
+    }
+
+    /**
      * Get all messages for a conversation, ordered by time.
      *
      * @param int $conversationid
@@ -273,10 +351,19 @@ class conversation_manager {
             $messages = array_slice($messages, -$maxmessages);
         }
 
+        // v7.2.5: the same read-side scrub the learner's transcript gets. A
+        // stored '[no response: core\exception\moodle_exception]' row is not
+        // just ugly on screen -- fed back as prior assistant output it is an
+        // example the model can reasonably imitate, and the one thing it must
+        // never learn to emit is an internal identifier.
         return array_map(function ($msg) {
+            $content = (string) $msg->message;
+            if ($msg->role === 'assistant') {
+                $content = self::display_turn_text($content);
+            }
             return [
                 'role' => $msg->role,
-                'content' => $msg->message,
+                'content' => $content,
             ];
         }, $messages);
     }
@@ -330,7 +417,7 @@ class conversation_manager {
         // 1. Messages (FK to conversations).
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', 'userid = ?', [$userid]);
         if (!empty($convids)) {
-            list($insql, $params) = $DB->get_in_or_equal($convids);
+            [$insql, $params] = $DB->get_in_or_equal($convids);
             $counts['messages'] = $DB->count_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $params);
             $DB->delete_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $params);
         } else {
@@ -354,7 +441,18 @@ class conversation_manager {
             'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
             'outreach_log'    => 'local_ai_course_assistant_outreach_log',
             'audit'           => 'local_ai_course_assistant_audit',
+            // v7.3.2 (F42): these four are declared in the plugin's own privacy
+            // metadata and were exported by the provider, but no deletion path
+            // reached them -- so a learner who used the "delete my data" button
+            // kept their mastery attempts, flashcards and avatar sessions.
+            'obj_att'         => 'local_ai_course_assistant_obj_att',
+            'flashcards'      => 'local_ai_course_assistant_flashcards',
+            'avatar_sess'     => 'local_ai_course_assistant_avatar_sess',
+            'email_optout'    => 'local_ai_course_assistant_email_optout',
         ];
+        // Bounded loop: $simple is a hard-coded map of this plugin's own tables,
+        // so the query count is fixed (2 per table) and does not grow with the
+        // amount of user data. Each table needs its own count + delete.
         foreach ($simple as $label => $table) {
             try {
                 $counts[$label] = $DB->count_records($table, ['userid' => $userid]);
@@ -363,6 +461,36 @@ class conversation_manager {
                 // Table may not exist on older installs; skip gracefully.
                 $counts[$label] = 0;
             }
+        }
+
+        // Tables that identify the user by a column other than `userid`, so they
+        // cannot join the loop above.
+        try {
+            // review_res records WHO resolved a flagged item, not whose data it
+            // was. Deleting removes that staff attribution along with the user.
+            $counts['review_res'] = $DB->count_records(
+                'local_ai_course_assistant_review_res', ['resolved_by' => $userid]);
+            $DB->delete_records('local_ai_course_assistant_review_res', ['resolved_by' => $userid]);
+        } catch (\Throwable $e) {
+            $counts['review_res'] = 0;
+        }
+        try {
+            // radar_sched is the creator's own saved report config. It has no
+            // courseid column -- see the note in privacy\provider.
+            $counts['radar_sched'] = $DB->count_records(
+                'local_ai_course_assistant_radar_sched', ['creator' => $userid]);
+            $DB->delete_records('local_ai_course_assistant_radar_sched', ['creator' => $userid]);
+        } catch (\Throwable $e) {
+            $counts['radar_sched'] = 0;
+        }
+
+        // Soapbox recordings are assignid-keyed and their media lives in object
+        // storage, so they need the provider's purge rather than a row delete.
+        try {
+            \local_ai_course_assistant\privacy\provider::purge_soapbox_recordings($userid, null);
+            $counts['sbx_rec'] = 0;
+        } catch (\Throwable $e) {
+            $counts['sbx_rec'] = 0;
         }
 
         return $counts;
@@ -392,7 +520,7 @@ class conversation_manager {
         }
         $convids = $DB->get_fieldset_select('local_ai_course_assistant_convs', 'id', $convwhere, $convparams);
         if (!empty($convids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($convids);
+            [$insql, $inparams] = $DB->get_in_or_equal($convids);
             $counts['messages'] = $DB->count_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $inparams);
             $DB->delete_records_select('local_ai_course_assistant_msgs', "conversationid {$insql}", $inparams);
         } else {
@@ -416,7 +544,17 @@ class conversation_manager {
             'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
             'outreach_log'    => 'local_ai_course_assistant_outreach_log',
             'audit'           => 'local_ai_course_assistant_audit',
+            // v7.3.2 (F43): declared in the privacy metadata, exported by the
+            // provider, and reached by no course-scoped deletion path. That made
+            // delete_data_for_all_users_in_context -- which core calls for
+            // context-expiry purges, where no course_deleted event fires --
+            // weaker than the per-user erasure in the same class.
+            'obj_att'         => 'local_ai_course_assistant_obj_att',
+            'flashcards'      => 'local_ai_course_assistant_flashcards',
+            'avatar_sess'     => 'local_ai_course_assistant_avatar_sess',
         ];
+        // Bounded loop, as above: one count + one delete per hard-coded table,
+        // not per row of data.
         foreach ($tables as $label => $table) {
             try {
                 $params = ['courseid' => $courseid];
@@ -431,6 +569,34 @@ class conversation_manager {
                 $counts[$label] = 0;
             }
         }
+
+        // review_res is course-scoped but identifies the actor as resolved_by,
+        // so it cannot use the (courseid, userid) shape above.
+        try {
+            $where = 'courseid = :courseid';
+            $params = ['courseid' => $courseid];
+            if ($userid) {
+                $where .= ' AND resolved_by = :resolvedby';
+                $params['resolvedby'] = $userid;
+            }
+            $counts['review_res'] = $DB->count_records_select(
+                'local_ai_course_assistant_review_res', $where, $params);
+            $DB->delete_records_select('local_ai_course_assistant_review_res', $where, $params);
+        } catch (\Throwable $e) {
+            $counts['review_res'] = 0;
+        }
+
+        // Soapbox recordings: assignid-keyed, and the media lives in object
+        // storage, so route through the provider's purge. Only meaningful for a
+        // single user -- the all-users course purge is handled by the observer.
+        if ($userid) {
+            try {
+                \local_ai_course_assistant\privacy\provider::purge_soapbox_recordings($userid, $courseid);
+            } catch (\Throwable $e) {
+                /* tables absent on older installs */
+            }
+        }
+        $counts['sbx_rec'] = 0;
 
         return $counts;
     }
@@ -479,5 +645,120 @@ class conversation_manager {
             'total_messages' => $totalmessages,
             'courses' => $courses,
         ];
+    }
+
+    /**
+     * What a failed assistant turn should say when the learner reads it back.
+     *
+     * Ordered by how much it tells them: whatever actually streamed, else the
+     * notice they were shown live, else a neutral sentence. Never an exception
+     * class, provider name or other internal identifier.
+     *
+     * This column is replayed into the learner's history, so a paused turn used
+     * to come back as "[no response: core\exception\moodle_exception]" after a
+     * reload -- the friendly notice existed only in the live stream and was
+     * never stored. The path is reached by timeouts and provider errors too,
+     * not only by the kill switch, so the floor has to be safe for all of them.
+     *
+     * @param string $partial Whatever had streamed before the failure.
+     * @param string $learnertext The notice shown at the time, if there was one.
+     * @return string
+     */
+    public static function failed_turn_text(string $partial, string $learnertext = ''): string {
+        if (trim($partial) !== '') {
+            return $partial;
+        }
+        if (trim($learnertext) !== '') {
+            return $learnertext;
+        }
+        return \local_ai_course_assistant\branding::str('chat:turn_failed');
+    }
+
+    /**
+     * What a stored assistant turn should say when it is replayed to a learner.
+     *
+     * failed_turn_text() fixed what gets WRITTEN from v7.2.4 on. This is the
+     * read side, and it has to hold for rows written before that: pre-7.2.4
+     * rows still say "[no response: core\exception\moodle_exception]"
+     * verbatim, and no forward fix can rewrite history. It also covers the
+     * paths that never reach the writer at all -- a provider timeout, a 5xx, an
+     * exhausted failover chain -- any of which can leave an empty assistant row
+     * behind.
+     *
+     * So the rule is about the OUTPUT, not the cause: an assistant row that is
+     * empty, or that is nothing but an internal identifier, renders as the
+     * learner-facing notice. Anything else is returned untouched.
+     *
+     * Only ever apply this to role='assistant'. A learner may legitimately type
+     * a class name into the chat box while asking about it, and their own words
+     * must come back as they wrote them.
+     *
+     * @param string $stored The message column as persisted.
+     * @return string Safe to show a learner.
+     */
+    public static function display_turn_text(string $stored): string {
+        if (trim($stored) === '' || self::is_internal_placeholder($stored)) {
+            return \local_ai_course_assistant\branding::str('chat:turn_failed');
+        }
+        return $stored;
+    }
+
+    /**
+     * Is this stored text an internal identifier rather than a reply?
+     *
+     * Deliberately narrow. It matches text that is ENTIRELY a placeholder or a
+     * type name, never text that merely mentions one -- a tutor explaining PHP
+     * namespaces will write a backslashed class name inside a real answer, and
+     * that answer must survive.
+     *
+     * @param string $stored The message column as persisted.
+     * @return bool
+     */
+    private static function is_internal_placeholder(string $stored): bool {
+        $text = trim($stored);
+
+        // The v7.1.1 form: "[no response: core\exception\moodle_exception]",
+        // and its bare cousin "[no response]".
+        if (preg_match('/^\[\s*no response\b[^\]]*\]$/i', $text)) {
+            return true;
+        }
+
+        // The two patterns below match a type-name SHAPE, not the substrings
+        // "exception", "throwable" or "error" anywhere in the text.
+        //
+        // Matching substrings looked equivalent and is not: "error" is a
+        // substring of "terrorism", so a one-word reply of "Terrorism." was
+        // being replaced with the failure notice -- and because
+        // get_history_for_api() applies the same scrub, the model was then told
+        // it had previously failed to answer when it had answered correctly.
+        // A bare link to .../wiki/Error_analysis did the same. Deleting a real
+        // answer is far worse than leaving an ugly one, so this errs the other
+        // way: it wants a namespace separator, or a class-like identifier
+        // ending in Exception/Error/Throwable.
+        // Three accepted shapes, and nothing else:
+        //   a\b\moodle_exception   namespaced, any leaf
+        //   dml_write_exception     snake_case with the suffix after an "_"
+        //   TypeError               CamelCase with a capitalised suffix
+        // The underscore and the capital are what keep "Terror" out: it has an
+        // "error" in it but no boundary before one, so it is prose.
+        $name = '[A-Za-z_][A-Za-z0-9_]*';
+        $classlike = '(?:'
+            . '\\\\?' . $name . '(?:\\\\' . $name . ')+'
+            . '|' . $name . '_(?:exception|error|throwable)'
+            . '|' . $name . '(?:Exception|Error|Throwable)'
+            . ')';
+
+        // A fully bracketed note whose content is a type name.
+        if (preg_match('/^\[\s*' . $classlike . '\s*\]$/', $text)) {
+            return true;
+        }
+
+        // A bare type name and nothing else. Covers an unbracketed get_class()
+        // leak from any future path.
+        if (preg_match('/^' . $classlike . '$/', $text)) {
+            return true;
+        }
+
+        return false;
     }
 }

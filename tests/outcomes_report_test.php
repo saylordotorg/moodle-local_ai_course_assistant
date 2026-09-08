@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\outcomes_report
  */
 final class outcomes_report_test extends \advanced_testcase {
-
     public function test_aggregate_counts_students_meeting_benchmark(): void {
         // 5 students, benchmark 0.70: three at/above, two below -> 60%.
         $scores = [0.9, 0.7, 0.72, 0.55, 0.1];

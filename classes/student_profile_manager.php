@@ -30,7 +30,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class student_profile_manager {
-
     private const PROFILE_PROMPT = <<<'PROMPT'
 You are analyzing a student's conversation history with an AI learning assistant. Based on the messages below, create a brief student learning profile in exactly this format:
 
@@ -121,7 +120,8 @@ PROMPT;
               WHERE m.userid = :userid AND m.courseid = :courseid
               ORDER BY m.timecreated DESC",
             ['userid' => $userid, 'courseid' => $courseid],
-            0, 40
+            0,
+            40
         );
 
         $messages = array_reverse(array_values($messages));
@@ -137,11 +137,11 @@ PROMPT;
         }
 
         $prompt = self::PROFILE_PROMPT . "\n\n## Recent conversation\n\n" . $transcript;
-        $llmMessages = [['role' => 'user', 'content' => $prompt]];
+        $llmmessages = [['role' => 'user', 'content' => $prompt]];
 
         try {
             $provider = provider\base_provider::create_from_config($courseid);
-            $profile = $provider->chat_completion('', $llmMessages, ['max_tokens' => 512]);
+            $profile = $provider->chat_completion('', $llmmessages, ['max_tokens' => 512]);
         } catch (\Throwable $e) {
             debugging('Student profile generation failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return '';

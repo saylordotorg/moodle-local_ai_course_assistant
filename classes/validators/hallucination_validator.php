@@ -39,7 +39,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hallucination_validator implements validator_interface {
-
     private const RE_YEAR    = '/\b(?:1[5-9]\d{2}|20\d{2})\b/';
     private const RE_PERCENT = '/\b\d+(?:\.\d+)?\s?%/';
     private const RE_MONEY   = '/\$\d+(?:,\d{3})*(?:\.\d+)?(?:\s?(?:million|billion|trillion))?/i';

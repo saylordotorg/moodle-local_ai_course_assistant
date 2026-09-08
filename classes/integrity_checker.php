@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class integrity_checker {
-
     /** @var string Plugin directory path. */
     private static function plugindir(): string {
         global $CFG;

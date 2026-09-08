@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_slide_vision {
-
     /** @var int Max slide images sent in the single vision pass (bounds cost). */
     const MAX_SLIDES = 12;
 
@@ -135,8 +134,10 @@ class soapbox_slide_vision {
             try {
                 return base_provider::create_for_comparison($providerid, $model, $courseid);
             } catch (\Throwable $e) {
-                debugging('soapbox slide-vision provider unavailable, falling back: ' . $e->getMessage(),
-                    DEBUG_DEVELOPER);
+                debugging(
+                    'soapbox slide-vision provider unavailable, falling back: ' . $e->getMessage(),
+                    DEBUG_DEVELOPER
+                );
             }
         }
         return base_provider::create_from_config($courseid);

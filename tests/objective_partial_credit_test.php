@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\objective_manager
  */
 final class objective_partial_credit_test extends \advanced_testcase {
-
     /** @var int */
     private $courseid;
     /** @var int */
@@ -54,8 +53,17 @@ final class objective_partial_credit_test extends \advanced_testcase {
     public function test_partial_credit_lands_between_wrong_and_right(): void {
         // Same objective assessed once with a 0.8 partial-credit attempt.
         $oid = $this->make_objective();
-        objective_manager::record_attempt($this->userid, $this->courseid, $oid,
-            true, 'rubric', 1.0, null, null, 0.8);
+        objective_manager::record_attempt(
+            $this->userid,
+            $this->courseid,
+            $oid,
+            true,
+            'rubric',
+            1.0,
+            null,
+            null,
+            0.8
+        );
         $partial = objective_manager::compute_mastery($this->userid, $oid)['score'];
 
         // Compare against a fully-correct and a fully-wrong single attempt on
@@ -74,8 +82,17 @@ final class objective_partial_credit_test extends \advanced_testcase {
 
     public function test_score_of_one_matches_binary_correct(): void {
         $oids = $this->make_objective();
-        objective_manager::record_attempt($this->userid, $this->courseid, $oids,
-            true, 'rubric', 1.0, null, null, 1.0);
+        objective_manager::record_attempt(
+            $this->userid,
+            $this->courseid,
+            $oids,
+            true,
+            'rubric',
+            1.0,
+            null,
+            null,
+            1.0
+        );
         $scored = objective_manager::compute_mastery($this->userid, $oids)['score'];
 
         $oidb = $this->make_objective();
@@ -88,8 +105,17 @@ final class objective_partial_credit_test extends \advanced_testcase {
     public function test_record_attempt_rounds_iscorrect_from_score(): void {
         global $DB;
         $oid = $this->make_objective();
-        $id = objective_manager::record_attempt($this->userid, $this->courseid, $oid,
-            false, 'rubric', 1.0, null, null, 0.7);
+        $id = objective_manager::record_attempt(
+            $this->userid,
+            $this->courseid,
+            $oid,
+            false,
+            'rubric',
+            1.0,
+            null,
+            null,
+            0.7
+        );
         $row = $DB->get_record(objective_manager::TABLE_ATTS, ['id' => $id]);
         $this->assertEquals(1, (int) $row->iscorrect); // 0.7 >= 0.5
         $this->assertEqualsWithDelta(0.7, (float) $row->score, 0.0001);

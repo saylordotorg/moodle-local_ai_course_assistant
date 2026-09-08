@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface program_source_interface {
-
     /**
      * Whether a supported program plugin is installed on this site.
      *

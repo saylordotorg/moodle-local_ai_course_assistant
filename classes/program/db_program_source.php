@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class db_program_source implements program_source_interface {
-
     /** @var string|null Detected prefix without trailing underscore, e.g. 'enrol_programs'. */
     private $prefix = null;
 
@@ -140,6 +139,11 @@ class db_program_source implements program_source_interface {
             }
             $out = [];
             $pos = 0;
+            // One row per program item: bounded by the courses an admin put in
+            // this program (tens), not by enrolment or activity. Left as a
+            // per-item read because these tables belong to a third-party
+            // program plugin that is not installed on the dev fleet, so a
+            // batched rewrite could not be verified here.
             foreach ($items as $it) {
                 $course = $DB->get_record('course', ['id' => (int) $it->courseid], 'id, fullname, visible');
                 if (!$course) {

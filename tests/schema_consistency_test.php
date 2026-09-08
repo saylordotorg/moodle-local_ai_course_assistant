@@ -34,7 +34,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class schema_consistency_test extends \basic_testcase {
-
     /**
      * Tables that pre-date the v3.x upgrade-savepoint era. They are
      * created by Moodle's xmldb_main_install on a fresh install via
@@ -103,9 +102,13 @@ final class schema_consistency_test extends \basic_testcase {
         // We only want the ones followed by `$dbman->create_table(...)`
         // (which signals an actual creation, not a column add).
         $tables = [];
-        if (preg_match_all(
-            "/new\s+xmldb_table\(['\"](local_ai_course_assistant[^'\"]+)['\"]\)/",
-            $body, $m)) {
+        if (
+            preg_match_all(
+                "/new\s+xmldb_table\(['\"](local_ai_course_assistant[^'\"]+)['\"]\)/",
+                $body,
+                $m
+            )
+        ) {
             foreach ($m[1] as $candidate) {
                 // Window = from this table-name occurrence up to the NEXT
                 // `new xmldb_table(` (or end of file), i.e. this table's own
@@ -141,10 +144,12 @@ final class schema_consistency_test extends \basic_testcase {
         // have an upgrade create.
         $checkable = array_diff($install, self::GRANDFATHERED_TABLES);
         $missing = array_diff($checkable, $upgrade);
-        $this->assertEmpty($missing,
+        $this->assertEmpty(
+            $missing,
             "Tables in install.xml but missing a matching create_table in upgrade.php "
             . "(upgrades from older releases will fail to create them): "
-            . implode(', ', $missing));
+            . implode(', ', $missing)
+        );
     }
 
     /**
@@ -156,8 +161,10 @@ final class schema_consistency_test extends \basic_testcase {
         $upgrade = $this->upgrade_php_creates();
 
         $orphan = array_diff($upgrade, $install);
-        $this->assertEmpty($orphan,
+        $this->assertEmpty(
+            $orphan,
             "Tables created in upgrade.php but NOT declared in install.xml "
-            . "(fresh installs will miss them): " . implode(', ', $orphan));
+            . "(fresh installs will miss them): " . implode(', ', $orphan)
+        );
     }
 }

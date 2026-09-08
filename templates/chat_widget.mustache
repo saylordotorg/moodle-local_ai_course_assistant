@@ -117,6 +117,8 @@
      data-modname="{{modname}}"
      data-pagetype="{{pagetype}}"
      data-quiz-locked="{{#quizlocked}}1{{/quizlocked}}"
+     data-attempt-locked="{{#attemptlocked}}1{{/attemptlocked}}"
+     data-attempt-locked-notice="{{attemptlockednotice}}"
      data-realtimeenabled="{{realtimeenabled}}"
      data-talkingavatarenabled="{{#talkingavatarenabled}}1{{/talkingavatarenabled}}"
      data-ttsurl="{{ttsurl}}"
@@ -130,6 +132,7 @@
      data-canviewanalytics="{{#canviewanalytics}}1{{/canviewanalytics}}"
      data-displaymode="{{displaymode}}"
      data-autoopen="{{#autoopen}}1{{/autoopen}}"
+     data-tourpending="{{#tourpending}}1{{/tourpending}}"
      data-displayname="{{displayname}}"
      data-shortname="{{shortname_label}}"
      data-brandtokens="{{brandtokens_json}}"
@@ -180,7 +183,7 @@
         {{#studentmode}}
         {{! Subtle 2px indicator that student mode is active. Observers won't notice;
             admin knows to look for the thin bar. Ctrl+Shift+A exits. }}
-        <div style="height:2px;background:linear-gradient(90deg,#ffc107,#fd7e14);flex-shrink:0" title="Student mode active (Ctrl+Shift+A to exit)"></div>
+        <div style="height:2px;background:linear-gradient(90deg,#ffc107,#fd7e14);flex-shrink:0" title="{{#str}}chat:studentmode_active, local_ai_course_assistant{{/str}}"></div>
         {{/studentmode}}
         <button id="local-ai-course-assistant-close-toggle"
                 class="local-ai-course-assistant__toggle local-ai-course-assistant__toggle--close"
@@ -201,9 +204,14 @@
         {{! Header }}
         <div class="local-ai-course-assistant__header">
             <div class="local-ai-course-assistant__header-title">
+                {{! The avatar picker interaction was removed; the image is
+                    decoration. aria-hidden + tabindex=-1 because a focusable,
+                    labeled "Change avatar" control that does nothing sends a
+                    screen-reader user hunting for a dialog that never opens.
+                    styles.css already sets pointer-events:none for mouse users. }}
                 <button class="local-ai-course-assistant__btn-avatar"
-                        title="{{#str}}chat:change_avatar, local_ai_course_assistant{{/str}}"
-                        aria-label="{{#str}}chat:change_avatar, local_ai_course_assistant{{/str}}"
+                        aria-hidden="true"
+                        tabindex="-1"
                         type="button">
                     <span class="aica-avatar-svg aica-avatar-svg--header" aria-hidden="true"
                           data-fallback-avatar="{{avatarurl}}">
@@ -217,7 +225,7 @@
                 <button class="local-ai-course-assistant__btn-talking-avatar"
                         title="{{#str}}talking_avatar:open, local_ai_course_assistant{{/str}}"
                         aria-label="{{#str}}talking_avatar:open, local_ai_course_assistant{{/str}}"
-                        aria-pressed="false"
+                        aria-expanded="false"
                         type="button">
                     {{! Person icon — talking avatar }}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
@@ -285,8 +293,8 @@
                 </button>
                 {{/contextdebugvisible}}
                 <button class="local-ai-course-assistant__btn-help"
-                        title="Help"
-                        aria-label="Help guide"
+                        title="{{#str}}help:button_title, local_ai_course_assistant{{/str}}"
+                        aria-label="{{#str}}help:button_label, local_ai_course_assistant{{/str}}"
                         type="button">
                     {{! Question mark / help icon }}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
@@ -330,9 +338,7 @@
     {{! First-run consent banner (GDPR Article 13, FERPA). Shown once per learner
         until `aica_sola_consent_given` user preference is set. }}
     {{^consentgiven}}
-    <div class="aica-consent-banner"
-         style="position:absolute;inset:0;z-index:20;background:rgba(255,255,255,0.98);
-                display:flex;flex-direction:column;padding:24px;font-size:14px;line-height:1.55">
+    <div class="aica-consent-banner" role="dialog" aria-modal="true">
         {{! v5.10.x: the policy is a scrollable region; the learner must reach the
             bottom before the Accept button enables. tabindex makes it scrollable
             by keyboard. }}
@@ -356,88 +362,44 @@
             </button>
         </div>
     </div>
-    <script>
-    (function() {
-        var banner = document.querySelector('.aica-consent-banner');
-        if (!banner) { return; }
-        var scroller = banner.querySelector('.aica-consent-scroll');
-        var btn = banner.querySelector('.aica-consent-accept');
-        var hint = banner.querySelector('.aica-consent-scrollhint');
-        if (!scroller || !btn) { return; }
-        var unlocked = false;
-        function unlock() {
-            if (unlocked) { return; }
-            unlocked = true;
-            btn.disabled = false;
-            btn.setAttribute('aria-disabled', 'false');
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
-            if (hint) { hint.style.display = 'none'; }
-        }
-        function reevaluate() {
-            // While the drawer is closed the region has no layout (0 height); a
-            // 0-height region would read as "already at the bottom" and unlock
-            // before the learner has seen anything, so skip until it is shown.
-            if (scroller.scrollHeight <= 0 || scroller.clientHeight <= 0) { return; }
-            // True both when the policy fits without scrolling and when the
-            // learner has scrolled to the bottom.
-            if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4) {
-                unlock();
-            }
-        }
-        reevaluate();
-        scroller.addEventListener('scroll', reevaluate);
-        // The drawer may render hidden (clientHeight 0); re-check once it has a
-        // real size so a short policy that needs no scrolling still unlocks.
-        if (window.ResizeObserver) {
-            var ro = new window.ResizeObserver(reevaluate);
-            ro.observe(scroller);
-        }
-        btn.addEventListener('click', function() {
-            if (btn.disabled) { return; }
-            // Record consent through the external service (core/ajax adds the
-            // sesskey); hide the banner regardless of the call outcome.
-            require(['core/ajax'], function(Ajax) {
-                Ajax.call([{
-                    methodname: 'local_ai_course_assistant_record_consent',
-                    args: {}
-                }])[0].always(function() {
-                    banner.style.display = 'none';
-                });
-            });
-        });
-    })();
-    </script>
+    {{! Behaviour lives in amd/src/consent_gate.js; initialised from
+        hook_callbacks via js_call_amd. CONTRIB-10574 #201. }}
     {{/consentgiven}}
 
     {{! Help guide panel — toggled by the ? button in the header }}
     <div class="aica-help-panel" hidden style="position:absolute;inset:0;z-index:10;background:#fff;overflow-y:auto;padding:16px 20px;font-size:14px;line-height:1.6">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <h4 style="margin:0;font-size:16px">How to use {{shortname_label}}</h4>
-            <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="Close help">&times;</button>
+            <h4 style="margin:0;font-size:16px">{{help_title}}</h4>
+            <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="{{#str}}help:close, local_ai_course_assistant{{/str}}">&times;</button>
         </div>
-        <p><strong>{{displayname}}</strong> is your AI learning assistant for this course. It reads the course content and helps you study, practice, and understand the material.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Getting started</h5>
-        <p>Click any conversation starter to begin, or type your own question. {{shortname_label}} answers based on the page you are on.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Practice quizzes</h5>
-        <p>Click <strong>Quiz Me</strong> to get multiple-choice questions from the course content. You will see explanations after each answer and a score summary at the end.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Study plans</h5>
-        <p>Click <strong>Study Plan</strong> to create a personalised week-by-week plan. Tell {{shortname_label}} your goal, how many hours you can study, and your deadline. You can opt into email reminders.</p>
+        {{! help_title / help_intro / help_start_body / help_plans_body /
+            help_languages_body / help_data_download are pre-rendered in
+            hook_callbacks: they carry a brand name (a $a placeholder or a
+            [[tutorshort]] token) which the str helper cannot resolve.
+            Triple-stache only where the string contains markup (strong
+            tags); the $a values are escaped server-side. }}
+        <p>{{{help_intro}}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:start_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{help_start_body}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:quizzes_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{#str}}help:quizzes_body, local_ai_course_assistant{{/str}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:plans_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{{help_plans_body}}}</p>
         {{#voiceenabled}}
-        <h5 style="margin:14px 0 6px;font-size:14px">Voice</h5>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:voice_title, local_ai_course_assistant{{/str}}</h5>
         <p>
-            Use the mic icon to speak your question.{{#voicetabenabled}} You can also switch to the Voice tab for a live two-way conversation.{{/voicetabenabled}}
+            {{#str}}help:voice_body, local_ai_course_assistant{{/str}}{{#voicetabenabled}} {{#str}}help:voice_body_tab, local_ai_course_assistant{{/str}}{{/voicetabenabled}}
         </p>
         {{/voiceenabled}}
-        <h5 style="margin:14px 0 6px;font-size:14px">Languages</h5>
-        <p>Click the gear icon and change the language. {{shortname_label}} supports 46 languages. All labels and responses switch instantly.</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">Your data</h5>
-        <p>Your conversations are private to you and the institution. The eraser icon in the header permanently deletes your conversation for this course.</p>
-        <p>For a full data download, or to delete every {{shortname_label}} record across every course, open <strong>My SOLA data</strong> from the gear icon → Settings panel. The page also lets you delete the data for one specific course.</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:languages_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{help_languages_body}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:data_title, local_ai_course_assistant{{/str}}</h5>
+        <p>{{#str}}help:data_body, local_ai_course_assistant{{/str}}</p>
+        <p>{{{help_data_download}}}</p>
     </div>
 
     {{! Language banner — shown by JS when browser language is detected }}
-        <div class="local-ai-course-assistant__lang-banner" aria-hidden="true">
+        <div class="local-ai-course-assistant__lang-banner" aria-hidden="true" inert>
             <span class="local-ai-course-assistant__lang-banner-text"></span>
             <div class="local-ai-course-assistant__lang-banner-actions">
                 <button class="local-ai-course-assistant__lang-accept"
@@ -571,13 +533,18 @@
 
         {{! v4.1/F3 — Active-learners-online indicator. Empty by default;
             chat.js polls get_active_learners and writes the count line
-            when ≥2 other learners are active, otherwise leaves it empty. }}
+            when ≥2 other learners are active, otherwise leaves it empty.
+            v6.9.7 — gated on activelearnersenabled (site setting, default off).
+            chat.js builds the poller only when this element exists, so the
+            60-second poll never starts on a site that has not opted in. }}
+        {{#activelearnersenabled}}
         <div class="aica-active-learners" aria-live="polite" hidden
              style="margin:0 0 10px;padding:6px 10px;background:#f0fdf4;border:1px solid #bbf7d0;
                     border-radius:6px;font-size:12px;color:#166534;display:flex;align-items:center;gap:8px">
             <span aria-hidden="true">●</span>
             <span class="aica-active-learners__text"></span>
         </div>
+        {{/activelearnersenabled}}
 
         {{! Conversation starters — hidden once a message is sent }}
         <div class="local-ai-course-assistant__starters"
@@ -795,18 +762,7 @@
 
         {{! Input area }}
         <div class="local-ai-course-assistant__input-area">
-            <div class="local-ai-course-assistant__composer-card"
-                 data-attachments-enabled="{{#attachmentsenabled}}1{{/attachmentsenabled}}"
-                 data-attachments-max-mb="{{attachmentmaxmb}}"
-                 data-attachments-allowed-mimes="{{attachmentallowedmimes}}"
-                 data-provider-supports-images="{{#providersupportsimages}}1{{/providersupportsimages}}">
-                {{! Attachment preview slot (shown above the textarea after upload). }}
-                <div class="aica-attachment-preview" hidden></div>
-                {{! Hidden input — the paperclip button triggers it. }}
-                {{#attachmentsenabled}}
-                <input type="file" class="aica-attachment-file-input" hidden
-                       accept="{{attachmentallowedmimes}}">
-                {{/attachmentsenabled}}
+            <div class="local-ai-course-assistant__composer-card">
                 <textarea class="local-ai-course-assistant__input"
                           placeholder="{{#str}}chat:placeholder, local_ai_course_assistant{{/str}}"
                           rows="1"
@@ -835,18 +791,6 @@
                         </label>
                     </div>
                     <div class="local-ai-course-assistant__composer-right">
-                        {{#attachmentsenabled}}
-                        <button class="aica-attachment-btn"
-                                title="{{#str}}attachment:attach, local_ai_course_assistant{{/str}}"
-                                aria-label="{{#str}}attachment:attach_image_or_pdf, local_ai_course_assistant{{/str}}"
-                                type="button">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" aria-hidden="true">
-                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                            </svg>
-                        </button>
-                        {{/attachmentsenabled}}
                         {{#voiceenabled}}
                         <button class="local-ai-course-assistant__btn-mic"
                                 title="{{#str}}chat:mic, local_ai_course_assistant{{/str}}"
@@ -969,18 +913,16 @@
     </div>
 </div>
 {{#studentmode}}
-<script>
-// Student mode exit: Ctrl+Shift+A from any page.
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        window.location.href = window.location.pathname + '?sola_student_mode=0';
-    }
-});
-</script>
+{{! Behaviour lives in amd/src/student_mode.js; initialised from
+    hook_callbacks via js_call_amd. CONTRIB-10574 #201. }}
 {{/studentmode}}
 {{#use_cdn}}
 <link rel="stylesheet" href="{{cdn_css_url}}" />
+{{! The two tags below are the standalone CDN bundle's bootstrap, not page JS.
+    They must stay inline: the bundle is loaded by <script src> from outside
+    Moodle's AMD loader and has no core/* available, so its i18n payload has to
+    be handed over as a global before it runs. Converting these to AMD would
+    break the CDN delivery path by design. CONTRIB-10574 #201. }}
 <script>window.SOLA_I18N = {{{i18n_json}}};</script>
 <script src="{{cdn_js_url}}" defer></script>
 {{/use_cdn}}

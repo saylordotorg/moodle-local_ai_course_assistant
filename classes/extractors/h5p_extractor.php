@@ -29,7 +29,6 @@ namespace local_ai_course_assistant\extractors;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class h5p_extractor {
-
     /** @var string[] Keys whose string values we treat as user-facing content. */
     private const CONTENT_KEYS = [
         'text', 'title', 'question', 'answer', 'description', 'feedback',

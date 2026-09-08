@@ -26,6 +26,16 @@ require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
+// AUTH002 (v7.0.1): reject the guest account. require_login() lets it through,
+// but every anonymous visitor on a guest-access site shares the single guest
+// user record — so "download my data" would hand one visitor another
+// visitor's rows, and "delete everything" would erase them. A page whose whole
+// purpose is per-user data has no meaning for a shared identity. Real learners
+// are unaffected: the drawer only links here for authenticated users.
+if (isguestuser()) {
+    throw new \moodle_exception('noguest');
+}
+
 // v5.3.7: optional_param handles both GET and POST sources, so the action
 // handlers below run identically for the new POST forms and any older link
 // pointing at the legacy GET URL. PARAM_ALPHANUMEXT covers 'delete_course',
@@ -58,11 +68,34 @@ if ($action === 'download' && confirm_sesskey()) {
         'study_plans'     => 'local_ai_course_assistant_plans',
         'reminders'       => 'local_ai_course_assistant_reminders',
         'feedback'        => 'local_ai_course_assistant_feedback',
-        'survey_responses'=> 'local_ai_course_assistant_survey_resp',
+        'survey_responses' => 'local_ai_course_assistant_survey_resp',
         'ut_responses'    => 'local_ai_course_assistant_ut_resp',
         'audit'           => 'local_ai_course_assistant_audit',
         'practice_scores' => 'local_ai_course_assistant_practice_scores',
         'profiles'        => 'local_ai_course_assistant_profiles',
+        // v7.3.3 (F44): the remaining tables the privacy metadata declares.
+        // The bundle claimed to be "a complete copy of all your data" while
+        // exporting 11 of 23 tables. Most consequential omissions:
+        // learner_memory holds MODEL-INFERRED observations about the learner
+        // and learner_goals holds their volunteered free text -- the core of
+        // what an Article 15 access request exists to surface.
+        'objective_attempts'  => 'local_ai_course_assistant_obj_att',
+        'flashcards'          => 'local_ai_course_assistant_flashcards',
+        'avatar_sessions'     => 'local_ai_course_assistant_avatar_sess',
+        'learner_goals'       => 'local_ai_course_assistant_learner_goals',
+        'learner_memory'      => 'local_ai_course_assistant_learner_memory',
+        'streak'              => 'local_ai_course_assistant_streak',
+        'struggle_signals'    => 'local_ai_course_assistant_struggle_signal',
+        'outreach_log'        => 'local_ai_course_assistant_outreach_log',
+        'email_optout'        => 'local_ai_course_assistant_email_optout',
+        'soapbox_recordings'  => 'local_ai_course_assistant_sbx_rec',
+        'review_resolutions'  => 'local_ai_course_assistant_review_res',
+        'radar_schedules'     => 'local_ai_course_assistant_radar_sched',
+    ];
+    // Two tables identify the user by a column other than `userid`.
+    $altkeys = [
+        'review_resolutions' => 'resolved_by',
+        'radar_schedules'    => 'creator',
     ];
     // One query per plugin table for this user's export. The list is a fixed,
     // small constant (not row-driven), so this is bounded, not an N+1.
@@ -75,7 +108,8 @@ if ($action === 'download' && confirm_sesskey()) {
                         WHERE c.userid = :uid ORDER BY m.timecreated ASC";
                 $bundle[$label] = array_values($DB->get_records_sql($sql, ['uid' => $uid]));
             } else {
-                $bundle[$label] = array_values($DB->get_records($table, ['userid' => $uid]));
+                $keycol = $altkeys[$label] ?? 'userid';
+                $bundle[$label] = array_values($DB->get_records($table, [$keycol => $uid]));
             }
         } catch (\Throwable $e) {
             $bundle[$label] = ['error' => 'table unavailable'];
@@ -92,6 +126,17 @@ if ($action === 'download' && confirm_sesskey()) {
 
 // Handle delete actions.
 if ($action === 'delete_course' && $courseid && confirm_sesskey()) {
+    // AUTH002 (v7.0.1): courseid arrives from the request, so scope it to a
+    // course this user actually holds assistant data in — exactly the set the
+    // page renders below. The deletion itself was always $USER-scoped, but the
+    // unvalidated id still reached get_course(), which ignores visibility, so
+    // any logged-in learner could read an arbitrary course's fullname (hidden
+    // courses included) back out of the confirmation prompt, and a nonexistent
+    // id raised an uncaught dml_missing_record_exception.
+    $owncourses = \local_ai_course_assistant\conversation_manager::get_user_stats((int) $USER->id)['courses'];
+    if (!isset($owncourses[$courseid])) {
+        throw new \moodle_exception('invalidcourseid', 'error');
+    }
     if ($confirm) {
         $manager = new \local_ai_course_assistant\conversation_manager();
         $manager->delete_course_data($courseid, $USER->id);
@@ -128,6 +173,15 @@ if ($action === 'delete_all' && confirm_sesskey()) {
     }
 }
 
+// F24: save the "My communications" milestone-email consent toggle. This is
+// the only writer for sola_outreach_milestones (read by
+// outreach_sender::learner_consents; declared in lib.php).
+if ($action === 'savecomms' && confirm_sesskey()) {
+    $milestones = optional_param('milestones', 0, PARAM_BOOL);
+    set_user_preference('sola_outreach_milestones', $milestones ? '1' : '0');
+    redirect($PAGE->url, get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
+}
+
 // Get user's data usage stats.
 $manager = new \local_ai_course_assistant\conversation_manager();
 $stats = $manager->get_user_stats($USER->id);
@@ -146,8 +200,22 @@ foreach ($stats['courses'] as $cid => $coursestat) {
         'deleteurl' => new moodle_url($PAGE->url, [
             'action' => 'delete_course',
             'courseid' => $cid,
-            'sesskey' => sesskey()
+            'sesskey' => sesskey(),
         ]),
+    ];
+}
+
+// F24: learner-visible audit of what has actually been sent. Dry-run rows
+// (F25) are internal previews, never emails the learner received, so they are
+// excluded here.
+$outreachlog = [];
+foreach (\local_ai_course_assistant\outreach_sender::get_log_for_learner((int)$USER->id) as $logrow) {
+    if (!empty($logrow->dryrun)) {
+        continue;
+    }
+    $outreachlog[] = [
+        'date' => userdate((int)$logrow->timesent),
+        'reason' => (string)$logrow->trigger_reason,
     ];
 }
 
@@ -167,6 +235,15 @@ $templatedata = [
     'deleteallurl' => new moodle_url($PAGE->url, ['action' => 'delete_all', 'sesskey' => sesskey()]),
     'downloadurl' => new moodle_url($PAGE->url, ['action' => 'download', 'sesskey' => sesskey()]),
     'privacyurl' => new moodle_url('/local/ai_course_assistant/privacy.php'),
+    // F24: My communications section. The comms:desc / audit strings carry
+    // [[tutorshort]] brand tokens, so they are pre-rendered via branding::str()
+    // -- the mustache {{#str}} helper cannot resolve brand tokens.
+    'commsmilestones' => get_user_preferences('sola_outreach_milestones', '0') === '1',
+    'commsdesc' => \local_ai_course_assistant\branding::str('comms:desc'),
+    'commsauditlogtitle' => \local_ai_course_assistant\branding::str('comms:audit_log_title'),
+    'commsauditlogempty' => \local_ai_course_assistant\branding::str('comms:audit_log_empty'),
+    'outreachlog' => $outreachlog,
+    'hasoutreachlog' => !empty($outreachlog),
 ];
 
 echo $OUTPUT->header();

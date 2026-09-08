@@ -17,6 +17,7 @@
 namespace local_ai_course_assistant;
 
 use local_ai_course_assistant\embedding_provider\base_embedding_provider;
+use local_ai_course_assistant\faq_manager;
 
 /**
  * Orchestrates content extraction → chunking → embedding → DB storage.
@@ -29,6 +30,11 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content_indexer {
+    /**
+     * How many stale chunk rows are removed per DELETE statement. Bounded so
+     * the IN() list stays well inside every DB's parameter limit.
+     */
+    private const DELETE_BATCH = 200;
 
     /**
      * Index all content in a course.
@@ -76,14 +82,59 @@ class content_indexer {
             $stats['fatal'] = $e->getMessage();
             return $stats;
         }
+
+        // v7.2.7: refresh the site-wide FAQ index alongside any course reindex.
+        //
+        // Hash-gated, so this is a no-op on every run where the setting has not
+        // changed. Attached here because it is the one path that already runs
+        // whenever an administrator rebuilds an index, and because the failure
+        // mode of NOT refreshing is invisible: context_builder falls back to
+        // injecting the FAQ inline, so a stale index costs prompt budget rather
+        // than breaking anything, and nobody would notice it had happened.
+        try {
+            $faqstats = faq_manager::index_faq();
+            if (!empty($faqstats['indexed'])) {
+                $stats['faq_chunks_indexed'] = $faqstats['indexed'];
+            }
+            if (!empty($faqstats['error'])) {
+                $stats['faq_error'] = $faqstats['error'];
+            }
+        } catch (\Throwable $e) {
+            // Never fail a course reindex because the FAQ could not be embedded.
+            $stats['faq_error'] = $e->getMessage();
+        }
         // v5.11.0: ask the provider its actual model so non-OpenAI vendors
         // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
         $modelname = $provider->get_model();
+        // Encoding for the vectors this run writes. effective_dtype() falls
+        // back to float when the provider cannot actually return quantized
+        // vectors, so a stored dtype always matches the stored bytes.
+        $dtype = $provider->effective_dtype();
+        // Contextualized-chunk models need the whole document in one call, so
+        // the per-chunk embed() path does not apply to them.
+        $iscontextualized = ($provider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider)
+            && $provider->is_contextualized();
+
+        // Budget gate. Indexing is the bulk of RAG spend, so refuse to start a
+        // run that is already over a configured 'rag' cap. Unreachable unless an
+        // admin set a cap: an unset cap is 0, which check() treats as unlimited.
+        // Returning here also means the stale-chunk prune below never runs, which
+        // matters: pruning on a run that indexed nothing would delete the whole
+        // existing index.
+        if (spend_guard::check(0, 'rag') === spend_guard::CAP_BLOCKED) {
+            $stats['cap_blocked'] = true;
+            $stats['fatal'] = get_string('rag_cap_blocked', 'local_ai_course_assistant');
+            return $stats;
+        }
 
         // Track all chunk content-hashes we encounter (for cleanup later).
         $seenhashes = [];
+        $capblocked = false;
 
         foreach ($modules as $mod) {
+            if ($capblocked) {
+                break;
+            }
             try {
                 $chunks = content_chunker::chunk(
                     $mod['text'],
@@ -92,25 +143,106 @@ class content_indexer {
                     $chunksize
                 );
 
+                // Contextualized models embed a whole document at once so each
+                // chunk vector encodes its surroundings, so the vectors for this
+                // module are computed in one call rather than per chunk. Filled
+                // lazily on the first chunk that actually needs embedding: a
+                // module whose content is unchanged skips the call entirely.
+                //
+                // Note this deliberately embeds EVERY chunk of the module even
+                // when only some need storing. That is not waste — it is the
+                // requirement. Embedding a subset would give the remaining
+                // chunks a different, poorer context than a full-document pass,
+                // so the vectors would not match the rest of the index.
+                $ctxvectors = null;
+
                 foreach ($chunks as $idx => $chunk) {
                     $hash = $chunk['contenthash'];
                     $seenhashes[] = $hash;
 
+                    // One indexed lookup per chunk, on the admin/cron reindex
+                    // path only. Deliberately not batched into a single
+                    // hash->row map for the course: get_record() here resolves
+                    // duplicate content hashes (the same boilerplate chunk in
+                    // two modules) to one arbitrary row, and a grouped preload
+                    // would quietly change which row wins. The embed() call
+                    // below dominates this query whenever the hash misses.
                     // Check for existing identical chunk.
                     if (!$force) {
                         $existing = $DB->get_record('local_ai_course_assistant_chunks', [
                             'courseid'    => $courseid,
                             'contenthash' => $hash,
-                        ], 'id, embedding');
+                        ], 'id, embedding, embedding_bin, embed_model, embed_dtype');
 
-                        if ($existing && !empty($existing->embedding)) {
+                        // Either column proves the chunk is embedded. Testing only the
+                        // JSON column made every quantized row look unembedded, so a
+                        // reindex re-embedded the entire course on every run and the
+                        // hash-skip optimization silently stopped working.
+                        //
+                        // But identical content is NOT sufficient on its own: the
+                        // encoding has to match too. The hash covers the text, not
+                        // the model or the dtype that turned it into a vector, so a
+                        // content-only skip made "change embed_dtype, then reindex"
+                        // a silent no-op — the documented way to adopt quantization
+                        // did nothing, and for binary it left a float index that the
+                        // retriever then refused row by row, emptying retrieval with
+                        // only a DEBUG_NORMAL line to show for it. Re-embed whenever
+                        // the stored encoding differs from what this run writes.
+                        $sameencoding = $existing
+                            && (string) $existing->embed_model === (string) $modelname
+                            && embedding_compat::normalize_dtype($existing->embed_dtype ?? null) === $dtype;
+
+                        if ($existing && $sameencoding
+                                && (!empty($existing->embedding) || !empty($existing->embedding_bin))) {
                             $stats['skipped']++;
                             continue;
                         }
                     }
 
+                    // Re-check the cap as the run proceeds, so a long reindex stops
+                    // when it crosses the cap rather than only being refused at
+                    // the start. check() caches for 60s, so this is not a query
+                    // per chunk. Stopping partway deliberately sets cap_blocked,
+                    // which suppresses the stale-chunk prune below: the hashes we
+                    // never reached would otherwise look stale and be deleted.
+                    if (spend_guard::check(0, 'rag') === spend_guard::CAP_BLOCKED) {
+                        $capblocked = true;
+                        $stats['cap_blocked'] = true;
+                        break;
+                    }
+
                     // Embed this chunk.
-                    $vector = $provider->embed($chunk['content']);
+                    if ($iscontextualized) {
+                        if ($ctxvectors === null) {
+                            $texts = [];
+                            foreach ($chunks as $c) {
+                                $texts[] = (string) $c['content'];
+                            }
+                            $groups = $provider->embed_contextualized([$texts], 'document');
+                            $ctxvectors = array_values($groups)[0] ?? [];
+                        }
+                        if (!isset($ctxvectors[$idx]) || !is_array($ctxvectors[$idx])) {
+                            // One vector per chunk is the contract. A gap means
+                            // the response did not line up with what was sent,
+                            // and storing a wrong-chunk vector would be worse
+                            // than failing this module.
+                            throw new \moodle_exception(
+                                'chat:error',
+                                'local_ai_course_assistant',
+                                '',
+                                null,
+                                sprintf(
+                                    'contextualized embedding missing vector for chunk %d of %d in cmid %d',
+                                    $idx,
+                                    count($chunks),
+                                    (int) $mod['cmid']
+                                )
+                            );
+                        }
+                        $vector = $ctxvectors[$idx];
+                    } else {
+                        $vector = $provider->embed($chunk['content']);
+                    }
 
                     // Upsert: delete any old row for this cmid+chunkindex first.
                     $DB->delete_records('local_ai_course_assistant_chunks', [
@@ -136,8 +268,22 @@ class content_indexer {
                     $record->chunkindex  = $idx;
                     $record->content     = $sanitized['text'];
                     $record->contenthash = $hash;
-                    $record->embedding   = json_encode($vector);
-                    $record->embed_model = $modelname;
+                    // Float indexes write both forms during the transition:
+                    // the packed vector is what retrieval reads, and the JSON
+                    // copy keeps a rollback to the previous release possible
+                    // without a reindex. A later release drops the JSON column.
+                    //
+                    // Quantized indexes write only the packed form. A JSON copy
+                    // of int8 or bit-packed values would be larger than the
+                    // binary it duplicates, which defeats the entire point of
+                    // quantizing. The consequence is deliberate and documented:
+                    // changing embed_dtype requires a reindex, and so does
+                    // rolling back to a release that cannot read the encoding.
+                    $isfloat = ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
+                    $record->embedding     = $isfloat ? json_encode($vector) : null;
+                    $record->embedding_bin = rag_retriever::pack_vector($vector, $dtype);
+                    $record->embed_model   = $modelname;
+                    $record->embed_dtype   = $dtype;
                     $record->timecreated = time();
                     $record->timeindexed = time();
 
@@ -166,31 +312,98 @@ class content_indexer {
         // in source. Only prune on a clean run (no embed errors) — otherwise a
         // transient embedding outage, where every embed() throws and nothing is
         // re-inserted, would silently delete a previously-good index.
-        if ($stats['errors'] === 0 && !empty($seenhashes)) {
-            // O(1) membership via a hash set, not in_array (which was O(n) per
-            // row, O(n^2) overall on large courses). Stream rows with a
-            // recordset so the whole chunk table is never held in memory.
-            $seenset = array_flip($seenhashes);
-            $rs = $DB->get_recordset(
-                'local_ai_course_assistant_chunks',
-                ['courseid' => $courseid],
-                '',
-                'id, contenthash'
-            );
-            foreach ($rs as $row) {
-                if (!isset($seenset[$row->contenthash])) {
-                    $DB->delete_records('local_ai_course_assistant_chunks', ['id' => $row->id]);
-                }
-            }
-            $rs->close();
+        // `cap_blocked` joins `errors` as a reason not to prune: a run cut short by
+        // the budget cap never reached the remaining chunks, so their hashes are
+        // absent from $seenhashes and would be misread as stale and deleted.
+        if ($stats['errors'] === 0 && empty($stats['cap_blocked']) && !empty($seenhashes)) {
+            self::prune_stale_chunks($courseid, $seenhashes);
         } else if ($stats['sources'] === 0) {
             // Genuinely no extractable content in the course — clear the index.
-            $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);
+            //
+            // v7.2.7: except the site-wide FAQ, which lives under SITEID but is
+            // not course material. delete_course_index() was guarded for this
+            // and these two paths were not, which mattered because index_faq()
+            // runs ~220 lines above in this same call: indexing the site course
+            // embedded every Q/A pair (billable) and then deleted the rows
+            // before returning, leaving faq_indexed_hash set so is_retrievable()
+            // stayed false forever and the prompt silently went back to the
+            // 4,451 inline characters this release set out to remove.
+            $DB->delete_records_select(
+                'local_ai_course_assistant_chunks',
+                'courseid = :courseid AND (modtype IS NULL OR modtype <> :faqtype)',
+                ['courseid' => $courseid, 'faqtype' => faq_manager::MODTYPE]
+            );
         }
         // Otherwise (sources existed but embeds errored) leave the existing
         // index untouched rather than risk wiping good data on a flaky run.
 
+        // The retriever caches decoded vectors for the life of the process.
+        // Reindexing inside a long-running CLI would otherwise keep scoring
+        // against the vectors this run just replaced.
+        rag_retriever::flush_cache($courseid);
+
         return $stats;
+    }
+
+    /**
+     * Delete this course's chunk rows whose content hash is no longer present
+     * in the freshly-extracted source.
+     *
+     * @param int $courseid
+     * @param string[] $seenhashes Content hashes seen in this indexing run.
+     */
+    private static function prune_stale_chunks(int $courseid, array $seenhashes): void {
+        global $DB;
+
+        // O(1) membership via a hash set, not in_array (which was O(n) per
+        // row, O(n^2) overall on large courses). Stream rows with a
+        // recordset so the whole chunk table is never held in memory.
+        $seenset = array_flip($seenhashes);
+        $stale = [];
+        // v7.2.7: never stream FAQ rows. $seenhashes is filled only from
+        // content_chunker::chunk() output for course modules, so a site-wide FAQ
+        // chunk can never appear in it and every one of them would be classified
+        // stale and deleted on the next reindex of the site course.
+        $rs = $DB->get_recordset_select(
+            'local_ai_course_assistant_chunks',
+            'courseid = :courseid AND (modtype IS NULL OR modtype <> :faqtype)',
+            ['courseid' => $courseid, 'faqtype' => faq_manager::MODTYPE],
+            '',
+            'id, contenthash'
+        );
+        try {
+            foreach ($rs as $row) {
+                if (!isset($seenset[$row->contenthash])) {
+                    // Collect and delete in batches below: one DELETE per stale
+                    // row meant a statement per removed chunk, which scales with
+                    // the index, not with what actually changed.
+                    $stale[] = (int) $row->id;
+                    if (count($stale) >= self::DELETE_BATCH) {
+                        self::delete_chunks($stale);
+                        $stale = [];
+                    }
+                }
+            }
+        } finally {
+            $rs->close();
+        }
+        if (!empty($stale)) {
+            self::delete_chunks($stale);
+        }
+    }
+
+    /**
+     * Delete a batch of chunk rows by id in a single statement.
+     *
+     * @param int[] $ids
+     */
+    private static function delete_chunks(array $ids): void {
+        global $DB;
+        if (empty($ids)) {
+            return;
+        }
+        [$insql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'cid');
+        $DB->delete_records_select('local_ai_course_assistant_chunks', "id {$insql}", $params);
     }
 
     /**
@@ -207,6 +420,7 @@ class content_indexer {
         if ($mod === null) {
             // Nothing extractable — delete any stale chunks.
             $DB->delete_records('local_ai_course_assistant_chunks', ['cmid' => $cmid]);
+            rag_retriever::flush_cache();
             return true;
         }
 
@@ -230,6 +444,11 @@ class content_indexer {
         // v5.11.0: ask the provider its actual model so non-OpenAI vendors
         // (e.g. Voyage) don't get vectors mis-labelled as text-embedding-3-small.
         $modelname = $provider->get_model();
+        // v7.0.3: and its encoding, for the same reason — a row whose recorded
+        // dtype disagreed with its stored bytes would be unscoreable. This path
+        // is the one auto_reindex_rag_drifted uses, so omitting it here would
+        // leave drifted modules writing float bytes labelled as quantized.
+        $dtype = $provider->effective_dtype();
 
         $chunks = content_chunker::chunk($mod['text'], $mod['title'], $section, $chunksize);
 
@@ -244,9 +463,21 @@ class content_indexer {
                 $existing = $DB->get_record('local_ai_course_assistant_chunks', [
                     'courseid'    => $courseid,
                     'contenthash' => $chunk['contenthash'],
-                ], 'id, embedding');
-                if ($existing && !empty($existing->embedding)) {
-                    // Re-insert with same data.
+                ], 'id, embedding, embedding_bin');
+                // Either column proves the chunk is embedded. Testing only the
+                // JSON column made every quantized row look unembedded, so a
+                // reindex re-embedded the entire course on every run and the
+                // hash-skip optimization silently stopped working.
+                if ($existing && (!empty($existing->embedding) || !empty($existing->embedding_bin))) {
+                    // WARNING, do not enable this path without rewriting it. It is
+                    // currently unreachable: the only caller of index_module() is
+                    // the auto_reindex_rag_drifted task, which passes $force=true.
+                    // As written it would fail or insert a broken row, because the
+                    // record was selected as 'id, embedding' only, so courseid,
+                    // modtype, content, contenthash and timecreated (all NOT NULL)
+                    // are absent, and embedding_bin would be dropped as well. Left
+                    // as-is rather than half-fixed, since deciding what a reuse
+                    // path should copy is a real change, not a tidy-up.
                     $existing->cmid       = $cmid;
                     $existing->chunkindex = $idx;
                     $DB->insert_record('local_ai_course_assistant_chunks', $existing);
@@ -263,14 +494,26 @@ class content_indexer {
             $record->chunkindex  = $idx;
             $record->content     = $chunk['content'];
             $record->contenthash = $chunk['contenthash'];
-            $record->embedding   = json_encode($vector);
-            $record->embed_model = $modelname;
+            // Write BOTH forms, exactly as index_course() does. Omitting the
+            // packed vector here silently un-converted rows: this is the path the
+            // auto_reindex_rag_drifted scheduled task uses, so a site that had
+            // been backfilled drifted back toward the slow JSON decode every time
+            // a module's content changed, with nothing to show it had happened
+            // (retrieval falls back to JSON per row, so it stays correct, just
+            // slower). Any future writer of this table must set both columns
+            // until the JSON column is dropped.
+            $isfloat = ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
+            $record->embedding     = $isfloat ? json_encode($vector) : null;
+            $record->embedding_bin = rag_retriever::pack_vector($vector, $dtype);
+            $record->embed_model   = $modelname;
+            $record->embed_dtype   = $dtype;
             $record->timecreated = time();
             $record->timeindexed = time();
 
             $DB->insert_record('local_ai_course_assistant_chunks', $record);
         }
 
+        rag_retriever::flush_cache();
         return true;
     }
 
@@ -282,10 +525,22 @@ class content_indexer {
      */
     public static function is_course_indexed(int $courseid): bool {
         global $DB;
+        // Either column proves the course is indexed, matching the predicate
+        // rag_retriever uses to read vectors. Testing only the JSON column made
+        // a quantized index (int8/binary, where that column is null on every
+        // row) look permanently unindexed, so both chat paths re-extracted and
+        // re-chunked the whole course before every single reply — embedding
+        // nothing, reporting "indexed 0, skipped N", and showing up only as
+        // latency.
+        // v7.2.7: FAQ rows are excluded. They live under SITEID, so without
+        // this the site course would report itself indexed on the strength of
+        // the FAQ alone and the lazy "index this course before answering" path
+        // would stop running for it.
         return $DB->record_exists_select(
             'local_ai_course_assistant_chunks',
-            'courseid = :courseid AND embedding IS NOT NULL',
-            ['courseid' => $courseid]
+            'courseid = :courseid AND (modtype IS NULL OR modtype <> :faqtype)
+               AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
+            ['courseid' => $courseid, 'faqtype' => faq_manager::MODTYPE]
         );
     }
 
@@ -296,6 +551,18 @@ class content_indexer {
      */
     public static function delete_course_index(int $courseid): void {
         global $DB;
-        $DB->delete_records('local_ai_course_assistant_chunks', ['courseid' => $courseid]);
+
+        // v7.2.7: the site-wide FAQ index lives under SITEID but is not course
+        // material, so clearing the site course's index from rag_admin must not
+        // take it with it. Nothing breaks if it does -- is_retrievable() checks
+        // the rows exist and falls back to injecting the FAQ inline -- but the
+        // site would quietly go back to spending 4,451 characters a turn with
+        // no indication of why.
+        $DB->delete_records_select(
+            'local_ai_course_assistant_chunks',
+            'courseid = :courseid AND (modtype IS NULL OR modtype <> :faqtype)',
+            ['courseid' => $courseid, 'faqtype' => faq_manager::MODTYPE]
+        );
+        rag_retriever::flush_cache($courseid);
     }
 }

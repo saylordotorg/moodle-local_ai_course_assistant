@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rag_judge {
-
     /**
      * nDCG@k using graded relevance (gain = 2^grade - 1). 0.0 when nothing is relevant.
      *

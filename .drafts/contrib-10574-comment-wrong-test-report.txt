@@ -1,0 +1,30 @@
+Reporting what looks like a Marketplace-side data problem rather than anything about our code, in case it affects the review here.
+
+We uploaded version 7.0.3 (build 2026082200) to the Marketplace listing for local_ai_course_assistant on 22 August. The version card shows an "Automated test passed" badge, but the test-results report attached to that version is for a different plugin, mod_playercross. It contains no reference to our component at all.
+
+We cannot tell from the Marketplace UI which of two things happened, and the difference matters for this review:
+
+1. Our zip was tested and the wrong report is being rendered, which would be cosmetic.
+2. The wrong zip was tested, in which case the pass badge on our version is not backed by a run against our code.
+
+What the report contains
+
+The run is described as "RUN PHP Lint on mod_playercross" over 80 files, and refers to mod_form.php, playercross_add_instance, mod/playercross:addinstance, and tests/behat/mod_playercross_*.feature. None of those can belong to our plugin: local_ai_course_assistant is a local plugin, so it has no mod_form.php, no mod/* capability namespace and no *_add_instance function, and it contains considerably more than 80 files. Counting occurrences in the rendered report: 31 mentions of "playercross", zero of "ai_course_assistant".
+
+Why we are confident this is bound to our version
+
+The report is in the modal with id testResultsModal26709, scoped to version id 26709, and the corresponding pluginDetailsModal26709 correctly describes our upload: local_ai_course_assistant, build 2026082200, release 7.0.3, repository tag v7.0.3, Moodle 4.5 / 5.0 / 5.1 / 5.2.
+
+It is also server-rendered into our version's page rather than fetched separately: a same-origin fetch of the raw page HTML (71,561 bytes) contains the same 31 occurrences of "playercross" as the rendered modal.
+
+The summary line and the mismatched detail are one block, so the summary is not independent of the wrong report. Offsets in the raw HTML: the "Automated test passed" badge at 38159 (version card), "0 test problems found" at 47084 (inside .modal-body), and the first "playercross" at 48579 (same .modal-body).
+
+What we are asking
+
+Whether our 7.0.3 zip was in fact tested. If it was, we would appreciate the correct report being re-attached so it is visible here. If it was not, we would rather the badge were cleared and the version re-queued than have the review rest on a result that is not ours. It would also be worth checking whether other versions or plugins are affected by the same mismatch.
+
+One side effect worth flagging: another plugin's lint output is currently visible on our version's page. If that submission is not yet public, this discloses more than intended.
+
+For reference, our own CI runs moodle-plugin-ci against the same commit that tag v7.0.3 points at (729b33e8) across PHP 8.1, 8.2 and 8.3 on both MariaDB and PostgreSQL on MOODLE_405_STABLE, and all checks pass, so we have no reason to expect a genuine failure hiding behind this. The concern is only that the result displayed is not ours.
+
+Happy to supply the raw page HTML or anything else useful.

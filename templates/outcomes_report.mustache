@@ -1,0 +1,111 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/outcomes_report
+
+    Outcomes-based assessment report: per-outcome benchmark and the percentage
+    of assessed students who met it, with a CSV export button.
+
+    All strings are resolved to plugin lang strings in PHP and rendered
+    unescaped (triple-brace) to preserve the pre-template html_writer
+    semantics, which emitted lang-string output raw. The row label carries
+    plugin-built markup (a muted span around the s()-escaped outcome code);
+    emptynotice and exportbutton are pre-rendered core Output API components.
+    Everything derived from user input is escaped in PHP before it gets here;
+    the numeric cells are plain numbers and stay double-brace escaped.
+
+    Context variables required for this template:
+    * intro string - Explanatory lead paragraph (site benchmark baked in).
+    * hasrows bool - Whether any outcomes exist for the course.
+    * emptynotice string - Pre-rendered info notification when no outcomes.
+    * exportbutton string - Pre-rendered CSV export single_button HTML.
+    * caption string - Visually hidden table caption for screen readers.
+    * cols object - Column headings: outcome, benchmark, assessed, met, pct.
+    * rows array - Table rows: label (HTML), benchmark, n, met, pct, lastrow.
+    * footnote string - Methodology footnote under the table.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "intro": "For each course outcome, the benchmark and the percentage of assessed students who met or exceeded it. The site benchmark is 70%.",
+        "hasrows": true,
+        "emptynotice": "",
+        "exportbutton": "<div class=\"singlebutton\">...</div>",
+        "caption": "Outcomes report",
+        "cols": {
+            "outcome": "Outcome",
+            "benchmark": "Benchmark",
+            "assessed": "Students assessed",
+            "met": "Met benchmark",
+            "pct": "Percent met"
+        },
+        "rows": [
+            {
+                "label": "<span class=\"text-muted\">LO1 </span>Explain opportunity cost",
+                "benchmark": 70,
+                "n": 12,
+                "met": 8,
+                "pct": 66.7,
+                "lastrow": true
+            }
+        ],
+        "footnote": "Assessed students are those with at least one attempt on the outcome."
+    }
+}}
+<div class="outcomes-intro text-muted mb-3">{{{intro}}}</div>
+
+{{^hasrows}}{{{emptynotice}}}{{/hasrows}}
+{{#hasrows}}
+    <div class="mb-3">{{{exportbutton}}}</div>
+
+    {{! Class layout mirrors html_writer::table so themed styling is unchanged:
+        table-responsive wrapper, generaltable, accesshide caption, header/cell
+        cN column classes, lastcol on the last column, lastrow on the last row.
+        The outcome name is the row header (scope=row) so screen readers
+        associate each data cell with it; the visible page heading already
+        names the table, hence the hidden caption. }}
+    <div class="table-responsive">
+        <table class="generaltable">
+            <caption class="accesshide">{{{caption}}}</caption>
+            <thead>
+                <tr>
+                    <th class="header c0" scope="col">{{{cols.outcome}}}</th>
+                    <th class="header c1" scope="col">{{{cols.benchmark}}}</th>
+                    <th class="header c2" scope="col">{{{cols.assessed}}}</th>
+                    <th class="header c3" scope="col">{{{cols.met}}}</th>
+                    <th class="header c4 lastcol" scope="col">{{{cols.pct}}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#rows}}
+                    <tr{{#lastrow}} class="lastrow"{{/lastrow}}>
+                        <th class="cell c0" scope="row">{{{label}}}</th>
+                        <td class="cell c1">{{benchmark}}%</td>
+                        <td class="cell c2">{{n}}</td>
+                        <td class="cell c3">{{met}}</td>
+                        <td class="cell c4 lastcol"><strong>{{pct}}%</strong></td>
+                    </tr>
+                {{/rows}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="small text-muted mt-1">{{{footnote}}}</div>
+{{/hasrows}}

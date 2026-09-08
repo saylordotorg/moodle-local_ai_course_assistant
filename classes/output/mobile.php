@@ -32,7 +32,6 @@ namespace local_ai_course_assistant\output;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobile {
-
     /**
      * Returns the mobile view for the SOLA chat within a course.
      *
@@ -84,6 +83,9 @@ class mobile {
                 'courseid' => (string) $courseid,
                 'firstname' => $firstname,
                 'displayname' => $displayname,
+                // Pre-resolved here because get_mobile_js() is a nowdoc:
+                // the app JS reads it from CONTENT_OTHERDATA.
+                'errormsg' => get_string('mobile:error_generic', 'local_ai_course_assistant'),
             ],
         ];
     }
@@ -96,8 +98,35 @@ class mobile {
      * @return string Raw HTML with Angular directives.
      */
     private static function get_mobile_template(string $firstname, string $displayname): string {
+        $component = 'local_ai_course_assistant';
         $firstname = htmlspecialchars($firstname, ENT_QUOTES, 'UTF-8');
         $displayname = htmlspecialchars($displayname, ENT_QUOTES, 'UTF-8');
+
+        // Learner-facing copy resolved server-side in the user's language.
+        // The names are escaped above and injected via the placeholder.
+        $greeting = get_string('mobile:greeting', $component, $firstname);
+        $intro = get_string('mobile:intro', $component, $displayname);
+        $chipconcepts = get_string('mobile:chip_concepts', $component);
+        $chipstudyplan = get_string('mobile:chip_studyplan', $component);
+        $chipquiz = get_string('mobile:chip_quiz', $component);
+        $placeholder = htmlspecialchars(
+            get_string('mobile:input_placeholder', $component), ENT_QUOTES, 'UTF-8');
+        $clearhistory = get_string('mobile:clear_history', $component);
+
+        // Chip payloads land inside a single-quoted JS string in an Angular
+        // (click) expression: escape for the JS string first, then for the
+        // double-quoted HTML attribute. ENT_COMPAT leaves single quotes
+        // alone so the \' survives the app's entity decode.
+        $jsattr = function (string $s): string {
+            return htmlspecialchars(
+                str_replace(['\\', "'"], ['\\\\', "\\'"], $s),
+                ENT_COMPAT,
+                'UTF-8'
+            );
+        };
+        $promptconcepts = $jsattr(get_string('mobile:chip_concepts_prompt', $component));
+        $promptstudyplan = $jsattr(get_string('mobile:chip_studyplan_prompt', $component));
+        $promptquiz = $jsattr(get_string('mobile:chip_quiz_prompt', $component));
 
         return <<<HTML
 <div class="aica-mobile-chat">
@@ -105,20 +134,20 @@ class mobile {
     <!-- Welcome screen (no messages yet) -->
     <div *ngIf="!messages || messages.length === 0" style="text-align:center;padding:32px 16px;">
         <ion-icon name="school-outline" style="font-size:48px;color:var(--core-color);"></ion-icon>
-        <h2 style="font-size:20px;margin:12px 0 8px;">Hi, {$firstname}!</h2>
-        <p style="color:#666;font-size:14px;margin:0 0 16px;">I'm {$displayname}, your learning assistant. How can I help?</p>
+        <h2 style="font-size:20px;margin:12px 0 8px;">{$greeting}</h2>
+        <p style="color:#666;font-size:14px;margin:0 0 16px;">{$intro}</p>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
-            <ion-chip (click)="sendChip('What are the key concepts in this course?')" color="primary" outline="true">
+            <ion-chip (click)="sendChip('{$promptconcepts}')" color="primary" outline="true">
                 <ion-icon name="bulb-outline"></ion-icon>
-                <ion-label>Key Concepts</ion-label>
+                <ion-label>{$chipconcepts}</ion-label>
             </ion-chip>
-            <ion-chip (click)="sendChip('Help me create a study plan')" color="primary" outline="true">
+            <ion-chip (click)="sendChip('{$promptstudyplan}')" color="primary" outline="true">
                 <ion-icon name="calendar-outline"></ion-icon>
-                <ion-label>Study Plan</ion-label>
+                <ion-label>{$chipstudyplan}</ion-label>
             </ion-chip>
-            <ion-chip (click)="sendChip('Quiz me on this course')" color="primary" outline="true">
+            <ion-chip (click)="sendChip('{$promptquiz}')" color="primary" outline="true">
                 <ion-icon name="flash-outline"></ion-icon>
-                <ion-label>Quiz Me</ion-label>
+                <ion-label>{$chipquiz}</ion-label>
             </ion-chip>
         </div>
     </div>
@@ -149,7 +178,7 @@ class mobile {
     <div style="display:flex;align-items:flex-end;gap:4px;padding:8px 0;border-top:1px solid var(--gray-200,#e0e0e0);">
         <ion-textarea
             [(ngModel)]="userInput"
-            placeholder="Ask a question..."
+            placeholder="{$placeholder}"
             rows="1"
             autoGrow="true"
             [disabled]="sending"
@@ -164,7 +193,7 @@ class mobile {
     <div *ngIf="messages && messages.length > 0" style="text-align:center;padding:4px 0;">
         <ion-button (click)="clearHistory()" fill="clear" size="small" color="medium">
             <ion-icon name="trash-outline" slot="start"></ion-icon>
-            Clear history
+            {$clearhistory}
         </ion-button>
     </div>
 </div>
@@ -233,7 +262,7 @@ that.sendMessage = function() {
     }).catch(function() {
         that.messages.push({
             role: 'assistant',
-            message: 'Sorry, something went wrong. Please try again.',
+            message: that.CONTENT_OTHERDATA.errormsg,
             time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
         });
         that.sending = false;

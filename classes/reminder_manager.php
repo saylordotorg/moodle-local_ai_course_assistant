@@ -24,7 +24,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class reminder_manager {
-
     /** @var int Seconds in a day. */
     private const DAY = 86400;
 
@@ -126,8 +125,10 @@ class reminder_manager {
         // residual signal is eliminated. The tokens are 32 random bytes
         // so the realistic attack is theoretical, but the cost is one
         // function call.
-        $record = $DB->get_record('local_ai_course_assistant_reminders',
-            ['unsubscribe_token' => $token]);
+        $record = $DB->get_record(
+            'local_ai_course_assistant_reminders',
+            ['unsubscribe_token' => $token]
+        );
         if (!$record) {
             // Burn a constant amount of CPU on the miss path so the
             // miss and hit paths look identical to a timing observer.

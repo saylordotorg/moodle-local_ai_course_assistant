@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\outcomes_report
  */
 final class outcomes_rubric_source_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -49,8 +48,17 @@ final class outcomes_rubric_source_test extends \advanced_testcase {
         foreach ([[1.0], [0.8], [0.4]] as $i => $pair) {
             $user = $this->getDataGenerator()->create_user();
             $norm = $pair[0];
-            objective_manager::record_attempt((int) $user->id, $courseid, $oid,
-                $norm >= 0.5, 'rubric', 1.0, null, null, $norm);
+            objective_manager::record_attempt(
+                (int) $user->id,
+                $courseid,
+                $oid,
+                $norm >= 0.5,
+                'rubric',
+                1.0,
+                null,
+                null,
+                $norm
+            );
         }
 
         $rows = outcomes_report::course_report($courseid);

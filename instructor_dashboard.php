@@ -40,8 +40,11 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 if ($courseid <= 0) {
     \local_ai_course_assistant\page_helpers::render_course_picker_landing(
         '/local/ai_course_assistant/instructor_dashboard.php',
-        get_string('coursepicker:title', 'local_ai_course_assistant',
-            get_string('instructor_dashboard:short', 'local_ai_course_assistant')),
+        get_string(
+            'coursepicker:title',
+            'local_ai_course_assistant',
+            get_string('instructor_dashboard:short', 'local_ai_course_assistant')
+        ),
         'local/ai_course_assistant:viewanalytics'
     );
     exit;
@@ -54,15 +57,20 @@ $course = get_course($courseid);
 $coursecontext = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:viewanalytics', $coursecontext);
 
-$pageurl = new moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-    ['courseid' => $courseid, 'range' => $range, 'gapdays' => $gapdays]);
+$pageurl = new moodle_url(
+    '/local/ai_course_assistant/instructor_dashboard.php',
+    ['courseid' => $courseid, 'range' => $range, 'gapdays' => $gapdays]
+);
 
 $PAGE->set_url($pageurl);
 $PAGE->set_context($coursecontext);
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_course($course);
-$PAGE->set_title(get_string('instructor_dashboard:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
+$PAGE->set_title(get_string(
+    'instructor_dashboard:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
 $PAGE->set_heading($course->fullname);
 
 security::send_security_headers(true);
@@ -73,10 +81,18 @@ if ($action === 'resolvereview' && confirm_sesskey()) {
     $sourceid = required_param('sourceid', PARAM_INT);
     $note = optional_param('note', '', PARAM_TEXT);
     \local_ai_course_assistant\review_queue::mark_resolved(
-        $source, $sourceid, $courseid, (int) $USER->id, $note
+        $source,
+        $sourceid,
+        $courseid,
+        (int) $USER->id,
+        $note
     );
-    redirect($pageurl, get_string('instructor_dashboard:review_resolved', 'local_ai_course_assistant'),
-        null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        $pageurl,
+        get_string('instructor_dashboard:review_resolved', 'local_ai_course_assistant'),
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 // Reveal-real-names toggle (session-scoped + audit logged). Stored in a
@@ -193,9 +209,11 @@ $gapsummary = get_string('instructor_dashboard:gap_summary', $strman, (object) [
 ]);
 $gapsample = [];
 if ($showrealnames && !empty($gap['sample_userids'])) {
-    list($insql, $inparams) = $DB->get_in_or_equal($gap['sample_userids'], SQL_PARAMS_NAMED, 'uid');
+    [$insql, $inparams] = $DB->get_in_or_equal($gap['sample_userids'], SQL_PARAMS_NAMED, 'uid');
     $gapusers = $DB->get_records_sql(
-        "SELECT id, firstname, lastname FROM {user} WHERE id $insql ORDER BY lastname, firstname", $inparams);
+        "SELECT id, firstname, lastname FROM {user} WHERE id $insql ORDER BY lastname, firstname",
+        $inparams
+    );
     foreach ($gapusers as $u) {
         $gapsample[] = ['name' => fullname($u)];
     }

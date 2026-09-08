@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class did_provider extends base_provider {
-
     public function get_key(): string {
         return 'did';
     }
@@ -45,8 +44,13 @@ class did_provider extends base_provider {
 
     public function start_session(array $context): array {
         if (!$this->is_configured()) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'D-ID: API key or source URL (persona_id) not configured.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'D-ID: API key or source URL (persona_id) not configured.'
+            );
         }
         $base = rtrim($this->cfg('base_url', 'https://api.d-id.com'), '/');
         $sourceurl = $this->cfg('persona_id');
@@ -63,8 +67,13 @@ class did_provider extends base_provider {
         $sessionid = (string) ($resp['id'] ?? '');
         $sessiontoken = (string) ($resp['session_id'] ?? '');
         if ($sessionid === '' || $sessiontoken === '') {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'D-ID: response missing stream id or session id.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'D-ID: response missing stream id or session id.'
+            );
         }
 
         $viewer = new \moodle_url('/local/ai_course_assistant/talking_avatar_viewer.php', [
@@ -77,6 +86,9 @@ class did_provider extends base_provider {
         return [
             'embed_url' => $viewer->out(false),
             'session_token' => $sessiontoken,
+            // See heygen_provider: the viewer's `sid` is the stream id, not the
+            // session_id credential.
+            'upstream_session_id' => $sessionid,
             'provider' => 'did',
             'expires_in' => 600,
             'extras' => [

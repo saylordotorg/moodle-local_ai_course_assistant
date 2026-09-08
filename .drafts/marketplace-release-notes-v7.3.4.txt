@@ -1,0 +1,10 @@
+v7.3.4 is a small hardening release. No user-visible behavior changes, no database schema changes, and no new language strings.
+
+Two new automated regression guards close the detection gaps behind the two most-repeated defect classes in the plugin's history:
+
+- Translation drift: byte-identical English shipping as a "translation" was invisible to the existing key-parity check. The current debt is frozen in a fixture; the new test fails on any new drift and requires paid-off debt to be removed, so the list can only shrink.
+- Result-keying collapse: get_records_sql keys its result by the first selected column, silently dropping rows when that column repeats. A new lint flags the two statically decidable shapes and carries a built-in self-test against the exact SQL of a historical bug.
+
+The new lint immediately found three live query sites (the courses admin list, the Soapbox sample seeder, and the token analytics course filter). All three were functionally safe and are now restructured to EXISTS with a unique id leading, safe by construction.
+
+Quality gate: 1,166 automated tests with 0 failures; 36/36 validators; 46/46 locales pass the i18n completeness check.

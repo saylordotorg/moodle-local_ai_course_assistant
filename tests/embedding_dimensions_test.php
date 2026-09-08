@@ -38,7 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::mrl_output_dimension
  */
 final class embedding_dimensions_test extends \advanced_testcase {
-
     public function test_unset_dimensions_default_to_native_zero(): void {
         $this->resetAfterTest();
         unset_config('embed_dimensions', 'local_ai_course_assistant');

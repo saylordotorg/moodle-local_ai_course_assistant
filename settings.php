@@ -28,7 +28,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-
     // Read plugin version for the banner text.
     $pluginfo   = core_plugin_manager::instance()->get_plugin_info('local_ai_course_assistant');
     $release    = $pluginfo ? htmlspecialchars($pluginfo->release, ENT_QUOTES) : '?';
@@ -52,23 +51,16 @@ if ($hassiteconfig) {
     ));
 
     // ── Single settings page with TOC ───────────────────────────────────────
-    $settings = new admin_settingpage('local_ai_course_assistant_general', 'Settings');
+    $settings = new admin_settingpage('local_ai_course_assistant_general',
+        get_string('settingspage:pagetitle', 'local_ai_course_assistant'));
 
-    // Scoped smooth scrolling + TOC styling.
-    $tocstyle = '<style>'
-        . 'html{scroll-behavior:smooth;}'
-        . '.sola-toc{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:14px 18px;margin:0 0 18px;}'
-        . '.sola-toc strong{display:block;font-size:13px;color:#495057;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}'
-        . '.sola-toc ul{display:flex;flex-wrap:wrap;gap:6px 10px;list-style:none;padding:0;margin:0;}'
-        . '.sola-toc li{margin:0;}'
-        . '.sola-toc a{display:inline-block;padding:4px 10px;background:#fff;border:1px solid #ced4da;border-radius:4px;font-size:13px;color:#3b5bdb;text-decoration:none;}'
-        . '.sola-toc a:hover{background:#e7f0ff;border-color:#3b5bdb;text-decoration:none;}'
-        . '.sola-quicklinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #ced4da;}'
-        . '.sola-quicklinks a{display:inline-block;padding:5px 12px;background:#3b5bdb;border:1px solid #3b5bdb;border-radius:4px;font-size:13px;color:#fff;text-decoration:none;font-weight:500;}'
-        . '.sola-quicklinks a:hover{background:#2d47b5;border-color:#2d47b5;color:#fff;text-decoration:none;}'
-        . '.sola-section-anchor{display:block;position:relative;top:-60px;visibility:hidden;}'
-        . '.sola-section-heading{margin-top:24px;padding-top:8px;border-top:2px solid #e5e7eb;}'
-        . '</style>';
+    // The TOC and quicklink styling lives in styles.css (search .sola-toc).
+    // It used to be an inline <style> block injected through an
+    // admin_setting_description here, which is one of the things the plugin
+    // directory review asked us to stop doing; it came back when the TOC was
+    // added. Moodle loads the plugin's styles.css on admin pages, so nothing
+    // needs injecting.
+    $tocstyle = '';
 
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
@@ -79,13 +71,20 @@ if ($hassiteconfig) {
     // review found the kill switch was CLI-only, leaving incident response
     // dependent on SSH access.
     $emergencyurl = new moodle_url('/local/ai_course_assistant/emergency_admin.php');
+    // v7.2.1: the audit log is reachable. Two settings told admins to go and
+    // read it -- Emergency Controls and per-call failover -- while no page
+    // existed to read it in.
+    $auditurl = new moodle_url('/local/ai_course_assistant/audit_log.php');
     $quicklinks = '<a href="' . $analyticsurl->out() . '">'
             . get_string('toc:analytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $tokenanalyticsurl->out() . '">'
             . get_string('toc:tokenanalytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $demoadminurl->out() . '">'
             . get_string('toc:testing', 'local_ai_course_assistant') . '</a>'
-        . '<a href="' . $playgroundurl->out() . '">Prompt Playground</a>'
+        . '<a href="' . $playgroundurl->out() . '">'
+            . get_string('toc:playground', 'local_ai_course_assistant') . '</a>'
+        . '<a href="' . $auditurl->out() . '">'
+            . \local_ai_course_assistant\branding::str('auditlog:settings_link') . '</a>'
         . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
             . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 
@@ -99,13 +98,23 @@ if ($hassiteconfig) {
         if ($lastcourse) {
             $lastlabel = $lastcourse->shortname !== '' ? $lastcourse->shortname : $lastcourse->fullname;
             $lasturl = new moodle_url('/course/view.php', ['id' => $lastcourseid]);
-            $coursesettingsurl = new moodle_url('/local/ai_course_assistant/course_settings.php',
-                ['courseid' => $lastcourseid]);
-            $backlabel = str_replace('{$a}', s($lastlabel),
-                get_string('toc:back_to_course', 'local_ai_course_assistant'));
+            $coursesettingsurl = new moodle_url(
+                '/local/ai_course_assistant/course_settings.php',
+                ['courseid' => $lastcourseid]
+            );
+            $backlabel = str_replace(
+                '{$a}',
+                s($lastlabel),
+                get_string('toc:back_to_course', 'local_ai_course_assistant')
+            );
+            $courseailabel = str_replace(
+                '{$a}',
+                s($lastlabel),
+                get_string('toc:course_ai_settings', 'local_ai_course_assistant')
+            );
             $courseaiurl = '<a href="' . $coursesettingsurl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#495057;border-color:#495057;">'
-                . '&#9881; ' . s($lastlabel) . ' AI settings</a>';
+                . '&#9881; ' . $courseailabel . '</a>';
             $backbtn = '<a href="' . $lasturl->out() . '" title="'
                 . s($lastcourse->fullname) . '" style="background:#6c757d;border-color:#6c757d;">'
                 . $backlabel . '</a>';
@@ -121,16 +130,17 @@ if ($hassiteconfig) {
     // TOC link still jumps to the right anchor.
     $toc = $tocstyle
         . '<div class="sola-toc">'
-        . '<strong>Jump to section</strong>'
+        . '<strong>' . get_string('settingspage:toc_heading', 'local_ai_course_assistant') . '</strong>'
         . '<ul>'
-        . '<li><a href="#sec-general">General</a></li>'
-        . '<li><a href="#sec-ai">AI Provider &amp; Models</a></li>'
-        . '<li><a href="#sec-branding">Branding &amp; UI</a></li>'
-        . '<li><a href="#sec-content">Content &amp; RAG</a></li>'
-        . '<li><a href="#sec-safety">Safety &amp; Moderation</a></li>'
-        . '<li><a href="#sec-engagement">Engagement</a></li>'
-        . '<li><a href="#sec-integrations">Integrations &amp; Delivery</a></li>'
-        . '<li><a href="#sec-save" style="background:#16a34a;border-color:#16a34a;color:#fff;font-weight:500">&#8595; Save</a></li>'
+        . '<li><a href="#sec-general">' . get_string('settingspage:sec_general', 'local_ai_course_assistant') . '</a></li>'
+        . '<li><a href="#sec-ai">' . s(get_string('settingspage:sec_ai', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-branding">' . s(get_string('settingspage:sec_branding', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-content">' . s(get_string('settingspage:sec_content', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-safety">' . s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-engagement">' . get_string('settingspage:sec_engagement', 'local_ai_course_assistant') . '</a></li>'
+        . '<li><a href="#sec-integrations">' . s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')) . '</a></li>'
+        . '<li><a href="#sec-save" class="sola-toc-save">&#8595; '
+        . get_string('settingspage:toc_save', 'local_ai_course_assistant') . '</a></li>'
         . '</ul>'
         . '<div class="sola-quicklinks">' . $quicklinks . '</div>'
         . '</div>';
@@ -142,7 +152,7 @@ if ($hassiteconfig) {
     ));
 
     // Helper to render a section anchor + heading.
-    $sectionanchor = function(string $id, string $title): string {
+    $sectionanchor = function (string $id, string $title): string {
         return '<span id="' . $id . '" class="sola-section-anchor"></span>'
             . '<h2 class="sola-section-heading">' . $title . '</h2>';
     };
@@ -151,7 +161,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_general_anchor',
         '',
-        $sectionanchor('sec-general', 'General')
+        $sectionanchor('sec-general', get_string('settingspage:sec_general', 'local_ai_course_assistant'))
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -173,6 +183,40 @@ if ($hassiteconfig) {
         $coursemodes
     ));
 
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/quizlock_heading',
+        \local_ai_course_assistant\branding::str('quizlock:heading'),
+        ''
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/quiz_lock_enabled',
+        \local_ai_course_assistant\branding::str('quizlock:enabled'),
+        \local_ai_course_assistant\branding::str('quizlock:enabled_desc'),
+        1
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/quiz_lock_window_minutes',
+        \local_ai_course_assistant\branding::str('quizlock:window'),
+        \local_ai_course_assistant\branding::str('quizlock:window_desc'),
+        180,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/quiz_lock_scope',
+        \local_ai_course_assistant\branding::str('quizlock:scope'),
+        \local_ai_course_assistant\branding::str('quizlock:scope_desc'),
+        \local_ai_course_assistant\quiz_lock::SCOPE_COURSE,
+        [
+            \local_ai_course_assistant\quiz_lock::SCOPE_COURSE
+                => \local_ai_course_assistant\branding::str('quizlock:scope_course'),
+            \local_ai_course_assistant\quiz_lock::SCOPE_SITE
+                => \local_ai_course_assistant\branding::str('quizlock:scope_site'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/auto_open',
         get_string('settings:auto_open', 'local_ai_course_assistant'),
@@ -182,10 +226,13 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/hidden_categories',
-        'Hidden course categories',
-        'Comma-separated list of course category names or IDs where the assistant should not appear. Example: "Course Development, 42". The assistant is also automatically hidden when editing mode is turned on.',
+        get_string('settings:hidden_categories', 'local_ai_course_assistant'),
+        get_string('settings:hidden_categories_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Comma-separated category IDs or names. PARAM_TEXT is lossless for
+        // category names (which may contain '&', accents or punctuation) while
+        // refusing markup; hook_callbacks trims and compares each entry.
+        PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -200,16 +247,17 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_ai_anchor',
         '',
-        $sectionanchor('sec-ai', 'AI Provider &amp; Models')
+        $sectionanchor('sec-ai', s(get_string('settingspage:sec_ai', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/provider_heading',
-        'AI Provider & Conversation',
-        'Configure the AI backend, model, and conversation behavior.'
+        get_string('settings:provider_heading', 'local_ai_course_assistant'),
+        get_string('settings:provider_heading_desc', 'local_ai_course_assistant'),
     ));
 
     $providers = [
+        'auto' => get_string('settings:provider_auto', 'local_ai_course_assistant'),
         'claude' => get_string('settings:provider_claude', 'local_ai_course_assistant'),
         'openai' => get_string('settings:provider_openai', 'local_ai_course_assistant'),
         'deepseek' => get_string('settings:provider_deepseek', 'local_ai_course_assistant'),
@@ -226,8 +274,10 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/provider',
         get_string('settings:provider', 'local_ai_course_assistant'),
-        get_string('settings:provider_desc', 'local_ai_course_assistant'),
-        'openai',
+        // branding::str(), not get_string(): this description carries a
+        // [[tutorshort]] token, and a bare get_string() would render it raw.
+        \local_ai_course_assistant\branding::str('settings:provider_desc'),
+        'auto',
         $providers
     ));
 
@@ -243,6 +293,22 @@ if ($hassiteconfig) {
         get_string('settings:model', 'local_ai_course_assistant'),
         get_string('settings:model_desc_dynamic', 'local_ai_course_assistant'),
         ''
+    ));
+
+    // v6.9.5: which Anthropic models accept `temperature`. An ALLOW-list —
+    // an unlisted model has temperature omitted, which is safe, rather than
+    // sent and rejected with a 400. Editable here (and pushable via policy
+    // bundle) so a newly released model never needs a plugin release.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/claude_temperature_allow_prefixes',
+        get_string('settings:claude_temperature_allow_prefixes', 'local_ai_course_assistant'),
+        get_string('settings:claude_temperature_allow_prefixes_desc', 'local_ai_course_assistant'),
+        implode("\n", \local_ai_course_assistant\provider\claude_provider::DEFAULT_TEMPERATURE_ALLOW_PREFIXES),
+        // PARAM_RAW is required: this is a newline-separated list, and the
+        // newlines are the record separator. It is never output as HTML - it is
+        // split and matched with str_starts_with() against the configured model
+        // name inside claude_provider::model_supports_temperature().
+        PARAM_RAW
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -267,7 +333,7 @@ if ($hassiteconfig) {
         get_string('settings:systemprompt_desc', 'local_ai_course_assistant')
         . '<br><button type="button" class="btn btn-sm btn-outline-secondary mt-1" '
         . 'onclick="document.getElementById(\'id_s_local_ai_course_assistant_systemprompt\').value='
-        . 'atob(\'' . base64_encode($defaultprompt) . '\');">Reset to default template</button>',
+        . 'atob(\'' . base64_encode($defaultprompt) . '\');">' . get_string('settingspage:reset_prompt_template', 'local_ai_course_assistant') . '</button>',
         ''
     ));
 
@@ -285,14 +351,73 @@ if ($hassiteconfig) {
         '0'
     ));
 
+    // Both budget banners below render through $OUTPUT. Declared here rather
+    // than beside either one: they are 130 lines apart and whichever came
+    // second would silently get a null if this were attached to the first.
+    global $OUTPUT;
+
+    // v4.12.0: structured prompt budget + verbosity controls.
+    //
+    // v7.2.6: the mode select and the truncation warning now sit with the
+    // budget they describe. v7.2.4 added the mode select next to the
+    // cost-anomaly settings, 2,165 lines away, while its own description told
+    // the reader to look at "the character budget below" -- which was above it,
+    // in a different section, and unfindable without searching.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/prompt_budget_mode',
+        get_string('settings:prompt_budget_mode', 'local_ai_course_assistant'),
+        get_string('settings:prompt_budget_mode_desc', 'local_ai_course_assistant'),
+        'auto',
+        [
+            'auto' => get_string('settings:prompt_budget_mode_auto', 'local_ai_course_assistant'),
+            'fixed' => get_string('settings:prompt_budget_mode_fixed', 'local_ai_course_assistant'),
+        ]
+    ));
+
     // v4.12.0: structured prompt budget + verbosity controls.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/prompt_budget_chars',
         get_string('settings:prompt_budget_chars', 'local_ai_course_assistant'),
         get_string('settings:prompt_budget_chars_desc', 'local_ai_course_assistant'),
-        '12000',
+        '36000',
         PARAM_INT
     ));
+
+    // v7.2.7: auto mode with nothing to derive from.
+    //
+    // Staging ran with prompt_budget_mode=auto, model empty and
+    // backend_context_tokens 0, so resolve_window_tokens() returned 0 and the
+    // budget quietly fell back to the configured number -- while the setting
+    // above told the administrator it was being derived from the model. The
+    // only place that said otherwise was a self-test nobody has to run, and
+    // 89.5% of turns were truncating with no indication why.
+    if ((string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
+        && \local_ai_course_assistant\context_builder::resolve_window_tokens(0) <= 0
+    ) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_budget_nowindow_warning',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str('settings:prompt_budget_no_window'),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
+
+    $trunclast = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
+    if ($trunclast > 0 && (time() - $trunclast) < (7 * DAYSECS)) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_truncation_warning',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str(
+                    'settings:prompt_truncated_warning',
+                    userdate($trunclast)
+                ),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
     // v5.10.0: backend context window (max_model_len) for self-hosted/small
     // backends. 0 = hosted/unlimited (no clamping). When set, the system-prompt
     // character budget above is clamped so the prompt fits the token window.
@@ -307,15 +432,21 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/selftest_link',
         get_string('selftest:link', 'local_ai_course_assistant'),
-        get_string('selftest:link_desc', 'local_ai_course_assistant',
-            (new moodle_url('/local/ai_course_assistant/backend_selftest.php'))->out())
+        get_string(
+            'selftest:link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/backend_selftest.php'))->out()
+        )
     ));
     // v5.10.0: link to the deployment presets page.
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/deployment_profile_link',
         get_string('profile:link', 'local_ai_course_assistant'),
-        get_string('profile:link_desc', 'local_ai_course_assistant',
-            (new moodle_url('/local/ai_course_assistant/deployment_profile.php'))->out())
+        get_string(
+            'profile:link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/deployment_profile.php'))->out()
+        )
     ));
     // v5.1.0: per-section cap on the current_page_content body. Lets
     // cost-conscious admins clamp how much of the current page is
@@ -371,12 +502,43 @@ if ($hassiteconfig) {
         get_string('settings:prompt_metrics_enabled_desc', 'local_ai_course_assistant'),
         '1'
     ));
+    // v7.2.6: DEPRECATED. The tuner infers a ceiling by watching for truncation
+    // and chasing the largest prompt it has seen; the v7.2.4 derived budget
+    // reads the model's context window directly. The second is strictly better
+    // -- it cannot oscillate, cannot chase noise, and needs no warm-up samples.
+    //
+    // Worse than redundant, the two collide. The tuner writes
+    // prompt_budget_chars, and resolve_budget_chars() treats any value other
+    // than the default as a deliberate administrator decision and stops
+    // deriving. So on a site with both enabled the tuner's first write silently
+    // switches the derived budget off. Found on Saylor production, where both
+    // were on and neither site's budget was the default.
+    //
+    // The task now stands down in auto mode, so the collision cannot happen
+    // even if this stays ticked. Kept for one release so nobody's configuration
+    // changes under them; scheduled for removal after that.
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/prompt_budget_auto_tune',
         get_string('settings:prompt_budget_auto_tune', 'local_ai_course_assistant'),
-        get_string('settings:prompt_budget_auto_tune_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::str('settings:prompt_budget_auto_tune_desc'),
         '0'
     ));
+
+    // Warn only when both are actually on: a deprecation notice that fires for
+    // everyone is noise, and this page already has a lot of it.
+    if (
+        (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune')
+        && (string) get_config('local_ai_course_assistant', 'prompt_budget_mode') !== 'fixed'
+    ) {
+        $settings->add(new admin_setting_description(
+            'local_ai_course_assistant/prompt_budget_tuner_conflict',
+            '',
+            $OUTPUT->notification(
+                \local_ai_course_assistant\branding::str('settings:prompt_budget_tuner_conflict'),
+                \core\output\notification::NOTIFY_WARNING
+            )
+        ));
+    }
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/prompt_verbosity',
@@ -392,10 +554,8 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/max_tokens',
-        'Max Response Length (tokens)',
-        'Maximum number of tokens per AI response. Lower values produce shorter, faster responses. '
-        . '512 = ~2-3 sentences, 1024 = ~1-2 paragraphs, 2048 = longer explanations. '
-        . 'Set to 0 for no limit (provider default).',
+        get_string('settings:max_tokens', 'local_ai_course_assistant'),
+        get_string('settings:max_tokens_desc', 'local_ai_course_assistant'),
         '1024',
         PARAM_INT
     ));
@@ -443,8 +603,8 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/profile_update_interval',
-        'Student Profile Update Interval',
-        'After this many student messages in a course, the assistant generates (or refreshes) a learning profile summarising the student\'s strengths, weaknesses, learning style, and interests. The profile is injected into the system prompt for personalised responses. Set to 0 to disable. Default: 10.',
+        get_string('settings:profile_update_interval', 'local_ai_course_assistant'),
+        get_string('settings:profile_update_interval_desc', 'local_ai_course_assistant'),
         '10',
         PARAM_INT
     ));
@@ -457,10 +617,8 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/enable_thinking',
-        'Extended Thinking (Claude only)',
-        'Enable adaptive thinking for Claude models. Claude decides when and how much to reason '
-        . 'through a problem before answering. Improves accuracy for complex questions but increases '
-        . 'token usage and latency. Thinking content is not shown to students. Other providers ignore this setting.',
+        get_string('settings:enable_thinking', 'local_ai_course_assistant'),
+        get_string('settings:enable_thinking_desc', 'local_ai_course_assistant'),
         '0'
     ));
 
@@ -479,20 +637,21 @@ if ($hassiteconfig) {
     $tokenanalyticsurl = new moodle_url('/local/ai_course_assistant/token_analytics.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/token_analytics_link',
-        'Token Cost & Analytics',
+        s(get_string('settingspage:token_analytics_title', 'local_ai_course_assistant')),
         '<a href="' . $tokenanalyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
-        . 'View Token Analytics &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">Monitor token usage and costs across courses and providers.</p>'
+        . s(get_string('settingspage:token_analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
+        . '<p class="text-muted mt-1" style="font-size:13px;">' . get_string('settingspage:token_analytics_blurb', 'local_ai_course_assistant') . '</p>'
     ));
 
     // Quick link to analytics dashboard.
     $analyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/analytics_link',
-        'Analytics Dashboard',
+        get_string('settingspage:analytics_title', 'local_ai_course_assistant'),
         '<a href="' . $analyticsurl->out() . '" class="btn btn-sm btn-outline-secondary">'
-        . 'View Analytics Dashboard &rarr;</a>'
-        . '<p class="text-muted mt-1" style="font-size:13px;">Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.</p>'
+        . s(get_string('settingspage:analytics_link', 'local_ai_course_assistant')) . ' &rarr;</a>'
+        . '<p class="text-muted mt-1" style="font-size:13px;">'
+        . get_string('settingspage:analytics_blurb', 'local_ai_course_assistant') . '</p>'
     ));
 
     // v3.9.28: SSRF trusted-endpoints allowlist. Operators running a self-hosted
@@ -504,6 +663,11 @@ if ($hassiteconfig) {
         get_string('settings:ssrf_trusted_endpoints', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:ssrf_trusted_endpoints_desc', 'local_ai_course_assistant')),
         '',
+        // PARAM_RAW is required: a newline-separated allowlist of host[:port]
+        // entries, including private/loopback hosts and Docker service names
+        // (underscores) that PARAM_URL/PARAM_HOST would reject outright. Strict
+        // checking happens where it matters - security::is_safe_provider_url()
+        // parses each entry and compares it to the resolved target host.
         PARAM_RAW
     ));
 
@@ -528,16 +692,14 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_content_anchor',
         '',
-        $sectionanchor('sec-content', 'Content &amp; RAG')
+        $sectionanchor('sec-content', s(get_string('settingspage:sec_content', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rag_heading',
         get_string('settings:rag_heading', 'local_ai_course_assistant'),
         get_string('settings:rag_heading_desc', 'local_ai_course_assistant')
-        . '<br><small class="text-muted">RAG (Retrieval-Augmented Generation) indexes your course content and retrieves '
-        . 'relevant passages when students ask questions, so the AI can give answers grounded in your materials. '
-        . 'Requires an embedding API key (OpenAI recommended). After enabling, use the RAG Admin page to index courses.</small>'
+        . '<br><small class="text-muted">' . get_string('settingspage:rag_explainer', 'local_ai_course_assistant') . '</small>'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -627,11 +789,45 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // v7.0.3: separate query-side model. Two vectors are only comparable within
+    // one embedding space, so this is empty by default (meaning "same model as
+    // documents") and is only useful for a model family that guarantees a shared
+    // space — currently Voyage's 4 series. rag_retriever refuses to score a
+    // query against chunks it cannot be compared with, so a wrong value here
+    // degrades to a logged warning and no results rather than to nonsense
+    // rankings.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_query_model',
+        get_string('settings:embed_query_model', 'local_ai_course_assistant'),
+        get_string('settings:embed_query_model_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_TEXT
+    ));
+
+    // v7.0.3: stored-vector quantization. int8 is a quarter of float32 and
+    // binary an eighth of int8, at some cost in recall. Changing this requires a
+    // full reindex — the encodings are not interchangeable, and the retriever
+    // will skip (and warn about) rows that disagree with this setting.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/embed_dtype',
+        get_string('settings:embed_dtype', 'local_ai_course_assistant'),
+        get_string('settings:embed_dtype_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT,
+        [
+            \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT  =>
+                get_string('settings:embed_dtype_float', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_compat::DTYPE_INT8   =>
+                get_string('settings:embed_dtype_int8', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_compat::DTYPE_BINARY =>
+                get_string('settings:embed_dtype_binary', 'local_ai_course_assistant'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_topk',
         get_string('settings:rag_topk', 'local_ai_course_assistant'),
         get_string('settings:rag_topk_desc', 'local_ai_course_assistant'),
-        '5',
+        '3',
         PARAM_INT
     ));
 
@@ -690,13 +886,15 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/rag_window_size',
         get_string('settings:rag_window_size', 'local_ai_course_assistant'),
         get_string('settings:rag_window_size_desc', 'local_ai_course_assistant'),
-        '1', PARAM_INT
+        '1',
+        PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_parent_max_chars',
         get_string('settings:rag_parent_max_chars', 'local_ai_course_assistant'),
         get_string('settings:rag_parent_max_chars_desc', 'local_ai_course_assistant'),
-        '6000', PARAM_INT
+        '6000',
+        PARAM_INT
     ));
 
     // v5.11.0: two-stage retrieval with Voyage rerank-2.5.
@@ -739,92 +937,98 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/rerank_candidates',
         get_string('settings:rerank_candidates', 'local_ai_course_assistant'),
         get_string('settings:rerank_candidates_desc', 'local_ai_course_assistant'),
-        '50',
+        '20',
         PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rerank_margin_threshold',
+        get_string('settings:rerank_margin_threshold', 'local_ai_course_assistant'),
+        get_string('settings:rerank_margin_threshold_desc', 'local_ai_course_assistant'),
+        '0.086',
+        PARAM_FLOAT
     ));
 
     $ragadminurl = new moodle_url('/local/ai_course_assistant/rag_admin.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/rag_admin_link',
         get_string('ragadmin:title', 'local_ai_course_assistant'),
-        html_writer::link($ragadminurl,
+        html_writer::link(
+            $ragadminurl,
             get_string('ragadmin:view_status', 'local_ai_course_assistant'),
-            ['class' => 'btn btn-secondary btn-sm'])
+            ['class' => 'btn btn-secondary btn-sm']
+        )
     ));
 
     // Content source extractors (v3.9.6+). Each flag gates a specific module
     // type or embed fetcher. Read from within the extractor classes.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rag_sources_heading',
-        'RAG content sources',
-        'Choose which course content types the RAG indexer extracts text from. '
-        . 'Status indicators on the <a href="' . $ragadminurl->out() . '">RAG Admin page</a> show whether each extractor '
-        . 'has what it needs (e.g. the pdftotext binary, Cloudflare allowlist) to run.'
+        get_string('settings:rag_sources_heading', 'local_ai_course_assistant'),
+        get_string('settings:rag_sources_heading_desc', 'local_ai_course_assistant', $ragadminurl->out()),
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_pdf',
-        'Index PDF files (mod_resource)',
-        'Extract text from PDF uploads via the <code>pdftotext</code> binary (poppler). Auto-detects the binary path; override below if needed.',
+        get_string('settings:rag_extract_pdf', 'local_ai_course_assistant'),
+        get_string('settings:rag_extract_pdf_desc', 'local_ai_course_assistant'),
         1
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_pdftotext_path',
-        'pdftotext binary path',
-        'Leave blank to auto-detect (checks <code>/usr/bin/pdftotext</code>, <code>/usr/local/bin/pdftotext</code>, and <code>which pdftotext</code>). Set this only if your installation lives somewhere else.',
+        get_string('settings:rag_pdftotext_path', 'local_ai_course_assistant'),
+        get_string('settings:rag_pdftotext_path_desc', 'local_ai_course_assistant'),
         ''
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_docx',
-        'Index DOCX files (mod_resource)',
-        'Extract text from Word uploads via PHP ZipArchive. No external dependency required.',
+        get_string('settings:rag_extract_docx', 'local_ai_course_assistant'),
+        get_string('settings:rag_extract_docx_desc', 'local_ai_course_assistant'),
         1
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_pptx',
-        'Index PPTX files (mod_resource)',
-        'Extract text from modern PowerPoint uploads via PHP ZipArchive. Walks slide and speaker-note XML in deck order; no external dependency required. Legacy binary <code>.ppt</code> files are not supported — re-save those decks as <code>.pptx</code>.',
+        get_string('settings:rag_extract_pptx', 'local_ai_course_assistant'),
+        get_string('settings:rag_extract_pptx_desc', 'local_ai_course_assistant'),
         1
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_h5p',
-        'Index H5P content (mod_h5p)',
-        'Walk H5P content JSON and index every text-bearing field (questions, answers, feedback, descriptions). H5P content type metadata is broad; expect some false positives in edge cases.',
+        get_string('settings:rag_extract_h5p', 'local_ai_course_assistant'),
+        get_string('settings:rag_extract_h5p_desc', 'local_ai_course_assistant'),
         1
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_extract_scorm',
-        'Index SCORM packages (mod_scorm)',
-        'Unzip SCORM packages and index <code>imsmanifest.xml</code>, any <code>.html</code> files, and Articulate Storyline content strings. <strong>Off by default</strong> because SCORM parses can be expensive. Max package size is controlled by <code>rag_scorm_max_mb</code>.',
+        get_string('settings:rag_extract_scorm', 'local_ai_course_assistant'),
+        get_string('settings:rag_extract_scorm_desc', 'local_ai_course_assistant'),
         0
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_scorm_max_mb',
-        'Max SCORM package size to index (MB)',
-        'Skip SCORM packages larger than this to avoid excessive memory use.',
+        get_string('settings:rag_scorm_max_mb', 'local_ai_course_assistant'),
+        get_string('settings:rag_scorm_max_mb_desc', 'local_ai_course_assistant'),
         '100',
         PARAM_INT
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/rag_fetch_transcripts',
-        'Fetch transcripts for embedded videos/interactives',
-        'Scan mod_page and mod_book content for embedded iframes (Synthesia, YouTube, Articulate, Genially) and fetch the companion transcript URL paired with each embed (searching both above and below the iframe). '
-        . 'Requires outbound HTTPS from this server to the transcript host. '
-        . '<strong>Off by default</strong>; enable once the transcript host has allowlisted this server (e.g. Cloudflare IP Access Rule).',
+        get_string('settings:rag_fetch_transcripts', 'local_ai_course_assistant'),
+        get_string('settings:rag_fetch_transcripts_desc', 'local_ai_course_assistant'),
         0
     ));
 
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/rag_iframe_host_patterns',
-        'Iframe host patterns',
-        'One regex per line matching an iframe <code>src</code> attribute. Each matching iframe is treated as an interactive embed whose transcript should be paired and indexed. Lines starting with <code>#</code> are comments.',
+        get_string('settings:rag_iframe_host_patterns', 'local_ai_course_assistant'),
+        get_string('settings:rag_iframe_host_patterns_desc', 'local_ai_course_assistant'),
         "share\\.synthesia\\.io/embeds/videos/\n"
         . "youtube\\.com/embed/\n"
         . "youtube-nocookie\\.com/embed/\n"
@@ -837,61 +1041,30 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/rag_transcript_url_pattern',
-        'Transcript URL pattern',
-        'Regex that matches transcript anchor URLs. The indexer picks the nearest matching anchor (above or below) to each detected iframe and pairs them. Leave blank to disable transcript pairing.',
+        get_string('settings:rag_transcript_url_pattern', 'local_ai_course_assistant'),
+        get_string('settings:rag_transcript_url_pattern_desc', 'local_ai_course_assistant'),
         ""
-    ));
-
-    // Student attachments (images + PDFs) on chat messages.
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/attachments_heading',
-        'Student attachments',
-        'Let students attach an image or PDF to their chat messages. Images are sent to multimodal providers (OpenAI, Anthropic, Gemini, xAI); '
-        . 'PDFs are always text-extracted on the server so every provider can read them.'
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'local_ai_course_assistant/allow_student_attachments',
-        'Allow attachments',
-        'When enabled, students see a paperclip button in the chat composer. Files are stored under the course context and linked from their message bubble.',
-        1
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/attachment_max_size_mb',
-        'Max attachment size (MB)',
-        'Hard cap on the size of an individual attachment. Clamped to 1–25 MB at runtime.',
-        '10',
-        PARAM_INT
-    ));
-
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/attachment_allowed_types',
-        'Allowed MIME types',
-        'Comma-separated MIME allowlist. The server also sniffs the uploaded file; a spoofed Content-Type will be rejected.',
-        'image/png,image/jpeg,image/webp,application/pdf',
-        PARAM_RAW_TRIMMED
     ));
 
     // Performance: caps on how much course content goes into the system prompt.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/performance_heading',
-        'Performance',
-        'Control the amount of course content included in the AI prompt. Lower values mean faster responses but less context for the AI.'
+        get_string('settings:performance_heading', 'local_ai_course_assistant'),
+        get_string('settings:performance_heading_desc', 'local_ai_course_assistant'),
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/max_content_per_resource',
-        'Max Content Per Resource (chars)',
-        'Maximum characters of content extracted from each page or book chapter. Lower values reduce prompt size and speed up responses.',
+        get_string('settings:max_content_per_resource', 'local_ai_course_assistant'),
+        get_string('settings:max_content_per_resource_desc', 'local_ai_course_assistant'),
         '1500',
         PARAM_INT
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/max_total_content',
-        'Max Total Content (chars)',
-        'Maximum total characters of course content included in the system prompt. Lower values reduce prompt size and speed up responses.',
+        get_string('settings:max_total_content', 'local_ai_course_assistant'),
+        get_string('settings:max_total_content_desc', 'local_ai_course_assistant'),
         '15000',
         PARAM_INT
     ));
@@ -899,51 +1072,57 @@ if ($hassiteconfig) {
     // Spend guard + optimizer (v3.9.9+).
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/spend_guard_heading',
-        'Spend guard and optimizer',
-        'Set LLM spend caps per period. SOLA pauses requests when a cap is hit or falls back to a cheaper provider from your failover chain. '
-        . 'See the <a href="' . (new moodle_url('/local/ai_course_assistant/token_analytics.php'))->out() . '">Token Cost page</a> '
-        . 'for the current spend status and optimizer recommendations.'
+        \local_ai_course_assistant\branding::str('settings:spend_guard_heading'),
+        \local_ai_course_assistant\branding::str('settings:spend_guard_heading_desc', (new moodle_url('/local/ai_course_assistant/token_analytics.php'))->out()),
     ));
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/spend_cap_period',
-        'Spend cap period',
-        'How often the spend cap resets. Calendar-aligned: monthly starts on the 1st of the month, weekly on Monday, daily at midnight.',
+        get_string('settings:spend_cap_period', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_period_desc', 'local_ai_course_assistant'),
         'monthly',
-        ['daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly']
+        [
+            'daily'   => get_string('settings:spend_cap_period_daily', 'local_ai_course_assistant'),
+            'weekly'  => get_string('settings:spend_cap_period_weekly', 'local_ai_course_assistant'),
+            'monthly' => get_string('settings:spend_cap_period_monthly', 'local_ai_course_assistant'),
+        ]
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_site',
-        'Site-wide spend cap (USD)',
-        'Total USD cap across all courses and capabilities for the current period. <code>0</code> = unlimited. Per-capability caps below override this when set.',
+        get_string('settings:spend_cap_site', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_site_desc', 'local_ai_course_assistant'),
         '0',
         PARAM_FLOAT
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_chat',
-        'Chat cap (USD)',
-        'Cap just for student chat + quiz workload. <code>0</code> = use site-wide cap.',
-        '0', PARAM_FLOAT
+        get_string('settings:spend_cap_chat', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_chat_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_voice',
-        'Voice cap (USD)',
-        'Cap for Voice (Realtime + TTS + STT). Voice is usually the biggest line item — cap it first.',
-        '0', PARAM_FLOAT
+        get_string('settings:spend_cap_voice', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_voice_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_rag',
-        'RAG cap (USD)',
-        'Cap for embedding calls made during course indexing.',
-        '0', PARAM_FLOAT
+        get_string('settings:spend_cap_rag', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_rag_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_cap_analytics',
-        'Analytics cap (USD)',
-        'Cap for Learning Radar admin queries.',
-        '0', PARAM_FLOAT
+        get_string('settings:spend_cap_analytics', 'local_ai_course_assistant'),
+        get_string('settings:spend_cap_analytics_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_FLOAT
     ));
 
     // v5.13.0: default per-course cap (applies to any course without an explicit override).
@@ -975,6 +1154,43 @@ if ($hassiteconfig) {
         // and '2' !== '2.0' fails default-validation at install (pre-existing
         // bug that has been failing CI since v6.0.1). Use '2'.
         '2',
+        PARAM_FLOAT
+    ));
+
+    // v6.9.7: unanswered-question monitor. The cost detector above only fires
+    // when spend goes UP, so a provider that rejects every call costs nothing
+    // and stays invisible — that gap hid a nine-day outage across ten courses
+    // in August 2026. This watches the ratio of learner questions to assistant
+    // replies instead, which drops to zero the moment a provider breaks.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/unanswered_check_enabled',
+        get_string('settings:unanswered_check_enabled', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(
+            get_string('settings:unanswered_check_enabled_desc', 'local_ai_course_assistant')),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_window_hours',
+        get_string('settings:unanswered_window_hours', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_window_hours_desc', 'local_ai_course_assistant'),
+        '6',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_min_questions',
+        get_string('settings:unanswered_min_questions', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_min_questions_desc', 'local_ai_course_assistant'),
+        '5',
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/unanswered_min_answer_rate',
+        get_string('settings:unanswered_min_answer_rate', 'local_ai_course_assistant'),
+        get_string('settings:unanswered_min_answer_rate_desc', 'local_ai_course_assistant'),
+        // As with cost_anomaly_multiplier, the default must round-trip through
+        // clean_param(PARAM_FLOAT) unchanged or install-time validation fails:
+        // '0.5' cleans to 0.5 and compares equal, so this one is safe as-is.
+        '0.5',
         PARAM_FLOAT
     ));
 
@@ -1011,7 +1227,11 @@ if ($hassiteconfig) {
         get_string('settings:policy_bundle_url', 'local_ai_course_assistant'),
         get_string('settings:policy_bundle_url_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // A single fetchable URL, so PARAM_URL is the right type (it accepts the
+        // https, localhost and private-IP forms this setting is used with, and
+        // rejects javascript:/data: outright). policy_bundle::sync() still runs
+        // the value through security::is_safe_provider_url() before fetching.
+        PARAM_URL
     ));
 
     $settings->add(new admin_setting_configtext(
@@ -1019,16 +1239,16 @@ if ($hassiteconfig) {
         get_string('settings:policy_bundle_pubkey', 'local_ai_course_assistant'),
         get_string('settings:policy_bundle_pubkey_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Base64-encoded 32-byte Ed25519 public key - PARAM_BASE64 is exactly
+        // that character class (verified against a generated key), and
+        // policy_bundle::verify_envelope() still length-checks the decoded key.
+        PARAM_BASE64
     ));
 
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/spend_failover_chain',
-        'Failover chain',
-        'When a cap is hit, SOLA tries these providers in order. One entry per line, format <code>capability:label</code>. '
-        . 'Labels refer to entries in Comparison providers (for <code>chat</code> / <code>analytics</code>) or Voice providers (for <code>voice</code>). '
-        . 'Lines starting with <code>#</code> are comments. Example:<br>'
-        . '<code>chat:claude-haiku<br>chat:ollama-local<br>voice:openai-prod<br>analytics:deepseek</code>',
+        \local_ai_course_assistant\branding::str('settings:spend_failover_chain'),
+        \local_ai_course_assistant\branding::str('settings:spend_failover_chain_desc'),
         ''
     ));
 
@@ -1039,32 +1259,21 @@ if ($hassiteconfig) {
     // installs see no behavior change on upgrade.
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/failover_per_call_enabled',
-        'Per-call failover (v5.5.0)',
-        'When on, every chat call wraps the primary provider in a failover-chain decorator. '
-        . 'On per-call timeout or 5xx error, SOLA rotates to the next entry in <strong>Failover chain</strong> '
-        . 'above and opens a 15-minute circuit on the failing provider. Emits an audit row '
-        . '(<code>failover_fallthrough</code>) on every fall-through; check Admin -> SOLA -> Audit log '
-        . 'after enabling to verify the chain is healthy. Off by default; turn on once the chain has been '
-        . 'validated and Saylor legal has confirmed FERPA addenda on each chain entry.',
+        \local_ai_course_assistant\branding::str('settings:failover_per_call_enabled'),
+        \local_ai_course_assistant\branding::str('settings:failover_per_call_enabled_desc'),
         0
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/failover_timeout_chat',
-        'Per-call failover: chat timeout (seconds)',
-        'How long to wait for the first token from a chat provider before falling through. Default 8s. '
-        . 'Lower values fall over faster on slow providers at the cost of false-positives on temporarily-slow '
-        . 'requests; higher values keep the chain on the primary longer. Only consulted when <strong>Per-call '
-        . 'failover</strong> is on.',
-        '8', PARAM_INT
+        get_string('settings:failover_timeout_chat', 'local_ai_course_assistant'),
+        get_string('settings:failover_timeout_chat_desc', 'local_ai_course_assistant'),
+        '8',
+        PARAM_INT
     ));
-    $settings->add(new admin_setting_configtext(
-        'local_ai_course_assistant/failover_timeout_voice',
-        'Per-call failover: voice timeout (seconds)',
-        'Equivalent timeout for the voice/realtime path. Default 3s; voice has tighter latency expectations '
-        . 'than chat. Only consulted when <strong>Per-call failover</strong> is on (and voice failover is '
-        . 'wired through; chat-only in v5.5.0).',
-        '3', PARAM_INT
-    ));
+    // failover_timeout_voice was removed in v7.0.0. It was registered here and
+    // on the policy-bundle allowlist, but nothing ever read it — voice failover
+    // was never wired through, as its own help text admitted. A remotely
+    // settable knob that does nothing reads as a control that works.
 
     // v5.10.0: bounded retry on a transient backend rejection (429/503). Aimed
     // at small self-hosted backends that reject under load. Retries only happen
@@ -1073,40 +1282,44 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/backend_retry_attempts',
         get_string('settings:backend_retry_attempts', 'local_ai_course_assistant'),
         get_string('settings:backend_retry_attempts_desc', 'local_ai_course_assistant'),
-        '2', PARAM_INT
+        '2',
+        PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/backend_retry_max_wait',
         get_string('settings:backend_retry_max_wait', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:backend_retry_max_wait_desc', 'local_ai_course_assistant')),
-        '5', PARAM_INT
+        '5',
+        PARAM_INT
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/spend_notify_emails',
-        'Spend alert recipients',
-        'Comma-separated email addresses to notify at 80%, 95%, and 100% of the cap. Leave blank to notify all site admins.',
+        get_string('settings:spend_notify_emails', 'local_ai_course_assistant'),
+        get_string('settings:spend_notify_emails_desc', 'local_ai_course_assistant'),
         ''
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/opt_cost_weight',
-        'Optimizer: cost weight',
-        'How much the optimizer prioritizes cost when ranking providers. 0.0 ignores cost, 1.0 optimizes purely for cost. Must sum with quality weight.',
-        '0.7', PARAM_FLOAT
+        get_string('settings:opt_cost_weight', 'local_ai_course_assistant'),
+        get_string('settings:opt_cost_weight_desc', 'local_ai_course_assistant'),
+        '0.7',
+        PARAM_FLOAT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/opt_quality_weight',
-        'Optimizer: quality weight',
-        'How much the optimizer prioritizes student satisfaction (thumbs-up rate) when ranking providers. 0.0 ignores quality.',
-        '0.3', PARAM_FLOAT
+        get_string('settings:opt_quality_weight', 'local_ai_course_assistant'),
+        get_string('settings:opt_quality_weight_desc', 'local_ai_course_assistant'),
+        '0.3',
+        PARAM_FLOAT
     ));
 
     // ── Section: Safety & Moderation ────────────────────────────────────────
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_safety_anchor',
         '',
-        $sectionanchor('sec-safety', 'Safety &amp; Moderation')
+        $sectionanchor('sec-safety', s(get_string('settingspage:sec_safety', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
@@ -1266,7 +1479,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_engagement_anchor',
         '',
-        $sectionanchor('sec-engagement', 'Engagement')
+        $sectionanchor('sec-engagement', get_string('settingspage:sec_engagement', 'local_ai_course_assistant'))
     ));
 
     // Study plans and reminders.
@@ -1327,15 +1540,15 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/inactivity_reminder_enabled',
-        'Inactivity Reminders',
-        'Send a weekly email to students who have not accessed their course in the configured number of days.',
+        get_string('settings:inactivity_reminder_enabled', 'local_ai_course_assistant'),
+        get_string('settings:inactivity_reminder_enabled_desc', 'local_ai_course_assistant'),
         1
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/inactivity_threshold_days',
-        'Inactivity Threshold (days)',
-        'Number of days of inactivity before sending a reminder email.',
+        get_string('settings:inactivity_threshold_days', 'local_ai_course_assistant'),
+        get_string('settings:inactivity_threshold_days_desc', 'local_ai_course_assistant'),
         '7',
         PARAM_INT
     ));
@@ -1344,10 +1557,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/realtime_heading',
         get_string('settings:realtime_heading', 'local_ai_course_assistant'),
-        '<small class="text-muted">Realtime Voice Mode enables live, two-way spoken conversations between students '
-        . 'and the AI using OpenAI\'s Realtime API. This is different from standard text-to-speech (TTS), which reads '
-        . 'AI responses aloud. Realtime Voice requires a separate API key and is billed per minute of audio. '
-        . 'Once enabled globally, you can toggle it per course in each course\'s settings page.</small>'
+        '<small class="text-muted">' . get_string('settingspage:realtime_explainer', 'local_ai_course_assistant') . '</small>'
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -1391,18 +1601,17 @@ if ($hassiteconfig) {
     // drives Realtime, TTS, and STT.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/voice_providers_heading',
-        'Voice providers (Realtime, TTS, STT)',
-        'Configure one or more voice API providers. These settings are independent of the chat provider above and the RAG embedding provider — voice has its own provider list because only OpenAI and xAI currently expose WebSocket Realtime, TTS, and STT endpoints. Use the dropdowns below to choose which registered provider drives each capability. '
-        . 'If no rows are defined, the legacy single-key fallback (Realtime API key above, or primary OpenAI key) is used. Saylor sites running Together AI / Anthropic / DeepSeek / Gemini / Mistral for chat must configure at least one row here for voice to work.'
+        get_string('settings:voice_providers_heading', 'local_ai_course_assistant'),
+        get_string('settings:voice_providers_heading_desc', 'local_ai_course_assistant'),
     ));
 
     $settings->add(new \local_ai_course_assistant\admin_setting_voice_providers(
         'local_ai_course_assistant/voice_providers',
-        'Voice providers',
-        'Add one row per voice API. Valid provider IDs: openai, xai (these are the only providers with WebSocket Realtime + TTS + STT today). The Label is a friendly name you use to pick the active provider for each capability below. Realtime voice and TTS voice can be left blank to use the provider default (shimmer for OpenAI, eve for xAI).'
+        get_string('settings:voice_providers', 'local_ai_course_assistant'),
+        get_string('settings:voice_providers_desc', 'local_ai_course_assistant')
     ));
 
-    $activechoices = ['' => '(use first configured or legacy fallback)'];
+    $activechoices = ['' => get_string('settings:voice_active_default', 'local_ai_course_assistant')];
     foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $activechoices[$label] = $label . ' (' . $row['provider'] . ')';
@@ -1410,32 +1619,32 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/voice_active_realtime',
-        'Active Realtime provider',
-        'Which configured voice provider handles Realtime Voice Agent sessions.',
+        get_string('settings:voice_active_realtime', 'local_ai_course_assistant'),
+        get_string('settings:voice_active_realtime_desc', 'local_ai_course_assistant'),
         '',
         $activechoices
     ));
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/voice_active_tts',
-        'Active TTS provider',
-        'Which configured voice provider handles text-to-speech playback of AI responses.',
+        get_string('settings:voice_active_tts', 'local_ai_course_assistant'),
+        get_string('settings:voice_active_tts_desc', 'local_ai_course_assistant'),
         '',
         $activechoices
     ));
     // STT additionally offers the selfhosted Whisper server (v6.2.0). When a
     // server URL is configured below, the blank default prefers selfhosted;
     // picking a paid label here overrides that.
-    $sttchoices = ['' => '(selfhosted if configured, else first row or legacy fallback)'];
+    $sttchoices = ['' => get_string('settings:voice_active_stt_default', 'local_ai_course_assistant')];
     $sttchoices[\local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL] =
-        'Selfhosted Whisper server (free, uses the URL below)';
+        get_string('settings:voice_active_stt_selfhosted', 'local_ai_course_assistant');
     foreach (\local_ai_course_assistant\voice_registry::parse_rows() as $row) {
         $label = $row['label'] !== '' ? $row['label'] : ucfirst($row['provider']);
         $sttchoices[$label] = $label . ' (' . $row['provider'] . ')';
     }
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/voice_active_stt',
-        'Active STT provider',
-        'Which provider handles speech-to-text transcription of student audio. Leave blank to prefer the selfhosted Whisper server when one is configured below, falling back to the first voice provider row or the legacy key.',
+        get_string('settings:voice_active_stt', 'local_ai_course_assistant'),
+        get_string('settings:voice_active_stt_desc', 'local_ai_course_assistant'),
         '',
         $sttchoices
     ));
@@ -1451,10 +1660,8 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/stt_selfhosted_enabled',
-        'Enable self-hosted transcription',
-        'Use the self-hosted Whisper server below as the speech-to-text path for voice input and Soapbox. '
-        . 'Requires a server URL below. When off, transcription falls back to the hosted (OpenAI Whisper) or '
-        . 'in-browser path even if a URL is set.',
+        get_string('settings:stt_selfhosted_enabled', 'local_ai_course_assistant'),
+        get_string('settings:stt_selfhosted_enabled_desc', 'local_ai_course_assistant'),
         1
     ));
 
@@ -1463,6 +1670,12 @@ if ($hassiteconfig) {
         get_string('settings:stt_selfhosted_url', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:stt_selfhosted_url_desc', 'local_ai_course_assistant')),
         '',
+        // PARAM_RAW_TRIMMED is required: this points at a private Whisper server,
+        // typically a container hostname such as http://whisper_server:8080/...
+        // PARAM_URL discards hostnames containing underscores, which would break
+        // existing docker-compose deployments. The value is not output as HTML;
+        // it is validated by security::is_safe_provider_url() (plus the SSRF
+        // trusted-endpoints allowlist) before any request is made.
         PARAM_RAW_TRIMMED
     ));
 
@@ -1471,7 +1684,10 @@ if ($hassiteconfig) {
         get_string('settings:stt_selfhosted_model', 'local_ai_course_assistant'),
         get_string('settings:stt_selfhosted_model_desc', 'local_ai_course_assistant'),
         '',
-        PARAM_RAW_TRIMMED
+        // Model slug ("whisper-1", "Systran/faster-whisper-large-v3"): PARAM_TEXT
+        // keeps the dots and slashes PARAM_ALPHANUMEXT would strip, and
+        // voice_registry trims the value when it reads it.
+        PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configpasswordunmask(
@@ -1483,18 +1699,15 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/stt_selfhosted_warm',
-        'Pre-warm on Soapbox record start',
-        'When on, starting a Soapbox recording sends a lightweight, best-effort "warm-up" ping to the '
-        . 'self-hosted transcription server so a scale-to-zero host (e.g. Cloud Run) boots while the student '
-        . 'is still recording — hiding the cold-start delay from the transcription that runs on submit. '
-        . 'No effect unless a self-hosted server URL is set above. Off by default.',
+        get_string('settings:stt_selfhosted_warm', 'local_ai_course_assistant'),
+        get_string('settings:stt_selfhosted_warm_desc', 'local_ai_course_assistant'),
         0
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/voice_tab_enabled',
-        'Enable Voice Tab',
-        'Show the Voice tab in the bottom navigation bar. When disabled, students only see Chat and Notes tabs. Voice features (Conversation Practice, Pronunciation Practice) can still be accessed via conversation starters if enabled separately.',
+        get_string('settings:voice_tab_enabled', 'local_ai_course_assistant'),
+        get_string('settings:voice_tab_enabled_desc', 'local_ai_course_assistant'),
         0
     ));
 
@@ -1502,9 +1715,8 @@ if ($hassiteconfig) {
     // mode and rubric editor sit together, separate from the pedagogy toggles.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/soapbox_heading',
-        'Soapbox',
-        'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. '
-        . 'Turn Soapbox on per course with the Soapbox pedagogy toggle in the Pedagogy section.'
+        get_string('settings:soapbox_heading', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_heading_desc', 'local_ai_course_assistant'),
     ));
 
     // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
@@ -1527,11 +1739,12 @@ if ($hassiteconfig) {
     // speech rubric; the editor also loads the General / ESL level presets).
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/soapbox_rubric_link',
-        'Soapbox speech rubric',
-        'Edit the rubric Soapbox scores against, or load a level preset (General, ESL beginner, '
-        . 'ESL intermediate, ESL advanced). '
-        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
-        . '" class="btn btn-sm btn-outline-primary ml-2">Open rubric editor &rarr;</a>'
+        get_string('settings:soapbox_rubric_link', 'local_ai_course_assistant'),
+        get_string(
+            'settings:soapbox_rubric_link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/rubric_admin.php', ['type' => 'speech']))->out()
+        )
     ));
 
     // v6.8.12 Soapbox video: site-wide caps and defaults for the video/audio
@@ -1539,34 +1752,34 @@ if ($hassiteconfig) {
     // these caps; the caps are clamped server-side in soapbox_config.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_max_seconds',
-        'Soapbox max recording length (seconds)',
-        'Hard ceiling on any assignment\'s recording length. Instructors may set a shorter range. Default 720 (12 minutes).',
+        get_string('settings:soapbox_max_seconds', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_max_seconds_desc', 'local_ai_course_assistant'),
         720,
         PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_max_recordings',
-        'Soapbox max recordings per student per assignment',
-        'Hard ceiling on how many recordings a student may make for one assignment, regardless of the per-assignment attempts setting. Default 3.',
+        get_string('settings:soapbox_max_recordings', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_max_recordings_desc', 'local_ai_course_assistant'),
         3,
         PARAM_INT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_retention_days',
-        'Soapbox recording retention (days)',
-        'How long a recording is stored before automatic deletion; the transcript, score, and feedback are kept. Clamped to 1 to 28 days. Shorter is better data minimization. Default 7.',
+        get_string('settings:soapbox_retention_days', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_retention_days_desc', 'local_ai_course_assistant'),
         7,
         PARAM_INT
     ));
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/soapbox_video_quality',
-        'Soapbox video quality',
-        'Recording resolution and bitrate. This is the main cost and bandwidth lever; a talking-head presenter is legible at Standard. Low suits weak connections; High only when visual detail matters.',
+        get_string('settings:soapbox_video_quality', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_video_quality_desc', 'local_ai_course_assistant'),
         'standard_480p',
         [
-            'low_360p'      => 'Low (360p, ~3 MB/min)',
-            'standard_480p' => 'Standard (480p, ~4 MB/min)',
-            'high_720p'     => 'High (720p, ~9 MB/min)',
+            'low_360p'      => get_string('settings:soapbox_video_quality_low', 'local_ai_course_assistant'),
+            'standard_480p' => get_string('settings:soapbox_video_quality_standard', 'local_ai_course_assistant'),
+            'high_720p'     => get_string('settings:soapbox_video_quality_high', 'local_ai_course_assistant'),
         ]
     ));
 
@@ -1592,7 +1805,8 @@ if ($hassiteconfig) {
         get_string('settings:soapbox_vision_model', 'local_ai_course_assistant'),
         get_string('settings:soapbox_vision_model_desc', 'local_ai_course_assistant'),
         'gpt-4o-mini',
-        PARAM_RAW_TRIMMED
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
 
     // v6.8.13 Soapbox video: object storage for recordings. The browser uploads
@@ -1601,163 +1815,176 @@ if ($hassiteconfig) {
     // prefix; a bucket lifecycle rule on that prefix is the deletion backstop.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_storage_bucket',
-        'Soapbox storage bucket',
-        'S3 bucket for recordings. Default: the shared archive bucket.',
+        get_string('settings:soapbox_storage_bucket', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_storage_bucket_desc', 'local_ai_course_assistant'),
         'archive-course',
         PARAM_TEXT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_storage_region',
-        'Soapbox storage region',
-        'AWS region of the bucket, e.g. us-east-1.',
+        get_string('settings:soapbox_storage_region', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_storage_region_desc', 'local_ai_course_assistant'),
         'us-east-1',
         PARAM_TEXT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_storage_prefix',
-        'Soapbox storage key prefix',
-        'Key prefix within the bucket. Recordings are stored under this path so a lifecycle rule can target them.',
+        get_string('settings:soapbox_storage_prefix', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_storage_prefix_desc', 'local_ai_course_assistant'),
         'soapbox/',
         PARAM_TEXT
     ));
-    $settings->add(new admin_setting_configtext(
+    // Password type, not configtext: this is half of an IAM credential pair, and
+    // Moodle only writes '********' into config_log for password settings. As
+    // configtext, every access key ID ever saved stayed readable in mdl_config_log,
+    // which is never purged. Its sibling soapbox_storage_secret was already
+    // declared correctly; this one was missed, the same way redash_api_key was.
+    // (configpasswordunmask takes no paramtype argument; it forces PARAM_RAW.)
+    $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/soapbox_storage_key',
-        'Soapbox storage access key ID',
-        'Access key ID for an IAM principal limited to PutObject/GetObject/DeleteObject on the prefix above.',
-        '',
-        PARAM_RAW_TRIMMED
+        get_string('settings:soapbox_storage_key', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_storage_key_desc', 'local_ai_course_assistant'),
+        ''
     ));
     $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/soapbox_storage_secret',
-        'Soapbox storage secret access key',
-        'Secret access key for the access key ID above.',
+        get_string('settings:soapbox_storage_secret', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_storage_secret_desc', 'local_ai_course_assistant'),
         ''
     ));
 
     // Student Survey.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/survey_heading',
-        'Student Survey',
-        'Configure the in-chat student experience survey. '
-        . '<a href="' . (new moodle_url('/local/ai_course_assistant/survey_admin.php'))->out() . '" class="btn btn-sm btn-outline-primary ml-2">Edit Survey Questions &rarr;</a>'
+        get_string('settings:survey_heading', 'local_ai_course_assistant'),
+        get_string('settings:survey_heading_desc', 'local_ai_course_assistant', (new moodle_url('/local/ai_course_assistant/survey_admin.php'))->out()),
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/survey_enabled',
-        'Enable surveys',
-        'When enabled, students will be offered a survey about their AI tutor experience.',
+        get_string('settings:survey_enabled', 'local_ai_course_assistant'),
+        get_string('settings:survey_enabled_desc', 'local_ai_course_assistant'),
         1
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/survey_trigger_messages',
-        'Trigger after N messages',
-        'Show the survey prompt after the student has sent this many messages in a course. Set to 0 to only show via manual trigger.',
+        get_string('settings:survey_trigger_messages', 'local_ai_course_assistant'),
+        get_string('settings:survey_trigger_messages_desc', 'local_ai_course_assistant'),
         '10',
         PARAM_INT
     ));
 
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/survey_frequency',
-        'Survey frequency per user',
-        'How often a student can be prompted to take the survey in each course.',
+        get_string('settings:survey_frequency', 'local_ai_course_assistant'),
+        get_string('settings:survey_frequency_desc', 'local_ai_course_assistant'),
         'once',
         [
-            'once' => 'Once per course (default)',
-            'monthly' => 'Once per month',
-            'quarterly' => 'Once per quarter',
-            'unlimited' => 'Every time (no limit)',
+            'once' => get_string('settings:survey_frequency_once', 'local_ai_course_assistant'),
+            'monthly' => get_string('settings:survey_frequency_monthly', 'local_ai_course_assistant'),
+            'quarterly' => get_string('settings:survey_frequency_quarterly', 'local_ai_course_assistant'),
+            'unlimited' => get_string('settings:survey_frequency_unlimited', 'local_ai_course_assistant'),
         ]
     ));
 
     // Practice Scoring (Rubrics).
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/rubric_heading',
-        'Practice Scoring Rubrics',
-        'Configure scoring rubrics for conversation and pronunciation practice sessions. '
-        . 'Students receive AI-generated scores and feedback when a practice session ends. '
-        . '<a href="' . (new moodle_url('/local/ai_course_assistant/rubric_admin.php'))->out() . '" class="btn btn-sm btn-outline-primary ml-2">Edit Rubrics &rarr;</a>'
+        get_string('settings:rubric_heading', 'local_ai_course_assistant'),
+        get_string('settings:rubric_heading_desc', 'local_ai_course_assistant', (new moodle_url('/local/ai_course_assistant/rubric_admin.php'))->out()),
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/practice_scoring_enabled',
-        'Enable practice scoring',
-        'When enabled, students receive a score card with per-criterion ratings and feedback after conversation and pronunciation practice sessions.',
+        get_string('settings:practice_scoring_enabled', 'local_ai_course_assistant'),
+        get_string('settings:practice_scoring_enabled_desc', 'local_ai_course_assistant'),
         1
     ));
 
     // Usability Testing.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/usertesting_heading',
-        'Usability Testing',
-        'In-widget usability testing with task-based evaluation. Students complete tasks inside the assistant and rate their experience. '
-        . 'Results appear in the analytics dashboard.'
+        get_string('settings:usertesting_heading', 'local_ai_course_assistant'),
+        get_string('settings:usertesting_heading_desc', 'local_ai_course_assistant'),
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/usertesting_enabled',
-        'Enable Usability Testing',
-        'Show the "Usability Testing" link in the widget footer. When enabled, students can access testing tasks.',
+        get_string('settings:usertesting_enabled', 'local_ai_course_assistant'),
+        get_string('settings:usertesting_enabled_desc', 'local_ai_course_assistant'),
         '0'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/usertesting_external_url',
-        'External form URL (Option C)',
-        'Optional: an external form URL (e.g. Google Forms, Typeform). Use placeholders: {{userid}}, {{courseid}}, {{messages}}, {{session_minutes}}. '
-        . 'If set, clicking "Usability Testing" opens this URL with context filled in. Leave blank to use the in-widget testing panel only.',
+        get_string('settings:usertesting_external_url', 'local_ai_course_assistant'),
+        get_string('settings:usertesting_external_url_desc', 'local_ai_course_assistant'),
         '',
         PARAM_URL
     ));
 
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/usertesting_editor_link',
-        'Edit Testing Tasks',
-        '<a href="' . (new moodle_url('/local/ai_course_assistant/usertesting_admin.php'))->out()
-        . '" class="btn btn-sm btn-outline-primary">Open Task Editor</a>'
+        get_string('settings:usertesting_editor_link', 'local_ai_course_assistant'),
+        get_string(
+            'settings:usertesting_editor_link_desc',
+            'local_ai_course_assistant',
+            (new moodle_url('/local/ai_course_assistant/usertesting_admin.php'))->out()
+        )
     ));
 
     // Footer links: an "explore courses" link below the Feedback link, plus
     // customizable feedback wording.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/footer_links_heading',
-        'Footer Links',
-        'Customize the links shown at the bottom of the assistant: an optional "explore courses" link '
-        . 'below the Feedback link, and the wording of the Feedback link and its panel.'
+        get_string('settings:footer_links_heading', 'local_ai_course_assistant'),
+        get_string('settings:footer_links_heading_desc', 'local_ai_course_assistant'),
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/footer_courses_text',
-        'Courses link text',
-        'Text for a link shown below the Feedback link. Leave blank to hide the link entirely.',
+        get_string('settings:footer_courses_text', 'local_ai_course_assistant'),
+        get_string('settings:footer_courses_text_desc', 'local_ai_course_assistant'),
         'Explore open online courses at saylor.org',
         PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/footer_courses_url',
-        'Courses link URL',
-        'Destination for the courses link (opens in a new tab). The link is hidden if this is blank.',
+        get_string('settings:footer_courses_url', 'local_ai_course_assistant'),
+        get_string('settings:footer_courses_url_desc', 'local_ai_course_assistant'),
         'https://www.saylor.org',
         PARAM_URL
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/feedback_link_label',
-        'Feedback link label',
-        'Override the footer Feedback link text, e.g. "Send feedback about SOLA to the IT team". '
-        . 'Leave blank to use the default translated "Feedback" label.',
+        \local_ai_course_assistant\branding::str('settings:feedback_link_label'),
+        \local_ai_course_assistant\branding::str('settings:feedback_link_label_desc'),
         '',
         PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/feedback_panel_intro',
-        'Feedback panel intro',
-        'Intro line shown at the top of the feedback panel. Clarifies where feedback goes. '
-        . 'Leave blank for no intro line.',
+        get_string('settings:feedback_panel_intro', 'local_ai_course_assistant'),
+        get_string('settings:feedback_panel_intro_desc', 'local_ai_course_assistant'),
         'Your feedback helps us improve the assistant and goes to your site administrators.',
         PARAM_TEXT
+    ));
+
+    // v6.9.7: master switch for the active-learners indicator. Default OFF.
+    // The indicator tells a learner how many others are studying, which is a
+    // social-proof nudge rather than a teaching feature, and it costs a poll
+    // every 60 seconds per open drawer. Sites should opt in deliberately.
+    // Existing sites that had it running will find it off after upgrade; the
+    // setting below controls the count's scope once it is enabled.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/active_learners_enabled',
+        get_string('settings:active_learners_enabled', 'local_ai_course_assistant'),
+        get_string('settings:active_learners_enabled_desc', 'local_ai_course_assistant'),
+        0
     ));
 
     // v4.1.1: Active-learners-online indicator scope. Default 'global' (the
@@ -1785,7 +2012,8 @@ if ($hassiteconfig) {
         get_string('settings:pedagogy_defaults_heading', 'local_ai_course_assistant'),
         \local_ai_course_assistant\branding::apply(get_string('settings:pedagogy_defaults_heading_desc', 'local_ai_course_assistant'))
     ));
-    foreach ([
+    foreach (
+        [
         'mastery_enabled'         => 'pedagogy:mastery',
         'socratic_mode_enabled'   => 'pedagogy:socratic_mode',
         'worked_examples_enabled' => 'pedagogy:worked_examples',
@@ -1796,7 +2024,8 @@ if ($hassiteconfig) {
         'talking_avatar_enabled'  => 'pedagogy:talking_avatar',
         // crossmastery / mastery_starter / program_path / learning_path render
         // in the Mastery tracking section below (they all require mastery).
-    ] as $key => $stringkey) {
+        ] as $key => $stringkey
+    ) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $key,
             \local_ai_course_assistant\branding::apply(get_string($stringkey, 'local_ai_course_assistant')),
@@ -1832,6 +2061,16 @@ if ($hassiteconfig) {
                     'synthesia' => get_string('settings:talking_avatar_provider_synthesia', 'local_ai_course_assistant'),
                 ]
             ));
+            // v7.3.3 (F10): the viewer's fallback notice has always told admins
+            // to "set the CDN bundle URL in plugin settings" -- and the setting
+            // had no admin surface, so the instruction was unfollowable.
+            $settings->add(new admin_setting_configtext(
+                'local_ai_course_assistant/cdn_bundle_url',
+                get_string('settings:cdn_bundle_url', 'local_ai_course_assistant'),
+                get_string('settings:cdn_bundle_url_desc', 'local_ai_course_assistant'),
+                '',
+                PARAM_URL
+            ));
             foreach (['did', 'heygen', 'tavus', 'synthesia'] as $tap) {
                 $settings->add(new admin_setting_configpasswordunmask(
                     'local_ai_course_assistant/' . $tap . '_api_key',
@@ -1847,21 +2086,13 @@ if ($hassiteconfig) {
                     PARAM_TEXT
                 ));
             }
-            // v4.8.1 fields kept readable as a fallback for upgrades; hidden in
-            // settings UI is unnecessary because the new driver fields are above.
-            $settings->add(new admin_setting_configtext(
-                'local_ai_course_assistant/talking_avatar_provider_url',
-                get_string('settings:talking_avatar_provider_url', 'local_ai_course_assistant'),
-                get_string('settings:talking_avatar_provider_url_desc', 'local_ai_course_assistant'),
-                '',
-                PARAM_URL
-            ));
-            $settings->add(new admin_setting_configpasswordunmask(
-                'local_ai_course_assistant/talking_avatar_provider_api_key',
-                get_string('settings:talking_avatar_provider_api_key', 'local_ai_course_assistant'),
-                get_string('settings:talking_avatar_provider_api_key_desc', 'local_ai_course_assistant'),
-                ''
-            ));
+            // The v4.8.1 placeholder fields (talking_avatar_provider_url and
+            // talking_avatar_provider_api_key) were removed in v7.0.0. They were
+            // documented as an upgrade fallback, but base_provider::cfg() composes
+            // 'talking_avatar_' . $key from suffixes like 'api_key' and 'base_url',
+            // so it looked for talking_avatar_api_key — a name that was never a
+            // registered setting. The fallback could not fire, which made the
+            // API key field a credential prompt for a value nothing would read.
 
             // v4.10.0: avatar rate-card overrides. Mirrors the LLM rate-card
             // overrides editor; takes a JSON object keyed by provider with a
@@ -1872,6 +2103,10 @@ if ($hassiteconfig) {
                 get_string('settings:avatar_rate_card_overrides', 'local_ai_course_assistant'),
                 get_string('settings:avatar_rate_card_overrides_desc', 'local_ai_course_assistant'),
                 '',
+                // PARAM_RAW is required: a JSON object (braces, quotes and
+                // newlines must survive verbatim). It is json_decode'd by the
+                // rate-card reader, which keeps only known provider keys and
+                // casts each value to float; it is never echoed as HTML.
                 PARAM_RAW
             ));
             // v4.10.0: optional per-provider webhook signing secrets. When set, the
@@ -1900,12 +2135,14 @@ if ($hassiteconfig) {
     // Mastery-dependent feature defaults (moved here from the pedagogy list so the
     // toggles sit with the mastery knobs they depend on). Each is a site-wide
     // default; per-course overrides remain authoritative. Default off.
-    foreach ([
+    foreach (
+        [
         'crossmastery_enabled'    => 'pedagogy:crossmastery',
         'mastery_starter_enabled' => 'pedagogy:mastery_starter',
         'program_path_enabled'    => 'pedagogy:program_path',
         'learning_path_enabled'   => 'pedagogy:learning_path',
-    ] as $mkey => $mstringkey) {
+        ] as $mkey => $mstringkey
+    ) {
         $settings->add(new admin_setting_configcheckbox(
             'local_ai_course_assistant/' . $mkey,
             \local_ai_course_assistant\branding::apply(get_string($mstringkey, 'local_ai_course_assistant')),
@@ -1918,7 +2155,11 @@ if ($hassiteconfig) {
         get_string('settings:mastery_threshold', 'local_ai_course_assistant'),
         get_string('settings:mastery_threshold_desc', 'local_ai_course_assistant'),
         '0.75',
-        PARAM_RAW
+        // Decimal fraction, or blank to fall back to the code default (which is
+        // why this is not PARAM_FLOAT - that would coerce '' to 0). A regex
+        // paramtype is accepted by admin_setting_configtext::validate() and
+        // restricts the field to digits and one decimal point.
+        '/^[0-9]*\.?[0-9]*$/'
     ));
     // v6.8.28 Outcomes-based assessment (WSCUC): the institution-set benchmark,
     // as a percentage, for the per-outcome achievement report. Distinct from the
@@ -1969,6 +2210,26 @@ if ($hassiteconfig) {
     // escalation block interrupted this group, splitting provider from its
     // three siblings — admins tuning the classifier had to scroll past an
     // unrelated feature.
+        // Quiz coach: optional dedicated provider/model. Empty (the default)
+    // keeps quiz generation on the course's chat provider, which is the
+    // pre-v6.9.5 behaviour. Set both to route quiz turns to a cheaper or
+    // better-suited model without touching the chat tier.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/quiz_provider',
+        get_string('settings:quiz_provider', 'local_ai_course_assistant'),
+        get_string('settings:quiz_provider_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/quiz_model',
+        get_string('settings:quiz_model', 'local_ai_course_assistant'),
+        get_string('settings:quiz_model_desc', 'local_ai_course_assistant'),
+        '',
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_provider',
         get_string('settings:mastery_classifier_provider', 'local_ai_course_assistant'),
@@ -1981,21 +2242,24 @@ if ($hassiteconfig) {
         get_string('settings:mastery_classifier_model', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_model_desc', 'local_ai_course_assistant'),
         'gpt-4o-mini',
-        PARAM_RAW_TRIMMED
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_weight',
         get_string('settings:mastery_classifier_weight', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_weight_desc', 'local_ai_course_assistant'),
         '0.3',
-        PARAM_RAW
+        // Decimal fraction, blank = code default; see mastery_threshold above.
+        '/^[0-9]*\.?[0-9]*$/'
     ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_classifier_threshold',
         get_string('settings:mastery_classifier_threshold', 'local_ai_course_assistant'),
         get_string('settings:mastery_classifier_threshold_desc', 'local_ai_course_assistant'),
         '0.7',
-        PARAM_RAW
+        // Decimal fraction, blank = code default; see mastery_threshold above.
+        '/^[0-9]*\.?[0-9]*$/'
     ));
 
     // v5.12.0: premium escalation tier (A.10 follow-on).
@@ -2023,14 +2287,28 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/premium_escalation_model',
         get_string('settings:premium_escalation_model', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_model_desc', 'local_ai_course_assistant'),
-        'claude-opus-4-8',
-        PARAM_RAW_TRIMMED
+        // claude-sonnet-5, not an Opus. Measured on the 50-prompt golden tutor
+        // set 2026-08-22: sonnet-5 scored 14.56/15 against opus-5's 14.22 at
+        // 0.352 cents/call against 2.224 -- higher quality for roughly a sixth
+        // of the cost, and a third of the time to first token. The escalation
+        // tier exists to buy quality on hard turns; on this evidence an Opus
+        // target bought latency and spend instead. Note the previous default
+        // was opus-4-8, which was not itself in that benchmark; the cost
+        // argument holds regardless since 4.8 and 5 share a price tier.
+        'claude-sonnet-5',
+        // Vendor model slug - PARAM_TEXT keeps the dots/slashes model ids need.
+        PARAM_TEXT
     ));
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/premium_escalation_triggers',
         get_string('settings:premium_escalation_triggers', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_triggers_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: newline-separated regular expressions, whose
+        // metacharacters (\, |, ^, $, backticks) must survive byte-for-byte.
+        // premium_router::matches_trigger() trims each line, skips # comments and
+        // evaluates it with a warning-suppressed preg_match, so a malformed
+        // pattern is a non-match rather than an error; never output as HTML.
         PARAM_RAW
     ));
     $settings->add(new admin_setting_configtextarea(
@@ -2038,6 +2316,9 @@ if ($hassiteconfig) {
         get_string('settings:premium_escalation_course_tags', 'local_ai_course_assistant'),
         get_string('settings:premium_escalation_course_tags_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: a newline-separated list of course shortnames /
+        // idnumbers, and the newlines are the record separator. premium_router
+        // trims each line and compares it to the course record; never echoed.
         PARAM_RAW
     ));
 
@@ -2045,54 +2326,54 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_branding_anchor',
         '',
-        $sectionanchor('sec-branding', 'Branding &amp; UI')
+        $sectionanchor('sec-branding', s(get_string('settingspage:sec_branding', 'local_ai_course_assistant')))
     ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/branding_heading',
-        'Branding',
-        'Customize the assistant name and appearance.'
+        get_string('settings:branding_heading', 'local_ai_course_assistant'),
+        get_string('settings:branding_heading_desc', 'local_ai_course_assistant'),
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_name',
-        'Institution Name',
-        'Full institution name used in the system prompt, avatar labels, and AI insights (e.g. "State University").',
+        get_string('settings:institution_name', 'local_ai_course_assistant'),
+        get_string('settings:institution_name_desc', 'local_ai_course_assistant'),
         'Saylor University'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/institution_short_name',
-        'Institution Short Name',
-        'Abbreviated institution name for compact UI elements (e.g. "State U").',
+        get_string('settings:institution_short_name', 'local_ai_course_assistant'),
+        get_string('settings:institution_short_name_desc', 'local_ai_course_assistant'),
         'Saylor'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/display_name',
-        'Assistant Display Name',
-        'Full name of the AI assistant shown in greetings and the welcome screen (e.g. "Online Learning Assistant").',
+        get_string('settings:display_name', 'local_ai_course_assistant'),
+        get_string('settings:display_name_desc', 'local_ai_course_assistant'),
         'Saylor Online Learning Assistant'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/short_name',
-        'Assistant Short Name',
-        'Short name shown in the header bar and compact UI elements (e.g. "Assistant").',
+        get_string('settings:short_name', 'local_ai_course_assistant'),
+        get_string('settings:short_name_desc', 'local_ai_course_assistant'),
         'SOLA'
     ));
 
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/welcome_message',
-        'Welcome Screen Message',
-        'Message shown on the first-visit welcome screen. Use <code>{{firstname}}</code> for the student\'s first name and <code>{{coursename}}</code> for the course name. Leave blank for the default.',
+        get_string('settings:welcome_message', 'local_ai_course_assistant'),
+        get_string('settings:welcome_message_desc', 'local_ai_course_assistant'),
         ''
     ));
 
     $settings->add(new admin_setting_configtextarea(
         'local_ai_course_assistant/chat_greeting',
-        'Chat Greeting',
-        'Greeting message shown when the chat window opens. Use <code>{{firstname}}</code> for the student\'s first name and <code>{{coursename}}</code> for the course name. Leave blank for the default.',
+        get_string('settings:chat_greeting', 'local_ai_course_assistant'),
+        get_string('settings:chat_greeting_desc', 'local_ai_course_assistant'),
         ''
     ));
 
@@ -2130,8 +2411,11 @@ if ($hassiteconfig) {
     ));
 
     $avatarchoices = [
-        'avatar_01' => get_string('settings:avatar_saylor', 'local_ai_course_assistant',
-            get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University'),
+        'avatar_01' => get_string(
+            'settings:avatar_saylor',
+            'local_ai_course_assistant',
+            get_config('local_ai_course_assistant', 'institution_name') ?: 'Saylor University'
+        ),
     ];
     for ($i = 2; $i <= 10; $i++) {
         $num = str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -2157,8 +2441,8 @@ if ($hassiteconfig) {
     // dropdown above so admins can set any uploaded image as the default.
     $settings->add(new admin_setting_configstoredfile(
         'local_ai_course_assistant/customavatars',
-        'Custom avatars',
-        'Upload square PNG or SVG images here to add them to the avatar dropdown above. Each uploaded file becomes a selectable default (prefixed "Custom:"). Remove a file from this list to remove it from the dropdown. Tip: 256×256 PNG works well for Retina displays.',
+        get_string('settings:customavatars', 'local_ai_course_assistant'),
+        get_string('settings:customavatars_desc', 'local_ai_course_assistant'),
         'customavatars',
         0,
         [
@@ -2221,7 +2505,7 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/sec_integrations_anchor',
         '',
-        $sectionanchor('sec-integrations', 'Integrations &amp; Delivery')
+        $sectionanchor('sec-integrations', s(get_string('settingspage:sec_integrations', 'local_ai_course_assistant')))
     ));
 
     // FAQ & Zendesk.
@@ -2246,6 +2530,15 @@ if ($hassiteconfig) {
     ));
     // v5.10.x (security finding #40): require disclosed learner consent before
     // a conversation (name, email, transcript) is escalated to the support desk.
+    $settings->add(new admin_setting_configtextarea(
+        'local_ai_course_assistant/escalation_intent_patterns',
+        get_string('settings:escalation_intent_patterns', 'local_ai_course_assistant'),
+        get_string('settings:escalation_intent_patterns_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_RAW,
+        60,
+        6
+    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/zendesk_require_consent',
         get_string('settings:zendesk_require_consent', 'local_ai_course_assistant'),
@@ -2281,47 +2574,55 @@ if ($hassiteconfig) {
     // the analytics page.
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/anomaly_digest_heading',
-        'Learning Radar — anomaly digest',
-        'Daily check that compares rolling windows of negative ratings, token spend, and integrity flags. '
-        . 'When a metric exceeds the configured threshold, a digest is sent to the configured channels. '
-        . 'For per-query scheduled reports, use the Schedules panel on the SOLA Analytics page.'
+        \local_ai_course_assistant\branding::str('settings:anomaly_digest_heading'),
+        \local_ai_course_assistant\branding::str('settings:anomaly_digest_heading_desc'),
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/anomaly_digest_enabled',
-        'Enable anomaly digest',
-        'Run the daily anomaly digest task. Quiet by default — only fires when a metric crosses the threshold.',
+        get_string('settings:anomaly_digest_enabled', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_enabled_desc', 'local_ai_course_assistant'),
         0
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/anomaly_digest_threshold_pct',
-        'Alert threshold (%)',
-        'Percent change between the recent and prior window that triggers an alert. Default: 50.',
+        get_string('settings:anomaly_digest_threshold_pct', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_threshold_pct_desc', 'local_ai_course_assistant'),
         '50',
         PARAM_INT
     ));
 
+    // v7.2.1: PARAM_FLOAT rejected "25.50" (it cleans to 25.5, and configtext
+    // compares the cleaned value to the input as a string) while happily storing
+    // "-5" as a spend floor. See setting_money_nonnegative.
+    $settings->add(new \local_ai_course_assistant\admin\setting_money_nonnegative(
+        'local_ai_course_assistant/anomaly_digest_floor_usd',
+        get_string('settings:anomaly_digest_floor_usd', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_floor_usd_desc', 'local_ai_course_assistant'),
+        '0'
+    ));
+
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/anomaly_digest_recipient_email',
-        'Recipient email',
-        'Email address that receives the anomaly digest. Leave blank to use the site admin.',
+        get_string('settings:anomaly_digest_recipient_email', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_recipient_email_desc', 'local_ai_course_assistant'),
         '',
         PARAM_EMAIL
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/anomaly_digest_slack_webhook',
-        'Slack incoming webhook URL',
-        'Optional Slack incoming webhook URL. The digest is posted as a Slack block message.',
+        get_string('settings:anomaly_digest_slack_webhook', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_slack_webhook_desc', 'local_ai_course_assistant'),
         '',
         PARAM_URL
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/anomaly_digest_teams_webhook',
-        'Microsoft Teams incoming webhook URL',
-        'Optional Teams incoming webhook URL. The digest is posted as an Office 365 connector card.',
+        get_string('settings:anomaly_digest_teams_webhook', 'local_ai_course_assistant'),
+        get_string('settings:anomaly_digest_teams_webhook_desc', 'local_ai_course_assistant'),
         '',
         PARAM_URL
     ));
@@ -2333,7 +2634,14 @@ if ($hassiteconfig) {
         get_string('redash_heading_desc', 'local_ai_course_assistant')
     ));
 
-    $settings->add(new admin_setting_configtext(
+    // Password type, not configtext: Moodle only writes '********' into
+    // config_log for password settings. A plain configtext credential has
+    // every historical value recorded in the clear in mdl_config_log, which is
+    // never purged and is readable by anything with DB or reporting access.
+    // Confirmed on production 2026-08-03 -- a retired key was recoverable in
+    // full from the log. Its siblings redash_user_api_key and github_token
+    // were already declared correctly; this one was missed.
+    $settings->add(new admin_setting_configpasswordunmask(
         'local_ai_course_assistant/redash_api_key',
         get_string('redash_api_key', 'local_ai_course_assistant'),
         get_string('redash_api_key_desc', 'local_ai_course_assistant'),
@@ -2345,6 +2653,25 @@ if ($hassiteconfig) {
         get_string('settings:redash_allowed_origin', 'local_ai_course_assistant'),
         get_string('settings:redash_allowed_origin_desc', 'local_ai_course_assistant'),
         ''
+    ));
+
+    // Default lookback window applied when a caller omits `since`, so a data
+    // source that forgets the parameter cannot pull every row ever recorded.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/redash_export_window_days',
+        get_string('settings:redash_export_window_days', 'local_ai_course_assistant'),
+        get_string('settings:redash_export_window_days_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\redash_export_request::DEFAULT_WINDOW_DAYS,
+        PARAM_INT
+    ));
+
+    // Gate on anonymize=0. Without it the shared API key alone is enough to
+    // pull real learner names out of the export.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/redash_allow_deanonymized',
+        get_string('settings:redash_allow_deanonymized', 'local_ai_course_assistant'),
+        get_string('settings:redash_allow_deanonymized_desc', 'local_ai_course_assistant'),
+        0
     ));
 
     // v4.3.0: Real Redash integration. Three settings together let SOLA
@@ -2417,6 +2744,10 @@ if ($hassiteconfig) {
         get_string('settings:vendor_dpa_overrides', 'local_ai_course_assistant'),
         get_string('settings:vendor_dpa_overrides_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: a JSON object (braces, quotes and newlines must
+        // survive verbatim). vendor_registry json_decode's it, keeps only
+        // string-keyed array rows, and merges them over the shipped table;
+        // vendor_dpa.php renders every field through Mustache, which escapes.
         PARAM_RAW
     ));
     $settings->add(new admin_setting_configtextarea(
@@ -2424,6 +2755,9 @@ if ($hassiteconfig) {
         get_string('settings:rate_card_overrides', 'local_ai_course_assistant'),
         get_string('settings:rate_card_overrides_desc', 'local_ai_course_assistant'),
         '',
+        // PARAM_RAW is required: a JSON object of per-model rates. json_decode'd
+        // by the rate-card reader, which keeps known keys only and casts each
+        // rate to float; never echoed as HTML.
         PARAM_RAW
     ));
 
@@ -2451,8 +2785,11 @@ if ($hassiteconfig) {
     $lastrefresherror = (string) (get_config('local_ai_course_assistant', 'rate_card_last_refresh_error') ?: '');
     $statusparts = [];
     if ($lastrefreshat > 0) {
-        $statusparts[] = get_string('settings:rate_card_last_refresh_at', 'local_ai_course_assistant',
-            userdate($lastrefreshat));
+        $statusparts[] = get_string(
+            'settings:rate_card_last_refresh_at',
+            'local_ai_course_assistant',
+            userdate($lastrefreshat)
+        );
     } else {
         $statusparts[] = get_string('settings:rate_card_never_refreshed', 'local_ai_course_assistant');
     }
@@ -2462,8 +2799,10 @@ if ($hassiteconfig) {
         $statusparts[] = '<span class="text-success">'
             . get_string('settings:rate_card_last_refresh_success', 'local_ai_course_assistant') . '</span>';
     }
-    $refreshurl = new moodle_url('/local/ai_course_assistant/rate_card_refresh.php',
-        ['sesskey' => sesskey()]);
+    $refreshurl = new moodle_url(
+        '/local/ai_course_assistant/rate_card_refresh.php',
+        ['sesskey' => sesskey()]
+    );
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/rate_card_refresh_button',
         get_string('settings:rate_card_refresh_now', 'local_ai_course_assistant'),
@@ -2530,27 +2869,6 @@ if ($hassiteconfig) {
         '0'
     ));
 
-    $settings->add(new admin_setting_heading(
-        'local_ai_course_assistant/updates_heading',
-        get_string('update:title', 'local_ai_course_assistant'),
-        get_string('update:desc', 'local_ai_course_assistant')
-    ));
-
-    $updateurl = new moodle_url('/local/ai_course_assistant/update_admin.php');
-    $settings->add(new admin_setting_description(
-        'local_ai_course_assistant/update_link',
-        '',
-        '<a href="' . $updateurl->out() . '" class="btn btn-sm btn-outline-primary">'
-        . get_string('update:check', 'local_ai_course_assistant') . ' &rarr;</a>'
-    ));
-
-    $settings->add(new admin_setting_configpasswordunmask(
-        'local_ai_course_assistant/github_token',
-        get_string('update:github_token', 'local_ai_course_assistant'),
-        get_string('update:github_token_desc', 'local_ai_course_assistant'),
-        ''
-    ));
-
     // v5.5.6: invisible anchor at the bottom of the registered settings so
     // the TOC can offer a "jump to Save" shortcut without forcing admins to
     // scroll through 2,000 lines of settings to commit a single change.
@@ -2561,6 +2879,101 @@ if ($hassiteconfig) {
         '',
         '<span id="sec-save" class="sola-section-anchor"></span>'
     ));
+
+    // ── Dependencies: collapse a feature's detail until the feature is on ───
+    //
+    // This page carries well over 200 controls, most of them belonging to
+    // features that ship off. Until v7.0.0 every one of them rendered
+    // unconditionally, which is why this file also grew a hand-rolled table of
+    // contents and jump anchors. Moodle already solves this: hide_if() gives
+    // each detail setting a dependency on the toggle that owns it, so a
+    // default install shows the toggles and nothing else.
+    //
+    // Two rules kept this safe to apply mechanically:
+    //   1. Each setting depends on its NEAREST owning toggle, never on a
+    //      grandparent, so no setting carries two dependencies. rag_scorm_max_mb
+    //      hangs off rag_extract_scorm, which hangs off rag_enabled.
+    //   2. A toggle only owns a setting the toggle genuinely controls. The
+    //      embed_* family sits under the "external resources" heading purely by
+    //      position — external_resources_enabled governs whether the tutor may
+    //      suggest outside links, not embeddings — so they depend on rag_enabled.
+    //
+    // This changes visibility only. Every setting keeps its stored value while
+    // hidden, so toggling a feature back on restores the configuration intact.
+    $dependencies = [
+        // Retrieval. rag_enabled defaults on, so this hides nothing by default;
+        // it matters for sites that deliberately run without retrieval.
+        'rag_enabled' => [
+            'embed_provider', 'embed_apikey', 'embed_model', 'embed_apibaseurl',
+            'embed_dimensions', 'embed_query_model', 'embed_dtype', 'rag_topk', 'rag_min_similarity', 'rag_currentpage_boost',
+            'rag_chunksize', 'rag_return_scope', 'rag_window_size', 'rag_parent_max_chars',
+            'rag_scope', 'rag_auto_reindex_drifted', 'rerank_enabled',
+            'rag_extract_pdf', 'rag_extract_docx', 'rag_extract_pptx',
+            'rag_extract_h5p', 'rag_extract_scorm', 'rag_fetch_transcripts',
+        ],
+        'rag_extract_pdf'   => ['rag_pdftotext_path'],
+        'rag_extract_scorm' => ['rag_scorm_max_mb'],
+        'rag_fetch_transcripts' => ['rag_iframe_host_patterns', 'rag_transcript_url_pattern'],
+        'rerank_enabled' => [
+            'rerank_apikey', 'rerank_model', 'rerank_apibaseurl',
+            'rerank_candidates', 'rerank_margin_threshold',
+        ],
+
+        // Provider routing.
+        'premium_escalation_enabled' => [
+            'premium_escalation_provider', 'premium_escalation_model',
+            'premium_escalation_triggers', 'premium_escalation_course_tags',
+        ],
+        'failover_per_call_enabled' => ['failover_timeout_chat'],
+
+        // Monitoring and alerting.
+        'cost_anomaly_enabled' => ['cost_anomaly_multiplier'],
+        'unanswered_check_enabled' => [
+            'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
+        ],
+        'anomaly_digest_enabled' => [
+            'anomaly_digest_threshold_pct', 'anomaly_digest_floor_usd',
+            'anomaly_digest_recipient_email',
+            'anomaly_digest_slack_webhook', 'anomaly_digest_teams_webhook',
+        ],
+
+        // Integrations.
+        'policy_bundle_enabled' => ['policy_bundle_url', 'policy_bundle_pubkey'],
+        'zendesk_enabled' => [
+            'zendesk_require_consent', 'zendesk_subdomain', 'zendesk_email', 'zendesk_token',
+        ],
+
+        // Voice.
+        'realtime_enabled' => ['realtime_apikey', 'realtime_voice'],
+        'stt_selfhosted_enabled' => [
+            'stt_selfhosted_url', 'stt_selfhosted_model',
+            'stt_selfhosted_apikey', 'stt_selfhosted_warm',
+        ],
+
+        // Engagement and outreach.
+        'reminders_whatsapp_enabled' => [
+            'whatsapp_api_url', 'whatsapp_api_token',
+            'whatsapp_from_number', 'whatsapp_blocked_countries',
+        ],
+        'inactivity_reminder_enabled' => ['inactivity_threshold_days'],
+        'survey_enabled' => ['survey_trigger_messages', 'survey_frequency'],
+
+        // Safety, integrity, mastery, Soapbox.
+        'offtopic_enabled' => ['offtopic_max', 'offtopic_action', 'offtopic_lockout_duration'],
+        'integrity_enabled' => ['integrity_email'],
+        'mastery_decay_enabled' => ['mastery_decay_half_life_days'],
+        'soapbox_slide_vision' => ['soapbox_vision_provider', 'soapbox_vision_model'],
+    ];
+
+    foreach ($dependencies as $toggle => $dependents) {
+        foreach ($dependents as $dependent) {
+            $settings->hide_if(
+                'local_ai_course_assistant/' . $dependent,
+                'local_ai_course_assistant/' . $toggle,
+                'notchecked'
+            );
+        }
+    }
 
     $ADMIN->add('local_ai_course_assistant', $settings);
 
@@ -2582,21 +2995,21 @@ if ($hassiteconfig) {
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_survey',
-        'Survey Editor',
+        get_string('survey_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/survey_admin.php'),
         'moodle/site:config'
     ));
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_usertesting',
-        'Usability Testing Editor',
+        get_string('usertesting_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/usertesting_admin.php'),
         'moodle/site:config'
     ));
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_rubric',
-        'Rubric Editor',
+        get_string('rubric_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/rubric_admin.php'),
         'moodle/site:config'
     ));
@@ -2628,15 +3041,8 @@ if ($hassiteconfig) {
     // content and inspect the result + per-section breakdown.
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_prompt_playground',
-        'SOLA Prompt Playground',
+        \local_ai_course_assistant\branding::str('settings:prompt_playground_navtitle'),
         new moodle_url('/local/ai_course_assistant/prompt_playground.php'),
-        'moodle/site:config'
-    ));
-
-    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
-        'local_ai_course_assistant_updates',
-        get_string('update:title', 'local_ai_course_assistant'),
-        new moodle_url('/local/ai_course_assistant/update_admin.php'),
         'moodle/site:config'
     ));
 
@@ -2656,8 +3062,11 @@ if ($hassiteconfig) {
 
     $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
         'local_ai_course_assistant_userdata',
-        get_string('admin:user_data:title', 'local_ai_course_assistant',
-            \local_ai_course_assistant\branding::short_name()),
+        get_string(
+            'admin:user_data:title',
+            'local_ai_course_assistant',
+            \local_ai_course_assistant\branding::short_name()
+        ),
         new moodle_url('/local/ai_course_assistant/admin_user_data.php'),
         'moodle/site:config'
     ));
@@ -2670,8 +3079,11 @@ if ($hassiteconfig) {
     if ((bool) get_config('local_ai_course_assistant', 'vendor_dpa_admin_page_enabled')) {
         $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
             'local_ai_course_assistant_vendordpa',
-            get_string('admin:vendor_dpa:title', 'local_ai_course_assistant',
-                \local_ai_course_assistant\branding::short_name()),
+            get_string(
+                'admin:vendor_dpa:title',
+                'local_ai_course_assistant',
+                \local_ai_course_assistant\branding::short_name()
+            ),
             new moodle_url('/local/ai_course_assistant/vendor_dpa.php'),
             'moodle/site:config'
         ));
@@ -2684,7 +3096,7 @@ if ($hassiteconfig) {
     if (file_exists(__DIR__ . '/whatsapp_test.php')) {
         $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
             'local_ai_course_assistant_whatsapptest',
-            'WhatsApp Integration Test',
+            get_string('settings:whatsapptest_navtitle', 'local_ai_course_assistant'),
             new moodle_url('/local/ai_course_assistant/whatsapp_test.php'),
             'moodle/site:config',
             true

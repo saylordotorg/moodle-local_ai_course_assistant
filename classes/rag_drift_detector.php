@@ -36,7 +36,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rag_drift_detector {
-
     /**
      * Find drifted course modules across all RAG-enabled visible courses.
      *
@@ -45,7 +44,8 @@ class rag_drift_detector {
     public static function detect_all(): array {
         global $DB;
         $courses = $DB->get_records_sql(
-            "SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1");
+            "SELECT c.id FROM {course} c WHERE c.id > 1 AND c.visible = 1"
+        );
         $out = [];
         foreach ($courses as $c) {
             foreach (self::detect_for_course((int) $c->id) as $entry) {
@@ -91,8 +91,10 @@ class rag_drift_detector {
             ['courseid' => $courseid]
         );
         foreach ($pagerows as $r) {
-            if (isset($chunkages[$r->cmid])
-                    && (int) $r->timemodified > (int) $chunkages[$r->cmid]->maxindexed) {
+            if (
+                isset($chunkages[$r->cmid])
+                    && (int) $r->timemodified > (int) $chunkages[$r->cmid]->maxindexed
+            ) {
                 $drifted[] = [
                     'courseid' => $courseid,
                     'cmid'     => (int) $r->cmid,
@@ -114,8 +116,10 @@ class rag_drift_detector {
             ['courseid' => $courseid]
         );
         foreach ($bookrows as $r) {
-            if (isset($chunkages[$r->cmid])
-                    && (int) $r->maxchaptertime > (int) $chunkages[$r->cmid]->maxindexed) {
+            if (
+                isset($chunkages[$r->cmid])
+                    && (int) $r->maxchaptertime > (int) $chunkages[$r->cmid]->maxindexed
+            ) {
                 $drifted[] = [
                     'courseid' => $courseid,
                     'cmid'     => (int) $r->cmid,

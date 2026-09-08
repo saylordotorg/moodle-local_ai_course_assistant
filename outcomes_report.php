@@ -45,7 +45,14 @@ if ($export === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['Outcome code', 'Outcome', 'Benchmark (%)', 'Students assessed', 'Met benchmark', 'Percent met']);
+    fputcsv($out, [
+        get_string('outcomes:csv_code', 'local_ai_course_assistant'),
+        get_string('outcomes:col_outcome', 'local_ai_course_assistant'),
+        get_string('outcomes:csv_benchmark', 'local_ai_course_assistant'),
+        get_string('outcomes:col_assessed', 'local_ai_course_assistant'),
+        get_string('outcomes:col_met', 'local_ai_course_assistant'),
+        get_string('outcomes:col_pct', 'local_ai_course_assistant'),
+    ]);
     foreach ($rows as $r) {
         fputcsv($out, [$r['code'], $r['title'], $r['benchmark_pct'], $r['n'], $r['met'], $r['pct']]);
     }
@@ -61,53 +68,57 @@ $PAGE->set_course($course);
 $PAGE->set_title(get_string('outcomes:title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('outcomes:title', 'local_ai_course_assistant'));
-
-echo html_writer::div(
-    get_string('outcomes:intro', 'local_ai_course_assistant', outcomes_report::default_benchmark_pct()),
-    'outcomes-intro text-muted mb-3');
+$templatedata = [
+    'intro' => get_string('outcomes:intro', 'local_ai_course_assistant', outcomes_report::default_benchmark_pct()),
+    'hasrows' => !empty($rows),
+    'emptynotice' => '',
+    'exportbutton' => '',
+    // Screen-reader caption (visually hidden; the visible <h2> already names the table).
+    'caption' => get_string('outcomes:title', 'local_ai_course_assistant'),
+    'cols' => [
+        'outcome' => get_string('outcomes:col_outcome', 'local_ai_course_assistant'),
+        'benchmark' => get_string('outcomes:col_benchmark', 'local_ai_course_assistant'),
+        'assessed' => get_string('outcomes:col_assessed', 'local_ai_course_assistant'),
+        'met' => get_string('outcomes:col_met', 'local_ai_course_assistant'),
+        'pct' => get_string('outcomes:col_pct', 'local_ai_course_assistant'),
+    ],
+    'rows' => [],
+    'footnote' => get_string('outcomes:footnote', 'local_ai_course_assistant'),
+];
 
 if (empty($rows)) {
-    echo $OUTPUT->notification(get_string('outcomes:none', 'local_ai_course_assistant'), 'info');
+    $templatedata['emptynotice'] = $OUTPUT->notification(
+        get_string('outcomes:none', 'local_ai_course_assistant'),
+        'info'
+    );
 } else {
-    echo html_writer::div(
-        $OUTPUT->single_button(new moodle_url($pageurl, ['export' => 'csv']),
-            get_string('outcomes:export', 'local_ai_course_assistant'), 'get'),
-        'mb-3');
+    $templatedata['exportbutton'] = $OUTPUT->single_button(
+        new moodle_url($pageurl, ['export' => 'csv']),
+        get_string('outcomes:export', 'local_ai_course_assistant'),
+        'get'
+    );
 
-    $table = new html_table();
-    $table->head = [
-        get_string('outcomes:col_outcome', 'local_ai_course_assistant'),
-        get_string('outcomes:col_benchmark', 'local_ai_course_assistant'),
-        get_string('outcomes:col_assessed', 'local_ai_course_assistant'),
-        get_string('outcomes:col_met', 'local_ai_course_assistant'),
-        get_string('outcomes:col_pct', 'local_ai_course_assistant'),
-    ];
-    $table->attributes['class'] = 'generaltable';
-    // Screen-reader caption (visually hidden; the visible <h2> already names the table).
-    $table->caption = get_string('outcomes:title', 'local_ai_course_assistant');
-    $table->captionhide = true;
-    foreach ($rows as $r) {
+    $lastindex = count($rows) - 1;
+    foreach (array_values($rows) as $i => $r) {
+        // Outcome name is the row header so screen readers associate each data
+        // cell with it; the code prefix is escaped here, the title via
+        // format_string, so the template renders the label unescaped.
         $label = format_string($r['title']);
         if ($r['code'] !== '') {
             $label = html_writer::span(s($r['code']) . ' ', 'text-muted') . $label;
         }
-        // Outcome name is the row header so screen readers associate each data cell with it.
-        $labelcell = new html_table_cell($label);
-        $labelcell->header = true;
-        $labelcell->scope = 'row';
-        $table->data[] = [
-            $labelcell,
-            $r['benchmark_pct'] . '%',
-            $r['n'],
-            $r['met'],
-            html_writer::tag('strong', $r['pct'] . '%'),
+        $templatedata['rows'][] = [
+            'label' => $label,
+            'benchmark' => $r['benchmark_pct'],
+            'n' => $r['n'],
+            'met' => $r['met'],
+            'pct' => $r['pct'],
+            'lastrow' => ($i === $lastindex),
         ];
     }
-    echo html_writer::table($table);
-    echo html_writer::div(
-        get_string('outcomes:footnote', 'local_ai_course_assistant'), 'small text-muted mt-1');
 }
 
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('outcomes:title', 'local_ai_course_assistant'));
+echo $OUTPUT->render_from_template('local_ai_course_assistant/outcomes_report', $templatedata);
 echo $OUTPUT->footer();

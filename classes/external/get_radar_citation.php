@@ -33,7 +33,6 @@ use local_ai_course_assistant\anonymizer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_radar_citation extends external_api {
-
     /**
      * @return external_function_parameters
      */

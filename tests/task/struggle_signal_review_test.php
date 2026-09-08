@@ -34,7 +34,6 @@ use local_ai_course_assistant\learner_memory_manager;
  * @covers     \local_ai_course_assistant\task\struggle_signal_review
  */
 final class struggle_signal_review_test extends \advanced_testcase {
-
     public function test_disabled_classifier_short_circuits(): void {
         $this->resetAfterTest();
         global $DB;
@@ -59,8 +58,10 @@ final class struggle_signal_review_test extends \advanced_testcase {
         ob_end_clean();
 
         // Signals must remain unprocessed when the classifier is off.
-        $unprocessed = $DB->count_records('local_ai_course_assistant_struggle_signal',
-            ['stage2_label' => 'unprocessed']);
+        $unprocessed = $DB->count_records(
+            'local_ai_course_assistant_struggle_signal',
+            ['stage2_label' => 'unprocessed']
+        );
         $this->assertEquals(4, $unprocessed);
     }
 
@@ -73,8 +74,13 @@ final class struggle_signal_review_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         for ($i = 0; $i < 4; $i++) {
-            struggle_classifier::record_stage1($user->id, $course->id,
-                'sess-enabled', 'Cellular respiration', 2);
+            struggle_classifier::record_stage1(
+                $user->id,
+                $course->id,
+                'sess-enabled',
+                'Cellular respiration',
+                2
+            );
         }
 
         $task = new struggle_signal_review();
@@ -102,8 +108,13 @@ final class struggle_signal_review_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         for ($i = 0; $i < 5; $i++) {
-            struggle_classifier::record_stage1($user->id, $course->id,
-                'sess-no-email', 'Topic', 3);
+            struggle_classifier::record_stage1(
+                $user->id,
+                $course->id,
+                'sess-no-email',
+                'Topic',
+                3
+            );
         }
 
         $task = new struggle_signal_review();
@@ -111,10 +122,12 @@ final class struggle_signal_review_test extends \advanced_testcase {
         $task->execute();
         ob_end_clean();
 
-        $this->assertEquals(0,
+        $this->assertEquals(
+            0,
             $DB->count_records('local_ai_course_assistant_outreach_log'),
             'struggle_signal_review must NEVER write to outreach_log. '
-            . 'Struggle signals stay inside the chat by design.');
+            . 'Struggle signals stay inside the chat by design.'
+        );
     }
 
     public function test_old_signals_purged(): void {
@@ -138,9 +151,13 @@ final class struggle_signal_review_test extends \advanced_testcase {
         $task->execute();
         ob_end_clean();
 
-        $this->assertEquals(0,
-            $DB->count_records('local_ai_course_assistant_struggle_signal',
-                ['session_id' => 'old-sess']),
-            'Signals older than the TTL must be purged by the task.');
+        $this->assertEquals(
+            0,
+            $DB->count_records(
+                'local_ai_course_assistant_struggle_signal',
+                ['session_id' => 'old-sess']
+            ),
+            'Signals older than the TTL must be purged by the task.'
+        );
     }
 }

@@ -26,7 +26,6 @@ namespace local_ai_course_assistant\task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class score_recording extends \core\task\adhoc_task {
-
     /**
      * Score the recording named in the custom data.
      */
@@ -34,7 +33,13 @@ class score_recording extends \core\task\adhoc_task {
         $data = $this->get_custom_data();
         $recid = (int) ($data->recid ?? 0);
         if ($recid > 0) {
-            \local_ai_course_assistant\soapbox_scorer::score_recording($recid);
+            // Retry transient STT/provider failures while the backoff is young.
+            // The adhoc fail delay doubles from 60s, so >= 960 means the fifth
+            // run (~30 minutes in): at that point score with $retrytransient
+            // false, which takes the mark-failed path -- a permanently
+            // unconfigured STT server must not loop forever.
+            $retry = $this->get_fail_delay() < 960;
+            \local_ai_course_assistant\soapbox_scorer::score_recording($recid, $retry);
         }
     }
 }

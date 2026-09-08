@@ -21,37 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/config'], function(Ajax, Config) {
-
-    /**
-     * Upload a student attachment to the server and get back a Moodle draft
-     * itemid that can be included in the next SSE chat submission. Uses
-     * fetch() directly because the endpoint is a multipart receiver, not a
-     * Moodle external function.
-     *
-     * @param {number} courseid
-     * @param {File} file
-     * @returns {Promise<{draftitemid:number, filename:string, mime:string, size:number, url:string}>}
-     */
-    const uploadAttachment = function(courseid, file) {
-        const form = new FormData();
-        form.append('courseid', String(courseid));
-        form.append('sesskey', Config.sesskey);
-        form.append('file', file);
-        const url = Config.wwwroot + '/local/ai_course_assistant/upload_attachment.php';
-        return fetch(url, {
-            method: 'POST',
-            body: form,
-            credentials: 'same-origin',
-        }).then(function(resp) {
-            return resp.json().then(function(data) {
-                if (!resp.ok || data.error) {
-                    throw new Error(data.error || ('Upload failed (' + resp.status + ')'));
-                }
-                return data;
-            });
-        });
-    };
+define(['core/ajax'], function(Ajax) {
 
     /**
      * Send a message (non-streaming fallback).
@@ -309,6 +279,13 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
             pageid: parseInt(ctx.pageId || ctx.pageid, 10) || 0,
             pagetitle: ctx.pageTitle || ctx.pagetitle || '',
             lang: ctx.lang || '',
+            // v7.0.5: the server assembles the voice-mode augmentation now, so
+            // it needs the mode and its inputs. Previously the browser built the
+            // text and pushed it with session.update, which replaced the
+            // server's grounded prompt outright.
+            mode: ctx.mode || 'conversation',
+            topic: ctx.topic || '',
+            phrase: ctx.phrase || '',
         };
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_get_realtime_token',
@@ -342,20 +319,7 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         }])[0];
     };
 
-    /**
-     * Email study session notes to the current user.
-     *
-     * @param {number} courseid
-     * @param {string} notes
-     * @returns {Promise}
-     */
-    const emailStudyNotes = function(courseid, notes) {
-        return Ajax.call([{
-            methodname: 'local_ai_course_assistant_email_study_notes',
-            args: {courseid: courseid, notes: notes},
-        }])[0];
-    };
-
+    
     /**
      * Get the active survey for a course.
      *
@@ -481,6 +445,26 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         }])[0];
     };
 
+    /**
+     * Record that the learner opened the practice-quiz panel.
+     *
+     * v7.1.1: the Quiz Me chip opens a panel rather than sending a message, so
+     * without this a press that never reached generation left no trace at all.
+     *
+     * @param {number} courseid
+     * @param {number} cmid Activity the learner is on, 0 if none.
+     * @returns {Promise} Resolves when recorded; failures are non-fatal.
+     */
+    const recordQuizOpen = function(courseid, cmid) {
+        return Ajax.call([{
+            methodname: 'local_ai_course_assistant_record_quiz_open',
+            args: {
+                courseid: courseid,
+                cmid: cmid || 0,
+            },
+        }])[0];
+    };
+
     const recordObjectiveAttempt = function(courseid, objectiveid, iscorrect) {
         return Ajax.call([{
             methodname: 'local_ai_course_assistant_record_objective_attempt',
@@ -524,7 +508,6 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         getHistory: getHistory,
         clearHistory: clearHistory,
         getConfig: getConfig,
-        uploadAttachment: uploadAttachment,
         updateStudyPlan: updateStudyPlan,
         getStudyPlan: getStudyPlan,
         updateReminderPreferences: updateReminderPreferences,
@@ -537,13 +520,13 @@ define(['core/ajax', 'core/config'], function(Ajax, Config) {
         saveAvatarPreference: saveAvatarPreference,
         getRealtimeToken: getRealtimeToken,
         submitFeedback: submitFeedback,
-        emailStudyNotes: emailStudyNotes,
         getSurvey: getSurvey,
         submitSurveyResponse: submitSurveyResponse,
         getUserTesting: getUserTesting,
         submitUserTestingResponse: submitUserTestingResponse,
         getRubric: getRubric,
         savePracticeScore: savePracticeScore,
+        recordQuizOpen: recordQuizOpen,
         recordObjectiveAttempt: recordObjectiveAttempt,
         getMasterySummary: getMasterySummary,
         generateFlashcards: generateFlashcards,

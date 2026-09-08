@@ -30,7 +30,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mastery_test extends \advanced_testcase {
-
     // ───────────────────────────────────────────────────────────
     // objective_manager — CRUD + feature-flag gating
     // ───────────────────────────────────────────────────────────
@@ -63,12 +62,23 @@ final class mastery_test extends \advanced_testcase {
 
         $id = objective_manager::create((int)$course->id, 'X');
         objective_manager::record_attempt(
-            (int)$user->id, (int)$course->id, $id, true, 'quiz', 1.0, null, null);
+            (int)$user->id,
+            (int)$course->id,
+            $id,
+            true,
+            'quiz',
+            1.0,
+            null,
+            null
+        );
         $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_obj_att'));
 
         objective_manager::delete($id);
-        $this->assertEquals(0, $DB->count_records('local_ai_course_assistant_obj_att'),
-            'Deleting an objective must cascade to its attempt rows.');
+        $this->assertEquals(
+            0,
+            $DB->count_records('local_ai_course_assistant_obj_att'),
+            'Deleting an objective must cascade to its attempt rows.'
+        );
     }
 
     public function test_objective_list_for_course_returns_only_that_course(): void {
@@ -97,8 +107,11 @@ final class mastery_test extends \advanced_testcase {
             ['title' => '  ', 'code' => 'whitespace'],
             ['title' => 'Another', 'description' => 'desc'],
         ]);
-        $this->assertCount(2, $ids,
-            'Empty / whitespace titles must be silently dropped, not inserted as blank rows.');
+        $this->assertCount(
+            2,
+            $ids,
+            'Empty / whitespace titles must be silently dropped, not inserted as blank rows.'
+        );
     }
 
     public function test_objective_feature_flag_resolves_per_course(): void {
@@ -145,8 +158,11 @@ final class mastery_test extends \advanced_testcase {
 
         $m = objective_manager::compute_mastery((int)$user->id, $objid);
 
-        $this->assertEquals('learning', $m['status'],
-            'Two correct attempts is below MIN_ATTEMPTS_FOR_MASTERY=3 — never mastered on a lucky pair.');
+        $this->assertEquals(
+            'learning',
+            $m['status'],
+            'Two correct attempts is below MIN_ATTEMPTS_FOR_MASTERY=3 — never mastered on a lucky pair.'
+        );
         $this->assertEquals(2, $m['attempts']);
     }
 
@@ -166,15 +182,26 @@ final class mastery_test extends \advanced_testcase {
         // Five correct attempts at full weight.
         for ($i = 0; $i < 5; $i++) {
             objective_manager::record_attempt(
-                (int)$user->id, (int)$course->id, $objid, true, 'quiz', 1.0, null, null);
+                (int)$user->id,
+                (int)$course->id,
+                $objid,
+                true,
+                'quiz',
+                1.0,
+                null,
+                null
+            );
         }
 
         $m = objective_manager::compute_mastery((int)$user->id, $objid);
 
         $this->assertEquals('mastered', $m['status']);
         $this->assertGreaterThanOrEqual(0.7, $m['score']);
-        $this->assertGreaterThanOrEqual(3, $m['attempts'],
-            'Promotion requires MIN_ATTEMPTS_FOR_MASTERY (3) attempts.');
+        $this->assertGreaterThanOrEqual(
+            3,
+            $m['attempts'],
+            'Promotion requires MIN_ATTEMPTS_FOR_MASTERY (3) attempts.'
+        );
     }
 
     public function test_compute_mastery_decay_lowers_score_when_enabled(): void {
@@ -189,11 +216,21 @@ final class mastery_test extends \advanced_testcase {
         $ninetydays = time() - (90 * 86400);
         for ($i = 0; $i < 5; $i++) {
             objective_manager::record_attempt(
-                (int)$user->id, (int)$course->id, $objid, true, 'quiz', 1.0, null, null);
+                (int)$user->id,
+                (int)$course->id,
+                $objid,
+                true,
+                'quiz',
+                1.0,
+                null,
+                null
+            );
         }
         // Force the recorded timestamps backwards.
-        $DB->execute("UPDATE {local_ai_course_assistant_obj_att} SET timecreated = ? WHERE objectiveid = ?",
-            [$ninetydays, $objid]);
+        $DB->execute(
+            "UPDATE {local_ai_course_assistant_obj_att} SET timecreated = ? WHERE objectiveid = ?",
+            [$ninetydays, $objid]
+        );
 
         // Without decay: score is high.
         unset_config('mastery_decay_enabled', 'local_ai_course_assistant');
@@ -203,8 +240,11 @@ final class mastery_test extends \advanced_testcase {
         set_config('mastery_decay_enabled', 1, 'local_ai_course_assistant');
         $with = objective_manager::compute_mastery((int)$user->id, $objid);
 
-        $this->assertLessThan($without['score'], $with['score'],
-            'Decay enabled with 90-day-old attempts must produce a lower score than decay disabled.');
+        $this->assertLessThan(
+            $without['score'],
+            $with['score'],
+            'Decay enabled with 90-day-old attempts must produce a lower score than decay disabled.'
+        );
         $this->assertLessThan(1.0, $with['decay_multiplier']);
     }
 
@@ -230,13 +270,24 @@ final class mastery_test extends \advanced_testcase {
         // 5 perfect attempts at weight 1.0: score ≈ 0.753, just over 0.75.
         for ($i = 0; $i < 5; $i++) {
             objective_manager::record_attempt(
-                (int)$user->id, (int)$course->id, $objid, true, 'quiz', 1.0, null, null);
+                (int)$user->id,
+                (int)$course->id,
+                $objid,
+                true,
+                'quiz',
+                1.0,
+                null,
+                null
+            );
         }
 
         $m = objective_manager::compute_mastery((int)$user->id, $objid);
 
-        $this->assertEquals('mastered', $m['status'],
-            'Default tuning must reach mastered after 5 perfect attempts.');
+        $this->assertEquals(
+            'mastered',
+            $m['status'],
+            'Default tuning must reach mastered after 5 perfect attempts.'
+        );
         $this->assertGreaterThanOrEqual(0.75, $m['score']);
     }
 
@@ -251,13 +302,24 @@ final class mastery_test extends \advanced_testcase {
         // The boundary between "learning" and "mastered" is between attempt 4 and 5.
         for ($i = 0; $i < 4; $i++) {
             objective_manager::record_attempt(
-                (int)$user->id, (int)$course->id, $objid, true, 'quiz', 1.0, null, null);
+                (int)$user->id,
+                (int)$course->id,
+                $objid,
+                true,
+                'quiz',
+                1.0,
+                null,
+                null
+            );
         }
 
         $m = objective_manager::compute_mastery((int)$user->id, $objid);
 
-        $this->assertEquals('learning', $m['status'],
-            'Four perfect attempts must NOT reach mastered — boundary lives between 4 and 5.');
+        $this->assertEquals(
+            'learning',
+            $m['status'],
+            'Four perfect attempts must NOT reach mastered — boundary lives between 4 and 5.'
+        );
         $this->assertLessThan(0.75, $m['score']);
     }
 
@@ -276,13 +338,24 @@ final class mastery_test extends \advanced_testcase {
         for ($i = 0; $i < 7; $i++) {
             $iscorrect = ($i !== 1); // mark attempt index 1 (second-most-recent) wrong.
             objective_manager::record_attempt(
-                (int)$user->id, (int)$course->id, $objid, $iscorrect, 'quiz', 1.0, null, null);
+                (int)$user->id,
+                (int)$course->id,
+                $objid,
+                $iscorrect,
+                'quiz',
+                1.0,
+                null,
+                null
+            );
         }
 
         $m = objective_manager::compute_mastery((int)$user->id, $objid);
 
-        $this->assertEquals('learning', $m['status'],
-            'One mistake within the 8-attempt window must block mastery promotion.');
+        $this->assertEquals(
+            'learning',
+            $m['status'],
+            'One mistake within the 8-attempt window must block mastery promotion.'
+        );
         $this->assertLessThan(0.75, $m['score']);
     }
 
@@ -300,16 +373,30 @@ final class mastery_test extends \advanced_testcase {
         // surfaces here.
         for ($i = 0; $i < 8; $i++) {
             objective_manager::record_attempt(
-                (int)$user->id, (int)$course->id, $objid, true, 'quiz', 1.0, null, null);
+                (int)$user->id,
+                (int)$course->id,
+                $objid,
+                true,
+                'quiz',
+                1.0,
+                null,
+                null
+            );
         }
 
         $m = objective_manager::compute_mastery((int)$user->id, $objid);
 
         $this->assertEquals('mastered', $m['status']);
-        $this->assertGreaterThanOrEqual(0.79, $m['score'],
-            'Window-ceiling score for all-correct attempts is ~0.794.');
-        $this->assertLessThan(0.80, $m['score'],
-            'And no higher than that — geometric decay caps the contribution of further attempts.');
+        $this->assertGreaterThanOrEqual(
+            0.79,
+            $m['score'],
+            'Window-ceiling score for all-correct attempts is ~0.794.'
+        );
+        $this->assertLessThan(
+            0.80,
+            $m['score'],
+            'And no higher than that — geometric decay caps the contribution of further attempts.'
+        );
     }
 
     public function test_get_weak_objectives_returns_lowest_scoring_first(): void {
@@ -333,8 +420,11 @@ final class mastery_test extends \advanced_testcase {
         $this->assertNotEmpty($rows);
         // The first weak row must have a lower score than the strong objective.
         $first = $rows[0];
-        $this->assertLessThan(0.85, $first['mastery']['score'],
-            'The weakest objective should have score below the mastery threshold.');
+        $this->assertLessThan(
+            0.85,
+            $first['mastery']['score'],
+            'The weakest objective should have score below the mastery threshold.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -358,16 +448,21 @@ final class mastery_test extends \advanced_testcase {
 
         $cards = [
             ['question' => 'Q1', 'answer' => 'A1'],
-            ['question' => '', 'answer' => 'A2'],         // empty question — drop
-            ['question' => 'Q3', 'answer' => ''],          // empty answer — drop
+            ['question' => '', 'answer' => 'A2'], // empty question — drop
+            ['question' => 'Q3', 'answer' => ''], // empty answer — drop
             ['question' => 'Q4', 'answer' => 'A4'],
         ];
         $ids = flashcard_manager::save_batch((int)$user->id, (int)$course->id, null, $cards);
 
-        $this->assertCount(2, array_filter($ids),
-            'save_batch must drop blank-question or blank-answer cards.');
-        $this->assertEquals(2, $DB->count_records('local_ai_course_assistant_flashcards',
-            ['userid' => $user->id]));
+        $this->assertCount(
+            2,
+            array_filter($ids),
+            'save_batch must drop blank-question or blank-answer cards.'
+        );
+        $this->assertEquals(2, $DB->count_records(
+            'local_ai_course_assistant_flashcards',
+            ['userid' => $user->id]
+        ));
     }
 
     public function test_save_batch_drops_hallucinated_objective_id(): void {
@@ -384,13 +479,22 @@ final class mastery_test extends \advanced_testcase {
             ['question' => 'Q2', 'answer' => 'A2', 'objectiveid' => 999999],
         ]);
 
-        $rows = $DB->get_records('local_ai_course_assistant_flashcards',
-            ['userid' => $user->id], 'id ASC');
+        $rows = $DB->get_records(
+            'local_ai_course_assistant_flashcards',
+            ['userid' => $user->id],
+            'id ASC'
+        );
         $rows = array_values($rows);
-        $this->assertEquals($realobj, (int)$rows[0]->objectiveid,
-            'Real objective id passes through.');
-        $this->assertEquals(0, (int)$rows[1]->objectiveid,
-            'Hallucinated objective id (not in this course) must be dropped to 0.');
+        $this->assertEquals(
+            $realobj,
+            (int)$rows[0]->objectiveid,
+            'Real objective id passes through.'
+        );
+        $this->assertEquals(
+            0,
+            (int)$rows[1]->objectiveid,
+            'Hallucinated objective id (not in this course) must be dropped to 0.'
+        );
     }
 
     public function test_review_quality_again_resets_repetitions_and_schedules_short_interval(): void {
@@ -413,8 +517,11 @@ final class mastery_test extends \advanced_testcase {
         flashcard_manager::review($cardid, (int)$user->id, flashcard_manager::QUALITY_AGAIN);
         $card = $DB->get_record('local_ai_course_assistant_flashcards', ['id' => $cardid]);
         $this->assertEquals(0, (int)$card->repetitions);
-        $this->assertLessThanOrEqual(time() + 700, (int)$card->next_review,
-            'AGAIN must surface the card again in ~10 minutes.');
+        $this->assertLessThanOrEqual(
+            time() + 700,
+            (int)$card->next_review,
+            'AGAIN must surface the card again in ~10 minutes.'
+        );
     }
 
     public function test_review_quality_easy_grows_interval_through_three_reps(): void {
@@ -438,8 +545,11 @@ final class mastery_test extends \advanced_testcase {
 
         flashcard_manager::review($cardid, (int)$user->id, flashcard_manager::QUALITY_EASY);
         $card = $DB->get_record('local_ai_course_assistant_flashcards', ['id' => $cardid]);
-        $this->assertGreaterThanOrEqual(7, (int)$card->interval_days,
-            'EASY rep3 must schedule at least the previous interval (7d), and grow with ease.');
+        $this->assertGreaterThanOrEqual(
+            7,
+            (int)$card->interval_days,
+            'EASY rep3 must schedule at least the previous interval (7d), and grow with ease.'
+        );
     }
 
     public function test_get_due_returns_only_cards_past_next_review(): void {
@@ -468,8 +578,11 @@ final class mastery_test extends \advanced_testcase {
 
         $due = flashcard_manager::get_due((int)$user->id, (int)$course->id);
 
-        $this->assertCount(1, $due,
-            'Only cards whose next_review has passed must surface in get_due().');
+        $this->assertCount(
+            1,
+            $due,
+            'Only cards whose next_review has passed must surface in get_due().'
+        );
         // get_records_sql returns array keyed by id, not 0..n. Index by value.
         $duevalues = array_values($due);
         $this->assertEquals($duecard, (int) $duevalues[0]->id);

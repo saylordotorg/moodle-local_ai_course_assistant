@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_setting_voice_providers extends \admin_setting {
-
     private static array $provider_options = [
         'openai' => 'OpenAI',
         'xai'    => 'xAI (Grok)',

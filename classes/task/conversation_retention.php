@@ -29,7 +29,6 @@ namespace local_ai_course_assistant\task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class conversation_retention extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:conversation_retention', 'local_ai_course_assistant');
     }
@@ -56,11 +55,17 @@ class conversation_retention extends \core\task\scheduled_task {
             mtrace('conversation_retention: nothing to purge (cutoff ' . $days . 'd).');
             return;
         }
-        list($insql, $params) = $DB->get_in_or_equal($convids);
-        $DB->delete_records_select('local_ai_course_assistant_msgs',
-            "conversationid {$insql}", $params);
-        $DB->delete_records_select('local_ai_course_assistant_convs',
-            "id {$insql}", $params);
+        [$insql, $params] = $DB->get_in_or_equal($convids);
+        $DB->delete_records_select(
+            'local_ai_course_assistant_msgs',
+            "conversationid {$insql}",
+            $params
+        );
+        $DB->delete_records_select(
+            'local_ai_course_assistant_convs',
+            "id {$insql}",
+            $params
+        );
         mtrace('conversation_retention: purged ' . count($convids)
             . ' conversation(s) older than ' . $days . ' days.');
     }

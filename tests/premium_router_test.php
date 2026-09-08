@@ -29,7 +29,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\premium_router
  */
 final class premium_router_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);

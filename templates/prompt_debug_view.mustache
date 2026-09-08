@@ -1,4 +1,33 @@
 {{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/prompt_debug_view
+
+    Rendered view of a captured prompt-debug log entry.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+    }
+}}
+{{!
     @template local_ai_course_assistant/prompt_debug_view
 
     Admin viewer for the per-turn prompt debug log written by sse.php
@@ -79,18 +108,18 @@
     <details class="card mb-3 sola-pdv-entry">
         <summary class="card-header" style="cursor:pointer;">
             <strong>{{timestamp}}</strong>
-            <span class="badge badge-secondary ml-2">course {{courseid}}</span>
-            <span class="badge badge-secondary ml-1">user {{userid}}</span>
+            <span class="badge badge-secondary ml-2">{{badge_course}}</span>
+            <span class="badge badge-secondary ml-1">{{badge_user}}</span>
             <span class="badge badge-info ml-1">{{provider}}</span>
-            {{#page_kept}}<span class="badge badge-success ml-1" title="current_page_content section assembled in full this turn">page content</span>{{/page_kept}}
-            {{#page_truncated}}<span class="badge badge-warning ml-1" title="current_page_content section landed but was truncated to fit the prompt budget">page content (truncated)</span>{{/page_truncated}}
-            {{#page_dropped}}<span class="badge badge-danger ml-1" title="current_page_content section was added but dropped under prompt-budget pressure. Raise the budget or reduce other sections.">page DROPPED by budget</span>{{/page_dropped}}
-            {{#page_absent}}<span class="badge badge-light ml-1" title="No current_page_content section was added this turn. Either pageid did not reach the server, the module type does not yield text, or the page record has no content.">no page section</span>{{/page_absent}}
-            {{#topic_kept}}<span class="badge badge-success ml-1">topic focus</span>{{/topic_kept}}
-            {{#topic_truncated}}<span class="badge badge-warning ml-1">topic focus (truncated)</span>{{/topic_truncated}}
-            {{#topic_dropped}}<span class="badge badge-danger ml-1" title="topic_focus section dropped by prompt budget">topic DROPPED</span>{{/topic_dropped}}
-            {{#has_attachment}}<span class="badge badge-warning ml-1">attachment</span>{{/has_attachment}}
-            {{#has_chunks}}<span class="badge badge-primary ml-1" title="Number of RAG chunks the retriever selected and showed the model this turn">{{chunk_count}} chunks</span>{{/has_chunks}}
+            {{#page_kept}}<span class="badge badge-success ml-1" title="{{str_page_kept_title}}">{{str_page_kept}}</span>{{/page_kept}}
+            {{#page_truncated}}<span class="badge badge-warning ml-1" title="{{str_page_truncated_title}}">{{str_page_truncated}}</span>{{/page_truncated}}
+            {{#page_dropped}}<span class="badge badge-danger ml-1" title="{{str_page_dropped_title}}">{{str_page_dropped}}</span>{{/page_dropped}}
+            {{#page_absent}}<span class="badge badge-light ml-1" title="{{str_page_absent_title}}">{{str_page_absent}}</span>{{/page_absent}}
+            {{#topic_kept}}<span class="badge badge-success ml-1">{{str_topic_kept}}</span>{{/topic_kept}}
+            {{#topic_truncated}}<span class="badge badge-warning ml-1">{{str_topic_truncated}}</span>{{/topic_truncated}}
+            {{#topic_dropped}}<span class="badge badge-danger ml-1" title="{{str_topic_dropped_title}}">{{str_topic_dropped}}</span>{{/topic_dropped}}
+            {{#has_attachment}}<span class="badge badge-warning ml-1">{{str_attachment_badge}}</span>{{/has_attachment}}
+            {{#has_chunks}}<span class="badge badge-primary ml-1" title="{{str_chunks_title}}">{{badge_chunks}}</span>{{/has_chunks}}
         </summary>
         <div class="card-body">
             <dl class="row mb-2">

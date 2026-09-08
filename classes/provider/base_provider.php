@@ -16,6 +16,15 @@
 
 namespace local_ai_course_assistant\provider;
 
+// v7.2.1: spend_guard lives in the plugin root namespace, not in \provider.
+// Without this import every `spend_guard::` reference below resolved to
+// local_ai_course_assistant\provider\spend_guard, which does not exist, and
+// threw a fatal Error -- straight into the two `catch (\Throwable $ignore)`
+// blocks that wrap them. The spend cap, cap failover, and the per-call
+// failover chain were therefore all inert at the one point every provider
+// call converges on, and had been since the guard was added.
+use local_ai_course_assistant\spend_guard;
+
 /**
  * Base provider with shared configuration and cURL helpers.
  *
@@ -25,6 +34,15 @@ namespace local_ai_course_assistant\provider;
  */
 abstract class base_provider implements provider_interface {
 
+    /**
+     * Providers that legitimately run without a SOLA-managed API key, and so
+     * must not be refused by the credential guard in create_for_comparison():
+     * a local ollama, coreai routing through Moodle's own AI subsystem, and
+     * the test stub.
+     *
+     * @var string[]
+     */
+    private const KEYLESS_PROVIDERS = ['stub', 'ollama', 'coreai'];
     /** @var string API key */
     protected string $apikey;
 
@@ -164,6 +182,22 @@ abstract class base_provider implements provider_interface {
             $response = $curl->post($url, $body);
             $httpcode = $curl->get_info()['http_code'] ?? 0;
 
+            // v7.2.8: check the transport error before the HTTP status. On a
+            // connection-level failure (proxy refusal, DNS, TLS) curl returns no
+            // status at all, so http_code is 0, every branch of
+            // check_http_error() falls through, and the operator is told
+            // "HTTP 0" with the real reason discarded. The streaming path has
+            // always checked this; this one never did.
+            if ($curl->error) {
+                throw new \moodle_exception(
+                    'chat:error',
+                    'local_ai_course_assistant',
+                    '',
+                    null,
+                    'Transport error: ' . $curl->error
+                );
+            }
+
             $this->check_http_error($httpcode, $response);
 
             return $response;
@@ -270,8 +304,12 @@ abstract class base_provider implements provider_interface {
         // 12 drivers. Fails loudly so a misconfigured endpoint cannot silently
         // be redirected at 127.0.0.1 or 169.254.169.254.
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
-            throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                'Provider endpoint rejected by SSRF validator: ' . $url);
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Provider endpoint rejected by SSRF validator: ' . $url
+            );
         }
 
         // v5.10.0: wrap the stream in the bounded transient-retry. A header
@@ -413,37 +451,72 @@ abstract class base_provider implements provider_interface {
      * Factory method to create a provider from plugin config, with optional per-course overrides.
      *
      * @param int $courseid Course ID to look up per-course overrides (0 = use global only).
+     * @param bool $diagnostic True for backend_probe / health_check, which must keep
+     *                         working while the emergency stop is engaged so an operator
+     *                         can verify the provider before restoring service.
      * @return provider_interface
      * @throws \moodle_exception If provider is not configured.
      */
-    public static function create_from_config(int $courseid = 0): provider_interface {
+    public static function create_from_config(int $courseid = 0, bool $diagnostic = false): provider_interface {
+        global $USER;
+
         $overrides = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
         $provider = !empty($overrides['provider'])
             ? $overrides['provider']
             : (get_config('local_ai_course_assistant', 'provider') ?: '');
 
-        // Spend guard: consult the cap before instantiation. If the site is
-        // over the cap for chat/analytics workload, try the failover chain.
-        // If no failover is configured, throw; the SSE handler catches this
-        // and shows a friendly "budget paused" message to the student.
-        // Read defensively; a fresh install has no caps and this is a no-op.
+        // 'auto' (the shipped default) resolves to a concrete provider here so
+        // the rest of the pipeline (spend guard, failover, instantiate) sees a
+        // real id. Prefers Moodle core_ai when it is configured, so a fresh
+        // install on a site with central AI setup works with no SOLA key.
+        if ($provider === 'auto' || $provider === '') {
+            $provider = self::resolve_auto_provider($overrides);
+            $overrides['provider'] = $provider;
+        }
+
+        self::enforce_learner_guards($diagnostic, $courseid);
+
         try {
             $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
             if ($level === spend_guard::CAP_BLOCKED) {
+                // Defence in depth. enforce_learner_guards() has already thrown
+                // for web requests, but CAP_BLOCKED covers two different events
+                // and only one of them may be answered by failing over. Without
+                // this, an emergency stop reaching here would be read as "this
+                // provider is capped" and silently resolved by moving chat onto
+                // the failover provider, which is the opposite of stopping.
+                if (!$diagnostic && spend_guard::emergency_chat_stopped()) {
+                    throw new \moodle_exception(
+                        'error',
+                        'local_ai_course_assistant',
+                        '',
+                        \local_ai_course_assistant\branding::str('emergency:chat_stopped')
+                    );
+                }
                 $failover = spend_guard::resolve_failover('chat');
                 if ($failover !== null) {
                     $overrides['provider'] = $failover['provider'];
                     $overrides['apikey']   = $failover['apikey'];
                     $provider = $failover['provider'];
                 } else {
-                    throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                        'SOLA spend cap reached for this period; no failover provider configured.');
+                    throw new \moodle_exception(
+                        'error',
+                        'local_ai_course_assistant',
+                        '',
+                        'SOLA spend cap reached for this period; no failover provider configured.'
+                    );
                 }
             }
         } catch (\moodle_exception $budgeterr) {
             throw $budgeterr;
-        } catch (\Throwable $ignore) {
-            // Never let the guard break core flow on a fresh install.
+        } catch (\Throwable $guarderr) {
+            // Still never break the call path on a fresh install -- but say so.
+            // Swallowing this silently is what let a missing import disable the
+            // spend guard entirely without a single symptom.
+            debugging(
+                'SOLA spend guard did not run: ' . $guarderr->getMessage(),
+                DEBUG_DEVELOPER
+            );
         }
 
         $primary = self::instantiate($provider, $overrides);
@@ -471,8 +544,28 @@ abstract class base_provider implements provider_interface {
                             // a row that didn't set one.
                             unset($entryoverrides['apibaseurl']);
                         }
+                        // v7.2.8: do not carry the primary's model onto a
+                        // different provider. $overrides (and, when it is empty,
+                        // the global `model` setting read in the constructor)
+                        // meant an openai fallback behind a gemini primary was
+                        // asked for "gemini-2.5-flash" and answered HTTP 404
+                        // "model not found" -- so the failover could never
+                        // succeed, and the error blamed a model name that was
+                        // correct. Prefer the model column of the
+                        // comparison_providers row; otherwise let the fallback
+                        // use its own default.
+                        if (!empty($entry['model'])) {
+                            $entryoverrides['model'] = $entry['model'];
+                        } else {
+                            unset($entryoverrides['model']);
+                        }
+                        $fallbackprovider = self::instantiate($entry['provider'], $entryoverrides);
+                        if (empty($entry['model'])
+                                && strtolower((string) $entry['provider']) !== strtolower((string) $provider)) {
+                            $fallbackprovider->use_default_model();
+                        }
                         $fallbacks[] = [
-                            'provider' => self::instantiate($entry['provider'], $entryoverrides),
+                            'provider' => $fallbackprovider,
                             'label'    => $entry['label'],
                         ];
                     }
@@ -487,8 +580,13 @@ abstract class base_provider implements provider_interface {
                         'userid'          => (int) ($USER->id ?? 0),
                     ]);
                 }
-            } catch (\Throwable $ignore) {
-                // Never let chain construction break the primary call path.
+            } catch (\Throwable $chainerr) {
+                // Never let chain construction break the primary call path,
+                // but do not hide the reason it did not build.
+                debugging(
+                    'SOLA per-call failover chain not built: ' . $chainerr->getMessage(),
+                    DEBUG_DEVELOPER
+                );
             }
         }
 
@@ -514,8 +612,10 @@ abstract class base_provider implements provider_interface {
                 continue;
             }
             $parts = array_map('trim', explode('|', $line));
-            if (strtolower($parts[0] ?? '') === strtolower($providerid)
-                && ($apikey === '' || ($parts[1] ?? '') === $apikey)) {
+            if (
+                strtolower($parts[0] ?? '') === strtolower($providerid)
+                && ($apikey === '' || ($parts[1] ?? '') === $apikey)
+            ) {
                 return strtolower($parts[0]);
             }
         }
@@ -539,17 +639,191 @@ abstract class base_provider implements provider_interface {
     }
 
     /**
+     * Per-learner guards that must run before ANY provider client is handed out.
+     *
+     * One method, called by every factory. Putting these in create_from_config()
+     * alone left create_for_comparison() open -- and that is the factory
+     * generate_quiz prefers whenever a site configures a separate quiz tier,
+     * which is exactly what the quiz lock exists to stop. A guard that covers
+     * most entry points is the shape of bug this release is fixing.
+     *
+     * Admins and CLI are exempt from the rate limit, so bulk scripts and
+     * scheduled tasks still run. They are NOT exempt from the emergency stop --
+     * that is a kill switch, and v7.2.1 fixed it reporting DISABLED while an
+     * admin session kept getting answers -- and, since v7.2.4, admins are not
+     * exempt from the quiz lock either. Real CLI still is; PHPUnit is not, so
+     * the branch is testable.
+     *
+     * @param bool $diagnostic True to exempt the caller from the emergency stop.
+     *                         backend_probe and health_check pass this: they are
+     *                         what an operator opens during the incident to decide
+     *                         whether it is safe to restore service.
+     * @param int $courseid Course this request belongs to. Scopes the quiz lock;
+     *                      0 means no course context and falls back to the
+     *                      site-wide attempt test.
+     * @return void
+     * @throws \moodle_exception
+     */
+    private static function enforce_learner_guards(bool $diagnostic = false, int $courseid = 0): void {
+        global $USER;
+
+        // v7.2.1: the emergency chat stop is checked FIRST, ahead of every
+        // exemption below, because it is a kill switch rather than a learner
+        // guard. It applies to site admins, to scheduled tasks and to CLI alike:
+        // an operator who pauses chat during an incident means everyone, and a
+        // switch with exemptions is a switch you cannot reason about at 3am.
+        //
+        // Admins being exempt is precisely how this was reported -- the panel
+        // read DISABLED while chat kept answering, from an admin session.
+        // Operator tooling that genuinely needs a model (benchmarks, the
+        // jailbreak suite) is unblocked by clearing the flag, which is one
+        // command and leaves an audit row.
+        //
+        // $diagnostic is the one exemption, and it is narrow: backend_probe and
+        // health_check are the pages an operator opens DURING the incident to
+        // decide whether it is safe to clear the flag. Without it they report
+        // the backend as broken when the only thing wrong is the operator's own
+        // switch. They report on the provider; they do not answer learners.
+        if (!$diagnostic && spend_guard::emergency_chat_stopped()) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                \local_ai_course_assistant\branding::str('emergency:chat_stopped')
+            );
+        }
+
+        // Nothing learner-shaped to guard: cron, install, CLI with no session.
+        if (empty($USER->id)) {
+            return;
+        }
+
+        // v7.2.4: the quiz lock is checked BEFORE the administrator exemption.
+        //
+        // It sat after it, so a site administrator with an attempt in progress
+        // could still reach a provider -- and because every AI surface goes
+        // through this factory, that meant practice-quiz generation, flashcards
+        // and the rest all worked while the drawer displayed the integrity
+        // notice. The setting's own text promises the opposite: "Blocks the
+        // assistant everywhere ... Checked on the server, so opening a second
+        // tab does not get around it." An integrity control with an exemption
+        // nobody documented is the same shape as the emergency-stop bug fixed
+        // in 7.2.1.
+        //
+        // CLI stays exempt because there is no learner sitting a quiz there,
+        // but not under PHPUnit -- otherwise this branch is untestable, which
+        // is precisely how it went unnoticed: every quiz-lock test asserts
+        // quiz_lock::is_locked_for() directly and none exercised enforcement.
+        //
+        // v7.2.5: the course is passed through so the lock can be scoped to the
+        // course holding the attempt. Site-wide, one forgotten attempt in an
+        // unrelated course killed the assistant everywhere -- see quiz_lock.
+        $realcli = CLI_SCRIPT && !(defined('PHPUNIT_TEST') && PHPUNIT_TEST);
+        $lockedattempt = $realcli
+            ? null
+            : \local_ai_course_assistant\quiz_lock::active_attempt((int) $USER->id, $courseid);
+        if ($lockedattempt !== null) {
+            // v7.2.7: the refusal is auditable. This is the chokepoint every
+            // surface except the SSE stream reaches, and sse.php records its own
+            // before it gets here, so a refusal is logged exactly once.
+            \local_ai_course_assistant\quiz_lock::record_refusal(
+                (int) $USER->id,
+                $courseid,
+                $lockedattempt,
+                'provider'
+            );
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                \local_ai_course_assistant\branding::str('quizlock:blocked')
+            );
+        }
+
+        // The rate limit keeps its exemptions: it exists to stop a scripted
+        // loop, and bulk CLI and benchmark runs are the legitimate exception.
+        if ($realcli || is_siteadmin()) {
+            return;
+        }
+
+        // Spend guard: consult the cap before instantiation. If the site is
+        // over the cap for chat/analytics workload, try the failover chain.
+        // If no failover is configured, throw; the SSE handler catches this
+        // and shows a friendly "budget paused" message to the student.
+        // Read defensively; a fresh install has no caps and this is a no-op.
+        //
+        // SECURITY / COST: a per-user floor for every provider call, applied
+        // here because this is the one path they all converge on. Not one of
+        // the ~47 files in classes/external/ contained any throttling, and
+        // spend_guard below is a LAGGING monthly guard that returns CAP_OK
+        // whenever no cap is configured -- the shipped state, since the caps
+        // have no defaults. So out of the box an authenticated student could
+        // loop generate_quiz or generate_flashcards with nothing in the way
+        // but the next morning's cost_anomaly_check, which is off by default.
+        //
+        // Deliberately generous (120/minute) so it never interrupts real use:
+        // it exists to stop a scripted loop, not to pace a person. Endpoints
+        // that need a tighter bound keep their own (sse 20/60, tts 30/60,
+        // transcribe 20/60, soapbox 12/600). Admins are exempt so bulk CLI and
+        // benchmark runs are unaffected.
+        if (\local_ai_course_assistant\rate_limiter::is_rate_limited(
+                (int) $USER->id, 'provider_call', 120, 60)) {
+            throw new \moodle_exception(
+                'error',
+                'local_ai_course_assistant',
+                '',
+                'Too many AI requests; please wait a moment and try again.'
+            );
+        }
+
+    }
+
+    /**
      * Factory for the admin LLM comparison picker. Looks up the API key from
      * the comparison_providers admin setting, falling back to the primary key.
      *
      * @param string $providerid Provider ID selected by the admin.
      * @param string $model Model name selected by the admin (may be blank).
      * @param int $courseid Course context for base config inheritance.
+     * @param bool $enforcespend Whether the learner spend cap applies; false for operator tooling that must measure providers.
      * @return provider_interface
      * @throws \moodle_exception If provider is unknown.
      */
-    public static function create_for_comparison(string $providerid, string $model, int $courseid = 0): provider_interface {
-        $overrides = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+    public static function create_for_comparison(
+        string $providerid,
+        string $model,
+        int $courseid = 0,
+        bool $enforcespend = true
+    ): provider_interface {
+        self::enforce_learner_guards(false, $courseid);
+
+        // enforce_learner_guards() covers the emergency stop, the quiz lock and
+        // the 120/60 request limit -- but NOT the spend cap, which only
+        // create_from_config() checked. That left the priciest path uncapped:
+        // sse.php calls create_from_config() first (so a capped site correctly
+        // fails over to the cheap tier) and then, if the premium router fires,
+        // overwrites that provider with an escalated one built HERE. The cap's
+        // failover was honoured for one line and then discarded.
+        // conversation_classifier also routes through here by default, so
+        // per-turn mastery classification was uncapped on a stock install.
+        //
+        // $enforcespend = false is for operator tooling that is deliberately
+        // measuring providers and must not be stopped by a learner spend cap.
+        // When capped, defer to create_from_config(), which already implements
+        // the whole ladder -- emergency-stop distinction, failover chain, and
+        // the learner-facing refusal. Deliberately NOT a new exception: the
+        // correct capped behavior here is "do not escalate, use the provider
+        // the cap already resolved", which is exactly what that method returns.
+        if ($enforcespend && spend_guard::check($courseid, 'chat') === spend_guard::CAP_BLOCKED) {
+            return self::create_from_config($courseid);
+        }
+
+        $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+        // Which vendor the inherited apikey actually belongs to, captured
+        // before 'provider' is overwritten below.
+        $keyowner = (string) ($effective['provider'] ?? '');
+
+        $overrides = $effective;
         $overrides['provider'] = $providerid;
         if ($model !== '') {
             $overrides['model'] = $model;
@@ -568,6 +842,42 @@ abstract class base_provider implements provider_interface {
             if (!empty($row['apibaseurl'])) {
                 $overrides['apibaseurl'] = $row['apibaseurl'];
             }
+        } else if (strcasecmp($providerid, $keyowner) !== 0) {
+            // No comparison row, and the requested provider is NOT the one the
+            // inherited key belongs to. Before v6.9.7 we shipped that key
+            // anyway, so picking a provider with no row sent one vendor's
+            // credential to another. That can only ever fail, and it fails
+            // opaquely: on 2026-08-18 an admin whose LLM picker was set to
+            // gemini got a bare "HTTP 400:" on CS101, because the course's
+            // Anthropic key was handed to Google, whose error body is not in
+            // the shape SOLA parses.
+            //
+            // Prefer the site key when it belongs to the requested provider.
+            // Otherwise drop the credential rather than refusing outright:
+            // several providers legitimately need no SOLA key (a stub in
+            // tests, a local ollama, coreai routing through Moodle's own AI
+            // subsystem), and refusing here would break them. A provider that
+            // does need a key now reports its own "missing credentials" error,
+            // which is accurate and, with the error surfacing in this same
+            // release, reaches the audit log.
+            $siteprovider = (string) (get_config('local_ai_course_assistant', 'provider') ?: '');
+            $sitekey = (string) (get_config('local_ai_course_assistant', 'apikey') ?: '');
+            if (strcasecmp($providerid, $siteprovider) === 0 && $sitekey !== '') {
+                $overrides['apikey'] = $sitekey;
+            } else if (!in_array(strtolower($providerid), self::KEYLESS_PROVIDERS, true)) {
+                // Note we cannot simply blank the key: base_provider's
+                // constructor treats an empty override as "unset" and falls
+                // back to the site key, so there is no way to express "no
+                // credential" through $overrides. Refusing is therefore the
+                // only way to stop the foreign key being sent, and it produces
+                // a message an operator can act on instead of a bare HTTP 400.
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                    'No credentials for provider "' . $providerid . '": it has no Comparison providers row, '
+                    . 'and is not the site provider. Refusing to send the '
+                    . ($keyowner ?: 'configured') . ' API key to a different vendor.');
+            }
+            // A base URL configured for one vendor is meaningless to another.
+            unset($overrides['apibaseurl']);
         }
 
         return self::instantiate($providerid, $overrides);
@@ -600,6 +910,34 @@ abstract class base_provider implements provider_interface {
             }
         }
         return null;
+    }
+
+    /**
+     * Resolve the 'auto' chat provider (the shipped default) to a concrete id.
+     *
+     * An explicit provider choice never reaches here. Rules:
+     *  - A configured SOLA chat API key means the admin wants a direct
+     *    provider, so 'auto' resolves to the historical default (openai) with
+     *    that key.
+     *  - Otherwise, if Moodle core_ai is available AND has a configured
+     *    provider, resolve to 'coreai' (zero-config on centrally-managed sites).
+     *  - Otherwise fall back to openai, which surfaces the usual
+     *    "configure a key" error, exactly as before 'auto' existed.
+     *
+     * @param array $overrides Effective config (may carry a per-course apikey).
+     * @return string Concrete provider id.
+     */
+    private static function resolve_auto_provider(array $overrides): string {
+        $apikey = !empty($overrides['apikey'])
+            ? $overrides['apikey']
+            : (get_config('local_ai_course_assistant', 'apikey') ?: '');
+        if (!empty($apikey)) {
+            return 'openai';
+        }
+        if (coreai_provider::is_available()) {
+            return 'coreai';
+        }
+        return 'openai';
     }
 
     /**

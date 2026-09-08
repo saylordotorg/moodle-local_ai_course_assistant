@@ -37,13 +37,23 @@ use local_ai_course_assistant\branding;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class instructor_weekly_digest extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:instructor_weekly_digest', 'local_ai_course_assistant');
     }
 
     public function execute(): void {
         global $DB;
+
+        // v7.3.3 (F22): honor the emergency switches. The panel copy promises
+        // MASTER KILL and the Outreach kill stop every automated email, and
+        // neither digest consulted either flag -- the promise was broken
+        // exactly where an operator under incident pressure relies on it.
+        if (!(bool) get_config('local_ai_course_assistant', 'enabled')
+                || !(bool) get_config('local_ai_course_assistant', 'outreach_master_enabled')) {
+            mtrace('  digest: skipped -- plugin disabled or outreach master switch off.');
+            return;
+        }
+
 
         // Find every course with the digest flag on. The flags live under
         // local_ai_course_assistant as course-id-suffixed keys; read them via
@@ -67,6 +77,9 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
         $since = time() - (7 * 86400);
         $sent = 0;
         $skipped = 0;
+        // One course row per opted-in course. Bounded by how many courses an
+        // admin switched the digest on for, and dwarfed by the analytics
+        // aggregation each iteration runs below, so it is left per-course.
         foreach ($enabledcourseids as $cid) {
             try {
                 $course = $DB->get_record('course', ['id' => $cid]);
@@ -178,8 +191,10 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
         $lines[] = 'Engagement gap:       ' . $gap['not_seen'] . ' of ' . $gap['enrolled']
             . ' enrolled learners not seen in the last 7 days.';
         $lines[] = '';
-        $url = (new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-            ['courseid' => $course->id]))->out(false);
+        $url = (new \moodle_url(
+            '/local/ai_course_assistant/instructor_dashboard.php',
+            ['courseid' => $course->id]
+        ))->out(false);
         $lines[] = 'Open the live dashboard: ' . $url;
         return implode("\n", $lines);
     }
@@ -198,8 +213,10 @@ class instructor_weekly_digest extends \core\task\scheduled_task {
     protected function render_html($course, array $s, array $mastery, array $confusion, array $r, array $gap): string {
         $product = s(branding::short_name());
         $coursename = s($course->fullname);
-        $url = (new \moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-            ['courseid' => $course->id]))->out(false);
+        $url = (new \moodle_url(
+            '/local/ai_course_assistant/instructor_dashboard.php',
+            ['courseid' => $course->id]
+        ))->out(false);
 
         $html = '<div style="font-family:Helvetica,Arial,sans-serif;line-height:1.5;color:#1f2937">';
         $html .= '<h2 style="color:#111827;margin:0 0 4px">' . $product . ' weekly digest</h2>';

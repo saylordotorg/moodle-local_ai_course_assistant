@@ -1,0 +1,46 @@
+SOLA v7.3.2
+
+Twenty-two findings from an adversarial review of the whole plugin. The theme is not that things were broken, but that they read as working: a green badge over a dead switch, a confident cost figure built from part of the data, and a deletion cascade that had never once run.
+
+SAFETY CONTROLS
+
+- Emergency restore is now the exact inverse of emergency disable. Three of five flags were restored to "on" with no saved baseline, so using the master kill switch and then restoring switched ON an outreach control that ships off. An operator who used the control to make a site safe could be left with it less safe than before.
+- The emergency panel's Voice card reported the wrong state. It inferred voice status from a leftover backup value instead of the flag that actually enforces the kill, so on a site with no voice provider configured, which is the default, it displayed a green "Active" badge while voice was disabled site-wide, and hid the button that would restore it.
+- Both "back to settings" links on the emergency and audit pages pointed at an address that does not resolve, so navigation failed at exactly the moment it is most needed.
+- The premium model tier ignored the spend cap. Ordinary chat correctly fell back to the cheaper model when a cap was reached, and the escalation path then replaced that with the expensive model anyway.
+- Opening the token usage page sent spend-alert email and consumed the once-per-period suppression flag, so refreshing the dashboard during a cost incident is how the real warning failed to arrive.
+
+DATA DELETION
+
+- Deleting a Moodle user did not remove their assistant data. The deletion cascade was registered against a hook that does not exist in Moodle, so it had never run since April. Every user deleted in that period left their conversations, messages, profile and an opt-out record containing their email address behind.
+- Two further faults in the same routine would each have kept it broken even after that was corrected, including one that computed which data to erase after the erasure had already happened.
+- Seven kinds of stored data that the plugin declares and exports were reached by no deletion path at all: mastery attempts, flashcards, avatar sessions, email opt-outs, review resolutions, saved report schedules and Soapbox recordings. Recordings now also have their audio removed from object storage, not just the database row.
+
+SOAPBOX AND SCORING
+
+- Speech scoring, essay scoring and flashcard generation could not work on any provider other than Moodle's built-in AI subsystem. All three sent a malformed request that the provider rejected, and the failure was reported as a generic outage with the real reason discarded.
+- A course set to an ESL speaking level could be silently switched to the general marking criteria by a learner in a completely different course starting conversation practice. The course settings page continued to display the ESL level, and the written feedback still sounded ESL-aware, because only the criteria changed.
+- A single uploaded recording could be submitted for scoring repeatedly, each time paying for a fresh transcription and marking pass. The endpoint had no feature check, no attempt limit and no throttle.
+
+REPORTING ACCURACY
+
+- Per-student cost was overstated by up to twenty-five times. Each learner's entire month of usage was priced at whichever model name sorted first alphabetically, so one use of a premium model repriced everything they had done.
+- The headline cost figure silently excluded any model without a published rate, including the main chat model, while still presenting a clean total. It now states what it is leaving out. Prices were deliberately not invented to fill the gap.
+- The per-unit report counted a learner once per activity rather than once per unit, inflating the student count and deflating messages-per-student by the same factor.
+- Administrators running Learning Radar queries were counted as active learners in every site-wide figure.
+- The Redash transcript export returned a fixed placeholder for every course, because a value was passed to the wrong parameter.
+- Scheduled Slack and Teams reports included internal markup that was meant to be stripped.
+
+STREAMING
+
+- The live response stream was divided on a fixed byte count. A character that spans that boundary, which is routine in every language other than English and common in English punctuation, produced an invalid message that was discarded whole. The text stored in the database remained correct, so what a learner saw and what the history shows could differ with nothing recorded anywhere.
+
+OTHER
+
+- Interface parity maintained across all 46 supported languages, with 90 new translations.
+- Full test suite: 1160 tests, no failures. Static validator suite: 36 of 36.
+- 30 new regression tests, each confirmed to fail without its corresponding fix.
+
+UPGRADE NOTES
+
+- No schema change and no manual action. Sites that have deleted users since April 2026 should be aware that data left behind by those deletions is not retrospectively removed by this release; it removes data for deletions from now on.

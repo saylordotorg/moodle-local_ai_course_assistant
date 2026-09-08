@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class analytics {
-
     /**
      * Upper bound on message rows pulled into PHP for text-sampling displays
      * (hotspots, common prompts, keywords). Caps memory on large courses; the
@@ -45,7 +44,25 @@ class analytics {
     public static function get_overview(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid];
+        // v7.2.4: courseid 0 means every course, which is what the Overall Usage
+        // panel asks for. This method was the only counter in the class that did
+        // not implement that -- get_session_stats(), get_return_rate() and
+        // get_daily_usage() all branch on $courseid > 0, and this one hard-coded
+        // "WHERE m.courseid = :courseid" into every query. Site-wide therefore
+        // matched only rows literally stored against course 0, of which there are
+        // none, so the panel an administrator opens to answer "is anyone using
+        // this" reported zero students, zero sessions and zero messages on a site
+        // with real traffic. Per-course reporting was correct throughout, which
+        // is why this survived: the panel is only wrong in the one mode nobody
+        // cross-checks against a course page.
+        $sitewide = ($courseid <= 0);
+
+        $params = [];
+        $coursewhere = '';
+        if (!$sitewide) {
+            $coursewhere = ' AND m.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -53,58 +70,90 @@ class analytics {
         }
 
         // Total conversations.
-        $totalconvs = $DB->count_records('local_ai_course_assistant_convs', ['courseid' => $courseid]);
+        $totalconvs = $sitewide
+            ? $DB->count_records('local_ai_course_assistant_convs')
+            : $DB->count_records('local_ai_course_assistant_convs', ['courseid' => $courseid]);
 
-        // Total messages.
+        // Total messages. Restricted to conversation roles: the msgs table also
+        // carries role='system' telemetry rows that are not learner messages at
+        // all (embedding cost rows from base_embedding_provider, which are
+        // written against SITEID, plus premium_router and reranker rows written
+        // against the real course id). Counting those overstated the metric --
+        // a site course with no learner activity reported tens of thousands of
+        // "messages" that were really background indexing ledger entries, and it
+        // inflated avg_messages_per_student and the has_data flag with it. An
+        // allowlist rather than a telemetry denylist, so any future role='system'
+        // writer is excluded without needing to update this query. The sibling
+        // counters (get_daily_usage, get_student_usage, instructor_analytics)
+        // already filter by role; this one was the outlier.
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid{$timewhere}";
+                 WHERE " . self::conversation_rows_predicate('m') . "{$coursewhere}{$timewhere}";
         $totalmessages = $DB->count_records_sql($sql, $params);
 
         // Active students (users who sent at least one message).
         $sql = "SELECT COUNT(DISTINCT m.userid)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhere}";
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
         $activestudents = $DB->count_records_sql($sql, $params);
 
         // Average messages per student.
         $avgmessages = $activestudents > 0 ? round($totalmessages / $activestudents, 1) : 0;
 
         // User messages count (for off-topic rate calculation).
-        $paramsuser = ['courseid' => $courseid];
-        $timewhereuser = '';
-        if ($since > 0) {
-            $timewhereuser = ' AND m.timecreated >= :since';
-            $paramsuser['since'] = $since;
-        }
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhereuser}";
-        $usermessages = $DB->count_records_sql($sql, $paramsuser);
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
+        $usermessages = (int) $DB->count_records_sql($sql, $params);
 
-        // Off-topic conversations (those with offtopic_count > 0).
-        $sql = "SELECT SUM(c.offtopic_count)
+        // Conversations currently off-topic.
+        //
+        // This used to publish an "off-topic rate": SUM(offtopic_count) divided
+        // by the windowed user-message count. Two things made that number
+        // untrue. offtopic_count is a CURRENT-STREAK counter -- sse.php resets
+        // it to zero on the next on-topic message -- so the numerator was a
+        // point-in-time snapshot of open streaks, not a count of off-topic
+        // events: a course where 500 learners each drifted once and came back
+        // read 0%. And the numerator carried no time window while the
+        // denominator did, so the figure disagreed with itself across range
+        // selections. The schema records no off-topic event ledger, so an
+        // honest rate is not derivable; what IS honest is the number of
+        // conversations sitting in an off-topic streak right now, windowed by
+        // recent activity when a range is selected.
+        $convconds = [];
+        $convparams = [];
+        if (!$sitewide) {
+            $convconds[] = 'c.courseid = :courseid';
+            $convparams['courseid'] = $courseid;
+        }
+        if ($since > 0) {
+            $convconds[] = 'c.timemodified >= :convsince';
+            $convparams['convsince'] = $since;
+        }
+        $convconds[] = 'c.offtopic_count > 0';
+        $sql = "SELECT COUNT(c.id)
                   FROM {local_ai_course_assistant_convs} c
-                 WHERE c.courseid = :courseid";
-        $offtopiccount = (int) $DB->get_field_sql($sql, ['courseid' => $courseid]);
-        $offtopicrate = $usermessages > 0 ? round(($offtopiccount / $usermessages) * 100, 1) : 0;
+                 WHERE " . implode(' AND ', $convconds);
+        $offtopicopen = (int) $DB->count_records_sql($sql, $convparams);
 
         // Escalation count (messages containing ticket references).
         $sql = "SELECT COUNT(m.id)
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'assistant'
-                   AND m.message LIKE '%support ticket%'{$timewhere}";
+                 WHERE m.role = 'assistant'
+                   AND m.message LIKE '%support ticket%'{$coursewhere}{$timewhere}";
         $escalations = $DB->count_records_sql($sql, $params);
 
         // Students with study plans.
-        $studyplans = $DB->count_records('local_ai_course_assistant_plans', ['courseid' => $courseid]);
+        $studyplans = $sitewide
+            ? $DB->count_records('local_ai_course_assistant_plans')
+            : $DB->count_records('local_ai_course_assistant_plans', ['courseid' => $courseid]);
 
         return [
             'total_conversations' => $totalconvs,
             'total_messages' => $totalmessages,
             'active_students' => $activestudents,
             'avg_messages_per_student' => $avgmessages,
-            'offtopic_rate' => $offtopicrate,
+            'offtopic_open' => $offtopicopen,
             'escalation_count' => $escalations,
             'studyplan_adoption' => $studyplans,
         ];
@@ -121,6 +170,8 @@ class analytics {
         global $DB;
 
         $since = time() - ($days * 86400);
+        [$coursewhere, $params] = self::course_clause($courseid);
+        $params['since'] = $since;
 
         // Get all message timestamps in the range, group by day.
         // get_fieldset_sql returns a flat array of values rather than a
@@ -128,9 +179,9 @@ class analytics {
         // timecreated values collide for messages sent in the same second.
         $sql = "SELECT m.timecreated
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.timecreated >= :since AND m.role = 'user'
+                 WHERE m.timecreated >= :since AND m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}
                  ORDER BY m.timecreated ASC";
-        $timestamps = $DB->get_fieldset_sql($sql, ['courseid' => $courseid, 'since' => $since]);
+        $timestamps = $DB->get_fieldset_sql($sql, $params);
 
         // Aggregate by day.
         $dailycounts = [];
@@ -188,7 +239,8 @@ class analytics {
         }
 
         // Get user messages.
-        $params = ['courseid' => $courseid, 'role' => 'user'];
+        [$coursewhere, $params] = self::course_clause($courseid, '');
+        $params['role'] = 'user';
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND timecreated >= :since';
@@ -200,7 +252,7 @@ class analytics {
         // load every message body in a large course into memory. The most
         // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
         $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE courseid = :courseid AND role = :role{$timewhere}
+                 WHERE role = :role{$coursewhere}{$timewhere}
                  ORDER BY timecreated DESC";
         $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
@@ -237,7 +289,8 @@ class analytics {
     public static function get_common_prompts(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid, 'role' => 'user'];
+        [$coursewhere, $params] = self::course_clause($courseid, '');
+        $params['role'] = 'user';
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND timecreated >= :since';
@@ -249,7 +302,7 @@ class analytics {
         // load every message body in a large course into memory. The most
         // recent self::TEXT_SAMPLE_CAP messages are a representative sample.
         $sql = "SELECT message FROM {local_ai_course_assistant_msgs}
-                 WHERE courseid = :courseid AND role = :role{$timewhere}
+                 WHERE role = :role{$coursewhere}{$timewhere}
                  ORDER BY timecreated DESC";
         $messages = $DB->get_fieldset_sql($sql, $params, 0, self::TEXT_SAMPLE_CAP);
 
@@ -321,7 +374,8 @@ class analytics {
     public static function get_provider_comparison(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid, 'role' => 'assistant'];
+        [$coursewhere, $params] = self::course_clause($courseid);
+        $params['role'] = 'assistant';
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -334,7 +388,7 @@ class analytics {
                        SUM(COALESCE(m.tokens_used, 0)) AS total_tokens,
                        AVG(COALESCE(m.tokens_used, 0)) AS avg_tokens
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = :role{$timewhere}
+                 WHERE m.role = :role{$coursewhere}{$timewhere}
                  GROUP BY COALESCE(m.provider, 'unknown')
                  ORDER BY response_count DESC";
 
@@ -353,6 +407,226 @@ class analytics {
     }
 
     /**
+     * SQL predicate matching learner-facing conversation rows.
+     *
+     * The counterpart to spend_rows_predicate(): those are the rows an API bill
+     * is computed from, these are the rows a human actually saw. Everything else
+     * in the msgs table is telemetry (role='system' embedding, rerank and
+     * premium_router rows) and must not be counted as activity.
+     *
+     * Shared so the definition of "a real message" cannot drift between the
+     * overview counters and the export's course list, which is the drift that
+     * produced a phantom course row consisting entirely of indexing telemetry.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression.
+     */
+    public static function conversation_rows_predicate(string $alias = 'm'): string {
+        return "{$alias}.role IN ('user', 'assistant') AND " . self::meta_rows_excluded($alias);
+    }
+
+    /**
+     * SQL predicate excluding Learning Radar meta rows from learner metrics.
+     *
+     * record_meta_query() writes an admin's radar question and the model's answer
+     * as role='user'/'assistant' against SITEID. Its own docblock says this is so
+     * "analytics that filter on interaction_type can exclude them" -- but nothing
+     * did, so on the site-wide dashboard the admin running a radar query was
+     * counted as an active learner, their prose landed in total messages, session
+     * stats, return rate, hour-of-day and the Themes keywords, and scheduled runs
+     * attributed to the cron admin with no human present.
+     *
+     * NOT IN is NULL-propagating and rows written before v6 have a NULL
+     * interaction_type, so the IS NULL branch is required or those rows vanish.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression.
+     */
+    public static function meta_rows_excluded(string $alias = 'm'): string {
+        return "({$alias}.interaction_type IS NULL"
+            . " OR {$alias}.interaction_type NOT IN ('meta', 'meta_scheduled'))";
+    }
+
+    /**
+     * SQL predicate matching rows that represent a real billable API call.
+     *
+     * Single definition on purpose. This predicate was previously written inline
+     * in each place that summed spend, and they drifted: every one of them said
+     * role='assistant', which silently omitted the embedding and rerank cost
+     * ledger (written with role='system' by base_embedding_provider and
+     * voyage_reranker). Any new spend total must use this rather than hand-roll
+     * the condition again.
+     *
+     * Matches on interaction_type rather than role for the background rows,
+     * because premium_router also writes role='system' -- with zero tokens and
+     * the escalation target's model name, while the escalated call itself is
+     * logged separately as an assistant row. Including it would double-count.
+     *
+     * Public because spend_guard shares it: its cap accounting had the same
+     * role='assistant' clause inline, which made the RAG capability unmatchable
+     * (see spend_guard::compute_spend). Two copies of this condition is how the
+     * drift happened, so there is exactly one.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression, already parenthesised.
+     */
+    public static function spend_rows_predicate(string $alias = 'm'): string {
+        // v7.0.6: 'quiz' joins the list for the same reason 'embedding' and
+        // 'rerank' are here. Quiz-generation telemetry is written role='system'
+        // (so it stays out of the learner's history and the model's context),
+        // which means the role='assistant' branch can never match it. Without
+        // this the row is written, counted by nothing, and priced at zero --
+        // capability_sql('chat') already names 'quiz', but it is ANDed on after
+        // this predicate and cannot rescue a row this has already rejected.
+        // That is precisely how RAG spend came to read $0.00, above.
+        // F81 (v7.3.3): the voice interaction types join the billable set now
+        // that their rows carry a model_name. The role='system' guard on the
+        // second arm is LOAD-BEARING: learner role='user' rows in voice mode
+        // carry interaction_type='voice', and get_total_tokens() applies this
+        // predicate without a model_name filter -- without the guard, learner
+        // rows would join the spend totals.
+        return "({$alias}.role = 'assistant'
+                 OR ({$alias}.role = 'system' AND {$alias}.interaction_type IN (
+                     'embedding', 'rerank', 'quiz',
+                     'voice', 'openai_tts', 'xai_tts',
+                     'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt')))";
+    }
+
+    /**
+     * Total tokens (prompt + completion) across all billable rows.
+     *
+     * Powers the site-wide "Tokens (30d)" figure. Unlike get_token_costs() this
+     * does not require a model_name, so it keeps counting rows whose model was
+     * never recorded; the two therefore need not agree exactly, and this one is
+     * the more complete total.
+     *
+     * Background embedding/rerank spend is written against SITEID, so a
+     * whole-site call ($courseid = 0) includes it and a per-course call does not.
+     * That means this total legitimately exceeds the sum of per-course totals.
+     *
+     * @param int $courseid 0 for the whole site, or a specific course.
+     * @param int $since Unix timestamp lower bound; 0 for no bound.
+     * @return int Total tokens.
+     */
+    public static function get_total_tokens(int $courseid = 0, int $since = 0): int {
+        global $DB;
+
+        $where = self::spend_rows_predicate('m');
+        $params = [];
+        if ($courseid > 0) {
+            $where .= ' AND m.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
+        if ($since > 0) {
+            $where .= ' AND m.timecreated >= :since';
+            $params['since'] = $since;
+        }
+
+        $sql = "SELECT COALESCE(SUM(COALESCE(m.prompt_tokens, 0)
+                               + COALESCE(m.completion_tokens, 0)), 0)
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE {$where}";
+
+        return (int) $DB->get_field_sql($sql, $params);
+    }
+
+    /**
+     * Aggregate token spend per model, including background RAG spend.
+     *
+     * Chat spend is the role='assistant' rows. Background spend is the ledger
+     * that base_embedding_provider::log_embedding_cost() and
+     * voyage_reranker::log_rerank_cost() write with role='system' -- those exist
+     * specifically to make indexing and rerank cost visible, so a filter of
+     * role='assistant' alone silently hid real API spend.
+     *
+     * premium_router also writes role='system' rows, but with zero tokens and
+     * the escalation target's model_name. Those are metadata, not spend: the
+     * escalated call itself is logged separately as an assistant row, so
+     * counting them would double-count each escalated turn against that model.
+     * They are excluded by matching on interaction_type rather than on role.
+     *
+     * `category` ('chat' / 'embedding' / 'rerank') is part of the grouping so
+     * background spend can never merge into a chat bucket, and so a consumer can
+     * split RAG cost from chat cost. `response_count` means assistant responses
+     * for chat rows and API calls for embedding/rerank rows.
+     *
+     * NOTE on scope: embedding and rerank rows are written against SITEID rather
+     * than the course whose content was indexed, so they appear only in a
+     * whole-site aggregate ($courseid = 0). A per-course call legitimately
+     * returns chat spend only.
+     *
+     * estimated_cost_usd is null when the model is absent from the rate card,
+     * which is currently the case for Voyage embedding and rerank models. Null
+     * means unknown, not free.
+     *
+     * @param int $courseid 0 for the whole site, or a specific course.
+     * @param int $since Unix timestamp lower bound; 0 for no bound.
+     * @return array List of ['model', 'category', 'response_count',
+     *               'total_prompt_tokens', 'total_completion_tokens',
+     *               'total_tokens', 'estimated_cost_usd'].
+     */
+    public static function get_token_costs(int $courseid = 0, int $since = 0): array {
+        global $DB;
+
+        // Rows that represent a real billable API call.
+        $where = "m.model_name IS NOT NULL AND m.model_name != ''
+                  AND " . self::spend_rows_predicate('m');
+        $params = [];
+        if ($courseid > 0) {
+            $where .= ' AND m.courseid = :courseid';
+            $params['courseid'] = $courseid;
+        }
+        if ($since > 0) {
+            $where .= ' AND m.timecreated >= :since';
+            $params['since'] = $since;
+        }
+
+        // v7.0.6: quiz is reported separately. It stays inside the 'chat'
+        // *capability* for cap purposes (see spend_guard::capability_sql) but
+        // is its own *category* for reporting, because folding it into chat is
+        // what hid it. Cap by capability, report by category.
+        $category = "CASE WHEN m.interaction_type IN ('embedding', 'rerank', 'quiz')
+                          THEN m.interaction_type ELSE 'chat' END";
+
+        // Recordset, not get_records_sql: the grouping key is (model, category),
+        // so model_name is not unique across rows and would silently collapse
+        // two groups into one if it were used as the array key.
+        $sql = "SELECT m.model_name,
+                       {$category} AS category,
+                       COUNT(m.id) AS response_count,
+                       SUM(COALESCE(m.prompt_tokens, 0)) AS total_prompt_tokens,
+                       SUM(COALESCE(m.completion_tokens, 0)) AS total_completion_tokens,
+                       SUM(COALESCE(m.tokens_used, 0)) AS total_tokens
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE {$where}
+              GROUP BY m.model_name, {$category}
+              ORDER BY total_tokens DESC";
+
+        $result = [];
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $row) {
+            $prompttokens = (int) $row->total_prompt_tokens;
+            $completiontokens = (int) $row->total_completion_tokens;
+            $result[] = [
+                'model' => $row->model_name,
+                'category' => $row->category,
+                'response_count' => (int) $row->response_count,
+                'total_prompt_tokens' => $prompttokens,
+                'total_completion_tokens' => $completiontokens,
+                'total_tokens' => (int) $row->total_tokens,
+                'estimated_cost_usd' => token_cost_manager::estimate_cost(
+                    $row->model_name,
+                    $prompttokens,
+                    $completiontokens
+                ),
+            ];
+        }
+        $rs->close();
+
+        return $result;
+    }
+
+    /**
      * Get per-student usage summary for a course.
      *
      * @param int $courseid
@@ -362,7 +636,7 @@ class analytics {
     public static function get_student_usage(int $courseid, int $since = 0): array {
         global $DB;
 
-        $params = ['courseid' => $courseid];
+        [$coursewhere, $params] = self::course_clause($courseid);
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -376,7 +650,7 @@ class analytics {
                        MAX(m.timecreated) AS last_active
                   FROM {local_ai_course_assistant_msgs} m
                   JOIN {user} u ON u.id = m.userid
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhere}
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}
                  GROUP BY m.userid, u.firstname, u.lastname
                  ORDER BY message_count DESC";
 
@@ -384,33 +658,82 @@ class analytics {
     }
 
     /**
-     * Get enrollment counts per course or for a specific course.
+     * SQL fragment and params restricting a query to one course, or to all.
+     *
+     * Course id 0 means "every course" throughout the dashboard: it is what the
+     * All courses option in the picker sends, and what the Overall Usage panel
+     * asks for. Several counters here used to interpolate
+     * "WHERE courseid = :courseid" unconditionally, which turned that request
+     * into a filter for rows literally stored against course 0 -- of which there
+     * are none. The panels went quietly empty instead of erroring, and only in
+     * site-wide mode, which is the one mode there is no per-course page to
+     * cross-check against. Routing every counter through one helper is what
+     * stops that drifting apart again.
+     *
+     * @param int $courseid Course id, or 0 for every course.
+     * @param string $alias Table alias used in the query, empty for none.
+     * @return array [string $whereclause, array $params] -- the clause is a
+     *               trailing AND fragment, so the caller supplies the WHERE.
+     */
+    private static function course_clause(int $courseid, string $alias = 'm'): array {
+        if ($courseid <= 0) {
+            return ['', []];
+        }
+        $prefix = $alias !== '' ? $alias . '.' : '';
+        return [" AND {$prefix}courseid = :courseid", ['courseid' => $courseid]];
+    }
+
+    /**
+     * Get enrollment counts for one course, or for the whole site.
+     *
+     * Course id 0 means every course here as it does everywhere else in this
+     * class, and the shape of the answer has to stay the same in both modes.
+     * It did not: the site-wide branch returned a bare list of per-course rows
+     * ([['courseid' => 3, 'total_enrolled' => 40], ...]) with no top-level
+     * total_enrolled key at all. get_analytics_overall JSON-encodes this array
+     * as PARAM_RAW, so nothing validated the shape; the dashboard read
+     * enrollment.total_enrolled off a list, got undefined, and painted the
+     * TOTAL STUDENTS tile as 0 while every neighbouring tile -- routed through
+     * course_clause() in v7.2.4 -- showed real site-wide traffic. Zero students
+     * next to 25.3 messages per student is the signature.
+     *
+     * Site-wide counts distinct users, not enrolment rows: a learner enrolled
+     * in six courses is one student, and summing the per-course rows would have
+     * counted them six times. The per-course number is distinct users for the
+     * same reason -- a user carrying both a manual and a self enrolment in one
+     * course is still one student. The per-course breakdown the old site-wide
+     * branch returned is preserved under 'courses' so no data is lost.
      *
      * @param int $courseid Course ID (0 = all courses).
-     * @return array Enrollment data.
+     * @param int $since Unused; accepted because the sibling getters take a time
+     *                   window and the external functions pass one positionally.
+     *                   Enrolment is a point-in-time count and is not windowed.
+     * @return array ['total_enrolled' => int] plus, site-wide, 'courses' => list.
      */
-    public static function get_enrollment_counts(int $courseid = 0): array {
+    public static function get_enrollment_counts(int $courseid = 0, int $since = 0): array {
         global $DB;
 
+        [$coursewhere, $params] = self::course_clause($courseid, 'e');
+
+        $sql = "SELECT COUNT(DISTINCT ue.userid)
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} e ON e.id = ue.enrolid
+                 WHERE ue.status = 0{$coursewhere}";
+        $result = ['total_enrolled' => (int) $DB->count_records_sql($sql, $params)];
+
         if ($courseid > 0) {
-            $sql = "SELECT COUNT(ue.id) AS total_enrolled
-                      FROM {user_enrolments} ue
-                      JOIN {enrol} e ON e.id = ue.enrolid
-                     WHERE e.courseid = :courseid AND ue.status = 0";
-            $count = $DB->count_records_sql($sql, ['courseid' => $courseid]);
-            return ['total_enrolled' => (int) $count];
+            return $result;
         }
 
-        $sql = "SELECT e.courseid, COUNT(ue.id) AS total_enrolled
+        $sql = "SELECT e.courseid, COUNT(DISTINCT ue.userid) AS total_enrolled
                   FROM {user_enrolments} ue
                   JOIN {enrol} e ON e.id = ue.enrolid
                  WHERE ue.status = 0
                  GROUP BY e.courseid
                  ORDER BY e.courseid ASC";
-        $rows = $DB->get_records_sql($sql);
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = [
+        $result['courses'] = [];
+        foreach ($DB->get_records_sql($sql) as $row) {
+            $result['courses'][] = [
                 'courseid' => (int) $row->courseid,
                 'total_enrolled' => (int) $row->total_enrolled,
             ];
@@ -432,7 +755,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -510,7 +833,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -531,12 +854,18 @@ class analytics {
         }
 
         // Users with messages on 2+ distinct days.
+        //
+        // FLOOR(timecreated / 86400), not FROM_UNIXTIME(..., '%Y-%m-%d'):
+        // FROM_UNIXTIME is MySQL-only and this query is fatal on Postgres. The
+        // integer form buckets by UTC day rather than by the database session's
+        // timezone, which is a small semantic shift and arguably the steadier
+        // definition -- "two distinct days" no longer depends on server config.
         $sql = "SELECT COUNT(*) FROM (
                     SELECT m.userid
                       FROM {local_ai_course_assistant_msgs} m
                      WHERE {$where}
                      GROUP BY m.userid
-                    HAVING COUNT(DISTINCT FROM_UNIXTIME(m.timecreated, '%Y-%m-%d')) >= 2
+                    HAVING COUNT(DISTINCT FLOOR(m.timecreated / 86400)) >= 2
                 ) returning_users";
         $returningusers = (int) $DB->count_records_sql($sql, $params);
 
@@ -558,7 +887,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -624,7 +953,7 @@ class analytics {
         }
 
         // Get AI users (those who sent at least one message).
-        $msgparams = ['courseid' => $courseid];
+        [$coursewhere, $msgparams] = self::course_clause($courseid);
         $timewhere = '';
         if ($since > 0) {
             $timewhere = ' AND m.timecreated >= :since';
@@ -632,7 +961,7 @@ class analytics {
         }
         $sql = "SELECT DISTINCT m.userid
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE m.courseid = :courseid AND m.role = 'user'{$timewhere}";
+                 WHERE m.role = 'user' AND " . self::meta_rows_excluded('m') . "{$coursewhere}{$timewhere}";
         $aiuserids = $DB->get_fieldset_sql($sql, $msgparams);
 
         $aiuserset = array_flip($aiuserids);
@@ -645,6 +974,9 @@ class analytics {
         // Ensure aiuserids only includes enrolled students.
         $aiuserids = array_intersect($aiuserids, $enrolled);
 
+        // Bounded loop: exactly two cohorts, and each metric inside is one
+        // aggregate query over the whole cohort via get_in_or_equal() — never a
+        // query per learner.
         $result = [];
         foreach (['ai_users' => $aiuserids, 'non_users' => $nonuserids] as $label => $userids) {
             $count = count($userids);
@@ -656,7 +988,7 @@ class analytics {
             // Average grade from course total grade item.
             $avggrade = 0.0;
             try {
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
                 $inparams['courseid'] = $courseid;
                 $sql = "SELECT AVG(gg.finalgrade) AS avg_grade
                           FROM {grade_grades} gg
@@ -676,7 +1008,7 @@ class analytics {
             // Completion rate.
             $completionrate = 0.0;
             try {
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
                 $inparams['courseid'] = $courseid;
                 $sql = "SELECT COUNT(cc.id) AS completed
                           FROM {course_completions} cc
@@ -692,7 +1024,7 @@ class analytics {
             // Average days to completion.
             $avgdays = 0.0;
             try {
-                list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+                [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
                 $inparams['courseid'] = $courseid;
                 $sql = "SELECT AVG(cc.timecompleted - ue.timestart) AS avg_seconds
                           FROM {course_completions} cc
@@ -742,10 +1074,28 @@ class analytics {
             $params['since'] = $since;
         }
 
-        $sql = "SELECT m.cmid, COUNT(m.id) AS message_count, COUNT(DISTINCT m.userid) AS student_count
+        // Aggregate BY SECTION in SQL, not per-cmid then summed in PHP.
+        //
+        // COUNT(DISTINCT userid) was computed per activity and the results added
+        // together, so one learner who chatted from four activities in a unit
+        // counted as four students. On a Saylor unit with 8-12 subunit pages the
+        // students column was inflated several-fold, and the dashboard derives
+        // "msgs/student" by dividing by it, so that figure was deflated by the
+        // same factor. The old comment on the summing line even said the
+        // re-aggregation was needed; the code summed anyway.
+        //
+        // course_modules.section is an FK to course_sections.id, so the join
+        // gives a true per-section distinct count.
+        $sql = "SELECT cs.id AS sectionid,
+                       cs.section AS sectionnum,
+                       COUNT(m.id) AS message_count,
+                       COUNT(DISTINCT m.userid) AS student_count
                   FROM {local_ai_course_assistant_msgs} m
+                  JOIN {course_modules} cm ON cm.id = m.cmid AND cm.course = m.courseid
+                  JOIN {course_sections} cs ON cs.id = cm.section
                  WHERE m.courseid = :courseid AND m.cmid IS NOT NULL AND m.role = 'user'{$timewhere}
-                 GROUP BY m.cmid";
+                 GROUP BY cs.id, cs.section
+                 ORDER BY cs.section ASC";
         $rows = $DB->get_records_sql($sql, $params);
 
         if (empty($rows)) {
@@ -759,34 +1109,25 @@ class analytics {
             return [];
         }
 
-        $sectiondata = [];
+        // modinfo is now needed only for the display name; the counts are
+        // already correct and already ordered by the query.
+        $result = [];
         foreach ($rows as $row) {
             try {
-                $cm = $modinfo->get_cm($row->cmid);
-                $sectionnum = $cm->sectionnum;
-                $sectioninfo = $modinfo->get_section_info($sectionnum);
+                $sectioninfo = $modinfo->get_section_info((int) $row->sectionnum);
                 $sectionname = get_section_name($courseid, $sectioninfo);
             } catch (\Throwable $e) {
                 continue;
             }
-
-            if (!isset($sectiondata[$sectionnum])) {
-                $sectiondata[$sectionnum] = [
-                    'section_name' => $sectionname,
-                    'section_num' => (int) $sectionnum,
-                    'student_count' => 0,
-                    'message_count' => 0,
-                ];
-            }
-            $sectiondata[$sectionnum]['message_count'] += (int) $row->message_count;
-            // Student count needs re-aggregation across cmids in same section.
-            $sectiondata[$sectionnum]['student_count'] += (int) $row->student_count;
+            $result[] = [
+                'section_name'  => $sectionname,
+                'section_num'   => (int) $row->sectionnum,
+                'student_count' => (int) $row->student_count,
+                'message_count' => (int) $row->message_count,
+            ];
         }
 
-        // Sort by section_num.
-        ksort($sectiondata);
-
-        return array_values($sectiondata);
+        return $result;
     }
 
     /**
@@ -800,7 +1141,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -844,7 +1185,7 @@ class analytics {
         global $DB;
 
         $params = [];
-        $where = "m.role = 'user'";
+        $where = "m.role = 'user' AND " . self::meta_rows_excluded('m');
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
             $params['courseid'] = $courseid;
@@ -994,9 +1335,20 @@ class analytics {
         $zeroresult = ['avg_messages' => 0.0, 'median_messages' => 0, 'sample_size' => 0];
 
         try {
-            // Get all user messages with their ratings.
+            // The session walk needs BOTH roles.
+            //
+            // Ratings are recorded against ASSISTANT message ids (the client
+            // submits the id from the SSE done frame, i.e. the assistant row),
+            // but this walk used to fetch role='user' rows only and test THEIR
+            // ids against the rated set. msgs.id is one shared sequence, so the
+            // intersection was always empty and the metric was a permanent 0.0
+            // on sites with thousands of thumbs-ups -- rendered, since v7.3.0,
+            // as a confident stat card on the Feedback tab.
+            //
+            // Bounding to learners who actually rated keeps this from being a
+            // full-table walk: only they can contribute a data point.
             $params = [];
-            $where = "m.role = 'user'";
+            $where = "m.role IN ('user', 'assistant') AND " . self::meta_rows_excluded('m');
             if ($courseid > 0) {
                 $where .= ' AND m.courseid = :courseid';
                 $params['courseid'] = $courseid;
@@ -1005,12 +1357,26 @@ class analytics {
                 $where .= ' AND m.timecreated >= :since';
                 $params['since'] = $since;
             }
+            $where .= " AND m.userid IN (
+                SELECT r2.userid
+                  FROM {local_ai_course_assistant_msg_ratings} r2
+                 WHERE r2.rating = 1"
+                . ($courseid > 0 ? ' AND r2.courseid = :rcourseid' : '')
+                . ($since > 0 ? ' AND r2.timecreated >= :rsince' : '')
+                . ')';
+            if ($courseid > 0) {
+                $params['rcourseid'] = $courseid;
+            }
+            if ($since > 0) {
+                $params['rsince'] = $since;
+            }
 
-            // Get user messages.
-            $sql = "SELECT m.id, m.userid, m.timecreated
+            // id tiebreak matters: a user turn and its assistant reply can share
+            // a timecreated second, and inverting them undercounts by one.
+            $sql = "SELECT m.id, m.userid, m.role, m.timecreated
                       FROM {local_ai_course_assistant_msgs} m
                      WHERE {$where}
-                     ORDER BY m.userid ASC, m.timecreated ASC";
+                     ORDER BY m.userid ASC, m.timecreated ASC, m.id ASC";
             $messages = $DB->get_records_sql($sql, $params);
 
             if (empty($messages)) {
@@ -1047,19 +1413,23 @@ class analytics {
             $sessionresolved = false;
 
             foreach ($messages as $msg) {
+                $isuser = ($msg->role === 'user');
                 if ($msg->userid !== $currentuserid || ($msg->timecreated - $sessionend) > 1800) {
-                    // New session.
+                    // New session. Count only the learner's own turns.
                     $currentuserid = $msg->userid;
-                    $sessionmsgcount = 1;
+                    $sessionmsgcount = $isuser ? 1 : 0;
                     $sessionend = $msg->timecreated;
                     $sessionresolved = false;
                 } else {
                     $sessionend = $msg->timecreated;
-                    $sessionmsgcount++;
+                    if ($isuser) {
+                        $sessionmsgcount++;
+                    }
                 }
 
-                // Check if this message has a thumbs-up.
-                if (!$sessionresolved && isset($ratedset[$msg->id])) {
+                // A thumbs-up lands on an ASSISTANT row; the answer is how many
+                // learner turns it took to get there.
+                if (!$isuser && !$sessionresolved && $sessionmsgcount > 0 && isset($ratedset[$msg->id])) {
                     $resolutioncounts[] = $sessionmsgcount;
                     $sessionresolved = true;
                 }

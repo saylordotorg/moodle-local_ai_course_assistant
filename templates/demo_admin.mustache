@@ -1,0 +1,123 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/demo_admin
+
+    Testing-environment admin page: create a hidden testing course and seed
+    fake student conversation data for previewing the Analytics Dashboard.
+
+    Context variables required for this template:
+    * notifications array - Pre-rendered notification HTML blocks.
+    * intro string - Lead paragraph (carries markup; rendered unescaped).
+    * formaction string - URL both forms post to.
+    * sesskey string - Session key.
+    * step1heading string - Step 1 card heading.
+    * nocoursetext string - Message shown when no testing course exists.
+    * createbtn string - Create-course submit button label.
+    * course object|false - Existing testing course panel (step 1 status +
+      step 2 seeding form), or false when no course exists yet.
+    * footer string - Footer note (carries markup; rendered unescaped).
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "notifications": [],
+        "intro": "This page creates a testing course that is hidden from students.",
+        "formaction": "/local/ai_course_assistant/demo_admin.php",
+        "sesskey": "abc123",
+        "step1heading": "Step 1: testing course",
+        "nocoursetext": "No testing course found. Click below to create one.",
+        "createbtn": "Create hidden testing course",
+        "course": {
+            "id": 42,
+            "existsmsg": "Testing course exists: SOLATEST (id 42)",
+            "badgeclass": "badge badge-secondary",
+            "badgetext": "hidden",
+            "courseurl": "/course/view.php?id=42",
+            "opencourse": "Open course",
+            "step2heading": "Step 2: seed fake students and AI chats",
+            "seedintro": "Creates demo students and inserts synthetic conversations.",
+            "userslabel": "Users",
+            "weekslabel": "Weeks",
+            "clearlabel": "Clear existing demo_* users first",
+            "seedbtn": "Seed students and chats",
+            "analyticsurl": "/local/ai_course_assistant/analytics.php?courseid=42",
+            "viewanalytics": "View Analytics for this course"
+        },
+        "footer": "Data created here lives in the standard Moodle tables."
+    }
+}}
+{{#notifications}}{{{html}}}{{/notifications}}
+{{! intro / existsmsg / opencourse / viewanalytics / footer are plugin-authored
+    lang strings carrying markup or entities (strong/code tags, arrow entities),
+    or PHP-composed strings whose interpolated values were already escaped with
+    s() — so they render unescaped here. Nothing request-derived is among them. }}
+<p>{{{intro}}}</p>
+<div class="card mb-3" style="max-width:720px">
+    <div class="card-body">
+        <h3 class="mb-2" style="font-size:18px">{{step1heading}}</h3>
+        {{#course}}
+            <p>{{{existsmsg}}} <span class="{{badgeclass}}">{{badgetext}}</span></p>
+            <a href="{{courseurl}}" class="btn btn-sm btn-outline-primary">{{{opencourse}}}</a>
+        {{/course}}
+        {{^course}}
+            <p>{{nocoursetext}}</p>
+            <form method="post" action="{{formaction}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="create">
+                <input type="submit" value="{{createbtn}}" class="btn btn-primary">
+            </form>
+        {{/course}}
+    </div>
+</div>
+{{#course}}
+    <div class="card mb-3" style="max-width:720px">
+        <div class="card-body">
+            <h3 class="mb-2" style="font-size:18px">{{step2heading}}</h3>
+            <p>{{seedintro}}</p>
+            <form method="post" action="{{formaction}}" class="form-inline">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="seed">
+                <input type="hidden" name="courseid" value="{{id}}">
+                <div class="form-group mr-2">
+                    <label for="users" class="mr-1">{{userslabel}}</label>
+                    <input type="number" id="users" name="users" value="15" min="1" max="100"
+                           class="form-control form-control-sm" style="width:80px">
+                </div>
+                <div class="form-group mr-2">
+                    <label for="weeks" class="mr-1">{{weekslabel}}</label>
+                    <input type="number" id="weeks" name="weeks" value="4" min="1" max="52"
+                           class="form-control form-control-sm" style="width:80px">
+                </div>
+                <div class="form-check mr-3">
+                    <input type="checkbox" id="clear" name="clear" value="1" class="form-check-input">
+                    <label for="clear" class="form-check-label">{{clearlabel}}</label>
+                </div>
+                <input type="submit" value="{{seedbtn}}" class="btn btn-primary">
+            </form>
+            <p class="mt-2">
+                <a href="{{analyticsurl}}" class="btn btn-sm btn-outline-secondary mt-3">{{{viewanalytics}}}</a>
+            </p>
+        </div>
+    </div>
+{{/course}}
+<div style="max-width:720px">
+    <p><small class="text-muted">{{{footer}}}</small></p>
+</div>

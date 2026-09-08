@@ -22,7 +22,6 @@ use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_value;
 use local_ai_course_assistant\conversation_manager;
-use local_ai_course_assistant\attachment_manager;
 
 /**
  * Get conversation history for a course.
@@ -32,7 +31,6 @@ use local_ai_course_assistant\attachment_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_history extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -56,31 +54,21 @@ class get_history extends external_api {
 
         $result = [];
         foreach ($messages as $msg) {
+            // Assistant rows are laundered on the way out, never on the way in:
+            // rows written before v7.2.4 can hold "[no response: <class>]", and
+            // a timeout or an exhausted failover chain can leave the column
+            // empty, both of which reached the learner verbatim. User rows are
+            // returned exactly as typed -- a learner asking about an exception
+            // class must see their own question back.
+            $text = $msg->role === 'assistant'
+                ? conversation_manager::display_turn_text((string) $msg->message)
+                : $msg->message;
             $entry = [
                 'id' => (int) $msg->id,
                 'role' => $msg->role,
-                'message' => $msg->message,
+                'message' => $text,
                 'timecreated' => (int) $msg->timecreated,
-                'attachment' => [
-                    'filename' => '',
-                    'mime' => '',
-                    'size' => 0,
-                    'url' => '',
-                ],
             ];
-            if ($msg->role === 'user') {
-                $file = attachment_manager::get_for_message((int) $params['courseid'], (int) $msg->id);
-                if ($file) {
-                    $entry['attachment'] = [
-                        'filename' => $file->get_filename(),
-                        'mime' => (string) ($file->get_mimetype() ?: ''),
-                        'size' => (int) $file->get_filesize(),
-                        'url' => attachment_manager::build_pluginfile_url(
-                            (int) $params['courseid'], (int) $msg->id, $file
-                        ),
-                    ];
-                }
-            }
             $result[] = $entry;
         }
 
@@ -95,12 +83,6 @@ class get_history extends external_api {
                     'role' => new external_value(PARAM_ALPHA, 'Message role'),
                     'message' => new external_value(PARAM_RAW, 'Message content'),
                     'timecreated' => new external_value(PARAM_INT, 'Timestamp'),
-                    'attachment' => new external_single_structure([
-                        'filename' => new external_value(PARAM_RAW, 'Attachment filename or empty'),
-                        'mime' => new external_value(PARAM_RAW, 'Attachment MIME type or empty'),
-                        'size' => new external_value(PARAM_INT, 'Attachment size in bytes'),
-                        'url' => new external_value(PARAM_URL, 'Pluginfile URL or empty'),
-                    ]),
                 ])
             ),
         ]);

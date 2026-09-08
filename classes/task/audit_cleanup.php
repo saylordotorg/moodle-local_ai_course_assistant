@@ -28,7 +28,6 @@ namespace local_ai_course_assistant\task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class audit_cleanup extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:audit_cleanup', 'local_ai_course_assistant');
     }

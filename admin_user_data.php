@@ -40,10 +40,16 @@ $confirm      = optional_param('confirm', 0, PARAM_INT);
 
 $PAGE->set_url('/local/ai_course_assistant/admin_user_data.php');
 $PAGE->set_context($syscontext);
-$PAGE->set_title(get_string('admin:user_data:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
-$PAGE->set_heading(get_string('admin:user_data:title', 'local_ai_course_assistant',
-    \local_ai_course_assistant\branding::short_name()));
+$PAGE->set_title(get_string(
+    'admin:user_data:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
+$PAGE->set_heading(get_string(
+    'admin:user_data:title',
+    'local_ai_course_assistant',
+    \local_ai_course_assistant\branding::short_name()
+));
 
 $tables = [
     'convs'          => 'local_ai_course_assistant_convs',
@@ -54,8 +60,28 @@ $tables = [
     'survey_resp'    => 'local_ai_course_assistant_survey_resp',
     'ut_resp'        => 'local_ai_course_assistant_ut_resp',
     'audit'          => 'local_ai_course_assistant_audit',
-    'practice_scores'=> 'local_ai_course_assistant_practice_scores',
+    'practice_scores' => 'local_ai_course_assistant_practice_scores',
     'profiles'       => 'local_ai_course_assistant_profiles',
+    // v7.3.3 (F44): the remaining metadata-declared tables -- this export
+    // covered 11 of 23. learner_memory (model-inferred observations) and
+    // learner_goals (volunteered free text) were the material omissions.
+    'obj_att'         => 'local_ai_course_assistant_obj_att',
+    'flashcards'      => 'local_ai_course_assistant_flashcards',
+    'avatar_sess'     => 'local_ai_course_assistant_avatar_sess',
+    'learner_goals'   => 'local_ai_course_assistant_learner_goals',
+    'learner_memory'  => 'local_ai_course_assistant_learner_memory',
+    'streak'          => 'local_ai_course_assistant_streak',
+    'struggle_signal' => 'local_ai_course_assistant_struggle_signal',
+    'outreach_log'    => 'local_ai_course_assistant_outreach_log',
+    'email_optout'    => 'local_ai_course_assistant_email_optout',
+    'sbx_rec'         => 'local_ai_course_assistant_sbx_rec',
+    'review_res'      => 'local_ai_course_assistant_review_res',
+    'radar_sched'     => 'local_ai_course_assistant_radar_sched',
+];
+// Two tables identify the user by a column other than `userid`.
+$altkeys = [
+    'review_res'  => 'resolved_by',
+    'radar_sched' => 'creator',
 ];
 
 // Handle download JSON action.
@@ -70,7 +96,8 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
     // small constant (not row-driven), so this is bounded, not an N+1.
     foreach ($tables as $label => $table) {
         try {
-            $bundle[$label] = array_values($DB->get_records($table, ['userid' => $targetuserid]));
+            $keycol = $altkeys[$label] ?? 'userid';
+            $bundle[$label] = array_values($DB->get_records($table, [$keycol => $targetuserid]));
         } catch (\Throwable $e) {
             $bundle[$label] = ['error' => 'table unavailable'];
         }
@@ -84,8 +111,12 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
     } catch (\Throwable $e) {
         $bundle['messages'] = ['error' => 'table unavailable'];
     }
-    \local_ai_course_assistant\audit_logger::log('admin_export_learner_data',
-        (int)$USER->id, 0, ['target_userid' => $targetuserid]);
+    \local_ai_course_assistant\audit_logger::log(
+        'admin_export_learner_data',
+        (int)$USER->id,
+        0,
+        ['target_userid' => $targetuserid]
+    );
     header('Content-Type: application/json; charset=utf-8');
     $fnslug = \local_ai_course_assistant\branding::filename_slug();
     header('Content-Disposition: attachment; filename="' . $fnslug . '-data-' . $targetuserid . '-' . date('Ymd') . '.json"');
@@ -97,29 +128,51 @@ if ($action === 'download' && $targetuserid && confirm_sesskey()) {
 // Handle purge action (two step confirm).
 if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
     if ($confirm) {
+        // Contexts first: the provider derives them from tables that
+        // delete_user_data() is about to empty, so computing them afterwards
+        // yields an empty list and silently skips the Privacy leg.
+        // Also note this was \core_privacy\manager::get_contexts_for_userid()
+        // called statically with two arguments -- it is a non-static one-argument
+        // instance method, so it raised an Error straight into the catch below.
+        $contextids = [];
+        try {
+            $contextlist = \local_ai_course_assistant\privacy\provider::get_contexts_for_userid($targetuserid);
+            $contextids = $contextlist ? $contextlist->get_contextids() : [];
+        } catch (\Throwable $e) {
+            debugging('Privacy API contextlist threw: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        }
+
         \local_ai_course_assistant\conversation_manager::delete_user_data($targetuserid);
         try {
-            $contextlist = \core_privacy\manager::get_contexts_for_userid(
-                $targetuserid, 'local_ai_course_assistant');
-            if ($contextlist && $contextlist->count() > 0) {
+            if (!empty($contextids)) {
                 $approved = new \core_privacy\local\request\approved_contextlist(
                     \core\user::get_user($targetuserid) ?: (object)['id' => $targetuserid],
                     'local_ai_course_assistant',
-                    $contextlist->get_contextids()
+                    $contextids
                 );
                 \local_ai_course_assistant\privacy\provider::delete_data_for_user($approved);
             }
         } catch (\Throwable $e) {
             debugging('Privacy API purge threw: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
-        \local_ai_course_assistant\audit_logger::log('admin_purge_learner_data',
-            (int)$USER->id, 0, ['target_userid' => $targetuserid]);
-        redirect($PAGE->url, get_string('admin:user_data:purged', 'local_ai_course_assistant'),
-            null, \core\output\notification::NOTIFY_SUCCESS);
+        \local_ai_course_assistant\audit_logger::log(
+            'admin_purge_learner_data',
+            (int)$USER->id,
+            0,
+            ['target_userid' => $targetuserid]
+        );
+        redirect(
+            $PAGE->url,
+            get_string('admin:user_data:purged', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
     } else {
         echo $OUTPUT->header();
         $target = core_user::get_user($targetuserid);
-        $targetname = $target ? fullname($target) : ('id ' . $targetuserid);
+        $targetname = $target
+            ? fullname($target)
+            : get_string('admin:user_data:idlabel', 'local_ai_course_assistant', $targetuserid);
         echo $OUTPUT->confirm(
             get_string('admin:user_data:confirm_purge', 'local_ai_course_assistant', $targetname),
             new moodle_url($PAGE->url, [
@@ -135,47 +188,42 @@ if ($action === 'purge' && $targetuserid && confirm_sesskey()) {
     }
 }
 
-echo $OUTPUT->header();
-
-echo \html_writer::tag('p',
-    get_string('admin:user_data:intro', 'local_ai_course_assistant'),
-    ['style' => 'max-width:720px']);
-
-// User search form.
-echo '<form method="get" action="' . $PAGE->url->out() . '" style="margin:16px 0">';
-echo '<label style="display:block;margin-bottom:6px;font-weight:600">'
-    . get_string('admin:user_data:search_label', 'local_ai_course_assistant')
-    . '</label>';
-echo '<input type="number" name="targetuserid" value="' . $targetuserid
-    . '" min="1" style="padding:6px 10px;font-size:14px;width:160px" placeholder="user id" aria-label="Target user ID" />';
-echo ' <button type="submit" class="btn btn-primary" style="padding:6px 14px">'
-    . get_string('admin:user_data:lookup', 'local_ai_course_assistant') . '</button>';
-echo '</form>';
+$templatedata = [
+    'intro' => get_string('admin:user_data:intro', 'local_ai_course_assistant'),
+    'formurl' => $PAGE->url->out(false),
+    'searchlabel' => get_string('admin:user_data:search_label', 'local_ai_course_assistant'),
+    'targetuserid' => $targetuserid,
+    'lookuplabel' => get_string('admin:user_data:lookup', 'local_ai_course_assistant'),
+    'notfound' => false,
+    'notfoundmsg' => get_string('admin:user_data:not_found', 'local_ai_course_assistant'),
+    'hasuser' => false,
+    'coltable' => get_string('admin:user_data:col_table', 'local_ai_course_assistant'),
+    'colrows' => get_string('admin:user_data:col_rows', 'local_ai_course_assistant'),
+    'totallabel' => get_string('admin:user_data:total', 'local_ai_course_assistant'),
+    'downloadlabel' => get_string('admin:user_data:download', 'local_ai_course_assistant'),
+    'purgelabel' => get_string('admin:user_data:purge', 'local_ai_course_assistant'),
+];
 
 if ($targetuserid) {
     $target = core_user::get_user($targetuserid);
     if (!$target) {
-        echo $OUTPUT->notification(get_string('admin:user_data:not_found', 'local_ai_course_assistant'),
-            'notifyerror');
+        $templatedata['notfound'] = true;
     } else {
-        echo '<h3>' . s(fullname($target)) . ' <small style="color:#888">(id ' . $targetuserid
-            . ')</small></h3>';
-
-        // Row count preview.
         global $DB;
-        echo '<table class="generaltable" style="margin-top:12px">';
-        echo '<thead><tr><th>Table</th><th>Rows for this user</th></tr></thead><tbody>';
+        $rows = [];
         $totalrows = 0;
+        // The table list is a fixed, small constant (not row-driven), so one
+        // count per table is bounded rather than an N+1.
         foreach ($tables as $label => $table) {
             try {
-                $count = $DB->count_records($table, ['userid' => $targetuserid]);
+                $count = $DB->count_records($table, [($altkeys[$label] ?? 'userid') => $targetuserid]);
             } catch (\Throwable $e) {
                 $count = 0;
             }
             $totalrows += $count;
-            echo '<tr><td><code>' . $label . '</code></td><td>' . $count . '</td></tr>';
+            $rows[] = ['label' => $label, 'count' => $count];
         }
-        // Messages join.
+        // Messages join through convs, so they need their own count.
         try {
             $msgsql = "SELECT COUNT(m.id) FROM {local_ai_course_assistant_msgs} m
                        JOIN {local_ai_course_assistant_convs} c ON c.id = m.conversationid
@@ -185,28 +233,30 @@ if ($targetuserid) {
             $msgcount = 0;
         }
         $totalrows += $msgcount;
-        echo '<tr><td><code>messages</code></td><td>' . $msgcount . '</td></tr>';
-        echo '<tr><th>total</th><th>' . $totalrows . '</th></tr>';
-        echo '</tbody></table>';
+        $rows[] = ['label' => 'messages', 'count' => $msgcount];
 
-        // Actions.
-        echo '<div style="margin-top:16px;display:flex;gap:12px">';
-        $downloadurl = new moodle_url($PAGE->url, [
+        $templatedata['hasuser'] = true;
+        $templatedata['fullname'] = fullname($target);
+        $templatedata['iddisplay'] = get_string(
+            'admin:user_data:idlabel',
+            'local_ai_course_assistant',
+            $targetuserid
+        );
+        $templatedata['rows'] = $rows;
+        $templatedata['totalrows'] = $totalrows;
+        $templatedata['downloadurl'] = (new moodle_url($PAGE->url, [
             'action' => 'download',
             'targetuserid' => $targetuserid,
             'sesskey' => sesskey(),
-        ]);
-        echo '<a class="btn btn-secondary" href="' . $downloadurl->out(false) . '">'
-            . get_string('admin:user_data:download', 'local_ai_course_assistant') . '</a>';
-        $purgeurl = new moodle_url($PAGE->url, [
+        ]))->out(false);
+        $templatedata['purgeurl'] = (new moodle_url($PAGE->url, [
             'action' => 'purge',
             'targetuserid' => $targetuserid,
             'sesskey' => sesskey(),
-        ]);
-        echo '<a class="btn btn-danger" href="' . $purgeurl->out(false) . '">'
-            . get_string('admin:user_data:purge', 'local_ai_course_assistant') . '</a>';
-        echo '</div>';
+        ]))->out(false);
     }
 }
 
+echo $OUTPUT->header();
+echo $OUTPUT->render_from_template('local_ai_course_assistant/admin_user_data', $templatedata);
 echo $OUTPUT->footer();

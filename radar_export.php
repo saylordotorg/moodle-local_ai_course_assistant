@@ -31,6 +31,7 @@
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\radar_delivery;
+use local_ai_course_assistant\branding;
 
 require_login();
 $syscontext = context_system::instance();
@@ -50,40 +51,46 @@ if (!is_array($meta)) {
 
 if ($action === 'download') {
     if ($format === 'pdf') {
-        // Print-friendly HTML view — user uses browser "Save as PDF".
-        header('Content-Type: text/html; charset=utf-8');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        $when = userdate(time(), '%Y-%m-%d %H:%M');
-        $qsafe = s($query);
-        $rsafe = nl2br(s($response));
-        $msafe = '';
+        // Print-friendly view — the admin uses the browser's "Save as PDF".
+        // v7.0.1: rendered through the Output API on an embedded page layout
+        // instead of echoing a detached document with an inline <style> block,
+        // so the markup lives in a template and the rules live in styles.css.
+        $metarows = [];
         foreach ($meta as $k => $v) {
-            $msafe .= '<dt>' . s((string) $k) . '</dt><dd>' . s((string) $v) . '</dd>';
+            $metarows[] = ['key' => (string) $k, 'value' => (string) $v];
         }
-        echo '<!doctype html><html lang="en"><head><meta charset="utf-8">';
-        echo '<title>SOLA Learning Radar Report</title>';
-        echo '<style>body{font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#222}';
-        echo 'h1{font-size:20px;margin:0 0 4px}h2{font-size:16px;margin:24px 0 8px}';
-        echo 'dl{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px;color:#555}';
-        echo 'dt{font-weight:600}.q{background:#f4f6f9;padding:12px 14px;border-radius:6px;white-space:pre-wrap}';
-        echo '.r{padding:12px 0}.foot{margin-top:32px;font-size:12px;color:#888;border-top:1px solid #e5e7eb;padding-top:12px}';
-        echo '@media print{body{margin:0}.noprint{display:none}}';
-        echo '</style></head><body>';
-        echo '<button class="noprint" onclick="window.print()">Print / save as PDF</button>';
-        echo '<h1>SOLA Learning Radar Report</h1>';
-        echo '<p style="color:#666;margin:0 0 12px">Generated ' . s($when) . '</p>';
-        if ($msafe !== '') {
-            echo '<dl>' . $msafe . '</dl>';
-        }
-        echo '<h2>Query</h2><div class="q">' . $qsafe . '</div>';
-        echo '<h2>Response</h2><div class="r">' . $rsafe . '</div>';
-        echo '<div class="foot">All student data in this report is anonymized. Do not share publicly.</div>';
-        echo '</body></html>';
+        $templatedata = [
+            'title' => branding::str('radar_report:title'),
+            'generated' => get_string(
+                'radar_report:generated',
+                'local_ai_course_assistant',
+                userdate(time(), '%Y-%m-%d %H:%M')
+            ),
+            'printlabel' => get_string('radar_report:print', 'local_ai_course_assistant'),
+            'querylabel' => get_string('radar_report:query', 'local_ai_course_assistant'),
+            'responselabel' => get_string('radar_report:response', 'local_ai_course_assistant'),
+            'privacynote' => get_string('radar_report:privacy_note', 'local_ai_course_assistant'),
+            'query' => $query,
+            'response' => $response,
+            'hasmeta' => !empty($metarows),
+            'meta' => $metarows,
+        ];
+
+        $PAGE->set_context($syscontext);
+        $PAGE->set_url(new moodle_url('/local/ai_course_assistant/radar_export.php'));
+        $PAGE->set_pagelayout('embedded');
+        $PAGE->set_title($templatedata['title']);
+        echo $OUTPUT->header();
+        echo $OUTPUT->render_from_template(
+            'local_ai_course_assistant/radar_report',
+            $templatedata
+        );
+        echo $OUTPUT->footer();
         return;
     }
 
     $payload = radar_delivery::format($format, $query, $response, $meta);
-    list($filename, $contenttype) = radar_delivery::format_meta($format);
+    [$filename, $contenttype] = radar_delivery::format_meta($format);
     header('Content-Type: ' . $contenttype);
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . strlen($payload));
@@ -95,11 +102,17 @@ if ($action === 'download') {
 // Send actions return JSON to the AMD module.
 header('Content-Type: application/json; charset=utf-8');
 
+// Everything below has promised JSON. Without this, any exception from a
+// delivery branch (notably a curl failure inside radar_delivery or
+// redash_client) rendered Moodle's themed HTML error page against the JSON
+// content-type, which the AMD module reports as an unparseable response with
+// no hint of the actual cause.
+try {
 if ($action === 'email') {
     $to = required_param('to', PARAM_EMAIL);
     if ($to === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Recipient email is required']);
+        echo json_encode(['ok' => false, 'error' => get_string('radar:err_email_required', 'local_ai_course_assistant')]);
         return;
     }
     $sent = radar_delivery::send_email($to, $query, $response, $format, 'On-demand', $meta);
@@ -111,7 +124,7 @@ if ($action === 'slack') {
     $url = required_param('webhook', PARAM_URL);
     if ($url === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Slack webhook URL is required']);
+        echo json_encode(['ok' => false, 'error' => get_string('radar:err_slack_webhook_required', 'local_ai_course_assistant')]);
         return;
     }
     $sent = radar_delivery::send_slack($url, $query, $response, $meta);
@@ -123,7 +136,7 @@ if ($action === 'teams') {
     $url = required_param('webhook', PARAM_URL);
     if ($url === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Teams webhook URL is required']);
+        echo json_encode(['ok' => false, 'error' => get_string('radar:err_teams_webhook_required', 'local_ai_course_assistant')]);
         return;
     }
     $sent = radar_delivery::send_teams($url, $query, $response, $meta);
@@ -137,7 +150,7 @@ if ($action === 'teams') {
 if ($action === 'push_redash') {
     $name = optional_param('name', '', PARAM_TEXT);
     if ($name === '') {
-        $name = 'SOLA Learning Radar — ' . userdate(time(), '%Y-%m-%d %H:%M');
+        $name = branding::str('radar:redash_default_name', userdate(time(), '%Y-%m-%d %H:%M'));
     }
     $result = \local_ai_course_assistant\redash_client::push_query($name, $query, $response);
     if (!$result['ok']) {
@@ -153,9 +166,20 @@ if ($action === 'push_redash') {
 // render the Setup Redash helper without re-fetching settings via webservice.
 if ($action === 'redash_setup') {
     $configured = \local_ai_course_assistant\redash_client::is_configured();
-    $pullurl = (new moodle_url('/local/ai_course_assistant/redash_export.php', [
-        'apikey' => get_config('local_ai_course_assistant', 'redash_api_key') ?: '',
-    ]))->out(false);
+    // v7.0.5: a BARE url -- no credential and no token.
+    //
+    // This is setup text an admin copies into a Redash JSON data source, not a
+    // link a browser follows now. A short-lived token would work during setup
+    // and then 401 on every scheduled refresh about fifteen minutes later, with
+    // nothing in the UI to explain why; and the raw key would be stored in
+    // plaintext inside Redash, which is the finding this release exists to fix.
+    // Redash sends the credential as an Authorization: Bearer header, which
+    // redash_export.php has always accepted and now documents in the modal.
+    //
+    // analytics.php draws the same distinction: bare URL for the paste-in
+    // address, short-lived token only on export_csv_url, which a browser really
+    // does follow.
+    $pullurl = (new moodle_url('/local/ai_course_assistant/redash_export.php'))->out(false);
     echo json_encode([
         'ok' => true,
         'configured' => $configured,
@@ -168,4 +192,8 @@ if ($action === 'redash_setup') {
 }
 
 http_response_code(400);
-echo json_encode(['ok' => false, 'error' => 'Unknown action']);
+echo json_encode(['ok' => false, 'error' => get_string('radar:err_unknown_action', 'local_ai_course_assistant')]);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+}

@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_storage {
-
     /** @var string Default bucket (shared archive bucket, under a soapbox/ prefix). */
     const DEFAULT_BUCKET = 'archive-course';
 
