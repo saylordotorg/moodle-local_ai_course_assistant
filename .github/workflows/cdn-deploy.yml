@@ -18,6 +18,18 @@ on:
       - 'classes/hook_callbacks.php'
       - 'lang/en/**'
 
+  # Validate cdn changes at PR time too. Before this, a PR touching cdn/ (every
+  # dependabot rollup bump, for instance) had no validation at all: the only job
+  # that builds the bundle ran on push to main, after the merge. The deploy step
+  # below is guarded so a PR run tests without publishing.
+  pull_request:
+    paths:
+      - 'amd/src/**'
+      - 'styles.css'
+      - 'cdn/**'
+      - 'classes/hook_callbacks.php'
+      - 'lang/en/**'
+
   workflow_dispatch:
 
 permissions:
@@ -113,6 +125,7 @@ jobs:
           echo "{\"version\":\"${SHA}\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > manifest.json
 
       - name: Deploy to GitHub Pages
+        if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
