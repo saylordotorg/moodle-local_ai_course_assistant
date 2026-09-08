@@ -126,6 +126,11 @@ class policy_bundle {
         'rerank_model',
         'rerank_candidates',
         'rerank_margin_threshold',
+        'rerank_min_query_chars',
+        // v7.4.0: Voyage query/document projection. Behaviour-only, and
+        // switching it needs no reindex — shared mode reuses the input_type the
+        // corpus was already indexed with, so only the query side changes.
+        'embed_input_type_mode',
         // Spend policy (v5.13/v6.0).
         'spend_cap_site',
         'spend_cap_chat',
@@ -136,6 +141,31 @@ class policy_bundle {
         'spend_cap_per_course_default',
         'cost_anomaly_enabled',
         'cost_anomaly_multiplier',
+        // v7.4.0 price-drift tolerance. The threshold is fleet-safe; the
+        // `price_drift_check_enabled` switch that owns it deliberately is NOT,
+        // because turning it on makes the site fetch admin-entered source URLs
+        // and email the spend recipients, and a bundle must not be able to
+        // start outbound traffic or send mail.
+        'price_drift_tolerance_pct',
+        // v7.4.0 benchmark shape. None of these spend anything by themselves:
+        // a run is only ever started by a human queueing it from the registry
+        // page or by the CLI. `bench_judge_*` is model routing, like the
+        // already-allowlisted quiz_* and mastery_classifier_* pairs.
+        'bench_default_samples',
+        'bench_min_quality_n',
+        'bench_judge_provider',
+        'bench_judge_model',
+        // v7.4.0 recommendation thresholds. Pure decision arithmetic: the
+        // recommender writes nothing and changes no routing, it only reports.
+        'rec_quality_epsilon',
+        'rec_savings_floor',
+        'rec_quality_margin',
+        'rec_min_quality_n',
+        // DELIBERATELY ABSENT: embed_migration_target_provider / _model /
+        // _dimensions / _apikey. One is a credential, and a bundle that could
+        // set the other three could command a full re-embed of the corpus,
+        // which is billable work. The migration is started by a human on
+        // rag_admin.php.
     ];
 
     /**

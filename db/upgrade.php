@@ -1732,5 +1732,100 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026090700, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026091000) {
+        // v7.4.0: the no-deploy model registry. Three tables land together so
+        // the schema change is atomic.
+        //
+        // Why this exists: token_cost_manager's committed rate card had no
+        // 'gemini-2.5-flash' prefix, get_rates() returned null for it, and
+        // every consumer treats null as "skip" -- so 100% of production chat
+        // spend computed as $0.00 with no error anywhere. A price fix must not
+        // require a code deploy, so pricing moves into a table an admin can
+        // edit, and pricing SOURCES become rows with a declarative parse spec
+        // rather than a PHP class per vendor.
+        $table = new xmldb_table('local_ai_course_assistant_models');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('modelkey', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('capability', XMLDB_TYPE_CHAR, '32', null, null, null, null);
+        $table->add_field('input_rate', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('output_rate', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('context_tokens', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'active');
+        $table->add_field('source', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'manual');
+        $table->add_field('notes', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('addedby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('addedby_fk_mdl', XMLDB_KEY_FOREIGN, ['addedby'], 'user', ['id']);
+        $table->add_index('modelkey_uq', XMLDB_INDEX_UNIQUE, ['modelkey']);
+        $table->add_index('status_capability', XMLDB_INDEX_NOTUNIQUE, ['status', 'capability']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('local_ai_course_assistant_pricesrc');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('url', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('format', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('spec', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('lastfetch', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('laststatus', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('lastmessage', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('addedby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('addedby_fk_psrc', XMLDB_KEY_FOREIGN, ['addedby'], 'user', ['id']);
+        $table->add_index('enabled', XMLDB_INDEX_NOTUNIQUE, ['enabled']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('local_ai_course_assistant_bench');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('runid', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('harness', XMLDB_TYPE_CHAR, '32', null, null, null, null);
+        $table->add_field('sola_function', XMLDB_TYPE_CHAR, '32', null, null, null, null);
+        $table->add_field('registry_key', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('model_name', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('fixture_set', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('fixture_n', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('params', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('judge_provider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('judge_model', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('quality_metric', XMLDB_TYPE_CHAR, '32', null, null, null, null);
+        $table->add_field('quality_raw', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('quality_max', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('quality_score', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('quality_n', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('cost_cents_per_call', XMLDB_TYPE_NUMBER, '12, 6', null, null, null, null);
+        $table->add_field('p50_ttft_ms', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('p95_ttft_ms', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('p50_total_ms', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('calls', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('errors', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('plugin_release', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'complete');
+        $table->add_field('message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('createdby', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('createdby_fk_bench', XMLDB_KEY_FOREIGN, ['createdby'], 'user', ['id']);
+        $table->add_index('runid_uq', XMLDB_INDEX_UNIQUE, ['runid']);
+        $table->add_index('function_model_time', XMLDB_INDEX_NOTUNIQUE, ['sola_function', 'model_name', 'timecreated']);
+        $table->add_index('registrykey_time', XMLDB_INDEX_NOTUNIQUE, ['registry_key', 'timecreated']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026091000, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

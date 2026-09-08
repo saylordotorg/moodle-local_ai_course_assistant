@@ -1,0 +1,798 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+    @copyright  2026 Tom Caswell & David Ta / Saylor University
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+{{!
+    @template local_ai_course_assistant/model_registry
+
+    Model registry admin page. Seven sections, in the order an operator needs
+    them: unpriced models seen in real traffic (the state that made every
+    production chat call report $0.00, so it leads and it is an alert, not a
+    table row), the effective merged price list with provenance, the add/correct
+    form, pricing sources, drift findings with one-click apply, benchmark
+    results and recommendations including their refusals, and a benchmark queue
+    form.
+
+    Every string arrives pre-resolved in `l`; the template makes no in-template
+    string lookup, because brand-bearing copy has to pass through
+    branding::str in PHP, and a mustache comment cannot even name the tag it is
+    avoiding without ending itself early -- which is exactly the bug that first
+    printed this documentation into the page.
+    Styling is Bootstrap plus the .sola-modelregistry namespace in styles.css.
+
+    Context variables required for this template:
+    * backurl, backlabel - link back to the plugin settings category.
+    * posturl - action URL for every POST form.
+    * pageurl - base URL for the edit links.
+    * sesskey - session key for those forms.
+    * l - map of every resolved label; see model_registry.php.
+    * unpriced - {has, count, days, rows[{modelkey, model, provider, calls,
+      tokens, lastseen, hasproposal, proposal{input, output, inputlabel,
+      outputlabel, provider, capability, context, sourcename} }]}.
+    * effective - {has, count, rows[{modelkey, input, output, inputraw,
+      outputraw, layerlabel, sourcelabel, intable, capability, context,
+      contextraw, provider, statuslabel, notes, setby, updated}]}.
+    * modelform - {modelkey, provider, capability, input_rate, output_rate,
+      context_tokens, notes, editing, statuses[{value, label, selected}]}.
+    * sources - {has, rows[{id, name, url, formatlabel, spec, enabled,
+      enabledlabel, lastfetch, statusok, statuserror, statuslabel, lastmessage}]}.
+    * sourceform - {sourceid, name, url, spec, enabled, editing,
+      formats[{value, label, selected}]}.
+    * drift - {hasrun, has, lastrun, statusnote, tolerance, truncated,
+      counts{missing, mismatch, new}, rows[...]}.
+    * bench - {cards[...], unmeasured[...], hasunmeasured, release, floor,
+      tunables}.
+    * queue - {models[{value, label}], hasmodels, functions[{value, label}],
+      samples, maxsamples}.
+
+    Example context (json):
+    {
+        "backurl": "https://example.org/admin/category.php?category=local_ai_course_assistant",
+        "backlabel": "Back to settings",
+        "posturl": "https://example.org/local/ai_course_assistant/model_registry.php",
+        "pageurl": "https://example.org/local/ai_course_assistant/model_registry.php",
+        "sesskey": "abc123",
+        "l": {
+            "title": "Model registry and pricing",
+            "intro": "Every model SOLA can bill for.",
+            "unpricedheading": "Unpriced models seen in real traffic",
+            "unpriceddesc": "These models appear in billable calls.",
+            "unpricednone": "Every model billed resolves to a price.",
+            "unpricedcount": "1 unpriced model in billable traffic",
+            "priceit": "Set a price",
+            "colmodel": "Model", "colprovider": "Provider", "colcalls": "Billable calls",
+            "coltokens": "Tokens", "collastseen": "Last seen", "colactions": "Actions",
+            "colprefix": "Model key", "colinput": "Input", "coloutput": "Output",
+            "colcapability": "Capability", "colcontext": "Context", "colstatus": "Status",
+            "collayer": "Supplied by", "colsource": "Source", "colsetby": "Set by",
+            "colupdated": "Updated", "colquality": "Quality", "colcost": "Cost per call",
+            "colttft": "First byte (p50)", "colverdict": "Verdict", "colmeasured": "Measured",
+            "effectiveheading": "Effective prices", "effectivedesc": "The merged rate card.",
+            "effectivenone": "No prices are resolvable.", "edit": "Edit", "delete": "Delete",
+            "deleteconfirm": "Delete this row?", "manualwins": "Manual rows are never overwritten.",
+            "formheading": "Add or correct a model", "formdesc": "Saving records you as the author.",
+            "fieldmodelkey": "Model key", "fieldmodelkeyhelp": "Lowercase.",
+            "fieldprovider": "Provider", "fieldcapability": "Capability",
+            "fieldcapabilityhelp": "Free text.", "fieldinput": "Input price",
+            "fieldoutput": "Output price", "fieldoutputhelp": "Include thinking tokens.",
+            "fieldcontext": "Context window", "fieldstatus": "Status", "fieldnotes": "Notes",
+            "fieldnoteshelp": "Where the price came from.", "save": "Save model",
+            "sourcesheading": "Pricing sources", "sourcesdesc": "A source is a row.",
+            "sourcesnone": "No pricing sources are configured.",
+            "colname": "Name", "colurl": "URL", "colformat": "Format", "colenabled": "Enabled",
+            "collastfetch": "Last fetch", "colresult": "Result",
+            "sourceformheading": "Add or edit a pricing source", "fieldname": "Name",
+            "fieldurl": "URL", "fieldurlhelp": "https only.", "fieldformat": "Format",
+            "fieldspec": "Parse spec (JSON)", "fieldspechelp": "inputpath is required.",
+            "fieldenabled": "Enabled", "savesource": "Save source",
+            "enable": "Enable", "disable": "Disable",
+            "driftheading": "Price drift findings", "driftdesc": "What the sources say.",
+            "driftnone": "Nothing to report.", "driftrunnow": "Check for drift now",
+            "drifttolerance": "Reporting differences above 1%.",
+            "drifttruncated": "0 further findings were not stored.",
+            "driftcolfinding": "Finding", "driftcolproposed": "Proposed (in / out)",
+            "driftcolregistry": "Registry (in / out)", "driftcoldelta": "Difference",
+            "driftapply": "Apply this price", "driftnosource": "No source knows this model.",
+            "benchheading": "Benchmarks and recommendations",
+            "benchdesc": "A recommendation compares measurements.",
+            "benchnoresults": "No benchmark has been stored for this model yet.",
+            "benchrecentruns": "Recent runs", "recunmeasured": "Unmeasured",
+            "recunmeasuredintro": "These functions have no comparable benchmark.",
+            "benchrunnow": "Benchmark this model",
+            "queueheading": "Run a benchmark", "queuedesc": "Queues a run on the next cron pass.",
+            "queuefieldmodel": "Registry key", "queuefieldfunction": "Function",
+            "queuefieldsamples": "Prompts", "queuesubmit": "Queue this benchmark",
+            "queuenoeligible": "Add a model to the registry first."
+        },
+        "unpriced": {"has": true, "count": 1, "days": 30, "rows": [{
+            "modelkey": "gemini-2.5-flash", "model": "gemini-2.5-flash", "provider": "gemini",
+            "calls": "18,204", "tokens": "9,100,000", "lastseen": "8/09/26, 11:02",
+            "hasproposal": true,
+            "proposal": {"input": "0.3", "output": "2.5", "inputlabel": "$0.3",
+                "outputlabel": "$2.5", "provider": "google", "capability": "chat",
+                "context": "1048576", "sourcename": "LiteLLM"}
+        }]},
+        "effective": {"has": true, "count": 1, "rows": [{
+            "modelkey": "gemini-2.5-flash", "input": "$0.3", "output": "$2.5",
+            "inputraw": "0.3", "outputraw": "2.5", "layerlabel": "Shipped baseline",
+            "sourcelabel": "", "intable": false, "capability": "", "context": "",
+            "contextraw": "", "provider": "", "statuslabel": "", "notes": "",
+            "setby": "", "updated": ""
+        }]},
+        "modelform": {"modelkey": "", "provider": "", "capability": "", "input_rate": "",
+            "output_rate": "", "context_tokens": "", "notes": "", "editing": false,
+            "statuses": [{"value": "active", "label": "Active", "selected": true}]},
+        "sources": {"has": true, "rows": [{
+            "id": 1, "name": "LiteLLM", "url": "https://example.org/prices.json",
+            "formatlabel": "LiteLLM manifest", "spec": "", "enabled": true,
+            "enabledlabel": "Yes", "lastfetch": "8/09/26, 02:30", "statusok": true,
+            "statuserror": false, "statuslabel": "OK", "lastmessage": "Parsed 812 prices."
+        }]},
+        "sourceform": {"sourceid": 0, "name": "", "url": "", "spec": "", "enabled": false,
+            "editing": false, "formats": [{"value": "litellm", "label": "LiteLLM manifest", "selected": true}]},
+        "drift": {"hasrun": true, "has": true, "lastrun": "Last checked 8/09/26, 02:30.",
+            "statusnote": "", "tolerance": "1", "truncated": 0,
+            "counts": {"missing": 1, "mismatch": 0, "new": 0},
+            "rows": [{"type": "missing", "typelabel": "Unpriced model in traffic",
+                "ismissing": true, "ismismatch": false, "isnew": false,
+                "modelkey": "gemini-2.5-flash", "provider": "google", "capability": "chat",
+                "proposed": "$0.3 / $2.5", "registry": "", "delta": "", "calls": "18,204",
+                "sourcename": "LiteLLM", "hasrates": true, "applyinput": "0.3",
+                "applyoutput": "2.5", "applycontext": "1048576"}]},
+        "bench": {"release": "7.4.0", "floor": 5,
+            "tunables": "Thresholds in force: quality tolerance 0.02.",
+            "hasunmeasured": false, "unmeasured": [],
+            "cards": [{"function": "chat", "label": "Chat tutor", "modelkey": "gemini-2.5-flash",
+                "current": "Currently configured: gemini / gemini-2.5-flash",
+                "inherited": false, "inheritedlabel": "inherited from the site model",
+                "currentmeasured": false,
+                "currentquality": {"has": false, "value": "", "n": "", "belowfloor": false},
+                "currentcost": "", "hascandidates": false, "candidates": [],
+                "recommendation": null,
+                "norecommendation": "Nothing has been benchmarked for this function yet.",
+                "volumenote": "", "sharednote": "", "hasruns": false, "runs": []}]},
+        "queue": {"hasmodels": true, "models": [{"value": "gemini-2.5-flash", "label": "gemini-2.5-flash (google)"}],
+            "functions": [{"value": "chat", "label": "Chat tutor"}], "samples": 10, "maxsamples": 50}
+    }
+}}
+<div class="sola-modelregistry">
+    <div>
+        <a href="{{backurl}}" class="btn btn-sm btn-outline-secondary mb-3">&larr; {{backlabel}}</a>
+    </div>
+
+    <p class="text-muted">{{l.intro}}</p>
+
+    {{! ---------------------------------------------------------------
+        1. Unpriced models. An alert rather than a table section: this is
+        the state in which every affected call reports as costing nothing.
+    --------------------------------------------------------------- }}
+    {{#unpriced.has}}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">{{l.unpricedheading}}</h4>
+            <p class="mb-2">{{l.unpriceddesc}}</p>
+            <p class="mb-2"><strong>{{l.unpricedcount}}</strong></p>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{l.colmodel}}</th>
+                            <th>{{l.colprovider}}</th>
+                            <th class="text-right">{{l.colcalls}}</th>
+                            <th class="text-right">{{l.coltokens}}</th>
+                            <th>{{l.collastseen}}</th>
+                            <th>{{l.colactions}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#unpriced.rows}}
+                            <tr>
+                                <td><code>{{model}}</code></td>
+                                <td>{{provider}}</td>
+                                <td class="text-right">{{calls}}</td>
+                                <td class="text-right">{{tokens}}</td>
+                                <td>{{lastseen}}</td>
+                                <td>
+                                    {{#hasproposal}}
+                                        <form method="post" action="{{posturl}}" class="d-inline">
+                                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                            <input type="hidden" name="action" value="applydrift">
+                                            <input type="hidden" name="modelkey" value="{{modelkey}}">
+                                            <input type="hidden" name="input_rate" value="{{proposal.input}}">
+                                            <input type="hidden" name="output_rate" value="{{proposal.output}}">
+                                            <input type="hidden" name="provider" value="{{proposal.provider}}">
+                                            <input type="hidden" name="capability" value="{{proposal.capability}}">
+                                            <input type="hidden" name="context_tokens" value="{{proposal.context}}">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                {{proposal.inputlabel}} / {{proposal.outputlabel}} &mdash; {{l.driftapply}}
+                                            </button>
+                                        </form>
+                                    {{/hasproposal}}
+                                    <a href="{{pageurl}}?edit={{modelkey}}#sola-modelform"
+                                       class="btn btn-sm btn-outline-primary">{{l.priceit}}</a>
+                                </td>
+                            </tr>
+                        {{/unpriced.rows}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {{/unpriced.has}}
+    {{^unpriced.has}}
+        <div class="alert alert-success" role="alert">{{l.unpricednone}}</div>
+    {{/unpriced.has}}
+
+    {{! ---------------------------------------------------------------
+        2. Add or correct a model.
+    --------------------------------------------------------------- }}
+    <div class="card mb-4" id="sola-modelform">
+        <div class="card-body">
+            <h4>{{l.formheading}}</h4>
+            <p class="text-muted">{{l.formdesc}}</p>
+            <form method="post" action="{{posturl}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="savemodel">
+                <div class="form-group">
+                    <label for="sola-mr-modelkey">{{l.fieldmodelkey}}</label>
+                    <input type="text" class="form-control" id="sola-mr-modelkey" name="modelkey"
+                           value="{{modelform.modelkey}}" maxlength="100" required>
+                    <small class="form-text text-muted">{{l.fieldmodelkeyhelp}}</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-provider">{{l.fieldprovider}}</label>
+                        <input type="text" class="form-control" id="sola-mr-provider" name="provider"
+                               value="{{modelform.provider}}" maxlength="50">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-capability">{{l.fieldcapability}}</label>
+                        <input type="text" class="form-control" id="sola-mr-capability" name="capability"
+                               value="{{modelform.capability}}" maxlength="32">
+                        <small class="form-text text-muted">{{l.fieldcapabilityhelp}}</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-status">{{l.fieldstatus}}</label>
+                        <select class="form-control" id="sola-mr-status" name="status">
+                            {{#modelform.statuses}}
+                                <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                            {{/modelform.statuses}}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-input">{{l.fieldinput}}</label>
+                        <input type="text" class="form-control" id="sola-mr-input" name="input_rate"
+                               value="{{modelform.input_rate}}" inputmode="decimal">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-output">{{l.fieldoutput}}</label>
+                        <input type="text" class="form-control" id="sola-mr-output" name="output_rate"
+                               value="{{modelform.output_rate}}" inputmode="decimal">
+                        <small class="form-text text-muted">{{l.fieldoutputhelp}}</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-context">{{l.fieldcontext}}</label>
+                        <input type="text" class="form-control" id="sola-mr-context" name="context_tokens"
+                               value="{{modelform.context_tokens}}" inputmode="numeric">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sola-mr-notes">{{l.fieldnotes}}</label>
+                    <input type="text" class="form-control" id="sola-mr-notes" name="notes"
+                           value="{{modelform.notes}}" maxlength="1000">
+                    <small class="form-text text-muted">{{l.fieldnoteshelp}}</small>
+                </div>
+                <button type="submit" class="btn btn-primary">{{l.save}}</button>
+            </form>
+        </div>
+    </div>
+
+    {{! ---------------------------------------------------------------
+        3. Effective prices with provenance.
+    --------------------------------------------------------------- }}
+    <h4>{{l.effectiveheading}}</h4>
+    <p class="text-muted">{{{l.effectivedesc}}}</p>
+    <p class="text-muted"><em>{{l.manualwins}}</em></p>
+    {{^effective.has}}
+        <div class="alert alert-warning" role="alert">{{l.effectivenone}}</div>
+    {{/effective.has}}
+    {{#effective.has}}
+        <div class="table-responsive mb-4">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.colprefix}}</th>
+                        <th class="text-right">{{l.colinput}}</th>
+                        <th class="text-right">{{l.coloutput}}</th>
+                        <th>{{l.colprovider}}</th>
+                        <th>{{l.colcapability}}</th>
+                        <th class="text-right">{{l.colcontext}}</th>
+                        <th>{{l.colstatus}}</th>
+                        <th>{{l.collayer}}</th>
+                        <th>{{l.colsource}}</th>
+                        <th>{{l.colsetby}}</th>
+                        <th>{{l.colupdated}}</th>
+                        <th>{{l.colactions}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#effective.rows}}
+                        <tr>
+                            <td><code>{{modelkey}}</code></td>
+                            <td class="text-right">{{input}}</td>
+                            <td class="text-right">{{output}}</td>
+                            <td>{{provider}}</td>
+                            <td>{{capability}}</td>
+                            <td class="text-right">{{context}}</td>
+                            <td>{{statuslabel}}</td>
+                            <td>
+                                {{#intable}}<span class="badge badge-info">{{layerlabel}}</span>{{/intable}}
+                                {{^intable}}<span class="badge badge-secondary">{{layerlabel}}</span>{{/intable}}
+                            </td>
+                            <td>{{sourcelabel}}</td>
+                            <td>{{setby}}</td>
+                            <td>{{updated}}</td>
+                            <td>
+                                <a href="{{pageurl}}?edit={{modelkey}}#sola-modelform"
+                                   class="btn btn-sm btn-outline-primary">{{l.edit}}</a>
+                                {{#intable}}
+                                    <form method="post" action="{{posturl}}" class="d-inline ml-1"
+                                          data-confirm="{{l.deleteconfirm}}">
+                                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                        <input type="hidden" name="action" value="deletemodel">
+                                        <input type="hidden" name="modelkey" value="{{modelkey}}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">{{l.delete}}</button>
+                                    </form>
+                                {{/intable}}
+                            </td>
+                        </tr>
+                        {{#notes}}
+                            <tr class="sola-modelregistry__notes">
+                                <td colspan="12" class="text-muted small">{{.}}</td>
+                            </tr>
+                        {{/notes}}
+                    {{/effective.rows}}
+                </tbody>
+            </table>
+        </div>
+    {{/effective.has}}
+
+    {{! ---------------------------------------------------------------
+        4. Pricing sources.
+    --------------------------------------------------------------- }}
+    <h4>{{l.sourcesheading}}</h4>
+    <p class="text-muted">{{l.sourcesdesc}}</p>
+    {{^sources.has}}
+        <div class="alert alert-warning" role="alert">{{l.sourcesnone}}</div>
+    {{/sources.has}}
+    {{#sources.has}}
+        <div class="table-responsive mb-3">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.colname}}</th>
+                        <th>{{l.colurl}}</th>
+                        <th>{{l.colformat}}</th>
+                        <th>{{l.colenabled}}</th>
+                        <th>{{l.collastfetch}}</th>
+                        <th>{{l.colresult}}</th>
+                        <th>{{l.colactions}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#sources.rows}}
+                        <tr>
+                            <td>{{name}}</td>
+                            <td class="sola-modelregistry__url"><code>{{url}}</code></td>
+                            <td>{{formatlabel}}</td>
+                            <td>
+                                {{#enabled}}<span class="badge badge-success">{{enabledlabel}}</span>{{/enabled}}
+                                {{^enabled}}<span class="badge badge-secondary">{{enabledlabel}}</span>{{/enabled}}
+                            </td>
+                            <td>{{lastfetch}}</td>
+                            <td>
+                                {{#statusok}}<span class="badge badge-success">{{statuslabel}}</span>{{/statusok}}
+                                {{#statuserror}}<span class="badge badge-danger">{{statuslabel}}</span>{{/statuserror}}
+                                {{#lastmessage}}<div class="small text-muted">{{.}}</div>{{/lastmessage}}
+                            </td>
+                            <td>
+                                <a href="{{pageurl}}?editsource={{id}}#sola-sourceform"
+                                   class="btn btn-sm btn-outline-primary">{{l.edit}}</a>
+                                <form method="post" action="{{posturl}}" class="d-inline ml-1">
+                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                    <input type="hidden" name="action" value="togglesource">
+                                    <input type="hidden" name="sourceid" value="{{id}}">
+                                    {{#enabled}}
+                                        <input type="hidden" name="enable" value="0">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">{{l.disable}}</button>
+                                    {{/enabled}}
+                                    {{^enabled}}
+                                        <input type="hidden" name="enable" value="1">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">{{l.enable}}</button>
+                                    {{/enabled}}
+                                </form>
+                                <form method="post" action="{{posturl}}" class="d-inline ml-1"
+                                      data-confirm="{{l.deleteconfirm}}">
+                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                    <input type="hidden" name="action" value="deletesource">
+                                    <input type="hidden" name="sourceid" value="{{id}}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">{{l.delete}}</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {{/sources.rows}}
+                </tbody>
+            </table>
+        </div>
+    {{/sources.has}}
+
+    <div class="card mb-4" id="sola-sourceform">
+        <div class="card-body">
+            <h5>{{l.sourceformheading}}</h5>
+            <form method="post" action="{{posturl}}">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="savesource">
+                <input type="hidden" name="sourceid" value="{{sourceform.sourceid}}">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="sola-mr-sourcename">{{l.fieldname}}</label>
+                        <input type="text" class="form-control" id="sola-mr-sourcename" name="name"
+                               value="{{sourceform.name}}" maxlength="100" required>
+                    </div>
+                    <div class="form-group col-md-5">
+                        <label for="sola-mr-sourceurl">{{l.fieldurl}}</label>
+                        <input type="url" class="form-control" id="sola-mr-sourceurl" name="url"
+                               value="{{sourceform.url}}" required>
+                        <small class="form-text text-muted">{{l.fieldurlhelp}}</small>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="sola-mr-sourceformat">{{l.fieldformat}}</label>
+                        <select class="form-control" id="sola-mr-sourceformat" name="format">
+                            {{#sourceform.formats}}
+                                <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                            {{/sourceform.formats}}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sola-mr-sourcespec">{{l.fieldspec}}</label>
+                    <textarea class="form-control sola-modelregistry__spec" id="sola-mr-sourcespec"
+                              name="spec" rows="3">{{sourceform.spec}}</textarea>
+                    <small class="form-text text-muted">{{{l.fieldspechelp}}}</small>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="sola-mr-sourceenabled"
+                           name="enabled" value="1" {{#sourceform.enabled}}checked{{/sourceform.enabled}}>
+                    <label class="form-check-label" for="sola-mr-sourceenabled">{{l.fieldenabled}}</label>
+                </div>
+                <button type="submit" class="btn btn-primary">{{l.savesource}}</button>
+            </form>
+        </div>
+    </div>
+
+    {{! ---------------------------------------------------------------
+        5. Drift findings. Nothing here has been applied.
+    --------------------------------------------------------------- }}
+    <h4>{{l.driftheading}}</h4>
+    <p class="text-muted">{{l.driftdesc}}</p>
+    <p class="text-muted small">{{drift.lastrun}} {{l.drifttolerance}}</p>
+    {{#drift.statusnote}}
+        <div class="alert alert-warning" role="alert">{{.}}</div>
+    {{/drift.statusnote}}
+    <form method="post" action="{{posturl}}" class="mb-3">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="driftnow">
+        <button type="submit" class="btn btn-secondary">{{l.driftrunnow}}</button>
+    </form>
+    {{^drift.has}}
+        {{#drift.hasrun}}<p class="text-muted">{{l.driftnone}}</p>{{/drift.hasrun}}
+    {{/drift.has}}
+    {{#drift.has}}
+        <div class="table-responsive mb-4">
+            <table class="table table-sm generaltable">
+                <thead>
+                    <tr>
+                        <th>{{l.driftcolfinding}}</th>
+                        <th>{{l.colmodel}}</th>
+                        <th>{{l.driftcolproposed}}</th>
+                        <th>{{l.driftcolregistry}}</th>
+                        <th>{{l.driftcoldelta}}</th>
+                        <th class="text-right">{{l.colcalls}}</th>
+                        <th>{{l.colsource}}</th>
+                        <th>{{l.colactions}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#drift.rows}}
+                        <tr>
+                            <td>
+                                {{#ismissing}}<span class="badge badge-danger">{{typelabel}}</span>{{/ismissing}}
+                                {{#ismismatch}}<span class="badge badge-warning">{{typelabel}}</span>{{/ismismatch}}
+                                {{#isnew}}<span class="badge badge-secondary">{{typelabel}}</span>{{/isnew}}
+                            </td>
+                            <td><code>{{modelkey}}</code></td>
+                            <td>{{proposed}}</td>
+                            <td>{{registry}}</td>
+                            <td>{{delta}}</td>
+                            <td class="text-right">{{calls}}</td>
+                            <td>{{sourcename}}</td>
+                            <td>
+                                {{#hasrates}}
+                                    <form method="post" action="{{posturl}}" class="d-inline">
+                                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                        <input type="hidden" name="action" value="applydrift">
+                                        <input type="hidden" name="modelkey" value="{{modelkey}}">
+                                        <input type="hidden" name="input_rate" value="{{applyinput}}">
+                                        <input type="hidden" name="output_rate" value="{{applyoutput}}">
+                                        <input type="hidden" name="provider" value="{{provider}}">
+                                        <input type="hidden" name="capability" value="{{capability}}">
+                                        <input type="hidden" name="context_tokens" value="{{applycontext}}">
+                                        <button type="submit" class="btn btn-sm btn-primary">{{l.driftapply}}</button>
+                                    </form>
+                                {{/hasrates}}
+                                {{^hasrates}}
+                                    <span class="text-muted small">{{l.driftnosource}}</span>
+                                    <a href="{{pageurl}}?edit={{modelkey}}#sola-modelform"
+                                       class="btn btn-sm btn-outline-primary">{{l.priceit}}</a>
+                                {{/hasrates}}
+                            </td>
+                        </tr>
+                    {{/drift.rows}}
+                </tbody>
+            </table>
+        </div>
+        {{#drift.truncated}}
+            <p class="text-muted small">{{l.drifttruncated}}</p>
+        {{/drift.truncated}}
+    {{/drift.has}}
+
+    {{! ---------------------------------------------------------------
+        6. Benchmarks and recommendations, per SOLA function. A refusal is
+        rendered as a refusal; no neutral score is ever substituted.
+    --------------------------------------------------------------- }}
+    <h4>{{l.benchheading}}</h4>
+    <p class="text-muted">{{l.benchdesc}}</p>
+    <p class="text-muted small">{{bench.tunables}}</p>
+
+    {{#bench.cards}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="mb-1">{{label}}</h5>
+                <p class="mb-1">
+                    {{current}}
+                    {{#inherited}}<span class="badge badge-secondary ml-1">{{inheritedlabel}}</span>{{/inherited}}
+                </p>
+                {{#currentquality.has}}
+                    <p class="mb-1 small">
+                        {{l.colquality}}: {{currentquality.value}} {{currentquality.n}}
+                        {{#currentcost}} &middot; {{l.colcost}}: {{.}}{{/currentcost}}
+                    </p>
+                {{/currentquality.has}}
+
+                {{#norecommendation}}
+                    <div class="alert alert-secondary mb-2" role="alert">{{.}}</div>
+                {{/norecommendation}}
+
+                {{#recommendation}}
+                    <div class="alert alert-success mb-2" role="alert">
+                        <strong>{{verdictlabel}}:</strong> <code>{{model}}</code>
+                        {{#provider}}({{.}}){{/provider}}
+                        &mdash; {{l.colquality}} {{quality.value}} {{quality.n}},
+                        {{l.colcost}} {{cost}} ({{costdelta}})
+                        {{#monthly}}<div class="mt-1">{{.}}</div>{{/monthly}}
+                        {{#group}}<div class="small">{{.}}</div>{{/group}}
+                    </div>
+                {{/recommendation}}
+
+                {{#volumenote}}<p class="text-muted small mb-1">{{.}}</p>{{/volumenote}}
+                {{#sharednote}}<p class="text-muted small mb-1">{{.}}</p>{{/sharednote}}
+
+                {{#hascandidates}}
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-2">
+                            <thead>
+                                <tr>
+                                    <th>{{l.colmodel}}</th>
+                                    <th>{{l.colquality}}</th>
+                                    <th>{{l.colcost}}</th>
+                                    <th>{{l.colttft}}</th>
+                                    <th>{{l.colverdict}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#candidates}}
+                                    <tr>
+                                        <td><code>{{model}}</code> {{#provider}}<span class="text-muted small">{{.}}</span>{{/provider}}</td>
+                                        <td>
+                                            {{#quality.has}}{{quality.value}}
+                                                <span class="text-muted small">{{quality.n}}</span>{{/quality.has}}
+                                        </td>
+                                        <td>{{cost}} {{#costdelta}}<span class="text-muted small">({{.}})</span>{{/costdelta}}</td>
+                                        <td>{{ttft}}</td>
+                                        <td>
+                                            {{#recommendable}}<span class="badge badge-success">{{verdictlabel}}</span>{{/recommendable}}
+                                            {{^recommendable}}<span class="badge badge-secondary">{{verdictlabel}}</span>{{/recommendable}}
+                                            {{#refusal}}<div class="small text-muted">{{.}}</div>{{/refusal}}
+                                            {{#group}}<div class="small text-muted">{{.}}</div>{{/group}}
+                                        </td>
+                                    </tr>
+                                {{/candidates}}
+                            </tbody>
+                        </table>
+                    </div>
+                {{/hascandidates}}
+
+                {{#hasruns}}
+                    <h6 class="mt-3">{{l.benchrecentruns}}</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{l.colmodel}}</th>
+                                    <th>{{l.colquality}}</th>
+                                    <th>{{l.colcost}}</th>
+                                    <th>{{l.colttft}}</th>
+                                    <th>{{l.colstatus}}</th>
+                                    <th>{{l.colmeasured}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#runs}}
+                                    <tr>
+                                        {{! The identity column is never truncated: an eight-character
+                                            truncation is what made a per-course readout unusable. }}
+                                        <td>
+                                            <code>{{model}}</code>
+                                            {{#provider}}<span class="text-muted small">{{.}}</span>{{/provider}}
+                                            {{#fixtureset}}<div class="small text-muted">{{.}}</div>{{/fixtureset}}
+                                            {{#grade}}<div class="small text-muted">{{.}}</div>{{/grade}}
+                                        </td>
+                                        <td>
+                                            {{#quality.has}}{{quality.value}}
+                                                <span class="text-muted small">{{quality.n}}</span>{{/quality.has}}
+                                            {{#belowfloor}}<div class="small text-warning">{{floorlabel}}</div>{{/belowfloor}}
+                                        </td>
+                                        <td>{{cost}}</td>
+                                        <td>{{ttft}}</td>
+                                        <td>
+                                            {{statuslabel}}
+                                            {{#message}}<div class="small text-muted">{{.}}</div>{{/message}}
+                                        </td>
+                                        <td>
+                                            {{measured}}
+                                            {{#release}}<div class="small text-muted">{{.}}</div>{{/release}}
+                                        </td>
+                                    </tr>
+                                {{/runs}}
+                            </tbody>
+                        </table>
+                    </div>
+                {{/hasruns}}
+                {{^hasruns}}
+                    <p class="text-muted small mb-0">{{l.benchnoresults}}</p>
+                {{/hasruns}}
+
+                {{#modelkey}}
+                    <form method="post" action="{{posturl}}" class="mt-2">
+                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                        <input type="hidden" name="action" value="queuebench">
+                        <input type="hidden" name="registrykey" value="{{modelkey}}">
+                        <input type="hidden" name="solafunction" value="{{function}}">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">{{l.benchrunnow}}</button>
+                    </form>
+                {{/modelkey}}
+            </div>
+        </div>
+    {{/bench.cards}}
+
+    {{#bench.hasunmeasured}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>{{l.recunmeasured}}</h5>
+                <p class="text-muted">{{l.recunmeasuredintro}}</p>
+                <ul class="mb-0">
+                    {{#bench.unmeasured}}
+                        <li>
+                            <strong>{{label}}</strong> &mdash; <code>{{model}}</code>
+                            {{#provider}}({{.}}){{/provider}}
+                            {{#reason}}<span class="text-muted">{{.}}</span>{{/reason}}
+                        </li>
+                    {{/bench.unmeasured}}
+                </ul>
+            </div>
+        </div>
+    {{/bench.hasunmeasured}}
+
+    {{! ---------------------------------------------------------------
+        7. Queue a benchmark for any registry key.
+    --------------------------------------------------------------- }}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>{{l.queueheading}}</h4>
+            <p class="text-muted">{{l.queuedesc}}</p>
+            {{^queue.hasmodels}}
+                <p class="text-muted mb-0">{{l.queuenoeligible}}</p>
+            {{/queue.hasmodels}}
+            {{#queue.hasmodels}}
+                <form method="post" action="{{posturl}}">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <input type="hidden" name="action" value="queuebench">
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label for="sola-mr-queuekey">{{l.queuefieldmodel}}</label>
+                            <select class="form-control" id="sola-mr-queuekey" name="registrykey">
+                                {{#queue.models}}
+                                    <option value="{{value}}">{{label}}</option>
+                                {{/queue.models}}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="sola-mr-queuefunction">{{l.queuefieldfunction}}</label>
+                            <select class="form-control" id="sola-mr-queuefunction" name="solafunction">
+                                {{#queue.functions}}
+                                    <option value="{{value}}">{{label}}</option>
+                                {{/queue.functions}}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="sola-mr-queuesamples">{{l.queuefieldsamples}}</label>
+                            <input type="number" class="form-control" id="sola-mr-queuesamples" name="samples"
+                                   value="{{queue.samples}}" min="1" max="{{queue.maxsamples}}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{l.queuesubmit}}</button>
+                </form>
+            {{/queue.hasmodels}}
+        </div>
+    </div>
+</div>
+{{#js}}
+// Destructive forms carry their prompt in data-confirm, which keeps the handler
+// out of an inline onclick attribute. window.confirm() is unavailable (Moodle's
+// ESLint forbids no-alert), so this uses the core save/cancel modal -- also the
+// accessible, themeable option. Same handler as rag_admin.
+require(['core/notification', 'core/str'], function(Notification, Str) {
+    var forms = document.querySelectorAll('.sola-modelregistry form[data-confirm]');
+    Array.prototype.forEach.call(forms, function(form) {
+        var confirmed = false;
+        form.addEventListener('submit', function(e) {
+            if (confirmed) {
+                return;
+            }
+            e.preventDefault();
+            Str.get_strings([
+                {key: 'confirm', component: 'moodle'},
+                {key: 'yes', component: 'moodle'}
+            ]).then(function(labels) {
+                return Notification.saveCancelPromise(
+                    labels[0],
+                    form.dataset.confirm,
+                    labels[1]
+                );
+            }).then(function() {
+                confirmed = true;
+                form.submit();
+                return null;
+            }).catch(function() {
+                // Cancelled, or the modal failed to load: leave the form unsubmitted.
+                return null;
+            });
+        });
+    });
+});
+{{/js}}

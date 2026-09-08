@@ -74,6 +74,12 @@ $openaiapikey = '';
 $voyageapikey = '';
 $abbatch = 96; // Chunk re-embed slice size; bounds per-call token usage for both providers.
 
+// Fixture-set grading (2026-09-08). The 40-row bus101_pol101 set is regression
+// smoke only: every vendor or configuration decision is made on the 816-row
+// production-shaped set. A small set does not run at all without this flag, and
+// when it does every table it prints is stamped SMOKE.
+$allowsmallset = false;
+
 $judgemode     = false;
 $questionspath = '';
 $samplesize    = 100;
@@ -104,6 +110,8 @@ foreach ($argv as $arg) {
         $voyageapikey = trim($m[1]);
     } else if (preg_match('/^--voyage-dim=(\d+)$/', $arg, $m)) {
         $voyagedim = (int) $m[1];
+    } else if ($arg === '--allow-small-set') {
+        $allowsmallset = true;
     } else if ($arg === '--judge') {
         $judgemode = true;
     } else if (preg_match('/^--questions=(.+)$/', $arg, $m)) {
@@ -124,6 +132,16 @@ Options:
   --out=PATH            Output JSON path (default: runs/YYYY-MM-DD-rag-bench.json)
   --rerank-delay-ms=N   Sleep N ms before each rerank call (default 0). Use ~21000
                         on a free-tier Voyage key (~3 requests/minute).
+  --allow-small-set     Permit a run on a fixture set below the decision-grade
+                        floor (see FIXTURE SETS below). Required for the 40-row
+                        bus101_pol101 smoke set; every table is stamped SMOKE.
+
+FIXTURE SETS
+  A set is DECISION-GRADE only at or above the fixture floor printed in every
+  run header. The 40-row bus101_pol101 set is regression smoke ONLY -- it is
+  refused without --allow-small-set, and stamped SMOKE when allowed. Make
+  vendor and configuration decisions on the 816-row production-shaped set
+  (tests/golden/rag_fixtures_prodshape_anchored_*.json).
 
 Embedding A/B mode (repeatable --embed-provider switches on a head-to-head
 embedding-only recall comparison; the rerank arm is skipped in this mode):
@@ -192,7 +210,25 @@ if (!is_array($fixturedoc) || empty($fixturedoc['fixtures'])) {
     exit(1);
 }
 $fixtures = $fixturedoc['fixtures'];
-echo "Loaded " . count($fixtures) . " fixtures from " . basename($fixturespath) . "\n";
+
+// ---------- Fixture-set grade (printed in EVERY run header) ----------
+// No readout should ever be ambiguous about what it was measured on, and the
+// 40-row set must not be usable as a decision instrument: it is regression
+// smoke only. The grade is computed once here, stamped on every table this
+// script prints, and recorded in the JSON output.
+$setgrade = local_ai_course_assistant_ragbench_set_grade(
+    $fixturespath,
+    count($fixtures),
+    $allowsmallset
+);
+echo local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
+if ($setgrade['blocked']) {
+    fwrite(STDERR, "\nERROR: {$setgrade['reason']}\n"
+        . "       Re-run against the production-shaped set, or pass --allow-small-set\n"
+        . "       to run it as regression smoke (results will be labelled SMOKE and\n"
+        . "       must not be used for a vendor or configuration decision).\n");
+    exit(2);
+}
 
 // ---------- Fixture anchor integrity preflight ----------
 // Recall scoring matches on expected_chunk_id, and falls back to a text match
@@ -235,12 +271,7 @@ if ($fxids) {
         if ($anchor === '') {
             continue;
         }
-        $prefix  = substr($anchor, 0, ANCHOR_MATCH_BYTES);
         $content = (string) $fxchunks[$cid]->content;
-        if (!str_contains($content, $prefix)) {
-            $anchorbroken[] = $label;
-            continue;
-        }
         $course = (int) $fxchunks[$cid]->courseid;
         if (!isset($courseblob[$course])) {
             $courseblob[$course] = implode("\x00", $DB->get_fieldset_select(
@@ -250,7 +281,15 @@ if ($fxids) {
                 ['cid' => $course]
             ));
         }
-        if (substr_count($courseblob[$course], $prefix) !== 1) {
+        $status = local_ai_course_assistant_ragbench_anchor_status(
+            $anchor,
+            $content,
+            $courseblob[$course],
+            ANCHOR_MATCH_BYTES
+        );
+        if ($status === 'notverbatim') {
+            $anchorbroken[] = $label;
+        } else if ($status === 'ambiguous') {
             $anchorambiguous[] = $label;
         }
     }
@@ -371,6 +410,7 @@ if ($judgemode) {
 
     echo "\n" . str_repeat('=', 64) . "\n";
     echo "FAMILY A (pipeline config, via live retriever)\n";
+    echo local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
     echo str_repeat('=', 64) . "\n";
     $hdr = ['Arm', 'nDCG', 'P@k', 'hit@k', 'mean'];
     echo implode(' | ', array_map(fn($h) => str_pad($h, 13), $hdr)) . "\n";
@@ -518,6 +558,7 @@ if ($judgemode) {
 
     echo "\n" . str_repeat('=', 64) . "\n";
     echo "FAMILY B (embedding provider, in-memory re-embed, bare cosine)\n";
+    echo local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
     echo str_repeat('=', 64) . "\n";
     foreach ($resultsb as $r) {
         printf(
@@ -720,6 +761,7 @@ if ($judgemode) {
 
     echo "\n" . str_repeat('=', 64) . "\n";
     echo "FAMILY C (full-stack: embeddings + Voyage rerank + parent-doc, in-memory)\n";
+    echo local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
     echo str_repeat('=', 64) . "\n";
     foreach ($resultsc as $r) {
         printf(
@@ -926,6 +968,7 @@ if (!empty($abproviders)) {
             $perfix[] = [
                 'fixture_id' => $fx['id'],
                 'course'     => $fx['course'],
+                'courseid'   => $cid,
                 'difficulty' => $fx['difficulty'] ?? '',
                 'rank'       => $rank,
                 'substring_match' => $submatch,
@@ -962,6 +1005,7 @@ if (!empty($abproviders)) {
     // ---------- A/B comparison table ----------
     echo str_repeat('=', 64) . "\n";
     echo "EMBEDDING A/B RESULTS (embedding-only recall, " . count($fixtures) . " fixtures)\n";
+    echo local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
     echo str_repeat('=', 64) . "\n\n";
     $hdr = ['Arm', 'Model', 'N', 'R@1', 'R@3', 'R@5', 'MRR', 'P50q'];
     $widths = [26, 22, 4, 7, 7, 7, 7, 7];
@@ -988,7 +1032,8 @@ if (!empty($abproviders)) {
     // Deltas vs the first arm (treated as the baseline).
     if (count($absummaries) > 1) {
         $base = $absummaries[0];
-        echo "Deltas vs baseline (" . $base['arm'] . "):\n";
+        echo "Deltas vs baseline (" . $base['arm'] . "):"
+            . ($setgrade['decision_grade'] ? '' : '   [SMOKE -- NOT decision-grade]') . "\n";
         foreach (array_slice($absummaries, 1) as $s) {
             printf(
                 "  %-26s  R@1 %+.1fpp  R@3 %+.1fpp  R@5 %+.1fpp  MRR %+.3f\n",
@@ -1007,6 +1052,9 @@ if (!empty($abproviders)) {
         'run_at'       => date('c'),
         'mode'         => 'embedding_ab',
         'fixture_file' => basename($fixturespath),
+        'fixture_count' => count($fixtures),
+        'fixture_set_grade' => $setgrade['grade'],
+        'decision_grade' => $setgrade['decision_grade'],
         'arms'         => $absummaries,
         'per_fixture'  => $abperfixture,
     ];
@@ -1255,6 +1303,7 @@ foreach ($fixtures as $fixture) {
         $results[] = [
             'fixture_id'     => $fid,
             'course'         => $course,
+            'courseid'       => $cid,
             'difficulty'     => $diff,
             'error'          => 'embed_empty',
         ];
@@ -1312,6 +1361,9 @@ foreach ($fixtures as $fixture) {
     $row = [
         'fixture_id'          => $fid,
         'course'              => $course,
+        // The course id, not just the label, so the per-course summary can group
+        // on something guaranteed unique (see group_results()).
+        'courseid'            => $cid,
         'difficulty'          => $diff,
         'question'            => $q,
         'expected_chunk_id'   => $expid,
@@ -1541,14 +1593,17 @@ function local_ai_course_assistant_ragbench_pct(array $values, int $p): ?int {
 }
 
 // Slice results by course and overall.
-$groups = ['overall' => $results];
-foreach ($results as $r) {
-    $groups[$r['course']][] = $r;
-}
+// Grouped on the course ID and labelled separately: two fixture sets in the
+// tree label courses by shortname, and two distinct courses can share one
+// shortname, which silently merged their rows when the label was the group key.
+// group_results() keys on the id and disambiguates any duplicate label.
+$groups = local_ai_course_assistant_ragbench_group_results($results);
 
 $summary = [];
 
-foreach ($groups as $label => $group) {
+foreach ($groups as $entryinfo) {
+    $label = $entryinfo['label'];
+    $group = $entryinfo['rows'];
     $cosineranks = array_map(fn($r) => $r['cosine_rank'] ?? null, $group);
     $rerankranks = array_map(fn($r) => $r['rerank_rank'] ?? null, $group);
     $hasrerank   = $rerankavailable && count(array_filter($rerankranks, fn($x) => $x !== null)) > 0;
@@ -1612,52 +1667,17 @@ foreach ($groups as $label => $group) {
 // ---------- Print summary table ----------
 
 echo "\n=== RESULTS SUMMARY ===\n\n";
+echo local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
 echo "Embedding model: " . $provider->get_model() . "\n";
 echo "Rerank arm: " . ($rerankavailable ? "ACTIVE (rerank-2.5)" : "SKIPPED (no key)") . "\n";
 echo "Candidates (N): {$candidates}  Top-K: {$topk}\n\n";
 
-$cols = ['Group', 'N', 'Cos@1', 'Cos@3', 'Cos@5', 'Cos MRR', 'Rnk@1', 'Rnk@3', 'Rnk@5', 'Rnk MRR', 'Delta@3', 'P50emb', 'P50rnk', 'Cost/q'];
-// Group labels are course names ("course115"), which run past the 8-character
-// data columns. Truncating them made distinct courses print under the same
-// label -- course115/116/117 all read as "course11" -- so size this one column
-// to its contents and leave the rest fixed.
-$groupw = 8;
-foreach ($summary as $s) {
-    $groupw = max($groupw, strlen((string) $s['group']));
+foreach (local_ai_course_assistant_ragbench_summary_table($summary) as $line) {
+    echo $line . "\n";
 }
-$widths = array_fill(0, count($cols), 8);
-$widths[0] = $groupw;
-echo implode(' | ', array_map(fn($c, $w) => str_pad($c, $w), $cols, $widths)) . "\n";
-echo str_repeat('-', array_sum($widths) + 3 * (count($cols) - 1)) . "\n";
-
-foreach ($summary as $s) {
-    $pct3 = function ($v) {
-        return $v !== null ? sprintf('%.1f%%', $v * 100) : 'n/a';
-    };
-    $ms   = function ($v) {
-        return $v !== null ? $v . 'ms' : 'n/a';
-    };
-    $usd  = function ($v) {
-        return $v !== null ? sprintf('$%.5f', $v) : 'n/a';
-    };
-
-    $row = [
-        str_pad((string) $s['group'], $groupw),
-        str_pad($s['n'], 8),
-        str_pad($pct3($s['cosine_recall_at_1']), 8),
-        str_pad($pct3($s['cosine_recall_at_3']), 8),
-        str_pad($pct3($s['cosine_recall_at_5']), 8),
-        str_pad(sprintf('%.3f', $s['cosine_mrr']), 8),
-        str_pad($pct3($s['rerank_recall_at_1']), 8),
-        str_pad($pct3($s['rerank_recall_at_3']), 8),
-        str_pad($pct3($s['rerank_recall_at_5']), 8),
-        str_pad($s['rerank_mrr'] !== null ? sprintf('%.3f', $s['rerank_mrr']) : 'n/a', 8),
-        str_pad($s['delta_recall_at_3'] !== null ? sprintf('%+.1f%%', $s['delta_recall_at_3'] * 100) : 'n/a', 8),
-        str_pad($ms($s['cosine_p50_embed_ms']), 8),
-        str_pad($ms($s['rerank_p50_ms']), 8),
-        str_pad($usd($s['rerank_cost_per_query_usd']), 8),
-    ];
-    echo implode(' | ', $row) . "\n";
+if (!$setgrade['decision_grade']) {
+    echo "\n" . local_ai_course_assistant_ragbench_grade_stamp($setgrade) . "\n";
+    echo "The comparative figures above (Delta@3, rerank-vs-cosine) are SMOKE ONLY.\n";
 }
 
 echo "\n";
@@ -1667,6 +1687,9 @@ echo "\n";
 $output = [
     'run_at'           => date('c'),
     'fixture_file'     => basename($fixturespath),
+    'fixture_count'    => count($fixtures),
+    'fixture_set_grade' => $setgrade['grade'],
+    'decision_grade'   => $setgrade['decision_grade'],
     'embed_model'      => $provider->get_model(),
     'rerank_available' => $rerankavailable,
     'candidates_n'     => $candidates,
@@ -1677,3 +1700,225 @@ $output = [
 
 file_put_contents($outfile, json_encode($output, JSON_PRETTY_PRINT));
 echo "Results written to: {$outfile}\n";
+
+// ============================================================================
+// Pure helpers. tests/rag_harness_test.php extracts the region delimited by the
+// two marker comments below and evaluates it on its own, so this region must
+// hold function declarations ONLY: no globals, no DB, no I/O, no constants and
+// no executable statements. That is what lets the three
+// defects fixed here (group-label collision, anchor ambiguity at the harness's
+// truncation length, and the 40-row set being read as decision-grade) be
+// pinned by unit tests without the harness making a single paid API call.
+// ============================================================================
+// RAGBENCH-PURE-BEGIN
+
+/**
+ * Grade a fixture set: is it big enough to decide anything on?
+ *
+ * The 40-row bus101_pol101 set is regression smoke only. It is refused unless
+ * $allowsmall, and even then every table the run prints is stamped SMOKE, so a
+ * readout can never be mistaken for a decision instrument. The floor is stated
+ * in the returned array rather than hidden in a comment.
+ *
+ * @param string $fixturepath Path (or basename) of the fixture file.
+ * @param int    $n           Number of fixtures loaded.
+ * @param bool   $allowsmall  True when --allow-small-set was passed.
+ * @return array{name:string,n:int,min_n:int,decision_grade:bool,grade:string,blocked:bool,reason:string}
+ */
+function local_ai_course_assistant_ragbench_set_grade(
+    string $fixturepath,
+    int $n,
+    bool $allowsmall
+): array {
+    // 200 sits well above the 40-row smoke set and well below the 816-row
+    // production-shaped set, so neither is a borderline call.
+    $minn = 200;
+    $name = basename($fixturepath);
+
+    // Named demotion as well as a count test: the 40-row set stays smoke even
+    // if someone pads it out, because its two courses cannot represent the
+    // 13-course production shape however many questions are asked of them.
+    $smokebyname = (bool) preg_match('/bus101_pol101/i', $name);
+
+    $reason = '';
+    if ($smokebyname) {
+        $reason = "fixture set '{$name}' is the two-course regression smoke set "
+            . "({$n} fixtures); it is not a decision instrument at any size";
+    } else if ($n < $minn) {
+        $reason = "fixture set '{$name}' has {$n} fixtures, below the "
+            . "decision-grade floor of {$minn}";
+    }
+    $decision = ($reason === '');
+
+    return [
+        'name'           => $name,
+        'n'              => $n,
+        'min_n'          => $minn,
+        'decision_grade' => $decision,
+        'grade'          => $decision ? 'DECISION-GRADE' : 'SMOKE',
+        'blocked'        => !$decision && !$allowsmall,
+        'reason'         => $reason,
+    ];
+}
+
+/**
+ * One-line stamp naming the set, its size and its grade. Printed in every run
+ * header and above every results table, so no readout is ambiguous about what
+ * it was measured on.
+ *
+ * @param array $grade Output of local_ai_course_assistant_ragbench_set_grade().
+ * @return string
+ */
+function local_ai_course_assistant_ragbench_grade_stamp(array $grade): string {
+    $head = sprintf('FIXTURE SET: %s  n=%d  ', $grade['name'], $grade['n']);
+    if (!empty($grade['decision_grade'])) {
+        return $head . sprintf('DECISION-GRADE (floor %d fixtures)', $grade['min_n']);
+    }
+    return $head . 'SMOKE -- REGRESSION SMOKE ONLY, NOT decision-grade. '
+        . 'Make vendor and configuration decisions on the 816-row '
+        . 'production-shaped set (rag_fixtures_prodshape_anchored_*.json).';
+}
+
+/**
+ * Slice per-fixture result rows into the overall group plus one group per
+ * course, with a UNIQUE label for each.
+ *
+ * Grouping keys on `courseid`, never on the human label: the label is a name
+ * ("BUS101", "course115") and two distinct courses can carry the same name, in
+ * which case keying on it merged their rows into one and reported the merge as
+ * a single course. Where two ids do share a label, the label is disambiguated
+ * with the id rather than allowed to repeat -- a repeated label is exactly what
+ * made the 13-course readout unusable.
+ *
+ * @param array $results Per-fixture rows, each with 'course' and (ideally) 'courseid'.
+ * @return array<int, array{key:string,label:string,rows:array}> Ordered; 'overall' first.
+ */
+function local_ai_course_assistant_ragbench_group_results(array $results): array {
+    $bykey = [];
+    foreach ($results as $r) {
+        $name = (string) ($r['course'] ?? '');
+        $cid = isset($r['courseid']) ? (int) $r['courseid'] : 0;
+        // Fall back to the name only when there is no id to group on; prefix it
+        // so a numeric-looking name can never collide with a real course id.
+        $key = $cid > 0 ? ('id:' . $cid) : ('name:' . $name);
+        if (!isset($bykey[$key])) {
+            $bykey[$key] = ['key' => $key, 'name' => $name, 'courseid' => $cid, 'rows' => []];
+        }
+        $bykey[$key]['rows'][] = $r;
+    }
+
+    // Which names are shared by more than one group?
+    $namecount = [];
+    foreach ($bykey as $g) {
+        $namecount[$g['name']] = ($namecount[$g['name']] ?? 0) + 1;
+    }
+
+    $groups = [['key' => 'overall', 'label' => 'overall', 'rows' => $results]];
+    foreach ($bykey as $g) {
+        $label = $g['name'] !== '' ? $g['name'] : ('course' . $g['courseid']);
+        if ($g['name'] !== '' && ($namecount[$g['name']] ?? 0) > 1) {
+            $label .= '#' . ($g['courseid'] > 0 ? $g['courseid'] : '?');
+        }
+        $groups[] = ['key' => $g['key'], 'label' => $label, 'rows' => $g['rows']];
+    }
+    return $groups;
+}
+
+/**
+ * Render the results summary table as lines.
+ *
+ * The group column is sized to its widest label. It used to be padded AND
+ * truncated to the 8 characters the numeric columns use, which printed
+ * course115/116/117 as three rows all labelled "course11" and
+ * course130/131/132 as three labelled "course13": six distinct courses reading
+ * as two duplicated ones. The grouping was correct and the JSON always carried
+ * the full label; only this table lied, which is enough to make a readout
+ * unusable. Never truncate an identity column.
+ *
+ * @param array $summary Rows from the summary build, each with a 'group' label.
+ * @return string[] Lines, header first.
+ */
+function local_ai_course_assistant_ragbench_summary_table(array $summary): array {
+    $cols = ['Group', 'N', 'Cos@1', 'Cos@3', 'Cos@5', 'Cos MRR', 'Rnk@1', 'Rnk@3',
+        'Rnk@5', 'Rnk MRR', 'Delta@3', 'P50emb', 'P50rnk', 'Cost/q'];
+    $groupw = strlen($cols[0]);
+    foreach ($summary as $s) {
+        $groupw = max($groupw, strlen((string) ($s['group'] ?? '')));
+    }
+    $widths = array_fill(0, count($cols), 8);
+    $widths[0] = $groupw;
+
+    $pct = function ($v) {
+        return $v !== null ? sprintf('%.1f%%', $v * 100) : 'n/a';
+    };
+    $ms = function ($v) {
+        return $v !== null ? $v . 'ms' : 'n/a';
+    };
+    $usd = function ($v) {
+        return $v !== null ? sprintf('$%.5f', $v) : 'n/a';
+    };
+
+    $lines = [];
+    $lines[] = implode(' | ', array_map(fn($c, $w) => str_pad($c, $w), $cols, $widths));
+    $lines[] = str_repeat('-', array_sum($widths) + 3 * (count($cols) - 1));
+    foreach ($summary as $s) {
+        $lines[] = implode(' | ', [
+            str_pad((string) ($s['group'] ?? ''), $widths[0]),
+            str_pad((string) ($s['n'] ?? 0), $widths[1]),
+            str_pad($pct($s['cosine_recall_at_1'] ?? null), $widths[2]),
+            str_pad($pct($s['cosine_recall_at_3'] ?? null), $widths[3]),
+            str_pad($pct($s['cosine_recall_at_5'] ?? null), $widths[4]),
+            str_pad(isset($s['cosine_mrr']) ? sprintf('%.3f', $s['cosine_mrr']) : 'n/a', $widths[5]),
+            str_pad($pct($s['rerank_recall_at_1'] ?? null), $widths[6]),
+            str_pad($pct($s['rerank_recall_at_3'] ?? null), $widths[7]),
+            str_pad($pct($s['rerank_recall_at_5'] ?? null), $widths[8]),
+            str_pad(isset($s['rerank_mrr']) && $s['rerank_mrr'] !== null
+                ? sprintf('%.3f', $s['rerank_mrr']) : 'n/a', $widths[9]),
+            str_pad(isset($s['delta_recall_at_3']) && $s['delta_recall_at_3'] !== null
+                ? sprintf('%+.1f%%', $s['delta_recall_at_3'] * 100) : 'n/a', $widths[10]),
+            str_pad($ms($s['cosine_p50_embed_ms'] ?? null), $widths[11]),
+            str_pad($ms($s['rerank_p50_ms'] ?? null), $widths[12]),
+            str_pad($usd($s['rerank_cost_per_query_usd'] ?? null), $widths[13]),
+        ]);
+    }
+    return $lines;
+}
+
+/**
+ * Classify a fixture's text anchor against the chunk it points at.
+ *
+ * Recall scoring matches on expected_chunk_id and falls back to a text match,
+ * truncating the anchor to $bytes first, so the anchor has to be sound AT THAT
+ * LENGTH: a longer anchor whose first $bytes also occur in an overlapping
+ * neighbour credits a hit against whichever chunk ranks first. Both faults are
+ * silent, and only bite once the ids have gone stale -- exactly when the anchor
+ * is all that is left.
+ *
+ * @param string $anchor       expected_substring from the fixture.
+ * @param string $chunkcontent Raw content of the expected chunk.
+ * @param string $courseblob   Raw content of every chunk in the course, NUL-joined.
+ * @param int    $bytes        Truncation length the harness matches on.
+ * @return string '' when sound, else 'missing' | 'notverbatim' | 'ambiguous'.
+ */
+function local_ai_course_assistant_ragbench_anchor_status(
+    string $anchor,
+    string $chunkcontent,
+    string $courseblob,
+    int $bytes
+): string {
+    if ($anchor === '') {
+        return 'missing';
+    }
+    // An anchor shorter than the truncation length is tested at its own length,
+    // which is a STRICTER uniqueness test, so it needs no special case.
+    $prefix = substr($anchor, 0, $bytes);
+    if (!str_contains($chunkcontent, $prefix)) {
+        return 'notverbatim';
+    }
+    if (substr_count($courseblob, $prefix) !== 1) {
+        return 'ambiguous';
+    }
+    return '';
+}
+
+// RAGBENCH-PURE-END

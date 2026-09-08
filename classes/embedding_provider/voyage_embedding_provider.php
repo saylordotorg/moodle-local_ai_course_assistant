@@ -17,18 +17,52 @@
 namespace local_ai_course_assistant\embedding_provider;
 
 /**
- * Voyage AI embedding provider (voyage-3.5, voyage-3.5-lite, voyage-3.1-large).
+ * Voyage AI embedding provider (voyage-4-large, voyage-4, voyage-4-lite,
+ * voyage-context-4, voyage-3.5, voyage-3.5-lite; see MODEL_PROFILES).
  *
  * v5.11.0: introduced as the recommended primary embedding provider per the
  * vendor recommendations doc. ~+4 MTEB English vs OpenAI text-embedding-3-small,
  * 4x the input context (32k vs 8k), and materially better multilingual recall.
  *
- * Voyage's embeddings API supports an `input_type` parameter ("document" or
- * "query") for asymmetric retrieval, plus an `output_dimension` MRL truncation
- * (default 1024 for voyage-3.5; valid values 256/512/1024/2048). We default to
- * "document" for index calls; rag_retriever asks for "query" on the user-query
- * embed call so the two vectors are projected for retrieval rather than
- * symmetric comparison.
+ * SHARED vs ASYMMETRIC EMBEDDING SPACE (v7.4.0 — read this before "fixing" it)
+ *
+ * Voyage's embeddings API accepts an `input_type` of "document" or "query".
+ * Sending "query" on the retrieval call and "document" on the index call —
+ * asymmetric retrieval — is the vendor's suggested optimization, and this
+ * adapter did it unconditionally from v5.11.0 to v7.3.x.
+ *
+ * It is now OFF by default, and that is deliberate, not an oversight. The gain
+ * has failed to reproduce on the SOLA corpus TWICE: 2026-08-21 it was a wash
+ * for voyage-4-lite and 1.0 pp WORSE for voyage-4 than querying with the model
+ * that indexed (see embedding_compat::SHARED_SPACES), and the re-measurement on
+ * the RAG fixture set found the same. So the asymmetric projection buys nothing
+ * measurable here while costing something real: queries and documents then live
+ * in two differently-projected spaces and are comparable only through whatever
+ * projection the vendor happens to ship. One shared space is migration
+ * insurance — both sides embedded the same way stay comparable to each other
+ * across a model change, and a future re-projection is one reindex instead of
+ * two mutually incompatible halves.
+ *
+ * `embed_input_type_mode` (shared|asymmetric, default shared) selects. It is a
+ * setting rather than a constant so the choice is reversible without a code
+ * deploy; anything unrecognized resolves to shared.
+ *
+ * Shared mode sends "document" for BOTH sides on purpose: that is the value the
+ * existing corpus was indexed with, so flipping the mode needs no reindex —
+ * only the query-side projection changes. The mode changes the WIRE value only.
+ * The query-side model and dtype are still chosen from the logical side of the
+ * call (see build_embed_payload), so embed_query_model and the
+ * float-query-against-int8-documents rule keep working exactly as before.
+ *
+ * OUTPUT WIDTH: `output_dimension` is an MRL truncation, per-model valid widths
+ * in MODEL_PROFILES (256/512/1024/2048 across the current line, native 1024).
+ * voyage-4-large at 2048 measured +14.0 pp recall on realistic queries for
+ * under $4/month, and reduces rather than increases the reranker's necessity.
+ * To adopt it an operator sets embed_model=voyage-4-large and
+ * embed_dimensions=2048 and then REINDEXES: changing the model or the width
+ * invalidates every stored vector, and rag_retriever refuses to score across
+ * embedding spaces, so a half-migrated index retrieves nothing rather than
+ * retrieving badly.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University
@@ -41,11 +75,131 @@ class voyage_embedding_provider extends base_embedding_provider {
     /** Default input_type when caller doesn't specify (indexing uses "document"). */
     private const DEFAULT_INPUT_TYPE = 'document';
 
+    /** The two input_type values the API accepts. */
+    private const INPUT_TYPES = ['document', 'query'];
+
+    /**
+     * Wire input_type used for BOTH sides in shared mode.
+     *
+     * "document" and not "query" or an omitted parameter, because the indexed
+     * corpus was written with "document": choosing it means switching modes
+     * changes only the query projection and needs no reindex.
+     */
+    private const SHARED_INPUT_TYPE = self::DEFAULT_INPUT_TYPE;
+
+    /** embed_input_type_mode: one shared space for queries and documents. */
+    public const INPUT_MODE_SHARED = 'shared';
+
+    /** embed_input_type_mode: vendor's asymmetric projection (see class docblock). */
+    public const INPUT_MODE_ASYMMETRIC = 'asymmetric';
+
     /** Native default output width; sending it explicitly is redundant. */
     private const NATIVE_DIMENSION = 1024;
 
     /** Valid Matryoshka (MRL) output widths for the voyage-3.x / voyage-4 line. */
     private const VALID_DIMENSIONS = [256, 512, 1024, 2048];
+
+    /**
+     * Per-model output-width profiles, matched by prefix.
+     *
+     * `native` is the width the API returns when output_dimension is omitted,
+     * so a configured width equal to it is not sent. `dims` are the MRL widths
+     * the model accepts; anything else is omitted rather than sent and
+     * rejected.
+     *
+     * This is an allowlist for the *width*, never for the model name: a model
+     * absent from here still works and simply falls back to the line-wide
+     * defaults above, because a new Voyage model must be adoptable by typing
+     * its name into embed_model with no code deploy. Adding a row here only
+     * makes the width validation exact for that model.
+     *
+     * Longest prefix wins, so 'voyage-4-large' cannot be swallowed by
+     * 'voyage-4' — the same trap the rate card documents.
+     */
+    private const MODEL_PROFILES = [
+        // v7.4.0: measured +14.0 pp on realistic queries at width 2048.
+        'voyage-4-large'   => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+        'voyage-4-lite'    => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+        'voyage-4'         => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+        'voyage-context-4' => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+        'voyage-3.5-lite'  => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+        'voyage-3.5'       => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+        'voyage-3-large'   => ['native' => self::NATIVE_DIMENSION, 'dims' => [256, 512, 1024, 2048]],
+    ];
+
+    /**
+     * Model prefixes with an exact width profile, longest first.
+     *
+     * @return string[]
+     */
+    public static function supported_models(): array {
+        $models = array_keys(self::MODEL_PROFILES);
+        usort($models, fn($a, $b) => strlen($b) <=> strlen($a));
+        return $models;
+    }
+
+    /**
+     * Width profile for a model name, or null when it has no explicit row.
+     *
+     * @param string $model
+     * @return array|null ['native' => int, 'dims' => int[]]
+     */
+    public static function model_profile(string $model): ?array {
+        $m = strtolower(trim($model));
+        if ($m === '') {
+            return null;
+        }
+        foreach (self::supported_models() as $prefix) {
+            if ($m === $prefix || strpos($m, $prefix) === 0) {
+                return self::MODEL_PROFILES[$prefix];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Width the API returns for this model when output_dimension is omitted.
+     *
+     * @param string $model
+     * @return int
+     */
+    public static function native_dimension(string $model = ''): int {
+        $profile = self::model_profile($model);
+        return $profile === null ? self::NATIVE_DIMENSION : (int) $profile['native'];
+    }
+
+    /**
+     * Wire input_type for a logical side of the call.
+     *
+     * Shared mode (the default — see the class docblock for why) sends one
+     * input_type for both sides so queries and documents share an embedding
+     * space. Asymmetric mode sends the vendor's per-side value.
+     *
+     * Pure when $mode is supplied, which is how the tests pin it; passing null
+     * reads embed_input_type_mode. An unset, empty or unrecognized mode is
+     * shared: this value reaches an outbound payload and decides whether the
+     * corpus is queryable, so it must never propagate unvalidated.
+     *
+     * @param string $requested Logical side: 'document' or 'query'.
+     * @param string|null $mode Explicit mode, or null to read config.
+     * @return string The input_type to put on the wire.
+     */
+    public static function resolve_input_type(string $requested, ?string $mode = null): string {
+        $requested = in_array($requested, self::INPUT_TYPES, true)
+            ? $requested
+            : self::DEFAULT_INPUT_TYPE;
+
+        if ($mode === null) {
+            $raw = get_config('local_ai_course_assistant', 'embed_input_type_mode');
+            $mode = ($raw === false || trim((string) $raw) === '')
+                ? self::INPUT_MODE_SHARED
+                : strtolower(trim((string) $raw));
+        } else {
+            $mode = strtolower(trim($mode));
+        }
+
+        return ($mode === self::INPUT_MODE_ASYMMETRIC) ? $requested : self::SHARED_INPUT_TYPE;
+    }
 
     /**
      * Resolve the output_dimension to send, or null to omit it (native default).
@@ -55,14 +209,27 @@ class voyage_embedding_provider extends base_embedding_provider {
      * left over from a provider switch) omits the parameter so Voyage applies
      * its own default instead of rejecting the call.
      *
+     * v7.4.0: $model narrows the valid set to that model's profile when it has
+     * one. It is optional and defaults to the line-wide widths, so the
+     * single-argument behaviour every existing caller and test relies on is
+     * unchanged.
+     *
      * @param int $configured Configured embed_dimensions (0 = unset).
+     * @param string $model Model the width will be requested for ('' = any).
      * @return int|null Width to send, or null to omit.
      */
-    public static function mrl_output_dimension(int $configured): ?int {
+    public static function mrl_output_dimension(int $configured, string $model = ''): ?int {
+        $valid = self::VALID_DIMENSIONS;
+        $native = self::NATIVE_DIMENSION;
+        $profile = self::model_profile($model);
+        if ($profile !== null) {
+            $valid = $profile['dims'];
+            $native = (int) $profile['native'];
+        }
         if (
             $configured > 0
-                && $configured !== self::NATIVE_DIMENSION
-                && in_array($configured, self::VALID_DIMENSIONS, true)
+                && $configured !== $native
+                && in_array($configured, $valid, true)
         ) {
             return $configured;
         }
@@ -123,8 +290,12 @@ class voyage_embedding_provider extends base_embedding_provider {
     }
 
     /**
-     * Embed a single query for retrieval. Uses input_type="query" so the
-     * vector is projected for asymmetric retrieval against document vectors.
+     * Embed a single query for retrieval.
+     *
+     * "query" is the LOGICAL side of the call, which picks the query model and
+     * the query dtype. Whether "query" or "document" goes on the wire is
+     * decided by embed_input_type_mode — shared by default, so by default this
+     * embeds into the same space as the documents. See the class docblock.
      *
      * @param string $text
      * @return float[]
@@ -150,62 +321,13 @@ class voyage_embedding_provider extends base_embedding_provider {
             $inputtype = self::DEFAULT_INPUT_TYPE;
         }
 
-        // Queries may be embedded with a different model from documents when
-        // both sit in a shared embedding space. Documents always use $model:
-        // the stored corpus defines the space, so only the query side may vary.
-        $model = ($inputtype === 'query') ? $this->querymodel : $this->model;
-
-        // Document vectors take the configured dtype. The query side depends on
-        // which dtype it has to be compared against:
-        //
-        //  - int8 documents are scored with a FLOAT query. Cosine is
-        //    scale-invariant, so a full-precision query against quantized
-        //    documents is both valid and strictly better than quantizing both
-        //    sides — it keeps precision on the one vector computed fresh per
-        //    request, which costs nothing extra.
-        //
-        //  - binary documents need a BINARY query, because bits are compared by
-        //    Hamming distance and a float vector has no meaningful Hamming
-        //    distance to a bit string. Crucially the query cannot be binarized
-        //    locally: measured against a live response, sign(float) agrees with
-        //    the API's binary output on only 87.5% of bits (chance is 50%, so
-        //    the layout is right but the values are not). Voyage derives binary
-        //    embeddings through a separate quantization path, so the binary
-        //    query must come from the API.
-        $configured = \local_ai_course_assistant\embedding_compat::normalize_dtype($this->dtype);
-        if ($inputtype === 'document') {
-            $dtype = $configured;
-        } else {
-            $dtype = ($configured === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY)
-                ? \local_ai_course_assistant\embedding_compat::DTYPE_BINARY
-                : \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT;
-        }
-
         $embeddings = [];
 
         foreach (array_chunk($texts, self::BATCH_SIZE) as $batch) {
-            $payload = [
-                'model' => $model,
-                'input' => $batch,
-                'input_type' => $inputtype,
-            ];
-
-            // Send output_dtype only when it is not the API default. Omitting
-            // it on float keeps the payload identical to what earlier releases
-            // sent, so a site that never touches the new setting cannot be
-            // affected by this code path at all.
-            if ($dtype !== \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT) {
-                $payload['output_dtype'] = $dtype;
-            }
-
-            // Pass output_dimension only when the configured width is a valid
-            // non-default MRL width (256/512/2048); 0/unset, 1024, or an invalid
-            // width (e.g. an OpenAI-shaped 1536 left after a provider switch)
-            // omit it so Voyage applies its native 1024 rather than erroring.
-            $outputdim = self::mrl_output_dimension($this->dimensions);
-            if ($outputdim !== null) {
-                $payload['output_dimension'] = $outputdim;
-            }
+            $payload = $this->build_embed_payload($batch, $inputtype);
+            $dtype = (string) ($payload['output_dtype']
+                ?? \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT);
+            $outputdim = $payload['output_dimension'] ?? null;
 
             $headers = [
                 'Content-Type: application/json',
@@ -239,7 +361,7 @@ class voyage_embedding_provider extends base_embedding_provider {
             // vector arrives as 128 elements. Checking here means a width/dtype
             // disagreement surfaces at write time instead of producing rows that
             // decode to the wrong length and score as noise.
-            $logicalwidth = $outputdim ?? self::NATIVE_DIMENSION;
+            $logicalwidth = $outputdim ?? self::native_dimension((string) $payload['model']);
             $expected = \local_ai_course_assistant\embedding_compat::expected_element_count(
                 $logicalwidth,
                 $dtype
@@ -283,6 +405,99 @@ class voyage_embedding_provider extends base_embedding_provider {
     }
 
     /**
+     * Build the /embeddings request payload for one batch.
+     *
+     * Extracted from embed_batch_typed so the wire shape can be asserted in a
+     * unit test: everything above this point is a billable network call, which
+     * is how the asymmetric input_type sat unmeasured for three releases.
+     * Pure apart from reading embed_input_type_mode.
+     *
+     * $inputtype is the LOGICAL side of the call. It selects the model and the
+     * dtype; the input_type that goes on the wire is resolve_input_type()'s
+     * business and, in the default shared mode, is the same for both sides.
+     *
+     * @param string[] $batch Texts for this request.
+     * @param string $inputtype Logical side: 'document' or 'query'.
+     * @return array Payload ready for json_encode.
+     */
+    public function build_embed_payload(array $batch, string $inputtype): array {
+        $logical = in_array($inputtype, self::INPUT_TYPES, true)
+            ? $inputtype
+            : self::DEFAULT_INPUT_TYPE;
+
+        // Queries may be embedded with a different model from documents when
+        // both sit in a shared embedding space. Documents always use $model:
+        // the stored corpus defines the space, so only the query side may vary.
+        $model = ($logical === 'query') ? $this->querymodel : $this->model;
+
+        $payload = [
+            'model' => $model,
+            'input' => array_values($batch),
+            'input_type' => self::resolve_input_type($logical),
+        ];
+
+        // Send output_dtype only when it is not the API default. Omitting
+        // it on float keeps the payload identical to what earlier releases
+        // sent, so a site that never touches the new setting cannot be
+        // affected by this code path at all.
+        $dtype = $this->wire_dtype($logical);
+        if ($dtype !== \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT) {
+            $payload['output_dtype'] = $dtype;
+        }
+
+        // Pass output_dimension only when the configured width is a valid
+        // non-default MRL width for the model being called (256/512/2048);
+        // 0/unset, the native 1024, or an invalid width (e.g. an OpenAI-shaped
+        // 1536 left after a provider switch) omit it so Voyage applies its own
+        // default rather than erroring. voyage-4-large @ 2048 is sent by this
+        // branch, on both the document and the query call.
+        $outputdim = self::mrl_output_dimension($this->dimensions, $model);
+        if ($outputdim !== null) {
+            $payload['output_dimension'] = $outputdim;
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Encoding to request for one logical side of the call.
+     *
+     * Document vectors take the configured dtype. The query side depends on
+     * which dtype it has to be compared against:
+     *
+     *  - int8 documents are scored with a FLOAT query. Cosine is
+     *    scale-invariant, so a full-precision query against quantized
+     *    documents is both valid and strictly better than quantizing both
+     *    sides — it keeps precision on the one vector computed fresh per
+     *    request, which costs nothing extra.
+     *
+     *  - binary documents need a BINARY query, because bits are compared by
+     *    Hamming distance and a float vector has no meaningful Hamming
+     *    distance to a bit string. Crucially the query cannot be binarized
+     *    locally: measured against a live response, sign(float) agrees with
+     *    the API's binary output on only 87.5% of bits (chance is 50%, so
+     *    the layout is right but the values are not). Voyage derives binary
+     *    embeddings through a separate quantization path, so the binary
+     *    query must come from the API.
+     *
+     * This keys off the LOGICAL side, not the wire input_type: in shared mode
+     * both sides send input_type "document" while the query still has to come
+     * back in the encoding it will be compared in.
+     *
+     * @param string $logical 'document' or 'query'.
+     * @return string One of embedding_compat::DTYPES.
+     */
+    private function wire_dtype(string $logical): string {
+        $configured = \local_ai_course_assistant\embedding_compat::normalize_dtype($this->dtype);
+        if ($logical === 'document') {
+            return $configured;
+        }
+        return ($configured === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY)
+            ? \local_ai_course_assistant\embedding_compat::DTYPE_BINARY
+            : \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT;
+    }
+
+    /**
      * Embed chunks grouped by source document, using the contextualized
      * endpoint.
      *
@@ -308,17 +523,15 @@ class voyage_embedding_provider extends base_embedding_provider {
         if (!in_array($inputtype, ['document', 'query'], true)) {
             $inputtype = self::DEFAULT_INPUT_TYPE;
         }
-        $dtype = ($inputtype === 'document')
-            ? \local_ai_course_assistant\embedding_compat::normalize_dtype($this->dtype)
-            : \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT;
-        $outputdim = self::mrl_output_dimension($this->dimensions);
+        $dtype = $this->wire_dtype($inputtype);
+        $outputdim = self::mrl_output_dimension($this->dimensions, $this->model);
 
         $out = [];
         foreach ($this->batch_groups($groups) as $batch) {
             $payload = [
                 'model' => $this->model,
                 'inputs' => array_values($batch['inputs']),
-                'input_type' => $inputtype,
+                'input_type' => self::resolve_input_type($inputtype),
             ];
             if ($outputdim !== null) {
                 $payload['output_dimension'] = $outputdim;

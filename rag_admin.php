@@ -25,6 +25,7 @@
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\content_indexer;
+use local_ai_course_assistant\embedding_migration;
 
 $syscontext = context_system::instance();
 require_login();
@@ -170,6 +171,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(
             $pageurl,
             get_string('ragadmin:deleteindex_done', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
+    } else if ($action === 'migrateone' && $courseid > 0) {
+        // One adhoc task per course. Queued, not run inline: a page request
+        // must not sit there re-embedding a course, and cron is what makes the
+        // work parallelize and retry per course.
+        $course = $DB->get_record('course', ['id' => $courseid], 'id, fullname');
+        if (embedding_migration::queue_course($courseid, (int) $USER->id)) {
+            redirect(
+                $pageurl,
+                get_string(
+                    'embedmigration:queued_one',
+                    'local_ai_course_assistant',
+                    $course ? format_string($course->fullname) : $courseid
+                ),
+                null,
+                \core\output\notification::NOTIFY_SUCCESS
+            );
+        }
+        redirect(
+            $pageurl,
+            get_string('embedmigration:already_queued', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_WARNING
+        );
+    } else if ($action === 'migrateall') {
+        $queued = embedding_migration::queue_all((int) $USER->id);
+        if ($queued === 0) {
+            redirect(
+                $pageurl,
+                get_string('embedmigration:queued_none', 'local_ai_course_assistant'),
+                null,
+                \core\output\notification::NOTIFY_WARNING
+            );
+        }
+        redirect(
+            $pageurl,
+            get_string('embedmigration:queued_many', 'local_ai_course_assistant', $queued),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
+    } else if ($action === 'migratepurge') {
+        $deleted = embedding_migration::purge_superseded();
+        redirect(
+            $pageurl,
+            $deleted > 0
+                ? get_string('embedmigration:purged', 'local_ai_course_assistant', number_format($deleted))
+                : get_string('embedmigration:purge_none', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
+    } else if ($action === 'faqreembed') {
+        // Forced, because index_faq() is gated on a hash of the FAQ TEXT and
+        // not on the embedding model: after a model change it would otherwise
+        // decide it had nothing to do, stay invisible to the retriever, and
+        // send context_builder back to injecting the whole FAQ inline.
+        $faqstats = \local_ai_course_assistant\faq_manager::index_faq(true);
+        if (!empty($faqstats['error'])) {
+            redirect(
+                $pageurl,
+                get_string('embedmigration:faq_error', 'local_ai_course_assistant', $faqstats['error']),
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
+        }
+        redirect(
+            $pageurl,
+            get_string(
+                'embedmigration:faq_reembedded',
+                'local_ai_course_assistant',
+                (int) ($faqstats['indexed'] ?? 0)
+            ),
             null,
             \core\output\notification::NOTIFY_SUCCESS
         );
@@ -405,6 +479,123 @@ foreach ($allcourses as $c) {
     ];
 }
 
+// ── v7.4.0: embedding-model migration ───────────────────────────────────────
+// The whole section is gated on a configured target model. With no target
+// there is nothing to show and nothing safe to offer, and the superseded-row
+// query (a self-join over the chunk table) is not worth running on every page
+// load of a site that is not migrating.
+$migrationtarget = embedding_migration::target();
+$migration = [
+    'configured' => false,
+    // Shown rather than hidden: an operator who has never migrated needs to
+    // know the capability exists and which setting turns it on. Hiding it is
+    // how a feature becomes undiscoverable after the deploy window closes.
+    'notarget'   => get_string('embedmigration:notarget', 'local_ai_course_assistant'),
+    'heading'    => get_string('embedmigration:heading', 'local_ai_course_assistant'),
+];
+if ($migrationtarget['configured']) {
+    $states = embedding_migration::course_states($migrationtarget);
+    $progress = embedding_migration::progress($states);
+    $statelabels = [
+        embedding_migration::STATE_NOINDEX    => get_string('embedmigration:state_noindex', 'local_ai_course_assistant'),
+        embedding_migration::STATE_NOTSTARTED => get_string('embedmigration:state_notstarted', 'local_ai_course_assistant'),
+        embedding_migration::STATE_COMPLETE   => get_string('embedmigration:state_complete', 'local_ai_course_assistant'),
+        embedding_migration::STATE_QUEUED     => get_string('embedmigration:state_queued', 'local_ai_course_assistant'),
+        embedding_migration::STATE_RUNNING    => get_string('embedmigration:state_running', 'local_ai_course_assistant'),
+    ];
+    $migrationrows = [];
+    foreach ($states as $row) {
+        $state = (string) $row['state'];
+        $migrationrows[] = [
+            'id'       => (int) $row['courseid'],
+            // Never truncated: the course name is the identity column, and an
+            // eight-character truncation of one is what made a per-course
+            // readout unusable in the first place.
+            'fullname' => format_string($row['fullname']),
+            'chunks'   => number_format((int) $row['chunks']),
+            'migrated' => number_format((int) $row['migrated']),
+            'state'    => $state,
+            'statelabel' => $state === embedding_migration::STATE_PARTIAL
+                ? get_string('embedmigration:state_partial', 'local_ai_course_assistant', (int) $row['pct'])
+                : ($statelabels[$state] ?? $state),
+            'complete' => $state === embedding_migration::STATE_COMPLETE,
+            'pending'  => in_array($state, [
+                embedding_migration::STATE_QUEUED, embedding_migration::STATE_RUNNING,
+            ], true),
+            'canqueue' => in_array($state, [
+                embedding_migration::STATE_NOTSTARTED, embedding_migration::STATE_PARTIAL,
+            ], true),
+        ];
+    }
+    $superseded = embedding_migration::superseded_count();
+    $faqmodel = embedding_migration::faq_model();
+    $dimlabel = $migrationtarget['dimensions'] > 0
+        ? (string) $migrationtarget['dimensions']
+        : get_string('embedmigration:target_native', 'local_ai_course_assistant');
+    $livedimlabel = $migrationtarget['livedimensions'] > 0
+        ? (string) $migrationtarget['livedimensions']
+        : get_string('embedmigration:target_native', 'local_ai_course_assistant');
+
+    $migration = [
+        'configured'  => true,
+        'heading'     => get_string('embedmigration:heading', 'local_ai_course_assistant'),
+        'desc'        => get_string('embedmigration:desc', 'local_ai_course_assistant'),
+        'summary'     => get_string('embedmigration:target_summary', 'local_ai_course_assistant', (object) [
+            'model'              => s($migrationtarget['model']),
+            'provider'           => s($migrationtarget['provider']),
+            'dimensions'         => s($dimlabel),
+            'currentmodel'       => s($migrationtarget['livemodel']),
+            'currentdimensions'  => s($livedimlabel),
+        ]),
+        'sameaslive'  => $migrationtarget['sameaslive']
+            ? get_string('embedmigration:same_as_live', 'local_ai_course_assistant')
+            : '',
+        'progress'    => get_string('embedmigration:progress', 'local_ai_course_assistant', (object) [
+            'done'    => $progress['done'],
+            'total'   => $progress['total'],
+            'pending' => $progress['pending'],
+        ]),
+        'allcomplete' => $progress['allcomplete']
+            ? get_string(
+                'embedmigration:all_complete',
+                'local_ai_course_assistant',
+                $migrationtarget['model']
+            )
+            : '',
+        'rows'        => $migrationrows,
+        'hasrows'     => !empty($migrationrows),
+        'colcourse'   => get_string('ragadmin:col_course', 'local_ai_course_assistant'),
+        'colchunks'   => get_string('ragadmin:col_chunks', 'local_ai_course_assistant'),
+        'colmigrated' => get_string('embedmigration:col_migrated', 'local_ai_course_assistant'),
+        'colstate'    => get_string('embedmigration:col_state', 'local_ai_course_assistant'),
+        'colactions'  => get_string('ragadmin:col_actions', 'local_ai_course_assistant'),
+        'queueone'    => get_string('embedmigration:queue_one', 'local_ai_course_assistant'),
+        'queueall'    => get_string('embedmigration:queue_all', 'local_ai_course_assistant'),
+        'queueallconfirm' => get_string('embedmigration:queue_all_confirm', 'local_ai_course_assistant'),
+        'purgeheading' => get_string('embedmigration:purge_heading', 'local_ai_course_assistant'),
+        'purgedesc'   => get_string(
+            'embedmigration:purge_desc',
+            'local_ai_course_assistant',
+            number_format($superseded)
+        ),
+        'haspurge'    => $superseded > 0,
+        'purgenone'   => get_string('embedmigration:purge_none', 'local_ai_course_assistant'),
+        'purge'       => get_string('embedmigration:purge', 'local_ai_course_assistant'),
+        'purgeconfirm' => get_string('embedmigration:purge_confirm', 'local_ai_course_assistant'),
+        'faqheading'  => get_string('embedmigration:faq_heading', 'local_ai_course_assistant'),
+        'faqstate'    => $faqmodel === null
+            ? get_string('embedmigration:faq_none', 'local_ai_course_assistant')
+            : get_string('embedmigration:faq_state', 'local_ai_course_assistant', $faqmodel),
+        // Stale = embedded with something other than the model retrieval is
+        // querying with. The symptom is silent: the retriever skips the rows
+        // and the prompt falls back to injecting the FAQ inline.
+        'faqstale'    => ($faqmodel !== null && $faqmodel !== $migrationtarget['livemodel'])
+            ? get_string('embedmigration:faq_stale', 'local_ai_course_assistant')
+            : '',
+        'faqreembed'  => get_string('embedmigration:faq_reembed', 'local_ai_course_assistant'),
+    ];
+}
+
 $templatedata = [
     'backurl'   => $settingsurl->out(false),
     'backlabel' => get_string('ragadmin:back_to_settings', 'local_ai_course_assistant'),
@@ -460,6 +651,7 @@ $templatedata = [
     'clearindex'    => get_string('ragadmin:deleteindex', 'local_ai_course_assistant'),
     'clearconfirm'  => get_string('ragadmin:deleteindex_confirm', 'local_ai_course_assistant'),
     'courses'       => $courserows,
+    'migration'     => $migration,
 ];
 
 echo $OUTPUT->header();

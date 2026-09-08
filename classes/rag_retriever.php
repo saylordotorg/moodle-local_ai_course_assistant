@@ -48,6 +48,22 @@ class rag_retriever {
     private static array $vectorcache = [];
 
     /**
+     * Default for `rerank_min_query_chars`: the longest query still skipped.
+     *
+     * 50 as measured on the RAG fixture set (gated 67.7% recall vs 67.2%
+     * always-on, ~a third cheaper). Only the DEFAULT lives in code — the
+     * effective value is the admin setting, because after the next release
+     * there are no code deploys.
+     */
+    public const RERANK_MIN_QUERY_CHARS_DEFAULT = 50;
+
+    /** Skip reason: query at or under `rerank_min_query_chars`. */
+    public const RERANK_SKIP_SHORT_QUERY = 'short_query';
+
+    /** Skip reason: cosine top-1/top-3 margin says the ranking is already confident. */
+    public const RERANK_SKIP_CONFIDENT = 'confident_margin';
+
+    /**
      * Discard cached vectors after the index changes.
      *
      * Called by content_indexer on every path that inserts or deletes chunks.
@@ -136,11 +152,13 @@ class rag_retriever {
             return [];
         }
 
-        // Embed the query. When the configured embedding provider is Voyage,
-        // ask for the asymmetric "query" projection so the vector pairs
-        // properly with the "document"-typed index vectors. Other providers
-        // (OpenAI, Ollama) expose a single embed() entrypoint and project
-        // symmetrically.
+        // Embed the query. Voyage exposes a separate embed_query() entrypoint;
+        // other providers (OpenAI, Ollama) have only embed(). Whether the
+        // Voyage query call actually asks for a different projection from the
+        // document call is the provider's business and is now a setting
+        // (embed_input_type_mode, shared by default -- the asymmetric variant
+        // failed to reproduce twice; see voyage_embedding_provider). Either way
+        // this call site is unchanged: it asks for "a query vector".
         $provider = base_embedding_provider::create_from_config();
         if ($provider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider) {
             $queryvec = $provider->embed_query($query);
@@ -378,8 +396,17 @@ class rag_retriever {
         // vectors alone, so this is the first point that needs the actual
         // chunk text -- and by now the set is at most a few dozen rows rather
         // than the whole course.
+        // Hydrate wider than top-k only when stage 2 can actually use the extra
+        // rows. The length gate is evaluated here as well as in apply_rerank
+        // because it needs nothing but the query: on a gated-off short query
+        // there is no point fetching 20 chunk bodies to then rank 5 of them by
+        // cosine. The margin gate cannot be hoisted the same way -- it is
+        // measured on the candidate scores, which is upstream of the text.
         $hydratelimit = $topk;
-        if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')) {
+        if (
+            (bool) get_config('local_ai_course_assistant', 'rerank_enabled')
+                && self::query_long_enough_to_rerank($query)
+        ) {
             $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
             $hydratelimit = max(
                 $topk,
@@ -391,48 +418,11 @@ class rag_retriever {
             return [];
         }
 
-        // Optional stage 2: two-stage retrieval with Voyage rerank-2.5.
-        // When `rerank_enabled` is on AND a Voyage rerank API key is configured,
-        // take the top `rerank_candidates` cosine matches (default 20) and
-        // re-score them with rerank-2.5 (cross-encoder), then keep the top-k.
-        // Published recall lifts: +15 Recall@10 enterprise / +39% NDCG BEIR.
-        // Falls back to single-stage cosine top-k if reranker fails or is unset.
-        if (
-            (bool) get_config('local_ai_course_assistant', 'rerank_enabled')
-                && self::should_rerank($scored)
-        ) {
-            $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
-            $candidates = ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand;
-            $candidates = max($topk, min($candidates, count($scored)));
-            $stage1 = array_slice($scored, 0, $candidates);
-            try {
-                $reranker = new \local_ai_course_assistant\embedding_provider\voyage_reranker();
-                if ($reranker->is_configured()) {
-                    $documents = array_map(fn($r) => $r['content'], $stage1);
-                    $reranked = $reranker->rerank($query, $documents, $topk);
-                    if (!empty($reranked)) {
-                        $out = [];
-                        foreach ($reranked as $entry) {
-                            $idx = $entry['index'];
-                            if (isset($stage1[$idx])) {
-                                $row = $stage1[$idx];
-                                // Replace the cosine score with the rerank
-                                // relevance score so downstream telemetry
-                                // reflects the actual ranking signal used.
-                                $row['score'] = $entry['score'];
-                                $row['cosine_score'] = $stage1[$idx]['score'];
-                                $out[] = $row;
-                            }
-                        }
-                        if (!empty($out)) {
-                            $final = $out;
-                        }
-                    }
-                }
-            } catch (\Throwable $e) {
-                debugging('rag_retriever rerank failed, falling back to cosine top-k: '
-                    . $e->getMessage(), DEBUG_DEVELOPER);
-            }
+        // Optional stage 2: two-stage retrieval with Voyage rerank-2.5. Gated
+        // per query (see apply_rerank / rerank_skip_reason) and falling back to
+        // the single-stage cosine top-k whenever it is skipped or fails.
+        if ((bool) get_config('local_ai_course_assistant', 'rerank_enabled')) {
+            $final = self::apply_rerank($query, $scored, $topk, null, $courseid);
         }
 
         $final = $final ?? array_slice($scored, 0, $topk);
@@ -518,7 +508,156 @@ class rag_retriever {
     }
 
     /**
+     * Stage 2: rerank the hydrated candidate set, or skip and say why.
+     *
+     * Split out of retrieve() so the gate is testable: retrieve() cannot be
+     * exercised in a unit test because it makes a billable embedding call
+     * first, which is exactly why the rerank decision went unmeasured for so
+     * long. $reranker is injectable for the same reason — a test can pass a
+     * counting double and assert that a gated-off query never reaches it.
+     *
+     * Returns null for "stage 2 did not produce a result", which the caller
+     * treats identically however it happened: gated off, no API key, empty
+     * response, or an exception. That collapse is deliberate — every one of
+     * those degrades to the cosine top-k, which is a correct answer, just a
+     * cheaper one.
+     *
+     * @param string $query The learner's query, as typed.
+     * @param array  $scored Hydrated candidates, best cosine first.
+     * @param int    $topk Number of rows to keep.
+     * @param \local_ai_course_assistant\embedding_provider\voyage_reranker|null $reranker
+     *               Injected reranker, or null to construct the configured one.
+     * @param int    $courseid Course being retrieved from, for skip telemetry.
+     * @return array|null Reranked rows, or null to keep the cosine ranking.
+     */
+    public static function apply_rerank(
+        string $query,
+        array $scored,
+        int $topk,
+        ?\local_ai_course_assistant\embedding_provider\voyage_reranker $reranker = null,
+        int $courseid = 0
+    ): ?array {
+        if (empty($scored) || $topk <= 0) {
+            return null;
+        }
+
+        $skip = self::rerank_skip_reason($query, $scored);
+        if ($skip !== null) {
+            // Recorded, not merely not-done: a gate whose only symptom is lower
+            // spend is indistinguishable from a broken reranker.
+            \local_ai_course_assistant\embedding_provider\voyage_reranker::log_skip($skip, $courseid);
+            return null;
+        }
+
+        $rawcand = get_config('local_ai_course_assistant', 'rerank_candidates');
+        $candidates = ($rawcand === false || $rawcand === '') ? 20 : (int) $rawcand;
+        $candidates = max($topk, min($candidates, count($scored)));
+        $stage1 = array_slice($scored, 0, $candidates);
+
+        try {
+            $reranker = $reranker
+                ?? new \local_ai_course_assistant\embedding_provider\voyage_reranker();
+            if (!$reranker->is_configured()) {
+                return null;
+            }
+            $documents = array_map(fn($r) => $r['content'], $stage1);
+            $reranked = $reranker->rerank($query, $documents, $topk);
+            if (empty($reranked)) {
+                return null;
+            }
+            $out = [];
+            foreach ($reranked as $entry) {
+                $idx = $entry['index'];
+                if (isset($stage1[$idx])) {
+                    $row = $stage1[$idx];
+                    // Replace the cosine score with the rerank relevance score
+                    // so downstream telemetry reflects the actual ranking
+                    // signal used.
+                    $row['score'] = $entry['score'];
+                    $row['cosine_score'] = $stage1[$idx]['score'];
+                    $out[] = $row;
+                }
+            }
+            return empty($out) ? null : $out;
+        } catch (\Throwable $e) {
+            debugging('rag_retriever rerank failed, falling back to cosine top-k: '
+                . $e->getMessage(), DEBUG_DEVELOPER);
+            return null;
+        }
+    }
+
+    /**
+     * Why stage 2 should be skipped for this query, or null to run it.
+     *
+     * Two independent gates, cheapest first:
+     *
+     *  1. LENGTH (`rerank_min_query_chars`, default 50). Measured on the RAG
+     *     fixture set: skipping the rerank on queries of 50 characters or fewer
+     *     scored 67.7% recall against 67.2% for always-on, and cost about a
+     *     third less. Short queries are keyword-shaped ("marginal cost",
+     *     "chapter 3 quiz") and a cross-encoder has almost no extra signal to
+     *     add over cosine on two or three words; longer queries are where its
+     *     sentence-level understanding earns the call.
+     *  2. MARGIN (`rerank_margin_threshold`) — the pre-existing ambiguity gate,
+     *     see should_rerank().
+     *
+     * The reasons are returned rather than folded into one boolean so the
+     * telemetry row can say WHICH gate fired; "reranks went down" on its own
+     * does not distinguish a working gate from an expired API key.
+     *
+     * @param string $query The learner's query, as typed.
+     * @param array $scored Candidates sorted by descending cosine score.
+     * @return string|null Skip reason, or null when reranking should run.
+     */
+    public static function rerank_skip_reason(string $query, array $scored): ?string {
+        if (!self::query_long_enough_to_rerank($query)) {
+            return self::RERANK_SKIP_SHORT_QUERY;
+        }
+        if (!self::should_rerank($scored)) {
+            return self::RERANK_SKIP_CONFIDENT;
+        }
+        return null;
+    }
+
+    /**
+     * Whether the query is long enough to be worth a rerank call.
+     *
+     * Length is measured with mb_strlen on the TRIMMED query: the corpus is
+     * 46-language, so counting bytes would gate a 20-character Japanese
+     * question as if it were a 60-character English one, and trailing
+     * whitespace must not buy a query a rerank it did not earn. An empty or
+     * whitespace-only query measures 0 and is therefore always skipped.
+     *
+     * The threshold is a setting rather than a constant because there are no
+     * code deploys after the next release; 0 (or negative) disables the length
+     * gate entirely, matching how rerank_margin_threshold treats 0, so an
+     * operator can revert to the pre-v7.4.0 behaviour from a form.
+     *
+     * Boundary: the setting is the largest length that is SKIPPED. At the
+     * default 50, a 50-character query is skipped and a 51-character query is
+     * reranked.
+     *
+     * @param string $query The learner's query, as typed.
+     * @return bool True when the query clears the length gate.
+     */
+    public static function query_long_enough_to_rerank(string $query): bool {
+        $raw = get_config('local_ai_course_assistant', 'rerank_min_query_chars');
+        // Unset means "use the measured default"; an explicit 0 disables the
+        // gate. Distinguishing the two matters, so test for false/'' first.
+        $threshold = ($raw === false || $raw === '') ? self::RERANK_MIN_QUERY_CHARS_DEFAULT : (int) $raw;
+        if ($threshold <= 0) {
+            return true;
+        }
+        return mb_strlen(trim($query)) > $threshold;
+    }
+
+    /**
      * Whether this query is ambiguous enough to be worth reranking.
+     *
+     * The SECOND of the two stage-2 gates; callers should go through
+     * rerank_skip_reason(), which applies the cheaper length gate first and
+     * reports which one fired. Kept public and unchanged in behaviour because
+     * it is the measured margin rule and has its own test.
      *
      * Measured 2026-08-01 over 1,008 queries across 16 courses: the cosine
      * margin between the top-1 and top-3 candidates predicts whether
