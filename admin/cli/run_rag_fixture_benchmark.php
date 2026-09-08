@@ -78,6 +78,10 @@ $judgemode     = false;
 $questionspath = '';
 $samplesize    = 100;
 $judgemodel    = 'gpt-4o-mini';
+// Voyage MRL width for A/B arms. 1024 is the native default; 2048 is the
+// ceiling and is the only way to compare Voyage against OpenAI's native
+// 1536 without the narrower vector confounding the result.
+$voyagedim     = 1024;
 
 foreach ($argv as $arg) {
     if (preg_match('/^--fixtures=(.+)$/', $arg, $m)) {
@@ -98,6 +102,8 @@ foreach ($argv as $arg) {
         $openaiapikey = trim($m[1]);
     } else if (preg_match('/^--voyage-apikey=(.+)$/', $arg, $m)) {
         $voyageapikey = trim($m[1]);
+    } else if (preg_match('/^--voyage-dim=(\d+)$/', $arg, $m)) {
+        $voyagedim = (int) $m[1];
     } else if ($arg === '--judge') {
         $judgemode = true;
     } else if (preg_match('/^--questions=(.+)$/', $arg, $m)) {
@@ -129,6 +135,9 @@ embedding-only recall comparison; the rerank arm is skipped in this mode):
                         arm and restored at exit.
   --openai-apikey=KEY   API key used for openai:* arms (in memory only).
   --voyage-apikey=KEY   API key used for voyage:* arms (in memory only).
+  --voyage-dim=N        MRL width for voyage:* arms (256/512/1024/2048;
+                        default 1024). OpenAI arms always use native 1536,
+                        so pass 2048 to rule out width as a confound.
 
   Example three-way A/B:
     php run_rag_fixture_benchmark.php \
@@ -158,14 +167,16 @@ if ($fixturespath === '') {
     $fixturespath = __DIR__ . '/../../' . $fixturespath;
 }
 
+// Run artifacts go to dataroot, never into the plugin directory: dirroot is
+// web-accessible and must be treated as read-only at runtime.
+// make_writable_directory() is the Moodle API for this and applies the correct
+// permissions, so the bare 0775 directory creation this used to do is gone.
 if ($outfile === '') {
-    $outdir = __DIR__ . '/../../runs';
-    if (!is_dir($outdir)) {
-        mkdir($outdir, 0775, true);
-    }
+    $outdir = make_writable_directory($CFG->dataroot . '/local_ai_course_assistant/runs');
     $outfile = $outdir . '/' . date('Y-m-d-His') . '-rag-bench.json';
 } else if ($outfile[0] !== '/') {
-    $outfile = __DIR__ . '/../../' . $outfile;
+    $outfile = make_writable_directory($CFG->dataroot . '/local_ai_course_assistant/runs')
+        . '/' . basename($outfile);
 }
 
 // ---------- Load fixtures ----------
@@ -182,6 +193,89 @@ if (!is_array($fixturedoc) || empty($fixturedoc['fixtures'])) {
 }
 $fixtures = $fixturedoc['fixtures'];
 echo "Loaded " . count($fixtures) . " fixtures from " . basename($fixturespath) . "\n";
+
+// ---------- Fixture anchor integrity preflight ----------
+// Recall scoring matches on expected_chunk_id, and falls back to a text match
+// when a reindex has renumbered the chunks. That fallback truncates the anchor
+// to ANCHOR_MATCH_BYTES (see the str_contains() calls further down). Two ways
+// an anchor can be quietly useless: it is not a verbatim substring of its own
+// chunk (whitespace was normalised when it was generated), or its truncated
+// prefix also appears in an overlapping neighbour, so any of them scores a hit.
+// Both fail silently, and only once the chunk ids have gone stale -- which is
+// exactly when the anchor is the only thing left. Check it up front instead.
+define('ANCHOR_MATCH_BYTES', 50);
+$anchorstale = 0;
+$anchormissing = 0;
+$anchorbroken = [];
+$anchorambiguous = [];
+$fxids = array_values(array_unique(array_filter(
+    array_map(fn($f) => (int) ($f['expected_chunk_id'] ?? 0), $fixtures)
+)));
+if ($fxids) {
+    [$insql, $inparams] = $DB->get_in_or_equal($fxids, SQL_PARAMS_NAMED);
+    $fxchunks = $DB->get_records_select(
+        'local_ai_course_assistant_chunks',
+        "id {$insql}",
+        $inparams,
+        '',
+        'id, courseid, content'
+    );
+    $courseblob = [];
+    foreach ($fixtures as $f) {
+        $anchor = (string) ($f['expected_substring'] ?? '');
+        $cid    = (int) ($f['expected_chunk_id'] ?? 0);
+        $label  = (string) ($f['id'] ?? $cid);
+        if ($anchor === '') {
+            $anchormissing++;
+        }
+        if (!$cid || !isset($fxchunks[$cid])) {
+            $anchorstale++;
+            continue; // Cannot verify an anchor against a chunk that is gone.
+        }
+        if ($anchor === '') {
+            continue;
+        }
+        $prefix  = substr($anchor, 0, ANCHOR_MATCH_BYTES);
+        $content = (string) $fxchunks[$cid]->content;
+        if (!str_contains($content, $prefix)) {
+            $anchorbroken[] = $label;
+            continue;
+        }
+        $course = (int) $fxchunks[$cid]->courseid;
+        if (!isset($courseblob[$course])) {
+            $courseblob[$course] = implode("\x00", $DB->get_fieldset_select(
+                'local_ai_course_assistant_chunks',
+                'content',
+                'courseid = :cid',
+                ['cid' => $course]
+            ));
+        }
+        if (substr_count($courseblob[$course], $prefix) !== 1) {
+            $anchorambiguous[] = $label;
+        }
+    }
+}
+$anchorbad = count($anchorbroken) + count($anchorambiguous);
+echo "Anchor preflight: {$anchorstale} stale chunk id(s), {$anchormissing} without a text anchor, "
+    . count($anchorbroken) . " anchor(s) not verbatim, " . count($anchorambiguous)
+    . " ambiguous at " . ANCHOR_MATCH_BYTES . " bytes\n";
+if ($anchorbad > 0 || ($anchorstale > 0 && $anchormissing > 0)) {
+    echo "\n!! WARNING: fixture anchors are not sound; recall figures from this run may be wrong.\n";
+    if ($anchorbroken) {
+        echo "   not verbatim in their chunk (text match can never fire): "
+            . implode(', ', array_slice($anchorbroken, 0, 8))
+            . (count($anchorbroken) > 8 ? ', +' . (count($anchorbroken) - 8) . ' more' : '') . "\n";
+    }
+    if ($anchorambiguous) {
+        echo "   ambiguous at " . ANCHOR_MATCH_BYTES . " bytes (an overlapping neighbour also scores a hit): "
+            . implode(', ', array_slice($anchorambiguous, 0, 8))
+            . (count($anchorambiguous) > 8 ? ', +' . (count($anchorambiguous) - 8) . ' more' : '') . "\n";
+    }
+    if ($anchorstale > 0 && $anchormissing > 0) {
+        echo "   {$anchorstale} fixture(s) have a stale chunk id and no text anchor to fall back on.\n";
+    }
+    echo "   Regenerate with admin/cli/generate_conversational_fixtures.php, which enforces the contract.\n\n";
+}
 
 // ---------- Judge mode (2026-07-18): label-free LLM relevance grading ----------
 if ($judgemode) {
@@ -226,28 +320,28 @@ if ($judgemode) {
     // expansion together. 'rerank-only' and 'parent-only' isolate each factor
     // so the combined lift can be attributed. Window vs page compares the two
     // parent-document return scopes under rerank.
-    $famA = [
-        ['label' => 'baseline',    'cfg' => ['rerank_enabled' => '0', 'rag_return_scope' => 'chunk']],
+    $fama = [
+        ['label' => 'baseline', 'cfg' => ['rerank_enabled' => '0', 'rag_return_scope' => 'chunk']],
         ['label' => 'rerank-only', 'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'chunk']],
         ['label' => 'parent-only', 'cfg' => ['rerank_enabled' => '0', 'rag_return_scope' => 'window', 'rag_window_size' => '1']],
         ['label' => 'full:window', 'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'window', 'rag_window_size' => '1']],
-        ['label' => 'full:page',   'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'page']],
+        ['label' => 'full:page', 'cfg' => ['rerank_enabled' => '1', 'rag_return_scope' => 'page']],
     ];
     $touched = ['rag_return_scope', 'rerank_enabled', 'rag_window_size', 'rerank_apikey'];
-    $origA = [];
+    $origa = [];
     foreach ($touched as $key) {
-        $origA[$key] = get_config('local_ai_course_assistant', $key);
+        $origa[$key] = get_config('local_ai_course_assistant', $key);
     }
-    $restoreA = function () use ($origA) {
-        foreach ($origA as $k => $v) {
+    $restorea = function () use ($origa) {
+        foreach ($origa as $k => $v) {
             set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant');
         }
     };
-    register_shutdown_function($restoreA);
+    register_shutdown_function($restorea);
 
-    $resultsA = [];
-    foreach ($famA as $arm) {
-        $restoreA();
+    $resultsa = [];
+    foreach ($fama as $arm) {
+        $restorea();
         foreach ($arm['cfg'] as $k => $v) {
             set_config($k, $v, 'local_ai_course_assistant');
         }
@@ -257,20 +351,30 @@ if ($judgemode) {
         if (($arm['cfg']['rerank_enabled'] ?? '0') === '1' && $voyageapikey !== '') {
             set_config('rerank_apikey', $voyageapikey, 'local_ai_course_assistant');
         }
-        $per = judge_arm($qitems, $topk, $judgemodel, $judgekey);
-        $resultsA[] = ['arm' => $arm['label']] + $per;
-        printf("  %-13s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
-            $arm['label'], $topk, $per['ndcg'], $topk, $per['precision'], $topk, $per['hit'],
-            $per['mean_rel'], $per['scored'], $per['errors']);
+        $per = local_ai_course_assistant_ragbench_judge_arm($qitems, $topk, $judgemodel, $judgekey);
+        $resultsa[] = ['arm' => $arm['label']] + $per;
+        printf(
+            "  %-13s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
+            $arm['label'],
+            $topk,
+            $per['ndcg'],
+            $topk,
+            $per['precision'],
+            $topk,
+            $per['hit'],
+            $per['mean_rel'],
+            $per['scored'],
+            $per['errors']
+        );
     }
-    $restoreA();
+    $restorea();
 
     echo "\n" . str_repeat('=', 64) . "\n";
     echo "FAMILY A (pipeline config, via live retriever)\n";
     echo str_repeat('=', 64) . "\n";
     $hdr = ['Arm', 'nDCG', 'P@k', 'hit@k', 'mean'];
     echo implode(' | ', array_map(fn($h) => str_pad($h, 13), $hdr)) . "\n";
-    foreach ($resultsA as $r) {
+    foreach ($resultsa as $r) {
         echo implode(' | ', [
             str_pad($r['arm'], 13),
             str_pad(sprintf('%.3f', $r['ndcg']), 13),
@@ -283,29 +387,45 @@ if ($judgemode) {
 
     // Family B: embedding-provider arms via in-memory re-embed (bare cosine,
     // no rerank/scope/parent-doc). Comparable to the embedding A/B, judged.
-    $famB = [
+    $famb = [
         ['label' => 'openai:3-small', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey)],
-        ['label' => 'voyage:3.5',     'prov' => 'voyage', 'model' => 'voyage-3.5',            'dim' => 1024, 'key' => $voyageapikey],
+        ['label' => 'voyage:3.5', 'prov' => 'voyage', 'model' => 'voyage-3.5', 'dim' => 1024, 'key' => $voyageapikey],
+        // 2026-09-01: voyage-4 line. Same MRL widths as the 3.x line
+        // (256/512/1024/2048), so 1024 keeps the comparison honest -- a wider
+        // vector would win on recall partly by being wider, not better.
+        // voyage-4-lite is here because it is a third of voyage-4's list price
+        // and the question that matters is whether the quality gap justifies it.
+        ['label' => 'voyage:4', 'prov' => 'voyage', 'model' => 'voyage-4', 'dim' => 1024, 'key' => $voyageapikey],
+        ['label' => 'voyage:4-lite', 'prov' => 'voyage', 'model' => 'voyage-4-lite', 'dim' => 1024, 'key' => $voyageapikey],
+        ['label' => 'voyage:4-large', 'prov' => 'voyage', 'model' => 'voyage-4-large', 'dim' => 1024, 'key' => $voyageapikey],
+        // NB: voyage-context-4 is deliberately absent. Probed live 2026-09-01 and
+        // /v1/embeddings rejects it with HTTP 400 -- it is a contextualized-embedding
+        // model on a different endpoint, not a drop-in for this arm.
     ];
-    $origB = [
+    $origb = [
         'embed_provider'   => get_config('local_ai_course_assistant', 'embed_provider'),
         'embed_model'      => get_config('local_ai_course_assistant', 'embed_model'),
         'embed_apikey'     => get_config('local_ai_course_assistant', 'embed_apikey'),
         'embed_dimensions' => get_config('local_ai_course_assistant', 'embed_dimensions'),
     ];
-    $restoreB = function () use ($origB) {
-        foreach ($origB as $k => $v) {
+    $restoreb = function () use ($origb) {
+        foreach ($origb as $k => $v) {
             set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant');
         }
     };
-    register_shutdown_function($restoreB);
+    register_shutdown_function($restoreb);
 
     // Preload chunk contents for the courses referenced by the sampled questions.
     $courseids = array_values(array_unique(array_map(fn($q) => $q['courseid'], $qitems)));
     $bcontents = [];
     foreach ($courseids as $cid) {
-        $rows = $DB->get_records_select('local_ai_course_assistant_chunks',
-            'courseid = :cid', ['cid' => $cid], '', 'id, content');
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_chunks',
+            'courseid = :cid',
+            ['cid' => $cid],
+            '',
+            'id, content'
+        );
         foreach ($rows as $row) {
             if (trim((string) $row->content) !== '') {
                 $bcontents[$cid][(int) $row->id] = (string) $row->content;
@@ -313,13 +433,13 @@ if ($judgemode) {
         }
     }
 
-    $resultsB = [];
-    foreach ($famB as $arm) {
+    $resultsb = [];
+    foreach ($famb as $arm) {
         if (empty($arm['key'])) {
             echo "  (skip {$arm['label']}: no API key)\n";
             continue;
         }
-        $restoreB();
+        $restoreb();
         set_config('embed_provider', $arm['prov'], 'local_ai_course_assistant');
         set_config('embed_model', $arm['model'], 'local_ai_course_assistant');
         set_config('embed_dimensions', $arm['dim'], 'local_ai_course_assistant');
@@ -328,7 +448,7 @@ if ($judgemode) {
             $prov = base_embedding_provider::create_from_config();
         } catch (\Throwable $e) {
             echo "  (skip {$arm['label']}: provider error: " . mb_substr($e->getMessage(), 0, 100) . ")\n";
-            $restoreB();
+            $restoreb();
             continue;
         }
         $isvoyage = $prov instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider;
@@ -346,22 +466,30 @@ if ($judgemode) {
             }
         }
 
-        $ndcg = $prec = $hit = $mean = 0.0; $scored = 0; $errors = 0;
+        $ndcg = $prec = $hit = $mean = 0.0;
+        $scored = 0;
+        $errors = 0;
         foreach ($qitems as $q) {
             $cid = $q['courseid'];
             $qvec = $isvoyage ? $prov->embed_query($q['question']) : $prov->embed($q['question']);
-            if (empty($qvec) || empty($vecs[$cid])) { $scored++; continue; }
+            if (empty($qvec) || empty($vecs[$cid])) {
+                $scored++;
+                continue;
+            }
             $scoredchunks = [];
             foreach ($vecs[$cid] as $chunkid => $vec) {
-                $scoredchunks[] = ['id' => $chunkid, 's' => cosine_sim($qvec, $vec)];
+                $scoredchunks[] = ['id' => $chunkid, 's' => local_ai_course_assistant_ragbench_cosine_sim($qvec, $vec)];
             }
             usort($scoredchunks, fn($a, $b) => $b['s'] <=> $a['s']);
             $passages = [];
             foreach (array_slice($scoredchunks, 0, $topk) as $sc) {
                 $passages[] = $bcontents[$cid][$sc['id']];
             }
-            $grades = judge_passages($q['question'], $passages, $judgemodel, $judgekey);
-            if ($grades === null) { $errors++; continue; }
+            $grades = local_ai_course_assistant_ragbench_judge_passages($q['question'], $passages, $judgemodel, $judgekey);
+            if ($grades === null) {
+                $errors++;
+                continue;
+            }
             $ndcg += \local_ai_course_assistant\rag_judge::ndcg_at_k($grades, $topk);
             $prec += \local_ai_course_assistant\rag_judge::precision_at_k($grades, $topk);
             $hit  += \local_ai_course_assistant\rag_judge::hit_at_k($grades, $topk);
@@ -369,53 +497,80 @@ if ($judgemode) {
             $scored++;
         }
         $n = max(1, $scored);
-        $resultsB[] = ['arm' => $arm['label'], 'ndcg' => $ndcg / $n, 'precision' => $prec / $n,
+        $resultsb[] = ['arm' => $arm['label'], 'ndcg' => $ndcg / $n, 'precision' => $prec / $n,
                        'hit' => $hit / $n, 'mean_rel' => $mean / $n, 'scored' => $scored, 'errors' => $errors];
-        printf("  %-15s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
-            $arm['label'], $topk, $ndcg / $n, $topk, $prec / $n, $topk, $hit / $n, $mean / $n, $scored, $errors);
-        $restoreB();
+        printf(
+            "  %-15s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
+            $arm['label'],
+            $topk,
+            $ndcg / $n,
+            $topk,
+            $prec / $n,
+            $topk,
+            $hit / $n,
+            $mean / $n,
+            $scored,
+            $errors
+        );
+        $restoreb();
     }
-    $restoreB();
+    $restoreb();
 
     echo "\n" . str_repeat('=', 64) . "\n";
     echo "FAMILY B (embedding provider, in-memory re-embed, bare cosine)\n";
     echo str_repeat('=', 64) . "\n";
-    foreach ($resultsB as $r) {
-        printf("  %-15s nDCG=%.3f  P@k=%.3f  hit@k=%.3f  mean=%.2f\n",
-            $r['arm'], $r['ndcg'], $r['precision'], $r['hit'], $r['mean_rel']);
+    foreach ($resultsb as $r) {
+        printf(
+            "  %-15s nDCG=%.3f  P@k=%.3f  hit@k=%.3f  mean=%.2f\n",
+            $r['arm'],
+            $r['ndcg'],
+            $r['precision'],
+            $r['hit'],
+            $r['mean_rel']
+        );
     }
     echo "\n";
 
     // Family C: full-stack before/after (in-memory re-embed + REAL Voyage
     // rerank-2.5 + REAL parent-document expansion via rag_retriever::merge_parents).
     // Isolates the embedding provider's contribution to the whole pipeline:
-    //   before(oa,bare) = OpenAI 3-small, no rerank, single chunk (prod default)
-    //   full(oa)        = OpenAI 3-small + rerank + parent-doc(window)
-    //   full(voyage)    = Voyage 3.5     + rerank + parent-doc(window)
+    // before(oa,bare) = OpenAI 3-small, no rerank, single chunk (prod default)
+    // full(oa)        = OpenAI 3-small + rerank + parent-doc(window)
+    // full(voyage)    = Voyage 3.5     + rerank + parent-doc(window)
     // No DB writes: vectors are in-memory; the reranker and merge_parents are the
     // real production components. Rerank arms need a Voyage key (--voyage-apikey).
-    $famC = [
+    $famc = [
         ['label' => 'before(oa,bare)', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => false, 'scope' => 'chunk'],
-        ['label' => 'full(oa)',        'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => true,  'scope' => 'window'],
-        ['label' => 'full(voyage)',    'prov' => 'voyage', 'model' => 'voyage-3.5',             'dim' => 1024, 'key' => $voyageapikey,               'rerank' => true,  'scope' => 'window'],
+        ['label' => 'full(oa)', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => true, 'scope' => 'window'],
+        ['label' => 'full(voyage)', 'prov' => 'voyage', 'model' => 'voyage-3.5', 'dim' => 1024, 'key' => $voyageapikey, 'rerank' => true, 'scope' => 'window'],
     ];
     $ckeys = ['embed_provider', 'embed_model', 'embed_dimensions', 'embed_apikey',
               'rerank_enabled', 'rag_return_scope', 'rag_window_size', 'rerank_apikey'];
-    $origC = [];
-    foreach ($ckeys as $k) { $origC[$k] = get_config('local_ai_course_assistant', $k); }
-    $restoreC = function () use ($origC) {
-        foreach ($origC as $k => $v) { set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant'); }
+    $origc = [];
+    foreach ($ckeys as $k) {
+        $origc[$k] = get_config('local_ai_course_assistant', $k);
+    }
+    $restorec = function () use ($origc) {
+        foreach ($origc as $k => $v) {
+            set_config($k, ($v === false) ? null : $v, 'local_ai_course_assistant');
+        }
     };
-    register_shutdown_function($restoreC);
+    register_shutdown_function($restorec);
 
     // Rich chunk metadata (content + cmid + chunkindex) for parent-doc expansion.
     $richchunks = []; // cid -> [chunkid => ['content','cmid','chunkindex']]
     foreach ($courseids as $cid) {
-        $rows = $DB->get_records_select('local_ai_course_assistant_chunks',
-            'courseid = :cid', ['cid' => $cid], 'cmid, chunkindex',
-            'id, content, cmid, chunkindex');
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_chunks',
+            'courseid = :cid',
+            ['cid' => $cid],
+            'cmid, chunkindex',
+            'id, content, cmid, chunkindex'
+        );
         foreach ($rows as $row) {
-            if (trim((string) $row->content) === '') { continue; }
+            if (trim((string) $row->content) === '') {
+                continue;
+            }
             $richchunks[$cid][(int) $row->id] = [
                 'content'    => (string) $row->content,
                 'cmid'       => (int) ($row->cmid ?? 0),
@@ -424,11 +579,17 @@ if ($judgemode) {
         }
     }
 
-    $resultsC = [];
-    foreach ($famC as $arm) {
-        if (empty($arm['key'])) { echo "  (skip {$arm['label']}: no embedding key)\n"; continue; }
-        if ($arm['rerank'] && $voyageapikey === '') { echo "  (skip {$arm['label']}: rerank needs --voyage-apikey)\n"; continue; }
-        $restoreC();
+    $resultsc = [];
+    foreach ($famc as $arm) {
+        if (empty($arm['key'])) {
+            echo "  (skip {$arm['label']}: no embedding key)\n";
+            continue;
+        }
+        if ($arm['rerank'] && $voyageapikey === '') {
+            echo "  (skip {$arm['label']}: rerank needs --voyage-apikey)\n";
+            continue;
+        }
+        $restorec();
         set_config('embed_provider', $arm['prov'], 'local_ai_course_assistant');
         set_config('embed_model', $arm['model'], 'local_ai_course_assistant');
         set_config('embed_dimensions', $arm['dim'], 'local_ai_course_assistant');
@@ -436,12 +597,15 @@ if ($judgemode) {
         set_config('rerank_enabled', $arm['rerank'] ? '1' : '0', 'local_ai_course_assistant');
         set_config('rag_return_scope', $arm['scope'], 'local_ai_course_assistant');
         set_config('rag_window_size', '1', 'local_ai_course_assistant');
-        if ($arm['rerank']) { set_config('rerank_apikey', $voyageapikey, 'local_ai_course_assistant'); }
+        if ($arm['rerank']) {
+            set_config('rerank_apikey', $voyageapikey, 'local_ai_course_assistant');
+        }
         try {
             $prov = base_embedding_provider::create_from_config();
         } catch (\Throwable $e) {
             echo "  (skip {$arm['label']}: provider error: " . mb_substr($e->getMessage(), 0, 100) . ")\n";
-            $restoreC(); continue;
+            $restorec();
+            continue;
         }
         $isvoyage = $prov instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider;
         $reranker = $arm['rerank'] ? new \local_ai_course_assistant\embedding_provider\voyage_reranker() : null;
@@ -459,15 +623,23 @@ if ($judgemode) {
             }
         }
 
-        $ndcg = $prec = $hit = $mean = 0.0; $scored = 0; $errors = 0;
+        $ndcg = $prec = $hit = $mean = 0.0;
+        $scored = 0;
+        $errors = 0;
         foreach ($qitems as $q) {
             $cid = $q['courseid'];
-            if (empty($vecs[$cid])) { $scored++; continue; }
+            if (empty($vecs[$cid])) {
+                $scored++;
+                continue;
+            }
             $qvec = $isvoyage ? $prov->embed_query($q['question']) : $prov->embed($q['question']);
-            if (empty($qvec)) { $scored++; continue; }
+            if (empty($qvec)) {
+                $scored++;
+                continue;
+            }
             $sc = [];
             foreach ($vecs[$cid] as $chunkid => $vec) {
-                $sc[] = ['id' => $chunkid, 's' => cosine_sim($qvec, $vec)];
+                $sc[] = ['id' => $chunkid, 's' => local_ai_course_assistant_ragbench_cosine_sim($qvec, $vec)];
             }
             usort($sc, fn($a, $b) => $b['s'] <=> $a['s']);
 
@@ -475,15 +647,22 @@ if ($judgemode) {
                 $candn = max($topk, min($candidates, count($sc)));
                 $cand = array_slice($sc, 0, $candn);
                 $docs = array_map(fn($x) => $richchunks[$cid][$x['id']]['content'], $cand);
-                if ($rerankdelayms > 0) { usleep($rerankdelayms * 1000); }
+                if ($rerankdelayms > 0) {
+                    usleep($rerankdelayms * 1000);
+                }
                 try {
                     $rr = $reranker->rerank($q['question'], $docs, $topk);
                 } catch (\Throwable $e) {
                     echo "  ({$arm['label']} rerank error: " . mb_substr($e->getMessage(), 0, 80) . ")\n";
-                    $errors++; continue;
+                    $errors++;
+                    continue;
                 }
                 $winners = [];
-                foreach ($rr as $e) { if (isset($cand[$e['index']])) { $winners[] = $cand[$e['index']]; } }
+                foreach ($rr as $e) {
+                    if (isset($cand[$e['index']])) {
+                        $winners[] = $cand[$e['index']];
+                    }
+                }
             } else {
                 $winners = array_slice($sc, 0, $topk);
             }
@@ -504,9 +683,15 @@ if ($judgemode) {
                 $rows = \local_ai_course_assistant\rag_retriever::merge_parents($rows, $siblings, $arm['scope'], 1, 6000);
             }
             $passages = array_map(fn($r) => (string) $r['content'], $rows);
-            if (empty($passages)) { $scored++; continue; }
-            $grades = judge_passages($q['question'], $passages, $judgemodel, $judgekey);
-            if ($grades === null) { $errors++; continue; }
+            if (empty($passages)) {
+                $scored++;
+                continue;
+            }
+            $grades = local_ai_course_assistant_ragbench_judge_passages($q['question'], $passages, $judgemodel, $judgekey);
+            if ($grades === null) {
+                $errors++;
+                continue;
+            }
             $ndcg += \local_ai_course_assistant\rag_judge::ndcg_at_k($grades, $topk);
             $prec += \local_ai_course_assistant\rag_judge::precision_at_k($grades, $topk);
             $hit  += \local_ai_course_assistant\rag_judge::hit_at_k($grades, $topk);
@@ -514,20 +699,37 @@ if ($judgemode) {
             $scored++;
         }
         $n = max(1, $scored);
-        $resultsC[] = ['arm' => $arm['label'], 'ndcg' => $ndcg / $n, 'precision' => $prec / $n,
+        $resultsc[] = ['arm' => $arm['label'], 'ndcg' => $ndcg / $n, 'precision' => $prec / $n,
                        'hit' => $hit / $n, 'mean_rel' => $mean / $n, 'scored' => $scored, 'errors' => $errors];
-        printf("  %-16s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
-            $arm['label'], $topk, $ndcg / $n, $topk, $prec / $n, $topk, $hit / $n, $mean / $n, $scored, $errors);
-        $restoreC();
+        printf(
+            "  %-16s nDCG@%d=%.3f  P@%d=%.3f  hit@%d=%.3f  mean=%.2f  (scored %d, judge-err %d)\n",
+            $arm['label'],
+            $topk,
+            $ndcg / $n,
+            $topk,
+            $prec / $n,
+            $topk,
+            $hit / $n,
+            $mean / $n,
+            $scored,
+            $errors
+        );
+        $restorec();
     }
-    $restoreC();
+    $restorec();
 
     echo "\n" . str_repeat('=', 64) . "\n";
     echo "FAMILY C (full-stack: embeddings + Voyage rerank + parent-doc, in-memory)\n";
     echo str_repeat('=', 64) . "\n";
-    foreach ($resultsC as $r) {
-        printf("  %-16s nDCG=%.3f  P@k=%.3f  hit@k=%.3f  mean=%.2f\n",
-            $r['arm'], $r['ndcg'], $r['precision'], $r['hit'], $r['mean_rel']);
+    foreach ($resultsc as $r) {
+        printf(
+            "  %-16s nDCG=%.3f  P@k=%.3f  hit@k=%.3f  mean=%.2f\n",
+            $r['arm'],
+            $r['ndcg'],
+            $r['precision'],
+            $r['hit'],
+            $r['mean_rel']
+        );
     }
     echo "\n";
 
@@ -537,9 +739,9 @@ if ($judgemode) {
         'judge'      => $judgemodel,
         'topk'       => $topk,
         'n'          => count($qitems),
-        'family_a'   => $resultsA,
-        'family_b'   => $resultsB,
-        'family_c'   => $resultsC,
+        'family_a'   => $resultsa,
+        'family_b'   => $resultsb,
+        'family_c'   => $resultsc,
     ];
     file_put_contents($outfile, json_encode($out, JSON_PRETTY_PRINT));
     echo "Results written to: {$outfile}\n";
@@ -613,7 +815,7 @@ if (!empty($abproviders)) {
         // The base provider hard-defaults an unset width to 1536, which Voyage
         // rejects (its MRL widths are only 256/512/1024/2048), so the width must
         // be pinned per provider rather than left unset.
-        $armdim = ($prov === 'voyage') ? 1024 : 1536;
+        $armdim = ($prov === 'voyage') ? $voyagedim : 1536;
         set_config('embed_provider', $prov, 'local_ai_course_assistant');
         set_config('embed_model', ($model !== '') ? $model : null, 'local_ai_course_assistant');
         set_config('embed_dimensions', $armdim, 'local_ai_course_assistant');
@@ -699,7 +901,7 @@ if (!empty($abproviders)) {
             }
             $scored = [];
             foreach ($armvecs[$cid] as $chunkid => $vec) {
-                $scored[] = ['id' => $chunkid, 'score' => cosine_sim($qvec, $vec)];
+                $scored[] = ['id' => $chunkid, 'score' => local_ai_course_assistant_ragbench_cosine_sim($qvec, $vec)];
             }
             usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
             $rank = null;
@@ -735,22 +937,24 @@ if (!empty($abproviders)) {
             'provider'        => $prov,
             'model'           => $armmodel,
             'n'               => count($ranks),
-            'recall_at_1'     => compute_metrics($ranks, 1)['recall_at_k'],
-            'recall_at_3'     => compute_metrics($ranks, 3)['recall_at_k'],
-            'recall_at_5'     => compute_metrics($ranks, 5)['recall_at_k'],
-            'mrr'             => compute_metrics($ranks, 999)['mrr'],
-            'p50_query_ms'    => pct($qlatencies, 50),
-            'p95_query_ms'    => pct($qlatencies, 95),
+            'recall_at_1'     => local_ai_course_assistant_ragbench_compute_metrics($ranks, 1)['recall_at_k'],
+            'recall_at_3'     => local_ai_course_assistant_ragbench_compute_metrics($ranks, 3)['recall_at_k'],
+            'recall_at_5'     => local_ai_course_assistant_ragbench_compute_metrics($ranks, 5)['recall_at_k'],
+            'mrr'             => local_ai_course_assistant_ragbench_compute_metrics($ranks, 999)['mrr'],
+            'p50_query_ms'    => local_ai_course_assistant_ragbench_pct($qlatencies, 50),
+            'p95_query_ms'    => local_ai_course_assistant_ragbench_pct($qlatencies, 95),
             'chunk_embed_sec' => $embedsec,
         ];
         $abperfixture[$spec] = $perfix;
 
         $armsum = $absummaries[count($absummaries) - 1];
-        printf("  recall@1=%.1f%%  recall@3=%.1f%%  recall@5=%.1f%%  mrr=%.3f\n\n",
+        printf(
+            "  recall@1=%.1f%%  recall@3=%.1f%%  recall@5=%.1f%%  mrr=%.3f\n\n",
             $armsum['recall_at_1'] * 100,
             $armsum['recall_at_3'] * 100,
             $armsum['recall_at_5'] * 100,
-            $armsum['mrr']);
+            $armsum['mrr']
+        );
 
         $abrestore();
     }
@@ -786,12 +990,14 @@ if (!empty($abproviders)) {
         $base = $absummaries[0];
         echo "Deltas vs baseline (" . $base['arm'] . "):\n";
         foreach (array_slice($absummaries, 1) as $s) {
-            printf("  %-26s  R@1 %+.1fpp  R@3 %+.1fpp  R@5 %+.1fpp  MRR %+.3f\n",
+            printf(
+                "  %-26s  R@1 %+.1fpp  R@3 %+.1fpp  R@5 %+.1fpp  MRR %+.3f\n",
                 $s['arm'],
                 ($s['recall_at_1'] - $base['recall_at_1']) * 100,
                 ($s['recall_at_3'] - $base['recall_at_3']) * 100,
                 ($s['recall_at_5'] - $base['recall_at_5']) * 100,
-                $s['mrr'] - $base['mrr']);
+                $s['mrr'] - $base['mrr']
+            );
         }
         echo "\n";
     }
@@ -843,15 +1049,37 @@ $courseids = array_unique(array_column($fixtures, 'courseid'));
 foreach ($courseids as $courseid) {
     $rows = $DB->get_records_select(
         'local_ai_course_assistant_chunks',
-        'courseid = :cid AND embedding IS NOT NULL',
+        'courseid = :cid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
         ['cid' => $courseid],
         '',
-        'id, content, embedding'
+        'id, content, embedding, embedding_bin, embed_dtype'
     );
     $coursechunks[$courseid] = [];
+    $binaryskipped = 0;
     foreach ($rows as $row) {
-        $vec = json_decode($row->embedding, true);
-        if (is_array($vec) && !empty($vec)) {
+        // Widening the predicate above is not enough on its own: a quantized row
+        // has embedding = NULL, so a json_decode() of that column discarded every
+        // row the predicate had just admitted and the tool reported "Loaded 0
+        // embedded chunks" on exactly the indexes it was widened to support.
+        // Decode through the retriever so this tool reads a vector the same way
+        // retrieval does.
+        $dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype($row->embed_dtype ?? null);
+
+        if ($dtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+            // decode_vector() returns [] for binary by design — those vectors are
+            // scored on packed bytes by binary_similarity(), while this tool's
+            // cosine helper takes float arrays. Count them and say so below,
+            // rather than silently benchmarking nothing.
+            $binaryskipped++;
+            continue;
+        }
+
+        $vec = \local_ai_course_assistant\rag_retriever::decode_vector(
+            $row->embedding_bin ?? null,
+            $row->embedding ?? null,
+            $dtype
+        );
+        if (!empty($vec)) {
             $coursechunks[$courseid][$row->id] = [
                 'content' => $row->content,
                 'vec'     => $vec,
@@ -859,6 +1087,11 @@ foreach ($courseids as $courseid) {
         }
     }
     echo "Loaded " . count($coursechunks[$courseid]) . " embedded chunks for courseid={$courseid}\n";
+    if ($binaryskipped > 0) {
+        echo "  WARNING: skipped {$binaryskipped} binary-encoded chunks. This tool scores float\n"
+           . "           arrays; binary vectors are compared as packed bytes. Re-run against a\n"
+           . "           float or int8 index to benchmark this course.\n";
+    }
 }
 echo "\n";
 
@@ -871,7 +1104,7 @@ echo "\n";
  * @param float[] $b
  * @return float
  */
-function cosine_sim(array $a, array $b): float {
+function local_ai_course_assistant_ragbench_cosine_sim(array $a, array $b): float {
     $dot = $norma = $normb = 0.0;
     $len = count($a);
     for ($i = 0; $i < $len; $i++) {
@@ -899,7 +1132,7 @@ function cosine_sim(array $a, array $b): float {
  * @param string $apikey OpenAI API key.
  * @return int[]|null
  */
-function judge_passages(string $question, array $passages, string $model, string $apikey): ?array {
+function local_ai_course_assistant_ragbench_judge_passages(string $question, array $passages, string $model, string $apikey): ?array {
     $k = count($passages);
     if ($k === 0) {
         return [];
@@ -922,17 +1155,17 @@ function judge_passages(string $question, array $passages, string $model, string
         'temperature' => 0,
     ]);
     for ($attempt = 0; $attempt < 4; $attempt++) {
-        $c = curl_init('https://api.openai.com/v1/chat/completions');
-        curl_setopt_array($c, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $apikey],
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 60,
-        ]);
-        $resp = curl_exec($c);
-        $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
-        curl_close($c);
+        // Moodle's \curl wrapper rather than a raw cURL handle: the wrapper
+        // honors the site proxy settings and the SSRF allowlist that a
+        // hand-built handle bypasses.
+        $curl = new \curl();
+        $curl->setHeader(['Content-Type: application/json', 'Authorization: Bearer ' . $apikey]);
+        $resp = $curl->post(
+            'https://api.openai.com/v1/chat/completions',
+            $payload,
+            ['CURLOPT_TIMEOUT' => 60]
+        );
+        $code = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($code === 429 || $code >= 500) {
             sleep(3);
             continue;
@@ -957,7 +1190,7 @@ function judge_passages(string $question, array $passages, string $model, string
  * @param string $key OpenAI API key for the judge.
  * @return array
  */
-function judge_arm(array $qitems, int $topk, string $model, string $key): array {
+function local_ai_course_assistant_ragbench_judge_arm(array $qitems, int $topk, string $model, string $key): array {
     $ndcg = $prec = $hit = $mean = 0.0;
     $scored = 0;
     $errors = 0;
@@ -969,7 +1202,7 @@ function judge_arm(array $qitems, int $topk, string $model, string $key): array 
             $scored++;
             continue;
         }
-        $grades = judge_passages($q['question'], $passages, $model, $key);
+        $grades = local_ai_course_assistant_ragbench_judge_passages($q['question'], $passages, $model, $key);
         if ($grades === null) {
             $errors++;
             continue;
@@ -1035,7 +1268,7 @@ foreach ($fixtures as $fixture) {
         $scored[] = [
             'id'      => $chunkid,
             'content' => $chunk['content'],
-            'score'   => cosine_sim($queryvec, $chunk['vec']),
+            'score'   => local_ai_course_assistant_ragbench_cosine_sim($queryvec, $chunk['vec']),
         ];
     }
     usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
@@ -1067,7 +1300,8 @@ foreach ($fixtures as $fixture) {
     }
 
     $top5cosine = array_slice(array_column($scored, 'id'), 0, 5);
-    printf("  [embed-only] rank=%s target_cosine=%s latency=%dms top5_ids=[%s]%s\n",
+    printf(
+        "  [embed-only] rank=%s target_cosine=%s latency=%dms top5_ids=[%s]%s\n",
         $cosinerank !== null ? $cosinerank : 'NOT_FOUND',
         $targetscore !== null ? number_format($targetscore, 4) : 'n/a',
         $totalembedlatencyms,
@@ -1088,6 +1322,18 @@ foreach ($fixtures as $fixture) {
         'cosine_latency_ms'   => $cosinelatencyms,
         'total_embed_ms'      => $totalembedlatencyms,
         'top10_cosine_ids'    => array_column(array_slice($scored, 0, 10), 'id'),
+        // Ground-truth-free confidence signals, available at query time in
+        // production. Used to test whether the embedding stage's own
+        // confidence predicts when reranking helps, which would allow gating
+        // rerank per query without needing labelled fixtures.
+        'top1_cosine_score'   => isset($scored[0]) ? (float) $scored[0]['score'] : null,
+        'top2_cosine_score'   => isset($scored[1]) ? (float) $scored[1]['score'] : null,
+        'top3_cosine_score'   => isset($scored[2]) ? (float) $scored[2]['score'] : null,
+        'top5_cosine_score'   => isset($scored[4]) ? (float) $scored[4]['score'] : null,
+        'margin_1_2'          => (isset($scored[0], $scored[1]))
+            ? (float) $scored[0]['score'] - (float) $scored[1]['score'] : null,
+        'margin_1_3'          => (isset($scored[0], $scored[2]))
+            ? (float) $scored[0]['score'] - (float) $scored[2]['score'] : null,
         'rerank_rank'         => null,
         'rerank_latency_ms'   => null,
         'rerank_total_tokens' => null,
@@ -1168,7 +1414,8 @@ foreach ($fixtures as $fixture) {
             $row['rerank_latency_ms']     = $reranklatencyms;
             $row['rerank_substring_match'] = $reranksubmatch;
 
-            printf("  [rerank]     rank=%s latency=%dms (+%dms) top5_ids=[%s]%s\n",
+            printf(
+                "  [rerank]     rank=%s latency=%dms (+%dms) top5_ids=[%s]%s\n",
                 $rerankrank !== null ? $rerankrank : 'NOT_FOUND',
                 $reranklatencyms,
                 $reranklatencyms,
@@ -1222,17 +1469,28 @@ foreach ($results as $r) {
         $below[] = sprintf('%s  cos=%.4f  course=%s', $r['fixture_id'] ?? '?', $s, $r['course'] ?? '?');
     }
 }
-printf("Target-chunk cosine over %d located fixtures: min=%.4f  mean=%.4f  max=%.4f\n",
-    $scoredcount, $scoredcount ? $minscore : 0.0,
-    $scoredcount ? $sumscore / $scoredcount : 0.0, $scoredcount ? $maxscore : 0.0);
-printf("Target chunk BELOW the %.2f floor (would be dropped in production): %d of %d\n",
-    $floor, count($below), $scoredcount);
+printf(
+    "Target-chunk cosine over %d located fixtures: min=%.4f  mean=%.4f  max=%.4f\n",
+    $scoredcount,
+    $scoredcount ? $minscore : 0.0,
+    $scoredcount ? $sumscore / $scoredcount : 0.0,
+    $scoredcount ? $maxscore : 0.0
+);
+printf(
+    "Target chunk BELOW the %.2f floor (would be dropped in production): %d of %d\n",
+    $floor,
+    count($below),
+    $scoredcount
+);
 foreach ($below as $b) {
     echo "  - $b\n";
 }
 if ($notfound) {
-    printf("Target chunk not located by cosine at all (unfixable by floor change): %d (%s)\n",
-        count($notfound), implode(',', $notfound));
+    printf(
+        "Target chunk not located by cosine at all (unfixable by floor change): %d (%s)\n",
+        count($notfound),
+        implode(',', $notfound)
+    );
 }
 echo "\n";
 
@@ -1245,7 +1503,7 @@ echo "\n";
  * @param int $k
  * @return array{recall_at_k: float, mrr: float}
  */
-function compute_metrics(array $ranks, int $k): array {
+function local_ai_course_assistant_ragbench_compute_metrics(array $ranks, int $k): array {
     $n = count($ranks);
     if ($n === 0) {
         return ['recall_at_k' => 0.0, 'mrr' => 0.0];
@@ -1273,7 +1531,7 @@ function compute_metrics(array $ranks, int $k): array {
  * @param int $p 0..100
  * @return int|null
  */
-function pct(array $values, int $p): ?int {
+function local_ai_course_assistant_ragbench_pct(array $values, int $p): ?int {
     if (empty($values)) {
         return null;
     }
@@ -1299,31 +1557,53 @@ foreach ($groups as $label => $group) {
     $rerankms = array_filter(array_map(fn($r) => $r['rerank_latency_ms'] ?? null, $group));
 
     $totaltokens = array_sum(array_filter(array_map(fn($r) => $r['rerank_total_tokens'] ?? 0, $group)));
-    $costusd = $totaltokens > 0 ? ($totaltokens / 1000000) * 0.05 : 0.0;
-    $costperquery = count($group) > 0 && $totaltokens > 0
-        ? ($totaltokens / count($group) / 1000000) * 0.05
-        : 0.0;
+    // Priced through the shared rate card rather than a hardcoded rate. This was
+    // `* 0.05` inline, which matched Voyage's rerank-2.5 price but would have kept
+    // billing at it silently after any price change, and ignored the fact that
+    // `rerank_model` is configurable, so a run on a different reranker was costed
+    // at rerank-2.5's rate. estimate_cost() returns null for a model absent from
+    // the card, which the $usd formatter already renders as "n/a" -- an honest
+    // unknown rather than a guessed figure.
+    $rerankmodel = (string) (get_config('local_ai_course_assistant', 'rerank_model') ?: 'rerank-2.5');
+    $costusd = null;
+    $costperquery = null;
+    if ($totaltokens > 0) {
+        $costusd = \local_ai_course_assistant\token_cost_manager::estimate_cost(
+            $rerankmodel,
+            $totaltokens,
+            0
+        );
+        if ($costusd === null) {
+            fwrite(STDERR, "WARNING: rerank model '{$rerankmodel}' is not in the rate card, "
+                . "so rerank cost is reported as n/a rather than estimated.\n");
+        } else if (count($group) > 0) {
+            $costperquery = $costusd / count($group);
+        }
+    } else {
+        $costusd = 0.0;
+        $costperquery = 0.0;
+    }
 
     $entry = [
         'group'                => $label,
         'n'                    => count($group),
-        'cosine_recall_at_1'   => compute_metrics($cosineranks, 1)['recall_at_k'],
-        'cosine_recall_at_3'   => compute_metrics($cosineranks, 3)['recall_at_k'],
-        'cosine_recall_at_5'   => compute_metrics($cosineranks, 5)['recall_at_k'],
-        'cosine_mrr'           => compute_metrics($cosineranks, 999)['mrr'],
-        'cosine_p50_embed_ms'  => pct(array_values($embedms), 50),
-        'cosine_p95_embed_ms'  => pct(array_values($embedms), 95),
-        'rerank_recall_at_1'   => $hasrerank ? compute_metrics($rerankranks, 1)['recall_at_k'] : null,
-        'rerank_recall_at_3'   => $hasrerank ? compute_metrics($rerankranks, 3)['recall_at_k'] : null,
-        'rerank_recall_at_5'   => $hasrerank ? compute_metrics($rerankranks, 5)['recall_at_k'] : null,
-        'rerank_mrr'           => $hasrerank ? compute_metrics($rerankranks, 999)['mrr'] : null,
-        'rerank_p50_ms'        => pct(array_values($rerankms), 50),
-        'rerank_p95_ms'        => pct(array_values($rerankms), 95),
+        'cosine_recall_at_1'   => local_ai_course_assistant_ragbench_compute_metrics($cosineranks, 1)['recall_at_k'],
+        'cosine_recall_at_3'   => local_ai_course_assistant_ragbench_compute_metrics($cosineranks, 3)['recall_at_k'],
+        'cosine_recall_at_5'   => local_ai_course_assistant_ragbench_compute_metrics($cosineranks, 5)['recall_at_k'],
+        'cosine_mrr'           => local_ai_course_assistant_ragbench_compute_metrics($cosineranks, 999)['mrr'],
+        'cosine_p50_embed_ms'  => local_ai_course_assistant_ragbench_pct(array_values($embedms), 50),
+        'cosine_p95_embed_ms'  => local_ai_course_assistant_ragbench_pct(array_values($embedms), 95),
+        'rerank_recall_at_1'   => $hasrerank ? local_ai_course_assistant_ragbench_compute_metrics($rerankranks, 1)['recall_at_k'] : null,
+        'rerank_recall_at_3'   => $hasrerank ? local_ai_course_assistant_ragbench_compute_metrics($rerankranks, 3)['recall_at_k'] : null,
+        'rerank_recall_at_5'   => $hasrerank ? local_ai_course_assistant_ragbench_compute_metrics($rerankranks, 5)['recall_at_k'] : null,
+        'rerank_mrr'           => $hasrerank ? local_ai_course_assistant_ragbench_compute_metrics($rerankranks, 999)['mrr'] : null,
+        'rerank_p50_ms'        => local_ai_course_assistant_ragbench_pct(array_values($rerankms), 50),
+        'rerank_p95_ms'        => local_ai_course_assistant_ragbench_pct(array_values($rerankms), 95),
         'rerank_total_tokens'  => $totaltokens,
         'rerank_cost_usd'      => $costusd,
         'rerank_cost_per_query_usd' => $costperquery,
         'delta_recall_at_3'    => $hasrerank
-            ? compute_metrics($rerankranks, 3)['recall_at_k'] - compute_metrics($cosineranks, 3)['recall_at_k']
+            ? local_ai_course_assistant_ragbench_compute_metrics($rerankranks, 3)['recall_at_k'] - local_ai_course_assistant_ragbench_compute_metrics($cosineranks, 3)['recall_at_k']
             : null,
     ];
     $summary[] = $entry;
@@ -1337,16 +1617,32 @@ echo "Rerank arm: " . ($rerankavailable ? "ACTIVE (rerank-2.5)" : "SKIPPED (no k
 echo "Candidates (N): {$candidates}  Top-K: {$topk}\n\n";
 
 $cols = ['Group', 'N', 'Cos@1', 'Cos@3', 'Cos@5', 'Cos MRR', 'Rnk@1', 'Rnk@3', 'Rnk@5', 'Rnk MRR', 'Delta@3', 'P50emb', 'P50rnk', 'Cost/q'];
-echo implode(' | ', array_map(fn($c) => str_pad($c, 8), $cols)) . "\n";
-echo str_repeat('-', 8 * count($cols) + 3 * (count($cols) - 1)) . "\n";
+// Group labels are course names ("course115"), which run past the 8-character
+// data columns. Truncating them made distinct courses print under the same
+// label -- course115/116/117 all read as "course11" -- so size this one column
+// to its contents and leave the rest fixed.
+$groupw = 8;
+foreach ($summary as $s) {
+    $groupw = max($groupw, strlen((string) $s['group']));
+}
+$widths = array_fill(0, count($cols), 8);
+$widths[0] = $groupw;
+echo implode(' | ', array_map(fn($c, $w) => str_pad($c, $w), $cols, $widths)) . "\n";
+echo str_repeat('-', array_sum($widths) + 3 * (count($cols) - 1)) . "\n";
 
 foreach ($summary as $s) {
-    $pct3 = function($v) { return $v !== null ? sprintf('%.1f%%', $v * 100) : 'n/a'; };
-    $ms   = function($v) { return $v !== null ? $v . 'ms' : 'n/a'; };
-    $usd  = function($v) { return $v !== null ? sprintf('$%.5f', $v) : 'n/a'; };
+    $pct3 = function ($v) {
+        return $v !== null ? sprintf('%.1f%%', $v * 100) : 'n/a';
+    };
+    $ms   = function ($v) {
+        return $v !== null ? $v . 'ms' : 'n/a';
+    };
+    $usd  = function ($v) {
+        return $v !== null ? sprintf('$%.5f', $v) : 'n/a';
+    };
 
     $row = [
-        str_pad(substr($s['group'], 0, 8), 8),
+        str_pad((string) $s['group'], $groupw),
         str_pad($s['n'], 8),
         str_pad($pct3($s['cosine_recall_at_1']), 8),
         str_pad($pct3($s['cosine_recall_at_3']), 8),

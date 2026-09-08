@@ -26,7 +26,6 @@ namespace local_ai_course_assistant\embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base_embedding_provider {
-
     /** @var string API key (may be empty for local providers). */
     protected string $apikey;
 
@@ -40,11 +39,36 @@ abstract class base_embedding_provider {
     protected int $dimensions;
 
     /**
+     * @var string Model used for QUERY-side embedding. Usually identical to
+     * $model. Differs only when an administrator has set embed_query_model to
+     * exploit a shared embedding space (see embedding_compat).
+     */
+    protected string $querymodel;
+
+    /** @var string Encoding for stored document vectors; one of embedding_compat::DTYPES. */
+    protected string $dtype;
+
+    /**
      * Constructor — reads plugin RAG config.
      */
     public function __construct() {
         $this->apikey     = (string) (get_config('local_ai_course_assistant', 'embed_apikey') ?: '');
         $this->model      = (string) (get_config('local_ai_course_assistant', 'embed_model') ?: $this->get_default_model());
+        // Query-side model. Empty (the default) means "same as the document
+        // model", which is the only universally safe choice: vectors from
+        // different models are comparable only within a declared shared
+        // embedding space. Mixing is gated by embedding_compat at read time, so
+        // a misconfiguration here degrades to a warning and a same-model
+        // fallback rather than silently meaningless scores.
+        $rawqm = get_config('local_ai_course_assistant', 'embed_query_model');
+        $this->querymodel = (trim((string) $rawqm) !== '') ? trim((string) $rawqm) : $this->model;
+        // Stored-vector encoding. Normalized against an allowlist rather than
+        // trusted: this value reaches an outbound API payload and selects a
+        // decode path, so an unrecognized string must resolve to float rather
+        // than propagate.
+        $this->dtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
+            (string) get_config('local_ai_course_assistant', 'embed_dtype')
+        );
         // 0 means "use the provider's native default width". An unset config
         // must NOT fall back to a hard 1536: that is only valid for OpenAI, and
         // forcing it on Voyage (whose MRL widths are 256/512/1024/2048) makes
@@ -83,6 +107,76 @@ abstract class base_embedding_provider {
      */
     public function get_dimensions(): int {
         return $this->dimensions;
+    }
+
+    /**
+     * Can this provider embed queries with a different model from documents?
+     *
+     * Only true where a shared embedding space actually exists and the adapter
+     * sends the query model on the query call. A provider that returns false
+     * ignores embed_query_model entirely, and get_query_model() reports the
+     * document model so callers are told what really produced the vector.
+     *
+     * @return bool
+     */
+    public function supports_query_model(): bool {
+        return false;
+    }
+
+    /**
+     * Model that actually produced the query vector.
+     *
+     * The retriever uses this to decide whether a query may be scored against a
+     * stored chunk, so it MUST name the model that did the embedding rather than
+     * whatever is configured. For a provider that ignores embed_query_model this
+     * is the document model.
+     *
+     * Returning the configured value unconditionally was a bug: with OpenAI
+     * selected, setting embed_query_model made the comparability check test a
+     * model that had embedded nothing, so every row was judged incomparable and
+     * retrieval returned nothing at all — while the query vector had in fact
+     * been produced by the ordinary document model and was perfectly usable.
+     *
+     * @return string
+     */
+    public function get_query_model(): string {
+        return $this->supports_query_model() ? $this->querymodel : $this->model;
+    }
+
+    /**
+     * Encoding used for stored document vectors.
+     *
+     * @return string One of embedding_compat::DTYPES.
+     */
+    public function get_dtype(): string {
+        return $this->dtype;
+    }
+
+    /**
+     * Does this provider support quantized output?
+     *
+     * Only providers that can actually return int8/binary vectors should
+     * advertise this. A provider that cannot must keep writing float, because
+     * recording a dtype the stored bytes do not match would make every affected
+     * row unscoreable.
+     *
+     * @return bool
+     */
+    public function supports_dtype(): bool {
+        return false;
+    }
+
+    /**
+     * Effective dtype for writing: the configured dtype if the provider can
+     * honor it, float otherwise.
+     *
+     * @return string
+     */
+    public function effective_dtype(): string {
+        if (!$this->supports_dtype()) {
+            return \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT;
+        }
+        return $this->dtype;
     }
 
     /**
@@ -181,8 +275,13 @@ abstract class base_embedding_provider {
     protected function http_post(string $url, array $headers, string $body): string {
         global $CFG;
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
-            throw new \moodle_exception('chat:error_generic', 'local_ai_course_assistant',
-                '', null, "embedding endpoint failed SSRF validation: {$url}");
+            throw new \moodle_exception(
+                'chat:error_generic',
+                'local_ai_course_assistant',
+                '',
+                null,
+                "embedding endpoint failed SSRF validation: {$url}"
+            );
         }
         require_once($CFG->libdir . '/filelib.php'); // For \curl.
         $curl = new \curl();
@@ -193,8 +292,11 @@ abstract class base_embedding_provider {
         ]);
 
         // Pin to the validated IP, closing the DNS-rebinding window.
-        $response = $curl->post($url, $body,
-            \local_ai_course_assistant\security::resolve_pin_options($url));
+        $response = $curl->post(
+            $url,
+            $body,
+            \local_ai_course_assistant\security::resolve_pin_options($url)
+        );
         $httpcode = $curl->get_info()['http_code'] ?? 0;
 
         if ($httpcode < 200 || $httpcode >= 300) {

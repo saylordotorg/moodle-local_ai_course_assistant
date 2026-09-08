@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_assignment_manager {
-
     /** @var string Assignments table. */
     const T_ASSIGN = 'local_ai_course_assistant_sbx_assign';
 
@@ -67,7 +66,11 @@ class soapbox_assignment_manager {
             $select .= ' AND visible = 1';
         }
         return array_values($DB->get_records_select(
-            self::T_ASSIGN, $select, ['courseid' => $courseid], 'name ASC'));
+            self::T_ASSIGN,
+            $select,
+            ['courseid' => $courseid],
+            'name ASC'
+        ));
     }
 
     /**
@@ -195,7 +198,10 @@ class soapbox_assignment_manager {
     public static function get_topics(int $assignid): array {
         global $DB;
         return array_values($DB->get_records(
-            self::T_TOPIC, ['assignid' => $assignid], 'sortorder ASC, id ASC'));
+            self::T_TOPIC,
+            ['assignid' => $assignid],
+            'sortorder ASC, id ASC'
+        ));
     }
 
     /**

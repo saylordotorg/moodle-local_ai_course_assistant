@@ -30,7 +30,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content_chunker {
-
     /**
      * Chunk a block of text into overlapping segments ready for embedding.
      *

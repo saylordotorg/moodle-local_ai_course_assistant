@@ -32,7 +32,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\conversation_manager::add_message
  */
 final class cached_tokens_persistence_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -43,8 +42,20 @@ final class cached_tokens_persistence_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $id = conversation_manager::add_message(
-            42, (int) $user->id, (int) $course->id, 'assistant', 'answer',
-            0, 'openai', 1500, 300, 'gpt-4o-mini', 'chat', null, null, 1024
+            42,
+            (int) $user->id,
+            (int) $course->id,
+            'assistant',
+            'answer',
+            0,
+            'openai',
+            1500,
+            300,
+            'gpt-4o-mini',
+            'chat',
+            null,
+            null,
+            1024
         );
         $row = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $id]);
         $this->assertEquals(1024, (int) $row->cached_tokens);
@@ -55,8 +66,20 @@ final class cached_tokens_persistence_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $id = conversation_manager::add_message(
-            42, (int) $user->id, (int) $course->id, 'assistant', 'answer',
-            0, 'gemini', 1500, 300, 'gemini-2.5-flash', 'chat', null, null, null
+            42,
+            (int) $user->id,
+            (int) $course->id,
+            'assistant',
+            'answer',
+            0,
+            'gemini',
+            1500,
+            300,
+            'gemini-2.5-flash',
+            'chat',
+            null,
+            null,
+            null
         );
         $row = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $id]);
         // Null (provider reported nothing) must stay distinguishable from 0
@@ -69,8 +92,20 @@ final class cached_tokens_persistence_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $id = conversation_manager::add_message(
-            42, (int) $user->id, (int) $course->id, 'user', 'question',
-            0, '', null, null, null, 'chat', null, null, 9999
+            42,
+            (int) $user->id,
+            (int) $course->id,
+            'user',
+            'question',
+            0,
+            '',
+            null,
+            null,
+            null,
+            'chat',
+            null,
+            null,
+            9999
         );
         $row = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $id]);
         $this->assertNull($row->cached_tokens);
@@ -81,8 +116,20 @@ final class cached_tokens_persistence_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
         $id = conversation_manager::add_message(
-            42, (int) $user->id, (int) $course->id, 'assistant', 'answer',
-            0, 'openai', 1500, 300, 'gpt-4o-mini', 'chat', null, null, 0
+            42,
+            (int) $user->id,
+            (int) $course->id,
+            'assistant',
+            'answer',
+            0,
+            'openai',
+            1500,
+            300,
+            'gpt-4o-mini',
+            'chat',
+            null,
+            null,
+            0
         );
         $row = $DB->get_record('local_ai_course_assistant_msgs', ['id' => $id]);
         $this->assertSame(0, (int) $row->cached_tokens);

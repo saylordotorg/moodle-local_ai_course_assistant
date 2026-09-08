@@ -1,5 +1,13 @@
 # SOLA v5.11.0 — External Actions Required (Tom)
 
+> **CORRECTION (2026-08-01) — the rerank cost and per-user volume figures below are superseded.**
+>
+> Two errors compound in the original model. Measured production usage is **5.07 chat turns per SOLA user per month**, not the ~70 implied by the capacity table here (**13.7x overstated**). And the measured rerank cost is **$0.00187/query at pool 50** against real ~700-token Saylor chunks, not the snippet-sized assumption behind the $63/mo figure (**52x understated**).
+>
+> They partly cancel, so the net error in absolute cost is **3.8x understated**: at 25,000 SOLA users, reranking at pool 50 is **~$237/month**, not $63. The bigger correction is proportional — reranking is **~101% of chat spend at pool 50** and **~41% at pool 20**, not the "~6% of chat spend" claimed here. Enabling it at pool 50 would roughly double the AI bill.
+>
+> Canonical figures: `sola-retrieval-cost-projections-2026-07-31.md`. Measurement: `sola-model-benchmark-2026-07-30.md`.
+
 **Date:** 2026-06-09. **Status:** unblocked-able by code; needs Tom's hand on vendor portals.
 
 Actions below cannot be performed by code or by SSM from this laptop. They sit in vendor portals (Voyage, Anthropic, OpenAI, Google) and require Tom's authenticated session.
@@ -29,10 +37,10 @@ Per section 5 of `sola-vendor-recommendations-2026-06-09.md`. 2–4 week procure
 
 | Vendor | Current tier | Target | Approx volume to justify | Contact |
 |---|---|---|---|---|
-| Google Vertex AI | unknown | **Tier 3+** (5k+ RPM) | ~58k chat turns/day at 100k MAU | sales@google.com or GCP account rep |
+| Google Vertex AI | unknown | **Tier 3+** (5k+ RPM) | ~58k chat turns/day at 100k MAU **[corrected: ~4.2k/day measured]** | sales@google.com or GCP account rep |
 | OpenAI | unknown | **Tier 4** (10k+ RPM) | ~25k structured calls/day (quiz + classifier + analytics + failover) | platform.openai.com → Settings → Limits → request increase |
 | Anthropic | unknown | **Tier 3** | ~3k integrity calls/day (once integrity lane built; today: minimal) | console.anthropic.com → Settings → Limits |
-| Voyage AI | none (need to onboard) | **Enterprise** | ~125k reranks/day at 100k MAU | sales@voyageai.com |
+| Voyage AI | none (need to onboard) | **Enterprise** | ~125k reranks/day at 100k MAU **[corrected: ~4.2k/day]** | sales@voyageai.com |
 
 **For each:** request the rate-card in writing, SOC 2 Type II report, GDPR DPA with no-training clause, EU residency confirmation where applicable.
 

@@ -79,12 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $invoker = 'web:' . $USER->username;
     if ($action === 'disable') {
         $touched = emergency_control::disable([$flag], $reason, $invoker);
-        \core\notification::warning(get_string('emergency:disabled_notice', 'local_ai_course_assistant',
-            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]));
+        \core\notification::warning(get_string(
+            'emergency:disabled_notice',
+            'local_ai_course_assistant',
+            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]
+        ));
     } else if ($action === 'restore') {
         $touched = emergency_control::restore([$flag], $reason, $invoker);
-        \core\notification::success(get_string('emergency:restored_notice', 'local_ai_course_assistant',
-            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]));
+        \core\notification::success(get_string(
+            'emergency:restored_notice',
+            'local_ai_course_assistant',
+            (object) ['flag' => $flag, 'touched' => implode(', ', $touched)]
+        ));
     }
     purge_all_caches();
     redirect($PAGE->url);
@@ -94,8 +100,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $state = [
     emergency_control::FLAG_ALL => !((bool) get_config('local_ai_course_assistant', 'enabled')),
     emergency_control::FLAG_CHAT => (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled'),
-    emergency_control::FLAG_VOICE => ((string) get_config('local_ai_course_assistant', 'voice_active_realtime') === ''
-        && (string) get_config('local_ai_course_assistant', 'voice_active_realtime_backup') !== ''),
+    // Read the flag that actually enforces the kill, not a heuristic over the
+    // backup key. voice_registry::resolve() gates on emergency_voice_disabled;
+    // disable() sets that unconditionally but writes voice_active_realtime_backup
+    // ONLY when the live label was already non-empty. A blank label is the
+    // default on an unconfigured site, so the old predicate reported "Active"
+    // while voice was dead site-wide -- and, because the template renders
+    // Restore inside {{#disabled}}, it also hid the button that undoes it.
+    // It could lie the other way too: blanking the label by hand while a stale
+    // backup row existed showed "Disabled" with voice running fine.
+    emergency_control::FLAG_VOICE => (bool) get_config('local_ai_course_assistant', 'emergency_voice_disabled'),
     emergency_control::FLAG_RAG => !((bool) get_config('local_ai_course_assistant', 'rag_enabled')),
     emergency_control::FLAG_OUTREACH => !((bool) get_config('local_ai_course_assistant', 'outreach_master_enabled')),
 ];
@@ -104,19 +118,26 @@ $rows = [];
 foreach ($validflags as $flag) {
     $rows[] = [
         'flag' => $flag,
-        'label' => get_string('emergency:flag_' . $flag, 'local_ai_course_assistant'),
-        'description' => get_string('emergency:flag_' . $flag . '_desc', 'local_ai_course_assistant'),
+        'label' => \local_ai_course_assistant\branding::str('emergency:flag_' . $flag),
+        'description' => \local_ai_course_assistant\branding::str('emergency:flag_' . $flag . '_desc'),
         'disabled' => $state[$flag],
         'is_all' => ($flag === emergency_control::FLAG_ALL),
     ];
 }
 
 echo $OUTPUT->header();
+// v7.2.1: brand-bearing strings are pre-rendered here rather than pulled in
+// with {{#str}}. The Mustache string helper does not resolve [[tutorshort]] and
+// friends, so four of them were rendering the raw token on the one page an
+// admin reaches mid-incident. Same treatment the widget's brand label already
+// gets; see branding::token_map().
 echo $OUTPUT->render_from_template('local_ai_course_assistant/emergency_admin', [
     'rows' => $rows,
+    'back_to_settings' => \local_ai_course_assistant\branding::str('emergency:back_to_settings'),
+    'page_warning' => \local_ai_course_assistant\branding::str('emergency:page_warning'),
     'sesskey' => sesskey(),
     'actionurl' => $PAGE->url->out(false),
-    'settings_url' => (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant']))->out(false),
+    'settings_url' => (new moodle_url('/admin/settings.php', ['section' => 'local_ai_course_assistant_general']))->out(false),
     'cli_path' => 'php local/ai_course_assistant/admin/cli/emergency_disable.php',
 ]);
 echo $OUTPUT->footer();

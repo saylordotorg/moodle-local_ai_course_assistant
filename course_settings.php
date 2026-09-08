@@ -29,6 +29,19 @@ require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\course_config_manager;
 
+/**
+ * Translated inline word for a global on/off state, used inside sentences and
+ * in the "Inherit global (...)" option labels.
+ *
+ * @param bool $on Whether the global setting is currently on.
+ * @return string Localized 'enabled' or 'disabled'.
+ */
+function local_ai_course_assistant_course_settings_state_label(bool $on): string {
+    return $on
+        ? get_string('coursesettings:state_enabled', 'local_ai_course_assistant')
+        : get_string('coursesettings:state_disabled', 'local_ai_course_assistant');
+}
+
 $courseid = required_param('courseid', PARAM_INT);
 
 $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
@@ -67,6 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'provider'    => optional_param('provider', '', PARAM_ALPHA),
         // API keys legitimately contain arbitrary characters, so PARAM_RAW_TRIMMED
         // is the correct (and Moodle-conventional) type for a secret credential.
+        // Submitted blank means "unchanged", not "clear it" -- the field is
+        // rendered empty now (the stored key is never sent to the browser), so
+        // treating blank as a wipe would destroy the key on every unrelated save.
+        // Clearing is still possible: see the explicit clear handling below.
         'apikey'      => optional_param('apikey', '', PARAM_RAW_TRIMMED),
         'model'       => optional_param('model', '', PARAM_TEXT),
         'apibaseurl'  => optional_param('apibaseurl', '', PARAM_URL),
@@ -75,7 +92,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'systemprompt' => optional_param('systemprompt', '', PARAM_RAW),
         // Received raw, then range-validated and cast to float just below.
         'temperature'  => optional_param('temperature', '', PARAM_RAW_TRIMMED),
+        // Per-course monthly spend cap in USD. Blank/0 = no per-course cap, in
+        // which case spend_guard falls back to spend_cap_per_course_default.
+        'spend_cap_monthly' => optional_param('spend_cap_monthly', '', PARAM_RAW_TRIMMED),
     ];
+
+    // v7.0.5 security fix: a course-level actor must not be able to redirect
+    // that course's AI traffic to a host of their choosing.
+    //
+    // This page is gated on local/ai_course_assistant:manage in the COURSE
+    // context, which an editing teacher holds. apibaseurl was accepted from it
+    // with no validation on this path at all -- is_safe_provider_url() is never
+    // called here -- so a teacher could point their course at any host they
+    // controlled and capture every student message and every retrieved course
+    // chunk for that course. security::is_safe_provider_url()'s own docblock
+    // says it was written to constrain a compromised admin, not a course-level
+    // actor, and blocking private ranges does nothing about a public collector.
+    //
+    // Changing the endpoint is therefore a site-level act: without
+    // moodle/site:config the submitted value is discarded and the stored one
+    // kept, so an existing override survives an unrelated save by a teacher.
+    // Accepted values still have to pass the SSRF check.
+    if (!has_capability('moodle/site:config', $syscontext)) {
+        $existing = course_config_manager::get($courseid);
+        $data['apibaseurl'] = ($existing && isset($existing->apibaseurl)) ? (string) $existing->apibaseurl : '';
+    } else if ($data['apibaseurl'] !== ''
+            && !\local_ai_course_assistant\security::is_safe_provider_url($data['apibaseurl'])) {
+        \core\notification::error(
+            get_string('coursesettings:apibaseurl_rejected', 'local_ai_course_assistant')
+        );
+        $existing = course_config_manager::get($courseid);
+        $data['apibaseurl'] = ($existing && isset($existing->apibaseurl)) ? (string) $existing->apibaseurl : '';
+    }
+
+    // Blank API key means "keep the stored one". The field is rendered empty
+    // (the credential is never sent to the browser), so without this every save
+    // of an unrelated field -- the enable toggle, the model, the system prompt --
+    // would silently clear the course's key and drop it back to the site key.
+    // An explicit clear is available via the dedicated checkbox.
+    if ($data['apikey'] === '') {
+        $existingkey = course_config_manager::get($courseid);
+        $data['apikey'] = ($existingkey && isset($existingkey->apikey)) ? (string) $existingkey->apikey : '';
+    }
+    if (optional_param('apikey_clear', 0, PARAM_INT)) {
+        $data['apikey'] = '';
+    }
 
     // Validate temperature range if provided.
     if ($data['temperature'] !== '') {
@@ -136,14 +197,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // v4.5.0: pedagogy toggles save as three-way (inherit / force on /
     // force off). Empty value = inherit (unset the per-course key, fall
     // back to site-wide default). '1' = force on. '0' = force off.
-    foreach ([
+    foreach (
+        [
         'socratic_mode'           => 'socratic_mode_course_',
         'flashcards_on'           => 'flashcards_enabled_course_',
         'sandbox_on'              => 'code_sandbox_enabled_course_',
         'essay_on'                => 'essay_feedback_enabled_course_',
         'soapbox_on'              => 'soapbox_enabled_course_',
         'we_on'                   => 'worked_examples_enabled_course_',
-    ] as $field => $cfgprefix) {
+        ] as $field => $cfgprefix
+    ) {
         $v = optional_param($field, '', PARAM_RAW_TRIMMED);
         if ($v === '1' || $v === '0') {
             set_config($cfgprefix . $courseid, $v, 'local_ai_course_assistant');
@@ -162,8 +225,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     // Digest email keeps its checkbox semantics — it's a per-course delivery
     // toggle, not a feature on/off.
-    set_config('digest_email_enabled_course_' . $courseid,
-        (int) optional_param('digest_email', 0, PARAM_BOOL), 'local_ai_course_assistant');
+    set_config(
+        'digest_email_enabled_course_' . $courseid,
+        (int) optional_param('digest_email', 0, PARAM_BOOL),
+        'local_ai_course_assistant'
+    );
 
     // v4.2.3: external resources opt-in. Inherit / force on / force off.
     $extres = optional_param('external_resources', '', PARAM_RAW_TRIMMED);
@@ -188,8 +254,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    redirect($pageurl, get_string('coursesettings:saved', 'local_ai_course_assistant'),
-        null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        $pageurl,
+        get_string('coursesettings:saved', 'local_ai_course_assistant'),
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 // Load current course overrides.
@@ -234,17 +304,23 @@ echo $OUTPUT->heading(get_string('coursesettings:title', 'local_ai_course_assist
 $courseurl = new moodle_url('/course/view.php', ['id' => $courseid]);
 $courseanalyticsurl = new moodle_url('/local/ai_course_assistant/analytics.php', ['courseid' => $courseid]);
 echo html_writer::div(
-    html_writer::link($courseurl,
-        '&larr; Back to Course',
-        ['class' => 'btn btn-sm btn-outline-secondary'])
+    html_writer::link(
+        $courseurl,
+        '&larr; ' . get_string('coursesettings:back_to_course', 'local_ai_course_assistant'),
+        ['class' => 'btn btn-sm btn-outline-secondary']
+    )
     . ' '
-    . html_writer::link($globalsettingsurl,
+    . html_writer::link(
+        $globalsettingsurl,
         get_string('coursesettings:global_settings_link', 'local_ai_course_assistant'),
-        ['class' => 'btn btn-sm btn-outline-secondary'])
+        ['class' => 'btn btn-sm btn-outline-secondary']
+    )
     . ' '
-    . html_writer::link($courseanalyticsurl,
-        'Course Analytics',
-        ['class' => 'btn btn-sm btn-outline-secondary']),
+    . html_writer::link(
+        $courseanalyticsurl,
+        get_string('coursesettings:course_analytics', 'local_ai_course_assistant'),
+        ['class' => 'btn btn-sm btn-outline-secondary']
+    ),
     'mb-3 d-flex flex-wrap" style="gap:8px'
 );
 
@@ -263,10 +339,8 @@ echo html_writer::div(
     </div>
 
     <div class="alert alert-info" style="font-size:14px;">
-        <strong>How course settings work:</strong>
-        Settings configured here override the global defaults for this course only.
-        Leave a field blank to use the global setting.
-        Changes here do not affect other courses.
+        <strong><?php echo get_string('coursesettings:how_it_works', 'local_ai_course_assistant'); ?></strong>
+        <?php echo get_string('coursesettings:how_it_works_desc', 'local_ai_course_assistant'); ?>
     </div>
 
     <div class="card mb-3">
@@ -283,7 +357,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-sola-course-enabled" name="sola_course_enabled" value="1"
-                               <?php if ($solacourseenabled) { echo 'checked'; } ?>>
+                               <?php if ($solacourseenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-sola-course-enabled">
                             <?php echo get_string('coursesettings:sola_enabled_toggle', 'local_ai_course_assistant'); ?>
                         </label>
@@ -309,7 +385,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-enabled" name="enabled" value="1"
-                               <?php if ($current && $current->enabled) { echo 'checked'; } ?>>
+                               <?php if ($current && $current->enabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-enabled">
                             <?php echo get_string('coursesettings:enabled', 'local_ai_course_assistant'); ?>
                         </label>
@@ -333,7 +411,9 @@ echo html_writer::div(
                     <select class="form-control" id="provider" name="provider">
                         <?php foreach ($providers as $val => $label) { ?>
                         <option value="<?php echo s($val); ?>"
-                            <?php if ($current && $current->provider === $val) { echo 'selected'; } ?>>
+                            <?php if ($current && $current->provider === $val) {
+                                echo 'selected';
+                            } ?>>
                             <?php echo s($label); ?>
                         </option>
                         <?php } ?>
@@ -343,13 +423,61 @@ echo html_writer::div(
 
             <!-- API Key -->
             <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="spend_cap_monthly">
+                    <?php echo get_string('coursesettings:spend_cap_monthly', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <input type="number" step="0.01" min="0" class="form-control" id="spend_cap_monthly"
+                           name="spend_cap_monthly"
+                           value="<?php echo s($current && $current->spend_cap_monthly > 0
+                               ? (string) (float) $current->spend_cap_monthly : ''); ?>">
+                    <small class="form-text text-muted">
+                        <?php echo get_string('coursesettings:spend_cap_monthly_desc', 'local_ai_course_assistant'); ?>
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group row">
                 <label class="col-sm-3 col-form-label" for="apikey">
                     <?php echo get_string('settings:apikey', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
+                    <?php
+                    /*
+                     * Never render the stored credential into the served HTML.
+                     * The field used to carry a value="..." echoing
+                     * s($current->apikey), which put the course's provider API
+                     * key in cleartext in the page source for everyone holding
+                     * :manage in the course context (an editing teacher), and in
+                     * any proxy or browser cache that saw the response. The field
+                     * now always renders empty; a blank submission keeps the
+                     * stored key (see the POST handler above).
+                     *
+                     * Do not quote a literal PHP close tag in a comment here. A
+                     * close tag ends PHP mode even inside a comment, and the
+                     * earlier `//` version of this note carried one: it dropped
+                     * the block mid-sentence, printed these lines to the page,
+                     * and left $haskey and $keyph unassigned -- which silently
+                     * removed the only UI path to clear a stored per-course key
+                     * (issue #218, broken v7.3.0 through v7.3.5).
+                     */
+                    $haskey = $current && $current->apikey !== '';
+                    $keyph = $haskey
+                        ? get_string('coursesettings:apikey_stored', 'local_ai_course_assistant')
+                        : get_string('coursesettings:using_global', 'local_ai_course_assistant');
+                    ?>
                     <input type="password" class="form-control" id="apikey" name="apikey"
-                           value="<?php echo s($current ? $current->apikey : ''); ?>"
-                           placeholder="<?php echo get_string('coursesettings:using_global', 'local_ai_course_assistant'); ?>">
+                           value="" autocomplete="new-password"
+                           placeholder="<?php echo s($keyph); ?>">
+                    <?php if ($haskey) { ?>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" value="1"
+                               id="apikey_clear" name="apikey_clear">
+                        <label class="form-check-label" for="apikey_clear">
+                            <?php echo get_string('coursesettings:apikey_clear', 'local_ai_course_assistant'); ?>
+                        </label>
+                    </div>
+                    <?php } ?>
                     <small class="form-text text-muted">
                         <?php echo get_string('settings:apikey_desc', 'local_ai_course_assistant'); ?>
                     </small>
@@ -413,17 +541,20 @@ echo html_writer::div(
                               ><?php echo s($current ? $current->systemprompt : ''); ?></textarea>
                     <div class="d-flex align-items-center mt-1" style="gap:8px">
                         <small class="form-text text-muted mb-0">
-                            Leave blank to use the global default. Or customize for this course only.
+                            <?php echo get_string('coursesettings:systemprompt_hint', 'local_ai_course_assistant'); ?>
                         </small>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt" title="Replace with the global default template">
-                            Reset to default
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-prompt"
+                                title="<?php echo s(get_string('coursesettings:reset_prompt_title', 'local_ai_course_assistant')); ?>">
+                            <?php echo get_string('coursesettings:reset_prompt', 'local_ai_course_assistant'); ?>
                         </button>
                     </div>
                 </div>
             </div>
             <script>
             document.getElementById('btn-reset-prompt').addEventListener('click', function() {
-                if (confirm('Replace the system prompt with the global default template? Any course-specific edits will be lost.')) {
+                if (confirm(<?php echo json_encode(
+                    get_string('coursesettings:reset_prompt_confirm', 'local_ai_course_assistant')
+                ); ?>)) {
                     document.getElementById('systemprompt').value = <?php echo json_encode($globalcfg['systemprompt']); ?>;
                 }
             });
@@ -446,7 +577,9 @@ echo html_writer::div(
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-rag-course-enabled" name="rag_course_enabled" value="1"
-                               <?php if ($ragcourseenabled) { echo 'checked'; } ?>>
+                               <?php if ($ragcourseenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-rag-course-enabled">
                             <?php echo get_string('coursesettings:rag_enable', 'local_ai_course_assistant'); ?>
                         </label>
@@ -459,17 +592,25 @@ echo html_writer::div(
                        class="btn btn-sm btn-outline-secondary" target="_blank">
                         <?php echo get_string('ragadmin:title', 'local_ai_course_assistant'); ?> &rarr;
                     </a>
-                    <a href="<?php echo (new moodle_url('/local/ai_course_assistant/objectives_admin.php',
-                            ['courseid' => $courseid]))->out(false); ?>"
+                    <a href="<?php echo (new moodle_url(
+                        '/local/ai_course_assistant/objectives_admin.php',
+                        ['courseid' => $courseid]
+                    ))->out(false); ?>"
                        class="btn btn-sm btn-outline-secondary ml-2" target="_blank">
                         <?php echo get_string('objectives:title', 'local_ai_course_assistant'); ?> &rarr;
                     </a>
-                    <?php if (has_capability('local/ai_course_assistant:viewanalytics',
-                            context_course::instance($courseid))) { ?>
-                    <a href="<?php echo (new moodle_url('/local/ai_course_assistant/instructor_dashboard.php',
-                            ['courseid' => $courseid]))->out(false); ?>"
+                    <?php if (
+                    has_capability(
+                        'local/ai_course_assistant:viewanalytics',
+                        context_course::instance($courseid)
+                    )
+) { ?>
+                    <a href="<?php echo (new moodle_url(
+                        '/local/ai_course_assistant/instructor_dashboard.php',
+                        ['courseid' => $courseid]
+                    ))->out(false); ?>"
                        class="btn btn-sm btn-outline-secondary ml-2" target="_blank">
-                        <?php echo get_string('instructor_dashboard:link', 'local_ai_course_assistant'); ?> &rarr;
+                            <?php echo get_string('instructor_dashboard:link', 'local_ai_course_assistant'); ?> &rarr;
                     </a>
                     <?php } ?>
                 </div>
@@ -512,11 +653,14 @@ echo html_writer::div(
 
             // Helper: render a three-way pedagogy select (inherit / force on / force off).
             $renderpedagogyselect = function (string $name, $raw, bool $globalon, string $id) {
-                $on  = get_string('pedagogy:on',  'local_ai_course_assistant');
+                $on  = get_string('pedagogy:on', 'local_ai_course_assistant');
                 $off = get_string('pedagogy:off', 'local_ai_course_assistant');
-                $inheritlabel = get_string('pedagogy:per_course_inherit',
-                    'local_ai_course_assistant', $globalon ? $on : $off);
-                $forceon  = get_string('pedagogy:per_course_force_on',  'local_ai_course_assistant');
+                $inheritlabel = get_string(
+                    'pedagogy:per_course_inherit',
+                    'local_ai_course_assistant',
+                    $globalon ? $on : $off
+                );
+                $forceon  = get_string('pedagogy:per_course_force_on', 'local_ai_course_assistant');
                 $forceoff = get_string('pedagogy:per_course_force_off', 'local_ai_course_assistant');
                 $sel = function ($value, $current) {
                     return ($value === $current) ? ' selected' : '';
@@ -565,8 +709,10 @@ echo html_writer::div(
                     </small>
                     <?php if ($fcon) { ?>
                     <div class="mt-1">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/flashcards.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/flashcards.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('flashcards:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -587,8 +733,10 @@ echo html_writer::div(
                     </small>
                     <?php if ($sbon) { ?>
                     <div class="mt-1">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/sandbox.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/sandbox.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('sandbox:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -609,8 +757,10 @@ echo html_writer::div(
                     </small>
                     <?php if ($esson) { ?>
                     <div class="mt-1">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/essay_feedback.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/essay_feedback.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('essay_feedback:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -646,13 +796,17 @@ echo html_writer::div(
                         </small>
                     </div>
                     <div class="mt-2 d-flex flex-wrap" style="gap:8px">
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/soapbox.php',
-                                ['courseid' => $courseid]))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/soapbox.php',
+                            ['courseid' => $courseid]
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('soapbox:link', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
-                        <a href="<?php echo (new moodle_url('/local/ai_course_assistant/rubric_admin.php',
-                                ['courseid' => $courseid, 'type' => 'speech']))->out(false); ?>"
+                        <a href="<?php echo (new moodle_url(
+                            '/local/ai_course_assistant/rubric_admin.php',
+                            ['courseid' => $courseid, 'type' => 'speech']
+                        ))->out(false); ?>"
                            class="btn btn-sm btn-outline-secondary" target="_blank">
                             <?php echo get_string('soapbox:edit_rubric', 'local_ai_course_assistant'); ?> &rarr;
                         </a>
@@ -704,9 +858,12 @@ echo html_writer::div(
                 <div class="col-sm-9">
                     <select id="aica-extres" name="external_resources" class="form-control form-control-sm" style="max-width:240px">
                         <option value="" <?php echo ($extresraw === false || $extresraw === '') ? 'selected' : ''; ?>>
-                            <?php echo get_string('external_resources:inherit', 'local_ai_course_assistant',
+                            <?php echo get_string(
+                                'external_resources:inherit',
+                                'local_ai_course_assistant',
                                 $extresglobal ? get_string('external_resources:on', 'local_ai_course_assistant')
-                                              : get_string('external_resources:off', 'local_ai_course_assistant')); ?>
+                                : get_string('external_resources:off', 'local_ai_course_assistant')
+                            ); ?>
                         </option>
                         <option value="1" <?php echo $extresraw === '1' ? 'selected' : ''; ?>>
                             <?php echo get_string('external_resources:force_on', 'local_ai_course_assistant'); ?>
@@ -726,25 +883,27 @@ echo html_writer::div(
 
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="mb-0">English Lock (ELL Courses)</h5>
+            <h5 class="mb-0"><?php echo get_string('coursesettings:english_lock_heading', 'local_ai_course_assistant'); ?></h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Force SOLA to always respond in English for this course, regardless of the student's language preference. Ideal for English language learning courses where students should practice reading and writing in English.</p>
+            <p class="text-muted"><?php echo \local_ai_course_assistant\branding::str('coursesettings:english_lock_desc'); ?></p>
             <div class="form-group row">
                 <label class="col-sm-3 col-form-label" for="english_lock">
-                    English Lock
+                    <?php echo get_string('coursesettings:english_lock', 'local_ai_course_assistant'); ?>
                 </label>
                 <div class="col-sm-9">
                     <div>
                         <input type="checkbox" role="switch"
                                id="aica-english-lock" name="english_lock" value="1"
-                               <?php if ($englishlockenabled) { echo 'checked'; } ?>>
+                               <?php if ($englishlockenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="aica-english-lock">
-                            Always respond in English
+                            <?php echo get_string('coursesettings:english_lock_toggle', 'local_ai_course_assistant'); ?>
                         </label>
                     </div>
                     <small class="form-text text-muted">
-                        When enabled, SOLA will respond in English even if the student writes in another language. The student's language preference in their settings panel will be overridden.
+                        <?php echo \local_ai_course_assistant\branding::str('coursesettings:english_lock_help'); ?>
                     </small>
                 </div>
             </div>
@@ -753,26 +912,42 @@ echo html_writer::div(
 
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="mb-0">Voice Tab</h5>
+            <h5 class="mb-0"><?php echo get_string('coursesettings:voice_tab', 'local_ai_course_assistant'); ?></h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Control the Voice Tab (settings panel voice options) for this course. By default it inherits the global setting (currently <strong><?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
+            <p class="text-muted"><?php echo get_string(
+                'coursesettings:voice_tab_desc',
+                'local_ai_course_assistant',
+                '<strong>' . local_ai_course_assistant_course_settings_state_label($voicetabglobal) . '</strong>'
+            ); ?></p>
             <div class="form-group row">
-                <label class="col-sm-3 col-form-label" for="voice_tab">Voice Tab</label>
+                <label class="col-sm-3 col-form-label" for="voice_tab">
+                    <?php echo get_string('coursesettings:voice_tab', 'local_ai_course_assistant'); ?>
+                </label>
                 <div class="col-sm-9">
                     <select class="form-control" name="voice_tab" id="voice_tab">
-                        <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') { echo 'selected'; } ?>>
-                            Inherit global (<?php echo $voicetabglobal ? 'enabled' : 'disabled'; ?>)
+                        <option value="" <?php if ($voicetabcourseraw === false || $voicetabcourseraw === '') {
+                            echo 'selected';
+                                         } ?>>
+                            <?php echo get_string(
+                                'coursesettings:inherit_global',
+                                'local_ai_course_assistant',
+                                local_ai_course_assistant_course_settings_state_label($voicetabglobal)
+                            ); ?>
                         </option>
-                        <option value="1" <?php if ($voicetabcourseraw === '1') { echo 'selected'; } ?>>
-                            Force on
+                        <option value="1" <?php if ($voicetabcourseraw === '1') {
+                            echo 'selected';
+                                          } ?>>
+                            <?php echo get_string('coursesettings:force_on', 'local_ai_course_assistant'); ?>
                         </option>
-                        <option value="0" <?php if ($voicetabcourseraw === '0') { echo 'selected'; } ?>>
-                            Force off
+                        <option value="0" <?php if ($voicetabcourseraw === '0') {
+                            echo 'selected';
+                                          } ?>>
+                            <?php echo get_string('coursesettings:force_off', 'local_ai_course_assistant'); ?>
                         </option>
                     </select>
                     <small class="form-text text-muted">
-                        Override the global Voice Tab setting for this course only.
+                        <?php echo get_string('coursesettings:voice_tab_help', 'local_ai_course_assistant'); ?>
                     </small>
                 </div>
             </div>
@@ -781,26 +956,41 @@ echo html_writer::div(
 
     <div class="card mb-3">
         <div class="card-header">
-            <h5 class="mb-0">Auto-open on first visit</h5>
+            <h5 class="mb-0"><?php echo get_string('coursesettings:auto_open_heading', 'local_ai_course_assistant'); ?></h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Control whether the SOLA drawer opens automatically the first time a student lands on this course. First-visit state is tracked per course in the student's browser via localStorage. By default this course inherits the global setting (currently <strong><?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?></strong>).</p>
+            <p class="text-muted"><?php echo \local_ai_course_assistant\branding::str(
+                'coursesettings:auto_open_desc',
+                '<strong>' . local_ai_course_assistant_course_settings_state_label($autoopenglobal) . '</strong>'
+            ); ?></p>
             <div class="form-group row">
-                <label class="col-sm-3 col-form-label" for="auto_open">Auto-open</label>
+                <label class="col-sm-3 col-form-label" for="auto_open">
+                    <?php echo get_string('coursesettings:auto_open', 'local_ai_course_assistant'); ?>
+                </label>
                 <div class="col-sm-9">
                     <select class="form-control" name="auto_open" id="auto_open">
-                        <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') { echo 'selected'; } ?>>
-                            Inherit global (<?php echo $autoopenglobal ? 'enabled' : 'disabled'; ?>)
+                        <option value="" <?php if ($autoopencourseraw === false || $autoopencourseraw === '') {
+                            echo 'selected';
+                                         } ?>>
+                            <?php echo get_string(
+                                'coursesettings:inherit_global',
+                                'local_ai_course_assistant',
+                                local_ai_course_assistant_course_settings_state_label($autoopenglobal)
+                            ); ?>
                         </option>
-                        <option value="1" <?php if ($autoopencourseraw === '1') { echo 'selected'; } ?>>
-                            Force on
+                        <option value="1" <?php if ($autoopencourseraw === '1') {
+                            echo 'selected';
+                                          } ?>>
+                            <?php echo get_string('coursesettings:force_on', 'local_ai_course_assistant'); ?>
                         </option>
-                        <option value="0" <?php if ($autoopencourseraw === '0') { echo 'selected'; } ?>>
-                            Force off
+                        <option value="0" <?php if ($autoopencourseraw === '0') {
+                            echo 'selected';
+                                          } ?>>
+                            <?php echo get_string('coursesettings:force_off', 'local_ai_course_assistant'); ?>
                         </option>
                     </select>
                     <small class="form-text text-muted">
-                        Override the global Auto-open setting for this course only.
+                        <?php echo get_string('coursesettings:auto_open_help', 'local_ai_course_assistant'); ?>
                     </small>
                 </div>
             </div>
@@ -837,7 +1027,9 @@ echo html_writer::div(
                         <input type="checkbox" role="switch"
                                id="<?php echo $paramname; ?>"
                                name="<?php echo $paramname; ?>" value="1"
-                               <?php if ($isenabled) { echo 'checked'; } ?>>
+                               <?php if ($isenabled) {
+                                    echo 'checked';
+                               } ?>>
                         <label class="form-check-label" for="<?php echo $paramname; ?>"></label>
                     </div>
                 </div>
@@ -892,7 +1084,9 @@ echo html_writer::div(
                             <td>
                                 <select name="<?php echo $field; ?>" class="form-control form-control-sm">
                                     <?php foreach ($levellabels as $key => $label) { ?>
-                                        <option value="<?php echo $key; ?>" <?php if ($stored === $key) { echo 'selected'; } ?>>
+                                        <option value="<?php echo $key; ?>" <?php if ($stored === $key) {
+                                            echo 'selected';
+                                                       } ?>>
                                             <?php echo s($label); ?>
                                         </option>
                                     <?php } ?>

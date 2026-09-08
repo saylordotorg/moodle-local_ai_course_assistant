@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\soapbox_storage
  */
 final class soapbox_storage_test extends \advanced_testcase {
-
     /**
      * Pin SigV4 against AWS's published presigned-URL worked example
      * (S3 GET https://examplebucket.s3.amazonaws.com/test.txt, 2013-05-24,
@@ -48,20 +47,27 @@ final class soapbox_storage_test extends \advanced_testcase {
         ]);
         $this->assertStringContainsString(
             'X-Amz-Signature=aeeed9bbccd4d02ee5c0109b86d86835f995330da4c265957d157751f604d404',
-            $url);
+            $url
+        );
         // Sanity on the query shape.
         $this->assertStringContainsString('X-Amz-Algorithm=AWS4-HMAC-SHA256', $url);
         $this->assertStringContainsString(
-            'X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request', $url);
+            'X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request',
+            $url
+        );
         $this->assertStringContainsString('X-Amz-Expires=86400', $url);
         $this->assertStringContainsString('X-Amz-SignedHeaders=host', $url);
     }
 
     public function test_encode_key_path_preserves_slashes(): void {
-        $this->assertSame('/soapbox/2/5/abc.mp4',
-            soapbox_storage::encode_key_path('soapbox/2/5/abc.mp4'));
-        $this->assertSame('/soapbox/2/5/abc.mp4',
-            soapbox_storage::encode_key_path('/soapbox/2/5/abc.mp4'));
+        $this->assertSame(
+            '/soapbox/2/5/abc.mp4',
+            soapbox_storage::encode_key_path('soapbox/2/5/abc.mp4')
+        );
+        $this->assertSame(
+            '/soapbox/2/5/abc.mp4',
+            soapbox_storage::encode_key_path('/soapbox/2/5/abc.mp4')
+        );
         // A space in a segment is percent-encoded, slashes are not.
         $this->assertSame('/a%20b/c', soapbox_storage::encode_key_path('a b/c'));
     }

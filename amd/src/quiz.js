@@ -23,6 +23,36 @@
 
 define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
 
+    /**
+     * Insert a panel into the drawer's content flow, above the trailing furniture.
+     *
+     * Deliberately a local copy of UI.mountPanel rather than a call to it.
+     * ui.js depends on quiz.js and quiz.js depends on ui.js, so under RequireJS
+     * one of the two receives an incomplete reference -- which is why the only
+     * other use of UI in this file is guarded with
+     * `typeof UI.appendIntroCard === 'function'`. Calling UI.mountPanel here
+     * threw inside a promise chain whose .catch swallowed it, and the quiz setup
+     * panel silently never rendered. Ten duplicated lines are cheaper than a
+     * failure mode with no error message.
+     *
+     * @param {HTMLElement} drawer
+     * @param {HTMLElement} panel
+     * @returns {void}
+     */
+    const mountInDrawer = function(drawer, panel) {
+        if (!drawer || !panel) {
+            return;
+        }
+        const trailing = drawer.querySelector('.local-ai-course-assistant__input-area')
+            || drawer.querySelector('.local-ai-course-assistant__footer-feedback')
+            || drawer.querySelector('.local-ai-course-assistant__bottom-nav');
+        if (trailing && trailing.parentNode === drawer) {
+            drawer.insertBefore(panel, trailing);
+            return;
+        }
+        drawer.appendChild(panel);
+    };
+
     // -------------------------------------------------------------------------
     // Setup panel
     // -------------------------------------------------------------------------
@@ -254,7 +284,10 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             });
             panel.appendChild(cancelBtn);
 
-            container.appendChild(panel);
+            // Into the content flow, not the drawer root: appending puts the
+            // panel after the footer and the bottom nav, which is what made the
+            // quiz setup render below both.
+            mountInDrawer(container, panel);
             return;
         }).catch(function() {
             // Silently fail.
@@ -295,7 +328,7 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
 
         const quizEl = document.createElement('div');
         quizEl.className = 'aica-quiz';
-        container.appendChild(quizEl);
+        mountInDrawer(container, quizEl);
 
         const renderCurrent = function() {
             quizEl.innerHTML = '';
@@ -718,7 +751,10 @@ define(['core/str', 'local_ai_course_assistant/ui'], function(Str, UI) {
             });
             panel.appendChild(cancelBtn);
 
-            container.appendChild(panel);
+            // Into the content flow, not the drawer root: appending puts the
+            // panel after the footer and the bottom nav, which is what made the
+            // quiz setup render below both.
+            mountInDrawer(container, panel);
             return;
         }).catch(function() { /**/ });
     };

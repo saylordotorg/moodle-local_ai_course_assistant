@@ -42,7 +42,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class branding {
-
     /**
      * Full product name, used in UI headings and learner-facing docs.
      */
@@ -128,10 +127,10 @@ class branding {
     // whole product (and the operator-facing copy) rebrands from the four
     // admin settings with no code or string-file edits:
     //
-    //   [[tutorname]]  → display_name()            (e.g. "Saylor Online Learning Assistant")
-    //   [[tutorshort]] → short_name()              (e.g. "SOLA")
-    //   [[uniname]]    → institution_name()        (e.g. "Saylor University")
-    //   [[unishort]]   → institution_short_name()  (e.g. "Saylor")
+    // [[tutorname]]  → display_name()            (e.g. "Saylor Online Learning Assistant")
+    // [[tutorshort]] → short_name()              (e.g. "SOLA")
+    // [[uniname]]    → institution_name()        (e.g. "Saylor University")
+    // [[unishort]]   → institution_short_name()  (e.g. "Saylor")
     //
     // Substitution happens at output boundaries (the JS string bundle, the
     // mustache template data, the system prompt builder, admin settings copy,

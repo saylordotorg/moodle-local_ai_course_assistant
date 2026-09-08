@@ -30,7 +30,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\voice_registry
  */
 final class voice_registry_selfhosted_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);

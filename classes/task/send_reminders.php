@@ -27,7 +27,6 @@ use local_ai_course_assistant\study_planner;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class send_reminders extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:send_reminders', 'local_ai_course_assistant');
     }

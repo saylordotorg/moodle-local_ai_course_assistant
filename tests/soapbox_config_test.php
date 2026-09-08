@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\soapbox_config
  */
 final class soapbox_config_test extends \advanced_testcase {
-
     public function test_retention_clamp_bounds(): void {
         $this->assertSame(1, soapbox_config::clamp_retention_days(0));
         $this->assertSame(1, soapbox_config::clamp_retention_days(-5));
@@ -66,8 +65,8 @@ final class soapbox_config_test extends \advanced_testcase {
         $clamped = soapbox_config::clamp_assignment([
             'mode' => 'video',
             'ptype' => 'Persuasive',
-            'min_seconds' => 900,   // above the 600 cap
-            'max_seconds' => 1200,  // above the 600 cap
+            'min_seconds' => 900, // above the 600 cap
+            'max_seconds' => 1200, // above the 600 cap
             'max_attempts' => 0,
             'stored_attempts' => 9, // above the 3 cap
         ]);
@@ -116,10 +115,10 @@ final class soapbox_config_test extends \advanced_testcase {
         $raw = [
             ['t' => 30, 'i' => 2],
             ['t' => 0, 'i' => 0],
-            ['t' => -5, 'i' => -1],        // negatives clamped to 0
-            ['t' => 10, 'i' => 99],        // index clamped to slidecount-1
-            ['nope' => 1],                 // malformed, dropped
-            'garbage',                     // malformed, dropped
+            ['t' => -5, 'i' => -1], // negatives clamped to 0
+            ['t' => 10, 'i' => 99], // index clamped to slidecount-1
+            ['nope' => 1], // malformed, dropped
+            'garbage', // malformed, dropped
         ];
         $out = soapbox_config::normalize_slide_timeline($raw, 5);
         $this->assertCount(4, $out);
@@ -140,7 +139,9 @@ final class soapbox_config_test extends \advanced_testcase {
         for ($k = 0; $k < 600; $k++) {
             $big[] = ['t' => $k, 'i' => 0];
         }
-        $this->assertCount(soapbox_config::MAX_TIMELINE_EVENTS,
-            soapbox_config::normalize_slide_timeline($big));
+        $this->assertCount(
+            soapbox_config::MAX_TIMELINE_EVENTS,
+            soapbox_config::normalize_slide_timeline($big)
+        );
     }
 }

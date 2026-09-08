@@ -60,52 +60,10 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
             $filepath .= '/';
         }
         $fs = get_file_storage();
-        $file = $fs->get_file($context->id, 'local_ai_course_assistant', 'customavatars',
-            $itemid, $filepath, $filename);
-        if (!$file || $file->is_directory()) {
-            send_file_not_found();
-        }
-        send_stored_file($file, DAYSECS, 0, $forcedownload, $options);
-        return true;
-    }
-
-    if ($filearea === \local_ai_course_assistant\attachment_manager::FILEAREA) {
-        // Student message attachments live under the course context. Access
-        // rules: the owner of the message can always view their own upload;
-        // course managers (capability manage) can view any message in the
-        // course to support troubleshooting.
-        if ($context->contextlevel !== CONTEXT_COURSE) {
-            return false;
-        }
-        if (empty($USER->id)) {
-            send_file_not_found();
-        }
-        require_login(null, false);
-
-        $itemid = (int) array_shift($args);
-        $filename = array_pop($args);
-        $filepath = '/' . (implode('/', $args) ?: '');
-        if (!str_ends_with($filepath, '/')) {
-            $filepath .= '/';
-        }
-
-        $msg = $DB->get_record('local_ai_course_assistant_msgs',
-            ['id' => $itemid], 'id, userid, courseid', IGNORE_MISSING);
-        if (!$msg || (int) $msg->courseid !== (int) $context->instanceid) {
-            send_file_not_found();
-        }
-
-        $isowner = ((int) $msg->userid === (int) $USER->id);
-        $canmanage = has_capability('local/ai_course_assistant:manage', $context);
-        if (!$isowner && !$canmanage) {
-            send_file_not_found();
-        }
-
-        $fs = get_file_storage();
         $file = $fs->get_file(
             $context->id,
-            \local_ai_course_assistant\attachment_manager::COMPONENT,
-            \local_ai_course_assistant\attachment_manager::FILEAREA,
+            'local_ai_course_assistant',
+            'customavatars',
             $itemid,
             $filepath,
             $filename
@@ -113,7 +71,7 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
         if (!$file || $file->is_directory()) {
             send_file_not_found();
         }
-        send_stored_file($file, HOURSECS, 0, $forcedownload, $options);
+        send_stored_file($file, DAYSECS, 0, $forcedownload, $options);
         return true;
     }
 
@@ -128,14 +86,27 @@ function local_ai_course_assistant_pluginfile($course, $cm, $context, $filearea,
 function local_ai_course_assistant_get_custom_avatars(): array {
     $fs = get_file_storage();
     $context = context_system::instance();
-    $files = $fs->get_area_files($context->id, 'local_ai_course_assistant',
-        'customavatars', 0, 'filename', false);
+    $files = $fs->get_area_files(
+        $context->id,
+        'local_ai_course_assistant',
+        'customavatars',
+        0,
+        'filename',
+        false
+    );
     $out = [];
     foreach ($files as $file) {
         $name = $file->get_filename();
         $key = 'custom:' . $file->get_contenthash();
-        $url = moodle_url::make_pluginfile_url($context->id, 'local_ai_course_assistant',
-            'customavatars', 0, $file->get_filepath(), $name, false);
+        $url = moodle_url::make_pluginfile_url(
+            $context->id,
+            'local_ai_course_assistant',
+            'customavatars',
+            0,
+            $file->get_filepath(),
+            $name,
+            false
+        );
         $out[] = ['key' => $key, 'label' => $name, 'url' => $url->out(false)];
     }
     return $out;
@@ -157,8 +128,11 @@ function local_ai_course_assistant_get_custom_avatars(): array {
  * @param stdClass $course The course record.
  * @param context_course $context The course context.
  */
-function local_ai_course_assistant_extend_navigation_course(navigation_node $navigation, stdClass $course,
-        context_course $context): void {
+function local_ai_course_assistant_extend_navigation_course(
+    navigation_node $navigation,
+    stdClass $course,
+    context_course $context
+): void {
     if (has_capability('local/ai_course_assistant:manage', $context)) {
         $navigation->add(
             get_string('coursesettings:title', 'local_ai_course_assistant'),
@@ -198,8 +172,10 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
     // v6.7.0: learner-facing Soapbox link. Unlike the admin nodes above, this is
     // shown to any enrolled learner (capability :use) when Soapbox is enabled for
     // the course, so students in speech courses have a discoverable way in.
-    if (has_capability('local/ai_course_assistant:use', $context)
-            && \local_ai_course_assistant\feature_flags::resolve('soapbox', $course->id)) {
+    if (
+        has_capability('local/ai_course_assistant:use', $context)
+            && \local_ai_course_assistant\feature_flags::resolve('soapbox', $course->id)
+    ) {
         $navigation->add(
             get_string('soapbox:link', 'local_ai_course_assistant'),
             new moodle_url('/local/ai_course_assistant/soapbox.php', ['courseid' => $course->id]),
@@ -223,7 +199,9 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
             );
         }
         $assignments = \local_ai_course_assistant\soapbox_assignment_manager::get_course_assignments(
-            $course->id, false);
+            $course->id,
+            false
+        );
         foreach ($assignments as $assign) {
             $navigation->add(
                 format_string($assign->name),
@@ -235,4 +213,31 @@ function local_ai_course_assistant_extend_navigation_course(navigation_node $nav
             );
         }
     }
+}
+
+/**
+ * Return a list of all the user preferences used by local_ai_course_assistant.
+ *
+ * Declares the milestone-outreach consent toggle so it is writable through
+ * set_user_preference / the user_preferences web service and covered by core's
+ * preference validation. Without this declaration core_user's
+ * can_edit_preference() throws for the unknown key and the write is silently
+ * dropped -- which is why the consent gate in outreach_sender::learner_consents
+ * had NO writer anywhere: the milestone email feature could be enabled,
+ * disclosed and documented, and never send to anyone.
+ *
+ * Default '0' = not consented (learner_consents treats absence as opt-out).
+ * Scoped to the user themselves so staff cannot opt learners in.
+ *
+ * @return array[]
+ */
+function local_ai_course_assistant_user_preferences(): array {
+    $preferences = [];
+    $preferences['sola_outreach_milestones'] = [
+        'type' => PARAM_BOOL,
+        'null' => NULL_NOT_ALLOWED,
+        'default' => '0',
+        'permissioncallback' => [core_user::class, 'is_current_user'],
+    ];
+    return $preferences;
 }

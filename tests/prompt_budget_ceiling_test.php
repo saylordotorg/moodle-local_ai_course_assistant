@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\prompt_metrics_logger::recommend
  */
 final class prompt_budget_ceiling_test extends \advanced_testcase {
-
     /** An aggregate that, uncapped, recommends raising the budget well above a small window. */
     private function truncating_agg(): array {
         return [

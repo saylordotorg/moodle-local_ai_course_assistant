@@ -31,12 +31,6 @@ $messageproviders = [
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
         ],
     ],
-    'study_notes' => [
-        'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
-        ],
-    ],
     'integrity_report' => [
         'defaults' => [
             'popup' => MESSAGE_PERMITTED,

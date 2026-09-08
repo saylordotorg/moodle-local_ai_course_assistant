@@ -24,7 +24,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class result {
-
     /** Validator approved the output. */
     const SEVERITY_PASS = 'pass';
     /** Soft signal — log but do not block. */

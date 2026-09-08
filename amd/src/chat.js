@@ -70,6 +70,16 @@ define([
     let streamMeta = null;
     /** @type {boolean} Whether SOLA is locked due to a Moodle quiz attempt/view page */
     let quizLocked = false;
+    // v7.2.5: the server-side attempt lock. Distinct from quizLocked, which is
+    // the per-quiz assistance level and only ever set on a quiz page. Without
+    // this the drawer rendered an enabled textarea everywhere else while
+    // base_provider was going to refuse, so a learner typed a whole question
+    // before finding out. Both sides now read the same check for the same
+    // course.
+    let attemptLocked = false;
+    // Rendered server-side: the string carries a [[tutorshort]] brand token and
+    // Moodle's string cache would hand us the raw value, token and all.
+    let attemptLockedNotice = '';
     /** @type {HTMLAudioElement|{pause:Function}|null} Currently playing OpenAI TTS audio (or AudioContext proxy) */
     let currentAudio = null;
     /** @type {AudioContext|null} Shared AudioContext unlocked by user gesture (iOS TTS fix) */
@@ -104,10 +114,6 @@ define([
     let practiceRubricId = null;
     /** @type {Array|null} Rubric criteria for current practice session */
     let practiceRubricCriteria = null;
-    /** @type {?{draftitemid:number, filename:string, mime:string, size:number, url:string}} */
-    let pendingAttachment = null;
-    /** @type {boolean} Whether an attachment upload is currently in flight */
-    let attachmentUploading = false;
     /** @type {RegExp} SOLA follow-up marker parser */
     const NEXT_BLOCK_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
     /** @type {RegExp} Source attribution tag parser — matches [SOURCE:page], [SOURCE:course], [SOURCE:general], [SOURCE:activity:123] */
@@ -1204,6 +1210,8 @@ define([
         currentPageId = parseInt(root.dataset.currentPageId, 10) || 0;
         currentPageTitle = root.dataset.currentPageTitle || '';
         quizLocked = root.dataset.quizLocked === '1';
+        attemptLocked = root.dataset.attemptLocked === '1';
+        attemptLockedNotice = root.dataset.attemptLockedNotice || '';
 
         // Fallbacks for themes/pages where Moodle does not populate PAGE->cm in the footer hook.
         if (!currentPageId && document.body) {
@@ -1214,6 +1222,14 @@ define([
                     root.dataset.currentPageId = String(currentPageId);
                 }
             }
+        }
+        // The "Generate flashcards from this page" starter is guaranteed to
+        // fail without a module page: generate_flashcards returns
+        // no_page_content for cmid 0, and course home pages have no cmid. A
+        // starter that always errors is worse than an absent one.
+        if (!currentPageId) {
+            root.querySelectorAll('.local-ai-course-assistant__starter[data-starter="generate-flashcards"]')
+                .forEach(function(btn) { btn.hidden = true; });
         }
         if (!currentPageTitle) {
             currentPageTitle = getContextDebugHeading() || root.dataset.serverPageTitle || '';
@@ -1250,7 +1266,15 @@ define([
         syncComposerLlmControls(root);
         initSpeech();
         syncVoicePanel();
-        UI.setModeButtonsEnabled(!quizLocked);
+        UI.setModeButtonsEnabled(!quizLocked && !attemptLocked);
+        if (attemptLocked) {
+            UI.setInputEnabled(false);
+            // The practice-quiz button is not a mode button, so setModeButtons
+            // does not reach it. Left live it is the same self-contradicting
+            // surface -- everything grey except the one control that starts an
+            // AI call the server is about to refuse.
+            UI.setQuizButtonEnabled(false);
+        }
         setBottomMode('chat', {force: true});
         // Cache English starter labels before any language update overwrites them.
         root.querySelectorAll('.local-ai-course-assistant__starter').forEach(function(btn) {
@@ -1654,11 +1678,47 @@ define([
         els.sendBtn.addEventListener('click', handleSend);
 
         // Input events.
-        els.input.addEventListener('keydown', handleInputKeydown);
-        els.input.addEventListener('input', function() {
-            UI.autoResizeInput();
-            UI.updateSendButton();
-        });
+        //
+        // Guarded, and delegated as well, because of a staging report that Enter
+        // did not send while the arrow button did. That pair of symptoms has
+        // exactly one shape: els.input was null, the unguarded addEventListener
+        // below threw, and every binding AFTER this point was silently lost --
+        // the send button binds three lines earlier and so survived. The handler
+        // itself has been correct since the initial commit and is present in the
+        // shipped bundle, so the wiring is the only thing left that can fail.
+        //
+        // The root cause was not reproducible off staging. Rather than guess,
+        // this makes the failure loud instead of silent, and keeps Enter working
+        // through the root even if the direct binding is ever lost.
+        if (els.input) {
+            els.input.addEventListener('keydown', handleInputKeydown);
+            els.input.addEventListener('input', function() {
+                UI.autoResizeInput();
+                UI.updateSendButton();
+            });
+        } else if (window.console && window.console.warn) {
+            window.console.warn(
+                '[SOLA] composer textarea not found; Enter-to-send and auto-resize are unavailable. '
+                + 'Expected .local-ai-course-assistant__input inside the widget root.'
+            );
+        }
+
+        // Delegated fallback on the widget root. The root outlives any re-render
+        // of the composer, so this survives what a direct binding would not.
+        // Guarded against double-send when the direct binding is also live.
+        if (els.root) {
+            els.root.addEventListener('keydown', function(e) {
+                if (e.key !== 'Enter' || e.shiftKey || e.defaultPrevented) {
+                    return;
+                }
+                var t = e.target;
+                if (!t || !t.classList
+                        || !t.classList.contains('local-ai-course-assistant__input')) {
+                    return;
+                }
+                handleInputKeydown(e);
+            });
+        }
 
         // Clear button.
         if (els.clearBtn) {
@@ -1668,18 +1728,6 @@ define([
         // Mic button (STT).
         if (els.micBtn) {
             els.micBtn.addEventListener('click', handleMic);
-        }
-
-        // Attachment button → hidden file input.
-        if (els.attachBtn && els.attachFileInput) {
-            els.attachBtn.addEventListener('click', function() {
-                if (attachmentUploading) {
-                    return;
-                }
-                els.attachFileInput.value = '';
-                els.attachFileInput.click();
-            });
-            els.attachFileInput.addEventListener('change', handleAttachmentChange);
         }
 
         if (els.modeButtons && els.modeButtons.forEach) {
@@ -1886,9 +1934,29 @@ define([
                                 const key = (res && res.scope === 'course')
                                     ? 'active_learners:line'
                                     : 'active_learners:line_global';
-                                Str.get_string(key, 'local_ai_course_assistant', n).then(function(line) {
-                                    text.textContent = line;
+                                // Fetch the template and substitute here rather than
+                                // passing n as get_string's third argument. Moodle caches
+                                // JS strings in localStorage keyed by id/component/lang
+                                // WITHOUT the parameter, so a parameterised call can be
+                                // served from that cache and skip the server entirely,
+                                // yielding the raw '{$a} ...' template.
+                                //
+                                // That is not what bit learn.saylor.org, though. Saylor
+                                // runs the standalone CDN bundle, whose core/str shim
+                                // resolves only from the window.SOLA_I18N map that PHP
+                                // injects and otherwise returns the key itself. Both of
+                                // these keys were absent from that map, so the widget
+                                // rendered a literal 'active_learners:line_global' and no
+                                // string was ever requested from the server — there is no
+                                // server round-trip to make in CDN mode. Fixed by listing
+                                // them in hook_callbacks::get_js_strings(); keep them
+                                // there, since the build check cannot see a runtime key.
+                                Str.get_string(key, 'local_ai_course_assistant').then(function(tpl) {
+                                    text.textContent = String(tpl).replace('{$a}', n);
                                     box.hidden = false;
+                                }).catch(function() {
+                                    // Never leave a half-resolved string on screen.
+                                    box.hidden = true;
                                 });
                             } else {
                                 box.hidden = true;
@@ -2107,6 +2175,14 @@ define([
         }
 
         if (starterType === 'quiz' || starterKey === 'quiz') {
+            // v7.1.1: record the press. The panel opens client-side, so without
+            // this a learner who opened it and backed out left no trace, and we
+            // could see what quiz generation cost but not how often the button
+            // was pressed. Fire-and-forget: telemetry must not delay or block
+            // the panel.
+            Repo.recordQuizOpen(courseId, currentPageId || 0).catch(function() {
+                return;
+            });
             handleQuiz();
             return;
         }
@@ -2121,17 +2197,36 @@ define([
                     UI.hideTypingIndicator();
                     var url = (starterBtn && starterBtn.dataset.flashcardsUrl) || '';
                     if (res && res.success && res.cards && res.cards.length) {
-                        var msg = 'Saved ' + res.cards.length + ' flashcards from this page. '
-                            + (url ? '[Open the review page](' + url + ') to study them with spaced repetition.' : '');
-                        UI.appendMessage('assistant', msg);
+                        Str.get_strings([
+                            {key: 'flashcards:starter_saved', component: 'local_ai_course_assistant'},
+                            {key: 'flashcards:starter_open_review', component: 'local_ai_course_assistant'},
+                        ]).then(function(strs) {
+                            // Moodle's string cache returns raw {$a}; substitute here.
+                            var msg = strs[0].replace('{$a}', String(res.cards.length))
+                                + (url ? ' [' + strs[1] + '](' + url + ')' : '');
+                            UI.appendMessage('assistant', msg);
+                            return null;
+                        }).catch(function() {
+                            UI.appendMessage('assistant', 'Saved ' + res.cards.length + ' flashcards from this page.');
+                        });
                     } else {
                         var why = res && res.message ? res.message : 'unknown_error';
-                        UI.appendMessage('assistant', 'I could not generate flashcards from this page (' + why + '). Try again or pick a page with more content.');
+                        Str.get_string('flashcards:starter_failed', 'local_ai_course_assistant').then(function(str) {
+                            UI.appendMessage('assistant', str.replace('{$a}', why));
+                            return null;
+                        }).catch(function() {
+                            UI.appendMessage('assistant', 'I could not generate flashcards from this page (' + why + ').');
+                        });
                     }
                 })
                 .catch(function() {
                     UI.hideTypingIndicator();
-                    UI.appendMessage('assistant', 'I could not generate flashcards from this page right now. Try again later.');
+                    Str.get_string('flashcards:starter_error', 'local_ai_course_assistant').then(function(str) {
+                        UI.appendMessage('assistant', str);
+                        return null;
+                    }).catch(function() {
+                        UI.appendMessage('assistant', 'I could not generate flashcards from this page right now.');
+                    });
                 });
             return;
         }
@@ -2514,7 +2609,13 @@ define([
                             root.dataset.avatarurl = avatarUrl;
                             UI.updateAvatarImages(avatarUrl);
                             return;
-                        }).catch(function() { /**/ });
+                        }).catch(function(err) {
+                            // The empty catch here is what hid F8 for months:
+                            // custom avatars were rejected server-side and the
+                            // picker looked like it simply did not work.
+                            window.console && console.warn('[SOLA avatar]', err);
+                            UI.showNotification('Could not save the avatar choice.', 'error');
+                        });
                     },
                     onVoiceSelect: function(voice) {
                         localStorage.setItem('aica_tts_voice', voice);
@@ -2939,7 +3040,14 @@ define([
             });
 
             Promise.all([
-                Repo.getRealtimeToken(courseId, getRealtimeVoiceRequestContext(root)),
+                Repo.getRealtimeToken(courseId, Object.assign(
+                    getRealtimeVoiceRequestContext(root),
+                    {
+                        mode: config.mode || 'conversation',
+                        topic: config.getTopic ? (config.getTopic(selection) || '') : '',
+                        phrase: config.getPhrase ? (config.getPhrase(selection) || '') : '',
+                    }
+                )),
                 micPromise,
             ]).then(function(results) {
                 if (!isCurrentVoiceSessionRequest(sessionRequestId)) {
@@ -3174,6 +3282,15 @@ define([
                 getInitialText: function(selection) {
                     return buildPracticeSpeakingInitialText(selection);
                 },
+                // v7.0.5: the server assembles the voice-mode text now, so it
+                // needs the mode and the chosen topic. getInstructions is kept
+                // for any caller that still wants the assembled string locally,
+                // but its output no longer reaches the wire -- session.update
+                // would have replaced the server's grounded prompt with it.
+                mode: 'conversation',
+                getTopic: function(selection) {
+                    return extractPracticeSpeakingTopic(selection) || '';
+                },
                 getInstructions: function(baseInstructions, selection) {
                     var instructions = baseInstructions || '';
                     var topic = extractPracticeSpeakingTopic(selection);
@@ -3239,6 +3356,11 @@ define([
             chips: buildELLPronunciationChips(),
             getInitialText: function(selection) {
                 return buildELLPronunciationInitialText(selection);
+            },
+            // v7.0.5: see the note on the conversation config above.
+            mode: 'ell',
+            getPhrase: function(selection) {
+                return extractPronunciationPhrase(selection) || '';
             },
             getInstructions: function(baseInstructions, selection) {
                 var phrase = extractPronunciationPhrase(selection);
@@ -3564,7 +3686,7 @@ define([
         // Chrome desktop can take 30+ seconds to initialize voices on first
         // use. Renamed to match the defined helper.
         var ctx = getOrCreateAudioCtx();
-        if (!ctx) { Speech.speak(text, callback); return; }
+        if (!ctx) { clearTtsLoadingState(); Speech.speak(text, callback); return; }
 
         var promises = chunks.map(function(c) {
             return fetchAndDecodeTts(c, ttsUrl, voice);
@@ -3666,7 +3788,7 @@ define([
                     byteArr[i] = byteChars.charCodeAt(i);
                 }
 
-                // â”€â”€ AudioContext path (iOS-compatible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── AudioContext path (iOS-compatible) ────────────────────────────
                 // sharedAudioCtx was unlocked synchronously in handleSpeak() within
                 // the user gesture; decoding + playing here (in a Promise chain) is
                 // safe because the context is already running.
@@ -3758,7 +3880,7 @@ define([
                     return;
                 }
 
-                // â”€â”€ HTMLAudioElement fallback (non-iOS / no AudioContext) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── HTMLAudioElement fallback (non-iOS / no AudioContext) ──────────
                 const blob = new Blob([byteArr], {type: data.type || 'audio/mpeg'});
                 const objUrl = URL.createObjectURL(blob);
                 const audio = new Audio(objUrl);
@@ -3808,6 +3930,7 @@ define([
                     URL.revokeObjectURL(objUrl);
                     currentAudio = null;
                     UI.stopMouthSync();
+                    clearTtsLoadingState();
                     Speech.speak(text, callback);
                 });
                 audio.play().catch(function() {
@@ -3815,13 +3938,22 @@ define([
                     URL.revokeObjectURL(objUrl);
                     currentAudio = null;
                     UI.stopMouthSync();
+                    clearTtsLoadingState();
                     Speech.speak(text, callback);
                 });
             } catch (e) {
+                // Every fallback must clear the loading pulse. These terminal
+                // handlers did not, so on short messages (the chunked path
+                // clears correctly) a tts.php failure left the speak button
+                // pulsing "loading" while the browser voice was already
+                // speaking -- during a TTS outage the UI read as a hang, not a
+                // fallback.
+                clearTtsLoadingState();
                 Speech.speak(text, callback);
             }
         })
         .catch(function() {
+            clearTtsLoadingState();
             Speech.speak(text, callback);
         });
     };
@@ -3913,7 +4045,7 @@ define([
         if (!options.skipHistory) {
             recordConversationMessage('user', text, ts || Date.now());
         }
-        return UI.addMessage('user', text, null, ts || null, options.attachment || null);
+        return UI.addMessage('user', text, null, ts || null);
     };
 
     /**
@@ -4022,6 +4154,13 @@ define([
                     if (!result.success) {
                         quizModeActive = false;
                         setQuizBtnActive(quizBtn, false);
+                        // The academic-integrity lock is not a retryable failure, so it must
+                        // not borrow the generic "please try again" wording. The server sends
+                        // back the same branded, translated notice the drawer shows.
+                        if (result.errorcode === 'quizlocked' && result.error) {
+                            addAssistantMsg(result.error);
+                            return;
+                        }
                         Str.get_string('chat:quiz_error', 'local_ai_course_assistant').then(function(msg) {
                             addAssistantMsg(msg);
                             return;
@@ -4450,7 +4589,9 @@ define([
         });
         panel.appendChild(cancelBtn);
 
-        drawer.appendChild(panel);
+        // Same mount rule as every other runtime panel: above the input area,
+        // not appended past the footer and the bottom nav.
+        UI.mountPanel(drawer, panel);
     };
 
     /**
@@ -4574,7 +4715,7 @@ define([
         content.appendChild(clearSection);
 
         panel.appendChild(content);
-        drawer.appendChild(panel);
+        UI.mountPanel(drawer, panel);
     };
 
     /**
@@ -4607,6 +4748,23 @@ define([
             setBottomMode('chat', {force: true});
             syncVoicePanel();
             hydrateMasteryChip();
+        }
+        if (opened && attemptLocked && !historyLoaded) {
+            // The learner has a quiz open in THIS course. Say so in the server's
+            // own words, which name the remedy: submit or close the attempt.
+            //
+            // The flag is a page-render snapshot. Submitting the attempt in a
+            // second tab leaves this one disabled until the page is reloaded, so
+            // the notice says to reload rather than leaving the learner to
+            // wonder why doing what it asked changed nothing.
+            historyLoaded = true;
+            UI.clearMessages();
+            setConversationHistory([]);
+            addAssistantMsg(attemptLockedNotice, null, {skipHistory: true});
+            UI.setInputEnabled(false);
+            UI.setModeButtonsEnabled(false);
+            UI.setQuizButtonEnabled(false);
+            return;
         }
         if (opened && quizLocked && !historyLoaded) {
             // Show quiz-locked notice instead of normal history/starters flow.
@@ -4858,17 +5016,8 @@ define([
                             alreadyClean: true,
                         });
                     } else {
-                        var histAttachment = null;
-                        if (msg.attachment && msg.attachment.url) {
-                            histAttachment = {
-                                filename: msg.attachment.filename || '',
-                                mime: msg.attachment.mime || '',
-                                url: msg.attachment.url,
-                            };
-                        }
                         addUserMsg(text, msg.timecreated ? msg.timecreated * 1000 : null, {
                             skipHistory: true,
-                            attachment: histAttachment,
                         });
                     }
                 });
@@ -4906,89 +5055,6 @@ define([
      */
     const detectQuizIntent = function(text) {
         return /quiz\s+me|test\s+me|give\s+(?:me\s+)?a\s+quiz|practice\s+quiz|take\s+a\s+quiz|let'?s\s+(?:do\s+a\s+)?quiz|quiz\s+(?:me\s+)?on|quiz\s+(?:me\s+)?about|test\s+my\s+knowledge/i.test(text);
-    };
-
-    /**
-     * Handle a newly picked attachment file: client-side validate, upload to
-     * the upload endpoint, and show the preview chip. Errors surface as a
-     * toast and clear the input so the user can retry.
-     */
-    const handleAttachmentChange = function(ev) {
-        const input = ev && ev.target;
-        if (!input || !input.files || !input.files.length) {
-            return;
-        }
-        const file = input.files[0];
-        const rootEl = document.getElementById('local-ai-course-assistant');
-        const card = rootEl && rootEl.querySelector('.local-ai-course-assistant__composer-card');
-        const maxMb = card ? (parseInt(card.dataset.attachmentsMaxMb, 10) || 10) : 10;
-        const allowedMimes = card && card.dataset.attachmentsAllowedMimes
-            ? card.dataset.attachmentsAllowedMimes.split(',').map(function(s) { return s.trim().toLowerCase(); })
-            : [];
-        const supportsImages = card && card.dataset.providerSupportsImages === '1';
-
-        // Client-side size check — duplicates the server check so we can fail fast.
-        if (file.size > maxMb * 1024 * 1024) {
-            UI.showNotification('File is too large. Maximum size is ' + maxMb + ' MB.', 'error');
-            input.value = '';
-            return;
-        }
-        // Client-side MIME check — authoritative check still lives server-side (finfo).
-        const mime = (file.type || '').toLowerCase();
-        if (allowedMimes.length && allowedMimes.indexOf(mime) === -1) {
-            UI.showNotification('Unsupported file type.', 'error');
-            input.value = '';
-            return;
-        }
-        // Block image uploads when the current provider can't handle them.
-        if (mime.indexOf('image/') === 0 && !supportsImages) {
-            Str.get_string('attachment:error_provider_no_images', 'local_ai_course_assistant').then(function(msg) {
-                UI.showNotification(msg, 'error');
-                return;
-            }).catch(function() {
-                UI.showNotification('The current AI provider does not accept images.', 'error');
-            });
-            input.value = '';
-            return;
-        }
-
-        attachmentUploading = true;
-        const attachBtn = UI.getElements().attachBtn;
-        if (attachBtn) {
-            attachBtn.disabled = true;
-            attachBtn.classList.add('aica-attachment-btn--uploading');
-        }
-
-        Repo.uploadAttachment(courseId, file).then(function(data) {
-            pendingAttachment = {
-                draftitemid: parseInt(data.draftitemid, 10) || 0,
-                filename: data.filename || file.name,
-                mime: data.mime || mime,
-                size: parseInt(data.size, 10) || file.size,
-                url: data.url || '',
-            };
-            UI.showAttachmentPreview(pendingAttachment, clearPendingAttachment);
-            return;
-        }).catch(function(err) {
-            window.console && console.error('[SOLA attachment]', err); // eslint-disable-line no-console
-            UI.showNotification((err && err.message) || 'Upload failed.', 'error');
-        }).finally(function() {
-            attachmentUploading = false;
-            if (attachBtn) {
-                attachBtn.disabled = false;
-                attachBtn.classList.remove('aica-attachment-btn--uploading');
-            }
-            input.value = '';
-        });
-    };
-
-    /**
-     * Clear any pending attachment and hide the preview chip. Used both
-     * when the user clicks the remove button and after a successful send.
-     */
-    const clearPendingAttachment = function() {
-        pendingAttachment = null;
-        UI.hideAttachmentPreview();
     };
 
     /**
@@ -5068,7 +5134,7 @@ define([
      * Handle sending a message.
      */
     const handleSend = function() {
-        if (quizLocked) {
+        if (quizLocked || attemptLocked) {
             return;
         }
         const text = UI.getInputValue();
@@ -5115,13 +5181,8 @@ define([
         // Track last session topic for personalized welcome-back.
         updateLastSession();
 
-        // Snapshot the pending attachment so the preview can clear immediately
-        // while we render the user bubble with the file still attached.
-        var sendingAttachment = pendingAttachment;
-        clearPendingAttachment();
-
         // Add user message.
-        addUserMsg(text, null, sendingAttachment ? {attachment: sendingAttachment} : null);
+        addUserMsg(text, null);
         UI.showTyping(true);
 
         // Accumulated response text.
@@ -5133,9 +5194,6 @@ define([
             courseid: courseId,
             message: text,
         };
-        if (sendingAttachment && sendingAttachment.draftitemid) {
-            postData.draftitemid = sendingAttachment.draftitemid;
-        }
         const currentLang = Speech.getLang();
         if (currentLang) {
             postData.lang = currentLang;

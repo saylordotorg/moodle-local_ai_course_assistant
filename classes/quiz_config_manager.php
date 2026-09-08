@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class quiz_config_manager {
-
     /** Table name. */
     const TABLE = 'local_ai_course_assistant_quiz_cfg';
 
@@ -59,12 +58,26 @@ class quiz_config_manager {
      * (grade > 0) → hidden, formative → full.
      *
      * @param int $cmid     course_modules.id of the quiz
-     * @param ?float $grade Optional pre-loaded quiz.grade. If null, looks it up.
+     * @param ?float $grade Optional pre-loaded quiz.grade. Since v7.1.0 the value
+     *        itself is no longer consulted -- every quiz locks by default -- but
+     *        passing it still asserts "I have already established that this cmid
+     *        is a quiz", which lets the batch resolver skip the module lookup.
+     *        Pass null unless that is true, or a non-quiz module will be locked.
+     * @param ?string $storedlevel Optional pre-loaded raw config value for this
+     *        cmid ('default' when no row exists). Lets a caller that already
+     *        batched the config rows skip the per-cmid lookup. Null looks it up.
      */
-    public static function get_assistance_level(int $cmid, ?float $grade = null): string {
+    public static function get_assistance_level(
+        int $cmid,
+        ?float $grade = null,
+        ?string $storedlevel = null
+    ): string {
         global $DB;
-        $row = self::get($cmid);
-        $level = $row ? $row->assistance_level : 'default';
+        if ($storedlevel === null) {
+            $row = self::get($cmid);
+            $storedlevel = $row ? $row->assistance_level : 'default';
+        }
+        $level = $storedlevel;
 
         if (!in_array($level, self::LEVELS, true)) {
             $level = 'default';
@@ -74,7 +87,10 @@ class quiz_config_manager {
             return $level;
         }
 
-        // Fall back to grade-based heuristic.
+        // Confirm this really is a quiz before locking anything: this method is
+        // also reached for non-quiz modules, which must stay 'full'. Callers that
+        // supplied $grade have already established it (see the parameter note),
+        // and skip the lookup so the batch resolver stays one query.
         if ($grade === null) {
             $cm = $DB->get_record('course_modules', ['id' => $cmid], 'instance, module', IGNORE_MISSING);
             if (!$cm) {
@@ -84,11 +100,17 @@ class quiz_config_manager {
             if ($modname !== 'quiz') {
                 return 'full';
             }
-            $quiz = $DB->get_record('quiz', ['id' => $cm->instance], 'grade', IGNORE_MISSING);
-            $grade = $quiz ? (float)$quiz->grade : 0.0;
+            if (!$DB->record_exists('quiz', ['id' => $cm->instance])) {
+                return 'full';
+            }
         }
 
-        return ($grade > 0) ? 'hidden' : 'full';
+        // v7.1.0: any Moodle quiz or exam, not just graded ones. The previous
+        // rule ("grade > 0") was written when the lock did not work, so it had
+        // never been exercised; it also matched 3,074 of 3,142 quizzes on
+        // learn.saylor.org, which made the distinction close to meaningless.
+        // Teachers opt an individual quiz out by setting its level to 'full'.
+        return 'hidden';
     }
 
     /**
@@ -159,7 +181,7 @@ class quiz_config_manager {
         }
 
         $cmids = array_keys($rows);
-        list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cm');
+        [$insql, $inparams] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED, 'cm');
         $cfgrows = $DB->get_records_select(self::TABLE, "cmid {$insql}", $inparams);
         $bycm = [];
         foreach ($cfgrows as $cfg) {
@@ -169,7 +191,10 @@ class quiz_config_manager {
         $out = [];
         foreach ($rows as $r) {
             $stored = $bycm[$r->cmid] ?? 'default';
-            $effective = self::get_assistance_level((int)$r->cmid, (float)$r->grade);
+            // Hand the already-batched stored level (and grade) to the
+            // resolver: without it, get_assistance_level() re-queries the
+            // config table once per quiz, which made the batch above pointless.
+            $effective = self::get_assistance_level((int)$r->cmid, (float)$r->grade, $stored);
             $r->stored_level = $stored;
             $r->effective_level = $effective;
             $out[] = $r;

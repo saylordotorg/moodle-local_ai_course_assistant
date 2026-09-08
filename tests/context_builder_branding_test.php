@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\context_builder
  */
 final class context_builder_branding_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
@@ -43,13 +42,26 @@ final class context_builder_branding_test extends \advanced_testcase {
         set_config('institution_name', 'Zeta University', 'local_ai_course_assistant');
 
         $prompt = context_builder::build_system_prompt(
-            (int) $course->id, (int) get_admin()->id, 'en', [], 0, '', '');
+            (int) $course->id,
+            (int) get_admin()->id,
+            'en',
+            [],
+            0,
+            '',
+            ''
+        );
 
-        $this->assertStringContainsString('ZBRANDX', $prompt,
-            'The configured short name must appear in the prompt.');
+        $this->assertStringContainsString(
+            'ZBRANDX',
+            $prompt,
+            'The configured short name must appear in the prompt.'
+        );
         $this->assertStringContainsString('Zeta University', $prompt);
-        $this->assertDoesNotMatchRegularExpression('/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/',
-            $prompt, 'No brand token may leak into the system prompt.');
+        $this->assertDoesNotMatchRegularExpression(
+            '/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/',
+            $prompt,
+            'No brand token may leak into the system prompt.'
+        );
         // The literal default brand must not survive a rebrand.
         $this->assertStringNotContainsString('You are SOLA', $prompt);
     }
@@ -58,10 +70,19 @@ final class context_builder_branding_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         // With no branding config, fallbacks apply -> the prompt is SOLA-branded.
         $prompt = context_builder::build_system_prompt(
-            (int) $course->id, (int) get_admin()->id, 'en', [], 0, '', '');
+            (int) $course->id,
+            (int) get_admin()->id,
+            'en',
+            [],
+            0,
+            '',
+            ''
+        );
 
         $this->assertStringContainsString('SOLA', $prompt);
-        $this->assertDoesNotMatchRegularExpression('/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/',
-            $prompt);
+        $this->assertDoesNotMatchRegularExpression(
+            '/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/',
+            $prompt
+        );
     }
 }

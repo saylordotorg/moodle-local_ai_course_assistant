@@ -27,7 +27,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class openai_compatible_provider extends base_provider {
-
     /** @var array|null Token usage from the last streaming call.
      *  v5.11.0 adds `cached_tokens` so dashboards can see the OpenAI auto-prefix
      *  discount hit rate (cached_tokens get 50% off input; auto-fires on any
@@ -113,8 +112,8 @@ abstract class openai_compatible_provider extends base_provider {
         // Multimodal: attach one or more images to the latest user message as a
         // content-block array, matching the OpenAI chat/completions schema that
         // Gemini, xAI, and other compatible endpoints also accept.
-        //   options['attachment']     => single {base64, mime} image
-        //   options['image_datauris'] => list of full data: URI strings (slide vision)
+        // options['attachment']     => single {base64, mime} image
+        // options['image_datauris'] => list of full data: URI strings (slide vision)
         $imageurls = [];
         if (!empty($options['attachment']['base64']) && !empty($options['attachment']['mime'])) {
             $imageurls[] = 'data:' . $options['attachment']['mime']
@@ -159,7 +158,13 @@ abstract class openai_compatible_provider extends base_provider {
                 'type' => 'json_schema',
                 'json_schema' => [
                     'name' => $schema['name'] ?? 'structured_output',
-                    'schema' => $schema['schema'],
+                    // Accept both the wrapped shape ['name'=>..,'schema'=>[..]]
+                    // and a bare JSON Schema. score_speech, score_essay and
+                    // generate_flashcards all passed bare schemas, so this read
+                    // yielded null and the request carried "schema": null --
+                    // which upstream rejects, taking every speech, essay and
+                    // flashcard scoring call down with a generic provider error.
+                    'schema' => $schema['schema'] ?? $schema,
                     'strict' => true,
                 ],
             ];
@@ -181,6 +186,22 @@ abstract class openai_compatible_provider extends base_provider {
         $data = json_decode($response, true);
         if (!$data || !isset($data['choices'][0]['message']['content'])) {
             throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null, 'Invalid API response');
+        }
+
+        // v7.0.6: capture usage on the NON-streaming path too. Until now only
+        // chat_completion_stream() populated this, so every non-streaming
+        // caller -- quiz generation, the mastery classifier, digests, essay
+        // scoring -- reported no tokens at all and contributed nothing to
+        // spend_guard's totals. The non-streaming response carries the same
+        // usage object; there was no reason to drop it.
+        $this->last_token_usage = null;
+        if (!empty($data['usage'])) {
+            $this->last_token_usage = [
+                'prompt_tokens'     => (int) ($data['usage']['prompt_tokens'] ?? 0),
+                'completion_tokens' => (int) ($data['usage']['completion_tokens'] ?? 0),
+                'model'             => $data['model'] ?? $this->model,
+                'cached_tokens'     => (int) ($data['usage']['prompt_tokens_details']['cached_tokens'] ?? 0),
+            ];
         }
 
         return $data['choices'][0]['message']['content'];

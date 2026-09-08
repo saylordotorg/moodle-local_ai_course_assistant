@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\audit_logger
  */
 final class audit_logger_test extends \advanced_testcase {
-
     public function test_log_writes_a_row(): void {
         $this->resetAfterTest();
         global $DB;
@@ -40,8 +39,10 @@ final class audit_logger_test extends \advanced_testcase {
 
         audit_logger::log('test_action', $user->id, $course->id, ['key' => 'value']);
 
-        $row = $DB->get_record('local_ai_course_assistant_audit',
-            ['action' => 'test_action', 'userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_audit',
+            ['action' => 'test_action', 'userid' => $user->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals($course->id, (int)$row->courseid);
         $details = json_decode($row->details, true);
@@ -58,8 +59,10 @@ final class audit_logger_test extends \advanced_testcase {
 
         audit_logger::log('sitewide_action', $user->id, 0, []);
 
-        $row = $DB->get_record('local_ai_course_assistant_audit',
-            ['action' => 'sitewide_action', 'userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_audit',
+            ['action' => 'sitewide_action', 'userid' => $user->id]
+        );
         $this->assertNotFalse($row);
         $this->assertEquals(0, (int)$row->courseid);
     }
@@ -76,11 +79,16 @@ final class audit_logger_test extends \advanced_testcase {
 
         audit_logger::log('complex_details', $user->id, 0, $details);
 
-        $row = $DB->get_record('local_ai_course_assistant_audit',
-            ['action' => 'complex_details', 'userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_audit',
+            ['action' => 'complex_details', 'userid' => $user->id]
+        );
         $decoded = json_decode($row->details, true);
-        $this->assertEquals($details, $decoded,
-            'details must round-trip through JSON without lossy encoding.');
+        $this->assertEquals(
+            $details,
+            $decoded,
+            'details must round-trip through JSON without lossy encoding.'
+        );
     }
 
     public function test_get_user_logs_returns_only_that_user(): void {
@@ -131,12 +139,20 @@ final class audit_logger_test extends \advanced_testcase {
 
         audit_logger::clean_old_logs(365);
 
-        $this->assertFalse($DB->record_exists('local_ai_course_assistant_audit',
-            ['action' => 'old_action']),
-            'Rows older than the retention window must be purged.');
-        $this->assertTrue($DB->record_exists('local_ai_course_assistant_audit',
-            ['action' => 'recent_action']),
-            'Recent rows must not be purged.');
+        $this->assertFalse(
+            $DB->record_exists(
+                'local_ai_course_assistant_audit',
+                ['action' => 'old_action']
+            ),
+            'Rows older than the retention window must be purged.'
+        );
+        $this->assertTrue(
+            $DB->record_exists(
+                'local_ai_course_assistant_audit',
+                ['action' => 'recent_action']
+            ),
+            'Recent rows must not be purged.'
+        );
     }
 
     public function test_log_records_ipaddress_and_useragent_when_available(): void {
@@ -149,8 +165,10 @@ final class audit_logger_test extends \advanced_testcase {
 
         audit_logger::log('ip_check', $user->id, 0);
 
-        $row = $DB->get_record('local_ai_course_assistant_audit',
-            ['action' => 'ip_check', 'userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_audit',
+            ['action' => 'ip_check', 'userid' => $user->id]
+        );
         // Columns must exist; values may be null/empty in test env.
         $this->assertObjectHasProperty('ipaddress', $row);
         $this->assertObjectHasProperty('useragent', $row);

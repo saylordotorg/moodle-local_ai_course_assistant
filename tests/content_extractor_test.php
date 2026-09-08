@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\content_extractor::is_indexable_text
  */
 final class content_extractor_test extends \advanced_testcase {
-
     public function test_null_and_empty_are_not_indexable(): void {
         $this->assertFalse(content_extractor::is_indexable_text(null));
         $this->assertFalse(content_extractor::is_indexable_text(''));

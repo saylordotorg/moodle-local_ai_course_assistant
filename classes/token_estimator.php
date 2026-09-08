@@ -40,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class token_estimator {
-
     /** Conservative fallback divisor for unlisted languages. */
     private const FALLBACK_CPT = 3.0;
 
@@ -98,7 +97,10 @@ final class token_estimator {
      * @param string $lang learner language code
      */
     public static function budget_chars_for_window(
-        int $windowtokens, int $outputtokens, int $historytokens, string $lang
+        int $windowtokens,
+        int $outputtokens,
+        int $historytokens,
+        string $lang
     ): int {
         $sysprompttokens = $windowtokens - $outputtokens - $historytokens - self::USER_HEADROOM_TOKENS;
         if ($sysprompttokens <= 0) {

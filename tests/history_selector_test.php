@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\history_selector
  */
 final class history_selector_test extends \advanced_testcase {
-
     /**
      * Build a scored row whose pair is identifiable by a label.
      *

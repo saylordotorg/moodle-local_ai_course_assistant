@@ -1,0 +1,102 @@
+Version 7.2.1 (build 2026082800)
+
+A defect-repair release. Thirteen findings from a verification pass over 7.2.0 on
+a staging site: sixteen admin surfaces, the learner chat drawer, and a full course
+backup and restore cycle. One blocker, three highs, six mediums, three lows.
+
+1. Retrieved course content never reached the model
+
+The most serious of these, and it had been present for some time rather than
+being introduced by 7.2.0. Retrieval worked correctly: the index was complete and
+the retriever returned the right passages with sensible relevance scores. The
+passages then failed to reach the assembled prompt.
+
+The shipped default prompt template carries a {{coursecontent}} placeholder, so
+retrieved passages were substituted into the identity block. That block is sized
+from a bucket worth 10% of the prompt character budget and intended for a 1.6 KB
+persona. The bucket meant for course content, worth 40%, was never spent, because
+no prompt section had ever been created under that name. The passages were
+therefore truncated away, while the prompt still instructed the model to cite them
+inline. It cited passages it had never been shown.
+
+Course structure and course content now flow through their own budgeted sections,
+which is what already happened for administrators whose custom template omitted
+the placeholders. The identity template is no longer clipped to a percentage of
+the budget; a floor keeps a normal template intact while still bounding a
+pathological one.
+
+2. The default prompt budget was smaller than the prompt
+
+A stock prompt with retrieval enabled measures about 23,800 characters. The
+default budget was 12,000, so the assembler dropped or truncated sections on every
+turn. The default is now 24,000. Existing sites are moved by the upgrade step only
+if the setting is still on the old default; a deliberately tuned value is left
+alone. Section weights are also now allocated from the budget that remains after
+the sections the assembler cannot reclaim space from, rather than from the whole
+budget while those sections competed for the same space.
+
+3. The emergency chat switch did not stop chat
+
+Three independent faults. The provider factory referenced the spend guard class
+without importing it, so every call resolved to a non-existent class and threw a
+fatal error into a catch block that discarded it: the spend cap, its failover and
+the per-call failover chain were all inert at the point every provider call passes
+through, with no visible symptom. The emergency stop was then treated as a spend
+cap and answered by switching to the failover provider. And the guard exempted
+site administrators.
+
+The emergency stop is now checked ahead of every exemption and applies to
+administrators, scheduled tasks and CLI alike. The backend self-test and health
+check are the one exception, so an operator can verify the provider before
+restoring service. Both discarding catch blocks now report through debugging().
+
+4. Analytics charts were blank
+
+Chart.js prefers AMD when a module loader is present, and Moodle always has one,
+so the bundle registered an anonymous module that the loader rejected instead of
+installing its global. All three canvases rendered empty while the headline
+numbers populated normally, which made it look like a data problem. The bundle is
+now bracketed by a pair of guards that hide the AMD marker across its load.
+
+5. Course backup carried only part of the per-course configuration
+
+The course configuration table holds provider, model, system prompt and
+temperature. Every other per-course decision is stored as a plugin configuration
+row keyed by course id, and none of it travelled: Socratic mode, flashcards, code
+sandbox, essay feedback, presentation practice, worked examples, external
+resources, the voice tab, auto-open, digest email, English lock, the retrieval
+toggle, the widget on/off choice and the starter chips. A duplicated course kept
+its model and system prompt, so the copy looked correct while every pedagogy
+decision silently reverted to the site default.
+
+Those rows now travel and are remapped to the new course id. Which settings may
+travel is an allowlist rather than a credential denylist, so a hand-edited backup
+file cannot write arbitrary plugin configuration on restore, and a setting added
+in a later release does not travel until it is deliberately added.
+
+Also in this release
+
+- An audit log viewer. The rows were always written and two settings told
+  administrators to go and read them, but no page existed to read them in.
+- Four unresolved brand placeholders on the emergency controls page, and five
+  field labels on the prompt playground rendering their own markup as text.
+- The anomaly spend floor rejected valid amounts such as 25.50 while accepting
+  negative values.
+- Stripping an unresolvable citation marker left a space before the punctuation.
+
+Upgrade notes
+
+No schema change. One upgrade step, which raises the prompt character budget for
+sites still on the old default and touches nothing else.
+
+The emergency chat switch now stops every AI call rather than chat alone, for
+administrators and scheduled tasks as well as learners. Its description has been
+updated in all 46 supported languages.
+
+Testing
+
+988 unit tests, 4,108 assertions, no failures. 36 of 36 corpus validators. New
+regression cover for each of the four most serious findings; four of the five
+tests covering the blocker fail against the previous prompt builder. The fixes
+were then put through code review, which found ten further issues, all of which
+are fixed in this release.

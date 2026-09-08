@@ -28,7 +28,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class meta_ai_data_builder {
-
     private const SYSTEM_PROMPT = <<<'PROMPT'
 You are an analytics assistant for an institution's AI learning assistant (SOLA).
 
@@ -115,14 +114,20 @@ PROMPT;
     public static function build_aggregate_stats(array $courseids = [], int $since = 0, string $filterprovider = ''): string {
         global $DB;
 
-        list($wcl, $params) = self::build_where($courseids, $since, $filterprovider);
+        [$wcl, $params] = self::build_where($courseids, $since, $filterprovider);
 
         $totalmsg = $DB->count_records_sql(
-            "SELECT COUNT(*) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}", $params);
+            "SELECT COUNT(*) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}",
+            $params
+        );
         $totalusers = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT m.userid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl} AND m.role = 'user'", $params);
+            "SELECT COUNT(DISTINCT m.userid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl} AND m.role = 'user'",
+            $params
+        );
         $totalcourses = $DB->count_records_sql(
-            "SELECT COUNT(DISTINCT m.courseid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}", $params);
+            "SELECT COUNT(DISTINCT m.courseid) FROM {local_ai_course_assistant_msgs} m WHERE {$wcl}",
+            $params
+        );
 
         // Token cost totals.
         $tokensql = "SELECT SUM(COALESCE(m.prompt_tokens, 0)) AS prompt_total,
@@ -176,7 +181,7 @@ PROMPT;
     public static function build_provider_stats(array $courseids = [], int $since = 0): string {
         global $DB;
 
-        list($wcl, $params) = self::build_where($courseids, $since);
+        [$wcl, $params] = self::build_where($courseids, $since);
 
         $sql = "SELECT m.provider, m.model_name,
                        COUNT(m.id) AS response_count,
@@ -195,7 +200,8 @@ PROMPT;
 
         $lines = ["Provider | Model | Responses | Prompt Tokens | Completion Tokens | Avg Tokens/Response"];
         foreach ($records as $r) {
-            $lines[] = sprintf("%s | %s | %s | %s | %s | %s",
+            $lines[] = sprintf(
+                "%s | %s | %s | %s | %s | %s",
                 $r->provider ?: '(unknown)',
                 $r->model_name ?: '(default)',
                 number_format((int) $r->response_count),
@@ -220,7 +226,7 @@ PROMPT;
         $params = [];
         $where = ['1=1'];
         if (!empty($courseids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'fc');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'fc');
             $where[] = "f.courseid {$insql}";
             $params = array_merge($params, $inparams);
         }
@@ -256,7 +262,9 @@ PROMPT;
                FROM {local_ai_course_assistant_feedback} f
               WHERE {$wcl} AND f.comment IS NOT NULL AND f.comment != ''
               ORDER BY f.timecreated DESC",
-            $params, 0, 10
+            $params,
+            0,
+            10
         );
         if (!empty($comments)) {
             $lines[] = "\nRecent comments:";
@@ -282,19 +290,21 @@ PROMPT;
         $params = [];
         $where = ['1=1'];
         if (!empty($courseids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'sp');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'sp');
             $where[] = "p.courseid {$insql}";
             $params = array_merge($params, $inparams);
         }
 
         try {
             $profiles = $DB->get_records_sql(
-                "SELECT p.userid, p.courseid, p.profile_summary, c.fullname AS coursename
+                "SELECT p.id, p.userid, p.courseid, p.profile_summary, c.fullname AS coursename
                    FROM {local_ai_course_assistant_profiles} p
                    JOIN {course} c ON c.id = p.courseid
                   WHERE " . implode(' AND ', $where) . "
                   ORDER BY p.courseid, p.userid",
-                $params, 0, 50
+                $params,
+                0,
+                50
             );
         } catch (\Throwable $e) {
             return '';
@@ -335,17 +345,35 @@ PROMPT;
             $courseids = $courseids > 0 ? [$courseids] : [];
         }
 
-        list($wcl, $params) = self::build_where($courseids, $since, $filterprovider);
+        [$wcl, $params] = self::build_where($courseids, $since, $filterprovider);
 
-        $sql = "SELECT m.id, m.userid, m.role, m.message, m.courseid, m.timecreated,
-                       m.provider, m.model_name,
-                       c.fullname AS coursename
-                  FROM {local_ai_course_assistant_msgs} m
-                  JOIN {course} c ON c.id = m.courseid
-                 WHERE {$wcl}
-                 ORDER BY m.courseid ASC, m.userid ASC, m.timecreated ASC";
+        // Bound the fetch in SQL and sample RECENT rows.
+        //
+        // This fetched every matching row unbounded and truncated afterwards in
+        // PHP, with courseid-ascending order -- so the lowest-numbered courses
+        // always filled the character budget and the newest courses were always
+        // absent from a site-wide radar query. Deterministic bias, not a random
+        // sample. Selecting the newest ids first and re-sorting for readability
+        // gives the sample an analyst would expect.
+        $rowcap = max(200, (int) ($maxchars / 400));
+        $recentids = $DB->get_fieldset_sql(
+            "SELECT m.id
+               FROM {local_ai_course_assistant_msgs} m
+              WHERE {$wcl}
+              ORDER BY m.id DESC", $params, 0, $rowcap);
 
-        $messages = $DB->get_records_sql($sql, $params);
+        $messages = [];
+        if (!empty($recentids)) {
+            [$tinsql, $tinparams] = $DB->get_in_or_equal($recentids, SQL_PARAMS_NAMED, 'tid');
+            $messages = $DB->get_records_sql(
+                "SELECT m.id, m.userid, m.role, m.message, m.courseid, m.timecreated,
+                        m.provider, m.model_name,
+                        c.fullname AS coursename
+                   FROM {local_ai_course_assistant_msgs} m
+                   JOIN {course} c ON c.id = m.courseid
+                  WHERE m.id {$tinsql}
+                  ORDER BY m.courseid ASC, m.userid ASC, m.timecreated ASC", $tinparams);
+        }
 
         if (empty($messages)) {
             return "(No conversation data found for the selected filters.)\n";
@@ -355,6 +383,7 @@ PROMPT;
         $currentcourse = 0;
         $totalchars = 0;
         $truncated = false;
+        $emitted = 0;
 
         foreach ($messages as $msg) {
             if ($msg->courseid !== $currentcourse) {
@@ -388,6 +417,7 @@ PROMPT;
                 break;
             }
             $lines[] = $line;
+            $emitted++;
         }
 
         $result = implode('', $lines);
@@ -395,8 +425,14 @@ PROMPT;
             $result .= "\n(Data truncated to ~" . number_format($maxchars) . " characters.)\n";
         }
 
-        $total = count($messages);
-        $result = "Total messages in transcript: {$total}\n" . $result;
+        // Report what is actually IN the block, not the fetch count. The radar
+        // model was being told "Total messages in transcript: 41,203" and handed
+        // a few hundred, so every "out of N, X% ..." claim it produced was
+        // computed against a denominator that did not match the evidence.
+        $result = "Messages included in transcript: {$emitted}"
+            . (($truncated || count($messages) >= $rowcap)
+                ? " (recent sample; more messages exist for these filters)" : "")
+            . "\n" . $result;
 
         return $result;
     }
@@ -426,11 +462,19 @@ PROMPT;
     private static function build_where(array $courseids = [], int $since = 0, string $filterprovider = ''): array {
         global $DB;
 
-        $where = ['m.courseid > 1'];
+        // Real learner conversation only. Without the role filter, role='system'
+        // quiz and indexing telemetry was fed to the Learning Radar model
+        // labelled "SOLA", and radar meta rows fed themselves back in. This
+        // matters more now that the Redash transcript_excerpt actually carries
+        // content -- see the arg-order fix in redash_export.php.
+        $where = [
+            'm.courseid > 1',
+            \local_ai_course_assistant\analytics::conversation_rows_predicate('m'),
+        ];
         $params = [];
 
         if (!empty($courseids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'cid');
+            [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'cid');
             $where[] = "m.courseid {$insql}";
             $params = array_merge($params, $inparams);
         }

@@ -32,7 +32,6 @@ use local_ai_course_assistant\analytics;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_analytics_by_course extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID (0 = all courses)', VALUE_DEFAULT, 0),
@@ -63,9 +62,23 @@ class get_analytics_by_course extends external_api {
             $courseids = $DB->get_fieldset_sql($sql);
         }
 
+        // One query for every course name rather than a get_record() per
+        // course id, which on a site with many SOLA-active courses added a
+        // query per course to this admin call.
+        $coursesbyid = [];
+        if (!empty($courseids)) {
+            $coursesbyid = $DB->get_records_list(
+                'course',
+                'id',
+                array_map('intval', $courseids),
+                '',
+                'id, fullname, shortname'
+            );
+        }
+
         $result = [];
         foreach ($courseids as $cid) {
-            $course = $DB->get_record('course', ['id' => $cid], 'id, fullname, shortname');
+            $course = $coursesbyid[(int) $cid] ?? null;
             if (!$course) {
                 continue;
             }

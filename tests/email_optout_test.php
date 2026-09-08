@@ -29,22 +29,25 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\email_footer
  */
 final class email_optout_test extends \advanced_testcase {
-
     // ───────────────────────────────────────────────────────────
     // Storage
     // ───────────────────────────────────────────────────────────
 
     public function test_is_opted_out_returns_false_for_unknown_pair(): void {
         $this->resetAfterTest();
-        $this->assertFalse(email_optout::is_opted_out('a@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
+        $this->assertFalse(email_optout::is_opted_out(
+            'a@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
     }
 
     public function test_record_then_is_opted_out_returns_true(): void {
         $this->resetAfterTest();
         email_optout::record('a@example.com', email_optout::TYPE_LEARNING_RADAR);
-        $this->assertTrue(email_optout::is_opted_out('a@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
+        $this->assertTrue(email_optout::is_opted_out(
+            'a@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
     }
 
     public function test_record_is_idempotent_on_duplicate(): void {
@@ -53,37 +56,51 @@ final class email_optout_test extends \advanced_testcase {
         email_optout::record('a@example.com', email_optout::TYPE_LEARNING_RADAR);
         // Second record call must not throw on the unique index.
         email_optout::record('a@example.com', email_optout::TYPE_LEARNING_RADAR);
-        $this->assertEquals(1, $DB->count_records('local_ai_course_assistant_email_optout',
-            ['email' => 'a@example.com']));
+        $this->assertEquals(1, $DB->count_records(
+            'local_ai_course_assistant_email_optout',
+            ['email' => 'a@example.com']
+        ));
     }
 
     public function test_record_normalizes_case_and_whitespace(): void {
         $this->resetAfterTest();
         email_optout::record('  Person@EXAMPLE.com  ', email_optout::TYPE_LEARNING_RADAR);
-        $this->assertTrue(email_optout::is_opted_out('person@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
-        $this->assertTrue(email_optout::is_opted_out('PERSON@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
+        $this->assertTrue(email_optout::is_opted_out(
+            'person@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
+        $this->assertTrue(email_optout::is_opted_out(
+            'PERSON@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
     }
 
     public function test_optout_is_per_type(): void {
         $this->resetAfterTest();
         email_optout::record('a@example.com', email_optout::TYPE_LEARNING_RADAR);
         // Same email, different type — should NOT count as opted out.
-        $this->assertTrue(email_optout::is_opted_out('a@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
-        $this->assertFalse(email_optout::is_opted_out('a@example.com',
-            email_optout::TYPE_ANOMALY_DIGEST));
+        $this->assertTrue(email_optout::is_opted_out(
+            'a@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
+        $this->assertFalse(email_optout::is_opted_out(
+            'a@example.com',
+            email_optout::TYPE_ANOMALY_DIGEST
+        ));
     }
 
     public function test_clear_removes_optout(): void {
         $this->resetAfterTest();
         email_optout::record('a@example.com', email_optout::TYPE_LEARNING_RADAR);
-        $this->assertTrue(email_optout::is_opted_out('a@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
+        $this->assertTrue(email_optout::is_opted_out(
+            'a@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
         email_optout::clear('a@example.com', email_optout::TYPE_LEARNING_RADAR);
-        $this->assertFalse(email_optout::is_opted_out('a@example.com',
-            email_optout::TYPE_LEARNING_RADAR));
+        $this->assertFalse(email_optout::is_opted_out(
+            'a@example.com',
+            email_optout::TYPE_LEARNING_RADAR
+        ));
     }
 
     public function test_record_with_empty_email_or_type_is_a_noop(): void {
@@ -120,8 +137,11 @@ final class email_optout_test extends \advanced_testcase {
     public function test_verify_rejects_expired_token(): void {
         $this->resetAfterTest();
         // ttl = -1 second mints an already-expired token.
-        $token = email_optout::mint_token('a@example.com',
-            email_optout::TYPE_LEARNING_RADAR, -1);
+        $token = email_optout::mint_token(
+            'a@example.com',
+            email_optout::TYPE_LEARNING_RADAR,
+            -1
+        );
         $this->assertNull(email_optout::verify_token($token));
     }
 
@@ -156,9 +176,11 @@ final class email_optout_test extends \advanced_testcase {
 
     public function test_text_footer_includes_optional_reason_line(): void {
         $this->resetAfterTest();
-        $footer = email_footer::text('a@example.com',
+        $footer = email_footer::text(
+            'a@example.com',
             email_optout::TYPE_LEARNING_RADAR,
-            'You are on the test list.');
+            'You are on the test list.'
+        );
         $this->assertStringContainsString('You are on the test list.', $footer);
     }
 
@@ -173,8 +195,11 @@ final class email_optout_test extends \advanced_testcase {
     public function test_append_text_concatenates_to_existing_body(): void {
         $this->resetAfterTest();
         $original = 'Daily report.';
-        $combined = email_footer::append_text($original, 'a@example.com',
-            email_optout::TYPE_ANOMALY_DIGEST);
+        $combined = email_footer::append_text(
+            $original,
+            'a@example.com',
+            email_optout::TYPE_ANOMALY_DIGEST
+        );
         $this->assertStringStartsWith('Daily report.', $combined);
         $this->assertStringContainsString('email_unsubscribe.php', $combined);
     }

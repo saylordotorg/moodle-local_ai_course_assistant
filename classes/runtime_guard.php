@@ -46,7 +46,6 @@ use local_ai_course_assistant\validators\second_person_validator;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class runtime_guard {
-
     /**
      * Apply the runtime validators to an assistant response.
      *
@@ -63,9 +62,9 @@ class runtime_guard {
 
         $guard = new guard();
         $guard->add(new pii_echo_validator())
-              ->add(new credential_leak_validator())
-              ->add(new hallucination_validator())
-              ->add(new second_person_validator());
+            ->add(new credential_leak_validator())
+            ->add(new hallucination_validator())
+            ->add(new second_person_validator());
 
         // v5.4.0: gate the memory_leak_validator behind its own flag for
         // staged roll-out. The validator was added in v5.3.35 and the

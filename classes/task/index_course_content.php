@@ -31,7 +31,6 @@ use local_ai_course_assistant\content_indexer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class index_course_content extends \core\task\scheduled_task {
-
     /**
      * Return the task's human-readable name.
      *

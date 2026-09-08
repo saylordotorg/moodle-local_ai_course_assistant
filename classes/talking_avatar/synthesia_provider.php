@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class synthesia_provider extends base_provider {
-
     public function get_key(): string {
         return 'synthesia';
     }
@@ -46,8 +45,13 @@ class synthesia_provider extends base_provider {
 
     public function start_session(array $context): array {
         if (!$this->is_configured()) {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'Synthesia: API key or agent id (persona_id) not configured.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'Synthesia: API key or agent id (persona_id) not configured.'
+            );
         }
         $base = rtrim($this->cfg('base_url', 'https://api.synthesia.io'), '/');
         $agentid = $this->cfg('persona_id');
@@ -68,8 +72,13 @@ class synthesia_provider extends base_provider {
         $embedurl = (string) ($resp['embed_url'] ?? $resp['session_url'] ?? '');
         $sessionid = (string) ($resp['session_id'] ?? $resp['id'] ?? '');
         if ($embedurl === '' || $sessionid === '') {
-            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
-                'Synthesia: response missing embed_url or session_id.');
+            throw new \moodle_exception(
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
+                'Synthesia: response missing embed_url or session_id.'
+            );
         }
         return [
             'embed_url' => $embedurl,

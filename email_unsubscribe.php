@@ -43,8 +43,11 @@ use local_ai_course_assistant\branding;
 use local_ai_course_assistant\email_optout;
 
 $token = optional_param('token', '', PARAM_RAW_TRIMMED);
+// RFC 8058 one-click POST. Read through optional_param rather than the raw
+// request superglobal so the value goes through clean_param like every other
+// input; PARAM_ALPHAEXT covers the literal we compare to.
 $isoneclick = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
-    && (string) ($_POST['List-Unsubscribe'] ?? '') === 'One-Click';
+    && optional_param('List-Unsubscribe', '', PARAM_ALPHAEXT) === 'One-Click';
 
 if ($token === '') {
     if ($isoneclick) {
@@ -87,8 +90,11 @@ $PAGE->set_pagelayout('login');
 
 echo $OUTPUT->header();
 echo $OUTPUT->box(
-    branding::apply(get_string('email_unsubscribe:done_body', 'local_ai_course_assistant',
-        (object)['product' => branding::short_name(), 'email' => s($verified['email'])])),
+    branding::apply(get_string(
+        'email_unsubscribe:done_body',
+        'local_ai_course_assistant',
+        (object)['product' => branding::short_name(), 'email' => s($verified['email'])]
+    )),
     'generalbox'
 );
 echo $OUTPUT->footer();

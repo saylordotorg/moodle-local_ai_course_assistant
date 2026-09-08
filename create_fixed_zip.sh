@@ -8,12 +8,17 @@ cd "$SCRIPT_DIR"
 rm -f ai_course_assistant.zip
 zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*.git*" \
+  -x "*/.claude/*" \
+  -x "*/CLAUDE.md" \
+  -x "*/deploy_dev.py" \
   -x "*/.DS_Store" \
   -x "*/Thumbs.db" \
   -x "*/._*" \
   -x "*/__MACOSX/*" \
   -x "__MACOSX/*" \
   -x "*/create_fixed_zip.sh" \
+  -x "*/*.zip" \
+  -x "*.zip" \
   -x "*/TROUBLESHOOTING.md" \
   -x "*/ENHANCEMENT_ESTIMATE.md" \
   -x "*/SAYLOR_ACADEMY_PROPOSAL.md" \
@@ -29,8 +34,12 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/cdn/test/*" \
   -x "*/services/*" \
   -x "*/tests/a11y/node_modules/*" \
+  -x "*/tests/golden/*" \
   -x "*/.wiki/*" \
-  -x "*/.drafts/*"
+  -x "*/.drafts/*" \
+  -x "*/__pycache__/*" \
+  -x "*.pyc" \
+  -x "*/scripts/*"
 
 echo "✅ Created: ${SCRIPT_DIR}/ai_course_assistant.zip"
 echo ""

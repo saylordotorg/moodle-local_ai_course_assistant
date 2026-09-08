@@ -31,7 +31,6 @@ use local_ai_course_assistant\soapbox_storage;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_cleanup extends \core\task\scheduled_task {
-
     /**
      * @return string
      */
@@ -55,20 +54,39 @@ class soapbox_cleanup extends \core\task\scheduled_task {
         $expired = $DB->get_records_select(
             'local_ai_course_assistant_sbx_rec',
             'status <> :deleted AND expires_at > 0 AND expires_at <= :now',
-            ['deleted' => 'deleted', 'now' => $now]);
+            ['deleted' => 'deleted', 'now' => $now]
+        );
         foreach ($expired as $rec) {
             $this->drop_object($storage, $rec);
         }
 
         // 2. Stored-attempts pruning: keep newest N per (assignid, userid).
+        // get_records_sql keys the result by the FIRST column. Two learners on
+        // the same assignment share assignid, so later rows silently overwrote
+        // earlier ones and pruning ran for exactly one learner per assignment --
+        // everyone else's over-quota recordings (and their storage objects)
+        // survived until retention expiry. A synthetic unique key fixes the
+        // collapse; sql_concat handles the int casts across DB drivers, which
+        // matters because the local suite is MySQL-only.
         $pairs = $DB->get_records_sql(
-            "SELECT DISTINCT assignid, userid
+            "SELECT " . $DB->sql_concat('assignid', "'-'", 'userid') . " AS pairkey,
+                    assignid, userid
                FROM {local_ai_course_assistant_sbx_rec}
-              WHERE status <> :deleted",
-            ['deleted' => 'deleted']);
+              WHERE status <> :deleted
+           GROUP BY assignid, userid",
+            ['deleted' => 'deleted']
+        );
+        // Known per-pair read on this nightly cleanup: one assignment row and
+        // one attempt list per (assignment, learner) pair with stored
+        // recordings. Batching the assignment lookup is straightforward, but is
+        // left alone until there is seeded Soapbox recording data to prove the
+        // rewrite prunes exactly the same rows.
         foreach ($pairs as $p) {
-            $assign = $DB->get_record('local_ai_course_assistant_sbx_assign',
-                ['id' => $p->assignid], 'id, stored_attempts');
+            $assign = $DB->get_record(
+                'local_ai_course_assistant_sbx_assign',
+                ['id' => $p->assignid],
+                'id, stored_attempts'
+            );
             if (!$assign) {
                 continue;
             }
@@ -77,7 +95,8 @@ class soapbox_cleanup extends \core\task\scheduled_task {
                 'local_ai_course_assistant_sbx_rec',
                 'assignid = :a AND userid = :u AND status <> :deleted',
                 ['a' => $p->assignid, 'u' => $p->userid, 'deleted' => 'deleted'],
-                'timecreated DESC');
+                'timecreated DESC'
+            );
             $extra = array_slice(array_values($recs), $keep);
             foreach ($extra as $rec) {
                 $this->drop_object($storage, $rec);

@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface provider_interface {
-
     /**
      * Provider key as stored in plugin config.
      *
@@ -52,16 +51,16 @@ interface provider_interface {
      * Open a real-time avatar session for the given user/course context.
      *
      * @param array $context {
-     *     @type int    courseid Optional Moodle course id.
-     *     @type int    userid   Moodle user id (always set by the endpoint).
-     *     @type string lang     Two-letter ISO 639-1 language code.
-     *     @type string greeting Optional initial line for the avatar to speak.
+     * @type int    courseid Optional Moodle course id.
+     * @type int    userid   Moodle user id (always set by the endpoint).
+     * @type string lang     Two-letter ISO 639-1 language code.
+     * @type string greeting Optional initial line for the avatar to speak.
      * }
      * @return array {
-     *     @type string embed_url     URL the widget loads inside an iframe.
-     *     @type string session_token Short-lived token if the URL needs one.
-     *     @type string provider      Provider key (echoed for the frontend).
-     *     @type int    expires_in    Lifetime hint in seconds (0 if unknown).
+     * @type string embed_url     URL the widget loads inside an iframe.
+     * @type string session_token Short-lived token if the URL needs one.
+     * @type string provider      Provider key (echoed for the frontend).
+     * @type int    expires_in    Lifetime hint in seconds (0 if unknown).
      * }
      * @throws \moodle_exception When the upstream API rejects the request,
      *                           returns an unsafe URL, or the driver is not

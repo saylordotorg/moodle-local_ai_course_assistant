@@ -43,7 +43,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class premium_router {
-
     /**
      * Default trigger regex set (one per line). Curated from the A.10
      * bake-off's hard_math / hard_cs / hard_science categories.

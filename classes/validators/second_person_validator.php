@@ -34,7 +34,6 @@ namespace local_ai_course_assistant\validators;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class second_person_validator implements validator_interface {
-
     /**
      * Phrases that almost always mean "talking about the learner I'm
      * supposed to be addressing directly." Each is matched as a

@@ -30,7 +30,6 @@ use local_ai_course_assistant\rate_card_refresher;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class refresh_rate_card extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return \local_ai_course_assistant\branding::apply(get_string('task:refresh_rate_card', 'local_ai_course_assistant'));
     }

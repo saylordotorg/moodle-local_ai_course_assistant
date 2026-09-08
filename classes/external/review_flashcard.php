@@ -32,7 +32,6 @@ use local_ai_course_assistant\flashcard_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class review_flashcard extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'cardid'   => new external_value(PARAM_INT, 'Flashcard ID'),
@@ -42,11 +41,17 @@ class review_flashcard extends external_api {
 
     public static function execute(int $cardid, int $quality): array {
         global $USER, $DB;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['cardid' => $cardid, 'quality' => $quality]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['cardid' => $cardid, 'quality' => $quality]
+        );
         // Look up the card to validate context.
-        $card = $DB->get_record('local_ai_course_assistant_flashcards',
-            ['id' => $params['cardid'], 'userid' => $USER->id], '*', IGNORE_MISSING);
+        $card = $DB->get_record(
+            'local_ai_course_assistant_flashcards',
+            ['id' => $params['cardid'], 'userid' => $USER->id],
+            '*',
+            IGNORE_MISSING
+        );
         if (!$card) {
             return ['success' => false];
         }
@@ -55,8 +60,10 @@ class review_flashcard extends external_api {
         require_capability('local/ai_course_assistant:use', $context);
 
         $q = (int) $params['quality'];
-        if (!in_array($q, [flashcard_manager::QUALITY_AGAIN, flashcard_manager::QUALITY_HARD,
-                flashcard_manager::QUALITY_EASY], true)) {
+        if (
+            !in_array($q, [flashcard_manager::QUALITY_AGAIN, flashcard_manager::QUALITY_HARD,
+                flashcard_manager::QUALITY_EASY], true)
+        ) {
             return ['success' => false];
         }
         $ok = flashcard_manager::review((int) $params['cardid'], (int) $USER->id, $q);

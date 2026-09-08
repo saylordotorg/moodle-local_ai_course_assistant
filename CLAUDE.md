@@ -12,8 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026061801`, release `6.8.5`
-- **Source folder (canonical):** the git repo at `~/Library/CloudStorage/Dropbox/!Saylor/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
+- **Current version:** `2026080500`, release `6.9.5`
+- **Source folder (canonical):** the git repo at `~/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
 - **Saylor production:** **v6.8.2 on Learn + Degrees as of 2026-06-24** (the Catalyst upgrade from v5.4.5 landed; the v5.4.5 → v6.8.2 jump is complete). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Upgrade runbook (now historical): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.8.2.md`; Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`. NOTE: the Moodle plugin **directory** track is a separate version (v6.8.3, the CONTRIB-10574 29/29 resubmission); the directory listing and the prod pin need not match. Resubmission email: `.drafts/moodle-directory-resubmission-email-v6.8.3.md`.
@@ -43,7 +43,7 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 - Security/privacy (v5.10.1): `email_optout` covered by the privacy provider erasure path, avatar-viewer session-ownership check, Zendesk escalation gated on disclosed first-run consent (`zendesk_require_consent`), de-anonymized Redash export audit-logged
 - First-run consent scroll-gate (v5.10.1, fixed v5.10.2): Accept button disabled until the learner scrolls the notice to the bottom; inline JS in `templates/chat_widget.mustache`, regression harness `tests/a11y/consent-gate-check.js` (Puppeteer)
 - Vendor-rec optimizations (v5.11.0): mastery classifier routed off chat tier via `mastery_classifier_provider` (default `openai`/`gpt-4o-mini`, saves ~$220/mo at 100k MAU); Voyage AI embeddings (voyage-3.5, asymmetric query/document `input_type`, MRL `output_dimension`); opt-in Voyage rerank-2.5 two-stage RAG (`rerank_enabled` checkbox, default off); OpenAI `prompt_tokens_details.cached_tokens` captured for auto-prefix cache-hit visibility; Claude Opus 4.7+ temperature deny-list (Anthropic deprecated `temperature` on reasoning-class Opus models, was bubbling up as the generic error string)
-- Premium escalation tier (v5.12.0): per-turn `premium_router` evaluates each chat call against admin-configured regex triggers (default ships with multi-step STEM markers from the A.10 bake-off: derive, prove that, step by step, LaTeX math, fenced code blocks, big-O, integrals, optimization, thermodynamics) plus an optional course-shortname/idnumber allowlist; matching turns route to Claude Opus 4.8 instead of the workhorse chat tier. Off by default; expected ~$700/mo at 100k MAU at 5% escalation rate.
+- Premium escalation tier (v5.12.0): per-turn `premium_router` evaluates each chat call against admin-configured regex triggers (default ships with multi-step STEM markers from the A.10 bake-off: derive, prove that, step by step, LaTeX math, fenced code blocks, big-O, integrals, optimization, thermodynamics) plus an optional course-shortname/idnumber allowlist; matching turns route to Claude Sonnet 5 instead of the workhorse chat tier. Off by default. **Target changed from Opus 4.8 to Sonnet 5 on 2026-08-23**: on the 50-prompt golden tutor set (2026-08-22) sonnet-5 scored 14.56/15 vs opus-5's 14.22 at 0.352 cents/call vs 2.224 — better answers for about a sixth of the cost and a third of the TTFT. The old ~$700/mo estimate at 100k MAU / 5% escalation was an Opus figure; per-call cost is now ~6x lower, though the monthly total depends on production output length so treat the old number as an upper bound rather than scaling it precisely.
 - Defensive defaults (v5.13.0): `spend_cap_per_course_default` fallback (every course without an explicit per-course override gets this cap; existing 80/95/100% notification email pipeline carries through). Fix: `emergency_control --chat` was a silent no-op v5.4.5 → v5.12.x; v5.13 adds a dedicated `emergency_chat_disabled` flag that spend_guard::check() consults first.
 - Operational maturity (v6.0.0): daily `cost_anomaly_check` scheduled task compares today's site-wide SOLA spend vs rolling 7-day median, emails `spend_notify_emails` recipients when today > multiplier × median (default 2.0). Catches runaway courses + accidental premium-tier enable + provider misroute that the cap thresholds miss. Off by default. Companion `admin/cli/send_spend_alert_test_email.php` lets admins verify alert delivery BEFORE relying on it.
 - Security + hardening hotfix (v6.0.1): conversation history filtered to user/assistant roles so internal telemetry rows ([PremiumRouter]/[Rerank]/[Embedding]) never reach learners or the LLM; email opt-out honored by the spend-alert self-test; `role_timecreated` index on msgs.
@@ -63,10 +63,10 @@ SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides a
 
 ## AI vendor stack (text-only baseline)
 
-- **Chat tutor:** Gemini 2.5 Flash on Vertex AI (primary), gpt-4o-mini failover.
+- **Chat tutor:** Gemini 2.5 Flash on Vertex AI (primary), gpt-4o-mini failover. **Reconfirmed 2026-07-24** by a thorough bake-off vs the newer Gemini Flash models: 2.5-flash is the most compliant Gemini (86% jailbreak, 3-run mean, vs 79% for 3.5-flash-lite and 62% for 3.6-flash) and the cheapest (0.056¢/call vs 0.117 for lite; 3.6-flash ~10x list price), with tutor-quality effectively tied across the three; gpt-4o-mini is the most compliant overall (98%) but the quality laggard, so it stays failover only. Newer Flash models rejected on safety + cost. Now live on the whole dev fleet. Report: `.drafts/sola-chat-model-benchmark-2026-07-24.md`.
 - **Quiz coach / mastery classifier / analytics / digests:** gpt-4o-mini.
 - **Anti-cheat reference (~5% of turns when integrity routing ships):** Claude Haiku 4.5.
-- **Premium escalation tier (v5.12 router):** Claude Opus 4.8 on ~5% of turns matching STEM markers + course allowlist. Off by default.
+- **Premium escalation tier (v5.12 router):** Claude Sonnet 5 on ~5% of turns matching STEM markers + course allowlist. Off by default. (Was Opus 4.8 until 2026-08-23; Sonnet 5 outscored Opus 5 on the golden tutor set at a sixth of the per-call cost.)
 - **Embeddings:** OpenAI `text-embedding-3-small` currently; recommended migration to Voyage-3.5 at 50K+ MAU.
 - **Re-ranker (opt-in):** Voyage rerank-2.5.
 - **Judge harness:** Claude Sonnet 4.6 (out of contestant pool).
@@ -105,7 +105,7 @@ See `.drafts/sola-vendor-recommendations-2026-06-09.md` (concise canonical) and 
 | `classes/emergency_control.php` | Site-wide kill switch. `--chat` sets `emergency_chat_disabled` (v5.13 fix; was silent no-op pre-v5.13); other flags toggle `enabled` / `voice_active_realtime` / `rag_enabled` / `outreach_master_enabled`. Admin UI at `emergency_control.php`; CLI at `admin/cli/emergency_disable.php` |
 | `classes/cost_anomaly_detector.php` | v6.0.0 daily cost-anomaly detector (today vs rolling 7-day median × multiplier); `classes/task/cost_anomaly_check.php` is the scheduled task wrapper; `admin/cli/send_spend_alert_test_email.php` is the alert-delivery self-test |
 | `classes/policy_bundle.php` | v6.4.0 signed policy bundle: Ed25519 verify + ALLOWED_KEYS allowlist + monotonic version + audit; `classes/task/policy_bundle_sync.php` daily task; `admin/cli/policy_bundle_tool.php` authoring CLI |
-| `classes/premium_router.php` | v5.12.0 per-turn router for premium escalation tier (regex triggers + course allowlist → Opus 4.8) |
+| `classes/premium_router.php` | v5.12.0 per-turn router for premium escalation tier (regex triggers + course allowlist → Sonnet 5 since 2026-08-23; was Opus 4.8) |
 | `classes/embedding_provider/voyage_embedding_provider.php` | v5.11.0 Voyage-3.5 embedding client (asymmetric query/document, MRL dims) |
 | `classes/embedding_provider/voyage_reranker.php` | v5.11.0 Voyage rerank-2.5 cross-encoder for two-stage RAG |
 | `classes/conversation_classifier.php` | v5.11.0 reads `mastery_classifier_provider` + `mastery_classifier_model`; routes per-turn classification through gpt-4o-mini by default |
@@ -161,9 +161,11 @@ Tabs: Chat, Voice (`{{#voicetabenabled}}`), History, Progress. **Re-clicking the
 **CRITICAL: Always rebuild AMD build files after any JS change.**
 Moodle serves `amd/build/*.min.js`, NOT the source files in `amd/src/`. Changes to source files have no effect until rebuilt.
 
+The paths below point at the canonical `ai-projects/` repo. Until 6.9.5 they pointed at the stale `aicoursetutor/` tree that the Project Overview above tells you never to deploy from, which is the most plausible reason `amd/build/sse_client.min.js` sat two months behind its source and shipped without the v5.5.4 SSE hardening: following this block rebuilt an abandoned copy, so the canonical bundle never changed. Verify a rebuild by grepping the built file for a distinctive string from your change, and compare src/build staleness with `git log -1 --format=%ct --` on each file rather than with mtimes, which are meaningless in a fresh checkout.
+
 ### Rebuild JS (terser required):
 ```bash
-BASE="/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor/ai_course_assistant"
+BASE="$HOME/ai-projects/ai_course_assistant"
 for f in chat ui quiz speech repository sse_client markdown audio_player realtime; do
   terser "$BASE/amd/src/${f}.js" --compress --mangle \
     --source-map "url=${f}.min.js.map" \
@@ -174,7 +176,7 @@ Only rebuild the files you actually changed to save time.
 
 ### Build zip (must use Python subprocess — `!` in path causes zsh history expansion):
 ```python
-python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/create_fixed_zip.sh'], cwd=os.path.expanduser('~/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor'), capture_output=True)"
+python3 -c "import subprocess,os; subprocess.run(['bash', 'ai_course_assistant/create_fixed_zip.sh'], cwd=os.path.expanduser('~/ai-projects'), capture_output=True)"
 ```
 
 ---
@@ -194,7 +196,7 @@ Then carry forward Part 2 (Key Features) and Part 3 (Admin Walkthrough) from the
 1. `python3 scripts/new_release_notes.py --version <N>` and fill the TODOs.
 2. Bump `version.php` (`$plugin->version` and `$plugin->release`).
 3. Update `.wiki/Changelog.md`.
-4. Run i18n sync, PHP lint, jailbreak test (32/32), validator suite: `php admin/cli/run_validators.php` (must be 0 failures).
+4. Run i18n sync, PHP lint, the jailbreak suite (gate on **0 FAIL and 0 ERROR**, not on a pass-rate: 32/32 is reproducible on `openai`/`gpt-4o-mini` but the production `gemini-2.5-flash` scores in the 24-27 PASS range with the remainder as REVIEW, which only means no pass-indicator regex matched), validator suite: `php admin/cli/run_validators.php` (must be 0 failures).
 5. Run the manual smoke checklist (`.wiki/Release-Checklist.md`) on local Moodle. Critical path takes ~5 minutes and catches the runtime UI bugs static checks can't.
 6. Commit plugin + wiki, tag `v<N>`, push, `gh release create` using the `.drafts/` file as the body source.
 7. `python3 deploy_dev.py --target all` and verify BUS101 smoke on all 5 dev sites.
@@ -206,7 +208,14 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
 ## CI and GitHub automation
 
 - **Claude code review triggers on pull requests, not releases.** `.github/workflows/claude-code-review.yml` runs `/code-review` automatically on every PR (opened / synchronize / reopened / ready_for_review); `.github/workflows/claude.yml` runs Claude whenever a comment or issue body contains `@claude`. No tag or release is involved — to get a review, open a PR (or comment `@claude`).
-- **Both workflows need write scope to post their output.** They originally shipped with a read-only `GITHUB_TOKEN` (`pull-requests: read`), so the review job ran and reported success but posted nothing — the job log showed `permission_denials_count` and `No buffered inline comments`. Fixed in **PR #108 (2026-07-03)** by granting `pull-requests: write` + `issues: write` in both files; verified by PR #109. If Claude reviews or `@claude` replies ever stop appearing, check these workflow permissions first.
+- **A review that posts nothing still reports `success`.** There are now three distinct causes for that one symptom, so check them in this order rather than assuming the first. All three log `No buffered inline comments`, and the job goes green in every case.
+  1. **The workflow file differs from the copy on `main`.** The action hard-refuses with *"Workflow validation failed. The workflow file must exist and have identical content to the version on the repository's default branch"* and skips without reviewing. This means **a PR that edits `claude-code-review.yml` can never test its own change** — the fix only takes effect on the next PR after it merges. Seen on PR #192.
+  2. **Missing tool permissions.** `permission_denials_count` is non-zero in the result JSON. `/code-review` fans the work out across Haiku/Sonnet/Opus subagents, so it needs `Task` plus `Read`/`Grep`/`Glob` for those subagents — none of which its own frontmatter declares, and the action grants nothing by default. Fixed in **PR #192** via `claude_args: --allowedTools`. Before that fix the v7.0.1 review billed $3.42 across nine turns, hit 21 denials and posted nothing.
+  3. **Read-only `GITHUB_TOKEN`** (`pull-requests: read`) — the original bug, fixed in **PR #108 (2026-07-03)** by granting `pull-requests: write` + `issues: write` in both files; verified by PR #109.
+
+  To tell 2 from 3: the job log prints a `GITHUB_TOKEN Permissions` block under *Set up job*. If it shows `PullRequests: write` and `Issues: write`, posting was possible and the problem is tool permissions, not API scope.
+
+  When granting tools, keep `Bash` scoped per `gh` subcommand and never grant `Edit`/`Write`. `pull_request` runs check out an untrusted head, so a blanket `Bash` grant would let a contributor's branch run arbitrary commands holding a `pull-requests: write` token.
 
 ---
 
@@ -224,7 +233,7 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
 ### Deploy to local Moodle:
 ```bash
 rsync -a --exclude=.git \
-  "/Users/tom.caswell/Library/CloudStorage/Dropbox/!Saylor/aicoursetutor/ai_course_assistant/" \
+  "$HOME/ai-projects/ai_course_assistant/" \
   ~/Sites/moodle/local/ai_course_assistant/
 ```
 

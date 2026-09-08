@@ -42,6 +42,13 @@ use local_ai_course_assistant\external\get_realtime_token;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class realtime_token_test extends \advanced_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+        // v7.0.5: get_realtime_token now enforces the site voice switch itself,
+        // so every case here needs it on unless it is specifically testing the
+        // switch. realtime_token_gating_test covers the off path.
+        set_config('realtime_enabled', 1, 'local_ai_course_assistant');
+    }
 
     /**
      * Wire up an xAI voice provider as the active realtime provider, with
@@ -49,18 +56,29 @@ final class realtime_token_test extends \advanced_testcase {
      */
     private function configure_xai_voice(): void {
         // Format: provider|apikey|label|realtime_voice|tts_voice
-        set_config('voice_providers',
+        set_config(
+            'voice_providers',
             "xai|sk-xai-test|MyXai|alloy|alloy",
-            'local_ai_course_assistant');
+            'local_ai_course_assistant'
+        );
         set_config('voice_active_realtime', 'MyXai', 'local_ai_course_assistant');
-        set_config('xai_proxy_url', 'wss://proxy.example.com/realtime',
-            'local_ai_course_assistant');
-        set_config('xai_proxy_jwt_secret', str_repeat('a', 64),
-            'local_ai_course_assistant');
+        set_config(
+            'xai_proxy_url',
+            'wss://proxy.example.com/realtime',
+            'local_ai_course_assistant'
+        );
+        set_config(
+            'xai_proxy_jwt_secret',
+            str_repeat('a', 64),
+            'local_ai_course_assistant'
+        );
         // Allow proxy.example.com via the admin-managed SSRF trusted-endpoints
         // allowlist — the host wouldn't resolve via DNS in CI.
-        set_config('ssrf_trusted_endpoints', 'https://proxy.example.com',
-            'local_ai_course_assistant');
+        set_config(
+            'ssrf_trusted_endpoints',
+            'https://proxy.example.com',
+            'local_ai_course_assistant'
+        );
     }
 
     /**
@@ -111,13 +129,21 @@ final class realtime_token_test extends \advanced_testcase {
 
         $this->assertEquals('xai', $result['provider']);
         $this->assertEquals('alloy', $result['voice']);
-        $this->assertEquals('', $result['token'],
-            'xAI path returns empty token; auth lives in the URL JWT.');
+        $this->assertEquals(
+            '',
+            $result['token'],
+            'xAI path returns empty token; auth lives in the URL JWT.'
+        );
         $this->assertStringContainsString('proxy.example.com', $result['endpoint']);
-        $this->assertStringContainsString('token=', $result['endpoint'],
-            'xAI endpoint must carry the minted JWT in a `token` query param.');
-        $this->assertNotEmpty($result['instructions'],
-            'instructions must include the system prompt + voice tail.');
+        $this->assertStringContainsString(
+            'token=',
+            $result['endpoint'],
+            'xAI endpoint must carry the minted JWT in a `token` query param.'
+        );
+        $this->assertNotEmpty(
+            $result['instructions'],
+            'instructions must include the system prompt + voice tail.'
+        );
     }
 
     public function test_xai_jwt_carries_user_and_course_claims(): void {
@@ -147,13 +173,18 @@ final class realtime_token_test extends \advanced_testcase {
     public function test_xai_missing_proxy_url_throws(): void {
         $this->resetAfterTest();
         // Configure xAI as active provider but omit the proxy URL.
-        set_config('voice_providers',
+        set_config(
+            'voice_providers',
             "xai|sk-xai-test|MyXai|alloy|alloy",
-            'local_ai_course_assistant');
+            'local_ai_course_assistant'
+        );
         set_config('voice_active_realtime', 'MyXai', 'local_ai_course_assistant');
         unset_config('xai_proxy_url', 'local_ai_course_assistant');
-        set_config('xai_proxy_jwt_secret', str_repeat('a', 64),
-            'local_ai_course_assistant');
+        set_config(
+            'xai_proxy_jwt_secret',
+            str_repeat('a', 64),
+            'local_ai_course_assistant'
+        );
         [$course, $user] = $this->enrolled_student();
 
         $this->expectException(\moodle_exception::class);
@@ -163,12 +194,17 @@ final class realtime_token_test extends \advanced_testcase {
 
     public function test_xai_missing_jwt_secret_throws(): void {
         $this->resetAfterTest();
-        set_config('voice_providers',
+        set_config(
+            'voice_providers',
             "xai|sk-xai-test|MyXai|alloy|alloy",
-            'local_ai_course_assistant');
+            'local_ai_course_assistant'
+        );
         set_config('voice_active_realtime', 'MyXai', 'local_ai_course_assistant');
-        set_config('xai_proxy_url', 'wss://proxy.example.com/realtime',
-            'local_ai_course_assistant');
+        set_config(
+            'xai_proxy_url',
+            'wss://proxy.example.com/realtime',
+            'local_ai_course_assistant'
+        );
         unset_config('xai_proxy_jwt_secret', 'local_ai_course_assistant');
         [$course, $user] = $this->enrolled_student();
 
@@ -180,8 +216,11 @@ final class realtime_token_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->configure_xai_voice();
         // Override proxy URL to a localhost target the SSRF allowlist rejects.
-        set_config('xai_proxy_url', 'wss://localhost:9999/realtime',
-            'local_ai_course_assistant');
+        set_config(
+            'xai_proxy_url',
+            'wss://localhost:9999/realtime',
+            'local_ai_course_assistant'
+        );
         [$course, $user] = $this->enrolled_student();
 
         $this->expectException(\moodle_exception::class);
@@ -196,10 +235,15 @@ final class realtime_token_test extends \advanced_testcase {
 
         $result = get_realtime_token::execute((int)$course->id);
         $clean = \core_external\external_api::clean_returnvalue(
-            get_realtime_token::execute_returns(), $result);
-        $this->assertEquals($result, $clean,
+            get_realtime_token::execute_returns(),
+            $result
+        );
+        $this->assertEquals(
+            $result,
+            $clean,
             'Return shape must round-trip through external_api validation '
-            . '(was a real bug in v5.1.3 — PARAM_URL rejected wss:// endpoints).');
+            . '(was a real bug in v5.1.3 — PARAM_URL rejected wss:// endpoints).'
+        );
     }
 
     public function test_pageid_and_pagetitle_passed_to_instructions(): void {
@@ -207,13 +251,20 @@ final class realtime_token_test extends \advanced_testcase {
         $this->configure_xai_voice();
         [$course, $user] = $this->enrolled_student();
 
-        // Pass a fake pageid + pagetitle. Even though the cmid won't resolve
-        // to a real module (context_builder swallows that), the pagetitle
-        // must propagate into the voice tail.
-        $result = get_realtime_token::execute((int)$course->id, 0, 'Photosynthesis Basics', 'en');
+        // A non-zero pageid, because that is what actually drives the tail: the
+        // endpoint only appends the "currently on the page titled ..." line when
+        // pageid > 0 AND pagetitle is non-empty. With pageid 0 this used to pass
+        // only because the title arrived via the system prompt, which v7.0.5 no
+        // longer returns to the client — the grounded prompt now goes to the
+        // provider server-side. The page title itself is not sensitive (the
+        // learner is looking at that page), so it stays in the client tail.
+        $result = get_realtime_token::execute((int)$course->id, 424242, 'Photosynthesis Basics', 'en');
 
-        $this->assertStringContainsString('Photosynthesis Basics', $result['instructions'],
-            'pagetitle must surface in the voice-mode instructions tail.');
+        $this->assertStringContainsString(
+            'Photosynthesis Basics',
+            $result['instructions'],
+            'pagetitle must surface in the voice-mode instructions tail.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────
@@ -227,9 +278,11 @@ final class realtime_token_test extends \advanced_testcase {
      */
     private function configure_openai_voice(): void {
         // Format: provider|apikey|label|realtime_voice|tts_voice
-        set_config('voice_providers',
+        set_config(
+            'voice_providers',
             "openai|sk-openai-test|MyOpenAI|alloy|alloy",
-            'local_ai_course_assistant');
+            'local_ai_course_assistant'
+        );
         set_config('voice_active_realtime', 'MyOpenAI', 'local_ai_course_assistant');
     }
 
@@ -257,10 +310,15 @@ final class realtime_token_test extends \advanced_testcase {
 
         $this->assertEquals('openai', $result['provider']);
         $this->assertEquals('alloy', $result['voice']);
-        $this->assertEquals('eph_sk_test_abcdef123456', $result['token'],
-            'The minted ephemeral secret must be returned verbatim to the client.');
-        $this->assertNotEmpty($result['endpoint'],
-            'The OpenAI Realtime endpoint URL is sourced from voice_registry config.');
+        $this->assertEquals(
+            'eph_sk_test_abcdef123456',
+            $result['token'],
+            'The minted ephemeral secret must be returned verbatim to the client.'
+        );
+        $this->assertNotEmpty(
+            $result['endpoint'],
+            'The OpenAI Realtime endpoint URL is sourced from voice_registry config.'
+        );
     }
 
     public function test_openai_falls_back_to_top_level_value_field(): void {
@@ -338,7 +396,9 @@ final class realtime_token_test extends \advanced_testcase {
 
         $result = get_realtime_token::execute((int)$course->id);
         $clean = \core_external\external_api::clean_returnvalue(
-            get_realtime_token::execute_returns(), $result);
+            get_realtime_token::execute_returns(),
+            $result
+        );
         $this->assertEquals($result, $clean);
     }
 }

@@ -35,7 +35,6 @@ namespace local_ai_course_assistant\embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class voyage_reranker {
-
     /** @var string */
     private string $apikey;
 
@@ -189,8 +188,13 @@ class voyage_reranker {
     private function http_post(string $url, array $headers, string $body): string {
         global $CFG;
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
-            throw new \moodle_exception('chat:error_generic', 'local_ai_course_assistant',
-                '', null, "rerank endpoint failed SSRF validation: {$url}");
+            throw new \moodle_exception(
+                'chat:error_generic',
+                'local_ai_course_assistant',
+                '',
+                null,
+                "rerank endpoint failed SSRF validation: {$url}"
+            );
         }
         require_once($CFG->libdir . '/filelib.php');
         $curl = new \curl();
@@ -201,8 +205,11 @@ class voyage_reranker {
         ]);
 
         // Pin to the validated IP, closing the DNS-rebinding window.
-        $response = $curl->post($url, $body,
-            \local_ai_course_assistant\security::resolve_pin_options($url));
+        $response = $curl->post(
+            $url,
+            $body,
+            \local_ai_course_assistant\security::resolve_pin_options($url)
+        );
         $httpcode = $curl->get_info()['http_code'] ?? 0;
 
         if ($httpcode < 200 || $httpcode >= 300) {

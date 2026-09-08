@@ -2,6 +2,8 @@ name: Moodle Plugin CI
 
 on:
   push:
+    branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -44,6 +46,19 @@ jobs:
         php: ['8.1', '8.2', '8.3']
         moodle-branch: ['MOODLE_405_STABLE']
         database: [pgsql, mariadb]
+        include:
+          # Moodle 5.x legs: catch core-API drift on the branches version.php
+          # claims to support. 5.x moved the webroot to public/ and requires
+          # PHP 8.2+, so these pin the newest PHP we test.
+          - php: '8.3'
+            moodle-branch: 'MOODLE_500_STABLE'
+            database: 'pgsql'
+          - php: '8.3'
+            moodle-branch: 'MOODLE_501_STABLE'
+            database: 'pgsql'
+          - php: '8.3'
+            moodle-branch: 'MOODLE_501_STABLE'
+            database: 'mariadb'
 
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -110,6 +125,21 @@ jobs:
         continue-on-error: true
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
+
+      - name: SOLA validator suite (static, corpus-driven)
+        if: ${{ !cancelled() }}
+        # Located by search rather than a fixed path: moodle-plugin-ci installs
+        # under ./moodle on 4.x but ./moodle/public on 5.x, and a wrong path
+        # would make this step silently vacuous rather than loudly missing.
+        run: |
+          set -euo pipefail
+          script=$(find . -maxdepth 7 -path '*/local/ai_course_assistant/admin/cli/run_validators.php' -print -quit)
+          if [ -z "$script" ]; then
+            echo "::error::run_validators.php not found - the validator gate did not run"
+            exit 1
+          fi
+          echo "Running $script"
+          php "$script"
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}

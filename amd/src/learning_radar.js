@@ -26,10 +26,21 @@
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
+define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, Str) {
 
     var root, cfg;
     var providers = [];
+    // Alert texts, prefetched in init(). English fallbacks cover the window
+    // before core/str resolves. Moodle's JS string cache returns raw {$a},
+    // so substitution is always a manual .replace().
+    var strs = {
+        redashPushFailed: 'Redash push failed: {$a}',
+        redashSetupFailed: 'Could not load Redash setup: {$a}',
+        sendFailed: 'Send failed: {$a}',
+        scheduleLoadFailed: 'Could not load schedule: {$a}',
+        saveFailed: 'Save failed: {$a}',
+        runFirst: 'Run a query first.'
+    };
     var chatHistory = [];
     var lastQuery = '';
     var lastResponse = '';
@@ -56,6 +67,22 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function init() {
         root = document.getElementById('learning-radar');
         if (!root) { return; }
+        Str.get_strings([
+            {key: 'radar:js_redash_push_failed', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_redash_setup_failed', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_send_failed', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_schedule_load_failed', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_save_failed', component: 'local_ai_course_assistant'},
+            {key: 'radar:js_run_first', component: 'local_ai_course_assistant'}
+        ]).then(function(loaded) {
+            strs.redashPushFailed = loaded[0];
+            strs.redashSetupFailed = loaded[1];
+            strs.sendFailed = loaded[2];
+            strs.scheduleLoadFailed = loaded[3];
+            strs.saveFailed = loaded[4];
+            strs.runFirst = loaded[5];
+            return null;
+        }).catch(function() { /* Keep English fallbacks. */ });
         cfg = {
             sseUrl: root.dataset.sseUrl,
             exportUrl: root.dataset.exportUrl,
@@ -64,6 +91,8 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             hasRedash: root.dataset.hasRedash === '1',
             sesskey: root.dataset.sesskey,
             courseid: parseInt(root.dataset.courseid, 10) || 0,
+            namePrompt: root.dataset.namePrompt || 'Name for the new Redash query:',
+            redashNameTpl: root.dataset.redashNameTpl || 'Learning Radar — {$a}',
             range: parseInt(root.dataset.range, 10) || 30
         };
         try {
@@ -453,11 +482,22 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         });
 
         // Dismiss on outside click.
+        //
+        // The old predicate compared the clicked element's citeId against THIS
+        // handler's id, so clicking a SECOND citation badge hid the popover the
+        // badge's own handler had just opened -- every subsequent citation
+        // needed two clicks. Now: a click on any badge hands off to that
+        // badge's handler (this listener just unbinds); only a genuine outside
+        // click hides. Unbinding on badge clicks also stops stale listeners
+        // stacking up as the user moves between citations.
         setTimeout(function() {
             document.addEventListener('click', function dismiss(ev) {
-                if (!pop.contains(ev.target) && ev.target.dataset.citeId !== id) {
+                if (pop.contains(ev.target)) {
+                    return;
+                }
+                document.removeEventListener('click', dismiss);
+                if (!ev.target.dataset.citeId) {
                     pop.style.display = 'none';
-                    document.removeEventListener('click', dismiss);
                 }
             });
         }, 0);
@@ -495,9 +535,9 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     }
 
     function pushToRedash() {
-        if (!lastResponse) { alert('Run a query first.'); return; }
-        var name = window.prompt('Name for the new Redash query:',
-            'SOLA Learning Radar — ' + new Date().toISOString().substring(0, 16));
+        if (!lastResponse) { alert(strs.runFirst); return; }
+        var name = window.prompt(cfg.namePrompt,
+            cfg.redashNameTpl.replace('{$a}', new Date().toISOString().substring(0, 16)));
         if (!name) { return; }
         var body = new URLSearchParams();
         body.append('sesskey', cfg.sesskey);
@@ -517,7 +557,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
                     window.open(j.url, '_blank');
                 }
             } else {
-                alert('Redash push failed: ' + (j.error || 'unknown error'));
+                alert(strs.redashPushFailed.replace('{$a}', j.error || 'unknown error'));
             }
         }).catch(function(err) {
             alert('Redash push error: ' + err.message);
@@ -528,7 +568,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
         fetch(cfg.exportUrl + '?action=redash_setup&sesskey=' + encodeURIComponent(cfg.sesskey), {
             credentials: 'same-origin'
         }).then(function(r) { return r.json(); }).then(function(j) {
-            if (!j.ok) { alert('Could not load Redash setup: ' + (j.error || '')); return; }
+            if (!j.ok) { alert(strs.redashSetupFailed.replace('{$a}', j.error || '')); return; }
             renderRedashSetupModal(j);
         });
     }
@@ -567,6 +607,13 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             + '<ol class="small mb-2">'
             + '<li>Settings &rarr; Data Sources &rarr; New &rarr; <strong>JSON</strong> (the JSON ds plugin must be enabled in Redash).</li>'
             + '<li>Name it <code>SOLA</code>. Save.</li>'
+            // v7.0.5: the pull URL deliberately carries no credential. Without
+            // this step the data source 401s, and previously the alternative was
+            // storing the bulk-export key in plaintext inside Redash.
+            + '<li><strong>Add an authorization header.</strong> Set '
+            + '<code>Authorization: Bearer &lt;your SOLA redash_api_key&gt;</code> on this data '
+            + 'source. The URL above intentionally does not contain the key, so that it is never '
+            + 'stored in Redash.</li>'
             + '<li>Note the new data source\'s numeric id (visible in the URL after saving). You will need that id below.</li>'
             + '</ol>'
             + '<h6>3. Configure the SOLA push (optional, but recommended)</h6>'
@@ -643,7 +690,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
             if (j.ok) {
                 alert('Sent.');
             } else {
-                alert('Send failed: ' + (j.error || 'unknown error'));
+                alert(strs.sendFailed.replace('{$a}', j.error || 'unknown error'));
             }
         }).catch(function(err) {
             alert('Send error: ' + err.message);
@@ -745,7 +792,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
     function loadAndEditSchedule(id) {
         var url = cfg.scheduleUrl + '?action=get&id=' + id + '&sesskey=' + encodeURIComponent(cfg.sesskey);
         fetch(url, { credentials: 'same-origin' }).then(function(r) { return r.json(); }).then(function(j) {
-            if (!j.ok) { alert('Could not load schedule: ' + (j.error || '')); return; }
+            if (!j.ok) { alert(strs.scheduleLoadFailed.replace('{$a}', j.error || '')); return; }
             openScheduleModal(j.schedule, j.schedule.query);
         });
     }
@@ -847,7 +894,7 @@ define(['core/ajax', 'core/templates'], function(Ajax, Templates) {
                 .then(function(r) { return r.json(); })
                 .then(function(j) {
                     if (j.ok) { window.location.reload(); }
-                    else { alert('Save failed: ' + (j.error || '')); }
+                    else { alert(strs.saveFailed.replace('{$a}', j.error || '')); }
                 });
         });
     }

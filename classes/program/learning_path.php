@@ -41,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learning_path {
-
     /** @var int Default mastery-readiness threshold, percent of tracked objectives mastered. */
     const DEFAULT_MASTERY_THRESHOLD = 80;
 
@@ -182,8 +181,10 @@ class learning_path {
         foreach ($summary['objectives'] as $row) {
             $status = (string) $row['mastery']['status']; // not_started | learning | mastered.
             $mastery = $status === 'learning' ? 'in_progress' : $status;
-            if ($mastery === 'not_started'
-                    && $this->demonstrated_elsewhere($userid, (int) $row['objective']->id)) {
+            if (
+                $mastery === 'not_started'
+                    && $this->demonstrated_elsewhere($userid, (int) $row['objective']->id)
+            ) {
                 $mastery = 'demonstrated_elsewhere';
             }
             $out[] = ['title' => (string) $row['objective']->title, 'mastery' => $mastery];

@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\feature_flags
  */
 final class feature_flags_test extends \advanced_testcase {
-
     public function test_resolve_returns_global_when_no_override(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -54,8 +53,10 @@ final class feature_flags_test extends \advanced_testcase {
         set_config('mastery_enabled', '0', 'local_ai_course_assistant');
         set_config('mastery_enabled_course_' . $course->id, '1', 'local_ai_course_assistant');
 
-        $this->assertTrue(feature_flags::resolve('mastery', (int)$course->id),
-            'Per-course force-on must beat the global default-off.');
+        $this->assertTrue(
+            feature_flags::resolve('mastery', (int)$course->id),
+            'Per-course force-on must beat the global default-off.'
+        );
     }
 
     public function test_resolve_per_course_force_off_overrides_global_on(): void {
@@ -64,8 +65,10 @@ final class feature_flags_test extends \advanced_testcase {
         set_config('mastery_enabled', '1', 'local_ai_course_assistant');
         set_config('mastery_enabled_course_' . $course->id, '0', 'local_ai_course_assistant');
 
-        $this->assertFalse(feature_flags::resolve('mastery', (int)$course->id),
-            'Per-course force-off must beat the global default-on.');
+        $this->assertFalse(
+            feature_flags::resolve('mastery', (int)$course->id),
+            'Per-course force-off must beat the global default-on.'
+        );
     }
 
     public function test_resolve_per_course_unset_inherits_global(): void {

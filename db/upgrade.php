@@ -318,8 +318,12 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             }
             unset($q);
             if ($changed) {
-                $DB->set_field('local_ai_course_assistant_surveys', 'questions',
-                    json_encode($questions), ['id' => $survey->id]);
+                $DB->set_field(
+                    'local_ai_course_assistant_surveys',
+                    'questions',
+                    json_encode($questions),
+                    ['id' => $survey->id]
+                );
             }
         }
         upgrade_plugin_savepoint(true, 2026031202, 'local', 'ai_course_assistant');
@@ -476,7 +480,7 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
                     [$dupe->userid, $dupe->courseid, $dupe->keepid]
                 );
                 if (!empty($dupconvids)) {
-                    list($insql, $inparams) = $DB->get_in_or_equal($dupconvids);
+                    [$insql, $inparams] = $DB->get_in_or_equal($dupconvids);
                     $DB->execute(
                         "UPDATE {local_ai_course_assistant_msgs} SET conversationid = ? WHERE conversationid $insql",
                         array_merge([$dupe->keepid], $inparams)
@@ -634,12 +638,23 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $attstable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $attstable->add_key('userid_fk', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
             $attstable->add_key('courseid_fk', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
-            $attstable->add_key('objectiveid_fk', XMLDB_KEY_FOREIGN, ['objectiveid'],
-                'local_ai_course_assistant_objs', ['id']);
-            $attstable->add_index('userid_objective_time', XMLDB_INDEX_NOTUNIQUE,
-                ['userid', 'objectiveid', 'timecreated']);
-            $attstable->add_index('courseid_time', XMLDB_INDEX_NOTUNIQUE,
-                ['courseid', 'timecreated']);
+            $attstable->add_key(
+                'objectiveid_fk',
+                XMLDB_KEY_FOREIGN,
+                ['objectiveid'],
+                'local_ai_course_assistant_objs',
+                ['id']
+            );
+            $attstable->add_index(
+                'userid_objective_time',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['userid', 'objectiveid', 'timecreated']
+            );
+            $attstable->add_index(
+                'courseid_time',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['courseid', 'timecreated']
+            );
             $dbman->create_table($attstable);
         }
 
@@ -663,8 +678,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-            $table->add_index('user_course_review', XMLDB_INDEX_NOTUNIQUE,
-                ['userid', 'courseid', 'next_review']);
+            $table->add_index(
+                'user_course_review',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['userid', 'courseid', 'next_review']
+            );
             $dbman->create_table($table);
         }
         upgrade_plugin_savepoint(true, 2026042406, 'local', 'ai_course_assistant');
@@ -673,8 +691,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
     // v3.9.24: prereq_ids column on objs table (prerequisite gap detection).
     if ($oldversion < 2026042408) {
         $table = new xmldb_table('local_ai_course_assistant_objs');
-        $field = new xmldb_field('prereq_ids', XMLDB_TYPE_CHAR, '255', null, null, null, null,
-            'external_ref');
+        $field = new xmldb_field(
+            'prereq_ids',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'external_ref'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -688,8 +714,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
     // fall back to vanilla SM-2 — backwards-compatible.
     if ($oldversion < 2026042700) {
         $table = new xmldb_table('local_ai_course_assistant_flashcards');
-        $field = new xmldb_field('objectiveid', XMLDB_TYPE_INTEGER, '10', null, null, null, null,
-            'cmid');
+        $field = new xmldb_field(
+            'objectiveid',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'cmid'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1006,8 +1040,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // in-PHP cosine-similarity loop starts to degrade (~3,000 chunks).
         // Null means RAG didn't run for this turn (off, not used, or pre-v5.4.6 row).
         $table = new xmldb_table('local_ai_course_assistant_msgs');
-        $field = new xmldb_field('rag_latency_ms', XMLDB_TYPE_INTEGER, '10', null,
-            null, null, null, 'cmid');
+        $field = new xmldb_field(
+            'rag_latency_ms',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'cmid'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1027,10 +1069,20 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
             $table->add_field('score', XMLDB_TYPE_NUMBER, '5, 4', null, XMLDB_NOTNULL, null, '1.0000');
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-            $table->add_key('objectiveida_fk', XMLDB_KEY_FOREIGN, ['objectiveida'],
-                'local_ai_course_assistant_objs', ['id']);
-            $table->add_key('objectiveidb_fk', XMLDB_KEY_FOREIGN, ['objectiveidb'],
-                'local_ai_course_assistant_objs', ['id']);
+            $table->add_key(
+                'objectiveida_fk',
+                XMLDB_KEY_FOREIGN,
+                ['objectiveida'],
+                'local_ai_course_assistant_objs',
+                ['id']
+            );
+            $table->add_key(
+                'objectiveidb_fk',
+                XMLDB_KEY_FOREIGN,
+                ['objectiveidb'],
+                'local_ai_course_assistant_objs',
+                ['id']
+            );
             $table->add_key('pair_uniq', XMLDB_KEY_UNIQUE, ['objectiveida', 'objectiveidb']);
             // objectiveidb is already indexed by its foreign key; no extra index.
             $dbman->create_table($table);
@@ -1075,8 +1127,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // them to the DB, so the cache-hit visibility feature was
         // unobservable in token analytics. One nullable int column.
         $table = new xmldb_table('local_ai_course_assistant_msgs');
-        $field = new xmldb_field('cached_tokens', XMLDB_TYPE_INTEGER, '10',
-            null, null, null, null, 'rag_latency_ms');
+        $field = new xmldb_field(
+            'cached_tokens',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'rag_latency_ms'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1091,8 +1151,11 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // courseid index forced a range scan over the whole course's rows for
         // the time filter, which degrades badly at production scale.
         $table = new xmldb_table('local_ai_course_assistant_msgs');
-        $index = new xmldb_index('courseid_role_timecreated', XMLDB_INDEX_NOTUNIQUE,
-            ['courseid', 'role', 'timecreated']);
+        $index = new xmldb_index(
+            'courseid_role_timecreated',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['courseid', 'role', 'timecreated']
+        );
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
@@ -1106,8 +1169,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // (never audio or transcript text) so the speech-history list can label
         // and filter past attempts. Nullable text; pre-existing rows stay NULL.
         $table = new xmldb_table('local_ai_course_assistant_practice_scores');
-        $field = new xmldb_field('session_meta', XMLDB_TYPE_TEXT, null,
-            null, null, null, null, 'session_duration');
+        $field = new xmldb_field(
+            'session_meta',
+            XMLDB_TYPE_TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'session_duration'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1143,8 +1214,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('courseid_fk_sbxa', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
-        $table->add_key('rubricid_fk_sbxa', XMLDB_KEY_FOREIGN, ['rubricid'],
-            'local_ai_course_assistant_rubrics', ['id']);
+        $table->add_key(
+            'rubricid_fk_sbxa',
+            XMLDB_KEY_FOREIGN,
+            ['rubricid'],
+            'local_ai_course_assistant_rubrics',
+            ['id']
+        );
         $table->add_index('course_visible', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'visible']);
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
@@ -1162,8 +1238,13 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('assignid_fk_sbxt', XMLDB_KEY_FOREIGN, ['assignid'],
-            'local_ai_course_assistant_sbx_assign', ['id']);
+        $table->add_key(
+            'assignid_fk_sbxt',
+            XMLDB_KEY_FOREIGN,
+            ['assignid'],
+            'local_ai_course_assistant_sbx_assign',
+            ['id']
+        );
         $table->add_index('assign_sort', XMLDB_INDEX_NOTUNIQUE, ['assignid', 'sortorder']);
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
@@ -1185,11 +1266,21 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         $table->add_field('expires_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('assignid_fk_sbxr', XMLDB_KEY_FOREIGN, ['assignid'],
-            'local_ai_course_assistant_sbx_assign', ['id']);
+        $table->add_key(
+            'assignid_fk_sbxr',
+            XMLDB_KEY_FOREIGN,
+            ['assignid'],
+            'local_ai_course_assistant_sbx_assign',
+            ['id']
+        );
         $table->add_key('userid_fk_sbxr', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-        $table->add_key('scoreid_fk_sbxr', XMLDB_KEY_FOREIGN, ['scoreid'],
-            'local_ai_course_assistant_practice_scores', ['id']);
+        $table->add_key(
+            'scoreid_fk_sbxr',
+            XMLDB_KEY_FOREIGN,
+            ['scoreid'],
+            'local_ai_course_assistant_practice_scores',
+            ['id']
+        );
         $table->add_index('assign_user', XMLDB_INDEX_NOTUNIQUE, ['assignid', 'userid']);
         $table->add_index('status_expires', XMLDB_INDEX_NOTUNIQUE, ['status', 'expires_at']);
         if (!$dbman->table_exists($table)) {
@@ -1203,20 +1294,44 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // v6.8.21 (Soapbox slides, Phase 2): a slides flag on the assignment and
         // the deck key + slide-advance timeline on the recording.
         $table = new xmldb_table('local_ai_course_assistant_sbx_assign');
-        $field = new xmldb_field('slides_enabled', XMLDB_TYPE_INTEGER, '1', null,
-            XMLDB_NOTNULL, null, '0', 'speaking_level');
+        $field = new xmldb_field(
+            'slides_enabled',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'speaking_level'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         $table = new xmldb_table('local_ai_course_assistant_sbx_rec');
-        $field = new xmldb_field('deck_key', XMLDB_TYPE_CHAR, '255', null,
-            null, null, null, 'transcript');
+        $field = new xmldb_field(
+            'deck_key',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'transcript'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        $field = new xmldb_field('slide_timeline', XMLDB_TYPE_TEXT, null, null,
-            null, null, null, 'deck_key');
+        $field = new xmldb_field(
+            'slide_timeline',
+            XMLDB_TYPE_TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'deck_key'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1229,8 +1344,16 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // score column on obj_att; when set (0-1) it contributes fractionally to
         // the mastery estimate instead of the binary iscorrect.
         $table = new xmldb_table('local_ai_course_assistant_obj_att');
-        $field = new xmldb_field('score', XMLDB_TYPE_NUMBER, '4, 3', null,
-            null, null, null, 'confidence');
+        $field = new xmldb_field(
+            'score',
+            XMLDB_TYPE_NUMBER,
+            '4, 3',
+            null,
+            null,
+            null,
+            null,
+            'confidence'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -1244,13 +1367,369 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         // images for visual-design feedback. Off by default; also gated on the
         // site soapbox_slide_vision toggle.
         $table = new xmldb_table('local_ai_course_assistant_sbx_assign');
-        $field = new xmldb_field('slide_vision', XMLDB_TYPE_INTEGER, '1', null,
-            XMLDB_NOTNULL, null, '0', 'slides_enabled');
+        $field = new xmldb_field(
+            'slide_vision',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'slides_enabled'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         upgrade_plugin_savepoint(true, 2026071102, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026080300) {
+        // Packed float32 vectors alongside the JSON `embedding` column.
+        // Measured on dev: decoding 793 chunks took 262 ms from JSON versus
+        // 65 ms from packed binary (4x), and storage fell from 22.3 MB to
+        // 4.6 MB (4.8x). There is no precision cost -- the embeddings are
+        // already float32, so a round trip through pack('g*') reproduces
+        // every element exactly and cosine scores are bit-identical.
+        //
+        // The JSON column is deliberately left in place and still written, so
+        // this release can be rolled back without a reindex. Backfill is a
+        // separate, resumable step (admin/cli/backfill_embedding_bin.php)
+        // rather than an upgrade-time loop, because converting a large
+        // catalog inside the upgrade would block the site.
+        $table = new xmldb_table('local_ai_course_assistant_chunks');
+        $field = new xmldb_field(
+            'embedding_bin',
+            XMLDB_TYPE_BINARY,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'embedding'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026080300, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082000) {
+        // v7.0.0: drop three settings that were registered but never read.
+        //
+        //   failover_timeout_voice        — voice failover was never wired up;
+        //                                   the value was also remotely settable
+        //                                   via a signed policy bundle.
+        //   talking_avatar_provider_url   — v4.8.1 placeholders whose documented
+        //   talking_avatar_provider_api_key  upgrade fallback looked up a
+        //                                   different config name and so could
+        //                                   never fire.
+        //
+        // Unsetting rather than leaving them costs nothing and stops a stale
+        // credential sitting in config for a field that no longer exists. This
+        // is not guarded on existence because unset_config() is a no-op for a
+        // key that is already absent, so a partial rerun is safe.
+        foreach (
+            [
+                'failover_timeout_voice',
+                'talking_avatar_provider_url',
+                'talking_avatar_provider_api_key',
+            ] as $orphan
+        ) {
+            unset_config($orphan, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082000, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082001) {
+        // v7.0.0 re-tag: settings.php titles and descriptions moved from
+        // hardcoded English into lang strings. No schema or config change — the
+        // version bump exists so sites already running 2026082000 pick up the
+        // new language files, which Moodle only re-reads on upgrade.
+        upgrade_plugin_savepoint(true, 2026082001, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082002) {
+        // v7.0.0 re-tag: analytics no longer hides hidden courses, and the demo
+        // seeder now enables the assistant on the course it creates. No schema
+        // or config change; the bump exists so installs already on 2026082001
+        // re-read the language files, which gained one string.
+        upgrade_plugin_savepoint(true, 2026082002, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082200) {
+        // v7.0.3: record how each chunk's packed vector is encoded.
+        //
+        // Nullable with no default, deliberately. Every existing row holds
+        // float32 in embedding_bin, and null is read as float by
+        // embedding_compat::normalize_dtype(), so existing indexes keep scoring
+        // without a backfill. Writing a default of 'float' across a
+        // hundred-thousand-row table would be a long UPDATE that buys nothing.
+        $table = new xmldb_table('local_ai_course_assistant_chunks');
+        $field = new xmldb_field(
+            'embed_dtype',
+            XMLDB_TYPE_CHAR,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'embed_model'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082200, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082500) {
+        // v7.0.6: migrate saved conversation-starter config.
+        //
+        // Two changes, both applied ONLY where the site is still on the
+        // superseded default, so an admin who wrote their own copy keeps it:
+        //
+        //  1. study-plan's prompt asked the assistant to open with two
+        //     questions. Learners who opened with that chip bounced at 43.9%
+        //     against 24.2% for learners who typed their own question
+        //     (measured on learn.saylor.org, 90 days to 2026-08-24, and
+        //     replicated on degrees.saylor.org). The new copy proposes a plan
+        //     first and asks afterwards.
+        //
+        //  2. help-page gains conditional='activity' so it is not offered on
+        //     the course home page, where its {page} placeholder expands to
+        //     the whole course name and the answer is a catalog summary.
+        //
+        // Sites that never touched starters have no stored value and simply
+        // pick up the new get_defaults(); nothing to migrate there.
+        $saved = get_config('local_ai_course_assistant', 'custom_starters');
+        if (!empty($saved)) {
+            $starters = json_decode($saved, true);
+            if (is_array($starters)) {
+                $oldstudyplan = "I'd like to plan my current study session. Please ask me: "
+                    . '(1) what I want to accomplish today, and (2) how much time I have '
+                    . "available. If we've discussed a study plan before, build on it.";
+                $newstudyplan = 'Suggest a focused plan for my study session in this course '
+                    . 'right now. Propose a concrete first step and a realistic 30-minute '
+                    . 'sequence based on where I am in the course, and cite the specific '
+                    . 'activities to work through. Then ask if I want to adjust the time '
+                    . 'or the focus.';
+
+                $changed = false;
+                foreach ($starters as $i => $starter) {
+                    $key = $starter['key'] ?? '';
+                    if ($key === 'study-plan'
+                            && trim((string) ($starter['prompt'] ?? '')) === $oldstudyplan) {
+                        $starters[$i]['prompt'] = $newstudyplan;
+                        $changed = true;
+                    }
+                    if ($key === 'help-page' && (string) ($starter['conditional'] ?? '') === '') {
+                        $starters[$i]['conditional'] = 'activity';
+                        $changed = true;
+                    }
+                }
+
+                if ($changed) {
+                    set_config(
+                        'custom_starters',
+                        json_encode($starters),
+                        'local_ai_course_assistant'
+                    );
+                }
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026082500, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082501) {
+        // v7.1.0 introduces the quiz lock. Nothing to migrate: quiz_lock_enabled
+        // defaults to on in code when unset, and quiz_cfg rows are untouched --
+        // an explicit per-quiz 'full' still opts that quiz out. The behaviour
+        // change is documented in the release notes rather than encoded here.
+        upgrade_plugin_savepoint(true, 2026082501, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082600) {
+        // v7.1.1: make two questions answerable that were previously only
+        // answerable by inference.
+        //
+        // stream_outcome — 9.5% of conversations contain a turn where the learner
+        // asked and no reply was stored. Until now a provider error and a learner
+        // closing the tab mid-answer produced byte-identical evidence: no row at
+        // all. Nullable, so every pre-existing row stays honestly unknown rather
+        // than being back-filled with a guess.
+        //
+        // chunk_count / top_score — whether retrieval found anything was being
+        // inferred from prompt_tokens, a proxy that turned out to be invalid
+        // because different providers report that field differently.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+
+        $fields = [
+            new xmldb_field('stream_outcome', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'cached_tokens'),
+            new xmldb_field('chunk_count', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'stream_outcome'),
+            new xmldb_field('top_score', XMLDB_TYPE_NUMBER, '10, 6', null, null, null, null, 'chunk_count'),
+        ];
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026082600, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082700) {
+        // v7.2.0 is the Marketplace review remediation: removals, a backup/
+        // restore implementation, template and AMD migrations, and string
+        // extraction. No schema change of its own.
+        //
+        // One tidy-up: the self-updater's settings are gone with the feature, so
+        // their stored values are dead weight. github_token in particular held a
+        // credential for a feature that no longer exists, and leaving it in
+        // config_plugins would keep it on disk indefinitely.
+        foreach (['github_token', 'update_link', 'updates_heading'] as $dead) {
+            unset_config($dead, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082700, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082800) {
+        // v7.2.1: raise the system-prompt character budget for sites still on
+        // the old default.
+        //
+        // A stock prompt with retrieval on measures about 23,800 characters, so
+        // the previous 12,000 default could never hold it: the assembler dropped
+        // or truncated sections on every single turn. Combined with course
+        // content being charged to the wrong budget bucket (see
+        // context_builder::build_system_prompt), retrieved passages were cut out
+        // of the prompt entirely while the model was still instructed to cite
+        // them, and it cited passages it had never been shown.
+        //
+        // Only sites still sitting on the literal old default are moved. An
+        // admin who deliberately tuned this -- down for cost, or up already --
+        // keeps their value; raising a configured budget would change their spend
+        // without asking.
+        $budget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
+        if ((string) $budget === '12000') {
+            set_config('prompt_budget_chars', 24000, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082800, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026082802) {
+        // v7.2.3: raise the prompt budget again, 24,000 -> 36,000.
+        //
+        // The 24,000 figure was measured against a stock prompt at the default
+        // retrieval depth and cleared it by about 200 characters. On real turns
+        // that margin was 46 characters and roughly a third of the retrieved
+        // course material was being discarded -- the exact payload the release
+        // before it existed to deliver.
+        //
+        // As before, only sites still sitting on the previous default are moved.
+        // An admin who tuned this keeps their value.
+        $budget = get_config('local_ai_course_assistant', 'prompt_budget_chars');
+        if ((string) $budget === '24000') {
+            set_config('prompt_budget_chars', 36000, 'local_ai_course_assistant');
+        }
+
+        upgrade_plugin_savepoint(true, 2026082802, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026090400) {
+        // v7.3.0 (F31): create the per-course spend cap column that
+        // spend_guard::get_cap() has been reading since v5.13.
+        //
+        // The read was `$coursecfg['spend_cap_monthly']` against
+        // course_config_manager::get_effective_config(), which returns exactly six
+        // keys -- provider, apikey, model, apibaseurl, systemprompt, temperature.
+        // spend_cap_monthly was never one of them, there was no column to hold it
+        // and no UI to set it, so the branch was unreachable and every course fell
+        // through to the site-wide default. A per-course cap could be documented,
+        // expected and believed in, and it did nothing.
+        $table = new xmldb_table('local_ai_course_assistant_course_cfg');
+        $field = new xmldb_field(
+            'spend_cap_monthly',
+            XMLDB_TYPE_NUMBER,
+            '10, 2',
+            null,
+            null,
+            null,
+            null,
+            'temperature'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026090400, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026090500) {
+        // v7.3.1 (F11): remove the chat attachment feature.
+        //
+        // The paperclip shipped enabled by default and could never work: the
+        // endpoint amd/src/repository.js posted to,
+        // /local/ai_course_assistant/upload_attachment.php, does not exist in
+        // the plugin and never has. Learners saw a control that failed every
+        // time. The settings are dropped here so they stop appearing in
+        // config_log and in the settings export.
+        unset_config('allow_student_attachments', 'local_ai_course_assistant');
+        unset_config('attachment_max_size_mb', 'local_ai_course_assistant');
+        unset_config('attachment_allowed_types', 'local_ai_course_assistant');
+
+        // sse.php would promote a client-supplied draftitemid into the
+        // permanent message_attachments area, so a crafted request could leave
+        // files behind even though the UI upload path was dead. Those files are
+        // now unreachable (the pluginfile handler is gone) and were never
+        // covered by the privacy provider's export or erasure paths, so leaving
+        // them would be orphaned learner data with no way to see or delete it.
+        $fs = get_file_storage();
+        $deleted = 0;
+        $areas = $DB->get_records_sql(
+            "SELECT DISTINCT contextid
+               FROM {files}
+              WHERE component = :component AND filearea = :filearea",
+            ['component' => 'local_ai_course_assistant', 'filearea' => 'message_attachments']
+        );
+        foreach ($areas as $area) {
+            $fs->delete_area_files((int) $area->contextid, 'local_ai_course_assistant', 'message_attachments');
+            $deleted++;
+        }
+        if ($deleted > 0) {
+            mtrace("local_ai_course_assistant: removed orphaned chat attachments in {$deleted} context(s)");
+        }
+
+        upgrade_plugin_savepoint(true, 2026090500, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026090700) {
+        // v7.3.3 (F25): mark dry-run outreach rows so they never trip the
+        // 7-day cooldown or burn a milestone. The insert was identical in both
+        // modes apart from a message_id prefix that nothing ever read: a
+        // dry-run row armed the real cooldown, and a dry-run "send" returning
+        // true drove streak_tracker::mark_sent(), which is terminal -- so every
+        // learner who crossed a milestone while the admin previewed in dry-run
+        // mode lost that email permanently. The setting's own description said
+        // to use dry-run "to verify the cooldown and consent logic before
+        // going live", which is precisely the trap.
+        $table = new xmldb_table('local_ai_course_assistant_outreach_log');
+        $field = new xmldb_field('dryrun', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timesent');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Backfill: dry-run rows are identifiable by their message_id prefix.
+        $DB->execute(
+            "UPDATE {local_ai_course_assistant_outreach_log}
+                SET dryrun = 1
+              WHERE " . $DB->sql_like('message_id', ':pfx'),
+            ['pfx' => 'dryrun_%']
+        );
+        upgrade_plugin_savepoint(true, 2026090700, 'local', 'ai_course_assistant');
     }
 
     return true;

@@ -29,7 +29,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class cross_course_mastery_test extends \advanced_testcase {
-
     // ───────────────────────────────────────────────────────────
     // normalize_title — pure string normalization
     // ───────────────────────────────────────────────────────────
@@ -121,8 +120,11 @@ final class cross_course_mastery_test extends \advanced_testcase {
 
         cross_course_mastery::rebuild_links();
 
-        $this->assertCount(0, cross_course_mastery::linked_objectives($a),
-            'Two objectives in the SAME course must never be linked.');
+        $this->assertCount(
+            0,
+            cross_course_mastery::linked_objectives($a),
+            'Two objectives in the SAME course must never be linked.'
+        );
     }
 
     public function test_rebuild_links_fuzzy_matches_close_titles(): void {
@@ -248,8 +250,11 @@ final class cross_course_mastery_test extends \advanced_testcase {
         $this->master((int)$user->id, (int)$c1->id, $b); // already mastered locally too.
 
         $this->enable_crossmastery((int)$c1->id);
-        $this->assertCount(0, cross_course_mastery::get_transfer_evidence((int)$user->id, (int)$c1->id),
-            'No need to surface transfer for an objective the learner already mastered here.');
+        $this->assertCount(
+            0,
+            cross_course_mastery::get_transfer_evidence((int)$user->id, (int)$c1->id),
+            'No need to surface transfer for an objective the learner already mastered here.'
+        );
     }
 
     // ───────────────────────────────────────────────────────────

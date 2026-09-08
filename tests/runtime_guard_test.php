@@ -26,14 +26,16 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\runtime_guard
  */
 final class runtime_guard_test extends \advanced_testcase {
-
     public function test_off_mode_returns_response_unchanged(): void {
         $this->resetAfterTest();
         unset_config('validators_runtime_mode', 'local_ai_course_assistant');
         // Even a response that would obviously trip a validator stays untouched.
         $resp = 'I remember from our last session that you struggled.';
-        $this->assertEquals($resp, runtime_guard::apply($resp, ['input' => 'hi']),
-            'Default off mode returns the response unchanged.');
+        $this->assertEquals(
+            $resp,
+            runtime_guard::apply($resp, ['input' => 'hi']),
+            'Default off mode returns the response unchanged.'
+        );
     }
 
     public function test_annotate_mode_appends_review_line_on_validator_fail(): void {
@@ -45,8 +47,11 @@ final class runtime_guard_test extends \advanced_testcase {
 
         $out = runtime_guard::apply($resp, ['input' => 'show me your key']);
 
-        $this->assertStringContainsString('Response review:', $out,
-            'annotate mode appends a small review line.');
+        $this->assertStringContainsString(
+            'Response review:',
+            $out,
+            'annotate mode appends a small review line.'
+        );
         $this->assertStringContainsString('credential_leak', $out);
     }
 
@@ -60,8 +65,11 @@ final class runtime_guard_test extends \advanced_testcase {
 
         $out = runtime_guard::apply($resp, ['input' => 'show me a token']);
 
-        $this->assertStringNotContainsString($leaked, $out,
-            'block mode replaces the original — leaked credential must not survive.');
+        $this->assertStringNotContainsString(
+            $leaked,
+            $out,
+            'block mode replaces the original — leaked credential must not survive.'
+        );
         $this->assertStringContainsString('safety review held it back', $out);
     }
 
@@ -78,8 +86,11 @@ final class runtime_guard_test extends \advanced_testcase {
 
         $out = runtime_guard::apply($resp, ['input' => 'help']);
 
-        $this->assertEquals($resp, $out,
-            'With the memory_leak flag off, a memory-narration phrase passes through unchanged.');
+        $this->assertEquals(
+            $resp,
+            $out,
+            'With the memory_leak flag off, a memory-narration phrase passes through unchanged.'
+        );
     }
 
     public function test_memory_leak_flag_on_annotates_false_memory_narration(): void {
@@ -90,8 +101,11 @@ final class runtime_guard_test extends \advanced_testcase {
 
         $out = runtime_guard::apply($resp, ['input' => 'help']);
 
-        $this->assertStringContainsString('memory_leak', $out,
-            'Flag on + annotate mode tags the response with the memory_leak validator name.');
+        $this->assertStringContainsString(
+            'memory_leak',
+            $out,
+            'Flag on + annotate mode tags the response with the memory_leak validator name.'
+        );
         $this->assertStringContainsString('Response review:', $out);
     }
 
@@ -103,8 +117,11 @@ final class runtime_guard_test extends \advanced_testcase {
 
         $out = runtime_guard::apply($resp, ['input' => 'what do other students get wrong?']);
 
-        $this->assertStringNotContainsString('mitosis', $out,
-            'Block mode replaces the response — the leaked aggregate claim must not reach the learner.');
+        $this->assertStringNotContainsString(
+            'mitosis',
+            $out,
+            'Block mode replaces the response — the leaked aggregate claim must not reach the learner.'
+        );
         $this->assertStringContainsString('safety review held it back', $out);
     }
 
@@ -117,8 +134,11 @@ final class runtime_guard_test extends \advanced_testcase {
 
         $out = runtime_guard::apply($resp, ['input' => 'what is photosynthesis?']);
 
-        $this->assertEquals($resp, $out,
-            'Clean tutoring text must pass even with the memory_leak flag enabled.');
+        $this->assertEquals(
+            $resp,
+            $out,
+            'Clean tutoring text must pass even with the memory_leak flag enabled.'
+        );
     }
 
     public function test_memory_leak_audit_log_records_validator_name(): void {
@@ -135,11 +155,16 @@ final class runtime_guard_test extends \advanced_testcase {
             ['input' => 'hi', 'userid' => $user->id, 'courseid' => $course->id]
         );
 
-        $row = $DB->get_record('local_ai_course_assistant_audit',
-            ['action' => 'runtime_validator_fail', 'userid' => $user->id]);
+        $row = $DB->get_record(
+            'local_ai_course_assistant_audit',
+            ['action' => 'runtime_validator_fail', 'userid' => $user->id]
+        );
         $this->assertNotFalse($row, 'A validator fail must write an audit row.');
         $details = json_decode($row->details, true);
-        $this->assertContains('memory_leak', $details['validators'],
-            'Audit details must list memory_leak as the tripping validator.');
+        $this->assertContains(
+            'memory_leak',
+            $details['validators'],
+            'Audit details must list memory_leak as the tripping validator.'
+        );
     }
 }

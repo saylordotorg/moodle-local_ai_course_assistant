@@ -27,7 +27,6 @@ namespace local_ai_course_assistant\external;
  * @covers     \local_ai_course_assistant\external\get_radar_citation
  */
 final class external_consent_citation_test extends \advanced_testcase {
-
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);

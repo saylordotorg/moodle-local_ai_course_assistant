@@ -38,9 +38,12 @@ namespace local_ai_course_assistant\provider;
  *
  * Recommended for courses that do not need streaming or provider-specific
  * features. For the best student experience, use a direct provider.
+ *
+ * @package    local_ai_course_assistant
+ * @copyright  2026 Tom Caswell & David Ta / Saylor University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class coreai_provider extends base_provider {
-
     /** @var array|null Token usage from the last successful call. */
     private ?array $lasttokenusage = null;
 
@@ -112,7 +115,10 @@ class coreai_provider extends base_provider {
 
         if (!class_exists('\\core_ai\\manager') || !class_exists('\\core_ai\\aiactions\\generate_text')) {
             throw new \moodle_exception(
-                'chat:error', 'local_ai_course_assistant', '', null,
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
                 'Moodle core_ai subsystem not available. The Moodle provider requires Moodle 4.5 or later with an aiprovider plugin configured.'
             );
         }
@@ -129,7 +135,16 @@ class coreai_provider extends base_provider {
             prompttext: $prompttext,
         );
 
-        $manager = new \core_ai\manager();
+        // Moodle 5.0 gave core_ai\manager a required \moodle_database
+        // constructor argument, so `new manager()` is a fatal
+        // ArgumentCountError on 5.0-5.3 -- and this provider is what
+        // `auto` resolves to whenever no SOLA key is set, so the shipped
+        // default was broken on every Moodle 5.x (issue #218). Core made
+        // the same move: ai/placement/courseassist and
+        // ai/classes/external/set_action.php both use di::get(). The
+        // container autowires the DB on 4.5 too, where the constructor
+        // takes no arguments.
+        $manager = \core\di::get(\core_ai\manager::class);
         $response = $manager->process_action($action);
 
         // Version-defensive response handling. core_ai's response object and
@@ -140,7 +155,10 @@ class coreai_provider extends base_provider {
             $msg = method_exists($response, 'get_errormessage') ? ($response->get_errormessage() ?: '') : '';
             $code = method_exists($response, 'get_errorcode') ? $response->get_errorcode() : 0;
             throw new \moodle_exception(
-                'chat:error', 'local_ai_course_assistant', '', null,
+                'chat:error',
+                'local_ai_course_assistant',
+                '',
+                null,
                 "Moodle core_ai error ({$code}): " . ($msg ?: 'core_ai returned an error.')
             );
         }

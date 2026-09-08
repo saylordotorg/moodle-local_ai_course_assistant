@@ -27,7 +27,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\security::resolve_pin_options
  */
 final class ssrf_pin_test extends \advanced_testcase {
-
     public function test_literal_ip_is_not_pinned(): void {
         $this->resetAfterTest();
         // A literal IP cannot be rebound, so no pin is emitted.
@@ -46,8 +45,11 @@ final class ssrf_pin_test extends \advanced_testcase {
         $this->resetAfterTest();
         // An admin-allowlisted self-hosted endpoint may legitimately resolve to
         // a private address; it is trusted, so neither pinned nor rejected.
-        set_config('ssrf_trusted_endpoints', "http://ollama.internal:11434",
-            'local_ai_course_assistant');
+        set_config(
+            'ssrf_trusted_endpoints',
+            "http://ollama.internal:11434",
+            'local_ai_course_assistant'
+        );
         $this->assertSame([], security::resolve_pin_options('http://ollama.internal:11434/api/generate'));
     }
 
@@ -67,6 +69,8 @@ final class ssrf_pin_test extends \advanced_testcase {
         $this->assertArrayHasKey('CURLOPT_RESOLVE', $opts);
         $this->assertCount(1, $opts['CURLOPT_RESOLVE']);
         $this->assertMatchesRegularExpression(
-            '/^example\.com:443:\d{1,3}(\.\d{1,3}){3}$/', $opts['CURLOPT_RESOLVE'][0]);
+            '/^example\.com:443:\d{1,3}(\.\d{1,3}){3}$/',
+            $opts['CURLOPT_RESOLVE'][0]
+        );
     }
 }

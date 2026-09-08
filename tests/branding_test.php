@@ -31,7 +31,6 @@ namespace local_ai_course_assistant;
  * @covers     \local_ai_course_assistant\branding
  */
 final class branding_test extends \advanced_testcase {
-
     public function test_short_name_returns_admin_setting_when_set(): void {
         $this->resetAfterTest();
         set_config('short_name', 'CHAT', 'local_ai_course_assistant');
@@ -95,23 +94,34 @@ final class branding_test extends \advanced_testcase {
         // settings_user.php. Must not contain spaces, slashes, or
         // characters that would corrupt a Content-Disposition header.
         $this->resetAfterTest();
-        set_config('display_name', 'My Tutor with spaces / & special chars',
-            'local_ai_course_assistant');
+        set_config(
+            'display_name',
+            'My Tutor with spaces / & special chars',
+            'local_ai_course_assistant'
+        );
 
         $slug = branding::filename_slug();
 
         $this->assertNotEmpty($slug);
-        $this->assertDoesNotMatchRegularExpression('#[\s/\\\\\'"]#', $slug,
-            'filename_slug must not contain spaces, slashes, or quotes.');
+        $this->assertDoesNotMatchRegularExpression(
+            '#[\s/\\\\\'"]#',
+            $slug,
+            'filename_slug must not contain spaces, slashes, or quotes.'
+        );
     }
 
     public function test_privacy_external_url_returns_setting_when_url(): void {
         $this->resetAfterTest();
-        set_config('privacy_external_url', 'https://example.com/privacy',
-            'local_ai_course_assistant');
+        set_config(
+            'privacy_external_url',
+            'https://example.com/privacy',
+            'local_ai_course_assistant'
+        );
 
-        $this->assertEquals('https://example.com/privacy',
-            branding::privacy_external_url());
+        $this->assertEquals(
+            'https://example.com/privacy',
+            branding::privacy_external_url()
+        );
     }
 
     public function test_all_methods_return_strings_under_blank_config(): void {
@@ -120,9 +130,11 @@ final class branding_test extends \advanced_testcase {
         // protection against any future branding field with a missing
         // null-safe fallback.
         $this->resetAfterTest();
-        foreach (['short_name', 'display_name', 'institution_name',
+        foreach (
+            ['short_name', 'display_name', 'institution_name',
                 'institution_short_name', 'contact_email', 'dpo_email',
-                'privacy_external_url'] as $key) {
+                'privacy_external_url'] as $key
+        ) {
             set_config($key, '', 'local_ai_course_assistant');
         }
 
@@ -147,7 +159,9 @@ final class branding_test extends \advanced_testcase {
         $this->resetAfterTest();
         $map = branding::token_map();
         $this->assertEqualsCanonicalizing(
-            ['tutorname', 'tutorshort', 'uniname', 'unishort'], array_keys($map));
+            ['tutorname', 'tutorshort', 'uniname', 'unishort'],
+            array_keys($map)
+        );
     }
 
     public function test_apply_resolves_every_token_from_config(): void {
@@ -222,13 +236,18 @@ final class branding_test extends \advanced_testcase {
                 continue;
             }
             $resolved = branding::apply($value);
-            if (strpos($resolved, '[[') !== false
-                    && preg_match('/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/', $resolved)) {
+            if (
+                strpos($resolved, '[[') !== false
+                    && preg_match('/\[\[(tutorname|tutorshort|uniname|unishort)\]\]/', $resolved)
+            ) {
                 $leaks[] = $key;
             }
         }
-        $this->assertSame([], $leaks,
+        $this->assertSame(
+            [],
+            $leaks,
             'These lang keys still hold an unresolved brand token after apply(): '
-            . implode(', ', $leaks));
+            . implode(', ', $leaks)
+        );
     }
 }

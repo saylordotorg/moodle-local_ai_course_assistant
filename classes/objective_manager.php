@@ -37,7 +37,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class objective_manager {
-
     public const TABLE_OBJS = 'local_ai_course_assistant_objs';
     public const TABLE_ATTS = 'local_ai_course_assistant_obj_att';
 
@@ -67,7 +66,7 @@ class objective_manager {
     private const DEFAULT_DECAY_HALF_LIFE_DAYS = 30;
 
     // ------------------------------------------------------------------
-    //  Feature gates
+    // Feature gates
     // ------------------------------------------------------------------
 
     /**
@@ -137,7 +136,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  CRUD
+    // CRUD
     // ------------------------------------------------------------------
 
     /**
@@ -257,7 +256,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  Attempts
+    // Attempts
     // ------------------------------------------------------------------
 
     /**
@@ -328,8 +327,64 @@ class objective_manager {
         );
     }
 
+    /**
+     * Bulk-load attempts for many (userid, objectiveid) pairs in ONE query.
+     *
+     * get_attempts() is a query per pair, so any caller that walks a cohort
+     * (instructor dashboard, outcomes report) turns into an N+1 over
+     * enrolment x objectives. This loads the same rows for the whole set at
+     * once and returns them bucketed and capped exactly as get_attempts()
+     * would: newest first, at most $limit per pair. Ordering adds a tiebreak
+     * on id DESC so two attempts sharing a timecreated are ordered
+     * deterministically rather than left to the DB.
+     *
+     * @param int[] $objectiveids
+     * @param int[] $userids Empty means every user with attempts on those objectives.
+     * @param int $limit Window size per pair; 0 uses DEFAULT_WINDOW.
+     * @return array<string, array> Keyed "userid:objectiveid" => attempt rows.
+     */
+    public static function preload_attempts(array $objectiveids, array $userids = [], int $limit = 0): array {
+        global $DB;
+        $limit = $limit ?: self::DEFAULT_WINDOW;
+        $objectiveids = array_values(array_unique(array_map('intval', $objectiveids)));
+        if (empty($objectiveids)) {
+            return [];
+        }
+        [$objsql, $params] = $DB->get_in_or_equal($objectiveids, SQL_PARAMS_NAMED, 'obj');
+        $where = "objectiveid {$objsql}";
+        if (!empty($userids)) {
+            $userids = array_values(array_unique(array_map('intval', $userids)));
+            [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+            $where .= " AND userid {$usersql}";
+            $params += $userparams;
+        }
+        $buckets = [];
+        $rs = $DB->get_recordset_select(
+            self::TABLE_ATTS,
+            $where,
+            $params,
+            'userid ASC, objectiveid ASC, timecreated DESC, id DESC'
+        );
+        try {
+            foreach ($rs as $row) {
+                $key = (int) $row->userid . ':' . (int) $row->objectiveid;
+                if (!isset($buckets[$key])) {
+                    $buckets[$key] = [];
+                }
+                // Cap in PHP: the window is per pair, which SQL cannot LIMIT
+                // per group portably.
+                if (count($buckets[$key]) < $limit) {
+                    $buckets[$key][(int) $row->id] = $row;
+                }
+            }
+        } finally {
+            $rs->close();
+        }
+        return $buckets;
+    }
+
     // ------------------------------------------------------------------
-    //  Mastery math
+    // Mastery math
     // ------------------------------------------------------------------
 
     /**
@@ -343,15 +398,22 @@ class objective_manager {
      *
      * @param int $userid
      * @param int $objectiveid
+     * @param array|null $attempts Optional pre-loaded attempt rows for this
+     *        pair (newest first, already capped to the window), as returned by
+     *        preload_attempts(). Null fetches them.
      * @return array{score:float, attempts:int, status:string, last:int}
      */
-    public static function compute_mastery(int $userid, int $objectiveid): array {
+    public static function compute_mastery(int $userid, int $objectiveid, ?array $attempts = null): array {
         $rawthresh = get_config('local_ai_course_assistant', 'mastery_threshold');
         $threshold = ($rawthresh === false || $rawthresh === '') ? self::DEFAULT_THRESHOLD : (float) $rawthresh;
         $rawwindow = get_config('local_ai_course_assistant', 'mastery_window');
         $window = ($rawwindow === false || $rawwindow === '') ? self::DEFAULT_WINDOW : (int) $rawwindow;
 
-        $attempts = self::get_attempts($userid, $objectiveid, $window);
+        // $attempts may be handed in by a caller that bulk-loaded the whole
+        // cohort via preload_attempts(); only fetch when it was not.
+        if ($attempts === null) {
+            $attempts = self::get_attempts($userid, $objectiveid, $window);
+        }
         $count = count($attempts);
 
         if ($count === 0) {
@@ -431,10 +493,26 @@ class objective_manager {
      */
     public static function compute_course_summary(int $userid, int $courseid): array {
         $objectives = self::list_for_course($courseid);
+        // One query for this learner's attempts across every objective in the
+        // course, instead of one per objective inside compute_mastery(). This
+        // summary is on learner-facing surfaces (mastery chip, progress panel,
+        // learning path), so the per-objective query multiplied by the number
+        // of objectives on every call.
+        $objectiveids = [];
+        foreach ($objectives as $obj) {
+            $objectiveids[] = (int) $obj->id;
+        }
+        $preloaded = !empty($objectiveids)
+            ? self::preload_attempts($objectiveids, [$userid])
+            : [];
         $rows = [];
         $mastered = $learning = $notstarted = 0;
         foreach ($objectives as $obj) {
-            $m = self::compute_mastery($userid, (int) $obj->id);
+            $m = self::compute_mastery(
+                $userid,
+                (int) $obj->id,
+                $preloaded[$userid . ':' . (int) $obj->id] ?? []
+            );
             $rows[] = [
                 'objective' => $obj,
                 'mastery' => $m,
@@ -627,6 +705,8 @@ class objective_manager {
         if (!$obj) {
             return false;
         }
+        // Bounded loop: $prereq_ids is the short list a teacher submitted on the
+        // objective form, and each row is validated against the same course.
         $clean = [];
         foreach ($prereq_ids as $pid) {
             $pid = (int) $pid;
@@ -639,13 +719,17 @@ class objective_manager {
             }
         }
         $clean = array_values(array_unique($clean));
-        $DB->set_field('local_ai_course_assistant_objs', 'prereq_ids',
-            implode(',', $clean), ['id' => $objectiveid]);
+        $DB->set_field(
+            'local_ai_course_assistant_objs',
+            'prereq_ids',
+            implode(',', $clean),
+            ['id' => $objectiveid]
+        );
         return true;
     }
 
     // ------------------------------------------------------------------
-    //  Source scanners (look-first authoring)
+    // Source scanners (look-first authoring)
     // ------------------------------------------------------------------
 
     /**
@@ -759,7 +843,7 @@ class objective_manager {
                 if (!$cm->uservisible || !in_array($cm->modname, ['page', 'book'], true)) {
                     continue;
                 }
-                $text = context_builder::get_module_content((int) $cm->id, 12000);
+                $text = context_builder::get_module_content((int) $cm->id, $courseid, 12000);
                 if ($text === '') {
                     continue;
                 }
@@ -851,7 +935,7 @@ class objective_manager {
     }
 
     // ------------------------------------------------------------------
-    //  Internal helpers
+    // Internal helpers
     // ------------------------------------------------------------------
 
     /**

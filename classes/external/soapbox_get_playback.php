@@ -40,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class soapbox_get_playback extends external_api {
-
     /**
      * @return external_function_parameters
      */
@@ -57,11 +56,15 @@ class soapbox_get_playback extends external_api {
     public static function execute(int $recordingid): array {
         global $USER, $DB, $CFG;
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['recordingid' => $recordingid]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['recordingid' => $recordingid]
+        );
 
-        $rec = $DB->get_record('local_ai_course_assistant_sbx_rec',
-            ['id' => (int) $params['recordingid']]);
+        $rec = $DB->get_record(
+            'local_ai_course_assistant_sbx_rec',
+            ['id' => (int) $params['recordingid']]
+        );
         if (!$rec || $rec->status === 'deleted' || empty($rec->storage_key)) {
             throw new \moodle_exception('invalidrecord', 'error');
         }
@@ -87,8 +90,11 @@ class soapbox_get_playback extends external_api {
             require_once($CFG->libdir . '/filelib.php');
             $tmp = make_request_directory() . '/deck.pdf';
             $curl = new \curl();
-            $curl->download_one($storage->presign_get($rec->deck_key, 900), null,
-                ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]);
+            $curl->download_one(
+                $storage->presign_get($rec->deck_key, 900),
+                null,
+                ['filepath' => $tmp, 'timeout' => 120, 'followlocation' => true]
+            );
             if (is_file($tmp) && filesize($tmp) > 0) {
                 $pages = soapbox_deck_renderer::render_to_datauris($tmp);
             }
@@ -112,7 +118,9 @@ class soapbox_get_playback extends external_api {
             'videourl' => new external_value(PARAM_RAW, 'Presigned URL of the recording'),
             'mode'     => new external_value(PARAM_ALPHA, 'video | audio'),
             'pages'    => new external_multiple_structure(
-                new external_value(PARAM_RAW, 'Page image as a data URI'), 'Slide page images'),
+                new external_value(PARAM_RAW, 'Page image as a data URI'),
+                'Slide page images'
+            ),
             'timeline' => new external_value(PARAM_RAW, 'JSON slide-advance timeline'),
         ]);
     }

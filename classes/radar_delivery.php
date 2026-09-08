@@ -29,7 +29,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class radar_delivery {
-
     /**
      * Build a payload string in the requested format.
      *
@@ -182,23 +181,31 @@ class radar_delivery {
         $payload = self::format($format, $query, $response, $meta);
 
         if ($format === 'text') {
-            $payload = email_footer::append_text($payload, $emailaddress,
-                email_optout::TYPE_LEARNING_RADAR, $reason);
+            $payload = email_footer::append_text(
+                $payload,
+                $emailaddress,
+                email_optout::TYPE_LEARNING_RADAR,
+                $reason
+            );
             return (bool) email_to_user($recipient, $admin, $subject, $payload);
         }
 
         // Non-text formats: attach as a file with a brief plain-text body.
         // The unsubscribe footer goes on the human-readable body, not the
         // attached CSV/JSON/markdown payload.
-        list($filename, ) = self::format_meta($format);
+        [$filename, ] = self::format_meta($format);
         // Moodle File API: creates $CFG->tempdir/sola_radar with safe perms.
         $tmpdir = make_temp_directory('sola_radar');
         $tmpfile = $tmpdir . '/' . uniqid('radar_', true) . '_' . $filename;
         file_put_contents($tmpfile, $payload);
         $body = "Your SOLA Learning Radar report is attached.\n\n"
             . "Query: {$query}\n\nAll student data is anonymized.";
-        $body = email_footer::append_text($body, $emailaddress,
-            email_optout::TYPE_LEARNING_RADAR, $reason);
+        $body = email_footer::append_text(
+            $body,
+            $emailaddress,
+            email_optout::TYPE_LEARNING_RADAR,
+            $reason
+        );
         $sent = (bool) email_to_user($recipient, $admin, $subject, $body, '', $tmpfile, $filename);
         @unlink($tmpfile);
         return $sent;
@@ -214,6 +221,10 @@ class radar_delivery {
      * @return bool
      */
     public static function send_slack(string $webhookurl, string $query, string $response, array $meta = []): bool {
+        // Slack and Teams do not go through format(), which is where the marker
+        // strip lives, so the literal [SOLA_NEXT]chip||chip[/SOLA_NEXT] block
+        // was posting verbatim into scheduled channel messages.
+        $response = self::strip_marker_tags($response);
         if (!security::is_safe_provider_url($webhookurl)) {
             debugging('Learning Radar Slack webhook rejected by SSRF allowlist', DEBUG_DEVELOPER);
             return false;
@@ -227,7 +238,9 @@ class radar_delivery {
         if (!empty($meta)) {
             $fields = [];
             foreach ($meta as $k => $v) {
-                $fields[] = ['type' => 'mrkdwn', 'text' => '*' . ucfirst((string) $k) . ':*\n' . (string) $v];
+                // Double-quoted: a single-quoted '\n' posts the two characters
+                // backslash-n into the Slack message instead of a line break.
+                $fields[] = ['type' => 'mrkdwn', 'text' => '*' . ucfirst((string) $k) . ":*\n" . (string) $v];
             }
             $blocks[] = ['type' => 'section', 'fields' => array_slice($fields, 0, 10)];
         }
@@ -236,7 +249,12 @@ class radar_delivery {
         ]];
 
         $payload = ['blocks' => $blocks, 'text' => 'SOLA Learning Radar report'];
-        return self::http_post($webhookurl, json_encode($payload), 'application/json');
+        $json = json_encode($payload);
+        if ($json === false) {
+            debugging('SOLA radar delivery: payload failed to encode: ' . json_last_error_msg(), DEBUG_DEVELOPER);
+            return false;
+        }
+        return self::http_post($webhookurl, $json, 'application/json');
     }
 
     /**
@@ -249,6 +267,10 @@ class radar_delivery {
      * @return bool
      */
     public static function send_teams(string $webhookurl, string $query, string $response, array $meta = []): bool {
+        // Slack and Teams do not go through format(), which is where the marker
+        // strip lives, so the literal [SOLA_NEXT]chip||chip[/SOLA_NEXT] block
+        // was posting verbatim into scheduled channel messages.
+        $response = self::strip_marker_tags($response);
         if (!security::is_safe_provider_url($webhookurl)) {
             debugging('Learning Radar Teams webhook rejected by SSRF allowlist', DEBUG_DEVELOPER);
             return false;
@@ -279,7 +301,12 @@ class radar_delivery {
                 ],
             ],
         ];
-        return self::http_post($webhookurl, json_encode($card), 'application/json');
+        $json = json_encode($card);
+        if ($json === false) {
+            debugging('SOLA radar delivery: card failed to encode: ' . json_last_error_msg(), DEBUG_DEVELOPER);
+            return false;
+        }
+        return self::http_post($webhookurl, $json, 'application/json');
     }
 
     /**
@@ -313,10 +340,14 @@ class radar_delivery {
      */
     private static function truncate_for_slack(string $text): string {
         $max = 2800;
-        if (strlen($text) <= $max) {
+        // mb functions, not byte substr: a byte-offset cut through a multi-byte
+        // character leaves invalid UTF-8, json_encode() then returns false, and
+        // the POST body goes out empty -- a silent delivery failure recorded as
+        // success. Unreachable on an all-ASCII site, guaranteed on any other.
+        if (mb_strlen($text, 'UTF-8') <= $max) {
             return $text;
         }
-        return substr($text, 0, $max) . "\n\n_(truncated)_";
+        return mb_substr($text, 0, $max, 'UTF-8') . "\n\n_(truncated)_";
     }
 
     /**
@@ -327,10 +358,14 @@ class radar_delivery {
      */
     private static function truncate_for_teams(string $text): string {
         $max = 18000;
-        if (strlen($text) <= $max) {
+        // mb functions, not byte substr: a byte-offset cut through a multi-byte
+        // character leaves invalid UTF-8, json_encode() then returns false, and
+        // the POST body goes out empty -- a silent delivery failure recorded as
+        // success. Unreachable on an all-ASCII site, guaranteed on any other.
+        if (mb_strlen($text, 'UTF-8') <= $max) {
             return $text;
         }
-        return substr($text, 0, $max) . "\n\n_(truncated)_";
+        return mb_substr($text, 0, $max, 'UTF-8') . "\n\n_(truncated)_";
     }
 
     /**

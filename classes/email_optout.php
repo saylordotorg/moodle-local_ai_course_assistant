@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class email_optout {
-
     /** @var string Learning Radar scheduled / on-demand email reports. */
     public const TYPE_LEARNING_RADAR = 'learning_radar';
     /** @var string Daily anomaly digest. */

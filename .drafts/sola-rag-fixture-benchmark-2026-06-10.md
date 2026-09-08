@@ -1,5 +1,13 @@
 # SOLA RAG Fixture Benchmark 2026-06-10
 
+> **CORRECTION (2026-08-01) — the rerank cost and per-user volume figures below are superseded.**
+>
+> Two errors compound in the original model. Measured production usage is **5.07 chat turns per SOLA user per month**, not the ~70 implied by the capacity table here (**13.7x overstated**). And the measured rerank cost is **$0.00187/query at pool 50** against real ~700-token Saylor chunks, not the snippet-sized assumption behind the $63/mo figure (**52x understated**).
+>
+> They partly cancel, so the net error in absolute cost is **3.8x understated**: at 25,000 SOLA users, reranking at pool 50 is **~$237/month**, not $63. The bigger correction is proportional — reranking is **~101% of chat spend at pool 50** and **~41% at pool 20**, not the "~6% of chat spend" claimed here. Enabling it at pool 50 would roughly double the AI bill.
+>
+> Canonical figures: `sola-retrieval-cost-projections-2026-07-31.md`. Measurement: `sola-model-benchmark-2026-07-30.md`.
+
 **Status:** COMPLETE — both arms measured on dev 2026-06-11 (embedding only, plus Voyage rerank-2.5 at 50 and 30 candidate pools) after a payment method on the Voyage account lifted the free tier rate limits.
 **Verdict:** GO — enable on dev with `rerank_candidates=30`; see section 7.
 
@@ -305,6 +313,7 @@ the RAG stage (the LLM generation step dominates perceived response time).
 | Cost at 100k MAU | ~$125/mo |
 
 This is well within the vendor recommendation budget of $63/mo stated in the docstring
+> **[CORRECTED 2026-08-01: it is not. The $63/mo budget itself was wrong — it assumed a per-query cost 52x below what this very benchmark measured. Measured reality at 25,000 SOLA users is ~$237/mo at pool 50. Note the section below already spotted the 4x chunk-size discrepancy; the gap is larger than it appeared because the volume assumption was also 13.7x too high.]**
 of `voyage_reranker.php` (which assumed 50 chunks at typical SOLA usage). The $125/mo
 figure uses more conservative token counts. At Saylor's current scale (pre-100k MAU),
 cost would be proportionally lower.

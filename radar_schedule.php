@@ -75,32 +75,60 @@ try {
             $row = radar_schedule_manager::get($id);
             if (!$row) {
                 http_response_code(404);
-                echo json_encode(['ok' => false, 'error' => 'Schedule not found']);
+                echo json_encode(['ok' => false, 'error' => get_string('radar:err_schedule_not_found', 'local_ai_course_assistant')]);
                 return;
             }
             echo json_encode(['ok' => true, 'schedule' => $row]);
             return;
 
         case 'save':
+            // Blank means "no explicit range" (stored as NULL = site default), so
+            // this cannot be read as PARAM_INT, which would coerce '' to 0. Read
+            // it raw, keep the blank/non-blank distinction, and clean the
+            // non-blank case to an integer explicitly.
+            $rangedaysraw = optional_param('range_days', '', PARAM_RAW_TRIMMED);
+            $rangedays = $rangedaysraw === '' ? '' : (string) clean_param($rangedaysraw, PARAM_INT);
             $data = [
                 'id' => optional_param('id', 0, PARAM_INT),
                 'name' => optional_param('name', '', PARAM_TEXT),
+                // PARAM_RAW is required: the scheduled Learning Radar query is
+                // free-form analyst prose that routinely carries newlines,
+                // quotes, LaTeX and fenced code blocks. It is stored verbatim,
+                // sent to the LLM by the cron task, and returned to the admin UI
+                // as JSON where the browser writes it into an input .value - it
+                // is never interpolated into HTML.
                 'query' => optional_param('query', '', PARAM_RAW),
                 'provider' => optional_param('provider', '', PARAM_ALPHANUMEXT),
-                'model' => optional_param('model', '', PARAM_RAW_TRIMMED),
+                // Vendor model slugs contain dots and slashes ("gemini-2.5-flash",
+                // "meta-llama/Llama-3.1-8B-Instruct"), which PARAM_ALPHANUMEXT
+                // would strip. PARAM_TEXT is lossless for those while stripping
+                // markup; trim() preserves the previous trimming behaviour.
+                'model' => trim(optional_param('model', '', PARAM_TEXT)),
                 'frequency' => optional_param('frequency', 'weekly', PARAM_ALPHA),
                 'recipient_email' => optional_param('recipient_email', '', PARAM_EMAIL),
                 'slack_webhook' => optional_param('slack_webhook', '', PARAM_URL),
                 'teams_webhook' => optional_param('teams_webhook', '', PARAM_URL),
                 'format' => optional_param('format', 'text', PARAM_ALPHA),
-                'courseids' => optional_param('courseids', '', PARAM_RAW_TRIMMED),
-                'filterprovider' => optional_param('filterprovider', '', PARAM_ALPHANUMEXT),
-                'range_days' => optional_param('range_days', '', PARAM_RAW_TRIMMED),
+                // Comma-separated course IDs (UI placeholder "2,5,12").
+                'courseids' => optional_param('courseids', '', PARAM_SEQUENCE),
+                // null default distinguishes ABSENT from empty: the schedule
+                // modal has no filterprovider input, so every edit used to post
+                // without the key and save() wrote '' over a provider filter
+                // migrated from the legacy metaai_cron_filterprovider setting.
+                // Absent now preserves the stored value; an explicit empty
+                // string still clears it.
+                'filterprovider' => optional_param('filterprovider', null, PARAM_ALPHANUMEXT),
+                'range_days' => $rangedays,
                 'enabled' => optional_param('enabled', 0, PARAM_INT),
             ];
+            if ($data['filterprovider'] === null) {
+                $editid = (int) ($data['id'] ?? 0);
+                $existingrow = $editid > 0 ? radar_schedule_manager::get($editid) : null;
+                $data['filterprovider'] = $existingrow ? (string) $existingrow->filterprovider : '';
+            }
             if ($data['name'] === '' || $data['query'] === '') {
                 http_response_code(400);
-                echo json_encode(['ok' => false, 'error' => 'Name and query are required']);
+                echo json_encode(['ok' => false, 'error' => get_string('radar:err_name_query_required', 'local_ai_course_assistant')]);
                 return;
             }
             $id = radar_schedule_manager::save($data, (int) $USER->id);
@@ -119,7 +147,7 @@ try {
             $row = radar_schedule_manager::get($id);
             if (!$row) {
                 http_response_code(404);
-                echo json_encode(['ok' => false, 'error' => 'Schedule not found']);
+                echo json_encode(['ok' => false, 'error' => get_string('radar:err_schedule_not_found', 'local_ai_course_assistant')]);
                 return;
             }
             radar_schedule_manager::save([
@@ -143,7 +171,7 @@ try {
 
         default:
             http_response_code(400);
-            echo json_encode(['ok' => false, 'error' => 'Unknown action']);
+            echo json_encode(['ok' => false, 'error' => get_string('radar:err_unknown_action', 'local_ai_course_assistant')]);
     }
 } catch (\Throwable $e) {
     http_response_code(500);

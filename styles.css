@@ -516,125 +516,6 @@ a.aica-source-pill:hover svg {
     text-decoration: none;
 }
 
-/* Attachment preview chip shown in the composer before send. */
-.aica-attachment-preview {
-    padding: 6px 10px 0;
-}
-.aica-attachment-preview__chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    max-width: 100%;
-    padding: 4px 6px 4px 4px;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    background: #fff;
-    font-size: 0.8125rem;
-}
-.aica-attachment-preview__thumb {
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-    border-radius: 4px;
-    background: #f1f3f4;
-}
-.aica-attachment-preview__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 4px;
-    background: #e3f2fd;
-    color: #1565c0;
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 0.03em;
-}
-.aica-attachment-preview__name {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 220px;
-    color: #202124;
-}
-.aica-attachment-preview__remove {
-    border: none;
-    background: transparent;
-    color: #5f6368;
-    font-size: 1.1rem;
-    line-height: 1;
-    padding: 0 6px;
-    cursor: pointer;
-    border-radius: 50%;
-}
-.aica-attachment-preview__remove:hover,
-.aica-attachment-preview__remove:focus {
-    background: #e8eaed;
-    color: #202124;
-}
-
-/* Attach paperclip button in the composer bar. */
-.aica-attachment-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    border-radius: 50%;
-    color: #5f6368;
-    cursor: pointer;
-}
-.aica-attachment-btn:hover,
-.aica-attachment-btn:focus {
-    background: #e8eaed;
-    color: #202124;
-}
-.aica-attachment-btn:disabled,
-.aica-attachment-btn--uploading {
-    opacity: 0.5;
-    cursor: progress;
-}
-
-/* Attachment displayed inside a user message bubble (persisted). */
-.aica-attachment {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 6px;
-    padding: 0;
-    text-decoration: none;
-    color: inherit;
-    max-width: 100%;
-}
-.aica-attachment__thumb {
-    display: block;
-    max-width: 240px;
-    max-height: 200px;
-    border-radius: 8px;
-    object-fit: cover;
-    background: rgba(0, 0, 0, 0.05);
-}
-.aica-attachment--file {
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.18);
-    border-radius: 8px;
-    font-size: 0.85rem;
-}
-.aica-attachment__icon {
-    display: inline-flex;
-    align-items: center;
-}
-.aica-attachment__name {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 220px;
-}
-
 /* Learning Mastery Chip — compact pill shown above the messages. */
 .aica-mastery-chip-wrap {
     position: relative;
@@ -5230,6 +5111,44 @@ a.aica-history-panel__source:hover {
     outline-offset: 2px !important;
 }
 
+/* v7.2.9 (S13): repaint the settings panel under high contrast.
+ *
+ * The drawer rule above sets color:#fff, and .aica-settings-panel keeps its own
+ * background:#fff, so every label inside it rendered white on white -- a
+ * measured contrast ratio of exactly 1:1, i.e. invisible. The panel is an
+ * absolutely-positioned overlay with its own surface, so it has to be repainted
+ * explicitly; inheriting the drawer's colour without its background is what
+ * caused this. The panel's links were 1.22:1 (#ffeb3b on white) for the same
+ * reason and come good once the surface is black. */
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel {
+    background: #000 !important;
+    color: #fff !important;
+}
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__header,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__footer {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__title,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__section-title,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__empty-note,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel label {
+    color: #fff !important;
+}
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__section + .aica-settings-panel__section {
+    border-top-color: #fff !important;
+}
+/* Form controls follow the composer's treatment: white surface, black text, so
+ * the selected value is readable rather than white-on-white. */
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel__select,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel select,
+.local-ai-course-assistant.aica-high-contrast .aica-settings-panel input {
+    background: #fff !important;
+    color: #000 !important;
+    border: 2px solid #fff !important;
+}
+
 /* v4.9.0: Talking avatar overlay panel */
 .aica-talking-avatar-panel {
     position: absolute;
@@ -5788,4 +5707,188 @@ button.local-ai-course-assistant__path-node-head[aria-expanded="true"] {
 }
 @media (prefers-reduced-motion: reduce) {
     .sbx-recorder.sbx-recording .sbx-audio-indicator .sbx-mic-dot { animation: none; }
+}
+
+/* ── Admin settings page: jump-to-section TOC and quicklinks (v7.0.0) ──────
+   Moved out of an inline <style> block in settings.php. The plugin directory
+   review flagged inline stylesheets; this is where these rules belong.
+
+   v7.0.1: the smooth-scroll rule was a bare `html { }` selector, which
+   styles.css aggregation applies to EVERY Moodle page, not just ours. Gated
+   on :has(.sola-toc) it can only match a page that is already rendering our
+   table of contents. Browsers without :has() simply jump instead of gliding,
+   which is the pre-7.0.0 behaviour and costs nothing. */
+html:has(.sola-toc) { scroll-behavior: smooth; }
+.sola-toc { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 14px 18px; margin: 0 0 18px; }
+.sola-toc strong { display: block; font-size: 13px; color: #495057; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.sola-toc ul { display: flex; flex-wrap: wrap; gap: 6px 10px; list-style: none; padding: 0; margin: 0; }
+.sola-toc li { margin: 0; }
+.sola-toc a { display: inline-block; padding: 4px 10px; background: #fff; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; color: #3b5bdb; text-decoration: none; }
+.sola-toc a:hover { background: #e7f0ff; border-color: #3b5bdb; text-decoration: none; }
+.sola-quicklinks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ced4da; }
+.sola-quicklinks a { display: inline-block; padding: 5px 12px; background: #3b5bdb; border: 1px solid #3b5bdb; border-radius: 4px; font-size: 13px; color: #fff; text-decoration: none; font-weight: 500; }
+.sola-quicklinks a:hover { background: #2d47b5; border-color: #2d47b5; color: #fff; }
+.sola-section-anchor { display: block; position: relative; top: -60px; visibility: hidden; }
+.sola-section-heading { margin-top: 24px; padding-top: 8px; border-top: 2px solid #e5e7eb; }
+
+/* ── Learning Radar printable report (v7.0.1) ─────────────────────────────
+   Was an inline <style> block in radar_export.php emitting a detached HTML
+   document with bare `body{}` / `h1{}` / `dl{}` rules. The page now renders
+   through templates/radar_report.mustache on an embedded page layout, so
+   styles.css is loaded and every rule can be namespaced. */
+.sola-radar-report { max-width: 780px; margin: 24px auto; padding: 0 16px; color: #222; line-height: 1.55; }
+.sola-radar-report__title { font-size: 20px; margin: 0 0 4px; }
+.sola-radar-report__heading { font-size: 16px; margin: 24px 0 8px; }
+.sola-radar-report__generated { color: #666; margin: 0 0 12px; }
+.sola-radar-report__meta { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 13px; color: #555; }
+.sola-radar-report__meta dt { font-weight: 600; }
+.sola-radar-report__meta dd { margin: 0; }
+.sola-radar-report__query { background: #f4f6f9; padding: 12px 14px; border-radius: 6px; white-space: pre-wrap; }
+.sola-radar-report__response { padding: 12px 0; white-space: pre-wrap; }
+.sola-radar-report__foot { margin-top: 32px; font-size: 12px; color: #888; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+@media print {
+    .sola-radar-report { margin: 0; max-width: none; }
+    .sola-radar-report__print { display: none; }
+}
+
+/* ── Flashcard review page (v7.0.1) ───────────────────────────────────────
+   Was a stack of inline style="..." attributes in flashcards.php. The page now
+   renders templates/flashcards.mustache, so every rule lives here under the
+   .sola-flashcards namespace. Card visibility is class-driven rather than
+   style.display so the JS never writes inline styles either. */
+.sola-flashcards { max-width: 720px; margin: 0 auto; }
+.sola-flashcards__empty { padding: 24px; border: 1px dashed #d1d5db; border-radius: 10px; text-align: center; color: #6b7280; }
+.sola-flashcards__card { display: none; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px; background: #fff; margin-bottom: 12px; }
+.sola-flashcards__card--active { display: block; }
+.sola-flashcards__label { font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; margin-bottom: 8px; }
+.sola-flashcards__question { font-size: 16px; color: #111827; line-height: 1.55; margin-bottom: 14px; }
+.sola-flashcards__back { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e5e7eb; }
+.sola-flashcards__back--visible { display: block; }
+.sola-flashcards__answer { font-size: 15px; color: #1f2937; line-height: 1.55; margin-bottom: 14px; }
+.sola-flashcards__grades { display: flex; gap: 8px; }
+.sola-flashcards__done { display: none; padding: 24px; border: 1px solid #d1fae5; border-radius: 10px; background: #ecfdf5; color: #065f46; text-align: center; font-weight: 600; }
+.sola-flashcards__done--visible { display: block; }
+.sola-flashcards__hidden { display: none; }
+
+/* ── Learner data export / purge admin page (v7.0.1) ──────────────────────
+   Was inline style="..." on the intro, lookup form and action row in
+   admin_user_data.php, which now renders templates/admin_user_data.mustache. */
+.sola-userdata__intro { max-width: 720px; }
+.sola-userdata__form { margin: 16px 0; }
+.sola-userdata__label { display: block; margin-bottom: 6px; font-weight: 600; }
+.sola-userdata__controls { display: flex; align-items: center; gap: 8px; }
+.sola-userdata__input { padding: 6px 10px; font-size: 14px; width: 160px; }
+.sola-userdata__id { color: #888; }
+.sola-userdata__table { margin-top: 12px; }
+.sola-userdata__actions { margin-top: 16px; display: flex; gap: 12px; }
+
+/* ── RAG index admin page (v7.0.1) ────────────────────────────────────────
+   Was inline style="..." on the content-source card in rag_admin.php, which
+   now renders templates/rag_admin.mustache. The badge colors are kept explicit
+   because Bootstrap 4 badge-success/-secondary are not present on every theme
+   this page has to look right on. */
+.sola-ragadmin__hint { font-size: 13px; }
+.sola-ragadmin__srclabel { width: 260px; font-weight: 500; }
+.sola-ragadmin__srcstate { width: 70px; }
+.sola-ragadmin__srcdetail { font-size: 13px; color: #495057; }
+.sola-ragadmin__badge { color: #fff; }
+.sola-ragadmin__badge--ready { background: #0f9d58; }
+.sola-ragadmin__badge--off { background: #6c757d; }
+
+/* v7.2.0 (CONTRIB-10574 #201): prompt playground, moved off inline style
+   attributes when the page was migrated to a Mustache template. */
+.sola-pp-narrow { max-width: 200px; }
+.sola-pp-mono { font-family: monospace; font-size: 13px; }
+.sola-pp-pre {
+    background: #f6f8fa;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.sola-pp-pre-tall { max-height: 600px; }
+.sola-pp-chunkcell {
+    max-height: 140px;
+    overflow: auto;
+    font-size: 12px;
+    white-space: pre-wrap;
+}
+
+/* v7.2.0 (CONTRIB-10574 #201): starter admin page, moved off inline style
+   attributes. The how-to panel is now a native <details>, which replaced an
+   onclick that toggled a sibling's inline display. */
+.sola-starters-howto { border-left: 4px solid #0d6efd; }
+.sola-starters-howto-summary { cursor: pointer; margin: 0; font-weight: 600; }
+.sola-starters-howto-body { margin-top: 12px; font-size: 14px; line-height: 1.6; }
+.sola-starters-howto-list { margin-bottom: 8px; }
+.sola-inline-form { display: inline; }
+.sola-starters-plus { font-size: 20px; }
+.aica-starter-type-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #fff3cd;
+    color: #856404;
+}
+.aica-starter-type-badge.type-voice,
+.aica-starter-type-badge.type-pronunciation {
+    background: #d4edda;
+    color: #155724;
+}
+.sola-toc-save { background: #16a34a; border-color: #16a34a; color: #fff; font-weight: 500; }
+
+/* A starter chip disabled alongside the input, e.g. during a quiz lock.
+   pointer-events off as well as the disabled attribute, because the chips are
+   rendered as buttons in some layouts and anchors in others. */
+.aica-starter--disabled {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* ── First-run consent banner ──────────────────────────────────────────────
+   Was inline-styled on the element with a 0.98-alpha white background and
+   z-index 20. Two defects came out of that on staging: the panel behind it
+   showed through the privacy notice, and the widget footer stayed clickable,
+   so the very first click a learner made granted consent AND opened the
+   feedback form.
+
+   Opacity is the load-bearing part. On the one screen whose entire purpose is
+   that a learner reads a data-processing disclosure, being able to see the
+   layer underneath through the words is not cosmetic. Fully opaque, and
+   theme-aware -- the inline white was wrong in dark mode regardless.
+
+   The z-index clears the header's 10. Covering the footer geometrically is not
+   relied on by itself: consent_gate.js also marks everything outside the
+   banner inert while consent is pending, so a stacking-context change
+   somewhere else in the widget cannot bring the click-through back. */
+.aica-consent-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    background: #fff;
+    color: #1f2933;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+    .aica-consent-banner {
+        background: #1b2430;
+        color: #e6ecf2;
+    }
+}
+
+/* Everything outside the banner is unreachable while consent is pending.
+   `inert` covers pointer, focus and assistive tech in one attribute; the
+   pointer-events rule is the fallback for browsers that do not support it. */
+.aica-consent-pending .local-ai-course-assistant__footer-feedback,
+.aica-consent-pending .local-ai-course-assistant__input-area,
+.aica-consent-pending .local-ai-course-assistant__bottom-nav {
+    pointer-events: none;
 }

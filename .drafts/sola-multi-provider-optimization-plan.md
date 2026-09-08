@@ -1,5 +1,13 @@
 # SOLA Multi-Provider Optimization Plan
 
+> **CORRECTION (2026-08-01) — the rerank cost and per-user volume figures below are superseded.**
+>
+> Two errors compound in the original model. Measured production usage is **5.07 chat turns per SOLA user per month**, not the ~70 implied by the capacity table here (**13.7x overstated**). And the measured rerank cost is **$0.00187/query at pool 50** against real ~700-token Saylor chunks, not the snippet-sized assumption behind the $63/mo figure (**52x understated**).
+>
+> They partly cancel, so the net error in absolute cost is **3.8x understated**: at 25,000 SOLA users, reranking at pool 50 is **~$237/month**, not $63. The bigger correction is proportional — reranking is **~101% of chat spend at pool 50** and **~41% at pool 20**, not the "~6% of chat spend" claimed here. Enabling it at pool 50 would roughly double the AI bill.
+>
+> Canonical figures: `sola-retrieval-cost-projections-2026-07-31.md`. Measurement: `sola-model-benchmark-2026-07-30.md`.
+
 **Status:** Draft. Internal architecture memo for Tom + Saylor leadership review.
 **Date:** 2026-06-04 (rev. 3 — aligned with the 2026-06-03 chat benchmark + 2026-06-04 domain bake-off; retired the 3-group pilot framing; universal-rollout baseline is now text-only; cost projections re-baselined to 25% SOLA adoption; voice + audio + avatars moved out of baseline scope).
 **Anchored to:** SOLA v5.9.0 (learning-path map shipped). Per-call failover decorator shipped in v5.5.0 and verified on dev.sylr.org.
@@ -36,7 +44,7 @@
 
 5. **Prompt caching is still the biggest cost lever not turned on.** Anthropic gives 90% off cached prefix reads; OpenAI applies a 50% prefix cache discount automatically; Gemini does not currently expose a prefix cache discount. At 100k Saylor MAU (25% SOLA adoption = 25k SOLA users), turning on Anthropic `cache_control` on the Haiku integrity-reference lane and surfacing OpenAI's `prompt_cache_tokens` on the analytics lane could trim baseline cost a further 5–10%. §4 has the wiring.
 
-6. **Embeddings migrate from OpenAI text-embedding-3-small to Voyage-3.5 (companion doc A.7).** SOLA adds Voyage rerank-2.5 as a runtime two-stage retrieval upgrade (companion doc A.8). Single biggest RAG-quality improvement available; absolute spend is trivial (~$5 one-time re-index of the 161-course corpus; ~$63/mo at 100k Saylor MAU for rerank). §10 below replaces the prior "OpenAI text-embedding-3-small unchanged" assumption.
+6. **Embeddings migrate from OpenAI text-embedding-3-small to Voyage-3.5 (companion doc A.7).** SOLA adds Voyage rerank-2.5 as a runtime two-stage retrieval upgrade (companion doc A.8). Single biggest RAG-quality improvement available; absolute spend is trivial (~$5 one-time re-index of the 161-course corpus; ~$63/mo at 100k Saylor MAU for rerank). **[CORRECTED 2026-08-01: ~$237/mo at pool 50 and ~101% of chat spend; ~$95/mo and ~41% at pool 20. See sola-retrieval-cost-projections-2026-07-31.md.]** §10 below replaces the prior "OpenAI text-embedding-3-small unchanged" assumption.
 
 7. **The per-call failover layer shipped in v5.5.0 (2026-05-13) and is verified on dev.sylr.org.** Settings: `failover_per_call_enabled` off by default, `failover_timeout_chat` 8s, `failover_timeout_voice` 3s. Audit rows fire on every `failover_fallthrough` and `failover_circuit_open`. Voice timeout is irrelevant in the baseline rollout (Voice tab off) but the setting remains in admin for a future opt-in.
 
@@ -528,7 +536,7 @@ Why this is a step-change:
 - **TIER 1 compliance** (SOC 2 Type II + GDPR DPA + no training by default; enterprise tier).
 - **Voyage rerank-2.5 is 40x cheaper than Cohere Rerank 3.5** for near-equivalent recall lift on educational content.
 
-One-shot migration cost: re-embedding the full 161-course corpus (~80M tokens) on Voyage-3.5 is **$4.80 one-time**. Quarterly re-indexing of half the corpus is under $10. Voyage rerank-2.5 at runtime adds ~$63/mo at 100k Saylor MAU (25% SOLA adoption) — ~6% of chat spend, easily justified by the recall lift.
+One-shot migration cost: re-embedding the full 161-course corpus (~80M tokens) on Voyage-3.5 is **$4.80 one-time**. Quarterly re-indexing of half the corpus is under $10. Voyage rerank-2.5 at runtime adds ~$63/mo at 100k Saylor MAU (25% SOLA adoption) — ~6% of chat spend, easily justified by the recall lift. **[CORRECTED 2026-08-01: ~$237/mo at pool 50 and ~101% of chat spend; ~$95/mo and ~41% at pool 20. See sola-retrieval-cost-projections-2026-07-31.md.]**
 
 Implementation: one config change in `sse.php` + `rag_admin.php` to point the embedding lane at Voyage; one new `rag_retriever::rerank()` call between embedding retrieval and chat to plug in Voyage rerank-2.5. Half-day work + a dev validation pass.
 
@@ -552,7 +560,7 @@ With the benchmark complete and v5.5.0 failover shipped, the remaining work is c
 | Week 1 | Populate `comparison_providers` + `spend_failover_chain` per §3a (universal-rollout chain); flip `failover_per_call_enabled` on after the chain is configured | Activates both the existing budget-cap failover AND the per-call failover for the named primaries. |
 | Week 1 | Confirm Voice tab is disabled in the rollout build: `realtimeenabled` off, header voice button hidden, `tts.php` and STT entry points not surfaced in the learner UI | Baseline ships text-only; see companion doc section 6 operational checklist. |
 | Week 2 | Migrate embeddings to Voyage-3.5 (§10): config update in `sse.php` + `rag_admin.php`; one-time re-index of the 161-course corpus (~$4.80) | Companion doc A.7. Better retrieval, 4x context window, multilingual ceiling. Half-day work. |
-| Week 2 | Wire Voyage rerank-2.5 as the second stage in `rag_retriever`: top-50 embeddings → rerank to top-5 (§10) | Companion doc A.8. ~$63/mo at 100k Saylor MAU; ~6% of chat spend. Half-day work. |
+| Week 2 | Wire Voyage rerank-2.5 as the second stage in `rag_retriever`: top-50 embeddings → rerank to top-5 (§10) | Companion doc A.8. ~$63/mo at 100k Saylor MAU; ~6% of chat spend. Half-day work. **[corrected: ~$237/mo, ~101% of chat spend at pool 50]** |
 | Week 3 | Ship §4's prompt-caching wiring for the Anthropic Haiku integrity lane (`cache_control` on system prompt + RAG block) and surface OpenAI `prompt_cache_tokens` on the gpt-4o-mini specialty lanes | Highest-ROI remaining cost work. 5–10% reduction on baseline at scale. |
 | Week 3 | Ship §7's synthetic canary + Learning Radar SLO panel | Observability catches issues before students do. |
 | Week 4 | Vendor tier-up negotiations (companion doc section 6): Vertex AI Tier 3+, OpenAI Tier 4, Anthropic Tier 3, Voyage enterprise. 2–4 week procurement window | Capacity headroom for 50k → 100k Saylor MAU scale-out. |

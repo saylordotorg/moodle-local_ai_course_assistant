@@ -55,7 +55,8 @@ if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'tts', 3
 
 // Resolve active TTS provider via the voice_providers registry.
 $cfg = \local_ai_course_assistant\voice_registry::resolve(
-    \local_ai_course_assistant\voice_registry::CAPABILITY_TTS);
+    \local_ai_course_assistant\voice_registry::CAPABILITY_TTS
+);
 if ($cfg === null) {
     http_response_code(503);
     echo json_encode(['error' => get_string('error_no_tts_key', 'local_ai_course_assistant')]);
@@ -139,10 +140,14 @@ try {
             'system',
             '[TTS]',
             0,
-            $cfg['provider'] . '_tts',
+            // F81: the capability suffix belongs in interaction_type (arg 11),
+            // where spend_guard's voice bucket and token_analytics' categories
+            // read it -- not welded onto the provider name.
+            $cfg['provider'],
             $approxtokens,
             0,
-            $model
+            $model,
+            $cfg['provider'] . '_tts'
         );
     }
 } catch (\Throwable $e) {

@@ -36,7 +36,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class generate_flashcards extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -47,8 +46,10 @@ class generate_flashcards extends external_api {
 
     public static function execute(int $courseid, int $cmid = 0, int $count = 5): array {
         global $USER;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['courseid' => $courseid, 'cmid' => $cmid, 'count' => $count]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['courseid' => $courseid, 'cmid' => $cmid, 'count' => $count]
+        );
         $context = \context_course::instance($params['courseid']);
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
@@ -59,7 +60,7 @@ class generate_flashcards extends external_api {
 
         $count = max(3, min(10, (int) $params['count']));
         $content = $params['cmid'] > 0
-            ? context_builder::get_module_content((int) $params['cmid'], 8000)
+            ? context_builder::get_module_content((int) $params['cmid'], (int) $params['courseid'], 8000)
             : '';
         if ($content === '') {
             return ['success' => false, 'message' => 'no_page_content', 'cards' => []];
@@ -174,10 +175,13 @@ class generate_flashcards extends external_api {
                         'type' => 'object',
                         'properties' => $cardprops,
                         'required' => $required,
+                        // Required on every object node under OpenAI strict mode.
+                        'additionalProperties' => false,
                     ],
                 ],
             ],
             'required' => ['cards'],
+            'additionalProperties' => false,
         ];
     }
 

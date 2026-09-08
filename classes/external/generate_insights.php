@@ -34,7 +34,6 @@ use local_ai_course_assistant\provider\base_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class generate_insights extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course ID'),
@@ -63,7 +62,8 @@ class generate_insights extends external_api {
               WHERE f.courseid = :courseid
               ORDER BY f.timecreated DESC",
             ['courseid' => $courseid],
-            0, 100
+            0,
+            100
         );
 
         $feedbacktext = '';

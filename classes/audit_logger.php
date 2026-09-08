@@ -26,7 +26,6 @@ namespace local_ai_course_assistant;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class audit_logger {
-
     /**
      * Log an event for audit trail.
      *
@@ -66,7 +65,8 @@ class audit_logger {
     public static function get_user_logs(int $userid, int $limit = 100): array {
         global $DB;
 
-        return $DB->get_records('local_ai_course_assistant_audit',
+        return $DB->get_records(
+            'local_ai_course_assistant_audit',
             ['userid' => $userid],
             'timecreated DESC',
             '*',
@@ -85,7 +85,8 @@ class audit_logger {
     public static function get_course_logs(int $courseid, int $limit = 100): array {
         global $DB;
 
-        return $DB->get_records('local_ai_course_assistant_audit',
+        return $DB->get_records(
+            'local_ai_course_assistant_audit',
             ['courseid' => $courseid],
             'timecreated DESC',
             '*',
@@ -102,9 +103,14 @@ class audit_logger {
      * @return array
      */
     public static function get_all_logs(int $limit = 100, int $offset = 0): array {
+        // Moodle's DML reads limitnum <= 0 as "no limit", so a caller asking for
+        // zero rows would be handed the entire audit table.
+        $limit = max(1, $limit);
+        $offset = max(0, $offset);
         global $DB;
 
-        return $DB->get_records('local_ai_course_assistant_audit',
+        return $DB->get_records(
+            'local_ai_course_assistant_audit',
             null,
             'timecreated DESC',
             '*',

@@ -30,7 +30,6 @@ use local_ai_course_assistant\usertesting_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submit_usertesting_response extends external_api {
-
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'tasksetid' => new external_value(PARAM_INT, 'Task set ID'),

@@ -61,8 +61,12 @@ use local_ai_course_assistant\provider\base_provider;
 $courseid = 0;
 $limit = 0;
 foreach ($argv as $a) {
-    if (preg_match('/^--courseid=(\d+)$/', $a, $m)) { $courseid = (int) $m[1]; }
-    if (preg_match('/^--limit=(\d+)$/', $a, $m))    { $limit = (int) $m[1]; }
+    if (preg_match('/^--courseid=(\d+)$/', $a, $m)) {
+        $courseid = (int) $m[1];
+    }
+    if (preg_match('/^--limit=(\d+)$/', $a, $m)) {
+        $limit = (int) $m[1];
+    }
 }
 if ($courseid <= 0) {
     fwrite(STDERR, "Usage: run_weight_benchmark.php --courseid=<id> [--limit=N]\n");
@@ -134,15 +138,29 @@ foreach ($candidates as $label => $weights) {
             // pageid=1 exercises the page_focus boost path. We are not
             // actually on a Moodle page; the boost only checks pageid > 0.
             $systemprompt = context_builder::build_system_prompt(
-                $courseid, $admin->id, '', [], 1, 'Practice page', ''
+                $courseid,
+                $admin->id,
+                '',
+                [],
+                1,
+                'Practice page',
+                ''
             );
             $provider = base_provider::create_from_config($courseid);
             $response = '';
             $provider->chat_completion_stream(
                 $systemprompt,
                 [['role' => 'user', 'content' => $p['text']]],
-                function (string $chunk) use (&$response) { $response .= $chunk; },
-                ['temperature' => 0.4, 'max_tokens' => 256]
+                function (string $chunk) use (&$response) {
+                    $response .= $chunk;
+                },
+                // 1024, not 256. gemini-2.5-flash spends part of the output
+                // budget before emitting any visible text, so a small cap
+                // truncates the reply being graded: measured on dev 2026-08-22,
+                // a 200-token cap yielded 8 completion tokens where 32 were
+                // needed. Grading a truncated answer measures the cap, not the
+                // weight configuration.
+                ['temperature' => 0.4, 'max_tokens' => 1024]
             );
             $usage = $provider->get_last_token_usage();
             if (!empty($usage['prompt_tokens']) && isset($usage['completion_tokens'])) {
@@ -156,8 +174,17 @@ foreach ($candidates as $label => $weights) {
                 $rubric_systemprompt,
                 [['role' => 'user', 'content' => "Student prompt:\n" . $p['text']
                     . "\n\nTutor response:\n" . mb_substr($response, 0, 1500)]],
-                function (string $chunk) use (&$judge_response) { $judge_response .= $chunk; },
-                ['temperature' => 0.0, 'max_tokens' => 200]
+                function (string $chunk) use (&$judge_response) {
+                    $judge_response .= $chunk;
+                },
+                // 800, not 200. At 200 the judge returned 8 completion tokens
+                // -- '```json\n{\n  "s' -- so json_decode() failed for EVERY
+                // prompt and the harness reported 0.00/15 with n=0 for all five
+                // weight sets, while still printing a sorted summary and a total
+                // spend. That reads like "all configurations scored zero" rather
+                // than "no data was collected". Verified on dev: 800 parses, 200
+                // never does.
+                ['temperature' => 0.0, 'max_tokens' => 800]
             );
             $jusage = $judge->get_last_token_usage();
             if (!empty($jusage['prompt_tokens']) && isset($jusage['completion_tokens'])) {
@@ -202,8 +229,13 @@ if ($origboost === '') {
 uasort($summary, fn($a, $b) => $b['rubric_avg'] <=> $a['rubric_avg']);
 echo "\n=== summary (sorted by avg rubric desc) ===\n";
 foreach ($summary as $label => $s) {
-    printf("  %-32s avg=%.2f/15 n=%-3d cost=%.3f cents\n",
-        $label, $s['rubric_avg'], $s['n'], $s['cost_cents']);
+    printf(
+        "  %-32s avg=%.2f/15 n=%-3d cost=%.3f cents\n",
+        $label,
+        $s['rubric_avg'],
+        $s['n'],
+        $s['cost_cents']
+    );
 }
 printf("\nTotal spend: %.3f cents\n", $totalcost * 100);
 echo "Original config restored.\n";

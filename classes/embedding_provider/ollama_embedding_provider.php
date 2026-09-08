@@ -26,7 +26,6 @@ namespace local_ai_course_assistant\embedding_provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ollama_embedding_provider extends base_embedding_provider {
-
     protected function get_default_model(): string {
         return 'nomic-embed-text';
     }

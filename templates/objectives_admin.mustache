@@ -1,0 +1,324 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/objectives_admin
+
+    Per-course learning objectives admin page: mastery toggles, look-first
+    detection banner, the objectives table (inline edit, prerequisites,
+    reorder, delete), and the add-new form. All strings are resolved in PHP
+    and passed in as data; every form posts back to formaction with a
+    sesskey + action pair, exactly as the pre-template page did.
+
+    Context variables required for this template:
+    * formaction string - URL every form posts to (page URL with courseid).
+    * sesskey string - Session key for the hidden form fields.
+    * togglesheading string - Heading of the toggles card.
+    * masterenabled bool - Master mastery switch state (checkbox + gating).
+    * togglemastervalue int - Hidden "enabled" value the master form posts.
+    * togglemasterlabel string - Master switch label.
+    * chipchecked bool - Chip checkbox state.
+    * togglechipvalue int - Hidden "enabled" value the chip form posts.
+    * togglechiplabel string / togglechiphelp string - Chip label + help.
+    * dashboardchecked bool - Dashboard checkbox state.
+    * toggledashboardvalue int - Hidden "enabled" value the dashboard form posts.
+    * toggledashboardlabel string / toggledashboardhelp string - Dashboard label + help.
+    * rebuild object|false - Cross-course rebuild card: heading, help, button.
+    * detected object|false - Look-first banner: heading, titles (array of
+      objects with title), hasmore bool, moretext string, source string,
+      payload string (JSON envelope), importlabel string.
+    * nonedetected bool - Show the nothing-detected warning banner.
+    * nonedetectedtext string / importllmlabel string - Banner strings.
+    * hasobjectives bool - Whether the objectives table renders.
+    * listheading, colcode, coltitle, colsource, colactions - Table strings.
+    * editlabel, descriptionlabel, savechangeslabel, deletelabel - Row strings.
+    * moveuplabel, movedownlabel - aria-labels for the reorder arrow buttons.
+    * deleteconfirmjs string - onsubmit JS for per-row delete confirm.
+    * saveprereqslabel string - Prerequisites save button label.
+    * objectives array - Rows: index, id, codedisplay, code, title,
+      description, hasdescription, descriptionshort (pre-escaped HTML),
+      sourcelabel, prereqsummary, prereqoptions (value, selected, label),
+      rowclass.
+    * deletealllabel string / deleteallconfirmjs string - Delete-all form.
+    * addheading string / addsubmitlabel string - Add-new card.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "formaction": "/local/ai_course_assistant/objectives_admin.php?courseid=2",
+        "sesskey": "abc123",
+        "togglesheading": "Mastery tracking",
+        "masterenabled": true,
+        "togglemastervalue": 0,
+        "togglemasterlabel": "Enable mastery tracking for this course",
+        "chipchecked": false,
+        "togglechipvalue": 1,
+        "togglechiplabel": "Show the Learning Mastery chip to students",
+        "togglechiphelp": "Optional.",
+        "dashboardchecked": false,
+        "toggledashboardvalue": 1,
+        "toggledashboardlabel": "Show the Progress dashboard tab to students",
+        "toggledashboardhelp": "Optional.",
+        "rebuild": false,
+        "detected": false,
+        "nonedetected": false,
+        "nonedetectedtext": "No learning objectives detected automatically.",
+        "importllmlabel": "Extract objectives with AI",
+        "hasobjectives": true,
+        "listheading": "Current objectives",
+        "colcode": "Code",
+        "coltitle": "Title",
+        "colsource": "Source",
+        "colactions": "Actions",
+        "editlabel": "Edit",
+        "descriptionlabel": "Description",
+        "savechangeslabel": "Save changes",
+        "deletelabel": "Delete",
+        "deleteconfirmjs": "return confirm(\"Delete this objective?\");",
+        "saveprereqslabel": "Save prerequisites",
+        "objectives": [
+            {
+                "index": 1,
+                "id": 12,
+                "codedisplay": "1.1",
+                "code": "1.1",
+                "title": "Define opportunity cost",
+                "description": "Explain trade-offs.",
+                "hasdescription": true,
+                "descriptionshort": "Explain trade-offs.",
+                "sourcelabel": "manual entry",
+                "prereqsummary": "Prerequisites: none yet",
+                "prereqoptions": [
+                    {"value": 13, "selected": false, "label": "[1.2] Compare costs"}
+                ],
+                "rowclass": "lastrow"
+            }
+        ],
+        "deletealllabel": "Delete all objectives for this course",
+        "deleteallconfirmjs": "return confirm(\"Delete every objective?\");",
+        "addheading": "Add an objective",
+        "addsubmitlabel": "Add objective"
+    }
+}}
+<div class="card mb-3">
+    <div class="card-body">
+        <h3 class="h5 mb-3">{{togglesheading}}</h3>
+        <form method="post" action="{{formaction}}" class="d-inline-block mr-4">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="toggle_master">
+            <input type="hidden" name="enabled" value="{{togglemastervalue}}">
+            <label class="mb-0">
+                <input type="checkbox"{{#masterenabled}} checked="checked"{{/masterenabled}}
+                       onchange="this.form.submit()">
+                {{togglemasterlabel}}
+            </label>
+        </form>
+        <form method="post" action="{{formaction}}" class="d-inline-block">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="toggle_chip">
+            <input type="hidden" name="enabled" value="{{togglechipvalue}}">
+            <label class="mb-0">
+                <input type="checkbox"{{#chipchecked}} checked="checked"{{/chipchecked}}{{^masterenabled}} disabled="disabled"{{/masterenabled}}
+                       onchange="this.form.submit()">
+                {{togglechiplabel}}
+            </label>
+            <small class="text-muted"> {{togglechiphelp}}</small>
+        </form>
+        <form method="post" action="{{formaction}}" class="d-inline-block ml-3">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="toggle_dashboard">
+            <input type="hidden" name="enabled" value="{{toggledashboardvalue}}">
+            <label class="mb-0">
+                <input type="checkbox"{{#dashboardchecked}} checked="checked"{{/dashboardchecked}}{{^masterenabled}} disabled="disabled"{{/masterenabled}}
+                       onchange="this.form.submit()">
+                {{toggledashboardlabel}}
+            </label>
+            <small class="text-muted"> {{toggledashboardhelp}}</small>
+        </form>
+    </div>
+</div>
+
+{{#rebuild}}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3 class="h5 mb-2">{{heading}}</h3>
+            <p class="text-muted small mb-2">{{help}}</p>
+            <form method="post" action="{{formaction}}" class="d-inline">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="rebuild_links">
+                <button type="submit" class="btn btn-outline-primary">{{button}}</button>
+            </form>
+        </div>
+    </div>
+{{/rebuild}}
+
+{{#detected}}
+    <div class="alert alert-info">
+        <strong>{{heading}}</strong>
+        <ul class="mt-2 mb-2">
+            {{#titles}}
+                <li>{{title}}</li>
+            {{/titles}}
+            {{#hasmore}}
+                <li class="text-muted">{{moretext}}</li>
+            {{/hasmore}}
+        </ul>
+        <form method="post" action="{{formaction}}" class="d-inline">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="import_detected">
+            <input type="hidden" name="source" value="{{source}}">
+            <input type="hidden" name="payload" value="{{payload}}">
+            <button type="submit" class="btn btn-primary">{{importlabel}}</button>
+        </form>
+        <form method="post" action="{{formaction}}" class="d-inline">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="import_llm">
+            <button type="submit" class="btn btn-outline-secondary">{{importllmlabel}}</button>
+        </form>
+    </div>
+{{/detected}}
+
+{{#nonedetected}}
+    <div class="alert alert-warning">
+        {{nonedetectedtext}}
+        <form method="post" action="{{formaction}}" class="d-inline">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="import_llm">
+            <button type="submit" class="btn btn-primary">{{importllmlabel}}</button>
+        </form>
+    </div>
+{{/nonedetected}}
+
+{{#hasobjectives}}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3 class="h5">{{listheading}}</h3>
+            <div class="table-responsive">
+                <table class="generaltable">
+                    <thead>
+                        <tr>
+                            <th class="header c0" scope="col">#</th>
+                            <th class="header c1" scope="col">{{colcode}}</th>
+                            <th class="header c2" scope="col">{{coltitle}}</th>
+                            <th class="header c3" scope="col">{{colsource}}</th>
+                            <th class="header c4 lastcol" scope="col">{{colactions}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#objectives}}
+                            <tr class="{{rowclass}}">
+                                <td class="cell c0">{{index}}</td>
+                                <td class="cell c1">{{codedisplay}}</td>
+                                <td class="cell c2">
+                                    <div class="font-weight-bold">{{title}}</div>
+                                    {{#hasdescription}}
+                                        {{! Pre-escaped in PHP (s() before shorten_text, matching the
+                                            pre-template page), so rendered unescaped here. }}
+                                        <div class="text-muted small">{{{descriptionshort}}}</div>
+                                    {{/hasdescription}}
+                                    <details>
+                                        <summary>{{editlabel}}</summary>
+                                        <form method="post" action="{{formaction}}" class="mt-2">
+                                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                            <input type="hidden" name="action" value="update">
+                                            <input type="hidden" name="id" value="{{id}}">
+                                            <label>{{colcode}}
+                                                <input type="text" name="code" value="{{code}}" maxlength="40"
+                                                       class="form-control form-control-sm">
+                                            </label>
+                                            <label>{{coltitle}}
+                                                <input type="text" name="title" value="{{title}}" maxlength="255"
+                                                       required="required" class="form-control form-control-sm">
+                                            </label>
+                                            <label>{{descriptionlabel}}
+                                                <textarea name="description" rows="2"
+                                                          class="form-control form-control-sm">{{description}}</textarea>
+                                            </label>
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2">{{savechangeslabel}}</button>
+                                        </form>
+                                    </details>
+                                    <details style="margin-top:6px">
+                                        <summary>{{prereqsummary}}</summary>
+                                        <form method="post" action="{{formaction}}" style="margin-top:6px">
+                                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                            <input type="hidden" name="action" value="set_prereqs">
+                                            <input type="hidden" name="id" value="{{id}}">
+                                            <select name="prereqs[]" multiple size="5" style="min-width:260px">
+                                                {{#prereqoptions}}
+                                                    <option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>
+                                                {{/prereqoptions}}
+                                            </select><br>
+                                            <button type="submit" class="btn btn-sm btn-primary mt-1">{{saveprereqslabel}}</button>
+                                        </form>
+                                    </details>
+                                </td>
+                                <td class="cell c3">{{sourcelabel}}</td>
+                                <td class="cell c4 lastcol">
+                                    <form method="post" action="{{formaction}}" class="d-inline">
+                                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                        <input type="hidden" name="action" value="move_up">
+                                        <input type="hidden" name="id" value="{{id}}">
+                                        <button type="submit" class="btn btn-sm btn-light" aria-label="{{moveuplabel}}">↑</button>
+                                    </form>
+                                    <form method="post" action="{{formaction}}" class="d-inline">
+                                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                        <input type="hidden" name="action" value="move_down">
+                                        <input type="hidden" name="id" value="{{id}}">
+                                        <button type="submit" class="btn btn-sm btn-light" aria-label="{{movedownlabel}}">↓</button>
+                                    </form>
+                                    <form method="post" action="{{formaction}}" class="d-inline"
+                                          onsubmit="{{deleteconfirmjs}}">
+                                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="{{id}}">
+                                        <button type="submit" class="btn btn-sm btn-danger">{{deletelabel}}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {{/objectives}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{{formaction}}" onsubmit="{{deleteallconfirmjs}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="delete_all">
+        <button type="submit" class="btn btn-sm btn-outline-danger">{{deletealllabel}}</button>
+    </form>
+{{/hasobjectives}}
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h3 class="h5">{{addheading}}</h3>
+        <form method="post" action="{{formaction}}">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="create">
+            <label for="obj-new-code">{{colcode}}</label>
+            <input type="text" name="code" id="obj-new-code" maxlength="40" class="form-control">
+            <label for="obj-new-title" class="mt-2">{{coltitle}}</label>
+            <input type="text" name="title" id="obj-new-title" maxlength="255" required="required"
+                   class="form-control">
+            <label for="obj-new-desc" class="mt-2">{{descriptionlabel}}</label>
+            <textarea name="description" id="obj-new-desc" rows="2" class="form-control"></textarea>
+            <button type="submit" class="btn btn-primary mt-3">{{addsubmitlabel}}</button>
+        </form>
+    </div>
+</div>

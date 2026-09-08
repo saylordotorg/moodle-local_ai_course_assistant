@@ -49,7 +49,6 @@ use local_ai_course_assistant\audit_logger;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class failover_chain implements provider_interface {
-
     /** @var provider_interface The primary provider (head of the chain). */
     private provider_interface $primary;
 
@@ -104,7 +103,13 @@ class failover_chain implements provider_interface {
      */
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
         $chain = $this->build_chain();
-        $lasterr = null;
+        // v7.2.8: keep the FIRST failure and a trail of every attempt.
+        // Rethrowing only the last one meant the surfaced error came from
+        // the end of the chain, so a gemini primary that failed was
+        // reported as an openai "model not found" -- pointing the admin at
+        // a correct setting and hiding which provider actually broke.
+        $firsterr = null;
+        $attempts = [];
         foreach ($chain as $entry) {
             if ($this->is_circuit_open($entry['label'])) {
                 continue;
@@ -118,10 +123,19 @@ class failover_chain implements provider_interface {
             } catch (\Throwable $e) {
                 $this->open_circuit($entry['label'], $e);
                 $this->audit_fallthrough($entry, (string) $e->getMessage(), microtime(true) - $start);
-                $lasterr = $e;
+                $firsterr = $firsterr ?? $e;
+                $attempts[] = $entry['label'] . ': ' . $e->getMessage();
             }
         }
-        throw $lasterr ?? new \moodle_exception('chat:error_notconfigured', 'local_ai_course_assistant');
+        if ($firsterr !== null) {
+            if ($firsterr instanceof \moodle_exception && count($attempts) > 1) {
+                $trail = 'Failover chain exhausted (' . count($attempts) . ' attempts) -- '
+                    . implode(' | ', $attempts);
+                $firsterr->debuginfo = trim((string) ($firsterr->debuginfo ?? '') . ' ' . $trail);
+            }
+            throw $firsterr;
+        }
+        throw new \moodle_exception('chat:error_notconfigured', 'local_ai_course_assistant');
     }
 
     /**
@@ -138,7 +152,13 @@ class failover_chain implements provider_interface {
      */
     public function chat_completion_stream(string $systemprompt, array $messages, callable $callback, array $options = []): void {
         $chain = $this->build_chain();
-        $lasterr = null;
+        // v7.2.8: keep the FIRST failure and a trail of every attempt.
+        // Rethrowing only the last one meant the surfaced error came from
+        // the end of the chain, so a gemini primary that failed was
+        // reported as an openai "model not found" -- pointing the admin at
+        // a correct setting and hiding which provider actually broke.
+        $firsterr = null;
+        $attempts = [];
         foreach ($chain as $entry) {
             if ($this->is_circuit_open($entry['label'])) {
                 continue;
@@ -152,8 +172,12 @@ class failover_chain implements provider_interface {
             try {
                 $entry['provider']->chat_completion_stream($systemprompt, $messages, $wrappedcb, $options);
                 if (!$firsttokenreceived) {
-                    throw new \moodle_exception('error', 'local_ai_course_assistant', '',
-                        'No tokens received from ' . $entry['label']);
+                    throw new \moodle_exception(
+                        'error',
+                        'local_ai_course_assistant',
+                        '',
+                        'No tokens received from ' . $entry['label']
+                    );
                 }
                 $this->record_success($entry['label']);
                 $this->lastused = $entry['provider'];
@@ -167,10 +191,19 @@ class failover_chain implements provider_interface {
                 }
                 $this->open_circuit($entry['label'], $e);
                 $this->audit_fallthrough($entry, (string) $e->getMessage(), microtime(true) - $start);
-                $lasterr = $e;
+                $firsterr = $firsterr ?? $e;
+                $attempts[] = $entry['label'] . ': ' . $e->getMessage();
             }
         }
-        throw $lasterr ?? new \moodle_exception('chat:error_notconfigured', 'local_ai_course_assistant');
+        if ($firsterr !== null) {
+            if ($firsterr instanceof \moodle_exception && count($attempts) > 1) {
+                $trail = 'Failover chain exhausted (' . count($attempts) . ' attempts) -- '
+                    . implode(' | ', $attempts);
+                $firsterr->debuginfo = trim((string) ($firsterr->debuginfo ?? '') . ' ' . $trail);
+            }
+            throw $firsterr;
+        }
+        throw new \moodle_exception('chat:error_notconfigured', 'local_ai_course_assistant');
     }
 
     /**

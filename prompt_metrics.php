@@ -21,8 +21,8 @@
  * captured by {@see prompt_metrics_logger}, plus a recommendation for
  * `prompt_budget_chars` based on observed truncation / headroom. An
  * "Apply recommendation" button is shown when the recommendation
- * differs from the current setting; admins can also opt into daily
- * auto-tune via the plugin settings.
+ * differs from the current setting. The daily auto-tune task is
+ * deprecated (v7.2.6) and is no longer offered from this page.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
@@ -47,15 +47,19 @@ $PAGE->set_pagelayout('admin');
 if ($apply && confirm_sesskey()) {
     $result = \local_ai_course_assistant\prompt_metrics_logger::apply_recommendation();
     if ($result['applied']) {
-        redirect($pageurl,
+        redirect(
+            $pageurl,
             get_string('prompt_metrics:applied', 'local_ai_course_assistant', (object) $result),
             null,
-            \core\output\notification::NOTIFY_SUCCESS);
+            \core\output\notification::NOTIFY_SUCCESS
+        );
     } else {
-        redirect($pageurl,
+        redirect(
+            $pageurl,
             get_string('prompt_metrics:noop', 'local_ai_course_assistant', s($result['reason'])),
             null,
-            \core\output\notification::NOTIFY_INFO);
+            \core\output\notification::NOTIFY_INFO
+        );
     }
 }
 
@@ -71,27 +75,47 @@ foreach ($agg['by_cat_avg'] as $cat => $chars) {
     ];
 }
 
-$auto_tune_on = (bool) get_config('local_ai_course_assistant', 'prompt_budget_auto_tune');
+// Section-name tallies, most frequent first. Rows written before v7.2.7 carry
+// no names, so these stay empty until the log rotates.
+$dropped_rows = [];
+foreach ($agg['dropped_by_section'] ?? [] as $secname => $count) {
+    $dropped_rows[] = ['name' => $secname, 'count' => number_format($count)];
+}
+$truncated_rows = [];
+foreach ($agg['truncated_by_section'] ?? [] as $secname => $count) {
+    $truncated_rows[] = ['name' => $secname, 'count' => number_format($count)];
+}
+
+// The "N chars" unit strings are pre-rendered so the template carries no
+// hardcoded English unit suffix (v7.x i18n extraction).
+$charsvalue = function ($n): string {
+    return get_string('prompt_metrics:chars_value', 'local_ai_course_assistant', number_format($n));
+};
 
 $templatedata = [
     'samples'         => number_format($agg['samples']),
     'has_data'        => $agg['samples'] > 0,
     'enough_for_rec'  => $agg['samples'] >= 30,
-    'avg_total'       => number_format($agg['avg_total']),
-    'max_total'       => number_format($agg['max_total']),
-    'avg_budget'      => number_format($agg['avg_budget']),
+    'avg_total'       => $charsvalue($agg['avg_total']),
+    'max_total'       => $charsvalue($agg['max_total']),
+    'avg_budget'      => $charsvalue($agg['avg_budget']),
     'pct_truncated'   => $agg['pct_truncated'],
     'pct_dropped'     => $agg['pct_dropped'],
+    // v7.2.7: which sections, not just how many. A dropped `safety` and a
+    // dropped `faq` were indistinguishable on this page, and they are not
+    // remotely the same event.
+    'dropped_sections'   => $dropped_rows,
+    'has_dropped_names'  => !empty($dropped_rows),
+    'truncated_sections' => $truncated_rows,
+    'has_truncated_names' => !empty($truncated_rows),
     'last_seen'       => $agg['last_seen'] ? userdate($agg['last_seen'], '%Y-%m-%d %H:%M') : '—',
     'by_cat'          => $by_cat_rows,
-    'current_budget'  => number_format($current),
+    'current_budget'  => $charsvalue($current),
     'has_rec'         => !empty($rec),
-    'rec_budget'      => $rec ? number_format($rec['budget']) : '',
+    'rec_budget'      => $rec ? $charsvalue($rec['budget']) : '',
     'rec_rationale'   => $rec ? $rec['rationale'] : '',
     'rec_diff'        => $rec ? ($rec['budget'] !== $current) : false,
     'apply_url'       => (new moodle_url($pageurl, ['apply' => 1, 'sesskey' => sesskey()]))->out(false),
-    'auto_tune_on'    => $auto_tune_on,
-    'settings_url'    => (new moodle_url('/admin/category.php', ['category' => 'local_ai_course_assistant']))->out(false),
 ];
 
 echo $OUTPUT->header();

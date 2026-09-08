@@ -64,7 +64,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class policy_bundle {
-
     /** @var string Envelope format identifier. */
     public const FORMAT = 'sola-policy-bundle-v1';
 
@@ -83,12 +82,13 @@ class policy_bundle {
         // Chat routing and prompt shape.
         'provider',
         'model',
+        'claude_temperature_allow_prefixes',
         'temperature',
         'maxhistory',
         'prompt_verbosity',
         'failover_per_call_enabled',
         'failover_timeout_chat',
-        'failover_timeout_voice',
+        // failover_timeout_voice removed in v7.0.0 — nothing read it.
         'spend_failover_chain',
         // Prompt budgeting (v5.10) and proportions (v6.2).
         'prompt_budget_chars',
@@ -101,6 +101,8 @@ class policy_bundle {
         'history_candidates',
         'history_semantic_minscore',
         // Mastery classifier (v5.11).
+        'quiz_provider',
+        'quiz_model',
         'mastery_classifier_provider',
         'mastery_classifier_model',
         'mastery_classifier_threshold',
@@ -123,6 +125,7 @@ class policy_bundle {
         'rerank_enabled',
         'rerank_model',
         'rerank_candidates',
+        'rerank_margin_threshold',
         // Spend policy (v5.13/v6.0).
         'spend_cap_site',
         'spend_cap_chat',
@@ -252,59 +255,105 @@ class policy_bundle {
      */
     public static function verify_envelope(string $json, string $pubkeyb64): array {
         if (strlen($json) > self::MAX_BUNDLE_BYTES) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'bundle exceeds ' . self::MAX_BUNDLE_BYTES . ' bytes');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'bundle exceeds ' . self::MAX_BUNDLE_BYTES . ' bytes'
+            );
         }
         $envelope = json_decode($json, true, 8);
         if (!is_array($envelope)) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'envelope is not valid JSON');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'envelope is not valid JSON'
+            );
         }
         if (($envelope['format'] ?? '') !== self::FORMAT) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'unknown bundle format');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'unknown bundle format'
+            );
         }
 
         $payloadbytes = base64_decode((string) ($envelope['payload'] ?? ''), true);
         $signature = base64_decode((string) ($envelope['signature'] ?? ''), true);
         $pubkey = base64_decode($pubkeyb64, true);
         if ($payloadbytes === false || $signature === false || $pubkey === false) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'envelope fields are not valid base64');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'envelope fields are not valid base64'
+            );
         }
-        if (strlen($pubkey) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES
-                || strlen($signature) !== SODIUM_CRYPTO_SIGN_BYTES) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'public key or signature has the wrong length');
+        if (
+            strlen($pubkey) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES
+                || strlen($signature) !== SODIUM_CRYPTO_SIGN_BYTES
+        ) {
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'public key or signature has the wrong length'
+            );
         }
         if (!sodium_crypto_sign_verify_detached($signature, $payloadbytes, $pubkey)) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'signature verification FAILED');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'signature verification FAILED'
+            );
         }
 
         $payload = json_decode($payloadbytes, true, 8);
         if (!is_array($payload)) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'payload is not valid JSON');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'payload is not valid JSON'
+            );
         }
         $version = $payload['version'] ?? null;
         if (!is_int($version) || $version < 1) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'payload version must be a positive integer');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'payload version must be a positive integer'
+            );
         }
         $settings = $payload['settings'] ?? null;
         if (!is_array($settings) || $settings === []) {
-            throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                'payload settings must be a non-empty object');
+            throw new \moodle_exception(
+                "policy_bundle:invalid",
+                "local_ai_course_assistant",
+                "",
+                'payload settings must be a non-empty object'
+            );
         }
         foreach ($settings as $key => $value) {
             if (!in_array($key, self::ALLOWED_KEYS, true)) {
-                throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                    "setting '{$key}' is not on the policy bundle allowlist; bundle rejected in full");
+                throw new \moodle_exception(
+                    "policy_bundle:invalid",
+                    "local_ai_course_assistant",
+                    "",
+                    "setting '{$key}' is not on the policy bundle allowlist; bundle rejected in full"
+                );
             }
             if (!is_scalar($value)) {
-                throw new \moodle_exception("policy_bundle:invalid", "local_ai_course_assistant", "",
-                    "setting '{$key}' has a non-scalar value; bundle rejected in full");
+                throw new \moodle_exception(
+                    "policy_bundle:invalid",
+                    "local_ai_course_assistant",
+                    "",
+                    "setting '{$key}' has a non-scalar value; bundle rejected in full"
+                );
             }
         }
         return $payload;

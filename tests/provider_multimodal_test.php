@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\provider\openai_compatible_provider
  */
 final class provider_multimodal_test extends \advanced_testcase {
-
     /**
      * Invoke the protected build_body and return the decoded request body.
      *
@@ -68,8 +67,10 @@ final class provider_multimodal_test extends \advanced_testcase {
     }
 
     public function test_non_image_datauris_are_ignored(): void {
-        $body = $this->body([['role' => 'user', 'content' => 'x']],
-            ['image_datauris' => ['data:text/plain;base64,QQ', 'not-a-uri']]);
+        $body = $this->body(
+            [['role' => 'user', 'content' => 'x']],
+            ['image_datauris' => ['data:text/plain;base64,QQ', 'not-a-uri']]
+        );
         $last = end($body['messages']);
         // Nothing valid to attach, so content stays a plain string.
         $this->assertSame('x', $last['content']);

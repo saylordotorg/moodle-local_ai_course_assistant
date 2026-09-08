@@ -60,6 +60,30 @@ if (!feature_flags::resolve('talking_avatar', $courseid)) {
     exit;
 }
 
+// F84: this was the one paid learner endpoint with neither a request limit nor
+// spend accounting -- every call opens a per-minute-billed vendor session.
+// Four opens per five minutes covers a flaky-connection retry; a loop does not
+// get to buy avatar minutes invisibly.
+if (\local_ai_course_assistant\rate_limiter::is_rate_limited($USER->id, 'talking_avatar_open', 4, 300)) {
+    echo json_encode(['ok' => false, 'reason' => 'ratelimited',
+        'error' => get_string('soapbox:rate_limited', 'local_ai_course_assistant')]);
+    exit;
+}
+// One open session per learner. A second tab (or a crafted loop) used to open
+// a second billable vendor session while the first kept running; the sweeper
+// eventually closes orphans, but minutes accrue until it does.
+global $DB;
+$opensessions = $DB->count_records_select(
+    'local_ai_course_assistant_avatar_sess',
+    'userid = :uid AND ended_at IS NULL AND started_at > :cutoff',
+    ['uid' => $USER->id, 'cutoff' => time() - 3600]
+);
+if ($opensessions >= 2) {
+    echo json_encode(['ok' => false, 'reason' => 'session_open',
+        'error' => get_string('talking_avatar:session_failed', 'local_ai_course_assistant')]);
+    exit;
+}
+
 $driver = provider_factory::make();
 if ($driver === null || !$driver->is_configured()) {
     echo json_encode(['ok' => false, 'reason' => 'unconfigured',
@@ -79,7 +103,10 @@ try {
         $courseid,
         (string) ($session['provider'] ?? $driver->get_key()),
         (string) (get_config('local_ai_course_assistant', $driver->get_key() . '_persona_id') ?: ''),
-        (string) ($session['session_token'] ?? '')
+        // upstream_session_id when the driver distinguishes it (HeyGen and
+        // D-ID carry a different id in the viewer URL than their credential);
+        // session_token as the fallback for drivers where they are the same.
+        (string) ($session['upstream_session_id'] ?? $session['session_token'] ?? '')
     );
     echo json_encode(array_merge(['ok' => true, 'session_rowid' => $rowid], $session));
 } catch (\Throwable $e) {

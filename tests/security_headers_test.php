@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_ai_course_assistant\security::build_security_headers
  */
 final class security_headers_test extends \advanced_testcase {
-
     public function test_raw_endpoint_sends_strict_csp(): void {
         $h = security::build_security_headers(false);
         $this->assertArrayHasKey('Content-Security-Policy', $h);

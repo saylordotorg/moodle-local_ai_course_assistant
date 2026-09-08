@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class spend_guard {
-
     public const SCOPE_SITE      = 'site';
     public const SCOPE_COURSE    = 'course';
 
@@ -81,14 +80,53 @@ class spend_guard {
     /**
      * Get the spend cap in USD for a scope and capability. 0 = unlimited.
      *
-     * Precedence: per-course override (if a positive course cap is set)
-     * beats site cap. Per-capability cap (if set) stacks on top.
+     * PRECEDENCE: THE MOST SPECIFIC CAP THAT IS SET WINS.
+     *
+     * Ordered from most to least specific, first positive value returned:
+     *
+     *   1. Per-course cap        -- names one course. The narrowest scope, so it
+     *                               wins outright: an admin who caps one runaway
+     *                               course means that number, not a site-wide
+     *                               per-capability figure that happens to differ.
+     *   2. Per-capability cap    -- site-wide, but limited to chat / voice / rag /
+     *                               analytics.
+     *   3. Per-course default    -- site-wide fallback applied to every course
+     *                               with no explicit cap of its own.
+     *   4. Site cap              -- the whole installation.
+     *
+     * Caps do NOT stack and are not combined by minimum: the most specific one
+     * that is set replaces the others entirely. That is what makes the setting
+     * predictable to an admin -- the number you typed on the course is the number
+     * that applies, and you do not have to reason about a site-wide setting
+     * silently overriding it.
+     *
+     * v7.3.1 (F40): the per-capability branch used to return before the
+     * per-course branch was reached, so a site-wide capability cap silently beat
+     * an explicit per-course cap -- the least specific setting winning over the
+     * most specific. Order corrected here; tests/course_spend_cap_test.php pins it.
      *
      * @param int $courseid 0 for site-wide
      * @param string|null $capability One of: chat, voice, rag, analytics, or null for total
      * @return float USD cap; 0.0 if unlimited
      */
     public static function get_cap(int $courseid = 0, ?string $capability = null): float {
+        // 1. Per-course cap -- the most specific scope, so it wins outright.
+        //
+        // v7.3.0 (F31): this read $coursecfg['spend_cap_monthly'] out of
+        // course_config_manager::get_effective_config(), which returns exactly six
+        // keys and never that one. There was also no column to store it and no UI
+        // to set it, so the branch was dead from v5.13 to v7.2.10 and every course
+        // silently fell through to the site-wide default. Per-course caps are now
+        // a real column, read directly rather than through the provider-override
+        // merge -- see course_config_manager::get_spend_cap() for why.
+        if ($courseid > 0) {
+            $coursecap = course_config_manager::get_spend_cap($courseid);
+            if ($coursecap > 0) {
+                return $coursecap;
+            }
+        }
+
+        // 2. Per-capability cap -- site-wide, narrowed to one capability.
         if ($capability !== null) {
             $rawcap = get_config('local_ai_course_assistant', 'spend_cap_' . $capability);
             $val = ($rawcap === false || $rawcap === '') ? 0.0 : (float) $rawcap;
@@ -96,22 +134,20 @@ class spend_guard {
                 return $val;
             }
         }
-        // Per-course cap takes priority when positive.
+
+        // 3. Site-wide default per-course cap (v5.13.0). Lets an admin set a
+        // defensive cap once (say $30/mo) that propagates to every course
+        // without an explicit override, so a runaway course is bounded even
+        // when no one has tuned its individual settings.
         if ($courseid > 0) {
-            $coursecfg = course_config_manager::get_effective_config($courseid);
-            if (!empty($coursecfg['spend_cap_monthly']) && (float) $coursecfg['spend_cap_monthly'] > 0) {
-                return (float) $coursecfg['spend_cap_monthly'];
-            }
-            // v5.13.0: site-wide default per-course cap. Lets an admin set a
-            // defensive cap once (say $30/mo) that propagates to every course
-            // without an explicit override, so a runaway course is bounded
-            // even when no one has tuned its individual settings.
             $rawdefault = get_config('local_ai_course_assistant', 'spend_cap_per_course_default');
             $coursedefault = ($rawdefault === false || $rawdefault === '') ? 0.0 : (float) $rawdefault;
             if ($coursedefault > 0) {
                 return $coursedefault;
             }
         }
+
+        // 4. Site cap -- the whole installation.
         $rawsite = get_config('local_ai_course_assistant', 'spend_cap_site');
         return ($rawsite === false || $rawsite === '') ? 0.0 : (float) $rawsite;
     }
@@ -155,7 +191,16 @@ class spend_guard {
 
         $since = self::period_start();
         $params = ['since' => $since];
-        $where = "m.role = 'assistant' AND m.model_name IS NOT NULL AND m.timecreated >= :since";
+        // Billable-row predicate is shared with analytics rather than inlined.
+        // This clause used to read role='assistant', which made the 'rag'
+        // capability impossible to satisfy: capability_sql('rag') requires an
+        // embedding/rerank interaction_type, and those rows are always
+        // role='system', so the intersection was empty for every row in the
+        // table. RAG spend therefore computed as $0.00 no matter how much
+        // indexing had run, and the "RAG" line in the admin spend panel was
+        // permanently zero.
+        $where = analytics::spend_rows_predicate('m')
+            . " AND m.model_name IS NOT NULL AND m.timecreated >= :since";
 
         if ($courseid > 0) {
             $where .= ' AND m.courseid = :courseid';
@@ -196,14 +241,18 @@ class spend_guard {
      * @param string $capability
      * @return string SQL clause
      */
-    private static function capability_sql(string $capability): string {
+    public static function capability_sql(string $capability): string {
         switch ($capability) {
             case 'chat':
                 return "(m.interaction_type IS NULL OR m.interaction_type IN ('chat','quiz',''))";
             case 'voice':
-                return "m.interaction_type IN ('voice','openai_tts','xai_tts','openai_whisper','openai_stt','xai_stt')";
+                return "m.interaction_type IN ('voice','openai_tts','xai_tts','openai_whisper','openai_stt','xai_stt','selfhosted_stt')";
             case 'rag':
-                return "m.interaction_type IN ('embedding','embed')";
+                // 'rerank' belongs to RAG spend too: voyage_reranker is the second
+                // half of the retrieval pipeline and was in no capability bucket at
+                // all, so its cost fell outside every per-capability total.
+                // 'embed' is kept for any legacy rows written under that type.
+                return "m.interaction_type IN ('embedding','embed','rerank')";
             case 'analytics':
                 return "m.interaction_type = 'meta'";
             default:
@@ -212,21 +261,46 @@ class spend_guard {
     }
 
     /**
+     * Is the emergency chat stop engaged?
+     *
+     * check() folds this into CAP_BLOCKED so that everything which already
+     * refuses on a spend cap also refuses here. But the two are not the same
+     * event and must not be handled the same way: a spend cap means "this
+     * provider's budget is gone, use another one", while the emergency stop
+     * means "stop answering". Callers that respond to CAP_BLOCKED by failing
+     * over need to ask this first, or the kill switch quietly turns into a
+     * provider switch and chat keeps answering.
+     *
+     * @return bool
+     */
+    public static function emergency_chat_stopped(): bool {
+        return (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled');
+    }
+
+    /**
      * Check whether a new request under this scope/capability is allowed.
      * Emits notification emails when crossing 80% and 95% thresholds.
      *
      * @param int $courseid 0 for site-wide
      * @param string|null $capability
+     * @param bool $notify Whether crossing a threshold sends the notification emails
      * @return string One of the CAP_* constants
      */
-    public static function check(int $courseid = 0, ?string $capability = null): string {
+    public static function check(int $courseid = 0, ?string $capability = null, bool $notify = true): string {
         // v5.13.0: emergency_control --chat sets a dedicated flag that
-        // short-circuits every chat-shaped call (and only chat-shaped calls)
-        // to CAP_BLOCKED so the friendly "SOLA paused" path runs. Previously
+        // short-circuits chat-shaped calls to CAP_BLOCKED so the friendly
+        // "SOLA paused" path runs. Note that since v7.2.1 this is no longer the
+        // only place the flag is enforced: base_provider::enforce_learner_guards()
+        // consults it for EVERY provider call, capability-blind and without the
+        // site-admin exemption, because a kill switch with exemptions is not one.
+        // The scope of the switch is therefore wider than this method alone
+        // suggests -- see emergency:flag_chat_desc, which documents it. Previously
         // emergency_control wrote spend_cap_site=0 thinking 0 = paused, but
         // get_cap() treats 0 as unlimited, so --chat was a silent no-op.
-        if (($capability === 'chat' || $capability === null)
-                && (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled')) {
+        if (
+            ($capability === 'chat' || $capability === null)
+                && (bool) get_config('local_ai_course_assistant', 'emergency_chat_disabled')
+        ) {
             return self::CAP_BLOCKED;
         }
         $cap = self::get_cap($courseid, $capability);
@@ -237,15 +311,21 @@ class spend_guard {
         $pct = $cap > 0 ? ($spent / $cap) : 0;
 
         if ($pct >= 1.0) {
-            self::maybe_notify(self::CAP_BLOCKED, $courseid, $capability, $spent, $cap);
+            if ($notify) {
+                self::maybe_notify(self::CAP_BLOCKED, $courseid, $capability, $spent, $cap);
+            }
             return self::CAP_BLOCKED;
         }
         if ($pct >= 0.95) {
-            self::maybe_notify(self::CAP_WARN_95, $courseid, $capability, $spent, $cap);
+            if ($notify) {
+                self::maybe_notify(self::CAP_WARN_95, $courseid, $capability, $spent, $cap);
+            }
             return self::CAP_WARN_95;
         }
         if ($pct >= 0.80) {
-            self::maybe_notify(self::CAP_WARN_80, $courseid, $capability, $spent, $cap);
+            if ($notify) {
+                self::maybe_notify(self::CAP_WARN_80, $courseid, $capability, $spent, $cap);
+            }
             return self::CAP_WARN_80;
         }
         return self::CAP_OK;
@@ -271,7 +351,9 @@ class spend_guard {
         if ($recipients === '') {
             // Fall back to site admins.
             $admins = get_admins();
-            $recipients = implode(',', array_map(function($a) { return $a->email; }, $admins));
+            $recipients = implode(',', array_map(function ($a) {
+                return $a->email;
+            }, $admins));
         }
         if ($recipients === '') {
             return;
@@ -283,8 +365,12 @@ class spend_guard {
         $body = "SOLA spend has crossed a configured threshold.\n\n"
             . "Scope: {$scope}\n"
             . "Period: " . self::period_label() . " (since " . userdate(self::period_start()) . ")\n"
-            . sprintf("Spent: \$%.2f of \$%.2f cap (%d%%)\n",
-                $spent, $cap, (int) round(($spent / $cap) * 100))
+            . sprintf(
+                "Spent: \$%.2f of \$%.2f cap (%d%%)\n",
+                $spent,
+                $cap,
+                (int) round(($spent / $cap) * 100)
+            )
             . "Level: {$level}\n\n"
             . "If the level is 'blocked', new requests under this scope are currently paused. "
             . "They will resume automatically at the start of the next period, or when the cap is raised.\n\n"
@@ -297,8 +383,12 @@ class spend_guard {
             if (email_optout::is_opted_out($email, email_optout::TYPE_SPEND_ALERT)) {
                 continue;
             }
-            $bodywithfooter = email_footer::append_text($body, $email,
-                email_optout::TYPE_SPEND_ALERT, $reason);
+            $bodywithfooter = email_footer::append_text(
+                $body,
+                $email,
+                email_optout::TYPE_SPEND_ALERT,
+                $reason
+            );
             $user = \core_user::get_noreply_user();
             $to = clone $user;
             $to->email = $email;
@@ -394,10 +484,16 @@ class spend_guard {
             }
             $parts = array_map('trim', explode('|', $cprow));
             if (strtolower($parts[0] ?? '') === strtolower($label) && !empty($parts[1])) {
+                // v7.2.8: the 3rd column is the row's model list
+                // (provider_id|api_key|model1,model2|temperature|baseurl). It was
+                // parsed for the LLM picker but dropped here, so a failover entry
+                // had no model of its own and inherited the primary's.
+                $rowmodels = array_values(array_filter(array_map('trim', explode(',', (string) ($parts[2] ?? '')))));
                 return [
                     'provider'   => strtolower($parts[0]),
                     'apikey'     => $parts[1],
                     'label'      => $label,
+                    'model'      => $rowmodels[0] ?? '',
                     'apibaseurl' => $parts[4] ?? '',
                 ];
             }
@@ -434,9 +530,9 @@ class spend_guard {
         $rows = [];
         $scopes = [
             ['label' => 'All capabilities (site)', 'capability' => null],
-            ['label' => 'Chat',      'capability' => 'chat'],
-            ['label' => 'Voice',     'capability' => 'voice'],
-            ['label' => 'RAG',       'capability' => 'rag'],
+            ['label' => 'Chat', 'capability' => 'chat'],
+            ['label' => 'Voice', 'capability' => 'voice'],
+            ['label' => 'RAG', 'capability' => 'rag'],
             ['label' => 'Analytics', 'capability' => 'analytics'],
         ];
         foreach ($scopes as $s) {
@@ -448,7 +544,16 @@ class spend_guard {
                 'spent' => $spent,
                 'cap'   => $cap,
                 'pct'   => $pct,
-                'level' => self::check(0, $s['capability']),
+                // $notify = false: this is a READ-ONLY status panel.
+                //
+                // check() fires maybe_notify(), which sends the spend-alert
+                // email and then sets a once-per-period suppression flag. With
+                // five scopes, merely loading token_analytics.php sent up to
+                // five alerts and consumed the suppression -- so an admin
+                // refreshing the dashboard during an incident is precisely how
+                // the real 95% warning fails to arrive. Rendering a number must
+                // never consume the alert about that number.
+                'level' => self::check(0, $s['capability'], false),
             ];
         }
         return $rows;

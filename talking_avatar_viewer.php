@@ -49,13 +49,31 @@ $lang = optional_param('lang', 'en', PARAM_ALPHA);
 // prove the requester owns the session. Verify the avatar session belongs to
 // the current user before exposing its stream, so a leaked or guessed
 // (sid, tok) pair cannot be replayed by a different logged-in user.
-if ($sid !== '' && !\local_ai_course_assistant\talking_avatar_session_manager::user_owns_session(
-        (int) $USER->id, $provider, $sid)) {
-    throw new \moodle_exception('nopermissions', 'error', '',
-        \local_ai_course_assistant\branding::apply(get_string('talking_avatar:viewer_title', 'local_ai_course_assistant')));
+//
+// v7.0.1 (AUTH002): the check used to be short-circuited by `$sid !== ''`, so
+// omitting the parameter skipped ownership verification entirely and rendered
+// the stage plus the operator's third-party bundle for any logged-in user. An
+// absent sid is now a failed check, matching user_owns_session()'s own
+// fail-closed contract for an empty id. Both callers that link here
+// (did_provider, heygen_provider) always send sid, so nothing legitimate
+// depended on the bypass.
+if (!\local_ai_course_assistant\talking_avatar_session_manager::user_owns_session(
+    (int) $USER->id,
+    $provider,
+    $sid
+)) {
+    throw new \moodle_exception(
+        'nopermissions',
+        'error',
+        '',
+        \local_ai_course_assistant\branding::apply(get_string('talking_avatar:viewer_title', 'local_ai_course_assistant'))
+    );
 }
 
-\local_ai_course_assistant\security::send_security_headers();
+// Full-page mode: this page renders through $OUTPUT with Moodle's own JS, and
+// the strict endpoint CSP (no unsafe-eval) breaks YUI/requirejs on full pages
+// -- see build_security_headers()'s own docblock, which this call contradicted.
+\local_ai_course_assistant\security::send_security_headers(true);
 
 $PAGE->set_url(new moodle_url('/local/ai_course_assistant/talking_avatar_viewer.php'));
 $PAGE->set_context(context_system::instance());

@@ -2,12 +2,13 @@
 
 A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-aware tutoring, support, and study planning for students.
 
-## Version 6.8.6
+## Version 7.2.0
 
-**Release Date:** July 2026
-**Requires:** Moodle 4.5+ (2024100700)
+**Release Date:** August 2026
+**Plugin build:** 2026082700
+**Requires:** Moodle 4.5+ (2024100700). Tested through Moodle 5.3 LTS.
 **License:** GPL v3+
-**Maturity:** Stable. In production at saylor.org for a 30-course pilot.
+**Maturity:** Stable. In production on Saylor's Learn and Degrees sites.
 
 See the [Changelog](https://github.com/saylordotorg/moodle-local_ai_course_assistant/wiki/Changelog) for what's new and the [GitHub Releases](https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases) page for the canonical version list.
 
@@ -21,7 +22,7 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Floating Chat Widget:** Non-intrusive, always-available AI tutor on course pages
 - **Context-Aware:** Ingests course structure to provide relevant, course-specific guidance
 - **Streaming Responses:** Real-time SSE (Server-Sent Events) for responsive user experience
-- **Multi-Provider Support:** Claude, OpenAI, Ollama, MiniMax, custom OpenAI-compatible APIs
+- **Multi-Provider Support:** Moodle's own core_ai subsystem, Anthropic Claude, OpenAI, Google Gemini, DeepSeek, Together AI, Mistral, xAI, OpenRouter, Ollama, MiniMax, and any OpenAI-compatible endpoint including self-hosted models. The shipped default is "Auto", which uses core_ai when no key of your own is configured
 - **Role-Based Behavior:** Adapts responses for students, academic support staff, and administrators
 
 ### Student Features
@@ -30,11 +31,34 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Study Planning:** Personalized study schedules based on available hours per week
 - **Reminders:** Opt-in email/WhatsApp study reminders with country restrictions
 - **AI Literacy:** Teaches students how to use AI effectively
-- **Multilingual:** Auto-detects and responds in 100+ languages
+- **Multilingual:** Ships in 46 languages, interface and speech included. Detects the language a learner writes in and replies in it, per message, with no configuration
 - **Conversation Persistence:** Continues conversations where students left off
 - **Audio Playback:** Listen to AI responses using Text-to-Speech
 - **Copy Conversations:** Export chat history to clipboard
 - **Data Management:** Self-service data deletion from user settings
+
+### Practice and Assessment
+- **Practice Quizzes:** Generated from the course's own material, answered inside the drawer, with per-question feedback and a score summary. These are practice only and separate from the course's Moodle quizzes
+- **Flashcards:** Generated from a page or activity, with spaced-repetition review
+- **Spoken Presentation Practice (Soapbox):** Learners record a talk against an instructor-configured assignment; it is transcribed and scored against a rubric with per-criterion feedback. Audio is deleted on a retention schedule, and only the transcript and score are kept. Four speaking levels including three ESL tiers
+- **Essay Feedback:** Rubric-based scoring with per-criterion commentary
+- **Academic Integrity:** The assistant is unavailable while a learner has a Moodle quiz attempt in progress. On by default for every quiz, checked on the server against the learner's live attempts rather than against whatever page the browser reports, and applied to every surface including voice. A teacher can exempt an individual quiz
+
+### Voice
+- **Speech Input:** Dictate questions instead of typing, in the same 46 languages as the interface
+- **Spoken Responses:** Text-to-speech playback of answers
+- **Live Voice Mode:** Optional two-way spoken conversation using OpenAI's Realtime API, with a live transcript and ELL coaching
+- **Self-hosted Speech-to-Text:** Point at any OpenAI-compatible Whisper server for transcription at no per-minute cost
+
+### Retrieval (RAG)
+- **Semantic Retrieval:** Answers are grounded in the actual course content rather than general web knowledge. Indexes pages, books, files, PDF, DOCX, PPTX, H5P and SCORM content, plus transcripts for embedded video
+- **Index Size Control:** Stored vectors can be kept at full precision or compressed to roughly a quarter or a thirtieth of the space, so a large catalogue does not force a large disk
+- **Optional Re-ranking:** Two-stage retrieval with a cross-encoder for harder queries
+
+### Course Backup and Restore
+- Per-course configuration, learning objectives, rubrics and Soapbox assignments travel with a course backup, so duplicating or restoring a course keeps its AI setup
+- Learner conversations, study plans, streaks, practice scores and flashcards are included only when the backup includes users
+- Per-course API keys are deliberately excluded from backup files, and the RAG index is rebuilt by reindexing rather than carried inside every backup
 
 ### Academic Support Features
 - **Analytics Dashboard:** Monitor student engagement and trends

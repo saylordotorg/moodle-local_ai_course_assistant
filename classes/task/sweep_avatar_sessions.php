@@ -31,7 +31,6 @@ use local_ai_course_assistant\talking_avatar_session_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sweep_avatar_sessions extends \core\task\scheduled_task {
-
     public function get_name(): string {
         return get_string('task:sweep_avatar_sessions', 'local_ai_course_assistant');
     }

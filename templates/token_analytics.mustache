@@ -1,4 +1,33 @@
 {{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_ai_course_assistant/token_analytics
+
+    Token usage and cost breakdown by category and model.
+
+    @package    local_ai_course_assistant
+    @copyright  2026 Saylor Academy
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+    }
+}}
+{{!
     Token usage and cost analytics page — admin only.
 
     @template local_ai_course_assistant/token_analytics
@@ -66,20 +95,20 @@
 <div class="aica-cost-page">
 
     <div class="aica-cost-nav">
-        <a href="{{analytics_url}}">&larr; Back to Analytics</a>
+        <a href="{{analytics_url}}">&larr; {{str_back}}</a>
         <span style="color:#d1d5db">|</span>
-        <strong style="font-size:20px;color:#111827">Token Usage &amp; Cost</strong>
+        <strong style="font-size:20px;color:#111827">{{str_heading}}</strong>
     </div>
 
     {{! ── Filters ─────────────────────────────────────────────────────────── }}
     <div class="aica-cost-filters">
-        <span class="aica-cost-filter-label">Period:</span>
-        <a href="{{url_7}}"  class="aica-cost-range-btn {{#range_7_active}}active{{/range_7_active}}">7 days</a>
-        <a href="{{url_30}}" class="aica-cost-range-btn {{#range_30_active}}active{{/range_30_active}}">30 days</a>
-        <a href="{{url_90}}" class="aica-cost-range-btn {{#range_90_active}}active{{/range_90_active}}">90 days</a>
-        <a href="{{url_all}}" class="aica-cost-range-btn {{#range_all_active}}active{{/range_all_active}}">All time</a>
+        <span class="aica-cost-filter-label">{{str_period}}</span>
+        <a href="{{url_7}}"  class="aica-cost-range-btn {{#range_7_active}}active{{/range_7_active}}">{{str_range_7}}</a>
+        <a href="{{url_30}}" class="aica-cost-range-btn {{#range_30_active}}active{{/range_30_active}}">{{str_range_30}}</a>
+        <a href="{{url_90}}" class="aica-cost-range-btn {{#range_90_active}}active{{/range_90_active}}">{{str_range_90}}</a>
+        <a href="{{url_all}}" class="aica-cost-range-btn {{#range_all_active}}active{{/range_all_active}}">{{str_range_all}}</a>
         &nbsp;
-        <label for="aica-course-select">Course:</label>
+        <label for="aica-course-select">{{str_course}}</label>
         <select id="aica-course-select" onchange="window.location=this.value">
             {{#courses}}
             <option value="/local/ai_course_assistant/token_analytics.php?range={{../range}}&amp;courseid={{id}}"
@@ -91,28 +120,31 @@
     {{! ── Summary cards ───────────────────────────────────────────────────── }}
     <div class="aica-cost-cards">
         <div class="aica-cost-card">
-            <div class="aica-cost-card__label">AI Responses</div>
+            <div class="aica-cost-card__label">{{str_card_responses}}</div>
             <div class="aica-cost-card__value">{{grand_responses}}</div>
         </div>
         <div class="aica-cost-card">
-            <div class="aica-cost-card__label">Prompt Tokens</div>
+            <div class="aica-cost-card__label">{{str_card_prompt}}</div>
             <div class="aica-cost-card__value">{{grand_prompt}}</div>
         </div>
         <div class="aica-cost-card">
-            <div class="aica-cost-card__label">Completion Tokens</div>
+            <div class="aica-cost-card__label">{{str_card_completion}}</div>
             <div class="aica-cost-card__value">{{grand_completion}}</div>
         </div>
         <div class="aica-cost-card">
-            <div class="aica-cost-card__label">Total Tokens</div>
+            <div class="aica-cost-card__label">{{str_card_total}}</div>
             <div class="aica-cost-card__value">{{grand_total_tokens}}</div>
         </div>
         <div class="aica-cost-card aica-cost-card--highlight">
-            <div class="aica-cost-card__label">Estimated Cost</div>
+            <div class="aica-cost-card__label">{{str_card_cost}}</div>
             <div class="aica-cost-card__value">{{grand_cost}}</div>
+            {{#cost_partial}}
+            <div class="aica-cost-card__warn text-warning small">{{cost_partial_note}}</div>
+            {{/cost_partial}}
         </div>
         {{#has_cache_data}}
         <div class="aica-cost-card">
-            <div class="aica-cost-card__label">Cached Tokens ({{cached_pct}}% of prompt)</div>
+            <div class="aica-cost-card__label">{{str_card_cached}}</div>
             <div class="aica-cost-card__value">{{cached_tokens}}</div>
         </div>
         {{/has_cache_data}}
@@ -122,15 +154,15 @@
     {{#has_spend_status}}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
-            <p class="aica-cost-section__title">Spend status</p>
-            <p class="aica-cost-section__sub">{{spend_period_label}} period, since {{spend_period_start}}. Configure caps in Settings &rarr; Spend guard and optimizer.</p>
+            <p class="aica-cost-section__title">{{str_spend_title}}</p>
+            <p class="aica-cost-section__sub">{{str_spend_sub}}</p>
         </div>
         <table class="aica-cost-table">
             <thead><tr>
-                <th>Scope</th>
-                <th style="text-align:right">Spent</th>
-                <th style="text-align:right">Cap</th>
-                <th>Status</th>
+                <th>{{str_col_scope}}</th>
+                <th style="text-align:right">{{str_col_spent}}</th>
+                <th style="text-align:right">{{str_col_cap}}</th>
+                <th>{{str_col_status}}</th>
             </tr></thead>
             <tbody>
                 {{#spend_status}}
@@ -148,7 +180,7 @@
                         </div>
                         {{/cap_is_set}}
                         {{^cap_is_set}}
-                        <span class="text-muted" style="font-size:12px">no cap</span>
+                        <span class="text-muted" style="font-size:12px">{{str_no_cap}}</span>
                         {{/cap_is_set}}
                     </td>
                 </tr>
@@ -161,16 +193,14 @@
     {{! ── Optimizer recommendations (v3.9.9+) ──────────────────────────── }}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
-            <p class="aica-cost-section__title">LLM Optimizer</p>
-            <p class="aica-cost-section__sub">Projected monthly spend at current mix: <strong>{{opt_projection_amount}}</strong>
-                ({{opt_projection_days}} days of data, {{opt_projection_confidence}} confidence).
-                Recommendations rank each capability's providers by composite cost + quality score.</p>
+            <p class="aica-cost-section__title">{{str_opt_title}}</p>
+            <p class="aica-cost-section__sub">{{{str_opt_sub}}}</p>
         </div>
         <table class="aica-cost-table">
             <thead><tr>
-                <th>Capability</th>
-                <th>Active</th>
-                <th>Top recommendations</th>
+                <th>{{str_col_capability}}</th>
+                <th>{{str_col_active}}</th>
+                <th>{{str_col_recommendations}}</th>
             </tr></thead>
             <tbody>
                 {{#opt_rows}}
@@ -188,17 +218,17 @@
     {{#has_by_category}}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
-            <p class="aica-cost-section__title">Cost by Category</p>
-            <p class="aica-cost-section__sub">Token totals grouped by workload: student Chat, Voice (Realtime / TTS / STT), RAG embedding, Learning Radar analytics queries.</p>
+            <p class="aica-cost-section__title">{{str_bycat_title}}</p>
+            <p class="aica-cost-section__sub">{{str_bycat_sub}}</p>
         </div>
         <table class="aica-cost-table">
             <thead>
                 <tr>
-                    <th>Category</th>
-                    <th style="text-align:right">Responses</th>
-                    <th style="text-align:right">Prompt tokens</th>
-                    <th style="text-align:right">Completion tokens</th>
-                    <th style="text-align:right">Total tokens</th>
+                    <th>{{str_col_category}}</th>
+                    <th style="text-align:right">{{str_col_responses}}</th>
+                    <th style="text-align:right">{{str_col_prompt_tokens}}</th>
+                    <th style="text-align:right">{{str_col_completion_tokens}}</th>
+                    <th style="text-align:right">{{str_col_total_tokens}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -219,20 +249,20 @@
     {{! ── By model ────────────────────────────────────────────────────────── }}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
-            <p class="aica-cost-section__title">Cost by Model</p>
-            <p class="aica-cost-section__sub">Responses with confirmed token data, grouped by model and provider.</p>
+            <p class="aica-cost-section__title">{{str_bymodel_title}}</p>
+            <p class="aica-cost-section__sub">{{str_bymodel_sub}}</p>
         </div>
         {{#has_by_model}}
         <table class="aica-cost-table">
             <thead>
                 <tr>
-                    <th>Model</th>
-                    <th>Provider</th>
-                    <th style="text-align:right">Responses</th>
-                    <th style="text-align:right">Prompt tokens</th>
-                    <th style="text-align:right">Completion tokens</th>
-                    <th style="text-align:right">Total tokens</th>
-                    <th style="text-align:right">Est. cost</th>
+                    <th>{{str_col_model}}</th>
+                    <th>{{str_col_provider}}</th>
+                    <th style="text-align:right">{{str_col_responses}}</th>
+                    <th style="text-align:right">{{str_col_prompt_tokens}}</th>
+                    <th style="text-align:right">{{str_col_completion_tokens}}</th>
+                    <th style="text-align:right">{{str_col_total_tokens}}</th>
+                    <th style="text-align:right">{{str_col_est_cost}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -253,12 +283,11 @@
         </table>
         {{/has_by_model}}
         {{^has_by_model}}
-        <p class="aica-cost-empty">No token data recorded yet. Token tracking begins with v1.1.0.</p>
+        <p class="aica-cost-empty">{{str_no_data_tracking}}</p>
         {{/has_by_model}}
         {{#has_missing}}
         <div class="aica-cost-alert">
-            &#9888; <strong>{{missing_count}}</strong> assistant messages in this period have no token data
-            (generated before v1.1.0 or by a provider that does not report usage).
+            &#9888; {{{str_missing_note}}}
         </div>
         {{/has_missing}}
     </div>
@@ -267,7 +296,7 @@
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
             <p class="aica-cost-section__title">{{#str}}analytics:avatar_cost_heading, local_ai_course_assistant{{/str}}</p>
-            <p class="aica-cost-section__sub">Per-minute streaming cost across the four configured talking-avatar providers. Heartbeat-based — webhook-confirmed sessions are exact, others are estimated from session open/close.</p>
+            <p class="aica-cost-section__sub">{{str_avatar_sub}}</p>
         </div>
         {{#avatar_has_rows}}
         <table class="aica-cost-table">
@@ -291,7 +320,7 @@
                 </tr>
                 {{/avatar_rows}}
                 <tr class="aica-cost-table__total">
-                    <td>Total</td>
+                    <td>{{str_avatar_total_row}}</td>
                     <td class="num">{{avatar_grand_sessions}}</td>
                     <td class="num">{{avatar_grand_minutes}}</td>
                     <td></td>
@@ -308,20 +337,20 @@
     {{! ── Per student ─────────────────────────────────────────────────────── }}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
-            <p class="aica-cost-section__title">Cost per Student</p>
-            <p class="aica-cost-section__sub">Top 100 students by token usage. Cost estimated using the model of their most recent session.</p>
+            <p class="aica-cost-section__title">{{str_bystudent_title}}</p>
+            <p class="aica-cost-section__sub">{{str_bystudent_sub}}</p>
         </div>
         {{#has_by_student}}
         <table class="aica-cost-table">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Student</th>
-                    <th style="text-align:right">Responses</th>
-                    <th style="text-align:right">Prompt tokens</th>
-                    <th style="text-align:right">Completion tokens</th>
-                    <th style="text-align:right">Total tokens</th>
-                    <th style="text-align:right">Est. cost</th>
+                    <th>{{str_col_student}}</th>
+                    <th style="text-align:right">{{str_col_responses}}</th>
+                    <th style="text-align:right">{{str_col_prompt_tokens}}</th>
+                    <th style="text-align:right">{{str_col_completion_tokens}}</th>
+                    <th style="text-align:right">{{str_col_total_tokens}}</th>
+                    <th style="text-align:right">{{str_col_est_cost}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -340,22 +369,21 @@
         </table>
         {{/has_by_student}}
         {{^has_by_student}}
-        <p class="aica-cost-empty">No token data recorded yet.</p>
+        <p class="aica-cost-empty">{{str_no_data}}</p>
         {{/has_by_student}}
     </div>
 
     {{! ── Rate card reference ─────────────────────────────────────────────── }}
     <div class="aica-cost-section">
         <div class="aica-cost-section__header">
-            <p class="aica-cost-section__title">Rate Card Reference</p>
-            <p class="aica-cost-section__sub">USD per 1,000,000 tokens. Model strings are matched by prefix.
-               Update <code>classes/token_cost_manager.php</code> when provider pricing changes.</p>
+            <p class="aica-cost-section__title">{{str_ratecard_title}}</p>
+            <p class="aica-cost-section__sub">{{{str_ratecard_sub}}}</p>
         </div>
         <div class="aica-rate-grid">
             {{#rate_cards}}
             <div class="aica-rate-item">
                 <span class="aica-rate-item__model">{{model}}</span>
-                <span class="aica-rate-item__price">in {{input_per_1m}} / out {{output_per_1m}}</span>
+                <span class="aica-rate-item__price">{{price_label}}</span>
             </div>
             {{/rate_cards}}
         </div>

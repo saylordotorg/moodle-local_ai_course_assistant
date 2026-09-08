@@ -24,7 +24,6 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface provider_interface {
-
     /**
      * Send a chat completion request (non-streaming).
      *
