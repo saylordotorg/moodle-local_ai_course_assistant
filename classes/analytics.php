@@ -627,6 +627,130 @@ class analytics {
     }
 
     /**
+     * Per-provider USD spend for one calendar month.
+     *
+     * This is what the Saylor AI Spend dashboard pulls (see
+     * \local_ai_course_assistant\spend_export for the contract and the endpoint).
+     * It differs from get_token_costs() in three ways that all matter here:
+     *
+     *  - The window is a CLOSED month [start, end) in UTC, never an open-ended
+     *    lower bound. `since`-shaped windows are right for "last 30 days" panels
+     *    and wrong for monthly billing: with an open upper bound every month
+     *    would contain every earlier month, so each month's spend would be
+     *    re-reported in every later pull and the dashboard's yearly total would
+     *    be a running sum of running sums.
+     *  - It groups by provider as well as model, because the dashboard bills by
+     *    vendor and one vendor serves several models.
+     *  - It COUNTS what it could not price instead of dropping it.
+     *    token_cost_manager::estimate_cost() returns null for a model with no
+     *    rate-card prefix and every existing caller reads that null as "add
+     *    nothing", which is how 100% of production chat spend came to report as
+     *    $0.00: gemini-2.5-flash matched no prefix. v7.4.0 fixes the rate card,
+     *    but the failure mode is structural — the next unpriced model does the
+     *    same thing silently. `unpriced_rows` / `unpriced_models` make a
+     *    reported zero distinguishable from an actual zero.
+     *
+     * Pricing resolves through \local_ai_course_assistant\model_registry (since
+     * v7.4.0 estimate_cost() is a thin wrapper over it), so an admin correcting a
+     * price in the model registry table changes this figure with no code deploy.
+     *
+     * Row selection is spend_rows_predicate() verbatim: it encodes the
+     * assistant-vs-system and interaction_type rules, and hand-rolling the
+     * condition is what produced both the RAG-priced-at-$0.00 bug and the
+     * premium_router double-count.
+     *
+     * A provider whose every model was unpriced still appears, at 0.0, rather
+     * than vanishing from the map: an explicit zero next to a non-zero
+     * `unpriced_rows` is far more likely to be noticed than an absent key.
+     *
+     * @param string $month Calendar month as YYYY-MM.
+     * @return array{by_provider: array<string, float>, by_model: array<string, float>,
+     *               unpriced_rows: int, unpriced_models: string[]}
+     * @throws \invalid_parameter_exception When $month is not a valid YYYY-MM.
+     */
+    public static function get_monthly_provider_spend(string $month): array {
+        global $DB;
+
+        // Parsing lives in spend_export so the endpoint can reject a bad month
+        // before doing any work, without a second copy of the regex here.
+        $range = spend_export::month_range($month);
+        if ($range === null) {
+            // The offending value is deliberately not interpolated: it is
+            // attacker-controlled and this message reaches the error log.
+            throw new \invalid_parameter_exception('Month must be a valid calendar month formatted YYYY-MM');
+        }
+        [$start, $end] = $range;
+
+        $where = "m.timecreated >= :monthstart AND m.timecreated < :monthend
+                  AND m.model_name IS NOT NULL AND m.model_name <> :emptymodel
+                  AND " . self::spend_rows_predicate('m');
+        $params = ['monthstart' => $start, 'monthend' => $end, 'emptymodel' => ''];
+
+        // Recordset, not get_records_sql: the grouping key is (provider, model),
+        // so the first selected column repeats across models and get_records_sql
+        // would keep only the last model of each provider.
+        $sql = "SELECT COALESCE(m.provider, 'unknown') AS provider,
+                       m.model_name,
+                       COUNT(m.id) AS callcount,
+                       SUM(COALESCE(m.prompt_tokens, 0)) AS prompttokens,
+                       SUM(COALESCE(m.completion_tokens, 0)) AS completiontokens
+                  FROM {local_ai_course_assistant_msgs} m
+                 WHERE {$where}
+              GROUP BY COALESCE(m.provider, 'unknown'), m.model_name";
+
+        $byprovider = [];
+        $bymodel = [];
+        $unpricedrows = 0;
+        $unpricedmodels = [];
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $row) {
+            $provider = (string) $row->provider;
+            $model = (string) $row->model_name;
+            $cost = token_cost_manager::estimate_cost(
+                $model,
+                (int) $row->prompttokens,
+                (int) $row->completiontokens
+            );
+
+            // Register the provider even when nothing here can be priced.
+            if (!array_key_exists($provider, $byprovider)) {
+                $byprovider[$provider] = 0.0;
+            }
+
+            if ($cost === null) {
+                $unpricedrows += (int) $row->callcount;
+                $unpricedmodels[$model] = true;
+                continue;
+            }
+
+            $byprovider[$provider] += $cost;
+            $bymodel[$model] = ($bymodel[$model] ?? 0.0) + $cost;
+        }
+        $rs->close();
+
+        // Round only at the end: rounding each group first would drift on a
+        // month with thousands of groups.
+        foreach ($byprovider as $key => $value) {
+            $byprovider[$key] = round($value, 6);
+        }
+        foreach ($bymodel as $key => $value) {
+            $bymodel[$key] = round($value, 6);
+        }
+        ksort($byprovider);
+        ksort($bymodel);
+        $unpricedmodels = array_keys($unpricedmodels);
+        sort($unpricedmodels);
+
+        return [
+            'by_provider' => $byprovider,
+            'by_model' => $bymodel,
+            'unpriced_rows' => $unpricedrows,
+            'unpriced_models' => $unpricedmodels,
+        ];
+    }
+
+    /**
      * Get per-student usage summary for a course.
      *
      * @param int $courseid

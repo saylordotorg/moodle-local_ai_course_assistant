@@ -23,7 +23,12 @@ namespace local_ai_course_assistant;
  * Model strings are matched by prefix (longest match wins) so new dated
  * model variants (e.g. gpt-4o-2024-11-20) are covered automatically.
  *
- * Update the rate card when providers change pricing.
+ * v7.4.0: the table below is now only the BASELINE layer. Resolution happens in
+ * {@see model_registry}, which merges this baseline with the legacy
+ * `rate_card_overrides` blob and then with the admin-editable
+ * local_ai_course_assistant_models table. Correcting a price no longer needs a
+ * code edit — add or edit a registry row. Edit this table only when shipping a
+ * release-time correction for every site.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant
@@ -77,8 +82,8 @@ class token_cost_manager {
         // would otherwise inherit the shorter prefix's rate.
         // Deliberately NO bare 'voyage' or 'rerank' catch-all: an unrecognized
         // future model should return null (unknown) rather than be priced at a
-        // guessed rate. Admins can still add one via the rate_card_overrides
-        // setting without a code change.
+        // guessed rate. Admins can still add one as a model_registry row
+        // without a code change.
         'voyage-4-large'         => ['input' => 0.12, 'output' => 0.00],
         'voyage-4-lite'          => ['input' => 0.02, 'output' => 0.00],
         'voyage-4'               => ['input' => 0.06, 'output' => 0.00],
@@ -109,15 +114,42 @@ class token_cost_manager {
         'whisper'           => ['input' => 6.00, 'output' => 0.00],
 
         // ── Anthropic Claude ──────────────────────────────────────────────────
-        'claude-haiku'      => ['input' => 0.80, 'output' => 4.00],
+        // Corrected in v7.4.0: this block was a full generation stale. Opus was
+        // listed at 15.00/75.00 and Haiku at 0.80/4.00 — the Claude 3/4-era
+        // prices — so every premium-router escalation to claude-sonnet-5 and
+        // every anti-cheat reference call to claude-haiku-4-5 was priced against
+        // the wrong card. The bare-family prefixes now carry the CURRENT
+        // generation's price, on the reasoning that an unrecognized future dated
+        // variant is better priced at today's rate than at a rate three years
+        // old; the explicitly named models below win on longest-prefix anyway.
+        'claude-haiku-4-5'  => ['input' => 1.00, 'output' => 5.00],
+        'claude-haiku'      => ['input' => 1.00, 'output' => 5.00],
+        'claude-sonnet-5'   => ['input' => 3.00, 'output' => 15.00],
         'claude-sonnet'     => ['input' => 3.00, 'output' => 15.00],
-        'claude-opus'       => ['input' => 15.00, 'output' => 75.00],
+        'claude-opus-5'     => ['input' => 5.00, 'output' => 25.00],
+        'claude-opus'       => ['input' => 5.00, 'output' => 25.00],
 
         // ── DeepSeek ──────────────────────────────────────────────────────────
         'deepseek-chat'     => ['input' => 0.14, 'output' => 0.28],
         'deepseek-reasoner' => ['input' => 0.55, 'output' => 2.19],
 
         // ── Google Gemini ─────────────────────────────────────────────────────
+        // gemini-2.5-flash is SOLA's PRODUCTION chat tutor, and until v7.4.0 it
+        // matched no prefix in this table at all. get_rates() returned null,
+        // estimate_cost() returned null, and every consumer treats null as
+        // "skip" rather than as an error — so 100% of production chat spend
+        // computed as $0.00. The spend caps, the anomaly detector and the
+        // dashboards all read zero and all agreed with each other, which is why
+        // it survived a release. tests/model_registry_test.php now pins these
+        // two numbers for exactly that reason.
+        // Rates from ai.google.dev/gemini-api/docs/pricing (fetched 2026-09-08),
+        // USD per 1M tokens, paid tier. The 0.30 input rate is text/image/video;
+        // audio input is 1.00 and is NOT modeled here (SOLA sends audio through
+        // Whisper/Realtime, not through the Gemini chat path). The 2.50 output
+        // rate INCLUDES thinking tokens, so no separate reasoning-token line is
+        // needed — Gemini bills them at the output rate.
+        'gemini-2.5-flash-lite' => ['input' => 0.10, 'output' => 0.40],
+        'gemini-2.5-flash'  => ['input' => 0.30, 'output' => 2.50],
         'gemini-2.0-flash'  => ['input' => 0.10, 'output' => 0.40],
         'gemini-1.5-flash'  => ['input' => 0.075, 'output' => 0.30],
         'gemini-1.5-pro'    => ['input' => 1.25, 'output' => 5.00],
@@ -203,16 +235,21 @@ class token_cost_manager {
      * @return array|null ['input' => float, 'output' => float] or null.
      */
     public static function get_rates(string $modelname): ?array {
-        $modelname = strtolower(trim($modelname));
-        $best    = null;
-        $bestlen = 0;
-        foreach (self::get_effective_rate_cards() as $prefix => $rates) {
-            if (str_starts_with($modelname, $prefix) && strlen($prefix) > $bestlen) {
-                $best    = $rates;
-                $bestlen = strlen($prefix);
-            }
-        }
-        return $best;
+        return model_registry::rate_for($modelname);
+    }
+
+    /**
+     * The committed baseline layer, unmerged.
+     *
+     * {@see model_registry} reads this as layer 1 and then applies the legacy
+     * override blob and the models table on top. Nothing else should read it:
+     * a caller wanting "the price of this model" wants the merged view, which
+     * is {@see get_rates()}.
+     *
+     * @return array<string, array{input: float, output: float}>
+     */
+    public static function baseline_rate_cards(): array {
+        return self::$rate_cards;
     }
 
     /**
@@ -257,41 +294,18 @@ class token_cost_manager {
     }
 
     /**
-     * v4.6.0: merge the hardcoded {@see $rate_cards} table with any admin-
-     * supplied JSON overrides from the `rate_card_overrides` setting. The
-     * override format is `{"model_prefix": {"input": float, "output":
-     * float}}` — overriding a prefix replaces both rates. New prefixes
-     * present only in the override are added to the table.
+     * The merged rate card: committed baseline, then the legacy
+     * `rate_card_overrides` blob, then the v7.4.0 models table.
      *
-     * Lets admins follow vendor pricing changes without a code edit.
-     * Errors in the JSON are silently ignored at runtime so a malformed
-     * paste does not break cost estimation; admins see the parse error
-     * when they save the setting.
+     * v7.4.0: the merge itself moved to {@see model_registry::effective_rates()}
+     * so that pricing has ONE resolver with provenance, instead of a private
+     * helper here plus a weekly job that overwrote the override blob wholesale.
+     * This wrapper stays because get_all_rates() below is a display path and
+     * reads the whole map, not a single model.
      *
      * @return array<string, array{input: float, output: float}>
      */
     private static function get_effective_rate_cards(): array {
-        $base = self::$rate_cards;
-        $rawjson = (string) (get_config('local_ai_course_assistant', 'rate_card_overrides') ?: '');
-        if (trim($rawjson) === '') {
-            return $base;
-        }
-        $decoded = json_decode($rawjson, true);
-        if (!is_array($decoded)) {
-            return $base;
-        }
-        foreach ($decoded as $prefix => $rates) {
-            if (!is_string($prefix) || !is_array($rates)) {
-                continue;
-            }
-            if (!isset($rates['input']) || !isset($rates['output'])) {
-                continue;
-            }
-            $base[strtolower(trim($prefix))] = [
-                'input'  => (float) $rates['input'],
-                'output' => (float) $rates['output'],
-            ];
-        }
-        return $base;
+        return model_registry::effective_rates();
     }
 }

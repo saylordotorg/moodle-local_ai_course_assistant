@@ -32,6 +32,14 @@ if 'Invalid login' in body or 'loginerrormessage' in body:
     print('LOGIN FAILED'); sys.exit(2)
 print('login ok')
 
+# The php-diagnostic / moodle-debugging detectors only see anything when the
+# target site renders notices. Assert it rather than trusting it: a smoke that
+# silently cannot detect its own failure class is worse than no smoke.
+code, dbg = get(BASE + '/admin/settings.php?section=debugging')
+if 'DEVELOPER' not in dbg and 'debugdisplay' not in dbg:
+    print('WARNING: could not confirm developer debugging on the target site;')
+    print('         the php-diagnostic detectors may be inert.')
+
 P = '/local/ai_course_assistant/'
 PAGES = [
     ('objectives_admin (picker)', P + 'objectives_admin.php'),
@@ -57,6 +65,26 @@ PAGES = [
     ('sandbox',                    P + 'sandbox.php?courseid=2'),
     ('soapbox',                    P + 'soapbox.php?courseid=2'),
     ('prompt_playground',          P + 'prompt_playground.php'),
+    # Added in v7.4.0. course_settings.php is first for a reason: it rendered
+    # its own source code from v7.3.0 to v7.3.5 and an outside user found it
+    # before this smoke did, because the page was not in this list.
+    ('course_settings',            P + 'course_settings.php?courseid=2'),
+    ('model_registry',             P + 'model_registry.php'),
+    ('rag_admin',                  P + 'rag_admin.php'),
+    ('audit_log',                  P + 'audit_log.php'),
+    ('emergency_admin',            P + 'emergency_admin.php'),
+    ('admin_user_data',            P + 'admin_user_data.php'),
+    ('backend_selftest',           P + 'backend_selftest.php'),
+    ('deployment_profile',         P + 'deployment_profile.php'),
+    ('vendor_dpa',                 P + 'vendor_dpa.php'),
+    # NOT smokeable by GET (verified, not assumed): rate_card_refresh.php is an
+    # action endpoint -- require_sesskey() at line 35, then it performs the
+    # refresh -- so a bare GET correctly refuses. Same for the POST-only and
+    # binary-upload endpoints (sse.php, transcribe.php, tts.php,
+    # soapbox_transcribe.php, spend_export.php, *_webhook.php).
+    ('starter_settings (course)',  P + 'starter_settings.php?courseid=2'),
+    ('flashcards',                 P + 'flashcards.php?courseid=2'),
+    ('instructor_dashboard',       P + 'instructor_dashboard.php?courseid=2'),
 ]
 BAD = [
     ('php-fatal',        re.compile(r'Fatal error|Parse error|Uncaught \w*(Error|Exception)')),
@@ -65,6 +93,16 @@ BAD = [
     ('unresolved-brand', re.compile(r'\[\[(tutorshort|tutorname|uniname|unishort)\]\]')),
     ('mustache-leak',    re.compile(r'\{\{[#/^]?[a-z_]')),
     ('raw-placeholder',  re.compile(r'\{\$a')),
+    # v7.4.0: a PHP delimiter in the response body means a block fell out of
+    # PHP mode and the page is serving its own source. This is the pattern
+    # that would have caught the course_settings.php defect (issue #218).
+    ('php-source-leak',  re.compile(r'<\?php|<\?=|\?>')),
+    # And the consequence, not just the cause. Local Moodle runs at
+    # DEVELOPER debug, so notices render; assert that below.
+    ('php-diagnostic',   re.compile(r'(?:Warning|Notice|Deprecated)\s*(?:</b>)?\s*:'
+                                    r'|Undefined variable|Undefined array key'
+                                    r'|Attempt to read property')),
+    ('moodle-debugging', re.compile(r'data-rel="debugging"')),
 ]
 fails = 0
 for name, path in PAGES:
@@ -85,6 +123,9 @@ for name, path in PAGES:
     # Prompt/report placeholder names are documented to admins as literal text.
     scan = re.sub(r'\{\{(coursename|userrole|institution|userid|courseid|messages|session_minutes|firstname)\}\}', '', scan)
     scan = re.sub(r'<script[^>]*>.*?</script>', '', scan, flags=re.S)
+    # An inline SVG may carry an XML declaration, the only legitimate '?>'
+    # in a response body.
+    scan = re.sub(r'<\?xml[^>]*\?>', '', scan)
     probs = [tag for tag, rx in BAD if rx.search(scan)]
     # a page that never rendered the plugin at all is also a failure
     if code != 200:

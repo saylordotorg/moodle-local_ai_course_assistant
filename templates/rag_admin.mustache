@@ -45,6 +45,14 @@
     * clearconfirm - Confirm prompt for the clear button.
     * courses - List of {id, fullname, courseurl, chunks, haschunks, embedded,
       hasembedded, lastindexed, hasindexed} rows.
+    * migration - v7.4.0 embedding-model migration. {configured} is false (and
+      the whole section is omitted) unless a target model is configured. When
+      true it also carries heading, desc, summary (trusted HTML), sameaslive,
+      progress, allcomplete, rows[{id, fullname, chunks, migrated, state,
+      statelabel, complete, pending, canqueue}], hasrows, the column labels,
+      queueone/queueall/queueallconfirm, the purge block (purgeheading,
+      purgedesc, haspurge, purgenone, purge, purgeconfirm) and the FAQ block
+      (faqheading, faqstate, faqstale, faqreembed).
 
     Example context (json):
     {
@@ -78,7 +86,8 @@
             "chunks": "12", "haschunks": true,
             "embedded": "12", "hasembedded": true,
             "lastindexed": "20/08/26, 14:03", "hasindexed": true
-        }]
+        }],
+        "migration": {"configured": false}
     }
 }}
 <div class="sola-ragadmin">
@@ -123,6 +132,112 @@
     {{#storageprojection}}
         <p class="text-muted sola-ragadmin__storagenote">{{.}}</p>
     {{/storageprojection}}
+
+    {{^migration.configured}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-2">{{migration.heading}}</h4>
+                <p class="text-muted mb-0">{{migration.notarget}}</p>
+            </div>
+        </div>
+    {{/migration.configured}}
+
+    {{#migration.configured}}
+        {{! ---------------------------------------------------------------
+            v7.4.0 embedding-model migration. One queued task per course; the
+            new vectors are written alongside the old ones, so the index keeps
+            serving until an administrator changes the live settings.
+        --------------------------------------------------------------- }}
+        <div class="card mb-4 sola-ragadmin__migration">
+            <div class="card-body">
+                <h4 class="mb-2">{{migration.heading}}</h4>
+                <p class="text-muted">{{migration.desc}}</p>
+                <p>{{{migration.summary}}}</p>
+                {{#migration.sameaslive}}
+                    <p class="text-muted">{{.}}</p>
+                {{/migration.sameaslive}}
+                <p><strong>{{migration.progress}}</strong></p>
+                {{#migration.allcomplete}}
+                    <div class="alert alert-success" role="alert">{{.}}</div>
+                {{/migration.allcomplete}}
+
+                <form method="post" action="{{posturl}}" class="mb-3"
+                      data-confirm="{{migration.queueallconfirm}}">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <input type="hidden" name="action" value="migrateall">
+                    <button type="submit" class="btn btn-primary">{{migration.queueall}}</button>
+                </form>
+
+                {{#migration.hasrows}}
+                    <div class="table-responsive">
+                        <table class="table table-sm generaltable mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{migration.colcourse}}</th>
+                                    <th class="text-right">{{migration.colchunks}}</th>
+                                    <th class="text-right">{{migration.colmigrated}}</th>
+                                    <th>{{migration.colstate}}</th>
+                                    <th>{{migration.colactions}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#migration.rows}}
+                                    <tr>
+                                        <td>{{fullname}}</td>
+                                        <td class="text-right">{{chunks}}</td>
+                                        <td class="text-right">{{migrated}}</td>
+                                        <td>
+                                            {{#complete}}<span class="badge badge-success">{{statelabel}}</span>{{/complete}}
+                                            {{#pending}}<span class="badge badge-info">{{statelabel}}</span>{{/pending}}
+                                            {{^complete}}{{^pending}}
+                                                <span class="badge badge-warning">{{statelabel}}</span>
+                                            {{/pending}}{{/complete}}
+                                        </td>
+                                        <td>
+                                            {{#canqueue}}
+                                                <form method="post" action="{{posturl}}" class="d-inline">
+                                                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                                                    <input type="hidden" name="action" value="migrateone">
+                                                    <input type="hidden" name="courseid" value="{{id}}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                        {{migration.queueone}}
+                                                    </button>
+                                                </form>
+                                            {{/canqueue}}
+                                        </td>
+                                    </tr>
+                                {{/migration.rows}}
+                            </tbody>
+                        </table>
+                    </div>
+                {{/migration.hasrows}}
+
+                <h5 class="mt-4">{{migration.purgeheading}}</h5>
+                {{#migration.haspurge}}
+                    <p class="text-muted">{{migration.purgedesc}}</p>
+                    <form method="post" action="{{posturl}}" data-confirm="{{migration.purgeconfirm}}">
+                        <input type="hidden" name="sesskey" value="{{sesskey}}">
+                        <input type="hidden" name="action" value="migratepurge">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">{{migration.purge}}</button>
+                    </form>
+                {{/migration.haspurge}}
+                {{^migration.haspurge}}
+                    <p class="text-muted mb-0">{{migration.purgenone}}</p>
+                {{/migration.haspurge}}
+
+                <h5 class="mt-4">{{migration.faqheading}}</h5>
+                <p class="text-muted">{{migration.faqstate}}</p>
+                {{#migration.faqstale}}
+                    <div class="alert alert-warning" role="alert">{{.}}</div>
+                {{/migration.faqstale}}
+                <form method="post" action="{{posturl}}">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <input type="hidden" name="action" value="faqreembed">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">{{migration.faqreembed}}</button>
+                </form>
+            </div>
+        </div>
+    {{/migration.configured}}
 
     <form method="post" action="{{posturl}}" class="mb-4" data-confirm="{{reindexallconfirm}}">
         <input type="hidden" name="sesskey" value="{{sesskey}}">

@@ -5892,3 +5892,19 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .aica-consent-pending .local-ai-course-assistant__bottom-nav {
     pointer-events: none;
 }
+
+/* ---------------------------------------------------------------------------
+   v7.4.0 model registry admin page (model_registry.php).
+   Namespaced under .sola-modelregistry. Only the things Bootstrap cannot do:
+   keep a long source URL and a JSON parse spec from stretching the layout, and
+   keep the notes row visually attached to the row it annotates. Identity
+   columns (model key, model name, fixture set) are deliberately NOT truncated
+   here -- a truncated identity column is what made a per-course benchmark
+   readout unusable, and an ellipsis on a model name would hide exactly the
+   character that distinguishes two models.
+   --------------------------------------------------------------------------- */
+.sola-modelregistry code { word-break: break-all; }
+.sola-modelregistry__url { max-width: 340px; }
+.sola-modelregistry__url code { font-size: 12px; }
+.sola-modelregistry__spec { font-family: monospace; font-size: 12px; }
+.sola-modelregistry__notes td { border-top: 0; padding-top: 0; }

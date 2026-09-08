@@ -272,4 +272,23 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // v7.4.0 - Daily model price drift check. For every enabled pricing
+        // source: fetch, parse, and compare against the model registry's
+        // effective rates. Produces PROPOSED findings only (missing / mismatch
+        // / new) - it never rewrites a price, because an automated feed
+        // silently overwriting a hand-entered correction is the defect v7.4.0
+        // fixed in the weekly refresher. Off by default; enable via
+        // price_drift_check_enabled. Runs at 05:40, after the overnight
+        // indexing tasks and before the 07:00 anomaly digest, so a drift
+        // finding is in the admin's inbox with the rest of the morning
+        // reports.
+        'classname' => \local_ai_course_assistant\task\model_price_drift_check::class,
+        'blocking' => 0,
+        'minute' => '40',
+        'hour' => '5',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

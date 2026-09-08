@@ -75,6 +75,9 @@ if ($hassiteconfig) {
     // read it -- Emergency Controls and per-call failover -- while no page
     // existed to read it in.
     $auditurl = new moodle_url('/local/ai_course_assistant/audit_log.php');
+    // v7.4.0: the model registry is where an unpriced model -- the state that
+    // made every production chat call report $0.00 -- is visible and fixable.
+    $modelregistrylinkurl = new moodle_url('/local/ai_course_assistant/model_registry.php');
     $quicklinks = '<a href="' . $analyticsurl->out() . '">'
             . get_string('toc:analytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $tokenanalyticsurl->out() . '">'
@@ -85,6 +88,8 @@ if ($hassiteconfig) {
             . get_string('toc:playground', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $auditurl->out() . '">'
             . \local_ai_course_assistant\branding::str('auditlog:settings_link') . '</a>'
+        . '<a href="' . $modelregistrylinkurl->out() . '">'
+            . \local_ai_course_assistant\branding::str('modelregistry:settings_link') . '</a>'
         . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
             . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 
@@ -804,6 +809,25 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
+    // v7.4.0: Voyage-only query/document projection. Default 'shared' sends the
+    // same input_type for both sides so a query and the corpus stay in one
+    // embedding space; 'asymmetric' restores the vendor's separate query
+    // projection, which has failed to reproduce a gain on this corpus twice.
+    // Switching modes needs no reindex: shared mode reuses the value the corpus
+    // was already indexed with, so only the query-side projection changes.
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/embed_input_type_mode',
+        get_string('settings:embed_input_type_mode', 'local_ai_course_assistant'),
+        get_string('settings:embed_input_type_mode_desc', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED,
+        [
+            \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED =>
+                get_string('settings:embed_input_type_shared', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_ASYMMETRIC =>
+                get_string('settings:embed_input_type_asymmetric', 'local_ai_course_assistant'),
+        ]
+    ));
+
     // v7.0.3: stored-vector quantization. int8 is a quarter of float32 and
     // binary an eighth of int8, at some cost in recall. Changing this requires a
     // full reindex — the encodings are not interchangeable, and the retriever
@@ -949,6 +973,18 @@ if ($hassiteconfig) {
         PARAM_FLOAT
     ));
 
+    // v7.4.0: cheap length gate ahead of the margin gate. The setting is the
+    // largest query length still SKIPPED, so the default 50 skips a 50-character
+    // query and reranks a 51-character one. 0 disables the gate, matching how
+    // rerank_margin_threshold treats 0.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rerank_min_query_chars',
+        get_string('settings:rerank_min_query_chars', 'local_ai_course_assistant'),
+        get_string('settings:rerank_min_query_chars_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\rag_retriever::RERANK_MIN_QUERY_CHARS_DEFAULT,
+        PARAM_INT
+    ));
+
     $ragadminurl = new moodle_url('/local/ai_course_assistant/rag_admin.php');
     $settings->add(new admin_setting_description(
         'local_ai_course_assistant/rag_admin_link',
@@ -958,6 +994,50 @@ if ($hassiteconfig) {
             get_string('ragadmin:view_status', 'local_ai_course_assistant'),
             ['class' => 'btn btn-secondary btn-sm']
         )
+    ));
+
+    // ── v7.4.0: embedding-model migration target ────────────────────────────
+    // These four describe the model being migrated TO, not the model serving
+    // retrieval. Changing embed_model/embed_dimensions above invalidates every
+    // stored vector at once (the retriever refuses to score across embedding
+    // spaces), which is why the migration re-embeds course by course against
+    // these values and leaves the live settings alone until the operator flips
+    // them. Deliberately NOT on the policy-bundle allowlist: a bundle that
+    // could set these could command a full re-embed of the corpus, which costs
+    // money, and one of them is a credential.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/embed_migration_heading',
+        get_string('settings:embed_migration_heading', 'local_ai_course_assistant'),
+        get_string('settings:embed_migration_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configselect(
+        'local_ai_course_assistant/embed_migration_target_provider',
+        get_string('settings:embed_migration_target_provider', 'local_ai_course_assistant'),
+        get_string('settings:embed_migration_target_provider_desc', 'local_ai_course_assistant'),
+        '',
+        \local_ai_course_assistant\embedding_migration::provider_options()
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_migration_target_model',
+        get_string('settings:embed_migration_target_model', 'local_ai_course_assistant'),
+        get_string('settings:embed_migration_target_model_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_TEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/embed_migration_target_dimensions',
+        get_string('settings:embed_migration_target_dimensions', 'local_ai_course_assistant'),
+        get_string('settings:embed_migration_target_dimensions_desc', 'local_ai_course_assistant'),
+        '0',
+        PARAM_INT
+    ));
+    // Password type, not configtext: a configtext credential has every
+    // historical value recorded in the clear in mdl_config_log.
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/embed_migration_target_apikey',
+        get_string('settings:embed_migration_target_apikey', 'local_ai_course_assistant'),
+        get_string('settings:embed_migration_target_apikey_desc', 'local_ai_course_assistant'),
+        ''
     ));
 
     // Content source extractors (v3.9.6+). Each flag gates a specific module
@@ -2674,6 +2754,21 @@ if ($hassiteconfig) {
         0
     ));
 
+    // v7.4.0: monthly AI-spend pull endpoint (spend_export.php). Empty = off,
+    // and the endpoint then returns a bare 404 so a disabled endpoint is
+    // indistinguishable from a missing file. Password type for the same reason
+    // redash_api_key is: a configtext credential has every historical value
+    // recorded in the clear in mdl_config_log. The key is read ONLY from an
+    // Authorization: Bearer header -- there is deliberately no query-string
+    // path, and no "link with the key baked in" affordance, because that is the
+    // leak redash_export.php had to paper over with HMAC download tokens.
+    $settings->add(new admin_setting_configpasswordunmask(
+        'local_ai_course_assistant/spend_export_key',
+        get_string('settings:spend_export_key', 'local_ai_course_assistant'),
+        get_string('settings:spend_export_key_desc', 'local_ai_course_assistant'),
+        ''
+    ));
+
     // v4.3.0: Real Redash integration. Three settings together let SOLA
     // push a Learning Radar query/response to Redash as a new saved query
     // via Redash's /api/queries endpoint. All three must be set for the
@@ -2812,6 +2907,112 @@ if ($hassiteconfig) {
         . implode(' &middot; ', $statusparts) . '</p>'
     ));
 
+    // ── v7.4.0: model registry, price drift, benchmarks, recommendations ────
+    // The rate-card settings above are the pre-v7.4.0 mechanism: one JSON blob
+    // that the weekly refresh overwrote wholesale. Everything below governs the
+    // replacement, which is a table with provenance, an admin page, and a check
+    // that notices when a model in real traffic has no price at all -- the state
+    // that made 100% of production chat spend compute as $0.00.
+    $modelregistryurl = new moodle_url('/local/ai_course_assistant/model_registry.php');
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/model_registry_link',
+        \local_ai_course_assistant\branding::str('modelregistry:navtitle'),
+        html_writer::link(
+            $modelregistryurl,
+            \local_ai_course_assistant\branding::str('modelregistry:title'),
+            ['class' => 'btn btn-secondary btn-sm']
+        )
+    ));
+
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/price_drift_heading',
+        get_string('pricedrift:heading', 'local_ai_course_assistant'),
+        ''
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/price_drift_check_enabled',
+        get_string('pricedrift:enabled', 'local_ai_course_assistant'),
+        get_string('pricedrift:enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/price_drift_tolerance_pct',
+        get_string('pricedrift:tolerance', 'local_ai_course_assistant'),
+        get_string('pricedrift:tolerance_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\task\model_price_drift_check::DEFAULT_TOLERANCE_PCT,
+        PARAM_FLOAT
+    ));
+
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/bench_heading',
+        get_string('settings:bench_heading', 'local_ai_course_assistant'),
+        \local_ai_course_assistant\branding::apply(
+            get_string('settings:bench_heading_desc', 'local_ai_course_assistant')
+        )
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/bench_default_samples',
+        get_string('settings:bench_default_samples', 'local_ai_course_assistant'),
+        get_string('settings:bench_default_samples_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\task\run_model_benchmark::DEFAULT_SAMPLES,
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/bench_min_quality_n',
+        get_string('settings:bench_min_quality_n', 'local_ai_course_assistant'),
+        get_string('settings:bench_min_quality_n_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\model_bench::MIN_QUALITY_N,
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/bench_judge_provider',
+        get_string('settings:bench_judge_provider', 'local_ai_course_assistant'),
+        get_string('settings:bench_judge_provider_desc', 'local_ai_course_assistant'),
+        'claude',
+        PARAM_ALPHANUMEXT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/bench_judge_model',
+        get_string('settings:bench_judge_model', 'local_ai_course_assistant'),
+        get_string('settings:bench_judge_model_desc', 'local_ai_course_assistant'),
+        'claude-sonnet-4-6',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/rec_heading',
+        \local_ai_course_assistant\branding::str('rec:cardtitle'),
+        ''
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rec_quality_epsilon',
+        \local_ai_course_assistant\branding::str('rec:settingname_epsilon'),
+        \local_ai_course_assistant\branding::str('rec:settingdesc_epsilon'),
+        (string) \local_ai_course_assistant\model_recommender::DEFAULT_QUALITY_EPSILON,
+        PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rec_savings_floor',
+        \local_ai_course_assistant\branding::str('rec:settingname_savingsfloor'),
+        \local_ai_course_assistant\branding::str('rec:settingdesc_savingsfloor'),
+        (string) \local_ai_course_assistant\model_recommender::DEFAULT_SAVINGS_FLOOR,
+        PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rec_quality_margin',
+        \local_ai_course_assistant\branding::str('rec:settingname_margin'),
+        \local_ai_course_assistant\branding::str('rec:settingdesc_margin'),
+        (string) \local_ai_course_assistant\model_recommender::DEFAULT_QUALITY_MARGIN,
+        PARAM_FLOAT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/rec_min_quality_n',
+        \local_ai_course_assistant\branding::str('rec:settingname_minqualityn'),
+        \local_ai_course_assistant\branding::str('rec:settingdesc_minqualityn'),
+        (string) \local_ai_course_assistant\model_recommender::DEFAULT_MIN_QUALITY_N,
+        PARAM_INT
+    ));
+
     // ── v5.3.0: Empathetic communications + carryover memory ───────────────
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/empathy_heading',
@@ -2910,13 +3111,14 @@ if ($hassiteconfig) {
             'rag_scope', 'rag_auto_reindex_drifted', 'rerank_enabled',
             'rag_extract_pdf', 'rag_extract_docx', 'rag_extract_pptx',
             'rag_extract_h5p', 'rag_extract_scorm', 'rag_fetch_transcripts',
+            'embed_input_type_mode',
         ],
         'rag_extract_pdf'   => ['rag_pdftotext_path'],
         'rag_extract_scorm' => ['rag_scorm_max_mb'],
         'rag_fetch_transcripts' => ['rag_iframe_host_patterns', 'rag_transcript_url_pattern'],
         'rerank_enabled' => [
             'rerank_apikey', 'rerank_model', 'rerank_apibaseurl',
-            'rerank_candidates', 'rerank_margin_threshold',
+            'rerank_candidates', 'rerank_margin_threshold', 'rerank_min_query_chars',
         ],
 
         // Provider routing.
@@ -2928,6 +3130,7 @@ if ($hassiteconfig) {
 
         // Monitoring and alerting.
         'cost_anomaly_enabled' => ['cost_anomaly_multiplier'],
+        'price_drift_check_enabled' => ['price_drift_tolerance_pct'],
         'unanswered_check_enabled' => [
             'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
         ],
@@ -3011,6 +3214,14 @@ if ($hassiteconfig) {
         'local_ai_course_assistant_rubric',
         get_string('rubric_admin:navtitle', 'local_ai_course_assistant'),
         new moodle_url('/local/ai_course_assistant/rubric_admin.php'),
+        'moodle/site:config'
+    ));
+
+    // v7.4.0: model registry + pricing sources + benchmarks + recommendations.
+    $ADMIN->add('local_ai_course_assistant', new admin_externalpage(
+        'local_ai_course_assistant_modelregistry',
+        \local_ai_course_assistant\branding::str('modelregistry:navtitle'),
+        new moodle_url('/local/ai_course_assistant/model_registry.php'),
         'moodle/site:config'
     ));
 
