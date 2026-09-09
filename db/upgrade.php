@@ -1827,5 +1827,40 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091000, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026091002) {
+        // v7.4.2: persist per-call reasoning ("thinking") token counts.
+        //
+        // The spend pipeline reads these msgs rows, so anything the provider
+        // reports but we never write is spend the AI Spend dashboard cannot
+        // see. Reasoning tokens were the biggest such hole: reconciling the
+        // logs against the Gemini invoice showed 0.35M completion tokens
+        // logged against 1.78M billed, because Gemini bills thinking as output
+        // and its OpenAI-compatibility shim reports it in
+        // completion_tokens_details.reasoning_tokens, which nothing read.
+        //
+        // Its own nullable column rather than being summed into
+        // completion_tokens, because whether reasoning is ALREADY inside
+        // completion_tokens is vendor-specific (OpenAI: yes; Gemini shim: not
+        // reliably). Storing it raw lets the consumer, which knows the
+        // provider, decide -- and keeps every pre-existing row honestly
+        // unknown instead of back-filled with a guess.
+        $table = new xmldb_table('local_ai_course_assistant_msgs');
+        $field = new xmldb_field(
+            'reasoning_tokens',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'cached_tokens'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026091002, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

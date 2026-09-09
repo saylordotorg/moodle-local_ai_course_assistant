@@ -1004,7 +1004,14 @@ try {
         $cachedtokens !== null ? (int) $cachedtokens : null,
         connection_aborted() ? 'client_aborted' : 'complete',
         $chunkcount ?? null,
-        $topscore ?? null
+        $topscore ?? null,
+        // v7.4.2: thinking tokens, stored as reported and NOT summed into
+        // completion_tokens -- OpenAI already counts reasoning there, Google's
+        // Gemini OpenAI-compat shim has not reliably done so while still
+        // billing thinking as output. Folding it in would double-count OpenAI;
+        // dropping it under-counts Gemini, which is the chat tier at Saylor
+        // and so the bulk of this table. The consumer knows the provider.
+        isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs
@@ -1153,11 +1160,44 @@ try {
         ? 'chat_paused'
         : 'sse_error';
     try {
+        // The provider layer throws moodle_exception with the real cause in
+        // debuginfo -- "HTTP 429: ...", a curl error, a vendor error type --
+        // so this is the handler that sees it for every provider failure. The
+        // Throwable handler below already records it; this one did not, which
+        // made the fix for the 2026-08 incident (ten courses failing for nine
+        // days behind an identical generic message) effective only for the
+        // exception class provider errors do NOT use.
+        //
+        // Deliberately NOT gated on debugdeveloper. The learner-facing string
+        // stays generic either way -- that is $msg, computed separately below.
+        // This is the admin-only audit trail, whose entire purpose is to
+        // survive a production site running with debug off, and it already
+        // carries de-anonymized export records.
+        //
+        // Ungated persistence is exactly why the string is redacted first.
+        // debuginfo here is raw provider output -- base_provider throws
+        // "HTTP {code}: {body}" with the vendor's unparsed error body, and puts
+        // the full endpoint URL in it when the SSRF validator rejects one. So a
+        // proxy base URL carrying credentials, or a vendor body echoing the
+        // Authorization header, would otherwise be written verbatim into a
+        // table that privacy/provider.php declares, audit_log.php displays and
+        // the learner's own data export includes. Truncation is not redaction:
+        // the first 500 characters of an error are where the key usually is.
+        // The 500-char bound stays as the second control, for the learner text
+        // that content-filter bodies quote back and no pattern can catch.
+        $auditentry = ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)];
+        if (!empty($e->debuginfo) && is_string($e->debuginfo)) {
+            $auditentry['detail'] = \core_text::substr(
+                \local_ai_course_assistant\security::redact_secrets((string) $e->debuginfo),
+                0,
+                500
+            );
+        }
         \local_ai_course_assistant\audit_logger::log(
             $auditaction,
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
-            ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]
+            $auditentry
         );
     } catch (\Throwable $ignore) {
         /* never let audit logging mask the real error */
@@ -1201,7 +1241,16 @@ try {
             : '';
         $entry = ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)];
         if ($detail !== '') {
-            $entry['detail'] = \core_text::substr($detail, 0, 500);
+            // v7.4.2: redacted before persisting, for the reason spelled out on
+            // the moodle_exception handler above. This handler has written raw
+            // debuginfo since the 2026-08 remediation; it carries the same
+            // credential exposure and is fixed with it rather than left as the
+            // one unredacted path.
+            $entry['detail'] = \core_text::substr(
+                \local_ai_course_assistant\security::redact_secrets($detail),
+                0,
+                500
+            );
         }
         \local_ai_course_assistant\audit_logger::log(
             \local_ai_course_assistant\spend_guard::emergency_chat_stopped()

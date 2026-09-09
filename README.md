@@ -2,10 +2,10 @@
 
 A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-aware tutoring, support, and study planning for students.
 
-## Version 7.4.1
+## Version 7.4.2
 
 **Release Date:** September 2026
-**Plugin build:** 2026091001
+**Plugin build:** 2026091002
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1; supported through 5.3.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.

@@ -42,6 +42,16 @@ defined('MOODLE_INTERNAL') || die();
  * and a real zero must be distinguishable by the dashboard, not just by whoever
  * happens to read the database.
  *
+ * v7.4.2 closes the second floor. Thinking tokens were never recorded at all,
+ * and on the production Gemini tier they are the larger half of billed output:
+ * reconciliation measured 0.35M completion tokens logged against 1.78M billed.
+ * They are now stored in msgs.reasoning_tokens and PRICED HERE, via
+ * analytics::get_monthly_provider_spend() -> token_cost_manager::estimate_cost(),
+ * which adds them to output only for providers that report them outside
+ * completion_tokens (see REASONING_OUTSIDE_COMPLETION_PREFIXES). The decision is
+ * NOT deferred to the Cloud Run shim: this endpoint exists to retire that shim,
+ * so a figure it returns has to be the whole bill and not a subset of it.
+ *
  * All logic lives here rather than in the page so it is testable without HTTP.
  *
  * @package    local_ai_course_assistant

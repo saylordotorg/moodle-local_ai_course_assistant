@@ -115,6 +115,18 @@ class score_essay extends external_api {
             return self::empty_result('provider_error');
         }
 
+        // Essay scoring is a real, billed provider call whose usage was being
+        // discarded, making its spend invisible to the AI Spend dashboard, the
+        // spend guard and the anomaly detector. Best-effort by contract: this
+        // must never be able to fail a learner's feedback request.
+        \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+            $provider,
+            (int) $USER->id,
+            (int) $params['courseid'],
+            'essay',
+            '[Essay] feedback'
+        );
+
         $decoded = json_decode($response, true);
         if (!$decoded || !isset($decoded['criteria'])) {
             if (preg_match('/\{[\s\S]*\}/', $response, $m)) {

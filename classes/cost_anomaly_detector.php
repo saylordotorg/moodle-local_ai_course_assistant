@@ -106,7 +106,8 @@ class cost_anomaly_detector {
             "SELECT " . $DB->sql_concat('m.model_name', "'_'", 'm.provider') . " AS id,
                     m.model_name AS model,
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0))  AS reasoning
                FROM {local_ai_course_assistant_msgs} m
               WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
@@ -117,10 +118,13 @@ class cost_anomaly_detector {
         );
         $total = 0.0;
         foreach ($rows as $r) {
+            // v7.4.2: see spend_guard::compute_spend(). A day whose spike was
+            // entirely thinking tokens was previously invisible to the detector.
             $cost = token_cost_manager::estimate_cost(
                 (string) $r->model,
                 (int) $r->prompt,
-                (int) $r->completion
+                (int) $r->completion,
+                (int) $r->reasoning
             );
             if ($cost !== null) {
                 $total += (float) $cost;
@@ -146,7 +150,8 @@ class cost_anomaly_detector {
                     m.courseid AS courseid,
                     m.model_name AS model,
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0))  AS reasoning
                FROM {local_ai_course_assistant_msgs} m
               WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
@@ -159,10 +164,15 @@ class cost_anomaly_detector {
         // Aggregate cost by courseid, then map to shortname.
         $bycourse = [];
         foreach ($rows as $r) {
+            // v7.4.2: same reasoning-token term as compute_daily_spend() above.
+            // These two numbers appear in the SAME alert email — the day total
+            // and the per-course breakdown that explains it — so pricing them
+            // differently would make the email disagree with itself.
             $cost = token_cost_manager::estimate_cost(
                 (string) $r->model,
                 (int) $r->prompt,
-                (int) $r->completion
+                (int) $r->completion,
+                (int) $r->reasoning
             );
             if ($cost === null) {
                 continue;

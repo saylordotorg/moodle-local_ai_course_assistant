@@ -214,7 +214,8 @@ class spend_guard {
             "SELECT " . $DB->sql_concat('m.model_name', "'_'", 'm.provider') . " AS id,
                     m.model_name AS model,
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0))  AS reasoning
                FROM {local_ai_course_assistant_msgs} m
               WHERE {$where}
               GROUP BY m.model_name, m.provider",
@@ -223,10 +224,16 @@ class spend_guard {
 
         $total = 0.0;
         foreach ($rows as $r) {
+            // v7.4.2: thinking tokens are part of what the cap is guarding
+            // against. estimate_cost() adds them only for providers that report
+            // them outside completion_tokens, so OpenAI is not charged twice.
+            // Without this a Gemini site burned roughly five times the spend the
+            // guard could see, so CAP_WARN_80 never fired on a real overspend.
             $cost = token_cost_manager::estimate_cost(
                 (string) $r->model,
                 (int) $r->prompt,
-                (int) $r->completion
+                (int) $r->completion,
+                (int) $r->reasoning
             );
             if ($cost !== null) {
                 $total += (float) $cost;

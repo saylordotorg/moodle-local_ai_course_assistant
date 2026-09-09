@@ -485,11 +485,26 @@ class analytics {
         // carry interaction_type='voice', and get_total_tokens() applies this
         // predicate without a model_name filter -- without the guard, learner
         // rows would join the spend totals.
+        // v7.4.2: the three ancillary endpoints join for the third time for the
+        // same reason. conversation_manager::log_ancillary_usage() writes
+        // flashcard, essay-scoring and insights spend as role='system' rows,
+        // so the role='assistant' arm can never match them. Adding the write
+        // side without adding the type here is the exact failure this comment
+        // has now documented twice: the row is written, counted by nothing, and
+        // priced at zero. tests/spend_predicate_coverage_test.php now asserts
+        // that every interaction_type conversation_manager writes is matched
+        // here, so a fourth one cannot be added silently.
+        //
+        // These land in no spend_guard::capability_sql() bucket, which is
+        // deliberate and unchanged: capability_sql is ANDed on AFTER this
+        // predicate, so per-capability caps still exclude them while the
+        // site-wide total, the anomaly detector and the dashboard now see them.
         return "({$alias}.role = 'assistant'
                  OR ({$alias}.role = 'system' AND {$alias}.interaction_type IN (
                      'embedding', 'rerank', 'quiz',
                      'voice', 'openai_tts', 'xai_tts',
-                     'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt')))";
+                     'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt',
+                     'flashcards', 'essay', 'insights')))";
     }
 
     /**
@@ -522,8 +537,16 @@ class analytics {
             $params['since'] = $since;
         }
 
+        // v7.4.2: add thinking tokens for the models whose provider reports them
+        // outside completion_tokens. This query prices nothing and groups by no
+        // model, so the vendor rule arrives as SQL rather than as a PHP branch;
+        // both come from the one prefix list in token_cost_manager. Adding
+        // reasoning unconditionally would double-count OpenAI, whose reported
+        // completion_tokens already contains it.
+        $extraoutput = token_cost_manager::extra_output_tokens_sql('m');
         $sql = "SELECT COALESCE(SUM(COALESCE(m.prompt_tokens, 0)
-                               + COALESCE(m.completion_tokens, 0)), 0)
+                               + COALESCE(m.completion_tokens, 0)
+                               + {$extraoutput}), 0)
                   FROM {local_ai_course_assistant_msgs} m
                  WHERE {$where}";
 
@@ -596,6 +619,7 @@ class analytics {
                        COUNT(m.id) AS response_count,
                        SUM(COALESCE(m.prompt_tokens, 0)) AS total_prompt_tokens,
                        SUM(COALESCE(m.completion_tokens, 0)) AS total_completion_tokens,
+                       SUM(COALESCE(m.reasoning_tokens, 0)) AS total_reasoning_tokens,
                        SUM(COALESCE(m.tokens_used, 0)) AS total_tokens
                   FROM {local_ai_course_assistant_msgs} m
                  WHERE {$where}
@@ -607,17 +631,24 @@ class analytics {
         foreach ($rs as $row) {
             $prompttokens = (int) $row->total_prompt_tokens;
             $completiontokens = (int) $row->total_completion_tokens;
+            // v7.4.2: reported separately AND priced. The per-model table and
+            // get_monthly_provider_spend() are read side by side, so a model
+            // priced without its thinking here and with it there would look
+            // like a bug in one of them.
+            $reasoningtokens = (int) $row->total_reasoning_tokens;
             $result[] = [
                 'model' => $row->model_name,
                 'category' => $row->category,
                 'response_count' => (int) $row->response_count,
                 'total_prompt_tokens' => $prompttokens,
                 'total_completion_tokens' => $completiontokens,
+                'total_reasoning_tokens' => $reasoningtokens,
                 'total_tokens' => (int) $row->total_tokens,
                 'estimated_cost_usd' => token_cost_manager::estimate_cost(
                     $row->model_name,
                     $prompttokens,
-                    $completiontokens
+                    $completiontokens,
+                    $reasoningtokens
                 ),
             ];
         }
@@ -689,11 +720,17 @@ class analytics {
         // Recordset, not get_records_sql: the grouping key is (provider, model),
         // so the first selected column repeats across models and get_records_sql
         // would keep only the last model of each provider.
+        // v7.4.2: reasoning_tokens is summed and handed to estimate_cost, which
+        // adds it to output only for models whose provider reports thinking
+        // OUTSIDE completion_tokens. Selecting it but not passing it is what
+        // would leave this endpoint reporting the same floor the Cloud Run shim
+        // reported: on Gemini, thinking was the larger half of real output.
         $sql = "SELECT COALESCE(m.provider, 'unknown') AS provider,
                        m.model_name,
                        COUNT(m.id) AS callcount,
                        SUM(COALESCE(m.prompt_tokens, 0)) AS prompttokens,
-                       SUM(COALESCE(m.completion_tokens, 0)) AS completiontokens
+                       SUM(COALESCE(m.completion_tokens, 0)) AS completiontokens,
+                       SUM(COALESCE(m.reasoning_tokens, 0)) AS reasoningtokens
                   FROM {local_ai_course_assistant_msgs} m
                  WHERE {$where}
               GROUP BY COALESCE(m.provider, 'unknown'), m.model_name";
@@ -710,7 +747,8 @@ class analytics {
             $cost = token_cost_manager::estimate_cost(
                 $model,
                 (int) $row->prompttokens,
-                (int) $row->completiontokens
+                (int) $row->completiontokens,
+                (int) $row->reasoningtokens
             );
 
             // Register the provider even when nothing here can be priced.
