@@ -2,11 +2,11 @@
 
 A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-aware tutoring, support, and study planning for students.
 
-## Version 7.2.0
+## Version 7.4.0
 
-**Release Date:** August 2026
-**Plugin build:** 2026082700
-**Requires:** Moodle 4.5+ (2024100700). Tested through Moodle 5.3 LTS.
+**Release Date:** September 2026
+**Plugin build:** 2026091000
+**Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1; supported through 5.3.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.
 
@@ -68,6 +68,10 @@ Originally built by Tom Caswell and David Ta at Saylor University, open-sourced 
 - **Off-Topic Detection:** Automatic identification of non-course-related conversations
 
 ### Administrative Features
+- **Model Registry:** One page listing every model the assistant can bill for, the price it bills at, and where that price came from -- built-in default, admin correction, or a vendor feed -- with who set it and when. Prices are corrected through a form, so keeping up with vendor pricing needs no code change and no deploy
+- **Price-Drift Checking:** Pricing sources are configurable rows with a declarative parse spec, so a new vendor feed is an admin form rather than new code. A daily task compares each source against the registry and *proposes* corrections; it never rewrites a price on its own, and its highest-severity finding is a model appearing in real traffic with no price at all -- the case that silently reports spend as $0.00
+- **Model Benchmarks and Recommendations:** Benchmark any registered model from the admin interface and compare it against the configured one on measured quality, cost per call and latency. Recommendations state their reasoning, and decline to compare when the sample is too small or spans a plugin release rather than guessing
+- **Spend Reporting:** An optional token-authenticated endpoint reports per-provider monthly spend for external dashboards, and reports how many rows it could not price so a real zero is distinguishable from a silent one. Off by default
 - **Comprehensive Settings:** Fine-tune behavior, limits, and integrations
 - **Off-Topic Management:** Configure limits and lockout duration
 - **Provider Configuration:** Choose and configure AI provider
