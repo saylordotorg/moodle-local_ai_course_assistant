@@ -317,7 +317,7 @@ $string['settings:embed_dtype_float'] = 'Full precision (largest, most accurate)
 $string['settings:embed_dtype_int8'] = 'Reduced precision — about a quarter of the space';
 $string['settings:embed_dtype_binary'] = 'Smallest — about a thirtieth of the space, lowest accuracy';
 $string['settings:embed_dimensions'] = 'Embedding Dimensions';
-$string['settings:embed_dimensions_desc'] = 'Number of dimensions in the embedding vector. Must match your model output. OpenAI text-embedding-3-small: 1536. nomic-embed-text: 768.';
+$string['settings:embed_dimensions_desc'] = 'Width of the embedding vector, which must be a width the model actually offers. OpenAI text-embedding-3-small: 1536. nomic-embed-text: 768. Voyage models accept 256, 512, 1024 and 2048 (the native 1024 is omitted from the request); an invalid width is omitted rather than sent, so you would silently get the native width instead of the one you asked for. voyage-4-large at 2048 is the measured configuration — +14.0 percentage points recall on realistic queries, under $4 a month — and adopting it requires a FULL RE-INDEX, because the retriever refuses to score a query against chunks from a different embedding space. Use the embedding-model migration on the RAG index page rather than changing this value first.';
 $string['settings:rag_topk'] = 'Top-K Chunks';
 $string['settings:rag_topk_desc'] = 'Number of most relevant chunks to retrieve per user query and inject into the system prompt. The default of 3 was chosen from a blind A/B over 40 questions in which 3 and 5 were statistically tied (11 wins vs 12, 17 ties) while 3 used 31% fewer prompt tokens. Raise it only if answers are visibly missing context.';
 $string['settings:rag_min_similarity'] = 'Minimum Relevance (cosine)';
@@ -1511,11 +1511,11 @@ $string['settings:vendor_dpa_admin_page_enabled_desc'] = 'When on, "Vendor DPA S
 $string['settings:vendor_dpa_overrides']      = 'Vendor DPA overrides (JSON)';
 $string['settings:vendor_dpa_overrides_desc'] = 'JSON object keyed by vendor id. Each value is an object whose fields override the hardcoded vendor row. Fields you do not specify fall through to the default. Example: <pre>{ "openai": { "dpa_status": "renegotiating" }, "newvendor": { "label": "New Vendor", "training_opt_out": "contractual", "dpa_status": "signed", "retention": "30 days", "dpa_link": "", "tier_ok": 2 } }</pre> A new vendor key in the override is added to the table; edits apply per field. Malformed JSON is ignored at runtime — fix the parse error here when the saved value does not appear in the Vendor DPA page.';
 $string['settings:rate_card_overrides']      = 'LLM rate card overrides (JSON)';
-$string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name prefix. Each value is <code>{"input": float, "output": float}</code> in USD per 1,000,000 tokens. Replaces the bundled rate card entry for that prefix. Example: <pre>{ "gpt-4o-mini": { "input": 0.15, "output": 0.60 }, "claude-sonnet-4.6": { "input": 3.00, "output": 15.00 } }</pre> Auto-refresh below populates this field from an upstream pricing manifest (default LiteLLM) on a weekly cron schedule. Manual edits here are preserved until the next refresh overwrites them.';
+$string['settings:rate_card_overrides_desc'] = 'JSON object keyed by model name prefix. Each value is <code>{"input": float, "output": float}</code> in USD per 1,000,000 tokens. Replaces the bundled rate card entry for that prefix. Example: <pre>{ "gpt-4o-mini": { "input": 0.15, "output": 0.60 }, "claude-sonnet-4.6": { "input": 3.00, "output": 15.00 } }</pre> Read-only from v7.4.0: this field is still merged (above the shipped baseline, below the model registry) so an existing override keeps working, but nothing writes to it any more and new prices belong in the model registry, which records who set each price and when. The weekly refresh used to overwrite this whole field, destroying any hand-entered price on the next run.';
 
 // v4.7.0: rate-card auto-refresh.
 $string['settings:rate_card_auto_refresh']      = 'Auto-refresh from upstream';
-$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task (Mondays 02:30 server time) fetches the upstream pricing JSON below, transforms it to [[tutorshort]]\'s rate-card schema, and writes it to the override field above. Default on — flip off to pin the rate card to whatever was last fetched / manually pasted. Failures keep the previous override in place; the last-refresh status appears under the Refresh now button.';
+$string['settings:rate_card_auto_refresh_desc'] = 'When on, a weekly scheduled task (Mondays 02:30 server time) fetches the upstream pricing JSON below, transforms it to [[tutorshort]]\'s rate-card schema, and writes each price into the model registry one row at a time. Default on — flip off to pin the rate card to whatever was last fetched or entered by hand. A price an administrator entered is never overwritten by this refresh, and a failed run writes nothing at all; the last-refresh status appears under the Refresh now button.';
 $string['settings:rate_card_upstream_url']      = 'Upstream pricing URL';
 $string['settings:rate_card_upstream_url_desc'] = 'URL of a JSON manifest in LiteLLM\'s schema (each entry has <code>input_cost_per_token</code>, <code>output_cost_per_token</code>, and <code>mode</code>). Default points at the community-maintained file in the LiteLLM GitHub repo. Override only if you mirror the manifest internally or maintain your own pricing source. URL is checked against the SSRF allowlist before fetch.';
 $string['settings:rate_card_refresh_now']        = 'Refresh now';
@@ -2917,3 +2917,313 @@ $string['quiz:error_noquestions'] = 'No valid questions in AI response.';
 
 $string['radar:js_name_prompt'] = 'Name for the new Redash query:';
 $string['radar:js_run_first'] = 'Run a query first.';
+
+// ---------------------------------------------------------------------------
+// v7.4.0 model registry, pricing sources, price drift, benchmarks,
+// recommendations, monthly spend export, and the embedding-model migration.
+// ---------------------------------------------------------------------------
+
+// Model registry admin page (model_registry.php + templates/model_registry.mustache).
+$string['modelregistry:navtitle'] = 'Model registry';
+$string['modelregistry:title'] = 'Model registry and pricing';
+$string['modelregistry:intro'] = 'Every model [[tutorshort]] can bill for, the price it is billed at, and where that price came from. A model with no price is not an error anywhere in the code: its spend simply computes as $0.00. Correct a price here rather than by editing a file — after a release there is no shell and no deploy.';
+$string['modelregistry:back_to_settings'] = 'Back to settings';
+$string['modelregistry:settings_link'] = 'Model registry';
+
+// Section: unpriced models observed in traffic. The headline of the page.
+$string['modelregistry:unpriced_heading'] = 'Unpriced models seen in real traffic';
+$string['modelregistry:unpriced_desc'] = 'These models appear in billable calls over the last {$a} days and match no price in the registry, so every one of those calls is currently reported as costing $0.00 — in the analytics pages, in the spend caps, in the anomaly detector and in the monthly export. Give each one a price.';
+$string['modelregistry:unpriced_none'] = 'Every model billed in the last {$a} days resolves to a price.';
+$string['modelregistry:unpriced_count'] = '{$a} unpriced model(s) in billable traffic';
+$string['modelregistry:col_model'] = 'Model';
+$string['modelregistry:col_provider'] = 'Provider';
+$string['modelregistry:col_calls'] = 'Billable calls';
+$string['modelregistry:col_tokens'] = 'Tokens';
+$string['modelregistry:col_lastseen'] = 'Last seen';
+$string['modelregistry:col_actions'] = 'Actions';
+$string['modelregistry:price_it'] = 'Set a price';
+
+// Section: effective merged rate card with provenance.
+$string['modelregistry:effective_heading'] = 'Effective prices';
+$string['modelregistry:effective_desc'] = 'The merged rate card, in the order it is resolved: the prices shipped in the code, then the legacy JSON override setting, then this registry table. A model name is matched against these keys longest-prefix-first, so <code>gemini-2.5-flash-lite</code> is priced by its own key rather than by <code>gemini-2.5-flash</code>. Prices are US dollars per 1,000,000 tokens.';
+$string['modelregistry:effective_none'] = 'No prices are resolvable at all. That is not an expected state — the baseline card ships in the code.';
+$string['modelregistry:col_prefix'] = 'Model key';
+$string['modelregistry:col_input'] = 'Input';
+$string['modelregistry:col_output'] = 'Output';
+$string['modelregistry:col_capability'] = 'Capability';
+$string['modelregistry:col_context'] = 'Context';
+$string['modelregistry:col_status'] = 'Status';
+$string['modelregistry:col_layer'] = 'Supplied by';
+$string['modelregistry:col_source'] = 'Source';
+$string['modelregistry:col_setby'] = 'Set by';
+$string['modelregistry:col_updated'] = 'Updated';
+$string['modelregistry:layer_baseline'] = 'Shipped baseline';
+$string['modelregistry:layer_legacy_overrides'] = 'Legacy JSON setting';
+$string['modelregistry:layer_table'] = 'This registry';
+$string['modelregistry:layer_none'] = 'Nothing';
+$string['modelregistry:source_manual'] = 'Entered by an administrator';
+$string['modelregistry:source_upstream'] = 'Weekly upstream refresh';
+$string['modelregistry:source_drift'] = 'Applied from a drift finding';
+$string['modelregistry:source_bundle'] = 'Signed policy bundle';
+$string['modelregistry:setby_feed'] = 'Automated feed';
+$string['modelregistry:notrecorded'] = 'Not recorded';
+$string['modelregistry:edit'] = 'Edit';
+$string['modelregistry:manual_wins'] = 'Administrator-entered rows are never overwritten by the weekly refresh or by a drift finding.';
+
+// Section: add or correct a model.
+$string['modelregistry:form_heading'] = 'Add or correct a model';
+$string['modelregistry:form_desc'] = 'Saving here records you as the author and pins the row against automated feeds. Leave a price empty to say it is unknown; an empty price is not a price of zero.';
+$string['modelregistry:field_modelkey'] = 'Model key';
+$string['modelregistry:field_modelkey_help'] = 'Lowercase. Either the exact model id the provider reports, or a shorter prefix that should cover a family.';
+$string['modelregistry:field_provider'] = 'Provider';
+$string['modelregistry:field_capability'] = 'Capability';
+$string['modelregistry:field_capability_help'] = 'Free text: chat, embedding, rerank, tts, stt, vision, judge. Not validated, so a new capability needs no code change.';
+$string['modelregistry:field_input_rate'] = 'Input price (USD per 1M tokens)';
+$string['modelregistry:field_output_rate'] = 'Output price (USD per 1M tokens)';
+$string['modelregistry:field_output_rate_help'] = 'For reasoning models this must be the price that includes thinking tokens, because that is what the provider bills.';
+$string['modelregistry:field_context_tokens'] = 'Context window (tokens)';
+$string['modelregistry:field_status'] = 'Status';
+$string['modelregistry:field_notes'] = 'Notes';
+$string['modelregistry:field_notes_help'] = 'Where the price came from and when you checked it. This is the only record of that.';
+$string['modelregistry:status_active'] = 'Active';
+$string['modelregistry:status_deprecated'] = 'Deprecated';
+$string['modelregistry:status_candidate'] = 'Candidate';
+$string['modelregistry:save'] = 'Save model';
+$string['modelregistry:delete'] = 'Delete';
+$string['modelregistry:delete_confirm'] = 'Delete this registry row? The price falls back to the shipped baseline, which may be a different number or none at all.';
+$string['modelregistry:saved_inserted'] = 'Added {$a} to the registry.';
+$string['modelregistry:saved_updated'] = 'Updated {$a}.';
+$string['modelregistry:saved_skipped'] = 'Nothing was written for {$a}: an administrator-entered row cannot be overwritten by an automated source.';
+$string['modelregistry:err_nokey'] = 'A model key is required.';
+$string['modelregistry:err_badrate'] = 'Prices must be numbers, or empty for unknown.';
+$string['modelregistry:deleted'] = 'Deleted the registry row for {$a}.';
+$string['modelregistry:err_norow'] = 'No registry row with that key.';
+
+// Section: pricing sources.
+$string['modelregistry:sources_heading'] = 'Pricing sources';
+$string['modelregistry:sources_desc'] = 'A pricing source is a row here, not a class in the code: a URL plus a declarative parse spec. Add a vendor feed without a deploy. Every fetch goes through the outbound-URL allowlist, redirects are not followed, and a source that parsed prices last time and none this time is reported as a regression rather than as an absence of prices.';
+$string['modelregistry:sources_none'] = 'No pricing sources are configured. The drift check has nothing to compare the registry against.';
+$string['modelregistry:col_name'] = 'Name';
+$string['modelregistry:col_url'] = 'URL';
+$string['modelregistry:col_format'] = 'Format';
+$string['modelregistry:col_enabled'] = 'Enabled';
+$string['modelregistry:col_lastfetch'] = 'Last fetch';
+$string['modelregistry:col_result'] = 'Result';
+$string['modelregistry:source_form_heading'] = 'Add or edit a pricing source';
+$string['modelregistry:field_name'] = 'Name';
+$string['modelregistry:field_url'] = 'URL';
+$string['modelregistry:field_url_help'] = 'https only, unless the host is listed in Moodle\'s trusted-endpoints setting. Redirects are refused, so enter the final URL.';
+$string['modelregistry:field_format'] = 'Format';
+$string['modelregistry:field_spec'] = 'Parse spec (JSON)';
+$string['modelregistry:field_spec_help'] = 'litellm: ignored. openrouter: optional scale and capability. json_generic: inputpath is required; also rowspath, modelpath, outputpath, providerpath, capabilitypath, contextpath, provider, capability, scale, stripvendorprefix. html_regex: pattern (no delimiters) plus groups, for example {"pattern":"([a-z0-9.-]+)\\\\s+$([0-9.]+)\\\\s+$([0-9.]+)","groups":{"model":1,"input":2,"output":3}}. Prices must end up in US dollars per 1,000,000 tokens after scale is applied.';
+$string['modelregistry:field_enabled'] = 'Enabled';
+$string['modelregistry:format_litellm'] = 'LiteLLM manifest';
+$string['modelregistry:format_openrouter'] = 'OpenRouter models API';
+$string['modelregistry:format_json_generic'] = 'Generic JSON (dot paths)';
+$string['modelregistry:format_html_regex'] = 'HTML or text (regex)';
+$string['modelregistry:save_source'] = 'Save source';
+$string['modelregistry:source_saved'] = 'Saved the pricing source "{$a}".';
+$string['modelregistry:source_deleted'] = 'Deleted the pricing source "{$a}".';
+$string['modelregistry:source_enabled'] = 'Enabled "{$a}".';
+$string['modelregistry:source_disabled'] = 'Disabled "{$a}".';
+$string['modelregistry:err_sourcename'] = 'A source needs a name.';
+$string['modelregistry:err_sourceurl'] = 'A source needs an https URL.';
+$string['modelregistry:err_sourceformat'] = 'Choose one of the supported source formats.';
+$string['modelregistry:err_sourcespec'] = 'The parse spec must be valid JSON, or empty.';
+$string['modelregistry:err_nosource'] = 'No pricing source with that id.';
+$string['modelregistry:enable'] = 'Enable';
+$string['modelregistry:disable'] = 'Disable';
+$string['modelregistry:yes'] = 'Yes';
+$string['modelregistry:no'] = 'No';
+$string['modelregistry:status_ok'] = 'OK';
+$string['modelregistry:status_error'] = 'Error';
+$string['modelregistry:never_fetched'] = 'Never fetched';
+
+// Section: drift findings.
+$string['modelregistry:drift_heading'] = 'Price drift findings';
+$string['modelregistry:drift_desc'] = 'What the enabled sources say, compared with what the registry charges. Nothing here has been applied: a price is a number an administrator is accountable for.';
+$string['modelregistry:drift_none'] = 'The last check found nothing to report.';
+$string['modelregistry:drift_never'] = 'The drift check has never run.';
+$string['modelregistry:drift_lastrun'] = 'Last checked {$a}.';
+$string['modelregistry:drift_tolerance'] = 'Reporting differences above {$a}%.';
+$string['modelregistry:drift_run_now'] = 'Check for drift now';
+$string['modelregistry:drift_ran'] = 'Drift check finished: {$a->missing} unpriced, {$a->mismatch} mismatched, {$a->new} unknown to the registry.';
+$string['modelregistry:drift_status_no_sources'] = 'No enabled pricing source, so nothing was compared.';
+$string['modelregistry:drift_status_all_sources_failed'] = 'Every enabled pricing source failed. The findings below, if any, are from traffic only.';
+$string['modelregistry:drift_truncated'] = '{$a} further finding(s) were not stored. Re-run the check after acting on these.';
+$string['modelregistry:drift_col_finding'] = 'Finding';
+$string['modelregistry:drift_col_proposed'] = 'Proposed (in / out)';
+$string['modelregistry:drift_col_registry'] = 'Registry (in / out)';
+$string['modelregistry:drift_col_delta'] = 'Difference';
+$string['modelregistry:finding_missing'] = 'Unpriced model in traffic';
+$string['modelregistry:finding_mismatch'] = 'Price mismatch';
+$string['modelregistry:finding_new'] = 'Unknown to the registry';
+$string['modelregistry:drift_apply'] = 'Apply this price';
+$string['modelregistry:drift_nosource'] = 'No source knows this model. Enter its price by hand.';
+$string['modelregistry:drift_applied'] = 'Applied the proposed price for {$a}.';
+$string['modelregistry:drift_apply_norates'] = 'That finding carries no price to apply.';
+
+// Section: benchmarks and recommendations.
+$string['modelregistry:bench_desc'] = 'A recommendation compares measurements. Where a measurement is missing or was taken on a different question set, release or scale, this says so instead of producing a number.';
+$string['modelregistry:function_chat'] = 'Chat tutor';
+$string['modelregistry:function_quiz'] = 'Quiz generation and coaching';
+$string['modelregistry:function_classifier'] = 'Mastery classifier';
+$string['modelregistry:function_rag'] = 'Embeddings and retrieval';
+$string['modelregistry:function_analytics'] = 'Analytics and digests';
+$string['modelregistry:function_safety'] = 'Safety and integrity reference';
+$string['modelregistry:function_soapbox'] = 'Soapbox speech scoring';
+$string['modelregistry:col_quality'] = 'Quality';
+$string['modelregistry:col_cost'] = 'Cost per call';
+$string['modelregistry:col_ttft'] = 'First byte (p50)';
+$string['modelregistry:col_verdict'] = 'Verdict';
+$string['modelregistry:col_measured'] = 'Measured';
+$string['modelregistry:cents'] = '{$a}c';
+$string['modelregistry:ms'] = '{$a} ms';
+$string['modelregistry:tunables'] = 'Thresholds in force: quality tolerance {$a->epsilon}, savings floor {$a->savingsfloor}, quality margin {$a->margin}, minimum sample {$a->minqualityn}.';
+
+// Section: queue a benchmark.
+$string['modelregistry:queue_heading'] = 'Run a benchmark';
+$string['modelregistry:queue_desc'] = 'Queues a run on the next cron pass. Each prompt costs two live model calls — the answer, and the rubric judge that scores it — so the sample size is the cost of finding out.';
+$string['modelregistry:queue_field_model'] = 'Registry key';
+$string['modelregistry:queue_field_function'] = 'Function';
+$string['modelregistry:queue_field_samples'] = 'Prompts';
+$string['modelregistry:queue_submit'] = 'Queue this benchmark';
+$string['modelregistry:queue_err_nokey'] = 'Choose a registry key to benchmark.';
+$string['modelregistry:queue_err_function'] = 'Choose which function this benchmark stands for.';
+$string['modelregistry:queue_noeligible'] = 'Add a model to the registry first; a benchmark is filed against a registry key.';
+
+// Benchmark result rendering (specified by the benchmark stage's manifest).
+$string['bench:heading'] = 'Benchmark results';
+$string['bench:run_now'] = 'Benchmark this model';
+$string['bench:queued'] = 'Benchmark queued; it runs on the next cron pass.';
+$string['bench:status_queued'] = 'Queued';
+$string['bench:status_running'] = 'Running';
+$string['bench:status_complete'] = 'Complete';
+$string['bench:status_failed'] = 'Failed';
+$string['bench:quality_of'] = '{$a->raw} / {$a->max}';
+$string['bench:quality_n'] = 'over {$a} scored items';
+$string['bench:not_comparable'] = 'Below the comparability floor ({$a} scored items) — shown for reference only';
+$string['bench:comparable_group'] = 'Question set: {$a}';
+$string['bench:release_stamp'] = 'Measured on [[tutorshort]] {$a}';
+$string['bench:no_results'] = 'No benchmark has been stored for this model yet.';
+$string['bench:grade_smoke'] = 'SMOKE ONLY — {$a} fixtures is a regression check, not a decision instrument';
+$string['bench:grade_decision'] = 'Decision-grade — {$a} fixtures';
+$string['bench:recent_runs'] = 'Recent runs';
+
+// Recommendation card (specified by the recommender stage's manifest).
+$string['rec:cardtitle'] = 'Model recommendations';
+$string['rec:currentmodel'] = 'Currently configured: {$a}';
+$string['rec:inherited'] = 'inherited from the site model';
+$string['rec:unmeasured'] = 'Unmeasured';
+$string['rec:unmeasuredintro'] = 'These functions have no comparable benchmark. No score is assumed for them.';
+$string['rec:projectedmonthly'] = 'Projected monthly change: {$a}';
+$string['rec:novolume'] = 'No billable calls observed in the last 30 days, so no monthly figure is projected.';
+$string['rec:sharedvolume'] = 'This call volume is shared with {$a}; do not add the projections together.';
+$string['rec:verdict_cost_saving'] = 'Cheaper, same quality';
+$string['rec:verdict_quality_gain'] = 'Better, no dearer';
+$string['rec:verdict_no_material_gain'] = 'No material gain';
+$string['rec:verdict_not_comparable'] = 'Not comparable';
+$string['rec:nc_run_not_complete'] = 'The run never finished.';
+$string['rec:nc_missing_metric'] = 'The run recorded no quality score or no cost per call.';
+$string['rec:nc_low_quality_n'] = 'Scored on only {$a->n} items, below the floor of {$a->floor}.';
+$string['rec:nc_release_mismatch'] = 'Measured on release {$a->runrelease}, not {$a->release}.';
+$string['rec:nc_fixture_mismatch'] = 'Measured with a different harness, fixture set or metric.';
+$string['rec:nr_not_configured'] = 'No model is configured for this function.';
+$string['rec:nr_no_benchmarks'] = 'Nothing has been benchmarked for this function yet.';
+$string['rec:nr_current_unmeasured'] = 'The configured model has never been benchmarked, so alternatives cannot be compared against it.';
+$string['rec:nr_current_not_comparable'] = 'The configured model\'s benchmark is not comparable: {$a}';
+$string['rec:nr_no_comparable_candidates'] = 'No benchmarked alternative is comparable.';
+$string['rec:nr_no_material_gain'] = 'No comparable alternative clears the savings floor or the quality margin.';
+
+// Price-drift settings and task (specified by the drift stage's manifest).
+$string['task:model_price_drift_check'] = 'Model price drift check';
+$string['task:run_model_benchmark'] = 'Benchmark a model';
+$string['pricedrift:heading'] = 'Price drift';
+$string['pricedrift:enabled'] = 'Enable the daily price-drift check';
+$string['pricedrift:enabled_desc'] = 'Once a day, fetch every enabled pricing source, compare it against the model registry, and record proposed corrections. Nothing is applied automatically: an unpriced model reports spend as $0.00 rather than as an error, and a price is a number an administrator is accountable for. Emails the spend-notification recipients when a model in real traffic has no price, or a price has drifted.';
+$string['pricedrift:tolerance'] = 'Price mismatch tolerance (%)';
+$string['pricedrift:tolerance_desc'] = 'How far a source price may differ from the registry price before it is reported. Default 1%.';
+
+// Benchmark settings (specified by the benchmark stage's manifest).
+$string['settings:bench_heading'] = 'Model benchmarks';
+$string['settings:bench_heading_desc'] = 'A benchmark run answers 50 prompts and has a judge model score each answer against a rubric, then stores one row: rubric mean, cost per call, and time to first byte. Runs are queued from the model registry page and executed by cron.';
+$string['settings:bench_default_samples'] = 'Prompts per run';
+$string['settings:bench_default_samples_desc'] = 'How many prompts a benchmark queued from the web sends. Each prompt costs two live model calls — the answer and the judge — so this is the cost dial. Capped at 50 in code, which is both the size of the golden set and what keeps one run inside the provider rate limit.';
+$string['settings:bench_min_quality_n'] = 'Comparability floor (scored items)';
+$string['settings:bench_min_quality_n_desc'] = 'The fewest scored items a stored run may have and still be compared with another run. Runs below the floor are kept and shown, labelled as reference only, so a three-prompt smoke run can never outrank a fifty-prompt result. Leave at 0 to use the built-in default; a floor of 0 would defeat the guard.';
+$string['settings:bench_judge_provider'] = 'Judge provider';
+$string['settings:bench_judge_provider_desc'] = 'Provider for the model that scores the answers. Keep it out of the contestant pool: a model must not grade itself.';
+$string['settings:bench_judge_model'] = 'Judge model';
+$string['settings:bench_judge_model_desc'] = 'Model that scores the answers. Changing it changes the meaning of every score taken afterwards, which is why each run records the judge it used and the plugin release it ran on.';
+
+// Recommender settings (specified by the recommender stage's manifest).
+$string['rec:settingname_epsilon'] = 'Quality tolerance';
+$string['rec:settingdesc_epsilon'] = 'How much measured quality (0-1) a cheaper model may give up before [[tutorshort]] stops recommending it. 0 means none.';
+$string['rec:settingname_savingsfloor'] = 'Minimum cost saving';
+$string['rec:settingdesc_savingsfloor'] = 'A cheaper model is only recommended when it cuts cost per call by more than this fraction.';
+$string['rec:settingname_margin'] = 'Quality margin';
+$string['rec:settingdesc_margin'] = 'A better model is recommended on quality alone when it beats the current model by at least this much at no higher cost per call.';
+$string['rec:settingname_minqualityn'] = 'Minimum benchmark sample';
+$string['rec:settingdesc_minqualityn'] = 'Benchmark runs scored on fewer items than this are reported as not comparable instead of being used.';
+
+// Monthly spend export (specified by the spend-export stage's manifest).
+$string['settings:spend_export_key'] = 'Spend export key';
+$string['settings:spend_export_key_desc'] = 'Bearer key for the monthly AI-spend export endpoint at <code>/local/ai_course_assistant/spend_export.php</code>, which the spend dashboard pulls once a month. Leave empty to switch the endpoint off — it then returns 404 to every request. The key is accepted ONLY in an <code>Authorization: Bearer</code> header, never in the URL. Generate a long random value; anyone holding it can read whole-site AI spend. Every successful export is recorded in the plugin audit log.';
+
+// RAG rerank length gate and embedding input type (specified by the RAG stage's manifest).
+$string['settings:rerank_min_query_chars'] = 'Rerank: minimum query length';
+$string['settings:rerank_min_query_chars_desc'] = 'Skip the re-ranker for queries this many characters long or shorter. Short queries are keyword-shaped and the re-ranker adds almost nothing over cosine similarity on two or three words. Measured on the RAG fixture set: gating at 50 scored 67.7% recall against 67.2% for always-on, at about a third of the cost. Set to 0 to re-rank every query. Skipped re-ranks are recorded in the message log as "[Rerank skipped: short_query]" so you can confirm the gate is working.';
+$string['settings:embed_input_type_mode'] = 'Embedding input type';
+$string['settings:embed_input_type_mode_desc'] = 'Voyage embeddings only. "Shared space" embeds queries and documents the same way, so the two stay comparable across a model change. "Asymmetric" uses Voyage\'s separate query projection; it is the vendor\'s suggested optimization but has failed to reproduce any gain on this corpus twice, so shared is the default. Changing this does not require a re-index.';
+$string['settings:embed_input_type_shared'] = 'Shared space (recommended)';
+$string['settings:embed_input_type_asymmetric'] = 'Asymmetric query/document';
+
+// Embedding-model migration settings and page section (rag_admin.php).
+$string['settings:embed_migration_heading'] = 'Embedding model migration';
+$string['settings:embed_migration_heading_desc'] = 'Changing the embedding model or its width invalidates every stored vector: the retriever refuses to score a query against chunks from a different embedding space, so a course retrieves nothing rather than retrieving badly. These settings describe the model you are moving TO. Courses are then re-embedded one at a time from the RAG index page, writing the new vectors alongside the old ones, and the live settings above keep serving retrieval until you change them yourself.';
+$string['settings:embed_migration_target_provider'] = 'Target embedding provider';
+$string['settings:embed_migration_target_provider_desc'] = 'Leave empty to migrate within the provider already configured above.';
+$string['settings:embed_migration_target_model'] = 'Target embedding model';
+$string['settings:embed_migration_target_model_desc'] = 'Model name to embed with during the migration, for example <code>voyage-4-large</code>. Empty means no migration is configured and the RAG index page offers none.';
+$string['settings:embed_migration_target_dimensions'] = 'Target embedding width';
+$string['settings:embed_migration_target_dimensions_desc'] = 'Vector width to request during the migration. 0 means the model\'s native width. Voyage accepts 256, 512, 1024 and 2048; a width the model does not offer is omitted from the request rather than sent, which would silently give you the native width instead of the one you asked for.';
+$string['settings:embed_migration_target_apikey'] = 'Target provider API key';
+$string['settings:embed_migration_target_apikey_desc'] = 'Only needed when the target provider differs from the one configured above. Empty means use the existing embedding key.';
+$string['embedmigration:heading'] = 'Embedding model migration';
+$string['embedmigration:desc'] = 'One queued task per course, so the work spreads across cron runs and a failure retries one course instead of restarting everything. New vectors are written alongside the existing ones — nothing is deleted before its replacement exists — and the live embedding settings are not touched, so retrieval keeps working throughout. Flip the settings yourself once every course reports complete.';
+$string['embedmigration:notarget'] = 'No migration target is configured. Set a target embedding model in the plugin settings to enable this.';
+$string['embedmigration:target_summary'] = 'Migrating to <strong>{$a->model}</strong> ({$a->provider}) at {$a->dimensions}. Currently serving <strong>{$a->currentmodel}</strong> at {$a->currentdimensions}.';
+$string['embedmigration:target_native'] = 'the model\'s native width';
+$string['embedmigration:same_as_live'] = 'The migration target matches the live embedding settings, so this re-embeds in place rather than building a second index.';
+$string['embedmigration:col_migrated'] = 'At target model';
+$string['embedmigration:col_state'] = 'Migration';
+$string['embedmigration:state_noindex'] = 'Nothing indexed';
+$string['embedmigration:state_notstarted'] = 'Not started';
+$string['embedmigration:state_partial'] = '{$a}% migrated';
+$string['embedmigration:state_complete'] = 'Complete';
+$string['embedmigration:state_queued'] = 'Queued';
+$string['embedmigration:state_running'] = 'Running';
+$string['embedmigration:queue_one'] = 'Migrate';
+$string['embedmigration:queue_all'] = 'Queue every unmigrated course';
+$string['embedmigration:queue_all_confirm'] = 'Queue one migration task per unmigrated course? Each course re-embeds its whole index, which is billable.';
+$string['embedmigration:queued_one'] = 'Queued the embedding migration for {$a}.';
+$string['embedmigration:queued_many'] = 'Queued {$a} course migration(s). They run on the next cron passes.';
+$string['embedmigration:queued_none'] = 'Nothing to queue: every course is already migrated, queued or running.';
+$string['embedmigration:already_queued'] = 'That course is already queued or running.';
+$string['embedmigration:progress'] = '{$a->done} of {$a->total} course(s) complete, {$a->pending} still to do.';
+$string['embedmigration:all_complete'] = 'Every indexed course has been re-embedded with {$a}. Change the live embedding settings now; retrieval switches to the new vectors as soon as you save.';
+$string['embedmigration:purge_heading'] = 'Superseded vectors';
+$string['embedmigration:purge_desc'] = 'Chunks still stored against an older embedding model, where a vector for the same chunk already exists under the live model. The retriever ignores them; they only occupy space. {$a} row(s) qualify.';
+$string['embedmigration:purge_none'] = 'No superseded vectors are held.';
+$string['embedmigration:purge'] = 'Delete superseded vectors';
+$string['embedmigration:purge_confirm'] = 'Delete every superseded vector? Only chunks that already have a vector under the live embedding model are removed.';
+$string['embedmigration:purged'] = 'Deleted {$a} superseded vector row(s).';
+$string['embedmigration:faq_heading'] = 'Site FAQ index';
+$string['embedmigration:faq_state'] = 'The FAQ is embedded once for the whole site, against {$a}.';
+$string['embedmigration:faq_none'] = 'The FAQ is not indexed.';
+$string['embedmigration:faq_stale'] = 'The FAQ was embedded with a model the live settings no longer use, so it is invisible to retrieval and the prompt falls back to injecting it inline. Re-embed it.';
+$string['embedmigration:faq_reembed'] = 'Re-embed the FAQ';
+$string['embedmigration:faq_reembedded'] = 'Re-embedded the FAQ: {$a} chunk(s).';
+$string['embedmigration:faq_error'] = 'The FAQ could not be re-embedded: {$a}';
+$string['task:migrate_course_embeddings'] = 'Migrate one course to a new embedding model';
+$string['settings:embed_migration_provider_inherit'] = 'Use the provider configured above';
