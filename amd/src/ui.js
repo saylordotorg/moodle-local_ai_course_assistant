@@ -2158,6 +2158,14 @@ define([
         if (!onStop) { return; }
         var slot = root ? root.querySelector('.local-ai-course-assistant__stop-slot') : null;
         if (!slot) { return; }
+        // The slot sits OUTSIDE the scrollable messages area, so revealing it shrinks
+        // that area by the button's height. The send path scrolls to the bottom just
+        // before this runs (showTyping(true)), so without re-pinning afterwards the
+        // learner's own just-sent question is left clipped ~50px below the fold --
+        // which reads as the Stop button covering the question. Reported from staging
+        // on 2026-09-09. Only re-pin if we were already at the bottom, so this never
+        // yanks someone who has scrolled up to re-read history.
+        const pinToBottom = isNearBottom();
         stopStreamBtn = document.createElement('button');
         stopStreamBtn.className = 'aica-stop-stream-btn';
         stopStreamBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">'
@@ -2168,6 +2176,9 @@ define([
         });
         slot.appendChild(stopStreamBtn);
         slot.hidden = false;
+        if (pinToBottom) {
+            scrollToBottom(true);
+        }
     };
 
     /**
@@ -2310,15 +2321,20 @@ define([
      *
      * @param {boolean} force Force scroll regardless of position
      */
+    const isNearBottom = function() {
+        if (!messagesContainer) {
+            return false;
+        }
+        const threshold = 100;
+        return messagesContainer.scrollHeight - messagesContainer.scrollTop -
+            messagesContainer.clientHeight < threshold;
+    };
+
     const scrollToBottom = function(force) {
         if (!messagesContainer) {
             return;
         }
-        const threshold = 100;
-        const isNearBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop -
-            messagesContainer.clientHeight < threshold;
-
-        if (force || isNearBottom) {
+        if (force || isNearBottom()) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     };

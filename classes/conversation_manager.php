@@ -200,7 +200,7 @@ class conversation_manager {
                 'local_ai_course_assistant_msgs',
                 $rolesql,
                 [$conversationid],
-                'timecreated ASC',
+                'timecreated ASC, id ASC',
                 'id',
                 0,
                 $excess
@@ -493,7 +493,7 @@ class conversation_manager {
             'local_ai_course_assistant_msgs',
             "conversationid = :cid AND role IN ('user', 'assistant')",
             ['cid' => $conversationid],
-            'timecreated ASC'
+            'timecreated ASC, id ASC'
         );
     }
 

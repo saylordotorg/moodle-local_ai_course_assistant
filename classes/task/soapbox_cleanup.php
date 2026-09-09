@@ -95,7 +95,7 @@ class soapbox_cleanup extends \core\task\scheduled_task {
                 'local_ai_course_assistant_sbx_rec',
                 'assignid = :a AND userid = :u AND status <> :deleted',
                 ['a' => $p->assignid, 'u' => $p->userid, 'deleted' => 'deleted'],
-                'timecreated DESC'
+                'timecreated DESC, id DESC'
             );
             $extra = array_slice(array_values($recs), $keep);
             foreach ($extra as $rec) {
