@@ -1956,6 +1956,7 @@ $string['soapbox:no_media_support'] = 'Dieser Browser kann hier kein Audio aufne
 $string['soapbox:status_uploaded'] = 'Wird verarbeitet — Transkription und Bewertung laufen';
 $string['soapbox:status_scored'] = 'Bewertet';
 $string['soapbox:status_failed'] = 'Bewertung fehlgeschlagen — dieser Versuch zählt nicht. Bitte nimm erneut auf.';
+$string['soapbox:assignment_notfound'] = 'Diese Redeaufgabe existiert nicht mehr, oder der Link ist veraltet. Öffnen Sie Soapbox über den Kurs, um die aktuelle Liste zu sehen.';
 $string['error:realtime_unavailable'] = 'Der Sprachmodus ist vorübergehend nicht verfügbar. Bitte versuche es gleich noch einmal oder nutze den Text-Chat.';
 $string['settings:cdn_bundle_url'] = 'Bundle-URL des Betrachters für sprechende Avatare';
 $string['settings:cdn_bundle_url_desc'] = 'URL des JavaScript-Bundles, das die Betrachterseite für den sprechenden Avatar lädt (WebRTC/LiveKit-Anbindung). Leer lassen, um den Betrachter zu deaktivieren; die Seite zeigt dann einen Hinweis statt einer defekten Bühne.';

@@ -36,7 +36,11 @@ require_login();
 $id = required_param('id', PARAM_INT);
 $assign = soapbox_assignment_manager::get_assignment($id);
 if (!$assign || !$assign->visible) {
-    throw new \moodle_exception('invalidrecord', 'error');
+    // Core's 'invalidrecord' string interpolates a table name via {$a}; thrown
+    // without one it renders literally as "Can't find data record in database
+    // table {$a}." A learner following a stale or hand-edited link saw the raw
+    // placeholder. Use a plugin string that reads as a sentence instead.
+    throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
 }
 $courseid = (int) $assign->courseid;
 $course = get_course($courseid);

@@ -2008,6 +2008,7 @@ $string['soapbox:no_media_support'] = 'Browser ini tidak dapat merekam audio di 
 $string['soapbox:status_uploaded'] = 'Memproses — transkripsi dan penilaian sedang berlangsung';
 $string['soapbox:status_scored'] = 'Dinilai';
 $string['soapbox:status_failed'] = 'Penilaian gagal — percobaan ini tidak dihitung. Silakan rekam ulang.';
+$string['soapbox:assignment_notfound'] = 'Tugas pidato itu sudah tidak ada, atau tautannya sudah tidak berlaku. Buka Soapbox dari kursus untuk melihat daftar terkini.';
 $string['error:realtime_unavailable'] = 'Mode suara sedang tidak tersedia untuk sementara. Silakan coba lagi sebentar lagi, atau gunakan obrolan teks.';
 $string['settings:cdn_bundle_url'] = 'URL bundel penampil avatar bicara';
 $string['settings:cdn_bundle_url_desc'] = 'URL bundel JavaScript yang dimuat oleh halaman penampil avatar bicara (perekat WebRTC/LiveKit). Biarkan kosong untuk menonaktifkan penampil; halaman kemudian akan menampilkan pemberitahuan alih-alih panggung yang rusak.';

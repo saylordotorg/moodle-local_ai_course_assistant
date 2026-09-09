@@ -1954,6 +1954,7 @@ $string['soapbox:no_media_support'] = 'لا يمكن لهذا المتصفح ت�
 $string['soapbox:status_uploaded'] = 'قيد المعالجة — النسخ الصوتي والتقييم جاريان';
 $string['soapbox:status_scored'] = 'تم التقييم';
 $string['soapbox:status_failed'] = 'فشل التقييم — هذه المحاولة لا تُحتسب. يرجى التسجيل مرة أخرى.';
+$string['soapbox:assignment_notfound'] = 'لم يعد تكليف الخطابة هذا موجودًا، أو أن الرابط قديم. افتح Soapbox من المقرّر لعرض القائمة الحالية.';
 $string['error:realtime_unavailable'] = 'الوضع الصوتي غير متاح مؤقتًا. يرجى المحاولة مرة أخرى بعد قليل، أو استخدام الدردشة النصية.';
 $string['settings:cdn_bundle_url'] = 'رابط حزمة عارض الصورة الرمزية المتحدثة';
 $string['settings:cdn_bundle_url_desc'] = 'رابط حزمة JavaScript التي تحمّلها صفحة عارض الصورة الرمزية المتحدثة (وصلة WebRTC/LiveKit). اتركه فارغًا لتعطيل العارض؛ ستعرض الصفحة حينها إشعارًا بدلًا من مسرح معطّل.';

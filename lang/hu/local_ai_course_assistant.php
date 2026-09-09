@@ -1997,6 +1997,7 @@ $string['soapbox:no_media_support'] = 'Ez a böngésző itt nem tud hangot rögz
 $string['soapbox:status_uploaded'] = 'Feldolgozás — átírás és pontozás folyamatban';
 $string['soapbox:status_scored'] = 'Pontozva';
 $string['soapbox:status_failed'] = 'A pontozás nem sikerült — ez a próbálkozás nem számít. Kérjük, rögzítsd újra.';
+$string['soapbox:assignment_notfound'] = 'Ez a beszédfeladat már nem létezik, vagy a hivatkozás elavult. Nyissa meg a Soapboxot a kurzusból az aktuális lista megtekintéséhez.';
 $string['error:realtime_unavailable'] = 'A hangmód átmenetileg nem érhető el. Próbáld újra kicsit később, vagy használd a szöveges csevegést.';
 $string['settings:cdn_bundle_url'] = 'Beszélő avatár megjelenítő csomag URL-je';
 $string['settings:cdn_bundle_url_desc'] = 'Annak a JavaScript-csomagnak az URL-je, amelyet a beszélő avatár megjelenítőoldala betölt (WebRTC/LiveKit összekötő). Hagyd üresen a megjelenítő kikapcsolásához; az oldal ekkor törött színpad helyett értesítést mutat.';

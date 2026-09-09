@@ -1955,6 +1955,7 @@ $string['soapbox:no_media_support'] = 'Acest browser nu poate înregistra audio 
 $string['soapbox:status_uploaded'] = 'Se procesează — transcrierea și evaluarea sunt în curs';
 $string['soapbox:status_scored'] = 'Evaluat';
 $string['soapbox:status_failed'] = 'Evaluarea a eșuat — această încercare nu se contorizează. Te rugăm să înregistrezi din nou.';
+$string['soapbox:assignment_notfound'] = 'Această temă de discurs nu mai există sau linkul este învechit. Deschideți Soapbox din curs pentru a vedea lista actuală.';
 $string['error:realtime_unavailable'] = 'Modul vocal este temporar indisponibil. Încearcă din nou peste puțin timp sau folosește chatul text.';
 $string['settings:cdn_bundle_url'] = 'URL-ul pachetului pentru vizualizatorul avatarului vorbitor';
 $string['settings:cdn_bundle_url_desc'] = 'URL-ul pachetului JavaScript pe care îl încarcă pagina vizualizatorului avatarului vorbitor (integrare WebRTC/LiveKit). Lasă gol pentru a dezactiva vizualizatorul; pagina va afișa atunci un mesaj în locul unei scene nefuncționale.';

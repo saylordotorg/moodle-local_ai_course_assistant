@@ -66,11 +66,11 @@ class soapbox_get_playback extends external_api {
             ['id' => (int) $params['recordingid']]
         );
         if (!$rec || $rec->status === 'deleted' || empty($rec->storage_key)) {
-            throw new \moodle_exception('invalidrecord', 'error');
+            throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
         }
         $assign = soapbox_assignment_manager::get_assignment((int) $rec->assignid);
         if (!$assign) {
-            throw new \moodle_exception('invalidrecord', 'error');
+            throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
         }
         $context = \context_course::instance((int) $assign->courseid);
         self::validate_context($context);

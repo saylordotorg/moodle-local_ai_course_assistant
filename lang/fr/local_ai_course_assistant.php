@@ -1957,6 +1957,7 @@ $string['soapbox:no_media_support'] = 'Ce navigateur ne peut pas enregistrer d\'
 $string['soapbox:status_uploaded'] = 'Traitement — transcription et évaluation en cours';
 $string['soapbox:status_scored'] = 'Évalué';
 $string['soapbox:status_failed'] = 'L\'évaluation a échoué — cette tentative ne compte pas. Veuillez enregistrer à nouveau.';
+$string['soapbox:assignment_notfound'] = 'Ce devoir d\'expression orale n\'existe plus, ou le lien est obsolète. Ouvrez Soapbox depuis le cours pour voir la liste actuelle.';
 $string['error:realtime_unavailable'] = 'Le mode vocal est temporairement indisponible. Réessayez dans un instant ou utilisez le chat écrit.';
 $string['settings:cdn_bundle_url'] = 'URL du bundle du lecteur d\'avatar parlant';
 $string['settings:cdn_bundle_url_desc'] = 'URL du bundle JavaScript chargé par la page du lecteur d\'avatar parlant (liaison WebRTC/LiveKit). Laissez vide pour désactiver le lecteur ; la page affichera alors un avis au lieu d\'une scène cassée.';

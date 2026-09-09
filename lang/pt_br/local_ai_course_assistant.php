@@ -1976,6 +1976,7 @@ $string['soapbox:no_media_support'] = 'Este navegador não consegue gravar áudi
 $string['soapbox:status_uploaded'] = 'Processando — transcrição e avaliação em andamento';
 $string['soapbox:status_scored'] = 'Avaliado';
 $string['soapbox:status_failed'] = 'A avaliação falhou — esta tentativa não conta. Grave novamente, por favor.';
+$string['soapbox:assignment_notfound'] = 'Essa tarefa de discurso não existe mais, ou o link está desatualizado. Abra o Soapbox pelo curso para ver a lista atual.';
 $string['error:realtime_unavailable'] = 'O modo de voz está temporariamente indisponível. Tente novamente em instantes ou use o chat de texto.';
 $string['settings:cdn_bundle_url'] = 'URL do pacote do visualizador do avatar falante';
 $string['settings:cdn_bundle_url_desc'] = 'URL do pacote JavaScript que a página do visualizador do avatar falante carrega (integração WebRTC/LiveKit). Deixe em branco para desativar o visualizador; a página exibirá então um aviso em vez de um palco quebrado.';

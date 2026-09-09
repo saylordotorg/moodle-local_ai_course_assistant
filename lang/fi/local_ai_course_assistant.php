@@ -1956,6 +1956,7 @@ $string['soapbox:no_media_support'] = 'Tämä selain ei voi tallentaa ääntä t
 $string['soapbox:status_uploaded'] = 'Käsitellään — litterointi ja arviointi käynnissä';
 $string['soapbox:status_scored'] = 'Arvioitu';
 $string['soapbox:status_failed'] = 'Arviointi epäonnistui — tätä yritystä ei lasketa. Ole hyvä ja nauhoita uudelleen.';
+$string['soapbox:assignment_notfound'] = 'Tätä puhetehtävää ei enää ole, tai linkki on vanhentunut. Avaa Soapbox kurssilta nähdäksesi nykyisen luettelon.';
 $string['error:realtime_unavailable'] = 'Äänitila ei ole tilapäisesti käytettävissä. Yritä hetken kuluttua uudelleen tai käytä tekstikeskustelua.';
 $string['settings:cdn_bundle_url'] = 'Puhuvan avatarin katselimen paketin URL';
 $string['settings:cdn_bundle_url_desc'] = 'URL-osoite JavaScript-paketille, jonka puhuvan avatarin katselusivu lataa (WebRTC/LiveKit-liitos). Jätä tyhjäksi poistaaksesi katselimen käytöstä; sivu näyttää silloin ilmoituksen rikkinäisen näyttämön sijaan.';

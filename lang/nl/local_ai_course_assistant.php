@@ -1979,6 +1979,7 @@ $string['soapbox:no_media_support'] = 'Deze browser kan hier geen audio opnemen.
 $string['soapbox:status_uploaded'] = 'Bezig met verwerken — transcriptie en beoordeling lopen';
 $string['soapbox:status_scored'] = 'Beoordeeld';
 $string['soapbox:status_failed'] = 'Beoordeling mislukt — deze poging telt niet mee. Neem opnieuw op.';
+$string['soapbox:assignment_notfound'] = 'Die spreekopdracht bestaat niet meer, of de link is verouderd. Open Soapbox vanuit de cursus om de huidige lijst te bekijken.';
 $string['error:realtime_unavailable'] = 'De spraakmodus is tijdelijk niet beschikbaar. Probeer het zo weer, of gebruik de tekstchat.';
 $string['settings:cdn_bundle_url'] = 'Bundel-URL voor de viewer van de pratende avatar';
 $string['settings:cdn_bundle_url_desc'] = 'URL van de JavaScript-bundel die de viewerpagina van de pratende avatar laadt (WebRTC/LiveKit-koppeling). Laat leeg om de viewer uit te schakelen; de pagina toont dan een melding in plaats van een kapot podium.';

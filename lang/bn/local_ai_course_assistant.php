@@ -1954,6 +1954,7 @@ $string['soapbox:no_media_support'] = 'এই ব্রাউজারটি এ
 $string['soapbox:status_uploaded'] = 'প্রক্রিয়াকরণ চলছে — ট্রান্সক্রিপশন ও স্কোরিং চলছে';
 $string['soapbox:status_scored'] = 'স্কোর করা হয়েছে';
 $string['soapbox:status_failed'] = 'স্কোরিং ব্যর্থ হয়েছে — এই প্রচেষ্টাটি গণনা করা হবে না। অনুগ্রহ করে আবার রেকর্ড করুন।';
+$string['soapbox:assignment_notfound'] = 'সেই বক্তৃতা অ্যাসাইনমেন্টটি আর নেই, অথবা লিঙ্কটি পুরনো হয়ে গেছে। বর্তমান তালিকা দেখতে কোর্স থেকে Soapbox খুলুন।';
 $string['error:realtime_unavailable'] = 'ভয়েস মোড সাময়িকভাবে অনুপলব্ধ। একটু পরে আবার চেষ্টা করুন, অথবা টেক্সট চ্যাট ব্যবহার করুন।';
 $string['settings:cdn_bundle_url'] = 'কথা-বলা অবতার ভিউয়ার বান্ডল URL';
 $string['settings:cdn_bundle_url_desc'] = 'কথা-বলা অবতার ভিউয়ার পৃষ্ঠাটি যে JavaScript বান্ডল লোড করে তার URL (WebRTC/LiveKit সংযোগ)। ভিউয়ার নিষ্ক্রিয় করতে খালি রাখুন; তখন পৃষ্ঠাটি ভাঙা স্টেজের বদলে একটি নোটিশ দেখাবে।';

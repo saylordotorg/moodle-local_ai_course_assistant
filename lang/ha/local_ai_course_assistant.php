@@ -1984,6 +1984,7 @@ $string['soapbox:no_media_support'] = 'Wannan burauzar ba ta iya ɗaukar sauti a
 $string['soapbox:status_uploaded'] = 'Ana sarrafawa — ana rubuta magana da kuma ba da maki';
 $string['soapbox:status_scored'] = 'An ba da maki';
 $string['soapbox:status_failed'] = 'Ba da maki ya gaza — wannan ƙoƙarin ba ya ƙidaya. Da fatan za a sake yin rikodi.';
+$string['soapbox:assignment_notfound'] = 'Wannan aikin jawabi babu shi kuma, ko kuma hanyar haɗin ta tsufa. Buɗe Soapbox daga darasin don ganin jerin na yanzu.';
 $string['error:realtime_unavailable'] = 'Yanayin murya ba ya samuwa na ɗan lokaci. Da fatan za a sake gwadawa nan da ɗan lokaci, ko a yi amfani da hirar rubutu.';
 $string['settings:cdn_bundle_url'] = 'URL na fakitin mai kallon avatar mai magana';
 $string['settings:cdn_bundle_url_desc'] = 'URL na fakitin JavaScript da shafin kallon avatar mai magana ke lodawa (haɗin WebRTC/LiveKit). A bar shi fanko don kashe mai kallon; shafin zai nuna sanarwa maimakon dandali da ya lalace.';

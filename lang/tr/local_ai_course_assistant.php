@@ -1956,6 +1956,7 @@ $string['soapbox:no_media_support'] = 'Bu tarayıcı burada ses kaydedemiyor. G�
 $string['soapbox:status_uploaded'] = 'İşleniyor — transkripsiyon ve puanlama devam ediyor';
 $string['soapbox:status_scored'] = 'Puanlandı';
 $string['soapbox:status_failed'] = 'Puanlama başarısız oldu — bu deneme sayılmaz. Lütfen yeniden kayıt yapın.';
+$string['soapbox:assignment_notfound'] = 'Bu konuşma ödevi artık mevcut değil veya bağlantı güncelliğini yitirmiş. Güncel listeyi görmek için kurstan Soapbox\'ı açın.';
 $string['error:realtime_unavailable'] = 'Sesli mod geçici olarak kullanılamıyor. Lütfen birazdan yeniden deneyin veya yazılı sohbeti kullanın.';
 $string['settings:cdn_bundle_url'] = 'Konuşan avatar görüntüleyici paketi URL\'si';
 $string['settings:cdn_bundle_url_desc'] = 'Konuşan avatar görüntüleyici sayfasının yüklediği JavaScript paketinin URL\'si (WebRTC/LiveKit bağlantı katmanı). Görüntüleyiciyi devre dışı bırakmak için boş bırakın; sayfa bozuk bir sahne yerine bir bildirim gösterir.';

@@ -1983,6 +1983,7 @@ $string['soapbox:no_media_support'] = 'ይህ አሳሽ እዚህ ድምፅ መ�
 $string['soapbox:status_uploaded'] = 'በሂደት ላይ — ግልባጭና ውጤት አሰጣጥ በመካሄድ ላይ ናቸው';
 $string['soapbox:status_scored'] = 'ውጤት ተሰጥቷል';
 $string['soapbox:status_failed'] = 'ውጤት አሰጣጡ አልተሳካም — ይህ ሙከራ አይቆጠርም። እባክዎ እንደገና ይቅዱ።';
+$string['soapbox:assignment_notfound'] = 'ያ የንግግር ስራ ከዚህ በኋላ የለም፣ ወይም አገናኙ ጊዜው ያለፈበት ነው። የአሁኑን ዝርዝር ለማየት ከኮርሱ ውስጥ Soapbox ይክፈቱ።';
 $string['error:realtime_unavailable'] = 'የድምፅ ሁነታ ለጊዜው አይገኝም። እባክዎ ከጥቂት ቆይታ በኋላ እንደገና ይሞክሩ ወይም የጽሑፍ ውይይትን ይጠቀሙ።';
 $string['settings:cdn_bundle_url'] = 'የሚናገር አቫታር መመልከቻ ጥቅል URL';
 $string['settings:cdn_bundle_url_desc'] = 'የሚናገረው አቫታር መመልከቻ ገጽ የሚጭነው የJavaScript ጥቅል URL (የWebRTC/LiveKit ማገናኛ)። መመልከቻውን ለማሰናከል ባዶ ይተዉት፤ ገጹ ከዚያ ከተሰበረ መድረክ ይልቅ ማስታወቂያ ያሳያል።';

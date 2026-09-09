@@ -1954,6 +1954,7 @@ $string['soapbox:no_media_support'] = '이 브라우저에서는 여기에서 �
 $string['soapbox:status_uploaded'] = '처리 중 — 전사 및 채점 진행 중';
 $string['soapbox:status_scored'] = '채점 완료';
 $string['soapbox:status_failed'] = '채점에 실패했습니다 — 이 시도는 집계되지 않습니다. 다시 녹음해 주세요.';
+$string['soapbox:assignment_notfound'] = '해당 스피치 과제는 더 이상 존재하지 않거나 링크가 오래되었습니다. 현재 목록을 보려면 코스에서 Soapbox를 여세요.';
 $string['error:realtime_unavailable'] = '음성 모드를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하거나 텍스트 채팅을 이용해 주세요.';
 $string['settings:cdn_bundle_url'] = '말하는 아바타 뷰어 번들 URL';
 $string['settings:cdn_bundle_url_desc'] = '말하는 아바타 뷰어 페이지가 로드하는 JavaScript 번들의 URL입니다(WebRTC/LiveKit 연동). 비워 두면 뷰어가 비활성화되며, 페이지에는 깨진 화면 대신 안내 문구가 표시됩니다.';

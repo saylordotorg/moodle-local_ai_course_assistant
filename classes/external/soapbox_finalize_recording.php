@@ -81,7 +81,7 @@ class soapbox_finalize_recording extends external_api {
 
         $assign = soapbox_assignment_manager::get_assignment((int) $params['assignid']);
         if (!$assign || !$assign->visible) {
-            throw new \moodle_exception('invalidrecord', 'error');
+            throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
         }
         $context = \context_course::instance((int) $assign->courseid);
         self::validate_context($context);

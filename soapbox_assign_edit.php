@@ -52,7 +52,7 @@ $existing = null;
 if ($id) {
     $existing = soapbox_assignment_manager::get_assignment($id);
     if (!$existing || (int) $existing->courseid !== $courseid) {
-        throw new \moodle_exception('invalidrecord', 'error');
+        throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
     }
 }
 

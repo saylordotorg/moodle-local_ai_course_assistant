@@ -1954,6 +1954,7 @@ $string['soapbox:no_media_support'] = 'Denne nettleseren kan ikke ta opp lyd her
 $string['soapbox:status_uploaded'] = 'Behandler — transkribering og vurdering pågår';
 $string['soapbox:status_scored'] = 'Vurdert';
 $string['soapbox:status_failed'] = 'Vurderingen mislyktes — dette forsøket teller ikke. Ta opp på nytt.';
+$string['soapbox:assignment_notfound'] = 'Denne taleoppgaven finnes ikke lenger, eller lenken er utdatert. Åpne Soapbox fra emnet for å se den gjeldende listen.';
 $string['error:realtime_unavailable'] = 'Talemodus er midlertidig utilgjengelig. Prøv igjen om litt, eller bruk tekstchat.';
 $string['settings:cdn_bundle_url'] = 'URL til bundle for visning av snakkende avatar';
 $string['settings:cdn_bundle_url_desc'] = 'URL til JavaScript-bundelen som visningssiden for snakkende avatar laster inn (WebRTC/LiveKit-kobling). La stå tom for å deaktivere visningen; siden viser da et varsel i stedet for en ødelagt scene.';

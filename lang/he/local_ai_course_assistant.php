@@ -1997,6 +1997,7 @@ $string['soapbox:no_media_support'] = 'דפדפן זה אינו יכול להק�
 $string['soapbox:status_uploaded'] = 'מעבד — תמלול ומתן ציון בתהליך';
 $string['soapbox:status_scored'] = 'התקבל ציון';
 $string['soapbox:status_failed'] = 'מתן הציון נכשל — ניסיון זה אינו נספר. אנא הקליטו שוב.';
+$string['soapbox:assignment_notfound'] = 'מטלת הנאום הזו אינה קיימת יותר, או שהקישור אינו מעודכן. פתחו את Soapbox מתוך הקורס כדי לראות את הרשימה הנוכחית.';
 $string['error:realtime_unavailable'] = 'מצב הקול אינו זמין באופן זמני. נסו שוב בעוד רגע, או השתמשו בצ\'אט טקסט.';
 $string['settings:cdn_bundle_url'] = 'כתובת URL של חבילת מציג האווטאר המדבר';
 $string['settings:cdn_bundle_url_desc'] = 'כתובת ה-URL של חבילת ה-JavaScript שעמוד מציג האווטאר המדבר טוען (חיבור WebRTC/LiveKit). השאירו ריק כדי להשבית את המציג; העמוד יציג אז הודעה במקום במה שבורה.';

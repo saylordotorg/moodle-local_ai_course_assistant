@@ -2000,6 +2000,7 @@ $string['soapbox:no_media_support'] = 'Le bhrawuza ayikwazi ukuqopha umsindo lap
 $string['soapbox:status_uploaded'] = 'Iyacutshungulwa — ukuloba nokunikeza amamaki kuyaqhubeka';
 $string['soapbox:status_scored'] = 'Kunikezwe amamaki';
 $string['soapbox:status_failed'] = 'Ukunikeza amamaki kuhlulekile — lo mzamo awubalwa. Sicela uqophe futhi.';
+$string['soapbox:assignment_notfound'] = 'Lowo msebenzi wenkulumo awusekho, noma isixhumanisi sesidlulelwe yisikhathi. Vula i-Soapbox kusuka enkambweni ukubona uhlu lamanje.';
 $string['error:realtime_unavailable'] = 'Imodi yezwi ayitholakali okwesikhashana. Sicela uzame futhi maduze, noma usebenzise ingxoxo yombhalo.';
 $string['settings:cdn_bundle_url'] = 'I-URL yesiqumbi sombukisi we-avatar ekhulumayo';
 $string['settings:cdn_bundle_url_desc'] = 'I-URL yesiqumbi se-JavaScript esilayishwa yikhasi lombukisi we-avatar ekhulumayo (isixhumanisi se-WebRTC/LiveKit). Shiya kungenalutho ukuze uvale umbukisi; ikhasi lizobe selibonisa isaziso esikhundleni sesiteji esiphukile.';

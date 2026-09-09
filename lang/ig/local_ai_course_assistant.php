@@ -1970,6 +1970,7 @@ $string['soapbox:no_media_support'] = 'Ihe nchọgharị a enweghị ike ịdek�
 $string['soapbox:status_uploaded'] = 'Na-ahazi — ndegharị okwu na inye akara ka na-aga n\'ihu';
 $string['soapbox:status_scored'] = 'Enyela akara';
 $string['soapbox:status_failed'] = 'Inye akara adaala — a naghị agụ mgbalị a. Biko dekọọ ọzọ.';
+$string['soapbox:assignment_notfound'] = 'Ọrụ okwu ahụ adịghịzi, ma ọ bụ njikọ ahụ agafeela oge. Mepee Soapbox site n\'usoro ahụ ka ị hụ ndepụta ugbu a.';
 $string['error:realtime_unavailable'] = 'Ọnọdụ olu adịghị adị nwa oge a. Biko nwaa ọzọ n\'oge na-adịghị anya, ma ọ bụ jiri nkata ederede.';
 $string['settings:cdn_bundle_url'] = 'URL ngwugwu ihe ngosi avata na-ekwu okwu';
 $string['settings:cdn_bundle_url_desc'] = 'URL nke ngwugwu JavaScript nke peeji ihe ngosi avata na-ekwu okwu na-ebudata (njikọ WebRTC/LiveKit). Hapụ ya efu ka ị gbanyụọ ihe ngosi ahụ; peeji ahụ ga-egosi ọkwa kama igosi ogbo mebiri emebi.';

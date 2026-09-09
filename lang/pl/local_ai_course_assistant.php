@@ -1955,6 +1955,7 @@ $string['soapbox:no_media_support'] = 'Ta przeglądarka nie może tutaj nagrywa�
 $string['soapbox:status_uploaded'] = 'Przetwarzanie — trwa transkrypcja i ocenianie';
 $string['soapbox:status_scored'] = 'Ocenione';
 $string['soapbox:status_failed'] = 'Ocenianie nie powiodło się — ta próba się nie liczy. Nagraj się ponownie.';
+$string['soapbox:assignment_notfound'] = 'To zadanie z wystąpienia już nie istnieje albo link jest nieaktualny. Otwórz Soapbox z kursu, aby zobaczyć aktualną listę.';
 $string['error:realtime_unavailable'] = 'Tryb głosowy jest chwilowo niedostępny. Spróbuj ponownie za moment lub skorzystaj z czatu tekstowego.';
 $string['settings:cdn_bundle_url'] = 'Adres URL pakietu przeglądarki mówiącego awatara';
 $string['settings:cdn_bundle_url_desc'] = 'Adres URL pakietu JavaScript ładowanego przez stronę przeglądarki mówiącego awatara (obsługa WebRTC/LiveKit). Pozostaw puste, aby wyłączyć przeglądarkę; strona wyświetli wtedy komunikat zamiast niedziałającej sceny.';

@@ -1975,6 +1975,7 @@ $string['soapbox:no_media_support'] = 'यो ब्राउजरले यह
 $string['soapbox:status_uploaded'] = 'प्रशोधन हुँदैछ — ट्रान्सक्रिप्सन र मूल्याङ्कन जारी छ';
 $string['soapbox:status_scored'] = 'मूल्याङ्कन गरियो';
 $string['soapbox:status_failed'] = 'मूल्याङ्कन असफल भयो — यो प्रयास गनिँदैन। कृपया फेरि रेकर्ड गर्नुहोस्।';
+$string['soapbox:assignment_notfound'] = 'त्यो भाषण असाइनमेन्ट अब अस्तित्वमा छैन, वा लिङ्क पुरानो भएको छ। हालको सूची देख्न कोर्सबाट Soapbox खोल्नुहोस्।';
 $string['error:realtime_unavailable'] = 'आवाज मोड अहिले अस्थायी रूपमा उपलब्ध छैन। कृपया केही बेरमा फेरि प्रयास गर्नुहोस्, वा टेक्स्ट च्याट प्रयोग गर्नुहोस्।';
 $string['settings:cdn_bundle_url'] = 'बोल्ने अवतार भ्युअर बन्डल URL';
 $string['settings:cdn_bundle_url_desc'] = 'बोल्ने अवतार भ्युअर पृष्ठले लोड गर्ने JavaScript बन्डलको URL (WebRTC/LiveKit जोड्ने कोड)। भ्युअर निष्क्रिय गर्न खाली छोड्नुहोस्; त्यसपछि पृष्ठले बिग्रिएको दृश्यको सट्टा सूचना देखाउँछ।';

@@ -2000,6 +2000,7 @@ $string['soapbox:no_media_support'] = 'Kivinjari hiki hakiwezi kurekodi sauti ha
 $string['soapbox:status_uploaded'] = 'Inachakatwa — unukuzi na upimaji unaendelea';
 $string['soapbox:status_scored'] = 'Imepimwa';
 $string['soapbox:status_failed'] = 'Upimaji umeshindikana — jaribio hili halihesabiwi. Tafadhali rekodi tena.';
+$string['soapbox:assignment_notfound'] = 'Kazi hiyo ya hotuba haipo tena, au kiungo kimepitwa na wakati. Fungua Soapbox kutoka kwenye kozi ili kuona orodha ya sasa.';
 $string['error:realtime_unavailable'] = 'Hali ya sauti haipatikani kwa muda. Jaribu tena baada ya muda mfupi, au tumia gumzo la maandishi.';
 $string['settings:cdn_bundle_url'] = 'URL ya kifurushi cha kionyeshi cha avatar inayozungumza';
 $string['settings:cdn_bundle_url_desc'] = 'URL ya kifurushi cha JavaScript kinachopakiwa na ukurasa wa kionyeshi cha avatar inayozungumza (kiunganishi cha WebRTC/LiveKit). Acha wazi ili kuzima kionyeshi; ukurasa utaonyesha taarifa badala ya jukwaa lisilofanya kazi.';

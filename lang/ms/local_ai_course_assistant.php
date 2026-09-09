@@ -1999,6 +1999,7 @@ $string['soapbox:no_media_support'] = 'Pelayar ini tidak dapat merakam audio di 
 $string['soapbox:status_uploaded'] = 'Sedang diproses — transkripsi dan pemarkahan sedang dijalankan';
 $string['soapbox:status_scored'] = 'Telah dimarkah';
 $string['soapbox:status_failed'] = 'Pemarkahan gagal — percubaan ini tidak dikira. Sila rakam semula.';
+$string['soapbox:assignment_notfound'] = 'Tugasan syarahan itu tidak lagi wujud, atau pautannya sudah lapuk. Buka Soapbox dari kursus untuk melihat senarai terkini.';
 $string['error:realtime_unavailable'] = 'Mod suara tidak tersedia buat sementara waktu. Sila cuba lagi sebentar nanti, atau gunakan sembang teks.';
 $string['settings:cdn_bundle_url'] = 'URL bundle pemapar avatar bercakap';
 $string['settings:cdn_bundle_url_desc'] = 'URL bundle JavaScript yang dimuatkan oleh halaman pemapar avatar bercakap (penghubung WebRTC/LiveKit). Biarkan kosong untuk melumpuhkan pemapar; halaman itu kemudiannya memaparkan notis dan bukannya paparan yang rosak.';

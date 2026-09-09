@@ -1955,6 +1955,7 @@ $string['soapbox:no_media_support'] = 'Tento prehliadač tu nedokáže nahráva�
 $string['soapbox:status_uploaded'] = 'Spracúva sa — prebieha prepis a hodnotenie';
 $string['soapbox:status_scored'] = 'Ohodnotené';
 $string['soapbox:status_failed'] = 'Hodnotenie zlyhalo — tento pokus sa nepočíta. Nahrajte sa, prosím, znova.';
+$string['soapbox:assignment_notfound'] = 'Táto rečnícka úloha už neexistuje alebo je odkaz neaktuálny. Otvorte Soapbox z kurzu a zobrazte si aktuálny zoznam.';
 $string['error:realtime_unavailable'] = 'Hlasový režim je dočasne nedostupný. Skúste to o chvíľu znova alebo použite textový čet.';
 $string['settings:cdn_bundle_url'] = 'URL balíka prehliadača hovoriaceho avatara';
 $string['settings:cdn_bundle_url_desc'] = 'URL JavaScriptového balíka, ktorý načítava stránka prehliadača hovoriaceho avatara (prepojenie WebRTC/LiveKit). Nechajte prázdne, ak chcete prehliadač vypnúť; stránka potom zobrazí upozornenie namiesto nefunkčnej scény.';

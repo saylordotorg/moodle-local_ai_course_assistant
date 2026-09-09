@@ -1984,6 +1984,7 @@ $string['soapbox:no_media_support'] = 'यह ब्राउज़र यहा
 $string['soapbox:status_uploaded'] = 'प्रोसेस हो रहा है — ट्रांसक्रिप्शन और स्कोरिंग जारी है';
 $string['soapbox:status_scored'] = 'स्कोर दिया गया';
 $string['soapbox:status_failed'] = 'स्कोरिंग विफल रही — यह प्रयास नहीं गिना जाएगा। कृपया फिर से रिकॉर्ड करें।';
+$string['soapbox:assignment_notfound'] = 'वह भाषण असाइनमेंट अब मौजूद नहीं है, या लिंक पुराना हो गया है। वर्तमान सूची देखने के लिए पाठ्यक्रम से Soapbox खोलें।';
 $string['error:realtime_unavailable'] = 'वॉयस मोड अस्थायी रूप से उपलब्ध नहीं है। कृपया थोड़ी देर में फिर प्रयास करें, या टेक्स्ट चैट का उपयोग करें।';
 $string['settings:cdn_bundle_url'] = 'बोलने वाले अवतार व्यूअर बंडल का URL';
 $string['settings:cdn_bundle_url_desc'] = 'उस JavaScript बंडल का URL जिसे बोलने वाले अवतार का व्यूअर पृष्ठ लोड करता है (WebRTC/LiveKit ग्लू)। व्यूअर को अक्षम करने के लिए खाली छोड़ें; तब पृष्ठ टूटे हुए स्टेज के बजाय एक सूचना दिखाएगा।';

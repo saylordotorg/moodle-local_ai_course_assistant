@@ -1976,6 +1976,7 @@ $string['soapbox:no_media_support'] = 'Trình duyệt này không thể ghi âm 
 $string['soapbox:status_uploaded'] = 'Đang xử lý — đang chuyển giọng nói thành văn bản và chấm điểm';
 $string['soapbox:status_scored'] = 'Đã chấm điểm';
 $string['soapbox:status_failed'] = 'Chấm điểm thất bại — lần thử này không được tính. Vui lòng ghi âm lại.';
+$string['soapbox:assignment_notfound'] = 'Bài tập thuyết trình đó không còn tồn tại, hoặc liên kết đã cũ. Hãy mở Soapbox từ khóa học để xem danh sách hiện tại.';
 $string['error:realtime_unavailable'] = 'Chế độ giọng nói tạm thời không khả dụng. Vui lòng thử lại sau giây lát hoặc dùng trò chuyện văn bản.';
 $string['settings:cdn_bundle_url'] = 'URL gói trình xem avatar biết nói';
 $string['settings:cdn_bundle_url_desc'] = 'URL của gói JavaScript mà trang trình xem avatar biết nói sẽ tải (lớp kết nối WebRTC/LiveKit). Để trống để tắt trình xem; khi đó trang sẽ hiển thị thông báo thay vì một sân khấu bị hỏng.';

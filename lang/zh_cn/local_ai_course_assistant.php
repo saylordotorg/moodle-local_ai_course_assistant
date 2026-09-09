@@ -1976,6 +1976,7 @@ $string['soapbox:no_media_support'] = '此浏览器无法在这里录音。请�
 $string['soapbox:status_uploaded'] = '处理中——正在转写并评分';
 $string['soapbox:status_scored'] = '已评分';
 $string['soapbox:status_failed'] = '评分失败——本次尝试不计入。请重新录音。';
+$string['soapbox:assignment_notfound'] = '该演讲作业已不存在，或者链接已过期。请从课程中打开 Soapbox 查看当前列表。';
 $string['error:realtime_unavailable'] = '语音模式暂时不可用。请稍后再试，或使用文字聊天。';
 $string['settings:cdn_bundle_url'] = '会说话头像查看器包 URL';
 $string['settings:cdn_bundle_url_desc'] = '会说话头像查看器页面加载的 JavaScript 包的 URL（WebRTC/LiveKit 粘合代码）。留空可禁用查看器；届时页面将显示提示，而不是损坏的舞台。';

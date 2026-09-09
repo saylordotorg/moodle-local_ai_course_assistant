@@ -1983,6 +1983,7 @@ $string['soapbox:no_media_support'] = 'Este navegador no puede grabar audio aqu�
 $string['soapbox:status_uploaded'] = 'Procesando: transcripción y calificación en curso';
 $string['soapbox:status_scored'] = 'Calificado';
 $string['soapbox:status_failed'] = 'La calificación falló: este intento no cuenta. Por favor, graba de nuevo.';
+$string['soapbox:assignment_notfound'] = 'Esa tarea de discurso ya no existe, o el enlace está desactualizado. Abra Soapbox desde el curso para ver la lista actual.';
 $string['error:realtime_unavailable'] = 'El modo de voz no está disponible temporalmente. Inténtalo de nuevo en un momento o usa el chat de texto.';
 $string['settings:cdn_bundle_url'] = 'URL del paquete del visor de avatar parlante';
 $string['settings:cdn_bundle_url_desc'] = 'URL del paquete JavaScript que carga la página del visor de avatar parlante (integración WebRTC/LiveKit). Déjalo en blanco para desactivar el visor; la página mostrará entonces un aviso en lugar de un escenario roto.';

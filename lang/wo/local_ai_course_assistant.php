@@ -1976,6 +1976,7 @@ $string['soapbox:no_media_support'] = 'Navigatër bii mënul a enregistre baat f
 $string['soapbox:status_uploaded'] = 'Ñu ngi ko liggéey — transcription bi ak not bi ñu ngi ci';
 $string['soapbox:status_scored'] = 'Jox nañu ko not';
 $string['soapbox:status_failed'] = 'Not bi antuwul — jéem bii duñu ko waññ. Su la neexee, enregistreeyaat.';
+$string['soapbox:assignment_notfound'] = 'Liggéey bu wax boobu amatul, walla lien bi yàgg na. Ubbil Soapbox ci sàrt bi ngir gis limu bi am tey.';
 $string['error:realtime_unavailable'] = 'Anamu baat jotul léegi ab diir. Jéemaat ci tuuti, walla jëfandikoo waxtaan ci mbind.';
 $string['settings:cdn_bundle_url'] = 'URL bu paket bu wonekaay avatar buy wax';
 $string['settings:cdn_bundle_url_desc'] = 'URL bu paket JavaScript bi xët wu wonekaay avatar buy wax di yeb (lëkkalekaay WebRTC/LiveKit). Bàyyil ko neen ngir taxawal wonekaay bi; xët wi dina won ab yégle ci palaasu ab sen bu yàqu.';

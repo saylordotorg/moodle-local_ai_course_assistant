@@ -1976,6 +1976,7 @@ $string['soapbox:no_media_support'] = 'Aṣàwákiri yìí kò lè gba ohùn sí
 $string['soapbox:status_uploaded'] = 'Ń ṣiṣẹ́ lórí rẹ̀ — ìyípadà-ọ̀rọ̀ àti ìdíwọ̀n ń lọ lọ́wọ́';
 $string['soapbox:status_scored'] = 'A ti fún un ní àmì';
 $string['soapbox:status_failed'] = 'Ìdíwọ̀n kùnà — ìgbìyànjú yìí kò ka. Jọ̀wọ́ gbà á sílẹ̀ lẹ́ẹ̀kansi.';
+$string['soapbox:assignment_notfound'] = 'Iṣẹ́ ọ̀rọ̀ sísọ yẹn kò sí mọ́, tàbí ọ̀nà ìjápọ̀ náà ti pẹ́. Ṣí Soapbox láti inú ẹkọ náà láti rí àkọsílẹ̀ tó wà lọ́wọ́lọ́wọ́.';
 $string['error:realtime_unavailable'] = 'Ipò ohùn kò sí fún ìgbà díẹ̀. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kansi láìpẹ́, tàbí lo ìfọ̀rọ̀wérọ̀ ọ̀rọ̀-kíkọ.';
 $string['settings:cdn_bundle_url'] = 'URL ìdìpọ̀ olùwò avatar tí ń sọ̀rọ̀';
 $string['settings:cdn_bundle_url_desc'] = 'URL ìdìpọ̀ JavaScript tí ojú-ìwé olùwò avatar tí ń sọ̀rọ̀ máa ń gbé wọlé (àsopọ̀ WebRTC/LiveKit). Fi sílẹ̀ ní òfìfo láti pa olùwò náà; ojú-ìwé yóò fi ìkìlọ̀ hàn dípò ìtàgé tí ó bàjẹ́.';

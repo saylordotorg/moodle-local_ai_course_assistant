@@ -1955,6 +1955,7 @@ $string['soapbox:no_media_support'] = 'Den här webbläsaren kan inte spela in l
 $string['soapbox:status_uploaded'] = 'Bearbetar — transkribering och bedömning pågår';
 $string['soapbox:status_scored'] = 'Bedömd';
 $string['soapbox:status_failed'] = 'Bedömningen misslyckades — det här försöket räknas inte. Spela in igen.';
+$string['soapbox:assignment_notfound'] = 'Den taluppgiften finns inte längre, eller så är länken inaktuell. Öppna Soapbox från kursen för att se den aktuella listan.';
 $string['error:realtime_unavailable'] = 'Röstläget är tillfälligt otillgängligt. Försök igen om en stund eller använd textchatten.';
 $string['settings:cdn_bundle_url'] = 'URL till paketet för den talande avatarens visningssida';
 $string['settings:cdn_bundle_url_desc'] = 'URL till det JavaScript-paket som den talande avatarens visningssida läser in (WebRTC/LiveKit-koppling). Lämna tomt för att inaktivera visaren; sidan visar då ett meddelande i stället för en trasig scen.';

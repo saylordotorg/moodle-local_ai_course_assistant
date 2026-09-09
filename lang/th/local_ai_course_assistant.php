@@ -1955,6 +1955,7 @@ $string['soapbox:no_media_support'] = 'เบราว์เซอร์นี�
 $string['soapbox:status_uploaded'] = 'กำลังประมวลผล — กำลังถอดเสียงและให้คะแนน';
 $string['soapbox:status_scored'] = 'ให้คะแนนแล้ว';
 $string['soapbox:status_failed'] = 'การให้คะแนนล้มเหลว — ความพยายามครั้งนี้ไม่ถูกนับ โปรดบันทึกเสียงอีกครั้ง';
+$string['soapbox:assignment_notfound'] = 'งานพูดนั้นไม่มีอยู่แล้ว หรือลิงก์ล้าสมัย เปิด Soapbox จากรายวิชาเพื่อดูรายการปัจจุบัน';
 $string['error:realtime_unavailable'] = 'โหมดเสียงไม่พร้อมใช้งานชั่วคราว โปรดลองอีกครั้งในอีกสักครู่ หรือใช้แชทข้อความ';
 $string['settings:cdn_bundle_url'] = 'URL ของบันเดิลหน้าดูอวาตาร์พูดได้';
 $string['settings:cdn_bundle_url_desc'] = 'URL ของบันเดิล JavaScript ที่หน้าดูอวาตาร์พูดได้จะโหลด (โค้ดเชื่อมต่อ WebRTC/LiveKit) เว้นว่างไว้เพื่อปิดหน้าดู หน้าจะแสดงประกาศแทนเวทีที่ใช้งานไม่ได้';

@@ -134,7 +134,7 @@ class soapbox_assignment_manager {
         global $DB, $USER;
         $existing = self::get_assignment($id);
         if (!$existing) {
-            throw new \moodle_exception('invalidrecord', 'error');
+            throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
         }
         self::require_manage((int) $existing->courseid);
 
@@ -216,7 +216,7 @@ class soapbox_assignment_manager {
         global $DB;
         $assign = self::get_assignment($assignid);
         if (!$assign) {
-            throw new \moodle_exception('invalidrecord', 'error');
+            throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
         }
         self::require_manage((int) $assign->courseid);
 

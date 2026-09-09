@@ -1954,6 +1954,7 @@ $string['soapbox:no_media_support'] = 'このブラウザではここで音声�
 $string['soapbox:status_uploaded'] = '処理中 — 文字起こしと採点を実行しています';
 $string['soapbox:status_scored'] = '採点済み';
 $string['soapbox:status_failed'] = '採点に失敗しました — この試行はカウントされません。もう一度録音してください。';
+$string['soapbox:assignment_notfound'] = 'そのスピーチ課題は存在しないか、リンクが古くなっています。現在の一覧を確認するには、コースから Soapbox を開いてください。';
 $string['error:realtime_unavailable'] = '音声モードは一時的に利用できません。しばらくしてからもう一度お試しいただくか、テキストチャットをご利用ください。';
 $string['settings:cdn_bundle_url'] = 'トーキングアバター ビューアーのバンドルURL';
 $string['settings:cdn_bundle_url_desc'] = 'トーキングアバターのビューアーページが読み込むJavaScriptバンドルのURL(WebRTC/LiveKit連携)。空欄にするとビューアーは無効になり、ページには壊れた画面の代わりに通知が表示されます。';

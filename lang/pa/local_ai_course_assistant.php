@@ -1976,6 +1976,7 @@ $string['soapbox:no_media_support'] = 'ਇਹ ਬ੍ਰਾਊਜ਼ਰ ਇੱਥ
 $string['soapbox:status_uploaded'] = 'ਪ੍ਰੋਸੈਸ ਹੋ ਰਿਹਾ ਹੈ — ਟ੍ਰਾਂਸਕ੍ਰਿਪਸ਼ਨ ਅਤੇ ਸਕੋਰਿੰਗ ਜਾਰੀ ਹੈ';
 $string['soapbox:status_scored'] = 'ਸਕੋਰ ਹੋ ਗਿਆ';
 $string['soapbox:status_failed'] = 'ਸਕੋਰਿੰਗ ਅਸਫਲ ਰਹੀ — ਇਹ ਕੋਸ਼ਿਸ਼ ਗਿਣੀ ਨਹੀਂ ਜਾਂਦੀ। ਕਿਰਪਾ ਕਰਕੇ ਫਿਰ ਰਿਕਾਰਡ ਕਰੋ।';
+$string['soapbox:assignment_notfound'] = 'ਉਹ ਭਾਸ਼ਣ ਅਸਾਈਨਮੈਂਟ ਹੁਣ ਮੌਜੂਦ ਨਹੀਂ ਹੈ, ਜਾਂ ਲਿੰਕ ਪੁਰਾਣਾ ਹੋ ਗਿਆ ਹੈ। ਮੌਜੂਦਾ ਸੂਚੀ ਦੇਖਣ ਲਈ ਕੋਰਸ ਤੋਂ Soapbox ਖੋਲ੍ਹੋ।';
 $string['error:realtime_unavailable'] = 'ਆਵਾਜ਼ ਮੋਡ ਫ਼ਿਲਹਾਲ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਫਿਰ ਕੋਸ਼ਿਸ਼ ਕਰੋ, ਜਾਂ ਟੈਕਸਟ ਚੈਟ ਵਰਤੋ।';
 $string['settings:cdn_bundle_url'] = 'ਬੋਲਦੇ ਅਵਤਾਰ ਵਿਊਅਰ ਬੰਡਲ URL';
 $string['settings:cdn_bundle_url_desc'] = 'ਉਸ JavaScript ਬੰਡਲ ਦਾ URL ਜੋ ਬੋਲਦੇ ਅਵਤਾਰ ਵਿਊਅਰ ਪੰਨਾ ਲੋਡ ਕਰਦਾ ਹੈ (WebRTC/LiveKit ਜੋੜ)। ਵਿਊਅਰ ਬੰਦ ਕਰਨ ਲਈ ਖਾਲੀ ਛੱਡੋ; ਫਿਰ ਪੰਨਾ ਟੁੱਟੇ ਹੋਏ ਦ੍ਰਿਸ਼ ਦੀ ਥਾਂ ਇੱਕ ਸੂਚਨਾ ਦਿਖਾਉਂਦਾ ਹੈ।';

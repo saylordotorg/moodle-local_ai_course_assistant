@@ -1987,6 +1987,7 @@ $string['soapbox:no_media_support'] = 'Biraawzariin kun asitti sagalee waraabuu 
 $string['soapbox:status_uploaded'] = 'Hojjetamaa jira — barreeffamatti jijjiiruu fi qabxii kennuun itti fufaa jira';
 $string['soapbox:status_scored'] = 'Qabxiin kennameera';
 $string['soapbox:status_failed'] = 'Qabxii kennuun hin milkoofne — yaaliin kun hin lakkaa\'amu. Maaloo irra deebi\'ii waraabi.';
+$string['soapbox:assignment_notfound'] = 'Hojiin haasawaa sun si\'achi hin jiru, yookaan hidhaan sun dulloomeera. Tarree ammaa ilaaluuf Soapbox koorsii irraa bani.';
 $string['error:realtime_unavailable'] = 'Haalata sagalee yeroof hin argamu. Maaloo yeroo muraasa booda irra deebi\'ii yaali, yookiin chaattii barreeffamaa fayyadami.';
 $string['settings:cdn_bundle_url'] = 'URL baandilii mul\'istuu avaataara dubbatu';
 $string['settings:cdn_bundle_url_desc'] = 'URL baandilii JavaScript fuulli mul\'istuu avaataara dubbatuu fe\'u (walqunnamsiisa WebRTC/LiveKit). Mul\'istuu dhaamsuuf duwwaa dhiisi; fuulli sun ergasii bakka mul\'ata cabee beeksisa agarsiisa.';

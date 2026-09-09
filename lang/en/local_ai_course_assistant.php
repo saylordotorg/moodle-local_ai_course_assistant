@@ -2477,6 +2477,7 @@ $string['soapbox:no_media_support'] = 'This browser cannot record audio here. Us
 $string['soapbox:status_uploaded'] = 'Processing — transcription and scoring in progress';
 $string['soapbox:status_scored'] = 'Scored';
 $string['soapbox:status_failed'] = 'Scoring failed — this attempt does not count. Please record again.';
+$string['soapbox:assignment_notfound'] = 'That speech assignment no longer exists, or the link is out of date. Open Soapbox from the course to see the current list.';
 $string['error:realtime_unavailable'] = 'Voice mode is temporarily unavailable. Please try again in a moment, or use text chat.';
 $string['settings:cdn_bundle_url'] = 'Talking avatar viewer bundle URL';
 $string['settings:cdn_bundle_url_desc'] = 'URL of the JavaScript bundle the talking-avatar viewer page loads (WebRTC/LiveKit glue). Leave blank to disable the viewer; the page then shows a notice instead of a broken stage.';

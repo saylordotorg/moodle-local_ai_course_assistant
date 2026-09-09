@@ -48,7 +48,7 @@ $PAGE->set_heading($course->fullname);
 if ($action === 'delete' && $id) {
     $assign = soapbox_assignment_manager::get_assignment($id);
     if (!$assign || (int) $assign->courseid !== $courseid) {
-        throw new \moodle_exception('invalidrecord', 'error');
+        throw new \moodle_exception('soapbox:assignment_notfound', 'local_ai_course_assistant');
     }
     if (optional_param('confirm', 0, PARAM_BOOL) && confirm_sesskey()) {
         soapbox_assignment_manager::delete_assignment($id);

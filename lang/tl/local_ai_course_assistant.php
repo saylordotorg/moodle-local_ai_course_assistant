@@ -2000,6 +2000,7 @@ $string['soapbox:no_media_support'] = 'Hindi makapag-record ng audio ang browser
 $string['soapbox:status_uploaded'] = 'Pinoproseso — isinasagawa ang transkripsyon at pagmamarka';
 $string['soapbox:status_scored'] = 'Namarkahan na';
 $string['soapbox:status_failed'] = 'Nabigo ang pagmamarka — hindi mabibilang ang pagtatangkang ito. Mangyaring mag-record muli.';
+$string['soapbox:assignment_notfound'] = 'Wala na ang takdang-aralin sa pagtatalumpati na iyon, o luma na ang link. Buksan ang Soapbox mula sa kurso upang makita ang kasalukuyang listahan.';
 $string['error:realtime_unavailable'] = 'Pansamantalang hindi available ang voice mode. Subukan muli sa ilang sandali, o gamitin ang text chat.';
 $string['settings:cdn_bundle_url'] = 'URL ng bundle ng talking avatar viewer';
 $string['settings:cdn_bundle_url_desc'] = 'URL ng JavaScript bundle na nilo-load ng pahina ng talking-avatar viewer (WebRTC/LiveKit glue). Iwanang blangko para i-disable ang viewer; magpapakita na lang ang pahina ng abiso sa halip na sirang stage.';

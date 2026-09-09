@@ -2000,6 +2000,7 @@ $string['soapbox:no_media_support'] = 'Browserkani halkan cod kuma duubi karo. I
 $string['soapbox:status_uploaded'] = 'Waa la farsameynayaa — qoraal-u-beddelka iyo qiimeyntu way socdaan';
 $string['soapbox:status_scored'] = 'Waa la qiimeeyay';
 $string['soapbox:status_failed'] = 'Qiimeyntu way fashilantay — iskuddaygan lama tirinayo. Fadlan mar kale duub.';
+$string['soapbox:assignment_notfound'] = 'Hawsha khudbaddaas mar dambe ma jirto, ama linkigu wuu duugoobay. Soapbox ka fur koorsada si aad u aragto liiska hadda jira.';
 $string['error:realtime_unavailable'] = 'Habka codku si ku-meel-gaar ah uma shaqaynayo. Isku day wax yar ka dib, ama isticmaal wada-sheekaysiga qoraalka.';
 $string['settings:cdn_bundle_url'] = 'URL-ka xirmada daawadaha avatar-ka hadlaya';
 $string['settings:cdn_bundle_url_desc'] = 'URL-ka xirmada JavaScript ee uu bogga daawadaha avatar-ka hadlaya soo raro (isku-xirka WebRTC/LiveKit). Ka tag meel bannaan si aad u damiso daawadaha; boggu markaas wuxuu muujin doonaa ogeysiis halkii uu ka muujin lahaa masrax jaban.';

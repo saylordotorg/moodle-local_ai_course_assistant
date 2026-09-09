@@ -1956,6 +1956,7 @@ $string['soapbox:no_media_support'] = 'Denne browser kan ikke optage lyd her. Br
 $string['soapbox:status_uploaded'] = 'Behandler — transskription og bedømmelse er i gang';
 $string['soapbox:status_scored'] = 'Bedømt';
 $string['soapbox:status_failed'] = 'Bedømmelsen mislykkedes — dette forsøg tæller ikke. Optag venligst igen.';
+$string['soapbox:assignment_notfound'] = 'Denne taleopgave findes ikke længere, eller linket er forældet. Åbn Soapbox fra kurset for at se den aktuelle liste.';
 $string['error:realtime_unavailable'] = 'Taletilstand er midlertidigt utilgængelig. Prøv igen om et øjeblik, eller brug tekstchatten.';
 $string['settings:cdn_bundle_url'] = 'Bundle-URL for fremviseren til talende avatar';
 $string['settings:cdn_bundle_url_desc'] = 'URL til det JavaScript-bundle, som fremvisersiden for den talende avatar indlæser (WebRTC/LiveKit-lim). Lad feltet stå tomt for at deaktivere fremviseren; siden viser så en meddelelse i stedet for en ødelagt scene.';

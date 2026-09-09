@@ -1996,6 +1996,7 @@ $string['soapbox:no_media_support'] = 'Questo browser non può registrare audio 
 $string['soapbox:status_uploaded'] = 'In elaborazione — trascrizione e valutazione in corso';
 $string['soapbox:status_scored'] = 'Valutato';
 $string['soapbox:status_failed'] = 'Valutazione non riuscita — questo tentativo non conta. Registra di nuovo.';
+$string['soapbox:assignment_notfound'] = 'Questo compito di oratoria non esiste più, oppure il collegamento non è aggiornato. Apri Soapbox dal corso per vedere l\'elenco attuale.';
 $string['error:realtime_unavailable'] = 'La modalità vocale è temporaneamente non disponibile. Riprova tra un momento oppure usa la chat testuale.';
 $string['settings:cdn_bundle_url'] = 'URL del bundle del visualizzatore dell\'avatar parlante';
 $string['settings:cdn_bundle_url_desc'] = 'URL del bundle JavaScript caricato dalla pagina del visualizzatore dell\'avatar parlante (integrazione WebRTC/LiveKit). Lascia vuoto per disattivare il visualizzatore; la pagina mostrerà un avviso invece di una schermata non funzionante.';

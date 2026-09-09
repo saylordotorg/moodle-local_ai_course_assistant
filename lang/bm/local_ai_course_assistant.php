@@ -1984,6 +1984,7 @@ $string['soapbox:no_media_support'] = 'Nin navigatɛri tɛ se ka kumakan ta yan.
 $string['soapbox:status_uploaded'] = 'Baara bɛ sen na — sɛbɛnni ni jateminɛ bɛ ka kɛ';
 $string['soapbox:status_scored'] = 'Jateminɛ kɛra';
 $string['soapbox:status_failed'] = 'Jateminɛ ma ɲɛ — nin kɔrɔbɔli tɛ jate. I ka kan ka a ta kokura.';
+$string['soapbox:assignment_notfound'] = 'Nin kumakan baara tɛ yen bilen, walima nɔrɔli in kɔrɔla. Soapbox dabɔ kalansen kɔnɔ walasa ka sisan lisi ye.';
 $string['error:realtime_unavailable'] = 'Kumakan cogo tɛ sɔrɔ waati kunkurun in na. A lajɛ kokura dɔɔnin kɔfɛ, walima ka sɛbɛnni baro baara kɛ.';
 $string['settings:cdn_bundle_url'] = 'Kuma avatari lajɛlan pake URL';
 $string['settings:cdn_bundle_url_desc'] = 'JavaScript pake URL min bɛ doni kuma avatari lajɛ ɲɛ fɛ (WebRTC/LiveKit cɛsiri). A to lankolon walasa ka lajɛlan bali; o tuma ɲɛ bɛna kunnafoni dɔ jira sanko ka jirayɔrɔ tiɲɛnen jira.';
