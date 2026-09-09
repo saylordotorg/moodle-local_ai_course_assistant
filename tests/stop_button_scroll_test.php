@@ -22,7 +22,6 @@ namespace local_ai_course_assistant;
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor Academy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_ai_course_assistant\output\chat_widget
  */
 final class stop_button_scroll_test extends \advanced_testcase {
 
