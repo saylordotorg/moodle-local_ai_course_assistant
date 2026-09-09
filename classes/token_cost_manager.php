@@ -122,9 +122,14 @@ class token_cost_manager {
         // generation's price, on the reasoning that an unrecognized future dated
         // variant is better priced at today's rate than at a rate three years
         // old; the explicitly named models below win on longest-prefix anyway.
+        // Corrected again 2026-09-09: sonnet-5 was still carrying Sonnet 4.6's
+        // 3.00/15.00. Verified 2.00/10.00 against claude.com/pricing that day.
+        // The bare 'claude-sonnet' prefix deliberately stays at 3.00/15.00: it is
+        // the fallback for sonnet-4/4-5/4-6, which really are that price, and
+        // longest-prefix means no claude-sonnet-5* string ever reaches it.
         'claude-haiku-4-5'  => ['input' => 1.00, 'output' => 5.00],
         'claude-haiku'      => ['input' => 1.00, 'output' => 5.00],
-        'claude-sonnet-5'   => ['input' => 3.00, 'output' => 15.00],
+        'claude-sonnet-5'   => ['input' => 2.00, 'output' => 10.00],
         'claude-sonnet'     => ['input' => 3.00, 'output' => 15.00],
         'claude-opus-5'     => ['input' => 5.00, 'output' => 25.00],
         'claude-opus'       => ['input' => 5.00, 'output' => 25.00],

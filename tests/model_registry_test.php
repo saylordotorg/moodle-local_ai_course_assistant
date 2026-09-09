@@ -102,8 +102,15 @@ final class model_registry_test extends \advanced_testcase {
         // The committed table was a generation stale: opus 15/75, haiku 0.80/4.
         $this->assertEqualsWithDelta(5.00, model_registry::rate_for('claude-opus-5')['input'], 1e-9);
         $this->assertEqualsWithDelta(25.00, model_registry::rate_for('claude-opus-5')['output'], 1e-9);
-        $this->assertEqualsWithDelta(3.00, model_registry::rate_for('claude-sonnet-5')['input'], 1e-9);
-        $this->assertEqualsWithDelta(15.00, model_registry::rate_for('claude-sonnet-5')['output'], 1e-9);
+        // Sonnet 5 is 2.00/10.00, not Sonnet 4.6's 3.00/15.00. Verified
+        // against claude.com/pricing on 2026-09-09.
+        $this->assertEqualsWithDelta(2.00, model_registry::rate_for('claude-sonnet-5')['input'], 1e-9);
+        $this->assertEqualsWithDelta(10.00, model_registry::rate_for('claude-sonnet-5')['output'], 1e-9);
+        // The bare prefix stays at Sonnet 4.x pricing: it is their fallback, and
+        // longest-prefix keeps every claude-sonnet-5* string off it.
+        $this->assertEqualsWithDelta(3.00, model_registry::rate_for('claude-sonnet')['input'], 1e-9);
+        $this->assertEqualsWithDelta(15.00, model_registry::rate_for('claude-sonnet')['output'], 1e-9);
+        $this->assertEqualsWithDelta(2.00, model_registry::rate_for('claude-sonnet-5-20260115')['input'], 1e-9);
         $this->assertEqualsWithDelta(1.00, model_registry::rate_for('claude-haiku-4-5')['input'], 1e-9);
         $this->assertEqualsWithDelta(5.00, model_registry::rate_for('claude-haiku-4-5')['output'], 1e-9);
     }
