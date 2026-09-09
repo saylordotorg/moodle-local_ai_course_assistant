@@ -424,7 +424,11 @@ class generate_quiz extends external_api {
                 // counter is silently null for every Claude-served quiz.
                 isset($usage['cached_tokens']) ? (int) $usage['cached_tokens']
                     : (isset($usage['cache_read_tokens']) ? (int) $usage['cache_read_tokens'] : null),
-                $cmid > 0 ? $cmid : null
+                $cmid > 0 ? $cmid : null,
+                // v7.4.2: thinking tokens. Quiz rows are priced, so omitting
+                // this under-reported every quiz generated on a thinking model
+                // by however much of the answer was thinking.
+                isset($usage['reasoning_tokens']) ? (int) $usage['reasoning_tokens'] : null
             );
         } catch (\Throwable $e) {
             debugging('generate_quiz: could not record quiz usage: ' . $e->getMessage(), DEBUG_DEVELOPER);

@@ -520,4 +520,64 @@ final class reasoning_tokens_persistence_test extends \advanced_testcase {
             );
         }
     }
+
+    /**
+     * BOTH chat write paths carry the field, not just the streaming one.
+     *
+     * sse.php serves the widget; send_message.php is the mobile/web-service
+     * fallback for the same turn. The two had already drifted once over token
+     * capture -- usage existed only on the streaming path until v7.0.6 -- and
+     * v7.4.2 initially re-created the drift one layer up, closing the gap on
+     * sse.php while send_message.php still wrote NULL. A NULL there is
+     * indistinguishable from "this provider does not report thinking", so
+     * every mobile turn on a Gemini course silently priced short.
+     */
+    public function test_both_chat_write_paths_persist_reasoning_tokens(): void {
+        $paths = [
+            'sse.php' => __DIR__ . '/../sse.php',
+            'classes/external/send_message.php' => __DIR__ . '/../classes/external/send_message.php',
+        ];
+        foreach ($paths as $label => $file) {
+            $src = file_get_contents($file);
+            $this->assertStringContainsString(
+                "reasoning_tokens",
+                $src,
+                $label . ' writes a chat row without the reasoning-token field; the two chat '
+                . 'paths must record the same counters or their rows are not comparable'
+            );
+        }
+    }
+
+    /**
+     * Quiz rows are PRICED (interaction_type 'quiz' is in
+     * spend_rows_predicate), so a missing reasoning term under-reports the
+     * highest-volume non-chat path on every course whose quiz tier is a
+     * thinking model.
+     */
+    public function test_quiz_usage_row_persists_reasoning_tokens(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+
+        conversation_manager::record_quiz_usage(
+            (int) $user->id,
+            (int) $course->id,
+            '[quiz]',
+            'google',
+            'gemini-2.5-flash',
+            12000,
+            800,
+            null,
+            null,
+            640
+        );
+
+        $row = $DB->get_record('local_ai_course_assistant_msgs',
+            ['userid' => $user->id, 'interaction_type' => 'quiz']);
+        $this->assertNotFalse($row, 'no quiz usage row was written');
+        $this->assertEquals(640, (int) $row->reasoning_tokens,
+            'quiz rows are priced, so their thinking tokens must be recorded');
+        $this->assertEquals(800, (int) $row->completion_tokens,
+            'reasoning must never be folded into completion_tokens');
+    }
 }

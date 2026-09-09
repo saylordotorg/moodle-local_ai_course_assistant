@@ -292,7 +292,17 @@ class send_message extends external_api {
             ((int) $params['pageid']) ?: null,
             $raglatencyms,
             $tokenusage['cached_tokens'] ?? null,
-            'complete'
+            'complete',
+            null,
+            null,
+            // v7.4.2: thinking tokens, as sse.php writes them. This path is the
+            // mobile/web-service fallback for the SAME chat turn, so omitting
+            // the field here would leave its rows carrying NULL — which reads
+            // as "this provider does not report thinking" and is
+            // indistinguishable from a provider that genuinely does not. The
+            // two chat paths had already drifted once over token capture; the
+            // comment above says these arguments are deliberately matched.
+            isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null
         );
 
         return [

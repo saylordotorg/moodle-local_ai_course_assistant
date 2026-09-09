@@ -530,4 +530,56 @@ class security {
         }
         return ['text' => $text, 'neutralized' => $neutralized];
     }
+
+    /**
+     * Strip credentials and obvious secrets from a provider error string before
+     * it is persisted.
+     *
+     * v7.4.2. sse.php records $e->debuginfo into the audit table so a
+     * production site running with debug OFF can still diagnose a chat failure.
+     * That is the right call for observability, but debuginfo from the provider
+     * layer is raw vendor output: base_provider throws
+     * "HTTP {code}: {response}" with the vendor's unparsed error body, embeds
+     * $curl->error, and embeds the full endpoint URL when the SSRF validator
+     * rejects it. Two things must therefore never reach the table.
+     *
+     * 1. Credentials. An admin who configured an OpenAI-compatible base URL of
+     *    the form https://user:token@proxy/v1 has that URL land in debuginfo
+     *    the moment the validator rejects it, and vendor bodies can echo the
+     *    Authorization header. URL userinfo and bearer/sk-/AIza-shaped strings
+     *    are replaced rather than truncated: a truncated key is still a key.
+     *
+     * 2. Learner text. Content-filter and invalid-parameter bodies routinely
+     *    quote a fragment of the offending request, which for score_essay is
+     *    the learner's essay. That cannot be pattern-matched, so the caller
+     *    bounds the length; this pass removes the part that patterns CAN find.
+     *
+     * @param string $text Raw debuginfo or error string.
+     * @return string Same string with credential-shaped substrings replaced.
+     */
+    public static function redact_secrets(string $text): string {
+        $patterns = [
+            // URL userinfo: scheme://user:pass@host -> scheme://[redacted]@host.
+            '~\b([a-z][a-z0-9+.-]*://)[^/\s:@]+:[^/\s@]*@~i' => '$1[redacted]@',
+            // Authorization headers, however they are quoted in a vendor body.
+            '~\b(bearer|authorization|api[_-]?key|x-api-key)\b\s*[:=]?\s*["\x27]?[A-Za-z0-9._\-]{8,}~i'
+                => '$1 [redacted]',
+            // Vendor key shapes: OpenAI sk-/rk-, Google AIza, Anthropic, xAI.
+            '~\b(?:sk|rk|xai|sk-ant)-[A-Za-z0-9._\-]{8,}~' => '[redacted-key]',
+            '~\bAIza[A-Za-z0-9._\-]{10,}~' => '[redacted-key]',
+            // Long opaque query-string credentials, e.g. ?key=... / &token=...
+            '~([?&](?:key|token|access_token|api_key)=)[^&\s]+~i' => '$1[redacted]',
+        ];
+        foreach ($patterns as $re => $replacement) {
+            $result = preg_replace($re, $replacement, $text);
+            // preg_replace returns null on backtrack limit. A pathological
+            // provider body must not turn the audit detail into null, and it
+            // must not fall through UNREDACTED either.
+            if ($result === null) {
+                return '[redaction failed; detail withheld]';
+            }
+            $text = $result;
+        }
+        return $text;
+    }
 }

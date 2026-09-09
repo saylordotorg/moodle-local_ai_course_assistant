@@ -1173,9 +1173,25 @@ try {
         // This is the admin-only audit trail, whose entire purpose is to
         // survive a production site running with debug off, and it already
         // carries de-anonymized export records.
+        //
+        // Ungated persistence is exactly why the string is redacted first.
+        // debuginfo here is raw provider output -- base_provider throws
+        // "HTTP {code}: {body}" with the vendor's unparsed error body, and puts
+        // the full endpoint URL in it when the SSRF validator rejects one. So a
+        // proxy base URL carrying credentials, or a vendor body echoing the
+        // Authorization header, would otherwise be written verbatim into a
+        // table that privacy/provider.php declares, audit_log.php displays and
+        // the learner's own data export includes. Truncation is not redaction:
+        // the first 500 characters of an error are where the key usually is.
+        // The 500-char bound stays as the second control, for the learner text
+        // that content-filter bodies quote back and no pattern can catch.
         $auditentry = ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)];
         if (!empty($e->debuginfo) && is_string($e->debuginfo)) {
-            $auditentry['detail'] = \core_text::substr((string) $e->debuginfo, 0, 500);
+            $auditentry['detail'] = \core_text::substr(
+                \local_ai_course_assistant\security::redact_secrets((string) $e->debuginfo),
+                0,
+                500
+            );
         }
         \local_ai_course_assistant\audit_logger::log(
             $auditaction,
@@ -1225,7 +1241,16 @@ try {
             : '';
         $entry = ['kind' => get_class($e), 'msg' => $e->getMessage(), 'pageid' => (int)($pageid ?? 0)];
         if ($detail !== '') {
-            $entry['detail'] = \core_text::substr($detail, 0, 500);
+            // v7.4.2: redacted before persisting, for the reason spelled out on
+            // the moodle_exception handler above. This handler has written raw
+            // debuginfo since the 2026-08 remediation; it carries the same
+            // credential exposure and is fixed with it rather than left as the
+            // one unredacted path.
+            $entry['detail'] = \core_text::substr(
+                \local_ai_course_assistant\security::redact_secrets($detail),
+                0,
+                500
+            );
         }
         \local_ai_course_assistant\audit_logger::log(
             \local_ai_course_assistant\spend_guard::emergency_chat_stopped()

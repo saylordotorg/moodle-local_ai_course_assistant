@@ -173,12 +173,33 @@ class conversation_manager {
         $DB->set_field('local_ai_course_assistant_convs', 'timemodified', time(), ['id' => $conversationid]);
 
         // Enforce 50-pair (100 message) cap: delete oldest messages beyond the limit.
-        $totalcount = $DB->count_records('local_ai_course_assistant_msgs', ['conversationid' => $conversationid]);
+        //
+        // v7.4.2: the cap counts and deletes LEARNER-VISIBLE rows only.
+        // It used to do both role-blind, which meant role='system' cost-log
+        // rows -- TTS, STT, quiz, and now flashcards/essay/insights -- both
+        // consumed the learner's 50-pair budget and were themselves eligible
+        // for deletion. Two consequences, both silent. A teacher who opened the
+        // course Insights report 101 times lost the first spend row on the
+        // 101st run and one more on every run after it. A learner mixing chat
+        // with voice and flashcards evicted real assistant rows -- carrying
+        // prompt_tokens, completion_tokens, cached_tokens and reasoning_tokens
+        // -- before the monthly spend pull ever read them, so that billed usage
+        // left the only table the dashboard reads. A cap whose purpose is
+        // bounding conversation HISTORY must not be able to destroy the cost
+        // ledger; the ledger is append-only here and ages out on its own
+        // retention schedule.
+        $rolesql = "conversationid = ? AND role IN ('user', 'assistant')";
+        $totalcount = $DB->count_records_select(
+            'local_ai_course_assistant_msgs',
+            $rolesql,
+            [$conversationid]
+        );
         if ($totalcount > 100) {
             $excess  = $totalcount - 100;
-            $oldest  = $DB->get_records(
+            $oldest  = $DB->get_records_select(
                 'local_ai_course_assistant_msgs',
-                ['conversationid' => $conversationid],
+                $rolesql,
+                [$conversationid],
                 'timecreated ASC',
                 'id',
                 0,
@@ -210,11 +231,22 @@ class conversation_manager {
      * ever shown to the learner or fed back to the LLM as context.
      *
      * Rows land in interaction_type buckets of their own ('flashcards',
-     * 'essay', 'insights'), which token_analytics categorises as "other" and
-     * spend_guard counts in the site-wide total but in no per-capability cap.
-     * That is deliberate: folding them into the 'chat' capability would make
-     * previously-uncapped spend start tripping the chat cap, which is a
-     * policy change and not this one's to make.
+     * 'essay', 'insights'). Those three names are LISTED IN
+     * analytics::spend_rows_predicate(), and writing a row here without adding
+     * it there is not a partial fix but a no-op: the predicate is an
+     * allow-list for role='system' rows and every spend consumer in the plugin
+     * selects through it, so an unlisted type is written, counted by nothing,
+     * and priced at zero. Adding a fourth endpoint means adding a fourth name
+     * there too; tests/spend_predicate_coverage_test.php fails if it is not.
+     *
+     * Given that listing, token_analytics categorises them as "other" and they
+     * count toward the site-wide spend total, the anomaly detector and the
+     * dashboard export, while falling in no spend_guard::capability_sql()
+     * bucket -- capability_sql is ANDed on after the predicate, so a
+     * per-capability cap still excludes them. That last part is deliberate:
+     * folding them into the 'chat' capability would make previously-uncapped
+     * spend start tripping the chat cap, which is a policy change and not this
+     * one's to make.
      *
      * EVERY failure path here is swallowed. Telemetry must never be able to
      * break the learner-facing feature it is measuring: a provider that
@@ -398,6 +430,7 @@ class conversation_manager {
      * @param int|null $completiontokens
      * @param int|null $cachedtokens
      * @param int|null $cmid
+     * @param int|null $reasoningtokens Thinking tokens as reported; null when the provider reported none.
      * @return void
      */
     public static function record_quiz_usage(
@@ -409,7 +442,8 @@ class conversation_manager {
         ?int $prompttokens,
         ?int $completiontokens,
         ?int $cachedtokens = null,
-        ?int $cmid = null
+        ?int $cmid = null,
+        ?int $reasoningtokens = null
     ): void {
         global $DB;
 
@@ -429,6 +463,13 @@ class conversation_manager {
         $row->interaction_type = 'quiz';
         $row->cmid             = $cmid;
         $row->cached_tokens    = $cachedtokens;
+        // v7.4.2: quiz rows ARE priced -- 'quiz' has been in
+        // analytics::spend_rows_predicate() since v7.0.6 -- so leaving this
+        // null priced the highest-volume non-chat path short by exactly its
+        // thinking tokens on every course whose config points quiz generation
+        // at a thinking model. Stored raw and never folded into
+        // completion_tokens, as in add_message().
+        $row->reasoning_tokens = $reasoningtokens;
         $row->timecreated      = time();
 
         $DB->insert_record('local_ai_course_assistant_msgs', $row);

@@ -145,9 +145,17 @@ class token_cost_manager {
         // Rates from ai.google.dev/gemini-api/docs/pricing (fetched 2026-09-08),
         // USD per 1M tokens, paid tier. The 0.30 input rate is text/image/video;
         // audio input is 1.00 and is NOT modeled here (SOLA sends audio through
-        // Whisper/Realtime, not through the Gemini chat path). The 2.50 output
-        // rate INCLUDES thinking tokens, so no separate reasoning-token line is
-        // needed — Gemini bills them at the output rate.
+        // Whisper/Realtime, not through the Gemini chat path).
+        //
+        // Thinking tokens bill AT the 2.50 output rate, so there is no separate
+        // reasoning line in this table. That is a statement about the RATE, not
+        // about the token COUNT, and v7.4.2 corrects what this comment used to
+        // imply: Google's OpenAI-compatibility shim does not reliably include
+        // thinking in the completion_tokens it reports, so pricing
+        // completion_tokens alone under-charges every thinking call. The count
+        // is carried separately in msgs.reasoning_tokens and added to output
+        // for these prefixes by estimate_cost(); see
+        // REASONING_OUTSIDE_COMPLETION_PREFIXES.
         'gemini-2.5-flash-lite' => ['input' => 0.10, 'output' => 0.40],
         'gemini-2.5-flash'  => ['input' => 0.30, 'output' => 2.50],
         'gemini-2.0-flash'  => ['input' => 0.10, 'output' => 0.40],
@@ -209,22 +217,102 @@ class token_cost_manager {
     ];
 
     /**
+     * Model prefixes whose reported completion_tokens EXCLUDES thinking tokens.
+     *
+     * v7.4.2. The msgs table stores reasoning_tokens exactly as the provider
+     * reported it and never folds it into completion_tokens, because whether
+     * thinking is already inside that number is vendor-specific. This list is
+     * where that vendor knowledge lives, and it is the ONLY place: both the
+     * PHP pricing path ({@see estimate_cost}) and the SQL aggregate path
+     * ({@see extra_output_tokens_sql}) derive from it, so they cannot drift.
+     *
+     * OpenAI (o-series, gpt-5) counts reasoning INSIDE completion_tokens, so
+     * those models are deliberately absent: adding reasoning for them would
+     * double-charge every call. Google's Gemini OpenAI-compatibility shim has
+     * not reliably done so while still billing thinking at the output rate,
+     * which is why gemini is here. A model absent from this list prices as
+     * completion_tokens alone, which is the safe default for any provider
+     * whose behaviour has not been confirmed.
+     *
+     * @var string[]
+     */
+    private const REASONING_OUTSIDE_COMPLETION_PREFIXES = ['gemini-', 'gemini/', 'models/gemini-'];
+
+    /**
+     * Does this model bill thinking as output ON TOP OF completion_tokens?
+     *
+     * @param string $modelname Exact model string as recorded on the row.
+     * @return bool True when reasoning_tokens must be ADDED to completion_tokens to price the call.
+     */
+    public static function reasoning_billed_as_extra_output(string $modelname): bool {
+        $model = strtolower(trim($modelname));
+        foreach (self::REASONING_OUTSIDE_COMPLETION_PREFIXES as $prefix) {
+            if (strpos($model, $prefix) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * SQL expression for the reasoning tokens that must be ADDED to
+     * completion_tokens for a row, or 0 when the provider already counted them.
+     *
+     * For aggregate queries that never see a model name in PHP (
+     * {@see analytics::get_total_tokens}). Queries that group by model and
+     * price in a PHP loop should sum reasoning_tokens plainly and pass it to
+     * {@see estimate_cost}, which applies the same rule.
+     *
+     * @param string $alias Table alias for the msgs table.
+     * @return string SQL scalar expression, already parenthesised.
+     */
+    public static function extra_output_tokens_sql(string $alias = 'm'): string {
+        $whens = [];
+        foreach (self::REASONING_OUTSIDE_COMPLETION_PREFIXES as $prefix) {
+            // The prefixes are class constants, not user input, so there is
+            // nothing here to parameterise; they contain no LIKE wildcards.
+            $whens[] = "LOWER({$alias}.model_name) LIKE '" . $prefix . "%'";
+        }
+        $condition = implode(' OR ', $whens);
+        return "(CASE WHEN {$condition} THEN COALESCE({$alias}.reasoning_tokens, 0) ELSE 0 END)";
+    }
+
+    /**
      * Estimate the cost of a single API call in USD.
      *
      * Returns null if the model is not in the rate card (e.g. Ollama local models).
      *
+     * v7.4.2 takes reasoning tokens. Passing them is what makes the figure
+     * match the invoice on a thinking model: the reconciliation that prompted
+     * this measured 0.35M completion tokens logged against 1.78M billed, and
+     * the missing ~1.4M was thinking that Gemini bills at the output rate but
+     * does not report inside completion_tokens. They are added to output ONLY
+     * for models in REASONING_OUTSIDE_COMPLETION_PREFIXES, so an OpenAI call —
+     * where the count is already inside completion_tokens — is not charged
+     * twice. Defaulting to 0 keeps every existing two-token caller correct.
+     *
      * @param string $modelname  Exact model string from the API response.
      * @param int    $prompttokens
      * @param int    $completiontokens
+     * @param int    $reasoningtokens Thinking tokens as reported; 0 when none/unknown.
      * @return float|null  Cost in USD, or null if model is not known.
      */
-    public static function estimate_cost(string $modelname, int $prompttokens, int $completiontokens): ?float {
+    public static function estimate_cost(
+        string $modelname,
+        int $prompttokens,
+        int $completiontokens,
+        int $reasoningtokens = 0
+    ): ?float {
         $rates = self::get_rates($modelname);
         if ($rates === null) {
             return null;
         }
+        $billableoutput = $completiontokens;
+        if ($reasoningtokens > 0 && self::reasoning_billed_as_extra_output($modelname)) {
+            $billableoutput += $reasoningtokens;
+        }
         $inputcost  = ($prompttokens / 1_000_000) * $rates['input'];
-        $outputcost = ($completiontokens / 1_000_000) * $rates['output'];
+        $outputcost = ($billableoutput / 1_000_000) * $rates['output'];
         return $inputcost + $outputcost;
     }
 
