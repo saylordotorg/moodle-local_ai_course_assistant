@@ -1290,6 +1290,14 @@ define([
         var initialLang = Speech.getLang ? Speech.getLang() : '';
         if (initialLang && initialLang !== 'en') {
             applyI18n(initialLang);
+            // Also on demand: a language restored from storage at init produces
+            // no change event, so the panel would otherwise open untranslated.
+            const helpBtnEl = document.querySelector('.local-ai-course-assistant__btn-help');
+            if (helpBtnEl) {
+                helpBtnEl.addEventListener('click', function() {
+                    applyHelpPanelI18n(Speech.getLang ? Speech.getLang() : initialLang);
+                });
+            }
         }
         initLanguage();
         if (root.dataset.introDismissed === '1') {
@@ -1565,6 +1573,100 @@ define([
      *
      * @param {string|null} langCode ISO 639-1 code, or null for English
      */
+    /** @type {boolean} True once the help panel has been retranslated at least once. */
+    let helpI18nApplied = false;
+
+    /**
+     * Retranslate the help panel into the language chosen inside the widget.
+     *
+     * The panel is rendered server-side in the PAGE language -- partly via
+     * {{#str}}, partly pre-rendered in hook_callbacks for the strings carrying a
+     * brand name. Neither updates when the learner switches language in the
+     * widget, because nothing reloads the page, so the panel sat in the page
+     * language while every tagged element around it switched (reported after
+     * v7.4.1).
+     *
+     * It cannot be fixed by asking the server for the strings: PARAM_LANG
+     * rejects any language whose pack is not installed, and these sites install
+     * only en and en_us. Verified on staging -- core_get_strings with lang 'es'
+     * returns "Invalid parameter value detected". The plugin's own 46 lang files
+     * hold the translations, so they travel in a generated module instead.
+     *
+     * That module is ~108KB, so it is required lazily: a page load that never
+     * opens Help and never switches language pays nothing.
+     *
+     * @param {string|null} langCode ISO 639-1 code, or null/'en' for English
+     * @return {void}
+     */
+    const applyHelpPanelI18n = function(langCode) {
+        const root = document.getElementById('local-ai-course-assistant');
+        if (!root) {
+            return;
+        }
+        const panel = root.querySelector('.aica-help-panel');
+        if (!panel) {
+            return;
+        }
+        const targets = panel.querySelectorAll('[data-help-key]');
+        if (!targets.length) {
+            // Older template without the tags: leave the server-rendered text
+            // alone rather than blanking the panel.
+            return;
+        }
+        const lang = (langCode || 'en').substring(0, 2).toLowerCase();
+        // Nothing to do for English unless we already replaced the text once,
+        // in which case switching back has to restore it.
+        if (lang === 'en' && !helpI18nApplied) {
+            return;
+        }
+
+        require(['local_ai_course_assistant/i18n_help'], function(HelpI18n) {
+            let brand = {};
+            try {
+                brand = JSON.parse(root.dataset.brandtokens || '{}');
+            } catch (e) {
+                brand = {};
+            }
+            const shortname = root.dataset.shortname || brand.tutorshort || 'SOLA';
+            const resolve = function(str) {
+                if (!str) {
+                    return str;
+                }
+                let outstr = str.split('{$a}').join(shortname);
+                Object.keys(brand).forEach(function(tok) {
+                    outstr = outstr.split('[[' + tok + ']]').join(brand[tok]);
+                });
+                return outstr;
+            };
+
+            targets.forEach(function(el) {
+                const key = el.getAttribute('data-help-key');
+                let str = HelpI18n.get(lang, key);
+                if (!str) {
+                    return;
+                }
+                const extra = el.getAttribute('data-help-key-extra');
+                if (extra) {
+                    const tail = HelpI18n.get(lang, extra);
+                    if (tail) {
+                        str += ' ' + tail;
+                    }
+                }
+                str = resolve(str);
+                // Written as HTML only where the lang string genuinely carries
+                // markup (strong tags), and only ever from a lang string --
+                // never from anything a learner supplied.
+                if (el.getAttribute('data-help-html') === '1') {
+                    el.innerHTML = str;
+                } else {
+                    el.textContent = str;
+                }
+            });
+            helpI18nApplied = true;
+            return null;
+        });
+    };
+
     const applyI18n = function(langCode) {
         const root = document.getElementById('local-ai-course-assistant');
         if (!root) {
@@ -1646,6 +1748,7 @@ define([
      */
     const updateUiTextsForLang = function(langCode) {
         applyI18n(langCode);
+        applyHelpPanelI18n(langCode);
 
         if (langCode && langCode !== 'en') {
             var langInfo = Speech.getLangInfo(langCode);

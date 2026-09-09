@@ -369,33 +369,46 @@
     {{! Help guide panel — toggled by the ? button in the header }}
     <div class="aica-help-panel" hidden style="position:absolute;inset:0;z-index:10;background:#fff;overflow-y:auto;padding:16px 20px;font-size:14px;line-height:1.6">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <h4 style="margin:0;font-size:16px">{{help_title}}</h4>
+            <h4 style="margin:0;font-size:16px" data-help-key="help:title">{{help_title}}</h4>
             <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="{{#str}}help:close, local_ai_course_assistant{{/str}}">&times;</button>
         </div>
-        {{! help_title / help_intro / help_start_body / help_plans_body /
+        {{! Every text node here carries data-help-key so chat.js can refetch it
+            in the language the learner picked inside the widget. Server-side
+            rendering alone is not enough: {{#str}} and the pre-rendered values
+            below are both resolved once, in the PAGE language, and the in-widget
+            language switch never reloads the page. The panel therefore stayed in
+            the page language while the rest of the UI switched (reported after
+            v7.4.1). The keys are fetched on demand rather than bundled into
+            i18n_strings.js because 19 paragraphs across 45 languages would add
+            roughly 57KB to a file that loads on every course page, for a panel
+            most learners never open.
+
+            help_title / help_intro / help_start_body / help_plans_body /
             help_languages_body / help_data_download are pre-rendered in
             hook_callbacks: they carry a brand name (a $a placeholder or a
             [[tutorshort]] token) which the str helper cannot resolve.
             Triple-stache only where the string contains markup (strong
             tags); the $a values are escaped server-side. }}
-        <p>{{{help_intro}}}</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:start_title, local_ai_course_assistant{{/str}}</h5>
-        <p>{{help_start_body}}</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:quizzes_title, local_ai_course_assistant{{/str}}</h5>
-        <p>{{#str}}help:quizzes_body, local_ai_course_assistant{{/str}}</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:plans_title, local_ai_course_assistant{{/str}}</h5>
-        <p>{{{help_plans_body}}}</p>
+        <p data-help-key="help:intro" data-help-html="1">{{{help_intro}}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:start_title">{{#str}}help:start_title, local_ai_course_assistant{{/str}}</h5>
+        <p data-help-key="help:start_body">{{help_start_body}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:quizzes_title">{{#str}}help:quizzes_title, local_ai_course_assistant{{/str}}</h5>
+        <p data-help-key="help:quizzes_body" data-help-html="1">{{#str}}help:quizzes_body, local_ai_course_assistant{{/str}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:plans_title">{{#str}}help:plans_title, local_ai_course_assistant{{/str}}</h5>
+        <p data-help-key="help:plans_body" data-help-html="1">{{{help_plans_body}}}</p>
         {{#voiceenabled}}
-        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:voice_title, local_ai_course_assistant{{/str}}</h5>
-        <p>
+        <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:voice_title">{{#str}}help:voice_title, local_ai_course_assistant{{/str}}</h5>
+        {{! Two strings joined when the voice tab is on, so the refetch needs both
+            keys: data-help-key-extra is appended after a space. }}
+        <p data-help-key="help:voice_body"{{#voicetabenabled}} data-help-key-extra="help:voice_body_tab"{{/voicetabenabled}}>
             {{#str}}help:voice_body, local_ai_course_assistant{{/str}}{{#voicetabenabled}} {{#str}}help:voice_body_tab, local_ai_course_assistant{{/str}}{{/voicetabenabled}}
         </p>
         {{/voiceenabled}}
-        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:languages_title, local_ai_course_assistant{{/str}}</h5>
-        <p>{{help_languages_body}}</p>
-        <h5 style="margin:14px 0 6px;font-size:14px">{{#str}}help:data_title, local_ai_course_assistant{{/str}}</h5>
-        <p>{{#str}}help:data_body, local_ai_course_assistant{{/str}}</p>
-        <p>{{{help_data_download}}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:languages_title">{{#str}}help:languages_title, local_ai_course_assistant{{/str}}</h5>
+        <p data-help-key="help:languages_body">{{help_languages_body}}</p>
+        <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:data_title">{{#str}}help:data_title, local_ai_course_assistant{{/str}}</h5>
+        <p data-help-key="help:data_body">{{#str}}help:data_body, local_ai_course_assistant{{/str}}</p>
+        <p data-help-key="help:data_download" data-help-html="1">{{{help_data_download}}}</p>
     </div>
 
     {{! Language banner — shown by JS when browser language is detected }}
