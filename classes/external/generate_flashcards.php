@@ -116,6 +116,18 @@ class generate_flashcards extends external_api {
             return ['success' => false, 'message' => 'provider_error', 'cards' => []];
         }
 
+        // Log what that call cost. Without this the flashcard generator was a
+        // real, billed provider call that left no trace in the msgs table, so
+        // the AI Spend dashboard, the spend guard and the anomaly detector all
+        // behaved as though flashcards were free. Best-effort by contract.
+        \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+            $provider,
+            (int) $USER->id,
+            (int) $params['courseid'],
+            'flashcards',
+            '[Flashcards] ' . $count . ' card(s)'
+        );
+
         $decoded = json_decode($response, true);
         if (!$decoded || empty($decoded['cards']) || !is_array($decoded['cards'])) {
             // Try to extract JSON object from the response if structured-output wasn't honored.

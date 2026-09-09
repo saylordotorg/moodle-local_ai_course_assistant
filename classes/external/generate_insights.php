@@ -41,7 +41,10 @@ class generate_insights extends external_api {
     }
 
     public static function execute(int $courseid): array {
-        global $DB;
+        // $USER is needed to attribute the spend-log row below; this method
+        // only imported $DB before, so using $USER without this would have
+        // silently read null.
+        global $DB, $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid,
@@ -190,6 +193,20 @@ class generate_insights extends external_api {
             require_once($CFG->dirroot . '/lib/filelib.php');
             $provider = base_provider::create_from_config($courseid);
             $response = $provider->chat_completion($systemprompt, $messages);
+
+            // Insight generation is a real, billed provider call over the whole
+            // course's feedback/survey corpus -- one of the larger single
+            // prompts SOLA sends -- and its usage was being discarded, so none
+            // of it reached the AI Spend dashboard. Best-effort by contract:
+            // log_ancillary_usage() swallows its own failures, so this cannot
+            // turn a successful insight run into an error.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider,
+                (int) $USER->id,
+                (int) $courseid,
+                'insights',
+                '[Insights] course report'
+            );
 
             return [
                 'success' => true,

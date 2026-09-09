@@ -1004,7 +1004,14 @@ try {
         $cachedtokens !== null ? (int) $cachedtokens : null,
         connection_aborted() ? 'client_aborted' : 'complete',
         $chunkcount ?? null,
-        $topscore ?? null
+        $topscore ?? null,
+        // v7.4.2: thinking tokens, stored as reported and NOT summed into
+        // completion_tokens -- OpenAI already counts reasoning there, Google's
+        // Gemini OpenAI-compat shim has not reliably done so while still
+        // billing thinking as output. Folding it in would double-count OpenAI;
+        // dropping it under-counts Gemini, which is the chat tier at Saylor
+        // and so the bulk of this table. The consumer knows the provider.
+        isset($tokenusage['reasoning_tokens']) ? (int) $tokenusage['reasoning_tokens'] : null
     );
 
     // Queue the conversation-mastery classifier as an adhoc task so it runs
@@ -1153,11 +1160,28 @@ try {
         ? 'chat_paused'
         : 'sse_error';
     try {
+        // The provider layer throws moodle_exception with the real cause in
+        // debuginfo -- "HTTP 429: ...", a curl error, a vendor error type --
+        // so this is the handler that sees it for every provider failure. The
+        // Throwable handler below already records it; this one did not, which
+        // made the fix for the 2026-08 incident (ten courses failing for nine
+        // days behind an identical generic message) effective only for the
+        // exception class provider errors do NOT use.
+        //
+        // Deliberately NOT gated on debugdeveloper. The learner-facing string
+        // stays generic either way -- that is $msg, computed separately below.
+        // This is the admin-only audit trail, whose entire purpose is to
+        // survive a production site running with debug off, and it already
+        // carries de-anonymized export records.
+        $auditentry = ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)];
+        if (!empty($e->debuginfo) && is_string($e->debuginfo)) {
+            $auditentry['detail'] = \core_text::substr((string) $e->debuginfo, 0, 500);
+        }
         \local_ai_course_assistant\audit_logger::log(
             $auditaction,
             (int)($USER->id ?? 0),
             (int)($courseid ?? 0),
-            ['kind' => get_class($e), 'msg' => $errmsg, 'pageid' => (int)($pageid ?? 0)]
+            $auditentry
         );
     } catch (\Throwable $ignore) {
         /* never let audit logging mask the real error */

@@ -27,19 +27,68 @@ namespace local_ai_course_assistant\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class openai_compatible_provider extends base_provider {
-    /** @var array|null Token usage from the last streaming call.
+    /** @var array|null Token usage from the last call, streaming or not.
      *  v5.11.0 adds `cached_tokens` so dashboards can see the OpenAI auto-prefix
      *  discount hit rate (cached_tokens get 50% off input; auto-fires on any
-     *  prompt >=1024 tokens with a stable prefix; no opt-in needed). */
+     *  prompt >=1024 tokens with a stable prefix; no opt-in needed).
+     *  v7.4.2 adds `reasoning_tokens` (completion_tokens_details.reasoning_tokens),
+     *  recorded as reported and never folded into completion_tokens -- see
+     *  {@see shape_usage()} for why. */
     protected ?array $last_token_usage = null;
 
     /**
      * Get token usage from the last streaming call.
      *
-     * @return array|null ['prompt_tokens', 'completion_tokens', 'model'] or null.
+     * @return array|null ['prompt_tokens', 'completion_tokens', 'model',
+     *                      'cached_tokens', 'reasoning_tokens'] or null.
      */
     public function get_last_token_usage(): ?array {
         return $this->last_token_usage;
+    }
+
+    /**
+     * Shape a provider `usage` object into SOLA's canonical usage array.
+     *
+     * ONE reader for BOTH the streaming and the non-streaming path. Those two
+     * drifted once already: usage capture lived only in
+     * chat_completion_stream() until v7.0.6, so every non-streaming caller
+     * reported no tokens at all. Doing the shaping in a single place means a
+     * newly-added counter cannot land on one path and be forgotten on the other.
+     *
+     * WHY reasoning_tokens is stored SEPARATELY and never folded into
+     * completion_tokens: whether thinking tokens are ALREADY counted inside
+     * completion_tokens differs by vendor. OpenAI includes them. Google's
+     * Gemini OpenAI-compatibility shim has not reliably done so, yet Google
+     * bills thinking as output. So adding it into completion_tokens would
+     * double-count OpenAI, and ignoring it keeps under-counting Gemini -- which
+     * is the largest remaining source of the spend-log undercount (a
+     * reconciliation against the Gemini invoice measured 0.35M completion
+     * tokens logged against 1.78M billed). We therefore record exactly what the
+     * provider reported, in its own field, and leave the add-or-not decision to
+     * the consumer, which knows which provider served the call.
+     *
+     * @param array|null  $usage The raw `usage` object from the API response.
+     * @param string|null $model Model id the response reported, if any.
+     * @return array|null Canonical usage array, or null when the call reported no usage.
+     */
+    protected function shape_usage(?array $usage, ?string $model): ?array {
+        if (empty($usage)) {
+            return null;
+        }
+
+        // reasoning_tokens stays null -- not 0 -- when the provider reported no
+        // completion_tokens_details block at all, so the spend pipeline can tell
+        // "this model does not report thinking" apart from "it thought zero
+        // tokens this call".
+        $reasoning = $usage['completion_tokens_details']['reasoning_tokens'] ?? null;
+
+        return [
+            'prompt_tokens'     => (int) ($usage['prompt_tokens'] ?? 0),
+            'completion_tokens' => (int) ($usage['completion_tokens'] ?? 0),
+            'model'             => ($model !== null && $model !== '') ? $model : $this->model,
+            'cached_tokens'     => (int) ($usage['prompt_tokens_details']['cached_tokens'] ?? 0),
+            'reasoning_tokens'  => $reasoning === null ? null : (int) $reasoning,
+        ];
     }
 
     /**
@@ -194,15 +243,10 @@ abstract class openai_compatible_provider extends base_provider {
         // scoring -- reported no tokens at all and contributed nothing to
         // spend_guard's totals. The non-streaming response carries the same
         // usage object; there was no reason to drop it.
-        $this->last_token_usage = null;
-        if (!empty($data['usage'])) {
-            $this->last_token_usage = [
-                'prompt_tokens'     => (int) ($data['usage']['prompt_tokens'] ?? 0),
-                'completion_tokens' => (int) ($data['usage']['completion_tokens'] ?? 0),
-                'model'             => $data['model'] ?? $this->model,
-                'cached_tokens'     => (int) ($data['usage']['prompt_tokens_details']['cached_tokens'] ?? 0),
-            ];
-        }
+        $this->last_token_usage = $this->shape_usage(
+            isset($data['usage']) && is_array($data['usage']) ? $data['usage'] : null,
+            isset($data['model']) ? (string) $data['model'] : null
+        );
 
         return $data['choices'][0]['message']['content'];
     }
@@ -238,13 +282,11 @@ abstract class openai_compatible_provider extends base_provider {
 
                 // Capture usage from the final usage-only chunk (stream_options: include_usage: true).
                 // This chunk has empty choices[] and a populated usage object.
-                if (!empty($event['usage'])) {
-                    $this->last_token_usage = [
-                        'prompt_tokens'     => (int) ($event['usage']['prompt_tokens'] ?? 0),
-                        'completion_tokens' => (int) ($event['usage']['completion_tokens'] ?? 0),
-                        'model'             => $event['model'] ?? $this->model,
-                        'cached_tokens'     => (int) ($event['usage']['prompt_tokens_details']['cached_tokens'] ?? 0),
-                    ];
+                if (!empty($event['usage']) && is_array($event['usage'])) {
+                    $this->last_token_usage = $this->shape_usage(
+                        $event['usage'],
+                        isset($event['model']) ? (string) $event['model'] : null
+                    );
                 }
 
                 $content = $event['choices'][0]['delta']['content'] ?? '';

@@ -88,6 +88,7 @@ class conversation_manager {
      * @param string|null $streamoutcome How the turn ended: complete, client_aborted, provider_error.
      * @param int|null $chunkcount Passages retrieved this turn; 0 means retrieval ran and found none.
      * @param float|null $topscore Similarity of the best retrieved passage.
+     * @param int|null $reasoningtokens Thinking tokens the provider reported, as reported; null when it reported none.
      * @return int The message ID.
      */
     public static function add_message(
@@ -107,7 +108,8 @@ class conversation_manager {
         ?int $cachedtokens = null,
         ?string $streamoutcome = null,
         ?int $chunkcount = null,
-        ?float $topscore = null
+        ?float $topscore = null,
+        ?int $reasoningtokens = null
     ): int {
         global $DB;
 
@@ -138,14 +140,31 @@ class conversation_manager {
         $record->rag_latency_ms    = ($role === 'assistant') ? $rag_latency_ms : null;
         // v6.1.0: prompt tokens the provider served from its prompt cache
         // (OpenAI auto-prefix 50% discount / Anthropic cache_read 90%
-        // discount). Assistant rows only; makes the cache hit rate visible
-        // in token analytics instead of in-memory only.
-        $record->cached_tokens     = ($role === 'assistant') ? $cachedtokens : null;
+        // discount). Makes the cache hit rate visible in token analytics
+        // instead of in-memory only.
+        //
+        // v7.4.2 widened this from assistant-only to "any row that is not the
+        // learner's own message", for the same reason F81 kept provider and
+        // model_name on system rows just above: role='system' cost-log rows
+        // (TTS, STT, flashcards, essay scoring, insights) describe a real
+        // billed provider call. Nulling their counters made that spend
+        // counted-but-uncostable, which is exactly the undercount the spend
+        // pipeline exists to close. role='user' rows still carry neither,
+        // because a learner's message pre-dates the provider call.
+        $record->cached_tokens     = ($role !== 'user') ? $cachedtokens : null;
         // v7.1.1: these describe how the turn went, so like the counters above
         // they only mean anything on the reply row.
         $record->stream_outcome    = ($role === 'assistant') ? $streamoutcome : null;
         $record->chunk_count       = ($role === 'assistant') ? $chunkcount : null;
         $record->top_score         = ($role === 'assistant') ? $topscore : null;
+        // v7.4.2: thinking tokens, exactly as the provider reported them.
+        // NOT added into completion_tokens above: OpenAI already counts
+        // reasoning inside completion_tokens, Google's Gemini
+        // OpenAI-compatibility shim has not reliably done so while still
+        // billing thinking as output. Summing here would double-count OpenAI;
+        // dropping it keeps under-counting Gemini. Stored raw so the consumer,
+        // which knows the provider, can decide.
+        $record->reasoning_tokens  = ($role !== 'user') ? $reasoningtokens : null;
         $record->timecreated = time();
 
         $id = $DB->insert_record('local_ai_course_assistant_msgs', $record);
@@ -172,6 +191,113 @@ class conversation_manager {
         }
 
         return $id;
+    }
+
+    /**
+     * Best-effort spend log for a one-shot, non-conversational provider call.
+     *
+     * generate_flashcards, score_essay and generate_insights each made a real,
+     * billed LLM call and then threw the usage away, so their spend never
+     * reached the msgs table and was invisible to the AI Spend dashboard, the
+     * spend guard and the anomaly detector alike. This is the shared writer for
+     * that class of call, so a fourth such endpoint has one obvious thing to
+     * call instead of reinventing the row shape.
+     *
+     * Shape follows tts.php: a role='system' row carrying a short marker rather
+     * than the generated content, hung off the caller's course conversation,
+     * with provider/model kept so token_cost_manager can price it.
+     * get_messages() filters role='system' out of history, so nothing here is
+     * ever shown to the learner or fed back to the LLM as context.
+     *
+     * Rows land in interaction_type buckets of their own ('flashcards',
+     * 'essay', 'insights'), which token_analytics categorises as "other" and
+     * spend_guard counts in the site-wide total but in no per-capability cap.
+     * That is deliberate: folding them into the 'chat' capability would make
+     * previously-uncapped spend start tripping the chat cap, which is a
+     * policy change and not this one's to make.
+     *
+     * EVERY failure path here is swallowed. Telemetry must never be able to
+     * break the learner-facing feature it is measuring: a provider that
+     * reports no usage, or a DB error, both mean "log nothing", never "fail
+     * the request".
+     *
+     * @param object|null $provider        Provider instance that just served the call.
+     * @param int         $userid
+     * @param int         $courseid        Course the call was made for; SITEID is used when 0.
+     * @param string      $interactiontype Analytics bucket, e.g. 'flashcards', 'essay', 'insights'.
+     * @param string      $label           Short human-readable marker, NOT the generated content.
+     * @return void
+     */
+    public static function log_ancillary_usage(
+        $provider,
+        int $userid,
+        int $courseid,
+        string $interactiontype,
+        string $label
+    ): void {
+        try {
+            if (!is_object($provider) || !method_exists($provider, 'get_last_token_usage')) {
+                return;
+            }
+            $usage = $provider->get_last_token_usage();
+            if (empty($usage) || !is_array($usage)) {
+                // Provider reported nothing billable (or the call never ran).
+                return;
+            }
+
+            $courseid = $courseid > 0 ? $courseid : SITEID;
+
+            // Create the conversation if the caller has none, as
+            // record_quiz_usage() does. tts.php instead returns early when
+            // there is no conversation, and that is right for TTS -- it only
+            // ever fires from inside an open chat drawer, so a conversation
+            // necessarily exists. These endpoints are different: flashcards and
+            // essay feedback have their own pages, and insights is run by a
+            // teacher who may never have opened the drawer at all. Returning
+            // early here would therefore drop precisely the rows this change
+            // exists to capture. The row is role='system', so get_messages()
+            // keeps it out of history and out of the LLM context.
+            $conv = self::get_or_create_conversation($userid, $courseid);
+
+            // The usage array carries no provider id, so resolve it the way
+            // base_provider::create_from_config() picked the client: the
+            // course's effective config, falling back to the site setting.
+            $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
+            $providername = (string) ($effective['provider']
+                ?? get_config('local_ai_course_assistant', 'provider'));
+
+            // Anthropic reports cache_read_tokens, OpenAI reports cached_tokens;
+            // coalesce both, as sse.php and generate_quiz.php do.
+            $cachedtokens = $usage['cached_tokens'] ?? $usage['cache_read_tokens'] ?? null;
+
+            self::add_message(
+                (int) $conv->id,
+                $userid,
+                $courseid,
+                'system',
+                $label,
+                0,
+                $providername,
+                isset($usage['prompt_tokens']) ? (int) $usage['prompt_tokens'] : null,
+                isset($usage['completion_tokens']) ? (int) $usage['completion_tokens'] : null,
+                isset($usage['model']) ? (string) $usage['model'] : null,
+                $interactiontype,
+                null,
+                null,
+                $cachedtokens !== null ? (int) $cachedtokens : null,
+                null,
+                null,
+                null,
+                // Thinking tokens, as reported. These endpoints run on the
+                // course chat provider, which at Saylor is Gemini -- the
+                // provider whose unlogged reasoning tokens were the largest
+                // single slice of the measured spend undercount.
+                isset($usage['reasoning_tokens']) ? (int) $usage['reasoning_tokens'] : null
+            );
+        } catch (\Throwable $e) {
+            unset($e);
+            // Non-critical: never block the feature being measured.
+        }
     }
 
     /**
