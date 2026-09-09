@@ -658,7 +658,8 @@ class model_recommender {
      * present; falls back to reading the bench table directly so this class
      * stays usable (and unit-testable) on its own.
      *
-     * @param string $function
+     * @param string $function SOLA function key (chat, quiz, rag, ...).
+     * @param string $release Plugin release to restrict comparable runs to; '' means any.
      * @return array Normalized rows.
      */
     public static function bench_rows(string $function, string $release = ''): array {

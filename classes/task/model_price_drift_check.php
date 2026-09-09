@@ -354,13 +354,12 @@ class model_price_drift_check extends \core\task\scheduled_task {
      * still recorded with null rates: "we are billing for this and nobody can
      * tell you what it costs" is the single most important thing on the page.
      *
-     * @param array $merged Merged source prices.
      * Public because the admin page renders the same list live (it is the
      * severity headline of the registry page), and because it is the one
      * finding class that needs no network at all to test.
      *
-     * @param array $merged Merged source prices; may be empty.
-     * @param array $owner Source per key.
+     * @param array $merged Merged source prices, keyed by model prefix; may be empty.
+     * @param array $owner Owning source per key, as id and name.
      * @return array[]
      */
     public static function missing_findings(array $merged = [], array $owner = []): array {
