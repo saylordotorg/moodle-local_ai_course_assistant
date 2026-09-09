@@ -60,7 +60,8 @@ use local_ai_course_assistant\embedding_provider\voyage_reranker;
 
 $fixturespath = '';
 $embedapikeyoverride = '';
-$candidates = 50;
+$candidates = null;      // null = inherit the site's rerank_candidates setting.
+$candidatesexplicit = false;
 $topk = 10;
 $outfile = '';
 $rerankdelayms = 0;
@@ -96,6 +97,7 @@ foreach ($argv as $arg) {
         $embedapikeyoverride = trim($m[1]);
     } else if (preg_match('/^--candidates=(\d+)$/', $arg, $m)) {
         $candidates = max(10, (int) $m[1]);
+        $candidatesexplicit = true;
     } else if (preg_match('/^--topk=(\d+)$/', $arg, $m)) {
         $topk = max(1, min(20, (int) $m[1]));
     } else if (preg_match('/^--out=(.+)$/', $arg, $m)) {
@@ -127,7 +129,8 @@ Usage: php run_rag_fixture_benchmark.php [options]
 Options:
   --fixtures=PATH       Path to fixture JSON (default: tests/golden/rag_fixtures_bus101_pol101.json)
   --embed-apikey=KEY    Override embed_apikey in memory (not written to DB)
-  --candidates=N        Embedding-stage candidate pool for reranker (default 50)
+  --candidates=N        Embedding-stage candidate pool for reranker
+                        (default: the site's rerank_candidates setting, else 20)
   --topk=N              Final top-k retrieved (default 10; max 20)
   --out=PATH            Output JSON path (default: runs/YYYY-MM-DD-rag-bench.json)
   --rerank-delay-ms=N   Sleep N ms before each rerank call (default 0). Use ~21000
@@ -177,6 +180,20 @@ Judge mode (--judge): LLM-judged relevance across pipeline configs.
 TXT;
         exit(0);
     }
+}
+
+// Candidate pool: mirror what the product actually does rather than a constant.
+// rag_retriever::… reads rerank_candidates and falls back to 20, so an
+// unqualified run measured a pool the site does not use -- historically 50
+// against a real setting of 20, i.e. the wrong configuration at 2.5x the cost.
+$storedcand = get_config('local_ai_course_assistant', 'rerank_candidates');
+$storedcand = ($storedcand === false || $storedcand === '') ? 20 : (int) $storedcand;
+if ($candidates === null) {
+    $candidates = max(10, $storedcand);
+} else if ($candidatesexplicit && $candidates !== $storedcand) {
+    fwrite(STDERR, "WARNING: --candidates={$candidates} overrides this site's "
+        . "rerank_candidates={$storedcand}.\n"
+        . "         Results describe a configuration production does not use.\n");
 }
 
 if ($fixturespath === '') {
