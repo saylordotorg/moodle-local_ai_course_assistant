@@ -3,11 +3,15 @@ Hi Dean,
 Thanks for checking in, and for the heads-up on tomorrow's 9:00 PM EDT window.
 
 Good timing: we have a new release ready and I'd like to do one final test pass
-on it today. If you're able to update staging to v7.4.0, I'll run that pass and
+on it today. If you're able to update staging to v7.4.1, I'll run that pass and
 confirm back to you well before tomorrow evening.
 
-  Release / tag:  https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.4.0
-  Latest commit:  https://github.com/saylordotorg/moodle-local_ai_course_assistant/commit/c99f57a66e295085566e28be80153a3383bcf82e
+  Release / tag:  https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.4.1
+  Latest commit:  https://github.com/saylordotorg/moodle-local_ai_course_assistant/commit/6cf19f0c33e4174818bea6379ae2b884b88557cc
+
+(If you already picked up v7.4.0 from my earlier note, v7.4.1 is a small patch
+on top of it — one error message and a documentation correction, no database
+changes — so either is fine to stage. v7.4.1 is the one I'd rather test.)
 
 One request on the deploy itself: please replace the plugin directory rather
 than copying over the existing one (`rsync -a --delete` does the same thing).
