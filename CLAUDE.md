@@ -162,6 +162,28 @@ Tabs: Chat, Voice (`{{#voicetabenabled}}`), History, Progress. **Re-clicking the
 
 ---
 
+## Committing: never split lang/en from the code that references it
+
+A commit that adds a `get_string()` / `branding::str()` call must carry the
+matching `lang/en` key in the SAME commit. Splitting them produces a commit
+that cannot install at all: Moodle applies default settings during install, so
+`settings.php` is executed, and a missing string is a fatal there rather than a
+cosmetic warning.
+
+This happened on 2026-09-08. v7.4.0's code was committed with
+`git add -A -- . ':(exclude)lang'` to hold the 45-locale translation batch for
+a later commit — which also excluded `lang/en`, so that commit referenced 45
+keys that did not exist yet. The full suite had passed, because it ran against
+the working tree where `lang/en` was present; what was never tested was the
+commit as an isolated unit. Two dependabot PRs rebased onto it and every CI job
+died in `moodle-plugin-ci install`.
+
+`tests/lang_completeness_test.php::test_every_referenced_key_is_defined`
+already catches this. The lesson is not a missing guard, it is: do not commit a
+subset of a working tree you have only ever tested whole. If a translation
+batch needs to land separately, commit `lang/en` with the code and the other 45
+locales afterwards.
+
 ## Build Process
 
 **CRITICAL: Always rebuild AMD build files after any JS change.**
