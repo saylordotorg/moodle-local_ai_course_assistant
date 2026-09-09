@@ -162,6 +162,24 @@ Tabs: Chat, Voice (`{{#voicetabenabled}}`), History, Progress. **Re-clicking the
 
 ---
 
+## Verifying a guard: mutate a COPY, never the tracked tree
+
+To prove a new test catches its defect, plant the defect in a temporary copy
+and point the test at that — never mutate tracked files and then "restore"
+them.
+
+On 2026-09-08 I proved the i18n drift guard by writing English into all 45
+locale files and then ran `git checkout -- lang/`. That reverted to HEAD, and
+18 of those locales had been translated but not yet committed, so the checkout
+destroyed several hours of translation. It was recoverable only because
+`~/Sites/moodle/local/ai_course_assistant/` still held an rsync'd copy from
+before the mutation — luck, not design.
+
+Two rules follow. Commit generated work as soon as it is verified, so a
+mistake costs nothing. And when a guard needs a failing input, build that
+input somewhere disposable ($CLAUDE_JOB_DIR/tmp) rather than in the tree the
+work lives in.
+
 ## Committing: never split lang/en from the code that references it
 
 A commit that adds a `get_string()` / `branding::str()` call must carry the
