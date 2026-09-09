@@ -88,7 +88,8 @@ final class i18n_translation_drift_test extends \basic_testcase {
             }
             $locales++;
             foreach ($this->parse($p) as $k => $v) {
-                if (isset($en[$k]) && strlen($en[$k]) >= self::MIN_LEN && $v === $en[$k]) {
+                if (isset($en[$k]) && strlen($en[$k]) >= self::MIN_LEN
+                        && $this->has_translatable_words($en[$k]) && $v === $en[$k]) {
                     $identicalcount[$k] = ($identicalcount[$k] ?? 0) + 1;
                 }
             }
@@ -116,5 +117,30 @@ final class i18n_translation_drift_test extends \basic_testcase {
             "These debt-list keys are now translated -- remove them from "
             . "tests/fixtures/i18n_identical_debt.txt so the list only shrinks:\n  - "
             . implode("\n  - ", $paid));
+    }
+
+    /**
+     * Whether a string contains anything a translator could actually change.
+     *
+     * Some strings are pure machinery -- '{$a->raw} / {$a->max}', '{$a} ms',
+     * 'URL' -- and being byte-identical in all 45 locales is the CORRECT
+     * outcome for them, not drift. Listing them as debt would be wrong in the
+     * other direction: debt says "fix this one day", and these must never
+     * change. So strip placeholders, brand tokens, HTML tags and entities,
+     * digits and punctuation, and ask whether any word-like run survives.
+     *
+     * @param string $value English string value.
+     * @return bool True when at least one translatable word remains.
+     */
+    private function has_translatable_words(string $value): bool {
+        $bare = preg_replace([
+            '/\{\$a(?:->\w+)?\}/',   // {$a} and {$a->name}
+            '/\[\[\w+\]\]/',        // [[brand tokens]]
+            '/<[^>]*>/',               // HTML tags
+            '/&[a-z]+;|&#\d+;/i',      // HTML entities
+            '/[\d\p{P}\p{S}\s]+/u',   // digits, punctuation, symbols, space
+        ], ' ', $value);
+        // A single letter is a label, not a sentence; require a real word.
+        return (bool) preg_match('/\p{L}{2,}/u', (string) $bare);
     }
 }
