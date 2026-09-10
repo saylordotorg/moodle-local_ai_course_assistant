@@ -864,9 +864,10 @@ class objective_manager {
      * Used as a last resort when no structured source is available.
      *
      * @param int $courseid
+     * @param int $userid Teacher who triggered the import, for spend attribution.
      * @return array
      */
-    public static function extract_via_llm(int $courseid): array {
+    public static function extract_via_llm(int $courseid, int $userid = 0): array {
         $topics = context_builder::get_course_topics_text($courseid);
         if (trim($topics) === '') {
             return [];
@@ -909,6 +910,12 @@ class objective_manager {
                 $sys,
                 [['role' => 'user', 'content' => 'Return the objectives now.']],
                 ['response_schema' => $schema]
+            );
+            // On the SUCCESS path only. Logging from the catch block below would
+            // read usage from a call that threw -- and on a Claude-configured
+            // course that meant the PREVIOUS call's tokens, billed twice.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, $userid, $courseid, 'objective_extract', '[Objectives] extracted from course'
             );
         } catch (\Throwable $e) {
             debugging('LLM objective extraction failed: ' . $e->getMessage(), DEBUG_DEVELOPER);

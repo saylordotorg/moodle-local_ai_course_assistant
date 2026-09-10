@@ -131,6 +131,13 @@ class conversation_classifier {
                 [['role' => 'user', 'content' => $user]],
                 ['response_schema' => $schema, 'max_tokens' => 200]
             );
+            // Log INSIDE the try and immediately after the call, ahead of every
+            // early return below. An unparseable response, or a signal below the
+            // threshold, still cost money -- returning before logging is how this
+            // call came to be billed and never counted at all.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, $userid, $courseid, 'mastery_signal', '[Mastery] turn classified'
+            );
         } catch (\Throwable $e) {
             debugging('conversation_classifier failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return self::nullresult();

@@ -246,10 +246,19 @@ final class reasoning_tokens_persistence_test extends \advanced_testcase {
             substr_count($src, 'protected function shape_usage('),
             'there must be exactly one usage shaper'
         );
+        // v7.4.4 adds a third reader: shape_batch_result(), which turns one
+        // OpenAI Batch output line into the same canonical usage array. It is
+        // counted here rather than exempted, because a batch result carries the
+        // identical usage object and re-inlining its own shaping is exactly the
+        // drift this test exists to prevent -- a batched Gemini call would
+        // otherwise be the one path that quietly stopped recording thinking
+        // tokens. Raise this number only alongside a new call site that reads
+        // usage through the shared shaper.
         $this->assertSame(
-            2,
+            3,
             substr_count($src, '$this->shape_usage('),
-            'both chat_completion() and chat_completion_stream() must go through it'
+            'chat_completion(), chat_completion_stream() and shape_batch_result() '
+            . 'must all go through it'
         );
         $this->assertStringNotContainsString(
             "'cached_tokens'     => (int) (\$data[",
@@ -579,5 +588,185 @@ final class reasoning_tokens_persistence_test extends \advanced_testcase {
             'quiz rows are priced, so their thinking tokens must be recorded');
         $this->assertEquals(800, (int) $row->completion_tokens,
             'reasoning must never be folded into completion_tokens');
+    }
+
+    /**
+     * Every reasoning argument a pricing call site passes is a column its own
+     * query actually selects.
+     *
+     * This is the v7.4.4 defect, and it is worth a structural guard because it
+     * is invisible in every other way. token_analytics.php's per-model loop
+     * passed `(int) ($row->total_reasoning ?? 0)` as estimate_cost()'s 4th
+     * argument while the $bymodel SELECT named no such column. Reading an
+     * undefined property on a stdClass through `??` yields null with no notice,
+     * so the argument was a HARD ZERO on every row: no warning, no error, just a
+     * headline dollar figure that silently kept the pre-v7.4.2 undercount while
+     * classes/analytics.php reported the corrected one. The reasoning SUM had
+     * been added to a DIFFERENT query on the same page, whose loop never read
+     * it -- the column was added where it was unused and omitted where it was
+     * used, and the page carried a comment asserting a fix that did not run.
+     *
+     * The rule generalises: if a call site dereferences a property to price a
+     * row, the file that builds that row must select it under that name.
+     */
+    public function test_pricing_call_sites_read_columns_their_queries_select(): void {
+        global $CFG;
+        $root = $CFG->dirroot . '/local/ai_course_assistant';
+        $files = [
+            'token_analytics.php',
+            'classes/analytics.php',
+            'classes/llm_optimizer.php',
+            'classes/cost_anomaly_detector.php',
+            'classes/spend_guard.php',
+        ];
+
+        $checked = 0;
+        foreach ($files as $rel) {
+            $src = file_get_contents($root . '/' . $rel);
+            $this->assertNotFalse($src, "cannot read {$rel}");
+
+            foreach ($this->calls_to($src, 'estimate_cost') as $arglist) {
+                $args = $this->split_top_level($arglist);
+                if (count($args) < 4) {
+                    continue;
+                }
+                // Resolve one level of indirection: a call site that hoists the
+                // count into a local ($reasoning = (int) ($row->total_reasoning
+                // ?? 0);) is the same defect wearing a variable name, and a scan
+                // that only reads the argument would sail straight past it.
+                $expr = $args[3];
+                if (preg_match('/^\(int\)\s*\$([a-z_]+)$|^\$([a-z_]+)$/i', trim($expr), $var)) {
+                    $name = $var[1] !== '' ? $var[1] : ($var[2] ?? '');
+                    if ($name !== '' && preg_match_all(
+                            '/\$' . preg_quote($name, '/') . '\s*=[^=]([^;]*);/', $src, $rhs)) {
+                        $expr = implode(' ', $rhs[1]);
+                    }
+                }
+                if (!preg_match('/->([a-z_]+)/i', $expr, $prop)) {
+                    // A literal, or a value that never came off a DB row.
+                    continue;
+                }
+                $checked++;
+                $this->assertMatchesRegularExpression(
+                    '/\bAS\s+' . preg_quote($prop[1], '/') . '\b/i',
+                    $src,
+                    "{$rel} prices a row with \$...->{$prop[1]}, but no query in that file "
+                    . "selects a column of that name. Reading an undefined property through "
+                    . "'??' yields null silently, so the reasoning argument is a hard zero and "
+                    . 'the cost is the pre-v7.4.2 undercount with nothing on screen to say so.'
+                );
+            }
+        }
+
+        $this->assertGreaterThanOrEqual(
+            3,
+            $checked,
+            'the scan reconciled only ' . $checked . ' pricing call sites, so it is not '
+            . 'looking at the code it claims to guard'
+        );
+    }
+
+
+    /**
+     * Every argument list passed to a named function in a PHP source string.
+     *
+     * Balanced-paren scanning rather than a regex. `/name\((.*?)\);/s` looks
+     * adequate and is not: a call used as an array VALUE ends with `),`, so the
+     * lazy match runs on to the next `);` anywhere below and hands back an
+     * "argument list" containing half the function -- which is how a scan
+     * reports a defect in `$rs->close()`.
+     *
+     * @param string $src  PHP source.
+     * @param string $name Function or method name, unqualified.
+     * @return string[] Raw text between the parentheses of each call.
+     */
+    private function calls_to(string $src, string $name): array {
+        $out = [];
+        $offset = 0;
+        $len = strlen($src);
+        while (($pos = strpos($src, $name . '(', $offset)) !== false) {
+            $offset = $pos + strlen($name);
+            // Require a call, not a longer identifier ending in $name.
+            if ($pos > 0 && preg_match('/[A-Za-z0-9_]/', $src[$pos - 1])) {
+                continue;
+            }
+            $i = $pos + strlen($name);
+            $depth = 0;
+            $quote = null;
+            $start = $i + 1;
+            for (; $i < $len; $i++) {
+                $ch = $src[$i];
+                if ($quote !== null) {
+                    if ($ch === '\\') {
+                        $i++;
+                    } else if ($ch === $quote) {
+                        $quote = null;
+                    }
+                    continue;
+                }
+                if ($ch === "'" || $ch === '"') {
+                    $quote = $ch;
+                    continue;
+                }
+                if ($ch === '(') {
+                    $depth++;
+                } else if ($ch === ')') {
+                    $depth--;
+                    if ($depth === 0) {
+                        $out[] = substr($src, $start, $i - $start);
+                        break;
+                    }
+                }
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Split a PHP argument list on top-level commas.
+     *
+     * @param string $arglist Raw text between a call's parentheses.
+     * @return string[]
+     */
+    private function split_top_level(string $arglist): array {
+        $args = [];
+        $buf = '';
+        $depth = 0;
+        $quote = null;
+        $len = strlen($arglist);
+        for ($i = 0; $i < $len; $i++) {
+            $ch = $arglist[$i];
+            if ($quote !== null) {
+                $buf .= $ch;
+                if ($ch === '\\') {
+                    if ($i + 1 < $len) {
+                        $buf .= $arglist[++$i];
+                    }
+                } else if ($ch === $quote) {
+                    $quote = null;
+                }
+                continue;
+            }
+            if ($ch === "'" || $ch === '"') {
+                $quote = $ch;
+                $buf .= $ch;
+                continue;
+            }
+            if ($ch === '(' || $ch === '[') {
+                $depth++;
+            } else if ($ch === ')' || $ch === ']') {
+                $depth--;
+            }
+            if ($ch === ',' && $depth === 0) {
+                $args[] = trim($buf);
+                $buf = '';
+                continue;
+            }
+            $buf .= $ch;
+        }
+        if (trim($buf) !== '') {
+            $args[] = trim($buf);
+        }
+        return $args;
     }
 }

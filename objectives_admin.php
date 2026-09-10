@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             \core\output\notification::NOTIFY_SUCCESS
         );
     } else if ($action === 'import_llm') {
-        $items = objective_manager::extract_via_llm($courseid);
+        $items = objective_manager::extract_via_llm($courseid, (int) $USER->id);
         if (empty($items)) {
             redirect(
                 $pageurl,

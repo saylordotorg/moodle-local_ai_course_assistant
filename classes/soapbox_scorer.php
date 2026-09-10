@@ -158,7 +158,11 @@ class soapbox_scorer {
                     $visionnote = soapbox_slide_vision::design_note(
                         $datauris,
                         (string) $assign->ptype,
-                        (int) $assign->courseid
+                        (int) $assign->courseid,
+                        // The recording's owner. This call happens BEFORE the
+                        // set_user() below, so design_note() cannot read $USER
+                        // itself without attributing the spend to cron.
+                        (int) $rec->userid
                     );
                 }
             }

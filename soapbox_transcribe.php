@@ -192,7 +192,7 @@ try {
         $approxtokens,
         0,
         $model,
-        $cfg['provider'] . '_stt'
+        \local_ai_course_assistant\voice_registry::interaction_type($cfg['provider'], 'stt')
     );
 } catch (\Throwable $e) {
     unset($e);

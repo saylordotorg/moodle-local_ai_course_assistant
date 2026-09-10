@@ -64,6 +64,7 @@ class run_anomaly_digest extends \core\task\scheduled_task {
             "SELECT COALESCE(SUM(COALESCE(m.prompt_tokens,0)+COALESCE(m.completion_tokens,0)),0) "
             . "FROM {local_ai_course_assistant_msgs} m WHERE "
             . \local_ai_course_assistant\analytics::spend_rows_predicate('m')
+            . " AND " . \local_ai_course_assistant\analytics::benchmark_rows_excluded('m')
             . " AND m.timecreated >= ? AND m.timecreated < ?",
             86400,
             $threshold
@@ -208,7 +209,8 @@ class run_anomaly_digest extends \core\task\scheduled_task {
                        SUM(COALESCE(m.prompt_tokens, 0))     AS prompt_tokens,
                        SUM(COALESCE(m.completion_tokens, 0)) AS completion_tokens
                   FROM {local_ai_course_assistant_msgs} m
-                 WHERE " . \local_ai_course_assistant\analytics::spend_rows_predicate('m') . "
+                 WHERE " . \local_ai_course_assistant\analytics::spend_rows_predicate('m')
+                     . " AND " . \local_ai_course_assistant\analytics::benchmark_rows_excluded('m') . "
                    AND m.timecreated >= :since
               GROUP BY m.model_name";
 

@@ -198,37 +198,37 @@ $string['reminder:email_body'] = 'नमस्ते {$a->firstname},
 
 ---
 यी स्मरणपत्रहरू रोक्न, यहाँ क्लिक गर्नुहोस्: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'नमस्ते {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+यो "{$a->coursename}" का लागि तपाईंको अध्ययन स्मरणपत्र हो।
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+उत्कृष्ट काम जारी राख्नुहोस्!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+यी स्मरणपत्रहरू रोक्न, यहाँ क्लिक गर्नुहोस्: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'नमस्ते {$a->firstname},
+
+यो "{$a->coursename}" का लागि तपाईंको अध्ययन स्मरणपत्र हो।
+
+{$a->message}
+
+तपाईंको अध्ययन योजना: साप्ताहिक {$a->hours_per_week} घन्टा, {$a->preferred_days} ({$a->preferred_time})।
+
+उत्कृष्ट काम जारी राख्नुहोस्!
+
+---
+यी स्मरणपत्रहरू रोक्न, यहाँ क्लिक गर्नुहोस्: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'पोमोडोरो विधि प्रयोग गर्नुहोस्: २५ मिनेट एकाग्र अध्ययन, त्यसपछि ५ मिनेट विश्राम।';
+$string['studytip:review_notes']        = 'नयाँ सामग्री सुरु गर्नु अघि अघिल्लो सत्रका आफ्ना टिपोटहरू दोहोर्याउनुहोस्।';
+$string['studytip:active_recall']       = 'भर्खर सिकेका कुरामा आफैलाई परीक्षण गर्नुहोस् — सक्रिय सम्झनाले स्मरणशक्ति बलियो बनाउँछ।';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'विभिन्न प्रकारका अध्ययन मिसाउनुहोस्: पढाइ, अभ्यास प्रश्न, र अरूलाई अवधारणा सिकाउने।';
+$string['studytip:tackle_hard_first']   = 'तपाईंको ऊर्जा सबैभन्दा उच्च हुँदा सबैभन्दा कठिन विषयबाट सुरु गर्नुहोस्।';
+$string['studytip:connect_concepts']    = 'नयाँ अवधारणा र तपाईंलाई पहिले नै थाहा भएका कुराबीच सम्बन्ध बनाउनुहोस्।';
+$string['studytip:short_breaks']        = 'एकाग्र रहन छोटो विश्राम लिनुहोस् — ताजा दिमाग राम्रोसँग सिक्छ।';
+$string['studyplan:hours_out_of_range'] = 'साप्ताहिक घन्टा {$a->min} र {$a->max} बीच हुनुपर्छ। तपाईंले {$a->got} दिनुभयो। [[tutorshort]] लाई अर्को सङ्ख्या बताउनुहोस् र तपाईंको योजना सुरक्षित हुनेछ।';
 $string['reminder:whatsapp_body'] = '{$a->coursename} का लागि अध्ययन स्मरणपत्र: {$a->message} (अनसब्सक्राइब: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'आजको अध्ययन फोकस: ';
 
@@ -387,9 +387,9 @@ $string['chat:voice_error'] = 'आवाज जडान असफल भयो�
 $string['chat:quiz_locked'] = 'शैक्षिक सत्यनिष्ठा समर्थन गर्न प्रश्नोत्तरीको क्रममा [[tutorshort]] रोकिएको छ। शुभकामना!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'मोड नेभिगेसन';
+$string['chat:mode_chat'] = 'कुराकानी';
+$string['chat:mode_voice'] = 'आवाज';
 $string['chat:mode_history'] = 'नोट्स';
 
 // History panel.
@@ -457,7 +457,7 @@ $string['chat:llm_model_label'] = 'मोडेल';
 $string['chat:llm_model_select'] = 'LLM मोडेल चयन गर्नुहोस्';
 $string['chat:footer_usertesting'] = 'उपयोगिता परीक्षण';
 $string['chat:footer_feedback'] = 'प्रतिक्रिया';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = '{$a} सँग कुरा गर्नुहोस्';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'सन्दर्भ डिबग';
@@ -504,12 +504,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'पाठबाट बोली सुविधा अहिले उपलब्ध छैन। कृपया आफ्नो साइट प्रशासकलाई बताउनुहोस्।';
+$string['error_rate_limit_ip'] = 'तपाईंको IP ठेगानाबाट धेरै अनुरोध आएका छन्। कृपया एक क्षण पर्खनुहोस्।';
+$string['error_reminders_email_disabled'] = 'इमेल स्मरणपत्र सक्षम गरिएको छैन।';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp स्मरणपत्र तपाईंको देशमा उपलब्ध छैन।';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp स्मरणपत्र सक्षम गरिएको छैन।';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1213,17 +1212,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'मेरा सञ्चारहरू';
 $string['comms:desc'] = '[[tutorshort]] ले तपाईंलाई कुन स्वचालित इमेलहरू पठाउन सक्छ छान्नुहोस्। पूर्वनिर्धारित रूपमा बन्द। तपाईं यो जुनसुकै बेला परिवर्तन गर्न सक्नुहुन्छ।';
 $string['comms:milestones_label'] = 'मैले माइलस्टोन पुगेपछि मलाई इमेल गर्नुहोस् (7 दिन लगातार, 30 दिन लगातार, पाठ्यक्रम पूरा)।';

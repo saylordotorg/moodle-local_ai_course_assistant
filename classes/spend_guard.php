@@ -199,7 +199,15 @@ class spend_guard {
         // table. RAG spend therefore computed as $0.00 no matter how much
         // indexing had run, and the "RAG" line in the admin spend panel was
         // permanently zero.
+        // Benchmark spend is real money and stays in the LEDGER, but it must not
+        // consume a cap that exists to protect learners: an operator comparing
+        // three candidate models in an afternoon could otherwise exhaust
+        // spend_cap_site and stop chat for everyone. Unconditional, not gated on
+        // $capability, because the exposed paths are precisely the site-wide and
+        // per-course totals -- every per-capability bucket already excludes
+        // 'model_bench' by not naming it.
         $where = analytics::spend_rows_predicate('m')
+            . " AND " . analytics::benchmark_rows_excluded('m')
             . " AND m.model_name IS NOT NULL AND m.timecreated >= :since";
 
         if ($courseid > 0) {
@@ -261,7 +269,14 @@ class spend_guard {
                 // 'embed' is kept for any legacy rows written under that type.
                 return "m.interaction_type IN ('embedding','embed','rerank')";
             case 'analytics':
-                return "m.interaction_type = 'meta'";
+                // 'meta_scheduled' as well as 'meta': record_meta_query() writes the
+                // scheduled variant for cron runs (conversation_manager.php:378), so
+                // matching only 'meta' let every scheduled Learning Radar call escape
+                // the analytics cap entirely -- the same shape of miss the RAG arm
+                // above documents for 'rerank'. An admin who set an analytics cap was
+                // capping the ad-hoc runs and none of the recurring ones, which are
+                // the larger share.
+                return "m.interaction_type IN ('meta','meta_scheduled')";
             default:
                 return '1=1';
         }

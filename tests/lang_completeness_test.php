@@ -193,6 +193,69 @@ final class lang_completeness_test extends \basic_testcase {
         // v7.0.1 and still awaiting a translation batch.
         ...self::ADMIN_DIAGNOSTIC_UNTRANSLATED,
         ...self::SETTINGS_PAGE_UNTRANSLATED,
+        ...self::BATCH_TIER_UNTRANSLATED,
+        ...self::MODEL_EOL_UNTRANSLATED,
+    ];
+
+    /**
+     * v7.4.4: model lifecycle (end-of-life) tracking on the model registry.
+     *
+     * Twenty-one administrator-only strings, all on the model-registry page and
+     * the price-drift settings block -- surfaces no learner and no teacher can
+     * reach. Staged as debt for the same reason as the batches above: every
+     * locale falls back to lang/en, and an honest fallback beats forty-five
+     * unreviewed machine translations.
+     *
+     * These in particular. Half of them are about WHICH API SURFACE a
+     * retirement was announced for, a distinction that already cost a real
+     * near-miss in English (gemini-2.5-flash's 2026-10-16 date was a Vertex AI
+     * lifecycle event, not the Gemini Developer API this plugin calls). A
+     * translation that blurred "surface" into "provider" or "platform" would
+     * hand an administrator a plausible-looking sentence that leads to exactly
+     * the false outage alarm the field exists to prevent -- and unlike a
+     * mistranslated button, nobody would notice until the day it mattered.
+     */
+    private const MODEL_EOL_UNTRANSLATED = [
+        'modelregistry:col_eol',
+        'modelregistry:field_eol_date',
+        'modelregistry:field_eol_date_help',
+        'modelregistry:field_eol_surface',
+        'modelregistry:field_eol_surface_help',
+        'modelregistry:status_retired',
+        'modelregistry:err_badeoldate',
+        'modelregistry:err_noeolsurface',
+        'modelregistry:eol_passed',
+        'modelregistry:eol_soon',
+        'modelregistry:eol_later',
+        'modelregistry:eol_othersurface',
+        'modelregistry:finding_eol',
+        'modelregistry:drift_eol_horizon',
+        'modelregistry:drift_eol_noapply',
+        'modelregistry:drift_eol_record',
+        'modelregistry:drift_ran_eol',
+        'pricedrift:eol_horizon',
+        'pricedrift:eol_horizon_desc',
+        'pricedrift:eol_surfaces',
+        'pricedrift:eol_surfaces_desc',
+    ];
+
+    /**
+     * v7.4.4: the Learning Radar offline-batch tier.
+     *
+     * Five administrator-only strings: one scheduled-task name that appears in
+     * Site administration > Server > Scheduled tasks, and four lines of settings
+     * copy on a page only a site administrator can open. Staged as debt for the
+     * same reason as the two batches above -- every locale falls back to
+     * lang/en, and an honest fallback beats forty-five unreviewed machine
+     * translations of a paragraph about token pricing, where a mistranslated
+     * "50% less" is a number an administrator would act on.
+     */
+    private const BATCH_TIER_UNTRANSLATED = [
+        'task:collect_meta_ai_batches',
+        'settings:radar_batch_heading',
+        'settings:radar_batch_heading_desc',
+        'settings:radar_batch_enabled',
+        'settings:radar_batch_enabled_desc',
     ];
 
     /**

@@ -365,4 +365,35 @@ class voice_registry {
         }
         return $out;
     }
+
+    /**
+     * The analytics interaction_type for a voice call, from a closed set.
+     *
+     * v7.4.4. tts.php and transcribe.php used to build this by concatenating the
+     * ADMIN-ENTERED provider id with '_tts' / '_stt'. Only a fixed list is
+     * admitted by analytics::spend_rows_predicate() and
+     * spend_guard::capability_sql('voice'), so any provider outside that list --
+     * anything an admin typed that we had not anticipated -- produced rows that
+     * were written, counted by nothing, and priced at zero. That is the same
+     * silent-floor shape that made RAG spend read $0.00.
+     *
+     * Unrecognised providers now fall back to the generic 'voice', which IS in
+     * both lists. A slightly coarse category beats an invisible row.
+     *
+     * @param string $provider Provider id from config; may be anything an admin typed.
+     * @param string $kind 'tts' or 'stt'.
+     * @return string An interaction_type guaranteed to be in the billable set.
+     */
+    public static function interaction_type(string $provider, string $kind): string {
+        $known = [
+            'tts' => ['openai' => 'openai_tts', 'xai' => 'xai_tts'],
+            'stt' => [
+                'openai' => 'openai_stt',
+                'xai' => 'xai_stt',
+                'whisper' => 'openai_whisper',
+                self::SELFHOSTED_LABEL => 'selfhosted_stt',
+            ],
+        ];
+        return $known[$kind][$provider] ?? 'voice';
+    }
 }

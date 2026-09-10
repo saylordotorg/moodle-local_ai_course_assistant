@@ -218,6 +218,25 @@ class failover_chain implements provider_interface {
     }
 
     /**
+     * The provider that actually served the most recent call.
+     *
+     * base_provider derives this from the class name, which would report
+     * 'failover_chain' -- a vendor that does not exist and cannot be priced. The
+     * whole point of naming the serving provider is defeated if the wrapper
+     * answers for itself, so delegate to whichever member actually ran. Falls
+     * back to the chain's primary before any call has been made.
+     *
+     * @return string
+     */
+    public function provider_id(): string {
+        if ($this->lastused !== null) {
+            return $this->lastused->provider_id();
+        }
+        $chain = $this->build_chain();
+        return $chain ? reset($chain)->provider_id() : 'unknown';
+    }
+
+    /**
      * Build the full chain ordered (primary first, then fallbacks).
      *
      * @return array<int, array{provider: provider_interface, label: string}>

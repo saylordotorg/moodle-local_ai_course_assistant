@@ -179,37 +179,37 @@ $string['reminder:email_body'] = 'Здравейте, {$a->firstname},
 
 ---
 За да се отпишете от тези напомняния, кликнете тук: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Здравейте, {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Това е вашето напомняне за учене по „{$a->coursename}“.
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Продължавайте с отличната работа!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+За да спрете да получавате тези напомняния, щракнете тук: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Здравейте, {$a->firstname},
+
+Това е вашето напомняне за учене по „{$a->coursename}“.
+
+{$a->message}
+
+Вашият учебен план: {$a->hours_per_week} часа седмично, в {$a->preferred_days} ({$a->preferred_time}).
+
+Продължавайте с отличната работа!
+
+---
+За да спрете да получавате тези напомняния, щракнете тук: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Опитайте техниката Помодоро: 25 минути съсредоточено учене, след което 5-минутна почивка.';
+$string['studytip:review_notes']        = 'Прегледайте бележките си от последната сесия, преди да започнете нов материал.';
+$string['studytip:active_recall']       = 'Проверете себе си върху наученото наскоро — активното припомняне укрепва паметта.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Редувайте различни видове учене: четене, решаване на задачи и обясняване на понятия на други.';
+$string['studytip:tackle_hard_first']   = 'Започнете с най-трудната тема, докато енергията ви е най-висока.';
+$string['studytip:connect_concepts']    = 'Създавайте връзки между новите понятия и това, което вече знаете.';
+$string['studytip:short_breaks']        = 'Правете кратки почивки, за да останете съсредоточени — освеженият ум учи по-добре.';
+$string['studyplan:hours_out_of_range'] = 'Часовете седмично трябва да бъдат между {$a->min} и {$a->max}. Получено: {$a->got}. Моля, кажете на [[tutorshort]] друго число и планът ви ще бъде запазен.';
 $string['reminder:whatsapp_body'] = 'Напомняне за учене за {$a->coursename}: {$a->message} (Отписване: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Учебна цел за деня: ';
 $string['unsubscribe:title'] = 'Отписване от напомняния за учене';
@@ -366,9 +366,9 @@ $string['chat:voice_error'] = 'Гласовата връзка не бе осъ�
 $string['chat:quiz_locked'] = '[[tutorshort]] е на пауза по време на тестове, за да се запази академичната почтеност. Успех!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Навигация между режимите';
+$string['chat:mode_chat'] = 'Чат';
+$string['chat:mode_voice'] = 'Глас';
 $string['chat:mode_history'] = 'Бележки';
 
 // History panel.
@@ -436,7 +436,7 @@ $string['chat:llm_model_label'] = 'Модел';
 $string['chat:llm_model_select'] = 'Избери LLM модел';
 $string['chat:footer_usertesting'] = 'Тестване на използваемостта';
 $string['chat:footer_feedback'] = 'Обратна връзка';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Говорете с {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Отстраняване на грешки';
@@ -483,12 +483,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Преобразуването на текст в говор не е достъпно в момента. Моля, съобщете на администратора на сайта.';
+$string['error_rate_limit_ip'] = 'Прекалено много заявки от вашия IP адрес. Моля, изчакайте малко.';
+$string['error_reminders_email_disabled'] = 'Напомнянията по имейл не са включени.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Напомнянията през WhatsApp не са достъпни във вашата държава.';
+$string['error_reminders_whatsapp_disabled'] = 'Напомнянията през WhatsApp не са включени.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1200,17 +1199,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Моите комуникации';
 $string['comms:desc'] = 'Изберете кои автоматични имейли може да ви изпраща [[tutorshort]]. Изключено по подразбиране. Можете да промените това по всяко време.';
 $string['comms:milestones_label'] = 'Изпращай ми имейл, когато достигна етап (7-дневна серия, 30-дневна серия, завършване на курса).';

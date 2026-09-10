@@ -110,28 +110,72 @@ class llm_optimizer {
                     m.model_name AS model,
                     COUNT(m.id) AS sample,
                     SUM(COALESCE(m.prompt_tokens, 0)) AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0)) AS reasoning
                FROM {local_ai_course_assistant_msgs} m
-              WHERE " . analytics::spend_rows_predicate('m') . "
+              WHERE " . analytics::spend_rows_predicate('m')
+                    . " AND " . analytics::benchmark_rows_excluded('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :since
                 AND {$capclause}
-              GROUP BY m.provider, m.model_name
-             HAVING COUNT(m.id) >= :minsample",
-            ['since' => $since, 'minsample' => self::MIN_COST_SAMPLE]
+              GROUP BY m.provider, m.model_name",
+            ['since' => $since]
         );
 
-        $options = [];
+        // v7.4.4: fold the batch tier back into the model it is a tier OF.
+        //
+        // A batched call records `batch/<model>`, which rate_for() reads to
+        // halve the price. That marker is a PRICING key; this method consumes
+        // the model STRING and hands it to an admin as something to adopt. Left
+        // raw it produced two defects at once: `batch/gpt-4o-mini` ranked as a
+        // separate model costing exactly half of `gpt-4o-mini` for the same
+        // capability -- a permanently unbeatable recommendation naming a model
+        // id no vendor will serve -- and one model's history split into two
+        // candidates, so a site that switched batch on could leave BOTH sides
+        // under MIN_COST_SAMPLE and produce no analytics recommendation at all.
+        //
+        // Cost is still computed per RAW row (that is where the discount lives)
+        // and only then summed, so the merged cost-per-request is the true
+        // blended rate of however much of the traffic went through batch.
+        // MIN_COST_SAMPLE moved out of HAVING for the same reason: the
+        // threshold has to apply to the merged population, not to each half.
+        $merged = [];
         foreach ($rows as $r) {
-            $cost = token_cost_manager::estimate_cost(
+            $model = token_cost_manager::strip_batch_prefix((string) $r->model);
+            $key = (string) $r->provider . '|' . $model;
+            if (!isset($merged[$key])) {
+                $merged[$key] = (object) [
+                    'provider' => (string) $r->provider,
+                    'model' => $model,
+                    'sample' => 0,
+                    'cost' => 0.0,
+                    'priced' => false,
+                ];
+            }
+            $rowcost = token_cost_manager::estimate_cost(
                 (string) $r->model,
                 (int) $r->prompt,
-                (int) $r->completion
+                (int) $r->completion,
+                (int) ($r->reasoning ?? 0)
             );
-            if ($cost === null || $r->sample == 0) {
+            $merged[$key]->sample += (int) $r->sample;
+            if ($rowcost !== null) {
+                $merged[$key]->cost += (float) $rowcost;
+                $merged[$key]->priced = true;
+            }
+        }
+
+        $options = [];
+        foreach ($merged as $r) {
+            if ($r->sample < self::MIN_COST_SAMPLE || !$r->priced) {
                 continue;
             }
-            $costperreq = (float) $cost / (int) $r->sample;
+            // Reasoning tokens belong in the cost, or the cheapest-model
+            // recommendation is computed from a figure that under-reports
+            // thinking-heavy models specifically -- i.e. it would recommend them
+            // BECAUSE their real cost is invisible. They are added per raw row
+            // in the merge above, where the batch tier's own discount applies.
+            $costperreq = $r->cost / (int) $r->sample;
             $sat = self::satisfaction_rate((string) $r->provider, (string) $r->model, $since);
             $conf = self::confidence_for_sample((int) $r->sample, $sat['rated']);
             $options[] = [
@@ -192,10 +236,19 @@ class llm_optimizer {
                FROM {local_ai_course_assistant_msg_ratings} r
                JOIN {local_ai_course_assistant_msgs} m ON m.id = r.messageid
               WHERE m.provider = :p
-                AND m.model_name = :mod
+                AND m.model_name IN (:mod, :batchmod)
                 AND m.timecreated >= :since
                 AND m.role = 'assistant'",
-            ['p' => $provider, 'mod' => $model, 'since' => $since]
+            [
+                'p' => $provider,
+                'mod' => $model,
+                // Same reason rank_providers() merges the two forms: a rating
+                // sits on the row as it was written, and a batched row's
+                // model_name carries the `batch/` pricing marker. An equality
+                // on the bare name silently rates only the synchronous half.
+                'batchmod' => token_cost_manager::batch_model_name($model),
+                'since' => $since,
+            ]
         );
         $rated = (int) ($row->rated ?? 0);
         if ($rated < self::MIN_RATED_SAMPLE) {
@@ -236,7 +289,8 @@ class llm_optimizer {
         $earliest = (int) ($DB->get_field_sql(
             "SELECT MIN(m.timecreated)
                FROM {local_ai_course_assistant_msgs} m
-              WHERE " . analytics::spend_rows_predicate('m') . "
+              WHERE " . analytics::spend_rows_predicate('m')
+                    . " AND " . analytics::benchmark_rows_excluded('m') . "
                 AND m.timecreated >= :since",
             ['since' => $since]
         ) ?: time());
@@ -249,9 +303,11 @@ class llm_optimizer {
         $rows = $DB->get_records_sql(
             "SELECT m.model_name AS model,
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0)) AS reasoning
                FROM {local_ai_course_assistant_msgs} m
-              WHERE " . analytics::spend_rows_predicate('m') . "
+              WHERE " . analytics::spend_rows_predicate('m')
+                    . " AND " . analytics::benchmark_rows_excluded('m') . "
                 AND m.model_name IS NOT NULL AND m.timecreated >= :since
               GROUP BY m.model_name",
             ['since' => $since]
@@ -259,7 +315,9 @@ class llm_optimizer {
 
         $windowcost = 0.0;
         foreach ($rows as $r) {
-            $c = token_cost_manager::estimate_cost((string) $r->model, (int) $r->prompt, (int) $r->completion);
+            $c = token_cost_manager::estimate_cost(
+                (string) $r->model, (int) $r->prompt, (int) $r->completion, (int) ($r->reasoning ?? 0)
+            );
             if ($c !== null) {
                 $windowcost += (float) $c;
             }

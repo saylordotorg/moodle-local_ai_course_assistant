@@ -222,37 +222,37 @@ Qhubeka nomsebenzi omuhle!
 
 ---
 Ukuyeka ukuthola lezi zikhumbuzo, chofoza lapha: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Sawubona {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Lesi isikhumbuzo sakho sokufunda se-"{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Qhubeka nomsebenzi omuhle!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Ukuyeka ukuthola lezi zikhumbuzo, chofoza lapha: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Sawubona {$a->firstname},
+
+Lesi isikhumbuzo sakho sokufunda se-"{$a->coursename}".
+
+{$a->message}
+
+Uhlelo lwakho lokufunda: amahora angu-{$a->hours_per_week} ngesonto, ngo-{$a->preferred_days} ({$a->preferred_time}).
+
+Qhubeka nomsebenzi omuhle!
+
+---
+Ukuyeka ukuthola lezi zikhumbuzo, chofoza lapha: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Zama indlela ye-Pomodoro: imizuzu engu-25 yokufunda ngokugxila, bese uphumula imizuzu emi-5.';
+$string['studytip:review_notes']        = 'Buyekeza amanothi akho wesikhathi sokufunda sokugcina ngaphambi kokuqala okusha.';
+$string['studytip:active_recall']       = 'Zihlole ngalokho okufunde muva nje — ukuzama ukukhumbula ngokwakho kuqinisa inkumbulo.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Xuba izindlela ezahlukene zokufunda: ukufunda, ukuxazulula imibuzo yokuzilolonga, kanye nokufundisa abanye imiqondo.';
+$string['studytip:tackle_hard_first']   = 'Qala ngesihloko esiyinselelo enkulu ngesikhathi unamandla amaningi.';
+$string['studytip:connect_concepts']    = 'Yakha ukuxhumana phakathi kwemiqondo emisha nalokho osuvele ukwazi.';
+$string['studytip:short_breaks']        = 'Thatha amakhefu amafushane ukuze uhlale ugxilile — ingqondo ephumulile ifunda kangcono.';
+$string['studyplan:hours_out_of_range'] = 'Amahora ngesonto kufanele abe phakathi kuka-{$a->min} no-{$a->max}. Kutholakele u-{$a->got}. Sicela utshele u-[[tutorshort]] elinye inombolo bese ulondoloza uhlelo lwakho.';
 $string['reminder:whatsapp_body'] = 'Isikhumbuzo Sokufunda se-{$a->coursename}: {$a->message} (Phuma: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Igxile lokufunda lamuhla: ';
 
@@ -411,9 +411,9 @@ $string['chat:voice_error'] = 'Ukuxhumana kwezwi kuhlulekile. Sicela uhlole izil
 $string['chat:quiz_locked'] = '[[tutorshort]] imisiwe ngesikhathi sokuhlola ukuze isekele ubuqotho bezemfundo. Ngikufisela inhlanhla!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Ukuzulazula kwezindlela';
+$string['chat:mode_chat'] = 'Ingxoxo';
+$string['chat:mode_voice'] = 'Izwi';
 $string['chat:mode_history'] = 'Amanothi';
 
 // History panel.
@@ -481,7 +481,7 @@ $string['chat:llm_model_label'] = 'Imodeli';
 $string['chat:llm_model_select'] = 'Khetha imodeli ye-LLM';
 $string['chat:footer_usertesting'] = 'Ukuhlolwa kokusebenziseka';
 $string['chat:footer_feedback'] = 'Impendulo';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Xoxa no-{$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Ukulungisa isimo';
@@ -528,12 +528,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Ukuguqula umbhalo ube yizwi akutholakali njengamanje. Sicela utshele umlawuli wesayithi lakho.';
+$string['error_rate_limit_ip'] = 'Kunezicelo eziningi kakhulu ezivela ekhelini lakho le-IP. Sicela ulinde umzuzwana.';
+$string['error_reminders_email_disabled'] = 'Izikhumbuzo nge-imeyili azivulelwe.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Izikhumbuzo nge-WhatsApp azitholakali ezweni lakho.';
+$string['error_reminders_whatsapp_disabled'] = 'Izikhumbuzo nge-WhatsApp azivulelwe.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1245,17 +1244,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Ukuxhumana kwami';
 $string['comms:desc'] = 'Khetha ukuthi yimaphi ama-imeyili azenzakalelayo u-[[tutorshort]] angakuthumelela wona. Kuvaliwe ngokuzenzakalela. Ungakushintsha noma nini.';
 $string['comms:milestones_label'] = 'Ngithumelele i-imeyili uma ngifinyelela impokophelo (izinsuku ezingu-7 zilandelana, izinsuku ezingu-30 zilandelana, ukuqedwa kwekhosi).';

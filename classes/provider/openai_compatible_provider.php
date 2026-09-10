@@ -26,7 +26,7 @@ namespace local_ai_course_assistant\provider;
  * @copyright  2025 AI Course Assistant
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class openai_compatible_provider extends base_provider {
+abstract class openai_compatible_provider extends base_provider implements batch_capable_interface {
     /** @var array|null Token usage from the last call, streaming or not.
      *  v5.11.0 adds `cached_tokens` so dashboards can see the OpenAI auto-prefix
      *  discount hit rate (cached_tokens get 50% off input; auto-fires on any
@@ -88,6 +88,14 @@ abstract class openai_compatible_provider extends base_provider {
             'model'             => ($model !== null && $model !== '') ? $model : $this->model,
             'cached_tokens'     => (int) ($usage['prompt_tokens_details']['cached_tokens'] ?? 0),
             'reasoning_tokens'  => $reasoning === null ? null : (int) $reasoning,
+            // v7.4.4: the provider that ACTUALLY served this call. Consumers used
+            // to re-derive it from course config, which is what config said should
+            // serve the turn -- wrong whenever the premium router escalated, 'auto'
+            // resolved, a spend cap forced a failover, or the failover chain moved
+            // to a fallback. Reported here because shape_usage() is already the one
+            // reader for both the streaming and non-streaming paths, which is
+            // exactly the place a value like this must live to avoid drifting.
+            'provider'          => $this->provider_id(),
         ];
     }
 
@@ -295,5 +303,424 @@ abstract class openai_compatible_provider extends base_provider {
                 }
             }
         });
+    }
+    // ─────────────────────────────────────────────────────────────────────
+    // OpenAI Batch API: submit / poll / collect.
+    //
+    // Half price on input AND output, for a completion window of up to 24
+    // hours. That trade is only available to callers nobody is waiting on, so
+    // the ONLY consumer in this plugin is the scheduled Learning Radar run
+    // (classes/task/run_meta_ai_query.php submits, classes/task/
+    // collect_meta_ai_batches.php collects). Every learner-facing call stays
+    // synchronous; see the class docblock on collect_meta_ai_batches for the
+    // caller analysis.
+    //
+    // The 50% discount is NOT applied here. It is applied where prices live,
+    // by recording the model as `batch/<model>` and letting
+    // model_registry::rate_for() halve the resolved rate -- so the dashboard,
+    // the spend guard, the anomaly detector and the CSV export all see the
+    // discount without any of them knowing that batch exists.
+    // ─────────────────────────────────────────────────────────────────────
+
+    /**
+     * Hosts whose OpenAI-compatible endpoint also serves /v1/files and
+     * /v1/batches with the JSONL contract implemented below.
+     *
+     * Deliberately an allow-list of ONE. Ten concrete providers inherit this
+     * class and all ten speak /v1/chat/completions, but batch is a separate
+     * product with a separate wire format, and most of those hosts return 404
+     * for /v1/batches. Google does offer a 50%-off batch tier, and Gemini rows
+     * would price correctly through the same `batch/` marker -- but it is
+     * reached through the Gemini-native batches endpoint, NOT through the
+     * OpenAI-compatibility shim this class talks to, so adding 'generativelanguage.googleapis.com'
+     * here would submit a JSONL file to a route that does not exist and lose
+     * the report silently. That is a new provider method, not a new host string.
+     *
+     * A site behind an OpenAI-compatible proxy therefore reports
+     * supports_batch() === false and keeps the synchronous path, which is the
+     * correct failure: a report that arrives is worth more than a discount.
+     *
+     * @var string[]
+     */
+    protected const BATCH_HOSTS = ['api.openai.com'];
+
+    /** Completion window requested for every batch. The only value OpenAI accepts today. */
+    protected const BATCH_COMPLETION_WINDOW = '24h';
+
+    /** Cap on how many bytes of a batch error file are retained in a message. */
+    private const BATCH_ERROR_LIMIT = 1024;
+
+    public function supports_batch(): bool {
+        $base = $this->batch_url('');
+        if (!\local_ai_course_assistant\security::is_safe_provider_url($base . '/batches')) {
+            return false;
+        }
+        $host = strtolower((string) parse_url($base, PHP_URL_HOST));
+        return $host !== '' && in_array($host, static::BATCH_HOSTS, true);
+    }
+
+    public function submit_batch(array $requests): string {
+        if (empty($requests)) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                'submit_batch called with no requests');
+        }
+
+        $endpoint = $this->batch_request_endpoint();
+        $lines = [];
+        foreach ($requests as $customid => $req) {
+            $customid = (string) $customid;
+            if ($customid === '') {
+                throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                    'submit_batch requires a non-empty custom_id for every request');
+            }
+            // Reuse build_body() rather than assembling a second payload shape.
+            // The batch line body must be byte-identical in MEANING to what the
+            // synchronous call would have sent, or a site that switches batch
+            // off gets a different answer from the same schedule -- and the
+            // response_format / max_tokens / temperature handling in there is
+            // exactly the part that is easy to get subtly wrong twice.
+            $body = json_decode($this->build_body(
+                (string) ($req['systemprompt'] ?? ''),
+                (array) ($req['messages'] ?? []),
+                false,
+                (array) ($req['options'] ?? [])
+            ), true);
+            $lines[] = self::encode_payload([
+                'custom_id' => $customid,
+                'method'    => 'POST',
+                'url'       => $endpoint,
+                'body'      => $body,
+            ]);
+        }
+        $jsonl = implode("\n", $lines) . "\n";
+
+        $fileid = $this->upload_batch_input($jsonl);
+
+        $created = json_decode($this->batch_http(
+            'POST',
+            $this->batch_url('/batches'),
+            array_merge($this->get_headers(), ['Content-Type: application/json']),
+            self::encode_payload([
+                'input_file_id'     => $fileid,
+                'endpoint'          => $endpoint,
+                'completion_window' => static::BATCH_COMPLETION_WINDOW,
+            ])
+        ), true);
+
+        if (empty($created['id'])) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                'Batch creation returned no id');
+        }
+        return (string) $created['id'];
+    }
+
+    public function fetch_batch(string $batchid): array {
+        $batchid = trim($batchid);
+        if ($batchid === '') {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                'fetch_batch called with an empty batch id');
+        }
+
+        $batch = json_decode($this->batch_http(
+            'GET',
+            $this->batch_url('/batches/' . rawurlencode($batchid)),
+            $this->get_headers(),
+            null
+        ), true);
+
+        $raw = strtolower((string) ($batch['status'] ?? ''));
+        $status = self::map_batch_status($raw);
+        $out = ['status' => $status, 'results' => [], 'error' => null];
+
+        if ($status === batch_capable_interface::BATCH_PENDING) {
+            return $out;
+        }
+
+        // A failed / expired / cancelled batch may still carry an error file
+        // naming WHY, and "the nightly report stopped arriving" is not a
+        // diagnosis an operator can act on.
+        if (!empty($batch['error_file_id'])) {
+            $out['error'] = $this->read_batch_error_file((string) $batch['error_file_id']);
+        } else if (!empty($batch['errors']['data'][0]['message'])) {
+            $out['error'] = (string) $batch['errors']['data'][0]['message'];
+        }
+
+        if ($status !== batch_capable_interface::BATCH_COMPLETED) {
+            return $out;
+        }
+
+        if (empty($batch['output_file_id'])) {
+            // Completed with nothing to collect is a failure from our side,
+            // whatever the vendor calls it: there is no report to deliver.
+            $out['status'] = batch_capable_interface::BATCH_FAILED;
+            $out['error'] = $out['error'] ?? 'Batch completed with no output file';
+            return $out;
+        }
+
+        $content = $this->batch_http(
+            'GET',
+            $this->batch_url('/files/' . rawurlencode((string) $batch['output_file_id']) . '/content'),
+            $this->get_headers(),
+            null
+        );
+
+        foreach (explode("\n", $content) as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            $row = json_decode($line, true);
+            if (!is_array($row) || empty($row['custom_id'])) {
+                continue;
+            }
+            $out['results'][(string) $row['custom_id']] = $this->shape_batch_result($row);
+        }
+
+        if (empty($out['results'])) {
+            $out['status'] = batch_capable_interface::BATCH_FAILED;
+            $out['error'] = $out['error'] ?? 'Batch output file contained no parseable results';
+        }
+
+        return $out;
+    }
+
+    public function cancel_batch(string $batchid): bool {
+        $batchid = trim($batchid);
+        if ($batchid === '') {
+            return false;
+        }
+        try {
+            $this->batch_http(
+                'POST',
+                $this->batch_url('/batches/' . rawurlencode($batchid) . '/cancel'),
+                array_merge($this->get_headers(), ['Content-Type: application/json']),
+                '{}'
+            );
+            return true;
+        } catch (\Throwable $e) {
+            // A batch that already finished cannot be cancelled, and that is
+            // not an error worth propagating into a cron run.
+            return false;
+        }
+    }
+
+    /**
+     * One JSONL output line -> the canonical per-request result shape.
+     *
+     * @param array $row Decoded output line.
+     * @return array{content: ?string, usage: ?array, error: ?string}
+     */
+    private function shape_batch_result(array $row): array {
+        $status = (int) ($row['response']['status_code'] ?? 0);
+        $body = $row['response']['body'] ?? null;
+
+        if (!empty($row['error']['message'])) {
+            return ['content' => null, 'usage' => null, 'error' => (string) $row['error']['message']];
+        }
+        if ($status >= 400 || !is_array($body)) {
+            $msg = is_array($body) && !empty($body['error']['message'])
+                ? (string) $body['error']['message']
+                : ('Batch request returned HTTP ' . $status);
+            return ['content' => null, 'usage' => null, 'error' => $msg];
+        }
+
+        $content = $body['choices'][0]['message']['content'] ?? null;
+        if (!is_string($content) || $content === '') {
+            return ['content' => null, 'usage' => null, 'error' => 'Batch response carried no message content'];
+        }
+
+        // shape_usage() is the SAME reader the streaming and non-streaming
+        // paths use, so a batch row records prompt / completion / cached /
+        // reasoning tokens in exactly the shape the spend pipeline already
+        // understands -- and, critically, REAL counts rather than the strlen/4
+        // approximation the Learning Radar used to persist.
+        return [
+            'content' => $content,
+            'usage'   => $this->shape_usage(
+                isset($body['usage']) && is_array($body['usage']) ? $body['usage'] : null,
+                isset($body['model']) ? (string) $body['model'] : null
+            ),
+            'error'   => null,
+        ];
+    }
+
+    /**
+     * Upload the JSONL input file and return its file id.
+     *
+     * The multipart body is assembled by hand rather than handed to \curl as
+     * an array, so the exact bytes on the wire are visible here and do not
+     * depend on how Moodle's curl wrapper decides to encode a CURLFile. It
+     * also means no temp file is written for what is a few kilobytes of JSON.
+     *
+     * @param string $jsonl
+     * @return string Provider file id.
+     */
+    private function upload_batch_input(string $jsonl): string {
+        $boundary = 'sola' . bin2hex(random_bytes(16));
+        $eol = "\r\n";
+        $body = '--' . $boundary . $eol
+            . 'Content-Disposition: form-data; name="purpose"' . $eol . $eol
+            . 'batch' . $eol
+            . '--' . $boundary . $eol
+            . 'Content-Disposition: form-data; name="file"; filename="sola_radar_batch.jsonl"' . $eol
+            . 'Content-Type: application/jsonl' . $eol . $eol
+            . $jsonl . $eol
+            . '--' . $boundary . '--' . $eol;
+
+        $headers = $this->get_headers();
+        // get_headers() hardcodes application/json, which would make the
+        // upload a 400 with a body that says nothing about the real cause.
+        $headers = array_values(array_filter($headers, static function ($h) {
+            return stripos((string) $h, 'content-type:') !== 0;
+        }));
+        $headers[] = 'Content-Type: multipart/form-data; boundary=' . $boundary;
+
+        $decoded = json_decode($this->batch_http('POST', $this->batch_url('/files'), $headers, $body), true);
+        if (empty($decoded['id'])) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                'Batch input upload returned no file id');
+        }
+        return (string) $decoded['id'];
+    }
+
+    /**
+     * Read a batch error file and return a truncated, human-usable message.
+     *
+     * @param string $fileid
+     * @return string|null
+     */
+    private function read_batch_error_file(string $fileid): ?string {
+        try {
+            $raw = $this->batch_http(
+                'GET',
+                $this->batch_url('/files/' . rawurlencode($fileid) . '/content'),
+                $this->get_headers(),
+                null
+            );
+        } catch (\Throwable $e) {
+            return null;
+        }
+        $raw = trim($raw);
+        if ($raw === '') {
+            return null;
+        }
+        $first = strtok($raw, "\n");
+        $decoded = json_decode((string) $first, true);
+        $msg = $decoded['error']['message']
+            ?? $decoded['response']['body']['error']['message']
+            ?? (string) $first;
+        return \core_text::substr((string) $msg, 0, self::BATCH_ERROR_LIMIT);
+    }
+
+    /**
+     * Base URL for the batch-family endpoints, always ending at `/v1`.
+     *
+     * Mirrors detect_context_window(): most configured base URLs stop short of
+     * /v1, but some already include it, and doubling it produces a 404 that
+     * looks exactly like "this host has no batch support".
+     *
+     * @param string $path Path under /v1, e.g. '/batches'. Empty returns the base.
+     * @return string
+     */
+    private function batch_url(string $path): string {
+        $base = rtrim($this->baseurl, '/');
+        if (strpos($base, '/v1') === false) {
+            $base .= '/v1';
+        }
+        return $base . $path;
+    }
+
+    /**
+     * The endpoint path each batched request targets, normalised to /v1/....
+     *
+     * @return string
+     */
+    private function batch_request_endpoint(): string {
+        $ep = $this->get_endpoint();
+        if (strpos($ep, '/v1') !== 0) {
+            $ep = '/v1' . (str_starts_with($ep, '/') ? $ep : '/' . $ep);
+        }
+        return $ep;
+    }
+
+    /**
+     * One HTTP call against the batch family, with the plugin's URL guard and
+     * error decoding applied.
+     *
+     * Deliberately NOT routed through http_post(): that method wraps every call
+     * in with_transient_retry(), which is right for a chat turn a learner is
+     * waiting on and wrong here. A batch submission is not idempotent -- a
+     * retried POST /v1/batches creates a SECOND batch, which is a second
+     * invoice and a second copy of the report -- and a poll that fails is
+     * simply retried by the next cron run half an hour later.
+     *
+     * @param string      $method  'GET' or 'POST'.
+     * @param string      $url
+     * @param array       $headers
+     * @param string|null $body    Raw request body for POST.
+     * @return string Response body.
+     * @throws \moodle_exception
+     */
+    private function batch_http(string $method, string $url, array $headers, ?string $body): string {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
+        if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                'Refusing to call an unsafe batch URL');
+        }
+
+        $curl = new \curl();
+        $curl->setopt([
+            'CURLOPT_HTTPHEADER'     => $headers,
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_TIMEOUT'        => 120,
+        ]);
+
+        $response = $method === 'GET' ? $curl->get($url) : $curl->post($url, (string) $body);
+        if ($curl->error) {
+            throw new \moodle_exception('chat:error', 'local_ai_course_assistant', '', null,
+                'Transport error: ' . $curl->error);
+        }
+        $this->check_http_error((int) ($curl->get_info()['http_code'] ?? 0), (string) $response);
+
+        return (string) $response;
+    }
+
+    /**
+     * Map the vendor's batch status onto the interface's five states.
+     *
+     * Every transitional vendor state collapses to BATCH_PENDING, including
+     * 'cancelling': a cancellation in flight is still in flight, and treating
+     * it as terminal would leave a job row closed while the batch was still
+     * capable of producing output.
+     *
+     * @param string $raw Lowercased vendor status.
+     * @return string One of the batch_capable_interface constants.
+     */
+    private static function map_batch_status(string $raw): string {
+        switch ($raw) {
+            case 'completed':
+                return batch_capable_interface::BATCH_COMPLETED;
+            case 'failed':
+                return batch_capable_interface::BATCH_FAILED;
+            case 'expired':
+                return batch_capable_interface::BATCH_EXPIRED;
+            case 'cancelled':
+            case 'canceled':
+                return batch_capable_interface::BATCH_CANCELLED;
+            case 'validating':
+            case 'in_progress':
+            case 'finalizing':
+            case 'cancelling':
+            case 'canceling':
+                return batch_capable_interface::BATCH_PENDING;
+            default:
+                // An unknown status is treated as still running rather than as
+                // failed: the age guard in radar_batch_manager closes a job out
+                // eventually, whereas declaring a live batch dead loses a report
+                // that was already paid for.
+                return batch_capable_interface::BATCH_PENDING;
+        }
     }
 }

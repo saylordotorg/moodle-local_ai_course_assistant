@@ -222,37 +222,37 @@ Sii wad shaqada fiican!
 
 ---
 Si aad u joojiso heelaadahan, halkan guji: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Salaan, {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+kani waa xusuusintaada waxbarasho ee koorsada "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Sii wad shaqada wanaagsan!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Haddii aad doonayso inaad joojiso xusuusinnadan, halkan guji: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Salaan, {$a->firstname},
+
+kani waa xusuusintaada waxbarasho ee koorsada "{$a->coursename}".
+
+{$a->message}
+
+Qorshahaaga waxbarasho: {$a->hours_per_week} saacadood toddobaadkii, maalmaha {$a->preferred_days} ({$a->preferred_time}).
+
+Sii wad shaqada wanaagsan!
+
+---
+Haddii aad doonayso inaad joojiso xusuusinnadan, halkan guji: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Isku day habka Pomodoro: 25 daqiiqo oo waxbarasho diiran ah, ka dibna nasasho 5 daqiiqo ah.';
+$string['studytip:review_notes']        = 'Ka hor inta aanad bilaabin cashar cusub, dib u eeg xusuus-qorkaagii fadhigii hore.';
+$string['studytip:active_recall']       = 'Is imtixaan waxa aad dhawaan bartay — soo xusuusashada firfircoon waxay xoojisaa xusuusta.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Isku dar habab waxbarasho kala duwan: akhrin, layliyo, iyo inaad fikradaha dadka kale bartid.';
+$string['studytip:tackle_hard_first']   = 'Ka bilow mowduuca ugu adag inta tamartaadu ay ugu sarrayso.';
+$string['studytip:connect_concepts']    = 'Isku xir fikradaha cusub iyo waxa aad horey u taqaanay.';
+$string['studytip:short_breaks']        = 'Qaado nasasho gaaban si aad diiran u ahaato — maskax nasatay si ka fiican bay wax barataa.';
+$string['studyplan:hours_out_of_range'] = 'Saacadaha toddobaadkii waa inay u dhexeeyaan {$a->min} iyo {$a->max}. Waxaad gelisay {$a->got}. Fadlan u sheeg [[tutorshort]] tiro kale, wuxuuna qorshahaaga kaydin doonaa.';
 $string['reminder:whatsapp_body'] = 'Xusuus-qoridda Barashada ee {$a->coursename}: {$a->message} (Ka bax: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Diiradda barashada maanta: ';
 
@@ -411,9 +411,9 @@ $string['chat:voice_error'] = 'Xiriirka codka ayaa ku guuldareystay. Fadlan hubi
 $string['chat:quiz_locked'] = '[[tutorshort]] waa la joojiyay inta lagu jiro imtixaanada si loo taageerayo daacadnimada akadeemiga. Nasiib wanaagsan!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Doorashada habka';
+$string['chat:mode_chat'] = 'Sheekaysi';
+$string['chat:mode_voice'] = 'Cod';
 $string['chat:mode_history'] = 'Xusuusin';
 
 // History panel.
@@ -481,7 +481,7 @@ $string['chat:llm_model_label'] = 'Qaabka';
 $string['chat:llm_model_select'] = 'Dooro qaabka LLM';
 $string['chat:footer_usertesting'] = 'Imtixaanka isticmaalka';
 $string['chat:footer_feedback'] = 'Jawaab celin';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'La hadal {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Hagaajinta macnaha';
@@ -528,12 +528,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Beddelidda qoraalka cod hadda lama heli karo. Fadlan u sheeg maamulaha goobta.';
+$string['error_rate_limit_ip'] = 'Codsiyo aad u badan oo ka imanaya cinwaankaaga IP. Fadlan wax yar sug.';
+$string['error_reminders_email_disabled'] = 'Xusuusinnada iimaylka lama shidin.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Xusuusinnada WhatsApp laguma heli karo dalkaaga.';
+$string['error_reminders_whatsapp_disabled'] = 'Xusuusinnada WhatsApp lama shidin.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1245,17 +1244,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Isgaarsiintayda';
 $string['comms:desc'] = 'Dooro iimaylada tooska ah ee [[tutorshort]] kuu soo diri karo. Si caadi ah way damsan yihiin. Tan waad beddeli kartaa mar kasta.';
 $string['comms:milestones_label'] = 'Ii soo dir iimayl marka aan gaaro guul muhiim ah (7 maalmood oo isku xigta, 30 maalmood oo isku xigta, dhammaystirka koorsada).';

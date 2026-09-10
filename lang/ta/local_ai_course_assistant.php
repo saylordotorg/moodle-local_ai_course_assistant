@@ -198,37 +198,37 @@ $string['reminder:email_body'] = 'வணக்கம் {$a->firstname},
 
 ---
 இந்த நினைவூட்டல்களை நிறுத்த, இங்கே கிளிக் செய்யுங்கள்: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'வணக்கம் {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+"{$a->coursename}" பாடத்திற்கான உங்கள் படிப்பு நினைவூட்டல் இது.
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+உங்கள் சிறந்த முயற்சியைத் தொடருங்கள்!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+இந்த நினைவூட்டல்களைப் பெறுவதை நிறுத்த, இங்கே சொடுக்குங்கள்: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'வணக்கம் {$a->firstname},
+
+"{$a->coursename}" பாடத்திற்கான உங்கள் படிப்பு நினைவூட்டல் இது.
+
+{$a->message}
+
+உங்கள் படிப்புத் திட்டம்: வாரத்திற்கு {$a->hours_per_week} மணி நேரம், {$a->preferred_days} அன்று ({$a->preferred_time}).
+
+உங்கள் சிறந்த முயற்சியைத் தொடருங்கள்!
+
+---
+இந்த நினைவூட்டல்களைப் பெறுவதை நிறுத்த, இங்கே சொடுக்குங்கள்: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'போமோடோரோ முறையை முயற்சி செய்யுங்கள்: 25 நிமிடங்கள் கவனத்துடன் படித்து, பிறகு 5 நிமிட இடைவேளை.';
+$string['studytip:review_notes']        = 'புதிய பாடத்தைத் தொடங்குவதற்கு முன், கடந்த அமர்வின் உங்கள் குறிப்புகளை மீள்பார்வை செய்யுங்கள்.';
+$string['studytip:active_recall']       = 'சமீபத்தில் கற்றதை நீங்களே சோதித்துப் பாருங்கள் — செயலூக்கமான நினைவுத்திரட்டல் நினைவாற்றலை வலுப்படுத்துகிறது.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'பலவகையான படிப்பு முறைகளைக் கலந்து பயன்படுத்துங்கள்: வாசிப்பு, பயிற்சிக் கணக்குகள், கருத்துகளைப் பிறருக்குக் கற்பித்தல்.';
+$string['studytip:tackle_hard_first']   = 'உங்கள் ஆற்றல் உச்சத்தில் இருக்கும்போது மிகக் கடினமான தலைப்பிலிருந்து தொடங்குங்கள்.';
+$string['studytip:connect_concepts']    = 'புதிய கருத்துகளுக்கும் உங்களுக்கு ஏற்கனவே தெரிந்தவற்றுக்கும் இடையே தொடர்புகளை உருவாக்குங்கள்.';
+$string['studytip:short_breaks']        = 'கவனம் நிலைத்திருக்க குறுகிய இடைவேளைகள் எடுத்துக்கொள்ளுங்கள் — புத்துணர்ச்சி பெற்ற மனம் சிறப்பாகக் கற்கிறது.';
+$string['studyplan:hours_out_of_range'] = 'வாரத்திற்கான மணி நேரம் {$a->min} முதல் {$a->max} வரை இருக்க வேண்டும். கிடைத்தது {$a->got}. [[tutorshort]] இடம் வேறு ஒரு எண்ணைச் சொல்லுங்கள், உங்கள் திட்டம் சேமிக்கப்படும்.';
 $string['reminder:whatsapp_body'] = '{$a->coursename}-க்கான படிப்பு நினைவூட்டல்: {$a->message} (குழுவிலக்கு: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'இன்றைய படிப்பு கவனம்: ';
 
@@ -387,9 +387,9 @@ $string['chat:voice_error'] = 'குரல் இணைப்பு தோல�
 $string['chat:quiz_locked'] = 'கல்வி நேர்மையை ஆதரிக்க வினாடி வினாக்களின் போது [[tutorshort]] இடைநிறுத்தப்பட்டுள்ளது. வாழ்த்துக்கள்!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'பயன்முறை வழிசெலுத்தல்';
+$string['chat:mode_chat'] = 'அரட்டை';
+$string['chat:mode_voice'] = 'குரல்';
 $string['chat:mode_history'] = 'குறிப்புகள்';
 
 // History panel.
@@ -457,7 +457,7 @@ $string['chat:llm_model_label'] = 'மாதிரி';
 $string['chat:llm_model_select'] = 'LLM மாதிரியைத் தேர்ந்தெடு';
 $string['chat:footer_usertesting'] = 'பயன்பாட்டுத் திறன் சோதனை';
 $string['chat:footer_feedback'] = 'கருத்து';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = '{$a} உடன் பேசுங்கள்';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'சூழல் பிழைத்திருத்தம்';
@@ -504,12 +504,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'உரையிலிருந்து பேச்சு வசதி இப்போது கிடைக்கவில்லை. உங்கள் தள நிர்வாகியிடம் தெரிவிக்கவும்.';
+$string['error_rate_limit_ip'] = 'உங்கள் IP முகவரியிலிருந்து மிக அதிகமான கோரிக்கைகள். சிறிது நேரம் காத்திருக்கவும்.';
+$string['error_reminders_email_disabled'] = 'மின்னஞ்சல் நினைவூட்டல்கள் இயக்கப்படவில்லை.';
+$string['error_reminders_whatsapp_country_blocked'] = 'உங்கள் நாட்டில் WhatsApp நினைவூட்டல்கள் கிடைக்கவில்லை.';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp நினைவூட்டல்கள் இயக்கப்படவில்லை.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1221,17 +1220,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'எனது தகவல்தொடர்புகள்';
 $string['comms:desc'] = '[[tutorshort]] உங்களுக்கு அனுப்பக்கூடிய தானியங்கி மின்னஞ்சல்களைத் தேர்ந்தெடுக்கவும். இயல்பாக முடக்கப்பட்டுள்ளது. இதை எப்போது வேண்டுமானாலும் மாற்றலாம்.';
 $string['comms:milestones_label'] = 'நான் ஒரு மைல்கல்லை எட்டும்போது எனக்கு மின்னஞ்சல் அனுப்பவும் (7 நாள் தொடர், 30 நாள் தொடர், பாடநெறி நிறைவு).';

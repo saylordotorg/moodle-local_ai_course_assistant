@@ -203,37 +203,37 @@ Ga zo door!
 
 ---
 Om u af te melden voor deze herinneringen, klik hier: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Hallo {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Hier is uw studieherinnering voor "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Ga zo door!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Om u af te melden voor deze herinneringen, klik hier: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Hallo {$a->firstname},
+
+Hier is uw studieherinnering voor "{$a->coursename}".
+
+{$a->message}
+
+Uw studieplan: {$a->hours_per_week} uur per week, op {$a->preferred_days} ({$a->preferred_time}).
+
+Ga zo door!
+
+---
+Om u af te melden voor deze herinneringen, klik hier: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Probeer de pomodorotechniek: 25 minuten geconcentreerd studeren en daarna 5 minuten pauze.';
+$string['studytip:review_notes']        = 'Neem uw aantekeningen van de vorige sessie door voordat u met nieuw materiaal begint.';
+$string['studytip:active_recall']       = 'Overhoor uzelf over wat u recent hebt geleerd — actief ophalen versterkt uw geheugen.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Combineer verschillende manieren van studeren: lezen, oefenopgaven maken en begrippen aan anderen uitleggen.';
+$string['studytip:tackle_hard_first']   = 'Begin met het moeilijkste onderwerp terwijl uw energie het hoogst is.';
+$string['studytip:connect_concepts']    = 'Leg verbanden tussen nieuwe begrippen en wat u al weet.';
+$string['studytip:short_breaks']        = 'Neem korte pauzes om gefocust te blijven — een uitgerust hoofd leert beter.';
+$string['studyplan:hours_out_of_range'] = 'Het aantal uur per week moet tussen {$a->min} en {$a->max} liggen. U gaf {$a->got} op. Geef [[tutorshort]] een ander getal door, dan wordt uw plan opgeslagen.';
 $string['reminder:whatsapp_body'] = 'Studieherinnering voor {$a->coursename}: {$a->message} (Afmelden: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Studiedoel van de dag: ';
 $string['unsubscribe:title'] = 'Afmelden voor studieherinneringen';
@@ -390,9 +390,9 @@ $string['chat:voice_error'] = 'Stemverbinding mislukt. Controleer uw instellinge
 $string['chat:quiz_locked'] = '[[tutorshort]] is gepauzeerd tijdens quizzen om academische integriteit te waarborgen. Succes!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_nav'] = 'Modusnavigatie';
 $string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_voice'] = 'Spraak';
 $string['chat:mode_history'] = 'Notities';
 
 // History panel.
@@ -460,7 +460,7 @@ $string['chat:llm_model_label'] = 'Model';
 $string['chat:llm_model_select'] = 'LLM-model selecteren';
 $string['chat:footer_usertesting'] = 'Gebruiksvriendelijkheidstest';
 $string['chat:footer_feedback'] = 'Feedback';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Praten met {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Context debug';
@@ -507,12 +507,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Tekst-naar-spraak is nu niet beschikbaar. Meld dit bij uw sitebeheerder.';
+$string['error_rate_limit_ip'] = 'Te veel verzoeken vanaf uw IP-adres. Wacht even.';
+$string['error_reminders_email_disabled'] = 'E-mailherinneringen zijn niet ingeschakeld.';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp-herinneringen zijn niet beschikbaar in uw land.';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp-herinneringen zijn niet ingeschakeld.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1224,17 +1223,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Mijn communicatie';
 $string['comms:desc'] = 'Kies welke automatische e-mails [[tutorshort]] je mag sturen. Standaard uit. Je kunt dit op elk moment wijzigen.';
 $string['comms:milestones_label'] = 'E-mail me wanneer ik een mijlpaal bereik (7 dagen op rij, 30 dagen op rij, cursus afgerond).';

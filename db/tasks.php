@@ -71,6 +71,22 @@ $tasks = [
         'dayofweek' => '*',
     ],
     [
+        // v7.4.4 - collect finished Learning Radar batches. Only does anything
+        // when radar_batch_enabled is on AND a batch is in flight; otherwise it
+        // returns on an empty table. Every 30 minutes because the vendor
+        // completion window is up to 24 hours and there is no callback: a batch
+        // that finishes at 09:05 is delivered by 09:30 rather than waiting for
+        // tomorrow's 06:00 submit run. Polling a batch is a metadata GET and
+        // costs nothing.
+        'classname' => \local_ai_course_assistant\task\collect_meta_ai_batches::class,
+        'blocking' => 0,
+        'minute' => '*/30',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
         'classname' => \local_ai_course_assistant\task\audit_cleanup::class,
         'blocking' => 0,
         'minute' => '30',

@@ -198,37 +198,37 @@ $string['reminder:email_body'] = 'ሰላም {$a->firstname}፣
 
 ---
 እነዚህ ማስታወሻዎች ለማቆም፣ እዚህ ጠቅ ያድርጉ፦ {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'ሰላም {$a->firstname}፣
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+ይህ ለ"{$a->coursename}" የጥናት አስታዋሽዎ ነው።
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+መልካም ሥራዎን ይቀጥሉ!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+እነዚህን አስታዋሾች መቀበል ለማቆም እዚህ ይጫኑ፡ {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'ሰላም {$a->firstname}፣
+
+ይህ ለ"{$a->coursename}" የጥናት አስታዋሽዎ ነው።
+
+{$a->message}
+
+የጥናት እቅድዎ፡ በሳምንት {$a->hours_per_week} ሰዓት፣ በ{$a->preferred_days} ({$a->preferred_time})።
+
+መልካም ሥራዎን ይቀጥሉ!
+
+---
+እነዚህን አስታዋሾች መቀበል ለማቆም እዚህ ይጫኑ፡ {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'የፖሞዶሮ ዘዴን ይሞክሩ፡ 25 ደቂቃ ትኩረት ያለው ጥናት፣ ከዚያም የ5 ደቂቃ እረፍት።';
+$string['studytip:review_notes']        = 'አዲስ ትምህርት ከመጀመርዎ በፊት ካለፈው ክፍለ ጊዜ የያዙትን ማስታወሻዎች ይከልሱ።';
+$string['studytip:active_recall']       = 'በቅርቡ የተማሩትን ራስዎን ይፈትኑ — በንቃት ማስታወስ ትውስታን ያጠናክራል።';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'የተለያዩ የጥናት ዓይነቶችን ያቀናጁ፡ ማንበብ፣ የልምምድ ጥያቄዎችን መሥራት እና ለሌሎች ጽንሰ-ሐሳቦችን ማስተማር።';
+$string['studytip:tackle_hard_first']   = 'ኃይልዎ በተሟላበት ጊዜ በጣም አስቸጋሪ በሆነው ርዕስ ይጀምሩ።';
+$string['studytip:connect_concepts']    = 'በአዲሶቹ ጽንሰ-ሐሳቦች እና አስቀድመው በሚያውቁት መካከል ግንኙነት ይፍጠሩ።';
+$string['studytip:short_breaks']        = 'ትኩረትዎን ለመጠበቅ አጭር እረፍት ይውሰዱ — የታደሰ አእምሮ በተሻለ ይማራል።';
+$string['studyplan:hours_out_of_range'] = 'በሳምንት ያሉት ሰዓቶች ከ{$a->min} እስከ {$a->max} መካከል መሆን አለባቸው። የገባው {$a->got} ነው። እባክዎ ለ[[tutorshort]] ሌላ ቁጥር ይንገሩት፤ እቅድዎን ያስቀምጣል።';
 $string['reminder:whatsapp_body'] = 'ለ{$a->coursename} የጥናት ማስታወሻ፦ {$a->message} (ምዝገባ ለመሰረዝ፦ {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'የዛሬ የጥናት ትኩረት፦ ';
 
@@ -393,9 +393,9 @@ $string['chat:voice_error'] = 'የድምፅ ግንኙነት አልተሳካም�
 $string['chat:quiz_locked'] = 'ሳይለር [[tutorshort]] ፈተና ወቅት ተቋርጧል። ጥሩ እድል!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'የሁነታ አሰሳ';
+$string['chat:mode_chat'] = 'ውይይት';
+$string['chat:mode_voice'] = 'ድምፅ';
 $string['chat:mode_history'] = 'ማስታወሻዎች';
 
 // History panel.
@@ -463,7 +463,7 @@ $string['chat:llm_model_label'] = 'ሞዴል';
 $string['chat:llm_model_select'] = 'የLLM ሞዴል ይምረጡ';
 $string['chat:footer_usertesting'] = 'የተጠቃሚ ሙከራ';
 $string['chat:footer_feedback'] = 'አስተያየት';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'ከ{$a} ጋር ይነጋገሩ';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'የአውድ ማረም';
@@ -510,12 +510,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'ጽሑፍን ወደ ንግግር መቀየር በዚህ ጊዜ አይገኝም። እባክዎ የጣቢያዎን አስተዳዳሪ ያሳውቁ።';
+$string['error_rate_limit_ip'] = 'ከእርስዎ የIP አድራሻ በጣም ብዙ ጥያቄዎች ገብተዋል። እባክዎ ጥቂት ይጠብቁ።';
+$string['error_reminders_email_disabled'] = 'የኢሜይል አስታዋሾች አልተነቁም።';
+$string['error_reminders_whatsapp_country_blocked'] = 'የWhatsApp አስታዋሾች በአገርዎ አይገኙም።';
+$string['error_reminders_whatsapp_disabled'] = 'የWhatsApp አስታዋሾች አልተነቁም።';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1227,17 +1226,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'የእኔ ግንኙነቶች';
 $string['comms:desc'] = '[[tutorshort]] የትኞቹን ራስ-ሰር ኢሜይሎች እንዲልክልዎ እንደሚፈቀድ ይምረጡ። በነባሪ ጠፍቷል። ይህን በማንኛውም ጊዜ መቀየር ይችላሉ።';
 $string['comms:milestones_label'] = 'ወሳኝ ደረጃ ስደርስ ኢሜይል ላክልኝ (የ7 ቀን ተከታታይነት፣ የ30 ቀን ተከታታይነት፣ የኮርስ ማጠናቀቅ)።';

@@ -91,6 +91,14 @@ final class spend_export {
         'google' => 'google',
         'claude' => 'anthropic',
         'anthropic' => 'anthropic',
+        // v7.4.4: synthetic provider ids that reached by_provider unmapped, so
+        // real money was reported against a vendor name the dashboard does not
+        // recognise. 'openai_realtime' is unambiguous. 'embedding' and 'rerank'
+        // cannot be resolved from the provider id alone -- they depend on the
+        // row's model -- so they are handled by vendor_for() rather than here.
+        'openai_realtime' => 'openai',
+        'openai' => 'openai',
+        'voyage' => 'voyage',
     ];
 
     /**

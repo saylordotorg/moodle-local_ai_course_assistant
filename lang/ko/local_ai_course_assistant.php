@@ -179,37 +179,37 @@ $string['reminder:email_body'] = '{$a->firstname}님, 안녕하세요.
 
 ---
 이 알림을 중지하려면 여기를 클릭하세요: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = '{$a->firstname}님, 안녕하세요.
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+"{$a->coursename}"의 학습 알림입니다.
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+계속 열심히 하세요!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+이 알림을 중지하려면 여기를 클릭하세요: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = '{$a->firstname}님, 안녕하세요.
+
+"{$a->coursename}"의 학습 알림입니다.
+
+{$a->message}
+
+학습 계획: 주당 {$a->hours_per_week}시간, {$a->preferred_days} ({$a->preferred_time}).
+
+계속 열심히 하세요!
+
+---
+이 알림을 중지하려면 여기를 클릭하세요: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = '포모도로 기법을 시도해 보세요: 25분간 집중해서 공부한 뒤 5분간 휴식하세요.';
+$string['studytip:review_notes']        = '새로운 내용을 시작하기 전에 이전 학습 세션의 노트를 복습하세요.';
+$string['studytip:active_recall']       = '최근에 배운 내용을 스스로 테스트해 보세요 — 능동적 회상은 기억을 강화합니다.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = '읽기, 연습 문제 풀기, 다른 사람에게 개념 설명하기 등 다양한 학습 방식을 섞어 보세요.';
+$string['studytip:tackle_hard_first']   = '에너지가 가장 높을 때 가장 어려운 주제부터 시작하세요.';
+$string['studytip:connect_concepts']    = '새로운 개념과 이미 알고 있는 내용을 연결해 보세요.';
+$string['studytip:short_breaks']        = '집중력을 유지하려면 짧은 휴식을 취하세요 — 재충전된 두뇌가 더 잘 배웁니다.';
+$string['studyplan:hours_out_of_range'] = '주당 학습 시간은 {$a->min}시간에서 {$a->max}시간 사이여야 합니다. 입력하신 값은 {$a->got}입니다. [[tutorshort]]에게 다른 숫자를 알려주시면 계획을 저장해 드립니다.';
 $string['reminder:whatsapp_body'] = '{$a->coursename} 학습 알림: {$a->message} (구독 취소: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = '오늘의 학습 목표: ';
 $string['unsubscribe:title'] = '학습 알림 구독 취소';
@@ -366,9 +366,9 @@ $string['chat:voice_error'] = '음성 연결에 실패했습니다. 설정을 �
 $string['chat:quiz_locked'] = '학술적 무결성을 위해 퀴즈 중에는 SOLA가 일시 중지됩니다. 행운을 빕니다!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = '모드 탐색';
+$string['chat:mode_chat'] = '채팅';
+$string['chat:mode_voice'] = '음성';
 $string['chat:mode_history'] = '메모';
 
 // History panel.
@@ -436,7 +436,7 @@ $string['chat:llm_model_label'] = '모델';
 $string['chat:llm_model_select'] = 'LLM 모델 선택';
 $string['chat:footer_usertesting'] = '사용성 테스트';
 $string['chat:footer_feedback'] = '피드백';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = '{$a}와 대화하기';
 
 // Additional translated strings.
 $string['chat:debug_context'] = '컨텍스트 디버그';
@@ -483,12 +483,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = '텍스트 음성 변환을 지금은 사용할 수 없습니다. 사이트 관리자에게 알려주세요.';
+$string['error_rate_limit_ip'] = '귀하의 IP 주소에서 오는 요청이 너무 많습니다. 잠시 기다려 주세요.';
+$string['error_reminders_email_disabled'] = '이메일 알림이 활성화되어 있지 않습니다.';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp 알림은 귀하의 국가에서 제공되지 않습니다.';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp 알림이 활성화되어 있지 않습니다.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1192,17 +1191,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = '내 커뮤니케이션';
 $string['comms:desc'] = '[[tutorshort]]이(가) 보낼 수 있는 자동 이메일을 선택하세요. 기본값은 꺼짐입니다. 언제든지 변경할 수 있습니다.';
 $string['comms:milestones_label'] = '마일스톤 달성 시 이메일 받기(7일 연속, 30일 연속, 강좌 수료).';

@@ -113,6 +113,18 @@ class token_cost_manager {
         // underpricing STT by a factor of 16.7.
         'whisper'           => ['input' => 6.00, 'output' => 0.00],
 
+        // ── Self-hosted inference (free at the API boundary) ────────────────
+        // v7.4.4: transcribe.php prefixes a self-hosted STT model with
+        // 'selfhosted-' so it cannot match the hosted 'whisper' rate above.
+        // That name has to resolve to a rate of ZERO rather than to NO rate.
+        // "No rate" is model_registry::unpriced_models()'s definition of a
+        // defect, so a site running its own Whisper box was raising a daily
+        // model_price_drift_check MISSING alert -- and a standing false alarm
+        // is how the next genuinely unpriced model goes unread, which is the
+        // exact failure the eol_surface gate exists to prevent.
+        // Zero is also the true price: the call never leaves the institution.
+        'selfhosted-'       => ['input' => 0.00, 'output' => 0.00],
+
         // ── Anthropic Claude ──────────────────────────────────────────────────
         // Corrected in v7.4.0: this block was a full generation stale. Opus was
         // listed at 15.00/75.00 and Haiku at 0.80/4.00 — the Claude 3/4-era
@@ -244,13 +256,97 @@ class token_cost_manager {
     private const REASONING_OUTSIDE_COMPLETION_PREFIXES = ['gemini-', 'gemini/', 'models/gemini-'];
 
     /**
+     * Marker written onto model_name when a call was served by an offline
+     * batch tier: `batch/gpt-4o-mini`.
+     *
+     * v7.4.4. The Learning Radar's scheduled runs go through the OpenAI Batch
+     * API, which is half price on input AND output. Something has to carry that
+     * fact from the writer to the twelve places that price a row, and the
+     * candidates were: a new column on msgs (a schema change every pricing
+     * query would then have to remember to read), a new interaction_type (which
+     * would have to be added to spend_rows_predicate AND to
+     * spend_guard::capability_sql('analytics'), and would split the Radar's own
+     * history in two), or a marker on the model string.
+     *
+     * The model string wins because pricing ALREADY funnels through exactly one
+     * function that reads it -- {@see model_registry::rate_for()} -- so the
+     * discount is applied once and every consumer inherits it with no change:
+     * the AI Spend dashboard, spend_guard's cap accounting, the cost anomaly
+     * detector, llm_optimizer, token_analytics, the CSV export and the
+     * price-drift check. It also survives in the row forever, so a
+     * reconciliation against the invoice six months later can still tell a
+     * batched call from a synchronous one, which a discount applied at write
+     * time and baked into a number could not.
+     *
+     * A trailing slash is deliberate: model prefixes are matched with
+     * str_starts_with and longest-prefix-wins, so a separator that appears in no
+     * vendor model id guarantees `batch/gpt-4o` can never accidentally match a
+     * rate card key, and `gpt-4o` can never match this one.
+     */
+    public const BATCH_MODEL_PREFIX = 'batch/';
+
+    /**
+     * Fraction of list price an offline batch call is charged at.
+     *
+     * OpenAI and Google both discount their batch tiers by 50% on input and on
+     * output. One number, used by {@see model_registry::rate_for()}.
+     */
+    public const BATCH_DISCOUNT = 0.5;
+
+    /**
+     * Mark a model string as having been served by the batch tier.
+     *
+     * Idempotent: marking an already-marked name returns it unchanged, so a
+     * caller cannot produce `batch/batch/gpt-4o` and quietly halve twice.
+     *
+     * @param string $modelname
+     * @return string
+     */
+    public static function batch_model_name(string $modelname): string {
+        $modelname = trim($modelname);
+        if ($modelname === '') {
+            return $modelname;
+        }
+        return self::is_batch_model($modelname) ? $modelname : self::BATCH_MODEL_PREFIX . $modelname;
+    }
+
+    /**
+     * Was this row's call served by the batch tier?
+     *
+     * @param string $modelname
+     * @return bool
+     */
+    public static function is_batch_model(string $modelname): bool {
+        return strpos(strtolower(trim($modelname)), self::BATCH_MODEL_PREFIX) === 0;
+    }
+
+    /**
+     * The underlying model string, with any batch marker removed.
+     *
+     * @param string $modelname
+     * @return string
+     */
+    public static function strip_batch_prefix(string $modelname): string {
+        $modelname = trim($modelname);
+        if (!self::is_batch_model($modelname)) {
+            return $modelname;
+        }
+        return substr($modelname, strlen(self::BATCH_MODEL_PREFIX));
+    }
+
+    /**
      * Does this model bill thinking as output ON TOP OF completion_tokens?
+     *
+     * The batch marker is stripped first. `batch/gemini-2.5-flash` is still
+     * Gemini and still bills thinking as output; without the strip it would
+     * match no prefix, and the batched Learning Radar rows would be the ONE
+     * place the v7.4.2 reasoning fix silently stopped applying.
      *
      * @param string $modelname Exact model string as recorded on the row.
      * @return bool True when reasoning_tokens must be ADDED to completion_tokens to price the call.
      */
     public static function reasoning_billed_as_extra_output(string $modelname): bool {
-        $model = strtolower(trim($modelname));
+        $model = strtolower(self::strip_batch_prefix($modelname));
         foreach (self::REASONING_OUTSIDE_COMPLETION_PREFIXES as $prefix) {
             if (strpos($model, $prefix) === 0) {
                 return true;
@@ -277,6 +373,12 @@ class token_cost_manager {
             // The prefixes are class constants, not user input, so there is
             // nothing here to parameterise; they contain no LIKE wildcards.
             $whens[] = "LOWER({$alias}.model_name) LIKE '" . $prefix . "%'";
+            // v7.4.4: and the same model served by the batch tier, whose rows
+            // carry the BATCH_MODEL_PREFIX marker. This is the SQL half of the
+            // strip that reasoning_billed_as_extra_output() does in PHP; the two
+            // must agree or get_total_tokens() and estimate_cost() disagree about
+            // the same row, which is exactly the drift this method exists to stop.
+            $whens[] = "LOWER({$alias}.model_name) LIKE '" . self::BATCH_MODEL_PREFIX . $prefix . "%'";
         }
         $condition = implode(' OR ', $whens);
         return "(CASE WHEN {$condition} THEN COALESCE({$alias}.reasoning_tokens, 0) ELSE 0 END)";

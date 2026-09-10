@@ -142,6 +142,11 @@ PROMPT;
         try {
             $provider = provider\base_provider::create_from_config($courseid);
             $profile = $provider->chat_completion('', $llmmessages, ['max_tokens' => 512]);
+            // Before the empty-profile early return below: a model that answered
+            // with whitespace was still billed.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, $userid, $courseid, 'student_profile', '[Profile] summary generated'
+            );
         } catch (\Throwable $e) {
             debugging('Student profile generation failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             return '';

@@ -289,6 +289,15 @@ class claude_provider extends base_provider {
     }
 
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {
+        // Clear stale usage FIRST. This method has two exits that never reach the
+        // capture below -- a model-level safety refusal returns early, and an
+        // empty-content response throws -- and the capture itself is guarded on
+        // isset($data['usage']). So a REUSED provider instance kept whatever the
+        // PREVIOUS call reported, and any caller logging get_last_token_usage()
+        // billed those tokens a second time. openai_compatible_provider has always
+        // reset unconditionally, and chat_completion_stream below has always had
+        // its own reset; this was the one path that did not.
+        $this->last_token_usage = null;
         $url = $this->baseurl . '/v1/messages';
         $body = $this->build_body($systemprompt, $messages, false, $options);
         $response = $this->http_post($url, $this->get_headers($options), $body);
@@ -316,6 +325,7 @@ class claude_provider extends base_provider {
                 'model'                  => $data['model'] ?? $this->model,
                 'cache_creation_tokens'  => (int) ($data['usage']['cache_creation_input_tokens'] ?? 0),
                 'cache_read_tokens'      => (int) ($data['usage']['cache_read_input_tokens'] ?? 0),
+                'provider'               => $this->provider_id(),
             ];
         }
 
@@ -401,6 +411,7 @@ class claude_provider extends base_provider {
                         'model'                  => $event['message']['model'] ?? $this->model,
                         'cache_creation_tokens'  => (int) ($usage['cache_creation_input_tokens'] ?? 0),
                         'cache_read_tokens'      => (int) ($usage['cache_read_input_tokens'] ?? 0),
+                        'provider'               => $this->provider_id(),
                         ];
                     }
 

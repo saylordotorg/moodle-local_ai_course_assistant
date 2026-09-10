@@ -84,9 +84,18 @@ class soapbox_slide_vision {
      * @param string[] $datauris Rendered slide image data URIs (data:image/png;base64,...).
      * @param string $ptype Presentation type (informative, persuasive, ...).
      * @param int $courseid Course id (for provider resolution).
+     * @param int $userid Learner the spend belongs to. A parameter rather than a
+     *                    global read, because soapbox_scorer calls this before it
+     *                    switches the session to the recording's owner -- the
+     *                    current user here is whoever ran cron.
      * @return string
      */
-    public static function design_note(array $datauris, string $ptype, int $courseid): string {
+    public static function design_note(
+        array $datauris,
+        string $ptype,
+        int $courseid,
+        int $userid = 0
+    ): string {
         $images = self::sample($datauris);
         if (empty($images)) {
             return '';
@@ -106,6 +115,13 @@ class soapbox_slide_vision {
                 $sysprompt,
                 [['role' => 'user', 'content' => 'Give the slide visual-design note now.']],
                 ['image_datauris' => $images, 'max_tokens' => 300]
+            );
+            // $userid is a PARAMETER, deliberately, not a global $USER read:
+            // soapbox_scorer.php calls this BEFORE it switches the session to the
+            // recording's owner, so $USER here is whoever ran cron and the row
+            // would be attributed to them.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, $userid, $courseid, 'slide_vision', '[Slides] visual-design note'
             );
         } catch (\Throwable $e) {
             return '';

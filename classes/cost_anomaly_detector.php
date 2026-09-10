@@ -109,7 +109,8 @@ class cost_anomaly_detector {
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion,
                     SUM(COALESCE(m.reasoning_tokens, 0))  AS reasoning
                FROM {local_ai_course_assistant_msgs} m
-              WHERE " . analytics::spend_rows_predicate('m') . "
+              WHERE " . analytics::spend_rows_predicate('m')
+                    . " AND " . analytics::benchmark_rows_excluded('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :daystart
                 AND m.timecreated <  :dayend
@@ -153,7 +154,8 @@ class cost_anomaly_detector {
                     SUM(COALESCE(m.completion_tokens, 0)) AS completion,
                     SUM(COALESCE(m.reasoning_tokens, 0))  AS reasoning
                FROM {local_ai_course_assistant_msgs} m
-              WHERE " . analytics::spend_rows_predicate('m') . "
+              WHERE " . analytics::spend_rows_predicate('m')
+                    . " AND " . analytics::benchmark_rows_excluded('m') . "
                 AND m.model_name IS NOT NULL
                 AND m.timecreated >= :daystart
                 AND m.timecreated <  :dayend

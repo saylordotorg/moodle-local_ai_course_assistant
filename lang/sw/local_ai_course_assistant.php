@@ -222,37 +222,37 @@ Endelea na kazi nzuri!
 
 ---
 Ili kusimamisha kupokea vikumbusho hivi, bonyeza hapa: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Habari {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+hiki ni kikumbusho chako cha kusoma kwa kozi ya "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Endelea na kazi nzuri!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Ili kuacha kupokea vikumbusho hivi, bofya hapa: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Habari {$a->firstname},
+
+hiki ni kikumbusho chako cha kusoma kwa kozi ya "{$a->coursename}".
+
+{$a->message}
+
+Mpango wako wa kusoma: saa {$a->hours_per_week} kwa wiki, siku za {$a->preferred_days} ({$a->preferred_time}).
+
+Endelea na kazi nzuri!
+
+---
+Ili kuacha kupokea vikumbusho hivi, bofya hapa: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Jaribu mbinu ya Pomodoro: dakika 25 za kusoma kwa umakini, kisha mapumziko ya dakika 5.';
+$string['studytip:review_notes']        = 'Pitia madokezo yako ya kipindi cha mwisho kabla ya kuanza somo jipya.';
+$string['studytip:active_recall']       = 'Jipime kwa yale uliyojifunza hivi karibuni — kukumbuka kwa kujitahidi huimarisha kumbukumbu.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Changanya njia tofauti za kusoma: kusoma, kufanya mazoezi, na kuwafundisha wengine dhana ulizojifunza.';
+$string['studytip:tackle_hard_first']   = 'Anza na mada ngumu zaidi wakati nguvu zako ziko juu.';
+$string['studytip:connect_concepts']    = 'Unganisha dhana mpya na yale unayoyajua tayari.';
+$string['studytip:short_breaks']        = 'Chukua mapumziko mafupi ili kubaki makini — akili iliyopumzika hujifunza vizuri zaidi.';
+$string['studyplan:hours_out_of_range'] = 'Saa kwa wiki zinapaswa kuwa kati ya {$a->min} na {$a->max}. Umeweka {$a->got}. Tafadhali mwambie [[tutorshort]] namba nyingine na mpango wako utahifadhiwa.';
 $string['reminder:whatsapp_body'] = 'Kikumbusho cha Masomo kwa {$a->coursename}: {$a->message} (Jitoe: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Mwelekeo wa masomo wa leo: ';
 
@@ -411,9 +411,9 @@ $string['chat:voice_error'] = 'Muunganisho wa sauti umeshindwa. Tafadhali angali
 $string['chat:quiz_locked'] = '[[tutorshort]] imesimamishwa wakati wa mitihani ili kusaidia uaminifu wa kitaaluma. Bahati njema!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Urambazaji wa hali';
+$string['chat:mode_chat'] = 'Gumzo';
+$string['chat:mode_voice'] = 'Sauti';
 $string['chat:mode_history'] = 'Maelezo';
 
 // History panel.
@@ -481,7 +481,7 @@ $string['chat:llm_model_label'] = 'Mfano';
 $string['chat:llm_model_select'] = 'Chagua mfano wa LLM';
 $string['chat:footer_usertesting'] = 'Jaribio la utumiaji';
 $string['chat:footer_feedback'] = 'Maoni';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Zungumza na {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Urekebishaji muktadha';
@@ -528,12 +528,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Kubadilisha maandishi kuwa sauti hakupatikani kwa sasa. Tafadhali mwambie msimamizi wa tovuti.';
+$string['error_rate_limit_ip'] = 'Maombi mengi mno kutoka anwani yako ya IP. Tafadhali subiri kidogo.';
+$string['error_reminders_email_disabled'] = 'Vikumbusho vya barua pepe havijawezeshwa.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Vikumbusho vya WhatsApp havipatikani katika nchi yako.';
+$string['error_reminders_whatsapp_disabled'] = 'Vikumbusho vya WhatsApp havijawezeshwa.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1245,17 +1244,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Mawasiliano yangu';
 $string['comms:desc'] = 'Chagua barua pepe za kiotomatiki ambazo [[tutorshort]] anaweza kukutumia. Zimezimwa kwa chaguo-msingi. Unaweza kubadilisha hili wakati wowote.';
 $string['comms:milestones_label'] = 'Nitumie barua pepe ninapofikia hatua muhimu (mfululizo wa siku 7, mfululizo wa siku 30, kukamilisha kozi).';
