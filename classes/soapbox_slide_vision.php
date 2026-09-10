@@ -83,10 +83,11 @@ class soapbox_slide_vision {
      *
      * @param string[] $datauris Rendered slide image data URIs (data:image/png;base64,...).
      * @param string $ptype Presentation type (informative, persuasive, ...).
-     * @param int $courseid
-     * @param int $userid Learner the spend belongs to. A PARAMETER, not a global
-     *                   \$USER read: soapbox_scorer calls this before switching the
-     *                   session to the recording's owner, so \$USER here is cron. Course id (for provider resolution).
+     * @param int $courseid Course id (for provider resolution).
+     * @param int $userid Learner the spend belongs to. A parameter rather than a
+     *                    global read, because soapbox_scorer calls this before it
+     *                    switches the session to the recording's owner -- the
+     *                    current user here is whoever ran cron.
      * @return string
      */
     public static function design_note(
