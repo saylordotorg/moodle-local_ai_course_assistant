@@ -979,8 +979,19 @@ try {
     ]);
 
     // Save the clean assistant response (without markers), recording which provider was used.
+    //
+    // v7.4.4: prefer the provider the usage array reports, because that is the one
+    // that actually served the turn. Re-reading course config here recorded what
+    // config said SHOULD have served it, which is wrong in four situations that all
+    // occur in production: a premium-router escalation, 'auto' resolution, a
+    // spend-cap failover, and the per-call failover chain. by_provider is the one
+    // key the external spend dashboard reads, so a misattributed row moves real
+    // money onto the wrong vendor. Config remains the fallback for providers that
+    // report no usage at all.
     $effectivecfg = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
-    $providername = $effectivecfg['provider'] ?? get_config('local_ai_course_assistant', 'provider');
+    $providername = $tokenusage['provider']
+        ?? $effectivecfg['provider']
+        ?? get_config('local_ai_course_assistant', 'provider');
     // v6.1.0: normalize the two vendors' cache-read counters into one column —
     // OpenAI reports prompt_tokens_details.cached_tokens, Anthropic reports
     // cache_read_input_tokens (captured as cache_read_tokens). Null when the

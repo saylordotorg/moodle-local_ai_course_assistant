@@ -147,7 +147,7 @@ try {
             $approxtokens,
             0,
             $model,
-            $cfg['provider'] . '_tts'
+            \local_ai_course_assistant\voice_registry::interaction_type($cfg['provider'], 'tts')
         );
     }
 } catch (\Throwable $e) {

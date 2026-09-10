@@ -261,7 +261,14 @@ class spend_guard {
                 // 'embed' is kept for any legacy rows written under that type.
                 return "m.interaction_type IN ('embedding','embed','rerank')";
             case 'analytics':
-                return "m.interaction_type = 'meta'";
+                // 'meta_scheduled' as well as 'meta': record_meta_query() writes the
+                // scheduled variant for cron runs (conversation_manager.php:378), so
+                // matching only 'meta' let every scheduled Learning Radar call escape
+                // the analytics cap entirely -- the same shape of miss the RAG arm
+                // above documents for 'rerank'. An admin who set an analytics cap was
+                // capping the ad-hoc runs and none of the recurring ones, which are
+                // the larger share.
+                return "m.interaction_type IN ('meta','meta_scheduled')";
             default:
                 return '1=1';
         }

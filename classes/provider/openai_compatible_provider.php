@@ -88,6 +88,14 @@ abstract class openai_compatible_provider extends base_provider {
             'model'             => ($model !== null && $model !== '') ? $model : $this->model,
             'cached_tokens'     => (int) ($usage['prompt_tokens_details']['cached_tokens'] ?? 0),
             'reasoning_tokens'  => $reasoning === null ? null : (int) $reasoning,
+            // v7.4.4: the provider that ACTUALLY served this call. Consumers used
+            // to re-derive it from course config, which is what config said should
+            // serve the turn -- wrong whenever the premium router escalated, 'auto'
+            // resolved, a spend cap forced a failover, or the failover chain moved
+            // to a fallback. Reported here because shape_usage() is already the one
+            // reader for both the streaming and non-streaming paths, which is
+            // exactly the place a value like this must live to avoid drifting.
+            'provider'          => $this->provider_id(),
         ];
     }
 

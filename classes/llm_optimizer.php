@@ -110,7 +110,8 @@ class llm_optimizer {
                     m.model_name AS model,
                     COUNT(m.id) AS sample,
                     SUM(COALESCE(m.prompt_tokens, 0)) AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0)) AS reasoning
                FROM {local_ai_course_assistant_msgs} m
               WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL
@@ -123,10 +124,15 @@ class llm_optimizer {
 
         $options = [];
         foreach ($rows as $r) {
+            // Reasoning tokens belong in the cost, or the cheapest-model
+            // recommendation is computed from a figure that under-reports
+            // thinking-heavy models specifically -- i.e. it would recommend them
+            // BECAUSE their real cost is invisible.
             $cost = token_cost_manager::estimate_cost(
                 (string) $r->model,
                 (int) $r->prompt,
-                (int) $r->completion
+                (int) $r->completion,
+                (int) ($r->reasoning ?? 0)
             );
             if ($cost === null || $r->sample == 0) {
                 continue;
@@ -249,7 +255,8 @@ class llm_optimizer {
         $rows = $DB->get_records_sql(
             "SELECT m.model_name AS model,
                     SUM(COALESCE(m.prompt_tokens, 0))     AS prompt,
-                    SUM(COALESCE(m.completion_tokens, 0)) AS completion
+                    SUM(COALESCE(m.completion_tokens, 0)) AS completion,
+                    SUM(COALESCE(m.reasoning_tokens, 0)) AS reasoning
                FROM {local_ai_course_assistant_msgs} m
               WHERE " . analytics::spend_rows_predicate('m') . "
                 AND m.model_name IS NOT NULL AND m.timecreated >= :since
@@ -259,7 +266,9 @@ class llm_optimizer {
 
         $windowcost = 0.0;
         foreach ($rows as $r) {
-            $c = token_cost_manager::estimate_cost((string) $r->model, (int) $r->prompt, (int) $r->completion);
+            $c = token_cost_manager::estimate_cost(
+                (string) $r->model, (int) $r->prompt, (int) $r->completion, (int) ($r->reasoning ?? 0)
+            );
             if ($c !== null) {
                 $windowcost += (float) $c;
             }

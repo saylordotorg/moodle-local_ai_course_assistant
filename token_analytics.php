@@ -130,7 +130,8 @@ $bycategory = $DB->get_records_sql(
     "SELECT {$categorysql} AS category,
             COUNT(m.id) AS response_count,
             SUM(COALESCE(m.prompt_tokens,0))     AS total_prompt,
-            SUM(COALESCE(m.completion_tokens,0)) AS total_completion
+            SUM(COALESCE(m.completion_tokens,0)) AS total_completion,
+            SUM(COALESCE(m.reasoning_tokens,0))  AS total_reasoning
        FROM {local_ai_course_assistant_msgs} m
       WHERE m.role IN ('assistant','system') AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}
       GROUP BY {$categorysql}
@@ -178,10 +179,14 @@ $grandcompl     = 0;
 $grandresponses = 0;
 
 foreach ($bymodel as $row) {
+    // Reasoning tokens must reach estimate_cost or this page disagrees with the
+    // external export by the whole Gemini thinking share -- analytics.php has
+    // passed the 4th argument since v7.4.2 and these two call sites did not.
     $cost = token_cost_manager::estimate_cost(
         $row->model,
         (int) $row->total_prompt,
-        (int) $row->total_completion
+        (int) $row->total_completion,
+        (int) ($row->total_reasoning ?? 0)
     );
     if ($cost !== null) {
         $grandcost += $cost;
@@ -250,7 +255,8 @@ if (!empty($bystudent)) {
     $rs = $DB->get_recordset_sql(
         "SELECT m.userid, m.model_name,
                 SUM(COALESCE(m.prompt_tokens,0))     AS p,
-                SUM(COALESCE(m.completion_tokens,0)) AS c
+                SUM(COALESCE(m.completion_tokens,0)) AS c,
+                SUM(COALESCE(m.reasoning_tokens,0))  AS r
            FROM {local_ai_course_assistant_msgs} m
           WHERE {$msgwhere} AND m.userid {$insql}
           GROUP BY m.userid, m.model_name",
@@ -258,7 +264,9 @@ if (!empty($bystudent)) {
     );
     foreach ($rs as $r) {
         $uid = (int) $r->userid;
-        $c = token_cost_manager::estimate_cost((string) ($r->model_name ?? ''), (int) $r->p, (int) $r->c);
+        $c = token_cost_manager::estimate_cost(
+            (string) ($r->model_name ?? ''), (int) $r->p, (int) $r->c, (int) ($r->r ?? 0)
+        );
         if ($c === null) {
             // An unpriced model contributes tokens but no dollars. Flag it
             // rather than letting the row read as a complete figure.

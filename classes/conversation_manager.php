@@ -291,11 +291,16 @@ class conversation_manager {
             // keeps it out of history and out of the LLM context.
             $conv = self::get_or_create_conversation($userid, $courseid);
 
-            // The usage array carries no provider id, so resolve it the way
-            // base_provider::create_from_config() picked the client: the
-            // course's effective config, falling back to the site setting.
+            // v7.4.4: the usage array now names the provider that actually served
+            // the call, so read that first. Re-deriving from course config was wrong
+            // in a way that mattered most here: the ancillary callers deliberately
+            // route through a DIFFERENT provider than the course chat tier -- the
+            // mastery classifier and slide vision both default to openai/gpt-4o-mini
+            // regardless of what the course uses -- so config-derived attribution
+            // put their spend on the course's chat vendor, which never saw the call.
             $effective = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
-            $providername = (string) ($effective['provider']
+            $providername = (string) ($usage['provider']
+                ?? $effective['provider']
                 ?? get_config('local_ai_course_assistant', 'provider'));
 
             // Anthropic reports cache_read_tokens, OpenAI reports cached_tokens;

@@ -316,6 +316,7 @@ class claude_provider extends base_provider {
                 'model'                  => $data['model'] ?? $this->model,
                 'cache_creation_tokens'  => (int) ($data['usage']['cache_creation_input_tokens'] ?? 0),
                 'cache_read_tokens'      => (int) ($data['usage']['cache_read_input_tokens'] ?? 0),
+                'provider'               => $this->provider_id(),
             ];
         }
 
@@ -401,6 +402,7 @@ class claude_provider extends base_provider {
                         'model'                  => $event['message']['model'] ?? $this->model,
                         'cache_creation_tokens'  => (int) ($usage['cache_creation_input_tokens'] ?? 0),
                         'cache_read_tokens'      => (int) ($usage['cache_read_input_tokens'] ?? 0),
+                        'provider'               => $this->provider_id(),
                         ];
                     }
 

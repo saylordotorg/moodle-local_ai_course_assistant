@@ -126,6 +126,16 @@ if ($cfg['provider'] === 'xai') {
     // comes from the registry so selfhosted servers can name the Whisper
     // model they have loaded.
     $model = !empty($cfg['model']) ? $cfg['model'] : 'whisper-1';
+    // v7.4.4: self-hosted Whisper is FREE, but pricing keys off model_name, not
+    // interaction_type -- and 'whisper-1' (or any name a self-hosted server
+    // reports) matches the 'whisper' rate-card prefix, so free transcription was
+    // being billed at the hosted rate. The comment further down claimed the
+    // opposite of what the code did. Prefixing puts the model outside every rate
+    // prefix while keeping it a DISTINCT name, so it still shows up in
+    // unpriced_models rather than vanishing the way a null model_name would.
+    if (($cfg['provider'] ?? '') === \local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL) {
+        $model = 'selfhosted-' . $model;
+    }
     $post = [
         'file'  => new CURLFile($tmpfile, $mimetype, $filename),
         'model' => $model,
@@ -173,8 +183,10 @@ if (!isset($data['text'])) {
 
 // Log Whisper transcription usage: approximate tokens from audio file size.
 // Hosted Whisper charges per minute (~$0.006/min). Rough estimate: 1MB ≈ 1 min
-// audio. Selfhosted servers cost $0 — the rate card simply has no entry for
-// 'selfhosted_stt', so the row records usage telemetry at zero cost.
+// audio. Selfhosted servers cost $0, which is enforced above by recording the
+// model under a 'selfhosted-' prefix that matches no rate card -- NOT by the
+// interaction_type, which pricing never looks at. This comment previously said
+// otherwise and free transcription was billed at the hosted rate.
 $filesizebytes = filesize($tmpfile) ?: 0;
 $approxminutes = max(0.1, $filesizebytes / 1_000_000);
 $approxtokens = (int) ceil($approxminutes * 1000); // Arbitrary unit for rate card matching.
@@ -197,7 +209,7 @@ try {
             $approxtokens,
             0,
             $model,
-            $cfg['provider'] . '_stt'
+            \local_ai_course_assistant\voice_registry::interaction_type($cfg['provider'], 'stt')
         );
     }
 } catch (\Throwable $e) {

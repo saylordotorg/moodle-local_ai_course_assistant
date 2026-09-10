@@ -466,6 +466,27 @@ abstract class base_provider implements provider_interface {
     }
 
     /**
+     * The provider id that identifies THIS instance, e.g. 'openai', 'gemini'.
+     *
+     * Derived from the class name because instantiate() maps every id to
+     * `<id>_provider`, so deriving it cannot drift out of step with that switch
+     * the way a hand-maintained constant per subclass would.
+     *
+     * This exists so the SERVING provider can report itself in the usage array
+     * rather than every consumer re-deriving it from configuration. Config says
+     * which provider *should* have served the turn; four things can make that
+     * wrong -- the premium router, 'auto' resolution, a spend-cap failover, and
+     * the per-call failover chain -- and each one produced spend attributed to a
+     * vendor that never saw the request.
+     *
+     * @return string
+     */
+    public function provider_id(): string {
+        $short = (new \ReflectionClass($this))->getShortName();
+        return preg_replace('/_provider$/', '', $short);
+    }
+
+    /**
      * Check HTTP status code and throw appropriate exception.
      *
      * @param int $httpcode
