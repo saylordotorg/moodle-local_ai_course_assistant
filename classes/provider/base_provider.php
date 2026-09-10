@@ -405,6 +405,66 @@ abstract class base_provider implements provider_interface {
         }, 0);
     }
 
+
+    /**
+     * Encode an outbound request body, keeping the failure diagnosable.
+     *
+     * json_encode() returns FALSE on invalid UTF-8. Returned unchecked from a
+     * method declared `: string`, PHP coerces that false to '' -- so the provider
+     * receives an EMPTY BODY and answers with a bare 400 that names nothing. That
+     * is a silent, unattributable failure, and it is why issue #219 was first
+     * mis-diagnosed as an encoding bug.
+     *
+     * The root producer of invalid UTF-8 was a byte-wise prompt cut, fixed in
+     * prompt\builder::truncate_content(). This is the boundary guard behind it:
+     * anything that still arrives malformed is NAMED in the log and then repaired
+     * rather than silently dropped, because a learner mid-conversation should not
+     * lose their turn over one bad byte. Substituting without logging would have
+     * hidden the builder bug permanently, so the log line is the point.
+     *
+     * @param array $body Request payload.
+     * @return string Encoded JSON, never false and never ''.
+     * @throws \moodle_exception If the payload cannot be encoded even with substitution.
+     */
+    protected static function encode_payload(array $body): string {
+        $json = json_encode($body);
+        if ($json !== false) {
+            return $json;
+        }
+
+        // Name the offending top-level key rather than logging "encoding failed".
+        $culprits = [];
+        foreach ($body as $key => $value) {
+            if (json_encode($value) === false) {
+                $culprits[] = (string) $key;
+            }
+        }
+        debugging(
+            'local_ai_course_assistant: outbound payload was not valid UTF-8 and had to be '
+            . 'repaired before sending. Offending field(s): '
+            . ($culprits ? implode(', ', $culprits) : 'unknown')
+            . '. json_last_error: ' . json_last_error_msg(),
+            DEBUG_DEVELOPER
+        );
+
+        $json = json_encode($body, JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($json !== false) {
+            return $json;
+        }
+
+        // Substitution could not save it, so there is a structural problem
+        // (a resource, or recursion) rather than an encoding one. Fail loudly:
+        // sending an empty body would produce exactly the unattributable 400
+        // this method exists to prevent.
+        throw new \moodle_exception(
+            'chat:error',
+            'local_ai_course_assistant',
+            '',
+            null,
+            'payload_encode_failed: ' . json_last_error_msg()
+        );
+    }
+
     /**
      * Check HTTP status code and throw appropriate exception.
      *

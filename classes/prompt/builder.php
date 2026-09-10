@@ -222,7 +222,22 @@ class builder {
      * @return string
      */
     private static function truncate_content(string $content, int $newlen): string {
-        $cut = substr($content, 0, $newlen);
+        // core_text::str_max_bytes() is a byte-budgeted cut that will not split a
+        // multibyte character (mb_strcut under the hood). A raw substr() here was
+        // the root producer of invalid UTF-8 in the assembled prompt, with two
+        // consequences that both presented as something else:
+        //
+        //   1. json_encode() returns FALSE on invalid UTF-8, so the outbound
+        //      provider body became the empty string and the vendor answered with
+        //      a bare HTTP 400 that named nothing (see issue #219's first theory).
+        //   2. The fence bookkeeping immediately below uses a /u regex, which
+        //      returns false on invalid UTF-8 -- so a split character ALSO meant
+        //      the [[/UNTRUSTED]] marker was never re-closed, and everything after
+        //      it in the prompt read as if it were inside the untrusted region.
+        //      That is a prompt-injection surface, not a cosmetic problem.
+        //
+        // The budget stays denominated in BYTES, which is what the caller computed.
+        $cut = \core_text::str_max_bytes($content, $newlen);
 
         // A cut can land part-way through a marker, leaving a dangling "[[UNTRU"
         // or "[[/UNTRU". Drop the fragment FIRST, then count -- deciding what is
