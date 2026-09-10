@@ -44,6 +44,25 @@ $PAGE->set_course($course);
 $PAGE->set_title(get_string('soapbox:assign_title', 'local_ai_course_assistant'));
 $PAGE->set_heading($course->fullname);
 
+// Place an assignment on the course page as a url activity (sesskey-protected).
+// This is also the migration path: every assignment created before v7.4.3 is
+// nav-only, and without an action here they would stay that way forever.
+if ($action === 'addlink' && $id && confirm_sesskey()) {
+    $section = optional_param('section', 0, PARAM_INT);
+    try {
+        \local_ai_course_assistant\soapbox_course_link::add_to_course_page($id, $section);
+        redirect(
+            $pageurl,
+            get_string('soapbox:link_added', 'local_ai_course_assistant'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
+    } catch (\moodle_exception $e) {
+        // A placement failure must not look like a deleted assignment.
+        redirect($pageurl, $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
+    }
+}
+
 // Delete action (sesskey-protected, with a confirm step).
 if ($action === 'delete' && $id) {
     $assign = soapbox_assignment_manager::get_assignment($id);
@@ -96,9 +115,18 @@ if (empty($assignments)) {
         get_string('soapbox:col_kept', 'local_ai_course_assistant'),
         get_string('visible'),
         get_string('soapbox:col_student_link', 'local_ai_course_assistant'),
+        get_string('soapbox:col_oncoursepage', 'local_ai_course_assistant'),
         get_string('actions'),
     ];
     $table->attributes['class'] = 'generaltable';
+
+    // One query for the whole course rather than one per assignment.
+    $placed = \local_ai_course_assistant\soapbox_course_link::placed_in_course($courseid);
+    $canplace = \local_ai_course_assistant\soapbox_course_link::can_place($courseid);
+    // Section 0 is the course's top section, which always exists; the teacher
+    // moves it afterwards with the drag handle they already use.
+    $defaultsection = 0;
+
     foreach ($assignments as $a) {
         $editurl = new moodle_url(
             '/local/ai_course_assistant/soapbox_assign_edit.php',
@@ -120,6 +148,28 @@ if (empty($assignments)) {
             'class' => 'form-control form-control-sm', 'style' => 'width:15em',
             'onclick' => 'this.select();', 'aria-label' => get_string('soapbox:copy_link', 'local_ai_course_assistant'),
         ]);
+        if (isset($placed[$a->id])) {
+            $oncourse = html_writer::link(
+                new moodle_url('/course/view.php', ['id' => $courseid]),
+                get_string('soapbox:oncoursepage', 'local_ai_course_assistant'),
+                ['class' => 'badge badge-success']
+            );
+        } else if ($canplace) {
+            $oncourse = html_writer::link(
+                new moodle_url($pageurl, [
+                    'action' => 'addlink',
+                    'id' => $a->id,
+                    'section' => $defaultsection,
+                    'sesskey' => sesskey(),
+                ]),
+                get_string('soapbox:addtocoursepage', 'local_ai_course_assistant')
+            );
+        } else {
+            // No moodle/course:manageactivities -- show nothing rather than a
+            // control that would throw when used.
+            $oncourse = '';
+        }
+
         $table->data[] = [
             html_writer::link(
                 new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $a->id]),
@@ -131,6 +181,7 @@ if (empty($assignments)) {
             (int) $a->stored_attempts,
             $a->visible ? 'Yes' : 'No',
             $linkcell,
+            $oncourse,
             $actions,
         ];
     }

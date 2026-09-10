@@ -43,7 +43,15 @@ class audit_logger {
         $record->courseid = $courseid;
         $record->ipaddress = getremoteaddr();
         $record->useragent = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
-        $record->details = json_encode($details);
+        // Unchecked, this returns false on invalid UTF-8 and the details column --
+        // the one field that would explain whatever went wrong -- silently becomes
+        // empty, precisely when something has gone wrong. Substitute so the record
+        // survives; a repaired detail beats no detail.
+        $encoded = json_encode($details);
+        if ($encoded === false) {
+            $encoded = json_encode($details, JSON_INVALID_UTF8_SUBSTITUTE);
+        }
+        $record->details = ($encoded === false) ? '{}' : $encoded;
         $record->timecreated = time();
 
         try {

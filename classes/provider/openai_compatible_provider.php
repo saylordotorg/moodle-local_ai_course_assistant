@@ -224,7 +224,7 @@ abstract class openai_compatible_provider extends base_provider {
             $body['stream_options'] = ['include_usage' => true];
         }
 
-        return json_encode($body);
+        return self::encode_payload($body);
     }
 
     public function chat_completion(string $systemprompt, array $messages, array $options = []): string {

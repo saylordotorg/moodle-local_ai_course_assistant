@@ -248,7 +248,7 @@ class claude_provider extends base_provider {
             $body['stream'] = true;
         }
 
-        return json_encode($body);
+        return self::encode_payload($body);
     }
 
     /**

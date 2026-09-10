@@ -189,6 +189,39 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     }
 
     /**
+     * Clear a restored model/provider this site cannot serve.
+     *
+     * Mutates $data in place. Logged at the restore's own log level so it shows
+     * up in the restore report rather than happening invisibly.
+     *
+     * @param \stdClass $data The incoming course_cfg row.
+     * @return void
+     */
+    private function drop_unservable_model(\stdClass $data): void {
+        $model = trim((string) ($data->model ?? ''));
+        if ($model === '') {
+            return;
+        }
+
+        // The rate card is this site's list of models it knows about. A model with
+        // no entry is already a defect for spend reporting (it prices as $0.00), so
+        // "unknown to the registry" is the right bar here too.
+        if (\local_ai_course_assistant\model_registry::rate_for($model) !== null) {
+            return;
+        }
+
+        $this->log(
+            "local_ai_course_assistant: restored course model '{$model}' is not known to this "
+            . 'site, so it has been cleared and the course will use the site default. '
+            . 'Set a model explicitly in the course AI settings if that is not wanted.',
+            \backup::LOG_WARNING
+        );
+        $data->model = null;
+        // The provider only means something paired with a model it can serve.
+        $data->provider = null;
+    }
+
+    /**
      * Per-course AI configuration.
      *
      * @param array $data
@@ -200,6 +233,22 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
         $data = (object) $data;
         $data->courseid = $this->task->get_courseid();
         unset($data->id);
+
+        // v7.4.3: a model name is only meaningful on the site that can serve it.
+        //
+        // Issue #219. A course restored onto staging carried
+        // model='SOLA-BACKUP-TEST-MODEL' from a backup/restore test, so every chat
+        // turn in that course got a provider HTTP 400 -- and because the streaming
+        // path discarded the provider's response body, the reason never reached
+        // anyone. Rolling a course between sites, or in from a partner, can carry
+        // any model string the origin happened to use.
+        //
+        // Clearing beats preserving here: an empty model falls back to the site
+        // default and the course works, whereas a foreign model name is a course
+        // that is silently broken for every learner in it. The teacher's own
+        // system prompt is NOT touched -- only the routing fields that must
+        // resolve against this site's providers.
+        $this->drop_unservable_model($data);
 
         $existing = $DB->get_record(
             'local_ai_course_assistant_course_cfg',
@@ -719,6 +768,64 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     }
 
     /**
+     * Repoint any placed Soapbox url activity at the restored assignment.
+     *
+     * v7.4.3 lets a teacher put a Soapbox assignment on the course page as a core
+     * url activity whose externalurl carries the assignment id. The url module
+     * restores that string verbatim -- and a local plugin cannot register a backup
+     * link encoder, because encode_content_links() exists only on the course,
+     * activity and block tasks. So without this, duplicating a course leaves the
+     * copy's activity pointing at the ORIGINAL course's assignment: it opens, it
+     * looks right, and every recording lands against the wrong course.
+     *
+     * Idempotent, because after_restore_section() aliases this method and the
+     * restore dispatches it once per section: a URL already carrying a mapped id
+     * simply maps to itself on the second pass.
+     *
+     * @return void
+     */
+    private function remap_soapbox_course_links(): void {
+        global $DB;
+
+        $courseid = $this->task->get_courseid();
+
+        // cm.id leads the SELECT so rows cannot collapse on a repeated key.
+        $sql = "SELECT cm.id AS cmid, u.id AS urlid, u.externalurl
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = 'url'
+                  JOIN {url} u ON u.id = cm.instance
+                 WHERE cm.course = :courseid";
+        $rows = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+
+        foreach ($rows as $row) {
+            $oldid = \local_ai_course_assistant\soapbox_course_link::assign_id_from_url(
+                (string) $row->externalurl
+            );
+            if ($oldid === null) {
+                continue;
+            }
+
+            $newid = $this->get_mappingid('aica_sbx_assign', $oldid);
+            if (!$newid) {
+                // No mapping means the assignment did not come across -- an import
+                // or merge restore never carries Soapbox rows. LEAVE IT ALONE: a
+                // stale-but-honest link into the source course is strictly better
+                // than a rewritten link into whatever assignment happens to hold
+                // that id here. Guessing would silently attach learners' recordings
+                // to an unrelated assignment.
+                continue;
+            }
+
+            $DB->set_field(
+                'url',
+                'externalurl',
+                \local_ai_course_assistant\soapbox_course_link::present_url((int) $newid),
+                ['id' => $row->urlid]
+            );
+        }
+    }
+
+    /**
      * Resolve everything that needed a course-module mapping.
      *
      * Dispatched by restore_plugin::launch_after_restore_methods(), which runs
@@ -730,6 +837,8 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      */
     public function after_restore_course() {
         global $DB;
+
+        $this->remap_soapbox_course_links();
 
         foreach ($this->deferredquizcfg as $row) {
             $cmid = $this->get_mappingid('course_module', $row->cmid);

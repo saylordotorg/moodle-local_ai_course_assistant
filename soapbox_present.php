@@ -35,7 +35,7 @@ require_login();
 
 $id = required_param('id', PARAM_INT);
 $assign = soapbox_assignment_manager::get_assignment($id);
-if (!$assign || !$assign->visible) {
+if (!$assign) {
     // Core's 'invalidrecord' string interpolates a table name via {$a}; thrown
     // without one it renders literally as "Can't find data record in database
     // table {$a}." A learner following a stale or hand-edited link saw the raw
@@ -46,8 +46,22 @@ $courseid = (int) $assign->courseid;
 $course = get_course($courseid);
 $context = context_course::instance($courseid);
 require_capability('local/ai_course_assistant:use', $context);
-if (!feature_flags::resolve('soapbox', $courseid)) {
-    throw new \moodle_exception('soapbox:disabled', 'local_ai_course_assistant');
+
+// v7.4.3: this page is now reachable from a url activity on the course page, and
+// mod_url enforces neither :manage nor the Soapbox feature flag -- it only knows
+// it points somewhere. So the two conditions below stopped being "impossible
+// unless the link was hand-edited" and became an ordinary mis-click: a teacher
+// hiding the assignment, or the feature being switched off for the course, while
+// the activity is still sitting on the page.
+//
+// Rendering a notice with a way back beats an error page for both. A hidden
+// assignment is still shown to anyone who can manage it, so a teacher can preview
+// before revealing it -- which is the normal Moodle expectation for hidden things.
+$blocked = null;
+if (!$assign->visible && !has_capability('local/ai_course_assistant:manage', $context)) {
+    $blocked = get_string('soapbox:assignment_hidden', 'local_ai_course_assistant');
+} else if (!feature_flags::resolve('soapbox', $courseid)) {
+    $blocked = get_string('soapbox:disabled', 'local_ai_course_assistant');
 }
 
 $pageurl = new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $id]);
@@ -211,6 +225,21 @@ if (!empty($recs)) {
 }
 
 echo $OUTPUT->header();
+
+if ($blocked !== null) {
+    echo $OUTPUT->notification($blocked, \core\output\notification::NOTIFY_INFO);
+    echo $OUTPUT->continue_button(new moodle_url('/course/view.php', ['id' => $courseid]));
+    echo $OUTPUT->footer();
+    exit;
+}
+
+if (!$assign->visible) {
+    // Visible only to someone who can manage it -- see above.
+    echo $OUTPUT->notification(
+        get_string('soapbox:assignment_hidden_preview', 'local_ai_course_assistant'),
+        \core\output\notification::NOTIFY_WARNING
+    );
+}
 echo $OUTPUT->heading(format_string($assign->name));
 echo $OUTPUT->render_from_template('local_ai_course_assistant/soapbox_present', $templatedata);
 echo $OUTPUT->footer();
