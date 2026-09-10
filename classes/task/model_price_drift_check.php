@@ -49,19 +49,43 @@ defined('MOODLE_INTERNAL') || die();
  *  - NEW      — the source knows a model the registry does not. Informational;
  *               capped, because a full aggregator knows a thousand models the
  *               site will never run.
+ *  - EOL      — v7.4.4. A model in real billable traffic has an announced
+ *               end-of-life that has passed or falls inside the horizon. This
+ *               is the one finding class that needs no pricing source at all:
+ *               it compares traffic against the registry's own calendar.
+ *               Everything else here watches PRICE, and the re-open rule
+ *               watches price and adoption, so before this a genuine model
+ *               retirement arrived as a production outage rather than as a
+ *               warning — the first symptom of a shut-off model is every chat
+ *               turn failing, and nothing was looking at a date.
+ *
+ *               EOL findings are split by whether the announced retirement is
+ *               on an API surface this site actually calls (see
+ *               model_registry::eol_applies()). Only the applicable ones alert.
+ *               That split is not fastidiousness: gemini-2.5-flash was reported
+ *               as retiring 2026-10-16, which was a Vertex AI lifecycle event
+ *               and not the Gemini Developer API this plugin calls. Paging an
+ *               operator about that once teaches them to ignore the next page,
+ *               which is a worse outcome than not having the check.
  *
  * Findings are PROPOSED, NEVER APPLIED. Nothing here calls
  * model_registry::upsert(). A price is a number an admin is accountable for,
  * and an automated feed silently rewriting it is precisely the defect v7.4.0
  * fixed in the weekly refresher (which wholesale-overwrote every hand-entered
- * correction). Findings land in a compact JSON summary in the
+ * correction). EOL findings obey the same rule for a second reason as well: a
+ * lifecycle write from here would carry source 'drift', which upsert()'s
+ * refusal rule skips outright on any row a human has ever price-corrected —
+ * i.e. exactly the busy, hand-tuned models an EOL warning matters most for.
+ * A finding that silently did nothing on the models that matter would be worse
+ * than no finding. Findings land in a compact JSON summary in the
  * `model_price_drift_last` config key, plus a human-readable line on each
  * source row, for the admin page to render with a one-click apply.
  *
  * Off by default (`price_drift_check_enabled`). Emails the existing
- * `spend_notify_emails` recipients on any MISSING or MISMATCH, honouring the
- * email_optout table exactly as {@see \local_ai_course_assistant\cost_anomaly_detector}
- * does. Nothing is written to the filesystem.
+ * `spend_notify_emails` recipients on any MISSING, MISMATCH or applicable EOL,
+ * honouring the email_optout table exactly as
+ * {@see \local_ai_course_assistant\cost_anomaly_detector} does. Nothing is
+ * written to the filesystem.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell & David Ta / Saylor University
@@ -82,6 +106,21 @@ class model_price_drift_check extends \core\task\scheduled_task {
 
     /** @var int Cap on MISSING findings. Distinct unpriced models in traffic are few. */
     public const MAX_MISSING_FINDINGS = 50;
+
+    /** @var int Cap on EOL findings. Bounded by distinct models in traffic, so also few. */
+    public const MAX_EOL_FINDINGS = 50;
+
+    /**
+     * How far ahead an announced retirement starts being reported, in days.
+     *
+     * Sixty days rather than seven: swapping a production chat model is a
+     * bake-off, a settings change and a deploy across a fleet, not an
+     * afternoon. Reporting a retirement the week it happens would be
+     * technically a warning and practically an outage notice.
+     *
+     * @var int
+     */
+    public const DEFAULT_EOL_HORIZON_DAYS = 60;
 
     /**
      * Byte ceiling for the stored summary.
@@ -127,20 +166,28 @@ class model_price_drift_check extends \core\task\scheduled_task {
         $summary = self::run();
         mtrace(sprintf(
             '  model_price_drift_check: status=%s sources=%d ok=%d failed=%d '
-                . 'missing=%d mismatch=%d new=%d tolerance=%.2f%%',
+                . 'missing=%d mismatch=%d eol=%d eol_other_surface=%d new=%d tolerance=%.2f%% horizon=%dd',
             $summary['status'],
             count($summary['sources']),
             $summary['counts']['sources_ok'],
             $summary['counts']['sources_failed'],
             $summary['counts']['missing'],
             $summary['counts']['mismatch'],
+            $summary['counts']['eol'],
+            $summary['counts']['eol_other'],
             $summary['counts']['new'],
-            $summary['tolerance_pct']
+            $summary['tolerance_pct'],
+            $summary['eol_horizon_days']
         ));
         foreach ($summary['sources'] as $row) {
             mtrace('    [' . $row['status'] . '] ' . $row['name'] . ': ' . $row['message']);
         }
-        if ($summary['counts']['missing'] > 0 || $summary['counts']['mismatch'] > 0) {
+        // This gate and the one inside maybe_send_alert() must agree. Widening
+        // only one of them is the easiest possible way to build a check that
+        // computes EOL findings, stores them, renders them on the admin page,
+        // and never sends a single email about them.
+        if ($summary['counts']['missing'] > 0 || $summary['counts']['mismatch'] > 0
+                || $summary['counts']['eol'] > 0) {
             $sent = self::maybe_send_alert($summary);
             mtrace('  model_price_drift_check: alert email ' . ($sent ? 'sent' : 'skipped'));
         }
@@ -151,9 +198,9 @@ class model_price_drift_check extends \core\task\scheduled_task {
      * "run now" button and by the tests; the enabled flag is checked by the
      * cron entry point, not here.
      *
-     * @return array{status: string, timerun: int, tolerance_pct: float, sources: array[],
-     *               counts: array<string, int>, findings: array[], truncated: array<string, int>,
-     *               unpriced_total: int}
+     * @return array{status: string, timerun: int, tolerance_pct: float, eol_horizon_days: int,
+     *               sources: array[], counts: array<string, int>, findings: array[],
+     *               truncated: array<string, int>, unpriced_total: int}
      */
     public static function run(): array {
         $tolerance = self::tolerance_pct();
@@ -232,30 +279,47 @@ class model_price_drift_check extends \core\task\scheduled_task {
         }
 
         $missing = self::missing_findings($merged, $owner);
+        $horizon = self::eol_horizon_days();
+        $eol = self::eol_findings($horizon);
 
-        // Sort the two severity-bearing classes so the worst is first: busiest
-        // unpriced model, then largest price delta.
+        // Sort the severity-bearing classes so the worst is first: busiest
+        // unpriced model, soonest retirement, then largest price delta.
         usort($missing, fn($a, $b) => ($b['calls'] ?? 0) <=> ($a['calls'] ?? 0));
+        usort($eol, function ($a, $b) {
+            // Findings that apply to a surface this site calls outrank ones that
+            // do not, whatever their dates: a Vertex-only retirement is context,
+            // and it must never push a real shutoff below the display cap.
+            $applies = ((int) !empty($b['eol_applies'])) <=> ((int) !empty($a['eol_applies']));
+            return $applies !== 0 ? $applies : (($a['eol_date'] ?? 0) <=> ($b['eol_date'] ?? 0));
+        });
         usort($mismatch, fn($a, $b) => self::worst_delta($b) <=> self::worst_delta($a));
+
+        $eolapplies = array_values(array_filter($eol, fn($f) => !empty($f['eol_applies'])));
 
         $counts = [
             'missing'        => count($missing),
             'mismatch'       => count($mismatch),
+            // 'eol' is the ALERTING count and deliberately excludes retirements
+            // announced for a surface this site does not call. 'eol_other' keeps
+            // those visible without making them wake anybody up.
+            'eol'            => count($eolapplies),
+            'eol_other'      => count($eol) - count($eolapplies),
             'new'            => count($newmodels),
             'sources_ok'     => $okcount,
             'sources_failed' => $failcount,
         ];
 
         $keptmissing = array_slice($missing, 0, self::MAX_MISSING_FINDINGS);
+        $kepteol = array_slice($eol, 0, self::MAX_EOL_FINDINGS);
         $keptnew = array_slice($newmodels, 0, self::MAX_NEW_FINDINGS);
         $findings = array_slice(
-            array_merge($keptmissing, $mismatch, $keptnew),
+            array_merge($keptmissing, $kepteol, $mismatch, $keptnew),
             0,
             self::MAX_FINDINGS
         );
 
         $status = 'ok';
-        if ($counts['missing'] > 0 || $counts['mismatch'] > 0) {
+        if ($counts['missing'] > 0 || $counts['mismatch'] > 0 || $counts['eol'] > 0) {
             $status = 'findings';
         } else if (empty($sourcerows)) {
             $status = 'no_sources';
@@ -264,17 +328,19 @@ class model_price_drift_check extends \core\task\scheduled_task {
         }
 
         $summary = [
-            'status'         => $status,
-            'timerun'        => time(),
-            'tolerance_pct'  => $tolerance,
-            'sources'        => $sources,
-            'counts'         => $counts,
-            'findings'       => $findings,
-            'truncated'      => [
+            'status'           => $status,
+            'timerun'          => time(),
+            'tolerance_pct'    => $tolerance,
+            'eol_horizon_days' => $horizon,
+            'sources'          => $sources,
+            'counts'           => $counts,
+            'findings'         => $findings,
+            'truncated'        => [
                 'missing' => max(0, $counts['missing'] - count($keptmissing)),
+                'eol'     => max(0, count($eol) - count($kepteol)),
                 'new'     => max(0, $counts['new'] - count($keptnew)),
             ],
-            'unpriced_total' => $counts['missing'],
+            'unpriced_total'   => $counts['missing'],
         ];
 
         // Findings go where the admin page can render them: a compact JSON
@@ -340,6 +406,90 @@ class model_price_drift_check extends \core\task\scheduled_task {
             return self::DEFAULT_TOLERANCE_PCT;
         }
         return max(0.0, min(100.0, (float) $raw));
+    }
+
+    /**
+     * Configured EOL horizon, clamped to something meaningful.
+     *
+     * @return int Days.
+     */
+    public static function eol_horizon_days(): int {
+        $raw = get_config('local_ai_course_assistant', 'price_drift_eol_horizon_days');
+        if ($raw === false || $raw === '' || !is_numeric($raw)) {
+            return self::DEFAULT_EOL_HORIZON_DAYS;
+        }
+        // Zero is legal and means "only tell me about retirements that have
+        // already happened", which is a defensible if pessimistic setting.
+        return max(0, min(730, (int) $raw));
+    }
+
+    /**
+     * EOL findings: models in real billable traffic with an announced retirement.
+     *
+     * Reads {@see model_registry::models_in_traffic()} rather than
+     * unpriced_models(), which is the whole reason that method was extracted:
+     * unpriced_models() skips every model that resolves to a rate, and a model
+     * being retired almost always has one. Sharing the traffic query keeps
+     * exactly one copy of analytics::spend_rows_predicate() in this area.
+     *
+     * A finding is emitted when the announced date has passed OR falls within
+     * the horizon. A passed date is still reported — loudly — because "the
+     * shutoff was three weeks ago and we are still calling it" is the state
+     * this check exists to make impossible to miss, and it does not stop being
+     * true just because the calendar moved past it.
+     *
+     * `eol_applies` is carried on every finding rather than filtering here, so
+     * the admin page can show a Vertex-only retirement as context while the
+     * alert path counts only the ones that can actually take this site down.
+     *
+     * Public for the same reason missing_findings() is: the admin page renders
+     * the same list live, and it needs no network at all to test.
+     *
+     * @param int|null $horizondays Days ahead to report; null takes the setting.
+     * @return array[]
+     */
+    public static function eol_findings(?int $horizondays = null): array {
+        $horizon = $horizondays === null ? self::eol_horizon_days() : max(0, $horizondays);
+        $now = time();
+        $cutoff = $now + ($horizon * DAYSECS);
+
+        $out = [];
+        foreach (model_registry::models_in_traffic() as $observed) {
+            $model = (string) $observed['model_name'];
+            $eol = model_registry::eol_for($model);
+            if ($eol === null || (int) $eol['eol_date'] <= 0 || (int) $eol['eol_date'] > $cutoff) {
+                continue;
+            }
+            $date = (int) $eol['eol_date'];
+            $surface = $eol['eol_surface'] !== null ? (string) $eol['eol_surface'] : '';
+            $out[] = [
+                'type'             => 'eol',
+                'modelkey'         => strtolower($model),
+                'provider'         => $observed['provider'],
+                'capability'       => null,
+                // Null, not zero. An EOL finding proposes no price, and a
+                // zero here would render as "this model is free" in every
+                // cell the drift table already knows how to draw.
+                'input'            => null,
+                'output'           => null,
+                'context'          => null,
+                'registry_input'   => null,
+                'registry_output'  => null,
+                'delta_pct_input'  => null,
+                'delta_pct_output' => null,
+                'calls'            => (int) $observed['calls'],
+                'tokens'           => (int) $observed['tokens'],
+                'sourceid'         => null,
+                'sourcename'       => null,
+                'matchedkey'       => (string) $eol['modelkey'],
+                'eol_date'         => $date,
+                'eol_surface'      => $surface,
+                'eol_applies'      => model_registry::eol_applies($surface !== '' ? $surface : null),
+                'eol_passed'       => $date <= $now,
+                'eol_days'         => (int) floor(($date - $now) / DAYSECS),
+            ];
+        }
+        return $out;
     }
 
     /**
@@ -415,7 +565,7 @@ class model_price_drift_check extends \core\task\scheduled_task {
     }
 
     /**
-     * Email the spend-notify recipients about MISSING / MISMATCH findings.
+     * Email the spend-notify recipients about MISSING / EOL / MISMATCH findings.
      *
      * Idempotent per day AND per finding set: the stored flag is a hash of the
      * findings, so a second run on the same day is silent, but a NEW finding
@@ -423,12 +573,16 @@ class model_price_drift_check extends \core\task\scheduled_task {
      * the way cost_anomaly_detector does, and falls back to site admins when
      * `spend_notify_emails` is empty (the same fallback spend_guard uses).
      *
+     * The EOL clause in the gate below must stay in step with the one in
+     * execute(); see the note there.
+     *
      * @param array $summary Output of {@see run()}.
      * @return bool True when at least one email was sent.
      */
     public static function maybe_send_alert(array $summary): bool {
         $counts = $summary['counts'] ?? [];
-        if (($counts['missing'] ?? 0) <= 0 && ($counts['mismatch'] ?? 0) <= 0) {
+        if (($counts['missing'] ?? 0) <= 0 && ($counts['mismatch'] ?? 0) <= 0
+                && ($counts['eol'] ?? 0) <= 0) {
             return false;
         }
 
@@ -447,7 +601,8 @@ class model_price_drift_check extends \core\task\scheduled_task {
         }
 
         $subject = '[SOLA price drift] ' . (int) ($counts['missing'] ?? 0) . ' unpriced model(s) in traffic, '
-            . (int) ($counts['mismatch'] ?? 0) . ' price mismatch(es)';
+            . (int) ($counts['mismatch'] ?? 0) . ' price mismatch(es), '
+            . (int) ($counts['eol'] ?? 0) . ' model(s) reaching end of life';
         $body = self::alert_body($summary);
 
         $sent = false;
@@ -510,12 +665,30 @@ class model_price_drift_check extends \core\task\scheduled_task {
     private static function fingerprint(array $summary): string {
         $parts = [];
         foreach ($summary['findings'] ?? [] as $finding) {
-            if (($finding['type'] ?? '') === 'new') {
+            $type = (string) ($finding['type'] ?? '');
+            if ($type === 'new') {
                 continue;
             }
-            $parts[] = ($finding['type'] ?? '') . '|' . ($finding['modelkey'] ?? '')
+            // An EOL on a surface this site does not call never alerts, so it
+            // must not be able to RE-OPEN one either — otherwise a Vertex-only
+            // date landing mid-morning would resend the morning's email.
+            if ($type === 'eol' && empty($finding['eol_applies'])) {
+                continue;
+            }
+            $part = $type . '|' . ($finding['modelkey'] ?? '')
                 . '|' . round((float) ($finding['input'] ?? 0), 6)
                 . '|' . round((float) ($finding['output'] ?? 0), 6);
+            // The date is appended ONLY for EOL findings, so the tuple for a
+            // missing/mismatch finding stays byte-identical to the pre-v7.4.4
+            // shape and today's stored flag does not spuriously re-alert on the
+            // day of the upgrade. Without it every EOL row degenerates to
+            // "eol|<key>|0|0" and a vendor SLIPPING a shutoff date -- the one
+            // lifecycle change an operator most needs to hear about twice --
+            // would be silently deduplicated against the original alert.
+            if ($type === 'eol') {
+                $part .= '|' . (int) ($finding['eol_date'] ?? 0);
+            }
+            $parts[] = $part;
         }
         sort($parts);
         return sha1(implode("\n", $parts));
@@ -534,8 +707,11 @@ class model_price_drift_check extends \core\task\scheduled_task {
         $body .= sprintf("Sources OK / failed:  %d / %d\n",
             (int) ($counts['sources_ok'] ?? 0), (int) ($counts['sources_failed'] ?? 0));
         $body .= sprintf("Unpriced in traffic:  %d\n", (int) ($counts['missing'] ?? 0));
+        $body .= sprintf("Reaching end of life: %d (within %d days)\n",
+            (int) ($counts['eol'] ?? 0), (int) ($summary['eol_horizon_days'] ?? 0));
         $body .= sprintf("Price mismatches:     %d\n", (int) ($counts['mismatch'] ?? 0));
-        $body .= sprintf("Unknown to registry:  %d (informational)\n\n", (int) ($counts['new'] ?? 0));
+        $body .= sprintf("Unknown to registry:  %d (informational)\n", (int) ($counts['new'] ?? 0));
+        $body .= sprintf("EOL on other surface: %d (informational)\n\n", (int) ($counts['eol_other'] ?? 0));
 
         $missing = array_filter($summary['findings'] ?? [], fn($f) => ($f['type'] ?? '') === 'missing');
         if ($missing) {
@@ -555,6 +731,55 @@ class model_price_drift_check extends \core\task\scheduled_task {
                     $body .= '  NO SOURCE KNOWS THIS MODEL — enter the price by hand';
                 }
                 $body .= "\n";
+            }
+            $body .= "\n";
+        }
+
+        $eol = array_filter($summary['findings'] ?? [], fn($f) => ($f['type'] ?? '') === 'eol');
+        $eolours = array_filter($eol, fn($f) => !empty($f['eol_applies']));
+        if ($eolours) {
+            $body .= "MODELS REACHING END OF LIFE — these are still being called.\n";
+            $body .= "A retirement is the one failure mode the price checks cannot see: the\n";
+            $body .= "model keeps working and keeps billing right up until it stops, and then\n";
+            $body .= "every call fails at once. Swapping a production model is a bake-off, a\n";
+            $body .= "settings change and a deploy, so start now rather than on the day.\n";
+            foreach ($eolours as $finding) {
+                $days = (int) ($finding['eol_days'] ?? 0);
+                $body .= sprintf(
+                    "  %-42s %7d calls  %s  (%s)",
+                    substr((string) $finding['modelkey'], 0, 42),
+                    (int) ($finding['calls'] ?? 0),
+                    gmdate('Y-m-d', (int) ($finding['eol_date'] ?? 0)),
+                    !empty($finding['eol_passed'])
+                        ? sprintf('PASSED %d day(s) ago', abs($days))
+                        : sprintf('in %d day(s)', $days)
+                );
+                $surface = trim((string) ($finding['eol_surface'] ?? ''));
+                $body .= $surface !== '' ? '  on ' . $surface : '  on every surface';
+                $body .= "\n";
+            }
+            $body .= "\n";
+        }
+
+        $eolother = array_filter($eol, fn($f) => empty($f['eol_applies']));
+        if ($eolother) {
+            // Reported, never alerted on. This block exists because of a real
+            // near-miss: gemini-2.5-flash's announced 2026-10-16 retirement was
+            // a Vertex AI lifecycle event, and this plugin reaches the model
+            // through the Gemini Developer API. Showing it here — plainly
+            // labelled as not ours — is what stops the same date being
+            // rediscovered and escalated every few weeks.
+            $body .= "END-OF-LIFE ANNOUNCED ON ANOTHER SURFACE — informational, no action.\n";
+            $body .= "These retirements are real, but they are announced for an API surface\n";
+            $body .= "this site does not call, so they do not threaten it.\n";
+            foreach ($eolother as $finding) {
+                $body .= sprintf(
+                    "  %-42s %s  on %s\n",
+                    substr((string) $finding['modelkey'], 0, 42),
+                    gmdate('Y-m-d', (int) ($finding['eol_date'] ?? 0)),
+                    trim((string) ($finding['eol_surface'] ?? '')) !== ''
+                        ? (string) $finding['eol_surface'] : 'an unrecorded surface'
+                );
             }
             $body .= "\n";
         }
@@ -583,7 +808,9 @@ class model_price_drift_check extends \core\task\scheduled_task {
 
         $body .= "\nNothing has been changed. These are PROPOSALS: review and apply them at\n";
         $body .= "  Site administration > Plugins > Local plugins > AI Course Assistant > Model registry.\n";
-        $body .= "Tolerance and the daily schedule are configurable in the same place.\n";
+        $body .= "Tolerance, the end-of-life horizon and the daily schedule are configurable in\n";
+        $body .= "the same place. End-of-life dates are never applied or edited automatically:\n";
+        $body .= "a retirement date is a fact a human records, with the API surface it applies to.\n";
         return $body;
     }
 }

@@ -447,7 +447,45 @@ class analytics {
             . " OR {$alias}.interaction_type NOT IN ('meta', 'meta_scheduled'))";
     }
 
-    /**
+        /**
+     * SQL predicate excluding model-benchmark rows from automated decisions.
+     *
+     * run_model_benchmark makes real, invoiced calls on models that never serve a
+     * learner. That spend BELONGS in the ledger -- get_total_tokens(),
+     * get_token_costs(), get_monthly_provider_spend(), token_analytics and
+     * model_registry::unpriced_models() all keep it, and the external dashboard
+     * contract is explicitly the whole bill rather than a subset. It must NOT
+     * reach any consumer that makes a decision or raises an alert.
+     *
+     * THE EXCLUSION SET IS COMPLETE AND IS NOT TO BE EXTENDED. It belongs at
+     * exactly seven sites: cost_anomaly_detector's daily median and its
+     * per-course breakdown, both project_monthly_spend() queries in
+     * llm_optimizer, run_anomaly_digest's day-over-day comparison and its USD
+     * floor, and spend_guard::compute_spend(). llm_optimizer::rank_providers()
+     * and model_recommender::volume_for() are shielded incidentally, because
+     * they AND capability_sql() and 'model_bench' sits in no bucket -- that is
+     * fragile (capability_sql's default arm returns '1=1'), so it is pinned by
+     * test rather than trusted. Adding this helper anywhere else silently
+     * un-logs the spend and returns the plugin to the exact defect -- money
+     * invoiced, counted by nothing -- that RAG, quiz and two ancillary batches
+     * each hit in turn. tests/benchmark_spend_exclusion_test.php fails in BOTH
+     * directions for this reason.
+     *
+     * NOT IN is NULL-propagating and rows written before the interaction_type
+     * column existed carry NULL, so the IS NULL branch is REQUIRED or every
+     * legacy chat row vanishes from whichever query uses this -- making the
+     * anomaly median, the digest floor and the projection all SMALLER. The
+     * symptom would be an alert that never fires, not an exception.
+     *
+     * @param string $alias table alias used in the calling query.
+     * @return string SQL boolean expression.
+     */
+    public static function benchmark_rows_excluded(string $alias = 'm'): string {
+        return "({$alias}.interaction_type IS NULL"
+            . " OR {$alias}.interaction_type NOT IN ('model_bench'))";
+    }
+
+/**
      * SQL predicate matching rows that represent a real billable API call.
      *
      * Single definition on purpose. This predicate was previously written inline
@@ -515,7 +553,7 @@ class analytics {
                      'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt',
                      'flashcards', 'essay', 'insights',
                      'mastery_signal', 'student_profile', 'speech_score',
-                     'objective_extract', 'slide_vision')))";
+                     'objective_extract', 'slide_vision', 'model_bench')))";
     }
 
     /**
@@ -619,7 +657,12 @@ class analytics {
         // *capability* for cap purposes (see spend_guard::capability_sql) but
         // is its own *category* for reporting, because folding it into chat is
         // what hid it. Cap by capability, report by category.
-        $category = "CASE WHEN m.interaction_type IN ('embedding', 'rerank', 'quiz')
+        // 'model_bench' must be named here, not left to the ELSE. This CASE falls
+        // back to 'chat', so benchmark spend on a never-served candidate model
+        // would be reported AS CHAT in the per-model cost table and in the Redash
+        // export -- an exclusion cannot fix that, because this consumer keeps
+        // benchmark rows deliberately. Reporting it as its own category is the fix.
+        $category = "CASE WHEN m.interaction_type IN ('embedding', 'rerank', 'quiz', 'model_bench')
                           THEN m.interaction_type ELSE 'chat' END";
 
         // Recordset, not get_records_sql: the grouping key is (model, category),

@@ -69,6 +69,7 @@ $string['settings:default_course_mode_desc'] = 'Controls whether the assistant a
 $string['settings:default_course_mode_per_course'] = 'Disabled by default (enable per course)';
 $string['settings:default_course_mode_all'] = 'Enabled on all courses';
 $string['task:run_meta_ai_query'] = 'Run scheduled Learning Radar analytics query';
+$string['task:collect_meta_ai_batches'] = 'Collect finished Learning Radar batch reports';
 $string['settings:comparison_providers'] = 'Comparison providers (LLM picker)';
 $string['settings:comparison_providers_desc'] = 'Add extra AI providers to the in-widget LLM picker so admins can compare responses across providers. Use the table below to add rows. The temperature column is optional (leave blank to use the global temperature). Stored format: provider_id|api_key|model1,model2|temperature. The primary provider configured above is always included automatically. Only admins with the manage capability see the picker; students never see it. Valid provider IDs: openai, claude, deepseek, gemini, ollama, minimax, mistral, openrouter, xai, coreai, custom.';
 $string['settings:auto_open'] = 'Auto-open on first visit';
@@ -488,17 +489,10 @@ $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
 
 // Goals UI strings.
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 
 // Communications settings panel.
 $string['comms:title'] = 'My communications';
@@ -1162,8 +1156,7 @@ $string['mobile_chip_quiz']     = 'Quiz Me';
 
 // Rate limiting and error strings.
 $string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
+$string['error_no_tts_key'] = 'Text-to-speech is not available right now. Please tell your site administrator.';
 
 // Reminder validation errors.
 $string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
@@ -2968,6 +2961,7 @@ $string['modelregistry:col_layer'] = 'Supplied by';
 $string['modelregistry:col_source'] = 'Source';
 $string['modelregistry:col_setby'] = 'Set by';
 $string['modelregistry:col_updated'] = 'Updated';
+$string['modelregistry:col_eol'] = 'End of life';
 $string['modelregistry:layer_baseline'] = 'Shipped baseline';
 $string['modelregistry:layer_legacy_overrides'] = 'Legacy JSON setting';
 $string['modelregistry:layer_table'] = 'This registry';
@@ -2993,12 +2987,17 @@ $string['modelregistry:field_input_rate'] = 'Input price (USD per 1M tokens)';
 $string['modelregistry:field_output_rate'] = 'Output price (USD per 1M tokens)';
 $string['modelregistry:field_output_rate_help'] = 'For reasoning models this must be the price that includes thinking tokens, because that is what the provider bills.';
 $string['modelregistry:field_context_tokens'] = 'Context window (tokens)';
+$string['modelregistry:field_eol_date'] = 'End-of-life date';
+$string['modelregistry:field_eol_date_help'] = 'The announced retirement or shutoff date, as YYYY-MM-DD. Leave empty when no end of life has been announced — empty means unannounced, not safe. Read as a calendar day in UTC, not in your own timezone, so everyone reading this row plans for the same week.';
+$string['modelregistry:field_eol_surface'] = 'End of life applies to';
+$string['modelregistry:field_eol_surface_help'] = 'Which API surface the date was announced for: <code>gemini-developer-api</code>, <code>vertex-ai</code>, <code>openai-api</code>, <code>azure-openai</code>, <code>bedrock</code>, or <code>any</code> for every surface. Required whenever a date is entered, and not paperwork: gemini-2.5-flash was reported as retiring on 2026-10-16, which was a Vertex AI lifecycle event and not the Gemini Developer API this site calls. Without the surface, that date raises a production-outage alarm about a model that is not going anywhere. List the surfaces this site actually calls under Price drift so the ones that are not yours stay informational.';
 $string['modelregistry:field_status'] = 'Status';
 $string['modelregistry:field_notes'] = 'Notes';
 $string['modelregistry:field_notes_help'] = 'Where the price came from and when you checked it. This is the only record of that.';
 $string['modelregistry:status_active'] = 'Active';
 $string['modelregistry:status_deprecated'] = 'Deprecated';
 $string['modelregistry:status_candidate'] = 'Candidate';
+$string['modelregistry:status_retired'] = 'Retired';
 $string['modelregistry:save'] = 'Save model';
 $string['modelregistry:delete'] = 'Delete';
 $string['modelregistry:delete_confirm'] = 'Delete this registry row? The price falls back to the shipped baseline, which may be a different number or none at all.';
@@ -3007,6 +3006,12 @@ $string['modelregistry:saved_updated'] = 'Updated {$a}.';
 $string['modelregistry:saved_skipped'] = 'Nothing was written for {$a}: an administrator-entered row cannot be overwritten by an automated source.';
 $string['modelregistry:err_nokey'] = 'A model key is required.';
 $string['modelregistry:err_badrate'] = 'Prices must be numbers, or empty for unknown.';
+$string['modelregistry:err_badeoldate'] = 'The end-of-life date must be a real calendar date written as YYYY-MM-DD, or empty.';
+$string['modelregistry:err_noeolsurface'] = 'An end-of-life date needs the API surface it was announced for. A retirement announced for one surface does not apply to another, and a date with no surface recorded is how a lifecycle notice for a model you do not call becomes a false outage alarm. Use \'any\' if it applies everywhere.';
+$string['modelregistry:eol_passed'] = 'Retired {$a} — still being called';
+$string['modelregistry:eol_soon'] = 'Retires {$a->date} ({$a->days} days)';
+$string['modelregistry:eol_later'] = 'Retires {$a}';
+$string['modelregistry:eol_othersurface'] = 'Retires {$a->date} on {$a->surface} — not a surface this site calls';
 $string['modelregistry:deleted'] = 'Deleted the registry row for {$a}.';
 $string['modelregistry:err_norow'] = 'No registry row with that key.';
 
@@ -3059,6 +3064,7 @@ $string['modelregistry:drift_lastrun'] = 'Last checked {$a}.';
 $string['modelregistry:drift_tolerance'] = 'Reporting differences above {$a}%.';
 $string['modelregistry:drift_run_now'] = 'Check for drift now';
 $string['modelregistry:drift_ran'] = 'Drift check finished: {$a->missing} unpriced, {$a->mismatch} mismatched, {$a->new} unknown to the registry.';
+$string['modelregistry:drift_ran_eol'] = '{$a} model(s) in traffic are reaching end of life.';
 $string['modelregistry:drift_status_no_sources'] = 'No enabled pricing source, so nothing was compared.';
 $string['modelregistry:drift_status_all_sources_failed'] = 'Every enabled pricing source failed. The findings below, if any, are from traffic only.';
 $string['modelregistry:drift_truncated'] = '{$a} further finding(s) were not stored. Re-run the check after acting on these.';
@@ -3069,10 +3075,14 @@ $string['modelregistry:drift_col_delta'] = 'Difference';
 $string['modelregistry:finding_missing'] = 'Unpriced model in traffic';
 $string['modelregistry:finding_mismatch'] = 'Price mismatch';
 $string['modelregistry:finding_new'] = 'Unknown to the registry';
+$string['modelregistry:finding_eol'] = 'Model reaching end of life';
 $string['modelregistry:drift_apply'] = 'Apply this price';
 $string['modelregistry:drift_nosource'] = 'No source knows this model. Enter its price by hand.';
 $string['modelregistry:drift_applied'] = 'Applied the proposed price for {$a}.';
 $string['modelregistry:drift_apply_norates'] = 'That finding carries no price to apply.';
+$string['modelregistry:drift_eol_horizon'] = 'Reporting announced retirements within {$a} days.';
+$string['modelregistry:drift_eol_noapply'] = 'End-of-life dates are never applied automatically.';
+$string['modelregistry:drift_eol_record'] = 'Record the date';
 
 // Section: benchmarks and recommendations.
 $string['modelregistry:bench_desc'] = 'A recommendation compares measurements. Where a measurement is missing or was taken on a different question set, release or scale, this says so instead of producing a number.';
@@ -3150,10 +3160,18 @@ $string['rec:nr_no_material_gain'] = 'No comparable alternative clears the savin
 $string['task:model_price_drift_check'] = 'Model price drift check';
 $string['task:run_model_benchmark'] = 'Benchmark a model';
 $string['pricedrift:heading'] = 'Price drift';
+$string['settings:radar_batch_heading'] = 'Learning Radar: offline batch tier';
+$string['settings:radar_batch_heading_desc'] = 'Scheduled Learning Radar reports can be sent to the AI provider\'s offline batch tier, which costs 50% less on both input and output tokens in exchange for a turnaround of up to 24 hours. Only the SCHEDULED reports are eligible: the ad-hoc Learning Radar you run from this page streams its answer to your browser and always stays synchronous, as does every learner-facing feature. Batch spend is recorded against a model name prefixed with <code>batch/</code>, so the AI Spend dashboard shows the discounted rate rather than list price.';
+$string['settings:radar_batch_enabled'] = 'Submit scheduled reports to the batch tier';
+$string['settings:radar_batch_enabled_desc'] = 'Off by default. When on, each scheduled report is submitted at the batch rate and delivered when the provider finishes it, which may be any time within 24 hours; the schedule shows a "submitted" status until then. Schedules whose provider has no batch tier keep running synchronously, so a report is never lost to this setting. Turning it off returns every schedule to the synchronous path on the next run, and any batch still in flight is still collected and delivered.';
 $string['pricedrift:enabled'] = 'Enable the daily price-drift check';
 $string['pricedrift:enabled_desc'] = 'Once a day, fetch every enabled pricing source, compare it against the model registry, and record proposed corrections. Nothing is applied automatically: an unpriced model reports spend as $0.00 rather than as an error, and a price is a number an administrator is accountable for. Emails the spend-notification recipients when a model in real traffic has no price, or a price has drifted.';
 $string['pricedrift:tolerance'] = 'Price mismatch tolerance (%)';
 $string['pricedrift:tolerance_desc'] = 'How far a source price may differ from the registry price before it is reported. Default 1%.';
+$string['pricedrift:eol_horizon'] = 'End-of-life warning horizon (days)';
+$string['pricedrift:eol_horizon_desc'] = 'How far ahead an announced model retirement starts being reported. The drift check watches price; without this nothing watches lifecycle, and a genuine retirement arrives as a production outage rather than as a warning — a model keeps working and keeps billing right up until it stops, and then every call fails at once. Default 60 days, because replacing a production model is a bake-off, a settings change and a deploy, not an afternoon. A retirement whose date has already passed is always reported, whatever this is set to.';
+$string['pricedrift:eol_surfaces'] = 'API surfaces this site calls';
+$string['pricedrift:eol_surfaces_desc'] = 'Comma-separated, for example <code>gemini-developer-api,openai-api</code>. An announced retirement is only alerted on when it was announced for one of these surfaces; the rest are still shown, labelled as not yours. Leave empty to alert on every recorded end of life. This exists because of a real near-miss: gemini-2.5-flash was reported as retiring on 2026-10-16, which was true of the Vertex AI lifecycle and not of the Gemini Developer API this plugin calls. Being paged once about a non-event teaches people to ignore the next page.';
 
 // Benchmark settings (specified by the benchmark stage's manifest).
 $string['settings:bench_heading'] = 'Model benchmarks';

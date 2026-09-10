@@ -73,6 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'input_rate'     => optional_param('input_rate', '', PARAM_TEXT),
             'output_rate'    => optional_param('output_rate', '', PARAM_TEXT),
             'context_tokens' => optional_param('context_tokens', '', PARAM_TEXT),
+            // PARAM_TEXT, not PARAM_INT: the field is an ISO calendar date and
+            // must reach save_model() exactly as typed so a malformed one is
+            // refused with a message rather than silently coerced to 0, which
+            // would read back as "no end-of-life announced".
+            'eol_date'       => optional_param('eol_date', '', PARAM_TEXT),
+            'eol_surface'    => optional_param('eol_surface', '', PARAM_TEXT),
             'status'         => optional_param('status', '', PARAM_ALPHA),
             'notes'          => optional_param('notes', '', PARAM_TEXT),
         ];
@@ -145,7 +151,8 @@ $modelform = [
     'input_rate'     => '',
     'output_rate'    => '',
     'context_tokens' => '',
-    'notes'          => '',
+    'eol_date'       => '',
+    'eol_surface'    => '',
     'editing'        => false,
     'statuses'       => model_registry_page::status_options(),
 ];
@@ -163,6 +170,13 @@ if ($editkey !== '') {
     $modelform['output_rate'] = model_registry_page::numberfield($prov['output'] ?? null);
     $modelform['context_tokens'] = ($existing && !empty($existing->context_tokens))
         ? (string) (int) $existing->context_tokens : '';
+    // Prefilled from the stored row rather than from provenance_for(), which
+    // resolves by longest prefix: editing 'gpt-5' must not silently inherit the
+    // retirement date somebody recorded on 'gpt-5-mini' and then write it back
+    // onto the shorter key.
+    $modelform['eol_date'] = ($existing && !empty($existing->eol_date))
+        ? model_registry_page::isodate((int) $existing->eol_date) : '';
+    $modelform['eol_surface'] = $existing ? (string) ($existing->eol_surface ?? '') : '';
     $modelform['notes'] = $existing ? (string) ($existing->notes ?? '') : '';
     foreach ($modelform['statuses'] as $idx => $option) {
         $modelform['statuses'][$idx]['selected'] =
@@ -243,6 +257,7 @@ $labels = [
     'colsource'          => get_string('modelregistry:col_source', 'local_ai_course_assistant'),
     'colsetby'           => get_string('modelregistry:col_setby', 'local_ai_course_assistant'),
     'colupdated'         => get_string('modelregistry:col_updated', 'local_ai_course_assistant'),
+    'coleol'             => get_string('modelregistry:col_eol', 'local_ai_course_assistant'),
     'colquality'         => get_string('modelregistry:col_quality', 'local_ai_course_assistant'),
     'colcost'            => get_string('modelregistry:col_cost', 'local_ai_course_assistant'),
     'colttft'            => get_string('modelregistry:col_ttft', 'local_ai_course_assistant'),
@@ -267,6 +282,10 @@ $labels = [
     'fieldoutput'        => get_string('modelregistry:field_output_rate', 'local_ai_course_assistant'),
     'fieldoutputhelp'    => get_string('modelregistry:field_output_rate_help', 'local_ai_course_assistant'),
     'fieldcontext'       => get_string('modelregistry:field_context_tokens', 'local_ai_course_assistant'),
+    'fieldeoldate'       => get_string('modelregistry:field_eol_date', 'local_ai_course_assistant'),
+    'fieldeoldatehelp'   => get_string('modelregistry:field_eol_date_help', 'local_ai_course_assistant'),
+    'fieldeolsurface'    => get_string('modelregistry:field_eol_surface', 'local_ai_course_assistant'),
+    'fieldeolsurfacehelp' => get_string('modelregistry:field_eol_surface_help', 'local_ai_course_assistant'),
     'fieldstatus'        => get_string('modelregistry:field_status', 'local_ai_course_assistant'),
     'fieldnotes'         => get_string('modelregistry:field_notes', 'local_ai_course_assistant'),
     'fieldnoteshelp'     => get_string('modelregistry:field_notes_help', 'local_ai_course_assistant'),
@@ -313,6 +332,13 @@ $labels = [
     'driftcoldelta'      => get_string('modelregistry:drift_col_delta', 'local_ai_course_assistant'),
     'driftapply'         => get_string('modelregistry:drift_apply', 'local_ai_course_assistant'),
     'driftnosource'      => get_string('modelregistry:drift_nosource', 'local_ai_course_assistant'),
+    'drifteolhorizon'    => get_string(
+        'modelregistry:drift_eol_horizon',
+        'local_ai_course_assistant',
+        $drift['horizon']
+    ),
+    'drifteolnoapply'    => get_string('modelregistry:drift_eol_noapply', 'local_ai_course_assistant'),
+    'drifteolrecord'     => get_string('modelregistry:drift_eol_record', 'local_ai_course_assistant'),
     // Benchmarks and recommendations.
     'benchheading'       => get_string('bench:heading', 'local_ai_course_assistant'),
     'benchdesc'          => get_string('modelregistry:bench_desc', 'local_ai_course_assistant'),

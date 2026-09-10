@@ -137,7 +137,7 @@ $bycategory = $DB->get_records_sql(
             COUNT(m.id) AS response_count,
             SUM(COALESCE(m.prompt_tokens,0))     AS total_prompt,
             SUM(COALESCE(m.completion_tokens,0)) AS total_completion,
-            SUM(COALESCE(m.reasoning_tokens,0))  AS total_reasoning
+            SUM(" . token_cost_manager::extra_output_tokens_sql('m') . ") AS extra_output
        FROM {local_ai_course_assistant_msgs} m
       WHERE m.role IN ('assistant','system') AND m.model_name IS NOT NULL{$timewhere}{$coursewhere}
       GROUP BY {$categorysql}
@@ -150,12 +150,20 @@ $categorytotalcost = 0.0;
 foreach ($bycategory as $row) {
     // Category-level cost uses the mean provider rate from the full set for
     // that category. Cheap estimate; the per-model table below is authoritative.
-    $rowtokens = (int) $row->total_prompt + (int) $row->total_completion;
+    //
+    // extra_output_tokens_sql() is summed rather than a plain SUM of
+    // reasoning_tokens: this query groups by CATEGORY, so no model name reaches
+    // PHP and the "is this thinking already inside completion_tokens?" rule has
+    // to be applied in SQL. It is the same rule
+    // analytics::get_total_tokens() uses, so the two now agree by construction
+    // instead of by coincidence.
+    $completionshown = (int) $row->total_completion + (int) $row->extra_output;
+    $rowtokens = (int) $row->total_prompt + $completionshown;
     $bycategoryrows[] = [
         'category'          => $categorylabels[$row->category] ?? $row->category,
         'response_count'    => number_format((int) $row->response_count),
         'prompt_tokens'     => number_format((int) $row->total_prompt),
-        'completion_tokens' => number_format((int) $row->total_completion),
+        'completion_tokens' => number_format($completionshown),
         'total_tokens'      => number_format($rowtokens),
     ];
 }
@@ -168,7 +176,8 @@ $bymodel = $DB->get_records_sql(
             COALESCE(m.provider,'unknown')   AS provider,
             COUNT(m.id)                       AS response_count,
             SUM(COALESCE(m.prompt_tokens,0))      AS total_prompt,
-            SUM(COALESCE(m.completion_tokens,0))  AS total_completion
+            SUM(COALESCE(m.completion_tokens,0))  AS total_completion,
+            SUM(COALESCE(m.reasoning_tokens,0))   AS total_reasoning
        FROM {local_ai_course_assistant_msgs} m
       WHERE {$msgwhere}
       GROUP BY m.model_name, m.provider
@@ -188,12 +197,29 @@ foreach ($bymodel as $row) {
     // Reasoning tokens must reach estimate_cost or this page disagrees with the
     // external export by the whole Gemini thinking share -- analytics.php has
     // passed the 4th argument since v7.4.2 and these two call sites did not.
+    //
+    // The SELECT above must actually name total_reasoning. It did not when this
+    // comment was first written: `(int) ($row->total_reasoning ?? 0)` reads an
+    // undefined property on a stdClass, which yields null with no warning, so
+    // the argument was a hard zero on every row and $grandcost -- the page's
+    // headline dollar figure -- still carried the pre-v7.4.2 undercount while
+    // analytics.php reported the corrected one.
+    $reasoning = (int) ($row->total_reasoning ?? 0);
     $cost = token_cost_manager::estimate_cost(
         $row->model,
         (int) $row->total_prompt,
         (int) $row->total_completion,
-        (int) ($row->total_reasoning ?? 0)
+        $reasoning
     );
+    // Thinking that the provider bills as output but does NOT report inside
+    // completion_tokens is billable output, so it belongs in the token columns
+    // too -- otherwise the cost column moves and the tokens beside it do not,
+    // and this table cannot be reconciled against analytics::get_total_tokens(),
+    // which adds exactly these tokens via extra_output_tokens_sql().
+    $extraoutput = token_cost_manager::reasoning_billed_as_extra_output((string) $row->model)
+        ? $reasoning
+        : 0;
+    $completionshown = (int) $row->total_completion + $extraoutput;
     if ($cost !== null) {
         $grandcost += $cost;
     } else {
@@ -201,11 +227,11 @@ foreach ($bymodel as $row) {
         // some model, and the primary chat tier is currently one of them -- so a
         // clean dollar figure built from the priced rows only is a confident
         // understatement with nothing on screen to say so.
-        $unpricedtokens += (int) $row->total_prompt + (int) $row->total_completion;
+        $unpricedtokens += (int) $row->total_prompt + $completionshown;
         $unpricedmodels[] = (string) $row->model;
     }
     $grandprompt    += (int) $row->total_prompt;
-    $grandcompl     += (int) $row->total_completion;
+    $grandcompl     += $completionshown;
     $grandresponses += (int) $row->response_count;
 
     $bymodelrows[] = [
@@ -213,8 +239,8 @@ foreach ($bymodel as $row) {
         'provider'           => $row->provider,
         'response_count'     => number_format((int) $row->response_count),
         'prompt_tokens'      => number_format((int) $row->total_prompt),
-        'completion_tokens'  => number_format((int) $row->total_completion),
-        'total_tokens'       => number_format((int)$row->total_prompt + (int)$row->total_completion),
+        'completion_tokens'  => number_format($completionshown),
+        'total_tokens'       => number_format((int) $row->total_prompt + $completionshown),
         'estimated_cost'     => token_cost_manager::format_cost($cost),
         'cost_unknown'       => ($cost === null),
     ];

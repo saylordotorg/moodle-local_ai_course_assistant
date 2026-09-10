@@ -179,37 +179,37 @@ $string['reminder:email_body'] = '{$a->firstname}さん、こんにちは。
 
 ---
 これらのリマインダーを停止するにはこちらをクリック：{$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = '{$a->firstname}さん、こんにちは。
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+「{$a->coursename}」の学習リマインダーです。
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+その調子で頑張ってください！
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+今後このリマインダーを受け取らない場合は、こちらをクリックしてください: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = '{$a->firstname}さん、こんにちは。
+
+「{$a->coursename}」の学習リマインダーです。
+
+{$a->message}
+
+あなたの学習プラン: 週{$a->hours_per_week}時間、{$a->preferred_days}（{$a->preferred_time}）。
+
+その調子で頑張ってください！
+
+---
+今後このリマインダーを受け取らない場合は、こちらをクリックしてください: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'ポモドーロ・テクニックを試してみましょう。25分間集中して学習し、そのあと5分間休憩します。';
+$string['studytip:review_notes']        = '新しい教材に取りかかる前に、前回の学習のノートを見直しましょう。';
+$string['studytip:active_recall']       = '最近学んだ内容を自分でテストしてみましょう。能動的に思い出すことで記憶が強くなります。';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = '学習のしかたを組み合わせましょう。読むこと、練習問題を解くこと、そして概念を人に教えることです。';
+$string['studytip:tackle_hard_first']   = '気力がいちばん高いうちに、最も難しいトピックから始めましょう。';
+$string['studytip:connect_concepts']    = '新しい概念と、すでに知っていることを結びつけましょう。';
+$string['studytip:short_breaks']        = '集中を保つために短い休憩を取りましょう。頭がすっきりしていると学習がはかどります。';
+$string['studyplan:hours_out_of_range'] = '1週間あたりの学習時間は{$a->min}から{$a->max}の範囲で指定してください。入力された値: {$a->got}。別の数値を[[tutorshort]]に伝えると、プランを保存します。';
 $string['reminder:whatsapp_body'] = '{$a->coursename}の学習リマインダー：{$a->message}（配信停止：{$a->unsubscribe_url}）';
 $string['reminder:study_tip_prefix'] = '今日の学習目標：';
 $string['unsubscribe:title'] = '学習リマインダーの配信停止';
@@ -366,9 +366,9 @@ $string['chat:voice_error'] = '音声接続に失敗しました。設定を確�
 $string['chat:quiz_locked'] = '学術的誠実性を維持するため、クイズ中はSOLAを一時停止しています。頑張ってください！';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'モードナビゲーション';
+$string['chat:mode_chat'] = 'チャット';
+$string['chat:mode_voice'] = '音声';
 $string['chat:mode_history'] = 'メモ';
 
 // History panel.
@@ -436,7 +436,7 @@ $string['chat:llm_model_label'] = 'モデル';
 $string['chat:llm_model_select'] = 'LLMモデルを選択';
 $string['chat:footer_usertesting'] = 'ユーザビリティテスト';
 $string['chat:footer_feedback'] = 'フィードバック';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = '{$a}と話す';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'コンテキストデバッグ';
@@ -483,12 +483,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = '音声読み上げは現在ご利用いただけません。サイト管理者にお知らせください。';
+$string['error_rate_limit_ip'] = 'お使いのIPアドレスからのリクエストが多すぎます。少し時間をおいてからお試しください。';
+$string['error_reminders_email_disabled'] = 'メールでのリマインダーは有効になっていません。';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsAppのリマインダーはお住まいの国ではご利用いただけません。';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsAppのリマインダーは有効になっていません。';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1192,17 +1191,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = '私のコミュニケーション';
 $string['comms:desc'] = '[[tutorshort]]があなたに送信できる自動メールを選択してください。デフォルトではオフです。いつでも変更できます。';
 $string['comms:milestones_label'] = 'マイルストーン達成時にメールを受け取る(7日連続、30日連続、コース修了)。';

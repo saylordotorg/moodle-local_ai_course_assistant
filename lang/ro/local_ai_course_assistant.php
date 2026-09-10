@@ -179,37 +179,37 @@ Continuă tot așa!
 
 ---
 Pentru a nu mai primi aceste memento-uri, faceți clic aici: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Bună {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Acesta este mementoul tău de studiu pentru "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Continuă tot așa!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Pentru a nu mai primi aceste mementouri, dă clic aici: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Bună {$a->firstname},
+
+Acesta este mementoul tău de studiu pentru "{$a->coursename}".
+
+{$a->message}
+
+Planul tău de studiu: {$a->hours_per_week} ore pe săptămână, în zilele {$a->preferred_days} ({$a->preferred_time}).
+
+Continuă tot așa!
+
+---
+Pentru a nu mai primi aceste mementouri, dă clic aici: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Încearcă tehnica Pomodoro: 25 de minute de studiu concentrat, apoi o pauză de 5 minute.';
+$string['studytip:review_notes']        = 'Recapitulează notițele de la sesiunea anterioară înainte de a începe un material nou.';
+$string['studytip:active_recall']       = 'Testează-te pe ceea ce ai învățat recent — reactualizarea activă întărește memoria.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Combină tipuri diferite de studiu: lectură, probleme practice și explicarea conceptelor altora.';
+$string['studytip:tackle_hard_first']   = 'Începe cu subiectul cel mai dificil, cât timp ai cea mai multă energie.';
+$string['studytip:connect_concepts']    = 'Creează legături între conceptele noi și ceea ce știi deja.';
+$string['studytip:short_breaks']        = 'Ia pauze scurte pentru a rămâne concentrat — o minte odihnită învață mai bine.';
+$string['studyplan:hours_out_of_range'] = 'Numărul de ore pe săptămână trebuie să fie între {$a->min} și {$a->max}. Ai introdus {$a->got}. Spune-i [[tutorshort]] un alt număr și îți va salva planul.';
 $string['reminder:whatsapp_body'] = 'Memento de studiu pentru {$a->coursename}: {$a->message} (Dezabonare: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Obiectivul de studiu al zilei: ';
 $string['unsubscribe:title'] = 'Dezabonare de la memento-urile de studiu';
@@ -366,9 +366,9 @@ $string['chat:voice_error'] = 'Conexiunea vocală a eșuat. Verificați setăril
 $string['chat:quiz_locked'] = '[[tutorshort]] este în pauză în timpul testelor pentru a păstra integritatea academică. Succes!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Navigare între moduri';
+$string['chat:mode_chat'] = 'Conversație';
+$string['chat:mode_voice'] = 'Voce';
 $string['chat:mode_history'] = 'Note';
 
 // History panel.
@@ -436,7 +436,7 @@ $string['chat:llm_model_label'] = 'Model';
 $string['chat:llm_model_select'] = 'Selectează modelul LLM';
 $string['chat:footer_usertesting'] = 'Testare de utilizabilitate';
 $string['chat:footer_feedback'] = 'Feedback';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Vorbește cu {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Depanare context';
@@ -483,12 +483,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Sinteza vocală nu este disponibilă în acest moment. Te rugăm să anunți administratorul site-ului.';
+$string['error_rate_limit_ip'] = 'Prea multe solicitări de la adresa ta IP. Te rugăm să aștepți un moment.';
+$string['error_reminders_email_disabled'] = 'Mementourile prin e-mail nu sunt activate.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Mementourile prin WhatsApp nu sunt disponibile în țara ta.';
+$string['error_reminders_whatsapp_disabled'] = 'Mementourile prin WhatsApp nu sunt activate.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1200,17 +1199,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Comunicările mele';
 $string['comms:desc'] = 'Alege ce e-mailuri automate îți poate trimite [[tutorshort]]. Dezactivat implicit. Poți schimba oricând.';
 $string['comms:milestones_label'] = 'Trimite-mi un e-mail când ating o etapă importantă (serie de 7 zile, serie de 30 de zile, finalizarea cursului).';

@@ -487,6 +487,26 @@ abstract class base_provider implements provider_interface {
     }
 
     /**
+     * The model this instance will actually ask for.
+     *
+     * The counterpart to {@see provider_id()}, and it exists for the same
+     * reason: the configured model and the served model are two different
+     * facts. The constructor resolves per-course overrides, the site setting,
+     * remote config and the provider default in that order, so a caller that
+     * passed '' can only learn what it got by asking.
+     *
+     * The offline-batch ledger needs both: it is written at submit and read up
+     * to 24 hours later in another process, and a job row that records what was
+     * REQUESTED rather than what ran sends the collector to the wrong vendor
+     * for an already-billed report.
+     *
+     * @return string
+     */
+    public function model_id(): string {
+        return $this->model;
+    }
+
+    /**
      * Check HTTP status code and throw appropriate exception.
      *
      * @param int $httpcode
@@ -563,10 +583,24 @@ abstract class base_provider implements provider_interface {
      * @param bool $diagnostic True for backend_probe / health_check, which must keep
      *                         working while the emergency stop is engaged so an operator
      *                         can verify the provider before restoring service.
+     * @param bool $enforcespend False for a call whose money is ALREADY COMMITTED and
+     *                         which must therefore reach the vendor that holds it --
+     *                         today, collecting an offline batch. It skips the spend-cap
+     *                         failover and the per-call failover_chain wrapper, both of
+     *                         which change WHICH VENDOR is called. It does not skip the
+     *                         emergency stop or the learner guards: those mean stop, not
+     *                         reroute. create_for_comparison() has carried this parameter
+     *                         since v7.4.2 and passed it here as a no-op, so a schedule
+     *                         with no explicit provider -- the default shape -- had none
+     *                         of the protection the parameter promised.
      * @return provider_interface
      * @throws \moodle_exception If provider is not configured.
      */
-    public static function create_from_config(int $courseid = 0, bool $diagnostic = false): provider_interface {
+    public static function create_from_config(
+        int $courseid = 0,
+        bool $diagnostic = false,
+        bool $enforcespend = true
+    ): provider_interface {
         global $USER;
 
         $overrides = \local_ai_course_assistant\course_config_manager::get_effective_config($courseid);
@@ -586,7 +620,9 @@ abstract class base_provider implements provider_interface {
         self::enforce_learner_guards($diagnostic, $courseid);
 
         try {
-            $level = spend_guard::check($courseid, self::infer_capability_for_primary($courseid));
+            $level = $enforcespend
+                ? spend_guard::check($courseid, self::infer_capability_for_primary($courseid))
+                : spend_guard::CAP_OK;
             if ($level === spend_guard::CAP_BLOCKED) {
                 // Defence in depth. enforce_learner_guards() has already thrown
                 // for web requests, but CAP_BLOCKED covers two different events
@@ -635,7 +671,12 @@ abstract class base_provider implements provider_interface {
         // AND the configured chain has at least one resolvable fallback,
         // wrap the primary in a failover_chain decorator that tries each
         // fallback on per-call timeout / 5xx.
-        if ((bool) get_config('local_ai_course_assistant', 'failover_per_call_enabled')) {
+        // $enforcespend = false also skips the wrapper, and not only because it
+        // reroutes: failover_chain does not implement batch_capable_interface,
+        // so wrapping the primary would make provider_can_batch() false at
+        // collect time and mark an already-paid-for batch permanently failed.
+        if ($enforcespend
+                && (bool) get_config('local_ai_course_assistant', 'failover_per_call_enabled')) {
             try {
                 $chain = spend_guard::resolve_failover_chain('chat');
                 if (!empty($chain)) {

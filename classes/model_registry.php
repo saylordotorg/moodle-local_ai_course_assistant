@@ -39,6 +39,15 @@ namespace local_ai_course_assistant;
  *     did the opposite: it called set_config('rate_card_overrides', <whole
  *     blob>) every Monday, destroying every hand-entered correction weekly.
  *
+ * v7.4.4 adds a THIRD property: LIFECYCLE. A row may carry an announced
+ * end-of-life date and the API surface that date applies to, so the drift check
+ * can warn about a retirement before it becomes an outage. Price and lifecycle
+ * are stored together and read together because they are the two facts an
+ * operator needs about a model, and the surface is stored because a date
+ * without one is a false alarm: gemini-2.5-flash's reported 2026-10-16
+ * retirement was a Vertex AI lifecycle event, not the Gemini Developer API this
+ * plugin calls.
+ *
  * Why the registry exists at all: the committed baseline had no
  * 'gemini-2.5-flash' prefix while gemini-2.5-flash was the production chat
  * model. get_rates() returned null, estimate_cost() returned null, and every
@@ -72,6 +81,29 @@ class model_registry {
     /** @var int Default lookback window for {@see unpriced_models()}, in days. */
     public const DEFAULT_WINDOW_DAYS = 30;
 
+    /**
+     * Surface value meaning "every surface this model is served on".
+     *
+     * A row whose eol_surface is this, or is empty, alerts on any site. That is
+     * the fail-loud direction: an EOL nobody scoped is treated as ours until a
+     * human says otherwise.
+     *
+     * @var string
+     */
+    public const EOL_SURFACE_ANY = 'any';
+
+    /**
+     * Config key listing the API surfaces this site actually calls.
+     *
+     * Empty (the shipped default) means "no surface filtering" — every recorded
+     * EOL alerts. Populating it is what lets a site record a Vertex AI
+     * retirement for a model it reaches through the Gemini Developer API and
+     * NOT be paged about it.
+     *
+     * @var string
+     */
+    public const EOL_SURFACES_SETTING = 'model_eol_surfaces';
+
     /** @var array<string, array{input: float, output: float}>|null Request-scoped rate cache. */
     private static ?array $ratecache = null;
 
@@ -81,6 +113,20 @@ class model_registry {
      * @var array<string, array{layer: string, source: ?string, addedby: ?int, timemodified: ?int}>|null
      */
     private static ?array $provcache = null;
+
+    /**
+     * Request-scoped lifecycle cache: prefix => announced end-of-life.
+     *
+     * Deliberately NOT folded into $ratecache. A registry row carrying an EOL
+     * date but no price is legal and useful — "this model is being switched off
+     * on the 15th" is worth recording whether or not anyone has typed its
+     * price — and build_cache() skips priceless rows when merging rates so it
+     * cannot clobber a lower layer's real number. Keeping lifecycle in its own
+     * map is what lets a priceless row still be seen.
+     *
+     * @var array<string, array{modelkey: string, eol_date: int, eol_surface: ?string}>|null
+     */
+    private static ?array $eolcache = null;
 
     /**
      * The raw legacy blob the caches were built from.
@@ -122,15 +168,130 @@ class model_registry {
      * str_starts_with, and the longest matching key supplies the rates. Null
      * means "unknown", which callers treat as "do not attribute a cost".
      *
+     * v7.4.4: a model string carrying token_cost_manager::BATCH_MODEL_PREFIX
+     * resolves against the UNMARKED name and then has both rates multiplied by
+     * BATCH_DISCOUNT. This one function is the only place the offline-batch
+     * discount is applied, and it is deliberately here rather than at the
+     * writer: every spend consumer in the plugin -- the dashboard, spend_guard's
+     * cap accounting, the anomaly detector, llm_optimizer, token_analytics, the
+     * CSV export, the price-drift check -- reaches a price through this call, so
+     * applying it here means none of them can report the batch line at list
+     * price. Halving at write time instead would have baked the discount into a
+     * stored number, thrown away the provenance, and left every one of those
+     * consumers free to disagree.
+     *
+     * The registry itself never holds a `batch/` key, so an admin still edits
+     * one price per model and the discounted rate follows automatically.
+     *
      * @param string $model Exact model identifier from the provider response.
      * @return array{input: float, output: float}|null Rates per 1M tokens, or null if unknown.
      */
     public static function rate_for(string $model): ?array {
-        $prefix = self::match_prefix($model);
+        $batched = token_cost_manager::is_batch_model($model);
+        $prefix = self::match_prefix($batched ? token_cost_manager::strip_batch_prefix($model) : $model);
         if ($prefix === null) {
             return null;
         }
-        return self::effective_rates()[$prefix];
+        $rates = self::effective_rates()[$prefix];
+        if (!$batched) {
+            return $rates;
+        }
+        return [
+            'input'  => (float) $rates['input'] * token_cost_manager::BATCH_DISCOUNT,
+            'output' => (float) $rates['output'] * token_cost_manager::BATCH_DISCOUNT,
+        ];
+    }
+
+    /**
+     * The merged prefix => announced-EOL map. Table layer only.
+     *
+     * Lifecycle has exactly one source of truth, and it is this table. Neither
+     * the committed baseline nor the legacy JSON blob carries a retirement date
+     * — they are price cards — so there is nothing to merge and no layering to
+     * explain.
+     *
+     * @return array<string, array{modelkey: string, eol_date: int, eol_surface: ?string}>
+     */
+    public static function effective_eol(): array {
+        $raw = self::legacy_raw();
+        if (self::$eolcache === null || self::$legacysig !== $raw) {
+            self::build_cache($raw);
+        }
+        return self::$eolcache;
+    }
+
+    /**
+     * The announced end-of-life for a model, longest matching prefix wins.
+     *
+     * Matched against the LIFECYCLE keys, not the rate keys. A registry row can
+     * carry an EOL date and no price at all — that row never enters
+     * effective_rates(), so resolving lifecycle through match_prefix() would
+     * silently miss exactly the rows an operator entered in a hurry because a
+     * vendor had just sent a shutdown notice.
+     *
+     * Batch-marked model strings resolve against the unmarked name, the same
+     * way {@see rate_for()} handles them: `batch/gpt-5-mini` is gpt-5-mini, and
+     * it retires when gpt-5-mini retires.
+     *
+     * @param string $model Exact model identifier from the provider response.
+     * @return array{modelkey: string, eol_date: int, eol_surface: ?string}|null
+     */
+    public static function eol_for(string $model): ?array {
+        if (token_cost_manager::is_batch_model($model)) {
+            $model = token_cost_manager::strip_batch_prefix($model);
+        }
+        $map = self::effective_eol();
+        $prefix = self::longest_key($model, array_keys($map));
+        return $prefix === null ? null : $map[$prefix];
+    }
+
+    /**
+     * The API surfaces this site actually calls, lowercased.
+     *
+     * @return string[] Empty when the site has not said, which means "do not filter".
+     */
+    public static function site_surfaces(): array {
+        $raw = (string) (get_config('local_ai_course_assistant', self::EOL_SURFACES_SETTING) ?: '');
+        $out = [];
+        foreach (explode(',', $raw) as $item) {
+            $item = strtolower(trim($item));
+            if ($item !== '') {
+                $out[$item] = true;
+            }
+        }
+        return array_keys($out);
+    }
+
+    /**
+     * Does an announced EOL apply to a surface this site actually calls?
+     *
+     * THIS IS THE FALSE-ALARM GATE, and it exists because of a specific
+     * near-miss. In the 2026-09-08 model review gemini-2.5-flash was reported as
+     * retiring on 2026-10-16. That was true — of the Vertex AI lifecycle. This
+     * plugin reaches the model through the Gemini Developer API, where no such
+     * retirement was announced, so a bare date would have raised a
+     * production-outage alarm about a model that was not going anywhere. An
+     * operator who is paged about a non-event once stops reading the pages.
+     *
+     * The rule fails LOUD in both unknown directions: a site that has not
+     * listed its surfaces filters nothing, and an EOL row with no surface (or
+     * the explicit 'any') applies everywhere. Silence is only ever the result
+     * of two positive statements — this site calls these surfaces, and this
+     * retirement is on that one.
+     *
+     * @param string|null $surface Surface recorded on the registry row.
+     * @return bool
+     */
+    public static function eol_applies(?string $surface): bool {
+        $surface = strtolower(trim((string) $surface));
+        if ($surface === '' || $surface === self::EOL_SURFACE_ANY) {
+            return true;
+        }
+        $site = self::site_surfaces();
+        if (empty($site)) {
+            return true;
+        }
+        return in_array($surface, $site, true);
     }
 
     /**
@@ -140,14 +301,35 @@ class model_registry {
      * layer is 'none' and every other field is null — that is the state that
      * makes a model's spend read as $0.00.
      *
+     * v7.4.4 adds a `batch` flag. It reports the DISCOUNTED rates for a
+     * `batch/`-marked model, matching what rate_for() returns, so the admin page
+     * cannot show a price the spend figures were not computed from -- and the
+     * flag says why the two numbers differ for the same underlying model.
+     *
+     * v7.4.4 also carries the announced end-of-life, so the admin page can put
+     * lifecycle next to the price rather than on a separate screen: the two
+     * facts an operator needs about a model are what it costs and how long it
+     * will exist, and splitting them is how a retirement goes unread.
+     * `eol_applies` is already resolved against this site's surfaces, so no
+     * caller has to remember the Vertex-vs-Developer-API distinction itself.
+     *
      * @param string $model Exact model identifier.
      * @return array{prefix: ?string, input: ?float, output: ?float, layer: string,
-     *               source: ?string, addedby: ?int, timemodified: ?int}
+     *               source: ?string, addedby: ?int, timemodified: ?int, batch: bool,
+     *               eol_date: ?int, eol_surface: ?string, eol_applies: bool}
      */
     public static function provenance_for(string $model): array {
-        $prefix = self::match_prefix($model);
+        $batched = token_cost_manager::is_batch_model($model);
+        $prefix = self::match_prefix($batched ? token_cost_manager::strip_batch_prefix($model) : $model);
+        $eol = self::eol_for($model);
+        $lifecycle = [
+            'eol_date'    => $eol !== null ? (int) $eol['eol_date'] : null,
+            'eol_surface' => $eol !== null && (string) ($eol['eol_surface'] ?? '') !== ''
+                ? (string) $eol['eol_surface'] : null,
+            'eol_applies' => $eol !== null && self::eol_applies($eol['eol_surface'] ?? null),
+        ];
         if ($prefix === null) {
-            return [
+            return $lifecycle + [
                 'prefix'       => null,
                 'input'        => null,
                 'output'       => null,
@@ -155,19 +337,21 @@ class model_registry {
                 'source'       => null,
                 'addedby'      => null,
                 'timemodified' => null,
+                'batch'        => $batched,
             ];
         }
-        $rates = self::effective_rates()[$prefix];
+        $rates = self::rate_for($model);
         $prov = self::$provcache[$prefix] ?? ['layer' => 'baseline', 'source' => null,
             'addedby' => null, 'timemodified' => null];
-        return [
-            'prefix'       => $prefix,
+        return $lifecycle + [
+            'prefix'       => $batched ? token_cost_manager::BATCH_MODEL_PREFIX . $prefix : $prefix,
             'input'        => (float) $rates['input'],
             'output'       => (float) $rates['output'],
             'layer'        => (string) $prov['layer'],
             'source'       => $prov['source'] !== null ? (string) $prov['source'] : null,
             'addedby'      => $prov['addedby'] !== null ? (int) $prov['addedby'] : null,
             'timemodified' => $prov['timemodified'] !== null ? (int) $prov['timemodified'] : null,
+            'batch'        => $batched,
         ];
     }
 
@@ -184,8 +368,8 @@ class model_registry {
      *
      * @param array $row Fields to write. 'modelkey' is required; provider,
      *                   capability, input_rate, output_rate, context_tokens,
-     *                   status and notes are optional and only overwrite when
-     *                   present in the array.
+     *                   eol_date, eol_surface, status and notes are optional and
+     *                   only overwrite when present in the array.
      * @param string $source One of manual|upstream|drift|bundle.
      * @param int|null $userid User to stamp as addedby; null for feed writes.
      * @param string|null $outcome Out-param: 'inserted', 'updated' or 'skipped_manual'.
@@ -213,7 +397,7 @@ class model_registry {
         }
 
         $record = new \stdClass();
-        foreach (['provider', 'capability', 'notes'] as $field) {
+        foreach (['provider', 'capability', 'notes', 'eol_surface'] as $field) {
             if (array_key_exists($field, $row)) {
                 $record->$field = $row[$field] !== null && $row[$field] !== ''
                     ? (string) $row[$field] : null;
@@ -228,6 +412,14 @@ class model_registry {
         if (array_key_exists('context_tokens', $row)) {
             $record->context_tokens = $row['context_tokens'] === null || $row['context_tokens'] === ''
                 ? null : (int) $row['context_tokens'];
+        }
+        // Its own branch, not the float loop and not the string loop: a
+        // timestamp cast through (float) loses precision past 2038 on 32-bit
+        // and reads back as a wrong date, and cast through (string) stores
+        // "1760572800" in an int column by luck rather than by intent.
+        if (array_key_exists('eol_date', $row)) {
+            $record->eol_date = $row['eol_date'] === null || $row['eol_date'] === ''
+                ? null : (int) $row['eol_date'];
         }
         if (array_key_exists('status', $row) && trim((string) $row['status']) !== '') {
             $record->status = strtolower(trim((string) $row['status']));
@@ -269,6 +461,33 @@ class model_registry {
      *               tokens: int, lastseen: int}> Busiest unpriced model first.
      */
     public static function unpriced_models(int $days = self::DEFAULT_WINDOW_DAYS): array {
+        $out = [];
+        foreach (self::models_in_traffic($days) as $row) {
+            if (self::rate_for($row['model_name']) !== null) {
+                continue;
+            }
+            $out[] = $row;
+        }
+        return $out;
+    }
+
+    /**
+     * EVERY model observed in billable traffic, priced or not.
+     *
+     * This is the shared traffic query, and it is deliberately the only place
+     * in the plugin that pairs analytics::spend_rows_predicate() with the msgs
+     * table for this purpose. {@see unpriced_models()} is a filter over it, and
+     * so is the v7.4.4 end-of-life check — which could NOT have reused
+     * unpriced_models(), because that method skips every model that resolves to
+     * a rate and a model being retired almost always has one. Copying the SQL
+     * to work around that would have produced a second copy of the predicate,
+     * which is exactly the drift the predicate's own docblock warns about.
+     *
+     * @param int $days Lookback window in days.
+     * @return array<int, array{model_name: string, provider: ?string, calls: int,
+     *               tokens: int, lastseen: int}> Busiest model first.
+     */
+    public static function models_in_traffic(int $days = self::DEFAULT_WINDOW_DAYS): array {
         global $DB;
 
         $since = time() - ($days * DAYSECS);
@@ -289,9 +508,6 @@ class model_registry {
         $out = [];
         $rs = $DB->get_recordset_sql($sql, ['since' => $since, 'empty' => '']);
         foreach ($rs as $row) {
-            if (self::rate_for((string) $row->model_name) !== null) {
-                continue;
-            }
             $out[] = [
                 'model_name' => (string) $row->model_name,
                 'provider'   => $row->provider !== null ? (string) $row->provider : null,
@@ -316,6 +532,7 @@ class model_registry {
     public static function reset_cache(): void {
         self::$ratecache = null;
         self::$provcache = null;
+        self::$eolcache = null;
         self::$legacysig = null;
     }
 
@@ -326,13 +543,29 @@ class model_registry {
      * @return string|null
      */
     private static function match_prefix(string $model): ?string {
+        return self::longest_key($model, array_keys(self::effective_rates()));
+    }
+
+    /**
+     * Longest key in $keys that prefixes $model, or null when none does.
+     *
+     * Extracted from match_prefix() so the lifecycle map can be searched with
+     * exactly the same rule as the rate map. Two copies of "longest prefix
+     * wins" would eventually disagree, and the one that disagreed would be the
+     * one nobody reads.
+     *
+     * @param string $model
+     * @param string[] $keys
+     * @return string|null
+     */
+    private static function longest_key(string $model, array $keys): ?string {
         $model = strtolower(trim($model));
         if ($model === '') {
             return null;
         }
         $best = null;
         $bestlen = 0;
-        foreach (self::effective_rates() as $prefix => $unused) {
+        foreach ($keys as $prefix) {
             if (str_starts_with($model, $prefix) && strlen($prefix) > $bestlen) {
                 $best = $prefix;
                 $bestlen = strlen($prefix);
@@ -351,6 +584,7 @@ class model_registry {
     private static function build_cache(string $legacyraw): void {
         $rates = [];
         $prov = [];
+        $eol = [];
 
         // Layer 1: the committed baseline.
         foreach (token_cost_manager::baseline_rate_cards() as $prefix => $row) {
@@ -375,10 +609,25 @@ class model_registry {
         // can reach with no deploy, so it must be able to correct both others.
         foreach (self::table_rows() as $row) {
             $prefix = strtolower(trim((string) $row->modelkey));
-            if ($prefix === '' || $row->input_rate === null) {
-                // A row with no input rate carries capability/status metadata
-                // only; leaving the price to the lower layer is correct, and
-                // beats overwriting a real number with null.
+            if ($prefix === '') {
+                continue;
+            }
+            // Lifecycle is read BEFORE the priceless-row skip below. A row that
+            // says only "this retires on the 15th" carries no input_rate, so
+            // reading it after the skip would drop precisely the rows entered
+            // in response to a vendor shutdown notice.
+            if (!empty($row->eol_date)) {
+                $eol[$prefix] = [
+                    'modelkey'    => $prefix,
+                    'eol_date'    => (int) $row->eol_date,
+                    'eol_surface' => isset($row->eol_surface) && trim((string) $row->eol_surface) !== ''
+                        ? strtolower(trim((string) $row->eol_surface)) : null,
+                ];
+            }
+            if ($row->input_rate === null) {
+                // A row with no input rate carries capability/status/lifecycle
+                // metadata only; leaving the price to the lower layer is
+                // correct, and beats overwriting a real number with null.
                 continue;
             }
             $rates[$prefix] = [
@@ -395,6 +644,7 @@ class model_registry {
 
         self::$ratecache = $rates;
         self::$provcache = $prov;
+        self::$eolcache = $eol;
         self::$legacysig = $legacyraw;
     }
 

@@ -151,22 +151,43 @@ final class spend_attribution_test extends \advanced_testcase {
     }
 
     /**
-     * Self-hosted Whisper is free and must not match a priced rate-card prefix.
+     * Self-hosted Whisper is FREE -- which is a price of zero, not an absence
+     * of one.
+     *
+     * The distinction is the whole test. "No rate" is
+     * model_registry::unpriced_models()'s definition of a defect, and
+     * 'selfhosted_stt' is in spend_rows_predicate(), so a self-hosted row with
+     * no resolvable rate became a MISSING finding, which fires
+     * model_price_drift_check's alert email EVERY DAY about a model that is
+     * free by design. A standing false alarm is how the next genuinely unpriced
+     * model -- the gemini-2.5-flash-at-$0.00 class of bug that check exists for
+     * -- goes unread.
      */
-    public function test_selfhosted_whisper_is_not_priced_as_hosted(): void {
+    public function test_selfhosted_whisper_is_free_not_unpriced(): void {
         $this->resetAfterTest();
 
+        $hosted = token_cost_manager::estimate_cost('whisper-1', 1000, 0);
         $this->assertNotNull(
-            token_cost_manager::estimate_cost('whisper-1', 1000, 0),
+            $hosted,
             'hosted whisper-1 is expected to be priced; if not, this test proves nothing'
         );
-        $this->assertNull(
-            token_cost_manager::estimate_cost('selfhosted-whisper-1', 1000, 0),
-            'A self-hosted Whisper model must fall outside every rate prefix, or free '
-            . 'transcription is billed at the hosted rate.'
+        $this->assertGreaterThan(0.0, $hosted, 'hosted whisper-1 must cost something');
+
+        $selfhosted = token_cost_manager::estimate_cost('selfhosted-whisper-1', 1000, 0);
+        $this->assertNotNull(
+            $selfhosted,
+            'A self-hosted Whisper model must resolve to a rate of ZERO, not to no rate at '
+            . 'all: an unpriced model in billable traffic is what model_price_drift_check '
+            . 'alerts on, so "free" written as null raises a daily false alarm.'
+        );
+        $this->assertSame(
+            0.0,
+            $selfhosted,
+            'Self-hosted transcription costs nothing, so it must price at exactly $0.00 -- '
+            . 'and in particular must not match the hosted whisper prefix.'
         );
 
-        // The above only proves the PREFIX is unpriced. It says nothing about
+        // The above only proves the PREFIX is priced at zero. It says nothing about
         // whether transcribe.php actually applies it -- and asserting the former
         // while believing it proves the latter is how a guard ends up passing
         // against the defect it exists to catch. So pin the endpoint's behaviour
@@ -182,8 +203,8 @@ final class spend_attribution_test extends \advanced_testcase {
         $prefix = strpos($src, "'selfhosted-' . \$model", $assign);
         $this->assertNotFalse(
             $prefix,
-            'transcribe.php must record a self-hosted Whisper model under a prefix that '
-            . 'matches no rate card. Pricing keys off model_name, NOT interaction_type, '
+            'transcribe.php must record a self-hosted Whisper model under the free '
+            . 'rate-card prefix. Pricing keys off model_name, NOT interaction_type, '
             . "so 'whisper-1' from a free self-hosted server was billed at the hosted rate."
         );
         $this->assertStringContainsString(

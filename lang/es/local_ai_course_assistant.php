@@ -198,37 +198,37 @@ Tu plan de estudio sugiere {$a->hours_per_week} horas por semana para este curso
 
 ---
 Para dejar de recibir estos recordatorios, haz clic aquí: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Hola {$a->firstname}:
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Este es tu recordatorio de estudio para «{$a->coursename}».
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+¡Sigue así, lo estás haciendo muy bien!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Para dejar de recibir estos recordatorios, haz clic aquí: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Hola {$a->firstname}:
+
+Este es tu recordatorio de estudio para «{$a->coursename}».
+
+{$a->message}
+
+Tu plan de estudio: {$a->hours_per_week} horas por semana, los {$a->preferred_days} ({$a->preferred_time}).
+
+¡Sigue así, lo estás haciendo muy bien!
+
+---
+Para dejar de recibir estos recordatorios, haz clic aquí: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Prueba la técnica Pomodoro: 25 minutos de estudio concentrado y luego un descanso de 5 minutos.';
+$string['studytip:review_notes']        = 'Repasa tus notas de la última sesión antes de empezar material nuevo.';
+$string['studytip:active_recall']       = 'Ponte a prueba con lo que aprendiste hace poco — el recuerdo activo refuerza la memoria.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Combina distintos tipos de estudio: lectura, ejercicios de práctica y explicar conceptos a otras personas.';
+$string['studytip:tackle_hard_first']   = 'Empieza por el tema más difícil, mientras tu energía está en su punto más alto.';
+$string['studytip:connect_concepts']    = 'Establece conexiones entre los conceptos nuevos y lo que ya sabes.';
+$string['studytip:short_breaks']        = 'Toma descansos cortos para mantener la concentración — una mente descansada aprende mejor.';
+$string['studyplan:hours_out_of_range'] = 'Las horas por semana deben estar entre {$a->min} y {$a->max}. Has indicado {$a->got}. Dile a [[tutorshort]] otro número y guardará tu plan.';
 $string['reminder:whatsapp_body'] = 'Recordatorio de estudio para {$a->coursename}: {$a->message} (Cancelar suscripción: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Enfoque de estudio de hoy: ';
 
@@ -393,9 +393,9 @@ $string['chat:voice_error'] = 'Error de conexión de voz. Por favor, revisa tu c
 $string['chat:quiz_locked'] = '[[tutorshort]] está en pausa durante los cuestionarios para apoyar la integridad académica. ¡Buena suerte!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_nav'] = 'Navegación de modos';
 $string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_voice'] = 'Voz';
 $string['chat:mode_history'] = 'Notas';
 
 // History panel.
@@ -463,7 +463,7 @@ $string['chat:llm_model_label'] = 'Modelo';
 $string['chat:llm_model_select'] = 'Seleccionar modelo de LLM';
 $string['chat:footer_usertesting'] = 'Pruebas de usabilidad';
 $string['chat:footer_feedback'] = 'Comentarios';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Habla con {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Depuración de contexto';
@@ -510,12 +510,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'La conversión de texto a voz no está disponible en este momento. Avisa al administrador del sitio.';
+$string['error_rate_limit_ip'] = 'Demasiadas solicitudes desde tu dirección IP. Espera un momento.';
+$string['error_reminders_email_disabled'] = 'Los recordatorios por correo electrónico no están habilitados.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Los recordatorios por WhatsApp no están disponibles en tu país.';
+$string['error_reminders_whatsapp_disabled'] = 'Los recordatorios por WhatsApp no están habilitados.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1227,17 +1226,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Mis comunicaciones';
 $string['comms:desc'] = 'Elige qué correos automáticos puede enviarte [[tutorshort]]. Desactivado por defecto. Puedes cambiarlo en cualquier momento.';
 $string['comms:milestones_label'] = 'Envíame un correo cuando alcance un hito (racha de 7 días, racha de 30 días, finalización del curso).';

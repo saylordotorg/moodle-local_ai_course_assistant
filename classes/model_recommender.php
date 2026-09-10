@@ -598,11 +598,25 @@ class model_recommender {
         $row = $DB->get_record_sql(
             "SELECT COUNT(m.id) AS calls, MIN(m.timecreated) AS firstseen, MAX(m.timecreated) AS lastseen
                FROM {local_ai_course_assistant_msgs} m
-              WHERE " . analytics::spend_rows_predicate('m') . "
-                AND m.model_name = :model
+              WHERE " . analytics::spend_rows_predicate('m')
+                    . " AND " . analytics::benchmark_rows_excluded('m') . "
+                AND m.model_name IN (:model, :batchmodel)
                 AND m.timecreated >= :since
                 AND " . spend_guard::capability_sql($spec['capability']),
-            ['model' => $model, 'since' => $since]
+            [
+                'model' => $model,
+                // v7.4.4: a call served by the offline batch tier records its
+                // model as `batch/<model>`. That marker is a PRICING key, not a
+                // model identity, and this is an identity match -- so without
+                // the second form the Analytics function goes blind the moment
+                // radar_batch_enabled is switched on: every scheduled Radar row
+                // is `batch/gpt-5-mini`, the equality never fires, and the card
+                // reports calls=0 and observed=false for exactly the function
+                // this release moved to batch. Reading zero where the traffic
+                // is, is worse than reading nothing.
+                'batchmodel' => token_cost_manager::batch_model_name($model),
+                'since' => $since,
+            ]
         );
 
         $calls = (int) ($row->calls ?? 0);

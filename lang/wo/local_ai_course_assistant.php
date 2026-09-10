@@ -198,37 +198,37 @@ Jàng ci kanam!
 
 ---
 Pour arrêter rappels yooy, cliquer ici: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Salaam {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Lii mooy sa fàttali njàng ngir "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Wéyal ak sa liggéey bu baax bi!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Ngir bàyyi jot fàttali yii, bësal fii: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Salaam {$a->firstname},
+
+Lii mooy sa fàttali njàng ngir "{$a->coursename}".
+
+{$a->message}
+
+Sa plaanu njàng: {$a->hours_per_week} waxtu ci ayubés, ci {$a->preferred_days} ({$a->preferred_time}).
+
+Wéyal ak sa liggéey bu baax bi!
+
+---
+Ngir bàyyi jot fàttali yii, bësal fii: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Jéemal métod Pomodoro: 25 simili njàng ak xel mu dal, ba noppi 5 simili noflaay.';
+$string['studytip:review_notes']        = 'Seetaatal say mbind yu jóge ci njàng mu mujj laata ngay tàmbali ci lu bees.';
+$string['studytip:active_recall']       = 'Nattul sa bopp ci li nga jàng léegi-léegi — fàttaliku ci sa bopp dafa dooleel sa xel.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Boolel xeeti njàng yu wuute: jàngat, jaarale ci ay ekserees, ak njàngale xalaat yi ñeneen ñi.';
+$string['studytip:tackle_hard_first']   = 'Tàmbalil ci wàll wi gën a jafe bu sa doole gën a mag.';
+$string['studytip:connect_concepts']    = 'Defal ay jokkalante diggante xalaat yu bees ak li nga xam ba noppi.';
+$string['studytip:short_breaks']        = 'Defal ay noflaay yu gàtt ngir sa xel dal — xel mu noppalu dafa gën a jàng.';
+$string['studyplan:hours_out_of_range'] = 'Waxtu yi ci ayubés war a nekk diggante {$a->min} ak {$a->max}. Li nga bind mooy {$a->got}. Waxal [[tutorshort]] beneen limu, dina denc sa plaan.';
 $string['reminder:whatsapp_body'] = 'Rappel Jàng ci {$a->coursename}: {$a->message} (Désabonner: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Focus jàng tey: ';
 
@@ -387,9 +387,9 @@ $string['chat:voice_error'] = 'Connexion jàng bi defoo kaay. Seeti sa réglages
 $string['chat:quiz_locked'] = '[[tutorshort]] dafa suspendu ci kanam ëntërviu yi ngir soxor intégrité académique bi. Yëgël sa jàng!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Joowiinu anam yi';
+$string['chat:mode_chat'] = 'Waxtaan';
+$string['chat:mode_voice'] = 'Baat';
 $string['chat:mode_history'] = 'Xam-xam';
 
 // History panel.
@@ -457,7 +457,7 @@ $string['chat:llm_model_label'] = 'Modél';
 $string['chat:llm_model_select'] = 'Tànn modél LLM';
 $string['chat:footer_usertesting'] = 'Testu jëfandikoo';
 $string['chat:footer_feedback'] = 'Xalaat';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Waxtaan ak {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Fegal ci contexte bi';
@@ -504,12 +504,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Soppi mbind ci baat mënuñu koo jëfandikoo léegi. Waxal ko kilifa gu sit bi.';
+$string['error_rate_limit_ip'] = 'Ñu jot ay ndigal yu bare lool jóge ci sa adrees IP. Xaaral tuuti.';
+$string['error_reminders_email_disabled'] = 'Fàttali yi ci imeel ubbiwuñu ko.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Fàttali yi ci WhatsApp amuñu ci sa réew.';
+$string['error_reminders_whatsapp_disabled'] = 'Fàttali yi ci WhatsApp ubbiwuñu ko.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1221,17 +1220,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Samay bataaxal';
 $string['comms:desc'] = 'Tànnal ban imel yu otomatik la [[tutorshort]] mën a yónnee. Tëju na ci ndoortel. Mën nga koo soppi saa su la neexee.';
 $string['comms:milestones_label'] = 'Yónnee ma imel su ma agsee ci ab dig (7 fan yu toftaloo, 30 fan yu toftaloo, mottali njàng mi).';

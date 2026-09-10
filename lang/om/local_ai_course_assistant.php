@@ -213,37 +213,37 @@ Hojii gaariin itti fufii!
 
 ---
 Yaadachiisuuwwan kana argachuu dhaabuuf, asitti cuqaasi: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Akkam {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Kun yaadachiisuu barumsa kee "{$a->coursename}" tiif.
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Hojii gaarii kana itti fufi!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Yaadachiisuuwwan kana argachuu dhaabuuf, asirratti cuqaasi: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Akkam {$a->firstname},
+
+Kun yaadachiisuu barumsa kee "{$a->coursename}" tiif.
+
+{$a->message}
+
+Karoora barumsa kee: torbanitti sa\'aatii {$a->hours_per_week}, guyyoota {$a->preferred_days} ({$a->preferred_time}).
+
+Hojii gaarii kana itti fufi!
+
+---
+Yaadachiisuuwwan kana argachuu dhaabuuf, asirratti cuqaasi: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Mala Pomodoro yaali: daqiiqaa 25 xiyyeeffannoodhaan barachuu, sana booda boqonnaa daqiiqaa 5.';
+$string['studytip:review_notes']        = 'Barumsa haaraa jalqabuu dura yaadannoo sessii darbe irraa qabdu irra deebi\'ii ilaali.';
+$string['studytip:active_recall']       = 'Waan dhiheenya kana baratte irratti of qori — ofumaan yaadachuun yaadannoo cimsa.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Akkaataa barumsa garaagaraa makaa: dubbisuu, gaaffii shaakalaa hojjechuu fi yaada namoota biraatti barsiisuu.';
+$string['studytip:tackle_hard_first']   = 'Yeroo humni kee olaanaa ta\'e mata-duree hunda caalaa rakkisaa ta\'e irraa jalqabi.';
+$string['studytip:connect_concepts']    = 'Yaadota haaraa fi waan duraan beektu gidduutti walitti dhufeenya uumi.';
+$string['studytip:short_breaks']        = 'Xiyyeeffannoo eeguuf boqonnaa gabaabaa fudhadhu — sammuun boqote caalaatti barata.';
+$string['studyplan:hours_out_of_range'] = 'Sa\'aatiin torbanitti {$a->min} fi {$a->max} gidduu ta\'uu qaba. {$a->got} galcheetta. Maaloo [[tutorshort]]-tti lakkoofsa biraa himi, innis karoora kee ni olkaa\'a.';
 $string['reminder:whatsapp_body'] = 'Yaadachiisuu Barumsa {$a->coursename}: {$a->message} (Bahuu: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Xiyyeeffannaa barumsa har\'aa: ';
 // Unsubscribe page.
@@ -398,9 +398,9 @@ $string['chat:voice_error'] = 'Walitti hidhamuu sagalee kufee. Maaloo qindaa\'in
 $string['chat:quiz_locked'] = '[[tutorshort]] qormaata yeroo dhaabbatee jira akka haqiinsaa barnootaa deeggaruuf. Carraa gaarii!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Qajeelfama haalata';
+$string['chat:mode_chat'] = 'Haasawaa';
+$string['chat:mode_voice'] = 'Sagalee';
 $string['chat:mode_history'] = 'Yaadannoo';
 
 // History panel.
@@ -468,7 +468,7 @@ $string['chat:llm_model_label'] = 'Moodela';
 $string['chat:llm_model_select'] = 'Moodela LLM filadhu';
 $string['chat:footer_usertesting'] = 'Qorannoo ittifayyadamummaa';
 $string['chat:footer_feedback'] = 'Yaada';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = '{$a} waliin haasa\'i';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Sirreessaa haala';
@@ -515,12 +515,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Barreeffama-gara-sagaleetti jijjiiruun yeroo ammaa hin argamu. Maaloo bulchaa marsariitii keessaniif himi.';
+$string['error_rate_limit_ip'] = 'Teessoo IP kee irraa gaaffii baay\'een dhufe. Maaloo yeroo xiqqoo turi.';
+$string['error_reminders_email_disabled'] = 'Yaadachiisuun email hin dandeessifamne.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Yaadachiisuun WhatsApp biyya keessan keessatti hin argamu.';
+$string['error_reminders_whatsapp_disabled'] = 'Yaadachiisuun WhatsApp hin dandeessifamne.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1232,17 +1231,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Qunnamtiiwwan koo';
 $string['comms:desc'] = 'Imeelii ofumaan ergaman kam [[tutorshort]] siif erguu akka danda\'u filadhu. Durtiin cufaadha. Yeroo barbaaddetti jijjiiruu dandeessa.';
 $string['comms:milestones_label'] = 'Yeroo sadarkaa milkaa\'inaa ga\'u imeelii naaf ergi (guyyaa 7 walitti aansee, guyyaa 30 walitti aansee, xumura koorsii).';

@@ -619,6 +619,35 @@
         <INDEX NAME="enabled_frequency" UNIQUE="false" FIELDS="enabled, frequency"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_ai_course_assistant_radar_batch" COMMENT="v7.4.4: in-flight OpenAI Batch API jobs for scheduled Learning Radar reports. One row per submitted schedule run; the poller task collects it on a later cron pass, up to 24h later.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="scheduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Schedule this batch was submitted for"/>
+        <FIELD NAME="batchid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Provider-side batch id returned by submit_batch()"/>
+        <FIELD NAME="provider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Provider id of the client that ACTUALLY submitted the batch (not the schedule&apos;s requested id), so the collector rebuilds the client that holds it"/>
+        <FIELD NAME="model" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Model the submitting client actually asked for, resolved from the schedule, course and site config"/>
+        <FIELD NAME="query" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Question asked, carried so delivery and persistence do not re-read a schedule that may have been edited since submit"/>
+        <FIELD NAME="format" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="text" SEQUENCE="false"/>
+        <FIELD NAME="frequency" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="range_days" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="since_time" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Analytics window start PINNED AT SUBMIT. Recomputing it at collect time would silently shift the reported period by the batch turnaround."/>
+        <FIELD NAME="courseids" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="filterprovider" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="submitted" SEQUENCE="false" COMMENT="submitted, collecting, completed, failed, cancelled"/>
+        <FIELD NAME="lasterror" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timesubmitted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="scheduleid_fk" TYPE="foreign" FIELDS="scheduleid" REFTABLE="local_ai_course_assistant_radar_sched" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status_submitted" UNIQUE="false" FIELDS="status, timesubmitted"/>
+        <INDEX NAME="batchid" UNIQUE="false" FIELDS="batchid"/>
+      </INDEXES>
+    </TABLE>
     <TABLE NAME="local_ai_course_assistant_avatar_sess" COMMENT="v4.10.0: talking-avatar streaming sessions and per-minute cost (D-ID, HeyGen, Tavus, Synthesia)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -766,7 +795,9 @@
         <FIELD NAME="input_rate" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="USD per 1M input tokens"/>
         <FIELD NAME="output_rate" TYPE="number" LENGTH="12" DECIMALS="6" NOTNULL="false" SEQUENCE="false" COMMENT="USD per 1M output tokens"/>
         <FIELD NAME="context_tokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Model context window in tokens, when known"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="active" SEQUENCE="false" COMMENT="active | deprecated | candidate"/>
+        <FIELD NAME="eol_date" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="v7.4.4: announced end-of-life / shutoff date, as a Moodle timestamp at 00:00 UTC on the announced calendar day. Null means NO ANNOUNCED EOL, which is not the same as safe. A date rather than a status word: status can say deprecated but carries no horizon, and the drift check needs the horizon to decide when to shout."/>
+        <FIELD NAME="eol_surface" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="v7.4.4: WHICH API surface eol_date applies to (gemini-developer-api, vertex-ai, openai-api, azure-openai, bedrock, ...). Load-bearing, not decoration: gemini-2.5-flash was reported as retiring 2026-10-16, which was a Vertex AI lifecycle event that does not apply to the Gemini Developer API this plugin actually calls. An EOL date with no surface recorded is that false alarm waiting to happen, so model_registry_page::save_model refuses one."/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="active" SEQUENCE="false" COMMENT="active | deprecated | candidate | retired"/>
         <FIELD NAME="source" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="manual" SEQUENCE="false" COMMENT="manual | upstream | drift | bundle. Load-bearing: model_registry::upsert refuses to let an upstream/drift feed overwrite a manual row."/>
         <FIELD NAME="notes" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="addedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who last wrote this row; null for feed writes"/>

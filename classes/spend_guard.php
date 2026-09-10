@@ -199,7 +199,15 @@ class spend_guard {
         // table. RAG spend therefore computed as $0.00 no matter how much
         // indexing had run, and the "RAG" line in the admin spend panel was
         // permanently zero.
+        // Benchmark spend is real money and stays in the LEDGER, but it must not
+        // consume a cap that exists to protect learners: an operator comparing
+        // three candidate models in an afternoon could otherwise exhaust
+        // spend_cap_site and stop chat for everyone. Unconditional, not gated on
+        // $capability, because the exposed paths are precisely the site-wide and
+        // per-course totals -- every per-capability bucket already excludes
+        // 'model_bench' by not naming it.
         $where = analytics::spend_rows_predicate('m')
+            . " AND " . analytics::benchmark_rows_excluded('m')
             . " AND m.model_name IS NOT NULL AND m.timecreated >= :since";
 
         if ($courseid > 0) {

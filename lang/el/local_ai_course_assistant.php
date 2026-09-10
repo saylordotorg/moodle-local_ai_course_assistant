@@ -386,7 +386,7 @@ $string['chat:llm_model_label'] = 'Μοντέλο';
 $string['chat:llm_model_select'] = 'Επιλογή μοντέλου LLM';
 $string['chat:footer_usertesting'] = 'Δοκιμή ευχρηστίας';
 $string['chat:footer_feedback'] = 'Σχόλια';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Μίλησε με {$a}';
 
 // Additional translated strings.
 $string['analytics:active_students'] = 'Active students';
@@ -423,12 +423,11 @@ $string['analytics:total_messages'] = 'Total messages';
 $string['analytics:total_tokens'] = 'Total tokens';
 $string['analytics:usage_trends'] = 'Usage Trends';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Η μετατροπή κειμένου σε ομιλία δεν είναι διαθέσιμη αυτή τη στιγμή. Ενημέρωσε τον διαχειριστή του ιστότοπου.';
+$string['error_rate_limit_ip'] = 'Πάρα πολλά αιτήματα από τη διεύθυνση IP σου. Περίμενε λίγο.';
+$string['error_reminders_email_disabled'] = 'Οι υπενθυμίσεις μέσω email δεν είναι ενεργοποιημένες.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Οι υπενθυμίσεις μέσω WhatsApp δεν είναι διαθέσιμες στη χώρα σου.';
+$string['error_reminders_whatsapp_disabled'] = 'Οι υπενθυμίσεις μέσω WhatsApp δεν είναι ενεργοποιημένες.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -540,37 +539,37 @@ Keep up the great work!
 
 ---
 To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Γεια σου {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+αυτή είναι η υπενθύμιση μελέτης σου για το μάθημα «{$a->coursename}».
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Συνέχισε την εξαιρετική προσπάθεια!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Για να μη λαμβάνεις πλέον αυτές τις υπενθυμίσεις, κάνε κλικ εδώ: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Γεια σου {$a->firstname},
+
+αυτή είναι η υπενθύμιση μελέτης σου για το μάθημα «{$a->coursename}».
+
+{$a->message}
+
+Το πρόγραμμα μελέτης σου: {$a->hours_per_week} ώρες την εβδομάδα, {$a->preferred_days} ({$a->preferred_time}).
+
+Συνέχισε την εξαιρετική προσπάθεια!
+
+---
+Για να μη λαμβάνεις πλέον αυτές τις υπενθυμίσεις, κάνε κλικ εδώ: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Δοκίμασε την τεχνική Pomodoro: 25 λεπτά συγκεντρωμένης μελέτης και μετά ένα διάλειμμα 5 λεπτών.';
+$string['studytip:review_notes']        = 'Ξαναδιάβασε τις σημειώσεις σου από την προηγούμενη συνεδρία μελέτης, πριν ξεκινήσεις νέο υλικό.';
+$string['studytip:active_recall']       = 'Δοκίμασε τον εαυτό σου σε ό,τι έμαθες πρόσφατα — η ενεργητική ανάκληση ενισχύει τη μνήμη.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Συνδύασε διαφορετικούς τρόπους μελέτης: ανάγνωση, ασκήσεις εξάσκησης και εξήγηση των εννοιών σε άλλους.';
+$string['studytip:tackle_hard_first']   = 'Ξεκίνα από το πιο δύσκολο θέμα, όσο η ενέργειά σου είναι στο μέγιστο.';
+$string['studytip:connect_concepts']    = 'Δημιούργησε συνδέσεις ανάμεσα στις νέες έννοιες και σε αυτά που ήδη γνωρίζεις.';
+$string['studytip:short_breaks']        = 'Κάνε μικρά διαλείμματα για να μένεις συγκεντρωμένος — ένα ξεκούραστο μυαλό μαθαίνει καλύτερα.';
+$string['studyplan:hours_out_of_range'] = 'Οι ώρες την εβδομάδα πρέπει να είναι μεταξύ {$a->min} και {$a->max}. Έδωσες {$a->got}. Πες στον [[tutorshort]] έναν διαφορετικό αριθμό και θα αποθηκεύσει το πρόγραμμά σου.';
 $string['reminder:email_subject'] = 'Study Reminder: {$a}';
 $string['reminder:study_tip_prefix'] = 'Today\'s study focus: ';
 $string['reminder:whatsapp_body'] = 'Study Reminder for {$a->coursename}: {$a->message} (Opt out: {$a->unsubscribe_url})';
@@ -1242,17 +1241,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Οι επικοινωνίες μου';
 $string['comms:desc'] = 'Επιλέξτε ποια αυτοματοποιημένα email επιτρέπεται να σας στέλνει το [[tutorshort]]. Απενεργοποιημένο από προεπιλογή. Μπορείτε να το αλλάξετε ανά πάσα στιγμή.';
 $string['comms:milestones_label'] = 'Στείλτε μου email όταν φτάνω σε ορόσημο (σερί 7 ημερών, σερί 30 ημερών, ολοκλήρωση μαθήματος).';

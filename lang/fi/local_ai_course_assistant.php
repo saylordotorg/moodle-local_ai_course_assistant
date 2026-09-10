@@ -179,37 +179,37 @@ Jatka hyvää työtä!
 
 ---
 Peruuttaaksesi nämä muistutukset, napsauta tästä: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Hei {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Tämä on opiskelumuistutuksesi kurssille "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Jatka samaan malliin!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Jos et halua enää saada näitä muistutuksia, napsauta tästä: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Hei {$a->firstname},
+
+Tämä on opiskelumuistutuksesi kurssille "{$a->coursename}".
+
+{$a->message}
+
+Opiskelusuunnitelmasi: {$a->hours_per_week} tuntia viikossa, päivinä {$a->preferred_days} ({$a->preferred_time}).
+
+Jatka samaan malliin!
+
+---
+Jos et halua enää saada näitä muistutuksia, napsauta tästä: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Kokeile pomodoro-tekniikkaa: 25 minuuttia keskittynyttä opiskelua, sitten 5 minuutin tauko.';
+$string['studytip:review_notes']        = 'Käy läpi edellisen opiskelukerran muistiinpanot ennen kuin aloitat uuden aineiston.';
+$string['studytip:active_recall']       = 'Testaa itseäsi juuri oppimastasi — aktiivinen palautus vahvistaa muistia.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Vaihtele opiskelutapoja: lukemista, harjoitustehtäviä ja asioiden opettamista muille.';
+$string['studytip:tackle_hard_first']   = 'Aloita vaikeimmasta aiheesta, kun energiatasosi on korkeimmillaan.';
+$string['studytip:connect_concepts']    = 'Luo yhteyksiä uusien käsitteiden ja jo osaamasi välille.';
+$string['studytip:short_breaks']        = 'Pidä lyhyitä taukoja pysyäksesi keskittyneenä — virkeä mieli oppii paremmin.';
+$string['studyplan:hours_out_of_range'] = 'Viikkotuntien määrän on oltava välillä {$a->min}–{$a->max}. Annettu arvo: {$a->got}. Kerro [[tutorshort]]-avustajalle toinen luku, niin suunnitelmasi tallennetaan.';
 $string['reminder:whatsapp_body'] = 'Opiskelumuistutus kurssille {$a->coursename}: {$a->message} (Peruuta tilaus: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Päivän opiskelutavoite: ';
 $string['unsubscribe:title'] = 'Peruuta opiskelumuistutukset';
@@ -366,9 +366,9 @@ $string['chat:voice_error'] = 'Ääniyhteys epäonnistui. Tarkista asetuksesi.';
 $string['chat:quiz_locked'] = '[[tutorshort]] on tauolla kokeiden aikana akateemisen rehellisyyden säilyttämiseksi. Onnea!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Tilojen navigointi';
+$string['chat:mode_chat'] = 'Keskustelu';
+$string['chat:mode_voice'] = 'Puhe';
 $string['chat:mode_history'] = 'Muistiinpanot';
 
 // History panel.
@@ -436,7 +436,7 @@ $string['chat:llm_model_label'] = 'Malli';
 $string['chat:llm_model_select'] = 'Valitse LLM-malli';
 $string['chat:footer_usertesting'] = 'Käytettävyystestaus';
 $string['chat:footer_feedback'] = 'Palaute';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Keskustele {$a}-avustajan kanssa';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Kontekstin virheenkorjaus';
@@ -483,12 +483,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Puheen tuottaminen ei ole juuri nyt käytettävissä. Ilmoita asiasta sivuston ylläpitäjälle.';
+$string['error_rate_limit_ip'] = 'Liian monta pyyntöä IP-osoitteestasi. Odota hetki.';
+$string['error_reminders_email_disabled'] = 'Sähköpostimuistutukset eivät ole käytössä.';
+$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp-muistutukset eivät ole käytettävissä maassasi.';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp-muistutukset eivät ole käytössä.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1200,17 +1199,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Oma viestintä';
 $string['comms:desc'] = 'Valitse, mitä automaattisia sähköposteja [[tutorshort]] saa lähettää sinulle. Oletuksena pois käytöstä. Voit muuttaa tätä milloin tahansa.';
 $string['comms:milestones_label'] = 'Lähetä minulle sähköpostia, kun saavutan virstanpylvään (7 päivän putki, 30 päivän putki, kurssin suorittaminen).';

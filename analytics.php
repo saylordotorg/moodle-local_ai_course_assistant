@@ -484,6 +484,10 @@ try {
             $statusclass = 'success';
         } else if ($s->last_status === 'error') {
             $statusclass = 'danger';
+        } else if ($s->last_status === \local_ai_course_assistant\radar_schedule_manager::STATUS_SUBMITTED) {
+            // v7.4.4: submitted to the offline batch tier and not back yet.
+            // Deliberately NOT green -- the report has not been delivered.
+            $statusclass = 'info';
         }
         $radar_schedules[] = [
             'id'                => (int) $s->id,

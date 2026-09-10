@@ -111,10 +111,24 @@ class radar_schedule_manager {
     }
 
     /**
+     * A run that has been handed to the provider's offline batch tier and has
+     * not come back yet.
+     *
+     * v7.4.4. Recording 'success' at submit time would be the same defect as
+     * the one run_meta_ai_query documents from the other direction: a run whose
+     * answer has not been produced, let alone delivered, wearing a green badge
+     * -- and a failure up to 24 hours later would then have nothing to
+     * overwrite, because the badge already said the report was fine. The
+     * collector task replaces this with 'success' or 'error' once the answer
+     * actually exists.
+     */
+    public const STATUS_SUBMITTED = 'submitted';
+
+    /**
      * Update execution result columns after a cron run.
      *
      * @param int $id
-     * @param string $status 'success' or 'error'.
+     * @param string $status 'success', 'error', or 'submitted' for an in-flight batch.
      * @param string $error Error message (empty on success).
      * @return void
      */
@@ -123,7 +137,9 @@ class radar_schedule_manager {
         $row = new \stdClass();
         $row->id = $id;
         $row->last_run = time();
-        $row->last_status = in_array($status, ['success', 'error'], true) ? $status : 'error';
+        $row->last_status = in_array($status, ['success', 'error', self::STATUS_SUBMITTED], true)
+            ? $status
+            : 'error';
         $row->last_error = $error;
         $DB->update_record('local_ai_course_assistant_radar_sched', $row);
     }

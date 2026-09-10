@@ -198,37 +198,37 @@ $string['reminder:email_body'] = '您好 {$a->firstname}，
 
 ---
 如需取消接收提醒，请点击此处：{$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = '{$a->firstname}，你好：
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+这是你的“{$a->coursename}”学习提醒。
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+请继续保持！
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+如需停止接收这些提醒，请点击这里：{$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = '{$a->firstname}，你好：
+
+这是你的“{$a->coursename}”学习提醒。
+
+{$a->message}
+
+你的学习计划：每周 {$a->hours_per_week} 小时，在 {$a->preferred_days}（{$a->preferred_time}）。
+
+请继续保持！
+
+---
+如需停止接收这些提醒，请点击这里：{$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = '试试番茄工作法：专注学习 25 分钟，然后休息 5 分钟。';
+$string['studytip:review_notes']        = '在开始新内容之前，先复习上一次学习的笔记。';
+$string['studytip:active_recall']       = '测试一下你最近学到的内容——主动回忆能强化记忆。';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = '把不同的学习方式结合起来：阅读、做练习题，以及把概念讲给别人听。';
+$string['studytip:tackle_hard_first']   = '在精力最充沛的时候先攻克最难的主题。';
+$string['studytip:connect_concepts']    = '把新概念和你已经掌握的知识联系起来。';
+$string['studytip:short_breaks']        = '适当短暂休息以保持专注——头脑清醒时学得更好。';
+$string['studyplan:hours_out_of_range'] = '每周学习小时数必须在 {$a->min} 到 {$a->max} 之间，而你填写的是 {$a->got}。请告诉 [[tutorshort]] 一个新的数字，它就会保存你的学习计划。';
 $string['reminder:whatsapp_body'] = '{$a->coursename} 的学习提醒：{$a->message}（退订：{$a->unsubscribe_url}）';
 $string['reminder:study_tip_prefix'] = '今日学习重点：';
 
@@ -387,9 +387,9 @@ $string['chat:voice_error'] = '语音连接失败，请检查您的设置。';
 $string['chat:quiz_locked'] = '测验期间 [[tutorshort]] 已暂停，以维护学术诚信。祝你好运！';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = '模式导航';
+$string['chat:mode_chat'] = '聊天';
+$string['chat:mode_voice'] = '语音';
 $string['chat:mode_history'] = '笔记';
 
 // History panel.
@@ -457,7 +457,7 @@ $string['chat:llm_model_label'] = '模型';
 $string['chat:llm_model_select'] = '选择LLM模型';
 $string['chat:footer_usertesting'] = '可用性测试';
 $string['chat:footer_feedback'] = '反馈';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = '与 {$a} 对话';
 
 // Additional translated strings.
 $string['chat:debug_context'] = '上下文调试';
@@ -504,12 +504,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = '文字转语音功能目前不可用，请告知你的网站管理员。';
+$string['error_rate_limit_ip'] = '来自你的 IP 地址的请求过多，请稍等一会儿。';
+$string['error_reminders_email_disabled'] = '邮件提醒未启用。';
+$string['error_reminders_whatsapp_country_blocked'] = '你所在的国家或地区无法使用 WhatsApp 提醒。';
+$string['error_reminders_whatsapp_disabled'] = 'WhatsApp 提醒未启用。';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1221,17 +1220,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = '我的通信';
 $string['comms:desc'] = '选择允许 [[tutorshort]] 向您发送哪些自动邮件。默认关闭。您可以随时更改。';
 $string['comms:milestones_label'] = '当我达成里程碑时给我发邮件（连续学习 7 天、连续学习 30 天、完成课程）。';

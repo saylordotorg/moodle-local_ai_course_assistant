@@ -130,9 +130,17 @@ if ($cfg['provider'] === 'xai') {
     // interaction_type -- and 'whisper-1' (or any name a self-hosted server
     // reports) matches the 'whisper' rate-card prefix, so free transcription was
     // being billed at the hosted rate. The comment further down claimed the
-    // opposite of what the code did. Prefixing puts the model outside every rate
-    // prefix while keeping it a DISTINCT name, so it still shows up in
-    // unpriced_models rather than vanishing the way a null model_name would.
+    // opposite of what the code did. Prefixing puts the model outside the
+    // 'whisper' rate prefix while keeping it a DISTINCT name, so the provenance
+    // survives on the row rather than vanishing the way a null model_name would.
+    //
+    // The prefix resolves to an explicit $0.00 entry in token_cost_manager's
+    // rate card. That is deliberate and NOT the same as leaving it unpriced:
+    // 'selfhosted_stt' is in analytics::spend_rows_predicate(), so these rows
+    // are billable-set rows, and a billable-set row whose model resolves to no
+    // rate is precisely what model_registry::unpriced_models() reports as a
+    // defect -- which raised a DAILY price-drift alert naming a model that is
+    // free by design.
     if (($cfg['provider'] ?? '') === \local_ai_course_assistant\voice_registry::SELFHOSTED_LABEL) {
         $model = 'selfhosted-' . $model;
     }
@@ -184,9 +192,12 @@ if (!isset($data['text'])) {
 // Log Whisper transcription usage: approximate tokens from audio file size.
 // Hosted Whisper charges per minute (~$0.006/min). Rough estimate: 1MB ≈ 1 min
 // audio. Selfhosted servers cost $0, which is enforced above by recording the
-// model under a 'selfhosted-' prefix that matches no rate card -- NOT by the
-// interaction_type, which pricing never looks at. This comment previously said
-// otherwise and free transcription was billed at the hosted rate.
+// model under the 'selfhosted-' prefix, whose rate-card entry is an explicit
+// $0.00 -- NOT by the interaction_type, which pricing never looks at. This
+// comment previously said otherwise and free transcription was billed at the
+// hosted rate. The entry has to EXIST: a model with no rate at all is what
+// model_registry::unpriced_models() reports as a defect, so "free" written as
+// an absent rate raises a daily price-drift alert instead of costing nothing.
 $filesizebytes = filesize($tmpfile) ?: 0;
 $approxminutes = max(0.1, $filesizebytes / 1_000_000);
 $approxtokens = (int) ceil($approxminutes * 1000); // Arbitrary unit for rate card matching.

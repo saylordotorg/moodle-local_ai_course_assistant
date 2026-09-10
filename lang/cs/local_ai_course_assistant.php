@@ -179,37 +179,37 @@ Jen tak dál!
 
 ---
 Pro odhlášení z těchto připomínek klikněte zde: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Dobrý den, {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+toto je vaše připomínka studia kurzu „{$a->coursename}“.
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Držte se, jde vám to výborně!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Pokud tyto připomínky již nechcete dostávat, klikněte zde: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Dobrý den, {$a->firstname},
+
+toto je vaše připomínka studia kurzu „{$a->coursename}“.
+
+{$a->message}
+
+Váš studijní plán: {$a->hours_per_week} hodin týdně, ve dnech {$a->preferred_days} ({$a->preferred_time}).
+
+Držte se, jde vám to výborně!
+
+---
+Pokud tyto připomínky již nechcete dostávat, klikněte zde: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Vyzkoušejte metodu Pomodoro: 25 minut soustředěného studia, potom pětiminutová přestávka.';
+$string['studytip:review_notes']        = 'Než začnete s novou látkou, projděte si poznámky z posledního studia.';
+$string['studytip:active_recall']       = 'Vyzkoušejte se z toho, co jste se nedávno naučili — aktivní vybavování posiluje paměť.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Kombinujte různé způsoby studia: čtení, procvičovací úlohy a vysvětlování pojmů druhým.';
+$string['studytip:tackle_hard_first']   = 'Začněte nejobtížnějším tématem, dokud máte nejvíc energie.';
+$string['studytip:connect_concepts']    = 'Vytvářejte spojení mezi novými pojmy a tím, co už znáte.';
+$string['studytip:short_breaks']        = 'Dělejte si krátké přestávky, abyste zůstali soustředění — odpočatá mysl se učí lépe.';
+$string['studyplan:hours_out_of_range'] = 'Počet hodin týdně musí být mezi {$a->min} a {$a->max}. Zadali jste {$a->got}. Řekněte prosím [[tutorshort]] jiné číslo a váš plán se uloží.';
 $string['reminder:whatsapp_body'] = 'Připomínka ke studiu pro {$a->coursename}: {$a->message} (Odhlásit se: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Studijní cíl dne: ';
 $string['unsubscribe:title'] = 'Odhlášení z připomínek ke studiu';
@@ -366,9 +366,9 @@ $string['chat:voice_error'] = 'Hlasové připojení selhalo. Zkontrolujte prosí
 $string['chat:quiz_locked'] = '[[tutorshort]] je během testů pozastavena, aby byla zachována akademická integrita. Hodně štěstí!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
+$string['chat:mode_nav'] = 'Navigace režimů';
 $string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_voice'] = 'Hlas';
 $string['chat:mode_history'] = 'Poznámky';
 
 // History panel.
@@ -436,7 +436,7 @@ $string['chat:llm_model_label'] = 'Model';
 $string['chat:llm_model_select'] = 'Vyberte model LLM';
 $string['chat:footer_usertesting'] = 'Testování použitelnosti';
 $string['chat:footer_feedback'] = 'Zpětná vazba';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Mluvte s {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Ladění kontextu';
@@ -483,12 +483,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Převod textu na řeč není momentálně dostupný. Obraťte se prosím na správce webu.';
+$string['error_rate_limit_ip'] = 'Příliš mnoho požadavků z vaší IP adresy. Chvíli prosím počkejte.';
+$string['error_reminders_email_disabled'] = 'E-mailové připomínky nejsou povoleny.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Připomínky přes WhatsApp nejsou ve vaší zemi dostupné.';
+$string['error_reminders_whatsapp_disabled'] = 'Připomínky přes WhatsApp nejsou povoleny.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1200,17 +1199,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Moje komunikace';
 $string['comms:desc'] = 'Zvolte, které automatické e-maily vám smí [[tutorshort]] posílat. Ve výchozím stavu vypnuto. Kdykoli to můžete změnit.';
 $string['comms:milestones_label'] = 'Poslat mi e-mail, když dosáhnu milníku (7denní série, 30denní série, dokončení kurzu).';

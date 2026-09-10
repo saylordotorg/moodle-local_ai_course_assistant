@@ -45,16 +45,18 @@
       tokens, lastseen, hasproposal, proposal{input, output, inputlabel,
       outputlabel, provider, capability, context, sourcename} }]}.
     * effective - {has, count, rows[{modelkey, input, output, inputraw,
-      outputraw, layerlabel, sourcelabel, intable, capability, context,
-      contextraw, provider, statuslabel, notes, setby, updated}]}.
+      outputraw, unpriced, layerlabel, sourcelabel, intable, capability, context,
+      contextraw, provider, statuslabel, notes, setby, updated, eol, eoldate,
+      eolsurface, eolwarn, eolstate}]}.
     * modelform - {modelkey, provider, capability, input_rate, output_rate,
-      context_tokens, notes, editing, statuses[{value, label, selected}]}.
+      context_tokens, eol_date, eol_surface, notes, editing,
+      statuses[{value, label, selected}]}.
     * sources - {has, rows[{id, name, url, formatlabel, spec, enabled,
       enabledlabel, lastfetch, statusok, statuserror, statuslabel, lastmessage}]}.
     * sourceform - {sourceid, name, url, spec, enabled, editing,
       formats[{value, label, selected}]}.
-    * drift - {hasrun, has, lastrun, statusnote, tolerance, truncated,
-      counts{missing, mismatch, new}, rows[...]}.
+    * drift - {hasrun, has, lastrun, statusnote, tolerance, horizon, truncated,
+      counts{missing, mismatch, eol, eol_other, new}, rows[...]}.
     * bench - {cards[...], unmeasured[...], hasunmeasured, release, floor,
       tunables}.
     * queue - {models[{value, label}], hasmodels, functions[{value, label}],
@@ -132,10 +134,14 @@
             "inputraw": "0.3", "outputraw": "2.5", "layerlabel": "Shipped baseline",
             "sourcelabel": "", "intable": false, "capability": "", "context": "",
             "contextraw": "", "provider": "", "statuslabel": "", "notes": "",
-            "setby": "", "updated": ""
+            "setby": "", "updated": "", "unpriced": false,
+            "eol": "Retires 2026-10-16 on vertex-ai \u2014 not a surface this site calls",
+            "eoldate": "2026-10-16", "eolsurface": "vertex-ai", "eolwarn": false,
+            "eolstate": "othersurface"
         }]},
         "modelform": {"modelkey": "", "provider": "", "capability": "", "input_rate": "",
-            "output_rate": "", "context_tokens": "", "notes": "", "editing": false,
+            "output_rate": "", "context_tokens": "", "eol_date": "", "eol_surface": "",
+            "notes": "", "editing": false,
             "statuses": [{"value": "active", "label": "Active", "selected": true}]},
         "sources": {"has": true, "rows": [{
             "id": 1, "name": "LiteLLM", "url": "https://example.org/prices.json",
@@ -146,10 +152,11 @@
         "sourceform": {"sourceid": 0, "name": "", "url": "", "spec": "", "enabled": false,
             "editing": false, "formats": [{"value": "litellm", "label": "LiteLLM manifest", "selected": true}]},
         "drift": {"hasrun": true, "has": true, "lastrun": "Last checked 8/09/26, 02:30.",
-            "statusnote": "", "tolerance": "1", "truncated": 0,
-            "counts": {"missing": 1, "mismatch": 0, "new": 0},
+            "statusnote": "", "tolerance": "1", "horizon": 60, "truncated": 0,
+            "counts": {"missing": 1, "mismatch": 0, "eol": 0, "eol_other": 0, "new": 0},
             "rows": [{"type": "missing", "typelabel": "Unpriced model in traffic",
-                "ismissing": true, "ismismatch": false, "isnew": false,
+                "ismissing": true, "ismismatch": false, "isnew": false, "iseol": false,
+                "eollabel": "", "eoldate": "", "eolsurface": "", "eolapplies": false,
                 "modelkey": "gemini-2.5-flash", "provider": "google", "capability": "chat",
                 "proposed": "$0.3 / $2.5", "registry": "", "delta": "", "calls": "18,204",
                 "sourcename": "LiteLLM", "hasrates": true, "applyinput": "0.3",
@@ -291,6 +298,22 @@
                                value="{{modelform.context_tokens}}" inputmode="numeric">
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="sola-mr-eoldate">{{l.fieldeoldate}}</label>
+                        <input type="text" class="form-control" id="sola-mr-eoldate" name="eol_date"
+                               value="{{modelform.eol_date}}" placeholder="2026-10-16"
+                               pattern="\d{4}-\d{2}-\d{2}" maxlength="10">
+                        <small class="form-text text-muted">{{l.fieldeoldatehelp}}</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="sola-mr-eolsurface">{{l.fieldeolsurface}}</label>
+                        <input type="text" class="form-control" id="sola-mr-eolsurface" name="eol_surface"
+                               value="{{modelform.eol_surface}}" maxlength="100"
+                               placeholder="gemini-developer-api">
+                        <small class="form-text text-muted">{{l.fieldeolsurfacehelp}}</small>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="sola-mr-notes">{{l.fieldnotes}}</label>
                     <input type="text" class="form-control" id="sola-mr-notes" name="notes"
@@ -323,6 +346,7 @@
                         <th>{{l.colcapability}}</th>
                         <th class="text-right">{{l.colcontext}}</th>
                         <th>{{l.colstatus}}</th>
+                        <th>{{l.coleol}}</th>
                         <th>{{l.collayer}}</th>
                         <th>{{l.colsource}}</th>
                         <th>{{l.colsetby}}</th>
@@ -332,7 +356,10 @@
                 </thead>
                 <tbody>
                     {{#effective.rows}}
-                        <tr>
+                        {{! A row with no resolvable price is muted rather than hidden: it is
+                            usually a lifecycle-only entry, and it must stay reachable for
+                            editing on the one page that can edit it. }}
+                        <tr class="{{#unpriced}}text-muted{{/unpriced}}">
                             <td><code>{{modelkey}}</code></td>
                             <td class="text-right">{{input}}</td>
                             <td class="text-right">{{output}}</td>
@@ -340,6 +367,10 @@
                             <td>{{capability}}</td>
                             <td class="text-right">{{context}}</td>
                             <td>{{statuslabel}}</td>
+                            <td>
+                                {{#eolwarn}}<span class="badge badge-danger">{{eol}}</span>{{/eolwarn}}
+                                {{^eolwarn}}<span class="text-muted small">{{eol}}</span>{{/eolwarn}}
+                            </td>
                             <td>
                                 {{#intable}}<span class="badge badge-info">{{layerlabel}}</span>{{/intable}}
                                 {{^intable}}<span class="badge badge-secondary">{{layerlabel}}</span>{{/intable}}
@@ -363,7 +394,7 @@
                         </tr>
                         {{#notes}}
                             <tr class="sola-modelregistry__notes">
-                                <td colspan="12" class="text-muted small">{{.}}</td>
+                                <td colspan="13" class="text-muted small">{{.}}</td>
                             </tr>
                         {{/notes}}
                     {{/effective.rows}}
@@ -490,7 +521,7 @@
     --------------------------------------------------------------- }}
     <h4>{{l.driftheading}}</h4>
     <p class="text-muted">{{l.driftdesc}}</p>
-    <p class="text-muted small">{{drift.lastrun}} {{l.drifttolerance}}</p>
+    <p class="text-muted small">{{drift.lastrun}} {{l.drifttolerance}} {{l.drifteolhorizon}}</p>
     {{#drift.statusnote}}
         <div class="alert alert-warning" role="alert">{{.}}</div>
     {{/drift.statusnote}}
@@ -524,9 +555,13 @@
                                 {{#ismissing}}<span class="badge badge-danger">{{typelabel}}</span>{{/ismissing}}
                                 {{#ismismatch}}<span class="badge badge-warning">{{typelabel}}</span>{{/ismismatch}}
                                 {{#isnew}}<span class="badge badge-secondary">{{typelabel}}</span>{{/isnew}}
+                                {{#iseol}}
+                                    {{#eolapplies}}<span class="badge badge-danger">{{typelabel}}</span>{{/eolapplies}}
+                                    {{^eolapplies}}<span class="badge badge-secondary">{{typelabel}}</span>{{/eolapplies}}
+                                {{/iseol}}
                             </td>
                             <td><code>{{modelkey}}</code></td>
-                            <td>{{proposed}}</td>
+                            <td>{{#iseol}}{{eollabel}}{{/iseol}}{{^iseol}}{{proposed}}{{/iseol}}</td>
                             <td>{{registry}}</td>
                             <td>{{delta}}</td>
                             <td class="text-right">{{calls}}</td>
@@ -546,9 +581,16 @@
                                     </form>
                                 {{/hasrates}}
                                 {{^hasrates}}
-                                    <span class="text-muted small">{{l.driftnosource}}</span>
-                                    <a href="{{pageurl}}?edit={{modelkey}}#sola-modelform"
-                                       class="btn btn-sm btn-outline-primary">{{l.priceit}}</a>
+                                    {{#iseol}}
+                                        <span class="text-muted small">{{l.drifteolnoapply}}</span>
+                                        <a href="{{pageurl}}?edit={{modelkey}}#sola-modelform"
+                                           class="btn btn-sm btn-outline-primary">{{l.drifteolrecord}}</a>
+                                    {{/iseol}}
+                                    {{^iseol}}
+                                        <span class="text-muted small">{{l.driftnosource}}</span>
+                                        <a href="{{pageurl}}?edit={{modelkey}}#sola-modelform"
+                                           class="btn btn-sm btn-outline-primary">{{l.priceit}}</a>
+                                    {{/iseol}}
                                 {{/hasrates}}
                             </td>
                         </tr>

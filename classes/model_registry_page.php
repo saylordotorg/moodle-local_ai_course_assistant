@@ -52,8 +52,17 @@ class model_registry_page {
         'driftnow', 'applydrift', 'queuebench',
     ];
 
-    /** @var string[] Statuses a registry row may carry. */
-    public const STATUSES = ['active', 'deprecated', 'candidate'];
+    /**
+     * Statuses a registry row may carry.
+     *
+     * v7.4.4 adds 'retired' as the terminal state, distinct from 'deprecated':
+     * deprecated means "do not choose this for new work", retired means "this
+     * no longer answers". The eol_date column carries the horizon between the
+     * two, because a status word cannot say WHEN.
+     *
+     * @var string[]
+     */
+    public const STATUSES = ['active', 'deprecated', 'candidate', 'retired'];
 
     /** @var string Notification level: success. */
     public const OK = 'success';
@@ -128,6 +137,12 @@ class model_registry_page {
      * columns exist only on table-layer rows, so they are read separately and
      * left blank for baseline and legacy rows rather than invented.
      *
+     * v7.4.4 also lists registry rows that carry NO price. Before this they were
+     * invisible here, because this method walked the rate map and a priceless
+     * row never enters it — which would have made an end-of-life-only row
+     * ("this retires on the 15th", entered before anyone has typed a price)
+     * unreachable from the one page that can edit it.
+     *
      * @return array {
      *   'has' => bool, 'count' => int, 'rows' => array[]
      * }
@@ -158,6 +173,20 @@ class model_registry_page {
                 $userids[(int) $prov['addedby']] = true;
             }
         }
+        // Registry rows that resolve to no rate at all still belong on this page:
+        // they are the rows an operator entered for lifecycle or capability
+        // alone, and this is the only screen that can edit them.
+        foreach ($tablerows as $prefix => $unusedrow) {
+            if (!array_key_exists($prefix, $rates)) {
+                $rates[$prefix] = null;
+                $prov = model_registry::provenance_for($prefix);
+                $provenance[$prefix] = $prov;
+                if (!empty($prov['addedby'])) {
+                    $userids[(int) $prov['addedby']] = true;
+                }
+            }
+        }
+        ksort($rates);
         $names = self::user_names(array_keys($userids));
 
         $rows = [];
@@ -165,12 +194,19 @@ class model_registry_page {
             $prov = $provenance[$prefix];
             $tablerow = $tablerows[$prefix] ?? null;
             $addedby = (int) ($prov['addedby'] ?? 0);
+            $eol = self::eol_cell($prov);
             $rows[] = [
                 'modelkey'   => $prefix,
-                'input'      => self::rate($rate['input']),
-                'output'     => self::rate($rate['output']),
-                'inputraw'   => self::numberfield($rate['input']),
-                'outputraw'  => self::numberfield($rate['output']),
+                'input'      => $rate === null ? self::rate(null) : self::rate($rate['input']),
+                'output'     => $rate === null ? self::rate(null) : self::rate($rate['output']),
+                'inputraw'   => $rate === null ? '' : self::numberfield($rate['input']),
+                'outputraw'  => $rate === null ? '' : self::numberfield($rate['output']),
+                'unpriced'   => $rate === null,
+                'eol'        => $eol['label'],
+                'eoldate'    => $eol['date'],
+                'eolsurface' => $eol['surface'],
+                'eolwarn'    => $eol['warn'],
+                'eolstate'   => $eol['state'],
                 'layer'      => (string) $prov['layer'],
                 'layerlabel' => self::layer_label((string) $prov['layer']),
                 'source'     => (string) ($prov['source'] ?? ''),
@@ -254,8 +290,8 @@ class model_registry_page {
      *
      * @return array {
      *   'hasrun' => bool, 'lastrun' => string, 'status' => string,
-     *   'statusnote' => string, 'tolerance' => string, 'counts' => array,
-     *   'rows' => array[], 'truncated' => int
+     *   'statusnote' => string, 'tolerance' => string, 'horizon' => int,
+     *   'counts' => array, 'rows' => array[], 'truncated' => int
      * }
      */
     public static function drift_block(): array {
@@ -265,7 +301,8 @@ class model_registry_page {
             'lastrun'    => get_string('modelregistry:drift_never', 'local_ai_course_assistant'),
             'statusnote' => '',
             'tolerance'  => self::plainnumber(model_price_drift_check::tolerance_pct()),
-            'counts'     => ['missing' => 0, 'mismatch' => 0, 'new' => 0],
+            'counts'     => ['missing' => 0, 'mismatch' => 0, 'eol' => 0, 'eol_other' => 0, 'new' => 0],
+            'horizon'    => model_price_drift_check::eol_horizon_days(),
             'rows'       => [],
             'truncated'  => 0,
             'has'        => false,
@@ -291,24 +328,50 @@ class model_registry_page {
         }
         $counts = (array) ($summary['counts'] ?? []);
         $out['counts'] = [
-            'missing'  => (int) ($counts['missing'] ?? 0),
-            'mismatch' => (int) ($counts['mismatch'] ?? 0),
-            'new'      => (int) ($counts['new'] ?? 0),
+            'missing'   => (int) ($counts['missing'] ?? 0),
+            'mismatch'  => (int) ($counts['mismatch'] ?? 0),
+            'eol'       => (int) ($counts['eol'] ?? 0),
+            'eol_other' => (int) ($counts['eol_other'] ?? 0),
+            'new'       => (int) ($counts['new'] ?? 0),
         ];
+        $out['horizon'] = (int) ($summary['eol_horizon_days'] ?? model_price_drift_check::eol_horizon_days());
         $truncated = (array) ($summary['truncated'] ?? []);
         $out['truncated'] = (int) ($truncated['missing'] ?? 0)
+            + (int) ($truncated['eol'] ?? 0)
             + (int) ($truncated['new'] ?? 0)
             + (int) ($truncated['stored'] ?? 0);
 
         foreach ((array) ($summary['findings'] ?? []) as $finding) {
             $type = (string) ($finding['type'] ?? '');
-            $hasrates = ($finding['input'] ?? null) !== null || ($finding['output'] ?? null) !== null;
+            // An EOL finding never carries a price and must never render an
+            // apply button: applying one would write source 'drift', which
+            // upsert()'s refusal rule discards on exactly the hand-corrected
+            // rows this warning is about. Lifecycle is recorded by a person.
+            $hasrates = $type !== 'eol'
+                && (($finding['input'] ?? null) !== null || ($finding['output'] ?? null) !== null);
+            $iseol = $type === 'eol';
+            $eollabel = '';
+            if ($iseol) {
+                // Reuse the effective-table renderer so one model cannot read
+                // "Retires 2026-10-16" in the price list and something else in
+                // the findings list on the same screen.
+                $eollabel = self::eol_cell([
+                    'eol_date'    => (int) ($finding['eol_date'] ?? 0),
+                    'eol_surface' => (string) ($finding['eol_surface'] ?? ''),
+                    'eol_applies' => !empty($finding['eol_applies']),
+                ])['label'];
+            }
             $out['rows'][] = [
                 'type'         => $type,
                 'typelabel'    => self::finding_label($type),
                 'ismissing'    => $type === 'missing',
                 'ismismatch'   => $type === 'mismatch',
                 'isnew'        => $type === 'new',
+                'iseol'        => $iseol,
+                'eollabel'     => $eollabel,
+                'eoldate'      => $iseol ? self::isodate((int) ($finding['eol_date'] ?? 0)) : '',
+                'eolsurface'   => $iseol ? (string) ($finding['eol_surface'] ?? '') : '',
+                'eolapplies'   => $iseol && !empty($finding['eol_applies']),
                 'modelkey'     => (string) ($finding['modelkey'] ?? ''),
                 'provider'     => (string) ($finding['provider'] ?? ''),
                 'capability'   => (string) ($finding['capability'] ?? ''),
@@ -650,6 +713,13 @@ class model_registry_page {
     /**
      * Add or correct one model, as a human.
      *
+     * Also the ONLY writer of the lifecycle columns. Nothing automated writes
+     * eol_date: a retirement date arriving from a feed would carry source
+     * 'drift', which upsert()'s refusal rule skips on any row a human has ever
+     * corrected — i.e. precisely the busy models an EOL warning matters for —
+     * so an automated lifecycle write would silently do nothing exactly where
+     * it was needed. The drift check reports; a person records.
+     *
      * Recorded with source 'manual', which is load-bearing: model_registry
      * refuses to let the weekly upstream refresh or a drift finding overwrite a
      * manual row afterwards. That refusal is the fix for the pre-v7.4.0 defect
@@ -675,6 +745,35 @@ class model_registry_page {
             }
         }
 
+        // Lifecycle. An empty date clears BOTH columns: a surface with no date
+        // attached says nothing, and leaving it behind would make the next
+        // editor think a retirement was still recorded.
+        $eolraw = trim((string) ($form['eol_date'] ?? ''));
+        $eolsurface = trim((string) ($form['eol_surface'] ?? ''));
+        $eoldate = '';
+        if ($eolraw !== '') {
+            $parsed = self::parse_eol_date($eolraw);
+            if ($parsed === null) {
+                return self::result(
+                    self::ERROR,
+                    get_string('modelregistry:err_badeoldate', 'local_ai_course_assistant')
+                );
+            }
+            // A date with no surface is refused, not defaulted. This is the
+            // 2026-09-08 near-miss written down as a validation rule:
+            // gemini-2.5-flash was reported as retiring 2026-10-16, which was
+            // true of Vertex AI and not of the Gemini Developer API this plugin
+            // calls. Whoever reads the announcement knows which surface it was
+            // on; nobody reading the row three weeks later does.
+            if ($eolsurface === '') {
+                return self::result(
+                    self::ERROR,
+                    get_string('modelregistry:err_noeolsurface', 'local_ai_course_assistant')
+                );
+            }
+            $eoldate = $parsed;
+        }
+
         $row = [
             'modelkey'       => $key,
             'provider'       => trim((string) ($form['provider'] ?? '')),
@@ -682,6 +781,8 @@ class model_registry_page {
             'input_rate'     => trim((string) ($form['input_rate'] ?? '')),
             'output_rate'    => trim((string) ($form['output_rate'] ?? '')),
             'context_tokens' => trim((string) ($form['context_tokens'] ?? '')),
+            'eol_date'       => $eoldate,
+            'eol_surface'    => $eoldate === '' ? '' : $eolsurface,
             'notes'          => trim((string) ($form['notes'] ?? '')),
         ];
         $status = strtolower(trim((string) ($form['status'] ?? '')));
@@ -864,9 +965,10 @@ class model_registry_page {
     public static function run_drift(): array {
         $summary = model_price_drift_check::run();
         $counts = (array) ($summary['counts'] ?? []);
-        $level = (($counts['missing'] ?? 0) > 0 || ($counts['mismatch'] ?? 0) > 0) ? self::WARN : self::OK;
+        $level = (($counts['missing'] ?? 0) > 0 || ($counts['mismatch'] ?? 0) > 0
+            || ($counts['eol'] ?? 0) > 0) ? self::WARN : self::OK;
 
-        return self::result($level, get_string(
+        $message = get_string(
             'modelregistry:drift_ran',
             'local_ai_course_assistant',
             (object) [
@@ -874,7 +976,23 @@ class model_registry_page {
                 'mismatch' => (int) ($counts['mismatch'] ?? 0),
                 'new'      => (int) ($counts['new'] ?? 0),
             ]
-        ));
+        );
+        // A SECOND string rather than a fourth placeholder in drift_ran. That
+        // key is already translated into 45 locales; adding a placeholder to
+        // the English would leave every one of them rendering a sentence that
+        // silently omits the end-of-life count, which reads as "none" — the
+        // exact silent-zero failure this whole check exists to prevent. A new
+        // key falls back to English instead, which is visibly untranslated
+        // rather than quietly wrong.
+        if ((int) ($counts['eol'] ?? 0) > 0) {
+            $message .= ' ' . get_string(
+                'modelregistry:drift_ran_eol',
+                'local_ai_course_assistant',
+                (int) $counts['eol']
+            );
+        }
+
+        return self::result($level, $message);
     }
 
     /**
@@ -1357,6 +1475,109 @@ class model_registry_page {
             return '';
         }
         return self::plainnumber((float) $value, 6);
+    }
+
+    /**
+     * Render one model's lifecycle for the effective-prices table.
+     *
+     * Lifecycle lives in the same row as the price on purpose. The two facts an
+     * operator needs about a model are what it costs and how long it will
+     * exist; putting the second on a different screen is how a retirement goes
+     * unread until the morning every call starts failing.
+     *
+     * @param array $prov Output of model_registry::provenance_for().
+     * @return array{label: string, date: string, surface: string, warn: bool, state: string}
+     */
+    public static function eol_cell(array $prov): array {
+        $date = (int) ($prov['eol_date'] ?? 0);
+        $surface = trim((string) ($prov['eol_surface'] ?? ''));
+        if ($date <= 0) {
+            return ['label' => '', 'date' => '', 'surface' => '', 'warn' => false, 'state' => 'none'];
+        }
+
+        $iso = self::isodate($date);
+        if (empty($prov['eol_applies'])) {
+            // Shown, and shown as NOT ours. This cell is the entire reason the
+            // surface column exists: gemini-2.5-flash's 2026-10-16 retirement
+            // was a Vertex AI lifecycle event, and rendering that as a bare red
+            // date would recreate the false alarm the field was added to stop.
+            return [
+                'label'   => get_string('modelregistry:eol_othersurface', 'local_ai_course_assistant',
+                    (object) ['date' => $iso, 'surface' => $surface]),
+                'date'    => $iso,
+                'surface' => $surface,
+                'warn'    => false,
+                'state'   => 'othersurface',
+            ];
+        }
+
+        $days = (int) floor(($date - time()) / DAYSECS);
+        // The SAME horizon the drift check emails on, read from the same
+        // setting rather than from a constant of this page's own. A page that
+        // paints a row calm while the nightly email calls it urgent teaches an
+        // operator to trust neither.
+        $soon = model_price_drift_check::eol_horizon_days();
+        if ($date <= time()) {
+            $state = 'passed';
+            $label = get_string('modelregistry:eol_passed', 'local_ai_course_assistant', $iso);
+        } else if ($days <= $soon) {
+            $state = 'soon';
+            $label = get_string('modelregistry:eol_soon', 'local_ai_course_assistant',
+                (object) ['date' => $iso, 'days' => $days]);
+        } else {
+            $state = 'later';
+            $label = get_string('modelregistry:eol_later', 'local_ai_course_assistant', $iso);
+        }
+
+        return [
+            'label'   => $label,
+            'date'    => $iso,
+            'surface' => $surface,
+            'warn'    => $state === 'passed' || $state === 'soon',
+            'state'   => $state,
+        ];
+    }
+
+    /**
+     * Parse an admin-entered end-of-life date.
+     *
+     * ISO 8601 calendar dates only, and pinned to 00:00 UTC. A vendor
+     * retirement is announced as a calendar day, not as an instant: rendering
+     * it through the viewer's timezone would show 2026-10-15 to a reader in
+     * Los Angeles and 2026-10-16 to one in Berlin for the same stored value,
+     * and one of them would plan the migration for the wrong week.
+     *
+     * Rejects anything PHP would otherwise silently coerce — '2026-13-40'
+     * overflows into 2027 under createFromFormat's lenient arithmetic, so the
+     * parsed date is formatted back and compared to the input.
+     *
+     * @param string $raw
+     * @return int|null Timestamp, or null when the input is not a valid date.
+     */
+    public static function parse_eol_date(string $raw): ?int {
+        $raw = trim($raw);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
+            return null;
+        }
+        $utc = new \DateTimeZone('UTC');
+        $parsed = \DateTime::createFromFormat('!Y-m-d', $raw, $utc);
+        if ($parsed === false || $parsed->format('Y-m-d') !== $raw) {
+            return null;
+        }
+        return (int) $parsed->getTimestamp();
+    }
+
+    /**
+     * A stored end-of-life timestamp as the calendar day it stands for.
+     *
+     * gmdate, not userdate: see {@see parse_eol_date()} for why this one value
+     * is deliberately timezone-free.
+     *
+     * @param int $time
+     * @return string
+     */
+    public static function isodate(int $time): string {
+        return $time > 0 ? gmdate('Y-m-d', $time) : '';
     }
 
     /**

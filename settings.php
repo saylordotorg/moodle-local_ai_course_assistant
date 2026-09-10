@@ -2652,6 +2652,25 @@ if ($hassiteconfig) {
     // into the multi-schedule table on upgrade. This block keeps only the
     // anomaly-digest options in admin settings; per-query schedules live on
     // the analytics page.
+
+    // v7.4.4: offline batch tier for SCHEDULED Radar reports only. Defaults
+    // OFF, and the default is the point: batch trades a same-morning report for
+    // one that arrives within 24 hours, which is a decision about an
+    // institution's reporting rhythm rather than a tuning knob. Turning it back
+    // off returns every schedule to the synchronous path on the next cron run;
+    // batches already in flight are still collected and delivered.
+    $settings->add(new admin_setting_heading(
+        'local_ai_course_assistant/radar_batch_heading',
+        get_string('settings:radar_batch_heading', 'local_ai_course_assistant'),
+        get_string('settings:radar_batch_heading_desc', 'local_ai_course_assistant')
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/radar_batch_enabled',
+        get_string('settings:radar_batch_enabled', 'local_ai_course_assistant'),
+        get_string('settings:radar_batch_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
+
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/anomaly_digest_heading',
         \local_ai_course_assistant\branding::str('settings:anomaly_digest_heading'),
@@ -2942,6 +2961,20 @@ if ($hassiteconfig) {
         (string) \local_ai_course_assistant\task\model_price_drift_check::DEFAULT_TOLERANCE_PCT,
         PARAM_FLOAT
     ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/price_drift_eol_horizon_days',
+        get_string('pricedrift:eol_horizon', 'local_ai_course_assistant'),
+        get_string('pricedrift:eol_horizon_desc', 'local_ai_course_assistant'),
+        (string) \local_ai_course_assistant\task\model_price_drift_check::DEFAULT_EOL_HORIZON_DAYS,
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/model_eol_surfaces',
+        get_string('pricedrift:eol_surfaces', 'local_ai_course_assistant'),
+        get_string('pricedrift:eol_surfaces_desc', 'local_ai_course_assistant'),
+        '',
+        PARAM_TEXT
+    ));
 
     $settings->add(new admin_setting_heading(
         'local_ai_course_assistant/bench_heading',
@@ -3130,7 +3163,9 @@ if ($hassiteconfig) {
 
         // Monitoring and alerting.
         'cost_anomaly_enabled' => ['cost_anomaly_multiplier'],
-        'price_drift_check_enabled' => ['price_drift_tolerance_pct'],
+        'price_drift_check_enabled' => [
+            'price_drift_tolerance_pct', 'price_drift_eol_horizon_days',
+        ],
         'unanswered_check_enabled' => [
             'unanswered_window_hours', 'unanswered_min_questions', 'unanswered_min_answer_rate',
         ],

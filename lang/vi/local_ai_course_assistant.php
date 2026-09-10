@@ -198,37 +198,37 @@ Cố lên nhé!
 
 ---
 Để ngừng nhận những nhắc nhở này, nhấn vào đây: {$a->unsubscribe_url}';
-$string['reminder:email_body_no_hours'] = 'Hi {$a->firstname},
+$string['reminder:email_body_no_hours'] = 'Chào {$a->firstname},
 
-This is your study reminder for "{$a->coursename}".
-
-{$a->message}
-
-Keep up the great work!
-
----
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['reminder:email_body_with_prefs'] = 'Hi {$a->firstname},
-
-This is your study reminder for "{$a->coursename}".
+Đây là lời nhắc học tập của bạn cho "{$a->coursename}".
 
 {$a->message}
 
-Your study plan: {$a->hours_per_week} hours per week, on {$a->preferred_days} ({$a->preferred_time}).
-
-Keep up the great work!
+Hãy tiếp tục phát huy nhé!
 
 ---
-To stop receiving these reminders, click here: {$a->unsubscribe_url}';
-$string['studytip:pomodoro']            = 'Try the Pomodoro technique: 25 minutes of focused study, then a 5-minute break.';
-$string['studytip:review_notes']        = 'Review your notes from the last session before starting new material.';
-$string['studytip:active_recall']       = 'Test yourself on what you learned recently — active recall strengthens memory.';
+Để ngừng nhận những lời nhắc này, hãy nhấp vào đây: {$a->unsubscribe_url}';
+$string['reminder:email_body_with_prefs'] = 'Chào {$a->firstname},
+
+Đây là lời nhắc học tập của bạn cho "{$a->coursename}".
+
+{$a->message}
+
+Kế hoạch học tập của bạn: {$a->hours_per_week} giờ mỗi tuần, vào {$a->preferred_days} ({$a->preferred_time}).
+
+Hãy tiếp tục phát huy nhé!
+
+---
+Để ngừng nhận những lời nhắc này, hãy nhấp vào đây: {$a->unsubscribe_url}';
+$string['studytip:pomodoro']            = 'Hãy thử phương pháp Pomodoro: học tập trung 25 phút, sau đó nghỉ 5 phút.';
+$string['studytip:review_notes']        = 'Hãy xem lại ghi chú của buổi học trước khi bắt đầu nội dung mới.';
+$string['studytip:active_recall']       = 'Hãy tự kiểm tra những gì bạn vừa học — việc chủ động hồi tưởng giúp củng cố trí nhớ.';
 $string['studytip:summarise']           = 'Take a few minutes to summarise what you have learned in your own words.';
-$string['studytip:mix_modes']           = 'Mix different types of study: reading, practice problems, and teaching concepts to others.';
-$string['studytip:tackle_hard_first']   = 'Start with the most challenging topic while your energy is highest.';
-$string['studytip:connect_concepts']    = 'Create connections between new concepts and what you already know.';
-$string['studytip:short_breaks']        = 'Take short breaks to stay focused — a refreshed mind learns better.';
-$string['studyplan:hours_out_of_range'] = 'Hours per week must be between {$a->min} and {$a->max}. Got {$a->got}. Please tell [[tutorshort]] a different number and it will save your plan.';
+$string['studytip:mix_modes']           = 'Hãy kết hợp nhiều cách học khác nhau: đọc tài liệu, làm bài tập và giảng lại khái niệm cho người khác.';
+$string['studytip:tackle_hard_first']   = 'Hãy bắt đầu với chủ đề khó nhất khi bạn còn nhiều năng lượng nhất.';
+$string['studytip:connect_concepts']    = 'Hãy tạo liên kết giữa các khái niệm mới và những điều bạn đã biết.';
+$string['studytip:short_breaks']        = 'Hãy nghỉ ngắn để giữ được sự tập trung — một tinh thần tỉnh táo sẽ học tốt hơn.';
+$string['studyplan:hours_out_of_range'] = 'Số giờ mỗi tuần phải nằm trong khoảng từ {$a->min} đến {$a->max}. Bạn đã nhập {$a->got}. Vui lòng cho [[tutorshort]] biết một con số khác và kế hoạch của bạn sẽ được lưu.';
 $string['reminder:whatsapp_body'] = 'Nhắc nhở học tập cho {$a->coursename}: {$a->message} (Hủy đăng ký: {$a->unsubscribe_url})';
 $string['reminder:study_tip_prefix'] = 'Nội dung học tập hôm nay: ';
 
@@ -387,9 +387,9 @@ $string['chat:voice_error'] = 'Kết nối giọng nói thất bại. Vui lòng 
 $string['chat:quiz_locked'] = '[[tutorshort]] tạm dừng trong khi làm bài kiểm tra để hỗ trợ tính trung thực học thuật. Chúc may mắn!';
 
 // Bottom nav.
-$string['chat:mode_nav'] = 'Mode navigation';
-$string['chat:mode_chat'] = 'Chat';
-$string['chat:mode_voice'] = 'Voice';
+$string['chat:mode_nav'] = 'Điều hướng chế độ';
+$string['chat:mode_chat'] = 'Trò chuyện';
+$string['chat:mode_voice'] = 'Giọng nói';
 $string['chat:mode_history'] = 'Ghi chú';
 
 // History panel.
@@ -457,7 +457,7 @@ $string['chat:llm_model_label'] = 'Mô hình';
 $string['chat:llm_model_select'] = 'Chọn mô hình LLM';
 $string['chat:footer_usertesting'] = 'Kiểm tra khả năng sử dụng';
 $string['chat:footer_feedback'] = 'Phản hồi';
-$string['chat:voice_panel_title']       = 'Talk with {$a}';
+$string['chat:voice_panel_title']       = 'Nói chuyện với {$a}';
 
 // Additional translated strings.
 $string['chat:debug_context'] = 'Gỡ lỗi ngữ cảnh';
@@ -504,12 +504,11 @@ $string['quizsettings:level_coach'] = 'Coach (Socratic only)';
 $string['quizsettings:level_hidden'] = 'Hidden';
 $string['quizsettings:ungraded'] = 'Ungraded';
 $string['error'] = '{$a}';
-$string['error_no_tts_key'] = 'No OpenAI API key configured for TTS.';
-$string['error_rate_limit_ip'] = 'Too many requests from your IP address. Please wait a moment.';
-$string['error_rate_limit_user'] = 'Too many requests. Please wait a moment.';
-$string['error_reminders_email_disabled'] = 'Email reminders are not enabled.';
-$string['error_reminders_whatsapp_country_blocked'] = 'WhatsApp reminders are not available in your country.';
-$string['error_reminders_whatsapp_disabled'] = 'WhatsApp reminders are not enabled.';
+$string['error_no_tts_key'] = 'Hiện không thể dùng chức năng chuyển văn bản thành giọng nói. Vui lòng thông báo cho quản trị viên trang web của bạn.';
+$string['error_rate_limit_ip'] = 'Có quá nhiều yêu cầu từ địa chỉ IP của bạn. Vui lòng đợi một chút.';
+$string['error_reminders_email_disabled'] = 'Lời nhắc qua email chưa được bật.';
+$string['error_reminders_whatsapp_country_blocked'] = 'Lời nhắc qua WhatsApp không khả dụng ở quốc gia của bạn.';
+$string['error_reminders_whatsapp_disabled'] = 'Lời nhắc qua WhatsApp chưa được bật.';
 $string['insights:desc'] = 'Analyze feedback, survey, and usability testing data to surface issues, feature requests, and recommendations.';
 $string['insights:error'] = 'Could not generate insights.';
 $string['insights:generate'] = 'Generate AI Insights';
@@ -1221,17 +1220,10 @@ $string['empathy:struggle_enabled'] = 'Enable struggle classifier';
 $string['empathy:struggle_enabled_desc'] = 'Off by default. Lets [[tutorshort]] detect sustained frustration over multiple turns and quietly record a sticking-point note in the carryover memory above. Output is in-chat only; no email is ever sent about a struggle session. Auto-purges signal data after 7 days.';
 $string['empathy:outreach_dryrun'] = 'Dry-run outreach (log without sending)';
 $string['empathy:outreach_dryrun_desc'] = 'When on, the milestone scheduled task records audit rows as if it sent emails but does not actually email anyone. Use this on a fresh install to verify the cooldown and consent logic before going live.';
-$string['goals:starter_title'] = 'Set my learning goals';
-$string['goals:starter_intro'] = "Mind sharing why you are taking this course? It helps me give you better answers.";
-$string['goals:q1_label'] = 'What brought you to this course?';
-$string['goals:q2_label'] = "What's the bigger thing this is helping you toward? A degree, a job, a project of your own, something else?";
-$string['goals:q3_label'] = 'Anything I should keep in mind while we work together?';
 $string['goals:save'] = 'Save my goals';
 $string['goals:dismiss'] = 'Not now';
 $string['goals:edit'] = 'Edit goals';
 $string['goals:clear'] = 'Clear my goals';
-$string['goals:cleared'] = 'Your goals have been cleared.';
-$string['goals:saved'] = 'Thanks for sharing.';
 $string['comms:title'] = 'Liên lạc của tôi';
 $string['comms:desc'] = 'Chọn những email tự động mà [[tutorshort]] được phép gửi cho bạn. Mặc định tắt. Bạn có thể thay đổi bất cứ lúc nào.';
 $string['comms:milestones_label'] = 'Gửi email cho tôi khi tôi đạt một cột mốc (chuỗi 7 ngày, chuỗi 30 ngày, hoàn thành khóa học).';

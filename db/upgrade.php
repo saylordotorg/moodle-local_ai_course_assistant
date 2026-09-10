@@ -1862,5 +1862,87 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091002, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026091004) {
+        // v7.4.4: in-flight OpenAI Batch API jobs for scheduled Learning Radar
+        // reports.
+        //
+        // Batch is half price on input and output, in exchange for a completion
+        // window of up to 24 hours. That turnaround is the whole reason this
+        // table has to exist: submit, poll and collect happen in three different
+        // cron runs and three different PHP processes, so the batch id and the
+        // context needed to deliver the finished report cannot be held in
+        // memory. One row per submitted schedule run.
+        //
+        // since_time is stored rather than recomputed on collection. The report
+        // window is `time() - rangedays * 86400`; recomputing that a day later
+        // would silently slide the reported period by the batch turnaround, so
+        // a "last 7 days" report would quietly cover days 2-8.
+        $table = new xmldb_table('local_ai_course_assistant_radar_batch');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('scheduleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('batchid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('provider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('model', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('query', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('format', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'text');
+        $table->add_field('frequency', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('range_days', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('since_time', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('courseids', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+        $table->add_field('filterprovider', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'submitted');
+        $table->add_field('lasterror', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timesubmitted', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('scheduleid_fk', XMLDB_KEY_FOREIGN, ['scheduleid'],
+            'local_ai_course_assistant_radar_sched', ['id']);
+        $table->add_index('status_submitted', XMLDB_INDEX_NOTUNIQUE, ['status', 'timesubmitted']);
+        $table->add_index('batchid', XMLDB_INDEX_NOTUNIQUE, ['batchid']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026091004, 'local', 'ai_course_assistant');
+    }
+
+    if ($oldversion < 2026091005) {
+        // v7.4.4: model lifecycle tracking on the registry.
+        //
+        // The drift check watches PRICE and the re-open rule watches price and
+        // adoption. Neither watched LIFECYCLE, so a genuine model retirement
+        // would have arrived as a production outage rather than as a warning:
+        // the first symptom of a shut-off model is every chat turn failing, and
+        // nothing in the plugin was looking at a calendar.
+        //
+        // eol_date is a DATE, not another status word. `status` can already say
+        // 'deprecated', but a lifecycle label carries no horizon: it cannot say
+        // "and the shutoff is 2026-11-15", which is exactly what a check needs
+        // in order to decide when to start shouting and when to stop.
+        //
+        // eol_surface exists because of a real near-miss in the 2026-09-08 model
+        // review. gemini-2.5-flash was reported as retiring 2026-10-16 -- true,
+        // but of the VERTEX AI lifecycle, which is not the Gemini Developer API
+        // this plugin calls. A bare date would have raised a production-outage
+        // alarm for a model that was never going anywhere. Recording which
+        // surface the date applies to is what turns that alarm back into
+        // information, so the two columns are added together and
+        // model_registry_page::save_model refuses a date without a surface.
+        $table = new xmldb_table('local_ai_course_assistant_models');
+
+        $field = new xmldb_field('eol_date', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'context_tokens');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('eol_surface', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'eol_date');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026091005, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

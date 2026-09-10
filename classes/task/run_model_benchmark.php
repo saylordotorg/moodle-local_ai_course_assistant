@@ -53,6 +53,20 @@ use local_ai_course_assistant\token_cost_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class run_model_benchmark extends \core\task\adhoc_task {
+
+    /**
+     * Aggregated benchmark spend, keyed 'answer' and 'judge'.
+     *
+     * An INSTANCE property, not a local, so a run that throws part-way through
+     * can still flush what it already spent: the loop can be 49 calls into 50
+     * when it dies, and those calls were invoiced. Accumulated as we go and
+     * never re-read from the provider at the end, because get_last_token_usage()
+     * only ever holds the most recent call.
+     *
+     * @var array
+     */
+    private $benchspend = [];
+
     /** @var string The only harness implemented here. */
     public const HARNESS_TUTOR_GOLDEN = 'tutor_golden';
 
@@ -196,6 +210,16 @@ TXT;
             ]);
         }
 
+        // Resolve the spend owner ONCE, before anything can be written. createdby
+        // is documented as audit-only and is 0 for CLI/programmatic queues, and
+        // log_usage_array(..., 0, ...) would reach get_or_create_conversation(0,
+        // SITEID) -- no FK guard -- and insert a conversation owned by nobody.
+        $spenduserid = (int) ($data['createdby'] ?? 0);
+        if ($spenduserid <= 0) {
+            $admin = get_admin();
+            $spenduserid = $admin ? (int) $admin->id : 0;
+        }
+
         try {
             $this->run_and_record($runid, $data, [
                 'harness'  => $harness,
@@ -206,9 +230,17 @@ TXT;
                 'samples'  => $samples,
                 'fixture'  => $fixture,
             ]);
+            $this->flush_bench_spend($spenduserid);
         } catch (\Throwable $e) {
             // A benchmark that dies must not leave a 'running' row forever, and
             // must not take cron's whole queue down with it.
+            //
+            // Flush FIRST: the run may have completed 49 of 50 invoiced calls
+            // before throwing, and that money was spent whether or not the run
+            // recorded a result. This deliberately widens the "log on the success
+            // path only" rule the ancillary writers follow, because there the
+            // failing call was the only call.
+            $this->flush_bench_spend($spenduserid);
             model_bench::fail_run($runid, 'Benchmark aborted: ' . $e->getMessage());
             mtrace('run_model_benchmark: ' . $e->getMessage());
         }
@@ -276,6 +308,9 @@ TXT;
         foreach ($prompts as $p) {
             $calls++;
             $result = $this->run_one_call($provider, (string) ($p['text'] ?? ''), $temperature);
+            // Accumulate BEFORE the error branch: a call that errored may still
+            // have been billed for its prompt.
+            $this->accumulate_bench_spend('answer', $result['usage'] ?? null);
             if ($result['error'] !== '') {
                 $errors++;
                 continue;
@@ -427,7 +462,8 @@ TXT;
                 $estimate = token_cost_manager::estimate_cost(
                     (string) $usage['model'],
                     (int) $usage['prompt_tokens'],
-                    (int) $usage['completion_tokens']
+                    (int) $usage['completion_tokens'],
+                    (int) ($usage['reasoning_tokens'] ?? 0)
                 );
                 if ($estimate !== null) {
                     $cost = round($estimate * 100, 6);
@@ -438,10 +474,23 @@ TXT;
                 'ttft_ms'          => $ttft,
                 'total_latency_ms' => $total,
                 'cost_cents'       => $cost,
+                'usage'            => is_array($usage) ? $usage : null,
                 'error'            => '',
             ];
         } catch (\Throwable $e) {
+            // Not a hard null: claude_provider populates prompt/cached tokens from
+            // the stream's opening event before any mid-stream failure, and those
+            // tokens are invoiced. Hard-coding null here would discard exactly the
+            // partially-billed calls this aggregate exists to preserve.
+            $partial = null;
+            try {
+                $u = $provider->get_last_token_usage();
+                $partial = (is_array($u) && !empty($u)) ? $u : null;
+            } catch (\Throwable $ignored) {
+                $partial = null;
+            }
             return [
+                'usage'            => $partial,
                 'response'         => '',
                 'ttft_ms'          => null,
                 'total_latency_ms' => (int) round((microtime(true) - $start) * 1000),
@@ -449,6 +498,74 @@ TXT;
                 'error'            => mb_substr((string) $e->getMessage(), 0, 200),
             ];
         }
+    }
+
+    /**
+     * Fold one call's usage into the run's aggregate.
+     *
+     * @param string     $bucket 'answer' or 'judge'.
+     * @param array|null $usage  Canonical usage array, or null when nothing was billed.
+     * @return void
+     */
+    private function accumulate_bench_spend(string $bucket, ?array $usage): void {
+        if (empty($usage) || empty($usage['model'])) {
+            return;
+        }
+        if (!isset($this->benchspend[$bucket])) {
+            $this->benchspend[$bucket] = [
+                'prompt_tokens' => 0,
+                'completion_tokens' => 0,
+                'cached_tokens' => 0,
+                // Null, not 0. Null means "this provider does not report thinking";
+                // 0 would claim it reported zero. claude_provider omits the key
+                // entirely, so defaulting to 0 here would misreport every judge run.
+                'reasoning_tokens' => null,
+                'model' => (string) $usage['model'],
+                'provider' => $usage['provider'] ?? null,
+                'calls' => 0,
+            ];
+        }
+        $acc = &$this->benchspend[$bucket];
+        $acc['calls']++;
+        $acc['prompt_tokens'] += (int) ($usage['prompt_tokens'] ?? 0);
+        $acc['completion_tokens'] += (int) ($usage['completion_tokens'] ?? 0);
+        // Anthropic reports cache_read_tokens, OpenAI cached_tokens.
+        $acc['cached_tokens'] += (int) ($usage['cached_tokens'] ?? $usage['cache_read_tokens'] ?? 0);
+        if (array_key_exists('reasoning_tokens', $usage) && $usage['reasoning_tokens'] !== null) {
+            $acc['reasoning_tokens'] = (int) $acc['reasoning_tokens'] + (int) $usage['reasoning_tokens'];
+        }
+    }
+
+    /**
+     * Write the run's accumulated spend as one ledger row per bucket.
+     *
+     * Called from the normal tail AND from execute()'s catch, because a run that
+     * dies at prompt 49 of 50 has already been billed for 49 calls.
+     *
+     * @param int $userid Resolved, non-zero.
+     * @return void
+     */
+    private function flush_bench_spend(int $userid): void {
+        if ($userid <= 0) {
+            // Never write with userid 0: get_or_create_conversation() has no FK
+            // guard and would insert a junk conversation owned by nobody.
+            mtrace('  SOLA: benchmark spend not logged (no resolvable user).');
+            $this->benchspend = [];
+            return;
+        }
+        foreach ($this->benchspend as $bucket => $acc) {
+            if ((int) $acc['calls'] < 1 || empty($acc['model'])) {
+                continue;
+            }
+            \local_ai_course_assistant\conversation_manager::log_usage_array(
+                $acc,
+                $userid,
+                0,
+                'model_bench',
+                '[Benchmark] ' . $bucket . ': ' . (int) $acc['calls'] . ' call(s)'
+            );
+        }
+        $this->benchspend = [];
     }
 
     /**
@@ -467,6 +584,13 @@ TXT;
             $out = $judge->chat_completion(self::JUDGE_PROMPT, [
                 ['role' => 'user', 'content' => "STUDENT PROMPT:\n" . $prompt . "\n\nTUTOR RESPONSE:\n" . $response],
             ], ['temperature' => 0.0]);
+            // Read here, not in the caller's loop. The empty-response early return
+            // above skips the judge entirely, so accumulating from the caller would
+            // count the PREVIOUS response's tokens for a call that never happened --
+            // the same stale-usage defect as claude_provider's missing reset, one
+            // layer up. Judge spend appeared in no number at all before this,
+            // including model_bench's own cost_cents.
+            $this->accumulate_bench_spend('judge', $judge->get_last_token_usage());
         } catch (\Throwable $e) {
             return null;
         }

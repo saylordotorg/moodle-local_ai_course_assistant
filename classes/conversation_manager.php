@@ -279,13 +279,45 @@ class conversation_manager {
         string $interactiontype,
         string $label
     ): void {
+        if (!is_object($provider) || !method_exists($provider, 'get_last_token_usage')) {
+            return;
+        }
+        $usage = $provider->get_last_token_usage();
+        if (empty($usage) || !is_array($usage)) {
+            // Provider reported nothing billable (or the call never ran).
+            return;
+        }
+        self::log_usage_array($usage, $userid, $courseid, $interactiontype, $label);
+    }
+
+    /**
+     * Persist an already-collected usage array as a billable telemetry row.
+     *
+     * The primitive behind log_ancillary_usage(). Exists separately because a
+     * provider object can only ever report its LAST call, and the benchmark task
+     * needs to write one AGGREGATE row for a run of up to 50 calls -- a per-call
+     * row there would mean 50 inserts per run and 50 rows nothing consumes,
+     * since model_bench already stores the per-call view.
+     *
+     * Same swallow-everything contract as its caller: telemetry must never break
+     * the feature it measures.
+     *
+     * @param array  $usage           Canonical usage array; 'provider' names the server.
+     * @param int    $userid
+     * @param int    $courseid        SITEID is used when 0.
+     * @param string $interactiontype Analytics bucket; MUST be in spend_rows_predicate().
+     * @param string $label           Short marker, NOT generated content.
+     * @return void
+     */
+    public static function log_usage_array(
+        array $usage,
+        int $userid,
+        int $courseid,
+        string $interactiontype,
+        string $label
+    ): void {
         try {
-            if (!is_object($provider) || !method_exists($provider, 'get_last_token_usage')) {
-                return;
-            }
-            $usage = $provider->get_last_token_usage();
-            if (empty($usage) || !is_array($usage)) {
-                // Provider reported nothing billable (or the call never ran).
+            if (empty($usage)) {
                 return;
             }
 
@@ -363,14 +395,25 @@ class conversation_manager {
      * (cron-driven), so analytics that filter on interaction_type can
      * include or exclude admin queries cleanly.
      *
+     * v7.4.4 takes cached and reasoning token counts. Until now this writer
+     * only ever received a strlen/4 approximation, so there was nothing to
+     * pass; both Radar paths now read the provider's real usage block, and the
+     * two counters that the rest of the spend pipeline has priced since v6.1.0
+     * and v7.4.2 respectively were the two this one row shape could not carry.
+     * A batched call records `batch/<model>` as $modelname, which is what makes
+     * model_registry::rate_for() apply the 50% offline discount.
+     *
      * @param int $userid
      * @param string $query Full text the admin asked.
      * @param string $response Full LLM response.
      * @param string $provider Provider id.
-     * @param string $modelname Model id.
-     * @param int $prompttokens Approximate input tokens.
-     * @param int $completiontokens Approximate output tokens.
+     * @param string $modelname Model id, optionally carrying the batch marker.
+     * @param int $prompttokens Input tokens, as reported when available.
+     * @param int $completiontokens Output tokens, as reported when available.
      * @param bool $scheduled True for cron-driven runs.
+     * @param int|null $cachedtokens Prompt tokens served from cache; null when unreported.
+     * @param int|null $reasoningtokens Thinking tokens as reported; null when unreported. Never
+     *                 folded into completion_tokens -- see add_message() for why.
      * @return void
      */
     public static function record_meta_query(
@@ -381,7 +424,9 @@ class conversation_manager {
         string $modelname,
         int $prompttokens,
         int $completiontokens,
-        bool $scheduled = false
+        bool $scheduled = false,
+        ?int $cachedtokens = null,
+        ?int $reasoningtokens = null
     ): void {
         global $DB;
 
@@ -408,11 +453,35 @@ class conversation_manager {
         $assistrow = clone $userrow;
         $assistrow->role = 'assistant';
         $assistrow->message = $response;
-        $assistrow->tokens_used = $completiontokens;
-        $assistrow->prompt_tokens = 0;
+        // v7.4.4: the ASSISTANT row carries the whole call's usage, not just
+        // its output half.
+        //
+        // The split above is a display convention -- the user row holds the
+        // question and the assistant row holds the answer -- and it was applied
+        // to the token counters too, so the input tokens lived on a role='user'
+        // row with no model_name. analytics::spend_rows_predicate() excludes
+        // role='user' outright, and every priced query additionally requires a
+        // model_name, so those input tokens matched NOTHING: not the AI Spend
+        // dashboard, not spend_guard's 'analytics' capability cap, not the
+        // anomaly detector. The Learning Radar has been priced on its completion
+        // tokens alone, which for an analytics call -- a small question over a
+        // very large anonymized context -- is the smaller half by a wide margin.
+        //
+        // This does not double-count. Nothing sums across both rows: the two
+        // aggregate queries over tokens_used are role='assistant' filtered
+        // (analytics.php:388) or run behind the spend predicate (analytics.php:634),
+        // and redash_export.php reads prompt_tokens from the paired USER row and
+        // completion_tokens from the assistant row by name rather than summing.
+        // The user row keeps its counters unchanged for that export.
+        $assistrow->tokens_used = $prompttokens + $completiontokens;
+        $assistrow->prompt_tokens = $prompttokens;
         $assistrow->completion_tokens = $completiontokens;
         $assistrow->model_name = $modelname !== '' ? $modelname : null;
         $assistrow->provider = $provider !== '' ? $provider : null;
+        // v7.4.4: on the assistant row only, matching add_message() -- the user
+        // row pre-dates the provider call and describes no billed usage.
+        $assistrow->cached_tokens = $cachedtokens;
+        $assistrow->reasoning_tokens = $reasoningtokens;
         // +1 second so the user row sorts strictly before the assistant row
         // even when both are inserted in the same wall-clock second.
         $assistrow->timecreated = $now + 1;
