@@ -35,6 +35,7 @@ $syscontext = context_system::instance();
 require_capability('moodle/site:config', $syscontext);
 
 $run = optional_param('run', 0, PARAM_BOOL);
+$runstorage = optional_param('runstorage', 0, PARAM_BOOL);
 
 $pageurl = new moodle_url('/local/ai_course_assistant/backend_selftest.php');
 $PAGE->set_url($pageurl);
@@ -47,13 +48,12 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('selftest:title', 'local_ai_course_assistant'));
 echo html_writer::tag('p', get_string('selftest:intro', 'local_ai_course_assistant'));
 
-if ($run && confirm_sesskey()) {
-    $rows = \local_ai_course_assistant\backend_probe::run_all();
-
+// Both probes report the same row shape, so they share one renderer.
+$rendertable = function (array $rows): void {
     $badge = [
-        \local_ai_course_assistant\backend_probe::STATUS_PASS => 'badge badge-success',
-        \local_ai_course_assistant\backend_probe::STATUS_WARN => 'badge badge-warning',
-        \local_ai_course_assistant\backend_probe::STATUS_FAIL => 'badge badge-danger',
+        'pass' => 'badge badge-success',
+        'warn' => 'badge badge-warning',
+        'fail' => 'badge badge-danger',
     ];
 
     $table = new html_table();
@@ -71,11 +71,31 @@ if ($run && confirm_sesskey()) {
         ];
     }
     echo html_writer::table($table);
+};
+
+if ($run && confirm_sesskey()) {
+    $rendertable(\local_ai_course_assistant\backend_probe::run_all());
 }
 
 echo $OUTPUT->single_button(
     new moodle_url($pageurl, ['run' => 1, 'sesskey' => sesskey()]),
     get_string('selftest:run', 'local_ai_course_assistant'),
+    'get'
+);
+
+// Soapbox object storage. Separate button because it performs real writes and
+// deletes against the configured bucket, which an admin should opt into rather
+// than have happen as a side effect of testing the chat backend.
+echo $OUTPUT->heading(get_string('selftest:storage_title', 'local_ai_course_assistant'), 3);
+echo html_writer::tag('p', get_string('selftest:storage_intro', 'local_ai_course_assistant'));
+
+if ($runstorage && confirm_sesskey()) {
+    $rendertable(\local_ai_course_assistant\soapbox_storage_probe::run_all());
+}
+
+echo $OUTPUT->single_button(
+    new moodle_url($pageurl, ['runstorage' => 1, 'sesskey' => sesskey()]),
+    get_string('selftest:storage_run', 'local_ai_course_assistant'),
     'get'
 );
 

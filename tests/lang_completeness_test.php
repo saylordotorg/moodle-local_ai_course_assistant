@@ -246,6 +246,10 @@ final class lang_completeness_test extends \basic_testcase {
      * the pages displayed before the extraction, so nothing regressed.
      */
     private const ADMIN_DIAGNOSTIC_UNTRANSLATED = [
+        // v7.4.3: Soapbox object-storage round-trip probe (admin-only page).
+        'selftest:storage_title',
+        'selftest:storage_intro',
+        'selftest:storage_run',
         // Administrator-only diagnostic-page strings, staged rather than
         // machine-translated: every locale falls back to lang/en, which is
         // byte-for-byte what those pages displayed before extraction, and

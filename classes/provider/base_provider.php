@@ -35,6 +35,14 @@ use local_ai_course_assistant\spend_guard;
 abstract class base_provider implements provider_interface {
 
     /**
+     * Cap on how much of a provider error body is retained, in bytes.
+     *
+     * Enough for any vendor's JSON error object, small enough that a provider
+     * returning an HTML error page cannot bloat the audit row.
+     */
+    private const ERROR_BODY_LIMIT = 2048;
+
+    /**
      * Providers that legitimately run without a SOLA-managed API key, and so
      * must not be refused by the credential guard in create_for_comparison():
      * a local ollama, coreai routing through Moodle's own AI subsystem, and
@@ -314,15 +322,18 @@ abstract class base_provider implements provider_interface {
 
         // v5.10.0: wrap the stream in the bounded transient-retry. A header
         // function captures the status before any body arrives; the write
-        // function swallows error-body bytes (status >= 400) so a clean 429/503
-        // rejection forwards zero real tokens and is safe to retry. A transport
-        // error (which may occur mid-stream) is thrown as non-transient and is
-        // never retried, so visible output cannot be duplicated.
+        // function diverts error-body bytes (status >= 400) away from the
+        // learner's stream into a bounded buffer, so a clean 429/503 rejection
+        // forwards zero real tokens and is safe to retry while the vendor's
+        // explanation is still available to the error path. A transport error
+        // (which may occur mid-stream) is thrown as non-transient and is never
+        // retried, so visible output cannot be duplicated.
         self::with_transient_retry(function () use ($url, $headers, $body, $writecallback) {
             global $CFG;
             require_once($CFG->libdir . '/filelib.php'); // For \curl.
             $status = 0;
             $retryafter = null;
+            $errbody = '';
             // Moodle's \curl wrapper reads proxy settings from $CFG and routes
             // through the organisation curl-security layer automatically, so the
             // previous manual CURLOPT_PROXY* wiring is gone. Streaming still works
@@ -344,9 +355,21 @@ abstract class base_provider implements provider_interface {
                     }
                     return strlen($header);
                 },
-                'CURLOPT_WRITEFUNCTION' => function ($ch, $data) use ($writecallback, &$status) {
+                'CURLOPT_WRITEFUNCTION' => function ($ch, $data) use ($writecallback, &$status, &$errbody) {
                     if ($status >= 400) {
-                        return strlen($data); // Swallow error body; keep call retry-safe.
+                        // Keep a BOUNDED copy of the error body instead of discarding it.
+                        // It must not reach the learner and must not be streamed, but
+                        // throwing it away is what made provider failures undiagnosable:
+                        // every streaming 4xx surfaced as "[HTTP 400: ]" with nothing
+                        // after the colon, because check_http_error() was called with a
+                        // hard-coded empty string. Vendors put the actual reason here --
+                        // "model not found", "temperature out of range", a quota message.
+                        // Issue #219 was a restored course pointing at a model that did
+                        // not exist; the provider said so and we deleted the sentence.
+                        if (strlen($errbody) < self::ERROR_BODY_LIMIT) {
+                            $errbody .= substr($data, 0, self::ERROR_BODY_LIMIT - strlen($errbody));
+                        }
+                        return strlen($data); // Still consume it all; keep the call retry-safe.
                     }
                     $writecallback($data);
                     return strlen($data);
@@ -372,7 +395,12 @@ abstract class base_provider implements provider_interface {
                 throw self::transient_http_exception(503, $retryafter);
             }
             if ($httpcode >= 400) {
-                $this->check_http_error($httpcode, '');
+                // Redact before it travels: provider error bodies echo request context
+                // and, on some vendors, a truncated key.
+                $this->check_http_error(
+                    $httpcode,
+                    \local_ai_course_assistant\security::redact_secrets($errbody)
+                );
             }
         }, 0);
     }
