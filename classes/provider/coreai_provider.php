@@ -175,6 +175,12 @@ class coreai_provider extends base_provider {
                 'prompt_tokens' => $prompttokens,
                 'completion_tokens' => $completiontokens,
                 'model' => 'moodle_core_ai',
+                // Name the provider like every other path does, or a coreai-served
+                // ancillary call falls back to config-derived attribution -- the exact
+                // thing v7.4.4 removed everywhere else. 'coreai' is honest about what
+                // served it even though core_ai does not disclose which vendor it
+                // routed to, which is also why 'moodle_core_ai' has no rate card.
+                'provider' => $this->provider_id(),
             ];
         } else {
             $this->lasttokenusage = null;

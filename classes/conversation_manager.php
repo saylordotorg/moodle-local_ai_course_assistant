@@ -194,6 +194,18 @@ class conversation_manager {
             $rolesql,
             [$conversationid]
         );
+        // v7.4.4 NOTE ON GROWTH: the role filter above means telemetry rows
+        // (mastery_signal, student_profile, speech_score, objective_extract,
+        // slide_vision, and the voice/quiz/RAG types) are NEVER evicted by this
+        // cap. That is deliberate and correct -- these rows are the financial
+        // ledger the spend dashboard reconciles against an invoice, and silently
+        // deleting them would reintroduce the undercount they exist to fix. But it
+        // does mean they are append-only: mastery_signal writes roughly one row per
+        // chat turn on mastery-enabled courses, so this table grows without bound
+        // in a way conversation history does not. If that becomes a problem the
+        // answer is an age-based retention task with an explicit policy, NOT
+        // widening this cap, which would trade a storage question for a
+        // reporting-accuracy one.
         if ($totalcount > 100) {
             $excess  = $totalcount - 100;
             $oldest  = $DB->get_records_select(

@@ -87,7 +87,10 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // openai_whisper, openai_stt,
 // xai_stt                       -> voice_stt
 // embedding, embed              -> rag
-// meta                          -> analytics
+// meta, meta_scheduled          -> analytics
+// mastery_signal, student_profile -> personalisation
+// speech_score, slide_vision    -> soapbox
+// objective_extract             -> authoring
 // anything else                 -> other
 
 $categorysql = "CASE
@@ -95,7 +98,10 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('openai_tts','xai_tts')                     THEN 'voice_tts'
     WHEN m.interaction_type IN ('openai_whisper','openai_stt','xai_stt','selfhosted_stt')    THEN 'voice_stt'
     WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'
-    WHEN m.interaction_type IN ('meta')                                     THEN 'analytics'
+    WHEN m.interaction_type IN ('meta','meta_scheduled')                    THEN 'analytics'
+    WHEN m.interaction_type IN ('mastery_signal','student_profile')          THEN 'personalisation'
+    WHEN m.interaction_type IN ('speech_score','slide_vision')               THEN 'soapbox'
+    WHEN m.interaction_type IN ('objective_extract')                         THEN 'authoring'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
     WHEN m.interaction_type IN ('quiz')                                     THEN 'quiz'
     WHEN m.interaction_type IN ('chat') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'

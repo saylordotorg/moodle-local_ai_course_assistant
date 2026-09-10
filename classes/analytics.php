@@ -499,12 +499,23 @@ class analytics {
         // deliberate and unchanged: capability_sql is ANDed on AFTER this
         // predicate, so per-capability caps still exclude them while the
         // site-wide total, the anomaly detector and the dashboard now see them.
+        // v7.4.4 adds five more calls that were billed and counted by nothing:
+        // mastery_signal, student_profile, speech_score, objective_extract and
+        // slide_vision. Each is a real provider round-trip whose usage row existed
+        // nowhere until now.
+        //
+        // Note every one of those names carries an underscore. sse.php:111 reads a
+        // CLIENT-supplied interaction_type with PARAM_ALPHA, which strips
+        // underscores, so a learner cannot forge one of these onto their own
+        // role='assistant' row. Keep that property when adding more.
         return "({$alias}.role = 'assistant'
                  OR ({$alias}.role = 'system' AND {$alias}.interaction_type IN (
                      'embedding', 'rerank', 'quiz',
                      'voice', 'openai_tts', 'xai_tts',
                      'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt',
-                     'flashcards', 'essay', 'insights')))";
+                     'flashcards', 'essay', 'insights',
+                     'mastery_signal', 'student_profile', 'speech_score',
+                     'objective_extract', 'slide_vision')))";
     }
 
     /**

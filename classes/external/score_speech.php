@@ -210,6 +210,17 @@ class score_speech extends external_api {
                     ],
                 ]
             );
+            // The most expensive of the ancillary calls: the transcript is clamped
+            // to 40,000 chars plus up to 8,000 of slide text, so this prompt is
+            // large. Logged before the parse-error return further down -- a speech
+            // whose JSON did not decode still cost the full prompt.
+            //
+            // The label names the event only. v6.7.0 deliberately stores neither
+            // the audio nor the transcript, and this row must not become the place
+            // either reappears.
+            \local_ai_course_assistant\conversation_manager::log_ancillary_usage(
+                $provider, (int) $USER->id, $courseid, 'speech_score', '[Speech] scored against rubric'
+            );
         } catch (\Throwable $e) {
             // Do not discard the reason. Three of the things that land here are
             // deliberate policy refusals -- emergency stop, quiz lock, exhausted

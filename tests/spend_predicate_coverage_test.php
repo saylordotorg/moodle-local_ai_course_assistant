@@ -69,6 +69,22 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
             'insights'   => 'generate_insights via log_ancillary_usage',
             'embedding'  => 'base_embedding_provider::log_embedding_cost',
             'rerank'     => 'voyage_reranker::log_rerank_cost',
+            // v7.4.4: five calls that were billed and counted by nothing.
+            'mastery_signal'    => 'conversation_classifier::classify_and_record',
+            'student_profile'   => 'student_profile_manager::generate_profile',
+            'speech_score'      => 'external\\score_speech::execute',
+            'objective_extract' => 'objective_manager::extract_via_llm',
+            'slide_vision'      => 'soapbox_slide_vision::design_note',
+            // Pre-existing gap closed while here: seven voice types have been in
+            // the predicate since v7.3.3 and none were listed, so this lint's
+            // coverage was narrower than its docblock claimed.
+            'voice'           => 'sse.php voice-mode rows',
+            'openai_tts'      => 'tts.php via voice_registry::interaction_type',
+            'xai_tts'         => 'tts.php via voice_registry::interaction_type',
+            'openai_whisper'  => 'transcribe.php via voice_registry::interaction_type',
+            'openai_stt'      => 'transcribe.php via voice_registry::interaction_type',
+            'xai_stt'         => 'transcribe.php via voice_registry::interaction_type',
+            'selfhosted_stt'  => 'transcribe.php via voice_registry::interaction_type',
         ];
 
         $missing = [];
