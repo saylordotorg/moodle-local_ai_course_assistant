@@ -202,7 +202,17 @@ function local_ai_course_assistant_extend_navigation_course(
             $course->id,
             false
         );
+        // v7.4.3: an assignment placed on the course page as a url activity must not
+        // ALSO appear here, or the same thing is listed twice in two places with no
+        // indication they are the same. Resolved in one query for the whole course --
+        // this callback runs on every course page load, so a lookup per assignment
+        // would add a query per assignment to every view.
+        $placed = \local_ai_course_assistant\soapbox_course_link::placed_in_course($course->id);
+
         foreach ($assignments as $assign) {
+            if (isset($placed[$assign->id])) {
+                continue;
+            }
             $navigation->add(
                 format_string($assign->name),
                 new moodle_url('/local/ai_course_assistant/soapbox_present.php', ['id' => $assign->id]),

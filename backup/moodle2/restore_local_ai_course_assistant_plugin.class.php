@@ -768,6 +768,64 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     }
 
     /**
+     * Repoint any placed Soapbox url activity at the restored assignment.
+     *
+     * v7.4.3 lets a teacher put a Soapbox assignment on the course page as a core
+     * url activity whose externalurl carries the assignment id. The url module
+     * restores that string verbatim -- and a local plugin cannot register a backup
+     * link encoder, because encode_content_links() exists only on the course,
+     * activity and block tasks. So without this, duplicating a course leaves the
+     * copy's activity pointing at the ORIGINAL course's assignment: it opens, it
+     * looks right, and every recording lands against the wrong course.
+     *
+     * Idempotent, because after_restore_section() aliases this method and the
+     * restore dispatches it once per section: a URL already carrying a mapped id
+     * simply maps to itself on the second pass.
+     *
+     * @return void
+     */
+    private function remap_soapbox_course_links(): void {
+        global $DB;
+
+        $courseid = $this->task->get_courseid();
+
+        // cm.id leads the SELECT so rows cannot collapse on a repeated key.
+        $sql = "SELECT cm.id AS cmid, u.id AS urlid, u.externalurl
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = 'url'
+                  JOIN {url} u ON u.id = cm.instance
+                 WHERE cm.course = :courseid";
+        $rows = $DB->get_records_sql($sql, ['courseid' => $courseid]);
+
+        foreach ($rows as $row) {
+            $oldid = \local_ai_course_assistant\soapbox_course_link::assign_id_from_url(
+                (string) $row->externalurl
+            );
+            if ($oldid === null) {
+                continue;
+            }
+
+            $newid = $this->get_mappingid('aica_sbx_assign', $oldid);
+            if (!$newid) {
+                // No mapping means the assignment did not come across -- an import
+                // or merge restore never carries Soapbox rows. LEAVE IT ALONE: a
+                // stale-but-honest link into the source course is strictly better
+                // than a rewritten link into whatever assignment happens to hold
+                // that id here. Guessing would silently attach learners' recordings
+                // to an unrelated assignment.
+                continue;
+            }
+
+            $DB->set_field(
+                'url',
+                'externalurl',
+                \local_ai_course_assistant\soapbox_course_link::present_url((int) $newid),
+                ['id' => $row->urlid]
+            );
+        }
+    }
+
+    /**
      * Resolve everything that needed a course-module mapping.
      *
      * Dispatched by restore_plugin::launch_after_restore_methods(), which runs
@@ -779,6 +837,8 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
      */
     public function after_restore_course() {
         global $DB;
+
+        $this->remap_soapbox_course_links();
 
         foreach ($this->deferredquizcfg as $row) {
             $cmid = $this->get_mappingid('course_module', $row->cmid);
