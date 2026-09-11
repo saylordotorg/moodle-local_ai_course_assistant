@@ -2242,6 +2242,22 @@ if ($hassiteconfig) {
         get_string('settings:mastery_heading', 'local_ai_course_assistant'),
         get_string('settings:mastery_heading_desc', 'local_ai_course_assistant')
     ));
+
+    // The objectives themselves, and the per-course mastery toggles, live on
+    // objectives_admin.php -- which had no link from anywhere in these settings,
+    // so the only way to reach it was to know the URL. Accessed without a
+    // courseid it renders a course picker (v5.1.7), so a bare link works.
+    $objectivesadminurl = new moodle_url('/local/ai_course_assistant/objectives_admin.php');
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/objectives_admin_link',
+        get_string('objectives:title', 'local_ai_course_assistant'),
+        get_string('settings:objectives_admin_link_desc', 'local_ai_course_assistant')
+        . ' ' . html_writer::link(
+            $objectivesadminurl,
+            get_string('settings:objectives_admin_link', 'local_ai_course_assistant'),
+            ['class' => 'btn btn-secondary btn-sm']
+        )
+    ));
     // Mastery-dependent feature defaults (moved here from the pedagogy list so the
     // toggles sit with the mastery knobs they depend on). Each is a site-wide
     // default; per-course overrides remain authoritative. Default off.
