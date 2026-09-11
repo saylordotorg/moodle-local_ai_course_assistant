@@ -819,9 +819,23 @@ if ($hassiteconfig) {
     // migration insurance only -- one projection means the query model can be
     // changed without re-embedding.
     //
-    // The default is still 'shared' because flipping it changes retrieval
-    // behaviour on every existing Voyage install and wants its own signed-off
-    // commit; the help text now says plainly which one to pick.
+    // v7.4.5: the DEFAULT is now 'asymmetric'. It had been 'shared', which is
+    // the arm that measures 24.1 pp WORSE on voyage-4-large and 10.2 pp worse
+    // than the OpenAI index a migration replaces
+    // (.drafts/sola-voyage4-input-type-benchmark-2026-09-10.md). Shipping the
+    // losing arm as the default is the defect; this is the fix.
+    //
+    // The default is FOUR values that have to agree, not one: this argument,
+    // the option order below, the empty-config fallback in
+    // voyage_embedding_provider::resolve_input_type(), and the prose that
+    // states the default. Flipping this argument alone leaves a fresh site
+    // resolving to 'shared' at runtime while this page renders 'asymmetric',
+    // which is worse than the bug it replaces because the page looks right.
+    //
+    // Moodle's admin_apply_default_settings() writes a default only where no
+    // value is stored, so this binds NEW installs and never reaches a site that
+    // explicitly saved 'shared'. No db/upgrade.php step ships with it. A site
+    // that does find itself on 'shared' fixes it here; no reindex is needed.
     //
     // NOT to be confused with asymmetric model PAIRING (indexing with a bigger
     // Voyage model than you query with), which is the thing that did not
@@ -835,12 +849,12 @@ if ($hassiteconfig) {
         'local_ai_course_assistant/embed_input_type_mode',
         get_string('settings:embed_input_type_mode', 'local_ai_course_assistant'),
         get_string('settings:embed_input_type_mode_desc', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED,
+        \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_ASYMMETRIC,
         [
-            \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED =>
-                get_string('settings:embed_input_type_shared', 'local_ai_course_assistant'),
             \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_ASYMMETRIC =>
                 get_string('settings:embed_input_type_asymmetric', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED =>
+                get_string('settings:embed_input_type_shared', 'local_ai_course_assistant'),
         ]
     ));
 

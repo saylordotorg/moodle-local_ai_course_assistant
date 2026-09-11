@@ -156,8 +156,9 @@ class rag_retriever {
         // other providers (OpenAI, Ollama) have only embed(). Whether the
         // Voyage query call actually asks for a different projection from the
         // document call is the provider's business and is now a setting
-        // (embed_input_type_mode, shared by default, though asymmetric is the
-        // option that measures better; see voyage_embedding_provider). Either way
+        // (embed_input_type_mode, asymmetric by default since v7.4.5 because
+        // that is the option that measures better; see
+        // voyage_embedding_provider). Either way
         // this call site is unchanged: it asks for "a query vector".
         $provider = base_embedding_provider::create_from_config();
         if ($provider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider) {
