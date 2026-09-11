@@ -78,6 +78,9 @@ if ($hassiteconfig) {
     // v7.4.0: the model registry is where an unpriced model -- the state that
     // made every production chat call report $0.00 -- is visible and fixable.
     $modelregistrylinkurl = new moodle_url('/local/ai_course_assistant/model_registry.php');
+    // provider_benchmark.php had no inbound link from any page -- only its own
+    // admin/cli twin referenced it -- so the web version was reachable by URL only.
+    $providerbenchurl = new moodle_url('/local/ai_course_assistant/provider_benchmark.php');
     $quicklinks = '<a href="' . $analyticsurl->out() . '">'
             . get_string('toc:analytics', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $tokenanalyticsurl->out() . '">'
@@ -90,6 +93,8 @@ if ($hassiteconfig) {
             . \local_ai_course_assistant\branding::str('auditlog:settings_link') . '</a>'
         . '<a href="' . $modelregistrylinkurl->out() . '">'
             . \local_ai_course_assistant\branding::str('modelregistry:settings_link') . '</a>'
+        . '<a href="' . $providerbenchurl->out() . '">'
+            . get_string('toc:providerbenchmark', 'local_ai_course_assistant') . '</a>'
         . '<a href="' . $emergencyurl->out() . '" style="color:#b91c1c;font-weight:600">'
             . get_string('emergency:settings_link', 'local_ai_course_assistant') . '</a>';
 

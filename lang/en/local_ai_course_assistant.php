@@ -2819,6 +2819,7 @@ $string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again
 // --- from newstrings_e.php ---
 // settings.php — page/nav chrome and select options (i18n extraction batch E).
 $string['settingspage:pagetitle'] = 'Settings';
+$string['toc:providerbenchmark'] = 'Provider benchmark';
 $string['toc:playground'] = 'Prompt Playground';
 $string['toc:course_ai_settings'] = '{$a} AI settings';
 $string['settingspage:analytics_blurb'] = 'Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.';
