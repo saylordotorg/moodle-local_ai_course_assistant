@@ -201,19 +201,45 @@ class faq_manager {
 
         // Build every row before touching the table, so a provider failure
         // halfway through leaves the existing index intact.
-        $records = [];
-        foreach (array_values($entries) as $idx => $entry) {
+        // v7.4.5: ONE batched call rather than one call per pair.
+        //
+        // This used to loop embed() per Q/A pair, so a 17-pair FAQ meant 17
+        // sequential requests -- seventeen chances to trip a rate limit, for a
+        // run that is all-or-nothing and restarts from pair 1 every time. In
+        // production a concurrent bulk re-embed was enough to make the FAQ
+        // permanently un-embeddable: it failed at pair 4 on every attempt.
+        // embed_batch() is on the base class and every provider implements it,
+        // so this is one request with the same result. Paired with the transient
+        // retry now in base_embedding_provider, the failure mode is gone rather
+        // than merely less likely.
+        $texts = [];
+        foreach (array_values($entries) as $entry) {
             $text = 'Q: ' . $entry['question'] . "\nA: " . $entry['answer'];
             // Sanitised on the same terms as course material. The FAQ is
             // admin-authored rather than learner-authored, but it is still text
             // that re-enters the prompt at retrieval time.
             $sanitized = \local_ai_course_assistant\security::sanitize_rag_chunk($text);
-            try {
-                $vector = $provider->embed($sanitized['text']);
-            } catch (\Throwable $e) {
-                $out['error'] = 'embedding failed on pair ' . ($idx + 1) . ': ' . $e->getMessage();
-                return $out;
-            }
+            $texts[] = $sanitized['text'];
+        }
+
+        try {
+            $vectors = $provider->embed_batch($texts);
+        } catch (\Throwable $e) {
+            $out['error'] = 'embedding failed: ' . $e->getMessage();
+            return $out;
+        }
+        if (count($vectors) !== count($texts)) {
+            // A short batch would silently drop pairs from the index, so refuse
+            // rather than write a partial FAQ that looks complete.
+            $out['error'] = 'embedding returned ' . count($vectors) . ' vector(s) for '
+                . count($texts) . ' pair(s)';
+            return $out;
+        }
+
+        $records = [];
+        foreach ($texts as $idx => $sanitizedtext) {
+            $sanitized = ['text' => $sanitizedtext];
+            $vector = $vectors[$idx] ?? null;
             if (empty($vector)) {
                 $out['error'] = 'embedding returned nothing for pair ' . ($idx + 1);
                 return $out;

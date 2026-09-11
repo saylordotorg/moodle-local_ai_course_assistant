@@ -426,8 +426,13 @@ final class rag_harness_test extends \basic_testcase {
         // loop, or a refused run still pays for embeddings.
         $guard = strpos($src, "if (\$setgrade['blocked'])");
         $this->assertNotFalse($guard, 'the harness must act on the blocked grade');
-        $provider = strpos($src, 'base_embedding_provider::create_from_config()');
-        $this->assertNotFalse($provider);
+        // Match the CALL SITE, not any mention of it. The script's docblock now
+        // names create_from_config() when explaining which arms write live
+        // config, and a bare strpos() found that prose first and reported the
+        // guard as too late while nothing had actually moved.
+        $this->assertSame(1, preg_match('/=\s*base_embedding_provider::create_from_config\(\);/', $src, $m,
+            PREG_OFFSET_CAPTURE), 'the harness must build a provider somewhere');
+        $provider = $m[0][1];
         $this->assertLessThan($provider, $guard,
             'the small-set guard must run before any provider is built or any call is paid for');
         $this->assertStringContainsString('--allow-small-set', $src,
