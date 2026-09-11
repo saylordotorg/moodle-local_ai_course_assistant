@@ -74,9 +74,13 @@ class counting_reranker extends voyage_reranker {
  *  2. A skipped rerank must not call the reranker AT ALL, and must leave a
  *     telemetry row saying why -- otherwise a working gate and an expired API
  *     key look identical (both are "spend went down").
- *  3. Voyage sends ONE input_type for queries and documents by default. The
- *     asymmetric projection failed to reproduce twice and a shared space is
- *     migration insurance; see voyage_embedding_provider's docblock.
+ *  3. Voyage sends the vendor's separate query projection by default as of
+ *     v7.4.5, because that is the better retriever: it measures +30.8 pp
+ *     (voyage-3.5) and +24.1 pp (voyage-4-large) against sending one
+ *     input_type for both sides. Shared remains available as migration
+ *     insurance, and an unrecognized mode still resolves to it. What failed to
+ *     reproduce was asymmetric model PAIRING, a different mechanism; see
+ *     voyage_embedding_provider's docblock.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University
@@ -369,13 +373,42 @@ final class rag_rerank_gate_test extends \advanced_testcase {
 
     // ----------------------------------------------- shared embedding space.
 
-    public function test_shared_mode_is_the_default(): void {
+    /**
+     * v7.4.5: asymmetric is the shipped default, and this is the test that
+     * pins it. Through v7.4.4 this asserted 'document' for both sides, i.e.
+     * shared -- the arm measured 24.1 pp worse on voyage-4-large. The default
+     * resolves HERE, in resolve_input_type(), independently of settings.php,
+     * so a site with no stored value is decided by this code path and not by
+     * the admin_setting default argument. The two must agree.
+     */
+    public function test_asymmetric_mode_is_the_default(): void {
         $this->resetAfterTest();
         unset_config('embed_input_type_mode', 'local_ai_course_assistant');
+        $this->assertSame('query', voyage_embedding_provider::resolve_input_type('query'));
+        $this->assertSame('document', voyage_embedding_provider::resolve_input_type('document'));
+    }
+
+    /**
+     * An explicitly saved 'shared' is still honoured.
+     *
+     * The flip binds new installs only. A site that chose shared on purpose,
+     * mid-migration, must keep it.
+     */
+    public function test_explicit_shared_mode_is_still_honoured(): void {
+        $this->resetAfterTest();
+        set_config('embed_input_type_mode', 'shared', 'local_ai_course_assistant');
         $this->assertSame('document', voyage_embedding_provider::resolve_input_type('query'));
         $this->assertSame('document', voyage_embedding_provider::resolve_input_type('document'));
     }
 
+    /**
+     * A typo resolves to shared, NOT to the shipped default.
+     *
+     * Deliberate and unchanged by the v7.4.5 flip: an unvalidated value reaches
+     * an outbound payload, and a corrupt setting should fail toward the
+     * projection the corpus was indexed with rather than toward a second one.
+     * This is a validation rule, not a statement about the default.
+     */
     public function test_unrecognized_mode_resolves_to_shared(): void {
         $this->resetAfterTest();
         set_config('embed_input_type_mode', 'ASYMETRIC-typo', 'local_ai_course_assistant');
@@ -393,7 +426,9 @@ final class rag_rerank_gate_test extends \advanced_testcase {
         $this->resetAfterTest();
         set_config('embed_provider', 'voyage', 'local_ai_course_assistant');
         set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
-        unset_config('embed_input_type_mode', 'local_ai_course_assistant');
+        // v7.4.5: shared is no longer the default, so this test that is ABOUT
+        // shared mode must now ask for it explicitly.
+        set_config('embed_input_type_mode', 'shared', 'local_ai_course_assistant');
 
         $provider = new voyage_embedding_provider();
         $doc = $provider->build_embed_payload(['a chunk of course material'], 'document');
@@ -423,7 +458,9 @@ final class rag_rerank_gate_test extends \advanced_testcase {
         set_config('embed_provider', 'voyage', 'local_ai_course_assistant');
         set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
         set_config('embed_query_model', 'voyage-4-lite', 'local_ai_course_assistant');
-        unset_config('embed_input_type_mode', 'local_ai_course_assistant');
+        // v7.4.5: shared is no longer the default, so this test that is ABOUT
+        // shared mode must now ask for it explicitly.
+        set_config('embed_input_type_mode', 'shared', 'local_ai_course_assistant');
 
         $provider = new voyage_embedding_provider();
         $this->assertSame('voyage-4-large', $provider->build_embed_payload(['x'], 'document')['model']);
@@ -435,7 +472,9 @@ final class rag_rerank_gate_test extends \advanced_testcase {
         set_config('embed_provider', 'voyage', 'local_ai_course_assistant');
         set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
         set_config('embed_dtype', 'int8', 'local_ai_course_assistant');
-        unset_config('embed_input_type_mode', 'local_ai_course_assistant');
+        // v7.4.5: shared is no longer the default, so this test that is ABOUT
+        // shared mode must now ask for it explicitly.
+        set_config('embed_input_type_mode', 'shared', 'local_ai_course_assistant');
 
         $provider = new voyage_embedding_provider();
         $doc = $provider->build_embed_payload(['x'], 'document');

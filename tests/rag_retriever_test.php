@@ -149,6 +149,34 @@ final class rag_retriever_test extends \advanced_testcase {
         $this->assertSame(0.9, $out[0]['score']); // best score preserved
     }
 
+    /**
+     * A duplicated sibling list must not double the text it feeds the model.
+     *
+     * On a migrated index every logical chunk exists twice -- once per
+     * embed_model -- and the sibling query used to load both. content_chunker's
+     * overlap dedupe caps at 100 words, so a duplicated ~1,000-character chunk
+     * is only partly stripped and the remainder is emitted twice.
+     */
+    public function test_merge_parents_drops_duplicate_chunkindexes() {
+        $prefix = "[U1] Intro: ";
+        // Same chunkindexes twice, as two coexisting embedding generations
+        // produce.
+        $siblings = [510 => [
+            ['content' => $prefix . "alpha beta gamma", 'chunkindex' => 0],
+            ['content' => $prefix . "alpha beta gamma", 'chunkindex' => 0],
+            ['content' => $prefix . "beta gamma delta epsilon", 'chunkindex' => 1],
+            ['content' => $prefix . "beta gamma delta epsilon", 'chunkindex' => 1],
+        ]];
+        $topk = [
+            ['content' => $prefix . "beta gamma delta epsilon", 'score' => 0.9, 'cmid' => 510, 'chunkindex' => 1],
+        ];
+        $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, $siblings, 'page', 1, 6000);
+        $this->assertCount(1, $out);
+        $this->assertSame(2, $out[0]['expanded_from'], 'duplicate chunkindexes were not collapsed');
+        // Byte-identical to the un-duplicated expansion.
+        $this->assertSame($prefix . "alpha beta gamma delta epsilon", $out[0]['content']);
+    }
+
     public function test_merge_parents_passthrough_without_cmid() {
         $topk = [['content' => 'x', 'score' => 0.7, 'cmid' => null, 'chunkindex' => 0]];
         $out = \local_ai_course_assistant\rag_retriever::merge_parents($topk, [], 'page', 1, 6000);

@@ -809,22 +809,52 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
-    // v7.4.0: Voyage-only query/document projection. Default 'shared' sends the
-    // same input_type for both sides so a query and the corpus stay in one
-    // embedding space; 'asymmetric' restores the vendor's separate query
-    // projection, which has failed to reproduce a gain on this corpus twice.
+    // v7.4.0: Voyage-only query/document projection. 'asymmetric' sends the
+    // vendor's separate query projection (input_type=query on retrieval,
+    // document on indexing) and is the option that MEASURES BEST, twice:
+    // +30.8 pp R@3 on voyage-3.5, 1,008 production-shaped fixtures, 2026-08-21
+    // (.drafts/sola-rag-rerank-benchmark-2026-08-21.md 5b), and +24.1 pp on
+    // voyage-4-large @2048, 816 production-shaped fixtures, 2026-09-10.
+    // 'shared' sends document for both sides; it retrieves worse and is
+    // migration insurance only -- one projection means the query model can be
+    // changed without re-embedding.
+    //
+    // v7.4.5: the DEFAULT is now 'asymmetric'. It had been 'shared', which is
+    // the arm that measures 24.1 pp WORSE on voyage-4-large and 10.2 pp worse
+    // than the OpenAI index a migration replaces
+    // (.drafts/sola-voyage4-input-type-benchmark-2026-09-10.md). Shipping the
+    // losing arm as the default is the defect; this is the fix.
+    //
+    // The default is FOUR values that have to agree, not one: this argument,
+    // the option order below, the empty-config fallback in
+    // voyage_embedding_provider::resolve_input_type(), and the prose that
+    // states the default. Flipping this argument alone leaves a fresh site
+    // resolving to 'shared' at runtime while this page renders 'asymmetric',
+    // which is worse than the bug it replaces because the page looks right.
+    //
+    // Moodle's admin_apply_default_settings() writes a default only where no
+    // value is stored, so this binds NEW installs and never reaches a site that
+    // explicitly saved 'shared'. No db/upgrade.php step ships with it. A site
+    // that does find itself on 'shared' fixes it here; no reindex is needed.
+    //
+    // NOT to be confused with asymmetric model PAIRING (indexing with a bigger
+    // Voyage model than you query with), which is the thing that did not
+    // reproduce a gain on this corpus (a wash for voyage-4-lite, 1.0 pp worse
+    // for voyage-4) and is governed by embed_query_model. Conflating the two is
+    // what put a warning against the winning option on this page.
+    //
     // Switching modes needs no reindex: shared mode reuses the value the corpus
     // was already indexed with, so only the query-side projection changes.
     $settings->add(new admin_setting_configselect(
         'local_ai_course_assistant/embed_input_type_mode',
         get_string('settings:embed_input_type_mode', 'local_ai_course_assistant'),
         get_string('settings:embed_input_type_mode_desc', 'local_ai_course_assistant'),
-        \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED,
+        \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_ASYMMETRIC,
         [
-            \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED =>
-                get_string('settings:embed_input_type_shared', 'local_ai_course_assistant'),
             \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_ASYMMETRIC =>
                 get_string('settings:embed_input_type_asymmetric', 'local_ai_course_assistant'),
+            \local_ai_course_assistant\embedding_provider\voyage_embedding_provider::INPUT_MODE_SHARED =>
+                get_string('settings:embed_input_type_shared', 'local_ai_course_assistant'),
         ]
     ));
 

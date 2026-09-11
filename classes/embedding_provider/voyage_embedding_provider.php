@@ -31,21 +31,58 @@ namespace local_ai_course_assistant\embedding_provider;
  * asymmetric retrieval — is the vendor's suggested optimization, and this
  * adapter did it unconditionally from v5.11.0 to v7.3.x.
  *
- * It is now OFF by default, and that is deliberate, not an oversight. The gain
- * has failed to reproduce on the SOLA corpus TWICE: 2026-08-21 it was a wash
- * for voyage-4-lite and 1.0 pp WORSE for voyage-4 than querying with the model
- * that indexed (see embedding_compat::SHARED_SPACES), and the re-measurement on
- * the RAG fixture set found the same. So the asymmetric projection buys nothing
- * measurable here while costing something real: queries and documents then live
- * in two differently-projected spaces and are comparable only through whatever
- * projection the vendor happens to ship. One shared space is migration
- * insurance — both sides embedded the same way stay comparable to each other
- * across a model change, and a future re-projection is one reindex instead of
- * two mutually incompatible halves.
+ * It is worth having ON, and that holds across two model generations. Measured
+ * directly on 2026-08-21 by embedding the identical queries both ways against
+ * the identical cached document vectors (voyage-3.5, 1,008 production-shaped
+ * fixtures): `input_type: query` scored 61.0% R@3 against 30.2% for `document`,
+ * a 30.8 pp penalty for getting it wrong, and `query` won in EVERY query-length
+ * bucket, from -19.9 pp on the shortest to -43.3 pp in the middle
+ * (`.drafts/sola-rag-rerank-benchmark-2026-08-21.md` section 5b). Re-measured
+ * independently on 2026-09-10 through the production harness (voyage-4-large
+ * @2048, 816 production-shaped fixtures): 66.7% against 42.6%, +24.1 pp. Same
+ * direction, same order of magnitude, different model. The asymmetric
+ * projection is doing real work.
  *
- * `embed_input_type_mode` (shared|asymmetric, default shared) selects. It is a
- * setting rather than a constant so the choice is reversible without a code
- * deploy; anything unrecognized resolves to shared.
+ * DO NOT CONFUSE THIS WITH ASYMMETRIC MODEL PAIRING. The thing that did not
+ * reproduce on the SOLA corpus is a different mechanism: embedding DOCUMENTS
+ * with a larger Voyage model than QUERIES (a wash for voyage-4-lite, 1.0 pp
+ * WORSE for voyage-4; a follow-up in-product run at n=30 agreed but is too
+ * small to count as a second independent measurement).
+ * embedding_compat::SHARED_SPACES records that measurement, and it is about
+ * model pairing, not about input_type; pairing is governed by
+ * `embed_query_model`. This docblock used to cite that result as evidence about
+ * input_type, and the settings help text inherited the same conflation and told
+ * operators to avoid the option that wins by 24-31 pp.
+ *
+ * The cost of asymmetric is real but narrow: queries and documents live in two
+ * differently-projected spaces, comparable only through whatever projection the
+ * vendor ships. One shared space is migration insurance — both sides embedded
+ * the same way stay comparable across a model change, so a query-model change
+ * is not a reindex.
+ *
+ * `embed_input_type_mode` (shared|asymmetric) selects. As of v7.4.5 the
+ * shipped DEFAULT is ASYMMETRIC. It was shared through v7.4.4, which meant the
+ * plugin shipped the arm that measures 24.1 pp worse on voyage-4-large and
+ * 10.2 pp worse than the OpenAI index a migration replaces; that was the
+ * defect, not a conservative choice.
+ *
+ * The default lives in FOUR places that must agree, because two of them
+ * resolve independently of each other: the admin_setting default argument and
+ * the option order in settings.php, the empty-config fallback in
+ * resolve_input_type() below, and the prose (here, settings.php, and the
+ * lang/en help string) that states what the default is. Changing the settings
+ * page alone gives a site with no stored value SHARED at runtime while the
+ * settings page displays ASYMMETRIC.
+ *
+ * The flip binds NEW installs only: admin_apply_default_settings() writes a
+ * default where no value is stored, so it never reaches a site that explicitly
+ * saved 'shared'. No db/upgrade.php step ships with it.
+ *
+ * It is a setting rather than a constant so the choice is reversible without a
+ * code deploy. An unset or empty value takes the default; anything
+ * unrecognized still resolves to shared, which is a validation fallback rather
+ * than a statement about the default, and is deliberately the conservative
+ * direction for a corrupt value.
  *
  * Shared mode sends "document" for BOTH sides on purpose: that is the value the
  * existing corpus was indexed with, so flipping the mode needs no reindex —
@@ -171,14 +208,18 @@ class voyage_embedding_provider extends base_embedding_provider {
     /**
      * Wire input_type for a logical side of the call.
      *
-     * Shared mode (the default — see the class docblock for why) sends one
+     * Asymmetric mode (the default since v7.4.5 — see the class docblock for
+     * the measurement) sends the vendor's per-side value. Shared mode sends one
      * input_type for both sides so queries and documents share an embedding
-     * space. Asymmetric mode sends the vendor's per-side value.
+     * space; it retrieves worse and exists as migration insurance.
      *
      * Pure when $mode is supplied, which is how the tests pin it; passing null
-     * reads embed_input_type_mode. An unset, empty or unrecognized mode is
-     * shared: this value reaches an outbound payload and decides whether the
-     * corpus is queryable, so it must never propagate unvalidated.
+     * reads embed_input_type_mode. An unset or empty mode takes the shipped
+     * default, asymmetric. An UNRECOGNIZED mode still resolves to shared: this
+     * value reaches an outbound payload and decides whether the corpus is
+     * queryable, so it must never propagate unvalidated, and a typo should fail
+     * toward the projection the corpus was indexed with rather than toward a
+     * second one. That is a validation rule, not the default.
      *
      * @param string $requested Logical side: 'document' or 'query'.
      * @param string|null $mode Explicit mode, or null to read config.
@@ -191,8 +232,12 @@ class voyage_embedding_provider extends base_embedding_provider {
 
         if ($mode === null) {
             $raw = get_config('local_ai_course_assistant', 'embed_input_type_mode');
+            // v7.4.5: this fallback IS the default on a site that has never
+            // saved the setting, and it resolves without ever consulting
+            // settings.php. It must be kept in step with the admin_setting
+            // default argument there or the two disagree silently.
             $mode = ($raw === false || trim((string) $raw) === '')
-                ? self::INPUT_MODE_SHARED
+                ? self::INPUT_MODE_ASYMMETRIC
                 : strtolower(trim((string) $raw));
         } else {
             $mode = strtolower(trim($mode));
@@ -294,8 +339,9 @@ class voyage_embedding_provider extends base_embedding_provider {
      *
      * "query" is the LOGICAL side of the call, which picks the query model and
      * the query dtype. Whether "query" or "document" goes on the wire is
-     * decided by embed_input_type_mode — shared by default, so by default this
-     * embeds into the same space as the documents. See the class docblock.
+     * decided by embed_input_type_mode — asymmetric since v7.4.5, so by default
+     * this now sends input_type=query and uses Voyage's separate query
+     * projection. See the class docblock.
      *
      * @param string $text
      * @return float[]
@@ -414,7 +460,9 @@ class voyage_embedding_provider extends base_embedding_provider {
      *
      * $inputtype is the LOGICAL side of the call. It selects the model and the
      * dtype; the input_type that goes on the wire is resolve_input_type()'s
-     * business and, in the default shared mode, is the same for both sides.
+     * business. Since v7.4.5 the default is asymmetric, so by default the wire
+     * value tracks this argument; in shared mode it is 'document' for both
+     * sides regardless.
      *
      * @param string[] $batch Texts for this request.
      * @param string $inputtype Logical side: 'document' or 'query'.

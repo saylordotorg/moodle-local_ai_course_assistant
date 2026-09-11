@@ -42,10 +42,12 @@ class faq_manager {
      * that was a third of the fixed overhead standing between the budget and
      * the retrieved course content, and it was pushing real passages out.
      *
-     * Retrieval is only used when there is an index to retrieve from. If RAG is
-     * off, or the FAQ has never been embedded, or an administrator has edited it
-     * since, the caller falls back to injecting it -- a site must never silently
-     * lose its FAQ, or keep answering from one that was already changed.
+     * Retrieval is only used when there is an index to retrieve from AND the
+     * retriever can actually score it. If RAG is off, or the FAQ has never been
+     * embedded, or an administrator has edited it since, or its chunks were
+     * embedded with a model the live query model cannot be compared against,
+     * the caller falls back to injecting it -- a site must never silently lose
+     * its FAQ, or keep answering from one that was already changed.
      *
      * Deliberately not memoized. It is one indexed lookup against a model call,
      * and a cached answer would go stale inside cron and between tests for no
@@ -82,10 +84,47 @@ class faq_manager {
             return false;
         }
 
-        return $DB->record_exists('local_ai_course_assistant_chunks', [
-            'courseid' => SITEID,
-            'modtype' => self::MODTYPE,
-        ]);
+        // v7.4.5: the rows must not merely EXIST, they must be scoreable by the
+        // live query model. record_exists() alone reintroduced the exact
+        // double-miss this method was written to prevent, through a door it did
+        // not check: an embedding-model migration leaves the site FAQ indexed
+        // under the OLD model (index_faq() is not part of the per-course
+        // re-embed loop), rag_retriever::classify_row() then refuses to score
+        // those rows across embedding spaces, and context_builder -- told the
+        // FAQ was retrievable -- drops the inline copy. The FAQ reaches the
+        // model by neither path, with no error and no counter. Observed on
+        // degrees.saylor.org on 2026-09-10, hours after its voyage cutover.
+        //
+        // classify_row() is the same predicate the retriever scores with, so
+        // the two cannot disagree about what is comparable; a row written
+        // before embed_model existed carries '' and is allowed through, which
+        // is classify_row's own legacy allowance. The configured dtype is read
+        // from config rather than from a provider instance on purpose: this
+        // method is called on every prompt build and must stay one indexed
+        // lookup, and only `binary` (Voyage-only, and Voyage honours the
+        // setting) can produce a dtype refusal.
+        $querymodel = (string) get_config('local_ai_course_assistant', 'embed_model');
+        $configureddtype = (string) get_config('local_ai_course_assistant', 'embed_dtype');
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_chunks',
+            'courseid = :siteid AND modtype = :faqtype',
+            ['siteid' => SITEID, 'faqtype' => self::MODTYPE],
+            '',
+            'id, embed_model, embed_dtype'
+        );
+        foreach ($rows as $row) {
+            $verdict = rag_retriever::classify_row(
+                $querymodel,
+                $configureddtype,
+                $row->embed_model ?? null,
+                $row->embed_dtype ?? null
+            );
+            if ($verdict === 'ok') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
