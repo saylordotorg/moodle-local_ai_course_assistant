@@ -58,9 +58,10 @@ final class faq_retrievable_test extends \advanced_testcase {
      * once the rows exist.
      *
      * @param string|null $forhash Hash to record as indexed; defaults to current.
+     * @param string $model Model to record on the rows.
      * @return void
      */
-    private function fake_index(?string $forhash = null): void {
+    private function fake_index(?string $forhash = null, string $model = 'text-embedding-3-small'): void {
         global $DB;
         foreach ([0, 1] as $idx) {
             $DB->insert_record('local_ai_course_assistant_chunks', (object) [
@@ -71,7 +72,7 @@ final class faq_retrievable_test extends \advanced_testcase {
                 'content' => 'Q: pair ' . $idx . ' | A: answer ' . $idx,
                 'contenthash' => sha1('pair' . $idx),
                 'embedding' => json_encode([0.1, 0.2, 0.3]),
-                'embed_model' => 'text-embedding-3-small',
+                'embed_model' => $model,
                 'embed_dtype' => 'float',
                 'timecreated' => time(),
                 'timeindexed' => time(),
@@ -251,6 +252,73 @@ final class faq_retrievable_test extends \advanced_testcase {
             ['courseid' => SITEID, 'modtype' => faq_manager::MODTYPE]);
         $this->assertSame(2, $after, 'the site-course reindex deleted the FAQ index');
         $this->assertTrue(faq_manager::is_retrievable());
+    }
+
+    /**
+     * A FAQ indexed under a different embedding model is not retrievable.
+     *
+     * This is the double-miss that hit degrees.saylor.org on 2026-09-10: the
+     * site migrated to voyage-4-large, index_faq() is not part of the
+     * per-course re-embed loop so the FAQ chunks stayed on
+     * text-embedding-3-small, and the retriever refuses to score across
+     * embedding spaces. Existence alone said "retrievable", context_builder
+     * dropped the inline copy, and the FAQ reached the model by neither path.
+     */
+    public function test_faq_on_a_foreign_embedding_model_falls_back_to_inline(): void {
+        $this->fake_index(null, 'text-embedding-3-small');
+        set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
+
+        $this->assertFalse(
+            faq_manager::is_retrievable(),
+            'A FAQ the retriever cannot score must not suppress the inline copy.'
+        );
+        $this->assertStringContainsString('certificate', faq_manager::get_faq_for_prompt());
+    }
+
+    /**
+     * The same model, or one in the same shared space, stays retrievable.
+     */
+    public function test_faq_on_a_comparable_model_stays_retrievable(): void {
+        $this->fake_index(null, 'voyage-4-large');
+
+        set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
+        $this->assertTrue(faq_manager::is_retrievable());
+
+        // voyage-4-* share one embedding space, so a query-model change within
+        // the family must not knock the FAQ out.
+        set_config('embed_model', 'voyage-4-lite', 'local_ai_course_assistant');
+        $this->assertTrue(faq_manager::is_retrievable());
+    }
+
+    /**
+     * Rows written before embed_model existed keep working.
+     *
+     * classify_row() allows an empty stored model through; is_retrievable()
+     * must make the same allowance or every pre-column site loses its FAQ
+     * index on upgrade.
+     */
+    public function test_legacy_rows_without_a_model_stay_retrievable(): void {
+        $this->fake_index(null, '');
+        set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
+        $this->assertTrue(faq_manager::is_retrievable());
+    }
+
+    /**
+     * A migrated FAQ keeps its inline copy in the prompt.
+     *
+     * The end-to-end statement of the bug: with the FAQ stranded on the old
+     * model, the support section must still be in the system prompt.
+     */
+    public function test_prompt_keeps_faq_when_the_index_is_on_a_foreign_model(): void {
+        $this->fake_index(null, 'text-embedding-3-small');
+        set_config('embed_model', 'voyage-4-large', 'local_ai_course_assistant');
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+
+        $prompt = context_builder::build_system_prompt($course->id, $user->id);
+        $this->assertStringContainsString('## Support FAQ', $prompt);
     }
 
     /**

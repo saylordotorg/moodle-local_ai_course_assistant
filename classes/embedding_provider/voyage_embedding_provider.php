@@ -31,21 +31,41 @@ namespace local_ai_course_assistant\embedding_provider;
  * asymmetric retrieval — is the vendor's suggested optimization, and this
  * adapter did it unconditionally from v5.11.0 to v7.3.x.
  *
- * It is now OFF by default, and that is deliberate, not an oversight. The gain
- * has failed to reproduce on the SOLA corpus TWICE: 2026-08-21 it was a wash
- * for voyage-4-lite and 1.0 pp WORSE for voyage-4 than querying with the model
- * that indexed (see embedding_compat::SHARED_SPACES), and the re-measurement on
- * the RAG fixture set found the same. So the asymmetric projection buys nothing
- * measurable here while costing something real: queries and documents then live
- * in two differently-projected spaces and are comparable only through whatever
- * projection the vendor happens to ship. One shared space is migration
- * insurance — both sides embedded the same way stay comparable to each other
- * across a model change, and a future re-projection is one reindex instead of
- * two mutually incompatible halves.
+ * It is worth having ON, and that holds across two model generations. Measured
+ * directly on 2026-08-21 by embedding the identical queries both ways against
+ * the identical cached document vectors (voyage-3.5, 1,008 production-shaped
+ * fixtures): `input_type: query` scored 61.0% R@3 against 30.2% for `document`,
+ * a 30.8 pp penalty for getting it wrong, and `query` won in EVERY query-length
+ * bucket, from -19.9 pp on the shortest to -43.3 pp in the middle
+ * (`.drafts/sola-rag-rerank-benchmark-2026-08-21.md` section 5b). Re-measured
+ * independently on 2026-09-10 through the production harness (voyage-4-large
+ * @2048, 816 production-shaped fixtures): 66.7% against 42.6%, +24.1 pp. Same
+ * direction, same order of magnitude, different model. The asymmetric
+ * projection is doing real work.
  *
- * `embed_input_type_mode` (shared|asymmetric, default shared) selects. It is a
- * setting rather than a constant so the choice is reversible without a code
- * deploy; anything unrecognized resolves to shared.
+ * DO NOT CONFUSE THIS WITH ASYMMETRIC MODEL PAIRING. The thing that did not
+ * reproduce on the SOLA corpus is a different mechanism: embedding DOCUMENTS
+ * with a larger Voyage model than QUERIES (a wash for voyage-4-lite, 1.0 pp
+ * WORSE for voyage-4; a follow-up in-product run at n=30 agreed but is too
+ * small to count as a second independent measurement).
+ * embedding_compat::SHARED_SPACES records that measurement, and it is about
+ * model pairing, not about input_type; pairing is governed by
+ * `embed_query_model`. This docblock used to cite that result as evidence about
+ * input_type, and the settings help text inherited the same conflation and told
+ * operators to avoid the option that wins by 24-31 pp.
+ *
+ * The cost of asymmetric is real but narrow: queries and documents live in two
+ * differently-projected spaces, comparable only through whatever projection the
+ * vendor ships. One shared space is migration insurance — both sides embedded
+ * the same way stay comparable across a model change, so a query-model change
+ * is not a reindex.
+ *
+ * `embed_input_type_mode` (shared|asymmetric) selects. The shipped DEFAULT is
+ * still shared, i.e. the worse-retrieving option: flipping it changes retrieval
+ * behaviour on every existing Voyage install and belongs in its own signed-off
+ * commit rather than in a documentation fix. It is a setting rather than a
+ * constant so the choice is reversible without a code deploy; anything
+ * unrecognized resolves to shared.
  *
  * Shared mode sends "document" for BOTH sides on purpose: that is the value the
  * existing corpus was indexed with, so flipping the mode needs no reindex —

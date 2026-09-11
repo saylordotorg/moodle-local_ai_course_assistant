@@ -74,9 +74,11 @@ class counting_reranker extends voyage_reranker {
  *  2. A skipped rerank must not call the reranker AT ALL, and must leave a
  *     telemetry row saying why -- otherwise a working gate and an expired API
  *     key look identical (both are "spend went down").
- *  3. Voyage sends ONE input_type for queries and documents by default. The
- *     asymmetric projection failed to reproduce twice and a shared space is
- *     migration insurance; see voyage_embedding_provider's docblock.
+ *  3. Voyage sends ONE input_type for queries and documents by default. That
+ *     default is migration insurance, not the better retriever: the asymmetric
+ *     projection measures +30.8 pp (voyage-3.5) and +24.1 pp (voyage-4-large).
+ *     What failed to reproduce was asymmetric model PAIRING, a different
+ *     mechanism; see voyage_embedding_provider's docblock.
  *
  * @package    local_ai_course_assistant
  * @copyright  2026 Tom Caswell / Saylor University

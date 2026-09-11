@@ -809,10 +809,26 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
-    // v7.4.0: Voyage-only query/document projection. Default 'shared' sends the
-    // same input_type for both sides so a query and the corpus stay in one
-    // embedding space; 'asymmetric' restores the vendor's separate query
-    // projection, which has failed to reproduce a gain on this corpus twice.
+    // v7.4.0: Voyage-only query/document projection. 'asymmetric' sends the
+    // vendor's separate query projection (input_type=query on retrieval,
+    // document on indexing) and is the option that MEASURES BEST, twice:
+    // +30.8 pp R@3 on voyage-3.5, 1,008 production-shaped fixtures, 2026-08-21
+    // (.drafts/sola-rag-rerank-benchmark-2026-08-21.md 5b), and +24.1 pp on
+    // voyage-4-large @2048, 816 production-shaped fixtures, 2026-09-10.
+    // 'shared' sends document for both sides; it retrieves worse and is
+    // migration insurance only -- one projection means the query model can be
+    // changed without re-embedding.
+    //
+    // The default is still 'shared' because flipping it changes retrieval
+    // behaviour on every existing Voyage install and wants its own signed-off
+    // commit; the help text now says plainly which one to pick.
+    //
+    // NOT to be confused with asymmetric model PAIRING (indexing with a bigger
+    // Voyage model than you query with), which is the thing that did not
+    // reproduce a gain on this corpus (a wash for voyage-4-lite, 1.0 pp worse
+    // for voyage-4) and is governed by embed_query_model. Conflating the two is
+    // what put a warning against the winning option on this page.
+    //
     // Switching modes needs no reindex: shared mode reuses the value the corpus
     // was already indexed with, so only the query-side projection changes.
     $settings->add(new admin_setting_configselect(

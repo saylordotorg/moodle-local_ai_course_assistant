@@ -156,8 +156,8 @@ class rag_retriever {
         // other providers (OpenAI, Ollama) have only embed(). Whether the
         // Voyage query call actually asks for a different projection from the
         // document call is the provider's business and is now a setting
-        // (embed_input_type_mode, shared by default -- the asymmetric variant
-        // failed to reproduce twice; see voyage_embedding_provider). Either way
+        // (embed_input_type_mode, shared by default, though asymmetric is the
+        // option that measures better; see voyage_embedding_provider). Either way
         // this call site is unchanged: it asks for "a query vector".
         $provider = base_embedding_provider::create_from_config();
         if ($provider instanceof \local_ai_course_assistant\embedding_provider\voyage_embedding_provider) {
@@ -450,13 +450,36 @@ class rag_retriever {
                 "courseid = :cid AND cmid {$insql}",
                 array_merge(['cid' => $courseid], $inparams),
                 'cmid, chunkindex',
-                'id, cmid, chunkindex, content'
+                // v7.4.5: embed_model/embed_dtype are selected because this
+                // query has to make the same comparability decision the scoring
+                // loop above makes. Selection is filtered by classify_row(); the
+                // expansion was not, so on an index holding two embedding
+                // generations -- exactly what a migration produces, and what
+                // content_indexer's shadow mode deliberately preserves -- every
+                // sibling arrived twice.
+                'id, cmid, chunkindex, content, embed_model, embed_dtype'
             );
             foreach ($rows as $r) {
-                $siblingsbycmid[(int) $r->cmid][] = [
+                // Same predicate as selection, so the two can never disagree
+                // about what belongs to the live index.
+                if (self::classify_row($querymodel, $configureddtype, $r->embed_model ?? null,
+                        $r->embed_dtype ?? null) !== 'ok') {
+                    continue;
+                }
+                // Keyed by chunkindex rather than appended: merge_parents sorts
+                // by chunkindex and hands the list to content_chunker, whose
+                // overlap dedupe caps at 100 words and so only partially strips
+                // a duplicated ~1,000-character chunk. Belt and braces -- a
+                // duplicate cannot survive even if a future caller reaches this
+                // array by another route.
+                $siblingsbycmid[(int) $r->cmid][(int) $r->chunkindex] = [
                     'content'    => (string) $r->content,
                     'chunkindex' => (int) $r->chunkindex,
                 ];
+            }
+            foreach ($siblingsbycmid as $cmid => $bychunkindex) {
+                ksort($bychunkindex);
+                $siblingsbycmid[$cmid] = array_values($bychunkindex);
             }
         }
         return self::merge_parents($final, $siblingsbycmid, $returnscope, $windowsize, $maxchars);
@@ -836,7 +859,19 @@ class rag_retriever {
             }
             $seen[$cmid] = true;
 
-            $siblings = $siblingsbycmid[$cmid];
+            // v7.4.5: one entry per chunkindex. A migrated index holds the same
+            // logical chunk under two embed_models, and content_chunker's
+            // overlap dedupe caps at 100 words -- far short of a ~1,000
+            // character chunk -- so a duplicate that reaches here is emitted
+            // twice as garbled near-duplicate text that also eats the
+            // rag_parent_max_chars budget. The caller filters by embedding
+            // space; this is the second line of defence, and it is here because
+            // merge_parents is the pure, testable half.
+            $siblings = [];
+            foreach ($siblingsbycmid[$cmid] as $s) {
+                $siblings[(int) $s['chunkindex']] ??= $s;
+            }
+            $siblings = array_values($siblings);
             usort($siblings, fn($a, $b) => ((int) $a['chunkindex']) <=> ((int) $b['chunkindex']));
             $center = (int) ($row['chunkindex'] ?? 0);
 
