@@ -82,9 +82,10 @@ interface batch_capable_interface {
     /**
      * Submit one or more chat completions for offline processing.
      *
-     * @param array<string, array{systemprompt: string, messages: array, options?: array}> $requests
-     *        Keyed by custom_id. The key is echoed back by fetch_batch(), and is
-     *        how a multi-request batch is demultiplexed on collection.
+     * @param array $requests Keyed by custom_id, each entry
+     *        ['systemprompt' => string, 'messages' => array, 'options' => array (optional)].
+     *        The key is echoed back by fetch_batch(), and is how a
+     *        multi-request batch is demultiplexed on collection.
      * @return string Provider batch id, to be persisted and passed to fetch_batch().
      * @throws \moodle_exception When the submission itself fails.
      */
