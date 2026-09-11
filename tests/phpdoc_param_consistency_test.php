@@ -76,6 +76,12 @@ final class phpdoc_param_consistency_test extends \basic_testcase {
                 [$whole, $doc, $name, $sig] = $m;
                 $line = substr_count(substr($src, 0, strpos($src, $whole)), "\n") + 1;
 
+                // The Moodle PHPDoc Checker (moodlehq/moodle-local_moodlecheck)
+                // is the authority here, not this test: it gates CI, and it
+                // cannot parse a generic or an array shape on @param. Do not
+                // relax this check to allow the modern annotation style --
+                // that puts main straight back in the red.
+                //
                 // A generic type or array shape on a param tag reads as
                 // undocumented to the Moodle sniff, so it must be flagged.
                 // This check MUST run before the "no param tags" bail below:
