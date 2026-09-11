@@ -316,6 +316,75 @@ abstract class base_embedding_provider {
      * @throws \moodle_exception On HTTP errors.
      */
     protected function http_post(string $url, array $headers, string $body): string {
+        // v7.4.5: bounded retry on transient rate limits.
+        //
+        // Embeddings were the ONLY provider path with no backoff. The chat path
+        // has had base_provider::with_transient_retry() since v5.10.0, and the
+        // asymmetry bit in production: re-embedding the site FAQ issues one
+        // sequential call per Q/A pair and aborts the whole run on the first
+        // failure, so a single 429 from a concurrent bulk migration made the FAQ
+        // permanently un-embeddable -- every retry restarted at pair 1 and hit
+        // the same limit. The retriever then skips the stale FAQ chunks and
+        // context_builder silently falls back to injecting the entire FAQ inline,
+        // which is a prompt-budget regression with no error anywhere.
+        //
+        // Same knobs as the chat path so an operator tunes one thing, not two.
+        $attempts = (int) get_config('local_ai_course_assistant', 'backend_retry_attempts');
+        if ($attempts < 0) {
+            $attempts = 0;
+        }
+        $rawmax = get_config('local_ai_course_assistant', 'backend_retry_max_wait');
+        $maxwait = ($rawmax === false || $rawmax === '') ? 5 : (int) $rawmax;
+
+        $backoffs = [0.5, 1.5, 3.0];
+        $tries = 0;
+        while (true) {
+            try {
+                return $this->http_post_once($url, $headers, $body);
+            } catch (\moodle_exception $e) {
+                $retryafter = self::transient_retry_after($e);
+                if ($retryafter === false || $tries >= $attempts) {
+                    throw $e;
+                }
+                $wait = is_int($retryafter) ? min($retryafter, $maxwait) : ($backoffs[$tries] ?? 3.0);
+                // usleep rather than sleep: sub-second waits matter when a
+                // batch of pairs is being embedded behind a web request.
+                usleep((int) round($wait * 1000000));
+                $tries++;
+            }
+        }
+    }
+
+    /**
+     * Whether an exception is a retryable rate limit, and any Retry-After.
+     *
+     * @param \moodle_exception $e
+     * @return int|bool Seconds from Retry-After, true when retryable with no
+     *                  hint, or false when the error must not be retried.
+     */
+    private static function transient_retry_after(\moodle_exception $e) {
+        if (empty($e->debuginfo) || !is_string($e->debuginfo)) {
+            return false;
+        }
+        $d = json_decode($e->debuginfo, true);
+        if (!is_array($d) || empty($d['transient'])) {
+            return false;
+        }
+        return isset($d['retry_after']) && $d['retry_after'] !== null
+            ? (int) $d['retry_after']
+            : true;
+    }
+
+    /**
+     * One POST attempt. See http_post() for the retry wrapper.
+     *
+     * @param string $url
+     * @param array  $headers
+     * @param string $body JSON-encoded request body.
+     * @return string Raw response body.
+     * @throws \moodle_exception On HTTP errors.
+     */
+    private function http_post_once(string $url, array $headers, string $body): string {
         global $CFG;
         if (!\local_ai_course_assistant\security::is_safe_provider_url($url)) {
             throw new \moodle_exception(
@@ -346,8 +415,33 @@ abstract class base_embedding_provider {
             if ($httpcode === 401 || $httpcode === 403) {
                 throw new \moodle_exception('chat:error_auth', 'local_ai_course_assistant');
             }
-            if ($httpcode === 429) {
-                throw new \moodle_exception('chat:error_ratelimit', 'local_ai_course_assistant');
+            if ($httpcode === 429 || $httpcode === 503) {
+                // debuginfo carries the machine-readable marker the retry
+                // wrapper reads; the learner-facing string is unchanged.
+                // Moodle's curl documents getResponse() as an array of arrays, and
+                // a repeated header does arrive as an array, so handle both shapes
+                // rather than stringifying an array into "Array" and silently never
+                // matching. A missing or unparseable value is fine: the wrapper
+                // falls back to its own backoff schedule.
+                $retryafter = null;
+                foreach ((array) $curl->getResponse() as $name => $value) {
+                    if (strcasecmp(trim((string) $name), 'Retry-After') !== 0) {
+                        continue;
+                    }
+                    $raw = is_array($value) ? reset($value) : $value;
+                    $raw = trim((string) $raw);
+                    if (is_numeric($raw)) {
+                        $retryafter = (int) $raw;
+                    }
+                    break;
+                }
+                $ex = new \moodle_exception('chat:error_ratelimit', 'local_ai_course_assistant');
+                $ex->debuginfo = json_encode([
+                    'transient'   => true,
+                    'status'      => $httpcode,
+                    'retry_after' => $retryafter,
+                ]);
+                throw $ex;
             }
             throw new \moodle_exception(
                 'chat:error',
