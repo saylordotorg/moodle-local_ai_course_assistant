@@ -74,6 +74,22 @@ final class phpdoc_param_consistency_test extends \basic_testcase {
             }
             foreach ($ms as $m) {
                 [$whole, $doc, $name, $sig] = $m;
+                $line = substr_count(substr($src, 0, strpos($src, $whole)), "\n") + 1;
+
+                // A generic type or array shape on a param tag reads as
+                // undocumented to the Moodle sniff, so it must be flagged.
+                // This check MUST run before the "no param tags" bail below:
+                // the extraction regex there is '\S+\s+\$name', so a type
+                // containing a space -- array<string, array{...}> -- yields no
+                // match at all, $documented comes back empty, and the function
+                // is skipped before ever reaching this check. That blind spot
+                // is how the submit_batch() generic reached CI in v7.4.4.
+                if (preg_match_all('/@param\s+\S*[<{][^$]*\$(\w+)/', $doc, $gm)) {
+                    $offenders[] = sprintf('%s:%d %s() uses a generic type on @param $%s',
+                        $path, $line, $name, implode(', $', $gm[1]));
+                    continue;
+                }
+
                 preg_match_all('/@param\s+\S+\s+\$(\w+)/', $doc, $dm);
                 $documented = $dm[1];
                 if (!$documented) {
@@ -84,18 +100,6 @@ final class phpdoc_param_consistency_test extends \basic_testcase {
                 $checked++;
                 preg_match_all('/\$(\w+)/', $sig, $sm);
                 $actual = $sm[1];
-                $line = substr_count(substr($src, 0, strpos($src, $whole)), "\n") + 1;
-
-                // A generic type on a param tag reads as undocumented to the
-                // Moodle sniff, so it must be flagged even though this
-                // scanner's own regex parses it happily and would otherwise
-                // see the parameter as documented and matching. Checking the
-                // scanner against a planted example is what caught this.
-                if (preg_match_all('/@param\s+\S*<[^$]*\$(\w+)/', $doc, $gm)) {
-                    $offenders[] = sprintf('%s:%d %s() uses a generic type on @param $%s',
-                        $path, $line, $name, implode(', $', $gm[1]));
-                    continue;
-                }
 
                 $dupes = array_keys(array_filter(array_count_values($documented), fn($n) => $n > 1));
                 if ($dupes) {
