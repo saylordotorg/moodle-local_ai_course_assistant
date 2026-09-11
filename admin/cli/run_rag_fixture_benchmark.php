@@ -31,10 +31,42 @@
  * broken down by course and overall. Also reports P50/P95 latency and estimated
  * per-query rerank cost at $0.05/MTok.
  *
- * IMPORTANT: This script reads config but does NOT mutate it. It accepts an
- * optional --embed-apikey override for deployments where embed_apikey is not
- * configured in the plugin settings (e.g. the dev site uses the main apikey).
- * The override is held in memory only and never written to the database.
+ * !! THIS SCRIPT WRITES LIVE PLUGIN CONFIGURATION. DO NOT RUN IT AGAINST A SITE
+ * !! THAT IS SERVING LEARNERS.
+ *
+ * The claim this docblock used to make -- "reads config but does NOT mutate
+ * it... held in memory only and never written to the database" -- was false,
+ * and the false version is what an engineer reads before pointing it at
+ * production. base_embedding_provider::create_from_config() builds providers
+ * from get_config(), so every arm that changes an embedding configuration has
+ * to write it. What actually happens:
+ *
+ *   - --embed-apikey=KEY is written to `embed_apikey` for the duration of the
+ *     run, and --voyage-apikey=KEY to `rerank_apikey` for the rerank arms.
+ *     Moodle's set_config() records every change in mdl_config_log VERBATIM and
+ *     PERMANENTLY, readable at /report/configlog by any site administrator. A
+ *     key passed to this script is a key disclosed to them. Prefer configuring
+ *     the key in plugin settings and passing no override at all.
+ *   - The judge-mode Family B/C arms and embedding A/B mode rewrite
+ *     embed_provider, embed_model, embed_dimensions, rerank_enabled,
+ *     rag_return_scope and rag_window_size per arm. While an arm runs, the LIVE
+ *     site retrieves with that arm's embedding space -- and because
+ *     rag_retriever refuses to score across embedding spaces, retrieval returns
+ *     NOTHING for every learner until the arm finishes. Those arms therefore
+ *     refuse to run without --i-know-this-writes-config.
+ *   - Every write is restored on the way out, including via
+ *     register_shutdown_function, but a SIGKILL or an OOM leaves the site on
+ *     the last arm's provider and key.
+ *
+ * The single-arm path (no --judge, no --embed-provider, no --embed-apikey)
+ * writes nothing and is the default.
+ *
+ * WHICH INDEX IS SCORED: chunks are read for the model in `embed_model`, or
+ * --embed-model=NAME. A migrated index holds two embedding generations of the
+ * same corpus at once (content_indexer's shadow mode keeps the live one alive
+ * on purpose), so an unfiltered read doubles the corpus, makes every fixture
+ * compete against its own twin and understates recall. The model actually
+ * scored is printed in the run header.
  *
  * Usage:
  *   sudo -u www-data php admin/cli/run_rag_fixture_benchmark.php
@@ -81,6 +113,13 @@ $abbatch = 96; // Chunk re-embed slice size; bounds per-call token usage for bot
 // when it does every table it prints is stamped SMOKE.
 $allowsmallset = false;
 
+// Which embedding generation to score (2026-09-10). Defaults to the live
+// embed_model; --embed-model=NAME scores a different one, e.g. to compare a
+// shadow index against the live one on a migrated site.
+$benchmodel = '';
+// Arms that rewrite live plugin configuration refuse to run without this.
+$allowconfigwrites = false;
+
 $judgemode     = false;
 $questionspath = '';
 $samplesize    = 100;
@@ -112,6 +151,10 @@ foreach ($argv as $arg) {
         $voyageapikey = trim($m[1]);
     } else if (preg_match('/^--voyage-dim=(\d+)$/', $arg, $m)) {
         $voyagedim = (int) $m[1];
+    } else if (preg_match('/^--embed-model=(.+)$/', $arg, $m)) {
+        $benchmodel = trim($m[1]);
+    } else if ($arg === '--i-know-this-writes-config') {
+        $allowconfigwrites = true;
     } else if ($arg === '--allow-small-set') {
         $allowsmallset = true;
     } else if ($arg === '--judge') {
@@ -128,7 +171,11 @@ Usage: php run_rag_fixture_benchmark.php [options]
 
 Options:
   --fixtures=PATH       Path to fixture JSON (default: tests/golden/rag_fixtures_bus101_pol101.json)
-  --embed-apikey=KEY    Override embed_apikey in memory (not written to DB)
+  --embed-apikey=KEY    Override embed_apikey for the run. WRITTEN to plugin
+                        config, and therefore recorded verbatim and permanently
+                        in the Moodle config change log (/report/configlog).
+                        Restored at exit. Prefer configuring the key in plugin
+                        settings and omitting this.
   --candidates=N        Embedding-stage candidate pool for reranker
                         (default: the site's rerank_candidates setting, else 20)
   --topk=N              Final top-k retrieved (default 10; max 20)
@@ -138,6 +185,14 @@ Options:
   --allow-small-set     Permit a run on a fixture set below the decision-grade
                         floor (see FIXTURE SETS below). Required for the 40-row
                         bus101_pol101 smoke set; every table is stamped SMOKE.
+  --embed-model=NAME    Score the chunks stored under this embed_model instead
+                        of the live one. A migrated index holds two generations
+                        of the same corpus; scoring both at once doubles it.
+  --i-know-this-writes-config
+                        Required by the arms that rewrite live plugin config
+                        (--judge Family B/C and --embed-provider A/B mode).
+                        Retrieval returns nothing for every learner while those
+                        arms run. Never pass it on a site serving learners.
 
 FIXTURE SETS
   A set is DECISION-GRADE only at or above the fixture floor printed in every
@@ -154,8 +209,10 @@ embedding-only recall comparison; the rerank arm is skipped in this mode):
                         with that provider, so arms compare like against like;
                         the stored vectors are ignored. Site config is set per
                         arm and restored at exit.
-  --openai-apikey=KEY   API key used for openai:* arms (in memory only).
-  --voyage-apikey=KEY   API key used for voyage:* arms (in memory only).
+  --openai-apikey=KEY   API key used for openai:* arms. Written to plugin
+                        config for the run (see the config-log warning above).
+  --voyage-apikey=KEY   API key used for voyage:* arms. Written to plugin
+                        config for the run (see the config-log warning above).
   --voyage-dim=N        MRL width for voyage:* arms (256/512/1024/2048;
                         default 1024). OpenAI arms always use native 1536,
                         so pass 2048 to rule out width as a confound.
@@ -180,6 +237,67 @@ Judge mode (--judge): LLM-judged relevance across pipeline configs.
 TXT;
         exit(0);
     }
+}
+
+// ---------- Which embedding generation are we scoring? ----------
+// One resolution point for the five chunk loads below. A migrated index holds
+// the same corpus twice -- content_indexer::reindex_course() deletes only
+// same-model rows in shadow mode, on purpose, so the live index keeps serving
+// while the new one is built. Reading chunks by courseid alone therefore:
+//   * makes every fixture's expected chunk compete against its byte-identical
+//     twin, so the twin can take rank 1 and recall is understated;
+//   * makes the anchor preflight see every anchor at least twice and flag
+//     essentially every fixture 'ambiguous', pointing the operator at a fixture
+//     regeneration that would fix nothing;
+//   * doubles the billable re-embed in the A/B and Family B/C arms, against a
+//     corpus production does not serve.
+// Exact-model equality rather than embedding_compat::are_comparable(): two
+// models in one shared space (voyage-4 and voyage-4-large) are exactly the
+// duplicate pair we are removing, so "comparable" is the wrong test here.
+// Rows written before the column existed hold NULL and are admitted, matching
+// rag_retriever::classify_row()'s legacy allowance.
+if ($benchmodel === '') {
+    $rawbench = get_config('local_ai_course_assistant', 'embed_model');
+    $benchmodel = ($rawbench === false) ? '' : (string) $rawbench;
+}
+if ($benchmodel === '') {
+    // Nothing to filter against. Do not silently score an empty set: leave the
+    // predicate open and say so, which is the pre-2026-09 behaviour plus a
+    // warning rather than a new failure mode.
+    $benchmodelsql = '';
+    $benchmodelparam = [];
+    echo "Scoring ALL stored chunks: embed_model is unset and no --embed-model was given.\n";
+    fwrite(STDERR, "WARNING: embed_model is unset, so chunks cannot be filtered by embedding\n"
+        . "         generation. On a migrated index this scores two corpora at once.\n");
+} else {
+    $benchmodelsql = 'AND (embed_model = :bm OR embed_model IS NULL)';
+    $benchmodelparam = ['bm' => $benchmodel];
+    echo "Scoring the index stored under embed_model={$benchmodel}"
+        . " (legacy rows with no model are included)\n";
+}
+
+// ---------- Config-write gate (2026-09-10) ----------
+// Judge mode and embedding A/B mode both rewrite LIVE plugin settings per arm,
+// because base_embedding_provider::create_from_config() and the retriever read
+// get_config(). Judge Family B/C and the A/B arms rewrite the embedding
+// provider, model and width, and rag_retriever refuses to score across
+// embedding spaces -- so for the length of an arm every learner on the site
+// retrieves nothing at all. Family A rewrites the rerank and return-scope
+// settings. The docblock used to promise none of this happened, which is what
+// made running it against production look safe. Make the operator say it out
+// loud instead.
+if (($judgemode || !empty($abproviders)) && !$allowconfigwrites) {
+    fwrite(STDERR,
+        "\nERROR: this mode rewrites LIVE plugin configuration for the duration of the run.\n"
+        . "       Judge Family B/C and --embed-provider arms swap embed_provider/embed_model/\n"
+        . "       embed_dimensions per arm; while an arm runs, retrieval returns NOTHING for\n"
+        . "       every learner on this site, because the query and the stored corpus are then\n"
+        . "       in different embedding spaces. Judge Family A swaps rerank_enabled and\n"
+        . "       rag_return_scope. Every write is restored at exit, including on a fatal, but\n"
+        . "       not on a SIGKILL or an OOM.\n"
+        . "       Run this on a site that is not serving learners, then pass\n"
+        . "       --i-know-this-writes-config.\n");
+    exit(3);
 }
 
 // Candidate pool: mirror what the product actually does rather than a constant.
@@ -294,8 +412,8 @@ if ($fxids) {
             $courseblob[$course] = implode("\x00", $DB->get_fieldset_select(
                 'local_ai_course_assistant_chunks',
                 'content',
-                'courseid = :cid',
-                ['cid' => $course]
+                "courseid = :cid {$benchmodelsql}",
+                ['cid' => $course] + $benchmodelparam
             ));
         }
         $status = local_ai_course_assistant_ragbench_anchor_status(
@@ -478,8 +596,8 @@ if ($judgemode) {
     foreach ($courseids as $cid) {
         $rows = $DB->get_records_select(
             'local_ai_course_assistant_chunks',
-            'courseid = :cid',
-            ['cid' => $cid],
+            "courseid = :cid {$benchmodelsql}",
+            ['cid' => $cid] + $benchmodelparam,
             '',
             'id, content'
         );
@@ -595,8 +713,11 @@ if ($judgemode) {
     // before(oa,bare) = OpenAI 3-small, no rerank, single chunk (prod default)
     // full(oa)        = OpenAI 3-small + rerank + parent-doc(window)
     // full(voyage)    = Voyage 3.5     + rerank + parent-doc(window)
-    // No DB writes: vectors are in-memory; the reranker and merge_parents are the
-    // real production components. Rerank arms need a Voyage key (--voyage-apikey).
+    // The vectors are in-memory, but this is NOT write-free: each arm rewrites
+    // embed_provider/embed_model/embed_dimensions/rerank_* /rag_return_scope in
+    // live plugin config so create_from_config() and the reranker pick them up,
+    // and restores them after. Rerank arms need a Voyage key (--voyage-apikey),
+    // which is likewise written to rerank_apikey for the run.
     $famc = [
         ['label' => 'before(oa,bare)', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => false, 'scope' => 'chunk'],
         ['label' => 'full(oa)', 'prov' => 'openai', 'model' => 'text-embedding-3-small', 'dim' => 1536, 'key' => ($openaiapikey ?: $judgekey), 'rerank' => true, 'scope' => 'window'],
@@ -620,8 +741,8 @@ if ($judgemode) {
     foreach ($courseids as $cid) {
         $rows = $DB->get_records_select(
             'local_ai_course_assistant_chunks',
-            'courseid = :cid',
-            ['cid' => $cid],
+            "courseid = :cid {$benchmodelsql}",
+            ['cid' => $cid] + $benchmodelparam,
             'cmid, chunkindex',
             'id, content, cmid, chunkindex'
         );
@@ -826,8 +947,8 @@ if (!empty($abproviders)) {
     foreach ($abcourseids as $courseid) {
         $rows = $DB->get_records_select(
             'local_ai_course_assistant_chunks',
-            'courseid = :cid',
-            ['cid' => $courseid],
+            "courseid = :cid {$benchmodelsql}",
+            ['cid' => $courseid] + $benchmodelparam,
             '',
             'id, content'
         );
@@ -1084,13 +1205,28 @@ if (!empty($abproviders)) {
 
 // If the caller supplied an override key, apply it via set_config() for the
 // duration of the run. base_embedding_provider reads get_config(), so the
-// override has to land in plugin config; the original value is captured here
-// and restored after the benchmark loop (see the restore block below), so the
-// site's stored configuration is unchanged once the CLI exits.
+// override has to land in plugin config -- it is NOT held in memory, whatever
+// this file used to claim. Two consequences the caller has to know about:
+// the key is written to mdl_config_plugins, and Moodle records the change in
+// mdl_config_log verbatim and permanently, where any site administrator can
+// read it at /report/configlog.
+//
+// The restore is registered as a shutdown function as well as run inline at the
+// end of the benchmark loop. create_from_config() is called five lines below
+// and throws moodle_exception on a bad provider; without the hook that throw
+// left the caller's key sitting in live plugin config.
 if ($embedapikeyoverride !== '') {
     $origkey = get_config('local_ai_course_assistant', 'embed_apikey');
+    $restorekey = function () use ($origkey) {
+        set_config('embed_apikey', ($origkey === false) ? '' : $origkey, 'local_ai_course_assistant');
+    };
     set_config('embed_apikey', $embedapikeyoverride, 'local_ai_course_assistant');
+    register_shutdown_function($restorekey);
     echo "embed_apikey override applied (will be restored at exit)\n";
+    fwrite(STDERR, "WARNING: --embed-apikey is WRITTEN to plugin config and recorded verbatim\n"
+        . "         in the Moodle config change log (/report/configlog), where it is\n"
+        . "         readable by every site administrator. It is restored at exit, but the\n"
+        . "         config-log entry is permanent.\n");
 }
 
 $provider = base_embedding_provider::create_from_config();
@@ -1114,8 +1250,8 @@ $courseids = array_unique(array_column($fixtures, 'courseid'));
 foreach ($courseids as $courseid) {
     $rows = $DB->get_records_select(
         'local_ai_course_assistant_chunks',
-        'courseid = :cid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
-        ['cid' => $courseid],
+        "courseid = :cid AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL) {$benchmodelsql}",
+        ['cid' => $courseid] + $benchmodelparam,
         '',
         'id, content, embedding, embedding_bin, embed_dtype'
     );
@@ -1163,13 +1299,31 @@ echo "\n";
 // ---------- Helper: cosine similarity ----------
 
 /**
- * Cosine similarity between two float vectors.
+ * Cosine similarity between two float vectors of equal width.
+ *
+ * Refuses a length mismatch rather than scoring it. This used to walk
+ * count($a) and read `$b[$i] ?? 0.0`, which zero-pads a shorter $b and ignores
+ * a longer one's tail: a 1536-dimension OpenAI row scored against a
+ * 2048-dimension Voyage query returned a plausible number instead of failing.
+ * A benchmark that emits a wrong number is worse than one that stops, and it
+ * emits that number precisely during a migration, which is when it is most
+ * likely to be run. With the embed_model filter in place this must never fire,
+ * which is the point of throwing rather than returning 0.0.
  *
  * @param float[] $a
  * @param float[] $b
  * @return float
+ * @throws \RuntimeException When the vectors come from different embedding spaces.
  */
 function local_ai_course_assistant_ragbench_cosine_sim(array $a, array $b): float {
+    if (count($a) !== count($b)) {
+        throw new \RuntimeException(sprintf(
+            'cosine on %d-dim vs %d-dim vectors: mixed embedding spaces. '
+            . 'Filter the chunk load by embed_model (--embed-model=NAME).',
+            count($a),
+            count($b)
+        ));
+    }
     $dot = $norma = $normb = 0.0;
     $len = count($a);
     for ($i = 0; $i < $len; $i++) {
@@ -1501,10 +1655,10 @@ foreach ($fixtures as $fixture) {
     echo "\n";
 }
 
-// Restore embed_apikey if we overrode it. A get_config() miss returns false;
-// in that case restore to empty string (the setting's unset-equivalent).
+// Restore embed_apikey if we overrode it -- the happy path; the shutdown hook
+// registered alongside the override covers every other exit.
 if ($embedapikeyoverride !== '') {
-    set_config('embed_apikey', ($origkey === false) ? '' : $origkey, 'local_ai_course_assistant');
+    $restorekey();
     echo "embed_apikey restored to original value\n\n";
 }
 
