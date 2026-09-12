@@ -1212,6 +1212,7 @@ $string['objectives:toggle_chip']       = 'Show the Learning Mastery chip to stu
 $string['objectives:toggle_chip_help']  = 'Optional. When off, mastery still steers the assistant silently but learners see no indicator.';
 $string['objectives:toggled']           = 'Setting updated.';
 $string['objectives:detected_heading']  = 'Detected {$a->count} learning objectives from {$a->source}.';
+$string['objectives:source_outcomemap'] = 'learning outcomes mapping';
 $string['objectives:source_competency'] = 'Moodle competencies';
 $string['objectives:source_summary']    = 'course summary';
 $string['objectives:source_section']    = 'section or first-page content';

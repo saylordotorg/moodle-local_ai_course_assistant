@@ -779,6 +779,7 @@ $string['objectives:toggle_chip'] = 'إظهار شارة إتقان التعلم
 $string['objectives:toggle_chip_help'] = 'اختياري. عند الإيقاف، يستمر الإتقان في توجيه المساعد بصمت لكن لا يرى المتعلمون أي مؤشر.';
 $string['objectives:toggled'] = 'تم تحديث الإعداد.';
 $string['objectives:detected_heading'] = 'تم اكتشاف {$a->count} من أهداف التعلم من {$a->source}.';
+$string['objectives:source_outcomemap'] = 'ربط مخرجات التعلم';
 $string['objectives:source_competency'] = 'كفاءات Moodle';
 $string['objectives:source_summary'] = 'ملخص الدورة';
 $string['objectives:source_section'] = 'محتوى القسم أو الصفحة الأولى';

@@ -826,6 +826,7 @@ $string['objectives:toggle_chip'] = 'Onyesha kwa wanafunzi alama ya Umilisi wa K
 $string['objectives:toggle_chip_help'] = 'Hiari. Ikiwa imezimwa, umilisi bado unaongoza msaidizi kimya kimya lakini wanafunzi hawaoni alama yoyote.';
 $string['objectives:toggled'] = 'Mpangilio umesasishwa.';
 $string['objectives:detected_heading'] = 'Yamegunduliwa malengo {$a->count} ya kujifunza kutoka {$a->source}.';
+$string['objectives:source_outcomemap'] = 'uchoraji wa matokeo ya kujifunza';
 $string['objectives:source_competency'] = 'Umahiri wa Moodle';
 $string['objectives:source_summary'] = 'muhtasari wa kozi';
 $string['objectives:source_section'] = 'sehemu au maudhui ya ukurasa wa kwanza';

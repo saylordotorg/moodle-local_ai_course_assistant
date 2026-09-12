@@ -826,6 +826,7 @@ $string['objectives:toggle_chip'] = 'Bonisa i-tag ye-Mastery Yokufunda kubafundi
 $string['objectives:toggle_chip_help'] = 'Okukhethwayo. Lapho kuvalwe, ukuhlonipha kuyaqhubeka kuqondisa umsizi ngokuthuleyo kodwa abafundi ababoni nesithombisi.';
 $string['objectives:toggled'] = 'Isilungiselelo silungisiwe.';
 $string['objectives:detected_heading'] = 'Kutholwe imigomo yokufunda engu-{$a->count} kusukela ku-{$a->source}.';
+$string['objectives:source_outcomemap'] = 'ukumepha kwemiphumela yokufunda';
 $string['objectives:source_competency'] = 'amakhono e-Moodle';
 $string['objectives:source_summary'] = 'isifinyezo sesifundo';
 $string['objectives:source_section'] = 'isigaba noma okuqukethwe ekhasini lokuqala';

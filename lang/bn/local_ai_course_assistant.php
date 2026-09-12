@@ -779,6 +779,7 @@ $string['objectives:toggle_chip'] = 'শিক্ষার্থীদের ক
 $string['objectives:toggle_chip_help'] = 'ঐচ্ছিক। বন্ধ থাকলে দক্ষতা অর্জন এখনও নীরবে সহকারীকে পরিচালনা করে কিন্তু শিক্ষার্থীরা কোনো নির্দেশক দেখে না।';
 $string['objectives:toggled'] = 'সেটিং আপডেট হয়েছে।';
 $string['objectives:detected_heading'] = '{$a->source} থেকে {$a->count}টি শিখন উদ্দেশ্য সনাক্ত করা হয়েছে।';
+$string['objectives:source_outcomemap'] = 'শেখার ফলাফল ম্যাপিং';
 $string['objectives:source_competency'] = 'Moodle যোগ্যতা';
 $string['objectives:source_summary'] = 'কোর্স সারাংশ';
 $string['objectives:source_section'] = 'বিভাগ বা প্রথম পৃষ্ঠার বিষয়বস্তু';

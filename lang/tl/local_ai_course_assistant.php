@@ -826,6 +826,7 @@ $string['objectives:toggle_chip'] = 'Ipakita ang chip ng Learning Mastery sa mga
 $string['objectives:toggle_chip_help'] = 'Opsyonal. Kapag naka-off, patuloy pa ring tahimik na inaakay ng kasanayan ang assistant ngunit walang nakikitang indikasyon ang mga mag-aaral.';
 $string['objectives:toggled'] = 'Na-update ang setting.';
 $string['objectives:detected_heading'] = 'Natukoy ang {$a->count} na layunin sa pagkatuto mula sa {$a->source}.';
+$string['objectives:source_outcomemap'] = 'pagmamapa ng mga kinalabasan ng pagkatuto';
 $string['objectives:source_competency'] = 'mga competency ng Moodle';
 $string['objectives:source_summary'] = 'buod ng kurso';
 $string['objectives:source_section'] = 'section o nilalaman ng unang pahina';

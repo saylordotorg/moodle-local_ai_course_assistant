@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Näytä Oppimisen hallinta -merkki opiskeli
 $string['objectives:toggle_chip_help'] = 'Valinnainen. Kun pois käytöstä, hallinta ohjaa avustajaa edelleen taustalla, mutta oppijat eivät näe ilmaisinta.';
 $string['objectives:toggled'] = 'Asetus päivitetty.';
 $string['objectives:detected_heading'] = 'Tunnistettu {$a->count} oppimistavoitetta lähteestä {$a->source}.';
+$string['objectives:source_outcomemap'] = 'oppimistulosten kartoitus';
 $string['objectives:source_competency'] = 'Moodlen kompetenssit';
 $string['objectives:source_summary'] = 'kurssin kuvaus';
 $string['objectives:source_section'] = 'osio tai etusivun sisältö';

@@ -823,6 +823,7 @@ $string['objectives:toggle_chip'] = 'Mostra il chip Padronanza dell\'apprendimen
 $string['objectives:toggle_chip_help'] = 'Opzionale. Quando disattivato, la padronanza guida comunque silenziosamente l\'assistente ma gli studenti non vedono alcun indicatore.';
 $string['objectives:toggled'] = 'Impostazione aggiornata.';
 $string['objectives:detected_heading'] = 'Rilevati {$a->count} obiettivi di apprendimento da {$a->source}.';
+$string['objectives:source_outcomemap'] = 'mappatura dei risultati di apprendimento';
 $string['objectives:source_competency'] = 'competenze Moodle';
 $string['objectives:source_summary'] = 'riepilogo del corso';
 $string['objectives:source_section'] = 'sezione o contenuto della prima pagina';

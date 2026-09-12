@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = '学生に学習習熟度チップを表示'
 $string['objectives:toggle_chip_help'] = '任意。オフの場合でも習熟度はアシスタントを陰で誘導しますが、学習者には何も表示されません。';
 $string['objectives:toggled'] = '設定を更新しました。';
 $string['objectives:detected_heading'] = '{$a->source} から学習目標を {$a->count} 件検出しました。';
+$string['objectives:source_outcomemap'] = '学習成果のマッピング';
 $string['objectives:source_competency'] = 'Moodle コンピテンシー';
 $string['objectives:source_summary'] = 'コース概要';
 $string['objectives:source_section'] = 'セクションまたは1ページ目のコンテンツ';

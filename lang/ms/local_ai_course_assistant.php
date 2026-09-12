@@ -826,6 +826,7 @@ $string['objectives:toggle_chip'] = 'Tunjukkan cip Penguasaan Pembelajaran kepad
 $string['objectives:toggle_chip_help'] = 'Pilihan. Apabila dimatikan, penguasaan masih membimbing pembantu secara senyap tetapi pelajar tidak melihat sebarang penunjuk.';
 $string['objectives:toggled'] = 'Tetapan dikemas kini.';
 $string['objectives:detected_heading'] = '{$a->count} objektif pembelajaran dikesan daripada {$a->source}.';
+$string['objectives:source_outcomemap'] = 'pemetaan hasil pembelajaran';
 $string['objectives:source_competency'] = 'Kompetensi Moodle';
 $string['objectives:source_summary'] = 'ringkasan kursus';
 $string['objectives:source_section'] = 'kandungan bahagian atau halaman pertama';

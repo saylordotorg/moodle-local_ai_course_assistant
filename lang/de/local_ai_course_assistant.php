@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Lern-Beherrschungs-Chip für Studierende an
 $string['objectives:toggle_chip_help'] = 'Optional. Wenn deaktiviert, steuert die Beherrschung den Assistenten weiterhin im Hintergrund, aber Lernende sehen keinen Indikator.';
 $string['objectives:toggled'] = 'Einstellung aktualisiert.';
 $string['objectives:detected_heading'] = '{$a->count} Lernziele aus {$a->source} erkannt.';
+$string['objectives:source_outcomemap'] = 'Zuordnung von Lernergebnissen';
 $string['objectives:source_competency'] = 'Moodle-Kompetenzen';
 $string['objectives:source_summary'] = 'Kursbeschreibung';
 $string['objectives:source_section'] = 'Abschnitt oder Inhalt der ersten Seite';

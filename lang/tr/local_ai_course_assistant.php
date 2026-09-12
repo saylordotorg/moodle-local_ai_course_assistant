@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Öğrenme Uzmanlığı çipini öğrenciler
 $string['objectives:toggle_chip_help'] = 'İsteğe bağlı. Kapalı olduğunda uzmanlık asistanı sessizce yönlendirmeye devam eder, ancak öğrenciler hiçbir gösterge görmez.';
 $string['objectives:toggled'] = 'Ayar güncellendi.';
 $string['objectives:detected_heading'] = '{$a->source} kaynağından {$a->count} öğrenme hedefi tespit edildi.';
+$string['objectives:source_outcomemap'] = 'öğrenme kazanımları eşlemesi';
 $string['objectives:source_competency'] = 'Moodle yetkinlikleri';
 $string['objectives:source_summary'] = 'kurs özeti';
 $string['objectives:source_section'] = 'bölüm veya ilk sayfa içeriği';

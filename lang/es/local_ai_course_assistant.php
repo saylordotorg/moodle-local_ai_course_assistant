@@ -808,6 +808,7 @@ $string['objectives:toggle_chip'] = 'Mostrar el indicador de Dominio del Aprendi
 $string['objectives:toggle_chip_help'] = 'Opcional. Cuando está desactivado, el dominio sigue guiando al asistente de forma silenciosa, pero los estudiantes no ven ningún indicador.';
 $string['objectives:toggled'] = 'Configuración actualizada.';
 $string['objectives:detected_heading'] = 'Se detectaron {$a->count} objetivos de aprendizaje desde {$a->source}.';
+$string['objectives:source_outcomemap'] = 'mapeo de resultados de aprendizaje';
 $string['objectives:source_competency'] = 'competencias de Moodle';
 $string['objectives:source_summary'] = 'resumen del curso';
 $string['objectives:source_section'] = 'sección o contenido de la primera página';

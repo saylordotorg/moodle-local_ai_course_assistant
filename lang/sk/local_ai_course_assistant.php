@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Zobraziť študentom indikátor zvládnutia
 $string['objectives:toggle_chip_help'] = 'Voliteľné. Keď je vypnuté, sledovanie zvládnutia stále diskrétne usmerňuje asistenta, ale študenti nevidia žiadny indikátor.';
 $string['objectives:toggled'] = 'Nastavenie aktualizované.';
 $string['objectives:detected_heading'] = 'Zistených vzdelávacích cieľov: {$a->count} (zdroj: {$a->source}).';
+$string['objectives:source_outcomemap'] = 'mapovanie výsledkov vzdelávania';
 $string['objectives:source_competency'] = 'Moodle kompetencie';
 $string['objectives:source_summary'] = 'súhrn kurzu';
 $string['objectives:source_section'] = 'sekcia alebo obsah prvej stránky';

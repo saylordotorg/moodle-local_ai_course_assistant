@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'ਵਿਦਿਆਰਥੀਆਂ ਨੂੰ �
 $string['objectives:toggle_chip_help'] = 'ਵਿਕਲਪਕ। ਜਦੋਂ ਬੰਦ ਹੁੰਦਾ ਹੈ, ਮੁਹਾਰਤ ਫਿਰ ਵੀ ਸਹਾਇਕ ਨੂੰ ਚੁੱਪ-ਚਾਪ ਚਲਾਉਂਦੀ ਹੈ ਪਰ ਸਿਖਿਆਰਥੀ ਕੋਈ ਸੰਕੇਤ ਨਹੀਂ ਦੇਖਦੇ।';
 $string['objectives:toggled'] = 'ਸੈਟਿੰਗ ਅਪਡੇਟ ਹੋਈ।';
 $string['objectives:detected_heading'] = '{$a->source} ਤੋਂ {$a->count} ਸਿਖਲਾਈ ਉਦੇਸ਼ ਖੋਜੇ ਗਏ।';
+$string['objectives:source_outcomemap'] = 'ਸਿੱਖਣ ਨਤੀਜਿਆਂ ਦੀ ਮੈਪਿੰਗ';
 $string['objectives:source_competency'] = 'ਮੂਡਲ ਯੋਗਤਾਵਾਂ';
 $string['objectives:source_summary'] = 'ਕੋਰਸ ਸਾਰਾਂਸ਼';
 $string['objectives:source_section'] = 'ਭਾਗ ਜਾਂ ਪਹਿਲੇ-ਪੰਨੇ ਦੀ ਸਮੱਗਰੀ';

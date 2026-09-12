@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'विद्यार्थीहरूल�
 $string['objectives:toggle_chip_help'] = 'वैकल्पिक। बन्द हुँदा, दक्षताले सहायकलाई पर्दा पछाडि निर्देशित गरिरहन्छ तर सिकारुहरूले कुनै सङ्केतक देख्दैनन्।';
 $string['objectives:toggled'] = 'सेटिङ अद्यावधिक गरियो।';
 $string['objectives:detected_heading'] = '{$a->source}बाट {$a->count} सिकाइ उद्देश्यहरू पहिचान गरियो।';
+$string['objectives:source_outcomemap'] = 'सिकाइ उपलब्धि म्यापिङ';
 $string['objectives:source_competency'] = 'मूडल कम्पिटेन्सीहरू';
 $string['objectives:source_summary'] = 'पाठ्यक्रम सारांश';
 $string['objectives:source_section'] = 'खण्ड वा पहिलो पृष्ठको सामग्री';

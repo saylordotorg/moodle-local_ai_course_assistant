@@ -810,6 +810,7 @@ $string['objectives:toggle_chip'] = 'Nuna alamar Gwanintar Koyo ga dalibai';
 $string['objectives:toggle_chip_help'] = 'Na zabi. Lokacin da aka kashe, gwaninta har yanzu tana jagorantar mataimaki cikin shiru amma daliban ba sa ganin alama.';
 $string['objectives:toggled'] = 'An sabunta saitin.';
 $string['objectives:detected_heading'] = 'An gano manufofin koyo {$a->count} daga {$a->source}.';
+$string['objectives:source_outcomemap'] = 'tsarin sakamakon koyo';
 $string['objectives:source_competency'] = 'iyawowi na Moodle';
 $string['objectives:source_summary'] = 'takaitaccen kwasa';
 $string['objectives:source_section'] = 'sashe ko abun ciki na shafi na farko';

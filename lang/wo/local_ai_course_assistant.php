@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'Wone tëgg Mastery Njàng ngir njàngalekat
 $string['objectives:toggle_chip_help'] = 'Tànn. Bu fofu, mastery dafay topp ndimbal bi ci kumpa waaye njàngalekat yi duñu gis indicateur.';
 $string['objectives:toggled'] = 'Configuration ñu ko soppi.';
 $string['objectives:detected_heading'] = 'Gis nañu {$a->count} yitte njàng ci {$a->source}.';
+$string['objectives:source_outcomemap'] = 'cartographie bu njàng mi';
 $string['objectives:source_competency'] = 'kompetan Moodle';
 $string['objectives:source_summary'] = 'résumé cours';
 $string['objectives:source_section'] = 'section walla peggal njëkk';

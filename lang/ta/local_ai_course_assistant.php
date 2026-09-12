@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'மாணவர்களுக்கு க
 $string['objectives:toggle_chip_help'] = 'விருப்பத்தேர்வு. ஆஃப் ஆக இருக்கும்போது, தேர்ச்சி உதவியாளரை அமைதியாகச் செலுத்துகிறது ஆனால் கற்றவர்களுக்கு எந்த சுட்டியும் தெரியாது.';
 $string['objectives:toggled'] = 'அமைப்பு புதுப்பிக்கப்பட்டது.';
 $string['objectives:detected_heading'] = '{$a->source} இல் இருந்து {$a->count} கற்றல் நோக்கங்கள் கண்டறியப்பட்டுள்ளன.';
+$string['objectives:source_outcomemap'] = 'கற்றல் விளைவுகள் வரைபடம்';
 $string['objectives:source_competency'] = 'Moodle திறமைகள்';
 $string['objectives:source_summary'] = 'படிப்புச் சுருக்கம்';
 $string['objectives:source_section'] = 'பிரிவு அல்லது முதல் பக்க உள்ளடக்கம்';

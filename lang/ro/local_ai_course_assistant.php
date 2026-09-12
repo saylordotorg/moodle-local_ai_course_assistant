@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Afișează cursanților indicatorul Stăpâ
 $string['objectives:toggle_chip_help'] = 'Opțional. Când este dezactivat, stăpânirea continuă să ghideze asistentul în mod silențios, dar cursanții nu văd niciun indicator.';
 $string['objectives:toggled'] = 'Setarea a fost actualizată.';
 $string['objectives:detected_heading'] = 'Detectate {$a->count} obiective de învățare din {$a->source}.';
+$string['objectives:source_outcomemap'] = 'maparea rezultatelor învățării';
 $string['objectives:source_competency'] = 'competențe Moodle';
 $string['objectives:source_summary'] = 'rezumatul cursului';
 $string['objectives:source_section'] = 'secțiune sau conținut din prima pagină';

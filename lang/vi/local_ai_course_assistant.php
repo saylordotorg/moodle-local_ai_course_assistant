@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'Hiển thị huy hiệu Mức thuần thụ
 $string['objectives:toggle_chip_help'] = 'Tuỳ chọn. Khi tắt, mức thuần thục vẫn âm thầm điều hướng trợ lý nhưng học viên không nhìn thấy chỉ báo nào.';
 $string['objectives:toggled'] = 'Đã cập nhật cài đặt.';
 $string['objectives:detected_heading'] = 'Đã phát hiện {$a->count} mục tiêu học tập từ {$a->source}.';
+$string['objectives:source_outcomemap'] = 'ánh xạ kết quả học tập';
 $string['objectives:source_competency'] = 'năng lực Moodle';
 $string['objectives:source_summary'] = 'tóm tắt khoá học';
 $string['objectives:source_section'] = 'phần hoặc nội dung trang đầu';

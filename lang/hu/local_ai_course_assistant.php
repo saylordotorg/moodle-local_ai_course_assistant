@@ -823,6 +823,7 @@ $string['objectives:toggle_chip'] = 'A Tanulási elsajátítás jelvény megjele
 $string['objectives:toggle_chip_help'] = 'Opcionális. Ha ki van kapcsolva, az elsajátítás csendben továbbra is irányítja az asszisztenst, de a tanulók nem látnak jelzést.';
 $string['objectives:toggled'] = 'Beállítás frissítve.';
 $string['objectives:detected_heading'] = '{$a->count} tanulási célkitűzés észlelve innen: {$a->source}.';
+$string['objectives:source_outcomemap'] = 'tanulási eredmények megfeleltetése';
 $string['objectives:source_competency'] = 'Moodle kompetenciák';
 $string['objectives:source_summary'] = 'kurzus összefoglaló';
 $string['objectives:source_section'] = 'szekció vagy első oldal tartalma';

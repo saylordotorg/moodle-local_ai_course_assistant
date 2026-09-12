@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'Показывать учащимся ин�
 $string['objectives:toggle_chip_help'] = 'Необязательно. Если выключено, отслеживание освоения по-прежнему незаметно направляет помощника, но учащиеся не видят индикатора.';
 $string['objectives:toggled'] = 'Настройка обновлена.';
 $string['objectives:detected_heading'] = 'Обнаружено учебных целей: {$a->count} (источник: {$a->source}).';
+$string['objectives:source_outcomemap'] = 'сопоставление результатов обучения';
 $string['objectives:source_competency'] = 'компетенции Moodle';
 $string['objectives:source_summary'] = 'описание курса';
 $string['objectives:source_section'] = 'раздел или содержимое первой страницы';

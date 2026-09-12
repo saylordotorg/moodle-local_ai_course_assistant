@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'แสดงชิปความเชี�
 $string['objectives:toggle_chip_help'] = 'เลือกได้ เมื่อปิด ความเชี่ยวชาญยังคงนำทางผู้ช่วยอย่างเงียบๆ แต่ผู้เรียนจะไม่เห็นตัวบ่งชี้';
 $string['objectives:toggled'] = 'อัปเดตการตั้งค่าแล้ว';
 $string['objectives:detected_heading'] = 'ตรวจพบ {$a->count} วัตถุประสงค์การเรียนรู้จาก {$a->source}';
+$string['objectives:source_outcomemap'] = 'การจับคู่ผลลัพธ์การเรียนรู้';
 $string['objectives:source_competency'] = 'ความสามารถของ Moodle';
 $string['objectives:source_summary'] = 'บทสรุปรายวิชา';
 $string['objectives:source_section'] = 'เนื้อหาส่วนหรือหน้าแรก';

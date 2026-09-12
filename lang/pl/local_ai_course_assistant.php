@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Pokazuj uczącym się znacznik Opanowanie n
 $string['objectives:toggle_chip_help'] = 'Opcjonalne. Gdy wyłączone, opanowanie nadal po cichu kieruje asystentem, ale uczący się nie widzą wskaźnika.';
 $string['objectives:toggled'] = 'Ustawienie zaktualizowane.';
 $string['objectives:detected_heading'] = 'Wykryto {$a->count} celów uczenia się ze źródła {$a->source}.';
+$string['objectives:source_outcomemap'] = 'mapowanie efektów uczenia się';
 $string['objectives:source_competency'] = 'Kompetencje Moodle';
 $string['objectives:source_summary'] = 'streszczenie kursu';
 $string['objectives:source_section'] = 'sekcja lub treść pierwszej strony';

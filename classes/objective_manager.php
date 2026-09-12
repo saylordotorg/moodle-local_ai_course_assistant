@@ -741,6 +741,21 @@ class objective_manager {
      */
     public static function detect_best_source(int $courseid): array {
         $candidates = [
+            // Curated outcomes first. local_outcomemap holds human-authored,
+            // approved, versioned outcome statements bound to the course. Where a
+            // course has them they beat anything the scrapers below can infer, and
+            // they are read with one query instead of a walk over every module.
+            //
+            // This also short-circuits the expensive path: detect_best_source()
+            // returns on the first candidate yielding three or more objectives, so
+            // a mapped course never reaches extract_from_section_content(), which
+            // runs roughly 4 queries and one format_text() per Page and per Book
+            // chapter with no module cap.
+            //
+            // The candidate is inert when the plugin is absent, which is every
+            // install that does not have it: outcomemap_bridge::fetch() returns an
+            // empty array and the chain falls through unchanged.
+            ['outcomemap', [outcomemap_bridge::class, 'fetch']],
             ['competency', [self::class, 'find_moodle_competencies']],
             ['summary', [self::class, 'extract_from_course_summary']],
             ['section', [self::class, 'extract_from_section_content']],

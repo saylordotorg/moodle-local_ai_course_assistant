@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = '向学生展示"学习掌握度"小标签';
 $string['objectives:toggle_chip_help'] = '可选。关闭时，掌握度仍会在后台引导助手，但学习者看不到任何指示。';
 $string['objectives:toggled'] = '设置已更新。';
 $string['objectives:detected_heading'] = '已从 {$a->source} 检测到 {$a->count} 个学习目标。';
+$string['objectives:source_outcomemap'] = '学习成果映射';
 $string['objectives:source_competency'] = 'Moodle 能力';
 $string['objectives:source_summary'] = '课程简介';
 $string['objectives:source_section'] = '章节或首页内容';
