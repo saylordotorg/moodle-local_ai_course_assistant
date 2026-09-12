@@ -1944,5 +1944,40 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091005, 'local', 'ai_course_assistant');
     }
 
+    if ($oldversion < 2026091007) {
+        // v7.4.5: give _radar_batch the table COMMENT that install.xml declares.
+        //
+        // The 2026091004 block builds this table with new xmldb_table() and never
+        // calls setComment(), so a site that UPGRADED into 7.4.4 got the table
+        // without a comment while a FRESH install got it with one. Found by
+        // diffing a rehearsed 7.4.1 -> 7.4.5 upgrade against a fresh 7.4.5
+        // install: the two agreed on all 38 tables, 416 columns and 226 index
+        // rows, and differed on exactly this one line of DDL.
+        //
+        // Nothing reads the comment, so this is documentation parity rather than
+        // a behaviour fix. It takes its own savepoint instead of an edit to the
+        // 2026091004 block because that block already shipped in v7.4.4: a site
+        // that has run it will never run it again, so repairing it in place
+        // would reach only the sites that had not upgraded yet.
+        //
+        // Routed through the generator rather than raw SQL so each database gets
+        // its own dialect: MySQL emits ALTER TABLE ... COMMENT=, PostgreSQL emits
+        // COMMENT ON TABLE, and SQLite and MSSQL emit nothing because they do not
+        // carry table comments. MySQL truncates to 60 characters, which is also
+        // what a fresh install stores, so both paths converge on one value.
+        $table = new xmldb_table('local_ai_course_assistant_radar_batch');
+        $table->setComment('v7.4.4: in-flight OpenAI Batch API jobs for scheduled Learning Radar reports. One row per submitted schedule run; the poller task collects it on a later cron pass, up to 24h later.');
+
+        if ($dbman->table_exists($table) && !empty($dbman->generator->add_table_comments)) {
+            foreach ($dbman->generator->getCommentSQL($table) as $statement) {
+                if (trim($statement) !== '') {
+                    $DB->execute($statement);
+                }
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026091007, 'local', 'ai_course_assistant');
+    }
+
     return true;
 }

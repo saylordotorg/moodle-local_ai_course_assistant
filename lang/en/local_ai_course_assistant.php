@@ -1780,6 +1780,8 @@ $string['sandbox:toggle']          = 'Enable the Python sandbox for this course'
 $string['sandbox:toggle_help']     = 'Adds a learner-facing page where students can write and run Python entirely in their browser via Pyodide. Off by default. Enable for courses with code work; leave off for courses without.';
 
 // Mastery admin settings (v3.9.17).
+$string['settings:objectives_admin_link'] = 'Open learning objectives & mastery';
+$string['settings:objectives_admin_link_desc'] = 'Objectives are defined per course, and the per-course mastery toggles live there too. The settings below are the site-wide defaults that govern how mastery is calculated.';
 $string['settings:mastery_heading']              = 'Mastery tracking';
 $string['settings:mastery_heading_desc']         = 'Opt-in per-course feature that tags quiz answers and assistant conversation turns against the course\'s learning objectives, then feeds a compact mastery snapshot back into the system prompt to steer questioning. Subtle by default: learners see nothing unless the per-course chip toggle is on.';
 $string['settings:mastery_threshold']            = 'Mastered threshold';
@@ -2817,6 +2819,7 @@ $string['mobile:error_generic'] = 'Sorry, something went wrong. Please try again
 // --- from newstrings_e.php ---
 // settings.php — page/nav chrome and select options (i18n extraction batch E).
 $string['settingspage:pagetitle'] = 'Settings';
+$string['toc:providerbenchmark'] = 'Provider benchmark';
 $string['toc:playground'] = 'Prompt Playground';
 $string['toc:course_ai_settings'] = '{$a} AI settings';
 $string['settingspage:analytics_blurb'] = 'Cross-course usage analytics, enable/disable AI per course, student feedback, and Learning Radar.';

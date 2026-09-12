@@ -5,7 +5,7 @@ A comprehensive AI-powered chat widget for Moodle 4.5+ that provides context-awa
 ## Version 7.4.5
 
 **Release Date:** September 2026
-**Plugin build:** 2026091006
+**Plugin build:** 2026091007
 **Requires:** Moodle 4.5+ (2024100700). Continuously tested against Moodle 4.5, 5.0 and 5.1; supported through 5.3.
 **License:** GPL v3+
 **Maturity:** Stable. In production on Saylor's Learn and Degrees sites.

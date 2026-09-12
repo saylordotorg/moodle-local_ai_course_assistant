@@ -834,6 +834,8 @@ $string['mastery:status_mastered'] = '已掌握';
 $string['mastery:status_learning'] = '进行中';
 $string['mastery:status_not_started'] = '未开始';
 $string['mastery:popover_empty'] = '本课程未配置任何学习目标。';
+$string['settings:objectives_admin_link'] = '打开学习目标与掌握度';
+$string['settings:objectives_admin_link_desc'] = '学习目标按课程定义，按课程的掌握度开关也在那里。下方的设置是控制掌握度计算方式的全站默认值。';
 $string['settings:mastery_heading'] = '掌握度跟踪';
 $string['settings:mastery_heading_desc'] = '按课程启用的可选功能，将测验答题与助手对话轮次按课程学习目标打标签，并把简洁的掌握度快照回填到 system prompt 以引导提问。默认低调：除非启用了按课程的小标签开关，学习者看不到任何提示。';
 $string['settings:mastery_threshold'] = '掌握阈值';
@@ -2290,6 +2292,7 @@ $string['mobile:clear_history'] = '清除历史';
 $string['mobile:error_generic'] = '抱歉，出了点问题。请重试。';
 // settings.php — page/nav chrome and select options.
 $string['settingspage:pagetitle'] = '设置';
+$string['toc:providerbenchmark'] = '提供商基准测试';
 $string['toc:playground'] = '提示词演练场';
 $string['toc:course_ai_settings'] = '{$a} AI 设置';
 $string['settingspage:analytics_blurb'] = '跨课程使用分析、按课程启用/禁用 AI、学生反馈以及 Learning Radar。';
