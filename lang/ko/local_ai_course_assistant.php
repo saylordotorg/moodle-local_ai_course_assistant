@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = '학생에게 학습 숙달 칩 표시';
 $string['objectives:toggle_chip_help'] = '선택 사항입니다. 비활성화하면 숙달 정보는 보이지 않게 어시스턴트를 안내하지만 학습자에게는 표시기가 보이지 않습니다.';
 $string['objectives:toggled'] = '설정이 업데이트되었습니다.';
 $string['objectives:detected_heading'] = '{$a->source}에서 {$a->count}개의 학습 목표를 감지했습니다.';
+$string['objectives:source_outcomemap'] = '학습 성과 매핑';
 $string['objectives:source_competency'] = 'Moodle 역량';
 $string['objectives:source_summary'] = '코스 요약';
 $string['objectives:source_section'] = '섹션 또는 첫 페이지 콘텐츠';

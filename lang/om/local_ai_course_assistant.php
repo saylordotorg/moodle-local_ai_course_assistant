@@ -813,6 +813,7 @@ $string['objectives:toggle_chip'] = 'Chip Gahumsa Barnootaa barattootaaf agarsii
 $string['objectives:toggle_chip_help'] = 'Filannoo. Yeroo cufamu, gahumsi gargaaraa kallattii hin agarsiifne ammas qajeelcha; barattoonni mallattoo tokko illee hin argan.';
 $string['objectives:toggled'] = 'Qindaa\'inni haaromfameera.';
 $string['objectives:detected_heading'] = 'Galmoota barnootaa {$a->count} {$a->source} irraa argaman.';
+$string['objectives:source_outcomemap'] = 'firii barnootaa walqabsiisuu';
 $string['objectives:source_competency'] = 'Dandeettiwwan Moodle';
 $string['objectives:source_summary'] = 'cuunfaa koorsii';
 $string['objectives:source_section'] = 'kutaa yookaan qabiyyee fuula jalqabaa';

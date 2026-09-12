@@ -834,6 +834,7 @@ $string['objectives:toggle_chip'] = 'Tampilkan chip Penguasaan Pembelajaran kepa
 $string['objectives:toggle_chip_help'] = 'Opsional. Saat dimatikan, penguasaan tetap mengarahkan asisten secara diam-diam tetapi pelajar tidak melihat indikator.';
 $string['objectives:toggled'] = 'Pengaturan diperbarui.';
 $string['objectives:detected_heading'] = 'Terdeteksi {$a->count} tujuan pembelajaran dari {$a->source}.';
+$string['objectives:source_outcomemap'] = 'pemetaan hasil pembelajaran';
 $string['objectives:source_competency'] = 'Kompetensi Moodle';
 $string['objectives:source_summary'] = 'ringkasan kursus';
 $string['objectives:source_section'] = 'konten bagian atau halaman pertama';

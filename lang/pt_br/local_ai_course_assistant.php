@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'Mostrar o chip de Domínio de Aprendizagem 
 $string['objectives:toggle_chip_help'] = 'Opcional. Quando desativado, o domínio continua orientando o assistente silenciosamente, mas os estudantes não veem nenhum indicador.';
 $string['objectives:toggled'] = 'Configuração atualizada.';
 $string['objectives:detected_heading'] = 'Detectados {$a->count} objetivos de aprendizagem em {$a->source}.';
+$string['objectives:source_outcomemap'] = 'mapeamento de resultados de aprendizagem';
 $string['objectives:source_competency'] = 'competências do Moodle';
 $string['objectives:source_summary'] = 'resumo do curso';
 $string['objectives:source_section'] = 'seção ou conteúdo da primeira página';

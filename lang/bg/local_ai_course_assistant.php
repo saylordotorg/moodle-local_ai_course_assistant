@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Показване на чипа за уч�
 $string['objectives:toggle_chip_help'] = 'По избор. Когато е изключено, владеенето продължава да насочва асистента мълчаливо, но учащите не виждат индикатор.';
 $string['objectives:toggled'] = 'Настройката е обновена.';
 $string['objectives:detected_heading'] = 'Открити са {$a->count} учебни цели от {$a->source}.';
+$string['objectives:source_outcomemap'] = 'съпоставяне на учебните резултати';
 $string['objectives:source_competency'] = 'компетенции в Moodle';
 $string['objectives:source_summary'] = 'обобщение на курса';
 $string['objectives:source_section'] = 'съдържание на раздел или първа страница';

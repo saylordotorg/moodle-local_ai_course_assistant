@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Vis Læringsmestring-chipen til elevene';
 $string['objectives:toggle_chip_help'] = 'Valgfritt. Når slått av, styrer mestring fortsatt assistenten i bakgrunnen, men eleven ser ingen indikator.';
 $string['objectives:toggled'] = 'Innstilling oppdatert.';
 $string['objectives:detected_heading'] = 'Oppdaget {$a->count} læringsmål fra {$a->source}.';
+$string['objectives:source_outcomemap'] = 'kartlegging av læringsutbytte';
 $string['objectives:source_competency'] = 'Moodle-kompetanser';
 $string['objectives:source_summary'] = 'emnesammendrag';
 $string['objectives:source_section'] = 'seksjons- eller førstesideinnhold';

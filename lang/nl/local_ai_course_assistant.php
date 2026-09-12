@@ -805,6 +805,7 @@ $string['objectives:toggle_chip'] = 'Toon de Leerbeheersing-chip aan studenten';
 $string['objectives:toggle_chip_help'] = 'Optioneel. Wanneer uitgeschakeld blijft beheersing de assistent stilletjes sturen, maar zien leerlingen geen indicator.';
 $string['objectives:toggled'] = 'Instelling bijgewerkt.';
 $string['objectives:detected_heading'] = '{$a->count} leerdoelen gedetecteerd uit {$a->source}.';
+$string['objectives:source_outcomemap'] = 'koppeling van leerresultaten';
 $string['objectives:source_competency'] = 'Moodle-competenties';
 $string['objectives:source_summary'] = 'cursussamenvatting';
 $string['objectives:source_section'] = 'sectie- of inhoud van eerste pagina';

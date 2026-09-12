@@ -823,6 +823,7 @@ $string['objectives:toggle_chip'] = 'Εμφάνιση του δείκτη Μαθ
 $string['objectives:toggle_chip_help'] = 'Προαιρετικό. Όταν είναι απενεργοποιημένο, η κατάκτηση εξακολουθεί να καθοδηγεί σιωπηλά τον βοηθό, αλλά οι εκπαιδευόμενοι δεν βλέπουν κανέναν δείκτη.';
 $string['objectives:toggled'] = 'Η ρύθμιση ενημερώθηκε.';
 $string['objectives:detected_heading'] = 'Εντοπίστηκαν {$a->count} μαθησιακοί στόχοι από: {$a->source}.';
+$string['objectives:source_outcomemap'] = 'αντιστοίχιση μαθησιακών αποτελεσμάτων';
 $string['objectives:source_competency'] = 'ικανότητες Moodle';
 $string['objectives:source_summary'] = 'περίληψη μαθήματος';
 $string['objectives:source_section'] = 'ενότητα ή περιεχόμενο πρώτης σελίδας';

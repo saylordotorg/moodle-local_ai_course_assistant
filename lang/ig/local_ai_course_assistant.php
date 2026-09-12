@@ -796,6 +796,7 @@ $string['objectives:toggle_chip'] = 'Gosi chip Nke a Kọwapụtara Mmụta nye 
 $string['objectives:toggle_chip_help'] = 'Nhọrọ. Mgbe gbanyụrụ, nke a kọwapụtara ka na-eduzi onye enyemaka na nzuzo mana ndị mmụta anaghị ahụ ihe ngosi.';
 $string['objectives:toggled'] = 'Emelitere ntọala.';
 $string['objectives:detected_heading'] = 'Achọpụtara ebumnobi mmụta {$a->count} site na {$a->source}.';
+$string['objectives:source_outcomemap'] = 'nhazi nsonaazụ mmụta';
 $string['objectives:source_competency'] = 'Ikike Moodle';
 $string['objectives:source_summary'] = 'nchịkọta usoro';
 $string['objectives:source_section'] = 'akụkụ ma ọ bụ ọdịnaya ibe mbụ';

@@ -809,6 +809,7 @@ $string['objectives:toggle_chip'] = 'Kalanden ka Sebagaya taamasiɲɛ jira kalan
 $string['objectives:toggle_chip_help'] = 'A man kan dɔrɔn. Ni a faga, sebagaya bɛ tora dɛmɛbaga bolosin makun na nka kalandenw tɛ taamasiɲɛ si ye.';
 $string['objectives:toggled'] = 'Labɛnni yɛlɛmana.';
 $string['objectives:detected_heading'] = 'Kalanni laɲini {$a->count} sɔrɔla {$a->source} la.';
+$string['objectives:source_outcomemap'] = 'kalan jaabiw sɛbɛnni';
 $string['objectives:source_competency'] = 'Moodle seko';
 $string['objectives:source_summary'] = 'kalan kunnafoni surunyalen';
 $string['objectives:source_section'] = 'tilayɔrɔ walima page fɔlɔ kɔnɔkow';

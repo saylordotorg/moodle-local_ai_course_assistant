@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Visa indikatorn Lärandebehärskning för e
 $string['objectives:toggle_chip_help'] = 'Valfritt. När det är av styr behärskningen fortfarande assistenten i bakgrunden, men eleverna ser ingen indikator.';
 $string['objectives:toggled'] = 'Inställning uppdaterad.';
 $string['objectives:detected_heading'] = 'Hittade {$a->count} lärandemål från {$a->source}.';
+$string['objectives:source_outcomemap'] = 'kartläggning av lärandemål';
 $string['objectives:source_competency'] = 'Moodle-kompetenser';
 $string['objectives:source_summary'] = 'kursöversikt';
 $string['objectives:source_section'] = 'avsnitt eller innehåll på första sidan';

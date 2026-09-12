@@ -802,6 +802,7 @@ $string['objectives:toggle_chip'] = 'Fi ààmì Ìmọ̀ràn Ìkẹ́kọ̀ọ́
 $string['objectives:toggle_chip_help'] = 'Àṣàyàn. Nígbà tí ó bá pa, ìmọ̀ràn ṣì ń ṣe ìtọ́sọ́nà olùrànlọ́wọ́ ní ìdákẹ́, ṣùgbọ́n àwọn akẹ́kọ̀ọ́ kò rí àfihàn.';
 $string['objectives:toggled'] = 'A ti yí ìṣètò padà.';
 $string['objectives:detected_heading'] = 'A rí {$a->count} èròjà ìkẹ́kọ̀ọ́ láti {$a->source}.';
+$string['objectives:source_outcomemap'] = 'àwòrán àbájáde ẹ̀kọ́';
 $string['objectives:source_competency'] = 'agbára Moodle';
 $string['objectives:source_summary'] = 'àkótán ẹ̀kọ́';
 $string['objectives:source_section'] = 'apá tàbí àkóónú ojú-ìwé àkọ́kọ́';

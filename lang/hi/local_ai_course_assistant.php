@@ -810,6 +810,7 @@ $string['objectives:toggle_chip'] = 'छात्रों को सीखन�
 $string['objectives:toggle_chip_help'] = 'वैकल्पिक। जब बंद होता है, तब भी महारत चुपचाप सहायक का मार्गदर्शन करती है लेकिन शिक्षार्थियों को कोई संकेतक नहीं दिखता।';
 $string['objectives:toggled'] = 'सेटिंग अद्यतन की गई।';
 $string['objectives:detected_heading'] = '{$a->source} से {$a->count} सीखने के उद्देश्यों का पता चला।';
+$string['objectives:source_outcomemap'] = 'सीखने के परिणामों की मैपिंग';
 $string['objectives:source_competency'] = 'Moodle दक्षताएँ';
 $string['objectives:source_summary'] = 'पाठ्यक्रम सारांश';
 $string['objectives:source_section'] = 'अनुभाग या प्रथम-पृष्ठ सामग्री';

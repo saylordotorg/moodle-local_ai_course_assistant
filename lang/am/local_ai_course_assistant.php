@@ -808,6 +808,7 @@ $string['objectives:toggle_chip'] = 'ለተማሪዎች የመማር ክህሎ�
 $string['objectives:toggle_chip_help'] = 'አማራጭ። ሲጠፋ፣ ክህሎት ጥራት ረዳቱን በዝምታ መምራቱን ይቀጥላል ነገር ግን ተማሪዎች ምንም አመልካች አያዩም።';
 $string['objectives:toggled'] = 'ቅንብር ተሻሽሏል።';
 $string['objectives:detected_heading'] = 'ከ{$a->source} {$a->count} የመማር ግቦች ተገኝተዋል።';
+$string['objectives:source_outcomemap'] = 'የመማር ውጤቶች ማዛመድ';
 $string['objectives:source_competency'] = 'የ Moodle ብቃቶች';
 $string['objectives:source_summary'] = 'የኮርሱ ማጠቃለያ';
 $string['objectives:source_section'] = 'የክፍል ወይም የመጀመሪያ ገጽ ይዘት';

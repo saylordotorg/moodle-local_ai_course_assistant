@@ -823,6 +823,7 @@ $string['objectives:toggle_chip'] = 'הצג את תווית שליטת הלמי�
 $string['objectives:toggle_chip_help'] = 'אופציונלי. כאשר כבוי, השליטה עדיין מנחה את העוזר בשקט אבל הלומדים אינם רואים מחוון.';
 $string['objectives:toggled'] = 'ההגדרה עודכנה.';
 $string['objectives:detected_heading'] = 'זוהו {$a->count} מטרות למידה מתוך {$a->source}.';
+$string['objectives:source_outcomemap'] = 'מיפוי תוצרי למידה';
 $string['objectives:source_competency'] = 'יכולות Moodle';
 $string['objectives:source_summary'] = 'סיכום הקורס';
 $string['objectives:source_section'] = 'תוכן של מקטע או של עמוד ראשון';

@@ -782,6 +782,7 @@ $string['objectives:toggle_chip'] = 'Afficher la pastille Maîtrise de l\'appren
 $string['objectives:toggle_chip_help'] = 'Facultatif. Lorsqu\'il est désactivé, la maîtrise continue de guider l\'assistant en silence mais les apprenants ne voient aucun indicateur.';
 $string['objectives:toggled'] = 'Paramètre mis à jour.';
 $string['objectives:detected_heading'] = '{$a->count} objectifs d\'apprentissage détectés depuis {$a->source}.';
+$string['objectives:source_outcomemap'] = 'cartographie des acquis d\'apprentissage';
 $string['objectives:source_competency'] = 'compétences Moodle';
 $string['objectives:source_summary'] = 'résumé du cours';
 $string['objectives:source_section'] = 'section ou contenu de la première page';

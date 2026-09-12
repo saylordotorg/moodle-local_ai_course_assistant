@@ -781,6 +781,7 @@ $string['objectives:toggle_chip'] = 'Zobrazovat studentům odznak Osvojení uče
 $string['objectives:toggle_chip_help'] = 'Volitelné. Když je vypnuto, osvojení stále tiše řídí asistenta, ale studenti nevidí žádný indikátor.';
 $string['objectives:toggled'] = 'Nastavení aktualizováno.';
 $string['objectives:detected_heading'] = 'Detekováno {$a->count} učebních cílů ze zdroje: {$a->source}.';
+$string['objectives:source_outcomemap'] = 'mapování výukových výstupů';
 $string['objectives:source_competency'] = 'Moodle kompetence';
 $string['objectives:source_summary'] = 'shrnutí kurzu';
 $string['objectives:source_section'] = 'sekce nebo obsah první stránky';

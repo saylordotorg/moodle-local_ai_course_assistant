@@ -826,6 +826,7 @@ $string['objectives:toggle_chip'] = 'Tus ardayda calaamada Aqoonsanaanta Waxbara
 $string['objectives:toggle_chip_help'] = 'Ikhtiyaari. Marka la damiyo, aqoonsanaantu weli si dahsoon ayey u hagaysaa caawiyaha laakiin ardayda waxba ma arkaan.';
 $string['objectives:toggled'] = 'Dejintii waa la cusboonaysiiyay.';
 $string['objectives:detected_heading'] = 'Waxaa la helay {$a->count} ujeedo waxbarasho oo ka socda {$a->source}.';
+$string['objectives:source_outcomemap'] = 'isku xidhka natiijooyinka waxbarashada';
 $string['objectives:source_competency'] = 'Awoodaha Moodle';
 $string['objectives:source_summary'] = 'soo koobitaanka koorsada';
 $string['objectives:source_section'] = 'qeyb ama nuxurka boggaa hore';

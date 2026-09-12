@@ -823,6 +823,7 @@ $string['objectives:toggle_chip'] = 'Показувати студентам ч�
 $string['objectives:toggle_chip_help'] = 'Необов\'язково. Коли вимкнено, опанування все ще тихо керує помічником, але учні не бачать жодного індикатора.';
 $string['objectives:toggled'] = 'Налаштування оновлено.';
 $string['objectives:detected_heading'] = 'Виявлено {$a->count} навчальних цілей з {$a->source}.';
+$string['objectives:source_outcomemap'] = 'зіставлення результатів навчання';
 $string['objectives:source_competency'] = 'компетенції Moodle';
 $string['objectives:source_summary'] = 'опис курсу';
 $string['objectives:source_section'] = 'розділ або вміст першої сторінки';
