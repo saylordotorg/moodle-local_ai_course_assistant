@@ -900,6 +900,54 @@ class context_builder {
     }
 
     /**
+     * Rewrite @@PLUGINFILE@@ placeholders, then format module HTML for text extraction.
+     *
+     * Moodle requires file_rewrite_pluginfile_urls() before format_text(). Without it
+     * core emits "Before calling format_text(), the content must be processed with
+     * file_rewrite_pluginfile_urls()" on every call. This was observed on production:
+     * one load of objectives_admin.php for a single course produced hundreds of those
+     * warnings, because the objective extractor walks every Page and Book in the course.
+     *
+     * Passing the module context explicitly matters just as much. Without it
+     * format_text() falls back to $PAGE->context, which is the wrong context whenever
+     * this runs anywhere other than that module's own page, and is unavailable in
+     * non-web callers such as scheduled tasks, where $PAGE may not exist at all.
+     *
+     * @param string   $html      Raw stored HTML.
+     * @param int|null $format    One of the FORMAT_* constants.
+     * @param int      $cmid      Course-module id supplying the context.
+     * @param string   $component Owning component, e.g. 'mod_page'.
+     * @param string   $filearea  File area within that component.
+     * @param int|null $itemid    File area item id, or null when the area has none.
+     * @return string Formatted HTML, or the unmodified input if the context is gone.
+     */
+    private static function format_module_html(
+        string $html,
+        ?int $format,
+        int $cmid,
+        string $component,
+        string $filearea,
+        ?int $itemid
+    ): string {
+        $context = \context_module::instance($cmid, IGNORE_MISSING);
+        if (!$context) {
+            // The module vanished between the modinfo read and here. Returning the
+            // raw HTML keeps the caller's strip_tags() fallback working rather than
+            // throwing inside what is only a best-effort content extraction.
+            return $html;
+        }
+        $html = file_rewrite_pluginfile_urls(
+            $html,
+            'pluginfile.php',
+            $context->id,
+            $component,
+            $filearea,
+            $itemid
+        );
+        return format_text($html, $format, ['context' => $context]);
+    }
+
+    /**
      * Extract readable text content from a single course module (page or book).
      * Used by quiz generation and system prompt page injection.
      *
@@ -967,7 +1015,14 @@ class context_builder {
                     // short summary post-filter. Tomi @ Debrecen reproduced
                     // this on a Page activity with full body text that
                     // returned empty here on his site.
-                    $filtered = strip_tags(format_text($record->content, $record->contentformat));
+                    $filtered = strip_tags(self::format_module_html(
+                        (string) $record->content,
+                        isset($record->contentformat) ? (int) $record->contentformat : null,
+                        $cmid,
+                        'mod_page',
+                        'content',
+                        isset($record->revision) ? (int) $record->revision : null
+                    ));
                     $filtered = preg_replace('/\s+/', ' ', trim($filtered));
                     if (strlen($filtered) >= 30) {
                         return substr($filtered, 0, $maxchars);
@@ -991,7 +1046,14 @@ class context_builder {
                     $parts = [];
                     $perchapter = ($maxchars > 6000) ? 2400 : 1200;
                     foreach ($chapters as $ch) {
-                        $text = strip_tags(format_text($ch->content, $ch->contentformat));
+                        $text = strip_tags(self::format_module_html(
+                            (string) $ch->content,
+                            isset($ch->contentformat) ? (int) $ch->contentformat : null,
+                            $cmid,
+                            'mod_book',
+                            'chapter',
+                            (int) $ch->id
+                        ));
                         $text = preg_replace('/\s+/', ' ', trim($text));
                         if (strlen($text) > 50) {
                             $heading = !empty($ch->title) ? "{$ch->title}: " : '';
@@ -1656,7 +1718,14 @@ class context_builder {
                     try {
                         $record = $pagerows[(int) $cm->instance] ?? null;
                         if ($record && !empty($record->content)) {
-                            $text = strip_tags(format_text($record->content, $record->contentformat));
+                            $text = strip_tags(self::format_module_html(
+                                (string) $record->content,
+                                isset($record->contentformat) ? (int) $record->contentformat : null,
+                                (int) $cm->id,
+                                'mod_page',
+                                'content',
+                                isset($record->revision) ? (int) $record->revision : null
+                            ));
                             $text = preg_replace('/\s+/', ' ', trim($text));
                             if (strlen($text) > 80) {
                                 $content = substr($text, 0, $maxperresource);
@@ -1680,7 +1749,14 @@ class context_builder {
                         if ($chapters) {
                             $parts = [];
                             foreach ($chapters as $ch) {
-                                $text = strip_tags(format_text($ch->content, $ch->contentformat));
+                                $text = strip_tags(self::format_module_html(
+                                    (string) $ch->content,
+                                    isset($ch->contentformat) ? (int) $ch->contentformat : null,
+                                    (int) $cm->id,
+                                    'mod_book',
+                                    'chapter',
+                                    (int) $ch->id
+                                ));
                                 $text = preg_replace('/\s+/', ' ', trim($text));
                                 if (strlen($text) > 50) {
                                     $heading = !empty($ch->title) ? "{$ch->title}: " : '';
