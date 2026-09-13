@@ -130,6 +130,24 @@ class context_builder {
      */
     private const CONTENT_SLICE = 20;
 
+    /** @var int Default character budget for the course-structure block. */
+    private const TOPICS_MAX_CHARS = 2500;
+
+    /** @var int Character budget for the structure block when a page anchors the prompt. */
+    private const TOPICS_ANCHORED_MAX_CHARS = 1500;
+
+    /** @var int Hard ceiling on the course-summary header, whatever the total budget is. */
+    private const TOPICS_SUMMARY_MAX_CHARS = 600;
+
+    /**
+     * @var int Shortest course summary worth spending budget on. Below this the
+     * header is dropped entirely rather than emitting a truncated fragment.
+     */
+    private const TOPICS_SUMMARY_MIN_CHARS = 80;
+
+    /** @var int Most activities listed for any one section. */
+    private const TOPICS_MAX_ACTIVITIES_PER_SECTION = 8;
+
     /**
      * v4.12.0: stash the last assembled section breakdown so the prompt-debug
      * log in sse.php can render per-section sizes without re-running the
@@ -248,15 +266,11 @@ class context_builder {
         $firstname = $userrecord->firstname;
         $userrole = self::detect_role($courseid, $userid);
 
-        // Build course structure (section names + activity list).
-        $coursetopics = self::build_course_topics($courseid);
-
-        // v5.3.6: when the learner is on a page with real content, the
-        // section/activity overview is mostly noise — the model only
-        // needs a thin breadcrumb. Halve the cap so a long course stays
-        // a one-screen overview instead of dominating the prompt.
-        // (Wide-dump skip decision happens below; this trim runs whenever
-        // a usable current page IS present.)
+        // Course structure (section names + activity list) is built below,
+        // once $skipwidedump is known: its character budget depends on whether
+        // a current page anchors the prompt, and the block has to be BUILT to
+        // that budget rather than built large and then cut -- cutting it is
+        // what dropped the tail of the unit list on an 8-unit course.
 
         // v5.3.6: Resolve the current-page content EARLY so we can decide
         // whether to skip the course-wide content dump. When the learner is
@@ -285,11 +299,14 @@ class context_builder {
         $skipwidedump = (strlen($resolvedpagecontent) >= 500);
 
         // v5.3.6: thin the course-structure overview when we have a usable
-        // current page anchor. 1500 char cap is plenty for a top-level
-        // breadcrumb; full overview goes back when no page anchor exists.
-        if ($skipwidedump && strlen($coursetopics) > 1500) {
-            $coursetopics = substr($coursetopics, 0, 1500) . "\n[..additional sections truncated..]";
-        }
+        // current page anchor. 1500 chars is plenty for a top-level breadcrumb;
+        // the full budget goes back when no page anchor exists. The budget is
+        // passed IN so the block is assembled to fit -- every section name
+        // still lands, and activity detail is what gives way.
+        $coursetopics = self::build_course_topics(
+            $courseid,
+            $skipwidedump ? self::TOPICS_ANCHORED_MAX_CHARS : self::TOPICS_MAX_CHARS
+        );
 
         // Determine course content: RAG chunks or full content stuffing.
         if ($ragmode) {
@@ -422,15 +439,40 @@ class context_builder {
         // budgeted as such. Priorities keep content above structure: when the
         // budget is tight the course map is the cheaper thing to lose.
         if (!empty($coursetopics)) {
+            // F78: fenced like its siblings -- section names and summaries
+            // are course-author content, the one such path that skipped
+            // fence_untrusted.
+            //
+            // The id-suppression rule leads the section rather than trailing
+            // it: prompt\builder truncates from the tail, so an instruction
+            // appended after the listing is the first thing a tight budget
+            // removes -- leaving the ids with nothing governing them. It sits
+            // outside the fence because it is our instruction, not
+            // course-author content.
+            $structureblock = "\n\n## Course Structure\n"
+                . self::get_activity_id_instructions() . "\n"
+                . security::fence_untrusted($coursetopics, 'course structure');
+
+            // min_chars is the WHOLE block, which makes it atomic: the
+            // assembler may drop it but may not shorten it.
+            //
+            // This was the third and last cap cutting the same list. Even with
+            // build_course_topics() budgeting section names ahead of activity
+            // detail, the proportional model then clipped the assembled section
+            // again from the tail -- and with a page in scope the current_page
+            // boost leaves course_structure a few hundred characters, so the
+            // block arrived ending at "Unit 6" with the marker for units 7-8
+            // stripped. A half-list is worse than no list: it is what let three
+            // different models answer "what does this course cover?" with the
+            // first three units and stop, stating it as complete. The block is
+            // already built to a hard character budget above (1500 anchored /
+            // 2500 otherwise), so making it atomic bounds what it can cost.
             $sections[] = new section(
                 'course_topics',
                 section::CAT_CONTEXT,
                 92,
-                // F78: fenced like its siblings -- section names and summaries
-                // are course-author content, the one such path that skipped
-                // fence_untrusted.
-                "\n\n## Course Structure\n" . security::fence_untrusted($coursetopics, 'course structure'),
-                200
+                $structureblock,
+                strlen($structureblock)
             );
         }
         if (!empty($coursecontent)) {
@@ -893,10 +935,14 @@ class context_builder {
      * Public wrapper so external classes can access the course topics text.
      *
      * @param int $courseid
+     * @param int $maxchars Total character budget for the block.
      * @return string
      */
-    public static function get_course_topics_text(int $courseid): string {
-        return self::build_course_topics($courseid);
+    public static function get_course_topics_text(
+        int $courseid,
+        int $maxchars = self::TOPICS_MAX_CHARS
+    ): string {
+        return self::build_course_topics($courseid, $maxchars);
     }
 
     /**
@@ -1529,14 +1575,38 @@ class context_builder {
     /**
      * Build a text summary of course sections and activities.
      *
+     * The budget is spent in priority order, because the block used to be
+     * assembled section-by-section and then cut off at the end -- which meant
+     * the tail of the course vanished. On CS101 (8 units) all three production
+     * models answered "what topics does this course cover?" with Units 1-3 and
+     * stopped; three models failing identically is a prompt defect, not a model
+     * defect. The cut is now taken from the detail rather than from the map:
+     *
+     *   1. the course summary (capped) -- it carries "Time: 26 hours" and
+     *      "CEUs: 2.6", facts that appear nowhere else in the prompt and that a
+     *      model with no answer will otherwise invent;
+     *   2. EVERY visible section name -- the skeleton of the course, priced in
+     *      before any optional detail and never the thing that yields;
+     *   3. section summaries, in course order, as they fit;
+     *   4. activities, round-robin across sections so unit 8 gets a first
+     *      activity before unit 1 gets a second.
+     *
      * @param int $courseid
+     * @param int $maxchars Total character budget for the block.
      * @return string
      */
-    private static function build_course_topics(int $courseid): string {
+    private static function build_course_topics(
+        int $courseid,
+        int $maxchars = self::TOPICS_MAX_CHARS
+    ): string {
+        $maxchars = max(200, $maxchars);
         $modinfo = get_fast_modinfo($courseid);
         $sections = $modinfo->get_section_info_all();
-        $lines = [];
 
+        // Gather the raw material for every visible section before pricing any
+        // of it, so the cap can be spent across the whole course rather than
+        // consumed front-to-back.
+        $entries = [];
         foreach ($sections as $section) {
             if (!$section->visible) {
                 continue;
@@ -1547,18 +1617,15 @@ class context_builder {
                 continue;
             }
 
-            $line = "- {$sectionname}";
-
-            // Add section summary if short.
-            $summary = strip_tags($section->summary ?? '');
-            if (!empty($summary) && strlen($summary) < 200) {
-                $line .= ": {$summary}";
+            $summary = self::flatten_text((string) ($section->summary ?? ''));
+            if ($summary === '' || strlen($summary) >= 200) {
+                $summary = '';
             }
 
-            // Add visible activities with cmid for source attribution. v6.2.0:
+            // Visible activities with cmid for source attribution. v6.2.0:
             // drop the module type from the annotation (the cmid is what
-            // citations need; the type was noise) and cap at 8 per section to
-            // keep the overview compact on large courses.
+            // citations need; the type was noise) and cap per section to keep
+            // the overview compact on large courses.
             $activities = [];
             if (!empty($modinfo->sections[$section->section])) {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
@@ -1568,28 +1635,195 @@ class context_builder {
                     }
                 }
             }
+            $listed = array_slice($activities, 0, self::TOPICS_MAX_ACTIVITIES_PER_SECTION);
 
-            if (!empty($activities)) {
-                $line .= "\n  Activities: " . implode(', ', array_slice($activities, 0, 8));
-                if (count($activities) > 8) {
+            $entries[] = [
+                'name' => $sectionname,
+                'summary' => $summary,
+                'acts' => $listed,
+                'more' => count($activities) > count($listed),
+                'withsummary' => false,
+                'chosen' => [],
+            ];
+        }
+
+        // Step 1: section names are non-negotiable, so they are priced FIRST --
+        // before the course summary, not after it. Charging the summary first
+        // let a long overview crowd names out: a 30-unit course on the
+        // page-anchored budget still lost units 21-30, which is the original
+        // defect relocated rather than fixed. Everything else bids for what the
+        // names leave behind.
+        $namecost = 0;
+        foreach ($entries as $entry) {
+            $namecost += strlen('- ' . $entry['name']) + 1; // +1 for the joining newline.
+        }
+        if (!empty($entries)) {
+            $namecost -= 1; // The last line carries no trailing newline.
+        }
+
+        // Step 2: the course summary, funded only out of what the names left.
+        // It carries "Time: 26 hours" and "CEUs: 2.6" -- facts that appear
+        // nowhere else in the prompt and that a model with no answer will
+        // otherwise invent (one production model reported "40-50 hours" for a
+        // 26-hour course). Valuable, but never at the cost of the course map.
+        //
+        // That ordering is a deliberate trade, and it does bite: measured on the
+        // 1500-char anchored budget, a course of ~30 sections at realistic name
+        // lengths spends the whole budget on names and drops this header
+        // entirely, so the hours/CEU facts become unavailable again. Names win
+        // anyway, because the two failures are not symmetrical. A missing
+        // summary makes the model say "the materials don't give a duration" --
+        // visibly incomplete, and the learner knows to look. A missing tail of
+        // the section list makes the model present a 20-unit course as the whole
+        // course -- confidently wrong, and nothing signals it. Honest
+        // incompleteness beats silent wrongness. See
+        // test_summary_yields_to_names_under_budget_pressure().
+        $header = '';
+        $coursesummary = self::flatten_text((string) (get_course($courseid)->summary ?? ''));
+        if ($coursesummary !== '') {
+            $overhead = strlen("Course overview: \n\n") + 3; // Wrapper + the "..." elision.
+            $affordable = $maxchars - $namecost - $overhead;
+            $summarycap = min(
+                self::TOPICS_SUMMARY_MAX_CHARS,
+                (int) floor($maxchars * 0.3),
+                max(0, $affordable)
+            );
+            // A one-word overview is noise; take it only if it can say something.
+            if ($summarycap >= self::TOPICS_SUMMARY_MIN_CHARS) {
+                if (strlen($coursesummary) > $summarycap) {
+                    // \core_text::str_max_bytes(), never substr(): a byte-wise cut
+                    // splits a multi-byte character and puts invalid UTF-8 into the
+                    // assembled prompt. That is issue #219, whose fix
+                    // (classes/prompt/builder.php) names substr() as the root cause.
+                    $coursesummary = rtrim(\core_text::str_max_bytes($coursesummary, $summarycap)) . '...';
+                }
+                $header = "Course overview: {$coursesummary}\n\n";
+            }
+        }
+
+        if (empty($entries)) {
+            return self::clamp_topics($header . 'No topics available.', $maxchars);
+        }
+
+        $budget = $maxchars - $namecost - strlen($header);
+
+        // Step 3: section summaries, in course order, as they fit.
+        if ($budget > 0) {
+            foreach ($entries as $i => $entry) {
+                if ($entry['summary'] === '') {
+                    continue;
+                }
+                $cost = 2 + strlen($entry['summary']); // ": " + text.
+                if ($cost <= $budget) {
+                    $entries[$i]['withsummary'] = true;
+                    $budget -= $cost;
+                }
+            }
+        }
+
+        // Step 4: activities, round-robin. Section 8 gets its first activity
+        // before section 1 gets its second, so a long course degrades to a
+        // thinner-but-complete map rather than a detailed prefix.
+        $rounds = 0;
+        foreach ($entries as $entry) {
+            $rounds = max($rounds, count($entry['acts']));
+        }
+        $firstcost = strlen("\n  Activities: ");
+        for ($r = 0; $r < $rounds && $budget > 0; $r++) {
+            foreach ($entries as $i => $entry) {
+                if (!isset($entry['acts'][$r])) {
+                    continue;
+                }
+                $cost = (empty($entries[$i]['chosen']) ? $firstcost : 2) + strlen($entry['acts'][$r]);
+                if ($cost <= $budget) {
+                    $entries[$i]['chosen'][] = $entry['acts'][$r];
+                    $budget -= $cost;
+                }
+            }
+        }
+
+        // Step 5: mark sections whose activity list was shortened, if the
+        // ellipsis itself still fits.
+        foreach ($entries as $i => $entry) {
+            $shortened = $entry['more'] || count($entry['chosen']) < count($entry['acts']);
+            $entries[$i]['ellipsis'] = false;
+            if ($shortened && !empty($entry['chosen']) && $budget >= 5) {
+                $entries[$i]['ellipsis'] = true;
+                $budget -= 5;
+            }
+        }
+
+        $lines = [];
+        foreach ($entries as $entry) {
+            $line = "- {$entry['name']}";
+            if ($entry['withsummary']) {
+                $line .= ": {$entry['summary']}";
+            }
+            if (!empty($entry['chosen'])) {
+                $line .= "\n  Activities: " . implode(', ', $entry['chosen']);
+                if (!empty($entry['ellipsis'])) {
                     $line .= ', ...';
                 }
             }
-
             $lines[] = $line;
         }
 
-        $out = !empty($lines) ? implode("\n", $lines) : 'No topics available.';
+        // Backstop. With the budgeting above this only bites when the section
+        // names alone exceed the budget (a course with hundreds of sections),
+        // and unlike the old version it leaves room for its own marker so the
+        // returned string genuinely respects the cap.
+        return self::clamp_topics($header . implode("\n", $lines), $maxchars);
+    }
 
-        // v6.2.0: unconditional backstop cap. The caller applies a tighter
-        // 1500-char cap when a usable current page anchors the prompt, but in
-        // RAG mode (no page resolved) the overview was previously uncapped and
-        // a large course could ship multiple KB of section/activity listing.
-        $maxtopics = 2500;
-        if (strlen($out) > $maxtopics) {
-            $out = substr($out, 0, $maxtopics) . "\n[..additional sections truncated..]";
+    /**
+     * Strip markup and collapse whitespace for prompt-safe inclusion.
+     *
+     * @param string $html
+     * @return string
+     */
+    private static function flatten_text(string $html): string {
+        $text = str_replace(['<br>', '<br/>', '<br />', '</p>'], ' ', $html);
+        // Decode BEFORE stripping, then strip again. Decoding last let
+        // entity-encoded markup ("&lt;script&gt;…") reconstitute itself into
+        // live-looking tags *after* the only strip_tags() had run, so the prompt
+        // carried what looked like real markup. Neither order is a security
+        // boundary here (the render paths escape, and the block is fenced as
+        // untrusted) -- this just stops markup reappearing as prompt noise.
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = strip_tags($text);
+        return trim((string) preg_replace('/\s+/u', ' ', $text));
+    }
+
+    /**
+     * Enforce the structure-block cap, marker included.
+     *
+     * @param string $out
+     * @param int $maxchars
+     * @return string
+     */
+    private static function clamp_topics(string $out, int $maxchars): string {
+        if (strlen($out) <= $maxchars) {
+            return $out;
         }
-        return $out;
+        $marker = "\n[..additional sections truncated..]";
+        $room = max(0, $maxchars - strlen($marker));
+        // Cut on a line boundary, and mb-safely.
+        //
+        // A raw substr() here did two separate kinds of damage. It split
+        // multi-byte characters, putting invalid UTF-8 into the prompt (issue
+        // #219 -- classes/prompt/builder.php names substr() as the root cause and
+        // uses \core_text::str_max_bytes() instead). And it cut mid-line, so the
+        // block ended on a bare "-" or, worse, on a half-written section name
+        // ("- Unit 17: A Reasonably Long Descriptive Section Nam") that the model
+        // could quote back to the learner as a real unit title. Dropping the
+        // partial line is the whole point of this function: a short honest list
+        // beats a long one ending in a fabrication.
+        $kept = \core_text::str_max_bytes($out, $room);
+        $lastbreak = strrpos($kept, "\n");
+        if ($lastbreak !== false) {
+            $kept = substr($kept, 0, $lastbreak);
+        }
+        return rtrim($kept) . $marker;
     }
 
     /**
@@ -2139,6 +2373,27 @@ class context_builder {
             . "and enter your phone number there.\"";
 
         return $text;
+    }
+
+    /**
+     * Get the rule governing the (id:N) annotations in the course structure.
+     *
+     * The structure block annotates every activity with "(id:N)" so the model
+     * can emit [SOURCE:activity:ID], but nothing ever told it those ids are
+     * machine-readable. Production replies carried them straight through into
+     * learner-facing prose: 'Review "What Is a Computer?" (id:86464)' and 'you
+     * can take the Unit 1 Assessment (Activity ID: 89206)'. This is a separate
+     * leak channel from the [[SOURCE:activity:N]] marker itself.
+     *
+     * @return string
+     */
+    private static function get_activity_id_instructions(): string {
+        return "Each activity below is annotated with `(id:N)`. Those ids are machine-readable "
+            . "identifiers for citation and linking only. NEVER write an id, an `(id:N)` "
+            . "annotation, or a phrase like \"Activity ID: 89206\" into a reply — refer to an "
+            . "activity by its name alone (\"the Unit 1 Assessment\", not \"the Unit 1 Assessment "
+            . "(id:89206)\"). The only place an id may appear in your output is inside a "
+            . "[SOURCE:activity:ID] tag.\n";
     }
 
     /**
