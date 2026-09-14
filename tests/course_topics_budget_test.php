@@ -80,6 +80,10 @@ final class course_topics_budget_test extends \advanced_testcase {
      * Activity names are deliberately as long as the real ones ("What a Computer
      * Is and Does"); that length is what makes the structure block outgrow its
      * cap on a real Saylor course.
+     *
+     * @param bool $withactivities Whether to create the six activities per section.
+     * @param string $summary Raw HTML course summary.
+     * @return void
      */
     private function build_course(bool $withactivities = true, string $summary = self::COURSE_SUMMARY): void {
         global $DB;
