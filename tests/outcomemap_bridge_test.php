@@ -123,6 +123,58 @@ final class outcomemap_bridge_test extends \advanced_testcase {
     }
 
     /**
+     * Every source the detector can return must be in objective_manager::SOURCES.
+     *
+     * objectives_admin.php validates the posted source against that constant
+     * before importing, so a candidate added to detect_best_source() without a
+     * matching entry would make its own import action fail. This reads the
+     * candidate list out of the method body rather than restating it, so the
+     * two cannot drift apart.
+     */
+    public function test_every_detector_source_is_an_allowed_source(): void {
+        $this->resetAfterTest();
+        $method = new \ReflectionMethod(objective_manager::class, 'detect_best_source');
+        $file = file($method->getFileName());
+        $body = implode('', array_slice(
+            $file,
+            $method->getStartLine() - 1,
+            $method->getEndLine() - $method->getStartLine() + 1
+        ));
+        preg_match_all("/\[\s*'([a-z]+)'\s*,\s*\[/", $body, $m);
+        $this->assertNotEmpty($m[1], 'could not read the candidate list; the parse is broken');
+        $this->assertContains('outcomemap', $m[1], 'outcomemap should be a detector candidate');
+        foreach ($m[1] as $source) {
+            $this->assertContains(
+                $source,
+                objective_manager::SOURCES,
+                "detect_best_source() can return '$source' but objective_manager::SOURCES "
+                . "omits it, so objectives_admin.php would reject its own import"
+            );
+        }
+    }
+
+    /**
+     * objs.source is char(20), so create() must clamp like its neighbours.
+     *
+     * Every other field in the insert gets a substr(); source did not, which
+     * made an over-long value a DB insert error rather than a truncation.
+     */
+    public function test_create_clamps_an_overlong_source(): void {
+        $this->resetAfterTest();
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $id = objective_manager::create(
+            (int) $course->id,
+            'Clamp check',
+            '',
+            '',
+            str_repeat('x', 40)
+        );
+        $row = $DB->get_record('local_ai_course_assistant_objs', ['id' => $id], '*', MUST_EXIST);
+        $this->assertSame(20, strlen($row->source));
+    }
+
+    /**
      * The provenance reference must fit objs.external_ref, which is char(64).
      *
      * The prefix plus a 36-character UUID is 47, so this has headroom; the test
