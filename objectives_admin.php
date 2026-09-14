@@ -97,6 +97,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
     } else if ($action === 'import_detected') {
         $source = required_param('source', PARAM_ALPHA);
+        // The form posts back whatever detect_best_source() reported, so a value
+        // outside that set means a tampered or stale POST. objs.source is
+        // char(20) NOT NULL, so an unrecognized value is not cosmetic: one over
+        // 20 characters is an insert error, and a short one renders as a
+        // missing-string placeholder in the source column below.
+        if (!in_array($source, objective_manager::SOURCES, true)) {
+            redirect(
+                $pageurl,
+                get_string('objectives:err_invalid_import', 'local_ai_course_assistant'),
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
+        }
         // PARAM_RAW is required to receive the JSON envelope of detected
         // objectives intact (it is a json_encode'd array, not a scalar). Each
         // decoded field is cleaned below with clean_param(PARAM_TEXT) - the same

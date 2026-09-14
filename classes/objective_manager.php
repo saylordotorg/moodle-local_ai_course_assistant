@@ -190,7 +190,7 @@ class objective_manager {
             'code' => $code !== '' ? substr($code, 0, 40) : null,
             'title' => substr($title, 0, 255),
             'description' => $description !== '' ? $description : null,
-            'source' => $source,
+            'source' => substr($source, 0, 20),
             'external_ref' => $externalref !== '' ? substr($externalref, 0, 64) : null,
             'timecreated' => $now,
             'timemodified' => $now,
@@ -739,6 +739,18 @@ class objective_manager {
      * @param int $courseid
      * @return array{source:string, objectives:array}
      */
+    /**
+     * Every value objs.source is allowed to hold.
+     *
+     * The column is char(20) and NOT NULL, and create() writes $source through
+     * without the substr() its neighbours get, so an unrecognized value is not
+     * a cosmetic problem: a long one is a DB insert error and a short one
+     * renders as a missing-string placeholder on objectives_admin.php. Keep
+     * this in step with detect_best_source()'s candidate list, plus the two
+     * sources that never come from detection ('manual', 'llm').
+     */
+    public const SOURCES = ['manual', 'competency', 'summary', 'section', 'llm', 'outcomemap'];
+
     public static function detect_best_source(int $courseid): array {
         $candidates = [
             // Curated outcomes first. local_outcomemap holds human-authored,
