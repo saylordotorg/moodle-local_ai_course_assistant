@@ -333,7 +333,10 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
                 return reader.read().then(function(r) {
                     if (r.done) {
                         // Strip [SOLA_NEXT] block, render follow-up chips.
-                        var nextMatch = fullText.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/);
+                        // Second pattern catches a truncated response that opened
+                        // the tag but never closed it — same hole as chat.js D1.
+                        var nextMatch = fullText.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/)
+                            || fullText.match(/\[SOLA_NEXT\]([\s\S]*)$/);
                         var suggestions = [];
                         if (nextMatch) {
                             fullText = fullText.replace(nextMatch[0], '').trim();
@@ -393,7 +396,8 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
      */
     function renderResponse(div, text) {
         // Strip the SOLA_NEXT block from the visible token stream.
-        var clean = text.replace(/\[SOLA_NEXT\][\s\S]*?\[\/SOLA_NEXT\]/g, '');
+        var clean = text.replace(/\[SOLA_NEXT\][\s\S]*?\[\/SOLA_NEXT\]/g, '')
+            .replace(/\[SOLA_NEXT\][\s\S]*/g, '');
         // Split on citation tokens, intersperse spans.
         var parts = clean.split(/(\[#\d+\])/g);
         div.innerHTML = '';

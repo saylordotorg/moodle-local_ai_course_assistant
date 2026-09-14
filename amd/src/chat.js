@@ -114,10 +114,50 @@ define([
     let practiceRubricId = null;
     /** @type {Array|null} Rubric criteria for current practice session */
     let practiceRubricCriteria = null;
-    /** @type {RegExp} SOLA follow-up marker parser */
-    const NEXT_BLOCK_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/;
+    /**
+     * @type {RegExp} SOLA follow-up marker parser.
+     *
+     * The closing tag is matched loosely — optional inner whitespace, any case —
+     * because a model that mangles it ("[/SOLA_NEXT ]", "[/sola_next]") still
+     * plainly meant to close the block. Matching it strictly sent those
+     * responses down the unterminated path below, which harvested the mangled
+     * closing token into the last chip, so the tag ended up as the visible label
+     * of a clickable button: a worse leak than the one being fixed.
+     */
+    const NEXT_BLOCK_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\s*\/\s*SOLA_NEXT\s*\]/i;
+    /**
+     * @type {RegExp} Unterminated follow-up marker — the model opened [SOLA_NEXT]
+     * but never emitted a closing tag (observed in production on BUS101). The
+     * streaming path already hid this form; without it here the open tag
+     * survived into the committed bubble. Same shape as the second pass in
+     * voice.js stripSolaTags().
+     */
+    const NEXT_OPEN_RE = /\n*\[SOLA_NEXT\]([\s\S]*)$/;
+    /**
+     * @type {RegExp} Residual closing-tag variant, for scrubbing a mangled
+     * "[/SOLA_NEXT" off a harvested chip when the loose match above did not
+     * reach it (e.g. the bracket itself never arrived).
+     */
+    const NEXT_CLOSE_RESIDUE_RE = /\[\s*\/\s*SOLA_NEXT\s*\]?\s*$/i;
+    /**
+     * @type {number} Longest payload an unterminated [SOLA_NEXT] may carry and
+     * still be treated as a truncated chip list. A real chip list is one short
+     * line ("Tell me more", "a||b||c"); prose that merely follows a stray marker
+     * is longer and usually multi-line. See the terminal test in
+     * parseAssistantDecorators().
+     */
+    const NEXT_OPEN_MAX_PAYLOAD = 200;
     /** @type {RegExp} Source attribution tag parser — matches [SOURCE:page], [SOURCE:course], [SOURCE:general], [SOURCE:activity:123] */
     const SOURCE_TAG_RE = /\n*\[SOURCE:(page|course|general|activity)(?::(\d+))?\]/;
+    /**
+     * @type {RegExp} Total source-tag stripper. SOURCE_TAG_RE above decides the
+     * source *pill* and must stay a closed vocabulary; this one only deletes, so
+     * it is deliberately permissive: every occurrence (/g — answers carry several
+     * inline tags), both bracket depths (the model emits [[SOURCE:activity:86467]]),
+     * and free-form labels such as [SOURCE:Unit 1: Computer Programming]. The
+     * inner class excludes brackets so [[c:1]] citation markers are never touched.
+     */
+    const SOURCE_STRIP_RE = /[ \t]*\n*\[{1,3}SOURCE:[^[\]]*\]{1,3}/g;
     /** @type {RegExp} Practice score block parser */
     const SCORE_BLOCK_RE = /\n*\[SOLA_SCORE\]([\s\S]*?)\[\/SOLA_SCORE\]/;
     /** @type {Object<string, string>} */
@@ -146,36 +186,82 @@ define([
         let sourceType = null;
         let sourceCmid = null;
 
-        const nextMatch = cleanText.match(NEXT_BLOCK_RE);
-        if (nextMatch) {
-            // v5.3.2: drop placeholder-looking chips so a weaker model that
-            // echoes the prompt template (e.g. "suggestion 1", "<chip 1>")
-            // never leaks to the UI. If the filter wipes everything, the
-            // caller falls back to its own defaults.
-            const placeholderRe = /^(suggestion\s*\d+|<?\s*chip\s*\d+\s*>?|\d+\s*:\s*\.?\.?\.?|placeholder.*|chip.*|<chip\s*\d+>)$/i;
-            suggestions = nextMatch[1].split('||').map(function(s) {
+        // v5.3.2: drop placeholder-looking chips so a weaker model that
+        // echoes the prompt template (e.g. "suggestion 1", "<chip 1>")
+        // never leaks to the UI. If the filter wipes everything, the
+        // caller falls back to its own defaults.
+        const placeholderRe = /^(suggestion\s*\d+|<?\s*chip\s*\d+\s*>?|\d+\s*:\s*\.?\.?\.?|placeholder.*|chip.*|<chip\s*\d+>)$/i;
+        const harvestChips = function(raw) {
+            return ((raw || '') + '').split('||').map(function(s) {
                 return s.trim();
             }).filter(function(s) {
                 return s.length > 0 && !placeholderRe.test(s);
             }).slice(0, 4);
+        };
+
+        const nextMatch = cleanText.match(NEXT_BLOCK_RE);
+        if (nextMatch) {
+            suggestions = harvestChips(nextMatch[1]);
             cleanText = cleanText.replace(NEXT_BLOCK_RE, '').trimEnd();
         }
 
+        // Recognition of the other markers happens BEFORE the unterminated
+        // [SOLA_NEXT] is dealt with. That strip can reach to end of string, so
+        // running it first destroyed a [SOURCE:…] or [SOLA_SCORE] that followed
+        // an open tag — the source pill vanished and the score card never
+        // rendered, both of which HEAD got right.
+        //
+        // The pill needs the first tag from the closed vocabulary; a free-form
+        // label must never become a sourceType (SOURCE_LABELS/createSourcePill
+        // only understand page|course|general|activity).
         const sourceMatch = cleanText.match(SOURCE_TAG_RE);
         if (sourceMatch) {
             sourceType = sourceMatch[1];
             sourceCmid = sourceMatch[2] || null; // Numeric cmid for activity type.
-            cleanText = cleanText.replace(SOURCE_TAG_RE, '').trimEnd();
         }
-
         let scoreData = null;
-        const scoreMatch = cleanText.match(SCORE_BLOCK_RE);
-        if (scoreMatch) {
+        const earlyScore = cleanText.match(SCORE_BLOCK_RE);
+        if (earlyScore) {
             try {
-                scoreData = JSON.parse(scoreMatch[1]);
+                scoreData = JSON.parse(earlyScore[1]);
             } catch (e) {
                 scoreData = null;
             }
+        }
+
+        // A truncated response can leave an open [SOLA_NEXT] with no closing
+        // tag. Only treat it as a truncated chip list when it actually looks
+        // like one: a chip list is a single short line. Prose that merely
+        // follows a stray marker is longer and usually multi-line, and
+        // swallowing it deleted real answer text from the learner's bubble
+        // while rendering it as one giant button. When the payload fails that
+        // test we delete only the marker itself — no tag leaks, no prose is
+        // lost, and nothing is harvested.
+        const nextOpen = cleanText.match(NEXT_OPEN_RE);
+        if (nextOpen) {
+            const payload = nextOpen[1] || '';
+            const looksTerminal = payload.indexOf('\n') === -1
+                && payload.length <= NEXT_OPEN_MAX_PAYLOAD;
+            if (looksTerminal) {
+                if (!suggestions.length) {
+                    suggestions = harvestChips(payload.replace(NEXT_CLOSE_RESIDUE_RE, ''));
+                }
+                cleanText = cleanText.replace(NEXT_OPEN_RE, '').trimEnd();
+            } else {
+                cleanText = cleanText.replace(/\n*\[SOLA_NEXT\]/, '\n').trimEnd();
+            }
+        }
+
+        // Stripping is separate from recognition and total: every occurrence,
+        // any bracket depth, recognised or free-form.
+        const sourceStripped = cleanText.replace(SOURCE_STRIP_RE, '');
+        if (sourceStripped !== cleanText) {
+            cleanText = sourceStripped.trimEnd();
+        }
+
+        // scoreData was already parsed above, before the open-tag strip could
+        // reach it; this pass only removes the block from the visible text.
+        if (cleanText.match(SCORE_BLOCK_RE)) {
             cleanText = cleanText.replace(SCORE_BLOCK_RE, '').trimEnd();
         }
 
@@ -186,6 +272,46 @@ define([
             sourceCmid: sourceCmid,
             scoreData: scoreData,
         };
+    };
+
+    /**
+     * Strip control tags from the text shown in the typewriter while a response
+     * is still streaming.
+     *
+     * This is the streaming counterpart of parseAssistantDecorators(), which is
+     * the authority on the committed text. The two must agree on a complete
+     * response: when they disagreed, a tag that was hidden mid-stream reappeared
+     * the moment the answer finished. Because this runs per token it must also
+     * hide a PARTIAL tag whose closing bracket has not arrived yet.
+     *
+     * @param {string} fullText Raw text accumulated so far.
+     * @returns {string}
+     */
+    const stripStreamingDecorators = function(fullText) {
+        let displayText = ((fullText || '') + '')
+            .replace(NEXT_BLOCK_RE, '')
+            .replace(SOURCE_STRIP_RE, '')
+            .replace(SCORE_BLOCK_RE, '');
+        // Complete opening tag, payload still arriving. This reaches to end of
+        // string rather than stopping at the next "[": the old [^\[]* class
+        // aborted the moment a chip contained a bracket, so a payload like
+        // "Explain O(n) [big-O] notation" left the raw tag visible for the whole
+        // stream and then vanished on commit — the very asymmetry this pairing
+        // exists to prevent, inverted. Bracket-bearing chips are the expected
+        // shape for the premium-router topics (big-O, LaTeX, fenced code).
+        // Hiding trailing prose for a few frames is the cheaper error: the
+        // committed text is authoritative and restores it.
+        displayText = displayText.replace(/\n*\[SOLA_NEXT\][\s\S]*$/, '');
+        displayText = displayText.replace(/\n*\[{1,3}SOURCE[^\]]*$/, '');
+        displayText = displayText.replace(/\n*\[SOLA_SCORE\][\s\S]*$/, '');
+        // Opening tag whose own closing bracket has not arrived ("[SOL", "[[SOUR").
+        // Confined to an uppercase run so ordinary prose ("see [note") and
+        // markdown links are not held back.
+        displayText = displayText.replace(/\n*\[\[?[A-Z_]*$/, '');
+        // Partial [[c:N inline citation — the closing ]] has not arrived yet, so
+        // hide the marker until it resolves.
+        displayText = displayText.replace(/\[\[c:\d*\]?$/, '');
+        return displayText;
     };
 
     /**
@@ -5407,17 +5533,9 @@ define([
                     UI.startStreaming(null);
                 }
                 fullText += token;
-                // Strip SOLA_NEXT / SOURCE / SOLA_SCORE tags so they never appear in the typewriter.
-                var displayText = fullText.replace(NEXT_BLOCK_RE, '').replace(SOURCE_TAG_RE, '').replace(SCORE_BLOCK_RE, '');
-                // Also strip an incomplete opening tag at the very end (still streaming in).
-                displayText = displayText.replace(/\n*\[SOLA_NEXT\][^\[]*$/, '');
-                displayText = displayText.replace(/\n*\[SOURCE[^\]]*$/, '');
-                displayText = displayText.replace(/\n*\[SOLA_SCORE\][^\[]*$/, '');
-                // Strip a partial [[c:N inline citation at the very end — the closing ]] has
-                // not arrived yet, so we hide the marker until it resolves.
-                displayText = displayText.replace(/\[\[c:\d*\]?$/, '');
-                displayText = displayText.replace(/\[\[?$/, '');
-                UI.updateStreamContent(displayText);
+                // Strip SOLA_NEXT / SOURCE / SOLA_SCORE tags, complete or partial,
+                // so they never appear in the typewriter.
+                UI.updateStreamContent(stripStreamingDecorators(fullText));
             },
             onDone: function(doneData) {
                 UI.showTyping(false);
