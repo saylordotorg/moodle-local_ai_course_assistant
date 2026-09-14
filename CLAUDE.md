@@ -242,7 +242,7 @@ Then carry forward Part 2 (Key Features) and Part 3 (Admin Walkthrough) from the
 1. `python3 scripts/new_release_notes.py --version <N>` and fill the TODOs.
 2. Bump `version.php` (`$plugin->version` and `$plugin->release`).
 3. Update `.wiki/Changelog.md`.
-4. Run i18n sync, PHP lint, the jailbreak suite (gate on **0 FAIL and 0 ERROR**, not on a pass-rate: 32/32 is reproducible on `openai`/`gpt-4o-mini` but the production `gemini-2.5-flash` scores in the 24-27 PASS range with the remainder as REVIEW, which only means no pass-indicator regex matched), validator suite: `php admin/cli/run_validators.php` (must be 0 failures).
+4. Run i18n sync, PHP lint, the jailbreak suite (gate on **0 FAIL and 0 ERROR**, not on a pass-rate: 32/32 is reproducible on `openai`/`gpt-4o-mini` but the production `gemini-2.5-flash` scores in the 24-27 PASS range with the remainder as REVIEW, which only means no pass-indicator regex matched), validator suite: `cd ~/Sites/moodle/local/ai_course_assistant && php admin/cli/run_validators.php` (must be 0 failures — it has to run from the Moodle tree, see Running the test suite).
 5. Run the manual smoke checklist (`.wiki/Release-Checklist.md`) on local Moodle. Critical path takes ~5 minutes and catches the runtime UI bugs static checks can't.
 6. Commit plugin + wiki, tag `v<N>`, push, `gh release create` using the `.drafts/` file as the body source.
 7. `python3 deploy_dev.py --target all` and verify BUS101 smoke on all 5 dev sites.
@@ -287,6 +287,41 @@ rsync -a --exclude=.git \
 ```bash
 /opt/homebrew/opt/php@8.3/bin/php ~/Sites/moodle/admin/cli/purge_caches.php
 ```
+
+### Running the test suite
+
+Three separate traps here, each of which reports something that is not the
+real problem. All three were hit on 2026-09-12.
+
+**Pin PHP 8.3 on the PATH, not just in the command.** Naming the 8.3 binary
+explicitly is not enough: `admin/tool/phpunit/cli/init.php` shells out to
+whatever `php` resolves to, which is `/opt/homebrew/bin/php` (8.5.x), and
+Moodle 4.5 refuses it. The failure it prints is
+`max_input_vars must be at least 5000`, which is a red herring — the value is
+already 5000. The real line is above it: *"version 8.1.0 is required and you
+are running 8.5.9"*. Export the PATH for the whole shell instead:
+
+```bash
+export PATH="/opt/homebrew/opt/php@8.3/bin:$PATH"
+rsync -a --exclude=.git "$HOME/ai-projects/ai_course_assistant/" ~/Sites/moodle/local/ai_course_assistant/
+cd ~/Sites/moodle && php vendor/bin/phpunit --testsuite local_ai_course_assistant_testsuite
+```
+
+**Use `--testsuite`, never a bare directory path.** `phpunit
+local/ai_course_assistant/tests/` prints `No tests executed!` and exits **0**.
+In a loop or a CI step that reads as a pass. The suite name is
+`local_ai_course_assistant_testsuite`; a single file by path is fine.
+
+**`run_validators.php` must run from the Moodle tree**, not the repo — it
+resolves `config.php` four levels up, so from `~/ai-projects/` it dies with a
+`Failed opening required` fatal:
+
+```bash
+cd ~/Sites/moodle/local/ai_course_assistant && php admin/cli/run_validators.php
+```
+
+Remember the suite here is MySQL-only (see the local-suite memory): Postgres
+portability bugs pass locally and only the `pgsql` CI jobs catch them.
 
 ---
 
