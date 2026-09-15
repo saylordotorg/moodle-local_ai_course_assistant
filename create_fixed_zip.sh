@@ -69,12 +69,37 @@ zip -r ai_course_assistant.zip ai_course_assistant/ \
   -x "*/cdn/test/*" \
   -x "*/services/*" \
   -x "*/tests/a11y/node_modules/*" \
+  -x "*/tests/a11y/package-lock.json" \
   -x "*/tests/golden/*" \
   -x "*/.wiki/*" \
   -x "*/.drafts/*" \
   -x "*/__pycache__/*" \
   -x "*.pyc" \
   -x "*/scripts/*"
+
+
+# Refuse to publish a file that git is not tracking.
+#
+# The exclude list above is hand-maintained and drifts from .gitignore: it
+# already excluded cdn/package-lock.json while shipping the identical
+# tests/a11y/package-lock.json, which .gitignore deliberately excludes. An
+# earlier build swept in a stray v7_workorder.zip the same way. git is not what
+# gets published -- this zip is -- so the zip is checked against the index
+# rather than trusted. Aborting rather than silently excluding, for the same
+# reason as the secrets check: a file in the tree that git does not track is
+# something the operator should see, not something the build should quietly
+# drop.
+STRAYS=$(comm -23 \
+  <(unzip -Z1 ai_course_assistant.zip | grep -v '/$' | sed 's|^ai_course_assistant/||' | sort) \
+  <(git -C ai_course_assistant ls-files | sort))
+if [ -n "$STRAYS" ]; then
+  echo "ABORTED: the zip contains files git does not track:" >&2
+  echo "$STRAYS" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "Either commit them or add an -x exclusion in create_fixed_zip.sh." >&2
+  rm -f ai_course_assistant.zip
+  exit 1
+fi
 
 echo "✅ Created: ${SCRIPT_DIR}/ai_course_assistant.zip"
 echo ""
