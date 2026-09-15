@@ -19,7 +19,7 @@ WHAT TO DEPLOY (Learn + Degrees)
   Release: https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.4.7
   Asset:   https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/download/v7.4.7/ai_course_assistant-v7.4.7.zip
 
-  sha256  b73a2b547e8004b69a0417128c63060e365ae3d6ee3a31d18dc62fb94793c4a1
+  sha256  5a3221ffb0d7189b34acebb962dca384045c0ef7dac7e326401b000c97d23681
 
 Both sites are on build 2026091001 (v7.4.1), the release you deployed on
 2026-09-09.
