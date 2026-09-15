@@ -12,11 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 SOLA (Saylor Online Learning Assistant) is a Moodle local plugin that provides an AI-powered learning coach embedded in course pages. Students interact via a side tab on the right edge of the page (default: halfway down), which opens a chat drawer. A floating avatar button at the bottom corner is an alternative placement available via the Display Mode admin setting.
 
 - **Plugin component:** `local_ai_course_assistant`
-- **Current version:** `2026091008`, release `7.4.6`
+- **Current version:** `2026091400`, release `7.4.7`
 - **Source folder (canonical):** the git repo at `~/ai-projects/ai_course_assistant/` (edit and commit here; the older `aicoursetutor/ai_course_assistant` path is a stale remnant, do not deploy from it)
 - **Zip for upload:** built from the repo via `create_fixed_zip.sh`
 - **GitHub:** `https://github.com/saylordotorg/moodle-local_ai_course_assistant` (public)
-- **Saylor production:** **v6.8.2 on Learn + Degrees as of 2026-06-24** (the Catalyst upgrade from v5.4.5 landed; the v5.4.5 → v6.8.2 jump is complete). Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Upgrade runbook (now historical): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.8.2.md`; Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`. NOTE: the Moodle plugin **directory** track is a separate version (v6.8.3, the CONTRIB-10574 29/29 resubmission); the directory listing and the prod pin need not match. Resubmission email: `.drafts/moodle-directory-resubmission-email-v6.8.3.md`.
+- **Saylor production:** **v7.4.1 (build 2026091001) on Learn + Degrees as of 2026-09-09**, deployed by Catalyst; this superseded the v6.8.2 pin that landed 2026-06-24. Confirmed from `mdl_config_plugins` on both sites on 2026-09-14. NOTE: a stale "v6.8.2" line here previously caused a wrong conclusion — that the spend-export feed was dark because prod predated v7.4.0. `spend_export.php` shipped in v7.4.0, so it IS present on prod; if the feed is empty the cause is configuration (`spend_export_key`), not version. Dev sites (dev / dev405 / dev500 / dev501 / dev503) track the latest release. Upgrade runbook (now historical): `.drafts/sola-prod-upgrade-runbook-v5.4.5-to-v6.8.2.md`; Catalyst request: `.drafts/catalyst-prod-deploy-request-2026-06-11.md`. NOTE: the Moodle plugin **directory** track is a separate version (v6.8.3, the CONTRIB-10574 29/29 resubmission); the directory listing and the prod pin need not match. Resubmission email: `.drafts/moodle-directory-resubmission-email-v6.8.3.md`.
 
 ---
 
