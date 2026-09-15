@@ -14,7 +14,7 @@ so the four blocks described below are exactly the four in the v7.4.6 request.
 WHAT TO DEPLOY (Learn + Degrees)
 
   Plugin:  local_ai_course_assistant
-  Tag:     v7.4.7  (commit a71f825d)
+  Tag:     v7.4.7  (commit e8b8f16d)
   Build:   2026091400
   Release: https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/tag/v7.4.7
   Asset:   https://github.com/saylordotorg/moodle-local_ai_course_assistant/releases/download/v7.4.7/ai_course_assistant-v7.4.7.zip
@@ -40,11 +40,25 @@ WHAT IT FIXES
    answer. Some were surviving to the transcript, so a learner could see
    internal protocol syntax in the middle of a reply. Stripping now also
    happens server-side, so a marker cannot get through on a path where the
-   client-side strip was missed. Related: under a tight prompt budget the
-   course structure block could be cut mid-way, which handed the model a
-   half-described course; it is now kept whole or omitted.
+   client-side strip was missed. This was found by running ten fixed prompts
+   against live production courses on Learn across three models, so it is a
+   thing that happened to real learners rather than a theoretical gap. The
+   same fix covers two places the browser never protected: the Moodle mobile
+   app, and the teacher-facing transcript CSV export, which reads the stored
+   message verbatim. Markers are now removed before the message is stored.
 
-2. 82 strings that displayed in English to every learner, in every language,
+2. The assistant no longer tells the user what their role is. It was opening
+   answers with "As an administrator...". The role is given to the model
+   deliberately, to decide how much depth to give, but it was never meant to
+   come back out in the reply; it is now explicitly instructed not to say it.
+   Teachers would have seen the same thing.
+
+3. Under a tight prompt budget the course outline could be dropped entirely
+   rather than shortened, because it was being counted against the budget
+   twice. On a course with more units than fit, the assistant would describe
+   the first three and present that as the complete list.
+
+4. 82 strings that displayed in English to every learner, in every language,
    are now translated. They were present in all 45 translation files while
    still holding the English text, so every completeness check we had reported
    the translations as complete and the interface still showed English. This
@@ -53,7 +67,7 @@ WHAT IT FIXES
    string is present in every language but still holding the English value,
    which is the specific gap that let this sit unnoticed.
 
-3. An invalid learning-objectives import is now rejected instead of erroring
+5. An invalid learning-objectives import is now rejected instead of erroring
    at the database. One field in that insert had no length limit applied where
    every neighboring field did, so an over-long value produced a database
    error rather than being truncated. Administrator-only and form-token
@@ -85,9 +99,9 @@ sub-second on both sites.
 
 VERIFICATION COMPLETED ON OUR SIDE
 
-- Full suite: 1,639 tests, 7,220 assertions, 0 failures.
+- Full suite: 1,644 tests, 7,238 assertions, 0 failures.
 - Static validators: 36 of 36, 0 failures.
-- PHP lint: 544 tracked files, 0 failures.
+- PHP lint: 546 tracked files, 0 failures.
 - CI: 10 of 10 matrix jobs green — PHP 8.1/8.2/8.3 against MariaDB and
   PostgreSQL on Moodle 4.5, 5.0 and 5.1.
 - Jailbreak / prompt-injection suite: 28 pass, 0 fail, 0 error (4 results
