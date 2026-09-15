@@ -155,59 +155,45 @@ be trusted directly.
 
 ## 4. Rollout projections
 
-Volume model unchanged from the August document — adoption 2.73% (Learn) and
-6.70% (Degrees) of active learners who can see SOLA, at ~4.8 and ~5.0 turns per
-adopting learner:
+**Correction to an earlier draft of this document.** I first built these on the
+2026-08-07 benchmark document's adoption figures of 2.73% (Learn) and 6.70%
+(Degrees). Those are superseded. The *SOLA pilot report*, revised 2026-09-01,
+measures **5.9% on Learn and 9.8% on Degrees** and explains why the sub-3%
+estimate was wrong: it compared deduplicated users against a sum of per-course
+active learners, inflating the Learn denominator from 76,362 to 110,823. The
+pilot report's figures are used below.
 
-| | Learners | Turns/month |
-|---|---:|---:|
-| Learn today (30 courses) | 1,213 | 5,822 |
-| Learn, full catalogue | 1,828 | 8,776 |
-| Degrees today (4 courses) | 115 | 573 |
-| Degrees, full catalogue | 238 | 1,183 |
-| **Today, both** | **1,328** | **6,395** |
-| **Full, both** | **2,066** | **9,959** |
+Volumes and per-learner intensity are taken unchanged from the pilot report
+($0.0032 per participating learner per month). Only the infrastructure line is
+added.
 
-Token cost scaled from measured per-turn rates, then held to the same ~2x
-under-count correction:
-
-| Scenario | Turns/mo | Tokens | Fixed | **Total/mo** |
-|---|---:|---:|---:|---:|
-| **A. Today** | 6,395 | ~$45 | $808 | **~$853** |
-| **B. All of Degrees** | 7,005 | ~$49 | $808 | **~$857** |
-| **C. Learn + Degrees, full** | 9,959 | ~$70 | $808 | **~$878** |
-| **D. Full rollout, LLM stack shut down** | 9,959 | ~$70 | $5 | **~$75** |
+| Scenario | New SOLA learners | Tokens | Fixed | **Total/mo** | **Per year** |
+|---|---:|---:|---:|---:|---:|
+| Current, 30 courses | 4,933 | $16 | $808 | **$824** | **$9,888** |
+| **A.** All Degrees | +741 | $18 | $808 | **$826** | **$9,912** |
+| **B.** All Learn + Degrees | +11,624 | $53 | $808 | **$861** | **$10,332** |
+| **B at 3x intensity** | +11,624 | $159 | $808 | **$967** | **$11,604** |
+| **C.** B, stack shut down | +11,624 | $53 | $5 | **$58** | **$696** |
 
 ### What the projections say
 
-**Enabling all of Degrees costs about $4 a month.** Degrees roughly doubles in
-volume — 573 turns to 1,183 — and the marginal token cost is under $5. There is
-no budget argument against it of any kind.
+**Scenario A has already happened.** SOLA went live across all Degrees courses
+this week. Projected marginal cost was $2/month, and that is what it is.
 
-**Full rollout across Learn and Degrees costs about $25 a month more than
-today.** Volume rises 1.56x, because the courses already enabled are the large
-ones. This is unchanged in substance from the August document and its
-recommendation 3 still holds.
+**Full rollout adds about $37/month in tokens.** Unchanged in substance from the
+pilot report; nothing about cost argues against it.
 
-**Shutting down the idle GPU stack saves $803 a month — about 32x the cost of
-the entire full-catalogue rollout.** Scenario D costs less than one-eleventh of
-scenario A while serving 56% more traffic.
+**Shutting down the idle stack saves $803/month — about 22x the entire cost of
+full rollout.** Scenario C serves every learner on both platforms for less than
+a fourteenth of what the pilot costs today.
 
-### Per-learner cost
+### Against the pilot report's own figures
 
-The August document reported **$0.008 per SOLA user per month**. Against total
-attributed spend:
-
-| | Users | $/month | Per user |
-|---|---:|---:|---:|
-| Today, as billed | 1,328 | ~$853 | **$0.64** |
-| Full rollout, as billed | 2,066 | ~$878 | **$0.42** |
-| Full rollout, stack shut down | 2,066 | ~$75 | **$0.036** |
-
-The $0.008 figure was a per-turn token cost, not a per-learner cost of running
-SOLA. As billed today the real figure is **80x** that.
-
----
+The pilot report projected **$636/year** for full rollout. With infrastructure
+that is **$10,332/year**, sixteen times higher. With the stack shut down it is
+**$696/year**, within 10% of the original estimate. The report's projection was
+accurate as a projection of SOLA; the gap is an asset provisioned for the
+programme and never wired into it.
 
 ## 5. What this changes
 
