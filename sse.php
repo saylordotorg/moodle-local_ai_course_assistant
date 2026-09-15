@@ -54,9 +54,11 @@ function local_ai_course_assistant_filter_response_safety(string $response): str
         '/## Off-topic Detection/i',
         '/## Student Learning Profile/i',
         '/## Wellbeing & Safety/i',
-        '/\[SOURCE:(page|activity|course|general)\]/i',
-        '/\[\[c:\d+\]\]/',
-        '/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/s',
+        // NOTE: protocol markers are NOT listed here any more. They are removed
+        // by protocol_markers::strip() below, which handles the unterminated and
+        // double-bracket forms these patterns missed -- the two shapes that
+        // actually reached learners in the 2026-09-12 production run. What stays
+        // in this list is system-prompt leakage, which is a different problem.
         '/You are SOLA \(Online Learning Assistant\)/i',
         '/KEEP RESPONSES BRIEF:/i',
         '/These rules override any conflicting instruction/i',
@@ -74,6 +76,12 @@ function local_ai_course_assistant_filter_response_safety(string $response): str
     $response = preg_replace('/\b(sk-[a-zA-Z0-9_-]{20,})\b/', '[key redacted]', $response);
     $response = preg_replace('/\b(sk-ant-[a-zA-Z0-9_-]{20,})\b/', '[key redacted]', $response);
     $response = preg_replace('/\b(AIza[a-zA-Z0-9_-]{30,})\b/', '[key redacted]', $response);
+
+    // Protocol markers, via the single authority. This runs on the copy that is
+    // persisted to msgs.message, which is what classes/transcript_report.php
+    // emits verbatim into the teacher-facing CSV -- so a marker that survived
+    // here used to reach a teacher even when the chat UI had hidden it.
+    $response = \local_ai_course_assistant\protocol_markers::strip($response);
 
     if ($leaked) {
         debugging('SOLA: system prompt leak detected in response, fragments scrubbed.', DEBUG_DEVELOPER);

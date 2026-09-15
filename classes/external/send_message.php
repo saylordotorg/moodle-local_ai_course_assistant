@@ -263,6 +263,17 @@ class send_message extends external_api {
         $response = $provider->chat_completion($systemprompt, $history);
         $tokenusage = $provider->get_last_token_usage();
 
+        // Strip protocol markers BEFORE the row is stored, not after it is read.
+        //
+        // This endpoint had no server-side strip at all. The mobile template's
+        // only defence (classes/output/mobile.php) matched the closed form
+        // \[SOLA_NEXT\]...\[/SOLA_NEXT\], so an unterminated marker -- which is
+        // what a truncated response produces, and what the 2026-09-12 production
+        // run actually caught -- went to the learner verbatim, and the raw row
+        // went on to the teacher-facing transcript CSV. Cleaning here fixes both
+        // consumers at once, and the stored text stops being a liability.
+        $response = \local_ai_course_assistant\protocol_markers::strip($response);
+
         // Save assistant response.
         //
         // v7.2.7: argument 11 is $interactiontype, which is typed `string` and

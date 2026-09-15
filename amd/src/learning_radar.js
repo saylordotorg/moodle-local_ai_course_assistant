@@ -335,13 +335,34 @@ define(['core/ajax', 'core/templates', 'core/str'], function(Ajax, Templates, St
                         // Strip [SOLA_NEXT] block, render follow-up chips.
                         // Second pattern catches a truncated response that opened
                         // the tag but never closed it — same hole as chat.js D1.
-                        var nextMatch = fullText.match(/\[SOLA_NEXT\]([\s\S]*?)\[\/SOLA_NEXT\]/)
-                            || fullText.match(/\[SOLA_NEXT\]([\s\S]*)$/);
+                        var nextMatch = fullText.match(/\[SOLA_NEXT\]([\s\S]*?)\[\s*\/\s*SOLA_NEXT\s*\]/i);
                         var suggestions = [];
                         if (nextMatch) {
                             fullText = fullText.replace(nextMatch[0], '').trim();
                             renderResponse(responseDiv, fullText);
                             suggestions = nextMatch[1].split('||').map(function(s) { return s.trim(); }).filter(Boolean);
+                        } else {
+                            // Unterminated opener. The first version of this
+                            // fallback harvested everything after the marker as
+                            // chip text, with none of the guards chat.js uses --
+                            // so a stray mid-answer marker deleted the rest of the
+                            // reply and re-rendered it as one enormous button.
+                            // Only treat the tail as chips when it looks like a
+                            // chip row: single line, short. Otherwise drop the
+                            // marker alone and keep the prose.
+                            var openMatch = fullText.match(/\n*\[\s*SOLA_NEXT\s*\]([\s\S]*)$/i);
+                            if (openMatch) {
+                                var tail = openMatch[1] || '';
+                                if (tail.indexOf('\n') === -1 && tail.length <= 200) {
+                                    suggestions = tail.split('||').map(function(s) {
+                                        return s.trim();
+                                    }).filter(Boolean).slice(0, 4);
+                                    fullText = fullText.replace(openMatch[0], '').trim();
+                                } else {
+                                    fullText = fullText.replace(/\n*\[\s*SOLA_NEXT\s*\]/ig, '\n').trim();
+                                }
+                                renderResponse(responseDiv, fullText);
+                            }
                         }
                         if (suggestions.length) {
                             var row = el('div', { style: 'display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px' });

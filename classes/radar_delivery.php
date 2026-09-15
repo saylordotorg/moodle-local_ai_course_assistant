@@ -370,21 +370,18 @@ class radar_delivery {
 
     /**
      * Strip SOLA's UI-marker tags from a response body so they do not leak
-     * into email / CSV / JSON / markdown deliveries. Matches the regexes
-     * in amd/src/chat.js and amd/src/learning_radar.js.
+     * into email / CSV / JSON / markdown deliveries.
+     *
+     * Delegates to protocol_markers, which is the single authority. The old
+     * docblock here claimed these regexes matched the ones in amd/src/chat.js;
+     * that stopped being true the moment chat.js learned about unterminated
+     * markers in v7.4.7 and this copy did not. Four hand-maintained copies of
+     * the same intent is how the production leak happened, so there is now one.
      *
      * @param string $text
      * @return string
      */
     private static function strip_marker_tags(string $text): string {
-        // SOLA_NEXT block (with leading newlines collapsed).
-        $text = preg_replace('/\n*\[SOLA_NEXT\][\s\S]*?\[\/SOLA_NEXT\]\s*/', '', $text);
-        // SOLA_SCORE block (used in practice scoring).
-        $text = preg_replace('/\n*\[SOLA_SCORE\][\s\S]*?\[\/SOLA_SCORE\]\s*/', '', $text);
-        // SOURCE marker — single line, e.g. [SOURCE:page] or [SOURCE:activity:123].
-        $text = preg_replace('/\n*\[SOURCE:[^\]]*\]\s*/', '', $text);
-        // OFF_TOPIC and NEEDS_ESCALATION single-line markers.
-        $text = preg_replace('/\n*\[(OFF_TOPIC|NEEDS_ESCALATION)\]\s*/', '', $text);
-        return rtrim((string) $text);
+        return \local_ai_course_assistant\protocol_markers::strip($text);
     }
 }

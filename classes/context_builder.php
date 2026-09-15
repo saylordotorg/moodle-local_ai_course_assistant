@@ -807,6 +807,26 @@ class context_builder {
         foreach ($sections as $sec) {
             if ($sec->category === section::CAT_SAFETY || self::section_to_bucket($sec->name) === null) {
                 $reservedchars += $sec->length();
+                continue;
+            }
+            // Same principle, second shape. A section whose min_chars equals its
+            // own length is atomic: prompt\builder::assemble() cannot clip it,
+            // because `length() - excess >= min_chars` can only hold when there
+            // is no excess, so the truncate branch is unreachable and the else
+            // branch drops it whole. It therefore gives nothing back under
+            // pressure, exactly like a CAT_SAFETY block, and must be reserved
+            // for the same reason.
+            //
+            // course_topics became atomic in v7.4.7 (8b4f520c) to stop the course
+            // map being cut after three units, but it stayed mapped to the
+            // course_structure bucket, so it was still handed a proportional
+            // share while spending its full size. The pool was over-subscribed by
+            // the difference, and assemble() paid for it by dropping the
+            // lowest-priority sections -- personalization, learner goals, memory --
+            // and, once those ran out, by dropping the course map itself in full.
+            // That is worse than the truncation it replaced.
+            if ($sec->min_chars > 0 && $sec->min_chars >= $sec->length()) {
+                $reservedchars += $sec->length();
             }
         }
         // Which buckets actually have a section to spend their share? In RAG mode
@@ -1853,7 +1873,17 @@ class context_builder {
         // untrusted) -- this just stops markup reappearing as prompt noise.
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = strip_tags($text);
-        return trim((string) preg_replace('/\s+/u', ' ', $text));
+        // preg_replace() returns null when the /u pattern meets invalid UTF-8,
+        // and a (string) cast turns that null into '' -- silently deleting the
+        // whole course or section summary. A single Windows-1252 smart quote
+        // pasted from Word is enough, and the summary is where the hours and CEU
+        // facts live, so the cost of the cast is losing the exact content this
+        // block spends budget to carry. Fall back to the unnormalized text.
+        $collapsed = preg_replace('/\s+/u', ' ', $text);
+        if ($collapsed === null) {
+            $collapsed = preg_replace('/\s+/', ' ', $text);
+        }
+        return trim($collapsed === null ? $text : $collapsed);
     }
 
     /**
@@ -2117,12 +2147,38 @@ class context_builder {
      * @param string $role 'administrator', 'academic_support', or 'student'
      * @return string
      */
+    /**
+     * Instruction forbidding the model from surfacing the user's role.
+     *
+     * The role is injected deliberately, to steer depth and Socratic behavior.
+     * What was never intended is for it to come back out in the reply: the
+     * 2026-09-12 production run caught answers opening "As an administrator..."
+     * and "especially for an administrator looking at the big picture". The
+     * account was an admin, so it read as a curiosity -- but the same code path
+     * serves teachers and academic support, and a learner-facing tutor telling
+     * someone what they are is the wrong register for all of them.
+     *
+     * This lives in PHP rather than in the prompt template because the template
+     * is a translated lang string, defined in all 46 locales and editable per
+     * site, so a fix there would reach neither a non-English site nor one that
+     * has customized it.
+     *
+     * @return string
+     */
+    private static function role_voice_rule(): string {
+        return ' Never state, name or allude to the user\'s role in your reply. '
+            . 'Do not open with "As an administrator", "As a teacher" or any equivalent, '
+            . 'and do not characterize what someone in their role would want. '
+            . 'The role changes how you answer; it is never something you say.';
+    }
+
     private static function get_role_instructions(string $role): string {
         if ($role === 'administrator') {
             return 'The user is an Administrator. Provide direct, comprehensive answers. '
                 . 'You can discuss system configuration, analytics insights, course design strategy, '
                 . 'and platform-wide trends. Help them understand student usage patterns, identify '
-                . 'areas for improvement, and make data-driven decisions about course assets and policies.';
+                . 'areas for improvement, and make data-driven decisions about course assets and policies.'
+                . self::role_voice_rule();
         }
 
         if ($role === 'academic_support') {
@@ -2131,7 +2187,8 @@ class context_builder {
                 . 'Provide direct, comprehensive answers. Help them analyze student engagement patterns, '
                 . 'identify confusing course sections, suggest content improvements, and discuss '
                 . 'assessment strategies and course design. Be a collaborative partner in '
-                . 'improving the student learning experience.';
+                . 'improving the student learning experience.'
+                . self::role_voice_rule();
         }
 
         return 'The user is a student. There are no live instructors — you are the primary learning support. '
@@ -2139,7 +2196,8 @@ class context_builder {
             . 'rather than giving direct answers. Ask clarifying questions, provide hints, and '
             . 'encourage critical thinking. Never provide complete solutions to assignments or assessments. '
             . 'If a student asks for an answer to a graded activity, redirect them to think about the problem. '
-            . 'Be patient, encouraging, and thorough since you are the student\'s main source of help.';
+            . 'Be patient, encouraging, and thorough since you are the student\'s main source of help.'
+            . self::role_voice_rule();
     }
 
     /**

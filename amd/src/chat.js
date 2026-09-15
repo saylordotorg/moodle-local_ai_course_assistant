@@ -124,7 +124,7 @@ define([
      * closing token into the last chip, so the tag ended up as the visible label
      * of a clickable button: a worse leak than the one being fixed.
      */
-    const NEXT_BLOCK_RE = /\n*\[SOLA_NEXT\]([\s\S]*?)\[\s*\/\s*SOLA_NEXT\s*\]/i;
+    const NEXT_BLOCK_RE = /\n*\[\s*SOLA_NEXT\s*\]((?:(?!\[\s*SOLA_NEXT\s*\])[\s\S])*?)\[\s*\/\s*SOLA_NEXT\s*\]/i;
     /**
      * @type {RegExp} Unterminated follow-up marker — the model opened [SOLA_NEXT]
      * but never emitted a closing tag (observed in production on BUS101). The
@@ -160,6 +160,7 @@ define([
     const SOURCE_STRIP_RE = /[ \t]*\n*\[{1,3}SOURCE:[^[\]]*\]{1,3}/g;
     /** @type {RegExp} Practice score block parser */
     const SCORE_BLOCK_RE = /\n*\[SOLA_SCORE\]([\s\S]*?)\[\/SOLA_SCORE\]/;
+    const SCORE_OPEN_RE = /\n*\[\s*SOLA_SCORE\s*\][\s\S]*$/i;
     /** @type {Object<string, string>} */
     const SOURCE_LABELS = {
         page: 'From: Current Page',
@@ -248,9 +249,20 @@ define([
                 }
                 cleanText = cleanText.replace(NEXT_OPEN_RE, '').trimEnd();
             } else {
-                cleanText = cleanText.replace(/\n*\[SOLA_NEXT\]/, '\n').trimEnd();
+                cleanText = cleanText.replace(/\n*\[\s*SOLA_NEXT\s*\]/ig, '\n').trimEnd();
             }
         }
+
+        // Final sweep. Any SOLA_NEXT tag still standing here is a stray the
+        // branches above did not own -- a second opener before the terminal
+        // block, or a closer whose opener never arrived. Neither carries chips
+        // worth harvesting, and both are protocol tokens, so remove every
+        // remaining one rather than the first. The /g the old delete lacked is
+        // the whole point: a response with two stray markers used to surface the
+        // second one to the learner.
+        cleanText = cleanText
+            .replace(/\n*\[\s*\/?\s*SOLA_NEXT\s*\]/ig, '')
+            .trimEnd();
 
         // Stripping is separate from recognition and total: every occurrence,
         // any bracket depth, recognised or free-form.
@@ -263,6 +275,15 @@ define([
         // reach it; this pass only removes the block from the visible text.
         if (cleanText.match(SCORE_BLOCK_RE)) {
             cleanText = cleanText.replace(SCORE_BLOCK_RE, '').trimEnd();
+        } else if (SCORE_OPEN_RE.test(cleanText)) {
+            // Unterminated [SOLA_SCORE]: the same stream/commit asymmetry that
+            // let [SOLA_NEXT] reach a learner. stripStreamingDecorators() hides
+            // an open score block while typing, so a response truncated before
+            // [/SOLA_SCORE] rendered clean for the whole stream and then dropped
+            // raw JSON into the bubble the instant it committed. scoreData is
+            // parsed above from the closed form only, so there is nothing to
+            // salvage here -- just remove it.
+            cleanText = cleanText.replace(SCORE_OPEN_RE, '').trimEnd();
         }
 
         return {

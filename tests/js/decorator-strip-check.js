@@ -269,7 +269,14 @@ check('amd/build/chat.min.js contains the unterminated [SOLA_NEXT] pattern',
 // ---- learning_radar.js has the same closing-tag assumption --------------------
 // Pinned as literal source text: the radar module is a standalone (non-AMD-core)
 // script whose stream handler cannot be evaluated in isolation here.
-const RADAR_OPEN_HARVEST = '\\[SOLA_NEXT\\]([\\s\\S]*)$';
+// v7.4.7 hardening: the opening tag now tolerates whitespace, matching the
+// closing tag, so the pinned literal moved with it.
+const RADAR_OPEN_HARVEST = '\\[\\s*SOLA_NEXT\\s*\\]([\\s\\S]*)$';
+// The harvest must stay GUARDED. Without a single-line + length test it deleted
+// the answer body and rendered it as one enormous chip button -- strictly worse
+// than the unterminated marker it was added to fix. Pin the guard, not just the
+// harvest, so removing it fails here rather than in front of a learner.
+const RADAR_OPEN_GUARD = "tail.indexOf('\\n') === -1 && tail.length <= 200";
 const RADAR_OPEN_STRIP = "replace(/\\[SOLA_NEXT\\][\\s\\S]*/g, '')";
 check('learning_radar renderResponse() also strips an unterminated [SOLA_NEXT]',
     radarSrc.indexOf(RADAR_OPEN_STRIP) !== -1,
@@ -277,6 +284,9 @@ check('learning_radar renderResponse() also strips an unterminated [SOLA_NEXT]',
 check('learning_radar harvests chips from an unterminated [SOLA_NEXT]',
     radarSrc.indexOf(RADAR_OPEN_HARVEST) !== -1,
     'no open-form harvest in learning_radar.js');
+check('learning_radar guards the open-form harvest (single line, bounded length)',
+    radarSrc.indexOf(RADAR_OPEN_GUARD) !== -1,
+    'unguarded harvest: a stray marker would delete the answer into one giant chip');
 check('amd/build/learning_radar.min.js contains the open-form harvest (stale-build guard)',
     radarBuild.indexOf(RADAR_OPEN_HARVEST) !== -1,
     'built bundle is STALE — run the terser rebuild for learning_radar.js');
