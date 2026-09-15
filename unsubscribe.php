@@ -24,6 +24,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// phpcs:disable moodle.Files.RequireLogin.Missing
+// Deliberately not login-gated: this is the RFC 8058 one-click unsubscribe
+// target, reached from a link in an email or by an unattended provider POST.
+// Neither carries a Moodle session cookie, so require_login() would redirect
+// the learner to a login page and break the opt-out the mail provider requires
+// us to honor. Authentication is the opaque per-recipient token below, looked
+// up in reminder_manager::unsubscribe_by_token(). Matches the exemption already
+// declared in email_unsubscribe.php and digest_unsubscribe.php.
 require_once(__DIR__ . '/../../config.php');
 
 use local_ai_course_assistant\reminder_manager;

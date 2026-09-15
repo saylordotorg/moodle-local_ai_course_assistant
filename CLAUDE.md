@@ -259,6 +259,19 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
   2. **Missing tool permissions.** `permission_denials_count` is non-zero in the result JSON. `/code-review` fans the work out across Haiku/Sonnet/Opus subagents, so it needs `Task` plus `Read`/`Grep`/`Glob` for those subagents — none of which its own frontmatter declares, and the action grants nothing by default. Fixed in **PR #192** via `claude_args: --allowedTools`. Before that fix the v7.0.1 review billed $3.42 across nine turns, hit 21 denials and posted nothing.
   3. **Read-only `GITHUB_TOKEN`** (`pull-requests: read`) — the original bug, fixed in **PR #108 (2026-07-03)** by granting `pull-requests: write` + `issues: write` in both files; verified by PR #109.
 
+  4. **The job ends while the review agents are still running.** `/code-review`
+     fans out to background subagents and the action returns before they report,
+     so the job exits green having posted nothing. The tell is in the run log:
+     the final `"result"` field reads like *"Review agents are still working.
+     I'll report once all four come back."* rather than a findings list. Seen on
+     **all four** PRs merged on 2026-09-14 (#233, #236, #237, #238), runs lasting
+     only 2.5-5 minutes. It is not harmless: on #238 three of four agents had
+     reported and one had found a real defect -- a constant inserted between
+     `detect_best_source()`'s docblock and the method, orphaning the docblock --
+     which was lost when the job exited, and reached `main`. Before trusting a
+     green `claude-review`, grep the run log for that `"result"` line; if the
+     agents had not reported, the PR was not reviewed.
+
   To tell 2 from 3: the job log prints a `GITHUB_TOKEN Permissions` block under *Set up job*. If it shows `PullRequests: write` and `Issues: write`, posting was possible and the problem is tool permissions, not API scope.
 
   When granting tools, keep `Bash` scoped per `gh` subcommand and never grant `Edit`/`Write`. `pull_request` runs check out an untrusted head, so a blanket `Bash` grant would let a contributor's branch run arbitrary commands holding a `pull-requests: write` token.

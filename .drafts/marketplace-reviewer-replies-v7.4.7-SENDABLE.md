@@ -99,18 +99,24 @@ a Moodle session by design, and the fifth is a machine API.
 ### The sessionless intent is already declared in code, not only in prose
 
 Each of the five states in its header docblock that it is deliberately not
-login-gated. Four also declare it in a machine-readable form:
+login-gated, and each also declares it in a form your tooling can see:
 
-- `email_unsubscribe.php` and `digest_unsubscribe.php` carry
-  `// phpcs:disable moodle.Files.RequireLogin.Missing`
+- `email_unsubscribe.php`, `digest_unsubscribe.php` and `unsubscribe.php` carry
+  `// phpcs:disable moodle.Files.RequireLogin.Missing`, with a comment giving
+  the reason.
 - `talking_avatar_webhook.php` and `redash_export.php` declare
-  `define('NO_MOODLE_COOKIES', true)`
+  `define('NO_MOODLE_COOKIES', true)`, which is what suppresses the same sniff
+  for a sessionless endpoint.
 
-`unsubscribe.php` documents it in the docblock ("Accessible without login — uses
-a unique token for authentication") but carries neither annotation. If a uniform
-marker would help your tooling, we will happily add the `phpcs:disable` line to
-all five so the exemption is declared identically everywhere — say the word and
-it ships in the next release.
+`unsubscribe.php` was the one file where `moodle.Files.RequireLogin.Missing`
+still raised an unsuppressed warning; we have added the exemption and its
+rationale there, so the declaration is now uniform across all five. We did *not*
+add the `phpcs:disable` line to the two `NO_MOODLE_COOKIES` endpoints, because
+the sniff does not fire on them — a suppression there would assert a warning
+that does not exist.
+
+If Marketplace would rather see one single marker on all five regardless, tell
+us which and we will standardize on it.
 
 ### Why `require_login()` would be a regression, not a fix
 
@@ -143,7 +149,8 @@ we can add to these five without breaking the features.
    annotation), please point us at it and we will adopt it across all five.
 3. If these findings can be marked reviewed-and-dismissed rather than requiring
    a code change, that would let us proceed. If instead there is a change you do
-   want, we would rather make it than argue.
+   want, we would rather make it than argue — as with the `unsubscribe.php`
+   annotation above, which we have already made rather than argued about.
 
 We are also separately replying on MP001, where the short answer is that the
 plugin requires no license key, activation code or subscription of any kind.

@@ -40,6 +40,18 @@ class objective_manager {
     public const TABLE_OBJS = 'local_ai_course_assistant_objs';
     public const TABLE_ATTS = 'local_ai_course_assistant_obj_att';
 
+    /**
+     * Every value objs.source is allowed to hold.
+     *
+     * The column is char(20) and NOT NULL, and create() writes $source through
+     * without the substr() its neighbours get, so an unrecognized value is not
+     * a cosmetic problem: a long one is a DB insert error and a short one
+     * renders as a missing-string placeholder on objectives_admin.php. Keep
+     * this in step with detect_best_source()'s candidate list, plus the two
+     * sources that never come from detection ('manual', 'llm').
+     */
+    public const SOURCES = ['manual', 'competency', 'summary', 'section', 'llm', 'outcomemap'];
+
     /** Default decay factor: recent attempts weigh more than older ones. */
     private const DEFAULT_DECAY = 0.90;
     /** Default Bayesian prior (α, β) for the mastery estimator. */
@@ -739,18 +751,6 @@ class objective_manager {
      * @param int $courseid
      * @return array{source:string, objectives:array}
      */
-    /**
-     * Every value objs.source is allowed to hold.
-     *
-     * The column is char(20) and NOT NULL, and create() writes $source through
-     * without the substr() its neighbours get, so an unrecognized value is not
-     * a cosmetic problem: a long one is a DB insert error and a short one
-     * renders as a missing-string placeholder on objectives_admin.php. Keep
-     * this in step with detect_best_source()'s candidate list, plus the two
-     * sources that never come from detection ('manual', 'llm').
-     */
-    public const SOURCES = ['manual', 'competency', 'summary', 'section', 'llm', 'outcomemap'];
-
     public static function detect_best_source(int $courseid): array {
         $candidates = [
             // Curated outcomes first. local_outcomemap holds human-authored,
