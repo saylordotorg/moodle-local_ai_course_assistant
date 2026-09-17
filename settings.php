@@ -2653,6 +2653,18 @@ if ($hassiteconfig) {
         ''
     ));
 
+    // v7.5.0: supplemental courses. Sits next to the FAQ because it solves the
+    // same problem one step further out: the FAQ covers answers an administrator
+    // can write down, this covers answers that already exist as a course.
+    $settings->add(new admin_setting_configtext(
+        'local_ai_course_assistant/supplemental_courses',
+        get_string('settings:supplemental_courses', 'local_ai_course_assistant'),
+        get_string('settings:supplemental_courses_desc', 'local_ai_course_assistant',
+            \local_ai_course_assistant\supplemental_sources::MAX_COURSES),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/zendesk_enabled',
         get_string('settings:zendesk_enabled', 'local_ai_course_assistant'),

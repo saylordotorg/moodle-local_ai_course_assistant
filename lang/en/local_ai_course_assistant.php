@@ -245,6 +245,15 @@ $string['chat:studyplan_intro'] = 'I can help you create a study plan for this c
 // FAQ & Support settings.
 $string['settings:faq_heading'] = 'FAQ & Support';
 $string['settings:faq_heading_desc'] = 'Configure the centralized FAQ and Zendesk support ticket integration.';
+$string['coursesettings:supplemental_heading'] = 'Supplemental courses';
+$string['coursesettings:supplemental_desc'] = 'Let [[tutorshort]] answer from another course as well as this one. The usual case is a student orientation or resource centre: a learner asking about exam policy gets the answer from there rather than nothing. Those courses must already be indexed, and hidden courses are ignored.';
+$string['coursesettings:supplemental_courses'] = 'Course IDs';
+$string['coursesettings:supplemental_inherit'] = 'Leave empty to use the site-wide list ({$a}). A value here replaces that list for this course rather than adding to it, so enter the full set.';
+$string['coursesettings:supplemental_nosite'] = 'Leave empty for none. No site-wide list is set.';
+$string['settings:supplemental_courses'] = 'Supplemental courses';
+$string['settings:supplemental_courses_desc'] = 'Course IDs whose content [[tutorshort]] may also draw on when answering, separated by commas. Use this for material that lives in another course and applies everywhere, such as a student orientation or resource centre: a learner asking about exam policy then gets the answer from that course instead of nothing.
+
+The courses must already be indexed for retrieval; nothing extra is embedded, so adding one here is immediate and costs nothing. Hidden courses are ignored, so this cannot be used to surface material a learner is not meant to see. Maximum {$a} courses. A per-course setting, where present, replaces this list rather than adding to it.';
 $string['settings:faq_content'] = 'FAQ Content';
 $string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
 $string['settings:zendesk_enabled'] = 'Enable Zendesk Escalation';

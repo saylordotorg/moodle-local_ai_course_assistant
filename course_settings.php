@@ -164,6 +164,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $englishlock = optional_param('english_lock', 0, PARAM_INT);
     set_config('english_lock_course_' . $courseid, $englishlock, 'local_ai_course_assistant');
 
+    // Supplemental courses — per-course override. An empty value REMOVES the
+    // override so the course falls back to the site-wide list; that is why this
+    // unsets rather than storing '', which would read as "supplement with
+    // nothing" and silently override the site default.
+    $supplemental = optional_param('supplemental_courses', '', PARAM_RAW_TRIMMED);
+    if (trim($supplemental) !== '') {
+        // Normalize through the same parser retrieval uses, so what is stored is
+        // what will actually be honoured rather than whatever was typed.
+        $ids = \local_ai_course_assistant\supplemental_sources::parse($supplemental, $courseid);
+        set_config('supplemental_courses_course_' . $courseid, implode(',', $ids), 'local_ai_course_assistant');
+    } else {
+        unset_config('supplemental_courses_course_' . $courseid, 'local_ai_course_assistant');
+    }
+    \local_ai_course_assistant\supplemental_sources::reset_cache();
+
     // Voice Tab — per-course override (inherit / force on / force off).
     $voicetab = optional_param('voice_tab', '', PARAM_RAW_TRIMMED);
     if ($voicetab === '1' || $voicetab === '0') {
@@ -275,6 +290,8 @@ $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw;
 
 // English lock setting.
 $englishlockenabled = (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
+$supplementalraw = (string) (get_config('local_ai_course_assistant', 'supplemental_courses_course_' . $courseid) ?: '');
+$supplementalsite = (string) (get_config('local_ai_course_assistant', 'supplemental_courses') ?: '');
 
 // Voice Tab per-course override ('', '1', or '0').
 $voicetabcourseraw = get_config('local_ai_course_assistant', 'sola_voicetab_course_' . $courseid);
@@ -880,6 +897,30 @@ echo html_writer::div(
         </div>
     </div>
     <?php } ?>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0"><?php echo get_string('coursesettings:supplemental_heading', 'local_ai_course_assistant'); ?></h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted"><?php echo \local_ai_course_assistant\branding::str('coursesettings:supplemental_desc'); ?></p>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="supplemental_courses">
+                    <?php echo get_string('coursesettings:supplemental_courses', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="supplemental_courses"
+                           name="supplemental_courses" value="<?php echo s($supplementalraw); ?>"
+                           placeholder="<?php echo s($supplementalsite); ?>">
+                    <small class="form-text text-muted">
+                        <?php echo $supplementalsite !== ''
+                            ? get_string('coursesettings:supplemental_inherit', 'local_ai_course_assistant', s($supplementalsite))
+                            : get_string('coursesettings:supplemental_nosite', 'local_ai_course_assistant'); ?>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="card mb-3">
         <div class="card-header">

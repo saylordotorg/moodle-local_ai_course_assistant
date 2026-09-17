@@ -198,9 +198,14 @@ class rag_retriever {
      * @return string
      */
     private static function persist_key(int $courseid, string $querymodel, string $dtype): string {
+        // The supplemental list is part of the key, not just the course: changing
+        // it changes which chunks the index contains, and without this the old
+        // scope would be served from cache until the generation happened to bump.
+        $scope = implode(',', supplemental_sources::usable_course_ids($courseid));
+
         return 'c' . $courseid
             . '_v' . self::course_version($courseid)
-            . '_' . md5($querymodel . '|' . $dtype);
+            . '_' . md5($querymodel . '|' . $dtype . '|' . $scope);
     }
 
     /**
@@ -282,6 +287,12 @@ class rag_retriever {
         // ever raises, so a site already configured higher is untouched.
         raise_memory_limit(MEMORY_EXTRA);
 
+        // One IN clause covering this course plus any supplemental ones, rather
+        // than a second query: retrieval scores them together, so loading them
+        // together keeps the ordering and the memory profile unchanged.
+        $scope = array_merge([$courseid], supplemental_sources::usable_course_ids($courseid));
+        [$coursesql, $courseparams] = $DB->get_in_or_equal($scope, SQL_PARAMS_NAMED, 'scope');
+
         $packed = [
             'ids' => [], 'lens' => [], 'dtypes' => [],
             'cmids' => [], 'modtypes' => [], 'chunkindexes' => [], 'blob' => '',
@@ -319,13 +330,18 @@ class rag_retriever {
             // certificate answer, and a question about marginal cost
             // retrieves none of it. Previously all 4,451 characters were
             // injected into every prompt regardless.
-            '(courseid = :courseid OR (courseid = :siteid AND modtype = :faqtype))
+            // v7.5.0: supplemental courses. An administrator can name courses
+            // whose already-indexed content is retrievable from here -- the
+            // orientation course being the case this exists for, so a question
+            // about exams reaches the Student Resource Center instead of
+            // finding nothing. No new embedding: these chunks are already in
+            // this table, only out of scope until now.
+            '(courseid ' . $coursesql . ' OR (courseid = :siteid AND modtype = :faqtype))
                AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
-            [
-                'courseid' => $courseid,
+            array_merge($courseparams, [
                 'siteid' => SITEID,
                 'faqtype' => \local_ai_course_assistant\faq_manager::MODTYPE,
-            ],
+            ]),
             '',
             // NB: `content` is deliberately NOT selected here. Scoring
             // reads vectors only, so the text is fetched later for the
