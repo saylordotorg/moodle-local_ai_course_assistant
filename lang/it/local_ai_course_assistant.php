@@ -2659,3 +2659,30 @@ $string['settings:spend_export_key_desc'] = 'Chiave bearer per l\'endpoint mensi
 $string['task:migrate_course_embeddings'] = 'Migra un corso a un nuovo modello di embedding';
 $string['task:model_price_drift_check'] = 'Controllo della deriva dei prezzi dei modelli';
 $string['task:run_model_benchmark'] = 'Esegui il benchmark di un modello';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Spiega questa pagina';
+$string['starters:builtin_help_page_desc'] = 'Spiega i concetti chiave della pagina della lezione corrente';
+$string['starters:builtin_quiz'] = 'Interrogami';
+$string['starters:builtin_quiz_desc'] = 'Genera un quiz di esercitazione sul materiale corrente';
+$string['starters:builtin_study_plan'] = 'Piano di studio';
+$string['starters:builtin_study_plan_desc'] = 'Crea un piano mirato per la sessione di studio';
+$string['starters:builtin_ai_project_coach'] = 'Coach di progetto IA';
+$string['starters:builtin_ai_project_coach_desc'] = 'Accompagnamento guidato per progetti e compiti del corso';
+$string['starters:builtin_focus_next'] = 'Su cosa dovrei concentrarmi?';
+$string['starters:builtin_focus_next_desc'] = 'Suggerimenti personalizzati sul prossimo passo, in base ai tuoi progressi sugli obiettivi';
+$string['starters:builtin_ell_practice'] = 'Pratica del parlato';
+$string['starters:builtin_ell_practice_desc'] = 'Pratica di conversazione parlata con l\'assistente';
+$string['starters:builtin_ell_pronunciation'] = 'Pratica pronuncia';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Riscontro suono per suono sulla tua pronuncia';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Corsi supplementari';
+$string['coursesettings:supplemental_desc'] = 'Consente a [[tutorshort]] di rispondere anche a partire da un altro corso, oltre a questo. Il caso tipico è un orientamento per studenti o un centro risorse: chi chiede della politica d\'esame ottiene la risposta da lì invece di nulla. Quei corsi devono essere già indicizzati, e i corsi nascosti vengono ignorati.';
+$string['coursesettings:supplemental_courses'] = 'ID dei corsi';
+$string['coursesettings:supplemental_inherit'] = 'Lascia vuoto per usare l\'elenco del sito ({$a}). Un valore qui sostituisce quell\'elenco per questo corso invece di aggiungersi: inserisci quindi l\'insieme completo.';
+$string['coursesettings:supplemental_nosite'] = 'Lascia vuoto per nessuno. Non è impostato alcun elenco del sito.';
+$string['settings:supplemental_courses'] = 'Corsi supplementari';
+$string['settings:supplemental_courses_desc'] = 'ID dei corsi il cui contenuto [[tutorshort]] può usare anche nel rispondere, separati da virgole. Da usare per materiale che vive in un altro corso e vale ovunque, come un orientamento per studenti o un centro risorse: chi chiede della politica d\'esame ottiene allora la risposta da quel corso invece di nulla.
+
+I corsi devono essere già indicizzati per il recupero; non viene incorporato nulla di aggiuntivo, quindi aggiungerne uno qui è immediato e non costa nulla. I corsi nascosti vengono ignorati. Le attività dentro un corso elencato, però, sono indicizzate come le vedeva l\'amministratore che lo ha reindicizzato, quindi il testo di un\'attività nascosta o limitata può essere citato a uno studente anche se non viene mostrato alcun collegamento. Elenca solo corsi il cui contenuto è interamente adatto al pubblico. Massimo {$a} corsi. Un\'impostazione per corso, dove presente, sostituisce questo elenco invece di aggiungersi.';

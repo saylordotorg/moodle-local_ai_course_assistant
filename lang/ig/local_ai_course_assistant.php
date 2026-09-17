@@ -2633,3 +2633,30 @@ $string['settings:spend_export_key_desc'] = 'Igodo bearer maka endpoint mbupụ 
 $string['task:migrate_course_embeddings'] = 'Bufee otu kọọsị gaa na model embedding ọhụrụ';
 $string['task:model_price_drift_check'] = 'Nyocha drift ọnụahịa model';
 $string['task:run_model_benchmark'] = 'Mee benchmark otu model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Kọwaa peeji a';
+$string['starters:builtin_help_page_desc'] = 'Na-akọwa echiche ndị bụ isi na ibe nkuzi ugbu a';
+$string['starters:builtin_quiz'] = 'Nwale m';
+$string['starters:builtin_quiz_desc'] = 'Na-emepụta ajụjụ ọmụmụ na ihe ọmụmụ ugbu a';
+$string['starters:builtin_study_plan'] = 'Atụmatụ mmụta';
+$string['starters:builtin_study_plan_desc'] = 'Na-emepụta atụmatụ ọmụmụ lekwasịrị anya';
+$string['starters:builtin_ai_project_coach'] = 'Onye nkuzi oru AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Nduzi nzọụkwụ maka ọrụ na oru ngo nke usoro ihe ọmụmụ';
+$string['starters:builtin_focus_next'] = 'Gịnị ka m kwesịrị ilekwasị anya na ya?';
+$string['starters:builtin_focus_next_desc'] = 'Ndụmọdụ nzọụkwụ ọzọ ahaziri gị dabere na ọganihu ebumnuche gị';
+$string['starters:builtin_ell_practice'] = 'Ịmụta ikwu okwu';
+$string['starters:builtin_ell_practice_desc'] = 'Omume mkparịta ụka ekwuru ekwu ya na onye enyemaka';
+$string['starters:builtin_ell_pronunciation'] = 'Ọmụma ịkpọ okwu';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Nzaghachi ụda n\'ụda maka otu i si akpọ okwu';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Ụsọrọ ihe ọmụmụ mgbakwunye';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] nwere ike ịza site na usoro ihe ọmụmụ ọzọ na mgbakwunye na nke a. Ọnọdụ a na-ahụkarị bụ usoro ntọala maka ụmụ akwụkwọ ma ọ bụ ebe akụrụngwa: onye na-ajụ maka iwu ule na-enweta azịza site n\'ebe ahụ kama ọ ghara inweta ihe ọ bụla. Usoro ihe ọmụmụ ndị ahụ ga-abụrịrị ndị edepụtalarị, a na-eleghara usoro ihe ọmụmụ zoro ezo anya.';
+$string['coursesettings:supplemental_courses'] = 'ID usoro ihe ọmụmụ';
+$string['coursesettings:supplemental_inherit'] = 'Hapụ ya efu iji jiri ndepụta saịtị dum ({$a}). Uru dị ebe a na-anọchi ndepụta ahụ maka usoro ihe ọmụmụ a kama ịgbakwunye na ya, ya mere tinye ihe niile.';
+$string['coursesettings:supplemental_nosite'] = 'Hapụ ya efu ma ọ bụrụ na ọ dịghị nke a chọrọ. E nweghị ndepụta saịtị dum edobere.';
+$string['settings:supplemental_courses'] = 'Ụsọrọ ihe ọmụmụ mgbakwunye';
+$string['settings:supplemental_courses_desc'] = 'ID nke usoro ihe ọmụmụ ndị [[tutorshort]] nwere ike iji ọdịnaya ha mgbe ọ na-aza, kewara ha site na rikoma. Jiri ya maka ihe dị n\'usoro ihe ọmụmụ ọzọ mana metụtara ebe niile, dị ka usoro ntọala maka ụmụ akwụkwọ ma ọ bụ ebe akụrụngwa: mgbe ahụ onye na-ajụ maka iwu ule na-enweta azịza site na usoro ihe ọmụmụ ahụ kama ọ ghara inweta ihe ọ bụla.
+
+Usoro ihe ọmụmụ ahụ ga-abụrịrị ndị edepụtalarị maka nweta; ọ dịghị ihe ọzọ a na-etinye, ya mere ịgbakwunye otu ebe a na-arụ ọrụ ozugbo ma ọ naghị efu ihe ọ bụla. A na-eleghara usoro ihe ọmụmụ zoro ezo anya. Mana ọrụ dị n\'ime usoro ihe ọmụmụ edepụtara ka a na-edepụta dịka onye nchịkwa depụtaghachiri ya hụrụ ha, ya mere enwere ike ihota ederede ọrụ zoro ezo ma ọ bụ nke a machibidoro maka nwa akwụkwọ ọ bụ ezie na egosighị njikọ ọ bụla. Depụta naanị usoro ihe ọmụmụ ndị ọdịnaya ha niile dabara maka ndị na-agụ ya. Kacha {$a} usoro ihe ọmụmụ. Ntọala n\'ọkwa usoro ihe ọmụmụ, ebe ọ dị, na-anọchi ndepụta a kama ịgbakwunye na ya.';

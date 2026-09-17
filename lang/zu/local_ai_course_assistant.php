@@ -2663,3 +2663,30 @@ $string['settings:spend_export_key_desc'] = 'Ukhiye we-Bearer we-endpoint yokukh
 $string['task:migrate_course_embeddings'] = 'Fudukisa isifundo esisodwa kumodeli entsha ye-embedding';
 $string['task:model_price_drift_check'] = 'Ukuhlolwa kwe-drift yentengo yemodeli';
 $string['task:run_model_benchmark'] = 'Yenza i-benchmark yemodeli';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Chaza leli khasi';
+$string['starters:builtin_help_page_desc'] = 'Ichaza imiqondo eyinhloko yekhasi lesifundo samanje';
+$string['starters:builtin_quiz'] = 'Ngihlole';
+$string['starters:builtin_quiz_desc'] = 'Yenza isivivinyo sokuzilolonga ngokuqukethwe kwamanje';
+$string['starters:builtin_study_plan'] = 'Uhlelo lwezifundo';
+$string['starters:builtin_study_plan_desc'] = 'Yenza uhlelo olugxilile lweseshini yokufunda';
+$string['starters:builtin_ai_project_coach'] = 'I-AI Project Coach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ukweluleka okuqondisiwe ngamaphrojekthi nemisebenzi yekhosi';
+$string['starters:builtin_focus_next'] = 'Kufanele ngigxile kuphi?';
+$string['starters:builtin_focus_next_desc'] = 'Iziphakamiso zesinyathelo esilandelayo ezenzelwe wena ngokuya ngenqubekela phambili yakho';
+$string['starters:builtin_ell_practice'] = 'Ukulolonga ukukhuluma';
+$string['starters:builtin_ell_practice_desc'] = 'Ukuzilolonga ngengxoxo ekhulunywayo nomsizi';
+$string['starters:builtin_ell_pronunciation'] = 'Ukulolonga ukuphimisa';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Impendulo ngomsindo nomsindo ngendlela obiza ngayo amagama';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Amakhosi angeziwe';
+$string['coursesettings:supplemental_desc'] = 'Ivumela [[tutorshort]] ukuthi aphendule nangokusuka kwelinye ikhosi ngaphandle kwaleli. Isimo esivamile yikhosi lokwethulwa kwabafundi noma isikhungo sezinsiza: obuza ngenqubomgomo yezivivinyo uthola impendulo lapho esikhundleni sokungatholi lutho. Lawo makhosi kumele abe esehlelwe kakade, futhi amakhosi afihliwe ayanganakwa.';
+$string['coursesettings:supplemental_courses'] = 'Ama-ID amakhosi';
+$string['coursesettings:supplemental_inherit'] = 'Shiya kungenalutho ukuze usebenzise uhlu lwesayithi lonke ({$a}). Inani lapha lithatha indawo yalolo hlu kuleli khosi esikhundleni sokwengeza kulo, ngakho faka isethi ephelele.';
+$string['coursesettings:supplemental_nosite'] = 'Shiya kungenalutho uma ungafuni noyedwa. Alukho uhlu lwesayithi lonke olubekiwe.';
+$string['settings:supplemental_courses'] = 'Amakhosi angeziwe';
+$string['settings:supplemental_courses_desc'] = 'Ama-ID amakhosi okuqukethwe kwawo [[tutorshort]] angakusebenzisa nalapho ephendula, ahlukaniswe ngokhefana. Sebenzisa lokhu kokuqukethwe okuhlala kwelinye ikhosi kodwa okusebenza yonke indawo, njengekhosi lokwethulwa kwabafundi noma isikhungo sezinsiza: obuza ngenqubomgomo yezivivinyo uthola-ke impendulo kulelo khosi esikhundleni sokungatholi lutho.
+
+Amakhosi kumele abe esehlelwe kakade ukuze atholakale; akukho okunye okushumekwayo, ngakho ukungeza lapha kusebenza masinyane futhi akubizi lutho. Amakhosi afihliwe ayanganakwa. Kodwa imisebenzi engaphakathi kwekhosi elifakiwe ihlelwa njengoba yayibonwa umlawuli owaphinde wayihlela, ngakho umbhalo womsebenzi ofihliwe noma okhawulelwe ungacashunelwa umfundi noma kungabonakali sixhumanisi sawo. Faka kuphela amakhosi aqukethe okulungele bonke ababukeli. Ubuningi obungu-{$a} amakhosi. Isilungiselelo sezinga lekhosi, lapho sikhona, sithatha indawo yalolu hlu esikhundleni sokwengeza kulo.';

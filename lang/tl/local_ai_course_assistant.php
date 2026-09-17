@@ -2663,3 +2663,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer key para sa buwanang endpoin
 $string['task:migrate_course_embeddings'] = 'I-migrate ang isang kurso sa bagong embedding model';
 $string['task:model_price_drift_check'] = 'Pagtingin sa price drift ng modelo';
 $string['task:run_model_benchmark'] = 'I-benchmark ang isang modelo';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Ipaliwanag ang pahinang ito';
+$string['starters:builtin_help_page_desc'] = 'Ipinapaliwanag ang mga pangunahing konsepto sa kasalukuyang pahina ng aralin';
+$string['starters:builtin_quiz'] = 'Subukin ako';
+$string['starters:builtin_quiz_desc'] = 'Gumagawa ng pagsasanay na pagsusulit mula sa kasalukuyang materyal';
+$string['starters:builtin_study_plan'] = 'Plano sa pag-aaral';
+$string['starters:builtin_study_plan_desc'] = 'Gumagawa ng nakatuong plano para sa iyong pag-aaral';
+$string['starters:builtin_ai_project_coach'] = 'AI Project Coach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Gabay na coaching para sa mga proyekto at takdang-aralin';
+$string['starters:builtin_focus_next'] = 'Ano ang dapat kong pagtuunan?';
+$string['starters:builtin_focus_next_desc'] = 'Personalisadong mungkahi sa susunod na hakbang batay sa iyong progreso';
+$string['starters:builtin_ell_practice'] = 'Pagsasanay sa pagsasalita';
+$string['starters:builtin_ell_practice_desc'] = 'Pagsasanay sa pasalitang usapan kasama ang katulong';
+$string['starters:builtin_ell_pronunciation'] = 'Pagsasanay sa bigkas';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Tugon nang tunog-sa-tunog sa iyong pagbigkas';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Mga karagdagang kurso';
+$string['coursesettings:supplemental_desc'] = 'Pinapayagan ang [[tutorshort]] na sumagot mula rin sa ibang kurso bukod sa kursong ito. Ang karaniwang kaso ay isang oryentasyon para sa mag-aaral o resource center: ang nagtatanong tungkol sa patakaran sa pagsusulit ay makakakuha ng sagot mula roon sa halip na wala. Kailangang na-index na ang mga kursong iyon, at binabalewala ang mga nakatagong kurso.';
+$string['coursesettings:supplemental_courses'] = 'Mga course ID';
+$string['coursesettings:supplemental_inherit'] = 'Iwanang blangko para gamitin ang listahan sa buong site ({$a}). Ang halaga rito ay pumapalit sa listahang iyon para sa kursong ito sa halip na madagdag dito, kaya ilagay ang buong set.';
+$string['coursesettings:supplemental_nosite'] = 'Iwanang blangko kung wala. Walang nakatakdang listahan sa buong site.';
+$string['settings:supplemental_courses'] = 'Mga karagdagang kurso';
+$string['settings:supplemental_courses_desc'] = 'Mga course ID na maaari ring pagkunan ng nilalaman ng [[tutorshort]] kapag sumasagot, pinaghihiwalay ng kuwit. Gamitin ito para sa materyal na nasa ibang kurso ngunit angkop saanman, tulad ng oryentasyon para sa mag-aaral o resource center: ang nagtatanong tungkol sa patakaran sa pagsusulit ay makakakuha ng sagot mula sa kursong iyon sa halip na wala.
+
+Kailangang na-index na ang mga kurso para sa pagkuha; walang karagdagang ina-embed, kaya agad na epektibo ang pagdagdag dito at walang gastos. Binabalewala ang mga nakatagong kurso. Ngunit ang mga aktibidad sa loob ng nakalistang kurso ay ini-index ayon sa nakita ng administrador na nag-index muli nito, kaya ang teksto ng nakatago o pinaghihigpitang aktibidad ay maaaring sipiin sa isang mag-aaral kahit walang ipinapakitang link dito. Ilista lamang ang mga kursong angkop sa mambabasa ang buong nilalaman. Pinakamarami ay {$a} kurso. Ang setting sa antas ng kurso, kung mayroon, ay pumapalit sa listahang ito sa halip na madagdag dito.';

@@ -2617,3 +2617,30 @@ $string['settings:spend_export_key_desc'] = 'مفتاح Bearer لنقطة نها
 $string['task:migrate_course_embeddings'] = 'ترحيل مقرر واحد إلى نموذج تضمين جديد';
 $string['task:model_price_drift_check'] = 'فحص انحراف أسعار النماذج';
 $string['task:run_model_benchmark'] = 'قياس أداء نموذج';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'اشرح هذه الصفحة';
+$string['starters:builtin_help_page_desc'] = 'يشرح المفاهيم الأساسية من صفحة الدرس الحالية';
+$string['starters:builtin_quiz'] = 'اختبرني';
+$string['starters:builtin_quiz_desc'] = 'ينشئ اختبارًا تدريبيًا على المادة الحالية';
+$string['starters:builtin_study_plan'] = 'خطة الدراسة';
+$string['starters:builtin_study_plan_desc'] = 'ينشئ خطة مركزة لجلسة دراسية';
+$string['starters:builtin_ai_project_coach'] = 'مدرب المشاريع بالذكاء الاصطناعي';
+$string['starters:builtin_ai_project_coach_desc'] = 'إرشاد موجَّه لمشاريع المقرر وواجباته';
+$string['starters:builtin_focus_next'] = 'على ماذا يجب أن أركز؟';
+$string['starters:builtin_focus_next_desc'] = 'اقتراحات مخصصة للخطوة التالية بناءً على تقدمك في الأهداف';
+$string['starters:builtin_ell_practice'] = 'تدريب على الكلام';
+$string['starters:builtin_ell_practice_desc'] = 'تدريب على المحادثة المنطوقة مع المساعد';
+$string['starters:builtin_ell_pronunciation'] = 'تحسين النطق';
+$string['starters:builtin_ell_pronunciation_desc'] = 'ملاحظات صوتًا بصوت حول طريقة نطقك للكلمات';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'مقررات تكميلية';
+$string['coursesettings:supplemental_desc'] = 'يتيح لـ[[tutorshort]] أن يجيب انطلاقًا من مقرر آخر إضافةً إلى هذا المقرر. الحالة المعتادة هي مقرر تعريفي للطلاب أو مركز موارد: من يسأل عن سياسة الامتحانات يحصل على الإجابة من هناك بدلًا من لا شيء. يجب أن تكون تلك المقررات مفهرسة بالفعل، وتُتجاهل المقررات المخفية.';
+$string['coursesettings:supplemental_courses'] = 'معرّفات المقررات';
+$string['coursesettings:supplemental_inherit'] = 'اتركه فارغًا لاستخدام قائمة الموقع ({$a}). القيمة هنا تحل محل تلك القائمة لهذا المقرر بدلًا من أن تضاف إليها، لذا أدخل المجموعة كاملة.';
+$string['coursesettings:supplemental_nosite'] = 'اتركه فارغًا لعدم استخدام أي مقرر. لا توجد قائمة على مستوى الموقع.';
+$string['settings:supplemental_courses'] = 'مقررات تكميلية';
+$string['settings:supplemental_courses_desc'] = 'معرّفات المقررات التي يجوز لـ[[tutorshort]] الاستناد إلى محتواها أيضًا عند الإجابة، مفصولة بفواصل. استخدمها للمحتوى الموجود في مقرر آخر والذي ينطبق في كل مكان، مثل مقرر تعريفي للطلاب أو مركز موارد: عندئذٍ يحصل من يسأل عن سياسة الامتحانات على الإجابة من ذلك المقرر بدلًا من لا شيء.
+
+يجب أن تكون المقررات مفهرسة بالفعل للاسترجاع؛ ولا يُضمَّن أي شيء إضافي، لذا فإن الإضافة هنا تسري فورًا ولا تكلف شيئًا. تُتجاهل المقررات المخفية. غير أن الأنشطة داخل المقرر المُدرَج تُفهرَس كما رآها المسؤول الذي أعاد فهرسته، لذا قد يُقتبس نص نشاط مخفي أو مقيَّد لطالب حتى لو لم يُعرض أي رابط إليه. أدرِج فقط المقررات التي يكون محتواها بالكامل مناسبًا للجمهور. بحد أقصى {$a} مقررات. الإعداد على مستوى المقرر، حيث يوجد، يحل محل هذه القائمة بدلًا من أن يضاف إليها.';

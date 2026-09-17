@@ -2620,3 +2620,30 @@ $string['settings:spend_export_key_desc'] = 'Clé Bearer pour le point de termin
 $string['task:migrate_course_embeddings'] = 'Migrer un cours vers un nouveau modèle d\'embedding';
 $string['task:model_price_drift_check'] = 'Vérification de dérive tarifaire des modèles';
 $string['task:run_model_benchmark'] = 'Évaluer un modèle';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Expliquer cette page';
+$string['starters:builtin_help_page_desc'] = 'Explique les concepts clés de la page de cours actuelle';
+$string['starters:builtin_quiz'] = 'Testez-moi';
+$string['starters:builtin_quiz_desc'] = 'Génère un quiz d\'entraînement sur le contenu actuel';
+$string['starters:builtin_study_plan'] = 'Plan d\'étude';
+$string['starters:builtin_study_plan_desc'] = 'Crée un plan de session d\'étude ciblé';
+$string['starters:builtin_ai_project_coach'] = 'Coach de projet IA';
+$string['starters:builtin_ai_project_coach_desc'] = 'Accompagnement guidé pour les projets et devoirs du cours';
+$string['starters:builtin_focus_next'] = 'Sur quoi dois-je me concentrer ?';
+$string['starters:builtin_focus_next_desc'] = 'Suggestions personnalisées pour la suite, selon votre progression sur les objectifs';
+$string['starters:builtin_ell_practice'] = 'Pratiquer l\'oral';
+$string['starters:builtin_ell_practice_desc'] = 'Pratique de conversation orale avec l\'assistant';
+$string['starters:builtin_ell_pronunciation'] = 'Prononciation';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Retour son par son sur votre prononciation';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Cours complémentaires';
+$string['coursesettings:supplemental_desc'] = 'Permet à [[tutorshort]] de répondre aussi à partir d\'un autre cours, en plus de celui-ci. Le cas courant est une orientation étudiante ou un centre de ressources : un apprenant qui interroge sur la politique d\'examen y trouve la réponse plutôt que rien. Ces cours doivent déjà être indexés, et les cours masqués sont ignorés.';
+$string['coursesettings:supplemental_courses'] = 'Identifiants de cours';
+$string['coursesettings:supplemental_inherit'] = 'Laissez vide pour utiliser la liste du site ({$a}). Une valeur ici remplace cette liste pour ce cours au lieu de s\'y ajouter : saisissez donc l\'ensemble complet.';
+$string['coursesettings:supplemental_nosite'] = 'Laissez vide pour n\'en utiliser aucun. Aucune liste du site n\'est définie.';
+$string['settings:supplemental_courses'] = 'Cours complémentaires';
+$string['settings:supplemental_courses_desc'] = 'Identifiants des cours dont [[tutorshort]] peut aussi exploiter le contenu pour répondre, séparés par des virgules. À utiliser pour du contenu qui vit dans un autre cours et vaut partout, comme une orientation étudiante ou un centre de ressources : un apprenant qui interroge sur la politique d\'examen obtient alors la réponse depuis ce cours plutôt que rien.
+
+Les cours doivent déjà être indexés pour la recherche ; rien de plus n\'est vectorisé, donc en ajouter un ici est immédiat et gratuit. Les cours masqués sont ignorés. En revanche, les activités d\'un cours listé sont indexées telles que l\'administrateur qui l\'a réindexé les voyait, si bien que le texte d\'une activité masquée ou restreinte peut être cité à un apprenant même si aucun lien n\'est affiché. Ne listez que des cours dont l\'intégralité du contenu convient au public. Maximum {$a} cours. Un réglage propre à un cours, lorsqu\'il existe, remplace cette liste au lieu de s\'y ajouter.';

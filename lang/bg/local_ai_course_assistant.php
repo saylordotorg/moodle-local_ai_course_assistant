@@ -2619,3 +2619,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer ключ за крайнат
 $string['task:migrate_course_embeddings'] = 'Миграция на един курс към нов embedding модел';
 $string['task:model_price_drift_check'] = 'Проверка за отклонение в цените на моделите';
 $string['task:run_model_benchmark'] = 'Бенчмаркиране на модел';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Обясни тази страница';
+$string['starters:builtin_help_page_desc'] = 'Обяснява ключовите понятия от текущата страница на урока';
+$string['starters:builtin_quiz'] = 'Тествай ме';
+$string['starters:builtin_quiz_desc'] = 'Създава практически тест върху текущия материал';
+$string['starters:builtin_study_plan'] = 'План за учене';
+$string['starters:builtin_study_plan_desc'] = 'Създава фокусиран план за учебна сесия';
+$string['starters:builtin_ai_project_coach'] = 'AI Проектен треньор';
+$string['starters:builtin_ai_project_coach_desc'] = 'Насочено напътствие за проекти и задания по курса';
+$string['starters:builtin_focus_next'] = 'Върху какво да се съсредоточа?';
+$string['starters:builtin_focus_next_desc'] = 'Персонализирани предложения за следваща стъпка според напредъка ти по целите';
+$string['starters:builtin_ell_practice'] = 'Практика на говорене';
+$string['starters:builtin_ell_practice_desc'] = 'Практика на говорим разговор с асистента';
+$string['starters:builtin_ell_pronunciation'] = 'Практика на произношение';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Обратна връзка звук по звук за произношението ти';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Допълнителни курсове';
+$string['coursesettings:supplemental_desc'] = 'Позволява на [[tutorshort]] да отговаря и въз основа на друг курс, освен този. Обичайният случай е студентска ориентация или ресурсен център: който пита за правилата за изпити, получава отговора оттам вместо нищо. Тези курсове вече трябва да са индексирани, а скритите курсове се пренебрегват.';
+$string['coursesettings:supplemental_courses'] = 'Идентификатори на курсове';
+$string['coursesettings:supplemental_inherit'] = 'Оставете празно, за да се използва списъкът за целия сайт ({$a}). Стойност тук заменя този списък за този курс, вместо да се добавя към него, затова въведете пълния набор.';
+$string['coursesettings:supplemental_nosite'] = 'Оставете празно за никакви. Не е зададен списък за целия сайт.';
+$string['settings:supplemental_courses'] = 'Допълнителни курсове';
+$string['settings:supplemental_courses_desc'] = 'Идентификатори на курсове, чието съдържание [[tutorshort]] може също да ползва при отговаряне, разделени със запетаи. Използвайте за материал, който живее в друг курс и важи навсякъде, като студентска ориентация или ресурсен център: който пита за правилата за изпити, тогава получава отговора от онзи курс вместо нищо.
+
+Курсовете вече трябва да са индексирани за извличане; нищо допълнително не се вгражда, така че добавянето тук действа веднага и не струва нищо. Скритите курсове се пренебрегват. Дейностите вътре в посочен курс обаче се индексират така, както ги е виждал администраторът, който го е преиндексирал, затова текстът на скрита или ограничена дейност може да бъде цитиран на студент дори когато не се показва връзка към нея. Посочвайте само курсове, чието цяло съдържание е подходящо за аудиторията. Най-много {$a} курса. Настройка на ниво курс, където има такава, заменя този списък, вместо да се добавя към него.';

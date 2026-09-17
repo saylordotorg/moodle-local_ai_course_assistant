@@ -2646,3 +2646,30 @@ $string['settings:spend_export_key_desc'] = 'Maɓallin Bearer don endpoint ɗin 
 $string['task:migrate_course_embeddings'] = 'Yi ƙaurar kwas ɗaya zuwa sabon samfurin embedding';
 $string['task:model_price_drift_check'] = 'Dubawar drift na kuɗin samfuri';
 $string['task:run_model_benchmark'] = 'Yi benchmark ga samfuri';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Bayyana wannan shafi';
+$string['starters:builtin_help_page_desc'] = 'Yana bayyana muhimman ra\'ayoyin shafin darasin yanzu';
+$string['starters:builtin_quiz'] = 'Jarrabeni';
+$string['starters:builtin_quiz_desc'] = 'Yana ƙirƙirar jarabawar gwaji kan darasin yanzu';
+$string['starters:builtin_study_plan'] = 'Shirin karatu';
+$string['starters:builtin_study_plan_desc'] = 'Yana ƙirƙirar tsari mai maida hankali na zaman karatu';
+$string['starters:builtin_ai_project_coach'] = 'Kocin Ayyuka na AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Jagora mataki-mataki don ayyuka da aikin kwas';
+$string['starters:builtin_focus_next'] = 'Me ya kamata in mai da hankali a kai?';
+$string['starters:builtin_focus_next_desc'] = 'Shawarwarin mataki na gaba na kanka bisa ci gaban manufofinka';
+$string['starters:builtin_ell_practice'] = 'Yi magana';
+$string['starters:builtin_ell_practice_desc'] = 'Aikin tattaunawa da baki tare da mataimakin';
+$string['starters:builtin_ell_pronunciation'] = 'Aikin furta';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Amsa sauti-bayan-sauti kan yadda kake furta kalmomi';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Ƙarin kwasa-kwasai';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] yana iya amsawa daga wani kwas ma, ban da wannan. Yanayin da aka saba shi ne kwas ɗin gabatarwa ga ɗalibai ko cibiyar albarkatu: wanda ya tambaya game da ka\'idar jarrabawa yana samun amsa daga can maimakon kome. Dole ne waɗannan kwasa-kwasan su riga sun kasance cikin fihirisa, kuma ana watsi da kwasa-kwasan ɓoyayyu.';
+$string['coursesettings:supplemental_courses'] = 'ID na kwas';
+$string['coursesettings:supplemental_inherit'] = 'Bar shi babu komai don amfani da jerin gabaɗayan shafin ({$a}). Ƙima a nan tana maye gurbin wannan jeri ga wannan kwas maimakon ƙarawa a kansa, don haka shigar da cikakken saitin.';
+$string['coursesettings:supplemental_nosite'] = 'Bar shi babu komai idan ba a so ko ɗaya. Ba a saita jerin gabaɗayan shafin ba.';
+$string['settings:supplemental_courses'] = 'Ƙarin kwasa-kwasai';
+$string['settings:supplemental_courses_desc'] = 'ID na kwasa-kwasan da [[tutorshort]] zai iya amfani da abubuwan da ke cikinsu yayin amsawa, a raba da waƙafi. Yi amfani da shi don kayan da ke wani kwas amma sun shafi ko\'ina, kamar kwas ɗin gabatarwa ga ɗalibai ko cibiyar albarkatu: sannan wanda ya tambaya game da ka\'idar jarrabawa yana samun amsa daga wannan kwas maimakon kome.
+
+Dole ne kwasa-kwasan su riga sun kasance cikin fihirisa domin dawowa; ba a ƙara saka wani abu ba, don haka ƙara ɗaya a nan yana aiki nan take kuma ba ya kashe kuɗi. Ana watsi da kwasa-kwasan ɓoyayyu. Sai dai ayyukan da ke cikin kwas ɗin da aka lissafa ana sanya su a fihirisa kamar yadda mai gudanarwa da ya sake yin fihirisar ya gan su, don haka ana iya kawo rubutun aiki ɓoyayye ko ƙuntatacce ga ɗalibi ko da ba a nuna masa wata haɗiya ba. Ka lissafa kwasa-kwasan da dukkan abin da ke cikinsu ya dace da masu karatu kawai. Iyaka {$a} kwasa-kwasai. Saitin matakin kwas, inda yake, yana maye gurbin wannan jeri maimakon ƙarawa a kansa.';

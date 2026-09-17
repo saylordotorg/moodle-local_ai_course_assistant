@@ -623,16 +623,20 @@ class hook_callbacks {
         // v5.7.0 / Feature C — personalize the focus-next starter chip with the
         // learner's weakest objective when the mastery-aware starter flag is on.
         // Only the display name changes; the chip's prompt and behavior are
-        // unchanged. focus-next has no STARTER_LABELS entry so it is never
-        // re-localized client-side — the server-rendered name persists across
-        // language switches. starter_label() returns kind 'generic' whenever
-        // mastery is off or there is no weak objective, so this is self-gating.
+        // unchanged. starter_label() returns kind 'generic' whenever mastery is
+        // off or there is no weak objective, so this is self-gating.
+        //
+        // v7.5.0: the chip is flagged 'personalized' so the client-side
+        // re-localization pass leaves it alone. Until then focus-next was kept
+        // out of STARTER_LABELS for exactly that reason, which meant the chip
+        // was the one starter that never followed a language switch.
         if (\local_ai_course_assistant\feature_flags::resolve('mastery_starter', $courseid)) {
             $starterlabel = \local_ai_course_assistant\next_best_action::starter_label($USER->id, $courseid);
             if ($starterlabel['kind'] === 'weak' && $starterlabel['label'] !== '') {
                 foreach ($starters as &$starter) {
                     if (($starter['key'] ?? '') === 'focus-next') {
                         $starter['name'] = $starterlabel['label'];
+                        $starter['personalized'] = true;
                         break;
                     }
                 }

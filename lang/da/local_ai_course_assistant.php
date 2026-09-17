@@ -2619,3 +2619,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-nøgle til endpointet for de
 $string['task:migrate_course_embeddings'] = 'Migrér ét kursus til en ny embedding-model';
 $string['task:model_price_drift_check'] = 'Kontrol af modelprisafvigelse';
 $string['task:run_model_benchmark'] = 'Benchmark en model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Forklar denne side';
+$string['starters:builtin_help_page_desc'] = 'Forklarer de vigtigste begreber på den aktuelle lektionsside';
+$string['starters:builtin_quiz'] = 'Test mig';
+$string['starters:builtin_quiz_desc'] = 'Laver en øvelsesquiz om det aktuelle stof';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Laver en fokuseret plan for en studiesession';
+$string['starters:builtin_ai_project_coach'] = 'AI-projektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Guidet coaching til kursusprojekter og opgaver';
+$string['starters:builtin_focus_next'] = 'Hvad skal jeg fokusere på?';
+$string['starters:builtin_focus_next_desc'] = 'Personlige forslag til næste skridt ud fra din fremgang på målene';
+$string['starters:builtin_ell_practice'] = 'Øv at tale';
+$string['starters:builtin_ell_practice_desc'] = 'Øvelse i talt samtale med assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Udtaleøvelse';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Lyd-for-lyd feedback på din udtale';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Supplerende kurser';
+$string['coursesettings:supplemental_desc'] = 'Lader [[tutorshort]] svare ud fra et andet kursus ud over dette. Det typiske tilfælde er en studieintroduktion eller et ressourcecenter: den, der spørger om eksamenspolitikken, får svaret derfra i stedet for ingenting. Kurserne skal allerede være indekseret, og skjulte kurser ignoreres.';
+$string['coursesettings:supplemental_courses'] = 'Kursus-id\'er';
+$string['coursesettings:supplemental_inherit'] = 'Lad feltet stå tomt for at bruge listen for hele sitet ({$a}). En værdi her erstatter den liste for dette kursus i stedet for at føje til den, så angiv hele sættet.';
+$string['coursesettings:supplemental_nosite'] = 'Lad feltet stå tomt for ingen. Der er ikke angivet nogen liste for sitet.';
+$string['settings:supplemental_courses'] = 'Supplerende kurser';
+$string['settings:supplemental_courses_desc'] = 'Kursus-id\'er, hvis indhold [[tutorshort]] også må trække på, når den svarer, adskilt af kommaer. Brug det til materiale, der ligger i et andet kursus og gælder overalt, som en studieintroduktion eller et ressourcecenter: den, der spørger om eksamenspolitikken, får så svaret fra det kursus i stedet for ingenting.
+
+Kurserne skal allerede være indekseret til opslag; der indlejres intet ekstra, så det virker med det samme og koster ingenting at tilføje et her. Skjulte kurser ignoreres. Aktiviteter inde i et angivet kursus indekseres dog, som den administrator der genindekserede det så dem, så teksten i en skjult eller begrænset aktivitet kan citeres for en studerende, selv om der ikke vises noget link. Angiv kun kurser, hvis samlede indhold passer til målgruppen. Højst {$a} kurser. En kursusindstilling erstatter, hvor den findes, denne liste i stedet for at føje til den.';

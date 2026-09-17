@@ -2618,3 +2618,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-nyckel för den månatliga s
 $string['task:migrate_course_embeddings'] = 'Migrera en kurs till en ny embedding-modell';
 $string['task:model_price_drift_check'] = 'Kontroll av modellprisavvikelser';
 $string['task:run_model_benchmark'] = 'Benchmarka en modell';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Förklara denna sida';
+$string['starters:builtin_help_page_desc'] = 'Förklarar nyckelbegreppen på den aktuella lektionssidan';
+$string['starters:builtin_quiz'] = 'Testa mig';
+$string['starters:builtin_quiz_desc'] = 'Skapar ett övningsquiz på det aktuella materialet';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Skapar en fokuserad plan för ditt studiepass';
+$string['starters:builtin_ai_project_coach'] = 'AI-projektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Vägledd coachning för kursens projekt och uppgifter';
+$string['starters:builtin_focus_next'] = 'Vad ska jag fokusera på?';
+$string['starters:builtin_focus_next_desc'] = 'Personliga förslag på nästa steg utifrån dina framsteg mot målen';
+$string['starters:builtin_ell_practice'] = 'Övning i tal';
+$string['starters:builtin_ell_practice_desc'] = 'Övning i talad konversation med assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Uttalsbövning';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Ljud-för-ljud-återkoppling på ditt uttal';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kompletterande kurser';
+$string['coursesettings:supplemental_desc'] = 'Låter [[tutorshort]] svara även utifrån en annan kurs, utöver den här. Det vanliga fallet är en studentintroduktion eller ett resurscentrum: den som frågar om tentamenspolicyn får svaret därifrån i stället för inget. Kurserna måste redan vara indexerade, och dolda kurser ignoreras.';
+$string['coursesettings:supplemental_courses'] = 'Kurs-ID:n';
+$string['coursesettings:supplemental_inherit'] = 'Lämna tomt för att använda den webbplatsgemensamma listan ({$a}). Ett värde här ersätter den listan för denna kurs i stället för att läggas till, så ange hela uppsättningen.';
+$string['coursesettings:supplemental_nosite'] = 'Lämna tomt för inga. Ingen webbplatsgemensam lista är angiven.';
+$string['settings:supplemental_courses'] = 'Kompletterande kurser';
+$string['settings:supplemental_courses_desc'] = 'Kurs-ID:n vars innehåll [[tutorshort]] också får använda när den svarar, separerade med kommatecken. Använd för material som ligger i en annan kurs och gäller överallt, som en studentintroduktion eller ett resurscentrum: den som frågar om tentamenspolicyn får då svaret från den kursen i stället för inget.
+
+Kurserna måste redan vara indexerade för hämtning; inget extra bäddas in, så att lägga till en här verkar direkt och kostar ingenting. Dolda kurser ignoreras. Aktiviteter inne i en listad kurs indexeras dock som administratören som indexerade om den såg dem, så texten i en dold eller begränsad aktivitet kan citeras för en student även om ingen länk visas. Lista bara kurser vars hela innehåll passar målgruppen. Högst {$a} kurser. En kursinställning ersätter, där den finns, denna lista i stället för att läggas till.';

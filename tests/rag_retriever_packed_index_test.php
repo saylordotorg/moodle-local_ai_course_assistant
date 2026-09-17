@@ -277,6 +277,54 @@ final class rag_retriever_packed_index_test extends \advanced_testcase {
     }
 
     /**
+     * A supplemental course's chunks are retrievable from another course.
+     *
+     * This is the whole point of the feature: the orientation course is already
+     * indexed, and a learner asking about exam policy from inside MBA603 should
+     * reach it. Before this, retrieval scoped to one course plus the site FAQ,
+     * so that content was unreachable however well it was indexed.
+     */
+    public function test_supplemental_course_chunks_are_in_scope(): void {
+        $this->resetAfterTest();
+        $orientation = $this->getDataGenerator()->create_course(['visible' => 1]);
+
+        $own = $this->chunk(42, ['embedding_bin' => rag_retriever::pack_vector([1.0, 2.0], 'float')]);
+        $supp = $this->chunk((int) $orientation->id, [
+            'embedding_bin' => rag_retriever::pack_vector([3.0, 4.0], 'float'),
+            'content'       => 'Exams are proctored online.',
+        ]);
+
+        set_config('supplemental_courses', (string) $orientation->id, 'local_ai_course_assistant');
+        supplemental_sources::reset_cache();
+
+        $packed = $this->call('build_packed_index_from_db', [42, 'text-embedding-3-small', 'float']);
+        sort($packed['ids']);
+        $expected = [$own, $supp];
+        sort($expected);
+        $this->assertSame($expected, $packed['ids'],
+            'the orientation course chunk must be scoreable from course 42');
+    }
+
+    /**
+     * A hidden supplemental course contributes nothing.
+     *
+     * Retrieval must not become a way around course visibility.
+     */
+    public function test_hidden_supplemental_course_contributes_nothing(): void {
+        $this->resetAfterTest();
+        $hidden = $this->getDataGenerator()->create_course(['visible' => 0]);
+
+        $own = $this->chunk(42, ['embedding_bin' => rag_retriever::pack_vector([1.0, 2.0], 'float')]);
+        $this->chunk((int) $hidden->id, ['embedding_bin' => rag_retriever::pack_vector([3.0, 4.0], 'float')]);
+
+        set_config('supplemental_courses', (string) $hidden->id, 'local_ai_course_assistant');
+        supplemental_sources::reset_cache();
+
+        $packed = $this->call('build_packed_index_from_db', [42, 'text-embedding-3-small', 'float']);
+        $this->assertSame([$own], $packed['ids']);
+    }
+
+    /**
      * An int8 index round trips, and its magnitudes are preserved.
      *
      * decode_vector() deliberately returns int8 values as-is rather than

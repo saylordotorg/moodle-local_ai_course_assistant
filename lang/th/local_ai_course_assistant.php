@@ -2618,3 +2618,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer key สำหรับ endpo
 $string['task:migrate_course_embeddings'] = 'ย้ายหนึ่งคอร์สไปยังโมเดล embedding ใหม่';
 $string['task:model_price_drift_check'] = 'ตรวจสอบราคาโมเดลที่คลาดเคลื่อน';
 $string['task:run_model_benchmark'] = 'ทำ benchmark โมเดล';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'อธิบายหน้านี้';
+$string['starters:builtin_help_page_desc'] = 'อธิบายแนวคิดสำคัญจากหน้าบทเรียนปัจจุบัน';
+$string['starters:builtin_quiz'] = 'ทดสอบฉัน';
+$string['starters:builtin_quiz_desc'] = 'สร้างแบบทดสอบฝึกหัดจากเนื้อหาปัจจุบัน';
+$string['starters:builtin_study_plan'] = 'แผนการเรียน';
+$string['starters:builtin_study_plan_desc'] = 'สร้างแผนการเรียนแบบโฟกัสสำหรับรอบนี้';
+$string['starters:builtin_ai_project_coach'] = 'โค้ชโปรเจกต์ AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'การโค้ชแบบมีไกด์สำหรับโครงงานและงานที่ได้รับมอบหมาย';
+$string['starters:builtin_focus_next'] = 'ฉันควรโฟกัสเรื่องอะไร?';
+$string['starters:builtin_focus_next_desc'] = 'ข้อเสนอแนะขั้นต่อไปเฉพาะบุคคล อิงจากความก้าวหน้าตามเป้าหมายของคุณ';
+$string['starters:builtin_ell_practice'] = 'ฝึกพูด';
+$string['starters:builtin_ell_practice_desc'] = 'ฝึกสนทนาด้วยเสียงกับผู้ช่วย';
+$string['starters:builtin_ell_pronunciation'] = 'ฝึกการออกเสียง';
+$string['starters:builtin_ell_pronunciation_desc'] = 'ผลตอบรับการออกเสียงทีละเสียง';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'รายวิชาเสริม';
+$string['coursesettings:supplemental_desc'] = 'ให้ [[tutorshort]] ตอบจากรายวิชาอื่นได้ด้วย นอกเหนือจากรายวิชานี้ กรณีที่พบบ่อยคือรายวิชาปฐมนิเทศนักศึกษาหรือศูนย์ทรัพยากร ผู้ที่ถามเรื่องระเบียบการสอบจะได้คำตอบจากที่นั่นแทนที่จะไม่ได้อะไรเลย รายวิชาเหล่านั้นต้องถูกจัดทำดัชนีไว้แล้ว และรายวิชาที่ซ่อนอยู่จะถูกข้ามไป';
+$string['coursesettings:supplemental_courses'] = 'รหัสรายวิชา';
+$string['coursesettings:supplemental_inherit'] = 'เว้นว่างไว้เพื่อใช้รายการระดับเว็บไซต์ ({$a}) ค่าที่ใส่ตรงนี้จะแทนที่รายการนั้นสำหรับรายวิชานี้ ไม่ใช่เพิ่มเข้าไป จึงต้องใส่ชุดเต็ม';
+$string['coursesettings:supplemental_nosite'] = 'เว้นว่างไว้หากไม่ต้องการเลย ยังไม่ได้ตั้งค่ารายการระดับเว็บไซต์';
+$string['settings:supplemental_courses'] = 'รายวิชาเสริม';
+$string['settings:supplemental_courses_desc'] = 'รหัสของรายวิชาที่ [[tutorshort]] สามารถใช้เนื้อหาประกอบการตอบได้ด้วย คั่นด้วยเครื่องหมายจุลภาค ใช้กับเนื้อหาที่อยู่ในรายวิชาอื่นแต่ใช้ได้ทุกที่ เช่น รายวิชาปฐมนิเทศนักศึกษาหรือศูนย์ทรัพยากร ผู้ที่ถามเรื่องระเบียบการสอบจะได้คำตอบจากรายวิชานั้นแทนที่จะไม่ได้อะไรเลย
+
+รายวิชาต้องถูกจัดทำดัชนีสำหรับการค้นคืนไว้แล้ว ไม่มีการฝังเวกเตอร์เพิ่ม การเพิ่มตรงนี้จึงมีผลทันทีและไม่มีค่าใช้จ่าย รายวิชาที่ซ่อนอยู่จะถูกข้ามไป แต่กิจกรรมภายในรายวิชาที่ระบุไว้จะถูกจัดทำดัชนีตามที่ผู้ดูแลระบบซึ่งจัดทำดัชนีใหม่มองเห็น ดังนั้นข้อความของกิจกรรมที่ซ่อนหรือถูกจำกัดอาจถูกยกมาให้ผู้เรียนเห็น แม้จะไม่แสดงลิงก์ไปยังกิจกรรมนั้นก็ตาม ให้ระบุเฉพาะรายวิชาที่เนื้อหาทั้งหมดเหมาะสมกับผู้อ่าน สูงสุด {$a} รายวิชา การตั้งค่าระดับรายวิชา หากมี จะแทนที่รายการนี้ ไม่ใช่เพิ่มเข้าไป';

@@ -55,7 +55,85 @@ class starter_manager {
     ];
 
     /**
+     * Translated label or help text for a built-in starter.
+     *
+     * Until v7.5.0 every built-in name and description here was a literal
+     * English string, so a learner on a Spanish site read Spanish everywhere
+     * in the drawer except the starter chips and their title= tooltips. The
+     * chip NAMES were partly rescued client-side by STARTER_LABELS in
+     * speech.js; the descriptions were not localized anywhere at all.
+     *
+     * Brand tokens are resolved here because "AI Project Coach" and friends are
+     * rebrandable copy like every other learner-facing string.
+     *
+     * @param string $key Suffix under `starters:builtin_`.
+     * @return string
+     */
+    private static function builtin_string(string $key): string {
+        return branding::str('starters:builtin_' . $key);
+    }
+
+    /**
+     * Re-localize built-in starter text that an admin never actually changed.
+     *
+     * save_global_starters() persists whatever the admin form posted back,
+     * including the built-in names and descriptions it rendered. So the first
+     * time anyone opens the starters admin page and clicks Save, the built-ins
+     * freeze into the language that page happened to be in -- and every learner
+     * on the site reads that language on the chips from then on, whatever their
+     * own is. Existing sites are already in that state, which is why this
+     * repairs the stored value at read time rather than only fixing the save.
+     *
+     * An admin's own wording must survive, so a value is only replaced when it
+     * still matches the ENGLISH built-in text, i.e. nobody has edited it.
+     *
+     * @param array $starter One starter definition, as stored.
+     * @return array The same starter with translatable text resolved.
+     */
+    /**
+     * The English built-in string for a starter field, or null if there is none.
+     *
+     * @param string $key Starter key, e.g. 'help-page'.
+     * @param string $field 'name' or 'description'.
+     * @return string|null
+     */
+    private static function builtin_english(string $key, string $field): ?string {
+        $suffix = str_replace('-', '_', $key) . ($field === 'description' ? '_desc' : '');
+        $identifier = 'starters:builtin_' . $suffix;
+        if (!get_string_manager()->string_exists($identifier, 'local_ai_course_assistant')) {
+            return null;
+        }
+        // get_string()'s fourth argument is $lazyload, not a language -- passing
+        // 'en' there returns a lang_string that resolves in the CURRENT
+        // language. The string manager is the API that takes a language.
+        return branding::apply(
+            get_string_manager()->get_string($identifier, 'local_ai_course_assistant', null, 'en')
+        );
+    }
+
+    private static function localize_builtin(array $starter): array {
+        if (empty($starter['builtin']) || empty($starter['key'])) {
+            return $starter;
+        }
+        $suffix = str_replace('-', '_', (string) $starter['key']);
+        foreach (['name' => $suffix, 'description' => $suffix . '_desc'] as $field => $key) {
+            $english = self::builtin_english((string) $starter['key'], $field);
+            if ($english === null) {
+                continue;
+            }
+            $current = (string) ($starter[$field] ?? '');
+            if ($current === '' || $current === $english) {
+                $starter[$field] = branding::str('starters:builtin_' . $key);
+            }
+        }
+        return $starter;
+    }
+
+    /**
      * Return the built-in default starters.
+     *
+     * Names and descriptions are resolved in the CURRENT user's language, so
+     * this must not be called and cached across users.
      *
      * @return array
      */
@@ -63,8 +141,8 @@ class starter_manager {
         return [
             [
                 'key'         => 'help-page',
-                'name'        => 'Explain This Page',
-                'description' => 'Explains key concepts from the current lesson page',
+                'name'        => self::builtin_string('help_page'),
+                'description' => self::builtin_string('help_page_desc'),
                 'prompt'      => 'Help me understand {page}. What are the key concepts, and can you explain them with examples?',
                 'icon'        => 'book',
                 'type'        => 'prompt',
@@ -81,8 +159,8 @@ class starter_manager {
             ],
             [
                 'key'         => 'quiz',
-                'name'        => 'Quiz Me',
-                'description' => 'Generates a practice quiz on the current material',
+                'name'        => self::builtin_string('quiz'),
+                'description' => self::builtin_string('quiz_desc'),
                 'prompt'      => '',
                 'icon'        => 'lightning',
                 'type'        => 'quiz',
@@ -95,8 +173,8 @@ class starter_manager {
             // 'Review & Practice' removed — confusing overlap with 'Quiz Me On This'.
             [
                 'key'         => 'study-plan',
-                'name'        => 'Study Plan',
-                'description' => 'Creates a focused study session plan',
+                'name'        => self::builtin_string('study_plan'),
+                'description' => self::builtin_string('study_plan_desc'),
                 'prompt'      => "Suggest a focused plan for my study session in this course right now. Propose a concrete first step and a realistic 30-minute sequence based on where I am in the course, and cite the specific activities to work through. Then ask if I want to adjust the time or the focus.",
                 'icon'        => 'calendar',
                 'type'        => 'prompt',
@@ -107,8 +185,8 @@ class starter_manager {
             ],
             [
                 'key'         => 'ai-project-coach',
-                'name'        => 'AI Project Coach',
-                'description' => 'Guided coaching for course projects and assignments',
+                'name'        => self::builtin_string('ai_project_coach'),
+                'description' => self::builtin_string('ai_project_coach_desc'),
                 'prompt'      => "I'd like help with a project or assignment for this course. Can you coach me through planning, structuring, and completing it? Ask me what I'm working on first.",
                 'icon'        => 'rocket',
                 'type'        => 'prompt',
@@ -124,8 +202,8 @@ class starter_manager {
             // so the assistant can answer naturally without reciting the data.
             [
                 'key'         => 'focus-next',
-                'name'        => 'What should I focus on?',
-                'description' => 'Personalized next-step suggestions based on your objective progress',
+                'name'        => self::builtin_string('focus_next'),
+                'description' => self::builtin_string('focus_next_desc'),
                 'prompt'      => "Based on my current progress on this course's objectives, what are the two or three things I should focus on next? Suggest specific activities — review a concept, take a short quiz, work a problem — and link to the most relevant module for each. Keep it short and concrete; no tables or percentages.",
                 'icon'        => 'target',
                 'type'        => 'prompt',
@@ -136,8 +214,8 @@ class starter_manager {
             ],
             [
                 'key'         => 'ell-practice',
-                'name'        => 'Conversation Practice',
-                'description' => 'Voice conversation practice via SSE + TTS',
+                'name'        => self::builtin_string('ell_practice'),
+                'description' => self::builtin_string('ell_practice_desc'),
                 'prompt'      => '',
                 'icon'        => 'mic',
                 'type'        => 'voice',
@@ -148,8 +226,8 @@ class starter_manager {
             ],
             [
                 'key'         => 'ell-pronunciation',
-                'name'        => 'Pronunciation Practice',
-                'description' => 'Phoneme-level feedback via OpenAI Realtime',
+                'name'        => self::builtin_string('ell_pronunciation'),
+                'description' => self::builtin_string('ell_pronunciation_desc'),
                 'prompt'      => '',
                 'icon'        => 'speaker',
                 'type'        => 'pronunciation',
@@ -236,10 +314,26 @@ class starter_manager {
             if (empty($s['key']) || empty($s['name'])) {
                 continue;
             }
+            // Store the ENGLISH canonical when the admin left a built-in's text
+            // as rendered. The form shows built-ins in the admin's own language,
+            // so without this an admin who saves while browsing in Spanish
+            // freezes Spanish chips for every learner on the site, and
+            // localize_builtin() can no longer tell "untouched" from "renamed".
+            $name = clean_param($s['name'], PARAM_TEXT);
+            $desc = clean_param($s['description'] ?? '', PARAM_TEXT);
+            if (!empty($s['builtin'])) {
+                $key = (string) $s['key'];
+                if ($name === branding::str('starters:builtin_' . str_replace('-', '_', $key))) {
+                    $name = self::builtin_english($key, 'name') ?? $name;
+                }
+                if ($desc !== '' && $desc === branding::str('starters:builtin_' . str_replace('-', '_', $key) . '_desc')) {
+                    $desc = self::builtin_english($key, 'description') ?? $desc;
+                }
+            }
             $clean[] = [
                 'key'         => clean_param($s['key'], PARAM_ALPHANUMEXT),
-                'name'        => clean_param($s['name'], PARAM_TEXT),
-                'description' => clean_param($s['description'] ?? '', PARAM_TEXT),
+                'name'        => $name,
+                'description' => $desc,
                 'prompt'      => $s['prompt'] ?? '',
                 'icon'        => isset(self::ICONS[$s['icon'] ?? '']) ? $s['icon'] : 'chat',
                 'type'        => in_array($s['type'] ?? 'prompt', ['prompt', 'quiz', 'voice', 'pronunciation'])
@@ -280,6 +374,8 @@ class starter_manager {
             if (empty($s['enabled'])) {
                 continue;
             }
+
+            $s = self::localize_builtin($s);
 
             // Per-course override: if key is explicitly disabled, skip.
             if (is_array($overrides) && isset($overrides[$s['key']]) && !$overrides[$s['key']]) {

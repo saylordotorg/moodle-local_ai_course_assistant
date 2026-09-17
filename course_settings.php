@@ -164,6 +164,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $englishlock = optional_param('english_lock', 0, PARAM_INT);
     set_config('english_lock_course_' . $courseid, $englishlock, 'local_ai_course_assistant');
 
+    // Supplemental courses — per-course override. An empty value REMOVES the
+    // override so the course falls back to the site-wide list; that is why this
+    // unsets rather than storing '', which would read as "supplement with
+    // nothing" and silently override the site default.
+    //
+    // Site-level act, for the same reason apibaseurl above is one. This page is
+    // gated on local/ai_course_assistant:manage in the COURSE context, which an
+    // editing teacher holds. The only validation the ids ever get is
+    // `visible = 1`, and in Moodle "visible" means "listed in the catalogue",
+    // not "this user may read it" -- a visible course's content is normally
+    // behind enrolment. Retrieval takes a course id and never checks enrolment,
+    // can_access_course() or moodle/course:view: build_packed_index_from_db()
+    // scopes by courseid and hydrate_content() fetches by chunk id alone.
+    //
+    // So without this gate a teacher with :manage in their own course could
+    // name any visible course on the site and have its indexed text injected
+    // into the prompt for themselves and for every learner in their course,
+    // none of them enrolled in it. Deciding that one course's content may be
+    // quoted into another is an administrator's call about what is suitable for
+    // the audience, not a per-course one.
+    //
+    // As with apibaseurl, a teacher's save keeps the stored value rather than
+    // clearing it, so an unrelated save does not wipe an administrator's list.
+    if (has_capability('moodle/site:config', $syscontext)) {
+        $supplemental = optional_param('supplemental_courses', '', PARAM_RAW_TRIMMED);
+        if (trim($supplemental) !== '') {
+            // Normalize through the same parser retrieval uses, so what is
+            // stored is what will actually be honoured rather than what was
+            // typed.
+            $ids = \local_ai_course_assistant\supplemental_sources::parse($supplemental, $courseid);
+            set_config('supplemental_courses_course_' . $courseid, implode(',', $ids), 'local_ai_course_assistant');
+        } else {
+            unset_config('supplemental_courses_course_' . $courseid, 'local_ai_course_assistant');
+        }
+        \local_ai_course_assistant\supplemental_sources::reset_cache();
+    }
+
     // Voice Tab — per-course override (inherit / force on / force off).
     $voicetab = optional_param('voice_tab', '', PARAM_RAW_TRIMMED);
     if ($voicetab === '1' || $voicetab === '0') {
@@ -275,6 +312,8 @@ $ragcourseenabled = ($ragcourseraw === false) || (bool)$ragcourseraw;
 
 // English lock setting.
 $englishlockenabled = (bool)get_config('local_ai_course_assistant', 'english_lock_course_' . $courseid);
+$supplementalraw = (string) (get_config('local_ai_course_assistant', 'supplemental_courses_course_' . $courseid) ?: '');
+$supplementalsite = (string) (get_config('local_ai_course_assistant', 'supplemental_courses') ?: '');
 
 // Voice Tab per-course override ('', '1', or '0').
 $voicetabcourseraw = get_config('local_ai_course_assistant', 'sola_voicetab_course_' . $courseid);
@@ -874,6 +913,36 @@ echo html_writer::div(
                     </select>
                     <small class="form-text text-muted">
                         <?php echo \local_ai_course_assistant\branding::apply(get_string('external_resources:toggle_help', 'local_ai_course_assistant')); ?>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php } ?>
+
+    <?php
+    // Administrators only, matching the save path. Rendering an editable field
+    // whose value the POST handler discards is worse than not showing it: the
+    // teacher fills it in, saves, sees no error and believes it took.
+    if (has_capability('moodle/site:config', $syscontext)) { ?>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0"><?php echo get_string('coursesettings:supplemental_heading', 'local_ai_course_assistant'); ?></h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted"><?php echo \local_ai_course_assistant\branding::str('coursesettings:supplemental_desc'); ?></p>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="supplemental_courses">
+                    <?php echo get_string('coursesettings:supplemental_courses', 'local_ai_course_assistant'); ?>
+                </label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="supplemental_courses"
+                           name="supplemental_courses" value="<?php echo s($supplementalraw); ?>"
+                           placeholder="<?php echo s($supplementalsite); ?>">
+                    <small class="form-text text-muted">
+                        <?php echo $supplementalsite !== ''
+                            ? get_string('coursesettings:supplemental_inherit', 'local_ai_course_assistant', s($supplementalsite))
+                            : get_string('coursesettings:supplemental_nosite', 'local_ai_course_assistant'); ?>
                     </small>
                 </div>
             </div>

@@ -2617,3 +2617,30 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = '1コースを新しい埋め込みモデルへ移行する';
 $string['task:model_price_drift_check'] = 'モデル価格ドリフトチェック';
 $string['task:run_model_benchmark'] = 'モデルをベンチマークする';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'このページを説明';
+$string['starters:builtin_help_page_desc'] = '現在のレッスンページの重要な概念を説明します';
+$string['starters:builtin_quiz'] = 'クイズ';
+$string['starters:builtin_quiz_desc'] = '現在の教材から練習クイズを作成します';
+$string['starters:builtin_study_plan'] = '学習計画';
+$string['starters:builtin_study_plan_desc'] = '集中できる学習セッションの計画を作ります';
+$string['starters:builtin_ai_project_coach'] = 'AIプロジェクトコーチ';
+$string['starters:builtin_ai_project_coach_desc'] = 'コースの課題やプロジェクトを段階的にサポートします';
+$string['starters:builtin_focus_next'] = '何に集中すべきですか？';
+$string['starters:builtin_focus_next_desc'] = '目標の進捗に基づいた、あなた向けの次の一歩の提案';
+$string['starters:builtin_ell_practice'] = '会話練習';
+$string['starters:builtin_ell_practice_desc'] = 'アシスタントとの話し言葉の会話練習';
+$string['starters:builtin_ell_pronunciation'] = '発音練習';
+$string['starters:builtin_ell_pronunciation_desc'] = '発音を音ごとにフィードバックします';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = '補助コース';
+$string['coursesettings:supplemental_desc'] = 'このコースに加えて、別のコースからも [[tutorshort]] が回答できるようにします。よくあるのは学生向けオリエンテーションやリソースセンターです。試験の規定について尋ねた学習者が、何も得られないのではなく、そこから答えを得られます。対象のコースはすでにインデックス済みである必要があり、非表示のコースは無視されます。';
+$string['coursesettings:supplemental_courses'] = 'コースID';
+$string['coursesettings:supplemental_inherit'] = 'サイト全体のリスト（{$a}）を使う場合は空欄にしてください。ここに値を入れると、このコースではそのリストに追加されるのではなく置き換えられます。完全な一式を入力してください。';
+$string['coursesettings:supplemental_nosite'] = '使用しない場合は空欄にしてください。サイト全体のリストは設定されていません。';
+$string['settings:supplemental_courses'] = '補助コース';
+$string['settings:supplemental_courses_desc'] = '回答時に [[tutorshort]] が内容を参照してよいコースのID（カンマ区切り）。別のコースにあり、どこでも当てはまる資料に使います。たとえば学生向けオリエンテーションやリソースセンターです。試験の規定について尋ねた学習者は、何も得られないのではなく、そのコースから答えを得られます。
+
+コースは検索用にすでにインデックス済みである必要があります。追加で埋め込みは行われないため、ここに追加すると即座に反映され、費用もかかりません。非表示のコースは無視されます。ただし、指定したコース内の活動は、再インデックスを実行した管理者に見えていた状態でインデックスされます。そのため、非表示または制限された活動の本文が、リンクが示されない場合でも学習者に引用されることがあります。全内容が読み手に適したコースだけを指定してください。最大 {$a} コース。コース単位の設定がある場合は、このリストに追加されるのではなく置き換えます。';

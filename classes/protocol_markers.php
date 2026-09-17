@@ -138,7 +138,74 @@ final class protocol_markers {
             $text = self::replace('/\n*\[\s*' . $m . '\s*\]\s*/i', '', $text);
         }
 
+        $text = self::strip_activity_ids($text);
+
         return rtrim($text);
+    }
+
+    /**
+     * Remove course-module ids the model copied out of the structure block.
+     *
+     * The structure block annotates every activity as "Name (id:20057)" so the
+     * model can cite it as [SOURCE:activity:20057]. context_builder tells it in
+     * so many words never to write an id into prose -- and a measured 8-12% of
+     * production replies do it anyway (Learn 2,112/17,265; Degrees 151/1,878).
+     * A prompt rule is a request; this is the enforcement. Learners were reading
+     * 'Watch the Unit 1 Introduction Video (id:20057)'.
+     *
+     * Only complete, digit-bearing forms are matched, so "(idea 2)" and a bare
+     * "(id)" are untouched, and a fragment split across a stream chunk is held
+     * in the caller's carry buffer until it completes.
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function strip_activity_ids(string $text): string {
+        // Case-insensitive: the patterns below are /i, so a case-sensitive
+        // guard here would skip "(Id: 5)" entirely.
+        if ($text === '' || stripos($text, 'id') === false) {
+            return $text;
+        }
+
+        // Prefixed form: "(Activity ID: 89206)", "(module id 5)". The word
+        // "activity" or "module" is itself the signal, so the separator may be
+        // absent.
+        $text = self::replace(
+            '/[ \t]*\([ \t]*(?:activity|module|course[ \t]+module)[ \t]+(?:c?mid|id)[ \t]*'
+                . '[:#=]?[ \t]*\d+[ \t]*\)/iu',
+            '',
+            $text
+        );
+
+        // Bare form: "(id:20057)", "(cmid: 3)". With no prefix to go on, the
+        // colon is required and it is the ONLY accepted separator.
+        //
+        // Both of those constraints were learned the expensive way. The first
+        // draft made the prefix, the separator and the "c" of "cmid" all
+        // optional, so the minimum accepted form was a parenthesis, "id" or
+        // "mid", and digits -- which deletes the operative clause out of
+        // ordinary prose a database or Moodle-adjacent course produces every
+        // day: "WHERE (id = 5)", "the URL ends with (id=2)", "Sample (ID 4)",
+        // "the recession (mid 2020)". All four are gone from the reply with no
+        // trace. The three shapes actually measured in production all use a
+        // colon, so nothing is lost by requiring one.
+        $text = self::replace(
+            '/[ \t]*\([ \t]*(?:cmid|id)[ \t]*:[ \t]*\d+[ \t]*\)/iu',
+            '',
+            $text
+        );
+
+        // Unparenthesised form: "the Unit 1 Assessment, Activity ID: 89206".
+        // The "activity"/"module" prefix is required here for the same reason.
+        // Any separator the model used to attach it is taken with it, so no
+        // orphaned comma or dash is left mid-sentence.
+        $text = self::replace(
+            '/[ \t]*[,;:\x{2013}\x{2014}-]?[ \t]*\b(?:activity|module)[ \t]+id[ \t]*[:#=][ \t]*\d+/iu',
+            '',
+            $text
+        );
+
+        return $text;
     }
 
     /**

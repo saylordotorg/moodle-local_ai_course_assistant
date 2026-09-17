@@ -2660,3 +2660,30 @@ $string['settings:spend_export_key_desc'] = 'מפתח Bearer עבור נקודת
 $string['task:migrate_course_embeddings'] = 'העברת קורס אחד למודל embedding חדש';
 $string['task:model_price_drift_check'] = 'בדיקת סחיפת מחירי מודלים';
 $string['task:run_model_benchmark'] = 'מדידת מודל';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'הסבר דף זה';
+$string['starters:builtin_help_page_desc'] = 'מסביר את המושגים המרכזיים בעמוד השיעור הנוכחי';
+$string['starters:builtin_quiz'] = 'בחן אותי';
+$string['starters:builtin_quiz_desc'] = 'יוצר בוחן תרגול על החומר הנוכחי';
+$string['starters:builtin_study_plan'] = 'תוכנית לימודים';
+$string['starters:builtin_study_plan_desc'] = 'בונה תוכנית ממוקדת למפגש לימוד';
+$string['starters:builtin_ai_project_coach'] = 'מאמן פרויקטים AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'ליווי מודרך לפרויקטים ולמטלות הקורס';
+$string['starters:builtin_focus_next'] = 'על מה כדאי לי להתמקד?';
+$string['starters:builtin_focus_next_desc'] = 'הצעות מותאמות אישית לצעד הבא לפי ההתקדמות שלך ביעדים';
+$string['starters:builtin_ell_practice'] = 'תרגול דיבור';
+$string['starters:builtin_ell_practice_desc'] = 'תרגול שיחה בעל פה עם העוזר';
+$string['starters:builtin_ell_pronunciation'] = 'תרגול הגייה';
+$string['starters:builtin_ell_pronunciation_desc'] = 'משוב צליל אחר צליל על ההגייה שלך';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'קורסים משלימים';
+$string['coursesettings:supplemental_desc'] = 'מאפשר ל[[tutorshort]] לענות גם מתוך קורס אחר, נוסף על הקורס הזה. המקרה הרגיל הוא קורס התמצאות לסטודנטים או מרכז משאבים: מי ששואל על נוהלי הבחינות מקבל את התשובה משם במקום כלום. הקורסים האלה חייבים להיות מאונדקסים כבר, וקורסים מוסתרים מתעלמים מהם.';
+$string['coursesettings:supplemental_courses'] = 'מזהי קורסים';
+$string['coursesettings:supplemental_inherit'] = 'השאירו ריק כדי להשתמש ברשימה של כל האתר ({$a}). ערך כאן מחליף את הרשימה הזאת עבור הקורס הזה במקום להוסיף אליה, לכן הזינו את הקבוצה המלאה.';
+$string['coursesettings:supplemental_nosite'] = 'השאירו ריק כדי לא לכלול אף אחד. לא הוגדרה רשימה לכל האתר.';
+$string['settings:supplemental_courses'] = 'קורסים משלימים';
+$string['settings:supplemental_courses_desc'] = 'מזהי קורסים שאת התוכן שלהם [[tutorshort]] רשאי לשאוב גם בעת מענה, מופרדים בפסיקים. השתמשו בזה לחומר שנמצא בקורס אחר וחל בכל מקום, כמו קורס התמצאות לסטודנטים או מרכז משאבים: מי ששואל על נוהלי הבחינות יקבל אז את התשובה מאותו קורס במקום כלום.
+
+הקורסים חייבים להיות מאונדקסים כבר לצורך אחזור; שום דבר נוסף לא מוטמע, ולכן הוספה כאן פועלת מיד ואינה עולה דבר. קורסים מוסתרים מתעלמים מהם. אולם פעילויות בתוך קורס שנרשם כאן מאונדקסות כפי שראה אותן מנהל המערכת שאינדקס אותו מחדש, ולכן טקסט של פעילות מוסתרת או מוגבלת עשוי להיות מצוטט לסטודנט גם אם לא מוצג אליה שום קישור. רשמו רק קורסים שכל תוכנם מתאים לקהל. עד {$a} קורסים. הגדרה ברמת הקורס, היכן שקיימת, מחליפה את הרשימה הזאת במקום להוסיף אליה.';

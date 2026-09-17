@@ -160,6 +160,21 @@ define([
     const SOURCE_STRIP_RE = /[ \t]*\n*\[{1,3}SOURCE:[^[\]]*\]{1,3}/g;
     /** @type {RegExp} Practice score block parser */
     const SCORE_BLOCK_RE = /\n*\[SOLA_SCORE\]([\s\S]*?)\[\/SOLA_SCORE\]/;
+
+    // Course-module ids the model copied out of the structure block, e.g.
+    // "Watch the Unit 1 Introduction Video (id:20057)". The server scrubs these
+    // now (protocol_markers::strip_activity_ids), so these patterns only matter
+    // for history rows stored before that shipped -- but that is every row on a
+    // site that has not upgraded yet, and history is rendered here.
+    //
+    // Keep these in step with the PHP. The first draft made the prefix, the
+    // separator and the "c" of "cmid" all optional, which deleted ordinary
+    // prose: "WHERE (id = 5)", "ends with (id=2)", "Sample (ID 4)", "the
+    // recession (mid 2020)". Unprefixed, the colon is required and is the only
+    // accepted separator.
+    const ACTIVITY_ID_PREFIXED_RE = /[ \t]*\([ \t]*(?:activity|module|course[ \t]+module)[ \t]+(?:c?mid|id)[ \t]*[:#=]?[ \t]*\d+[ \t]*\)/gi;
+    const ACTIVITY_ID_PAREN_RE = /[ \t]*\([ \t]*(?:cmid|id)[ \t]*:[ \t]*\d+[ \t]*\)/gi;
+    const ACTIVITY_ID_BARE_RE = /[ \t]*[,;:\u2013\u2014-]?[ \t]*\b(?:activity|module)[ \t]+id[ \t]*[:#=][ \t]*\d+/gi;
     const SCORE_OPEN_RE = /\n*\[\s*SOLA_SCORE\s*\][\s\S]*$/i;
     /** @type {Object<string, string>} */
     const SOURCE_LABELS = {
@@ -167,6 +182,36 @@ define([
         course: 'From: Course Materials',
         general: 'General Knowledge',
         activity: 'From: Course Materials',
+    };
+    /** @type {Object} SOURCE_LABELS key -> i18n_strings key. */
+    const SOURCE_LABEL_KEYS = {
+        page: 'source_page',
+        course: 'source_course',
+        general: 'source_general',
+        activity: 'source_course',
+    };
+
+    /**
+     * The source pill's label in the learner's currently selected language.
+     *
+     * The pill was built from the English SOURCE_LABELS map regardless of
+     * language, so a learner who switched the drawer to Spanish read "From:
+     * Course Materials" under every answer. It is created dynamically per
+     * message, so it cannot use the data-i18n-* pass that handles the static
+     * chrome -- it has to resolve at build time instead.
+     *
+     * @param {string} sourceType page|course|general|activity
+     * @param {string} [title] Activity title, substituted into 'From: {$a}'.
+     * @returns {string}
+     */
+    const sourceLabel = function(sourceType, title) {
+        const lang = (Speech.getLang && Speech.getLang()) || 'en';
+        if (title) {
+            const tpl = I18nStrings.get(lang, 'source_from') || 'From: {$a}';
+            return tpl.replace('{$a}', title);
+        }
+        const key = SOURCE_LABEL_KEYS[sourceType];
+        return (key && I18nStrings.get(lang, key)) || SOURCE_LABELS[sourceType] || sourceType;
     };
     /** @type {string} Local intro-dismiss key */
     const INTRO_DISMISSED_KEY = 'ai_course_assistant_intro_dismissed';
@@ -271,6 +316,12 @@ define([
             cleanText = sourceStripped.trimEnd();
         }
 
+        cleanText = cleanText
+            .replace(ACTIVITY_ID_PREFIXED_RE, '')
+            .replace(ACTIVITY_ID_PREFIXED_RE, '')
+            .replace(ACTIVITY_ID_PAREN_RE, '')
+            .replace(ACTIVITY_ID_BARE_RE, '');
+
         // scoreData was already parsed above, before the open-tag strip could
         // reach it; this pass only removes the block from the visible text.
         if (cleanText.match(SCORE_BLOCK_RE)) {
@@ -312,7 +363,9 @@ define([
         let displayText = ((fullText || '') + '')
             .replace(NEXT_BLOCK_RE, '')
             .replace(SOURCE_STRIP_RE, '')
-            .replace(SCORE_BLOCK_RE, '');
+            .replace(SCORE_BLOCK_RE, '')
+            .replace(ACTIVITY_ID_PAREN_RE, '')
+            .replace(ACTIVITY_ID_BARE_RE, '');
         // Complete opening tag, payload still arriving. This reaches to end of
         // string rather than stopping at the next "[": the old [^\[]* class
         // aborted the moment a chip contained a bracket, so a payload like
@@ -379,8 +432,63 @@ define([
         }
         const pill = document.createElement('span');
         pill.className = 'aica-source-pill aica-source-pill--' + sourceType;
-        pill.textContent = SOURCE_LABELS[sourceType];
+        pill.textContent = sourceLabel(sourceType);
         msgEl.appendChild(pill);
+    };
+
+    /**
+     * Derive a source pill when the model emitted no [SOURCE:] marker.
+     *
+     * Two measurements shaped this, both against production Degrees:
+     *
+     * 1. Over 24 paired prompts, 75% of replies carried a [SOURCE:] tag with no
+     *    retrieved chunks in context and 13% with them (Fisher exact,
+     *    p = 2.6e-5). Retrieval suppresses source attribution, and every
+     *    Degrees course runs with retrieval on -- which is why source links
+     *    were missing there across the board.
+     * 2. Tapping the live SSE stream on a course page: retrieval returned three
+     *    chunks, the top one resolving to a real module, and the reply carried
+     *    NEITHER [SOURCE:] nor a single [[c:N]] citation.
+     *
+     * The second one matters, because the obvious fallback -- read the [[c:N]]
+     * the answer cited and link to that chunk's activity -- would not have
+     * fired at all. It is still tier 2 here, since it is exact when it does
+     * fire, but it cannot be the whole fix.
+     *
+     * Tier 3 is deliberately the weaker claim. When retrieval put chunks in the
+     * prompt and the model named nothing, what is certainly true is "this
+     * answer was grounded in this course's material"; what is NOT known is
+     * which page. Naming a specific activity from the top-scoring chunk would
+     * read as precision the data does not support, and would point at the wrong
+     * page whenever the model answered from general knowledge instead. So tier
+     * 3 links to the course, and the specific activity link stays something the
+     * model earns by citing.
+     *
+     * @param {string} rawText Response text BEFORE marker stripping.
+     * @param {Object|null} meta SSE meta event (citations, modules).
+     * @returns {{type: string, cmid: string|null}|null}
+     */
+    const deriveSourceFromCitations = function(rawText, meta) {
+        if (!meta || !Array.isArray(meta.citations) || !meta.citations.length) {
+            return null;
+        }
+        const cited = String(rawText || '').match(/\[\[c:(\d+)\]\]/g);
+        if (cited && cited.length) {
+            for (let i = 0; i < cited.length; i++) {
+                const idx = parseInt(cited[i].replace(/\D/g, ''), 10);
+                const entry = meta.citations.find(function(c) {
+                    return Number(c.index) === idx;
+                });
+                if (!entry) {
+                    continue;
+                }
+                const cmid = entry.cmid ? String(entry.cmid) : null;
+                if (cmid && meta.modules && meta.modules[cmid]) {
+                    return {type: 'activity', cmid: cmid};
+                }
+            }
+        }
+        return {type: 'course', cmid: null};
     };
 
     /**
@@ -393,13 +501,13 @@ define([
      */
     const createSourcePill = function(sourceType, meta, cmid) {
         var href = '';
-        var label = SOURCE_LABELS[sourceType] || sourceType;
+        var label = sourceLabel(sourceType);
         var title = '';
 
         if (sourceType === 'activity' && cmid && meta && meta.modules && meta.modules[cmid]) {
             var mod = meta.modules[cmid];
             href = mod.url;
-            label = 'From: ' + mod.title;
+            label = sourceLabel(sourceType, mod.title);
             title = mod.title;
         } else if (sourceType === 'page' && meta && meta.pageurl) {
             href = meta.pageurl;
@@ -1532,6 +1640,7 @@ define([
             'ask-anything': labels ? labels.askAnything  : null,
             'review-practice': labels ? labels.reviewPractice : null,
             'ai-project-coach':   labels ? labels.aiProjectCoach   : null,
+            'focus-next':         labels ? labels.focusNext         : null,
             'ell-practice':       labels ? labels.ellPractice       : null,
             'ell-pronunciation':  labels ? labels.ellPronunciation  : null,
             // Legacy starter keys.
@@ -1550,6 +1659,12 @@ define([
             if (btn.dataset.builtin !== '1') {
                 // Custom (non-built-in) starters keep their admin-configured label.
                 span.textContent = btn.dataset.labelEn || span.textContent;
+                return;
+            }
+            if (btn.dataset.personalized === '1') {
+                // focus-next when mastery is on: the server rendered the
+                // learner's weakest objective into the label. A generic
+                // translation would be a downgrade, so leave it as rendered.
                 return;
             }
             const text = keyMap[btn.dataset.starter];
@@ -1647,6 +1762,18 @@ define([
 
         // Starters overlay container (individual starter labels handled by updateStarterTexts).
         setAria($('.local-ai-course-assistant__starters'), 'starters_label');
+
+        // Each built-in starter's title= tooltip. The chip LABEL is retranslated
+        // by updateStarterTexts(); its help text was never retranslated at all,
+        // so a learner who switched the drawer to Spanish got Spanish labels
+        // with English tooltips. Custom starters keep their admin-authored
+        // description -- there is nothing to translate it to.
+        $$('.local-ai-course-assistant__starter').forEach(function(el) {
+            if (el.dataset.builtin !== '1' || !el.dataset.starter) {
+                return;
+            }
+            setTitle(el, 'starter_desc_' + el.dataset.starter.replace(/-/g, '_'));
+        });
 
         // Voice mode card.
         setText($('.aica-mode-card--voice .aica-mode-card__eyebrow'), 'mode_voice');
@@ -5571,14 +5698,19 @@ define([
                         }
                     }
                     // Append clickable source pill using SSE metadata (page/course URLs + modules map).
-                    if (parsed.sourceType) {
+                    // parsed.* comes from the model's [SOURCE:] marker; the
+                    // fallback reads the passages it cited with [[c:N]].
+                    var derived = parsed.sourceType ? null : deriveSourceFromCitations(fullText, streamMeta);
+                    var pillType = parsed.sourceType || (derived ? derived.type : null);
+                    var pillCmid = parsed.sourceType ? parsed.sourceCmid : (derived ? derived.cmid : null);
+                    if (pillType) {
                         var lastMsgEl = getLastAssistantMessageEl();
                         if (lastMsgEl) {
                             var slot = lastMsgEl.querySelector('.local-ai-course-assistant__msg-source-slot');
                             if (slot) {
-                                slot.appendChild(createSourcePill(parsed.sourceType, streamMeta, parsed.sourceCmid));
+                                slot.appendChild(createSourcePill(pillType, streamMeta, pillCmid));
                             } else {
-                                lastMsgEl.appendChild(createSourcePill(parsed.sourceType, streamMeta, parsed.sourceCmid));
+                                lastMsgEl.appendChild(createSourcePill(pillType, streamMeta, pillCmid));
                             }
                         }
                     }

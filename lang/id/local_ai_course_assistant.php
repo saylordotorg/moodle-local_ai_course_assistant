@@ -2671,3 +2671,30 @@ $string['settings:spend_export_key_desc'] = 'Kunci bearer untuk endpoint ekspor 
 $string['task:migrate_course_embeddings'] = 'Migrasikan satu kursus ke model embedding baru';
 $string['task:model_price_drift_check'] = 'Pemeriksaan drift harga model';
 $string['task:run_model_benchmark'] = 'Benchmark sebuah model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Jelaskan halaman ini';
+$string['starters:builtin_help_page_desc'] = 'Menjelaskan konsep utama dari halaman pelajaran saat ini';
+$string['starters:builtin_quiz'] = 'Uji saya';
+$string['starters:builtin_quiz_desc'] = 'Membuat kuis latihan dari materi saat ini';
+$string['starters:builtin_study_plan'] = 'Rencana belajar';
+$string['starters:builtin_study_plan_desc'] = 'Membuat rencana sesi belajar yang terfokus';
+$string['starters:builtin_ai_project_coach'] = 'Pelatih Proyek AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Bimbingan terarah untuk proyek dan tugas kursus';
+$string['starters:builtin_focus_next'] = 'Apa yang sebaiknya saya fokuskan?';
+$string['starters:builtin_focus_next_desc'] = 'Saran langkah berikutnya yang dipersonalisasi berdasarkan kemajuan tujuanmu';
+$string['starters:builtin_ell_practice'] = 'Latihan berbicara';
+$string['starters:builtin_ell_practice_desc'] = 'Latihan percakapan lisan dengan asisten';
+$string['starters:builtin_ell_pronunciation'] = 'Latihan pelafalan';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Umpan balik bunyi demi bunyi tentang pelafalanmu';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kursus pelengkap';
+$string['coursesettings:supplemental_desc'] = 'Memungkinkan [[tutorshort]] menjawab dari kursus lain selain kursus ini. Kasus yang lazim adalah orientasi mahasiswa atau pusat sumber daya: yang bertanya soal kebijakan ujian mendapat jawabannya dari sana alih-alih tidak mendapat apa pun. Kursus tersebut harus sudah terindeks, dan kursus tersembunyi diabaikan.';
+$string['coursesettings:supplemental_courses'] = 'ID kursus';
+$string['coursesettings:supplemental_inherit'] = 'Kosongkan untuk memakai daftar tingkat situs ({$a}). Nilai di sini menggantikan daftar itu untuk kursus ini, bukan menambahinya, jadi masukkan set lengkapnya.';
+$string['coursesettings:supplemental_nosite'] = 'Kosongkan untuk tidak memakai satu pun. Tidak ada daftar tingkat situs yang disetel.';
+$string['settings:supplemental_courses'] = 'Kursus pelengkap';
+$string['settings:supplemental_courses_desc'] = 'ID kursus yang isinya juga boleh dipakai [[tutorshort]] saat menjawab, dipisah koma. Gunakan untuk materi yang berada di kursus lain tetapi berlaku di mana saja, seperti orientasi mahasiswa atau pusat sumber daya: yang bertanya soal kebijakan ujian kemudian mendapat jawabannya dari kursus itu alih-alih tidak mendapat apa pun.
+
+Kursus harus sudah terindeks untuk pengambilan; tidak ada yang disematkan tambahan, jadi menambahkannya di sini langsung berlaku dan tidak berbiaya. Kursus tersembunyi diabaikan. Namun aktivitas di dalam kursus yang didaftarkan diindeks sebagaimana dilihat oleh admin yang mengindeks ulang kursus itu, sehingga teks aktivitas yang tersembunyi atau dibatasi bisa dikutipkan kepada pelajar meski tidak ada tautan yang ditampilkan. Daftarkan hanya kursus yang seluruh isinya sesuai untuk pembacanya. Maksimal {$a} kursus. Setelan tingkat kursus, jika ada, menggantikan daftar ini, bukan menambahinya.';

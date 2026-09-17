@@ -2619,3 +2619,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-Schlüssel für den Endpunkt
 $string['task:migrate_course_embeddings'] = 'Einen Kurs auf ein neues Embedding-Modell migrieren';
 $string['task:model_price_drift_check'] = 'Prüfung der Modellpreisabweichung';
 $string['task:run_model_benchmark'] = 'Ein Modell benchmarken';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Diese Seite erklären';
+$string['starters:builtin_help_page_desc'] = 'Erklärt die Kernbegriffe der aktuellen Lektionsseite';
+$string['starters:builtin_quiz'] = 'Teste mich';
+$string['starters:builtin_quiz_desc'] = 'Erstellt ein Übungsquiz zum aktuellen Stoff';
+$string['starters:builtin_study_plan'] = 'Lernplan';
+$string['starters:builtin_study_plan_desc'] = 'Erstellt einen fokussierten Plan für deine Lerneinheit';
+$string['starters:builtin_ai_project_coach'] = 'KI-Projektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Begleitetes Coaching für Kursprojekte und Aufgaben';
+$string['starters:builtin_focus_next'] = 'Worauf soll ich mich konzentrieren?';
+$string['starters:builtin_focus_next_desc'] = 'Persönliche Vorschläge für den nächsten Schritt, basierend auf deinem Lernfortschritt';
+$string['starters:builtin_ell_practice'] = 'Sprechen üben';
+$string['starters:builtin_ell_practice_desc'] = 'Übung gesprochener Konversation mit dem Assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Ausspracheübung';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Laut-für-Laut-Rückmeldung zu deiner Aussprache';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Ergänzende Kurse';
+$string['coursesettings:supplemental_desc'] = 'Lässt [[tutorshort]] zusätzlich zu diesem Kurs auch aus einem anderen Kurs antworten. Der übliche Fall ist eine Studieneinführung oder ein Ressourcenzentrum: Wer nach der Prüfungsordnung fragt, bekommt die Antwort von dort statt gar keine. Diese Kurse müssen bereits indexiert sein, und verborgene Kurse werden ignoriert.';
+$string['coursesettings:supplemental_courses'] = 'Kurs-IDs';
+$string['coursesettings:supplemental_inherit'] = 'Leer lassen, um die seitenweite Liste zu verwenden ({$a}). Ein Wert hier ersetzt diese Liste für diesen Kurs, statt sie zu ergänzen — geben Sie also den vollständigen Satz an.';
+$string['coursesettings:supplemental_nosite'] = 'Leer lassen für keine. Es ist keine seitenweite Liste gesetzt.';
+$string['settings:supplemental_courses'] = 'Ergänzende Kurse';
+$string['settings:supplemental_courses_desc'] = 'Kurs-IDs, deren Inhalte [[tutorshort]] beim Antworten ebenfalls heranziehen darf, durch Kommas getrennt. Für Material, das in einem anderen Kurs liegt und überall gilt, etwa eine Studieneinführung oder ein Ressourcenzentrum: Wer nach der Prüfungsordnung fragt, bekommt die Antwort dann aus jenem Kurs statt gar keine.
+
+Die Kurse müssen für den Abruf bereits indexiert sein; es wird nichts zusätzlich eingebettet, das Hinzufügen wirkt also sofort und kostet nichts. Verborgene Kurse werden ignoriert. Aktivitäten innerhalb eines gelisteten Kurses werden jedoch so indexiert, wie sie die Person sah, die den Kurs neu indexiert hat, sodass der Text einer verborgenen oder eingeschränkten Aktivität einem Lernenden zitiert werden kann, auch wenn kein Link darauf erscheint. Listen Sie nur Kurse, deren gesamter Inhalt für das Publikum geeignet ist. Maximal {$a} Kurse. Eine kursspezifische Einstellung ersetzt diese Liste, statt sie zu ergänzen.';

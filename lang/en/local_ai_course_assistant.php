@@ -245,6 +245,15 @@ $string['chat:studyplan_intro'] = 'I can help you create a study plan for this c
 // FAQ & Support settings.
 $string['settings:faq_heading'] = 'FAQ & Support';
 $string['settings:faq_heading_desc'] = 'Configure the centralized FAQ and Zendesk support ticket integration.';
+$string['coursesettings:supplemental_heading'] = 'Supplemental courses';
+$string['coursesettings:supplemental_desc'] = 'Let [[tutorshort]] answer from another course as well as this one. The usual case is a student orientation or resource centre: a learner asking about exam policy gets the answer from there rather than nothing. Those courses must already be indexed, and hidden courses are ignored.';
+$string['coursesettings:supplemental_courses'] = 'Course IDs';
+$string['coursesettings:supplemental_inherit'] = 'Leave empty to use the site-wide list ({$a}). A value here replaces that list for this course rather than adding to it, so enter the full set.';
+$string['coursesettings:supplemental_nosite'] = 'Leave empty for none. No site-wide list is set.';
+$string['settings:supplemental_courses'] = 'Supplemental courses';
+$string['settings:supplemental_courses_desc'] = 'Course IDs whose content [[tutorshort]] may also draw on when answering, separated by commas. Use this for material that lives in another course and applies everywhere, such as a student orientation or resource centre: a learner asking about exam policy then gets the answer from that course instead of nothing.
+
+The courses must already be indexed for retrieval; nothing extra is embedded, so adding one here is immediate and costs nothing. Hidden courses are ignored. Activities inside a listed course, however, are indexed as the administrator who reindexed it saw them, so a hidden or restricted activity’s text can be quoted back to a learner even though no link to it is shown. Only list courses whose whole content is suitable for the audience. Maximum {$a} courses. A per-course setting, where present, replaces this list rather than adding to it.';
 $string['settings:faq_content'] = 'FAQ Content';
 $string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
 $string['settings:zendesk_enabled'] = 'Enable Zendesk Escalation';
@@ -1033,6 +1042,24 @@ $string['starters:reset_done']      = 'Starters reset to defaults.';
 $string['starters:back_settings']   = 'Back to settings';
 $string['starters:course_section']  = 'Conversation starters';
 $string['starters:course_desc']     = 'Enable or disable individual starters for this course.';
+
+// Built-in starter chip labels and help text (the title= tooltip on each chip).
+// These were literal English in starter_manager::get_defaults() until v7.5.0,
+// so a learner on a Spanish site read Spanish everywhere except the chips.
+$string['starters:builtin_help_page']              = 'Explain This Page';
+$string['starters:builtin_help_page_desc']         = 'Explains key concepts from the current lesson page';
+$string['starters:builtin_quiz']                   = 'Quiz Me';
+$string['starters:builtin_quiz_desc']              = 'Generates a practice quiz on the current material';
+$string['starters:builtin_study_plan']             = 'Study Plan';
+$string['starters:builtin_study_plan_desc']        = 'Creates a focused study session plan';
+$string['starters:builtin_ai_project_coach']       = 'AI Project Coach';
+$string['starters:builtin_ai_project_coach_desc']  = 'Guided coaching for course projects and assignments';
+$string['starters:builtin_focus_next']             = 'What should I focus on?';
+$string['starters:builtin_focus_next_desc']        = 'Personalized next-step suggestions based on your objective progress';
+$string['starters:builtin_ell_practice']           = 'Conversation Practice';
+$string['starters:builtin_ell_practice_desc']      = 'Spoken conversation practice with the assistant';
+$string['starters:builtin_ell_pronunciation']      = 'Pronunciation Practice';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Sound-by-sound feedback on how you pronounce words';
 
 // Topic picker (used by conversation starters).
 $string['chat:topic_picker_title']        = 'What would you like to focus on?';

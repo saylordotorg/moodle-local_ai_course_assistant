@@ -2642,3 +2642,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-sleutel voor het maandelijks
 $string['task:migrate_course_embeddings'] = 'Eén cursus naar een nieuw embedding-model migreren';
 $string['task:model_price_drift_check'] = 'Controle op prijsdrift van modellen';
 $string['task:run_model_benchmark'] = 'Een model benchmarken';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Leg deze pagina uit';
+$string['starters:builtin_help_page_desc'] = 'Legt de kernbegrippen van de huidige lespagina uit';
+$string['starters:builtin_quiz'] = 'Test me';
+$string['starters:builtin_quiz_desc'] = 'Maakt een oefentoets over de huidige stof';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Maakt een gericht plan voor je studiesessie';
+$string['starters:builtin_ai_project_coach'] = 'AI-projectcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Begeleide coaching bij cursusprojecten en opdrachten';
+$string['starters:builtin_focus_next'] = 'Waar moet ik me op richten?';
+$string['starters:builtin_focus_next_desc'] = 'Persoonlijke suggesties voor je volgende stap op basis van je voortgang';
+$string['starters:builtin_ell_practice'] = 'Spreektraining';
+$string['starters:builtin_ell_practice_desc'] = 'Gesproken conversatieoefening met de assistent';
+$string['starters:builtin_ell_pronunciation'] = 'Uitspraakoefening';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Klank-voor-klank feedback op je uitspraak';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Aanvullende cursussen';
+$string['coursesettings:supplemental_desc'] = 'Laat [[tutorshort]] naast deze cursus ook uit een andere cursus antwoorden. Het gebruikelijke geval is een studentenintroductie of een informatiecentrum: wie naar het examenbeleid vraagt, krijgt het antwoord daarvandaan in plaats van niets. Die cursussen moeten al geïndexeerd zijn, en verborgen cursussen worden genegeerd.';
+$string['coursesettings:supplemental_courses'] = 'Cursus-ID\'s';
+$string['coursesettings:supplemental_inherit'] = 'Laat leeg om de sitebrede lijst te gebruiken ({$a}). Een waarde hier vervangt die lijst voor deze cursus in plaats van eraan toe te voegen, dus vul de volledige set in.';
+$string['coursesettings:supplemental_nosite'] = 'Laat leeg voor geen. Er is geen sitebrede lijst ingesteld.';
+$string['settings:supplemental_courses'] = 'Aanvullende cursussen';
+$string['settings:supplemental_courses_desc'] = 'Cursus-ID\'s waarvan [[tutorshort]] de inhoud ook mag gebruiken bij het antwoorden, gescheiden door komma\'s. Gebruik dit voor materiaal dat in een andere cursus staat en overal geldt, zoals een studentenintroductie of een informatiecentrum: wie naar het examenbeleid vraagt, krijgt het antwoord dan uit die cursus in plaats van niets.
+
+De cursussen moeten al geïndexeerd zijn voor ophalen; er wordt niets extra ingebed, dus er hier een toevoegen werkt direct en kost niets. Verborgen cursussen worden genegeerd. Activiteiten binnen een vermelde cursus worden echter geïndexeerd zoals de beheerder die de cursus opnieuw indexeerde ze zag, dus de tekst van een verborgen of beperkte activiteit kan aan een student worden geciteerd, ook al wordt er geen link naar getoond. Vermeld alleen cursussen waarvan de hele inhoud geschikt is voor het publiek. Maximaal {$a} cursussen. Een cursusinstelling vervangt, waar aanwezig, deze lijst in plaats van eraan toe te voegen.';

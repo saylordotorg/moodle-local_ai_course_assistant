@@ -2619,3 +2619,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-avain kuukausittaiselle teko
 $string['task:migrate_course_embeddings'] = 'Siirrä yksi kurssi uuteen upotusmalliin';
 $string['task:model_price_drift_check'] = 'Mallien hintapoikkeamatarkistus';
 $string['task:run_model_benchmark'] = 'Tee mallin vertailuajo';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Selitä tämä sivu';
+$string['starters:builtin_help_page_desc'] = 'Selittää nykyisen oppituntisivun keskeiset käsitteet';
+$string['starters:builtin_quiz'] = 'Testaa minua';
+$string['starters:builtin_quiz_desc'] = 'Luo harjoitustestin nykyisestä aineistosta';
+$string['starters:builtin_study_plan'] = 'Opiskelusuunnitelma';
+$string['starters:builtin_study_plan_desc'] = 'Laatii keskittyneen suunnitelman opiskeluhetkelle';
+$string['starters:builtin_ai_project_coach'] = 'AI-projektivalmennus';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ohjattua valmennusta kurssin projekteihin ja tehtäviin';
+$string['starters:builtin_focus_next'] = 'Mihin minun kannattaa keskittyä?';
+$string['starters:builtin_focus_next_desc'] = 'Henkilökohtaisia ehdotuksia seuraavaksi askeleeksi tavoitteidesi edistymisen perusteella';
+$string['starters:builtin_ell_practice'] = 'Puheen harjoittelu';
+$string['starters:builtin_ell_practice_desc'] = 'Puhutun keskustelun harjoittelua avustajan kanssa';
+$string['starters:builtin_ell_pronunciation'] = 'Ääntämisharjoitus';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Äänne äänteeltä palautetta ääntämisestäsi';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Täydentävät kurssit';
+$string['coursesettings:supplemental_desc'] = 'Antaa [[tutorshort]]in vastata myös toisen kurssin pohjalta tämän lisäksi. Tavallinen tapaus on opiskelijoiden perehdytys tai resurssikeskus: tenttikäytännöstä kysyvä saa vastauksen sieltä sen sijaan, ettei saisi mitään. Kurssien on oltava jo indeksoituja, ja piilotetut kurssit ohitetaan.';
+$string['coursesettings:supplemental_courses'] = 'Kurssitunnukset';
+$string['coursesettings:supplemental_inherit'] = 'Jätä tyhjäksi käyttääksesi sivuston laajuista luetteloa ({$a}). Tähän annettu arvo korvaa sen luettelon tällä kurssilla sen sijaan, että lisäisi siihen, joten anna koko joukko.';
+$string['coursesettings:supplemental_nosite'] = 'Jätä tyhjäksi, jos et halua yhtään. Sivuston laajuista luetteloa ei ole asetettu.';
+$string['settings:supplemental_courses'] = 'Täydentävät kurssit';
+$string['settings:supplemental_courses_desc'] = 'Kurssitunnukset, joiden sisältöä [[tutorshort]] saa käyttää myös vastatessaan, pilkuilla erotettuina. Käytä tätä aineistoon, joka sijaitsee toisella kurssilla ja pätee kaikkialla, kuten opiskelijoiden perehdytys tai resurssikeskus: tenttikäytännöstä kysyvä saa tällöin vastauksen siltä kurssilta sen sijaan, ettei saisi mitään.
+
+Kurssien on oltava jo indeksoituja hakua varten; mitään ylimääräistä ei upoteta, joten lisääminen tähän vaikuttaa heti eikä maksa mitään. Piilotetut kurssit ohitetaan. Luetellun kurssin sisällä olevat aktiviteetit indeksoidaan kuitenkin sellaisina kuin ne näki se ylläpitäjä, joka kurssin indeksoi uudelleen, joten piilotetun tai rajoitetun aktiviteetin teksti voidaan lainata opiskelijalle, vaikka siihen ei näytetä linkkiä. Luettele vain kursseja, joiden koko sisältö sopii yleisölle. Enintään {$a} kurssia. Kurssikohtainen asetus korvaa tämän luettelon sen sijaan, että lisäisi siihen.';

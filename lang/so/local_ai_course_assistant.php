@@ -2663,3 +2663,30 @@ $string['settings:spend_export_key_desc'] = 'Furaha Bearer ee dhammaadka dhoofin
 $string['task:migrate_course_embeddings'] = 'Guuri hal koorso model embedding cusub';
 $string['task:model_price_drift_check'] = 'Hubinta isbeddelka qiimaha model-ka';
 $string['task:run_model_benchmark'] = 'Benchmark model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Sharax boggan';
+$string['starters:builtin_help_page_desc'] = 'Wuxuu sharraxayaa fikradaha muhiimka ah ee bogga casharka hadda';
+$string['starters:builtin_quiz'] = 'I imtixaan';
+$string['starters:builtin_quiz_desc'] = 'Wuxuu abuuraa imtixaan tababar oo ku saabsan waxa hadda la baranayo';
+$string['starters:builtin_study_plan'] = 'Qorshe waxbarashada';
+$string['starters:builtin_study_plan_desc'] = 'Wuxuu sameeyaa qorshe diiradsan oo fadhi wax-barasho ah';
+$string['starters:builtin_ai_project_coach'] = 'Tababaraha Mashruuca AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Hagid tallaabo-tallaabo ah oo loogu talagalay mashaariicda iyo hawlaha koorsada';
+$string['starters:builtin_focus_next'] = 'Maxaan diiradda saaraa?';
+$string['starters:builtin_focus_next_desc'] = 'Talooyin shakhsiyeysan oo tallaabada xigta ku saleysan horumarkaaga';
+$string['starters:builtin_ell_practice'] = 'Celinta hadlida';
+$string['starters:builtin_ell_practice_desc'] = 'Tababar wada-hadal afka ah oo lala yeesho kaaliyaha';
+$string['starters:builtin_ell_pronunciation'] = 'Ku celinta madadaalaha';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Jawaab cod-cod ah oo ku saabsan sida aad erayada u dhawaaqdo';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Koorsooyin dheeraad ah';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] wuxuu awoodaa inuu sidoo kale ka jawaabo koorsi kale oo aan kan ahayn. Xaaladda caadiga ah waa koorsi hordhac ah oo ardayda loogu talagalay ama xarun kheyraad: qofka wax ka weydiiya siyaasadda imtixaanka wuxuu halkaas ka helaa jawaabta halkii uu waxba heli lahayn. Koorsooyinkaas waa inay horeyba u xusan yihiin, koorsooyinka qarsoonna waa la iska indhatiraa.';
+$string['coursesettings:supplemental_courses'] = 'Aqoonsiyada koorsada';
+$string['coursesettings:supplemental_inherit'] = 'Ka tag madhan si aad u isticmaasho liiska guud ee goobta ({$a}). Qiimaha halkan lagu qoro wuxuu liiskaas u beddelayaa koorsadan halkii uu ku dari lahaa, sidaas awgeed geli koox dhammaystiran.';
+$string['coursesettings:supplemental_nosite'] = 'Ka tag madhan haddii aadan midna rabin. Liis guud oo goobta ah lama dejin.';
+$string['settings:supplemental_courses'] = 'Koorsooyin dheeraad ah';
+$string['settings:supplemental_courses_desc'] = 'Aqoonsiyada koorsooyinka uu [[tutorshort]] sidoo kale ka isticmaali karo waxa ku jira markuu jawaabayo, oo ay kala qeexaan hakadyo. U isticmaal agab ku jira koorsi kale laakiin meel kasta khuseeya, sida koorsi hordhac ah oo ardayda ama xarun kheyraad: markaas qofka wax ka weydiiya siyaasadda imtixaanka wuxuu jawaabta ka helaa koorsadaas halkii uu waxba heli lahayn.
+
+Koorsooyinku waa inay horeyba u xusan yihiin soo-saarista; waxba dheeraad ah lama dhex geliyo, sidaas awgeed mid halkan lagu daro wuxuu shaqeeyaa isla markiiba mana lacag baxo. Koorsooyinka qarsoon waa la iska indhatiraa. Hase yeeshee waxqabadyada ku jira koorsada la taxay waxaa loo xusaa sidii uu u arkay maamulaha dib u xusay, sidaas awgeed qoraalka waxqabad qarsoon ama xaddidan waxaa laga soo xigan karaa arday xataa haddii aan lagu tusin wax xiriiriye ah. Kaliya tax koorsooyinka ay dhammaan waxa ku jira ku habboon yihiin akhristayaasha. Ugu badnaan {$a} koorso. Dejinta heerka koorsada, meesha ay jirto, waxay u beddelaysaa liiskan halkii ay ku dari lahayd.';

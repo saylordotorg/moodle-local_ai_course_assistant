@@ -2655,3 +2655,30 @@ $string['settings:spend_export_key_desc'] = '用于 <code>/local/ai_course_assis
 $string['task:migrate_course_embeddings'] = '将一门课程迁移到新的嵌入模型';
 $string['task:model_price_drift_check'] = '模型价格漂移检查';
 $string['task:run_model_benchmark'] = '对模型做基准测试';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = '解释此页面';
+$string['starters:builtin_help_page_desc'] = '讲解当前课程页面的关键概念';
+$string['starters:builtin_quiz'] = '考考我';
+$string['starters:builtin_quiz_desc'] = '根据当前内容生成练习测验';
+$string['starters:builtin_study_plan'] = '学习计划';
+$string['starters:builtin_study_plan_desc'] = '制定一个专注的学习时段计划';
+$string['starters:builtin_ai_project_coach'] = 'AI项目教练';
+$string['starters:builtin_ai_project_coach_desc'] = '为课程项目和作业提供指导';
+$string['starters:builtin_focus_next'] = '我应该重点学什么？';
+$string['starters:builtin_focus_next_desc'] = '根据你的目标进度提供个性化的下一步建议';
+$string['starters:builtin_ell_practice'] = '口语练习';
+$string['starters:builtin_ell_practice_desc'] = '与助手进行口语对话练习';
+$string['starters:builtin_ell_pronunciation'] = '发音练习';
+$string['starters:builtin_ell_pronunciation_desc'] = '逐音反馈你的单词发音';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = '补充课程';
+$string['coursesettings:supplemental_desc'] = '让 [[tutorshort]] 除了本课程之外，也可以从另一门课程作答。常见情形是学生导览课或资源中心：询问考试规定的学习者可以从那里得到答案，而不是一无所获。这些课程必须已建立索引，隐藏的课程会被忽略。';
+$string['coursesettings:supplemental_courses'] = '课程 ID';
+$string['coursesettings:supplemental_inherit'] = '留空则使用站点级列表（{$a}）。此处填写的值会替换该列表用于本课程，而不是追加，因此请填写完整的一组。';
+$string['coursesettings:supplemental_nosite'] = '留空表示不使用。尚未设置站点级列表。';
+$string['settings:supplemental_courses'] = '补充课程';
+$string['settings:supplemental_courses_desc'] = '[[tutorshort]] 作答时也可以引用其内容的课程 ID，用逗号分隔。适用于位于另一门课程但处处适用的材料，例如学生导览课或资源中心：这样询问考试规定的学习者就能从那门课程得到答案，而不是一无所获。
+
+课程必须已为检索建立索引；不会额外做嵌入，因此在此添加会立即生效且不产生费用。隐藏的课程会被忽略。但所列课程内的活动是按重建索引的管理员当时所见的状态建立索引的，因此隐藏或受限活动的文字有可能被引用给学习者，即使不显示任何指向它的链接。请只列出全部内容都适合读者的课程。最多 {$a} 门课程。课程级设置若存在，会替换此列表而不是追加。';

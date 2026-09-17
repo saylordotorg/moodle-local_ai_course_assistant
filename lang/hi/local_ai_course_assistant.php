@@ -2647,3 +2647,30 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = 'एक कोर्स को नए एम्बेडिंग मॉडल पर माइग्रेट करें';
 $string['task:model_price_drift_check'] = 'मॉडल कीमत ड्रिफ्ट जाँच';
 $string['task:run_model_benchmark'] = 'किसी मॉडल का बेंचमार्क चलाएँ';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'यह पेज समझाएं';
+$string['starters:builtin_help_page_desc'] = 'वर्तमान पाठ पृष्ठ की मुख्य अवधारणाएं समझाता है';
+$string['starters:builtin_quiz'] = 'मुझे परखो';
+$string['starters:builtin_quiz_desc'] = 'वर्तमान सामग्री पर अभ्यास प्रश्नोत्तरी बनाता है';
+$string['starters:builtin_study_plan'] = 'अध्ययन योजना';
+$string['starters:builtin_study_plan_desc'] = 'एक केंद्रित अध्ययन सत्र योजना बनाता है';
+$string['starters:builtin_ai_project_coach'] = 'AI प्रोजेक्ट कोच';
+$string['starters:builtin_ai_project_coach_desc'] = 'कोर्स की परियोजनाओं और असाइनमेंट के लिए निर्देशित मार्गदर्शन';
+$string['starters:builtin_focus_next'] = 'मुझे किस पर ध्यान देना चाहिए?';
+$string['starters:builtin_focus_next_desc'] = 'आपके उद्देश्यों की प्रगति के आधार पर व्यक्तिगत अगले कदम के सुझाव';
+$string['starters:builtin_ell_practice'] = 'बोलने का अभ्यास';
+$string['starters:builtin_ell_practice_desc'] = 'सहायक के साथ बोलकर बातचीत का अभ्यास';
+$string['starters:builtin_ell_pronunciation'] = 'उच्चारण अभ्यास';
+$string['starters:builtin_ell_pronunciation_desc'] = 'आपके उच्चारण पर ध्वनि-दर-ध्वनि प्रतिक्रिया';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'पूरक पाठ्यक्रम';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] को इस पाठ्यक्रम के अलावा किसी अन्य पाठ्यक्रम से भी उत्तर देने देता है। सामान्य स्थिति छात्र परिचय या संसाधन केंद्र की होती है: परीक्षा नीति पूछने वाले को वहीं से उत्तर मिलता है, कुछ नहीं के बजाय। वे पाठ्यक्रम पहले से अनुक्रमित होने चाहिए, और छिपे हुए पाठ्यक्रम अनदेखे कर दिए जाते हैं।';
+$string['coursesettings:supplemental_courses'] = 'पाठ्यक्रम आईडी';
+$string['coursesettings:supplemental_inherit'] = 'साइट-स्तरीय सूची ({$a}) उपयोग करने के लिए खाली छोड़ें। यहाँ दिया गया मान इस पाठ्यक्रम के लिए उस सूची में जुड़ता नहीं, बल्कि उसकी जगह ले लेता है, इसलिए पूरा समूह दर्ज करें।';
+$string['coursesettings:supplemental_nosite'] = 'कोई नहीं चाहिए तो खाली छोड़ें। कोई साइट-स्तरीय सूची निर्धारित नहीं है।';
+$string['settings:supplemental_courses'] = 'पूरक पाठ्यक्रम';
+$string['settings:supplemental_courses_desc'] = 'उन पाठ्यक्रमों की आईडी जिनकी सामग्री [[tutorshort]] उत्तर देते समय भी उपयोग कर सकता है, अल्पविराम से अलग। ऐसी सामग्री के लिए उपयोग करें जो किसी अन्य पाठ्यक्रम में रहती है और हर जगह लागू होती है, जैसे छात्र परिचय या संसाधन केंद्र: तब परीक्षा नीति पूछने वाले को उसी पाठ्यक्रम से उत्तर मिलता है, कुछ नहीं के बजाय।
+
+पाठ्यक्रम पुनर्प्राप्ति के लिए पहले से अनुक्रमित होने चाहिए; कुछ अतिरिक्त एम्बेड नहीं किया जाता, इसलिए यहाँ जोड़ना तुरंत प्रभावी होता है और इसका कोई खर्च नहीं। छिपे हुए पाठ्यक्रम अनदेखे कर दिए जाते हैं। लेकिन सूचीबद्ध पाठ्यक्रम के भीतर की गतिविधियाँ उसी रूप में अनुक्रमित होती हैं जैसा उन्हें पुनः अनुक्रमित करने वाले प्रशासक ने देखा था, इसलिए किसी छिपी या प्रतिबंधित गतिविधि का पाठ छात्र को उद्धृत किया जा सकता है, भले ही उसका कोई लिंक न दिखे। केवल वे पाठ्यक्रम सूचीबद्ध करें जिनकी पूरी सामग्री दर्शकों के लिए उपयुक्त हो। अधिकतम {$a} पाठ्यक्रम। पाठ्यक्रम-स्तरीय सेटिंग, जहाँ हो, इस सूची में जुड़ती नहीं बल्कि उसकी जगह ले लेती है।';

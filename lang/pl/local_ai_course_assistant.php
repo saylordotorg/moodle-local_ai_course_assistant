@@ -2618,3 +2618,30 @@ $string['settings:spend_export_key_desc'] = 'Klucz Bearer dla miesięcznego punk
 $string['task:migrate_course_embeddings'] = 'Migracja jednego kursu do nowego modelu embeddingu';
 $string['task:model_price_drift_check'] = 'Kontrola odchyleń cen modeli';
 $string['task:run_model_benchmark'] = 'Benchmark modelu';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Wyjaśnij tę stronę';
+$string['starters:builtin_help_page_desc'] = 'Wyjaśnia kluczowe pojęcia z bieżącej strony lekcji';
+$string['starters:builtin_quiz'] = 'Sprawdź mnie';
+$string['starters:builtin_quiz_desc'] = 'Tworzy quiz ćwiczeniowy z bieżącego materiału';
+$string['starters:builtin_study_plan'] = 'Plan nauki';
+$string['starters:builtin_study_plan_desc'] = 'Tworzy skoncentrowany plan sesji nauki';
+$string['starters:builtin_ai_project_coach'] = 'Trener projektów AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Prowadzone wsparcie przy projektach i zadaniach z kursu';
+$string['starters:builtin_focus_next'] = 'Na czym powinienem się skupić?';
+$string['starters:builtin_focus_next_desc'] = 'Spersonalizowane propozycje kolejnego kroku na podstawie twoich postępów w celach';
+$string['starters:builtin_ell_practice'] = 'Ćwiczenie mówienia';
+$string['starters:builtin_ell_practice_desc'] = 'Ćwiczenie rozmowy na głos z asystentem';
+$string['starters:builtin_ell_pronunciation'] = 'Ćwiczenie wymowy';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Informacja zwrotna głoska po głosce o twojej wymowie';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kursy uzupełniające';
+$string['coursesettings:supplemental_desc'] = 'Pozwala [[tutorshort]] odpowiadać również na podstawie innego kursu, nie tylko tego. Typowy przypadek to orientacja dla studentów lub centrum zasobów: osoba pytająca o zasady egzaminów dostaje odpowiedź stamtąd zamiast żadnej. Te kursy muszą być już zindeksowane, a kursy ukryte są pomijane.';
+$string['coursesettings:supplemental_courses'] = 'Identyfikatory kursów';
+$string['coursesettings:supplemental_inherit'] = 'Pozostaw puste, aby użyć listy z poziomu witryny ({$a}). Wartość podana tutaj zastępuje tę listę dla tego kursu, a nie dodaje się do niej — podaj więc pełny zestaw.';
+$string['coursesettings:supplemental_nosite'] = 'Pozostaw puste, aby nie używać żadnego. Nie ustawiono listy z poziomu witryny.';
+$string['settings:supplemental_courses'] = 'Kursy uzupełniające';
+$string['settings:supplemental_courses_desc'] = 'Identyfikatory kursów, z których treści [[tutorshort]] może również korzystać przy odpowiadaniu, oddzielone przecinkami. Używaj do materiałów, które znajdują się w innym kursie i obowiązują wszędzie, jak orientacja dla studentów lub centrum zasobów: osoba pytająca o zasady egzaminów dostaje wtedy odpowiedź z tamtego kursu zamiast żadnej.
+
+Kursy muszą być już zindeksowane na potrzeby wyszukiwania; nic dodatkowego nie jest osadzane, więc dodanie kursu tutaj działa natychmiast i nic nie kosztuje. Kursy ukryte są pomijane. Aktywności wewnątrz wymienionego kursu są jednak indeksowane tak, jak widział je administrator, który go przeindeksował, więc tekst ukrytej lub ograniczonej aktywności może zostać zacytowany studentowi, nawet jeśli nie pokazuje się do niej żaden odnośnik. Wymieniaj tylko kursy, których cała treść jest odpowiednia dla odbiorców. Maksymalnie {$a} kursów. Ustawienie na poziomie kursu, jeśli istnieje, zastępuje tę listę, a nie dodaje się do niej.';

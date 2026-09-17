@@ -2618,3 +2618,30 @@ $string['settings:spend_export_key_desc'] = 'Cheie bearer pentru endpoint-ul lun
 $string['task:migrate_course_embeddings'] = 'Migrează un curs la un nou model de încorporare';
 $string['task:model_price_drift_check'] = 'Verificarea abaterii prețurilor modelelor';
 $string['task:run_model_benchmark'] = 'Rulează un benchmark pentru un model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Explică această pagină';
+$string['starters:builtin_help_page_desc'] = 'Explică noțiunile-cheie din pagina curentă a lecției';
+$string['starters:builtin_quiz'] = 'Testează-mă';
+$string['starters:builtin_quiz_desc'] = 'Generează un test de exersare pe materialul curent';
+$string['starters:builtin_study_plan'] = 'Plan de studiu';
+$string['starters:builtin_study_plan_desc'] = 'Creează un plan concentrat pentru sesiunea de studiu';
+$string['starters:builtin_ai_project_coach'] = 'Coach de Proiect IA';
+$string['starters:builtin_ai_project_coach_desc'] = 'Îndrumare ghidată pentru proiectele și temele cursului';
+$string['starters:builtin_focus_next'] = 'Pe ce ar trebui să mă concentrez?';
+$string['starters:builtin_focus_next_desc'] = 'Sugestii personalizate pentru pasul următor, în funcție de progresul tău la obiective';
+$string['starters:builtin_ell_practice'] = 'Practică vorbirea';
+$string['starters:builtin_ell_practice_desc'] = 'Exersarea conversației vorbite cu asistentul';
+$string['starters:builtin_ell_pronunciation'] = 'Practică pronunție';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Feedback sunet cu sunet despre pronunția ta';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Cursuri suplimentare';
+$string['coursesettings:supplemental_desc'] = 'Permite [[tutorshort]] să răspundă și pe baza altui curs, nu doar a acestuia. Cazul obișnuit este o orientare pentru studenți sau un centru de resurse: cine întreabă despre regulile de examen primește răspunsul de acolo în loc de niciunul. Acele cursuri trebuie să fie deja indexate, iar cursurile ascunse sunt ignorate.';
+$string['coursesettings:supplemental_courses'] = 'ID-uri de curs';
+$string['coursesettings:supplemental_inherit'] = 'Lăsați gol pentru a folosi lista de la nivelul site-ului ({$a}). O valoare aici înlocuiește acea listă pentru acest curs în loc să i se adauge, deci introduceți setul complet.';
+$string['coursesettings:supplemental_nosite'] = 'Lăsați gol pentru niciunul. Nu este setată nicio listă la nivelul site-ului.';
+$string['settings:supplemental_courses'] = 'Cursuri suplimentare';
+$string['settings:supplemental_courses_desc'] = 'ID-uri de cursuri al căror conținut [[tutorshort]] îl poate folosi și la răspuns, separate prin virgule. Folosiți-le pentru materiale care se află în alt curs și se aplică peste tot, precum o orientare pentru studenți sau un centru de resurse: cine întreabă despre regulile de examen primește atunci răspunsul din acel curs în loc de niciunul.
+
+Cursurile trebuie să fie deja indexate pentru regăsire; nu se încorporează nimic în plus, așa că adăugarea unuia aici are efect imediat și nu costă nimic. Cursurile ascunse sunt ignorate. Activitățile dintr-un curs listat sunt însă indexate așa cum le-a văzut administratorul care l-a reindexat, deci textul unei activități ascunse sau restricționate poate fi citat unui student chiar dacă nu se afișează niciun link. Listați doar cursuri al căror conținut întreg este potrivit pentru public. Maximum {$a} cursuri. O setare pe curs, acolo unde există, înlocuiește această listă în loc să i se adauge.';

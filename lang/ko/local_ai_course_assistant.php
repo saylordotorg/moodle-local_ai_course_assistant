@@ -2617,3 +2617,30 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = '강좌 하나를 새 임베딩 모델로 마이그레이션';
 $string['task:model_price_drift_check'] = '모델 가격 편차 점검';
 $string['task:run_model_benchmark'] = '모델 벤치마크';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = '이 페이지 설명';
+$string['starters:builtin_help_page_desc'] = '현재 학습 페이지의 핵심 개념을 설명합니다';
+$string['starters:builtin_quiz'] = '퀴즈';
+$string['starters:builtin_quiz_desc'] = '현재 학습 내용으로 연습 퀴즈를 만듭니다';
+$string['starters:builtin_study_plan'] = '학습 계획';
+$string['starters:builtin_study_plan_desc'] = '집중적인 학습 세션 계획을 세웁니다';
+$string['starters:builtin_ai_project_coach'] = 'AI 프로젝트 코치';
+$string['starters:builtin_ai_project_coach_desc'] = '과목 프로젝트와 과제를 단계별로 안내합니다';
+$string['starters:builtin_focus_next'] = '무엇에 집중해야 할까요?';
+$string['starters:builtin_focus_next_desc'] = '학습 목표 진행 상황에 맞춘 다음 단계 제안';
+$string['starters:builtin_ell_practice'] = '말하기 연습';
+$string['starters:builtin_ell_practice_desc'] = '어시스턴트와 말하기 대화 연습';
+$string['starters:builtin_ell_pronunciation'] = '발음 연습';
+$string['starters:builtin_ell_pronunciation_desc'] = '발음에 대한 소리 단위 피드백';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = '보조 강좌';
+$string['coursesettings:supplemental_desc'] = '이 강좌 외에 다른 강좌에서도 [[tutorshort]]가 답변할 수 있게 합니다. 흔한 경우는 학생 오리엔테이션이나 자료 센터입니다. 시험 규정을 묻는 학습자가 아무 답도 못 받는 대신 그곳에서 답을 받습니다. 해당 강좌는 이미 색인되어 있어야 하며, 숨겨진 강좌는 무시됩니다.';
+$string['coursesettings:supplemental_courses'] = '강좌 ID';
+$string['coursesettings:supplemental_inherit'] = '사이트 전체 목록({$a})을 사용하려면 비워 두세요. 여기에 값을 넣으면 이 강좌에서는 그 목록에 더해지는 것이 아니라 대체합니다. 전체 집합을 입력하세요.';
+$string['coursesettings:supplemental_nosite'] = '사용하지 않으려면 비워 두세요. 사이트 전체 목록이 설정되어 있지 않습니다.';
+$string['settings:supplemental_courses'] = '보조 강좌';
+$string['settings:supplemental_courses_desc'] = '답변할 때 [[tutorshort]]가 내용을 함께 활용할 수 있는 강좌 ID(쉼표로 구분). 다른 강좌에 있으면서 어디서나 적용되는 자료에 사용하세요. 예를 들어 학생 오리엔테이션이나 자료 센터입니다. 그러면 시험 규정을 묻는 학습자가 아무 답도 못 받는 대신 그 강좌에서 답을 받습니다.
+
+강좌는 검색을 위해 이미 색인되어 있어야 합니다. 추가로 임베딩하지 않으므로 여기에 추가하면 즉시 반영되고 비용도 들지 않습니다. 숨겨진 강좌는 무시됩니다. 다만 지정한 강좌 안의 활동은 재색인을 실행한 관리자가 본 상태 그대로 색인되므로, 숨겨졌거나 제한된 활동의 본문이 링크가 표시되지 않더라도 학습자에게 인용될 수 있습니다. 전체 내용이 대상 독자에게 적합한 강좌만 지정하세요. 최대 {$a}개 강좌. 강좌 단위 설정이 있으면 이 목록에 더해지지 않고 대체합니다.';

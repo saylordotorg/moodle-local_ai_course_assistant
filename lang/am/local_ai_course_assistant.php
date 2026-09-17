@@ -2646,3 +2646,30 @@ $string['settings:spend_export_key_desc'] = 'የወጪ ዳሽቦርዱ በወር
 $string['task:migrate_course_embeddings'] = 'አንድ ኮርስን ወደ አዲስ embedding ሞዴል አፍልስ';
 $string['task:model_price_drift_check'] = 'የሞዴል ዋጋ መንሸራተት ፍተሻ';
 $string['task:run_model_benchmark'] = 'ሞዴል benchmark አድርግ';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'ይህን ገጽ አብራራ';
+$string['starters:builtin_help_page_desc'] = 'የአሁኑን የትምህርት ገጽ ዋና ሐሳቦች ያብራራል';
+$string['starters:builtin_quiz'] = 'ፈትነኝ';
+$string['starters:builtin_quiz_desc'] = 'በአሁኑ ትምህርት ላይ የልምምድ ፈተና ይፈጥራል';
+$string['starters:builtin_study_plan'] = 'የጥናት እቅድ';
+$string['starters:builtin_study_plan_desc'] = 'ትኩረት ያለው የጥናት ክፍለ ጊዜ ዕቅድ ይሠራል';
+$string['starters:builtin_ai_project_coach'] = 'AI ፕሮጀክት አሰልጣኝ';
+$string['starters:builtin_ai_project_coach_desc'] = 'ለኮርሱ ፕሮጀክቶችና ሥራዎች የተመራ ድጋፍ';
+$string['starters:builtin_focus_next'] = 'በምን ላይ ላተኩር?';
+$string['starters:builtin_focus_next_desc'] = 'በግብ እድገትህ መሠረት የሚቀጥለው እርምጃ የግል ጥቆማዎች';
+$string['starters:builtin_ell_practice'] = 'የንግግር ልምምድ';
+$string['starters:builtin_ell_practice_desc'] = 'ከረዳቱ ጋር በንግግር የመወያየት ልምምድ';
+$string['starters:builtin_ell_pronunciation'] = 'የአጠራር ልምምድ';
+$string['starters:builtin_ell_pronunciation_desc'] = 'በአጠራርህ ላይ ድምፅ በድምፅ አስተያየት';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'ተጨማሪ ኮርሶች';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] ከዚህ ኮርስ በተጨማሪ ከሌላ ኮርስም እንዲመልስ ያስችላል። የተለመደው ሁኔታ የተማሪ መግቢያ ኮርስ ወይም የግብዓት ማዕከል ነው፦ ስለ ፈተና ደንብ የሚጠይቅ ተማሪ ምንም ከማጣት ይልቅ ከዚያ መልስ ያገኛል። እነዚያ ኮርሶች አስቀድመው መጠቆሚያ የተሠራላቸው መሆን አለባቸው፣ የተደበቁ ኮርሶችም ችላ ይባላሉ።';
+$string['coursesettings:supplemental_courses'] = 'የኮርስ መለያዎች';
+$string['coursesettings:supplemental_inherit'] = 'የጣቢያውን ሙሉ ዝርዝር ({$a}) ለመጠቀም ባዶ ይተዉት። እዚህ የሚገባ እሴት ለዚህ ኮርስ ያንን ዝርዝር ከመጨመር ይልቅ ይተካዋል፣ ስለዚህ ሙሉውን ስብስብ ያስገቡ።';
+$string['coursesettings:supplemental_nosite'] = 'ምንም ካልፈለጉ ባዶ ይተዉት። የጣቢያ ሙሉ ዝርዝር አልተቀመጠም።';
+$string['settings:supplemental_courses'] = 'ተጨማሪ ኮርሶች';
+$string['settings:supplemental_courses_desc'] = '[[tutorshort]] ሲመልስ ይዘታቸውን ሊጠቀምባቸው የሚችሉ ኮርሶች መለያዎች፣ በኮማ ተለያይተው። በሌላ ኮርስ ውስጥ ሆኖ በሁሉም ቦታ ለሚሠራ ይዘት ይጠቀሙበት፣ እንደ የተማሪ መግቢያ ኮርስ ወይም የግብዓት ማዕከል፦ ስለ ፈተና ደንብ የሚጠይቅ ተማሪ ምንም ከማጣት ይልቅ ከዚያ ኮርስ መልስ ያገኛል።
+
+ኮርሶቹ ለማውጣት አስቀድመው መጠቆሚያ የተሠራላቸው መሆን አለባቸው፤ ተጨማሪ ምንም አይካተትም፣ ስለዚህ እዚህ መጨመር ወዲያውኑ ይሠራል ምንም አያስከፍልም። የተደበቁ ኮርሶች ችላ ይባላሉ። ሆኖም በተዘረዘረው ኮርስ ውስጥ ያሉ ተግባራት እንደገና መጠቆሚያ የሠራው አስተዳዳሪ እንዳያቸው ሆነው ይጠቆማሉ፤ ስለዚህ የተደበቀ ወይም የተገደበ ተግባር ጽሑፍ አገናኝ ባይታይም ለተማሪ ሊጠቀስ ይችላል። ሙሉ ይዘታቸው ለአንባቢው የሚስማማ ኮርሶችን ብቻ ይዘርዝሩ። ቢበዛ {$a} ኮርሶች። የኮርስ ደረጃ ቅንብር ካለ ይህን ዝርዝር ከመጨመር ይልቅ ይተካዋል።';

@@ -735,6 +735,57 @@ try {
         // Non-critical; pill will fall back to generic course link.
     }
 
+    // Supplemental courses contribute only the cmids this turn actually
+    // retrieved, not their whole module list.
+    //
+    // Two reasons, and the first is not the obvious one. uservisible is NOT an
+    // enrolment check: cm_info::update_user_visible() tests deletion,
+    // visibility, availability and mod/<modname>:view, and for the module types
+    // an orientation course is made of -- page, url, book, folder, resource --
+    // that capability carries the `user` archetype and resolves true for any
+    // logged-in user. So emitting the full map for another course would publish
+    // the names and URLs of its activities to learners not enrolled in it,
+    // whether or not this turn cited any of them. Scoping to retrieved cmids
+    // means we disclose only what the answer was actually built from.
+    //
+    // Second, it is on the hot path: up to five extra get_fast_modinfo() builds
+    // plus a per-cm obtain_dynamic_data(), and a bigger pre-stream payload,
+    // added to time-to-first-token on every turn.
+    $supplementalcmids = [];
+    foreach ($retrievedchunks as $chunk) {
+        $chunkcmid = isset($chunk['cmid']) ? (int) $chunk['cmid'] : 0;
+        if ($chunkcmid > 0 && !isset($modulesmap[(string) $chunkcmid])) {
+            $supplementalcmids[$chunkcmid] = true;
+        }
+    }
+    if (!empty($supplementalcmids)) {
+        foreach (\local_ai_course_assistant\supplemental_sources::usable_course_ids($courseid) as $supcourseid) {
+            try {
+                $supmodinfo = get_fast_modinfo($supcourseid);
+            } catch (\Throwable $e) {
+                // Non-critical; the pill falls back to a course-level link.
+                continue;
+            }
+            foreach (array_keys($supplementalcmids) as $wantedcmid) {
+                if (isset($modulesmap[(string) $wantedcmid])) {
+                    continue;
+                }
+                try {
+                    $cmobj = $supmodinfo->get_cm($wantedcmid);
+                } catch (\Throwable $e) {
+                    // Not in this course; try the next one.
+                    continue;
+                }
+                if ($cmobj->uservisible && $cmobj->has_view() && !empty($cmobj->name)) {
+                    $modulesmap[(string) $cmobj->id] = [
+                        'url' => (new \moodle_url('/mod/' . $cmobj->modname . '/view.php', ['id' => $cmobj->id]))->out(false),
+                        'title' => $cmobj->name,
+                    ];
+                }
+            }
+        }
+    }
+
     // Resolve retrieved RAG chunks to inline-citation payloads. The frontend
     // uses these to turn [[c:N]] markers in the streamed response into
     // clickable superscript links to the cited Moodle resource.
@@ -839,11 +890,13 @@ try {
         $fullresponse .= $chunk;
         // Combine carry-over with new chunk so split markers reassemble.
         $buf = $carry . $chunk;
-        // Hold back the trailing 24 bytes as carry so a marker straddling
-        // the next chunk boundary still gets caught. 24 is the length of
-        // the longest control marker we care about: "[/SOLA_NEXT]" plus
-        // a safety margin.
-        $holdback = 24;
+        // Hold back the trailing bytes as carry so a marker straddling
+        // the next chunk boundary still gets caught. 64 covers the longest
+        // control marker ("[/SOLA_NEXT]") and the longest activity-id
+        // annotation the model copies out of the structure block
+        // ("(course module id: 1234567)"), plus a safety margin. It was 24,
+        // which was enough for the bracket markers alone.
+        $holdback = 64;
         if (mb_strlen($buf, '8bit') > $holdback) {
             // Back the split up to a UTF-8 character boundary.
             //
@@ -871,6 +924,10 @@ try {
         // SOLA_NEXT chips are server-emitted chip text the client parses
         // separately; the live stream should never show them as raw text.
         $emit = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $emit) ?? $emit;
+        // Course-module ids the model copied out of the structure block. The
+        // stored copy is scrubbed by protocol_markers::strip() further down,
+        // but the learner reads the LIVE stream, so it has to happen here too.
+        $emit = \local_ai_course_assistant\protocol_markers::strip_activity_ids($emit);
         if ($emit !== '') {
             local_ai_course_assistant_sse_send(['token' => $emit]);
         }
@@ -881,6 +938,7 @@ try {
         }
         $tail = str_replace(['[OFF_TOPIC]', '[NEEDS_ESCALATION]'], '', $carry);
         $tail = preg_replace('/\[SOLA_NEXT\].*?\[\/SOLA_NEXT\]/su', '', $tail) ?? $tail;
+        $tail = \local_ai_course_assistant\protocol_markers::strip_activity_ids($tail);
         if ($tail !== '') {
             local_ai_course_assistant_sse_send(['token' => $tail]);
         }

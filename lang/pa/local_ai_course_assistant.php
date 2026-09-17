@@ -2639,3 +2639,30 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = 'ਇੱਕ ਕੋਰਸ ਨੂੰ ਨਵੇਂ embedding ਮਾਡਲ ਉੱਤੇ ਮਾਈਗ੍ਰੇਟ ਕਰੋ';
 $string['task:model_price_drift_check'] = 'ਮਾਡਲ ਕੀਮਤ ਡ੍ਰਿਫਟ ਜਾਂਚ';
 $string['task:run_model_benchmark'] = 'ਮਾਡਲ ਦਾ Benchmark';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'ਇਹ ਪੰਨਾ ਸਮਝਾਓ';
+$string['starters:builtin_help_page_desc'] = 'ਮੌਜੂਦਾ ਪਾਠ ਸਫ਼ੇ ਦੇ ਮੁੱਖ ਸੰਕਲਪ ਸਮਝਾਉਂਦਾ ਹੈ';
+$string['starters:builtin_quiz'] = 'ਮੈਨੂੰ ਪਰਖੋ';
+$string['starters:builtin_quiz_desc'] = 'ਮੌਜੂਦਾ ਸਮੱਗਰੀ ਉੱਤੇ ਅਭਿਆਸ ਕਵਿਜ਼ ਬਣਾਉਂਦਾ ਹੈ';
+$string['starters:builtin_study_plan'] = 'ਅਧਿਐਨ ਯੋਜਨਾ';
+$string['starters:builtin_study_plan_desc'] = 'ਇੱਕ ਕੇਂਦਰਿਤ ਪੜ੍ਹਾਈ ਸੈਸ਼ਨ ਯੋਜਨਾ ਬਣਾਉਂਦਾ ਹੈ';
+$string['starters:builtin_ai_project_coach'] = 'AI ਪ੍ਰੋਜੈਕਟ ਕੋਚ';
+$string['starters:builtin_ai_project_coach_desc'] = 'ਕੋਰਸ ਦੇ ਪ੍ਰੋਜੈਕਟਾਂ ਅਤੇ ਅਸਾਈਨਮੈਂਟਾਂ ਲਈ ਅਗਵਾਈ';
+$string['starters:builtin_focus_next'] = 'ਮੈਨੂੰ ਕਿਸ ਉੱਤੇ ਧਿਆਨ ਦੇਣਾ ਚਾਹੀਦਾ ਹੈ?';
+$string['starters:builtin_focus_next_desc'] = 'ਤੁਹਾਡੀ ਟੀਚਾ ਤਰੱਕੀ ਦੇ ਆਧਾਰ ਉੱਤੇ ਅਗਲੇ ਕਦਮ ਦੇ ਨਿੱਜੀ ਸੁਝਾਅ';
+$string['starters:builtin_ell_practice'] = 'ਬੋਲਣ ਦੀ ਪ੍ਰੈਕਟਿਸ';
+$string['starters:builtin_ell_practice_desc'] = 'ਸਹਾਇਕ ਨਾਲ ਬੋਲ ਕੇ ਗੱਲਬਾਤ ਦਾ ਅਭਿਆਸ';
+$string['starters:builtin_ell_pronunciation'] = 'ਉਚਾਰਨ ਅਭਿਆਸ';
+$string['starters:builtin_ell_pronunciation_desc'] = 'ਤੁਹਾਡੇ ਉਚਾਰਨ ਉੱਤੇ ਧੁਨੀ-ਦਰ-ਧੁਨੀ ਫੀਡਬੈਕ';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'ਪੂਰਕ ਕੋਰਸ';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] ਨੂੰ ਇਸ ਕੋਰਸ ਤੋਂ ਇਲਾਵਾ ਕਿਸੇ ਹੋਰ ਕੋਰਸ ਤੋਂ ਵੀ ਜਵਾਬ ਦੇਣ ਦਿੰਦਾ ਹੈ। ਆਮ ਹਾਲਤ ਵਿਦਿਆਰਥੀ ਜਾਣ-ਪਛਾਣ ਜਾਂ ਸਰੋਤ ਕੇਂਦਰ ਦੀ ਹੁੰਦੀ ਹੈ: ਪ੍ਰੀਖਿਆ ਨੀਤੀ ਬਾਰੇ ਪੁੱਛਣ ਵਾਲੇ ਨੂੰ ਕੁਝ ਨਾ ਮਿਲਣ ਦੀ ਥਾਂ ਉੱਥੋਂ ਜਵਾਬ ਮਿਲਦਾ ਹੈ। ਉਹ ਕੋਰਸ ਪਹਿਲਾਂ ਹੀ ਸੂਚੀਬੱਧ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ, ਅਤੇ ਲੁਕੇ ਹੋਏ ਕੋਰਸ ਅਣਡਿੱਠੇ ਕੀਤੇ ਜਾਂਦੇ ਹਨ।';
+$string['coursesettings:supplemental_courses'] = 'ਕੋਰਸ ਆਈਡੀ';
+$string['coursesettings:supplemental_inherit'] = 'ਸਾਈਟ-ਪੱਧਰੀ ਸੂਚੀ ({$a}) ਵਰਤਣ ਲਈ ਖਾਲੀ ਛੱਡੋ। ਇੱਥੇ ਦਿੱਤੀ ਕੀਮਤ ਇਸ ਕੋਰਸ ਲਈ ਉਸ ਸੂਚੀ ਵਿੱਚ ਜੁੜਦੀ ਨਹੀਂ, ਸਗੋਂ ਉਸ ਦੀ ਥਾਂ ਲੈਂਦੀ ਹੈ, ਇਸ ਲਈ ਪੂਰਾ ਸਮੂਹ ਭਰੋ।';
+$string['coursesettings:supplemental_nosite'] = 'ਕੋਈ ਨਹੀਂ ਚਾਹੀਦਾ ਤਾਂ ਖਾਲੀ ਛੱਡੋ। ਕੋਈ ਸਾਈਟ-ਪੱਧਰੀ ਸੂਚੀ ਨਿਰਧਾਰਤ ਨਹੀਂ ਹੈ।';
+$string['settings:supplemental_courses'] = 'ਪੂਰਕ ਕੋਰਸ';
+$string['settings:supplemental_courses_desc'] = 'ਉਹਨਾਂ ਕੋਰਸਾਂ ਦੀਆਂ ਆਈਡੀ ਜਿਨ੍ਹਾਂ ਦੀ ਸਮੱਗਰੀ [[tutorshort]] ਜਵਾਬ ਦਿੰਦੇ ਸਮੇਂ ਵੀ ਵਰਤ ਸਕਦਾ ਹੈ, ਕੌਮਿਆਂ ਨਾਲ ਵੱਖ। ਅਜਿਹੀ ਸਮੱਗਰੀ ਲਈ ਵਰਤੋ ਜੋ ਕਿਸੇ ਹੋਰ ਕੋਰਸ ਵਿੱਚ ਰਹਿੰਦੀ ਹੈ ਅਤੇ ਹਰ ਥਾਂ ਲਾਗੂ ਹੁੰਦੀ ਹੈ, ਜਿਵੇਂ ਵਿਦਿਆਰਥੀ ਜਾਣ-ਪਛਾਣ ਜਾਂ ਸਰੋਤ ਕੇਂਦਰ: ਫਿਰ ਪ੍ਰੀਖਿਆ ਨੀਤੀ ਬਾਰੇ ਪੁੱਛਣ ਵਾਲੇ ਨੂੰ ਉਸੇ ਕੋਰਸ ਤੋਂ ਜਵਾਬ ਮਿਲਦਾ ਹੈ।
+
+ਕੋਰਸ ਪ੍ਰਾਪਤੀ ਲਈ ਪਹਿਲਾਂ ਹੀ ਸੂਚੀਬੱਧ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ; ਕੁਝ ਵਾਧੂ ਏਮਬੈੱਡ ਨਹੀਂ ਕੀਤਾ ਜਾਂਦਾ, ਇਸ ਲਈ ਇੱਥੇ ਜੋੜਨਾ ਤੁਰੰਤ ਅਸਰ ਕਰਦਾ ਹੈ ਅਤੇ ਕੁਝ ਖਰਚ ਨਹੀਂ ਆਉਂਦਾ। ਲੁਕੇ ਹੋਏ ਕੋਰਸ ਅਣਡਿੱਠੇ ਕੀਤੇ ਜਾਂਦੇ ਹਨ। ਪਰ ਸੂਚੀਬੱਧ ਕੋਰਸ ਦੇ ਅੰਦਰਲੀਆਂ ਗਤੀਵਿਧੀਆਂ ਉਸੇ ਤਰ੍ਹਾਂ ਸੂਚੀਬੱਧ ਹੁੰਦੀਆਂ ਹਨ ਜਿਵੇਂ ਮੁੜ-ਸੂਚੀਬੱਧ ਕਰਨ ਵਾਲੇ ਪ੍ਰਬੰਧਕ ਨੇ ਵੇਖੀਆਂ ਸਨ, ਇਸ ਲਈ ਕਿਸੇ ਲੁਕੀ ਜਾਂ ਸੀਮਤ ਗਤੀਵਿਧੀ ਦਾ ਪਾਠ ਵਿਦਿਆਰਥੀ ਨੂੰ ਹਵਾਲੇ ਵਜੋਂ ਦਿੱਤਾ ਜਾ ਸਕਦਾ ਹੈ, ਭਾਵੇਂ ਉਸ ਦਾ ਕੋਈ ਲਿੰਕ ਨਾ ਦਿਖੇ। ਸਿਰਫ਼ ਉਹੀ ਕੋਰਸ ਸੂਚੀਬੱਧ ਕਰੋ ਜਿਨ੍ਹਾਂ ਦੀ ਸਾਰੀ ਸਮੱਗਰੀ ਦਰਸ਼ਕਾਂ ਲਈ ਢੁਕਵੀਂ ਹੋਵੇ। ਵੱਧ ਤੋਂ ਵੱਧ {$a} ਕੋਰਸ। ਕੋਰਸ-ਪੱਧਰੀ ਸੈਟਿੰਗ, ਜਿੱਥੇ ਹੋਵੇ, ਇਸ ਸੂਚੀ ਵਿੱਚ ਜੁੜਦੀ ਨਹੀਂ ਸਗੋਂ ਉਸ ਦੀ ਥਾਂ ਲੈਂਦੀ ਹੈ।';

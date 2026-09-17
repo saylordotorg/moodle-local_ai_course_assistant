@@ -2639,3 +2639,30 @@ $string['settings:spend_export_key_desc'] = 'Khóa Bearer cho endpoint xuất ch
 $string['task:migrate_course_embeddings'] = 'Di trú một khóa học sang mô hình embedding mới';
 $string['task:model_price_drift_check'] = 'Kiểm tra drift giá mô hình';
 $string['task:run_model_benchmark'] = 'Benchmark một mô hình';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Giải thích trang này';
+$string['starters:builtin_help_page_desc'] = 'Giải thích các khái niệm chính trong trang bài học hiện tại';
+$string['starters:builtin_quiz'] = 'Kiểm tra tôi';
+$string['starters:builtin_quiz_desc'] = 'Tạo bài kiểm tra luyện tập từ nội dung hiện tại';
+$string['starters:builtin_study_plan'] = 'Kế hoạch học tập';
+$string['starters:builtin_study_plan_desc'] = 'Lập kế hoạch tập trung cho buổi học';
+$string['starters:builtin_ai_project_coach'] = 'Huấn luyện dự án AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Hướng dẫn từng bước cho dự án và bài tập của khóa học';
+$string['starters:builtin_focus_next'] = 'Tôi nên tập trung vào điều gì?';
+$string['starters:builtin_focus_next_desc'] = 'Gợi ý bước tiếp theo được cá nhân hóa theo tiến độ mục tiêu của bạn';
+$string['starters:builtin_ell_practice'] = 'Luyện nói';
+$string['starters:builtin_ell_practice_desc'] = 'Luyện hội thoại nói với trợ lý';
+$string['starters:builtin_ell_pronunciation'] = 'Luyện phát âm';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Phản hồi từng âm về cách bạn phát âm';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Khóa học bổ sung';
+$string['coursesettings:supplemental_desc'] = 'Cho phép [[tutorshort]] trả lời từ một khóa học khác bên cạnh khóa này. Trường hợp thường gặp là khóa định hướng cho sinh viên hoặc trung tâm tài nguyên: người hỏi về quy định thi sẽ nhận câu trả lời từ đó thay vì không có gì. Các khóa đó phải đã được lập chỉ mục, và khóa bị ẩn sẽ bị bỏ qua.';
+$string['coursesettings:supplemental_courses'] = 'ID khóa học';
+$string['coursesettings:supplemental_inherit'] = 'Để trống để dùng danh sách toàn site ({$a}). Giá trị ở đây thay thế danh sách đó cho khóa này chứ không cộng thêm, nên hãy nhập trọn bộ.';
+$string['coursesettings:supplemental_nosite'] = 'Để trống nếu không dùng khóa nào. Chưa đặt danh sách toàn site.';
+$string['settings:supplemental_courses'] = 'Khóa học bổ sung';
+$string['settings:supplemental_courses_desc'] = 'ID của các khóa học mà [[tutorshort]] cũng được dùng nội dung khi trả lời, phân tách bằng dấu phẩy. Dùng cho tài liệu nằm ở khóa khác nhưng áp dụng ở mọi nơi, như khóa định hướng cho sinh viên hoặc trung tâm tài nguyên: khi đó người hỏi về quy định thi sẽ nhận câu trả lời từ khóa ấy thay vì không có gì.
+
+Các khóa phải đã được lập chỉ mục để truy xuất; không nhúng thêm gì cả, nên thêm một khóa ở đây có hiệu lực ngay và không tốn chi phí. Khóa bị ẩn sẽ bị bỏ qua. Tuy nhiên, các hoạt động bên trong một khóa được liệt kê sẽ được lập chỉ mục đúng như quản trị viên lập chỉ mục lại nhìn thấy, nên văn bản của một hoạt động bị ẩn hoặc bị hạn chế vẫn có thể được trích cho người học dù không hiển thị liên kết nào tới nó. Chỉ liệt kê những khóa mà toàn bộ nội dung phù hợp với người đọc. Tối đa {$a} khóa. Thiết lập ở cấp khóa học, nếu có, sẽ thay thế danh sách này chứ không cộng thêm.';

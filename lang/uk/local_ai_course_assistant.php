@@ -2661,3 +2661,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-ключ для місячн
 $string['task:migrate_course_embeddings'] = 'Перенести один курс на нову модель embedding';
 $string['task:model_price_drift_check'] = 'Перевірка drift цін моделей';
 $string['task:run_model_benchmark'] = 'Виконати benchmark моделі';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Поясни цю сторінку';
+$string['starters:builtin_help_page_desc'] = 'Пояснює ключові поняття поточної сторінки уроку';
+$string['starters:builtin_quiz'] = 'Перевір мене';
+$string['starters:builtin_quiz_desc'] = 'Створює тренувальний тест за поточним матеріалом';
+$string['starters:builtin_study_plan'] = 'Навчальний план';
+$string['starters:builtin_study_plan_desc'] = 'Складає зосереджений план навчальної сесії';
+$string['starters:builtin_ai_project_coach'] = 'ШІ-тренер проєктів';
+$string['starters:builtin_ai_project_coach_desc'] = 'Покрокова підтримка з проєктами та завданнями курсу';
+$string['starters:builtin_focus_next'] = 'На чому мені зосередитися?';
+$string['starters:builtin_focus_next_desc'] = 'Персональні пропозиції наступного кроку з огляду на твій поступ за цілями';
+$string['starters:builtin_ell_practice'] = 'Практика мовлення';
+$string['starters:builtin_ell_practice_desc'] = 'Практика усної розмови з асистентом';
+$string['starters:builtin_ell_pronunciation'] = 'Практика вимови';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Відгук про вимову, звук за звуком';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Додаткові курси';
+$string['coursesettings:supplemental_desc'] = 'Дозволяє [[tutorshort]] відповідати не лише за цим курсом, а й за іншим. Звичайний випадок — вступний курс для студентів або ресурсний центр: той, хто питає про правила іспитів, отримує відповідь звідти, а не порожнечу. Ці курси вже мають бути проіндексовані, а приховані курси ігноруються.';
+$string['coursesettings:supplemental_courses'] = 'Ідентифікатори курсів';
+$string['coursesettings:supplemental_inherit'] = 'Залиште порожнім, щоб використати загальносайтовий список ({$a}). Значення тут замінює цей список для цього курсу, а не доповнює його, тож вкажіть повний набір.';
+$string['coursesettings:supplemental_nosite'] = 'Залиште порожнім, щоб не використовувати жодного. Загальносайтовий список не задано.';
+$string['settings:supplemental_courses'] = 'Додаткові курси';
+$string['settings:supplemental_courses_desc'] = 'Ідентифікатори курсів, вміст яких [[tutorshort]] також може використовувати у відповідях, через кому. Застосовуйте для матеріалів, що живуть в іншому курсі й діють усюди: вступний курс для студентів або ресурсний центр. Тоді той, хто питає про правила іспитів, отримає відповідь із того курсу, а не порожнечу.
+
+Курси вже мають бути проіндексовані для пошуку; нічого додатково не векторизується, тож додавання діє одразу й нічого не коштує. Приховані курси ігноруються. Проте елементи всередині вказаного курсу індексуються такими, якими їх бачив адміністратор, що переіндексував курс, тож текст прихованого або обмеженого елемента може бути процитований студентові, навіть якщо посилання на нього не показано. Вказуйте лише курси, увесь вміст яких підходить аудиторії. Щонайбільше {$a} курсів. Налаштування на рівні курсу, якщо воно задане, замінює цей список, а не доповнює його.';

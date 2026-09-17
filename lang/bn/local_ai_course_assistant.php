@@ -2617,3 +2617,30 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = 'একটি কোর্সকে নতুন এমবেডিং মডেলে মাইগ্রেট করুন';
 $string['task:model_price_drift_check'] = 'মডেল মূল্য ড্রিফট পরীক্ষা';
 $string['task:run_model_benchmark'] = 'একটি মডেলের বেঞ্চমার্ক করুন';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'এই পৃষ্ঠা ব্যাখ্যা করুন';
+$string['starters:builtin_help_page_desc'] = 'বর্তমান পাঠ পাতার মূল ধারণাগুলো ব্যাখ্যা করে';
+$string['starters:builtin_quiz'] = 'আমাকে পরীক্ষা করো';
+$string['starters:builtin_quiz_desc'] = 'বর্তমান বিষয়বস্তু থেকে অনুশীলন কুইজ তৈরি করে';
+$string['starters:builtin_study_plan'] = 'অধ্যয়ন পরিকল্পনা';
+$string['starters:builtin_study_plan_desc'] = 'একটি মনোযোগী পড়ার পরিকল্পনা তৈরি করে';
+$string['starters:builtin_ai_project_coach'] = 'AI প্রকল্প কোচ';
+$string['starters:builtin_ai_project_coach_desc'] = 'কোর্সের প্রকল্প ও অ্যাসাইনমেন্টের জন্য ধাপে ধাপে সহায়তা';
+$string['starters:builtin_focus_next'] = 'আমার কীসে মনোযোগ দেওয়া উচিত?';
+$string['starters:builtin_focus_next_desc'] = 'তোমার লক্ষ্য অগ্রগতির ভিত্তিতে পরবর্তী ধাপের ব্যক্তিগত পরামর্শ';
+$string['starters:builtin_ell_practice'] = 'কথা বলার অনুশীলন';
+$string['starters:builtin_ell_practice_desc'] = 'সহকারীর সঙ্গে মুখে বলা কথোপকথনের অনুশীলন';
+$string['starters:builtin_ell_pronunciation'] = 'উচ্চারণ অনুশীলন';
+$string['starters:builtin_ell_pronunciation_desc'] = 'তোমার উচ্চারণ নিয়ে ধ্বনি-ধরে-ধ্বনি মতামত';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'পরিপূরক কোর্স';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]]-কে এই কোর্সের পাশাপাশি অন্য একটি কোর্স থেকেও উত্তর দিতে দেয়। সাধারণ ক্ষেত্রটি হলো শিক্ষার্থী পরিচিতি বা রিসোর্স সেন্টার: পরীক্ষার নীতি নিয়ে প্রশ্ন করলে কিছু না পাওয়ার বদলে সেখান থেকেই উত্তর মেলে। সেই কোর্সগুলো আগে থেকেই সূচিবদ্ধ থাকতে হবে, এবং লুকানো কোর্স উপেক্ষা করা হয়।';
+$string['coursesettings:supplemental_courses'] = 'কোর্স আইডি';
+$string['coursesettings:supplemental_inherit'] = 'সাইটব্যাপী তালিকা ({$a}) ব্যবহার করতে ফাঁকা রাখুন। এখানে দেওয়া মান এই কোর্সের জন্য সেই তালিকায় যুক্ত হয় না, বরং তার জায়গা নেয়, তাই পূর্ণ সেটটি লিখুন।';
+$string['coursesettings:supplemental_nosite'] = 'কোনোটিই না চাইলে ফাঁকা রাখুন। কোনো সাইটব্যাপী তালিকা নির্ধারিত নেই।';
+$string['settings:supplemental_courses'] = 'পরিপূরক কোর্স';
+$string['settings:supplemental_courses_desc'] = 'যে কোর্সগুলোর বিষয়বস্তু [[tutorshort]] উত্তর দেওয়ার সময়ও ব্যবহার করতে পারে, তাদের আইডি, কমা দিয়ে আলাদা। এমন উপকরণের জন্য ব্যবহার করুন যা অন্য কোর্সে থাকে অথচ সর্বত্র প্রযোজ্য, যেমন শিক্ষার্থী পরিচিতি বা রিসোর্স সেন্টার: তখন পরীক্ষার নীতি নিয়ে প্রশ্ন করলে কিছু না পাওয়ার বদলে ওই কোর্স থেকে উত্তর মেলে।
+
+কোর্সগুলো পুনরুদ্ধারের জন্য আগেই সূচিবদ্ধ থাকতে হবে; বাড়তি কিছু এম্বেড করা হয় না, তাই এখানে যোগ করা সঙ্গে সঙ্গে কাজ করে এবং কোনো খরচ নেই। লুকানো কোর্স উপেক্ষা করা হয়। তবে তালিকাভুক্ত কোর্সের ভেতরের কার্যক্রম সেভাবেই সূচিবদ্ধ হয় যেভাবে পুনঃসূচিকরণকারী প্রশাসক সেগুলো দেখেছিলেন, তাই কোনো লুকানো বা সীমাবদ্ধ কার্যক্রমের লেখা শিক্ষার্থীকে উদ্ধৃত করা হতে পারে, যদিও তার কোনো লিংক দেখানো হয় না। কেবল সেই কোর্সগুলোই তালিকাভুক্ত করুন যেগুলোর সম্পূর্ণ বিষয়বস্তু দর্শকদের জন্য উপযুক্ত। সর্বোচ্চ {$a}টি কোর্স। কোর্স-পর্যায়ের সেটিং, যেখানে আছে, এই তালিকায় যুক্ত হয় না বরং তার জায়গা নেয়।';

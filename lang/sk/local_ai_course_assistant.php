@@ -2618,3 +2618,30 @@ $string['settings:spend_export_key_desc'] = 'Kľúč typu Bearer pre mesačný e
 $string['task:migrate_course_embeddings'] = 'Migrácia jedného kurzu na nový model embeddingu';
 $string['task:model_price_drift_check'] = 'Kontrola odchýlok cien modelov';
 $string['task:run_model_benchmark'] = 'Benchmark modelu';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Vysvetli túto stránku';
+$string['starters:builtin_help_page_desc'] = 'Vysvetlí kľúčové pojmy z aktuálnej stránky lekcie';
+$string['starters:builtin_quiz'] = 'Otestuj ma';
+$string['starters:builtin_quiz_desc'] = 'Vytvorí cvičný kvíz na aktuálne učivo';
+$string['starters:builtin_study_plan'] = 'Študijný plán';
+$string['starters:builtin_study_plan_desc'] = 'Zostaví sústredený plán študijného bloku';
+$string['starters:builtin_ai_project_coach'] = 'AI projektový kouč';
+$string['starters:builtin_ai_project_coach_desc'] = 'Vedené koučovanie pre projekty a zadania kurzu';
+$string['starters:builtin_focus_next'] = 'Na čo sa mám zamerať?';
+$string['starters:builtin_focus_next_desc'] = 'Personalizované návrhy ďalšieho kroku podľa tvojho pokroku v cieľoch';
+$string['starters:builtin_ell_practice'] = 'Cvičenie reči';
+$string['starters:builtin_ell_practice_desc'] = 'Precvičovanie hovoreného rozhovoru s asistentom';
+$string['starters:builtin_ell_pronunciation'] = 'Nácvik výslovnosti';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Spätná väzba hláska po hláske k tvojej výslovnosti';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Doplnkové kurzy';
+$string['coursesettings:supplemental_desc'] = 'Umožní [[tutorshort]] odpovedať okrem tohto kurzu aj z iného. Obvyklým prípadom je úvodný kurz pre študentov alebo informačné centrum: kto sa pýta na pravidlá skúšok, dostane odpoveď odtiaľ namiesto žiadnej. Tieto kurzy už musia byť zaindexované a skryté kurzy sa ignorujú.';
+$string['coursesettings:supplemental_courses'] = 'ID kurzov';
+$string['coursesettings:supplemental_inherit'] = 'Nechajte prázdne na použitie celostránkového zoznamu ({$a}). Hodnota tu tento zoznam pre daný kurz nahrádza, nie dopĺňa, takže zadajte celú množinu.';
+$string['coursesettings:supplemental_nosite'] = 'Nechajte prázdne pre žiadne. Žiadny celostránkový zoznam nie je nastavený.';
+$string['settings:supplemental_courses'] = 'Doplnkové kurzy';
+$string['settings:supplemental_courses_desc'] = 'ID kurzov, ktorých obsah môže [[tutorshort]] pri odpovedaní tiež použiť, oddelené čiarkami. Použite pre materiál, ktorý je v inom kurze a platí všade, napríklad úvodný kurz pre študentov alebo informačné centrum: kto sa pýta na pravidlá skúšok, potom dostane odpoveď z toho kurzu namiesto žiadnej.
+
+Kurzy už musia byť zaindexované na vyhľadávanie; nič ďalšie sa nevkladá, takže pridanie je okamžité a nič nestojí. Skryté kurzy sa ignorujú. Činnosti vnútri uvedeného kurzu sa však indexujú tak, ako ich videl správca, ktorý kurz preindexoval, takže text skrytej alebo obmedzenej činnosti možno študentovi citovať, aj keď sa naň nezobrazí žiadny odkaz. Uvádzajte len kurzy, ktorých celý obsah je pre publikum vhodný. Najviac {$a} kurzov. Nastavenie na úrovni kurzu, ak existuje, tento zoznam nahrádza, nie dopĺňa.';

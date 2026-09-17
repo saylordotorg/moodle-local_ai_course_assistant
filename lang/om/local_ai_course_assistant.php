@@ -2650,3 +2650,30 @@ $string['settings:spend_export_key_desc'] = 'Furtuu Bearer endpoint baasa baasii
 $string['task:migrate_course_embeddings'] = 'Koorsii tokko gara moodeelii embedding haaraatti ceehumsiisi';
 $string['task:model_price_drift_check'] = 'To\'annoo drift gatii moodeelaa';
 $string['task:run_model_benchmark'] = 'Moodeelii benchmark godhi';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Fuula kana ibsi';
+$string['starters:builtin_help_page_desc'] = 'Yaadota ijoo fuula barnoota ammaa ibsa';
+$string['starters:builtin_quiz'] = 'Na qori';
+$string['starters:builtin_quiz_desc'] = 'Barnoota ammaa irratti qormaata shaakalaa uuma';
+$string['starters:builtin_study_plan'] = 'Karoora barumsaa';
+$string['starters:builtin_study_plan_desc'] = 'Karoora yeroo qayyabannaa xiyyeeffate uuma';
+$string['starters:builtin_ai_project_coach'] = 'AI Pirojektii Qoree';
+$string['starters:builtin_ai_project_coach_desc'] = 'Gorsa tarkaanfiin tarkaanfii pirojektii fi hojii koorsii';
+$string['starters:builtin_focus_next'] = 'Maalirratti xiyyeeffachuu qaba?';
+$string['starters:builtin_focus_next_desc'] = 'Guddina galma keetii irratti hundaa\'uun yaada tarkaanfii itti aanuu dhuunfaa';
+$string['starters:builtin_ell_practice'] = 'Dubbachuu shaakala';
+$string['starters:builtin_ell_practice_desc'] = 'Shaakala haasawa afaaniin gargaaraa waliin';
+$string['starters:builtin_ell_pronunciation'] = 'Dhaggeeffannaa';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Deebii sagalee sagaleen akkaataa jecha dubbattu irratti';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Koorsiiwwan dabalataa';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] koorsii kana malees koorsii biraa irraa deebii akka kennu heyyama. Haalli baratamaan koorsii seensaa barattootaa yookaan wiirtuu qabeenyaati: namni seera qormaataa gaafatu homaa dhabuu mannaa achi irraa deebii argata. Koorsiiwwan sun duraan galmeeffamanii jiraachuu qabu, koorsiiwwan dhokfaman ni tuffatamu.';
+$string['coursesettings:supplemental_courses'] = 'ID koorsii';
+$string['coursesettings:supplemental_inherit'] = 'Tarree sadarkaa saayitii ({$a}) fayyadamuuf duwwaa dhiisi. Gatiin asitti galfamu koorsii kanaaf tarree sana itti dabaluu mannaa bakka buʼa; kanaaf tuuta guutuu galchi.';
+$string['coursesettings:supplemental_nosite'] = 'Tokkollee yoo hin barbaadne duwwaa dhiisi. Tarreen sadarkaa saayitii hin qindaaʼne.';
+$string['settings:supplemental_courses'] = 'Koorsiiwwan dabalataa';
+$string['settings:supplemental_courses_desc'] = 'ID koorsiiwwan qabiyyee isaanii [[tutorshort]] yeroo deebii kennu fayyadamuu dandaʼu, qoodduudhaan adda baʼan. Meeshaa koorsii biraa keessa jiruuf garuu bakka hundatti hojjetuuf fayyadami, fakkeenyaaf koorsii seensaa barattootaa yookaan wiirtuu qabeenyaa: yeroo sana namni seera qormaataa gaafatu homaa dhabuu mannaa koorsii sana irraa deebii argata.
+
+Koorsiiwwan argamuuf duraan galmeeffamanii jiraachuu qabu; wanti dabalataa hin seenfamu, kanaaf as itti dabaluun yeroo sanatti hojjeta, baasiis hin qabu. Koorsiiwwan dhokfaman ni tuffatamu. Haa taʼu malee, sochiiwwan koorsii tarreeffame keessa jiran akkuma bulchaan irra deebiʼee galmeesse isaan argetti galmaaʼu; kanaaf barreeffamni sochii dhokate yookaan daangeffame barataaf caqasamuu ni dandaʼa, yoo hidhaan itti hin agarsiifamne illee. Koorsiiwwan qabiyyeen isaanii guutuun dubbistootaaf mijaaʼu qofa tarreessi. Baayʼinaan koorsii {$a}. Qindaaʼinni sadarkaa koorsii, yoo jiraate, tarree kana itti dabaluu mannaa bakka buʼa.';

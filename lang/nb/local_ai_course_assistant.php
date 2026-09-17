@@ -2617,3 +2617,30 @@ $string['settings:spend_export_key_desc'] = 'Bearer-nøkkel for det månedlige e
 $string['task:migrate_course_embeddings'] = 'Migrer ett emne til en ny embeddingmodell';
 $string['task:model_price_drift_check'] = 'Sjekk av modellprisavvik';
 $string['task:run_model_benchmark'] = 'Kjør benchmark på en modell';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Forklar denne siden';
+$string['starters:builtin_help_page_desc'] = 'Forklarer nøkkelbegrepene på den gjeldende leksjonssiden';
+$string['starters:builtin_quiz'] = 'Test meg';
+$string['starters:builtin_quiz_desc'] = 'Lager en øvingsquiz om det gjeldende stoffet';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Lager en fokusert plan for økten din';
+$string['starters:builtin_ai_project_coach'] = 'AI-prosjektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Veiledet støtte til prosjekter og oppgaver i emnet';
+$string['starters:builtin_focus_next'] = 'Hva bør jeg fokusere på?';
+$string['starters:builtin_focus_next_desc'] = 'Personlige forslag til neste steg basert på framgangen din på målene';
+$string['starters:builtin_ell_practice'] = 'Øv å snakke';
+$string['starters:builtin_ell_practice_desc'] = 'Øving på muntlig samtale med assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Uttaleøvelse';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Lyd-for-lyd tilbakemelding på uttalen din';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Supplerende emner';
+$string['coursesettings:supplemental_desc'] = 'Lar [[tutorshort]] svare ut fra et annet emne i tillegg til dette. Det vanlige tilfellet er en studieintroduksjon eller et ressurssenter: den som spør om eksamensreglene, får svaret derfra i stedet for ingenting. Emnene må allerede være indeksert, og skjulte emner ignoreres.';
+$string['coursesettings:supplemental_courses'] = 'Emne-id-er';
+$string['coursesettings:supplemental_inherit'] = 'La stå tomt for å bruke den nettstedsomfattende listen ({$a}). En verdi her erstatter den listen for dette emnet i stedet for å legge til, så oppgi hele settet.';
+$string['coursesettings:supplemental_nosite'] = 'La stå tomt for ingen. Ingen nettstedsomfattende liste er satt.';
+$string['settings:supplemental_courses'] = 'Supplerende emner';
+$string['settings:supplemental_courses_desc'] = 'Emne-id-er hvis innhold [[tutorshort]] også kan bruke når den svarer, atskilt med komma. Bruk det for materiale som ligger i et annet emne og gjelder overalt, som en studieintroduksjon eller et ressurssenter: den som spør om eksamensreglene, får da svaret fra det emnet i stedet for ingenting.
+
+Emnene må allerede være indeksert for henting; ingenting ekstra blir innebygd, så å legge til ett her virker umiddelbart og koster ingenting. Skjulte emner ignoreres. Aktiviteter inne i et oppført emne indekseres derimot slik administratoren som indekserte det på nytt så dem, så teksten i en skjult eller begrenset aktivitet kan siteres til en student selv om ingen lenke vises. Før bare opp emner der hele innholdet passer for målgruppen. Maks {$a} emner. En emneinnstilling erstatter, der den finnes, denne listen i stedet for å legge til.';

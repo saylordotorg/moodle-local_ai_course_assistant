@@ -2663,3 +2663,30 @@ $string['settings:spend_export_key_desc'] = 'Kitufe cha Bearer kwa kituo cha rip
 $string['task:migrate_course_embeddings'] = 'Hamisha kozi moja kwenye modeli mpya ya embedding';
 $string['task:model_price_drift_check'] = 'Ukaguzi wa mabadiliko ya bei ya modeli';
 $string['task:run_model_benchmark'] = 'Pima modeli kwa benchmark';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Eleza ukurasa huu';
+$string['starters:builtin_help_page_desc'] = 'Hufafanua dhana kuu za ukurasa wa somo la sasa';
+$string['starters:builtin_quiz'] = 'Nipime';
+$string['starters:builtin_quiz_desc'] = 'Hutengeneza jaribio la mazoezi kutoka kwa somo la sasa';
+$string['starters:builtin_study_plan'] = 'Mpango wa masomo';
+$string['starters:builtin_study_plan_desc'] = 'Hutengeneza mpango wa kipindi cha kusoma chenye mwelekeo';
+$string['starters:builtin_ai_project_coach'] = 'Kocha wa Miradi wa AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Mwongozo wa hatua kwa hatua kwa miradi na kazi za kozi';
+$string['starters:builtin_focus_next'] = 'Nizingatie nini?';
+$string['starters:builtin_focus_next_desc'] = 'Mapendekezo binafsi ya hatua inayofuata kulingana na maendeleo yako';
+$string['starters:builtin_ell_practice'] = 'Mazoezi ya kusema';
+$string['starters:builtin_ell_practice_desc'] = 'Mazoezi ya mazungumzo ya kusema na msaidizi';
+$string['starters:builtin_ell_pronunciation'] = 'Mazoezi ya matamshi';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Maoni sauti kwa sauti kuhusu matamshi yako';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kozi za nyongeza';
+$string['coursesettings:supplemental_desc'] = 'Huruhusu [[tutorshort]] kujibu pia kutoka kozi nyingine zaidi ya hii. Hali ya kawaida ni kozi ya utangulizi kwa wanafunzi au kituo cha rasilimali: anayeuliza kuhusu sera ya mitihani anapata jibu kutoka huko badala ya kutopata chochote. Kozi hizo lazima ziwe tayari zimeorodheshwa, na kozi zilizofichwa hupuuzwa.';
+$string['coursesettings:supplemental_courses'] = 'Vitambulisho vya kozi';
+$string['coursesettings:supplemental_inherit'] = 'Acha wazi ili kutumia orodha ya tovuti nzima ({$a}). Thamani hapa inachukua nafasi ya orodha hiyo kwa kozi hii badala ya kuiongezea, kwa hiyo weka seti kamili.';
+$string['coursesettings:supplemental_nosite'] = 'Acha wazi ili kutokuwa na yoyote. Hakuna orodha ya tovuti nzima iliyowekwa.';
+$string['settings:supplemental_courses'] = 'Kozi za nyongeza';
+$string['settings:supplemental_courses_desc'] = 'Vitambulisho vya kozi ambazo maudhui yake [[tutorshort]] anaweza pia kutumia anapojibu, vikitenganishwa kwa mikato. Tumia kwa nyenzo zinazokaa katika kozi nyingine lakini zinafaa kila mahali, kama kozi ya utangulizi kwa wanafunzi au kituo cha rasilimali: anayeuliza kuhusu sera ya mitihani basi anapata jibu kutoka kozi hiyo badala ya kutopata chochote.
+
+Kozi lazima ziwe tayari zimeorodheshwa kwa upatikanaji; hakuna kinachopachikwa zaidi, hivyo kuongeza hapa kunaanza kufanya kazi mara moja na hakugharimu chochote. Kozi zilizofichwa hupuuzwa. Hata hivyo, shughuli ndani ya kozi iliyoorodheshwa huorodheshwa kama alivyoziona msimamizi aliyeiorodhesha upya, hivyo maandishi ya shughuli iliyofichwa au yenye vikwazo yanaweza kunukuliwa kwa mwanafunzi hata kama hakuna kiungo kinachoonyeshwa. Orodhesha tu kozi ambazo maudhui yake yote yanafaa kwa hadhira. Upeo wa kozi {$a}. Mpangilio wa ngazi ya kozi, panapokuwapo, huchukua nafasi ya orodha hii badala ya kuiongezea.';
