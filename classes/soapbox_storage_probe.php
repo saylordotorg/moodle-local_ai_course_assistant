@@ -121,11 +121,19 @@ class soapbox_storage_probe {
         // 2. PUT.
         try {
             $puturl = $storage->presign_put($key, 300);
+            // curl::put() streams the body from a file on disk: it tests the
+            // 'file' value with is_file() and returns null WITHOUT issuing any
+            // request when that fails. Passing the body inline therefore never
+            // reached S3, and reported as HTTP 0 -- indistinguishable from a
+            // network failure. Stage the probe body in the per-request temp
+            // directory, which Moodle clears at the end of the request.
+            $tmpfile = make_request_directory() . '/soapbox-probe.txt';
+            file_put_contents($tmpfile, $body);
             $curl = new \curl();
             // Same reason as soapbox_storage::delete_object(): Moodle's curl helpers
             // add an Authorization header, and S3 refuses a request carrying both
             // that and a query-string SigV4 signature.
-            $curl->put($puturl, ['file' => $body], ['CURLOPT_HTTPHEADER' => ['Authorization:']]);
+            $curl->put($puturl, ['file' => $tmpfile], ['CURLOPT_HTTPHEADER' => ['Authorization:']]);
             $code = (int) ($curl->get_info()['http_code'] ?? 0);
             if ($code >= 200 && $code < 300) {
                 $uploaded = true;
