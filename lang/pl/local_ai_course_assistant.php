@@ -2634,3 +2634,14 @@ $string['starters:builtin_ell_practice'] = 'Ćwiczenie mówienia';
 $string['starters:builtin_ell_practice_desc'] = 'Ćwiczenie rozmowy na głos z asystentem';
 $string['starters:builtin_ell_pronunciation'] = 'Ćwiczenie wymowy';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Informacja zwrotna głoska po głosce o twojej wymowie';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kursy uzupełniające';
+$string['coursesettings:supplemental_desc'] = 'Pozwala [[tutorshort]] odpowiadać również na podstawie innego kursu, nie tylko tego. Typowy przypadek to orientacja dla studentów lub centrum zasobów: osoba pytająca o zasady egzaminów dostaje odpowiedź stamtąd zamiast żadnej. Te kursy muszą być już zindeksowane, a kursy ukryte są pomijane.';
+$string['coursesettings:supplemental_courses'] = 'Identyfikatory kursów';
+$string['coursesettings:supplemental_inherit'] = 'Pozostaw puste, aby użyć listy z poziomu witryny ({$a}). Wartość podana tutaj zastępuje tę listę dla tego kursu, a nie dodaje się do niej — podaj więc pełny zestaw.';
+$string['coursesettings:supplemental_nosite'] = 'Pozostaw puste, aby nie używać żadnego. Nie ustawiono listy z poziomu witryny.';
+$string['settings:supplemental_courses'] = 'Kursy uzupełniające';
+$string['settings:supplemental_courses_desc'] = 'Identyfikatory kursów, z których treści [[tutorshort]] może również korzystać przy odpowiadaniu, oddzielone przecinkami. Używaj do materiałów, które znajdują się w innym kursie i obowiązują wszędzie, jak orientacja dla studentów lub centrum zasobów: osoba pytająca o zasady egzaminów dostaje wtedy odpowiedź z tamtego kursu zamiast żadnej.
+
+Kursy muszą być już zindeksowane na potrzeby wyszukiwania; nic dodatkowego nie jest osadzane, więc dodanie kursu tutaj działa natychmiast i nic nie kosztuje. Kursy ukryte są pomijane, więc nie da się w ten sposób udostępnić materiałów, których student nie powinien widzieć. Maksymalnie {$a} kursów. Ustawienie na poziomie kursu, jeśli istnieje, zastępuje tę listę, a nie dodaje się do niej.';

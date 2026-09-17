@@ -2678,3 +2678,14 @@ $string['starters:builtin_ell_practice'] = 'Latihan bercakap';
 $string['starters:builtin_ell_practice_desc'] = 'Latihan perbualan lisan bersama pembantu';
 $string['starters:builtin_ell_pronunciation'] = 'Latihan sebutan';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Maklum balas bunyi demi bunyi tentang sebutan anda';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kursus tambahan';
+$string['coursesettings:supplemental_desc'] = 'Membolehkan [[tutorshort]] menjawab daripada kursus lain selain kursus ini. Kes biasa ialah orientasi pelajar atau pusat sumber: yang bertanya tentang dasar peperiksaan mendapat jawapannya dari situ dan bukan tiada apa-apa. Kursus tersebut mesti sudah diindeks, dan kursus tersembunyi diabaikan.';
+$string['coursesettings:supplemental_courses'] = 'ID kursus';
+$string['coursesettings:supplemental_inherit'] = 'Biarkan kosong untuk menggunakan senarai peringkat laman ({$a}). Nilai di sini menggantikan senarai itu bagi kursus ini, bukan menambahnya, jadi masukkan set penuh.';
+$string['coursesettings:supplemental_nosite'] = 'Biarkan kosong untuk tiada. Tiada senarai peringkat laman ditetapkan.';
+$string['settings:supplemental_courses'] = 'Kursus tambahan';
+$string['settings:supplemental_courses_desc'] = 'ID kursus yang kandungannya boleh juga digunakan [[tutorshort]] semasa menjawab, dipisahkan koma. Gunakan untuk bahan yang berada dalam kursus lain tetapi terpakai di mana-mana, seperti orientasi pelajar atau pusat sumber: yang bertanya tentang dasar peperiksaan kemudian mendapat jawapannya daripada kursus itu dan bukan tiada apa-apa.
+
+Kursus mesti sudah diindeks untuk capaian; tiada apa-apa tambahan dibenamkan, jadi menambahnya di sini berkuat kuasa serta-merta dan tidak berkos. Kursus tersembunyi diabaikan, jadi ini tidak boleh digunakan untuk mendedahkan bahan yang tidak sepatutnya dilihat pelajar. Maksimum {$a} kursus. Tetapan peringkat kursus, jika ada, menggantikan senarai ini dan bukan menambahnya.';

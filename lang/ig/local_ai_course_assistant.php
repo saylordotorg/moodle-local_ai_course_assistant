@@ -2649,3 +2649,14 @@ $string['starters:builtin_ell_practice'] = 'Ịmụta ikwu okwu';
 $string['starters:builtin_ell_practice_desc'] = 'Omume mkparịta ụka ekwuru ekwu ya na onye enyemaka';
 $string['starters:builtin_ell_pronunciation'] = 'Ọmụma ịkpọ okwu';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Nzaghachi ụda n\'ụda maka otu i si akpọ okwu';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Ụsọrọ ihe ọmụmụ mgbakwunye';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] nwere ike ịza site na usoro ihe ọmụmụ ọzọ na mgbakwunye na nke a. Ọnọdụ a na-ahụkarị bụ usoro ntọala maka ụmụ akwụkwọ ma ọ bụ ebe akụrụngwa: onye na-ajụ maka iwu ule na-enweta azịza site n\'ebe ahụ kama ọ ghara inweta ihe ọ bụla. Usoro ihe ọmụmụ ndị ahụ ga-abụrịrị ndị edepụtalarị, a na-eleghara usoro ihe ọmụmụ zoro ezo anya.';
+$string['coursesettings:supplemental_courses'] = 'ID usoro ihe ọmụmụ';
+$string['coursesettings:supplemental_inherit'] = 'Hapụ ya efu iji jiri ndepụta saịtị dum ({$a}). Uru dị ebe a na-anọchi ndepụta ahụ maka usoro ihe ọmụmụ a kama ịgbakwunye na ya, ya mere tinye ihe niile.';
+$string['coursesettings:supplemental_nosite'] = 'Hapụ ya efu ma ọ bụrụ na ọ dịghị nke a chọrọ. E nweghị ndepụta saịtị dum edobere.';
+$string['settings:supplemental_courses'] = 'Ụsọrọ ihe ọmụmụ mgbakwunye';
+$string['settings:supplemental_courses_desc'] = 'ID nke usoro ihe ọmụmụ ndị [[tutorshort]] nwere ike iji ọdịnaya ha mgbe ọ na-aza, kewara ha site na rikoma. Jiri ya maka ihe dị n\'usoro ihe ọmụmụ ọzọ mana metụtara ebe niile, dị ka usoro ntọala maka ụmụ akwụkwọ ma ọ bụ ebe akụrụngwa: mgbe ahụ onye na-ajụ maka iwu ule na-enweta azịza site na usoro ihe ọmụmụ ahụ kama ọ ghara inweta ihe ọ bụla.
+
+Usoro ihe ọmụmụ ahụ ga-abụrịrị ndị edepụtalarị maka nweta; ọ dịghị ihe ọzọ a na-etinye, ya mere ịgbakwunye otu ebe a na-arụ ọrụ ozugbo ma ọ naghị efu ihe ọ bụla. A na-eleghara usoro ihe ọmụmụ zoro ezo anya, ya mere enweghị ike iji nke a gosipụta ihe nwa akwụkwọ na-ekwesịghị ịhụ. Kacha {$a} usoro ihe ọmụmụ. Ntọala n\'ọkwa usoro ihe ọmụmụ, ebe ọ dị, na-anọchi ndepụta a kama ịgbakwunye na ya.';

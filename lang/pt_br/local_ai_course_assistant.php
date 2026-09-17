@@ -2655,3 +2655,14 @@ $string['starters:builtin_ell_practice'] = 'Praticar a fala';
 $string['starters:builtin_ell_practice_desc'] = 'Prática de conversa falada com o assistente';
 $string['starters:builtin_ell_pronunciation'] = 'Prática de pronúncia';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Feedback som a som sobre a sua pronúncia';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Cursos complementares';
+$string['coursesettings:supplemental_desc'] = 'Permite que [[tutorshort]] responda também a partir de outro curso, além deste. O caso comum é uma orientação ao estudante ou um centro de recursos: quem pergunta sobre a política de provas recebe a resposta de lá em vez de nada. Esses cursos já precisam estar indexados, e cursos ocultos são ignorados.';
+$string['coursesettings:supplemental_courses'] = 'IDs de curso';
+$string['coursesettings:supplemental_inherit'] = 'Deixe vazio para usar a lista do site ({$a}). Um valor aqui substitui essa lista para este curso em vez de somar-se a ela, então informe o conjunto completo.';
+$string['coursesettings:supplemental_nosite'] = 'Deixe vazio para nenhum. Nenhuma lista do site está definida.';
+$string['settings:supplemental_courses'] = 'Cursos complementares';
+$string['settings:supplemental_courses_desc'] = 'IDs de cursos cujo conteúdo [[tutorshort]] também pode usar ao responder, separados por vírgulas. Use para material que fica em outro curso e vale em todo lugar, como uma orientação ao estudante ou um centro de recursos: quem pergunta sobre a política de provas recebe então a resposta daquele curso em vez de nada.
+
+Os cursos já precisam estar indexados para a recuperação; nada extra é incorporado, então adicionar um aqui é imediato e não custa nada. Cursos ocultos são ignorados, de modo que isto não serve para expor material que o estudante não deve ver. Máximo de {$a} cursos. Uma configuração por curso, quando existir, substitui esta lista em vez de somar-se a ela.';

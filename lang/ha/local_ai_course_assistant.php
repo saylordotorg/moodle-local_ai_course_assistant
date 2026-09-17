@@ -2662,3 +2662,14 @@ $string['starters:builtin_ell_practice'] = 'Yi magana';
 $string['starters:builtin_ell_practice_desc'] = 'Aikin tattaunawa da baki tare da mataimakin';
 $string['starters:builtin_ell_pronunciation'] = 'Aikin furta';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Amsa sauti-bayan-sauti kan yadda kake furta kalmomi';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Ƙarin kwasa-kwasai';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] yana iya amsawa daga wani kwas ma, ban da wannan. Yanayin da aka saba shi ne kwas ɗin gabatarwa ga ɗalibai ko cibiyar albarkatu: wanda ya tambaya game da ka\'idar jarrabawa yana samun amsa daga can maimakon kome. Dole ne waɗannan kwasa-kwasan su riga sun kasance cikin fihirisa, kuma ana watsi da kwasa-kwasan ɓoyayyu.';
+$string['coursesettings:supplemental_courses'] = 'ID na kwas';
+$string['coursesettings:supplemental_inherit'] = 'Bar shi babu komai don amfani da jerin gabaɗayan shafin ({$a}). Ƙima a nan tana maye gurbin wannan jeri ga wannan kwas maimakon ƙarawa a kansa, don haka shigar da cikakken saitin.';
+$string['coursesettings:supplemental_nosite'] = 'Bar shi babu komai idan ba a so ko ɗaya. Ba a saita jerin gabaɗayan shafin ba.';
+$string['settings:supplemental_courses'] = 'Ƙarin kwasa-kwasai';
+$string['settings:supplemental_courses_desc'] = 'ID na kwasa-kwasan da [[tutorshort]] zai iya amfani da abubuwan da ke cikinsu yayin amsawa, a raba da waƙafi. Yi amfani da shi don kayan da ke wani kwas amma sun shafi ko\'ina, kamar kwas ɗin gabatarwa ga ɗalibai ko cibiyar albarkatu: sannan wanda ya tambaya game da ka\'idar jarrabawa yana samun amsa daga wannan kwas maimakon kome.
+
+Dole ne kwasa-kwasan su riga sun kasance cikin fihirisa domin dawowa; ba a ƙara saka wani abu ba, don haka ƙara ɗaya a nan yana aiki nan take kuma ba ya kashe kuɗi. Ana watsi da kwasa-kwasan ɓoyayyu, don haka ba za a iya amfani da wannan wajen bayyana kayan da bai kamata ɗalibi ya gani ba. Iyaka {$a} kwasa-kwasai. Saitin matakin kwas, inda yake, yana maye gurbin wannan jeri maimakon ƙarawa a kansa.';

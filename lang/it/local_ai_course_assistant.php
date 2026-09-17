@@ -2675,3 +2675,14 @@ $string['starters:builtin_ell_practice'] = 'Pratica del parlato';
 $string['starters:builtin_ell_practice_desc'] = 'Pratica di conversazione parlata con l\'assistente';
 $string['starters:builtin_ell_pronunciation'] = 'Pratica pronuncia';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Riscontro suono per suono sulla tua pronuncia';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Corsi supplementari';
+$string['coursesettings:supplemental_desc'] = 'Consente a [[tutorshort]] di rispondere anche a partire da un altro corso, oltre a questo. Il caso tipico è un orientamento per studenti o un centro risorse: chi chiede della politica d\'esame ottiene la risposta da lì invece di nulla. Quei corsi devono essere già indicizzati, e i corsi nascosti vengono ignorati.';
+$string['coursesettings:supplemental_courses'] = 'ID dei corsi';
+$string['coursesettings:supplemental_inherit'] = 'Lascia vuoto per usare l\'elenco del sito ({$a}). Un valore qui sostituisce quell\'elenco per questo corso invece di aggiungersi: inserisci quindi l\'insieme completo.';
+$string['coursesettings:supplemental_nosite'] = 'Lascia vuoto per nessuno. Non è impostato alcun elenco del sito.';
+$string['settings:supplemental_courses'] = 'Corsi supplementari';
+$string['settings:supplemental_courses_desc'] = 'ID dei corsi il cui contenuto [[tutorshort]] può usare anche nel rispondere, separati da virgole. Da usare per materiale che vive in un altro corso e vale ovunque, come un orientamento per studenti o un centro risorse: chi chiede della politica d\'esame ottiene allora la risposta da quel corso invece di nulla.
+
+I corsi devono essere già indicizzati per il recupero; non viene incorporato nulla di aggiuntivo, quindi aggiungerne uno qui è immediato e non costa nulla. I corsi nascosti vengono ignorati, perciò questo non può servire a mostrare materiale che uno studente non deve vedere. Massimo {$a} corsi. Un\'impostazione per corso, dove presente, sostituisce questo elenco invece di aggiungersi.';

@@ -2658,9 +2658,11 @@ if ($hassiteconfig) {
     // can write down, this covers answers that already exist as a course.
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/supplemental_courses',
-        get_string('settings:supplemental_courses', 'local_ai_course_assistant'),
-        get_string('settings:supplemental_courses_desc', 'local_ai_course_assistant',
-            \local_ai_course_assistant\supplemental_sources::MAX_COURSES),
+        \local_ai_course_assistant\branding::str('settings:supplemental_courses'),
+        \local_ai_course_assistant\branding::str(
+            'settings:supplemental_courses_desc',
+            \local_ai_course_assistant\supplemental_sources::MAX_COURSES
+        ),
         '',
         PARAM_RAW_TRIMMED
     ));

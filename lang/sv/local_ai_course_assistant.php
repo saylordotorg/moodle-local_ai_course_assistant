@@ -2634,3 +2634,14 @@ $string['starters:builtin_ell_practice'] = 'Övning i tal';
 $string['starters:builtin_ell_practice_desc'] = 'Övning i talad konversation med assistenten';
 $string['starters:builtin_ell_pronunciation'] = 'Uttalsbövning';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Ljud-för-ljud-återkoppling på ditt uttal';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kompletterande kurser';
+$string['coursesettings:supplemental_desc'] = 'Låter [[tutorshort]] svara även utifrån en annan kurs, utöver den här. Det vanliga fallet är en studentintroduktion eller ett resurscentrum: den som frågar om tentamenspolicyn får svaret därifrån i stället för inget. Kurserna måste redan vara indexerade, och dolda kurser ignoreras.';
+$string['coursesettings:supplemental_courses'] = 'Kurs-ID:n';
+$string['coursesettings:supplemental_inherit'] = 'Lämna tomt för att använda den webbplatsgemensamma listan ({$a}). Ett värde här ersätter den listan för denna kurs i stället för att läggas till, så ange hela uppsättningen.';
+$string['coursesettings:supplemental_nosite'] = 'Lämna tomt för inga. Ingen webbplatsgemensam lista är angiven.';
+$string['settings:supplemental_courses'] = 'Kompletterande kurser';
+$string['settings:supplemental_courses_desc'] = 'Kurs-ID:n vars innehåll [[tutorshort]] också får använda när den svarar, separerade med kommatecken. Använd för material som ligger i en annan kurs och gäller överallt, som en studentintroduktion eller ett resurscentrum: den som frågar om tentamenspolicyn får då svaret från den kursen i stället för inget.
+
+Kurserna måste redan vara indexerade för hämtning; inget extra bäddas in, så att lägga till en här verkar direkt och kostar ingenting. Dolda kurser ignoreras, så detta kan inte användas för att visa material som en student inte ska se. Högst {$a} kurser. En kursinställning ersätter, där den finns, denna lista i stället för att läggas till.';

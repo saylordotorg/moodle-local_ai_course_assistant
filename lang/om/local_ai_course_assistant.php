@@ -2666,3 +2666,14 @@ $string['starters:builtin_ell_practice'] = 'Dubbachuu shaakala';
 $string['starters:builtin_ell_practice_desc'] = 'Shaakala haasawa afaaniin gargaaraa waliin';
 $string['starters:builtin_ell_pronunciation'] = 'Dhaggeeffannaa';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Deebii sagalee sagaleen akkaataa jecha dubbattu irratti';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Koorsiiwwan dabalataa';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] koorsii kana malees koorsii biraa irraa deebii akka kennu heyyama. Haalli baratamaan koorsii seensaa barattootaa yookaan wiirtuu qabeenyaati: namni seera qormaataa gaafatu homaa dhabuu mannaa achi irraa deebii argata. Koorsiiwwan sun duraan galmeeffamanii jiraachuu qabu, koorsiiwwan dhokfaman ni tuffatamu.';
+$string['coursesettings:supplemental_courses'] = 'ID koorsii';
+$string['coursesettings:supplemental_inherit'] = 'Tarree sadarkaa saayitii ({$a}) fayyadamuuf duwwaa dhiisi. Gatiin asitti galfamu koorsii kanaaf tarree sana itti dabaluu mannaa bakka buʼa; kanaaf tuuta guutuu galchi.';
+$string['coursesettings:supplemental_nosite'] = 'Tokkollee yoo hin barbaadne duwwaa dhiisi. Tarreen sadarkaa saayitii hin qindaaʼne.';
+$string['settings:supplemental_courses'] = 'Koorsiiwwan dabalataa';
+$string['settings:supplemental_courses_desc'] = 'ID koorsiiwwan qabiyyee isaanii [[tutorshort]] yeroo deebii kennu fayyadamuu dandaʼu, qoodduudhaan adda baʼan. Meeshaa koorsii biraa keessa jiruuf garuu bakka hundatti hojjetuuf fayyadami, fakkeenyaaf koorsii seensaa barattootaa yookaan wiirtuu qabeenyaa: yeroo sana namni seera qormaataa gaafatu homaa dhabuu mannaa koorsii sana irraa deebii argata.
+
+Koorsiiwwan argamuuf duraan galmeeffamanii jiraachuu qabu; wanti dabalataa hin seenfamu, kanaaf as itti dabaluun yeroo sanatti hojjeta, baasiis hin qabu. Koorsiiwwan dhokfaman ni tuffatamu, kanaaf kanaan meeshaa barataan arguu hin qabne mulʼisuun hin dandaʼamu. Baayʼinaan koorsii {$a}. Qindaaʼinni sadarkaa koorsii, yoo jiraate, tarree kana itti dabaluu mannaa bakka buʼa.';

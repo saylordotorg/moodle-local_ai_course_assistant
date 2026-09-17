@@ -2655,3 +2655,14 @@ $string['starters:builtin_ell_practice'] = 'Luyện nói';
 $string['starters:builtin_ell_practice_desc'] = 'Luyện hội thoại nói với trợ lý';
 $string['starters:builtin_ell_pronunciation'] = 'Luyện phát âm';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Phản hồi từng âm về cách bạn phát âm';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Khóa học bổ sung';
+$string['coursesettings:supplemental_desc'] = 'Cho phép [[tutorshort]] trả lời từ một khóa học khác bên cạnh khóa này. Trường hợp thường gặp là khóa định hướng cho sinh viên hoặc trung tâm tài nguyên: người hỏi về quy định thi sẽ nhận câu trả lời từ đó thay vì không có gì. Các khóa đó phải đã được lập chỉ mục, và khóa bị ẩn sẽ bị bỏ qua.';
+$string['coursesettings:supplemental_courses'] = 'ID khóa học';
+$string['coursesettings:supplemental_inherit'] = 'Để trống để dùng danh sách toàn site ({$a}). Giá trị ở đây thay thế danh sách đó cho khóa này chứ không cộng thêm, nên hãy nhập trọn bộ.';
+$string['coursesettings:supplemental_nosite'] = 'Để trống nếu không dùng khóa nào. Chưa đặt danh sách toàn site.';
+$string['settings:supplemental_courses'] = 'Khóa học bổ sung';
+$string['settings:supplemental_courses_desc'] = 'ID của các khóa học mà [[tutorshort]] cũng được dùng nội dung khi trả lời, phân tách bằng dấu phẩy. Dùng cho tài liệu nằm ở khóa khác nhưng áp dụng ở mọi nơi, như khóa định hướng cho sinh viên hoặc trung tâm tài nguyên: khi đó người hỏi về quy định thi sẽ nhận câu trả lời từ khóa ấy thay vì không có gì.
+
+Các khóa phải đã được lập chỉ mục để truy xuất; không nhúng thêm gì cả, nên thêm một khóa ở đây có hiệu lực ngay và không tốn chi phí. Khóa bị ẩn sẽ bị bỏ qua, nên không thể dùng cách này để lộ tài liệu mà người học không được xem. Tối đa {$a} khóa. Thiết lập ở cấp khóa học, nếu có, sẽ thay thế danh sách này chứ không cộng thêm.';

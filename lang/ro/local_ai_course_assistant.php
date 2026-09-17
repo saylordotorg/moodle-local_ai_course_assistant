@@ -2634,3 +2634,14 @@ $string['starters:builtin_ell_practice'] = 'Practică vorbirea';
 $string['starters:builtin_ell_practice_desc'] = 'Exersarea conversației vorbite cu asistentul';
 $string['starters:builtin_ell_pronunciation'] = 'Practică pronunție';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Feedback sunet cu sunet despre pronunția ta';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Cursuri suplimentare';
+$string['coursesettings:supplemental_desc'] = 'Permite [[tutorshort]] să răspundă și pe baza altui curs, nu doar a acestuia. Cazul obișnuit este o orientare pentru studenți sau un centru de resurse: cine întreabă despre regulile de examen primește răspunsul de acolo în loc de niciunul. Acele cursuri trebuie să fie deja indexate, iar cursurile ascunse sunt ignorate.';
+$string['coursesettings:supplemental_courses'] = 'ID-uri de curs';
+$string['coursesettings:supplemental_inherit'] = 'Lăsați gol pentru a folosi lista de la nivelul site-ului ({$a}). O valoare aici înlocuiește acea listă pentru acest curs în loc să i se adauge, deci introduceți setul complet.';
+$string['coursesettings:supplemental_nosite'] = 'Lăsați gol pentru niciunul. Nu este setată nicio listă la nivelul site-ului.';
+$string['settings:supplemental_courses'] = 'Cursuri suplimentare';
+$string['settings:supplemental_courses_desc'] = 'ID-uri de cursuri al căror conținut [[tutorshort]] îl poate folosi și la răspuns, separate prin virgule. Folosiți-le pentru materiale care se află în alt curs și se aplică peste tot, precum o orientare pentru studenți sau un centru de resurse: cine întreabă despre regulile de examen primește atunci răspunsul din acel curs în loc de niciunul.
+
+Cursurile trebuie să fie deja indexate pentru regăsire; nu se încorporează nimic în plus, așa că adăugarea unuia aici are efect imediat și nu costă nimic. Cursurile ascunse sunt ignorate, deci acest lucru nu poate fi folosit pentru a expune materiale pe care un student nu trebuie să le vadă. Maximum {$a} cursuri. O setare pe curs, acolo unde există, înlocuiește această listă în loc să i se adauge.';

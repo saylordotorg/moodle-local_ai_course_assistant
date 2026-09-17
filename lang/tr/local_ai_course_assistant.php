@@ -2635,3 +2635,14 @@ $string['starters:builtin_ell_practice'] = 'Konuşma pratiği';
 $string['starters:builtin_ell_practice_desc'] = 'Asistanla sesli konuşma pratiği';
 $string['starters:builtin_ell_pronunciation'] = 'Telaffuz pratiği';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Telaffuzun için ses ses geri bildirim';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Tamamlayıcı dersler';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] bu dersin yanı sıra başka bir dersten de yanıt verebilir. Olağan durum bir öğrenci oryantasyonu veya kaynak merkezidir: sınav kurallarını soran biri yanıtı hiç yanıt almamak yerine oradan alır. Bu derslerin önceden dizinlenmiş olması gerekir ve gizli dersler yok sayılır.';
+$string['coursesettings:supplemental_courses'] = 'Ders kimlikleri';
+$string['coursesettings:supplemental_inherit'] = 'Site genelindeki listeyi kullanmak için boş bırakın ({$a}). Buradaki bir değer o listeye eklenmez, bu ders için onun yerine geçer; bu yüzden tüm kümeyi girin.';
+$string['coursesettings:supplemental_nosite'] = 'Hiçbiri için boş bırakın. Site genelinde bir liste ayarlanmamış.';
+$string['settings:supplemental_courses'] = 'Tamamlayıcı dersler';
+$string['settings:supplemental_courses_desc'] = 'İçeriğinden [[tutorshort]] yanıt verirken de yararlanabileceği ders kimlikleri, virgülle ayrılmış. Başka bir derste duran ve her yerde geçerli olan materyal için kullanın: öğrenci oryantasyonu ya da kaynak merkezi gibi. O zaman sınav kurallarını soran biri yanıtı hiç yanıt almamak yerine o dersten alır.
+
+Derslerin getirme için önceden dizinlenmiş olması gerekir; fazladan hiçbir şey gömülmez, bu yüzden buraya bir ders eklemek anında etkili olur ve hiçbir maliyeti yoktur. Gizli dersler yok sayılır, dolayısıyla bu, bir öğrencinin görmemesi gereken materyali açığa çıkarmak için kullanılamaz. En fazla {$a} ders. Ders düzeyinde bir ayar varsa bu listeye eklenmez, onun yerine geçer.';

@@ -2676,3 +2676,14 @@ $string['starters:builtin_ell_practice'] = 'Beszéd gyakorlása';
 $string['starters:builtin_ell_practice_desc'] = 'Beszélt társalgás gyakorlása az asszisztenssel';
 $string['starters:builtin_ell_pronunciation'] = 'Kiejtés gyakorlás';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Hangról hangra visszajelzés a kiejtésedről';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kiegészítő kurzusok';
+$string['coursesettings:supplemental_desc'] = 'Lehetővé teszi, hogy a [[tutorshort]] ezen a kurzuson kívül egy másikból is válaszoljon. A szokásos eset egy hallgatói bevezető vagy forrásközpont: aki a vizsgaszabályzatról kérdez, onnan kapja meg a választ a semmi helyett. Ezeknek a kurzusoknak már indexeltnek kell lenniük, a rejtett kurzusokat a rendszer figyelmen kívül hagyja.';
+$string['coursesettings:supplemental_courses'] = 'Kurzusazonosítók';
+$string['coursesettings:supplemental_inherit'] = 'Hagyja üresen az oldalszintű lista használatához ({$a}). Az itt megadott érték felváltja azt a listát ehhez a kurzushoz, nem kiegészíti, ezért adja meg a teljes halmazt.';
+$string['coursesettings:supplemental_nosite'] = 'Hagyja üresen, ha egyiket sem szeretné. Nincs beállítva oldalszintű lista.';
+$string['settings:supplemental_courses'] = 'Kiegészítő kurzusok';
+$string['settings:supplemental_courses_desc'] = 'Azoknak a kurzusoknak az azonosítói, amelyek tartalmát a [[tutorshort]] válaszadáskor szintén felhasználhatja, vesszővel elválasztva. Olyan anyaghoz használja, amely másik kurzuson él és mindenhol érvényes, például hallgatói bevezető vagy forrásközpont: aki a vizsgaszabályzatról kérdez, akkor abból a kurzusból kapja meg a választ a semmi helyett.
+
+A kurzusoknak már indexeltnek kell lenniük a visszakereséshez; semmi többlet nem kerül beágyazásra, így egy kurzus hozzáadása azonnal hat és semmibe sem kerül. A rejtett kurzusokat a rendszer figyelmen kívül hagyja, ezért ezzel nem lehet olyan anyagot megjeleníteni, amelyet a hallgatónak nem szabad látnia. Legfeljebb {$a} kurzus. A kurzusszintű beállítás, ahol van, felváltja ezt a listát, nem egészíti ki.';

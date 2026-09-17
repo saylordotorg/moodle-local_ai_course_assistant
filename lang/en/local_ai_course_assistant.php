@@ -1044,7 +1044,7 @@ $string['starters:course_section']  = 'Conversation starters';
 $string['starters:course_desc']     = 'Enable or disable individual starters for this course.';
 
 // Built-in starter chip labels and help text (the title= tooltip on each chip).
-// These were literal English in starter_manager::get_defaults() until v7.4.10,
+// These were literal English in starter_manager::get_defaults() until v7.5.0,
 // so a learner on a Spanish site read Spanish everywhere except the chips.
 $string['starters:builtin_help_page']              = 'Explain This Page';
 $string['starters:builtin_help_page_desc']         = 'Explains key concepts from the current lesson page';

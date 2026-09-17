@@ -2655,3 +2655,14 @@ $string['starters:builtin_ell_practice'] = 'Taxawaay ci wax-waxu';
 $string['starters:builtin_ell_practice_desc'] = 'Jàngale waxtaan ci làmmiñ ak jëfandikukat bi';
 $string['starters:builtin_ell_pronunciation'] = 'Liggéeyu baat';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Delluwaat ci baat ci baat ci ni ngay wax baat yi';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kurs yu dolliku';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] mën na tontu it ci beneen kurs, waxuma kurs bii rekk. Li gën a ame moo di kurs bu jubbanti ndongo yi walla barab bu am jumtukaay: ku laaj ci sart yu ekzame yi dana am tontu foofu, ci biir amul dara. Kurs yooyu warees na leen indeks ba noppi, te kurs yu nëbbu ñungi leen di bàyyi.';
+$string['coursesettings:supplemental_courses'] = 'ID yu kurs';
+$string['coursesettings:supplemental_inherit'] = 'Bàyyil ko neen ngir jëfandikoo listu sit bi bépp ({$a}). Njëg mu nekk fii dafay wuutu list boobu ci kurs bii, du ci yokk, kon bindal mbooloo mi bépp.';
+$string['coursesettings:supplemental_nosite'] = 'Bàyyil ko neen su la neexul menn. Amul listu sit bi bépp bu ñu tëral.';
+$string['settings:supplemental_courses'] = 'Kurs yu dolliku';
+$string['settings:supplemental_courses_desc'] = 'ID yu kurs yu [[tutorshort]] mën a jëfandikoo seen njël bu muy tontu, ñu leen xaajale ak virgil. Jëfandikool ko ci njël mu nekk ci beneen kurs waaye mu jëm ci fépp, ni kurs bu jubbanti ndongo yi walla barab bu am jumtukaay: booba ku laaj ci sart yu ekzame yi dana am tontu ci kurs boobu, ci biir amul dara.
+
+Kurs yi warees na leen indeks ba noppi ngir ñu leen mëna wut; dañuy dolli dara ci embedding, kon dolli benn fii day dox ci saa si te du jëf xaalis. Kurs yu nëbbu ñungi leen di bàyyi, kon kii mënuñu koo jëfandikoo ngir wone njël mu ndongo warul a gis. Ba mu yem ci {$a} kurs. Tëralin bu kurs bi, su amee, day wuutu list bii, du ci yokk.';

@@ -2635,3 +2635,14 @@ $string['starters:builtin_ell_practice'] = 'Puheen harjoittelu';
 $string['starters:builtin_ell_practice_desc'] = 'Puhutun keskustelun harjoittelua avustajan kanssa';
 $string['starters:builtin_ell_pronunciation'] = 'Ääntämisharjoitus';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Äänne äänteeltä palautetta ääntämisestäsi';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Täydentävät kurssit';
+$string['coursesettings:supplemental_desc'] = 'Antaa [[tutorshort]]in vastata myös toisen kurssin pohjalta tämän lisäksi. Tavallinen tapaus on opiskelijoiden perehdytys tai resurssikeskus: tenttikäytännöstä kysyvä saa vastauksen sieltä sen sijaan, ettei saisi mitään. Kurssien on oltava jo indeksoituja, ja piilotetut kurssit ohitetaan.';
+$string['coursesettings:supplemental_courses'] = 'Kurssitunnukset';
+$string['coursesettings:supplemental_inherit'] = 'Jätä tyhjäksi käyttääksesi sivuston laajuista luetteloa ({$a}). Tähän annettu arvo korvaa sen luettelon tällä kurssilla sen sijaan, että lisäisi siihen, joten anna koko joukko.';
+$string['coursesettings:supplemental_nosite'] = 'Jätä tyhjäksi, jos et halua yhtään. Sivuston laajuista luetteloa ei ole asetettu.';
+$string['settings:supplemental_courses'] = 'Täydentävät kurssit';
+$string['settings:supplemental_courses_desc'] = 'Kurssitunnukset, joiden sisältöä [[tutorshort]] saa käyttää myös vastatessaan, pilkuilla erotettuina. Käytä tätä aineistoon, joka sijaitsee toisella kurssilla ja pätee kaikkialla, kuten opiskelijoiden perehdytys tai resurssikeskus: tenttikäytännöstä kysyvä saa tällöin vastauksen siltä kurssilta sen sijaan, ettei saisi mitään.
+
+Kurssien on oltava jo indeksoituja hakua varten; mitään ylimääräistä ei upoteta, joten lisääminen tähän vaikuttaa heti eikä maksa mitään. Piilotetut kurssit ohitetaan, joten tällä ei voi tuoda näkyviin aineistoa, jota opiskelijan ei ole tarkoitus nähdä. Enintään {$a} kurssia. Kurssikohtainen asetus korvaa tämän luettelon sen sijaan, että lisäisi siihen.';

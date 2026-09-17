@@ -2635,3 +2635,14 @@ $string['starters:builtin_ell_practice'] = 'Øv at tale';
 $string['starters:builtin_ell_practice_desc'] = 'Øvelse i talt samtale med assistenten';
 $string['starters:builtin_ell_pronunciation'] = 'Udtaleøvelse';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Lyd-for-lyd feedback på din udtale';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Supplerende kurser';
+$string['coursesettings:supplemental_desc'] = 'Lader [[tutorshort]] svare ud fra et andet kursus ud over dette. Det typiske tilfælde er en studieintroduktion eller et ressourcecenter: den, der spørger om eksamenspolitikken, får svaret derfra i stedet for ingenting. Kurserne skal allerede være indekseret, og skjulte kurser ignoreres.';
+$string['coursesettings:supplemental_courses'] = 'Kursus-id\'er';
+$string['coursesettings:supplemental_inherit'] = 'Lad feltet stå tomt for at bruge listen for hele sitet ({$a}). En værdi her erstatter den liste for dette kursus i stedet for at føje til den, så angiv hele sættet.';
+$string['coursesettings:supplemental_nosite'] = 'Lad feltet stå tomt for ingen. Der er ikke angivet nogen liste for sitet.';
+$string['settings:supplemental_courses'] = 'Supplerende kurser';
+$string['settings:supplemental_courses_desc'] = 'Kursus-id\'er, hvis indhold [[tutorshort]] også må trække på, når den svarer, adskilt af kommaer. Brug det til materiale, der ligger i et andet kursus og gælder overalt, som en studieintroduktion eller et ressourcecenter: den, der spørger om eksamenspolitikken, får så svaret fra det kursus i stedet for ingenting.
+
+Kurserne skal allerede være indekseret til opslag; der indlejres intet ekstra, så det virker med det samme og koster ingenting at tilføje et her. Skjulte kurser ignoreres, så dette kan ikke bruges til at vise materiale, en studerende ikke skal se. Højst {$a} kurser. En kursusindstilling erstatter, hvor den findes, denne liste i stedet for at føje til den.';

@@ -2662,3 +2662,14 @@ $string['starters:builtin_ell_practice'] = 'የንግግር ልምምድ';
 $string['starters:builtin_ell_practice_desc'] = 'ከረዳቱ ጋር በንግግር የመወያየት ልምምድ';
 $string['starters:builtin_ell_pronunciation'] = 'የአጠራር ልምምድ';
 $string['starters:builtin_ell_pronunciation_desc'] = 'በአጠራርህ ላይ ድምፅ በድምፅ አስተያየት';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'ተጨማሪ ኮርሶች';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] ከዚህ ኮርስ በተጨማሪ ከሌላ ኮርስም እንዲመልስ ያስችላል። የተለመደው ሁኔታ የተማሪ መግቢያ ኮርስ ወይም የግብዓት ማዕከል ነው፦ ስለ ፈተና ደንብ የሚጠይቅ ተማሪ ምንም ከማጣት ይልቅ ከዚያ መልስ ያገኛል። እነዚያ ኮርሶች አስቀድመው መጠቆሚያ የተሠራላቸው መሆን አለባቸው፣ የተደበቁ ኮርሶችም ችላ ይባላሉ።';
+$string['coursesettings:supplemental_courses'] = 'የኮርስ መለያዎች';
+$string['coursesettings:supplemental_inherit'] = 'የጣቢያውን ሙሉ ዝርዝር ({$a}) ለመጠቀም ባዶ ይተዉት። እዚህ የሚገባ እሴት ለዚህ ኮርስ ያንን ዝርዝር ከመጨመር ይልቅ ይተካዋል፣ ስለዚህ ሙሉውን ስብስብ ያስገቡ።';
+$string['coursesettings:supplemental_nosite'] = 'ምንም ካልፈለጉ ባዶ ይተዉት። የጣቢያ ሙሉ ዝርዝር አልተቀመጠም።';
+$string['settings:supplemental_courses'] = 'ተጨማሪ ኮርሶች';
+$string['settings:supplemental_courses_desc'] = '[[tutorshort]] ሲመልስ ይዘታቸውን ሊጠቀምባቸው የሚችሉ ኮርሶች መለያዎች፣ በኮማ ተለያይተው። በሌላ ኮርስ ውስጥ ሆኖ በሁሉም ቦታ ለሚሠራ ይዘት ይጠቀሙበት፣ እንደ የተማሪ መግቢያ ኮርስ ወይም የግብዓት ማዕከል፦ ስለ ፈተና ደንብ የሚጠይቅ ተማሪ ምንም ከማጣት ይልቅ ከዚያ ኮርስ መልስ ያገኛል።
+
+ኮርሶቹ ለማውጣት አስቀድመው መጠቆሚያ የተሠራላቸው መሆን አለባቸው፤ ተጨማሪ ምንም አይካተትም፣ ስለዚህ እዚህ መጨመር ወዲያውኑ ይሠራል ምንም አያስከፍልም። የተደበቁ ኮርሶች ችላ ይባላሉ፣ ስለዚህ ተማሪ ማየት የሌለበትን ይዘት ለማሳየት ይህ አይጠቅምም። ቢበዛ {$a} ኮርሶች። የኮርስ ደረጃ ቅንብር ካለ ይህን ዝርዝር ከመጨመር ይልቅ ይተካዋል።';

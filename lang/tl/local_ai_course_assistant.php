@@ -2679,3 +2679,14 @@ $string['starters:builtin_ell_practice'] = 'Pagsasanay sa pagsasalita';
 $string['starters:builtin_ell_practice_desc'] = 'Pagsasanay sa pasalitang usapan kasama ang katulong';
 $string['starters:builtin_ell_pronunciation'] = 'Pagsasanay sa bigkas';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Tugon nang tunog-sa-tunog sa iyong pagbigkas';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Mga karagdagang kurso';
+$string['coursesettings:supplemental_desc'] = 'Pinapayagan ang [[tutorshort]] na sumagot mula rin sa ibang kurso bukod sa kursong ito. Ang karaniwang kaso ay isang oryentasyon para sa mag-aaral o resource center: ang nagtatanong tungkol sa patakaran sa pagsusulit ay makakakuha ng sagot mula roon sa halip na wala. Kailangang na-index na ang mga kursong iyon, at binabalewala ang mga nakatagong kurso.';
+$string['coursesettings:supplemental_courses'] = 'Mga course ID';
+$string['coursesettings:supplemental_inherit'] = 'Iwanang blangko para gamitin ang listahan sa buong site ({$a}). Ang halaga rito ay pumapalit sa listahang iyon para sa kursong ito sa halip na madagdag dito, kaya ilagay ang buong set.';
+$string['coursesettings:supplemental_nosite'] = 'Iwanang blangko kung wala. Walang nakatakdang listahan sa buong site.';
+$string['settings:supplemental_courses'] = 'Mga karagdagang kurso';
+$string['settings:supplemental_courses_desc'] = 'Mga course ID na maaari ring pagkunan ng nilalaman ng [[tutorshort]] kapag sumasagot, pinaghihiwalay ng kuwit. Gamitin ito para sa materyal na nasa ibang kurso ngunit angkop saanman, tulad ng oryentasyon para sa mag-aaral o resource center: ang nagtatanong tungkol sa patakaran sa pagsusulit ay makakakuha ng sagot mula sa kursong iyon sa halip na wala.
+
+Kailangang na-index na ang mga kurso para sa pagkuha; walang karagdagang ina-embed, kaya agad na epektibo ang pagdagdag dito at walang gastos. Binabalewala ang mga nakatagong kurso, kaya hindi ito magagamit upang ilantad ang materyal na hindi dapat makita ng mag-aaral. Pinakamarami ay {$a} kurso. Ang setting sa antas ng kurso, kung mayroon, ay pumapalit sa listahang ito sa halip na madagdag dito.';

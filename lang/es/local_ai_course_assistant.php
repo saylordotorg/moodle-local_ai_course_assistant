@@ -2662,3 +2662,14 @@ $string['starters:builtin_ell_practice'] = 'Practicar el habla';
 $string['starters:builtin_ell_practice_desc'] = 'Práctica de conversación hablada con el asistente';
 $string['starters:builtin_ell_pronunciation'] = 'Práctica de pronunciación';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Comentarios sonido por sonido sobre tu pronunciación';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Cursos complementarios';
+$string['coursesettings:supplemental_desc'] = 'Permite que [[tutorshort]] responda también desde otro curso, además de este. El caso habitual es una orientación estudiantil o un centro de recursos: un estudiante que pregunta por la política de exámenes obtiene la respuesta de ahí en lugar de nada. Esos cursos ya deben estar indexados, y los cursos ocultos se ignoran.';
+$string['coursesettings:supplemental_courses'] = 'IDs de curso';
+$string['coursesettings:supplemental_inherit'] = 'Déjalo vacío para usar la lista del sitio ({$a}). Un valor aquí reemplaza esa lista para este curso en lugar de añadirse a ella, así que introduce el conjunto completo.';
+$string['coursesettings:supplemental_nosite'] = 'Déjalo vacío para ninguno. No hay ninguna lista del sitio configurada.';
+$string['settings:supplemental_courses'] = 'Cursos complementarios';
+$string['settings:supplemental_courses_desc'] = 'IDs de curso cuyo contenido [[tutorshort]] también puede usar al responder, separados por comas. Úsalo para material que vive en otro curso y se aplica en todas partes, como una orientación estudiantil o un centro de recursos: un estudiante que pregunta por la política de exámenes obtiene entonces la respuesta de ese curso en lugar de nada.
+
+Los cursos ya deben estar indexados para la recuperación; no se incrusta nada adicional, así que añadir uno aquí es inmediato y no cuesta nada. Los cursos ocultos se ignoran, de modo que esto no puede usarse para mostrar material que un estudiante no debe ver. Máximo {$a} cursos. Un ajuste por curso, donde exista, reemplaza esta lista en lugar de añadirse a ella.';

@@ -2679,3 +2679,14 @@ $string['starters:builtin_ell_practice'] = 'Mazoezi ya kusema';
 $string['starters:builtin_ell_practice_desc'] = 'Mazoezi ya mazungumzo ya kusema na msaidizi';
 $string['starters:builtin_ell_pronunciation'] = 'Mazoezi ya matamshi';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Maoni sauti kwa sauti kuhusu matamshi yako';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kozi za nyongeza';
+$string['coursesettings:supplemental_desc'] = 'Huruhusu [[tutorshort]] kujibu pia kutoka kozi nyingine zaidi ya hii. Hali ya kawaida ni kozi ya utangulizi kwa wanafunzi au kituo cha rasilimali: anayeuliza kuhusu sera ya mitihani anapata jibu kutoka huko badala ya kutopata chochote. Kozi hizo lazima ziwe tayari zimeorodheshwa, na kozi zilizofichwa hupuuzwa.';
+$string['coursesettings:supplemental_courses'] = 'Vitambulisho vya kozi';
+$string['coursesettings:supplemental_inherit'] = 'Acha wazi ili kutumia orodha ya tovuti nzima ({$a}). Thamani hapa inachukua nafasi ya orodha hiyo kwa kozi hii badala ya kuiongezea, kwa hiyo weka seti kamili.';
+$string['coursesettings:supplemental_nosite'] = 'Acha wazi ili kutokuwa na yoyote. Hakuna orodha ya tovuti nzima iliyowekwa.';
+$string['settings:supplemental_courses'] = 'Kozi za nyongeza';
+$string['settings:supplemental_courses_desc'] = 'Vitambulisho vya kozi ambazo maudhui yake [[tutorshort]] anaweza pia kutumia anapojibu, vikitenganishwa kwa mikato. Tumia kwa nyenzo zinazokaa katika kozi nyingine lakini zinafaa kila mahali, kama kozi ya utangulizi kwa wanafunzi au kituo cha rasilimali: anayeuliza kuhusu sera ya mitihani basi anapata jibu kutoka kozi hiyo badala ya kutopata chochote.
+
+Kozi lazima ziwe tayari zimeorodheshwa kwa upatikanaji; hakuna kinachopachikwa zaidi, hivyo kuongeza hapa kunaanza kufanya kazi mara moja na hakugharimu chochote. Kozi zilizofichwa hupuuzwa, hivyo hii haiwezi kutumika kuonyesha nyenzo ambazo mwanafunzi hapaswi kuona. Upeo wa kozi {$a}. Mpangilio wa ngazi ya kozi, panapokuwapo, huchukua nafasi ya orodha hii badala ya kuiongezea.';

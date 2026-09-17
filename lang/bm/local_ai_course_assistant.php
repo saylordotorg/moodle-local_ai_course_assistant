@@ -2663,3 +2663,14 @@ $string['starters:builtin_ell_practice'] = 'Kumakan lasɛli';
 $string['starters:builtin_ell_practice_desc'] = 'Kuma fɔli degeli ni dɛmɛbaga ye';
 $string['starters:builtin_ell_pronunciation'] = 'Kumakan fɔli lasɛli';
 $string['starters:builtin_ell_pronunciation_desc'] = 'I ka kumadenw fɔcogo kan, kumakan kelen-kelen jaabi';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Kalan dɛmɛbaw';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] bɛ se ka jaabi di ka bɔ kalan wɛrɛ la fana, nin kalan kɔ. A caman na, o ye kalandenw ladonni kalan walima dɛmɛ yɔrɔ ye: mɔgɔ min bɛ ɲininkali kɛ sɛgɛsɛgɛli sariya kan, o bɛ jaabi sɔrɔ yen sanni a ka foyi sɔrɔ. O kalanw ka kan ka kɛ minnu ye ɲɛmɔgɔyali kɛ ka ban, dogolen kalanw tɛ jate.';
+$string['coursesettings:supplemental_courses'] = 'Kalan ID';
+$string['coursesettings:supplemental_inherit'] = 'A to lakolon walasa ka sitiw bɛɛ ka lisɛli ({$a}) kɛ. Hakili min bɛ yan, o bɛ o lisɛli nɔ ta nin kalan na, a tɛ fara a kan, o la aw ka kulu bɛɛ sɛbɛn.';
+$string['coursesettings:supplemental_nosite'] = 'A to lakolon ni aw t’a fɛ si. Sitiw bɛɛ ka lisɛli ma sigi.';
+$string['settings:supplemental_courses'] = 'Kalan dɛmɛbaw';
+$string['settings:supplemental_courses_desc'] = 'Kalanw ID minnu kɔnɔkow [[tutorshort]] bɛ se ka baara kɛ ni u ye jaabili waati la fana, u faranfasilen ni komaw ye. A kɛ fɛnw na minnu bɛ kalan wɛrɛ la nka u bɛ baara kɛ yɔrɔ bɛɛ, i n’a fɔ kalandenw ladonni kalan walima dɛmɛ yɔrɔ: o tuma na mɔgɔ min bɛ ɲininkali kɛ sɛgɛsɛgɛli sariya kan, o bɛ jaabi sɔrɔ o kalan na sanni a ka foyi sɔrɔ.
+
+Kalanw ka kan ka kɛ ɲɛmɔgɔyalenw ye ka ban walasa u ka se ka sɔrɔ; foyi wɛrɛ tɛ don a la, o la ka dɔ fara yan, o bɛ baara kɛ joona wa a tɛ wari bɔ. Dogolen kalanw tɛ jate, o la nin tɛ se ka kɛ ka fɛn jira kalanden ma min man kan k’a ye. A caya {$a} kalan. Kalan hakɛ sigiden, ni a bɛ yen, o bɛ nin lisɛli nɔ ta, a tɛ fara a kan.';

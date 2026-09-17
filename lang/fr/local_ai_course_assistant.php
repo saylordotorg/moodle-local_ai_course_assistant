@@ -2636,3 +2636,14 @@ $string['starters:builtin_ell_practice'] = 'Pratiquer l\'oral';
 $string['starters:builtin_ell_practice_desc'] = 'Pratique de conversation orale avec l\'assistant';
 $string['starters:builtin_ell_pronunciation'] = 'Prononciation';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Retour son par son sur votre prononciation';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Cours complémentaires';
+$string['coursesettings:supplemental_desc'] = 'Permet à [[tutorshort]] de répondre aussi à partir d\'un autre cours, en plus de celui-ci. Le cas courant est une orientation étudiante ou un centre de ressources : un apprenant qui interroge sur la politique d\'examen y trouve la réponse plutôt que rien. Ces cours doivent déjà être indexés, et les cours masqués sont ignorés.';
+$string['coursesettings:supplemental_courses'] = 'Identifiants de cours';
+$string['coursesettings:supplemental_inherit'] = 'Laissez vide pour utiliser la liste du site ({$a}). Une valeur ici remplace cette liste pour ce cours au lieu de s\'y ajouter : saisissez donc l\'ensemble complet.';
+$string['coursesettings:supplemental_nosite'] = 'Laissez vide pour n\'en utiliser aucun. Aucune liste du site n\'est définie.';
+$string['settings:supplemental_courses'] = 'Cours complémentaires';
+$string['settings:supplemental_courses_desc'] = 'Identifiants des cours dont [[tutorshort]] peut aussi exploiter le contenu pour répondre, séparés par des virgules. À utiliser pour du contenu qui vit dans un autre cours et vaut partout, comme une orientation étudiante ou un centre de ressources : un apprenant qui interroge sur la politique d\'examen obtient alors la réponse depuis ce cours plutôt que rien.
+
+Les cours doivent déjà être indexés pour la recherche ; rien de plus n\'est vectorisé, donc en ajouter un ici est immédiat et gratuit. Les cours masqués sont ignorés, ce qui empêche d\'exposer par ce biais du contenu qu\'un apprenant ne doit pas voir. Maximum {$a} cours. Un réglage propre à un cours, lorsqu\'il existe, remplace cette liste au lieu de s\'y ajouter.';

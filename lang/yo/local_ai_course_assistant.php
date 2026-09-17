@@ -2655,3 +2655,14 @@ $string['starters:builtin_ell_practice'] = 'Ìdánwò Ọ̀rọ̀';
 $string['starters:builtin_ell_practice_desc'] = 'Ìdánrawò ìjíròrò ẹnu pẹ̀lú olùrànlọ́wọ́';
 $string['starters:builtin_ell_pronunciation'] = 'Ìdánwò Pronunciation';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Èsì ohùn-kọ̀ọ̀kan lórí bí o ṣe ń pe àwọn ọ̀rọ̀';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Àwọn ẹ̀kọ́ àfikún';
+$string['coursesettings:supplemental_desc'] = '[[tutorshort]] lè dáhùn láti inú ẹ̀kọ́ mìíràn pẹ̀lú, kì í ṣe ẹ̀kọ́ yìí nìkan. Ọ̀ràn tí ó wọ́pọ̀ ni ẹ̀kọ́ ìtọ́sọ́nà fún akẹ́kọ̀ọ́ tàbí ilé ìwádìí: ẹni tí ó bèèrè nípa òfin ìdánwò yóò rí ìdáhùn níbẹ̀ dípò kí ó má rí nǹkan kan. Àwọn ẹ̀kọ́ wọ̀nyẹn gbọ́dọ̀ ti wà nínú àtọ́ka tẹ́lẹ̀, a ó sì fi àwọn ẹ̀kọ́ tí a fi pamọ́ sílẹ̀.';
+$string['coursesettings:supplemental_courses'] = 'ID àwọn ẹ̀kọ́';
+$string['coursesettings:supplemental_inherit'] = 'Fi sílẹ̀ ní òfo láti lo àkójọ gbogbo ojúlé náà ({$a}). Iye tí a bá kọ síbí yóò rọ́pò àkójọ yẹn fún ẹ̀kọ́ yìí dípò kí ó fi kún un, nítorí náà kọ gbogbo àkójọ pátá.';
+$string['coursesettings:supplemental_nosite'] = 'Fi sílẹ̀ ní òfo bí o kò bá fẹ́ ọ̀kankan. Kò sí àkójọ gbogbo ojúlé tí a ṣètò.';
+$string['settings:supplemental_courses'] = 'Àwọn ẹ̀kọ́ àfikún';
+$string['settings:supplemental_courses_desc'] = 'ID àwọn ẹ̀kọ́ tí [[tutorshort]] tún lè lo àkóónú wọn nígbà tí ó bá ń dáhùn, tí a yà sọ́tọ̀ pẹ̀lú àmì ìdáwọ́dúró. Lò ó fún ohun èlò tí ó wà nínú ẹ̀kọ́ mìíràn ṣùgbọ́n tí ó wúlò níbi gbogbo, bíi ẹ̀kọ́ ìtọ́sọ́nà fún akẹ́kọ̀ọ́ tàbí ilé ìwádìí: nígbà náà ẹni tí ó bèèrè nípa òfin ìdánwò yóò rí ìdáhùn láti inú ẹ̀kọ́ yẹn dípò kí ó má rí nǹkan kan.
+
+Àwọn ẹ̀kọ́ gbọ́dọ̀ ti wà nínú àtọ́ka tẹ́lẹ̀ fún ìwádìí; kò sí ohun tuntun tí a ń fi kún, nítorí náà fífi ọ̀kan kún níbí yóò ṣiṣẹ́ lẹ́sẹ̀kẹsẹ̀, kò sì ná owó kankan. A ó fi àwọn ẹ̀kọ́ tí a fi pamọ́ sílẹ̀, nítorí náà a kò lè lo èyí láti fi ohun èlò tí akẹ́kọ̀ọ́ kò gbọ́dọ̀ rí hàn. Ó pọ̀ jù {$a} ẹ̀kọ́. Ìṣètò ìpele ẹ̀kọ́, níbi tí ó bá wà, yóò rọ́pò àkójọ yìí dípò kí ó fi kún un.';

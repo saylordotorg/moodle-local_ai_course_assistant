@@ -2671,3 +2671,14 @@ $string['starters:builtin_ell_practice'] = '口语练习';
 $string['starters:builtin_ell_practice_desc'] = '与助手进行口语对话练习';
 $string['starters:builtin_ell_pronunciation'] = '发音练习';
 $string['starters:builtin_ell_pronunciation_desc'] = '逐音反馈你的单词发音';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = '补充课程';
+$string['coursesettings:supplemental_desc'] = '让 [[tutorshort]] 除了本课程之外，也可以从另一门课程作答。常见情形是学生导览课或资源中心：询问考试规定的学习者可以从那里得到答案，而不是一无所获。这些课程必须已建立索引，隐藏的课程会被忽略。';
+$string['coursesettings:supplemental_courses'] = '课程 ID';
+$string['coursesettings:supplemental_inherit'] = '留空则使用站点级列表（{$a}）。此处填写的值会替换该列表用于本课程，而不是追加，因此请填写完整的一组。';
+$string['coursesettings:supplemental_nosite'] = '留空表示不使用。尚未设置站点级列表。';
+$string['settings:supplemental_courses'] = '补充课程';
+$string['settings:supplemental_courses_desc'] = '[[tutorshort]] 作答时也可以引用其内容的课程 ID，用逗号分隔。适用于位于另一门课程但处处适用的材料，例如学生导览课或资源中心：这样询问考试规定的学习者就能从那门课程得到答案，而不是一无所获。
+
+课程必须已为检索建立索引；不会额外做嵌入，因此在此添加会立即生效且不产生费用。隐藏的课程会被忽略，所以无法借此暴露学习者不该看到的材料。最多 {$a} 门课程。课程级设置若存在，会替换此列表而不是追加。';

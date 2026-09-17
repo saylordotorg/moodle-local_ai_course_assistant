@@ -78,6 +78,12 @@ class course_setting_transfer {
         'soapbox_level_course_',
         // Retrieval and outreach.
         'rag_enabled_course_',
+        // The value is a list of OTHER courses' ids, which stay valid on the
+        // same site, so a copied course keeps pointing at the same orientation
+        // material. supplemental_sources::usable_course_ids() drops any id that
+        // has since gone missing or been hidden, so a stale entry degrades to
+        // "not used" rather than to an error.
+        'supplemental_courses_course_',
         'digest_email_enabled_course_',
     ];
 

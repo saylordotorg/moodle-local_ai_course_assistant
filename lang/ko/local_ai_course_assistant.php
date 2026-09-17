@@ -2633,3 +2633,14 @@ $string['starters:builtin_ell_practice'] = '말하기 연습';
 $string['starters:builtin_ell_practice_desc'] = '어시스턴트와 말하기 대화 연습';
 $string['starters:builtin_ell_pronunciation'] = '발음 연습';
 $string['starters:builtin_ell_pronunciation_desc'] = '발음에 대한 소리 단위 피드백';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = '보조 강좌';
+$string['coursesettings:supplemental_desc'] = '이 강좌 외에 다른 강좌에서도 [[tutorshort]]가 답변할 수 있게 합니다. 흔한 경우는 학생 오리엔테이션이나 자료 센터입니다. 시험 규정을 묻는 학습자가 아무 답도 못 받는 대신 그곳에서 답을 받습니다. 해당 강좌는 이미 색인되어 있어야 하며, 숨겨진 강좌는 무시됩니다.';
+$string['coursesettings:supplemental_courses'] = '강좌 ID';
+$string['coursesettings:supplemental_inherit'] = '사이트 전체 목록({$a})을 사용하려면 비워 두세요. 여기에 값을 넣으면 이 강좌에서는 그 목록에 더해지는 것이 아니라 대체합니다. 전체 집합을 입력하세요.';
+$string['coursesettings:supplemental_nosite'] = '사용하지 않으려면 비워 두세요. 사이트 전체 목록이 설정되어 있지 않습니다.';
+$string['settings:supplemental_courses'] = '보조 강좌';
+$string['settings:supplemental_courses_desc'] = '답변할 때 [[tutorshort]]가 내용을 함께 활용할 수 있는 강좌 ID(쉼표로 구분). 다른 강좌에 있으면서 어디서나 적용되는 자료에 사용하세요. 예를 들어 학생 오리엔테이션이나 자료 센터입니다. 그러면 시험 규정을 묻는 학습자가 아무 답도 못 받는 대신 그 강좌에서 답을 받습니다.
+
+강좌는 검색을 위해 이미 색인되어 있어야 합니다. 추가로 임베딩하지 않으므로 여기에 추가하면 즉시 반영되고 비용도 들지 않습니다. 숨겨진 강좌는 무시되므로, 학습자가 보면 안 되는 자료를 이 방법으로 노출할 수는 없습니다. 최대 {$a}개 강좌. 강좌 단위 설정이 있으면 이 목록에 더해지지 않고 대체합니다.';

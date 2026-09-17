@@ -2635,3 +2635,14 @@ $string['starters:builtin_ell_practice'] = 'Sprechen üben';
 $string['starters:builtin_ell_practice_desc'] = 'Übung gesprochener Konversation mit dem Assistenten';
 $string['starters:builtin_ell_pronunciation'] = 'Ausspracheübung';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Laut-für-Laut-Rückmeldung zu deiner Aussprache';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Ergänzende Kurse';
+$string['coursesettings:supplemental_desc'] = 'Lässt [[tutorshort]] zusätzlich zu diesem Kurs auch aus einem anderen Kurs antworten. Der übliche Fall ist eine Studieneinführung oder ein Ressourcenzentrum: Wer nach der Prüfungsordnung fragt, bekommt die Antwort von dort statt gar keine. Diese Kurse müssen bereits indexiert sein, und verborgene Kurse werden ignoriert.';
+$string['coursesettings:supplemental_courses'] = 'Kurs-IDs';
+$string['coursesettings:supplemental_inherit'] = 'Leer lassen, um die seitenweite Liste zu verwenden ({$a}). Ein Wert hier ersetzt diese Liste für diesen Kurs, statt sie zu ergänzen — geben Sie also den vollständigen Satz an.';
+$string['coursesettings:supplemental_nosite'] = 'Leer lassen für keine. Es ist keine seitenweite Liste gesetzt.';
+$string['settings:supplemental_courses'] = 'Ergänzende Kurse';
+$string['settings:supplemental_courses_desc'] = 'Kurs-IDs, deren Inhalte [[tutorshort]] beim Antworten ebenfalls heranziehen darf, durch Kommas getrennt. Für Material, das in einem anderen Kurs liegt und überall gilt, etwa eine Studieneinführung oder ein Ressourcenzentrum: Wer nach der Prüfungsordnung fragt, bekommt die Antwort dann aus jenem Kurs statt gar keine.
+
+Die Kurse müssen für den Abruf bereits indexiert sein; es wird nichts zusätzlich eingebettet, das Hinzufügen wirkt also sofort und kostet nichts. Verborgene Kurse werden ignoriert, sodass sich damit kein Material sichtbar machen lässt, das Lernende nicht sehen sollen. Maximal {$a} Kurse. Eine kursspezifische Einstellung ersetzt diese Liste, statt sie zu ergänzen.';

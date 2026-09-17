@@ -2635,3 +2635,14 @@ $string['starters:builtin_ell_practice'] = 'Cvičení mluvení';
 $string['starters:builtin_ell_practice_desc'] = 'Procvičování mluveného rozhovoru s asistentem';
 $string['starters:builtin_ell_pronunciation'] = 'Výslovnost';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Zpětná vazba hláska po hlásce k tvé výslovnosti';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Doplňkové kurzy';
+$string['coursesettings:supplemental_desc'] = 'Umožní [[tutorshort]] odpovídat kromě tohoto kurzu i z jiného. Obvyklým případem je úvodní kurz pro studenty nebo informační centrum: kdo se ptá na pravidla zkoušek, dostane odpověď odtamtud místo žádné. Tyto kurzy už musí být zaindexované a skryté kurzy se ignorují.';
+$string['coursesettings:supplemental_courses'] = 'ID kurzů';
+$string['coursesettings:supplemental_inherit'] = 'Ponechte prázdné pro použití celostránkového seznamu ({$a}). Hodnota zde tento seznam pro daný kurz nahrazuje, nikoli doplňuje, takže zadejte celou sadu.';
+$string['coursesettings:supplemental_nosite'] = 'Ponechte prázdné pro žádné. Žádný celostránkový seznam není nastaven.';
+$string['settings:supplemental_courses'] = 'Doplňkové kurzy';
+$string['settings:supplemental_courses_desc'] = 'ID kurzů, jejichž obsah může [[tutorshort]] při odpovídání také použít, oddělená čárkami. Použijte pro materiál, který leží v jiném kurzu a platí všude, například úvodní kurz pro studenty nebo informační centrum: kdo se ptá na pravidla zkoušek, pak dostane odpověď z onoho kurzu místo žádné.
+
+Kurzy už musí být zaindexované pro vyhledávání; nic dalšího se nevkládá, takže přidání je okamžité a nic nestojí. Skryté kurzy se ignorují, takže tímto nelze zpřístupnit materiál, který student vidět nemá. Nejvýše {$a} kurzů. Nastavení na úrovni kurzu, pokud existuje, tento seznam nahrazuje, nikoli doplňuje.';

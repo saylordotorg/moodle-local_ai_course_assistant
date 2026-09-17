@@ -2658,3 +2658,14 @@ $string['starters:builtin_ell_practice'] = 'Spreektraining';
 $string['starters:builtin_ell_practice_desc'] = 'Gesproken conversatieoefening met de assistent';
 $string['starters:builtin_ell_pronunciation'] = 'Uitspraakoefening';
 $string['starters:builtin_ell_pronunciation_desc'] = 'Klank-voor-klank feedback op je uitspraak';
+
+// Supplemental courses (v7.5.0).
+$string['coursesettings:supplemental_heading'] = 'Aanvullende cursussen';
+$string['coursesettings:supplemental_desc'] = 'Laat [[tutorshort]] naast deze cursus ook uit een andere cursus antwoorden. Het gebruikelijke geval is een studentenintroductie of een informatiecentrum: wie naar het examenbeleid vraagt, krijgt het antwoord daarvandaan in plaats van niets. Die cursussen moeten al geïndexeerd zijn, en verborgen cursussen worden genegeerd.';
+$string['coursesettings:supplemental_courses'] = 'Cursus-ID\'s';
+$string['coursesettings:supplemental_inherit'] = 'Laat leeg om de sitebrede lijst te gebruiken ({$a}). Een waarde hier vervangt die lijst voor deze cursus in plaats van eraan toe te voegen, dus vul de volledige set in.';
+$string['coursesettings:supplemental_nosite'] = 'Laat leeg voor geen. Er is geen sitebrede lijst ingesteld.';
+$string['settings:supplemental_courses'] = 'Aanvullende cursussen';
+$string['settings:supplemental_courses_desc'] = 'Cursus-ID\'s waarvan [[tutorshort]] de inhoud ook mag gebruiken bij het antwoorden, gescheiden door komma\'s. Gebruik dit voor materiaal dat in een andere cursus staat en overal geldt, zoals een studentenintroductie of een informatiecentrum: wie naar het examenbeleid vraagt, krijgt het antwoord dan uit die cursus in plaats van niets.
+
+De cursussen moeten al geïndexeerd zijn voor ophalen; er wordt niets extra ingebed, dus er hier een toevoegen werkt direct en kost niets. Verborgen cursussen worden genegeerd, dus hiermee kan geen materiaal zichtbaar worden gemaakt dat een student niet hoort te zien. Maximaal {$a} cursussen. Een cursusinstelling vervangt, waar aanwezig, deze lijst in plaats van eraan toe te voegen.';
