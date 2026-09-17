@@ -164,6 +164,10 @@ final class protocol_markers_test extends \basic_testcase {
                 "- Identifying Strategy (id:20060)\n- Next item",
                 "- Identifying Strategy\n- Next item",
             ],
+            'mixed case' => [
+                'Open the reading (Id: 20061) first.',
+                'Open the reading first.',
+            ],
             'inside markdown bold' => [
                 '**Unit 1 Introduction Video** (id:20057) covers the basics.',
                 '**Unit 1 Introduction Video** covers the basics.',

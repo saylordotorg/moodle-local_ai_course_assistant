@@ -161,7 +161,9 @@ final class protocol_markers {
      * @return string
      */
     public static function strip_activity_ids(string $text): string {
-        if ($text === '' || strpos($text, 'id') === false && strpos($text, 'ID') === false) {
+        // Case-insensitive: the patterns below are /i, so a case-sensitive
+        // guard here would skip "(Id: 5)" entirely.
+        if ($text === '' || stripos($text, 'id') === false) {
             return $text;
         }
 

@@ -57,7 +57,7 @@ class starter_manager {
     /**
      * Translated label or help text for a built-in starter.
      *
-     * Until v7.4.10 every built-in name and description here was a literal
+     * Until v7.5.0 every built-in name and description here was a literal
      * English string, so a learner on a Spanish site read Spanish everywhere
      * in the drawer except the starter chips and their title= tooltips. The
      * chip NAMES were partly rescued client-side by STARTER_LABELS in
@@ -90,26 +90,40 @@ class starter_manager {
      * @param array $starter One starter definition, as stored.
      * @return array The same starter with translatable text resolved.
      */
+    /**
+     * The English built-in string for a starter field, or null if there is none.
+     *
+     * @param string $key Starter key, e.g. 'help-page'.
+     * @param string $field 'name' or 'description'.
+     * @return string|null
+     */
+    private static function builtin_english(string $key, string $field): ?string {
+        $suffix = str_replace('-', '_', $key) . ($field === 'description' ? '_desc' : '');
+        $identifier = 'starters:builtin_' . $suffix;
+        if (!get_string_manager()->string_exists($identifier, 'local_ai_course_assistant')) {
+            return null;
+        }
+        // get_string()'s fourth argument is $lazyload, not a language -- passing
+        // 'en' there returns a lang_string that resolves in the CURRENT
+        // language. The string manager is the API that takes a language.
+        return branding::apply(
+            get_string_manager()->get_string($identifier, 'local_ai_course_assistant', null, 'en')
+        );
+    }
+
     private static function localize_builtin(array $starter): array {
         if (empty($starter['builtin']) || empty($starter['key'])) {
             return $starter;
         }
         $suffix = str_replace('-', '_', (string) $starter['key']);
         foreach (['name' => $suffix, 'description' => $suffix . '_desc'] as $field => $key) {
-            $identifier = 'starters:builtin_' . $key;
-            if (!get_string_manager()->string_exists($identifier, 'local_ai_course_assistant')) {
+            $english = self::builtin_english((string) $starter['key'], $field);
+            if ($english === null) {
                 continue;
             }
             $current = (string) ($starter[$field] ?? '');
-            // get_string()'s fourth argument is $lazyload, not a language --
-            // passing 'en' there returns a lang_string that resolves in the
-            // CURRENT language, which would make this comparison always true.
-            // The string manager is the API that takes a language.
-            $english = branding::apply(
-                get_string_manager()->get_string($identifier, 'local_ai_course_assistant', null, 'en')
-            );
             if ($current === '' || $current === $english) {
-                $starter[$field] = branding::str($identifier);
+                $starter[$field] = branding::str('starters:builtin_' . $key);
             }
         }
         return $starter;
@@ -300,10 +314,26 @@ class starter_manager {
             if (empty($s['key']) || empty($s['name'])) {
                 continue;
             }
+            // Store the ENGLISH canonical when the admin left a built-in's text
+            // as rendered. The form shows built-ins in the admin's own language,
+            // so without this an admin who saves while browsing in Spanish
+            // freezes Spanish chips for every learner on the site, and
+            // localize_builtin() can no longer tell "untouched" from "renamed".
+            $name = clean_param($s['name'], PARAM_TEXT);
+            $desc = clean_param($s['description'] ?? '', PARAM_TEXT);
+            if (!empty($s['builtin'])) {
+                $key = (string) $s['key'];
+                if ($name === branding::str('starters:builtin_' . str_replace('-', '_', $key))) {
+                    $name = self::builtin_english($key, 'name') ?? $name;
+                }
+                if ($desc !== '' && $desc === branding::str('starters:builtin_' . str_replace('-', '_', $key) . '_desc')) {
+                    $desc = self::builtin_english($key, 'description') ?? $desc;
+                }
+            }
             $clean[] = [
                 'key'         => clean_param($s['key'], PARAM_ALPHANUMEXT),
-                'name'        => clean_param($s['name'], PARAM_TEXT),
-                'description' => clean_param($s['description'] ?? '', PARAM_TEXT),
+                'name'        => $name,
+                'description' => $desc,
                 'prompt'      => $s['prompt'] ?? '',
                 'icon'        => isset(self::ICONS[$s['icon'] ?? '']) ? $s['icon'] : 'chat',
                 'type'        => in_array($s['type'] ?? 'prompt', ['prompt', 'quiz', 'voice', 'pronunciation'])

@@ -626,7 +626,7 @@ class hook_callbacks {
         // unchanged. starter_label() returns kind 'generic' whenever mastery is
         // off or there is no weak objective, so this is self-gating.
         //
-        // v7.4.10: the chip is flagged 'personalized' so the client-side
+        // v7.5.0: the chip is flagged 'personalized' so the client-side
         // re-localization pass leaves it alone. Until then focus-next was kept
         // out of STARTER_LABELS for exactly that reason, which meant the chip
         // was the one starter that never followed a language switch.
