@@ -60,12 +60,18 @@ class rag_retriever {
     /**
      * Largest packed index we will hand to the application cache, in bytes.
      *
-     * The cache store has to serialize whatever it is given, so a pathologically
-     * large course should degrade to reading the database every time rather than
-     * to thrashing the cache. 64 MB is roughly four times our largest measured
-     * course (2,020 chunks at 2048 float32 dimensions is 15.8 MB).
+     * 24 MB, sized against what a WEB REQUEST can afford rather than against the
+     * corpus. The previous value was 64 MB, which was indefensible: PHP's
+     * default memory_limit for a web request here is 128 MB, and serializing a
+     * 64 MB blob for the cache store needs another 64 MB on top of the blob
+     * itself, so the ceiling could not be reached without fatalling first. A
+     * ceiling that can only be hit by crashing is not a ceiling.
+     *
+     * 24 MB clears our largest measured course (2,020 chunks at 2048 float32
+     * dimensions is 15.8 MB) with headroom, and anything larger degrades to
+     * reading the database each time, which is slow but correct.
      */
-    private const MAX_CACHED_INDEX_BYTES = 67108864;
+    private const MAX_CACHED_INDEX_BYTES = 25165824;
 
     /**
      * Default for `rerank_min_query_chars`: the longest query still skipped.
@@ -268,6 +274,14 @@ class rag_retriever {
     private static function build_packed_index_from_db(int $courseid, string $querymodel, string $dtype): array {
         global $DB;
 
+        // Even streaming, a large course index is a genuinely heavy structure:
+        // 2,020 chunks at 2048 float32 dimensions peaks around 116 MB against a
+        // default web limit of 128 MB, and a bigger course would cross it. This
+        // is the case raise_memory_limit() exists for, and Moodle core uses it
+        // for the same reason in backup, restore and search indexing. It only
+        // ever raises, so a site already configured higher is untouched.
+        raise_memory_limit(MEMORY_EXTRA);
+
         $packed = [
             'ids' => [], 'lens' => [], 'dtypes' => [],
             'cmids' => [], 'modtypes' => [], 'chunkindexes' => [], 'blob' => '',
@@ -280,7 +294,14 @@ class rag_retriever {
             'skipped_dtype' => 0, 'skipped_dtype_name' => '',
         ];
 
-        $rows = $DB->get_records_select(
+        // get_recordSET, not get_records: materializing every row first peaks at
+        // 166 MB on a 2,020-chunk course at 2048 dimensions, which is over the
+        // 128 MB a web request gets and is why retrieval fatalled with
+        // "Allowed memory size exhausted" on the largest courses. That predates
+        // the packed cache -- the read alone was already over budget, so the
+        // cache could never populate on exactly the courses it was built for.
+        // A recordset streams, so peak is one row plus what we keep.
+        $rs = $DB->get_recordset_select(
             'local_ai_course_assistant_chunks',
             // Either column is sufficient. Testing only `embedding` made
             // every quantized row invisible: an int8 or binary index writes
@@ -315,16 +336,12 @@ class rag_retriever {
             'id, courseid, embedding, embedding_bin, embed_dtype, embed_model, cmid, modtype, chunkindex'
         );
 
-        if (empty($rows)) {
-            return $packed;
-        }
-
         $skippedincompatible = 0;
         $skippedmodel = '';
         $skippeddtype = 0;
         $skippeddtypename = '';
 
-        foreach ($rows as $row) {
+        foreach ($rs as $row) {
             $rowdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
                 $row->embed_dtype ?? null
             );
@@ -382,7 +399,13 @@ class rag_retriever {
             $packed['modtypes'][]     = (string) ($row->modtype ?? '');
             $packed['chunkindexes'][] = (int) ($row->chunkindex ?? 0);
             $packed['blob']          .= $bytes;
+
+            // Drop every reference to this row's payload before the next one is
+            // fetched. Without this the blobs accumulate anyway and the
+            // recordset buys nothing.
+            unset($bytes, $row->embedding, $row->embedding_bin, $row);
         }
+        $rs->close();
 
         $packed['skipped_model'] = $skippedincompatible;
         $packed['skipped_model_name'] = $skippedmodel;

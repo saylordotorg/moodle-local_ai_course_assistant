@@ -234,6 +234,49 @@ final class rag_retriever_packed_index_test extends \advanced_testcase {
     }
 
     /**
+     * The index is read as a recordset, not materialized row by row first.
+     *
+     * This is a memory guard, not a behaviour one. get_records_select() builds
+     * the whole result in PHP before anything is decoded, which measured 166 MB
+     * on a 2,020-chunk course at 2048 dimensions against a 128 MB web request
+     * limit, so retrieval fatalled with "Allowed memory size exhausted" on
+     * exactly the largest courses. Every CLI harness we own runs at
+     * memory_limit=-1, so none of them could see it.
+     *
+     * Asserting on the source is crude, but the alternative is a test that
+     * allocates hundreds of megabytes to prove a regression, and the thing that
+     * actually regresses is the choice of DB call.
+     */
+    public function test_index_is_read_as_a_recordset(): void {
+        $src = file_get_contents(__DIR__ . '/../classes/rag_retriever.php');
+        $build = substr($src, strpos($src, 'function build_packed_index_from_db'));
+        $build = substr($build, 0, strpos($build, "\n    }"));
+
+        $this->assertStringContainsString('get_recordset_select', $build,
+            'the chunk read must stream; get_records_select peaks over a web request limit');
+        $this->assertStringNotContainsString('$DB->get_records_select(', $build,
+            'materializing every chunk row is what caused the out-of-memory fatal');
+        $this->assertStringContainsString('close()', $build, 'a recordset must be closed');
+    }
+
+    /**
+     * The cache ceiling has to be affordable inside a web request.
+     *
+     * It was 64 MB, which could not be reached without fatalling first: the
+     * store serializes what it is given, so a 64 MB blob needs another 64 MB on
+     * top, against a 128 MB default limit. A ceiling only reachable by crashing
+     * is not a ceiling.
+     */
+    public function test_cache_ceiling_fits_a_web_request(): void {
+        $c = new \ReflectionClassConstant(rag_retriever::class, 'MAX_CACHED_INDEX_BYTES');
+        $bytes = (int) $c->getValue();
+        $this->assertGreaterThan(16 * 1024 * 1024, $bytes,
+            'must still clear our largest measured course, which is 15.8 MB');
+        $this->assertLessThanOrEqual(32 * 1024 * 1024, $bytes,
+            'a blob this size is serialized for the cache, so it must leave room under 128 MB');
+    }
+
+    /**
      * An int8 index round trips, and its magnitudes are preserved.
      *
      * decode_vector() deliberately returns int8 values as-is rather than
