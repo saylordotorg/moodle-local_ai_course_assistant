@@ -200,10 +200,13 @@ jobs:
       #       mid-flight and the job went green. On PR #238 the same thing lost
       #       a real defect that then reached main.
       #
-      #   permission_denials_count > 0
-      #       A denied tool call means some part of the review could not run.
-      #       This was the v7.0.1 (21 denials) and v7.2.1 (26 denials) failure;
-      #       both billed and posted nothing.
+      #   spawned == 0
+      #       The command never fanned out, so nothing was reviewed.
+      #
+      # Denials are reported but do NOT fail: see the note at the check itself.
+      # They were present in the v7.0.1 (21) and v7.2.1 (26) failures, but so was
+      # abandonment, and abandonment is the signal that discriminates a broken
+      # run from a sandbox correctly refusing something.
       #
       # Deliberately NOT a failure: posting no comment. A genuinely clean review
       # may have nothing to say, and failing on that would train everyone to
@@ -268,13 +271,24 @@ jobs:
           completed=$(jq -r '(.subagent_stats.completed // 0)' <<<"$RESULT")
           failed=$(jq -r '(.subagent_stats.failed // 0)' <<<"$RESULT")
           denials=$(jq -r '((.permission_denials // []) | length)' <<<"$RESULT")
+          denied_tools=$(jq -r '[(.permission_denials // [])[] | .tool_name] | unique | join(", ")' <<<"$RESULT")
+          spawned=$(jq -r '(.subagent_stats.spawned // 0)' <<<"$RESULT")
           iserror=$(jq -r '(.is_error // false)' <<<"$RESULT")
           reason=$(jq -r '(.terminal_reason // "unknown")' <<<"$RESULT")
           summary=$(jq -r '(.result // "")' <<<"$RESULT" | head -c 400)
-          abandoned=$(( started - completed - failed ))
+          # spawned, NOT started_in_background: agents can run in the foreground,
+          # and then started_in_background is 0 while completed is not. The first
+          # version subtracted the wrong pair and reported "-8 abandoned" on a
+          # perfectly good run -- harmless there, but in a MIXED run the negative
+          # from the foreground agents would have cancelled out real background
+          # abandonment and passed it silently. Total spawned against total
+          # accounted-for is the measure that holds in both modes.
+          abandoned=$(( spawned - completed - failed ))
 
-          echo "review agents: started_in_background=$started completed=$completed failed=$failed abandoned=$abandoned"
-          echo "permission denials: $denials   is_error: $iserror   terminal_reason: $reason"
+          echo "review agents: spawned=$spawned completed=$completed failed=$failed abandoned=$abandoned"
+          echo "(of which started in background: $started)"
+          echo "agents spawned: $spawned   denials: $denials ($denied_tools)"
+          echo "is_error: $iserror   terminal_reason: $reason"
           echo "final result text: $summary"
 
           rc=0
@@ -282,20 +296,36 @@ jobs:
             echo "::error::The review session ended in an error state."
             rc=1
           fi
-          if [ "$denials" -gt 0 ] 2>/dev/null; then
-            echo "::error::$denials tool call(s) were denied, so part of the review could not run." \
-                 "Grant the missing tool in claude_args --allowedTools (keep every pattern space-free)."
+          if [ "$spawned" -eq 0 ] 2>/dev/null; then
+            echo "::error::The review spawned no agents at all, so no review happened." \
+                 "/code-review always fans out; a run that does not has stopped at step 1."
             rc=1
           fi
+          # Denials are NOT a failure. The sandbox is meant to refuse things: the
+          # allowlist deliberately excludes php/npm/make because a pull_request
+          # run checks out an untrusted head, and shell output redirection is
+          # blocked outright whatever is granted. The first real run under this
+          # gate (PR #242) completed all 8 agents and posted a genuine review,
+          # and was failed by this check over a single denied `php -l` -- a
+          # refusal that is correct, intentional and permanent. Failing on that
+          # would red every future review and train everyone to ignore the gate,
+          # which is the failure mode it exists to prevent. Report and move on;
+          # the signal that a review did not happen is abandonment, above.
+          if [ "$denials" -gt 0 ] 2>/dev/null; then
+            echo "::notice::$denials tool call(s) were denied. Expected for things the allowlist" \
+                 "excludes on purpose (php, npm, make, shell redirection). If the review also came" \
+                 "back thin, check whether a grant is genuinely missing: $denied_tools"
+          fi
           if [ "$abandoned" -gt 0 ] 2>/dev/null; then
-            echo "::error::The job ended with $abandoned of $started review agent(s) still running," \
+            echo "::error::The job ended with $abandoned of $spawned review agent(s) unaccounted for," \
                  "so this pull request was NOT fully reviewed even though the action reported success." \
                  "Re-run the job, or comment '@claude please review this diff' on the PR, which posts reliably."
             rc=1
           fi
 
           if [ "$rc" -eq 0 ]; then
-            echo "::notice::Review completed: $completed of $started agents reported, $denials denials." \
-                 "If no comment was posted, the review had nothing to report."
+            echo "::notice::Review completed: $spawned agents spawned, $completed reported," \
+                 "$abandoned abandoned, $denials denied. If no comment was posted, the review" \
+                 "had nothing to report."
           fi
           exit $rc
