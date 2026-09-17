@@ -428,50 +428,57 @@ define([
     };
 
     /**
-     * Derive a source pill from the passages the answer actually cited.
+     * Derive a source pill when the model emitted no [SOURCE:] marker.
      *
-     * The model is asked for exactly one [SOURCE:...] marker per reply, and
-     * mostly complies -- until RAG puts retrieved chunks in the prompt. Measured
-     * on 24 paired prompts (2026-09-16): 75% of replies carried a SOURCE tag
-     * with no chunks in context, 13% with them. That is the configuration every
-     * Degrees course runs in, which is why source links were missing there
-     * across the board.
+     * Two measurements shaped this, both against production Degrees:
      *
-     * The prompt now says the two markers are complementary. This is the half
-     * that does not depend on the model complying: a reply that cited [[c:N]]
-     * told us exactly which retrieved passage it used, and the meta event
-     * already carries that chunk's cmid. No inference, no guessing -- if the
-     * model cited nothing, this returns null and no pill is shown, because
-     * inventing an attribution is worse than omitting one.
+     * 1. Over 24 paired prompts, 75% of replies carried a [SOURCE:] tag with no
+     *    retrieved chunks in context and 13% with them (Fisher exact,
+     *    p = 2.6e-5). Retrieval suppresses source attribution, and every
+     *    Degrees course runs with retrieval on -- which is why source links
+     *    were missing there across the board.
+     * 2. Tapping the live SSE stream on a course page: retrieval returned three
+     *    chunks, the top one resolving to a real module, and the reply carried
+     *    NEITHER [SOURCE:] nor a single [[c:N]] citation.
+     *
+     * The second one matters, because the obvious fallback -- read the [[c:N]]
+     * the answer cited and link to that chunk's activity -- would not have
+     * fired at all. It is still tier 2 here, since it is exact when it does
+     * fire, but it cannot be the whole fix.
+     *
+     * Tier 3 is deliberately the weaker claim. When retrieval put chunks in the
+     * prompt and the model named nothing, what is certainly true is "this
+     * answer was grounded in this course's material"; what is NOT known is
+     * which page. Naming a specific activity from the top-scoring chunk would
+     * read as precision the data does not support, and would point at the wrong
+     * page whenever the model answered from general knowledge instead. So tier
+     * 3 links to the course, and the specific activity link stays something the
+     * model earns by citing.
      *
      * @param {string} rawText Response text BEFORE marker stripping.
      * @param {Object|null} meta SSE meta event (citations, modules).
      * @returns {{type: string, cmid: string|null}|null}
      */
     const deriveSourceFromCitations = function(rawText, meta) {
-        if (!rawText || !meta || !Array.isArray(meta.citations) || !meta.citations.length) {
+        if (!meta || !Array.isArray(meta.citations) || !meta.citations.length) {
             return null;
         }
-        const cited = String(rawText).match(/\[\[c:(\d+)\]\]/g);
-        if (!cited || !cited.length) {
-            return null;
-        }
-        for (let i = 0; i < cited.length; i++) {
-            const idx = parseInt(cited[i].replace(/\D/g, ''), 10);
-            const entry = meta.citations.find(function(c) {
-                return Number(c.index) === idx;
-            });
-            if (!entry) {
-                continue;
+        const cited = String(rawText || '').match(/\[\[c:(\d+)\]\]/g);
+        if (cited && cited.length) {
+            for (let i = 0; i < cited.length; i++) {
+                const idx = parseInt(cited[i].replace(/\D/g, ''), 10);
+                const entry = meta.citations.find(function(c) {
+                    return Number(c.index) === idx;
+                });
+                if (!entry) {
+                    continue;
+                }
+                const cmid = entry.cmid ? String(entry.cmid) : null;
+                if (cmid && meta.modules && meta.modules[cmid]) {
+                    return {type: 'activity', cmid: cmid};
+                }
             }
-            const cmid = entry.cmid ? String(entry.cmid) : null;
-            if (cmid && meta.modules && meta.modules[cmid]) {
-                return {type: 'activity', cmid: cmid};
-            }
         }
-        // Chunks were cited but none resolves to a visible module (course-level
-        // content, or a module the learner cannot see). The course page is still
-        // a true and useful answer to "where did this come from".
         return {type: 'course', cmid: null};
     };
 

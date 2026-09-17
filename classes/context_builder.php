@@ -2352,6 +2352,14 @@ class context_builder {
             // treats the grounding as already declared. Saying otherwise out loud
             // is the difference between two competing instructions and two
             // complementary ones.
+            //
+            // A second measurement is why the browser does not simply read the
+            // citation instead: tapping the live stream on Degrees with three
+            // chunks retrieved, the reply carried NEITHER marker. The model is
+            // not choosing [[c:N]] over [SOURCE:], it is skipping attribution
+            // altogether once retrieved content is present. So this wording has
+            // to do real work; chat.js only has a course-level fallback behind
+            // it, not an equivalent.
             $sourcebullet .= " Required even when you already used `[[c:N]]` — the two are not "
                 . "alternatives: `[[c:N]]` marks which passage one sentence came from, `[SOURCE:]` "
                 . "marks where the whole answer is grounded. A reply carrying `[[c:N]]` but no "
