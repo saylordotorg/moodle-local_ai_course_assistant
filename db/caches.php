@@ -94,6 +94,16 @@ $definitions = [
     // is otherwise handled by the per-course version counter that
     // rag_retriever::flush_cache() increments, so a reindex on one web node is
     // seen by every other node. The old per-process static could not do that.
+    //
+    // That cross-node guarantee holds only for a SHARED store. The default file
+    // store in shared moodledata qualifies; APCu, a documented mapping for
+    // application caches, does not, and on such a site both the generation bump
+    // and purge_by_definition() are node-local -- which would make per-node
+    // staleness worse than the old static, not better, because the window grows
+    // from one page load to this TTL. Sites mapping this definition to APCu
+    // should map it elsewhere or shorten the TTL. Note also that stores cap item
+    // size (memcached at 1 MB by default) well below MAX_CACHED_INDEX_BYTES; a
+    // rejected set() is reported via debugging() rather than passing silently.
     'vectors' => [
         'mode'       => cache_store::MODE_APPLICATION,
         'simplekeys' => true,

@@ -86,8 +86,13 @@ class rag_retriever {
     /**
      * Discard cached vectors after the index changes.
      *
-     * Called by content_indexer on every path that inserts or deletes chunks.
-     * Cheap: the cache is per-process and rebuilt on the next retrieval.
+     * Called by every path that inserts or deletes chunks: content_indexer,
+     * faq_manager, observer::course_deleted(), embedding_migration.
+     *
+     * No longer cheap, and no longer per-process. Flushing one course bumps a
+     * shared generation counter (two cache ops). Flushing everything purges the
+     * whole `vectors` definition across the site, so do not call the null form
+     * in a loop -- call it once after the loop.
      *
      * @param int|null $courseid Course to flush, or null for every course.
      */
@@ -106,9 +111,30 @@ class rag_retriever {
         // the behaviour the old per-process static could not provide: a
         // reindex on one node left every other node scoring against vectors
         // that no longer existed until its PHP process recycled.
-        $cache = self::vector_cache();
-        $ver = $cache->get("ver_{$courseid}");
-        $cache->set("ver_{$courseid}", (($ver === false) ? 1 : (int) $ver) + 1);
+        // max(counter + 1, time()) rather than counter + 1, because the counter
+        // shares this definition's 24h TTL with the entries it guards AND is
+        // written before them, so it expires first. Once it is gone
+        // course_version() falls back to 1, and a plain increment would set 2 --
+        // a generation whose entries can still be live, reviving a pre-reindex
+        // index for the remainder of their TTL. Eviction does the same thing:
+        // a tiny counter and a 16 MB blob are not evicted together. Wall clock
+        // is monotonic, so a generation is never reused.
+        // The counter lives in config_plugins, NOT in a cache. A cached counter
+        // can be lost independently of the entries it guards -- it expires on
+        // the same clock (and is written first, so it goes first), and eviction
+        // under memory pressure drops a tiny key long before a 16 MB blob. After
+        // such a loss there is no memory of which generations were already used,
+        // so the next bump restarts low and revives a pre-reindex index whose
+        // entries are still live. A clock-derived value only narrows that window;
+        // two flushes inside the same millisecond still collide. config_plugins
+        // is durable, shared across nodes, and survives a cache purge, which
+        // closes the hole rather than shrinking it. Reads are free: Moodle keeps
+        // plugin config in memory for the request.
+        set_config(
+            self::GENERATION_CONFIG_PREFIX . $courseid,
+            self::course_version($courseid) + 1,
+            'local_ai_course_assistant'
+        );
         // Keys are "course_<id>_<querymodel hash>", because a cached set is
         // filtered for comparability against one query model. Flushing has to
         // clear every variant for the course: an exact unset() of
@@ -134,6 +160,9 @@ class rag_retriever {
         return \cache::make('local_ai_course_assistant', 'vectors');
     }
 
+    /** Config key prefix for the per-course index generation. */
+    private const GENERATION_CONFIG_PREFIX = 'ragvecgen_';
+
     /**
      * Current generation number for a course's index.
      *
@@ -146,8 +175,8 @@ class rag_retriever {
      * @return int
      */
     private static function course_version(int $courseid): int {
-        $ver = self::vector_cache()->get("ver_{$courseid}");
-        return ($ver === false) ? 1 : (int) $ver;
+        $ver = get_config('local_ai_course_assistant', self::GENERATION_CONFIG_PREFIX . $courseid);
+        return ($ver === false || $ver === null || $ver === '') ? 1 : (int) $ver;
     }
 
     /**
@@ -181,13 +210,32 @@ class rag_retriever {
         $key = self::persist_key($courseid, $querymodel, $dtype);
 
         $packed = $cache->get($key);
-        if (is_array($packed) && isset($packed['ids'], $packed['blob'])) {
+        if (self::packed_index_is_intact($packed)) {
+            self::report_skips($packed, $courseid, $querymodel, $dtype);
             return $packed;
         }
 
         $packed = self::build_packed_index_from_db($courseid, $querymodel, $dtype);
-        if (strlen($packed['blob']) <= self::MAX_CACHED_INDEX_BYTES) {
-            $cache->set($key, $packed);
+        self::report_skips($packed, $courseid, $querymodel, $dtype);
+
+        $size = strlen($packed['blob']);
+        if ($size <= self::MAX_CACHED_INDEX_BYTES && !$cache->set($key, $packed)) {
+            // MAX_CACHED_INDEX_BYTES is our ceiling; the store has its own and it
+            // is usually lower. cachestore_memcached refuses items over 1 MB by
+            // default, so on such a site every request would pay the full
+            // database read AND a failed multi-megabyte serialize, with the
+            // headline speedup simply not happening and nothing to say why.
+            debugging(
+                sprintf(
+                    'rag_retriever: the application cache store rejected a %d-byte packed index for '
+                    . 'course %d. Retrieval will read the database on every request. Cache stores cap '
+                    . 'item size (memcached defaults to 1 MB); map the "vectors" definition to a store '
+                    . 'that can hold it, or reduce the index with int8 embeddings.',
+                    $size,
+                    $courseid
+                ),
+                DEBUG_NORMAL
+            );
         }
         return $packed;
     }
@@ -223,6 +271,13 @@ class rag_retriever {
         $packed = [
             'ids' => [], 'lens' => [], 'dtypes' => [],
             'cmids' => [], 'modtypes' => [], 'chunkindexes' => [], 'blob' => '',
+            // Carried rather than reported here so the warnings survive caching.
+            // They used to fire on every retrieval; once the build happens at
+            // most once a day per course they would otherwise go quiet, and the
+            // whole point of them is that the symptom (retrieval silently
+            // returning nothing) looks nothing like the cause.
+            'skipped_model' => 0, 'skipped_model_name' => '',
+            'skipped_dtype' => 0, 'skipped_dtype_name' => '',
         ];
 
         $rows = $DB->get_records_select(
@@ -305,6 +360,15 @@ class rag_retriever {
                 if (!is_array($vec) || empty($vec)) {
                     continue;
                 }
+                // decode_vector()'s JSON branch ignores $dtype and returns the
+                // literal decoded values, so an int8-LABELLED row that only has
+                // the JSON column yields float32 magnitudes in roughly [-1, 1].
+                // Packing those as int8 would round every one to -1, 0 or +1 and
+                // then score the result, which is silent garbage and a
+                // regression against main, where the same row scored correctly.
+                // Pack float32 and record float: lossless either way, and
+                // classify_row() only distinguishes binary from non-binary.
+                $rowdtype = \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT;
                 $bytes = self::pack_vector($vec, $rowdtype);
             }
             if ($bytes === '') {
@@ -320,10 +384,33 @@ class rag_retriever {
             $packed['blob']          .= $bytes;
         }
 
+        $packed['skipped_model'] = $skippedincompatible;
+        $packed['skipped_model_name'] = $skippedmodel;
+        $packed['skipped_dtype'] = $skippeddtype;
+        $packed['skipped_dtype_name'] = $skippeddtypename;
+
+        return $packed;
+    }
+
+    /**
+     * Emit the "some chunks were skipped" warnings for a packed index.
+     *
+     * Called on the cache HIT path as well as the miss path. Loud, because the
+     * symptom otherwise is "retrieval quietly returns nothing" and the cause is
+     * a config change made days earlier.
+     *
+     * @param array  $packed
+     * @param int    $courseid
+     * @param string $querymodel
+     * @param string $dtype
+     */
+    private static function report_skips(array $packed, int $courseid, string $querymodel, string $dtype): void {
+        $skippedincompatible = (int) ($packed['skipped_model'] ?? 0);
+        $skippedmodel = (string) ($packed['skipped_model_name'] ?? '');
+        $skippeddtype = (int) ($packed['skipped_dtype'] ?? 0);
+        $skippeddtypename = (string) ($packed['skipped_dtype_name'] ?? '');
+
         if ($skippedincompatible > 0) {
-            // Loud, because the symptom otherwise is "retrieval quietly
-            // returns nothing" and the cause is a config change made
-            // days earlier.
             debugging(
                 sprintf(
                     'rag_retriever: skipped %d chunk(s) in course %d embedded with "%s", '
@@ -352,8 +439,30 @@ class rag_retriever {
                 DEBUG_NORMAL
             );
         }
+    }
 
-        return $packed;
+    /**
+     * Is a cached packed index structurally self-consistent?
+     *
+     * hydrate_index() walks the blob by the recorded lengths, so a short or
+     * corrupt `lens` shifts every subsequent offset and yields plausible
+     * garbage rather than an error. An array_sum over a few thousand ints is
+     * microseconds against a ~210 ms decode, so the certainty is worth buying.
+     *
+     * @param mixed $packed
+     * @return bool
+     */
+    private static function packed_index_is_intact($packed): bool {
+        if (!is_array($packed) || !isset($packed['ids'], $packed['blob'], $packed['lens'])) {
+            return false;
+        }
+        if (!is_array($packed['ids']) || !is_array($packed['lens']) || !is_string($packed['blob'])) {
+            return false;
+        }
+        if (count($packed['lens']) !== count($packed['ids'])) {
+            return false;
+        }
+        return array_sum($packed['lens']) === strlen($packed['blob']);
     }
 
     /**
@@ -376,9 +485,14 @@ class rag_retriever {
         $count = count($packed['ids']);
         for ($i = 0; $i < $count; $i++) {
             $len = (int) $packed['lens'][$i];
+            if ($len <= 0) {
+                // substr() reads a negative length as "stop N from the end",
+                // which would slice the wrong bytes and walk $offset backwards.
+                continue;
+            }
             $slice = substr($packed['blob'], $offset, $len);
             $offset += $len;
-            if ($slice === false || $slice === '') {
+            if ($slice === '') {
                 continue;
             }
 

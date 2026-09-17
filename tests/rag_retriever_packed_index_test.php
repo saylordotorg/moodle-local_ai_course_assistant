@@ -164,11 +164,16 @@ final class rag_retriever_packed_index_test extends \advanced_testcase {
             'embed_model'   => 'voyage-4-large',
         ]);
 
-        $packed = $this->call('build_packed_index_from_db', [42, 'text-embedding-3-small', 'float']);
+        $packed = $this->call('load_packed_index', [42, 'text-embedding-3-small', 'float']);
         $this->assertDebuggingCalled();
 
         $out = $this->call('hydrate_index', [$packed]);
         $this->assertSame([$keep], array_keys($out));
+
+        // And again from the cache: the warning must not go quiet for 24 hours
+        // just because the index is no longer rebuilt on every request.
+        $this->call('load_packed_index', [42, 'text-embedding-3-small', 'float']);
+        $this->assertDebuggingCalled();
     }
 
     /**
@@ -226,6 +231,143 @@ final class rag_retriever_packed_index_test extends \advanced_testcase {
         rag_retriever::flush_cache();
 
         $this->assertSame([], $this->call('load_packed_index', [42, 'text-embedding-3-small', 'float'])['ids']);
+    }
+
+    /**
+     * An int8 index round trips, and its magnitudes are preserved.
+     *
+     * decode_vector() deliberately returns int8 values as-is rather than
+     * dequantizing, because cosine is scale-invariant. The packed form has to
+     * preserve that, not silently renormalize it.
+     */
+    public function test_int8_vectors_round_trip_with_magnitudes_intact(): void {
+        $this->resetAfterTest();
+        $vals = [127.0, -128.0, 0.0, 42.0];
+        $id = $this->chunk(42, [
+            'embedding_bin' => rag_retriever::pack_vector($vals, 'int8'),
+            'embed_dtype'   => 'int8',
+        ]);
+
+        $out = $this->call('hydrate_index', [
+            $this->call('build_packed_index_from_db', [42, 'text-embedding-3-small', 'int8']),
+        ]);
+
+        $this->assertSame($vals, $out[$id]['vec']);
+        $this->assertSame('int8', $out[$id]['dtype']);
+    }
+
+    /**
+     * A course holding two encodings decodes each chunk with its own decoder.
+     *
+     * This is what the parallel `lens`/`dtypes` arrays exist for: float is four
+     * bytes per dimension and int8 is one, so a fixed stride or a single shared
+     * dtype would mis-slice or mis-decode every row after the first.
+     *
+     * float and int8 are the only pair that can share a scored set: classify_row()
+     * separates binary from non-binary, so a binary row is excluded outright when
+     * the configured encoding is not binary.
+     */
+    public function test_mixed_dtype_course_decodes_each_chunk_with_its_own_decoder(): void {
+        $this->resetAfterTest();
+        $floatvals = [0.5, -0.25, 0.125, 1.0];   // 16 bytes
+        $int8vals  = [127.0, -128.0, 7.0];       // 3 bytes
+        $fid = $this->chunk(42, ['embedding_bin' => rag_retriever::pack_vector($floatvals, 'float')]);
+        $iid = $this->chunk(42, [
+            'embedding_bin' => rag_retriever::pack_vector($int8vals, 'int8'),
+            'embed_dtype'   => 'int8',
+        ]);
+
+        $packed = $this->call('build_packed_index_from_db', [42, 'text-embedding-3-small', 'float']);
+        // Map id => len rather than asserting positions: get_records_select has
+        // no ORDER BY, so row order is not guaranteed and differs between an
+        // isolated run and the full suite.
+        $lens = array_combine($packed['ids'], $packed['lens']);
+        $this->assertSame(16, $lens[$fid], 'float32 is four bytes per dimension');
+        $this->assertSame(3, $lens[$iid], 'int8 is one byte per dimension');
+
+        $out = $this->call('hydrate_index', [$packed]);
+        $this->assertSame($floatvals, $out[$fid]['vec']);
+        $this->assertSame($int8vals, $out[$iid]['vec'], 'the int8 row must not be decoded as float32');
+    }
+
+    /**
+     * A legacy JSON-only row labelled int8 is packed as float, not quantized.
+     *
+     * decode_vector()'s JSON branch ignores the dtype and returns the literal
+     * decoded values, so these are float32 magnitudes. Packing them as int8
+     * would round each to -1, 0 or +1 and then score the result: silent garbage,
+     * and a regression against the behaviour before this index was cached.
+     */
+    public function test_json_only_row_labelled_int8_is_not_quantized(): void {
+        $this->resetAfterTest();
+        $vec = [0.5, -0.25, 0.125];
+        $id = $this->chunk(42, [
+            'embedding'     => json_encode($vec),
+            'embedding_bin' => null,
+            'embed_dtype'   => 'int8',
+        ]);
+
+        $out = $this->call('hydrate_index', [
+            $this->call('build_packed_index_from_db', [42, 'text-embedding-3-small', 'float']),
+        ]);
+
+        $this->assertSame($vec, $out[$id]['vec'], 'values must survive, not be rounded to 0/±1');
+        $this->assertSame('float', $out[$id]['dtype']);
+    }
+
+    /**
+     * A cached entry whose blob no longer matches its lengths is rebuilt.
+     *
+     * Trusting it would not throw: the offsets would simply shift and every
+     * chunk after the damage would decode into plausible garbage.
+     */
+    public function test_corrupt_cached_entry_is_rebuilt_rather_than_mis_sliced(): void {
+        $this->resetAfterTest();
+        $vec = [1.0, 2.0, 3.0];
+        $id = $this->chunk(42, ['embedding_bin' => rag_retriever::pack_vector($vec, 'float')]);
+
+        $key = $this->call('persist_key', [42, 'text-embedding-3-small', 'float']);
+        $cache = $this->call('vector_cache');
+        $packed = $this->call('load_packed_index', [42, 'text-embedding-3-small', 'float']);
+        $this->assertSame([$id], $packed['ids']);
+
+        $packed['blob'] = substr($packed['blob'], 0, -4);   // lose one dimension
+        $cache->set($key, $packed);
+
+        $fresh = $this->call('load_packed_index', [42, 'text-embedding-3-small', 'float']);
+        $this->assertSame(array_sum($fresh['lens']), strlen($fresh['blob']),
+            'a truncated entry must be rebuilt from the database, not hydrated');
+        $this->assertSame($vec, $this->call('hydrate_index', [$fresh])[$id]['vec']);
+    }
+
+    /**
+     * Every flush produces a generation that has never been used before.
+     *
+     * The counter lives in config_plugins rather than a cache precisely so this
+     * holds: a cached counter can be evicted or expire independently of the
+     * entries it guards, and after that loss a fresh increment restarts low and
+     * revives a still-live pre-reindex index. Purging every cache in the site
+     * simulates the worst case; the generation must still move forward.
+     */
+    public function test_every_flush_produces_an_unused_generation(): void {
+        $this->resetAfterTest();
+        $this->chunk(42, ['embedding_bin' => rag_retriever::pack_vector([1.0, 2.0], 'float')]);
+
+        $seen = [];
+        for ($i = 0; $i < 3; $i++) {
+            rag_retriever::flush_cache(42);
+            $seen[] = $this->call('persist_key', [42, 'text-embedding-3-small', 'float']);
+            // Back-to-back flushes land in the same millisecond, which is what
+            // defeated a clock-derived counter.
+        }
+
+        // And again after every cache in the site has been thrown away.
+        \cache_helper::purge_all();
+        rag_retriever::flush_cache(42);
+        $seen[] = $this->call('persist_key', [42, 'text-embedding-3-small', 'float']);
+
+        $this->assertSame($seen, array_values(array_unique($seen)),
+            'a generation must never be reused, or a flush can revive a cached index');
     }
 
     /**

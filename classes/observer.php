@@ -152,6 +152,15 @@ class observer {
             }
         }
 
+        // The sweep above deletes this course's RAG chunks, so the cached vector
+        // index for it is now a set of rows that no longer exist. That used to
+        // self-correct at the end of the request; with a 24-hour persistent
+        // cache it does not. It matters beyond wasted memory because, as the
+        // note at the top of this method says, course ids are reused -- a new
+        // course landing on this id would retrieve the deleted course's content
+        // until something reindexed it.
+        \local_ai_course_assistant\rag_retriever::flush_cache($courseid);
+
         // Per-course overrides live in config_plugins keyed by course id.
         foreach ($DB->get_records_select(
             'config_plugins',
