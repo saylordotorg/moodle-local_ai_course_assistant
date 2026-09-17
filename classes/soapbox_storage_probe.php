@@ -52,8 +52,8 @@ class soapbox_storage_probe {
     /** @var string Probe failed. */
     public const STATUS_FAIL = 'fail';
 
-    /** @var string Key prefix for probe objects, so they are obvious in the bucket. */
-    private const PROBE_PREFIX = '__selftest/';
+    /** @var string Marker segment for probe objects, so they are obvious in the bucket. */
+    private const PROBE_MARKER = '__selftest/';
 
     /**
      * Build a result row.
@@ -115,17 +115,30 @@ class soapbox_storage_probe {
         // A distinctive body so a GET that silently returns someone else's object,
         // or an HTML error page, cannot be mistaken for success.
         $body = 'sola-soapbox-selftest-' . bin2hex(random_bytes(8));
-        $key = self::PROBE_PREFIX . 'probe-' . (int) $USER->id . '-' . time() . '.txt';
+        // Probe INSIDE the configured recording prefix. Writing to a sibling
+        // path meant the probe exercised a location real recordings never use,
+        // so a bucket policy correctly scoped to the recording prefix returned
+        // 403 and the probe reported a working bucket as broken.
+        $key = soapbox_storage::prefix() . self::PROBE_MARKER
+            . 'probe-' . (int) $USER->id . '-' . time() . '.txt';
         $uploaded = false;
 
         // 2. PUT.
         try {
             $puturl = $storage->presign_put($key, 300);
+            // curl::put() streams the body from a file on disk: it tests the
+            // 'file' value with is_file() and returns null WITHOUT issuing any
+            // request when that fails. Passing the body inline therefore never
+            // reached S3, and reported as HTTP 0 -- indistinguishable from a
+            // network failure. Stage the probe body in the per-request temp
+            // directory, which Moodle clears at the end of the request.
+            $tmpfile = make_request_directory() . '/soapbox-probe.txt';
+            file_put_contents($tmpfile, $body);
             $curl = new \curl();
             // Same reason as soapbox_storage::delete_object(): Moodle's curl helpers
             // add an Authorization header, and S3 refuses a request carrying both
             // that and a query-string SigV4 signature.
-            $curl->put($puturl, ['file' => $body], ['CURLOPT_HTTPHEADER' => ['Authorization:']]);
+            $curl->put($puturl, ['file' => $tmpfile], ['CURLOPT_HTTPHEADER' => ['Authorization:']]);
             $code = (int) ($curl->get_info()['http_code'] ?? 0);
             if ($code >= 200 && $code < 300) {
                 $uploaded = true;
