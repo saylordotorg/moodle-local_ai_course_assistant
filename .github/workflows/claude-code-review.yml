@@ -73,7 +73,23 @@ jobs:
           # along -- "No buffered inline comments" is what a review that was told
           # not to comment prints -- and reading the command's own definition would
           # have found it in one step.
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }} --comment'
+          # The trailing instruction is a mitigation for the abandoned-agent
+          # failure the gate below detects. Step 4 of /code-review launches its
+          # reviewers as BACKGROUND agents, and the SDK will end the session
+          # while they are still running -- on PR #239 it stopped with 3 of 6
+          # unreported and reported success. Telling the session not to finish
+          # early cannot make that impossible, but it removes the "I've launched
+          # them, my work here is done" reading that produced every silent run.
+          # The gate stays regardless: this reduces the failure rate, it does
+          # not make the failure detectable, which is a different job.
+          prompt: |
+            /code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }} --comment
+
+            Do not end your turn while any review agent is still running. Wait for
+            every agent to report, synthesise their findings, and post the review
+            comment before you finish. If you are about to say that agents are
+            "still running" or that you will "report once they come back", you are
+            stopping too early: wait for them instead.
 
           # Without this the review runs, reports success, bills for the tokens
           # and posts nothing -- v7.0.1's run finished with
@@ -165,3 +181,121 @@ jobs:
           #
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
+
+      # THE GATE. Everything above this point can succeed while the review does
+      # not happen, which is the whole problem: five separate causes have each
+      # produced a green job that posted nothing, and a reviewer gate that
+      # cannot fail is not a gate.
+      #
+      # This reads the action's own execution log and fails the job on the two
+      # conditions that are unambiguously broken, both machine-readable rather
+      # than matched against prose:
+      #
+      #   started_in_background > completed
+      #       The session ended with reviewers still running. On PR #239 the
+      #       terminal record read started_in_background: 6, completed: 3,
+      #       failed: 0, is_error: false, subtype: "success", with
+      #       result: "Four review agents are running in parallel ... I'll
+      #       report once they all come back." Three reviewers were killed
+      #       mid-flight and the job went green. On PR #238 the same thing lost
+      #       a real defect that then reached main.
+      #
+      #   permission_denials_count > 0
+      #       A denied tool call means some part of the review could not run.
+      #       This was the v7.0.1 (21 denials) and v7.2.1 (26 denials) failure;
+      #       both billed and posted nothing.
+      #
+      # Deliberately NOT a failure: posting no comment. A genuinely clean review
+      # may have nothing to say, and failing on that would train everyone to
+      # ignore a red gate. It is reported as a notice instead.
+      #
+      # This step must fail loudly if it cannot find or parse the log. A guard
+      # that passes when it cannot see anything is the bug it exists to catch.
+      - name: Fail if the review did not actually finish
+        if: always() && steps.claude-review.outcome != 'skipped'
+        env:
+          EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          FILE="${EXECUTION_FILE:-}"
+          if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
+            FILE="${RUNNER_TEMP}/claude-execution-output.json"
+          fi
+
+          if [ ! -f "$FILE" ]; then
+            # One legitimate reason there is no log: the action refuses to run at
+            # all when the workflow file differs from the copy on the default
+            # branch ("Workflow validation failed ... identical content"). That
+            # makes a PR editing THIS file unreviewable by design, so failing it
+            # would block every future fix to the reviewer. Detect that case
+            # specifically and pass with a notice; anything else is a real
+            # "we cannot tell whether the review ran", which must fail.
+            if gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename' 2>/dev/null \
+                 | grep -qx '.github/workflows/claude-code-review.yml'; then
+              echo "::notice::No execution log because this PR edits the review workflow itself," \
+                   "so the action skipped with a workflow-validation error. That is expected and" \
+                   "documented. The review, and this gate, take effect on the next PR after merge." \
+                   "Get a review on THIS pull request by commenting '@claude please review this diff'."
+              exit 0
+            fi
+            echo "::error::Cannot find the Claude execution log. Expected it at" \
+                 "'${EXECUTION_FILE:-<action output unset>}' or '${RUNNER_TEMP}/claude-execution-output.json'," \
+                 "and this PR does not touch the review workflow, so the skip is not the expected one." \
+                 "Failing rather than assuming the review ran."
+            exit 1
+          fi
+
+          # The log is a JSON array of stream records. The last one of type
+          # "result" carries the terminal accounting.
+          RESULT="$(jq -c '[ (if type=="array" then .[] else . end)
+                             | select(type=="object" and .type=="result") ] | last' "$FILE" 2>/dev/null || true)"
+          if [ -z "$RESULT" ] || [ "$RESULT" = "null" ]; then
+            echo "::error::No terminal 'result' record in $FILE, so the review's own report of what it did is missing."
+            exit 1
+          fi
+
+          # Field names verified against a real terminal record (run 35212917057,
+          # PR #239). They are NOT what you would guess: the agent counters live
+          # under .subagent_stats, and denials are an ARRAY .permission_denials,
+          # not a count. A first draft of this gate read .background_tasks and
+          # .permission_denials_count, found nothing, defaulted every value to 0
+          # and passed the very run it was written to catch.
+          started=$(jq -r '(.subagent_stats.started_in_background // 0)' <<<"$RESULT")
+          completed=$(jq -r '(.subagent_stats.completed // 0)' <<<"$RESULT")
+          failed=$(jq -r '(.subagent_stats.failed // 0)' <<<"$RESULT")
+          denials=$(jq -r '((.permission_denials // []) | length)' <<<"$RESULT")
+          iserror=$(jq -r '(.is_error // false)' <<<"$RESULT")
+          reason=$(jq -r '(.terminal_reason // "unknown")' <<<"$RESULT")
+          summary=$(jq -r '(.result // "")' <<<"$RESULT" | head -c 400)
+          abandoned=$(( started - completed - failed ))
+
+          echo "review agents: started_in_background=$started completed=$completed failed=$failed abandoned=$abandoned"
+          echo "permission denials: $denials   is_error: $iserror   terminal_reason: $reason"
+          echo "final result text: $summary"
+
+          rc=0
+          if [ "$iserror" = "true" ]; then
+            echo "::error::The review session ended in an error state."
+            rc=1
+          fi
+          if [ "$denials" -gt 0 ] 2>/dev/null; then
+            echo "::error::$denials tool call(s) were denied, so part of the review could not run." \
+                 "Grant the missing tool in claude_args --allowedTools (keep every pattern space-free)."
+            rc=1
+          fi
+          if [ "$abandoned" -gt 0 ] 2>/dev/null; then
+            echo "::error::The job ended with $abandoned of $started review agent(s) still running," \
+                 "so this pull request was NOT fully reviewed even though the action reported success." \
+                 "Re-run the job, or comment '@claude please review this diff' on the PR, which posts reliably."
+            rc=1
+          fi
+
+          if [ "$rc" -eq 0 ]; then
+            echo "::notice::Review completed: $completed of $started agents reported, $denials denials." \
+                 "If no comment was posted, the review had nothing to report."
+          fi
+          exit $rc

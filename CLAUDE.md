@@ -272,6 +272,30 @@ The validator suite is corpus-driven (`tests/security/`) and runs in millisecond
      green `claude-review`, grep the run log for that `"result"` line; if the
      agents had not reported, the PR was not reviewed.
 
+  **Causes 2 and 4 are now caught automatically.** `claude-code-review.yml` ends
+  with a "Fail if the review did not actually finish" step that parses the
+  action's execution log and fails the job when the session abandoned its
+  reviewers or hit a denied tool call. Two things about it are worth knowing
+  before you touch it:
+
+  - The fields are **not** where you would guess. Agent counters live under
+    `.subagent_stats` (`started_in_background`, `completed`, `failed`) and
+    denials are an **array** `.permission_denials`, not a count. The first
+    draft of the gate read `.background_tasks` and `.permission_denials_count`,
+    found neither, defaulted everything to 0 and passed the exact run it was
+    written to catch. Verify any change against a real terminal record.
+  - A missing or unparseable log **fails** the job. A guard that passes when it
+    cannot see anything is the bug it exists to prevent.
+
+  It does NOT fail on "posted no comment": a genuinely clean review may have
+  nothing to say, and a gate that cries wolf gets ignored. That case is a
+  `::notice::`.
+
+  Remember cause 1 when fixing any of this: **a PR that edits
+  `claude-code-review.yml` cannot exercise its own change**, because the action
+  refuses to run unless the workflow file matches the copy on the default
+  branch. The gate only starts working on the first PR opened AFTER it merges.
+
   To tell 2 from 3: the job log prints a `GITHUB_TOKEN Permissions` block under *Set up job*. If it shows `PullRequests: write` and `Issues: write`, posting was possible and the problem is tool permissions, not API scope.
 
   When granting tools, keep `Bash` scoped per `gh` subcommand and never grant `Edit`/`Write`. `pull_request` runs check out an untrusted head, so a blanket `Bash` grant would let a contributor's branch run arbitrary commands holding a `pull-requests: write` token.
