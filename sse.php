@@ -720,19 +720,32 @@ try {
         }
     }
     // Build modules lookup map (cmid → url, title) for specific source attribution.
+    //
+    // Supplemental courses are included, because retrieval now scores their
+    // chunks too. Without them a citation into the orientation course had no
+    // entry here and fell back to the CURRENT course's page -- a link that
+    // works but points at the wrong course. uservisible is the access check:
+    // a learner who cannot see the activity gets no link to it.
     $modulesmap = [];
-    try {
-        $modinfo = get_fast_modinfo($courseid);
-        foreach ($modinfo->get_cms() as $cmobj) {
-            if ($cmobj->uservisible && $cmobj->has_view() && !empty($cmobj->name)) {
-                $modulesmap[(string) $cmobj->id] = [
-                    'url' => (new \moodle_url('/mod/' . $cmobj->modname . '/view.php', ['id' => $cmobj->id]))->out(false),
-                    'title' => $cmobj->name,
-                ];
+    $mapcourses = array_merge(
+        [$courseid],
+        \local_ai_course_assistant\supplemental_sources::usable_course_ids($courseid)
+    );
+    foreach ($mapcourses as $mapcourseid) {
+        try {
+            $modinfo = get_fast_modinfo($mapcourseid);
+            foreach ($modinfo->get_cms() as $cmobj) {
+                if ($cmobj->uservisible && $cmobj->has_view() && !empty($cmobj->name)) {
+                    $modulesmap[(string) $cmobj->id] = [
+                        'url' => (new \moodle_url('/mod/' . $cmobj->modname . '/view.php', ['id' => $cmobj->id]))->out(false),
+                        'title' => $cmobj->name,
+                    ];
+                }
             }
+        } catch (\Throwable $e) {
+            // Non-critical; pill will fall back to generic course link.
+            continue;
         }
-    } catch (\Throwable $e) {
-        // Non-critical; pill will fall back to generic course link.
     }
 
     // Resolve retrieved RAG chunks to inline-citation payloads. The frontend
