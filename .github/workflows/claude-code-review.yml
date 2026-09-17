@@ -215,6 +215,9 @@ jobs:
         if: always() && steps.claude-review.outcome != 'skipped'
         env:
           EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
 
@@ -222,9 +225,26 @@ jobs:
           if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
             FILE="${RUNNER_TEMP}/claude-execution-output.json"
           fi
+
           if [ ! -f "$FILE" ]; then
+            # One legitimate reason there is no log: the action refuses to run at
+            # all when the workflow file differs from the copy on the default
+            # branch ("Workflow validation failed ... identical content"). That
+            # makes a PR editing THIS file unreviewable by design, so failing it
+            # would block every future fix to the reviewer. Detect that case
+            # specifically and pass with a notice; anything else is a real
+            # "we cannot tell whether the review ran", which must fail.
+            if gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename' 2>/dev/null \
+                 | grep -qx '.github/workflows/claude-code-review.yml'; then
+              echo "::notice::No execution log because this PR edits the review workflow itself," \
+                   "so the action skipped with a workflow-validation error. That is expected and" \
+                   "documented. The review, and this gate, take effect on the next PR after merge." \
+                   "Get a review on THIS pull request by commenting '@claude please review this diff'."
+              exit 0
+            fi
             echo "::error::Cannot find the Claude execution log. Expected it at" \
-                 "'${EXECUTION_FILE:-<action output unset>}' or '${RUNNER_TEMP}/claude-execution-output.json'." \
+                 "'${EXECUTION_FILE:-<action output unset>}' or '${RUNNER_TEMP}/claude-execution-output.json'," \
+                 "and this PR does not touch the review workflow, so the skip is not the expected one." \
                  "Failing rather than assuming the review ran."
             exit 1
           fi
