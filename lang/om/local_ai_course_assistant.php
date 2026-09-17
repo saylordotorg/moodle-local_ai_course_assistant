@@ -2650,3 +2650,19 @@ $string['settings:spend_export_key_desc'] = 'Furtuu Bearer endpoint baasa baasii
 $string['task:migrate_course_embeddings'] = 'Koorsii tokko gara moodeelii embedding haaraatti ceehumsiisi';
 $string['task:model_price_drift_check'] = 'To\'annoo drift gatii moodeelaa';
 $string['task:run_model_benchmark'] = 'Moodeelii benchmark godhi';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Fuula kana ibsi';
+$string['starters:builtin_help_page_desc'] = 'Yaadota ijoo fuula barnoota ammaa ibsa';
+$string['starters:builtin_quiz'] = 'Na qori';
+$string['starters:builtin_quiz_desc'] = 'Barnoota ammaa irratti qormaata shaakalaa uuma';
+$string['starters:builtin_study_plan'] = 'Karoora barumsaa';
+$string['starters:builtin_study_plan_desc'] = 'Karoora yeroo qayyabannaa xiyyeeffate uuma';
+$string['starters:builtin_ai_project_coach'] = 'AI Pirojektii Qoree';
+$string['starters:builtin_ai_project_coach_desc'] = 'Gorsa tarkaanfiin tarkaanfii pirojektii fi hojii koorsii';
+$string['starters:builtin_focus_next'] = 'Maalirratti xiyyeeffachuu qaba?';
+$string['starters:builtin_focus_next_desc'] = 'Guddina galma keetii irratti hundaa\'uun yaada tarkaanfii itti aanuu dhuunfaa';
+$string['starters:builtin_ell_practice'] = 'Dubbachuu shaakala';
+$string['starters:builtin_ell_practice_desc'] = 'Shaakala haasawa afaaniin gargaaraa waliin';
+$string['starters:builtin_ell_pronunciation'] = 'Dhaggeeffannaa';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Deebii sagalee sagaleen akkaataa jecha dubbattu irratti';

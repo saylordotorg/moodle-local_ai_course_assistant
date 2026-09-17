@@ -2663,3 +2663,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer key para sa buwanang endpoin
 $string['task:migrate_course_embeddings'] = 'I-migrate ang isang kurso sa bagong embedding model';
 $string['task:model_price_drift_check'] = 'Pagtingin sa price drift ng modelo';
 $string['task:run_model_benchmark'] = 'I-benchmark ang isang modelo';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Ipaliwanag ang pahinang ito';
+$string['starters:builtin_help_page_desc'] = 'Ipinapaliwanag ang mga pangunahing konsepto sa kasalukuyang pahina ng aralin';
+$string['starters:builtin_quiz'] = 'Subukin ako';
+$string['starters:builtin_quiz_desc'] = 'Gumagawa ng pagsasanay na pagsusulit mula sa kasalukuyang materyal';
+$string['starters:builtin_study_plan'] = 'Plano sa pag-aaral';
+$string['starters:builtin_study_plan_desc'] = 'Gumagawa ng nakatuong plano para sa iyong pag-aaral';
+$string['starters:builtin_ai_project_coach'] = 'AI Project Coach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Gabay na coaching para sa mga proyekto at takdang-aralin';
+$string['starters:builtin_focus_next'] = 'Ano ang dapat kong pagtuunan?';
+$string['starters:builtin_focus_next_desc'] = 'Personalisadong mungkahi sa susunod na hakbang batay sa iyong progreso';
+$string['starters:builtin_ell_practice'] = 'Pagsasanay sa pagsasalita';
+$string['starters:builtin_ell_practice_desc'] = 'Pagsasanay sa pasalitang usapan kasama ang katulong';
+$string['starters:builtin_ell_pronunciation'] = 'Pagsasanay sa bigkas';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Tugon nang tunog-sa-tunog sa iyong pagbigkas';

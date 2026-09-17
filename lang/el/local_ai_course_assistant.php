@@ -2661,3 +2661,19 @@ $string['settings:spend_export_key_desc'] = 'Κλειδί Bearer για το end
 $string['task:migrate_course_embeddings'] = 'Μετάπτωση ενός μαθήματος σε νέο μοντέλο ενσωμάτωσης';
 $string['task:model_price_drift_check'] = 'Έλεγχος απόκλισης τιμών μοντέλων';
 $string['task:run_model_benchmark'] = 'Benchmark ενός μοντέλου';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Εξήγησε αυτή τη σελίδα';
+$string['starters:builtin_help_page_desc'] = 'Εξηγεί τις βασικές έννοιες της τρέχουσας σελίδας του μαθήματος';
+$string['starters:builtin_quiz'] = 'Εξέτασέ με';
+$string['starters:builtin_quiz_desc'] = 'Δημιουργεί κουίζ εξάσκησης πάνω στο τρέχον υλικό';
+$string['starters:builtin_study_plan'] = 'Σχέδιο μελέτης';
+$string['starters:builtin_study_plan_desc'] = 'Δημιουργεί ένα εστιασμένο πλάνο μελέτης';
+$string['starters:builtin_ai_project_coach'] = 'AI Coach Εργασιών';
+$string['starters:builtin_ai_project_coach_desc'] = 'Καθοδηγούμενη υποστήριξη για εργασίες και projects του μαθήματος';
+$string['starters:builtin_focus_next'] = 'Σε τι πρέπει να εστιάσω;';
+$string['starters:builtin_focus_next_desc'] = 'Εξατομικευμένες προτάσεις επόμενου βήματος με βάση την πρόοδό σου στους στόχους';
+$string['starters:builtin_ell_practice'] = 'Εξάσκηση ομιλίας';
+$string['starters:builtin_ell_practice_desc'] = 'Εξάσκηση προφορικής συνομιλίας με τον βοηθό';
+$string['starters:builtin_ell_pronunciation'] = 'Προφορά';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Ανατροφοδότηση ήχο προς ήχο για την προφορά σου';

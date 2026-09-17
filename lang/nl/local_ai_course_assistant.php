@@ -2642,3 +2642,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer-sleutel voor het maandelijks
 $string['task:migrate_course_embeddings'] = 'Eén cursus naar een nieuw embedding-model migreren';
 $string['task:model_price_drift_check'] = 'Controle op prijsdrift van modellen';
 $string['task:run_model_benchmark'] = 'Een model benchmarken';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Leg deze pagina uit';
+$string['starters:builtin_help_page_desc'] = 'Legt de kernbegrippen van de huidige lespagina uit';
+$string['starters:builtin_quiz'] = 'Test me';
+$string['starters:builtin_quiz_desc'] = 'Maakt een oefentoets over de huidige stof';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Maakt een gericht plan voor je studiesessie';
+$string['starters:builtin_ai_project_coach'] = 'AI-projectcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Begeleide coaching bij cursusprojecten en opdrachten';
+$string['starters:builtin_focus_next'] = 'Waar moet ik me op richten?';
+$string['starters:builtin_focus_next_desc'] = 'Persoonlijke suggesties voor je volgende stap op basis van je voortgang';
+$string['starters:builtin_ell_practice'] = 'Spreektraining';
+$string['starters:builtin_ell_practice_desc'] = 'Gesproken conversatieoefening met de assistent';
+$string['starters:builtin_ell_pronunciation'] = 'Uitspraakoefening';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Klank-voor-klank feedback op je uitspraak';

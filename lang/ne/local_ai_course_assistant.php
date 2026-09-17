@@ -2638,3 +2638,19 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = 'एउटा पाठ्यक्रमलाई नयाँ एम्बेडिङ मोडेलमा माइग्रेट गर्नुहोस्';
 $string['task:model_price_drift_check'] = 'मोडेल मूल्य ड्रिफ्ट जाँच';
 $string['task:run_model_benchmark'] = 'मोडेलको बेन्चमार्क गर्नुहोस्';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'यो पृष्ठ व्याख्या गर्नुहोस्';
+$string['starters:builtin_help_page_desc'] = 'हालको पाठ पृष्ठका मुख्य अवधारणाहरू व्याख्या गर्छ';
+$string['starters:builtin_quiz'] = 'मलाई परीक्षा लिनुहोस्';
+$string['starters:builtin_quiz_desc'] = 'हालको सामग्रीमा अभ्यास क्विज बनाउँछ';
+$string['starters:builtin_study_plan'] = 'अध्ययन योजना';
+$string['starters:builtin_study_plan_desc'] = 'केन्द्रित अध्ययन सत्र योजना बनाउँछ';
+$string['starters:builtin_ai_project_coach'] = 'AI परियोजना कोच';
+$string['starters:builtin_ai_project_coach_desc'] = 'पाठ्यक्रमका परियोजना र असाइनमेन्टका लागि निर्देशित सहयोग';
+$string['starters:builtin_focus_next'] = 'मैले केमा ध्यान दिनुपर्छ?';
+$string['starters:builtin_focus_next_desc'] = 'तपाईंको उद्देश्य प्रगतिका आधारमा अर्को कदमका व्यक्तिगत सुझाव';
+$string['starters:builtin_ell_practice'] = 'बोल्ने अभ्यास';
+$string['starters:builtin_ell_practice_desc'] = 'सहायकसँग बोलेर कुराकानी अभ्यास';
+$string['starters:builtin_ell_pronunciation'] = 'उच्चारण अभ्यास';
+$string['starters:builtin_ell_pronunciation_desc'] = 'तपाईंको उच्चारणमा ध्वनि-दर-ध्वनि प्रतिक्रिया';

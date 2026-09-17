@@ -2619,3 +2619,19 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = 'Bir dersi yeni bir embedding modeline geçir';
 $string['task:model_price_drift_check'] = 'Model fiyat drift kontrolü';
 $string['task:run_model_benchmark'] = 'Bir modeli benchmark et';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Bu sayfayı açıkla';
+$string['starters:builtin_help_page_desc'] = 'Geçerli ders sayfasındaki temel kavramları açıklar';
+$string['starters:builtin_quiz'] = 'Beni sına';
+$string['starters:builtin_quiz_desc'] = 'Geçerli içerikten alıştırma testi oluşturur';
+$string['starters:builtin_study_plan'] = 'Çalışma planı';
+$string['starters:builtin_study_plan_desc'] = 'Odaklı bir çalışma oturumu planı hazırlar';
+$string['starters:builtin_ai_project_coach'] = 'AI Proje Koçu';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ders projeleri ve ödevleri için rehberli koçluk';
+$string['starters:builtin_focus_next'] = 'Neye odaklanmalıyım?';
+$string['starters:builtin_focus_next_desc'] = 'Hedeflerindeki ilerlemeye göre kişiselleştirilmiş sonraki adım önerileri';
+$string['starters:builtin_ell_practice'] = 'Konuşma pratiği';
+$string['starters:builtin_ell_practice_desc'] = 'Asistanla sesli konuşma pratiği';
+$string['starters:builtin_ell_pronunciation'] = 'Telaffuz pratiği';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Telaffuzun için ses ses geri bildirim';

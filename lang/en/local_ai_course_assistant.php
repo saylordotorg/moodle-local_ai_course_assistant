@@ -1043,6 +1043,24 @@ $string['starters:back_settings']   = 'Back to settings';
 $string['starters:course_section']  = 'Conversation starters';
 $string['starters:course_desc']     = 'Enable or disable individual starters for this course.';
 
+// Built-in starter chip labels and help text (the title= tooltip on each chip).
+// These were literal English in starter_manager::get_defaults() until v7.4.10,
+// so a learner on a Spanish site read Spanish everywhere except the chips.
+$string['starters:builtin_help_page']              = 'Explain This Page';
+$string['starters:builtin_help_page_desc']         = 'Explains key concepts from the current lesson page';
+$string['starters:builtin_quiz']                   = 'Quiz Me';
+$string['starters:builtin_quiz_desc']              = 'Generates a practice quiz on the current material';
+$string['starters:builtin_study_plan']             = 'Study Plan';
+$string['starters:builtin_study_plan_desc']        = 'Creates a focused study session plan';
+$string['starters:builtin_ai_project_coach']       = 'AI Project Coach';
+$string['starters:builtin_ai_project_coach_desc']  = 'Guided coaching for course projects and assignments';
+$string['starters:builtin_focus_next']             = 'What should I focus on?';
+$string['starters:builtin_focus_next_desc']        = 'Personalized next-step suggestions based on your objective progress';
+$string['starters:builtin_ell_practice']           = 'Conversation Practice';
+$string['starters:builtin_ell_practice_desc']      = 'Spoken conversation practice with the assistant';
+$string['starters:builtin_ell_pronunciation']      = 'Pronunciation Practice';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Sound-by-sound feedback on how you pronounce words';
+
 // Topic picker (used by conversation starters).
 $string['chat:topic_picker_title']        = 'What would you like to focus on?';
 $string['chat:topic_picker_title_help']   = 'What would you like help with?';

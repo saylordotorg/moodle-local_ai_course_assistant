@@ -2618,3 +2618,19 @@ $string['settings:spend_export_key_desc'] = 'Cheie bearer pentru endpoint-ul lun
 $string['task:migrate_course_embeddings'] = 'Migrează un curs la un nou model de încorporare';
 $string['task:model_price_drift_check'] = 'Verificarea abaterii prețurilor modelelor';
 $string['task:run_model_benchmark'] = 'Rulează un benchmark pentru un model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Explică această pagină';
+$string['starters:builtin_help_page_desc'] = 'Explică noțiunile-cheie din pagina curentă a lecției';
+$string['starters:builtin_quiz'] = 'Testează-mă';
+$string['starters:builtin_quiz_desc'] = 'Generează un test de exersare pe materialul curent';
+$string['starters:builtin_study_plan'] = 'Plan de studiu';
+$string['starters:builtin_study_plan_desc'] = 'Creează un plan concentrat pentru sesiunea de studiu';
+$string['starters:builtin_ai_project_coach'] = 'Coach de Proiect IA';
+$string['starters:builtin_ai_project_coach_desc'] = 'Îndrumare ghidată pentru proiectele și temele cursului';
+$string['starters:builtin_focus_next'] = 'Pe ce ar trebui să mă concentrez?';
+$string['starters:builtin_focus_next_desc'] = 'Sugestii personalizate pentru pasul următor, în funcție de progresul tău la obiective';
+$string['starters:builtin_ell_practice'] = 'Practică vorbirea';
+$string['starters:builtin_ell_practice_desc'] = 'Exersarea conversației vorbite cu asistentul';
+$string['starters:builtin_ell_pronunciation'] = 'Practică pronunție';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Feedback sunet cu sunet despre pronunția ta';

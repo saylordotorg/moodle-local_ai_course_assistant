@@ -2617,3 +2617,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer-nøkkel for det månedlige e
 $string['task:migrate_course_embeddings'] = 'Migrer ett emne til en ny embeddingmodell';
 $string['task:model_price_drift_check'] = 'Sjekk av modellprisavvik';
 $string['task:run_model_benchmark'] = 'Kjør benchmark på en modell';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Forklar denne siden';
+$string['starters:builtin_help_page_desc'] = 'Forklarer nøkkelbegrepene på den gjeldende leksjonssiden';
+$string['starters:builtin_quiz'] = 'Test meg';
+$string['starters:builtin_quiz_desc'] = 'Lager en øvingsquiz om det gjeldende stoffet';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Lager en fokusert plan for økten din';
+$string['starters:builtin_ai_project_coach'] = 'AI-prosjektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Veiledet støtte til prosjekter og oppgaver i emnet';
+$string['starters:builtin_focus_next'] = 'Hva bør jeg fokusere på?';
+$string['starters:builtin_focus_next_desc'] = 'Personlige forslag til neste steg basert på framgangen din på målene';
+$string['starters:builtin_ell_practice'] = 'Øv å snakke';
+$string['starters:builtin_ell_practice_desc'] = 'Øving på muntlig samtale med assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Uttaleøvelse';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Lyd-for-lyd tilbakemelding på uttalen din';

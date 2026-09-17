@@ -2639,3 +2639,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer-ключ для месячн
 $string['task:migrate_course_embeddings'] = 'Перевести один курс на новую модель встраивания';
 $string['task:model_price_drift_check'] = 'Проверка отклонения цен моделей';
 $string['task:run_model_benchmark'] = 'Выполнить бенчмарк модели';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Объясни эту страницу';
+$string['starters:builtin_help_page_desc'] = 'Объясняет ключевые понятия текущей страницы урока';
+$string['starters:builtin_quiz'] = 'Проверь меня';
+$string['starters:builtin_quiz_desc'] = 'Создаёт тренировочный тест по текущему материалу';
+$string['starters:builtin_study_plan'] = 'План учёбы';
+$string['starters:builtin_study_plan_desc'] = 'Составляет сфокусированный план учебной сессии';
+$string['starters:builtin_ai_project_coach'] = 'ИИ-коуч по проектам';
+$string['starters:builtin_ai_project_coach_desc'] = 'Пошаговая поддержка по проектам и заданиям курса';
+$string['starters:builtin_focus_next'] = 'На чём мне сосредоточиться?';
+$string['starters:builtin_focus_next_desc'] = 'Персональные предложения следующего шага с учётом прогресса по целям';
+$string['starters:builtin_ell_practice'] = 'Практика речи';
+$string['starters:builtin_ell_practice_desc'] = 'Практика устного разговора с ассистентом';
+$string['starters:builtin_ell_pronunciation'] = 'Практика произношения';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Обратная связь по произношению, звук за звуком';

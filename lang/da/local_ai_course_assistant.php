@@ -2619,3 +2619,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer-nøgle til endpointet for de
 $string['task:migrate_course_embeddings'] = 'Migrér ét kursus til en ny embedding-model';
 $string['task:model_price_drift_check'] = 'Kontrol af modelprisafvigelse';
 $string['task:run_model_benchmark'] = 'Benchmark en model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Forklar denne side';
+$string['starters:builtin_help_page_desc'] = 'Forklarer de vigtigste begreber på den aktuelle lektionsside';
+$string['starters:builtin_quiz'] = 'Test mig';
+$string['starters:builtin_quiz_desc'] = 'Laver en øvelsesquiz om det aktuelle stof';
+$string['starters:builtin_study_plan'] = 'Studieplan';
+$string['starters:builtin_study_plan_desc'] = 'Laver en fokuseret plan for en studiesession';
+$string['starters:builtin_ai_project_coach'] = 'AI-projektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Guidet coaching til kursusprojekter og opgaver';
+$string['starters:builtin_focus_next'] = 'Hvad skal jeg fokusere på?';
+$string['starters:builtin_focus_next_desc'] = 'Personlige forslag til næste skridt ud fra din fremgang på målene';
+$string['starters:builtin_ell_practice'] = 'Øv at tale';
+$string['starters:builtin_ell_practice_desc'] = 'Øvelse i talt samtale med assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Udtaleøvelse';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Lyd-for-lyd feedback på din udtale';

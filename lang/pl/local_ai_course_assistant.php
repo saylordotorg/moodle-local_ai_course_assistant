@@ -2618,3 +2618,19 @@ $string['settings:spend_export_key_desc'] = 'Klucz Bearer dla miesięcznego punk
 $string['task:migrate_course_embeddings'] = 'Migracja jednego kursu do nowego modelu embeddingu';
 $string['task:model_price_drift_check'] = 'Kontrola odchyleń cen modeli';
 $string['task:run_model_benchmark'] = 'Benchmark modelu';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Wyjaśnij tę stronę';
+$string['starters:builtin_help_page_desc'] = 'Wyjaśnia kluczowe pojęcia z bieżącej strony lekcji';
+$string['starters:builtin_quiz'] = 'Sprawdź mnie';
+$string['starters:builtin_quiz_desc'] = 'Tworzy quiz ćwiczeniowy z bieżącego materiału';
+$string['starters:builtin_study_plan'] = 'Plan nauki';
+$string['starters:builtin_study_plan_desc'] = 'Tworzy skoncentrowany plan sesji nauki';
+$string['starters:builtin_ai_project_coach'] = 'Trener projektów AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Prowadzone wsparcie przy projektach i zadaniach z kursu';
+$string['starters:builtin_focus_next'] = 'Na czym powinienem się skupić?';
+$string['starters:builtin_focus_next_desc'] = 'Spersonalizowane propozycje kolejnego kroku na podstawie twoich postępów w celach';
+$string['starters:builtin_ell_practice'] = 'Ćwiczenie mówienia';
+$string['starters:builtin_ell_practice_desc'] = 'Ćwiczenie rozmowy na głos z asystentem';
+$string['starters:builtin_ell_pronunciation'] = 'Ćwiczenie wymowy';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Informacja zwrotna głoska po głosce o twojej wymowie';

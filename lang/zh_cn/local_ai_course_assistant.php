@@ -2655,3 +2655,19 @@ $string['settings:spend_export_key_desc'] = '用于 <code>/local/ai_course_assis
 $string['task:migrate_course_embeddings'] = '将一门课程迁移到新的嵌入模型';
 $string['task:model_price_drift_check'] = '模型价格漂移检查';
 $string['task:run_model_benchmark'] = '对模型做基准测试';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = '解释此页面';
+$string['starters:builtin_help_page_desc'] = '讲解当前课程页面的关键概念';
+$string['starters:builtin_quiz'] = '考考我';
+$string['starters:builtin_quiz_desc'] = '根据当前内容生成练习测验';
+$string['starters:builtin_study_plan'] = '学习计划';
+$string['starters:builtin_study_plan_desc'] = '制定一个专注的学习时段计划';
+$string['starters:builtin_ai_project_coach'] = 'AI项目教练';
+$string['starters:builtin_ai_project_coach_desc'] = '为课程项目和作业提供指导';
+$string['starters:builtin_focus_next'] = '我应该重点学什么？';
+$string['starters:builtin_focus_next_desc'] = '根据你的目标进度提供个性化的下一步建议';
+$string['starters:builtin_ell_practice'] = '口语练习';
+$string['starters:builtin_ell_practice_desc'] = '与助手进行口语对话练习';
+$string['starters:builtin_ell_pronunciation'] = '发音练习';
+$string['starters:builtin_ell_pronunciation_desc'] = '逐音反馈你的单词发音';

@@ -2618,3 +2618,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer key สำหรับ endpo
 $string['task:migrate_course_embeddings'] = 'ย้ายหนึ่งคอร์สไปยังโมเดล embedding ใหม่';
 $string['task:model_price_drift_check'] = 'ตรวจสอบราคาโมเดลที่คลาดเคลื่อน';
 $string['task:run_model_benchmark'] = 'ทำ benchmark โมเดล';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'อธิบายหน้านี้';
+$string['starters:builtin_help_page_desc'] = 'อธิบายแนวคิดสำคัญจากหน้าบทเรียนปัจจุบัน';
+$string['starters:builtin_quiz'] = 'ทดสอบฉัน';
+$string['starters:builtin_quiz_desc'] = 'สร้างแบบทดสอบฝึกหัดจากเนื้อหาปัจจุบัน';
+$string['starters:builtin_study_plan'] = 'แผนการเรียน';
+$string['starters:builtin_study_plan_desc'] = 'สร้างแผนการเรียนแบบโฟกัสสำหรับรอบนี้';
+$string['starters:builtin_ai_project_coach'] = 'โค้ชโปรเจกต์ AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'การโค้ชแบบมีไกด์สำหรับโครงงานและงานที่ได้รับมอบหมาย';
+$string['starters:builtin_focus_next'] = 'ฉันควรโฟกัสเรื่องอะไร?';
+$string['starters:builtin_focus_next_desc'] = 'ข้อเสนอแนะขั้นต่อไปเฉพาะบุคคล อิงจากความก้าวหน้าตามเป้าหมายของคุณ';
+$string['starters:builtin_ell_practice'] = 'ฝึกพูด';
+$string['starters:builtin_ell_practice_desc'] = 'ฝึกสนทนาด้วยเสียงกับผู้ช่วย';
+$string['starters:builtin_ell_pronunciation'] = 'ฝึกการออกเสียง';
+$string['starters:builtin_ell_pronunciation_desc'] = 'ผลตอบรับการออกเสียงทีละเสียง';

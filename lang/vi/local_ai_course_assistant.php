@@ -2639,3 +2639,19 @@ $string['settings:spend_export_key_desc'] = 'Khóa Bearer cho endpoint xuất ch
 $string['task:migrate_course_embeddings'] = 'Di trú một khóa học sang mô hình embedding mới';
 $string['task:model_price_drift_check'] = 'Kiểm tra drift giá mô hình';
 $string['task:run_model_benchmark'] = 'Benchmark một mô hình';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Giải thích trang này';
+$string['starters:builtin_help_page_desc'] = 'Giải thích các khái niệm chính trong trang bài học hiện tại';
+$string['starters:builtin_quiz'] = 'Kiểm tra tôi';
+$string['starters:builtin_quiz_desc'] = 'Tạo bài kiểm tra luyện tập từ nội dung hiện tại';
+$string['starters:builtin_study_plan'] = 'Kế hoạch học tập';
+$string['starters:builtin_study_plan_desc'] = 'Lập kế hoạch tập trung cho buổi học';
+$string['starters:builtin_ai_project_coach'] = 'Huấn luyện dự án AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Hướng dẫn từng bước cho dự án và bài tập của khóa học';
+$string['starters:builtin_focus_next'] = 'Tôi nên tập trung vào điều gì?';
+$string['starters:builtin_focus_next_desc'] = 'Gợi ý bước tiếp theo được cá nhân hóa theo tiến độ mục tiêu của bạn';
+$string['starters:builtin_ell_practice'] = 'Luyện nói';
+$string['starters:builtin_ell_practice_desc'] = 'Luyện hội thoại nói với trợ lý';
+$string['starters:builtin_ell_pronunciation'] = 'Luyện phát âm';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Phản hồi từng âm về cách bạn phát âm';

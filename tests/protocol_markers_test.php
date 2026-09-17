@@ -117,4 +117,114 @@ final class protocol_markers_test extends \basic_testcase {
         $text = "Time: 26 hours \x92 self-paced";
         $this->assertNotSame('', protocol_markers::strip($text));
     }
+
+    /**
+     * Course-module ids copied out of the structure block never reach a learner.
+     *
+     * Every one of these is a shape observed in production output. The system
+     * prompt already forbids them; 8-12% of replies wrote one anyway.
+     *
+     * @dataProvider activity_id_provider
+     * @param string $input
+     * @param string $expected
+     * @return void
+     */
+    public function test_activity_ids_are_removed(string $input, string $expected): void {
+        $this->assertSame($expected, protocol_markers::strip($input));
+    }
+
+    /**
+     * Leaked-id shapes and what should be left behind.
+     *
+     * @return array<string, array{string, string}>
+     */
+    public static function activity_id_provider(): array {
+        return [
+            'compact' => [
+                'Watch the Unit 1 Introduction Video (id:20057) to get an overview.',
+                'Watch the Unit 1 Introduction Video to get an overview.',
+            ],
+            'spaced' => [
+                'Read What Is Strategy? (id: 20059) next.',
+                'Read What Is Strategy? next.',
+            ],
+            'cmid' => [
+                'Open the assessment (cmid: 89206) when ready.',
+                'Open the assessment when ready.',
+            ],
+            'activity id words' => [
+                'You can take the Unit 1 Assessment (Activity ID: 89206).',
+                'You can take the Unit 1 Assessment.',
+            ],
+            'bare trailing' => [
+                'Try the Unit 1 Assessment, Activity ID: 89206',
+                'Try the Unit 1 Assessment',
+            ],
+            'end of line' => [
+                "- Identifying Strategy (id:20060)\n- Next item",
+                "- Identifying Strategy\n- Next item",
+            ],
+            'inside markdown bold' => [
+                '**Unit 1 Introduction Video** (id:20057) covers the basics.',
+                '**Unit 1 Introduction Video** covers the basics.',
+            ],
+        ];
+    }
+
+    /**
+     * Prose that merely looks like an id annotation is left alone.
+     *
+     * A scrub that eats "(ideas 2)" or a learner's own parenthetical is worse
+     * than the leak it removes, so the patterns require a digit-bearing,
+     * complete, parenthesised form.
+     *
+     * @dataProvider innocent_text_provider
+     * @param string $text
+     * @return void
+     */
+    public function test_innocent_parentheticals_survive(string $text): void {
+        $this->assertSame($text, protocol_markers::strip($text));
+    }
+
+    /**
+     * Text that must pass through untouched.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function innocent_text_provider(): array {
+        return [
+            'idea' => ['Pick one (ideas are in Unit 2).'],
+            'bare id word' => ['Bring a photo id to the exam.'],
+            'no digits' => ['The identifier (id) is internal.'],
+            'student id prompt' => ['Enter your student ID in the field.'],
+            'numbered aside' => ['Strategy has three parts (see Unit 2).'],
+        ];
+    }
+
+    /**
+     * The scrub is idempotent, because it runs on both the live stream chunk
+     * and again on the stored copy.
+     *
+     * @return void
+     */
+    public function test_scrub_is_idempotent(): void {
+        $once = protocol_markers::strip_activity_ids('Watch the video (id:20057) now.');
+        $this->assertSame($once, protocol_markers::strip_activity_ids($once));
+        $this->assertSame('Watch the video now.', $once);
+    }
+
+    /**
+     * A SOURCE marker still carries its id -- that is the one place an id is
+     * allowed, and the pill depends on it.
+     *
+     * @return void
+     */
+    public function test_source_marker_ids_are_not_collateral_damage(): void {
+        $input = 'Start with the intro video. [SOURCE:activity:20057]';
+        $this->assertSame('Start with the intro video.', protocol_markers::strip($input));
+        $this->assertSame(
+            'Start with the intro video. [SOURCE:activity:20057]',
+            protocol_markers::strip_activity_ids($input)
+        );
+    }
 }

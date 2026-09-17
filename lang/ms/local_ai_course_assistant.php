@@ -2662,3 +2662,19 @@ $string['settings:spend_export_key_desc'] = 'Kunci Bearer bagi titik akhir ekspo
 $string['task:migrate_course_embeddings'] = 'Migrasikan satu kursus kepada satu model embedding baharu';
 $string['task:model_price_drift_check'] = 'Pemeriksaan drift harga model';
 $string['task:run_model_benchmark'] = 'Tanda aras satu model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Terangkan halaman ini';
+$string['starters:builtin_help_page_desc'] = 'Menerangkan konsep utama daripada halaman pelajaran semasa';
+$string['starters:builtin_quiz'] = 'Uji saya';
+$string['starters:builtin_quiz_desc'] = 'Menjana kuiz latihan daripada bahan semasa';
+$string['starters:builtin_study_plan'] = 'Rancangan belajar';
+$string['starters:builtin_study_plan_desc'] = 'Membina pelan sesi belajar yang fokus';
+$string['starters:builtin_ai_project_coach'] = 'Jurulatih Projek AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Bimbingan berpandu untuk projek dan tugasan kursus';
+$string['starters:builtin_focus_next'] = 'Apa yang patut saya fokuskan?';
+$string['starters:builtin_focus_next_desc'] = 'Cadangan langkah seterusnya yang diperibadikan berdasarkan kemajuan objektif anda';
+$string['starters:builtin_ell_practice'] = 'Latihan bercakap';
+$string['starters:builtin_ell_practice_desc'] = 'Latihan perbualan lisan bersama pembantu';
+$string['starters:builtin_ell_pronunciation'] = 'Latihan sebutan';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Maklum balas bunyi demi bunyi tentang sebutan anda';

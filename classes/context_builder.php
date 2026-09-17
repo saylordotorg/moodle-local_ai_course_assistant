@@ -2341,7 +2341,23 @@ class context_builder {
         if ($hasrag) {
             $lines[] = "- `[[c:N]]` inline (not at end) — cite a retrieved passage you actually used. Example: \"Photosynthesis occurs in chloroplasts [[c:0]].\"";
         }
-        $lines[] = "- `[SOURCE:page]` or `[SOURCE:activity:ID]` or `[SOURCE:course]` or `[SOURCE:general]` — exactly one per response, indicating where the answer is grounded. Prefer activity:ID when an obvious activity matches.";
+        $sourcebullet = "- `[SOURCE:page]` or `[SOURCE:activity:ID]` or `[SOURCE:course]` or "
+            . "`[SOURCE:general]` — exactly one per response, indicating where the answer is "
+            . "grounded. Prefer activity:ID when an obvious activity matches.";
+        if ($hasrag) {
+            // Measured on 24 paired prompts (2026-09-16): 75% of replies carried a
+            // SOURCE tag with no retrieved chunks in context and 13% with them
+            // (Fisher exact, p = 2.6e-5). The [[c:N]] bullet above reads as an
+            // ALTERNATIVE citation mechanism, so the model cites a passage and
+            // treats the grounding as already declared. Saying otherwise out loud
+            // is the difference between two competing instructions and two
+            // complementary ones.
+            $sourcebullet .= " Required even when you already used `[[c:N]]` — the two are not "
+                . "alternatives: `[[c:N]]` marks which passage one sentence came from, `[SOURCE:]` "
+                . "marks where the whole answer is grounded. A reply carrying `[[c:N]]` but no "
+                . "`[SOURCE:]` is incomplete.";
+        }
+        $lines[] = $sourcebullet;
         if ($hasnext) {
             $lines[] = "- `[SOLA_NEXT]chip 1||chip 2||chip 3||chip 4[/SOLA_NEXT]` — four short (3-8 word) follow-up suggestions tied to the answer.";
         }

@@ -2660,3 +2660,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer kulcs a havi AI-költés exp
 $string['task:migrate_course_embeddings'] = 'Egy kurzus migrálása új beágyazási modellre';
 $string['task:model_price_drift_check'] = 'Modellár-elmozdulás ellenőrzése';
 $string['task:run_model_benchmark'] = 'Modell benchmarkolása';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Magyarázd el ezt az oldalt';
+$string['starters:builtin_help_page_desc'] = 'Elmagyarázza az aktuális leckeoldal kulcsfogalmait';
+$string['starters:builtin_quiz'] = 'Tesztelj';
+$string['starters:builtin_quiz_desc'] = 'Gyakorlókvízt készít az aktuális anyagból';
+$string['starters:builtin_study_plan'] = 'Tanulmányi terv';
+$string['starters:builtin_study_plan_desc'] = 'Fókuszált tervet készít a tanulási alkalomra';
+$string['starters:builtin_ai_project_coach'] = 'AI projekttréner';
+$string['starters:builtin_ai_project_coach_desc'] = 'Irányított támogatás a kurzus projektjeihez és feladataihoz';
+$string['starters:builtin_focus_next'] = 'Mire érdemes koncentrálnom?';
+$string['starters:builtin_focus_next_desc'] = 'Személyre szabott javaslatok a következő lépésre a célok szerinti haladásod alapján';
+$string['starters:builtin_ell_practice'] = 'Beszéd gyakorlása';
+$string['starters:builtin_ell_practice_desc'] = 'Beszélt társalgás gyakorlása az asszisztenssel';
+$string['starters:builtin_ell_pronunciation'] = 'Kiejtés gyakorlás';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Hangról hangra visszajelzés a kiejtésedről';

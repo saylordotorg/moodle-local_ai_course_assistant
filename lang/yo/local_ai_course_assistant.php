@@ -2639,3 +2639,19 @@ $string['settings:spend_export_key_desc'] = 'Kọ́kọ́rọ́ Bearer fún endp
 $string['task:migrate_course_embeddings'] = 'Migrate ẹ̀kọ́ kan sí awoṣe embedding tuntun';
 $string['task:model_price_drift_check'] = 'Àyẹ̀wò drift iye awoṣe';
 $string['task:run_model_benchmark'] = 'Ṣe benchmark awoṣe kan';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Ṣàlàyé ojú-ìwé yìí';
+$string['starters:builtin_help_page_desc'] = 'Ó ń ṣàlàyé àwọn èròngbà pàtàkì lórí ojú-ìwé ẹ̀kọ́ lọ́wọ́lọ́wọ́';
+$string['starters:builtin_quiz'] = 'Dánwò mi';
+$string['starters:builtin_quiz_desc'] = 'Ó ń ṣẹ̀dá ìdánwò ìdánrawò lórí ohun tí à ń kọ́ báyìí';
+$string['starters:builtin_study_plan'] = 'Ètò Ẹkọ';
+$string['starters:builtin_study_plan_desc'] = 'Ó ń ṣẹ̀dá ètò ìkẹ́kọ̀ọ́ tí ó dojúkọ ohun kan';
+$string['starters:builtin_ai_project_coach'] = 'Olùkọ́ Iṣẹ́ Àkànṣe AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ìtọ́sọ́nà ìgbésẹ̀-ń-tẹ̀lé fún àwọn iṣẹ́ àti iṣẹ́ àyànfúnni ẹ̀kọ́';
+$string['starters:builtin_focus_next'] = 'Kí ni mo yẹ kí n dojúkọ?';
+$string['starters:builtin_focus_next_desc'] = 'Àbá ìgbésẹ̀ tó tẹ̀lé tí a ṣe fún ọ ní pàtàkì lórí ìlọsíwájú rẹ';
+$string['starters:builtin_ell_practice'] = 'Ìdánwò Ọ̀rọ̀';
+$string['starters:builtin_ell_practice_desc'] = 'Ìdánrawò ìjíròrò ẹnu pẹ̀lú olùrànlọ́wọ́';
+$string['starters:builtin_ell_pronunciation'] = 'Ìdánwò Pronunciation';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Èsì ohùn-kọ̀ọ̀kan lórí bí o ṣe ń pe àwọn ọ̀rọ̀';

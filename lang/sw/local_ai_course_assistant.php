@@ -2663,3 +2663,19 @@ $string['settings:spend_export_key_desc'] = 'Kitufe cha Bearer kwa kituo cha rip
 $string['task:migrate_course_embeddings'] = 'Hamisha kozi moja kwenye modeli mpya ya embedding';
 $string['task:model_price_drift_check'] = 'Ukaguzi wa mabadiliko ya bei ya modeli';
 $string['task:run_model_benchmark'] = 'Pima modeli kwa benchmark';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Eleza ukurasa huu';
+$string['starters:builtin_help_page_desc'] = 'Hufafanua dhana kuu za ukurasa wa somo la sasa';
+$string['starters:builtin_quiz'] = 'Nipime';
+$string['starters:builtin_quiz_desc'] = 'Hutengeneza jaribio la mazoezi kutoka kwa somo la sasa';
+$string['starters:builtin_study_plan'] = 'Mpango wa masomo';
+$string['starters:builtin_study_plan_desc'] = 'Hutengeneza mpango wa kipindi cha kusoma chenye mwelekeo';
+$string['starters:builtin_ai_project_coach'] = 'Kocha wa Miradi wa AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Mwongozo wa hatua kwa hatua kwa miradi na kazi za kozi';
+$string['starters:builtin_focus_next'] = 'Nizingatie nini?';
+$string['starters:builtin_focus_next_desc'] = 'Mapendekezo binafsi ya hatua inayofuata kulingana na maendeleo yako';
+$string['starters:builtin_ell_practice'] = 'Mazoezi ya kusema';
+$string['starters:builtin_ell_practice_desc'] = 'Mazoezi ya mazungumzo ya kusema na msaidizi';
+$string['starters:builtin_ell_pronunciation'] = 'Mazoezi ya matamshi';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Maoni sauti kwa sauti kuhusu matamshi yako';

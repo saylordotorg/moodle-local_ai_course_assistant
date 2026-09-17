@@ -2646,3 +2646,19 @@ $string['settings:spend_export_key_desc'] = 'የወጪ ዳሽቦርዱ በወር
 $string['task:migrate_course_embeddings'] = 'አንድ ኮርስን ወደ አዲስ embedding ሞዴል አፍልስ';
 $string['task:model_price_drift_check'] = 'የሞዴል ዋጋ መንሸራተት ፍተሻ';
 $string['task:run_model_benchmark'] = 'ሞዴል benchmark አድርግ';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'ይህን ገጽ አብራራ';
+$string['starters:builtin_help_page_desc'] = 'የአሁኑን የትምህርት ገጽ ዋና ሐሳቦች ያብራራል';
+$string['starters:builtin_quiz'] = 'ፈትነኝ';
+$string['starters:builtin_quiz_desc'] = 'በአሁኑ ትምህርት ላይ የልምምድ ፈተና ይፈጥራል';
+$string['starters:builtin_study_plan'] = 'የጥናት እቅድ';
+$string['starters:builtin_study_plan_desc'] = 'ትኩረት ያለው የጥናት ክፍለ ጊዜ ዕቅድ ይሠራል';
+$string['starters:builtin_ai_project_coach'] = 'AI ፕሮጀክት አሰልጣኝ';
+$string['starters:builtin_ai_project_coach_desc'] = 'ለኮርሱ ፕሮጀክቶችና ሥራዎች የተመራ ድጋፍ';
+$string['starters:builtin_focus_next'] = 'በምን ላይ ላተኩር?';
+$string['starters:builtin_focus_next_desc'] = 'በግብ እድገትህ መሠረት የሚቀጥለው እርምጃ የግል ጥቆማዎች';
+$string['starters:builtin_ell_practice'] = 'የንግግር ልምምድ';
+$string['starters:builtin_ell_practice_desc'] = 'ከረዳቱ ጋር በንግግር የመወያየት ልምምድ';
+$string['starters:builtin_ell_pronunciation'] = 'የአጠራር ልምምድ';
+$string['starters:builtin_ell_pronunciation_desc'] = 'በአጠራርህ ላይ ድምፅ በድምፅ አስተያየት';

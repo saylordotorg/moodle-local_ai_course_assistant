@@ -138,7 +138,57 @@ final class protocol_markers {
             $text = self::replace('/\n*\[\s*' . $m . '\s*\]\s*/i', '', $text);
         }
 
+        $text = self::strip_activity_ids($text);
+
         return rtrim($text);
+    }
+
+    /**
+     * Remove course-module ids the model copied out of the structure block.
+     *
+     * The structure block annotates every activity as "Name (id:20057)" so the
+     * model can cite it as [SOURCE:activity:20057]. context_builder tells it in
+     * so many words never to write an id into prose -- and a measured 8-12% of
+     * production replies do it anyway (Learn 2,112/17,265; Degrees 151/1,878).
+     * A prompt rule is a request; this is the enforcement. Learners were reading
+     * 'Watch the Unit 1 Introduction Video (id:20057)'.
+     *
+     * Only complete, digit-bearing forms are matched, so "(idea 2)" and a bare
+     * "(id)" are untouched, and a fragment split across a stream chunk is held
+     * in the caller's carry buffer until it completes.
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function strip_activity_ids(string $text): string {
+        if ($text === '' || strpos($text, 'id') === false && strpos($text, 'ID') === false) {
+            return $text;
+        }
+
+        // Parenthesised form: "(id:20057)", "(cmid: 3)", "(Activity ID: 89206)".
+        $text = self::replace(
+            '/[ \t]*\((?:[ \t]*(?:activity|module|course[ \t]+module))?[ \t]*c?mid[ \t]*'
+                . '[:#=]?[ \t]*\d+[ \t]*\)/iu',
+            '',
+            $text
+        );
+        $text = self::replace(
+            '/[ \t]*\((?:[ \t]*(?:activity|module|course[ \t]+module))?[ \t]*id[ \t]*'
+                . '[:#=]?[ \t]*\d+[ \t]*\)/iu',
+            '',
+            $text
+        );
+
+        // Bare form: "the Unit 1 Assessment, Activity ID: 89206". Any separator
+        // the model used to attach it is taken with it, so no orphaned comma or
+        // dash is left behind mid-sentence.
+        $text = self::replace(
+            '/[ \t]*[,;:\x{2013}\x{2014}-]?[ \t]*\b(?:activity|module)[ \t]+id[ \t]*[:#=][ \t]*\d+/iu',
+            '',
+            $text
+        );
+
+        return $text;
     }
 
     /**

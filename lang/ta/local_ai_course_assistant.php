@@ -2640,3 +2640,19 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = 'ஒரு பாடத்தைப் புதிய embedding மாதிரிக்கு இடமாற்று';
 $string['task:model_price_drift_check'] = 'மாதிரி விலை மாறுபாட்டுச் சோதனை';
 $string['task:run_model_benchmark'] = 'ஒரு மாதிரியை benchmark செய்';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'இந்தப் பக்கத்தை விளக்கு';
+$string['starters:builtin_help_page_desc'] = 'தற்போதைய பாடப் பக்கத்தின் முக்கிய கருத்துகளை விளக்குகிறது';
+$string['starters:builtin_quiz'] = 'என்னைச் சோதி';
+$string['starters:builtin_quiz_desc'] = 'தற்போதைய பாடப்பொருளில் பயிற்சி வினாடி வினாவை உருவாக்குகிறது';
+$string['starters:builtin_study_plan'] = 'படிப்பு திட்டம்';
+$string['starters:builtin_study_plan_desc'] = 'கவனம் குவிந்த படிப்பு அமர்வுத் திட்டத்தை உருவாக்குகிறது';
+$string['starters:builtin_ai_project_coach'] = 'AI திட்ட பயிற்சியாளர்';
+$string['starters:builtin_ai_project_coach_desc'] = 'பாடத்தின் திட்டப்பணிகளுக்கும் ஒப்படைப்புகளுக்கும் வழிகாட்டுதல்';
+$string['starters:builtin_focus_next'] = 'நான் எதில் கவனம் செலுத்த வேண்டும்?';
+$string['starters:builtin_focus_next_desc'] = 'உங்கள் இலக்கு முன்னேற்றத்தின் அடிப்படையில் அடுத்த படிக்கான தனிப்பயன் பரிந்துரைகள்';
+$string['starters:builtin_ell_practice'] = 'பேசும் பயிற்சி';
+$string['starters:builtin_ell_practice_desc'] = 'உதவியாளருடன் பேச்சு உரையாடல் பயிற்சி';
+$string['starters:builtin_ell_pronunciation'] = 'உச்சரிப்பு பயிற்சி';
+$string['starters:builtin_ell_pronunciation_desc'] = 'உங்கள் உச்சரிப்பு குறித்து ஒலி வாரியான கருத்து';

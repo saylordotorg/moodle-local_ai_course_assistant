@@ -2619,3 +2619,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer-avain kuukausittaiselle teko
 $string['task:migrate_course_embeddings'] = 'Siirrä yksi kurssi uuteen upotusmalliin';
 $string['task:model_price_drift_check'] = 'Mallien hintapoikkeamatarkistus';
 $string['task:run_model_benchmark'] = 'Tee mallin vertailuajo';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Selitä tämä sivu';
+$string['starters:builtin_help_page_desc'] = 'Selittää nykyisen oppituntisivun keskeiset käsitteet';
+$string['starters:builtin_quiz'] = 'Testaa minua';
+$string['starters:builtin_quiz_desc'] = 'Luo harjoitustestin nykyisestä aineistosta';
+$string['starters:builtin_study_plan'] = 'Opiskelusuunnitelma';
+$string['starters:builtin_study_plan_desc'] = 'Laatii keskittyneen suunnitelman opiskeluhetkelle';
+$string['starters:builtin_ai_project_coach'] = 'AI-projektivalmennus';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ohjattua valmennusta kurssin projekteihin ja tehtäviin';
+$string['starters:builtin_focus_next'] = 'Mihin minun kannattaa keskittyä?';
+$string['starters:builtin_focus_next_desc'] = 'Henkilökohtaisia ehdotuksia seuraavaksi askeleeksi tavoitteidesi edistymisen perusteella';
+$string['starters:builtin_ell_practice'] = 'Puheen harjoittelu';
+$string['starters:builtin_ell_practice_desc'] = 'Puhutun keskustelun harjoittelua avustajan kanssa';
+$string['starters:builtin_ell_pronunciation'] = 'Ääntämisharjoitus';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Äänne äänteeltä palautetta ääntämisestäsi';

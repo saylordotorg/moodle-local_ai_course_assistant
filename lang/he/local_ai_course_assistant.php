@@ -2660,3 +2660,19 @@ $string['settings:spend_export_key_desc'] = 'מפתח Bearer עבור נקודת
 $string['task:migrate_course_embeddings'] = 'העברת קורס אחד למודל embedding חדש';
 $string['task:model_price_drift_check'] = 'בדיקת סחיפת מחירי מודלים';
 $string['task:run_model_benchmark'] = 'מדידת מודל';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'הסבר דף זה';
+$string['starters:builtin_help_page_desc'] = 'מסביר את המושגים המרכזיים בעמוד השיעור הנוכחי';
+$string['starters:builtin_quiz'] = 'בחן אותי';
+$string['starters:builtin_quiz_desc'] = 'יוצר בוחן תרגול על החומר הנוכחי';
+$string['starters:builtin_study_plan'] = 'תוכנית לימודים';
+$string['starters:builtin_study_plan_desc'] = 'בונה תוכנית ממוקדת למפגש לימוד';
+$string['starters:builtin_ai_project_coach'] = 'מאמן פרויקטים AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'ליווי מודרך לפרויקטים ולמטלות הקורס';
+$string['starters:builtin_focus_next'] = 'על מה כדאי לי להתמקד?';
+$string['starters:builtin_focus_next_desc'] = 'הצעות מותאמות אישית לצעד הבא לפי ההתקדמות שלך ביעדים';
+$string['starters:builtin_ell_practice'] = 'תרגול דיבור';
+$string['starters:builtin_ell_practice_desc'] = 'תרגול שיחה בעל פה עם העוזר';
+$string['starters:builtin_ell_pronunciation'] = 'תרגול הגייה';
+$string['starters:builtin_ell_pronunciation_desc'] = 'משוב צליל אחר צליל על ההגייה שלך';

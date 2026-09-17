@@ -2618,3 +2618,19 @@ $string['settings:spend_export_key_desc'] = 'Kľúč typu Bearer pre mesačný e
 $string['task:migrate_course_embeddings'] = 'Migrácia jedného kurzu na nový model embeddingu';
 $string['task:model_price_drift_check'] = 'Kontrola odchýlok cien modelov';
 $string['task:run_model_benchmark'] = 'Benchmark modelu';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Vysvetli túto stránku';
+$string['starters:builtin_help_page_desc'] = 'Vysvetlí kľúčové pojmy z aktuálnej stránky lekcie';
+$string['starters:builtin_quiz'] = 'Otestuj ma';
+$string['starters:builtin_quiz_desc'] = 'Vytvorí cvičný kvíz na aktuálne učivo';
+$string['starters:builtin_study_plan'] = 'Študijný plán';
+$string['starters:builtin_study_plan_desc'] = 'Zostaví sústredený plán študijného bloku';
+$string['starters:builtin_ai_project_coach'] = 'AI projektový kouč';
+$string['starters:builtin_ai_project_coach_desc'] = 'Vedené koučovanie pre projekty a zadania kurzu';
+$string['starters:builtin_focus_next'] = 'Na čo sa mám zamerať?';
+$string['starters:builtin_focus_next_desc'] = 'Personalizované návrhy ďalšieho kroku podľa tvojho pokroku v cieľoch';
+$string['starters:builtin_ell_practice'] = 'Cvičenie reči';
+$string['starters:builtin_ell_practice_desc'] = 'Precvičovanie hovoreného rozhovoru s asistentom';
+$string['starters:builtin_ell_pronunciation'] = 'Nácvik výslovnosti';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Spätná väzba hláska po hláske k tvojej výslovnosti';

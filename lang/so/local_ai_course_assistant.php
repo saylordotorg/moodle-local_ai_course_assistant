@@ -2663,3 +2663,19 @@ $string['settings:spend_export_key_desc'] = 'Furaha Bearer ee dhammaadka dhoofin
 $string['task:migrate_course_embeddings'] = 'Guuri hal koorso model embedding cusub';
 $string['task:model_price_drift_check'] = 'Hubinta isbeddelka qiimaha model-ka';
 $string['task:run_model_benchmark'] = 'Benchmark model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Sharax boggan';
+$string['starters:builtin_help_page_desc'] = 'Wuxuu sharraxayaa fikradaha muhiimka ah ee bogga casharka hadda';
+$string['starters:builtin_quiz'] = 'I imtixaan';
+$string['starters:builtin_quiz_desc'] = 'Wuxuu abuuraa imtixaan tababar oo ku saabsan waxa hadda la baranayo';
+$string['starters:builtin_study_plan'] = 'Qorshe waxbarashada';
+$string['starters:builtin_study_plan_desc'] = 'Wuxuu sameeyaa qorshe diiradsan oo fadhi wax-barasho ah';
+$string['starters:builtin_ai_project_coach'] = 'Tababaraha Mashruuca AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Hagid tallaabo-tallaabo ah oo loogu talagalay mashaariicda iyo hawlaha koorsada';
+$string['starters:builtin_focus_next'] = 'Maxaan diiradda saaraa?';
+$string['starters:builtin_focus_next_desc'] = 'Talooyin shakhsiyeysan oo tallaabada xigta ku saleysan horumarkaaga';
+$string['starters:builtin_ell_practice'] = 'Celinta hadlida';
+$string['starters:builtin_ell_practice_desc'] = 'Tababar wada-hadal afka ah oo lala yeesho kaaliyaha';
+$string['starters:builtin_ell_pronunciation'] = 'Ku celinta madadaalaha';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Jawaab cod-cod ah oo ku saabsan sida aad erayada u dhawaaqdo';

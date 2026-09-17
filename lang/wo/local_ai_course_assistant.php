@@ -2639,3 +2639,19 @@ $string['settings:spend_export_key_desc'] = 'Caabi Bearer ngir endpoint export n
 $string['task:migrate_course_embeddings'] = 'Migre benn kurs ci benn modèle embedding bu bees';
 $string['task:model_price_drift_check'] = 'Vérification drift njëg modèle';
 $string['task:run_model_benchmark'] = 'Benchmark benn modèle';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Xamal bii xët';
+$string['starters:builtin_help_page_desc'] = 'Dafay leeral xalaat yu am solo yi ci xët wu ñu jàng nii';
+$string['starters:builtin_quiz'] = 'Seetlu ma';
+$string['starters:builtin_quiz_desc'] = 'Dafay sos ab layoo njàngale ci li ñuy jàng nii';
+$string['starters:builtin_study_plan'] = 'Xëy ci jàng';
+$string['starters:builtin_study_plan_desc'] = 'Dafay defar ab tëralin bu ñaw ngir sa waxtu njàng';
+$string['starters:builtin_ai_project_coach'] = 'Kooci AI ci proojee';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ndimbal bu jub ngir projet ak liggéey yu kurs bi';
+$string['starters:builtin_focus_next'] = 'Loo war a xool lu ëpp?';
+$string['starters:builtin_focus_next_desc'] = 'Xalaat yu la jëm ci ñaareelu pas, aju ci sa yokkute ci say pàkk';
+$string['starters:builtin_ell_practice'] = 'Taxawaay ci wax-waxu';
+$string['starters:builtin_ell_practice_desc'] = 'Jàngale waxtaan ci làmmiñ ak jëfandikukat bi';
+$string['starters:builtin_ell_pronunciation'] = 'Liggéeyu baat';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Delluwaat ci baat ci baat ci ni ngay wax baat yi';

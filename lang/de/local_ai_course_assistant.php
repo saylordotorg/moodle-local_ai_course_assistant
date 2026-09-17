@@ -2619,3 +2619,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer-Schlüssel für den Endpunkt
 $string['task:migrate_course_embeddings'] = 'Einen Kurs auf ein neues Embedding-Modell migrieren';
 $string['task:model_price_drift_check'] = 'Prüfung der Modellpreisabweichung';
 $string['task:run_model_benchmark'] = 'Ein Modell benchmarken';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Diese Seite erklären';
+$string['starters:builtin_help_page_desc'] = 'Erklärt die Kernbegriffe der aktuellen Lektionsseite';
+$string['starters:builtin_quiz'] = 'Teste mich';
+$string['starters:builtin_quiz_desc'] = 'Erstellt ein Übungsquiz zum aktuellen Stoff';
+$string['starters:builtin_study_plan'] = 'Lernplan';
+$string['starters:builtin_study_plan_desc'] = 'Erstellt einen fokussierten Plan für deine Lerneinheit';
+$string['starters:builtin_ai_project_coach'] = 'KI-Projektcoach';
+$string['starters:builtin_ai_project_coach_desc'] = 'Begleitetes Coaching für Kursprojekte und Aufgaben';
+$string['starters:builtin_focus_next'] = 'Worauf soll ich mich konzentrieren?';
+$string['starters:builtin_focus_next_desc'] = 'Persönliche Vorschläge für den nächsten Schritt, basierend auf deinem Lernfortschritt';
+$string['starters:builtin_ell_practice'] = 'Sprechen üben';
+$string['starters:builtin_ell_practice_desc'] = 'Übung gesprochener Konversation mit dem Assistenten';
+$string['starters:builtin_ell_pronunciation'] = 'Ausspracheübung';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Laut-für-Laut-Rückmeldung zu deiner Aussprache';

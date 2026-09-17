@@ -2633,3 +2633,19 @@ $string['settings:spend_export_key_desc'] = 'Igodo bearer maka endpoint mbupụ 
 $string['task:migrate_course_embeddings'] = 'Bufee otu kọọsị gaa na model embedding ọhụrụ';
 $string['task:model_price_drift_check'] = 'Nyocha drift ọnụahịa model';
 $string['task:run_model_benchmark'] = 'Mee benchmark otu model';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Kọwaa peeji a';
+$string['starters:builtin_help_page_desc'] = 'Na-akọwa echiche ndị bụ isi na ibe nkuzi ugbu a';
+$string['starters:builtin_quiz'] = 'Nwale m';
+$string['starters:builtin_quiz_desc'] = 'Na-emepụta ajụjụ ọmụmụ na ihe ọmụmụ ugbu a';
+$string['starters:builtin_study_plan'] = 'Atụmatụ mmụta';
+$string['starters:builtin_study_plan_desc'] = 'Na-emepụta atụmatụ ọmụmụ lekwasịrị anya';
+$string['starters:builtin_ai_project_coach'] = 'Onye nkuzi oru AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Nduzi nzọụkwụ maka ọrụ na oru ngo nke usoro ihe ọmụmụ';
+$string['starters:builtin_focus_next'] = 'Gịnị ka m kwesịrị ilekwasị anya na ya?';
+$string['starters:builtin_focus_next_desc'] = 'Ndụmọdụ nzọụkwụ ọzọ ahaziri gị dabere na ọganihu ebumnuche gị';
+$string['starters:builtin_ell_practice'] = 'Ịmụta ikwu okwu';
+$string['starters:builtin_ell_practice_desc'] = 'Omume mkparịta ụka ekwuru ekwu ya na onye enyemaka';
+$string['starters:builtin_ell_pronunciation'] = 'Ọmụma ịkpọ okwu';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Nzaghachi ụda n\'ụda maka otu i si akpọ okwu';

@@ -2647,3 +2647,19 @@ $string['settings:spend_export_key_desc'] = 'Bearer saraka kalo o kalo AI musaka
 $string['task:migrate_course_embeddings'] = 'Kalan kelen yɛlɛma embedding modɛli kura kan';
 $string['task:model_price_drift_check'] = 'Modɛli sɔngɔ yɛlɛmali sɛgɛsɛgɛli';
 $string['task:run_model_benchmark'] = 'Modɛli benchmark kɛ';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Nin ɲɛ ɲɛfɔ';
+$string['starters:builtin_help_page_desc'] = 'A bɛ kalan ɲɛ in hakilina kunbabaw ɲɛfɔ';
+$string['starters:builtin_quiz'] = 'N sɛgɛsɛgɛ';
+$string['starters:builtin_quiz_desc'] = 'A bɛ degeli ɲininkali dilan kalanfɛn kura kan';
+$string['starters:builtin_study_plan'] = 'Kalanso jɛtigi';
+$string['starters:builtin_study_plan_desc'] = 'A bɛ kalan waati labɛn ɲuman dilan';
+$string['starters:builtin_ai_project_coach'] = 'AI porojɛ kɔntigi';
+$string['starters:builtin_ai_project_coach_desc'] = 'Ɲɛminɛli kalan porozɛw ni baaraw kama';
+$string['starters:builtin_focus_next'] = 'N ka kan ka n hakili sigi mun kan?';
+$string['starters:builtin_focus_next_desc'] = 'I ka laɲini taabolo sabu la, sira nata ladilikanw';
+$string['starters:builtin_ell_practice'] = 'Kumakan lasɛli';
+$string['starters:builtin_ell_practice_desc'] = 'Kuma fɔli degeli ni dɛmɛbaga ye';
+$string['starters:builtin_ell_pronunciation'] = 'Kumakan fɔli lasɛli';
+$string['starters:builtin_ell_pronunciation_desc'] = 'I ka kumadenw fɔcogo kan, kumakan kelen-kelen jaabi';

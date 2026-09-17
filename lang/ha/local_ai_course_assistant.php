@@ -2646,3 +2646,19 @@ $string['settings:spend_export_key_desc'] = 'Maɓallin Bearer don endpoint ɗin 
 $string['task:migrate_course_embeddings'] = 'Yi ƙaurar kwas ɗaya zuwa sabon samfurin embedding';
 $string['task:model_price_drift_check'] = 'Dubawar drift na kuɗin samfuri';
 $string['task:run_model_benchmark'] = 'Yi benchmark ga samfuri';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'Bayyana wannan shafi';
+$string['starters:builtin_help_page_desc'] = 'Yana bayyana muhimman ra\'ayoyin shafin darasin yanzu';
+$string['starters:builtin_quiz'] = 'Jarrabeni';
+$string['starters:builtin_quiz_desc'] = 'Yana ƙirƙirar jarabawar gwaji kan darasin yanzu';
+$string['starters:builtin_study_plan'] = 'Shirin karatu';
+$string['starters:builtin_study_plan_desc'] = 'Yana ƙirƙirar tsari mai maida hankali na zaman karatu';
+$string['starters:builtin_ai_project_coach'] = 'Kocin Ayyuka na AI';
+$string['starters:builtin_ai_project_coach_desc'] = 'Jagora mataki-mataki don ayyuka da aikin kwas';
+$string['starters:builtin_focus_next'] = 'Me ya kamata in mai da hankali a kai?';
+$string['starters:builtin_focus_next_desc'] = 'Shawarwarin mataki na gaba na kanka bisa ci gaban manufofinka';
+$string['starters:builtin_ell_practice'] = 'Yi magana';
+$string['starters:builtin_ell_practice_desc'] = 'Aikin tattaunawa da baki tare da mataimakin';
+$string['starters:builtin_ell_pronunciation'] = 'Aikin furta';
+$string['starters:builtin_ell_pronunciation_desc'] = 'Amsa sauti-bayan-sauti kan yadda kake furta kalmomi';

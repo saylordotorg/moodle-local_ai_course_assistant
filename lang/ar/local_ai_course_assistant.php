@@ -2617,3 +2617,19 @@ $string['settings:spend_export_key_desc'] = 'مفتاح Bearer لنقطة نها
 $string['task:migrate_course_embeddings'] = 'ترحيل مقرر واحد إلى نموذج تضمين جديد';
 $string['task:model_price_drift_check'] = 'فحص انحراف أسعار النماذج';
 $string['task:run_model_benchmark'] = 'قياس أداء نموذج';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'اشرح هذه الصفحة';
+$string['starters:builtin_help_page_desc'] = 'يشرح المفاهيم الأساسية من صفحة الدرس الحالية';
+$string['starters:builtin_quiz'] = 'اختبرني';
+$string['starters:builtin_quiz_desc'] = 'ينشئ اختبارًا تدريبيًا على المادة الحالية';
+$string['starters:builtin_study_plan'] = 'خطة الدراسة';
+$string['starters:builtin_study_plan_desc'] = 'ينشئ خطة مركزة لجلسة دراسية';
+$string['starters:builtin_ai_project_coach'] = 'مدرب المشاريع بالذكاء الاصطناعي';
+$string['starters:builtin_ai_project_coach_desc'] = 'إرشاد موجَّه لمشاريع المقرر وواجباته';
+$string['starters:builtin_focus_next'] = 'على ماذا يجب أن أركز؟';
+$string['starters:builtin_focus_next_desc'] = 'اقتراحات مخصصة للخطوة التالية بناءً على تقدمك في الأهداف';
+$string['starters:builtin_ell_practice'] = 'تدريب على الكلام';
+$string['starters:builtin_ell_practice_desc'] = 'تدريب على المحادثة المنطوقة مع المساعد';
+$string['starters:builtin_ell_pronunciation'] = 'تحسين النطق';
+$string['starters:builtin_ell_pronunciation_desc'] = 'ملاحظات صوتًا بصوت حول طريقة نطقك للكلمات';

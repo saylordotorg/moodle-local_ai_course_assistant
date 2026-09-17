@@ -2617,3 +2617,19 @@ $string['settings:spend_export_key_desc'] = '<code>/local/ai_course_assistant/sp
 $string['task:migrate_course_embeddings'] = '1コースを新しい埋め込みモデルへ移行する';
 $string['task:model_price_drift_check'] = 'モデル価格ドリフトチェック';
 $string['task:run_model_benchmark'] = 'モデルをベンチマークする';
+
+// Built-in starter chip labels and help text (v7.4.10).
+$string['starters:builtin_help_page'] = 'このページを説明';
+$string['starters:builtin_help_page_desc'] = '現在のレッスンページの重要な概念を説明します';
+$string['starters:builtin_quiz'] = 'クイズ';
+$string['starters:builtin_quiz_desc'] = '現在の教材から練習クイズを作成します';
+$string['starters:builtin_study_plan'] = '学習計画';
+$string['starters:builtin_study_plan_desc'] = '集中できる学習セッションの計画を作ります';
+$string['starters:builtin_ai_project_coach'] = 'AIプロジェクトコーチ';
+$string['starters:builtin_ai_project_coach_desc'] = 'コースの課題やプロジェクトを段階的にサポートします';
+$string['starters:builtin_focus_next'] = '何に集中すべきですか？';
+$string['starters:builtin_focus_next_desc'] = '目標の進捗に基づいた、あなた向けの次の一歩の提案';
+$string['starters:builtin_ell_practice'] = '会話練習';
+$string['starters:builtin_ell_practice_desc'] = 'アシスタントとの話し言葉の会話練習';
+$string['starters:builtin_ell_pronunciation'] = '発音練習';
+$string['starters:builtin_ell_pronunciation_desc'] = '発音を音ごとにフィードバックします';
