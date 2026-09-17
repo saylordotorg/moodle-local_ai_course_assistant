@@ -163,10 +163,17 @@ define([
 
     // Course-module ids the model copied out of the structure block, e.g.
     // "Watch the Unit 1 Introduction Video (id:20057)". The server scrubs these
-    // now (protocol_markers::strip_activity_ids), so these two patterns only
-    // matter for history rows stored before that shipped -- but that is every
-    // row on a site that has not upgraded yet, and history is rendered here.
-    const ACTIVITY_ID_PAREN_RE = /[ \t]*\((?:[ \t]*(?:activity|module|course[ \t]+module))?[ \t]*(?:c?mid|id)[ \t]*[:#=]?[ \t]*\d+[ \t]*\)/gi;
+    // now (protocol_markers::strip_activity_ids), so these patterns only matter
+    // for history rows stored before that shipped -- but that is every row on a
+    // site that has not upgraded yet, and history is rendered here.
+    //
+    // Keep these in step with the PHP. The first draft made the prefix, the
+    // separator and the "c" of "cmid" all optional, which deleted ordinary
+    // prose: "WHERE (id = 5)", "ends with (id=2)", "Sample (ID 4)", "the
+    // recession (mid 2020)". Unprefixed, the colon is required and is the only
+    // accepted separator.
+    const ACTIVITY_ID_PREFIXED_RE = /[ \t]*\([ \t]*(?:activity|module|course[ \t]+module)[ \t]+(?:c?mid|id)[ \t]*[:#=]?[ \t]*\d+[ \t]*\)/gi;
+    const ACTIVITY_ID_PAREN_RE = /[ \t]*\([ \t]*(?:cmid|id)[ \t]*:[ \t]*\d+[ \t]*\)/gi;
     const ACTIVITY_ID_BARE_RE = /[ \t]*[,;:\u2013\u2014-]?[ \t]*\b(?:activity|module)[ \t]+id[ \t]*[:#=][ \t]*\d+/gi;
     const SCORE_OPEN_RE = /\n*\[\s*SOLA_SCORE\s*\][\s\S]*$/i;
     /** @type {Object<string, string>} */
@@ -310,6 +317,8 @@ define([
         }
 
         cleanText = cleanText
+            .replace(ACTIVITY_ID_PREFIXED_RE, '')
+            .replace(ACTIVITY_ID_PREFIXED_RE, '')
             .replace(ACTIVITY_ID_PAREN_RE, '')
             .replace(ACTIVITY_ID_BARE_RE, '');
 

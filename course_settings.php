@@ -168,16 +168,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // override so the course falls back to the site-wide list; that is why this
     // unsets rather than storing '', which would read as "supplement with
     // nothing" and silently override the site default.
-    $supplemental = optional_param('supplemental_courses', '', PARAM_RAW_TRIMMED);
-    if (trim($supplemental) !== '') {
-        // Normalize through the same parser retrieval uses, so what is stored is
-        // what will actually be honoured rather than whatever was typed.
-        $ids = \local_ai_course_assistant\supplemental_sources::parse($supplemental, $courseid);
-        set_config('supplemental_courses_course_' . $courseid, implode(',', $ids), 'local_ai_course_assistant');
-    } else {
-        unset_config('supplemental_courses_course_' . $courseid, 'local_ai_course_assistant');
+    //
+    // Site-level act, for the same reason apibaseurl above is one. This page is
+    // gated on local/ai_course_assistant:manage in the COURSE context, which an
+    // editing teacher holds. The only validation the ids ever get is
+    // `visible = 1`, and in Moodle "visible" means "listed in the catalogue",
+    // not "this user may read it" -- a visible course's content is normally
+    // behind enrolment. Retrieval takes a course id and never checks enrolment,
+    // can_access_course() or moodle/course:view: build_packed_index_from_db()
+    // scopes by courseid and hydrate_content() fetches by chunk id alone.
+    //
+    // So without this gate a teacher with :manage in their own course could
+    // name any visible course on the site and have its indexed text injected
+    // into the prompt for themselves and for every learner in their course,
+    // none of them enrolled in it. Deciding that one course's content may be
+    // quoted into another is an administrator's call about what is suitable for
+    // the audience, not a per-course one.
+    //
+    // As with apibaseurl, a teacher's save keeps the stored value rather than
+    // clearing it, so an unrelated save does not wipe an administrator's list.
+    if (has_capability('moodle/site:config', $syscontext)) {
+        $supplemental = optional_param('supplemental_courses', '', PARAM_RAW_TRIMMED);
+        if (trim($supplemental) !== '') {
+            // Normalize through the same parser retrieval uses, so what is
+            // stored is what will actually be honoured rather than what was
+            // typed.
+            $ids = \local_ai_course_assistant\supplemental_sources::parse($supplemental, $courseid);
+            set_config('supplemental_courses_course_' . $courseid, implode(',', $ids), 'local_ai_course_assistant');
+        } else {
+            unset_config('supplemental_courses_course_' . $courseid, 'local_ai_course_assistant');
+        }
+        \local_ai_course_assistant\supplemental_sources::reset_cache();
     }
-    \local_ai_course_assistant\supplemental_sources::reset_cache();
 
     // Voice Tab — per-course override (inherit / force on / force off).
     $voicetab = optional_param('voice_tab', '', PARAM_RAW_TRIMMED);
@@ -898,6 +920,11 @@ echo html_writer::div(
     </div>
     <?php } ?>
 
+    <?php
+    // Administrators only, matching the save path. Rendering an editable field
+    // whose value the POST handler discards is worse than not showing it: the
+    // teacher fills it in, saves, sees no error and believes it took.
+    if (has_capability('moodle/site:config', $syscontext)) { ?>
     <div class="card mb-3">
         <div class="card-header">
             <h5 class="mb-0"><?php echo get_string('coursesettings:supplemental_heading', 'local_ai_course_assistant'); ?></h5>
@@ -921,6 +948,7 @@ echo html_writer::div(
             </div>
         </div>
     </div>
+    <?php } ?>
 
     <div class="card mb-3">
         <div class="card-header">

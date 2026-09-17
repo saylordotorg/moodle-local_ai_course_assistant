@@ -198,14 +198,30 @@ class rag_retriever {
      * @return string
      */
     private static function persist_key(int $courseid, string $querymodel, string $dtype): string {
-        // The supplemental list is part of the key, not just the course: changing
-        // it changes which chunks the index contains, and without this the old
-        // scope would be served from cache until the generation happened to bump.
-        $scope = implode(',', supplemental_sources::usable_course_ids($courseid));
+        // Every course whose chunks are packed into this index contributes BOTH
+        // its id and its generation counter.
+        //
+        // The id alone is not enough, and the difference is a real 24-hour bug.
+        // flush_cache() bumps ragvecgen_<courseid> for one course, and there is
+        // no reverse map from a supplemental course to the courses listing it.
+        // So an admin who edits the orientation course and reindexes it bumps a
+        // counter that no host course's key reads: with the id alone in the key,
+        // ninety courses keep scoring the pre-edit chunks until the 24h TTL
+        // expires. New policy text is unreachable, and chunk ids that the
+        // reindex deleted still occupy top-k slots -- hydrate_content() drops
+        // them AFTER the slice, so the learner silently gets fewer passages than
+        // before the edit, with nothing logged.
+        //
+        // Reading a generation per course costs nothing: they are plugin config
+        // values already in memory for this request.
+        $scope = [$courseid . ':' . self::course_version($courseid)];
+        foreach (supplemental_sources::usable_course_ids($courseid) as $supplementalid) {
+            $scope[] = $supplementalid . ':' . self::course_version($supplementalid);
+        }
 
         return 'c' . $courseid
             . '_v' . self::course_version($courseid)
-            . '_' . md5($querymodel . '|' . $dtype . '|' . $scope);
+            . '_' . md5($querymodel . '|' . $dtype . '|' . implode(',', $scope));
     }
 
     /**
@@ -664,6 +680,12 @@ class rag_retriever {
         // because the filtered set depends on both.
         $cache_key .= '_' . $configureddtype;
 
+        // ...and by the supplemental scope, for the same reason persist_key()
+        // is. supplemental_sources::reset_cache() clears that class's memo, not
+        // this static, so without the scope here a settings change inside one
+        // request would keep serving the index built under the old scope.
+        $cache_key .= '_' . md5(implode(',', supplemental_sources::usable_course_ids($courseid)));
+
         // Load embeddings. Three layers, cheapest first: a per-request static,
         // a cross-request application cache holding the packed bytes, and the
         // database.
@@ -796,10 +818,27 @@ class rag_retriever {
         $siblingsbycmid = [];
         if (!empty($cmids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+            // Same course scope the index was built over. Pinning this to
+            // $courseid alone was correct until supplemental courses existed:
+            // FAQ chunks carry cmid 0 and are dropped by the $cmid <= 0 guard
+            // above, so every cmid reaching here did belong to this course.
+            // Now one can come from a supplemental course, and course_modules.id
+            // is a site-wide sequence, so `courseid = :cid` could never match
+            // it. Its sibling set came back empty and merge_parents() returned
+            // the bare chunk with no expand_mode marker -- indistinguishable
+            // downstream from a chunk that was deliberately not expanded. The
+            // effect, wherever rag_return_scope is window or page: same-course
+            // hits expand and cross-course ones never do, which is worse
+            // grounding for exactly the orientation content this is for.
+            [$coursesql, $courseparams] = $DB->get_in_or_equal(
+                array_merge([$courseid], supplemental_sources::usable_course_ids($courseid)),
+                SQL_PARAMS_NAMED,
+                'expandscope'
+            );
             $rows = $DB->get_records_select(
                 'local_ai_course_assistant_chunks',
-                "courseid = :cid AND cmid {$insql}",
-                array_merge(['cid' => $courseid], $inparams),
+                "courseid {$coursesql} AND cmid {$insql}",
+                array_merge($courseparams, $inparams),
                 'cmid, chunkindex',
                 // v7.4.5: embed_model/embed_dtype are selected because this
                 // query has to make the same comparability decision the scoring

@@ -167,23 +167,38 @@ final class protocol_markers {
             return $text;
         }
 
-        // Parenthesised form: "(id:20057)", "(cmid: 3)", "(Activity ID: 89206)".
+        // Prefixed form: "(Activity ID: 89206)", "(module id 5)". The word
+        // "activity" or "module" is itself the signal, so the separator may be
+        // absent.
         $text = self::replace(
-            '/[ \t]*\((?:[ \t]*(?:activity|module|course[ \t]+module))?[ \t]*c?mid[ \t]*'
-                . '[:#=]?[ \t]*\d+[ \t]*\)/iu',
-            '',
-            $text
-        );
-        $text = self::replace(
-            '/[ \t]*\((?:[ \t]*(?:activity|module|course[ \t]+module))?[ \t]*id[ \t]*'
+            '/[ \t]*\([ \t]*(?:activity|module|course[ \t]+module)[ \t]+(?:c?mid|id)[ \t]*'
                 . '[:#=]?[ \t]*\d+[ \t]*\)/iu',
             '',
             $text
         );
 
-        // Bare form: "the Unit 1 Assessment, Activity ID: 89206". Any separator
-        // the model used to attach it is taken with it, so no orphaned comma or
-        // dash is left behind mid-sentence.
+        // Bare form: "(id:20057)", "(cmid: 3)". With no prefix to go on, the
+        // colon is required and it is the ONLY accepted separator.
+        //
+        // Both of those constraints were learned the expensive way. The first
+        // draft made the prefix, the separator and the "c" of "cmid" all
+        // optional, so the minimum accepted form was a parenthesis, "id" or
+        // "mid", and digits -- which deletes the operative clause out of
+        // ordinary prose a database or Moodle-adjacent course produces every
+        // day: "WHERE (id = 5)", "the URL ends with (id=2)", "Sample (ID 4)",
+        // "the recession (mid 2020)". All four are gone from the reply with no
+        // trace. The three shapes actually measured in production all use a
+        // colon, so nothing is lost by requiring one.
+        $text = self::replace(
+            '/[ \t]*\([ \t]*(?:cmid|id)[ \t]*:[ \t]*\d+[ \t]*\)/iu',
+            '',
+            $text
+        );
+
+        // Unparenthesised form: "the Unit 1 Assessment, Activity ID: 89206".
+        // The "activity"/"module" prefix is required here for the same reason.
+        // Any separator the model used to attach it is taken with it, so no
+        // orphaned comma or dash is left mid-sentence.
         $text = self::replace(
             '/[ \t]*[,;:\x{2013}\x{2014}-]?[ \t]*\b(?:activity|module)[ \t]+id[ \t]*[:#=][ \t]*\d+/iu',
             '',

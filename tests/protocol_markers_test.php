@@ -168,6 +168,10 @@ final class protocol_markers_test extends \basic_testcase {
                 'Open the reading (Id: 20061) first.',
                 'Open the reading first.',
             ],
+            'prefixed without separator' => [
+                'Open the Unit 1 Assessment (Activity ID 89206) now.',
+                'Open the Unit 1 Assessment now.',
+            ],
             'inside markdown bold' => [
                 '**Unit 1 Introduction Video** (id:20057) covers the basics.',
                 '**Unit 1 Introduction Video** covers the basics.',
@@ -202,6 +206,15 @@ final class protocol_markers_test extends \basic_testcase {
             'no digits' => ['The identifier (id) is internal.'],
             'student id prompt' => ['Enter your student ID in the field.'],
             'numbered aside' => ['Strategy has three parts (see Unit 2).'],
+            // Every one of these was deleted by the first version of the
+            // scrub, which made the prefix, the separator and the "c" of
+            // "cmid" all optional. A database course produces the first two
+            // routinely.
+            'sql predicate' => ['Use `SELECT * FROM users WHERE (id = 5)` to fetch that row.'],
+            'url fragment' => ['The course URL ends with (id=2).'],
+            'sample number' => ['Sample (ID 4) showed the highest yield.'],
+            'mid decade' => ['The recession (mid 2020) was severe.'],
+            'bare mid' => ['The value (mid 7) is the midpoint.'],
         ];
     }
 

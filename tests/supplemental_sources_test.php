@@ -129,4 +129,60 @@ final class supplemental_sources_test extends \advanced_testcase {
         $this->assertNotSame($before, $after,
             'adding a supplemental course must not serve the pre-change index from cache');
     }
+
+    /**
+     * Reindexing a supplemental course invalidates every course that lists it.
+     *
+     * The list being in the key covers a change to the SETTING. It does not
+     * cover a change to the listed course's CONTENT, and that is the case an
+     * administrator will actually hit: edit the exam-policy page in the
+     * orientation course, press Reindex, and every course pointing at it should
+     * see the new text.
+     *
+     * flush_cache() bumps one course's generation counter and there is no
+     * reverse map from a supplemental course to its hosts, so with only the
+     * host's generation in the key those courses kept scoring the pre-edit
+     * chunks until the 24-hour TTL expired -- serving stale answers and
+     * spending top-k slots on chunk ids the reindex had deleted.
+     *
+     * @return void
+     */
+    public function test_reindexing_a_supplemental_course_invalidates_its_hosts(): void {
+        $this->resetAfterTest();
+        $orientation = $this->getDataGenerator()->create_course(['visible' => 1]);
+        set_config('supplemental_courses', (string) $orientation->id, 'local_ai_course_assistant');
+        supplemental_sources::reset_cache();
+
+        $m = new \ReflectionMethod(rag_retriever::class, 'persist_key');
+        $m->setAccessible(true);
+        $before = $m->invoke(null, 42, 'text-embedding-3-small', 'float');
+
+        // What content_indexer::index_course() does at the end of a reindex.
+        rag_retriever::flush_cache((int) $orientation->id);
+        supplemental_sources::reset_cache();
+
+        $after = $m->invoke(null, 42, 'text-embedding-3-small', 'float');
+        $this->assertNotSame($before, $after,
+            'reindexing a supplemental course must invalidate the courses that list it');
+    }
+
+    /**
+     * The host course's own generation still rotates the key.
+     *
+     * Guards against a fix for the above that replaces the host's generation
+     * with the supplemental set rather than combining them.
+     *
+     * @return void
+     */
+    public function test_reindexing_the_host_course_still_invalidates_its_own_key(): void {
+        $this->resetAfterTest();
+        $m = new \ReflectionMethod(rag_retriever::class, 'persist_key');
+        $m->setAccessible(true);
+
+        $before = $m->invoke(null, 42, 'text-embedding-3-small', 'float');
+        rag_retriever::flush_cache(42);
+        $after = $m->invoke(null, 42, 'text-embedding-3-small', 'float');
+
+        $this->assertNotSame($before, $after);
+    }
 }

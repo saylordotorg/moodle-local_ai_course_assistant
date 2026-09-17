@@ -720,21 +720,62 @@ try {
         }
     }
     // Build modules lookup map (cmid → url, title) for specific source attribution.
-    //
-    // Supplemental courses are included, because retrieval now scores their
-    // chunks too. Without them a citation into the orientation course had no
-    // entry here and fell back to the CURRENT course's page -- a link that
-    // works but points at the wrong course. uservisible is the access check:
-    // a learner who cannot see the activity gets no link to it.
     $modulesmap = [];
-    $mapcourses = array_merge(
-        [$courseid],
-        \local_ai_course_assistant\supplemental_sources::usable_course_ids($courseid)
-    );
-    foreach ($mapcourses as $mapcourseid) {
-        try {
-            $modinfo = get_fast_modinfo($mapcourseid);
-            foreach ($modinfo->get_cms() as $cmobj) {
+    try {
+        $modinfo = get_fast_modinfo($courseid);
+        foreach ($modinfo->get_cms() as $cmobj) {
+            if ($cmobj->uservisible && $cmobj->has_view() && !empty($cmobj->name)) {
+                $modulesmap[(string) $cmobj->id] = [
+                    'url' => (new \moodle_url('/mod/' . $cmobj->modname . '/view.php', ['id' => $cmobj->id]))->out(false),
+                    'title' => $cmobj->name,
+                ];
+            }
+        }
+    } catch (\Throwable $e) {
+        // Non-critical; pill will fall back to generic course link.
+    }
+
+    // Supplemental courses contribute only the cmids this turn actually
+    // retrieved, not their whole module list.
+    //
+    // Two reasons, and the first is not the obvious one. uservisible is NOT an
+    // enrolment check: cm_info::update_user_visible() tests deletion,
+    // visibility, availability and mod/<modname>:view, and for the module types
+    // an orientation course is made of -- page, url, book, folder, resource --
+    // that capability carries the `user` archetype and resolves true for any
+    // logged-in user. So emitting the full map for another course would publish
+    // the names and URLs of its activities to learners not enrolled in it,
+    // whether or not this turn cited any of them. Scoping to retrieved cmids
+    // means we disclose only what the answer was actually built from.
+    //
+    // Second, it is on the hot path: up to five extra get_fast_modinfo() builds
+    // plus a per-cm obtain_dynamic_data(), and a bigger pre-stream payload,
+    // added to time-to-first-token on every turn.
+    $supplementalcmids = [];
+    foreach ($retrievedchunks as $chunk) {
+        $chunkcmid = isset($chunk['cmid']) ? (int) $chunk['cmid'] : 0;
+        if ($chunkcmid > 0 && !isset($modulesmap[(string) $chunkcmid])) {
+            $supplementalcmids[$chunkcmid] = true;
+        }
+    }
+    if (!empty($supplementalcmids)) {
+        foreach (\local_ai_course_assistant\supplemental_sources::usable_course_ids($courseid) as $supcourseid) {
+            try {
+                $supmodinfo = get_fast_modinfo($supcourseid);
+            } catch (\Throwable $e) {
+                // Non-critical; the pill falls back to a course-level link.
+                continue;
+            }
+            foreach (array_keys($supplementalcmids) as $wantedcmid) {
+                if (isset($modulesmap[(string) $wantedcmid])) {
+                    continue;
+                }
+                try {
+                    $cmobj = $supmodinfo->get_cm($wantedcmid);
+                } catch (\Throwable $e) {
+                    // Not in this course; try the next one.
+                    continue;
+                }
                 if ($cmobj->uservisible && $cmobj->has_view() && !empty($cmobj->name)) {
                     $modulesmap[(string) $cmobj->id] = [
                         'url' => (new \moodle_url('/mod/' . $cmobj->modname . '/view.php', ['id' => $cmobj->id]))->out(false),
@@ -742,9 +783,6 @@ try {
                     ];
                 }
             }
-        } catch (\Throwable $e) {
-            // Non-critical; pill will fall back to generic course link.
-            continue;
         }
     }
 

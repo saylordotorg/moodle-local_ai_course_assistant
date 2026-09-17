@@ -253,7 +253,7 @@ $string['coursesettings:supplemental_nosite'] = 'Leave empty for none. No site-w
 $string['settings:supplemental_courses'] = 'Supplemental courses';
 $string['settings:supplemental_courses_desc'] = 'Course IDs whose content [[tutorshort]] may also draw on when answering, separated by commas. Use this for material that lives in another course and applies everywhere, such as a student orientation or resource centre: a learner asking about exam policy then gets the answer from that course instead of nothing.
 
-The courses must already be indexed for retrieval; nothing extra is embedded, so adding one here is immediate and costs nothing. Hidden courses are ignored, so this cannot be used to surface material a learner is not meant to see. Maximum {$a} courses. A per-course setting, where present, replaces this list rather than adding to it.';
+The courses must already be indexed for retrieval; nothing extra is embedded, so adding one here is immediate and costs nothing. Hidden courses are ignored. Activities inside a listed course, however, are indexed as the administrator who reindexed it saw them, so a hidden or restricted activity’s text can be quoted back to a learner even though no link to it is shown. Only list courses whose whole content is suitable for the audience. Maximum {$a} courses. A per-course setting, where present, replaces this list rather than adding to it.';
 $string['settings:faq_content'] = 'FAQ Content';
 $string['settings:faq_content_desc'] = 'Enter FAQ entries (one per line in the format: Q: question | A: answer). These will be provided to the AI to answer common support questions.';
 $string['settings:zendesk_enabled'] = 'Enable Zendesk Escalation';
