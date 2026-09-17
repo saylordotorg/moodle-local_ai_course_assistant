@@ -52,8 +52,8 @@ class soapbox_storage_probe {
     /** @var string Probe failed. */
     public const STATUS_FAIL = 'fail';
 
-    /** @var string Key prefix for probe objects, so they are obvious in the bucket. */
-    private const PROBE_PREFIX = '__selftest/';
+    /** @var string Marker segment for probe objects, so they are obvious in the bucket. */
+    private const PROBE_MARKER = '__selftest/';
 
     /**
      * Build a result row.
@@ -115,7 +115,12 @@ class soapbox_storage_probe {
         // A distinctive body so a GET that silently returns someone else's object,
         // or an HTML error page, cannot be mistaken for success.
         $body = 'sola-soapbox-selftest-' . bin2hex(random_bytes(8));
-        $key = self::PROBE_PREFIX . 'probe-' . (int) $USER->id . '-' . time() . '.txt';
+        // Probe INSIDE the configured recording prefix. Writing to a sibling
+        // path meant the probe exercised a location real recordings never use,
+        // so a bucket policy correctly scoped to the recording prefix returned
+        // 403 and the probe reported a working bucket as broken.
+        $key = soapbox_storage::prefix() . self::PROBE_MARKER
+            . 'probe-' . (int) $USER->id . '-' . time() . '.txt';
         $uploaded = false;
 
         // 2. PUT.
