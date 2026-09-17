@@ -181,6 +181,12 @@ while (true) {
     cli_writeln("  {$converted} converted, {$skipped} skipped ({$pct}%)");
 }
 
+// Every other writer of this table flushes; this was the last one that did not.
+// Harmless before the vector index was cached across requests (the round trip
+// is lossless and the filtered set is unchanged), but leaving one writer outside
+// the invariant is how the next person concludes the invariant does not hold.
+rag_retriever::flush_cache();
+
 $secs = microtime(true) - $start;
 cli_writeln('');
 cli_writeln(sprintf('Done: %d converted, %d skipped, %.1fs', $converted, $skipped, $secs));

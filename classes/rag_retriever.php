@@ -27,8 +27,13 @@ use local_ai_course_assistant\embedding_provider\base_embedding_provider;
  *  3. Compute cosine similarity for each chunk.
  *  4. Return top-k chunks sorted by descending similarity.
  *
- * Performance: cosine similarity in PHP is fast for < ~2000 chunks.
- * For larger corpora consider a vector DB or pgvector extension.
+ * Performance, measured on the dev fleet 2026-09-17 over a 2,020-chunk course
+ * at 2048 dimensions: scoring every vector costs ~71 ms, but reading them out
+ * of the database costs ~4,380 ms. The scan is not the expensive part; the
+ * fetch is. Step 2 is therefore cached as packed bytes in the `vectors`
+ * application cache, which leaves ~210 ms of decode on a warm hit. Reach for a
+ * vector database when a single course index makes the scan itself the cost,
+ * which at these numbers is well past 10,000 chunks.
  *
  * @package    local_ai_course_assistant
  * @copyright  2025 AI Course Assistant
@@ -38,14 +43,29 @@ class rag_retriever {
     /**
      * @var array Decoded chunk vectors, keyed "course_<id>".
      *
-     * Avoids re-decoding every vector on repeated retrievals. Lives for the
-     * life of the PHP process, so it MUST be flushed whenever the index
-     * changes -- see flush_cache(). For a web request that window is a single
-     * page load, but CLI processes (reindex tools, benchmark harnesses,
+     * The innermost of three layers: this static, then the `vectors`
+     * application cache holding the packed bytes, then the database. This one
+     * holds the DECODED vectors and is never serialized, because serializing
+     * decoded float arrays is slower than re-reading them (see
+     * build_packed_index_from_db()).
+     *
+     * Lives for the life of the PHP process, so it MUST be flushed whenever the
+     * index changes -- see flush_cache(). For a web request that window is a
+     * single page load, but CLI processes (reindex tools, benchmark harnesses,
      * scheduled tasks) can hold it across an entire run and would otherwise
      * score against vectors that no longer exist.
      */
     private static array $vectorcache = [];
+
+    /**
+     * Largest packed index we will hand to the application cache, in bytes.
+     *
+     * The cache store has to serialize whatever it is given, so a pathologically
+     * large course should degrade to reading the database every time rather than
+     * to thrashing the cache. 64 MB is roughly four times our largest measured
+     * course (2,020 chunks at 2048 float32 dimensions is 15.8 MB).
+     */
+    private const MAX_CACHED_INDEX_BYTES = 67108864;
 
     /**
      * Default for `rerank_min_query_chars`: the longest query still skipped.
@@ -66,16 +86,55 @@ class rag_retriever {
     /**
      * Discard cached vectors after the index changes.
      *
-     * Called by content_indexer on every path that inserts or deletes chunks.
-     * Cheap: the cache is per-process and rebuilt on the next retrieval.
+     * Called by every path that inserts or deletes chunks: content_indexer,
+     * faq_manager, observer::course_deleted(), embedding_migration.
+     *
+     * No longer cheap, and no longer per-process. Flushing one course bumps a
+     * shared generation counter (two cache ops). Flushing everything purges the
+     * whole `vectors` definition across the site, so do not call the null form
+     * in a loop -- call it once after the loop.
      *
      * @param int|null $courseid Course to flush, or null for every course.
      */
     public static function flush_cache(?int $courseid = null): void {
         if ($courseid === null) {
             self::$vectorcache = [];
+            // The persistent layer has no key enumeration, so "everything"
+            // means purging the definition. Safe: it only forces rebuilds.
+            \cache_helper::purge_by_definition('local_ai_course_assistant', 'vectors');
             return;
         }
+
+        // Bump the course's generation before touching the static, so that a
+        // concurrent request on this node cannot repopulate the old key from
+        // the old generation. Every web node reads the same counter, which is
+        // the behaviour the old per-process static could not provide: a
+        // reindex on one node left every other node scoring against vectors
+        // that no longer existed until its PHP process recycled.
+        // max(counter + 1, time()) rather than counter + 1, because the counter
+        // shares this definition's 24h TTL with the entries it guards AND is
+        // written before them, so it expires first. Once it is gone
+        // course_version() falls back to 1, and a plain increment would set 2 --
+        // a generation whose entries can still be live, reviving a pre-reindex
+        // index for the remainder of their TTL. Eviction does the same thing:
+        // a tiny counter and a 16 MB blob are not evicted together. Wall clock
+        // is monotonic, so a generation is never reused.
+        // The counter lives in config_plugins, NOT in a cache. A cached counter
+        // can be lost independently of the entries it guards -- it expires on
+        // the same clock (and is written first, so it goes first), and eviction
+        // under memory pressure drops a tiny key long before a 16 MB blob. After
+        // such a loss there is no memory of which generations were already used,
+        // so the next bump restarts low and revives a pre-reindex index whose
+        // entries are still live. A clock-derived value only narrows that window;
+        // two flushes inside the same millisecond still collide. config_plugins
+        // is durable, shared across nodes, and survives a cache purge, which
+        // closes the hole rather than shrinking it. Reads are free: Moodle keeps
+        // plugin config in memory for the request.
+        set_config(
+            self::GENERATION_CONFIG_PREFIX . $courseid,
+            self::course_version($courseid) + 1,
+            'local_ai_course_assistant'
+        );
         // Keys are "course_<id>_<querymodel hash>", because a cached set is
         // filtered for comparability against one query model. Flushing has to
         // clear every variant for the course: an exact unset() of
@@ -87,6 +146,380 @@ class rag_retriever {
                 unset(self::$vectorcache[$key]);
             }
         }
+    }
+
+    /**
+     * Application cache holding packed per-course vector indexes.
+     *
+     * Untyped on purpose: the concrete class moved to core_cache\application_cache
+     * in Moodle 5.0 and we support 4.5 through 5.2.
+     *
+     * @return \cache_loader
+     */
+    private static function vector_cache() {
+        return \cache::make('local_ai_course_assistant', 'vectors');
+    }
+
+    /** Config key prefix for the per-course index generation. */
+    private const GENERATION_CONFIG_PREFIX = 'ragvecgen_';
+
+    /**
+     * Current generation number for a course's index.
+     *
+     * Every cached index embeds this in its key, so bumping it orphans every
+     * variant for the course at once. That is the only invalidation primitive
+     * MUC gives us that works across processes and web nodes: there is no way
+     * to enumerate or wildcard-delete keys.
+     *
+     * @param int $courseid
+     * @return int
+     */
+    private static function course_version(int $courseid): int {
+        $ver = get_config('local_ai_course_assistant', self::GENERATION_CONFIG_PREFIX . $courseid);
+        return ($ver === false || $ver === null || $ver === '') ? 1 : (int) $ver;
+    }
+
+    /**
+     * Key for one course's packed index under one query model and encoding.
+     *
+     * Both discriminators matter: the stored set is filtered for comparability
+     * against the query model AND against the configured encoding, so an index
+     * built for one is wrong for the other.
+     *
+     * @param int    $courseid
+     * @param string $querymodel
+     * @param string $dtype
+     * @return string
+     */
+    private static function persist_key(int $courseid, string $querymodel, string $dtype): string {
+        return 'c' . $courseid
+            . '_v' . self::course_version($courseid)
+            . '_' . md5($querymodel . '|' . $dtype);
+    }
+
+    /**
+     * Fetch a course's packed index, from the application cache or the database.
+     *
+     * @param int    $courseid
+     * @param string $querymodel Model that produced the query vector.
+     * @param string $dtype      Encoding the query is prepared for.
+     * @return array Packed index; see build_packed_index_from_db() for the shape.
+     */
+    private static function load_packed_index(int $courseid, string $querymodel, string $dtype): array {
+        $cache = self::vector_cache();
+        $key = self::persist_key($courseid, $querymodel, $dtype);
+
+        $packed = $cache->get($key);
+        if (self::packed_index_is_intact($packed)) {
+            self::report_skips($packed, $courseid, $querymodel, $dtype);
+            return $packed;
+        }
+
+        $packed = self::build_packed_index_from_db($courseid, $querymodel, $dtype);
+        self::report_skips($packed, $courseid, $querymodel, $dtype);
+
+        $size = strlen($packed['blob']);
+        if ($size <= self::MAX_CACHED_INDEX_BYTES && !$cache->set($key, $packed)) {
+            // MAX_CACHED_INDEX_BYTES is our ceiling; the store has its own and it
+            // is usually lower. cachestore_memcached refuses items over 1 MB by
+            // default, so on such a site every request would pay the full
+            // database read AND a failed multi-megabyte serialize, with the
+            // headline speedup simply not happening and nothing to say why.
+            debugging(
+                sprintf(
+                    'rag_retriever: the application cache store rejected a %d-byte packed index for '
+                    . 'course %d. Retrieval will read the database on every request. Cache stores cap '
+                    . 'item size (memcached defaults to 1 MB); map the "vectors" definition to a store '
+                    . 'that can hold it, or reduce the index with int8 embeddings.',
+                    $size,
+                    $courseid
+                ),
+                DEBUG_NORMAL
+            );
+        }
+        return $packed;
+    }
+
+    /**
+     * Read a course's embedded chunks and pack them into one cacheable structure.
+     *
+     * The returned shape is deliberately NOT a list of decoded float arrays.
+     * Measured on the dev fleet over a 2,020-chunk course at 2048 dimensions:
+     * serializing decoded arrays costs ~3,580 ms and 117 MB, which is slower
+     * than the ~4,380 ms database read it exists to avoid, whereas the packed
+     * form serializes in ~6 ms at 16 MB. Everything here is a scalar or one
+     * binary string for exactly that reason.
+     *
+     *   [
+     *     'ids'          => int[],           // chunk ids, in blob order
+     *     'lens'         => int[],           // bytes each chunk occupies
+     *     'dtypes'       => string[],        // per-chunk encoding
+     *     'cmids'        => (int|null)[],
+     *     'modtypes'     => string[],
+     *     'chunkindexes' => int[],
+     *     'blob'         => string,          // every chunk's packed bytes, concatenated
+     *   ]
+     *
+     * @param int    $courseid
+     * @param string $querymodel
+     * @param string $dtype
+     * @return array
+     */
+    private static function build_packed_index_from_db(int $courseid, string $querymodel, string $dtype): array {
+        global $DB;
+
+        $packed = [
+            'ids' => [], 'lens' => [], 'dtypes' => [],
+            'cmids' => [], 'modtypes' => [], 'chunkindexes' => [], 'blob' => '',
+            // Carried rather than reported here so the warnings survive caching.
+            // They used to fire on every retrieval; once the build happens at
+            // most once a day per course they would otherwise go quiet, and the
+            // whole point of them is that the symptom (retrieval silently
+            // returning nothing) looks nothing like the cause.
+            'skipped_model' => 0, 'skipped_model_name' => '',
+            'skipped_dtype' => 0, 'skipped_dtype_name' => '',
+        ];
+
+        $rows = $DB->get_records_select(
+            'local_ai_course_assistant_chunks',
+            // Either column is sufficient. Testing only `embedding` made
+            // every quantized row invisible: an int8 or binary index writes
+            // the packed blob and leaves the JSON column null, because
+            // storing a second, larger copy of the vector would defeat the
+            // point of quantizing it.
+            // v7.2.7: site-wide FAQ chunks are scored alongside the
+            // course's own material. The FAQ is one admin setting, so it is
+            // embedded once against SITEID rather than copied into every
+            // course index; without this clause it would be invisible to
+            // every course that is not the site course.
+            //
+            // It competes on relevance like anything else, which is the
+            // point: a question about certificates retrieves the
+            // certificate answer, and a question about marginal cost
+            // retrieves none of it. Previously all 4,451 characters were
+            // injected into every prompt regardless.
+            '(courseid = :courseid OR (courseid = :siteid AND modtype = :faqtype))
+               AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
+            [
+                'courseid' => $courseid,
+                'siteid' => SITEID,
+                'faqtype' => \local_ai_course_assistant\faq_manager::MODTYPE,
+            ],
+            '',
+            // NB: `content` is deliberately NOT selected here. Scoring
+            // reads vectors only, so the text is fetched later for the
+            // handful of chunks that survive selection. Measured
+            // 2026-08-02 over repeated cold runs this is a small time win
+            // but a real memory one: the largest course holds 56 MB of
+            // chunk text that scoring never looks at.
+            'id, courseid, embedding, embedding_bin, embed_dtype, embed_model, cmid, modtype, chunkindex'
+        );
+
+        if (empty($rows)) {
+            return $packed;
+        }
+
+        $skippedincompatible = 0;
+        $skippedmodel = '';
+        $skippeddtype = 0;
+        $skippeddtypename = '';
+
+        foreach ($rows as $row) {
+            $rowdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
+                $row->embed_dtype ?? null
+            );
+            $rowmodel = (string) ($row->embed_model ?? '');
+
+            // Refuse to score across embedding spaces or encodings.
+            // Both refusals are decided by classify_row(), which is pure
+            // and unit-tested; retrieve() itself cannot be exercised in a
+            // test because it makes a billable API call first.
+            $verdict = self::classify_row($querymodel, $dtype, $rowmodel, $rowdtype);
+            if ($verdict === 'model') {
+                $skippedincompatible++;
+                $skippedmodel = $rowmodel;
+                continue;
+            }
+            if ($verdict === 'dtype') {
+                $skippeddtype++;
+                $skippeddtypename = $rowdtype;
+                continue;
+            }
+
+            // Prefer the stored bytes. Where a legacy row has only the JSON
+            // column, decode it and re-pack: pack('g*') is float32 and the
+            // embeddings are float32, so the round trip is lossless (verified
+            // on dev over a full course at max element error 0.0).
+            $bytes = (string) ($row->embedding_bin ?? '');
+            if ($bytes === '') {
+                if ($rowdtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+                    // A binary index has no JSON representation to fall back to.
+                    continue;
+                }
+                $vec = self::decode_vector(null, $row->embedding ?? null, $rowdtype);
+                if (!is_array($vec) || empty($vec)) {
+                    continue;
+                }
+                // decode_vector()'s JSON branch ignores $dtype and returns the
+                // literal decoded values, so an int8-LABELLED row that only has
+                // the JSON column yields float32 magnitudes in roughly [-1, 1].
+                // Packing those as int8 would round every one to -1, 0 or +1 and
+                // then score the result, which is silent garbage and a
+                // regression against main, where the same row scored correctly.
+                // Pack float32 and record float: lossless either way, and
+                // classify_row() only distinguishes binary from non-binary.
+                $rowdtype = \local_ai_course_assistant\embedding_compat::DTYPE_FLOAT;
+                $bytes = self::pack_vector($vec, $rowdtype);
+            }
+            if ($bytes === '') {
+                continue;
+            }
+
+            $packed['ids'][]          = (int) $row->id;
+            $packed['lens'][]         = strlen($bytes);
+            $packed['dtypes'][]       = $rowdtype;
+            $packed['cmids'][]        = isset($row->cmid) ? (int) $row->cmid : null;
+            $packed['modtypes'][]     = (string) ($row->modtype ?? '');
+            $packed['chunkindexes'][] = (int) ($row->chunkindex ?? 0);
+            $packed['blob']          .= $bytes;
+        }
+
+        $packed['skipped_model'] = $skippedincompatible;
+        $packed['skipped_model_name'] = $skippedmodel;
+        $packed['skipped_dtype'] = $skippeddtype;
+        $packed['skipped_dtype_name'] = $skippeddtypename;
+
+        return $packed;
+    }
+
+    /**
+     * Emit the "some chunks were skipped" warnings for a packed index.
+     *
+     * Called on the cache HIT path as well as the miss path. Loud, because the
+     * symptom otherwise is "retrieval quietly returns nothing" and the cause is
+     * a config change made days earlier.
+     *
+     * @param array  $packed
+     * @param int    $courseid
+     * @param string $querymodel
+     * @param string $dtype
+     */
+    private static function report_skips(array $packed, int $courseid, string $querymodel, string $dtype): void {
+        $skippedincompatible = (int) ($packed['skipped_model'] ?? 0);
+        $skippedmodel = (string) ($packed['skipped_model_name'] ?? '');
+        $skippeddtype = (int) ($packed['skipped_dtype'] ?? 0);
+        $skippeddtypename = (string) ($packed['skipped_dtype_name'] ?? '');
+
+        if ($skippedincompatible > 0) {
+            debugging(
+                sprintf(
+                    'rag_retriever: skipped %d chunk(s) in course %d embedded with "%s", '
+                    . 'which is not comparable to the query model "%s". '
+                    . 'Re-index the course, or set embed_query_model back to a compatible model.',
+                    $skippedincompatible,
+                    $courseid,
+                    shorten_text($skippedmodel, 100),
+                    shorten_text($querymodel, 100)
+                ),
+                DEBUG_NORMAL
+            );
+        }
+
+        if ($skippeddtype > 0) {
+            debugging(
+                sprintf(
+                    'rag_retriever: skipped %d chunk(s) in course %d stored as "%s" while the '
+                    . 'configured embed_dtype is "%s". Re-index the course after changing '
+                    . 'embed_dtype — the encodings are not interchangeable.',
+                    $skippeddtype,
+                    $courseid,
+                    shorten_text($skippeddtypename, 40),
+                    $dtype
+                ),
+                DEBUG_NORMAL
+            );
+        }
+    }
+
+    /**
+     * Is a cached packed index structurally self-consistent?
+     *
+     * hydrate_index() walks the blob by the recorded lengths, so a short or
+     * corrupt `lens` shifts every subsequent offset and yields plausible
+     * garbage rather than an error. An array_sum over a few thousand ints is
+     * microseconds against a ~210 ms decode, so the certainty is worth buying.
+     *
+     * @param mixed $packed
+     * @return bool
+     */
+    private static function packed_index_is_intact($packed): bool {
+        if (!is_array($packed) || !isset($packed['ids'], $packed['blob'], $packed['lens'])) {
+            return false;
+        }
+        if (!is_array($packed['ids']) || !is_array($packed['lens']) || !is_string($packed['blob'])) {
+            return false;
+        }
+        if (count($packed['lens']) !== count($packed['ids'])) {
+            return false;
+        }
+        return array_sum($packed['lens']) === strlen($packed['blob']);
+    }
+
+    /**
+     * Expand a packed index into the scoring structure keyed by chunk id.
+     *
+     * Binary vectors stay packed: binary_similarity() compares the bytes
+     * directly, which is the entire point of that encoding.
+     *
+     * @param array $packed From build_packed_index_from_db() or the cache.
+     * @return array chunkid => ['vec' => float[], 'bin' => string|null, 'dtype' => string,
+     *               'cmid' => int|null, 'modtype' => string, 'chunkindex' => int]
+     */
+    private static function hydrate_index(array $packed): array {
+        $out = [];
+        if (empty($packed['ids']) || !isset($packed['blob'])) {
+            return $out;
+        }
+
+        $offset = 0;
+        $count = count($packed['ids']);
+        for ($i = 0; $i < $count; $i++) {
+            $len = (int) $packed['lens'][$i];
+            if ($len <= 0) {
+                // substr() reads a negative length as "stop N from the end",
+                // which would slice the wrong bytes and walk $offset backwards.
+                continue;
+            }
+            $slice = substr($packed['blob'], $offset, $len);
+            $offset += $len;
+            if ($slice === '') {
+                continue;
+            }
+
+            $rowdtype = (string) $packed['dtypes'][$i];
+            $entry = [
+                'cmid'       => $packed['cmids'][$i],
+                'modtype'    => (string) $packed['modtypes'][$i],
+                'chunkindex' => (int) $packed['chunkindexes'][$i],
+                'dtype'      => $rowdtype,
+            ];
+
+            if ($rowdtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
+                $entry['vec'] = [];
+                $entry['bin'] = $slice;
+            } else {
+                $vec = self::decode_vector($slice, null, $rowdtype);
+                if (!is_array($vec) || empty($vec)) {
+                    continue;
+                }
+                $entry['vec'] = $vec;
+                $entry['bin'] = null;
+            }
+
+            $out[(int) $packed['ids'][$i]] = $entry;
+        }
+
+        return $out;
     }
 
     /**
@@ -188,138 +621,16 @@ class rag_retriever {
         // entry built for the first one.
         $cache_key .= '_' . md5($querymodel);
 
-        // Load and decode embeddings (cached per-course within the request).
+        // The persistent layer is keyed by encoding as well as query model,
+        // because the filtered set depends on both.
+        $cache_key .= '_' . $configureddtype;
+
+        // Load embeddings. Three layers, cheapest first: a per-request static,
+        // a cross-request application cache holding the packed bytes, and the
+        // database.
         if (!isset(self::$vectorcache[$cache_key])) {
-            $rows = $DB->get_records_select(
-                'local_ai_course_assistant_chunks',
-                // Either column is sufficient. Testing only `embedding` made
-                // every quantized row invisible: an int8 or binary index writes
-                // the packed blob and leaves the JSON column null, because
-                // storing a second, larger copy of the vector would defeat the
-                // point of quantizing it.
-                // v7.2.7: site-wide FAQ chunks are scored alongside the
-                // course's own material. The FAQ is one admin setting, so it is
-                // embedded once against SITEID rather than copied into every
-                // course index; without this clause it would be invisible to
-                // every course that is not the site course.
-                //
-                // It competes on relevance like anything else, which is the
-                // point: a question about certificates retrieves the
-                // certificate answer, and a question about marginal cost
-                // retrieves none of it. Previously all 4,451 characters were
-                // injected into every prompt regardless.
-                '(courseid = :courseid OR (courseid = :siteid AND modtype = :faqtype))
-                   AND (embedding IS NOT NULL OR embedding_bin IS NOT NULL)',
-                [
-                    'courseid' => $courseid,
-                    'siteid' => SITEID,
-                    'faqtype' => \local_ai_course_assistant\faq_manager::MODTYPE,
-                ],
-                '',
-                // NB: `content` is deliberately NOT selected here. Scoring
-                // reads vectors only, so the text is fetched below for the
-                // handful of chunks that survive selection. Measured
-                // 2026-08-02 over repeated cold runs this is a small time win
-                // (course 116: ~318 ms vs ~315 ms; the difference is within
-                // noise) but a real memory one: the largest course holds
-                // 56 MB of chunk text that scoring never looks at.
-                'id, courseid, embedding, embedding_bin, embed_dtype, embed_model, cmid, modtype, chunkindex'
-            );
-
-            self::$vectorcache[$cache_key] = [];
-            if (!empty($rows)) {
-                $skippedincompatible = 0;
-                $skippedmodel = '';
-                $skippeddtype = 0;
-                $skippeddtypename = '';
-                foreach ($rows as $row) {
-                    $rowdtype = \local_ai_course_assistant\embedding_compat::normalize_dtype(
-                        $row->embed_dtype ?? null
-                    );
-                    $rowmodel = (string) ($row->embed_model ?? '');
-
-                    // Refuse to score across embedding spaces or encodings.
-                    // Both refusals are decided by classify_row(), which is pure
-                    // and unit-tested; retrieve() itself cannot be exercised in a
-                    // test because it makes a billable API call first.
-                    $verdict = self::classify_row($querymodel, $configureddtype, $rowmodel, $rowdtype);
-                    if ($verdict === 'model') {
-                        $skippedincompatible++;
-                        $skippedmodel = $rowmodel;
-                        continue;
-                    }
-                    if ($verdict === 'dtype') {
-                        $skippeddtype++;
-                        $skippeddtypename = $rowdtype;
-                        continue;
-                    }
-
-                    if ($rowdtype === \local_ai_course_assistant\embedding_compat::DTYPE_BINARY) {
-                        $blob = (string) ($row->embedding_bin ?? '');
-                        if ($blob === '') {
-                            continue;
-                        }
-                        self::$vectorcache[$cache_key][$row->id] = [
-                            'vec'        => [],
-                            'bin'        => $blob,
-                            'dtype'      => $rowdtype,
-                            'cmid'       => isset($row->cmid) ? (int) $row->cmid : null,
-                            'modtype'    => (string) ($row->modtype ?? ''),
-                            'chunkindex' => (int) ($row->chunkindex ?? 0),
-                        ];
-                        continue;
-                    }
-
-                    $vec = self::decode_vector(
-                        $row->embedding_bin ?? null,
-                        $row->embedding ?? null,
-                        $rowdtype
-                    );
-                    if (is_array($vec) && !empty($vec)) {
-                        self::$vectorcache[$cache_key][$row->id] = [
-                            'vec'        => $vec,
-                            'bin'        => null,
-                            'dtype'      => $rowdtype,
-                            'cmid'       => isset($row->cmid) ? (int) $row->cmid : null,
-                            'modtype'    => (string) ($row->modtype ?? ''),
-                            'chunkindex' => (int) ($row->chunkindex ?? 0),
-                        ];
-                    }
-                }
-
-                if ($skippedincompatible > 0) {
-                    // Loud, because the symptom otherwise is "retrieval quietly
-                    // returns nothing" and the cause is a config change made
-                    // days earlier.
-                    debugging(
-                        sprintf(
-                            'rag_retriever: skipped %d chunk(s) in course %d embedded with "%s", '
-                            . 'which is not comparable to the query model "%s". '
-                            . 'Re-index the course, or set embed_query_model back to a compatible model.',
-                            $skippedincompatible,
-                            $courseid,
-                            shorten_text($skippedmodel, 100),
-                            shorten_text($querymodel, 100)
-                        ),
-                        DEBUG_NORMAL
-                    );
-                }
-
-                if ($skippeddtype > 0) {
-                    debugging(
-                        sprintf(
-                            'rag_retriever: skipped %d chunk(s) in course %d stored as "%s" while the '
-                            . 'configured embed_dtype is "%s". Re-index the course after changing '
-                            . 'embed_dtype — the encodings are not interchangeable.',
-                            $skippeddtype,
-                            $courseid,
-                            shorten_text($skippeddtypename, 40),
-                            $configureddtype
-                        ),
-                        DEBUG_NORMAL
-                    );
-                }
-            }
+            $packed = self::load_packed_index($courseid, $querymodel, $configureddtype);
+            self::$vectorcache[$cache_key] = self::hydrate_index($packed);
         }
 
         if (empty(self::$vectorcache[$cache_key])) {
