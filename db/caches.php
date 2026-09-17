@@ -79,6 +79,27 @@ $definitions = [
         'simpledata' => false,
         'ttl'        => 60,
     ],
+    // v7.4.8: per-course RAG vector index, stored as ONE concatenated binary
+    // blob plus parallel metadata arrays -- deliberately NOT as decoded float
+    // arrays. Measured on the dev fleet against a 2,020-chunk course at 2048
+    // dimensions: reading the vectors out of the database costs ~4,380 ms and
+    // decoding them ~230 ms, so the database read is the entire cost. But
+    // serializing the DECODED arrays for a cache costs ~3,580 ms and 117 MB,
+    // which is slower than the read it was meant to avoid. The blob form
+    // serializes in ~6 ms at 16 MB and reads back in ~7 ms, leaving only the
+    // ~210 ms decode on a warm hit.
+    //
+    // simpledata is false: the value is a nested array holding a binary string.
+    // TTL bounds how long an entry can survive a missed invalidation; staleness
+    // is otherwise handled by the per-course version counter that
+    // rag_retriever::flush_cache() increments, so a reindex on one web node is
+    // seen by every other node. The old per-process static could not do that.
+    'vectors' => [
+        'mode'       => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'ttl'        => 86400, // 24 hours.
+    ],
     // v5.5.0: per-provider failover circuit state. Stores the timestamp at which
     // a label's circuit was opened (after a failed call). Lookups treat an
     // open circuit as "skip this provider until TTL elapses." TTL of 900s

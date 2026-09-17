@@ -174,6 +174,11 @@ class faq_manager {
                 'modtype' => self::MODTYPE,
             ]);
             unset_config('faq_indexed_hash', 'local_ai_course_assistant');
+            // FAQ chunks are stored once against SITEID and scored inside EVERY
+            // course's index, so a change here invalidates all of them, not just
+            // the site course. Flushing everything is the correct blast radius
+            // and the FAQ is one admin setting, so this is rare.
+            rag_retriever::flush_cache();
             return $out;
         }
 
@@ -271,6 +276,8 @@ class faq_manager {
             $out['indexed']++;
         }
         set_config('faq_indexed_hash', $hash, 'local_ai_course_assistant');
+        // See the note above: FAQ chunks participate in every course's index.
+        rag_retriever::flush_cache();
 
         return $out;
     }
