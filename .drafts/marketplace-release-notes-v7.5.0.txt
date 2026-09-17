@@ -1,0 +1,35 @@
+Version 7.5.0 (build 2026091704)
+
+A course can now draw on another course's indexed content, and three defects a learner sees directly are fixed.
+
+New: supplemental courses
+
+An administrator can name courses whose already-indexed content retrieval may also draw on, site-wide (supplemental_courses) and per course. The case it exists for is a student orientation or resource centre: a learner asking about exam policy in one course gets the answer from there rather than nothing.
+
+Nothing extra is embedded. A supplemental course is an ordinary course the indexer has already chunked, so this widens which chunks may be scored rather than adding a second pipeline, and pointing many courses at one orientation course costs nothing.
+
+Access decisions worth stating plainly, because they were tightened during review:
+
+- Both the site-wide setting and the per-course override require moodle/site:config. The only validation the ids receive is that the target course is visible, and in Moodle "visible" means "listed in the catalogue", not "this user may read it". Without the capability gate a teacher with course-level rights could have pointed retrieval at any visible course on the site.
+- Activities inside a listed course are indexed as the administrator who reindexed it saw them, so a hidden or restricted activity's text can be quoted back to a learner even though no link to it is shown. The setting's help text says so. List only courses whose whole content suits the audience.
+- Hidden courses are dropped, a per-course value replaces the site-wide list rather than adding to it, and the list is capped at five because every listed course is loaded and scored on every retrieval.
+
+Fixed: course-module ids reaching learners as prose
+
+Replies contained text such as "Watch the Unit 1 Introduction Video (id:20057)". The ids annotate the course structure so the assistant can cite an activity; they are not meant to be written into an answer. They are now removed from the streamed reply and from the stored copy that the teacher-facing transcript export reads. A citation marker keeps its id, which is the one place an id belongs.
+
+Fixed: starter chips and source attribution stayed in English
+
+Every built-in starter chip's label and hover help text was a hardcoded English string, so a learner reading the interface in another language saw English on the chips alone. The source attribution shown under an answer had the same problem. Twenty-five strings are now translatable and translated into all 45 non-English languages.
+
+Fixed: source links missing wherever retrieval was enabled
+
+Measured across 24 paired prompts, replies carried a source tag 75% of the time with no retrieved content in the prompt and 13% of the time with it: retrieval was suppressing attribution. The prompt now states that the inline citation and the source tag are complementary rather than alternatives, and the interface falls back to a course-level source link whenever retrieval fed the answer and the assistant named no source. A cited passage still resolves to that exact activity.
+
+Also in this release
+
+- Reindexing a supplemental course now invalidates every course that lists it. Each course in scope contributes its own generation counter to the retrieval cache key.
+- Parent-document expansion works for cross-course hits.
+- Documentation corrected: the internationalization page had understated the string count and wrongly described the deliberately-untranslated list as empty.
+
+Requires Moodle 4.5 or later. Tested against Moodle 4.5, 5.0 and 5.1 on PHP 8.1, 8.2 and 8.3, with both PostgreSQL and MariaDB.
