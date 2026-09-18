@@ -78,6 +78,59 @@ final class score_speech_returns_test extends \advanced_testcase {
     }
 
     /**
+     * A successful result validates too, with every key execute() actually sets.
+     *
+     * The existing early-return test covered empty_result() only, and the bug it
+     * missed lived on the success path: execute() puts max_score on every
+     * criterion entry, execute_returns() did not declare it, and
+     * external_single_structure throws invalid_parameter_exception on ANY
+     * undeclared key rather than ignoring it. Since this endpoint is
+     * ajax => true, that failed every successful scoring call, after the
+     * provider had been billed and the score row written, and the learner saw a
+     * generic error.
+     *
+     * Building the shape by hand rather than calling execute() is deliberate: a
+     * real call needs a provider, and this needs to run in CI with none.
+     *
+     * @return void
+     */
+    public function test_a_successful_result_shape_satisfies_the_declared_structure(): void {
+        $this->resetAfterTest();
+
+        $result = [
+            'success'  => true,
+            'message'  => 'ok',
+            'criteria' => [
+                [
+                    'name'      => 'Delivery & Fluency',
+                    'score'     => 4,
+                    'feedback'  => 'Steady pace throughout.',
+                    'max_score' => 5,
+                    'assessed'  => true,
+                ],
+                [
+                    'name'      => 'Body Language & Gestures',
+                    'score'     => 0,
+                    'feedback'  => 'Not assessed in this attempt.',
+                    'max_score' => 5,
+                    'assessed'  => false,
+                ],
+            ],
+            'overall'  => 'A solid attempt.',
+            'tips'     => ['Slow the opening.', 'Name the ask.', 'Close on the benefit.'],
+            'scoreid'  => 42,
+            'assessedcount' => 1,
+        ];
+
+        $clean = \core_external\external_api::clean_returnvalue(score_speech::execute_returns(), $result);
+
+        $this->assertTrue($clean['success']);
+        $this->assertCount(2, $clean['criteria']);
+        $this->assertSame(5, (int) $clean['criteria'][0]['max_score']);
+        $this->assertFalse((bool) $clean['criteria'][1]['assessed']);
+    }
+
+    /**
      * Criterion names are matched case- and whitespace-insensitively.
      *
      * This decides what reaches a learner's score, so it is pinned directly

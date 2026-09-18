@@ -499,6 +499,21 @@ class score_speech extends external_api {
                         'Whether this criterion was actually evaluated',
                         VALUE_OPTIONAL
                     ),
+                    // Declared because execute() puts it on every entry, and
+                    // external_single_structure throws invalid_parameter_exception
+                    // on ANY undeclared key rather than ignoring it. This endpoint
+                    // is ajax => true, so clean_returnvalue() runs on the path a
+                    // learner actually uses: an undeclared key here fails every
+                    // successful scoring call, after the provider has been billed
+                    // and the score row written. It is carried rather than
+                    // stripped because the stored criteria feed
+                    // rubric_manager::compute_overall(), which needs the per
+                    // criterion maximum to compute an honest denominator.
+                    'max_score' => new external_value(
+                        PARAM_INT,
+                        'Maximum score for this criterion',
+                        VALUE_OPTIONAL
+                    ),
                 ])
             ),
             'overall'  => new external_value(PARAM_RAW, 'Overall comment'),
