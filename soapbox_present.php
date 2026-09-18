@@ -144,9 +144,15 @@ $templatedata = [
     ],
     // The retention statement derives the number from the setting rather than
     // hardcoding 7, so a site that raises the window does not start lying.
-    'privacynote' => get_string(
+    // branding::str(), not get_string(): this string carries [[uniname]], and
+    // nothing downstream resolves brand tokens. Resolution happens at the output
+    // boundary, and this page is one. get_string() here rendered the literal
+    // "[[uniname]] storage" to every learner, in all 46 locales.
+    //
+    // tests/branding_test.php cannot catch this: it asserts no string RETAINS a
+    // token after apply() runs, not that a caller remembered to run it.
+    'privacynote' => \local_ai_course_assistant\branding::str(
         'soapbox:present_privacy',
-        'local_ai_course_assistant',
         soapbox_config::retention_days()
     ),
     'coldeletes' => get_string('soapbox:col_deletes', 'local_ai_course_assistant'),
