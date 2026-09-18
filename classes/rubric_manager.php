@@ -33,6 +33,20 @@ class rubric_manager {
     /** @var string Rubric/session type for Soapbox speech practice. */
     const TYPE_SPEECH = 'speech';
 
+    /**
+     * Rubric type for a Soapbox VIDEO presentation: the spoken criteria plus the
+     * two visual ones.
+     *
+     * This is a rubric TYPE key and has nothing to do with soapbox_config::MODES,
+     * which is the recording mode ('video' or 'audio'). They share a word and
+     * mean different things: an attempt recorded in video mode is scored against
+     * a rubric of type video, but a video-mode attempt whose camera produced
+     * nothing usable is still scored against that rubric with the visual criteria
+     * dropped. The rubrics table's `type` column is char(20), so this fits with
+     * no schema change.
+     */
+    const TYPE_VIDEO = 'video';
+
     /** @var string Soapbox course-type/level presets (drive both the default rubric and the coaching register). */
     const SPEECH_LEVEL_GENERAL = 'general';
     const SPEECH_LEVEL_ESL_BEGINNER = 'esl_beginner';
@@ -47,6 +61,56 @@ class rubric_manager {
         ['name' => 'Language & Vocabulary', 'description' => 'Word choice, grammar, and varied, precise language.', 'max_score' => 5],
         ['name' => 'Time Management', 'description' => 'Fits the target length without rushing or running long.', 'max_score' => 5],
     ];
+
+    /**
+     * The two visual criteria, appended to the spoken rubric only when the
+     * attempt actually produced usable video.
+     *
+     * The 'visual' flag decides whether a criterion is put in the PROMPT at all.
+     * It deliberately does NOT decide what is allowed into the score: that is
+     * governed by an allowlist built from the rubric text actually sent, in
+     * score_speech. The flag lives in hand-editable JSON and can simply be
+     * absent from a criterion an admin added on rubric_admin.php, so trusting it
+     * for the score would let an audio-only attempt be marked on body language
+     * inferred from a transcript.
+     *
+     * Criterion text is English seed data, not lang strings, matching every
+     * other DEFAULT_* array here: admins edit this wording on rubric_admin.php.
+     */
+    const VISUAL_CRITERIA = [
+        [
+            'name' => 'Body Language & Gestures',
+            'description' => 'Gestures, posture and movement that SUPPORT what you are saying: '
+                . 'open hands that mark structure or add emphasis, a steady stance, and weight '
+                . 'that stays settled. No repeated habits that DISTRACT from the presentation '
+                . '(fidgeting, rocking or pacing, hands in pockets or folded, playing with an '
+                . 'object, hair or clothing).',
+            'max_score' => 5,
+            'visual' => true,
+        ],
+        [
+            'name' => 'Eye Contact & Camera Presence',
+            'description' => 'Looking at the camera lens as if it were your audience, rather than '
+                . 'reading from notes or watching a second screen. Steady head-and-shoulders '
+                . 'framing that keeps your hands in view, a face lit well enough to read, and '
+                . 'facial expression that matches what you are saying.',
+            'max_score' => 5,
+            'visual' => true,
+        ],
+    ];
+
+    /**
+     * The full default video rubric: the five spoken criteria then the two visual ones.
+     *
+     * A method rather than a constant because PHP does not allow a function call
+     * in a const initializer, and spelling the seven entries out again would
+     * duplicate the speech five and drift from them.
+     *
+     * @return array
+     */
+    public static function default_video_criteria(): array {
+        return array_merge(self::DEFAULT_SPEECH_CRITERIA, self::VISUAL_CRITERIA);
+    }
 
     /** @var array Default conversation practice rubric criteria. */
     const DEFAULT_CONVERSATION_CRITERIA = [
@@ -142,6 +206,128 @@ class rubric_manager {
             return ['criteria' => $rubric->criteria, 'rubricid' => (int) $rubric->id];
         }
         return ['criteria' => $preset['criteria'], 'rubricid' => 0];
+    }
+
+    /**
+     * Resolve the criteria for a Soapbox VIDEO attempt.
+     *
+     * The overlay rule, and why it is not the obvious one: a GLOBAL video rubric
+     * never replaces the spoken base set, it only contributes its visual
+     * criteria. resolve_speech_criteria()'s docblock records what happens
+     * otherwise -- an auto-seeded global row silently outranks a course's
+     * configured ESL level, swapping the course's criteria for the general set,
+     * invisibly, because nothing in the UI shows which rubric won. Only a
+     * COURSE-scoped video rubric, which is a deliberate authoring act, wins
+     * outright.
+     *
+     * That is what keeps every hand-authored ESL speech rubric and every level
+     * preset working untouched: they come through resolve_speech_criteria() as
+     * the base, and only gain two rows on top.
+     *
+     * @param int    $courseid
+     * @param string $level     Speaking level preset key.
+     * @param bool   $hasvisual Whether this attempt produced usable visual evidence.
+     * @return array{criteria: array, rubricid: int, visualnames: string[]}
+     */
+    public static function resolve_video_criteria(int $courseid, string $level, bool $hasvisual): array {
+        $rubric = self::get_active_rubric($courseid, self::TYPE_VIDEO);
+        $iscoursescoped = $rubric && (int) $rubric->courseid === $courseid && $courseid > 0;
+
+        if ($iscoursescoped && is_array($rubric->criteria) && !empty($rubric->criteria)) {
+            $criteria = $rubric->criteria;
+            $rubricid = (int) $rubric->id;
+        } else {
+            $base = self::resolve_speech_criteria($courseid, $level);
+            // A global video rubric contributes only its visual-flagged rows.
+            $visual = self::VISUAL_CRITERIA;
+            if ($rubric && is_array($rubric->criteria) && !empty($rubric->criteria)) {
+                $fromglobal = array_values(array_filter(
+                    $rubric->criteria,
+                    static fn($c) => !empty($c['visual'])
+                ));
+                if (!empty($fromglobal)) {
+                    $visual = $fromglobal;
+                }
+            }
+            $criteria = array_merge($base['criteria'], $visual);
+            $rubricid = (int) $base['rubricid'];
+        }
+
+        // The names are returned whether or not they survive the filter: the
+        // caller needs them to decide what to put in the prompt and what to
+        // allow into the score.
+        $visualnames = array_values(array_map(
+            static fn($c) => (string) ($c['name'] ?? ''),
+            array_filter($criteria, static fn($c) => !empty($c['visual']))
+        ));
+
+        if (!$hasvisual) {
+            $criteria = array_values(array_filter($criteria, static fn($c) => empty($c['visual'])));
+        }
+
+        return ['criteria' => $criteria, 'rubricid' => $rubricid, 'visualnames' => $visualnames];
+    }
+
+    /**
+     * The video counterpart of speech_preset(): the level's spoken criteria plus
+     * the visual ones, so rubric_admin's sample loader offers the same four
+     * levels on the video tab.
+     *
+     * @param string $level
+     * @return array{label_key: string, hint: string, criteria: array}
+     */
+    public static function video_preset(string $level): array {
+        $preset = self::speech_preset($level);
+        return [
+            'label_key' => $preset['label_key'],
+            'hint' => $preset['hint'],
+            'criteria' => array_merge($preset['criteria'], self::VISUAL_CRITERIA),
+        ];
+    }
+
+    /**
+     * Overall score over the criteria that were actually assessed.
+     *
+     * Extracted from the inline expression in score_speech so the exclusion
+     * arithmetic is unit-testable without a provider, and so there is one place
+     * a Soapbox total is computed rather than two that can drift.
+     *
+     * Three rules, each of which protects a learner who has nobody to appeal to:
+     *
+     *  - An entry is excluded only on an EXPLICIT `assessed === false`. A row
+     *    with no `assessed` key counts as assessed, which is every score written
+     *    before v7.5.1 and every provider that ignores the field.
+     *  - Excluded entries are left out of the sum AND out of maxtotal, so they
+     *    neither add zero to the numerator nor inflate the denominator.
+     *  - Zero assessed criteria yields overall 0 and pct 0 by an explicit
+     *    branch, not by max(1, $n). A fabricated denominator would turn "nothing
+     *    could be judged" into a real-looking low score.
+     *
+     * Pure: no globals, no database.
+     *
+     * @param array $scoredcriteria Entries of ['name', 'score', 'feedback', 'assessed'].
+     * @return array{overall: int, assessed: int, maxtotal: int, pct: int}
+     */
+    public static function compute_overall(array $scoredcriteria): array {
+        $sum = 0;
+        $assessed = 0;
+        $maxtotal = 0;
+
+        foreach ($scoredcriteria as $c) {
+            if (isset($c['assessed']) && $c['assessed'] === false) {
+                continue;
+            }
+            $sum += (int) ($c['score'] ?? 0);
+            $maxtotal += (int) ($c['max_score'] ?? 5);
+            $assessed++;
+        }
+
+        return [
+            'overall' => $assessed > 0 ? (int) round($sum / $assessed) : 0,
+            'assessed' => $assessed,
+            'maxtotal' => $maxtotal,
+            'pct' => $maxtotal > 0 ? (int) round(100 * $sum / $maxtotal) : 0,
+        ];
     }
 
     public static function get_active_rubric(int $courseid, string $type): ?object {
@@ -360,6 +546,7 @@ class rubric_manager {
             $titles = [
                 'pronunciation' => 'Pronunciation Practice Rubric',
                 self::TYPE_SPEECH => 'Soapbox Speech Rubric',
+                self::TYPE_VIDEO => 'Soapbox Video Rubric',
             ];
             $title = $titles[$type] ?? 'Conversation Practice Rubric';
             self::create_rubric(0, $type, $title, $criteria);
@@ -375,6 +562,9 @@ class rubric_manager {
     public static function get_default_criteria(string $type): array {
         if ($type === 'pronunciation') {
             return self::DEFAULT_PRONUNCIATION_CRITERIA;
+        }
+        if ($type === self::TYPE_VIDEO) {
+            return self::default_video_criteria();
         }
         if ($type === self::TYPE_SPEECH) {
             return self::DEFAULT_SPEECH_CRITERIA;

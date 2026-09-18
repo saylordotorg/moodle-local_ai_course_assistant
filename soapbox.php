@@ -131,9 +131,21 @@ echo $OUTPUT->header();
             <span class="text-muted ml-2 small"><?php echo userdate((int) $h->timecreated, get_string('strftimedatetimeshort', 'langconfig')); ?> · <?php echo $durtxt; ?></span>
         </summary><div class="card-body">
             <table class="generaltable" style="width:100%"><tbody>
-            <?php foreach ((array) $h->scores as $c) { ?>
-                <tr><td style="width:30%"><?php echo s($c['name'] ?? ''); ?></td>
-                    <td style="width:70px;font-family:monospace"><?php echo (int) ($c['score'] ?? 0); ?></td>
+            <?php foreach ((array) $h->scores as $c) {
+                // v7.5.1: a criterion the model was never given evidence for is
+                // marked, not printed as a bare 0. This loop is the only place
+                // stored criterion scores are rendered anywhere, and it runs
+                // server-side: there is no client consumer that could grey it.
+                $assessed = !isset($c['assessed']) || (bool) $c['assessed'];
+            ?>
+                <tr<?php echo $assessed ? '' : ' class="text-muted"'; ?>><td style="width:30%"><?php echo s($c['name'] ?? ''); ?></td>
+                    <td style="width:70px;font-family:monospace"><?php
+                    if ($assessed) {
+                        echo (int) ($c['score'] ?? 0);
+                    } else {
+                        ?><span class="badge badge-secondary" title="<?php echo s(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?>"><?php echo s(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?></span><?php
+                    }
+                    ?></td>
                     <td><?php echo s($c['feedback'] ?? ''); ?></td></tr>
             <?php } ?>
             </tbody></table>

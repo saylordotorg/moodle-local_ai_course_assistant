@@ -128,6 +128,22 @@ class soapbox_storage {
     }
 
     /**
+     * Key for the still-frame sheet sampled from a recording in the browser.
+     *
+     * Mirrors make_deck_key() deliberately: the finalize ownership check matches
+     * on `prefix + courseid/userid/`, so a key built any other way is rejected
+     * as foreign.
+     *
+     * @param int $courseid
+     * @param int $userid
+     * @return string
+     */
+    public static function make_frames_key(int $courseid, int $userid): string {
+        $token = random_string(24);
+        return self::prefix() . $courseid . '/' . $userid . '/frames/' . $token . '.jpg';
+    }
+
+    /**
      * Presigned PUT URL for uploading an object (browser -> S3 directly).
      *
      * @param string $key Object key (no leading slash).
@@ -155,17 +171,34 @@ class soapbox_storage {
      * @param int $expires
      * @return string
      */
-    public function presign_get(string $key, int $expires = self::DEFAULT_EXPIRY): string {
+    public function presign_get(string $key, int $expires = self::DEFAULT_EXPIRY, string $filename = ''): string {
+        // A non-empty $filename turns the link into a real download rather than
+        // inline playback. A learner could always reach their recording, but the
+        // presigned URL opened it in a browser tab, which is not the same thing
+        // as being able to keep it -- and the media is deleted on the retention
+        // clock, so saving a copy is the only way anything survives the window.
+        //
+        // response-content-disposition travels through extraquery because
+        // presign_url() merges that into the canonical query string BEFORE the
+        // ksort and the signature. Appending it to the finished URL instead
+        // would invalidate the signature and S3 would refuse the request.
+        $extra = [];
+        if ($filename !== '') {
+            $safe = preg_replace('/[^A-Za-z0-9._-]/', '-', basename($filename));
+            $extra['response-content-disposition'] = 'attachment; filename="' . $safe . '"';
+        }
+
         return self::presign_url([
-            'host'      => self::host(),
-            'region'    => self::region(),
-            'service'   => 's3',
-            'accesskey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
-            'secretkey' => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
-            'method'    => 'GET',
-            'uri'       => self::encode_key_path($key),
-            'expires'   => $expires,
-            'timestamp' => time(),
+            'host'       => self::host(),
+            'region'     => self::region(),
+            'service'    => 's3',
+            'accesskey'  => (string) get_config('local_ai_course_assistant', 'soapbox_storage_key'),
+            'secretkey'  => (string) get_config('local_ai_course_assistant', 'soapbox_storage_secret'),
+            'method'     => 'GET',
+            'uri'        => self::encode_key_path($key),
+            'expires'    => $expires,
+            'timestamp'  => time(),
+            'extraquery' => $extra,
         ]);
     }
 

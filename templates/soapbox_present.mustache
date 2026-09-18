@@ -100,6 +100,15 @@
 {{{storagewarninghtml}}}
 {{/storageready}}
 {{#storageready}}
+<div class="sbx-howto card p-3 mb-3">
+    <h5 class="mt-0">{{{howtoheading}}}</h5>
+    <ul class="mb-2">
+        {{#howto}}
+        <li>{{{text}}}</li>
+        {{/howto}}
+    </ul>
+    <p class="small text-muted mb-0">{{{privacynote}}}</p>
+</div>
 <div class="sbx-recorder card p-3 mb-4 {{modeclass}}" id="sbx-recorder">
     {{#slidesenabled}}
     <div class="sbx-deck mb-3">
@@ -136,6 +145,7 @@
             <th>{{{colrecorded}}}</th>
             <th>{{{collength}}}</th>
             <th>{{{colstatus}}}</th>
+            <th>{{{coldeletes}}}</th>
             <th></th>
         </tr>
     </thead>
@@ -145,7 +155,46 @@
             <td>{{recorded}}</td>
             <td>{{length}}</td>
             <td>{{{status}}}</td>
-            <td>{{#viewurl}}<a href="{{viewurl}}" target="_blank" rel="noopener">{{{viewlabel}}}</a>{{/viewurl}}{{#hasplay}} &middot; <button type="button" class="sbx-play-btn btn btn-link btn-sm p-0" data-recid="{{recid}}">{{{playlabel}}}</button>{{/hasplay}}{{#expired}}<span class="text-muted">{{{expiredlabel}}}</span>{{/expired}}</td>
+            <td>{{deleteson}}</td>
+            <td>{{#viewurl}}<a href="{{viewurl}}" target="_blank" rel="noopener">{{{watchlabel}}}</a>{{/viewurl}}{{#downloadurl}} &middot; <a href="{{downloadurl}}" download aria-label="{{{downloadaria}}}">{{{downloadlabel}}}</a>{{/downloadurl}}{{#hasplay}} &middot; <button type="button" class="sbx-play-btn btn btn-link btn-sm p-0" data-recid="{{recid}}">{{{playlabel}}}</button>{{/hasplay}}{{#expired}}<span class="text-muted">{{{expiredlabel}}}</span>{{/expired}}</td>
+        </tr>
+        <tr class="sbx-fb-row">
+            <td colspan="5" class="pt-0">
+                <details class="sbx-fb">
+                    <summary class="small">{{{feedbacktoggle}}}</summary>
+                    {{#hasfeedback}}
+                    <table class="table table-sm mt-2 mb-1">
+                        <thead>
+                            <tr>
+                                <th>{{{colcriterion}}}</th>
+                                <th>{{{colscore}}}</th>
+                                <th>{{{colfeedback}}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#criteria}}
+                            <tr class="{{^assessed}}text-muted{{/assessed}}">
+                                <td>{{name}}</td>
+                                <td>{{#assessed}}{{score}}{{/assessed}}{{^assessed}}<span class="badge badge-secondary" title="{{{notassessedaria}}}">{{{notassessed}}}</span>{{/assessed}}</td>
+                                <td>{{feedback}}</td>
+                            </tr>
+                            {{/criteria}}
+                        </tbody>
+                    </table>
+                    <p class="small text-muted mb-1">{{{scoredon}}}</p>
+                    {{#visualnote}}<p class="small text-muted mb-1">{{{visualnote}}}</p>{{/visualnote}}
+                    {{#overall}}<p class="mb-1">{{overall}}</p>{{/overall}}
+                    {{#hastips}}
+                    <ul class="small mb-0">
+                        {{#tips}}<li>{{text}}</li>{{/tips}}
+                    </ul>
+                    {{/hastips}}
+                    {{/hasfeedback}}
+                    {{^hasfeedback}}
+                    <p class="small text-muted mt-2 mb-0">{{{feedbackpending}}}</p>
+                    {{/hasfeedback}}
+                </details>
+            </td>
         </tr>
         {{/recordings}}
     </tbody>

@@ -771,6 +771,7 @@
         <FIELD NAME="transcript" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="deck_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="v6.8.21: object-storage key for the uploaded PDF slide deck; null if none / deleted"/>
         <FIELD NAME="slide_timeline" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="v6.8.21: JSON [{t:seconds, i:slideindex}] of slide advances during the recording"/>
+        <FIELD NAME="frames_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="v7.5.1: object-storage key for the still-frame sheet sampled from the recording in the browser, used for the body-language vision pass; null if none or deleted"/>
         <FIELD NAME="scoreid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="expires_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

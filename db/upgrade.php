@@ -1978,6 +1978,27 @@ function xmldb_local_ai_course_assistant_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2026091007, 'local', 'ai_course_assistant');
     }
+    if ($oldversion < 2026091800) {
+        // v7.5.1: still frames sampled from the recording in the browser, for
+        // body-language feedback. Nullable because every existing row has none,
+        // and because an audio-only attempt never gets one.
+        $table = new xmldb_table('local_ai_course_assistant_sbx_rec');
+        $field = new xmldb_field(
+            'frames_key',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'slide_timeline'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026091800, 'local', 'ai_course_assistant');
+    }
+
 
     return true;
 }
