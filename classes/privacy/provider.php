@@ -469,7 +469,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         }
         try {
             $recs = $DB->get_records_sql(
-                "SELECT r.id, r.storage_key, r.deck_key
+                "SELECT r.id, r.storage_key, r.deck_key, r.frames_key
                    FROM {local_ai_course_assistant_sbx_rec} r
                    JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
                   WHERE r.userid = :userid" . $coursejoin,
@@ -485,7 +485,14 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             ? new \local_ai_course_assistant\soapbox_storage() : null;
         foreach ($recs as $rec) {
             if ($storage) {
-                foreach ([$rec->storage_key, $rec->deck_key] as $objkey) {
+                // frames_key too: it holds a contact sheet of stills of the
+                // learner's face. Deleting the row without deleting the object
+                // strands it in the bucket permanently, because the cleanup task
+                // walks sbx_rec rows and there would no longer be one. That is
+                // the exact "erasure removes the row but leaves the media"
+                // outcome this function exists to prevent, and the privacy
+                // string promises these are deleted with the recording.
+                foreach ([$rec->storage_key, $rec->deck_key, $rec->frames_key] as $objkey) {
                     if (!empty($objkey)) {
                         try {
                             $storage->delete_object($objkey);

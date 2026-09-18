@@ -119,13 +119,28 @@ class soapbox_gesture_vision {
                 return $empty;
             }
 
+            // Off is the DEFAULT, and score_recording() calls this for every
+            // scored recording with no enablement guard of its own. Computing
+            // couldhavevideo before this check meant the disabled path returned
+            // true, and score_speech turned that into a saved paragraph telling
+            // the learner their camera "could not be read" -- on a site where
+            // the recorder never sampled a frame in the first place. Both stated
+            // causes were false, the remedy was unactionable, and it contradicted
+            // the "5 of 5 criteria assessed (100%)" line rendered right above it.
+            if (!self::is_enabled($assign)) {
+                return $empty;
+            }
+
             // Reported even when no note can be produced: the caller uses it to
             // decide whether to tell the learner why a section of feedback is
-            // missing. On an audio-only assignment there is nothing to explain.
+            // missing. The surviving mode test still covers an audio row under a
+            // video assignment, and the rate-limit and fetch-failure paths below
+            // keep it true, which is the case the message was actually written
+            // for.
             $couldhavevideo = (($rec->mode ?? $assign->mode ?? '') !== 'audio');
             $out = ['note' => '', 'couldhavevideo' => $couldhavevideo];
 
-            if (!self::is_enabled($assign) || empty($rec->frames_key)) {
+            if (empty($rec->frames_key)) {
                 return $out;
             }
             if (rate_limiter::is_rate_limited($userid, 'soapbox_gesture_vision', self::RATE_MAX, self::RATE_WINDOW)) {

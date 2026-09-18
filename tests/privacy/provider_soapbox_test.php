@@ -52,6 +52,7 @@ final class provider_soapbox_test extends \advanced_testcase {
         $recid = $DB->insert_record('local_ai_course_assistant_sbx_rec', (object) [
             'assignid' => $assignid, 'userid' => $user->id, 'topicid' => null, 'mode' => 'video',
             'storage_key' => 'soapbox/' . $course->id . '/' . $user->id . '/x.mp4',
+            'frames_key' => 'soapbox/' . $course->id . '/' . $user->id . '/frames/x.jpg',
             'duration_seconds' => 120, 'size_bytes' => 999, 'status' => 'scored',
             'transcript' => 'Hello, this is my persuasive pitch about recycling.',
             'scoreid' => null, 'expires_at' => $now + 604800, 'timecreated' => $now,
@@ -97,5 +98,47 @@ final class provider_soapbox_test extends \advanced_testcase {
             'local_ai_course_assistant_sbx_rec',
             ['userid' => $user->id]
         ));
+    }
+
+    /**
+     * Erasure collects every object key on the row, not just the media.
+     *
+     * The failure this guards is silent and permanent. purge_soapbox_recordings()
+     * deletes the objects it selected and then deletes the row, so any key it did
+     * not select is stranded in the bucket with nothing left pointing at it: the
+     * cleanup task walks sbx_rec rows, and there is no longer a row. For
+     * frames_key that means a contact sheet of stills of the learner's face
+     * surviving their own erasure request.
+     *
+     * Storage is unconfigured under test, so the delete calls are skipped and
+     * this cannot assert on the bucket. What it can assert is the part that
+     * actually regressed: the SELECT carries every key column, so the delete
+     * loop has something to iterate. A new key column added without touching
+     * the query fails here.
+     *
+     * @return void
+     */
+    public function test_erasure_selects_every_object_key_on_the_row(): void {
+        $src = file_get_contents(__DIR__ . '/../../classes/privacy/provider.php');
+        $this->assertNotFalse($src);
+
+        $start = strpos($src, 'function purge_soapbox_recordings');
+        $this->assertNotFalse($start, 'purge_soapbox_recordings has been renamed');
+        $select = substr($src, $start, 2600);
+
+        foreach (['r.storage_key', 'r.deck_key', 'r.frames_key'] as $col) {
+            $this->assertStringContainsString(
+                $col,
+                $select,
+                $col . ' is not selected by the erasure query, so its object would be stranded'
+            );
+        }
+        foreach (['$rec->storage_key', '$rec->deck_key', '$rec->frames_key'] as $prop) {
+            $this->assertStringContainsString(
+                $prop,
+                $select,
+                $prop . ' is not passed to the object delete loop'
+            );
+        }
     }
 }
