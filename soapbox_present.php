@@ -255,7 +255,6 @@ if (!empty($recs)) {
         $row['hastips'] = false;
         $row['overall'] = '';
         $row['scoredon'] = '';
-        $row['visualnote'] = '';
         if (!empty($r->scoreid)) {
             try {
                 $score = $DB->get_record(
@@ -289,12 +288,19 @@ if (!empty($recs)) {
                                 'pct' => $totals['pct'],
                             ]
                         );
-                        if ($totals['assessed'] < count($criteria)) {
-                            $row['visualnote'] = get_string(
-                                'soapbox:visual_not_assessed',
-                                'local_ai_course_assistant'
-                            );
-                        }
+                        // No "your camera could not be read" note here. The
+                        // accurate version is already in $overall: score_speech
+                        // appends it gated on couldhavevideo && !$hasvisual, so
+                        // it says that only when video really was unreadable.
+                        // A count of unassessed criteria cannot stand in for
+                        // that test, because compute_overall() excludes ANY
+                        // criterion the model marked assessed=false, spoken ones
+                        // included -- and every ESL preset ships a criterion
+                        // (Pronunciation & Intelligibility, & Clarity, & Stress)
+                        // that is unjudgeable from a transcript. Gating on the
+                        // count told a learner whose camera worked fine, and
+                        // whose Body Language score was sitting in the table
+                        // directly above, that no video was recorded.
                         if (is_array($meta) && !empty($meta['tips']) && is_array($meta['tips'])) {
                             foreach ($meta['tips'] as $tip) {
                                 $row['tips'][] = ['text' => (string) $tip];

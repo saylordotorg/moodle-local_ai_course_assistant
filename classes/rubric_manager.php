@@ -261,8 +261,22 @@ class rubric_manager {
 
     /**
      * The video counterpart of speech_preset(): the level's spoken criteria plus
-     * the visual ones, so rubric_admin's sample loader offers the same four
-     * levels on the video tab.
+     * the visual ones.
+     *
+     * NOT REACHED IN v7.5.1, and deliberately so. This was written for a video
+     * tab on rubric_admin.php that did not land: that page clamps an unknown
+     * ?type back to 'conversation' and its tab strip is hard-coded to three
+     * types, so nothing in the product can create a rubric row with
+     * type = 'video'. Live behaviour is therefore always resolve_speech_criteria()
+     * plus the hard-coded VISUAL_CRITERIA -- correct, but not admin-editable.
+     *
+     * Kept rather than deleted because resolve_video_criteria() already reads a
+     * course-scoped video rubric when one exists, so this is the other half of a
+     * mechanism that is finished apart from its UI. Whoever wires that UI up:
+     * rubric_admin's criteria-cleaning loop rebuilds each entry from name,
+     * description and max_score only, so it will silently drop the 'visual' flag
+     * on the first Save and quietly turn an audio-only attempt into one marked
+     * on body language inferred from a transcript.
      *
      * @param string $level
      * @return array{label_key: string, hint: string, criteria: array}

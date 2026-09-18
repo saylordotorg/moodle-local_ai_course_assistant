@@ -89,7 +89,7 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // embedding, embed              -> rag
 // meta, meta_scheduled          -> analytics
 // mastery_signal, student_profile -> personalisation
-// speech_score, slide_vision    -> soapbox
+// speech_score, slide_vision, gesture_vision -> soapbox
 // objective_extract             -> authoring
 // anything else                 -> other
 
@@ -100,7 +100,7 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'
     WHEN m.interaction_type IN ('meta','meta_scheduled')                    THEN 'analytics'
     WHEN m.interaction_type IN ('mastery_signal','student_profile')          THEN 'personalisation'
-    WHEN m.interaction_type IN ('speech_score','slide_vision')               THEN 'soapbox'
+    WHEN m.interaction_type IN ('speech_score','slide_vision','gesture_vision') THEN 'soapbox'
     WHEN m.interaction_type IN ('objective_extract')                         THEN 'authoring'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
     WHEN m.interaction_type IN ('quiz')                                     THEN 'quiz'
