@@ -166,15 +166,6 @@ class rubric_manager {
     ];
 
     /**
-     * Get the active rubric for a course and type.
-     *
-     * Checks for a course-level rubric first, then falls back to the global default (courseid=0).
-     *
-     * @param int $courseid
-     * @param string $type 'conversation' or 'pronunciation'
-     * @return object|null Rubric record with decoded criteria, or null if none found.
-     */
-    /**
      * Resolve the speech criteria for a course, honouring its ESL level.
      *
      * A course-scoped rubric is always a deliberate authoring act, so it wins.
@@ -330,6 +321,15 @@ class rubric_manager {
         ];
     }
 
+    /**
+     * Get the active rubric for a course and type.
+     *
+     * Checks for a course-level rubric first, then falls back to the global default (courseid=0).
+     *
+     * @param int $courseid
+     * @param string $type 'conversation' or 'pronunciation'
+     * @return object|null Rubric record with decoded criteria, or null if none found.
+     */
     public static function get_active_rubric(int $courseid, string $type): ?object {
         global $DB;
 

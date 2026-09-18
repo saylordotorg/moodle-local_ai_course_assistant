@@ -448,10 +448,6 @@ class score_speech extends external_api {
     }
 
     /**
-     * @param string $code
-     * @return array
-     */
-    /**
      * Canonical form of a criterion name, for matching a model's echoed name
      * against the rubric it was given.
      *
@@ -466,6 +462,12 @@ class score_speech extends external_api {
         return (string) preg_replace('/\s+/', ' ', trim(\core_text::strtolower($n)));
     }
 
+    /**
+     * An early-return result carrying a status code and no feedback.
+     *
+     * @param string $code
+     * @return array
+     */
     private static function empty_result(string $code): array {
         return [
             'success'  => false,
