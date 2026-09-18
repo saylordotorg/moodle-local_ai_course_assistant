@@ -2674,3 +2674,26 @@ $string['settings:supplemental_courses'] = 'Kalan dɛmɛbaw';
 $string['settings:supplemental_courses_desc'] = 'Kalanw ID minnu kɔnɔkow [[tutorshort]] bɛ se ka baara kɛ ni u ye jaabili waati la fana, u faranfasilen ni komaw ye. A kɛ fɛnw na minnu bɛ kalan wɛrɛ la nka u bɛ baara kɛ yɔrɔ bɛɛ, i n’a fɔ kalandenw ladonni kalan walima dɛmɛ yɔrɔ: o tuma na mɔgɔ min bɛ ɲininkali kɛ sɛgɛsɛgɛli sariya kan, o bɛ jaabi sɔrɔ o kalan na sanni a ka foyi sɔrɔ.
 
 Kalanw ka kan ka kɛ ɲɛmɔgɔyalenw ye ka ban walasa u ka se ka sɔrɔ; foyi wɛrɛ tɛ don a la, o la ka dɔ fara yan, o bɛ baara kɛ joona wa a tɛ wari bɔ. Dogolen kalanw tɛ jate. Nka kalan sɛbɛnnen kɔnɔ baaraw bɛ ɲɛmɔgɔya i n\'a fɔ ɲɛmɔgɔ min y\'a segin ka ɲɛmɔgɔya kɛ, o y\'u ye cogo min na. O la, baara dogolen walima dantigɛlen sɛbɛn bɛ se ka fɔ kalanden ye hali ni a jɛyɔrɔ ma jira. Kalanw dama de sɛbɛn minnu kɔnɔkow bɛɛ bɛ bɛn kalandenw ma. A caya {$a} kalan. Kalan hakɛ sigiden, ni a bɛ yen, o bɛ nin lisɛli nɔ ta, a tɛ fara a kan.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'A bɛna jɔsi';
+$string['soapbox:download'] = 'A lajigin';
+$string['soapbox:download_aria'] = 'Nin duubu in lajigin i ka minɛn kan';
+$string['soapbox:feedback_pending'] = 'I ka hakilina bɛna bɔ yan ni sɛgɛsɛgɛli banna. A ka teli ka miniti damadɔ ta. I man kan ka to nin ɲɛ in kan.';
+$string['soapbox:feedback_toggle'] = 'N ka hakilina jira';
+$string['soapbox:frames_not_video'] = 'Nin baara in ye kumakan dɔrɔn ye, o la wideyo ja tɛ yen ka ci.';
+$string['soapbox:howto_eyes'] = 'I ɲɛ jɔ kameran ɲɛ na, i yɛrɛ ja kɔ ekran kan. Wideyo la, kameran ɲɛ filɛli de bɛ lamɛnbagaw fɛ i n\'a fɔ ɲɛ n\'ɲɛ ye.';
+$string['soapbox:howto_feedback'] = 'Miniti damadɔ i banna kɔfɛ, i bɛna jateminɛ ni sɛbɛnnen hakilina sɔrɔ sariya kelen-kelen bɛɛ kan, ka fara i farikolo kan-kan ni i cogoya kan kameran ɲɛkɔrɔ ni kameran tun bɛ baara la.';
+$string['soapbox:howto_frame'] = 'Kameran bila ɲɛw hakɛ la, i bolo kelen ni tila hakɛ la, walasa kunkolo, kaman ni bolow bɛɛ ka don ja kɔnɔ. Bolo kanw minnu bɛ kɛ ja dan jukɔrɔ, olu tɛ ye, o la u tɛ se ka sɛgɛsɛgɛ.';
+$string['soapbox:howto_hands'] = 'Yɔrɔ to i yɛrɛ ye ka i bolow lamaga, ka kuma i ka kan hakɛ la. Duubu kelen dafalen kɛ: jɔli, segin ka daminɛ ani tuma dɔ senkɔrɔtali ye ko gansan ye, u tɛ jateminɛ dɔgɔya.';
+$string['soapbox:howto_heading'] = 'Sani i ka duubu kɛ';
+$string['soapbox:howto_light'] = 'I ɲɛsin finɛtiri walima lanpa ma, ka yeelen kolo dɔgɔya i kɔfɛ. Finɛtiri min bɛ i kɔfɛ, o b\'i kɛ suma dɔrɔn ye.';
+$string['soapbox:not_assessed'] = 'A ma sɛgɛsɛgɛ';
+$string['soapbox:not_assessed_aria'] = 'Nin sariya in ma sɛgɛsɛgɛ nin kɛlɛ in na wa a bɔra i ka jateminɛ la';
+$string['soapbox:present_privacy'] = 'I ka duubu bɛ ci Saylor ka marayɔrɔ la walasa a ka sɛbɛn ani ka sɛgɛsɛgɛ. E dɔrɔn ni site ɲɛmɔgɔw de bɛ se k\'a da wuli. A bɛ jɔsi a yɛrɛ ma tile {$a} duubu kɔfɛ, ni ja jɔlenw ye minnu kɛra farikolo kan-kan hakilina na. I ka sɛbɛn, i ka jateminɛw ani i ka hakilina bɛ to wideyo taalen kɔfɛ, o la i mago bɛ min na k\'a mara, o lajigin.';
+$string['soapbox:scored_on'] = 'I ka jateminɛ kuuru ye sariya {$a->assessed} minnu sɛgɛsɛgɛra, olu cɛmancɛ ye, tablo kɔnɔ {$a->total} la ({$a->pct}%). Min ma se ka sɛgɛsɛgɛ, o bɔra kɛnɛma sanni a ka fo zero.';
+$string['soapbox:visual_not_assessed'] = 'Farikolo kan-kan ni cogoya kameran ɲɛkɔrɔ ma sɛgɛsɛgɛ nin kɛlɛ in na, katuguni wideyo ma duubu walima kameran ja ma se ka kalan. O sariyaw bɔra i ka jateminɛ la sanni a k\'a dɔgɔya. Duubu kɛ ni kameran ye baara la, kunkolo, kaman ni bolow ka kɛ ja kɔnɔ, walasa ka hakilina sɔrɔ olu kan.';
+$string['soapbox:watch'] = 'A filɛ';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Wideyo walima kumakan duublen marayɔrɔ, fo a bɛ jɔsi maracogoya waati laban na.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Slide minnu cira ni duubu ye, olu marayɔrɔ, fo u bɛ jɔsi n\'a ye.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Ja jɔlenw marayɔrɔ minnu tara duubu la farikolo kan-kan hakilina kama. U bɛ jɔsi ni duubu ye.';

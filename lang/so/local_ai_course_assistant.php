@@ -2690,3 +2690,26 @@ $string['settings:supplemental_courses'] = 'Koorsooyin dheeraad ah';
 $string['settings:supplemental_courses_desc'] = 'Aqoonsiyada koorsooyinka uu [[tutorshort]] sidoo kale ka isticmaali karo waxa ku jira markuu jawaabayo, oo ay kala qeexaan hakadyo. U isticmaal agab ku jira koorsi kale laakiin meel kasta khuseeya, sida koorsi hordhac ah oo ardayda ama xarun kheyraad: markaas qofka wax ka weydiiya siyaasadda imtixaanka wuxuu jawaabta ka helaa koorsadaas halkii uu waxba heli lahayn.
 
 Koorsooyinku waa inay horeyba u xusan yihiin soo-saarista; waxba dheeraad ah lama dhex geliyo, sidaas awgeed mid halkan lagu daro wuxuu shaqeeyaa isla markiiba mana lacag baxo. Koorsooyinka qarsoon waa la iska indhatiraa. Hase yeeshee waxqabadyada ku jira koorsada la taxay waxaa loo xusaa sidii uu u arkay maamulaha dib u xusay, sidaas awgeed qoraalka waxqabad qarsoon ama xaddidan waxaa laga soo xigan karaa arday xataa haddii aan lagu tusin wax xiriiriye ah. Kaliya tax koorsooyinka ay dhammaan waxa ku jira ku habboon yihiin akhristayaasha. Ugu badnaan {$a} koorso. Dejinta heerka koorsada, meesha ay jirto, waxay u beddelaysaa liiskan halkii ay ku dari lahayd.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'La tirtiri doono';
+$string['soapbox:download'] = 'Soo dejiso';
+$string['soapbox:download_aria'] = 'Duubistaan ku soo dejiso qalabkaaga';
+$string['soapbox:feedback_pending'] = 'Jawaabtaada halkan ayay ka muuqan doontaa marka qiimaynta la dhammeeyo. Badanaa waxay qaadataa dhowr daqiiqo. Uma baahnid inaad bogga sii joogto.';
+$string['soapbox:feedback_toggle'] = 'Muuji jawaabtayda';
+$string['soapbox:frames_not_video'] = 'Hawshan waa cod kaliya, sidaas darteed ma jiraan sawirro muuqaal ah oo la soo geliyo.';
+$string['soapbox:howto_eyes'] = 'Fiiri lenska kamaradda, ee ha fiirin sawirkaaga shaashadda. Muuqaalka, in aad lenska fiiriso ayaa daawadayaasha u muuqda isha-is-dhaafsi.';
+$string['soapbox:howto_feedback'] = 'Dhowr daqiiqo kadib markaad dhammayso waxaad heli doontaa dhibco iyo jawaab qoran mid kasta oo ka mid ah shuruudaha qiimaynta, oo ay ku jiraan luqadda jidhkaaga iyo muuqaalkaaga kamaradda hortiisa marka kamaraddu shidnayd.';
+$string['soapbox:howto_frame'] = 'Kamaradda dhig heerka indhaha, qiyaastii hal gacan iyo badh u jirta, si madaxa, garbaha iyo gacmaha oo dhan ay sawirka u galaan. Tilmaamaha gacmeed ee laga sameeyo cidhifka sawirka hoostiisa lama arko, sidaas darteed lama qiimayn karo.';
+$string['soapbox:howto_hands'] = 'Isu dhaaf meel aad gacmaha ku dhaqaajiso oo ku hadal codkaaga caadiga ah. Duub hal duubis oo dhamaystiran: hakadyada, dib-u-bilaabidda iyo marmar turunturoodku waa caadi mana dhimayaan dhibcaha.';
+$string['soapbox:howto_heading'] = 'Ka hor intaadan duubin';
+$string['soapbox:howto_light'] = 'U jeeso daaqad ama laambad, oo yaree iftiinka xooggan ee gadaashaada. Daaqad gadaashaada ah waxay kaa dhigaysaa hoos-hadh kaliya.';
+$string['soapbox:not_assessed'] = 'Lama qiimayn';
+$string['soapbox:not_assessed_aria'] = 'Shuruuddan lama qiimayn isku daygan waxaana laga saaray dhibcahaaga';
+$string['soapbox:present_privacy'] = 'Duubistaada waxaa loo geliyaa kaydka Saylor si loo qoro oo loo qiimeeyo. Adiga iyo maamulayaasha goobta oo kaliya ayaa furi kara. Si toos ah ayaa loo tirtiraa {$a} maalmood kadib markaad duubto, iyada oo ay la socdaan sawirrada taagan ee loo isticmaalay jawaabta luqadda jidhka. Qoraalkaaga, dhibcahaaga iyo jawaabtaadu way sii jiraan kadib markuu muuqaalku baabba\'o, sidaas darteed soo dejiso waxa aad rabto inaad hayso.';
+$string['soapbox:scored_on'] = 'Dhibcahaaga guud waa celceliska {$a->assessed} shuruudood oo la qiimeeyay, {$a->total} ee jadwalka ah ({$a->pct}%). Waxa aan la qiimayn karin waa laga saaray halkii eber la siin lahaa.';
+$string['soapbox:visual_not_assessed'] = 'Luqadda jidhka iyo muuqaalka kamaradda hortiisa lama qiimayn isku daygan, sababtoo ah muuqaal lama duubin ama sawirka kamaradda lama akhrin karin. Shuruudahaas waxaa laga saaray dhibcahaaga halkii la dhimi lahaa. Duub adiga oo kamaradda shidan, madaxa, garbaha iyo gacmaha sawirka ku jiraan, si aad jawaab uga hesho.';
+$string['soapbox:watch'] = 'Daawo';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Meesha lagu kaydiyo muuqaalka ama codka la duubay, ilaa laga tirtiro dhammaadka muddada kaydinta.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Meesha lagu kaydiyo bogagga la soo geliyay ee duubista la socday, ilaa lala tirtiro iyada.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Meesha lagu kaydiyo sawirrada taagan ee laga qaaday duubista jawaabta luqadda jidhka. Waa lala tirtiraa duubista.';

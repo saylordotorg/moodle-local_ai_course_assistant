@@ -192,6 +192,10 @@ if ($storageready) {
                 'videoKbps' => (int) $quality['video_kbps'],
                 'audioKbps' => (int) $quality['audio_kbps'],
             ],
+            // v7.5.1: whether to sample still frames for body-language
+            // feedback. Off means the recorder skips the work entirely rather
+            // than uploading frames nothing will read.
+            'gestureEnabled' => \local_ai_course_assistant\soapbox_gesture_vision::is_enabled($assign),
             'topicid'       => 0,
             'topicSelector' => $hastopics ? '#sbx-topic' : null,
             'slidesEnabled' => !empty($assign->slides_enabled),

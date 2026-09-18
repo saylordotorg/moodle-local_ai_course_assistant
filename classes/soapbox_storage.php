@@ -169,6 +169,7 @@ class soapbox_storage {
      *
      * @param string $key
      * @param int $expires
+     * @param string $filename Non-empty turns the link into a download with this name
      * @return string
      */
     public function presign_get(string $key, int $expires = self::DEFAULT_EXPIRY, string $filename = ''): string {

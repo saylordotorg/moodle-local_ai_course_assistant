@@ -146,6 +146,7 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
             'speech_score'      => 'external\\score_speech::execute',
             'objective_extract' => 'objective_manager::extract_via_llm',
             'slide_vision'      => 'soapbox_slide_vision::design_note',
+            'gesture_vision'    => 'soapbox_gesture_vision::observe',
             'model_bench'       => 'run_model_benchmark via flush_bench_spend',
             // Seven voice types have been in the predicate since v7.3.3.
             'voice'           => 'voice_registry::interaction_type fallback',

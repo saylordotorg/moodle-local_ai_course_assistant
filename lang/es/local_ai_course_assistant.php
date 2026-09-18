@@ -2673,3 +2673,26 @@ $string['settings:supplemental_courses'] = 'Cursos complementarios';
 $string['settings:supplemental_courses_desc'] = 'IDs de curso cuyo contenido [[tutorshort]] también puede usar al responder, separados por comas. Úsalo para material que vive en otro curso y se aplica en todas partes, como una orientación estudiantil o un centro de recursos: un estudiante que pregunta por la política de exámenes obtiene entonces la respuesta de ese curso en lugar de nada.
 
 Los cursos ya deben estar indexados para la recuperación; no se incrusta nada adicional, así que añadir uno aquí es inmediato y no cuesta nada. Los cursos ocultos se ignoran. Sin embargo, las actividades dentro de un curso listado se indexan tal como las vio el administrador que lo reindexó, así que el texto de una actividad oculta o restringida puede citarse a un estudiante aunque no se muestre ningún enlace a ella. Lista solo cursos cuyo contenido completo sea adecuado para la audiencia. Máximo {$a} cursos. Un ajuste por curso, donde exista, reemplaza esta lista en lugar de añadirse a ella.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Se elimina el';
+$string['soapbox:download'] = 'Descargar';
+$string['soapbox:download_aria'] = 'Descarga esta grabación en tu dispositivo';
+$string['soapbox:feedback_pending'] = 'Tus comentarios aparecerán aquí cuando termine la evaluación. Suele tardar unos minutos. No necesitas quedarte en esta página.';
+$string['soapbox:feedback_toggle'] = 'Ver mis comentarios';
+$string['soapbox:frames_not_video'] = 'Esta tarea es solo de audio, así que no hay fotogramas de vídeo que subir.';
+$string['soapbox:howto_eyes'] = 'Mira al objetivo de la cámara, no a tu propia imagen en la pantalla. En vídeo, mirar al objetivo es lo que tu público percibe como contacto visual.';
+$string['soapbox:howto_feedback'] = 'Unos minutos después de terminar recibirás una puntuación y comentarios escritos sobre cada criterio de la rúbrica, incluidos tu lenguaje corporal y tu presencia ante la cámara cuando la cámara estuviera encendida.';
+$string['soapbox:howto_frame'] = 'Coloca la cámara a la altura de los ojos, a algo más de un brazo de distancia, de modo que se vean la cabeza, los hombros y las manos. Los gestos que hagas por debajo del borde del encuadre no se ven, así que no se pueden evaluar.';
+$string['soapbox:howto_hands'] = 'Deja espacio para mover las manos y habla con tu volumen normal. Graba una toma completa: las pausas, los reinicios y algún tropiezo son normales y no penalizan.';
+$string['soapbox:howto_heading'] = 'Antes de grabar';
+$string['soapbox:howto_light'] = 'Ponte de cara a una ventana o a una lámpara y evita la luz fuerte detrás de ti. Una ventana a tu espalda te convierte en una silueta.';
+$string['soapbox:not_assessed'] = 'Sin evaluar';
+$string['soapbox:not_assessed_aria'] = 'Este criterio no se evaluó en este intento y quedó fuera de tu puntuación';
+$string['soapbox:present_privacy'] = 'Tu grabación se sube al almacenamiento de Saylor para transcribirla y evaluarla. Solo tú y los administradores del sitio podéis abrirla. Se elimina automáticamente {$a} días después de grabarla, junto con los fotogramas usados para los comentarios sobre lenguaje corporal. Tu transcripción, tus puntuaciones y tus comentarios se conservan después de que el vídeo desaparezca, así que descarga lo que quieras guardar.';
+$string['soapbox:scored_on'] = 'Tu puntuación general es la media de los {$a->assessed} criterios que se evaluaron, de los {$a->total} de la rúbrica ({$a->pct}%). Lo que no se pudo evaluar quedó fuera en lugar de puntuarse con cero.';
+$string['soapbox:visual_not_assessed'] = 'El lenguaje corporal y la presencia ante la cámara no se evaluaron en este intento, porque no se grabó vídeo o no se pudo interpretar la imagen. Esos criterios quedaron fuera de tu puntuación en lugar de penalizarte. Graba con la cámara encendida, con la cabeza, los hombros y las manos en el encuadre, para recibir comentarios sobre ellos.';
+$string['soapbox:watch'] = 'Ver';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'La ubicación de almacenamiento del vídeo o audio grabado, hasta que se elimina al final del periodo de conservación.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'La ubicación de almacenamiento de las diapositivas subidas con la grabación, hasta que se eliminan con ella.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'La ubicación de almacenamiento de los fotogramas tomados de la grabación para los comentarios sobre lenguaje corporal. Se eliminan con la grabación.';

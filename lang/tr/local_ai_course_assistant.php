@@ -2646,3 +2646,26 @@ $string['settings:supplemental_courses'] = 'Tamamlayıcı dersler';
 $string['settings:supplemental_courses_desc'] = 'İçeriğinden [[tutorshort]] yanıt verirken de yararlanabileceği ders kimlikleri, virgülle ayrılmış. Başka bir derste duran ve her yerde geçerli olan materyal için kullanın: öğrenci oryantasyonu ya da kaynak merkezi gibi. O zaman sınav kurallarını soran biri yanıtı hiç yanıt almamak yerine o dersten alır.
 
 Derslerin getirme için önceden dizinlenmiş olması gerekir; fazladan hiçbir şey gömülmez, bu yüzden buraya bir ders eklemek anında etkili olur ve hiçbir maliyeti yoktur. Gizli dersler yok sayılır. Ancak listelenen bir dersin içindeki etkinlikler, dersi yeniden dizinleyen yöneticinin gördüğü haliyle dizinlenir; bu yüzden gizli veya kısıtlı bir etkinliğin metni, ona hiçbir bağlantı gösterilmese de bir öğrenciye alıntılanabilir. Yalnızca tüm içeriği hedef kitleye uygun dersleri listeleyin. En fazla {$a} ders. Ders düzeyinde bir ayar varsa bu listeye eklenmez, onun yerine geçer.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Silinme tarihi';
+$string['soapbox:download'] = 'İndir';
+$string['soapbox:download_aria'] = 'Bu kaydı cihazınıza indirin';
+$string['soapbox:feedback_pending'] = 'Geri bildiriminiz değerlendirme bittiğinde burada görünecek. Genellikle birkaç dakika sürer. Bu sayfada kalmanız gerekmez.';
+$string['soapbox:feedback_toggle'] = 'Geri bildirimimi göster';
+$string['soapbox:frames_not_video'] = 'Bu ödev yalnızca sestir, bu yüzden yüklenecek video karesi yoktur.';
+$string['soapbox:howto_eyes'] = 'Kendi görüntünüze değil, kamera merceğine bakın. Videoda izleyicinin göz teması olarak algıladığı şey merceğe bakmaktır.';
+$string['soapbox:howto_feedback'] = 'Bitirdikten birkaç dakika sonra, kamera açıkken beden diliniz ve kamera önündeki duruşunuz dahil, değerlendirme ölçeğindeki her ölçüt için bir puan ve yazılı geri bildirim alacaksınız.';
+$string['soapbox:howto_frame'] = 'Kamerayı göz hizasına, yaklaşık bir buçuk kol boyu uzağa yerleştirin ki baş, omuzlar ve eller kadraja girsin. Kadrajın alt kenarının altında yapılan el hareketleri görünmez, dolayısıyla değerlendirilemez.';
+$string['soapbox:howto_hands'] = 'Ellerinizi hareket ettirecek yer bırakın ve normal ses tonunuzla konuşun. Tek bir tam çekim kaydedin: duraklamalar, yeniden başlamalar ve ara sıra takılmak normaldir ve puanı düşürmez.';
+$string['soapbox:howto_heading'] = 'Kayıttan önce';
+$string['soapbox:howto_light'] = 'Bir pencereye ya da lambaya dönük durun ve arkanızdaki parlak ışığı en aza indirin. Arkanızdaki bir pencere sizi siluete dönüştürür.';
+$string['soapbox:not_assessed'] = 'Değerlendirilmedi';
+$string['soapbox:not_assessed_aria'] = 'Bu ölçüt bu denemede değerlendirilmedi ve puanınızın dışında bırakıldı';
+$string['soapbox:present_privacy'] = 'Kaydınız, yazıya dökülüp değerlendirilebilmesi için Saylor deposuna yüklenir. Yalnızca siz ve site yöneticileri açabilir. Kaydettikten {$a} gün sonra, beden dili geri bildirimi için kullanılan sabit karelerle birlikte otomatik olarak silinir. Video gittikten sonra da yazınız, puanlarınız ve geri bildiriminiz saklanır; bu yüzden saklamak istediğinizi indirin.';
+$string['soapbox:scored_on'] = 'Genel puanınız, ölçekteki {$a->total} ölçütten değerlendirilen {$a->assessed} tanesinin ortalamasıdır ({$a->pct}%). Değerlendirilemeyen her şey sıfır verilmek yerine dışarıda bırakıldı.';
+$string['soapbox:visual_not_assessed'] = 'Beden dili ve kamera önündeki duruş bu denemede değerlendirilmedi, çünkü video kaydedilmedi ya da kamera görüntüsü okunamadı. Bu ölçütler puanınızı düşürmek yerine dışarıda bırakıldı. Bunlar için geri bildirim almak üzere kameranız açık, baş, omuz ve elleriniz kadrajda olacak şekilde kaydedin.';
+$string['soapbox:watch'] = 'İzle';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Kaydedilen video veya sesin, saklama süresi sonunda silinene kadarki depolama konumu.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Kayıtla birlikte yüklenen slaytların, kayıtla birlikte silinene kadarki depolama konumu.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Beden dili geri bildirimi için kayıttan alınan sabit karelerin depolama konumu. Kayıtla birlikte silinir.';

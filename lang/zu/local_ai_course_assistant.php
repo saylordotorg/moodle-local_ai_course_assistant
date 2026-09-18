@@ -2690,3 +2690,26 @@ $string['settings:supplemental_courses'] = 'Amakhosi angeziwe';
 $string['settings:supplemental_courses_desc'] = 'Ama-ID amakhosi okuqukethwe kwawo [[tutorshort]] angakusebenzisa nalapho ephendula, ahlukaniswe ngokhefana. Sebenzisa lokhu kokuqukethwe okuhlala kwelinye ikhosi kodwa okusebenza yonke indawo, njengekhosi lokwethulwa kwabafundi noma isikhungo sezinsiza: obuza ngenqubomgomo yezivivinyo uthola-ke impendulo kulelo khosi esikhundleni sokungatholi lutho.
 
 Amakhosi kumele abe esehlelwe kakade ukuze atholakale; akukho okunye okushumekwayo, ngakho ukungeza lapha kusebenza masinyane futhi akubizi lutho. Amakhosi afihliwe ayanganakwa. Kodwa imisebenzi engaphakathi kwekhosi elifakiwe ihlelwa njengoba yayibonwa umlawuli owaphinde wayihlela, ngakho umbhalo womsebenzi ofihliwe noma okhawulelwe ungacashunelwa umfundi noma kungabonakali sixhumanisi sawo. Faka kuphela amakhosi aqukethe okulungele bonke ababukeli. Ubuningi obungu-{$a} amakhosi. Isilungiselelo sezinga lekhosi, lapho sikhona, sithatha indawo yalolu hlu esikhundleni sokwengeza kulo.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Kususwa ngo';
+$string['soapbox:download'] = 'Landa';
+$string['soapbox:download_aria'] = 'Landa lokhu okuqoshiwe kudivayisi yakho';
+$string['soapbox:feedback_pending'] = 'Impendulo yakho izovela lapha lapho ukukalwa sekuqediwe. Ngokuvamile kuthatha imizuzu embalwa. Akudingeki uhlale kuleli khasi.';
+$string['soapbox:feedback_toggle'] = 'Bonisa impendulo yami';
+$string['soapbox:frames_not_video'] = 'Lo msebenzi ungowomsindo kuphela, ngakho awekho amafreyimu evidiyo okumele alayishwe.';
+$string['soapbox:howto_eyes'] = 'Bheka ilensi yekhamera, hhayi isithombe sakho esikrinini. Kuvidiyo, ukubheka ilensi yikho okufundwa yizibukeli njengokubhekana ngamehlo.';
+$string['soapbox:howto_feedback'] = 'Ngemuva kwemizuzu embalwa uqedile uzothola amamaki nempendulo ebhaliwe kuzo zonke izinkomba zokukala, kufaka phakathi ulimi lomzimba nokubonakala kwakho phambi kwekhamera lapho ikhamera ibivuliwe.';
+$string['soapbox:howto_frame'] = 'Beka ikhamera ezingeni lamehlo, cishe ubude bengalo nengxenye, ukuze ikhanda, amahlombe nezandla kube sesithombeni. Izenzo zezandla ezenziwa ngaphansi komphetho wesithombe azibonakali, ngakho azikwazi ukukalwa.';
+$string['soapbox:howto_hands'] = 'Zinike indawo yokunyakazisa izandla, ukhulume ngezwi lakho elijwayelekile. Qopha ukuqopha okukodwa okuphelele: ukuma, ukuqala kabusha nokukhubeka kwesikhathi ngesikhathi kujwayelekile futhi akwehlisi amamaki.';
+$string['soapbox:howto_heading'] = 'Ngaphambi kokuqopha';
+$string['soapbox:howto_light'] = 'Bhekana newindi noma isibani, unciphise ukukhanya okukhulu ngemuva kwakho. Iwindi elingemuva kwakho likwenza ube yisithunzi nje.';
+$string['soapbox:not_assessed'] = 'Akukalwanga';
+$string['soapbox:not_assessed_aria'] = 'Le nkomba ayikalwanga kulo mzamo futhi ishiywe ngaphandle kwamamaki akho';
+$string['soapbox:present_privacy'] = 'Okuqoshiwe kwakho kulayishwa esitoreji sikaSaylor ukuze kubhalwe phansi futhi kukalwe. Nguwe kuphela nabaphathi bewebhusayithi eningakuvula. Kususwa ngokuzenzakalela ezinsukwini ezingu-{$a} ngemuva kokuqopha, kanye nezithombe ezingashintshi ezisetshenziselwa impendulo yolimi lomzimba. Umbhalo, amamaki nempendulo yakho kuhlala nangemuva kokunyamalala kwevidiyo, ngakho landa noma yini ofuna ukuyigcina.';
+$string['soapbox:scored_on'] = 'Amamaki akho ewonke ayisilinganiso sezinkomba ezingu-{$a->assessed} ezikaliwe, kwezingu-{$a->total} ohlwini ({$a->pct}%). Lokho obekungenakukalwa kushiywe ngaphandle esikhundleni sokunikwa uziro.';
+$string['soapbox:visual_not_assessed'] = 'Ulimi lomzimba nokubonakala phambi kwekhamera akukalwanga kulo mzamo, ngoba ayikho ividiyo eqoshiwe noma isithombe sekhamera besingafundeki. Lezo zinkomba zishiywe ngaphandle kwamamaki esikhundleni sokuwehlisa. Qopha ikhamera ivuliwe, ikhanda, amahlombe nezandla kusesithombeni, ukuze uthole impendulo ngazo.';
+$string['soapbox:watch'] = 'Buka';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Indawo yokugcina yevidiyo noma umsindo oqoshiwe, kuze kususwe ekupheleni kwesikhathi sokugcina.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Indawo yokugcina yamaslayidi alayishwe kanye nokuqoshiwe, kuze kususwe kanye nakho.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Indawo yokugcina yezithombe ezingashintshi ezithathwe kokuqoshiwe zempendulo yolimi lomzimba. Zisuswa kanye nokuqoshiwe.';

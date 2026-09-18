@@ -104,6 +104,36 @@ define(['core/ajax'], function(Ajax) {
         },
 
         /**
+         * Upload a still-frame sheet for body-language feedback.
+         *
+         * Same injected-dependency shape as uploadDeck, so it is unit-testable
+         * without a network. Never called for an audio-only assignment: the
+         * server refuses `kind: 'frames'` there.
+         *
+         * @param {object} opts
+         * @param {number} opts.assignid
+         * @param {Blob} opts.blob the JPEG contact sheet
+         * @param {function} [opts.fetchFn]
+         * @param {object} [opts.ajax]
+         * @param {number} [opts.retries]
+         * @return {Promise<string>} the frames object key
+         */
+        uploadFrames: function(opts) {
+            var ajax = opts.ajax || Ajax;
+            var fetchFn = opts.fetchFn || window.fetch.bind(window);
+            var retries = opts.retries || 2;
+            return ajax.call([{
+                methodname: 'local_ai_course_assistant_soapbox_get_upload_url',
+                args: {assignid: opts.assignid, ext: 'jpg', kind: 'frames'}
+            }])[0].then(function(urlinfo) {
+                return putWithRetry(fetchFn, urlinfo.uploadurl, opts.blob, 'image/jpeg', retries)
+                    .then(function() {
+                        return urlinfo.objectkey;
+                    });
+            });
+        },
+
+        /**
          * Upload a finished recording end to end.
          *
          * @param {object} opts
@@ -115,6 +145,7 @@ define(['core/ajax'], function(Ajax) {
          * @param {number} opts.durationSeconds
          * @param {string} [opts.deckKey] slide deck object key (slides mode)
          * @param {string} [opts.slideTimeline] JSON slide-advance timeline
+         * @param {string} [opts.framesKey] still-frame sheet object key (video mode)
          * @param {function} [opts.fetchFn] fetch (defaults to window.fetch)
          * @param {object} [opts.ajax] core/ajax (defaults to the module)
          * @param {number} [opts.retries] PUT attempts (default 3)
@@ -139,7 +170,8 @@ define(['core/ajax'], function(Ajax) {
                                 topicid: opts.topicid || 0,
                                 durationseconds: opts.durationSeconds || 0,
                                 deckkey: opts.deckKey || '',
-                                slidetimeline: opts.slideTimeline || ''
+                                slidetimeline: opts.slideTimeline || '',
+                                framekey: opts.framesKey || ''
                             }
                         }])[0];
                     });

@@ -2645,3 +2645,26 @@ $string['settings:supplemental_courses'] = 'Cursuri suplimentare';
 $string['settings:supplemental_courses_desc'] = 'ID-uri de cursuri al căror conținut [[tutorshort]] îl poate folosi și la răspuns, separate prin virgule. Folosiți-le pentru materiale care se află în alt curs și se aplică peste tot, precum o orientare pentru studenți sau un centru de resurse: cine întreabă despre regulile de examen primește atunci răspunsul din acel curs în loc de niciunul.
 
 Cursurile trebuie să fie deja indexate pentru regăsire; nu se încorporează nimic în plus, așa că adăugarea unuia aici are efect imediat și nu costă nimic. Cursurile ascunse sunt ignorate. Activitățile dintr-un curs listat sunt însă indexate așa cum le-a văzut administratorul care l-a reindexat, deci textul unei activități ascunse sau restricționate poate fi citat unui student chiar dacă nu se afișează niciun link. Listați doar cursuri al căror conținut întreg este potrivit pentru public. Maximum {$a} cursuri. O setare pe curs, acolo unde există, înlocuiește această listă în loc să i se adauge.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Se șterge la';
+$string['soapbox:download'] = 'Descarcă';
+$string['soapbox:download_aria'] = 'Descarcă această înregistrare pe dispozitivul tău';
+$string['soapbox:feedback_pending'] = 'Feedbackul tău va apărea aici după ce se termină evaluarea. De obicei durează câteva minute. Nu trebuie să rămâi pe această pagină.';
+$string['soapbox:feedback_toggle'] = 'Arată feedbackul meu';
+$string['soapbox:frames_not_video'] = 'Această sarcină este doar audio, deci nu există cadre video de încărcat.';
+$string['soapbox:howto_eyes'] = 'Privește în obiectivul camerei, nu la propria imagine de pe ecran. În video, privirea în obiectiv este ceea ce publicul percepe drept contact vizual.';
+$string['soapbox:howto_feedback'] = 'La câteva minute după ce termini vei primi o notă și feedback scris pentru fiecare criteriu din grilă, inclusiv limbajul corpului și prezența în fața camerei, când camera a fost pornită.';
+$string['soapbox:howto_frame'] = 'Așază camera la nivelul ochilor, la aproximativ un braț și jumătate distanță, astfel încât capul, umerii și mâinile să fie în cadru. Gesturile făcute sub marginea cadrului nu se văd, deci nu pot fi evaluate.';
+$string['soapbox:howto_hands'] = 'Lasă-ți spațiu să miști mâinile și vorbește la volumul tău obișnuit. Înregistrează o singură filmare completă: pauzele, reluările și câte o poticnire sunt normale și nu scad nota.';
+$string['soapbox:howto_heading'] = 'Înainte de a înregistra';
+$string['soapbox:howto_light'] = 'Așază-te cu fața spre o fereastră sau o lampă și limitează lumina puternică din spatele tău. O fereastră în spate te transformă într-o siluetă.';
+$string['soapbox:not_assessed'] = 'Neevaluat';
+$string['soapbox:not_assessed_aria'] = 'Acest criteriu nu a fost evaluat la această încercare și a rămas în afara notei tale';
+$string['soapbox:present_privacy'] = 'Înregistrarea ta este încărcată în stocarea Saylor pentru a fi transcrisă și evaluată. Doar tu și administratorii site-ului o puteți deschide. Se șterge automat la {$a} zile după înregistrare, împreună cu cadrele folosite pentru feedbackul despre limbajul corpului. Transcrierea, notele și feedbackul se păstrează după ce videoclipul dispare, așa că descarcă ce vrei să păstrezi.';
+$string['soapbox:scored_on'] = 'Nota ta generală este media celor {$a->assessed} criterii care au fost evaluate, din {$a->total} din grilă ({$a->pct}%). Ce nu a putut fi evaluat a fost lăsat deoparte, nu notat cu zero.';
+$string['soapbox:visual_not_assessed'] = 'Limbajul corpului și prezența în fața camerei nu au fost evaluate la această încercare, pentru că nu s-a înregistrat video sau imaginea nu a putut fi citită. Aceste criterii au rămas în afara notei, nu au scăzut-o. Înregistrează cu camera pornită, cu capul, umerii și mâinile în cadru, ca să primești feedback despre ele.';
+$string['soapbox:watch'] = 'Vizionează';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Locul de stocare al videoclipului sau audio-ului înregistrat, până la ștergerea sa la finalul perioadei de păstrare.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Locul de stocare al prezentării încărcate odată cu înregistrarea, până la ștergerea sa odată cu ea.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Locul de stocare al cadrelor extrase din înregistrare pentru feedbackul despre limbajul corpului. Se șterg odată cu înregistrarea.';

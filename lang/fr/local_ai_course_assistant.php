@@ -2647,3 +2647,26 @@ $string['settings:supplemental_courses'] = 'Cours complémentaires';
 $string['settings:supplemental_courses_desc'] = 'Identifiants des cours dont [[tutorshort]] peut aussi exploiter le contenu pour répondre, séparés par des virgules. À utiliser pour du contenu qui vit dans un autre cours et vaut partout, comme une orientation étudiante ou un centre de ressources : un apprenant qui interroge sur la politique d\'examen obtient alors la réponse depuis ce cours plutôt que rien.
 
 Les cours doivent déjà être indexés pour la recherche ; rien de plus n\'est vectorisé, donc en ajouter un ici est immédiat et gratuit. Les cours masqués sont ignorés. En revanche, les activités d\'un cours listé sont indexées telles que l\'administrateur qui l\'a réindexé les voyait, si bien que le texte d\'une activité masquée ou restreinte peut être cité à un apprenant même si aucun lien n\'est affiché. Ne listez que des cours dont l\'intégralité du contenu convient au public. Maximum {$a} cours. Un réglage propre à un cours, lorsqu\'il existe, remplace cette liste au lieu de s\'y ajouter.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Supprimé le';
+$string['soapbox:download'] = 'Télécharger';
+$string['soapbox:download_aria'] = 'Télécharger cet enregistrement sur votre appareil';
+$string['soapbox:feedback_pending'] = 'Vos retours apparaîtront ici une fois l\'évaluation terminée. Cela prend généralement quelques minutes. Vous n\'avez pas besoin de rester sur cette page.';
+$string['soapbox:feedback_toggle'] = 'Voir mes retours';
+$string['soapbox:frames_not_video'] = 'Ce devoir est uniquement audio : il n\'y a donc aucune image vidéo à envoyer.';
+$string['soapbox:howto_eyes'] = 'Regardez l\'objectif de la caméra, pas votre propre image à l\'écran. En vidéo, regarder l\'objectif est ce que votre public perçoit comme un contact visuel.';
+$string['soapbox:howto_feedback'] = 'Quelques minutes après la fin, vous recevrez une note et des retours écrits sur chaque critère de la grille, y compris votre langage corporel et votre présence à l\'image lorsque la caméra était allumée.';
+$string['soapbox:howto_frame'] = 'Placez la caméra à hauteur des yeux, à environ une longueur de bras et demie, pour que la tête, les épaules et les mains soient dans l\'image. Les gestes faits sous le bord du cadre ne se voient pas et ne peuvent donc pas être évalués.';
+$string['soapbox:howto_hands'] = 'Laissez-vous de la place pour bouger les mains et parlez à votre volume habituel. Enregistrez une prise complète : pauses, reprises et petits accrocs sont normaux et ne sont pas pénalisés.';
+$string['soapbox:howto_heading'] = 'Avant d\'enregistrer';
+$string['soapbox:howto_light'] = 'Placez-vous face à une fenêtre ou à une lampe et limitez la lumière vive derrière vous. Une fenêtre dans votre dos vous transforme en silhouette.';
+$string['soapbox:not_assessed'] = 'Non évalué';
+$string['soapbox:not_assessed_aria'] = 'Ce critère n\'a pas été évalué pour cette tentative et a été exclu de votre note';
+$string['soapbox:present_privacy'] = 'Votre enregistrement est envoyé au stockage de Saylor pour être transcrit et évalué. Vous seul et les administrateurs du site pouvez l\'ouvrir. Il est supprimé automatiquement {$a} jours après l\'enregistrement, avec les images fixes utilisées pour les retours sur le langage corporel. Votre transcription, vos notes et vos retours sont conservés après la disparition de la vidéo : téléchargez donc ce que vous souhaitez garder.';
+$string['soapbox:scored_on'] = 'Votre note globale est la moyenne des {$a->assessed} critères effectivement évalués, sur les {$a->total} de la grille ({$a->pct} %). Ce qui n\'a pas pu être évalué a été exclu plutôt que noté zéro.';
+$string['soapbox:visual_not_assessed'] = 'Le langage corporel et la présence à l\'image n\'ont pas été évalués pour cette tentative, car aucune vidéo n\'a été enregistrée ou l\'image n\'a pas pu être lue. Ces critères ont été exclus de votre note plutôt que pénalisés. Enregistrez avec la caméra allumée, tête, épaules et mains dans le cadre, pour obtenir des retours sur ces points.';
+$string['soapbox:watch'] = 'Regarder';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'L\'emplacement de stockage de la vidéo ou de l\'audio enregistré, jusqu\'à sa suppression à la fin de la période de conservation.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'L\'emplacement de stockage du diaporama envoyé avec l\'enregistrement, jusqu\'à sa suppression avec celui-ci.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'L\'emplacement de stockage des images fixes extraites de l\'enregistrement pour les retours sur le langage corporel. Supprimées avec l\'enregistrement.';

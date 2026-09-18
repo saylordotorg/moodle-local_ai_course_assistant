@@ -2698,3 +2698,26 @@ $string['settings:supplemental_courses'] = 'Kursus pelengkap';
 $string['settings:supplemental_courses_desc'] = 'ID kursus yang isinya juga boleh dipakai [[tutorshort]] saat menjawab, dipisah koma. Gunakan untuk materi yang berada di kursus lain tetapi berlaku di mana saja, seperti orientasi mahasiswa atau pusat sumber daya: yang bertanya soal kebijakan ujian kemudian mendapat jawabannya dari kursus itu alih-alih tidak mendapat apa pun.
 
 Kursus harus sudah terindeks untuk pengambilan; tidak ada yang disematkan tambahan, jadi menambahkannya di sini langsung berlaku dan tidak berbiaya. Kursus tersembunyi diabaikan. Namun aktivitas di dalam kursus yang didaftarkan diindeks sebagaimana dilihat oleh admin yang mengindeks ulang kursus itu, sehingga teks aktivitas yang tersembunyi atau dibatasi bisa dikutipkan kepada pelajar meski tidak ada tautan yang ditampilkan. Daftarkan hanya kursus yang seluruh isinya sesuai untuk pembacanya. Maksimal {$a} kursus. Setelan tingkat kursus, jika ada, menggantikan daftar ini, bukan menambahinya.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Dihapus pada';
+$string['soapbox:download'] = 'Unduh';
+$string['soapbox:download_aria'] = 'Unduh rekaman ini ke perangkat Anda';
+$string['soapbox:feedback_pending'] = 'Umpan balik Anda akan muncul di sini setelah penilaian selesai. Biasanya butuh beberapa menit. Anda tidak perlu tetap di halaman ini.';
+$string['soapbox:feedback_toggle'] = 'Tampilkan umpan balik saya';
+$string['soapbox:frames_not_video'] = 'Tugas ini hanya audio, jadi tidak ada bingkai video untuk diunggah.';
+$string['soapbox:howto_eyes'] = 'Lihatlah lensa kamera, bukan gambar Anda sendiri di layar. Dalam video, menatap lensa itulah yang terbaca sebagai kontak mata bagi penonton.';
+$string['soapbox:howto_feedback'] = 'Beberapa menit setelah selesai, Anda akan menerima nilai dan umpan balik tertulis untuk setiap kriteria rubrik, termasuk bahasa tubuh dan kehadiran di depan kamera saat kamera menyala.';
+$string['soapbox:howto_frame'] = 'Letakkan kamera setinggi mata, sekitar satu setengah panjang lengan, agar kepala, bahu, dan tangan semuanya masuk bingkai. Gerakan yang dilakukan di bawah tepi bingkai tidak terlihat sehingga tidak bisa dinilai.';
+$string['soapbox:howto_hands'] = 'Beri ruang untuk menggerakkan tangan dan bicaralah dengan volume normal Anda. Rekam satu pengambilan penuh: jeda, mengulang, dan sesekali tersendat itu wajar dan tidak mengurangi nilai.';
+$string['soapbox:howto_heading'] = 'Sebelum merekam';
+$string['soapbox:howto_light'] = 'Menghadaplah ke jendela atau lampu, dan minimalkan cahaya terang di belakang Anda. Jendela di belakang membuat Anda menjadi siluet.';
+$string['soapbox:not_assessed'] = 'Tidak dinilai';
+$string['soapbox:not_assessed_aria'] = 'Kriteria ini tidak dinilai pada percobaan ini dan dikeluarkan dari nilai Anda';
+$string['soapbox:present_privacy'] = 'Rekaman Anda diunggah ke penyimpanan Saylor agar dapat ditranskripsikan dan dinilai. Hanya Anda dan administrator situs yang dapat membukanya. Rekaman dihapus otomatis {$a} hari setelah Anda merekam, bersama bingkai diam yang dipakai untuk umpan balik bahasa tubuh. Transkrip, nilai, dan umpan balik Anda tetap ada setelah videonya hilang, jadi unduh apa pun yang ingin Anda simpan.';
+$string['soapbox:scored_on'] = 'Nilai keseluruhan Anda adalah rata-rata dari {$a->assessed} kriteria yang dinilai, dari {$a->total} kriteria dalam rubrik ({$a->pct}%). Apa pun yang tidak dapat dinilai dikeluarkan, bukan diberi nol.';
+$string['soapbox:visual_not_assessed'] = 'Bahasa tubuh dan kehadiran di depan kamera tidak dinilai pada percobaan ini, karena tidak ada video yang direkam atau tampilan kamera tidak terbaca. Kriteria tersebut dikeluarkan dari nilai Anda, bukan menurunkannya. Rekam dengan kamera menyala, dengan kepala, bahu, dan tangan dalam bingkai, untuk mendapat umpan balik tentangnya.';
+$string['soapbox:watch'] = 'Tonton';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Lokasi penyimpanan video atau audio yang direkam, sampai dihapus di akhir masa penyimpanan.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Lokasi penyimpanan salindia yang diunggah bersama rekaman, sampai dihapus bersamanya.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Lokasi penyimpanan bingkai diam yang diambil dari rekaman untuk umpan balik bahasa tubuh. Dihapus bersama rekaman.';

@@ -2666,3 +2666,26 @@ $string['settings:supplemental_courses'] = 'Kurs yu dolliku';
 $string['settings:supplemental_courses_desc'] = 'ID yu kurs yu [[tutorshort]] mën a jëfandikoo seen njël bu muy tontu, ñu leen xaajale ak virgil. Jëfandikool ko ci njël mu nekk ci beneen kurs waaye mu jëm ci fépp, ni kurs bu jubbanti ndongo yi walla barab bu am jumtukaay: booba ku laaj ci sart yu ekzame yi dana am tontu ci kurs boobu, ci biir amul dara.
 
 Kurs yi warees na leen indeks ba noppi ngir ñu leen mëna wut; dañuy dolli dara ci embedding, kon dolli benn fii day dox ci saa si te du jëf xaalis. Kurs yu nëbbu ñungi leen di bàyyi. Waaye jëf yi nekk ci biir kurs bu ñu tudd fii dañu leen di indeks ni ko admin bi defaraat indeks bi gise woon, kon mbind mu jëf mu nëbbu walla mu ñu tënk mën nañ koo wax ndongo li, doonte itam duñu wone benn lëkkalekaay. Bindal rekk kurs yi seen njël bépp jàppandi ci ñi koy jàng. Ba mu yem ci {$a} kurs. Tëralin bu kurs bi, su amee, day wuutu list bii, du ci yokk.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Dañu koy far ci';
+$string['soapbox:download'] = 'Yebbi';
+$string['soapbox:download_aria'] = 'Yebbil duub bii ci sa jumtukaay';
+$string['soapbox:feedback_pending'] = 'Sa xalaat dina feeñ fii bu jàngaleb jàngale bi jeexee. Ci ay simili la war a yàgg. Warul nga des ci xët bii.';
+$string['soapbox:feedback_toggle'] = 'Wone sama xalaat';
+$string['soapbox:frames_not_video'] = 'Liggéey bii ci baat rekk la, kon amul benn nataalu wideo bu ñu war a yónnee.';
+$string['soapbox:howto_eyes'] = 'Xoolal ci lentiy kamera bi, du ci sa nataal ci ekraan bi. Ci wideo, xool ci lentil bi moo di li ñi lay xool di gis ni jàkkarloo bët.';
+$string['soapbox:howto_feedback'] = 'Ay simili ginnaaw bu nga noppee, dinga am ay tomb ak xalaat bu ñu bind ci benn benn ci sart yi, ak sa làmmiñu yaram ak ni nga feeñ ci kanam kamera bi, su kamera bi ubbeekoon.';
+$string['soapbox:howto_frame'] = 'Teg kamera bi ci taxawaayu bët, lu tollook benn loxo ak genn-wàll, ngir bopp, wet ak loxo yépp nekk ci nataal bi. Tërëlin yi nga def ci suufu catu nataal bi duñu leen gis, kon mënuñu leen a natt.';
+$string['soapbox:howto_hands'] = 'Bàyyil sa bopp barab bu nga mëna yëngal say loxo te wax ak sa baat bu yaram. Duubal benn duub bu mat: taxaw, tàmbalee at, ak dalal ci ay yoon, loolu normal la te du wàññi sa tomb.';
+$string['soapbox:howto_heading'] = 'Bala ngay duub';
+$string['soapbox:howto_light'] = 'Jublu ci palanteer walla lampa, te wàññi leer bu tàng bi nekk ci sa ginnaaw. Palanteer bu nekk ci sa ginnaaw dafa lay def benn takkandeer rekk.';
+$string['soapbox:not_assessed'] = 'Ñu nattu ko';
+$string['soapbox:not_assessed_aria'] = 'Sart bii nattuñu ko ci jéego bii te génne nañu ko ci sa tomb';
+$string['soapbox:present_privacy'] = 'Sa duub ñungi koy yónnee ci denc bu Saylor ngir ñu mëna bind ak natt ko. Yaw rekk ak admin yu sit bi ñoo koy mëna ubbi. Dañu koy far ci boppam {$a} fan ginnaaw bi nga ko duubee, ak nataal yu taxaw yi ñu jëfandikoo ngir xalaatu làmmiñu yaram. Sa bind, say tomb ak sa xalaat dañuy des ginnaaw bi wideo bi demee, kon yebbil li nga bëgg a denc.';
+$string['soapbox:scored_on'] = 'Sa tombu mbooloo mooy digganteb sart yi ñu natt, {$a->assessed} ci {$a->total} yi nekk ci tablo bi ({$a->pct}%). Li ñu mënul a natt génne nañu ko ci biir, waxuñu ko zero.';
+$string['soapbox:visual_not_assessed'] = 'Làmmiñu yaram ak ni nga feeñ ci kanam kamera bi nattuñu leen ci jéego bii, ndax duubuñu benn wideo walla mënuñu woon a jàng nataalu kamera bi. Sart yooyu génne nañu leen ci sa tomb, wàññiwuñu ko. Duubal ak kamera bu ubbeeku, bopp, wet ak loxo ci biir nataal bi, ngir am xalaat ci ñoom.';
+$string['soapbox:watch'] = 'Xool';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Barab bu ñuy denc wideo walla baat bi ñu duub, ba kera ñu koy far ci jeexitalu waxtu denc bi.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Barab bu ñuy denc slide yi ñu yónnee ak duub bi, ba kera ñu leen di far ak moom.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Barab bu ñuy denc nataal yu taxaw yi ñu jële ci duub bi ngir xalaatu làmmiñu yaram. Dañu leen di far ak duub bi.';

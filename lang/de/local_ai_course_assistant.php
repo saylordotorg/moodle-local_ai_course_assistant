@@ -2646,3 +2646,26 @@ $string['settings:supplemental_courses'] = 'Ergänzende Kurse';
 $string['settings:supplemental_courses_desc'] = 'Kurs-IDs, deren Inhalte [[tutorshort]] beim Antworten ebenfalls heranziehen darf, durch Kommas getrennt. Für Material, das in einem anderen Kurs liegt und überall gilt, etwa eine Studieneinführung oder ein Ressourcenzentrum: Wer nach der Prüfungsordnung fragt, bekommt die Antwort dann aus jenem Kurs statt gar keine.
 
 Die Kurse müssen für den Abruf bereits indexiert sein; es wird nichts zusätzlich eingebettet, das Hinzufügen wirkt also sofort und kostet nichts. Verborgene Kurse werden ignoriert. Aktivitäten innerhalb eines gelisteten Kurses werden jedoch so indexiert, wie sie die Person sah, die den Kurs neu indexiert hat, sodass der Text einer verborgenen oder eingeschränkten Aktivität einem Lernenden zitiert werden kann, auch wenn kein Link darauf erscheint. Listen Sie nur Kurse, deren gesamter Inhalt für das Publikum geeignet ist. Maximal {$a} Kurse. Eine kursspezifische Einstellung ersetzt diese Liste, statt sie zu ergänzen.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Wird gelöscht am';
+$string['soapbox:download'] = 'Herunterladen';
+$string['soapbox:download_aria'] = 'Diese Aufnahme auf Ihr Gerät herunterladen';
+$string['soapbox:feedback_pending'] = 'Ihr Feedback erscheint hier, sobald die Bewertung abgeschlossen ist. Das dauert meist einige Minuten. Sie müssen nicht auf dieser Seite bleiben.';
+$string['soapbox:feedback_toggle'] = 'Mein Feedback anzeigen';
+$string['soapbox:frames_not_video'] = 'Diese Aufgabe ist reine Audioaufnahme, daher gibt es keine Videobilder zum Hochladen.';
+$string['soapbox:howto_eyes'] = 'Schauen Sie in das Kameraobjektiv, nicht auf Ihr eigenes Bild auf dem Schirm. Im Video wirkt der Blick ins Objektiv auf Ihr Publikum wie Blickkontakt.';
+$string['soapbox:howto_feedback'] = 'Wenige Minuten nach dem Ende erhalten Sie eine Bewertung und schriftliches Feedback zu jedem Kriterium der Bewertungsvorlage, einschließlich Körpersprache und Kamerapräsenz, sofern die Kamera an war.';
+$string['soapbox:howto_frame'] = 'Stellen Sie die Kamera auf Augenhöhe, etwa anderthalb Armlängen entfernt, sodass Kopf, Schultern und Hände im Bild sind. Gesten unterhalb des Bildrands sind nicht zu sehen und können deshalb nicht bewertet werden.';
+$string['soapbox:howto_hands'] = 'Lassen Sie sich Platz für Handbewegungen und sprechen Sie in normaler Lautstärke. Nehmen Sie einen vollständigen Durchgang auf: Pausen, Neuanfänge und kleine Versprecher sind normal und werden nicht abgewertet.';
+$string['soapbox:howto_heading'] = 'Vor der Aufnahme';
+$string['soapbox:howto_light'] = 'Wenden Sie sich einem Fenster oder einer Lampe zu und halten Sie helles Licht hinter sich möglichst gering. Ein Fenster im Rücken macht Sie zur Silhouette.';
+$string['soapbox:not_assessed'] = 'Nicht bewertet';
+$string['soapbox:not_assessed_aria'] = 'Dieses Kriterium wurde für diesen Versuch nicht bewertet und blieb außerhalb Ihrer Punktzahl';
+$string['soapbox:present_privacy'] = 'Ihre Aufnahme wird in den Saylor-Speicher hochgeladen, um transkribiert und bewertet zu werden. Nur Sie und die Administratorinnen und Administratoren der Website können sie öffnen. Sie wird {$a} Tage nach der Aufnahme automatisch gelöscht, zusammen mit den Standbildern für das Körpersprache-Feedback. Transkript, Bewertungen und Feedback bleiben erhalten, wenn das Video weg ist. Laden Sie also herunter, was Sie behalten möchten.';
+$string['soapbox:scored_on'] = 'Ihre Gesamtnote ist der Durchschnitt der {$a->assessed} tatsächlich bewerteten Kriterien von insgesamt {$a->total} in der Vorlage ({$a->pct} %). Was nicht bewertet werden konnte, blieb außen vor, statt mit null bewertet zu werden.';
+$string['soapbox:visual_not_assessed'] = 'Körpersprache und Kamerapräsenz wurden für diesen Versuch nicht bewertet, weil kein Video aufgenommen wurde oder das Kamerabild nicht lesbar war. Diese Kriterien blieben außerhalb Ihrer Note, statt abgewertet zu werden. Nehmen Sie mit eingeschalteter Kamera auf, mit Kopf, Schultern und Händen im Bild, um dazu Feedback zu erhalten.';
+$string['soapbox:watch'] = 'Ansehen';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Der Speicherort des aufgenommenen Videos oder Audios, bis es am Ende der Aufbewahrungsfrist gelöscht wird.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Der Speicherort der mit der Aufnahme hochgeladenen Folien, bis sie mit der Aufnahme gelöscht werden.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Der Speicherort der aus der Aufnahme entnommenen Standbilder für das Körpersprache-Feedback. Werden mit der Aufnahme gelöscht.';

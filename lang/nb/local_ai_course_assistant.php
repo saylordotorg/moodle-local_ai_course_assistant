@@ -2644,3 +2644,26 @@ $string['settings:supplemental_courses'] = 'Supplerende emner';
 $string['settings:supplemental_courses_desc'] = 'Emne-id-er hvis innhold [[tutorshort]] også kan bruke når den svarer, atskilt med komma. Bruk det for materiale som ligger i et annet emne og gjelder overalt, som en studieintroduksjon eller et ressurssenter: den som spør om eksamensreglene, får da svaret fra det emnet i stedet for ingenting.
 
 Emnene må allerede være indeksert for henting; ingenting ekstra blir innebygd, så å legge til ett her virker umiddelbart og koster ingenting. Skjulte emner ignoreres. Aktiviteter inne i et oppført emne indekseres derimot slik administratoren som indekserte det på nytt så dem, så teksten i en skjult eller begrenset aktivitet kan siteres til en student selv om ingen lenke vises. Før bare opp emner der hele innholdet passer for målgruppen. Maks {$a} emner. En emneinnstilling erstatter, der den finnes, denne listen i stedet for å legge til.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Slettes den';
+$string['soapbox:download'] = 'Last ned';
+$string['soapbox:download_aria'] = 'Last ned dette opptaket til enheten din';
+$string['soapbox:feedback_pending'] = 'Tilbakemeldingen din vises her når vurderingen er ferdig. Det tar vanligvis noen minutter. Du trenger ikke bli på siden.';
+$string['soapbox:feedback_toggle'] = 'Vis tilbakemeldingen min';
+$string['soapbox:frames_not_video'] = 'Denne oppgaven er bare lyd, så det finnes ingen videobilder å laste opp.';
+$string['soapbox:howto_eyes'] = 'Se inn i kameralinsen, ikke på ditt eget bilde på skjermen. På video er det blikket inn i linsen publikum oppfatter som øyekontakt.';
+$string['soapbox:howto_feedback'] = 'Noen minutter etter at du er ferdig, får du en vurdering og skriftlig tilbakemelding på hvert kriterium i vurderingsskjemaet, inkludert kroppsspråk og kameratilstedeværelse når kameraet var på.';
+$string['soapbox:howto_frame'] = 'Sett kameraet i øyehøyde, omtrent halvannen armlengde unna, slik at hode, skuldre og hender er med i bildet. Bevegelser under bildekanten synes ikke og kan derfor ikke vurderes.';
+$string['soapbox:howto_hands'] = 'Gi deg selv plass til å bevege hendene, og snakk med normalt stemmeleie. Ta opp ett helt opptak: pauser, omstarter og en og annen snubling er normalt og trekker ikke ned.';
+$string['soapbox:howto_heading'] = 'Før du tar opp';
+$string['soapbox:howto_light'] = 'Vend deg mot et vindu eller en lampe, og hold sterkt lys bak deg på et minimum. Et vindu bak deg gjør deg til en silhuett.';
+$string['soapbox:not_assessed'] = 'Ikke vurdert';
+$string['soapbox:not_assessed_aria'] = 'Dette kriteriet ble ikke vurdert i dette forsøket og ble holdt utenfor vurderingen din';
+$string['soapbox:present_privacy'] = 'Opptaket ditt lastes opp til Saylors lagring for å bli transkribert og vurdert. Bare du og administratorene på nettstedet kan åpne det. Det slettes automatisk {$a} dager etter at du tok det opp, sammen med stillbildene som brukes til tilbakemelding om kroppsspråk. Transkripsjonen, vurderingene og tilbakemeldingen beholdes etter at videoen er borte, så last ned det du vil ta vare på.';
+$string['soapbox:scored_on'] = 'Samlet vurdering er gjennomsnittet av de {$a->assessed} kriteriene som ble vurdert, av {$a->total} i skjemaet ({$a->pct} %). Det som ikke kunne vurderes, ble holdt utenfor i stedet for å få null.';
+$string['soapbox:visual_not_assessed'] = 'Kroppsspråk og kameratilstedeværelse ble ikke vurdert i dette forsøket, fordi det ikke ble tatt opp video eller kamerabildet ikke kunne leses. Disse kriteriene ble holdt utenfor vurderingen i stedet for å trekke ned. Ta opp med kameraet på, med hode, skuldre og hender i bildet, for å få tilbakemelding på dem.';
+$string['soapbox:watch'] = 'Se';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Lagringsplasseringen for den opptatte videoen eller lyden, til den slettes ved slutten av oppbevaringsperioden.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Lagringsplasseringen for lysbildene som ble lastet opp med opptaket, til de slettes sammen med det.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Lagringsplasseringen for stillbildene som er hentet fra opptaket til tilbakemelding om kroppsspråk. Slettes sammen med opptaket.';

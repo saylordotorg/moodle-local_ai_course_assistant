@@ -54,6 +54,7 @@ class score_speech extends external_api {
             'slidecontext' => new external_value(PARAM_RAW, 'Slide-by-slide text + pacing context (slides mode)', VALUE_DEFAULT, ''),
             'slidecount' => new external_value(PARAM_INT, 'Number of slides (0 = no slides)', VALUE_DEFAULT, 0),
             'visionnote' => new external_value(PARAM_RAW, 'Optional slide visual-design note from the vision pass', VALUE_DEFAULT, ''),
+            'recordingid' => new external_value(PARAM_INT, 'Soapbox recording id whose stored frames supply body-language evidence (0 = none)', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -68,6 +69,7 @@ class score_speech extends external_api {
      * @param string $slidecontext
      * @param int $slidecount
      * @param string $visionnote
+     * @param int $recordingid
      * @return array
      */
     public static function execute(
@@ -80,13 +82,15 @@ class score_speech extends external_api {
         string $mode = 'informative',
         string $slidecontext = '',
         int $slidecount = 0,
-        string $visionnote = ''
+        string $visionnote = '',
+        int $recordingid = 0
     ): array {
         global $USER;
         $params = self::validate_parameters(self::execute_parameters(), [
             'courseid' => $courseid, 'transcript' => $transcript, 'name' => $name,
             'topic' => $topic, 'targetsec' => $targetsec, 'durationsec' => $durationsec, 'mode' => $mode,
             'slidecontext' => $slidecontext, 'slidecount' => $slidecount, 'visionnote' => $visionnote,
+            'recordingid' => $recordingid,
         ]);
         $courseid = (int) $params['courseid'];
         $context = \context_course::instance($courseid);
@@ -118,13 +122,36 @@ class score_speech extends external_api {
         // Resolve the per-course speech rubric, honouring the course's ESL level.
         // See rubric_manager::resolve_speech_criteria() for why a global rubric
         // must not silently outrank a course's configured level.
-        $resolved = rubric_manager::resolve_speech_criteria($courseid, $level);
+        // v7.5.1: body-language evidence, derived server side from a recording
+        // the caller must own. It is NOT accepted as a parameter: this is an
+        // ajax external function any learner may call, so a visual-evidence
+        // string on the wire would let a learner describe their own gestures
+        // flatteringly and self-award the visual criteria. With no instructor
+        // anywhere in these courses, nothing downstream would notice.
+        $visual = ['note' => '', 'couldhavevideo' => false];
+        if ((int) $params['recordingid'] > 0) {
+            $visual = \local_ai_course_assistant\soapbox_gesture_vision::observe(
+                (int) $params['recordingid'],
+                $courseid,
+                (int) $USER->id
+            );
+        }
+        $hasvisual = (trim($visual['note']) !== '');
+
+        // The visual criteria are appended only when there is evidence for them.
+        // When there is not, they are absent from the rubric text entirely, so
+        // the model is never asked about something it cannot see.
+        $resolved = rubric_manager::resolve_video_criteria($courseid, $level, $hasvisual);
         $criteriadefs = $resolved['criteria'];
-        $rubric = $resolved['rubricid'] > 0
-            ? rubric_manager::get_active_rubric($courseid, rubric_manager::TYPE_SPEECH)
-            : null;
+        $rubricid = (int) $resolved['rubricid'];
         $maxscore = 5;
         $rubriclines = [];
+        // Allowlist of the criteria actually written into the prompt. This, not
+        // the 'visual' flag, is what decides which criteria may reach the score:
+        // the flag lives in hand-editable rubric JSON and can simply be absent
+        // from a criterion an admin added, and a denylist of visual names would
+        // not match a criterion the model invented under a different wording.
+        $allowed = [];
         foreach ($criteriadefs as $c) {
             $cn = (string) ($c['name'] ?? '');
             $cd = (string) ($c['description'] ?? '');
@@ -133,6 +160,7 @@ class score_speech extends external_api {
                 $maxscore = $cm;
             }
             $rubriclines[] = "- {$cn}: {$cd} (0-{$cm})";
+            $allowed[self::normalise_name($cn)] = true;
         }
         $rubrictext = implode("\n", $rubriclines);
 
@@ -167,6 +195,25 @@ class score_speech extends external_api {
             $contextline .= ' This was a slide presentation, so also weigh how well the delivery uses the slides.';
         }
 
+        // v7.5.1: the learner is self-paced with nobody to ask, so generic
+        // advice is worse than useless -- there is no follow-up conversation in
+        // which "work on your posture" gets unpacked.
+        $noinstructorrule = "\n\nThe learner is self-paced and has no instructor to ask. For every criterion, "
+            . "name the specific thing you observed and roughly where in the talk it happened, then give one "
+            . "concrete action to do differently next time. Never give advice the learner cannot act on alone.";
+
+        // The visual evidence block exists only when there is evidence. When it
+        // is absent so are the visual rubric lines, so the model is never in a
+        // position to guess at body language from a transcript.
+        $visualblock = '';
+        if ($hasvisual) {
+            $visualblock = "\n\nVISUAL EVIDENCE (a description of still frames sampled from the recording, "
+                . "not continuous video):\n" . mb_substr($visual['note'], 0, 2000)
+                . "\n\nScore the visual criteria from this evidence ONLY. If the evidence does not let you "
+                . "judge a criterion, set its \"assessed\" field to false and its score to 0; never guess. "
+                . "Scoring 0 with \"assessed\" true means you could see the behaviour and it was absent.";
+        }
+
         $sysprompt = "You are a supportive public-speaking coach giving formative feedback on a learner's spoken "
             . "presentation. You are reading a speech-to-text transcript, so ignore transcription artefacts "
             . "(missing punctuation, homophone errors, '[inaudible]') and do not penalise them. {$contextline} "
@@ -174,8 +221,9 @@ class score_speech extends external_api {
             . "one or two sentences of concrete, encouraging feedback naming a specific strength and the single "
             . "highest-leverage improvement. Then give a short overall comment and three concrete next-time tips ordered "
             . "by impact. Be encouraging; this is practice. Respond with JSON only, in this shape:\n"
-            . '{"criteria":[{"name":"...","score":3,"feedback":"..."}], "overall":"...", "tips":["...","...","..."]}'
-            . "\n\nRUBRIC:\n{$rubrictext}{$slideblock}\n\nTRANSCRIPT:\n{$speech}";
+            . '{"criteria":[{"name":"...","score":3,"feedback":"...","assessed":true}], "overall":"...", "tips":["...","...","..."]}'
+            . $noinstructorrule
+            . "\n\nRUBRIC:\n{$rubrictext}{$slideblock}{$visualblock}\n\nTRANSCRIPT:\n{$speech}";
 
         try {
             $provider = base_provider::create_from_config($courseid);
@@ -194,8 +242,12 @@ class score_speech extends external_api {
                                         'name'     => ['type' => 'string'],
                                         'score'    => ['type' => 'integer'],
                                         'feedback' => ['type' => 'string'],
+                                        // Required, not optional: under OpenAI
+                                        // strict mode a key in properties but
+                                        // absent from required is rejected.
+                                        'assessed' => ['type' => 'boolean'],
                                     ],
-                                    'required' => ['name', 'score', 'feedback'],
+                                    'required' => ['name', 'score', 'feedback', 'assessed'],
                                     // OpenAI strict mode (the provider sets
                                     // strict => true) requires this on every
                                     // object node, or the request is rejected.
@@ -241,16 +293,30 @@ class score_speech extends external_api {
         }
 
         $criteria = [];
-        $sum = 0;
+        $defmax = [];
+        foreach ($criteriadefs as $d) {
+            $defmax[self::normalise_name((string) ($d['name'] ?? ''))] = (int) ($d['max_score'] ?? 5);
+        }
         foreach ($decoded['criteria'] as $c) {
-            $sc = (int) ($c['score'] ?? 0);
-            $sum += $sc;
+            $cname = (string) ($c['name'] ?? '');
+            $key = self::normalise_name($cname);
+            // Allowlist, not denylist: only criteria actually put in the prompt
+            // may reach the score. Drops a visual criterion the model invented
+            // when it was never shown one, and any other hallucination.
+            if (empty($allowed[$key])) {
+                continue;
+            }
             $criteria[] = [
-                'name'     => (string) ($c['name'] ?? ''),
-                'score'    => $sc,
+                'name'     => $cname,
+                'score'    => (int) ($c['score'] ?? 0),
                 'feedback' => (string) ($c['feedback'] ?? ''),
+                'max_score' => $defmax[$key] ?? 5,
+                // Absent defaults to true, so a provider that ignores the field
+                // behaves exactly as it did before v7.5.1.
+                'assessed' => !isset($c['assessed']) || (bool) $c['assessed'],
             ];
         }
+        $totals = rubric_manager::compute_overall($criteria);
         $overall = (string) ($decoded['overall'] ?? '');
         $tips = array_map('strval', (array) ($decoded['tips'] ?? []));
 
@@ -263,15 +329,33 @@ class score_speech extends external_api {
             $overall = trim($overall . "\n\n" . $label . ' ' . $visionnote);
         }
 
+        // v7.5.1: tell a learner why a section of their feedback is missing.
+        // Gated on couldhavevideo so it never appears on the audio-only practice
+        // page. With nobody to ask, silence where body-language feedback should
+        // be reads as a low score the learner cannot locate.
+        if (!empty($visual['couldhavevideo']) && !$hasvisual) {
+            $overall = trim($overall . "\n\n"
+                . get_string('soapbox:visual_not_assessed', 'local_ai_course_assistant'));
+        }
+
         // Persist to the learner's speech history. We store the scores, feedback,
         // duration, and a meta blob with the name/topic/target — never the audio
         // or the transcript text.
         $scoreid = 0;
         try {
-            $rubricid = $rubric ? (int) $rubric->id : 0;
             $meta = ['name' => $name, 'topic' => $topic, 'target' => $targetsec, 'mode' => $mode, 'tips' => $tips];
             if ($visionnote !== '') {
                 $meta['slide_design_note'] = $visionnote;
+            }
+            // v7.5.1: how much of the rubric was actually judged, so the page
+            // can tell the learner the honest denominator. No schema change,
+            // same trick v6.8.31 used for slide_design_note. Still no audio and
+            // no transcript in meta.
+            $meta['assessed_count'] = $totals['assessed'];
+            $meta['pct'] = $totals['pct'];
+            $meta['visual_assessed'] = $hasvisual;
+            if ($hasvisual) {
+                $meta['visual_observation'] = $visual['note'];
             }
             $scoreid = rubric_manager::save_score(
                 $rubricid,
@@ -279,7 +363,7 @@ class score_speech extends external_api {
                 $courseid,
                 rubric_manager::TYPE_SPEECH,
                 $criteria,
-                (int) round($sum / max(1, count($criteria))),
+                $totals['overall'],
                 $overall,
                 $durationsec,
                 $meta
@@ -332,6 +416,7 @@ class score_speech extends external_api {
             'overall'  => $overall,
             'tips'     => $tips,
             'scoreid'  => $scoreid,
+            'assessedcount' => $totals['assessed'],
         ];
     }
 
@@ -366,6 +451,21 @@ class score_speech extends external_api {
      * @param string $code
      * @return array
      */
+    /**
+     * Canonical form of a criterion name, for matching a model's echoed name
+     * against the rubric it was given.
+     *
+     * Public and pure so the matching rule is unit-testable without a provider:
+     * it decides what reaches a learner's score, so it should not only be
+     * exercised through a mocked HTTP call.
+     *
+     * @param string $n
+     * @return string
+     */
+    public static function normalise_name(string $n): string {
+        return (string) preg_replace('/\s+/', ' ', trim(\core_text::strtolower($n)));
+    }
+
     private static function empty_result(string $code): array {
         return [
             'success'  => false,
@@ -374,6 +474,11 @@ class score_speech extends external_api {
             'overall'  => '',
             'tips'     => [],
             'scoreid'  => 0,
+            // Present on every path, including this one. execute_returns()
+            // declares it required, and clean_returnvalue() runs on the AJAX
+            // path but not in the direct-call tests, so omitting it here would
+            // break production while the suite stayed green.
+            'assessedcount' => 0,
         ];
     }
 
@@ -389,11 +494,17 @@ class score_speech extends external_api {
                     'name'     => new external_value(PARAM_RAW, 'Criterion name'),
                     'score'    => new external_value(PARAM_INT, 'Score'),
                     'feedback' => new external_value(PARAM_RAW, 'Feedback text'),
+                    'assessed' => new external_value(
+                        PARAM_BOOL,
+                        'Whether this criterion was actually evaluated',
+                        VALUE_OPTIONAL
+                    ),
                 ])
             ),
             'overall'  => new external_value(PARAM_RAW, 'Overall comment'),
             'tips'     => new external_multiple_structure(new external_value(PARAM_RAW, 'Next-time tip')),
             'scoreid'  => new external_value(PARAM_INT, 'Saved history row id (0 if not saved)'),
+            'assessedcount' => new external_value(PARAM_INT, 'Number of criteria actually scored'),
         ]);
     }
 }

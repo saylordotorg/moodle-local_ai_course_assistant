@@ -2645,3 +2645,26 @@ $string['settings:supplemental_courses'] = 'Kompletterande kurser';
 $string['settings:supplemental_courses_desc'] = 'Kurs-ID:n vars innehåll [[tutorshort]] också får använda när den svarar, separerade med kommatecken. Använd för material som ligger i en annan kurs och gäller överallt, som en studentintroduktion eller ett resurscentrum: den som frågar om tentamenspolicyn får då svaret från den kursen i stället för inget.
 
 Kurserna måste redan vara indexerade för hämtning; inget extra bäddas in, så att lägga till en här verkar direkt och kostar ingenting. Dolda kurser ignoreras. Aktiviteter inne i en listad kurs indexeras dock som administratören som indexerade om den såg dem, så texten i en dold eller begränsad aktivitet kan citeras för en student även om ingen länk visas. Lista bara kurser vars hela innehåll passar målgruppen. Högst {$a} kurser. En kursinställning ersätter, där den finns, denna lista i stället för att läggas till.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Raderas den';
+$string['soapbox:download'] = 'Ladda ner';
+$string['soapbox:download_aria'] = 'Ladda ner den här inspelningen till din enhet';
+$string['soapbox:feedback_pending'] = 'Din återkoppling visas här när bedömningen är klar. Det tar oftast några minuter. Du behöver inte stanna kvar på sidan.';
+$string['soapbox:feedback_toggle'] = 'Visa min återkoppling';
+$string['soapbox:frames_not_video'] = 'Den här uppgiften är endast ljud, så det finns inga videobilder att ladda upp.';
+$string['soapbox:howto_eyes'] = 'Titta in i kameralinsen, inte på din egen bild på skärmen. På video är det blicken in i linsen som publiken uppfattar som ögonkontakt.';
+$string['soapbox:howto_feedback'] = 'Några minuter efter att du är klar får du ett omdöme och skriftlig återkoppling på varje kriterium i bedömningsmatrisen, inklusive kroppsspråk och kameranärvaro när kameran var på.';
+$string['soapbox:howto_frame'] = 'Ställ kameran i ögonhöjd, ungefär en och en halv armlängd bort, så att huvud, axlar och händer syns i bild. Gester under bildkanten syns inte och kan därför inte bedömas.';
+$string['soapbox:howto_hands'] = 'Ge dig själv utrymme att röra händerna och tala med din vanliga röststyrka. Spela in ett helt tagande: pauser, omtag och en och annan snubbling är normalt och sänker inte omdömet.';
+$string['soapbox:howto_heading'] = 'Innan du spelar in';
+$string['soapbox:howto_light'] = 'Vänd dig mot ett fönster eller en lampa och håll starkt ljus bakom dig till ett minimum. Ett fönster bakom dig gör dig till en siluett.';
+$string['soapbox:not_assessed'] = 'Ej bedömt';
+$string['soapbox:not_assessed_aria'] = 'Det här kriteriet bedömdes inte i det här försöket och lämnades utanför ditt omdöme';
+$string['soapbox:present_privacy'] = 'Din inspelning laddas upp till Saylors lagring för att transkriberas och bedömas. Bara du och webbplatsens administratörer kan öppna den. Den raderas automatiskt {$a} dagar efter att du spelat in, tillsammans med stillbilderna som används för återkoppling på kroppsspråk. Transkription, omdömen och återkoppling sparas efter att videon är borta, så ladda ner det du vill behålla.';
+$string['soapbox:scored_on'] = 'Ditt sammanlagda omdöme är medelvärdet av de {$a->assessed} kriterier som bedömdes, av {$a->total} i matrisen ({$a->pct} %). Det som inte kunde bedömas lämnades utanför i stället för att ges noll.';
+$string['soapbox:visual_not_assessed'] = 'Kroppsspråk och kameranärvaro bedömdes inte i det här försöket, eftersom ingen video spelades in eller kamerabilden inte gick att tolka. De kriterierna lämnades utanför ditt omdöme i stället för att sänka det. Spela in med kameran på, med huvud, axlar och händer i bild, för att få återkoppling på dem.';
+$string['soapbox:watch'] = 'Titta';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Lagringsplatsen för den inspelade videon eller ljudet, tills den raderas vid bevarandetidens slut.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Lagringsplatsen för bildspelet som laddades upp med inspelningen, tills det raderas tillsammans med den.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Lagringsplatsen för stillbilderna som tagits ur inspelningen för återkoppling på kroppsspråk. Raderas tillsammans med inspelningen.';

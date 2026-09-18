@@ -2646,3 +2646,26 @@ $string['settings:supplemental_courses'] = 'Täydentävät kurssit';
 $string['settings:supplemental_courses_desc'] = 'Kurssitunnukset, joiden sisältöä [[tutorshort]] saa käyttää myös vastatessaan, pilkuilla erotettuina. Käytä tätä aineistoon, joka sijaitsee toisella kurssilla ja pätee kaikkialla, kuten opiskelijoiden perehdytys tai resurssikeskus: tenttikäytännöstä kysyvä saa tällöin vastauksen siltä kurssilta sen sijaan, ettei saisi mitään.
 
 Kurssien on oltava jo indeksoituja hakua varten; mitään ylimääräistä ei upoteta, joten lisääminen tähän vaikuttaa heti eikä maksa mitään. Piilotetut kurssit ohitetaan. Luetellun kurssin sisällä olevat aktiviteetit indeksoidaan kuitenkin sellaisina kuin ne näki se ylläpitäjä, joka kurssin indeksoi uudelleen, joten piilotetun tai rajoitetun aktiviteetin teksti voidaan lainata opiskelijalle, vaikka siihen ei näytetä linkkiä. Luettele vain kursseja, joiden koko sisältö sopii yleisölle. Enintään {$a} kurssia. Kurssikohtainen asetus korvaa tämän luettelon sen sijaan, että lisäisi siihen.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Poistetaan';
+$string['soapbox:download'] = 'Lataa';
+$string['soapbox:download_aria'] = 'Lataa tämä tallenne laitteellesi';
+$string['soapbox:feedback_pending'] = 'Palautteesi ilmestyy tähän, kun arviointi on valmis. Se kestää yleensä muutaman minuutin. Sinun ei tarvitse jäädä tälle sivulle.';
+$string['soapbox:feedback_toggle'] = 'Näytä palautteeni';
+$string['soapbox:frames_not_video'] = 'Tämä tehtävä on vain ääni, joten videokuvia ei ole ladattavaksi.';
+$string['soapbox:howto_eyes'] = 'Katso kameran linssiin, älä omaan kuvaasi ruudulla. Videolla juuri linssiin katsominen välittyy yleisölle katsekontaktina.';
+$string['soapbox:howto_feedback'] = 'Muutama minuutti lopettamisen jälkeen saat arvosanan ja kirjallisen palautteen jokaisesta arviointikriteeristä, mukaan lukien kehonkielesi ja kameraläsnäolosi, jos kamera oli päällä.';
+$string['soapbox:howto_frame'] = 'Aseta kamera silmien korkeudelle, noin puolentoista käsivarren päähän, niin että pää, hartiat ja kädet näkyvät kuvassa. Kuvarajauksen alapuolella tehdyt eleet eivät näy, joten niitä ei voi arvioida.';
+$string['soapbox:howto_hands'] = 'Jätä itsellesi tilaa liikuttaa käsiä ja puhu normaalilla äänenvoimakkuudella. Nauhoita yksi kokonainen otto: tauot, uudelleenaloitukset ja pienet kompastelut ovat normaaleja eivätkä laske arvosanaa.';
+$string['soapbox:howto_heading'] = 'Ennen kuin nauhoitat';
+$string['soapbox:howto_light'] = 'Asetu ikkunaa tai lamppua kohti ja vältä kirkasta valoa takanasi. Ikkuna selkäsi takana muuttaa sinut siluetiksi.';
+$string['soapbox:not_assessed'] = 'Ei arvioitu';
+$string['soapbox:not_assessed_aria'] = 'Tätä kriteeriä ei arvioitu tässä yrityksessä, ja se jätettiin arvosanasi ulkopuolelle';
+$string['soapbox:present_privacy'] = 'Tallenteesi ladataan Saylorin tallennustilaan litterointia ja arviointia varten. Vain sinä ja sivuston ylläpitäjät voivat avata sen. Se poistetaan automaattisesti {$a} päivän kuluttua nauhoituksesta yhdessä kehonkielipalautteeseen käytettyjen pysäytyskuvien kanssa. Litterointi, arvosanat ja palaute säilyvät videon poistumisen jälkeen, joten lataa se mitä haluat säilyttää.';
+$string['soapbox:scored_on'] = 'Kokonaisarvosanasi on niiden {$a->assessed} kriteerin keskiarvo, jotka arvioitiin, kaikkiaan {$a->total} kriteeristä ({$a->pct} %). Se mitä ei voitu arvioida jätettiin pois sen sijaan, että siitä olisi annettu nolla.';
+$string['soapbox:visual_not_assessed'] = 'Kehonkieltä ja kameraläsnäoloa ei arvioitu tässä yrityksessä, koska videota ei nauhoitettu tai kamerakuvaa ei voitu lukea. Nämä kriteerit jätettiin arvosanan ulkopuolelle sen sijaan, että ne olisivat laskeneet sitä. Nauhoita kamera päällä, pää, hartiat ja kädet kuvassa, saadaksesi niistä palautetta.';
+$string['soapbox:watch'] = 'Katso';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Nauhoitetun videon tai äänen tallennuspaikka, kunnes se poistetaan säilytysajan päätyttyä.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Tallenteen mukana ladattujen diojen tallennuspaikka, kunnes ne poistetaan tallenteen mukana.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Tallenteesta otettujen pysäytyskuvien tallennuspaikka kehonkielipalautetta varten. Poistetaan tallenteen mukana.';

@@ -2660,3 +2660,26 @@ $string['settings:supplemental_courses'] = 'Ụsọrọ ihe ọmụmụ mgbakwun
 $string['settings:supplemental_courses_desc'] = 'ID nke usoro ihe ọmụmụ ndị [[tutorshort]] nwere ike iji ọdịnaya ha mgbe ọ na-aza, kewara ha site na rikoma. Jiri ya maka ihe dị n\'usoro ihe ọmụmụ ọzọ mana metụtara ebe niile, dị ka usoro ntọala maka ụmụ akwụkwọ ma ọ bụ ebe akụrụngwa: mgbe ahụ onye na-ajụ maka iwu ule na-enweta azịza site na usoro ihe ọmụmụ ahụ kama ọ ghara inweta ihe ọ bụla.
 
 Usoro ihe ọmụmụ ahụ ga-abụrịrị ndị edepụtalarị maka nweta; ọ dịghị ihe ọzọ a na-etinye, ya mere ịgbakwunye otu ebe a na-arụ ọrụ ozugbo ma ọ naghị efu ihe ọ bụla. A na-eleghara usoro ihe ọmụmụ zoro ezo anya. Mana ọrụ dị n\'ime usoro ihe ọmụmụ edepụtara ka a na-edepụta dịka onye nchịkwa depụtaghachiri ya hụrụ ha, ya mere enwere ike ihota ederede ọrụ zoro ezo ma ọ bụ nke a machibidoro maka nwa akwụkwọ ọ bụ ezie na egosighị njikọ ọ bụla. Depụta naanị usoro ihe ọmụmụ ndị ọdịnaya ha niile dabara maka ndị na-agụ ya. Kacha {$a} usoro ihe ọmụmụ. Ntọala n\'ọkwa usoro ihe ọmụmụ, ebe ọ dị, na-anọchi ndepụta a kama ịgbakwunye na ya.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'A ga ehichapụ na';
+$string['soapbox:download'] = 'Budata';
+$string['soapbox:download_aria'] = 'Budata ndekọ a na ngwaọrụ gị';
+$string['soapbox:feedback_pending'] = 'Nzaghachi gị ga-apụta ebe a ozugbo nyocha gbachara. Ọ na-ewerekarị nkeji ole na ole. Ị kwesịghị ịnọ na peeji a.';
+$string['soapbox:feedback_toggle'] = 'Gosi nzaghachi m';
+$string['soapbox:frames_not_video'] = 'Ọrụ a bụ naanị ụda, yabụ enweghị foto vidiyo ị ga-ebulite.';
+$string['soapbox:howto_eyes'] = 'Lee anya na lens igwefoto, ọ bụghị onyonyo gị na ihuenyo. Na vidiyo, ile anya na lens bụ ihe ndị na-ekiri na-ahụ dị ka ikiri anya n\'anya.';
+$string['soapbox:howto_feedback'] = 'Nkeji ole na ole mgbe ị gwụchara, ị ga-enweta akara na nzaghachi edere maka nkọwa nyocha ọ bụla, gụnyere asụsụ ahụ gị na otú i si apụta n\'ihu igwefoto mgbe igwefoto na-agba.';
+$string['soapbox:howto_frame'] = 'Tinye igwefoto n\'ọkwa anya, ihe dịka otu ogologo aka na ọkara, ka isi, ubu na aka gị niile bata n\'ime foto. Mmegharị aka e mere n\'okpuru ọnụ ọnụ foto anaghị apụta, yabụ enweghị ike ịnyocha ha.';
+$string['soapbox:howto_hands'] = 'Hapụrụ onwe gị ohere ịkwaga aka gị, kwuo okwu n\'olu gị nkịtị. Dekọọ otu ndekọ zuru ezu: nkwụsị, ịmalitegharị na ịsụ ngọngọ mgbe ụfọdụ bụ ihe nkịtị, ọ naghịkwa ebelata akara.';
+$string['soapbox:howto_heading'] = 'Tupu ị dekọọ';
+$string['soapbox:howto_light'] = 'Chee ihu na windo maọbụ oriọna, belata ìhè dị ike n\'azụ gị. Windo dị n\'azụ gị na-eme ka ị bụrụ naanị onyinyo.';
+$string['soapbox:not_assessed'] = 'Anyochabeghị';
+$string['soapbox:not_assessed_aria'] = 'Anyochabeghị nkọwa a na mgbalị a, e wepụrụ ya n\'akara gị';
+$string['soapbox:present_privacy'] = 'A na-ebugo ndekọ gị na ebe nchekwa Saylor ka e dee ya ma nyochaa ya. Naanị gị na ndị nchịkwa saịtị nwere ike imepe ya. A na-ehichapụ ya n\'onwe ya ụbọchị {$a} mgbe i dekọchara, tinyere foto ndị a na-ejighị mee ihe maka nzaghachi asụsụ ahụ. Edemede gị, akara gị na nzaghachi gị na-anọgide mgbe vidiyo gafechara, yabụ budata ihe ọ bụla ị chọrọ idobe.';
+$string['soapbox:scored_on'] = 'Akara gị zuru ezu bụ nkezi nke nkọwa {$a->assessed} a nyochara, site na {$a->total} dị na nyocha ({$a->pct}%). Ihe enweghị ike ịnyocha ka e wepụrụ kama inye ya efu.';
+$string['soapbox:visual_not_assessed'] = 'Anyochabeghị asụsụ ahụ na ịpụta n\'ihu igwefoto na mgbalị a, n\'ihi na edekọtaghị vidiyo maọbụ enweghị ike ịgụ onyonyo igwefoto. E wepụrụ nkọwa ndị ahụ n\'akara gị kama ibelata ya. Dekọọ ka igwefoto na-agba, isi, ubu na aka gị nọ n\'ime foto, ka ị nweta nzaghachi banyere ha.';
+$string['soapbox:watch'] = 'Lelee';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Ebe nchekwa nke vidiyo maọbụ ụda edekọtara, ruo mgbe a ga-ehichapụ ya na njedebe oge nchekwa.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Ebe nchekwa nke slide ndị e bulitere tinyere ndekọ, ruo mgbe a ga-ehichapụ ha ya na ya.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Ebe nchekwa nke foto ndị e wepụtara na ndekọ maka nzaghachi asụsụ ahụ. A na-ehichapụ ha ya na ndekọ.';

@@ -252,6 +252,12 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
                 'userid' => 'privacy:metadata:sbx_rec:userid',
                 'transcript' => 'privacy:metadata:sbx_rec:transcript',
                 'duration_seconds' => 'privacy:metadata:sbx_rec:duration_seconds',
+                // v7.5.1: the object keys are declared because they locate
+                // personal data (a recording of the learner, and stills of
+                // their face) even though the bytes live outside Moodle.
+                'storage_key' => 'privacy:metadata:sbx_rec:storage_key',
+                'deck_key' => 'privacy:metadata:sbx_rec:deck_key',
+                'frames_key' => 'privacy:metadata:sbx_rec:frames_key',
                 'timecreated' => 'privacy:metadata:sbx_rec:timecreated',
             ],
             'privacy:metadata:sbx_rec'

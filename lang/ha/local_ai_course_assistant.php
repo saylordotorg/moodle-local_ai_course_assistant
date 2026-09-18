@@ -2673,3 +2673,26 @@ $string['settings:supplemental_courses'] = 'Ƙarin kwasa-kwasai';
 $string['settings:supplemental_courses_desc'] = 'ID na kwasa-kwasan da [[tutorshort]] zai iya amfani da abubuwan da ke cikinsu yayin amsawa, a raba da waƙafi. Yi amfani da shi don kayan da ke wani kwas amma sun shafi ko\'ina, kamar kwas ɗin gabatarwa ga ɗalibai ko cibiyar albarkatu: sannan wanda ya tambaya game da ka\'idar jarrabawa yana samun amsa daga wannan kwas maimakon kome.
 
 Dole ne kwasa-kwasan su riga sun kasance cikin fihirisa domin dawowa; ba a ƙara saka wani abu ba, don haka ƙara ɗaya a nan yana aiki nan take kuma ba ya kashe kuɗi. Ana watsi da kwasa-kwasan ɓoyayyu. Sai dai ayyukan da ke cikin kwas ɗin da aka lissafa ana sanya su a fihirisa kamar yadda mai gudanarwa da ya sake yin fihirisar ya gan su, don haka ana iya kawo rubutun aiki ɓoyayye ko ƙuntatacce ga ɗalibi ko da ba a nuna masa wata haɗiya ba. Ka lissafa kwasa-kwasan da dukkan abin da ke cikinsu ya dace da masu karatu kawai. Iyaka {$a} kwasa-kwasai. Saitin matakin kwas, inda yake, yana maye gurbin wannan jeri maimakon ƙarawa a kansa.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Za a share a';
+$string['soapbox:download'] = 'Sauke';
+$string['soapbox:download_aria'] = 'Sauke wannan rikodin zuwa na\'urarka';
+$string['soapbox:feedback_pending'] = 'Ra\'ayin ku zai bayyana a nan bayan an gama kimantawa. Yawanci yana ɗaukar mintuna kaɗan. Ba dole ba ne ku zauna a wannan shafin.';
+$string['soapbox:feedback_toggle'] = 'Nuna ra\'ayina';
+$string['soapbox:frames_not_video'] = 'Wannan aikin sauti ne kawai, don haka babu firam ɗin bidiyo da za a ɗora.';
+$string['soapbox:howto_eyes'] = 'Ka duba ruwan tabarau na kyamara, ba hoton kanka a allo ba. A bidiyo, duban ruwan tabarau shi ne abin da masu kallo ke ɗauka a matsayin haɗuwar ido.';
+$string['soapbox:howto_feedback'] = 'Mintuna kaɗan bayan ka gama za ka samu maki da ra\'ayi a rubuce kan kowane ma\'auni, gami da yaren jikinka da yadda ka bayyana gaban kyamara idan kyamarar tana kunne.';
+$string['soapbox:howto_frame'] = 'Ka sanya kyamara daidai da matakin ido, kusan tsawon hannu ɗaya da rabi, domin kai, kafaɗu da hannuwa duk su shiga cikin firam. Alamun hannu da aka yi ƙasa da gefen firam ba sa bayyana, don haka ba za a iya kimanta su ba.';
+$string['soapbox:howto_hands'] = 'Ka bar wa kanka wuri don motsa hannuwa, ka yi magana da muryarka ta yau da kullum. Ka yi rikodi ɗaya cikakke: tsayawa, sake farawa da tuntuɓe lokaci-lokaci abu ne na al\'ada kuma ba ya rage maki.';
+$string['soapbox:howto_heading'] = 'Kafin ka yi rikodi';
+$string['soapbox:howto_light'] = 'Ka fuskanci taga ko fitila, ka rage haske mai ƙarfi da ke bayanka. Taga a bayanka tana mai da kai inuwa kawai.';
+$string['soapbox:not_assessed'] = 'Ba a kimanta ba';
+$string['soapbox:not_assessed_aria'] = 'Ba a kimanta wannan ma\'auni a wannan yunƙurin ba kuma an bar shi waje da makinka';
+$string['soapbox:present_privacy'] = 'Ana ɗora rikodin ka zuwa ma\'ajiyar Saylor domin a rubuta shi a kuma kimanta shi. Kai kaɗai da masu kula da shafin ne za su iya buɗe shi. Ana share shi ta atomatik kwanaki {$a} bayan ka yi rikodin, tare da hotuna marasa motsi da aka yi amfani da su don ra\'ayin yaren jiki. Rubutun ka, makin ka da ra\'ayin ka suna nan bayan bidiyon ya tafi, don haka ka sauke duk abin da kake son ajiyewa.';
+$string['soapbox:scored_on'] = 'Jimillar makin ka shi ne matsakaicin ma\'auni {$a->assessed} da aka kimanta, daga cikin {$a->total} a cikin jadawalin ({$a->pct}%). Abin da ba a iya kimantawa an bar shi waje maimakon a ba shi sifili.';
+$string['soapbox:visual_not_assessed'] = 'Ba a kimanta yaren jiki da bayyanar gaban kyamara a wannan yunƙurin ba, saboda ba a yi rikodin bidiyo ba ko kuma ba a iya karanta hoton kyamara ba. An bar waɗannan ma\'auni waje da makinka maimakon a rage shi. Ka yi rikodi da kyamara a kunne, kai, kafaɗu da hannuwa cikin firam, domin samun ra\'ayi a kansu.';
+$string['soapbox:watch'] = 'Kalla';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Wurin ajiyar bidiyo ko sautin da aka yi rikodinsa, har sai an share shi a ƙarshen lokacin ajiya.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Wurin ajiyar nunin da aka ɗora tare da rikodin, har sai an share shi tare da shi.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Wurin ajiyar hotuna marasa motsi da aka ɗauko daga rikodin don ra\'ayin yaren jiki. Ana share su tare da rikodin.';

@@ -2686,3 +2686,26 @@ $string['settings:supplemental_courses'] = 'Corsi supplementari';
 $string['settings:supplemental_courses_desc'] = 'ID dei corsi il cui contenuto [[tutorshort]] può usare anche nel rispondere, separati da virgole. Da usare per materiale che vive in un altro corso e vale ovunque, come un orientamento per studenti o un centro risorse: chi chiede della politica d\'esame ottiene allora la risposta da quel corso invece di nulla.
 
 I corsi devono essere già indicizzati per il recupero; non viene incorporato nulla di aggiuntivo, quindi aggiungerne uno qui è immediato e non costa nulla. I corsi nascosti vengono ignorati. Le attività dentro un corso elencato, però, sono indicizzate come le vedeva l\'amministratore che lo ha reindicizzato, quindi il testo di un\'attività nascosta o limitata può essere citato a uno studente anche se non viene mostrato alcun collegamento. Elenca solo corsi il cui contenuto è interamente adatto al pubblico. Massimo {$a} corsi. Un\'impostazione per corso, dove presente, sostituisce questo elenco invece di aggiungersi.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Eliminato il';
+$string['soapbox:download'] = 'Scarica';
+$string['soapbox:download_aria'] = 'Scarica questa registrazione sul tuo dispositivo';
+$string['soapbox:feedback_pending'] = 'Il tuo riscontro comparirà qui al termine della valutazione. Di solito servono pochi minuti. Non è necessario restare su questa pagina.';
+$string['soapbox:feedback_toggle'] = 'Mostra il mio riscontro';
+$string['soapbox:frames_not_video'] = 'Questo compito è solo audio, quindi non ci sono fotogrammi video da caricare.';
+$string['soapbox:howto_eyes'] = 'Guarda l\'obiettivo della fotocamera, non la tua immagine sullo schermo. In video, guardare l\'obiettivo è ciò che il pubblico percepisce come contatto visivo.';
+$string['soapbox:howto_feedback'] = 'Pochi minuti dopo la fine riceverai un punteggio e un riscontro scritto su ogni criterio della griglia, compresi il linguaggio del corpo e la presenza davanti alla fotocamera quando era accesa.';
+$string['soapbox:howto_frame'] = 'Metti la fotocamera all\'altezza degli occhi, a circa un braccio e mezzo di distanza, così che testa, spalle e mani siano inquadrate. I gesti fatti sotto il bordo dell\'inquadratura non si vedono e quindi non possono essere valutati.';
+$string['soapbox:howto_hands'] = 'Lasciati spazio per muovere le mani e parla al tuo volume abituale. Registra una ripresa intera: pause, ripartenze e qualche inciampo sono normali e non penalizzano.';
+$string['soapbox:howto_heading'] = 'Prima di registrare';
+$string['soapbox:howto_light'] = 'Mettiti di fronte a una finestra o a una lampada e riduci al minimo la luce forte alle tue spalle. Una finestra dietro di te ti trasforma in una sagoma.';
+$string['soapbox:not_assessed'] = 'Non valutato';
+$string['soapbox:not_assessed_aria'] = 'Questo criterio non è stato valutato in questo tentativo ed è rimasto fuori dal punteggio';
+$string['soapbox:present_privacy'] = 'La tua registrazione viene caricata nello spazio di archiviazione di Saylor per essere trascritta e valutata. Solo tu e gli amministratori del sito potete aprirla. Viene eliminata automaticamente {$a} giorni dopo la registrazione, insieme ai fotogrammi usati per il riscontro sul linguaggio del corpo. Trascrizione, punteggi e riscontro restano anche dopo che il video è sparito, quindi scarica ciò che vuoi conservare.';
+$string['soapbox:scored_on'] = 'Il tuo punteggio complessivo è la media dei {$a->assessed} criteri effettivamente valutati, sui {$a->total} della griglia ({$a->pct}%). Ciò che non è stato possibile valutare è rimasto fuori invece di essere valutato zero.';
+$string['soapbox:visual_not_assessed'] = 'Il linguaggio del corpo e la presenza davanti alla fotocamera non sono stati valutati in questo tentativo, perché non è stato registrato alcun video o l\'inquadratura non era leggibile. Questi criteri sono rimasti fuori dal punteggio invece di penalizzarti. Registra con la fotocamera accesa, con testa, spalle e mani inquadrate, per ricevere un riscontro su questi aspetti.';
+$string['soapbox:watch'] = 'Guarda';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'La posizione di archiviazione del video o dell\'audio registrato, fino alla sua eliminazione al termine del periodo di conservazione.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'La posizione di archiviazione delle diapositive caricate con la registrazione, fino alla loro eliminazione insieme a essa.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'La posizione di archiviazione dei fotogrammi estratti dalla registrazione per il riscontro sul linguaggio del corpo. Eliminati insieme alla registrazione.';

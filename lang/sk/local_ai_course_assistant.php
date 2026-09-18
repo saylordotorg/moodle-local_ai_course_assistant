@@ -2645,3 +2645,26 @@ $string['settings:supplemental_courses'] = 'Doplnkové kurzy';
 $string['settings:supplemental_courses_desc'] = 'ID kurzov, ktorých obsah môže [[tutorshort]] pri odpovedaní tiež použiť, oddelené čiarkami. Použite pre materiál, ktorý je v inom kurze a platí všade, napríklad úvodný kurz pre študentov alebo informačné centrum: kto sa pýta na pravidlá skúšok, potom dostane odpoveď z toho kurzu namiesto žiadnej.
 
 Kurzy už musia byť zaindexované na vyhľadávanie; nič ďalšie sa nevkladá, takže pridanie je okamžité a nič nestojí. Skryté kurzy sa ignorujú. Činnosti vnútri uvedeného kurzu sa však indexujú tak, ako ich videl správca, ktorý kurz preindexoval, takže text skrytej alebo obmedzenej činnosti možno študentovi citovať, aj keď sa naň nezobrazí žiadny odkaz. Uvádzajte len kurzy, ktorých celý obsah je pre publikum vhodný. Najviac {$a} kurzov. Nastavenie na úrovni kurzu, ak existuje, tento zoznam nahrádza, nie dopĺňa.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Zmazané dňa';
+$string['soapbox:download'] = 'Stiahnuť';
+$string['soapbox:download_aria'] = 'Stiahnuť túto nahrávku do zariadenia';
+$string['soapbox:feedback_pending'] = 'Spätná väzba sa zobrazí tu, keď sa hodnotenie skončí. Zvyčajne to trvá niekoľko minút. Nemusíte zostávať na tejto stránke.';
+$string['soapbox:feedback_toggle'] = 'Zobraziť moju spätnú väzbu';
+$string['soapbox:frames_not_video'] = 'Táto úloha je iba zvuková, takže nie sú žiadne snímky videa na nahranie.';
+$string['soapbox:howto_eyes'] = 'Pozerajte sa do objektívu kamery, nie na svoj obraz na obrazovke. Vo videu sa práve pohľad do objektívu číta ako očný kontakt.';
+$string['soapbox:howto_feedback'] = 'Niekoľko minút po skončení dostanete hodnotenie a písomnú spätnú väzbu ku každému kritériu, vrátane reči tela a pôsobenia pred kamerou, ak bola kamera zapnutá.';
+$string['soapbox:howto_frame'] = 'Umiestnite kameru do výšky očí, asi jeden a pol dĺžky ruky od seba, aby boli v zábere hlava, ramená aj ruky. Gestá pod okrajom záberu nie sú vidieť, a preto sa nedajú hodnotiť.';
+$string['soapbox:howto_hands'] = 'Nechajte si priestor na pohyb rúk a hovorte svojou bežnou hlasitosťou. Nahrajte jeden celý pokus: pauzy, nové začiatky aj občasné zaváhanie sú normálne a neznižujú hodnotenie.';
+$string['soapbox:howto_heading'] = 'Skôr než začnete nahrávať';
+$string['soapbox:howto_light'] = 'Postavte sa čelom k oknu alebo lampe a obmedzte silné svetlo za sebou. Okno za chrbtom z vás urobí siluetu.';
+$string['soapbox:not_assessed'] = 'Nehodnotené';
+$string['soapbox:not_assessed_aria'] = 'Toto kritérium nebolo v tomto pokuse hodnotené a zostalo mimo vášho hodnotenia';
+$string['soapbox:present_privacy'] = 'Vaša nahrávka sa nahráva do úložiska Saylor, aby mohla byť prepísaná a ohodnotená. Otvoriť ju môžete len vy a správcovia stránky. Automaticky sa zmaže {$a} dní po nahraní, spolu so snímkami použitými na spätnú väzbu k reči tela. Prepis, hodnotenia a spätná väzba zostávajú aj po zmiznutí videa, takže si stiahnite, čo si chcete nechať.';
+$string['soapbox:scored_on'] = 'Vaše celkové hodnotenie je priemer z {$a->assessed} kritérií, ktoré boli hodnotené, z celkových {$a->total} ({$a->pct} %). Čo nebolo možné posúdiť, zostalo bokom, namiesto toho aby dostalo nulu.';
+$string['soapbox:visual_not_assessed'] = 'Reč tela a pôsobenie pred kamerou neboli v tomto pokuse hodnotené, pretože video nebolo nahraté alebo sa obraz z kamery nedal prečítať. Tieto kritériá zostali mimo hodnotenia, namiesto toho aby ho znížili. Nahrávajte so zapnutou kamerou, s hlavou, ramenami a rukami v zábere, aby ste k nim dostali spätnú väzbu.';
+$string['soapbox:watch'] = 'Prehrať';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Umiestnenie nahraného videa alebo zvuku v úložisku, kým sa na konci doby uchovávania nezmaže.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Umiestnenie prezentácie nahranej spolu s nahrávkou v úložisku, kým sa nezmaže spolu s ňou.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Umiestnenie snímok získaných z nahrávky na spätnú väzbu k reči tela v úložisku. Mažú sa spolu s nahrávkou.';
