@@ -385,6 +385,20 @@ class score_speech extends external_api {
                 }
             }
             foreach ($criteria as $scored) {
+                // The same rule as rubric_manager::compute_overall(), written
+                // the same way on purpose so the two cannot drift. A criterion
+                // the model could not judge is out of the learner's score, in
+                // both the numerator and the denominator; it must not become a
+                // permanent not-met mastery attempt either. Before this guard,
+                // one array had two consumers applying opposite rules: the
+                // learner saw "4 of 5 assessed" while an objective quietly took
+                // a score=0.0 attempt for the fifth, which compute_mastery()
+                // then counted as weight in the denominator and nothing in the
+                // numerator. Outcome attempts are staff-visible only, so the
+                // learner could neither see it nor appeal it.
+                if (isset($scored['assessed']) && $scored['assessed'] === false) {
+                    continue;
+                }
                 $def = $defbyname[$scored['name']] ?? null;
                 $oid = (int) ($def['objectiveid'] ?? 0);
                 if (!$def || $oid <= 0) {
