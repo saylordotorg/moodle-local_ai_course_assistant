@@ -915,6 +915,31 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             foreach ($userids as $uid) {
                 self::purge_soapbox_recordings((int) $uid, (int) $context->instanceid);
             }
+            // Children before the parent. sbx_topic has no courseid: assignid is
+            // its only link to a course, so deleting the assignment first leaves
+            // the topic rows pointing at nothing and unreachable forever.
+            // get_topics() is keyed on assignid, and observer::course_deleted()
+            // resolves topics by selecting sbx_assign WHERE courseid, which by
+            // then returns nothing and skips straight past them.
+            //
+            // Both existing deleters already do this in this order:
+            // soapbox_assignment_manager::delete_assignment() and
+            // observer::CHILD_TABLES, whose comment says why -- "children first:
+            // their parent ids have to still be resolvable".
+            $assignids = $DB->get_fieldset_select(
+                'local_ai_course_assistant_sbx_assign',
+                'id',
+                'courseid = :courseid',
+                ['courseid' => $context->instanceid]
+            );
+            if (!empty($assignids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal($assignids, SQL_PARAMS_NAMED, 'aid');
+                $DB->delete_records_select(
+                    'local_ai_course_assistant_sbx_topic',
+                    "assignid {$insql}",
+                    $inparams
+                );
+            }
             $DB->delete_records('local_ai_course_assistant_sbx_assign', ['courseid' => $context->instanceid]);
         } catch (\Throwable $e) {
             // Tables absent on older installs, consistent with the guard in

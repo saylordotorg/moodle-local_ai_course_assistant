@@ -169,6 +169,12 @@ final class provider_soapbox_test extends \advanced_testcase {
             'timecreated' => time(),
             'timemodified' => time(),
         ]);
+        $topicid = (int) $DB->insert_record('local_ai_course_assistant_sbx_topic', (object) [
+            'assignid' => $assignid,
+            'title' => 'A topic the teacher wrote',
+            'instructionsformat' => 1,
+            'sortorder' => 0,
+        ]);
         $DB->insert_record('local_ai_course_assistant_sbx_rec', (object) [
             'assignid' => $assignid,
             'userid' => $user->id,
@@ -195,6 +201,14 @@ final class provider_soapbox_test extends \advanced_testcase {
             0,
             $DB->count_records('local_ai_course_assistant_sbx_assign', ['courseid' => $course->id]),
             'the assignment rows go with them, or the next purge has nothing to walk'
+        );
+        $this->assertSame(
+            0,
+            $DB->count_records('local_ai_course_assistant_sbx_topic', ['id' => $topicid]),
+            'Topics must go BEFORE their assignment. sbx_topic has no courseid, so assignid is its '
+                . 'only route back to a course: delete the assignment first and the topic rows are '
+                . 'orphaned permanently, invisible to get_topics() and skipped by the course-deleted '
+                . 'observer, which resolves them through the assignment that no longer exists.'
         );
     }
 }
