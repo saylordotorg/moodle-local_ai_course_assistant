@@ -2268,6 +2268,7 @@ $string['rubric_admin:title_course'] = 'Practice scoring rubric editor: {$a}';
 $string['rubric_admin:title_global'] = 'Practice scoring rubric editor: global default';
 $string['rubric_admin:err_invalid_criteria'] = 'Criteria data is invalid or empty.';
 $string['rubric_admin:err_no_criteria'] = 'No valid criteria after cleaning.';
+$string['rubric_admin:err_duplicate_names'] = 'Two criteria are named "{$a}" once case and spacing are ignored. Scoring matches criteria by that normalised name, so one row would silently shadow the other. Rename one of them.';
 $string['rubric_admin:saved_updated'] = 'Rubric updated.';
 $string['rubric_admin:saved_created'] = 'Rubric created.';
 $string['rubric_admin:reset_course_done'] = 'Course rubric removed. The global default will be used.';
