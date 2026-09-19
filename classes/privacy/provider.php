@@ -263,6 +263,47 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'privacy:metadata:sbx_rec'
         );
 
+        // v7.5.2: the v7.4.0 model-registry tables. Each carries one column that
+        // core reads as a user identifier, and none of them holds learner data:
+        // the column records WHICH SITE ADMINISTRATOR performed an act of site
+        // configuration. Every writer of a non-null value sits behind
+        // require_capability('moodle/site:config'); the automated price feed
+        // writes null on purpose.
+        //
+        // DECLARED but deliberately not exported and not erased. An erasure
+        // request that deleted these rows would delete the site's model pricing,
+        // its price feeds and its benchmark history, which is configuration
+        // belonging to the institution rather than personal data belonging to
+        // the requester. The lang strings say so, so the reason is visible on
+        // the site's data registry page and not only here.
+        //
+        // Undeclared, these failed core's own privacy/tests/provider_test.php,
+        // which the plugin's suite never runs.
+        $collection->add_database_table(
+            'local_ai_course_assistant_models',
+            ['addedby' => 'privacy:metadata:models:addedby'],
+            'privacy:metadata:models'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_pricesrc',
+            ['addedby' => 'privacy:metadata:pricesrc:addedby'],
+            'privacy:metadata:pricesrc'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_bench',
+            ['createdby' => 'privacy:metadata:bench:createdby'],
+            'privacy:metadata:bench'
+        );
+        // Same class of row, found by the guard below rather than by core:
+        // which staff member last edited a Soapbox assignment. Course
+        // configuration, not learner data, and erasing it would silently
+        // reshape an assignment other learners are still working against.
+        $collection->add_database_table(
+            'local_ai_course_assistant_sbx_assign',
+            ['usermodified' => 'privacy:metadata:sbx_assign:usermodified'],
+            'privacy:metadata:sbx_assign'
+        );
+
         // External systems that personal data may be transmitted to. The plugin
         // forwards learner-authored content to the admin-configured AI provider
         // to generate tutoring responses; voice content to the configured speech

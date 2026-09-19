@@ -754,6 +754,17 @@ $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferen
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
 $string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
+// v7.5.2: model-registry tables added in v7.4.0. Each records which site
+// administrator made a configuration change. Declared, but never exported or
+// erased: the rows are site configuration, not learner data.
+$string['privacy:metadata:models'] = 'Model registry entries: the per-model pricing and capability overrides a site administrator maintains. The only personal data is the identifier of the administrator who last saved the entry. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:models:addedby'] = 'The site administrator who last saved this model registry entry. Empty when the entry was written by an automated price feed.';
+$string['privacy:metadata:pricesrc'] = 'Pricing feed definitions: the vendor price lists a site administrator has configured the plugin to fetch. The only personal data is the identifier of the administrator who added the feed. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:pricesrc:addedby'] = 'The site administrator who added this pricing feed. Empty when the feed ships with the plugin.';
+$string['privacy:metadata:bench'] = 'Provider benchmark runs: the model comparison results a site administrator has generated. The only personal data is the identifier of the administrator who started the run. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:bench:createdby'] = 'The site administrator who started this benchmark run. Empty when the run was started from the command line.';
+$string['privacy:metadata:sbx_assign'] = 'Soapbox presentation assignments: the tasks a teacher sets up for a course. The only personal data is the identifier of the staff member who last edited the assignment. These rows are course configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure, which would otherwise reshape an assignment other learners are still working against.';
+$string['privacy:metadata:sbx_assign:usermodified'] = 'The staff member who last edited this presentation assignment.';
 // External locations that personal data may be transmitted to.
 $string['privacy:metadata:ai_provider'] = 'To generate tutoring responses, learner-authored content is sent to the AI provider configured by the site or course administrator.';
 $string['privacy:metadata:ai_provider:message'] = 'The message text and attachments the learner sends to the AI tutor.';
