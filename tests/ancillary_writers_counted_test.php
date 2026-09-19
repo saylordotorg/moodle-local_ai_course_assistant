@@ -33,7 +33,7 @@ namespace local_ai_course_assistant;
  */
 final class ancillary_writers_counted_test extends \advanced_testcase {
 
-    /** @var string[] The five types added in v7.4.4. */
+    /** @var string[] The five types added in v7.4.4, plus gesture_vision in v7.5.1. */
     private const NEW_TYPES = [
         'mastery_signal', 'student_profile', 'speech_score',
         'objective_extract', 'slide_vision', 'gesture_vision',

@@ -309,13 +309,14 @@ final class lang_completeness_test extends \basic_testcase {
      * the pages displayed before the extraction, so nothing regressed.
      */
     private const ADMIN_DIAGNOSTIC_UNTRANSLATED = [
-        // v7.5.1: the video rubric tab and the body-language setting. Both
-        // are administrator-only surfaces (rubric_admin.php and the site
-        // settings page), and every other key on those two pages is already
-        // staged here. Nothing a LEARNER sees is in this list: the eighteen
-        // soapbox: strings this release adds are translated into all 45
-        // locales, because a self-paced learner with no instructor reads the
-        // feedback page as the entire product.
+        // v7.5.1: the video rubric tab. These seven are NOT deferred translation
+        // debt -- the tab was specced and cut, so nothing in the product can
+        // reach them: rubric_admin.php whitelists only conversation,
+        // pronunciation and speech, and clamps an unknown ?type back to
+        // conversation. They are held rather than deleted because the video
+        // rubric TYPE is live (rubric_manager::TYPE_VIDEO, reached from
+        // score_speech), so these are the labels for the tab that ships with
+        // it. Do not send them to a translator until that tab exists.
         'rubric_admin:tab_video',
         'rubric_admin:rubric_title_video',
         'rubric_admin:needs_video',
@@ -323,8 +324,13 @@ final class lang_completeness_test extends \basic_testcase {
         'rubric_admin:needs_video_aria',
         'rubric_admin:preview_conditional',
         'rubric_admin:preview_total_novideo',
+        // These two ARE live, on the site settings page.
         'settings:soapbox_gesture_vision',
         'settings:soapbox_gesture_vision_desc',
+        // Nothing a LEARNER sees is in this list: the eighteen soapbox: strings
+        // this release adds are translated into all 45 locales, because a
+        // self-paced learner with no instructor reads the feedback page as the
+        // entire product.
         // v7.4.3: Soapbox object-storage round-trip probe (admin-only page).
         'selftest:storage_title',
         'selftest:storage_intro',

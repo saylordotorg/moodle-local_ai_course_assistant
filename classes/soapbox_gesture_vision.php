@@ -39,8 +39,16 @@
  * model to score body language directly invites it to reason about the person;
  * asking it to report what the hands and eyes are doing keeps the judgement in
  * the rubric, where the criteria are visible to the learner and editable by an
- * administrator. The learner can read the stored observation, so they can always
- * see what the scoring was actually told.
+ * administrator.
+ *
+ * The observation is stored on the attempt and is the only evidence those two
+ * criteria are scored from. It is NOT rendered to the learner in v7.5.1, so the
+ * transparency argument above is about where the judgement lives, not about the
+ * learner being able to audit it. Do not cite this comment as evidence that the
+ * guarantee already exists. Rendering it is a deliberate decision, not a patch:
+ * it is raw unreviewed model prose about a named learner's body, and nothing
+ * between the prompt and the store enforces the appearance bar the prompt asks
+ * for.
  *
  * Best-effort throughout: every failure path returns an empty note and the
  * rubric feedback is unaffected, exactly as soapbox_slide_vision behaves.
