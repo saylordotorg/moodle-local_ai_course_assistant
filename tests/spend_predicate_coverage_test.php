@@ -75,9 +75,10 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
      * @var array<string,string>
      */
     private const UNCATEGORISED = [
-        'model_bench' => 'benchmark spend is excluded from every other spend surface by '
-            . 'analytics::benchmark_rows_excluded(); giving it a visible bucket on this one '
-            . 'page would contradict that, so it stays in ELSE other',
+        'model_bench' => 'benchmark spend is hidden by every other spend surface, so giving it '
+            . 'a visible bucket on this one page would contradict that. The rows themselves are '
+            . 'deliberately still IN scope here -- this page is a money-truth consumer and the '
+            . 'bill is the whole bill -- they are just pooled into ELSE other rather than named',
     ];
 
     /**

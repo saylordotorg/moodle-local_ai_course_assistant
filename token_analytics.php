@@ -94,10 +94,16 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // flashcards                    -> flashcards
 // essay                         -> essay
 // insights                      -> insights
-// model_bench                   -> other, deliberately: benchmark spend is excluded
-//                                  from every other spend surface by
-//                                  analytics::benchmark_rows_excluded(), so giving it a
-//                                  visible bucket on this one page would contradict that
+// model_bench                   -> other, deliberately. Benchmark spend is real
+//                                  invoiced money and this page is a money-truth
+//                                  consumer, so the rows ARE in scope here and must
+//                                  stay that way -- see benchmark_spend_exclusion_test,
+//                                  which fails if this file ever learns to filter them.
+//                                  They get no bucket of their own because every other
+//                                  spend surface hides them, and one page disagreeing
+//                                  about what the bill is would be worse than one page
+//                                  pooling them. The reason lives in UNCATEGORISED in
+//                                  spend_predicate_coverage_test.
 // anything else                 -> other
 
 $categorysql = "CASE
