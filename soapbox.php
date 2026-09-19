@@ -146,7 +146,15 @@ echo $OUTPUT->header();
                     if ($assessed) {
                         echo (int) ($c['score'] ?? 0);
                     } else {
-                        ?><span class="badge badge-secondary" title="<?php echo s(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?>"><?php echo s(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?></span><?php
+                        // The explanation goes in a visually-hidden sibling, not
+                        // a title. This span has its own text, so it takes its
+                        // accessible name from that text and the title is never
+                        // announced: the reason a criterion was dropped was
+                        // mouse-only, in a self-paced course with nobody to ask.
+                        // accesshide is Moodle core's class, used the same way in
+                        // templates/outcomes_report.mustache. aria-label would
+                        // REPLACE the visible "Not assessed" rather than add to it.
+                        ?><span class="badge badge-secondary"><?php echo s(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?></span><span class="accesshide"> <?php echo s(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?></span><?php
                     }
                     ?></td>
                     <td><?php echo s($c['feedback'] ?? ''); ?></td></tr>
@@ -267,8 +275,8 @@ echo $OUTPUT->header();
                 // row the total had already counted.
                 var ok = c.assessed !== false;
                 var cell = ok ? esc(c.score)
-                    : '<span class="badge badge-secondary" title="' + esc(STR.not_assessed_aria) + '">' +
-                      esc(STR.not_assessed) + '</span>';
+                    : '<span class="badge badge-secondary">' + esc(STR.not_assessed) +
+                      '</span><span class="accesshide"> ' + esc(STR.not_assessed_aria) + '</span>';
                 html += '<tr' + (ok ? '' : ' class="text-muted"') + '><td>' + esc(c.name) +
                     '</td><td style="font-family:monospace">' + cell +
                     '</td><td>' + esc(c.feedback) + '</td></tr>';

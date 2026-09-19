@@ -162,3 +162,41 @@ jobs:
       - name: Mark cancelled jobs as failed
         if: ${{ cancelled() }}
         run: exit 1
+
+  # The zero-dependency node guards in tests/js/. These are not PHPUnit and not
+  # Behat, so nothing in the job above would ever have run them.
+  #
+  # Its own job rather than a step inside `test`: that job carries a 9-leg matrix
+  # behind a full Moodle install, and running three dependency-free scripts nine
+  # times would be nine times the wait for the same answer.
+  #
+  # The assertion that earns this job is the built-bundle check in
+  # starter-page-ref-check.js, which matches the exact minified shape rather than
+  # grepping for a symbol. A loose grep passes against a stale bundle, which is
+  # how amd/build/sse_client.min.js once sat two months behind its source.
+  js-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Run the tests/js guards
+        run: |
+          shopt -s nullglob
+          scripts=(tests/js/*.js)
+          if [ ${#scripts[@]} -eq 0 ]; then
+            echo "::error::No scripts found in tests/js/. If they moved, update this job;"
+            echo "::error::a job that silently runs nothing is worse than no job."
+            exit 1
+          fi
+          fail=0
+          for f in "${scripts[@]}"; do
+            echo "--- $f"
+            node "$f" || fail=1
+          done
+          exit $fail
