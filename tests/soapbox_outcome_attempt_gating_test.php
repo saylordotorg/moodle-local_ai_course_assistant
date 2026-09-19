@@ -53,6 +53,8 @@ final class soapbox_outcome_attempt_gating_test extends \advanced_testcase {
      *
      * @param bool $assessed What the model reports for the criterion.
      * @param int $score The score the model reports alongside it.
+     * @param string $echoedname The name the model echoes back, which may differ
+     *               in case or spacing from the rubric definition.
      * @return array [objective id, course id]
      */
     private function score_one(bool $assessed, int $score, string $echoedname = 'Evidence'): array {

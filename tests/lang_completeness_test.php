@@ -472,6 +472,7 @@ final class lang_completeness_test extends \basic_testcase {
         'rubric_admin:description',
         'rubric_admin:description_aria',
         'rubric_admin:description_placeholder',
+        'rubric_admin:err_duplicate_names',
         'rubric_admin:err_invalid_criteria',
         'rubric_admin:err_no_criteria',
         'rubric_admin:inherited_notice',

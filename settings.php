@@ -3271,7 +3271,15 @@ if ($hassiteconfig) {
         'offtopic_enabled' => ['offtopic_max', 'offtopic_action', 'offtopic_lockout_duration'],
         'integrity_enabled' => ['integrity_email'],
         'mastery_decay_enabled' => ['mastery_decay_half_life_days'],
-        'soapbox_slide_vision' => ['soapbox_vision_provider', 'soapbox_vision_model'],
+        // soapbox_vision_provider and soapbox_vision_model are deliberately NOT
+        // listed here. They used to hang off soapbox_slide_vision alone, but
+        // soapbox_gesture_vision (v7.5.1) reads the same two keys, so an admin
+        // who enabled gesture vision without slide vision could not see, let
+        // alone configure, the model it was about to call. This map applies one
+        // hide_if per dependent and cannot express "show if either toggle is
+        // on", so the fix is to stop hiding them: they are two text fields with
+        // working defaults, and showing them to an admin who needs neither is a
+        // far smaller cost than hiding them from one who needs both.
     ];
 
     foreach ($dependencies as $toggle => $dependents) {

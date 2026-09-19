@@ -141,4 +141,60 @@ final class provider_soapbox_test extends \advanced_testcase {
             );
         }
     }
+
+    /**
+     * A course-context purge must not leave the recording behind.
+     *
+     * delete_data_for_all_users_in_context() deleted seven tables, including
+     * practice_scores, and never touched sbx_rec. So the score went and the
+     * video of the learner saying it stayed, along with the transcript, which
+     * lives on the recording row. The bucket object stayed too: the retention
+     * task walks sbx_rec rows, so nothing was ever going to come back for it.
+     *
+     * This is the purge a site runs when it deletes a course's data. Leaving
+     * the most sensitive artefact of the lot is the wrong way round.
+     *
+     * @return void
+     */
+    public function test_a_course_purge_removes_soapbox_recordings(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+
+        $assignid = (int) $DB->insert_record('local_ai_course_assistant_sbx_assign', (object) [
+            'courseid' => $course->id,
+            'name' => 'Presentation',
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $DB->insert_record('local_ai_course_assistant_sbx_rec', (object) [
+            'assignid' => $assignid,
+            'userid' => $user->id,
+            'mode' => 'video',
+            'storage_key' => 'sbx/rec/keepme.webm',
+            'transcript' => 'The transcript of everything the learner said.',
+            'status' => 'scored',
+            'expires_at' => time() + WEEKSECS,
+            'timecreated' => time(),
+        ]);
+
+        \local_ai_course_assistant\privacy\provider::delete_data_for_all_users_in_context(
+            \context_course::instance($course->id)
+        );
+
+        $this->assertSame(
+            0,
+            $DB->count_records('local_ai_course_assistant_sbx_rec', ['assignid' => $assignid]),
+            'A course-data purge left the Soapbox recording row behind, and with it the transcript '
+                . 'and the key pointing at the video in the bucket. The score was deleted, so the '
+                . 'purge looked like it had worked.'
+        );
+        $this->assertSame(
+            0,
+            $DB->count_records('local_ai_course_assistant_sbx_assign', ['courseid' => $course->id]),
+            'the assignment rows go with them, or the next purge has nothing to walk'
+        );
+    }
 }

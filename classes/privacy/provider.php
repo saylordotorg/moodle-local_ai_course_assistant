@@ -850,6 +850,36 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $DB->delete_records('local_ai_course_assistant_ut_resp', ['courseid' => $context->instanceid]);
         $DB->delete_records('local_ai_course_assistant_audit', ['courseid' => $context->instanceid]);
         $DB->delete_records('local_ai_course_assistant_practice_scores', ['courseid' => $context->instanceid]);
+
+        // Soapbox recordings, which this used to leave behind entirely.
+        //
+        // The row carries the TRANSCRIPT, and storage_key points at the video
+        // in the bucket, so a course-context purge deleted the learner's score
+        // and kept the recording of them saying it. The bucket object outlived
+        // the purge too: the retention task walks sbx_rec rows, so deleting the
+        // row without the object strands it, and not deleting the row at all
+        // left both.
+        //
+        // Done per learner through purge_soapbox_recordings() rather than as a
+        // courseid delete, because sbx_rec has no courseid: it hangs off
+        // sbx_assign, and the object deletion has to happen per row anyway.
+        try {
+            $userids = $DB->get_fieldset_sql(
+                "SELECT DISTINCT r.userid
+                   FROM {local_ai_course_assistant_sbx_rec} r
+                   JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
+                  WHERE a.courseid = :courseid",
+                ['courseid' => $context->instanceid]
+            );
+            foreach ($userids as $uid) {
+                self::purge_soapbox_recordings((int) $uid, (int) $context->instanceid);
+            }
+            $DB->delete_records('local_ai_course_assistant_sbx_assign', ['courseid' => $context->instanceid]);
+        } catch (\Throwable $e) {
+            // Tables absent on older installs, consistent with the guard in
+            // purge_soapbox_recordings() itself.
+            return;
+        }
     }
 
     /**
