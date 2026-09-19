@@ -2696,3 +2696,6 @@ $string['soapbox:watch'] = 'Ver';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'La ubicación de almacenamiento del vídeo o audio grabado, hasta que se elimina al final del periodo de conservación.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'La ubicación de almacenamiento de las diapositivas subidas con la grabación, hasta que se eliminan con ella.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'La ubicación de almacenamiento de los fotogramas tomados de la grabación para los comentarios sobre lenguaje corporal. Se eliminan con la grabación.';
+
+$string['soapbox:retention_heading'] = 'Tu vídeo se elimina después de {$a} días.';
+$string['soapbox:retention_line'] = 'Cada grabación se elimina automáticamente {$a} días después de hacerla, y la fecha exacta aparece junto a cada intento más abajo. Tus puntuaciones, tus comentarios escritos y tu transcripción se conservan. Usa el enlace Descargar para guardar, antes de esa fecha, cualquier vídeo que quieras conservar.';

@@ -2713,3 +2713,6 @@ $string['soapbox:watch'] = 'Panoorin';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Ang lokasyon ng imbakan ng na-record na video o audio, hanggang sa mabura ito sa pagtatapos ng panahon ng pag-iingat.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Ang lokasyon ng imbakan ng mga slide na na-upload kasama ng recording, hanggang sa mabura kasama nito.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Ang lokasyon ng imbakan ng mga still frame na kinuha mula sa recording para sa feedback sa body language. Binubura kasama ng recording.';
+
+$string['soapbox:retention_heading'] = 'Buburahin ang iyong video pagkatapos ng {$a} araw.';
+$string['soapbox:retention_line'] = 'Awtomatikong buburahin ang bawat recording {$a} araw pagkatapos mong i-record ito, at makikita ang eksaktong petsa sa tabi ng bawat pagsubok sa ibaba. Nananatili ang iyong mga marka, nakasulat na feedback at transcript. Gamitin ang link na I-download para i-save ang anumang video na gusto mong itago bago dumating ang petsang iyon.';

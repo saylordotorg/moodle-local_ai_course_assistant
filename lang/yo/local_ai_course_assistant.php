@@ -2689,3 +2689,6 @@ $string['soapbox:watch'] = 'Wò ó';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Ibi ìpamọ́ fídíò tàbí ohùn tí a gbà sílẹ̀, títí tí a ó fi parẹ́ ní ìparí àkókò ìpamọ́.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Ibi ìpamọ́ àwọn ìsàlẹ̀ tí a gbé sókè pẹ̀lú ìgbàsílẹ̀ náà, títí tí a ó fi parẹ́ pẹ̀lú rẹ̀.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Ibi ìpamọ́ àwọn àwòrán tí a mú láti inú ìgbàsílẹ̀ fún èsì èdè ara. A ó parẹ́ pẹ̀lú ìgbàsílẹ̀ náà.';
+
+$string['soapbox:retention_heading'] = 'Fídíò rẹ yóò parẹ́ lẹ́yìn ọjọ́ {$a}.';
+$string['soapbox:retention_line'] = 'A ó pa àkọsílẹ̀ kọ̀ọ̀kan rẹ́ láìfọwọ́yí ní ọjọ́ {$a} lẹ́yìn tí o bá gbà á sílẹ̀, ọjọ́ gangan sì hàn lẹ́gbẹ̀ẹ́ ìgbìdánwò kọ̀ọ̀kan nísàlẹ̀. Àwọn ipele rẹ, èsì tí a kọ sílẹ̀ àti ìkọsílẹ̀ rẹ yóò wà. Lo ọ̀nà-ìjápọ̀ Gbà sílẹ̀ láti fi pamọ́ fídíò èyíkéyìí tí o fẹ́ tọ́jú ṣáájú ọjọ́ yẹn.';

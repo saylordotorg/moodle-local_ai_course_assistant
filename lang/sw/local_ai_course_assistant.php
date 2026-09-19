@@ -2713,3 +2713,6 @@ $string['soapbox:watch'] = 'Tazama';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Mahali pa kuhifadhi video au sauti iliyorekodiwa, hadi itakapofutwa mwishoni mwa muda wa kuhifadhi.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Mahali pa kuhifadhi slaidi zilizopakiwa pamoja na rekodi, hadi zitakapofutwa pamoja nayo.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Mahali pa kuhifadhi picha tuli zilizochukuliwa kutoka kwenye rekodi kwa ajili ya maoni ya lugha ya mwili. Hufutwa pamoja na rekodi.';
+
+$string['soapbox:retention_heading'] = 'Video yako inafutwa baada ya siku {$a}.';
+$string['soapbox:retention_line'] = 'Kila rekodi inafutwa kiotomatiki siku {$a} baada ya kuirekodi, na tarehe kamili inaonyeshwa kwa kila jaribio hapa chini. Alama zako, maoni yako yaliyoandikwa na maandishi yako hubaki. Tumia kiungo cha Pakua kuhifadhi video yoyote unayotaka kuweka kabla ya tarehe hiyo.';

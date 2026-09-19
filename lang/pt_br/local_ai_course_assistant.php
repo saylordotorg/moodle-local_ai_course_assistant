@@ -2689,3 +2689,6 @@ $string['soapbox:watch'] = 'Assistir';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'O local de armazenamento do vídeo ou áudio gravado, até ser excluído ao fim do período de retenção.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'O local de armazenamento dos slides enviados com a gravação, até serem excluídos junto com ela.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'O local de armazenamento dos quadros extraídos da gravação para o retorno sobre linguagem corporal. Excluídos junto com a gravação.';
+
+$string['soapbox:retention_heading'] = 'Seu vídeo é excluído depois de {$a} dias.';
+$string['soapbox:retention_line'] = 'Cada gravação é excluída automaticamente {$a} dias depois de você gravá-la, e a data exata aparece em cada tentativa abaixo. Suas notas, o retorno escrito e a transcrição são mantidos. Use o link Baixar para salvar, antes dessa data, qualquer vídeo que você queira guardar.';

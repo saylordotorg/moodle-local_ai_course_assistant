@@ -2689,3 +2689,6 @@ $string['soapbox:watch'] = 'Xem';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Vị trí lưu trữ của video hoặc âm thanh đã ghi, cho đến khi bị xóa vào cuối thời hạn lưu giữ.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Vị trí lưu trữ của bộ trình chiếu được tải lên cùng bản ghi, cho đến khi bị xóa cùng với nó.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Vị trí lưu trữ của các khung hình tĩnh lấy từ bản ghi để phục vụ nhận xét về ngôn ngữ cơ thể. Bị xóa cùng bản ghi.';
+
+$string['soapbox:retention_heading'] = 'Video của bạn sẽ bị xóa sau {$a} ngày.';
+$string['soapbox:retention_line'] = 'Mỗi bản ghi sẽ tự động bị xóa {$a} ngày sau khi bạn quay, và ngày cụ thể được hiển thị ở từng lần thử bên dưới. Điểm, nhận xét bằng chữ và bản gỡ băng của bạn vẫn được giữ lại. Hãy dùng liên kết Tải xuống để lưu lại bất kỳ video nào bạn muốn giữ trước ngày đó.';

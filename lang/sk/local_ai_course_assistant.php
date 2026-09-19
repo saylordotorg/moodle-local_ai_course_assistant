@@ -2668,3 +2668,6 @@ $string['soapbox:watch'] = 'Prehrať';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Umiestnenie nahraného videa alebo zvuku v úložisku, kým sa na konci doby uchovávania nezmaže.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Umiestnenie prezentácie nahranej spolu s nahrávkou v úložisku, kým sa nezmaže spolu s ňou.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Umiestnenie snímok získaných z nahrávky na spätnú väzbu k reči tela v úložisku. Mažú sa spolu s nahrávkou.';
+
+$string['soapbox:retention_heading'] = 'Vaše video sa vymaže po {$a} dňoch.';
+$string['soapbox:retention_line'] = 'Každá nahrávka sa automaticky vymaže {$a} dní po tom, ako ju vytvoríte, a presný dátum je uvedený pri každom pokuse nižšie. Vaše hodnotenia, písomná spätná väzba a prepis zostávajú zachované. Pomocou odkazu Stiahnuť si pred týmto dátumom uložte každé video, ktoré si chcete nechať.';

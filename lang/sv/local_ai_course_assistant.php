@@ -2668,3 +2668,6 @@ $string['soapbox:watch'] = 'Titta';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Lagringsplatsen för den inspelade videon eller ljudet, tills den raderas vid bevarandetidens slut.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Lagringsplatsen för bildspelet som laddades upp med inspelningen, tills det raderas tillsammans med den.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Lagringsplatsen för stillbilderna som tagits ur inspelningen för återkoppling på kroppsspråk. Raderas tillsammans med inspelningen.';
+
+$string['soapbox:retention_heading'] = 'Din video raderas efter {$a} dagar.';
+$string['soapbox:retention_line'] = 'Varje inspelning raderas automatiskt {$a} dagar efter att du gjort den, och det exakta datumet visas för varje försök nedan. Dina omdömen, din skriftliga återkoppling och din transkription sparas. Använd länken Ladda ner för att spara den video du vill behålla, före det datumet.';

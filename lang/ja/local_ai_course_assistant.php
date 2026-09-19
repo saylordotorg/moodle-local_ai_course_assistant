@@ -2667,3 +2667,6 @@ $string['soapbox:watch'] = '視聴';
 $string['privacy:metadata:sbx_rec:storage_key'] = '録画された映像または音声の保存場所。保存期間の終了時に削除されるまで。';
 $string['privacy:metadata:sbx_rec:deck_key'] = '録画とあわせてアップロードされたスライドの保存場所。録画とともに削除されるまで。';
 $string['privacy:metadata:sbx_rec:frames_key'] = '身ぶりのフィードバックのために録画から取り出した静止画の保存場所。録画とともに削除されます。';
+
+$string['soapbox:retention_heading'] = '動画は {$a} 日後に削除されます。';
+$string['soapbox:retention_line'] = '各録画は、録画してから {$a} 日後に自動的に削除されます。正確な削除日は下の一覧の各録画に表示されています。点数、文章によるフィードバック、文字起こしは残ります。残しておきたい動画は、その日までに「ダウンロード」リンクから保存してください。';

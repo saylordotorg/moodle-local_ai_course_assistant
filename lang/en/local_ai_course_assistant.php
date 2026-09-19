@@ -1737,6 +1737,9 @@ $string['soapbox:howto_light']     = 'Face a window or a lamp, and keep bright l
 $string['soapbox:howto_eyes']      = 'Look at the camera lens, not at your own picture on the screen. On video, looking at the lens is what reads to your audience as eye contact.';
 $string['soapbox:howto_hands']     = 'Give yourself room to move your hands, and speak at your normal volume. Record one full take: pauses, restarts and the odd stumble are normal and are not marked down.';
 $string['soapbox:howto_feedback']  = 'A few minutes after you finish you will get a score and written feedback on every rubric criterion, including your body language and camera presence when your camera was on.';
+$string['soapbox:retention_heading'] = 'Your video is deleted after {$a} days.';
+$string['soapbox:retention_line'] = 'Each recording is deleted automatically {$a} days after you make it, and the exact date is shown against every attempt below. Your scores, written feedback and transcript are kept. Use the Download link to save any video you want to keep '
+    . 'before that date.';
 $string['soapbox:present_privacy'] = 'Your recording is uploaded to [[uniname]] storage so it can be transcribed and scored. Only you and site administrators can open it. It is deleted automatically {$a} days after you record it, together with the still frames used for body-language feedback. Your transcript, scores and feedback are kept after the video is gone, so download anything you want to keep.';
 $string['soapbox:col_deletes']     = 'Deletes on';
 $string['soapbox:watch']           = 'Watch';

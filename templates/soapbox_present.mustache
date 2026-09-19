@@ -107,7 +107,11 @@
         <li>{{{text}}}</li>
         {{/howto}}
     </ul>
-    <p class="small text-muted mb-0">{{{privacynote}}}</p>
+    <div class="alert alert-info mb-0" role="note">
+        <strong>{{retentionheading}}</strong>
+        <span>{{retentionline}}</span>
+    </div>
+    <p class="small text-muted mb-0 mt-2">{{{privacynote}}}</p>
 </div>
 <div class="sbx-recorder card p-3 mb-4 {{modeclass}}" id="sbx-recorder">
     {{#slidesenabled}}

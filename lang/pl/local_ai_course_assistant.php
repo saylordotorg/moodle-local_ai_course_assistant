@@ -2668,3 +2668,6 @@ $string['soapbox:watch'] = 'Obejrzyj';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Miejsce przechowywania nagranego wideo lub dźwięku, do czasu usunięcia na koniec okresu przechowywania.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Miejsce przechowywania slajdów przesłanych razem z nagraniem, do czasu usunięcia razem z nim.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Miejsce przechowywania klatek pobranych z nagrania na potrzeby informacji zwrotnej o mowie ciała. Usuwane razem z nagraniem.';
+
+$string['soapbox:retention_heading'] = 'Twoje wideo jest usuwane po {$a} dniach.';
+$string['soapbox:retention_line'] = 'Każde nagranie jest usuwane automatycznie {$a} dni po jego wykonaniu, a dokładna data jest podana przy każdym podejściu poniżej. Twoje oceny, pisemna informacja zwrotna i transkrypcja zostają zachowane. Użyj linku Pobierz, aby przed tą datą zapisać każde wideo, które chcesz zachować.';

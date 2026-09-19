@@ -2713,3 +2713,6 @@ $string['soapbox:watch'] = 'Daawo';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Meesha lagu kaydiyo muuqaalka ama codka la duubay, ilaa laga tirtiro dhammaadka muddada kaydinta.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Meesha lagu kaydiyo bogagga la soo geliyay ee duubista la socday, ilaa lala tirtiro iyada.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Meesha lagu kaydiyo sawirrada taagan ee laga qaaday duubista jawaabta luqadda jidhka. Waa lala tirtiraa duubista.';
+
+$string['soapbox:retention_heading'] = 'Muuqaalkaagu waa la tirtiraa {$a} maalmood ka dib.';
+$string['soapbox:retention_line'] = 'Duubis kasta si toos ah ayaa loo tirtiraa {$a} maalmood ka dib markaad samayso, taariikhda saxda ahna waxaa lagu tusayaa isku day kasta oo hoos ku qoran. Dhibcahaaga, jawaabtaada qoran iyo qoraalkaagu way sii jiraan. Isticmaal xiriirka Soo dejiso si aad u kaydsato muuqaal kasta oo aad rabto inaad hayso ka hor taariikhdaas.';

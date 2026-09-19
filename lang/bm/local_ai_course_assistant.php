@@ -2697,3 +2697,6 @@ $string['soapbox:watch'] = 'A filɛ';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Wideyo walima kumakan duublen marayɔrɔ, fo a bɛ jɔsi maracogoya waati laban na.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Slide minnu cira ni duubu ye, olu marayɔrɔ, fo u bɛ jɔsi n\'a ye.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Ja jɔlenw marayɔrɔ minnu tara duubu la farikolo kan-kan hakilina kama. U bɛ jɔsi ni duubu ye.';
+
+$string['soapbox:retention_heading'] = 'I ka wideyo bɛ jɔsi tile {$a} kɔfɛ.';
+$string['soapbox:retention_line'] = 'Kumakan kelen-kelen bɛɛ bɛ jɔsi a yɛrɛ ma tile {$a} i k\'a minɛni kɔfɛ, wa don yɛrɛyɛrɛ bɛ jira kɛlɛ kelen-kelen bɛɛ kɛrɛfɛ duguma. I ka jateminɛw, i ka hakilina sɛbɛnnen ani i ka sɛbɛn bɛ to. I mago bɛ wideyo o wideyo mara na, «A lajigin» jɛɲɔgɔnya kɛ k\'a mara sanni o don ka se.';

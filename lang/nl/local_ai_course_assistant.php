@@ -2692,3 +2692,6 @@ $string['soapbox:watch'] = 'Bekijken';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'De opslaglocatie van de opgenomen video of audio, totdat die aan het einde van de bewaartermijn wordt verwijderd.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'De opslaglocatie van de dia\'s die met de opname zijn geüpload, totdat ze samen met de opname worden verwijderd.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'De opslaglocatie van de stilstaande beelden uit de opname voor feedback op lichaamstaal. Worden samen met de opname verwijderd.';
+
+$string['soapbox:retention_heading'] = 'Je video wordt na {$a} dagen verwijderd.';
+$string['soapbox:retention_line'] = 'Elke opname wordt {$a} dagen nadat je hem maakt automatisch verwijderd, en de precieze datum staat hieronder bij elke poging. Je scores, geschreven feedback en transcript blijven wel bewaard. Gebruik de link Downloaden om elke video die je wilt houden vóór die datum op te slaan.';

@@ -2670,3 +2670,6 @@ $string['soapbox:watch'] = 'Regarder';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'L\'emplacement de stockage de la vidéo ou de l\'audio enregistré, jusqu\'à sa suppression à la fin de la période de conservation.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'L\'emplacement de stockage du diaporama envoyé avec l\'enregistrement, jusqu\'à sa suppression avec celui-ci.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'L\'emplacement de stockage des images fixes extraites de l\'enregistrement pour les retours sur le langage corporel. Supprimées avec l\'enregistrement.';
+
+$string['soapbox:retention_heading'] = 'Votre vidéo est supprimée au bout de {$a} jours.';
+$string['soapbox:retention_line'] = 'Chaque enregistrement est supprimé automatiquement {$a} jours après que vous l\'avez réalisé, et la date exacte est indiquée en face de chaque tentative ci-dessous. Vos scores, vos retours écrits et votre transcription sont conservés. Utilisez le lien Télécharger pour enregistrer, avant cette date, toute vidéo que vous souhaitez garder.';

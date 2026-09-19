@@ -2696,3 +2696,6 @@ $string['soapbox:watch'] = 'ተመልከት';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'የተቀረጸው ቪዲዮ ወይም ድምፅ የማከማቻ ቦታ፣ በማቆያ ጊዜው መጨረሻ እስኪሰረዝ ድረስ።';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'ከቀረጻው ጋር የተሰቀሉት ስላይዶች የማከማቻ ቦታ፣ ከቀረጻው ጋር እስኪሰረዙ ድረስ።';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'ለሰውነት ቋንቋ አስተያየት ከቀረጻው የተወሰዱ ቋሚ ምስሎች የማከማቻ ቦታ። ከቀረጻው ጋር ይሰረዛሉ።';
+
+$string['soapbox:retention_heading'] = 'ቪዲዮዎ ከ{$a} ቀናት በኋላ ይሰረዛል።';
+$string['soapbox:retention_line'] = 'እያንዳንዱ ቀረጻ ከቀረጹት ከ{$a} ቀናት በኋላ በራስ-ሰር ይሰረዛል፣ እና ትክክለኛው ቀን ከታች ካለው እያንዳንዱ ሙከራ ጎን ይታያል። ውጤቶችዎ፣ የተጻፈ አስተያየትዎና ግልባጭዎ ይቆያሉ። ከዚያ ቀን በፊት ማቆየት የሚፈልጉትን ማንኛውንም ቪዲዮ ለማስቀመጥ «አውርድ» የሚለውን አገናኝ ይጠቀሙ።';
