@@ -186,6 +186,24 @@ final class provider_soapbox_test extends \advanced_testcase {
             'timecreated' => time(),
         ]);
 
+        // A second course, untouched, so the test pins over-deletion as well as
+        // under-deletion. A rewrite to "assignid NOT IN (SELECT id FROM
+        // sbx_assign)" would satisfy every other assertion here while wiping
+        // every other course's topics.
+        $other = $this->getDataGenerator()->create_course();
+        $otherassign = (int) $DB->insert_record('local_ai_course_assistant_sbx_assign', (object) [
+            'courseid' => $other->id,
+            'name' => 'Someone else\'s assignment',
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $othertopic = (int) $DB->insert_record('local_ai_course_assistant_sbx_topic', (object) [
+            'assignid' => $otherassign,
+            'title' => 'A topic in a different course',
+            'instructionsformat' => 1,
+            'sortorder' => 0,
+        ]);
+
         \local_ai_course_assistant\privacy\provider::delete_data_for_all_users_in_context(
             \context_course::instance($course->id)
         );
@@ -201,6 +219,17 @@ final class provider_soapbox_test extends \advanced_testcase {
             0,
             $DB->count_records('local_ai_course_assistant_sbx_assign', ['courseid' => $course->id]),
             'the assignment rows go with them, or the next purge has nothing to walk'
+        );
+        $this->assertSame(
+            1,
+            $DB->count_records('local_ai_course_assistant_sbx_topic', ['id' => $othertopic]),
+            'Another course\'s topic must survive. Purging one course must not reach into a course '
+                . 'the request never named.'
+        );
+        $this->assertSame(
+            1,
+            $DB->count_records('local_ai_course_assistant_sbx_assign', ['id' => $otherassign]),
+            'and neither must its assignment'
         );
         $this->assertSame(
             0,

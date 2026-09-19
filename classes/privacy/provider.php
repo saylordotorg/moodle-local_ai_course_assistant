@@ -943,7 +943,15 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             $DB->delete_records('local_ai_course_assistant_sbx_assign', ['courseid' => $context->instanceid]);
         } catch (\Throwable $e) {
             // Tables absent on older installs, consistent with the guard in
-            // purge_soapbox_recordings() itself.
+            // purge_soapbox_recordings() itself. Logged rather than swallowed:
+            // this is the terminal statement of a data-deletion request, so a
+            // failure here means core marks the request satisfied while the data
+            // is still there and nobody is told. The observer solves the same
+            // problem the same way.
+            debugging(
+                'SOLA: Soapbox purge failed for course ' . $context->instanceid . ': ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
             return;
         }
     }
