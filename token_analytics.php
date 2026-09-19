@@ -91,6 +91,13 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // mastery_signal, student_profile -> personalisation
 // speech_score, slide_vision, gesture_vision -> soapbox
 // objective_extract             -> authoring
+// flashcards                    -> flashcards
+// essay                         -> essay
+// insights                      -> insights
+// model_bench                   -> other, deliberately: benchmark spend is excluded
+//                                  from every other spend surface by
+//                                  analytics::benchmark_rows_excluded(), so giving it a
+//                                  visible bucket on this one page would contradict that
 // anything else                 -> other
 
 $categorysql = "CASE
@@ -102,6 +109,9 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('mastery_signal','student_profile')          THEN 'personalisation'
     WHEN m.interaction_type IN ('speech_score','slide_vision','gesture_vision') THEN 'soapbox'
     WHEN m.interaction_type IN ('objective_extract')                         THEN 'authoring'
+    WHEN m.interaction_type IN ('flashcards')                                THEN 'flashcards'
+    WHEN m.interaction_type IN ('essay')                                     THEN 'essay'
+    WHEN m.interaction_type IN ('insights')                                  THEN 'insights'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
     WHEN m.interaction_type IN ('quiz')                                     THEN 'quiz'
     WHEN m.interaction_type IN ('chat') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'
@@ -122,6 +132,14 @@ $categorylabels = [
     // v7.1.0: reuse the already-translated column heading rather than adding an
     // English-only key, same reasoning as the two above.
     'quiz'           => get_string('quizsettings:colquiz', 'local_ai_course_assistant'),
+    // These six emit from the CASE above. Without a label here they fell through
+    // the `?? $row->category` fallback and an administrator read the raw slug.
+    'personalisation' => get_string('token_analytics:cat_personalisation', 'local_ai_course_assistant'),
+    'soapbox'        => get_string('token_analytics:cat_soapbox', 'local_ai_course_assistant'),
+    'authoring'      => get_string('token_analytics:cat_authoring', 'local_ai_course_assistant'),
+    'flashcards'     => get_string('token_analytics:cat_flashcards', 'local_ai_course_assistant'),
+    'essay'          => get_string('token_analytics:cat_essay', 'local_ai_course_assistant'),
+    'insights'       => get_string('token_analytics:cat_insights', 'local_ai_course_assistant'),
     'other'          => get_string('token_analytics:cat_other', 'local_ai_course_assistant'),
 ];
 
