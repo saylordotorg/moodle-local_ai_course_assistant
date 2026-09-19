@@ -94,6 +94,16 @@ $assignments = soapbox_assignment_manager::get_course_assignments($courseid);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('soapbox:assign_title', 'local_ai_course_assistant'));
 
+// v7.5.2: the staff who build Soapbox assignments are the second audience who
+// need to know, and they do not live on the site settings page. This page is
+// behind :manage, so no learner sees it. Learners are deliberately told nothing
+// in this release: nothing changes for them, and telling a student mid-course
+// that their work sits in a feature being retired produces worry and no action.
+echo $OUTPUT->notification(
+    \local_ai_course_assistant\branding::str('soapbox:assign_deprecated'),
+    \core\output\notification::NOTIFY_INFO
+);
+
 echo html_writer::div(
     $OUTPUT->single_button(
         new moodle_url('/local/ai_course_assistant/soapbox_assign_edit.php', ['courseid' => $courseid]),

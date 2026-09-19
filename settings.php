@@ -1834,6 +1834,41 @@ if ($hassiteconfig) {
         get_string('settings:soapbox_heading_desc', 'local_ai_course_assistant'),
     ));
 
+    // v7.5.2: Soapbox is deprecated, and the notice is graded by whether this
+    // site actually runs it. Same house rule as the tuner banner above: a
+    // deprecation notice that fires for everyone is noise, and this page has a
+    // lot of it already. get_config() with no second argument returns the whole
+    // cached plugin config, so scanning the per-course soapbox_enabled_course_N
+    // rows costs no extra query, which matters because settings.php has no
+    // fulltree guard and runs on every admin tree build.
+    //
+    // The notice names a VERSION, not a date. A date in a lang string is a
+    // promise that ages in 46 locale files, and the removal is gated on
+    // PresenterAI being able to import existing recordings and scores, which is
+    // a fact rather than a calendar.
+    $sbxcfg = (array) get_config('local_ai_course_assistant');
+    $sbxinuse = !empty($sbxcfg['soapbox_enabled']);
+    if (!$sbxinuse) {
+        foreach ($sbxcfg as $sbxk => $sbxv) {
+            if (strpos($sbxk, 'soapbox_enabled_course_') === 0 && (string) $sbxv === '1') {
+                $sbxinuse = true;
+                break;
+            }
+        }
+    }
+    $settings->add(new admin_setting_description(
+        'local_ai_course_assistant/soapbox_deprecated_notice',
+        '',
+        $OUTPUT->notification(
+            \local_ai_course_assistant\branding::str(
+                $sbxinuse ? 'settings:soapbox_deprecated_inuse' : 'settings:soapbox_deprecated_off'
+            ),
+            $sbxinuse
+                ? \core\output\notification::NOTIFY_WARNING
+                : \core\output\notification::NOTIFY_INFO
+        )
+    ));
+
     // v6.7.0 Soapbox: which speech-to-text path the recorder uses. "server"
     // transcribes through the configured Whisper provider (self-hosted free, or
     // hosted OpenAI) via voice_registry; "browser" uses the learner's built-in
