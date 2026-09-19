@@ -1,0 +1,55 @@
+Send to: Moodle Marketplace support, via the "Create a support request" link at https://marketplace.moodle.com/ (Jira Service Management portal: https://moodle.atlassian.net/servicedesk/customer/portal/166/)
+
+Subject: CONTRIB-10574: I cannot comment on our own plugin approval request
+
+Hello,
+
+I am the lead maintainer of local_ai_course_assistant (AI Course Assistant, plugin id 3808), under review in CONTRIB-10574:
+
+    https://moodle.atlassian.net/browse/CONTRIB-10574
+
+I can read the request but I cannot reply to it. No comment control renders on the page, and this is a permission state rather than a browser problem. Querying the Jira permissions API for the account I am writing from returns:
+
+    GET /rest/api/3/mypermissions?issueKey=CONTRIB-10574&permissions=ADD_COMMENTS,BROWSE_PROJECTS
+    ADD_COMMENTS:    havePermission = false
+    BROWSE_PROJECTS: havePermission = true
+
+A second Atlassian account in our organisation returns the same pair.
+
+I suspect the cause is identity rather than a missing grant. CONTRIB-10574 was raised under our moodle.org account before the Marketplace migration, and I now sign in through the Marketplace SSO. If those are two separate Atlassian identities, I am browsing our own review as a non-participant, which would produce exactly this result.
+
+What I am asking for, in order:
+
+1. Please tell me which account is the reporter on CONTRIB-10574, and either add tom.caswell@saylor.org as a request participant or tell me which account to sign in with.
+
+2. If maintainers are not expected to comment on approval requests at all, please forward the attached document to the reviewer on CONTRIB-10574 on my behalf. That gets it there either way.
+
+3. Please also confirm which uploaded zip produced the 25 BLOCKER occurrences on our listing, and re-run the scan against the current version.
+
+What is waiting on this: a written response to those 25 BLOCKER occurrences (AUTH001 x16, SEC006 x9), all of which we assess as false positives. No code change can reduce that count, so shipping another release cannot clear the gate. The written response is the only thing that can, and it is attached.
+
+On point 3: one SEC006 citation points at line 1380 of a file that is 458 lines long, and the automated test report attached to one of our versions was a PHP lint run for mod_playercross. I have raised that second item as a separate support request, and each references the other.
+
+For context, the reviewer raised six issues on our public repository on 25 August 2026, #200 to #205, and I answered and closed all six on 7 September:
+
+    https://github.com/saylordotorg/moodle-local_ai_course_assistant/issues?q=is%3Aissue+is%3Aclosed+author%3Avolodymyrdovhan
+
+The review itself is the one channel I cannot reach.
+
+Thank you,
+
+Tom Caswell
+Lead maintainer, local_ai_course_assistant
+Saylor Academy / Saylor University
+tom.caswell@saylor.org
+
+---
+
+NOTE TO TOM (not part of the message, delete before sending):
+
+1. Attach two files: the rebuttal, and the raw JSON from the mypermissions call re-run on the day you send. The API result in the body is roughly three weeks old. Re-run it first; if ADD_COMMENTS has flipped to true, this request is moot.
+2. Fix two things in `.drafts/marketplace-reviewer-replies-v7.4.7-JIRA.md` before attaching it. First, the sentence "we did not add the phpcs:disable line to the two NO_MOODLE_COOKIES endpoints" is false: `email_unsubscribe.php` and `digest_unsubscribe.php` carry both markers, and four files declare NO_MOODLE_COOKIES, not two. Second, `$categorysql` is cited at `token_analytics.php:96`, which is correct at v7.4.7 and v7.5.0 but is line 109 at 7.5.1. If you upload 7.5.1 before sending, update it.
+3. The portal path (166) is the only channel identifier in the repo and is unverified. If the "Create a support request" link on marketplace.moodle.com lands somewhere else, use that and the body still reads correctly.
+4. If the 2026-07-26 Marketplace migration question was ever sent, add its reference number after the CONTRIB-10574 link as prior correspondence. Nothing in the repo records it being sent.
+5. Point 1 names tom.caswell@saylor.org as the account to add. If you are signed into the Marketplace under a different address, change that one string.
+6. Send the wrong-test-report request (`.drafts/moodle-support-request-wrong-test-report-marketplace.md`) separately and after this one. Re-check first that it still reproduces on version 7.0.3, record id 26709: that observation is four weeks old. If it has been fixed silently, drop that request and the sentence in point 3 here still stands on its own.

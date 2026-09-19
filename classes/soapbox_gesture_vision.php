@@ -69,6 +69,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 class soapbox_gesture_vision {
 
+    /**
+     * Largest frame sheet this will read, in bytes.
+     *
+     * The sheet the browser produces is six 426x240 JPEG cells at quality 0.72,
+     * comfortably under 1MB. 8MB is generous for that and still far below what
+     * cron can absorb.
+     */
+    const MAX_FRAMES_BYTES = 8388608;
+
     /** @var int Max characters kept from the model's observation. */
     const MAX_NOTE_CHARS = 900;
 
@@ -226,17 +235,31 @@ class soapbox_gesture_vision {
     private static function fetch_frames_datauri(string $key): string {
         try {
             $storage = new soapbox_storage();
-            $url = $storage->presign_get($key, 900);
-            $tmp = make_request_directory() . '/frames.jpg';
 
-            $curl = new \curl();
-            $body = $curl->get($url);
-            if ($curl->get_errno() || $body === false || $body === '') {
+            // Bound this before a byte is read. The object is learner-supplied:
+            // the frames branch of soapbox_get_upload_url hands out a
+            // query-signed PUT, which has no content-length-range, so nothing
+            // upstream caps what lands in the bucket. Reading it whole used to
+            // cost roughly 3.3x the object size resident (body, temp file read
+            // back, then base64), and this runs in cron at MEMORY_EXTRA, so a
+            // ~110MB sheet was enough to exhaust it. A memory_limit breach is
+            // E_ERROR, not a Throwable, so neither catch below would have caught
+            // it: the cron process dies with whatever else was queued behind it,
+            // the row never leaves 'uploaded', and the retry re-fetches the same
+            // object forever.
+            $size = $storage->object_size($key);
+            if ($size === null || $size > self::MAX_FRAMES_BYTES) {
                 return '';
             }
-            file_put_contents($tmp, $body);
-            $bytes = file_get_contents($tmp);
-            if ($bytes === false || $bytes === '') {
+
+            $curl = new \curl();
+            // Pre-transfer, and it needs Content-Length, which S3 sends. The
+            // object_size() check above and the strlen() below cover the case
+            // where it does not.
+            $curl->setopt(['CURLOPT_MAXFILESIZE' => self::MAX_FRAMES_BYTES]);
+            $bytes = $curl->get($storage->presign_get($key, 900));
+            if ($curl->get_errno() || !is_string($bytes) || $bytes === ''
+                    || strlen($bytes) > self::MAX_FRAMES_BYTES) {
                 return '';
             }
             // Sniff rather than trust the extension: the object was uploaded by

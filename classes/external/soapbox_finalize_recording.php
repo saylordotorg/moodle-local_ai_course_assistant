@@ -169,9 +169,15 @@ class soapbox_finalize_recording extends external_api {
         // losing the attempt.
         $frameskeystored = null;
         $framekey = (string) $params['framekey'];
+        // Defence in depth: drop an oversized sheet at finalize time rather
+        // than leaving it for the scoring task to refuse. Consistent with this
+        // file's existing policy that a missing or foreign sheet is dropped and
+        // is never a reason to fail the recording.
+        $framesize = $framekey !== '' ? $storage->object_size($framekey) : null;
         if (
             $framekey !== '' && strpos($framekey, $expectedprefix) === 0
-                && $storage->object_size($framekey) !== null
+                && $framesize !== null
+                && $framesize <= \local_ai_course_assistant\soapbox_gesture_vision::MAX_FRAMES_BYTES
         ) {
             $frameskeystored = $framekey;
         }
