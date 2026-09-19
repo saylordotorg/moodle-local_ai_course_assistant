@@ -282,7 +282,7 @@ if (!empty($recs)) {
                             // A row written before v7.5.1 carries no `assessed`
                             // key. Absent means assessed, or every historic
                             // score would render as "not assessed".
-                            $assessed = !isset($c['assessed']) || (bool) $c['assessed'];
+                            $assessed = \local_ai_course_assistant\rubric_manager::is_assessed($c);
                             $row['criteria'][] = [
                                 'name' => (string) ($c['name'] ?? ''),
                                 'score' => (int) ($c['score'] ?? 0),

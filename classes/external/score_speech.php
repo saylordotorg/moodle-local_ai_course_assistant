@@ -311,8 +311,19 @@ class score_speech extends external_api {
                 'score'    => (int) ($c['score'] ?? 0),
                 'feedback' => (string) ($c['feedback'] ?? ''),
                 'max_score' => $defmax[$key] ?? 5,
-                // Absent defaults to true, so a provider that ignores the field
-                // behaves exactly as it did before v7.5.1.
+                // The API boundary, and the ONLY loose reader of this flag in
+                // the plugin. Provider JSON is untrusted: a provider outside the
+                // structured-output path can answer 0 or "" meaning "could not
+                // judge", so every falsy value is coerced to false here, once,
+                // in the learner's favour, before anything is stored or
+                // returned. Absent defaults to true, so a provider that ignores
+                // the field behaves exactly as it did before v7.5.1.
+                //
+                // Do NOT replace this with rubric_manager::is_assessed(). That
+                // helper is strict and would turn a provider's 0 into an
+                // assessed zero, pulling a real learner's score down to tidy up
+                // an unreachable state. Everything downstream of this line reads
+                // the boolean it produces, through is_assessed().
                 'assessed' => !isset($c['assessed']) || (bool) $c['assessed'],
             ];
         }
@@ -403,7 +414,7 @@ class score_speech extends external_api {
                 // then counted as weight in the denominator and nothing in the
                 // numerator. Outcome attempts are staff-visible only, so the
                 // learner could neither see it nor appeal it.
-                if (isset($scored['assessed']) && $scored['assessed'] === false) {
+                if (!rubric_manager::is_assessed($scored)) {
                     continue;
                 }
                 // Normalised the same way as the allowlist that let this row
