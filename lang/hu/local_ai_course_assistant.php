@@ -2687,3 +2687,26 @@ $string['settings:supplemental_courses'] = 'Kiegészítő kurzusok';
 $string['settings:supplemental_courses_desc'] = 'Azoknak a kurzusoknak az azonosítói, amelyek tartalmát a [[tutorshort]] válaszadáskor szintén felhasználhatja, vesszővel elválasztva. Olyan anyaghoz használja, amely másik kurzuson él és mindenhol érvényes, például hallgatói bevezető vagy forrásközpont: aki a vizsgaszabályzatról kérdez, akkor abból a kurzusból kapja meg a választ a semmi helyett.
 
 A kurzusoknak már indexeltnek kell lenniük a visszakereséshez; semmi többlet nem kerül beágyazásra, így egy kurzus hozzáadása azonnal hat és semmibe sem kerül. A rejtett kurzusokat a rendszer figyelmen kívül hagyja. A felsorolt kurzuson belüli tevékenységek viszont úgy kerülnek indexelésre, ahogyan azokat az újraindexelő adminisztrátor látta, így egy rejtett vagy korlátozott tevékenység szövege idézhető a hallgatónak akkor is, ha nem jelenik meg rá hivatkozás. Csak olyan kurzusokat soroljon fel, amelyek teljes tartalma megfelelő a közönségnek. Legfeljebb {$a} kurzus. A kurzusszintű beállítás, ahol van, felváltja ezt a listát, nem egészíti ki.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Törlés dátuma';
+$string['soapbox:download'] = 'Letöltés';
+$string['soapbox:download_aria'] = 'Töltse le ezt a felvételt az eszközére';
+$string['soapbox:feedback_pending'] = 'A visszajelzés itt jelenik meg, amint az értékelés elkészül. Ez általában néhány percet vesz igénybe. Nem kell ezen az oldalon maradnia.';
+$string['soapbox:feedback_toggle'] = 'Visszajelzésem megjelenítése';
+$string['soapbox:frames_not_video'] = 'Ez a feladat csak hang, ezért nincsenek feltöltendő videokockák.';
+$string['soapbox:howto_eyes'] = 'Nézzen a kamera lencséjébe, ne a saját képére a képernyőn. Videón a lencsébe nézést érzékeli szemkontaktusként a közönség.';
+$string['soapbox:howto_feedback'] = 'Néhány perccel a befejezés után értékelést és írásos visszajelzést kap az értékelőtábla minden szempontjához, beleértve a testbeszédet és a kamera előtti jelenlétet, ha a kamera be volt kapcsolva.';
+$string['soapbox:howto_frame'] = 'Állítsa a kamerát szemmagasságba, körülbelül másfél karnyi távolságra, hogy a fej, a vállak és a kezek is a képben legyenek. A képkivágás alatt tett gesztusok nem látszanak, ezért nem értékelhetők.';
+$string['soapbox:howto_hands'] = 'Hagyjon helyet a kézmozdulatoknak, és beszéljen a szokásos hangerején. Vegyen fel egy teljes felvételt: a szünetek, az újrakezdések és egy-egy megbicsaklás természetesek, és nem rontják az értékelést.';
+$string['soapbox:howto_heading'] = 'Mielőtt felvenné';
+$string['soapbox:howto_light'] = 'Forduljon ablak vagy lámpa felé, és kerülje az erős fényt a háta mögött. A háta mögötti ablaktól sziluetté válik.';
+$string['soapbox:not_assessed'] = 'Nem értékelt';
+$string['soapbox:not_assessed_aria'] = 'Ezt a szempontot ebben a kísérletben nem értékeltük, és kimaradt az értékeléséből';
+$string['soapbox:present_privacy'] = 'A felvétele feltöltődik a [[uniname]] tárhelyére, hogy leiratozni és értékelni lehessen. Csak Ön és az oldal adminisztrátorai nyithatják meg. A felvételtől számított {$a} nap után automatikusan törlődik, a testbeszéd-visszajelzéshez használt állóképekkel együtt. A leirat, az értékelések és a visszajelzés a videó törlése után is megmarad, ezért töltse le, amit meg szeretne tartani.';
+$string['soapbox:scored_on'] = 'Az összesített értékelés a ténylegesen értékelt {$a->assessed} szempont átlaga a táblázat {$a->total} szempontjából ({$a->pct}%). Amit nem lehetett értékelni, kimaradt, nem pedig nullát kapott.';
+$string['soapbox:visual_not_assessed'] = 'A testbeszédet és a kamera előtti jelenlétet ebben a kísérletben nem értékeltük, mert nem készült videó, vagy a kamerakép nem volt olvasható. Ezek a szempontok kimaradtak az értékelésből, nem rontották azt. Vegyen fel bekapcsolt kamerával, fejjel, vállakkal és kezekkel a képben, hogy ezekről is visszajelzést kapjon.';
+$string['soapbox:watch'] = 'Megtekintés';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'A rögzített videó vagy hang tárolási helye, amíg a megőrzési idő végén törlésre nem kerül.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'A felvétellel együtt feltöltött diák tárolási helye, amíg a felvétellel együtt törlésre nem kerülnek.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'A felvételből a testbeszéd-visszajelzéshez kivett állóképek tárolási helye. A felvétellel együtt törlődnek.';

@@ -128,4 +128,58 @@ final class phpdoc_param_consistency_test extends \basic_testcase {
             . "reads as undocumented to the sniff -- use plain array and put the shape in the description:\n"
             . implode("\n", $offenders));
     }
+    /**
+     * No docblock is left stranded with another docblock immediately after it.
+     *
+     * This is a repeat defect, not a hypothetical. Inserting a new member
+     * directly above an existing one puts the new member's docblock between the
+     * existing docblock and the thing it documents. The first docblock now
+     * describes nothing, and the member below it has none. It happened once with
+     * a constant above detect_best_source() and reached main, and again in
+     * v7.5.1 with normalise_name() above empty_result().
+     *
+     * test_param_tags_match_signatures() cannot see it: it matches each docblock
+     * to whatever function follows it, and the ORPHAN is followed by a perfectly
+     * well documented function, so the pairing looks correct. This checks the
+     * shape instead, which is two docblocks with only whitespace between them.
+     *
+     * @return void
+     */
+    public function test_no_orphaned_docblocks(): void {
+        $root = realpath(__DIR__ . '/..');
+        $offenders = [];
+
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($it as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            $path = str_replace($root . '/', '', $file->getPathname());
+            if (preg_match('#^(lang|cdn/node_modules|node_modules|\.git)/#', $path)) {
+                continue;
+            }
+            $src = file_get_contents($file->getPathname());
+
+            // A docblock, then only whitespace, then another docblock.
+            $re = '#/\*\*(?:[^*]|\*(?!/))*\*/\s*/\*\*#';
+            if (!preg_match_all($re, $src, $ms, PREG_OFFSET_CAPTURE)) {
+                continue;
+            }
+            foreach ($ms[0] as $m) {
+                $line = substr_count(substr($src, 0, $m[1]), "\n") + 1;
+                $offenders[] = $path . ':' . $line;
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offenders,
+            "A docblock is immediately followed by another docblock, so the first one documents nothing "
+                . "and the member it belonged to now has no docblock. This usually means a new member was "
+                . "inserted between an existing docblock and its function."
+        );
+    }
+
 }

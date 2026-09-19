@@ -396,16 +396,6 @@ class security {
     }
 
     /**
-     * Normalize RAG chunks on ingest to strip prompt injection markers that
-     * would otherwise influence the system prompt when the chunk is later
-     * retrieved. Targets common role delimiters and section markers in the
-     * jailbreak test corpus. Returns the sanitized text plus a count of
-     * neutralized patterns for indexing visibility.
-     *
-     * @param string $text
-     * @return array{text:string,neutralized:int}
-     */
-    /**
      * Sanitise untrusted text and wrap it in an explicit data fence.
      *
      * v7.0.5. Pattern matching alone cannot win this: the list is finite, the
@@ -488,6 +478,16 @@ class security {
         return hash_equals($expected, $sig);
     }
 
+    /**
+     * Normalize RAG chunks on ingest to strip prompt injection markers that
+     * would otherwise influence the system prompt when the chunk is later
+     * retrieved. Targets common role delimiters and section markers in the
+     * jailbreak test corpus. Returns the sanitized text plus a count of
+     * neutralized patterns for indexing visibility.
+     *
+     * @param string $text
+     * @return array{text:string,neutralized:int}
+     */
     public static function sanitize_rag_chunk(string $text): array {
         $neutralized = 0;
         $patterns = [

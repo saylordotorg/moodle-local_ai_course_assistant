@@ -2689,3 +2689,26 @@ $string['settings:supplemental_courses'] = 'Kursus tambahan';
 $string['settings:supplemental_courses_desc'] = 'ID kursus yang kandungannya boleh juga digunakan [[tutorshort]] semasa menjawab, dipisahkan koma. Gunakan untuk bahan yang berada dalam kursus lain tetapi terpakai di mana-mana, seperti orientasi pelajar atau pusat sumber: yang bertanya tentang dasar peperiksaan kemudian mendapat jawapannya daripada kursus itu dan bukan tiada apa-apa.
 
 Kursus mesti sudah diindeks untuk capaian; tiada apa-apa tambahan dibenamkan, jadi menambahnya di sini berkuat kuasa serta-merta dan tidak berkos. Kursus tersembunyi diabaikan. Namun aktiviti di dalam kursus yang disenaraikan diindeks sebagaimana dilihat oleh pentadbir yang mengindeks semula kursus itu, jadi teks aktiviti tersembunyi atau terhad boleh dipetik kepada pelajar walaupun tiada pautan ditunjukkan. Senaraikan hanya kursus yang keseluruhan kandungannya sesuai untuk pembacanya. Maksimum {$a} kursus. Tetapan peringkat kursus, jika ada, menggantikan senarai ini dan bukan menambahnya.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Dipadam pada';
+$string['soapbox:download'] = 'Muat turun';
+$string['soapbox:download_aria'] = 'Muat turun rakaman ini ke peranti anda';
+$string['soapbox:feedback_pending'] = 'Maklum balas anda akan muncul di sini sebaik penilaian selesai. Biasanya mengambil masa beberapa minit. Anda tidak perlu kekal di halaman ini.';
+$string['soapbox:feedback_toggle'] = 'Tunjukkan maklum balas saya';
+$string['soapbox:frames_not_video'] = 'Tugasan ini audio sahaja, jadi tiada bingkai video untuk dimuat naik.';
+$string['soapbox:howto_eyes'] = 'Pandang kanta kamera, bukan imej anda sendiri pada skrin. Dalam video, memandang kanta itulah yang dibaca oleh penonton sebagai hubungan mata.';
+$string['soapbox:howto_feedback'] = 'Beberapa minit selepas selesai anda akan menerima markah dan maklum balas bertulis bagi setiap kriteria rubrik, termasuk bahasa badan dan kehadiran di hadapan kamera apabila kamera dihidupkan.';
+$string['soapbox:howto_frame'] = 'Letakkan kamera pada aras mata, kira-kira satu setengah panjang lengan, supaya kepala, bahu dan tangan semuanya dalam bingkai. Gerak isyarat di bawah tepi bingkai tidak kelihatan, jadi ia tidak boleh dinilai.';
+$string['soapbox:howto_hands'] = 'Beri ruang untuk menggerakkan tangan dan bercakap pada kelantangan biasa anda. Rakam satu pengambilan penuh: jeda, mula semula dan tersasul sekali-sekala adalah biasa dan tidak menjejaskan markah.';
+$string['soapbox:howto_heading'] = 'Sebelum anda merakam';
+$string['soapbox:howto_light'] = 'Hadap tingkap atau lampu, dan kurangkan cahaya terang di belakang anda. Tingkap di belakang menjadikan anda hanya satu siluet.';
+$string['soapbox:not_assessed'] = 'Tidak dinilai';
+$string['soapbox:not_assessed_aria'] = 'Kriteria ini tidak dinilai dalam percubaan ini dan dikecualikan daripada markah anda';
+$string['soapbox:present_privacy'] = 'Rakaman anda dimuat naik ke storan [[uniname]] supaya boleh ditranskripsi dan dinilai. Hanya anda dan pentadbir laman boleh membukanya. Ia dipadam secara automatik {$a} hari selepas anda merakam, bersama bingkai pegun yang digunakan untuk maklum balas bahasa badan. Transkrip, markah dan maklum balas anda kekal selepas video hilang, jadi muat turun apa yang ingin anda simpan.';
+$string['soapbox:scored_on'] = 'Markah keseluruhan anda ialah purata bagi {$a->assessed} kriteria yang dinilai, daripada {$a->total} dalam rubrik ({$a->pct}%). Apa yang tidak dapat dinilai dikecualikan, bukan diberi sifar.';
+$string['soapbox:visual_not_assessed'] = 'Bahasa badan dan kehadiran di hadapan kamera tidak dinilai dalam percubaan ini, kerana tiada video dirakam atau paparan kamera tidak dapat dibaca. Kriteria itu dikecualikan daripada markah anda, bukan menurunkannya. Rakam dengan kamera dihidupkan, dengan kepala, bahu dan tangan dalam bingkai, untuk mendapat maklum balas mengenainya.';
+$string['soapbox:watch'] = 'Tonton';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Lokasi storan video atau audio yang dirakam, sehingga ia dipadam pada akhir tempoh penyimpanan.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Lokasi storan slaid yang dimuat naik bersama rakaman, sehingga ia dipadam bersamanya.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Lokasi storan bingkai pegun yang diambil daripada rakaman untuk maklum balas bahasa badan. Dipadam bersama rakaman.';

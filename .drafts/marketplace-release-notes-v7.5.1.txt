@@ -1,0 +1,40 @@
+Version 7.5.1 (build 2026091800)
+
+Soapbox learners can now read the rubric feedback that has been generated for every presentation since v6.7.0 and never shown to them, download their recording, and see the date it is deleted.
+
+Fixed: Soapbox feedback was generated and never displayed
+
+Since v6.7.0 every presentation has been transcribed, scored against a rubric and given per-criterion comments, an overall note and three next-time tips. None of it was ever rendered: the learner saw a table row reading "Scored", and with these courses fully online and self-paced there was no instructor to ask either. The attempt now shows every criterion, its score and its comment, the overall note and the tips.
+
+The download link saves a file rather than opening the video in a browser tab, so a learner can keep a copy after the retention window closes. Each attempt shows the exact date its recording is deleted, read from the stored expiry rather than asserted in prose, and controlled by soapbox_retention_days. Guidance on camera height, framing and lighting now appears before recording rather than after.
+
+New: body language and camera presence
+
+Off by default. The setting is soapbox_gesture_vision.
+
+When it is on and an attempt produces usable video, two criteria join the existing five: gestures that support the presentation rather than distract from it, and eye contact and camera presence. Both are fixed in this release. The rubric types an administrator can author remain speech, conversation and pronunciation. Six stills are sampled from the recording, one vision pass describes what is visible, and the rubric does the judging.
+
+Decisions worth stating plainly before enabling it:
+
+- Frames are sampled in the browser from the recorded video, because ffmpeg cannot be assumed present on the server and a server-side sampler would degrade silently to "the visual criteria are never assessed".
+- The observation is derived server-side from a recording id the caller must own, never accepted as a parameter. Evidence arriving over the wire would have let any learner holding the use capability award themselves both criteria.
+- The vision prompt is descriptive rather than evaluative, is instructed not to describe appearance, ethnicity, clothing or setting. Its output is stored on the attempt and used only to score those two criteria. It is not shown to the learner in this release: what a learner reads is the criterion score and its comment.
+- One extra provider call per scored recording while the feature is on, logged as gesture_vision and counted by the spend predicate, the anomaly detector and the dashboard.
+- The frames are client-supplied. They are validated on upload and re-sniffed server-side, but a determined learner could substitute flattering ones. The feedback is formative and nothing depends on it but the learner.
+
+Changed: a criterion nobody could assess leaves the average
+
+Camera off, camera pointed away, frame capture failed: those criteria now leave the prompt, the numerator and the denominator instead of scoring zero. On the worked example that is an overall 4 at 76% instead of an overall 3 at 54%, a whole point and 22 percentage points that would otherwise have come off a learner for a camera angle. An audio-only assignment is untouched: five criteria, no visual rows, no sentence about cameras.
+
+Fixed: a translated "Explain This Page" never named the page
+
+On a non-English drawer the starter was sent with no page title in it, for as long as translated starters have shipped. Nothing looked broken: page context travels separately from the prompt text, so the assistant answered about the right page. What was missing was the record: reporting on which pages learners asked about has covered only the English-speaking part of the cohort. Fixed by appending the title, so none of the 45 translations are reopened.
+
+Also in this release
+
+- On a course whose Soapbox rubric maps criteria to outcomes, the assessed-student count in the outcomes report will fall after upgrading. The new number is correct: the old count included criteria the model had reported it could not judge.
+- 18 learner-facing strings are translated into all 45 non-English locales.
+- One nullable column is added to the Soapbox recordings table. Nothing is dropped or renamed, and no existing row is modified.
+- 1,725 automated tests and 7,426 assertions, with no failures.
+
+Requires Moodle 4.5 or later. Tested against Moodle 4.5, 5.0 and 5.1 on PHP 8.1, 8.2 and 8.3, with both PostgreSQL and MariaDB.

@@ -2666,3 +2666,26 @@ $string['settings:supplemental_courses'] = 'Àwọn ẹ̀kọ́ àfikún';
 $string['settings:supplemental_courses_desc'] = 'ID àwọn ẹ̀kọ́ tí [[tutorshort]] tún lè lo àkóónú wọn nígbà tí ó bá ń dáhùn, tí a yà sọ́tọ̀ pẹ̀lú àmì ìdáwọ́dúró. Lò ó fún ohun èlò tí ó wà nínú ẹ̀kọ́ mìíràn ṣùgbọ́n tí ó wúlò níbi gbogbo, bíi ẹ̀kọ́ ìtọ́sọ́nà fún akẹ́kọ̀ọ́ tàbí ilé ìwádìí: nígbà náà ẹni tí ó bèèrè nípa òfin ìdánwò yóò rí ìdáhùn láti inú ẹ̀kọ́ yẹn dípò kí ó má rí nǹkan kan.
 
 Àwọn ẹ̀kọ́ gbọ́dọ̀ ti wà nínú àtọ́ka tẹ́lẹ̀ fún ìwádìí; kò sí ohun tuntun tí a ń fi kún, nítorí náà fífi ọ̀kan kún níbí yóò ṣiṣẹ́ lẹ́sẹ̀kẹsẹ̀, kò sì ná owó kankan. A ó fi àwọn ẹ̀kọ́ tí a fi pamọ́ sílẹ̀. Ṣùgbọ́n àwọn iṣẹ́ inú ẹ̀kọ́ tí a kọ síbí ni a ń tò sínú àtọ́ka bí alábòójútó tí ó tún tò ó ṣe rí wọn, nítorí náà ọ̀rọ̀ iṣẹ́ tí a fi pamọ́ tàbí tí a dínà lè jáde sí akẹ́kọ̀ọ́ bí a kò tilẹ̀ fi ìjápọ̀ kankan hàn sí i. Kọ àwọn ẹ̀kọ́ tí gbogbo àkóónú wọn bá bá àwọn olùkàwé mu nìkan. Ó pọ̀ jù {$a} ẹ̀kọ́. Ìṣètò ìpele ẹ̀kọ́, níbi tí ó bá wà, yóò rọ́pò àkójọ yìí dípò kí ó fi kún un.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Yóò parẹ́ ní';
+$string['soapbox:download'] = 'Gbà sílẹ̀';
+$string['soapbox:download_aria'] = 'Gba ìgbàsílẹ̀ yìí sórí ẹ̀rọ rẹ';
+$string['soapbox:feedback_pending'] = 'Èsì rẹ yóò farahàn níbí nígbà tí ìgbéléwọ̀n bá parí. Ó sábà máa ń gba ìṣẹ́jú díẹ̀. Kò pọn dandan kí o dúró sí ojú-ìwé yìí.';
+$string['soapbox:feedback_toggle'] = 'Fi èsì mi hàn';
+$string['soapbox:frames_not_video'] = 'Iṣẹ́ àyànfúnni yìí jẹ́ ohùn nìkan, nítorí náà kò sí férémù fídíò láti fi sí orí ẹ̀rọ.';
+$string['soapbox:howto_eyes'] = 'Wo lẹ́nsì kámẹ́rà, kì í ṣe àwòrán ara rẹ lórí ìṣàfihàn. Nínú fídíò, wíwo lẹ́nsì ni ohun tí àwọn olùwòran ń rí gẹ́gẹ́ bí ìfojúkojú.';
+$string['soapbox:howto_feedback'] = 'Ìṣẹ́jú díẹ̀ lẹ́yìn tí o bá parí, wàá gba ipele àti èsì tí a kọ sílẹ̀ lórí gbogbo ọ̀nà ìdíwọ̀n, pẹ̀lú èdè ara rẹ àti bí o ṣe farahàn níwájú kámẹ́rà nígbà tí kámẹ́rà bá wà ní ṣíṣí.';
+$string['soapbox:howto_frame'] = 'Gbé kámẹ́rà sí ipele ojú, ní nǹkan bí ìgbọ̀nwọ́ kan àti ààbọ̀ sí ọ, kí orí, èjìká àti ọwọ́ gbogbo wà nínú férémù. Àwọn ìṣe ọwọ́ tí a ṣe ní ìsàlẹ̀ etí férémù kò ní farahàn, nítorí náà a kò lè díwọ̀n wọn.';
+$string['soapbox:howto_hands'] = 'Fi àyè sílẹ̀ fún ara rẹ láti gbé ọwọ́, kí o sì sọ̀rọ̀ ní ohùn rẹ déédéé. Gba gbogbo rẹ ní ẹ̀ẹ̀kan: ìdúró, ìbẹ̀rẹ̀ tuntun àti kíkọsẹ̀ lẹ́ẹ̀kọ̀ọ̀kan jẹ́ àbùdá àti pé kò dín ipele kù.';
+$string['soapbox:howto_heading'] = 'Kí o tó gbà á sílẹ̀';
+$string['soapbox:howto_light'] = 'Kọjú sí fèrèsé tàbí àtùpà, kí o sì dín ìmọ́lẹ̀ tí ó lágbára lẹ́yìn rẹ kù. Fèrèsé lẹ́yìn rẹ á sọ ọ́ di òjìji lásán.';
+$string['soapbox:not_assessed'] = 'A kò díwọ̀n';
+$string['soapbox:not_assessed_aria'] = 'A kò díwọ̀n ọ̀nà ìdíwọ̀n yìí nínú ìgbìdánwò yìí, a sì fi sílẹ̀ níta ipele rẹ';
+$string['soapbox:present_privacy'] = 'A ó gbé ìgbàsílẹ̀ rẹ lọ sí ibi ìpamọ́ [[uniname]] kí a lè kọ ọ́ sílẹ̀ kí a sì díwọ̀n rẹ̀. Ìwọ nìkan àti àwọn alábòójútó ojúlé ló lè ṣí i. A ó parẹ́ ní àdáṣe ní ọjọ́ {$a} lẹ́yìn tí o bá gbà á, pẹ̀lú àwọn àwòrán tí a lò fún èsì èdè ara. Ìkọsílẹ̀, ipele àti èsì rẹ yóò wà lẹ́yìn tí fídíò bá lọ, nítorí náà gba ohunkóhun tí o fẹ́ pamọ́ sílẹ̀.';
+$string['soapbox:scored_on'] = 'Ipele gbogbogbò rẹ ni àpapọ̀ àárín àwọn ọ̀nà ìdíwọ̀n {$a->assessed} tí a díwọ̀n, nínú {$a->total} nínú àtẹ ({$a->pct}%). Ohun tí a kò lè díwọ̀n ni a fi sílẹ̀ níta dípò kí a fún un ní òdo.';
+$string['soapbox:visual_not_assessed'] = 'A kò díwọ̀n èdè ara àti bí o ṣe farahàn níwájú kámẹ́rà nínú ìgbìdánwò yìí, nítorí pé a kò gba fídíò kankan tàbí a kò lè ka àwòrán kámẹ́rà. A fi àwọn ọ̀nà ìdíwọ̀n wọ̀nyẹn sílẹ̀ níta ipele rẹ dípò kí a dín in kù. Gbà á sílẹ̀ pẹ̀lú kámẹ́rà ní ṣíṣí, pẹ̀lú orí, èjìká àti ọwọ́ nínú férémù, láti gba èsì lórí wọn.';
+$string['soapbox:watch'] = 'Wò ó';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Ibi ìpamọ́ fídíò tàbí ohùn tí a gbà sílẹ̀, títí tí a ó fi parẹ́ ní ìparí àkókò ìpamọ́.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Ibi ìpamọ́ àwọn ìsàlẹ̀ tí a gbé sókè pẹ̀lú ìgbàsílẹ̀ náà, títí tí a ó fi parẹ́ pẹ̀lú rẹ̀.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Ibi ìpamọ́ àwọn àwòrán tí a mú láti inú ìgbàsílẹ̀ fún èsì èdè ara. A ó parẹ́ pẹ̀lú ìgbàsílẹ̀ náà.';

@@ -130,6 +130,42 @@ $templatedata = [
         'local_ai_course_assistant',
         soapbox_config::retention_days()
     ),
+    // v7.5.1: setup guidance, shown before a learner records rather than after.
+    // These courses are fully online and self-paced, so there is no instructor
+    // to ask how to frame a shot, and a learner who fills the frame with their
+    // forehead cannot be given body-language feedback at all.
+    'howtoheading' => get_string('soapbox:howto_heading', 'local_ai_course_assistant'),
+    'howto' => [
+        ['text' => get_string('soapbox:howto_frame', 'local_ai_course_assistant')],
+        ['text' => get_string('soapbox:howto_light', 'local_ai_course_assistant')],
+        ['text' => get_string('soapbox:howto_eyes', 'local_ai_course_assistant')],
+        ['text' => get_string('soapbox:howto_hands', 'local_ai_course_assistant')],
+        ['text' => get_string('soapbox:howto_feedback', 'local_ai_course_assistant')],
+    ],
+    // The retention statement derives the number from the setting rather than
+    // hardcoding 7, so a site that raises the window does not start lying.
+    // branding::str(), not get_string(): this string carries [[uniname]], and
+    // nothing downstream resolves brand tokens. Resolution happens at the output
+    // boundary, and this page is one. get_string() here rendered the literal
+    // "[[uniname]] storage" to every learner, in all 46 locales.
+    //
+    // tests/branding_test.php cannot catch this: it asserts no string RETAINS a
+    // token after apply() runs, not that a caller remembered to run it.
+    'privacynote' => \local_ai_course_assistant\branding::str(
+        'soapbox:present_privacy',
+        soapbox_config::retention_days()
+    ),
+    'coldeletes' => get_string('soapbox:col_deletes', 'local_ai_course_assistant'),
+    'watchlabel' => get_string('soapbox:watch', 'local_ai_course_assistant'),
+    'downloadlabel' => get_string('soapbox:download', 'local_ai_course_assistant'),
+    'downloadaria' => get_string('soapbox:download_aria', 'local_ai_course_assistant'),
+    'feedbacktoggle' => get_string('soapbox:feedback_toggle', 'local_ai_course_assistant'),
+    'feedbackpending' => get_string('soapbox:feedback_pending', 'local_ai_course_assistant'),
+    'notassessed' => get_string('soapbox:not_assessed', 'local_ai_course_assistant'),
+    'notassessedaria' => get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant'),
+    'colcriterion' => get_string('soapbox:col_criterion', 'local_ai_course_assistant'),
+    'colscore' => get_string('soapbox:col_score', 'local_ai_course_assistant'),
+    'colfeedback' => get_string('soapbox:col_feedback', 'local_ai_course_assistant'),
 ];
 
 // Topic picker.
@@ -162,6 +198,10 @@ if ($storageready) {
                 'videoKbps' => (int) $quality['video_kbps'],
                 'audioKbps' => (int) $quality['audio_kbps'],
             ],
+            // v7.5.1: whether to sample still frames for body-language
+            // feedback. Off means the recorder skips the work entirely rather
+            // than uploading frames nothing will read.
+            'gestureEnabled' => \local_ai_course_assistant\soapbox_gesture_vision::is_enabled($assign),
             'topicid'       => 0,
             'topicSelector' => $hastopics ? '#sbx-topic' : null,
             'slidesEnabled' => !empty($assign->slides_enabled),
@@ -196,8 +236,99 @@ if (!empty($recs)) {
             'recid' => (int) $r->id,
             'expired' => false,
         ];
+        // v7.5.1: the date this recording disappears, taken from the row rather
+        // than from "7 days" in prose, so it stays true if an admin changes the
+        // window or a row was written under a different one.
+        $row['deleteson'] = ((int) ($r->expires_at ?? 0) > 0)
+            ? userdate((int) $r->expires_at, get_string('strftimedatefullshort', 'langconfig'))
+            : '';
+        $row['downloadurl'] = '';
+
+        // v7.5.1: a learner's own score and feedback. Every one of these has
+        // been generated, paid for and written to practice_scores since v6.7.0,
+        // and none of it has ever been rendered: score_recording() keeps the
+        // scoreid and discards the rest, and this page never read the table. A
+        // self-paced learner with no instructor had no way to see any of it.
+        $row['hasfeedback'] = false;
+        $row['criteria'] = [];
+        $row['tips'] = [];
+        $row['hastips'] = false;
+        $row['overall'] = '';
+        $row['scoredon'] = '';
+        if (!empty($r->scoreid)) {
+            try {
+                $score = $DB->get_record(
+                    'local_ai_course_assistant_practice_scores',
+                    ['id' => (int) $r->scoreid, 'userid' => $USER->id]
+                );
+                if ($score) {
+                    $criteria = json_decode((string) $score->scores, true);
+                    $meta = json_decode((string) ($score->session_meta ?? ''), true);
+                    if (is_array($criteria) && !empty($criteria)) {
+                        foreach ($criteria as $c) {
+                            // A row written before v7.5.1 carries no `assessed`
+                            // key. Absent means assessed, or every historic
+                            // score would render as "not assessed".
+                            $assessed = !isset($c['assessed']) || (bool) $c['assessed'];
+                            $row['criteria'][] = [
+                                'name' => (string) ($c['name'] ?? ''),
+                                'score' => (int) ($c['score'] ?? 0),
+                                'feedback' => (string) ($c['feedback'] ?? ''),
+                                'assessed' => $assessed,
+                            ];
+                        }
+                        $totals = \local_ai_course_assistant\rubric_manager::compute_overall($criteria);
+                        $row['overall'] = (string) ($score->ai_feedback ?? '');
+                        $row['scoredon'] = get_string(
+                            'soapbox:scored_on',
+                            'local_ai_course_assistant',
+                            (object) [
+                                'assessed' => $totals['assessed'],
+                                'total' => count($criteria),
+                                'pct' => $totals['pct'],
+                            ]
+                        );
+                        // No "your camera could not be read" note here. The
+                        // accurate version is already in $overall: score_speech
+                        // appends it gated on couldhavevideo && !$hasvisual, so
+                        // it says that only when video really was unreadable.
+                        // A count of unassessed criteria cannot stand in for
+                        // that test, because compute_overall() excludes ANY
+                        // criterion the model marked assessed=false, spoken ones
+                        // included -- and every ESL preset ships a criterion
+                        // (Pronunciation & Intelligibility, & Clarity, & Stress)
+                        // that is unjudgeable from a transcript. Gating on the
+                        // count told a learner whose camera worked fine, and
+                        // whose Body Language score was sitting in the table
+                        // directly above, that no video was recorded.
+                        if (is_array($meta) && !empty($meta['tips']) && is_array($meta['tips'])) {
+                            foreach ($meta['tips'] as $tip) {
+                                $row['tips'][] = ['text' => (string) $tip];
+                            }
+                        }
+                        $row['hastips'] = !empty($row['tips']);
+                        $row['hasfeedback'] = true;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // A missing or malformed score row renders the pending message.
+                // A learner losing the page entirely over one bad JSON blob
+                // would be a worse outcome than losing one attempt's feedback.
+                $row['hasfeedback'] = false;
+            }
+        }
+
         if ($storage && $r->storage_key && $r->status !== 'deleted') {
             $row['viewurl'] = $storage->presign_get($r->storage_key, 3600);
+            // Same object, but as a download the learner can keep after the
+            // retention window closes.
+            $ext = pathinfo((string) $r->storage_key, PATHINFO_EXTENSION);
+            $row['downloadurl'] = $storage->presign_get(
+                $r->storage_key,
+                3600,
+                'presentation-' . userdate((int) $r->timecreated, '%Y-%m-%d')
+                    . ($ext !== '' ? '.' . $ext : '')
+            );
             // Slides playback: recordings that carry a deck can be played back
             // with the slides advancing in sync.
             if (!empty($r->deck_key) && !empty($r->slide_timeline)) {

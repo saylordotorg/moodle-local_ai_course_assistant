@@ -2677,3 +2677,26 @@ $string['settings:supplemental_courses'] = 'Koorsiiwwan dabalataa';
 $string['settings:supplemental_courses_desc'] = 'ID koorsiiwwan qabiyyee isaanii [[tutorshort]] yeroo deebii kennu fayyadamuu dandaʼu, qoodduudhaan adda baʼan. Meeshaa koorsii biraa keessa jiruuf garuu bakka hundatti hojjetuuf fayyadami, fakkeenyaaf koorsii seensaa barattootaa yookaan wiirtuu qabeenyaa: yeroo sana namni seera qormaataa gaafatu homaa dhabuu mannaa koorsii sana irraa deebii argata.
 
 Koorsiiwwan argamuuf duraan galmeeffamanii jiraachuu qabu; wanti dabalataa hin seenfamu, kanaaf as itti dabaluun yeroo sanatti hojjeta, baasiis hin qabu. Koorsiiwwan dhokfaman ni tuffatamu. Haa taʼu malee, sochiiwwan koorsii tarreeffame keessa jiran akkuma bulchaan irra deebiʼee galmeesse isaan argetti galmaaʼu; kanaaf barreeffamni sochii dhokate yookaan daangeffame barataaf caqasamuu ni dandaʼa, yoo hidhaan itti hin agarsiifamne illee. Koorsiiwwan qabiyyeen isaanii guutuun dubbistootaaf mijaaʼu qofa tarreessi. Baayʼinaan koorsii {$a}. Qindaaʼinni sadarkaa koorsii, yoo jiraate, tarree kana itti dabaluu mannaa bakka buʼa.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Kan haqamu';
+$string['soapbox:download'] = 'Buufadhu';
+$string['soapbox:download_aria'] = 'Waraabbii kana meeshaa keetti buufadhu';
+$string['soapbox:feedback_pending'] = 'Yaadni kee madaallii xumuramnaan asitti ni mul\'ata. Yeroo baay\'ee daqiiqaa muraasa fudhata. Fuula kana irra turuun si hin barbaachisu.';
+$string['soapbox:feedback_toggle'] = 'Yaada koo agarsiisi';
+$string['soapbox:frames_not_video'] = 'Hojiin kun sagalee qofa, kanaaf fuula viidiyoo olkaa\'amu hin jiru.';
+$string['soapbox:howto_eyes'] = 'Ijaa kaameeraa ilaali, fakkii kee kan iskiriinii irraa miti. Viidiyoo irratti, ija kaameeraa ilaaluun namoota daawwataniif walqunnamtii ijaatti fakkaata.';
+$string['soapbox:howto_feedback'] = 'Erga xumurtee daqiiqaa muraasa booda ulaagaa madaallii hundaaf qabxii fi yaada barreeffamaan argatta, yeroo kaameeraan banaa ture afaan qaamaa keetii fi haala fuula kaameeraa duratti mul\'attu dabalatee.';
+$string['soapbox:howto_frame'] = 'Kaameeraa sadarkaa ijaatti, gara dheerina harkaa tokkoo fi walakkaa fagaatee kaa\'i, akka mataan, gateettiin fi harki hundi fuula keessa galan. Mallattoon harkaa daangaa fuulaa jalatti raawwatamu hin mul\'atu, kanaaf madaalamuu hin danda\'u.';
+$string['soapbox:howto_hands'] = 'Harka kee sochoosuuf bakka of kenni, sagalee kee idileetiin dubbadhu. Waraabbii guutuu tokko waraabi: dhaabbachuun, irra deebi\'anii jalqabuun fi yeroo tokko tokko gufachuun waan baratamaadha, qabxiis hin hir\'isu.';
+$string['soapbox:howto_heading'] = 'Osoo hin waraabin dura';
+$string['soapbox:howto_light'] = 'Gara foddaa yookaan ibsaa garagali, ifa cimaa duuba kee jiru hir\'isi. Foddaan duuba kee jiru gaaddidduu qofa si taasisa.';
+$string['soapbox:not_assessed'] = 'Hin madaalamne';
+$string['soapbox:not_assessed_aria'] = 'Ulaagaan kun yaalii kana keessatti hin madaalamne, qabxii kee keessaas ala taasifame';
+$string['soapbox:present_privacy'] = 'Waraabbiin kee barreeffamaan galmaa\'ee madaalamuuf gara kuusaa [[uniname]] olkaa\'ama. Siifi bulchitoota saayitii qofatu banuu danda\'a. Erga waraabdee guyyaa {$a} booda, fakkiiwwan dhaabbataa afaan qaamaa yaadaaf oolan waliin, ofumaan haqama. Barreeffamni, qabxiin fi yaadni kee erga viidiyoon deemee booda ni hafu, kanaaf waan qabachuu barbaaddu buufadhu.';
+$string['soapbox:scored_on'] = 'Qabxiin kee waliigalaa ulaagaalee {$a->total} keessaa kanneen madaalaman {$a->assessed} giddu-galeessa isaaniiti ({$a->pct}%). Wanti madaalamuu hin dandeenye zeeroo kennamuu mannaa ala taasifame.';
+$string['soapbox:visual_not_assessed'] = 'Yaalii kana keessatti afaan qaamaa fi haala fuula kaameeraa duratti mul\'attu hin madaalamne, sababni isaas viidiyoon waraabamuu dhabuu yookaan fakkiin kaameeraa dubbifamuu dhabuu isaati. Ulaagaaleen sun qabxii hir\'isuu mannaa ala taasifaman. Waa\'ee isaanii yaada argachuuf kaameeraa banaadhaan, mataa, gateettii fi harka fuula keessa qabdee waraabi.';
+$string['soapbox:watch'] = 'Ilaali';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Bakka kuusaa viidiyoo yookaan sagalee waraabame, hanga yeroo kuusaa dhumarratti haqamutti.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Bakka kuusaa isiliidota waraabbii waliin olkaa\'aman, hanga isaa waliin haqamanitti.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Bakka kuusaa fakkiiwwan dhaabbataa waraabbii irraa yaada afaan qaamaatiif fudhataman. Waraabbii waliin haqamu.';

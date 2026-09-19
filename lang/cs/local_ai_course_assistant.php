@@ -2646,3 +2646,26 @@ $string['settings:supplemental_courses'] = 'Doplňkové kurzy';
 $string['settings:supplemental_courses_desc'] = 'ID kurzů, jejichž obsah může [[tutorshort]] při odpovídání také použít, oddělená čárkami. Použijte pro materiál, který leží v jiném kurzu a platí všude, například úvodní kurz pro studenty nebo informační centrum: kdo se ptá na pravidla zkoušek, pak dostane odpověď z onoho kurzu místo žádné.
 
 Kurzy už musí být zaindexované pro vyhledávání; nic dalšího se nevkládá, takže přidání je okamžité a nic nestojí. Skryté kurzy se ignorují. Činnosti uvnitř uvedeného kurzu se však indexují tak, jak je viděl správce, který kurz přeindexoval, takže text skryté nebo omezené činnosti lze studentovi citovat, i když se na ni nezobrazí žádný odkaz. Uvádějte jen kurzy, jejichž celý obsah je pro publikum vhodný. Nejvýše {$a} kurzů. Nastavení na úrovni kurzu, pokud existuje, tento seznam nahrazuje, nikoli doplňuje.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Smazáno dne';
+$string['soapbox:download'] = 'Stáhnout';
+$string['soapbox:download_aria'] = 'Stáhnout tuto nahrávku do zařízení';
+$string['soapbox:feedback_pending'] = 'Zpětná vazba se objeví zde, jakmile hodnocení skončí. Obvykle to trvá několik minut. Nemusíte zůstávat na této stránce.';
+$string['soapbox:feedback_toggle'] = 'Zobrazit mou zpětnou vazbu';
+$string['soapbox:frames_not_video'] = 'Tento úkol je pouze zvukový, takže nejsou žádné snímky videa k nahrání.';
+$string['soapbox:howto_eyes'] = 'Dívejte se do objektivu kamery, ne na svůj obraz na obrazovce. Ve videu se právě pohled do objektivu čte jako oční kontakt.';
+$string['soapbox:howto_feedback'] = 'Několik minut po skončení dostanete hodnocení a písemnou zpětnou vazbu ke každému kritériu, včetně řeči těla a působení před kamerou, pokud byla kamera zapnutá.';
+$string['soapbox:howto_frame'] = 'Umístěte kameru do výšky očí, asi jeden a půl délky paže od sebe, aby byly v záběru hlava, ramena i ruce. Gesta pod okrajem záběru nejsou vidět, a proto je nelze hodnotit.';
+$string['soapbox:howto_hands'] = 'Nechte si prostor na pohyb rukou a mluvte svou běžnou hlasitostí. Nahrajte jeden celý pokus: pauzy, nové začátky i občasné zaváhání jsou normální a nesnižují hodnocení.';
+$string['soapbox:howto_heading'] = 'Než začnete nahrávat';
+$string['soapbox:howto_light'] = 'Postavte se čelem k oknu nebo lampě a omezte silné světlo za sebou. Okno za zády z vás udělá siluetu.';
+$string['soapbox:not_assessed'] = 'Nehodnoceno';
+$string['soapbox:not_assessed_aria'] = 'Toto kritérium nebylo v tomto pokusu hodnoceno a zůstalo mimo vaše hodnocení';
+$string['soapbox:present_privacy'] = 'Vaše nahrávka se nahrává do úložiště [[uniname]], aby mohla být přepsána a ohodnocena. Otevřít ji můžete jen vy a správci webu. Automaticky se smaže {$a} dní po nahrání, spolu se snímky použitými pro zpětnou vazbu k řeči těla. Přepis, hodnocení a zpětná vazba zůstávají i po zmizení videa, takže si stáhněte, co si chcete nechat.';
+$string['soapbox:scored_on'] = 'Vaše celkové hodnocení je průměr z {$a->assessed} kritérií, která byla hodnocena, z celkových {$a->total} ({$a->pct} %). Co nebylo možné posoudit, zůstalo stranou, místo aby dostalo nulu.';
+$string['soapbox:visual_not_assessed'] = 'Řeč těla a působení před kamerou nebyly v tomto pokusu hodnoceny, protože video nebylo nahráno nebo obraz z kamery nešlo přečíst. Tato kritéria zůstala mimo hodnocení, místo aby ho snížila. Nahrávejte se zapnutou kamerou, s hlavou, rameny a rukama v záběru, abyste k nim dostali zpětnou vazbu.';
+$string['soapbox:watch'] = 'Přehrát';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Umístění nahraného videa nebo zvuku v úložišti, dokud nebude na konci doby uchovávání smazáno.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Umístění prezentace nahrané spolu s nahrávkou v úložišti, dokud nebude smazána spolu s ní.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Umístění snímků pořízených z nahrávky pro zpětnou vazbu k řeči těla v úložišti. Mažou se spolu s nahrávkou.';

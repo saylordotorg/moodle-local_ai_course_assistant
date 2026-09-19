@@ -87,6 +87,22 @@ class soapbox_get_upload_url extends external_api {
         // Deck upload: only for slides-enabled assignments; a PDF under the
         // learner's own deck/ path. No recording-cap check (a deck is not an
         // attempt), and decks are pruned with their recording / on erasure.
+        // v7.5.1: still-frame sheet for body-language feedback. Same shape as a
+        // deck: the learner's own frames/ path, no recording-cap check because a
+        // frame sheet is not an attempt, and it is deleted with its recording.
+        if (($params['kind'] ?? 'recording') === 'frames') {
+            if (($assign->mode ?? '') === 'audio') {
+                throw new \moodle_exception('soapbox:frames_not_video', 'local_ai_course_assistant');
+            }
+            $key = soapbox_storage::make_frames_key((int) $assign->courseid, (int) $USER->id);
+            return [
+                'uploadurl' => $storage->presign_put($key),
+                'objectkey' => $key,
+                'method'    => 'PUT',
+                'expiresin' => soapbox_storage::DEFAULT_EXPIRY,
+            ];
+        }
+
         if (($params['kind'] ?? 'recording') === 'deck') {
             if (empty($assign->slides_enabled)) {
                 throw new \moodle_exception('soapbox:slides_disabled', 'local_ai_course_assistant');

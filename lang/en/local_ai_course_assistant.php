@@ -743,6 +743,9 @@ $string['privacy:metadata:sbx_rec'] = 'Soapbox presentation recordings. The medi
 $string['privacy:metadata:sbx_rec:userid'] = 'The learner who made the recording.';
 $string['privacy:metadata:sbx_rec:transcript'] = 'The speech-to-text transcript of the recording.';
 $string['privacy:metadata:sbx_rec:duration_seconds'] = 'The length of the recording in seconds.';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'The storage location of the recorded video or audio, until it is deleted at the end of the retention window.';
+$string['privacy:metadata:sbx_rec:deck_key']    = 'The storage location of the slide deck uploaded with the recording, until it is deleted with the recording.';
+$string['privacy:metadata:sbx_rec:frames_key']  = 'The storage location of the still frames sampled from the recording for body-language feedback. Deleted with the recording.';
 $string['privacy:metadata:sbx_rec:timecreated'] = 'When the recording was made.';
 $string['privacy:metadata:outreach_log'] = 'Audit log of empathetic outreach emails.';
 $string['privacy:metadata:outreach_log:userid'] = 'The learner the outreach was sent to.';
@@ -1681,6 +1684,10 @@ $string['settings:soapbox_stt_mode_server'] = 'Server (Whisper provider)';
 $string['settings:soapbox_stt_mode_browser'] = 'Browser (free, no server)';
 $string['settings:soapbox_slide_vision']      = 'Soapbox slide visual-design feedback';
 $string['settings:soapbox_slide_vision_desc'] = 'Allow a single vision pass over the rendered slide images to add a short visual-design note to a scored presentation. Off by default and privacy-conscious: no images are stored, and each assignment must also opt in with its own Slide visual-design feedback checkbox. Only slide presentations with an uploaded deck are affected.';
+
+// Settings - body-language vision pass (v7.5.1).
+$string['settings:soapbox_gesture_vision']      = 'Soapbox body-language feedback';
+$string['settings:soapbox_gesture_vision_desc'] = 'Score body language and camera presence on video presentations. The browser samples six still frames from the learner\'s own recording, and one vision pass reads them for gestures, posture, framing and eye contact. The frames are deleted with the recording on the same retention clock. Audio-only assignments are never affected, and a learner whose camera was off or unreadable has those criteria left out of the score rather than marked zero.';
 $string['settings:soapbox_vision_provider']      = 'Soapbox slide-vision provider';
 $string['settings:soapbox_vision_provider_desc'] = 'Provider used for the slide-vision pass. Defaults to openai. Must be a vision-capable provider configured with an API key (via the course provider or the comparison-providers list).';
 $string['settings:soapbox_vision_model']      = 'Soapbox slide-vision model';
@@ -1722,6 +1729,28 @@ $string['soapbox:assignment_hidden_preview'] = 'This assignment is hidden from s
 $string['soapbox:view_download']    = 'View / download';
 $string['soapbox:expired']          = 'Expired';
 $string['soapbox:retention_note']   = 'Recordings are available to view and download for {$a} days, then automatically deleted.';
+
+// Soapbox presentation page - instructions, retention, download (v7.5.1).
+$string['soapbox:howto_heading']   = 'Before you record';
+$string['soapbox:howto_frame']     = 'Set your camera at eye level, about an arm and a half away, so your head, shoulders and hands are all in the picture. Gestures you make below the edge of the frame cannot be seen, so they cannot be scored.';
+$string['soapbox:howto_light']     = 'Face a window or a lamp, and keep bright light behind you to a minimum. A window behind you turns you into a silhouette.';
+$string['soapbox:howto_eyes']      = 'Look at the camera lens, not at your own picture on the screen. On video, looking at the lens is what reads to your audience as eye contact.';
+$string['soapbox:howto_hands']     = 'Give yourself room to move your hands, and speak at your normal volume. Record one full take: pauses, restarts and the odd stumble are normal and are not marked down.';
+$string['soapbox:howto_feedback']  = 'A few minutes after you finish you will get a score and written feedback on every rubric criterion, including your body language and camera presence when your camera was on.';
+$string['soapbox:present_privacy'] = 'Your recording is uploaded to [[uniname]] storage so it can be transcribed and scored. Only you and site administrators can open it. It is deleted automatically {$a} days after you record it, together with the still frames used for body-language feedback. Your transcript, scores and feedback are kept after the video is gone, so download anything you want to keep.';
+$string['soapbox:col_deletes']     = 'Deletes on';
+$string['soapbox:watch']           = 'Watch';
+$string['soapbox:download']        = 'Download';
+$string['soapbox:download_aria']   = 'Download this recording to your device';
+
+// Soapbox presentation page - feedback display (v7.5.1).
+$string['soapbox:feedback_toggle']  = 'Show my feedback';
+$string['soapbox:feedback_pending'] = 'Your feedback will appear here once scoring finishes. This usually takes a few minutes. You do not need to stay on this page.';
+$string['soapbox:not_assessed']     = 'Not assessed';
+$string['soapbox:not_assessed_aria'] = 'This criterion was not assessed for this attempt and was left out of your score';
+$string['soapbox:scored_on']        = 'Your overall score is the average of the {$a->assessed} criteria that were assessed, out of {$a->total} in the rubric ({$a->pct}%). Anything that could not be assessed was left out rather than scored zero.';
+$string['soapbox:visual_not_assessed'] = 'Body language and camera presence were not assessed for this attempt, because no video was recorded or the camera view could not be read. Those criteria were left out of your score rather than marked down. Record with your camera on, with your head, shoulders and hands in the picture, to get feedback on them.';
+$string['soapbox:frames_not_video'] = 'This assignment is audio only, so there are no video frames to upload.';
 $string['soapbox:assign_title']     = 'Soapbox assignments';
 $string['soapbox:assign_single_title'] = 'Soapbox assignment';
 $string['soapbox:assign_add']       = 'Add assignment';
@@ -2249,6 +2278,15 @@ $string['rubric_admin:scope_global'] = 'Global default (all courses)';
 $string['rubric_admin:tab_conversation'] = 'Conversation practice';
 $string['rubric_admin:tab_pronunciation'] = 'Pronunciation practice';
 $string['rubric_admin:tab_speech'] = 'Soapbox speech';
+
+// Rubric admin - video rubric type (v7.5.1).
+$string['rubric_admin:tab_video']            = 'Soapbox video';
+$string['rubric_admin:rubric_title_video']   = 'Soapbox Video Rubric';
+$string['rubric_admin:needs_video']          = 'Needs video';
+$string['rubric_admin:needs_video_help']     = 'This criterion is skipped, and left out of the score, when an attempt has no usable video.';
+$string['rubric_admin:needs_video_aria']     = 'This criterion requires video evidence';
+$string['rubric_admin:preview_conditional']  = 'Scored only when video is available';
+$string['rubric_admin:preview_total_novideo'] = 'Total without video: {$a}';
 $string['rubric_admin:inherited_notice'] = 'This course has no custom rubric. Showing the global default. Edit below to create a course-specific override.';
 $string['rubric_admin:add_criterion'] = '+ Add criterion';
 $string['rubric_admin:save'] = 'Save rubric';
@@ -2385,6 +2423,12 @@ $string['token_analytics:cat_voice_tts'] = 'Voice (TTS)';
 $string['token_analytics:cat_voice_stt'] = 'Voice (STT)';
 $string['token_analytics:cat_analytics'] = 'Analytics';
 $string['token_analytics:cat_premium_route'] = 'Premium routing (escalation decisions)';
+$string['token_analytics:cat_personalisation'] = 'Personalisation';
+$string['token_analytics:cat_soapbox'] = 'Soapbox (speech and presentation)';
+$string['token_analytics:cat_authoring'] = 'Course authoring';
+$string['token_analytics:cat_flashcards'] = 'Flashcards';
+$string['token_analytics:cat_essay'] = 'Essay feedback';
+$string['token_analytics:cat_insights'] = 'Insights';
 $string['token_analytics:cat_other'] = 'Other';
 $string['token_analytics:all_courses'] = 'All courses';
 $string['token_analytics:cap_unlimited'] = 'unlimited';

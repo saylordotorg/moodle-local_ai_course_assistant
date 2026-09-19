@@ -24,7 +24,12 @@
  * @copyright  2026 Saylor
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['local_ai_course_assistant/soapbox_uploader', 'core/str', 'core/ajax'], function(Uploader, Str, Ajax) {
+define([
+    'local_ai_course_assistant/soapbox_uploader',
+    'local_ai_course_assistant/soapbox_frames',
+    'core/str',
+    'core/ajax'
+], function(Uploader, Frames, Str, Ajax) {
 
     /**
      * Fire-and-forget ping so a scale-to-zero self-hosted STT server starts
@@ -183,15 +188,39 @@ define(['local_ai_course_assistant/soapbox_uploader', 'core/str', 'core/ajax'], 
                     slideTimeline = JSON.stringify(config.slides.getTimeline());
                 }
                 setStatus('Uploading...');
-                Uploader.uploadRecording({
-                    assignid: config.assignid,
-                    topicid: topicid,
-                    blob: blob,
-                    ext: extFor(mime || (config.mode === 'audio' ? 'audio/webm' : 'video/webm')),
-                    contentType: mime || 'application/octet-stream',
-                    durationSeconds: elapsed,
-                    deckKey: deckKey,
-                    slideTimeline: slideTimeline
+
+                // v7.5.1: sample still frames for body-language feedback before
+                // the recording goes up. Every failure path resolves to '', so
+                // frame work can never fail an upload: losing one section of
+                // feedback is recoverable, losing the attempt is not.
+                var framesReady = (config.mode === 'audio' || !config.gestureEnabled)
+                    ? Promise.resolve('')
+                    : Frames.extractSheet(blob, elapsed, {})
+                        .then(function(sheet) {
+                            if (!sheet) {
+                                return '';
+                            }
+                            return Uploader.uploadFrames({
+                                assignid: config.assignid,
+                                blob: sheet
+                            });
+                        })
+                        .catch(function() {
+                            return '';
+                        });
+
+                framesReady.then(function(framesKey) {
+                    return Uploader.uploadRecording({
+                        assignid: config.assignid,
+                        topicid: topicid,
+                        blob: blob,
+                        ext: extFor(mime || (config.mode === 'audio' ? 'audio/webm' : 'video/webm')),
+                        contentType: mime || 'application/octet-stream',
+                        durationSeconds: elapsed,
+                        deckKey: deckKey,
+                        slideTimeline: slideTimeline,
+                        framesKey: framesKey
+                    });
                 }).then(function(res) {
                     setStatus('Uploaded.');
                     if (resultEl) {

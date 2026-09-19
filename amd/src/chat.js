@@ -2697,6 +2697,25 @@ define([
         if (currentLang && currentLang !== 'en' && promptKey) {
             var translatedPrompt = Speech.getStarterPrompt(currentLang, promptKey);
             if (translatedPrompt) {
+                // Explain-This carries the page title; every other starter is
+                // self-contained. The English branch below interpolates {page}
+                // into the middle of its sentence, but the translated prompts
+                // in speech.js have no {page} placeholder (and adding one to 45
+                // languages would need the grammatical position to be right in
+                // each). Appending is the form that needs no retranslation, and
+                // it is what the reporting side parses back out.
+                //
+                // Without this the title is simply lost: this branch returns
+                // before the interpolation below, so a non-English learner's
+                // Explain-This click has never told us which page they were on.
+                //
+                // An empty title appends nothing, so the bare string still
+                // matches the reporting side's exact starter list. Emitting
+                // `: ""` would parse as a topic with no name and be dropped
+                // from both buckets.
+                if (promptKey === 'helpPage' && currentPageTitle) {
+                    translatedPrompt += ': "' + currentPageTitle + '"';
+                }
                 sendStarterPrompt(translatedPrompt);
                 return;
             }

@@ -186,7 +186,12 @@ class soapbox_scorer {
             (string) $assign->ptype,
             $slidecontext,
             $slidecount,
-            $visionnote
+            $visionnote,
+            // v7.5.1: the recording id, not the visual evidence. score_speech
+            // derives the observation itself and refuses a recording the caller
+            // does not own, which is what stops the visual criteria being
+            // self-awarded over the wire.
+            $recid
         );
 
         if (empty($result['success']) && $retrytransient

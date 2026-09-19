@@ -50,6 +50,7 @@ class soapbox_finalize_recording extends external_api {
             'topicid' => new external_value(PARAM_INT, 'Chosen topic id (0 = none)', VALUE_DEFAULT, 0),
             'durationseconds' => new external_value(PARAM_INT, 'Recorded duration in seconds', VALUE_DEFAULT, 0),
             'deckkey' => new external_value(PARAM_RAW, 'Object key of the uploaded PDF deck (slides mode)', VALUE_DEFAULT, ''),
+            'framekey' => new external_value(PARAM_RAW, 'Object key of the uploaded still-frame sheet (video mode)', VALUE_DEFAULT, ''),
             'slidetimeline' => new external_value(PARAM_RAW, 'JSON slide-advance timeline', VALUE_DEFAULT, ''),
         ]);
     }
@@ -60,6 +61,7 @@ class soapbox_finalize_recording extends external_api {
      * @param int $topicid
      * @param int $durationseconds
      * @param string $deckkey
+     * @param string $framekey
      * @param string $slidetimeline
      * @return array
      */
@@ -69,6 +71,7 @@ class soapbox_finalize_recording extends external_api {
         int $topicid = 0,
         int $durationseconds = 0,
         string $deckkey = '',
+        string $framekey = '',
         string $slidetimeline = ''
     ): array {
         global $USER, $DB;
@@ -76,7 +79,7 @@ class soapbox_finalize_recording extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'assignid' => $assignid, 'objectkey' => $objectkey,
             'topicid' => $topicid, 'durationseconds' => $durationseconds,
-            'deckkey' => $deckkey, 'slidetimeline' => $slidetimeline,
+            'deckkey' => $deckkey, 'framekey' => $framekey, 'slidetimeline' => $slidetimeline,
         ]);
 
         $assign = soapbox_assignment_manager::get_assignment((int) $params['assignid']);
@@ -160,6 +163,25 @@ class soapbox_finalize_recording extends external_api {
             }
         }
 
+        // v7.5.1: the still-frame sheet, validated exactly as the deck is. A
+        // missing or foreign sheet is dropped, never a reason to fail the
+        // recording: losing body-language feedback is a smaller harm than
+        // losing the attempt.
+        $frameskeystored = null;
+        $framekey = (string) $params['framekey'];
+        // Defence in depth: drop an oversized sheet at finalize time rather
+        // than leaving it for the scoring task to refuse. Consistent with this
+        // file's existing policy that a missing or foreign sheet is dropped and
+        // is never a reason to fail the recording.
+        $framesize = $framekey !== '' ? $storage->object_size($framekey) : null;
+        if (
+            $framekey !== '' && strpos($framekey, $expectedprefix) === 0
+                && $framesize !== null
+                && $framesize <= \local_ai_course_assistant\soapbox_gesture_vision::MAX_FRAMES_BYTES
+        ) {
+            $frameskeystored = $framekey;
+        }
+
         $now = time();
         $rec = (object) [
             'assignid'         => (int) $assign->id,
@@ -169,6 +191,7 @@ class soapbox_finalize_recording extends external_api {
             'storage_key'      => $key,
             'deck_key'         => $deckkeystored,
             'slide_timeline'   => $timelinejson,
+            'frames_key'       => $frameskeystored,
             'duration_seconds' => max(0, (int) $params['durationseconds']),
             'size_bytes'       => $size,
             'status'           => 'uploaded',

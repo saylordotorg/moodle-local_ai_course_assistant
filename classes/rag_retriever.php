@@ -1295,13 +1295,6 @@ class rag_retriever {
     }
 
     /**
-     * Compute cosine similarity between two equal-length float vectors.
-     *
-     * @param float[] $a
-     * @param float[] $b
-     * @return float Value in [-1, 1]; returns 0.0 if either vector has zero norm.
-     */
-    /**
      * Pack a float vector into the compact storage form.
      *
      * `g` is little-endian float32. Embeddings arrive as float32 from every
@@ -1564,6 +1557,13 @@ class rag_retriever {
         return $dot / ($qnorm * sqrt($vnorm));
     }
 
+    /**
+     * Compute cosine similarity between two equal-length float vectors.
+     *
+     * @param float[] $a
+     * @param float[] $b
+     * @return float Value in [-1, 1]; returns 0.0 if either vector has zero norm.
+     */
     private static function cosine(array $a, array $b): float {
         $dot = $norma = $normb = 0.0;
         $len = count($a);

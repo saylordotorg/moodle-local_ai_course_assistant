@@ -89,8 +89,21 @@ $msgwhere = \local_ai_course_assistant\analytics::spend_rows_predicate('m')
 // embedding, embed              -> rag
 // meta, meta_scheduled          -> analytics
 // mastery_signal, student_profile -> personalisation
-// speech_score, slide_vision    -> soapbox
+// speech_score, slide_vision, gesture_vision -> soapbox
 // objective_extract             -> authoring
+// flashcards                    -> flashcards
+// essay                         -> essay
+// insights                      -> insights
+// model_bench                   -> other, deliberately. Benchmark spend is real
+//                                  invoiced money and this page is a money-truth
+//                                  consumer, so the rows ARE in scope here and must
+//                                  stay that way -- see benchmark_spend_exclusion_test,
+//                                  which fails if this file ever learns to filter them.
+//                                  They get no bucket of their own because every other
+//                                  spend surface hides them, and one page disagreeing
+//                                  about what the bill is would be worse than one page
+//                                  pooling them. The reason lives in UNCATEGORISED in
+//                                  spend_predicate_coverage_test.
 // anything else                 -> other
 
 $categorysql = "CASE
@@ -100,8 +113,11 @@ $categorysql = "CASE
     WHEN m.interaction_type IN ('embedding','embed','rerank')               THEN 'rag'
     WHEN m.interaction_type IN ('meta','meta_scheduled')                    THEN 'analytics'
     WHEN m.interaction_type IN ('mastery_signal','student_profile')          THEN 'personalisation'
-    WHEN m.interaction_type IN ('speech_score','slide_vision')               THEN 'soapbox'
+    WHEN m.interaction_type IN ('speech_score','slide_vision','gesture_vision') THEN 'soapbox'
     WHEN m.interaction_type IN ('objective_extract')                         THEN 'authoring'
+    WHEN m.interaction_type IN ('flashcards')                                THEN 'flashcards'
+    WHEN m.interaction_type IN ('essay')                                     THEN 'essay'
+    WHEN m.interaction_type IN ('insights')                                  THEN 'insights'
     WHEN m.interaction_type IN ('premium_route')                            THEN 'premium_route'
     WHEN m.interaction_type IN ('quiz')                                     THEN 'quiz'
     WHEN m.interaction_type IN ('chat') OR m.interaction_type IS NULL OR m.interaction_type = '' THEN 'chat'
@@ -122,6 +138,14 @@ $categorylabels = [
     // v7.1.0: reuse the already-translated column heading rather than adding an
     // English-only key, same reasoning as the two above.
     'quiz'           => get_string('quizsettings:colquiz', 'local_ai_course_assistant'),
+    // These six emit from the CASE above. Without a label here they fell through
+    // the `?? $row->category` fallback and an administrator read the raw slug.
+    'personalisation' => get_string('token_analytics:cat_personalisation', 'local_ai_course_assistant'),
+    'soapbox'        => get_string('token_analytics:cat_soapbox', 'local_ai_course_assistant'),
+    'authoring'      => get_string('token_analytics:cat_authoring', 'local_ai_course_assistant'),
+    'flashcards'     => get_string('token_analytics:cat_flashcards', 'local_ai_course_assistant'),
+    'essay'          => get_string('token_analytics:cat_essay', 'local_ai_course_assistant'),
+    'insights'       => get_string('token_analytics:cat_insights', 'local_ai_course_assistant'),
     'other'          => get_string('token_analytics:cat_other', 'local_ai_course_assistant'),
 ];
 

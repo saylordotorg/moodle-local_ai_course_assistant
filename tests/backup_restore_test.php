@@ -41,13 +41,6 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 final class backup_restore_test extends \advanced_testcase {
 
     /**
-     * Back up a course and restore it into a new one, returning the new course id.
-     *
-     * @param int $courseid Source course.
-     * @param bool $withusers Include user data.
-     * @return int New course id.
-     */
-    /**
      * Restore a course archive INTO an existing course, without overwriting.
      *
      * This is the path that carried nothing: restore_course_task only adds
@@ -86,6 +79,13 @@ final class backup_restore_test extends \advanced_testcase {
         $rc->destroy();
     }
 
+    /**
+     * Back up a course and restore it into a new one, returning the new course id.
+     *
+     * @param int $courseid Source course.
+     * @param bool $withusers Include user data.
+     * @return int New course id.
+     */
     private function duplicate_course(int $courseid, bool $withusers): int {
         global $USER, $CFG;
 

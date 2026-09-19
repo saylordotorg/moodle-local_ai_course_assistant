@@ -2669,3 +2669,26 @@ $string['settings:supplemental_courses'] = 'Aanvullende cursussen';
 $string['settings:supplemental_courses_desc'] = 'Cursus-ID\'s waarvan [[tutorshort]] de inhoud ook mag gebruiken bij het antwoorden, gescheiden door komma\'s. Gebruik dit voor materiaal dat in een andere cursus staat en overal geldt, zoals een studentenintroductie of een informatiecentrum: wie naar het examenbeleid vraagt, krijgt het antwoord dan uit die cursus in plaats van niets.
 
 De cursussen moeten al geïndexeerd zijn voor ophalen; er wordt niets extra ingebed, dus er hier een toevoegen werkt direct en kost niets. Verborgen cursussen worden genegeerd. Activiteiten binnen een vermelde cursus worden echter geïndexeerd zoals de beheerder die de cursus opnieuw indexeerde ze zag, dus de tekst van een verborgen of beperkte activiteit kan aan een student worden geciteerd, ook al wordt er geen link naar getoond. Vermeld alleen cursussen waarvan de hele inhoud geschikt is voor het publiek. Maximaal {$a} cursussen. Een cursusinstelling vervangt, waar aanwezig, deze lijst in plaats van eraan toe te voegen.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Verwijderd op';
+$string['soapbox:download'] = 'Downloaden';
+$string['soapbox:download_aria'] = 'Download deze opname naar je apparaat';
+$string['soapbox:feedback_pending'] = 'Je feedback verschijnt hier zodra de beoordeling klaar is. Dat duurt meestal een paar minuten. Je hoeft niet op deze pagina te blijven.';
+$string['soapbox:feedback_toggle'] = 'Toon mijn feedback';
+$string['soapbox:frames_not_video'] = 'Deze opdracht is alleen audio, dus er zijn geen videobeelden om te uploaden.';
+$string['soapbox:howto_eyes'] = 'Kijk in de cameralens, niet naar je eigen beeld op het scherm. Op video leest kijken in de lens voor je publiek als oogcontact.';
+$string['soapbox:howto_feedback'] = 'Een paar minuten nadat je klaar bent krijg je een score en geschreven feedback op elk criterium van het beoordelingsmodel, inclusief je lichaamstaal en camerapresentie als je camera aan stond.';
+$string['soapbox:howto_frame'] = 'Zet je camera op ooghoogte, ongeveer anderhalve armlengte weg, zodat je hoofd, schouders en handen in beeld zijn. Gebaren onder de rand van het beeld zijn niet te zien en kunnen dus niet worden beoordeeld.';
+$string['soapbox:howto_hands'] = 'Geef jezelf ruimte om je handen te bewegen en spreek op je normale volume. Neem één volledige take op: pauzes, herstarts en een enkele struikeling zijn normaal en tellen niet tegen je.';
+$string['soapbox:howto_heading'] = 'Voordat je opneemt';
+$string['soapbox:howto_light'] = 'Ga voor een raam of lamp staan en houd fel licht achter je zo beperkt mogelijk. Een raam achter je maakt van jou een silhouet.';
+$string['soapbox:not_assessed'] = 'Niet beoordeeld';
+$string['soapbox:not_assessed_aria'] = 'Dit criterium is bij deze poging niet beoordeeld en is buiten je score gelaten';
+$string['soapbox:present_privacy'] = 'Je opname wordt geüpload naar de opslag van [[uniname]] om te worden getranscribeerd en beoordeeld. Alleen jij en sitebeheerders kunnen hem openen. Hij wordt {$a} dagen na de opname automatisch verwijderd, samen met de stilstaande beelden voor feedback op lichaamstaal. Je transcript, scores en feedback blijven bewaard nadat de video weg is, dus download wat je wilt houden.';
+$string['soapbox:scored_on'] = 'Je totaalscore is het gemiddelde van de {$a->assessed} criteria die zijn beoordeeld, van de {$a->total} in het model ({$a->pct}%). Wat niet beoordeeld kon worden is weggelaten in plaats van op nul gezet.';
+$string['soapbox:visual_not_assessed'] = 'Lichaamstaal en camerapresentie zijn bij deze poging niet beoordeeld, omdat er geen video is opgenomen of het camerabeeld niet te lezen was. Die criteria zijn buiten je score gelaten in plaats van als onvoldoende geteld. Neem op met je camera aan, met hoofd, schouders en handen in beeld, om hier feedback op te krijgen.';
+$string['soapbox:watch'] = 'Bekijken';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'De opslaglocatie van de opgenomen video of audio, totdat die aan het einde van de bewaartermijn wordt verwijderd.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'De opslaglocatie van de dia\'s die met de opname zijn geüpload, totdat ze samen met de opname worden verwijderd.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'De opslaglocatie van de stilstaande beelden uit de opname voor feedback op lichaamstaal. Worden samen met de opname verwijderd.';

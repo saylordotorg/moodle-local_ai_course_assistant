@@ -69,6 +69,104 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
     ];
 
     /**
+     * Billable types deliberately absent from token_analytics.php's $categorysql,
+     * with the reason each one stays pooled in ELSE 'other'.
+     *
+     * @var array<string,string>
+     */
+    private const UNCATEGORISED = [
+        'model_bench' => 'benchmark spend is hidden by every other spend surface, so giving it '
+            . 'a visible bucket on this one page would contradict that. The rows themselves are '
+            . 'deliberately still IN scope here -- this page is a money-truth consumer and the '
+            . 'bill is the whole bill -- they are just pooled into ELSE other rather than named',
+    ];
+
+    /**
+     * Read token_analytics.php's category CASE as text.
+     *
+     * The page cannot be included: it require_capability()s on moodle/site:config
+     * at the top and would die. Text-scanning a page is established practice in
+     * this suite for exactly that reason -- see benchmark_spend_exclusion_test.
+     *
+     * @return string The CASE ... END block.
+     */
+    private static function category_case(): string {
+        $src = file_get_contents(dirname(__DIR__) . '/token_analytics.php');
+        $matched = preg_match('/\$categorysql\s*=\s*"(CASE.*?END)"/s', (string) $src, $m);
+        self::assertSame(
+            1,
+            $matched,
+            'Could not find $categorysql in token_analytics.php. If it was renamed or '
+                . 'restructured, fix this regex -- do not delete the test, or the category '
+                . 'mapping goes back to having nothing pinning it at all.'
+        );
+        return $m[1];
+    }
+
+    /**
+     * Every billable type reaches a named category on the spend dashboard.
+     *
+     * The predicate decides whether a row is COUNTED. This decides whether it is
+     * ATTRIBUTED. A type can pass the predicate, be priced correctly, and still
+     * land in "Other", which reads as a real answer rather than a gap -- so the
+     * feature that spent the money never shows up next to its own name.
+     *
+     * v6.1.0 did this to RAG rows and v7.5.1 did it to gesture_vision, both in
+     * this same file, because the CASE had nothing pinning it.
+     *
+     * @return void
+     */
+    public function test_every_billable_type_has_a_category_on_the_spend_dashboard(): void {
+        $case = self::category_case();
+        $missing = [];
+        foreach (array_keys(self::discover_written_types()) as $type) {
+            if (isset(self::NOT_BILLABLE[$type]) || isset(self::UNCATEGORISED[$type])) {
+                continue;
+            }
+            if (strpos($case, "'{$type}'") === false) {
+                $missing[] = $type;
+            }
+        }
+        sort($missing);
+        $this->assertSame(
+            [],
+            $missing,
+            "A billable interaction_type reaches no category arm in token_analytics.php, so its "
+                . "spend is pooled into 'Other' on the dashboard. Add it to \$categorysql, or to "
+                . "this test's UNCATEGORISED list with the reason it belongs in Other."
+        );
+    }
+
+    /**
+     * Every slug the CASE emits has a display label.
+     *
+     * $categorylabels falls back to `?? $row->category`, so a missing label is
+     * not an error -- the administrator just reads a raw slug like
+     * 'personalisation' in a column of translated names.
+     *
+     * @return void
+     */
+    public function test_every_category_slug_has_a_display_label(): void {
+        $case = self::category_case();
+        preg_match_all("/THEN\s*'([a-z_]+)'/", $case, $m);
+        $slugs = array_values(array_unique($m[1]));
+
+        $src = (string) file_get_contents(dirname(__DIR__) . '/token_analytics.php');
+        $matched = preg_match('/\$categorylabels\s*=\s*\[(.*?)\n\];/s', $src, $lm);
+        $this->assertSame(1, $matched, 'Could not find $categorylabels in token_analytics.php.');
+        preg_match_all("/'([a-z_]+)'\s*=>/", $lm[1], $km);
+
+        $unlabelled = array_values(array_diff($slugs, $km[1]));
+        sort($unlabelled);
+        $this->assertSame(
+            [],
+            $unlabelled,
+            'A category slug emitted by $categorysql has no entry in $categorylabels, so the '
+                . 'spend dashboard renders the raw slug instead of a translated label.'
+        );
+    }
+
+    /**
      * Every billable interaction_type any writer emits is listed in the
      * predicate.
      *
@@ -146,6 +244,7 @@ final class spend_predicate_coverage_test extends \advanced_testcase {
             'speech_score'      => 'external\\score_speech::execute',
             'objective_extract' => 'objective_manager::extract_via_llm',
             'slide_vision'      => 'soapbox_slide_vision::design_note',
+            'gesture_vision'    => 'soapbox_gesture_vision::observe',
             'model_bench'       => 'run_model_benchmark via flush_bench_spend',
             // Seven voice types have been in the predicate since v7.3.3.
             'voice'           => 'voice_registry::interaction_type fallback',

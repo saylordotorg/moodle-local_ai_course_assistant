@@ -2682,3 +2682,26 @@ $string['settings:supplemental_courses'] = '补充课程';
 $string['settings:supplemental_courses_desc'] = '[[tutorshort]] 作答时也可以引用其内容的课程 ID，用逗号分隔。适用于位于另一门课程但处处适用的材料，例如学生导览课或资源中心：这样询问考试规定的学习者就能从那门课程得到答案，而不是一无所获。
 
 课程必须已为检索建立索引；不会额外做嵌入，因此在此添加会立即生效且不产生费用。隐藏的课程会被忽略。但所列课程内的活动是按重建索引的管理员当时所见的状态建立索引的，因此隐藏或受限活动的文字有可能被引用给学习者，即使不显示任何指向它的链接。请只列出全部内容都适合读者的课程。最多 {$a} 门课程。课程级设置若存在，会替换此列表而不是追加。';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = '删除日期';
+$string['soapbox:download'] = '下载';
+$string['soapbox:download_aria'] = '将这段录制下载到你的设备';
+$string['soapbox:feedback_pending'] = '评分完成后，你的反馈会显示在这里。通常需要几分钟。你不必停留在本页。';
+$string['soapbox:feedback_toggle'] = '查看我的反馈';
+$string['soapbox:frames_not_video'] = '本作业仅有音频，因此没有可上传的视频画面。';
+$string['soapbox:howto_eyes'] = '看镜头，而不是屏幕上自己的画面。在视频里，看镜头才会让观众感觉到目光交流。';
+$string['soapbox:howto_feedback'] = '结束几分钟后，你会收到每一条评分标准的分数和文字反馈，如果开着摄像头，还包括你的肢体语言和镜头前的表现。';
+$string['soapbox:howto_frame'] = '把摄像头放在与视线齐平的位置，约一臂半远，让头、肩和手都进入画面。在画面下边缘以下做的手势看不到，因此无法评分。';
+$string['soapbox:howto_hands'] = '给自己留出活动双手的空间，用平常的音量讲话。一次录完：停顿、重新开始和偶尔卡壳都很正常，不会扣分。';
+$string['soapbox:howto_heading'] = '录制之前';
+$string['soapbox:howto_light'] = '面向窗户或台灯，尽量减少身后的强光。身后有窗会把你变成一个剪影。';
+$string['soapbox:not_assessed'] = '未评估';
+$string['soapbox:not_assessed_aria'] = '本次提交未评估该项标准，已将其排除在你的分数之外';
+$string['soapbox:present_privacy'] = '你的录制会上传到 [[uniname]] 的存储空间，以便转写和评分。只有你和站点管理员可以打开。录制后 {$a} 天会连同用于肢体语言反馈的静态画面一起自动删除。视频删除后，转写文字、分数和反馈仍会保留，所以想留存的内容请自行下载。';
+$string['soapbox:scored_on'] = '你的总分是评分表中 {$a->total} 条标准里实际评估的 {$a->assessed} 条的平均分（{$a->pct}%）。无法评估的部分被排除在外，而不是记为零分。';
+$string['soapbox:visual_not_assessed'] = '本次未评估肢体语言和镜头前的表现，因为没有录到视频，或者摄像头画面无法识别。这两项被排除在分数之外，而不是拉低你的分数。想获得这方面的反馈，请开启摄像头录制，并让头、肩和手都在画面中。';
+$string['soapbox:watch'] = '观看';
+$string['privacy:metadata:sbx_rec:storage_key'] = '录制的视频或音频的存储位置，直到保留期结束被删除为止。';
+$string['privacy:metadata:sbx_rec:deck_key'] = '随录制一起上传的幻灯片的存储位置，直到与录制一起被删除为止。';
+$string['privacy:metadata:sbx_rec:frames_key'] = '为肢体语言反馈从录制中截取的静态画面的存储位置。与录制一起删除。';

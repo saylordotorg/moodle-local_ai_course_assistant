@@ -35,21 +35,6 @@ use local_ai_course_assistant\prompt\section;
  */
 class context_builder {
     /**
-     * Maximum system prompt length in characters.
-     * Hosted large-context models (e.g. Claude Sonnet 4.6, 200K tokens) leave
-     * ample room; this is now a fallback ceiling only. When backend_context_tokens
-     * is set (self-hosted small-context backends), effective_budget_chars()
-     * computes a tighter, window-aware budget below this value.
-     */
-    /**
-     * Floor for the base_template cap, in characters.
-     *
-     * Sized so the shipped 1,640-char default and any reasonable operator
-     * rewrite of it clear the cap comfortably, while a pasted 100 KB template
-     * is still bounded rather than being allowed to crowd out the entire rest
-     * of the prompt from the front of the drop queue.
-     */
-    /**
      * Context window, in tokens, for the models this plugin routes to.
      *
      * Matched on prefix, so a dated or regional variant of a model resolves to
@@ -99,6 +84,14 @@ class context_builder {
      */
     public const DEFAULT_BUDGET_CHARS = 36000;
 
+    /**
+     * Floor for the base_template cap, in characters.
+     *
+     * Sized so the shipped 1,640-char default and any reasonable operator
+     * rewrite of it clear the cap comfortably, while a pasted 100 KB template
+     * is still bounded rather than being allowed to crowd out the entire rest
+     * of the prompt from the front of the drop queue.
+     */
     public const IDENTITY_MIN_CHARS = 4000;
 
     /**
@@ -1222,18 +1215,6 @@ class context_builder {
     }
 
     /**
-     * v5.10.0: Clamp the system-prompt character budget so the prompt fits a
-     * backend token window. Returns $rawbudget unchanged when $windowtokens
-     * is 0 (hosted/unlimited). Otherwise computes a token-aware ceiling and
-     * returns max(MIN_BUDGET_FLOOR, min($rawbudget, ceiling)).
-     *
-     * @param int $rawbudget admin prompt_budget_chars
-     * @param int $windowtokens backend_context_tokens (0 = unlimited)
-     * @param int $outputtokens reserved output tokens (max_tokens)
-     * @param int $historytokens estimated conversation-history tokens
-     * @param string $lang learner language code
-     */
-    /**
      * The model's context window in tokens, or 0 when it cannot be known.
      *
      * @param int $courseid Course whose provider override may apply.
@@ -1332,6 +1313,18 @@ class context_builder {
         return max($configured, $ceiling);
     }
 
+    /**
+     * v5.10.0: Clamp the system-prompt character budget so the prompt fits a
+     * backend token window. Returns $rawbudget unchanged when $windowtokens
+     * is 0 (hosted/unlimited). Otherwise computes a token-aware ceiling and
+     * returns max(MIN_BUDGET_FLOOR, min($rawbudget, ceiling)).
+     *
+     * @param int $rawbudget admin prompt_budget_chars
+     * @param int $windowtokens backend_context_tokens (0 = unlimited)
+     * @param int $outputtokens reserved output tokens (max_tokens)
+     * @param int $historytokens estimated conversation-history tokens
+     * @param string $lang learner language code
+     */
     public static function effective_budget_chars(
         int $rawbudget,
         int $windowtokens,
@@ -1365,6 +1358,32 @@ class context_builder {
     }
 
     /**
+     * Note that retrieved course content was cut, for the settings-page warning.
+     *
+     * Throttled to at most one config write per hour. The value is the timestamp
+     * of the most recent turn on which course_content was dropped or truncated.
+     *
+     * @param array $breakdown Assembly breakdown from prompt\builder::assemble().
+     * @return void
+     */
+    private static function note_content_truncation(array $breakdown): void {
+        $cc = $breakdown['course_content'] ?? null;
+        if ($cc === null) {
+            return;
+        }
+        $lost = empty($cc['used']) || !empty($cc['truncated']);
+        if (!$lost) {
+            return;
+        }
+        $last = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
+        $now = time();
+        if ($now - $last < HOURSECS) {
+            return;
+        }
+        set_config('prompt_truncation_seen', $now, 'local_ai_course_assistant');
+    }
+
+    /**
      * v5.6.0: Compute per-bucket character budgets for the system prompt.
      *
      * Weights are percentages summing to 100 across the four buckets
@@ -1394,32 +1413,6 @@ class context_builder {
      *                            than left unspent. Null keeps the fixed split.
      * @return array<string,int> Map of bucket key -> char budget.
      */
-    /**
-     * Note that retrieved course content was cut, for the settings-page warning.
-     *
-     * Throttled to at most one config write per hour. The value is the timestamp
-     * of the most recent turn on which course_content was dropped or truncated.
-     *
-     * @param array $breakdown Assembly breakdown from prompt\builder::assemble().
-     * @return void
-     */
-    private static function note_content_truncation(array $breakdown): void {
-        $cc = $breakdown['course_content'] ?? null;
-        if ($cc === null) {
-            return;
-        }
-        $lost = empty($cc['used']) || !empty($cc['truncated']);
-        if (!$lost) {
-            return;
-        }
-        $last = (int) get_config('local_ai_course_assistant', 'prompt_truncation_seen');
-        $now = time();
-        if ($now - $last < HOURSECS) {
-            return;
-        }
-        set_config('prompt_truncation_seen', $now, 'local_ai_course_assistant');
-    }
-
     public static function section_budgets(
         int $total_budget,
         int $pageid,
@@ -2142,12 +2135,6 @@ class context_builder {
     }
 
     /**
-     * Get role-specific additional instructions.
-     *
-     * @param string $role 'administrator', 'academic_support', or 'student'
-     * @return string
-     */
-    /**
      * Instruction forbidding the model from surfacing the user's role.
      *
      * The role is injected deliberately, to steer depth and Socratic behavior.
@@ -2172,6 +2159,12 @@ class context_builder {
             . 'The role changes how you answer; it is never something you say.';
     }
 
+    /**
+     * Get role-specific additional instructions.
+     *
+     * @param string $role 'administrator', 'academic_support', or 'student'
+     * @return string
+     */
     private static function get_role_instructions(string $role): string {
         if ($role === 'administrator') {
             return 'The user is an Administrator. Provide direct, comprehensive answers. '
@@ -2200,13 +2193,6 @@ class context_builder {
             . self::role_voice_rule();
     }
 
-    /**
-     * Get AI literacy instructions to weave into tutoring.
-     *
-     * Remote config key: instruction_blocks.ai_literacy
-     *
-     * @return string
-     */
     /**
      * v4.12.0: Socratic-mode directive, scaled by verbosity. The 1-line
      * concise form is what hosted models follow reliably; verbose mode
@@ -2404,6 +2390,13 @@ class context_builder {
         return "\n\n## House style\n- " . implode("\n- ", $rules);
     }
 
+    /**
+     * Get AI literacy instructions to weave into tutoring.
+     *
+     * Remote config key: instruction_blocks.ai_literacy
+     *
+     * @return string
+     */
     private static function get_ai_literacy_instructions(): string {
         $blocks = remote_config_manager::get_value('instruction_blocks', []);
         if (!empty($blocks['ai_literacy'])) {

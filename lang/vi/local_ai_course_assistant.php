@@ -2666,3 +2666,26 @@ $string['settings:supplemental_courses'] = 'Khóa học bổ sung';
 $string['settings:supplemental_courses_desc'] = 'ID của các khóa học mà [[tutorshort]] cũng được dùng nội dung khi trả lời, phân tách bằng dấu phẩy. Dùng cho tài liệu nằm ở khóa khác nhưng áp dụng ở mọi nơi, như khóa định hướng cho sinh viên hoặc trung tâm tài nguyên: khi đó người hỏi về quy định thi sẽ nhận câu trả lời từ khóa ấy thay vì không có gì.
 
 Các khóa phải đã được lập chỉ mục để truy xuất; không nhúng thêm gì cả, nên thêm một khóa ở đây có hiệu lực ngay và không tốn chi phí. Khóa bị ẩn sẽ bị bỏ qua. Tuy nhiên, các hoạt động bên trong một khóa được liệt kê sẽ được lập chỉ mục đúng như quản trị viên lập chỉ mục lại nhìn thấy, nên văn bản của một hoạt động bị ẩn hoặc bị hạn chế vẫn có thể được trích cho người học dù không hiển thị liên kết nào tới nó. Chỉ liệt kê những khóa mà toàn bộ nội dung phù hợp với người đọc. Tối đa {$a} khóa. Thiết lập ở cấp khóa học, nếu có, sẽ thay thế danh sách này chứ không cộng thêm.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Xóa vào';
+$string['soapbox:download'] = 'Tải xuống';
+$string['soapbox:download_aria'] = 'Tải bản ghi này về thiết bị của bạn';
+$string['soapbox:feedback_pending'] = 'Nhận xét của bạn sẽ xuất hiện ở đây khi việc chấm điểm hoàn tất. Thường mất vài phút. Bạn không cần ở lại trang này.';
+$string['soapbox:feedback_toggle'] = 'Xem nhận xét của tôi';
+$string['soapbox:frames_not_video'] = 'Bài này chỉ có âm thanh nên không có khung hình video để tải lên.';
+$string['soapbox:howto_eyes'] = 'Hãy nhìn vào ống kính máy quay, không nhìn hình của chính bạn trên màn hình. Trong video, nhìn vào ống kính mới là điều người xem cảm nhận như giao tiếp bằng mắt.';
+$string['soapbox:howto_feedback'] = 'Vài phút sau khi kết thúc, bạn sẽ nhận được điểm và nhận xét bằng chữ cho từng tiêu chí, bao gồm ngôn ngữ cơ thể và sự hiện diện trước máy quay khi máy quay được bật.';
+$string['soapbox:howto_frame'] = 'Đặt máy quay ngang tầm mắt, cách khoảng một cánh tay rưỡi, sao cho đầu, vai và bàn tay đều nằm trong khung hình. Những cử chỉ thực hiện dưới mép khung hình sẽ không thấy được nên không thể chấm.';
+$string['soapbox:howto_hands'] = 'Chừa chỗ để cử động tay và nói với âm lượng bình thường của bạn. Hãy quay một lần trọn vẹn: dừng lại, bắt đầu lại và đôi lúc vấp là chuyện bình thường và không bị trừ điểm.';
+$string['soapbox:howto_heading'] = 'Trước khi quay';
+$string['soapbox:howto_light'] = 'Hãy quay mặt về phía cửa sổ hoặc đèn, và hạn chế ánh sáng mạnh phía sau lưng. Cửa sổ sau lưng sẽ biến bạn thành một bóng đen.';
+$string['soapbox:not_assessed'] = 'Chưa được chấm';
+$string['soapbox:not_assessed_aria'] = 'Tiêu chí này không được chấm trong lần thử này và đã được để ngoài điểm của bạn';
+$string['soapbox:present_privacy'] = 'Bản ghi của bạn được tải lên kho lưu trữ của [[uniname]] để được gỡ băng và chấm điểm. Chỉ bạn và quản trị viên trang mới mở được. Bản ghi sẽ tự động bị xóa {$a} ngày sau khi bạn quay, cùng với các khung hình tĩnh dùng cho nhận xét về ngôn ngữ cơ thể. Bản gỡ băng, điểm và nhận xét vẫn được giữ sau khi video biến mất, vì vậy hãy tải về những gì bạn muốn giữ.';
+$string['soapbox:scored_on'] = 'Điểm tổng của bạn là trung bình của {$a->assessed} tiêu chí đã được chấm, trên tổng số {$a->total} trong bảng tiêu chí ({$a->pct}%). Những gì không thể chấm đã được để ngoài thay vì cho điểm không.';
+$string['soapbox:visual_not_assessed'] = 'Ngôn ngữ cơ thể và sự hiện diện trước máy quay không được chấm trong lần thử này, vì không có video được quay hoặc hình ảnh từ máy quay không đọc được. Các tiêu chí đó được để ngoài điểm thay vì bị trừ. Hãy quay với máy quay bật, đầu, vai và bàn tay trong khung hình, để nhận nhận xét về chúng.';
+$string['soapbox:watch'] = 'Xem';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Vị trí lưu trữ của video hoặc âm thanh đã ghi, cho đến khi bị xóa vào cuối thời hạn lưu giữ.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Vị trí lưu trữ của bộ trình chiếu được tải lên cùng bản ghi, cho đến khi bị xóa cùng với nó.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Vị trí lưu trữ của các khung hình tĩnh lấy từ bản ghi để phục vụ nhận xét về ngôn ngữ cơ thể. Bị xóa cùng bản ghi.';

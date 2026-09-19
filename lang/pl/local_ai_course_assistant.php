@@ -2645,3 +2645,26 @@ $string['settings:supplemental_courses'] = 'Kursy uzupełniające';
 $string['settings:supplemental_courses_desc'] = 'Identyfikatory kursów, z których treści [[tutorshort]] może również korzystać przy odpowiadaniu, oddzielone przecinkami. Używaj do materiałów, które znajdują się w innym kursie i obowiązują wszędzie, jak orientacja dla studentów lub centrum zasobów: osoba pytająca o zasady egzaminów dostaje wtedy odpowiedź z tamtego kursu zamiast żadnej.
 
 Kursy muszą być już zindeksowane na potrzeby wyszukiwania; nic dodatkowego nie jest osadzane, więc dodanie kursu tutaj działa natychmiast i nic nie kosztuje. Kursy ukryte są pomijane. Aktywności wewnątrz wymienionego kursu są jednak indeksowane tak, jak widział je administrator, który go przeindeksował, więc tekst ukrytej lub ograniczonej aktywności może zostać zacytowany studentowi, nawet jeśli nie pokazuje się do niej żaden odnośnik. Wymieniaj tylko kursy, których cała treść jest odpowiednia dla odbiorców. Maksymalnie {$a} kursów. Ustawienie na poziomie kursu, jeśli istnieje, zastępuje tę listę, a nie dodaje się do niej.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Usunięcie';
+$string['soapbox:download'] = 'Pobierz';
+$string['soapbox:download_aria'] = 'Pobierz to nagranie na swoje urządzenie';
+$string['soapbox:feedback_pending'] = 'Twoja informacja zwrotna pojawi się tutaj po zakończeniu oceniania. Zwykle trwa to kilka minut. Nie musisz zostawać na tej stronie.';
+$string['soapbox:feedback_toggle'] = 'Pokaż moją informację zwrotną';
+$string['soapbox:frames_not_video'] = 'To zadanie jest tylko dźwiękowe, więc nie ma klatek wideo do przesłania.';
+$string['soapbox:howto_eyes'] = 'Patrz w obiektyw kamery, a nie na swój obraz na ekranie. W nagraniu wideo to spojrzenie w obiektyw odbiera się jako kontakt wzrokowy.';
+$string['soapbox:howto_feedback'] = 'Kilka minut po zakończeniu otrzymasz ocenę i pisemną informację zwrotną do każdego kryterium, w tym do mowy ciała i obecności przed kamerą, jeśli kamera była włączona.';
+$string['soapbox:howto_frame'] = 'Ustaw kamerę na wysokości oczu, mniej więcej półtorej długości ramienia od siebie, tak aby w kadrze były głowa, ramiona i dłonie. Gestów poniżej krawędzi kadru nie widać, więc nie da się ich ocenić.';
+$string['soapbox:howto_hands'] = 'Zostaw sobie miejsce na ruch rąk i mów normalnym głosem. Nagraj jedno pełne podejście: pauzy, ponowne początki i drobne potknięcia są normalne i nie obniżają oceny.';
+$string['soapbox:howto_heading'] = 'Zanim zaczniesz nagrywać';
+$string['soapbox:howto_light'] = 'Ustaw się twarzą do okna lub lampy i ogranicz jasne światło za plecami. Okno za tobą zamienia cię w sylwetkę.';
+$string['soapbox:not_assessed'] = 'Nieocenione';
+$string['soapbox:not_assessed_aria'] = 'To kryterium nie zostało ocenione w tym podejściu i nie weszło do twojej oceny';
+$string['soapbox:present_privacy'] = 'Twoje nagranie trafia do magazynu [[uniname]], aby mogło zostać przepisane i ocenione. Otworzyć je możesz tylko ty i administratorzy serwisu. Jest usuwane automatycznie {$a} dni po nagraniu, razem z klatkami użytymi do informacji zwrotnej o mowie ciała. Transkrypcja, oceny i informacja zwrotna zostają po zniknięciu wideo, więc pobierz to, co chcesz zachować.';
+$string['soapbox:scored_on'] = 'Twoja ocena ogólna to średnia z {$a->assessed} ocenionych kryteriów spośród {$a->total} w tabeli ({$a->pct}%). To, czego nie dało się ocenić, zostało pominięte, a nie ocenione na zero.';
+$string['soapbox:visual_not_assessed'] = 'Mowa ciała i obecność przed kamerą nie zostały ocenione w tym podejściu, ponieważ nie nagrano wideo albo obrazu z kamery nie dało się odczytać. Te kryteria zostały pominięte, a nie policzone na twoją niekorzyść. Nagraj z włączoną kamerą, z głową, ramionami i dłońmi w kadrze, aby otrzymać informację zwrotną na ich temat.';
+$string['soapbox:watch'] = 'Obejrzyj';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Miejsce przechowywania nagranego wideo lub dźwięku, do czasu usunięcia na koniec okresu przechowywania.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Miejsce przechowywania slajdów przesłanych razem z nagraniem, do czasu usunięcia razem z nim.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Miejsce przechowywania klatek pobranych z nagrania na potrzeby informacji zwrotnej o mowie ciała. Usuwane razem z nagraniem.';

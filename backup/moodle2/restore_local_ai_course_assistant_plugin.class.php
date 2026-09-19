@@ -124,17 +124,6 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     }
 
     /**
-     * A per-course override stored in config_plugins as "<setting>_course_<id>".
-     *
-     * The course id is part of the setting name, so it is remapped here the way
-     * a foreign key would be elsewhere. Without this the row would either be
-     * dropped or, worse, written back against the ORIGINATING course and change
-     * the settings of the course that was backed up.
-     *
-     * @param array|object $data
-     * @return void
-     */
-    /**
      * Rows whose cmid cannot be resolved yet, held until after_restore_course().
      *
      * Course-module mappings do not exist while the COURSE task runs: core sets
@@ -154,6 +143,17 @@ class restore_local_ai_course_assistant_plugin extends restore_local_plugin {
     /** @var array [table => [[newid, oldcmid], ...]] rows needing a cmid fix-up. */
     private $deferredcmids = [];
 
+    /**
+     * A per-course override stored in config_plugins as "<setting>_course_<id>".
+     *
+     * The course id is part of the setting name, so it is remapped here the way
+     * a foreign key would be elsewhere. Without this the row would either be
+     * dropped or, worse, written back against the ORIGINATING course and change
+     * the settings of the course that was backed up.
+     *
+     * @param array|object $data
+     * @return void
+     */
     public function process_aica_course_setting($data) {
         $data = (object) $data;
         $name = (string) ($data->name ?? '');

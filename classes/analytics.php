@@ -542,6 +542,10 @@ class analytics {
         // slide_vision. Each is a real provider round-trip whose usage row existed
         // nowhere until now.
         //
+        // v7.5.1 adds gesture_vision, the body-language pass. Same shape as
+        // slide_vision: one real provider round-trip per scored recording, on a
+        // role='system' row, which the assistant arm can never match.
+        //
         // Note every one of those names carries an underscore. sse.php:111 reads a
         // CLIENT-supplied interaction_type with PARAM_ALPHA, which strips
         // underscores, so a learner cannot forge one of these onto their own
@@ -553,7 +557,8 @@ class analytics {
                      'openai_whisper', 'openai_stt', 'xai_stt', 'selfhosted_stt',
                      'flashcards', 'essay', 'insights',
                      'mastery_signal', 'student_profile', 'speech_score',
-                     'objective_extract', 'slide_vision', 'model_bench')))";
+                     'objective_extract', 'slide_vision', 'model_bench',
+                     'gesture_vision')))";
     }
 
     /**

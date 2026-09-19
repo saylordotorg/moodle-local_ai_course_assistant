@@ -2644,3 +2644,26 @@ $string['settings:supplemental_courses'] = '보조 강좌';
 $string['settings:supplemental_courses_desc'] = '답변할 때 [[tutorshort]]가 내용을 함께 활용할 수 있는 강좌 ID(쉼표로 구분). 다른 강좌에 있으면서 어디서나 적용되는 자료에 사용하세요. 예를 들어 학생 오리엔테이션이나 자료 센터입니다. 그러면 시험 규정을 묻는 학습자가 아무 답도 못 받는 대신 그 강좌에서 답을 받습니다.
 
 강좌는 검색을 위해 이미 색인되어 있어야 합니다. 추가로 임베딩하지 않으므로 여기에 추가하면 즉시 반영되고 비용도 들지 않습니다. 숨겨진 강좌는 무시됩니다. 다만 지정한 강좌 안의 활동은 재색인을 실행한 관리자가 본 상태 그대로 색인되므로, 숨겨졌거나 제한된 활동의 본문이 링크가 표시되지 않더라도 학습자에게 인용될 수 있습니다. 전체 내용이 대상 독자에게 적합한 강좌만 지정하세요. 최대 {$a}개 강좌. 강좌 단위 설정이 있으면 이 목록에 더해지지 않고 대체합니다.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = '삭제일';
+$string['soapbox:download'] = '다운로드';
+$string['soapbox:download_aria'] = '이 녹화를 내 기기에 다운로드합니다';
+$string['soapbox:feedback_pending'] = '채점이 끝나면 피드백이 여기에 표시됩니다. 보통 몇 분 걸립니다. 이 페이지에 머무를 필요는 없습니다.';
+$string['soapbox:feedback_toggle'] = '내 피드백 보기';
+$string['soapbox:frames_not_video'] = '이 과제는 음성만 사용하므로 업로드할 영상 프레임이 없습니다.';
+$string['soapbox:howto_eyes'] = '화면에 보이는 자신이 아니라 카메라 렌즈를 보세요. 영상에서는 렌즈를 보는 것이 청중에게 시선을 맞추는 것으로 읽힙니다.';
+$string['soapbox:howto_feedback'] = '마친 뒤 몇 분이면 채점 기준별 점수와 서면 피드백을 받게 됩니다. 카메라가 켜져 있었다면 몸짓과 화면에서의 모습도 포함됩니다.';
+$string['soapbox:howto_frame'] = '카메라를 눈높이에, 팔 길이의 한 배 반쯤 떨어진 곳에 두어 머리와 어깨와 손이 모두 화면에 들어오게 하세요. 화면 아래 경계보다 낮은 곳에서 한 몸짓은 보이지 않으므로 평가할 수 없습니다.';
+$string['soapbox:howto_hands'] = '손을 움직일 공간을 두고 평소 목소리로 말하세요. 한 번에 끝까지 녹화하세요. 멈추거나 다시 시작하거나 가끔 말이 막히는 것은 자연스러운 일이며 감점되지 않습니다.';
+$string['soapbox:howto_heading'] = '녹화하기 전에';
+$string['soapbox:howto_light'] = '창문이나 조명을 마주 보고, 뒤쪽의 밝은 빛은 최대한 줄이세요. 뒤에 창문이 있으면 실루엣만 남습니다.';
+$string['soapbox:not_assessed'] = '평가되지 않음';
+$string['soapbox:not_assessed_aria'] = '이 기준은 이번 시도에서 평가되지 않았으며 점수에서 제외되었습니다';
+$string['soapbox:present_privacy'] = '녹화는 전사와 채점을 위해 [[uniname]] 저장소에 업로드됩니다. 본인과 사이트 관리자만 열 수 있습니다. 녹화한 지 {$a}일 후에 몸짓 피드백에 사용한 정지 화면과 함께 자동으로 삭제됩니다. 영상이 사라진 뒤에도 전사본과 점수와 피드백은 남으므로, 보관하고 싶은 것은 내려받아 두세요.';
+$string['soapbox:scored_on'] = '종합 점수는 채점 기준 {$a->total}개 중 실제로 평가된 {$a->assessed}개의 평균입니다({$a->pct}%). 평가할 수 없었던 항목은 0점 처리 대신 계산에서 제외했습니다.';
+$string['soapbox:visual_not_assessed'] = '이번 시도에서는 몸짓과 화면에서의 모습을 평가하지 않았습니다. 영상이 녹화되지 않았거나 카메라 화면을 읽을 수 없었기 때문입니다. 해당 기준은 점수를 깎는 대신 계산에서 제외했습니다. 이에 대한 피드백을 받으려면 카메라를 켜고 머리와 어깨와 손이 화면에 들어오도록 녹화하세요.';
+$string['soapbox:watch'] = '보기';
+$string['privacy:metadata:sbx_rec:storage_key'] = '녹화된 영상 또는 음성의 저장 위치. 보존 기간이 끝나 삭제될 때까지입니다.';
+$string['privacy:metadata:sbx_rec:deck_key'] = '녹화와 함께 업로드된 슬라이드의 저장 위치. 녹화와 함께 삭제될 때까지입니다.';
+$string['privacy:metadata:sbx_rec:frames_key'] = '몸짓 피드백을 위해 녹화에서 추출한 정지 화면의 저장 위치. 녹화와 함께 삭제됩니다.';

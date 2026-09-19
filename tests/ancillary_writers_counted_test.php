@@ -33,10 +33,10 @@ namespace local_ai_course_assistant;
  */
 final class ancillary_writers_counted_test extends \advanced_testcase {
 
-    /** @var string[] The five types added in v7.4.4. */
+    /** @var string[] The five types added in v7.4.4, plus gesture_vision in v7.5.1. */
     private const NEW_TYPES = [
         'mastery_signal', 'student_profile', 'speech_score',
-        'objective_extract', 'slide_vision',
+        'objective_extract', 'slide_vision', 'gesture_vision',
     ];
 
     /**
@@ -114,8 +114,11 @@ final class ancillary_writers_counted_test extends \advanced_testcase {
             );
         }
 
+        // Derived from NEW_TYPES, not a literal: a hardcoded total makes adding
+        // the next ancillary writer look like a spend regression in a test whose
+        // subject is the writer, not the arithmetic.
         $this->assertSame(
-            $before + (5 * 1500),
+            $before + (count(self::NEW_TYPES) * 1500),
             analytics::get_total_tokens(),
             'get_total_tokens() must include the new rows; if it does not, the site-wide '
             . 'spend total still under-reports by exactly this work.'

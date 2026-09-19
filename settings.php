@@ -1908,6 +1908,12 @@ if ($hassiteconfig) {
         get_string('settings:soapbox_slide_vision_desc', 'local_ai_course_assistant'),
         0
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/soapbox_gesture_vision',
+        get_string('settings:soapbox_gesture_vision', 'local_ai_course_assistant'),
+        get_string('settings:soapbox_gesture_vision_desc', 'local_ai_course_assistant'),
+        0
+    ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/soapbox_vision_provider',
         get_string('settings:soapbox_vision_provider', 'local_ai_course_assistant'),

@@ -233,14 +233,6 @@ class outreach_sender {
     }
 
     /**
-     * Trim a string to fit a CHAR column without splitting a multibyte
-     * sequence.
-     *
-     * @param string $s
-     * @param int $max
-     * @return string
-     */
-    /**
      * Record a block reason in cron output and refuse the send.
      *
      * The class docblock promises an audit trace for every send AND every
@@ -256,6 +248,14 @@ class outreach_sender {
         return false;
     }
 
+    /**
+     * Trim a string to fit a CHAR column without splitting a multibyte
+     * sequence.
+     *
+     * @param string $s
+     * @param int $max
+     * @return string
+     */
     private static function truncate_for_db(string $s, int $max): string {
         if (function_exists('mb_substr')) {
             return mb_substr($s, 0, $max);

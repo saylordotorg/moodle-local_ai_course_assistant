@@ -123,11 +123,18 @@ class soapbox_cleanup extends \core\task\scheduled_task {
         if (!empty($rec->deck_key)) {
             $storage->delete_object($rec->deck_key);
         }
+        // v7.5.1: and the still-frame sheet. These are frames of the learner's
+        // face, so they must not outlive the recording they came from -- the
+        // privacy notice promises they go on the same clock.
+        if (!empty($rec->frames_key)) {
+            $storage->delete_object($rec->frames_key);
+        }
         $DB->update_record('local_ai_course_assistant_sbx_rec', (object) [
             'id' => $rec->id,
             'status' => 'deleted',
             'storage_key' => null,
             'deck_key' => null,
+            'frames_key' => null,
         ]);
     }
 }

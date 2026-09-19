@@ -131,9 +131,24 @@ echo $OUTPUT->header();
             <span class="text-muted ml-2 small"><?php echo userdate((int) $h->timecreated, get_string('strftimedatetimeshort', 'langconfig')); ?> · <?php echo $durtxt; ?></span>
         </summary><div class="card-body">
             <table class="generaltable" style="width:100%"><tbody>
-            <?php foreach ((array) $h->scores as $c) { ?>
-                <tr><td style="width:30%"><?php echo s($c['name'] ?? ''); ?></td>
-                    <td style="width:70px;font-family:monospace"><?php echo (int) ($c['score'] ?? 0); ?></td>
+            <?php foreach ((array) $h->scores as $c) {
+                // v7.5.1: a criterion the model was never given evidence for is
+                // marked, not printed as a bare 0. This is the STORED-score
+                // renderer; the live result table further down this file
+                // consumes the same `assessed` field from the scoring response
+                // and must stay in step with it. An earlier version of this
+                // comment claimed there was no client consumer. There is, and
+                // it printed the bare 0 this branch exists to avoid.
+                $assessed = !isset($c['assessed']) || (bool) $c['assessed'];
+            ?>
+                <tr<?php echo $assessed ? '' : ' class="text-muted"'; ?>><td style="width:30%"><?php echo s($c['name'] ?? ''); ?></td>
+                    <td style="width:70px;font-family:monospace"><?php
+                    if ($assessed) {
+                        echo (int) ($c['score'] ?? 0);
+                    } else {
+                        ?><span class="badge badge-secondary" title="<?php echo s(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?>"><?php echo s(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?></span><?php
+                    }
+                    ?></td>
                     <td><?php echo s($c['feedback'] ?? ''); ?></td></tr>
             <?php } ?>
             </tbody></table>
@@ -181,7 +196,9 @@ echo $OUTPUT->header();
         col_score: <?php echo json_encode(get_string('soapbox:col_score', 'local_ai_course_assistant')); ?>,
         col_feedback: <?php echo json_encode(get_string('soapbox:col_feedback', 'local_ai_course_assistant')); ?>,
         overall_heading: <?php echo json_encode(get_string('soapbox:overall_heading', 'local_ai_course_assistant')); ?>,
-        tips_heading: <?php echo json_encode(get_string('soapbox:tips_heading', 'local_ai_course_assistant')); ?>
+        tips_heading: <?php echo json_encode(get_string('soapbox:tips_heading', 'local_ai_course_assistant')); ?>,
+        not_assessed: <?php echo json_encode(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?>,
+        not_assessed_aria: <?php echo json_encode(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?>
     };
     var esc = function(s) {
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -240,7 +257,16 @@ echo $OUTPUT->header();
             html += '<table class="generaltable" style="width:100%"><thead><tr><th>' + esc(STR.col_criterion) +
                 '</th><th style="width:80px">' + esc(STR.col_score) + '</th><th>' + esc(STR.col_feedback) + '</th></tr></thead><tbody>';
             res.criteria.forEach(function(c) {
-                html += '<tr><td>' + esc(c.name) + '</td><td style="font-family:monospace">' + esc(c.score) +
+                // Mirrors the stored-score loop above. A criterion the model
+                // reported it could not judge is excluded from the total by
+                // compute_overall(), so showing its raw 0 here would tell the
+                // learner one thing and the saved attempt another.
+                var ok = (c.assessed === undefined) || !!c.assessed;
+                var cell = ok ? esc(c.score)
+                    : '<span class="badge badge-secondary" title="' + esc(STR.not_assessed_aria) + '">' +
+                      esc(STR.not_assessed) + '</span>';
+                html += '<tr' + (ok ? '' : ' class="text-muted"') + '><td>' + esc(c.name) +
+                    '</td><td style="font-family:monospace">' + cell +
                     '</td><td>' + esc(c.feedback) + '</td></tr>';
             });
             html += '</tbody></table>';

@@ -74,23 +74,6 @@ class starter_manager {
     }
 
     /**
-     * Re-localize built-in starter text that an admin never actually changed.
-     *
-     * save_global_starters() persists whatever the admin form posted back,
-     * including the built-in names and descriptions it rendered. So the first
-     * time anyone opens the starters admin page and clicks Save, the built-ins
-     * freeze into the language that page happened to be in -- and every learner
-     * on the site reads that language on the chips from then on, whatever their
-     * own is. Existing sites are already in that state, which is why this
-     * repairs the stored value at read time rather than only fixing the save.
-     *
-     * An admin's own wording must survive, so a value is only replaced when it
-     * still matches the ENGLISH built-in text, i.e. nobody has edited it.
-     *
-     * @param array $starter One starter definition, as stored.
-     * @return array The same starter with translatable text resolved.
-     */
-    /**
      * The English built-in string for a starter field, or null if there is none.
      *
      * @param string $key Starter key, e.g. 'help-page'.
@@ -111,6 +94,23 @@ class starter_manager {
         );
     }
 
+    /**
+     * Re-localize built-in starter text that an admin never actually changed.
+     *
+     * save_global_starters() persists whatever the admin form posted back,
+     * including the built-in names and descriptions it rendered. So the first
+     * time anyone opens the starters admin page and clicks Save, the built-ins
+     * freeze into the language that page happened to be in -- and every learner
+     * on the site reads that language on the chips from then on, whatever their
+     * own is. Existing sites are already in that state, which is why this
+     * repairs the stored value at read time rather than only fixing the save.
+     *
+     * An admin's own wording must survive, so a value is only replaced when it
+     * still matches the ENGLISH built-in text, i.e. nobody has edited it.
+     *
+     * @param array $starter One starter definition, as stored.
+     * @return array The same starter with translatable text resolved.
+     */
     private static function localize_builtin(array $starter): array {
         if (empty($starter['builtin']) || empty($starter['key'])) {
             return $starter;

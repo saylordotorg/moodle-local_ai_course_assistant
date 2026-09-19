@@ -2690,3 +2690,26 @@ $string['settings:supplemental_courses'] = 'Kozi za nyongeza';
 $string['settings:supplemental_courses_desc'] = 'Vitambulisho vya kozi ambazo maudhui yake [[tutorshort]] anaweza pia kutumia anapojibu, vikitenganishwa kwa mikato. Tumia kwa nyenzo zinazokaa katika kozi nyingine lakini zinafaa kila mahali, kama kozi ya utangulizi kwa wanafunzi au kituo cha rasilimali: anayeuliza kuhusu sera ya mitihani basi anapata jibu kutoka kozi hiyo badala ya kutopata chochote.
 
 Kozi lazima ziwe tayari zimeorodheshwa kwa upatikanaji; hakuna kinachopachikwa zaidi, hivyo kuongeza hapa kunaanza kufanya kazi mara moja na hakugharimu chochote. Kozi zilizofichwa hupuuzwa. Hata hivyo, shughuli ndani ya kozi iliyoorodheshwa huorodheshwa kama alivyoziona msimamizi aliyeiorodhesha upya, hivyo maandishi ya shughuli iliyofichwa au yenye vikwazo yanaweza kunukuliwa kwa mwanafunzi hata kama hakuna kiungo kinachoonyeshwa. Orodhesha tu kozi ambazo maudhui yake yote yanafaa kwa hadhira. Upeo wa kozi {$a}. Mpangilio wa ngazi ya kozi, panapokuwapo, huchukua nafasi ya orodha hii badala ya kuiongezea.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Itafutwa tarehe';
+$string['soapbox:download'] = 'Pakua';
+$string['soapbox:download_aria'] = 'Pakua rekodi hii kwenye kifaa chako';
+$string['soapbox:feedback_pending'] = 'Maoni yako yataonekana hapa mara tathmini itakapokamilika. Kwa kawaida huchukua dakika chache. Huhitaji kubaki kwenye ukurasa huu.';
+$string['soapbox:feedback_toggle'] = 'Onyesha maoni yangu';
+$string['soapbox:frames_not_video'] = 'Kazi hii ni sauti pekee, hivyo hakuna fremu za video za kupakia.';
+$string['soapbox:howto_eyes'] = 'Tazama lenzi ya kamera, si picha yako kwenye skrini. Katika video, kutazama lenzi ndiko kunachoonekana kwa hadhira kama kuangaliana macho.';
+$string['soapbox:howto_feedback'] = 'Dakika chache baada ya kumaliza utapata alama na maoni yaliyoandikwa kwa kila kigezo cha rubriki, ikiwa ni pamoja na lugha ya mwili na uwepo wako mbele ya kamera pale kamera ilipokuwa imewashwa.';
+$string['soapbox:howto_frame'] = 'Weka kamera usawa wa macho, umbali wa takriban mkono mmoja na nusu, ili kichwa, mabega na mikono vyote viwe ndani ya fremu. Ishara zinazofanywa chini ya ukingo wa fremu hazionekani, hivyo haziwezi kutathminiwa.';
+$string['soapbox:howto_hands'] = 'Jipe nafasi ya kusogeza mikono na ongea kwa sauti yako ya kawaida. Rekodi mfululizo mmoja kamili: kusita, kuanza upya na kujikwaa mara chache ni kawaida na hakupunguzi alama.';
+$string['soapbox:howto_heading'] = 'Kabla ya kurekodi';
+$string['soapbox:howto_light'] = 'Elekea dirishani au taa, na punguza mwanga mkali nyuma yako. Dirisha nyuma yako hukufanya uwe kivuli tu.';
+$string['soapbox:not_assessed'] = 'Haikutathminiwa';
+$string['soapbox:not_assessed_aria'] = 'Kigezo hiki hakikutathminiwa katika jaribio hili na kiliachwa nje ya alama zako';
+$string['soapbox:present_privacy'] = 'Rekodi yako hupakiwa kwenye hifadhi ya [[uniname]] ili iandikwe na kutathminiwa. Ni wewe tu na wasimamizi wa tovuti mnaoweza kuifungua. Hufutwa kiotomatiki siku {$a} baada ya kurekodi, pamoja na picha tuli zilizotumika kwa maoni ya lugha ya mwili. Maandishi, alama na maoni yako hubaki baada ya video kuondoka, hivyo pakua chochote unachotaka kuhifadhi.';
+$string['soapbox:scored_on'] = 'Alama yako ya jumla ni wastani wa vigezo {$a->assessed} vilivyotathminiwa, kati ya {$a->total} katika rubriki ({$a->pct}%). Kisichoweza kutathminiwa kiliachwa nje badala ya kupewa sifuri.';
+$string['soapbox:visual_not_assessed'] = 'Lugha ya mwili na uwepo mbele ya kamera havikutathminiwa katika jaribio hili, kwa sababu hakuna video iliyorekodiwa au picha ya kamera haikusomeka. Vigezo hivyo viliachwa nje ya alama badala ya kuzipunguza. Rekodi kamera ikiwa imewashwa, kichwa, mabega na mikono vikiwa ndani ya fremu, ili upate maoni kuhusu hivyo.';
+$string['soapbox:watch'] = 'Tazama';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Mahali pa kuhifadhi video au sauti iliyorekodiwa, hadi itakapofutwa mwishoni mwa muda wa kuhifadhi.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Mahali pa kuhifadhi slaidi zilizopakiwa pamoja na rekodi, hadi zitakapofutwa pamoja nayo.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Mahali pa kuhifadhi picha tuli zilizochukuliwa kutoka kwenye rekodi kwa ajili ya maoni ya lugha ya mwili. Hufutwa pamoja na rekodi.';

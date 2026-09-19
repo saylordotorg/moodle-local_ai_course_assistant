@@ -2690,3 +2690,26 @@ $string['settings:supplemental_courses'] = 'Mga karagdagang kurso';
 $string['settings:supplemental_courses_desc'] = 'Mga course ID na maaari ring pagkunan ng nilalaman ng [[tutorshort]] kapag sumasagot, pinaghihiwalay ng kuwit. Gamitin ito para sa materyal na nasa ibang kurso ngunit angkop saanman, tulad ng oryentasyon para sa mag-aaral o resource center: ang nagtatanong tungkol sa patakaran sa pagsusulit ay makakakuha ng sagot mula sa kursong iyon sa halip na wala.
 
 Kailangang na-index na ang mga kurso para sa pagkuha; walang karagdagang ina-embed, kaya agad na epektibo ang pagdagdag dito at walang gastos. Binabalewala ang mga nakatagong kurso. Ngunit ang mga aktibidad sa loob ng nakalistang kurso ay ini-index ayon sa nakita ng administrador na nag-index muli nito, kaya ang teksto ng nakatago o pinaghihigpitang aktibidad ay maaaring sipiin sa isang mag-aaral kahit walang ipinapakitang link dito. Ilista lamang ang mga kursong angkop sa mambabasa ang buong nilalaman. Pinakamarami ay {$a} kurso. Ang setting sa antas ng kurso, kung mayroon, ay pumapalit sa listahang ito sa halip na madagdag dito.';
+
+// Soapbox: see your recording and your feedback (v7.5.1).
+$string['soapbox:col_deletes'] = 'Buburahin sa';
+$string['soapbox:download'] = 'I-download';
+$string['soapbox:download_aria'] = 'I-download ang recording na ito sa iyong device';
+$string['soapbox:feedback_pending'] = 'Lalabas dito ang iyong feedback kapag tapos na ang pagmamarka. Karaniwang ilang minuto lang. Hindi mo kailangang manatili sa pahinang ito.';
+$string['soapbox:feedback_toggle'] = 'Ipakita ang aking feedback';
+$string['soapbox:frames_not_video'] = 'Audio lang ang takdang-aralin na ito, kaya walang video frames na i-a-upload.';
+$string['soapbox:howto_eyes'] = 'Tumingin sa lens ng camera, hindi sa sarili mong larawan sa screen. Sa video, ang pagtingin sa lens ang nararamdaman ng manonood bilang eye contact.';
+$string['soapbox:howto_feedback'] = 'Ilang minuto pagkatapos mo, makakatanggap ka ng marka at nakasulat na feedback sa bawat pamantayan ng rubric, kasama ang iyong body language at presensya sa harap ng camera kapag nakabukas ito.';
+$string['soapbox:howto_frame'] = 'Ilagay ang camera sa antas ng mata, mga isa\'t kalahating haba ng braso ang layo, para pumasok sa frame ang ulo, balikat at mga kamay. Ang mga kilos na ginawa sa ibaba ng gilid ng frame ay hindi nakikita, kaya hindi ito mamarkahan.';
+$string['soapbox:howto_hands'] = 'Bigyan ang sarili ng puwang para igalaw ang mga kamay, at magsalita sa normal mong lakas. Mag-record ng isang buong take: normal ang mga paghinto, pag-uulit at paminsan-minsang pagkakamali, at hindi ito ibinabawas.';
+$string['soapbox:howto_heading'] = 'Bago ka mag-record';
+$string['soapbox:howto_light'] = 'Humarap sa bintana o ilaw, at bawasan ang matapang na ilaw sa likod mo. Ang bintana sa likuran mo ay nagiging dahilan para maging silweta ka lang.';
+$string['soapbox:not_assessed'] = 'Hindi nasuri';
+$string['soapbox:not_assessed_aria'] = 'Hindi nasuri ang pamantayang ito sa pagsubok na ito at hindi isinama sa iyong marka';
+$string['soapbox:present_privacy'] = 'Ina-upload ang iyong recording sa storage ng [[uniname]] para ma-transcribe at mamarkahan. Ikaw lang at ang mga administrator ng site ang makakabukas nito. Awtomatiko itong buburahin {$a} araw pagkatapos mong mag-record, kasama ang mga still frame na ginamit para sa feedback sa body language. Nananatili ang iyong transcript, marka at feedback pagkatapos mawala ang video, kaya i-download ang gusto mong itago.';
+$string['soapbox:scored_on'] = 'Ang iyong pangkalahatang marka ay ang average ng {$a->assessed} pamantayang nasuri, mula sa {$a->total} sa rubric ({$a->pct}%). Ang hindi masuri ay hindi isinama sa halip na bigyan ng zero.';
+$string['soapbox:visual_not_assessed'] = 'Hindi nasuri ang body language at presensya sa harap ng camera sa pagsubok na ito, dahil walang na-record na video o hindi mabasa ang larawan ng camera. Hindi isinama ang mga pamantayang iyon sa iyong marka sa halip na ibawas. Mag-record nang nakabukas ang camera, na nasa frame ang ulo, balikat at mga kamay, para makakuha ng feedback sa mga ito.';
+$string['soapbox:watch'] = 'Panoorin';
+$string['privacy:metadata:sbx_rec:storage_key'] = 'Ang lokasyon ng imbakan ng na-record na video o audio, hanggang sa mabura ito sa pagtatapos ng panahon ng pag-iingat.';
+$string['privacy:metadata:sbx_rec:deck_key'] = 'Ang lokasyon ng imbakan ng mga slide na na-upload kasama ng recording, hanggang sa mabura kasama nito.';
+$string['privacy:metadata:sbx_rec:frames_key'] = 'Ang lokasyon ng imbakan ng mga still frame na kinuha mula sa recording para sa feedback sa body language. Binubura kasama ng recording.';
