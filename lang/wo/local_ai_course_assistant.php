@@ -2689,3 +2689,6 @@ $string['soapbox:watch'] = 'Xool';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Barab bu ñuy denc wideo walla baat bi ñu duub, ba kera ñu koy far ci jeexitalu waxtu denc bi.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Barab bu ñuy denc slide yi ñu yónnee ak duub bi, ba kera ñu leen di far ak moom.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Barab bu ñuy denc nataal yu taxaw yi ñu jële ci duub bi ngir xalaatu làmmiñu yaram. Dañu leen di far ak duub bi.';
+
+$string['soapbox:retention_heading'] = 'Sa wideo dañu koy far ginnaaw {$a} fan.';
+$string['soapbox:retention_line'] = 'Duub bu nekk dañu koy far ci boppam {$a} fan ginnaaw bi nga ko defee, te bés bi ñu koy far ñungi ko wone ci wetu jéego bu nekk ci suuf. Say tomb, sa xalaat bu ñu bind ak sa bind dañuy des. Jëfandikool lëkkalekaay bu Yebbi ngir denc wideo bu nga bëgg a denc bala bés boobu.';

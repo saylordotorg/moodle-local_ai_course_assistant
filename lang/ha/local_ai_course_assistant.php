@@ -2696,3 +2696,6 @@ $string['soapbox:watch'] = 'Kalla';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Wurin ajiyar bidiyo ko sautin da aka yi rikodinsa, har sai an share shi a ƙarshen lokacin ajiya.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Wurin ajiyar nunin da aka ɗora tare da rikodin, har sai an share shi tare da shi.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Wurin ajiyar hotuna marasa motsi da aka ɗauko daga rikodin don ra\'ayin yaren jiki. Ana share su tare da rikodin.';
+
+$string['soapbox:retention_heading'] = 'Ana share bidiyon ka bayan kwanaki {$a}.';
+$string['soapbox:retention_line'] = 'Ana share kowane rikodi ta atomatik kwanaki {$a} bayan ka yi shi, kuma an nuna ainihin ranar a gaban kowane yunƙuri a ƙasa. Ana ajiye makin ka, ra\'ayin da aka rubuta maka da kuma rubutun maganarka. Yi amfani da hanyar haɗin Sauke don ajiye duk bidiyon da kake son riƙewa kafin wannan ranar.';

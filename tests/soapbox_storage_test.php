@@ -107,4 +107,59 @@ final class soapbox_storage_test extends \advanced_testcase {
         $this->assertStringContainsString('/deck/', $key);
         $this->assertStringEndsWith('.pdf', $key);
     }
+
+    /**
+     * A download link must carry response-content-disposition INSIDE the
+     * signature, not appended to the finished URL.
+     *
+     * This is the difference between a working download and a 403. SigV4 signs
+     * the canonical query string, so a parameter appended afterwards makes S3
+     * answer SignatureDoesNotMatch. The learner would click Download and get an
+     * XML error page, and because the recording is deleted on the retention
+     * clock, a broken download is the difference between keeping their work and
+     * losing it.
+     *
+     * Pinned against the same AWS worked example as the test above so the
+     * expectation is a real signature rather than one this code generated.
+     *
+     * @return void
+     */
+    public function test_a_download_signs_its_content_disposition(): void {
+        $params = [
+            'host'      => 'examplebucket.s3.amazonaws.com',
+            'region'    => 'us-east-1',
+            'service'   => 's3',
+            'accesskey' => 'AKIAIOSFODNN7EXAMPLE',
+            'secretkey' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+            'method'    => 'GET',
+            'uri'       => '/test.txt',
+            'expires'   => 86400,
+            'timestamp' => strtotime('2013-05-24T00:00:00Z'),
+        ];
+
+        $plain = soapbox_storage::presign_url($params);
+        $download = soapbox_storage::presign_url($params + [
+            'extraquery' => ['response-content-disposition' => 'attachment; filename="talk.webm"'],
+        ]);
+
+        // The parameter is present and percent-encoded in the query string.
+        $this->assertStringContainsString('response-content-disposition=', $download);
+        $this->assertStringContainsString('attachment', rawurldecode($download));
+
+        // And it is SIGNED: adding it must change the signature. If these two
+        // matched, the disposition was appended after signing and S3 would
+        // reject the request.
+        preg_match('/X-Amz-Signature=([0-9a-f]+)/', $plain, $a);
+        preg_match('/X-Amz-Signature=([0-9a-f]+)/', $download, $b);
+        $this->assertNotEmpty($a[1] ?? '', 'the plain URL must carry a signature');
+        $this->assertNotEmpty($b[1] ?? '', 'the download URL must carry a signature');
+        $this->assertNotSame(
+            $a[1],
+            $b[1],
+            'response-content-disposition must be part of the signed canonical query string. '
+                . 'An identical signature means it was appended to the finished URL, which S3 '
+                . 'rejects with SignatureDoesNotMatch, so the learner cannot download their '
+                . 'recording before it is deleted.'
+        );
+    }
 }

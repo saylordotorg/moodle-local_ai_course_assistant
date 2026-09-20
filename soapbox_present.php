@@ -155,6 +155,19 @@ $templatedata = [
         'soapbox:present_privacy',
         soapbox_config::retention_days()
     ),
+    // The retention fact, stated plainly and on its own rather than buried in
+    // the privacy paragraph below it. A learner who misses this loses work: the
+    // video really does go, and downloading is the only way to keep it.
+    'retentionheading' => get_string(
+        'soapbox:retention_heading',
+        'local_ai_course_assistant',
+        soapbox_config::retention_days()
+    ),
+    'retentionline' => get_string(
+        'soapbox:retention_line',
+        'local_ai_course_assistant',
+        soapbox_config::retention_days()
+    ),
     'coldeletes' => get_string('soapbox:col_deletes', 'local_ai_course_assistant'),
     'watchlabel' => get_string('soapbox:watch', 'local_ai_course_assistant'),
     'downloadlabel' => get_string('soapbox:download', 'local_ai_course_assistant'),
@@ -269,7 +282,7 @@ if (!empty($recs)) {
                             // A row written before v7.5.1 carries no `assessed`
                             // key. Absent means assessed, or every historic
                             // score would render as "not assessed".
-                            $assessed = !isset($c['assessed']) || (bool) $c['assessed'];
+                            $assessed = \local_ai_course_assistant\rubric_manager::is_assessed($c);
                             $row['criteria'][] = [
                                 'name' => (string) ($c['name'] ?? ''),
                                 'score' => (int) ($c['score'] ?? 0),

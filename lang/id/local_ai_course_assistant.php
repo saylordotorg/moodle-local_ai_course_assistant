@@ -2721,3 +2721,6 @@ $string['soapbox:watch'] = 'Tonton';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Lokasi penyimpanan video atau audio yang direkam, sampai dihapus di akhir masa penyimpanan.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Lokasi penyimpanan salindia yang diunggah bersama rekaman, sampai dihapus bersamanya.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Lokasi penyimpanan bingkai diam yang diambil dari rekaman untuk umpan balik bahasa tubuh. Dihapus bersama rekaman.';
+
+$string['soapbox:retention_heading'] = 'Video Anda dihapus setelah {$a} hari.';
+$string['soapbox:retention_line'] = 'Setiap rekaman dihapus otomatis {$a} hari setelah Anda membuatnya, dan tanggal pastinya ditampilkan pada setiap percobaan di bawah. Nilai, umpan balik tertulis, dan transkrip Anda tetap disimpan. Gunakan tautan Unduh untuk menyimpan video yang ingin Anda pertahankan sebelum tanggal tersebut.';

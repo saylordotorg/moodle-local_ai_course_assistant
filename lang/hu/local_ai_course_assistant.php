@@ -2710,3 +2710,6 @@ $string['soapbox:watch'] = 'Megtekintés';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'A rögzített videó vagy hang tárolási helye, amíg a megőrzési idő végén törlésre nem kerül.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'A felvétellel együtt feltöltött diák tárolási helye, amíg a felvétellel együtt törlésre nem kerülnek.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'A felvételből a testbeszéd-visszajelzéshez kivett állóképek tárolási helye. A felvétellel együtt törlődnek.';
+
+$string['soapbox:retention_heading'] = 'A videója {$a} nap után törlődik.';
+$string['soapbox:retention_line'] = 'Minden felvétel automatikusan törlődik a rögzítésétől számított {$a} nap után, és a pontos dátum lent minden kísérletnél szerepel. A pontszámai, az írásos visszajelzés és a leirat megmaradnak. A Letöltés hivatkozással mentsen el minden olyan videót, amelyet meg szeretne tartani, még ez előtt a dátum előtt.';

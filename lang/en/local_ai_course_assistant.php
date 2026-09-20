@@ -754,6 +754,17 @@ $string['privacy:metadata:email_optout'] = 'Per-recipient email opt-out preferen
 $string['privacy:metadata:email_optout:email'] = 'The recipient email address the opt-out applies to.';
 $string['privacy:metadata:email_optout:optout_type'] = 'The email type the recipient has opted out of.';
 $string['privacy:metadata:email_optout:userid'] = 'The Moodle user the opt-out belongs to, when known.';
+// v7.5.2: model-registry tables added in v7.4.0. Each records which site
+// administrator made a configuration change. Declared, but never exported or
+// erased: the rows are site configuration, not learner data.
+$string['privacy:metadata:models'] = 'Model registry entries: the per-model pricing and capability overrides a site administrator maintains. The only personal data is the identifier of the administrator who last saved the entry. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:models:addedby'] = 'The site administrator who last saved this model registry entry. Empty when the entry was written by an automated price feed.';
+$string['privacy:metadata:pricesrc'] = 'Pricing feed definitions: the vendor price lists a site administrator has configured the plugin to fetch. The only personal data is the identifier of the administrator who added the feed. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:pricesrc:addedby'] = 'The site administrator who added this pricing feed. Empty when the feed ships with the plugin.';
+$string['privacy:metadata:bench'] = 'Provider benchmark runs: the model comparison results a site administrator has generated. The only personal data is the identifier of the administrator who started the run. These rows are site configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure.';
+$string['privacy:metadata:bench:createdby'] = 'The site administrator who started this benchmark run. Empty when the run was started from the command line.';
+$string['privacy:metadata:sbx_assign'] = 'Soapbox presentation assignments: the tasks a teacher sets up for a course. The only personal data is the identifier of the staff member who last edited the assignment. These rows are course configuration rather than personal data about a learner, so they are not included in a data export and are not removed when a user requests erasure, which would otherwise reshape an assignment other learners are still working against.';
+$string['privacy:metadata:sbx_assign:usermodified'] = 'The staff member who last edited this presentation assignment.';
 // External locations that personal data may be transmitted to.
 $string['privacy:metadata:ai_provider'] = 'To generate tutoring responses, learner-authored content is sent to the AI provider configured by the site or course administrator.';
 $string['privacy:metadata:ai_provider:message'] = 'The message text and attachments the learner sends to the AI tutor.';
@@ -1737,6 +1748,9 @@ $string['soapbox:howto_light']     = 'Face a window or a lamp, and keep bright l
 $string['soapbox:howto_eyes']      = 'Look at the camera lens, not at your own picture on the screen. On video, looking at the lens is what reads to your audience as eye contact.';
 $string['soapbox:howto_hands']     = 'Give yourself room to move your hands, and speak at your normal volume. Record one full take: pauses, restarts and the odd stumble are normal and are not marked down.';
 $string['soapbox:howto_feedback']  = 'A few minutes after you finish you will get a score and written feedback on every rubric criterion, including your body language and camera presence when your camera was on.';
+$string['soapbox:retention_heading'] = 'Your video is deleted after {$a} days.';
+$string['soapbox:retention_line'] = 'Each recording is deleted automatically {$a} days after you make it, and the exact date is shown against every attempt below. Your scores, written feedback and transcript are kept. Use the Download link to save any video you want to keep '
+    . 'before that date.';
 $string['soapbox:present_privacy'] = 'Your recording is uploaded to [[uniname]] storage so it can be transcribed and scored. Only you and site administrators can open it. It is deleted automatically {$a} days after you record it, together with the still frames used for body-language feedback. Your transcript, scores and feedback are kept after the video is gone, so download anything you want to keep.';
 $string['soapbox:col_deletes']     = 'Deletes on';
 $string['soapbox:watch']           = 'Watch';
@@ -1752,6 +1766,7 @@ $string['soapbox:scored_on']        = 'Your overall score is the average of the 
 $string['soapbox:visual_not_assessed'] = 'Body language and camera presence were not assessed for this attempt, because no video was recorded or the camera view could not be read. Those criteria were left out of your score rather than marked down. Record with your camera on, with your head, shoulders and hands in the picture, to get feedback on them.';
 $string['soapbox:frames_not_video'] = 'This assignment is audio only, so there are no video frames to upload.';
 $string['soapbox:assign_title']     = 'Soapbox assignments';
+$string['soapbox:assign_deprecated'] = 'Soapbox is being replaced by PresenterAI, a separate activity that will appear in the activity chooser. Your assignments, and your learners\' recordings, scores and feedback, are not affected and keep working. There is nothing to do today. When PresenterAI is released, build new presentation work there rather than here. Your learners do not need to be told anything yet.';
 $string['soapbox:assign_single_title'] = 'Soapbox assignment';
 $string['soapbox:assign_add']       = 'Add assignment';
 $string['soapbox:assign_none']      = 'No Soapbox assignments yet.';
@@ -2056,6 +2071,8 @@ $string['settings:voice_tab_enabled'] = 'Enable Voice Tab';
 $string['settings:voice_tab_enabled_desc'] = 'Show the Voice tab in the bottom navigation bar. When disabled, students only see Chat and Notes tabs. Voice features (Conversation Practice, Pronunciation Practice) can still be accessed via conversation starters if enabled separately.';
 $string['settings:soapbox_heading'] = 'Soapbox';
 $string['settings:soapbox_heading_desc'] = 'Spoken-presentation practice: how recordings are transcribed and the rubric they are scored against. Turn Soapbox on per course with the Soapbox pedagogy toggle in the Pedagogy section.';
+$string['settings:soapbox_deprecated_inuse'] = 'Soapbox is deprecated. It is being replaced by PresenterAI, a separate Moodle activity plugin that does everything Soapbox does, appears in the activity chooser, and lets you choose between an S3 bucket and Moodle\'s own file storage, and between Moodle core AI and Claude, OpenAI or Gemini configured directly. Nothing changes in this release: your assignments, recordings, transcripts, scores and feedback are untouched, the retention setting still applies exactly as before, and the daily cleanup task still runs. The code is scheduled for removal in v8.0.0, and no release will remove it until PresenterAI can import existing recordings and scores. The database tables are dropped separately and later, because Soapbox writes no gradebook entry, so these tables are the only copy of a learner\'s presentation record. What to do: stop building new courses on Soapbox now, install PresenterAI alongside it when it is released and use it for new work, and leave your existing Soapbox courses running until the import is available. Your learners do not need to be told anything yet.';
+$string['settings:soapbox_deprecated_off'] = 'Soapbox is deprecated and is not switched on anywhere on this site. Leave it off. It is being replaced by PresenterAI, a separate Moodle activity plugin that does the same job with a choice of storage and AI provider. The code is scheduled for removal in v8.0.0.';
 $string['settings:soapbox_max_seconds'] = 'Soapbox max recording length (seconds)';
 $string['settings:soapbox_max_seconds_desc'] = 'Hard ceiling on any assignment\'s recording length. Instructors may set a shorter range. Default 720 (12 minutes).';
 $string['settings:soapbox_max_recordings'] = 'Soapbox max recordings per student per assignment';
@@ -2265,6 +2282,7 @@ $string['rubric_admin:title_course'] = 'Practice scoring rubric editor: {$a}';
 $string['rubric_admin:title_global'] = 'Practice scoring rubric editor: global default';
 $string['rubric_admin:err_invalid_criteria'] = 'Criteria data is invalid or empty.';
 $string['rubric_admin:err_no_criteria'] = 'No valid criteria after cleaning.';
+$string['rubric_admin:err_duplicate_names'] = 'Two criteria are named "{$a}" once case and spacing are ignored. Scoring matches criteria by that normalised name, so one row would silently shadow the other. Rename one of them.';
 $string['rubric_admin:saved_updated'] = 'Rubric updated.';
 $string['rubric_admin:saved_created'] = 'Rubric created.';
 $string['rubric_admin:reset_course_done'] = 'Course rubric removed. The global default will be used.';

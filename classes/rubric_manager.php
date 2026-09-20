@@ -290,6 +290,42 @@ class rubric_manager {
         ];
     }
 
+
+    /**
+     * Whether one scored criterion counts toward the learner's score.
+     *
+     * The single implementation of the "assessed" contract. Every reader calls
+     * this: compute_overall() below, the outcome gate in score_speech, the
+     * stored-score table in soapbox.php and the learner's attempt list in
+     * soapbox_present.php. Before it was extracted there were four hand-written
+     * copies and three different answers for the values 0, "0" and "", so the
+     * score counted a criterion all three renderers had greyed out.
+     *
+     * The rule is the strict one, deliberately. A criterion is excluded ONLY on
+     * an explicit boolean false. An absent key counts, which is every score
+     * written before v7.5.1 and every provider that ignores the field; null
+     * counts; any other falsy value counts. The score is the authority and must
+     * not move, and greying a row is the cheaper thing to get wrong.
+     *
+     * One site is deliberately looser and is not this one: score_speech coerces
+     * untrusted provider JSON into a real boolean once, at the API boundary,
+     * before anything stores or returns it. Everything downstream reads that
+     * boolean through here.
+     *
+     * Pure: no globals, no database.
+     *
+     * @param mixed $criterion One entry of a scores array.
+     * @return bool True when the criterion counts toward the score.
+     */
+    public static function is_assessed($criterion): bool {
+        if (!is_array($criterion)) {
+            // A malformed row is not a reason to take a score off anyone, and
+            // it matches what compute_overall() did before the extraction.
+            return true;
+        }
+        return ($criterion['assessed'] ?? null) !== false;
+    }
+
     /**
      * Overall score over the criteria that were actually assessed.
      *
@@ -299,9 +335,11 @@ class rubric_manager {
      *
      * Three rules, each of which protects a learner who has nobody to appeal to:
      *
-     *  - An entry is excluded only on an EXPLICIT `assessed === false`. A row
-     *    with no `assessed` key counts as assessed, which is every score written
-     *    before v7.5.1 and every provider that ignores the field.
+     *  - An entry is excluded only on an EXPLICIT `assessed === false`, which is
+     *    is_assessed() above. A row with no `assessed` key counts as assessed,
+     *    which is every score written before v7.5.1 and every provider that
+     *    ignores the field. Do not re-inline this test: the renderers call the
+     *    same helper so a total and the table printing it cannot disagree.
      *  - Excluded entries are left out of the sum AND out of maxtotal, so they
      *    neither add zero to the numerator nor inflate the denominator.
      *  - Zero assessed criteria yields overall 0 and pct 0 by an explicit
@@ -319,7 +357,7 @@ class rubric_manager {
         $maxtotal = 0;
 
         foreach ($scoredcriteria as $c) {
-            if (isset($c['assessed']) && $c['assessed'] === false) {
+            if (!self::is_assessed($c)) {
                 continue;
             }
             $sum += (int) ($c['score'] ?? 0);

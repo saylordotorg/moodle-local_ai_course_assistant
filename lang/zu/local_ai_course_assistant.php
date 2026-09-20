@@ -2713,3 +2713,6 @@ $string['soapbox:watch'] = 'Buka';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Indawo yokugcina yevidiyo noma umsindo oqoshiwe, kuze kususwe ekupheleni kwesikhathi sokugcina.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Indawo yokugcina yamaslayidi alayishwe kanye nokuqoshiwe, kuze kususwe kanye nakho.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Indawo yokugcina yezithombe ezingashintshi ezithathwe kokuqoshiwe zempendulo yolimi lomzimba. Zisuswa kanye nokuqoshiwe.';
+
+$string['soapbox:retention_heading'] = 'Ividiyo yakho isuswa ngemuva kwezinsuku ezingu-{$a}.';
+$string['soapbox:retention_line'] = 'Konke okuqoshiwe kususwa ngokuzenzakalela ezinsukwini ezingu-{$a} ngemuva kokukuqopha, futhi usuku olunembile luboniswa kuwo wonke umzamo ongezansi. Amamaki akho, impendulo ebhaliwe nombhalo kuyagcinwa. Sebenzisa isixhumanisi esithi Landa ukuze ulondoloze noma iyiphi ividiyo ofuna ukuyigcina ngaphambi kwalolo suku.';

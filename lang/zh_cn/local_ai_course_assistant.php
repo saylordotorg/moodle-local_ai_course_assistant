@@ -2705,3 +2705,6 @@ $string['soapbox:watch'] = '观看';
 $string['privacy:metadata:sbx_rec:storage_key'] = '录制的视频或音频的存储位置，直到保留期结束被删除为止。';
 $string['privacy:metadata:sbx_rec:deck_key'] = '随录制一起上传的幻灯片的存储位置，直到与录制一起被删除为止。';
 $string['privacy:metadata:sbx_rec:frames_key'] = '为肢体语言反馈从录制中截取的静态画面的存储位置。与录制一起删除。';
+
+$string['soapbox:retention_heading'] = '你的视频会在 {$a} 天后被删除。';
+$string['soapbox:retention_line'] = '每段录制都会在你录制后 {$a} 天自动删除，确切日期显示在下方每一次录制的旁边。你的分数、文字反馈和转写文字会保留下来。请在那个日期之前用下载链接把想留下的视频保存到本地。';

@@ -2669,3 +2669,6 @@ $string['soapbox:watch'] = 'Ansehen';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Der Speicherort des aufgenommenen Videos oder Audios, bis es am Ende der Aufbewahrungsfrist gelöscht wird.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Der Speicherort der mit der Aufnahme hochgeladenen Folien, bis sie mit der Aufnahme gelöscht werden.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Der Speicherort der aus der Aufnahme entnommenen Standbilder für das Körpersprache-Feedback. Werden mit der Aufnahme gelöscht.';
+
+$string['soapbox:retention_heading'] = 'Ihr Video wird nach {$a} Tagen gelöscht.';
+$string['soapbox:retention_line'] = 'Jede Aufnahme wird {$a} Tage nach der Aufzeichnung automatisch gelöscht, und das genaue Datum steht unten bei jedem Versuch. Ihre Bewertungen, Ihr schriftliches Feedback und Ihr Transkript bleiben erhalten. Nutzen Sie den Link „Herunterladen“, um vor diesem Datum jedes Video zu speichern, das Sie behalten möchten.';

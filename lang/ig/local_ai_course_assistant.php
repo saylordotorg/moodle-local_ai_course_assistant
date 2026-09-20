@@ -2683,3 +2683,6 @@ $string['soapbox:watch'] = 'Lelee';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Ebe nchekwa nke vidiyo maọbụ ụda edekọtara, ruo mgbe a ga-ehichapụ ya na njedebe oge nchekwa.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Ebe nchekwa nke slide ndị e bulitere tinyere ndekọ, ruo mgbe a ga-ehichapụ ha ya na ya.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Ebe nchekwa nke foto ndị e wepụtara na ndekọ maka nzaghachi asụsụ ahụ. A na-ehichapụ ha ya na ndekọ.';
+
+$string['soapbox:retention_heading'] = 'A ga-ehichapụ vidiyo gị mgbe ụbọchị {$a} gasịrị.';
+$string['soapbox:retention_line'] = 'A na-ehichapụ ndekọ ọ bụla n\'onwe ya ụbọchị {$a} mgbe i mechara ya, a na-egosikwa ụbọchị ahụ kpọmkwem na mgbalị ọ bụla dị n\'okpuru. Akara gị, nzaghachi edere ede na edemede gị ka a na-edobe. Jiri njikọ Budata chekwaa vidiyo ọ bụla ị chọrọ idobe tupu ụbọchị ahụ eruo.';

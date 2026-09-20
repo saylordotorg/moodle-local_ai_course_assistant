@@ -139,14 +139,22 @@ echo $OUTPUT->header();
                 // and must stay in step with it. An earlier version of this
                 // comment claimed there was no client consumer. There is, and
                 // it printed the bare 0 this branch exists to avoid.
-                $assessed = !isset($c['assessed']) || (bool) $c['assessed'];
+                $assessed = rubric_manager::is_assessed($c);
             ?>
                 <tr<?php echo $assessed ? '' : ' class="text-muted"'; ?>><td style="width:30%"><?php echo s($c['name'] ?? ''); ?></td>
                     <td style="width:70px;font-family:monospace"><?php
                     if ($assessed) {
                         echo (int) ($c['score'] ?? 0);
                     } else {
-                        ?><span class="badge badge-secondary" title="<?php echo s(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?>"><?php echo s(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?></span><?php
+                        // The explanation goes in a visually-hidden sibling, not
+                        // a title. This span has its own text, so it takes its
+                        // accessible name from that text and the title is never
+                        // announced: the reason a criterion was dropped was
+                        // mouse-only, in a self-paced course with nobody to ask.
+                        // accesshide is Moodle core's class, used the same way in
+                        // templates/outcomes_report.mustache. aria-label would
+                        // REPLACE the visible "Not assessed" rather than add to it.
+                        ?><span class="badge badge-secondary"><?php echo s(get_string('soapbox:not_assessed', 'local_ai_course_assistant')); ?></span><span class="accesshide"> <?php echo s(get_string('soapbox:not_assessed_aria', 'local_ai_course_assistant')); ?></span><?php
                     }
                     ?></td>
                     <td><?php echo s($c['feedback'] ?? ''); ?></td></tr>
@@ -261,10 +269,14 @@ echo $OUTPUT->header();
                 // reported it could not judge is excluded from the total by
                 // compute_overall(), so showing its raw 0 here would tell the
                 // learner one thing and the saved attempt another.
-                var ok = (c.assessed === undefined) || !!c.assessed;
+                // rubric_manager::is_assessed() in JavaScript: excluded only
+                // on an explicit false, so undefined, null, 0, "0" and "" all
+                // count, exactly as PHP counts them. The older form greyed out a
+                // row the total had already counted.
+                var ok = c.assessed !== false;
                 var cell = ok ? esc(c.score)
-                    : '<span class="badge badge-secondary" title="' + esc(STR.not_assessed_aria) + '">' +
-                      esc(STR.not_assessed) + '</span>';
+                    : '<span class="badge badge-secondary">' + esc(STR.not_assessed) +
+                      '</span><span class="accesshide"> ' + esc(STR.not_assessed_aria) + '</span>';
                 html += '<tr' + (ok ? '' : ' class="text-muted"') + '><td>' + esc(c.name) +
                     '</td><td style="font-family:monospace">' + cell +
                     '</td><td>' + esc(c.feedback) + '</td></tr>';

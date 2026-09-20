@@ -53,9 +53,11 @@ final class soapbox_outcome_attempt_gating_test extends \advanced_testcase {
      *
      * @param bool $assessed What the model reports for the criterion.
      * @param int $score The score the model reports alongside it.
+     * @param string $echoedname The name the model echoes back, which may differ
+     *               in case or spacing from the rubric definition.
      * @return array [objective id, course id]
      */
-    private function score_one(bool $assessed, int $score): array {
+    private function score_one(bool $assessed, int $score, string $echoedname = 'Evidence'): array {
         global $DB;
 
         $this->resetAfterTest();
@@ -85,7 +87,7 @@ final class soapbox_outcome_attempt_gating_test extends \advanced_testcase {
 
         provider\stub_provider::program_response('chat', json_encode([
             'criteria' => [[
-                'name' => 'Evidence',
+                'name' => $echoedname,
                 'score' => $score,
                 'feedback' => $assessed ? 'Well supported.' : 'Could not be judged.',
                 'assessed' => $assessed,
@@ -135,5 +137,34 @@ final class soapbox_outcome_attempt_gating_test extends \advanced_testcase {
         $rec = reset($recs);
         $this->assertSame(1, (int) $rec->iscorrect, '4 of 5 is above the 0.5 threshold');
         $this->assertEqualsWithDelta(0.8, (float) $rec->score, 0.001, '4 of 5 must normalise to 0.8');
+    }
+
+    /**
+     * A criterion name echoed in a different case still finds its objective.
+     *
+     * The allowlist that let this row in is keyed on the normalised name, and
+     * the max-score map is too, but the objective map was keyed on the raw
+     * definition name. So a model answering "evidence" for a rubric row called
+     * "Evidence" was allowed, was scored, was shown to the learner, and then
+     * silently recorded nothing against the outcome. Nothing failed and nothing
+     * was logged; the outcomes report was simply short, which is invisible
+     * unless you know the attempt should be there.
+     *
+     * @return void
+     */
+    public function test_a_case_variant_name_still_records_its_outcome(): void {
+        global $DB;
+        [$oid] = $this->score_one(true, 4, 'evidence');
+
+        $recs = $DB->get_records(objective_manager::TABLE_ATTS, ['objectiveid' => $oid]);
+        $this->assertCount(
+            1,
+            $recs,
+            'The model echoed the criterion name in a different case. The allowlist normalises, so '
+                . 'the row was scored and shown to the learner; the objective map must normalise '
+                . 'too, or the attempt silently vanishes and the outcomes report under-reports.'
+        );
+        $rec = reset($recs);
+        $this->assertEqualsWithDelta(0.8, (float) $rec->score, 0.001);
     }
 }

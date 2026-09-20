@@ -2712,3 +2712,6 @@ $string['soapbox:watch'] = 'Tonton';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Lokasi storan video atau audio yang dirakam, sehingga ia dipadam pada akhir tempoh penyimpanan.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Lokasi storan slaid yang dimuat naik bersama rakaman, sehingga ia dipadam bersamanya.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Lokasi storan bingkai pegun yang diambil daripada rakaman untuk maklum balas bahasa badan. Dipadam bersama rakaman.';
+
+$string['soapbox:retention_heading'] = 'Video anda dipadam selepas {$a} hari.';
+$string['soapbox:retention_line'] = 'Setiap rakaman dipadam secara automatik {$a} hari selepas anda membuatnya, dan tarikh tepatnya ditunjukkan pada setiap percubaan di bawah. Markah, maklum balas bertulis dan transkrip anda kekal. Gunakan pautan Muat turun untuk menyimpan mana-mana video yang anda mahu kekalkan sebelum tarikh tersebut.';

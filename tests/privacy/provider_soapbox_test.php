@@ -141,4 +141,103 @@ final class provider_soapbox_test extends \advanced_testcase {
             );
         }
     }
+
+    /**
+     * A course-context purge must not leave the recording behind.
+     *
+     * delete_data_for_all_users_in_context() deleted seven tables, including
+     * practice_scores, and never touched sbx_rec. So the score went and the
+     * video of the learner saying it stayed, along with the transcript, which
+     * lives on the recording row. The bucket object stayed too: the retention
+     * task walks sbx_rec rows, so nothing was ever going to come back for it.
+     *
+     * This is the purge a site runs when it deletes a course's data. Leaving
+     * the most sensitive artefact of the lot is the wrong way round.
+     *
+     * @return void
+     */
+    public function test_a_course_purge_removes_soapbox_recordings(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+
+        $assignid = (int) $DB->insert_record('local_ai_course_assistant_sbx_assign', (object) [
+            'courseid' => $course->id,
+            'name' => 'Presentation',
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $topicid = (int) $DB->insert_record('local_ai_course_assistant_sbx_topic', (object) [
+            'assignid' => $assignid,
+            'title' => 'A topic the teacher wrote',
+            'instructionsformat' => 1,
+            'sortorder' => 0,
+        ]);
+        $DB->insert_record('local_ai_course_assistant_sbx_rec', (object) [
+            'assignid' => $assignid,
+            'userid' => $user->id,
+            'mode' => 'video',
+            'storage_key' => 'sbx/rec/keepme.webm',
+            'transcript' => 'The transcript of everything the learner said.',
+            'status' => 'scored',
+            'expires_at' => time() + WEEKSECS,
+            'timecreated' => time(),
+        ]);
+
+        // A second course, untouched, so the test pins over-deletion as well as
+        // under-deletion. A rewrite to "assignid NOT IN (SELECT id FROM
+        // sbx_assign)" would satisfy every other assertion here while wiping
+        // every other course's topics.
+        $other = $this->getDataGenerator()->create_course();
+        $otherassign = (int) $DB->insert_record('local_ai_course_assistant_sbx_assign', (object) [
+            'courseid' => $other->id,
+            'name' => 'Someone else\'s assignment',
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $othertopic = (int) $DB->insert_record('local_ai_course_assistant_sbx_topic', (object) [
+            'assignid' => $otherassign,
+            'title' => 'A topic in a different course',
+            'instructionsformat' => 1,
+            'sortorder' => 0,
+        ]);
+
+        \local_ai_course_assistant\privacy\provider::delete_data_for_all_users_in_context(
+            \context_course::instance($course->id)
+        );
+
+        $this->assertSame(
+            0,
+            $DB->count_records('local_ai_course_assistant_sbx_rec', ['assignid' => $assignid]),
+            'A course-data purge left the Soapbox recording row behind, and with it the transcript '
+                . 'and the key pointing at the video in the bucket. The score was deleted, so the '
+                . 'purge looked like it had worked.'
+        );
+        $this->assertSame(
+            0,
+            $DB->count_records('local_ai_course_assistant_sbx_assign', ['courseid' => $course->id]),
+            'the assignment rows go with them, or the next purge has nothing to walk'
+        );
+        $this->assertSame(
+            1,
+            $DB->count_records('local_ai_course_assistant_sbx_topic', ['id' => $othertopic]),
+            'Another course\'s topic must survive. Purging one course must not reach into a course '
+                . 'the request never named.'
+        );
+        $this->assertSame(
+            1,
+            $DB->count_records('local_ai_course_assistant_sbx_assign', ['id' => $otherassign]),
+            'and neither must its assignment'
+        );
+        $this->assertSame(
+            0,
+            $DB->count_records('local_ai_course_assistant_sbx_topic', ['id' => $topicid]),
+            'Topics must go BEFORE their assignment. sbx_topic has no courseid, so assignid is its '
+                . 'only route back to a course: delete the assignment first and the topic rows are '
+                . 'orphaned permanently, invisible to get_topics() and skipped by the course-deleted '
+                . 'observer, which resolves them through the assignment that no longer exists.'
+        );
+    }
 }

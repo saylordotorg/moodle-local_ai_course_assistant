@@ -2667,3 +2667,6 @@ $string['soapbox:watch'] = 'Se';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Lagringsplasseringen for den opptatte videoen eller lyden, til den slettes ved slutten av oppbevaringsperioden.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Lagringsplasseringen for lysbildene som ble lastet opp med opptaket, til de slettes sammen med det.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Lagringsplasseringen for stillbildene som er hentet fra opptaket til tilbakemelding om kroppsspråk. Slettes sammen med opptaket.';
+
+$string['soapbox:retention_heading'] = 'Videoen din slettes etter {$a} dager.';
+$string['soapbox:retention_line'] = 'Hvert opptak slettes automatisk {$a} dager etter at du tok det opp, og den nøyaktige datoen står ved hvert forsøk nedenfor. Vurderingene dine, den skriftlige tilbakemeldingen og transkripsjonen beholdes. Bruk Last ned-lenken for å lagre videoer du vil ta vare på, før den datoen.';

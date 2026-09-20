@@ -2669,3 +2669,6 @@ $string['soapbox:watch'] = 'Katso';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Nauhoitetun videon tai äänen tallennuspaikka, kunnes se poistetaan säilytysajan päätyttyä.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Tallenteen mukana ladattujen diojen tallennuspaikka, kunnes ne poistetaan tallenteen mukana.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Tallenteesta otettujen pysäytyskuvien tallennuspaikka kehonkielipalautetta varten. Poistetaan tallenteen mukana.';
+
+$string['soapbox:retention_heading'] = 'Videosi poistetaan {$a} päivän kuluttua.';
+$string['soapbox:retention_line'] = 'Jokainen nauhoitus poistetaan automaattisesti {$a} päivän kuluttua sen tekemisestä, ja tarkka päivämäärä näkyy alla jokaisen yrityksen kohdalla. Pisteesi, kirjallinen palautteesi ja litterointi säilytetään. Tallenna Lataa-linkillä ennen tuota päivämäärää jokainen video, jonka haluat säilyttää.';

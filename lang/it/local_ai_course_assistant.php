@@ -2709,3 +2709,6 @@ $string['soapbox:watch'] = 'Guarda';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'La posizione di archiviazione del video o dell\'audio registrato, fino alla sua eliminazione al termine del periodo di conservazione.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'La posizione di archiviazione delle diapositive caricate con la registrazione, fino alla loro eliminazione insieme a essa.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'La posizione di archiviazione dei fotogrammi estratti dalla registrazione per il riscontro sul linguaggio del corpo. Eliminati insieme alla registrazione.';
+
+$string['soapbox:retention_heading'] = 'Il tuo video viene eliminato dopo {$a} giorni.';
+$string['soapbox:retention_line'] = 'Ogni registrazione viene eliminata automaticamente {$a} giorni dopo che l\'hai fatta, e la data esatta è indicata accanto a ogni tentativo qui sotto. I tuoi punteggi, il riscontro scritto e la trascrizione restano. Usa il link Scarica per salvare i video che vuoi conservare prima di quella data.';

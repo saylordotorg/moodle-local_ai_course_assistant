@@ -136,5 +136,66 @@ class soapbox_cleanup extends \core\task\scheduled_task {
             'deck_key' => null,
             'frames_key' => null,
         ]);
+        $this->forget_visual_observation($rec);
+    }
+
+    /**
+     * Drop the body-language observation when the video it describes is deleted.
+     *
+     * The observation is prose a vision model wrote about a named learner's
+     * body: where their hands were, whether they looked at the lens, how they
+     * were standing. It lived in the score row's session_meta, and the score row
+     * deliberately outlives the recording, so it survived the video, the frames
+     * it was derived from, and the retention window, indefinitely.
+     *
+     * Nothing read it. v7.5.1 decided not to render it to learners, because it
+     * is unreviewed model output about a person's appearance and nothing
+     * downstream enforces the "do not describe appearance" instruction the
+     * prompt asks for. Data nobody reads, describing a body, kept forever, is
+     * the weakest possible position to be in.
+     *
+     * It also made the privacy notice untrue. That notice promises the recording
+     * goes "together with the still frames used for body-language feedback", so
+     * a learner reasonably concludes nothing visual survives. Now nothing does.
+     *
+     * The rest of the score is untouched on purpose: the per-criterion comments,
+     * the tips and the totals ARE the learner's feedback, the notice says they
+     * are kept, and they are what the learner is told to download before the
+     * video goes.
+     *
+     * @param \stdClass $rec The recording row being retired.
+     * @return void
+     */
+    private function forget_visual_observation(\stdClass $rec): void {
+        global $DB;
+
+        $scoreid = (int) ($rec->scoreid ?? 0);
+        if ($scoreid <= 0) {
+            return;
+        }
+        try {
+            $score = $DB->get_record(
+                'local_ai_course_assistant_practice_scores',
+                ['id' => $scoreid],
+                'id, session_meta'
+            );
+            if (!$score || empty($score->session_meta)) {
+                return;
+            }
+            $meta = json_decode((string) $score->session_meta, true);
+            if (!is_array($meta) || !array_key_exists('visual_observation', $meta)) {
+                return;
+            }
+            unset($meta['visual_observation']);
+            $DB->update_record('local_ai_course_assistant_practice_scores', (object) [
+                'id' => $score->id,
+                'session_meta' => json_encode($meta),
+            ]);
+        } catch (\Throwable $e) {
+            // Best effort, consistent with the rest of this task: a score row
+            // that cannot be rewritten must not stop the object deletion that
+            // has already happened above.
+            return;
+        }
     }
 }

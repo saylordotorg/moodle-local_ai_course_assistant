@@ -2668,3 +2668,6 @@ $string['soapbox:watch'] = 'Vizionează';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Locul de stocare al videoclipului sau audio-ului înregistrat, până la ștergerea sa la finalul perioadei de păstrare.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Locul de stocare al prezentării încărcate odată cu înregistrarea, până la ștergerea sa odată cu ea.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Locul de stocare al cadrelor extrase din înregistrare pentru feedbackul despre limbajul corpului. Se șterg odată cu înregistrarea.';
+
+$string['soapbox:retention_heading'] = 'Videoclipul tău se șterge după {$a} zile.';
+$string['soapbox:retention_line'] = 'Fiecare înregistrare se șterge automat la {$a} zile după ce o faci, iar data exactă este afișată în dreptul fiecărei încercări de mai jos. Notele, feedbackul scris și transcrierea se păstrează. Folosește linkul Descarcă pentru a salva, înainte de acea dată, orice videoclip pe care vrei să îl păstrezi.';

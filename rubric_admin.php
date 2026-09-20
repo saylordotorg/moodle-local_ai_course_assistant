@@ -107,6 +107,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect(new moodle_url($PAGE->url, ['type' => $posttype]));
         }
 
+        // A rubric with two criteria whose names differ only in case or spacing
+        // is broken in three places at once: score_speech's allowlist, its
+        // max-score map and its objective map all key on the normalised name, so
+        // one row silently shadows the other and the model is handed two
+        // indistinguishable rubric lines. Reject it here, where an admin can see
+        // and fix it, rather than let it reach a learner's permanent outcome
+        // record where nobody can.
+        $seennames = [];
+        foreach ($clean as $entry) {
+            $namekey = \local_ai_course_assistant\external\score_speech::normalise_name($entry['name']);
+            if (isset($seennames[$namekey])) {
+                \core\notification::error(get_string(
+                    'rubric_admin:err_duplicate_names',
+                    'local_ai_course_assistant',
+                    $entry['name']
+                ));
+                redirect(new moodle_url($PAGE->url, ['type' => $posttype]));
+            }
+            $seennames[$namekey] = true;
+        }
+
         // Check if a rubric already exists for this scope and type.
         $title = get_string('rubric_admin:rubric_title_' . $posttype, 'local_ai_course_assistant');
         $existing = rubric_manager::get_rubric($courseid, $posttype);

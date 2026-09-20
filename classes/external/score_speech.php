@@ -311,8 +311,19 @@ class score_speech extends external_api {
                 'score'    => (int) ($c['score'] ?? 0),
                 'feedback' => (string) ($c['feedback'] ?? ''),
                 'max_score' => $defmax[$key] ?? 5,
-                // Absent defaults to true, so a provider that ignores the field
-                // behaves exactly as it did before v7.5.1.
+                // The API boundary, and the ONLY loose reader of this flag in
+                // the plugin. Provider JSON is untrusted: a provider outside the
+                // structured-output path can answer 0 or "" meaning "could not
+                // judge", so every falsy value is coerced to false here, once,
+                // in the learner's favour, before anything is stored or
+                // returned. Absent defaults to true, so a provider that ignores
+                // the field behaves exactly as it did before v7.5.1.
+                //
+                // Do NOT replace this with rubric_manager::is_assessed(). That
+                // helper is strict and would turn a provider's 0 into an
+                // assessed zero, pulling a real learner's score down to tidy up
+                // an unreachable state. Everything downstream of this line reads
+                // the boolean it produces, through is_assessed().
                 'assessed' => !isset($c['assessed']) || (bool) $c['assessed'],
             ];
         }
@@ -377,13 +388,20 @@ class score_speech extends external_api {
         // records a partial-credit mastery attempt (its normalized score), so
         // the presentation feeds the WSCUC outcomes report. Best-effort.
         try {
+            // Keyed exactly the way the allowlist and the max-score map are
+            // keyed. Keying this map on the raw definition name while the
+            // allowlist was normalised meant a model echoing "eye contact" for a
+            // rubric row called "Eye Contact" passed the allowlist, was scored,
+            // was shown to the learner, and then silently missed its objective
+            // mapping here, with no log line and no error.
             $defbyname = [];
             foreach ($criteriadefs as $d) {
-                $dname = (string) ($d['name'] ?? '');
-                if ($dname !== '') {
-                    $defbyname[$dname] = $d;
+                $dkey = self::normalise_name((string) ($d['name'] ?? ''));
+                if ($dkey !== '') {
+                    $defbyname[$dkey] = $d;
                 }
             }
+            $ambiguous = self::ambiguous_objective_keys($criteriadefs);
             foreach ($criteria as $scored) {
                 // The same rule as rubric_manager::compute_overall(), written
                 // the same way on purpose so the two cannot drift. A criterion
@@ -396,10 +414,30 @@ class score_speech extends external_api {
                 // then counted as weight in the denominator and nothing in the
                 // numerator. Outcome attempts are staff-visible only, so the
                 // learner could neither see it nor appeal it.
-                if (isset($scored['assessed']) && $scored['assessed'] === false) {
+                if (!rubric_manager::is_assessed($scored)) {
                     continue;
                 }
-                $def = $defbyname[$scored['name']] ?? null;
+                // Normalised the same way as the allowlist that let this row
+                // in, so the two cannot disagree about which definition a name
+                // means.
+                $skey = self::normalise_name((string) $scored['name']);
+                // Two definitions normalise to this key and disagree about the
+                // attempt they would produce. Last-wins would pick one, and
+                // which one is an accident of array order. An outcome attempt is
+                // permanent and staff-visible only, so a learner can neither see
+                // nor appeal one written against the wrong outcome. Record
+                // nothing, and say why where a developer will see it.
+                if (isset($ambiguous[$skey])) {
+                    debugging(
+                        'SOLA score_speech: more than one rubric criterion is named "' . $skey
+                            . '" once case and spacing are ignored, and they disagree about the '
+                            . 'outcome mapping, so no attempt was recorded. Rename the duplicate '
+                            . 'rows in the rubric editor.',
+                        DEBUG_DEVELOPER
+                    );
+                    continue;
+                }
+                $def = $defbyname[$skey] ?? null;
                 $oid = (int) ($def['objectiveid'] ?? 0);
                 if (!$def || $oid <= 0) {
                     continue;
@@ -474,6 +512,47 @@ class score_speech extends external_api {
      */
     public static function normalise_name(string $n): string {
         return (string) preg_replace('/\s+/', ' ', trim(\core_text::strtolower($n)));
+    }
+
+    /**
+     * Normalised criterion names claimed by more than one definition, where
+     * those definitions disagree about the outcome attempt they would produce.
+     *
+     * The allowlist and the max-score map have always collapsed two criteria
+     * whose names normalise to the same key, and last-wins there only decides
+     * which of two max scores is used. Keying the objective map the same way
+     * promotes that collision to deciding WHICH course outcome a permanent
+     * mastery attempt is written against. A missing attempt is a reporting gap
+     * an admin closes by renaming the rows; a wrong attempt cannot be undone by
+     * anyone, and the learner cannot see it to appeal it.
+     *
+     * Ambiguity is disagreement on the pair that decides the record: the
+     * objective it is written against, and the maximum the score is normalised
+     * over. Definitions that collide but agree on both are interchangeable
+     * here, so they are not ambiguous and still record.
+     *
+     * Pure and public so the rule is unit-testable without a provider, for the
+     * same reason normalise_name() is.
+     *
+     * @param array $criteriadefs Rubric criterion definitions, each carrying a
+     *              name and optionally an objectiveid and a max_score.
+     * @return array Map of normalised name to true, for each ambiguous key.
+     */
+    public static function ambiguous_objective_keys(array $criteriadefs): array {
+        $seen = [];
+        $ambiguous = [];
+        foreach ($criteriadefs as $d) {
+            $key = self::normalise_name((string) ($d['name'] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+            $sig = (int) ($d['objectiveid'] ?? 0) . ':' . max(1, (int) ($d['max_score'] ?? 5));
+            if (isset($seen[$key]) && $seen[$key] !== $sig) {
+                $ambiguous[$key] = true;
+            }
+            $seen[$key] = $sig;
+        }
+        return $ambiguous;
     }
 
     /**

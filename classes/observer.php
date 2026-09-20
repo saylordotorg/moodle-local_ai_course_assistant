@@ -108,6 +108,31 @@ class observer {
             return;
         }
 
+        // Media before rows. The generic sweep below deletes sbx_rec rows, and
+        // soapbox_cleanup finds expired media by walking exactly those rows, so
+        // deleting them first stranded every recording, slide deck and frame
+        // sheet in the bucket permanently. This is the path an administrator
+        // actually uses, and until v7.5.2 only the privacy erasure path removed
+        // the objects at all.
+        try {
+            $sbxassignids = $DB->get_fieldset_select(
+                'local_ai_course_assistant_sbx_assign',
+                'id',
+                'courseid = :courseid',
+                ['courseid' => $courseid]
+            );
+            soapbox_assignment_manager::drop_recording_objects((array) $sbxassignids);
+        } catch (\Throwable $e) {
+            // Tables absent on an older install, or storage unreachable. Logged
+            // rather than thrown: an object we cannot delete must not stop the
+            // course deletion the administrator asked for, and the bucket
+            // lifecycle rule on the prefix is the backstop.
+            debugging(
+                "SOLA: could not drop Soapbox media for deleted course {$courseid}: " . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+        }
+
         // Children first: their parent ids have to still be resolvable.
         foreach (self::CHILD_TABLES as $child => [$parent, $column]) {
             try {

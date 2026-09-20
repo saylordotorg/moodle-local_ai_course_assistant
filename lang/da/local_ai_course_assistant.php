@@ -2669,3 +2669,6 @@ $string['soapbox:watch'] = 'Se';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Lagerplaceringen for den optagede video eller lyd, indtil den slettes ved opbevaringsperiodens udløb.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Lagerplaceringen for de slides, der blev uploadet med optagelsen, indtil de slettes sammen med den.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Lagerplaceringen for de stillbilleder, der er taget fra optagelsen til feedback om kropssprog. Slettes sammen med optagelsen.';
+
+$string['soapbox:retention_heading'] = 'Din video slettes efter {$a} dage.';
+$string['soapbox:retention_line'] = 'Hver optagelse slettes automatisk {$a} dage efter, du har lavet den, og den præcise dato står ud for hvert forsøg nedenfor. Dine karakterer, din skriftlige feedback og din transskription bevares. Brug linket »Download« til at gemme enhver video, du vil beholde, inden den dato.';

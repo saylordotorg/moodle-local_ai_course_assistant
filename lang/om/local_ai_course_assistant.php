@@ -2700,3 +2700,6 @@ $string['soapbox:watch'] = 'Ilaali';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Bakka kuusaa viidiyoo yookaan sagalee waraabame, hanga yeroo kuusaa dhumarratti haqamutti.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Bakka kuusaa isiliidota waraabbii waliin olkaa\'aman, hanga isaa waliin haqamanitti.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Bakka kuusaa fakkiiwwan dhaabbataa waraabbii irraa yaada afaan qaamaatiif fudhataman. Waraabbii waliin haqamu.';
+
+$string['soapbox:retention_heading'] = 'Viidiyoon kee guyyaa {$a} booda ni haqama.';
+$string['soapbox:retention_line'] = 'Waraabbiin hundinuu erga waraabdee guyyaa {$a} booda ofumaan haqama, guyyaan haqamu sirriinis gadiitti yaalii hunda bira ni mul\'ata. Qabxiin kee, yaadni barreeffamaan siif kenname fi barreeffamni haasawaa keetii ni kuufamu. Viidiyoo qabachuu barbaaddu kamiyyuu guyyaa sanaan dura olkaa\'uuf liinkii Buufadhu jedhu fayyadami.';

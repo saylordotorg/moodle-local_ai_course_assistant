@@ -2667,3 +2667,6 @@ $string['soapbox:watch'] = '보기';
 $string['privacy:metadata:sbx_rec:storage_key'] = '녹화된 영상 또는 음성의 저장 위치. 보존 기간이 끝나 삭제될 때까지입니다.';
 $string['privacy:metadata:sbx_rec:deck_key'] = '녹화와 함께 업로드된 슬라이드의 저장 위치. 녹화와 함께 삭제될 때까지입니다.';
 $string['privacy:metadata:sbx_rec:frames_key'] = '몸짓 피드백을 위해 녹화에서 추출한 정지 화면의 저장 위치. 녹화와 함께 삭제됩니다.';
+
+$string['soapbox:retention_heading'] = '영상은 {$a}일 후에 삭제됩니다.';
+$string['soapbox:retention_line'] = '각 녹화는 만든 지 {$a}일 후에 자동으로 삭제되며, 정확한 삭제일은 아래 각 시도 옆에 표시됩니다. 점수와 서면 피드백, 전사본은 그대로 남습니다. 보관하고 싶은 영상은 그 날짜 전에 다운로드 링크로 저장하세요.';

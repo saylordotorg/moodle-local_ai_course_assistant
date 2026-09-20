@@ -263,6 +263,47 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             'privacy:metadata:sbx_rec'
         );
 
+        // v7.5.2: the v7.4.0 model-registry tables. Each carries one column that
+        // core reads as a user identifier, and none of them holds learner data:
+        // the column records WHICH SITE ADMINISTRATOR performed an act of site
+        // configuration. Every writer of a non-null value sits behind
+        // require_capability('moodle/site:config'); the automated price feed
+        // writes null on purpose.
+        //
+        // DECLARED but deliberately not exported and not erased. An erasure
+        // request that deleted these rows would delete the site's model pricing,
+        // its price feeds and its benchmark history, which is configuration
+        // belonging to the institution rather than personal data belonging to
+        // the requester. The lang strings say so, so the reason is visible on
+        // the site's data registry page and not only here.
+        //
+        // Undeclared, these failed core's own privacy/tests/provider_test.php,
+        // which the plugin's suite never runs.
+        $collection->add_database_table(
+            'local_ai_course_assistant_models',
+            ['addedby' => 'privacy:metadata:models:addedby'],
+            'privacy:metadata:models'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_pricesrc',
+            ['addedby' => 'privacy:metadata:pricesrc:addedby'],
+            'privacy:metadata:pricesrc'
+        );
+        $collection->add_database_table(
+            'local_ai_course_assistant_bench',
+            ['createdby' => 'privacy:metadata:bench:createdby'],
+            'privacy:metadata:bench'
+        );
+        // Same class of row, found by the guard below rather than by core:
+        // which staff member last edited a Soapbox assignment. Course
+        // configuration, not learner data, and erasing it would silently
+        // reshape an assignment other learners are still working against.
+        $collection->add_database_table(
+            'local_ai_course_assistant_sbx_assign',
+            ['usermodified' => 'privacy:metadata:sbx_assign:usermodified'],
+            'privacy:metadata:sbx_assign'
+        );
+
         // External systems that personal data may be transmitted to. The plugin
         // forwards learner-authored content to the admin-configured AI provider
         // to generate tutoring responses; voice content to the configured speech
@@ -850,6 +891,69 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $DB->delete_records('local_ai_course_assistant_ut_resp', ['courseid' => $context->instanceid]);
         $DB->delete_records('local_ai_course_assistant_audit', ['courseid' => $context->instanceid]);
         $DB->delete_records('local_ai_course_assistant_practice_scores', ['courseid' => $context->instanceid]);
+
+        // Soapbox recordings, which this used to leave behind entirely.
+        //
+        // The row carries the TRANSCRIPT, and storage_key points at the video
+        // in the bucket, so a course-context purge deleted the learner's score
+        // and kept the recording of them saying it. The bucket object outlived
+        // the purge too: the retention task walks sbx_rec rows, so deleting the
+        // row without the object strands it, and not deleting the row at all
+        // left both.
+        //
+        // Done per learner through purge_soapbox_recordings() rather than as a
+        // courseid delete, because sbx_rec has no courseid: it hangs off
+        // sbx_assign, and the object deletion has to happen per row anyway.
+        try {
+            $userids = $DB->get_fieldset_sql(
+                "SELECT DISTINCT r.userid
+                   FROM {local_ai_course_assistant_sbx_rec} r
+                   JOIN {local_ai_course_assistant_sbx_assign} a ON a.id = r.assignid
+                  WHERE a.courseid = :courseid",
+                ['courseid' => $context->instanceid]
+            );
+            foreach ($userids as $uid) {
+                self::purge_soapbox_recordings((int) $uid, (int) $context->instanceid);
+            }
+            // Children before the parent. sbx_topic has no courseid: assignid is
+            // its only link to a course, so deleting the assignment first leaves
+            // the topic rows pointing at nothing and unreachable forever.
+            // get_topics() is keyed on assignid, and observer::course_deleted()
+            // resolves topics by selecting sbx_assign WHERE courseid, which by
+            // then returns nothing and skips straight past them.
+            //
+            // Both existing deleters already do this in this order:
+            // soapbox_assignment_manager::delete_assignment() and
+            // observer::CHILD_TABLES, whose comment says why -- "children first:
+            // their parent ids have to still be resolvable".
+            $assignids = $DB->get_fieldset_select(
+                'local_ai_course_assistant_sbx_assign',
+                'id',
+                'courseid = :courseid',
+                ['courseid' => $context->instanceid]
+            );
+            if (!empty($assignids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal($assignids, SQL_PARAMS_NAMED, 'aid');
+                $DB->delete_records_select(
+                    'local_ai_course_assistant_sbx_topic',
+                    "assignid {$insql}",
+                    $inparams
+                );
+            }
+            $DB->delete_records('local_ai_course_assistant_sbx_assign', ['courseid' => $context->instanceid]);
+        } catch (\Throwable $e) {
+            // Tables absent on older installs, consistent with the guard in
+            // purge_soapbox_recordings() itself. Logged rather than swallowed:
+            // this is the terminal statement of a data-deletion request, so a
+            // failure here means core marks the request satisfied while the data
+            // is still there and nobody is told. The observer solves the same
+            // problem the same way.
+            debugging(
+                'SOLA: Soapbox purge failed for course ' . $context->instanceid . ': ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+            return;
+        }
     }
 
     /**

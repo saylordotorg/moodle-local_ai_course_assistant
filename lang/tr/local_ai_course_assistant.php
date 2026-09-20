@@ -2669,3 +2669,6 @@ $string['soapbox:watch'] = 'İzle';
 $string['privacy:metadata:sbx_rec:storage_key'] = 'Kaydedilen video veya sesin, saklama süresi sonunda silinene kadarki depolama konumu.';
 $string['privacy:metadata:sbx_rec:deck_key'] = 'Kayıtla birlikte yüklenen slaytların, kayıtla birlikte silinene kadarki depolama konumu.';
 $string['privacy:metadata:sbx_rec:frames_key'] = 'Beden dili geri bildirimi için kayıttan alınan sabit karelerin depolama konumu. Kayıtla birlikte silinir.';
+
+$string['soapbox:retention_heading'] = 'Videonuz {$a} gün sonra silinir.';
+$string['soapbox:retention_line'] = 'Her kayıt, siz kaydettikten {$a} gün sonra otomatik olarak silinir; kesin tarih aşağıda her deneme için gösterilir. Puanlarınız, yazılı geri bildiriminiz ve yazıya dökümünüz saklanır. O tarihten önce saklamak istediğiniz videoları kaydetmek için İndir bağlantısını kullanın.';

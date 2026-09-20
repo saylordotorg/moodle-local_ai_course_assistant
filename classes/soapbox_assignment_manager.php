@@ -172,8 +172,13 @@ class soapbox_assignment_manager {
     /**
      * Delete an assignment and its topics and recording rows. Requires :manage.
      *
-     * Storage objects for any recordings are removed by the retention cleanup /
-     * storage layer (later Phase 1 PR); this drops the DB rows only.
+     * The stored objects go first, through drop_recording_objects(). The
+     * previous version of this docblock said the retention cleanup task would
+     * remove them. It could not: that task finds expired objects by walking the
+     * very sbx_rec rows this method deletes, so dropping the rows first left
+     * every recording stranded in the bucket with nothing pointing at it, and
+     * only the bucket lifecycle rule as a backstop. The "later Phase 1 PR" it
+     * deferred to never landed.
      *
      * @param int $id
      */
@@ -184,9 +189,74 @@ class soapbox_assignment_manager {
             return;
         }
         self::require_manage((int) $existing->courseid);
+        self::drop_recording_objects([$id]);
         $DB->delete_records(self::T_REC, ['assignid' => $id]);
         $DB->delete_records(self::T_TOPIC, ['assignid' => $id]);
         $DB->delete_records(self::T_ASSIGN, ['id' => $id]);
+    }
+
+    /**
+     * Delete the stored media for every recording on these assignments.
+     *
+     * Call this BEFORE deleting the sbx_rec rows. Nothing comes back for an
+     * object once its row is gone: soapbox_cleanup finds expired media by
+     * walking sbx_rec, so a row deleted without its object strands a learner's
+     * video, their slide deck and the still frames of their face in the bucket
+     * permanently.
+     *
+     * Every deleter of sbx_rec rows calls this. There are three, and until
+     * v7.5.2 only the privacy erasure path did it: deleting an assignment, and
+     * deleting a whole course, both left the media behind, and the course path
+     * is the one an administrator actually uses.
+     *
+     * Best-effort by design. A storage failure must not stop the deletion an
+     * administrator asked for, and the bucket lifecycle rule on the prefix is
+     * the backstop, so a failed object delete is logged rather than thrown.
+     *
+     * @param int[] $assignids Assignment ids whose recordings are being removed.
+     * @return void
+     */
+    public static function drop_recording_objects(array $assignids): void {
+        global $DB;
+
+        $assignids = array_values(array_filter(array_map('intval', $assignids)));
+        if (empty($assignids) || !\local_ai_course_assistant\soapbox_storage::is_configured()) {
+            return;
+        }
+        try {
+            [$insql, $inparams] = $DB->get_in_or_equal($assignids, SQL_PARAMS_NAMED, 'aid');
+            $recs = $DB->get_records_select(
+                self::T_REC,
+                "assignid {$insql}",
+                $inparams,
+                '',
+                'id, storage_key, deck_key, frames_key'
+            );
+            if (empty($recs)) {
+                return;
+            }
+            $storage = new \local_ai_course_assistant\soapbox_storage();
+            foreach ($recs as $rec) {
+                foreach ([$rec->storage_key, $rec->deck_key, $rec->frames_key] as $objkey) {
+                    if (empty($objkey)) {
+                        continue;
+                    }
+                    try {
+                        $storage->delete_object($objkey);
+                    } catch (\Throwable $e) {
+                        debugging(
+                            'SOLA: could not delete Soapbox object ' . $objkey . ': ' . $e->getMessage(),
+                            DEBUG_DEVELOPER
+                        );
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            debugging(
+                'SOLA: could not enumerate Soapbox recordings for deletion: ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+        }
     }
 
     /**
