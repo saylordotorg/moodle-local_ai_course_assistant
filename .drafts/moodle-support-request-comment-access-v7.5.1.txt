@@ -1,3 +1,16 @@
+DO NOT SEND. MOOT AS OF 20 September 2026.
+
+Tom posted three comments on CONTRIB-10574 on 16 September 2026 (the AUTH001 and
+SEC006 rebuttal, and the MP001 response), so whatever was blocking comment access
+has cleared. Verified against the public Jira REST API: the issue carries six
+comments, three of them authored by Tom Caswell.
+
+Kept for the record because the diagnosis in it may be useful if access is ever
+lost again. Note the reporter on CONTRIB-10574 is "Plugins bot", not Tom, so the
+identity hypothesis below was close but not exact: he was never the reporter.
+
+--- original draft below ---
+
 Send to: Moodle Marketplace support, via the "Create a support request" link at https://marketplace.moodle.com/ (Jira Service Management portal: https://moodle.atlassian.net/servicedesk/customer/portal/166/)
 
 Subject: CONTRIB-10574: I cannot comment on our own plugin approval request

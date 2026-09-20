@@ -115,6 +115,18 @@ add the `phpcs:disable` line to the two `NO_MOODLE_COOKIES` endpoints, because
 the sniff does not fire on them — a suppression there would assert a warning
 that does not exist.
 
+> **CORRECTION, 20 September 2026.** The paragraph above is wrong and was posted
+> to CONTRIB-10574 on 16 September before anyone checked it. Four of the five
+> cited files declare `NO_MOODLE_COOKIES`, not two, and two of those four
+> (`email_unsubscribe.php`, `digest_unsubscribe.php`) carry the `phpcs:disable`
+> line as well, so the two markers are not alternatives used in different files
+> and the stated reason for the difference does not hold. Verified against the
+> v7.4.7 tag this reply cites and against v7.5.2. The substance of the AUTH001
+> response is unaffected: all five endpoints authenticate their caller. A
+> correction is drafted for posting in
+> `.drafts/contrib-10574-correction-auth001-marker-map.md`.
+
+
 If Marketplace would rather see one single marker on all five regardless, tell
 us which and we will standardize on it.
 
