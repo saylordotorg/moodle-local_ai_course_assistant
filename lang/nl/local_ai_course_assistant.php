@@ -2695,3 +2695,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'De opslaglocatie van de stilst
 
 $string['soapbox:retention_heading'] = 'Je video wordt na {$a} dagen verwijderd.';
 $string['soapbox:retention_line'] = 'Elke opname wordt {$a} dagen nadat je hem maakt automatisch verwijderd, en de precieze datum staat hieronder bij elke poging. Je scores, geschreven feedback en transcript blijven wel bewaard. Gebruik de link Downloaden om elke video die je wilt houden vóór die datum op te slaan.';
+
+$string['outcomes:panel_heading'] = 'Leerresultaten van je programma';
+$string['outcomes:panel_intro'] = 'Dit zijn de leerresultaten van je programma, over alle cursussen die eraan bijdragen. Ze staan los van de leerdoelen van deze cursus en ze worden bijgewerkt naarmate je elders beoordeeld werk afrondt.';
+$string['outcomes:no_percentage_yet'] = 'Nog geen resultaat';
+$string['outcomes:state_insufficient_evidence'] = 'Nog niet genoeg beoordeeld werk. Voor dit leerresultaat zijn meer nagekeken vragen in je cursussen nodig voordat er een resultaat berekend kan worden. Dit betekent niet dat je nul hebt gescoord.';
+$string['outcomes:state_calculation_pending'] = 'Je resultaat wordt berekend en verschijnt binnenkort.';
+$string['outcomes:state_stale'] = 'Recent werk is nog niet meegeteld, dus dit cijfer is verouderd.';
+$string['outcomes:state_not_released'] = 'Je resultaat is berekend, maar is nog niet gepubliceerd.';
+$string['outcomes:state_not_assessed'] = 'Dit leerresultaat wordt niet beoordeeld in de cursussen die je tot nu toe hebt gevolgd.';
+$string['outcomes:threshold_expected'] = 'Verwacht: {$a}%';
+$string['outcomes:threshold_strong'] = 'Sterk: {$a}%';
+$string['outcomes:evidence_from'] = 'Gebaseerd op {$a->items} beoordeelde onderdelen in {$a->assessed} van {$a->total} cursussen.';

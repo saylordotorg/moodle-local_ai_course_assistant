@@ -2672,3 +2672,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Umístění snímků pořízen
 
 $string['soapbox:retention_heading'] = 'Vaše video se po {$a} dnech smaže.';
 $string['soapbox:retention_line'] = 'Každá nahrávka se automaticky smaže {$a} dní poté, co ji pořídíte, a přesné datum je uvedeno u každého pokusu níže. Vaše hodnocení, písemná zpětná vazba a přepis zůstávají zachovány. Pomocí odkazu „Stáhnout“ si před tímto datem uložte každé video, které si chcete nechat.';
+
+$string['outcomes:panel_heading'] = 'Výstupy vašeho studijního programu';
+$string['outcomes:panel_intro'] = 'Toto jsou výstupy učení vašeho studijního programu napříč všemi kurzy, které k nim přispívají. Jsou oddělené od cílů tohoto kurzu a aktualizují se, jakmile dokončíte hodnocenou práci jinde.';
+$string['outcomes:no_percentage_yet'] = 'Zatím žádný výsledek';
+$string['outcomes:state_insufficient_evidence'] = 'Zatím není dost hodnocené práce. Než bude možné výsledek vypočítat, potřebuje tento výstup více hodnocených otázek napříč vašimi kurzy. Neznamená to, že jste získali nula bodů.';
+$string['outcomes:state_calculation_pending'] = 'Váš výsledek se právě počítá a měl by se brzy zobrazit.';
+$string['outcomes:state_stale'] = 'Nedávná práce zatím nebyla započítána, takže tento údaj je zastaralý.';
+$string['outcomes:state_not_released'] = 'Váš výsledek byl vypočítán, ale zatím není zveřejněn.';
+$string['outcomes:state_not_assessed'] = 'Tento výstup se v kurzech, které jste dosud absolvovali, nehodnotí.';
+$string['outcomes:threshold_expected'] = 'Očekáváno: {$a} %';
+$string['outcomes:threshold_strong'] = 'Silný výsledek: {$a} %';
+$string['outcomes:evidence_from'] = 'Na základě {$a->items} hodnocených položek v {$a->assessed} z {$a->total} kurzů.';

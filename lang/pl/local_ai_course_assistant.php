@@ -2671,3 +2671,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Miejsce przechowywania klatek 
 
 $string['soapbox:retention_heading'] = 'Twoje wideo jest usuwane po {$a} dniach.';
 $string['soapbox:retention_line'] = 'Każde nagranie jest usuwane automatycznie {$a} dni po jego wykonaniu, a dokładna data jest podana przy każdym podejściu poniżej. Twoje oceny, pisemna informacja zwrotna i transkrypcja zostają zachowane. Użyj linku Pobierz, aby przed tą datą zapisać każde wideo, które chcesz zachować.';
+
+$string['outcomes:panel_heading'] = 'Efekty kształcenia Twojego programu';
+$string['outcomes:panel_intro'] = 'To są efekty kształcenia Twojego programu, obejmujące wszystkie kursy, które się na nie składają. Są odrębne od celów uczenia się tego kursu i aktualizują się, gdy wykonujesz oceniane prace na innych kursach.';
+$string['outcomes:no_percentage_yet'] = 'Brak wyniku';
+$string['outcomes:state_insufficient_evidence'] = 'Za mało ocenionych prac. Zanim będzie można wyliczyć wynik, ten efekt kształcenia wymaga większej liczby ocenionych pytań w Twoich kursach. To nie oznacza, że Twój wynik wynosi zero.';
+$string['outcomes:state_calculation_pending'] = 'Twój wynik jest właśnie wyliczany i powinien pojawić się wkrótce.';
+$string['outcomes:state_stale'] = 'Ostatnie prace nie zostały jeszcze uwzględnione, więc ta wartość jest nieaktualna.';
+$string['outcomes:state_not_released'] = 'Twój wynik został wyliczony, ale nie jest jeszcze opublikowany.';
+$string['outcomes:state_not_assessed'] = 'Ten efekt kształcenia nie jest oceniany na żadnym z Twoich dotychczasowych kursów.';
+$string['outcomes:threshold_expected'] = 'Oczekiwany: {$a}%';
+$string['outcomes:threshold_strong'] = 'Wysoki: {$a}%';
+$string['outcomes:evidence_from'] = 'Na podstawie ocenionych elementów: {$a->items}, z {$a->assessed} z {$a->total} kursów.';

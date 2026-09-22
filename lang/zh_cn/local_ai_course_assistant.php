@@ -2708,3 +2708,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = '为肢体语言反馈从录制
 
 $string['soapbox:retention_heading'] = '你的视频会在 {$a} 天后被删除。';
 $string['soapbox:retention_line'] = '每段录制都会在你录制后 {$a} 天自动删除，确切日期显示在下方每一次录制的旁边。你的分数、文字反馈和转写文字会保留下来。请在那个日期之前用下载链接把想留下的视频保存到本地。';
+
+$string['outcomes:panel_heading'] = '你的学习项目成果';
+$string['outcomes:panel_intro'] = '这些是你所在学习项目的学习成果，汇总自每一门对其有贡献的课程。它们与本课程的学习目标是分开的，当你在其他课程完成受评作业后，它们会随之更新。';
+$string['outcomes:no_percentage_yet'] = '暂无结果';
+$string['outcomes:state_insufficient_evidence'] = '受评作业还不够。该成果需要你在各门课程中完成更多已评分的题目，才能算出结果。这并不表示你的得分为零。';
+$string['outcomes:state_calculation_pending'] = '你的结果正在计算中，稍后即会显示。';
+$string['outcomes:state_stale'] = '最近完成的作业尚未计入，因此这个数字不是最新的。';
+$string['outcomes:state_not_released'] = '你的结果已经算出，但尚未公布。';
+$string['outcomes:state_not_assessed'] = '你目前修过的课程中没有评估这项成果。';
+$string['outcomes:threshold_expected'] = '预期：{$a}%';
+$string['outcomes:threshold_strong'] = '优秀：{$a}%';
+$string['outcomes:evidence_from'] = '依据 {$a->total} 门课程中 {$a->assessed} 门的 {$a->items} 个已评分项目得出。';

@@ -2703,3 +2703,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Bakka kuusaa fakkiiwwan dhaabb
 
 $string['soapbox:retention_heading'] = 'Viidiyoon kee guyyaa {$a} booda ni haqama.';
 $string['soapbox:retention_line'] = 'Waraabbiin hundinuu erga waraabdee guyyaa {$a} booda ofumaan haqama, guyyaan haqamu sirriinis gadiitti yaalii hunda bira ni mul\'ata. Qabxiin kee, yaadni barreeffamaan siif kenname fi barreeffamni haasawaa keetii ni kuufamu. Viidiyoo qabachuu barbaaddu kamiyyuu guyyaa sanaan dura olkaa\'uuf liinkii Buufadhu jedhu fayyadami.';
+
+$string['outcomes:panel_heading'] = 'Bu\'aawwan sagantaa keessanii';
+$string['outcomes:panel_intro'] = 'Kunneen bu\'aawwan barnootaa sagantaa keessanii ti, koorsiiwwan isaanitti gumaachan hunda keessatti. Isaan galmoota koorsii kanaa irraa adda; akkuma hojii madaalamu koorsiiwwan biroo keessatti xumurtaniin ni haaromfamu.';
+$string['outcomes:no_percentage_yet'] = 'Hanga ammaatti bu\'aan hin jiru';
+$string['outcomes:state_insufficient_evidence'] = 'Hojiin madaalame hanga ammaatti ga\'aa miti. Bu\'aan kun, dura bu\'aan shallagamuu danda\'uuf, gaaffiiwwan qabxiin kennameef dabalataa koorsiiwwan keessan keessatti barbaada. Kun qabxii duwwaa argattan jechuu miti.';
+$string['outcomes:state_calculation_pending'] = 'Bu\'aan keessan shallagamaa jira; yeroo gabaabaa keessatti ni mul\'ata.';
+$string['outcomes:state_stale'] = 'Hojiin dhiyeenyaa hanga ammaatti hin lakkaa\'amne, kanaafuu lakkoofsi kun kan durii ti.';
+$string['outcomes:state_not_released'] = 'Bu\'aan keessan shallagameera, garuu hanga ammaatti hin maxxanfamne.';
+$string['outcomes:state_not_assessed'] = 'Bu\'aan kun koorsiiwwan hanga ammaatti fudhattan keessatti hin madaalamu.';
+$string['outcomes:threshold_expected'] = 'Kan eegamu: {$a}%';
+$string['outcomes:threshold_strong'] = 'Cimaa: {$a}%';
+$string['outcomes:evidence_from'] = 'Koorsiiwwan {$a->total} keessaa {$a->assessed} irraa wantoota qabxiin kennameef {$a->items} irratti hundaa\'e.';

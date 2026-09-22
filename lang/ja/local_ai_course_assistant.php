@@ -2670,3 +2670,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = '身ぶりのフィードバッ
 
 $string['soapbox:retention_heading'] = '動画は {$a} 日後に削除されます。';
 $string['soapbox:retention_line'] = '各録画は、録画してから {$a} 日後に自動的に削除されます。正確な削除日は下の一覧の各録画に表示されています。点数、文章によるフィードバック、文字起こしは残ります。残しておきたい動画は、その日までに「ダウンロード」リンクから保存してください。';
+
+$string['outcomes:panel_heading'] = 'あなたのプログラムのアウトカム';
+$string['outcomes:panel_intro'] = 'これらは、あなたのプログラムの学習アウトカムで、それに寄与するすべてのコースを通じて集計されます。このコースの学習目標とは別のもので、他のコースで採点対象の学習を終えるたびに更新されます。';
+$string['outcomes:no_percentage_yet'] = '結果はまだありません';
+$string['outcomes:state_insufficient_evidence'] = '採点対象の学習がまだ十分ではありません。このアウトカムは、結果を算出するために、あなたの各コースでさらに採点済みの問題が必要です。得点が0点だという意味ではありません。';
+$string['outcomes:state_calculation_pending'] = '結果を算出中です。まもなく表示されます。';
+$string['outcomes:state_stale'] = '最近の学習がまだ集計されていないため、この数値は最新ではありません。';
+$string['outcomes:state_not_released'] = '結果は算出済みですが、まだ公開されていません。';
+$string['outcomes:state_not_assessed'] = 'このアウトカムは、これまでに履修したコースでは評価の対象になっていません。';
+$string['outcomes:threshold_expected'] = '期待水準: {$a}%';
+$string['outcomes:threshold_strong'] = '優良水準: {$a}%';
+$string['outcomes:evidence_from'] = '{$a->total} コース中 {$a->assessed} コースの採点済み項目 {$a->items} 件に基づいています。';

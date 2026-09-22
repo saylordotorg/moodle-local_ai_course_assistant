@@ -2724,3 +2724,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Lokasi penyimpanan bingkai dia
 
 $string['soapbox:retention_heading'] = 'Video Anda dihapus setelah {$a} hari.';
 $string['soapbox:retention_line'] = 'Setiap rekaman dihapus otomatis {$a} hari setelah Anda membuatnya, dan tanggal pastinya ditampilkan pada setiap percobaan di bawah. Nilai, umpan balik tertulis, dan transkrip Anda tetap disimpan. Gunakan tautan Unduh untuk menyimpan video yang ingin Anda pertahankan sebelum tanggal tersebut.';
+
+$string['outcomes:panel_heading'] = 'Capaian pembelajaran program Anda';
+$string['outcomes:panel_intro'] = 'Ini adalah capaian pembelajaran untuk program Anda, mencakup semua kursus yang berkontribusi terhadapnya. Capaian ini terpisah dari tujuan pembelajaran kursus ini, dan diperbarui saat Anda menyelesaikan tugas yang dinilai di kursus lain.';
+$string['outcomes:no_percentage_yet'] = 'Belum ada hasil';
+$string['outcomes:state_insufficient_evidence'] = 'Belum cukup tugas yang dinilai. Capaian ini memerlukan lebih banyak pertanyaan yang dinilai di seluruh kursus Anda sebelum hasilnya dapat dihitung. Ini bukan berarti nilai Anda nol.';
+$string['outcomes:state_calculation_pending'] = 'Hasil Anda sedang dihitung dan akan segera muncul.';
+$string['outcomes:state_stale'] = 'Pekerjaan terbaru Anda belum diperhitungkan, sehingga angka ini sudah tidak mutakhir.';
+$string['outcomes:state_not_released'] = 'Hasil Anda sudah dihitung, tetapi belum dipublikasikan.';
+$string['outcomes:state_not_assessed'] = 'Capaian ini tidak dinilai dalam kursus yang telah Anda ambil sejauh ini.';
+$string['outcomes:threshold_expected'] = 'Diharapkan: {$a}%';
+$string['outcomes:threshold_strong'] = 'Sangat baik: {$a}%';
+$string['outcomes:evidence_from'] = 'Berdasarkan {$a->items} butir penilaian di {$a->assessed} dari {$a->total} kursus.';

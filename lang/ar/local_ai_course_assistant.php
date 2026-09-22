@@ -2670,3 +2670,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'موضع تخزين اللقط
 
 $string['soapbox:retention_heading'] = 'يُحذف الفيديو الخاص بك بعد {$a} يومًا.';
 $string['soapbox:retention_line'] = 'يُحذف كل تسجيل تلقائيًا بعد {$a} يومًا من تسجيله، والتاريخ الدقيق مبيَّن أمام كل محاولة في القائمة أدناه. أما درجاتك وملاحظاتك المكتوبة والنص المفرَّغ فتبقى محفوظة. استخدم رابط «تنزيل» لحفظ أي فيديو تريد الاحتفاظ به قبل ذلك التاريخ.';
+
+$string['outcomes:panel_heading'] = 'نتائج برنامجك الدراسي';
+$string['outcomes:panel_intro'] = 'هذه هي نتائج التعلم الخاصة ببرنامجك الدراسي، عبر كل مقرر يساهم فيها. وهي منفصلة عن أهداف هذا المقرر، وتُحدَّث كلما أكملت عملاً مُقيَّماً في مقررات أخرى.';
+$string['outcomes:no_percentage_yet'] = 'لا توجد نتيجة بعد';
+$string['outcomes:state_insufficient_evidence'] = 'لا يوجد عمل مُقيَّم كافٍ حتى الآن. تحتاج هذه النتيجة إلى مزيد من الأسئلة المُقيَّمة عبر مقرراتك قبل أن يمكن احتساب نتيجتك. هذا لا يعني أنك حصلت على صفر.';
+$string['outcomes:state_calculation_pending'] = 'يجري احتساب نتيجتك وستظهر قريباً.';
+$string['outcomes:state_stale'] = 'لم يُحتسب عملك الأخير بعد، لذا فإن هذا الرقم غير محدَّث.';
+$string['outcomes:state_not_released'] = 'تم احتساب نتيجتك، لكنها لم تُنشر بعد.';
+$string['outcomes:state_not_assessed'] = 'هذه النتيجة لا تُقيَّم في المقررات التي درستها حتى الآن.';
+$string['outcomes:threshold_expected'] = 'المتوقع: {$a}%';
+$string['outcomes:threshold_strong'] = 'قوي: {$a}%';
+$string['outcomes:evidence_from'] = 'استناداً إلى عدد {$a->items} من العناصر المُقيَّمة عبر {$a->assessed} من أصل {$a->total} من المقررات.';

@@ -2692,3 +2692,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'O local de armazenamento dos q
 
 $string['soapbox:retention_heading'] = 'Seu vídeo é excluído depois de {$a} dias.';
 $string['soapbox:retention_line'] = 'Cada gravação é excluída automaticamente {$a} dias depois de você gravá-la, e a data exata aparece em cada tentativa abaixo. Suas notas, o retorno escrito e a transcrição são mantidos. Use o link Baixar para salvar, antes dessa data, qualquer vídeo que você queira guardar.';
+
+$string['outcomes:panel_heading'] = 'Resultados do seu programa';
+$string['outcomes:panel_intro'] = 'Estes são os resultados de aprendizagem do seu programa, considerando todos os cursos que contribuem para eles. São diferentes dos objetivos deste curso e se atualizam conforme você conclui trabalhos avaliados em outros cursos.';
+$string['outcomes:no_percentage_yet'] = 'Ainda sem resultado';
+$string['outcomes:state_insufficient_evidence'] = 'Ainda não há trabalho avaliado suficiente. Este resultado de aprendizagem precisa de mais questões corrigidas ao longo dos seus cursos para que um valor possa ser calculado. Isso não significa que você tirou zero.';
+$string['outcomes:state_calculation_pending'] = 'Seu resultado está sendo calculado e deve aparecer em breve.';
+$string['outcomes:state_stale'] = 'Trabalhos recentes ainda não foram contabilizados, então este número está desatualizado.';
+$string['outcomes:state_not_released'] = 'Seu resultado já foi calculado, mas ainda não foi publicado.';
+$string['outcomes:state_not_assessed'] = 'Este resultado não é avaliado nos cursos que você fez até agora.';
+$string['outcomes:threshold_expected'] = 'Esperado: {$a}%';
+$string['outcomes:threshold_strong'] = 'Forte: {$a}%';
+$string['outcomes:evidence_from'] = 'Com base em {$a->items} itens corrigidos em {$a->assessed} de {$a->total} cursos.';

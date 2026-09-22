@@ -2699,3 +2699,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Wurin ajiyar hotuna marasa mot
 
 $string['soapbox:retention_heading'] = 'Ana share bidiyon ka bayan kwanaki {$a}.';
 $string['soapbox:retention_line'] = 'Ana share kowane rikodi ta atomatik kwanaki {$a} bayan ka yi shi, kuma an nuna ainihin ranar a gaban kowane yunƙuri a ƙasa. Ana ajiye makin ka, ra\'ayin da aka rubuta maka da kuma rubutun maganarka. Yi amfani da hanyar haɗin Sauke don ajiye duk bidiyon da kake son riƙewa kafin wannan ranar.';
+
+$string['outcomes:panel_heading'] = 'Sakamakon koyo na shirin karatunka';
+$string['outcomes:panel_intro'] = 'Waɗannan su ne sakamakon koyo na shirin karatunka, waɗanda aka tattara daga dukkan darussan da suke ba da gudummawa gare su. Sun bambanta da manufofin koyo na wannan kwasa, kuma suna sabuntawa yayin da kake kammala aikin da ake kimantawa a sauran darussa.';
+$string['outcomes:no_percentage_yet'] = 'Babu sakamako tukuna';
+$string['outcomes:state_insufficient_evidence'] = 'Har yanzu babu isasshen aikin da aka kimanta. Wannan sakamakon koyo yana buƙatar ƙarin tambayoyi masu maki a cikin darussanka kafin a iya lissafa sakamako. Ba yana nufin ka samu sifili ba.';
+$string['outcomes:state_calculation_pending'] = 'Ana lissafa sakamakonka yanzu, kuma zai bayyana nan ba da jimawa ba.';
+$string['outcomes:state_stale'] = 'Ba a ƙidaya aikin da ka yi kwanan nan ba tukuna, don haka wannan adadin ya tsufa.';
+$string['outcomes:state_not_released'] = 'An lissafa sakamakonka, amma ba a buga shi ba tukuna.';
+$string['outcomes:state_not_assessed'] = 'Ba a kimanta wannan sakamakon koyo a cikin darussan da ka yi ya zuwa yanzu ba.';
+$string['outcomes:threshold_expected'] = 'Ana tsammani: {$a}%';
+$string['outcomes:threshold_strong'] = 'Mai ƙarfi: {$a}%';
+$string['outcomes:evidence_from'] = 'Bisa abubuwa {$a->items} masu maki a cikin darussa {$a->assessed} daga cikin {$a->total}.';

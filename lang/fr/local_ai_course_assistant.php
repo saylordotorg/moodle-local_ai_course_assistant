@@ -2673,3 +2673,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'L\'emplacement de stockage des
 
 $string['soapbox:retention_heading'] = 'Votre vidéo est supprimée au bout de {$a} jours.';
 $string['soapbox:retention_line'] = 'Chaque enregistrement est supprimé automatiquement {$a} jours après que vous l\'avez réalisé, et la date exacte est indiquée en face de chaque tentative ci-dessous. Vos scores, vos retours écrits et votre transcription sont conservés. Utilisez le lien Télécharger pour enregistrer, avant cette date, toute vidéo que vous souhaitez garder.';
+
+$string['outcomes:panel_heading'] = 'Les acquis de votre programme';
+$string['outcomes:panel_intro'] = 'Voici les acquis d\'apprentissage de votre programme d\'études, rassemblés à partir de tous les cours qui y contribuent. Ils sont distincts des objectifs de ce cours et se mettent à jour à mesure que vous réalisez des travaux notés ailleurs.';
+$string['outcomes:no_percentage_yet'] = 'Pas encore de résultat';
+$string['outcomes:state_insufficient_evidence'] = 'Pas encore assez de travaux évalués. Cet acquis a besoin de davantage de questions notées dans l\'ensemble de vos cours avant qu\'un résultat puisse être calculé. Cela ne veut pas dire que vous avez obtenu zéro.';
+$string['outcomes:state_calculation_pending'] = 'Votre résultat est en cours de calcul et devrait apparaître sous peu.';
+$string['outcomes:state_stale'] = 'Les travaux récents n\'ont pas encore été pris en compte, ce chiffre n\'est donc pas à jour.';
+$string['outcomes:state_not_released'] = 'Votre résultat a été calculé, mais il n\'est pas encore publié.';
+$string['outcomes:state_not_assessed'] = 'Cet acquis n\'est pas évalué dans les cours que vous avez suivis jusqu\'à présent.';
+$string['outcomes:threshold_expected'] = 'Attendu : {$a} %';
+$string['outcomes:threshold_strong'] = 'Élevé : {$a} %';
+$string['outcomes:evidence_from'] = 'Basé sur {$a->items} éléments notés dans {$a->assessed} cours sur {$a->total}.';

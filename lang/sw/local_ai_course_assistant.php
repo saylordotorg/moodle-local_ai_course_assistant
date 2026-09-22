@@ -2716,3 +2716,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Mahali pa kuhifadhi picha tuli
 
 $string['soapbox:retention_heading'] = 'Video yako inafutwa baada ya siku {$a}.';
 $string['soapbox:retention_line'] = 'Kila rekodi inafutwa kiotomatiki siku {$a} baada ya kuirekodi, na tarehe kamili inaonyeshwa kwa kila jaribio hapa chini. Alama zako, maoni yako yaliyoandikwa na maandishi yako hubaki. Tumia kiungo cha Pakua kuhifadhi video yoyote unayotaka kuweka kabla ya tarehe hiyo.';
+
+$string['outcomes:panel_heading'] = 'Matokeo ya programu yako';
+$string['outcomes:panel_intro'] = 'Haya ni matokeo ya kujifunza ya programu yako, yakijumlishwa kutoka kozi zote zinazochangia. Ni tofauti na malengo ya kujifunza ya kozi hii, na yanasasishwa unapokamilisha kazi iliyotathminiwa katika kozi nyingine.';
+$string['outcomes:no_percentage_yet'] = 'Bado hakuna matokeo';
+$string['outcomes:state_insufficient_evidence'] = 'Bado hakuna kazi ya kutosha iliyotathminiwa. Tokeo hili linahitaji maswali zaidi yaliyosahihishwa katika kozi zako kabla matokeo hayajaweza kukokotolewa. HAIMAANISHI kwamba ulipata sifuri.';
+$string['outcomes:state_calculation_pending'] = 'Matokeo yako yanakokotolewa na yataonekana hivi karibuni.';
+$string['outcomes:state_stale'] = 'Kazi ya hivi karibuni bado haijahesabiwa, kwa hivyo takwimu hii imepitwa na wakati.';
+$string['outcomes:state_not_released'] = 'Matokeo yako yamekokotolewa lakini bado hayajachapishwa.';
+$string['outcomes:state_not_assessed'] = 'Tokeo hili halitathminiwi katika kozi ulizosoma hadi sasa.';
+$string['outcomes:threshold_expected'] = 'Inayotarajiwa: {$a}%';
+$string['outcomes:threshold_strong'] = 'Imara: {$a}%';
+$string['outcomes:evidence_from'] = 'Kwa msingi wa vipengele {$a->items} vilivyosahihishwa katika kozi {$a->assessed} kati ya {$a->total}.';

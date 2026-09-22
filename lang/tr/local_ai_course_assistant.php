@@ -2672,3 +2672,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Beden dili geri bildirimi içi
 
 $string['soapbox:retention_heading'] = 'Videonuz {$a} gün sonra silinir.';
 $string['soapbox:retention_line'] = 'Her kayıt, siz kaydettikten {$a} gün sonra otomatik olarak silinir; kesin tarih aşağıda her deneme için gösterilir. Puanlarınız, yazılı geri bildiriminiz ve yazıya dökümünüz saklanır. O tarihten önce saklamak istediğiniz videoları kaydetmek için İndir bağlantısını kullanın.';
+
+$string['outcomes:panel_heading'] = 'Program kazanımlarınız';
+$string['outcomes:panel_intro'] = 'Bunlar, programınızın öğrenme kazanımlarıdır; kazanımlara katkı sağlayan tüm dersler birlikte hesaba katılır. Bu dersin öğrenme hedeflerinden ayrıdırlar ve başka derslerde değerlendirilen çalışmaları tamamladıkça güncellenirler.';
+$string['outcomes:no_percentage_yet'] = 'Henüz sonuç yok';
+$string['outcomes:state_insufficient_evidence'] = 'Henüz yeterli değerlendirilmiş çalışma yok. Bir sonuç hesaplanabilmesi için bu kazanımın derslerinizde daha fazla puanlanmış soruya ihtiyacı var. Bu, sıfır aldığınız anlamına GELMEZ.';
+$string['outcomes:state_calculation_pending'] = 'Sonucunuz hesaplanıyor ve kısa süre içinde görünecek.';
+$string['outcomes:state_stale'] = 'Son zamanlarda yaptığınız çalışmalar henüz sayılmadı, bu nedenle bu değer güncel değil.';
+$string['outcomes:state_not_released'] = 'Sonucunuz hesaplandı ancak henüz yayımlanmadı.';
+$string['outcomes:state_not_assessed'] = 'Bu kazanım, şimdiye kadar aldığınız derslerde değerlendirilmiyor.';
+$string['outcomes:threshold_expected'] = 'Beklenen: {$a}%';
+$string['outcomes:threshold_strong'] = 'Güçlü: {$a}%';
+$string['outcomes:evidence_from'] = '{$a->total} dersin {$a->assessed} tanesindeki {$a->items} puanlanmış öğeye dayanmaktadır.';

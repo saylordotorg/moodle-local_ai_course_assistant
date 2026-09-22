@@ -2713,3 +2713,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'מיקום האחסון של �
 
 $string['soapbox:retention_heading'] = 'הווידאו שלכם נמחק אחרי {$a} ימים.';
 $string['soapbox:retention_line'] = 'כל הקלטה נמחקת אוטומטית {$a} ימים אחרי שהקלטתם אותה, והתאריך המדויק מופיע ליד כל ניסיון למטה. הציונים, המשוב הכתוב והתמלול שלכם נשמרים. אם אתם רוצים לשמור וידאו, השתמשו בקישור ההורדה כדי לשמור אותו אצלכם לפני התאריך הזה.';
+
+$string['outcomes:panel_heading'] = 'תוצרי הלמידה של התוכנית שלך';
+$string['outcomes:panel_intro'] = 'אלה תוצרי הלמידה של תוכנית הלימודים שלך, מכל הקורסים שתורמים להם. הם נפרדים ממטרות הלמידה של הקורס הזה, והם מתעדכנים עם השלמת משימות מוערכות בקורסים אחרים.';
+$string['outcomes:no_percentage_yet'] = 'אין עדיין תוצאה';
+$string['outcomes:state_insufficient_evidence'] = 'עדיין אין מספיק עבודה שהוערכה. תוצר הלמידה הזה זקוק ליותר שאלות מנוקדות בקורסים שלך לפני שאפשר לחשב תוצאה. זה לא אומר שקיבלת אפס.';
+$string['outcomes:state_calculation_pending'] = 'התוצאה שלך מחושבת כעת ואמורה להופיע בקרוב.';
+$string['outcomes:state_stale'] = 'עבודה אחרונה עדיין לא נספרה, ולכן הנתון הזה אינו מעודכן.';
+$string['outcomes:state_not_released'] = 'התוצאה שלך חושבה, אך היא עדיין לא פורסמה.';
+$string['outcomes:state_not_assessed'] = 'תוצר הלמידה הזה אינו מוערך בקורסים שלמדת עד כה.';
+$string['outcomes:threshold_expected'] = 'צפוי: {$a}%';
+$string['outcomes:threshold_strong'] = 'גבוה: {$a}%';
+$string['outcomes:evidence_from'] = 'מבוסס על {$a->items} פריטים מנוקדים ב-{$a->assessed} קורסים מתוך {$a->total}.';

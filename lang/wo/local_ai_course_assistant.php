@@ -2692,3 +2692,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Barab bu ñuy denc nataal yu t
 
 $string['soapbox:retention_heading'] = 'Sa wideo dañu koy far ginnaaw {$a} fan.';
 $string['soapbox:retention_line'] = 'Duub bu nekk dañu koy far ci boppam {$a} fan ginnaaw bi nga ko defee, te bés bi ñu koy far ñungi ko wone ci wetu jéego bu nekk ci suuf. Say tomb, sa xalaat bu ñu bind ak sa bind dañuy des. Jëfandikool lëkkalekaay bu Yebbi ngir denc wideo bu nga bëgg a denc bala bés boobu.';
+
+$string['outcomes:panel_heading'] = 'Résultat yu sa prograam';
+$string['outcomes:panel_intro'] = 'Yii ñooy résultat yu njàng yu sa prograam, ci bépp cours bu ci ànd. Duñu benn ak yitte yu cours bii, te dañuy yeesu bu nga defee liggéey yu ñu note ci yeneen cours.';
+$string['outcomes:no_percentage_yet'] = 'Amul résultat ba tey';
+$string['outcomes:state_insufficient_evidence'] = 'Liggéey bu ñu note doyagul. Résultat bii dafa soxla yeneen laaj yu ñu note ci sa cours yi balaa ñu mën a xayma benn résultat. Loolu tekkiwul ne jot nga zéro, te tekkiwul it ne ñàkk nga.';
+$string['outcomes:state_calculation_pending'] = 'Ñu ngi xayma sa résultat, dina feeñ léegi.';
+$string['outcomes:state_stale'] = 'Liggéey bi nga def ci bés yii, ñu boolewu ko ba léegi, kon limu bii dafa yàgg.';
+$string['outcomes:state_not_released'] = 'Xayma nañu sa résultat waaye ñu génnewu ko ba tey.';
+$string['outcomes:state_not_assessed'] = 'Résultat bii, ñu ko assessewul ci cours yi nga jàng ba tey.';
+$string['outcomes:threshold_expected'] = 'Li ñu séentu: {$a}%';
+$string['outcomes:threshold_strong'] = 'Bu dëgër: {$a}%';
+$string['outcomes:evidence_from'] = 'Tegoo na ci {$a->items} liggéey yu ñu note ci {$a->assessed} cours ci {$a->total}.';

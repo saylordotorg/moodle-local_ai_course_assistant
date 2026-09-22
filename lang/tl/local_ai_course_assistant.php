@@ -2716,3 +2716,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Ang lokasyon ng imbakan ng mga
 
 $string['soapbox:retention_heading'] = 'Buburahin ang iyong video pagkatapos ng {$a} araw.';
 $string['soapbox:retention_line'] = 'Awtomatikong buburahin ang bawat recording {$a} araw pagkatapos mong i-record ito, at makikita ang eksaktong petsa sa tabi ng bawat pagsubok sa ibaba. Nananatili ang iyong mga marka, nakasulat na feedback at transcript. Gamitin ang link na I-download para i-save ang anumang video na gusto mong itago bago dumating ang petsang iyon.';
+
+$string['outcomes:panel_heading'] = 'Mga outcome ng iyong programa';
+$string['outcomes:panel_intro'] = 'Ito ang mga learning outcome ng iyong programa, pinagsama-sama mula sa lahat ng kursong nag-aambag sa mga ito. Hiwalay ang mga ito sa mga layunin sa pagkatuto ng kursong ito, at nag-a-update ang mga ito habang natatapos mo ang mga na-assess na gawain sa ibang kurso.';
+$string['outcomes:no_percentage_yet'] = 'Wala pang resulta';
+$string['outcomes:state_insufficient_evidence'] = 'Wala pang sapat na na-assess na gawain. Kailangan ng outcome na ito ng mas maraming nabigyang-marka na tanong sa iyong mga kurso bago matukoy ang isang resulta. HINDI ito nangangahulugang zero ang nakuha mo.';
+$string['outcomes:state_calculation_pending'] = 'Kinakalkula pa ang iyong resulta at dapat itong lumabas sa lalong madaling panahon.';
+$string['outcomes:state_stale'] = 'Hindi pa nabibilang ang mga kamakailang gawain, kaya luma na ang bilang na ito.';
+$string['outcomes:state_not_released'] = 'Nakalkula na ang iyong resulta ngunit hindi pa ito nailalathala.';
+$string['outcomes:state_not_assessed'] = 'Hindi ina-assess ang outcome na ito sa mga kursong nakuha mo hanggang ngayon.';
+$string['outcomes:threshold_expected'] = 'Inaasahan: {$a}%';
+$string['outcomes:threshold_strong'] = 'Malakas: {$a}%';
+$string['outcomes:evidence_from'] = 'Batay sa {$a->items} nabigyang-marka na aytem sa {$a->assessed} ng {$a->total} kurso.';

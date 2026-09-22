@@ -2672,3 +2672,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Der Speicherort der aus der Au
 
 $string['soapbox:retention_heading'] = 'Ihr Video wird nach {$a} Tagen gelöscht.';
 $string['soapbox:retention_line'] = 'Jede Aufnahme wird {$a} Tage nach der Aufzeichnung automatisch gelöscht, und das genaue Datum steht unten bei jedem Versuch. Ihre Bewertungen, Ihr schriftliches Feedback und Ihr Transkript bleiben erhalten. Nutzen Sie den Link „Herunterladen“, um vor diesem Datum jedes Video zu speichern, das Sie behalten möchten.';
+
+$string['outcomes:panel_heading'] = 'Lernergebnisse Ihres Studiengangs';
+$string['outcomes:panel_intro'] = 'Dies sind die Lernergebnisse Ihres Studiengangs, über alle Kurse hinweg, die dazu beitragen. Sie sind unabhängig von den Lernzielen dieses Kurses und werden aktualisiert, sobald Sie an anderer Stelle bewertete Arbeiten abschließen.';
+$string['outcomes:no_percentage_yet'] = 'Noch kein Ergebnis';
+$string['outcomes:state_insufficient_evidence'] = 'Noch nicht genügend bewertete Arbeiten. Für dieses Lernergebnis sind mehr bewertete Fragen in Ihren Kursen nötig, bevor ein Wert berechnet werden kann. Das bedeutet nicht, dass Sie null Punkte erreicht haben.';
+$string['outcomes:state_calculation_pending'] = 'Ihr Ergebnis wird gerade berechnet und sollte in Kürze erscheinen.';
+$string['outcomes:state_stale'] = 'Kürzlich bearbeitete Aufgaben sind noch nicht berücksichtigt, daher ist dieser Wert nicht aktuell.';
+$string['outcomes:state_not_released'] = 'Ihr Ergebnis wurde berechnet, ist aber noch nicht veröffentlicht.';
+$string['outcomes:state_not_assessed'] = 'Dieses Lernergebnis wird in den von Ihnen bisher belegten Kursen nicht bewertet.';
+$string['outcomes:threshold_expected'] = 'Erwartet: {$a}%';
+$string['outcomes:threshold_strong'] = 'Stark: {$a}%';
+$string['outcomes:evidence_from'] = 'Basiert auf {$a->items} bewerteten Aufgaben in {$a->assessed} von {$a->total} Kursen.';

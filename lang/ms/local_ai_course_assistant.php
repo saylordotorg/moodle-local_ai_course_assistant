@@ -2715,3 +2715,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Lokasi storan bingkai pegun ya
 
 $string['soapbox:retention_heading'] = 'Video anda dipadam selepas {$a} hari.';
 $string['soapbox:retention_line'] = 'Setiap rakaman dipadam secara automatik {$a} hari selepas anda membuatnya, dan tarikh tepatnya ditunjukkan pada setiap percubaan di bawah. Markah, maklum balas bertulis dan transkrip anda kekal. Gunakan pautan Muat turun untuk menyimpan mana-mana video yang anda mahu kekalkan sebelum tarikh tersebut.';
+
+$string['outcomes:panel_heading'] = 'Hasil pembelajaran program anda';
+$string['outcomes:panel_intro'] = 'Ini ialah hasil pembelajaran bagi program anda, merentas setiap kursus yang menyumbang kepadanya. Ia berasingan daripada objektif pembelajaran kursus ini, dan dikemas kini apabila anda menyelesaikan kerja yang dinilai dalam kursus lain.';
+$string['outcomes:no_percentage_yet'] = 'Belum ada keputusan';
+$string['outcomes:state_insufficient_evidence'] = 'Kerja yang dinilai masih belum mencukupi. Hasil pembelajaran ini memerlukan lebih banyak soalan yang diberi markah merentas kursus anda sebelum keputusan boleh dikira. Ia tidak bermakna markah anda sifar.';
+$string['outcomes:state_calculation_pending'] = 'Keputusan anda sedang dikira dan akan dipaparkan sebentar lagi.';
+$string['outcomes:state_stale'] = 'Kerja terbaharu belum dikira, jadi angka ini sudah lapuk.';
+$string['outcomes:state_not_released'] = 'Keputusan anda telah dikira tetapi belum diterbitkan.';
+$string['outcomes:state_not_assessed'] = 'Hasil pembelajaran ini tidak dinilai dalam kursus yang anda ambil setakat ini.';
+$string['outcomes:threshold_expected'] = 'Dijangka: {$a}%';
+$string['outcomes:threshold_strong'] = 'Kukuh: {$a}%';
+$string['outcomes:evidence_from'] = 'Berdasarkan {$a->items} item yang dinilai dalam {$a->assessed} daripada {$a->total} kursus.';

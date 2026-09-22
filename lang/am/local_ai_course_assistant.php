@@ -2699,3 +2699,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'ለሰውነት ቋንቋ አ�
 
 $string['soapbox:retention_heading'] = 'ቪዲዮዎ ከ{$a} ቀናት በኋላ ይሰረዛል።';
 $string['soapbox:retention_line'] = 'እያንዳንዱ ቀረጻ ከቀረጹት ከ{$a} ቀናት በኋላ በራስ-ሰር ይሰረዛል፣ እና ትክክለኛው ቀን ከታች ካለው እያንዳንዱ ሙከራ ጎን ይታያል። ውጤቶችዎ፣ የተጻፈ አስተያየትዎና ግልባጭዎ ይቆያሉ። ከዚያ ቀን በፊት ማቆየት የሚፈልጉትን ማንኛውንም ቪዲዮ ለማስቀመጥ «አውርድ» የሚለውን አገናኝ ይጠቀሙ።';
+
+$string['outcomes:panel_heading'] = 'የፕሮግራምህ ውጤቶች';
+$string['outcomes:panel_intro'] = 'እነዚህ የፕሮግራምህ የመማር ውጤቶች ናቸው፤ ለእነሱ አስተዋፅኦ የሚያደርጉትን ሁሉንም ኮርሶች ያካትታሉ። ከዚህ ኮርስ ግቦች የተለዩ ናቸው፤ በሌሎች ኮርሶች የተገመገመ ሥራ ስትጨርስም ይዘምናሉ።';
+$string['outcomes:no_percentage_yet'] = 'ገና ውጤት የለም';
+$string['outcomes:state_insufficient_evidence'] = 'ገና በቂ የተገመገመ ሥራ የለም። ውጤት ሊሰላ ከመቻሉ በፊት ይህ ውጤት በኮርሶችህ ውስጥ ተጨማሪ የተገመገሙ ጥያቄዎችን ይፈልጋል። ይህ ዜሮ አግኝተሃል ማለት አይደለም።';
+$string['outcomes:state_calculation_pending'] = 'ውጤትህ እየተሰላ ነው፤ በቅርቡ ይታያል።';
+$string['outcomes:state_stale'] = 'የቅርብ ጊዜ ሥራህ ገና አልተቆጠረም፤ ስለዚህ ይህ አኃዝ ያረጀ ነው።';
+$string['outcomes:state_not_released'] = 'ውጤትህ ተሰልቷል፤ ነገር ግን ገና አልታተመም።';
+$string['outcomes:state_not_assessed'] = 'ይህ ውጤት እስካሁን በወሰድካቸው ኮርሶች ውስጥ አይገመገምም።';
+$string['outcomes:threshold_expected'] = 'የሚጠበቀው፦ {$a}%';
+$string['outcomes:threshold_strong'] = 'ጠንካራ፦ {$a}%';
+$string['outcomes:evidence_from'] = 'ከ{$a->total} ኮርሶች ውስጥ በ{$a->assessed} ውስጥ ባሉ {$a->items} የተገመገሙ ንጥሎች ላይ የተመሠረተ።';

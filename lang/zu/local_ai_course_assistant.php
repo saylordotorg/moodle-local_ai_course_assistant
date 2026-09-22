@@ -2716,3 +2716,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Indawo yokugcina yezithombe ez
 
 $string['soapbox:retention_heading'] = 'Ividiyo yakho isuswa ngemuva kwezinsuku ezingu-{$a}.';
 $string['soapbox:retention_line'] = 'Konke okuqoshiwe kususwa ngokuzenzakalela ezinsukwini ezingu-{$a} ngemuva kokukuqopha, futhi usuku olunembile luboniswa kuwo wonke umzamo ongezansi. Amamaki akho, impendulo ebhaliwe nombhalo kuyagcinwa. Sebenzisa isixhumanisi esithi Landa ukuze ulondoloze noma iyiphi ividiyo ofuna ukuyigcina ngaphambi kwalolo suku.';
+
+$string['outcomes:panel_heading'] = 'Imiphumela yohlelo lwakho';
+$string['outcomes:panel_intro'] = 'Le yimiphumela yokufunda yohlelo lwakho lweziqu, kuzo zonke izifundo ezinegalelo kuyo. Ihlukile kwimigomo yalesi sifundo, futhi iyabuyekezwa njengoba uqedela umsebenzi ohloliwe kwezinye izifundo.';
+$string['outcomes:no_percentage_yet'] = 'Awukho umphumela okwamanje';
+$string['outcomes:state_insufficient_evidence'] = 'Awukho umsebenzi owanele osuhloliwe. Lo mphumela udinga imibuzo eminingi enikwe amamaki ezifundweni zakho ngaphambi kokuba umphumela ubalwe. Akusho ukuthi uthole amamaki angu-0.';
+$string['outcomes:state_calculation_pending'] = 'Umphumela wakho uyabalwa futhi kufanele uvele maduze.';
+$string['outcomes:state_stale'] = 'Umsebenzi wakamuva awukabalwa, ngakho leli nani seliphelelwe yisikhathi.';
+$string['outcomes:state_not_released'] = 'Umphumela wakho usubaliwe kodwa awukakhishwa.';
+$string['outcomes:state_not_assessed'] = 'Lo mphumela awuhlolwa ezifundweni osuzithathile kuze kube manje.';
+$string['outcomes:threshold_expected'] = 'Okulindelekile: {$a}%';
+$string['outcomes:threshold_strong'] = 'Okuqinile: {$a}%';
+$string['outcomes:evidence_from'] = 'Kusekelwe ezintweni ezingu-{$a->items} ezinikwe amamaki ezifundweni ezingu-{$a->assessed} kwezingu-{$a->total}.';

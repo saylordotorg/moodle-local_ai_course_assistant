@@ -359,4 +359,88 @@ final class outcomemap_bridge {
         }
         return (float) $value;
     }
+
+    /**
+     * The "Your program outcomes" panel for one learner in one course, or null.
+     *
+     * Returns null, meaning render nothing at all, unless BOTH are true: this course
+     * actually sits under a framework that defines outcomes, and the learner has
+     * attainment rows to show. A panel on a course with no outcome mapping is an
+     * empty box asking a learner to care about something their course does not
+     * participate in.
+     *
+     * The course gate uses outcome_search through fetch(), which the class docblock
+     * records as returning the outcomes of every framework visible to the course,
+     * including the programs the course belongs to. That is the plugin's own
+     * definition of "outcomes for this course" and it is the right gate here: a
+     * course inside a degree program receives that program's outcomes, which is
+     * exactly the population this panel is about.
+     *
+     * Every outcome keeps its state and an explanation of that state, because most
+     * of them have no number. Of the 546 result rows on the production degrees site
+     * today, 525 are insufficient_evidence. A panel that showed those as blanks, or
+     * worse as zeroes, would read as a wall of failure on outcomes nobody has
+     * measured yet.
+     *
+     * @param int $userid The learner.
+     * @param int $courseid The course whose page the panel would appear on.
+     * @return array|null Panel data, or null when nothing should be rendered.
+     */
+    public static function course_panel(int $userid, int $courseid): ?array {
+        if ($userid <= 0 || $courseid <= 0 || $courseid == SITEID) {
+            return null;
+        }
+        if (!self::attainment_available()) {
+            return null;
+        }
+        // Gate one: does this course participate in outcomes at all?
+        if (self::fetch($courseid) === []) {
+            return null;
+        }
+        // Gate two: does this learner have anything to show?
+        $programs = self::attainment($userid);
+        if ($programs === []) {
+            return null;
+        }
+
+        $out = [];
+        $anyoutcome = false;
+        foreach ($programs as $program) {
+            $outcomes = [];
+            foreach ($program['outcomes'] as $o) {
+                $anyoutcome = true;
+                $outcomes[] = $o + ['explanation' => self::state_explanation($o['state'])];
+            }
+            if ($outcomes !== []) {
+                $out[] = ['code' => $program['code'], 'name' => $program['name'], 'outcomes' => $outcomes];
+            }
+        }
+
+        return $anyoutcome ? $out : null;
+    }
+
+    /**
+     * Plain-language reason a given outcome has no percentage.
+     *
+     * Each state means something different and a learner deserves the difference:
+     * "nobody has assessed this yet" is not the same as "your result is calculated
+     * but not published". Returning one vague sentence for all of them would be
+     * the same as returning none.
+     *
+     * @param string $state The upstream result state.
+     * @return string A translated sentence, empty for a calculated result.
+     */
+    public static function state_explanation(string $state): string {
+        $keys = [
+            'calculated' => '',
+            'insufficient_evidence' => 'outcomes:state_insufficient_evidence',
+            'calculation_pending' => 'outcomes:state_calculation_pending',
+            'stale' => 'outcomes:state_stale',
+            'not_released' => 'outcomes:state_not_released',
+            'not_assessed' => 'outcomes:state_not_assessed',
+        ];
+        $key = $keys[$state] ?? 'outcomes:state_not_assessed';
+
+        return $key === '' ? '' : branding::str($key);
+    }
 }

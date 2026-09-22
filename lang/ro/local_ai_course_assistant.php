@@ -2671,3 +2671,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Locul de stocare al cadrelor e
 
 $string['soapbox:retention_heading'] = 'Videoclipul tău se șterge după {$a} zile.';
 $string['soapbox:retention_line'] = 'Fiecare înregistrare se șterge automat la {$a} zile după ce o faci, iar data exactă este afișată în dreptul fiecărei încercări de mai jos. Notele, feedbackul scris și transcrierea se păstrează. Folosește linkul Descarcă pentru a salva, înainte de acea dată, orice videoclip pe care vrei să îl păstrezi.';
+
+$string['outcomes:panel_heading'] = 'Rezultatele programului tău';
+$string['outcomes:panel_intro'] = 'Acestea sunt rezultatele învățării pentru programul tău, din toate cursurile care contribuie la ele. Sunt distincte de obiectivele acestui curs și se actualizează pe măsură ce finalizezi lucrări evaluate la alte cursuri.';
+$string['outcomes:no_percentage_yet'] = 'Încă niciun rezultat';
+$string['outcomes:state_insufficient_evidence'] = 'Încă nu există suficiente lucrări evaluate. Acest rezultat are nevoie de mai multe întrebări notate la cursurile tale înainte de a putea fi calculată o valoare. Nu înseamnă că ai obținut zero.';
+$string['outcomes:state_calculation_pending'] = 'Rezultatul tău este în curs de calculare și ar trebui să apară în scurt timp.';
+$string['outcomes:state_stale'] = 'Lucrările recente nu au fost încă luate în calcul, așa că această valoare este depășită.';
+$string['outcomes:state_not_released'] = 'Rezultatul tău a fost calculat, dar nu este încă publicat.';
+$string['outcomes:state_not_assessed'] = 'Acest rezultat nu este evaluat la cursurile pe care le-ai urmat până acum.';
+$string['outcomes:threshold_expected'] = 'Așteptat: {$a}%';
+$string['outcomes:threshold_strong'] = 'Ridicat: {$a}%';
+$string['outcomes:evidence_from'] = 'Pe baza a {$a->items} elemente notate, provenind din {$a->assessed} cursuri din totalul de {$a->total}.';

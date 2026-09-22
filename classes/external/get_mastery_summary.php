@@ -49,6 +49,12 @@ class get_mastery_summary extends external_api {
         self::validate_context($context);
         require_capability('local/ai_course_assistant:use', $context);
 
+        // Every key the return structure declares, including the two added for the
+        // program-outcomes panel. external_single_structure is strict in BOTH
+        // directions: an undeclared key throws, and a declared key that is absent
+        // throws too. This early return fires on every course with mastery
+        // disabled, which is most of them, so omitting a key here would break the
+        // common path rather than the rare one.
         $empty = [
             'enabled' => false,
             'total' => 0,
@@ -56,6 +62,8 @@ class get_mastery_summary extends external_api {
             'learning' => 0,
             'not_started' => 0,
             'objectives' => [],
+            'showprograms' => false,
+            'programs' => [],
         ];
 
         if (!objective_manager::is_enabled_for_course((int) $params['courseid'])) {
@@ -75,6 +83,16 @@ class get_mastery_summary extends external_api {
                 'last' => (int) $m['last'],
             ];
         }
+        // The program-outcomes panel is a SEPARATE question from course mastery and
+        // is rendered as its own panel, not folded into the objectives above. It is
+        // null unless this course participates in outcomes and this learner has
+        // attainment, so a course with no outcome mapping renders nothing rather
+        // than an empty box.
+        $programs = \local_ai_course_assistant\outcomemap_bridge::course_panel(
+            (int) $USER->id,
+            (int) $params['courseid']
+        );
+
         return [
             'enabled' => true,
             'total' => (int) $summary['total'],
@@ -82,6 +100,8 @@ class get_mastery_summary extends external_api {
             'learning' => (int) $summary['learning'],
             'not_started' => (int) $summary['not_started'],
             'objectives' => $rows,
+            'showprograms' => $programs !== null,
+            'programs' => $programs ?? [],
         ];
     }
 
@@ -99,6 +119,60 @@ class get_mastery_summary extends external_api {
                     'title' => new external_value(PARAM_RAW, 'Objective title'),
                     'status' => new external_value(PARAM_ALPHAEXT, 'not_started|learning|mastered'),
                     'last' => new external_value(PARAM_INT, 'Timestamp of last attempt, 0 if none'),
+                ])
+            ),
+            // Declared, not optional. external_single_structure throws
+            // invalid_parameter_exception on any key it was not told about, on an
+            // ajax endpoint, AFTER the work is done. v7.5.1 shipped exactly that
+            // defect by returning max_score without declaring it, which broke every
+            // successful scoring call in production.
+            'showprograms' => new external_value(PARAM_BOOL, 'Whether to render the program outcomes panel'),
+            'programs' => new external_multiple_structure(
+                new external_single_structure([
+                    'code' => new external_value(PARAM_RAW, 'Program code'),
+                    'name' => new external_value(PARAM_RAW, 'Program name'),
+                    'outcomes' => new external_multiple_structure(
+                        new external_single_structure([
+                            'itemid' => new external_value(PARAM_INT, 'Stable outcome item id'),
+                            'code' => new external_value(PARAM_RAW, 'Outcome code, e.g. PLO1'),
+                            'statement' => new external_value(PARAM_RAW, 'Outcome statement'),
+                            'shortstatement' => new external_value(PARAM_RAW, 'Short form of the statement'),
+                            'state' => new external_value(PARAM_ALPHAEXT, 'calculated or a state carrying no figure'),
+                            // NULL_ALLOWED is the point. Only a calculated result has
+                            // a number; 525 of 546 rows on the production site do not.
+                            // A zero here would tell a learner they failed an outcome
+                            // nobody has measured.
+                            'percent' => new external_value(
+                                PARAM_FLOAT,
+                                'Attainment percentage, null unless the state is calculated',
+                                VALUE_REQUIRED,
+                                null,
+                                NULL_ALLOWED
+                            ),
+                            'explanation' => new external_value(
+                                PARAM_RAW,
+                                'Plain-language reason there is no figure; empty when calculated'
+                            ),
+                            'expectedpercent' => new external_value(
+                                PARAM_FLOAT,
+                                'Expected threshold, or null',
+                                VALUE_REQUIRED,
+                                null,
+                                NULL_ALLOWED
+                            ),
+                            'strongpercent' => new external_value(
+                                PARAM_FLOAT,
+                                'Strong threshold, or null',
+                                VALUE_REQUIRED,
+                                null,
+                                NULL_ALLOWED
+                            ),
+                            'coursesassessed' => new external_value(PARAM_INT, 'Courses contributing evidence'),
+                            'coursestotal' => new external_value(PARAM_INT, 'Courses the program promises'),
+                            'gradeditems' => new external_value(PARAM_INT, 'Distinct graded items'),
+                            'timecalculated' => new external_value(PARAM_INT, 'Last calculation time, 0 if none'),
+                        ])
+                    ),
                 ])
             ),
         ]);

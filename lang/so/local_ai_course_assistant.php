@@ -2716,3 +2716,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Meesha lagu kaydiyo sawirrada 
 
 $string['soapbox:retention_heading'] = 'Muuqaalkaagu waa la tirtiraa {$a} maalmood ka dib.';
 $string['soapbox:retention_line'] = 'Duubis kasta si toos ah ayaa loo tirtiraa {$a} maalmood ka dib markaad samayso, taariikhda saxda ahna waxaa lagu tusayaa isku day kasta oo hoos ku qoran. Dhibcahaaga, jawaabtaada qoran iyo qoraalkaagu way sii jiraan. Isticmaal xiriirka Soo dejiso si aad u kaydsato muuqaal kasta oo aad rabto inaad hayso ka hor taariikhdaas.';
+
+$string['outcomes:panel_heading'] = 'Natiijooyinka barnaamijkaaga';
+$string['outcomes:panel_intro'] = 'Kuwani waa natiijooyinka waxbarasho ee barnaamijkaaga, oo laga soo ururiyay koorso kasta oo wax ku darta. Way ka duwan yihiin ujeedooyinka waxbarasho ee koorsadan, waxayna cusboonaadaan markaad koorsooyin kale ku dhammaystirto shaqo la qiimeeyay.';
+$string['outcomes:no_percentage_yet'] = 'Weli natiijo ma jirto';
+$string['outcomes:state_insufficient_evidence'] = 'Weli ma jirto shaqo la qiimeeyay oo ku filan. Natiijadan waxay u baahan tahay su\'aalo dheeraad ah oo buundo la siiyay oo koorsooyinkaaga ka mid ah ka hor inta aan natiijo la xisaabin. Micnaheedu MA AHA inaad eber dhibcood heshay.';
+$string['outcomes:state_calculation_pending'] = 'Natiijadaada hadda waa la xisaabinayaa, waxayna soo muuqan doontaa dhawaan.';
+$string['outcomes:state_stale'] = 'Shaqadii ugu dambaysay weli lama tirin, sidaas darteed tiradan waa mid duugoobay.';
+$string['outcomes:state_not_released'] = 'Natiijadaada waa la xisaabiyay laakiin weli lama daabicin.';
+$string['outcomes:state_not_assessed'] = 'Natiijadan laguma qiimeeyo koorsooyinka aad ilaa hadda qaadatay.';
+$string['outcomes:threshold_expected'] = 'La filayo: {$a}%';
+$string['outcomes:threshold_strong'] = 'Xooggan: {$a}%';
+$string['outcomes:evidence_from'] = 'Waxay ku salaysan tahay {$a->items} shay oo la qiimeeyay, oo ka yimid {$a->assessed} koorso oo ka mid ah {$a->total}.';

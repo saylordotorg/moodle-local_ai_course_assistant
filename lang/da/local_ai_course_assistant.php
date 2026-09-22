@@ -2672,3 +2672,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Lagerplaceringen for de stillb
 
 $string['soapbox:retention_heading'] = 'Din video slettes efter {$a} dage.';
 $string['soapbox:retention_line'] = 'Hver optagelse slettes automatisk {$a} dage efter, du har lavet den, og den præcise dato står ud for hvert forsøg nedenfor. Dine karakterer, din skriftlige feedback og din transskription bevares. Brug linket »Download« til at gemme enhver video, du vil beholde, inden den dato.';
+
+$string['outcomes:panel_heading'] = 'Læringsmål for din uddannelse';
+$string['outcomes:panel_intro'] = 'Dette er læringsmålene for din uddannelse, på tværs af alle de kurser, der bidrager til dem. De er adskilt fra målene for dette kursus, og de opdateres, efterhånden som du gennemfører bedømt arbejde andre steder.';
+$string['outcomes:no_percentage_yet'] = 'Intet resultat endnu';
+$string['outcomes:state_insufficient_evidence'] = 'Der er endnu ikke bedømt arbejde nok. Dette læringsmål kræver flere bedømte opgaver på tværs af dine kurser, før et resultat kan beregnes. Det betyder ikke, at du har fået nul.';
+$string['outcomes:state_calculation_pending'] = 'Dit resultat er ved at blive beregnet og bør vises om kort tid.';
+$string['outcomes:state_stale'] = 'Nyligt arbejde er endnu ikke talt med, så dette tal er forældet.';
+$string['outcomes:state_not_released'] = 'Dit resultat er beregnet, men er endnu ikke offentliggjort.';
+$string['outcomes:state_not_assessed'] = 'Dette læringsmål bedømmes ikke på de kurser, du har taget indtil nu.';
+$string['outcomes:threshold_expected'] = 'Forventet: {$a}%';
+$string['outcomes:threshold_strong'] = 'Stærkt: {$a}%';
+$string['outcomes:evidence_from'] = 'Baseret på {$a->items} bedømte opgaver på tværs af {$a->assessed} ud af {$a->total} kurser.';

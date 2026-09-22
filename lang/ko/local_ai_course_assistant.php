@@ -2670,3 +2670,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = '몸짓 피드백을 위해 녹
 
 $string['soapbox:retention_heading'] = '영상은 {$a}일 후에 삭제됩니다.';
 $string['soapbox:retention_line'] = '각 녹화는 만든 지 {$a}일 후에 자동으로 삭제되며, 정확한 삭제일은 아래 각 시도 옆에 표시됩니다. 점수와 서면 피드백, 전사본은 그대로 남습니다. 보관하고 싶은 영상은 그 날짜 전에 다운로드 링크로 저장하세요.';
+
+$string['outcomes:panel_heading'] = '내 프로그램 성취목표';
+$string['outcomes:panel_intro'] = '이 항목은 소속 프로그램의 학습 성취목표이며, 여기에 기여하는 모든 강좌를 합산한 것입니다. 이 강좌의 학습 목표와는 별개이며, 다른 강좌에서 평가 대상 과제를 완료하면 갱신됩니다.';
+$string['outcomes:no_percentage_yet'] = '아직 결과 없음';
+$string['outcomes:state_insufficient_evidence'] = '아직 평가된 학습량이 충분하지 않습니다. 이 성취목표는 결과를 산출하기 전에 여러 강좌에 걸쳐 더 많은 채점 문항이 필요합니다. 점수가 0점이라는 뜻이 아닙니다.';
+$string['outcomes:state_calculation_pending'] = '결과를 산출하는 중이며 곧 표시됩니다.';
+$string['outcomes:state_stale'] = '최근 학습이 아직 반영되지 않아 이 수치는 최신 정보가 아닙니다.';
+$string['outcomes:state_not_released'] = '결과가 산출되었지만 아직 공개되지 않았습니다.';
+$string['outcomes:state_not_assessed'] = '이 성취목표는 지금까지 수강한 강좌에서 평가되지 않습니다.';
+$string['outcomes:threshold_expected'] = '기대 수준: {$a}%';
+$string['outcomes:threshold_strong'] = '우수 수준: {$a}%';
+$string['outcomes:evidence_from'] = '{$a->total}개 강좌 중 {$a->assessed}개 강좌에서 채점된 {$a->items}개 문항을 기준으로 합니다.';

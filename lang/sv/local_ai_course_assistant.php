@@ -2671,3 +2671,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Lagringsplatsen för stillbild
 
 $string['soapbox:retention_heading'] = 'Din video raderas efter {$a} dagar.';
 $string['soapbox:retention_line'] = 'Varje inspelning raderas automatiskt {$a} dagar efter att du gjort den, och det exakta datumet visas för varje försök nedan. Dina omdömen, din skriftliga återkoppling och din transkription sparas. Använd länken Ladda ner för att spara den video du vill behålla, före det datumet.';
+
+$string['outcomes:panel_heading'] = 'Ditt programs lärandemål';
+$string['outcomes:panel_intro'] = 'Det här är lärandemålen för ditt program, sammanräknade över alla kurser som bidrar till dem. De är skilda från målen för den här kursen och uppdateras när du gör bedömda uppgifter i andra kurser.';
+$string['outcomes:no_percentage_yet'] = 'Inget resultat ännu';
+$string['outcomes:state_insufficient_evidence'] = 'Det finns ännu inte tillräckligt med bedömt arbete. Det här lärandemålet behöver fler rättade frågor från dina kurser innan ett resultat kan räknas fram. Det betyder inte att du har fått noll.';
+$string['outcomes:state_calculation_pending'] = 'Ditt resultat håller på att räknas fram och bör visas inom kort.';
+$string['outcomes:state_stale'] = 'Arbete du gjort nyligen är ännu inte medräknat, så den här siffran är inaktuell.';
+$string['outcomes:state_not_released'] = 'Ditt resultat är framräknat men ännu inte publicerat.';
+$string['outcomes:state_not_assessed'] = 'Det här lärandemålet bedöms inte i de kurser du har läst hittills.';
+$string['outcomes:threshold_expected'] = 'Förväntat: {$a}%';
+$string['outcomes:threshold_strong'] = 'Starkt: {$a}%';
+$string['outcomes:evidence_from'] = 'Baserat på {$a->items} bedömda uppgifter i {$a->assessed} av {$a->total} kurser.';

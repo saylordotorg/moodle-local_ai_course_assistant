@@ -2692,3 +2692,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Vị trí lưu trữ của cá
 
 $string['soapbox:retention_heading'] = 'Video của bạn sẽ bị xóa sau {$a} ngày.';
 $string['soapbox:retention_line'] = 'Mỗi bản ghi sẽ tự động bị xóa {$a} ngày sau khi bạn quay, và ngày cụ thể được hiển thị ở từng lần thử bên dưới. Điểm, nhận xét bằng chữ và bản gỡ băng của bạn vẫn được giữ lại. Hãy dùng liên kết Tải xuống để lưu lại bất kỳ video nào bạn muốn giữ trước ngày đó.';
+
+$string['outcomes:panel_heading'] = 'Kết quả đầu ra chương trình của bạn';
+$string['outcomes:panel_intro'] = 'Đây là các kết quả đầu ra học tập của chương trình bạn đang theo học, tổng hợp từ mọi khóa học có đóng góp vào chúng. Chúng tách biệt với mục tiêu học tập của khóa học này, và được cập nhật khi bạn hoàn thành các bài được chấm điểm ở những khóa học khác.';
+$string['outcomes:no_percentage_yet'] = 'Chưa có kết quả';
+$string['outcomes:state_insufficient_evidence'] = 'Chưa đủ bài được chấm điểm. Kết quả đầu ra này cần thêm câu hỏi đã được chấm điểm trong các khóa học của bạn thì mới tính ra được kết quả. Điều này không có nghĩa là bạn được 0 điểm.';
+$string['outcomes:state_calculation_pending'] = 'Kết quả của bạn đang được tính và sẽ hiển thị trong giây lát.';
+$string['outcomes:state_stale'] = 'Các bài làm gần đây chưa được tính vào, nên con số này đã cũ.';
+$string['outcomes:state_not_released'] = 'Kết quả của bạn đã được tính nhưng chưa được công bố.';
+$string['outcomes:state_not_assessed'] = 'Kết quả đầu ra này không được đánh giá trong các khóa học bạn đã học cho đến nay.';
+$string['outcomes:threshold_expected'] = 'Mức mong đợi: {$a}%';
+$string['outcomes:threshold_strong'] = 'Mức vững vàng: {$a}%';
+$string['outcomes:evidence_from'] = 'Dựa trên {$a->items} bài được chấm điểm ở {$a->assessed} trong số {$a->total} khóa học.';

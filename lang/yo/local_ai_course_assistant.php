@@ -2692,3 +2692,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Ibi ìpamọ́ àwọn àwòr�
 
 $string['soapbox:retention_heading'] = 'Fídíò rẹ yóò parẹ́ lẹ́yìn ọjọ́ {$a}.';
 $string['soapbox:retention_line'] = 'A ó pa àkọsílẹ̀ kọ̀ọ̀kan rẹ́ láìfọwọ́yí ní ọjọ́ {$a} lẹ́yìn tí o bá gbà á sílẹ̀, ọjọ́ gangan sì hàn lẹ́gbẹ̀ẹ́ ìgbìdánwò kọ̀ọ̀kan nísàlẹ̀. Àwọn ipele rẹ, èsì tí a kọ sílẹ̀ àti ìkọsílẹ̀ rẹ yóò wà. Lo ọ̀nà-ìjápọ̀ Gbà sílẹ̀ láti fi pamọ́ fídíò èyíkéyìí tí o fẹ́ tọ́jú ṣáájú ọjọ́ yẹn.';
+
+$string['outcomes:panel_heading'] = 'Àbájáde ìtòlẹ́sẹẹsẹ rẹ';
+$string['outcomes:panel_intro'] = 'Ìwọ̀nyí ni àwọn àbájáde ẹ̀kọ́ fún ìtòlẹ́sẹẹsẹ rẹ, ní gbogbo ẹ̀kọ́ tí ó ń kópa nínú wọn. Wọ́n yàtọ̀ sí àwọn èròjà ìkẹ́kọ̀ọ́ ti ẹ̀kọ́ yìí, wọ́n sì ń yípadà bí o ṣe ń parí iṣẹ́ tí a fún ní àmì ní àwọn ẹ̀kọ́ mìíràn.';
+$string['outcomes:no_percentage_yet'] = 'Kò sí àbájáde síbẹ̀';
+$string['outcomes:state_insufficient_evidence'] = 'Iṣẹ́ tí a fún ní àmì kò tí ì tó. Àbájáde yìí nílò àwọn ìbéèrè tí a fún ní àmì síwájú sí i ní àwọn ẹ̀kọ́ rẹ kí a tó lè ṣírò àbájáde kan. Kò túmọ̀ sí pé o gba òdo.';
+$string['outcomes:state_calculation_pending'] = 'A ń ṣírò àbájáde rẹ, yóò sì hàn láìpẹ́.';
+$string['outcomes:state_stale'] = 'A kò tí ì ka iṣẹ́ tuntun rẹ, nítorí náà nọ́mbà yìí ti gbó.';
+$string['outcomes:state_not_released'] = 'A ti ṣírò àbájáde rẹ ṣùgbọ́n a kò tí ì tẹ̀ ẹ́ jáde.';
+$string['outcomes:state_not_assessed'] = 'A kò ṣàyẹ̀wò àbájáde yìí nínú àwọn ẹ̀kọ́ tí o ti kọ́ títí di báyìí.';
+$string['outcomes:threshold_expected'] = 'Èyí tí a retí: {$a}%';
+$string['outcomes:threshold_strong'] = 'Èyí tó lágbára: {$a}%';
+$string['outcomes:evidence_from'] = 'Ó dá lórí {$a->items} iṣẹ́ tí a fún ní àmì ní {$a->assessed} nínú {$a->total} ẹ̀kọ́.';

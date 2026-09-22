@@ -2686,3 +2686,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Ebe nchekwa nke foto ndị e w
 
 $string['soapbox:retention_heading'] = 'A ga-ehichapụ vidiyo gị mgbe ụbọchị {$a} gasịrị.';
 $string['soapbox:retention_line'] = 'A na-ehichapụ ndekọ ọ bụla n\'onwe ya ụbọchị {$a} mgbe i mechara ya, a na-egosikwa ụbọchị ahụ kpọmkwem na mgbalị ọ bụla dị n\'okpuru. Akara gị, nzaghachi edere ede na edemede gị ka a na-edobe. Jiri njikọ Budata chekwaa vidiyo ọ bụla ị chọrọ idobe tupu ụbọchị ahụ eruo.';
+
+$string['outcomes:panel_heading'] = 'Nsonaazụ mmemme gị';
+$string['outcomes:panel_intro'] = 'Ndị a bụ nsonaazụ mmụta nke mmemme gị, gụnyere nkuzi niile na-enye aka na ha. Ha dị iche na ebumnobi mmụta nke nkuzi a, ha na-emelitekwa ka ị na-arụcha ọrụ a na-enye akara na nkuzi ndị ọzọ.';
+$string['outcomes:no_percentage_yet'] = 'Akara adịbeghị';
+$string['outcomes:state_insufficient_evidence'] = 'Ọrụ a nyochara ezughị ugbu a. Nsonaazụ a chọrọ ajụjụ ndị ọzọ e nyere akara n\'ofe nkuzi gị tupu enwee ike ịgbakọ akara. Ọ pụtaghị na ị nwetara efu.';
+$string['outcomes:state_calculation_pending'] = 'A na-agbakọ akara gị ugbu a; ọ ga-apụta n\'oge na-adịghị anya.';
+$string['outcomes:state_stale'] = 'A gụbeghị ọrụ ọhụrụ gị, ya mere ọnụọgụ a abụghị nke kacha ọhụrụ.';
+$string['outcomes:state_not_released'] = 'A gbakọọla akara gị mana e bipụtabeghị ya.';
+$string['outcomes:state_not_assessed'] = 'A naghị enyocha nsonaazụ a na nkuzi ndị ị gụworo ruo ugbu a.';
+$string['outcomes:threshold_expected'] = 'Ọkwa a tụrụ anya: {$a}%';
+$string['outcomes:threshold_strong'] = 'Ọkwa dị elu: {$a}%';
+$string['outcomes:evidence_from'] = 'Dabere na ihe {$a->items} e nyere akara n\'ofe nkuzi {$a->assessed} n\'ime {$a->total}.';

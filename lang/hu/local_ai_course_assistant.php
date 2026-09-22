@@ -2713,3 +2713,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'A felvételből a testbeszéd-
 
 $string['soapbox:retention_heading'] = 'A videója {$a} nap után törlődik.';
 $string['soapbox:retention_line'] = 'Minden felvétel automatikusan törlődik a rögzítésétől számított {$a} nap után, és a pontos dátum lent minden kísérletnél szerepel. A pontszámai, az írásos visszajelzés és a leirat megmaradnak. A Letöltés hivatkozással mentsen el minden olyan videót, amelyet meg szeretne tartani, még ez előtt a dátum előtt.';
+
+$string['outcomes:panel_heading'] = 'Képzésed tanulási eredményei';
+$string['outcomes:panel_intro'] = 'Ezek a képzésed tanulási eredményei, minden olyan kurzusból összegyűjtve, amely hozzájuk hozzájárul. Ezek különböznek ennek a kurzusnak a tanulási célkitűzéseitől, és frissülnek, ahogy más kurzusokon értékelt munkákat teljesítesz.';
+$string['outcomes:no_percentage_yet'] = 'Még nincs eredmény';
+$string['outcomes:state_insufficient_evidence'] = 'Még nincs elég értékelt munka. Ehhez a tanulási eredményhez több értékelt kérdés kell a kurzusaidból, mielőtt eredményt lehetne számolni. Ez nem azt jelenti, hogy nullát kaptál.';
+$string['outcomes:state_calculation_pending'] = 'Az eredményed számítása folyamatban van, hamarosan megjelenik.';
+$string['outcomes:state_stale'] = 'A legutóbbi munkádat még nem számoltuk bele, ezért ez az érték elavult.';
+$string['outcomes:state_not_released'] = 'Az eredményed elkészült, de még nincs közzétéve.';
+$string['outcomes:state_not_assessed'] = 'Ezt a tanulási eredményt nem értékelik azokon a kurzusokon, amelyeket eddig elvégeztél.';
+$string['outcomes:threshold_expected'] = 'Elvárt: {$a}%';
+$string['outcomes:threshold_strong'] = 'Erős: {$a}%';
+$string['outcomes:evidence_from'] = '{$a->items} értékelt feladat alapján, {$a->total} kurzusból {$a->assessed} kurzuson.';

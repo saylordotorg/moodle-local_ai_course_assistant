@@ -2672,3 +2672,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Tallenteesta otettujen pysäyt
 
 $string['soapbox:retention_heading'] = 'Videosi poistetaan {$a} päivän kuluttua.';
 $string['soapbox:retention_line'] = 'Jokainen nauhoitus poistetaan automaattisesti {$a} päivän kuluttua sen tekemisestä, ja tarkka päivämäärä näkyy alla jokaisen yrityksen kohdalla. Pisteesi, kirjallinen palautteesi ja litterointi säilytetään. Tallenna Lataa-linkillä ennen tuota päivämäärää jokainen video, jonka haluat säilyttää.';
+
+$string['outcomes:panel_heading'] = 'Tutkinto-ohjelmasi oppimistulokset';
+$string['outcomes:panel_intro'] = 'Nämä ovat tutkinto-ohjelmasi oppimistulokset, koottuna kaikilta kursseilta, jotka kerryttävät niitä. Ne ovat eri asia kuin tämän kurssin oppimistavoitteet, ja ne päivittyvät, kun suoritat arvioitavia tehtäviä muilla kursseilla.';
+$string['outcomes:no_percentage_yet'] = 'Ei vielä tulosta';
+$string['outcomes:state_insufficient_evidence'] = 'Arvioitua suoritusta ei ole vielä tarpeeksi. Tämä oppimistulos tarvitsee lisää arvosteltuja tehtäviä kursseiltasi, ennen kuin tulos voidaan laskea. Se ei tarkoita, että olisit saanut nolla pistettä.';
+$string['outcomes:state_calculation_pending'] = 'Tulostasi lasketaan parhaillaan, ja sen pitäisi näkyä pian.';
+$string['outcomes:state_stale'] = 'Viimeaikaisia suorituksia ei ole vielä laskettu mukaan, joten tämä luku ei ole ajan tasalla.';
+$string['outcomes:state_not_released'] = 'Tuloksesi on laskettu, mutta sitä ei ole vielä julkaistu.';
+$string['outcomes:state_not_assessed'] = 'Tätä oppimistulosta ei arvioida niillä kursseilla, jotka olet tähän mennessä suorittanut.';
+$string['outcomes:threshold_expected'] = 'Odotettu: {$a} %';
+$string['outcomes:threshold_strong'] = 'Vahva: {$a} %';
+$string['outcomes:evidence_from'] = 'Perustuu {$a->items} arvosteltuun tehtävään {$a->assessed} kurssilla {$a->total} kurssista.';

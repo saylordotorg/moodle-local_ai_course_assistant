@@ -2700,3 +2700,15 @@ $string['privacy:metadata:sbx_rec:frames_key'] = 'Ja jɔlenw marayɔrɔ minnu ta
 
 $string['soapbox:retention_heading'] = 'I ka wideyo bɛ jɔsi tile {$a} kɔfɛ.';
 $string['soapbox:retention_line'] = 'Kumakan kelen-kelen bɛɛ bɛ jɔsi a yɛrɛ ma tile {$a} i k\'a minɛni kɔfɛ, wa don yɛrɛyɛrɛ bɛ jira kɛlɛ kelen-kelen bɛɛ kɛrɛfɛ duguma. I ka jateminɛw, i ka hakilina sɛbɛnnen ani i ka sɛbɛn bɛ to. I mago bɛ wideyo o wideyo mara na, «A lajigin» jɛɲɔgɔnya kɛ k\'a mara sanni o don ka se.';
+
+$string['outcomes:panel_heading'] = 'I ka porogaramu ɲɛtaaw';
+$string['outcomes:panel_intro'] = 'Ninnu ye i ka porogaramu ka kalanni ɲɛtaaw ye, kalansen bɛɛ la minnu bɛ dɛmɛ don u la. U tɛ kelen ye ni nin kalansen in ka laɲiniw ye, ani u bɛ kura don ni i ye baara jatelen dafa yɔrɔ wɛrɛ la.';
+$string['outcomes:no_percentage_yet'] = 'Ɲɛtaa si tɛ yen fɔlɔ';
+$string['outcomes:state_insufficient_evidence'] = 'Baara jatelen ma caya fɔlɔ. Nin ɲɛtaa in mago bɛ ɲininkali jatelen caman wɛrɛ la i ka kalansenw kɔnɔ, sanni ɲɛtaa ka se ka jate. O kɔrɔ tɛ ko i ye fu sɔrɔ.';
+$string['outcomes:state_calculation_pending'] = 'I ka ɲɛtaa bɛ jate sisan, a bɛna bɔ kɛnɛ kan sɔɔni.';
+$string['outcomes:state_stale'] = 'I ka baara kura ma jate fɔlɔ, o de kosɔn nin hakɛ in kɔrɔla.';
+$string['outcomes:state_not_released'] = 'I ka ɲɛtaa jatela, nka a ma jira kɛnɛ kan fɔlɔ.';
+$string['outcomes:state_not_assessed'] = 'Nin ɲɛtaa in tɛ jate i ye kalansen minnu kɛ fɔlɔ.';
+$string['outcomes:threshold_expected'] = 'Hakɛ min ka kan: {$a}%';
+$string['outcomes:threshold_strong'] = 'Hakɛ barikama: {$a}%';
+$string['outcomes:evidence_from'] = 'A sinsinnen bɛ baara jatelen {$a->items} kan, kalansen {$a->assessed} kɔnɔ kalansen {$a->total} la.';
