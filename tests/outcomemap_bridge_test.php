@@ -184,4 +184,95 @@ final class outcomemap_bridge_test extends \advanced_testcase {
     public function test_reference_prefix_leaves_room_for_a_uuid(): void {
         $this->assertLessThanOrEqual(64, strlen(outcomemap_bridge::REF_PREFIX) + 36);
     }
+
+    /**
+     * A state that carries no figure must never become a percentage.
+     *
+     * This is the assertion that matters most in this file. On the production
+     * degrees site 525 of 546 result rows are insufficient_evidence and 21 are
+     * calculated. A reader that cast those to 0.0 would tell almost every learner
+     * they scored zero on an outcome nobody has measured, which is the same defect
+     * as scoring a Soapbox criterion zero because the camera was off, and it would
+     * be far more visible because it is the normal case rather than the edge.
+     *
+     * @return void
+     */
+    public function test_a_state_without_evidence_yields_null_not_zero(): void {
+        $method = new \ReflectionMethod(outcomemap_bridge::class, 'percent_or_null');
+        $method->setAccessible(true);
+
+        foreach (['insufficient_evidence', 'calculation_pending', 'stale', 'not_released', 'not_assessed'] as $state) {
+            $this->assertNull(
+                $method->invoke(null, $state, '87.5'),
+                "State {$state} carries no usable figure, so it must return null even when the "
+                    . 'upstream payload contains a number. Returning a float here would render a '
+                    . 'percentage nobody calculated and nobody released.'
+            );
+        }
+    }
+
+    /**
+     * A calculated state keeps its number, cast from the canonical decimal string.
+     *
+     * Without this, returning null unconditionally would satisfy the test above
+     * and delete the only figures that are real.
+     *
+     * @return void
+     */
+    public function test_a_calculated_state_keeps_its_percentage(): void {
+        $method = new \ReflectionMethod(outcomemap_bridge::class, 'percent_or_null');
+        $method->setAccessible(true);
+
+        $this->assertSame(87.5, $method->invoke(null, 'calculated', '87.5'));
+        $this->assertSame(0.0, $method->invoke(null, 'calculated', '0.0000000000'));
+        $this->assertNull(
+            $method->invoke(null, 'calculated', null),
+            'A calculated row with a null percentage is still null. The upstream contract '
+                . 'allows it, and (float) null is 0.0, which is the value this class exists to '
+                . 'avoid inventing.'
+        );
+    }
+
+    /**
+     * One learner cannot read another learner's attainment.
+     *
+     * The underlying external function requires a system capability no learner
+     * holds, so the only paths in are "asking about yourself" and "holding the
+     * capability". Neither is true here.
+     *
+     * @return void
+     */
+    public function test_a_learner_cannot_read_someone_elses_attainment(): void {
+        $this->resetAfterTest();
+
+        $alice = $this->getDataGenerator()->create_user();
+        $bob = $this->getDataGenerator()->create_user();
+        $this->setUser($alice);
+
+        $this->assertSame(
+            [],
+            outcomemap_bridge::attainment((int) $bob->id),
+            'Attainment is evidence about a named person across their whole programme. A learner '
+                . 'asking for another learner id must get nothing, whether or not the plugin is '
+                . 'installed on this site.'
+        );
+    }
+
+    /**
+     * An absent plugin is an empty answer, not an error.
+     *
+     * @return void
+     */
+    public function test_attainment_is_empty_when_the_plugin_is_absent(): void {
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        if (!outcomemap_bridge::attainment_available()) {
+            $this->assertSame([], outcomemap_bridge::attainment((int) $user->id));
+        } else {
+            $this->markTestSkipped('local_outcomemap is installed on this site.');
+        }
+    }
 }
