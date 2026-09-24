@@ -123,11 +123,20 @@ final class i18n_translation_drift_test extends \basic_testcase {
      * Whether a string contains anything a translator could actually change.
      *
      * Some strings are pure machinery -- '{$a->raw} / {$a->max}', '{$a} ms',
-     * 'URL' -- and being byte-identical in all 45 locales is the CORRECT
-     * outcome for them, not drift. Listing them as debt would be wrong in the
-     * other direction: debt says "fix this one day", and these must never
-     * change. So strip placeholders, brand tokens, HTML tags and entities,
-     * digits and punctuation, and ask whether any word-like run survives.
+     * 'URL', 'DOCX (mod_resource)' -- and being byte-identical in all 45 locales
+     * is the CORRECT outcome for them, not drift. Listing them as debt would be
+     * wrong in the other direction: debt says "fix this one day", and these must
+     * never change. So strip placeholders, brand tokens, HTML tags and entities,
+     * Moodle component names, file-format acronyms, digits and punctuation, and
+     * ask whether any word-like run survives.
+     *
+     * The component names and acronyms were added after the v7.5.3 batch, where
+     * forty-five translators independently returned 'DOCX (mod_resource)'
+     * unchanged and several said in as many words that it is an identifier rather
+     * than a phrase. Before that the scan counted 'mod_resource' as a word and
+     * reported three format labels as new drift, which would have pushed a
+     * maintainer to either invent translations for a Moodle plugin name or park
+     * them on a list promising to do so later.
      *
      * @param string $value English string value.
      * @return bool True when at least one translatable word remains.
@@ -138,6 +147,8 @@ final class i18n_translation_drift_test extends \basic_testcase {
             '/\[\[\w+\]\]/',        // [[brand tokens]]
             '/<[^>]*>/',               // HTML tags
             '/&[a-z]+;|&#\d+;/i',      // HTML entities
+            '/\b(?:mod|block|local|qtype|qbank|tool|format|auth|enrol|report|theme)_\w+/',
+            '/\b[A-Z0-9]{2,6}\b/',   // DOCX, PDF, PPTX, H5P, SCORM, CSV, API
             '/[\d\p{P}\p{S}\s]+/u',   // digits, punctuation, symbols, space
         ], ' ', $value);
         // A single letter is a label, not a sentence; require a real word.
