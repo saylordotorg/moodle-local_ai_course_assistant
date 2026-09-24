@@ -3129,3 +3129,5 @@ $string['outcomes:label_not_assessed'] = 'Lama qiimeeyo';
 $string['outcomes:state_unavailable'] = 'Natiijadan hadda lama heli karo. Cidna dhibcahaaga waxba kama dhimin; fadlan mar kale hubi goor dambe.';
 
 $string['cachedef_outcomesattainment'] = 'Gaadhista natiijooyinka barnaamijka ee arday kasta iyo koorso kasta';
+
+$string['cachedef_vectors'] = 'Vectors-ka embedding-ka RAG ee indekska soo-helitaanka';

@@ -3084,3 +3084,5 @@ $string['outcomes:label_not_assessed'] = 'Neevaluat la cursuri';
 $string['outcomes:state_unavailable'] = 'Acest rezultat nu este disponibil momentan. Nimeni nu ți-a scăzut punctajul; verifică din nou mai târziu.';
 
 $string['cachedef_outcomesattainment'] = 'Gradul de atingere a rezultatelor programului per cursant și curs';
+
+$string['cachedef_vectors'] = 'Vectori de încorporare RAG pentru indexul de regăsire';

@@ -3083,3 +3083,5 @@ $string['outcomes:label_not_assessed'] = '評価対象外';
 $string['outcomes:state_unavailable'] = 'この結果は現在表示できません。減点されたわけではありませんので、しばらくしてからもう一度ご確認ください。';
 
 $string['cachedef_outcomesattainment'] = '学習者・コースごとのプログラムアウトカムの達成状況';
+
+$string['cachedef_vectors'] = 'RAG取得インデックス用の埋め込みベクトル';

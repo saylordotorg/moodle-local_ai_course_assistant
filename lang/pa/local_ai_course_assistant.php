@@ -3105,3 +3105,5 @@ $string['outcomes:label_not_assessed'] = 'ਮੁਲਾਂਕਣ ਨਹੀਂ ਹ
 $string['outcomes:state_unavailable'] = 'ਇਹ ਨਤੀਜਾ ਇਸ ਵੇਲੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ, ਪਰ ਕਿਸੇ ਨੇ ਤੁਹਾਡੇ ਅੰਕ ਨਹੀਂ ਘਟਾਏ। ਕਿਰਪਾ ਕਰਕੇ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਵੇਖੋ।';
 
 $string['cachedef_outcomesattainment'] = 'ਪ੍ਰੋਗਰਾਮ ਦੇ ਨਤੀਜਿਆਂ ਦੀ ਪ੍ਰਾਪਤੀ (ਪ੍ਰਤੀ ਸਿੱਖਿਆਰਥੀ ਅਤੇ ਕੋਰਸ)';
+
+$string['cachedef_vectors'] = 'ਪ੍ਰਾਪਤੀ ਇੰਡੈਕਸ ਲਈ RAG ਏਮਬੈਡਿੰਗ ਵੈਕਟਰ';

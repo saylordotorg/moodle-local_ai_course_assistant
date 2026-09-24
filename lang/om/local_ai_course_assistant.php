@@ -3116,3 +3116,5 @@ $string['outcomes:label_not_assessed'] = 'Hin madaalamu';
 $string['outcomes:state_unavailable'] = 'Bu\'aan kun yeroo ammaatti hin argamu. Namni tokkollee qabxii keessan hin hir\'isne; booda irra deebi\'aa ilaalaa.';
 
 $string['cachedef_outcomesattainment'] = 'Gahumsa bu\'aa sagantaa tokkoo tokkoon barataa fi koorsii';
+
+$string['cachedef_vectors'] = 'Vektaroota embedding RAG indeeksii argannootiif';

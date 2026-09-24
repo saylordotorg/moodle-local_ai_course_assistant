@@ -3085,3 +3085,5 @@ $string['outcomes:label_not_assessed'] = 'Ei arvioida kursseillasi';
 $string['outcomes:state_unavailable'] = 'Tämä tulos ei ole juuri nyt saatavilla. Kukaan ei ole vähentänyt pisteitäsi; tarkista tilanne myöhemmin uudelleen.';
 
 $string['cachedef_outcomesattainment'] = 'Tutkinto-ohjelman oppimistulosten saavuttaminen (oppija- ja kurssikohtainen)';
+
+$string['cachedef_vectors'] = 'RAG-upotusvektorit hakuindeksiä varten';

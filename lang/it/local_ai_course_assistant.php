@@ -3123,3 +3123,5 @@ $string['outcomes:label_not_assessed'] = 'Non valutato nei corsi';
 $string['outcomes:state_unavailable'] = 'Questo esito non è disponibile in questo momento. Nessuno ha abbassato il tuo punteggio: controlla di nuovo più tardi.';
 
 $string['cachedef_outcomesattainment'] = 'Conseguimento dei risultati di apprendimento del programma per studente e corso';
+
+$string['cachedef_vectors'] = 'Vettori di embedding RAG per l\'indice di recupero';

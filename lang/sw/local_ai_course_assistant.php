@@ -3129,3 +3129,5 @@ $string['outcomes:label_not_assessed'] = 'Halitathminiwi';
 $string['outcomes:state_unavailable'] = 'Tokeo hili halipatikani kwa sasa. Hakuna aliyekupunguzia alama; angalia tena baadaye.';
 
 $string['cachedef_outcomesattainment'] = 'Kiwango cha kufikia matokeo ya programu kwa kila mwanafunzi na kozi';
+
+$string['cachedef_vectors'] = 'Vekta za upachikaji wa RAG kwa faharasa ya urejeshaji';

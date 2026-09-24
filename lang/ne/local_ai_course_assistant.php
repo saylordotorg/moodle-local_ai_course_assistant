@@ -3104,3 +3104,5 @@ $string['outcomes:label_not_assessed'] = 'मूल्याङ्कन हु�
 $string['outcomes:state_unavailable'] = 'यो नतिजा अहिले उपलब्ध छैन। तपाईंको अङ्क कसैले घटाएको छैन; पछि फेरि हेर्नुहोस्।';
 
 $string['cachedef_outcomesattainment'] = 'कार्यक्रमका सिकाइ उपलब्धिको प्राप्ति स्तर (प्रति सिकारु र पाठ्यक्रम)';
+
+$string['cachedef_vectors'] = 'पुनःप्राप्ति अनुक्रमणिकाका लागि RAG एम्बेडिङ भेक्टरहरू';

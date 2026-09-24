@@ -3128,3 +3128,5 @@ $string['outcomes:label_not_assessed'] = 'Tidak dinilai';
 $string['outcomes:state_unavailable'] = 'Keputusan ini tidak tersedia buat masa ini. Tiada sesiapa yang menolak markah anda; sila semak semula kemudian.';
 
 $string['cachedef_outcomesattainment'] = 'Pencapaian hasil program setiap pelajar dan kursus';
+
+$string['cachedef_vectors'] = 'Vektor embedding RAG untuk indeks dapatan semula';

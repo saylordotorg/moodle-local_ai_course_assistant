@@ -3105,3 +3105,5 @@ $string['outcomes:label_not_assessed'] = 'Não avaliado';
 $string['outcomes:state_unavailable'] = 'Este resultado não está disponível no momento. Ninguém reduziu sua nota; verifique novamente mais tarde.';
 
 $string['cachedef_outcomesattainment'] = 'Atingimento de resultados do programa por estudante e curso';
+
+$string['cachedef_vectors'] = 'Vetores de incorporação RAG para o índice de recuperação';

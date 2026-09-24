@@ -3099,3 +3099,5 @@ $string['outcomes:label_not_assessed'] = 'A naghị enyocha ya';
 $string['outcomes:state_unavailable'] = 'A pụghị inweta nsonaazụ a ugbu a. O nweghị onye belatara akara gị; lelee ya ọzọ ma emesịa.';
 
 $string['cachedef_outcomesattainment'] = 'Mmezu nsonaazụ mmemme kwa nwa akwụkwọ na nkuzi';
+
+$string['cachedef_vectors'] = 'Vector embedding RAG maka ndeksị nweghachi';

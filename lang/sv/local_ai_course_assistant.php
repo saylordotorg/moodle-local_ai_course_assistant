@@ -3084,3 +3084,5 @@ $string['outcomes:label_not_assessed'] = 'Bedöms inte';
 $string['outcomes:state_unavailable'] = 'Det här resultatet är inte tillgängligt just nu. Ingenting har räknats emot dig; titta in igen senare.';
 
 $string['cachedef_outcomesattainment'] = 'Uppnående av programmets lärandemål per deltagare och kurs';
+
+$string['cachedef_vectors'] = 'RAG:s embedding-vektorer för hämtningsindexet';

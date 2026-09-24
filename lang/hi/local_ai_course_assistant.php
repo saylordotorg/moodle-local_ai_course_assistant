@@ -3113,3 +3113,5 @@ $string['outcomes:label_not_assessed'] = 'मूल्यांकन नही�
 $string['outcomes:state_unavailable'] = 'यह परिणाम अभी उपलब्ध नहीं है। किसी ने आपके अंक कम नहीं किए हैं; कुछ देर बाद फिर देखें।';
 
 $string['cachedef_outcomesattainment'] = 'कार्यक्रम परिणामों की उपलब्धि (प्रति शिक्षार्थी और पाठ्यक्रम)';
+
+$string['cachedef_vectors'] = 'पुनर्प्राप्ति इंडेक्स के लिए RAG एम्बेडिंग वेक्टर';

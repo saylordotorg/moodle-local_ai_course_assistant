@@ -3085,3 +3085,5 @@ $string['outcomes:label_not_assessed'] = 'Bedømmes ikke';
 $string['outcomes:state_unavailable'] = 'Dette resultat er ikke tilgængeligt lige nu. Ingen har sat din score ned; prøv igen senere.';
 
 $string['cachedef_outcomesattainment'] = 'Opnåelse af uddannelsens læringsmål pr. studerende og kursus';
+
+$string['cachedef_vectors'] = 'RAG-embedding-vektorer til hentningsindekset';

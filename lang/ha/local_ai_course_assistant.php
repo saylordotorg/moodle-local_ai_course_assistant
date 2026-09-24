@@ -3112,3 +3112,5 @@ $string['outcomes:label_not_assessed'] = 'Ba a kimanta ba';
 $string['outcomes:state_unavailable'] = 'Wannan sakamakon ba ya samuwa a yanzu. Ba a rage maka maki ba; sake duba daga baya.';
 
 $string['cachedef_outcomesattainment'] = 'Matakin cimma sakamakon shiri na kowane xalibi da kowane kwas';
+
+$string['cachedef_vectors'] = 'Vektocin embedding na RAG don ƙididdigar dawowa';

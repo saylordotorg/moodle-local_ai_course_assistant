@@ -3084,3 +3084,5 @@ $string['outcomes:label_not_assessed'] = 'ไม่มีการประเ�
 $string['outcomes:state_unavailable'] = 'ขณะนี้ยังไม่สามารถแสดงผลลัพธ์นี้ได้ ไม่มีการหักคะแนนของคุณแต่อย่างใด โปรดตรวจสอบอีกครั้งในภายหลัง';
 
 $string['cachedef_outcomesattainment'] = 'ผลสัมฤทธิ์ตามผลลัพธ์หลักสูตรต่อผู้เรียนและรายวิชา';
+
+$string['cachedef_vectors'] = 'เวกเตอร์ embedding RAG สำหรับดัชนีการค้นคืน';

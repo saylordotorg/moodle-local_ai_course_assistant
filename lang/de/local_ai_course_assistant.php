@@ -3085,3 +3085,5 @@ $string['outcomes:label_not_assessed'] = 'Wird nicht bewertet';
 $string['outcomes:state_unavailable'] = 'Dieses Ergebnis ist derzeit nicht verfügbar. Es wurden Ihnen keine Punkte abgezogen; schauen Sie später noch einmal nach.';
 
 $string['cachedef_outcomesattainment'] = 'Erreichung der Studiengangs-Lernergebnisse pro Lernendem und Kurs';
+
+$string['cachedef_vectors'] = 'RAG-Embedding-Vektoren für den Abrufindex';

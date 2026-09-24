@@ -3129,3 +3129,5 @@ $string['outcomes:label_not_assessed'] = 'Hindi ina-assess';
 $string['outcomes:state_unavailable'] = 'Hindi available ang resultang ito sa ngayon. Walang binawas sa iyong marka; tingnan mo muli mamaya.';
 
 $string['cachedef_outcomesattainment'] = 'Pagkamit ng outcome ng programa bawat mag-aaral at kurso';
+
+$string['cachedef_vectors'] = 'Mga embedding vector ng RAG para sa index ng pagkuha';

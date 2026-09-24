@@ -3083,3 +3083,5 @@ $string['outcomes:label_not_assessed'] = '평가 대상 아님';
 $string['outcomes:state_unavailable'] = '이 결과는 지금 확인할 수 없습니다. 점수가 깎인 것은 아니니 잠시 후 다시 확인해 주세요.';
 
 $string['cachedef_outcomesattainment'] = '학습자·강좌별 프로그램 성취목표 달성도';
+
+$string['cachedef_vectors'] = 'RAG 검색 색인용 임베딩 벡터';

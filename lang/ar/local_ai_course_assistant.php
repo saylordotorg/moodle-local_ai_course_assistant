@@ -3083,3 +3083,5 @@ $string['outcomes:label_not_assessed'] = 'لا تُقيَّم';
 $string['outcomes:state_unavailable'] = 'هذه النتيجة غير متاحة في الوقت الحالي. لم تُخفَّض درجتك ولم يُحتسَب شيء ضدك؛ تحقَّق مرة أخرى لاحقًا.';
 
 $string['cachedef_outcomesattainment'] = 'مستوى تحقيق نتائج البرنامج الدراسي لكل متعلم ومقرر';
+
+$string['cachedef_vectors'] = 'متجهات تضمين RAG لفهرس الاسترجاع';

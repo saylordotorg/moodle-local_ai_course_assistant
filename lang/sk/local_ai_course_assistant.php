@@ -3084,3 +3084,5 @@ $string['outcomes:label_not_assessed'] = 'Nehodnotí sa';
 $string['outcomes:state_unavailable'] = 'Tento výsledok momentálne nie je k dispozícii. Nikto vám zaň neznížil hodnotenie, skúste to skontrolovať neskôr.';
 
 $string['cachedef_outcomesattainment'] = 'Dosiahnutie výsledkov vzdelávania programu na študenta a kurz';
+
+$string['cachedef_vectors'] = 'Embeddingové vektory RAG pre vyhľadávací index';

@@ -3121,3 +3121,5 @@ $string['outcomes:label_not_assessed'] = '未评估此成果';
 $string['outcomes:state_unavailable'] = '这项结果目前无法显示。没有人扣过你的分数，请稍后再查看。';
 
 $string['cachedef_outcomesattainment'] = '按学习者和课程的学习项目成果达成度';
+
+$string['cachedef_vectors'] = '供检索索引使用的 RAG 嵌入向量';

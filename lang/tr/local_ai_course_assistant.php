@@ -3085,3 +3085,5 @@ $string['outcomes:label_not_assessed'] = 'Değerlendirilmiyor';
 $string['outcomes:state_unavailable'] = 'Bu sonuç şu anda mevcut değil. Puanınız düşürülmedi; daha sonra tekrar kontrol edin.';
 
 $string['cachedef_outcomesattainment'] = 'Öğrenci ve ders başına program kazanımı karşılama düzeyi';
+
+$string['cachedef_vectors'] = 'Getirme dizini için RAG gömme vektörleri';

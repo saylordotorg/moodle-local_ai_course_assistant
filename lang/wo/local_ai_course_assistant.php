@@ -3105,3 +3105,5 @@ $string['outcomes:label_not_assessed'] = 'Assessewuñu ko';
 $string['outcomes:state_unavailable'] = 'Résultat bii, mënuñu koo wone léegi. Kenn wàññiwul dara ci sa nota; seetaatal ko ci kanam.';
 
 $string['cachedef_outcomesattainment'] = 'Àggu résultat yu prograam ci njàngkat ak cours bu nekk';
+
+$string['cachedef_vectors'] = 'Vektoor embedding RAG yi ngir index bu retrieval bi';

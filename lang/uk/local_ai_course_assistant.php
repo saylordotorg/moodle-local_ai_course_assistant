@@ -3125,3 +3125,5 @@ $string['outcomes:label_not_assessed'] = 'Не оцінюється';
 $string['outcomes:state_unavailable'] = 'Цей результат зараз недоступний. Ніхто не знижував вам оцінку; перевірте ще раз пізніше.';
 
 $string['cachedef_outcomesattainment'] = 'Досягнення результатів програми для кожного учня й курсу';
+
+$string['cachedef_vectors'] = 'Вектори вбудовувань RAG для пошукового індексу';

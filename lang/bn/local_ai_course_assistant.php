@@ -3083,3 +3083,5 @@ $string['outcomes:label_not_assessed'] = 'মূল্যায়ন করা 
 $string['outcomes:state_unavailable'] = 'এই ফলাফলটি এই মুহূর্তে পাওয়া যাচ্ছে না। কেউ আপনার নম্বর কমায়নি; কিছুক্ষণ পরে আবার দেখুন।';
 
 $string['cachedef_outcomesattainment'] = 'প্রোগ্রাম শিখন ফলাফলের অর্জন (প্রতি শিক্ষার্থী ও কোর্স)';
+
+$string['cachedef_vectors'] = 'পুনরুদ্ধার সূচির জন্য RAG এমবেডিং ভেক্টর';

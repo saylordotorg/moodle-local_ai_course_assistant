@@ -3124,3 +3124,5 @@ $string['outcomes:label_not_assessed'] = 'אינו מוערך';
 $string['outcomes:state_unavailable'] = 'התוצאה הזו אינה זמינה כרגע. לא הופחתו לך נקודות; אפשר לבדוק שוב מאוחר יותר.';
 
 $string['cachedef_outcomesattainment'] = 'השגת תוצרי הלמידה של התוכנית לכל לומד וקורס';
+
+$string['cachedef_vectors'] = 'וקטורי embedding של RAG לאינדקס האחזור';

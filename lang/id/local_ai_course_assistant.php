@@ -3137,3 +3137,5 @@ $string['outcomes:label_not_assessed'] = 'Tidak dinilai';
 $string['outcomes:state_unavailable'] = 'Hasil ini tidak tersedia saat ini. Nilai Anda tidak dikurangi; silakan periksa kembali nanti.';
 
 $string['cachedef_outcomesattainment'] = 'Pencapaian capaian program per pelajar dan kursus';
+
+$string['cachedef_vectors'] = 'Vektor embedding RAG untuk indeks pengambilan';

@@ -3105,3 +3105,5 @@ $string['outcomes:label_not_assessed'] = 'Kò sí àyẹ̀wò';
 $string['outcomes:state_unavailable'] = 'Àbájáde yìí kò sí ní àkókò yìí. Kò sí ẹnìkan tí ó dín àmì rẹ kù; ṣàyẹ̀wò lẹ́ẹ̀kan sí i nígbà tó bá yá.';
 
 $string['cachedef_outcomesattainment'] = 'Ìmúṣẹ àbájáde ìtòlẹ́sẹẹsẹ fún akẹ́kọ̀ọ́ àti ẹ̀kọ́ kọ̀ọ̀kan';
+
+$string['cachedef_vectors'] = 'Àwọn vẹ́ktọ̀ embedding RAG fún àtọ́ka ìgbàpadà';

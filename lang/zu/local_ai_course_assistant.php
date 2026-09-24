@@ -3129,3 +3129,5 @@ $string['outcomes:label_not_assessed'] = 'Awuhlolwa';
 $string['outcomes:state_unavailable'] = 'Lo mphumela awutholakali okwamanje. Akekho owehlise amamaki akho; hlola futhi kamuva.';
 
 $string['cachedef_outcomesattainment'] = 'Ukufezeka kwemiphumela yohlelo ngomfundi ngamunye nangesifundo ngasinye';
+
+$string['cachedef_vectors'] = 'Amavektha e-embedding ye-RAG enkombeni yokulanda';

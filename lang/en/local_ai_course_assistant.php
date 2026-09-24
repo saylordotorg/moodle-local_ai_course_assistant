@@ -30,6 +30,7 @@ $string['error'] = '{$a}';
 // Cache definitions (db/caches.php). Required so the cache admin UI has a label per store.
 $string['cachedef_ratelimit'] = 'Per-user request rate limiting';
 $string['cachedef_outcomesattainment'] = 'Program-outcome attainment per learner and course';
+$string['cachedef_vectors'] = 'RAG embedding vectors for the retrieval index';
 $string['cachedef_uistate'] = 'Per-session UI toggles (view-as-student, reveal real names)';
 // Provider benchmark admin page.
 $string['benchmark:pagetitle'] = 'Provider benchmark';

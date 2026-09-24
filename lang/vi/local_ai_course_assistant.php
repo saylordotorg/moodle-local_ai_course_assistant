@@ -3105,3 +3105,5 @@ $string['outcomes:label_not_assessed'] = 'Không được đánh giá';
 $string['outcomes:state_unavailable'] = 'Hiện chưa xem được kết quả này. Bạn không bị trừ điểm nào; hãy kiểm tra lại sau.';
 
 $string['cachedef_outcomesattainment'] = 'Mức độ đạt kết quả đầu ra chương trình theo từng học viên và khóa học';
+
+$string['cachedef_vectors'] = 'Vectơ embedding RAG cho chỉ mục truy xuất';

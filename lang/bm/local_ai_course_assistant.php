@@ -3113,3 +3113,5 @@ $string['outcomes:label_not_assessed'] = 'Jate tɛ a la';
 $string['outcomes:state_unavailable'] = 'Nin ɲɛtaa in tɛ sɔrɔ sisan. Mɔgɔ si ma foyi bɔ i ka hakɛ la, segin k\'a filɛ kɔfɛ.';
 
 $string['cachedef_outcomesattainment'] = 'Porogaramu ɲɛtaa sɔrɔ (kalanden ni kalansen kelen-kelen na)';
+
+$string['cachedef_vectors'] = 'RAG embedding vɛkitɛriw sɔrɔli index kama';

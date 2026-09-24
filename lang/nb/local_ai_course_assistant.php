@@ -3083,3 +3083,5 @@ $string['outcomes:label_not_assessed'] = 'Vurderes ikke';
 $string['outcomes:state_unavailable'] = 'Dette resultatet er ikke tilgjengelig akkurat nå. Ingen har trukket fra poeng, så sjekk igjen senere.';
 
 $string['cachedef_outcomesattainment'] = 'Oppnåelse av læringsutbytte i studieprogrammet per student og emne';
+
+$string['cachedef_vectors'] = 'RAG-embeddingvektorer for innhentingsindeksen';

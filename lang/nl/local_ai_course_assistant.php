@@ -3108,3 +3108,5 @@ $string['outcomes:label_not_assessed'] = 'Niet beoordeeld';
 $string['outcomes:state_unavailable'] = 'Dit resultaat is op dit moment niet beschikbaar. Er is niets van je score afgetrokken; kijk later nog eens.';
 
 $string['cachedef_outcomesattainment'] = 'Behaald niveau op programmaleerresultaten per student en cursus';
+
+$string['cachedef_vectors'] = 'RAG-embeddingvectoren voor de zoekindex';

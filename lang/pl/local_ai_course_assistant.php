@@ -3084,3 +3084,5 @@ $string['outcomes:label_not_assessed'] = 'Nie jest oceniany';
 $string['outcomes:state_unavailable'] = 'Ten wynik jest w tej chwili niedostępny. Nikt nie obniżył Twojego wyniku; sprawdź ponownie później.';
 
 $string['cachedef_outcomesattainment'] = 'Stopień osiągnięcia efektów kształcenia programu na uczącego się i kurs';
+
+$string['cachedef_vectors'] = 'Wektory embeddingów RAG dla indeksu wyszukiwania';

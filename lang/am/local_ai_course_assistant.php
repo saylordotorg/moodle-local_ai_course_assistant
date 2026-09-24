@@ -3112,3 +3112,5 @@ $string['outcomes:label_not_assessed'] = 'በኮርሶችህ አይገመገም�
 $string['outcomes:state_unavailable'] = 'ይህ ውጤት በአሁኑ ጊዜ አይገኝም። ማንም ነጥብህን አልቀነሰም፤ ቆይተህ እንደገና አረጋግጥ።';
 
 $string['cachedef_outcomesattainment'] = 'የፕሮግራም ውጤት ማሳካት ደረጃ በተማሪና በኮርስ';
+
+$string['cachedef_vectors'] = 'ለማምጣት ማውጫ የRAG ኤምቤዲንግ ቬክተሮች';

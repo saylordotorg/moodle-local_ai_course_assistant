@@ -3105,3 +3105,5 @@ $string['outcomes:label_not_assessed'] = 'Не оценивается';
 $string['outcomes:state_unavailable'] = 'Этот результат сейчас недоступен. Оценку вам никто не снижал; загляните позже.';
 
 $string['cachedef_outcomesattainment'] = 'Достижение результатов обучения по программе для каждого учащегося и курса';
+
+$string['cachedef_vectors'] = 'Векторы встраивания RAG для поискового индекса';
