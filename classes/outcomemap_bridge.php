@@ -73,6 +73,22 @@ final class outcomemap_bridge {
     /** @var int Upper bound on imported outcomes. The upstream API itself caps at 200. */
     private const MAX_OUTCOMES = 200;
 
+    /**
+     * @var string The only result state that carries a percentage.
+     *
+     * Everything else means the figure does not exist yet, and each means
+     * something different to a learner: no evidence collected, a calculation
+     * queued, a figure out of date, a result withheld pending release, or an
+     * outcome not assessed in this program at all.
+     *
+     * "No number" is the normal case rather than an edge. When last measured, on
+     * the production degrees site on 2026-09-22, 525 of 546 result rows were
+     * insufficient_evidence against 21 calculated. That is a reading with a date
+     * on it, not a property of the system: it will drift as courses are assessed,
+     * and the design holds whatever the ratio is.
+     */
+    private const STATE_CALCULATED = 'calculated';
+
     /** @var string External function that reports a learner's program-level attainment. */
     private const ATTAINMENT_WS = 'local_outcomemap_get_user_program_attainment';
 
@@ -90,25 +106,6 @@ final class outcomemap_bridge {
      */
     private const OWN_ATTAINMENT_WS = 'local_outcomemap_get_own_program_attainment';
 
-    /**
-     * @var string[] Result states that carry no usable percentage.
-     *
-     * Only 'calculated' has a number. Every other state means the figure does not
-     * exist yet, and each means something different to a learner: no evidence has
-     * been collected, a calculation is queued, the figure is out of date, the
-     * result is withheld pending release, or the outcome is not assessed in this
-     * program at all. On the production site 525 of 546 result rows are
-     * insufficient_evidence and 21 are calculated, so this is the normal case
-     * rather than an edge, and rendering any of them as 0% would tell almost
-     * every learner they had failed an outcome nobody has measured.
-     */
-    private const STATES_WITHOUT_A_NUMBER = [
-        'insufficient_evidence',
-        'calculation_pending',
-        'stale',
-        'not_released',
-        'not_assessed',
-    ];
 
     /**
      * Is the local_outcomemap outcome-search API installed and callable?
@@ -312,10 +309,11 @@ final class outcomemap_bridge {
      * STATE IS NOT A DETAIL. Every outcome carries a state, and only 'calculated'
      * has a percentage. The rest are returned with percent = null and their state
      * intact, and a caller MUST render the state rather than substituting zero.
-     * On the production site today 525 of 546 rows are insufficient_evidence
-     * against 21 calculated, so a caller that treats null as 0 would tell almost
-     * every learner they had failed an outcome nobody has measured yet. This is the
-     * same mistake as scoring a Soapbox criterion zero because no camera was on.
+     * A caller that treats null as 0 tells a learner they failed an outcome nobody
+     * has measured yet. It is the same mistake as scoring a Soapbox criterion zero
+     * because no camera was on, and it is not a rare case: 525 of 546 rows were
+     * insufficient_evidence when last measured (production degrees, 2026-09-22).
+     * Treat that figure as a dated reading rather than a constant.
      *
      * PRIVACY, AND WHY THERE ARE TWO WAYS IN. There is no path here that lets one
      * learner read another's attainment, and the two routes protect that property
@@ -410,9 +408,24 @@ final class outcomemap_bridge {
         }
 
         $programs = [];
-        foreach (($data['programs'] ?? []) as $program) {
+        // is_array() on both levels: the upstream plugin is optional and beta, and
+        // foreach over a scalar is a PHP warning plus an empty result rather than a
+        // clean refusal. A shape we do not recognise is "no data", not a notice in
+        // the log of every learner who opens the widget.
+        $rawprograms = $data['programs'] ?? [];
+        if (!is_array($rawprograms)) {
+            return [];
+        }
+        foreach ($rawprograms as $program) {
+            if (!is_array($program)) {
+                continue;
+            }
             $outcomes = [];
-            foreach (($program['outcomes'] ?? []) as $o) {
+            $rawoutcomes = $program['outcomes'] ?? [];
+            foreach (is_array($rawoutcomes) ? $rawoutcomes : [] as $o) {
+                if (!is_array($o)) {
+                    continue;
+                }
                 $state = (string) ($o['state'] ?? 'not_assessed');
                 $outcomes[] = [
                     'itemid' => (int) ($o['itemid'] ?? 0),
@@ -452,7 +465,13 @@ final class outcomemap_bridge {
      * @return float|null
      */
     private static function percent_or_null(string $state, $value): ?float {
-        if (in_array($state, self::STATES_WITHOUT_A_NUMBER, true)) {
+        // Allowlist, not a deny-list. The deny-list version failed OPEN: a state
+        // this plugin has not heard of, added by a later local_outcomemap, would
+        // have had its figure printed next to an explanation reading "not
+        // assessed", because state_explanation() defaults the other way. Printing
+        // a number we cannot describe is the one outcome this class exists to
+        // prevent, so an unrecognised state carries no figure.
+        if ($state !== self::STATE_CALCULATED) {
             return null;
         }
         return self::decimal_or_null($value);
@@ -486,10 +505,10 @@ final class outcomemap_bridge {
      * back is still only this learner's own attainment.
      *
      * Every outcome keeps its state and an explanation of that state, because most
-     * of them have no number. Of the 546 result rows on the production degrees site
-     * today, 525 are insufficient_evidence. A panel that showed those as blanks, or
-     * worse as zeroes, would read as a wall of failure on outcomes nobody has
-     * measured yet.
+     * of them have no number: 525 of 546 rows were insufficient_evidence when last
+     * measured (production degrees, 2026-09-22). A panel that showed those as
+     * blanks, or worse as zeroes, would read as a wall of failure on outcomes
+     * nobody has measured yet.
      *
      * @param int $userid The learner.
      * @param int $courseid The course whose page the panel would appear on.
@@ -538,7 +557,7 @@ final class outcomemap_bridge {
         // an empty list when the course takes part in no program. That is the same
         // "render nothing" answer the course gate was there to produce, reached
         // without asking a learner for an author's capability.
-        $programs = self::attainment($userid, '', $courseid);
+        $programs = self::cached_attainment($userid, $courseid);
         if ($programs === []) {
             return null;
         }
@@ -549,7 +568,10 @@ final class outcomemap_bridge {
             $outcomes = [];
             foreach ($program['outcomes'] as $o) {
                 $anyoutcome = true;
-                $outcomes[] = $o + ['explanation' => self::state_explanation($o['state'])];
+                $outcomes[] = $o + [
+                    'explanation' => self::state_explanation($o['state']),
+                    'statelabel' => self::state_label($o['state']),
+                ];
             }
             if ($outcomes !== []) {
                 $out[] = ['code' => $program['code'], 'name' => $program['name'], 'outcomes' => $outcomes];
@@ -557,6 +579,74 @@ final class outcomemap_bridge {
         }
 
         return $anyoutcome ? $out : null;
+    }
+
+    /**
+     * The short text that stands where a percentage would.
+     *
+     * One generic label for every state was a small lie told five times. "No
+     * result yet" sat next to "Your result has been worked out but is not
+     * published yet", and next to "your result is out of date", both of which say
+     * a result exists. A learner reading the column and then the sentence under it
+     * got two different answers.
+     *
+     * @param string $state The upstream result state.
+     * @return string A short translated label.
+     */
+    public static function state_label(string $state): string {
+        $keys = [
+            'insufficient_evidence' => 'outcomes:label_insufficient_evidence',
+            'calculation_pending' => 'outcomes:label_calculation_pending',
+            'stale' => 'outcomes:label_stale',
+            'not_released' => 'outcomes:label_not_released',
+            'not_assessed' => 'outcomes:label_not_assessed',
+        ];
+
+        // An unrecognised state falls back to the most cautious wording rather than
+        // to a claim about assessment, because we do not know which it is.
+        return branding::str($keys[$state] ?? 'outcomes:no_percentage_yet');
+    }
+
+    /**
+     * attainment(), through a five-minute cache, for the panel path only.
+     *
+     * The panel is drawn every time a learner opens the Progress tab, and the read
+     * behind it walks every course where they hold a current result and builds a
+     * release-gated report for each. On a seeded fixture that measured 22 queries
+     * and about 8ms for a single contributing course, and it is linear in a degree
+     * learner's history rather than in the course they are looking at, so the
+     * number nobody has measured is the one that matters: a learner three years
+     * into a programme.
+     *
+     * Five minutes, by TTL rather than by invalidation. The figures move when a
+     * batch calculation runs inside local_outcomemap, which this plugin is not
+     * told about and should not subscribe to. The panel is a view of another
+     * system's record, not the record, and a learner seeing a figure five minutes
+     * late cannot act differently for it.
+     *
+     * Only this path is cached. attainment() itself stays uncached, because its
+     * other caller is an administrator reading one named learner deliberately, and
+     * a stale answer there is a support ticket rather than a saved query.
+     *
+     * @param int $userid The learner.
+     * @param int $courseid The course being viewed.
+     * @return array Programs, as attainment() returns them.
+     */
+    private static function cached_attainment(int $userid, int $courseid): array {
+        $cache = \cache::make('local_ai_course_assistant', 'outcomesattainment');
+        // Underscore, not a colon: simplekeys allows only alphanumerics and
+        // underscores, and a colon raises a coding_exception on every set().
+        $key = $userid . '_' . $courseid;
+
+        $hit = $cache->get($key);
+        if (is_array($hit)) {
+            return $hit;
+        }
+
+        $programs = self::attainment($userid, '', $courseid);
+        $cache->set($key, $programs);
+
+        return $programs;
     }
 
     /**

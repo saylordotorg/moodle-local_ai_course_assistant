@@ -148,10 +148,11 @@ class get_mastery_summary extends external_api {
                             'statement' => new external_value(PARAM_RAW, 'Outcome statement'),
                             'shortstatement' => new external_value(PARAM_RAW, 'Short form of the statement'),
                             'state' => new external_value(PARAM_ALPHAEXT, 'calculated or a state carrying no figure'),
-                            // NULL_ALLOWED is the point. Only a calculated result has
-                            // a number; 525 of 546 rows on the production site do not.
-                            // A zero here would tell a learner they failed an outcome
-                            // nobody has measured.
+                            // NULL_ALLOWED is the point. Only a calculated result
+                            // has a number, and most do not: 525 of 546 rows were
+                            // insufficient_evidence when last measured (production
+                            // degrees, 2026-09-22). A zero here would tell a learner
+                            // they failed an outcome nobody has measured.
                             'percent' => new external_value(
                                 PARAM_FLOAT,
                                 'Attainment percentage, null unless the state is calculated',
@@ -162,6 +163,10 @@ class get_mastery_summary extends external_api {
                             'explanation' => new external_value(
                                 PARAM_RAW,
                                 'Plain-language reason there is no figure; empty when calculated'
+                            ),
+                            'statelabel' => new external_value(
+                                PARAM_RAW,
+                                'Short text to show where a percentage would be, per state'
                             ),
                             'expectedpercent' => new external_value(
                                 PARAM_FLOAT,

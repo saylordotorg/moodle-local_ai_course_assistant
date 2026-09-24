@@ -189,7 +189,7 @@ final class outcomemap_bridge_test extends \advanced_testcase {
      * A state that carries no figure must never become a percentage.
      *
      * This is the assertion that matters most in this file. On the production
-     * degrees site 525 of 546 result rows are insufficient_evidence and 21 are
+     * degrees site 525 of 546 result rows were insufficient_evidence and 21 were
      * calculated. A reader that cast those to 0.0 would tell almost every learner
      * they scored zero on an outcome nobody has measured, which is the same defect
      * as scoring a Soapbox criterion zero because the camera was off, and it would
@@ -309,6 +309,24 @@ final class outcomemap_bridge_test extends \advanced_testcase {
             'With the switch off, course_panel must return null before it looks at anything else, '
                 . 'so an administrator can silence the feature without a deploy.'
         );
+
+        // Same caveat as the gate test above: on a site with no attainment this
+        // returns null whether or not the switch is consulted, so the assertion
+        // alone does not prove the switch is wired. That it is consulted FIRST is
+        // asserted here, and that it silences a panel which does have data is
+        // asserted in outcomemap_integration_test, where there is data.
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $start = strpos($source, 'public static function course_panel(');
+        $switch = strpos($source, "get_config('local_ai_course_assistant', 'outcomes_panel_enabled')", $start);
+        $read = strpos($source, 'cached_attainment(', $start);
+
+        $this->assertNotFalse($switch, 'course_panel() no longer reads the kill switch.');
+        $this->assertLessThan(
+            $read,
+            $switch,
+            'The kill switch must be read before anything expensive, so turning it off costs one '
+                . 'setting change and takes effect on the next request.'
+        );
     }
 
     /**
@@ -371,6 +389,27 @@ final class outcomemap_bridge_test extends \advanced_testcase {
             'An administrator holds the export capability and could be answered through the '
                 . 'privileged path, so this is exactly the caller who would see a panel that no '
                 . 'learner on the site can see. The gate must refuse them too.'
+        );
+
+        // The assertion above passes for two different reasons and only one of them
+        // is the gate: an administrator on a site with no seeded attainment gets
+        // null anyway, because there is nothing to report. Deleting the gate
+        // entirely would not fail it. So the gate is also asserted directly,
+        // against the source, and the two together mean something the behavioural
+        // half does not mean alone.
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $start = strpos($source, 'public static function course_panel(');
+        $gate = strpos($source, 'own_attainment_available()', $start);
+        $read = strpos($source, 'cached_attainment(', $start);
+
+        $this->assertNotFalse($gate, 'course_panel() no longer checks for the learner-safe API.');
+        $this->assertNotFalse($read, 'course_panel() no longer reads attainment; update this guard.');
+        $this->assertLessThan(
+            $read,
+            $gate,
+            'The learner-safe API check must come BEFORE the read, or a site on an older '
+                . 'Outcome Map answers administrators through the privileged path and shows them '
+                . 'a panel no learner can see.'
         );
     }
 

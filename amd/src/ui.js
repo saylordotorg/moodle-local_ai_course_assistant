@@ -748,6 +748,9 @@ define([
         const heading = panel.dataset.programsHeading || '';
         const intro = panel.dataset.programsIntro || '';
         const noResult = panel.dataset.programsNoresult || '';
+        const expectedTpl = panel.dataset.programsExpected || '';
+        const strongTpl = panel.dataset.programsStrong || '';
+        const evidenceTpl = panel.dataset.programsEvidence || '';
 
         const headingEl = section.querySelector('.aica-program-outcomes__heading');
         const introEl = section.querySelector('.aica-program-outcomes__intro');
@@ -772,6 +775,10 @@ define([
 
             const list = document.createElement('ul');
             list.className = 'aica-program-outcomes__list';
+            // list-style:none removes list semantics in Safari with VoiceOver, so
+            // the outcomes stop being announced as "list, 6 items" and the learner
+            // loses the count and their position in it. role="list" puts it back.
+            list.setAttribute('role', 'list');
 
             outcomes.forEach(function(outcome) {
                 const hasFigure = outcome.percent !== null && outcome.percent !== undefined;
@@ -791,9 +798,10 @@ define([
                 if (hasFigure) {
                     value.textContent = Math.round(parseFloat(outcome.percent)) + '%';
                 } else {
-                    // The label, then the reason. The reason is the point: it is
-                    // what stops "no figure" being read as "you scored nothing".
-                    value.textContent = noResult;
+                    // Per state, not one generic phrase. "No result yet" printed
+                    // above "your result has been worked out but is not published"
+                    // gave the learner two different answers in adjacent lines.
+                    value.textContent = outcome.statelabel || noResult;
                     value.classList.add('aica-program-outcomes__value--none');
                 }
                 item.appendChild(value);
@@ -803,6 +811,36 @@ define([
                     why.className = 'aica-program-outcomes__explanation';
                     why.textContent = outcome.explanation;
                     item.appendChild(why);
+                }
+
+                // Context, but only where it means something. A threshold is the
+                // bar this outcome is judged against and is worth seeing next to a
+                // real figure; printed next to "not assessed" it would invite a
+                // comparison with nothing. The evidence line is the opposite: it
+                // is most useful when there is no figure, because it says how much
+                // of the programme has actually been measured so far.
+                const meta = [];
+                if (hasFigure && expectedTpl && outcome.expectedpercent !== null
+                        && outcome.expectedpercent !== undefined) {
+                    meta.push(expectedTpl.replace('{$a}', Math.round(parseFloat(outcome.expectedpercent))));
+                }
+                if (hasFigure && strongTpl && outcome.strongpercent !== null
+                        && outcome.strongpercent !== undefined) {
+                    meta.push(strongTpl.replace('{$a}', Math.round(parseFloat(outcome.strongpercent))));
+                }
+                const total = parseInt(outcome.coursestotal, 10) || 0;
+                const graded = parseInt(outcome.gradeditems, 10) || 0;
+                if (evidenceTpl && total > 0 && graded > 0) {
+                    meta.push(evidenceTpl
+                        .replace('{$a->items}', graded)
+                        .replace('{$a->assessed}', parseInt(outcome.coursesassessed, 10) || 0)
+                        .replace('{$a->total}', total));
+                }
+                if (meta.length) {
+                    const detail = document.createElement('div');
+                    detail.className = 'aica-program-outcomes__meta';
+                    detail.textContent = meta.join(' \u00b7 ');
+                    item.appendChild(detail);
                 }
 
                 list.appendChild(item);

@@ -4726,6 +4726,19 @@ a.aica-history-panel__source:hover {
     .local-ai-course-assistant__input {
         border: 2px solid #333;
     }
+    /* The program outcomes rows are separated only by a hairline. At this
+       setting a hairline is not a separator. */
+    .local-ai-course-assistant .aica-program-outcomes {
+        border-top: 2px solid #000;
+    }
+    .local-ai-course-assistant .aica-program-outcomes__item {
+        border-bottom: 1px solid #333;
+    }
+    .local-ai-course-assistant .aica-program-outcomes__value--none,
+    .local-ai-course-assistant .aica-program-outcomes__explanation,
+    .local-ai-course-assistant .aica-program-outcomes__intro {
+        color: #1f2933;
+    }
 }
 
 /* User settings page */
@@ -5914,22 +5927,32 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
    question: where the learner stands on their degree program rather than on this
    course. Rows with no figure are the NORMAL case, not an error state, so they
    are styled as muted information carrying an explanation rather than as a
-   warning or a zero. */
+   warning or a zero.
+
+   Muted here means a lighter GREY, never a lower opacity. The first version of
+   this block dimmed with opacity, which is wrong three times over: it breaks the
+   convention the rest of this file follows (#6b7280 and #4b5563 are the muted
+   greys used by the progress panel this sits inside), it makes the resulting
+   contrast depend on whatever is painted behind the text, and in Windows
+   forced-colors mode it dims text the operating system has just set to maximum
+   contrast on purpose. The greys below are 4.8:1 and 7.5:1 on white, so the
+   explanation a learner most needs to read is the more legible of the two. */
 .local-ai-course-assistant .aica-program-outcomes {
     margin-top: 1.25rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #e5e7eb;
 }
 
 .local-ai-course-assistant .aica-program-outcomes__heading {
     font-size: 0.95rem;
     font-weight: 600;
+    color: #111827;
     margin: 0 0 0.25rem;
 }
 
 .local-ai-course-assistant .aica-program-outcomes__intro {
     font-size: 0.8rem;
-    opacity: 0.75;
+    color: #4b5563;
     margin: 0 0 0.75rem;
 }
 
@@ -5938,7 +5961,7 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    opacity: 0.7;
+    color: #6b7280;
     margin: 0.75rem 0 0.35rem;
 }
 
@@ -5953,30 +5976,64 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
     grid-template-columns: 1fr auto;
     gap: 0.15rem 0.75rem;
     padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid #eef0f3;
 }
 
 .local-ai-course-assistant .aica-program-outcomes__label {
     font-size: 0.85rem;
+    color: #1f2933;
 }
 
 .local-ai-course-assistant .aica-program-outcomes__value {
     font-size: 0.85rem;
     font-weight: 600;
+    color: #111827;
     white-space: nowrap;
 }
 
 /* Not a failure state. Muted, never red. */
 .local-ai-course-assistant .aica-program-outcomes__value--none {
     font-weight: 400;
-    opacity: 0.6;
+    color: #6b7280;
 }
 
 /* The explanation spans both columns so it reads as a sentence rather than as a
-   caption squeezed beside a number. */
+   caption squeezed beside a number. It is the only thing on the row that tells a
+   learner why there is no number, so it is the LEAST muted of the muted text,
+   not the most. */
 .local-ai-course-assistant .aica-program-outcomes__explanation {
     grid-column: 1 / -1;
     font-size: 0.78rem;
     line-height: 1.4;
-    opacity: 0.7;
+    color: #4b5563;
+}
+
+/* Thresholds and the evidence line. Secondary to the explanation, which is why
+   it is smaller and lighter, but still an accessible grey rather than a dimmed
+   one. */
+.local-ai-course-assistant .aica-program-outcomes__meta {
+    grid-column: 1 / -1;
+    font-size: 0.74rem;
+    line-height: 1.4;
+    color: #6b7280;
+}
+
+/* Windows high contrast and similar. The OS repaints every colour, so the panel
+   loses the greys that separate a row from the next one and the heading from the
+   list. Borders are re-stated in system colours so the structure survives, and
+   nothing here re-introduces an opacity. */
+@media (forced-colors: active) {
+    .local-ai-course-assistant .aica-program-outcomes {
+        border-top-color: CanvasText;
+    }
+    .local-ai-course-assistant .aica-program-outcomes__item {
+        border-bottom-color: CanvasText;
+    }
+    .local-ai-course-assistant .aica-program-outcomes__value--none,
+    .local-ai-course-assistant .aica-program-outcomes__explanation,
+    .local-ai-course-assistant .aica-program-outcomes__meta,
+    .local-ai-course-assistant .aica-program-outcomes__intro,
+    .local-ai-course-assistant .aica-program-outcomes__program-name {
+        color: CanvasText;
+    }
 }
