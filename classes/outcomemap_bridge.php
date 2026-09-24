@@ -340,10 +340,14 @@ final class outcomemap_bridge {
      *
      * @param int $userid The learner whose attainment is wanted.
      * @param string $programcode Restrict to one program, or empty for all of them.
+     * @param int $courseid Restrict to the programs this Moodle course contributes to, or 0
+     *        for all of them. Honoured only on the own-attainment path, which is the only
+     *        one that accepts it; the SIS export function has no such parameter, so a
+     *        privileged caller asking about somebody else gets the unnarrowed report.
      * @return array<int, array{code: string, name: string, outcomes: array}> Programs,
      *         each carrying its outcomes with percent (float|null), state and thresholds.
      */
-    public static function attainment(int $userid, string $programcode = ''): array {
+    public static function attainment(int $userid, string $programcode = '', int $courseid = 0): array {
         global $USER;
 
         if ($userid <= 0 || !self::attainment_available()) {
@@ -358,7 +362,7 @@ final class outcomemap_bridge {
         if ($own !== false) {
             $function = self::OWN_ATTAINMENT_WS;
             $info = $own;
-            $args = [$programcode];
+            $args = [$programcode, max(0, $courseid)];
         } else {
             $info = has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())
                 ? self::function_info(self::ATTAINMENT_WS)
@@ -470,18 +474,16 @@ final class outcomemap_bridge {
     /**
      * The "Your program outcomes" panel for one learner in one course, or null.
      *
-     * Returns null, meaning render nothing at all, unless BOTH are true: this course
-     * actually sits under a framework that defines outcomes, and the learner has
-     * attainment rows to show. A panel on a course with no outcome mapping is an
-     * empty box asking a learner to care about something their course does not
-     * participate in.
+     * Returns null, meaning render nothing at all, unless the learner has attainment
+     * rows in a program THIS COURSE contributes to. A panel on a course with no
+     * outcome mapping is an empty box asking a learner to care about something their
+     * course does not take part in, and a panel with no rows is worse: it implies
+     * the reader has been measured and found empty.
      *
-     * The course gate uses outcome_search through fetch(), which the class docblock
-     * records as returning the outcomes of every framework visible to the course,
-     * including the programs the course belongs to. That is the plugin's own
-     * definition of "outcomes for this course" and it is the right gate here: a
-     * course inside a degree program receives that program's outcomes, which is
-     * exactly the population this panel is about.
+     * Both conditions are one question, answered upstream. The course-to-program
+     * mapping lives in local_outcomemap, so the narrowing happens there, against
+     * tables SOLA does not read and effective dates SOLA does not track. What comes
+     * back is still only this learner's own attainment.
      *
      * Every outcome keeps its state and an explanation of that state, because most
      * of them have no number. Of the 546 result rows on the production degrees site
@@ -517,12 +519,26 @@ final class outcomemap_bridge {
         if (!self::own_attainment_available()) {
             return null;
         }
-        // Gate one: does this course participate in outcomes at all?
-        if (self::fetch($courseid) === []) {
-            return null;
-        }
-        // Gate two: does this learner have anything to show?
-        $programs = self::attainment($userid);
+        // One gate, asked of the plugin that owns the answer: what are this learner's
+        // results in the programs THIS COURSE contributes to?
+        //
+        // It used to be two, and the first of them was a defect of exactly the kind
+        // this release exists to fix. It called fetch(), which requires
+        // local/outcomemap:viewdefinitions, and that capability is granted to
+        // editing teachers and managers and NOT to students. So the course gate
+        // returned nothing for every learner, and a panel written for learners
+        // could only ever have rendered for staff. The capability blocker had a
+        // second copy one layer up, in code added to work around the first.
+        //
+        // The fix is not to elevate the check but to stop asking that question
+        // here. A learner may see their own results, including the outcome
+        // statements attached to them; browsing the outcome catalogue is a
+        // different thing and the two capabilities say so. Narrowing by course
+        // happens upstream, where the program-to-course mapping lives, and returns
+        // an empty list when the course takes part in no program. That is the same
+        // "render nothing" answer the course gate was there to produce, reached
+        // without asking a learner for an author's capability.
+        $programs = self::attainment($userid, '', $courseid);
         if ($programs === []) {
             return null;
         }

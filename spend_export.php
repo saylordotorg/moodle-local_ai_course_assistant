@@ -52,6 +52,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Authenticated by a bearer key compared with hash_equals(), not by a Moodle session, so
+// require_login() would break the integration it exists for. Declared here as well as
+// through NO_MOODLE_COOKIES so that every sessionless endpoint in this plugin states the
+// same intent the same way.
+// phpcs:disable moodle.Files.RequireLogin.Missing
 define('NO_MOODLE_COOKIES', true);
 
 require_once(__DIR__ . '/../../config.php');

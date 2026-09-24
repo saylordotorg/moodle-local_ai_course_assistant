@@ -473,4 +473,62 @@ final class outcomemap_bridge_test extends \advanced_testcase {
                 . 'methodname directly. See this test\'s docblock for the sesskey trap.'
         );
     }
+
+    /**
+     * The learner panel never asks a learner for an author's capability.
+     *
+     * This one nearly shipped twice. The panel exists because the only pooled
+     * attainment API needed local/outcomemap:exportattainment, which no student
+     * holds. The first version of the course gate then called fetch(), which
+     * requires local/outcomemap:viewdefinitions, granted to editing teachers and
+     * managers and NOT to students. So the workaround for the capability blocker
+     * contained a second copy of the capability blocker, and every learner would
+     * have been gated out by the check written to decide whether to show them
+     * anything.
+     *
+     * Reading a learner's own results and browsing the outcome catalogue are
+     * different rights and local_outcomemap says so with two capabilities. Anything
+     * in the learner path that touches the second is the bug, whatever it is
+     * checking for. Narrowing by course happens upstream now, where the
+     * program-to-course mapping lives.
+     *
+     * Source-level because the condition needs the third-party plugin installed and
+     * seeded to reproduce, and a behavioural test would silently pass on every CI
+     * job, which is every job.
+     *
+     * @return void
+     */
+    public function test_the_learner_panel_does_not_touch_the_definitions_capability(): void {
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $this->assertIsString($source);
+
+        $start = strpos($source, 'public static function course_panel(');
+        $this->assertNotFalse($start, 'course_panel() has been renamed; update this guard.');
+
+        // To the end of the method: the next method's docblock starts at column 5.
+        $end = strpos($source, "\n    /**", $start);
+        $body = $end === false ? substr($source, $start) : substr($source, $start, $end - $start);
+
+        $offenders = [];
+        foreach (explode("\n", $body) as $line) {
+            $code = ltrim($line);
+            if (strpos($code, '//') === 0 || strpos($code, '*') === 0) {
+                continue;
+            }
+            if (strpos($code, 'VIEW_CAPABILITY') !== false
+                    || strpos($code, 'viewdefinitions') !== false
+                    || preg_match('/\bself::fetch\s*\(/', $code)) {
+                $offenders[] = trim($line);
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offenders,
+            'course_panel() is the learner path. It must not read the outcome definitions, '
+                . 'directly or through fetch(), because local/outcomemap:viewdefinitions is an '
+                . 'author capability that students do not hold. Ask the upstream '
+                . 'own-attainment function to narrow by course instead.'
+        );
+    }
 }
