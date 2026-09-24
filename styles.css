@@ -5908,3 +5908,75 @@ html:has(.sola-toc) { scroll-behavior: smooth; }
 .sola-modelregistry__url code { font-size: 12px; }
 .sola-modelregistry__spec { font-family: monospace; font-size: 12px; }
 .sola-modelregistry__notes td { border-top: 0; padding-top: 0; }
+
+/* Program outcomes panel (v7.5.3).
+   A distinct section under the course objectives, because it answers a wider
+   question: where the learner stands on their degree program rather than on this
+   course. Rows with no figure are the NORMAL case, not an error state, so they
+   are styled as muted information carrying an explanation rather than as a
+   warning or a zero. */
+.local-ai-course-assistant .aica-program-outcomes {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.local-ai-course-assistant .aica-program-outcomes__heading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+}
+
+.local-ai-course-assistant .aica-program-outcomes__intro {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0 0 0.75rem;
+}
+
+.local-ai-course-assistant .aica-program-outcomes__program-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+    margin: 0.75rem 0 0.35rem;
+}
+
+.local-ai-course-assistant .aica-program-outcomes__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.local-ai-course-assistant .aica-program-outcomes__item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.15rem 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.local-ai-course-assistant .aica-program-outcomes__label {
+    font-size: 0.85rem;
+}
+
+.local-ai-course-assistant .aica-program-outcomes__value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Not a failure state. Muted, never red. */
+.local-ai-course-assistant .aica-program-outcomes__value--none {
+    font-weight: 400;
+    opacity: 0.6;
+}
+
+/* The explanation spans both columns so it reads as a sentence rather than as a
+   caption squeezed beside a number. */
+.local-ai-course-assistant .aica-program-outcomes__explanation {
+    grid-column: 1 / -1;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    opacity: 0.7;
+}

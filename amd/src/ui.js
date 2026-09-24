@@ -715,13 +715,121 @@ define([
      * @param {Function} onRefresh         Called when the Refresh button is clicked.
      * @param {string}   askTemplateLabel  Localised "Ask about this" button label (mastery:ask_about).
      */
+
+    /**
+     * Render the "Your program outcomes" section, or leave it hidden.
+     *
+     * This is deliberately NOT part of the objective lists above it. Course
+     * objectives answer "have I mastered this course"; program outcomes answer
+     * "where do I stand on my degree", pooled across every course that has
+     * contributed assessed evidence. Interleaving them would invite a learner to
+     * read one number as the other.
+     *
+     * Most outcomes will have no figure. On the live site today the great
+     * majority of results are "not enough evidence yet", so this renders the
+     * explanation sentence as the primary content of such a row rather than
+     * leaving a blank where a percentage would go. A blank reads as a zero, and a
+     * zero here would be a score nobody calculated.
+     *
+     * @param {HTMLElement} panel The progress panel root.
+     * @param {Object} summary The mastery summary payload.
+     * @returns {void}
+     */
+    const renderProgramOutcomes = function(panel, summary) {
+        const section = panel.querySelector('.aica-program-outcomes');
+        if (!section) { return; }
+
+        const programs = Array.isArray(summary.programs) ? summary.programs : [];
+        if (!summary.showprograms || programs.length === 0) {
+            section.hidden = true;
+            return;
+        }
+
+        const heading = panel.dataset.programsHeading || '';
+        const intro = panel.dataset.programsIntro || '';
+        const noResult = panel.dataset.programsNoresult || '';
+
+        const headingEl = section.querySelector('.aica-program-outcomes__heading');
+        const introEl = section.querySelector('.aica-program-outcomes__intro');
+        if (headingEl) { headingEl.textContent = heading; }
+        if (introEl) { introEl.textContent = intro; }
+
+        const body = section.querySelector('.aica-program-outcomes__body');
+        if (!body) { return; }
+        while (body.firstChild) { body.removeChild(body.firstChild); }
+
+        programs.forEach(function(program) {
+            const outcomes = Array.isArray(program.outcomes) ? program.outcomes : [];
+            if (outcomes.length === 0) { return; }
+
+            const group = document.createElement('div');
+            group.className = 'aica-program-outcomes__program';
+
+            const name = document.createElement('div');
+            name.className = 'aica-program-outcomes__program-name';
+            name.textContent = program.name || program.code || '';
+            group.appendChild(name);
+
+            const list = document.createElement('ul');
+            list.className = 'aica-program-outcomes__list';
+
+            outcomes.forEach(function(outcome) {
+                const hasFigure = outcome.percent !== null && outcome.percent !== undefined;
+
+                const item = document.createElement('li');
+                item.className = 'aica-program-outcomes__item'
+                    + (hasFigure ? '' : ' aica-program-outcomes__item--noresult');
+
+                const label = document.createElement('div');
+                label.className = 'aica-program-outcomes__label';
+                label.textContent = (outcome.code ? outcome.code + ': ' : '')
+                    + (outcome.shortstatement || outcome.statement || '');
+                item.appendChild(label);
+
+                const value = document.createElement('div');
+                value.className = 'aica-program-outcomes__value';
+                if (hasFigure) {
+                    value.textContent = Math.round(parseFloat(outcome.percent)) + '%';
+                } else {
+                    // The label, then the reason. The reason is the point: it is
+                    // what stops "no figure" being read as "you scored nothing".
+                    value.textContent = noResult;
+                    value.classList.add('aica-program-outcomes__value--none');
+                }
+                item.appendChild(value);
+
+                if (outcome.explanation) {
+                    const why = document.createElement('div');
+                    why.className = 'aica-program-outcomes__explanation';
+                    why.textContent = outcome.explanation;
+                    item.appendChild(why);
+                }
+
+                list.appendChild(item);
+            });
+
+            group.appendChild(list);
+            body.appendChild(group);
+        });
+
+        section.hidden = false;
+    };
+
     const renderMasteryDashboard = function(summary, onAskAbout, onRefresh, askTemplateLabel) {
         if (!root) { return; }
         const panel = root.querySelector('.local-ai-course-assistant__progress-panel');
         if (!panel) { return; }
         if (!summary || !summary.enabled) {
-            // Mastery off for this course — render nothing visible. The tab
-            // itself will not have rendered in the template either.
+            // Mastery off for this course. Program outcomes are a separate
+            // feature with a separate gate, so check them before hiding: a course
+            // can sit inside a degree program while its own objective tracking is
+            // switched off, and in that case the program panel is the only thing
+            // the tab has to show.
+            if (summary && summary.showprograms) {
+                panel.hidden = false;
+                renderProgramOutcomes(panel, summary);
+                return;
+            }
             panel.hidden = true;
             return;
         }
@@ -842,6 +950,11 @@ define([
             });
             refreshBtn._aicaProgressBound = true;
         }
+
+        // Program outcomes last, below the course objectives, because it answers a
+        // wider question than the rest of this panel. It hides itself when this
+        // course does not take part in outcomes.
+        renderProgramOutcomes(panel, summary);
     };
 
     /** @type {HTMLElement|null} Currently playing TTS message element */

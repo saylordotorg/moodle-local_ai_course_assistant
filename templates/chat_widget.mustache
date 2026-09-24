@@ -710,6 +710,9 @@
              data-ask-label="{{#str}}mastery:ask_about, local_ai_course_assistant{{/str}}"
              data-celebrate-label="{{#str}}mastery:celebrate, local_ai_course_assistant{{/str}}"
              data-summary-label="{{#str}}mastery:summary_label, local_ai_course_assistant{{/str}}"
+             data-programs-heading="{{#str}}outcomes:panel_heading, local_ai_course_assistant{{/str}}"
+             data-programs-intro="{{#str}}outcomes:panel_intro, local_ai_course_assistant{{/str}}"
+             data-programs-noresult="{{#str}}outcomes:no_percentage_yet, local_ai_course_assistant{{/str}}"
              hidden>
             <div class="aica-progress-panel">
                 <div class="aica-progress-panel__header">
@@ -760,6 +763,17 @@
 
                 {{! Three sectioned objective lists. JS populates each. }}
                 <div class="aica-progress-panel__sections" aria-live="polite"></div>
+
+                {{! Program-level outcomes from local_outcomemap, when that plugin is
+                    present AND this course participates in outcomes AND the learner
+                    has attainment. JS fills it and unhides it; it stays hidden
+                    otherwise, because an empty panel asks a learner to care about
+                    outcomes their course does not take part in. }}
+                <section class="aica-program-outcomes" aria-live="polite" hidden>
+                    <h4 class="aica-program-outcomes__heading"></h4>
+                    <p class="aica-program-outcomes__intro"></p>
+                    <div class="aica-program-outcomes__body"></div>
+                </section>
             </div>
         </div>
         {{/masterydashboardenabled}}
