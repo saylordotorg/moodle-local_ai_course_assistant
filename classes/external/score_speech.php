@@ -594,16 +594,26 @@ class score_speech extends external_api {
                         'Whether this criterion was actually evaluated',
                         VALUE_OPTIONAL
                     ),
-                    // Declared because execute() puts it on every entry, and
-                    // external_single_structure throws invalid_parameter_exception
-                    // on ANY undeclared key rather than ignoring it. This endpoint
-                    // is ajax => true, so clean_returnvalue() runs on the path a
-                    // learner actually uses: an undeclared key here fails every
-                    // successful scoring call, after the provider has been billed
-                    // and the score row written. It is carried rather than
-                    // stripped because the stored criteria feed
-                    // rubric_manager::compute_overall(), which needs the per
-                    // criterion maximum to compute an honest denominator.
+                    // Declared because execute() puts it on every entry, and an
+                    // undeclared key is silently DROPPED by clean_returnvalue()
+                    // rather than rejected. This endpoint is ajax => true, so that
+                    // filtering runs on the path a learner actually uses: leaving
+                    // it undeclared would not fail the call, it would quietly
+                    // remove max_score from every scored criterion the browser
+                    // receives, with nothing logged and nothing to notice.
+                    //
+                    // It is carried rather than stripped because the per criterion
+                    // maximum is what rubric_manager::compute_overall() needs for
+                    // an honest denominator; without it the display falls back to
+                    // assuming five.
+                    //
+                    // An earlier version of this comment described the opposite
+                    // behaviour, and an outage that never happened. The real
+                    // semantics are pinned in external_return_semantics_test
+                    // rather than restated here, because restating them is how
+                    // they came to be wrong in five places at once. The omission
+                    // and its fix both landed before v7.5.1 was tagged, so no
+                    // release ever carried it.
                     'max_score' => new external_value(
                         PARAM_INT,
                         'Maximum score for this criterion',

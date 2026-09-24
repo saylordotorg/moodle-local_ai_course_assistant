@@ -50,11 +50,14 @@ class get_mastery_summary extends external_api {
         require_capability('local/ai_course_assistant:use', $context);
 
         // Every key the return structure declares, including the two added for the
-        // program-outcomes panel. external_single_structure is strict in BOTH
-        // directions: an undeclared key throws, and a declared key that is absent
-        // throws too. This early return fires on every course with mastery
-        // disabled, which is most of them, so omitting a key here would break the
-        // common path rather than the rare one.
+        // program-outcomes panel. A declared key that is ABSENT and VALUE_REQUIRED
+        // makes clean_returnvalue() throw, and this early return fires on every
+        // course with mastery disabled, which is most of them, so omitting one here
+        // would break the common path rather than the rare one.
+        //
+        // The other direction is not symmetric, whatever this comment used to say:
+        // an UNDECLARED key is silently dropped, never rejected. Both rules are
+        // pinned in external_return_semantics_test.
         // The program-outcomes panel is a SEPARATE question from course mastery and
         // is answered before the mastery gate rather than after it. A course can
         // have program outcomes in Outcome Map and have SOLA's own objectives

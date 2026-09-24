@@ -23,17 +23,25 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The mastery summary's declared return shape matches what it actually returns.
  *
- * This is the test v7.5.1 did not have. That release added max_score to a scored
- * criterion without declaring it in execute_returns(), and because
- * external_single_structure throws on an undeclared key, on an ajax endpoint,
- * after the provider had been billed and the row written, it broke every
- * successful scoring call in production. The defect was invisible to a direct
- * call and only appeared through clean_returnvalue().
+ * This is the test the max_score episode should have produced. During v7.5.1's
+ * development a scored criterion gained max_score without a matching declaration
+ * in execute_returns(). The defect was invisible to a direct call and appeared
+ * only through clean_returnvalue(), which is the reason for this file.
  *
- * Adding the program-outcomes panel widened this same structure, so the same
- * mistake was available again in both directions: a key returned but not
- * declared, and a key declared but missing from the early return that fires on
- * every course with mastery switched off.
+ * What it would actually have done is worth stating precisely, because the
+ * commit message and three comments said otherwise for a week. An undeclared key
+ * is silently DROPPED, not rejected, so the call would have succeeded and the
+ * browser would simply never have received max_score. Nothing would have failed
+ * and nothing would have been logged. It also never reached a release: the
+ * defect and its fix both landed before the v7.5.1 tag.
+ *
+ * The expensive direction is the other one. A DECLARED key that is absent throws
+ * invalid_response_exception, on an ajax endpoint, after the provider has been
+ * billed and the row written. Adding the program-outcomes panel widened this
+ * structure and made that mistake available again through the early return that
+ * fires on every course with mastery switched off.
+ *
+ * Both rules are proven rather than asserted, in external_return_semantics_test.
  *
  * @package    local_ai_course_assistant
  * @covers     \local_ai_course_assistant\external\get_mastery_summary
