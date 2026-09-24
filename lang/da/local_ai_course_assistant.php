@@ -3082,3 +3082,5 @@ $string['outcomes:label_calculation_pending'] = 'Under beregning';
 $string['outcomes:label_stale'] = 'Forældet resultat';
 $string['outcomes:label_not_released'] = 'Ikke offentliggjort';
 $string['outcomes:label_not_assessed'] = 'Bedømmes ikke';
+
+$string['outcomes:state_unavailable'] = 'Dette resultat er ikke tilgængeligt lige nu. Ingen har sat din score ned; prøv igen senere.';

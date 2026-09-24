@@ -3110,3 +3110,5 @@ $string['outcomes:label_calculation_pending'] = 'निकाला जा र�
 $string['outcomes:label_stale'] = 'पुराना आँकड़ा';
 $string['outcomes:label_not_released'] = 'अभी प्रकाशित नहीं';
 $string['outcomes:label_not_assessed'] = 'मूल्यांकन नहीं होता';
+
+$string['outcomes:state_unavailable'] = 'यह परिणाम अभी उपलब्ध नहीं है। किसी ने आपके अंक कम नहीं किए हैं; कुछ देर बाद फिर देखें।';

@@ -3096,3 +3096,5 @@ $string['outcomes:label_calculation_pending'] = 'A na-agbakọ ya';
 $string['outcomes:label_stale'] = 'Ọ dịghị ọhụrụ';
 $string['outcomes:label_not_released'] = 'E bipụtabeghị ya';
 $string['outcomes:label_not_assessed'] = 'A naghị enyocha ya';
+
+$string['outcomes:state_unavailable'] = 'A pụghị inweta nsonaazụ a ugbu a. O nweghị onye belatara akara gị; lelee ya ọzọ ma emesịa.';

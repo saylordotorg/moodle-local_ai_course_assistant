@@ -3102,3 +3102,5 @@ $string['outcomes:label_calculation_pending'] = 'Ñu ngi ko xayma';
 $string['outcomes:label_stale'] = 'Limu bi yàgg na';
 $string['outcomes:label_not_released'] = 'Génnewuñu ko ba tey';
 $string['outcomes:label_not_assessed'] = 'Assessewuñu ko';
+
+$string['outcomes:state_unavailable'] = 'Résultat bii, mënuñu koo wone léegi. Kenn wàññiwul dara ci sa nota; seetaatal ko ci kanam.';

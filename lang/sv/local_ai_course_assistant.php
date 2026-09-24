@@ -3081,3 +3081,5 @@ $string['outcomes:label_calculation_pending'] = 'Räknas fram nu';
 $string['outcomes:label_stale'] = 'Inaktuellt resultat';
 $string['outcomes:label_not_released'] = 'Ännu inte publicerat';
 $string['outcomes:label_not_assessed'] = 'Bedöms inte';
+
+$string['outcomes:state_unavailable'] = 'Det här resultatet är inte tillgängligt just nu. Ingenting har räknats emot dig; titta in igen senare.';

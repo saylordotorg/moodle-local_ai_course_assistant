@@ -3080,3 +3080,5 @@ $string['outcomes:label_calculation_pending'] = 'নির্ণয় করা
 $string['outcomes:label_stale'] = 'হালনাগাদ নয়';
 $string['outcomes:label_not_released'] = 'প্রকাশ করা হয়নি';
 $string['outcomes:label_not_assessed'] = 'মূল্যায়ন করা হয় না';
+
+$string['outcomes:state_unavailable'] = 'এই ফলাফলটি এই মুহূর্তে পাওয়া যাচ্ছে না। কেউ আপনার নম্বর কমায়নি; কিছুক্ষণ পরে আবার দেখুন।';

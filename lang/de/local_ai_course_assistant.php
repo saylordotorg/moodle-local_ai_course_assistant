@@ -3082,3 +3082,5 @@ $string['outcomes:label_calculation_pending'] = 'Wird berechnet';
 $string['outcomes:label_stale'] = 'Nicht aktuell';
 $string['outcomes:label_not_released'] = 'Noch nicht veröffentlicht';
 $string['outcomes:label_not_assessed'] = 'Wird nicht bewertet';
+
+$string['outcomes:state_unavailable'] = 'Dieses Ergebnis ist derzeit nicht verfügbar. Es wurden Ihnen keine Punkte abgezogen; schauen Sie später noch einmal nach.';

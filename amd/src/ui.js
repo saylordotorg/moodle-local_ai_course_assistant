@@ -725,11 +725,18 @@ define([
      * contributed assessed evidence. Interleaving them would invite a learner to
      * read one number as the other.
      *
-     * Most outcomes will have no figure. On the live site today the great
-     * majority of results are "not enough evidence yet", so this renders the
-     * explanation sentence as the primary content of such a row rather than
-     * leaving a blank where a percentage would go. A blank reads as a zero, and a
-     * zero here would be a score nobody calculated.
+     * Most outcomes will have no figure: 525 of 546 rows were "not enough
+     * evidence yet" when last measured on the production degrees site, on
+     * 2026-09-22. So a row without a number is the normal row, and it gets a
+     * short state label where the percentage would go plus a sentence saying why,
+     * rather than a blank. A blank reads as a zero, and a zero here would be a
+     * score nobody calculated.
+     *
+     * On prominence: the label sits in the value column and the sentence below it
+     * spans the row. The sentence is the thing that stops the label being read as
+     * a bad mark, so styles.css gives it the darker of the two muted greys. It is
+     * not the most prominent element on the row, which is the outcome name, and
+     * it is not meant to be.
      *
      * @param {HTMLElement} panel The progress panel root.
      * @param {Object} summary The mastery summary payload.

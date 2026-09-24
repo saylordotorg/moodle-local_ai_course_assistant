@@ -3082,3 +3082,5 @@ $string['outcomes:label_calculation_pending'] = 'Hesaplanıyor';
 $string['outcomes:label_stale'] = 'Güncel değil';
 $string['outcomes:label_not_released'] = 'Henüz yayımlanmadı';
 $string['outcomes:label_not_assessed'] = 'Değerlendirilmiyor';
+
+$string['outcomes:state_unavailable'] = 'Bu sonuç şu anda mevcut değil. Puanınız düşürülmedi; daha sonra tekrar kontrol edin.';

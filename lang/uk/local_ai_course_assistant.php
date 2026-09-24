@@ -3124,3 +3124,5 @@ $string['outcomes:label_calculation_pending'] = 'Обчислюється';
 $string['outcomes:label_stale'] = 'Застарілий показник';
 $string['outcomes:label_not_released'] = 'Ще не опубліковано';
 $string['outcomes:label_not_assessed'] = 'Не оцінюється';
+
+$string['outcomes:state_unavailable'] = 'Цей результат зараз недоступний. Ніхто не знижував вам оцінку; перевірте ще раз пізніше.';

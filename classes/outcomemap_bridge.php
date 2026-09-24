@@ -224,11 +224,18 @@ final class outcomemap_bridge {
     }
 
     /**
-     * Whether this site can report program attainment at all.
+     * Is attainment readable by ANYBODY on this site?
      *
-     * Separate from is_available() because the two capabilities are different and a
-     * site can have one without the other: outcome definitions are readable by any
-     * course teacher, attainment is not.
+     * A question about what is installed, not about who may ask. It returns true
+     * if either attainment function is registered, and says nothing about whether
+     * the current user can call it: the export function needs a system capability
+     * and the own-attainment function needs none beyond being the subject. Callers
+     * that care about a learner want own_attainment_available() below.
+     *
+     * Separate from is_available(), which answers the same question about outcome
+     * DEFINITIONS. A site can have one without the other, and the capabilities
+     * behind them differ too: definitions are readable by a course teacher,
+     * anybody's attainment is not.
      *
      * @return bool
      */
@@ -242,8 +249,12 @@ final class outcomemap_bridge {
      * The distinction that decides whether the program outcomes panel is a real
      * feature or a staff-only curiosity. Without the own-attainment function the
      * only pooled API needs a system capability students do not have, so the panel
-     * renders for administrators and for nobody else; the settings page says so,
-     * and this is the method that makes that statement checkable rather than a
+     * COULD render for administrators and for nobody else.
+     *
+     * course_panel() gates on this rather than on attainment_available() precisely
+     * so that it does not: on a site without the learner-safe function the panel is
+     * hidden from everyone, staff included, which is what the settings page
+     * promises. This method is what makes that promise checkable rather than a
      * claim in a comment.
      *
      * @return bool
@@ -389,10 +400,21 @@ final class outcomemap_bridge {
             // silently returns nothing depending on how the page was reached is a
             // bug waiting to be diagnosed as "the outcomes plugin is broken".
             //
-            // Nothing is skipped by going direct. The capability and context checks
-            // live inside the function's own execute(), which is what actually
-            // enforces them; the wrapper only adds the transport-layer guards that
-            // an in-process caller does not need and cannot satisfy.
+            // What is given up, precisely, because "nothing is skipped" was the
+            // first version of this comment and it was not true. The wrapper also
+            // runs clean_returnvalue() against execute_returns(), and going direct
+            // does not. That is a deliberate trade rather than an oversight: the
+            // parsing below reads every field defensively with a default, whereas
+            // clean_returnvalue() THROWS on a shape it does not expect, and a
+            // throw here means the panel silently disappears the day a third-party
+            // plugin adds a field. Degrading to a missing value beats degrading to
+            // a missing panel.
+            //
+            // The checks that matter are not skipped. The capability and context
+            // checks live inside the function's own execute(), which is what
+            // actually enforces them, and validate_parameters() runs there too.
+            // What the wrapper adds beyond that is transport-layer guards an
+            // in-process caller does not need and cannot satisfy.
             $callable = [$info->classname, $info->methodname];
             $data = call_user_func_array($callable, $args);
         } catch (\Throwable $e) {
@@ -568,9 +590,19 @@ final class outcomemap_bridge {
             $outcomes = [];
             foreach ($program['outcomes'] as $o) {
                 $anyoutcome = true;
+                // A row can arrive claiming 'calculated' with no number, which is
+                // upstream contradicting itself. state_explanation() returns an
+                // empty string for calculated, on the reasonable assumption that a
+                // figure needs no excuse, so without this the learner would get
+                // "No result yet" and no reason at all: the one blank this panel
+                // exists to prevent. We do not know WHY it is missing, so the
+                // explanation says only that, rather than picking a cause.
+                $state = $o['percent'] === null && $o['state'] === self::STATE_CALCULATED
+                    ? 'unavailable'
+                    : $o['state'];
                 $outcomes[] = $o + [
-                    'explanation' => self::state_explanation($o['state']),
-                    'statelabel' => self::state_label($o['state']),
+                    'explanation' => self::state_explanation($state),
+                    'statelabel' => self::state_label($state),
                 ];
             }
             if ($outcomes !== []) {
@@ -600,6 +632,7 @@ final class outcomemap_bridge {
             'stale' => 'outcomes:label_stale',
             'not_released' => 'outcomes:label_not_released',
             'not_assessed' => 'outcomes:label_not_assessed',
+            'unavailable' => 'outcomes:no_percentage_yet',
         ];
 
         // An unrecognised state falls back to the most cautious wording rather than
@@ -663,6 +696,7 @@ final class outcomemap_bridge {
     public static function state_explanation(string $state): string {
         $keys = [
             'calculated' => '',
+            'unavailable' => 'outcomes:state_unavailable',
             'insufficient_evidence' => 'outcomes:state_insufficient_evidence',
             'calculation_pending' => 'outcomes:state_calculation_pending',
             'stale' => 'outcomes:state_stale',

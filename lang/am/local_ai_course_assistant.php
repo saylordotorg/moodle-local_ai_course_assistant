@@ -3109,3 +3109,5 @@ $string['outcomes:label_calculation_pending'] = 'እየተሰላ ነው';
 $string['outcomes:label_stale'] = 'ያረጀ አኃዝ';
 $string['outcomes:label_not_released'] = 'ገና አልታተመም';
 $string['outcomes:label_not_assessed'] = 'በኮርሶችህ አይገመገምም';
+
+$string['outcomes:state_unavailable'] = 'ይህ ውጤት በአሁኑ ጊዜ አይገኝም። ማንም ነጥብህን አልቀነሰም፤ ቆይተህ እንደገና አረጋግጥ።';

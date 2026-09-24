@@ -3080,3 +3080,5 @@ $string['outcomes:label_calculation_pending'] = '결과 산출 중';
 $string['outcomes:label_stale'] = '최신 정보 아님';
 $string['outcomes:label_not_released'] = '아직 공개 전';
 $string['outcomes:label_not_assessed'] = '평가 대상 아님';
+
+$string['outcomes:state_unavailable'] = '이 결과는 지금 확인할 수 없습니다. 점수가 깎인 것은 아니니 잠시 후 다시 확인해 주세요.';

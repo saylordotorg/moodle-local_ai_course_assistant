@@ -3081,3 +3081,5 @@ $string['outcomes:label_calculation_pending'] = 'กำลังคำนวณ�
 $string['outcomes:label_stale'] = 'ยังไม่เป็นปัจจุบัน';
 $string['outcomes:label_not_released'] = 'ยังไม่ได้เผยแพร่';
 $string['outcomes:label_not_assessed'] = 'ไม่มีการประเมิน';
+
+$string['outcomes:state_unavailable'] = 'ขณะนี้ยังไม่สามารถแสดงผลลัพธ์นี้ได้ ไม่มีการหักคะแนนของคุณแต่อย่างใด โปรดตรวจสอบอีกครั้งในภายหลัง';

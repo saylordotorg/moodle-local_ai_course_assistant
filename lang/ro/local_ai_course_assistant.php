@@ -3081,3 +3081,5 @@ $string['outcomes:label_calculation_pending'] = 'În curs de calculare';
 $string['outcomes:label_stale'] = 'Valoare depășită';
 $string['outcomes:label_not_released'] = 'Nepublicat încă';
 $string['outcomes:label_not_assessed'] = 'Neevaluat la cursuri';
+
+$string['outcomes:state_unavailable'] = 'Acest rezultat nu este disponibil momentan. Nimeni nu ți-a scăzut punctajul; verifică din nou mai târziu.';

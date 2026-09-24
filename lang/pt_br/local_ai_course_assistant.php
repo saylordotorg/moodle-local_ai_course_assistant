@@ -3102,3 +3102,5 @@ $string['outcomes:label_calculation_pending'] = 'Sendo calculado';
 $string['outcomes:label_stale'] = 'Desatualizado';
 $string['outcomes:label_not_released'] = 'Ainda não publicado';
 $string['outcomes:label_not_assessed'] = 'Não avaliado';
+
+$string['outcomes:state_unavailable'] = 'Este resultado não está disponível no momento. Ninguém reduziu sua nota; verifique novamente mais tarde.';

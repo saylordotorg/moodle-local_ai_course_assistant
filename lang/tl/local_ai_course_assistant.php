@@ -3126,3 +3126,5 @@ $string['outcomes:label_calculation_pending'] = 'Kinakalkula pa';
 $string['outcomes:label_stale'] = 'Luma na';
 $string['outcomes:label_not_released'] = 'Hindi pa nailalathala';
 $string['outcomes:label_not_assessed'] = 'Hindi ina-assess';
+
+$string['outcomes:state_unavailable'] = 'Hindi available ang resultang ito sa ngayon. Walang binawas sa iyong marka; tingnan mo muli mamaya.';

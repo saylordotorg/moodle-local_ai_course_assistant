@@ -3101,3 +3101,5 @@ $string['outcomes:label_calculation_pending'] = 'गणना हुँदै �
 $string['outcomes:label_stale'] = 'पुरानो तथ्याङ्क';
 $string['outcomes:label_not_released'] = 'अझै प्रकाशित छैन';
 $string['outcomes:label_not_assessed'] = 'मूल्याङ्कन हुँदैन';
+
+$string['outcomes:state_unavailable'] = 'यो नतिजा अहिले उपलब्ध छैन। तपाईंको अङ्क कसैले घटाएको छैन; पछि फेरि हेर्नुहोस्।';

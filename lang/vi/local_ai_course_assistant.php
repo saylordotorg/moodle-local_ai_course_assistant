@@ -3102,3 +3102,5 @@ $string['outcomes:label_calculation_pending'] = 'Đang tính kết quả';
 $string['outcomes:label_stale'] = 'Kết quả đã cũ';
 $string['outcomes:label_not_released'] = 'Chưa công bố';
 $string['outcomes:label_not_assessed'] = 'Không được đánh giá';
+
+$string['outcomes:state_unavailable'] = 'Hiện chưa xem được kết quả này. Bạn không bị trừ điểm nào; hãy kiểm tra lại sau.';

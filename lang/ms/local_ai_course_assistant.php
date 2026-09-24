@@ -3125,3 +3125,5 @@ $string['outcomes:label_calculation_pending'] = 'Sedang dikira';
 $string['outcomes:label_stale'] = 'Sudah lapuk';
 $string['outcomes:label_not_released'] = 'Belum diterbitkan';
 $string['outcomes:label_not_assessed'] = 'Tidak dinilai';
+
+$string['outcomes:state_unavailable'] = 'Keputusan ini tidak tersedia buat masa ini. Tiada sesiapa yang menolak markah anda; sila semak semula kemudian.';

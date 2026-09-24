@@ -3102,3 +3102,5 @@ $string['outcomes:label_calculation_pending'] = 'A ń ṣírò rẹ̀';
 $string['outcomes:label_stale'] = 'Àbájáde ti gbó';
 $string['outcomes:label_not_released'] = 'Kò tí ì tẹ̀ jáde';
 $string['outcomes:label_not_assessed'] = 'Kò sí àyẹ̀wò';
+
+$string['outcomes:state_unavailable'] = 'Àbájáde yìí kò sí ní àkókò yìí. Kò sí ẹnìkan tí ó dín àmì rẹ kù; ṣàyẹ̀wò lẹ́ẹ̀kan sí i nígbà tó bá yá.';

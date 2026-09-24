@@ -3124,3 +3124,5 @@ $string['outcomes:label_calculation_pending'] = 'Υπολογίζεται';
 $string['outcomes:label_stale'] = 'Μη ενημερωμένο';
 $string['outcomes:label_not_released'] = 'Δεν δημοσιεύτηκε ακόμη';
 $string['outcomes:label_not_assessed'] = 'Δεν αξιολογείται';
+
+$string['outcomes:state_unavailable'] = 'Αυτό το αποτέλεσμα δεν είναι διαθέσιμο αυτή τη στιγμή. Κανείς δεν σας έχει αφαιρέσει βαθμούς· ελέγξτε ξανά αργότερα.';

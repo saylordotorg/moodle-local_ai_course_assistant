@@ -3081,3 +3081,5 @@ $string['outcomes:label_calculation_pending'] = 'Trwa wyliczanie';
 $string['outcomes:label_stale'] = 'Nieaktualny wynik';
 $string['outcomes:label_not_released'] = 'Jeszcze nieopublikowany';
 $string['outcomes:label_not_assessed'] = 'Nie jest oceniany';
+
+$string['outcomes:state_unavailable'] = 'Ten wynik jest w tej chwili niedostępny. Nikt nie obniżył Twojego wyniku; sprawdź ponownie później.';

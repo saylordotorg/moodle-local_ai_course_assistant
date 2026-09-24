@@ -3105,3 +3105,5 @@ $string['outcomes:label_calculation_pending'] = 'Wordt berekend';
 $string['outcomes:label_stale'] = 'Verouderd';
 $string['outcomes:label_not_released'] = 'Nog niet gepubliceerd';
 $string['outcomes:label_not_assessed'] = 'Niet beoordeeld';
+
+$string['outcomes:state_unavailable'] = 'Dit resultaat is op dit moment niet beschikbaar. Er is niets van je score afgetrokken; kijk later nog eens.';

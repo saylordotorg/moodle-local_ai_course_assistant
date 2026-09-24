@@ -3126,3 +3126,5 @@ $string['outcomes:label_calculation_pending'] = 'Linakokotolewa';
 $string['outcomes:label_stale'] = 'Limepitwa na wakati';
 $string['outcomes:label_not_released'] = 'Bado halijachapishwa';
 $string['outcomes:label_not_assessed'] = 'Halitathminiwi';
+
+$string['outcomes:state_unavailable'] = 'Tokeo hili halipatikani kwa sasa. Hakuna aliyekupunguzia alama; angalia tena baadaye.';

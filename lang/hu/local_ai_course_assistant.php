@@ -3123,3 +3123,5 @@ $string['outcomes:label_calculation_pending'] = 'Számítás folyamatban';
 $string['outcomes:label_stale'] = 'Elavult érték';
 $string['outcomes:label_not_released'] = 'Közzététel előtt';
 $string['outcomes:label_not_assessed'] = 'Nem értékelik';
+
+$string['outcomes:state_unavailable'] = 'Ez az eredmény most nem érhető el. Senki nem vont le tőled pontot, nézd meg később újra.';

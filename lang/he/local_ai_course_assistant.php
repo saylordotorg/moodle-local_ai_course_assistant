@@ -3123,3 +3123,5 @@ $string['outcomes:label_calculation_pending'] = 'מחושב כעת';
 $string['outcomes:label_stale'] = 'לא מעודכן';
 $string['outcomes:label_not_released'] = 'טרם פורסם';
 $string['outcomes:label_not_assessed'] = 'אינו מוערך';
+
+$string['outcomes:state_unavailable'] = 'התוצאה הזו אינה זמינה כרגע. לא הופחתו לך נקודות; אפשר לבדוק שוב מאוחר יותר.';

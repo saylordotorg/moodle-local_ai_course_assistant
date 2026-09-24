@@ -3126,3 +3126,5 @@ $string['outcomes:label_calculation_pending'] = 'Umphumela uyabalwa';
 $string['outcomes:label_stale'] = 'Sekuphelelwe yisikhathi';
 $string['outcomes:label_not_released'] = 'Awukakhishwa';
 $string['outcomes:label_not_assessed'] = 'Awuhlolwa';
+
+$string['outcomes:state_unavailable'] = 'Lo mphumela awutholakali okwamanje. Akekho owehlise amamaki akho; hlola futhi kamuva.';

@@ -3118,3 +3118,5 @@ $string['outcomes:label_calculation_pending'] = '正在计算中';
 $string['outcomes:label_stale'] = '不是最新';
 $string['outcomes:label_not_released'] = '尚未公布';
 $string['outcomes:label_not_assessed'] = '未评估此成果';
+
+$string['outcomes:state_unavailable'] = '这项结果目前无法显示。没有人扣过你的分数，请稍后再查看。';

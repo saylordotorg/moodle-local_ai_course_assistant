@@ -3109,3 +3109,5 @@ $string['outcomes:label_calculation_pending'] = 'Calculándose';
 $string['outcomes:label_stale'] = 'Desactualizado';
 $string['outcomes:label_not_released'] = 'Sin publicar';
 $string['outcomes:label_not_assessed'] = 'No se evalúa';
+
+$string['outcomes:state_unavailable'] = 'Este resultado no está disponible ahora mismo. No se te ha restado nada; vuelve a consultarlo más tarde.';

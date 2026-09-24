@@ -1875,6 +1875,7 @@ $string['outcomes:state_calculation_pending'] = 'Your result is being worked out
 $string['outcomes:state_stale'] = 'Recent work has not been counted yet, so your result is out of date. It is held back until it has been worked out again.';
 $string['outcomes:state_not_released'] = 'Your result has been worked out but is not published yet.';
 $string['outcomes:state_not_assessed'] = 'This outcome is not assessed in the courses you have taken so far.';
+$string['outcomes:state_unavailable'] = 'This result is not available right now. Nobody has marked it down; check again later.';
 $string['outcomes:threshold_expected'] = 'Expected: {$a}%';
 $string['outcomes:threshold_strong'] = 'Strong: {$a}%';
 $string['outcomes:evidence_from'] = 'Based on {$a->items} graded items across {$a->assessed} of {$a->total} courses.';

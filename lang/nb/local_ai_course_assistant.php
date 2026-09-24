@@ -3080,3 +3080,5 @@ $string['outcomes:label_calculation_pending'] = 'Beregnes nå';
 $string['outcomes:label_stale'] = 'Utdatert';
 $string['outcomes:label_not_released'] = 'Ikke publisert ennå';
 $string['outcomes:label_not_assessed'] = 'Vurderes ikke';
+
+$string['outcomes:state_unavailable'] = 'Dette resultatet er ikke tilgjengelig akkurat nå. Ingen har trukket fra poeng, så sjekk igjen senere.';

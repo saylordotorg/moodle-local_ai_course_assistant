@@ -3081,3 +3081,5 @@ $string['outcomes:label_calculation_pending'] = 'Práve sa počíta';
 $string['outcomes:label_stale'] = 'Neaktuálne';
 $string['outcomes:label_not_released'] = 'Ešte nezverejnené';
 $string['outcomes:label_not_assessed'] = 'Nehodnotí sa';
+
+$string['outcomes:state_unavailable'] = 'Tento výsledok momentálne nie je k dispozícii. Nikto vám zaň neznížil hodnotenie, skúste to skontrolovať neskôr.';

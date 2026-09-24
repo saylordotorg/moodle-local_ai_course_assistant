@@ -3109,3 +3109,5 @@ $string['outcomes:label_calculation_pending'] = 'Ana lissafawa';
 $string['outcomes:label_stale'] = 'Adadin ya tsufa';
 $string['outcomes:label_not_released'] = 'Ba a buga ba tukuna';
 $string['outcomes:label_not_assessed'] = 'Ba a kimanta ba';
+
+$string['outcomes:state_unavailable'] = 'Wannan sakamakon ba ya samuwa a yanzu. Ba a rage maka maki ba; sake duba daga baya.';

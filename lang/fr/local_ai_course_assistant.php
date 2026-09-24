@@ -3083,3 +3083,5 @@ $string['outcomes:label_calculation_pending'] = 'Calcul en cours';
 $string['outcomes:label_stale'] = 'Pas à jour';
 $string['outcomes:label_not_released'] = 'En attente de publication';
 $string['outcomes:label_not_assessed'] = 'Non évalué';
+
+$string['outcomes:state_unavailable'] = 'Ce résultat n\'est pas disponible pour le moment. Personne n\'a baissé votre note ; revenez vérifier plus tard.';

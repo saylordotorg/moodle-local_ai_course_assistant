@@ -3122,3 +3122,5 @@ $string['outcomes:label_calculation_pending'] = 'Calcolo in corso';
 $string['outcomes:label_stale'] = 'Non aggiornato';
 $string['outcomes:label_not_released'] = 'Non ancora pubblicato';
 $string['outcomes:label_not_assessed'] = 'Non valutato nei corsi';
+
+$string['outcomes:state_unavailable'] = 'Questo esito non è disponibile in questo momento. Nessuno ha abbassato il tuo punteggio: controlla di nuovo più tardi.';

@@ -3113,3 +3113,5 @@ $string['outcomes:label_calculation_pending'] = 'Shallagamaa jira';
 $string['outcomes:label_stale'] = 'Bu\'aa durii';
 $string['outcomes:label_not_released'] = 'Ammaaf hin maxxanfamne';
 $string['outcomes:label_not_assessed'] = 'Hin madaalamu';
+
+$string['outcomes:state_unavailable'] = 'Bu\'aan kun yeroo ammaatti hin argamu. Namni tokkollee qabxii keessan hin hir\'isne; booda irra deebi\'aa ilaalaa.';

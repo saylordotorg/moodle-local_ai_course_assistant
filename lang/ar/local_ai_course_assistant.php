@@ -3080,3 +3080,5 @@ $string['outcomes:label_calculation_pending'] = 'جارٍ الاحتساب';
 $string['outcomes:label_stale'] = 'غير محدَّثة';
 $string['outcomes:label_not_released'] = 'لم تُنشر بعد';
 $string['outcomes:label_not_assessed'] = 'لا تُقيَّم';
+
+$string['outcomes:state_unavailable'] = 'هذه النتيجة غير متاحة في الوقت الحالي. لم تُخفَّض درجتك ولم يُحتسَب شيء ضدك؛ تحقَّق مرة أخرى لاحقًا.';

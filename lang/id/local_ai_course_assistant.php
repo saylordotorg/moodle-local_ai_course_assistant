@@ -3134,3 +3134,5 @@ $string['outcomes:label_calculation_pending'] = 'Sedang dihitung';
 $string['outcomes:label_stale'] = 'Tidak mutakhir';
 $string['outcomes:label_not_released'] = 'Belum dipublikasikan';
 $string['outcomes:label_not_assessed'] = 'Tidak dinilai';
+
+$string['outcomes:state_unavailable'] = 'Hasil ini tidak tersedia saat ini. Nilai Anda tidak dikurangi; silakan periksa kembali nanti.';

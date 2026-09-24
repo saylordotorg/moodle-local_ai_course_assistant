@@ -3110,3 +3110,5 @@ $string['outcomes:label_calculation_pending'] = 'A bɛ jate sisan';
 $string['outcomes:label_stale'] = 'Hakɛ kɔrɔla';
 $string['outcomes:label_not_released'] = 'A ma jira fɔlɔ';
 $string['outcomes:label_not_assessed'] = 'Jate tɛ a la';
+
+$string['outcomes:state_unavailable'] = 'Nin ɲɛtaa in tɛ sɔrɔ sisan. Mɔgɔ si ma foyi bɔ i ka hakɛ la, segin k\'a filɛ kɔfɛ.';

@@ -3126,3 +3126,5 @@ $string['outcomes:label_calculation_pending'] = 'Waa la xisaabinayaa';
 $string['outcomes:label_stale'] = 'Waa duugoobay';
 $string['outcomes:label_not_released'] = 'Weli lama daabicin';
 $string['outcomes:label_not_assessed'] = 'Lama qiimeeyo';
+
+$string['outcomes:state_unavailable'] = 'Natiijadan hadda lama heli karo. Cidna dhibcahaaga waxba kama dhimin; fadlan mar kale hubi goor dambe.';

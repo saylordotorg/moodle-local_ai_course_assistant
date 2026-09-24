@@ -3102,3 +3102,5 @@ $string['outcomes:label_calculation_pending'] = 'ਕੱਢਿਆ ਜਾ ਰਿ�
 $string['outcomes:label_stale'] = 'ਪੁਰਾਣਾ ਅੰਕੜਾ';
 $string['outcomes:label_not_released'] = 'ਅਜੇ ਪ੍ਰਕਾਸ਼ਿਤ ਨਹੀਂ';
 $string['outcomes:label_not_assessed'] = 'ਮੁਲਾਂਕਣ ਨਹੀਂ ਹੁੰਦਾ';
+
+$string['outcomes:state_unavailable'] = 'ਇਹ ਨਤੀਜਾ ਇਸ ਵੇਲੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ, ਪਰ ਕਿਸੇ ਨੇ ਤੁਹਾਡੇ ਅੰਕ ਨਹੀਂ ਘਟਾਏ। ਕਿਰਪਾ ਕਰਕੇ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਵੇਖੋ।';

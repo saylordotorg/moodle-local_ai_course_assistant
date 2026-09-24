@@ -3082,3 +3082,5 @@ $string['outcomes:label_calculation_pending'] = 'Právě se počítá';
 $string['outcomes:label_stale'] = 'Zastaralý údaj';
 $string['outcomes:label_not_released'] = 'Zatím nezveřejněno';
 $string['outcomes:label_not_assessed'] = 'Nehodnotí se';
+
+$string['outcomes:state_unavailable'] = 'Tento výsledek teď není k dispozici. Nikdo vám nestrhl žádné body, zkuste to prosím znovu později.';

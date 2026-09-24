@@ -3082,3 +3082,5 @@ $string['outcomes:label_calculation_pending'] = 'Lasketaan parhaillaan';
 $string['outcomes:label_stale'] = 'Ei ajan tasalla';
 $string['outcomes:label_not_released'] = 'Odottaa julkaisua';
 $string['outcomes:label_not_assessed'] = 'Ei arvioida kursseillasi';
+
+$string['outcomes:state_unavailable'] = 'Tämä tulos ei ole juuri nyt saatavilla. Kukaan ei ole vähentänyt pisteitäsi; tarkista tilanne myöhemmin uudelleen.';

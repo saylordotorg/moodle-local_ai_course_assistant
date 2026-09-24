@@ -3103,3 +3103,5 @@ $string['outcomes:label_calculation_pending'] = 'கணக்கிடப்ப�
 $string['outcomes:label_stale'] = 'பழைய முடிவு';
 $string['outcomes:label_not_released'] = 'இன்னும் வெளியிடப்படவில்லை';
 $string['outcomes:label_not_assessed'] = 'மதிப்பீடு செய்யப்படுவதில்லை';
+
+$string['outcomes:state_unavailable'] = 'இந்த முடிவு இப்போது கிடைக்கவில்லை. யாரும் உங்கள் மதிப்பெண்ணைக் குறைக்கவில்லை; சிறிது நேரம் கழித்து மீண்டும் பார்க்கவும்.';
