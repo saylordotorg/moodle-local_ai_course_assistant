@@ -3076,3 +3076,9 @@ $string['usertesting_admin:title_course'] = 'Käytettävyystestauksen editori: {
 $string['usertesting_admin:title_global'] = 'Käytettävyystestauksen editori: globaali oletus';
 $string['usertesting_admin:type_action_then_rate'] = 'Toiminto + arviointi';
 $string['usertesting_admin:type_free_response'] = 'Vapaa vastaus';
+
+$string['outcomes:label_insufficient_evidence'] = 'Ei vielä tulosta';
+$string['outcomes:label_calculation_pending'] = 'Lasketaan parhaillaan';
+$string['outcomes:label_stale'] = 'Ei ajan tasalla';
+$string['outcomes:label_not_released'] = 'Odottaa julkaisua';
+$string['outcomes:label_not_assessed'] = 'Ei arvioida kursseillasi';

@@ -3120,3 +3120,9 @@ $string['usertesting_admin:title_course'] = 'Tafatiraha tijaabinta isticmaalka f
 $string['usertesting_admin:title_global'] = 'Tafatiraha tijaabinta isticmaalka fudud: caadiga guud';
 $string['usertesting_admin:type_action_then_rate'] = 'Ficil + qiimee';
 $string['usertesting_admin:type_free_response'] = 'Jawaab xor ah';
+
+$string['outcomes:label_insufficient_evidence'] = 'Weli natiijo ma jirto';
+$string['outcomes:label_calculation_pending'] = 'Waa la xisaabinayaa';
+$string['outcomes:label_stale'] = 'Waa duugoobay';
+$string['outcomes:label_not_released'] = 'Weli lama daabicin';
+$string['outcomes:label_not_assessed'] = 'Lama qiimeeyo';

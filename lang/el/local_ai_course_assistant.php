@@ -3118,3 +3118,9 @@ $string['usertesting_admin:title_course'] = 'Επεξεργαστής δοκιμ
 $string['usertesting_admin:title_global'] = 'Επεξεργαστής δοκιμών ευχρηστίας: καθολική προεπιλογή';
 $string['usertesting_admin:type_action_then_rate'] = 'Ενέργεια + βαθμολόγηση';
 $string['usertesting_admin:type_free_response'] = 'Ελεύθερη απάντηση';
+
+$string['outcomes:label_insufficient_evidence'] = 'Ανεπαρκή δεδομένα';
+$string['outcomes:label_calculation_pending'] = 'Υπολογίζεται';
+$string['outcomes:label_stale'] = 'Μη ενημερωμένο';
+$string['outcomes:label_not_released'] = 'Δεν δημοσιεύτηκε ακόμη';
+$string['outcomes:label_not_assessed'] = 'Δεν αξιολογείται';

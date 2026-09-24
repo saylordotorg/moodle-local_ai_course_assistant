@@ -3074,3 +3074,9 @@ $string['usertesting_admin:title_course'] = 'ユーザビリティテストエ�
 $string['usertesting_admin:title_global'] = 'ユーザビリティテストエディター: グローバルデフォルト';
 $string['usertesting_admin:type_action_then_rate'] = 'アクション + 評価';
 $string['usertesting_admin:type_free_response'] = '自由記述';
+
+$string['outcomes:label_insufficient_evidence'] = '採点データ待ち';
+$string['outcomes:label_calculation_pending'] = '算出中';
+$string['outcomes:label_stale'] = '最新ではありません';
+$string['outcomes:label_not_released'] = '公開待ち';
+$string['outcomes:label_not_assessed'] = '評価対象外';

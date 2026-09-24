@@ -3077,3 +3077,9 @@ $string['usertesting_admin:title_course'] = 'Éditeur de tests d\'utilisabilité
 $string['usertesting_admin:title_global'] = 'Éditeur de tests d\'utilisabilité : valeur par défaut globale';
 $string['usertesting_admin:type_action_then_rate'] = 'Action + évaluation';
 $string['usertesting_admin:type_free_response'] = 'Réponse libre';
+
+$string['outcomes:label_insufficient_evidence'] = 'Pas encore de résultat';
+$string['outcomes:label_calculation_pending'] = 'Calcul en cours';
+$string['outcomes:label_stale'] = 'Pas à jour';
+$string['outcomes:label_not_released'] = 'En attente de publication';
+$string['outcomes:label_not_assessed'] = 'Non évalué';

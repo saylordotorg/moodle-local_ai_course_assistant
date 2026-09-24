@@ -3076,3 +3076,9 @@ $string['usertesting_admin:title_course'] = 'Редактор за тества�
 $string['usertesting_admin:title_global'] = 'Редактор за тестване на използваемостта: глобална стойност по подразбиране';
 $string['usertesting_admin:type_action_then_rate'] = 'Действие + оценка';
 $string['usertesting_admin:type_free_response'] = 'Свободен отговор';
+
+$string['outcomes:label_insufficient_evidence'] = 'Още няма резултат';
+$string['outcomes:label_calculation_pending'] = 'Изчислява се';
+$string['outcomes:label_stale'] = 'Остаряла стойност';
+$string['outcomes:label_not_released'] = 'Очаква публикуване';
+$string['outcomes:label_not_assessed'] = 'Не се оценява';

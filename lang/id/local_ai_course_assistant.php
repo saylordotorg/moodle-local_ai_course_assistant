@@ -3128,3 +3128,9 @@ $string['usertesting_admin:title_course'] = 'Editor uji kebergunaan: {$a}';
 $string['usertesting_admin:title_global'] = 'Editor uji kebergunaan: default global';
 $string['usertesting_admin:type_action_then_rate'] = 'Aksi + nilai';
 $string['usertesting_admin:type_free_response'] = 'Respons bebas';
+
+$string['outcomes:label_insufficient_evidence'] = 'Belum ada hasil';
+$string['outcomes:label_calculation_pending'] = 'Sedang dihitung';
+$string['outcomes:label_stale'] = 'Tidak mutakhir';
+$string['outcomes:label_not_released'] = 'Belum dipublikasikan';
+$string['outcomes:label_not_assessed'] = 'Tidak dinilai';

@@ -3117,3 +3117,9 @@ $string['usertesting_admin:title_course'] = 'עורך בדיקות השמישו�
 $string['usertesting_admin:title_global'] = 'עורך בדיקות השמישות: ברירת מחדל גלובלית';
 $string['usertesting_admin:type_action_then_rate'] = 'פעולה + דירוג';
 $string['usertesting_admin:type_free_response'] = 'תשובה חופשית';
+
+$string['outcomes:label_insufficient_evidence'] = 'עדיין אין תוצאה';
+$string['outcomes:label_calculation_pending'] = 'מחושב כעת';
+$string['outcomes:label_stale'] = 'לא מעודכן';
+$string['outcomes:label_not_released'] = 'טרם פורסם';
+$string['outcomes:label_not_assessed'] = 'אינו מוערך';

@@ -3099,3 +3099,9 @@ $string['usertesting_admin:title_course'] = 'Editor voor gebruikstests: {$a}';
 $string['usertesting_admin:title_global'] = 'Editor voor gebruikstests: globale standaard';
 $string['usertesting_admin:type_action_then_rate'] = 'Actie + beoordeling';
 $string['usertesting_admin:type_free_response'] = 'Vrij antwoord';
+
+$string['outcomes:label_insufficient_evidence'] = 'Nog geen resultaat';
+$string['outcomes:label_calculation_pending'] = 'Wordt berekend';
+$string['outcomes:label_stale'] = 'Verouderd';
+$string['outcomes:label_not_released'] = 'Nog niet gepubliceerd';
+$string['outcomes:label_not_assessed'] = 'Niet beoordeeld';

@@ -3075,3 +3075,9 @@ $string['usertesting_admin:title_course'] = 'Redigerare för användbarhetsteste
 $string['usertesting_admin:title_global'] = 'Redigerare för användbarhetstester: globalt standardvärde';
 $string['usertesting_admin:type_action_then_rate'] = 'Åtgärd + betyg';
 $string['usertesting_admin:type_free_response'] = 'Fritt svar';
+
+$string['outcomes:label_insufficient_evidence'] = 'Inget resultat ännu';
+$string['outcomes:label_calculation_pending'] = 'Räknas fram nu';
+$string['outcomes:label_stale'] = 'Inaktuellt resultat';
+$string['outcomes:label_not_released'] = 'Ännu inte publicerat';
+$string['outcomes:label_not_assessed'] = 'Bedöms inte';

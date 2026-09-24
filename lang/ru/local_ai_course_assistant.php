@@ -3096,3 +3096,9 @@ $string['usertesting_admin:title_course'] = 'Редактор тестирова
 $string['usertesting_admin:title_global'] = 'Редактор тестирования удобства использования: глобальный набор по умолчанию';
 $string['usertesting_admin:type_action_then_rate'] = 'Действие + оценка';
 $string['usertesting_admin:type_free_response'] = 'Свободный ответ';
+
+$string['outcomes:label_insufficient_evidence'] = 'Результата пока нет';
+$string['outcomes:label_calculation_pending'] = 'Идёт расчёт';
+$string['outcomes:label_stale'] = 'Значение устарело';
+$string['outcomes:label_not_released'] = 'Пока не опубликован';
+$string['outcomes:label_not_assessed'] = 'Не оценивается';

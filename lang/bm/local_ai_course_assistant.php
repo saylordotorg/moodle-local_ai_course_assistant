@@ -3104,3 +3104,9 @@ $string['usertesting_admin:title_course'] = 'Baarakɛcogo kɔrɔbɔli yɛlɛmala
 $string['usertesting_admin:title_global'] = 'Baarakɛcogo kɔrɔbɔli yɛlɛmalan: global fɔlɔ ta';
 $string['usertesting_admin:type_action_then_rate'] = 'Kɛwale + jateminɛ';
 $string['usertesting_admin:type_free_response'] = 'Jaabi hɔrɔn';
+
+$string['outcomes:label_insufficient_evidence'] = 'Baara ma caya fɔlɔ';
+$string['outcomes:label_calculation_pending'] = 'A bɛ jate sisan';
+$string['outcomes:label_stale'] = 'Hakɛ kɔrɔla';
+$string['outcomes:label_not_released'] = 'A ma jira fɔlɔ';
+$string['outcomes:label_not_assessed'] = 'Jate tɛ a la';

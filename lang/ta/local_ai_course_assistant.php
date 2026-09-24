@@ -3097,3 +3097,9 @@ $string['usertesting_admin:title_course'] = 'பயன்பாட்டுத�
 $string['usertesting_admin:title_global'] = 'பயன்பாட்டுத் திறன் சோதனைத் திருத்தி: உலகளாவிய இயல்புநிலை';
 $string['usertesting_admin:type_action_then_rate'] = 'செயல் + மதிப்பீடு';
 $string['usertesting_admin:type_free_response'] = 'சுதந்திரப் பதில்';
+
+$string['outcomes:label_insufficient_evidence'] = 'முடிவு இன்னும் இல்லை';
+$string['outcomes:label_calculation_pending'] = 'கணக்கிடப்பட்டு வருகிறது';
+$string['outcomes:label_stale'] = 'பழைய முடிவு';
+$string['outcomes:label_not_released'] = 'இன்னும் வெளியிடப்படவில்லை';
+$string['outcomes:label_not_assessed'] = 'மதிப்பீடு செய்யப்படுவதில்லை';

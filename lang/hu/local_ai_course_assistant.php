@@ -3117,3 +3117,9 @@ $string['usertesting_admin:title_course'] = 'Használhatósági tesztelés szerk
 $string['usertesting_admin:title_global'] = 'Használhatósági tesztelés szerkesztője: globális alapértelmezés';
 $string['usertesting_admin:type_action_then_rate'] = 'Művelet + értékelés';
 $string['usertesting_admin:type_free_response'] = 'Szabad válasz';
+
+$string['outcomes:label_insufficient_evidence'] = 'Még nincs eredmény';
+$string['outcomes:label_calculation_pending'] = 'Számítás folyamatban';
+$string['outcomes:label_stale'] = 'Elavult érték';
+$string['outcomes:label_not_released'] = 'Közzététel előtt';
+$string['outcomes:label_not_assessed'] = 'Nem értékelik';

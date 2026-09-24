@@ -3096,3 +3096,9 @@ $string['usertesting_admin:title_course'] = 'Soppikatu natteb yombaayu jëfandik
 $string['usertesting_admin:title_global'] = 'Soppikatu natteb yombaayu jëfandikoo: li ñu def ci sit bi';
 $string['usertesting_admin:type_action_then_rate'] = 'Jëf + natt';
 $string['usertesting_admin:type_free_response'] = 'Tontu bu ubbeeku';
+
+$string['outcomes:label_insufficient_evidence'] = 'Liggéey doyagul';
+$string['outcomes:label_calculation_pending'] = 'Ñu ngi ko xayma';
+$string['outcomes:label_stale'] = 'Limu bi yàgg na';
+$string['outcomes:label_not_released'] = 'Génnewuñu ko ba tey';
+$string['outcomes:label_not_assessed'] = 'Assessewuñu ko';

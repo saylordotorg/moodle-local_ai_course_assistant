@@ -3074,3 +3074,9 @@ $string['usertesting_admin:title_course'] = '사용성 테스트 편집기: {$a}
 $string['usertesting_admin:title_global'] = '사용성 테스트 편집기: 글로벌 기본값';
 $string['usertesting_admin:type_action_then_rate'] = '실행 + 평가';
 $string['usertesting_admin:type_free_response'] = '자유 응답';
+
+$string['outcomes:label_insufficient_evidence'] = '아직 결과 없음';
+$string['outcomes:label_calculation_pending'] = '결과 산출 중';
+$string['outcomes:label_stale'] = '최신 정보 아님';
+$string['outcomes:label_not_released'] = '아직 공개 전';
+$string['outcomes:label_not_assessed'] = '평가 대상 아님';

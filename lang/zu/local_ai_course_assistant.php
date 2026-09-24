@@ -3120,3 +3120,9 @@ $string['usertesting_admin:title_course'] = 'Umhleli wokuhlola ukusebenziseka: {
 $string['usertesting_admin:title_global'] = 'Umhleli wokuhlola ukusebenziseka: okuzenzakalelayo komhlaba wonke';
 $string['usertesting_admin:type_action_then_rate'] = 'Isenzo + isilinganiso';
 $string['usertesting_admin:type_free_response'] = 'Impendulo ekhululekile';
+
+$string['outcomes:label_insufficient_evidence'] = 'Awukho umphumela okwamanje';
+$string['outcomes:label_calculation_pending'] = 'Umphumela uyabalwa';
+$string['outcomes:label_stale'] = 'Sekuphelelwe yisikhathi';
+$string['outcomes:label_not_released'] = 'Awukakhishwa';
+$string['outcomes:label_not_assessed'] = 'Awuhlolwa';

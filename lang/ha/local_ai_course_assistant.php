@@ -3103,3 +3103,9 @@ $string['usertesting_admin:title_course'] = 'Editan gwajin sauƙin amfani: {$a}'
 $string['usertesting_admin:title_global'] = 'Editan gwajin sauƙin amfani: tsoho na gaba ɗaya';
 $string['usertesting_admin:type_action_then_rate'] = 'Aiki + kima';
 $string['usertesting_admin:type_free_response'] = 'Amsa a buɗe';
+
+$string['outcomes:label_insufficient_evidence'] = 'Babu sakamako tukuna';
+$string['outcomes:label_calculation_pending'] = 'Ana lissafawa';
+$string['outcomes:label_stale'] = 'Adadin ya tsufa';
+$string['outcomes:label_not_released'] = 'Ba a buga ba tukuna';
+$string['outcomes:label_not_assessed'] = 'Ba a kimanta ba';

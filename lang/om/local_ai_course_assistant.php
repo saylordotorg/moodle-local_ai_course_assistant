@@ -3107,3 +3107,9 @@ $string['usertesting_admin:title_course'] = 'Gulaalaa qorannoo fayyadamummaa: {$
 $string['usertesting_admin:title_global'] = 'Gulaalaa qorannoo fayyadamummaa: durtii idila-addunyaa';
 $string['usertesting_admin:type_action_then_rate'] = 'Gocha + madaallii';
 $string['usertesting_admin:type_free_response'] = 'Deebii bilisaa';
+
+$string['outcomes:label_insufficient_evidence'] = 'Ammaaf bu\'aan hin jiru';
+$string['outcomes:label_calculation_pending'] = 'Shallagamaa jira';
+$string['outcomes:label_stale'] = 'Bu\'aa durii';
+$string['outcomes:label_not_released'] = 'Ammaaf hin maxxanfamne';
+$string['outcomes:label_not_assessed'] = 'Hin madaalamu';

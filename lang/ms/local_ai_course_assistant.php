@@ -3119,3 +3119,9 @@ $string['usertesting_admin:title_course'] = 'Penyunting ujian kebolehgunaan: {$a
 $string['usertesting_admin:title_global'] = 'Penyunting ujian kebolehgunaan: lalai global';
 $string['usertesting_admin:type_action_then_rate'] = 'Tindakan + nilai';
 $string['usertesting_admin:type_free_response'] = 'Respons bebas';
+
+$string['outcomes:label_insufficient_evidence'] = 'Belum ada keputusan';
+$string['outcomes:label_calculation_pending'] = 'Sedang dikira';
+$string['outcomes:label_stale'] = 'Sudah lapuk';
+$string['outcomes:label_not_released'] = 'Belum diterbitkan';
+$string['outcomes:label_not_assessed'] = 'Tidak dinilai';

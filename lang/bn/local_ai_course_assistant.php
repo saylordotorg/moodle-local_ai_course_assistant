@@ -3074,3 +3074,9 @@ $string['usertesting_admin:title_course'] = 'ব্যবহারযোগ্�
 $string['usertesting_admin:title_global'] = 'ব্যবহারযোগ্যতা পরীক্ষা সম্পাদক: গ্লোবাল ডিফল্ট';
 $string['usertesting_admin:type_action_then_rate'] = 'কাজ + মূল্যায়ন';
 $string['usertesting_admin:type_free_response'] = 'মুক্ত উত্তর';
+
+$string['outcomes:label_insufficient_evidence'] = 'এখনও ফলাফল নেই';
+$string['outcomes:label_calculation_pending'] = 'নির্ণয় করা হচ্ছে';
+$string['outcomes:label_stale'] = 'হালনাগাদ নয়';
+$string['outcomes:label_not_released'] = 'প্রকাশ করা হয়নি';
+$string['outcomes:label_not_assessed'] = 'মূল্যায়ন করা হয় না';

@@ -3112,3 +3112,9 @@ $string['usertesting_admin:title_course'] = '可用性测试编辑器：{$a}';
 $string['usertesting_admin:title_global'] = '可用性测试编辑器：全局默认';
 $string['usertesting_admin:type_action_then_rate'] = '操作 + 评分';
 $string['usertesting_admin:type_free_response'] = '自由作答';
+
+$string['outcomes:label_insufficient_evidence'] = '暂无结果';
+$string['outcomes:label_calculation_pending'] = '正在计算中';
+$string['outcomes:label_stale'] = '不是最新';
+$string['outcomes:label_not_released'] = '尚未公布';
+$string['outcomes:label_not_assessed'] = '未评估此成果';

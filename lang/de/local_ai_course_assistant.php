@@ -3076,3 +3076,9 @@ $string['usertesting_admin:title_course'] = 'Editor für Usability-Tests: {$a}';
 $string['usertesting_admin:title_global'] = 'Editor für Usability-Tests: globaler Standard';
 $string['usertesting_admin:type_action_then_rate'] = 'Aktion + Bewertung';
 $string['usertesting_admin:type_free_response'] = 'Freie Antwort';
+
+$string['outcomes:label_insufficient_evidence'] = 'Noch kein Ergebnis';
+$string['outcomes:label_calculation_pending'] = 'Wird berechnet';
+$string['outcomes:label_stale'] = 'Nicht aktuell';
+$string['outcomes:label_not_released'] = 'Noch nicht veröffentlicht';
+$string['outcomes:label_not_assessed'] = 'Wird nicht bewertet';

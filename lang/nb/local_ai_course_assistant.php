@@ -3074,3 +3074,9 @@ $string['usertesting_admin:title_course'] = 'Redigering av brukskvalitetstesting
 $string['usertesting_admin:title_global'] = 'Redigering av brukskvalitetstesting: global standard';
 $string['usertesting_admin:type_action_then_rate'] = 'Handling + vurdering';
 $string['usertesting_admin:type_free_response'] = 'Fritekstsvar';
+
+$string['outcomes:label_insufficient_evidence'] = 'Ikke noe resultat ennå';
+$string['outcomes:label_calculation_pending'] = 'Beregnes nå';
+$string['outcomes:label_stale'] = 'Utdatert';
+$string['outcomes:label_not_released'] = 'Ikke publisert ennå';
+$string['outcomes:label_not_assessed'] = 'Vurderes ikke';

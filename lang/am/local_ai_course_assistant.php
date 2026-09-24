@@ -3103,3 +3103,9 @@ $string['usertesting_admin:title_course'] = 'የተጠቃሚነት ምርመራ 
 $string['usertesting_admin:title_global'] = 'የተጠቃሚነት ምርመራ አስተካካይ፦ ዓለም አቀፍ ነባሪ';
 $string['usertesting_admin:type_action_then_rate'] = 'ተግባር + ደረጃ';
 $string['usertesting_admin:type_free_response'] = 'ነጻ ምላሽ';
+
+$string['outcomes:label_insufficient_evidence'] = 'ገና በቂ ግምገማ የለም';
+$string['outcomes:label_calculation_pending'] = 'እየተሰላ ነው';
+$string['outcomes:label_stale'] = 'ያረጀ አኃዝ';
+$string['outcomes:label_not_released'] = 'ገና አልታተመም';
+$string['outcomes:label_not_assessed'] = 'በኮርሶችህ አይገመገምም';

@@ -3096,3 +3096,9 @@ $string['usertesting_admin:title_course'] = 'ਵਰਤੋਂਯੋਗਤਾ ਟ�
 $string['usertesting_admin:title_global'] = 'ਵਰਤੋਂਯੋਗਤਾ ਟੈਸਟਿੰਗ ਸੰਪਾਦਕ: ਗਲੋਬਲ ਡਿਫ਼ਾਲਟ';
 $string['usertesting_admin:type_action_then_rate'] = 'ਕਾਰਵਾਈ + ਰੇਟਿੰਗ';
 $string['usertesting_admin:type_free_response'] = 'ਖੁੱਲ੍ਹਾ ਜਵਾਬ';
+
+$string['outcomes:label_insufficient_evidence'] = 'ਅਜੇ ਨਤੀਜਾ ਨਹੀਂ';
+$string['outcomes:label_calculation_pending'] = 'ਕੱਢਿਆ ਜਾ ਰਿਹਾ';
+$string['outcomes:label_stale'] = 'ਪੁਰਾਣਾ ਅੰਕੜਾ';
+$string['outcomes:label_not_released'] = 'ਅਜੇ ਪ੍ਰਕਾਸ਼ਿਤ ਨਹੀਂ';
+$string['outcomes:label_not_assessed'] = 'ਮੁਲਾਂਕਣ ਨਹੀਂ ਹੁੰਦਾ';

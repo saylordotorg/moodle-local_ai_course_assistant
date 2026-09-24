@@ -3103,3 +3103,9 @@ $string['usertesting_admin:title_course'] = 'Editor de pruebas de usabilidad: {$
 $string['usertesting_admin:title_global'] = 'Editor de pruebas de usabilidad: valor predeterminado global';
 $string['usertesting_admin:type_action_then_rate'] = 'Acción + valoración';
 $string['usertesting_admin:type_free_response'] = 'Respuesta libre';
+
+$string['outcomes:label_insufficient_evidence'] = 'Aún sin resultado';
+$string['outcomes:label_calculation_pending'] = 'Calculándose';
+$string['outcomes:label_stale'] = 'Desactualizado';
+$string['outcomes:label_not_released'] = 'Sin publicar';
+$string['outcomes:label_not_assessed'] = 'No se evalúa';

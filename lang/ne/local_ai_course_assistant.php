@@ -3095,3 +3095,9 @@ $string['usertesting_admin:title_course'] = 'प्रयोगयोग्य�
 $string['usertesting_admin:title_global'] = 'प्रयोगयोग्यता परीक्षण सम्पादक: विश्वव्यापी पूर्वनिर्धारित';
 $string['usertesting_admin:type_action_then_rate'] = 'कार्य + मूल्याङ्कन';
 $string['usertesting_admin:type_free_response'] = 'स्वतन्त्र उत्तर';
+
+$string['outcomes:label_insufficient_evidence'] = 'नतिजा अझै छैन';
+$string['outcomes:label_calculation_pending'] = 'गणना हुँदै छ';
+$string['outcomes:label_stale'] = 'पुरानो तथ्याङ्क';
+$string['outcomes:label_not_released'] = 'अझै प्रकाशित छैन';
+$string['outcomes:label_not_assessed'] = 'मूल्याङ्कन हुँदैन';

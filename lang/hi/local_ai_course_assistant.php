@@ -3104,3 +3104,9 @@ $string['usertesting_admin:title_course'] = 'उपयोगिता परी�
 $string['usertesting_admin:title_global'] = 'उपयोगिता परीक्षण संपादक: वैश्विक डिफ़ॉल्ट';
 $string['usertesting_admin:type_action_then_rate'] = 'क्रिया + रेटिंग';
 $string['usertesting_admin:type_free_response'] = 'मुक्त उत्तर';
+
+$string['outcomes:label_insufficient_evidence'] = 'अभी कोई परिणाम नहीं';
+$string['outcomes:label_calculation_pending'] = 'निकाला जा रहा है';
+$string['outcomes:label_stale'] = 'पुराना आँकड़ा';
+$string['outcomes:label_not_released'] = 'अभी प्रकाशित नहीं';
+$string['outcomes:label_not_assessed'] = 'मूल्यांकन नहीं होता';

@@ -3120,3 +3120,9 @@ $string['usertesting_admin:title_course'] = 'Editor ng usability testing: {$a}';
 $string['usertesting_admin:title_global'] = 'Editor ng usability testing: global na default';
 $string['usertesting_admin:type_action_then_rate'] = 'Aksyon + markahan';
 $string['usertesting_admin:type_free_response'] = 'Malayang sagot';
+
+$string['outcomes:label_insufficient_evidence'] = 'Wala pang resulta';
+$string['outcomes:label_calculation_pending'] = 'Kinakalkula pa';
+$string['outcomes:label_stale'] = 'Luma na';
+$string['outcomes:label_not_released'] = 'Hindi pa nailalathala';
+$string['outcomes:label_not_assessed'] = 'Hindi ina-assess';

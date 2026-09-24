@@ -3076,3 +3076,9 @@ $string['usertesting_admin:title_course'] = 'Editor til brugervenlighedstest: {$
 $string['usertesting_admin:title_global'] = 'Editor til brugervenlighedstest: global standard';
 $string['usertesting_admin:type_action_then_rate'] = 'Handling + bedømmelse';
 $string['usertesting_admin:type_free_response'] = 'Frit svar';
+
+$string['outcomes:label_insufficient_evidence'] = 'Intet resultat endnu';
+$string['outcomes:label_calculation_pending'] = 'Under beregning';
+$string['outcomes:label_stale'] = 'Forældet resultat';
+$string['outcomes:label_not_released'] = 'Ikke offentliggjort';
+$string['outcomes:label_not_assessed'] = 'Bedømmes ikke';

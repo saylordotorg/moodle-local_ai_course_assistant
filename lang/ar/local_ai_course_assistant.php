@@ -3074,3 +3074,9 @@ $string['usertesting_admin:title_course'] = 'محرر اختبار قابلية 
 $string['usertesting_admin:title_global'] = 'محرر اختبار قابلية الاستخدام: الافتراضي العام';
 $string['usertesting_admin:type_action_then_rate'] = 'إجراء + تقييم';
 $string['usertesting_admin:type_free_response'] = 'إجابة حرة';
+
+$string['outcomes:label_insufficient_evidence'] = 'لا توجد نتيجة بعد';
+$string['outcomes:label_calculation_pending'] = 'جارٍ الاحتساب';
+$string['outcomes:label_stale'] = 'غير محدَّثة';
+$string['outcomes:label_not_released'] = 'لم تُنشر بعد';
+$string['outcomes:label_not_assessed'] = 'لا تُقيَّم';

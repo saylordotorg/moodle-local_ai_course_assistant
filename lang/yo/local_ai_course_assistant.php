@@ -3096,3 +3096,9 @@ $string['usertesting_admin:title_course'] = 'Olùṣàtúnṣe ìdánwò ìṣe�
 $string['usertesting_admin:title_global'] = 'Olùṣàtúnṣe ìdánwò ìṣeéṣelò: àbáwọlé àgbáyé';
 $string['usertesting_admin:type_action_then_rate'] = 'Ìṣe + ìwọ̀n';
 $string['usertesting_admin:type_free_response'] = 'Ìdáhùn ọ̀fẹ́';
+
+$string['outcomes:label_insufficient_evidence'] = 'Iṣẹ́ àmì kò tó';
+$string['outcomes:label_calculation_pending'] = 'A ń ṣírò rẹ̀';
+$string['outcomes:label_stale'] = 'Àbájáde ti gbó';
+$string['outcomes:label_not_released'] = 'Kò tí ì tẹ̀ jáde';
+$string['outcomes:label_not_assessed'] = 'Kò sí àyẹ̀wò';

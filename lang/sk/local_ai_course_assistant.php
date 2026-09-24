@@ -3075,3 +3075,9 @@ $string['usertesting_admin:title_course'] = 'Editor testovania použiteľnosti: 
 $string['usertesting_admin:title_global'] = 'Editor testovania použiteľnosti: globálne predvolené nastavenie';
 $string['usertesting_admin:type_action_then_rate'] = 'Akcia + hodnotenie';
 $string['usertesting_admin:type_free_response'] = 'Voľná odpoveď';
+
+$string['outcomes:label_insufficient_evidence'] = 'Zatiaľ bez výsledku';
+$string['outcomes:label_calculation_pending'] = 'Práve sa počíta';
+$string['outcomes:label_stale'] = 'Neaktuálne';
+$string['outcomes:label_not_released'] = 'Ešte nezverejnené';
+$string['outcomes:label_not_assessed'] = 'Nehodnotí sa';

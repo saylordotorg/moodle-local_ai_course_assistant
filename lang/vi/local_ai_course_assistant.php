@@ -3096,3 +3096,9 @@ $string['usertesting_admin:title_course'] = 'Trình chỉnh sửa kiểm thử k
 $string['usertesting_admin:title_global'] = 'Trình chỉnh sửa kiểm thử khả dụng: mặc định toàn cục';
 $string['usertesting_admin:type_action_then_rate'] = 'Hành động + đánh giá';
 $string['usertesting_admin:type_free_response'] = 'Trả lời tự do';
+
+$string['outcomes:label_insufficient_evidence'] = 'Chưa có kết quả';
+$string['outcomes:label_calculation_pending'] = 'Đang tính kết quả';
+$string['outcomes:label_stale'] = 'Kết quả đã cũ';
+$string['outcomes:label_not_released'] = 'Chưa công bố';
+$string['outcomes:label_not_assessed'] = 'Không được đánh giá';

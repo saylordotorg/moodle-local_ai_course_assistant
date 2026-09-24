@@ -3075,3 +3075,9 @@ $string['usertesting_admin:title_course'] = 'ตัวแก้ไขการ�
 $string['usertesting_admin:title_global'] = 'ตัวแก้ไขการทดสอบการใช้งาน: ค่าเริ่มต้นส่วนกลาง';
 $string['usertesting_admin:type_action_then_rate'] = 'ดำเนินการ + ให้คะแนน';
 $string['usertesting_admin:type_free_response'] = 'ตอบอิสระ';
+
+$string['outcomes:label_insufficient_evidence'] = 'ยังไม่มีผล';
+$string['outcomes:label_calculation_pending'] = 'กำลังคำนวณผล';
+$string['outcomes:label_stale'] = 'ยังไม่เป็นปัจจุบัน';
+$string['outcomes:label_not_released'] = 'ยังไม่ได้เผยแพร่';
+$string['outcomes:label_not_assessed'] = 'ไม่มีการประเมิน';

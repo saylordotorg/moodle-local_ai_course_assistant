@@ -3090,3 +3090,9 @@ $string['usertesting_admin:title_course'] = 'Onye nchịkọta nnwale ojiji: {$a
 $string['usertesting_admin:title_global'] = 'Onye nchịkọta nnwale ojiji: ndabara zuru ụwa ọnụ';
 $string['usertesting_admin:type_action_then_rate'] = 'Omume + ọkwa';
 $string['usertesting_admin:type_free_response'] = 'Nzaghachi efu';
+
+$string['outcomes:label_insufficient_evidence'] = 'Enwebeghị nsonaazụ';
+$string['outcomes:label_calculation_pending'] = 'A na-agbakọ ya';
+$string['outcomes:label_stale'] = 'Ọ dịghị ọhụrụ';
+$string['outcomes:label_not_released'] = 'E bipụtabeghị ya';
+$string['outcomes:label_not_assessed'] = 'A naghị enyocha ya';

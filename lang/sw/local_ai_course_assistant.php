@@ -3120,3 +3120,9 @@ $string['usertesting_admin:title_course'] = 'Kihariri cha majaribio ya utumiaji:
 $string['usertesting_admin:title_global'] = 'Kihariri cha majaribio ya utumiaji: chaguo-msingi la kimataifa';
 $string['usertesting_admin:type_action_then_rate'] = 'Kitendo + kadiria';
 $string['usertesting_admin:type_free_response'] = 'Jibu huru';
+
+$string['outcomes:label_insufficient_evidence'] = 'Hakuna tokeo bado';
+$string['outcomes:label_calculation_pending'] = 'Linakokotolewa';
+$string['outcomes:label_stale'] = 'Limepitwa na wakati';
+$string['outcomes:label_not_released'] = 'Bado halijachapishwa';
+$string['outcomes:label_not_assessed'] = 'Halitathminiwi';

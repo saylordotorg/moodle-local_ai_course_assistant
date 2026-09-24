@@ -3075,3 +3075,9 @@ $string['usertesting_admin:title_course'] = 'Edytor testów użyteczności: {$a}
 $string['usertesting_admin:title_global'] = 'Edytor testów użyteczności: domyślny zestaw globalny';
 $string['usertesting_admin:type_action_then_rate'] = 'Akcja + ocena';
 $string['usertesting_admin:type_free_response'] = 'Odpowiedź otwarta';
+
+$string['outcomes:label_insufficient_evidence'] = 'Za mało ocenionych prac';
+$string['outcomes:label_calculation_pending'] = 'Trwa wyliczanie';
+$string['outcomes:label_stale'] = 'Nieaktualny wynik';
+$string['outcomes:label_not_released'] = 'Jeszcze nieopublikowany';
+$string['outcomes:label_not_assessed'] = 'Nie jest oceniany';

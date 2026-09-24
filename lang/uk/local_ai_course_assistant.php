@@ -3118,3 +3118,9 @@ $string['usertesting_admin:title_course'] = 'Редактор тестуванн
 $string['usertesting_admin:title_global'] = 'Редактор тестування зручності: глобальне значення за замовчуванням';
 $string['usertesting_admin:type_action_then_rate'] = 'Дія + оцінка';
 $string['usertesting_admin:type_free_response'] = 'Вільна відповідь';
+
+$string['outcomes:label_insufficient_evidence'] = 'Оцінених робіт замало';
+$string['outcomes:label_calculation_pending'] = 'Обчислюється';
+$string['outcomes:label_stale'] = 'Застарілий показник';
+$string['outcomes:label_not_released'] = 'Ще не опубліковано';
+$string['outcomes:label_not_assessed'] = 'Не оцінюється';

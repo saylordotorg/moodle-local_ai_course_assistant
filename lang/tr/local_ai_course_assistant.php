@@ -3076,3 +3076,9 @@ $string['usertesting_admin:title_course'] = 'Kullanılabilirlik testi düzenleyi
 $string['usertesting_admin:title_global'] = 'Kullanılabilirlik testi düzenleyicisi: genel varsayılan';
 $string['usertesting_admin:type_action_then_rate'] = 'Eylem + puanlama';
 $string['usertesting_admin:type_free_response'] = 'Serbest yanıt';
+
+$string['outcomes:label_insufficient_evidence'] = 'Henüz sonuç yok';
+$string['outcomes:label_calculation_pending'] = 'Hesaplanıyor';
+$string['outcomes:label_stale'] = 'Güncel değil';
+$string['outcomes:label_not_released'] = 'Henüz yayımlanmadı';
+$string['outcomes:label_not_assessed'] = 'Değerlendirilmiyor';

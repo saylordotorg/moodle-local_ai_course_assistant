@@ -3075,3 +3075,9 @@ $string['usertesting_admin:title_course'] = 'Editor de testare a utilizabilită�
 $string['usertesting_admin:title_global'] = 'Editor de testare a utilizabilității: implicit global';
 $string['usertesting_admin:type_action_then_rate'] = 'Acțiune + evaluare';
 $string['usertesting_admin:type_free_response'] = 'Răspuns liber';
+
+$string['outcomes:label_insufficient_evidence'] = 'Niciun rezultat încă';
+$string['outcomes:label_calculation_pending'] = 'În curs de calculare';
+$string['outcomes:label_stale'] = 'Valoare depășită';
+$string['outcomes:label_not_released'] = 'Nepublicat încă';
+$string['outcomes:label_not_assessed'] = 'Neevaluat la cursuri';
