@@ -9,7 +9,7 @@ Usage (from repo root):
     python3 scripts/new_release_notes.py --version 3.9.6 --date "21 April 2026"
     python3 scripts/new_release_notes.py --version 3.9.6 --overwrite
 
-The resulting file is a starting point — edit the PART 1 headline, the
+The resulting file is a starting point. Edit the PART 1 headline, the
 bullet list of changes, and update any drifted feature or walkthrough
 sections before tagging the release.
 """
@@ -20,7 +20,7 @@ import re
 import sys
 
 
-TEMPLATE = """# SOLA v{version} — Release Notes, Feature Summary, and 20-minute Admin Walkthrough
+TEMPLATE = """# SOLA v{version}: Release Notes, Feature Summary, and 20-minute Admin Walkthrough
 
 ## Part 1: Release Notes ({date})
 

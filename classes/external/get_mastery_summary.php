@@ -55,6 +55,18 @@ class get_mastery_summary extends external_api {
         // throws too. This early return fires on every course with mastery
         // disabled, which is most of them, so omitting a key here would break the
         // common path rather than the rare one.
+        // The program-outcomes panel is a SEPARATE question from course mastery and
+        // is answered before the mastery gate rather than after it. A course can
+        // have program outcomes in Outcome Map and have SOLA's own objectives
+        // switched off; suppressing the panel in that case would hide a learner's
+        // degree progress because of an unrelated setting on one course. The
+        // browser has always had a branch for "mastery off, programs present"; for
+        // one release the server could not produce it.
+        $programs = \local_ai_course_assistant\outcomemap_bridge::course_panel(
+            (int) $USER->id,
+            (int) $params['courseid']
+        );
+
         $empty = [
             'enabled' => false,
             'total' => 0,
@@ -62,8 +74,8 @@ class get_mastery_summary extends external_api {
             'learning' => 0,
             'not_started' => 0,
             'objectives' => [],
-            'showprograms' => false,
-            'programs' => [],
+            'showprograms' => $programs !== null,
+            'programs' => $programs ?? [],
         ];
 
         if (!objective_manager::is_enabled_for_course((int) $params['courseid'])) {
@@ -83,16 +95,11 @@ class get_mastery_summary extends external_api {
                 'last' => (int) $m['last'],
             ];
         }
-        // The program-outcomes panel is a SEPARATE question from course mastery and
-        // is rendered as its own panel, not folded into the objectives above. It is
-        // null unless this course participates in outcomes and this learner has
-        // attainment, so a course with no outcome mapping renders nothing rather
-        // than an empty box.
-        $programs = \local_ai_course_assistant\outcomemap_bridge::course_panel(
-            (int) $USER->id,
-            (int) $params['courseid']
-        );
-
+        // $programs was resolved above the mastery gate; see the note there. It is
+        // rendered as its own panel, not folded into the objectives above, and is
+        // null unless this learner has attainment in a program this course
+        // contributes to, so a course with no outcome mapping renders nothing
+        // rather than an empty box.
         return [
             'enabled' => true,
             'total' => (int) $summary['total'],

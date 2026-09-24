@@ -104,4 +104,39 @@ final class mastery_summary_returns_test extends \advanced_testcase {
                 . 'empty one asking a learner to care about outcomes their site does not track.'
         );
     }
+
+    /**
+     * The program outcomes panel is decided before the course-mastery gate.
+     *
+     * They are different questions, and for one release the code said so in a
+     * comment while doing the opposite. execute() returned early when SOLA's own
+     * objectives were disabled for the course, with showprograms hard-coded false,
+     * so a course that had program outcomes in Outcome Map but no SOLA objectives
+     * showed a learner nothing. The browser had a branch for exactly that state and
+     * the server could not produce it.
+     *
+     * Source-level because the two states cannot be told apart behaviourally
+     * without the optional third-party plugin installed and seeded: with it absent,
+     * which is every CI job, showprograms is false either way and a behavioural
+     * test would pass whichever order the code is in.
+     *
+     * @return void
+     */
+    public function test_the_panel_is_resolved_before_the_mastery_gate(): void {
+        $source = file_get_contents(__DIR__ . '/../classes/external/get_mastery_summary.php');
+        $this->assertIsString($source);
+
+        $panel = strpos($source, 'outcomemap_bridge::course_panel(');
+        $gate = strpos($source, 'objective_manager::is_enabled_for_course(');
+
+        $this->assertNotFalse($panel, 'course_panel() is no longer called; update this guard.');
+        $this->assertNotFalse($gate, 'the mastery gate has moved; update this guard.');
+        $this->assertLessThan(
+            $gate,
+            $panel,
+            'Resolve the program outcomes panel BEFORE returning early on disabled course '
+                . 'mastery. A learner\'s degree progress must not be hidden by an unrelated '
+                . 'setting on one course.'
+        );
+    }
 }
