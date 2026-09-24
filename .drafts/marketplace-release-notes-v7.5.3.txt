@@ -1,0 +1,51 @@
+Version 7.5.3 (build 2026092400)
+
+Learners can be shown where they stand on their degree program's outcomes, not just on the course in front of them. Almost everything a teacher reads is now translated. And several things this plugin had been asserting in comments are now checked by tests instead.
+
+NEW: YOUR PROGRAM OUTCOMES
+
+A "Your program outcomes" section appears in the learner progress panel, beside the course-level progress the assistant already tracks and deliberately not merged into it. They answer different questions. Course mastery asks whether this learner has mastered the objectives of this course, from attempts the assistant itself recorded. Program outcomes ask where the learner stands on their program's outcomes, pooled across every course that contributes released evidence, from graded questions a human mapped to an outcome and approved.
+
+Most outcomes have no percentage, and that is the normal case rather than an edge. When last measured, 525 of 546 result rows on the site this was built against had no figure. So every row without a number says why in a sentence, and the sentences differ: not enough assessed work yet, a calculation queued, a figure out of date, a result finished but not published, an outcome not assessed in the courses taken so far. Nothing is ever drawn as a zero and no row is left blank. A blank reads as a zero, and a zero here is a score nobody calculated.
+
+The section appears only where it means something: the learner must have results in a program the course they are looking at actually contributes to. A panel with no rows would be worse than no panel, because it implies the reader has been measured and found empty.
+
+REQUIREMENTS, AND WHY IT IS OFF BY DEFAULT
+
+This needs the Outcome Map plugin (local_outcomemap) at version 0.9.4 or later. That version does not exist yet. Through 0.9.3 the only way to read pooled program attainment is an SIS export function that takes an arbitrary user id and therefore requires a site-level capability. No student holds it, and it must not be granted to one, because holding it means being able to read any other student's attainment.
+
+The learner-safe alternative is proposed upstream and is not merged. Until it lands, switching this on does nothing at all: the panel is hidden from everyone, staff included. That is deliberate. A panel that appears for administrators and never for the learners it describes is worse than no panel, because the only people who could check whether it worked would be the only people it worked for.
+
+The setting is local_ai_course_assistant | outcomes_panel_enabled. It ships off so that enabling it is a deliberate act by somebody who then looks at the result, rather than something that happens by itself the day an unrelated plugin is upgraded.
+
+TRANSLATIONS
+
+33,588 strings across the 45 non-English locales.
+
+The largest part of that is text a teacher reads. The per-course settings page is reachable by any editing teacher, and every string on it had been falling back to English. So had the course instructor dashboard. The plugin reported full locale parity throughout, because the keys were present in each locale file holding the English text, which passes every automated check and tells you nothing.
+
+Also covered: the privacy declarations Moodle shows a learner who asks what this plugin stores about them, the rubric, survey and user-testing authoring pages, the RAG index admin, the prompt playground, token analytics and the audit log.
+
+Every translation is checked mechanically before it is accepted. Placeholders, branding tokens, HTML tags and the byte-exact contents of every code span have to survive in the same number, and each locale is scanned for expected-script coverage and for how many values came back identical to the English.
+
+ACCESSIBILITY
+
+The panel uses explicit greys rather than reduced opacity, at 4.8:1 and 7.5:1 on white, with the explanation a learner most needs to read being the more legible of the two. Opacity makes contrast depend on whatever is painted behind the text, and in Windows forced-colors mode it dims text the operating system has deliberately set to maximum contrast; that mode is now handled explicitly. The section is a labelled region rather than a live region, so a screen reader does not re-announce the whole programme list every time the panel is drawn, and the outcome list keeps its list semantics in Safari with VoiceOver.
+
+FIXED
+
+A data source that worked or not depending on how the page was reached. The bridge into Outcome Map called the web service layer rather than the function, and that layer requires a session key for any login-required function outside a web service server. Whether the read succeeded therefore depended on whether the surrounding request happened to carry one, with the failure swallowed into a debug line either way.
+
+Sessionless endpoints now declare themselves the same way. Six endpoints authenticate their caller with a token or a bearer key compared with hash_equals() rather than with a Moodle session. Three declared that intent one way and three another, and two of the latter declared it with a value that says the opposite of what a reader counting the token would assume. All six now carry the same marker with a comment naming what authenticates the caller instead.
+
+The packaged README names the release being packaged. A test now fails the build if the README and version.php disagree.
+
+WHAT THIS RELEASE DOES NOT DO
+
+It changes nothing for a learner or a teacher on a site that does not install Outcome Map 0.9.4 and switch the new setting on. No table is added, altered or dropped, and there is no upgrade step. The only database-facing change is one new cache definition.
+
+TESTING
+
+TESTSUMMARY
+
+Requires Moodle 4.5 or later.
