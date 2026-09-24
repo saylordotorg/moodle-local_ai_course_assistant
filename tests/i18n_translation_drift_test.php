@@ -69,9 +69,23 @@ final class i18n_translation_drift_test extends \basic_testcase {
         global $CFG;
         $root = $CFG->dirroot . '/local/ai_course_assistant';
 
+        // Two lists, because they mean opposite things and merging them loses the
+        // difference. Debt says "translate this one day" and must only ever
+        // shrink. Never-translate says "this is a product name, leaving it in
+        // English is correct", and putting one of those on the debt list would
+        // promise work nobody should do.
+        //
+        // The debt list is legitimately EMPTY as of v7.5.3, which is why this no
+        // longer asserts it is not: 324 keys were worked down to nothing across
+        // three batches. The file stays so the next release that extracts
+        // hardcoded English without translating it has somewhere honest to put
+        // it.
         $debt = array_flip(array_filter(array_map('trim',
             file($root . '/tests/fixtures/i18n_identical_debt.txt'))));
-        $this->assertNotEmpty($debt, 'debt fixture missing or empty; the scan is broken');
+        $never = array_flip(array_filter(array_map('trim',
+            file($root . '/tests/fixtures/i18n_never_translate.txt'))));
+        $this->assertNotEmpty($never, 'never-translate fixture missing; the scan is broken');
+        $allowed = $debt + $never;
 
         $en = $this->parse($root . '/lang/en/local_ai_course_assistant.php');
         $this->assertGreaterThan(1000, count($en), 'en parse failed');
@@ -98,13 +112,15 @@ final class i18n_translation_drift_test extends \basic_testcase {
 
         $newdrift = [];
         foreach ($identicalcount as $k => $c) {
-            if ($c >= self::THRESHOLD && !isset($debt[$k])) {
+            if ($c >= self::THRESHOLD && !isset($allowed[$k])) {
                 $newdrift[] = "$k (identical in $c locales)";
             }
         }
         $this->assertSame([], $newdrift,
             "NEW untranslated strings shipping as byte-identical English. Translate them, "
-            . "or add them to tests/fixtures/i18n_identical_debt.txt as a deliberate act:\n  - "
+            . "or add them to tests/fixtures/i18n_identical_debt.txt (work to do) or "
+            . "tests/fixtures/i18n_never_translate.txt (a product name) as a deliberate "
+            . "act:\n  - "
             . implode("\n  - ", $newdrift));
 
         $paid = [];

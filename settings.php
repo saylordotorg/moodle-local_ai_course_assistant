@@ -2355,9 +2355,13 @@ if ($hassiteconfig) {
     // dev against a real learner with calculated results, who returned false for
     // that capability.
     //
-    // The learner-safe sibling is proposed upstream as
-    // dta121/moodle-local_outcomemap#9 and is the function this panel is built
-    // against: it takes no user id, so it can only ever answer about its caller.
+    // The learner-safe sibling is dta121/moodle-local_outcomemap#9, and its first
+    // commit is merged upstream. That commit is not sufficient on its own: it was
+    // merged without the course filter, and its pooling still required the export
+    // capability, so it raised for exactly the learners it was written for. The
+    // remaining commits are written and tested and not yet taken. This panel is
+    // built against the complete version and checks what the installed function
+    // declares before calling it, rather than trusting a version number.
     // outcomemap_bridge::course_panel() renders nothing unless that function is
     // registered, which means a site on 0.9.3 sees no panel at all rather than one
     // that works for administrators and silently never appears for the learners it

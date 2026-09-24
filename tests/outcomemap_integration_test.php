@@ -56,8 +56,8 @@ final class outcomemap_integration_test extends \advanced_testcase {
     private function seed(int $learners = 2): array {
         if (!outcomemap_bridge::own_attainment_available()) {
             $this->markTestSkipped(
-                'local_outcomemap 0.9.4 or later is not installed, so the learner path cannot be '
-                    . 'exercised here. This is NOT a pass.'
+                'No local_outcomemap whose own-attainment function accepts a course id is '
+                    . 'installed, so the learner path cannot be exercised here. This is NOT a pass.'
             );
         }
 
@@ -162,9 +162,12 @@ final class outcomemap_integration_test extends \advanced_testcase {
     /**
      * The panel survives the external function's return structure, with data in it.
      *
-     * external_single_structure is strict both ways and throws AFTER the call has
-     * been billed, so a shape that only holds for the empty case is a bug that
-     * appears the first time a real learner has real data.
+     * A declared key that is absent makes clean_returnvalue() throw, on an ajax
+     * endpoint, after the call has been billed, so a shape that only holds for the
+     * empty case is a bug that appears the first time a real learner has real
+     * data. (The other direction is not symmetric: a key the structure does not
+     * declare is dropped in silence. Both are proven in
+     * external_return_semantics_test.)
      *
      * @return void
      */

@@ -175,9 +175,22 @@ final class external_return_semantics_test extends \basic_testcase {
      * @return bool
      */
     private static function claims_undeclared_keys_are_rejected(string $source): bool {
+        // The claim has more than one spelling, which is how two copies survived
+        // the first correction pass. One said "strict both ways" and one said
+        // "throws on any key it was not told about", and a guard matching the
+        // literal words "undeclared key" saw neither of them. A reviewer found
+        // both. So match the IDEA, in either order, and let the negation check
+        // below spare a comment that is correcting the claim rather than making
+        // it.
+        $subject = '(?:undeclared key|key it was not told about|key it does not declare'
+            . '|key that is not declared|key the structure does not declare)';
+        $verb = '(?:throws?|rejects?|rejected|fails?|failed|errors?)';
         $patterns = [
-            '/undeclared key(.{0,90}?)\b(throws|throw|rejected|rejects|fails|failed)\b/is',
-            '/\b(throws|throw|rejects)\b(.{0,90}?)undeclared key/is',
+            "/{$subject}(.{0,120}?)\b{$verb}\b/is",
+            "/\b{$verb}\b(.{0,120}?){$subject}/is",
+            // This one asserts it with no verb anywhere near, so it needs its own
+            // pattern and an empty capture group to keep the negation check happy.
+            '/\bstrict (?:both ways|in both directions)\b()/i',
         ];
 
         foreach ($patterns as $pattern) {

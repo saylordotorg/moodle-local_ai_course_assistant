@@ -260,7 +260,41 @@ final class outcomemap_bridge {
      * @return bool
      */
     public static function own_attainment_available(): bool {
-        return self::ws_registered(self::OWN_ATTAINMENT_WS);
+        return self::own_attainment_takes_a_course() !== null;
+    }
+
+    /**
+     * Does the installed own-attainment function accept a courseid, and is it there at all?
+     *
+     * Returns null when the function is absent, true or false for whether it
+     * declares courseid.
+     *
+     * WHY THIS IS NOT JUST ws_registered(). local_outcomemap merged the first
+     * version of this function without the course filter, so a site can now have
+     * a registered function that cannot narrow by course. Calling it anyway is
+     * worse than it sounds: PHP discards surplus arguments to a userland function
+     * silently, so the courseid would vanish with no error and the learner would
+     * see every programme they have results in, on every course they open. The
+     * requirement was that the panel appears only where it means something, and
+     * that failure mode breaks it quietly, which is the worst way to break it.
+     *
+     * This asks the external-services registry what the installed function
+     * actually declares rather than assuming a version number implies a shape.
+     *
+     * @return bool|null True if courseid is accepted, false if not, null if absent.
+     */
+    private static function own_attainment_takes_a_course(): ?bool {
+        $info = self::function_info(self::OWN_ATTAINMENT_WS);
+        if ($info === false) {
+            return null;
+        }
+
+        $desc = $info->parameters_desc ?? null;
+        if (!$desc || !isset($desc->keys) || !is_array($desc->keys)) {
+            return false;
+        }
+
+        return array_key_exists('courseid', $desc->keys);
     }
 
     /**
@@ -341,11 +375,18 @@ final class outcomemap_bridge {
      * or integration capability and it must never be granted to a student, since
      * holding it means being able to read anybody's attainment.
      *
-     * The own-attainment function does not exist before local_outcomemap 0.9.4. On
-     * a site without it a learner asking about themselves gets an empty array, not
-     * a fallback to the export function, because falling back would mean either
-     * calling it without the capability, which fails, or calling it privileged on a
-     * learner's behalf, which would make the capability meaningless.
+     * The own-attainment function does not exist before local_outcomemap 0.9.4,
+     * and the first 0.9.4 is not enough either: it was merged without the course
+     * filter, and its pooling still required the export capability, so it raised
+     * for exactly the learners it was written for. own_attainment_takes_a_course()
+     * is what decides, by asking the registry what the installed function declares
+     * rather than trusting a version number.
+     *
+     * On a site where it is absent or too old, a learner asking about themselves
+     * gets an empty array, not a fallback to the export function. Falling back
+     * would mean either calling it without the capability, which fails, or calling
+     * it privileged on a learner's behalf, which would make the capability
+     * meaningless.
      *
      * @param int $userid The learner whose attainment is wanted.
      * @param string $programcode Restrict to one program, or empty for all of them.
@@ -371,7 +412,13 @@ final class outcomemap_bridge {
         if ($own !== false) {
             $function = self::OWN_ATTAINMENT_WS;
             $info = $own;
-            $args = [$programcode, max(0, $courseid)];
+            // Only pass what the installed function declares. See
+            // own_attainment_takes_a_course(): a surplus argument is dropped in
+            // silence, so a version without the filter would answer about every
+            // programme rather than raising.
+            $args = self::own_attainment_takes_a_course() === true
+                ? [$programcode, max(0, $courseid)]
+                : [$programcode];
         } else {
             $info = has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())
                 ? self::function_info(self::ATTAINMENT_WS)
@@ -543,7 +590,8 @@ final class outcomemap_bridge {
         // The kill switch, checked before anything else so that turning it off
         // costs one setting change and no deploy. OFF by default: see the long
         // note in settings.php. The short version is that the panel needs
-        // local_outcomemap 0.9.4 or later, and turning it on should be a deliberate
+        // a local_outcomemap whose own-attainment function accepts a courseid,
+        // and turning it on should be a deliberate
         // act by someone watching the result rather than something that happens by
         // itself when an unrelated plugin is upgraded.
         if (!get_config('local_ai_course_assistant', 'outcomes_panel_enabled')) {
@@ -666,18 +714,45 @@ final class outcomemap_bridge {
      * @return array Programs, as attainment() returns them.
      */
     private static function cached_attainment(int $userid, int $courseid): array {
-        $cache = \cache::make('local_ai_course_assistant', 'outcomesattainment');
         // Underscore, not a colon: simplekeys allows only alphanumerics and
         // underscores, and a colon raises a coding_exception on every set().
         $key = $userid . '_' . $courseid;
 
-        $hit = $cache->get($key);
-        if (is_array($hit)) {
-            return $hit;
+        // The cache is an optimisation, so it is not allowed to be the thing that
+        // breaks the panel. cache::make() throws if the definition is missing,
+        // which happens on a site mid-upgrade or with a cache store that has gone
+        // away, and this runs inside the ajax call that draws the whole Progress
+        // tab. Falling back to the uncached read costs about 8ms per contributing
+        // course; letting it throw costs the tab.
+        $cache = null;
+        try {
+            $cache = \cache::make('local_ai_course_assistant', 'outcomesattainment');
+            $hit = $cache->get($key);
+            if (is_array($hit)) {
+                return $hit;
+            }
+        } catch (\Throwable $e) {
+            debugging(
+                'local_ai_course_assistant: outcomes attainment cache unavailable, reading '
+                    . 'through: ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+            $cache = null;
         }
 
         $programs = self::attainment($userid, '', $courseid);
-        $cache->set($key, $programs);
+
+        if ($cache !== null) {
+            try {
+                $cache->set($key, $programs);
+            } catch (\Throwable $e) {
+                debugging(
+                    'local_ai_course_assistant: could not store outcomes attainment: '
+                        . $e->getMessage(),
+                    DEBUG_DEVELOPER
+                );
+            }
+        }
 
         return $programs;
     }

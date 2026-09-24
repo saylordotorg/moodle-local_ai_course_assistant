@@ -12,9 +12,11 @@ The section appears only where it means something: the learner must have results
 
 REQUIREMENTS, AND WHY IT IS OFF BY DEFAULT
 
-This needs the Outcome Map plugin (local_outcomemap) at version 0.9.4 or later. That version does not exist yet. Through 0.9.3 the only way to read pooled program attainment is an SIS export function that takes an arbitrary user id and therefore requires a site-level capability. No student holds it, and it must not be granted to one, because holding it means being able to read any other student's attainment.
+This needs a version of the Outcome Map plugin (local_outcomemap) whose own-attainment function accepts a course id. Through 0.9.3 the only way to read pooled program attainment is an SIS export function that takes an arbitrary user id and therefore requires a site-level capability. No student holds it, and it must not be granted to one, because holding it means being able to read any other student's attainment.
 
-The learner-safe alternative is proposed upstream and is not merged. Until it lands, switching this on does nothing at all: the panel is hidden from everyone, staff included. That is deliberate. A panel that appears for administrators and never for the learners it describes is worse than no panel, because the only people who could check whether it worked would be the only people it worked for.
+The learner-safe alternative was contributed upstream and is partly merged: the first commit landed, and the commits that make it work for a learner and let it be narrowed to one course have not. Until they do, switching this on does nothing at all: the panel is hidden from everyone, staff included. That is deliberate. A panel that appears for administrators and never for the learners it describes is worse than no panel, because the only people who could check whether it worked would be the only people it worked for.
+
+The plugin does not decide this from a version number. It asks Moodle's external-services registry what the installed function actually declares, and stays hidden unless it can narrow by course. A version that cannot would otherwise have shown every learner every program they have results in, on every course they opened, because PHP discards a surplus argument in silence.
 
 The setting is local_ai_course_assistant | outcomes_panel_enabled. It ships off so that enabling it is a deliberate act by somebody who then looks at the result, rather than something that happens by itself the day an unrelated plugin is upgraded.
 
@@ -42,10 +44,16 @@ The packaged README names the release being packaged. A test now fails the build
 
 WHAT THIS RELEASE DOES NOT DO
 
-It changes nothing for a learner or a teacher on a site that does not install Outcome Map 0.9.4 and switch the new setting on. No table is added, altered or dropped, and there is no upgrade step. The only database-facing change is one new cache definition.
+It changes nothing for a learner or a teacher on a site that does not install a sufficient Outcome Map and switch the new setting on. No table is added, altered or dropped, and there is no upgrade step. The only database-facing change is one new cache definition.
 
 TESTING
 
-TESTSUMMARY
+Full PHPUnit suite green: 1788 tests, 7547 assertions, 7 skipped.
+Security validator suite 36 of 36.
+PHP lint clean on 567 files; upgrade savepoints ordered and matching.
+All three tests/js guards pass, and amd/build/ui.min.js is rebuilt from its source.
+All 46 lang files parse; 45 locales at full parity with lang/en.
+Tested against Moodle 4.5, 5.0 and 5.1 on PHP 8.1, 8.2 and 8.3, with both PostgreSQL and MariaDB.
+The seven skips are the integration tests that need a sufficient Outcome Map installed. A skip there is not a pass, and the skip message says so.
 
 Requires Moodle 4.5 or later.

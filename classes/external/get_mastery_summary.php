@@ -131,11 +131,18 @@ class get_mastery_summary extends external_api {
                     'last' => new external_value(PARAM_INT, 'Timestamp of last attempt, 0 if none'),
                 ])
             ),
-            // Declared, not optional. external_single_structure throws
-            // invalid_parameter_exception on any key it was not told about, on an
-            // ajax endpoint, AFTER the work is done. v7.5.1 shipped exactly that
-            // defect by returning max_score without declaring it, which broke every
-            // successful scoring call in production.
+            // Declared, not optional, and for the opposite reason to the one this
+            // comment used to give. A key the structure was not told about is
+            // silently DROPPED by clean_returnvalue(), so leaving this undeclared
+            // would not fail anything: the browser would simply never receive it,
+            // with nothing logged. A key that IS declared and then absent is what
+            // throws, on an ajax endpoint, after the work is done, which is why
+            // every early return above carries both of these.
+            //
+            // The story this comment told about v7.5.1 shipping that defect and
+            // breaking every scoring call in production was not true either. See
+            // external_return_semantics_test, which proves both directions rather
+            // than restating them.
             'showprograms' => new external_value(PARAM_BOOL, 'Whether to render the program outcomes panel'),
             'programs' => new external_multiple_structure(
                 new external_single_structure([

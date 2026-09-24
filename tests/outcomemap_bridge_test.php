@@ -570,4 +570,54 @@ final class outcomemap_bridge_test extends \advanced_testcase {
                 . 'own-attainment function to narrow by course instead.'
         );
     }
+
+    /**
+     * A registered function that cannot narrow by course does not count as available.
+     *
+     * The upstream plugin merged the first version of the learner-safe function
+     * without the course filter, so "the function exists" and "the function can
+     * answer the question this panel asks" came apart. Calling it anyway would not
+     * have raised: PHP discards surplus arguments to a userland function in
+     * silence, so the courseid would have vanished and every learner would have
+     * seen every programme they have results in, on every course they opened.
+     * The requirement was that the panel appears only where it means something,
+     * and that breaks it without a single line in any log.
+     *
+     * So availability is defined by the SHAPE the registry reports, not by the
+     * name being present. Source-level because reproducing it needs two different
+     * versions of a third-party plugin installed, which no CI job has.
+     *
+     * @return void
+     */
+    public function test_availability_depends_on_the_signature_not_just_the_name(): void {
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $this->assertIsString($source);
+
+        $start = strpos($source, 'public static function own_attainment_available(');
+        $this->assertNotFalse($start, 'own_attainment_available() has been renamed.');
+        $end = strpos($source, "\n    /**", $start);
+        $body = $end === false ? substr($source, $start) : substr($source, $start, $end - $start);
+
+        $this->assertStringNotContainsString(
+            'ws_registered(',
+            $body,
+            'own_attainment_available() must not answer "is the name registered". It has to ask '
+                . 'what the installed function declares, because a version without courseid '
+                . 'would drop the argument in silence and widen the panel to every programme.'
+        );
+        $this->assertStringContainsString(
+            'own_attainment_takes_a_course()',
+            $body,
+            'Availability is decided by the signature the registry reports.'
+        );
+
+        // And the call site must not pass an argument the installed function has
+        // not declared.
+        $callsite = substr($source, strpos($source, 'public static function attainment('));
+        $this->assertStringContainsString(
+            'own_attainment_takes_a_course() === true',
+            $callsite,
+            'attainment() must decide its argument list from the installed signature.'
+        );
+    }
 }
