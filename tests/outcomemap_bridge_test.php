@@ -611,6 +611,40 @@ final class outcomemap_bridge_test extends \advanced_testcase {
             'Availability is decided by the signature the registry reports.'
         );
 
+        // The helper is three-state on purpose: null for absent, false for
+        // present but unable to narrow by course, true for usable. The first
+        // version of this method compared with !== null, which reads the false
+        // case as a yes, so the panel rendered against an upstream that would
+        // silently drop the course filter. That is exactly the failure the helper
+        // was added to prevent, written into the line that was supposed to
+        // prevent it, and the text-matching half of this test did not notice
+        // because the method name was present either way.
+        $this->assertStringContainsString(
+            'own_attainment_takes_a_course() === true',
+            $body,
+            'Compare with === true. A three-state helper checked for "not null" treats "present '
+                . 'but unusable" as available.'
+        );
+        // Code lines only. The comment above the return explains why "!== null" is
+        // wrong, so a check against the whole method would flag the explanation
+        // along with the mistake, which is how the earlier prose guard in
+        // external_return_semantics_test went wrong before it was taught the
+        // difference between making a claim and correcting one.
+        $code = [];
+        foreach (explode("\n", $body) as $line) {
+            $trimmed = ltrim($line);
+            if ($trimmed === '' || strpos($trimmed, '//') === 0 || strpos($trimmed, '*') === 0) {
+                continue;
+            }
+            $code[] = $trimmed;
+        }
+
+        $this->assertStringNotContainsString(
+            '!== null',
+            implode("\n", $code),
+            'Never decide availability by "not null" here; see the assertion above.'
+        );
+
         // And the call site must not pass an argument the installed function has
         // not declared.
         $callsite = substr($source, strpos($source, 'public static function attainment('));

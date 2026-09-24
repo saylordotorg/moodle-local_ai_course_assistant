@@ -260,7 +260,12 @@ final class outcomemap_bridge {
      * @return bool
      */
     public static function own_attainment_available(): bool {
-        return self::own_attainment_takes_a_course() !== null;
+        // === true, not !== null. The helper is deliberately THREE-state: null for
+        // absent, false for present but unable to narrow by course, true for
+        // usable. Treating "not null" as available reads the false case as a yes,
+        // which is the precise failure this guard exists to prevent, and it is
+        // what the first version of this line did.
+        return self::own_attainment_takes_a_course() === true;
     }
 
     /**
