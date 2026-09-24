@@ -2346,24 +2346,30 @@ if ($hassiteconfig) {
     // v7.5.3: the learner-facing program outcomes panel, OFF BY DEFAULT and
     // deliberately so.
     //
-    // The panel reads attainment from local_outcomemap. The only entry point that
-    // pools attainment across a program is its SIS export function, which requires
-    // local/outcomemap:exportattainment at system context. No learner holds that,
-    // and it must never be granted to one: the function takes an arbitrary user id
-    // and checks only the capability, so a student holding it could read any other
-    // student's attainment. Verified on dev against a real learner with calculated
-    // results, who returned false for that capability.
+    // The panel reads attainment from local_outcomemap. Through 0.9.3 the only
+    // entry point that pools attainment across a program was its SIS export
+    // function, which requires local/outcomemap:exportattainment at system
+    // context. No learner holds that, and it must never be granted to one: the
+    // function takes an arbitrary user id and checks only the capability, so a
+    // student holding it could read any other student's attainment. Verified on
+    // dev against a real learner with calculated results, who returned false for
+    // that capability.
     //
-    // So until local_outcomemap exposes a learner-safe pooled API, this renders for
-    // administrators and for nobody else. Shipping it on would put a panel in front
-    // of staff that silently never appears for the audience it describes.
+    // The learner-safe sibling is proposed upstream as
+    // dta121/moodle-local_outcomemap#9 and is the function this panel is built
+    // against: it takes no user id, so it can only ever answer about its caller.
+    // outcomemap_bridge::course_panel() renders nothing unless that function is
+    // registered, which means a site on 0.9.3 sees no panel at all rather than one
+    // that works for administrators and silently never appears for the learners it
+    // describes.
     //
-    // It ships anyway, off, for two reasons. The upstream API is requested and may
-    // land inside this plugin's release cycle, and this is the last production push
-    // of the year, so a feature that is absent from the code cannot be switched on
-    // in January without another deploy. A switch can be. The same switch turns it
-    // off again in one click if it behaves badly, which matters more than usual
-    // when the next chance to ship a fix is months away.
+    // Why it still ships off. Enabling it should be a deliberate act by somebody
+    // who then looks at the result, not something that happens by itself the day an
+    // unrelated plugin is upgraded. Both halves matter given the timing: this is
+    // the last production push of the year, so a feature absent from the code could
+    // not be switched on in January without another deploy, and a feature that
+    // switched itself on could not be assessed by anyone who was not expecting it.
+    // A checkbox is both the way in and the way out.
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_course_assistant/outcomes_panel_enabled',
         get_string('settings:outcomes_panel_enabled', 'local_ai_course_assistant'),

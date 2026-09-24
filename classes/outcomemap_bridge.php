@@ -80,6 +80,17 @@ final class outcomemap_bridge {
     private const ATTAINMENT_CAPABILITY = 'local/outcomemap:exportattainment';
 
     /**
+     * @var string External function that reports the CALLER'S OWN attainment.
+     *
+     * The learner-safe sibling of ATTAINMENT_WS. It takes no user id, so there is
+     * no request it can be made to answer about another person, which is what lets
+     * a site expose it to students. Requested upstream and proposed as
+     * dta121/moodle-local_outcomemap#9; absent from local_outcomemap 0.9.3 and
+     * earlier, which is why every use of it is guarded rather than assumed.
+     */
+    private const OWN_ATTAINMENT_WS = 'local_outcomemap_get_own_program_attainment';
+
+    /**
      * @var string[] Result states that carry no usable percentage.
      *
      * Only 'calculated' has a number. Every other state means the figure does not
@@ -225,9 +236,65 @@ final class outcomemap_bridge {
      * @return bool
      */
     public static function attainment_available(): bool {
-        return class_exists('\\core_external\\external_api')
-            && \core_component::get_component_directory('local_outcomemap') !== null
-            && \core_external\external_api::external_function_info(self::ATTAINMENT_WS, IGNORE_MISSING) !== false;
+        return self::ws_registered(self::ATTAINMENT_WS) || self::ws_registered(self::OWN_ATTAINMENT_WS);
+    }
+
+    /**
+     * Can a LEARNER read their own attainment on this site?
+     *
+     * The distinction that decides whether the program outcomes panel is a real
+     * feature or a staff-only curiosity. Without the own-attainment function the
+     * only pooled API needs a system capability students do not have, so the panel
+     * renders for administrators and for nobody else; the settings page says so,
+     * and this is the method that makes that statement checkable rather than a
+     * claim in a comment.
+     *
+     * @return bool
+     */
+    public static function own_attainment_available(): bool {
+        return self::ws_registered(self::OWN_ATTAINMENT_WS);
+    }
+
+    /**
+     * Is one named external function installed and callable on this site?
+     *
+     * IGNORE_MISSING rather than a try/catch: a function that is not registered is
+     * the expected case here, not an error, since local_outcomemap is optional and
+     * the own-attainment function is newer than the releases most sites run.
+     *
+     * @param string $function Frankenstyle external function name.
+     * @return bool
+     */
+    private static function ws_registered(string $function): bool {
+        return self::function_info($function) !== false;
+    }
+
+    /**
+     * The external-services registry entry for one function, or false.
+     *
+     * The registry, rather than a hard-coded class name, is what makes calling the
+     * implementation directly safe: it is the same record the web service layer
+     * resolves, so it tracks an upstream class rename without SOLA knowing one
+     * happened.
+     *
+     * @param string $function Frankenstyle external function name.
+     * @return \stdClass|false
+     */
+    private static function function_info(string $function) {
+        if (!class_exists('\\core_external\\external_api')) {
+            return false;
+        }
+        if (\core_component::get_component_directory('local_outcomemap') === null) {
+            return false;
+        }
+        try {
+            return \core_external\external_api::external_function_info($function, IGNORE_MISSING);
+        } catch (\Throwable $e) {
+            // A function declared in db/services.php whose class is missing or
+            // malformed. The plugin is optional and beta; an unusable entry is the
+            // same to us as an absent one.
+            return false;
+        }
     }
 
     /**
@@ -250,12 +317,26 @@ final class outcomemap_bridge {
      * every learner they had failed an outcome nobody has measured yet. This is the
      * same mistake as scoring a Soapbox criterion zero because no camera was on.
      *
-     * PRIVACY. The underlying external function requires
-     * local/outcomemap:exportattainment at SYSTEM context, which is an
-     * administrator or SIS capability that no learner holds. So this deliberately
-     * does NOT call the external function as the current user. It refuses outright
-     * unless the caller is asking about themselves, or holds the capability. There
-     * is no path here that lets one learner read another's attainment.
+     * PRIVACY, AND WHY THERE ARE TWO WAYS IN. There is no path here that lets one
+     * learner read another's attainment, and the two routes protect that property
+     * differently rather than one being a relaxed version of the other.
+     *
+     * A learner asking about themselves goes through
+     * local_outcomemap_get_own_program_attainment, which takes no user id at all:
+     * it can only ever answer about its caller, so no argument this method could
+     * construct would reach somebody else's data.
+     *
+     * Anyone asking about another user goes through the SIS export function, which
+     * takes an arbitrary user id and therefore requires
+     * local/outcomemap:exportattainment at SYSTEM context. That is an administrator
+     * or integration capability and it must never be granted to a student, since
+     * holding it means being able to read anybody's attainment.
+     *
+     * The own-attainment function does not exist before local_outcomemap 0.9.4. On
+     * a site without it a learner asking about themselves gets an empty array, not
+     * a fallback to the export function, because falling back would mean either
+     * calling it without the capability, which fails, or calling it privileged on a
+     * learner's behalf, which would make the capability meaningless.
      *
      * @param int $userid The learner whose attainment is wanted.
      * @param string $programcode Restrict to one program, or empty for all of them.
@@ -269,32 +350,58 @@ final class outcomemap_bridge {
             return [];
         }
 
-        // Self, or a holder of the export capability. Nothing else.
+        // Which function answers this question, if any. Asking about yourself is a
+        // different question from asking about someone else, and they are answered
+        // by different functions with different guarantees; see the docblock.
         $isself = ((int) $USER->id === $userid);
-        if (!$isself && !has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())) {
-            return [];
+        $own = $isself ? self::function_info(self::OWN_ATTAINMENT_WS) : false;
+        if ($own !== false) {
+            $function = self::OWN_ATTAINMENT_WS;
+            $info = $own;
+            $args = [$programcode];
+        } else {
+            $info = has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())
+                ? self::function_info(self::ATTAINMENT_WS)
+                : false;
+            if ($info === false) {
+                // A learner on a site whose local_outcomemap predates the
+                // own-attainment function lands here. Empty, deliberately: the
+                // alternative would be reading their data through a privileged path
+                // the site has not granted them.
+                return [];
+            }
+            $function = self::ATTAINMENT_WS;
+            $args = [$userid, $programcode];
         }
 
         try {
-            $raw = \core_external\external_api::call_external_function(
-                self::ATTAINMENT_WS,
-                ['userid' => $userid, 'programcode' => $programcode],
-                false
-            );
-            if (!empty($raw['error'])) {
-                debugging(
-                    'local_outcomemap attainment call failed for user ' . $userid . ': '
-                        . (string) ($raw['exception']->message ?? 'unknown'),
-                    DEBUG_DEVELOPER
-                );
-                return [];
-            }
-            $data = $raw['data'] ?? [];
+            // The implementation directly, resolved through the registry, rather
+            // than external_api::call_external_function().
+            //
+            // That wrapper is the HTTP/AJAX entry path and it calls require_sesskey()
+            // for any login-required function outside a web service server. This is
+            // an in-process read during a page or AJAX render, so whether it works
+            // would depend on whether the surrounding request happens to carry a
+            // sesskey parameter: it does from the mastery-summary AJAX call and it
+            // does not from cron, CLI or a plain page render. A data source that
+            // silently returns nothing depending on how the page was reached is a
+            // bug waiting to be diagnosed as "the outcomes plugin is broken".
+            //
+            // Nothing is skipped by going direct. The capability and context checks
+            // live inside the function's own execute(), which is what actually
+            // enforces them; the wrapper only adds the transport-layer guards that
+            // an in-process caller does not need and cannot satisfy.
+            $callable = [$info->classname, $info->methodname];
+            $data = call_user_func_array($callable, $args);
         } catch (\Throwable $e) {
             debugging(
-                'local_outcomemap attainment lookup failed for user ' . $userid . ': ' . $e->getMessage(),
+                'local_outcomemap ' . $function . ' failed for user ' . $userid . ': ' . $e->getMessage(),
                 DEBUG_DEVELOPER
             );
+            return [];
+        }
+
+        if (!is_array($data)) {
             return [];
         }
 
@@ -392,14 +499,22 @@ final class outcomemap_bridge {
         }
         // The kill switch, checked before anything else so that turning it off
         // costs one setting change and no deploy. OFF by default: see the long
-        // note in settings.php, but the short version is that the only pooled
-        // attainment API this plugin can reach requires a system capability no
-        // learner holds, so with the switch on today the panel renders for
-        // administrators and for nobody else.
+        // note in settings.php. The short version is that the panel needs
+        // local_outcomemap 0.9.4 or later, and turning it on should be a deliberate
+        // act by someone watching the result rather than something that happens by
+        // itself when an unrelated plugin is upgraded.
         if (!get_config('local_ai_course_assistant', 'outcomes_panel_enabled')) {
             return null;
         }
-        if (!self::attainment_available()) {
+        // The learner-safe API, specifically, and not attainment_available().
+        //
+        // attainment() will happily answer an administrator through the privileged
+        // SIS export path, so without this line a site running local_outcomemap
+        // 0.9.3 would show the panel to staff and to nobody else: every learner it
+        // describes would see nothing, and the people in a position to notice would
+        // see something that looked like it worked. That asymmetry is worse than
+        // the feature being absent, so the panel is all-or-nothing per site.
+        if (!self::own_attainment_available()) {
             return null;
         }
         // Gate one: does this course participate in outcomes at all?

@@ -327,6 +327,17 @@ final class lang_completeness_test extends \basic_testcase {
         // These two ARE live, on the site settings page.
         'settings:soapbox_gesture_vision',
         'settings:soapbox_gesture_vision_desc',
+        // v7.5.3: the program outcomes panel switch. Administrator-only settings
+        // copy, and the description is the longest single string in the file: it
+        // has to explain a capability boundary in another plugin, why a version
+        // number matters, and what happens if you switch it on too early. That is
+        // exactly the kind of text an unreviewed translation gets subtly wrong,
+        // and getting it wrong means an administrator enables a panel believing
+        // something false about who can see it. The learner-facing half of this
+        // feature, the eleven outcomes:* strings, IS translated into all 45
+        // locales, because a learner reads that panel with no one to ask.
+        'settings:outcomes_panel_enabled',
+        'settings:outcomes_panel_enabled_desc',
         // Nothing a LEARNER sees is in this list: the eighteen soapbox: strings
         // this release adds are translated into all 45 locales, because a
         // self-paced learner with no instructor reads the feedback page as the
