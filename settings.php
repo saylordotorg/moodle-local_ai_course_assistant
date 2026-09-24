@@ -2343,6 +2343,33 @@ if ($hassiteconfig) {
         '70',
         PARAM_INT
     ));
+    // v7.5.3: the learner-facing program outcomes panel, OFF BY DEFAULT and
+    // deliberately so.
+    //
+    // The panel reads attainment from local_outcomemap. The only entry point that
+    // pools attainment across a program is its SIS export function, which requires
+    // local/outcomemap:exportattainment at system context. No learner holds that,
+    // and it must never be granted to one: the function takes an arbitrary user id
+    // and checks only the capability, so a student holding it could read any other
+    // student's attainment. Verified on dev against a real learner with calculated
+    // results, who returned false for that capability.
+    //
+    // So until local_outcomemap exposes a learner-safe pooled API, this renders for
+    // administrators and for nobody else. Shipping it on would put a panel in front
+    // of staff that silently never appears for the audience it describes.
+    //
+    // It ships anyway, off, for two reasons. The upstream API is requested and may
+    // land inside this plugin's release cycle, and this is the last production push
+    // of the year, so a feature that is absent from the code cannot be switched on
+    // in January without another deploy. A switch can be. The same switch turns it
+    // off again in one click if it behaves badly, which matters more than usual
+    // when the next chance to ship a fix is months away.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/outcomes_panel_enabled',
+        get_string('settings:outcomes_panel_enabled', 'local_ai_course_assistant'),
+        get_string('settings:outcomes_panel_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_window',
         get_string('settings:mastery_window', 'local_ai_course_assistant'),

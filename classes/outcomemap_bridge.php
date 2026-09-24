@@ -390,6 +390,15 @@ final class outcomemap_bridge {
         if ($userid <= 0 || $courseid <= 0 || $courseid == SITEID) {
             return null;
         }
+        // The kill switch, checked before anything else so that turning it off
+        // costs one setting change and no deploy. OFF by default: see the long
+        // note in settings.php, but the short version is that the only pooled
+        // attainment API this plugin can reach requires a system capability no
+        // learner holds, so with the switch on today the panel renders for
+        // administrators and for nobody else.
+        if (!get_config('local_ai_course_assistant', 'outcomes_panel_enabled')) {
+            return null;
+        }
         if (!self::attainment_available()) {
             return null;
         }

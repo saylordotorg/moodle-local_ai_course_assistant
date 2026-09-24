@@ -275,4 +275,61 @@ final class outcomemap_bridge_test extends \advanced_testcase {
             $this->markTestSkipped('local_outcomemap is installed on this site.');
         }
     }
+
+    /**
+     * The kill switch is off by default, and off means nothing renders.
+     *
+     * This is the assertion that makes shipping the feature safe. It goes to
+     * production in the last release of the year, on a code path that cannot
+     * currently work for learners, so the default has to be silence and the
+     * switch has to be the only thing that breaks it.
+     *
+     * @return void
+     */
+    public function test_the_panel_is_off_by_default(): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($user);
+
+        $this->assertSame(
+            '',
+            (string) get_config('local_ai_course_assistant', 'outcomes_panel_enabled'),
+            'The setting must be unset or empty on a fresh install, which get_config reports as '
+                . 'falsy. A default of on would put a panel in front of every site running the '
+                . 'outcomes plugin, and it cannot render for learners yet.'
+        );
+        $this->assertNull(
+            outcomemap_bridge::course_panel((int) $user->id, (int) $course->id),
+            'With the switch off, course_panel must return null before it looks at anything else, '
+                . 'so an administrator can silence the feature without a deploy.'
+        );
+    }
+
+    /**
+     * Switching it on does not by itself make a panel appear.
+     *
+     * The switch is permission to try, not a guarantee of output. The course must
+     * still participate in outcomes and the learner must still have attainment,
+     * so a site that enables it on a course with no outcome mapping still gets
+     * nothing rather than an empty box.
+     *
+     * @return void
+     */
+    public function test_enabling_it_still_respects_the_other_gates(): void {
+        $this->resetAfterTest();
+
+        set_config('outcomes_panel_enabled', 1, 'local_ai_course_assistant');
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($user);
+
+        $this->assertNull(
+            outcomemap_bridge::course_panel((int) $user->id, (int) $course->id),
+            'A bare course has no outcome mapping, so even with the switch on there is nothing to '
+                . 'show and null is the right answer.'
+        );
+    }
 }
