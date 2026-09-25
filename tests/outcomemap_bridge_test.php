@@ -647,7 +647,15 @@ final class outcomemap_bridge_test extends \advanced_testcase {
 
         // And the call site must not pass an argument the installed function has
         // not declared.
-        $callsite = substr($source, strpos($source, 'public static function attainment('));
+        // Bounded at the next docblock, like $body above. Running to the end of the
+        // file would let this pass because "=== true" appears somewhere later,
+        // which is not the same as it appearing in attainment().
+        $attainmentat = strpos($source, 'public static function attainment(');
+        $this->assertNotFalse($attainmentat, 'attainment() has been renamed; update this guard.');
+        $attainmentend = strpos($source, "\n    /**", $attainmentat);
+        $callsite = $attainmentend === false
+            ? substr($source, $attainmentat)
+            : substr($source, $attainmentat, $attainmentend - $attainmentat);
         $this->assertStringContainsString(
             'own_attainment_takes_a_course() === true',
             $callsite,

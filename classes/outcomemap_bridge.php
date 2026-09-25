@@ -417,13 +417,19 @@ final class outcomemap_bridge {
         if ($own !== false) {
             $function = self::OWN_ATTAINMENT_WS;
             $info = $own;
-            // Only pass what the installed function declares. See
-            // own_attainment_takes_a_course(): a surplus argument is dropped in
-            // silence, so a version without the filter would answer about every
-            // programme rather than raising.
+            // Named arguments, not positional. Only passing what the installed
+            // function declares handles the surplus-argument problem described on
+            // own_attainment_takes_a_course(), but positional passing leaves a
+            // second assumption: that the parameters are in the order we expect.
+            // If upstream settles on execute(int $courseid, string $programcode),
+            // the helper still says yes and the two values land in each other's
+            // slots, where validate_parameters() coerces or rejects them and the
+            // panel comes back empty with nothing but a DEBUG_DEVELOPER line.
+            // Named arguments make order irrelevant, and a renamed parameter
+            // raises "Unknown named parameter", which the catch below logs.
             $args = self::own_attainment_takes_a_course() === true
-                ? [$programcode, max(0, $courseid)]
-                : [$programcode];
+                ? ['programcode' => $programcode, 'courseid' => max(0, $courseid)]
+                : ['programcode' => $programcode];
         } else {
             $info = has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())
                 ? self::function_info(self::ATTAINMENT_WS)
@@ -436,7 +442,7 @@ final class outcomemap_bridge {
                 return [];
             }
             $function = self::ATTAINMENT_WS;
-            $args = [$userid, $programcode];
+            $args = ['userid' => $userid, 'programcode' => $programcode];
         }
 
         try {
@@ -457,10 +463,14 @@ final class outcomemap_bridge {
             // runs clean_returnvalue() against execute_returns(), and going direct
             // does not. That is a deliberate trade rather than an oversight: the
             // parsing below reads every field defensively with a default, whereas
-            // clean_returnvalue() THROWS on a shape it does not expect, and a
-            // throw here means the panel silently disappears the day a third-party
-            // plugin adds a field. Degrading to a missing value beats degrading to
-            // a missing panel.
+            // clean_returnvalue() raises when a key the structure DECLARES is
+            // absent, or when a value will not validate as its declared type. An
+            // upstream that adds a field does not trigger that, in either
+            // direction: a field it declares passes, and one it does not is
+            // dropped. What would trigger it is upstream removing, renaming or
+            // retyping something its own execute_returns() still declares, and a
+            // raise here takes the whole panel rather than one value. Degrading to
+            // a missing value beats degrading to a missing panel.
             //
             // The checks that matter are not skipped. The capability and context
             // checks live inside the function's own execute(), which is what

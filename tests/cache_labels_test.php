@@ -33,7 +33,7 @@ namespace local_ai_course_assistant;
  * @package    local_ai_course_assistant
  * @copyright  2026 Saylor University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_ai_course_assistant\cache_labels_test
+ * @coversNothing
  */
 final class cache_labels_test extends \basic_testcase {
     /**
@@ -49,7 +49,7 @@ final class cache_labels_test extends \basic_testcase {
     private function definitions(): array {
         $source = file_get_contents(dirname(__DIR__) . '/db/caches.php');
         $this->assertIsString($source);
-        preg_match_all("/^    '([a-z_]+)' => \\[/m", $source, $m);
+        preg_match_all("/^    '([a-z0-9_]+)' => \\[/m", $source, $m);
 
         return $m[1];
     }
@@ -93,7 +93,7 @@ final class cache_labels_test extends \basic_testcase {
     public function test_every_label_has_a_definition(): void {
         $definitions = array_flip($this->definitions());
         $strings = file_get_contents(dirname(__DIR__) . '/lang/en/local_ai_course_assistant.php');
-        preg_match_all("/\\\$string\\['cachedef_([a-z_]+)'\\]/", $strings, $m);
+        preg_match_all("/\\\$string\\['cachedef_([a-z0-9_]+)'\\]/", $strings, $m);
 
         $orphans = [];
         foreach ($m[1] as $name) {

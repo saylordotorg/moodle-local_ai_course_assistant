@@ -183,14 +183,19 @@ final class external_return_semantics_test extends \basic_testcase {
         // below spare a comment that is correcting the claim rather than making
         // it.
         $subject = '(?:undeclared key|key it was not told about|key it does not declare'
-            . '|key that is not declared|key the structure does not declare)';
+            . '|key that is not declared|key the structure does not declare'
+            . '|shape it does not expect|adds? a field|extra field|new field)';
         $verb = '(?:throws?|rejects?|rejected|fails?|failed|errors?)';
         $patterns = [
             "/{$subject}(.{0,120}?)\b{$verb}\b/is",
             "/\b{$verb}\b(.{0,120}?){$subject}/is",
             // This one asserts it with no verb anywhere near, so it needs its own
-            // pattern and an empty capture group to keep the negation check happy.
-            '/\bstrict (?:both ways|in both directions)\b()/i',
+            // pattern. It captures the text BEFORE the phrase rather than an empty
+            // group, so that "it is not strict both ways" reaches the negation
+            // check like every other match. An empty capture made this the one
+            // pattern that could not be corrected in place, which is the failure
+            // the whole negation check exists to avoid.
+            '/(.{0,40})\bstrict (?:both ways|in both directions)\b/i',
         ];
 
         foreach ($patterns as $pattern) {
