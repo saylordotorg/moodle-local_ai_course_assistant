@@ -69,9 +69,23 @@ final class i18n_translation_drift_test extends \basic_testcase {
         global $CFG;
         $root = $CFG->dirroot . '/local/ai_course_assistant';
 
+        // Two lists, because they mean opposite things and merging them loses the
+        // difference. Debt says "translate this one day" and must only ever
+        // shrink. Never-translate says "this is a product name, leaving it in
+        // English is correct", and putting one of those on the debt list would
+        // promise work nobody should do.
+        //
+        // The debt list is legitimately EMPTY as of v7.5.3, which is why this no
+        // longer asserts it is not: 324 keys were worked down to nothing across
+        // three batches. The file stays so the next release that extracts
+        // hardcoded English without translating it has somewhere honest to put
+        // it.
         $debt = array_flip(array_filter(array_map('trim',
             file($root . '/tests/fixtures/i18n_identical_debt.txt'))));
-        $this->assertNotEmpty($debt, 'debt fixture missing or empty; the scan is broken');
+        $never = array_flip(array_filter(array_map('trim',
+            file($root . '/tests/fixtures/i18n_never_translate.txt'))));
+        $this->assertNotEmpty($never, 'never-translate fixture missing; the scan is broken');
+        $allowed = $debt + $never;
 
         $en = $this->parse($root . '/lang/en/local_ai_course_assistant.php');
         $this->assertGreaterThan(1000, count($en), 'en parse failed');
@@ -98,13 +112,15 @@ final class i18n_translation_drift_test extends \basic_testcase {
 
         $newdrift = [];
         foreach ($identicalcount as $k => $c) {
-            if ($c >= self::THRESHOLD && !isset($debt[$k])) {
+            if ($c >= self::THRESHOLD && !isset($allowed[$k])) {
                 $newdrift[] = "$k (identical in $c locales)";
             }
         }
         $this->assertSame([], $newdrift,
             "NEW untranslated strings shipping as byte-identical English. Translate them, "
-            . "or add them to tests/fixtures/i18n_identical_debt.txt as a deliberate act:\n  - "
+            . "or add them to tests/fixtures/i18n_identical_debt.txt (work to do) or "
+            . "tests/fixtures/i18n_never_translate.txt (a product name) as a deliberate "
+            . "act:\n  - "
             . implode("\n  - ", $newdrift));
 
         $paid = [];
@@ -123,11 +139,20 @@ final class i18n_translation_drift_test extends \basic_testcase {
      * Whether a string contains anything a translator could actually change.
      *
      * Some strings are pure machinery -- '{$a->raw} / {$a->max}', '{$a} ms',
-     * 'URL' -- and being byte-identical in all 45 locales is the CORRECT
-     * outcome for them, not drift. Listing them as debt would be wrong in the
-     * other direction: debt says "fix this one day", and these must never
-     * change. So strip placeholders, brand tokens, HTML tags and entities,
-     * digits and punctuation, and ask whether any word-like run survives.
+     * 'URL', 'DOCX (mod_resource)' -- and being byte-identical in all 45 locales
+     * is the CORRECT outcome for them, not drift. Listing them as debt would be
+     * wrong in the other direction: debt says "fix this one day", and these must
+     * never change. So strip placeholders, brand tokens, HTML tags and entities,
+     * Moodle component names, file-format acronyms, digits and punctuation, and
+     * ask whether any word-like run survives.
+     *
+     * The component names and acronyms were added after the v7.5.3 batch, where
+     * forty-five translators independently returned 'DOCX (mod_resource)'
+     * unchanged and several said in as many words that it is an identifier rather
+     * than a phrase. Before that the scan counted 'mod_resource' as a word and
+     * reported three format labels as new drift, which would have pushed a
+     * maintainer to either invent translations for a Moodle plugin name or park
+     * them on a list promising to do so later.
      *
      * @param string $value English string value.
      * @return bool True when at least one translatable word remains.
@@ -138,6 +163,8 @@ final class i18n_translation_drift_test extends \basic_testcase {
             '/\[\[\w+\]\]/',        // [[brand tokens]]
             '/<[^>]*>/',               // HTML tags
             '/&[a-z]+;|&#\d+;/i',      // HTML entities
+            '/\b(?:mod|block|local|qtype|qbank|tool|format|auth|enrol|report|theme)_\w+/',
+            '/\b[A-Z0-9]{2,6}\b/',   // DOCX, PDF, PPTX, H5P, SCORM, CSV, API
             '/[\d\p{P}\p{S}\s]+/u',   // digits, punctuation, symbols, space
         ], ' ', $value);
         // A single letter is a label, not a sentence; require a real word.

@@ -50,11 +50,26 @@ class get_mastery_summary extends external_api {
         require_capability('local/ai_course_assistant:use', $context);
 
         // Every key the return structure declares, including the two added for the
-        // program-outcomes panel. external_single_structure is strict in BOTH
-        // directions: an undeclared key throws, and a declared key that is absent
-        // throws too. This early return fires on every course with mastery
-        // disabled, which is most of them, so omitting a key here would break the
-        // common path rather than the rare one.
+        // program-outcomes panel. A declared key that is ABSENT and VALUE_REQUIRED
+        // makes clean_returnvalue() throw, and this early return fires on every
+        // course with mastery disabled, which is most of them, so omitting one here
+        // would break the common path rather than the rare one.
+        //
+        // The other direction is not symmetric, whatever this comment used to say:
+        // an UNDECLARED key is silently dropped, never rejected. Both rules are
+        // pinned in external_return_semantics_test.
+        // The program-outcomes panel is a SEPARATE question from course mastery and
+        // is answered before the mastery gate rather than after it. A course can
+        // have program outcomes in Outcome Map and have SOLA's own objectives
+        // switched off; suppressing the panel in that case would hide a learner's
+        // degree progress because of an unrelated setting on one course. The
+        // browser has always had a branch for "mastery off, programs present"; for
+        // one release the server could not produce it.
+        $programs = \local_ai_course_assistant\outcomemap_bridge::course_panel(
+            (int) $USER->id,
+            (int) $params['courseid']
+        );
+
         $empty = [
             'enabled' => false,
             'total' => 0,
@@ -62,8 +77,8 @@ class get_mastery_summary extends external_api {
             'learning' => 0,
             'not_started' => 0,
             'objectives' => [],
-            'showprograms' => false,
-            'programs' => [],
+            'showprograms' => $programs !== null,
+            'programs' => $programs ?? [],
         ];
 
         if (!objective_manager::is_enabled_for_course((int) $params['courseid'])) {
@@ -83,16 +98,11 @@ class get_mastery_summary extends external_api {
                 'last' => (int) $m['last'],
             ];
         }
-        // The program-outcomes panel is a SEPARATE question from course mastery and
-        // is rendered as its own panel, not folded into the objectives above. It is
-        // null unless this course participates in outcomes and this learner has
-        // attainment, so a course with no outcome mapping renders nothing rather
-        // than an empty box.
-        $programs = \local_ai_course_assistant\outcomemap_bridge::course_panel(
-            (int) $USER->id,
-            (int) $params['courseid']
-        );
-
+        // $programs was resolved above the mastery gate; see the note there. It is
+        // rendered as its own panel, not folded into the objectives above, and is
+        // null unless this learner has attainment in a program this course
+        // contributes to, so a course with no outcome mapping renders nothing
+        // rather than an empty box.
         return [
             'enabled' => true,
             'total' => (int) $summary['total'],
@@ -121,11 +131,18 @@ class get_mastery_summary extends external_api {
                     'last' => new external_value(PARAM_INT, 'Timestamp of last attempt, 0 if none'),
                 ])
             ),
-            // Declared, not optional. external_single_structure throws
-            // invalid_parameter_exception on any key it was not told about, on an
-            // ajax endpoint, AFTER the work is done. v7.5.1 shipped exactly that
-            // defect by returning max_score without declaring it, which broke every
-            // successful scoring call in production.
+            // Declared, not optional, and for the opposite reason to the one this
+            // comment used to give. A key the structure was not told about is
+            // silently DROPPED by clean_returnvalue(), so leaving this undeclared
+            // would not fail anything: the browser would simply never receive it,
+            // with nothing logged. A key that IS declared and then absent is what
+            // throws, on an ajax endpoint, after the work is done, which is why
+            // every early return above carries both of these.
+            //
+            // The story this comment told about v7.5.1 shipping that defect and
+            // breaking every scoring call in production was not true either. See
+            // external_return_semantics_test, which proves both directions rather
+            // than restating them.
             'showprograms' => new external_value(PARAM_BOOL, 'Whether to render the program outcomes panel'),
             'programs' => new external_multiple_structure(
                 new external_single_structure([
@@ -138,10 +155,11 @@ class get_mastery_summary extends external_api {
                             'statement' => new external_value(PARAM_RAW, 'Outcome statement'),
                             'shortstatement' => new external_value(PARAM_RAW, 'Short form of the statement'),
                             'state' => new external_value(PARAM_ALPHAEXT, 'calculated or a state carrying no figure'),
-                            // NULL_ALLOWED is the point. Only a calculated result has
-                            // a number; 525 of 546 rows on the production site do not.
-                            // A zero here would tell a learner they failed an outcome
-                            // nobody has measured.
+                            // NULL_ALLOWED is the point. Only a calculated result
+                            // has a number, and most do not: 525 of 546 rows were
+                            // insufficient_evidence when last measured (production
+                            // degrees, 2026-09-22). A zero here would tell a learner
+                            // they failed an outcome nobody has measured.
                             'percent' => new external_value(
                                 PARAM_FLOAT,
                                 'Attainment percentage, null unless the state is calculated',
@@ -152,6 +170,10 @@ class get_mastery_summary extends external_api {
                             'explanation' => new external_value(
                                 PARAM_RAW,
                                 'Plain-language reason there is no figure; empty when calculated'
+                            ),
+                            'statelabel' => new external_value(
+                                PARAM_RAW,
+                                'Short text to show where a percentage would be, per state'
                             ),
                             'expectedpercent' => new external_value(
                                 PARAM_FLOAT,

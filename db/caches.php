@@ -125,4 +125,27 @@ $definitions = [
         'simpledata' => false,
         'ttl'        => 900,
     ],
+    // v7.5.3: the learner's pooled program-outcome attainment, per user per course.
+    //
+    // Why a cache at all. Reading it walks every course where the learner holds a
+    // current result and builds a release-gated report for each, which is roughly
+    // 22 queries per contributing course as measured on a seeded fixture. That is
+    // fine for one course and is linear in a degree learner's history, and it
+    // would run on every open of the Progress tab.
+    //
+    // Why a short TTL rather than event invalidation. The underlying figures move
+    // when a batch calculation runs upstream, which this plugin is not told about
+    // and has no business subscribing to. Five minutes is well inside the interval
+    // at which attainment actually changes, and the panel is a view of someone
+    // else's system of record rather than the record itself: a learner seeing a
+    // figure five minutes late is not wrong in any way they could act on.
+    //
+    // Keys are "userid_courseid". simpledata is false because the value is a
+    // nested array of programs and outcomes.
+    'outcomesattainment' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'ttl' => 300,
+    ],
 ];

@@ -1,0 +1,6 @@
+settings:embed_provider_openai
+settings:provider_claude
+settings:provider_together
+settings:talking_avatar_provider_did
+settings:talking_avatar_provider_heygen
+settings:talking_avatar_provider_tavus

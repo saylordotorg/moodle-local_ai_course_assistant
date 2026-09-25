@@ -73,6 +73,22 @@ final class outcomemap_bridge {
     /** @var int Upper bound on imported outcomes. The upstream API itself caps at 200. */
     private const MAX_OUTCOMES = 200;
 
+    /**
+     * @var string The only result state that carries a percentage.
+     *
+     * Everything else means the figure does not exist yet, and each means
+     * something different to a learner: no evidence collected, a calculation
+     * queued, a figure out of date, a result withheld pending release, or an
+     * outcome not assessed in this program at all.
+     *
+     * "No number" is the normal case rather than an edge. When last measured, on
+     * the production degrees site on 2026-09-22, 525 of 546 result rows were
+     * insufficient_evidence against 21 calculated. That is a reading with a date
+     * on it, not a property of the system: it will drift as courses are assessed,
+     * and the design holds whatever the ratio is.
+     */
+    private const STATE_CALCULATED = 'calculated';
+
     /** @var string External function that reports a learner's program-level attainment. */
     private const ATTAINMENT_WS = 'local_outcomemap_get_user_program_attainment';
 
@@ -80,24 +96,16 @@ final class outcomemap_bridge {
     private const ATTAINMENT_CAPABILITY = 'local/outcomemap:exportattainment';
 
     /**
-     * @var string[] Result states that carry no usable percentage.
+     * @var string External function that reports the CALLER'S OWN attainment.
      *
-     * Only 'calculated' has a number. Every other state means the figure does not
-     * exist yet, and each means something different to a learner: no evidence has
-     * been collected, a calculation is queued, the figure is out of date, the
-     * result is withheld pending release, or the outcome is not assessed in this
-     * program at all. On the production site 525 of 546 result rows are
-     * insufficient_evidence and 21 are calculated, so this is the normal case
-     * rather than an edge, and rendering any of them as 0% would tell almost
-     * every learner they had failed an outcome nobody has measured.
+     * The learner-safe sibling of ATTAINMENT_WS. It takes no user id, so there is
+     * no request it can be made to answer about another person, which is what lets
+     * a site expose it to students. Requested upstream and proposed as
+     * dta121/moodle-local_outcomemap#9; absent from local_outcomemap 0.9.3 and
+     * earlier, which is why every use of it is guarded rather than assumed.
      */
-    private const STATES_WITHOUT_A_NUMBER = [
-        'insufficient_evidence',
-        'calculation_pending',
-        'stale',
-        'not_released',
-        'not_assessed',
-    ];
+    private const OWN_ATTAINMENT_WS = 'local_outcomemap_get_own_program_attainment';
+
 
     /**
      * Is the local_outcomemap outcome-search API installed and callable?
@@ -216,18 +224,124 @@ final class outcomemap_bridge {
     }
 
     /**
-     * Whether this site can report program attainment at all.
+     * Is attainment readable by ANYBODY on this site?
      *
-     * Separate from is_available() because the two capabilities are different and a
-     * site can have one without the other: outcome definitions are readable by any
-     * course teacher, attainment is not.
+     * A question about what is installed, not about who may ask. It returns true
+     * if either attainment function is registered, and says nothing about whether
+     * the current user can call it: the export function needs a system capability
+     * and the own-attainment function needs none beyond being the subject. Callers
+     * that care about a learner want own_attainment_available() below.
+     *
+     * Separate from is_available(), which answers the same question about outcome
+     * DEFINITIONS. A site can have one without the other, and the capabilities
+     * behind them differ too: definitions are readable by a course teacher,
+     * anybody's attainment is not.
      *
      * @return bool
      */
     public static function attainment_available(): bool {
-        return class_exists('\\core_external\\external_api')
-            && \core_component::get_component_directory('local_outcomemap') !== null
-            && \core_external\external_api::external_function_info(self::ATTAINMENT_WS, IGNORE_MISSING) !== false;
+        return self::ws_registered(self::ATTAINMENT_WS) || self::ws_registered(self::OWN_ATTAINMENT_WS);
+    }
+
+    /**
+     * Can a LEARNER read their own attainment on this site?
+     *
+     * The distinction that decides whether the program outcomes panel is a real
+     * feature or a staff-only curiosity. Without the own-attainment function the
+     * only pooled API needs a system capability students do not have, so the panel
+     * COULD render for administrators and for nobody else.
+     *
+     * course_panel() gates on this rather than on attainment_available() precisely
+     * so that it does not: on a site without the learner-safe function the panel is
+     * hidden from everyone, staff included, which is what the settings page
+     * promises. This method is what makes that promise checkable rather than a
+     * claim in a comment.
+     *
+     * @return bool
+     */
+    public static function own_attainment_available(): bool {
+        // === true, not !== null. The helper is deliberately THREE-state: null for
+        // absent, false for present but unable to narrow by course, true for
+        // usable. Treating "not null" as available reads the false case as a yes,
+        // which is the precise failure this guard exists to prevent, and it is
+        // what the first version of this line did.
+        return self::own_attainment_takes_a_course() === true;
+    }
+
+    /**
+     * Does the installed own-attainment function accept a courseid, and is it there at all?
+     *
+     * Returns null when the function is absent, true or false for whether it
+     * declares courseid.
+     *
+     * WHY THIS IS NOT JUST ws_registered(). local_outcomemap merged the first
+     * version of this function without the course filter, so a site can now have
+     * a registered function that cannot narrow by course. Calling it anyway is
+     * worse than it sounds: PHP discards surplus arguments to a userland function
+     * silently, so the courseid would vanish with no error and the learner would
+     * see every programme they have results in, on every course they open. The
+     * requirement was that the panel appears only where it means something, and
+     * that failure mode breaks it quietly, which is the worst way to break it.
+     *
+     * This asks the external-services registry what the installed function
+     * actually declares rather than assuming a version number implies a shape.
+     *
+     * @return bool|null True if courseid is accepted, false if not, null if absent.
+     */
+    private static function own_attainment_takes_a_course(): ?bool {
+        $info = self::function_info(self::OWN_ATTAINMENT_WS);
+        if ($info === false) {
+            return null;
+        }
+
+        $desc = $info->parameters_desc ?? null;
+        if (!$desc || !isset($desc->keys) || !is_array($desc->keys)) {
+            return false;
+        }
+
+        return array_key_exists('courseid', $desc->keys);
+    }
+
+    /**
+     * Is one named external function installed and callable on this site?
+     *
+     * IGNORE_MISSING rather than a try/catch: a function that is not registered is
+     * the expected case here, not an error, since local_outcomemap is optional and
+     * the own-attainment function is newer than the releases most sites run.
+     *
+     * @param string $function Frankenstyle external function name.
+     * @return bool
+     */
+    private static function ws_registered(string $function): bool {
+        return self::function_info($function) !== false;
+    }
+
+    /**
+     * The external-services registry entry for one function, or false.
+     *
+     * The registry, rather than a hard-coded class name, is what makes calling the
+     * implementation directly safe: it is the same record the web service layer
+     * resolves, so it tracks an upstream class rename without SOLA knowing one
+     * happened.
+     *
+     * @param string $function Frankenstyle external function name.
+     * @return \stdClass|false
+     */
+    private static function function_info(string $function) {
+        if (!class_exists('\\core_external\\external_api')) {
+            return false;
+        }
+        if (\core_component::get_component_directory('local_outcomemap') === null) {
+            return false;
+        }
+        try {
+            return \core_external\external_api::external_function_info($function, IGNORE_MISSING);
+        } catch (\Throwable $e) {
+            // A function declared in db/services.php whose class is missing or
+            // malformed. The plugin is optional and beta; an unusable entry is the
+            // same to us as an absent one.
+            return false;
+        }
     }
 
     /**
@@ -245,63 +359,157 @@ final class outcomemap_bridge {
      * STATE IS NOT A DETAIL. Every outcome carries a state, and only 'calculated'
      * has a percentage. The rest are returned with percent = null and their state
      * intact, and a caller MUST render the state rather than substituting zero.
-     * On the production site today 525 of 546 rows are insufficient_evidence
-     * against 21 calculated, so a caller that treats null as 0 would tell almost
-     * every learner they had failed an outcome nobody has measured yet. This is the
-     * same mistake as scoring a Soapbox criterion zero because no camera was on.
+     * A caller that treats null as 0 tells a learner they failed an outcome nobody
+     * has measured yet. It is the same mistake as scoring a Soapbox criterion zero
+     * because no camera was on, and it is not a rare case: 525 of 546 rows were
+     * insufficient_evidence when last measured (production degrees, 2026-09-22).
+     * Treat that figure as a dated reading rather than a constant.
      *
-     * PRIVACY. The underlying external function requires
-     * local/outcomemap:exportattainment at SYSTEM context, which is an
-     * administrator or SIS capability that no learner holds. So this deliberately
-     * does NOT call the external function as the current user. It refuses outright
-     * unless the caller is asking about themselves, or holds the capability. There
-     * is no path here that lets one learner read another's attainment.
+     * PRIVACY, AND WHY THERE ARE TWO WAYS IN. There is no path here that lets one
+     * learner read another's attainment, and the two routes protect that property
+     * differently rather than one being a relaxed version of the other.
+     *
+     * A learner asking about themselves goes through
+     * local_outcomemap_get_own_program_attainment, which takes no user id at all:
+     * it can only ever answer about its caller, so no argument this method could
+     * construct would reach somebody else's data.
+     *
+     * Anyone asking about another user goes through the SIS export function, which
+     * takes an arbitrary user id and therefore requires
+     * local/outcomemap:exportattainment at SYSTEM context. That is an administrator
+     * or integration capability and it must never be granted to a student, since
+     * holding it means being able to read anybody's attainment.
+     *
+     * The own-attainment function does not exist before local_outcomemap 0.9.4,
+     * and the first 0.9.4 is not enough either: it was merged without the course
+     * filter, and its pooling still required the export capability, so it raised
+     * for exactly the learners it was written for. own_attainment_takes_a_course()
+     * is what decides, by asking the registry what the installed function declares
+     * rather than trusting a version number.
+     *
+     * On a site where it is absent or too old, a learner asking about themselves
+     * gets an empty array, not a fallback to the export function. Falling back
+     * would mean either calling it without the capability, which fails, or calling
+     * it privileged on a learner's behalf, which would make the capability
+     * meaningless.
      *
      * @param int $userid The learner whose attainment is wanted.
      * @param string $programcode Restrict to one program, or empty for all of them.
+     * @param int $courseid Restrict to the programs this Moodle course contributes to, or 0
+     *        for all of them. Honoured only on the own-attainment path, which is the only
+     *        one that accepts it; the SIS export function has no such parameter, so a
+     *        privileged caller asking about somebody else gets the unnarrowed report.
      * @return array<int, array{code: string, name: string, outcomes: array}> Programs,
      *         each carrying its outcomes with percent (float|null), state and thresholds.
      */
-    public static function attainment(int $userid, string $programcode = ''): array {
+    public static function attainment(int $userid, string $programcode = '', int $courseid = 0): array {
         global $USER;
 
         if ($userid <= 0 || !self::attainment_available()) {
             return [];
         }
 
-        // Self, or a holder of the export capability. Nothing else.
+        // Which function answers this question, if any. Asking about yourself is a
+        // different question from asking about someone else, and they are answered
+        // by different functions with different guarantees; see the docblock.
         $isself = ((int) $USER->id === $userid);
-        if (!$isself && !has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())) {
-            return [];
+        $own = $isself ? self::function_info(self::OWN_ATTAINMENT_WS) : false;
+        if ($own !== false) {
+            $function = self::OWN_ATTAINMENT_WS;
+            $info = $own;
+            // Named arguments, not positional. Only passing what the installed
+            // function declares handles the surplus-argument problem described on
+            // own_attainment_takes_a_course(), but positional passing leaves a
+            // second assumption: that the parameters are in the order we expect.
+            // If upstream settles on execute(int $courseid, string $programcode),
+            // the helper still says yes and the two values land in each other's
+            // slots, where validate_parameters() coerces or rejects them and the
+            // panel comes back empty with nothing but a DEBUG_DEVELOPER line.
+            // Named arguments make order irrelevant, and a renamed parameter
+            // raises "Unknown named parameter", which the catch below logs.
+            $args = self::own_attainment_takes_a_course() === true
+                ? ['programcode' => $programcode, 'courseid' => max(0, $courseid)]
+                : ['programcode' => $programcode];
+        } else {
+            $info = has_capability(self::ATTAINMENT_CAPABILITY, \context_system::instance())
+                ? self::function_info(self::ATTAINMENT_WS)
+                : false;
+            if ($info === false) {
+                // A learner on a site whose local_outcomemap predates the
+                // own-attainment function lands here. Empty, deliberately: the
+                // alternative would be reading their data through a privileged path
+                // the site has not granted them.
+                return [];
+            }
+            $function = self::ATTAINMENT_WS;
+            $args = ['userid' => $userid, 'programcode' => $programcode];
         }
 
         try {
-            $raw = \core_external\external_api::call_external_function(
-                self::ATTAINMENT_WS,
-                ['userid' => $userid, 'programcode' => $programcode],
-                false
-            );
-            if (!empty($raw['error'])) {
-                debugging(
-                    'local_outcomemap attainment call failed for user ' . $userid . ': '
-                        . (string) ($raw['exception']->message ?? 'unknown'),
-                    DEBUG_DEVELOPER
-                );
-                return [];
-            }
-            $data = $raw['data'] ?? [];
+            // The implementation directly, resolved through the registry, rather
+            // than external_api::call_external_function().
+            //
+            // That wrapper is the HTTP/AJAX entry path and it calls require_sesskey()
+            // for any login-required function outside a web service server. This is
+            // an in-process read during a page or AJAX render, so whether it works
+            // would depend on whether the surrounding request happens to carry a
+            // sesskey parameter: it does from the mastery-summary AJAX call and it
+            // does not from cron, CLI or a plain page render. A data source that
+            // silently returns nothing depending on how the page was reached is a
+            // bug waiting to be diagnosed as "the outcomes plugin is broken".
+            //
+            // What is given up, precisely, because "nothing is skipped" was the
+            // first version of this comment and it was not true. The wrapper also
+            // runs clean_returnvalue() against execute_returns(), and going direct
+            // does not. That is a deliberate trade rather than an oversight: the
+            // parsing below reads every field defensively with a default, whereas
+            // clean_returnvalue() raises when a key the structure DECLARES is
+            // absent, or when a value will not validate as its declared type. An
+            // upstream that adds a field does not trigger that, in either
+            // direction: a field it declares passes, and one it does not is
+            // dropped. What would trigger it is upstream removing, renaming or
+            // retyping something its own execute_returns() still declares, and a
+            // raise here takes the whole panel rather than one value. Degrading to
+            // a missing value beats degrading to a missing panel.
+            //
+            // The checks that matter are not skipped. The capability and context
+            // checks live inside the function's own execute(), which is what
+            // actually enforces them, and validate_parameters() runs there too.
+            // What the wrapper adds beyond that is transport-layer guards an
+            // in-process caller does not need and cannot satisfy.
+            $callable = [$info->classname, $info->methodname];
+            $data = call_user_func_array($callable, $args);
         } catch (\Throwable $e) {
             debugging(
-                'local_outcomemap attainment lookup failed for user ' . $userid . ': ' . $e->getMessage(),
+                'local_outcomemap ' . $function . ' failed for user ' . $userid . ': ' . $e->getMessage(),
                 DEBUG_DEVELOPER
             );
             return [];
         }
 
+        if (!is_array($data)) {
+            return [];
+        }
+
         $programs = [];
-        foreach (($data['programs'] ?? []) as $program) {
+        // is_array() on both levels: the upstream plugin is optional and beta, and
+        // foreach over a scalar is a PHP warning plus an empty result rather than a
+        // clean refusal. A shape we do not recognise is "no data", not a notice in
+        // the log of every learner who opens the widget.
+        $rawprograms = $data['programs'] ?? [];
+        if (!is_array($rawprograms)) {
+            return [];
+        }
+        foreach ($rawprograms as $program) {
+            if (!is_array($program)) {
+                continue;
+            }
             $outcomes = [];
-            foreach (($program['outcomes'] ?? []) as $o) {
+            $rawoutcomes = $program['outcomes'] ?? [];
+            foreach (is_array($rawoutcomes) ? $rawoutcomes : [] as $o) {
+                if (!is_array($o)) {
+                    continue;
+                }
                 $state = (string) ($o['state'] ?? 'not_assessed');
                 $outcomes[] = [
                     'itemid' => (int) ($o['itemid'] ?? 0),
@@ -341,7 +549,13 @@ final class outcomemap_bridge {
      * @return float|null
      */
     private static function percent_or_null(string $state, $value): ?float {
-        if (in_array($state, self::STATES_WITHOUT_A_NUMBER, true)) {
+        // Allowlist, not a deny-list. The deny-list version failed OPEN: a state
+        // this plugin has not heard of, added by a later local_outcomemap, would
+        // have had its figure printed next to an explanation reading "not
+        // assessed", because state_explanation() defaults the other way. Printing
+        // a number we cannot describe is the one outcome this class exists to
+        // prevent, so an unrecognised state carries no figure.
+        if ($state !== self::STATE_CALCULATED) {
             return null;
         }
         return self::decimal_or_null($value);
@@ -363,24 +577,22 @@ final class outcomemap_bridge {
     /**
      * The "Your program outcomes" panel for one learner in one course, or null.
      *
-     * Returns null, meaning render nothing at all, unless BOTH are true: this course
-     * actually sits under a framework that defines outcomes, and the learner has
-     * attainment rows to show. A panel on a course with no outcome mapping is an
-     * empty box asking a learner to care about something their course does not
-     * participate in.
+     * Returns null, meaning render nothing at all, unless the learner has attainment
+     * rows in a program THIS COURSE contributes to. A panel on a course with no
+     * outcome mapping is an empty box asking a learner to care about something their
+     * course does not take part in, and a panel with no rows is worse: it implies
+     * the reader has been measured and found empty.
      *
-     * The course gate uses outcome_search through fetch(), which the class docblock
-     * records as returning the outcomes of every framework visible to the course,
-     * including the programs the course belongs to. That is the plugin's own
-     * definition of "outcomes for this course" and it is the right gate here: a
-     * course inside a degree program receives that program's outcomes, which is
-     * exactly the population this panel is about.
+     * Both conditions are one question, answered upstream. The course-to-program
+     * mapping lives in local_outcomemap, so the narrowing happens there, against
+     * tables SOLA does not read and effective dates SOLA does not track. What comes
+     * back is still only this learner's own attainment.
      *
      * Every outcome keeps its state and an explanation of that state, because most
-     * of them have no number. Of the 546 result rows on the production degrees site
-     * today, 525 are insufficient_evidence. A panel that showed those as blanks, or
-     * worse as zeroes, would read as a wall of failure on outcomes nobody has
-     * measured yet.
+     * of them have no number: 525 of 546 rows were insufficient_evidence when last
+     * measured (production degrees, 2026-09-22). A panel that showed those as
+     * blanks, or worse as zeroes, would read as a wall of failure on outcomes
+     * nobody has measured yet.
      *
      * @param int $userid The learner.
      * @param int $courseid The course whose page the panel would appear on.
@@ -390,15 +602,47 @@ final class outcomemap_bridge {
         if ($userid <= 0 || $courseid <= 0 || $courseid == SITEID) {
             return null;
         }
-        if (!self::attainment_available()) {
+        // The kill switch, checked before anything else so that turning it off
+        // costs one setting change and no deploy. OFF by default: see the long
+        // note in settings.php. The short version is that the panel needs
+        // a local_outcomemap whose own-attainment function accepts a courseid,
+        // and turning it on should be a deliberate
+        // act by someone watching the result rather than something that happens by
+        // itself when an unrelated plugin is upgraded.
+        if (!get_config('local_ai_course_assistant', 'outcomes_panel_enabled')) {
             return null;
         }
-        // Gate one: does this course participate in outcomes at all?
-        if (self::fetch($courseid) === []) {
+        // The learner-safe API, specifically, and not attainment_available().
+        //
+        // attainment() will happily answer an administrator through the privileged
+        // SIS export path, so without this line a site running local_outcomemap
+        // 0.9.3 would show the panel to staff and to nobody else: every learner it
+        // describes would see nothing, and the people in a position to notice would
+        // see something that looked like it worked. That asymmetry is worse than
+        // the feature being absent, so the panel is all-or-nothing per site.
+        if (!self::own_attainment_available()) {
             return null;
         }
-        // Gate two: does this learner have anything to show?
-        $programs = self::attainment($userid);
+        // One gate, asked of the plugin that owns the answer: what are this learner's
+        // results in the programs THIS COURSE contributes to?
+        //
+        // It used to be two, and the first of them was a defect of exactly the kind
+        // this release exists to fix. It called fetch(), which requires
+        // local/outcomemap:viewdefinitions, and that capability is granted to
+        // editing teachers and managers and NOT to students. So the course gate
+        // returned nothing for every learner, and a panel written for learners
+        // could only ever have rendered for staff. The capability blocker had a
+        // second copy one layer up, in code added to work around the first.
+        //
+        // The fix is not to elevate the check but to stop asking that question
+        // here. A learner may see their own results, including the outcome
+        // statements attached to them; browsing the outcome catalogue is a
+        // different thing and the two capabilities say so. Narrowing by course
+        // happens upstream, where the program-to-course mapping lives, and returns
+        // an empty list when the course takes part in no program. That is the same
+        // "render nothing" answer the course gate was there to produce, reached
+        // without asking a learner for an author's capability.
+        $programs = self::cached_attainment($userid, $courseid);
         if ($programs === []) {
             return null;
         }
@@ -409,7 +653,20 @@ final class outcomemap_bridge {
             $outcomes = [];
             foreach ($program['outcomes'] as $o) {
                 $anyoutcome = true;
-                $outcomes[] = $o + ['explanation' => self::state_explanation($o['state'])];
+                // A row can arrive claiming 'calculated' with no number, which is
+                // upstream contradicting itself. state_explanation() returns an
+                // empty string for calculated, on the reasonable assumption that a
+                // figure needs no excuse, so without this the learner would get
+                // "No result yet" and no reason at all: the one blank this panel
+                // exists to prevent. We do not know WHY it is missing, so the
+                // explanation says only that, rather than picking a cause.
+                $state = $o['percent'] === null && $o['state'] === self::STATE_CALCULATED
+                    ? 'unavailable'
+                    : $o['state'];
+                $outcomes[] = $o + [
+                    'explanation' => self::state_explanation($state),
+                    'statelabel' => self::state_label($state),
+                ];
             }
             if ($outcomes !== []) {
                 $out[] = ['code' => $program['code'], 'name' => $program['name'], 'outcomes' => $outcomes];
@@ -417,6 +674,102 @@ final class outcomemap_bridge {
         }
 
         return $anyoutcome ? $out : null;
+    }
+
+    /**
+     * The short text that stands where a percentage would.
+     *
+     * One generic label for every state was a small lie told five times. "No
+     * result yet" sat next to "Your result has been worked out but is not
+     * published yet", and next to "your result is out of date", both of which say
+     * a result exists. A learner reading the column and then the sentence under it
+     * got two different answers.
+     *
+     * @param string $state The upstream result state.
+     * @return string A short translated label.
+     */
+    public static function state_label(string $state): string {
+        $keys = [
+            'insufficient_evidence' => 'outcomes:label_insufficient_evidence',
+            'calculation_pending' => 'outcomes:label_calculation_pending',
+            'stale' => 'outcomes:label_stale',
+            'not_released' => 'outcomes:label_not_released',
+            'not_assessed' => 'outcomes:label_not_assessed',
+            'unavailable' => 'outcomes:no_percentage_yet',
+        ];
+
+        // An unrecognised state falls back to the most cautious wording rather than
+        // to a claim about assessment, because we do not know which it is.
+        return branding::str($keys[$state] ?? 'outcomes:no_percentage_yet');
+    }
+
+    /**
+     * attainment(), through a five-minute cache, for the panel path only.
+     *
+     * The panel is drawn every time a learner opens the Progress tab, and the read
+     * behind it walks every course where they hold a current result and builds a
+     * release-gated report for each. On a seeded fixture that measured 22 queries
+     * and about 8ms for a single contributing course, and it is linear in a degree
+     * learner's history rather than in the course they are looking at, so the
+     * number nobody has measured is the one that matters: a learner three years
+     * into a programme.
+     *
+     * Five minutes, by TTL rather than by invalidation. The figures move when a
+     * batch calculation runs inside local_outcomemap, which this plugin is not
+     * told about and should not subscribe to. The panel is a view of another
+     * system's record, not the record, and a learner seeing a figure five minutes
+     * late cannot act differently for it.
+     *
+     * Only this path is cached. attainment() itself stays uncached, because its
+     * other caller is an administrator reading one named learner deliberately, and
+     * a stale answer there is a support ticket rather than a saved query.
+     *
+     * @param int $userid The learner.
+     * @param int $courseid The course being viewed.
+     * @return array Programs, as attainment() returns them.
+     */
+    private static function cached_attainment(int $userid, int $courseid): array {
+        // Underscore, not a colon: simplekeys allows only alphanumerics and
+        // underscores, and a colon raises a coding_exception on every set().
+        $key = $userid . '_' . $courseid;
+
+        // The cache is an optimisation, so it is not allowed to be the thing that
+        // breaks the panel. cache::make() throws if the definition is missing,
+        // which happens on a site mid-upgrade or with a cache store that has gone
+        // away, and this runs inside the ajax call that draws the whole Progress
+        // tab. Falling back to the uncached read costs about 8ms per contributing
+        // course; letting it throw costs the tab.
+        $cache = null;
+        try {
+            $cache = \cache::make('local_ai_course_assistant', 'outcomesattainment');
+            $hit = $cache->get($key);
+            if (is_array($hit)) {
+                return $hit;
+            }
+        } catch (\Throwable $e) {
+            debugging(
+                'local_ai_course_assistant: outcomes attainment cache unavailable, reading '
+                    . 'through: ' . $e->getMessage(),
+                DEBUG_DEVELOPER
+            );
+            $cache = null;
+        }
+
+        $programs = self::attainment($userid, '', $courseid);
+
+        if ($cache !== null) {
+            try {
+                $cache->set($key, $programs);
+            } catch (\Throwable $e) {
+                debugging(
+                    'local_ai_course_assistant: could not store outcomes attainment: '
+                        . $e->getMessage(),
+                    DEBUG_DEVELOPER
+                );
+            }
+        }
+
+        return $programs;
     }
 
     /**
@@ -433,6 +786,7 @@ final class outcomemap_bridge {
     public static function state_explanation(string $state): string {
         $keys = [
             'calculated' => '',
+            'unavailable' => 'outcomes:state_unavailable',
             'insufficient_evidence' => 'outcomes:state_insufficient_evidence',
             'calculation_pending' => 'outcomes:state_calculation_pending',
             'stale' => 'outcomes:state_stale',

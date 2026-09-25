@@ -36,6 +36,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// A provider callback authenticated by an HMAC-SHA256 token compared with hash_equals().
+// The caller is a third-party service with no Moodle session, so require_login() would
+// reject every legitimate delivery. Declared here as well as through NO_MOODLE_COOKIES so
+// that every sessionless endpoint in this plugin states the same intent the same way.
+// phpcs:disable moodle.Files.RequireLogin.Missing
 define('NO_MOODLE_COOKIES', true);
 define('AJAX_SCRIPT', true);
 

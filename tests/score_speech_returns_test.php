@@ -82,12 +82,17 @@ final class score_speech_returns_test extends \advanced_testcase {
      *
      * The existing early-return test covered empty_result() only, and the bug it
      * missed lived on the success path: execute() puts max_score on every
-     * criterion entry, execute_returns() did not declare it, and
-     * external_single_structure throws invalid_parameter_exception on ANY
-     * undeclared key rather than ignoring it. Since this endpoint is
-     * ajax => true, that failed every successful scoring call, after the
-     * provider had been billed and the score row written, and the learner saw a
-     * generic error.
+     * criterion entry and execute_returns() did not declare it.
+     *
+     * The consequence is quieter than this docblock used to claim. An undeclared
+     * key is silently DROPPED by clean_returnvalue(), not rejected, so the call
+     * would have succeeded with max_score missing from every criterion the
+     * browser received, and the display would have fallen back to assuming a
+     * maximum of five. No error, no log line, and no release ever carried it: the
+     * defect and its fix both landed before v7.5.1 was tagged.
+     *
+     * The rule is pinned in external_return_semantics_test rather than restated
+     * here, because restating it is how it came to be wrong in five places.
      *
      * Building the shape by hand rather than calling execute() is deliberate: a
      * real call needs a provider, and this needs to run in CI with none.

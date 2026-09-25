@@ -2343,6 +2343,43 @@ if ($hassiteconfig) {
         '70',
         PARAM_INT
     ));
+    // v7.5.3: the learner-facing program outcomes panel, OFF BY DEFAULT and
+    // deliberately so.
+    //
+    // The panel reads attainment from local_outcomemap. Through 0.9.3 the only
+    // entry point that pools attainment across a program was its SIS export
+    // function, which requires local/outcomemap:exportattainment at system
+    // context. No learner holds that, and it must never be granted to one: the
+    // function takes an arbitrary user id and checks only the capability, so a
+    // student holding it could read any other student's attainment. Verified on
+    // dev against a real learner with calculated results, who returned false for
+    // that capability.
+    //
+    // The learner-safe sibling is dta121/moodle-local_outcomemap#9, and its first
+    // commit is merged upstream. That commit is not sufficient on its own: it was
+    // merged without the course filter, and its pooling still required the export
+    // capability, so it raised for exactly the learners it was written for. The
+    // remaining commits are written and tested and not yet taken. This panel is
+    // built against the complete version and checks what the installed function
+    // declares before calling it, rather than trusting a version number.
+    // outcomemap_bridge::course_panel() renders nothing unless that function is
+    // registered, which means a site on 0.9.3 sees no panel at all rather than one
+    // that works for administrators and silently never appears for the learners it
+    // describes.
+    //
+    // Why it still ships off. Enabling it should be a deliberate act by somebody
+    // who then looks at the result, not something that happens by itself the day an
+    // unrelated plugin is upgraded. Both halves matter given the timing: this is
+    // the last production push of the year, so a feature absent from the code could
+    // not be switched on in January without another deploy, and a feature that
+    // switched itself on could not be assessed by anyone who was not expecting it.
+    // A checkbox is both the way in and the way out.
+    $settings->add(new admin_setting_configcheckbox(
+        'local_ai_course_assistant/outcomes_panel_enabled',
+        get_string('settings:outcomes_panel_enabled', 'local_ai_course_assistant'),
+        get_string('settings:outcomes_panel_enabled_desc', 'local_ai_course_assistant'),
+        0
+    ));
     $settings->add(new admin_setting_configtext(
         'local_ai_course_assistant/mastery_window',
         get_string('settings:mastery_window', 'local_ai_course_assistant'),

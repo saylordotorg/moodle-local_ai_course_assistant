@@ -189,7 +189,7 @@ final class outcomemap_bridge_test extends \advanced_testcase {
      * A state that carries no figure must never become a percentage.
      *
      * This is the assertion that matters most in this file. On the production
-     * degrees site 525 of 546 result rows are insufficient_evidence and 21 are
+     * degrees site 525 of 546 result rows were insufficient_evidence and 21 were
      * calculated. A reader that cast those to 0.0 would tell almost every learner
      * they scored zero on an outcome nobody has measured, which is the same defect
      * as scoring a Soapbox criterion zero because the camera was off, and it would
@@ -274,5 +274,392 @@ final class outcomemap_bridge_test extends \advanced_testcase {
         } else {
             $this->markTestSkipped('local_outcomemap is installed on this site.');
         }
+    }
+
+    /**
+     * The kill switch is off by default, and off means nothing renders.
+     *
+     * This is the assertion that makes shipping the feature safe. It goes to
+     * production in the last release of the year, on a code path that cannot
+     * currently work for learners, so the default has to be silence and the
+     * switch has to be the only thing that breaks it.
+     *
+     * @return void
+     */
+    public function test_the_panel_is_off_by_default(): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($user);
+
+        // Falsy rather than a specific value. get_config returns '' when the
+        // setting has never been written and '0' once install has applied the
+        // declared default, and both are the state this test is about; asserting
+        // one of the two spellings fails on whichever install order it did not
+        // expect, which is a broken test rather than a caught regression.
+        $this->assertEmpty(
+            get_config('local_ai_course_assistant', 'outcomes_panel_enabled'),
+            'The setting must be off on a fresh install. A default of on would put a panel in '
+                . 'front of every site running the outcomes plugin, the day their Outcome Map is '
+                . 'upgraded, with nobody expecting it.'
+        );
+        $this->assertNull(
+            outcomemap_bridge::course_panel((int) $user->id, (int) $course->id),
+            'With the switch off, course_panel must return null before it looks at anything else, '
+                . 'so an administrator can silence the feature without a deploy.'
+        );
+
+        // Same caveat as the gate test above: on a site with no attainment this
+        // returns null whether or not the switch is consulted, so the assertion
+        // alone does not prove the switch is wired. That it is consulted FIRST is
+        // asserted here, and that it silences a panel which does have data is
+        // asserted in outcomemap_integration_test, where there is data.
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $start = strpos($source, 'public static function course_panel(');
+        $switch = strpos($source, "get_config('local_ai_course_assistant', 'outcomes_panel_enabled')", $start);
+        $read = strpos($source, 'cached_attainment(', $start);
+
+        $this->assertNotFalse($switch, 'course_panel() no longer reads the kill switch.');
+        $this->assertLessThan(
+            $read,
+            $switch,
+            'The kill switch must be read before anything expensive, so turning it off costs one '
+                . 'setting change and takes effect on the next request.'
+        );
+    }
+
+    /**
+     * Switching it on does not by itself make a panel appear.
+     *
+     * The switch is permission to try, not a guarantee of output. The course must
+     * still participate in outcomes and the learner must still have attainment,
+     * so a site that enables it on a course with no outcome mapping still gets
+     * nothing rather than an empty box.
+     *
+     * @return void
+     */
+    public function test_enabling_it_still_respects_the_other_gates(): void {
+        $this->resetAfterTest();
+
+        set_config('outcomes_panel_enabled', 1, 'local_ai_course_assistant');
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($user);
+
+        $this->assertNull(
+            outcomemap_bridge::course_panel((int) $user->id, (int) $course->id),
+            'A bare course has no outcome mapping, so even with the switch on there is nothing to '
+                . 'show and null is the right answer.'
+        );
+    }
+
+    /**
+     * Without the learner-safe API the panel is hidden from everyone, staff included.
+     *
+     * This is the finding that nearly shipped. Attainment can be read two ways: the
+     * SIS export function, which needs a system capability administrators have and
+     * students do not, and the own-attainment function, which needs neither because
+     * it cannot be asked about anybody but its caller. If the panel gated only on
+     * "can attainment be read at all", then on a site running an older Outcome Map
+     * it would render for administrators and for nobody else, so the people
+     * checking whether the feature worked would be the only people it worked for.
+     *
+     * A feature that is invisible to its audience and visible to its reviewers is
+     * worse than one that is absent, because absence is noticed.
+     *
+     * @return void
+     */
+    public function test_without_the_learner_safe_api_nobody_sees_the_panel(): void {
+        $this->resetAfterTest();
+
+        if (outcomemap_bridge::own_attainment_available()) {
+            $this->markTestSkipped('This site has the learner-safe attainment API installed.');
+        }
+
+        set_config('outcomes_panel_enabled', 1, 'local_ai_course_assistant');
+
+        $course = $this->getDataGenerator()->create_course();
+        $admin = get_admin();
+        $this->setUser($admin);
+
+        $this->assertNull(
+            outcomemap_bridge::course_panel((int) $admin->id, (int) $course->id),
+            'An administrator holds the export capability and could be answered through the '
+                . 'privileged path, so this is exactly the caller who would see a panel that no '
+                . 'learner on the site can see. The gate must refuse them too.'
+        );
+
+        // The assertion above passes for two different reasons and only one of them
+        // is the gate: an administrator on a site with no seeded attainment gets
+        // null anyway, because there is nothing to report. Deleting the gate
+        // entirely would not fail it. So the gate is also asserted directly,
+        // against the source, and the two together mean something the behavioural
+        // half does not mean alone.
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $start = strpos($source, 'public static function course_panel(');
+        $gate = strpos($source, 'own_attainment_available()', $start);
+        $read = strpos($source, 'cached_attainment(', $start);
+
+        $this->assertNotFalse($gate, 'course_panel() no longer checks for the learner-safe API.');
+        $this->assertNotFalse($read, 'course_panel() no longer reads attainment; update this guard.');
+        $this->assertLessThan(
+            $read,
+            $gate,
+            'The learner-safe API check must come BEFORE the read, or a site on an older '
+                . 'Outcome Map answers administrators through the privileged path and shows them '
+                . 'a panel no learner can see.'
+        );
+    }
+
+    /**
+     * A learner is never answered through the privileged path.
+     *
+     * The tempting shortcut, when the learner-safe function is missing, is to call
+     * the export function on the learner's behalf because we have already checked
+     * that they are asking about themselves. That would make
+     * local/outcomemap:exportattainment mean nothing: the site would be granting
+     * through SOLA exactly what it withheld in Outcome Map. Empty is the answer.
+     *
+     * @return void
+     */
+    public function test_a_learner_is_not_answered_through_the_privileged_path(): void {
+        $this->resetAfterTest();
+
+        if (outcomemap_bridge::own_attainment_available()) {
+            $this->markTestSkipped('This site has the learner-safe attainment API installed.');
+        }
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->setUser($user);
+
+        $this->assertSame(
+            [],
+            outcomemap_bridge::attainment((int) $user->id),
+            'Asking about yourself is permission to be answered, not permission to be answered by '
+                . 'any means available.'
+        );
+    }
+
+    /**
+     * The learner-safe API is a strict subset of attainment being readable at all.
+     *
+     * Pins the relationship between the two availability checks rather than each
+     * one separately, so a later edit cannot leave course_panel gating on the
+     * narrower condition while attainment() routes on the wider one.
+     *
+     * @return void
+     */
+    public function test_the_learner_safe_api_implies_attainment_is_available(): void {
+        $this->resetAfterTest();
+
+        if (!outcomemap_bridge::own_attainment_available()) {
+            $this->assertTrue(true, 'Nothing to imply on a site without the learner-safe API.');
+            return;
+        }
+
+        $this->assertTrue(
+            outcomemap_bridge::attainment_available(),
+            'attainment_available() answers "can attainment be read by somebody", so it cannot be '
+                . 'false while the learner-safe reader is installed.'
+        );
+    }
+
+    /**
+     * Attainment is read by calling the function, not by calling the web service layer.
+     *
+     * external_api::call_external_function() is the HTTP and AJAX entry path, and
+     * for any login-required function outside a web service server it calls
+     * require_sesskey(). Whether that succeeds depends on whether the surrounding
+     * request happens to carry a sesskey parameter: it does when SOLA's mastery
+     * summary is fetched over AJAX, and it does not from cron, from CLI, or from a
+     * plain page render.
+     *
+     * So the wrapper turns an optional data source into one that works or returns
+     * nothing depending on how the page was reached, with the failure swallowed
+     * into debugging() either way. It cost an afternoon to find once, because in
+     * the only path anyone tested by hand the sesskey was there.
+     *
+     * A source-level assertion because the condition cannot be reproduced in a test:
+     * PHPUnit has no sesskey, so the wrapper fails here unconditionally and a
+     * behavioural test would pass for the wrong reason on the day somebody added
+     * one. Nothing is given up by going direct, since the capability and context
+     * checks live inside the function's own execute().
+     *
+     * @return void
+     */
+    public function test_attainment_does_not_go_through_the_web_service_wrapper(): void {
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $this->assertIsString($source);
+
+        // Every line that names the wrapper must be a comment explaining why it is
+        // not used. Asserting on lines rather than on the file lets the explanation
+        // name the thing it is about, which a plain "must not appear" assertion
+        // makes impossible.
+        $offenders = [];
+        foreach (explode("\n", $source) as $number => $line) {
+            if (strpos($line, 'call_external_function') !== false && strpos(ltrim($line), '//') !== 0) {
+                $offenders[] = ($number + 1) . ': ' . trim($line);
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offenders,
+            'Resolve the function through external_function_info() and call its classname and '
+                . 'methodname directly. See this test\'s docblock for the sesskey trap.'
+        );
+    }
+
+    /**
+     * The learner panel never asks a learner for an author's capability.
+     *
+     * This one nearly shipped twice. The panel exists because the only pooled
+     * attainment API needed local/outcomemap:exportattainment, which no student
+     * holds. The first version of the course gate then called fetch(), which
+     * requires local/outcomemap:viewdefinitions, granted to editing teachers and
+     * managers and NOT to students. So the workaround for the capability blocker
+     * contained a second copy of the capability blocker, and every learner would
+     * have been gated out by the check written to decide whether to show them
+     * anything.
+     *
+     * Reading a learner's own results and browsing the outcome catalogue are
+     * different rights and local_outcomemap says so with two capabilities. Anything
+     * in the learner path that touches the second is the bug, whatever it is
+     * checking for. Narrowing by course happens upstream now, where the
+     * program-to-course mapping lives.
+     *
+     * Source-level because the condition needs the third-party plugin installed and
+     * seeded to reproduce, and a behavioural test would silently pass on every CI
+     * job, which is every job.
+     *
+     * @return void
+     */
+    public function test_the_learner_panel_does_not_touch_the_definitions_capability(): void {
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $this->assertIsString($source);
+
+        $start = strpos($source, 'public static function course_panel(');
+        $this->assertNotFalse($start, 'course_panel() has been renamed; update this guard.');
+
+        // To the end of the method: the next method's docblock starts at column 5.
+        $end = strpos($source, "\n    /**", $start);
+        $body = $end === false ? substr($source, $start) : substr($source, $start, $end - $start);
+
+        $offenders = [];
+        foreach (explode("\n", $body) as $line) {
+            $code = ltrim($line);
+            if (strpos($code, '//') === 0 || strpos($code, '*') === 0) {
+                continue;
+            }
+            if (strpos($code, 'VIEW_CAPABILITY') !== false
+                    || strpos($code, 'viewdefinitions') !== false
+                    || preg_match('/\bself::fetch\s*\(/', $code)) {
+                $offenders[] = trim($line);
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offenders,
+            'course_panel() is the learner path. It must not read the outcome definitions, '
+                . 'directly or through fetch(), because local/outcomemap:viewdefinitions is an '
+                . 'author capability that students do not hold. Ask the upstream '
+                . 'own-attainment function to narrow by course instead.'
+        );
+    }
+
+    /**
+     * A registered function that cannot narrow by course does not count as available.
+     *
+     * The upstream plugin merged the first version of the learner-safe function
+     * without the course filter, so "the function exists" and "the function can
+     * answer the question this panel asks" came apart. Calling it anyway would not
+     * have raised: PHP discards surplus arguments to a userland function in
+     * silence, so the courseid would have vanished and every learner would have
+     * seen every programme they have results in, on every course they opened.
+     * The requirement was that the panel appears only where it means something,
+     * and that breaks it without a single line in any log.
+     *
+     * So availability is defined by the SHAPE the registry reports, not by the
+     * name being present. Source-level because reproducing it needs two different
+     * versions of a third-party plugin installed, which no CI job has.
+     *
+     * @return void
+     */
+    public function test_availability_depends_on_the_signature_not_just_the_name(): void {
+        $source = file_get_contents(__DIR__ . '/../classes/outcomemap_bridge.php');
+        $this->assertIsString($source);
+
+        $start = strpos($source, 'public static function own_attainment_available(');
+        $this->assertNotFalse($start, 'own_attainment_available() has been renamed.');
+        $end = strpos($source, "\n    /**", $start);
+        $body = $end === false ? substr($source, $start) : substr($source, $start, $end - $start);
+
+        $this->assertStringNotContainsString(
+            'ws_registered(',
+            $body,
+            'own_attainment_available() must not answer "is the name registered". It has to ask '
+                . 'what the installed function declares, because a version without courseid '
+                . 'would drop the argument in silence and widen the panel to every programme.'
+        );
+        $this->assertStringContainsString(
+            'own_attainment_takes_a_course()',
+            $body,
+            'Availability is decided by the signature the registry reports.'
+        );
+
+        // The helper is three-state on purpose: null for absent, false for
+        // present but unable to narrow by course, true for usable. The first
+        // version of this method compared with !== null, which reads the false
+        // case as a yes, so the panel rendered against an upstream that would
+        // silently drop the course filter. That is exactly the failure the helper
+        // was added to prevent, written into the line that was supposed to
+        // prevent it, and the text-matching half of this test did not notice
+        // because the method name was present either way.
+        $this->assertStringContainsString(
+            'own_attainment_takes_a_course() === true',
+            $body,
+            'Compare with === true. A three-state helper checked for "not null" treats "present '
+                . 'but unusable" as available.'
+        );
+        // Code lines only. The comment above the return explains why "!== null" is
+        // wrong, so a check against the whole method would flag the explanation
+        // along with the mistake, which is how the earlier prose guard in
+        // external_return_semantics_test went wrong before it was taught the
+        // difference between making a claim and correcting one.
+        $code = [];
+        foreach (explode("\n", $body) as $line) {
+            $trimmed = ltrim($line);
+            if ($trimmed === '' || strpos($trimmed, '//') === 0 || strpos($trimmed, '*') === 0) {
+                continue;
+            }
+            $code[] = $trimmed;
+        }
+
+        $this->assertStringNotContainsString(
+            '!== null',
+            implode("\n", $code),
+            'Never decide availability by "not null" here; see the assertion above.'
+        );
+
+        // And the call site must not pass an argument the installed function has
+        // not declared.
+        // Bounded at the next docblock, like $body above. Running to the end of the
+        // file would let this pass because "=== true" appears somewhere later,
+        // which is not the same as it appearing in attainment().
+        $attainmentat = strpos($source, 'public static function attainment(');
+        $this->assertNotFalse($attainmentat, 'attainment() has been renamed; update this guard.');
+        $attainmentend = strpos($source, "\n    /**", $attainmentat);
+        $callsite = $attainmentend === false
+            ? substr($source, $attainmentat)
+            : substr($source, $attainmentat, $attainmentend - $attainmentat);
+        $this->assertStringContainsString(
+            'own_attainment_takes_a_course() === true',
+            $callsite,
+            'attainment() must decide its argument list from the installed signature.'
+        );
     }
 }
