@@ -180,6 +180,36 @@ mistake costs nothing. And when a guard needs a failing input, build that
 input somewhere disposable ($CLAUDE_JOB_DIR/tmp) rather than in the tree the
 work lives in.
 
+## Commit messages: prefix plugin-directory work with CONTRIB-10574
+
+Anything that touches the Moodle plugin-directory review starts the subject with
+`CONTRIB-10574 `, following the Jira convention:
+
+```
+git commit -m "CONTRIB-10574 Standardise the sessionless endpoint marker"
+```
+
+That covers reviewer findings, the README and version sync, the sessionless
+endpoint markers, Marketplace listing copy, and anything else whose reason for
+existing is the approval ticket. It does NOT cover ordinary feature work that
+happens to ship in the same release; a key on a commit that is not about the
+ticket makes the ticket's commit list misleading.
+
+Two caveats worth knowing before relying on it:
+
+The key is for humans and for grep. moodle.atlassian.net is Moodle's Jira, not
+Saylor's, and it is not connected to this GitHub repository, so Jira's
+development panel will not auto-detect these commits however they are worded.
+The automatic linking described in Atlassian's docs needs the repo connected on
+their side.
+
+Do not retrofit the key onto commits that are already pushed. Every commit since
+v7.5.2 is tagged or published, so rewriting a message changes the SHA, breaks
+both release tags, and invalidates the commit hash already sent to Catalyst in a
+deploy request. This was attempted on 2026-09-25, caught before any force-push,
+and reverted. The durable alternative is a comment on the ticket listing the
+commits with permalinks, which also carries the nuance a prefix cannot.
+
 ## Committing: never split lang/en from the code that references it
 
 A commit that adds a `get_string()` / `branding::str()` call must carry the
