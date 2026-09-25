@@ -1,0 +1,31 @@
+Version 7.5.4 (build 2026092500)
+
+A single-defect release. The help panel was printing internal engineering notes to learners, and had been since v7.4.7.
+
+FIXED: THE HELP PANEL SHOWED INTERNAL COMMENTS
+
+A Mustache comment ends at the first closing brace pair it meets, not at a matching one. The comment above the help panel quoted a template tag inline, while explaining why that tag could not be used there, so the comment ended at that point. The remaining nine lines rendered to the page as body text: a paragraph about language switching, on-demand string fetching and bundle size, ending in a stray brace pair, immediately above the real first line of the help text.
+
+Anyone who pressed the question-mark button in the assistant header saw it.
+
+Nothing in the build could have caught this. The Mustache linter checks syntax, and the template is syntactically valid; the comment simply ends earlier than its author intended, and everything after it is ordinary template text as far as a parser is concerned. A new test now scans every template and fails the build on any comment truncated by a tag written inside it. The fix is to describe tags in words rather than writing them, and the comment now opens by saying so.
+
+The defect was introduced in 7.4.7 and was present in every release through 7.5.3.
+
+EVERYTHING ELSE
+
+Unchanged from 7.5.3. That release added a learner-facing program outcomes panel reading from the Outcome Map plugin, translated 36,423 strings across the 45 non-English locales, and corrected a set of claims the code had been asserting in comments without anything checking them.
+
+UPGRADE NOTES
+
+No action required. No database change, no new setting, no upgrade step.
+
+TESTING
+
+Full PHPUnit suite green: 1791 tests, 7557 assertions, 7 skipped.
+Security validator suite 36 of 36.
+All three tests/js guards pass.
+PHP lint clean; all 46 lang files parse.
+The seven skips need a sufficient Outcome Map installed. A skip there is not a pass.
+
+Requires Moodle 4.5 or later.

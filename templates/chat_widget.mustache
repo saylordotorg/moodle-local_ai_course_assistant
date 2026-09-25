@@ -372,10 +372,19 @@
             <h4 style="margin:0;font-size:16px" data-help-key="help:title">{{help_title}}</h4>
             <button class="aica-help-panel__close" type="button" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px" aria-label="{{#str}}help:close, local_ai_course_assistant{{/str}}">&times;</button>
         </div>
-        {{! Every text node here carries data-help-key so chat.js can refetch it
+        {{!
+            NOTHING IN A MUSTACHE COMMENT MAY CONTAIN A DOUBLE BRACE. The comment
+            ends at the first closing pair it meets, so an example tag written
+            inline here terminates it early and the remaining prose renders to the
+            learner as body text. That is exactly what happened to this comment:
+            it named the str helper in tag form, ended there, and printed nine
+            lines of internal notes at the top of the help panel. Describe tags in
+            words instead.
+
+            Every text node below carries data-help-key so chat.js can refetch it
             in the language the learner picked inside the widget. Server-side
-            rendering alone is not enough: {{#str}} and the pre-rendered values
-            below are both resolved once, in the PAGE language, and the in-widget
+            rendering alone is not enough: the str helper and the pre-rendered
+            values are both resolved once, in the PAGE language, and the in-widget
             language switch never reloads the page. The panel therefore stayed in
             the page language while the rest of the UI switched (reported after
             v7.4.1). The keys are fetched on demand rather than bundled into
@@ -383,12 +392,13 @@
             roughly 57KB to a file that loads on every course page, for a panel
             most learners never open.
 
-            help_title / help_intro / help_start_body / help_plans_body /
-            help_languages_body / help_data_download are pre-rendered in
-            hook_callbacks: they carry a brand name (a $a placeholder or a
-            [[tutorshort]] token) which the str helper cannot resolve.
-            Triple-stache only where the string contains markup (strong
-            tags); the $a values are escaped server-side. }}
+            help_title, help_intro, help_start_body, help_plans_body,
+            help_languages_body and help_data_download are pre-rendered in
+            hook_callbacks: they carry a brand name (a placeholder or a
+            tutorshort token) which the str helper cannot resolve. Unescaped
+            output only where the string genuinely carries markup; those values
+            are escaped server-side.
+        }}
         <p data-help-key="help:intro" data-help-html="1">{{{help_intro}}}</p>
         <h5 style="margin:14px 0 6px;font-size:14px" data-help-key="help:start_title">{{#str}}help:start_title, local_ai_course_assistant{{/str}}</h5>
         <p data-help-key="help:start_body">{{help_start_body}}</p>
