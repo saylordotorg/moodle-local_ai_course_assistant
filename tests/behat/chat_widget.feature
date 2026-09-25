@@ -48,6 +48,7 @@ Feature: AI Course Assistant widget
     And I am on "Test Course" course homepage
     When I click on "#local-ai-course-assistant-toggle" "css_element"
     Then "#local-ai-course-assistant-drawer" "css_element" should be visible
+    And "#local-ai-course-assistant-drawer" should not leak template syntax
     When I press the escape key
     Then "#local-ai-course-assistant-drawer" "css_element" should not be visible
 

@@ -34,6 +34,7 @@ Feature: SOLA drawer interactions beyond send-receive
     When I click on "#local-ai-course-assistant-toggle" "css_element"
     And I click on ".local-ai-course-assistant__btn-settings-panel" "css_element"
     Then ".aica-settings-panel, .local-ai-course-assistant__settings-panel" "css_element" should be visible
+    And ".aica-settings-panel, .local-ai-course-assistant__settings-panel" should not leak template syntax
 
   @javascript
   Scenario: Reset (home) icon shows starters without clearing message history
@@ -63,6 +64,13 @@ Feature: SOLA drawer interactions beyond send-receive
     When I click on "#local-ai-course-assistant-toggle" "css_element"
     And I click on ".local-ai-course-assistant__btn-help" "css_element"
     Then ".aica-help-panel" "css_element" should be visible
+    # "Should be visible" is what this scenario asserted from v5.3 until
+    # v7.5.4, and it passed for the seven weeks the panel was showing the
+    # learner nine lines of our own engineering notes. Visible it was. These
+    # two steps say what may NOT appear, which is the half that catches
+    # anything.
+    And ".aica-help-panel" should not leak template syntax
+    And ".aica-help-panel" should contain readable text
 
   @javascript
   Scenario: A second send-receive cycle with the stub provider works after reset
@@ -81,3 +89,24 @@ Feature: SOLA drawer interactions beyond send-receive
     And I click on ".local-ai-course-assistant__btn-send" "css_element"
     Then I should see "First message" in the ".local-ai-course-assistant__messages" "css_element"
     And I should see "Second message" in the ".local-ai-course-assistant__messages" "css_element"
+
+  @javascript
+  Scenario: Every panel a learner can open is free of template artefacts
+    # The bottom-nav panels, Progress and History, are reachable by any learner
+    # and were reached by no scenario until v7.5.4. The help panel was in the
+    # same position: it HAD a scenario, which asserted only that it was visible,
+    # and it stayed green through seven weeks of showing internal notes.
+    #
+    # This walks the learner-reachable surfaces and asserts the thing that is
+    # cheap to check and expensive to miss: no Mustache tag, no unresolved
+    # branding token, no unsubstituted placeholder, no raw string key.
+    Given I log in as "student1"
+    And I am on "Test Course" course homepage
+    When I click on "#local-ai-course-assistant-toggle" "css_element"
+    Then "#local-ai-course-assistant-drawer" should not leak template syntax
+    And I click on "[data-mode=\"progress\"]" "css_element"
+    And ".local-ai-course-assistant__progress-panel" should not leak template syntax
+    And I click on "[data-mode=\"history\"]" "css_element"
+    And ".local-ai-course-assistant__history-panel" should not leak template syntax
+    And I click on "[data-mode=\"chat\"]" "css_element"
+    And ".local-ai-course-assistant__starters" should not leak template syntax
