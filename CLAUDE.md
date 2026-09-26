@@ -162,6 +162,42 @@ Tabs: Chat, Voice (`{{#voicetabenabled}}`), History, Progress. **Re-clicking the
 
 ---
 
+## Proving a test can fail: use scripts/prove_test.py, never a bare rsync
+
+A test that cannot fail is decoration. Prove it by planting the defect and
+watching it go red, and do that through `scripts/prove_test.py`:
+
+```
+python3 scripts/prove_test.py \
+    --file classes/external/generate_quiz.php \
+    --find "require_capability('local/ai_course_assistant:use', $context);" \
+    --replace "" \
+    --filter quiz_learner_journey_test::test_a_learner_without_the_use_capability_is_refused_the_quiz
+```
+
+Exit 0 means caught, 1 means the test does NOT pin that defect, 2 means the run
+was inconclusive and must not be reported either way.
+
+Do not hand-roll this with `rsync --delete`. On 2026-09-25 three agents proved
+mutations in parallel against the one Moodle tree and produced a FALSE PASS: one
+agent's revert wiped another's planted defect between applying it and phpunit
+loading the file, so phpunit compiled clean code and reported OK. The agent
+nearly recorded "this test does not catch that defect" about a test that catches
+it perfectly. The failure is silent and it lies in both directions, so it can
+also make a broken test look proven.
+
+The script takes an exclusive flock for the whole cycle, re-checks that the
+mutation is still on disk after phpunit exits (discarding the verdict if it is
+not, which catches a process that never took the lock), and reverts only the one
+file it touched rather than the whole plugin. It also refuses to return a verdict
+when the --find text is absent, or when the filter matched no tests, because
+phpunit reports "No tests executed!" as success and that is the same shape as a
+silent pass.
+
+Moodle's phpunit also serialises on its own lock and prints "Waiting for other
+test execution to complete..." while it does. Seeing that line is a sign another
+run is in flight; the script handles it, but a hand-rolled loop will not.
+
 ## Verifying a guard: mutate a COPY, never the tracked tree
 
 To prove a new test catches its defect, plant the defect in a temporary copy
