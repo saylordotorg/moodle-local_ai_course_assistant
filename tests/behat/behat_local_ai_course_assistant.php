@@ -111,4 +111,95 @@ class behat_local_ai_course_assistant extends behat_base {
             );
         }
     }
+
+    /**
+     * POST an audio clip of a given size to transcribe.php and remember the status.
+     *
+     * WHY THIS IS A BEHAT STEP AND NOT A UNIT TEST. transcribe.php declares
+     * AJAX_SCRIPT and gates on is_uploaded_file(), so PHPUnit cannot enter it:
+     * there is no uploaded file in a CLI process and the script terminates before
+     * anything testable runs. The unit tests therefore assert that the size guard
+     * is PRESENT, complete and ordered ahead of the provider call, by reading the
+     * source. That is worth having, and it is not the same claim as "the request
+     * stops here".
+     *
+     * It matters which claim you have. Deleting only the `exit;` from the guard
+     * body leaves every source assertion intact while the defect is fully live: an
+     * oversized clip reaches the transcription provider and is billed, and the
+     * provider's JSON refusal comes back to the learner base64-encoded as audio
+     * that decodes to silence.
+     *
+     * A real browser closes that gap. The fetch below carries the session cookie
+     * and the page's sesskey, so the request satisfies require_login(),
+     * require_sesskey() and require_capability() and reaches the guard the way a
+     * learner's recording does.
+     *
+     * @When /^I post a (?P<bytes>\d+) byte audio clip to the transcription endpoint$/
+     * @param int $bytes Size of the synthetic clip.
+     * @throws ExpectationException
+     */
+    public function i_post_an_audio_clip_of_size(int $bytes): void {
+        $script = <<<JS
+            window.__solaProbeStatus = null;
+            (function () {
+                var body = new Blob([new Uint8Array($bytes)], {type: 'audio/webm'});
+                var form = new FormData();
+                form.append('audio', body, 'probe.webm');
+                form.append('sesskey', M.cfg.sesskey);
+                form.append('courseid', M.cfg.courseId || 0);
+                form.append('lang', 'en');
+                fetch(M.cfg.wwwroot + '/local/ai_course_assistant/transcribe.php', {
+                    method: 'POST', body: form, credentials: 'same-origin'
+                }).then(function (r) {
+                    window.__solaProbeStatus = r.status;
+                }).catch(function () {
+                    window.__solaProbeStatus = -1;
+                });
+            })();
+JS;
+        $this->getSession()->executeScript($script);
+
+        // Poll rather than sleep: a large upload over a local socket is fast but
+        // not instant, and a fixed wait is either flaky or slow.
+        $deadline = time() + 30;
+        do {
+            $status = $this->getSession()->evaluateScript('return window.__solaProbeStatus;');
+            if ($status !== null) {
+                return;
+            }
+            usleep(200000);
+        } while (time() < $deadline);
+
+        throw new ExpectationException(
+            'The transcription endpoint did not answer within 30 seconds. That is not a pass: '
+                . 'the guard under test refuses in well under a second, so no answer means the '
+                . 'request went somewhere it should not have.',
+            $this->getSession()
+        );
+    }
+
+    /**
+     * Assert the status the endpoint actually returned.
+     *
+     * @Then /^the transcription endpoint should have refused with (?P<code>\d+)$/
+     * @param int $code Expected HTTP status.
+     * @throws ExpectationException
+     */
+    public function the_transcription_endpoint_should_have_refused_with(int $code): void {
+        $status = (int) $this->getSession()->evaluateScript('return window.__solaProbeStatus;');
+
+        if ($status === $code) {
+            return;
+        }
+
+        $meaning = $status === 200
+            ? 'The clip was ACCEPTED. The size guard did not stop the request, so this audio '
+                . 'reached the transcription provider and was billed.'
+            : 'Expected ' . $code . ' from the size guard.';
+
+        throw new ExpectationException(
+            $meaning . ' Got HTTP ' . $status . '.',
+            $this->getSession()
+        );
+    }
 }
